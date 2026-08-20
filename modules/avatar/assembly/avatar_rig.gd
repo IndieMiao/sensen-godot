@@ -7,7 +7,7 @@ signal part_load_failed(slot: StringName, part_id: String, err: int)
 
 @export var slot_table: AvatarSlotTable
 var skeleton: Skeleton3D
-var assembler: AvatarAssembler = AvatarAssemblerDirect.new()
+var assembler: AvatarAssembler = AvatarAssemblerMerged.new()
 var loader: PartLoader
 
 var _current: Dictionary = {}      # slot -> part_id（已应用）
