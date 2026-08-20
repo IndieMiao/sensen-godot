@@ -1,0 +1,11 @@
+{
+	"version": 1,
+	"parts": [
+		{ "id": "fx_cloth_a", "slot": "cloth", "attach": "mesh", "tier": 0, "pack": "builtin",
+		  "res": "res://tests/fixtures/parts/fx_cloth_a.tres", "thumb": "", "unity_guid": "aa" },
+		{ "id": "fx_cloth_b", "slot": "cloth", "attach": "mesh", "tier": 0, "pack": "builtin",
+		  "res": "res://tests/fixtures/parts/fx_cloth_b.tres", "thumb": "", "unity_guid": "bb" },
+		{ "id": "fx_glass_a", "slot": "glass", "attach": "socket", "tier": 0, "pack": "builtin",
+		  "res": "res://tests/fixtures/parts/fx_glass_a.tres", "thumb": "", "unity_guid": "cc" }
+	]
+}
