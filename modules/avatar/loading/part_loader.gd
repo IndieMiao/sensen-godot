@@ -9,7 +9,7 @@ var cache: PartCache
 var content_repo: ContentRepo = ContentRepo.new()
 
 var _next_id := 1
-var _by_path: Dictionary = {}   # res_path -> {part_id: String, waiters: Array[int]}
+var _by_path: Dictionary = {}   # res_path -> {waiters: Array[{rid: int, part_id: String}]}
 var _cancelled: Dictionary = {} # request_id -> true
 
 func request_part(part_id: String) -> int:
@@ -29,13 +29,13 @@ func request_part(part_id: String) -> int:
 			call_deferred("_deliver", rid, part_id, hit)
 			return rid
 	if _by_path.has(meta.res_path):
-		_by_path[meta.res_path].waiters.append(rid)
+		_by_path[meta.res_path].waiters.append({"rid": rid, "part_id": part_id})
 		return rid
 	var err := ResourceLoader.load_threaded_request(meta.res_path)
 	if err != OK:
 		call_deferred("_fail", rid, part_id, err)
 		return rid
-	_by_path[meta.res_path] = {"part_id": part_id, "waiters": [rid]}
+	_by_path[meta.res_path] = {"waiters": [{"rid": rid, "part_id": part_id}]}
 	set_process(true)
 	return rid
 
@@ -55,12 +55,16 @@ func _process(_delta: float) -> void:
 		if status == ResourceLoader.THREAD_LOAD_LOADED:
 			var res := ResourceLoader.load_threaded_get(path)
 			if cache:
-				cache.put(entry.part_id, res, PartCache.estimate_resource_bytes(path))
-			for rid in entry.waiters:
-				_deliver(rid, entry.part_id, res)
+				var cached_parts: Dictionary = {}
+				for w in entry.waiters:
+					if not cached_parts.has(w.part_id):
+						cache.put(w.part_id, res, PartCache.estimate_resource_bytes(path))
+						cached_parts[w.part_id] = true
+			for w in entry.waiters:
+				_deliver(w.rid, w.part_id, res)
 		else:
-			for rid in entry.waiters:
-				_fail(rid, entry.part_id, ERR_CANT_ACQUIRE_RESOURCE)
+			for w in entry.waiters:
+				_fail(w.rid, w.part_id, ERR_CANT_ACQUIRE_RESOURCE)
 
 func _deliver(rid: int, part_id: String, res: Resource) -> void:
 	if _cancelled.erase(rid):

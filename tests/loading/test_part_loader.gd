@@ -63,3 +63,45 @@ func test_concurrent_same_part_merged() -> void:
 		await get_tree().process_frame
 	assert_int(finished.size()).is_equal(2)
 	assert_bool(r1 != r2).is_true()
+
+func test_shared_res_path_per_part_id() -> void:
+	var manifest_text = """
+	{
+		"version": 1,
+		"parts": [
+			{ "id": "sh_a", "slot": "shared", "attach": "mesh", "tier": 0, "pack": "builtin",
+			  "res": "res://tests/fixtures/parts/fx_cloth_a.tres", "thumb": "", "unity_guid": "aa" },
+			{ "id": "sh_b", "slot": "shared", "attach": "mesh", "tier": 0, "pack": "builtin",
+			  "res": "res://tests/fixtures/parts/fx_cloth_a.tres", "thumb": "", "unity_guid": "bb" }
+		]
+	}
+	"""
+	var manifest_path = "user://test_manifest_shared.json"
+	var file = FileAccess.open(manifest_path, FileAccess.WRITE)
+	file.store_string(manifest_text)
+	file = null
+
+	loader.catalog = PartCatalog.load_from_file(manifest_path)
+
+	var r1 := loader.request_part("sh_a")
+	var r2 := loader.request_part("sh_b")
+
+	for i in 300:
+		if finished.size() >= 2:
+			break
+		await get_tree().process_frame
+
+	assert_int(finished.size()).is_equal(2)
+	# Find the signals by rid to check part_ids
+	var sig_a = finished.filter(func(s): return s[0] == r1)
+	var sig_b = finished.filter(func(s): return s[0] == r2)
+	assert_int(sig_a.size()).is_equal(1)
+	assert_int(sig_b.size()).is_equal(1)
+	assert_str(sig_a[0][1]).is_equal("sh_a")
+	assert_str(sig_b[0][1]).is_equal("sh_b")
+	# Both should be cached separately
+	assert_object(loader.cache.get_part("sh_a")).is_not_null()
+	assert_object(loader.cache.get_part("sh_b")).is_not_null()
+
+	# Cleanup
+	DirAccess.remove_absolute(manifest_path)
