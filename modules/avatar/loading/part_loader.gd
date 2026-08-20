@@ -63,6 +63,8 @@ func _process(_delta: float) -> void:
 			for w in entry.waiters:
 				_deliver(w.rid, w.part_id, res)
 		else:
+			# 取走失败的加载令牌，释放引擎内部句柄（否则 ObjectDB 泄漏）
+			var _discard := ResourceLoader.load_threaded_get(path)
 			for w in entry.waiters:
 				_fail(w.rid, w.part_id, ERR_CANT_ACQUIRE_RESOURCE)
 
