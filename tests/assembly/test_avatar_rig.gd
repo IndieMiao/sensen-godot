@@ -114,3 +114,29 @@ func test_unequip_optional_clears_socket() -> void:
 	for i in 60:
 		await get_tree().process_frame
 	assert_object(rig.skeleton.get_node_or_null("socket_glass")).is_null()
+
+func test_initial_required_failure_falls_back_wrong_type() -> void:
+	var fails := []
+	var cb := func(s, p, e): fails.append([s, p, e])
+	rig.part_load_failed.connect(cb)
+	var cfg := AvatarConfig.new()
+	cfg.slots[&"cloth"] = "fx_wrongtype"
+	rig.apply_config(cfg)
+	await _await_signal(rig.config_applied, 600)
+	rig.part_load_failed.disconnect(cb)
+	assert_bool(rig.visible).is_true()
+	assert_str(rig.current_config().slots[&"cloth"]).is_equal("fx_mesh_cloth")
+	assert_int(fails.size()).is_greater(0)
+
+func test_initial_required_failure_falls_back_load_error() -> void:
+	var fails := []
+	var cb := func(s, p, e): fails.append([s, p, e])
+	rig.part_load_failed.connect(cb)
+	var cfg := AvatarConfig.new()
+	cfg.slots[&"cloth"] = "fx_broken"
+	rig.apply_config(cfg)
+	await _await_signal(rig.config_applied, 600)
+	rig.part_load_failed.disconnect(cb)
+	assert_bool(rig.visible).is_true()
+	assert_str(rig.current_config().slots[&"cloth"]).is_equal("fx_mesh_cloth")
+	assert_int(fails.size()).is_greater(0)

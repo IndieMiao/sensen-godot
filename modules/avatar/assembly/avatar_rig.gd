@@ -78,8 +78,7 @@ func _on_load_finished(request_id: int, part_id: String, resource: Resource) -> 
 	_slot_request.erase(slot)
 	var def := resource as AvatarPartDef
 	if def == null:
-		part_load_failed.emit(slot, part_id, ERR_INVALID_DATA)
-		_try_apply()
+		_handle_slot_failure(slot, part_id, ERR_INVALID_DATA)
 		return
 	_pending_defs[slot] = def
 	_try_apply()
@@ -90,6 +89,9 @@ func _on_load_failed(request_id: int, part_id: String, err: int) -> void:
 		return
 	_req_slot.erase(request_id)
 	_slot_request.erase(slot)
+	_handle_slot_failure(slot, part_id, err)
+
+func _handle_slot_failure(slot: StringName, part_id: String, err: int) -> void:
 	part_load_failed.emit(slot, part_id, err)
 	var sdef := slot_table.slot(slot)
 	if sdef and sdef.required and part_id != sdef.default_part and sdef.default_part != "":
