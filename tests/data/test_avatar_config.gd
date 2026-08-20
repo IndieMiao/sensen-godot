@@ -20,5 +20,4 @@ func test_changed_slots() -> void:
 	var a := AvatarConfig.new(); a.slots[&"cloth"] = "cloth1"; a.slots[&"shoes"] = "shoes1"
 	var b := AvatarConfig.new(); b.slots[&"cloth"] = "cloth2"; b.slots[&"shoes"] = "shoes1"; b.slots[&"glass"] = "glass1"
 	var changed := a.changed_slots(b)
-	changed.sort()
-	assert_array(changed).contains_exactly([&"cloth", &"glass"])
+	assert_array(changed).contains_exactly_in_any_order([&"cloth", &"glass"])
