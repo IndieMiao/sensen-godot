@@ -100,4 +100,5 @@ func test_rebuild_creates_single_mesh_instance() -> void:
 	assert_int(((skel.get_node("merged_mesh") as MeshInstance3D).mesh as ArrayMesh).get_surface_count()).is_equal(1)
 
 func test_default_assembler_is_merged() -> void:
-	assert_bool(AvatarRig.new().assembler is AvatarAssemblerMerged).is_true()
+	var rig: AvatarRig = auto_free(AvatarRig.new())
+	assert_bool(rig.assembler is AvatarAssemblerMerged).is_true()
