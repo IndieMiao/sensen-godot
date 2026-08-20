@@ -1,0 +1,106 @@
+[gd_resource type="Resource" script_class="AvatarSlotTable" load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://modules/avatar/data/slot_table.gd" id="1"]
+[ext_resource type="Script" path="res://modules/avatar/data/slot_def.gd" id="2"]
+
+[sub_resource type="Resource" id="s01"]
+script = ExtResource("2")
+slot_name = &"body"
+attach_bone = "Root_M"
+required = true
+default_part = "body00"
+
+[sub_resource type="Resource" id="s02"]
+script = ExtResource("2")
+slot_name = &"eyes"
+attach_bone = "Head_M"
+required = true
+default_part = "eyes00"
+
+[sub_resource type="Resource" id="s03"]
+script = ExtResource("2")
+slot_name = &"hairHat"
+attach_bone = "Head_M"
+required = true
+default_part = "hairhat00"
+
+[sub_resource type="Resource" id="s04"]
+script = ExtResource("2")
+slot_name = &"cloth"
+attach_bone = "Spine1_M"
+required = true
+default_part = "cloth00"
+
+[sub_resource type="Resource" id="s05"]
+script = ExtResource("2")
+slot_name = &"shoes"
+attach_bone = "Root_M"
+required = true
+default_part = "shoes00"
+
+[sub_resource type="Resource" id="s06"]
+script = ExtResource("2")
+slot_name = &"shoulderBag"
+attach_bone = "Chest_M"
+required = false
+default_part = ""
+
+[sub_resource type="Resource" id="s07"]
+script = ExtResource("2")
+slot_name = &"messengerBag"
+attach_bone = "Chest_M"
+required = false
+default_part = ""
+
+[sub_resource type="Resource" id="s08"]
+script = ExtResource("2")
+slot_name = &"pocketBag"
+attach_bone = "RootPart1_M"
+required = false
+default_part = ""
+
+[sub_resource type="Resource" id="s09"]
+script = ExtResource("2")
+slot_name = &"backpack"
+attach_bone = "Chest_M"
+required = false
+default_part = ""
+
+[sub_resource type="Resource" id="s10"]
+script = ExtResource("2")
+slot_name = &"headset"
+attach_bone = "Head_M"
+required = false
+default_part = ""
+
+[sub_resource type="Resource" id="s11"]
+script = ExtResource("2")
+slot_name = &"handleft"
+attach_bone = "Wrist_L"
+required = false
+default_part = ""
+
+[sub_resource type="Resource" id="s12"]
+script = ExtResource("2")
+slot_name = &"handright"
+attach_bone = "Wrist_R"
+required = false
+default_part = ""
+
+[sub_resource type="Resource" id="s13"]
+script = ExtResource("2")
+slot_name = &"mask"
+attach_bone = "Head_M"
+required = false
+default_part = ""
+
+[sub_resource type="Resource" id="s14"]
+script = ExtResource("2")
+slot_name = &"glass"
+attach_bone = "Head_M"
+required = false
+default_part = ""
+
+[resource]
+script = ExtResource("1")
+slots = [SubResource("s01"), SubResource("s02"), SubResource("s03"), SubResource("s04"), SubResource("s05"), SubResource("s06"), SubResource("s07"), SubResource("s08"), SubResource("s09"), SubResource("s10"), SubResource("s11"), SubResource("s12"), SubResource("s13"), SubResource("s14")]
