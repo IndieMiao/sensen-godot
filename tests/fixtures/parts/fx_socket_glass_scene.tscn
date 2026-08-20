@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3]
+
+[sub_resource type="BoxMesh" id="m1"]
+size = Vector3(0.05, 0.05, 0.05)
+
+[node name="FxGlass" type="MeshInstance3D"]
+mesh = SubResource("m1")

@@ -1,0 +1,9 @@
+{
+	"version": 1,
+	"parts": [
+		{ "id": "fx_mesh_cloth",  "slot": "cloth", "attach": "mesh",   "res": "res://tests/fixtures/parts/fx_mesh_cloth.tres" },
+		{ "id": "fx_mesh_cloth2", "slot": "cloth", "attach": "mesh",   "res": "res://tests/fixtures/parts/fx_mesh_cloth2.tres" },
+		{ "id": "fx_socket_glass","slot": "glass", "attach": "socket", "res": "res://tests/fixtures/parts/fx_socket_glass.tres" },
+		{ "id": "fx_broken",      "slot": "mask",  "attach": "mesh",   "res": "res://tests/fixtures/parts/does_not_exist.tres" }
+	]
+}

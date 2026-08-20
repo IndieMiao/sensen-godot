@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AvatarPartDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://modules/avatar/assembly/part_def.gd" id="1"]
+[ext_resource type="PackedScene" path="res://tests/fixtures/parts/fx_socket_glass_scene.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "fx_socket_glass"
+slot = &"glass"
+attach = "socket"
+scene = ExtResource("2")

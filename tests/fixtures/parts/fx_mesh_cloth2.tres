@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AvatarPartDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://modules/avatar/assembly/part_def.gd" id="1"]
+
+[sub_resource type="BoxMesh" id="m1"]
+size = Vector3(0.3, 0.3, 0.3)
+
+[resource]
+script = ExtResource("1")
+id = "fx_mesh_cloth2"
+slot = &"cloth"
+attach = "mesh"
+mesh = SubResource("m1")
