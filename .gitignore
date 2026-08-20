@@ -5,3 +5,4 @@ tools/unity_export/__pycache__/
 tools/unity_export/**/__pycache__/
 tools/unity_export/out/
 *.swp
+reports/

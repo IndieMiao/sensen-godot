@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<testsuites id="2026-08-21" name="report_2" tests="2" failures="0" skipped="0" flaky="0" time="0.000">
-	<testsuite id="0" name="test_smoke" package="tests" timestamp="2026-08-20T17:29:58" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="0.011">
-		<testcase name="test_project_boots" classname="test_smoke" time="0.001">
-		</testcase>
-		<testcase name="test_renderer_is_mobile" classname="test_smoke" time="0.001">
-		</testcase>
-	</testsuite>
-</testsuites>
