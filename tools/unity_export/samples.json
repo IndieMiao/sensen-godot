@@ -1,0 +1,14 @@
+{
+  "base_parts": ["ap_body00", "ap_eyes00", "ap_hairHat00", "ap_cloth00", "ap_shoes00", "ap_glass00"],
+  "parts": [
+    { "asset": "ap_cloth1",        "tier": 0 },
+    { "asset": "ap_cloth1_1",      "tier": 0 },
+    { "asset": "ap_shoes1",        "tier": 0 },
+    { "asset": "ap_glass1",        "tier": 0 },
+    { "asset": "ap_messengerBag1", "tier": 0 },
+    { "asset": "ap_cloth87",       "tier": 0 },
+    { "asset": "ap_hairHat20",     "tier": 0 },
+    { "asset": "ap_hairHat37",     "tier": 1 },
+    { "asset": "ap_hairHat101",    "tier": 2 }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "cloth0": {
+    "fbx": "/Volumes/ACASIS/projects/sensen-unity/Assets/_Gensen/Characters/BaseCharacter/Models/SK_DtBase.fbx",
+    "folder": "/Volumes/ACASIS/projects/sensen-unity/Assets/_Gensen/Characters/BaseCharacter/Texture"
+  },
+  "shoes0": {
+    "fbx": "/Volumes/ACASIS/projects/sensen-unity/Assets/_Gensen/Characters/BaseCharacter/Models/SK_DtBase.fbx",
+    "folder": "/Volumes/ACASIS/projects/sensen-unity/Assets/_Gensen/Characters/BaseCharacter/Texture"
+  },
+  "hairhat0": {
+    "fbx": "/Volumes/ACASIS/projects/sensen-unity/Assets/_Gensen/Characters/BaseCharacter/Models/SK_DtBase.fbx",
+    "folder": "/Volumes/ACASIS/projects/sensen-unity/Assets/_Gensen/Characters/BaseCharacter/Texture"
+  },
+  "glass0": {
+    "fbx": "/Volumes/ACASIS/projects/sensen-unity/Assets/_Gensen/Characters/BaseCharacter/Models/SK_DtBase.fbx",
+    "folder": "/Volumes/ACASIS/projects/sensen-unity/Assets/_Gensen/Characters/BaseCharacter/Texture"
+  },
+  "cloth1_1": {
+    "fbx": "/Volumes/ACASIS/projects/sensen-unity/Assets/_Gensen/Characters/AvatarPaks/skin01/skin01/SK_dt_skin01.fbx"
+  },
+  "hairhat20": {
+    "folder": "/Volumes/ACASIS/projects/sensen-unity/Assets/_Gensen/Characters/AvatarPaks/hairHat/hairHat20"
+  }
+}
