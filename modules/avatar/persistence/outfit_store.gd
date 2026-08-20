@@ -23,7 +23,11 @@ func load_outfit(user_id: String) -> AvatarConfig:
 		push_warning("OutfitStore: 存档损坏，备份并回退默认: %s" % path)
 		var dir := DirAccess.open(base_dir)
 		if dir:
-			dir.rename(path.get_file(), path.get_file() + ".corrupt")
+			var rename_err := dir.rename(path.get_file(), path.get_file() + ".corrupt")
+			if rename_err != OK:
+				push_error("OutfitStore: 损坏存档备份失败 err=%d path=%s" % [rename_err, path])
+		else:
+			push_error("OutfitStore: 无法打开目录备份损坏存档: %s" % base_dir)
 	return cfg
 
 func _path_for(user_id: String) -> String:
