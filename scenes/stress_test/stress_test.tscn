@@ -1,0 +1,60 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scenes/stress_test/stress_test.gd" id="1_stress"]
+
+[sub_resource type="Environment" id="Environment_stress"]
+background_mode = 1
+background_color = Color(0.164706, 0.164706, 0.188235, 1)
+ambient_light_energy = 0.6
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
+size = Vector2(40, 40)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="StressTest" type="Node3D"]
+script = ExtResource("1_stress")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(0, 4, 10)
+rotation_degrees = Vector3(-21.8, 0, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-45, 30, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_stress")
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_floor")
+surface_material_override/0 = SubResource("StandardMaterial3D_floor")
+
+[node name="Rigs" type="Node3D" parent="."]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="VBox" type="VBoxContainer" parent="HUD"]
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 260.0
+offset_bottom = 120.0
+
+[node name="StatsLabel" type="Label" parent="HUD/VBox"]
+layout_mode = 2
+text = "角色: 0  策略: merged
+FPS: 0  帧时: 0.00ms
+DrawCalls: 0
+显存: 0.0MB"
+
+[node name="CountSlider" type="HSlider" parent="HUD/VBox"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+min_value = 1.0
+max_value = 20.0
+step = 1.0
+value = 10.0
+
+[node name="StrategyButton" type="Button" parent="HUD/VBox"]
+layout_mode = 2
+text = "策略: merged"
