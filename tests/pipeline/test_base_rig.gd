@@ -21,12 +21,10 @@ func test_animations_present_and_play() -> void:
 	var ap := rig.get_node("AnimationPlayer") as AnimationPlayer
 	for anim_name in ["idle", "walk", "run"]:
 		assert_bool(ap.has_animation(anim_name)).is_true()
-	ap.play("idle")
-	var skel := rig.get_node("Skeleton3D") as Skeleton3D
-	var before := skel.get_bone_pose_position(skel.find_bone("Root_M"))
-	for i in 30:
-		await get_tree().process_frame
-	assert_bool(ap.is_playing()).is_true()
+		ap.play(anim_name)
+		for i in 5:
+			await get_tree().process_frame
+		assert_bool(ap.is_playing()).is_true()
 
 func test_slot_table_bones_exist_in_skeleton() -> void:
 	if not FileAccess.file_exists(RIG_SCENE):
