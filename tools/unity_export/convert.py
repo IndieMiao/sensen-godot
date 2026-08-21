@@ -1,4 +1,4 @@
-import argparse, csv, json, shutil, sys
+import argparse, csv, json, os, shutil, stat, sys
 from pathlib import Path
 import addressables, naming, parts as parts_mod
 
@@ -28,16 +28,17 @@ def main():
             "anim_fbx": {k: _stage(base_dir / f"Animations/{v}", godot_root, "base", report)
                          for k, v in {"idle": "dt@idle02.fbx", "walk": "dt@walk01.fbx", "run": "dt@run01.fbx"}.items()}}
 
-    # 基础部件的 FBX/贴图不在部件目录约定内（Models/ 与 Texture/），进 build_recipe 前注入 override
+    # 基础部件的 FBX/贴图不在部件目录约定内（Models/ 与 Texture/）：用 build_recipe 的 forced
+    # 参数强制注入（不依赖 overrides 字典的 key——base_parts 的文件名 slug 与资产内 partName
+    # 解析出的 part_id 并不总是一致，例如 ap_cloth00.asset 的 partName 其实是 "cloth0"）。
+    base_forced = {"fbx": str(base_fbx), "folder": str(base_dir / "Texture")}
     for name in samples.get("base_parts", []):
-        pid = naming.slug(name.replace("ap_", ""))
-        overrides.setdefault(pid, {})
-        overrides[pid].setdefault("fbx", str(base_fbx))
-        overrides[pid].setdefault("folder", str(base_dir / "Texture"))
-        r = parts_mod.build_recipe(unity_root, name, 0, overrides, registry, report)
+        r = parts_mod.build_recipe(unity_root, name, 0, overrides, registry, report, forced=base_forced)
         if r:
             recipes.append(r)
     for item in samples.get("parts", []):
+        if "tier" not in item:
+            report.warn(f"{item['asset']}: tier 未声明，默认 0")
         r = parts_mod.build_recipe(unity_root, item["asset"], int(item.get("tier", 0)), overrides, registry, report)
         if r:
             recipes.append(r)
@@ -61,7 +62,10 @@ def main():
         sys.exit(1)
 
 def _stage(src, godot_root: Path, part_id: str, report) -> str:
-    """拷贝到 assets/avatar/source/<part_id>/，返回 res:// 路径。同名文件幂等覆盖。"""
+    """拷贝到 assets/avatar/source/<part_id>/，返回 res:// 路径。同名文件真正幂等覆盖：用
+    copyfile（不像 copy2 那样拷贝源文件的元数据/系统标志——Unity 源文件本身可能带只读/
+    uchg 等不可变标志，copy2 会把它们连带复制到目标文件上，导致下一次运行覆盖同名文件时
+    PermissionError）。覆盖前若目标已存在且不可写，先清掉不可变标志/加上写权限。"""
     src = Path(src)
     if not src.is_file():
         report.error(f"{part_id}: 源文件缺失 {src}")
@@ -69,7 +73,16 @@ def _stage(src, godot_root: Path, part_id: str, report) -> str:
     dst_dir = godot_root / "assets/avatar/source" / part_id
     dst_dir.mkdir(parents=True, exist_ok=True)
     dst = dst_dir / src.name
-    shutil.copy2(src, dst)
+    if dst.exists():
+        try:
+            os.chflags(dst, 0)  # 清 uchg 等标志（macOS；非 macOS 平台没有 chflags）
+        except (AttributeError, OSError):
+            pass
+        try:
+            dst.chmod(dst.stat().st_mode | stat.S_IWUSR)
+        except OSError:
+            pass
+    shutil.copyfile(src, dst)
     return "res://" + dst.relative_to(godot_root).as_posix()
 
 if __name__ == "__main__":

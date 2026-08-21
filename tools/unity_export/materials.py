@@ -20,11 +20,15 @@ def extract_floats(mat_path) -> dict:
         return floats
     return {}
 
-def find_material_file(folder, slot_word):
-    """M_*<slot_word>*.mat（大小写不敏感），无则 None。"""
+def find_material_files(folder, slot_word):
+    """M_*<slot_word>*.mat（大小写不敏感），返回全部命中（已排序），无则 []。"""
     import re
     if folder is None or not folder.is_dir():
-        return None
+        return []
     pat = re.compile(rf"^M_.*{re.escape(slot_word)}.*\.mat$", re.I)
-    hits = sorted(p for p in folder.iterdir() if pat.match(p.name))
+    return sorted(p for p in folder.iterdir() if pat.match(p.name))
+
+def find_material_file(folder, slot_word):
+    """M_*<slot_word>*.mat（大小写不敏感），无则 None。find_material_files 的首个命中。"""
+    hits = find_material_files(folder, slot_word)
     return hits[0] if hits else None
