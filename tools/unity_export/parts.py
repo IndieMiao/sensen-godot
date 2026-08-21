@@ -28,9 +28,13 @@ def _resolve_override_path(val, unity_root: Path) -> Path:
 def build_recipe(unity_root: Path, asset_name: str, tier: int,
                  overrides: dict, registry: naming.SlugRegistry, report: Report,
                  forced: dict = None):
-    """forced：调用方强制注入的 per-part override（优先级最高），不依赖 part_id 匹配任何 key——
-    直接并入 overrides.json 里该 part_id 的条目之上。用于 base_parts 这类"文件名 slug 与
-    partName 解析出的 part_id 不一致"的场景（不能靠 overrides 字典的 key 命中）。"""
+    """forced：调用方强制注入的 per-part override，不依赖 part_id 匹配任何 key——直接并入
+    overrides.json 里该 part_id 的条目之下。用于 base_parts 这类"文件名 slug 与 partName
+    解析出的 part_id 不一致"的场景（不能靠 overrides 字典的 key 命中），提供一个通用兜底值。
+    但 overrides.json 里针对具体 part_id 的人工定点修正优先级更高——同一个 key（如 fbx）两边
+    都给时，以 overrides.json 为准，因为那是人工核实过具体这个部件的正确资产之后写的，而
+    forced 只是给一整类 part 的笼统兜底（例如所有 base_parts 都指向同一个 SK_DtBase.fbx，
+    但个别 socket 挂载件如 glass0/hairhat0 实际网格在别处，需要 overrides.json 精确纠正）。"""
     ap_path = find_ap_asset(unity_root, asset_name)
     if ap_path is None:
         report.error(f"{asset_name}: 找不到 ap 资产")
@@ -47,7 +51,7 @@ def build_recipe(unity_root: Path, asset_name: str, tier: int,
         report.error(f"{asset_name}: {e}")
         return None
     attach = "mesh" if int(mb.get("attachType", 0)) == 0 else "socket"
-    ov = {**(overrides.get(part_id, {}) if overrides else {}), **(forced or {})}
+    ov = {**(forced or {}), **(overrides.get(part_id, {}) if overrides else {})}
     pak_dir = ap_path.parent
     folder = _resolve_override_path(ov["folder"], unity_root) if "folder" in ov else convention.variant_dir(pak_dir, part_name)
     recipe = {"id": part_id, "slot": slot, "attach": attach, "tier": tier,

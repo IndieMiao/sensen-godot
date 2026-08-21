@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://y70cfrmoecxy"
-path="res://.godot/imported/SK_DtBase.fbx-67c84ca288964b3330c860be1aa311ee.scn"
+uid="uid://cem1v5uqktiw"
+path="res://.godot/imported/SM_glass1.fbx-dc03fbe4600010eb4df6dec9a3d14e91.scn"
 
 [deps]
 
-source_file="res://assets/avatar/source/glass0/SK_DtBase.fbx"
-dest_files=["res://.godot/imported/SK_DtBase.fbx-67c84ca288964b3330c860be1aa311ee.scn"]
+source_file="res://assets/avatar/source/glass0/SM_glass1.fbx"
+dest_files=["res://.godot/imported/SM_glass1.fbx-dc03fbe4600010eb4df6dec9a3d14e91.scn"]
 
 [params]
 

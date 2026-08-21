@@ -4,5 +4,11 @@
   },
   "hairhat20": {
     "folder": "Assets/_Gensen/Characters/AvatarPaks/hairHat/hairHat20"
+  },
+  "glass0": {
+    "fbx": "Assets/_Gensen/Characters/BaseCharacter/Models/SM_glass1.fbx"
+  },
+  "hairhat0": {
+    "fbx": "Assets/_Gensen/Characters/BaseCharacter/Models/SM_hairHat0.fbx"
   }
 }

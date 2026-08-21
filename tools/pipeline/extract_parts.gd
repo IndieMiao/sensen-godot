@@ -49,11 +49,15 @@ func _process_part(recipe: Dictionary):
 	def.attach = String(recipe.attach)
 	def.tier = int(recipe.get("tier", 0))
 	var materials := _build_materials(recipe)
+	## recipe.mesh_name 对 socket 部件通常是 JSON null（键存在但值为 null）；Dictionary.get()
+	## 的 default 只在键不存在时生效，因此不能直接 String(recipe.get("mesh_name", ""))——
+	## 那会对 null 调用 String() 构造器而报错。统一走 _str_or_empty 兜底成空字符串。
+	var mesh_name := _str_or_empty(recipe.get("mesh_name"))
 	var res_path := ""
 	if def.attach == "mesh":
-		var mi := _find_mesh_instance(inst, String(recipe.get("mesh_name", "")))
+		var mi := _find_mesh_instance(inst, mesh_name)
 		if mi == null:
-			_errors.append("%s: FBX 内找不到子网格 '%s'" % [id, recipe.get("mesh_name", "")])
+			_errors.append("%s: FBX 内找不到子网格 '%s'" % [id, mesh_name])
 			inst.free()
 			return null
 		var mesh := (mi.mesh as ArrayMesh).duplicate(true) as ArrayMesh
@@ -64,7 +68,7 @@ func _process_part(recipe: Dictionary):
 		res_path = "%s/%s.res" % [PARTS_DIR, id]
 	else:
 		var scene_path := "%s/%s_scene.tscn" % [PARTS_DIR, id]
-		var root := _build_socket_scene(inst, materials, int(recipe.get("tier", 0)))
+		var root := _build_socket_scene(inst, materials, int(recipe.get("tier", 0)), mesh_name, id)
 		if root == null:
 			_errors.append("%s: socket FBX 内没有网格" % id)
 			inst.free()
@@ -115,6 +119,12 @@ func _build_materials(recipe: Dictionary) -> Array[ShaderMaterial]:
 		result.append(AvatarMaterialFactory.create({}))
 	return result
 
+func _str_or_empty(v) -> String:
+	## JSON null 在 GDScript 里是 TYPE_NIL；对它调用 String() 构造器会报错（"Nonexistent
+	## 'String' constructor"），必须先判空。用于 recipe 里可能是 null 的字符串字段（如
+	## socket 部件的 mesh_name）。
+	return String(v) if typeof(v) == TYPE_STRING else ""
+
 func _find_mesh_instance(root: Node, mesh_name: String) -> MeshInstance3D:
 	var stack: Array = [root]
 	var first: MeshInstance3D = null
@@ -129,16 +139,22 @@ func _find_mesh_instance(root: Node, mesh_name: String) -> MeshInstance3D:
 			stack.append(c)
 	return first if mesh_name.is_empty() else null
 
-func _build_socket_scene(fbx_root: Node, materials: Array[ShaderMaterial], tier: int) -> Node3D:
-	## 收集 FBX 中全部网格烘成静态 MeshInstance3D；tier==1 时保留 AnimationPlayer。
+func _build_socket_scene(fbx_root: Node, materials: Array[ShaderMaterial], tier: int, mesh_name: String, id: String) -> Node3D:
+	## 收集 FBX 中的网格烘成静态 MeshInstance3D；tier==1 时保留 AnimationPlayer。
+	## mesh_name 非空时只收名字匹配（不区分大小写）的 MeshInstance3D——避免像 glass0/hairhat0
+	## 这类 socket 挂载件误配到共享骨架 FBX（如 SK_DtBase.fbx）时，把整套身体网格都打包进
+	## socket 场景。mesh_name 为空时保持"全收"的旧行为，但收集数 >3 视为疑似打包了整套 FBX，
+	## 报错而非静默产出坏资产——调用方需要为该部件指定 mesh_name 或在 overrides.json 里修正 fbx。
 	var root := Node3D.new()
 	root.name = "SocketPart"
 	var found := false
+	var collected := 0
 	var stack: Array = [fbx_root]
 	while not stack.is_empty():
 		var n: Node = stack.pop_back()
-		if n is MeshInstance3D and n.mesh != null:
+		if n is MeshInstance3D and n.mesh != null and (mesh_name.is_empty() or String(n.name).to_lower() == mesh_name.to_lower()):
 			found = true
+			collected += 1
 			var mi := MeshInstance3D.new()
 			mi.name = n.name
 			var mesh := (n.mesh as ArrayMesh).duplicate(true) as ArrayMesh
@@ -151,6 +167,8 @@ func _build_socket_scene(fbx_root: Node, materials: Array[ShaderMaterial], tier:
 			mi.owner = root
 		for c in n.get_children():
 			stack.append(c)
+	if mesh_name.is_empty() and collected > 3:
+		_errors.append("%s: socket 场景收集了 %d 个网格，疑似打包了整套 FBX——请为该部件指定 mesh_name 或修正 fbx" % [id, collected])
 	if tier == 1:
 		var src_player := _find_anim_player(fbx_root)
 		if src_player:

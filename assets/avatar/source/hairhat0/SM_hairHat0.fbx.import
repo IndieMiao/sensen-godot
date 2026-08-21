@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://baqcdxdc7bfvx"
-path="res://.godot/imported/SK_DtBase.fbx-4f3467447432fdc6c01553ee3ef067f2.scn"
+uid="uid://cwhrwq5vwqb2r"
+path="res://.godot/imported/SM_hairHat0.fbx-8a50b30f7e513abbc8ff26a684b752e9.scn"
 
 [deps]
 
-source_file="res://assets/avatar/source/hairhat0/SK_DtBase.fbx"
-dest_files=["res://.godot/imported/SK_DtBase.fbx-4f3467447432fdc6c01553ee3ef067f2.scn"]
+source_file="res://assets/avatar/source/hairhat0/SM_hairHat0.fbx"
+dest_files=["res://.godot/imported/SM_hairHat0.fbx-8a50b30f7e513abbc8ff26a684b752e9.scn"]
 
 [params]
 

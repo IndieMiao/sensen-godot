@@ -46,6 +46,30 @@ def test_forced_override_bypasses_key_mismatch(tmp_path):
     assert not report.errors
     assert recipe["fbx"] == forced_fbx
 
+def test_overrides_dict_wins_over_forced_for_same_key(tmp_path):
+    """人工定点修正优先于通用注入：当 forced 与 overrides.json（按实际 part_id 命中）都给了
+    同一个 key（如 fbx）时，以 overrides.json 为准——例如 base_parts 统统 forced 到
+    SK_DtBase.fbx，但 glass0/hairhat0 这类 socket 挂载件的真实网格在别处，靠 overrides.json
+    按 part_id 精确纠正。"""
+    unity_root = _make_unity_root(tmp_path)
+    forced_fbx = tmp_path / "SK_Forced.fbx"
+    forced_fbx.touch()
+    override_fbx = tmp_path / "SM_Correct.fbx"
+    override_fbx.touch()
+    forced_folder = tmp_path / "tex"
+    forced_folder.mkdir()
+
+    report = parts.Report()
+    registry = naming.SlugRegistry()
+    overrides = {"fakepart": {"fbx": str(override_fbx)}}  # part_id 与实际解析结果一致
+
+    recipe = parts.build_recipe(unity_root, "ap_fakepart", 0, overrides, registry, report,
+                                 forced={"fbx": str(forced_fbx), "folder": str(forced_folder)})
+
+    assert recipe is not None
+    assert not report.errors
+    assert recipe["fbx"] == override_fbx
+
 def test_forced_none_falls_back_to_overrides_dict(tmp_path):
     """forced 为 None（默认）时，行为与不传一致：仍走 overrides 字典按 part_id 查找。"""
     unity_root = _make_unity_root(tmp_path)
