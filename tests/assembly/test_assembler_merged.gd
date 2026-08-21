@@ -102,3 +102,29 @@ func test_rebuild_creates_single_mesh_instance() -> void:
 func test_default_assembler_is_merged() -> void:
 	var rig: AvatarRig = auto_free(AvatarRig.new())
 	assert_bool(rig.assembler is AvatarAssemblerMerged).is_true()
+
+func test_mesh_instances_bind_to_skeleton() -> void:
+	# 回归：Godot 4.7 MeshInstance3D.skeleton 默认为空 NodePath，必须显式绑定，
+	# 否则 mesh 不参与蒙皮、永远停在绑定姿势（实机/桌面均复现过）。
+	var mat := StandardMaterial3D.new()
+	for strategy in [AvatarAssemblerMerged.new(), AvatarAssemblerDirect.new()]:
+		var rig := AvatarRig.new()
+		var t := AvatarSlotTable.new()
+		var sd := AvatarSlotDef.new()
+		sd.slot_name = &"cloth"
+		sd.attach_bone = "Root_M"
+		t.slots.append(sd)
+		rig.slot_table = t
+		var skel := Skeleton3D.new()
+		skel.name = "Skeleton3D"
+		skel.add_bone("Root_M")
+		rig.add_child(skel)
+		add_child(auto_free(rig))
+		rig.skeleton = skel
+		strategy.rebuild(rig, {&"cloth": _make_skinned_def("a", &"cloth", ["Root_M"], mat)})
+		for child in skel.get_children():
+			if child is MeshInstance3D:
+				var target := child.get_node_or_null(child.skeleton)
+				assert_object(target)\
+					.override_failure_message("%s 的 %s 未绑定骨架 (skeleton path='%s')" % [strategy.get_class(), child.name, child.skeleton])\
+					.is_same(skel)

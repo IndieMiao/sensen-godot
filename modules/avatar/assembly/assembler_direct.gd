@@ -19,6 +19,8 @@ func rebuild(rig: AvatarRig, parts: Dictionary) -> void:
 			mi.name = node_name
 			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			skeleton.add_child(mi)
+		# Godot 4.7 起 MeshInstance3D.skeleton 默认为空 NodePath，必须显式绑定
+		mi.skeleton = mi.get_path_to(skeleton)
 		mi.mesh = def.mesh
 		mi.skin = def.skin
 		mi.set_meta("part_id", def.id)

@@ -9,10 +9,17 @@ run/main_scene="res://scenes/dressing_room/dressing_room.tscn"
 [autoload]
 Avatar="*res://modules/avatar/avatar_service.gd"
 
+[display]
+
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/handheld/orientation=1
+
 [editor_plugins]
 enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
 
 [rendering]
 renderer/rendering_method="mobile"
 renderer/rendering_method.mobile="mobile"
+anti_aliasing/quality/msaa_3d=2
 textures/vram_compression/import_etc2_astc=true
