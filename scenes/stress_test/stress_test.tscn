@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scenes/stress_test/stress_test.gd" id="1_stress"]
+[ext_resource type="Script" path="res://scenes/stress_test/camera_orbit.gd" id="2_camorbit"]
 
 [sub_resource type="Environment" id="Environment_stress"]
 background_mode = 1
@@ -17,6 +18,7 @@ albedo_color = Color(0.5, 0.5, 0.5, 1)
 script = ExtResource("1_stress")
 
 [node name="Camera3D" type="Camera3D" parent="."]
+script = ExtResource("2_camorbit")
 position = Vector3(0, 4, 10)
 rotation_degrees = Vector3(-21.8, 0, 0)
 

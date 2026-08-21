@@ -88,3 +88,19 @@ func test_reapply_on_slot_applied() -> void:
 	rig.add_child(act)
 	rig.slot_applied.emit(&"glass", "x")
 	assert_bool(player.is_playing()).is_true()
+
+func test_blob_shadow_attach_idempotent() -> void:
+	var rig := Node3D.new()
+	add_child(auto_free(rig))
+	BlobShadow.attach(rig)
+	BlobShadow.attach(rig)  # 幂等：不重复挂
+	var shadows := 0
+	var node: MeshInstance3D = null
+	for c in rig.get_children():
+		if c.name == "blob_shadow":
+			shadows += 1
+			node = c
+	assert_int(shadows).is_equal(1)
+	assert_object(node.mesh).is_not_null()
+	assert_bool(node.material_override is StandardMaterial3D).is_true()
+	assert_int(node.cast_shadow).is_equal(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)

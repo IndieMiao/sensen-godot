@@ -27,6 +27,7 @@ func create_rig() -> AvatarRig:
 	var rig := (load(BASE_RIG_SCENE) as PackedScene).instantiate() as AvatarRig
 	rig.setup(loader)
 	rig.add_child(RigActivity.new())
+	BlobShadow.attach(rig)
 	return rig
 
 func load_outfit() -> AvatarConfig:

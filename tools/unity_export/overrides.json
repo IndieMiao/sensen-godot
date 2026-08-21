@@ -1,5 +1,6 @@
 {
   "cloth1_1": {
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin01/skin01_1/T_skin01_1_cloth_D 1.png",
     "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin01/skin01/SK_dt_skin01.fbx"
   },
   "hairhat20": {
@@ -10,5 +11,14 @@
   },
   "hairhat0": {
     "fbx": "Assets/_Gensen/Characters/BaseCharacter/Models/SM_hairHat0.fbx"
+  },
+  "eyes00": {
+    "albedo": "Assets/_Gensen/Characters/BaseCharacter/Texture/T_eye.png"
+  },
+  "cloth1": {
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin01/skin01/T_skin01_cloth_D 1.png"
+  },
+  "messengerbag1": {
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin01/skin01/T_skin01_bag_D.png"
   }
 }
