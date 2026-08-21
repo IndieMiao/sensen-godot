@@ -8,6 +8,7 @@ var _dragging := false
 func _ready() -> void:
 	rig = Avatar.create_rig()
 	anchor.add_child(rig)
+	rig.config_applied.connect(func(_c): var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer; if ap: ap.play("idle"))
 	rig.apply_config(Avatar.load_outfit())
 	$UI/Panel/VBox/Buttons/SaveButton.pressed.connect(_on_save)
 	$UI/Panel/VBox/Buttons/ResetButton.pressed.connect(_on_reset)

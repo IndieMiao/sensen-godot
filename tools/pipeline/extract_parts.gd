@@ -82,7 +82,7 @@ func _process_part(recipe: Dictionary):
 		if typeof(off) == TYPE_DICTIONARY:
 			def.offset_pos = _v3(off.pos)
 			def.offset_rot_deg = _v3(off.rot)
-			def.offset_scale = _v3(off.scale)
+			def.offset_scale = _v3(off.scale, Vector3.ONE)
 		res_path = "%s/%s.res" % [PARTS_DIR, id]
 	inst.free()
 	var err := ResourceSaver.save(def, res_path, ResourceSaver.FLAG_COMPRESS)
@@ -202,7 +202,7 @@ func _write_thumb(id: String, thumb_src) -> String:
 	img.save_png(ProjectSettings.globalize_path(dst))
 	return dst
 
-func _v3(a) -> Vector3:
+func _v3(a, fallback := Vector3.ZERO) -> Vector3:
 	if typeof(a) == TYPE_ARRAY and a.size() == 3:
 		return Vector3(float(a[0]), float(a[1]), float(a[2]))
-	return Vector3.ZERO
+	return fallback

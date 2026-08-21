@@ -32,7 +32,6 @@ func _respawn(count: int) -> void:
 		var row := floori(float(i) / side)
 		rig.position = Vector3((i % side) * 1.5 - side * 0.75, 0, row * 1.5)
 		rigs_root.add_child(rig)
-		rig.add_child(RigActivity.new())
 		rig.apply_config(_random_config())
 		rig.config_applied.connect(func(_c):
 			var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer

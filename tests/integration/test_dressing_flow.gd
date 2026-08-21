@@ -1,6 +1,19 @@
 extends GdUnitTestSuite
 ## 全链路：默认装 → 换件 → 保存 → 重建 rig → 读档恢复。依赖转换产物，缺失则跳过。
 
+var _saved_base_dir: String
+var _saved_user_id: String
+
+func before_test() -> void:
+	## Avatar 是全局 autoload 单例：本套用例会改写 store.base_dir/user_id 来隔离存档
+	## 目录，若不还原会污染同一次运行里其它测试套件观察到的单例状态。
+	_saved_base_dir = Avatar.store.base_dir
+	_saved_user_id = Avatar.user_id
+
+func after_test() -> void:
+	Avatar.store.base_dir = _saved_base_dir
+	Avatar.user_id = _saved_user_id
+
 func test_slot_table_defaults_exist_in_catalog() -> void:
 	if not FileAccess.file_exists("res://assets/avatar/parts_manifest.json"):
 		push_warning("转换产物缺失，跳过")

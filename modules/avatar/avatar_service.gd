@@ -26,6 +26,7 @@ func _ready() -> void:
 func create_rig() -> AvatarRig:
 	var rig := (load(BASE_RIG_SCENE) as PackedScene).instantiate() as AvatarRig
 	rig.setup(loader)
+	rig.add_child(RigActivity.new())
 	return rig
 
 func load_outfit() -> AvatarConfig:

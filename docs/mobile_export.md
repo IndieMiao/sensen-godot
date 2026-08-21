@@ -18,6 +18,9 @@
 
 `Project > Export... > Add.. > Android`。
 
+- **资源过滤**：`Resources` 标签页的导出过滤规则应排除 `addons/gdUnit4/*`、`tests/*`、
+  `assets/avatar/source/*`（运行时只需要 parts/base/thumbs/manifest，这三类目录只在编辑器
+  测试和转换管线阶段用到，不必随包分发；Android/iOS 两个 preset 都要设置）。
 - **纹理压缩**：`Texture Format` 勾选 `ETC2` 和 `ASTC`（一期渲染管线是 `mobile`，两种格式
   都开，覆盖新旧机型；只有 ASTC 支持的机型也不会因为缺 ETC2 资源出问题）。
 - **架构**：只勾 `arm64-v8a`（真机验收只关心当前主流 64 位机型，不需要 `armeabi-v7a`/

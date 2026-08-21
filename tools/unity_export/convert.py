@@ -2,6 +2,24 @@ import argparse, csv, json, os, shutil, stat, sys
 from pathlib import Path
 import addressables, naming, parts as parts_mod
 
+# 移动端贴图导入预设（spec §4.6 步骤2）：新 png 首次落地时若旁边还没有 .import，
+# 写入这份最小模板——importer/type 之外只带 [params]，缺失的 uid/path/[deps] 由 Godot
+# 在实际导入时补全。已存在 .import 的文件不会被这里覆盖（幂等：不破坏已导入产物或
+# 后续在编辑器里手工调整过的设置）。
+_PNG_IMPORT_PRESET = """[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+
+[params]
+
+compress/mode=2
+compress/high_quality=false
+mipmaps/generate=true
+process/size_limit=512
+detect_3d/compress_to=0
+"""
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--unity-root", required=True)
@@ -83,6 +101,10 @@ def _stage(src, godot_root: Path, part_id: str, report) -> str:
         except OSError:
             pass
     shutil.copyfile(src, dst)
+    if dst.suffix.lower() == ".png":
+        import_path = dst.parent / (dst.name + ".import")
+        if not import_path.exists():
+            import_path.write_text(_PNG_IMPORT_PRESET, encoding="utf-8")
     return "res://" + dst.relative_to(godot_root).as_posix()
 
 if __name__ == "__main__":
