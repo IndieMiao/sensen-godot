@@ -4,6 +4,10 @@ config_version=5
 [application]
 config/name="SensenAvatar"
 config/features=PackedStringArray("4.7", "GL Compatibility")
+run/main_scene="res://scenes/dressing_room/dressing_room.tscn"
+
+[autoload]
+Avatar="*res://modules/avatar/avatar_service.gd"
 
 [editor_plugins]
 enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")
