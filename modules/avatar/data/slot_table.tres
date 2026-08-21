@@ -22,21 +22,21 @@ script = ExtResource("2")
 slot_name = &"hairHat"
 attach_bone = "Head_M"
 required = true
-default_part = "hairhat00"
+default_part = "hairhat0"
 
 [sub_resource type="Resource" id="s04"]
 script = ExtResource("2")
 slot_name = &"cloth"
 attach_bone = "Spine1_M"
 required = true
-default_part = "cloth00"
+default_part = "cloth0"
 
 [sub_resource type="Resource" id="s05"]
 script = ExtResource("2")
 slot_name = &"shoes"
 attach_bone = "Root_M"
 required = true
-default_part = "shoes00"
+default_part = "shoes0"
 
 [sub_resource type="Resource" id="s06"]
 script = ExtResource("2")
