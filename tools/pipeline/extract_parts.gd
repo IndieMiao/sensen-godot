@@ -1,0 +1,190 @@
+## Headless 提取器：recipes.json → AvatarPartDef .res / socket .tscn / thumbs / parts_manifest.json
+## 用法: godot --headless --path . --script res://tools/pipeline/extract_parts.gd -- <recipes.json路径>
+extends SceneTree
+
+const PARTS_DIR := "res://assets/avatar/parts"
+const THUMBS_DIR := "res://assets/avatar/thumbs"
+const MANIFEST_PATH := "res://assets/avatar/parts_manifest.json"
+
+var _errors: PackedStringArray = []
+
+func _initialize() -> void:
+	var args := OS.get_cmdline_user_args()
+	if args.is_empty():
+		push_error("缺少参数: recipes.json 路径")
+		quit(2)
+		return
+	var recipes_text := FileAccess.get_file_as_string(args[0])
+	var recipes = JSON.parse_string(recipes_text)
+	if typeof(recipes) != TYPE_DICTIONARY:
+		push_error("recipes.json 解析失败: %s" % args[0])
+		quit(2)
+		return
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(PARTS_DIR))
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(THUMBS_DIR))
+	var manifest_parts: Array = []
+	for recipe in recipes.parts:
+		var entry = _process_part(recipe)
+		if entry != null:
+			manifest_parts.append(entry)
+	var manifest := {"version": 1, "parts": manifest_parts}
+	var f := FileAccess.open(MANIFEST_PATH, FileAccess.WRITE)
+	f.store_string(JSON.stringify(manifest, "\t"))
+	f.close()
+	for e in _errors:
+		printerr("ERROR: " + e)
+	print("提取完成: %d 部件, %d 错误" % [manifest_parts.size(), _errors.size()])
+	quit(1 if _errors.size() > 0 else 0)
+
+func _process_part(recipe: Dictionary):
+	var id: String = recipe.id
+	var scene_res = load(String(recipe.fbx))
+	if scene_res == null or not (scene_res is PackedScene):
+		_errors.append("%s: FBX 未导入或加载失败 %s" % [id, recipe.fbx])
+		return null
+	var inst: Node = (scene_res as PackedScene).instantiate()
+	var def := AvatarPartDef.new()
+	def.id = id
+	def.slot = StringName(String(recipe.slot))
+	def.attach = String(recipe.attach)
+	def.tier = int(recipe.get("tier", 0))
+	var materials := _build_materials(recipe)
+	var res_path := ""
+	if def.attach == "mesh":
+		var mi := _find_mesh_instance(inst, String(recipe.get("mesh_name", "")))
+		if mi == null:
+			_errors.append("%s: FBX 内找不到子网格 '%s'" % [id, recipe.get("mesh_name", "")])
+			inst.free()
+			return null
+		var mesh := (mi.mesh as ArrayMesh).duplicate(true) as ArrayMesh
+		for s in mesh.get_surface_count():
+			mesh.surface_set_material(s, materials[mini(s, materials.size() - 1)])
+		def.mesh = mesh
+		def.skin = mi.skin.duplicate(true) if mi.skin else null
+		res_path = "%s/%s.res" % [PARTS_DIR, id]
+	else:
+		var scene_path := "%s/%s_scene.tscn" % [PARTS_DIR, id]
+		var root := _build_socket_scene(inst, materials, int(recipe.get("tier", 0)))
+		if root == null:
+			_errors.append("%s: socket FBX 内没有网格" % id)
+			inst.free()
+			return null
+		var packed := PackedScene.new()
+		packed.pack(root)
+		ResourceSaver.save(packed, scene_path)
+		root.free()
+		def.scene = load(scene_path)
+		var off = recipe.get("offset")
+		if typeof(off) == TYPE_DICTIONARY:
+			def.offset_pos = _v3(off.pos)
+			def.offset_rot_deg = _v3(off.rot)
+			def.offset_scale = _v3(off.scale)
+		res_path = "%s/%s.res" % [PARTS_DIR, id]
+	inst.free()
+	var err := ResourceSaver.save(def, res_path, ResourceSaver.FLAG_COMPRESS)
+	if err != OK:
+		_errors.append("%s: 保存失败 err=%d" % [id, err])
+		return null
+	var thumb_path := _write_thumb(id, recipe.get("thumb_src"))
+	var entry := {"id": id, "slot": String(recipe.slot), "attach": def.attach, "tier": def.tier,
+		"pack": "builtin", "res": res_path, "thumb": thumb_path,
+		"unity_guid": String(recipe.get("unity_guid", ""))}
+	if typeof(recipe.get("offset")) == TYPE_DICTIONARY:
+		entry["offset"] = recipe.offset
+	return entry
+
+## AMENDMENT (controller ruling): recipes 的 materials 是数组（cloth87 等多材质部件每条 entry
+## 一个材质）。空数组时回退到默认材质，避免 mesh/socket 无材质可用。
+func _build_materials(recipe: Dictionary) -> Array[ShaderMaterial]:
+	var mats: Array = recipe.get("materials", [])
+	var result: Array[ShaderMaterial] = []
+	for entry in mats:
+		var params := {}
+		if typeof(entry) == TYPE_DICTIONARY:
+			var m: Dictionary = entry
+			if m.get("albedo"):
+				params["albedo_tex"] = String(m.albedo)
+			if m.get("ao"):
+				params["ao_tex"] = String(m.ao)
+			var floats = m.get("floats", {})
+			if typeof(floats) == TYPE_DICTIONARY:
+				for k in floats:
+					params[k] = floats[k]
+		result.append(AvatarMaterialFactory.create(params))
+	if result.is_empty():
+		result.append(AvatarMaterialFactory.create({}))
+	return result
+
+func _find_mesh_instance(root: Node, mesh_name: String) -> MeshInstance3D:
+	var stack: Array = [root]
+	var first: MeshInstance3D = null
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if n is MeshInstance3D:
+			if first == null:
+				first = n
+			if String(n.name).to_lower() == mesh_name.to_lower():
+				return n
+		for c in n.get_children():
+			stack.append(c)
+	return first if mesh_name.is_empty() else null
+
+func _build_socket_scene(fbx_root: Node, materials: Array[ShaderMaterial], tier: int) -> Node3D:
+	## 收集 FBX 中全部网格烘成静态 MeshInstance3D；tier==1 时保留 AnimationPlayer。
+	var root := Node3D.new()
+	root.name = "SocketPart"
+	var found := false
+	var stack: Array = [fbx_root]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if n is MeshInstance3D and n.mesh != null:
+			found = true
+			var mi := MeshInstance3D.new()
+			mi.name = n.name
+			var mesh := (n.mesh as ArrayMesh).duplicate(true) as ArrayMesh
+			for s in mesh.get_surface_count():
+				mesh.surface_set_material(s, materials[mini(s, materials.size() - 1)])
+			mi.mesh = mesh
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			mi.transform = (n as Node3D).transform
+			root.add_child(mi)
+			mi.owner = root
+		for c in n.get_children():
+			stack.append(c)
+	if tier == 1:
+		var src_player := _find_anim_player(fbx_root)
+		if src_player:
+			var player := AnimationPlayer.new()
+			player.name = "AnimationPlayer"
+			var lib := AnimationLibrary.new()
+			for anim_name in src_player.get_animation_list():
+				lib.add_animation(anim_name, src_player.get_animation(anim_name).duplicate(true))
+			player.add_animation_library("", lib)
+			root.add_child(player)
+			player.owner = root
+	return root if found else null
+
+func _find_anim_player(root: Node) -> AnimationPlayer:
+	var stack: Array = [root]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if n is AnimationPlayer:
+			return n
+		for c in n.get_children():
+			stack.append(c)
+	return null
+
+func _write_thumb(id: String, thumb_src) -> String:
+	var dst := "%s/%s.png" % [THUMBS_DIR, id]
+	if thumb_src != null and String(thumb_src) != "" and FileAccess.file_exists(String(thumb_src)):
+		DirAccess.copy_absolute(ProjectSettings.globalize_path(String(thumb_src)), ProjectSettings.globalize_path(dst))
+		return dst
+	var img := Image.create_empty(64, 64, false, Image.FORMAT_RGB8)
+	img.fill(Color(0.6, 0.6, 0.65))
+	img.save_png(ProjectSettings.globalize_path(dst))
+	return dst
+
+func _v3(a) -> Vector3:
+	if typeof(a) == TYPE_ARRAY and a.size() == 3:
+		return Vector3(float(a[0]), float(a[1]), float(a[2]))
+	return Vector3.ZERO

@@ -1,0 +1,240 @@
+{
+	"parts": [
+		{
+			"attach": "mesh",
+			"id": "body00",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/body00.res",
+			"slot": "body",
+			"thumb": "res://assets/avatar/thumbs/body00.png",
+			"tier": 0,
+			"unity_guid": "3700b07a454dc4f4ebd5a55601afebb1"
+		},
+		{
+			"attach": "mesh",
+			"id": "eyes00",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/eyes00.res",
+			"slot": "eyes",
+			"thumb": "res://assets/avatar/thumbs/eyes00.png",
+			"tier": 0,
+			"unity_guid": "4f5425f3ec43fb649b3d76ae3b831b9f"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat0",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat0.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat0.png",
+			"tier": 0,
+			"unity_guid": "b0b02dea071649a40b9760288a2c6667"
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth0",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth0.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth0.png",
+			"tier": 0,
+			"unity_guid": "95a86c36404b70543b345f3b3e20a366"
+		},
+		{
+			"attach": "mesh",
+			"id": "shoes0",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/shoes0.res",
+			"slot": "shoes",
+			"thumb": "res://assets/avatar/thumbs/shoes0.png",
+			"tier": 0,
+			"unity_guid": "136d4a1f1e5625d45ba32b985da0c39e"
+		},
+		{
+			"attach": "socket",
+			"id": "glass0",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/glass0.res",
+			"slot": "glass",
+			"thumb": "res://assets/avatar/thumbs/glass0.png",
+			"tier": 0,
+			"unity_guid": "6e730febf52058d488f91c7461a4c617"
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth1",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth1.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth1.png",
+			"tier": 0,
+			"unity_guid": "604181a9f529ef64782f943b40247ed4"
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth1_1",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth1_1.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth1_1.png",
+			"tier": 0,
+			"unity_guid": "0eeca5d7f439faf4d908709dc216c2cf"
+		},
+		{
+			"attach": "mesh",
+			"id": "shoes1",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/shoes1.res",
+			"slot": "shoes",
+			"thumb": "res://assets/avatar/thumbs/shoes1.png",
+			"tier": 0,
+			"unity_guid": "c2b73901ca98fe84c87eef80fb91a4dd"
+		},
+		{
+			"attach": "mesh",
+			"id": "glass1",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/glass1.res",
+			"slot": "glass",
+			"thumb": "res://assets/avatar/thumbs/glass1.png",
+			"tier": 0,
+			"unity_guid": "f062bb7328c70424dbe72ab7cf7611da"
+		},
+		{
+			"attach": "mesh",
+			"id": "messengerbag1",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/messengerbag1.res",
+			"slot": "messengerBag",
+			"thumb": "res://assets/avatar/thumbs/messengerbag1.png",
+			"tier": 0,
+			"unity_guid": "b5611d54162b8564da339daa8d2f9b40"
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth87",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth87.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth87.png",
+			"tier": 0,
+			"unity_guid": "ae8605b8264e1fa48a9c3193c5ae0189"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat20",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat20.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat20.png",
+			"tier": 0,
+			"unity_guid": "efa97150743fc444382d7974623a42ce"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat37",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat37.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat37.png",
+			"tier": 1,
+			"unity_guid": "551ec9cde1262b843ae10690ae2964d2"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat101",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat101.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat101.png",
+			"tier": 2,
+			"unity_guid": "41915d1d9fbe4d54ea4dd0ff0abd384f"
+		}
+	],
+	"version": 1
+}
