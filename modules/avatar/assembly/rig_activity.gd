@@ -13,6 +13,7 @@ signal level_changed(level: int)
 
 var current_level: int = Level.ACTIVE
 var _accum := 0.0
+var _applied_once := false
 var _notifier: VisibleOnScreenNotifier3D
 
 func _ready() -> void:
@@ -20,6 +21,12 @@ func _ready() -> void:
 	_notifier = VisibleOnScreenNotifier3D.new()
 	_notifier.aabb = AABB(Vector3(-0.5, 0, -0.5), Vector3(1, 2, 1))
 	rig.add_child.call_deferred(_notifier)
+	# 装配（换装/初次加载）可能在本节点 _ready 之后才把新部件挂上树，
+	# 需要在装配变化后重新按当前档位应用一次，否则新挂件永远不会启动。
+	if rig and rig.has_signal("slot_applied"):
+		rig.slot_applied.connect(func(_s, _p): apply_level(current_level))
+	if rig and rig.has_signal("config_applied"):
+		rig.config_applied.connect(func(_c): apply_level(current_level))
 
 func _process(delta: float) -> void:
 	_accum += delta
@@ -33,7 +40,9 @@ func _process(delta: float) -> void:
 	var dist := cam.global_position.distance_to(rig.global_position)
 	var visible_on_screen := _notifier.is_on_screen() if _notifier and _notifier.is_inside_tree() else true
 	var lv := level_for(dist, visible_on_screen)
-	if lv != current_level:
+	# 稳态 ACTIVE（默认档位从未变化）也必须至少应用一次，否则新装配的
+	# T1 socket 动画/T2 粒子永远不会被启动播放。
+	if lv != current_level or not _applied_once:
 		apply_level(lv)
 
 func level_for(distance: float, on_screen: bool) -> int:
@@ -44,6 +53,7 @@ func level_for(distance: float, on_screen: bool) -> int:
 	return Level.ACTIVE
 
 func apply_level(level: int) -> void:
+	_applied_once = true
 	current_level = level
 	var rig := get_parent()
 	var main_player := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
