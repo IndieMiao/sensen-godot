@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scenes/dressing_room/dressing_room.gd" id="1_dress"]
 [ext_resource type="Script" path="res://scenes/dressing_room/parts_panel.gd" id="2_parts"]
 [ext_resource type="Script" path="res://modules/ui/safe_area_margin.gd" id="3_safearea"]
+[ext_resource type="Script" path="res://scenes/dressing_room/dressing_camera.gd" id="4_dresscam"]
 
 [sub_resource type="Environment" id="Environment_room"]
 background_mode = 1
@@ -22,8 +23,9 @@ corner_radius_top_right = 16
 script = ExtResource("1_dress")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-position = Vector3(0, 1.2, 2.2)
-rotation_degrees = Vector3(-28.6, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 5.5)
+fov = 35.0
+script = ExtResource("4_dresscam")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 rotation_degrees = Vector3(-45, 30, 0)
