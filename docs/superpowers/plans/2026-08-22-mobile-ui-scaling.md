@@ -13,7 +13,8 @@
 - 拉伸基准固定 **360×640**，`stretch/mode="canvas_items"`、`stretch/aspect="expand"`；所有 UI 尺寸数值以基准单位书写，1 单位 ≈ 1dp。
 - 触摸控件最小高 **48** 单位（Android 48dp 标准）。
 - 缩略图按钮 **72×72** 单位；容器间距 **8** 单位；安全区兜底最小边距 **16** 单位。
-- 换装抽屉内容高 **296** 单位；缩略图网格 **4** 列。
+- 换装抽屉内容高 **312** 单位（原推导 296 有误：漏算 Drawer 自身 PanelContainer 的 content_margin，且标签栏/按钮行实测为 59/51 而非假设的 48）；缩略图网格 **4** 列。
+- `Drawer` 必须用自有 StyleBox 覆盖全局 PanelContainer 样式：横向内边距 **0**（安全区已提供离屏边 16），纵向 **12**。否则 4×72+3×8=312 的网格放不进 328−32=296 的真实内宽。
 - 换装相机 `fov = 35°`、`rotation = 0`、包围盒余量系数 `padding = 1.12`。
 - `canvas_items` 只缩放 2D，3D 必须仍按屏幕原生分辨率渲染——任何改动不得改成 `viewport` 模式。
 - 测试命令统一为 `tools/run_tests.sh [res://tests/子目录]`；退出码 0 且报告中 `orphans` 为 0 才算通过。
@@ -502,7 +503,7 @@ git commit -m "feat(ui): SafeAreaMargin 安全区容器（含最小边距兜底�
 
 **Interfaces:**
 - Consumes: `SafeAreaMargin`（Task 3）、主题（Task 1）
-- Produces: 场景节点路径 `UI/SafeArea`（SafeAreaMargin）、`UI/SafeArea/VBox/Spacer`、`UI/SafeArea/VBox/Drawer`（PanelContainer，`custom_minimum_size.y = 296`）、`UI/SafeArea/VBox/Drawer/VBox`（parts_panel.gd）、`UI/SafeArea/VBox/Drawer/VBox/Buttons/{SaveButton,ResetButton,SceneButton}`；`parts_panel.gd` 常量 `THUMB_SIZE := Vector2(72, 72)`。
+- Produces: 场景节点路径 `UI/SafeArea`（SafeAreaMargin）、`UI/SafeArea/VBox/Spacer`、`UI/SafeArea/VBox/Drawer`（PanelContainer，`custom_minimum_size.y = 312`）、`UI/SafeArea/VBox/Drawer/VBox`（parts_panel.gd）、`UI/SafeArea/VBox/Drawer/VBox/Buttons/{SaveButton,ResetButton,SceneButton}`；`parts_panel.gd` 常量 `THUMB_SIZE := Vector2(72, 72)`。
 
 - [ ] **Step 1: 写失败测试**
 
@@ -524,7 +525,7 @@ func test_drawer_sits_at_bottom_with_expected_height() -> void:
 	var s := _instantiate()
 	var drawer := s.get_node("UI/SafeArea/VBox/Drawer") as PanelContainer
 	assert_object(drawer).is_not_null()
-	assert_float(drawer.custom_minimum_size.y).is_equal(296.0)
+	assert_float(drawer.custom_minimum_size.y).is_equal(312.0)
 
 func test_spacer_passes_touches_through_for_rotation() -> void:
 	var s := _instantiate()
@@ -585,7 +586,7 @@ size_flags_vertical = 3
 mouse_filter = 2
 
 [node name="Drawer" type="PanelContainer" parent="UI/SafeArea/VBox"]
-custom_minimum_size = Vector2(0, 296)
+custom_minimum_size = Vector2(0, 312)
 layout_mode = 2
 
 [node name="VBox" type="VBoxContainer" parent="UI/SafeArea/VBox/Drawer"]
@@ -718,7 +719,7 @@ extends GdUnitTestSuite
 
 func _cam() -> DressingCamera:
 	var c := DressingCamera.new()
-	c.drawer_height = 296.0
+	c.drawer_height = 312.0
 	c.safe_margin_top = 24.0
 	c.safe_margin_bottom = 24.0
 	add_child(auto_free(c))
@@ -800,7 +801,7 @@ extends Camera3D
 const FOV_DEG := 35.0    # 现状 75° 默认值透视过强（头大脚小）
 const PADDING := 1.12    # 包围盒四周留白系数
 
-var drawer_height: float = 296.0
+var drawer_height: float = 312.0
 var safe_margin_top: float = 16.0
 var safe_margin_bottom: float = 16.0
 
