@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scenes/stress_test/stress_test.gd" id="1_stress"]
 [ext_resource type="Script" path="res://scenes/stress_test/camera_orbit.gd" id="2_camorbit"]
+[ext_resource type="Script" path="res://modules/ui/safe_area_margin.gd" id="3_safearea"]
 
 [sub_resource type="Environment" id="Environment_stress"]
 background_mode = 1
@@ -36,31 +37,38 @@ surface_material_override/0 = SubResource("StandardMaterial3D_floor")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
-[node name="VBox" type="VBoxContainer" parent="HUD"]
-offset_left = 12.0
-offset_top = 12.0
-offset_right = 260.0
-offset_bottom = 120.0
+[node name="SafeArea" type="MarginContainer" parent="HUD"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("3_safearea")
 
-[node name="StatsLabel" type="Label" parent="HUD/VBox"]
+[node name="VBox" type="VBoxContainer" parent="HUD/SafeArea"]
+layout_mode = 2
+mouse_filter = 2
+size_flags_vertical = 0
+
+[node name="StatsLabel" type="Label" parent="HUD/SafeArea/VBox"]
 layout_mode = 2
 text = "角色: 0  策略: merged
 FPS: 0  帧时: 0.00ms
 DrawCalls: 0
 显存: 0.0MB"
 
-[node name="CountSlider" type="HSlider" parent="HUD/VBox"]
-custom_minimum_size = Vector2(220, 0)
+[node name="CountSlider" type="HSlider" parent="HUD/SafeArea/VBox"]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
+size_flags_horizontal = 3
 min_value = 1.0
 max_value = 20.0
 step = 1.0
 value = 10.0
 
-[node name="StrategyButton" type="Button" parent="HUD/VBox"]
+[node name="StrategyButton" type="Button" parent="HUD/SafeArea/VBox"]
 layout_mode = 2
 text = "策略: merged"
 
-[node name="SceneButton" type="Button" parent="HUD/VBox"]
+[node name="SceneButton" type="Button" parent="HUD/SafeArea/VBox"]
+layout_mode = 2
 text = "换装房间"
 
