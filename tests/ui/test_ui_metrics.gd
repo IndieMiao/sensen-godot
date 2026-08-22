@@ -33,7 +33,11 @@ func test_safe_margins_handles_zero_window() -> void:
 	assert_float(m.w).is_equal_approx(16.0, 0.01)
 
 func test_free_ratios_typical_phone() -> void:
-	# 视口 800 高，上下安全区各 24，抽屉 296 → 可用 456
+	# 296 是历史值，保留只是为了让这条纯函数算术用例的输入/期望值不必跟着改。
+	# 出货配置的抽屉实际高度是 312（见 dressing_room.tscn 与 spec 第 4 节），此时
+	# ratio ≈ 0.55，而非本用例算出的 0.57。这里仅验证 free_ratios() 的算术是否正确，
+	# 不代表当前真实的抽屉高度。
+	# 视口 800 高，上下安全区各 24，抽屉 296（历史值）→ 可用 456
 	var r := UIMetrics.free_ratios(800.0, 24.0, 24.0, 296.0)
 	assert_float(r.x).is_equal_approx(0.57, 0.01)
 	assert_float(r.y).is_equal_approx(0.315, 0.01)

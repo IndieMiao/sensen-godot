@@ -22,6 +22,16 @@ func test_spacer_passes_touches_through_for_rotation() -> void:
 	# IGNORE 才能让 _unhandled_input 收到拖拽事件转动角色
 	assert_int(spacer.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 	assert_int(spacer.size_flags_vertical).is_equal(Control.SIZE_EXPAND_FILL)
+	# 回归：Spacer 自己是 IGNORE 不够——它的祖先 SafeArea/VBox 只要有一个是默认
+	# STOP，就会在事件传到 Spacer 之前把整个全屏容器的触摸事件吞掉，导致换装
+	# 房间完全无法拖拽转身。变异测试证实了这条真实回归向量，且现有 96 个用例
+	# 对此全部失明。
+	var safe_area := s.get_node("UI/SafeArea") as Control
+	var vbox := s.get_node("UI/SafeArea/VBox") as Control
+	assert_object(safe_area).is_not_null()
+	assert_object(vbox).is_not_null()
+	assert_int(safe_area.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int(vbox.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 
 func test_parts_grid_has_four_columns() -> void:
 	var s := _instantiate()
@@ -33,7 +43,7 @@ func test_slot_tabs_are_horizontally_scrollable() -> void:
 	var s := _instantiate()
 	var scroll := s.get_node("UI/SafeArea/VBox/Drawer/VBox/TabsScroll") as ScrollContainer
 	assert_object(scroll).is_not_null()
-	# 标签必须能横滑，否则槽位多时最后几个（如 glasses）溢出屏幕点不到
+	# 标签必须能横滑，否则槽位多时最后几个（如 glass）溢出屏幕点不到
 	assert_bool(scroll.horizontal_scroll_mode != ScrollContainer.SCROLL_MODE_DISABLED).is_true()
 	assert_int(scroll.vertical_scroll_mode).is_equal(ScrollContainer.SCROLL_MODE_DISABLED)
 	assert_object(s.get_node("UI/SafeArea/VBox/Drawer/VBox/TabsScroll/SlotTabs")).is_not_null()
@@ -90,6 +100,65 @@ func test_equip_taller_part_triggers_camera_reframe() -> void:
 		await get_tree().process_frame
 	assert_float(cam.position.z).is_greater(before_z)
 
+func _assert_body_within_usable_area(cam: DressingCamera, rig: AvatarRig, drawer: PanelContainer, safe_area: MarginContainer) -> void:
+	var box := DressingCamera.merged_aabb(rig)
+	assert_float(box.size.y).is_greater(0.0)
+	var cx := box.position.x + box.size.x * 0.5
+	var cz := box.position.z + box.size.z * 0.5
+	var top_screen := cam.unproject_position(Vector3(cx, box.position.y + box.size.y, cz))
+	var bottom_screen := cam.unproject_position(Vector3(cx, box.position.y, cz))
+	var top_bound: float = safe_area.get_theme_constant(&"margin_top")
+	var bottom_bound: float = drawer.global_position.y
+	assert_float(top_screen.y).is_greater_equal(top_bound)
+	assert_float(top_screen.y).is_less_equal(bottom_bound)
+	assert_float(bottom_screen.y).is_greater_equal(top_bound)
+	assert_float(bottom_screen.y).is_less_equal(bottom_bound)
+
+func test_character_full_body_stays_within_usable_area() -> void:
+	## 现有相机测试断言的全是代理量（z 变大、v_offset 为负、fov==35），没有一条
+	## 断言用户真正关心的不变量：头顶和脚底是否真的落在屏幕可用区（安全区上边界
+	## ~ 抽屉顶边）内。这条直接把角色包围盒顶/底中心投影到屏幕坐标做断言，能同时
+	## 抓住已修的多个取景缺陷和任何未来的回归。换上 manifest 里最高的部件
+	## hairhat101 再断言一次（终审实测：头顶余量 24.5、脚底 24.4，均为正）。
+	if not FileAccess.file_exists("res://assets/avatar/parts_manifest.json"):
+		push_warning("转换产物缺失，跳过")
+		return
+	var s := _instantiate()
+	var rig: AvatarRig = s.rig
+	var applied := []
+	rig.config_applied.connect(func(c): applied.append(c))
+	for i in 600:
+		if applied.size() > 0:
+			break
+		await get_tree().process_frame
+	assert_int(applied.size()).is_equal(1)
+	for i in range(5):
+		await get_tree().process_frame
+	var cam: DressingCamera = s.cam
+	var drawer := s.get_node("UI/SafeArea/VBox/Drawer") as PanelContainer
+	var safe_area := s.get_node("UI/SafeArea") as MarginContainer
+	_assert_body_within_usable_area(cam, rig, drawer, safe_area)
+
+	var target := ""
+	for meta in Avatar.catalog.parts_for_slot(&"hairHat"):
+		if meta.id == "hairhat101":  # manifest 里 hairHat 槽最高的部件
+			target = meta.id
+			break
+	if target == "":
+		push_warning("hairhat101 不在 manifest 里，跳过换装后的第二段断言")
+		return
+	var slots_applied := []
+	rig.slot_applied.connect(func(slot, part_id): slots_applied.append([slot, part_id]))
+	rig.equip(&"hairHat", target)
+	for i in 600:
+		if slots_applied.size() > 0:
+			break
+		await get_tree().process_frame
+	assert_int(slots_applied.size()).is_greater(0)
+	for i in range(5):
+		await get_tree().process_frame
+	_assert_body_within_usable_area(cam, rig, drawer, safe_area)
+
 func test_drawer_does_not_overflow_safe_area_on_four_part_slot() -> void:
 	## 回归 Critical 缺陷：PartsGrid 4 列 + 3 间距的最小宽度（312）曾经比 Drawer
 	## 的可用内宽更大，PartsScroll 横向不可滚动导致 Drawer 被顶宽出安全区，
@@ -125,3 +194,10 @@ func test_drawer_does_not_overflow_safe_area_on_four_part_slot() -> void:
 	var margin_r: float = safe_area.get_theme_constant(&"margin_right")
 	var content_w := viewport_size.x - margin_l - margin_r
 	assert_float(drawer.size.x).is_less_equal(content_w)
+
+func test_conversion_artifacts_present_otherwise_regressions_silently_skip() -> void:
+	# 本套件多条关键回归（换装相机重取景、Drawer 顶宽出安全区等）在转换产物缺失
+	# 时会 push_warning 后 return 跳过，而 push_warning 不进 gdUnit4 的 pass/fail
+	# 汇总——产物一旦丢失，套件依然报"全部通过"，但最重要的几条回归实际一条
+	# 都没跑。这条用例把"产物是否存在"变成一处显式失败，防止误报绿色。
+	assert_bool(FileAccess.file_exists("res://assets/avatar/parts_manifest.json")).is_true()
