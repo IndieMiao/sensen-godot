@@ -12,6 +12,8 @@ func _ready() -> void:
 	rig.apply_config(Avatar.load_outfit())
 	$UI/Panel/VBox/Buttons/SaveButton.pressed.connect(_on_save)
 	$UI/Panel/VBox/Buttons/ResetButton.pressed.connect(_on_reset)
+	$UI/Panel/VBox/Buttons/SceneButton.pressed.connect(func():
+		get_tree().change_scene_to_file("res://scenes/stress_test/stress_test.tscn"))
 	parts_panel.setup(rig)
 
 func _on_save() -> void:

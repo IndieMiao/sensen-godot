@@ -60,3 +60,7 @@ value = 10.0
 [node name="StrategyButton" type="Button" parent="HUD/VBox"]
 layout_mode = 2
 text = "策略: merged"
+
+[node name="SceneButton" type="Button" parent="HUD/VBox"]
+text = "换装房间"
+

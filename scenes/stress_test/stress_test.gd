@@ -13,6 +13,8 @@ func _ready() -> void:
 	_rng.seed = 20260821  # 固定种子，压测可复现
 	slider.value_changed.connect(func(v): _respawn(int(v)))
 	strategy_btn.pressed.connect(_toggle_strategy)
+	$HUD/VBox/SceneButton.pressed.connect(func():
+		get_tree().change_scene_to_file("res://scenes/dressing_room/dressing_room.tscn"))
 	_respawn(int(slider.value))
 
 func _toggle_strategy() -> void:

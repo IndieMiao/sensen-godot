@@ -49,10 +49,8 @@
 及格线，用于和 `direct` 策略、和不同角色数横向比较，定位性能瓶颈方向）。
 
 1. 按上面 preset 导出安装到真机（Android: 直接装 APK；iOS: Xcode Build & Run）。
-2. 应用启动后默认打开的是换装场景（`dressing_room.tscn`）；压测场景不是 main scene，
-   真机上没有场景切换入口的情况下，导出前临时把 `project.godot` 里
-   `run/main_scene` 改成 `res://scenes/stress_test/stress_test.tscn` 再导出（验收结束记得
-   改回来，不要把这个改动带进正式提交）。
+2. 应用启动后默认打开换装房间（`dressing_room.tscn`）；点击右下角「压测场景」按钮
+   进入压测场景（压测 HUD 内有「换装房间」按钮可切回）。无需修改 main_scene。
 3. 打开压测场景后：把数量滑条拖到 `15`；确认策略按钮显示“策略: merged”（默认就是
    merged，如果之前被切换过再点一下切回来）。
 4. 静置 3–5 秒等 HUD 数字稳定（刚重建角色阵列的头几帧会有加载抖动，不计入读数）。

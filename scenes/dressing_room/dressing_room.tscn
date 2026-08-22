@@ -50,3 +50,7 @@ text = "保存"
 
 [node name="ResetButton" type="Button" parent="UI/Panel/VBox/Buttons"]
 text = "重置"
+
+[node name="SceneButton" type="Button" parent="UI/Panel/VBox/Buttons"]
+text = "压测场景"
+
