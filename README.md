@@ -22,6 +22,10 @@ modules/avatar/            avatar 模块本体（GDScript，无场景状态）
   persistence/                LocalOutfitStore：本地存档
   shaders/                    统一 toon shader + 材质工厂（Unity 参数映射）
 
+modules/ui/                移动端 UI 基建（与 avatar 模块无耦合）
+  ui_metrics.gd              纯计算：安全区换算、取景距离/偏移（无节点依赖，全覆盖单测）
+  safe_area_margin.gd        SafeAreaMargin：按系统安全区设四边内缩，含最小边距兜底
+
 assets/avatar/
   base/                       base_rig.tscn（骨架+AnimationPlayer）、animations.res（idle/walk/run）
   parts/                      转换产出的 AvatarPartDef .res（每个部件一份）
@@ -54,6 +58,9 @@ tools/run_tests.sh res://tests/assembly  # 只跑某个子目录
 脚本会先做一次 `--headless --import`（保证 .uid/导入缓存是最新的），再调用
 `addons/gdUnit4/runtest.sh`。退出码 0 且报告里 `orphans` 为 0 才算通过——gdUnit4 会把节点
 泄漏也计入失败。
+
+UI 相关用例在 `tests/ui`（纯函数与容器）与 `tests/scenes`（场景布局回归），
+两者都不依赖转换产物之外的资源，可单独跑：`tools/run_tests.sh res://tests/ui`。
 
 ## 跑转换管线（Unity → Godot）
 
