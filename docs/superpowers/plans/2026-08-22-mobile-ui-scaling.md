@@ -891,7 +891,11 @@ script = ExtResource("4_dresscam")
 
 ```gdscript
 	rig.config_applied.connect(func(_c): _reframe())
+	rig.slot_applied.connect(func(_s, _p): _reframe())
 ```
+
+**两个信号都要连**：`avatar_rig.gd:124-126` 里 `config_applied` 只在 `_initial_loading` 为真时发出（进场首次装配那一次）；之后点缩略图走 `equip()`，只发 `slot_applied`。只连前者的话，换装后相机永不重取景，戴高帽子直接切头顶——正是本任务要修的原始症状。
+`slot_applied` 是每个变更槽位各发一次，`_reframe()` 内需加合并守卫（`_reframe_queued` 标志），避免首次 `apply_config` 变更十几个槽位时连续触发十几次带 `await` 的取景。
 
 再在 `parts_panel.setup(rig)` 之前加入安全区接线：
 
