@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scenes/dressing_room/dressing_room.gd" id="1_dress"]
 [ext_resource type="Script" path="res://scenes/dressing_room/parts_panel.gd" id="2_parts"]
+[ext_resource type="Script" path="res://modules/ui/safe_area_margin.gd" id="3_safearea"]
 
 [sub_resource type="Environment" id="Environment_room"]
 background_mode = 1
@@ -25,32 +26,63 @@ environment = SubResource("Environment_room")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
-[node name="Panel" type="Panel" parent="UI"]
-anchor_left = 0.6
+[node name="SafeArea" type="MarginContainer" parent="UI"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("3_safearea")
 
-[node name="VBox" type="VBoxContainer" parent="UI/Panel"]
-anchor_right = 1.0
-anchor_bottom = 1.0
+[node name="VBox" type="VBoxContainer" parent="UI/SafeArea"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Spacer" type="Control" parent="UI/SafeArea/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Drawer" type="PanelContainer" parent="UI/SafeArea/VBox"]
+custom_minimum_size = Vector2(0, 296)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="UI/SafeArea/VBox/Drawer"]
+layout_mode = 2
 script = ExtResource("2_parts")
 
-[node name="SlotTabs" type="HBoxContainer" parent="UI/Panel/VBox"]
+[node name="TabsScroll" type="ScrollContainer" parent="UI/SafeArea/VBox/Drawer/VBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+horizontal_scroll_mode = 2
+vertical_scroll_mode = 0
 
-[node name="PartsScroll" type="ScrollContainer" parent="UI/Panel/VBox"]
+[node name="SlotTabs" type="HBoxContainer" parent="UI/SafeArea/VBox/Drawer/VBox/TabsScroll"]
+layout_mode = 2
+
+[node name="PartsScroll" type="ScrollContainer" parent="UI/SafeArea/VBox/Drawer/VBox"]
+layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="PartsGrid" type="GridContainer" parent="UI/Panel/VBox/PartsScroll"]
-columns = 3
+[node name="PartsGrid" type="GridContainer" parent="UI/SafeArea/VBox/Drawer/VBox/PartsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 4
 
-[node name="Buttons" type="HBoxContainer" parent="UI/Panel/VBox"]
+[node name="Buttons" type="HBoxContainer" parent="UI/SafeArea/VBox/Drawer/VBox"]
+layout_mode = 2
 
-[node name="SaveButton" type="Button" parent="UI/Panel/VBox/Buttons"]
+[node name="SaveButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "保存"
 
-[node name="ResetButton" type="Button" parent="UI/Panel/VBox/Buttons"]
+[node name="ResetButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "重置"
 
-[node name="SceneButton" type="Button" parent="UI/Panel/VBox/Buttons"]
+[node name="SceneButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "压测场景"
 
