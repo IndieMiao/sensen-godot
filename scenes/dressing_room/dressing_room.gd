@@ -13,6 +13,10 @@ func _ready() -> void:
 	anchor.add_child(rig)
 	rig.config_applied.connect(func(_c): var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer; if ap: ap.play("idle"))
 	rig.config_applied.connect(func(_c): _reframe())
+	# config_applied 只在首次进场装配完成时发一次；equip()/unequip()（parts_panel 点缩略图走的
+	# 就是这条路）只发 slot_applied，不发 config_applied，若不接这条线，换装后相机永远不会
+	# 重新取景，戴上更高的帽子会直接切头顶。
+	rig.slot_applied.connect(func(_s, _p): _reframe())
 	rig.apply_config(Avatar.load_outfit())
 	$UI/SafeArea/VBox/Drawer/VBox/Buttons/SaveButton.pressed.connect(_on_save)
 	$UI/SafeArea/VBox/Drawer/VBox/Buttons/ResetButton.pressed.connect(_on_reset)
@@ -43,9 +47,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventScreenDrag:
 		anchor.rotate_y(-event.relative.x * 0.01)
 
+var _reframe_queued := false
+
 func _reframe() -> void:
+	# 合并守卫：初次装配一次性触发十几个 slot_applied，若不合并会背靠背 await 十几次。
+	# 已有一次在排队时直接返回；await 结束后才清标志，保证排队期间的所有调用最终
+	# 合并成实际执行的这一次（用当时最新的 rig 状态取景），而不是被静默丢弃。
+	if _reframe_queued:
+		return
+	_reframe_queued = true
 	# 等一帧让装配后的网格与骨骼姿态落定，否则包围盒可能仍是上一套部件的
 	await get_tree().process_frame
+	_reframe_queued = false
 	if not is_instance_valid(rig) or not is_instance_valid(cam):
 		return
 	var h := drawer.size.y if drawer.size.y > 0.0 else drawer.custom_minimum_size.y

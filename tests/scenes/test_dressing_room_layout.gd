@@ -45,6 +45,51 @@ func test_action_buttons_share_width() -> void:
 		assert_object(b).is_not_null()
 		assert_int(b.size_flags_horizontal).is_equal(Control.SIZE_EXPAND_FILL)
 
+func test_equip_taller_part_triggers_camera_reframe() -> void:
+	## 回归 Critical：equip()/unequip()（parts_panel 点缩略图走的正是这条路，见
+	## parts_panel.gd 的 `rig.equip(current_slot, meta.id)`）只发 slot_applied，
+	## 不发 config_applied（avatar_rig.gd:124-126，config_applied 只在
+	## _initial_loading 为真的首次装配那次发出）。dressing_room.gd 若只连
+	## config_applied，进场取景一次之后换任何部件相机都不会重新取景——戴上更高的
+	## 帽子会直接切头顶，直接违反"能看到角色全身"的验收项。
+	if not FileAccess.file_exists("res://assets/avatar/parts_manifest.json"):
+		push_warning("转换产物缺失，跳过")
+		return
+	var s := _instantiate()
+	var rig: AvatarRig = s.rig
+	var applied := []
+	rig.config_applied.connect(func(c): applied.append(c))
+	for i in 600:
+		if applied.size() > 0:
+			break
+		await get_tree().process_frame
+	assert_int(applied.size()).is_equal(1)
+	# _reframe() 内部自身 await 一帧才真正取景，这里多等几帧让进场取景落定，
+	# 拿到换装前的基线相机距离。
+	for i in range(5):
+		await get_tree().process_frame
+	var cam: DressingCamera = s.cam
+	var before_z := cam.position.z
+	var target := ""
+	for meta in Avatar.catalog.parts_for_slot(&"hairHat"):
+		if meta.id == "hairhat101":  # manifest 里 hairHat 槽最高的部件（收敛后 size.y≈2.0m）
+			target = meta.id
+			break
+	if target == "":
+		push_warning("hairhat101 不在 manifest 里，跳过")
+		return
+	var slots_applied := []
+	rig.slot_applied.connect(func(slot, part_id): slots_applied.append([slot, part_id]))
+	rig.equip(&"hairHat", target)
+	for i in 600:
+		if slots_applied.size() > 0:
+			break
+		await get_tree().process_frame
+	assert_int(slots_applied.size()).is_greater(0)
+	for i in range(5):
+		await get_tree().process_frame
+	assert_float(cam.position.z).is_greater(before_z)
+
 func test_drawer_does_not_overflow_safe_area_on_four_part_slot() -> void:
 	## 回归 Critical 缺陷：PartsGrid 4 列 + 3 间距的最小宽度（312）曾经比 Drawer
 	## 的可用内宽更大，PartsScroll 横向不可滚动导致 Drawer 被顶宽出安全区，
