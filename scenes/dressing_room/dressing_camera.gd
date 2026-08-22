@@ -14,7 +14,11 @@ func _ready() -> void:
 	fov = FOV_DEG
 	rotation = Vector3.ZERO
 
-## 合并 root 子树内所有可见 VisualInstance3D 的全局包围盒。
+## 合并 root 子树内所有可见 GeometryInstance3D（真实渲染几何：网格/粒子/文字等）的
+## 全局包围盒。用 GeometryInstance3D 而非 VisualInstance3D 是为了排除
+## VisibleOnScreenNotifier3D / VisibleOnScreenEnabler3D 这类只继承 VisualInstance3D、
+## 但不产生任何渲染像素的节点——RigActivity 会挂一个硬编码剔除框的 Notifier3D 到 rig 下
+## （modules/avatar/assembly/rig_activity.gd），若不过滤会把取景撑大到它的 AABB。
 ## 子树为空或全不可见时返回 size 为 0 的退化 AABB，调用方据此跳过取景。
 static func merged_aabb(root: Node3D) -> AABB:
 	var out := AABB()
@@ -28,9 +32,9 @@ static func merged_aabb(root: Node3D) -> AABB:
 			found = true
 	return out
 
-static func _visuals(node: Node) -> Array[VisualInstance3D]:
-	var result: Array[VisualInstance3D] = []
-	var vi := node as VisualInstance3D
+static func _visuals(node: Node) -> Array[GeometryInstance3D]:
+	var result: Array[GeometryInstance3D] = []
+	var vi := node as GeometryInstance3D
 	if vi and vi.is_visible_in_tree():
 		result.append(vi)
 	for c in node.get_children():

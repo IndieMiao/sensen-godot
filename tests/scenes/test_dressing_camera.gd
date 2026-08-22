@@ -31,6 +31,22 @@ func test_merged_aabb_of_empty_root_is_degenerate() -> void:
 	add_child(auto_free(root))
 	assert_float(DressingCamera.merged_aabb(root).size.y).is_equal(0.0)
 
+func test_merged_aabb_ignores_non_geometry_visual_instances() -> void:
+	## 回归：RigActivity（modules/avatar/assembly/rig_activity.gd）会给 rig 挂一个
+	## VisibleOnScreenNotifier3D 用于可见性节流，其 aabb 是硬编码的通用剔除框
+	## AABB((-0.5,0,-0.5),(1,2,1))，与角色实际渲染范围无关。它只继承 VisualInstance3D、
+	## 不继承 GeometryInstance3D，_visuals() 必须把它排除，否则会把取景撑大到剔除框的尺寸。
+	var root := Node3D.new()
+	add_child(auto_free(root))
+	root.add_child(_box(Vector3(-0.2, 0.0, -0.2), Vector3(0.4, 1.6, 0.4)))
+	var notifier := VisibleOnScreenNotifier3D.new()
+	notifier.aabb = AABB(Vector3(-0.5, 0.0, -0.5), Vector3(1.0, 2.0, 1.0))
+	root.add_child(notifier)
+	auto_free(notifier)
+	var box := DressingCamera.merged_aabb(root)
+	assert_float(box.size.y).is_equal_approx(1.6, 0.01)
+	assert_float(box.size.x).is_equal_approx(0.4, 0.01)
+
 func test_reframe_sets_flat_perspective_and_no_rotation() -> void:
 	var cam := _cam()
 	var root := Node3D.new()
