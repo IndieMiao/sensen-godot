@@ -2,9 +2,9 @@ extends Node3D
 ## 压测场景：批量生成角色，direct/merged 策略可切换对比 HUD 读数。
 
 @onready var rigs_root: Node3D = $Rigs
-@onready var stats: Label = $HUD/VBox/StatsLabel
-@onready var slider: HSlider = $HUD/VBox/CountSlider
-@onready var strategy_btn: Button = $HUD/VBox/StrategyButton
+@onready var stats: Label = $HUD/SafeArea/VBox/StatsLabel
+@onready var slider: HSlider = $HUD/SafeArea/VBox/CountSlider
+@onready var strategy_btn: Button = $HUD/SafeArea/VBox/StrategyButton
 
 var _merged := true
 var _rng := RandomNumberGenerator.new()
@@ -13,7 +13,7 @@ func _ready() -> void:
 	_rng.seed = 20260821  # 固定种子，压测可复现
 	slider.value_changed.connect(func(v): _respawn(int(v)))
 	strategy_btn.pressed.connect(_toggle_strategy)
-	$HUD/VBox/SceneButton.pressed.connect(func():
+	$HUD/SafeArea/VBox/SceneButton.pressed.connect(func():
 		get_tree().change_scene_to_file("res://scenes/dressing_room/dressing_room.tscn"))
 	_respawn(int(slider.value))
 

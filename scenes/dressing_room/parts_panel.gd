@@ -1,10 +1,12 @@
 extends VBoxContainer
 ## 槽位标签页 + 部件网格。数据只来自 slot_table 与 PartCatalog（元数据+缩略图）。
 
+const THUMB_SIZE := Vector2(72, 72)  # 基准单位≈dp；1080 宽屏实际 216px
+
 var rig: AvatarRig
 var current_slot: StringName
 
-@onready var tabs: HBoxContainer = $SlotTabs
+@onready var tabs: HBoxContainer = $TabsScroll/SlotTabs
 @onready var grid: GridContainer = $PartsScroll/PartsGrid
 
 func setup(p_rig: AvatarRig) -> void:
@@ -28,12 +30,12 @@ func _show_slot(slot: StringName) -> void:
 	if slot_def and not slot_def.required:
 		var none_btn := Button.new()
 		none_btn.text = "卸下"
-		none_btn.custom_minimum_size = Vector2(96, 96)
+		none_btn.custom_minimum_size = THUMB_SIZE
 		none_btn.pressed.connect(func(): rig.unequip(slot))
 		grid.add_child(none_btn)
 	for meta in Avatar.catalog.parts_for_slot(slot):
 		var b := Button.new()
-		b.custom_minimum_size = Vector2(96, 96)
+		b.custom_minimum_size = THUMB_SIZE
 		b.tooltip_text = meta.id
 		var tex: Texture2D = load(meta.thumb_path) if meta.thumb_path != "" and ResourceLoader.exists(meta.thumb_path) else null
 		if tex:

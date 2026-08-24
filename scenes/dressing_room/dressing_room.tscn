@@ -1,19 +1,31 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scenes/dressing_room/dressing_room.gd" id="1_dress"]
 [ext_resource type="Script" path="res://scenes/dressing_room/parts_panel.gd" id="2_parts"]
+[ext_resource type="Script" path="res://modules/ui/safe_area_margin.gd" id="3_safearea"]
+[ext_resource type="Script" path="res://scenes/dressing_room/dressing_camera.gd" id="4_dresscam"]
 
 [sub_resource type="Environment" id="Environment_room"]
 background_mode = 1
 background_color = Color(0.164706, 0.164706, 0.188235, 1)
 ambient_light_energy = 0.6
 
+[sub_resource type="StyleBoxFlat" id="SB_drawer"]
+content_margin_left = 0.0
+content_margin_top = 12.0
+content_margin_right = 0.0
+content_margin_bottom = 12.0
+bg_color = Color(0.117647, 0.117647, 0.141176, 0.941176)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+
 [node name="DressingRoom" type="Node3D"]
 script = ExtResource("1_dress")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-position = Vector3(0, 1.2, 2.2)
-rotation_degrees = Vector3(-28.6, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 5.5)
+fov = 35.0
+script = ExtResource("4_dresscam")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 rotation_degrees = Vector3(-45, 30, 0)
@@ -25,32 +37,64 @@ environment = SubResource("Environment_room")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
-[node name="Panel" type="Panel" parent="UI"]
-anchor_left = 0.6
+[node name="SafeArea" type="MarginContainer" parent="UI"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("3_safearea")
 
-[node name="VBox" type="VBoxContainer" parent="UI/Panel"]
-anchor_right = 1.0
-anchor_bottom = 1.0
+[node name="VBox" type="VBoxContainer" parent="UI/SafeArea"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Spacer" type="Control" parent="UI/SafeArea/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Drawer" type="PanelContainer" parent="UI/SafeArea/VBox"]
+custom_minimum_size = Vector2(0, 312)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_drawer")
+
+[node name="VBox" type="VBoxContainer" parent="UI/SafeArea/VBox/Drawer"]
+layout_mode = 2
 script = ExtResource("2_parts")
 
-[node name="SlotTabs" type="HBoxContainer" parent="UI/Panel/VBox"]
+[node name="TabsScroll" type="ScrollContainer" parent="UI/SafeArea/VBox/Drawer/VBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+horizontal_scroll_mode = 1
+vertical_scroll_mode = 0
 
-[node name="PartsScroll" type="ScrollContainer" parent="UI/Panel/VBox"]
+[node name="SlotTabs" type="HBoxContainer" parent="UI/SafeArea/VBox/Drawer/VBox/TabsScroll"]
+layout_mode = 2
+
+[node name="PartsScroll" type="ScrollContainer" parent="UI/SafeArea/VBox/Drawer/VBox"]
+layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="PartsGrid" type="GridContainer" parent="UI/Panel/VBox/PartsScroll"]
-columns = 3
+[node name="PartsGrid" type="GridContainer" parent="UI/SafeArea/VBox/Drawer/VBox/PartsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 4
 
-[node name="Buttons" type="HBoxContainer" parent="UI/Panel/VBox"]
+[node name="Buttons" type="HBoxContainer" parent="UI/SafeArea/VBox/Drawer/VBox"]
+layout_mode = 2
 
-[node name="SaveButton" type="Button" parent="UI/Panel/VBox/Buttons"]
+[node name="SaveButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "保存"
 
-[node name="ResetButton" type="Button" parent="UI/Panel/VBox/Buttons"]
+[node name="ResetButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "重置"
 
-[node name="SceneButton" type="Button" parent="UI/Panel/VBox/Buttons"]
+[node name="SceneButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "压测场景"
 
