@@ -162,7 +162,7 @@ func _build_socket_scene(fbx_root: Node, materials: Array[ShaderMaterial], tier:
 				mesh.surface_set_material(s, materials[mini(s, materials.size() - 1)])
 			mi.mesh = mesh
 			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			mi.transform = (n as Node3D).transform
+			mi.transform = _global_in_fbx(n as Node3D, fbx_root)
 			root.add_child(mi)
 			mi.owner = root
 		for c in n.get_children():
@@ -181,6 +181,31 @@ func _build_socket_scene(fbx_root: Node, materials: Array[ShaderMaterial], tier:
 			root.add_child(player)
 			player.owner = root
 	return root if found else null
+
+## 网格相对 fbx_root 的全局变换。
+##
+## 必须走全局而不是 node.transform（历史缺陷）：BoneAttachment3D 那层的变换在场景未进树时
+## 读出来是单位阵，真正的值是它所绑骨骼的 global rest。两族源 FBX 因此落在不同坐标系里——
+##   SM_*：网格挂在 FBX 自带骨架的 BoneAttachment3D 下，顶点等价于建模在骨骼系；
+##   SK_*：网格直挂 Skeleton3D，顶点建模在根坐标系。
+## 只取局部变换会把前者那层丢掉，装配时又统一绑到目标骨骼，于是 SK_ 族凭空多吃一次旋转
+## （实测 hairhat37 躺倒 90° 并甩出头顶 0.29m）。烘全局后两族统一落在 FBX 根坐标系，
+## 再由 assembler 的 socket 帧（骨骼 rest 基的逆）搬回模型系，两边才对齐。
+static func _global_in_fbx(node: Node3D, fbx_root: Node) -> Transform3D:
+	var t := Transform3D.IDENTITY
+	var cur: Node = node
+	while cur != null and cur != fbx_root and cur is Node3D:
+		var ba := cur as BoneAttachment3D
+		if ba != null:
+			## BoneAttachment3D 自身 transform 由骨骼姿势驱动，此处用绑定骨骼的 global rest 代替
+			var skel := ba.get_parent() as Skeleton3D
+			var idx := skel.find_bone(ba.bone_name) if skel != null else -1
+			if idx >= 0:
+				t = skel.get_bone_global_rest(idx) * t
+		else:
+			t = (cur as Node3D).transform * t
+		cur = cur.get_parent()
+	return t
 
 func _find_anim_player(root: Node) -> AnimationPlayer:
 	var stack: Array = [root]
