@@ -134,6 +134,13 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         }
     }
 
+    /** MapView 的像素密度（= MapInitOptions 默认 pixelRatio）。Godot 侧换算 zoom↔米每像素用。 */
+    @UsedByGodot
+    fun getPixelRatio(): Double {
+        val ctx = container?.context ?: getActivity() ?: return 1.0
+        return ctx.resources.displayMetrics.density.toDouble()
+    }
+
     /** HUD 调试用：当前相机状态。注意跨线程读取仅用于展示，不作同步依据。 */
     @UsedByGodot
     fun getCameraInfo(): String {
