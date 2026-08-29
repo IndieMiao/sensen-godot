@@ -1,7 +1,21 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scenes/map_poc/map_poc.gd" id="1_mp"]
 [ext_resource type="Script" path="res://modules/ui/safe_area_margin.gd" id="2_sa"]
+
+[sub_resource type="StyleBoxFlat" id="SB_load_bg"]
+bg_color = Color(0.882, 0.902, 0.914, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="SB_load_fill"]
+bg_color = Color(0.31, 0.72, 0.58, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [node name="MapPoc" type="Node3D"]
 script = ExtResource("1_mp")
@@ -67,6 +81,14 @@ horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.42, 0.44, 0.46, 1)
 theme_override_font_sizes/font_size = 10
 text = ""
+
+[node name="LoadBar" type="ProgressBar" parent="HUD/SafeArea/Root/Chip/VBox"]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+theme_override_styles/background = SubResource("SB_load_bg")
+theme_override_styles/fill = SubResource("SB_load_fill")
+max_value = 23.0
+show_percentage = false
 
 [node name="Stack" type="VBoxContainer" parent="HUD/SafeArea/Root"]
 layout_mode = 1

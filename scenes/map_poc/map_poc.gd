@@ -42,6 +42,7 @@ const REANCHOR_DIST_M := 3000.0 # 浮动原点重锚阈值
 @onready var chip_debug: Label = $HUD/SafeArea/Root/Chip/VBox/Debug
 @onready var tilt_btn: Button = $HUD/SafeArea/Root/Stack/Tilt
 @onready var fly_btn: Button = $HUD/SafeArea/Root/Bottom/Fly
+@onready var load_bar: ProgressBar = $HUD/SafeArea/Root/Chip/VBox/LoadBar
 
 const DOT_WAIT := Color(0.62, 0.65, 0.68) # 连接中：灰
 const DOT_OK := Color(0.31, 0.72, 0.58) # 同步中：薄荷绿（角色短裤色系）
@@ -116,14 +117,13 @@ func _exit_tree() -> void:
 
 func _process(_dt: float) -> void:
 	if not _spawn_queue.is_empty():
-		for i in 2:
-			if _spawn_queue.is_empty():
-				break
-			var spec: Dictionary = _spawn_queue.pop_front()
-			_add_pawn(spec.lat, spec.lng, spec.cfg, spec.anim)
+		# 每帧 1 个：装配（部件加载+网格合并）摊薄到 ~23 帧，压掉加载期卡顿
+		var spec: Dictionary = _spawn_queue.pop_front()
+		_add_pawn(spec.lat, spec.lng, spec.cfg, spec.anim)
 	if _camera_dirty:
 		_camera_dirty = false
 		_update_cameras()
+	_update_load_bar()
 	if Engine.get_process_frames() % 30 == 0:
 		_refresh_chip()
 
@@ -191,7 +191,9 @@ func _update_pawns(d: float) -> void:
 	for p in _pawns:
 		var n := p.node as Node3D # holder：可见性/位置/缩放归本场景管
 		var act := p.activity as RigActivity
-		var vis := n.position.distance_to(center_world) <= cull_r
+		# ready 门禁：装配完成+首帧姿态应用前绝不显示——半成品蒙皮网格在地图
+		# 缩放（~25×）下会渲染成通天拉伸毛刺（2026-08-29 真机截图实证）。
+		var vis: bool = p.ready and n.position.distance_to(center_world) <= cull_r
 		if n.visible != vis:
 			n.visible = vis
 			# 不等 RigActivity 的 0.25s 节流：隐藏立即停播，显形立即恢复
@@ -330,6 +332,7 @@ func _spawn_pawns() -> void:
 
 func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String) -> void:
 	var holder := Node3D.new()
+	holder.visible = false # ready 门禁：config_applied + 首帧姿态之前不显示
 	rigs.add_child(holder)
 	holder.position = MapGeoMath.geo_to_world(lat, lng, anchor_lat, anchor_lng)
 	# 默认朝南（世界系 +z；rig 零旋转即面向 bearing=0 时位于南侧的相机，
@@ -337,18 +340,35 @@ func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String) -> void:
 	var rig := Avatar.create_rig()
 	rig.assembler = AvatarAssemblerMerged.new()
 	holder.add_child(rig)
-	rig.config_applied.connect(func(_c):
-		var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
-		if ap:
-			ap.play(anim))
-	rig.apply_config(cfg)
 	var activity: RigActivity = null
 	for c in rig.get_children():
 		if c is RigActivity:
 			activity = c
 			break
-	_pawns.append({"lat": lat, "lng": lng, "node": holder, "activity": activity})
-	_camera_dirty = true # 新角色下一帧按当前相机重跑一次剔除/缩放
+	var pawn := {"lat": lat, "lng": lng, "node": holder, "activity": activity, "ready": false}
+	rig.config_applied.connect(func(_c):
+		var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
+		if ap:
+			ap.play(anim)
+			ap.advance(0.0) # 强制立刻应用首帧骨骼姿态，杜绝未蒙皮帧被渲染
+		pawn.ready = true
+		_camera_dirty = true) # 下一帧重跑剔除，按当前相机决定是否显示
+	rig.apply_config(cfg)
+	_pawns.append(pawn)
+	_camera_dirty = true
+
+func _update_load_bar() -> void:
+	if not load_bar.visible:
+		return
+	var total := 1 + PAWNS_NEAR_COUNT + PAWNS_LA_COUNT
+	var ready := 0
+	for p in _pawns:
+		if p.ready:
+			ready += 1
+	load_bar.max_value = total
+	load_bar.value = ready
+	if ready >= total and _spawn_queue.is_empty():
+		load_bar.visible = false
 
 func _rand_anim() -> String:
 	return "idle" if _rng.randf() > 0.4 else "walk"
