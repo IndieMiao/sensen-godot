@@ -15,9 +15,12 @@ content_margin_left = 0.0
 content_margin_top = 12.0
 content_margin_right = 0.0
 content_margin_bottom = 12.0
-bg_color = Color(0.117647, 0.117647, 0.141176, 0.941176)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
+bg_color = Color(1, 1, 1, 0.96)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+shadow_color = Color(0.09, 0.12, 0.16, 0.16)
+shadow_size = 8
+shadow_offset = Vector2(0, -2)
 
 [node name="DressingRoom" type="Node3D"]
 script = ExtResource("1_dress")
@@ -86,6 +89,7 @@ layout_mode = 2
 [node name="SaveButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_type_variation = &"AccentButton"
 text = "保存"
 
 [node name="ResetButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]

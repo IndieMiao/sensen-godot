@@ -2,8 +2,8 @@ extends Node3D
 ## 压测场景：批量生成角色，direct/merged 策略可切换对比 HUD 读数。
 
 @onready var rigs_root: Node3D = $Rigs
-@onready var stats: Label = $HUD/SafeArea/VBox/StatsLabel
-@onready var slider: HSlider = $HUD/SafeArea/VBox/CountSlider
+@onready var stats: Label = $HUD/SafeArea/VBox/Card/CardVBox/StatsLabel
+@onready var slider: HSlider = $HUD/SafeArea/VBox/Card/CardVBox/CountSlider
 @onready var strategy_btn: Button = $HUD/SafeArea/VBox/StrategyButton
 
 var _merged := true

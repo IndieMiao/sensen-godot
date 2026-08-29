@@ -1,99 +1,7 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scenes/map_poc/map_poc.gd" id="1_mp"]
 [ext_resource type="Script" path="res://modules/ui/safe_area_margin.gd" id="2_sa"]
-
-[sub_resource type="StyleBoxFlat" id="SB_chip"]
-content_margin_left = 14.0
-content_margin_top = 8.0
-content_margin_right = 14.0
-content_margin_bottom = 8.0
-bg_color = Color(1, 1, 1, 0.94)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-shadow_color = Color(0.09, 0.12, 0.16, 0.14)
-shadow_size = 6
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="SB_round"]
-bg_color = Color(1, 1, 1, 0.94)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-shadow_color = Color(0.09, 0.12, 0.16, 0.14)
-shadow_size = 6
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="SB_round_pressed"]
-bg_color = Color(0.914, 0.929, 0.937, 0.97)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-shadow_color = Color(0.09, 0.12, 0.16, 0.08)
-shadow_size = 3
-shadow_offset = Vector2(0, 1)
-
-[sub_resource type="StyleBoxFlat" id="SB_pill"]
-content_margin_left = 18.0
-content_margin_top = 11.0
-content_margin_right = 18.0
-content_margin_bottom = 11.0
-bg_color = Color(1, 1, 1, 0.94)
-corner_radius_top_left = 21
-corner_radius_top_right = 21
-corner_radius_bottom_right = 21
-corner_radius_bottom_left = 21
-shadow_color = Color(0.09, 0.12, 0.16, 0.14)
-shadow_size = 6
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="SB_pill_pressed"]
-content_margin_left = 18.0
-content_margin_top = 11.0
-content_margin_right = 18.0
-content_margin_bottom = 11.0
-bg_color = Color(0.914, 0.929, 0.937, 0.97)
-corner_radius_top_left = 21
-corner_radius_top_right = 21
-corner_radius_bottom_right = 21
-corner_radius_bottom_left = 21
-shadow_color = Color(0.09, 0.12, 0.16, 0.08)
-shadow_size = 3
-shadow_offset = Vector2(0, 1)
-
-[sub_resource type="StyleBoxFlat" id="SB_accent"]
-content_margin_left = 18.0
-content_margin_top = 11.0
-content_margin_right = 18.0
-content_margin_bottom = 11.0
-bg_color = Color(0.498, 0.847, 0.745, 1)
-corner_radius_top_left = 21
-corner_radius_top_right = 21
-corner_radius_bottom_right = 21
-corner_radius_bottom_left = 21
-shadow_color = Color(0.24, 0.55, 0.46, 0.28)
-shadow_size = 6
-shadow_offset = Vector2(0, 2)
-
-[sub_resource type="StyleBoxFlat" id="SB_accent_pressed"]
-content_margin_left = 18.0
-content_margin_top = 11.0
-content_margin_right = 18.0
-content_margin_bottom = 11.0
-bg_color = Color(0.41, 0.776, 0.667, 1)
-corner_radius_top_left = 21
-corner_radius_top_right = 21
-corner_radius_bottom_right = 21
-corner_radius_bottom_left = 21
-shadow_color = Color(0.24, 0.55, 0.46, 0.18)
-shadow_size = 3
-shadow_offset = Vector2(0, 1)
-
-[sub_resource type="StyleBoxEmpty" id="SB_nofocus"]
 
 [node name="MapPoc" type="Node3D"]
 script = ExtResource("1_mp")
@@ -123,7 +31,7 @@ anchor_left = 0.5
 anchor_right = 0.5
 grow_horizontal = 2
 offset_top = 4.0
-theme_override_styles/panel = SubResource("SB_chip")
+theme_type_variation = &"ChipPanel"
 
 [node name="VBox" type="VBoxContainer" parent="HUD/SafeArea/Root/Chip"]
 layout_mode = 2
@@ -175,56 +83,32 @@ theme_override_constants/separation = 10
 custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
 focus_mode = 0
-theme_override_colors/font_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_pressed_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_hover_color = Color(0.15, 0.165, 0.19, 1)
+theme_type_variation = &"RoundButton"
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("SB_round")
-theme_override_styles/hover = SubResource("SB_round")
-theme_override_styles/pressed = SubResource("SB_round_pressed")
-theme_override_styles/focus = SubResource("SB_nofocus")
 text = "＋"
 
 [node name="ZoomOut" type="Button" parent="HUD/SafeArea/Root/Stack"]
 custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
 focus_mode = 0
-theme_override_colors/font_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_pressed_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_hover_color = Color(0.15, 0.165, 0.19, 1)
+theme_type_variation = &"RoundButton"
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("SB_round")
-theme_override_styles/hover = SubResource("SB_round")
-theme_override_styles/pressed = SubResource("SB_round_pressed")
-theme_override_styles/focus = SubResource("SB_nofocus")
 text = "－"
 
 [node name="Tilt" type="Button" parent="HUD/SafeArea/Root/Stack"]
 custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
 focus_mode = 0
-theme_override_colors/font_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_pressed_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_hover_color = Color(0.15, 0.165, 0.19, 1)
+theme_type_variation = &"RoundButton"
 theme_override_font_sizes/font_size = 13
-theme_override_styles/normal = SubResource("SB_round")
-theme_override_styles/hover = SubResource("SB_round")
-theme_override_styles/pressed = SubResource("SB_round_pressed")
-theme_override_styles/focus = SubResource("SB_nofocus")
 text = "2D"
 
 [node name="Rotate" type="Button" parent="HUD/SafeArea/Root/Stack"]
 custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
 focus_mode = 0
-theme_override_colors/font_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_pressed_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_hover_color = Color(0.15, 0.165, 0.19, 1)
+theme_type_variation = &"RoundButton"
 theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("SB_round")
-theme_override_styles/hover = SubResource("SB_round")
-theme_override_styles/pressed = SubResource("SB_round_pressed")
-theme_override_styles/focus = SubResource("SB_nofocus")
 text = "旋转"
 
 [node name="Bottom" type="HBoxContainer" parent="HUD/SafeArea/Root"]
@@ -241,25 +125,11 @@ theme_override_constants/separation = 12
 [node name="Fly" type="Button" parent="HUD/SafeArea/Root/Bottom"]
 layout_mode = 2
 focus_mode = 0
-theme_override_colors/font_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_pressed_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_hover_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_font_sizes/font_size = 14
-theme_override_styles/normal = SubResource("SB_pill")
-theme_override_styles/hover = SubResource("SB_pill")
-theme_override_styles/pressed = SubResource("SB_pill_pressed")
-theme_override_styles/focus = SubResource("SB_nofocus")
+theme_type_variation = &"PillButton"
 text = "飞洛杉矶"
 
 [node name="Dress" type="Button" parent="HUD/SafeArea/Root/Bottom"]
 layout_mode = 2
 focus_mode = 0
-theme_override_colors/font_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_pressed_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_colors/font_hover_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_font_sizes/font_size = 14
-theme_override_styles/normal = SubResource("SB_accent")
-theme_override_styles/hover = SubResource("SB_accent")
-theme_override_styles/pressed = SubResource("SB_accent_pressed")
-theme_override_styles/focus = SubResource("SB_nofocus")
+theme_type_variation = &"AccentPillButton"
 text = "去换装"

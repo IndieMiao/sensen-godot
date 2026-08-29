@@ -35,3 +35,22 @@ func test_container_separation_is_8() -> void:
 	assert_int(theme.get_constant(&"separation", &"VBoxContainer")).is_equal(8)
 	assert_int(theme.get_constant(&"h_separation", &"GridContainer")).is_equal(8)
 	assert_int(theme.get_constant(&"v_separation", &"GridContainer")).is_equal(8)
+
+func test_design_system_type_variations_exist() -> void:
+	## 守护统一设计语言（2026-08-29 白色浮层+薄荷绿主行动色）：三个场景共用这些
+	## 类型变体，误删任意一个都会让对应场景静默回退到默认灰按钮。
+	var theme := load(THEME_PATH) as Theme
+	for variation in [&"AccentButton", &"AccentPillButton", &"PillButton", &"RoundButton"]:
+		assert_str(String(theme.get_type_variation_base(variation))).is_equal("Button")
+		assert_object(theme.get_stylebox(&"normal", variation)).is_not_null()
+		assert_object(theme.get_stylebox(&"pressed", variation)).is_not_null()
+	assert_str(String(theme.get_type_variation_base(&"ChipPanel"))).is_equal("PanelContainer")
+	assert_object(theme.get_stylebox(&"panel", &"ChipPanel")).is_not_null()
+
+func test_accent_color_is_mint() -> void:
+	## 主行动色取自角色短裤的薄荷绿；按钮文字用墨色保证对比度。
+	var theme := load(THEME_PATH) as Theme
+	var sb := theme.get_stylebox(&"normal", &"AccentButton") as StyleBoxFlat
+	assert_object(sb).is_not_null()
+	assert_float(sb.bg_color.g).is_greater(sb.bg_color.r) # 绿 > 红：确实是绿色系
+	assert_float(theme.get_color(&"font_color", &"Button").v).is_less(0.5) # 墨色文字

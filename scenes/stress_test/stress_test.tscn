@@ -48,14 +48,24 @@ layout_mode = 2
 mouse_filter = 2
 size_flags_vertical = 0
 
-[node name="StatsLabel" type="Label" parent="HUD/SafeArea/VBox"]
+[node name="Card" type="PanelContainer" parent="HUD/SafeArea/VBox"]
 layout_mode = 2
+theme_type_variation = &"ChipPanel"
+
+[node name="CardVBox" type="VBoxContainer" parent="HUD/SafeArea/VBox/Card"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="StatsLabel" type="Label" parent="HUD/SafeArea/VBox/Card/CardVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15, 0.165, 0.19, 1)
+theme_override_font_sizes/font_size = 13
 text = "角色: 0  策略: merged
 FPS: 0  帧时: 0.00ms
 DrawCalls: 0
 显存: 0.0MB"
 
-[node name="CountSlider" type="HSlider" parent="HUD/SafeArea/VBox"]
+[node name="CountSlider" type="HSlider" parent="HUD/SafeArea/VBox/Card/CardVBox"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -66,13 +76,16 @@ value = 10.0
 
 [node name="StrategyButton" type="Button" parent="HUD/SafeArea/VBox"]
 layout_mode = 2
+size_flags_horizontal = 0
 text = "策略: merged"
 
 [node name="SceneButton" type="Button" parent="HUD/SafeArea/VBox"]
 layout_mode = 2
+size_flags_horizontal = 0
 text = "换装房间"
 
 [node name="MapButton" type="Button" parent="HUD/SafeArea/VBox"]
 layout_mode = 2
+size_flags_horizontal = 0
 text = "去地图"
 
