@@ -33,9 +33,19 @@ const LA_SPREAD_M := 3000.0
 const CULL_FACTOR := 4.0 # 距地图中心 > 4×相机距离 → 隐藏
 const REANCHOR_DIST_M := 3000.0 # 浮动原点重锚阈值
 
-@onready var status: Label = $HUD/Margin/VBox/Status
 @onready var rigs: Node3D = $Rigs
 @onready var cam: Camera3D = $Camera3D
+@onready var chip: PanelContainer = $HUD/SafeArea/Root/Chip
+@onready var chip_dot: Panel = $HUD/SafeArea/Root/Chip/VBox/TitleRow/Dot
+@onready var chip_title: Label = $HUD/SafeArea/Root/Chip/VBox/TitleRow/Title
+@onready var chip_sub: Label = $HUD/SafeArea/Root/Chip/VBox/Sub
+@onready var chip_debug: Label = $HUD/SafeArea/Root/Chip/VBox/Debug
+@onready var tilt_btn: Button = $HUD/SafeArea/Root/Stack/Tilt
+@onready var fly_btn: Button = $HUD/SafeArea/Root/Bottom/Fly
+
+const DOT_WAIT := Color(0.62, 0.65, 0.68) # 连接中：灰
+const DOT_OK := Color(0.31, 0.72, 0.58) # 同步中：薄荷绿（角色短裤色系）
+const DOT_ERR := Color(0.9, 0.36, 0.34) # 出错：红
 
 var map: Object = null
 var anchor_lat := START_LAT # 浮动锚点（世界原点的地理坐标）
@@ -61,6 +71,9 @@ var _pawns: Array[Dictionary] = []
 ## 分帧装配队列：23 个蒙皮 rig 同帧 apply_config 会把装配风暴挤进一两帧
 ## （缓存全命中时 call_deferred 保证同帧 23 次全量网格合并），每帧只放行 2 个。
 var _spawn_queue: Array[Dictionary] = []
+var _dot_tween: Tween = null
+## 错误态锁定芯片文案（缺 token 等），不再被周期刷新覆盖
+var _chip_locked := false
 
 func _ready() -> void:
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
@@ -80,12 +93,18 @@ func _ready() -> void:
 		pixel_ratio = maxf(float(map.getPixelRatio()), 0.5)
 		var token := _load_token()
 		if token.is_empty():
-			status.text = "G2: 缺 res://mapbox_token.txt（构建机放置，勿提交）"
+			_set_dot(DOT_ERR, false)
+			chip_title.text = "缺少地图密钥"
+			chip_sub.text = "在工程根放置 mapbox_token.txt 后重新构建"
+			_chip_locked = true
 		else:
 			map.createMap(token, START_LAT, START_LNG, zoom)
-			status.text = "G2: createMap 已调用，等待 map_ready…"
+			_set_dot(DOT_WAIT, true) # 连接中：呼吸闪烁
 	else:
-		status.text = "G2: 无 GodotMap 插件（桌面运行仅能看透明视口与角色）"
+		_set_dot(DOT_WAIT, false)
+		chip_title.text = "地图预览"
+		chip_sub.text = "桌面运行，无地图插件"
+		_chip_locked = true
 	_camera_dirty = true
 
 func _exit_tree() -> void:
@@ -105,13 +124,22 @@ func _process(_dt: float) -> void:
 	if _camera_dirty:
 		_camera_dirty = false
 		_update_cameras()
-	if map != null and Engine.get_process_frames() % 30 == 0:
+	if Engine.get_process_frames() % 30 == 0:
+		_refresh_chip()
+
+func _refresh_chip() -> void:
+	if _chip_locked:
+		return
+	chip_title.text = "洛杉矶" if _in_la else "上海"
+	chip_sub.text = "%.4f, %.4f  ·  z%.1f" % [center_lat, center_lng, zoom]
+	if chip_debug.visible:
 		var vis := 0
 		for p in _pawns:
 			if (p.node as Node3D).visible:
 				vis += 1
-		status.text = "G2 权威: %.5f,%.5f z%.2f b%.0f p%.0f\n地图回读: %s\n角色: %d/%d 可见" % [
-			center_lat, center_lng, zoom, bearing, pitch, map.getCameraInfo(), vis, _pawns.size()]
+		chip_debug.text = "同步 b%.0f° p%.0f°  ·  角色 %d/%d\n回读 %s" % [
+			bearing, pitch, vis, _pawns.size(),
+			(map.getCameraInfo() if map else "—")]
 
 ## —— 相机同步核心 ————————————————————————————————————————————
 
@@ -213,18 +241,29 @@ func _unhandled_input(e: InputEvent) -> void:
 		_set_pitch(pitch - e.delta.y * 0.2)
 
 func _wire_buttons() -> void:
-	$HUD/Margin/VBox/Row1/ZoomIn.pressed.connect(func(): _set_zoom(zoom + 1.0))
-	$HUD/Margin/VBox/Row1/ZoomOut.pressed.connect(func(): _set_zoom(zoom - 1.0))
-	$HUD/Margin/VBox/Row1/PitchUp.pressed.connect(func(): _set_pitch(pitch + 15.0))
-	$HUD/Margin/VBox/Row1/PitchDown.pressed.connect(func(): _set_pitch(pitch - 15.0))
-	$HUD/Margin/VBox/Row2/Rotate.pressed.connect(func(): _set_bearing(bearing + 30.0))
-	$HUD/Margin/VBox/Row2/Fly.pressed.connect(_on_fly_pressed)
-	$HUD/Margin/VBox/Row2/ToDressing.pressed.connect(func():
+	$HUD/SafeArea/Root/Stack/ZoomIn.pressed.connect(func(): _set_zoom(zoom + 1.0))
+	$HUD/SafeArea/Root/Stack/ZoomOut.pressed.connect(func(): _set_zoom(zoom - 1.0))
+	tilt_btn.pressed.connect(_on_tilt_pressed)
+	$HUD/SafeArea/Root/Stack/Rotate.pressed.connect(func(): _set_bearing(bearing + 30.0))
+	fly_btn.pressed.connect(_on_fly_pressed)
+	$HUD/SafeArea/Root/Bottom/Dress.pressed.connect(func():
 		get_tree().change_scene_to_file("res://scenes/dressing_room/dressing_room.tscn"))
+	# 点定位芯片展开/收起工程数据（触屏经 emulate_mouse 到达，只接鼠标事件防双触发）
+	chip.gui_input.connect(func(ev: InputEvent):
+		if ev is InputEventMouseButton and ev.pressed:
+			chip_debug.visible = not chip_debug.visible
+			_refresh_chip())
+
+## 倾角在 2D 俯视与 3D 斜视之间切换；按钮文案显示"将要切去的模式"
+func _on_tilt_pressed() -> void:
+	_set_pitch(45.0 if pitch < 10.0 else 0.0)
+
+func _update_tilt_label() -> void:
+	tilt_btn.text = "2D" if pitch >= 10.0 else "3D"
 
 func _on_fly_pressed() -> void:
 	_in_la = not _in_la
-	$HUD/Margin/VBox/Row2/Fly.text = "回上海" if _in_la else "飞洛杉矶"
+	fly_btn.text = "回上海" if _in_la else "飞洛杉矶"
 	_teleport(LA_LAT, LA_LNG) if _in_la else _teleport(START_LAT, START_LNG)
 
 func _teleport(lat: float, lng: float) -> void:
@@ -242,6 +281,7 @@ func _set_zoom(v: float) -> void:
 
 func _set_pitch(v: float) -> void:
 	pitch = clampf(v, 0.0, 70.0)
+	_update_tilt_label()
 	_camera_dirty = true
 
 func _set_bearing(v: float) -> void:
@@ -251,8 +291,23 @@ func _set_bearing(v: float) -> void:
 ## —— 初始化 ————————————————————————————————————————————————————
 
 func _on_map_ready() -> void:
-	status.text = "G2: map_ready ✅"
+	_set_dot(DOT_OK, false) # 同步中：常亮薄荷绿
 	_camera_dirty = true
+
+## 芯片状态圆点：颜色 + 是否呼吸闪烁（连接中）
+func _set_dot(color: Color, pulse: bool) -> void:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = color
+	sb.set_corner_radius_all(4)
+	chip_dot.add_theme_stylebox_override("panel", sb)
+	if _dot_tween:
+		_dot_tween.kill()
+		_dot_tween = null
+	chip_dot.modulate.a = 1.0
+	if pulse:
+		_dot_tween = create_tween().set_loops()
+		_dot_tween.tween_property(chip_dot, "modulate:a", 0.3, 0.7)
+		_dot_tween.tween_property(chip_dot, "modulate:a", 1.0, 0.7)
 
 func _load_token() -> String:
 	if not FileAccess.file_exists(TOKEN_PATH):
