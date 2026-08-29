@@ -20,8 +20,13 @@ def find_ap_asset(unity_root: Path, asset_name: str):
             return hits[0]
     return None
 
-def _resolve_override_path(val, unity_root: Path) -> Path:
-    """overrides.json 里的路径可以是绝对路径，也可以是相对 unity_root 的相对路径（便于换机器/仓库位置）。"""
+def _resolve_override_path(val, unity_root: Path):
+    """overrides.json 里的路径可以是绝对路径、相对 unity_root 的相对路径（便于换机器/仓库
+    位置），或 res:// 开头的 Godot 仓库内资源路径——后者原样直通、不参与 _stage 拷贝
+    （用于 eyes00→T_black 这类"不用 Unity 贴图、指向仓库自带资产"的覆盖）。"""
+    s = str(val)
+    if s.startswith("res://"):
+        return s
     p = Path(val)
     return p if p.is_absolute() else Path(unity_root) / p
 

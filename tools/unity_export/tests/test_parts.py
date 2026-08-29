@@ -92,3 +92,11 @@ def test_resolve_override_path_absolute(tmp_path):
 def test_resolve_override_path_relative(tmp_path):
     unity_root = tmp_path / "unity"
     assert parts._resolve_override_path("sub/x.fbx", unity_root) == unity_root / "sub/x.fbx"
+
+
+def test_resolve_override_path_res_passthrough(tmp_path):
+    """res:// 开头的 override 原样直通（指向 Godot 仓库内资产：不拼 unity_root、
+    不进 _stage 拷贝）。eyes00→T_black 纯黑眼睛依赖此行为。"""
+    v = parts._resolve_override_path("res://assets/avatar/common/T_black.png", tmp_path)
+    assert v == "res://assets/avatar/common/T_black.png"
+    assert isinstance(v, str)

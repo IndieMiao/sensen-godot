@@ -101,3 +101,16 @@ func _find_skeleton_3d(node: Node) -> Skeleton3D:
 		if found:
 			return found
 	return null
+
+func test_eyes_material_is_pure_black() -> void:
+	## 回归守护（2026-08-29 定案）：T_eye 贴图有瑕疵，眼睛在任何场景一律纯黑——
+	## eyes00 的 albedo 必须指向共享黑图 T_black，重跑转换管线也不得回退到 T_eye。
+	const EYES := "res://assets/avatar/parts/eyes00.res"
+	if not FileAccess.file_exists(EYES):
+		return
+	var def := load(EYES) as AvatarPartDef
+	assert_object(def).is_not_null()
+	var mat := def.mesh.surface_get_material(0) as ShaderMaterial
+	var tex: Texture2D = mat.get_shader_parameter("albedo_tex")
+	assert_object(tex).is_not_null()
+	assert_str(tex.resource_path).is_equal("res://assets/avatar/common/T_black.png")
