@@ -5,7 +5,7 @@ config_version=5
 config/name="SensenAvatar"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
-run/main_scene="res://scenes/dressing_room/dressing_room.tscn"
+run/main_scene="res://scenes/map_poc/map_poc.tscn"
 
 [autoload]
 Avatar="*res://modules/avatar/avatar_service.gd"
@@ -19,10 +19,15 @@ window/size/window_height_override=1280
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
+window/per_pixel_transparency/allowed=true
 
 [gui]
 
 theme/custom="res://assets/ui/app_theme.tres"
+
+[input_devices]
+
+pointing/android/enable_pan_and_scale_gestures=true
 
 [editor_plugins]
 enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")

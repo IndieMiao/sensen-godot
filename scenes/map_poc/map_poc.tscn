@@ -1,0 +1,65 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/map_poc/map_poc.gd" id="1_mp"]
+
+[node name="MapPoc" type="Node3D"]
+script = ExtResource("1_mp")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+
+[node name="Rigs" type="Node3D" parent="."]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="HUD"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="HUD/Margin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Status" type="Label" parent="HUD/Margin/VBox"]
+layout_mode = 2
+text = "G1 PoC"
+autowrap_mode = 2
+
+[node name="Row1" type="HBoxContainer" parent="HUD/Margin/VBox"]
+layout_mode = 2
+
+[node name="ZoomIn" type="Button" parent="HUD/Margin/VBox/Row1"]
+layout_mode = 2
+text = "放大"
+
+[node name="ZoomOut" type="Button" parent="HUD/Margin/VBox/Row1"]
+layout_mode = 2
+text = "缩小"
+
+[node name="PitchUp" type="Button" parent="HUD/Margin/VBox/Row1"]
+layout_mode = 2
+text = "倾角+"
+
+[node name="PitchDown" type="Button" parent="HUD/Margin/VBox/Row1"]
+layout_mode = 2
+text = "倾角-"
+
+[node name="Row2" type="HBoxContainer" parent="HUD/Margin/VBox"]
+layout_mode = 2
+
+[node name="Rotate" type="Button" parent="HUD/Margin/VBox/Row2"]
+layout_mode = 2
+text = "旋转30°"
+
+[node name="ToDressing" type="Button" parent="HUD/Margin/VBox/Row2"]
+layout_mode = 2
+text = "去换装房"
