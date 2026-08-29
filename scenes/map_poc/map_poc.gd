@@ -23,7 +23,8 @@ const LA_LNG := -118.2437
 ## 角色相对地图滑动，此值是第一校准项（终极手段：no-op custom layer dump projectionMatrix）。
 const MAP_FOV_DEG := 36.87
 ## 角色屏幕等大系数：scale = 相机距离 / 此值。越小角色越大（产品口径 G5 定）。
-const CHAR_DIST_PER_SCALE := 10.0
+## 2026-08-29 调整：16.7 ≈ 10/0.6，角色缩小到原来的 0.6 倍。
+const CHAR_DIST_PER_SCALE := 16.7
 
 const PAWNS_NEAR_COUNT := 12 # 初始地图中心（上海）周边随机角色数
 const PAWNS_LA_COUNT := 10 # 洛杉矶随机角色数
@@ -276,7 +277,8 @@ func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String) -> void:
 	var holder := Node3D.new()
 	rigs.add_child(holder)
 	holder.position = MapGeoMath.geo_to_world(lat, lng, anchor_lat, anchor_lng)
-	holder.rotation.y = _rng.randf_range(0.0, TAU)
+	# 默认朝南（世界系 +z；rig 零旋转即面向 bearing=0 时位于南侧的相机，
+	# G1 真机截图已证实）。若换模型后前向翻转，只需在此处统一加 PI。
 	var rig := Avatar.create_rig()
 	rig.assembler = AvatarAssemblerMerged.new()
 	holder.add_child(rig)
