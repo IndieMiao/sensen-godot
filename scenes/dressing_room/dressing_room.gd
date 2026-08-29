@@ -22,6 +22,8 @@ func _ready() -> void:
 	$UI/SafeArea/VBox/Drawer/VBox/Buttons/ResetButton.pressed.connect(_on_reset)
 	$UI/SafeArea/VBox/Drawer/VBox/Buttons/SceneButton.pressed.connect(func():
 		get_tree().change_scene_to_file("res://scenes/stress_test/stress_test.tscn"))
+	$UI/SafeArea/VBox/Drawer/VBox/Buttons/MapButton.pressed.connect(func():
+		get_tree().change_scene_to_file("res://scenes/map_poc/map_poc.tscn"))
 	safe_area.margins_applied.connect(func(m: Vector4):
 		cam.safe_margin_top = m.y
 		cam.safe_margin_bottom = m.w

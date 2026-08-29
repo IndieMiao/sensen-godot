@@ -15,6 +15,8 @@ func _ready() -> void:
 	strategy_btn.pressed.connect(_toggle_strategy)
 	$HUD/SafeArea/VBox/SceneButton.pressed.connect(func():
 		get_tree().change_scene_to_file("res://scenes/dressing_room/dressing_room.tscn"))
+	$HUD/SafeArea/VBox/MapButton.pressed.connect(func():
+		get_tree().change_scene_to_file("res://scenes/map_poc/map_poc.tscn"))
 	_respawn(int(slider.value))
 
 func _toggle_strategy() -> void:

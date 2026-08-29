@@ -98,3 +98,8 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "压测场景"
 
+[node name="MapButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "去地图"
+
