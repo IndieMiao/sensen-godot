@@ -32,7 +32,7 @@ func test_safe_area_and_vbox_pass_touches_through_for_camera_orbit() -> void:
 	assert_object(vbox).is_not_null()
 	assert_int(safe_area.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 	assert_int(vbox.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
-	for path in ["Card/CardVBox/CountSlider", "StrategyButton", "SceneButton"]:
+	for path in ["Card/CardVBox/CountSlider", "Row/StrategyButton", "Row/SceneButton"]:
 		var ctrl := s.get_node("HUD/SafeArea/VBox/" + path) as Control
 		assert_object(ctrl).is_not_null()
 		assert_int(ctrl.mouse_filter).is_not_equal(Control.MOUSE_FILTER_IGNORE)

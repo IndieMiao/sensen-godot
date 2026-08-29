@@ -74,18 +74,21 @@ max_value = 20.0
 step = 1.0
 value = 10.0
 
-[node name="StrategyButton" type="Button" parent="HUD/SafeArea/VBox"]
+[node name="Row" type="HBoxContainer" parent="HUD/SafeArea/VBox"]
 layout_mode = 2
-size_flags_horizontal = 0
+
+[node name="StrategyButton" type="Button" parent="HUD/SafeArea/VBox/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "策略: merged"
 
-[node name="SceneButton" type="Button" parent="HUD/SafeArea/VBox"]
+[node name="SceneButton" type="Button" parent="HUD/SafeArea/VBox/Row"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "换装房间"
 
-[node name="MapButton" type="Button" parent="HUD/SafeArea/VBox"]
+[node name="MapButton" type="Button" parent="HUD/SafeArea/VBox/Row"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 text = "去地图"
 

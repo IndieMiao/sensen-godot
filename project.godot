@@ -23,6 +23,7 @@ window/per_pixel_transparency/allowed=true
 
 [gui]
 
+common/default_scroll_deadzone=24
 theme/custom="res://assets/ui/app_theme.tres"
 
 [input_devices]

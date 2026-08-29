@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=14 format=3]
+[gd_resource type="Theme" load_steps=17 format=3]
 
 [sub_resource type="StyleBoxFlat" id="SB_btn_normal"]
 content_margin_left = 16.0
@@ -158,6 +158,22 @@ shadow_color = Color(0.24, 0.55, 0.46, 0.18)
 shadow_size = 3
 shadow_offset = Vector2(0, 1)
 
+[sub_resource type="StyleBoxEmpty" id="SB_scroll_track"]
+
+[sub_resource type="StyleBoxFlat" id="SB_scroll_grabber"]
+bg_color = Color(0.78, 0.81, 0.84, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SB_scroll_grabber_hi"]
+bg_color = Color(0.65, 0.69, 0.73, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
 [resource]
 default_font_size = 16
 AccentButton/base_type = &"Button"
@@ -182,6 +198,10 @@ Button/styles/pressed = SubResource("SB_btn_pressed")
 ChipPanel/base_type = &"PanelContainer"
 ChipPanel/styles/panel = SubResource("SB_chip")
 GridContainer/constants/h_separation = 8
+HScrollBar/styles/grabber = SubResource("SB_scroll_grabber")
+HScrollBar/styles/grabber_highlight = SubResource("SB_scroll_grabber_hi")
+HScrollBar/styles/grabber_pressed = SubResource("SB_scroll_grabber_hi")
+HScrollBar/styles/scroll = SubResource("SB_scroll_track")
 GridContainer/constants/v_separation = 8
 HBoxContainer/constants/separation = 8
 Label/font_sizes/font_size = 16
@@ -195,4 +215,8 @@ RoundButton/base_type = &"Button"
 RoundButton/styles/hover = SubResource("SB_round")
 RoundButton/styles/normal = SubResource("SB_round")
 RoundButton/styles/pressed = SubResource("SB_round_pressed")
+VScrollBar/styles/grabber = SubResource("SB_scroll_grabber")
+VScrollBar/styles/grabber_highlight = SubResource("SB_scroll_grabber_hi")
+VScrollBar/styles/grabber_pressed = SubResource("SB_scroll_grabber_hi")
+VScrollBar/styles/scroll = SubResource("SB_scroll_track")
 VBoxContainer/constants/separation = 8
