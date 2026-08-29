@@ -48,6 +48,21 @@ func test_slot_tabs_are_horizontally_scrollable() -> void:
 	assert_int(scroll.vertical_scroll_mode).is_equal(ScrollContainer.SCROLL_MODE_DISABLED)
 	assert_object(s.get_node("UI/SafeArea/VBox/Drawer/VBox/TabsScroll/SlotTabs")).is_not_null()
 
+func test_list_buttons_pass_touch_for_scroll() -> void:
+	## 回归（2026-08-29 真机）：ScrollContainer 触摸滚动依赖按压事件冒泡到容器
+	## （引擎在按压时开始拖拽跟踪，越过死区后 propagate NOTIFICATION_SCROLL_BEGIN
+	## 取消子按钮按压——base_button.cpp 对该通知有专门处理）。列表内按钮若是默认
+	## STOP，事件在按钮处截断，手指落在按钮上便只能拖滚动条。必须 PASS。
+	var s := _instantiate()
+	var tabs := s.get_node("UI/SafeArea/VBox/Drawer/VBox/TabsScroll/SlotTabs")
+	assert_int(tabs.get_child_count()).is_greater(0)
+	for b in tabs.get_children():
+		assert_int((b as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
+	var grid := s.get_node("UI/SafeArea/VBox/Drawer/VBox/PartsScroll/PartsGrid")
+	assert_int(grid.get_child_count()).is_greater(0)
+	for b in grid.get_children():
+		assert_int((b as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
+
 func test_action_buttons_share_width() -> void:
 	var s := _instantiate()
 	for name in ["SaveButton", "ResetButton", "SceneButton"]:
