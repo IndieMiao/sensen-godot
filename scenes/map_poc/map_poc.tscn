@@ -60,6 +60,10 @@ layout_mode = 2
 layout_mode = 2
 text = "旋转30°"
 
+[node name="Fly" type="Button" parent="HUD/Margin/VBox/Row2"]
+layout_mode = 2
+text = "飞洛杉矶"
+
 [node name="ToDressing" type="Button" parent="HUD/Margin/VBox/Row2"]
 layout_mode = 2
 text = "去换装房"

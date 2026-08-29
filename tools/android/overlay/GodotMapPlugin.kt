@@ -5,6 +5,7 @@ import android.graphics.PixelFormat
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
+import java.util.Locale
 import com.mapbox.common.MapboxOptions
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -30,6 +31,11 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
     private var container: FrameLayout? = null
     private var mapView: MapView? = null
+
+    // MapboxMap 是 @MainThread API：相机状态在 UI 线程订阅时写入缓存，
+    // getCameraInfo()（Godot 线程调用）只读缓存，避免跨线程读 native Map。
+    @Volatile
+    private var cameraInfoCache = ""
 
     override fun getPluginName() = "GodotMap"
 
@@ -57,7 +63,13 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     @UsedByGodot
     fun createMap(token: String, lat: Double, lng: Double, zoom: Double) {
         runOnUiThread {
-            if (mapView != null) return@runOnUiThread
+            if (mapView != null) {
+                // 幂等重入（从其他场景返回）：恢复可见并补发 ready 信号，
+                // 否则 GDScript 侧会永远停在"等待 map_ready"。
+                mapView?.visibility = View.VISIBLE
+                emitSignal("map_ready")
+                return@runOnUiThread
+            }
             val parent = container ?: run {
                 Log.e(TAG, "container 为空，createMap 失败")
                 return@runOnUiThread
@@ -80,6 +92,13 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
             mv.mapboxMap.loadStyle(Style.MAPBOX_STREETS) {
                 Log.i(TAG, "style loaded")
                 emitSignal("map_ready")
+            }
+            mv.mapboxMap.subscribeCameraChanged {
+                val c = mv.mapboxMap.cameraState
+                cameraInfoCache = String.format(
+                    Locale.US, "%.5f,%.5f,z%.2f,b%.1f,p%.1f",
+                    c.center.latitude(), c.center.longitude(), c.zoom, c.bearing, c.pitch
+                )
             }
             mapView = mv
             Log.i(TAG, "MapView created @($lat,$lng) z=$zoom")
@@ -141,13 +160,15 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         return ctx.resources.displayMetrics.density.toDouble()
     }
 
-    /** HUD 调试用：当前相机状态。注意跨线程读取仅用于展示，不作同步依据。 */
+    /** 地图整体显隐：离开地图场景时关掉，省 GPU/电（保留实例，返回时秒恢复）。 */
     @UsedByGodot
-    fun getCameraInfo(): String {
-        val mv = mapView ?: return ""
-        val c = mv.mapboxMap.cameraState
-        return "%.5f,%.5f,z%.2f,b%.1f,p%.1f".format(
-            c.center.latitude(), c.center.longitude(), c.zoom, c.bearing, c.pitch
-        )
+    fun setMapVisible(visible: Boolean) {
+        runOnUiThread {
+            mapView?.visibility = if (visible) View.VISIBLE else View.GONE
+        }
     }
+
+    /** HUD 调试用：当前相机状态（UI 线程写入的缓存，任意线程可读）。 */
+    @UsedByGodot
+    fun getCameraInfo(): String = cameraInfoCache
 }
