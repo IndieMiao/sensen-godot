@@ -65,8 +65,11 @@ def main():
         sid = r["id"]
         r["fbx"] = _stage(Path(r["fbx"]), godot_root, sid, report)
         for m in r["materials"]:
-            m["albedo"] = _stage(m["albedo"], godot_root, sid, report) if m["albedo"] else None
-            m["ao"] = _stage(m["ao"], godot_root, sid, report) if m["ao"] else None
+            # res:// 直通值（overrides 指向仓库内资产）不拷贝、原样进 recipe
+            m["albedo"] = m["albedo"] if str(m["albedo"]).startswith("res://") \
+                else (_stage(m["albedo"], godot_root, sid, report) if m["albedo"] else None)
+            m["ao"] = m["ao"] if str(m["ao"]).startswith("res://") \
+                else (_stage(m["ao"], godot_root, sid, report) if m["ao"] else None)
         guid_rows.append((r["unity_guid"], sid))
 
     (out_dir / "recipes.json").write_text(

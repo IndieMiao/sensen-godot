@@ -2,9 +2,9 @@ extends Node3D
 ## 压测场景：批量生成角色，direct/merged 策略可切换对比 HUD 读数。
 
 @onready var rigs_root: Node3D = $Rigs
-@onready var stats: Label = $HUD/SafeArea/VBox/StatsLabel
-@onready var slider: HSlider = $HUD/SafeArea/VBox/CountSlider
-@onready var strategy_btn: Button = $HUD/SafeArea/VBox/StrategyButton
+@onready var stats: Label = $HUD/SafeArea/VBox/Card/CardVBox/StatsLabel
+@onready var slider: HSlider = $HUD/SafeArea/VBox/Card/CardVBox/CountSlider
+@onready var strategy_btn: Button = $HUD/SafeArea/VBox/Row/StrategyButton
 
 var _merged := true
 var _rng := RandomNumberGenerator.new()
@@ -13,8 +13,10 @@ func _ready() -> void:
 	_rng.seed = 20260821  # 固定种子，压测可复现
 	slider.value_changed.connect(func(v): _respawn(int(v)))
 	strategy_btn.pressed.connect(_toggle_strategy)
-	$HUD/SafeArea/VBox/SceneButton.pressed.connect(func():
+	$HUD/SafeArea/VBox/Row/SceneButton.pressed.connect(func():
 		get_tree().change_scene_to_file("res://scenes/dressing_room/dressing_room.tscn"))
+	$HUD/SafeArea/VBox/Row/MapButton.pressed.connect(func():
+		get_tree().change_scene_to_file("res://scenes/map_poc/map_poc.tscn"))
 	_respawn(int(slider.value))
 
 func _toggle_strategy() -> void:

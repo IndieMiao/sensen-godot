@@ -7,3 +7,6 @@ tools/unity_export/out/
 *.swp
 reports/
 build/
+mapbox_token.txt
+/android/
+.DS_Store

@@ -32,8 +32,8 @@ func test_safe_area_and_vbox_pass_touches_through_for_camera_orbit() -> void:
 	assert_object(vbox).is_not_null()
 	assert_int(safe_area.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 	assert_int(vbox.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
-	for name in ["CountSlider", "StrategyButton", "SceneButton"]:
-		var ctrl := s.get_node("HUD/SafeArea/VBox/" + name) as Control
+	for path in ["Card/CardVBox/CountSlider", "Row/StrategyButton", "Row/SceneButton"]:
+		var ctrl := s.get_node("HUD/SafeArea/VBox/" + path) as Control
 		assert_object(ctrl).is_not_null()
 		assert_int(ctrl.mouse_filter).is_not_equal(Control.MOUSE_FILTER_IGNORE)
 
@@ -42,7 +42,7 @@ func test_slider_is_tall_enough_to_drag() -> void:
 	if s == null:
 		push_warning("转换产物缺失，跳过")
 		return
-	var slider := s.get_node("HUD/SafeArea/VBox/CountSlider") as HSlider
+	var slider := s.get_node("HUD/SafeArea/VBox/Card/CardVBox/CountSlider") as HSlider
 	assert_object(slider).is_not_null()
 	assert_float(slider.custom_minimum_size.y).is_greater_equal(48.0)
 	assert_int(slider.size_flags_horizontal).is_equal(Control.SIZE_EXPAND_FILL)
