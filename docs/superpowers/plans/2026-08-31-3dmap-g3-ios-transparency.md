@@ -51,3 +51,16 @@ tools/ios/setup_ios_g3.sh   # 导出工程 + 注入 spike（首次需 Xcode 选�
 2. 相机同步在 iOS 端复验（G2 清单同款，`presentsWithTransaction` 备用）
 3. G4 性能矩阵补 iOS 侧（真机 Metal 合成开销、发热）
 4. 导出链自动化：pbxproj 注入改为 Godot iOS 插件/export plugin 正规化
+
+## 追记（2026-08-31 深夜）：iOS 真地图桥端到端通过 ✅
+
+G3 收尾第 1 项当天完成：MapUnderlay.swift（Mapbox iOS SDK 11.29.1 via SPM）+ UDP 回环桥
++ MapBridge 抽象层，真机截图验证——真地图垫底、UDP READY 握手（芯片绿点）、
+拖拽/缩放相机同步、飞洛杉矶瞬移+浮动原点、中文 UI（Noto SC）、Mapbox 归属标识可见。
+
+构建踩坑追加：①SwiftPM 取 GitHub 凭据会触发钥匙串授权弹窗，headless 构建
+静默挂死在 SecKeychainItemCopyContent——Mac 屏幕上点"始终允许"即解
+（采样定位：sample xcodebuild 看 KeychainAuthorizationProvider）；②SPM 二进制
+工件下载需代理时给 xcodebuild 显式 https_proxy env；③Godot 新导出的 pbxproj
+字符串值带引号、被 Xcode 保存过的不带——注入锚点两种都要匹配；④macOS 无
+timeout 命令。iOS 端"回读"通道（HUD 调试用）未实现，显示 "—" 为预期。

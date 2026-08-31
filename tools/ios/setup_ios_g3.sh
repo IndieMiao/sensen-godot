@@ -52,11 +52,15 @@ t = t.replace(
     '\t\t\t\tDEADBEEF2F582BE20003B888 /* godot in Frameworks */,\n'
     '\t\t\t\tAA00000000000000000000C3 /* MapboxMaps in Frameworks */,', 1)
 # 6) target 的 packageProductDependencies
-t = t.replace(
-    '\t\t\tname = sensen;\n\t\t\tproductName = SensenAvatar;',
-    '\t\t\tname = sensen;\n\t\t\tpackageProductDependencies = (\n'
-    '\t\t\t\tAA00000000000000000000C2 /* MapboxMaps */,\n\t\t\t);\n'
-    '\t\t\tproductName = SensenAvatar;', 1)
+# 注意：Godot 新导出的 pbxproj 值带引号（name = "sensen";），被 Xcode 保存过的
+# 不带引号——两种锚点都要试（2026-08-31 实际踩过：只匹配无引号版导致漏注入）。
+for anchor in ['\t\t\tname = "sensen";\n\t\t\tproductName = "SensenAvatar";',
+               '\t\t\tname = sensen;\n\t\t\tproductName = SensenAvatar;']:
+    if anchor in t:
+        lines = anchor.split('\n')
+        t = t.replace(anchor, lines[0] + '\n\t\t\tpackageProductDependencies = (\n'
+            '\t\t\t\tAA00000000000000000000C2 /* MapboxMaps */,\n\t\t\t);\n' + lines[1], 1)
+        break
 # 7) project 的 packageReferences
 t = t.replace(
     '\t\t\thasScannedForEncodings = 0;',
