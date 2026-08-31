@@ -48,7 +48,7 @@ const DOT_WAIT := Color(0.62, 0.65, 0.68) # 连接中：灰
 const DOT_OK := Color(0.31, 0.72, 0.58) # 同步中：薄荷绿（角色短裤色系）
 const DOT_ERR := Color(0.9, 0.36, 0.34) # 出错：红
 
-var map: Object = null
+var map: MapBridge = null
 var anchor_lat := START_LAT # 浮动锚点（世界原点的地理坐标）
 var anchor_lng := START_LNG
 ## 权威地图中心用 f64 标量端到端保存（GDScript 变量是双精度）。
@@ -86,12 +86,11 @@ func _ready() -> void:
 	# 窗口尺寸变化（旋屏/分屏/折叠屏）会改变两层的像素↔米换算基准，必须重推相机
 	get_viewport().size_changed.connect(func(): _camera_dirty = true)
 
-	if Engine.has_singleton("GodotMap"):
-		map = Engine.get_singleton("GodotMap")
-		# 插件在 Android UI 线程 emitSignal，必须 deferred 回主循环再碰场景树
-		map.connect("map_ready", _on_map_ready, CONNECT_DEFERRED)
-		map.setMapVisible(true)
-		pixel_ratio = maxf(float(map.getPixelRatio()), 0.5)
+	map = _make_bridge()
+	if map:
+		map.map_ready.connect(_on_map_ready)
+		map.set_map_visible(true)
+		pixel_ratio = map.get_pixel_ratio()
 		var token := _load_token()
 		if token.is_empty():
 			_set_dot(DOT_ERR, false)
@@ -99,7 +98,7 @@ func _ready() -> void:
 			chip_sub.text = "在工程根放置 mapbox_token.txt 后重新构建"
 			_chip_locked = true
 		else:
-			map.createMap(token, START_LAT, START_LNG, zoom)
+			map.create_map(token, START_LAT, START_LNG, zoom)
 			_set_dot(DOT_WAIT, true) # 连接中：呼吸闪烁
 	else:
 		_set_dot(DOT_WAIT, false)
@@ -108,14 +107,24 @@ func _ready() -> void:
 		_chip_locked = true
 	_camera_dirty = true
 
+## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）
+func _make_bridge() -> MapBridge:
+	if Engine.has_singleton("GodotMap"):
+		return MapBridgeAndroid.new()
+	if OS.get_name() == "iOS":
+		return MapBridgeIOS.new()
+	return null
+
 func _exit_tree() -> void:
 	# 场景切走的清理：transparent_bg 是根视口全局态，不还原会把换装房的
 	# Environment 背景干掉、地图从底下透上来；地图本体也要停渲染省电。
 	get_viewport().transparent_bg = false
 	if map:
-		map.setMapVisible(false)
+		map.set_map_visible(false)
 
 func _process(_dt: float) -> void:
+	if map:
+		map.poll()
 	if not _spawn_queue.is_empty():
 		# 每帧 1 个：装配（部件加载+网格合并）摊薄到 ~23 帧，压掉加载期卡顿
 		var spec: Dictionary = _spawn_queue.pop_front()
@@ -137,9 +146,9 @@ func _refresh_chip() -> void:
 		for p in _pawns:
 			if (p.node as Node3D).visible:
 				vis += 1
+		var info := map.camera_info() if map else ""
 		chip_debug.text = "同步 b%.0f° p%.0f°  ·  角色 %d/%d\n回读 %s" % [
-			bearing, pitch, vis, _pawns.size(),
-			(map.getCameraInfo() if map else "—")]
+			bearing, pitch, vis, _pawns.size(), info if not info.is_empty() else "—"]
 
 ## —— 相机同步核心 ————————————————————————————————————————————
 
@@ -172,9 +181,9 @@ func _update_cameras() -> void:
 	cam.near = maxf(d / 1000.0, 0.05)
 	cam.far = d * 8.0
 	_update_pawns(d)
-	# 同一份位姿喂给地图（单一权威，f64 直达 JNI double）
+	# 同一份位姿喂给地图（单一权威）
 	if map:
-		map.setCamera(center_lat, center_lng, zoom, bearing, pitch)
+		map.set_camera(center_lat, center_lng, zoom, bearing, pitch)
 
 ## 浮动原点：地图中心跑远了就把锚点搬过来（f64 精确拷贝），所有几何重算。
 func _maybe_reanchor() -> void:
@@ -294,6 +303,8 @@ func _set_bearing(v: float) -> void:
 
 func _on_map_ready() -> void:
 	_set_dot(DOT_OK, false) # 同步中：常亮薄荷绿
+	if map:
+		pixel_ratio = map.get_pixel_ratio() # iOS 桥的真实 scale 随 READY 到达
 	_camera_dirty = true
 
 ## 芯片状态圆点：颜色 + 是否呼吸闪烁（连接中）
