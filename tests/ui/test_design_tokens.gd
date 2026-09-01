@@ -52,3 +52,16 @@ func test_sheet_radius_token_applied_to_drawer() -> void:
 
 func test_ink_is_dark_enough_for_contrast() -> void:
 	assert_bool(DesignTokens.INK.v < 0.5).is_true()
+
+func test_button_font_color_matches_ink_token() -> void:
+	var color := _theme().get_color(&"font_color", &"Button")
+	assert_bool(color.is_equal_approx(DesignTokens.INK)).is_true()
+
+func test_label_font_color_matches_ink_token() -> void:
+	var color := _theme().get_color(&"font_color", &"Label")
+	assert_bool(color.is_equal_approx(DesignTokens.INK)).is_true()
+
+func test_pill_font_size_matches_token() -> void:
+	## PillButton / AccentPillButton 用的是专属中间字号 FONT_PILL（非 LABEL/BODY）。
+	assert_int(_theme().get_font_size(&"font_size", &"PillButton")).is_equal(DesignTokens.FONT_PILL)
+	assert_int(_theme().get_font_size(&"font_size", &"AccentPillButton")).is_equal(DesignTokens.FONT_PILL)

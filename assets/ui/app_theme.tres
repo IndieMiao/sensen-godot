@@ -181,6 +181,7 @@ AccentButton/styles/hover = SubResource("SB_accent_normal")
 AccentButton/styles/normal = SubResource("SB_accent_normal")
 AccentButton/styles/pressed = SubResource("SB_accent_pressed")
 AccentPillButton/base_type = &"Button"
+; FONT_PILL：胶囊按钮专用中间字号，故意介于 FONT_LABEL(13) 与 FONT_BODY(16) 之间，非硬编码遗留
 AccentPillButton/font_sizes/font_size = 14
 AccentPillButton/styles/hover = SubResource("SB_pill_accent")
 AccentPillButton/styles/normal = SubResource("SB_pill_accent")
@@ -208,6 +209,7 @@ Label/font_sizes/font_size = 16
 Label/colors/font_color = Color(0.070588, 0.188235, 0.156863, 1)
 PanelContainer/styles/panel = SubResource("SB_panel_drawer")
 PillButton/base_type = &"Button"
+; FONT_PILL：胶囊按钮专用中间字号，故意介于 FONT_LABEL(13) 与 FONT_BODY(16) 之间，非硬编码遗留
 PillButton/font_sizes/font_size = 14
 PillButton/styles/hover = SubResource("SB_pill")
 PillButton/styles/normal = SubResource("SB_pill")
