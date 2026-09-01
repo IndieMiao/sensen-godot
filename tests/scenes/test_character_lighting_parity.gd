@@ -57,3 +57,17 @@ func test_map_background_mode_keeps_transparency() -> void:
 	## Environment 的 background_mode 必须是 0（CLEAR_COLOR），
 	## 用 1（COLOR）会画一层实色盖掉底图，G1/G3 那套透明合成就废了。
 	assert_str(_val(MAP, "background_mode")).is_equal("0")
+
+## 换装房必须有实体背板，不能靠清屏色当背景。
+## 2026-09-01：真机上从地图进换装房时整屏透到桌面。已排除的两个原因——
+## transparent_bg 在地图 _exit_tree 里确实还原了（真机日志 [DR] enter transparent_bg=false），
+## DisplayServer.WINDOW_FLAG_TRANSPARENT 关掉也无效（背景像素逐字节不变）。
+## 根因在 Activity 级窗口透明（Godot 因 per_pixel_transparency/allowed=true 套的
+## translucent 主题），GDScript 管不到。与其跟引擎较劲，不如给场景一个真的背板——
+## 这本来也是对的：参考版的换装间是个真实房间，不是一块清屏色。
+func test_dressing_room_has_opaque_backdrop() -> void:
+	var src := FileAccess.get_file_as_string(ROOM)
+	assert_bool(src.contains('name="Backdrop"')).is_true()
+	assert_bool(src.contains('type="MeshInstance3D"')).is_true()
+	## 无光照（shading_mode = 0）：背板要的是确定的底色，不该跟着平行光变
+	assert_bool(src.contains("shading_mode = 0")).is_true()
