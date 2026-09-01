@@ -247,17 +247,33 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
             if (locationStarted) return@runOnUiThread
 
-            // 再订阅持续更新：有 FINE 用 GPS，只有 COARSE 就退 NETWORK。
-            // 这个订阅故意跨场景存活到插件销毁为止（不在场景退出时 stopLocation）——
-            // 它是场景重入时唯一能保证送达新鲜定位的来源，见上面的函数注释。
-            val provider = if (fine) LocationManager.GPS_PROVIDER else LocationManager.NETWORK_PROVIDER
-            try {
-                lm.requestLocationUpdates(provider, 2000L, 5f, locationListener)
-                locationStarted = true
-                Log.i(TAG, "定位订阅启动 provider=$provider")
-            } catch (e: Exception) {
-                Log.e(TAG, "requestLocationUpdates 失败: ${e.message}")
+            // 再订阅持续更新：GPS 与 NETWORK 两个 provider，权限允许的都订上。
+            // 室内环境 GPS 常常几分钟拿不到定影，只订 GPS（原实现）会让 demo 在
+            // 室内跑很容易撞上 3 秒超时回落；listener 本身与 provider 无关，
+            // GDScript 侧取第一个到达的即可。这个订阅故意跨场景存活到插件销毁
+            // 为止（不在场景退出时 stopLocation）——它是场景重入时唯一能保证
+            // 送达新鲜定位的来源，见上面的函数注释。每个 provider 单独 try/catch，
+            // 一个不可用不连累另一个。
+            var subscribed = false
+            if (fine) {
+                try {
+                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 5f, locationListener)
+                    subscribed = true
+                    Log.i(TAG, "定位订阅启动 provider=${LocationManager.GPS_PROVIDER}")
+                } catch (e: Exception) {
+                    Log.e(TAG, "requestLocationUpdates(GPS) 失败: ${e.message}")
+                }
             }
+            if (coarse) {
+                try {
+                    lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000L, 5f, locationListener)
+                    subscribed = true
+                    Log.i(TAG, "定位订阅启动 provider=${LocationManager.NETWORK_PROVIDER}")
+                } catch (e: Exception) {
+                    Log.e(TAG, "requestLocationUpdates(NETWORK) 失败: ${e.message}")
+                }
+            }
+            locationStarted = subscribed
         }
     }
 
