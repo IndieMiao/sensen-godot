@@ -275,7 +275,8 @@ func _step_fling(dt: float) -> void:
 	if _touch_count > 0 or _fling_vel.length() < FLING_MIN_SPEED:
 		_fling_vel = Vector3.ZERO
 		return
-	_apply_world_delta(_fling_vel * dt)
+	# 与拖拽路径同款限幅：帧率抖动导致 vel*dt 失配时，不至于把地图甩出几千公里。
+	_apply_world_delta((_fling_vel * dt).limit_length(_cam_distance()))
 	_fling_vel *= exp(-FLING_DECAY * dt)
 	_camera_dirty = true
 
@@ -302,12 +303,13 @@ func _unhandled_input(e: InputEvent) -> void:
 		_touch_count = maxi(_touch_count, 0)
 		if e.pressed:
 			_fling_vel = Vector3.ZERO # 新触摸立即打断惯性
-			if _is_double_tap(Time.get_ticks_msec(), e.position):
-				_last_tap_ms = 0
-				_tween_zoom(zoom + 1.0)
-			else:
-				_last_tap_ms = Time.get_ticks_msec()
-				_last_tap_pos = e.position
+			if _touch_count <= 1: # 第二指落下（捏合起手）不算双击，镜像拖拽路径的门禁
+				if _is_double_tap(Time.get_ticks_msec(), e.position):
+					_last_tap_ms = 0
+					_tween_zoom(zoom + 1.0)
+				else:
+					_last_tap_ms = Time.get_ticks_msec()
+					_last_tap_pos = e.position
 	if e is InputEventScreenDrag and _touch_count <= 1:
 		# 抓地拖拽：让按下时的地面点始终跟在手指下（倾角下精确）。
 		# 高 pitch 时屏幕上缘一像素对应的地面位移可达 ~0.4d，单次 delta 限幅到 d

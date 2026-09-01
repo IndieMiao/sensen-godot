@@ -38,3 +38,67 @@ func test_fling_respects_latitude_clamp() -> void:
 	n._fling_vel = Vector3(0.0, 0.0, -5.0e6)
 	n._step_fling(1.0)
 	assert_bool(n.center_lat <= 85.051129).is_true()
+
+func test_step_fling_clamps_delta_like_drag() -> void:
+	## 拖拽路径对每次 delta 用 limit_length(_cam_distance()) 限幅，注释写明原因：
+	## 一次拖拽不限幅能把地图甩出上百公里。fling 路径此前没有对称限幅——帧率
+	## 抖动或极端速度下，单帧就能把地图甩出几千公里，是同一个洞、不对称的补丁。
+	var n = auto_free(MapPoc.new())
+	var lat0: float = n.center_lat
+	# 限幅发生在 center_lat 变化之前，取同一时刻的值比较——事后再算 _cam_distance()
+	# 会因为 center_lat 已经挪动、cos(lat) 略微变了而产生虚假的几十厘米级偏差。
+	var d0: float = n._cam_distance()
+	n._fling_vel = Vector3(0.0, 0.0, -5.0e6) # 极端速度：不限幅一步就能甩出几千公里
+	n._step_fling(1.0)
+	var moved_m: float = (n.center_lat - lat0) * MapGeoMath.M_PER_DEG_LAT
+	assert_float(moved_m).is_less_equal(d0 + 0.01)
+
+func test_second_finger_press_does_not_trigger_double_tap() -> void:
+	## 捏合起手：第二根手指的落点往往在时间和距离上都离第一指很近，若不比照
+	## 拖拽路径加 _touch_count 门禁，会被误判成双击，在用户捏合手势中途
+	## 叠加一次意外缩放。
+	var n = auto_free(SpyMapPoc.new())
+	n._touch_count = 1 # 已有一指按下
+	n._last_tap_ms = Time.get_ticks_msec()
+	n._last_tap_pos = Vector2(100, 100)
+	var ev := InputEventScreenTouch.new()
+	ev.pressed = true
+	ev.position = Vector2(102, 101) # 时间、距离都落在双击判定窗口内
+	n._unhandled_input(ev)
+	assert_int(n.zoom_tween_calls).is_equal(0)
+	assert_bool(n._last_tap_pos == Vector2(100, 100)).is_true() # 第二指不覆盖单指落点记录
+
+func test_double_tap_zoom_tweens_not_instant() -> void:
+	## 瞬变实现会让 zoom 在调用后立刻等于目标值——这正是决策者点名"不丝滑"的
+	## 另一半，此前测试从未调用过 _tween_zoom，对这条毫无保护。
+	var n := TreeReadyMapPoc.new()
+	add_child(auto_free(n))
+	var z0: float = n.zoom
+	n._tween_zoom(z0 + 1.0)
+	assert_object(n._zoom_tween).is_not_null()
+	assert_bool(n._zoom_tween.is_running()).is_true()
+	assert_float(n.zoom).is_equal(z0) # 调用后还没推进，证明是过渡而非瞬变
+
+func test_double_tap_zoom_tween_replaces_previous() -> void:
+	## 双击的双击：第二次 _tween_zoom 必须杀掉第一个 tween，不留两条并行变焦。
+	var n := TreeReadyMapPoc.new()
+	add_child(auto_free(n))
+	n._tween_zoom(n.zoom + 1.0)
+	var first_tween: Tween = n._zoom_tween
+	n._tween_zoom(n.zoom + 1.0)
+	assert_bool(first_tween.is_running()).is_false()
+	assert_object(n._zoom_tween).is_not_same(first_tween)
+	assert_bool(n._zoom_tween.is_running()).is_true()
+
+## 测试替身：把 _tween_zoom 换成计数器，用来验证"是否试图缩放"而不需要节点在
+## 场景树里（create_tween() 的前提是节点在树中，但这条只关心门禁，不关心 Tween 本身）。
+class SpyMapPoc extends MapPoc:
+	var zoom_tween_calls := 0
+	func _tween_zoom(_target: float) -> void:
+		zoom_tween_calls += 1
+
+## 测试专用轻量子类：_ready() 里 $Sun/$HUD/... 等路径只在真实 .tscn 里存在，
+## 覆写成空避免装配崩溃；只是为了让节点进场景树以满足 create_tween() 的前提。
+class TreeReadyMapPoc extends MapPoc:
+	func _ready() -> void:
+		pass
