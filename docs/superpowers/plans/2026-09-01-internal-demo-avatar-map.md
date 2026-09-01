@@ -1553,6 +1553,37 @@ func test_double_tap_window_and_radius() -> void:
 	assert_bool(n._is_double_tap(1500, Vector2(100, 100))).is_false() # 超时
 	assert_bool(n._is_double_tap(1200, Vector2(200, 200))).is_false() # 距离太远
 
+func test_second_finger_does_not_trigger_double_tap() -> void:
+	## 捏合起手时两指并拢落下，不得被读成双击
+	var n = auto_free(MapPoc.new())
+	n._last_tap_ms = 1000
+	n._last_tap_pos = Vector2(100, 100)
+	n._touch_count = 1 # 已有一指按下
+	assert_bool(n._touch_count <= 1 and n._is_double_tap(1150, Vector2(103, 101))).is_true()
+	n._touch_count = 2 # 第二指落下
+	assert_bool(n._touch_count <= 1 and n._is_double_tap(1150, Vector2(103, 101))).is_false()
+
+## _tween_zoom 需要在场景树里（create_tween 的前提），所以这两条用 add_child。
+## 关键断言是"zoom 没有立刻跳到目标值"——这正是本任务要交付的"平滑而非瞬变"，
+## 没有它，谁把 _tween_zoom 换成裸 _set_zoom() 都能全绿通过。
+func test_double_tap_zoom_is_tweened_not_instant() -> void:
+	var n = MapPoc.new()
+	add_child(auto_free(n))
+	var z0: float = n.zoom
+	n._tween_zoom(z0 + 1.0)
+	assert_object(n._zoom_tween).is_not_null()
+	assert_bool(n._zoom_tween.is_running()).is_true()
+	assert_float(n.zoom).is_less(z0 + 1.0) # 尚未到达目标 = 不是瞬变
+
+func test_repeat_tween_zoom_kills_previous() -> void:
+	var n = MapPoc.new()
+	add_child(auto_free(n))
+	n._tween_zoom(n.zoom + 1.0)
+	var first: Tween = n._zoom_tween
+	n._tween_zoom(n.zoom + 2.0)
+	assert_bool(first.is_valid()).is_false() # 前一个被 kill，而不是两个同时活着
+	assert_object(n._zoom_tween).is_not_null()
+
 func test_fling_respects_latitude_clamp() -> void:
 	## 极高速向北甩不得把中心拖过 Web Mercator 边界（拖过极点会东西镜像）
 	var n = auto_free(MapPoc.new())
@@ -1601,7 +1632,9 @@ func _unhandled_input(e: InputEvent) -> void:
 		_touch_count = maxi(_touch_count, 0)
 		if e.pressed:
 			_fling_vel = Vector3.ZERO # 新触摸立即打断惯性
-			if _is_double_tap(Time.get_ticks_msec(), e.position):
+			# ⚠️ 必须卡 _touch_count <= 1：本界面支持双指捏合，而捏合起手时两指
+			# 是并拢落下的——不卡的话第二指会被读成双击，在用户手势中途叠一次放大。
+			if _touch_count <= 1 and _is_double_tap(Time.get_ticks_msec(), e.position):
 				_last_tap_ms = 0
 				_tween_zoom(zoom + 1.0)
 			else:
@@ -1637,7 +1670,8 @@ func _step_fling(dt: float) -> void:
 	if _touch_count > 0 or _fling_vel.length() < FLING_MIN_SPEED:
 		_fling_vel = Vector3.ZERO
 		return
-	_apply_world_delta(_fling_vel * dt)
+	# 与拖拽路径同样的单帧限幅：帧率抖动导致 vel/dt 失配时不至于把地图甩出几百公里
+	_apply_world_delta((_fling_vel * dt).limit_length(_cam_distance()))
 	_fling_vel *= exp(-FLING_DECAY * dt)
 	_camera_dirty = true
 
