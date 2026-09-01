@@ -91,6 +91,11 @@ var _chip_locked := false
 var home_lat := START_LAT
 var home_lng := START_LNG
 var _home_resolved := false
+## 当前 home 是否来自超时回落（而非真实定位）。为真时允许下一手真实定位
+## 纠正一次——纠正用掉之后立即置回 false，之后的定位更新一律忽略，与
+## Android 侧 GodotMapPlugin.LAST_KNOWN_MAX_AGE_MS（5 分钟内的缓存才当作
+## "当前位置"发出）保持同一个口径："只信一次，信完就不再变"。
+var _home_from_fallback := false
 var marker_layer: MarkerLayer = null
 var _fling_vel := Vector3.ZERO
 var _last_tap_ms := 0
@@ -141,7 +146,7 @@ func _ready() -> void:
 	# 定位兜底：拒绝授权 / 定位慢 / 桌面无插件，3 秒后一律回落上海默认点。
 	# 没有这条，_spawn_home_cohort 永远不会被调用，地图上只剩洛杉矶夹具。
 	get_tree().create_timer(HOME_TIMEOUT_S).timeout.connect(
-		func(): _resolve_home(START_LAT, START_LNG))
+		func(): _resolve_home(START_LAT, START_LNG, true))
 	_camera_dirty = true
 
 ## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）
@@ -166,7 +171,7 @@ func _process(_dt: float) -> void:
 	if not _spawn_queue.is_empty():
 		# 每帧 1 个：装配（部件加载+网格合并）摊薄到 ~23 帧，压掉加载期卡顿
 		var spec: Dictionary = _spawn_queue.pop_front()
-		_add_pawn(spec.lat, spec.lng, spec.cfg, spec.anim)
+		_add_pawn(spec.lat, spec.lng, spec.cfg, spec.anim, spec.cohort)
 	if _camera_dirty:
 		_camera_dirty = false
 		_update_cameras()
@@ -441,10 +446,18 @@ func _spawn_la_fixture() -> void:
 
 ## 确定"我的位置"并把演示内容锚上去。首个有效定位与 3 秒超时先到者生效；
 ## 之后的定位更新不再改锚点（避免演示中途所有内容整体位移）。
-func _resolve_home(lat: float, lng: float) -> void:
+## is_fallback：本次调用是不是 3 秒超时回落（而非真实定位）。首个调用（无论
+## 来源）落锁 home；若落锁的是回落点，允许随后第一手真实定位纠正一次
+## （_correct_home），再之后一律忽略——语义与顶部 _home_from_fallback 的
+## 注释一致，也是"首个定位或超时先到者生效，之后不再挪锚点"这条不变量在
+## 加入纠正机制后的精确表述。
+func _resolve_home(lat: float, lng: float, is_fallback: bool = false) -> void:
 	if _home_resolved:
+		if _home_from_fallback and not is_fallback:
+			_correct_home(lat, lng)
 		return
 	_home_resolved = true
+	_home_from_fallback = is_fallback
 	home_lat = lat
 	home_lng = lng
 	# _in_la 为真说明用户已经手动飞去洛杉矶：这里只更新 home 数据和角色队列，
@@ -456,10 +469,36 @@ func _resolve_home(lat: float, lng: float) -> void:
 	if marker_layer:
 		marker_layer.set_home(lat, lng)
 
+## 回落点 -> 真实定位的一次性纠正。home 队列（self/near）可能已经排队甚至
+## 已经装配完成，重新生成会打乱随机布局、白白重付一次装配代价——所以是
+## 平移已有条目的经纬度（按 delta 整体搬），而不是重新 _spawn_home_cohort()。
+## 洛杉矶夹具坐标绝对、故意不跟 home 走，靠 cohort 字段甄别、跳过不动。
+func _correct_home(lat: float, lng: float) -> void:
+	_home_from_fallback = false # 纠正机会用掉即焚，无论后面还会不会再调用本函数
+	var d_lat := lat - home_lat
+	var d_lng := lng - home_lng
+	home_lat = lat
+	home_lng = lng
+	for spec in _spawn_queue:
+		if spec.cohort != "la":
+			spec.lat += d_lat
+			spec.lng += d_lng
+	for p in _pawns:
+		if p.cohort != "la":
+			p.lat += d_lat
+			p.lng += d_lng
+	if not _in_la: # 同 _resolve_home：镜头已经飞去洛杉矶就不拽回来
+		_teleport(lat, lng)
+	else:
+		_reposition_pawns() # 镜头留在洛杉矶，但 home 队伍的世界坐标仍要跟着搬
+		_camera_dirty = true
+	if marker_layer:
+		marker_layer.set_home(lat, lng)
+
 func _on_location_update(lat: float, lng: float, _accuracy: float) -> void:
 	_resolve_home(lat, lng)
 
-func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String) -> void:
+func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String, cohort: String) -> void:
 	var holder := Node3D.new()
 	holder.visible = false # ready 门禁：config_applied + 首帧姿态之前不显示
 	rigs.add_child(holder)
@@ -474,7 +513,10 @@ func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String) -> void:
 		if c is RigActivity:
 			activity = c
 			break
-	var pawn := {"lat": lat, "lng": lng, "node": holder, "activity": activity, "ready": false}
+	# cohort 保留到 pawn 记录里：home 纠正（_correct_home）要靠它分清哪些已生成
+	# 的角色跟着 home 搬（self/near）、哪些是绝对坐标的洛杉矶夹具不能动。
+	var pawn := {"lat": lat, "lng": lng, "node": holder, "activity": activity, "ready": false,
+		"cohort": cohort}
 	rig.config_applied.connect(func(_c):
 		var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
 		if ap:
