@@ -1,7 +1,13 @@
 package com.sensen.map
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.PixelFormat
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
@@ -32,6 +38,15 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     private var container: FrameLayout? = null
     private var mapView: MapView? = null
 
+    private var locationManager: LocationManager? = null
+    private var locationStarted = false
+
+    private val locationListener = LocationListener { loc -> emitLocation(loc) }
+
+    private fun emitLocation(loc: Location) {
+        emitSignal("location_update", loc.latitude, loc.longitude, loc.accuracy.toDouble())
+    }
+
     // MapboxMap 是 @MainThread API：相机状态在 UI 线程订阅时写入缓存，
     // getCameraInfo()（Godot 线程调用）只读缓存，避免跨线程读 native Map。
     @Volatile
@@ -41,6 +56,12 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
     override fun getPluginSignals() = setOf(
         SignalInfo("map_ready"),
+        SignalInfo(
+            "location_update",
+            Double::class.javaObjectType,
+            Double::class.javaObjectType,
+            Double::class.javaObjectType,
+        ),
     )
 
     override fun onMainCreate(activity: Activity?): View? {
@@ -166,6 +187,66 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         runOnUiThread {
             mapView?.visibility = if (visible) View.VISIBLE else View.GONE
         }
+    }
+
+    /**
+     * 启动定位订阅。权限由 GDScript 侧的 OS.request_permissions() 拿（Android 12+
+     * 必须 FINE+COARSE 同请求），本方法只在已授权时工作，未授权直接放弃——
+     * GDScript 那边有 3 秒超时会回落默认点。
+     */
+    @UsedByGodot
+    fun startLocation() {
+        runOnUiThread {
+            if (locationStarted) return@runOnUiThread
+            val act = getActivity() ?: return@runOnUiThread
+            val fine = act.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+            val coarse = act.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+            if (!fine && !coarse) {
+                Log.w(TAG, "定位权限未授予，startLocation 放弃（GDScript 侧靠超时回落）")
+                return@runOnUiThread
+            }
+            val lm = act.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+                ?: return@runOnUiThread
+            locationManager = lm
+            locationStarted = true
+
+            // 先补一发 last-known：冷启动 GPS 首次定影可能要几十秒，而 demo 只等 3 秒。
+            // 两个 provider 都取，谁的时间戳新用谁。
+            val candidates = mutableListOf<Location>()
+            for (p in listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)) {
+                try {
+                    lm.getLastKnownLocation(p)?.let(candidates::add)
+                } catch (e: Exception) {
+                    Log.w(TAG, "getLastKnownLocation($p) 失败: ${e.message}")
+                }
+            }
+            candidates.maxByOrNull { it.time }?.let {
+                Log.i(TAG, "last-known 定位 ${it.latitude},${it.longitude} acc=${it.accuracy}")
+                emitLocation(it)
+            }
+
+            // 再订阅持续更新：有 FINE 用 GPS，只有 COARSE 就退 NETWORK
+            val provider = if (fine) LocationManager.GPS_PROVIDER else LocationManager.NETWORK_PROVIDER
+            try {
+                lm.requestLocationUpdates(provider, 2000L, 5f, locationListener)
+                Log.i(TAG, "定位订阅启动 provider=$provider")
+            } catch (e: Exception) {
+                Log.e(TAG, "requestLocationUpdates 失败: ${e.message}")
+            }
+        }
+    }
+
+    override fun onMainDestroy() {
+        runOnUiThread {
+            try {
+                locationManager?.removeUpdates(locationListener)
+            } catch (e: Exception) {
+                Log.w(TAG, "removeUpdates 失败: ${e.message}")
+            }
+        }
+        super.onMainDestroy()
     }
 
     /** HUD 调试用：当前相机状态（UI 线程写入的缓存，任意线程可读）。 */
