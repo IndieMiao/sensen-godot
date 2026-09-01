@@ -1151,12 +1151,12 @@ const BTN_PAD_H := 16
 | 位置 | 原值 | 新值 | 依据 |
 |---|---|---|---|
 | `SB_btn_normal` / `SB_btn_pressed` / `SB_btn_focus` 的四个 `corner_radius_*` | `12` | `14` | `RADIUS_CARD` |
-| `SB_btn_normal.bg_color` | `Color(0.941, 0.949, 0.957, 1)` | `Color(0.953, 0.965, 0.961, 1)` | `SURFACE_SUNK` #f3f6f5 |
-| `SB_btn_pressed.bg_color` | `Color(0.882, 0.902, 0.914, 1)` | `Color(0.925, 0.969, 0.949, 1)` | `SURFACE_TINT` #ecf7f2 |
-| `SB_btn_focus.border_color` | `Color(0.31, 0.72, 0.58, 1)` | `Color(0.204, 0.827, 0.6, 1)` | `ACCENT` #34d399 |
+| `SB_btn_normal.bg_color` | `Color(0.941, 0.949, 0.957, 1)` | `Color(0.952941, 0.964706, 0.960784, 1)` | `SURFACE_SUNK` #f3f6f5 |
+| `SB_btn_pressed.bg_color` | `Color(0.882, 0.902, 0.914, 1)` | `Color(0.925490, 0.968627, 0.949020, 1)` | `SURFACE_TINT` #ecf7f2 |
+| `SB_btn_focus.border_color` | `Color(0.31, 0.72, 0.58, 1)` | `Color(0.203922, 0.827451, 0.6, 1)` | `ACCENT` #34d399 |
 | `SB_panel_drawer` 的两个 `corner_radius_top_*` | `20` | `22` | `RADIUS_SHEET` |
-| `SB_accent_normal.bg_color` / `SB_pill_accent.bg_color` | `Color(0.498, 0.847, 0.745, 1)` | `Color(0.204, 0.827, 0.6, 1)` | `ACCENT` |
-| `SB_accent_pressed.bg_color` / `SB_pill_accent_pressed.bg_color` | `Color(0.41, 0.776, 0.667, 1)` | `Color(0.02, 0.588, 0.412, 1)` | `ACCENT_DEEP` #059669 |
+| `SB_accent_normal.bg_color` / `SB_pill_accent.bg_color` | `Color(0.498, 0.847, 0.745, 1)` | `Color(0.203922, 0.827451, 0.6, 1)` | `ACCENT` |
+| `SB_accent_pressed.bg_color` / `SB_pill_accent_pressed.bg_color` | `Color(0.41, 0.776, 0.667, 1)` | `Color(0.019608, 0.588235, 0.411765, 1)` | `ACCENT_DEEP` #059669 |
 | `SB_accent_normal` / `SB_accent_pressed` 的四个 `corner_radius_*` | `12` | `14` | `RADIUS_CARD` |
 | `SB_chip` 的四个 `corner_radius_*` | `14` | `14` | 已符合 `RADIUS_CARD`，不动 |
 | `SB_round` / `SB_round_pressed` 的四个 `corner_radius_*` | `20` | `22` | `RADIUS_SHEET`（圆形按钮沿用最大档） |
@@ -1165,10 +1165,10 @@ const BTN_PAD_H := 16
 `[resource]` 段落里：
 
 ```
-Button/colors/font_color = Color(0.071, 0.188, 0.157, 1)
-Button/colors/font_focus_color = Color(0.071, 0.188, 0.157, 1)
-Button/colors/font_hover_color = Color(0.071, 0.188, 0.157, 1)
-Button/colors/font_pressed_color = Color(0.071, 0.188, 0.157, 1)
+Button/colors/font_color = Color(0.070588, 0.188235, 0.156863, 1)
+Button/colors/font_focus_color = Color(0.070588, 0.188235, 0.156863, 1)
+Button/colors/font_hover_color = Color(0.070588, 0.188235, 0.156863, 1)
+Button/colors/font_pressed_color = Color(0.070588, 0.188235, 0.156863, 1)
 ```
 
 （四个都从 `Color(0.15, 0.165, 0.19, 1)` 改成 `INK` #123028）
@@ -1176,10 +1176,14 @@ Button/colors/font_pressed_color = Color(0.071, 0.188, 0.157, 1)
 并新增一行（`Label/font_sizes/font_size = 16` 之后）：
 
 ```
-Label/colors/font_color = Color(0.071, 0.188, 0.157, 1)
+Label/colors/font_color = Color(0.070588, 0.188235, 0.156863, 1)
 ```
 
 **不要动**：`default_font_size = 16`、所有 `content_margin_*`、所有 `constants/*separation = 8`、全部类型变体的 `base_type` 行——这些是 `tests/ui/test_app_theme.gd` 守护的基线。
+
+⚠️ **颜色必须写 6 位小数**：上表的值是 hex/255 的精确展开。3 位小数的误差（7.8e-5 ~ 4.5e-4）超过 Godot `is_equal_approx` 对 ≤1 数值的 `CMP_EPSILON ≈ 1e-5` 容差，token 与主题的比对断言会失败。
+
+⚠️ **`design_tokens.gd` 的 docstring 不要写"每个取值都能在这里找到对应常量"**——那不成立：阴影（色/尺寸/偏移）、表面 alpha（0.94/0.96/0.97）、`SB_round_pressed`/`SB_pill_pressed` 的独立灰、滚动条 grabber 色、`SB_chip`/`SB_pill*` 的内边距都没有 token。要写就写准边界：本文件是色板/间距栅格/圆角档/字阶/触摸目标padding 的来源，其余仍散在主题里。承诺"改这两个文件就够、不用翻场景"是真的，"每个值都有名字"不是。
 
 - [ ] **Step 5: 跑两套主题测试确认都通过**
 
