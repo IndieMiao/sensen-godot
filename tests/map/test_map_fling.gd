@@ -136,3 +136,104 @@ class SpyMapPoc extends MapPoc:
 	var zoom_tween_calls := 0
 	func _tween_zoom(_target: float) -> void:
 		zoom_tween_calls += 1
+
+## —— 缩放轴惯性（2026-09-01 真机反馈：拖拽惯性有了，双指缩放松手即停）——
+
+func test_zoom_fling_continues_and_decays_after_release() -> void:
+	var n = auto_free(MapPoc.new())
+	var z0: float = n.zoom
+	n._touch_count = 0
+	n._zoom_vel = 2.0 # zoom 单位/秒
+	var steps := 0
+	while absf(n._zoom_vel) >= MapPoc.ZOOM_FLING_MIN and steps < 2000:
+		n._step_fling(1.0 / 60.0)
+		steps += 1
+	assert_float(n.zoom).is_greater(z0) # 松手后继续放大
+	assert_bool(steps > 5).is_true() # 有滑行，不是一帧停死
+	assert_bool(steps < 600).is_true() # 10 秒内停
+
+func test_zoom_velocity_survives_frames_while_pinching() -> void:
+	## 与平移轴同一个坑：按住期间 _step_fling 每帧都会跑到，不能清掉积累的速度
+	var n = auto_free(MapPoc.new())
+	n._touch_count = 2 # 双指
+	n._zoom_vel = 2.0
+	n._step_fling(1.0 / 60.0)
+	assert_float(n._zoom_vel).is_equal_approx(2.0, 1e-6)
+
+func test_touch_down_kills_zoom_fling() -> void:
+	var n = auto_free(MapPoc.new())
+	n._zoom_vel = 2.0
+	var press := InputEventScreenTouch.new()
+	press.pressed = true
+	press.position = Vector2(100, 100)
+	n._unhandled_input(press)
+	assert_float(n._zoom_vel).is_equal(0.0)
+
+func test_zoom_fling_respects_zoom_clamp() -> void:
+	var n = auto_free(MapPoc.new())
+	n.zoom = 19.5
+	n._zoom_vel = 50.0 # 极速放大
+	for i in 60:
+		n._step_fling(1.0 / 60.0)
+	assert_bool(n.zoom <= 20.0).is_true()
+
+func test_pan_and_zoom_fling_are_independent() -> void:
+	## 一个轴停了不该把另一个轴也掐掉
+	var n = auto_free(MapPoc.new())
+	n._touch_count = 0
+	n._fling_vel = Vector3.ZERO # 平移已停
+	n._zoom_vel = 2.0 # 缩放还在
+	var z0: float = n.zoom
+	n._step_fling(1.0 / 60.0)
+	assert_float(n.zoom).is_greater(z0)
+
+## —— 捏合不得泄漏 pan 惯性（2026-09-01 真机反馈）——
+## 捏合抬手是一根一根抬的：第一根离开后 _touch_count 掉回 1，剩下那根往往还在动，
+## 它的 drag 事件会通过 "_touch_count <= 1" 门禁把 pan 速度灌进 _fling_vel，
+## 抬手就甩出一段用户没要的平移。
+
+func _press(n, pos: Vector2) -> void:
+	var e := InputEventScreenTouch.new()
+	e.pressed = true
+	e.position = pos
+	n._unhandled_input(e)
+
+func _release(n, pos: Vector2) -> void:
+	var e := InputEventScreenTouch.new()
+	e.pressed = false
+	e.position = pos
+	n._unhandled_input(e)
+
+func _drag(n, pos: Vector2, rel: Vector2) -> void:
+	var e := InputEventScreenDrag.new()
+	e.position = pos
+	e.relative = rel
+	n._unhandled_input(e)
+
+func test_second_finger_discards_pan_velocity_accumulated_by_first() -> void:
+	var n = auto_free(MapPoc.new())
+	_press(n, Vector2(100, 100))
+	n._fling_vel = Vector3(200.0, 0.0, 0.0) # 第一指已攒出速度
+	_press(n, Vector2(300, 100)) # 第二指落下 → 转为捏合
+	assert_float(n._fling_vel.length()).is_equal(0.0)
+	assert_bool(n._gesture_multi).is_true()
+
+func test_lifting_one_finger_of_a_pinch_does_not_resume_pan_velocity() -> void:
+	## 这是真机上"缩放时冒出一段平移惯性"的确切路径
+	var n = auto_free(MapPoc.new())
+	_press(n, Vector2(100, 100))
+	_press(n, Vector2(300, 100)) # 双指
+	_release(n, Vector2(300, 100)) # 抬起一根 → _touch_count 回到 1
+	_drag(n, Vector2(160, 100), Vector2(60, 0)) # 剩下那根还在动
+	assert_float(n._fling_vel.length()).is_equal(0.0) # 不得攒出 pan 速度
+
+func test_gesture_multi_resets_after_all_fingers_lift() -> void:
+	var n = auto_free(MapPoc.new())
+	_press(n, Vector2(100, 100))
+	_press(n, Vector2(300, 100))
+	_release(n, Vector2(300, 100))
+	_release(n, Vector2(100, 100)) # 全部离手
+	assert_bool(n._gesture_multi).is_false()
+	# 下一次单指拖拽必须恢复正常
+	_press(n, Vector2(100, 100))
+	assert_bool(n._gesture_multi).is_false()

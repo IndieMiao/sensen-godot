@@ -40,6 +40,8 @@ const HOME_TIMEOUT_S := 3.0
 const FLING_DECAY := 4.0
 const FLING_MIN_SPEED := 0.5 # 米/秒
 const FLING_EMA := 0.35
+## 缩放轴惯性的停止门槛（zoom 单位/秒）。zoom 是对数刻度，0.05 已经几乎看不出变化。
+const ZOOM_FLING_MIN := 0.05
 ## 双击：300ms 内两次落点相距不超过 32 单位
 const DOUBLE_TAP_S := 0.3
 const DOUBLE_TAP_MAX_PX := 32.0
@@ -106,6 +108,13 @@ var _drag_accum_px := 0.0 # 当前手势累计拖拽位移，超过双击半径�
 ## 调试芯片读它：芯片每 30 帧才刷一次，抓不到瞬时值。用途是判断惯性"没触发"
 ## 还是"触发了但速度太小"——单帧多次 ScreenDrag 采样都除以整帧 dt 会系统性低估。
 var _fling_peak := 0.0
+## 缩放轴惯性速度（zoom 单位/秒），与 _fling_vel 是同一套语义、不同轴。
+var _zoom_vel := 0.0
+## 本次手势是否曾经有过 2 指以上。捏合抬手是一根一根抬的：第一根离开后
+## _touch_count 掉回 1，剩下那根往往还在动，它的 drag 事件就会通过
+## "_touch_count <= 1" 门禁把 pan 速度灌进 _fling_vel，抬手甩出一段意外平移。
+## 所以一旦升级成多指，本次手势剩余时间一律不再喂 pan 速度，直到所有手指离开。
+var _gesture_multi := false
 
 func _ready() -> void:
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
@@ -291,12 +300,22 @@ func _step_fling(dt: float) -> void:
 	# 打断惯性是按下事件的职责，_unhandled_input 的 pressed 分支已经清零。
 	if _touch_count > 0:
 		return
-	if _fling_vel.length() < FLING_MIN_SPEED:
+	# 平移轴与缩放轴各自独立存活/衰减：捏合完松手要能继续缩，拖拽完松手要能继续滑。
+	var pan_alive := _fling_vel.length() >= FLING_MIN_SPEED
+	var zoom_alive := absf(_zoom_vel) >= ZOOM_FLING_MIN
+	if not pan_alive:
 		_fling_vel = Vector3.ZERO
+	if not zoom_alive:
+		_zoom_vel = 0.0
+	if not pan_alive and not zoom_alive:
 		return
-	# 与拖拽路径同款限幅：帧率抖动导致 vel*dt 失配时，不至于把地图甩出几千公里。
-	_apply_world_delta((_fling_vel * dt).limit_length(_cam_distance()))
-	_fling_vel *= exp(-FLING_DECAY * dt)
+	if pan_alive:
+		# 与拖拽路径同款限幅：帧率抖动导致 vel*dt 失配时，不至于把地图甩出几千公里。
+		_apply_world_delta((_fling_vel * dt).limit_length(_cam_distance()))
+		_fling_vel *= exp(-FLING_DECAY * dt)
+	if zoom_alive:
+		_set_zoom(zoom + _zoom_vel * dt) # _set_zoom 自带 3~20 钳位
+		_zoom_vel *= exp(-FLING_DECAY * dt)
 	_camera_dirty = true
 
 ## 双击判定：与上一次触摸的时间差与落点距离都在窗口内。
@@ -308,6 +327,7 @@ func _is_double_tap(now_ms: int, pos: Vector2) -> bool:
 
 ## 双击放大走 Tween 而不是瞬变——瞬变在地图上很跳，是"不丝滑"的另一半。
 func _tween_zoom(target: float) -> void:
+	_zoom_vel = 0.0 # 双击接管缩放，清掉残余的捏合惯性
 	if _zoom_tween:
 		_zoom_tween.kill()
 	_zoom_tween = create_tween()
@@ -322,6 +342,13 @@ func _unhandled_input(e: InputEvent) -> void:
 		_touch_count = maxi(_touch_count, 0)
 		if e.pressed:
 			_fling_vel = Vector3.ZERO # 新触摸立即打断惯性
+			_zoom_vel = 0.0 # 缩放轴同理
+			if _touch_count >= 2:
+				# 第二指落下：丢掉第一指此前攒的 pan 速度，本次手势按捏合处理
+				_gesture_multi = true
+				_fling_vel = Vector3.ZERO
+		elif _touch_count == 0:
+			_gesture_multi = false # 全部离手，下一次手势重新判定
 			if _zoom_tween: # 惯性的另一半：新触摸也要打断还在跑的双击变焦
 				_zoom_tween.kill()
 				_zoom_tween = null
@@ -334,7 +361,7 @@ func _unhandled_input(e: InputEvent) -> void:
 				else:
 					_last_tap_ms = Time.get_ticks_msec()
 					_last_tap_pos = e.position
-	if e is InputEventScreenDrag and _touch_count <= 1:
+	if e is InputEventScreenDrag and _touch_count <= 1 and not _gesture_multi:
 		# 抓地拖拽：让按下时的地面点始终跟在手指下（倾角下精确）。
 		# 高 pitch 时屏幕上缘一像素对应的地面位移可达 ~0.4d，单次 delta 限幅到 d
 		# 防止一次拖拽把地图甩出上百公里。
@@ -354,7 +381,11 @@ func _unhandled_input(e: InputEvent) -> void:
 		if _drag_accum_px > DOUBLE_TAP_MAX_PX:
 			_last_tap_ms = 0
 	elif e is InputEventMagnifyGesture:
-		_set_zoom(zoom + log(e.factor) / log(2.0))
+		# 与拖拽同款：应用之后把变化量换算成 zoom/秒 做 EMA 平滑，松手接着走。
+		var dz := log(e.factor) / log(2.0)
+		_set_zoom(zoom + dz)
+		var zdt := maxf(get_process_delta_time(), 0.001)
+		_zoom_vel = lerpf(_zoom_vel, dz / zdt, FLING_EMA)
 	elif e is InputEventPanGesture:
 		_set_pitch(pitch - e.delta.y * 0.2)
 
