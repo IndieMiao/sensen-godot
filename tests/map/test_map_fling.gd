@@ -29,12 +29,42 @@ func test_fling_moves_center_east_and_decays_to_stop() -> void:
 	assert_bool(steps > 10).is_true() # 不是一帧停死，有滑行手感
 	assert_bool(steps < 600).is_true() # 也不会滑个没完（10 秒内停）
 
-func test_touch_down_kills_fling_immediately() -> void:
+## 打断惯性是"按下事件"的职责（_unhandled_input 的 pressed 分支清零），
+## 不是 _step_fling 的。原先这条测试断言 _step_fling 在 _touch_count>0 时清零，
+## 那恰好是 2026-09-01 真机上"完全没有惯性"的根因——见下面两条回归。
+func test_touch_down_event_kills_fling() -> void:
 	var n = auto_free(MapPoc.new())
 	n._fling_vel = Vector3(200.0, 0.0, 0.0)
-	n._touch_count = 1
-	n._step_fling(1.0 / 60.0)
+	var press := InputEventScreenTouch.new()
+	press.pressed = true
+	press.position = Vector2(100, 100)
+	n._unhandled_input(press)
 	assert_float(n._fling_vel.length()).is_equal(0.0)
+
+## 回归（2026-09-01 真机）：手指按着的每一帧 _process 都会跑 _step_fling，
+## 它当时把 _fling_vel 清零 → 一次 300ms 拖拽被清约 18 次 → 抬手那帧手指通常
+## 已不动、没有新的 drag 事件补速度 → 惯性永远不触发。
+## 所以按住期间必须"不推进但保住速度"。
+func test_velocity_survives_frames_while_finger_is_down() -> void:
+	var n = auto_free(MapPoc.new())
+	var lng0: float = n.center_lng
+	n._touch_count = 1
+	n._fling_vel = Vector3(200.0, 0.0, 0.0)
+	n._step_fling(1.0 / 60.0)
+	assert_float(n._fling_vel.length()).is_equal_approx(200.0, 1e-6) # 速度没被清掉
+	assert_float(n.center_lng).is_equal_approx(lng0, 1e-12) # 但按住期间不自己推进
+
+func test_drag_frames_then_release_actually_flings() -> void:
+	var n = auto_free(MapPoc.new())
+	var lng0: float = n.center_lng
+	n._touch_count = 1
+	for i in 10: # 拖拽期间：每帧 drag 事件刷新速度，同帧 _process 也跑
+		n._fling_vel = Vector3(200.0, 0.0, 0.0)
+		n._step_fling(1.0 / 60.0)
+	n._touch_count = 0 # 抬手，且该帧没有新的 drag 事件
+	for i in 30:
+		n._step_fling(1.0 / 60.0)
+	assert_float(n.center_lng).is_greater(lng0) # 抬手后必须继续向东滑行
 
 func test_double_tap_window_and_radius() -> void:
 	var n = auto_free(MapPoc.new())

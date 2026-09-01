@@ -102,6 +102,10 @@ var _last_tap_ms := 0
 var _last_tap_pos := Vector2.ZERO
 var _zoom_tween: Tween = null
 var _drag_accum_px := 0.0 # 当前手势累计拖拽位移，超过双击半径就作废 _last_tap_ms
+## 本次手势里 _fling_vel 达到过的峰值（米/秒），按下时归零。
+## 调试芯片读它：芯片每 30 帧才刷一次，抓不到瞬时值。用途是判断惯性"没触发"
+## 还是"触发了但速度太小"——单帧多次 ScreenDrag 采样都除以整帧 dt 会系统性低估。
+var _fling_peak := 0.0
 
 func _ready() -> void:
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
@@ -190,8 +194,10 @@ func _refresh_chip() -> void:
 			if (p.node as Node3D).visible:
 				vis += 1
 		var info := map.camera_info() if map else ""
-		chip_debug.text = "同步 b%.0f° p%.0f°  ·  角色 %d/%d\n回读 %s" % [
-			bearing, pitch, vis, _pawns.size(), info if not info.is_empty() else "—"]
+		chip_debug.text = "同步 b%.0f° p%.0f°  ·  角色 %d/%d\n惯性 峰值%.0f 当前%.0f m/s（门槛%.1f）\n回读 %s" % [
+			bearing, pitch, vis, _pawns.size(),
+			_fling_peak, _fling_vel.length(), FLING_MIN_SPEED,
+			info if not info.is_empty() else "—"]
 
 ## —— 相机同步核心 ————————————————————————————————————————————
 
@@ -278,7 +284,14 @@ func _ground_point(screen_pos: Vector2) -> Variant:
 ## 抬手后的惯性滑行：指数衰减，低于阈值停止。有手指按下时直接清零
 ## （新触摸打断惯性是原生地图的通用手感）。
 func _step_fling(dt: float) -> void:
-	if _touch_count > 0 or _fling_vel.length() < FLING_MIN_SPEED:
+	# ⚠️ 手指按着时"不推进"但**绝不清零**——速度要留到抬手那一刻用。
+	# 原先这两件事写在同一个条件里，于是拖拽期间每帧都把刚积累的速度清掉
+	# （300ms 拖拽 ≈ 18 帧 = 清 18 次），抬手那帧手指通常已不动、没有新的 drag
+	# 事件补速度，惯性就永远不触发。2026-09-01 真机实测"完全没有惯性"的根因。
+	# 打断惯性是按下事件的职责，_unhandled_input 的 pressed 分支已经清零。
+	if _touch_count > 0:
+		return
+	if _fling_vel.length() < FLING_MIN_SPEED:
 		_fling_vel = Vector3.ZERO
 		return
 	# 与拖拽路径同款限幅：帧率抖动导致 vel*dt 失配时，不至于把地图甩出几千公里。
@@ -313,6 +326,7 @@ func _unhandled_input(e: InputEvent) -> void:
 				_zoom_tween.kill()
 				_zoom_tween = null
 			_drag_accum_px = 0.0 # 新手势重新计里程，配合下面的拖拽门禁
+			_fling_peak = 0.0
 			if _touch_count <= 1: # 第二指落下（捏合起手）不算双击，镜像拖拽路径的门禁
 				if _is_double_tap(Time.get_ticks_msec(), e.position):
 					_last_tap_ms = 0
@@ -332,6 +346,7 @@ func _unhandled_input(e: InputEvent) -> void:
 			# 惯性速度：位移换算成米/秒后 EMA 平滑，抬手接着走
 			var dt := maxf(get_process_delta_time(), 0.001)
 			_fling_vel = _fling_vel.lerp(delta / dt, FLING_EMA)
+			_fling_peak = maxf(_fling_peak, _fling_vel.length())
 			_camera_dirty = true
 		# 累计拖拽位移超过双击判定半径就作废当前这次落点：按下→短拖拽→抬手→
 		# 300ms 内再按一次不该被判成双击变焦——那是拖拽中途的手抖，不是双击。
