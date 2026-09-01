@@ -33,6 +33,12 @@ import org.godotengine.godot.plugin.UsedByGodot
 class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     companion object {
         private const val TAG = "GodotMapPlugin"
+
+        // demo 锚点由 GDScript 侧取"第一次收到的定位"锁定、之后永不更新（避免演示中途
+        // 地图跳动）。所以 last-known 缓存一旦太旧就绝不能拿去当首帧发——发出去就是
+        // 永久锚错城市，且后面真实 GPS 定位到达时也不会被拿来纠正。5 分钟内的缓存
+        // 视为等同于"当前位置"；更旧的宁可没有，等下面的实时订阅。
+        private const val LAST_KNOWN_MAX_AGE_MS = 5 * 60 * 1000L
     }
 
     private var container: FrameLayout? = null
@@ -223,8 +229,13 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
                 }
             }
             candidates.maxByOrNull { it.time }?.let {
-                Log.i(TAG, "last-known 定位 ${it.latitude},${it.longitude} acc=${it.accuracy}")
-                emitLocation(it)
+                val ageMs = System.currentTimeMillis() - it.time
+                if (ageMs <= LAST_KNOWN_MAX_AGE_MS) {
+                    Log.i(TAG, "last-known 定位 ${it.latitude},${it.longitude} acc=${it.accuracy}")
+                    emitLocation(it)
+                } else {
+                    Log.i(TAG, "last-known 定位太旧（${ageMs / 1000}秒前），不作为锚点发出，等实时订阅")
+                }
             }
 
             // 再订阅持续更新：有 FINE 用 GPS，只有 COARSE 就退 NETWORK
