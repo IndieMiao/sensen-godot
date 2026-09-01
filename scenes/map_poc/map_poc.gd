@@ -32,6 +32,8 @@ const NEAR_SPREAD_M := 900.0 # 上海散布半径（米）
 const LA_SPREAD_M := 3000.0
 const CULL_FACTOR := 4.0 # 距地图中心 > 4×相机距离 → 隐藏
 const REANCHOR_DIST_M := 3000.0 # 浮动原点重锚阈值
+## 等首个定位的上限；超时就用 START_LAT/LNG 当 home，演示内容照常可见。
+const HOME_TIMEOUT_S := 3.0
 
 @onready var rigs: Node3D = $Rigs
 @onready var cam: Camera3D = $Camera3D
@@ -75,12 +77,17 @@ var _spawn_queue: Array[Dictionary] = []
 var _dot_tween: Tween = null
 ## 错误态锁定芯片文案（缺 token 等），不再被周期刷新覆盖
 var _chip_locked := false
+## "我的位置"：定位成功则为真实位置，超时/无定位则回落 START_LAT/LNG。
+## 自己、近处路人、全部 marker 都相对它摆放——绝不写死经纬度。
+var home_lat := START_LAT
+var home_lng := START_LNG
+var _home_resolved := false
 
 func _ready() -> void:
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
 	get_viewport().transparent_bg = true
 	$Sun.rotation_degrees = Vector3(-55, 30, 0)
-	_spawn_pawns()
+	_spawn_la_fixture() # 压测夹具先排队；home 队列等定位确定后再插
 	_wire_buttons()
 
 	# 窗口尺寸变化（旋屏/分屏/折叠屏）会改变两层的像素↔米换算基准，必须重推相机
@@ -89,6 +96,7 @@ func _ready() -> void:
 	map = _make_bridge()
 	if map:
 		map.map_ready.connect(_on_map_ready)
+		map.location_update.connect(_on_location_update)
 		map.set_map_visible(true)
 		pixel_ratio = map.get_pixel_ratio()
 		var token := _load_token()
@@ -100,11 +108,16 @@ func _ready() -> void:
 		else:
 			map.create_map(token, START_LAT, START_LNG, zoom)
 			_set_dot(DOT_WAIT, true) # 连接中：呼吸闪烁
+		map.start_location()
 	else:
 		_set_dot(DOT_WAIT, false)
 		chip_title.text = "地图预览"
 		chip_sub.text = "桌面运行，无地图插件"
 		_chip_locked = true
+	# 定位兜底：拒绝授权 / 定位慢 / 桌面无插件，3 秒后一律回落上海默认点。
+	# 没有这条，_spawn_home_cohort 永远不会被调用，地图上只剩洛杉矶夹具。
+	get_tree().create_timer(HOME_TIMEOUT_S).timeout.connect(
+		func(): _resolve_home(START_LAT, START_LNG))
 	_camera_dirty = true
 
 ## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）
@@ -139,7 +152,7 @@ func _process(_dt: float) -> void:
 func _refresh_chip() -> void:
 	if _chip_locked:
 		return
-	chip_title.text = "洛杉矶" if _in_la else "上海"
+	chip_title.text = "洛杉矶" if _in_la else "我的位置"
 	chip_sub.text = "%.4f, %.4f  ·  z%.1f" % [center_lat, center_lng, zoom]
 	if chip_debug.visible:
 		var vis := 0
@@ -274,8 +287,8 @@ func _update_tilt_label() -> void:
 
 func _on_fly_pressed() -> void:
 	_in_la = not _in_la
-	fly_btn.text = "回上海" if _in_la else "飞洛杉矶"
-	_teleport(LA_LAT, LA_LNG) if _in_la else _teleport(START_LAT, START_LNG)
+	fly_btn.text = "回我的位置" if _in_la else "飞洛杉矶"
+	_teleport(LA_LAT, LA_LNG) if _in_la else _teleport(home_lat, home_lng)
 
 func _teleport(lat: float, lng: float) -> void:
 	anchor_lat = lat
@@ -333,18 +346,38 @@ func _load_token() -> String:
 func self_config() -> AvatarConfig:
 	return Avatar.load_outfit()
 
-func _spawn_pawns() -> void:
-	# 自己：固定站在初始地图中心，读换装房存档（立即生成）
-	_add_pawn(START_LAT, START_LNG, self_config(), "idle")
-	# 其余排进分帧队列（上海围绕初始地图中心散布；洛杉矶验证跨洋剔除+浮动原点）
+## 自己 + 近处路人，全部相对 home 摆放。绝不写死经纬度：写死的话定位到任何
+## 非上海的位置，这些角色都会落在 CULL_FACTOR×相机距离之外被剔除，地图空无一人。
+func _spawn_home_cohort() -> void:
+	# push_front：自己排队头，第一个出队，玩家最先看到自己
+	_spawn_queue.push_front({"lat": home_lat, "lng": home_lng,
+		"cfg": self_config(), "anim": "idle", "cohort": "self"})
 	for i in PAWNS_NEAR_COUNT:
-		var off := _rand_offset_deg(NEAR_SPREAD_M, START_LAT)
-		_spawn_queue.append({"lat": START_LAT + off.y, "lng": START_LNG + off.x,
-			"cfg": _random_config(), "anim": _rand_anim()})
+		var off := _rand_offset_deg(NEAR_SPREAD_M, home_lat)
+		_spawn_queue.append({"lat": home_lat + off.y, "lng": home_lng + off.x,
+			"cfg": _random_config(), "anim": _rand_anim(), "cohort": "near"})
+
+## 洛杉矶夹具：验证跨洋剔除 + 浮动原点重锚，不是演示内容，坐标保持绝对，
+## 不跟随定位——改成相对就失去了这个夹具的意义。
+func _spawn_la_fixture() -> void:
 	for i in PAWNS_LA_COUNT:
 		var off := _rand_offset_deg(LA_SPREAD_M, LA_LAT)
 		_spawn_queue.append({"lat": LA_LAT + off.y, "lng": LA_LNG + off.x,
-			"cfg": _random_config(), "anim": _rand_anim()})
+			"cfg": _random_config(), "anim": _rand_anim(), "cohort": "la"})
+
+## 确定"我的位置"并把演示内容锚上去。首个有效定位与 3 秒超时先到者生效；
+## 之后的定位更新不再改锚点（避免演示中途所有内容整体位移）。
+func _resolve_home(lat: float, lng: float) -> void:
+	if _home_resolved:
+		return
+	_home_resolved = true
+	home_lat = lat
+	home_lng = lng
+	_teleport(lat, lng)
+	_spawn_home_cohort()
+
+func _on_location_update(lat: float, lng: float, _accuracy: float) -> void:
+	_resolve_home(lat, lng)
 
 func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String) -> void:
 	var holder := Node3D.new()
