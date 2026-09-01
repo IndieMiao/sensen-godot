@@ -234,6 +234,157 @@
 			"thumb": "res://assets/avatar/thumbs/hairhat101.png",
 			"tier": 2,
 			"unity_guid": "41915d1d9fbe4d54ea4dd0ff0abd384f"
+		},
+		{
+			"attach": "mesh",
+			"id": "shoes2",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/shoes2.res",
+			"slot": "shoes",
+			"thumb": "res://assets/avatar/thumbs/shoes2.png",
+			"tier": 0,
+			"unity_guid": "7cb0770bde36b2b40ae2dc9f3c335994"
+		},
+		{
+			"attach": "mesh",
+			"id": "shoes3",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/shoes3.res",
+			"slot": "shoes",
+			"thumb": "res://assets/avatar/thumbs/shoes3.png",
+			"tier": 0,
+			"unity_guid": "5e59efd05192349419e0e67beeed47e2"
+		},
+		{
+			"attach": "mesh",
+			"id": "shoes4",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/shoes4.res",
+			"slot": "shoes",
+			"thumb": "res://assets/avatar/thumbs/shoes4.png",
+			"tier": 0,
+			"unity_guid": "e5b38c703bd0bdd4080e86292a0f50a0"
+		},
+		{
+			"attach": "mesh",
+			"id": "shoes5",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/shoes5.res",
+			"slot": "shoes",
+			"thumb": "res://assets/avatar/thumbs/shoes5.png",
+			"tier": 0,
+			"unity_guid": "cc34a68118ba571468ea63fbc5d768e4"
+		},
+		{
+			"attach": "socket",
+			"id": "glass3",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/glass3.res",
+			"slot": "glass",
+			"thumb": "res://assets/avatar/thumbs/glass3.png",
+			"tier": 0,
+			"unity_guid": "649fab5df2dfc804eb86a21543b7fd09"
+		},
+		{
+			"attach": "socket",
+			"id": "glass4",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/glass4.res",
+			"slot": "glass",
+			"thumb": "res://assets/avatar/thumbs/glass4.png",
+			"tier": 0,
+			"unity_guid": "fdc6f66ed9d6ac4408398b82d2dc2524"
+		},
+		{
+			"attach": "socket",
+			"id": "glass5",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/glass5.res",
+			"slot": "glass",
+			"thumb": "res://assets/avatar/thumbs/glass5.png",
+			"tier": 0,
+			"unity_guid": "3d0db9cf63f284940a690e4081af497b"
+		},
+		{
+			"attach": "mesh",
+			"id": "messengerbag2",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/messengerbag2.res",
+			"slot": "messengerBag",
+			"thumb": "res://assets/avatar/thumbs/messengerbag2.png",
+			"tier": 0,
+			"unity_guid": "7878ad9ab95fa4d448df1c61a521bf69"
+		},
+		{
+			"attach": "mesh",
+			"id": "messengerbag3",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/messengerbag3.res",
+			"slot": "messengerBag",
+			"thumb": "res://assets/avatar/thumbs/messengerbag3.png",
+			"tier": 0,
+			"unity_guid": "051667d544ec041489553e931f0fd3d1"
+		},
+		{
+			"attach": "mesh",
+			"id": "messengerbag4",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/messengerbag4.res",
+			"slot": "messengerBag",
+			"thumb": "res://assets/avatar/thumbs/messengerbag4.png",
+			"tier": 0,
+			"unity_guid": "84f0f6c03021c094e95394925fcad1aa"
 		}
 	],
 	"version": 1

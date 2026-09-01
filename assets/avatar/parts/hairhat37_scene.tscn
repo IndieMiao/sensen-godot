@@ -42,11 +42,11 @@ _data = {
 &"hairHat37_rig": SubResource("Animation_6a60d")
 }
 
-[node name="SocketPart" type="Node3D" unique_id=1310157733]
+[node name="SocketPart" type="Node3D" unique_id=300343969]
 
-[node name="hairHat" type="MeshInstance3D" parent="." unique_id=1916474434]
+[node name="hairHat" type="MeshInstance3D" parent="." unique_id=946767894]
 cast_shadow = 0
 mesh = SubResource("ArrayMesh_bc3sv")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1314801030]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1385316149]
 libraries/ = SubResource("AnimationLibrary_r2poc")
