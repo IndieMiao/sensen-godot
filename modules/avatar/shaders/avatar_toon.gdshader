@@ -28,7 +28,15 @@ uniform float rim_strength : hint_range(0.0, 1.0) = 0.0; // Unity _FresnelHighLi
 
 void fragment() {
 	vec4 alb = texture(albedo_tex, UV);
-	ALBEDO = alb.rgb * diffuse_strength;
+	// _Kd（受光）与 _Ke（平光地板）在 Unity 材质里成对出现，且和常常大于 1
+	// （body 0.8/0.6、eyes 1/1、水晶发 0.5/0.8）——更像美术在配"受光 vs 平光"的
+	// 配比，而不是两个独立的绝对值。1:1 照搬进 Godot 会把总能量顶到 1.4，
+	// 皮肤这种浅底色直接裁成纯白、体积感消失（2026-09-01 真机实测）。
+	// 这里保住美术选的比例、把总量归一到 ≤1；和本来就 ≤1 的材质不受影响。
+	float energy = max(diffuse_strength + emission_strength, 1.0);
+	float lit_w = diffuse_strength / energy;
+	float flat_w = emission_strength / energy;
+	ALBEDO = alb.rgb * lit_w;
 	// URP 的 Occlusion 只压间接光。AO_LIGHT_AFFECT=0 就是这个语义。
 	AO = mix(1.0, texture(ao_tex, UV).r, ao_strength);
 	AO_LIGHT_AFFECT = 0.0;
@@ -36,5 +44,5 @@ void fragment() {
 	SPECULAR = 0.5; // URP Lit 非金属反射率 0.04 ≈ Godot SPECULAR 0.5
 	METALLIC = 0.0;
 	float rim = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
-	EMISSION = alb.rgb * (emission_strength + rim * rim_strength);
+	EMISSION = alb.rgb * (flat_w + rim * rim_strength);
 }

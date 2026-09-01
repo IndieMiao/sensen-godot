@@ -21,7 +21,9 @@ corner_radius_bottom_left = 2
 background_mode = 0
 ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
-ambient_light_energy = 0.4
+ambient_light_energy = 0.3
+tonemap_mode = 2
+tonemap_exposure = 1.0
 
 [node name="MapPoc" type="Node3D"]
 script = ExtResource("1_mp")
