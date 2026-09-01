@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scenes/dressing_room/dressing_room.gd" id="1_dress"]
 [ext_resource type="Script" path="res://scenes/dressing_room/parts_panel.gd" id="2_parts"]
@@ -7,8 +7,12 @@
 
 [sub_resource type="Environment" id="Environment_room"]
 background_mode = 1
-background_color = Color(0.164706, 0.164706, 0.188235, 1)
-ambient_light_energy = 0.6
+background_color = Color(0.9, 0.9, 0.9, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.3
+tonemap_mode = 2
+tonemap_exposure = 1.0
 
 [sub_resource type="StyleBoxFlat" id="SB_drawer"]
 content_margin_left = 0.0
@@ -16,11 +20,18 @@ content_margin_top = 12.0
 content_margin_right = 0.0
 content_margin_bottom = 12.0
 bg_color = Color(1, 1, 1, 0.96)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
+corner_radius_top_left = 22
+corner_radius_top_right = 22
 shadow_color = Color(0.09, 0.12, 0.16, 0.16)
 shadow_size = 8
 shadow_offset = Vector2(0, -2)
+
+[sub_resource type="QuadMesh" id="Mesh_backdrop"]
+size = Vector2(30, 30)
+
+[sub_resource type="StandardMaterial3D" id="Mat_backdrop"]
+shading_mode = 0
+albedo_color = Color(0.9, 0.9, 0.9, 1)
 
 [node name="DressingRoom" type="Node3D"]
 script = ExtResource("1_dress")
@@ -32,9 +43,18 @@ script = ExtResource("4_dresscam")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 rotation_degrees = Vector3(-45, 30, 0)
+light_energy = 1.0
+shadow_enabled = true
+shadow_blur = 2.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_room")
+
+[node name="Backdrop" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+cast_shadow = 0
+mesh = SubResource("Mesh_backdrop")
+surface_material_override/0 = SubResource("Mat_backdrop")
 
 [node name="RigAnchor" type="Node3D" parent="."]
 

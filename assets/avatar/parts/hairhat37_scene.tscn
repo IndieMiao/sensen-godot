@@ -8,8 +8,8 @@ render_priority = 0
 shader = ExtResource("1_5qm54")
 shader_parameter/albedo_tex = ExtResource("2_y5cid")
 shader_parameter/ao_strength = 0.2
-shader_parameter/shadow_value = 0.85
-shader_parameter/shadow_softness = null
+shader_parameter/smoothness = 0.1
+shader_parameter/diffuse_strength = 0.5
 shader_parameter/emission_strength = 0.8
 shader_parameter/rim_strength = null
 
@@ -42,11 +42,11 @@ _data = {
 &"hairHat37_rig": SubResource("Animation_6a60d")
 }
 
-[node name="SocketPart" type="Node3D" unique_id=1310157733]
+[node name="SocketPart" type="Node3D" unique_id=1620669936]
 
-[node name="hairHat" type="MeshInstance3D" parent="." unique_id=1916474434]
+[node name="hairHat" type="MeshInstance3D" parent="." unique_id=335917467]
 cast_shadow = 0
 mesh = SubResource("ArrayMesh_bc3sv")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1314801030]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=774649133]
 libraries/ = SubResource("AnimationLibrary_r2poc")

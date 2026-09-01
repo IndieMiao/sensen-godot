@@ -32,6 +32,19 @@ const NEAR_SPREAD_M := 900.0 # 上海散布半径（米）
 const LA_SPREAD_M := 3000.0
 const CULL_FACTOR := 4.0 # 距地图中心 > 4×相机距离 → 隐藏
 const REANCHOR_DIST_M := 3000.0 # 浮动原点重锚阈值
+## 等首个定位的上限；超时就用 START_LAT/LNG 当 home，演示内容照常可见。
+const HOME_TIMEOUT_S := 3.0
+
+## 抬手惯性：速度按 exp(-DECAY*dt) 衰减，低于 MIN_SPEED 停止。
+## EMA 平滑掉单帧抖动，否则最后一帧的抖动会决定整段滑行方向。
+const FLING_DECAY := 4.0
+const FLING_MIN_SPEED := 0.5 # 米/秒
+const FLING_EMA := 0.35
+## 缩放轴惯性的停止门槛（zoom 单位/秒）。zoom 是对数刻度，0.05 已经几乎看不出变化。
+const ZOOM_FLING_MIN := 0.05
+## 双击：300ms 内两次落点相距不超过 32 单位
+const DOUBLE_TAP_S := 0.3
+const DOUBLE_TAP_MAX_PX := 32.0
 
 @onready var rigs: Node3D = $Rigs
 @onready var cam: Camera3D = $Camera3D
@@ -75,13 +88,49 @@ var _spawn_queue: Array[Dictionary] = []
 var _dot_tween: Tween = null
 ## 错误态锁定芯片文案（缺 token 等），不再被周期刷新覆盖
 var _chip_locked := false
+## "我的位置"：定位成功则为真实位置，超时/无定位则回落 START_LAT/LNG。
+## 自己、近处路人、全部 marker 都相对它摆放——绝不写死经纬度。
+var home_lat := START_LAT
+var home_lng := START_LNG
+var _home_resolved := false
+## 当前 home 是否来自超时回落（而非真实定位）。为真时允许下一手真实定位
+## 纠正一次——纠正用掉之后立即置回 false，之后的定位更新一律忽略，与
+## Android 侧 GodotMapPlugin.LAST_KNOWN_MAX_AGE_MS（5 分钟内的缓存才当作
+## "当前位置"发出）保持同一个口径："只信一次，信完就不再变"。
+var _home_from_fallback := false
+var marker_layer: MarkerLayer = null
+var _fling_vel := Vector3.ZERO
+var _last_tap_ms := 0
+var _last_tap_pos := Vector2.ZERO
+var _zoom_tween: Tween = null
+var _drag_accum_px := 0.0 # 当前手势累计拖拽位移，超过双击半径就作废 _last_tap_ms
+## 本次手势里 _fling_vel 达到过的峰值（米/秒），按下时归零。
+## 调试芯片读它：芯片每 30 帧才刷一次，抓不到瞬时值。用途是判断惯性"没触发"
+## 还是"触发了但速度太小"——单帧多次 ScreenDrag 采样都除以整帧 dt 会系统性低估。
+var _fling_peak := 0.0
+## 缩放轴惯性速度（zoom 单位/秒），与 _fling_vel 是同一套语义、不同轴。
+var _zoom_vel := 0.0
+## 本次手势是否曾经有过 2 指以上。捏合抬手是一根一根抬的：第一根离开后
+## _touch_count 掉回 1，剩下那根往往还在动，它的 drag 事件就会通过
+## "_touch_count <= 1" 门禁把 pan 速度灌进 _fling_vel，抬手甩出一段意外平移。
+## 所以一旦升级成多指，本次手势剩余时间一律不再喂 pan 速度，直到所有手指离开。
+var _gesture_multi := false
 
 func _ready() -> void:
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
 	get_viewport().transparent_bg = true
 	$Sun.rotation_degrees = Vector3(-55, 30, 0)
-	_spawn_pawns()
+	_spawn_la_fixture() # 压测夹具先排队；home 队列等定位确定后再插
 	_wire_buttons()
+
+	# marker 层：铺满 HUD 且排在最底，别挡住芯片和按钮。
+	# 自身 MOUSE_FILTER_IGNORE 只是让层本身不吞事件，图钉 Button 仍然可点。
+	marker_layer = MarkerLayer.new()
+	marker_layer.name = "Markers"
+	marker_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	marker_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$HUD.add_child(marker_layer)
+	$HUD.move_child(marker_layer, 0)
 
 	# 窗口尺寸变化（旋屏/分屏/折叠屏）会改变两层的像素↔米换算基准，必须重推相机
 	get_viewport().size_changed.connect(func(): _camera_dirty = true)
@@ -89,6 +138,7 @@ func _ready() -> void:
 	map = _make_bridge()
 	if map:
 		map.map_ready.connect(_on_map_ready)
+		map.location_update.connect(_on_location_update)
 		map.set_map_visible(true)
 		pixel_ratio = map.get_pixel_ratio()
 		var token := _load_token()
@@ -100,11 +150,16 @@ func _ready() -> void:
 		else:
 			map.create_map(token, START_LAT, START_LNG, zoom)
 			_set_dot(DOT_WAIT, true) # 连接中：呼吸闪烁
+		map.start_location()
 	else:
 		_set_dot(DOT_WAIT, false)
 		chip_title.text = "地图预览"
 		chip_sub.text = "桌面运行，无地图插件"
 		_chip_locked = true
+	# 定位兜底：拒绝授权 / 定位慢 / 桌面无插件，3 秒后一律回落上海默认点。
+	# 没有这条，_spawn_home_cohort 永远不会被调用，地图上只剩洛杉矶夹具。
+	get_tree().create_timer(HOME_TIMEOUT_S).timeout.connect(
+		func(): _resolve_home(START_LAT, START_LNG, true))
 	_camera_dirty = true
 
 ## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）
@@ -125,10 +180,11 @@ func _exit_tree() -> void:
 func _process(_dt: float) -> void:
 	if map:
 		map.poll()
+	_step_fling(_dt)
 	if not _spawn_queue.is_empty():
 		# 每帧 1 个：装配（部件加载+网格合并）摊薄到 ~23 帧，压掉加载期卡顿
 		var spec: Dictionary = _spawn_queue.pop_front()
-		_add_pawn(spec.lat, spec.lng, spec.cfg, spec.anim)
+		_add_pawn(spec.lat, spec.lng, spec.cfg, spec.anim, spec.cohort)
 	if _camera_dirty:
 		_camera_dirty = false
 		_update_cameras()
@@ -139,7 +195,7 @@ func _process(_dt: float) -> void:
 func _refresh_chip() -> void:
 	if _chip_locked:
 		return
-	chip_title.text = "洛杉矶" if _in_la else "上海"
+	chip_title.text = "洛杉矶" if _in_la else "我的位置"
 	chip_sub.text = "%.4f, %.4f  ·  z%.1f" % [center_lat, center_lng, zoom]
 	if chip_debug.visible:
 		var vis := 0
@@ -147,8 +203,10 @@ func _refresh_chip() -> void:
 			if (p.node as Node3D).visible:
 				vis += 1
 		var info := map.camera_info() if map else ""
-		chip_debug.text = "同步 b%.0f° p%.0f°  ·  角色 %d/%d\n回读 %s" % [
-			bearing, pitch, vis, _pawns.size(), info if not info.is_empty() else "—"]
+		chip_debug.text = "同步 b%.0f° p%.0f°  ·  角色 %d/%d\n惯性 峰值%.0f 当前%.0f m/s（门槛%.1f）\n回读 %s" % [
+			bearing, pitch, vis, _pawns.size(),
+			_fling_peak, _fling_vel.length(), FLING_MIN_SPEED,
+			info if not info.is_empty() else "—"]
 
 ## —— 相机同步核心 ————————————————————————————————————————————
 
@@ -181,6 +239,8 @@ func _update_cameras() -> void:
 	cam.near = maxf(d / 1000.0, 0.05)
 	cam.far = d * 8.0
 	_update_pawns(d)
+	if marker_layer:
+		marker_layer.sync(cam, anchor_lat, anchor_lng, d * CULL_FACTOR, center_world)
 	# 同一份位姿喂给地图（单一权威）
 	if map:
 		map.set_camera(center_lat, center_lng, zoom, bearing, pitch)
@@ -230,24 +290,102 @@ func _ground_point(screen_pos: Vector2) -> Variant:
 	return Plane(Vector3.UP, 0.0).intersects_ray(
 		cam.project_ray_origin(screen_pos), cam.project_ray_normal(screen_pos))
 
+## 抬手后的惯性滑行：指数衰减，低于阈值停止。有手指按下时直接清零
+## （新触摸打断惯性是原生地图的通用手感）。
+func _step_fling(dt: float) -> void:
+	# ⚠️ 手指按着时"不推进"但**绝不清零**——速度要留到抬手那一刻用。
+	# 原先这两件事写在同一个条件里，于是拖拽期间每帧都把刚积累的速度清掉
+	# （300ms 拖拽 ≈ 18 帧 = 清 18 次），抬手那帧手指通常已不动、没有新的 drag
+	# 事件补速度，惯性就永远不触发。2026-09-01 真机实测"完全没有惯性"的根因。
+	# 打断惯性是按下事件的职责，_unhandled_input 的 pressed 分支已经清零。
+	if _touch_count > 0:
+		return
+	# 平移轴与缩放轴各自独立存活/衰减：捏合完松手要能继续缩，拖拽完松手要能继续滑。
+	var pan_alive := _fling_vel.length() >= FLING_MIN_SPEED
+	var zoom_alive := absf(_zoom_vel) >= ZOOM_FLING_MIN
+	if not pan_alive:
+		_fling_vel = Vector3.ZERO
+	if not zoom_alive:
+		_zoom_vel = 0.0
+	if not pan_alive and not zoom_alive:
+		return
+	if pan_alive:
+		# 与拖拽路径同款限幅：帧率抖动导致 vel*dt 失配时，不至于把地图甩出几千公里。
+		_apply_world_delta((_fling_vel * dt).limit_length(_cam_distance()))
+		_fling_vel *= exp(-FLING_DECAY * dt)
+	if zoom_alive:
+		_set_zoom(zoom + _zoom_vel * dt) # _set_zoom 自带 3~20 钳位
+		_zoom_vel *= exp(-FLING_DECAY * dt)
+	_camera_dirty = true
+
+## 双击判定：与上一次触摸的时间差与落点距离都在窗口内。
+func _is_double_tap(now_ms: int, pos: Vector2) -> bool:
+	if _last_tap_ms <= 0:
+		return false
+	return now_ms - _last_tap_ms <= int(DOUBLE_TAP_S * 1000.0) \
+		and pos.distance_to(_last_tap_pos) <= DOUBLE_TAP_MAX_PX
+
+## 双击放大走 Tween 而不是瞬变——瞬变在地图上很跳，是"不丝滑"的另一半。
+func _tween_zoom(target: float) -> void:
+	_zoom_vel = 0.0 # 双击接管缩放，清掉残余的捏合惯性
+	if _zoom_tween:
+		_zoom_tween.kill()
+	_zoom_tween = create_tween()
+	_zoom_tween.tween_method(_set_zoom, zoom, clampf(target, 3.0, 20.0), 0.25) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
 ## —— 输入与 UI ————————————————————————————————————————————————
 
 func _unhandled_input(e: InputEvent) -> void:
 	if e is InputEventScreenTouch:
 		_touch_count += 1 if e.pressed else -1
 		_touch_count = maxi(_touch_count, 0)
-	if e is InputEventScreenDrag and _touch_count <= 1:
+		if e.pressed:
+			_fling_vel = Vector3.ZERO # 新触摸立即打断惯性
+			_zoom_vel = 0.0 # 缩放轴同理
+			if _touch_count >= 2:
+				# 第二指落下：丢掉第一指此前攒的 pan 速度，本次手势按捏合处理
+				_gesture_multi = true
+				_fling_vel = Vector3.ZERO
+		elif _touch_count == 0:
+			_gesture_multi = false # 全部离手，下一次手势重新判定
+			if _zoom_tween: # 惯性的另一半：新触摸也要打断还在跑的双击变焦
+				_zoom_tween.kill()
+				_zoom_tween = null
+			_drag_accum_px = 0.0 # 新手势重新计里程，配合下面的拖拽门禁
+			_fling_peak = 0.0
+			if _touch_count <= 1: # 第二指落下（捏合起手）不算双击，镜像拖拽路径的门禁
+				if _is_double_tap(Time.get_ticks_msec(), e.position):
+					_last_tap_ms = 0
+					_tween_zoom(zoom + 1.0)
+				else:
+					_last_tap_ms = Time.get_ticks_msec()
+					_last_tap_pos = e.position
+	if e is InputEventScreenDrag and _touch_count <= 1 and not _gesture_multi:
 		# 抓地拖拽：让按下时的地面点始终跟在手指下（倾角下精确）。
 		# 高 pitch 时屏幕上缘一像素对应的地面位移可达 ~0.4d，单次 delta 限幅到 d
 		# 防止一次拖拽把地图甩出上百公里。
 		var prev = _ground_point(e.position - e.relative)
 		var now = _ground_point(e.position)
 		if prev != null and now != null:
-			var delta := (prev as Vector3) - (now as Vector3)
-			_apply_world_delta(delta.limit_length(_cam_distance()))
+			var delta := ((prev as Vector3) - (now as Vector3)).limit_length(_cam_distance())
+			_apply_world_delta(delta)
+			# 惯性速度：位移换算成米/秒后 EMA 平滑，抬手接着走
+			var dt := maxf(get_process_delta_time(), 0.001)
+			_fling_vel = _fling_vel.lerp(delta / dt, FLING_EMA)
+			_fling_peak = maxf(_fling_peak, _fling_vel.length())
 			_camera_dirty = true
+		# 累计拖拽位移超过双击判定半径就作废当前这次落点：按下→短拖拽→抬手→
+		# 300ms 内再按一次不该被判成双击变焦——那是拖拽中途的手抖，不是双击。
+		_drag_accum_px += e.relative.length()
+		if _drag_accum_px > DOUBLE_TAP_MAX_PX:
+			_last_tap_ms = 0
 	elif e is InputEventMagnifyGesture:
-		_set_zoom(zoom + log(e.factor) / log(2.0))
+		# 与拖拽同款：应用之后把变化量换算成 zoom/秒 做 EMA 平滑，松手接着走。
+		var dz := log(e.factor) / log(2.0)
+		_set_zoom(zoom + dz)
+		var zdt := maxf(get_process_delta_time(), 0.001)
+		_zoom_vel = lerpf(_zoom_vel, dz / zdt, FLING_EMA)
 	elif e is InputEventPanGesture:
 		_set_pitch(pitch - e.delta.y * 0.2)
 
@@ -274,8 +412,8 @@ func _update_tilt_label() -> void:
 
 func _on_fly_pressed() -> void:
 	_in_la = not _in_la
-	fly_btn.text = "回上海" if _in_la else "飞洛杉矶"
-	_teleport(LA_LAT, LA_LNG) if _in_la else _teleport(START_LAT, START_LNG)
+	fly_btn.text = "回我的位置" if _in_la else "飞洛杉矶"
+	_teleport(LA_LAT, LA_LNG) if _in_la else _teleport(home_lat, home_lng)
 
 func _teleport(lat: float, lng: float) -> void:
 	anchor_lat = lat
@@ -328,20 +466,85 @@ func _load_token() -> String:
 	var f := FileAccess.open(TOKEN_PATH, FileAccess.READ)
 	return f.get_as_text().strip_edges() if f else ""
 
-func _spawn_pawns() -> void:
-	# 自己：固定站在初始地图中心，默认装扮（立即生成）
-	_add_pawn(START_LAT, START_LNG, Avatar.slot_table.default_config(), "idle")
-	# 其余排进分帧队列（上海围绕初始地图中心散布；洛杉矶验证跨洋剔除+浮动原点）
+## 自己的角色装扮：读换装房存档。Avatar.load_outfit()（avatar_service.gd:33-35）
+## 内部已在无存档时回落 slot_table.default_config()，此处不需要再守卫 null。
+func self_config() -> AvatarConfig:
+	return Avatar.load_outfit()
+
+## 自己 + 近处路人，全部相对 home 摆放。绝不写死经纬度：写死的话定位到任何
+## 非上海的位置，这些角色都会落在 CULL_FACTOR×相机距离之外被剔除，地图空无一人。
+func _spawn_home_cohort() -> void:
+	# push_front：自己排队头，第一个出队，玩家最先看到自己
+	_spawn_queue.push_front({"lat": home_lat, "lng": home_lng,
+		"cfg": self_config(), "anim": "idle", "cohort": "self"})
 	for i in PAWNS_NEAR_COUNT:
-		var off := _rand_offset_deg(NEAR_SPREAD_M, START_LAT)
-		_spawn_queue.append({"lat": START_LAT + off.y, "lng": START_LNG + off.x,
-			"cfg": _random_config(), "anim": _rand_anim()})
+		var off := _rand_offset_deg(NEAR_SPREAD_M, home_lat)
+		_spawn_queue.append({"lat": home_lat + off.y, "lng": home_lng + off.x,
+			"cfg": _random_config(), "anim": _rand_anim(), "cohort": "near"})
+
+## 洛杉矶夹具：验证跨洋剔除 + 浮动原点重锚，不是演示内容，坐标保持绝对，
+## 不跟随定位——改成相对就失去了这个夹具的意义。
+func _spawn_la_fixture() -> void:
 	for i in PAWNS_LA_COUNT:
 		var off := _rand_offset_deg(LA_SPREAD_M, LA_LAT)
 		_spawn_queue.append({"lat": LA_LAT + off.y, "lng": LA_LNG + off.x,
-			"cfg": _random_config(), "anim": _rand_anim()})
+			"cfg": _random_config(), "anim": _rand_anim(), "cohort": "la"})
 
-func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String) -> void:
+## 确定"我的位置"并把演示内容锚上去。首个有效定位与 3 秒超时先到者生效；
+## 之后的定位更新不再改锚点（避免演示中途所有内容整体位移）。
+## is_fallback：本次调用是不是 3 秒超时回落（而非真实定位）。首个调用（无论
+## 来源）落锁 home；若落锁的是回落点，允许随后第一手真实定位纠正一次
+## （_correct_home），再之后一律忽略——语义与顶部 _home_from_fallback 的
+## 注释一致，也是"首个定位或超时先到者生效，之后不再挪锚点"这条不变量在
+## 加入纠正机制后的精确表述。
+func _resolve_home(lat: float, lng: float, is_fallback: bool = false) -> void:
+	if _home_resolved:
+		if _home_from_fallback and not is_fallback:
+			_correct_home(lat, lng)
+		return
+	_home_resolved = true
+	_home_from_fallback = is_fallback
+	home_lat = lat
+	home_lng = lng
+	# _in_la 为真说明用户已经手动飞去洛杉矶：这里只更新 home 数据和角色队列，
+	# 不把镜头拽回去——否则相机瞬移回家但 _in_la/Fly 按钮文案仍停在"洛杉矶"，
+	# 下一次按 Fly 又飞去洛杉矶，状态和画面对不上。
+	if not _in_la:
+		_teleport(lat, lng)
+	_spawn_home_cohort()
+	if marker_layer:
+		marker_layer.set_home(lat, lng)
+
+## 回落点 -> 真实定位的一次性纠正。home 队列（self/near）可能已经排队甚至
+## 已经装配完成，重新生成会打乱随机布局、白白重付一次装配代价——所以是
+## 平移已有条目的经纬度（按 delta 整体搬），而不是重新 _spawn_home_cohort()。
+## 洛杉矶夹具坐标绝对、故意不跟 home 走，靠 cohort 字段甄别、跳过不动。
+func _correct_home(lat: float, lng: float) -> void:
+	_home_from_fallback = false # 纠正机会用掉即焚，无论后面还会不会再调用本函数
+	var d_lat := lat - home_lat
+	var d_lng := lng - home_lng
+	home_lat = lat
+	home_lng = lng
+	for spec in _spawn_queue:
+		if spec.cohort != "la":
+			spec.lat += d_lat
+			spec.lng += d_lng
+	for p in _pawns:
+		if p.cohort != "la":
+			p.lat += d_lat
+			p.lng += d_lng
+	if not _in_la: # 同 _resolve_home：镜头已经飞去洛杉矶就不拽回来
+		_teleport(lat, lng)
+	else:
+		_reposition_pawns() # 镜头留在洛杉矶，但 home 队伍的世界坐标仍要跟着搬
+		_camera_dirty = true
+	if marker_layer:
+		marker_layer.set_home(lat, lng)
+
+func _on_location_update(lat: float, lng: float, _accuracy: float) -> void:
+	_resolve_home(lat, lng)
+
+func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String, cohort: String) -> void:
 	var holder := Node3D.new()
 	holder.visible = false # ready 门禁：config_applied + 首帧姿态之前不显示
 	rigs.add_child(holder)
@@ -356,7 +559,10 @@ func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String) -> void:
 		if c is RigActivity:
 			activity = c
 			break
-	var pawn := {"lat": lat, "lng": lng, "node": holder, "activity": activity, "ready": false}
+	# cohort 保留到 pawn 记录里：home 纠正（_correct_home）要靠它分清哪些已生成
+	# 的角色跟着 home 搬（self/near）、哪些是绝对坐标的洛杉矶夹具不能动。
+	var pawn := {"lat": lat, "lng": lng, "node": holder, "activity": activity, "ready": false,
+		"cohort": cohort}
 	rig.config_applied.connect(func(_c):
 		var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
 		if ap:

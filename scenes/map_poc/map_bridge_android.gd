@@ -2,12 +2,29 @@ class_name MapBridgeAndroid
 extends MapBridge
 ## Android 实现：包装 GodotMap 插件 singleton（GodotMapPlugin.kt）。
 
+## Android 12+（本工程 targetSdk 取 Godot 默认 36）要求 FINE 与 COARSE 在同一次
+## 运行时请求里提交，否则系统直接忽略。OS.request_permissions()（复数）一次提交
+## manifest 中全部危险权限；单数版 OS.request_permission("...FINE_LOCATION")
+## 会静默失败（无弹窗、无回调）——这是本模块最容易翻车的点。
+const LOCATION_PERMS := [
+	"android.permission.ACCESS_FINE_LOCATION",
+	"android.permission.ACCESS_COARSE_LOCATION",
+]
+## 授权对话框的等待上限（poll 帧数）。用户点"拒绝"后不该无限轮询。
+const PERMISSION_POLL_LIMIT := 600
+const PERMISSION_POLL_EVERY := 15
+
 var _plugin: Object
+var _awaiting_permission := false
+var _poll_frames := 0
 
 func _init() -> void:
 	_plugin = Engine.get_singleton("GodotMap")
 	# 插件在 Android UI 线程 emitSignal，必须 deferred 回主循环再碰场景树
 	_plugin.connect("map_ready", func(): map_ready.emit(), CONNECT_DEFERRED)
+	_plugin.connect("location_update",
+		func(lat: float, lng: float, acc: float): location_update.emit(lat, lng, acc),
+		CONNECT_DEFERRED)
 
 func create_map(token: String, lat: float, lng: float, zoom: float) -> void:
 	_plugin.createMap(token, lat, lng, zoom)
@@ -23,3 +40,35 @@ func get_pixel_ratio() -> float:
 
 func camera_info() -> String:
 	return _plugin.getCameraInfo()
+
+func start_location() -> void:
+	if _has_location_permission():
+		_plugin.startLocation()
+		return
+	OS.request_permissions()
+	_awaiting_permission = true
+	_poll_frames = 0
+
+## request_permissions() 是异步的（系统弹窗），授权结果没有 GDScript 信号，
+## 只能轮询 get_granted_permissions()。授权到手就启动定位；拒绝或超时就放弃，
+## 场景那边的 3 秒超时会接管回落。
+func poll() -> void:
+	if not _awaiting_permission:
+		return
+	_poll_frames += 1
+	if _poll_frames > PERMISSION_POLL_LIMIT:
+		_awaiting_permission = false
+		push_warning("MapBridgeAndroid: 定位授权等待超时，放弃定位")
+		return
+	if _poll_frames % PERMISSION_POLL_EVERY != 0:
+		return
+	if _has_location_permission():
+		_awaiting_permission = false
+		_plugin.startLocation()
+
+func _has_location_permission() -> bool:
+	var granted := OS.get_granted_permissions()
+	for p in LOCATION_PERMS:
+		if granted.has(p):
+			return true
+	return false

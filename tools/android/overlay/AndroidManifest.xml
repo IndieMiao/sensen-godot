@@ -19,6 +19,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- 定位：Android 12+（targetSdk≥31）必须同时声明 FINE 与 COARSE，并在同一次
+         运行时请求中提交；只声明/只请求 FINE 会被系统直接忽略（无弹窗无回调）。 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:label="@string/godot_project_name_string"
         android:allowBackup="false"

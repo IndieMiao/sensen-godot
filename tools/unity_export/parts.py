@@ -83,10 +83,18 @@ def build_recipe(unity_root: Path, asset_name: str, tier: int,
         ao = _resolve_override_path(ov["ao"], unity_root) if "ao" in ov else convention.find_texture(folder, slot_word, "AO")
         if albedo is None:
             report.warn(f"{part_id}: 找不到 albedo 贴图，材质将无贴图")
-        mat_file = materials.find_material_file(folder, slot_word)
+        mat_file = materials.find_material_file(_mat_folder(folder, ov, unity_root), slot_word)
         floats = materials.extract_floats(mat_file) if mat_file else {}
         recipe["materials"].append({"albedo": albedo, "ao": ao, "floats": floats})
     return recipe
+
+def _mat_folder(folder, ov: dict, unity_root: Path):
+    """材质目录。默认与贴图同目录；基础部件例外——贴图在 BaseCharacter/Texture/
+    而材质在 BaseCharacter/Material/（单数），靠 overrides 的 mat_folder 指过去。"""
+    if ov and "mat_folder" in ov:
+        return _resolve_override_path(ov["mat_folder"], unity_root)
+    return folder
+
 
 def _mesh_materials(folder, slot_word: str, ov: dict, unity_root: Path, part_id: str, report: Report):
     """mesh 部件的材质列表：每个命中的 .mat 一条 entry（floats 各取各的），贴图先按该 .mat
@@ -99,9 +107,13 @@ def _mesh_materials(folder, slot_word: str, ov: dict, unity_root: Path, part_id:
         ao = _resolve_override_path(ov["ao"], unity_root) if "ao" in ov else convention.find_texture(folder, slot_word, "AO")
         if albedo is None:
             report.warn(f"{part_id}: 找不到 albedo 贴图，材质将无贴图")
-        return [{"albedo": albedo, "ao": ao, "floats": {}}]
+        # overrides 里指定贴图只是"这个部件的贴图要换"，与材质参数无关——
+        # 此前这里把 floats 硬写成 {}，等于顺手丢掉了该部件的全部光照参数。
+        mat_file = materials.find_material_file(_mat_folder(folder, ov, unity_root), slot_word)
+        floats = materials.extract_floats(mat_file) if mat_file else {}
+        return [{"albedo": albedo, "ao": ao, "floats": floats}]
 
-    mat_files = materials.find_material_files(folder, slot_word)
+    mat_files = materials.find_material_files(_mat_folder(folder, ov, unity_root), slot_word)
     if not mat_files:
         albedo = convention.find_texture(folder, slot_word, "D")
         ao = convention.find_texture(folder, slot_word, "AO")

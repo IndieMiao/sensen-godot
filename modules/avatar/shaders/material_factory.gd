@@ -3,7 +3,12 @@ extends RefCounted
 
 const SHADER := preload("res://modules/avatar/shaders/avatar_toon.gdshader")
 const TEXTURE_KEYS := ["albedo_tex", "ao_tex"]
-const FLOAT_KEYS := ["ao_strength", "shadow_value", "shadow_softness", "emission_strength", "rim_strength"]
+## 与 avatar_toon.gdshader 的 uniform 名一一对应；由 tools/unity_export/materials.py
+## 的 FLOAT_MAP 从 Unity .mat 抽出。2026-09-01 起按 URP Lit 真实语义命名
+## （smoothness/diffuse_strength），不再有 shadow_value/shadow_softness——
+## 那两个是把 Unity PBR 参数错当成 toon ramp 参数的产物。
+const FLOAT_KEYS := ["ao_strength", "smoothness", "diffuse_strength",
+	"emission_strength", "rim_strength"]
 
 static func create(params: Dictionary) -> ShaderMaterial:
 	var m := ShaderMaterial.new()

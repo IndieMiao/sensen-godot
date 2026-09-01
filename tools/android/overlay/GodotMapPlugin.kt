@@ -1,7 +1,13 @@
 package com.sensen.map
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.PixelFormat
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
@@ -27,10 +33,25 @@ import org.godotengine.godot.plugin.UsedByGodot
 class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     companion object {
         private const val TAG = "GodotMapPlugin"
+
+        // demo 锚点由 GDScript 侧取"第一次收到的定位"锁定、之后永不更新（避免演示中途
+        // 地图跳动）。所以 last-known 缓存一旦太旧就绝不能拿去当首帧发——发出去就是
+        // 永久锚错城市，且后面真实 GPS 定位到达时也不会被拿来纠正。5 分钟内的缓存
+        // 视为等同于"当前位置"；更旧的宁可没有，等下面的实时订阅。
+        private const val LAST_KNOWN_MAX_AGE_MS = 5 * 60 * 1000L
     }
 
     private var container: FrameLayout? = null
     private var mapView: MapView? = null
+
+    private var locationManager: LocationManager? = null
+    private var locationStarted = false
+
+    private val locationListener = LocationListener { loc -> emitLocation(loc) }
+
+    private fun emitLocation(loc: Location) {
+        emitSignal("location_update", loc.latitude, loc.longitude, loc.accuracy.toDouble())
+    }
 
     // MapboxMap 是 @MainThread API：相机状态在 UI 线程订阅时写入缓存，
     // getCameraInfo()（Godot 线程调用）只读缓存，避免跨线程读 native Map。
@@ -41,6 +62,12 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
     override fun getPluginSignals() = setOf(
         SignalInfo("map_ready"),
+        SignalInfo(
+            "location_update",
+            Double::class.javaObjectType,
+            Double::class.javaObjectType,
+            Double::class.javaObjectType,
+        ),
     )
 
     override fun onMainCreate(activity: Activity?): View? {
@@ -166,6 +193,99 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         runOnUiThread {
             mapView?.visibility = if (visible) View.VISIBLE else View.GONE
         }
+    }
+
+    /**
+     * 启动定位订阅。权限由 GDScript 侧的 OS.request_permissions() 拿（Android 12+
+     * 必须 FINE+COARSE 同请求），本方法只在已授权时工作，未授权直接放弃——
+     * GDScript 那边有 3 秒超时会回落默认点。
+     *
+     * 幂等重入（从换装房返回地图场景）：GDScript 侧的 home 锚点（map_poc.gd 的
+     * _home_resolved）是场景实例变量，change_scene_to_file 重建地图场景后会
+     * 再调一次本方法——参照上面 createMap() 的重入处理，last-known 的读取和
+     * 补发必须每次都做，不能被 locationStarted 挡住。否则返回场景只能指望仍在
+     * 跑的旧订阅（minDistance=5f，静止设备摸不到新数据），3 秒超时一到就永久
+     * 错锚上海。locationStarted 只挡下面的 requestLocationUpdates 本身，避免
+     * 重入把同一个 listener 在同一个 provider 上重复订阅。
+     */
+    @UsedByGodot
+    fun startLocation() {
+        runOnUiThread {
+            val act = getActivity() ?: return@runOnUiThread
+            val fine = act.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+            val coarse = act.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+            if (!fine && !coarse) {
+                Log.w(TAG, "定位权限未授予，startLocation 放弃（GDScript 侧靠超时回落）")
+                return@runOnUiThread
+            }
+            val lm = act.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+                ?: return@runOnUiThread
+            locationManager = lm
+
+            // 先补一发 last-known：冷启动 GPS 首次定影可能要几十秒，而 demo 只等 3 秒。
+            // 两个 provider 都取，谁的时间戳新用谁。每次调用 startLocation 都做
+            // （不受下面的 locationStarted 影响）——重入时靠它把新鲜缓存立刻喂回去。
+            val candidates = mutableListOf<Location>()
+            for (p in listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)) {
+                try {
+                    lm.getLastKnownLocation(p)?.let(candidates::add)
+                } catch (e: Exception) {
+                    Log.w(TAG, "getLastKnownLocation($p) 失败: ${e.message}")
+                }
+            }
+            candidates.maxByOrNull { it.time }?.let {
+                val ageMs = System.currentTimeMillis() - it.time
+                if (ageMs <= LAST_KNOWN_MAX_AGE_MS) {
+                    Log.i(TAG, "last-known 定位 ${it.latitude},${it.longitude} acc=${it.accuracy}")
+                    emitLocation(it)
+                } else {
+                    Log.i(TAG, "last-known 定位太旧（${ageMs / 1000}秒前），不作为锚点发出，等实时订阅")
+                }
+            }
+
+            if (locationStarted) return@runOnUiThread
+
+            // 再订阅持续更新：GPS 与 NETWORK 两个 provider，权限允许的都订上。
+            // 室内环境 GPS 常常几分钟拿不到定影，只订 GPS（原实现）会让 demo 在
+            // 室内跑很容易撞上 3 秒超时回落；listener 本身与 provider 无关，
+            // GDScript 侧取第一个到达的即可。这个订阅故意跨场景存活到插件销毁
+            // 为止（不在场景退出时 stopLocation）——它是场景重入时唯一能保证
+            // 送达新鲜定位的来源，见上面的函数注释。每个 provider 单独 try/catch，
+            // 一个不可用不连累另一个。
+            var subscribed = false
+            if (fine) {
+                try {
+                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 5f, locationListener)
+                    subscribed = true
+                    Log.i(TAG, "定位订阅启动 provider=${LocationManager.GPS_PROVIDER}")
+                } catch (e: Exception) {
+                    Log.e(TAG, "requestLocationUpdates(GPS) 失败: ${e.message}")
+                }
+            }
+            if (coarse) {
+                try {
+                    lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000L, 5f, locationListener)
+                    subscribed = true
+                    Log.i(TAG, "定位订阅启动 provider=${LocationManager.NETWORK_PROVIDER}")
+                } catch (e: Exception) {
+                    Log.e(TAG, "requestLocationUpdates(NETWORK) 失败: ${e.message}")
+                }
+            }
+            locationStarted = subscribed
+        }
+    }
+
+    override fun onMainDestroy() {
+        runOnUiThread {
+            try {
+                locationManager?.removeUpdates(locationListener)
+            } catch (e: Exception) {
+                Log.w(TAG, "removeUpdates 失败: ${e.message}")
+            }
+        }
+        super.onMainDestroy()
     }
 
     /** HUD 调试用：当前相机状态（UI 线程写入的缓存，任意线程可读）。 */

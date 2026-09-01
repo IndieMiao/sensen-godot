@@ -362,6 +362,18 @@ import android.location.LocationListener
 import android.location.LocationManager
 ```
 
+在 `companion object` 里 `TAG` 之后新增：
+
+```kotlin
+        /**
+         * last-known 定位的时效上界。超过这个岁数的缓存定位不能用来定锚点——
+         * GDScript 侧 _resolve_home() 锁的是**第一个**定位并丢弃后续更新，
+         * 所以一发"上周在别的城市"的陈旧缓存会永久钉错演示位置，不会被后到的
+         * 真实定位纠正。5 分钟内的定位基本等于当前位置。
+         */
+        private const val LAST_KNOWN_MAX_AGE_MS = 5 * 60 * 1000L
+```
+
 在 `private var mapView: MapView? = null`（第 33 行）之后新增：
 
 ```kotlin
@@ -429,9 +441,17 @@ import android.location.LocationManager
                     Log.w(TAG, "getLastKnownLocation($p) 失败: ${e.message}")
                 }
             }
+            // ⚠️ 必须卡时效：GDScript 侧 _resolve_home() 锁第一个定位并丢弃后续更新，
+            // 陈旧缓存定位会永久钉错位置且不会被真实定位纠正。拒绝时要打日志——
+            // "缓存太旧被拒"和"根本没有缓存"在 logcat 里否则长得一样，人工排查会卡住。
             candidates.maxByOrNull { it.time }?.let {
-                Log.i(TAG, "last-known 定位 ${it.latitude},${it.longitude} acc=${it.accuracy}")
-                emitLocation(it)
+                val ageMs = System.currentTimeMillis() - it.time
+                if (ageMs <= LAST_KNOWN_MAX_AGE_MS) {
+                    Log.i(TAG, "last-known 定位 ${it.latitude},${it.longitude} acc=${it.accuracy}")
+                    emitLocation(it)
+                } else {
+                    Log.i(TAG, "last-known 定位已过期 ${ageMs / 1000}s，丢弃，等实时定位")
+                }
             }
 
             // 再订阅持续更新：有 FINE 用 GPS，只有 COARSE 就退 NETWORK
@@ -792,9 +812,17 @@ func test_missing_file_is_empty_not_error() -> void:
 	assert_int(PartCatalog.load_denylist("user://definitely_not_here.json").size()).is_equal(0)
 
 func test_shipped_denylist_file_is_valid() -> void:
-	## 名单文件本身必须能解析——格式写错会静默变成"没剔除任何东西"
-	assert_bool(FileAccess.file_exists("res://assets/avatar/demo_denylist.json")).is_true()
-	PartCatalog.load_denylist("res://assets/avatar/demo_denylist.json")
+	## 不能只调一次 load_denylist 就算验过：它对"格式正确但名单为空"和"格式写坏"
+	## 都返回空数组，两者观察不到区别。所以独立解析一遍 JSON 做对照。
+	## Step 7 要人工手改这个文件，写坏了只会静默变成"没剔除任何东西"。
+	var path := "res://assets/avatar/demo_denylist.json"
+	assert_bool(FileAccess.file_exists(path)).is_true()
+	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+	assert_int(typeof(data)).is_equal(TYPE_DICTIONARY)
+	assert_int(int(data.get("version", -1))).is_equal(PartCatalog.DENYLIST_VERSION)
+	assert_int(typeof(data.get("hidden"))).is_equal(TYPE_ARRAY)
+	var hidden: Array = data.get("hidden")
+	assert_int(PartCatalog.load_denylist(path).size()).is_equal(hidden.size())
 ```
 
 - [ ] **Step 2: 跑测试确认失败**
@@ -1123,12 +1151,12 @@ const BTN_PAD_H := 16
 | 位置 | 原值 | 新值 | 依据 |
 |---|---|---|---|
 | `SB_btn_normal` / `SB_btn_pressed` / `SB_btn_focus` 的四个 `corner_radius_*` | `12` | `14` | `RADIUS_CARD` |
-| `SB_btn_normal.bg_color` | `Color(0.941, 0.949, 0.957, 1)` | `Color(0.953, 0.965, 0.961, 1)` | `SURFACE_SUNK` #f3f6f5 |
-| `SB_btn_pressed.bg_color` | `Color(0.882, 0.902, 0.914, 1)` | `Color(0.925, 0.969, 0.949, 1)` | `SURFACE_TINT` #ecf7f2 |
-| `SB_btn_focus.border_color` | `Color(0.31, 0.72, 0.58, 1)` | `Color(0.204, 0.827, 0.6, 1)` | `ACCENT` #34d399 |
+| `SB_btn_normal.bg_color` | `Color(0.941, 0.949, 0.957, 1)` | `Color(0.952941, 0.964706, 0.960784, 1)` | `SURFACE_SUNK` #f3f6f5 |
+| `SB_btn_pressed.bg_color` | `Color(0.882, 0.902, 0.914, 1)` | `Color(0.925490, 0.968627, 0.949020, 1)` | `SURFACE_TINT` #ecf7f2 |
+| `SB_btn_focus.border_color` | `Color(0.31, 0.72, 0.58, 1)` | `Color(0.203922, 0.827451, 0.6, 1)` | `ACCENT` #34d399 |
 | `SB_panel_drawer` 的两个 `corner_radius_top_*` | `20` | `22` | `RADIUS_SHEET` |
-| `SB_accent_normal.bg_color` / `SB_pill_accent.bg_color` | `Color(0.498, 0.847, 0.745, 1)` | `Color(0.204, 0.827, 0.6, 1)` | `ACCENT` |
-| `SB_accent_pressed.bg_color` / `SB_pill_accent_pressed.bg_color` | `Color(0.41, 0.776, 0.667, 1)` | `Color(0.02, 0.588, 0.412, 1)` | `ACCENT_DEEP` #059669 |
+| `SB_accent_normal.bg_color` / `SB_pill_accent.bg_color` | `Color(0.498, 0.847, 0.745, 1)` | `Color(0.203922, 0.827451, 0.6, 1)` | `ACCENT` |
+| `SB_accent_pressed.bg_color` / `SB_pill_accent_pressed.bg_color` | `Color(0.41, 0.776, 0.667, 1)` | `Color(0.019608, 0.588235, 0.411765, 1)` | `ACCENT_DEEP` #059669 |
 | `SB_accent_normal` / `SB_accent_pressed` 的四个 `corner_radius_*` | `12` | `14` | `RADIUS_CARD` |
 | `SB_chip` 的四个 `corner_radius_*` | `14` | `14` | 已符合 `RADIUS_CARD`，不动 |
 | `SB_round` / `SB_round_pressed` 的四个 `corner_radius_*` | `20` | `22` | `RADIUS_SHEET`（圆形按钮沿用最大档） |
@@ -1137,10 +1165,10 @@ const BTN_PAD_H := 16
 `[resource]` 段落里：
 
 ```
-Button/colors/font_color = Color(0.071, 0.188, 0.157, 1)
-Button/colors/font_focus_color = Color(0.071, 0.188, 0.157, 1)
-Button/colors/font_hover_color = Color(0.071, 0.188, 0.157, 1)
-Button/colors/font_pressed_color = Color(0.071, 0.188, 0.157, 1)
+Button/colors/font_color = Color(0.070588, 0.188235, 0.156863, 1)
+Button/colors/font_focus_color = Color(0.070588, 0.188235, 0.156863, 1)
+Button/colors/font_hover_color = Color(0.070588, 0.188235, 0.156863, 1)
+Button/colors/font_pressed_color = Color(0.070588, 0.188235, 0.156863, 1)
 ```
 
 （四个都从 `Color(0.15, 0.165, 0.19, 1)` 改成 `INK` #123028）
@@ -1148,10 +1176,14 @@ Button/colors/font_pressed_color = Color(0.071, 0.188, 0.157, 1)
 并新增一行（`Label/font_sizes/font_size = 16` 之后）：
 
 ```
-Label/colors/font_color = Color(0.071, 0.188, 0.157, 1)
+Label/colors/font_color = Color(0.070588, 0.188235, 0.156863, 1)
 ```
 
 **不要动**：`default_font_size = 16`、所有 `content_margin_*`、所有 `constants/*separation = 8`、全部类型变体的 `base_type` 行——这些是 `tests/ui/test_app_theme.gd` 守护的基线。
+
+⚠️ **颜色必须写 6 位小数**：上表的值是 hex/255 的精确展开。3 位小数的误差（7.8e-5 ~ 4.5e-4）超过 Godot `is_equal_approx` 对 ≤1 数值的 `CMP_EPSILON ≈ 1e-5` 容差，token 与主题的比对断言会失败。
+
+⚠️ **`design_tokens.gd` 的 docstring 不要写"每个取值都能在这里找到对应常量"**——那不成立：阴影（色/尺寸/偏移）、表面 alpha（0.94/0.96/0.97）、`SB_round_pressed`/`SB_pill_pressed` 的独立灰、滚动条 grabber 色、`SB_chip`/`SB_pill*` 的内边距都没有 token。要写就写准边界：本文件是色板/间距栅格/圆角档/字阶/触摸目标padding 的来源，其余仍散在主题里。承诺"改这两个文件就够、不用翻场景"是真的，"每个值都有名字"不是。
 
 - [ ] **Step 5: 跑两套主题测试确认都通过**
 
@@ -1521,6 +1553,37 @@ func test_double_tap_window_and_radius() -> void:
 	assert_bool(n._is_double_tap(1500, Vector2(100, 100))).is_false() # 超时
 	assert_bool(n._is_double_tap(1200, Vector2(200, 200))).is_false() # 距离太远
 
+func test_second_finger_does_not_trigger_double_tap() -> void:
+	## 捏合起手时两指并拢落下，不得被读成双击
+	var n = auto_free(MapPoc.new())
+	n._last_tap_ms = 1000
+	n._last_tap_pos = Vector2(100, 100)
+	n._touch_count = 1 # 已有一指按下
+	assert_bool(n._touch_count <= 1 and n._is_double_tap(1150, Vector2(103, 101))).is_true()
+	n._touch_count = 2 # 第二指落下
+	assert_bool(n._touch_count <= 1 and n._is_double_tap(1150, Vector2(103, 101))).is_false()
+
+## _tween_zoom 需要在场景树里（create_tween 的前提），所以这两条用 add_child。
+## 关键断言是"zoom 没有立刻跳到目标值"——这正是本任务要交付的"平滑而非瞬变"，
+## 没有它，谁把 _tween_zoom 换成裸 _set_zoom() 都能全绿通过。
+func test_double_tap_zoom_is_tweened_not_instant() -> void:
+	var n = MapPoc.new()
+	add_child(auto_free(n))
+	var z0: float = n.zoom
+	n._tween_zoom(z0 + 1.0)
+	assert_object(n._zoom_tween).is_not_null()
+	assert_bool(n._zoom_tween.is_running()).is_true()
+	assert_float(n.zoom).is_less(z0 + 1.0) # 尚未到达目标 = 不是瞬变
+
+func test_repeat_tween_zoom_kills_previous() -> void:
+	var n = MapPoc.new()
+	add_child(auto_free(n))
+	n._tween_zoom(n.zoom + 1.0)
+	var first: Tween = n._zoom_tween
+	n._tween_zoom(n.zoom + 2.0)
+	assert_bool(first.is_valid()).is_false() # 前一个被 kill，而不是两个同时活着
+	assert_object(n._zoom_tween).is_not_null()
+
 func test_fling_respects_latitude_clamp() -> void:
 	## 极高速向北甩不得把中心拖过 Web Mercator 边界（拖过极点会东西镜像）
 	var n = auto_free(MapPoc.new())
@@ -1569,7 +1632,9 @@ func _unhandled_input(e: InputEvent) -> void:
 		_touch_count = maxi(_touch_count, 0)
 		if e.pressed:
 			_fling_vel = Vector3.ZERO # 新触摸立即打断惯性
-			if _is_double_tap(Time.get_ticks_msec(), e.position):
+			# ⚠️ 必须卡 _touch_count <= 1：本界面支持双指捏合，而捏合起手时两指
+			# 是并拢落下的——不卡的话第二指会被读成双击，在用户手势中途叠一次放大。
+			if _touch_count <= 1 and _is_double_tap(Time.get_ticks_msec(), e.position):
 				_last_tap_ms = 0
 				_tween_zoom(zoom + 1.0)
 			else:
@@ -1605,7 +1670,8 @@ func _step_fling(dt: float) -> void:
 	if _touch_count > 0 or _fling_vel.length() < FLING_MIN_SPEED:
 		_fling_vel = Vector3.ZERO
 		return
-	_apply_world_delta(_fling_vel * dt)
+	# 与拖拽路径同样的单帧限幅：帧率抖动导致 vel/dt 失配时不至于把地图甩出几百公里
+	_apply_world_delta((_fling_vel * dt).limit_length(_cam_distance()))
 	_fling_vel *= exp(-FLING_DECAY * dt)
 	_camera_dirty = true
 

@@ -7,11 +7,11 @@
 render_priority = 0
 shader = ExtResource("1_a00rn")
 shader_parameter/albedo_tex = ExtResource("2_b8l12")
-shader_parameter/ao_strength = null
-shader_parameter/shadow_value = null
-shader_parameter/shadow_softness = null
-shader_parameter/emission_strength = null
-shader_parameter/rim_strength = null
+shader_parameter/ao_strength = 0.3
+shader_parameter/smoothness = 0.1
+shader_parameter/diffuse_strength = 1.0
+shader_parameter/emission_strength = 0.45
+shader_parameter/rim_strength = 0.0
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_i7qwt"]
 _surfaces = [{
@@ -47,9 +47,9 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_i7qwt")
 
-[node name="SocketPart" type="Node3D" unique_id=375198354]
+[node name="SocketPart" type="Node3D" unique_id=118481591]
 
-[node name="hairHat" type="MeshInstance3D" parent="." unique_id=250026736]
+[node name="hairHat" type="MeshInstance3D" parent="." unique_id=2048424313]
 transform = Transform3D(0, 0, 1, 0.9999355, -0.011353135, 0, 0.011353135, 0.9999355, 0, 0, 0, 0)
 cast_shadow = 0
 mesh = SubResource("ArrayMesh_pdn0i")

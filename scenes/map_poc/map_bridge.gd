@@ -6,6 +6,9 @@ extends RefCounted
 
 signal map_ready
 
+## 定位回传（Android 实现发出；无定位能力的平台不发）。accuracy 单位米，越小越准。
+signal location_update(lat: float, lng: float, accuracy: float)
+
 func create_map(_token: String, _lat: float, _lng: float, _zoom: float) -> void:
 	pass
 
@@ -20,6 +23,11 @@ func get_pixel_ratio() -> float:
 
 func camera_info() -> String:
 	return ""
+
+## 启动定位订阅（含运行时权限）。默认空转——iOS/桌面无实现，
+## 调用方（map_poc）靠 HOME_TIMEOUT_S 超时回落默认点。
+func start_location() -> void:
+	pass
 
 ## 每帧调用（收异步消息/重发）；无事可做的实现留空。
 func poll() -> void:

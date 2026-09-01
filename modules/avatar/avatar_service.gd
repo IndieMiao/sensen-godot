@@ -4,6 +4,8 @@ extends Node
 
 const MANIFEST_PATH := "res://assets/avatar/parts_manifest.json"
 const BASE_RIG_SCENE := "res://assets/avatar/base/base_rig.tscn"
+## demo 部件剔除名单。独立文件而非 manifest 字段——manifest 是管线产物会被覆写。
+const DENYLIST_PATH := "res://assets/avatar/demo_denylist.json"
 
 var slot_table: AvatarSlotTable = preload("res://modules/avatar/data/slot_table.tres")
 var catalog: PartCatalog
@@ -17,6 +19,9 @@ func _ready() -> void:
 	if catalog == null:
 		push_error("AvatarService: manifest 加载失败，先运行转换管线")
 		catalog = PartCatalog.new()
+	var denied := catalog.apply_denylist(PartCatalog.load_denylist(DENYLIST_PATH))
+	if denied > 0:
+		print("AvatarService: demo denylist 剔除 %d 个部件" % denied)
 	loader = PartLoader.new()
 	loader.name = "PartLoader"
 	loader.catalog = catalog

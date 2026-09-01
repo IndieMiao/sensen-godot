@@ -3,6 +3,7 @@ extends RefCounted
 
 const MANIFEST_VERSION := 1
 const REQUIRED_FIELDS := ["id", "slot", "attach", "res"]
+const DENYLIST_VERSION := 1
 
 class AvatarPartMeta:
 	extends RefCounted
@@ -81,3 +82,41 @@ func size() -> int:
 
 func all_ids() -> Array:
 	return _by_id.keys()
+
+## 从可选集合里剔除若干部件（付费高级部件在统一 toon shader 下呈平面色，
+## 本周不做专用 shader，先不让它们出现在换装列表和随机路人池里）。
+## 返回实际剔除数量；名单里不存在的 id 静默忽略。
+func apply_denylist(ids: PackedStringArray) -> int:
+	var removed := 0
+	for id in ids:
+		var meta: AvatarPartMeta = _by_id.get(id)
+		if meta == null:
+			continue
+		_by_id.erase(id)
+		# arr 是 _by_slot 里存的那个 Array 对象本身（Godot Array 是引用类型），
+		# 不是拷贝——parts_for_slot() 返回的也是同一个对象，所以这里的 erase
+		# 就是在改调用方手里那份池子。是有意为之：谁给这行加 .duplicate() 防御性
+		# 拷贝，剔除名单会静默失效，而且测试照样全绿（没有用例断言对象同一性）。
+		var arr: Array = _by_slot.get(meta.slot, [])
+		arr.erase(meta)
+		removed += 1
+	return removed
+
+## 读 demo 剔除名单。**独立于 parts_manifest.json**——后者是管线产物，
+## extract_parts.gd 每次转换全量覆写，写进去的标记必被擦除。
+## 文件缺失或格式非法都返回空数组（不剔除），不阻断启动。
+static func load_denylist(path: String) -> PackedStringArray:
+	if not FileAccess.file_exists(path):
+		return PackedStringArray()
+	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(data) != TYPE_DICTIONARY or int(data.get("version", 0)) != DENYLIST_VERSION:
+		push_warning("PartCatalog: denylist 版本/格式非法 %s" % path)
+		return PackedStringArray()
+	var raw = data.get("hidden")
+	if typeof(raw) != TYPE_ARRAY:
+		push_warning("PartCatalog: denylist 缺 hidden 数组 %s" % path)
+		return PackedStringArray()
+	var out := PackedStringArray()
+	for x in raw:
+		out.append(str(x))
+	return out
