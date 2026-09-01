@@ -82,6 +82,7 @@ var _chip_locked := false
 var home_lat := START_LAT
 var home_lng := START_LNG
 var _home_resolved := false
+var marker_layer: MarkerLayer = null
 
 func _ready() -> void:
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
@@ -89,6 +90,15 @@ func _ready() -> void:
 	$Sun.rotation_degrees = Vector3(-55, 30, 0)
 	_spawn_la_fixture() # 压测夹具先排队；home 队列等定位确定后再插
 	_wire_buttons()
+
+	# marker 层：铺满 HUD 且排在最底，别挡住芯片和按钮。
+	# 自身 MOUSE_FILTER_IGNORE 只是让层本身不吞事件，图钉 Button 仍然可点。
+	marker_layer = MarkerLayer.new()
+	marker_layer.name = "Markers"
+	marker_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	marker_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$HUD.add_child(marker_layer)
+	$HUD.move_child(marker_layer, 0)
 
 	# 窗口尺寸变化（旋屏/分屏/折叠屏）会改变两层的像素↔米换算基准，必须重推相机
 	get_viewport().size_changed.connect(func(): _camera_dirty = true)
@@ -194,6 +204,8 @@ func _update_cameras() -> void:
 	cam.near = maxf(d / 1000.0, 0.05)
 	cam.far = d * 8.0
 	_update_pawns(d)
+	if marker_layer:
+		marker_layer.sync(cam, anchor_lat, anchor_lng, d * CULL_FACTOR, center_world)
 	# 同一份位姿喂给地图（单一权威）
 	if map:
 		map.set_camera(center_lat, center_lng, zoom, bearing, pitch)
@@ -375,6 +387,8 @@ func _resolve_home(lat: float, lng: float) -> void:
 	home_lng = lng
 	_teleport(lat, lng)
 	_spawn_home_cohort()
+	if marker_layer:
+		marker_layer.set_home(lat, lng)
 
 func _on_location_update(lat: float, lng: float, _accuracy: float) -> void:
 	_resolve_home(lat, lng)
