@@ -49,7 +49,8 @@ def main():
     # 基础部件的 FBX/贴图不在部件目录约定内（Models/ 与 Texture/）：用 build_recipe 的 forced
     # 参数强制注入（不依赖 overrides 字典的 key——base_parts 的文件名 slug 与资产内 partName
     # 解析出的 part_id 并不总是一致，例如 ap_cloth00.asset 的 partName 其实是 "cloth0"）。
-    base_forced = {"fbx": str(base_fbx), "folder": str(base_dir / "Texture")}
+    base_forced = {"fbx": str(base_fbx), "folder": str(base_dir / "Texture"),
+                   "mat_folder": str(base_dir / "Material")}
     for name in samples.get("base_parts", []):
         r = parts_mod.build_recipe(unity_root, name, 0, overrides, registry, report, forced=base_forced)
         if r:
