@@ -44,11 +44,15 @@ func _show_slot(slot: StringName) -> void:
 		b.custom_minimum_size = THUMB_SIZE
 		b.mouse_filter = Control.MOUSE_FILTER_PASS # 同 tabs：让列表可从按钮上起滑
 		b.tooltip_text = meta.id
+		# 文案无条件设置：thumbs 目前全是同一张 168 字节占位图（管线缺口，见
+		# tools/pipeline），有效贴图判断走 load() 必然成功，text 分支此前是死
+		# 代码——25 个部件按钮长得一模一样且不带文字。id 兜底让部件至少可辨认，
+		# 缩略图真实产出后 icon+text 一起显示也不冲突。
+		b.text = meta.id
+		b.clip_text = true # 与占位缩略图同宽：id 文案不撑大按钮，超宽就省略号截断
 		var tex: Texture2D = load(meta.thumb_path) if meta.thumb_path != "" and ResourceLoader.exists(meta.thumb_path) else null
 		if tex:
 			b.icon = tex
 			b.expand_icon = true
-		else:
-			b.text = meta.id
 		b.pressed.connect(func(): rig.equip(current_slot, meta.id))
 		grid.add_child(b)
