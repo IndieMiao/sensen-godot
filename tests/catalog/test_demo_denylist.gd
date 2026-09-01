@@ -50,6 +50,14 @@ func test_missing_file_is_empty_not_error() -> void:
 	assert_int(PartCatalog.load_denylist("user://definitely_not_here.json").size()).is_equal(0)
 
 func test_shipped_denylist_file_is_valid() -> void:
-	## 名单文件本身必须能解析——格式写错会静默变成"没剔除任何东西"
-	assert_bool(FileAccess.file_exists("res://assets/avatar/demo_denylist.json")).is_true()
-	PartCatalog.load_denylist("res://assets/avatar/demo_denylist.json")
+	## 不能只调一次 load_denylist 就算验过：它对"格式正确但名单为空"和"格式写坏"
+	## 都返回空数组，两者观察不到区别。所以独立解析一遍 JSON 做对照。
+	## Step 7 要人工手改这个文件，写坏了只会静默变成"没剔除任何东西"。
+	var path := "res://assets/avatar/demo_denylist.json"
+	assert_bool(FileAccess.file_exists(path)).is_true()
+	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+	assert_int(typeof(data)).is_equal(TYPE_DICTIONARY)
+	assert_int(int(data.get("version", -1))).is_equal(PartCatalog.DENYLIST_VERSION)
+	assert_int(typeof(data.get("hidden"))).is_equal(TYPE_ARRAY)
+	var hidden: Array = data.get("hidden")
+	assert_int(PartCatalog.load_denylist(path).size()).is_equal(hidden.size())
