@@ -35,6 +35,15 @@ const REANCHOR_DIST_M := 3000.0 # 浮动原点重锚阈值
 ## 等首个定位的上限；超时就用 START_LAT/LNG 当 home，演示内容照常可见。
 const HOME_TIMEOUT_S := 3.0
 
+## 抬手惯性：速度按 exp(-DECAY*dt) 衰减，低于 MIN_SPEED 停止。
+## EMA 平滑掉单帧抖动，否则最后一帧的抖动会决定整段滑行方向。
+const FLING_DECAY := 4.0
+const FLING_MIN_SPEED := 0.5 # 米/秒
+const FLING_EMA := 0.35
+## 双击：300ms 内两次落点相距不超过 32 单位
+const DOUBLE_TAP_S := 0.3
+const DOUBLE_TAP_MAX_PX := 32.0
+
 @onready var rigs: Node3D = $Rigs
 @onready var cam: Camera3D = $Camera3D
 @onready var chip: PanelContainer = $HUD/SafeArea/Root/Chip
@@ -83,6 +92,10 @@ var home_lat := START_LAT
 var home_lng := START_LNG
 var _home_resolved := false
 var marker_layer: MarkerLayer = null
+var _fling_vel := Vector3.ZERO
+var _last_tap_ms := 0
+var _last_tap_pos := Vector2.ZERO
+var _zoom_tween: Tween = null
 
 func _ready() -> void:
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
@@ -148,6 +161,7 @@ func _exit_tree() -> void:
 func _process(_dt: float) -> void:
 	if map:
 		map.poll()
+	_step_fling(_dt)
 	if not _spawn_queue.is_empty():
 		# 每帧 1 个：装配（部件加载+网格合并）摊薄到 ~23 帧，压掉加载期卡顿
 		var spec: Dictionary = _spawn_queue.pop_front()
@@ -255,12 +269,45 @@ func _ground_point(screen_pos: Vector2) -> Variant:
 	return Plane(Vector3.UP, 0.0).intersects_ray(
 		cam.project_ray_origin(screen_pos), cam.project_ray_normal(screen_pos))
 
+## 抬手后的惯性滑行：指数衰减，低于阈值停止。有手指按下时直接清零
+## （新触摸打断惯性是原生地图的通用手感）。
+func _step_fling(dt: float) -> void:
+	if _touch_count > 0 or _fling_vel.length() < FLING_MIN_SPEED:
+		_fling_vel = Vector3.ZERO
+		return
+	_apply_world_delta(_fling_vel * dt)
+	_fling_vel *= exp(-FLING_DECAY * dt)
+	_camera_dirty = true
+
+## 双击判定：与上一次触摸的时间差与落点距离都在窗口内。
+func _is_double_tap(now_ms: int, pos: Vector2) -> bool:
+	if _last_tap_ms <= 0:
+		return false
+	return now_ms - _last_tap_ms <= int(DOUBLE_TAP_S * 1000.0) \
+		and pos.distance_to(_last_tap_pos) <= DOUBLE_TAP_MAX_PX
+
+## 双击放大走 Tween 而不是瞬变——瞬变在地图上很跳，是"不丝滑"的另一半。
+func _tween_zoom(target: float) -> void:
+	if _zoom_tween:
+		_zoom_tween.kill()
+	_zoom_tween = create_tween()
+	_zoom_tween.tween_method(_set_zoom, zoom, clampf(target, 3.0, 20.0), 0.25) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
 ## —— 输入与 UI ————————————————————————————————————————————————
 
 func _unhandled_input(e: InputEvent) -> void:
 	if e is InputEventScreenTouch:
 		_touch_count += 1 if e.pressed else -1
 		_touch_count = maxi(_touch_count, 0)
+		if e.pressed:
+			_fling_vel = Vector3.ZERO # 新触摸立即打断惯性
+			if _is_double_tap(Time.get_ticks_msec(), e.position):
+				_last_tap_ms = 0
+				_tween_zoom(zoom + 1.0)
+			else:
+				_last_tap_ms = Time.get_ticks_msec()
+				_last_tap_pos = e.position
 	if e is InputEventScreenDrag and _touch_count <= 1:
 		# 抓地拖拽：让按下时的地面点始终跟在手指下（倾角下精确）。
 		# 高 pitch 时屏幕上缘一像素对应的地面位移可达 ~0.4d，单次 delta 限幅到 d
@@ -268,8 +315,11 @@ func _unhandled_input(e: InputEvent) -> void:
 		var prev = _ground_point(e.position - e.relative)
 		var now = _ground_point(e.position)
 		if prev != null and now != null:
-			var delta := (prev as Vector3) - (now as Vector3)
-			_apply_world_delta(delta.limit_length(_cam_distance()))
+			var delta := ((prev as Vector3) - (now as Vector3)).limit_length(_cam_distance())
+			_apply_world_delta(delta)
+			# 惯性速度：位移换算成米/秒后 EMA 平滑，抬手接着走
+			var dt := maxf(get_process_delta_time(), 0.001)
+			_fling_vel = _fling_vel.lerp(delta / dt, FLING_EMA)
 			_camera_dirty = true
 	elif e is InputEventMagnifyGesture:
 		_set_zoom(zoom + log(e.factor) / log(2.0))
