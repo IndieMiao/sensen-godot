@@ -4,6 +4,18 @@ extends GdUnitTestSuite
 ## _apply_world_delta，抬手即停。
 
 const MapPoc := preload("res://scenes/map_poc/map_poc.gd")
+const MAP_POC_SCENE := "res://scenes/map_poc/map_poc.tscn"
+
+## 双击缩放的两条 Tween 用例需要节点真的在场景树里（create_tween() 的前提）。
+## 早先试过 add_child(auto_free(MapPoc.new()))：裸脚本实例没有 $Sun/$HUD/...
+## 这些子节点，_ready() 里直接崩溃。改成子类覆写 _ready() 为空能避免崩溃，
+## 但 @onready 变量的隐式初始化不受 _ready() 覆写影响，仍会为每个缺失的子节点
+## 打一条 "Node not found" ERROR，把测试输出弄脏。实例化真正的 .tscn 没有这个
+## 问题（子节点都在），耗时也在个位数十毫秒，两全。
+func _instantiate_map_poc() -> Node:
+	var scene := (load(MAP_POC_SCENE) as PackedScene).instantiate()
+	add_child(auto_free(scene))
+	return scene
 
 func test_fling_moves_center_east_and_decays_to_stop() -> void:
 	var n = auto_free(MapPoc.new())
@@ -71,8 +83,7 @@ func test_second_finger_press_does_not_trigger_double_tap() -> void:
 func test_double_tap_zoom_tweens_not_instant() -> void:
 	## 瞬变实现会让 zoom 在调用后立刻等于目标值——这正是决策者点名"不丝滑"的
 	## 另一半，此前测试从未调用过 _tween_zoom，对这条毫无保护。
-	var n := TreeReadyMapPoc.new()
-	add_child(auto_free(n))
+	var n = _instantiate_map_poc()
 	var z0: float = n.zoom
 	n._tween_zoom(z0 + 1.0)
 	assert_object(n._zoom_tween).is_not_null()
@@ -81,8 +92,7 @@ func test_double_tap_zoom_tweens_not_instant() -> void:
 
 func test_double_tap_zoom_tween_replaces_previous() -> void:
 	## 双击的双击：第二次 _tween_zoom 必须杀掉第一个 tween，不留两条并行变焦。
-	var n := TreeReadyMapPoc.new()
-	add_child(auto_free(n))
+	var n = _instantiate_map_poc()
 	n._tween_zoom(n.zoom + 1.0)
 	var first_tween: Tween = n._zoom_tween
 	n._tween_zoom(n.zoom + 1.0)
@@ -96,9 +106,3 @@ class SpyMapPoc extends MapPoc:
 	var zoom_tween_calls := 0
 	func _tween_zoom(_target: float) -> void:
 		zoom_tween_calls += 1
-
-## 测试专用轻量子类：_ready() 里 $Sun/$HUD/... 等路径只在真实 .tscn 里存在，
-## 覆写成空避免装配崩溃；只是为了让节点进场景树以满足 create_tween() 的前提。
-class TreeReadyMapPoc extends MapPoc:
-	func _ready() -> void:
-		pass
