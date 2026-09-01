@@ -199,11 +199,18 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
      * 启动定位订阅。权限由 GDScript 侧的 OS.request_permissions() 拿（Android 12+
      * 必须 FINE+COARSE 同请求），本方法只在已授权时工作，未授权直接放弃——
      * GDScript 那边有 3 秒超时会回落默认点。
+     *
+     * 幂等重入（从换装房返回地图场景）：GDScript 侧的 home 锚点（map_poc.gd 的
+     * _home_resolved）是场景实例变量，change_scene_to_file 重建地图场景后会
+     * 再调一次本方法——参照上面 createMap() 的重入处理，last-known 的读取和
+     * 补发必须每次都做，不能被 locationStarted 挡住。否则返回场景只能指望仍在
+     * 跑的旧订阅（minDistance=5f，静止设备摸不到新数据），3 秒超时一到就永久
+     * 错锚上海。locationStarted 只挡下面的 requestLocationUpdates 本身，避免
+     * 重入把同一个 listener 在同一个 provider 上重复订阅。
      */
     @UsedByGodot
     fun startLocation() {
         runOnUiThread {
-            if (locationStarted) return@runOnUiThread
             val act = getActivity() ?: return@runOnUiThread
             val fine = act.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED
@@ -216,10 +223,10 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
             val lm = act.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
                 ?: return@runOnUiThread
             locationManager = lm
-            locationStarted = true
 
             // 先补一发 last-known：冷启动 GPS 首次定影可能要几十秒，而 demo 只等 3 秒。
-            // 两个 provider 都取，谁的时间戳新用谁。
+            // 两个 provider 都取，谁的时间戳新用谁。每次调用 startLocation 都做
+            // （不受下面的 locationStarted 影响）——重入时靠它把新鲜缓存立刻喂回去。
             val candidates = mutableListOf<Location>()
             for (p in listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)) {
                 try {
@@ -238,10 +245,15 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
                 }
             }
 
-            // 再订阅持续更新：有 FINE 用 GPS，只有 COARSE 就退 NETWORK
+            if (locationStarted) return@runOnUiThread
+
+            // 再订阅持续更新：有 FINE 用 GPS，只有 COARSE 就退 NETWORK。
+            // 这个订阅故意跨场景存活到插件销毁为止（不在场景退出时 stopLocation）——
+            // 它是场景重入时唯一能保证送达新鲜定位的来源，见上面的函数注释。
             val provider = if (fine) LocationManager.GPS_PROVIDER else LocationManager.NETWORK_PROVIDER
             try {
                 lm.requestLocationUpdates(provider, 2000L, 5f, locationListener)
+                locationStarted = true
                 Log.i(TAG, "定位订阅启动 provider=$provider")
             } catch (e: Exception) {
                 Log.e(TAG, "requestLocationUpdates 失败: ${e.message}")
