@@ -1,29 +1,40 @@
-// 统一 avatar toon shader：近似 Unity DonutAvatar（BaseColor × AO × 双段光照 ramp）
-// 一期把 56 种 Unity shader 收敛到这一个；特殊效果二期按需扩展。
+// 统一 avatar 材质：对齐 Unity DonutAvatar 的 **URP Lit（PBR）** 语义。
+//
+// 2026-09-01 修正（真机 lookdev 与森森正式版比对后）：
+// 一期把 56 种 Unity shader 收敛成一个自定义两段 toon ramp，并按名字把 Unity 的
+// PBR 参数硬套到含义无关的 ramp 参数上，结果画面完全没有体积感（硬边平色）。
+// 查证原图 Assets/_Gensen/Characters/Materials/DonutAvatar.shadergraph：目标是
+// UniversalLitSubTarget，只写 BaseColor / Emission / Smoothness / Metallic /
+// Occlusion / NormalTS 这些**标准表面输出**，没有任何自定义光照函数——
+// 那种"黏土玩具"的柔和体积来自 Lambert 的自然渐变 + 环境光填充 + 宽高光。
+//
+// 三处错位（均已修正）：
+//   _Ksmooth  是 Smoothness（roughness = 1 - it），不是 ramp 宽度。
+//             原先写死 ROUGHNESS=1 / SPECULAR=0，把高光整个掐死。
+//   _Kshadow  是 graph 内部的 Lerp 系数，不是"暗部亮度"。原先 0.85 让亮暗只差 15%。
+//   AO        按 URP Occlusion 语义只压间接光；原先直接乘进 ALBEDO，连直接光一起压。
+//
+// 所以这里**不写 light()**，交给引擎标准光照——既是对齐原版，也更简单。
 shader_type spatial;
 render_mode cull_back, depth_draw_opaque;
 
 uniform sampler2D albedo_tex : source_color, filter_linear_mipmap, repeat_enable;
 uniform sampler2D ao_tex : hint_default_white, filter_linear_mipmap, repeat_enable;
-uniform float ao_strength : hint_range(0.0, 1.0) = 0.3;
-uniform float shadow_value : hint_range(0.0, 1.0) = 0.85; // 暗部亮度（对应 _Kshadow）
-uniform float shadow_softness : hint_range(0.001, 1.0) = 0.1;
-uniform float emission_strength : hint_range(0.0, 2.0) = 0.0;
-uniform float rim_strength : hint_range(0.0, 1.0) = 0.0;
+uniform float ao_strength : hint_range(0.0, 1.0) = 0.3; // Unity _Kao
+uniform float smoothness : hint_range(0.0, 1.0) = 0.1; // Unity _Ksmooth
+uniform float diffuse_strength : hint_range(0.0, 2.0) = 1.0; // Unity _Kd
+uniform float emission_strength : hint_range(0.0, 2.0) = 0.0; // Unity _Ke
+uniform float rim_strength : hint_range(0.0, 1.0) = 0.0; // Unity _FresnelHighLight
 
 void fragment() {
 	vec4 alb = texture(albedo_tex, UV);
-	float ao = mix(1.0, texture(ao_tex, UV).r, ao_strength);
-	ALBEDO = alb.rgb * ao;
+	ALBEDO = alb.rgb * diffuse_strength;
+	// URP 的 Occlusion 只压间接光。AO_LIGHT_AFFECT=0 就是这个语义。
+	AO = mix(1.0, texture(ao_tex, UV).r, ao_strength);
+	AO_LIGHT_AFFECT = 0.0;
+	ROUGHNESS = clamp(1.0 - smoothness, 0.0, 1.0);
+	SPECULAR = 0.5; // URP Lit 非金属反射率 0.04 ≈ Godot SPECULAR 0.5
+	METALLIC = 0.0;
 	float rim = pow(1.0 - clamp(dot(NORMAL, VIEW), 0.0, 1.0), 3.0);
 	EMISSION = alb.rgb * (emission_strength + rim * rim_strength);
-	SPECULAR = 0.0;
-	ROUGHNESS = 1.0;
-}
-
-void light() {
-	float ndl = dot(NORMAL, LIGHT);
-	float lit = smoothstep(0.0, shadow_softness, ndl);
-	float shade = mix(shadow_value, 1.0, lit);
-	DIFFUSE_LIGHT += ALBEDO * LIGHT_COLOR / PI * ATTENUATION * shade;
 }

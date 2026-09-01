@@ -8,8 +8,8 @@ render_priority = 0
 shader = ExtResource("1_6afuk")
 shader_parameter/albedo_tex = ExtResource("2_c3usx")
 shader_parameter/ao_strength = null
-shader_parameter/shadow_value = null
-shader_parameter/shadow_softness = null
+shader_parameter/smoothness = null
+shader_parameter/diffuse_strength = null
 shader_parameter/emission_strength = null
 shader_parameter/rim_strength = null
 
@@ -47,9 +47,9 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_wc21p")
 
-[node name="SocketPart" type="Node3D" unique_id=376412311]
+[node name="SocketPart" type="Node3D" unique_id=404418769]
 
-[node name="glass" type="MeshInstance3D" parent="." unique_id=221061438]
+[node name="glass" type="MeshInstance3D" parent="." unique_id=1175531669]
 transform = Transform3D(0, 0, 1, 0.9999355, -0.011353135, 0, 0.011353135, 0.9999355, 0, 3.4186862e-18, -0.01, 2.1827873e-10)
 cast_shadow = 0
 mesh = SubResource("ArrayMesh_uqvsu")

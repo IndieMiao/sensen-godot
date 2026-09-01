@@ -1,8 +1,13 @@
 """从 Unity .mat 提取 float 参数并映射到 toon shader 参数名。贴图靠 convention 定位，不走 .mat 引用。"""
 import unity_yaml
 
-FLOAT_MAP = {"_Kao": "ao_strength", "_Kshadow": "shadow_value",
-             "_Ke": "emission_strength", "_FresnelHighLight": "rim_strength"}
+# 映射按 Unity DonutAvatar.shadergraph 的真实语义（URP Lit 表面输出）对齐。
+# 2026-09-01 修正：_Ksmooth 是 Smoothness 而非 ramp 宽度，此前完全没映射，
+# 于是 Godot 侧高光被写死掐掉；_Kshadow 是 graph 内部 Lerp 系数、不对应任何
+# Godot 表面输入，硬映射成"暗部亮度"是画面变平的主因之一，故不再映射。
+FLOAT_MAP = {"_Kao": "ao_strength", "_Ksmooth": "smoothness",
+             "_Kd": "diffuse_strength", "_Ke": "emission_strength",
+             "_FresnelHighLight": "rim_strength"}
 
 def extract_floats(mat_path) -> dict:
     docs = unity_yaml.load_documents(mat_path)
