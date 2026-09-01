@@ -10,3 +10,6 @@ build/
 mapbox_token.txt
 /android/
 .DS_Store
+
+# superpowers 可视化头脑风暴会话产物
+.superpowers/
