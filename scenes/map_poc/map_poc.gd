@@ -328,9 +328,14 @@ func _load_token() -> String:
 	var f := FileAccess.open(TOKEN_PATH, FileAccess.READ)
 	return f.get_as_text().strip_edges() if f else ""
 
+## 自己的角色装扮：读换装房存档。Avatar.load_outfit()（avatar_service.gd:33-35）
+## 内部已在无存档时回落 slot_table.default_config()，此处不需要再守卫 null。
+func self_config() -> AvatarConfig:
+	return Avatar.load_outfit()
+
 func _spawn_pawns() -> void:
-	# 自己：固定站在初始地图中心，默认装扮（立即生成）
-	_add_pawn(START_LAT, START_LNG, Avatar.slot_table.default_config(), "idle")
+	# 自己：固定站在初始地图中心，读换装房存档（立即生成）
+	_add_pawn(START_LAT, START_LNG, self_config(), "idle")
 	# 其余排进分帧队列（上海围绕初始地图中心散布；洛杉矶验证跨洋剔除+浮动原点）
 	for i in PAWNS_NEAR_COUNT:
 		var off := _rand_offset_deg(NEAR_SPREAD_M, START_LAT)
