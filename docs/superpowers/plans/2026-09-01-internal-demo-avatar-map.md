@@ -362,6 +362,18 @@ import android.location.LocationListener
 import android.location.LocationManager
 ```
 
+在 `companion object` 里 `TAG` 之后新增：
+
+```kotlin
+        /**
+         * last-known 定位的时效上界。超过这个岁数的缓存定位不能用来定锚点——
+         * GDScript 侧 _resolve_home() 锁的是**第一个**定位并丢弃后续更新，
+         * 所以一发"上周在别的城市"的陈旧缓存会永久钉错演示位置，不会被后到的
+         * 真实定位纠正。5 分钟内的定位基本等于当前位置。
+         */
+        private const val LAST_KNOWN_MAX_AGE_MS = 5 * 60 * 1000L
+```
+
 在 `private var mapView: MapView? = null`（第 33 行）之后新增：
 
 ```kotlin
@@ -429,9 +441,17 @@ import android.location.LocationManager
                     Log.w(TAG, "getLastKnownLocation($p) 失败: ${e.message}")
                 }
             }
+            // ⚠️ 必须卡时效：GDScript 侧 _resolve_home() 锁第一个定位并丢弃后续更新，
+            // 陈旧缓存定位会永久钉错位置且不会被真实定位纠正。拒绝时要打日志——
+            // "缓存太旧被拒"和"根本没有缓存"在 logcat 里否则长得一样，人工排查会卡住。
             candidates.maxByOrNull { it.time }?.let {
-                Log.i(TAG, "last-known 定位 ${it.latitude},${it.longitude} acc=${it.accuracy}")
-                emitLocation(it)
+                val ageMs = System.currentTimeMillis() - it.time
+                if (ageMs <= LAST_KNOWN_MAX_AGE_MS) {
+                    Log.i(TAG, "last-known 定位 ${it.latitude},${it.longitude} acc=${it.accuracy}")
+                    emitLocation(it)
+                } else {
+                    Log.i(TAG, "last-known 定位已过期 ${ageMs / 1000}s，丢弃，等实时定位")
+                }
             }
 
             // 再订阅持续更新：有 FINE 用 GPS，只有 COARSE 就退 NETWORK
