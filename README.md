@@ -73,15 +73,19 @@ cd tools/unity_export
 .venv/bin/python convert.py --unity-root ../../../sensen-unity --godot-root ../.. --out out
 cd ../..
 
-# 2. Godot 阶段：recipes.json → assets/avatar/parts/*.res + parts_manifest.json + thumbs
+# 2. Godot 阶段：先跑一次 import，确保第 1 步搬进来的新 FBX/PNG 已生成 .import 缓存
+#    ——漏了这步，第 3 步读到的是未导入/过期的资源，本分支为此丢过一个小时。
+godot --headless --path . --import
+
+# 3. Godot 阶段：recipes.json → assets/avatar/parts/*.res + parts_manifest.json + thumbs
 godot --headless --path . --script res://tools/pipeline/extract_parts.gd -- tools/unity_export/out/recipes.json
 
-# 3. Godot 阶段：生成基础角色骨架 + idle/walk/run 动画库
+# 4. Godot 阶段：生成基础角色骨架 + idle/walk/run 动画库
 godot --headless --path . --script res://tools/pipeline/gen_base_rig.gd
 ```
 
 第 1 步的报告（`tools/unity_export/out/report.txt`）里出现 ERROR 时命令会以非 0 退出；
-按报告修 `overrides.json` 或 `samples.json` 直到干净退出。第 2/3 步是幂等的，可重复跑。
+按报告修 `overrides.json` 或 `samples.json` 直到干净退出。第 2/3/4 步是幂等的，可重复跑。
 
 ## 两个场景怎么开
 

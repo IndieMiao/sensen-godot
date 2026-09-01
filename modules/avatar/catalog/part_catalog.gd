@@ -93,6 +93,10 @@ func apply_denylist(ids: PackedStringArray) -> int:
 		if meta == null:
 			continue
 		_by_id.erase(id)
+		# arr 是 _by_slot 里存的那个 Array 对象本身（Godot Array 是引用类型），
+		# 不是拷贝——parts_for_slot() 返回的也是同一个对象，所以这里的 erase
+		# 就是在改调用方手里那份池子。是有意为之：谁给这行加 .duplicate() 防御性
+		# 拷贝，剔除名单会静默失效，而且测试照样全绿（没有用例断言对象同一性）。
 		var arr: Array = _by_slot.get(meta.slot, [])
 		arr.erase(meta)
 		removed += 1

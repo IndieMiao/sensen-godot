@@ -96,6 +96,7 @@ var _fling_vel := Vector3.ZERO
 var _last_tap_ms := 0
 var _last_tap_pos := Vector2.ZERO
 var _zoom_tween: Tween = null
+var _drag_accum_px := 0.0 # 当前手势累计拖拽位移，超过双击半径就作废 _last_tap_ms
 
 func _ready() -> void:
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
@@ -303,6 +304,10 @@ func _unhandled_input(e: InputEvent) -> void:
 		_touch_count = maxi(_touch_count, 0)
 		if e.pressed:
 			_fling_vel = Vector3.ZERO # 新触摸立即打断惯性
+			if _zoom_tween: # 惯性的另一半：新触摸也要打断还在跑的双击变焦
+				_zoom_tween.kill()
+				_zoom_tween = null
+			_drag_accum_px = 0.0 # 新手势重新计里程，配合下面的拖拽门禁
 			if _touch_count <= 1: # 第二指落下（捏合起手）不算双击，镜像拖拽路径的门禁
 				if _is_double_tap(Time.get_ticks_msec(), e.position):
 					_last_tap_ms = 0
@@ -323,6 +328,11 @@ func _unhandled_input(e: InputEvent) -> void:
 			var dt := maxf(get_process_delta_time(), 0.001)
 			_fling_vel = _fling_vel.lerp(delta / dt, FLING_EMA)
 			_camera_dirty = true
+		# 累计拖拽位移超过双击判定半径就作废当前这次落点：按下→短拖拽→抬手→
+		# 300ms 内再按一次不该被判成双击变焦——那是拖拽中途的手抖，不是双击。
+		_drag_accum_px += e.relative.length()
+		if _drag_accum_px > DOUBLE_TAP_MAX_PX:
+			_last_tap_ms = 0
 	elif e is InputEventMagnifyGesture:
 		_set_zoom(zoom + log(e.factor) / log(2.0))
 	elif e is InputEventPanGesture:
@@ -437,7 +447,11 @@ func _resolve_home(lat: float, lng: float) -> void:
 	_home_resolved = true
 	home_lat = lat
 	home_lng = lng
-	_teleport(lat, lng)
+	# _in_la 为真说明用户已经手动飞去洛杉矶：这里只更新 home 数据和角色队列，
+	# 不把镜头拽回去——否则相机瞬移回家但 _in_la/Fly 按钮文案仍停在"洛杉矶"，
+	# 下一次按 Fly 又飞去洛杉矶，状态和画面对不上。
+	if not _in_la:
+		_teleport(lat, lng)
 	_spawn_home_cohort()
 	if marker_layer:
 		marker_layer.set_home(lat, lng)

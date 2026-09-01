@@ -29,7 +29,10 @@ func test_home_cohort_follows_resolved_location() -> void:
 	assert_int(near).is_equal(MapPoc.PAWNS_NEAR_COUNT + 1) # 12 路人 + 自己
 
 func test_self_is_first_out_of_queue() -> void:
+	## 不先排一批 LA 夹具进队列的话，push_front 和 append 对空队列毫无差别，
+	## 这条用例测不出"自己排队头"这条真正要守的行为。
 	var n := _make()
+	n._spawn_la_fixture()
 	n._resolve_home(TOKYO_LAT, TOKYO_LNG)
 	assert_str(str(n._spawn_queue[0].cohort)).is_equal("self")
 
