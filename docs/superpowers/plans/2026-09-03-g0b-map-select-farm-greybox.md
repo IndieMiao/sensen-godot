@@ -716,10 +716,29 @@ git commit -m "feat(blueprint): regions 配置、城市/蓝图选择持久化"
 **Interfaces:**
 - Produces（AppRouter 新增）：`const FARM := "res://scenes/farm/farm.tscn"`、`const CITY_SELECT := "res://scenes/city_select/city_select.tscn"`；`push_instance(scene_path: String, args := {}) -> Node`（实例化、若有 `setup(args)` 则调用、挂到 `root`、把之前的顶层 `suspend()`）；`pop_instance() -> void`（栈空时回退 `go_to_map()`；否则释放顶层并 `resume()` 新顶层）；`instance_depth() -> int`；`top_instance() -> Node`；`handle_back()` 在栈非空时改为 pop。
 - 协议：被压栈的场景可实现 `suspend()` / `resume()`；没有这两个方法的节点不被触碰。
+- **2026-09-04 终审 C1 补记（原计划遗漏，faithfully implemented 成了真实缺陷）**：光靠
+  `suspend()` 隐藏节点（`visible=false`、`process_mode` 关掉）不会让该场景的
+  `Camera3D`/`WorldEnvironment` 跟着失去"当前"身份——Godot 4 里一台 Camera3D 只有
+  `current == true` 或是视口里第一台相机时才会被选中，`WorldEnvironment` 同理只认树里
+  第一个生效的 `Environment`。因此凡是自己拥有 `Camera3D`/`WorldEnvironment` 的场景，
+  必须把这两者的所有权也纳入 `suspend()`/`resume()`：`suspend()` 里 `cam.current = false`
+  并把 `world_env.environment` 摘下来存到成员变量，`resume()` 里 `cam.make_current()`
+  并把存的 `Environment`插回去（范例见 Task 6 里 `map_poc.gd` 的 `suspend()`/`resume()`）。
+  这条不是一个独立于 `suspend()`/`resume()` 的新协议（没有另开 `release_view()`/
+  `acquire_view()` 一对方法）——理由：AppRouter 已有的 `suspend()`/`resume()` 分发是
+  唯一、久经测试的挂载点，`map_poc.gd` 的这两个方法本来就在管一揽子"离场/回场"副作用
+  （HUD、地图桥可见性、`transparent_bg`），相机与环境所有权是这份清单上很自然的下一项；
+  另开一对方法只会多一处"忘记实现另一半"的地方，这正是本次事故的成因。
+  新被压入（第一次入树）的场景不走这条路径——它们没有"之前的状态"要收回，直接在各自
+  `_ready()` 里 `cam.make_current()` 即可（farm.gd/dressing_room.gd 都这么做）。
+  回归测试同样要跟上：`tests/fixtures/scenes/stack_probe.tscn` 原来是个裸 `Node`，看不出
+  这类缺陷——Step 1 的探针要补一个 `Camera3D`（`WorldEnvironment` 也顺手带上）并照抄上面
+  这套协议，见下方 Step 1 更新后的代码。
 
 - [ ] **Step 1: 写探针场景**
 
-`tests/fixtures/scenes/stack_probe.gd`：
+`tests/fixtures/scenes/stack_probe.gd`（2026-09-04 终审 C1 更新：带一个 `Camera3D` +
+`WorldEnvironment`，照抄上面记录的相机/环境协议，否则探针发现不了 C1 那类缺陷）：
 ```gdscript
 extends Node
 ## AppRouter 场景栈测试探针：记录 setup 参数与 suspend/resume 次数。
@@ -728,27 +747,49 @@ var suspended := 0
 var resumed := 0
 var back_locked := false
 
+@onready var cam: Camera3D = $Camera3D
+@onready var world_env: WorldEnvironment = $WorldEnvironment
+var _saved_environment: Environment
+
 func setup(p_args: Dictionary) -> void:
 	args = p_args
+
+func _ready() -> void:
+	cam.make_current()
 
 func is_back_navigation_locked() -> bool:
 	return back_locked
 
 func suspend() -> void:
 	suspended += 1
+	cam.current = false
+	if world_env.environment:
+		_saved_environment = world_env.environment
+	world_env.environment = null
 
 func resume() -> void:
 	resumed += 1
+	cam.make_current()
+	world_env.environment = _saved_environment
 ```
 
 `tests/fixtures/scenes/stack_probe.tscn`：
 ```
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://tests/fixtures/scenes/stack_probe.gd" id="1"]
 
+[sub_resource type="Environment" id="Environment_probe"]
+background_mode = 1
+background_color = Color(0.2, 0.2, 0.2, 1)
+
 [node name="StackProbe" type="Node"]
 script = ExtResource("1")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_probe")
 ```
 
 - [ ] **Step 2: 写失败测试**
@@ -808,6 +849,17 @@ func test_back_action_table_includes_city_select() -> void:
 	assert_int(AppRouter.back_action_for_scene(AppRouter.CITY_SELECT)).is_equal(AppRouter.BACK_LEAVE_APP)
 	assert_str(AppRouter.qa_scene_path(PackedStringArray(["--qa-scene=city"]))).is_equal(AppRouter.CITY_SELECT)
 	assert_str(AppRouter.qa_scene_path(PackedStringArray(["--qa-scene=farm"]))).is_equal(AppRouter.FARM)
+
+## C1（2026-09-04 终审）：压栈场景必须真的接管视口的当前相机，光隐藏节点不够——
+## Godot 4 里 Camera3D 只有 current==true 或是视口里第一台相机时才会被选中。
+func test_push_makes_probe_camera_current_and_pop_restores_previous() -> void:
+	var a := AppRouter.push_instance(PROBE)
+	assert_bool(get_viewport().get_camera_3d() == a.cam).is_true()
+	var b := AppRouter.push_instance(PROBE)
+	assert_bool(get_viewport().get_camera_3d() == b.cam).is_true()
+	AppRouter.pop_instance()
+	await get_tree().process_frame
+	assert_bool(get_viewport().get_camera_3d() == a.cam).is_true()
 ```
 
 - [ ] **Step 3: 跑测试确认失败**
@@ -1079,7 +1131,10 @@ func fly_to(lat: float, lng: float) -> void:
 	_teleport(lat, lng)
 	_clamp_to_bounds()
 
-## 场景栈协议（AppRouter.push_instance）：进入第二层实例时地图完全隐藏并停渲染。
+## 场景栈协议（AppRouter.push_instance）：进入第二层实例时地图完全隐藏并停渲染，
+## 同时交出相机与环境的所有权——只隐藏节点不够：Godot 4 里 Camera3D/WorldEnvironment
+## 不会因为父节点 visible=false 就失去"当前"身份，压栈场景会看见地图相机冻结的位姿
+## 和地图的天空/环境光（2026-09-04 终审 C1；协议本身记在 Task 5 的"协议"条目下）。
 func suspend() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 	visible = false
@@ -1087,6 +1142,10 @@ func suspend() -> void:
 	if map:
 		map.set_map_visible(false)
 	get_viewport().transparent_bg = false
+	cam.current = false
+	if world_env.environment:
+		_saved_environment = world_env.environment
+	world_env.environment = null
 
 func resume() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
@@ -1096,6 +1155,16 @@ func resume() -> void:
 	if map:
 		map.set_map_visible(true)
 	_camera_dirty = true
+	cam.make_current()
+	world_env.environment = _saved_environment
+```
+本任务同时要在变量区新增（放在 `@onready var cam: Camera3D = $Camera3D` 后面、
+`var _camera_dirty := true` 后面）：
+```gdscript
+@onready var world_env: WorldEnvironment = $WorldEnvironment
+...
+## suspend() 里从 world_env.environment 摘下来的引用，resume() 时原样插回去。
+var _saved_environment: Environment
 ```
 `_apply_world_delta` 末尾加 `_clamp_to_bounds()`。`_set_zoom` 开头加 `if street_mode: return`。`_unhandled_input` 里：双击分支 `_tween_zoom(zoom + 1.0)` 改为 `if not street_mode: _tween_zoom(zoom + 1.0)`；`elif e is InputEventMagnifyGesture:` 改为 `elif e is InputEventMagnifyGesture and not street_mode:`；`elif e is InputEventPanGesture:` 改为 `elif e is InputEventPanGesture and not street_mode:`。`_spawn_home_cohort()` 里 `for i in PAWNS_NEAR_COUNT:` 改为 `for i in (0 if street_mode else PAWNS_NEAR_COUNT):`。`_teleport()` 已有 `_reposition_pawns()`，不动。
 
@@ -1371,7 +1440,6 @@ var _group := ButtonGroup.new()
 
 func _init() -> void:
 	name = "SelectPanel"
-	set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", DesignTokens.SPACE_3)
 	add_child(vbox)
@@ -1387,6 +1455,15 @@ func _init() -> void:
 	confirm_button.disabled = true
 	confirm_button.pressed.connect(func(): if not focused_id.is_empty(): confirmed.emit(focused_id))
 	vbox.add_child(confirm_button)
+	# 必须放在所有子节点加完之后（2026-09-04 终审 C2）：set_anchors_and_offsets_preset
+	# 的默认档 PRESET_MODE_MINSIZE 按**调用那一刻**的 get_combined_minimum_size() 算
+	# offset_top；子节点还没挂上去时那是 0，面板会整个长在父容器底边以下、彻底不可见。
+	# 候选卡是真正的高度大头（在 set_candidates() 里动态加，不在这里），所以那边也要
+	# 在加完卡片后重新调一次这个 preset，否则仍然按"还没有卡片"时的尺寸定住。
+	_apply_bottom_preset()
+
+func _apply_bottom_preset() -> void:
+	set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 
 func set_candidates(items: Array) -> void:
 	for c in _cards:
@@ -1409,6 +1486,7 @@ func set_candidates(items: Array) -> void:
 		card.pressed.connect(_on_card_pressed.bind(card))
 		_row.add_child(card)
 		_cards.append(card)
+	_apply_bottom_preset() # 卡片才是高度大头，加完之后必须重算一次 offset_top（C2）
 
 func _on_card_pressed(card: Button) -> void:
 	focused_id = str(card.get_meta("id"))
@@ -1857,6 +1935,13 @@ git commit -m "feat(farm): PlayerMover 摇杆直走与点按寻路"
 **Interfaces:**
 - Produces：`scenes/farm/farm.tscn` 根 `Farm`（Node3D，脚本 farm.gd）；`setup(args: Dictionary)`（`{"blueprint": FarmBlueprint}` 优先，否则 `{"layout_patch_id", "revision"}`）；`var bp, grid, mover`；`prop_count() -> int`；`WORLD_SCALE := 1.0`、`CAM_DIST := 16.0`、`CAM_PITCH_DEG := 45.0`；退出按钮 → `AppRouter.pop_instance()`。
 - 场景树：`Farm/Sun(DirectionalLight3D)`、`WorldEnvironment`、`Camera3D`、`Ground(MeshInstance3D)`、`Props(Node3D)`、`Player(Node3D)`、`HUD(CanvasLayer)/SafeArea(SafeAreaMargin)/Root(Control)/Title(Label)`、`.../ExitButton(Button)`、`.../Joystick(TouchStick)`。
+- **2026-09-04 终审 C1 补记**：`Farm` 是靠 `AppRouter.push_instance` 压栈进场的新实例，
+  不会经过 Task 5 记录的 suspend/resume 协议（那条协议只管"已经在栈里、被别人盖住/
+  揭开"的场景）——自己的 `Camera3D` 要不要成为视口当前相机，得在 `_ready()` 第一次
+  入树时自己抢：`cam.make_current()`。不抢的话会保留住地图（或任何压在下面的场景）
+  冻结的相机位姿，真机表现是农场里看见的是地图相机俯视几百米外的一个小灰盒，而不是
+  农场本身。`WorldEnvironment` 因为是树里第一个（下层地图的环境已经在 suspend() 里被
+  摘空），不需要额外动作就会生效。
 
 - [ ] **Step 1: 写失败测试**
 
@@ -2023,6 +2108,12 @@ func setup(args: Dictionary) -> void:
 	_args = args
 
 func _ready() -> void:
+	# 压栈进入的新实例不会经过 Task 5 的 suspend/resume 协议；自己的相机要不要
+	# 成为当前相机得在第一次入树时自己抢，否则会保留住下层场景冻结的相机位姿
+	# （2026-09-04 终审 C1）。WorldEnvironment 不需要额外动作：下层地图在
+	# suspend() 里已经把自己的 environment 摘空，Farm 自己的 WorldEnvironment
+	# 会自动成为树里"第一个有效"的那个。
+	cam.make_current()
 	bp = _args.get("blueprint")
 	if bp == null:
 		bp = FarmBlueprint.load_file(FarmBlueprint.asset_path(
