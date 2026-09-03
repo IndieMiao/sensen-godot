@@ -34,6 +34,8 @@ function collectLines(g: Geometry, out: LineString[]): void {
   } else if (g.type === 'MultiLineString') {
     for (const c of g.coordinates) if (c.length >= 2) out.push({ type: 'LineString', coordinates: c });
   } else if ('geometries' in g) {
+    // GeometryCollection: GEOS produces this when line-polygon intersection yields mixed geometry types
+    // (e.g., point touching boundary + segment inside; rare but must be handled)
     for (const sub of (g as any).geometries) collectLines(sub, out);
   }
 }

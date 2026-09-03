@@ -29,4 +29,23 @@ describe('topology', () => {
     const biggest = Math.max(...polys.map(geos.area));
     expect(biggest).toBeGreaterThan(190 * 190); expect(biggest).toBeLessThan(210 * 210);
   });
+  it('clipLines handles line exiting and re-entering window (MultiLineString case)', () => {
+    const half = 150;
+    // LineString that exits the window (y > half) and re-enters: crosses at y=150 twice
+    const line: any = {
+      type: 'LineString',
+      coordinates: [[-200, 0], [-100, 0], [-100, 200], [100, 200], [100, 0], [200, 0]],
+    };
+    const clipped = topo.clipLines([line], half);
+    // Should produce 2 LineStrings (one from x=-100→-150 to y=150, one from y=150 to x=100→150)
+    expect(clipped).toHaveLength(2);
+    // Verify all coordinates are within window (with small epsilon for numerical precision)
+    const eps = 1e-6;
+    for (const lineStr of clipped) {
+      for (const [x, y] of lineStr.coordinates) {
+        expect(Math.abs(x)).toBeLessThanOrEqual(half + eps);
+        expect(Math.abs(y)).toBeLessThanOrEqual(half + eps);
+      }
+    }
+  });
 });
