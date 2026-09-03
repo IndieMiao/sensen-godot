@@ -145,16 +145,6 @@
 			"unity_guid": "b5611d54162b8564da339daa8d2f9b40"
 		},
 		{
-			"attach": "mesh",
-			"id": "cloth87",
-			"pack": "builtin",
-			"res": "res://assets/avatar/parts/cloth87.res",
-			"slot": "cloth",
-			"thumb": "res://assets/avatar/thumbs/cloth87.png",
-			"tier": 0,
-			"unity_guid": "ae8605b8264e1fa48a9c3193c5ae0189"
-		},
-		{
 			"attach": "socket",
 			"id": "hairhat20",
 			"offset": {
@@ -180,60 +170,6 @@
 			"thumb": "res://assets/avatar/thumbs/hairhat20.png",
 			"tier": 0,
 			"unity_guid": "efa97150743fc444382d7974623a42ce"
-		},
-		{
-			"attach": "socket",
-			"id": "hairhat37",
-			"offset": {
-				"pos": [
-					0.0,
-					0.0,
-					0.0
-				],
-				"rot": [
-					0.0,
-					0.0,
-					0.0
-				],
-				"scale": [
-					1.0,
-					1.0,
-					1.0
-				]
-			},
-			"pack": "builtin",
-			"res": "res://assets/avatar/parts/hairhat37.res",
-			"slot": "hairHat",
-			"thumb": "res://assets/avatar/thumbs/hairhat37.png",
-			"tier": 1,
-			"unity_guid": "551ec9cde1262b843ae10690ae2964d2"
-		},
-		{
-			"attach": "socket",
-			"id": "hairhat101",
-			"offset": {
-				"pos": [
-					0.0,
-					0.0,
-					0.0
-				],
-				"rot": [
-					0.0,
-					0.0,
-					0.0
-				],
-				"scale": [
-					1.0,
-					1.0,
-					1.0
-				]
-			},
-			"pack": "builtin",
-			"res": "res://assets/avatar/parts/hairhat101.res",
-			"slot": "hairHat",
-			"thumb": "res://assets/avatar/thumbs/hairhat101.png",
-			"tier": 2,
-			"unity_guid": "41915d1d9fbe4d54ea4dd0ff0abd384f"
 		},
 		{
 			"attach": "mesh",
@@ -304,33 +240,6 @@
 		},
 		{
 			"attach": "socket",
-			"id": "glass4",
-			"offset": {
-				"pos": [
-					0.0,
-					0.0,
-					0.0
-				],
-				"rot": [
-					0.0,
-					0.0,
-					0.0
-				],
-				"scale": [
-					1.0,
-					1.0,
-					1.0
-				]
-			},
-			"pack": "builtin",
-			"res": "res://assets/avatar/parts/glass4.res",
-			"slot": "glass",
-			"thumb": "res://assets/avatar/thumbs/glass4.png",
-			"tier": 0,
-			"unity_guid": "fdc6f66ed9d6ac4408398b82d2dc2524"
-		},
-		{
-			"attach": "socket",
 			"id": "glass5",
 			"offset": {
 				"pos": [
@@ -385,6 +294,171 @@
 			"thumb": "res://assets/avatar/thumbs/messengerbag4.png",
 			"tier": 0,
 			"unity_guid": "84f0f6c03021c094e95394925fcad1aa"
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth11",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth11.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth11.png",
+			"tier": 0,
+			"unity_guid": "None"
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth28",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth28.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth28.png",
+			"tier": 0,
+			"unity_guid": "b33ce08744efe5c409db917a59ca1bf1"
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth42",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth42.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth42.png",
+			"tier": 0,
+			"unity_guid": "90b1f40326e35f04a9d99dd1d007cdf6"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat41",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat41.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat41.png",
+			"tier": 0,
+			"unity_guid": "985163a16c8bea2408e1f48641893c28"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat43",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat43.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat43.png",
+			"tier": 0,
+			"unity_guid": "b649a37554031234cbeb75d44fd5e120"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat51",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat51.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat51.png",
+			"tier": 0,
+			"unity_guid": "72f04ea038a9e384584a08d901c7e900"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat70",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat70.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat70.png",
+			"tier": 0,
+			"unity_guid": "0b5b7440f61c63c41be0826dd8d7f143"
+		},
+		{
+			"attach": "socket",
+			"id": "glass8",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/glass8.res",
+			"slot": "glass",
+			"thumb": "res://assets/avatar/thumbs/glass8.png",
+			"tier": 0,
+			"unity_guid": "a31a8ec11cac7794b9e67c558b7d6f0e"
 		}
 	],
 	"version": 1

@@ -125,12 +125,12 @@ xcodebuild -project sensen.xcodeproj -scheme sensen -configuration Debug \
    定位失败就变成空地图。三条路径共用同一个"3 秒超时回落上海"兜底
    （`map_poc.gd:36,142`），但触发方式不同，行为可能有差异，建议三条都单独试。
 
-4. **`glass3` 的贴图选型没有过肉眼确认，值得扫一眼。** Task 6 补充部件时，
-   `glass3` 在 Unity 源素材里有一个带副本尾巴的候选文件
-   `T_skin05_glass_D 1.png`（`assets/avatar/source/glass3/`），提取器靠
-   `tools/unity_export/overrides.json` 里的显式 `albedo` 覆盖锁定了这一个
-   文件（commit `69ca227`），但**没有人实际穿上这副眼镜看过效果**——换装房里
-   随手点一下 glass3，看贴图对不对、有没有错位/拉伸。
+4. ~~**`glass3` 的贴图选型没有过肉眼确认，值得扫一眼。**~~
+   **已确认（2026-09-02）**：用 `tools/dev/render_part_previews.gd` 离屏渲出来看过，
+   `T_skin05_glass_D 1.png` 这个覆盖是对的——金框圆墨镜，贴图不错位不拉伸。
+   唯一可说的是镜片在 Unity 侧本有一份 alpha 材质（`M_skin05_glass_alpha.mat`），
+   我们的管线对 socket 部件只取排序第一个 `.mat`（正好是标准 toon 的那份），
+   于是镜片渲成不透明深色。作为墨镜看是合理的，**保留**。
 
 5. **`assets/avatar/thumbs/` 下每个部件缩略图都是同一张 64×64 占位图**
    （25 个 PNG 文件逐一核对，尺寸均为 64×64，属于既有素材流水线的缺口，
@@ -139,6 +139,12 @@ xcodebuild -project sensen.xcodeproj -scheme sensen -configuration Debug \
    来选 denylist"这一步比听起来难得多：截图也认不出是哪个部件，只能靠文件名
    /索引对照。如果后续要扩充 denylist 或部件池，建议先补缩略图生成，否则
    纯靠肉眼在换装房里挨个试穿。
+
+   **已缓解（2026-09-02）**：`assets/avatar/thumbs/` 那批占位图仍未修（管线缺口
+   照旧），但运行时有了 `PartThumbnailer` 离屏渲染，换装房里的按钮已经能互相
+   分清；挑件也不必再装机试穿——`tools/dev/render_part_previews.gd` 可以把
+   manifest 里每个部件批量渲成 PNG 直接看（**必须带窗口跑**，headless 的 dummy
+   渲染驱动下 SubViewport 取不到图像，存出来是全透明）。
 
 6. **iOS 免费个人团队证书 7 天有效期，装机必须当天完成。** Team ID
    `53LT77CV6R`，从签发日起算 7 天后证书失效，App 会拒绝启动，需要重新连

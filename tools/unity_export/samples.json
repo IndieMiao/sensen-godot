@@ -6,19 +6,23 @@
     { "asset": "ap_shoes1",        "tier": 0 },
     { "asset": "ap_glass1",        "tier": 0 },
     { "asset": "ap_messengerBag1", "tier": 0 },
-    { "asset": "ap_cloth87",       "tier": 0 },
     { "asset": "ap_hairHat20",     "tier": 0 },
-    { "asset": "ap_hairHat37",     "tier": 1 },
-    { "asset": "ap_hairHat101",    "tier": 2 },
     { "asset": "ap_shoes2",        "tier": 0 },
     { "asset": "ap_shoes3",        "tier": 0 },
     { "asset": "ap_shoes4",        "tier": 0 },
     { "asset": "ap_shoes5",        "tier": 0 },
     { "asset": "ap_glass3",        "tier": 0 },
-    { "asset": "ap_glass4",        "tier": 0 },
     { "asset": "ap_glass5",        "tier": 0 },
     { "asset": "ap_messengerBag2", "tier": 0 },
     { "asset": "ap_messengerBag3", "tier": 0 },
-    { "asset": "ap_messengerBag4", "tier": 0 }
+    { "asset": "ap_messengerBag4", "tier": 0 },
+    { "asset": "ap_cloth11",       "tier": 0 },
+    { "asset": "ap_cloth28",       "tier": 0 },
+    { "asset": "ap_cloth42",       "tier": 0 },
+    { "asset": "ap_hairHat41",     "tier": 0 },
+    { "asset": "ap_hairHat43",     "tier": 0 },
+    { "asset": "ap_hairHat51",     "tier": 0 },
+    { "asset": "ap_hairHat70",     "tier": 0 },
+    { "asset": "ap_glass8",        "tier": 0 }
   ]
 }

@@ -10,9 +10,16 @@ extends GdUnitTestSuite
 ## 实测 hairhat37 水平偏出 0.292m、落在头骨同高度（+-0），而正常件是 0.013~0.147m / +0.22~+0.35m。
 ##
 ## 下面的阈值取自实测：坏件 0.292/-0.002，最差的正常件 0.147/+0.224，中间留出清晰间隔。
+##
+## 2026-09-02 修正纵向判据：原来量的是**包围盒中心**高于头骨多少。那只在"所有发型都跟
+## 脑袋差不多大"时才等价于本意——长发部件合法地垂到背后（hairhat41 顶 +0.436、底
+## -0.353），中心被拽到 +0.042，于是端正戴着的长发被判成坏件。改量**包围盒顶**：
+## 发顶高于头骨多少，与头发往下垂多长无关。这不是放宽——原缺陷 hairhat37 水平偏出
+## 0.292 已经先撞上 MAX_HORIZONTAL(0.20)；"躺倒"这一失效模式本就是靠水平判据抓的，
+## 纵向判据守的是"部件陷进/沉到头骨以下"，用顶比用中心更直接。
 
 const MAX_HORIZONTAL := 0.20   ## 水平偏移上限（正常件最大 0.147）
-const MIN_ABOVE_BONE := 0.10   ## 头发中心至少高于头骨这么多（正常件最小 +0.224）
+const MIN_TOP_ABOVE_BONE := 0.25   ## 发顶至少高于头骨这么多（实测正常件 +0.425 ~ +0.686）
 
 func test_every_hairhat_sits_on_the_head() -> void:
 	if not FileAccess.file_exists("res://assets/avatar/parts_manifest.json"):
@@ -50,9 +57,9 @@ func test_every_hairhat_sits_on_the_head() -> void:
 		assert_float(box.size.y).is_greater(0.0)
 		var c := box.position + box.size * 0.5
 		var horizontal := Vector2(c.x - bone.origin.x, c.z - bone.origin.z).length()
-		var above := c.y - bone.origin.y
-		if horizontal > MAX_HORIZONTAL or above < MIN_ABOVE_BONE:
-			bad.append("%s(水平%.3f 高%.3f)" % [meta.id, horizontal, above])
+		var top_above := box.position.y + box.size.y - bone.origin.y
+		if horizontal > MAX_HORIZONTAL or top_above < MIN_TOP_ABOVE_BONE:
+			bad.append("%s(水平%.3f 发顶%.3f)" % [meta.id, horizontal, top_above])
 
 	assert_array(bad).override_failure_message(
 		"这些 hairHat 部件没有端正落在头骨上: %s" % str(bad)).is_empty()

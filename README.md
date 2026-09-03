@@ -87,6 +87,27 @@ godot --headless --path . --script res://tools/pipeline/gen_base_rig.gd
 第 1 步的报告（`tools/unity_export/out/report.txt`）里出现 ERROR 时命令会以非 0 退出；
 按报告修 `overrides.json` 或 `samples.json` 直到干净退出。第 2/3/4 步是幂等的，可重复跑。
 
+管线只**增改**不删：从 `samples.json` 拿掉一个部件后，它在 `assets/avatar/`
+`source/` `parts/` `thumbs/` 下的产物不会自动消失（manifest 里没有了，但文件还在、
+照样进包）。拿掉部件后按 manifest 对一遍这三个目录，手工删干净。
+
+第 2 步如果长时间不动（`imported` 数不涨、进程 CPU 时间不涨），多半是**另有一个
+Godot 进程占着本工程的锁**——`ps aux | grep godot` 看有没有残留的 headless 实例，
+杀掉再跑。踩过一次，白等了二十多分钟。
+
+### 怎么挑要加哪些部件
+
+Unity 侧共 949 个 `ap_*.asset`，但**只有用标准 toon shader（`DonutAvatar`，
+GUID `090d4a3e…`）的那些能直接用**。其余是水晶/火焰/透明镜片这类特效材质，依赖
+cubemap 反射、菲涅尔、alpha 等我们不消费的通道，搬过来会渲成一坨平色
+（`cloth87`/`hairhat101`/`hairhat37`/`glass4` 就是这么下架的）。
+
+判据是 `.mat` 里的 `m_Shader` GUID——注意 `.meta` 的 GUID 被 Tuanjie 混淆成 base64，
+**不能反查路径**，但 `.mat` 内部的引用仍是明文 hex，直接 grep 即可。挑的时候还应
+要求「该槽位下只有一个 `.mat` + 一张 `_D` 贴图」，否则贴图靠 token 匹配容易配错。
+
+选完先用 `tools/dev/render_part_previews.gd` 渲出来看一眼再定（见下）。
+
 ## 两个场景怎么开
 
 - **换装场景** `res://scenes/dressing_room/dressing_room.tscn` —— 项目 main scene，直接
@@ -117,6 +138,18 @@ HUD 四行含义：
 `headless` 模式下渲染服务器是空实现，DrawCalls/显存两行恒为 0，仅用来做“脚本跑得通”的
 冒烟检查；真实读数需要在有头环境（桌面或真机）里看。真机走查步骤见
 [`docs/mobile_export.md`](docs/mobile_export.md)。
+
+## 部件预览（挑件不用装机）
+
+`assets/avatar/thumbs/` 里那批是占位图，看不出谁是谁。要肉眼过一遍部件，用离屏渲染：
+
+```bash
+# 渲 manifest 里的全部部件；也可在末尾追加 part_id 只渲其中几个
+godot --path . --script res://tools/dev/render_part_previews.gd -- /tmp/previews
+```
+
+复用换装页那个 `PartThumbnailer`，所以颜色/打光与真实换装页一致。**必须带窗口跑**——
+`--headless` 的 dummy 渲染驱动下 SubViewport 取不到图像，存出来全是透明的。
 
 ## 已知限制（一期）
 
