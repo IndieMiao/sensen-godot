@@ -109,6 +109,10 @@ func _update_camera() -> void:
 	cam.look_at(player.position + Vector3(0, 0.8, 0), Vector3.UP)
 
 func _unhandled_input(e: InputEvent) -> void:
+	# 缺蓝图退场帧：_ready() 里 call_deferred("_leave") 要到本帧末才生效，
+	# 这期间仍可能收到输入事件，此时 mover/bp 还是 null，必须先跳过。
+	if mover == null:
+		return
 	if e is InputEventScreenTouch:
 		if e.pressed:
 			_tap_start = e.position
@@ -119,6 +123,9 @@ func _unhandled_input(e: InputEvent) -> void:
 				_on_ground_tapped(hit as Vector3)
 
 func _on_ground_tapped(world: Vector3) -> void:
+	# 同上：退场帧内测试/输入可能直接调用本函数，mover 为 null 时安全跳过。
+	if mover == null:
+		return
 	mover.set_target_cell(bp.world_to_cell(world, WORLD_SCALE))
 
 func is_back_navigation_locked() -> bool:
