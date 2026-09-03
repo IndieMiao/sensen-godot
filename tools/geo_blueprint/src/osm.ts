@@ -36,8 +36,11 @@ function installEnvProxy(): void {
 export async function fetchOverpass(lat: number, lng: number, radiusM: number, cachePath: string): Promise<OverpassJson> {
   if (existsSync(cachePath)) return JSON.parse(readFileSync(cachePath, 'utf8')) as OverpassJson;
   installEnvProxy();
+  // Overpass 的 Apache 前端在走本机代理时会对 undici 默认请求头返回 406；显式带上
+  // User-Agent/Accept（等价于 curl 的默认行为）即可通过，与业务逻辑无关，纯粹是客户端兼容性修复。
   const res = await fetch(OVERPASS_URL, {
     method: 'POST',
+    headers: { 'User-Agent': 'geo_blueprint/0.1 (sensen-godot)', Accept: '*/*' },
     body: new URLSearchParams({ data: buildQuery(lat, lng, radiusM) }),
   });
   if (!res.ok) throw new Error(`overpass HTTP ${res.status}`);

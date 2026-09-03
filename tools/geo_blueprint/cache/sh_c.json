@@ -1,0 +1,1114 @@
+{
+ "version": 0.6,
+ "generator": "Overpass API 0.7.62.11 87bfad18",
+ "osm3s": {
+  "timestamp_osm_base": "2026-09-03T12:26:31Z",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+ },
+ "elements": [
+  {
+   "type": "node",
+   "id": 64808790,
+   "lat": 31.2222047,
+   "lon": 121.4389367
+  },
+  {
+   "type": "node",
+   "id": 64808792,
+   "lat": 31.2226474,
+   "lon": 121.4397947,
+   "tags": {
+    "bus": "yes",
+    "name": "延安西路华山路",
+    "name:en": "West Yan'an Road Huashan Road",
+    "name:zh": "延安西路华山路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 65667398,
+   "lat": 31.2189957,
+   "lon": 121.4324182
+  },
+  {
+   "type": "node",
+   "id": 78629037,
+   "lat": 31.2209219,
+   "lon": 121.4358296
+  },
+  {
+   "type": "node",
+   "id": 78629038,
+   "lat": 31.2211162,
+   "lon": 121.4366416
+  },
+  {
+   "type": "node",
+   "id": 78629040,
+   "lat": 31.2212411,
+   "lon": 121.4375784
+  },
+  {
+   "type": "node",
+   "id": 78629041,
+   "lat": 31.2218067,
+   "lon": 121.4389347
+  },
+  {
+   "type": "node",
+   "id": 78632221,
+   "lat": 31.2230905,
+   "lon": 121.4378621,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 78632223,
+   "lat": 31.2220435,
+   "lon": 121.4367117,
+   "tags": {
+    "alt_name": "美丽园",
+    "bus": "yes",
+    "name": "南京西路延安西路",
+    "name:zh": "南京西路延安西路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 78632226,
+   "lat": 31.2212473,
+   "lon": 121.4359699
+  },
+  {
+   "type": "node",
+   "id": 78632227,
+   "lat": 31.2209147,
+   "lon": 121.4351475
+  },
+  {
+   "type": "node",
+   "id": 85631867,
+   "lat": 31.2218454,
+   "lon": 121.4383454
+  },
+  {
+   "type": "node",
+   "id": 85632327,
+   "lat": 31.2221038,
+   "lon": 121.4393944
+  },
+  {
+   "type": "node",
+   "id": 85632620,
+   "lat": 31.2214935,
+   "lon": 121.4374004
+  },
+  {
+   "type": "node",
+   "id": 87752335,
+   "lat": 31.2229358,
+   "lon": 121.4409275,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 154073025,
+   "lat": 31.2183116,
+   "lon": 121.4394258
+  },
+  {
+   "type": "node",
+   "id": 154073058,
+   "lat": 31.2213915,
+   "lon": 121.4381371
+  },
+  {
+   "type": "node",
+   "id": 154073129,
+   "lat": 31.2173279,
+   "lon": 121.4399522
+  },
+  {
+   "type": "node",
+   "id": 154080003,
+   "lat": 31.2189666,
+   "lon": 121.4392437
+  },
+  {
+   "type": "node",
+   "id": 154080029,
+   "lat": 31.218876,
+   "lon": 121.4384467
+  },
+  {
+   "type": "node",
+   "id": 154884705,
+   "lat": 31.2184646,
+   "lon": 121.4393834,
+   "tags": {
+    "created_by": "JOSM"
+   }
+  },
+  {
+   "type": "node",
+   "id": 154884971,
+   "lat": 31.2194112,
+   "lon": 121.4391446
+  },
+  {
+   "type": "node",
+   "id": 154885091,
+   "lat": 31.2201242,
+   "lon": 121.4390011
+  },
+  {
+   "type": "node",
+   "id": 154885125,
+   "lat": 31.2216668,
+   "lon": 121.4387272,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 313633798,
+   "lat": 31.2233094,
+   "lon": 121.4383258,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 554206380,
+   "lat": 31.2188491,
+   "lon": 121.4375774
+  },
+  {
+   "type": "node",
+   "id": 554206381,
+   "lat": 31.2185968,
+   "lon": 121.4359037
+  },
+  {
+   "type": "node",
+   "id": 554206382,
+   "lat": 31.2181243,
+   "lon": 121.4353672
+  },
+  {
+   "type": "node",
+   "id": 554206383,
+   "lat": 31.2174407,
+   "lon": 121.4350668
+  },
+  {
+   "type": "node",
+   "id": 554206384,
+   "lat": 31.2166792,
+   "lon": 121.434879
+  },
+  {
+   "type": "node",
+   "id": 559821818,
+   "lat": 31.2222679,
+   "lon": 121.4396918
+  },
+  {
+   "type": "node",
+   "id": 573259241,
+   "lat": 31.2193611,
+   "lon": 121.4330156,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 600486973,
+   "lat": 31.2162754,
+   "lon": 121.4347986
+  },
+  {
+   "type": "node",
+   "id": 603891484,
+   "lat": 31.2220402,
+   "lon": 121.4386404,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 603891564,
+   "lat": 31.2194483,
+   "lon": 121.4405044
+  },
+  {
+   "type": "node",
+   "id": 640483800,
+   "lat": 31.2187463,
+   "lon": 121.4393051
+  },
+  {
+   "type": "node",
+   "id": 640484229,
+   "lat": 31.2200776,
+   "lon": 121.4416041
+  },
+  {
+   "type": "node",
+   "id": 824480990,
+   "lat": 31.2213092,
+   "lon": 121.4362384
+  },
+  {
+   "type": "node",
+   "id": 824480994,
+   "lat": 31.2213488,
+   "lon": 121.4361473
+  },
+  {
+   "type": "node",
+   "id": 824480998,
+   "lat": 31.2214214,
+   "lon": 121.436112
+  },
+  {
+   "type": "node",
+   "id": 824481003,
+   "lat": 31.2215119,
+   "lon": 121.4360988,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 824481236,
+   "lat": 31.2211106,
+   "lon": 121.4356064,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 824481701,
+   "lat": 31.2212447,
+   "lon": 121.4357553
+  },
+  {
+   "type": "node",
+   "id": 824481706,
+   "lat": 31.2207159,
+   "lon": 121.4353514,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1984271641,
+   "lat": 31.2215583,
+   "lon": 121.4377208
+  },
+  {
+   "type": "node",
+   "id": 1984271647,
+   "lat": 31.2214016,
+   "lon": 121.4367284
+  },
+  {
+   "type": "node",
+   "id": 1984271698,
+   "lat": 31.2216327,
+   "lon": 121.4379259
+  },
+  {
+   "type": "node",
+   "id": 1984271701,
+   "lat": 31.2197967,
+   "lon": 121.4337416
+  },
+  {
+   "type": "node",
+   "id": 2822040271,
+   "lat": 31.2174595,
+   "lon": 121.4407119
+  },
+  {
+   "type": "node",
+   "id": 2822040272,
+   "lat": 31.2178591,
+   "lon": 121.4406893
+  },
+  {
+   "type": "node",
+   "id": 2822040273,
+   "lat": 31.2180839,
+   "lon": 121.4406786
+  },
+  {
+   "type": "node",
+   "id": 2822040274,
+   "lat": 31.2181986,
+   "lon": 121.4406249
+  },
+  {
+   "type": "node",
+   "id": 2822040275,
+   "lat": 31.2183592,
+   "lon": 121.4405713
+  },
+  {
+   "type": "node",
+   "id": 2822040276,
+   "lat": 31.2190794,
+   "lon": 121.4404318
+  },
+  {
+   "type": "node",
+   "id": 2822040277,
+   "lat": 31.2192183,
+   "lon": 121.4403317
+  },
+  {
+   "type": "node",
+   "id": 2982221118,
+   "lat": 31.2183858,
+   "lon": 121.4355818
+  },
+  {
+   "type": "node",
+   "id": 2982221119,
+   "lat": 31.2187336,
+   "lon": 121.4367287
+  },
+  {
+   "type": "node",
+   "id": 2997636587,
+   "lat": 31.2181724,
+   "lon": 121.4394859
+  },
+  {
+   "type": "node",
+   "id": 3355874983,
+   "lat": 31.2228835,
+   "lon": 121.4405732
+  },
+  {
+   "type": "node",
+   "id": 4066074289,
+   "lat": 31.2177934,
+   "lon": 121.4396868
+  },
+  {
+   "type": "node",
+   "id": 4215841632,
+   "lat": 31.2190935,
+   "lon": 121.4398006
+  },
+  {
+   "type": "node",
+   "id": 4461632048,
+   "lat": 31.2232708,
+   "lon": 121.4383354,
+   "tags": {
+    "crossing": "controlled",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 4599535994,
+   "lat": 31.2195735,
+   "lon": 121.4333797,
+   "tags": {
+    "bus": "yes",
+    "name": "镇宁路",
+    "name:en": "Zhenning Road",
+    "name:zh": "镇宁路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 4824550728,
+   "lat": 31.2193174,
+   "lon": 121.4402448
+  },
+  {
+   "type": "node",
+   "id": 4824558617,
+   "lat": 31.2185379,
+   "lon": 121.4358138
+  },
+  {
+   "type": "node",
+   "id": 8955354772,
+   "lat": 31.2224184,
+   "lon": 121.4400203,
+   "tags": {
+    "bus": "yes",
+    "name": "延安西路华山路",
+    "name:en": "West Yan'an Road Huashan Road",
+    "name:zh": "延安西路华山路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 8992134562,
+   "lat": 31.2214456,
+   "lon": 121.4370503,
+   "tags": {
+    "crossing": "marked",
+    "crossing:markings": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 8992134563,
+   "lat": 31.2211786,
+   "lon": 121.4371097,
+   "tags": {
+    "crossing": "marked",
+    "crossing:markings": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9108195683,
+   "lat": 31.2197011,
+   "lon": 121.4335904,
+   "tags": {
+    "bus": "yes",
+    "name": "延安西路镇宁路",
+    "name:en": "West Yan'an Road Zhenning Road",
+    "name:zh": "延安西路镇宁路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9108195685,
+   "lat": 31.2224973,
+   "lon": 121.4394249
+  },
+  {
+   "type": "node",
+   "id": 9808581981,
+   "lat": 31.2208208,
+   "lon": 121.4388692,
+   "tags": {
+    "bus": "yes",
+    "name": "乌鲁木齐中路延安西路",
+    "name:zh": "乌鲁木齐中路延安西路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9854768349,
+   "lat": 31.2202153,
+   "lon": 121.4418035
+  },
+  {
+   "type": "node",
+   "id": 9857442897,
+   "lat": 31.218855,
+   "lon": 121.4376247,
+   "tags": {
+    "bus": "yes",
+    "name": "华山路乌鲁木齐中路",
+    "name:zh": "华山路乌鲁木齐中路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9857442899,
+   "lat": 31.218855,
+   "lon": 121.4379305,
+   "tags": {
+    "bus": "yes",
+    "name": "华山路乌鲁木齐中路",
+    "name:zh": "华山路乌鲁木齐中路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9857442901,
+   "lat": 31.2170291,
+   "lon": 121.4349666,
+   "tags": {
+    "bus": "yes",
+    "name": "华山路长乐路",
+    "name:zh": "华山路长乐路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9879041732,
+   "lat": 31.2217016,
+   "lon": 121.4363171,
+   "tags": {
+    "bus": "yes",
+    "name": "南京西路延安西路",
+    "name:zh": "南京西路延安西路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9879041733,
+   "lat": 31.2223782,
+   "lon": 121.4370963,
+   "tags": {
+    "alt_name": "美丽园",
+    "bus": "yes",
+    "name": "南京西路延安西路",
+    "name:zh": "南京西路延安西路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9879041736,
+   "lat": 31.2216488,
+   "lon": 121.4362648,
+   "tags": {
+    "bus": "yes",
+    "name": "华东医院",
+    "name:zh": "华东医院",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 10073042350,
+   "lat": 31.2226764,
+   "lon": 121.4398912,
+   "tags": {
+    "bus": "yes",
+    "name": "华山路",
+    "name:zh": "华山路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11750705484,
+   "lat": 31.2185711,
+   "lon": 121.4353042
+  },
+  {
+   "type": "node",
+   "id": 11750705485,
+   "lat": 31.2183719,
+   "lon": 121.435413
+  },
+  {
+   "type": "node",
+   "id": 11750705486,
+   "lat": 31.2187072,
+   "lon": 121.4356597
+  },
+  {
+   "type": "node",
+   "id": 11750705487,
+   "lat": 31.2185568,
+   "lon": 121.4357438
+  },
+  {
+   "type": "node",
+   "id": 11750705488,
+   "lat": 31.2184041,
+   "lon": 121.4354914
+  },
+  {
+   "type": "node",
+   "id": 12588862014,
+   "lat": 31.2199588,
+   "lon": 121.4339671
+  },
+  {
+   "type": "way",
+   "id": 44032510,
+   "nodes": [
+    824481236,
+    78632227,
+    12588862014,
+    1984271701,
+    9108195683,
+    4599535994,
+    573259241,
+    65667398
+   ],
+   "tags": {
+    "bicycle": "no",
+    "busway:left": "lane",
+    "highway": "primary",
+    "name": "延安西路",
+    "name:en": "West Yan'an Road",
+    "oneway": "yes",
+    "surface": "asphalt",
+    "trolley_wire": "yes"
+   }
+  },
+  {
+   "type": "way",
+   "id": 68574143,
+   "nodes": [
+    824480990,
+    824480994,
+    824480998,
+    824481003
+   ],
+   "tags": {
+    "cycleway:right": "no",
+    "highway": "primary_link",
+    "lanes": "1",
+    "name": "南京西路",
+    "name:en": "West Nanjing Road",
+    "oneway": "yes",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 227962892,
+   "nodes": [
+    87752335,
+    3355874983,
+    10073042350,
+    64808792,
+    9108195685,
+    64808790,
+    603891484
+   ],
+   "tags": {
+    "bicycle": "no",
+    "busway:left": "lane",
+    "highway": "primary",
+    "lanes": "5",
+    "lit": "yes",
+    "maxheight": "default",
+    "name": "延安西路",
+    "name:en": "West Yan'an Road",
+    "oneway": "yes",
+    "surface": "asphalt",
+    "trolley_wire": "yes"
+   }
+  },
+  {
+   "type": "way",
+   "id": 277743606,
+   "nodes": [
+    2822040271,
+    2822040272,
+    2822040273,
+    2822040274,
+    2822040275,
+    2822040276,
+    2822040277,
+    4824550728
+   ],
+   "tags": {
+    "highway": "living_street",
+    "name": "长乐路946弄",
+    "name:en": "Lane 946 Changle Road",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 441792045,
+   "nodes": [
+    9854768349,
+    640484229,
+    603891564,
+    4824550728,
+    4215841632,
+    154080003
+   ],
+   "tags": {
+    "highway": "secondary",
+    "name": "华山路",
+    "name:en": "Huashan Road",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 442026219,
+   "nodes": [
+    78632221,
+    9879041733,
+    78632223
+   ],
+   "tags": {
+    "bicycle": "no",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "南京西路",
+    "name:en": "West Nanjing Road",
+    "surface": "asphalt",
+    "wikidata": "Q10906894",
+    "wikipedia": "zh:南京西路 (上海)"
+   }
+  },
+  {
+   "type": "way",
+   "id": 482569915,
+   "nodes": [
+    154885125,
+    603891484
+   ],
+   "tags": {
+    "cycleway": "lane",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "乌鲁木齐中路",
+    "name:en": "Middle Wulumuqi Road",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 482569921,
+   "nodes": [
+    154080003,
+    154080029,
+    9857442899,
+    9857442897,
+    554206380,
+    2982221119,
+    554206381,
+    4824558617,
+    2982221118,
+    554206382,
+    554206383,
+    9857442901,
+    554206384,
+    600486973
+   ],
+   "tags": {
+    "cycleway:both": "shared_lane",
+    "cycleway:both:lane": "pictogram",
+    "highway": "secondary",
+    "name": "华山路",
+    "name:en": "Huashan Road",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 482569922,
+   "nodes": [
+    154080003,
+    154884971,
+    154885091,
+    9808581981
+   ],
+   "tags": {
+    "cycleway": "lane",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "乌鲁木齐北路",
+    "name:en": "Middle Wulumuqi Road",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 482569924,
+   "nodes": [
+    154885125,
+    78629041,
+    85632327,
+    559821818,
+    8955354772
+   ],
+   "tags": {
+    "bicycle": "no",
+    "busway:left": "lane",
+    "highway": "primary",
+    "name": "延安西路",
+    "name:en": "West Yan'an Road",
+    "oneway": "yes",
+    "surface": "asphalt",
+    "trolley_wire": "yes"
+   }
+  },
+  {
+   "type": "way",
+   "id": 492977127,
+   "nodes": [
+    154073129,
+    4066074289,
+    2997636587,
+    154073025,
+    154884705,
+    640483800,
+    154080003
+   ],
+   "tags": {
+    "cycleway:both": "shared_lane",
+    "cycleway:both:lane": "pictogram",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "乌鲁木齐中路",
+    "name:en": "Middle Wulumuqi Road",
+    "surface": "asphalt",
+    "wikidata": "Q10878245",
+    "wikipedia": "zh:乌鲁木齐中路"
+   }
+  },
+  {
+   "type": "way",
+   "id": 656471270,
+   "nodes": [
+    78632226,
+    824481236
+   ],
+   "tags": {
+    "bicycle": "no",
+    "busway:left": "lane",
+    "highway": "primary",
+    "lane_markings": "no",
+    "name": "延安西路",
+    "name:en": "West Yan'an Road",
+    "oneway": "yes",
+    "surface": "asphalt",
+    "trolley_wire": "yes"
+   }
+  },
+  {
+   "type": "way",
+   "id": 656471271,
+   "nodes": [
+    824481236,
+    824481706
+   ],
+   "tags": {
+    "bicycle": "no",
+    "highway": "secondary",
+    "lanes": "2",
+    "maxheight": "default",
+    "name": "南京西路",
+    "name:en": "West Nanjing Road",
+    "surface": "asphalt",
+    "wikidata": "Q10906894",
+    "wikipedia": "zh:南京西路 (上海)"
+   }
+  },
+  {
+   "type": "way",
+   "id": 769230222,
+   "nodes": [
+    824481706,
+    78629037,
+    78629038,
+    8992134563,
+    78629040,
+    154073058,
+    154885125
+   ],
+   "tags": {
+    "bicycle": "no",
+    "busway:left": "lane",
+    "highway": "primary",
+    "name": "延安西路",
+    "name:en": "West Yan'an Road",
+    "oneway": "yes",
+    "surface": "asphalt",
+    "trolley_wire": "yes"
+   }
+  },
+  {
+   "type": "way",
+   "id": 769230223,
+   "nodes": [
+    824481003,
+    824481701,
+    824481236
+   ],
+   "tags": {
+    "bicycle": "no",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "南京西路",
+    "name:en": "West Nanjing Road",
+    "surface": "asphalt",
+    "wikidata": "Q10906894",
+    "wikipedia": "zh:南京西路 (上海)"
+   }
+  },
+  {
+   "type": "way",
+   "id": 769230224,
+   "nodes": [
+    313633798,
+    4461632048,
+    603891484
+   ],
+   "tags": {
+    "cycleway:both": "lane",
+    "cycleway:left:oneway": "-1",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "乌鲁木齐北路",
+    "name:en": "North Wulumuqi Road",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 769230225,
+   "nodes": [
+    603891484,
+    85631867,
+    1984271698,
+    1984271641,
+    85632620,
+    8992134562,
+    1984271647,
+    824480990
+   ],
+   "tags": {
+    "bicycle": "no",
+    "busway:left": "lane",
+    "highway": "primary",
+    "lanes": "5",
+    "lit": "yes",
+    "name": "延安西路",
+    "name:en": "West Yan'an Road",
+    "oneway": "yes",
+    "surface": "asphalt",
+    "trolley_wire": "yes"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1068486063,
+   "nodes": [
+    9808581981,
+    154885125
+   ],
+   "tags": {
+    "cycleway": "lane",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "乌鲁木齐北路",
+    "name:en": "Middle Wulumuqi Road",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1084974328,
+   "nodes": [
+    78632223,
+    9879041732,
+    9879041736
+   ],
+   "tags": {
+    "bicycle": "no",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "南京西路",
+    "name:en": "West Nanjing Road",
+    "surface": "asphalt",
+    "wikidata": "Q10906894",
+    "wikipedia": "zh:南京西路 (上海)"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1264845154,
+   "nodes": [
+    11750705484,
+    11750705486,
+    11750705487,
+    11750705488,
+    11750705485,
+    11750705484
+   ],
+   "tags": {
+    "area": "yes",
+    "highway": "pedestrian"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1330340324,
+   "nodes": [
+    9879041736,
+    824481003
+   ],
+   "tags": {
+    "bicycle": "no",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "南京西路",
+    "name:en": "West Nanjing Road",
+    "surface": "asphalt",
+    "wikidata": "Q10906894",
+    "wikipedia": "zh:南京西路 (上海)"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1330340325,
+   "nodes": [
+    824480990,
+    78632226
+   ],
+   "tags": {
+    "bicycle": "no",
+    "busway:left": "lane",
+    "highway": "primary",
+    "lanes": "5",
+    "lit": "yes",
+    "name": "延安西路",
+    "name:en": "West Yan'an Road",
+    "oneway": "yes",
+    "surface": "asphalt",
+    "trolley_wire": "yes"
+   }
+  }
+ ]
+}
