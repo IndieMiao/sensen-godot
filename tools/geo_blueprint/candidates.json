@@ -1,0 +1,19 @@
+{
+  "format": 1,
+  "regions": [
+    {"id": "shanghai", "name": "上海", "timezone": "Asia/Shanghai",
+     "center": [31.2304, 121.4737], "street_zoom": 16.0, "pitch": 45.0,
+     "candidates": [
+       {"layout_patch_id": "sh_a", "name": "衡山路", "lat": 31.2076, "lng": 121.4432, "radius_m": 200},
+       {"layout_patch_id": "sh_b", "name": "老城厢", "lat": 31.2265, "lng": 121.4915, "radius_m": 200},
+       {"layout_patch_id": "sh_c", "name": "愚园路", "lat": 31.2240, "lng": 121.4450, "radius_m": 200}
+     ]},
+    {"id": "los_angeles", "name": "Los Angeles", "timezone": "America/Los_Angeles",
+     "center": [34.0522, -118.2437], "street_zoom": 16.0, "pitch": 45.0,
+     "candidates": [
+       {"layout_patch_id": "la_a", "name": "Historic Core", "lat": 34.0455, "lng": -118.2495, "radius_m": 200},
+       {"layout_patch_id": "la_b", "name": "Venice Canals", "lat": 33.9822, "lng": -118.4665, "radius_m": 200},
+       {"layout_patch_id": "la_c", "name": "Silver Lake", "lat": 34.0870, "lng": -118.2745, "radius_m": 200}
+     ]}
+  ]
+}

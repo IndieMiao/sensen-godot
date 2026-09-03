@@ -13,3 +13,5 @@ mapbox_token.txt
 
 # superpowers 可视化头脑风暴会话产物
 .superpowers/
+tools/geo_blueprint/node_modules/
+tools/geo_blueprint/.tmp/
