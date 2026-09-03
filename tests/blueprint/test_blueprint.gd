@@ -45,3 +45,50 @@ func test_world_roundtrip() -> void:
 func test_missing_file_returns_null() -> void:
 	assert_object(FarmBlueprint.load_file("res://tests/fixtures/blueprints/nope/r1/farm_blueprint.json")).is_null()
 	assert_str(FarmBlueprint.asset_path("sh_a", 1)).is_equal("res://assets/blueprints/sh_a/r1/farm_blueprint.json")
+
+func test_malformed_dict_returns_null() -> void:
+	## 从 fixture 独立复制每个情形，确保测试间隔离。
+	var fix_text := FileAccess.get_file_as_string(FIX)
+	var parsed_base := JSON.parse_string(fix_text) as Dictionary
+
+	# 缺失 grid
+	var missing_grid := parsed_base.duplicate(true)
+	missing_grid.erase("grid")
+	assert_object(FarmBlueprint.from_dict(missing_grid)).is_null()
+
+	# 缺失 masks.walkable
+	var missing_mask := parsed_base.duplicate(true)
+	(missing_mask.masks as Dictionary).erase("walkable")
+	assert_object(FarmBlueprint.from_dict(missing_mask)).is_null()
+
+	# 缺失 anchors
+	var missing_anchors := parsed_base.duplicate(true)
+	missing_anchors.erase("anchors")
+	assert_object(FarmBlueprint.from_dict(missing_anchors)).is_null()
+
+	# 缺失 anchors.beds
+	var missing_beds := parsed_base.duplicate(true)
+	((missing_beds.anchors) as Dictionary).erase("beds")
+	assert_object(FarmBlueprint.from_dict(missing_beds)).is_null()
+
+	# 缺失 anchors.reserved_bed
+	var missing_reserved := parsed_base.duplicate(true)
+	((missing_reserved.anchors) as Dictionary).erase("reserved_bed")
+	assert_object(FarmBlueprint.from_dict(missing_reserved)).is_null()
+
+func test_mask_indexing_is_row_major_by_y() -> void:
+	## 这些对是特意选的，以捕捉 x/y 坐标交换的错误。
+	## cultivable row 1 col 0 是 '1'，但 row 0 col 1 是 '0'，反向检查确认行主序。
+	var bp := FarmBlueprint.load_file(FIX)
+	assert_bool(bp.mask_has("cultivable", Vector2i(0, 1))).is_true()
+	assert_bool(bp.mask_has("cultivable", Vector2i(1, 0))).is_false()
+
+	## cultivable row 5 col 0 是 '1'，但 row 0 col 5 是 '0'，第二对对比。
+	assert_bool(bp.mask_has("cultivable", Vector2i(0, 5))).is_true()
+	assert_bool(bp.mask_has("cultivable", Vector2i(5, 0))).is_false()
+
+func test_unknown_format_returns_null() -> void:
+	var fix_text := FileAccess.get_file_as_string(FIX)
+	var parsed := JSON.parse_string(fix_text) as Dictionary
+	parsed.format = 2
+	assert_object(FarmBlueprint.from_dict(parsed)).is_null()

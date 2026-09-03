@@ -43,9 +43,48 @@ static func _points(arr) -> PackedVector2Array:
 		out.append(Vector2(float(p[0]), float(p[1])))
 	return out
 
+## 校验必需字段存在且类型符合。失败时返回缺失的字段列表，成功时返回空数组。
+static func _missing_keys(d: Dictionary) -> PackedStringArray:
+	var missing := PackedStringArray()
+	if not d.has("layout_patch_id"):
+		missing.append("layout_patch_id")
+	if not d.has("revision"):
+		missing.append("revision")
+	if not d.has("grid") or typeof(d.grid) != TYPE_ARRAY or d.grid is Array and d.grid.size() < 2:
+		missing.append("grid")
+	if not d.has("masks") or typeof(d.masks) != TYPE_DICTIONARY:
+		missing.append("masks")
+	elif typeof(d.masks) == TYPE_DICTIONARY:
+		for name in MASK_NAMES:
+			if not (d.masks as Dictionary).has(name):
+				missing.append("masks.%s" % name)
+	if not d.has("anchors") or typeof(d.anchors) != TYPE_DICTIONARY:
+		missing.append("anchors")
+	elif typeof(d.anchors) == TYPE_DICTIONARY:
+		var a := d.anchors as Dictionary
+		for name in POINT_ANCHORS:
+			if not a.has(name):
+				missing.append("anchors.%s" % name)
+		if not a.has("beds") or typeof(a.beds) != TYPE_ARRAY or (a.beds as Array).is_empty():
+			missing.append("anchors.beds")
+		elif typeof(a.beds) == TYPE_ARRAY:
+			for bed in a.beds as Array:
+				if typeof(bed) != TYPE_DICTIONARY or not (bed as Dictionary).has("cells"):
+					missing.append("anchors.beds[].cells")
+					break
+		if not a.has("reserved_bed") or typeof(a.reserved_bed) != TYPE_DICTIONARY:
+			missing.append("anchors.reserved_bed")
+		elif typeof(a.reserved_bed) == TYPE_DICTIONARY and not (a.reserved_bed as Dictionary).has("cells"):
+			missing.append("anchors.reserved_bed.cells")
+	return missing
+
 static func from_dict(d: Dictionary) -> FarmBlueprint:
 	if int(d.get("format", 0)) != FORMAT:
 		push_error("FarmBlueprint: 不支持的 format %s" % str(d.get("format")))
+		return null
+	var missing := _missing_keys(d)
+	if not missing.is_empty():
+		push_error("FarmBlueprint: 字段缺失/类型不符 %s" % ", ".join(missing))
 		return null
 	var bp := FarmBlueprint.new()
 	bp.layout_patch_id = str(d.layout_patch_id)
