@@ -1,0 +1,1157 @@
+{
+ "version": 0.6,
+ "generator": "Overpass API 0.7.62.11 87bfad18",
+ "osm3s": {
+  "timestamp_osm_base": "2026-09-03T12:34:40Z",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+ },
+ "elements": [
+  {
+   "type": "node",
+   "id": 26427711,
+   "lat": 33.9810492,
+   "lon": -118.463516,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal",
+    "traffic_signals:direction": "both"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122479832,
+   "lat": 33.9839393,
+   "lon": -118.4629078
+  },
+  {
+   "type": "node",
+   "id": 122644212,
+   "lat": 33.9815847,
+   "lon": -118.4685847
+  },
+  {
+   "type": "node",
+   "id": 122644214,
+   "lat": 33.9821271,
+   "lon": -118.4676825
+  },
+  {
+   "type": "node",
+   "id": 122670558,
+   "lat": 33.9839147,
+   "lon": -118.470623
+  },
+  {
+   "type": "node",
+   "id": 122670562,
+   "lat": 33.9836515,
+   "lon": -118.4703902
+  },
+  {
+   "type": "node",
+   "id": 122670564,
+   "lat": 33.9833841,
+   "lon": -118.470161,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:markings": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122670566,
+   "lat": 33.9831281,
+   "lon": -118.4699369
+  },
+  {
+   "type": "node",
+   "id": 122670567,
+   "lat": 33.9828715,
+   "lon": -118.46971,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:markings": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122670568,
+   "lat": 33.9826122,
+   "lon": -118.4694796
+  },
+  {
+   "type": "node",
+   "id": 122670570,
+   "lat": 33.9823541,
+   "lon": -118.4692587,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:markings": "no",
+    "highway": "crossing",
+    "tactile_paving": "no"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122670573,
+   "lat": 33.9820842,
+   "lon": -118.4690241
+  },
+  {
+   "type": "node",
+   "id": 122670575,
+   "lat": 33.9818384,
+   "lon": -118.4688065,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:markings": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122670577,
+   "lat": 33.9813226,
+   "lon": -118.4683585,
+   "tags": {
+    "crossing:markings": "no",
+    "crossing:signals": "no",
+    "highway": "crossing",
+    "tactile_paving": "no"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122670580,
+   "lat": 33.9810662,
+   "lon": -118.4681277
+  },
+  {
+   "type": "node",
+   "id": 122670583,
+   "lat": 33.9808042,
+   "lon": -118.4679127,
+   "tags": {
+    "crossing:markings": "no",
+    "crossing:signals": "no",
+    "highway": "crossing",
+    "tactile_paving": "no"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122670585,
+   "lat": 33.9805552,
+   "lon": -118.4676895
+  },
+  {
+   "type": "node",
+   "id": 122670587,
+   "lat": 33.9802864,
+   "lon": -118.4674591,
+   "tags": {
+    "crossing": "uncontrolled",
+    "crossing:markings": "surface",
+    "crossing:signals": "no",
+    "highway": "crossing",
+    "tactile_paving": "no"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122670590,
+   "lat": 33.9800297,
+   "lon": -118.4672357
+  },
+  {
+   "type": "node",
+   "id": 122670595,
+   "lat": 33.9797611,
+   "lon": -118.467019,
+   "tags": {
+    "crossing": "uncontrolled",
+    "crossing:markings": "surface",
+    "crossing:signals": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122670598,
+   "lat": 33.9795012,
+   "lon": -118.4667988
+  },
+  {
+   "type": "node",
+   "id": 122670600,
+   "lat": 33.9792333,
+   "lon": -118.4665793
+  },
+  {
+   "type": "node",
+   "id": 122681683,
+   "lat": 33.9839525,
+   "lon": -118.4692405
+  },
+  {
+   "type": "node",
+   "id": 122685488,
+   "lat": 33.9847322,
+   "lon": -118.4693048
+  },
+  {
+   "type": "node",
+   "id": 122685489,
+   "lat": 33.9802871,
+   "lon": -118.4655199
+  },
+  {
+   "type": "node",
+   "id": 122685506,
+   "lat": 33.9802598,
+   "lon": -118.4647571
+  },
+  {
+   "type": "node",
+   "id": 122685508,
+   "lat": 33.9805041,
+   "lon": -118.4650919
+  },
+  {
+   "type": "node",
+   "id": 122691712,
+   "lat": 33.9838471,
+   "lon": -118.4659614
+  },
+  {
+   "type": "node",
+   "id": 122856329,
+   "lat": 33.9830158,
+   "lon": -118.4652241
+  },
+  {
+   "type": "node",
+   "id": 122895555,
+   "lat": 33.9836391,
+   "lon": -118.4657759
+  },
+  {
+   "type": "node",
+   "id": 122895558,
+   "lat": 33.9834299,
+   "lon": -118.4655892
+  },
+  {
+   "type": "node",
+   "id": 122895561,
+   "lat": 33.9832275,
+   "lon": -118.4654102
+  },
+  {
+   "type": "node",
+   "id": 122895563,
+   "lat": 33.9827044,
+   "lon": -118.4649516,
+   "tags": {
+    "direction": "both",
+    "highway": "stop",
+    "stop": "all"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122923632,
+   "lat": 33.984193,
+   "lon": -118.462499,
+   "tags": {
+    "direction": "both",
+    "highway": "stop",
+    "stop": "all"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122935327,
+   "lat": 33.9836894,
+   "lon": -118.4633179
+  },
+  {
+   "type": "node",
+   "id": 122957259,
+   "lat": 33.9823901,
+   "lon": -118.4679198
+  },
+  {
+   "type": "node",
+   "id": 122979261,
+   "lat": 33.9822967,
+   "lon": -118.4656184
+  },
+  {
+   "type": "node",
+   "id": 122979264,
+   "lat": 33.9809894,
+   "lon": -118.4644759
+  },
+  {
+   "type": "node",
+   "id": 122979266,
+   "lat": 33.980632,
+   "lon": -118.4641696
+  },
+  {
+   "type": "node",
+   "id": 122984162,
+   "lat": 33.9813581,
+   "lon": -118.4670095
+  },
+  {
+   "type": "node",
+   "id": 122984169,
+   "lat": 33.9820965,
+   "lon": -118.465956
+  },
+  {
+   "type": "node",
+   "id": 122984171,
+   "lat": 33.9832,
+   "lon": -118.4641393
+  },
+  {
+   "type": "node",
+   "id": 122984174,
+   "lat": 33.9846093,
+   "lon": -118.4618241
+  },
+  {
+   "type": "node",
+   "id": 122984180,
+   "lat": 33.9847362,
+   "lon": -118.4616096
+  },
+  {
+   "type": "node",
+   "id": 123014885,
+   "lat": 33.9816091,
+   "lon": -118.4672328
+  },
+  {
+   "type": "node",
+   "id": 123086238,
+   "lat": 33.9836762,
+   "lon": -118.4690228
+  },
+  {
+   "type": "node",
+   "id": 123139312,
+   "lat": 33.9844989,
+   "lon": -118.4696694,
+   "tags": {
+    "highway": "traffic_signals"
+   }
+  },
+  {
+   "type": "node",
+   "id": 123139314,
+   "lat": 33.9842224,
+   "lon": -118.4694538
+  },
+  {
+   "type": "node",
+   "id": 123139315,
+   "lat": 33.9834121,
+   "lon": -118.4688077
+  },
+  {
+   "type": "node",
+   "id": 123139316,
+   "lat": 33.9831557,
+   "lon": -118.468588
+  },
+  {
+   "type": "node",
+   "id": 123139318,
+   "lat": 33.9829013,
+   "lon": -118.468365,
+   "tags": {
+    "button_operated": "yes",
+    "crossing": "traffic_signals",
+    "crossing:island": "no",
+    "crossing:markings": "zebra",
+    "highway": "crossing",
+    "tactile_paving": "yes",
+    "traffic_signals:sound": "yes",
+    "traffic_signals:vibration": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 123139320,
+   "lat": 33.9826407,
+   "lon": -118.4681408
+  },
+  {
+   "type": "node",
+   "id": 123139322,
+   "lat": 33.9818649,
+   "lon": -118.4674594
+  },
+  {
+   "type": "node",
+   "id": 123139325,
+   "lat": 33.981097,
+   "lon": -118.4667797
+  },
+  {
+   "type": "node",
+   "id": 123139328,
+   "lat": 33.9808387,
+   "lon": -118.4665558
+  },
+  {
+   "type": "node",
+   "id": 123139330,
+   "lat": 33.9805552,
+   "lon": -118.4663083
+  },
+  {
+   "type": "node",
+   "id": 123139332,
+   "lat": 33.9802956,
+   "lon": -118.4660916
+  },
+  {
+   "type": "node",
+   "id": 123455943,
+   "lat": 33.9803952,
+   "lon": -118.4645423
+  },
+  {
+   "type": "node",
+   "id": 201551220,
+   "lat": 33.983766,
+   "lon": -118.468528
+  },
+  {
+   "type": "node",
+   "id": 416766627,
+   "lat": 33.9820693,
+   "lon": -118.4670632
+  },
+  {
+   "type": "node",
+   "id": 559822573,
+   "lat": 33.9818525,
+   "lon": -118.4674479
+  },
+  {
+   "type": "node",
+   "id": 559826512,
+   "lat": 33.9834386,
+   "lon": -118.4682619
+  },
+  {
+   "type": "node",
+   "id": 559860549,
+   "lat": 33.9814054,
+   "lon": -118.4638233
+  },
+  {
+   "type": "node",
+   "id": 602110113,
+   "lat": 33.9831021,
+   "lon": -118.4679668
+  },
+  {
+   "type": "node",
+   "id": 705794038,
+   "lat": 33.9834455,
+   "lon": -118.4637246
+  },
+  {
+   "type": "node",
+   "id": 705794041,
+   "lat": 33.982953,
+   "lon": -118.4645459
+  },
+  {
+   "type": "node",
+   "id": 705794043,
+   "lat": 33.9824967,
+   "lon": -118.4652872
+  },
+  {
+   "type": "node",
+   "id": 705794187,
+   "lat": 33.9844121,
+   "lon": -118.4621439
+  },
+  {
+   "type": "node",
+   "id": 1773898590,
+   "lat": 33.9846691,
+   "lon": -118.4692547
+  },
+  {
+   "type": "node",
+   "id": 4026201074,
+   "lat": 33.980485,
+   "lon": -118.4644008
+  },
+  {
+   "type": "node",
+   "id": 6965543431,
+   "lat": 33.9840171,
+   "lon": -118.466104
+  },
+  {
+   "type": "node",
+   "id": 7111673827,
+   "lat": 33.9805637,
+   "lon": -118.4642733
+  },
+  {
+   "type": "node",
+   "id": 8086289225,
+   "lat": 33.9805045,
+   "lon": -118.4651201
+  },
+  {
+   "type": "node",
+   "id": 8086384336,
+   "lat": 33.9846828,
+   "lon": -118.4692648,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:markings": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 8657620611,
+   "lat": 33.9803566,
+   "lon": -118.4648984,
+   "tags": {
+    "direction": "backward",
+    "highway": "stop"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9869414686,
+   "lat": 33.9844384,
+   "lon": -118.469619,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "ladder",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9873342763,
+   "lat": 33.9811569,
+   "lon": -118.463607,
+   "tags": {
+    "button_operated": "yes",
+    "crossing": "traffic_signals",
+    "crossing:island": "yes",
+    "crossing:markings": "yes",
+    "highway": "crossing",
+    "tactile_paving": "no",
+    "traffic_signals:sound": "yes",
+    "traffic_signals:vibration": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9873413145,
+   "lat": 33.979314,
+   "lon": -118.4666424,
+   "tags": {
+    "crossing": "marked",
+    "crossing:markings": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9873438125,
+   "lat": 33.9803475,
+   "lon": -118.464885,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:markings": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9873438189,
+   "lat": 33.9807486,
+   "lon": -118.4642666,
+   "tags": {
+    "direction": "forward",
+    "highway": "stop"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9873438190,
+   "lat": 33.980734,
+   "lon": -118.464255,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:markings": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9890502557,
+   "lat": 33.9820149,
+   "lon": -118.4643488,
+   "tags": {
+    "traffic_calming": "hump"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9904958902,
+   "lat": 33.9802979,
+   "lon": -118.4655371
+  },
+  {
+   "type": "node",
+   "id": 9904958903,
+   "lat": 33.9802987,
+   "lon": -118.4654883
+  },
+  {
+   "type": "node",
+   "id": 12152894575,
+   "lat": 33.9801754,
+   "lon": -118.465997
+  },
+  {
+   "type": "node",
+   "id": 12848910579,
+   "lat": 33.9810337,
+   "lon": -118.466171
+  },
+  {
+   "type": "node",
+   "id": 13052882917,
+   "lat": 33.9826562,
+   "lon": -118.4649072,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:island": "no",
+    "crossing:markings": "no",
+    "highway": "crossing",
+    "tactile_paving": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13052882918,
+   "lat": 33.9827403,
+   "lon": -118.464893,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:island": "no",
+    "crossing:markings": "no",
+    "highway": "crossing",
+    "tactile_paving": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13052882919,
+   "lat": 33.9827479,
+   "lon": -118.4649897,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:island": "no",
+    "crossing:markings": "no",
+    "highway": "crossing",
+    "tactile_paving": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13052882920,
+   "lat": 33.9826666,
+   "lon": -118.4650127,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:island": "no",
+    "crossing:markings": "no",
+    "highway": "crossing",
+    "tactile_paving": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13052882955,
+   "lat": 33.9842295,
+   "lon": -118.4624362,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:markings": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13052882961,
+   "lat": 33.9841503,
+   "lon": -118.4625678,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:markings": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13065057106,
+   "lat": 33.9846389,
+   "lon": -118.461774,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:markings": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13065057108,
+   "lat": 33.9845733,
+   "lon": -118.4618824,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:markings": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13065057168,
+   "lat": 33.9822551,
+   "lon": -118.465582,
+   "tags": {
+    "crossing": "unmarked",
+    "crossing:island": "no",
+    "crossing:markings": "no",
+    "highway": "crossing",
+    "tactile_paving": "yes"
+   }
+  },
+  {
+   "type": "way",
+   "id": 13348622,
+   "nodes": [
+    122979261,
+    13065057168,
+    122979264,
+    9873438189,
+    9873438190,
+    122979266
+   ],
+   "tags": {
+    "highway": "residential",
+    "name": "Sanborn Avenue",
+    "tiger:cfcc": "A41",
+    "tiger:county": "Los Angeles, CA",
+    "tiger:name_base": "Sanborn",
+    "tiger:name_type": "Ave"
+   }
+  },
+  {
+   "type": "way",
+   "id": 13349578,
+   "nodes": [
+    122895563,
+    13052882918,
+    705794041,
+    122984171,
+    705794038,
+    122935327,
+    122479832,
+    13052882961,
+    122923632,
+    13052882955,
+    705794187,
+    13065057108,
+    122984174,
+    13065057106,
+    122984180
+   ],
+   "tags": {
+    "highway": "residential",
+    "name": "28th Avenue",
+    "tiger:cfcc": "A41",
+    "tiger:county": "Los Angeles, CA",
+    "tiger:name_base": "28th",
+    "tiger:name_type": "Ave",
+    "tiger:reviewed": "no"
+   }
+  },
+  {
+   "type": "way",
+   "id": 160283137,
+   "nodes": [
+    122670577,
+    122644212,
+    122670575,
+    122670573,
+    122670570,
+    122670568,
+    122670567,
+    122670566,
+    122670564,
+    122670562,
+    122670558
+   ],
+   "tags": {
+    "highway": "residential",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "15 mph",
+    "name": "Speedway",
+    "note": "Speedway is designated by the city of Los Angeles as a normal road, not as an alley.",
+    "oneway": "yes",
+    "source": "TIGER, Bing",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 165877840,
+   "nodes": [
+    122685488,
+    8086384336,
+    1773898590,
+    201551220,
+    559826512,
+    602110113,
+    416766627,
+    12848910579,
+    9904958902,
+    122685489
+   ],
+   "tags": {
+    "highway": "residential",
+    "name": "Strongs Drive",
+    "tiger:cfcc": "A41",
+    "tiger:name_base": "Strongs",
+    "tiger:name_type": "Dr"
+   }
+  },
+  {
+   "type": "way",
+   "id": 165877933,
+   "nodes": [
+    122895558,
+    122895555,
+    122691712
+   ],
+   "tags": {
+    "highway": "residential",
+    "lanes": "1",
+    "maxspeed": "15 mph",
+    "name": "Dell Avenue",
+    "oneway": "yes",
+    "surface": "asphalt",
+    "tiger:cfcc": "A41",
+    "tiger:name_base": "Dell",
+    "tiger:name_type": "Ave"
+   }
+  },
+  {
+   "type": "way",
+   "id": 165877991,
+   "nodes": [
+    122895561,
+    122895558
+   ],
+   "tags": {
+    "bridge": "yes",
+    "highway": "residential",
+    "lanes": "1",
+    "layer": "1",
+    "maxspeed": "5 mph",
+    "name": "Dell Avenue",
+    "oneway": "yes",
+    "tiger:cfcc": "A41",
+    "tiger:name_base": "Dell",
+    "tiger:name_type": "Ave"
+   }
+  },
+  {
+   "type": "way",
+   "id": 175761943,
+   "nodes": [
+    122691712,
+    6965543431
+   ],
+   "tags": {
+    "bridge": "yes",
+    "highway": "residential",
+    "lanes": "1",
+    "layer": "1",
+    "maxspeed": "5 mph",
+    "name": "Dell Avenue",
+    "oneway": "yes",
+    "tiger:cfcc": "A41",
+    "tiger:county": "Los Angeles, CA",
+    "tiger:name_base": "Dell",
+    "tiger:name_type": "Ave"
+   }
+  },
+  {
+   "type": "way",
+   "id": 175761947,
+   "nodes": [
+    122856329,
+    13052882919,
+    122895563,
+    13052882917,
+    9890502557,
+    559860549,
+    9873342763,
+    26427711
+   ],
+   "tags": {
+    "bicycle": "designated",
+    "highway": "residential",
+    "maxspeed": "15 mph",
+    "name": "Dell Avenue",
+    "surface": "concrete",
+    "tiger:cfcc": "A41",
+    "tiger:name_base": "Dell",
+    "tiger:name_type": "Ave"
+   }
+  },
+  {
+   "type": "way",
+   "id": 288116304,
+   "nodes": [
+    123139312,
+    9869414686,
+    123139314,
+    122681683,
+    123086238,
+    123139315,
+    123139316,
+    123139318,
+    123139320,
+    122957259,
+    122644214,
+    123139322,
+    559822573,
+    123014885,
+    122984162,
+    123139325,
+    123139328
+   ],
+   "tags": {
+    "abutters": "residential",
+    "cycleway": "shared_lane",
+    "highway": "secondary",
+    "lane_markings": "yes",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "30 mph",
+    "maxspeed:backward": "30 mph",
+    "name": "Pacific Avenue",
+    "sidewalk": "both",
+    "surface": "asphalt",
+    "tiger:cfcc": "A41",
+    "tiger:name_base": "Pacific",
+    "tiger:name_type": "Ave"
+   }
+  },
+  {
+   "type": "way",
+   "id": 378057236,
+   "nodes": [
+    122856329,
+    122895561
+   ],
+   "tags": {
+    "bicycle": "designated",
+    "highway": "residential",
+    "lanes": "1",
+    "maxspeed": "15 mph",
+    "name": "Dell Avenue",
+    "oneway": "yes",
+    "tiger:cfcc": "A41",
+    "tiger:name_base": "Dell",
+    "tiger:name_type": "Ave"
+   }
+  },
+  {
+   "type": "way",
+   "id": 382843814,
+   "nodes": [
+    123139328,
+    123139330,
+    123139332,
+    12152894575
+   ],
+   "tags": {
+    "abutters": "residential",
+    "cycleway": "shared_lane",
+    "highway": "secondary",
+    "lit": "yes",
+    "maxspeed": "30 mph",
+    "maxspeed:backward": "30 mph",
+    "name": "Pacific Avenue",
+    "sidewalk": "both",
+    "surface": "asphalt",
+    "tiger:cfcc": "A41",
+    "tiger:county": "Los Angeles, CA",
+    "tiger:name_base": "Pacific",
+    "tiger:name_type": "Ave"
+   }
+  },
+  {
+   "type": "way",
+   "id": 398221373,
+   "nodes": [
+    4026201074,
+    7111673827,
+    122979266
+   ],
+   "tags": {
+    "cycleway": "lane",
+    "highway": "secondary",
+    "lanes": "5",
+    "lanes:backward": "2",
+    "lanes:forward": "3",
+    "lit": "yes",
+    "maxspeed": "35 mph",
+    "name": "Washington Boulevard",
+    "name:etymology:wikidata": "Q23",
+    "oneway": "no",
+    "sidewalk": "both",
+    "smoothness": "good",
+    "surface": "asphalt",
+    "turn:lanes:forward": "left|none|none"
+   }
+  },
+  {
+   "type": "way",
+   "id": 399967784,
+   "nodes": [
+    123455943,
+    4026201074
+   ],
+   "tags": {
+    "cycleway": "lane",
+    "highway": "secondary",
+    "lanes": "4",
+    "lit": "yes",
+    "maxspeed": "35 mph",
+    "name": "Washington Boulevard",
+    "name:etymology:wikidata": "Q23",
+    "oneway": "no",
+    "sidewalk": "both",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 509058555,
+   "nodes": [
+    122670583,
+    122670580,
+    122670577
+   ],
+   "tags": {
+    "highway": "residential",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "15 mph",
+    "name": "Speedway",
+    "note": "Speedway is designated by the city of Los Angeles as a normal road, not as an alley.",
+    "oneway": "yes",
+    "source": "TIGER, Bing",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 509058557,
+   "nodes": [
+    122670600,
+    9873413145,
+    122670598,
+    122670595,
+    122670590,
+    122670587,
+    122670585,
+    122670583
+   ],
+   "tags": {
+    "bicycle": "yes",
+    "highway": "residential",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "15 mph",
+    "name": "Speedway",
+    "note": "Speedway is designated by the city of Los Angeles as a normal road, not as an alley.",
+    "oneway": "yes",
+    "source": "TIGER, Bing",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 845406642,
+   "nodes": [
+    122984169,
+    122979261,
+    705794043,
+    13052882920,
+    122895563
+   ],
+   "tags": {
+    "bicycle": "designated",
+    "highway": "residential",
+    "lane_markings": "no",
+    "name": "28th Avenue",
+    "surface": "concrete",
+    "tiger:cfcc": "A41",
+    "tiger:name_base": "28th",
+    "tiger:name_type": "Ave"
+   }
+  },
+  {
+   "type": "way",
+   "id": 936326997,
+   "nodes": [
+    122685506,
+    9873438125,
+    8657620611,
+    122685508,
+    8086289225,
+    9904958903,
+    122685489
+   ],
+   "tags": {
+    "highway": "residential",
+    "name": "Strongs Drive",
+    "tiger:cfcc": "A41",
+    "tiger:county": "Los Angeles, CA",
+    "tiger:name_base": "Strongs",
+    "tiger:name_type": "Dr"
+   }
+  }
+ ]
+}
