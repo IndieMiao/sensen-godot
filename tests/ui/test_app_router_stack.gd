@@ -35,6 +35,18 @@ func test_back_pops_when_stack_not_empty() -> void:
 	assert_bool(is_instance_valid(a)).is_false()
 	assert_int(AppRouter.instance_depth()).is_equal(0)
 
+func test_back_respects_top_instance_lock() -> void:
+	var a := AppRouter.push_instance(PROBE)
+	a.back_locked = true
+	AppRouter.handle_back()
+	await get_tree().process_frame
+	assert_bool(is_instance_valid(a)).is_true() # 锁住时不得弹栈
+	assert_int(AppRouter.instance_depth()).is_equal(1)
+	a.back_locked = false
+	AppRouter.handle_back()
+	await get_tree().process_frame
+	assert_int(AppRouter.instance_depth()).is_equal(0)
+
 func test_back_action_table_includes_city_select() -> void:
 	assert_int(AppRouter.back_action_for_scene(AppRouter.CITY_SELECT)).is_equal(AppRouter.BACK_LEAVE_APP)
 	assert_str(AppRouter.qa_scene_path(PackedStringArray(["--qa-scene=city"]))).is_equal(AppRouter.CITY_SELECT)

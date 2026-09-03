@@ -79,6 +79,10 @@ func _resume(node: Node) -> void:
 
 func handle_back() -> void:
 	if not _stack.is_empty():
+		# 栈顶也要尊重返回锁：换装房保存中（_committing）被系统返回键弹栈会中断保存。
+		# 与下方 current_scene 分支同一语义（2026-09-04 执行时补上，原计划漏了这一层）。
+		if scene_locks_back_navigation(top_instance()):
+			return
 		pop_instance()
 		return
 	var current := get_tree().current_scene

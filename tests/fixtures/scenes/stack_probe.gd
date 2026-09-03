@@ -3,9 +3,13 @@ extends Node
 var args := {}
 var suspended := 0
 var resumed := 0
+var back_locked := false
 
 func setup(p_args: Dictionary) -> void:
 	args = p_args
+
+func is_back_navigation_locked() -> bool:
+	return back_locked
 
 func suspend() -> void:
 	suspended += 1
