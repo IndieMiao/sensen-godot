@@ -139,6 +139,9 @@ var street_mode := false
 var region: Dictionary = {}
 ## 平移边界（lat/lng）：position=(lat_min,lng_min)，size=(lat span,lng span)；零 size 不钳。
 var pan_bounds := Rect2()
+var candidate_overlay: CandidateOverlay = null
+var select_panel: SelectPanel = null
+var _candidate_bps: Dictionary = {} # layout_patch_id -> FarmBlueprint
 
 func _ready() -> void:
 	_load_bar_started_ms = Time.get_ticks_msec()
@@ -204,6 +207,7 @@ func _ready() -> void:
 		func(): _resolve_home(START_LAT, START_LNG, true))
 	if street_mode:
 		_resolve_home(float(region.center[0]), float(region.center[1]), false)
+		load_candidates(region)
 	_camera_dirty = true
 
 ## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）
@@ -366,6 +370,8 @@ func _reposition_pawns() -> void:
 	for p in _pawns:
 		(p.node as Node3D).position = MapGeoMath.geo_to_world(
 			p.lat, p.lng, anchor_lat, anchor_lng)
+	if candidate_overlay:
+		candidate_overlay.reanchor(anchor_lat, anchor_lng)
 
 ## 相机射线与地面平面（y=0）的交点。近地平线的甩飞防护不在这里做——
 ## 在拖拽处对单次 delta 限幅（limit_length(d)），比丢弃命中点的手感更接近原生地图。
@@ -524,6 +530,7 @@ func enter_street_mode(r: Dictionary) -> void:
 			marker_layer.visible = false
 		if not _home_resolved:
 			_resolve_home(float(r.center[0]), float(r.center[1]), false)
+		load_candidates(r)
 	_camera_dirty = true
 
 func set_pan_bounds(center_lat: float, center_lng: float, half_m: float) -> void:
@@ -531,6 +538,51 @@ func set_pan_bounds(center_lat: float, center_lng: float, half_m: float) -> void
 	var dlng := half_m / (MapGeoMath.M_PER_DEG_LAT * cos(deg_to_rad(center_lat)))
 	pan_bounds = Rect2(center_lat - dlat, center_lng - dlng, 2.0 * dlat, 2.0 * dlng)
 	_clamp_to_bounds()
+
+## —— 候选流（PRD §4.3）——————————————————————————————————————————
+
+func load_candidates(r: Dictionary) -> void:
+	if candidate_overlay:
+		return
+	_candidate_bps.clear()
+	var items: Array = []
+	for c in r.get("candidates", []):
+		var id := str(c.layout_patch_id)
+		var bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(id, int(c.get("revision", 1))))
+		if bp == null:
+			continue
+		_candidate_bps[id] = bp
+		var preview_path := "res://assets/blueprints/%s/r%d/preview.png" % [id, int(c.get("revision", 1))]
+		items.append({"id": id, "name": str(c.get("name", id)),
+			"preview": load(preview_path) if ResourceLoader.exists(preview_path) else null})
+	candidate_overlay = CandidateOverlay.new()
+	candidate_overlay.name = "Candidates"
+	add_child(candidate_overlay)
+	candidate_overlay.set_candidates(_candidate_bps.values(), anchor_lat, anchor_lng)
+	select_panel = SelectPanel.new()
+	$HUD/SafeArea/Root.add_child(select_panel)
+	select_panel.set_candidates(items)
+	select_panel.candidate_focused.connect(focus_candidate)
+	select_panel.confirmed.connect(_on_candidate_confirmed)
+	if not items.is_empty():
+		focus_candidate(items[0].id)
+
+func focus_candidate(id: String) -> void:
+	if not _candidate_bps.has(id):
+		return
+	var center: Vector2 = _candidate_bps[id].overlay.center
+	fly_to(center.x, center.y)
+	set_pan_bounds(center.x, center.y, 300.0)
+	candidate_overlay.select(id)
+	if select_panel.focused_id != id:
+		select_panel.focus(id)
+
+func _save_choice(id: String) -> void:
+	FarmChoice.save(id, _candidate_bps[id].revision)
+
+func _on_candidate_confirmed(id: String) -> void:
+	_save_choice(id)
+	AppRouter.push_instance(AppRouter.FARM, {"layout_patch_id": id, "revision": _candidate_bps[id].revision})
 
 func _clamp_to_bounds() -> void:
 	if pan_bounds.size == Vector2.ZERO:
