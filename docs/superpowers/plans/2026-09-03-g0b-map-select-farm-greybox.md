@@ -1120,7 +1120,7 @@ git commit -m "feat(map): 街区级受限模式、平移边界、fly_to 与场�
 - Create: `tests/map/test_candidate_overlay.gd`
 
 **Interfaces:**
-- Produces: `class_name CandidateOverlay extends Node3D`：`const Y_LIFT := 0.3`、`const ALPHA_IDLE := 0.16`、`const ALPHA_SELECTED := 0.42`、`const PATH_WIDTH_M := 4.0`；`set_candidates(bps: Array, anchor_lat, anchor_lng)`；`select(id: String)`；`selected_id: String`；`reanchor(anchor_lat, anchor_lng)`；`candidate_ids() -> PackedStringArray`；`candidate_center(id) -> Vector2(lat, lng)`；`static to_local(lat, lng, anchor_lat, anchor_lng) -> Vector2(x, z)`；`static block_mesh(pts: PackedVector2Array) -> ArrayMesh`；`static path_mesh(pts: PackedVector2Array, width: float) -> ArrayMesh`。
+- Produces: `class_name CandidateOverlay extends Node3D`：`const Y_LIFT := 0.3`、`const ALPHA_IDLE := 0.16`、`const ALPHA_SELECTED := 0.42`、`const PATH_WIDTH_M := 4.0`；`set_candidates(bps: Array, anchor_lat, anchor_lng)`；`select(id: String)`；`selected_id: String`；`reanchor(anchor_lat, anchor_lng)`；`candidate_ids() -> PackedStringArray`；`candidate_center(id) -> Vector2(lat, lng)`；`static geo_geo_to_local(lat, lng, anchor_lat, anchor_lng) -> Vector2(x, z)`（**不能叫 `to_local`**：与 `Node3D` 内置的 `geo_to_local(Vector3) -> Vector3` 冲突，是硬解析错误，2026-09-04 执行时发现并改名，与 `MapGeoMath.geo_to_world` 命名一致）；`static block_mesh(pts: PackedVector2Array) -> ArrayMesh`；`static path_mesh(pts: PackedVector2Array, width: float) -> ArrayMesh`。
 
 - [ ] **Step 1: 写失败测试**
 
@@ -1132,8 +1132,8 @@ extends GdUnitTestSuite
 const FIX := "res://tests/fixtures/blueprints/fix_grid/r1/farm_blueprint.json"
 
 func test_to_local_center_is_origin() -> void:
-	assert_that(CandidateOverlay.to_local(31.2, 121.4, 31.2, 121.4)).is_equal(Vector2.ZERO)
-	var east := CandidateOverlay.to_local(31.2, 121.401, 31.2, 121.4)
+	assert_that(CandidateOverlay.geo_to_local(31.2, 121.4, 31.2, 121.4)).is_equal(Vector2.ZERO)
+	var east := CandidateOverlay.geo_to_local(31.2, 121.401, 31.2, 121.4)
 	assert_bool(east.x > 0.0 and absf(east.y) < 1e-6).is_true()
 
 func test_meshes_from_fixture() -> void:
@@ -1188,7 +1188,7 @@ var _items: Dictionary = {} # id -> {node, mats: Array[StandardMaterial3D], cent
 var _anchor_lat := 0.0
 var _anchor_lng := 0.0
 
-static func to_local(lat: float, lng: float, anchor_lat: float, anchor_lng: float) -> Vector2:
+static func geo_to_local(lat: float, lng: float, anchor_lat: float, anchor_lng: float) -> Vector2:
 	var w := MapGeoMath.geo_to_world(lat, lng, anchor_lat, anchor_lng)
 	return Vector2(w.x, w.z)
 
@@ -1238,14 +1238,14 @@ func set_candidates(bps: Array, anchor_lat: float, anchor_lng: float) -> void:
 		for pg in bp.overlay.blocks:
 			var local := PackedVector2Array()
 			for ll in pg:
-				local.append(to_local(ll.x, ll.y, center.x, center.y))
+				local.append(geo_to_local(ll.x, ll.y, center.x, center.y))
 			if local.size() > 1 and local[0].is_equal_approx(local[local.size() - 1]):
 				local.remove_at(local.size() - 1)
 			mats.append(_add_mesh(node, block_mesh(local), ALPHA_IDLE))
 		for pl in bp.overlay.paths:
 			var local := PackedVector2Array()
 			for ll in pl:
-				local.append(to_local(ll.x, ll.y, center.x, center.y))
+				local.append(geo_to_local(ll.x, ll.y, center.x, center.y))
 			mats.append(_add_mesh(node, path_mesh(local, PATH_WIDTH_M), ALPHA_IDLE))
 		_items[bp.layout_patch_id] = {"node": node, "mats": mats, "center": center}
 	reanchor(anchor_lat, anchor_lng)
@@ -1269,7 +1269,7 @@ func reanchor(anchor_lat: float, anchor_lng: float) -> void:
 	_anchor_lng = anchor_lng
 	for key in _items:
 		var c: Vector2 = _items[key].center
-		var l := to_local(c.x, c.y, anchor_lat, anchor_lng)
+		var l := geo_to_local(c.x, c.y, anchor_lat, anchor_lng)
 		(_items[key].node as Node3D).position = Vector3(l.x, 0.0, l.y)
 
 func candidate_ids() -> PackedStringArray:
