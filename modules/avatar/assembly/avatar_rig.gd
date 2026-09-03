@@ -4,6 +4,7 @@ extends Node3D
 signal config_applied(config: AvatarConfig)
 signal slot_applied(slot: StringName, part_id: String)
 signal part_load_failed(slot: StringName, part_id: String, err: int)
+signal busy_changed(busy: bool)
 
 @export var slot_table: AvatarSlotTable
 var skeleton: Skeleton3D
@@ -17,6 +18,7 @@ var _req_slot: Dictionary = {}     # request_id -> slot
 var _loaded_defs: Dictionary = {}  # slot -> AvatarPartDef（当前已装）
 var _pending_defs: Dictionary = {} # slot -> AvatarPartDef|null（到货待应用）
 var _initial_loading := false
+var _last_busy := false
 
 func _ready() -> void:
 	if skeleton == null:
@@ -34,10 +36,12 @@ func apply_config(config: AvatarConfig) -> void:
 	for slot in slot_table.slot_names():
 		_set_desired(slot, String(config.slots.get(slot, "")))
 	_try_apply()
+	_sync_busy_state()
 
 func equip(slot: StringName, part_id: String) -> void:
 	_set_desired(slot, part_id)
 	_try_apply()
+	_sync_busy_state()
 
 func unequip(slot: StringName) -> void:
 	var sdef := slot_table.slot(slot)
@@ -50,6 +54,23 @@ func current_config() -> AvatarConfig:
 	var cfg := AvatarConfig.new()
 	for slot in slot_table.slot_names():
 		cfg.slots[slot] = String(_current.get(slot, ""))
+	return cfg
+
+## 装配状态以目标请求为准。保存方必须等它变为 false，才能持久化 current_config()。
+func is_busy() -> bool:
+	return _initial_loading or not _slot_request.is_empty() or not _pending_defs.is_empty()
+
+func is_slot_busy(slot: StringName) -> bool:
+	return _slot_request.has(slot) or _pending_defs.has(slot)
+
+## UI 用目标态即时标记用户刚点的选项，不必等异步资源到货后才改变选中态。
+func desired_part(slot: StringName) -> String:
+	return String(_desired.get(slot, _current.get(slot, "")))
+
+func desired_config() -> AvatarConfig:
+	var cfg := AvatarConfig.new()
+	for slot in slot_table.slot_names():
+		cfg.slots[slot] = desired_part(slot)
 	return cfg
 
 func _set_desired(slot: StringName, part_id: String) -> void:
@@ -79,9 +100,11 @@ func _on_load_finished(request_id: int, part_id: String, resource: Resource) -> 
 	var def := resource as AvatarPartDef
 	if def == null:
 		_handle_slot_failure(slot, part_id, ERR_INVALID_DATA)
+		_sync_busy_state()
 		return
 	_pending_defs[slot] = def
 	_try_apply()
+	_sync_busy_state()
 
 func _on_load_failed(request_id: int, part_id: String, err: int) -> void:
 	var slot = _req_slot.get(request_id)
@@ -90,6 +113,7 @@ func _on_load_failed(request_id: int, part_id: String, err: int) -> void:
 	_req_slot.erase(request_id)
 	_slot_request.erase(slot)
 	_handle_slot_failure(slot, part_id, err)
+	_sync_busy_state()
 
 func _handle_slot_failure(slot: StringName, part_id: String, err: int) -> void:
 	part_load_failed.emit(slot, part_id, err)
@@ -124,6 +148,13 @@ func _try_apply() -> void:
 		_initial_loading = false
 		visible = true
 		config_applied.emit(current_config())
+
+func _sync_busy_state() -> void:
+	var busy := is_busy()
+	if busy == _last_busy:
+		return
+	_last_busy = busy
+	busy_changed.emit(busy)
 
 func _find_skeleton(node: Node) -> Skeleton3D:
 	if node is Skeleton3D:

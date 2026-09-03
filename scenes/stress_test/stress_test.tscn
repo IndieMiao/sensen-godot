@@ -6,14 +6,17 @@
 
 [sub_resource type="Environment" id="Environment_stress"]
 background_mode = 1
-background_color = Color(0.164706, 0.164706, 0.188235, 1)
-ambient_light_energy = 0.6
+background_color = Color(0.929412, 0.952941, 0.941176, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.870588, 0.901961, 0.890196, 1)
+ambient_light_energy = 0.72
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
 size = Vector2(40, 40)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
-albedo_color = Color(0.5, 0.5, 0.5, 1)
+albedo_color = Color(0.65098, 0.701961, 0.682353, 1)
+roughness = 0.88
 
 [node name="StressTest" type="Node3D"]
 script = ExtResource("1_stress")
@@ -25,6 +28,9 @@ rotation_degrees = Vector3(-21.8, 0, 0)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 rotation_degrees = Vector3(-45, 30, 0)
+light_color = Color(0.94902, 1, 0.980392, 1)
+light_energy = 1.1
+shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_stress")
@@ -54,16 +60,40 @@ theme_type_variation = &"ChipPanel"
 
 [node name="CardVBox" type="VBoxContainer" parent="HUD/SafeArea/VBox/Card"]
 layout_mode = 2
-theme_override_constants/separation = 4
+
+[node name="HeaderRow" type="HBoxContainer" parent="HUD/SafeArea/VBox/Card/CardVBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="HUD/SafeArea/VBox/Card/CardVBox/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Performance Monitor"
+
+[node name="Badge" type="Label" parent="HUD/SafeArea/VBox/Card/CardVBox/HeaderRow"]
+layout_mode = 2
+text = "INTERNAL"
+vertical_alignment = 1
 
 [node name="StatsLabel" type="Label" parent="HUD/SafeArea/VBox/Card/CardVBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.15, 0.165, 0.19, 1)
-theme_override_font_sizes/font_size = 13
-text = "角色: 0  策略: merged
-FPS: 0  帧时: 0.00ms
-DrawCalls: 0
-显存: 0.0MB"
+custom_minimum_size = Vector2(0, 66)
+text = "Characters 0  ·  Merged Assembly
+FPS 0  ·  Frame 0.00 ms
+Draw Calls 0  ·  VRAM 0.0 MB"
+
+[node name="LoadRow" type="HBoxContainer" parent="HUD/SafeArea/VBox/Card/CardVBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="LoadLabel" type="Label" parent="HUD/SafeArea/VBox/Card/CardVBox/LoadRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Characters"
+
+[node name="CountValue" type="Label" parent="HUD/SafeArea/VBox/Card/CardVBox/LoadRow"]
+layout_mode = 2
+text = "10"
 
 [node name="CountSlider" type="HSlider" parent="HUD/SafeArea/VBox/Card/CardVBox"]
 custom_minimum_size = Vector2(0, 48)
@@ -76,19 +106,16 @@ value = 10.0
 
 [node name="Row" type="HBoxContainer" parent="HUD/SafeArea/VBox"]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="StrategyButton" type="Button" parent="HUD/SafeArea/VBox/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "策略: merged"
-
-[node name="SceneButton" type="Button" parent="HUD/SafeArea/VBox/Row"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "换装房间"
+theme_type_variation = &"SecondaryButton"
+text = "Assembly: Merged"
 
 [node name="MapButton" type="Button" parent="HUD/SafeArea/VBox/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "去地图"
-
+theme_type_variation = &"AccentButton"
+text = "Back to Map"

@@ -28,8 +28,10 @@ const CHAR_DIST_PER_SCALE := 16.7
 
 const PAWNS_NEAR_COUNT := 12 # 初始地图中心（上海）周边随机角色数
 const PAWNS_LA_COUNT := 10 # 洛杉矶随机角色数
+const INITIAL_ROLE_COUNT := 1 + PAWNS_NEAR_COUNT + PAWNS_LA_COUNT
+const LOAD_BAR_MIN_VISIBLE_MS := 1800
 const NEAR_SPREAD_M := 900.0 # 上海散布半径（米）
-const LA_SPREAD_M := 3000.0
+const LA_SPREAD_M := 900.0 # 跨城首屏也应立即看到角色，而不是只有数量没有内容
 const CULL_FACTOR := 4.0 # 距地图中心 > 4×相机距离 → 隐藏
 const REANCHOR_DIST_M := 3000.0 # 浮动原点重锚阈值
 ## 等首个定位的上限；超时就用 START_LAT/LNG 当 home，演示内容照常可见。
@@ -48,18 +50,30 @@ const DOUBLE_TAP_MAX_PX := 32.0
 
 @onready var rigs: Node3D = $Rigs
 @onready var cam: Camera3D = $Camera3D
-@onready var chip: PanelContainer = $HUD/SafeArea/Root/Chip
-@onready var chip_dot: Panel = $HUD/SafeArea/Root/Chip/VBox/TitleRow/Dot
-@onready var chip_title: Label = $HUD/SafeArea/Root/Chip/VBox/TitleRow/Title
-@onready var chip_sub: Label = $HUD/SafeArea/Root/Chip/VBox/Sub
-@onready var chip_debug: Label = $HUD/SafeArea/Root/Chip/VBox/Debug
-@onready var tilt_btn: Button = $HUD/SafeArea/Root/Stack/Tilt
-@onready var fly_btn: Button = $HUD/SafeArea/Root/Bottom/Fly
-@onready var load_bar: ProgressBar = $HUD/SafeArea/Root/Chip/VBox/LoadBar
+@onready var safe_area: SafeAreaMargin = $HUD/SafeArea
+@onready var top_panel: PanelContainer = $HUD/SafeArea/Root/TopPanel
+@onready var status_dot: Panel = $HUD/SafeArea/Root/TopPanel/VBox/StatusRow/Dot
+@onready var region_title: Label = $HUD/SafeArea/Root/TopPanel/VBox/TitleRow/RegionTitle
+@onready var nearby_count: Label = $HUD/SafeArea/Root/TopPanel/VBox/TitleRow/NearbyCount
+@onready var location_status: Label = $HUD/SafeArea/Root/TopPanel/VBox/StatusRow/LocationStatus
+@onready var load_bar: ProgressBar = $HUD/SafeArea/Root/TopPanel/VBox/LoadSlot/LoadBar
+@onready var side_toolbar: PanelContainer = $HUD/SafeArea/Root/SideToolbar
+@onready var view_mode_switch: Button = $HUD/SafeArea/Root/SideToolbar/VBox/ViewGroup/ViewModeSwitch
+@onready var view_mode_label: Label = $HUD/SafeArea/Root/SideToolbar/VBox/ViewGroup/ViewLabel
+@onready var travel_btn: Button = $HUD/SafeArea/Root/SideToolbar/VBox/TravelGroup/Travel
+@onready var travel_label: Label = $HUD/SafeArea/Root/SideToolbar/VBox/TravelGroup/TravelLabel
+@onready var edit_avatar_btn: Button = $HUD/SafeArea/Root/SideToolbar/VBox/EditGroup/EditAvatar
 
-const DOT_WAIT := Color(0.62, 0.65, 0.68) # 连接中：灰
-const DOT_OK := Color(0.31, 0.72, 0.58) # 同步中：薄荷绿（角色短裤色系）
-const DOT_ERR := Color(0.9, 0.36, 0.34) # 出错：红
+const DOT_WAIT := DesignTokens.INK_MUTED
+const DOT_OK := DesignTokens.ACCENT_DEEP
+const DOT_ERR := DesignTokens.DANGER
+
+## 侧栏图标：白色描边 SVG，由主题的 icon_*_color 调制成墨色/主色。
+## 两个双态按钮各备一对，图标与文案一起换，状态不靠单一线索表达。
+const ICON_VIEW_3D := preload("res://assets/ui/icons/view_3d.svg")
+const ICON_VIEW_2D := preload("res://assets/ui/icons/view_2d.svg")
+const ICON_TRAVEL := preload("res://assets/ui/icons/travel.svg")
+const ICON_PIN := preload("res://assets/ui/icons/pin.svg")
 
 var map: MapBridge = null
 var anchor_lat := START_LAT # 浮动锚点（世界原点的地理坐标）
@@ -71,6 +85,9 @@ var center_lat := START_LAT
 var center_lng := START_LNG
 var center_world := Vector3.ZERO # 渲染派生量：中心的本地米制坐标（每次相机更新重算）
 var zoom := 16.0
+## 罗盘方向。2026-09-02 移除侧栏 Rotate 按钮后**没有任何入口会改它**，恒为 0（正北朝上）。
+## 但它仍是相机协议（spec §5.3）的一部分：要参与 Godot 相机推导，也要随 set_camera
+## 一起喂给 Mapbox，别因为"看起来是常量"就把它优化掉。要恢复旋转就加回一个 setter。
 var bearing := 0.0
 var pitch := 45.0
 var pixel_ratio := 1.0
@@ -86,9 +103,9 @@ var _pawns: Array[Dictionary] = []
 ## （缓存全命中时 call_deferred 保证同帧 23 次全量网格合并），每帧只放行 2 个。
 var _spawn_queue: Array[Dictionary] = []
 var _dot_tween: Tween = null
-## 错误态锁定芯片文案（缺 token 等），不再被周期刷新覆盖
-var _chip_locked := false
-## "我的位置"：定位成功则为真实位置，超时/无定位则回落 START_LAT/LNG。
+## 错误态锁定顶部状态文案（缺 token 等），不再被周期刷新覆盖。
+var _header_locked := false
+## home：定位成功则为真实位置，超时/无定位则回落 START_LAT/LNG。
 ## 自己、近处路人、全部 marker 都相对它摆放——绝不写死经纬度。
 var home_lat := START_LAT
 var home_lng := START_LNG
@@ -115,8 +132,11 @@ var _zoom_vel := 0.0
 ## "_touch_count <= 1" 门禁把 pan 速度灌进 _fling_vel，抬手甩出一段意外平移。
 ## 所以一旦升级成多指，本次手势剩余时间一律不再喂 pan 速度，直到所有手指离开。
 var _gesture_multi := false
+var _load_bar_started_ms := 0
+var _map_is_ready := false
 
 func _ready() -> void:
+	_load_bar_started_ms = Time.get_ticks_msec()
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
 	get_viewport().transparent_bg = true
 	$Sun.rotation_degrees = Vector3(-55, 30, 0)
@@ -129,11 +149,17 @@ func _ready() -> void:
 	marker_layer.name = "Markers"
 	marker_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	marker_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	marker_layer.z_index = -10
 	$HUD.add_child(marker_layer)
 	$HUD.move_child(marker_layer, 0)
+	_sync_marker_margins()
+	safe_area.margins_applied.connect(func(_m): call_deferred("_sync_marker_margins"))
 
 	# 窗口尺寸变化（旋屏/分屏/折叠屏）会改变两层的像素↔米换算基准，必须重推相机
-	get_viewport().size_changed.connect(func(): _camera_dirty = true)
+	get_viewport().size_changed.connect(func():
+		_camera_dirty = true
+		call_deferred("_sync_marker_margins"))
+	call_deferred("_sync_marker_margins")
 
 	map = _make_bridge()
 	if map:
@@ -143,19 +169,21 @@ func _ready() -> void:
 		pixel_ratio = map.get_pixel_ratio()
 		var token := _load_token()
 		if token.is_empty():
+			_map_is_ready = true
 			_set_dot(DOT_ERR, false)
-			chip_title.text = "缺少地图密钥"
-			chip_sub.text = "在工程根放置 mapbox_token.txt 后重新构建"
-			_chip_locked = true
+			region_title.text = "Map unavailable"
+			location_status.text = "Check your connection"
+			_header_locked = true
 		else:
 			map.create_map(token, START_LAT, START_LNG, zoom)
 			_set_dot(DOT_WAIT, true) # 连接中：呼吸闪烁
 		map.start_location()
 	else:
+		_map_is_ready = true
 		_set_dot(DOT_WAIT, false)
-		chip_title.text = "地图预览"
-		chip_sub.text = "桌面运行，无地图插件"
-		_chip_locked = true
+		region_title.text = "Map preview"
+		location_status.text = "Location unavailable"
+		_header_locked = true
 	# 定位兜底：拒绝授权 / 定位慢 / 桌面无插件，3 秒后一律回落上海默认点。
 	# 没有这条，_spawn_home_cohort 永远不会被调用，地图上只剩洛杉矶夹具。
 	get_tree().create_timer(HOME_TIMEOUT_S).timeout.connect(
@@ -190,23 +218,61 @@ func _process(_dt: float) -> void:
 		_update_cameras()
 	_update_load_bar()
 	if Engine.get_process_frames() % 30 == 0:
-		_refresh_chip()
+		_refresh_header()
 
-func _refresh_chip() -> void:
-	if _chip_locked:
+func _refresh_header() -> void:
+	nearby_count.text = _people_count_text(_visible_role_count())
+	if _header_locked:
 		return
-	chip_title.text = "洛杉矶" if _in_la else "我的位置"
-	chip_sub.text = "%.4f, %.4f  ·  z%.1f" % [center_lat, center_lng, zoom]
-	if chip_debug.visible:
-		var vis := 0
-		for p in _pawns:
-			if (p.node as Node3D).visible:
-				vis += 1
-		var info := map.camera_info() if map else ""
-		chip_debug.text = "同步 b%.0f° p%.0f°  ·  角色 %d/%d\n惯性 峰值%.0f 当前%.0f m/s（门槛%.1f）\n回读 %s" % [
-			bearing, pitch, vis, _pawns.size(),
-			_fling_peak, _fling_vel.length(), FLING_MIN_SPEED,
-			info if not info.is_empty() else "—"]
+	region_title.text = _region_title_text()
+	location_status.text = _location_status_text()
+
+func _people_count_text(count: int) -> String:
+	return "%d %s" % [count, "person" if count == 1 else "people"]
+
+func _region_title_text() -> String:
+	if _in_la:
+		return "Los Angeles"
+	if not _home_resolved:
+		return "Nearby"
+	return "Demo Area" if _home_from_fallback else "Near You"
+
+func _location_status_text() -> String:
+	if _in_la:
+		return "Exploring"
+	if is_instance_valid(load_bar) and load_bar.visible:
+		return "Loading map..."
+	if not _home_resolved:
+		return "Locating..."
+	return "Demo location" if _home_from_fallback else "Location ready"
+
+func _visible_role_count() -> int:
+	var visible := 0
+	for p in _pawns:
+		if p.cohort != "self" and p.ready and (p.node as Node3D).visible:
+			visible += 1
+	return visible
+
+func _system_safe_margins() -> Vector4:
+	return Vector4(
+		safe_area.get_theme_constant(&"margin_left"),
+		safe_area.get_theme_constant(&"margin_top"),
+		safe_area.get_theme_constant(&"margin_right"),
+		safe_area.get_theme_constant(&"margin_bottom"))
+
+func _sync_marker_margins() -> void:
+	if marker_layer == null or not is_instance_valid(marker_layer):
+		return
+	var margins := _system_safe_margins()
+	var top_height := maxf(top_panel.size.y, top_panel.get_combined_minimum_size().y)
+	var reserved_top := top_panel.position.y + top_height
+	var reserved_right := maxf(
+		side_toolbar.size.x, side_toolbar.get_combined_minimum_size().x)
+	marker_layer.set_safe_margins(Vector4(
+		margins.x,
+		margins.y + reserved_top + DesignTokens.SPACE_2,
+		margins.z + reserved_right + DesignTokens.SPACE_2,
+		margins.w + DesignTokens.SPACE_2))
 
 ## —— 相机同步核心 ————————————————————————————————————————————
 
@@ -390,30 +456,31 @@ func _unhandled_input(e: InputEvent) -> void:
 		_set_pitch(pitch - e.delta.y * 0.2)
 
 func _wire_buttons() -> void:
-	$HUD/SafeArea/Root/Stack/ZoomIn.pressed.connect(func(): _set_zoom(zoom + 1.0))
-	$HUD/SafeArea/Root/Stack/ZoomOut.pressed.connect(func(): _set_zoom(zoom - 1.0))
-	tilt_btn.pressed.connect(_on_tilt_pressed)
-	$HUD/SafeArea/Root/Stack/Rotate.pressed.connect(func(): _set_bearing(bearing + 30.0))
-	fly_btn.pressed.connect(_on_fly_pressed)
-	$HUD/SafeArea/Root/Bottom/Dress.pressed.connect(func():
-		get_tree().change_scene_to_file("res://scenes/dressing_room/dressing_room.tscn"))
-	# 点定位芯片展开/收起工程数据（触屏经 emulate_mouse 到达，只接鼠标事件防双触发）
-	chip.gui_input.connect(func(ev: InputEvent):
-		if ev is InputEventMouseButton and ev.pressed:
-			chip_debug.visible = not chip_debug.visible
-			_refresh_chip())
+	view_mode_switch.toggled.connect(_on_view_mode_toggled)
+	travel_btn.pressed.connect(_on_fly_pressed)
+	edit_avatar_btn.pressed.connect(func(): AppRouter.go_to_dressing())
+	_update_view_mode()
 
-## 倾角在 2D 俯视与 3D 斜视之间切换；按钮文案显示"将要切去的模式"
-func _on_tilt_pressed() -> void:
-	_set_pitch(45.0 if pitch < 10.0 else 0.0)
+func _on_view_mode_toggled(is_3d: bool) -> void:
+	_set_pitch(45.0 if is_3d else 0.0)
 
-func _update_tilt_label() -> void:
-	tilt_btn.text = "2D" if pitch >= 10.0 else "3D"
+func _update_view_mode() -> void:
+	if not is_instance_valid(view_mode_switch):
+		return
+	var is_3d := pitch >= 10.0
+	view_mode_switch.set_pressed_no_signal(is_3d)
+	view_mode_switch.icon = ICON_VIEW_3D if is_3d else ICON_VIEW_2D
+	view_mode_switch.tooltip_text = "Switch to 2D" if is_3d else "Switch to 3D"
+	# 文案在按钮外面（RailCaption），状态变化要连它一起更新
+	view_mode_label.text = "3D" if is_3d else "2D"
 
 func _on_fly_pressed() -> void:
 	_in_la = not _in_la
-	fly_btn.text = "回我的位置" if _in_la else "飞洛杉矶"
+	travel_btn.icon = ICON_PIN if _in_la else ICON_TRAVEL
+	travel_btn.tooltip_text = "Back Nearby" if _in_la else "Explore Los Angeles"
+	travel_label.text = "Nearby" if _in_la else "LA"
 	_teleport(LA_LAT, LA_LNG) if _in_la else _teleport(home_lat, home_lng)
+	_refresh_header()
 
 func _teleport(lat: float, lng: float) -> void:
 	anchor_lat = lat
@@ -430,16 +497,13 @@ func _set_zoom(v: float) -> void:
 
 func _set_pitch(v: float) -> void:
 	pitch = clampf(v, 0.0, 70.0)
-	_update_tilt_label()
-	_camera_dirty = true
-
-func _set_bearing(v: float) -> void:
-	bearing = fmod(v + 360.0, 360.0)
+	_update_view_mode()
 	_camera_dirty = true
 
 ## —— 初始化 ————————————————————————————————————————————————————
 
 func _on_map_ready() -> void:
+	_map_is_ready = true
 	_set_dot(DOT_OK, false) # 同步中：常亮薄荷绿
 	if map:
 		pixel_ratio = map.get_pixel_ratio() # iOS 桥的真实 scale 随 READY 到达
@@ -450,15 +514,15 @@ func _set_dot(color: Color, pulse: bool) -> void:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = color
 	sb.set_corner_radius_all(4)
-	chip_dot.add_theme_stylebox_override("panel", sb)
+	status_dot.add_theme_stylebox_override("panel", sb)
 	if _dot_tween:
 		_dot_tween.kill()
 		_dot_tween = null
-	chip_dot.modulate.a = 1.0
+	status_dot.modulate.a = 1.0
 	if pulse:
 		_dot_tween = create_tween().set_loops()
-		_dot_tween.tween_property(chip_dot, "modulate:a", 0.3, 0.7)
-		_dot_tween.tween_property(chip_dot, "modulate:a", 1.0, 0.7)
+		_dot_tween.tween_property(status_dot, "modulate:a", 0.3, 0.7)
+		_dot_tween.tween_property(status_dot, "modulate:a", 1.0, 0.7)
 
 func _load_token() -> String:
 	if not FileAccess.file_exists(TOKEN_PATH):
@@ -514,6 +578,8 @@ func _resolve_home(lat: float, lng: float, is_fallback: bool = false) -> void:
 	_spawn_home_cohort()
 	if marker_layer:
 		marker_layer.set_home(lat, lng)
+	if is_node_ready():
+		_refresh_header()
 
 ## 回落点 -> 真实定位的一次性纠正。home 队列（self/near）可能已经排队甚至
 ## 已经装配完成，重新生成会打乱随机布局、白白重付一次装配代价——所以是
@@ -540,6 +606,8 @@ func _correct_home(lat: float, lng: float) -> void:
 		_camera_dirty = true
 	if marker_layer:
 		marker_layer.set_home(lat, lng)
+	if is_node_ready():
+		_refresh_header()
 
 func _on_location_update(lat: float, lng: float, _accuracy: float) -> void:
 	_resolve_home(lat, lng)
@@ -577,15 +645,17 @@ func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String, cohort: 
 func _update_load_bar() -> void:
 	if not load_bar.visible:
 		return
-	var total := 1 + PAWNS_NEAR_COUNT + PAWNS_LA_COUNT
 	var ready := 0
 	for p in _pawns:
 		if p.ready:
 			ready += 1
-	load_bar.max_value = total
-	load_bar.value = ready
-	if ready >= total and _spawn_queue.is_empty():
+	load_bar.max_value = INITIAL_ROLE_COUNT + 1
+	load_bar.value = ready + (1 if _map_is_ready else 0)
+	var elapsed_ms := Time.get_ticks_msec() - _load_bar_started_ms
+	if _map_is_ready and ready >= INITIAL_ROLE_COUNT and _spawn_queue.is_empty() \
+			and elapsed_ms >= LOAD_BAR_MIN_VISIBLE_MS:
 		load_bar.visible = false
+		_refresh_header()
 
 func _rand_anim() -> String:
 	return "idle" if _rng.randf() > 0.4 else "walk"

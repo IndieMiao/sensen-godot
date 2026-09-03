@@ -1,65 +1,252 @@
 extends VBoxContainer
-## 槽位标签页 + 部件网格。数据只来自 slot_table 与 PartCatalog（元数据+缩略图）。
+## 只展示确实存在选择空间的槽位；资源 ID 仅作为内部值，不进入界面文案。
 
-const THUMB_SIZE := Vector2(72, 72)  # 基准单位≈dp；1080 宽屏实际 216px
-## 是否在部件按钮上显示缩略图。**当前为 false**：assets/avatar/thumbs/ 下 25 张
-## 缩略图是同一张 64×64 / 168 字节占位图（管线缺口，见 tools/pipeline/extract_parts.gd
-## 的 _write_thumb —— thumb_src 对所有部件都没解析到真实图），信息量为零；而主题给
-## Button 的 content_margin 是 16（48dp 触摸标准），包在 64px 图标外面会把每格最小宽
-## 顶到 96，4 列就撑破安全区（test_drawer_does_not_overflow_safe_area_on_four_part_slot）。
-## 管线能产出真实缩略图之后，把这里改 true 即可；届时需要同步放宽格子尺寸并重跑那条布局回归。
-const SHOW_THUMBNAILS := false
+signal selection_failed(message: String)
+signal selection_started
+## 仅在用户主动点分类标签时发出。setup() 的首次 _show_slot 与测试/预览的直接调用
+## 都不发——否则一进房相机就推到头部，而进场应当先看到完整角色。
+signal slot_changed(slot: StringName)
+
+const TOUCH_HEIGHT := 48.0
+
+## 缩略图格子的实测最小高度。
+##
+## 注意这不是"52 图 + 文案 + 内边距"那样算出来的：Button 的最小尺寸参考的是
+## **纹理原始尺寸**（PartThumbnailer.RENDER_SIZE = 160），主题的 icon_max_width 只
+## 约束绘制宽度、不参与最小尺寸计算。所以这个数字是量出来的，不是推出来的。
+## 改 RENDER_SIZE / 字号 / icon_max_width 都会让它失准 ——
+## test_thumbnail_cell_height_matches_the_drawer_budget 会在失准时报红，
+## 提示重新量并同步调整抽屉高度。
+const THUMB_CELL_HEIGHT := 98.0
+## "无"选项没有部件可渲，用一个灰色禁止符占位，保证格子高度与其它项一致。
+const ICON_NONE := preload("res://assets/ui/icons/none.svg")
+
+const SLOT_LABELS := {
+	&"hairHat": "Hair",
+	&"cloth": "Outfits",
+	&"shoes": "Shoes",
+	&"messengerBag": "Bags",
+	&"glass": "Glasses",
+}
+
+const PART_LABELS := {
+	"hairhat0": "Silver Crop",
+	"hairhat20": "Playful Hood",
+	"hairhat41": "Chestnut Long",
+	"hairhat43": "Blonde Bob",
+	"hairhat51": "Straw Bucket",
+	"hairhat70": "Propeller Cap",
+	"cloth0": "Mint Casual",
+	"cloth1": "Cream Suit",
+	"cloth1_1": "Blue Stripe",
+	"cloth11": "Garden Apron",
+	"cloth28": "Navy Utility",
+	"cloth42": "Blue Dungarees",
+	"shoes0": "Gray Sneakers",
+	"shoes1": "Cream Loafers",
+	"shoes2": "Coral Sneakers",
+	# 两列格子在 360dp 下每格内宽约 132 单位；14 号字约 18 字符就顶满并被
+	# clip_text 截断（真机上会看到 "Black Teal Runne"）。新增文案请控制在 16 字符内。
+	"shoes3": "Black Runners",
+	"shoes4": "Graffiti Tops",
+	"shoes5": "Sand Boots",
+	"messengerbag1": "Coral Satchel",
+	"messengerbag2": "Basketball Sling",
+	"messengerbag3": "Explorer Kit",
+	"messengerbag4": "Playful Pack",
+	"glass0": "Classic Black",
+	"glass1": "Minimal Square",
+	"glass3": "Gold Rounds",
+	"glass5": "Lime Frames",
+	"glass8": "Sharp Shades",
+}
 
 var rig: AvatarRig
-var current_slot: StringName
+var thumbnailer: PartThumbnailer
+var current_slot: StringName = &""
+var _interaction_enabled := true
+var _tab_buttons: Dictionary = {}
+var _choice_buttons: Dictionary = {}
+## 每次 _show_slot 自增；异步补缩略图时用来判断"这批还是不是当前这批"，
+## 否则快速连点分类会把上一个分类的图贴到新按钮上。
+var _slot_generation := 0
 
 @onready var tabs: HBoxContainer = $TabsScroll/SlotTabs
 @onready var grid: GridContainer = $PartsScroll/PartsGrid
 
+
 func setup(p_rig: AvatarRig) -> void:
 	rig = p_rig
+	_clear(tabs)
+	_tab_buttons.clear()
 	for slot_def in Avatar.slot_table.slots:
-		if Avatar.catalog.parts_for_slot(slot_def.slot_name).is_empty():
+		var parts: Array = Avatar.catalog.parts_for_slot(slot_def.slot_name)
+		var choice_count := parts.size() + (0 if slot_def.required else 1)
+		if choice_count <= 1:
 			continue
-		var b := Button.new()
-		b.text = String(slot_def.slot_name)
-		# 触摸滚动关键：按钮默认 STOP 会把按压事件截断在自己身上，ScrollContainer
-		# 收不到就永远不会开始拖拽跟踪（scroll_container.cpp 按压起跟踪、越死区后
-		# 广播 NOTIFICATION_SCROLL_BEGIN 取消子按钮按压）。PASS 让事件继续冒泡：
-		# 短按=点击，划动=滚动，两者由全局滚动死区(24)仲裁。
-		b.mouse_filter = Control.MOUSE_FILTER_PASS
-		b.pressed.connect(_show_slot.bind(slot_def.slot_name))
-		tabs.add_child(b)
-	if tabs.get_child_count() > 0:
-		_show_slot(StringName(tabs.get_child(0).text))
+		var button := Button.new()
+		button.text = _slot_label(slot_def.slot_name)
+		button.custom_minimum_size.y = TOUCH_HEIGHT
+		button.focus_mode = Control.FOCUS_NONE
+		button.mouse_filter = Control.MOUSE_FILTER_PASS
+		button.theme_type_variation = &"TabButton"
+		button.pressed.connect(_show_slot.bind(slot_def.slot_name, true))
+		tabs.add_child(button)
+		_tab_buttons[slot_def.slot_name] = button
 
-func _show_slot(slot: StringName) -> void:
+	rig.slot_applied.connect(_on_slot_applied)
+	rig.part_load_failed.connect(_on_part_load_failed)
+	rig.busy_changed.connect(_on_busy_changed)
+	if not _tab_buttons.is_empty():
+		_show_slot(_tab_buttons.keys()[0])
+
+
+func set_interaction_enabled(enabled: bool) -> void:
+	_interaction_enabled = enabled
+	_refresh_state()
+
+
+func refresh() -> void:
+	_refresh_state()
+
+
+func visible_slot_names() -> Array[StringName]:
+	var result: Array[StringName] = []
+	for slot in _tab_buttons:
+		result.append(slot)
+	return result
+
+
+func _show_slot(slot: StringName, user_initiated := false) -> void:
+	if not _tab_buttons.has(slot):
+		return
 	current_slot = slot
-	for c in grid.get_children():
-		grid.remove_child(c)
-		c.queue_free()
+	if user_initiated:
+		slot_changed.emit(slot)
+	_clear(grid)
+	_choice_buttons.clear()
+	_slot_generation += 1
 	var slot_def := Avatar.slot_table.slot(slot)
 	if slot_def and not slot_def.required:
-		var none_btn := Button.new()
-		none_btn.text = "卸下"
-		none_btn.custom_minimum_size = THUMB_SIZE
-		none_btn.mouse_filter = Control.MOUSE_FILTER_PASS # 同 tabs：让列表可从按钮上起滑
-		none_btn.pressed.connect(func(): rig.unequip(slot))
-		grid.add_child(none_btn)
+		_add_choice("", _none_label(slot))
+	var index := 0
 	for meta in Avatar.catalog.parts_for_slot(slot):
-		var b := Button.new()
-		b.custom_minimum_size = THUMB_SIZE
-		b.mouse_filter = Control.MOUSE_FILTER_PASS # 同 tabs：让列表可从按钮上起滑
-		b.tooltip_text = meta.id
-		# id 文案是当前唯一有信息量的内容——缩略图全是同一张占位图（见 SHOW_THUMBNAILS）。
-		b.text = meta.id
-		b.clip_text = true # id 过长时省略号截断，不撑大格子
-		b.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
-		if SHOW_THUMBNAILS:
-			var tex: Texture2D = load(meta.thumb_path) if meta.thumb_path != "" and ResourceLoader.exists(meta.thumb_path) else null
-			if tex:
-				b.icon = tex
-				b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-				b.alignment = HORIZONTAL_ALIGNMENT_CENTER
-		b.pressed.connect(func(): rig.equip(current_slot, meta.id))
-		grid.add_child(b)
+		_add_choice(meta.id, _part_label(slot, meta.id, index))
+		index += 1
+	_refresh_state()
+	_fill_thumbnails(_slot_generation)
+
+
+func _add_choice(part_id: String, label: String) -> void:
+	var button := Button.new()
+	button.text = label
+	button.custom_minimum_size = Vector2(0.0, THUMB_CELL_HEIGHT)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.focus_mode = Control.FOCUS_NONE
+	# 短按由按钮处理，拖动继续冒泡给 ScrollContainer。
+	button.mouse_filter = Control.MOUSE_FILTER_PASS
+	button.clip_text = true
+	button.theme_type_variation = &"ThumbChoiceButton"
+	# 图在上、文案在下。图标先留空，由 _fill_thumbnails 渲好后回填；
+	# 渲染失败也不影响可用性——文案一直都在。
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+	if part_id.is_empty():
+		button.icon = ICON_NONE
+	button.set_meta(&"part_id", part_id)
+	button.pressed.connect(_select_part.bind(current_slot, part_id))
+	grid.add_child(button)
+	_choice_buttons[part_id] = button
+
+
+## 逐个渲缩略图并回填。串行是有意的：共用一个 SubViewport，而且一次只渲一个
+## 部件对帧时间的影响可控（首次进入某分类时图会在几帧内陆续出现）。
+func _fill_thumbnails(generation: int) -> void:
+	if thumbnailer == null:
+		return
+	for part_id in _choice_buttons.keys():
+		if part_id.is_empty():
+			continue
+		var texture: Texture2D = await thumbnailer.thumbnail(part_id)
+		# 期间用户可能已经切走：换了分类就丢弃这一批结果。
+		if generation != _slot_generation or not is_inside_tree():
+			return
+		var button := _choice_buttons.get(part_id) as Button
+		if texture != null and is_instance_valid(button):
+			button.icon = texture
+
+
+func _select_part(slot: StringName, part_id: String) -> void:
+	if not _interaction_enabled or rig == null:
+		return
+	selection_started.emit()
+	if part_id.is_empty():
+		rig.unequip(slot)
+	else:
+		rig.equip(slot, part_id)
+	_refresh_state()
+
+
+func _refresh_state() -> void:
+	for slot in _tab_buttons:
+		var tab := _tab_buttons[slot] as Button
+		tab.disabled = not _interaction_enabled
+		tab.theme_type_variation = &"TabSelectedButton" if slot == current_slot else &"TabButton"
+	if rig == null or current_slot == &"":
+		return
+	var selected := rig.desired_part(current_slot)
+	for part_id in _choice_buttons:
+		var choice := _choice_buttons[part_id] as Button
+		choice.disabled = not _interaction_enabled
+		choice.theme_type_variation = (&"ThumbChoiceSelectedButton" if part_id == selected
+			else &"ThumbChoiceButton")
+	# 原来这里还有一行 "Selected: X" 文案。它说的三件事各自都已经有更直接的表达：
+	# 选中项有薄荷描边、角色身上已经穿着、忙碌态 Done 按钮会显示 "Trying on..."。
+	# 删掉它省下的一整行页脚（48 单位）还给了部件列表。
+
+
+func _on_slot_applied(_slot: StringName, _part_id: String) -> void:
+	_refresh_state()
+
+
+func _on_busy_changed(_busy: bool) -> void:
+	_refresh_state()
+
+
+func _on_part_load_failed(slot: StringName, part_id: String, _err: int) -> void:
+	var label := _part_label(slot, part_id)
+	selection_failed.emit("Couldn't load %s. Previous look kept." % label)
+	# AvatarRig 在发出失败信号后才回退 desired，延迟刷新才能读到最终目标态。
+	call_deferred("_refresh_state")
+
+
+func _slot_label(slot: StringName) -> String:
+	return String(SLOT_LABELS.get(slot, "Other"))
+
+
+func _part_label(slot: StringName, part_id: String, fallback_index := -1) -> String:
+	if PART_LABELS.has(part_id):
+		return String(PART_LABELS[part_id])
+	if fallback_index < 0:
+		var parts: Array = Avatar.catalog.parts_for_slot(slot)
+		for i in parts.size():
+			if parts[i].id == part_id:
+				fallback_index = i
+				break
+	return "%s Style %d" % [_slot_label(slot), maxi(fallback_index + 1, 1)]
+
+
+func _none_label(slot: StringName) -> String:
+	match slot:
+		&"glass":
+			return "No Glasses"
+		&"messengerBag":
+			return "No Bag"
+		_:
+			return "None"
+
+
+func _clear(container: Node) -> void:
+	for child in container.get_children():
+		container.remove_child(child)
+		child.queue_free()

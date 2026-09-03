@@ -1,17 +1,41 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scenes/map_poc/map_poc.gd" id="1_mp"]
 [ext_resource type="Script" path="res://modules/ui/safe_area_margin.gd" id="2_sa"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/view_3d.svg" id="3_ico_view"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/travel.svg" id="4_ico_travel"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/avatar.svg" id="5_ico_avatar"]
+
+[sub_resource type="StyleBoxFlat" id="SB_compact_panel"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.85098, 0.882353, 0.870588, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0.06, 0.09, 0.08, 0.12)
+shadow_size = 5
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxEmpty" id="SB_rail"]
 
 [sub_resource type="StyleBoxFlat" id="SB_load_bg"]
-bg_color = Color(0.882, 0.902, 0.914, 1)
+bg_color = Color(0.85098, 0.882353, 0.870588, 0.8)
 corner_radius_top_left = 2
 corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="SB_load_fill"]
-bg_color = Color(0.203922, 0.827451, 0.6, 1)
+bg_color = Color(0.184314, 0.811765, 0.623529, 1)
 corner_radius_top_left = 2
 corner_radius_top_right = 2
 corner_radius_bottom_right = 2
@@ -52,120 +76,148 @@ script = ExtResource("2_sa")
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Chip" type="PanelContainer" parent="HUD/SafeArea/Root"]
+[node name="TopPanel" type="PanelContainer" parent="HUD/SafeArea/Root"]
+custom_minimum_size = Vector2(208, 60)
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-grow_horizontal = 2
+offset_left = 4.0
 offset_top = 4.0
-theme_type_variation = &"ChipPanel"
+grow_horizontal = 1
+grow_vertical = 1
+theme_override_styles/panel = SubResource("SB_compact_panel")
 
-[node name="VBox" type="VBoxContainer" parent="HUD/SafeArea/Root/Chip"]
+[node name="VBox" type="VBoxContainer" parent="HUD/SafeArea/Root/TopPanel"]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="TitleRow" type="HBoxContainer" parent="HUD/SafeArea/Root/Chip/VBox"]
+[node name="TitleRow" type="HBoxContainer" parent="HUD/SafeArea/Root/TopPanel/VBox"]
 layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
-[node name="Dot" type="Panel" parent="HUD/SafeArea/Root/Chip/VBox/TitleRow"]
-custom_minimum_size = Vector2(8, 8)
+[node name="RegionTitle" type="Label" parent="HUD/SafeArea/Root/TopPanel/VBox/TitleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 17
+text = "Nearby"
+
+[node name="NearbyCount" type="Label" parent="HUD/SafeArea/Root/TopPanel/VBox/TitleRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.372549, 0.435294, 0.415686, 1)
+theme_override_font_sizes/font_size = 12
+text = "0 people"
+
+[node name="StatusRow" type="HBoxContainer" parent="HUD/SafeArea/Root/TopPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Dot" type="Panel" parent="HUD/SafeArea/Root/TopPanel/VBox/StatusRow"]
+custom_minimum_size = Vector2(6, 6)
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="Title" type="Label" parent="HUD/SafeArea/Root/Chip/VBox/TitleRow"]
+[node name="LocationStatus" type="Label" parent="HUD/SafeArea/Root/TopPanel/VBox/StatusRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.070588, 0.188235, 0.156863, 1)
-theme_override_font_sizes/font_size = 14
-text = "上海"
+theme_override_colors/font_color = Color(0.372549, 0.435294, 0.415686, 1)
+theme_override_font_sizes/font_size = 12
+text = "Loading map..."
 
-[node name="Sub" type="Label" parent="HUD/SafeArea/Root/Chip/VBox"]
-layout_mode = 2
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.490196, 0.564706, 0.537255, 1)
-theme_override_font_sizes/font_size = 11
-text = "31.2304, 121.4737 · z16.0"
-
-[node name="Debug" type="Label" parent="HUD/SafeArea/Root/Chip/VBox"]
-visible = false
-layout_mode = 2
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.490196, 0.564706, 0.537255, 1)
-theme_override_font_sizes/font_size = 9
-text = ""
-
-[node name="LoadBar" type="ProgressBar" parent="HUD/SafeArea/Root/Chip/VBox"]
+[node name="LoadSlot" type="Control" parent="HUD/SafeArea/Root/TopPanel/VBox"]
 custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
-theme_override_styles/background = SubResource("SB_load_bg")
-theme_override_styles/fill = SubResource("SB_load_fill")
-max_value = 23.0
-show_percentage = false
+mouse_filter = 2
 
-[node name="Stack" type="VBoxContainer" parent="HUD/SafeArea/Root"]
+[node name="LoadBar" type="ProgressBar" parent="HUD/SafeArea/Root/TopPanel/VBox/LoadSlot"]
 layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
+anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 0.5
-grow_horizontal = 0
-grow_vertical = 2
-theme_override_constants/separation = 10
-
-[node name="ZoomIn" type="Button" parent="HUD/SafeArea/Root/Stack"]
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-focus_mode = 0
-theme_type_variation = &"RoundButton"
-theme_override_font_sizes/font_size = 18
-text = "＋"
-
-[node name="ZoomOut" type="Button" parent="HUD/SafeArea/Root/Stack"]
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-focus_mode = 0
-theme_type_variation = &"RoundButton"
-theme_override_font_sizes/font_size = 18
-text = "－"
-
-[node name="Tilt" type="Button" parent="HUD/SafeArea/Root/Stack"]
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-focus_mode = 0
-theme_type_variation = &"RoundButton"
-theme_override_font_sizes/font_size = 13
-text = "2D"
-
-[node name="Rotate" type="Button" parent="HUD/SafeArea/Root/Stack"]
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-focus_mode = 0
-theme_type_variation = &"RoundButton"
-theme_override_font_sizes/font_size = 12
-text = "旋转"
-
-[node name="Bottom" type="HBoxContainer" parent="HUD/SafeArea/Root"]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
 anchor_bottom = 1.0
 grow_horizontal = 2
-grow_vertical = 0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("SB_load_bg")
+theme_override_styles/fill = SubResource("SB_load_fill")
+max_value = 24.0
+show_percentage = false
+
+[node name="SideToolbar" type="PanelContainer" parent="HUD/SafeArea/Root"]
+custom_minimum_size = Vector2(56, 0)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_top = 4.0
+offset_right = -4.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("SB_rail")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/SafeArea/Root/SideToolbar"]
+layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Fly" type="Button" parent="HUD/SafeArea/Root/Bottom"]
+[node name="EditGroup" type="VBoxContainer" parent="HUD/SafeArea/Root/SideToolbar/VBox"]
 layout_mode = 2
-focus_mode = 0
-theme_type_variation = &"PillButton"
-text = "飞洛杉矶"
+mouse_filter = 2
+theme_override_constants/separation = 2
 
-[node name="Dress" type="Button" parent="HUD/SafeArea/Root/Bottom"]
+[node name="EditAvatar" type="Button" parent="HUD/SafeArea/Root/SideToolbar/VBox/EditGroup"]
+custom_minimum_size = Vector2(52, 52)
 layout_mode = 2
+size_flags_horizontal = 4
 focus_mode = 0
-theme_type_variation = &"AccentPillButton"
-text = "去换装"
+theme_type_variation = &"RailButton"
+icon_alignment = 1
+icon = ExtResource("5_ico_avatar")
+tooltip_text = "Edit Avatar"
+
+[node name="EditLabel" type="Label" parent="HUD/SafeArea/Root/SideToolbar/VBox/EditGroup"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"RailCaption"
+text = "Edit"
+horizontal_alignment = 1
+
+[node name="ViewGroup" type="VBoxContainer" parent="HUD/SafeArea/Root/SideToolbar/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="ViewModeSwitch" type="Button" parent="HUD/SafeArea/Root/SideToolbar/VBox/ViewGroup"]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_type_variation = &"RailButton"
+toggle_mode = true
+button_pressed = true
+icon_alignment = 1
+icon = ExtResource("3_ico_view")
+tooltip_text = "Switch to 2D"
+
+[node name="ViewLabel" type="Label" parent="HUD/SafeArea/Root/SideToolbar/VBox/ViewGroup"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"RailCaption"
+text = "3D"
+horizontal_alignment = 1
+
+[node name="TravelGroup" type="VBoxContainer" parent="HUD/SafeArea/Root/SideToolbar/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Travel" type="Button" parent="HUD/SafeArea/Root/SideToolbar/VBox/TravelGroup"]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_type_variation = &"RailButton"
+icon_alignment = 1
+icon = ExtResource("4_ico_travel")
+tooltip_text = "Explore Los Angeles"
+
+[node name="TravelLabel" type="Label" parent="HUD/SafeArea/Root/SideToolbar/VBox/TravelGroup"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"RailCaption"
+text = "LA"
+horizontal_alignment = 1

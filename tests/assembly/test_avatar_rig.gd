@@ -57,6 +57,33 @@ func test_apply_config_atomic_show() -> void:
 	assert_object(rig.skeleton.get_node_or_null("mesh_cloth")).is_not_null()
 	assert_object(rig.skeleton.get_node_or_null("socket_glass")).is_not_null()
 
+func test_busy_signal_wraps_initial_assembly() -> void:
+	var transitions: Array[bool] = []
+	rig.busy_changed.connect(func(busy: bool): transitions.append(busy))
+	var cfg := AvatarConfig.new()
+	cfg.slots[&"cloth"] = "fx_mesh_cloth"
+	cfg.slots[&"glass"] = "fx_socket_glass"
+	rig.apply_config(cfg)
+	assert_bool(rig.is_busy()).is_true()
+	assert_bool(rig.is_slot_busy(&"cloth")).is_true()
+	assert_str(rig.desired_part(&"glass")).is_equal("fx_socket_glass")
+	await _await_signal(rig.config_applied)
+	assert_bool(rig.is_busy()).is_false()
+	assert_array(transitions).contains_exactly([true, false])
+
+func test_desired_config_updates_before_async_part_is_applied() -> void:
+	var cfg := AvatarConfig.new()
+	cfg.slots[&"cloth"] = "fx_mesh_cloth"
+	rig.apply_config(cfg)
+	await _await_signal(rig.config_applied)
+	rig.equip(&"cloth", "fx_mesh_cloth2")
+	assert_bool(rig.is_busy()).is_true()
+	assert_str(rig.desired_part(&"cloth")).is_equal("fx_mesh_cloth2")
+	assert_str(rig.desired_config().slots[&"cloth"]).is_equal("fx_mesh_cloth2")
+	assert_str(rig.current_config().slots[&"cloth"]).is_equal("fx_mesh_cloth")
+	await _await_signal(rig.slot_applied)
+	assert_bool(rig.is_busy()).is_false()
+
 func test_equip_switch_and_current_config() -> void:
 	var cfg := AvatarConfig.new()
 	cfg.slots[&"cloth"] = "fx_mesh_cloth"

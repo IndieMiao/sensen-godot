@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## 布局回归：抽屉高度、网格列数、标签可横滚、角色区触摸穿透、抽屉不顶宽出安全区。
+## 布局回归：顶部操作、有效分类、两列选项、状态反馈、角色区旋转与安全区取景。
 ## 这些退化任一发生都会直接复现"点不到/看不到"的线上问题。
 
 const SCENE := "res://scenes/dressing_room/dressing_room.tscn"
@@ -9,11 +9,46 @@ func _instantiate() -> Node:
 	add_child(auto_free(scene))
 	return scene
 
+## 取景断言要的是"最坏情况的发型"，不是某个特定部件。以前三处都写死 hairhat101，
+## 部件池一换（它因材质原因下架）就走 push_warning + return —— 而 push_warning
+## 不计入 gdUnit 的 pass/fail，三条取景回归会一起静默失明，套件照样全绿。
+## 改成实测：逐个戴上量包围盒高度，返回最高的那个 id。
+##
+## 刻意用**另起的一具 rig** 来量，不碰被测场景里那具：调用方普遍是先记下换装前的
+## 相机基线再换装，若在同一具上逐顶试戴，基线就被搅了。
+func _tallest_hair_id() -> String:
+	var probe: AvatarRig = Avatar.create_rig()
+	add_child(auto_free(probe))
+	probe.apply_config(Avatar.slot_table.default_config())
+	for i in 900:
+		if not probe.is_busy():
+			break
+		await get_tree().process_frame
+	var best := ""
+	var best_h := -1.0
+	for meta in Avatar.catalog.parts_for_slot(&"hairHat"):
+		probe.equip(&"hairHat", meta.id)
+		for i in 900:
+			if not probe.is_busy():
+				break
+			await get_tree().process_frame
+		var h := DressingCamera.merged_aabb(probe).size.y
+		if h > best_h:
+			best_h = h
+			best = meta.id
+	probe.queue_free()
+	return best
+
 func test_drawer_sits_at_bottom_with_expected_height() -> void:
 	var s := _instantiate()
 	var drawer := s.get_node("UI/SafeArea/VBox/Drawer") as PanelContainer
 	assert_object(drawer).is_not_null()
-	assert_float(drawer.custom_minimum_size.y).is_equal(312.0)
+	# 演进：312 → 268（Done 移到右上角）→ 208（删掉冗余的状态行）→ 292（上缩略图）。
+	# 缩略图把每格顶到 98 高，抽屉只能重新变高——换来的是不必试穿就看得出是什么。
+	# 292 = 32 内边距 + 48 标签行 + 8 间距 + 204 列表区（2 行 × 98 + 8 间距）。
+	# 3 列 × 2 行 = 6 格，正好装下部件最多的槽位（shoes 6 件、glass 5+无 = 6），
+	# 所有分类都不需要滚动。缩略图换尺寸就得重算这一串。
+	assert_float(drawer.custom_minimum_size.y).is_equal(292.0)
 
 func test_spacer_passes_touches_through_for_rotation() -> void:
 	var s := _instantiate()
@@ -33,11 +68,86 @@ func test_spacer_passes_touches_through_for_rotation() -> void:
 	assert_int(safe_area.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 	assert_int(vbox.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 
-func test_parts_grid_has_four_columns() -> void:
+func test_top_bar_is_two_floating_actions_over_the_character() -> void:
+	## 顶栏原本是整条白卡片 + 两个 80 宽文字按钮 + 18 号标题，占掉角色的可视高度
+	## 又和下方抽屉抢注意力。现在只留"返回"圆形图标与右上角的 Done，卡片背景去掉，
+	## 中间必须是 IGNORE 才能继续把拖拽透给 _unhandled_input 转身。
+	var s := _instantiate()
+	var top := s.get_node("UI/SafeArea/VBox/TopBar") as Control
+	var back := s.get_node("UI/SafeArea/VBox/TopBar/BackButton") as Button
+	var done := s.get_node("UI/SafeArea/VBox/TopBar/DoneButton") as Button
+	assert_bool(top is PanelContainer).is_false()
+	assert_int(top.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int((top.get_node("Spacer") as Control).mouse_filter).is_equal(
+		Control.MOUSE_FILTER_IGNORE)
+	# 返回是纯图标圆钮：没有 icon 就成了一个没有任何标识的空白圆
+	assert_object(back.icon).is_not_null()
+	assert_str(str(back.theme_type_variation)).is_equal("RoundButton")
+	assert_str(back.tooltip_text).is_equal("Back")
+	assert_float(back.get_combined_minimum_size().x).is_greater_equal(48.0)
+	assert_float(back.get_combined_minimum_size().y).is_greater_equal(48.0)
+	# Done 必须排在最后（右上角），且不再位于抽屉里
+	assert_object(top.get_child(top.get_child_count() - 1)).is_same(done)
+	assert_float(done.get_combined_minimum_size().y).is_greater_equal(48.0)
+	assert_object(s.get_node_or_null("UI/SafeArea/VBox/Drawer/VBox/DoneButton")).is_null()
+	assert_object(top.get_node_or_null("Title")).is_null()
+	# 左侧一组图标圆钮、右侧一个实心胶囊：两端形状语言各自统一，中间是可穿透的空白
+	var restore := top.get_node("RestoreButton") as Button
+	assert_str(str(back.theme_type_variation)).is_equal(str(restore.theme_type_variation))
+	assert_bool(top.get_child(0) == back and top.get_child(1) == restore).is_true()
+
+
+func test_redundant_selection_status_row_is_gone() -> void:
+	## "Selected: X" 说的三件事各自都已有更直接的表达：选中项有薄荷描边、角色身上
+	## 已经穿着、忙碌态 Done 会显示 "Trying on..."。整行（48 单位）删掉还给部件列表。
+	## Reset 一并回到顶栏，做成与返回同款的图标圆钮——它作用于整套装扮，不属于某个分类。
+	var s := _instantiate()
+	var restore := s.get_node("UI/SafeArea/VBox/TopBar/RestoreButton") as Button
+	assert_object(restore.icon).is_not_null()
+	assert_str(restore.tooltip_text).is_equal("Reset")
+	assert_float(restore.get_combined_minimum_size().x).is_greater_equal(48.0)
+	assert_float(restore.get_combined_minimum_size().y).is_greater_equal(48.0)
+	assert_object(s.get_node_or_null("UI/SafeArea/VBox/Drawer/VBox/FooterRow")).is_null()
+	var editor := s.get_node("UI/SafeArea/VBox/Drawer/VBox")
+	assert_object(editor.find_child("SelectionStatus", true, false)).is_null()
+	assert_bool(FileAccess.get_file_as_string(
+		"res://scenes/dressing_room/parts_panel.gd").contains("status_label")).is_false()
+
+func test_parts_grid_has_three_responsive_columns() -> void:
+	## 上了缩略图后从 2 列改 3 列：3×2 正好装下部件最多的槽位，任何分类都不用滚动。
 	var s := _instantiate()
 	var grid := s.get_node("UI/SafeArea/VBox/Drawer/VBox/PartsScroll/PartsGrid") as GridContainer
 	assert_object(grid).is_not_null()
-	assert_int(grid.columns).is_equal(4)
+	assert_int(grid.columns).is_equal(3)
+	assert_int(grid.size_flags_horizontal).is_equal(Control.SIZE_EXPAND_FILL)
+
+
+func test_thumbnail_cell_height_matches_the_drawer_budget() -> void:
+	## THUMB_CELL_HEIGHT 是量出来的（Button 的最小尺寸参考纹理原始尺寸，
+	## icon_max_width 只管绘制宽度）。一旦改了 RENDER_SIZE / 字号 / icon_max_width，
+	## 真实格子高度就会偏离这个常量，抽屉高度也得跟着重算——这条把偏离拦下来。
+	if not FileAccess.file_exists("res://assets/avatar/parts_manifest.json"):
+		push_warning("转换产物缺失，跳过")
+		return
+	var s := _instantiate()
+	var panel = s.get_node("UI/SafeArea/VBox/Drawer/VBox")
+	var grid := s.get_node("UI/SafeArea/VBox/Drawer/VBox/PartsScroll/PartsGrid") as GridContainer
+	var measured := 0.0
+	for i in 900:
+		await get_tree().process_frame
+		for child in grid.get_children():
+			var button := child as Button
+			if button.icon != null and not String(button.get_meta(&"part_id")).is_empty():
+				measured = button.get_combined_minimum_size().y
+				break
+		if measured > 0.0:
+			break
+	assert_float(measured).is_greater(0.0)
+	assert_float(measured).is_equal_approx(panel.THUMB_CELL_HEIGHT, 0.5)
+	# 抽屉必须装得下 2 行 + 标签行 + 内边距，否则第二行会被切
+	var drawer := s.get_node("UI/SafeArea/VBox/Drawer") as PanelContainer
+	var needed := 32.0 + 48.0 + 8.0 + measured * 2.0 + 8.0
+	assert_float(drawer.custom_minimum_size.y).is_greater_equal(needed)
 
 func test_slot_tabs_are_horizontally_scrollable() -> void:
 	var s := _instantiate()
@@ -48,6 +158,18 @@ func test_slot_tabs_are_horizontally_scrollable() -> void:
 	assert_int(scroll.vertical_scroll_mode).is_equal(ScrollContainer.SCROLL_MODE_DISABLED)
 	assert_object(s.get_node("UI/SafeArea/VBox/Drawer/VBox/TabsScroll/SlotTabs")).is_not_null()
 
+func test_only_slots_with_real_choices_are_visible_and_named_in_english() -> void:
+	var s := _instantiate()
+	var tabs := s.get_node("UI/SafeArea/VBox/Drawer/VBox/TabsScroll/SlotTabs")
+	var labels: Array[String] = []
+	for child in tabs.get_children():
+		labels.append((child as Button).text)
+	assert_array(labels).contains_exactly(["Hair", "Outfits", "Shoes", "Bags", "Glasses"])
+	assert_bool(labels.has("body")).is_false()
+	assert_bool(labels.has("eyes")).is_false()
+	# 360dp 设计宽度扣除抽屉左右 16dp 后仍应完整显示五个英文分类。
+	assert_float((tabs as Control).get_combined_minimum_size().x).is_less_equal(328.0)
+
 func test_list_buttons_pass_touch_for_scroll() -> void:
 	## 回归（2026-08-29 真机）：ScrollContainer 触摸滚动依赖按压事件冒泡到容器
 	## （引擎在按压时开始拖拽跟踪，越过死区后 propagate NOTIFICATION_SCROLL_BEGIN
@@ -55,28 +177,149 @@ func test_list_buttons_pass_touch_for_scroll() -> void:
 	## STOP，事件在按钮处截断，手指落在按钮上便只能拖滚动条。必须 PASS。
 	var s := _instantiate()
 	var tabs := s.get_node("UI/SafeArea/VBox/Drawer/VBox/TabsScroll/SlotTabs")
+	assert_int((tabs as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
 	assert_int(tabs.get_child_count()).is_greater(0)
 	for b in tabs.get_children():
 		assert_int((b as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
 	var grid := s.get_node("UI/SafeArea/VBox/Drawer/VBox/PartsScroll/PartsGrid")
+	assert_int((grid as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
 	assert_int(grid.get_child_count()).is_greater(0)
 	for b in grid.get_children():
 		assert_int((b as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
 
-func test_action_buttons_share_width() -> void:
+func test_choices_are_human_readable_and_have_selected_state() -> void:
 	var s := _instantiate()
-	for name in ["SaveButton", "ResetButton", "SceneButton"]:
-		var b := s.get_node("UI/SafeArea/VBox/Drawer/VBox/Buttons/" + name) as Button
-		assert_object(b).is_not_null()
-		assert_int(b.size_flags_horizontal).is_equal(Control.SIZE_EXPAND_FILL)
+	var grid := s.get_node("UI/SafeArea/VBox/Drawer/VBox/PartsScroll/PartsGrid")
+	var selected := 0
+	for child in grid.get_children():
+		var button := child as Button
+		assert_float(button.get_combined_minimum_size().y).is_greater_equal(48.0)
+		assert_bool(button.text.contains("hairhat")).is_false()
+		assert_bool(button.tooltip_text.contains("hairhat")).is_false()
+		if button.theme_type_variation == &"ThumbChoiceSelectedButton":
+			selected += 1
+	assert_int(selected).is_equal(1)
 
-func test_equip_taller_part_triggers_camera_reframe() -> void:
-	## 回归 Critical：equip()/unequip()（parts_panel 点缩略图走的正是这条路，见
-	## parts_panel.gd 的 `rig.equip(current_slot, meta.id)`）只发 slot_applied，
-	## 不发 config_applied（avatar_rig.gd:124-126，config_applied 只在
-	## _initial_loading 为真的首次装配那次发出）。dressing_room.gd 若只连
-	## config_applied，进场取景一次之后换任何部件相机都不会重新取景——戴上更高的
-	## 帽子会直接切头顶，直接违反"能看到角色全身"的验收项。
+func test_choice_button_receives_pointer_and_touch_inside_scroll_container() -> void:
+	## 属性检查不足以证明真机能点中：用布局后的真实 rect 中心走 Viewport GUI
+	## 派发，覆盖 ScrollContainer、PASS 冒泡、Button.pressed 和 rig.equip 全链路。
+	## headless 根窗口不做 GUI hit-test，因此挂到启用本地输入的 SubViewport。
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(360, 640)
+	viewport.handle_input_locally = true
+	viewport.gui_disable_input = false
+	add_child(auto_free(viewport))
+	var s := (load(SCENE) as PackedScene).instantiate()
+	viewport.add_child(s)
+	var panel = s.get_node("UI/SafeArea/VBox/Drawer/VBox")
+	panel._show_slot(&"hairHat")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var before: String = s.rig.desired_part(&"hairHat")
+	var target_button: Button = null
+	var original_button: Button = null
+	for child in panel.grid.get_children():
+		var candidate := child as Button
+		if String(candidate.get_meta(&"part_id")) == before:
+			original_button = candidate
+		elif target_button == null:
+			target_button = candidate
+	assert_object(target_button).is_not_null()
+	assert_object(original_button).is_not_null()
+	if target_button == null or original_button == null:
+		return
+	var target := String(target_button.get_meta(&"part_id"))
+	var hits: Array[bool] = []
+	target_button.pressed.connect(func(): hits.append(true))
+	var center := target_button.get_global_rect().get_center()
+	for pressed in [true, false]:
+		var event := InputEventMouseButton.new()
+		event.button_index = MOUSE_BUTTON_LEFT
+		event.button_mask = MOUSE_BUTTON_MASK_LEFT if pressed else 0
+		event.position = center
+		event.global_position = center
+		event.pressed = pressed
+		viewport.push_input(event, true)
+	await get_tree().process_frame
+	assert_int(hits.size()).is_equal(1)
+	assert_bool(s.rig.desired_part(&"hairHat") == target).is_true()
+	assert_bool(target_button.theme_type_variation == &"ThumbChoiceSelectedButton").is_true()
+
+	var touch_hits: Array[bool] = []
+	original_button.pressed.connect(func(): touch_hits.append(true))
+	var touch_center := original_button.get_global_rect().get_center()
+	for pressed in [true, false]:
+		var touch := InputEventScreenTouch.new()
+		touch.index = 0
+		touch.position = touch_center
+		touch.pressed = pressed
+		viewport.push_input(touch, true)
+	await get_tree().process_frame
+	assert_int(touch_hits.size()).is_equal(1)
+	assert_bool(s.rig.desired_part(&"hairHat") == before).is_true()
+	assert_bool(original_button.theme_type_variation == &"ThumbChoiceSelectedButton").is_true()
+
+func test_top_bar_actions_are_really_tappable_not_just_present() -> void:
+	## 顶栏改成浮在 3D 场景上的透明 HBox 后，TopBar 与 Spacer 都是 MOUSE_FILTER_IGNORE
+	## （否则整条 48 单位高的空白会吞掉转身拖拽）。属性断言证明不了按钮还收得到点击：
+	## 父容器 IGNORE 时子控件仍参与命中测试是引擎行为，一旦哪次改动把按钮自己也设成
+	## IGNORE/或被 Spacer 盖住，右上角的 Done 就会变成"看得见点不到"——正是 §2.4 那类
+	## 静默回归。这里用布局后的真实 rect 中心走 Viewport GUI 派发，真按一次。
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(360, 640)
+	viewport.handle_input_locally = true
+	viewport.gui_disable_input = false
+	add_child(auto_free(viewport))
+	var s := (load(SCENE) as PackedScene).instantiate()
+	viewport.add_child(s)
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	for path in ["BackButton", "RestoreButton", "DoneButton"]:
+		var button := s.get_node("UI/SafeArea/VBox/TopBar/" + path) as Button
+		assert_object(button).is_not_null()
+		# 提交中会禁用按钮，这里只验证命中链路，先确保可按
+		button.disabled = false
+		var hits: Array[bool] = []
+		button.pressed.connect(func(): hits.append(true))
+		var center := button.get_global_rect().get_center()
+		for pressed in [true, false]:
+			var touch := InputEventScreenTouch.new()
+			touch.index = 0
+			touch.position = center
+			touch.pressed = pressed
+			viewport.push_input(touch, true)
+		await get_tree().process_frame
+		assert_int(hits.size()).is_equal(1)
+
+
+func test_single_primary_action_replaces_demo_buttons() -> void:
+	var s := _instantiate()
+	var editor := s.get_node("UI/SafeArea/VBox/Drawer/VBox")
+	var done := s.get_node("UI/SafeArea/VBox/TopBar/DoneButton") as Button
+	assert_object(done).is_not_null()
+	assert_str(done.theme_type_variation).is_equal("AccentPillButton")
+	assert_float(done.get_combined_minimum_size().y).is_greater_equal(48.0)
+	assert_object(editor.get_node_or_null("Buttons")).is_null()
+	for legacy in ["SaveButton", "ResetButton", "SceneButton", "MapButton"]:
+		assert_object(editor.find_child(legacy, true, false)).is_null()
+
+func test_loading_state_disables_completion_and_is_visible() -> void:
+	var s := _instantiate()
+	## 删掉 "Selected/Trying on" 那行文案后，忙碌反馈只剩 Done 一处，
+	## 它必须同时禁用并说明在忙——否则用户会觉得点了没反应。
+	var done := s.get_node("UI/SafeArea/VBox/TopBar/DoneButton") as Button
+	assert_bool(s.rig.is_busy()).is_true()
+	assert_bool(done.disabled).is_true()
+	assert_bool(done.text.contains("Preparing")).is_true()
+
+func test_equip_taller_part_keeps_the_character_the_same_size() -> void:
+	## 产品口径（2026-09-02 改）：换装**不能**改变角色在画面中的比例。
+	## 旧行为相反——按 merged_aabb 取景，戴上 hairhat101（1.971m vs 默认 1.721m）
+	## 相机就后退 14%，屏幕上角色肉眼可见地一缩。现在取景对着固定的
+	## DressingCamera.reference_box()，REF_HEIGHT 已含最高发型的余量，
+	## 因此换装既不改大小也不会切头顶。
+	## 这条走的是真实链路：parts_panel 点选项 → rig.equip() → slot_applied。
 	if not FileAccess.file_exists("res://assets/avatar/parts_manifest.json"):
 		push_warning("转换产物缺失，跳过")
 		return
@@ -95,14 +338,9 @@ func test_equip_taller_part_triggers_camera_reframe() -> void:
 		await get_tree().process_frame
 	var cam: DressingCamera = s.cam
 	var before_z := cam.position.z
-	var target := ""
-	for meta in Avatar.catalog.parts_for_slot(&"hairHat"):
-		if meta.id == "hairhat101":  # manifest 里 hairHat 槽最高的部件（收敛后 size.y≈2.0m）
-			target = meta.id
-			break
-	if target == "":
-		push_warning("hairhat101 不在 manifest 里，跳过")
-		return
+	var before_v := cam.v_offset
+	var target := await _tallest_hair_id()
+	assert_str(target).is_not_empty()
 	var slots_applied := []
 	rig.slot_applied.connect(func(slot, part_id): slots_applied.append([slot, part_id]))
 	rig.equip(&"hairHat", target)
@@ -113,7 +351,12 @@ func test_equip_taller_part_triggers_camera_reframe() -> void:
 	assert_int(slots_applied.size()).is_greater(0)
 	for i in range(5):
 		await get_tree().process_frame
-	assert_float(cam.position.z).is_greater(before_z)
+	assert_float(cam.position.z).is_equal_approx(before_z, 0.0001)
+	assert_float(cam.v_offset).is_equal_approx(before_v, 0.0001)
+	# 比例不变的同时头顶不能被切：换上最高发型后全身仍在可用区内
+	var drawer := s.get_node("UI/SafeArea/VBox/Drawer") as PanelContainer
+	var safe_area := s.get_node("UI/SafeArea") as MarginContainer
+	_assert_body_within_usable_area(cam, rig, drawer, safe_area)
 
 func _assert_body_within_usable_area(cam: DressingCamera, rig: AvatarRig, drawer: PanelContainer, safe_area: MarginContainer) -> void:
 	var box := DressingCamera.merged_aabb(rig)
@@ -122,7 +365,8 @@ func _assert_body_within_usable_area(cam: DressingCamera, rig: AvatarRig, drawer
 	var cz := box.position.z + box.size.z * 0.5
 	var top_screen := cam.unproject_position(Vector3(cx, box.position.y + box.size.y, cz))
 	var bottom_screen := cam.unproject_position(Vector3(cx, box.position.y, cz))
-	var top_bound: float = safe_area.get_theme_constant(&"margin_top")
+	var top_bar := safe_area.get_node("VBox/TopBar") as Control
+	var top_bound: float = top_bar.global_position.y + top_bar.size.y
 	var bottom_bound: float = drawer.global_position.y
 	assert_float(top_screen.y).is_greater_equal(top_bound)
 	assert_float(top_screen.y).is_less_equal(bottom_bound)
@@ -154,14 +398,8 @@ func test_character_full_body_stays_within_usable_area() -> void:
 	var safe_area := s.get_node("UI/SafeArea") as MarginContainer
 	_assert_body_within_usable_area(cam, rig, drawer, safe_area)
 
-	var target := ""
-	for meta in Avatar.catalog.parts_for_slot(&"hairHat"):
-		if meta.id == "hairhat101":  # manifest 里 hairHat 槽最高的部件
-			target = meta.id
-			break
-	if target == "":
-		push_warning("hairhat101 不在 manifest 里，跳过换装后的第二段断言")
-		return
+	var target := await _tallest_hair_id()
+	assert_str(target).is_not_empty()
 	var slots_applied := []
 	rig.slot_applied.connect(func(slot, part_id): slots_applied.append([slot, part_id]))
 	rig.equip(&"hairHat", target)
@@ -173,6 +411,44 @@ func test_character_full_body_stays_within_usable_area() -> void:
 	for i in range(5):
 		await get_tree().process_frame
 	_assert_body_within_usable_area(cam, rig, drawer, safe_area)
+
+func test_head_zoom_keeps_the_tallest_hair_on_screen() -> void:
+	## HEAD 取景盒按常见发型定（上界 1.85），最高的 hairhat101（1.971m）会向上
+	## 溢出到顶栏那条透明带子里。溢出到"顶栏底下"没问题，溢出到"画面外"就是切头。
+	## 这条把最坏组合——推近头部 + 最高发型——的头顶投影出来，断言仍在视口内。
+	if not FileAccess.file_exists("res://assets/avatar/parts_manifest.json"):
+		push_warning("转换产物缺失，跳过")
+		return
+	var s := _instantiate()
+	var rig: AvatarRig = s.rig
+	var applied := []
+	rig.config_applied.connect(func(c): applied.append(c))
+	for i in 600:
+		if applied.size() > 0:
+			break
+		await get_tree().process_frame
+	assert_int(applied.size()).is_equal(1)
+	var target := await _tallest_hair_id()
+	assert_str(target).is_not_empty()
+	var slots_applied := []
+	rig.slot_applied.connect(func(slot, part_id): slots_applied.append([slot, part_id]))
+	rig.equip(&"hairHat", target)
+	for i in 600:
+		if slots_applied.size() > 0:
+			break
+		await get_tree().process_frame
+	assert_int(slots_applied.size()).is_greater(0)
+	var cam: DressingCamera = s.cam
+	# 直接落位，跳过补间，免得断言撞在动画中途
+	cam.focus_region = DressingCamera.Region.HEAD
+	cam.reframe(rig, s.get_viewport().get_visible_rect().size)
+	await get_tree().process_frame
+	var box := DressingCamera.merged_aabb(rig)
+	var cx := box.position.x + box.size.x * 0.5
+	var cz := box.position.z + box.size.z * 0.5
+	var top_screen := cam.unproject_position(Vector3(cx, box.position.y + box.size.y, cz))
+	assert_float(top_screen.y).is_greater_equal(0.0)
+
 
 func test_drawer_does_not_overflow_safe_area_on_four_part_slot() -> void:
 	## 回归 Critical 缺陷：PartsGrid 4 列 + 3 间距的最小宽度（312）曾经比 Drawer

@@ -4,34 +4,24 @@
 [ext_resource type="Script" path="res://scenes/dressing_room/parts_panel.gd" id="2_parts"]
 [ext_resource type="Script" path="res://modules/ui/safe_area_margin.gd" id="3_safearea"]
 [ext_resource type="Script" path="res://scenes/dressing_room/dressing_camera.gd" id="4_dresscam"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/back.svg" id="5_ico_back"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/reset.svg" id="6_ico_reset"]
 
 [sub_resource type="Environment" id="Environment_room"]
 background_mode = 1
-background_color = Color(0.9, 0.9, 0.9, 1)
+background_color = Color(0.94902, 0.960784, 0.956863, 1)
 ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_energy = 0.3
 tonemap_mode = 2
 tonemap_exposure = 1.0
 
-[sub_resource type="StyleBoxFlat" id="SB_drawer"]
-content_margin_left = 0.0
-content_margin_top = 12.0
-content_margin_right = 0.0
-content_margin_bottom = 12.0
-bg_color = Color(1, 1, 1, 0.96)
-corner_radius_top_left = 22
-corner_radius_top_right = 22
-shadow_color = Color(0.09, 0.12, 0.16, 0.16)
-shadow_size = 8
-shadow_offset = Vector2(0, -2)
-
 [sub_resource type="QuadMesh" id="Mesh_backdrop"]
 size = Vector2(30, 30)
 
 [sub_resource type="StandardMaterial3D" id="Mat_backdrop"]
 shading_mode = 0
-albedo_color = Color(0.9, 0.9, 0.9, 1)
+albedo_color = Color(0.94902, 0.960784, 0.956863, 1)
 
 [node name="DressingRoom" type="Node3D"]
 script = ExtResource("1_dress")
@@ -69,6 +59,45 @@ script = ExtResource("3_safearea")
 [node name="VBox" type="VBoxContainer" parent="UI/SafeArea"]
 layout_mode = 2
 mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="TopBar" type="HBoxContainer" parent="UI/SafeArea/VBox"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="BackButton" type="Button" parent="UI/SafeArea/VBox/TopBar"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_type_variation = &"RoundButton"
+icon = ExtResource("5_ico_back")
+icon_alignment = 1
+tooltip_text = "Back"
+
+[node name="RestoreButton" type="Button" parent="UI/SafeArea/VBox/TopBar"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_type_variation = &"RoundButton"
+icon = ExtResource("6_ico_reset")
+icon_alignment = 1
+tooltip_text = "Reset"
+
+[node name="Spacer" type="Control" parent="UI/SafeArea/VBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="DoneButton" type="Button" parent="UI/SafeArea/VBox/TopBar"]
+custom_minimum_size = Vector2(92, 48)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_type_variation = &"AccentPillButton"
+text = "Done"
 
 [node name="Spacer" type="Control" parent="UI/SafeArea/VBox"]
 layout_mode = 2
@@ -76,9 +105,9 @@ size_flags_vertical = 3
 mouse_filter = 2
 
 [node name="Drawer" type="PanelContainer" parent="UI/SafeArea/VBox"]
-custom_minimum_size = Vector2(0, 312)
+custom_minimum_size = Vector2(0, 292)
 layout_mode = 2
-theme_override_styles/panel = SubResource("SB_drawer")
+theme_type_variation = &"BottomSheet"
 
 [node name="VBox" type="VBoxContainer" parent="UI/SafeArea/VBox/Drawer"]
 layout_mode = 2
@@ -92,8 +121,11 @@ vertical_scroll_mode = 0
 
 [node name="SlotTabs" type="HBoxContainer" parent="UI/SafeArea/VBox/Drawer/VBox/TabsScroll"]
 layout_mode = 2
+mouse_filter = 1
+theme_override_constants/separation = 0
 
 [node name="PartsScroll" type="ScrollContainer" parent="UI/SafeArea/VBox/Drawer/VBox"]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
@@ -101,29 +133,19 @@ horizontal_scroll_mode = 0
 [node name="PartsGrid" type="GridContainer" parent="UI/SafeArea/VBox/Drawer/VBox/PartsScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
-columns = 4
+mouse_filter = 1
+columns = 3
 
-[node name="Buttons" type="HBoxContainer" parent="UI/SafeArea/VBox/Drawer/VBox"]
+[node name="FeedbackPanel" type="PanelContainer" parent="UI/SafeArea/VBox/Drawer/VBox"]
+visible = false
 layout_mode = 2
+theme_type_variation = &"ToastPanel"
 
-[node name="SaveButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
+[node name="FeedbackLabel" type="Label" parent="UI/SafeArea/VBox/Drawer/VBox/FeedbackPanel"]
 layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"AccentButton"
-text = "保存"
-
-[node name="ResetButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "重置"
-
-[node name="SceneButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "压测场景"
-
-[node name="MapButton" type="Button" parent="UI/SafeArea/VBox/Drawer/VBox/Buttons"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "去地图"
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "Couldn't save. Try again."
+autowrap_mode = 2
 

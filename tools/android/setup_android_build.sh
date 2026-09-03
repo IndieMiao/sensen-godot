@@ -25,6 +25,8 @@ cp "$OVERLAY/build.gradle" "$BUILD_DIR/build.gradle"
 cp "$OVERLAY/AndroidManifest.xml" "$BUILD_DIR/src/main/AndroidManifest.xml"
 mkdir -p "$BUILD_DIR/src/main/java/com/sensen/map"
 cp "$OVERLAY/GodotMapPlugin.kt" "$BUILD_DIR/src/main/java/com/sensen/map/GodotMapPlugin.kt"
+mkdir -p "$BUILD_DIR/src/test/java/com/sensen/map"
+cp "$OVERLAY/GodotMapPluginTest.kt" "$BUILD_DIR/src/test/java/com/sensen/map/GodotMapPluginTest.kt"
 
 echo "android/build 已就绪（模板 4.7.2 + GodotMap 插件覆盖层）"
 echo "别忘了在仓库根放 mapbox_token.txt（pk token，勿提交）"

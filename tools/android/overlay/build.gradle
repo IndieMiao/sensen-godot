@@ -34,6 +34,9 @@ configurations {
 }
 
 dependencies {
+    // JVM unit tests for the debug-only QA launch gate.
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlinTestVersion"
+
     // Android instrumented test dependencies
     androidTestImplementation "androidx.test.ext:junit:$versions.junitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$versions.espressoCoreVersion"

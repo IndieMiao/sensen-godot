@@ -32,6 +32,20 @@
   `Debug Keystore` 需要能定位到本机 Android SDK（`adb`、`build-tools`）；首次导出 Godot 会
   在缺失时给出明确报错，按提示装 SDK/命令行工具即可。
 
+### Debug-only 压测场景入口
+
+普通启动始终进入地图，正式 UI 不提供压测入口。只有 debug 包会接受以下冷启动命令，直接
+打开压测场景：
+
+```bash
+adb shell am start -S -W \
+  -n com.sensen.avatarphase1/com.godot.game.GodotAppLauncher \
+  --es com.sensen.qa.SCENE stress
+```
+
+`-S` 会先停止现有进程，确保 `singleInstancePerTask` 的 Launcher 重新读取 Intent extra；省略
+`--es` 仍进入地图。extra 的值必须严格为 `stress`，release 包会忽略这个 extra。
+
 ## 3. iOS preset
 
 `Project > Export... > Add.. > iOS`。
@@ -49,20 +63,20 @@
 及格线，用于和 `direct` 策略、和不同角色数横向比较，定位性能瓶颈方向）。
 
 1. 按上面 preset 导出安装到真机（Android: 直接装 APK；iOS: Xcode Build & Run）。
-2. 应用启动后默认打开换装房间（`dressing_room.tscn`）；点击右下角「压测场景」按钮
-   进入压测场景（压测 HUD 内有「换装房间」按钮可切回）。无需修改 main_scene。
+2. 应用启动后默认打开地图（`map_poc.tscn`）。debug 包按上面的冷启动命令进入压测场景；
+   无需修改 `main_scene`，也不在正式 UI 中暴露压测按钮。
 3. **UI 走查**（本次缩放/安全区改动的验收项，逐条确认）：
-   - 换装房间底部「保存 / 重置 / 压测场景」三个按钮都能一次点中，不需要瞄准；
-   - 槽位标签栏可以横向滑动，能滑到最后一个槽位（如 `glass`）并点中；
+   - 换装房间顶部 `Back / Reset` 和底部 `Done` 按钮都能一次点中，不需要瞄准；
+   - 槽位标签栏可以横向滑动，能滑到最后一个槽位（如 `Glasses`）并点中；
    - 角色全身（含头顶）完整可见，不被底部抽屉遮挡；换上高帽子类部件后相机自动拉远，
      头顶仍不被裁切；
    - 在角色区域拖动仍能转动角色，在抽屉区域滑动只滚动列表、不转动角色；
    - 切到压测场景后 HUD 不压住状态栏/刘海，数量滑条能正常拖动。
-4. 打开压测场景后：把数量滑条拖到 `15`；确认策略按钮显示“策略: merged”（默认就是
-   merged，如果之前被切换过再点一下切回来）。
+4. 打开压测场景后：把数量滑条拖到 `15`；确认策略按钮显示 `Assembly: Merged`（默认就是
+   `Merged`，如果之前被切换过再点一下切回来）。
 5. 静置 3–5 秒等 HUD 数字稳定（刚重建角色阵列的头几帧会有加载抖动，不计入读数）。
-6. 记录 HUD 上的 `FPS`、`帧时`、`显存` 三个数字到下表；同一台机器建议至少测
-   `merged` 和 `direct` 两种策略，角色数覆盖 `1/5/10/15/20`，用于判断性能拐点。
+6. 记录 HUD 上的 `FPS`、`Frame`、`VRAM` 三个数字到下表；同一台机器建议至少测
+   `Merged` 和 `Direct` 两种策略，角色数覆盖 `1/5/10/15/20`，用于判断性能拐点。
 
 ### 记录表格格式
 

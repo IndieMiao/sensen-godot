@@ -3,6 +3,7 @@ package com.sensen.map
 import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.PixelFormat
 import android.location.Location
@@ -18,6 +19,10 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
+import com.mapbox.maps.extension.localization.localizeLabels
+import com.mapbox.maps.extension.style.expressions.generated.Expression
+import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
+import com.mapbox.maps.extension.style.layers.getLayerAs
 import org.godotengine.godot.Godot
 import org.godotengine.godot.plugin.GodotPlugin
 import org.godotengine.godot.plugin.SignalInfo
@@ -33,12 +38,29 @@ import org.godotengine.godot.plugin.UsedByGodot
 class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     companion object {
         private const val TAG = "GodotMapPlugin"
-
+        private const val QA_SCENE_EXTRA = "com.sensen.qa.SCENE"
+        private const val QA_STRESS_SCENE = "stress"
+        internal val MAP_LABEL_LOCALE: Locale = Locale.ENGLISH
         // demo 锚点由 GDScript 侧取"第一次收到的定位"锁定、之后永不更新（避免演示中途
         // 地图跳动）。所以 last-known 缓存一旦太旧就绝不能拿去当首帧发——发出去就是
         // 永久锚错城市，且后面真实 GPS 定位到达时也不会被拿来纠正。5 分钟内的缓存
         // 视为等同于"当前位置"；更旧的宁可没有，等下面的实时订阅。
         private const val LAST_KNOWN_MAX_AGE_MS = 5 * 60 * 1000L
+
+        internal fun qaCommandLine(debuggable: Boolean, scene: String?): List<String> =
+            if (debuggable && scene == QA_STRESS_SCENE) {
+                listOf("++", "--qa-scene=stress")
+            } else {
+                emptyList()
+            }
+
+        internal fun shouldRequireEnglishName(layerId: String): Boolean {
+            val terms = layerId
+                .lowercase(Locale.ROOT)
+                .split(Regex("[^a-z0-9]+"))
+                .filter(String::isNotEmpty)
+            return "label" in terms
+        }
     }
 
     private var container: FrameLayout? = null
@@ -59,6 +81,16 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     private var cameraInfoCache = ""
 
     override fun getPluginName() = "GodotMap"
+
+    override fun getCommandLineParams(_originalParams: List<String>): List<String> {
+        val activity = getActivity() ?: return emptyList()
+        val debuggable =
+            (activity.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        return qaCommandLine(
+            debuggable,
+            activity.intent?.getStringExtra(QA_SCENE_EXTRA),
+        )
+    }
 
     override fun getPluginSignals() = setOf(
         SignalInfo("map_ready"),
@@ -116,7 +148,9 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
                     .zoom(zoom)
                     .build()
             )
-            mv.mapboxMap.loadStyle(Style.MAPBOX_STREETS) {
+            mv.mapboxMap.loadStyle(Style.MAPBOX_STREETS) { style ->
+                style.localizeLabels(MAP_LABEL_LOCALE)
+                requireEnglishNamesForMapLabels(style)
                 Log.i(TAG, "style loaded")
                 emitSignal("map_ready")
             }
@@ -130,6 +164,36 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
             mapView = mv
             Log.i(TAG, "MapView created @($lat,$lng) z=$zoom")
         }
+    }
+
+    private fun requireEnglishNamesForMapLabels(style: Style) {
+        val englishNameFilter = Expression.has(Expression.literal("name_en"))
+        val matchedLayerIds = mutableListOf<String>()
+
+        style.styleLayers
+            .filter { it.type == "symbol" && shouldRequireEnglishName(it.id) }
+            .forEach { layerInfo ->
+                val layer = style.getLayerAs<SymbolLayer>(layerInfo.id)
+                if (layer == null) {
+                    Log.w(TAG, "Unable to access selected map label layer: ${layerInfo.id}")
+                    return@forEach
+                }
+                try {
+                    val combinedFilter = layer.filter?.let {
+                        Expression.all(it, englishNameFilter)
+                    } ?: englishNameFilter
+                    layer.filter(combinedFilter)
+                    matchedLayerIds.add(layerInfo.id)
+                } catch (exception: RuntimeException) {
+                    Log.w(TAG, "Unable to constrain map label layer: ${layerInfo.id}", exception)
+                }
+            }
+
+        Log.i(
+            TAG,
+            "English-only filtering applied to ${matchedLayerIds.size} map label layers: " +
+                matchedLayerIds.joinToString(),
+        )
     }
 
     /** 单指拖拽平移：finger 位移 (dx,dy) px，地图内容随手指走。用地图自身投影换算，DPI 无关。 */
@@ -192,6 +256,14 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     fun setMapVisible(visible: Boolean) {
         runOnUiThread {
             mapView?.visibility = if (visible) View.VISIBLE else View.GONE
+        }
+    }
+
+    /** Android 根页返回遵循系统语义：任务进入后台并保留热启动状态。 */
+    @UsedByGodot
+    fun moveTaskToBack() {
+        runOnUiThread {
+            getActivity()?.moveTaskToBack(true)
         }
     }
 

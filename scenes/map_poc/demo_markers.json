@@ -1,10 +1,10 @@
 {
 	"version": 1,
 	"markers": [
-		{ "east_m": 120.0,  "north_m": 80.0,   "author": "小满",  "text": "今天这儿的云超好看" },
-		{ "east_m": -180.0, "north_m": 40.0,   "author": "阿泽",  "text": "楼下这家咖啡新出了桂花拿铁" },
-		{ "east_m": 60.0,   "north_m": -150.0, "author": "Nina",  "text": "周六早上这里有市集" },
-		{ "east_m": -90.0,  "north_m": -220.0, "author": "老陈",  "text": "这段路在修，绕一下" },
-		{ "east_m": 260.0,  "north_m": -60.0,  "author": "豆豆",  "text": "遛狗打卡点" }
+		{ "east_m": 120.0,  "north_m": 80.0,   "author": "Mina",  "text": "Great clouds today." },
+		{ "east_m": -180.0, "north_m": 40.0,   "author": "Zane",  "text": "New osmanthus latte downstairs." },
+		{ "east_m": 60.0,   "north_m": -150.0, "author": "Nina",  "text": "Saturday market here, 9 AM." },
+		{ "east_m": -90.0,  "north_m": -220.0, "author": "Chen",  "text": "Roadwork ahead. Take the next turn." },
+		{ "east_m": 260.0,  "north_m": -60.0,  "author": "Dodo",  "text": "A favorite evening walk." }
 	]
 }
