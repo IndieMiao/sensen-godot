@@ -17,13 +17,15 @@ export interface Built { bp: Blueprint; overlay: FeatureCollection }
 
 const round2 = (v: number) => Math.round(v * 100) / 100;
 
-function linesToPlay(lines: LineString[], half: number): LineString[] {
-  const out: LineString[] = [];
+/** 只过滤一次：留下的 play 线与留下的原始（局部窗口坐标）线一一对应，overlay 与 bp.paths 共用同一份 kept 列表。 */
+function linesToPlay(lines: LineString[], half: number): { play: LineString[]; kept: LineString[] } {
+  const play: LineString[] = [];
+  const kept: LineString[] = [];
   for (const l of lines) {
     const g = norm.simplify(norm.toPlay(l, half, config.PLAY_AREA_M), 1.0);
-    if (g.type === 'LineString' && geos.length(g) > 2.0) out.push(g);
+    if (g.type === 'LineString' && geos.length(g) > 2.0) { play.push(g); kept.push(l); }
   }
-  return out;
+  return { play, kept };
 }
 
 function overlayOf(t: topo.Transformer, lines: LineString[], blocks: Polygon[]) {
@@ -47,7 +49,7 @@ export function buildFromLines(rawLines: LineString[], half: number, meta: Meta,
   const polys = topo.polygonizeBlocks(lines, half);
   const blocksLocal = norm.selectBlocks(polys, half);
   const blocksPlay = blocksLocal.map(b => norm.simplify(norm.toPlay(b, half, config.PLAY_AREA_M)));
-  const pathsPlay = linesToPlay(lines, half);
+  const { play: pathsPlay, kept: pathsLocal } = linesToPlay(lines, half);
   const m = masks.rasterize(pathsPlay, blocksPlay, config.GRID, config.CELL_M, config.PATH_WIDTH_M);
   const pcs = masks.pathCells(pathsPlay, config.GRID, config.CELL_M, config.PATH_WIDTH_M);
   const a = anchors.place(m, pcs, config.GRID);
@@ -56,7 +58,7 @@ export function buildFromLines(rawLines: LineString[], half: number, meta: Meta,
   let center: [number, number] = [0, 0];
   let paths: [number, number][][] = [], blocksLL: [number, number][][] = [];
   if (transformer) {
-    const o = overlayOf(transformer, lines, blocksLocal);
+    const o = overlayOf(transformer, pathsLocal, blocksLocal);
     overlay = o.geojson; paths = o.paths; blocksLL = o.blocks;
     const [lng, lat] = transformer.inverse([0, 0]);
     center = [lat, lng];
@@ -99,8 +101,9 @@ export function syntheticSafe(layoutPatchId = 'safe_grid', revision = 1): Built 
 }
 
 export function buildAndWrite(bp: Blueprint, overlay: FeatureCollection, outRoot: string): string {
-  if (bp.report && bp.report.errors.length) throw new anchors.ValidationError(bp.report.errors.join('; '));
+  const report = bp.report ?? anchors.validate(bp);
+  if (report.errors.length) throw new anchors.ValidationError(report.errors.join('; '));
   const outDir = path.join(outRoot, bp.layout_patch_id, `r${bp.revision}`);
-  writer.writeOutputs(bp, overlay, outDir);
+  writer.writeOutputs({ ...bp, report }, overlay, outDir);
   return outDir;
 }
