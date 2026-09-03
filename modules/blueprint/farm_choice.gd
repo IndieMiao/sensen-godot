@@ -6,8 +6,10 @@ const PATH := "user://farm_choice.json"
 
 static func save(layout_patch_id: String, revision: int) -> void:
 	var f := FileAccess.open(PATH, FileAccess.WRITE)
-	if f:
-		f.store_string(JSON.stringify({"layout_patch_id": layout_patch_id, "revision": revision}))
+	if f == null:
+		push_error("FarmChoice: 选择保存失败 err=%d path=%s" % [FileAccess.get_open_error(), PATH])
+		return
+	f.store_string(JSON.stringify({"layout_patch_id": layout_patch_id, "revision": revision}))
 
 static func load() -> Dictionary:
 	if not FileAccess.file_exists(PATH):

@@ -48,8 +48,10 @@ static func nearest_region_id(p_regions: Array, lat: float, lng: float) -> Strin
 
 static func save_choice(id: String) -> void:
 	var f := FileAccess.open(CHOICE_PATH, FileAccess.WRITE)
-	if f:
-		f.store_string(JSON.stringify({"region_id": id}))
+	if f == null:
+		push_error("FarmRegions: 选择保存失败 err=%d path=%s" % [FileAccess.get_open_error(), CHOICE_PATH])
+		return
+	f.store_string(JSON.stringify({"region_id": id}))
 
 static func load_choice() -> String:
 	if not FileAccess.file_exists(CHOICE_PATH):
