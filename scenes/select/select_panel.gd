@@ -6,6 +6,7 @@ signal candidate_focused(id: String)
 signal confirmed(id: String)
 
 const CAPACITY_TEXT := "9 格起步 · 首周可扩到 12 格"
+## 卡片最小尺寸——暂时硬编码，待 DesignTokens 决定是否纳入尺寸令牌体系
 const CARD_MIN := Vector2(104, 156)
 
 var focused_id := ""
@@ -34,7 +35,9 @@ func _init() -> void:
 	vbox.add_child(confirm_button)
 
 func set_candidates(items: Array) -> void:
+	# 必须先 remove_child 立即解除父子关系，再 queue_free 释放。queue_free 同帧内不解除父子关系。
 	for c in _cards:
+		_row.remove_child(c)
 		c.queue_free()
 	_cards.clear()
 	focused_id = ""
