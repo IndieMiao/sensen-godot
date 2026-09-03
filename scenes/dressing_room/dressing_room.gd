@@ -97,7 +97,7 @@ func _on_back() -> void:
 	if _committing:
 		return
 	# 当前 rig 是编辑草稿；不调用 save 即可丢弃改动。
-	AppRouter.go_to_map()
+	AppRouter.pop_instance()
 
 
 func is_back_navigation_locked() -> bool:
@@ -133,7 +133,7 @@ func _on_done() -> void:
 		_show_feedback("Couldn't save. Try again.")
 		_refresh_completion_state()
 		return
-	AppRouter.go_to_map()
+	AppRouter.pop_instance()
 
 
 func _refresh_completion_state() -> void:
