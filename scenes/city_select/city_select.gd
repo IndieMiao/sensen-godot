@@ -6,6 +6,7 @@ const LOCATE_TIMEOUT_S := 3.0
 var regions: FarmRegions
 var _bridge: MapBridge = null
 var _located := false
+var _locating := false
 
 @onready var buttons: VBoxContainer = %Buttons
 @onready var use_current: Button = %UseCurrent
@@ -40,24 +41,45 @@ func choose(id: String) -> void:
 	AppRouter.go_to_map()
 
 func locate() -> void:
+	if _locating: # 请求进行中：吞掉重复点击/重复调用，不重复 connect
+		return
 	if _bridge == null:
 		_bridge = MapBridgeFactory.make()
 	if _bridge == null:
 		status.text = "此设备无法定位，请手选城市"
 		return
+	_locating = true
+	_located = false
 	use_current.disabled = true
 	status.text = "正在定位…"
 	_bridge.location_update.connect(_on_location, CONNECT_ONE_SHOT)
 	_bridge.start_location()
-	get_tree().create_timer(LOCATE_TIMEOUT_S).timeout.connect(func():
-		if not _located:
-			use_current.disabled = false
-			status.text = "定位超时，请手选城市")
+	# CONNECT_ONE_SHOT 只在信号真正触发后才会自动断开；UI 层「放弃」（超时）
+	# 不会断开订阅——迟到的定位仍会静默把用户带走，所以超时必须走 _cancel_locate()
+	# 手动断开，不能只改 UI 文案。
+	get_tree().create_timer(LOCATE_TIMEOUT_S).timeout.connect(_on_locate_timeout)
+
+## 定位超时：还没等到 _on_location 就放弃。真正取消订阅（不是只改 UI），
+## 否则迟到的信号仍会触发 _on_location 把用户带走，且重新点按会重复 connect 报错。
+func _on_locate_timeout() -> void:
+	if _located:
+		return
+	status.text = "定位超时，请手选城市"
+	_cancel_locate()
+
+## 断开定位订阅并把 UI 收回到可再次点按的状态。is_connected 判断是因为迟到的
+## 信号可能在同一帧已经靠 ONE_SHOT 自动断开，这里不能无条件 disconnect。
+func _cancel_locate() -> void:
+	if _bridge and _bridge.location_update.is_connected(_on_location):
+		_bridge.location_update.disconnect(_on_location)
+	_locating = false
+	use_current.disabled = false
 
 func _on_location(lat: float, lng: float, _accuracy: float) -> void:
 	if _located:
 		return
 	_located = true
+	_locating = false
 	choose(pick_region(regions.regions, lat, lng, true))
 
 func _process(_dt: float) -> void:
