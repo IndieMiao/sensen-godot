@@ -25,4 +25,10 @@ describe('masks', () => {
     expect(col).toEqual([31, 32, 33]);
   });
   it('count', () => { expect(masks.count(['0110', '0000'])).toBe(2); });
+  it('buildable excludes path cells inside block', () => {
+    const m = masks.rasterize([line([[0, 16], [64, 16]])], [box(4, 4, 28, 28)], 64, 1, 3);
+    expect(m.walkable[16][10]).toBe('1');   // 路穿区块，可行走
+    expect(m.buildable[16][10]).toBe('0');  // 路上不可建造
+    expect(m.buildable[10][10]).toBe('1');  // 区块内非路可建造
+  });
 });
