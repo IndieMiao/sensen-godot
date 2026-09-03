@@ -29,6 +29,8 @@ static func _material(alpha: float) -> StandardMaterial3D:
 	return m
 
 static func block_mesh(pts: PackedVector2Array) -> ArrayMesh:
+	if pts.size() < 3: # 退化输入：不足以成面，防御性返回空 mesh 而非崩溃
+		return ArrayMesh.new()
 	var idx := Geometry2D.triangulate_polygon(pts)
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -38,6 +40,8 @@ static func block_mesh(pts: PackedVector2Array) -> ArrayMesh:
 	return st.commit()
 
 static func path_mesh(pts: PackedVector2Array, width: float) -> ArrayMesh:
+	if pts.size() < 2: # 退化输入：不足以成线段，防御性返回空 mesh 而非崩溃
+		return ArrayMesh.new()
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for i in range(pts.size() - 1):
@@ -51,7 +55,11 @@ static func path_mesh(pts: PackedVector2Array, width: float) -> ArrayMesh:
 	return st.commit()
 
 func set_candidates(bps: Array, anchor_lat: float, anchor_lng: float) -> void:
+	# queue_free() 只是把释放排到本帧末尾，节点本帧内仍留在树里；
+	# 若同帧内二次调用 set_candidates，get_children()/get_child_count() 会看到旧节点还没走，
+	# 必须先 remove_child 立即解除父子关系，再 queue_free 释放。
 	for c in get_children():
+		remove_child(c)
 		c.queue_free()
 	_items.clear()
 	selected_id = ""

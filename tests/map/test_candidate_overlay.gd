@@ -34,3 +34,16 @@ func test_select_changes_alpha_and_reanchor_moves() -> void:
 	var before := (ov.get_child(0) as Node3D).position
 	ov.reanchor(31.2, 121.41)
 	assert_bool((ov.get_child(0) as Node3D).position.x < before.x).is_true() # 锚点东移，候选相对西移
+
+## 故意不 await 任何一帧：queue_free() 只是把释放排到本帧末尾，节点本帧内仍留在树里；
+## 如果 set_candidates() 只 queue_free 不 remove_child，第二次调用会看到第一次的旧节点还没走，
+## get_child_count() 会变成 2 而不是 1。
+func test_set_candidates_twice_does_not_accumulate() -> void:
+	var ov = auto_free(CandidateOverlay.new())
+	add_child(ov)
+	var bp := FarmBlueprint.load_file(FIX)
+	ov.set_candidates([bp], 31.2, 121.4)
+	ov.set_candidates([bp], 31.2, 121.4)
+	assert_int(ov.get_child_count()).is_equal(1)
+	assert_int(ov.candidate_ids().size()).is_equal(1)
+	await get_tree().process_frame # 断言已完成；让第一次调用 remove_child 后排队的 queue_free 落地，避免误报 orphan
