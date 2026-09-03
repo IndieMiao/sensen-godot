@@ -63,6 +63,10 @@ export function buildFromLines(rawLines: LineString[], half: number, meta: Meta,
     const [lng, lat] = transformer.inverse([0, 0]);
     center = [lat, lng];
   }
+  // NOTE: bp.overlay_wgs84 below is a coordinate-swapped duplicate of map_overlay.geojson (~25%
+  // of each blueprint file) and the only location data carried inside the blueprint itself.
+  // Whether it should leave the blueprint entirely is pending a decision; until then, any
+  // endpoint that serves a blueprint to a visitor must strip this field.
   const bp: Blueprint = {
     format: 1, layout_patch_id: meta.layout_patch_id, revision: meta.revision, region_id: meta.region_id, name: meta.name,
     checksum: '', source: meta.source,

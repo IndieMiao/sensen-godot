@@ -48,7 +48,10 @@ export function place(masks: Masks, pathCells: Set<number>, grid: number): Ancho
   const bset = new Set(buildable.map(c => cellKey(c[0], c[1], grid)));
   const runs: Cell[][] = [];
   for (const [i, j] of buildable)
-    if (bset.has(cellKey(i + 1, j, grid)) && bset.has(cellKey(i + 2, j, grid))) runs.push([[i, j], [i + 1, j], [i + 2, j]]);
+    // i + 2 必须仍落在同一行内：cellKey(i,j,grid)=j*grid+i 没有上界检查时，cellKey(grid,j)
+    // 会与 cellKey(0,j+1) 别名重合，把下一行左端的格子误判成本行的延续，产出 x>=grid 的床格
+    // （2026-09-03 终审发现；今天不触发纯属 masks.ts 硬编码 1m 侵蚀让最外圈不可建造的偶然巧合）。
+    if (i + 2 < grid && bset.has(cellKey(i + 1, j, grid)) && bset.has(cellKey(i + 2, j, grid))) runs.push([[i, j], [i + 1, j], [i + 2, j]]);
   runs.sort((a, b) => dOf(a[0]) + dOf(a[2]) - (dOf(b[0]) + dOf(b[2])));
   const beds: Cell[][] = []; const used: Cell[] = [];
   for (const r of runs) {

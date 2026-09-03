@@ -13,6 +13,12 @@ const COLORS: Record<string, RGB> = {
   storage: [120, 120, 120], well: [60, 160, 220], exit: [220, 80, 80],
 };
 
+// NOTE: canonical() covers the four masks plus point anchors and beds, but NOT grid, cell_m,
+// play_area_m, or reserved_bed. A blueprint whose grid is hand-edited from [64,64] to [32,128]
+// still passes checksum validation while the client reinterprets the same 4096 mask characters
+// as a different grid; cell_m (which drives every distance/time computation) is likewise
+// unprotected. Widening the formula needs a coordinated edit in three places — this file,
+// modules/blueprint/blueprint.gd, and the Godot fixture's pinned literal — pending a decision.
 export function canonical(bp: Blueprint): string {
   const m = bp.masks, a = bp.anchors;
   const beds = a.beds.map(b => b.cells.map(c => `${c[0]},${c[1]}`).join(',')).join('/');

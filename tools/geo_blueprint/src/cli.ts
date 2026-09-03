@@ -30,6 +30,11 @@ export function validateAll(root: string = config.BLUEPRINTS_DIR): number {
     if (r.errors.length) { console.log(`INVALID ${file}: ${r.errors.join('; ')}`); return 1; }
     reports[bp.layout_patch_id] = r;
   }
+  // NOTE: this fairness check compares metrics whose definitions are pending review. far_bed_s
+  // is pinned by construction — bed runs are chosen nearest-to-spawn first, so its spread across
+  // blueprints certifies nothing. tour_s bakes in a constant 9 * ACTION_S = 18s (INITIAL_BEDS *
+  // BED_CELLS * ACTION_S), which dilutes real walk-time variation (~29% across the shipped
+  // blueprints) down to the ~6.8% reported here.
   for (const key of ['far_bed_s', 'tour_s'] as const) {
     const vals = Object.entries(reports).filter(([id]) => !id.startsWith('safe')).map(([, r]) => r[key]);
     if (!vals.length) continue;

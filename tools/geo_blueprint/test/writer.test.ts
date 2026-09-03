@@ -34,11 +34,16 @@ describe('writer', () => {
   it('writeRegions strips coordinates from candidates', () => {
     const dir = mkdtempSync(path.join(os.tmpdir(), 'rg-'));
     const file = path.join(dir, 'regions.json');
+    // 输入候选带真实 lat/lng/radius_m（不同于 ShippedCandidate 声明的字段），故意越过类型做
+    // naive-passthrough 探测：writeRegions 必须显式挑字段，否则精确拓扑可能反推出玩家选的小区。
+    const candidateWithCoords = { layout_patch_id: 'sh_a', revision: 1, name: 'A', lat: 31.2, lng: 121.4, radius_m: 200 };
     writer.writeRegions(
       [{ id: 'shanghai', name: '上海', timezone: 'Asia/Shanghai', center: [31.2, 121.4], street_zoom: 16, pitch: 45, candidates: [] }],
-      { shanghai: [{ layout_patch_id: 'sh_a', revision: 1, name: 'A' }] }, file);
+      { shanghai: [candidateWithCoords] } as unknown as Record<string, writer.ShippedCandidate[]>, file);
     const data = JSON.parse(readFileSync(file, 'utf8'));
     expect(data.regions[0].candidates[0].layout_patch_id).toBe('sh_a');
     expect(data.regions[0].candidates[0].lat).toBeUndefined();
+    expect(data.regions[0].candidates[0].lng).toBeUndefined();
+    expect(data.regions[0].candidates[0].radius_m).toBeUndefined();
   });
 });
