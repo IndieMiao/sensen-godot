@@ -1586,7 +1586,7 @@ git commit -m "feat(map): 候选高亮与卡片接入，确认后压栈进入农
 - Create: `tests/ui/test_touch_stick.gd`
 
 **Interfaces:**
-- Produces: `class_name TouchStick`（**不能叫 `TouchStick`**：Godot 4.7 已有同名内置类，GDScript 禁止遮蔽原生类，2026-09-04 执行时经 `ClassDB.class_exists` 核实并改名），`extends Control`：`signal changed(vector: Vector2)`；`@export var radius := 56.0`、`@export var dead_zone := 0.15`；`var vector := Vector2.ZERO`（单位圆内，x 右、y 下）；`static knob_vector(center, pos, radius, dead) -> Vector2`；处理 `InputEventScreenTouch/Drag`（按 `index` 锁定一根手指）。
+- Produces: `class_name TouchStick`（**不能叫 `VirtualJoystick`**：Godot 4.7 已有同名内置类，GDScript 禁止遮蔽原生类；2026-09-04 执行时经 `ClassDB.class_exists` 核实后改名），`extends Control`：`signal changed(vector: Vector2)`；`@export var radius := 56.0`、`@export var dead_zone := 0.15`；`var vector := Vector2.ZERO`（单位圆内，x 右、y 下）；`static knob_vector(center, pos, radius, dead) -> Vector2`；处理 `InputEventScreenTouch/Drag`（按 `index` 锁定一根手指）。
 
 - [ ] **Step 1: 写失败测试**
 
