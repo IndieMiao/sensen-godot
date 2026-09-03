@@ -21,6 +21,20 @@ static func knob_vector(center: Vector2, pos: Vector2, p_radius: float, dead: fl
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_EXIT_TREE or (what == NOTIFICATION_VISIBILITY_CHANGED and not is_visible_in_tree()):
+		_release_stick()
+
+func _release_stick() -> void:
+	## 场景隐藏/离开时释放手指槽位。若拖拽中止且未复位，
+	## 恢复后同一手指索引会被挂住，新触摸被丢弃。
+	if _touch_index >= 0:
+		_touch_index = -1
+		if vector != Vector2.ZERO:
+			vector = Vector2.ZERO
+			changed.emit(vector)
+		queue_redraw()
+
 func _gui_input(e: InputEvent) -> void:
 	if e is InputEventScreenTouch:
 		if e.pressed and _touch_index < 0:
