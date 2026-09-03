@@ -20,6 +20,8 @@ static func metrics(bp: FarmBlueprint, grid: BlueprintGrid) -> Dictionary:
 	for nxt in firsts + [spawn]:
 		tour += grid.distance_cells(cur, nxt)
 		cur = nxt
+	# n_cells 恒等于 Node 侧字面量 INITIAL_BEDS * BED_CELLS = 9：anchors.ts::place() 总是
+	# 恰好产出 3 条 3 格的畦（beds.slice(0, config.INITIAL_BEDS)），不是巧合，是管线保证。
 	var n_cells := 0
 	for bed in bp.beds():
 		n_cells += bed.cells.size()
