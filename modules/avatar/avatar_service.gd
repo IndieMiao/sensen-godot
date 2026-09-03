@@ -37,7 +37,28 @@ func create_rig() -> AvatarRig:
 
 func load_outfit() -> AvatarConfig:
 	var cfg := store.load_outfit(user_id)
-	return cfg if cfg != null else slot_table.default_config()
+	if cfg == null:
+		return slot_table.default_config()
+	_drop_missing_parts(cfg)
+	return cfg
+
+## 把存档里已经不存在的部件换掉：必选槽回落到默认件，可选槽清空。
+##
+## 部件池会随版本增删（下架特殊材质件、denylist 剔除、改名），而存档是上个版本写的。
+## 不清洗的话这些 id 会原样送进 rig，装配失败后弹一条 "Couldn't load ... Previous look
+## kept."——2026-09-02 真机上就是这样：旧存档写着 cloth87/hairhat101，一进换装房就报错。
+##
+## 注意 catalog 此时已经过 denylist 过滤，所以被剔除的部件同样会在这里被换掉——
+## 这是想要的：剔除名单上的东西不该还穿在身上。
+func _drop_missing_parts(cfg: AvatarConfig) -> void:
+	for slot_def in slot_table.slots:
+		var id := String(cfg.slots.get(slot_def.slot_name, ""))
+		if id.is_empty() or catalog.has_part(id):
+			continue
+		var replacement := slot_def.default_part if slot_def.required else ""
+		cfg.slots[slot_def.slot_name] = replacement
+		push_warning("AvatarService: 存档里的 %s 已不存在，%s 回落为 '%s'"
+			% [id, slot_def.slot_name, replacement])
 
 func save_outfit(config: AvatarConfig) -> Error:
 	return store.save_outfit(user_id, config)
