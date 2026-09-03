@@ -3,7 +3,7 @@
  "layout_patch_id": "sh_b",
  "revision": 1,
  "region_id": "shanghai",
- "name": "老城厢",
+ "name": "Old Town",
  "checksum": "78abf71679f08c211e46dff86289d32ac519d104ef3de7121b0af144f579f0c4",
  "source": {
   "provider": "osm",

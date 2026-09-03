@@ -3,7 +3,7 @@
  "regions": [
   {
    "id": "shanghai",
-   "name": "上海",
+   "name": "Shanghai",
    "timezone": "Asia/Shanghai",
    "center": [
     31.2304,
@@ -15,17 +15,17 @@
     {
      "layout_patch_id": "sh_a",
      "revision": 1,
-     "name": "衡山路"
+     "name": "Hengshan Road"
     },
     {
      "layout_patch_id": "sh_b",
      "revision": 1,
-     "name": "老城厢"
+     "name": "Old Town"
     },
     {
      "layout_patch_id": "sh_c",
      "revision": 1,
-     "name": "愚园路"
+     "name": "Yuyuan Road"
     }
    ]
   },

@@ -3,7 +3,7 @@
  "layout_patch_id": "sh_a",
  "revision": 1,
  "region_id": "shanghai",
- "name": "衡山路",
+ "name": "Hengshan Road",
  "checksum": "223f4de32a1f4d558cc4dc4eace0a17bbd7cb8367ee1508ea8d3b4f869d802ed",
  "source": {
   "provider": "osm",

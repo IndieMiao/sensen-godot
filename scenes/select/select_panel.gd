@@ -1,14 +1,29 @@
 class_name SelectPanel
 extends PanelContainer
 ## 底部候选卡片（PRD §4.3 / §10.2）：三张卡容量文案一致，只有名字与缩略图不同。
+##
+## 卡片曾经是一个纯 Button：card.text 塞「名字\n容量文案」、card.icon 塞预览图。
+## 真机上炸了两个坑（2026-09-04，vivo V2509A，360×800 逻辑视口）：
+##   D1 Button 文字默认不折行，容量文案（13 个 CJK 字）撑出 237px 的卡片最小宽度，
+##      三张卡 + 两条 8px 间隙 = 727px，远超 360px 视口，2/3 号卡片跑到屏幕外。
+##   D2 app_theme.tres 的 Button/colors/icon_normal_color 是给侧栏白色描边 SVG
+##      调墨色用的乘色，顺带把预览缩略图乘成近黑色小方块。
+## 现在卡片仍然是 Button（要它的 toggle_mode / ButtonGroup 行为），但文字和图像
+## 挪到内部一个 MOUSE_FILTER_IGNORE 的 VBoxContainer 里：TextureRect（不经过
+## Button 的 icon 乘色）+ 两级字号的 Label（容量行开自动折行，不再撑宽度）。
 
 signal candidate_focused(id: String)
 signal confirmed(id: String)
 
-const CAPACITY_TEXT := "9 格起步 · 首周可扩到 12 格"
+const CAPACITY_TEXT := "9 plots · 12 in week one"
 ## 卡片最小尺寸——刻意硬编码的一次性屏幕度量，不是要纳入 DesignTokens 的通用值
 ## （plan 第 18 行的约束只管 UI 颜色：「UI 颜色只取 DesignTokens」，尺寸不在此列）。
-const CARD_MIN := Vector2(104, 156)
+## x=104：360 逻辑视口下 SelectPanel 的可用宽度（328，减去 SB_drawer 左右各
+## 16px 内边距）再减两条 8px 卡间距，三等分正好是 104——这是这块屏幕的地板，
+## 不是随便挑的数。y 比原来的 156 高，给两行折行的容量文案留够空间。
+const CARD_MIN := Vector2(104, 172)
+## 预览缩略图固定高度：卡片内容区（CARD_MIN 减去内边距）分给预览的那一份。
+const CARD_PREVIEW_H := 64.0
 
 var focused_id := ""
 var confirm_button: Button
@@ -22,14 +37,14 @@ func _init() -> void:
 	vbox.add_theme_constant_override("separation", DesignTokens.SPACE_3)
 	add_child(vbox)
 	var title := Label.new()
-	title.text = "选一片街区，生成你的农场"
+	title.text = "Pick a neighborhood for your farm"
 	title.add_theme_font_size_override("font_size", DesignTokens.FONT_LABEL)
 	vbox.add_child(title)
 	_row = HBoxContainer.new()
 	_row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	vbox.add_child(_row)
 	confirm_button = Button.new()
-	confirm_button.text = "确认创建"
+	confirm_button.text = "Create Farm"
 	confirm_button.disabled = true
 	confirm_button.pressed.connect(func(): if not focused_id.is_empty(): confirmed.emit(focused_id))
 	vbox.add_child(confirm_button)
@@ -56,19 +71,76 @@ func set_candidates(items: Array) -> void:
 		card.button_group = _group
 		card.custom_minimum_size = CARD_MIN
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		card.text = "%s\n%s" % [item.name, CAPACITY_TEXT]
-		card.icon = item.get("preview")
-		card.expand_icon = true
-		card.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-		card.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		card.set_meta("id", item.id)
 		card.pressed.connect(_on_card_pressed.bind(card))
+		_build_card_content(card, item)
 		_row.add_child(card)
 		_cards.append(card)
-	# 候选卡是面板真正的高度大头（CARD_MIN.y=156 远大于标题/按钮），必须在它们
+	# 候选卡是面板真正的高度大头（CARD_MIN.y 远大于标题/按钮），必须在它们
 	# 都挂好之后重算一次 offset_top，否则仍然按 _init() 时刻（还没有卡片）的
 	# 尺寸定住，卡片撑高的部分照样会长到父容器底边以下（C2，2026-09-04 终审）。
 	_apply_bottom_preset()
+
+## Button 不是 Container，子节点不会自动跟着按钮尺寸走，必须手动铺满
+## （PRESET_FULL_RECT）再留一圈内边距，否则内容会贴着卡片圆角边框。
+## 所有子节点 MOUSE_FILTER_IGNORE：点击要落在 Button 本体上才能触发
+## toggle/ButtonGroup，被内容节点吞掉的话卡片就点不亮了。
+func _build_card_content(card: Button, item: Dictionary) -> void:
+	var content := VBoxContainer.new()
+	content.name = "Content"
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_theme_constant_override("separation", DesignTokens.SPACE_1)
+	content.set_anchors_preset(Control.PRESET_FULL_RECT)
+	content.offset_left = DesignTokens.SPACE_2
+	content.offset_top = DesignTokens.SPACE_2
+	content.offset_right = -DesignTokens.SPACE_2
+	content.offset_bottom = -DesignTokens.SPACE_2
+	card.add_child(content)
+
+	# D2：预览图独立成 TextureRect，不再经过 Button 的 icon_normal_color 乘色。
+	var preview := TextureRect.new()
+	preview.name = "Preview"
+	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	preview.texture = item.get("preview")
+	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	preview.custom_minimum_size = Vector2(0, CARD_PREVIEW_H)
+	preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	preview.clip_contents = true
+	content.add_child(preview)
+
+	var name_label := Label.new()
+	name_label.name = "NameLabel"
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	name_label.text = str(item.name)
+	name_label.add_theme_font_size_override("font_size", DesignTokens.FONT_LABEL)
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content.add_child(name_label)
+
+	# D1：容量文案挪到独立 Label，AUTOWRAP_WORD_SMART 折行——CJK 没有空格，
+	# 普通 WORD 折行遇到一个装不下的整词会整段不折，SMART 会在词内断开兜底。
+	var capacity := Label.new()
+	capacity.name = "CapacityLabel"
+	capacity.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	capacity.text = CAPACITY_TEXT
+	capacity.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
+	capacity.add_theme_color_override("font_color", DesignTokens.INK_SUB)
+	capacity.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	capacity.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content.add_child(capacity)
+
+## 卡片内承载容量文案的节点——测试断言"三卡容量文案一致"要读它，而不是已经
+## 清空的 Button.text（回归测试：谁把文案搬回 Button.text，这条先炸）。
+func capacity_label(card: Button) -> Label:
+	return card.get_node_or_null("Content/CapacityLabel") as Label
+
+## 卡片内承载名字的节点——name_label 也开了自动折行（候选名字长度不受我们控制）。
+func name_label(card: Button) -> Label:
+	return card.get_node_or_null("Content/NameLabel") as Label
+
+## 卡片内承载预览图的节点——测试断言"预览不是被主题染色的 Button.icon"要读它。
+func preview_node(card: Button) -> TextureRect:
+	return card.get_node_or_null("Content/Preview") as TextureRect
 
 func _on_card_pressed(card: Button) -> void:
 	focused_id = str(card.get_meta("id"))

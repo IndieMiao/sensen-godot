@@ -25,7 +25,7 @@ static func pick_region(p_regions: Array, lat: float, lng: float, has_fix: bool,
 func _ready() -> void:
 	regions = FarmRegions.load_default()
 	if regions == null:
-		status.text = "缺少城市配置"
+		status.text = "Missing city configuration"
 		return
 	for r in regions.regions:
 		var b := Button.new()
@@ -53,12 +53,12 @@ func locate() -> void:
 	if _bridge == null:
 		_bridge = MapBridgeFactory.make()
 	if _bridge == null:
-		status.text = "此设备无法定位，请手选城市"
+		status.text = "This device can't locate you — please choose a city manually"
 		return
 	_locating = true
 	_located = false
 	use_current.disabled = true
-	status.text = "正在定位…"
+	status.text = "Locating…"
 	_bridge.location_update.connect(_on_location, CONNECT_ONE_SHOT)
 	_bridge.start_location()
 	# CONNECT_ONE_SHOT 只在信号真正触发后才会自动断开；UI 层「放弃」（超时）
@@ -71,7 +71,7 @@ func locate() -> void:
 func _on_locate_timeout() -> void:
 	if _located:
 		return
-	status.text = "定位超时，请手选城市"
+	status.text = "Location timed out — please choose a city manually"
 	_cancel_locate()
 
 ## 断开定位订阅并把 UI 收回到可再次点按的状态。is_connected 判断是因为迟到的

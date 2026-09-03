@@ -64,3 +64,35 @@ func test_suspend_resume() -> void:
 	assert_int(m.process_mode).is_equal(Node.PROCESS_MODE_INHERIT)
 	assert_bool(m.visible).is_true()
 	assert_bool(m._camera_dirty).is_true()
+
+## D3（2026-09-04 真机实测，vivo V2509A）：受限模式顶栏卡死在「Loading map...」。
+## _update_load_bar() 用自由漫游的 INITIAL_ROLE_COUNT（1 自己 + 12 近处路人 +
+## 10 洛杉矶夹具 = 23）当门禁；但受限模式下 _spawn_home_cohort() 不排近处路人
+## （for i in (0 if street_mode else PAWNS_NEAR_COUNT)）、_spawn_la_fixture()
+## 在 _ready() 里被 `if not street_mode` 整个跳过——ready 顶多到 1（玩家自己），
+## 23 永远够不着，进度条永远不消失，顶部状态文案也永远卡在 "Loading map..."。
+func test_load_bar_hides_after_the_single_player_pawn_is_ready_in_street_mode() -> void:
+	var m := _map()
+	assert_bool(m.street_mode).is_true()
+	m._spawn_queue.clear()
+	m._pawns.clear()
+	var holder := Node3D.new()
+	m.rigs.add_child(holder)
+	m._pawns.append({"ready": true, "cohort": "self", "node": holder})
+	m._map_is_ready = true
+	m._header_locked = false
+	m._load_bar_started_ms = Time.get_ticks_msec() - m.LOAD_BAR_MIN_VISIBLE_MS
+	m._update_load_bar()
+	assert_bool(m.load_bar.visible).is_false()
+	assert_str(m._location_status_text()).is_not_equal("Loading map...")
+
+## D4（收窄后的范围，2026-09-04）：受限模式下按设计不生成近处路人，人数
+## 结构性恒为 0——"0 people" 是误导性的空信息，改成显示已选城市名字
+## （region.name，来自 FarmRegions），比一个恒为零的数字更有意义。
+## 自由漫游路径（street_mode == false）保持人数文案不变，见 test_map_ui.gd。
+func test_nearby_label_shows_city_name_instead_of_zero_people_in_street_mode() -> void:
+	var m := _map()
+	m._header_locked = false
+	m._refresh_header()
+	assert_str(m.nearby_count.text).is_equal("T") # REGION.name
+	assert_bool(m.nearby_count.text.contains("people")).is_false()

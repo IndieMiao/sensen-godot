@@ -241,7 +241,7 @@ func _process(_dt: float) -> void:
 		_refresh_header()
 
 func _refresh_header() -> void:
-	nearby_count.text = _people_count_text(_visible_role_count())
+	nearby_count.text = _nearby_label_text()
 	if _header_locked:
 		return
 	region_title.text = _region_title_text()
@@ -249,6 +249,15 @@ func _refresh_header() -> void:
 
 func _people_count_text(count: int) -> String:
 	return "%d %s" % [count, "person" if count == 1 else "people"]
+
+## D4（2026-09-04 真机实测）：受限模式下按设计不生成近处路人（_spawn_home_cohort
+## 只排玩家自己），人数结构性恒为 0——"0 people" 是误导性的空信息。受限模式下
+## 改显示已选城市名字（region.name，来自 FarmRegions），比一个恒为零的数字更有
+## 意义；自由漫游路径的人数文案保持不变。
+func _nearby_label_text() -> String:
+	if street_mode:
+		return str(region.get("name", ""))
+	return _people_count_text(_visible_role_count())
 
 func _region_title_text() -> String:
 	if _in_la:
@@ -774,6 +783,15 @@ func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String, cohort: 
 	_pawns.append(pawn)
 	_camera_dirty = true
 
+## D3（2026-09-04 真机实测）：受限模式顶栏卡死在「Loading map...」——这里原来
+## 无条件用自由漫游的 INITIAL_ROLE_COUNT（1 自己 + 12 近处路人 + 10 洛杉矶夹具
+## = 23）当门禁，但受限模式下 _spawn_home_cohort() 不排近处路人（for i in
+## (0 if street_mode else PAWNS_NEAR_COUNT)）、_spawn_la_fixture() 在 _ready()
+## 里被 `if not street_mode` 整个跳过——ready 顶多到 1（玩家自己），23 永远
+## 够不着，进度条永远不消失，_location_status_text() 也就永远卡在加载态。
+func _expected_role_count() -> int:
+	return 1 if street_mode else INITIAL_ROLE_COUNT
+
 func _update_load_bar() -> void:
 	if not load_bar.visible:
 		return
@@ -781,10 +799,11 @@ func _update_load_bar() -> void:
 	for p in _pawns:
 		if p.ready:
 			ready += 1
-	load_bar.max_value = INITIAL_ROLE_COUNT + 1
+	var expected := _expected_role_count()
+	load_bar.max_value = expected + 1
 	load_bar.value = ready + (1 if _map_is_ready else 0)
 	var elapsed_ms := Time.get_ticks_msec() - _load_bar_started_ms
-	if _map_is_ready and ready >= INITIAL_ROLE_COUNT and _spawn_queue.is_empty() \
+	if _map_is_ready and ready >= expected and _spawn_queue.is_empty() \
 			and elapsed_ms >= LOAD_BAR_MIN_VISIBLE_MS:
 		load_bar.visible = false
 		_refresh_header()
