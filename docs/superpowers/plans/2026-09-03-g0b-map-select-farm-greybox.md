@@ -1120,7 +1120,7 @@ git commit -m "feat(map): 街区级受限模式、平移边界、fly_to 与场�
 - Create: `tests/map/test_candidate_overlay.gd`
 
 **Interfaces:**
-- Produces: `class_name CandidateOverlay extends Node3D`：`const Y_LIFT := 0.3`、`const ALPHA_IDLE := 0.16`、`const ALPHA_SELECTED := 0.42`、`const PATH_WIDTH_M := 4.0`；`set_candidates(bps: Array, anchor_lat, anchor_lng)`；`select(id: String)`；`selected_id: String`；`reanchor(anchor_lat, anchor_lng)`；`candidate_ids() -> PackedStringArray`；`candidate_center(id) -> Vector2(lat, lng)`；`static geo_geo_to_local(lat, lng, anchor_lat, anchor_lng) -> Vector2(x, z)`（**不能叫 `to_local`**：与 `Node3D` 内置的 `geo_to_local(Vector3) -> Vector3` 冲突，是硬解析错误，2026-09-04 执行时发现并改名，与 `MapGeoMath.geo_to_world` 命名一致）；`static block_mesh(pts: PackedVector2Array) -> ArrayMesh`；`static path_mesh(pts: PackedVector2Array, width: float) -> ArrayMesh`。
+- Produces: `class_name CandidateOverlay extends Node3D`：`const Y_LIFT := 0.3`、`const ALPHA_IDLE := 0.16`、`const ALPHA_SELECTED := 0.42`、`const PATH_WIDTH_M := 4.0`；`set_candidates(bps: Array, anchor_lat, anchor_lng)`；`select(id: String)`；`selected_id: String`；`reanchor(anchor_lat, anchor_lng)`；`candidate_ids() -> PackedStringArray`；`candidate_center(id) -> Vector2(lat, lng)`；`static geo_to_local(lat, lng, anchor_lat, anchor_lng) -> Vector2(x, z)`（**不能叫 `to_local`**：与 `Node3D` 内置的同名实例方法 `to_local(Vector3) -> Vector3` 冲突，是硬解析错误；2026-09-04 执行时发现并改名，与 `MapGeoMath.geo_to_world` 命名一致）；`static block_mesh(pts: PackedVector2Array) -> ArrayMesh`；`static path_mesh(pts: PackedVector2Array, width: float) -> ArrayMesh`。
 
 - [ ] **Step 1: 写失败测试**
 
