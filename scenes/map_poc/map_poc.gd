@@ -210,13 +210,9 @@ func _ready() -> void:
 		load_candidates(region)
 	_camera_dirty = true
 
-## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）
+## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）；城市选择页共用同一工厂。
 func _make_bridge() -> MapBridge:
-	if Engine.has_singleton("GodotMap"):
-		return MapBridgeAndroid.new()
-	if OS.get_name() == "iOS":
-		return MapBridgeIOS.new()
-	return null
+	return MapBridgeFactory.make()
 
 func _exit_tree() -> void:
 	# 场景切走的清理：transparent_bg 是根视口全局态，不还原会把换装房的

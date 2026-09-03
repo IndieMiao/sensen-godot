@@ -6,7 +6,7 @@ config/name="SensenAvatar"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 config/quit_on_go_back=false
-run/main_scene="res://scenes/map_poc/map_poc.tscn"
+run/main_scene="res://scenes/city_select/city_select.tscn"
 
 [autoload]
 Avatar="*res://modules/avatar/avatar_service.gd"
