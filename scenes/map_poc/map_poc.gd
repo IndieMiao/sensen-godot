@@ -50,6 +50,7 @@ const DOUBLE_TAP_MAX_PX := 32.0
 
 @onready var rigs: Node3D = $Rigs
 @onready var cam: Camera3D = $Camera3D
+@onready var world_env: WorldEnvironment = $WorldEnvironment
 @onready var safe_area: SafeAreaMargin = $HUD/SafeArea
 @onready var top_panel: PanelContainer = $HUD/SafeArea/Root/TopPanel
 @onready var status_dot: Panel = $HUD/SafeArea/Root/TopPanel/VBox/StatusRow/Dot
@@ -93,6 +94,9 @@ var pitch := 45.0
 var pixel_ratio := 1.0
 var _touch_count := 0
 var _camera_dirty := true
+## suspend() 里从 world_env.environment 摘下来的引用，resume() 时原样插回去
+## （suspend/resume 协议的一部分，见 app_router.gd::_suspend 的类注释）。
+var _saved_environment: Environment
 var _in_la := false
 var _rng := RandomNumberGenerator.new()
 ## 每项：{lat, lng, node: holder Node3D, activity: RigActivity}
@@ -590,7 +594,10 @@ func fly_to(lat: float, lng: float) -> void:
 	_teleport(lat, lng)
 	_clamp_to_bounds()
 
-## 场景栈协议（AppRouter.push_instance）：进入第二层实例时地图完全隐藏并停渲染。
+## 场景栈协议（AppRouter.push_instance）：进入第二层实例时地图完全隐藏并停渲染，
+## 同时交出相机与环境的所有权——只隐藏节点不够：Godot 4 里 Camera3D/WorldEnvironment
+## 不会因为父节点 visible=false 就失去"当前"身份，压栈场景会看见地图相机冻结的位姿
+## 和地图的天空/环境光（2026-09-04 终审 C1）。
 func suspend() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 	visible = false
@@ -598,6 +605,10 @@ func suspend() -> void:
 	if map:
 		map.set_map_visible(false)
 	get_viewport().transparent_bg = false
+	cam.current = false
+	if world_env.environment:
+		_saved_environment = world_env.environment
+	world_env.environment = null
 
 func resume() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
@@ -607,6 +618,8 @@ func resume() -> void:
 	if map:
 		map.set_map_visible(true)
 	_camera_dirty = true
+	cam.make_current()
+	world_env.environment = _saved_environment
 
 func _set_zoom(v: float) -> void:
 	if street_mode:

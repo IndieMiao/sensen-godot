@@ -33,5 +33,8 @@ func test_shipped_blueprints_fair_and_checksummed() -> void:
 			far.append(m.far_bed_s)
 			tour.append(m.tour_s)
 	assert_int(seen.size()).override_failure_message("需要 6 个真实蓝图（G0-A Task 10）").is_equal(6)
+	# far 的 spread 结构性地恒为 0（选畦总是优先离出生点最近，见 fairness.gd 类注释），
+	# 这一条实际是 0 <= 0.10，测不出任何东西；真正的守卫是上面第 32 行逐蓝图的
+	# MAX_FAR_BED_S 断言。留着这一行只是保持与 tour_s 对称，不代表它验证了公平性。
 	assert_float(BlueprintFairness.spread(far)).is_less_equal(BlueprintFairness.MAX_SPREAD)
 	assert_float(BlueprintFairness.spread(tour)).is_less_equal(BlueprintFairness.MAX_SPREAD)

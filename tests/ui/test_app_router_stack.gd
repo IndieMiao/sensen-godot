@@ -47,6 +47,17 @@ func test_back_respects_top_instance_lock() -> void:
 	await get_tree().process_frame
 	assert_int(AppRouter.instance_depth()).is_equal(0)
 
+## C1（2026-09-04 终审）：压栈场景必须真的接管视口的当前相机，光隐藏节点不够——
+## Godot 4 里 Camera3D 只有 current==true 或是视口里第一台相机时才会被选中。
+func test_push_makes_probe_camera_current_and_pop_restores_previous() -> void:
+	var a := AppRouter.push_instance(PROBE)
+	assert_bool(get_viewport().get_camera_3d() == a.cam).is_true()
+	var b := AppRouter.push_instance(PROBE)
+	assert_bool(get_viewport().get_camera_3d() == b.cam).is_true()
+	AppRouter.pop_instance()
+	await get_tree().process_frame
+	assert_bool(get_viewport().get_camera_3d() == a.cam).is_true()
+
 func test_back_action_table_includes_city_select() -> void:
 	assert_int(AppRouter.back_action_for_scene(AppRouter.CITY_SELECT)).is_equal(AppRouter.BACK_LEAVE_APP)
 	assert_str(AppRouter.qa_scene_path(PackedStringArray(["--qa-scene=city"]))).is_equal(AppRouter.CITY_SELECT)

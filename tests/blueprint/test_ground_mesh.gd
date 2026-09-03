@@ -43,8 +43,7 @@ func test_water_beats_buildable_in_priority() -> void:
 func test_build_places_cell_colors_at_expected_offsets() -> void:
 	## Validates that build() places colours at the correct mesh vertex offsets.
 	## Fixtures grid is 8×8, so (i,j) and (j,i) transpose would not be caught by AABB alone.
-	## These cells are chosen to differ from their transpose: (0,1) cultivable vs (1,0) buildable,
-	## and (6,7) water vs (7,6) water - well, those both water. Let me use (6,7) water vs (7,7) water.
+	## These cells are chosen to differ from their transpose: (0,1) cultivable vs (1,0) buildable.
 	var bp := FarmBlueprint.load_file(FIX)
 	var mesh := BlueprintGroundMesh.build(bp)
 	var arrays := mesh.surface_get_arrays(0)
@@ -63,10 +62,3 @@ func test_build_places_cell_colors_at_expected_offsets() -> void:
 		assert_float(colors[idx].r).is_equal_approx(BlueprintGroundMesh.COLOR_BLOCK.r, 0.01)
 		assert_float(colors[idx].g).is_equal_approx(BlueprintGroundMesh.COLOR_BLOCK.g, 0.01)
 		assert_float(colors[idx].b).is_equal_approx(BlueprintGroundMesh.COLOR_BLOCK.b, 0.01)
-
-	## Cell (6, 7): non-walkable → COLOR_WATER
-	var offset_6_7 := (7 * bp.grid.x + 6) * 6
-	for idx in range(offset_6_7, offset_6_7 + 6):
-		assert_float(colors[idx].r).is_equal_approx(BlueprintGroundMesh.COLOR_WATER.r, 0.01)
-		assert_float(colors[idx].g).is_equal_approx(BlueprintGroundMesh.COLOR_WATER.g, 0.01)
-		assert_float(colors[idx].b).is_equal_approx(BlueprintGroundMesh.COLOR_WATER.b, 0.01)

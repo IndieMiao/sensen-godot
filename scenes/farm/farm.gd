@@ -27,6 +27,10 @@ func setup(args: Dictionary) -> void:
 	_args = args
 
 func _ready() -> void:
+	# 压栈进入的新实例不会经过 AppRouter 的 suspend/resume 协议（那条协议只管
+	# "已经在栈里、被别人盖住/揭开"的场景）；自己的相机要不要成为当前相机，
+	# 得在第一次入树时自己抢——不抢的话会保留住下层地图冻结的位姿（2026-09-04 终审 C1）。
+	cam.make_current()
 	bp = _args.get("blueprint")
 	if bp == null:
 		bp = FarmBlueprint.load_file(FarmBlueprint.asset_path(

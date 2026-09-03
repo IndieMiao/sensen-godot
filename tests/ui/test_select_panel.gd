@@ -35,6 +35,24 @@ func test_focus_api_marks_card_pressed() -> void:
 	assert_bool((p.cards()[2] as Button).button_pressed).is_true()
 	assert_str(p.focused_id).is_equal("c")
 
+## C2（2026-09-04 终审）：_init() 里 set_anchors_and_offsets_preset(PRESET_BOTTOM_WIDE)
+## 曾经在任何子节点存在之前就被调用，PRESET_MODE_MINSIZE 按调用时刻的
+## get_combined_minimum_size()（当时是 0）算 offset_top，面板因此整个长在父容器
+## 底边以下、完全不可见——三张候选卡与「确认创建」是确认候选的唯一入口，这条回归
+## 直接决定这个 gate 能不能用。用一个有具体尺寸的父 Control 复现真实布局环境。
+func test_panel_stays_within_parent_bounds_after_candidates() -> void:
+	var parent := Control.new()
+	add_child(auto_free(parent))
+	parent.size = Vector2(1080, 1920)
+	var p: SelectPanel = auto_free(SelectPanel.new())
+	parent.add_child(p)
+	p.set_candidates([
+		{"id": "a", "name": "甲", "preview": null},
+		{"id": "b", "name": "乙", "preview": null},
+		{"id": "c", "name": "丙", "preview": null}])
+	assert_float(p.position.y).is_greater_equal(0.0)
+	assert_float(p.position.y + p.size.y).is_less_equal(parent.size.y)
+
 func test_set_candidates_twice_does_not_accumulate() -> void:
 	var p: SelectPanel = auto_free(SelectPanel.new())
 	add_child(p)

@@ -1,6 +1,14 @@
 class_name BlueprintFairness
 extends RefCounted
 ## 与 tools/geo_blueprint/src/anchors.ts validate() 同一套公式，Godot 侧再算一遍做双端守卫。
+##
+## 口径局限（与 tools/geo_blueprint/src/cli.ts:33-37 的 NOTE 同一条，尚待评审，
+## 不是本文件的新发现，只是把上游已经写在代码里的记录抄一份过来）：
+## far_bed_s 是管线结构性保证——anchors.ts::place() 选畦永远优先离出生点最近的
+## 三条，所以它在候选之间的 spread 恒为 0，测不出任何公平性差异，只验证"最远
+## 畦格没有超过 MAX_FAR_BED_S 上限"。tour_s 里恒定的 9 * ACTION_S = 18s
+## （INITIAL_BEDS * BED_CELLS * ACTION_S）会把真实的步行耗时差异稀释：六个真实
+## 蓝图未稀释前的纯步行时间 spread ≈ 29%，稀释后只剩 ~6.8%（< MAX_SPREAD）。
 
 const WALK_SPEED := 2.5
 const ACTION_S := 2.0

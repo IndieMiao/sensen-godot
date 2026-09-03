@@ -156,6 +156,13 @@ static func _cs(c: Vector2i) -> String:
 	return "%d,%d" % [c.x, c.y]
 
 ## 与 tools/geo_blueprint/src/writer.ts 的 canonical() 逐字一致，改一处必须改两处。
+##
+## 覆盖范围（与 writer.ts:16-21 同一条 NOTE）：只覆盖四张 mask、点位锚点与畦，
+## 不覆盖 grid、cell_m、play_area_m、reserved_bed。把 grid 从 [64,64] 改成
+## [32,128]，或者改 cell_m（驱动每一次距离/耗时换算），checksum 照样能通过，
+## 客户端却会把同一份 4096 字符的 mask 解读成完全不同的网格。要收紧这个公式
+## 需要同时改三处——这个文件、tools/geo_blueprint/src/writer.ts、以及 Godot 侧
+## fixture 里钉死的字面量——目前还没有人拍板要不要收紧。
 func canonical() -> String:
 	var bed_strs := PackedStringArray()
 	for bed in beds():
