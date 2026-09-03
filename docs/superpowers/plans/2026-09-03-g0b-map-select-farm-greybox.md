@@ -726,9 +726,13 @@ extends Node
 var args := {}
 var suspended := 0
 var resumed := 0
+var back_locked := false
 
 func setup(p_args: Dictionary) -> void:
 	args = p_args
+
+func is_back_navigation_locked() -> bool:
+	return back_locked
 
 func suspend() -> void:
 	suspended += 1
@@ -786,6 +790,18 @@ func test_back_pops_when_stack_not_empty() -> void:
 	AppRouter.handle_back()
 	await get_tree().process_frame
 	assert_bool(is_instance_valid(a)).is_false()
+	assert_int(AppRouter.instance_depth()).is_equal(0)
+
+func test_back_respects_top_instance_lock() -> void:
+	var a := AppRouter.push_instance(PROBE)
+	a.back_locked = true
+	AppRouter.handle_back()
+	await get_tree().process_frame
+	assert_bool(is_instance_valid(a)).is_true() # 锁住时不得弹栈
+	assert_int(AppRouter.instance_depth()).is_equal(1)
+	a.back_locked = false
+	AppRouter.handle_back()
+	await get_tree().process_frame
 	assert_int(AppRouter.instance_depth()).is_equal(0)
 
 func test_back_action_table_includes_city_select() -> void:
@@ -857,6 +873,10 @@ func go_to_dressing() -> void:
 ```gdscript
 func handle_back() -> void:
 	if not _stack.is_empty():
+		# 栈顶也要尊重返回锁：换装房保存中（_committing）被系统返回键弹栈会中断保存。
+		# 与下方 current_scene 分支同一语义（2026-09-04 执行时补上，原计划漏了这一层）。
+		if scene_locks_back_navigation(top_instance()):
+			return
 		pop_instance()
 		return
 	var current := get_tree().current_scene
