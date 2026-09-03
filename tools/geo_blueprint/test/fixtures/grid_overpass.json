@@ -1,0 +1,11 @@
+{"version": 0.6, "elements": [
+ {"type":"node","id":1,"lat":31.20090,"lon":121.39820},{"type":"node","id":2,"lat":31.20090,"lon":121.40180},
+ {"type":"node","id":3,"lat":31.19910,"lon":121.39820},{"type":"node","id":4,"lat":31.19910,"lon":121.40180},
+ {"type":"node","id":5,"lat":31.20160,"lon":121.39895},{"type":"node","id":6,"lat":31.19840,"lon":121.39895},
+ {"type":"node","id":7,"lat":31.20160,"lon":121.40105},{"type":"node","id":8,"lat":31.19840,"lon":121.40105},
+ {"type":"way","id":101,"nodes":[1,2],"tags":{"highway":"residential","name":"North St"}},
+ {"type":"way","id":102,"nodes":[3,4],"tags":{"highway":"residential","name":"South St"}},
+ {"type":"way","id":103,"nodes":[5,6],"tags":{"highway":"tertiary","name":"West Ave"}},
+ {"type":"way","id":104,"nodes":[7,8],"tags":{"highway":"tertiary","name":"East Ave"}},
+ {"type":"way","id":105,"nodes":[1,3],"tags":{"highway":"footway"}}
+]}
