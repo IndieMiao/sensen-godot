@@ -134,13 +134,23 @@ var _zoom_vel := 0.0
 var _gesture_multi := false
 var _load_bar_started_ms := 0
 var _map_is_ready := false
+## 受限模式（PRD §3.1）：由 FarmRegions 的城市选择触发；为真时地图只做「看见、选择、返回」。
+var street_mode := false
+var region: Dictionary = {}
+## 平移边界（lat/lng）：position=(lat_min,lng_min)，size=(lat span,lng span)；零 size 不钳。
+var pan_bounds := Rect2()
 
 func _ready() -> void:
 	_load_bar_started_ms = Time.get_ticks_msec()
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
 	get_viewport().transparent_bg = true
 	$Sun.rotation_degrees = Vector3(-55, 30, 0)
-	_spawn_la_fixture() # 压测夹具先排队；home 队列等定位确定后再插
+	var choice := FarmRegions.load_choice()
+	var regions := FarmRegions.load_default()
+	if regions != null and not choice.is_empty() and not regions.region(choice).is_empty():
+		enter_street_mode(regions.region(choice))
+	if not street_mode:
+		_spawn_la_fixture() # 压测夹具先排队；home 队列等定位确定后再插
 	_wire_buttons()
 
 	# marker 层：铺满 HUD 且排在最底，别挡住芯片和按钮。
@@ -152,6 +162,7 @@ func _ready() -> void:
 	marker_layer.z_index = -10
 	$HUD.add_child(marker_layer)
 	$HUD.move_child(marker_layer, 0)
+	marker_layer.visible = not street_mode
 	_sync_marker_margins()
 	safe_area.margins_applied.connect(func(_m): call_deferred("_sync_marker_margins"))
 
@@ -175,9 +186,12 @@ func _ready() -> void:
 			location_status.text = "Check your connection"
 			_header_locked = true
 		else:
-			map.create_map(token, START_LAT, START_LNG, zoom)
+			var lat0 := float(region.center[0]) if street_mode else START_LAT
+			var lng0 := float(region.center[1]) if street_mode else START_LNG
+			map.create_map(token, lat0, lng0, zoom)
 			_set_dot(DOT_WAIT, true) # 连接中：呼吸闪烁
-		map.start_location()
+		if not street_mode:
+			map.start_location()
 	else:
 		_map_is_ready = true
 		_set_dot(DOT_WAIT, false)
@@ -188,6 +202,8 @@ func _ready() -> void:
 	# 没有这条，_spawn_home_cohort 永远不会被调用，地图上只剩洛杉矶夹具。
 	get_tree().create_timer(HOME_TIMEOUT_S).timeout.connect(
 		func(): _resolve_home(START_LAT, START_LNG, true))
+	if street_mode:
+		_resolve_home(float(region.center[0]), float(region.center[1]), false)
 	_camera_dirty = true
 
 ## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）
@@ -290,6 +306,7 @@ func _apply_world_delta(delta: Vector3) -> void:
 		center_lat + (-delta.z) / MapGeoMath.M_PER_DEG_LAT, -85.051129, 85.051129)
 	center_lng += delta.x / (MapGeoMath.M_PER_DEG_LAT * cos(deg_to_rad(anchor_lat)))
 	center_lng = wrapf(center_lng, -180.0, 180.0)
+	_clamp_to_bounds()
 
 func _update_cameras() -> void:
 	center_world = MapGeoMath.geo_to_world(center_lat, center_lng, anchor_lat, anchor_lng)
@@ -423,7 +440,8 @@ func _unhandled_input(e: InputEvent) -> void:
 			if _touch_count <= 1: # 第二指落下（捏合起手）不算双击，镜像拖拽路径的门禁
 				if _is_double_tap(Time.get_ticks_msec(), e.position):
 					_last_tap_ms = 0
-					_tween_zoom(zoom + 1.0)
+					if not street_mode:
+						_tween_zoom(zoom + 1.0)
 				else:
 					_last_tap_ms = Time.get_ticks_msec()
 					_last_tap_pos = e.position
@@ -446,13 +464,13 @@ func _unhandled_input(e: InputEvent) -> void:
 		_drag_accum_px += e.relative.length()
 		if _drag_accum_px > DOUBLE_TAP_MAX_PX:
 			_last_tap_ms = 0
-	elif e is InputEventMagnifyGesture:
+	elif e is InputEventMagnifyGesture and not street_mode:
 		# 与拖拽同款：应用之后把变化量换算成 zoom/秒 做 EMA 平滑，松手接着走。
 		var dz := log(e.factor) / log(2.0)
 		_set_zoom(zoom + dz)
 		var zdt := maxf(get_process_delta_time(), 0.001)
 		_zoom_vel = lerpf(_zoom_vel, dz / zdt, FLING_EMA)
-	elif e is InputEventPanGesture:
+	elif e is InputEventPanGesture and not street_mode:
 		_set_pitch(pitch - e.delta.y * 0.2)
 
 func _wire_buttons() -> void:
@@ -491,7 +509,60 @@ func _teleport(lat: float, lng: float) -> void:
 	_reposition_pawns()
 	_camera_dirty = true
 
+## —— 受限模式 ——————————————————————————————————————————————
+
+func enter_street_mode(r: Dictionary) -> void:
+	street_mode = true
+	region = r
+	zoom = float(r.get("street_zoom", 16.0))
+	pitch = float(r.get("pitch", 45.0))
+	bearing = 0.0
+	if is_node_ready():
+		view_mode_switch.get_parent().visible = false
+		travel_btn.get_parent().visible = false
+		if marker_layer:
+			marker_layer.visible = false
+		if not _home_resolved:
+			_resolve_home(float(r.center[0]), float(r.center[1]), false)
+	_camera_dirty = true
+
+func set_pan_bounds(center_lat: float, center_lng: float, half_m: float) -> void:
+	var dlat := half_m / MapGeoMath.M_PER_DEG_LAT
+	var dlng := half_m / (MapGeoMath.M_PER_DEG_LAT * cos(deg_to_rad(center_lat)))
+	pan_bounds = Rect2(center_lat - dlat, center_lng - dlng, 2.0 * dlat, 2.0 * dlng)
+	_clamp_to_bounds()
+
+func _clamp_to_bounds() -> void:
+	if pan_bounds.size == Vector2.ZERO:
+		return
+	center_lat = clampf(center_lat, pan_bounds.position.x, pan_bounds.position.x + pan_bounds.size.x)
+	center_lng = clampf(center_lng, pan_bounds.position.y, pan_bounds.position.y + pan_bounds.size.y)
+
+func fly_to(lat: float, lng: float) -> void:
+	_teleport(lat, lng)
+	_clamp_to_bounds()
+
+## 场景栈协议（AppRouter.push_instance）：进入第二层实例时地图完全隐藏并停渲染。
+func suspend() -> void:
+	process_mode = Node.PROCESS_MODE_DISABLED
+	visible = false
+	$HUD.visible = false
+	if map:
+		map.set_map_visible(false)
+	get_viewport().transparent_bg = false
+
+func resume() -> void:
+	process_mode = Node.PROCESS_MODE_INHERIT
+	visible = true
+	$HUD.visible = true
+	get_viewport().transparent_bg = true
+	if map:
+		map.set_map_visible(true)
+	_camera_dirty = true
+
 func _set_zoom(v: float) -> void:
+	if street_mode:
+		return
 	zoom = clampf(v, 3.0, 20.0)
 	_camera_dirty = true
 
@@ -541,7 +612,7 @@ func _spawn_home_cohort() -> void:
 	# push_front：自己排队头，第一个出队，玩家最先看到自己
 	_spawn_queue.push_front({"lat": home_lat, "lng": home_lng,
 		"cfg": self_config(), "anim": "idle", "cohort": "self"})
-	for i in PAWNS_NEAR_COUNT:
+	for i in (0 if street_mode else PAWNS_NEAR_COUNT):
 		var off := _rand_offset_deg(NEAR_SPREAD_M, home_lat)
 		_spawn_queue.append({"lat": home_lat + off.y, "lng": home_lng + off.x,
 			"cfg": _random_config(), "anim": _rand_anim(), "cohort": "near"})
