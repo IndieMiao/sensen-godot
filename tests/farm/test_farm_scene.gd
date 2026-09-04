@@ -41,7 +41,8 @@ func test_process_moves_player_and_camera_follows() -> void:
 	# 且精确钉在 45° 俯角 * CAM_DIST 的公式上——相机在南侧看向北。
 	assert_bool(cam.position != cam_before).is_true()
 	var phi := deg_to_rad(45.0) # CAM_PITCH_DEG
-	var expected := player.position + Vector3(0.0, 16.0 * sin(phi), 16.0 * cos(phi)) # CAM_DIST
+	# 跟随点比玩家再往南 CAM_AHEAD：玩家落在屏幕上三分之一，南侧那一畦不再压在工具栏下。
+	var expected := player.position + Vector3(0.0, 16.0 * sin(phi), 16.0 * cos(phi) + f.CAM_AHEAD) # CAM_DIST
 	assert_vector(cam.position).is_equal_approx(expected, Vector3(0.001, 0.001, 0.001))
 
 func test_exit_button_wired_to_router() -> void:

@@ -4,6 +4,9 @@ extends Node3D
 
 const WORLD_SCALE := 1.0 # 逻辑米 → 世界米；G1 调观感时只改这里，时长不变量不受影响
 const CAM_DIST := 16.0
+## 相机跟随点比玩家再往南（+z，靠相机一侧）偏这么多米：HUD 占掉屏幕下方约 40%，玩家若在正
+## 中，南侧那一畦永远压在工具栏底下点不到（2026-09-04 真机）。偏移后玩家落在上三分之一。
+const CAM_AHEAD := 3.0
 ## 田畦盒子高度；作物层从它的顶面往上长。
 const BED_H := 0.15
 const CAM_PITCH_DEG := 45.0
@@ -106,6 +109,8 @@ func _ready() -> void:
 	hud.row_tool_toggled.connect(func(on): row_tool = on)
 	if not visitor:
 		_build_director()
+		# 第一眼就告诉玩家怎么开始；选了工具后提示会换成下一步。
+		hud.set_hint("Pick a tool below, then tap a plot")
 	_refresh_hud()
 	joystick.changed.connect(mover.set_joystick)
 	player.position = mover.position
@@ -181,8 +186,9 @@ func _process(dt: float) -> void:
 
 func _update_camera() -> void:
 	var phi := deg_to_rad(CAM_PITCH_DEG)
-	cam.position = player.position + Vector3(0.0, CAM_DIST * sin(phi), CAM_DIST * cos(phi))
-	cam.look_at(player.position + Vector3(0, 0.8, 0), Vector3.UP)
+	var target := player.position + Vector3(0.0, 0.0, CAM_AHEAD)
+	cam.position = target + Vector3(0.0, CAM_DIST * sin(phi), CAM_DIST * cos(phi))
+	cam.look_at(target + Vector3(0, 0.8, 0), Vector3.UP)
 
 func _unhandled_input(e: InputEvent) -> void:
 	# 缺蓝图退场帧：_ready() 里 call_deferred("_leave") 要到本帧末才生效，

@@ -159,6 +159,7 @@ func _build_bottom() -> void:
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.clip_text = true   # 兜底：字号/字体一变，宁可省略号也不要溢出屏幕
 		b.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
+		_tighten(b)
 		b.pressed.connect(_on_crop.bind(id))
 		seeds.add_child(b)
 		_crop_buttons[id] = b
@@ -175,10 +176,23 @@ func _build_bottom() -> void:
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.clip_text = true
 		b.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
+		_tighten(b)
 		b.pressed.connect(_on_tool.bind(str(spec.id)))
 		tools.add_child(b)
 		_tool_buttons[spec.id] = b
 
+
+## 主题给 Button 的左右内边距是 16，一行五个按钮时「Reap」在真机字体下被裁成「Rea」。
+## 工具与作物按钮收到 6，触摸高度靠 BUTTON_H 兜着不受影响。
+static func _tighten(b: Button) -> void:
+	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+		var sb := b.get_theme_stylebox(state)
+		if sb == null:
+			continue
+		var dup := sb.duplicate() as StyleBox
+		dup.content_margin_left = 6.0
+		dup.content_margin_right = 6.0
+		b.add_theme_stylebox_override(state, dup)
 
 ## 再点一次已选工具就退回移动模式——不给「取消」单独占一个按钮位。
 func _on_tool(id: String) -> void:
@@ -283,14 +297,13 @@ func set_visitor_mode(on: bool) -> void:
 ## 底栏上方的一条状态：选了工具给提示，干活时给「Clearing… 40%」+ 进度条。
 ## 2026-09-04 录屏：没有它，2 秒一格的劳作在玩家眼里就是「点了没反应」。
 func _build_status() -> void:
+	# 挂在右上那一列的末尾（金币/田况/倒计时/Row 之下），不再横在底栏上方——那里正好盖住
+	# 中间那一畦（2026-09-04 真机）。
 	_status = PanelContainer.new()
 	_status.name = "ActionStatus"
 	_status.theme_type_variation = &"ChipPanel"
-	_status.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	_status.offset_left = 8.0
-	_status.offset_right = -8.0
-	_status.offset_top = -330.0
-	_status.offset_bottom = -288.0
+	_status.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_status.custom_minimum_size.x = 150.0
 	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_status.visible = false
 	var v := VBoxContainer.new()
@@ -305,7 +318,7 @@ func _build_status() -> void:
 	_status_bar.custom_minimum_size.y = 6.0
 	_status_bar.max_value = 1.0
 	v.add_child(_status_bar)
-	add_child(_status)
+	get_node("TopRight").add_child(_status)
 	_toast = PanelContainer.new()
 	_toast.name = "Toast"
 	_toast.theme_type_variation = &"ToastPanel"
