@@ -1,0 +1,30 @@
+# 局域网测试服务器 devserver（192.168.124.53）上的开发/测试 PostgreSQL。
+# 本机不装 Docker 也不装 PG——这台机器已经有 Docker（免 sudo）且 5432 空闲。
+#
+#   scp deploy/devserver-pg.compose.yml zhangshaojie@192.168.124.53:/tmp/
+#   ssh zhangshaojie@192.168.124.53 'mkdir -p ~/pg16-farm && mv /tmp/devserver-pg.compose.yml ~/pg16-farm/compose.yml \
+#     && cd ~/pg16-farm && POSTGRES_PASSWORD=... docker compose up -d'
+services:
+  postgres:
+    # 国内直连 Docker Hub 拉不动（2026-09-04 实测 short read / EOF），走 daocloud 镜像源。
+    image: docker.m.daocloud.io/library/postgres:16-alpine
+    container_name: farm-pg16
+    restart: unless-stopped
+    # 只绑局域网地址，不监听 0.0.0.0
+    ports: ["192.168.124.53:5432:5432"]
+    environment:
+      POSTGRES_USER: farm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?需要显式提供}
+      POSTGRES_DB: sensen_farm_dev
+      # 只允许局域网网段的密码认证
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    volumes:
+      - pgdata_farm:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U farm -d sensen_farm_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  pgdata_farm:

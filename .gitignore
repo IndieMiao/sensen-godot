@@ -20,3 +20,5 @@ tools/geo_blueprint/.tmp/
 .claude/settings.local.json
 
 node_modules/
+
+server/.env
