@@ -78,7 +78,7 @@ export interface Content {
   };
   recipes: {
     recipes: Record<DishId, { inputs: CropAmounts; stall_price: number }>;
-    buyback: { dish: DishId; coins: number; per_player_day: number; counts_against_stall_budget: boolean };
+    buyback: { dish: DishId; coins: number; per_player_day: number; per_week: number; counts_against_stall_budget: boolean };
   };
   economy: {
     initial_wallet: number;

@@ -1,11 +1,34 @@
 {
-  "_source": "PRD §6.5 L435-438；摊位定价为 2026-09-04 用户决策⑦",
-  "format": 1,
-  "recipes": {
-    "salad": { "_name": "蔬菜沙拉", "_line": "L435 1C + 1L", "inputs": { "C": 1, "L": 1 }, "stall_price": 36 },
-    "tea":   { "_name": "洋甘菊茶", "_line": "L436 1H",      "inputs": { "H": 1 },         "stall_price": 24 }
+ "_source": "PRD §6.5 L435-438；摊位定价为 2026-09-04 用户决策⑦",
+ "format": 1,
+ "recipes": {
+  "salad": {
+   "_name": "蔬菜沙拉",
+   "_line": "L435 1C + 1L",
+   "inputs": {
+    "C": 1,
+    "L": 1
+   },
+   "stall_price": 36
   },
-  "_premium_note": "决策⑦：料理上自助摊且溢价（原料售价和为 28 / 19）。Codex 二审算出溢价配合预算外的回购箱会把高频账户价值上界推到 1026，越过 PRD L431 的 1.8×=981 红线；决策是让回购箱计入摊位预算（见 economy.json buyback），模型回落 968。",
-  "_buyback_note": "L534：洋甘菊茶经农场门口回购箱换 24 金币且不加关系。",
-  "buyback": { "dish": "tea", "coins": 24, "per_player_day": 1, "counts_against_stall_budget": true }
+  "tea": {
+   "_name": "洋甘菊茶",
+   "_line": "L436 1H",
+   "inputs": {
+    "H": 1
+   },
+   "stall_price": 24
+  }
+ },
+ "_premium_note": "决策⑦：料理上自助摊且溢价（原料售价和为 28 / 19）。Codex 二审算出溢价配合无限次回购会把高频账户价值上界推到 1026，越过 PRD L431 的 1.8×=981 红线。曾考虑让回购计入摊位预算，但 PRD L544-547 自己把茶回购算在「居民请求」224 那一栏里（30+45+55+70+24），不在摊位 381 中，且账本 D4 当天摊位 79 + 回购 24 = 103 会超 100 预算——计入预算既违背 PRD 口径又让目标账本跑不通。改为回购**周上限 1 次**（PRD 全周恰好用一次）+ 种苗包周上限 2，实测宽松整数上界 972 ≤ 981。",
+ "_buyback_note": "L534：洋甘菊茶经农场门口回购箱换 24 金币且不加关系。",
+ "buyback": {
+  "dish": "tea",
+  "coins": 24,
+  "per_player_day": 1,
+  "per_week": 1,
+  "_week_note": "PRD 账本全周只在 D4 用一次；不限次数时高频上界会到 1026。",
+  "counts_against_stall_budget": false,
+  "_budget_note": "PRD L544-547 把它算在「居民请求」栏，不占摊位 381 的额度。"
+ }
 }

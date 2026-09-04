@@ -1,45 +1,82 @@
 {
-  "_source": "PRD §6.4 L431、§7.3 L509-515、§7.4 L519-522、§7.5 L526-574、§7.6 L587",
-  "format": 1,
-  "initial_wallet": 180,
-  "_stall_note": "L431：自助摊每个 player_day_id 最多按固定价收购 100 金币，达到预算后产物留在库存且不降价；居民请求不占该预算。决策⑦：门口回购箱也计入这 100。",
-  "stall_budget_per_day": 100,
-  "_growth_note": "L520：240 工具 或 400 扩地，首周永久二选一。L559：扩地交易同时预留并支付本轮 12 格种子——不能买出空田后无钱播种。",
-  "growth_choice": {
-    "tool": { "price": 240, "_line": "L520 行级工具 240，覆盖翻土/照料/收获同畦 3 格，不提产量不缩时长（L408）" },
-    "field": {
-      "price": 400,
-      "_line": "L520 第四田畦 400",
-      "_basket_note": "固定篮而不是玩家任选 12 枚：任选时 12R 只要 48、12H 要 120，都推不出账本里的 84（Codex 二审 Critical 1）。3×4+3×6+3×8+3×10 = 84。",
-      "seed_basket": { "R": 3, "L": 3, "C": 3, "H": 3 },
-      "_basket_cost": 84,
-      "beds_unlocked_after": 4,
-      "_tilled_note": "决策⑥：预留畦到手即已清理已翻土，不计首次清理 XP——否则 D5/D6 累计会变成 271/304，与 PRD L567/L570 的 268/301 矛盾。"
-    }
+ "_source": "PRD §6.4 L431、§7.3 L509-515、§7.4 L519-522、§7.5 L526-574、§7.6 L587",
+ "format": 1,
+ "initial_wallet": 180,
+ "_stall_note": "L431：自助摊每个 player_day_id 最多按固定价收购 100 金币，达到预算后产物留在库存且不降价；居民请求不占该预算。决策⑦：门口回购箱也计入这 100。",
+ "stall_budget_per_day": 100,
+ "_growth_note": "L520：240 工具 或 400 扩地，首周永久二选一。L559：扩地交易同时预留并支付本轮 12 格种子——不能买出空田后无钱播种。",
+ "growth_choice": {
+  "tool": {
+   "price": 240,
+   "_line": "L520 行级工具 240，覆盖翻土/照料/收获同畦 3 格，不提产量不缩时长（L408）"
   },
-  "_subsidy_note": "L509-515 + L548：首周两次一次性补贴，合计 80。D7 起关闭一次性金币（L590）。",
-  "subsidies": {
-    "weather_story":  { "chapter": 1, "coins": 20, "_line": "L531 D1「天气故事 20」" },
-    "nursery_built":  { "chapter": 6, "coins": 60, "_line": "L536 D6「竣工补贴 60」，需 nursery.stage == built" }
+  "field": {
+   "price": 400,
+   "_line": "L520 第四田畦 400",
+   "_basket_note": "固定篮而不是玩家任选 12 枚：任选时 12R 只要 48、12H 要 120，都推不出账本里的 84（Codex 二审 Critical 1）。3×4+3×6+3×8+3×10 = 84。",
+   "seed_basket": {
+    "R": 3,
+    "L": 3,
+    "C": 3,
+    "H": 3
+   },
+   "_basket_cost": 84,
+   "beds_unlocked_after": 4,
+   "_tilled_note": "决策⑥：预留畦到手即已清理已翻土，不计首次清理 XP——否则 D5/D6 累计会变成 271/304，与 PRD L567/L570 的 268/301 矛盾。"
+  }
+ },
+ "_subsidy_note": "L509-515 + L548：首周两次一次性补贴，合计 80。D7 起关闭一次性金币（L590）。",
+ "subsidies": {
+  "weather_story": {
+   "chapter": 1,
+   "coins": 20,
+   "_line": "L531 D1「天气故事 20」"
   },
-  "_engineering_note": "L574：苗圃入口首周配额固定 2C+4H，无替代兑换；D3 展示缺口后开放预留；预留物不进入一键出售、赠礼、料理候选；提交必须原子。",
-  "engineering_quota": { "C": 2, "H": 4 },
-  "_seedling_note": "L587 触发条件 + 2026-09-04 决策⑧内容与上限。Codex 三审指出不限次数时高频上界会到 1008，故加首周 3 次上限并收紧空仓判定。",
-  "seedling_pack": {
-    "contents": { "R": 3 },
-    "bound": true,
-    "per_player_day": 1,
-    "week_cap": 3,
-    "_conditions": "wallet < 最便宜种子价 且 无 produce 且 无 dishes 且 无 growing/sown 格 且 无 bought 种子 且 无 engineering.reserved"
+  "nursery_built": {
+   "chapter": 6,
+   "coins": 60,
+   "_line": "L536 D6「竣工补贴 60」，需 nursery.stage == built"
+  }
+ },
+ "_engineering_note": "L574：苗圃入口首周配额固定 2C+4H，无替代兑换；D3 展示缺口后开放预留；预留物不进入一键出售、赠礼、料理候选；提交必须原子。",
+ "engineering_quota": {
+  "C": 2,
+  "H": 4
+ },
+ "_seedling_note": "L587 触发条件 + 2026-09-04 决策⑧内容。Codex 三审指出不限次数时高频上界到 1008；收紧空仓判定后再把周上限定为 2（周上限 3 时宽松上界 982，差 1 分越线）。",
+ "seedling_pack": {
+  "contents": {
+   "R": 3
   },
-  "_ledger_note": "L541 总账 wallet_end = 180 + 685 - 320 - 240 = 305。L572 两条路线 D6 账户价值同为 545。",
-  "target_wallet_by_day": {
-    "tool":  [210, 287, 325, 362, 413, 218, 305],
-    "field": [210, 287, 325, 362, 413, 46, 145]
-  },
-  "target_account_value_d6": 545,
-  "_sell_first_note": "L578：把 D1-D6 原用于赠礼/保留的 1R+1L+1R+1L+1H+1L 全部出售，七日多得 71 金币。",
-  "sell_first_extra_coins": 71,
-  "_highfreq_note": "L431：账户价值实测 P90 不得超过目标的 1.8 倍 = 981。",
-  "account_value_cap_multiplier": 1.8
+  "bound": true,
+  "per_player_day": 1,
+  "week_cap": 2,
+  "_conditions": "wallet < 最便宜种子价 且 无 produce 且 无 dishes 且 无 growing/sown 格 且 无 bought 种子 且 无 engineering.reserved"
+ },
+ "_ledger_note": "L541 总账 wallet_end = 180 + 685 - 320 - 240 = 305。L572 两条路线 D6 账户价值同为 545。",
+ "target_wallet_by_day": {
+  "tool": [
+   210,
+   287,
+   325,
+   362,
+   413,
+   218,
+   305
+  ],
+  "field": [
+   210,
+   287,
+   325,
+   362,
+   413,
+   46,
+   145
+  ]
+ },
+ "target_account_value_d6": 545,
+ "_sell_first_note": "L578：把 D1-D6 原用于赠礼/保留的 1R+1L+1R+1L+1H+1L 全部出售，七日多得 71 金币。",
+ "sell_first_extra_coins": 71,
+ "_highfreq_note": "L431：账户价值实测 P90 不得超过目标的 1.8 倍 = 981。当前约束组合（回购周 1 次 + 种苗包周 2 次 + 收紧空仓判定）的宽松整数上界为 972。",
+ "account_value_cap_multiplier": 1.8
 }

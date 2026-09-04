@@ -88,7 +88,7 @@ export interface FarmState {
     transaction_id: string | null;
   };
   stall: { day: string; settled: number };
-  buyback: { day: string; sold: number };
+  buyback: { day: string; sold: number; week_total: number };
   seedling_packs: { days: string[] };
   engineering: { reserved: Partial<Record<CropId, number>>; submitted: Partial<Record<CropId, number>> };
   nursery: { stage: NurseryStage; appearance: 'a' | 'b' | null };
@@ -152,7 +152,7 @@ export function createInitialState(a: InitialArgs): FarmState {
     tools: { row_tool: false },
     growth_choice: { intent: null, purchase: null, locked_at: null, transaction_id: null },
     stall: { day: a.player_day_id, settled: 0 },
-    buyback: { day: a.player_day_id, sold: 0 },
+    buyback: { day: a.player_day_id, sold: 0, week_total: 0 },
     seedling_packs: { days: [] },
     engineering: { reserved: {}, submitted: {} },
     nursery: { stage: 'derelict', appearance: null },

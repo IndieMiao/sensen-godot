@@ -13,7 +13,9 @@ import type { Command } from './commands.js';
 import { derive, type Derived } from './derive.js';
 import { err, ok, type Result } from './errors.js';
 import { materializeDay } from './handlers/day.js';
+import { applyEconomy } from './handlers/economy.js';
 import { applyFarming } from './handlers/farming.js';
+import { applyResidents } from './handlers/residents.js';
 import { applySettings } from './handlers/settings.js';
 import type { FarmState } from './state.js';
 
@@ -44,6 +46,10 @@ export function apply(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmState> {
 
   const farming = applyFarming(base, cmd, ctx);
   if (farming) return farming;
+  const economy = applyEconomy(base, cmd, ctx);
+  if (economy) return economy;
+  const residents = applyResidents(base, cmd, ctx);
+  if (residents) return residents;
   const settings = applySettings(base, cmd, ctx);
   if (settings) return settings;
 

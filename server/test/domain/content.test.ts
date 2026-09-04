@@ -65,10 +65,15 @@ describe('content tables', () => {
     expect(total).toEqual({ R: 6, L: 7, C: 3, H: 5 });
   });
 
-  it('回购箱计入摊位预算——否则高频账户价值上界会越过 981', () => {
+  it('回购箱不占摊位预算，但周上限 1 次——PRD 把它算在「居民请求」栏', () => {
     const c = loadContent(DEFAULT_CONTENT_DIR);
-    expect(c.recipes.buyback.counts_against_stall_budget).toBe(true);
+    // L544-547：请求栏 224 = 30+45+55+70+24，摊位栏 381 不含回购。
+    // 计入摊位预算会让账本 D4 的 79+24=103 超过 100，目标路径直接跑不通。
+    expect(c.recipes.buyback.counts_against_stall_budget).toBe(false);
     expect(c.recipes.buyback.per_player_day).toBe(1);
+    expect(c.recipes.buyback.per_week).toBe(1);
+    // 高频闸门改由「回购周 1 次 + 种苗包周 2 次 + 收紧空仓判定」承担，宽松上界 972。
+    expect(c.economy.seedling_pack.week_cap).toBe(2);
     expect(c.economy.account_value_cap_multiplier).toBe(1.8);
   });
 
@@ -141,6 +146,9 @@ describe('content vs PRD ledger arithmetic', () => {
     const subsidies = Object.values(c.economy.subsidies).reduce((s, r) => s + r.coins, 0);
     expect(requests).toBe(200);
     expect(subsidies).toBe(80);
+    // L546「具体居民请求 224」= 四条请求 200 + 茶回购 24（生活回购，L550）
+    expect(requests + c.recipes.buyback.coins).toBe(224);
+    expect(requests + subsidies + c.recipes.buyback.coins + 381).toBe(685); // L541 总收入
   });
 
   it('按内容表推算的七日钱包等于 PRD 的目标序列', () => {

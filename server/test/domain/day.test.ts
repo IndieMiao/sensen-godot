@@ -70,11 +70,12 @@ describe('换日重置', () => {
   it('摊位预算、回购次数、当日收获计数都按玩家日重置', () => {
     const s = freshFarm();
     s.stall = { day: '2026-09-04', settled: 100 };
-    s.buyback = { day: '2026-09-04', sold: 1 };
+    s.buyback = { day: '2026-09-04', sold: 1, week_total: 1 };
     s.xp.harvest_counted = { day: '2026-09-04', plants: 9 };
     const next = advance(s, D(1));
     expect(next.stall).toEqual({ day: '2026-09-05', settled: 0 });
-    expect(next.buyback).toEqual({ day: '2026-09-05', sold: 0 });
+    // week_total 跨日累计，不随换日清零——回购是周上限而不是日上限
+    expect(next.buyback).toEqual({ day: '2026-09-05', sold: 0, week_total: 1 });
     expect(next.xp.harvest_counted).toEqual({ day: '2026-09-05', plants: 0 });
   });
 

@@ -29,7 +29,7 @@ export function materializeDay(s: FarmState, ctx: Ctx): Ok<FarmState> {
 
   // 每日额度按玩家日重置（PRD §6.4 L431 摊位、L534 回购箱）。
   next.stall = { day: d.player_day_id, settled: 0 };
-  next.buyback = { day: d.player_day_id, sold: 0 };
+  next.buyback = { ...next.buyback, day: d.player_day_id, sold: 0 }; // week_total 跨日累计
   next.xp.harvest_counted = { day: d.player_day_id, plants: 0 };
 
   if (d.opens_new_chapter) {
