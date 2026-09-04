@@ -1,0 +1,736 @@
+{
+  "cultivable": [
+    "1,1",
+    "2,1",
+    "3,1",
+    "1,2",
+    "2,2",
+    "3,2",
+    "1,3",
+    "2,3",
+    "3,3",
+    "5,1",
+    "6,1",
+    "7,1"
+  ],
+  "reserved": [
+    "5,1",
+    "6,1",
+    "7,1"
+  ],
+  "cells0": {
+    "1,1": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    },
+    "2,1": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    },
+    "3,1": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    },
+    "1,2": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    },
+    "2,2": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    },
+    "3,2": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    },
+    "1,3": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    },
+    "2,3": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    },
+    "3,3": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    },
+    "5,1": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    },
+    "6,1": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    },
+    "7,1": {
+      "state": "wild",
+      "crop": null,
+      "care_weather": null,
+      "care_done_at": null,
+      "ready_at": null,
+      "careful": false,
+      "tutorial": false
+    }
+  },
+  "field_condition": "sunny",
+  "care_kind": "water",
+  "crop": "R",
+  "steps": [
+    {
+      "name": "clear",
+      "type": "clear_cells",
+      "cell_ids": [
+        "1,1",
+        "2,1",
+        "3,1"
+      ],
+      "now": 1788487200000,
+      "cells": {
+        "1,1": {
+          "state": "cleared",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,1": {
+          "state": "cleared",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,1": {
+          "state": "cleared",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "1,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "1,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "5,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "6,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "7,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        }
+      }
+    },
+    {
+      "name": "till",
+      "type": "till_cells",
+      "cell_ids": [
+        "1,1",
+        "2,1",
+        "3,1"
+      ],
+      "now": 1788487200000,
+      "cells": {
+        "1,1": {
+          "state": "tilled",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,1": {
+          "state": "tilled",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,1": {
+          "state": "tilled",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "1,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "1,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "5,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "6,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "7,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        }
+      }
+    },
+    {
+      "name": "sow",
+      "type": "sow_cells",
+      "cell_ids": [
+        "1,1",
+        "2,1",
+        "3,1"
+      ],
+      "now": 1788487200000,
+      "cells": {
+        "1,1": {
+          "state": "sown",
+          "crop": "R",
+          "care_weather": "sunny",
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": true
+        },
+        "2,1": {
+          "state": "sown",
+          "crop": "R",
+          "care_weather": "sunny",
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": true
+        },
+        "3,1": {
+          "state": "sown",
+          "crop": "R",
+          "care_weather": "sunny",
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": true
+        },
+        "1,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "1,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "5,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "6,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "7,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        }
+      }
+    },
+    {
+      "name": "care",
+      "type": "apply_care",
+      "cell_ids": [
+        "1,1",
+        "2,1",
+        "3,1"
+      ],
+      "now": 1788487200000,
+      "cells": {
+        "1,1": {
+          "state": "growing",
+          "crop": "R",
+          "care_weather": "sunny",
+          "care_done_at": 1788487200000,
+          "ready_at": 1788487380000,
+          "careful": false,
+          "tutorial": true
+        },
+        "2,1": {
+          "state": "growing",
+          "crop": "R",
+          "care_weather": "sunny",
+          "care_done_at": 1788487200000,
+          "ready_at": 1788487380000,
+          "careful": false,
+          "tutorial": true
+        },
+        "3,1": {
+          "state": "growing",
+          "crop": "R",
+          "care_weather": "sunny",
+          "care_done_at": 1788487200000,
+          "ready_at": 1788487380000,
+          "careful": false,
+          "tutorial": true
+        },
+        "1,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "1,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "5,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "6,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "7,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        }
+      }
+    },
+    {
+      "name": "harvest",
+      "type": "harvest_cells",
+      "cell_ids": [
+        "1,1",
+        "2,1",
+        "3,1"
+      ],
+      "now": 1788487800000,
+      "cells": {
+        "1,1": {
+          "state": "tilled",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,1": {
+          "state": "tilled",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,1": {
+          "state": "tilled",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "1,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,2": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "1,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "2,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "3,3": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "5,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "6,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        },
+        "7,1": {
+          "state": "wild",
+          "crop": null,
+          "care_weather": null,
+          "care_done_at": null,
+          "ready_at": null,
+          "careful": false,
+          "tutorial": false
+        }
+      }
+    }
+  ]
+}
