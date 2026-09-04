@@ -100,3 +100,11 @@ func test_wild_tilled_sown_look_different_from_each_other_and_from_cleared() -> 
 	# 草要明显高出畦面，苗要比草矮但亮
 	assert_bool(CropField.WEED_SIZE.y >= 0.3).is_true()
 	assert_bool(CropField._stage_color("R", 0).g > CropField.WEED_COLOR.g).is_true()
+
+
+func test_instance_colors_are_declared_srgb() -> void:
+	# 不声明的话 8 位实例色被当线性色，整体发白：真机上深棕翻土板成了浅褐。
+	var f := _field()
+	for layer in f._mm:
+		var mat := (f._mm[layer] as MultiMeshInstance3D).material_override as StandardMaterial3D
+		assert_bool(mat.vertex_color_is_srgb).is_true()

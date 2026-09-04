@@ -62,6 +62,8 @@ func _make_layer(mesh: Mesh) -> MultiMeshInstance3D:
 	mmi.multimesh = mm
 	var mat := StandardMaterial3D.new()
 	mat.vertex_color_use_as_albedo = true
+	# 实例色是 8 位 sRGB；不声明的话会被当线性色，整体发白——真机上深棕翻土板成了浅褐。
+	mat.vertex_color_is_srgb = true
 	mmi.material_override = mat
 	add_child(mmi)
 	return mmi
