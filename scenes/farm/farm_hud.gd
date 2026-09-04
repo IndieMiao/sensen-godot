@@ -27,6 +27,19 @@ const TOOLS := [
 	{"id": "harvest", "label": "Reap"},
 ]
 const CONDITION_LABEL := {"sunny": "Sunny", "rain": "Rain", "wind": "Wind"}
+const ACTION_VERB := {"clear": "Clearing", "till": "Tilling", "sow": "Sowing", "care": "Tending", "harvest": "Harvesting"}
+## 服务端拒绝码 → 玩家能懂的一句话。没列的直接显示码，至少不是静默。
+const REJECT_TEXT := {
+	"WRONG_STATE": "That plot isn't ready for this step",
+	"NOT_RIPE": "Not ripe yet",
+	"WRONG_CARE": "Wrong care for today's weather",
+	"INSUFFICIENT_ITEMS": "Not enough seeds",
+	"INSUFFICIENT_FUNDS": "Not enough coins",
+	"CELL_LOCKED": "This bed isn't unlocked yet",
+	"CHAPTER_LOCKED": "Not available in this chapter yet",
+	"OFFLINE": "You're offline",
+}
+const TOAST_S := 2.5
 const CARE_LABEL := {"sunny": "Water", "rain": "Drain", "wind": "Shelter"}
 
 var tool := ""
@@ -44,6 +57,13 @@ var _row_button: Button
 var _bottom: VBoxContainer
 var _visitor_bar: HBoxContainer
 var visitor := false
+var _status: PanelContainer
+var _status_label: Label
+var _status_bar: ProgressBar
+var _toast: PanelContainer
+var _toast_label: Label
+var _toast_left := 0.0
+var _last_action_text := ""
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -51,6 +71,7 @@ func _ready() -> void:
 	_build_top_right()
 	_build_banner()
 	_build_bottom()
+	_build_status()
 	_refresh_buttons()
 
 ## 金币与田况靠**右上**，避开顶栏左侧的 Leave Farm 与居中的路名。
@@ -254,3 +275,82 @@ func set_visitor_mode(on: bool) -> void:
 			_visitor_bar.add_child(b)
 	if _visitor_bar:
 		_visitor_bar.visible = on
+
+## 底栏上方的一条状态：选了工具给提示，干活时给「Clearing… 40%」+ 进度条。
+## 2026-09-04 录屏：没有它，2 秒一格的劳作在玩家眼里就是「点了没反应」。
+func _build_status() -> void:
+	_status = PanelContainer.new()
+	_status.name = "ActionStatus"
+	_status.theme_type_variation = &"ChipPanel"
+	_status.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_status.offset_left = 8.0
+	_status.offset_right = -8.0
+	_status.offset_top = -330.0
+	_status.offset_bottom = -288.0
+	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_status.visible = false
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 2)
+	_status.add_child(v)
+	_status_label = Label.new()
+	_status_label.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
+	_status_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	v.add_child(_status_label)
+	_status_bar = ProgressBar.new()
+	_status_bar.show_percentage = false
+	_status_bar.custom_minimum_size.y = 6.0
+	_status_bar.max_value = 1.0
+	v.add_child(_status_bar)
+	add_child(_status)
+	_toast = PanelContainer.new()
+	_toast.name = "Toast"
+	_toast.theme_type_variation = &"ToastPanel"
+	_toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_toast.offset_top = 100.0
+	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_toast.visible = false
+	_toast_label = Label.new()
+	_toast_label.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
+	_toast.add_child(_toast_label)
+	add_child(_toast)
+
+func set_hint(text: String) -> void:
+	if _status == null:
+		return
+	_status_bar.visible = false
+	_status_label.text = text
+	_status.visible = not text.is_empty()
+
+## 每帧调用：有动作在跑就显示动词 + 进度；空闲时不改提示（提示由 set_hint 管）。
+func set_action(action: String, progress: float, pending: int) -> void:
+	if _status == null:
+		return
+	if action.is_empty():
+		if not _last_action_text.is_empty():
+			_last_action_text = ""
+			_status.visible = false
+		return
+	var text := "%s… %d%%" % [str(ACTION_VERB.get(action, action.capitalize())), int(progress * 100.0)]
+	if pending > 1:
+		text += "  (+%d queued)" % (pending - 1)
+	_last_action_text = text
+	_status_label.text = text
+	_status_bar.visible = true
+	_status_bar.value = progress
+	_status.visible = true
+
+static func reject_text(code: String) -> String:
+	return str(REJECT_TEXT.get(code, "Rejected: %s" % code))
+
+func show_toast(text: String) -> void:
+	if _toast == null:
+		return
+	_toast_label.text = text
+	_toast.visible = true
+	_toast_left = TOAST_S
+
+func _process(dt: float) -> void:
+	if _toast_left > 0.0:
+		_toast_left -= dt
+		if _toast_left <= 0.0 and _toast:
+			_toast.visible = false

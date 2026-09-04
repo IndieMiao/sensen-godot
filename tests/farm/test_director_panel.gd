@@ -113,3 +113,11 @@ func test_panel_text_is_english() -> void:
 		for ch in text:
 			assert_bool(ch.unicode_at(0) < 0x2E80).override_failure_message(
 				"导演面板文案含非英文字符: %s" % text).is_true()
+
+
+func test_panel_never_opens_on_its_own() -> void:
+	# 2026-09-04 录屏：_title_hold 初值曾是 0，进农场 3 秒后导演面板自己弹出来盖住底栏。
+	var f := _farm()
+	for i in 400:
+		f._process(0.016)      # 6.4 秒没有任何输入
+	assert_bool(f.director.visible).is_false()

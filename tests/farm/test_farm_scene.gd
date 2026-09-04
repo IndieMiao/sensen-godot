@@ -184,3 +184,37 @@ func test_without_farm_in_session_stays_offline_greybox() -> void:
 	add_child(auto_free(scene))
 	assert_object(scene.session).is_null()
 	assert_object(scene.predictor).is_null()
+
+
+func test_action_progress_and_hint_are_visible_in_hud() -> void:
+	# 2 秒一格的劳作必须有可见反馈，否则就是「点了没反应」。
+	var f := _farm()
+	f.hud._on_tool("clear")
+	assert_bool(f.hud._status.visible).is_true()
+	assert_str(f.hud._status_label.text).is_equal("Tap or drag across plots")
+	f._enqueue_cells(f.bp.beds()[0].cells)
+	f._process(0.0)
+	f._process(1.0)
+	assert_str(f.hud._status_label.text).starts_with("Clearing… 50%")
+	assert_bool(f.hud._status_label.text.contains("(+2 queued)")).is_true()
+	# 队列每步只结一格：三格要走三个 ACTION_S，再一帧让 HUD 收起
+	for i in 3:
+		f._process(ActionRunner.ACTION_S)
+	f._process(0.016)
+	assert_bool(f.hud._status.visible).is_false()
+
+func test_server_rejection_is_shown_not_swallowed() -> void:
+	var t := FakeTransport.new([{"status": 422, "json": {"code": "WRONG_STATE", "detail": "x"}}])
+	var s := FarmSession.new(ApiClient.new("https://example.test/v1", t.callable()))
+	s.client.token = "tok"
+	s.farm_id = "f1"
+	s.state = {"cells": {"1,1": {"state": "wild"}}, "beds_unlocked": 3}
+	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
+	scene.setup({"blueprint": FarmBlueprint.load_file(FIX), "session": s})
+	add_child(auto_free(scene))
+	scene.tool = "clear"
+	scene._on_cell_started(Vector2i(1, 1), "clear")
+	await scene._on_cell_done(Vector2i(1, 1), "clear")
+	assert_bool(scene.hud._toast.visible).is_true()
+	assert_str(scene.hud._toast_label.text).is_equal("That plot isn't ready for this step")
+	assert_str(str(scene.predictor.view()["1,1"].state)).is_equal("wild")   # 预测已回滚

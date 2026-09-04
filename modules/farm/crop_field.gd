@@ -17,22 +17,30 @@ const CROP_COLOR := {
 	"C": Color(0.93, 0.60, 0.24),   # 胡萝卜
 	"H": Color(0.95, 0.90, 0.52),   # 洋甘菊
 }
-const WEED_COLOR := Color(0.42, 0.47, 0.30)
+const WEED_COLOR := Color(0.46, 0.58, 0.30)
+## 翻土标记：一块压在畦面上的深色薄板——「翻过」与「只清理过」必须一眼能分。
+const SOIL_COLOR := Color(0.42, 0.27, 0.16)
+const SOIL_SIZE := Vector3(0.92, 0.05, 0.92)
+## 刚播下的幼苗用亮绿：阶段 0 曾是 0.10 高的暗绿小块，埋在畦面里根本看不见。
+const SEEDLING_COLOR := Color(0.42, 0.78, 0.36)
 ## 四阶段的盒体尺寸（逻辑米）；成熟那阶段明显更高更挺。
 const STAGE_SIZE := [
-	Vector3(0.18, 0.10, 0.18),
-	Vector3(0.26, 0.26, 0.26),
-	Vector3(0.34, 0.46, 0.34),
+	Vector3(0.16, 0.16, 0.16),
+	Vector3(0.26, 0.30, 0.26),
+	Vector3(0.34, 0.48, 0.34),
 	Vector3(0.40, 0.66, 0.40),
 ]
-const WEED_SIZE := Vector3(0.22, 0.18, 0.22)
+const WEED_SIZE := Vector3(0.24, 0.34, 0.24)
 ## 一格里散布几株，摆成 2×2。
 const PER_CELL := 4
 const JITTER := 0.22
 
 var bp: FarmBlueprint
 var world_scale := 1.0
-var _mm: Dictionary = {}       ## crop_id / "weed" → MultiMeshInstance3D
+## 田畦盒子的顶面高度。作物与杂草都从这里往上长——2026-09-04 真机上草和苗全埋在
+## 0.15 高的畦面盒子里，玩家清理了什么都看不见。
+var ground_y := 0.0
+var _mm: Dictionary = {}       ## crop_id / "weed" / "soil" → MultiMeshInstance3D
 
 func _init(p_bp: FarmBlueprint = null, p_scale := 1.0) -> void:
 	bp = p_bp
@@ -42,6 +50,7 @@ func _ready() -> void:
 	for crop in CROPS:
 		_mm[crop] = _make_layer(BoxMesh.new())
 	_mm["weed"] = _make_layer(BoxMesh.new())
+	_mm["soil"] = _make_layer(BoxMesh.new())
 
 func _make_layer(mesh: Mesh) -> MultiMeshInstance3D:
 	var mmi := MultiMeshInstance3D.new()
@@ -73,10 +82,12 @@ static func stage_of(slot: Dictionary, now_ms: int) -> int:
 		return 0
 	return clampi(int(progress * float(STAGES - 1)), 0, STAGES - 2)
 
-## 这格该画什么：`""` 表示不画（cleared / tilled 都是空地）。
+## 这格该画什么：`""` 表示不画（只有 cleared 是真正的空地）。
+## tilled 画深色翻土板：清理过与翻过土在服务端是两个状态，画面上也必须是两个样子。
 static func layer_of(slot: Dictionary) -> String:
 	match str(slot.get("state", "")):
 		"wild": return "weed"
+		"tilled": return "soil"
 		"sown", "growing": return str(slot.get("crop", ""))
 		_: return ""
 
@@ -88,7 +99,7 @@ static func stage_from_snapshot(c: Dictionary) -> int:
 	return 1 if str(c.get("state", "")) == "growing" else 0
 
 func sync_snapshot(cells: Array) -> void:
-	var buckets := {"weed": []}
+	var buckets := {"weed": [], "soil": []}
 	for crop in CROPS:
 		buckets[crop] = []
 	for c in cells:
@@ -97,12 +108,12 @@ func sync_snapshot(cells: Array) -> void:
 		if layer == "" or not buckets.has(layer):
 			continue
 		buckets[layer].append({"cell": _parse_cell(str(c.get("cell_id", ""))),
-			"stage": 0 if layer == "weed" else stage_from_snapshot(c)})
+			"stage": 0 if layer in ["weed", "soil"] else stage_from_snapshot(c)})
 	for layer in buckets:
 		_fill(_mm[layer], buckets[layer], layer)
 
 func sync(cells: Dictionary, now_ms: int) -> void:
-	var buckets := {"weed": []}
+	var buckets := {"weed": [], "soil": []}
 	for crop in CROPS:
 		buckets[crop] = []
 	for id in cells:
@@ -111,23 +122,32 @@ func sync(cells: Dictionary, now_ms: int) -> void:
 		if layer == "" or not buckets.has(layer):
 			continue
 		var cell := _parse_cell(str(id))
-		var stage := 0 if layer == "weed" else stage_of(slot, now_ms)
+		var stage := 0 if layer in ["weed", "soil"] else stage_of(slot, now_ms)
 		buckets[layer].append({"cell": cell, "stage": stage})
 	for layer in buckets:
 		_fill(_mm[layer], buckets[layer], layer)
 
+static func per_cell(layer: String) -> int:
+	return 1 if layer == "soil" else PER_CELL
+
 func _fill(mmi: MultiMeshInstance3D, items: Array, layer: String) -> void:
 	var mm := mmi.multimesh
-	mm.instance_count = items.size() * PER_CELL
+	var per := per_cell(layer)
+	mm.instance_count = items.size() * per
 	var n := 0
 	for item in items:
 		var base: Vector3 = bp.cell_to_world(item.cell, world_scale)
-		var size: Vector3 = (WEED_SIZE if layer == "weed" else STAGE_SIZE[item.stage]) * world_scale
+		var size: Vector3
+		match layer:
+			"weed": size = WEED_SIZE * world_scale
+			"soil": size = SOIL_SIZE * world_scale
+			_: size = STAGE_SIZE[item.stage] * world_scale
 		var color := _stage_color(layer, item.stage)
-		for k in PER_CELL:
-			var dx := (-1.0 if k % 2 == 0 else 1.0) * JITTER * world_scale
-			var dz := (-1.0 if k < 2 else 1.0) * JITTER * world_scale
-			var t := Transform3D(Basis().scaled(size), base + Vector3(dx, size.y * 0.5, dz))
+		for k in per:
+			var dx := 0.0 if per == 1 else (-1.0 if k % 2 == 0 else 1.0) * JITTER * world_scale
+			var dz := 0.0 if per == 1 else (-1.0 if k < 2 else 1.0) * JITTER * world_scale
+			# 从畦面顶部往上长，而不是从世界原点：否则矮的东西全埋在畦面盒子里
+			var t := Transform3D(Basis().scaled(size), base + Vector3(dx, ground_y + size.y * 0.5, dz))
 			mm.set_instance_transform(n, t)
 			mm.set_instance_color(n, color)
 			n += 1
@@ -135,6 +155,10 @@ func _fill(mmi: MultiMeshInstance3D, items: Array, layer: String) -> void:
 static func _stage_color(layer: String, stage: int) -> Color:
 	if layer == "weed":
 		return WEED_COLOR
+	if layer == "soil":
+		return SOIL_COLOR
+	if stage == 0:
+		return SEEDLING_COLOR
 	var c: Color = CROP_COLOR[layer]
 	# 未成熟偏绿偏暗，成熟才回到作物本色并提亮——玩家一眼能挑出该收的格子。
 	if stage >= STAGES - 1:
@@ -151,8 +175,9 @@ func counts() -> Dictionary:
 ## 每层的格数。
 func cell_counts() -> Dictionary:
 	var out := {}
-	for layer in counts():
-		out[layer] = counts()[layer] / PER_CELL
+	var c := counts()
+	for layer in c:
+		out[layer] = c[layer] / per_cell(layer)
 	return out
 
 static func _parse_cell(id: String) -> Vector2i:

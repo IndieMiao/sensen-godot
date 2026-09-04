@@ -4,6 +4,8 @@ extends Node3D
 
 const WORLD_SCALE := 1.0 # 逻辑米 → 世界米；G1 调观感时只改这里，时长不变量不受影响
 const CAM_DIST := 16.0
+## 田畦盒子高度；作物层从它的顶面往上长。
+const BED_H := 0.15
 const CAM_PITCH_DEG := 45.0
 const TAP_MAX_PX := 16.0
 ## 工具 → 服务端命令。空工具名表示「移动模式」，点地就是走过去。
@@ -37,7 +39,8 @@ var _emote_lock_s := 0.0
 var _stamp_index := 0
 const STAMPS := ["Nice!", "Lovely", "Wow"]
 const STAMP_LIFETIME_S := 1.2
-var _title_hold := 0.0
+## -1 表示没在按。曾经初值是 0.0，进农场 3 秒后导演面板自己弹出来（2026-09-04 录屏）。
+var _title_hold := -1.0
 var _drag_points := PackedVector2Array()
 var _dragging := false
 
@@ -75,6 +78,7 @@ func _ready() -> void:
 	_build_props()
 	# 作物挂 Crops（Props 的同级）：prop_count() 只数锚点原语与畦面，作物不进去。
 	crop_field = CropField.new(bp, WORLD_SCALE)
+	crop_field.ground_y = BED_H * WORLD_SCALE
 	crops_root.add_child(crop_field)
 	mover = PlayerMover.new(bp, grid, WORLD_SCALE)
 	runner = ActionRunner.new()
@@ -86,7 +90,9 @@ func _ready() -> void:
 	if visitor:
 		_enter_visitor_mode()
 	exit_btn.pressed.connect(_leave)
-	hud.tool_selected.connect(func(t): tool = t)
+	hud.tool_selected.connect(func(t):
+		tool = t
+		hud.set_hint("" if t.is_empty() else "Tap or drag across plots"))
 	hud.crop_selected.connect(func(c): sow_crop = c)
 	hud.row_tool_toggled.connect(func(on): row_tool = on)
 	if not visitor:
@@ -122,7 +128,7 @@ func _build_props() -> void:
 	_box(bp.cell_to_world(bp.anchor("exit"), s), Vector3(0.3, 2.0, 0.3) * s, Color(0.85, 0.3, 0.3))
 	for bed in bp.beds():
 		for c in bed.cells:
-			_box(bp.cell_to_world(c, s), Vector3(0.9, 0.15, 0.9) * s, BlueprintGroundMesh.COLOR_BED)
+			_box(bp.cell_to_world(c, s), Vector3(0.9, BED_H, 0.9) * s, BlueprintGroundMesh.COLOR_BED)
 	for c in bp.reserved_bed().get("cells", []):
 		_box(bp.cell_to_world(c, s), Vector3(0.9, 0.08, 0.9) * s, Color(0.78, 0.66, 0.55))
 
@@ -150,6 +156,8 @@ func _process(dt: float) -> void:
 		runner.step(dt)
 	if _emote_lock_s > 0.0:
 		_emote_lock_s -= dt
+	if hud and runner:
+		hud.set_action(runner.current_action(), runner.progress(), runner.pending_count())
 	_tick_title_hold(dt)
 	# 劳作中锁住动画：否则 _process 每帧无条件用 walk/idle 覆盖，动作动画永远播不出来。
 	if not _action_locked():
@@ -240,7 +248,16 @@ func _on_cell_started(cell: Vector2i, action: String) -> void:
 			session.server_now() if session else 0)
 		if r.ok:
 			_render()
-	_play(AnimPlaceholders.clip_for(action))
+	var clip := AnimPlaceholders.clip_for(action)
+	_play(clip)
+	# 占位动作只回退到 idle 的话玩家看到的是站着发呆 2 秒——至少俯身、至少面向那格。
+	if AnimPlaceholders.is_placeholder(action) and _rig:
+		AnimPlaceholders.play_fallback(_rig, ActionRunner.ACTION_S)
+	var target := bp.cell_to_world(cell, WORLD_SCALE)
+	if target.distance_to(player.position) > 0.05:
+		player.look_at(Vector3(target.x, player.position.y, target.z), Vector3.UP)
+	if hud:
+		hud.set_hint("")
 
 ## 每格收工：把命令发给服务端，回包对账；被拒就丢掉预测并把原因报出去。
 func _on_cell_done(cell: Vector2i, action: String) -> void:
@@ -340,6 +357,8 @@ func _attach_session() -> void:
 	predictor.beds_unlocked = int(session.state.get("beds_unlocked", 3))
 	session.state_changed.connect(_on_server_state)
 	session.offline_changed.connect(func(off): if hud: hud.set_offline(off))
+	# 服务端拒绝必须说出来：静默回滚在玩家眼里就是「点了没反应」（2026-09-04 录屏）。
+	session.rejected.connect(func(code, _detail): if hud: hud.show_toast(FarmHud.reject_text(code)))
 	_render()
 
 ## 服务端每次回包都整体覆盖预测器；漂移一律以服务端为准（方案 §3 D4）。
