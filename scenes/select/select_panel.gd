@@ -18,10 +18,22 @@ signal confirmed(id: String)
 const CAPACITY_TEXT := "9 plots · 12 in week one"
 ## 卡片最小尺寸——刻意硬编码的一次性屏幕度量，不是要纳入 DesignTokens 的通用值
 ## （plan 第 18 行的约束只管 UI 颜色：「UI 颜色只取 DesignTokens」，尺寸不在此列）。
-## x=104：360 逻辑视口下 SelectPanel 的可用宽度（328，减去 SB_drawer 左右各
-## 16px 内边距）再减两条 8px 卡间距，三等分正好是 104——这是这块屏幕的地板，
-## 不是随便挑的数。y 比原来的 156 高，给两行折行的容量文案留够空间。
-const CARD_MIN := Vector2(104, 172)
+##
+## x 的推导（2026-09-04 code review 订正：round 1 算错了父容器）。SelectPanel
+## 不独占 360 逻辑视口——它是 $HUD/SafeArea/Root 的子节点，SafeArea
+## （MarginContainer + SafeAreaMargin 脚本，modules/ui/safe_area_margin.gd）
+## 每边至少留 min_margin=16px（modules/ui/ui_metrics.gd 的
+## maxf(实测值, min_margin)，「任何情况下都不贴边」），所以 Root 的真实宽度
+## 上限是 360-16-16=328，不是 360。预算：
+##   360（逻辑视口）
+##   - 32（安全区左右各 16，SafeAreaMargin.min_margin）
+##   - 32（SB_drawer 面板内边距左右各 16，assets/ui/app_theme.tres）
+##   - 16（两条卡间距，2×DesignTokens.SPACE_2）
+##   = 280，三等分 ≤93.33。取 88（4dp 栅格对齐）留一点余量——HBoxContainer 的
+## SIZE_EXPAND_FILL 会把富余摊给三张卡，实际渲染宽度只会比 88 更宽，不会更窄。
+## y 比原来的 156 高，给两行折行的容量文案留够空间；真实层级下垂直方向仍有
+## ~460px 富余（Root 高度 800-32=768 远大于面板自身高度 ~300），不需要收紧。
+const CARD_MIN := Vector2(88, 172)
 ## 预览缩略图固定高度：卡片内容区（CARD_MIN 减去内边距）分给预览的那一份。
 const CARD_PREVIEW_H := 64.0
 
