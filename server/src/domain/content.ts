@@ -27,6 +27,8 @@ export const FIELD_CONDITIONS = ['sunny', 'rain', 'wind'] as const;
 export type FieldCondition = (typeof FIELD_CONDITIONS)[number];
 export const CARE_KINDS = ['water', 'drain', 'shelter'] as const;
 export type CareKind = (typeof CARE_KINDS)[number];
+export const GROWTH_CHOICE_IDS = ['tool', 'field'] as const;
+export type GrowthChoiceId = (typeof GROWTH_CHOICE_IDS)[number];
 
 export type CropAmounts = Partial<Record<CropId, number>>;
 
