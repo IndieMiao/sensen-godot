@@ -40,6 +40,7 @@ var _dragging := false
 @onready var title: Label = %Title
 @onready var exit_btn: Button = %ExitButton
 @onready var joystick: TouchStick = $HUD/SafeArea/Root/Joystick
+@onready var hud: FarmHud = %Hud
 
 func setup(args: Dictionary) -> void:
 	_args = args
@@ -71,6 +72,10 @@ func _ready() -> void:
 	_spawn_player()
 	title.text = bp.display_name
 	exit_btn.pressed.connect(_leave)
+	hud.tool_selected.connect(func(t): tool = t)
+	hud.crop_selected.connect(func(c): sow_crop = c)
+	hud.row_tool_toggled.connect(func(on): row_tool = on)
+	_refresh_hud()
 	joystick.changed.connect(mover.set_joystick)
 	player.position = mover.position
 	_update_camera()
@@ -249,3 +254,15 @@ func _field_condition() -> String:
 func _render() -> void:
 	if predictor:
 		render_cells(predictor.view(), session.server_now() if session else 0)
+	_refresh_hud()
+
+## 把权威状态（叠上预测）刷到 HUD。倒计时与成熟判定都走服务端时间。
+func _refresh_hud() -> void:
+	if hud == null:
+		return
+	var now := session.server_now() if session else 0
+	var cells: Dictionary = predictor.view() if predictor else {}
+	hud.set_coins(int(session.state.get("wallet", 0)) if session else 0)
+	hud.set_condition(_field_condition())
+	hud.set_next_ripe(cells, now)
+	hud.set_offline(session.offline if session else false)
