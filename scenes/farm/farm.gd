@@ -322,7 +322,7 @@ func _on_director_command(type: String, payload: Dictionary) -> void:
 		var idx := int((session.state.get("clock", {}) as Dictionary).get("weather_day_index", 0))
 		body = {"overrides": {str(idx): payload.get("day", "sunny")}}
 	var accepted: bool = await session.send(type, body)
-	director.report(accepted, session.last_error_code)
+	director.report(accepted, session.last_error_code, session.player_id)
 	if accepted:
 		predictor.commit(session.state.get("cells", {}), session.version) if predictor else null
 		_render()

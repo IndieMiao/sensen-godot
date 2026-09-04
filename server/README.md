@@ -84,3 +84,33 @@ DEPLOY_HOST=farm@<IP> deploy/deploy.sh release-manifest.json
 `deploy/restore-drill.sh` 是恢复演练：拉最近一份 → 本机解密 → 恢复到 devserver 的
 `sensen_farm_restore` → 比对表行数、表数量、10 个农场的 state 哈希、`max(version)` → 删库。
 脚本硬拒绝非 devserver 网段与非该库名的目标。
+
+## 线上真机 QA（2026-09-04 起的流程）
+
+线上只有香港这一套环境，没有 staging——QA 造出来的匿名账号与农场都会留在生产库里。
+
+```bash
+# 1. 打包装机（约 130 MB；设备用 adb devices 确认）
+godot --headless --path . --export-debug "Android" build/sensen-g2-debug.apk
+adb install -r build/sensen-g2-debug.apk          # -r 保留 App 数据（安装密钥、已选城市/蓝图）
+adb shell pm clear com.sensen.avatarphase1        # 想要一个全新玩家 / 回到选地流程时用
+
+# 2. 客户端默认连 https://farm.sensenjoy.cn/v1；要指到别的服务器，往 user:// 放一行 URL
+adb shell run-as com.sensen.avatarphase1 sh -c 'echo http://192.168.124.53:3000/v1 > files/server.txt'
+
+# 3. 观察
+adb logcat -s godot:* GodotApp:*                  # 客户端
+ssh farm@47.76.226.41 'cd /opt/farm && docker compose logs -f app'   # 服务端
+```
+
+**导演模式（加速时间）**：农场里长按标题 3 秒开面板 → 任意按一下 → 面板显示
+`This farm is not a QA instance · player <id>` → 把这个 id 加进服务器白名单：
+
+```bash
+ssh farm@47.76.226.41 'cd /opt/farm && sed -i "s/^QA_PLAYER_IDS=.*/QA_PLAYER_IDS=<id1>,<id2>/" .env && docker compose up -d app'
+```
+
+app 容器重建后再按即生效；480x = 3 分钟走完一个玩家日。白名单只认 player_id，
+`pm clear` 之后是新玩家，要重新加。
+
+检查清单在 Plane SGODOT-33。

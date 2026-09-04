@@ -22,6 +22,7 @@ func _farm() -> Node:
 func _fake_session(f: Node, responses: Array) -> FakeTransport:
 	var t := FakeTransport.new(responses)
 	var s := FarmSession.new(ApiClient.new("https://example.test/v1", t.callable()))
+	s.player_id = "p-qa-1"
 	s.state = {"clock": {"weather_day_index": 3}, "cells": {}}
 	s.version = 1
 	f.session = s
@@ -54,7 +55,8 @@ func test_403_says_this_farm_is_not_qa_instead_of_failing_silently() -> void:
 	var f := _farm()
 	_fake_session(f, [{"status": 403, "json": {"code": "QA_ONLY"}}])
 	f._on_director_command("qa_skip_days", {"days": 1})
-	assert_str(f.director._status.text).is_equal(DirectorPanel.DENIED_TEXT)
+	# 403 必须把 player_id 亮出来——QA 靠它把自己加进服务器白名单
+	assert_str(f.director._status.text).is_equal(DirectorPanel.DENIED_TEXT + " · player p-qa-1")
 
 func test_other_rejections_show_their_code() -> void:
 	var f := _farm()

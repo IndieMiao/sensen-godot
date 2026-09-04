@@ -69,11 +69,13 @@ func _send(type: String, payload: Dictionary) -> void:
 	emit_signal("command_requested", type, payload)
 
 ## 把服务端的答复显示出来。403 必须明说，否则 QA 会以为面板坏了。
-func report(ok: bool, code: String) -> void:
+## 403 时顺带把 player_id 亮出来：这是 QA 把自己加进服务器白名单的唯一途径——App 里
+## 别处看不到它，而去库里翻「最近注册的匿名玩家」在多台测试机同时在线时根本分不清。
+func report(ok: bool, code: String, player_id := "") -> void:
 	if ok:
 		_status.text = "Applied"
 	elif code == "QA_ONLY":
-		_status.text = DENIED_TEXT
+		_status.text = DENIED_TEXT if player_id.is_empty() else "%s · player %s" % [DENIED_TEXT, player_id]
 	else:
 		_status.text = "Rejected: %s" % code
 
