@@ -1,0 +1,86 @@
+class_name ApiClient
+extends RefCounted
+## 服务端 HTTP 封装。**不做重试策略以外的任何判断**：状态码与 JSON 原样返回，
+## 由 FarmSession 决定怎么处理。
+##
+## 为什么可注入 transport：真实 HTTPRequest 需要场景树、需要网络、慢且不稳定。
+## 把「发一次请求」抽成一个 Callable，单测就能覆盖 409/422/超时/断线这些真网络里
+## 很难稳定复现的分支（仓库里此前零 HTTPRequest 用例，没有现成模式可抄）。
+
+const DEFAULT_BASE := "https://farm.sensenjoy.cn/v1"
+const TIMEOUT_S := 10.0
+const INSTALL_KEY_PATH := "user://install_key.txt"
+
+## 一次请求的结果。`ok` 只表示**传输层**成功；业务失败（4xx/5xx）时 ok 仍为 true，
+## 看 `status` 与 `json.code`。
+class Response extends RefCounted:
+	var ok := false        ## 传输层是否拿到了响应
+	var status := 0
+	var json: Dictionary = {}
+	var error := ""
+
+	func _init(p_ok := false, p_status := 0, p_json: Dictionary = {}, p_error := "") -> void:
+		ok = p_ok
+		status = p_status
+		json = p_json
+		error = p_error
+
+	func is_success() -> bool:
+		return ok and status >= 200 and status < 300
+
+var base_url := DEFAULT_BASE
+var token := ""
+## transport.call(method, url, headers, body_text) -> Response
+var transport: Callable
+
+func _init(p_base_url := DEFAULT_BASE, p_transport := Callable()) -> void:
+	base_url = p_base_url
+	transport = p_transport
+
+## 首装生成 128 位随机安装密钥并持久化；之后复用。
+##
+## 用随机密钥而不是设备 ID：可猜的设备标识意味着任何人都能登进别人的账号
+## （服务端 spec §7.1 同一条理由）。
+static func install_key() -> String:
+	if FileAccess.file_exists(INSTALL_KEY_PATH):
+		var existing := FileAccess.get_file_as_string(INSTALL_KEY_PATH).strip_edges()
+		if existing.length() == 32:
+			return existing
+	var bytes := Crypto.new().generate_random_bytes(16)
+	var key := bytes.hex_encode()
+	var f := FileAccess.open(INSTALL_KEY_PATH, FileAccess.WRITE)
+	if f:
+		f.store_string(key)
+		f.close()
+	return key
+
+func request(method: String, path: String, body: Variant = null) -> Response:
+	var headers := PackedStringArray(["content-type: application/json"])
+	if not token.is_empty():
+		headers.append("authorization: Bearer %s" % token)
+	var text := "" if body == null else JSON.stringify(body)
+	if not transport.is_valid():
+		return Response.new(false, 0, {}, "no transport")
+	return transport.call(method, base_url + path, headers, text)
+
+## 真实传输：需要一个在场景树里的 Node 来挂 HTTPRequest。
+static func make_http_transport(host: Node) -> Callable:
+	return func(method: String, url: String, headers: PackedStringArray, body: String) -> Response:
+		var req := HTTPRequest.new()
+		req.timeout = TIMEOUT_S
+		host.add_child(req)
+		var verb := HTTPClient.METHOD_GET
+		match method:
+			"POST": verb = HTTPClient.METHOD_POST
+			"DELETE": verb = HTTPClient.METHOD_DELETE
+		var err := req.request(url, headers, verb, body)
+		if err != OK:
+			req.queue_free()
+			return Response.new(false, 0, {}, "request failed: %d" % err)
+		var result: Array = await req.request_completed
+		req.queue_free()
+		# result = [result_code, response_code, headers, body]
+		if int(result[0]) != HTTPRequest.RESULT_SUCCESS:
+			return Response.new(false, 0, {}, "transport error: %d" % int(result[0]))
+		var parsed = JSON.parse_string((result[3] as PackedByteArray).get_string_from_utf8())
+		return Response.new(true, int(result[1]), parsed if parsed is Dictionary else {}, "")
