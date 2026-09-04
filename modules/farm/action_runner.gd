@@ -20,9 +20,20 @@ var paused := false
 var _current = null
 var _elapsed := 0.0
 
+## 已在队列里（或正在做）的格不重复入队：大按钮连按两下不该把 9 格清理排成 18 格。
+func contains(cell: Vector2i) -> bool:
+	if _current != null and _current.cell == cell:
+		return true
+	for q in _queue:
+		if q.cell == cell:
+			return true
+	return false
+
 func enqueue(cells: Array, action: String) -> int:
 	var added := 0
 	for c in cells:
+		if contains(c as Vector2i):
+			continue
 		_queue.append({"cell": c as Vector2i, "action": action})
 		added += 1
 	return added

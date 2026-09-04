@@ -102,12 +102,12 @@ func test_goals_header_counts_and_highlights_the_next_open_goal() -> void:
 	var f := await _farm_at_phone_size()
 	f.hud.set_goals([{"id": "a", "label": "Clear a plot", "done": true}, {"id": "b", "label": "Till it", "done": false},
 		{"id": "c", "label": "Sow", "done": false}], 0)
-	assert_str(f.hud._goals_header.text).is_equal("Day 1 goals · 1/3")
+	assert_str(f.hud._goals_header.text).is_equal("Day 1 goals · 1/3 ▸")   # 首条完成后自动折叠
 	var labels: Array = f.hud.goal_labels()
 	assert_str(labels[0]).is_equal("✓ Clear a plot")
 	assert_str(labels[1]).is_equal("○ Till it")
 	f.hud.set_goals([{"id": "a", "label": "x", "done": true}], 2)
-	assert_str(f.hud._goals_header.text).is_equal("Day 3 goals · 1/1")
+	assert_bool(f.hud._goals_header.text.begins_with("Day 3 goals · 1/1")).is_true()
 	assert_bool(f.hud.goal_labels().has("Day complete — come back tomorrow")).is_true()
 
 func test_offline_disables_actions_and_shows_the_banner() -> void:

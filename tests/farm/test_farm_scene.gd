@@ -252,11 +252,11 @@ func test_server_rejection_is_shown_and_prediction_rolled_back() -> void:
 
 func test_goals_and_coins_follow_server_state() -> void:
 	var f: Node = await _online_farm(FakeTransport.new([]))
-	assert_str(f.hud._goals_header.text).is_equal("Day 1 goals · 0/7")
+	assert_bool(f.hud._goals_header.text.begins_with("Day 1 goals · 0/7")).is_true()
 	f.session.state.xp.first_harvest_crops = ["R"]
 	f.session.state.wallet = 204
 	f.session.state_changed.emit(f.session.state, 3)
-	assert_str(f.hud._goals_header.text).is_equal("Day 1 goals · 5/7")
+	assert_bool(f.hud._goals_header.text.begins_with("Day 1 goals · 5/7")).is_true()
 	assert_str(f.hud._coins.text).is_equal("Coins 204")
 
 func test_stall_sells_and_toasts_the_coins() -> void:
@@ -280,3 +280,22 @@ func test_action_status_shows_walking_then_the_verb() -> void:
 	assert_bool(_run_until(f, func(): return not f.runner.paused and f.runner.is_busy())).is_true()
 	f._process(0.5)
 	assert_str(f.hud._status_label.text).starts_with("Clearing…")
+
+func test_cta_goes_busy_while_the_queue_runs_and_pressing_it_again_adds_nothing() -> void:
+	var f: Node = await _online_farm(FakeTransport.new([]))
+	f._on_cta()
+	f._process(0.0)
+	assert_bool(f.hud._cta.disabled).is_true()
+	assert_str(f.hud._cta.text).is_equal("Working… 9 plots left")
+	f._on_cta()                                   # 再按一下：什么都不会多排
+	assert_int(f.runner.pending_count()).is_equal(9)
+
+func test_goals_collapse_after_the_first_goal_completes() -> void:
+	var f: Node = await _online_farm(FakeTransport.new([]))
+	assert_bool(f.hud._goals_list.visible).is_true()
+	f.session.state.xp.first_clear_cells = ["1,1"]
+	f.session.state_changed.emit(f.session.state, 2)
+	assert_bool(f.hud._goals_list.visible).is_false()
+	assert_str(f.hud._goals_header.text).is_equal("Day 1 goals · 1/7 ▸")
+	f.hud._goals_header.pressed.emit()
+	assert_bool(f.hud._goals_list.visible).is_true()

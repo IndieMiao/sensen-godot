@@ -52,6 +52,7 @@ var _last_bulk: Dictionary = {}
 ## 还没回包的命令数。>0 时队列不往下走：下一格的本地校验要看的是权威状态，不是一条
 ## 可能被服务端拒掉的预测（自动玩家：sow 被拒后紧跟的 care 照样发了出去）。
 var _in_flight := 0
+var _cta_was_busy := false
 
 @onready var cam: Camera3D = $Camera3D
 @onready var ground: MeshInstance3D = $Ground
@@ -194,13 +195,21 @@ func _process(dt: float) -> void:
 			_play("idle")
 	elif mover.is_moving():
 		player.look_at(player.position + mover.facing, Vector3.UP)
-	if hud and runner:
+	if hud and runner and not visitor:
 		var doing := ""
 		if runner.is_busy() and not runner.paused:
 			doing = NextStep.doing_label(runner.current_action(), hud.selected_crop, _field_condition())
 		elif runner.is_busy():
 			doing = "Walking over…"
 		hud.set_action(doing, runner.progress(), runner.pending_count())
+		var busy_now := runner.is_busy() or _in_flight > 0
+		if busy_now != _cta_was_busy:
+			_cta_was_busy = busy_now
+			hud.set_cta_busy(runner.pending_count() if busy_now else 0)
+			if not busy_now:
+				_refresh_hud()
+		elif busy_now:
+			hud.set_cta_busy(maxi(runner.pending_count(), 1))
 	_tick_title_hold(dt)
 	_update_camera()
 

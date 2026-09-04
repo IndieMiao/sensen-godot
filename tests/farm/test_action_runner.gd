@@ -91,3 +91,11 @@ func test_abort_current_skips_done_and_moves_on() -> void:
 	r.step(ActionRunner.ACTION_S)
 	assert_int(_done.size()).is_equal(1)
 	assert_int(_empty).is_equal(1)
+
+func test_enqueue_skips_cells_already_queued_or_in_progress() -> void:
+	var r := _runner()
+	assert_int(r.enqueue([Vector2i(1, 1), Vector2i(2, 1)], "clear")).is_equal(2)
+	assert_int(r.enqueue([Vector2i(1, 1), Vector2i(3, 1)], "clear")).is_equal(1)
+	r.step(0.0)                                   # 1,1 正在做
+	assert_int(r.enqueue([Vector2i(1, 1)], "clear")).is_equal(0)
+	assert_int(r.pending_count()).is_equal(3)

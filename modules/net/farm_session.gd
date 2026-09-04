@@ -84,7 +84,14 @@ func ensure_farm(region_id: String, layout_patch_id: String, revision: int) -> b
 	return true
 
 func refresh() -> bool:
+	# 和命令走同一条串行队列：GET 与在途命令并发时，先回来的旧状态会盖掉后回来的新状态
+	#（自动玩家：9 格都 applied，客户端却剩「Water 1 plot」）。
+	var ticket := _next_ticket
+	_next_ticket += 1
+	while _serving != ticket:
+		await Engine.get_main_loop().process_frame
 	var r: ApiClient.Response = await client.request("GET", "/farms/me")
+	_serving += 1
 	if not _track(r):
 		return false
 	if r.is_success():
@@ -156,6 +163,9 @@ func _track(r: ApiClient.Response) -> bool:
 func _adopt(body: Dictionary) -> void:
 	if body.has("server_time"):
 		clock_offset_ms = int(body.server_time) - int(Time.get_unix_time_from_system() * 1000.0)
+	# 版本只增不减：比手上还旧的回包（并发 GET、迟到的重试）一律丢弃，否则状态倒退。
+	if body.has("version") and int(body.version) < version:
+		return
 	if body.has("farm_id"):
 		farm_id = str(body.farm_id)
 	if body.has("layout_patch_id"):

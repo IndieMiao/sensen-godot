@@ -149,3 +149,28 @@ func test_sends_are_serialized_so_versions_never_go_stale() -> void:
 	assert_int(int(t.requests[1].body.base_version)).is_equal(4)
 	assert_int(int(t.requests[2].body.base_version)).is_equal(5)
 	assert_int(s.version).is_equal(6)
+
+func test_stale_response_never_regresses_state() -> void:
+	# 版本只增不减：迟到的旧回包不能把状态倒退回去。
+	var pair := _session([{"status": 200, "json": {"version": 7, "state": {"wallet": 70}, "farm_id": "f"}},
+		{"status": 200, "json": {"version": 5, "state": {"wallet": 50}, "farm_id": "f"}}])
+	var s: FarmSession = pair[0]
+	await s.refresh()
+	await s.refresh()
+	assert_int(s.version).is_equal(7)
+	assert_int(int(s.state.wallet)).is_equal(70)
+
+func test_refresh_waits_for_in_flight_commands() -> void:
+	var pair := _session([{"status": 200, "json": _state(4)},
+		{"status": 200, "json": {"version": 5, "state": {"wallet": 1}}},
+		{"status": 200, "json": {"version": 5, "state": {"wallet": 1}}}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	await s.ensure_farm("hk", "p", 2)
+	Callable(s, "send").call("clear_cells", {"cell_ids": ["1,1"]})
+	Callable(s, "refresh").call()
+	for i in 5:
+		await get_tree().process_frame
+	assert_str(str(t.requests[1].method)).is_equal("POST")
+	assert_str(str(t.requests[2].method)).is_equal("GET")
+	assert_int(s.version).is_equal(5)

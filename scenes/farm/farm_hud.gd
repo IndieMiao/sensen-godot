@@ -50,6 +50,8 @@ var _goals: PanelContainer
 var _goals_header: Button
 var _goals_list: VBoxContainer
 var _goals_open := true
+var _goals_auto_collapsed := false
+var _cta_busy := false
 var _cta: Button
 var _seed_row: HBoxContainer
 var _seed_buttons: Dictionary = {}
@@ -92,7 +94,7 @@ func _build_top_right() -> void:
 	v.add_theme_constant_override("separation", 2)
 	_status.add_child(v)
 	_status_label = Label.new()
-	_status_label.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
+	_status_label.add_theme_font_size_override("font_size", DesignTokens.FONT_MICRO + 1)   # 「Clearing… 92% · 8 left」要装进 126 宽
 	_status_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	# 固定宽：省略号模式下 Label 最小宽是 1，SHRINK_END 的 chip 会缩成 29 px 的空白小丸；
 	# 不固定又会被长句撑到和左边的目标卡相撞。
@@ -139,7 +141,8 @@ func _build_goals() -> void:
 	_tighten(_goals_header)   # 默认 16 px 内边距会把整张卡撑到 159 宽、碰到右上列
 	_goals_header.pressed.connect(func():
 		_goals_open = not _goals_open
-		_goals_list.visible = _goals_open)
+		_goals_list.visible = _goals_open
+		_goals_header.text = _goals_header.text.trim_suffix("▾").trim_suffix("▸") + ("▾" if _goals_open else "▸"))
 	v.add_child(_goals_header)
 	_goals_list = VBoxContainer.new()
 	_goals_list.add_theme_constant_override("separation", 0)
@@ -150,7 +153,13 @@ func _build_goals() -> void:
 ## 行节点复用：_refresh_hud 每次回包都会调用，重建 Label 会留一堆等帧末释放的孤儿。
 func set_goals(goals: Array, day_index: int) -> void:
 	var done := DayGoals.done_count(goals)
-	_goals_header.text = "Day %d goals · %d/%d" % [day_index + 1, done, goals.size()]
+	_goals_header.text = "Day %d goals · %d/%d %s" % [day_index + 1, done, goals.size(), "▾" if _goals_open else "▸"]
+	# 第一条完成后自动折叠成一行：整张卡展开着会一直挡住左上那一畦；点标题随时展开。
+	if done > 0 and not _goals_auto_collapsed:
+		_goals_auto_collapsed = true
+		_goals_open = false
+		_goals_list.visible = false
+		_goals_header.text = "Day %d goals · %d/%d ▸" % [day_index + 1, done, goals.size()]
 	var rows: Array = []
 	var highlighted := false
 	for g in goals:
@@ -279,11 +288,24 @@ static func _tighten(b: Button) -> void:
 		dup.content_margin_right = 6.0
 		b.add_theme_stylebox_override(state, dup)
 
-## 大按钮：bulk = NextStep.bulk() 的结果。
+## 大按钮：bulk = NextStep.bulk() 的结果。队列在跑时不改（见 set_cta_busy）。
 func set_cta(bulk: Dictionary) -> void:
+	if _cta_busy:
+		return
 	_cta.text = str(bulk.get("label", ""))
 	_cta.disabled = offline or not bool(bulk.get("enabled", true))
 	_cta.theme_type_variation = &"AccentButton" if bulk.get("action", "") != "stall" else &"SecondaryButton"
+
+## 队列在跑：大按钮改成禁用的「Working… N plots left」。原来它仍显示可点的下一步，再按一下
+## 就把同一批格再排一遍，然后一格格被拒。
+func set_cta_busy(pending: int) -> void:
+	if pending <= 0:
+		_cta_busy = false
+		return
+	_cta_busy = true
+	_cta.text = "Working… %d %s left" % [pending, "plot" if pending == 1 else "plots"]
+	_cta.disabled = true
+	_cta.theme_type_variation = &"SecondaryButton"
 
 ## 种子行：只在能播种时出现；每颗作物显示还剩几颗；锁着的不出现。
 func set_seeds(inventory: Dictionary, unlocked: Array, show: bool) -> void:
@@ -362,7 +384,7 @@ func set_action(text: String, progress: float, pending: int) -> void:
 		return
 	var full := "%s %d%%" % [text, int(progress * 100.0)]
 	if pending > 1:
-		full += "  (+%d more)" % (pending - 1)
+		full += " · %d left" % (pending - 1)
 	_last_action_text = full
 	_status_label.text = full
 	_status_bar.visible = true
