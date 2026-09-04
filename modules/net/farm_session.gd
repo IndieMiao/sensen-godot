@@ -52,8 +52,11 @@ func server_now() -> int:
 func login() -> bool:
 	var r: ApiClient.Response = await client.request("POST", "/auth/anonymous", {"install_key": ApiClient.install_key()})
 	if not _track(r):
+		last_error_code = "TRANSPORT"
 		return false
 	if not r.is_success():
+		# 429 = 登录限流（每 IP 每小时 10 次）；记下来，否则「登录失败」和断网分不清。
+		last_error_code = str(r.json.get("code", "HTTP_%d" % r.status))
 		return false
 	player_id = str(r.json.get("player_id", ""))
 	client.token = str(r.json.get("token", ""))

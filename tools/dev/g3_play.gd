@@ -38,7 +38,7 @@ func _ready() -> void:
 		if logged:
 			break
 		await get_tree().create_timer(2.0).timeout
-	_ok(logged, "login")
+	_ok(logged, "login%s" % ("" if logged else "（%s）" % session.last_error_code))
 	_ok(await session.ensure_farm("shanghai", "sh_a", 2), "ensure_farm %s" % session.layout_patch_id)
 	var bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(session.layout_patch_id, session.blueprint_revision))
 	farm = (load("res://scenes/farm/farm.tscn") as PackedScene).instantiate()
