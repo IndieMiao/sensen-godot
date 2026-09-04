@@ -1,0 +1,12 @@
+# 构建上下文是仓库根：只放行服务端真正需要的东西，别把 .godot / build / reports 塞进去。
+*
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!packages/blueprint-core/**
+!server/**
+!assets/farm/data/**
+!assets/blueprints/*/r*/farm_blueprint.json
+server/node_modules
+server/.env
+packages/blueprint-core/node_modules

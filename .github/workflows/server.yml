@@ -1,0 +1,67 @@
+name: server
+
+on:
+  push:
+    branches: [main]
+    paths: ['server/**', 'packages/**', 'assets/farm/data/**', '.github/workflows/server.yml']
+  pull_request:
+    paths: ['server/**', 'packages/**', 'assets/farm/data/**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      # DB 层的单写者语义只有真库能验证；缺库时套件会直接抛错而不是 skip。
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: farm
+          POSTGRES_PASSWORD: farm
+          POSTGRES_DB: sensen_farm_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U farm" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    env:
+      CI: '1'
+      TEST_DATABASE_URL: postgres://farm:farm@localhost:5432/sensen_farm_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 11 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r typecheck
+      - run: pnpm -r test
+
+  image:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: registry.cn-hongkong.aliyuncs.com
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: server/Dockerfile
+          push: true
+          tags: registry.cn-hongkong.aliyuncs.com/sensen/farm-server:${{ github.sha }}
+      # 部署只认 digest：tag 可以被重新推送，digest 不能。
+      - name: release manifest
+        run: |
+          cat > release-manifest.json <<JSON
+          {
+            "git_sha": "${{ github.sha }}",
+            "image_digest": "registry.cn-hongkong.aliyuncs.com/sensen/farm-server@${{ steps.build.outputs.digest }}"
+          }
+          JSON
+          cat release-manifest.json
+      - uses: actions/upload-artifact@v4
+        with: { name: release-manifest, path: release-manifest.json }

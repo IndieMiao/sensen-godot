@@ -1,0 +1,2 @@
+# supercronic 格式：每天 03:30 UTC（上海 11:30 / 洛杉矶 20:30 前一天）备份。
+30 3 * * * /usr/local/bin/backup.sh

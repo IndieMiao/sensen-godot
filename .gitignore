@@ -22,3 +22,11 @@ tools/geo_blueprint/.tmp/
 node_modules/
 
 server/.env
+
+.env.production
+release-manifest.json
+
+# 工具与调试产物，不入库
+.playwright-mcp/
+artifacts/
+output/

@@ -1,0 +1,69 @@
+# 生产 compose（阿里云香港 ECS）。镜像一律按 **digest** 引用，不用 tag：
+# tag 可以被重新推送，digest 不能，部署什么就是什么（Codex 三审 N-I8）。
+services:
+  app:
+    image: ${APP_IMAGE:?需要带 digest 的镜像，如 registry.cn-hongkong.aliyuncs.com/sensen/farm-server@sha256:...}
+    restart: unless-stopped
+    env_file: [.env]
+    environment:
+      GIT_SHA: ${GIT_SHA:-unknown}
+    depends_on:
+      postgres: { condition: service_healthy }
+    mem_limit: 1g
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+  postgres:
+    image: docker.m.daocloud.io/library/postgres@sha256:${PG_DIGEST:?需要 postgres 镜像 digest}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: farm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: sensen_farm
+    volumes: [pgdata:/var/lib/postgresql/data]
+    mem_limit: 1500m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U farm -d sensen_farm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+  caddy:
+    image: docker.m.daocloud.io/library/caddy@sha256:${CADDY_DIGEST:?需要 caddy 镜像 digest}
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # caddy_data 必须持久化：证书在里面，重建容器会重新申请并撞 Let's Encrypt 限流。
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [app]
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+  backup:
+    image: docker.m.daocloud.io/library/postgres@sha256:${PG_DIGEST:?}
+    restart: unless-stopped
+    env_file: [.env]
+    depends_on:
+      postgres: { condition: service_healthy }
+    volumes:
+      - ./backup.sh:/usr/local/bin/backup.sh:ro
+      - ./crontab:/etc/crontab.farm:ro
+      - backups:/backups
+    # compose 自己不会定时跑脚本；用 supercronic 常驻（Codex 三审 N-I9）。
+    entrypoint: ["/bin/sh", "-c", "apk add --no-cache supercronic age aws-cli >/dev/null && exec supercronic /etc/crontab.farm"]
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
+  backups:
