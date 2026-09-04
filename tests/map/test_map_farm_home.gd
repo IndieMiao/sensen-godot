@@ -12,6 +12,7 @@ func before_test() -> void:
 func after_test() -> void:
 	FarmChoice.clear()
 	FarmRegions.clear_choice()
+	UiState.clear()
 	# 别把假传输留给下一个套件。
 	Net.use_transport(FakeTransport.new([]).callable())
 	Net.client.token = ""
@@ -102,3 +103,25 @@ func test_preset_snapshots_load_per_region() -> void:
 	assert_int(PresetSnapshots.entries("mars").size()).is_equal(0)
 	var sh: Array = PresetSnapshots.entries("shanghai")
 	assert_array(sh.map(func(e): return str(e.avatar_ref))).contains(["preset_a", "preset_b"])
+
+
+func test_focus_is_remembered_and_restored_on_cold_start() -> void:
+	# PRD §3.3：返回时恢复角色选择。同一次运行地图不销毁天然保留；这里管冷启动。
+	_login_fake([{"error": "down"}])
+	var m := _map()
+	await get_tree().process_frame
+	var second := str(m.nearby_panel.cards()[1].get_meta("farm_id"))
+	m.nearby_panel.focus(second)
+	assert_str(str(UiState.read().get("selected_farm_id", ""))).is_equal(second)
+	# 「重启」：新地图实例
+	_login_fake([{"error": "down"}])
+	var m2 := _map()
+	await get_tree().process_frame
+	assert_str(m2.nearby_panel.focused_id).is_equal(second)
+
+func test_remembered_farm_no_longer_listed_is_ignored() -> void:
+	UiState.write({"selected_farm_id": "gone"})
+	_login_fake([{"error": "down"}])
+	var m := _map()
+	await get_tree().process_frame
+	assert_str(m.nearby_panel.focused_id).is_equal("")

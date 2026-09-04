@@ -902,9 +902,14 @@ func _refresh_nearby() -> void:
 		_nearby_from_presets = true
 		var fallback := PresetSnapshots.entries(region_id)
 		nearby_panel.set_entries(fallback, fallback.size(), true)
+	# 冷启动恢复上次选中的那张卡（仍在列表里才恢复）。
+	var remembered := str(UiState.read().get("selected_farm_id", ""))
+	if not remembered.is_empty() and nearby_panel.entries.any(func(e): return str(e.farm_id) == remembered):
+		nearby_panel.focus(remembered)
 
 ## 选中一张卡：先要线上快照，失败再看随包有没有这座；都没有就明说不可用。
 func _on_farm_focused(farm_id: String) -> void:
+	UiState.write({"selected_farm_id": farm_id})
 	var snap := {}
 	if not _nearby_from_presets and Net and Net.logged_in():
 		var r: Dictionary = await Net.snapshot(farm_id)
