@@ -15,7 +15,7 @@ import { effectiveNow as qaNow } from '../domain/qa.js';
 import { DOMAIN_VERSION, STATE_SCHEMA_VERSION } from '../domain/version.js';
 import { MAX_ACTIVE_TOKENS, TOKEN_IDLE_MS, newToken, tokenHash } from '../http/auth.js';
 import { ownerFarmView, type FarmRow } from '../http/dto.js';
-import { payloadHash } from '../http/hash.js';
+import { canonicalJson, payloadHash } from '../http/hash.js';
 import type { ApplyOutcome, CommandRecord, PlayerRow, Store } from '../http/store.js';
 
 export interface PgStoreDeps {
@@ -106,6 +106,82 @@ export class PgStore implements Store {
   async farmByOwner(ownerId: string): Promise<FarmRow | null> {
     const r = await this.d.pool.query('SELECT * FROM farms WHERE owner_id = $1', [ownerId]);
     return r.rowCount ? rowToFarm(r.rows[0]) : null;
+  }
+
+  async farmById(farmId: string): Promise<FarmRow | null> {
+    if (!/^[0-9a-f-]{36}$/i.test(farmId)) return null; // 非 uuid 直接当不存在，别让 pg 抛类型错
+    const r = await this.d.pool.query('SELECT * FROM farms WHERE id = $1', [farmId]);
+    return r.rowCount ? rowToFarm(r.rows[0]) : null;
+  }
+
+  async nearby(regionId: string, excludeOwnerId: string, limit: number) {
+    const where = `region_id = $1 AND visit_access = 'anyone' AND owner_id <> $2`;
+    const [count, rows] = await Promise.all([
+      this.d.pool.query(`SELECT count(*)::int AS n FROM farms WHERE ${where}`, [regionId, excludeOwnerId]),
+      this.d.pool.query(`SELECT * FROM farms WHERE ${where} ORDER BY created_at, id LIMIT $3`,
+        [regionId, excludeOwnerId, limit]),
+    ]);
+    return { count: count.rows[0].n as number, farms: rows.rows.map(rowToFarm) };
+  }
+
+  async snapshotGetOrCreate(farmId: string, slot: number, build: () => object) {
+    const client = await this.d.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const prev = await client.query('SELECT * FROM farm_snapshots WHERE farm_id = $1 FOR UPDATE', [farmId]);
+      if (prev.rowCount && Number(prev.rows[0].snapshot_taken_at) === slot) {
+        await client.query('COMMIT');
+        return { revision: prev.rows[0].snapshot_revision as number, taken_at: slot, body: prev.rows[0].body as object };
+      }
+      const body = build();
+      const old = prev.rowCount ? prev.rows[0] : null;
+      const changed = !old || canonicalJson(old.body) !== canonicalJson(body);
+      const revision = old ? (changed ? (old.snapshot_revision as number) + 1 : old.snapshot_revision as number) : 1;
+      const farm = await client.query('SELECT blueprint_revision FROM farms WHERE id = $1', [farmId]);
+      await client.query(
+        `INSERT INTO farm_snapshots (farm_id, snapshot_revision, snapshot_taken_at, body,
+           blueprint_revision, content_version, domain_version)
+         VALUES ($1,$2,$3,$4,$5,$6,$7)
+         ON CONFLICT (farm_id) DO UPDATE SET snapshot_revision = EXCLUDED.snapshot_revision,
+           snapshot_taken_at = EXCLUDED.snapshot_taken_at, body = EXCLUDED.body,
+           blueprint_revision = EXCLUDED.blueprint_revision, content_version = EXCLUDED.content_version,
+           domain_version = EXCLUDED.domain_version`,
+        [farmId, revision, slot, JSON.stringify(body), farm.rows[0]?.blueprint_revision ?? 0,
+          this.d.contentVersion, DOMAIN_VERSION]);
+      await client.query('COMMIT');
+      return { revision, taken_at: slot, body };
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
+  async ensureSystemFarm(playerHmac: string, farm: FarmRow) {
+    const now = this.d.now();
+    const client = await this.d.pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query(
+        `INSERT INTO players (id, install_key_hmac, created_at, last_seen_at) VALUES ($1,$2,$3,$3)
+           ON CONFLICT (install_key_hmac) DO NOTHING`, [farm.owner_id, playerHmac, now]);
+      await client.query(
+        `INSERT INTO farms (id, owner_id, region_id, layout_patch_id, blueprint_revision,
+           blueprint_checksum, content_version, domain_version, state_schema_version,
+           version, state, visit_access, location_visible, created_at, updated_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11,$12,$13,$13)
+         ON CONFLICT (id) DO NOTHING`,
+        [farm.id, farm.owner_id, farm.region_id, farm.layout_patch_id, farm.blueprint_revision,
+          '', this.d.contentVersion, DOMAIN_VERSION, STATE_SCHEMA_VERSION,
+          JSON.stringify(farm.state), farm.visit_access, farm.location_visible, now]);
+      await client.query('COMMIT');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
   }
 
   async createFarm(args: Parameters<Store['createFarm']>[0]) {

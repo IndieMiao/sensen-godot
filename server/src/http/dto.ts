@@ -55,12 +55,14 @@ export interface VisitorProp {
  */
 export function visitorSnapshot(
   f: FarmRow, d: Derived, snapshotRevision: number, takenAt: number, props: VisitorProp[] = [],
+  avatarRef = 'seed:unknown',
 ) {
   const cells = Object.entries(f.state.cells).map(([cell_id, c]) => ({
     cell_id, state: c.state, crop: c.crop, ripe: d.ripe_cells.includes(cell_id),
   }));
   return {
     farm_id: f.id,
+    avatar_ref: avatarRef,
     layout_patch_id: f.layout_patch_id,
     blueprint_revision: f.blueprint_revision,
     snapshot_revision: snapshotRevision,

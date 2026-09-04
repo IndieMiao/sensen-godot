@@ -45,4 +45,21 @@ export interface Store {
 
   /** 事务内：行锁 → 幂等查表 → 版本门控 → 采样时间 → reducer → 写日志与状态。 */
   applyCommand(ownerId: string, env: CommandEnvelope, cmd: Command): Promise<ApplyOutcome>;
+
+  // —— G2 访问骨架 ——
+  farmById(farmId: string): Promise<FarmRow | null>;
+  /**
+   * 同城开放访问的农场，排除调用者自己。按 created_at 排序而不是 updated_at：
+   * 后者会把「谁刚上线」暴露给整个列表。
+   */
+  nearby(regionId: string, excludeOwnerId: string, limit: number): Promise<{ count: number; farms: FarmRow[] }>;
+  /**
+   * 按 15 分钟槽取或建快照。同槽复用；跨槽用 build() 重算，内容不变则 revision 不动。
+   * `build` 产出的 body 里 snapshot_revision / snapshot_taken_at 都是占位 0，调用方用返回值覆盖——
+   * 时间戳进了 body，跨槽就永远"内容变了"。
+   */
+  snapshotGetOrCreate(farmId: string, slot: number, build: () => object):
+    Promise<{ revision: number; taken_at: number; body: object }>;
+  /** 幂等写入系统农场（预置访客农场）。已存在就什么都不做。 */
+  ensureSystemFarm(playerHmac: string, farm: FarmRow): Promise<void>;
 }

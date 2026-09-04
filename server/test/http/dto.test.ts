@@ -55,7 +55,7 @@ describe('VisitorSnapshot（G2）', () => {
 
   it('顶层字段集精确——不是靠扫禁用键名', () => {
     expect(Object.keys(snap()).sort()).toEqual([
-      'blueprint_revision', 'cells', 'farm_id', 'layout_patch_id', 'nursery',
+      'avatar_ref', 'blueprint_revision', 'cells', 'farm_id', 'layout_patch_id', 'nursery',
       'props', 'region_id', 'snapshot_revision', 'snapshot_taken_at', 'weather_snapshot',
     ]);
   });

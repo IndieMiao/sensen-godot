@@ -1,0 +1,89 @@
+{
+  "farm_id": "28665a2c-7561-599e-bbc8-56cee85f533c",
+  "avatar_ref": "preset_a",
+  "layout_patch_id": "sh_b",
+  "blueprint_revision": 2,
+  "snapshot_revision": 1,
+  "snapshot_taken_at": 1788508800000,
+  "cells": [
+    {
+      "cell_id": "30,28",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "31,28",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "32,28",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "30,32",
+      "state": "growing",
+      "crop": "L",
+      "ripe": false
+    },
+    {
+      "cell_id": "31,32",
+      "state": "growing",
+      "crop": "L",
+      "ripe": false
+    },
+    {
+      "cell_id": "32,32",
+      "state": "growing",
+      "crop": "L",
+      "ripe": false
+    },
+    {
+      "cell_id": "30,34",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "31,34",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "32,34",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "34,33",
+      "state": "wild",
+      "crop": null,
+      "ripe": false
+    },
+    {
+      "cell_id": "35,33",
+      "state": "wild",
+      "crop": null,
+      "ripe": false
+    },
+    {
+      "cell_id": "36,33",
+      "state": "wild",
+      "crop": null,
+      "ripe": false
+    }
+  ],
+  "nursery": {
+    "stage": "cleared",
+    "appearance": null
+  },
+  "props": [],
+  "weather_snapshot": "sunny",
+  "region_id": "shanghai"
+}

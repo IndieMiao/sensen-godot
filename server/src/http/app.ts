@@ -16,11 +16,11 @@ import { contentVersion, loadContent, type Content } from '../domain/content.js'
 import { derive } from '../domain/derive.js';
 import { effectiveNow as qaNow } from '../domain/qa.js';
 import type { Ctx } from '../domain/reducer.js';
-import { createInitialState } from '../domain/state.js';
-import { playerDayId } from '../domain/time.js';
 import { DOMAIN_VERSION } from '../domain/version.js';
 import { installKeyHmac, isValidInstallKey, safeEqualHex, tokenHash } from './auth.js';
-import { ownerFarmView, type FarmRow } from './dto.js';
+import { nearbyEntry, ownerFarmView, snapshotSlot, visitorSnapshot, type FarmRow } from './dto.js';
+import { avatarRef } from './avatar_ref.js';
+import { initialFarmState } from '../domain/farm_factory.js';
 import { payloadHash } from './hash.js';
 import type { Store } from './store.js';
 
@@ -40,6 +40,9 @@ export interface AppDeps {
 interface Regions {
   regions: { id: string; timezone: string; candidates: { layout_patch_id: string; revision: number }[] }[];
 }
+
+/** Nearby 列表上限：横向列表放不下更多，且越长越像在暴露整个城市的用户名单。 */
+export const NEARBY_LIMIT = 20;
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
@@ -186,6 +189,40 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     }
   });
 
+  // —— G2 访问骨架（spec §7.5 四种组合）——
+  app.get('/v1/nearby', async (req, reply) => {
+    const p = await auth(req);
+    if (!p) return reply.code(401).send({ code: 'UNAUTHENTICATED' });
+    const regionId = String((req.query as Record<string, unknown>).region_id ?? '');
+    if (!regions.regions.some(r => r.id === regionId)) return reply.code(400).send({ code: 'SCHEMA' });
+    const { count, farms } = await deps.store.nearby(regionId, p.id, NEARBY_LIMIT);
+    return reply.send({
+      region_id: regionId, count,
+      entries: farms.map(f => nearbyEntry(f, avatarRef(f))),
+      server_time: deps.now(),
+    });
+  });
+
+  app.get('/v1/farms/:farm_id/snapshot', async (req, reply) => {
+    const p = await auth(req);
+    if (!p) return reply.code(401).send({ code: 'UNAUTHENTICATED' });
+    const farm = await deps.store.farmById(String((req.params as Record<string, string>).farm_id));
+    // 不存在与不开放都是 404：区分它们就等于告诉访客「这座农场存在但拒绝你」。
+    if (!farm || farm.visit_access !== 'anyone') return reply.code(404).send({ code: 'NOT_FOUND' });
+    const tz = timezoneOf(regions, farm.region_id);
+    const real = deps.now();
+    const now = Math.max(qaNow(farm.state.qa, real), farm.state.clock.last_effective_now);
+    // 槽按真实墙钟切：快照节流是给访客看的节奏，与主人的 QA 时钟无关。
+    const slot = snapshotSlot(real);
+    // body 里**不放** taken_at / revision（都传 0）：Store 用 body 判「内容有没有变」，
+    // 时间戳进了 body 就每槽都"变了"，revision 会跟着槽号一路涨。
+    const snap = await deps.store.snapshotGetOrCreate(farm.id, slot,
+      () => visitorSnapshot(farm, derive(farm.state, now, tz, deps.content), 0, 0, [], avatarRef(farm)));
+    return reply.send({
+      ...snap.body, snapshot_revision: snap.revision, snapshot_taken_at: snap.taken_at, server_time: real,
+    });
+  });
+
   app.get('/v1/healthz', async (_req, reply) => reply.send({
     ok: true, db: true, git_sha: deps.gitSha ?? 'dev',
     content_version: deps.contentVersion, domain_version: DOMAIN_VERSION,
@@ -214,18 +251,7 @@ function buildFarmRow(
   ownerId: string, regionId: string, timezone: string,
   bp: ReturnType<typeof parseBlueprint>, deps: AppDeps, now: number,
 ): FarmRow {
-  const { cultivable, reserved } = blueprintSets(bp);
-  const d0 = deps.content.weather.script[0];
-  const state = createInitialState({
-    player_day_id: playerDayId(now, timezone), field_condition: d0, now,
-    wallet: deps.content.economy.initial_wallet,
-    bed_cells: [...cultivable].filter(x => !reserved.has(x)),
-    reserved_cells: [...reserved],
-  });
-  // 第 0 章 Grant 在建场时发（不经过换日路径）。
-  for (const [crop, n] of Object.entries(deps.content.chapters.chapters[0].grants))
-    if (!crop.startsWith('_')) state.inventory.seeds[crop as 'R'].bound += n ?? 0;
-  state.chapters[0].grants_issued = true;
+  const state = initialFarmState(deps.content, blueprintSets(bp), timezone, now);
   return {
     id: cryptoRandomId(), owner_id: ownerId, region_id: regionId,
     layout_patch_id: bp.layout_patch_id, blueprint_revision: bp.revision,

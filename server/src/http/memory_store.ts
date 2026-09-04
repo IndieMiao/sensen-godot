@@ -12,7 +12,7 @@ import { DOMAIN_VERSION, STATE_SCHEMA_VERSION } from '../domain/version.js';
 import { ownerFarmView, type FarmRow } from './dto.js';
 import { MAX_ACTIVE_TOKENS, TOKEN_IDLE_MS, newToken, tokenHash } from './auth.js';
 import type { ApplyOutcome, CommandRecord, PlayerRow, Store, TokenRow } from './store.js';
-import { payloadHash } from './hash.js';
+import { canonicalJson, payloadHash } from './hash.js';
 
 export interface MemoryStoreDeps {
   content: Content;
@@ -25,9 +25,10 @@ export interface MemoryStoreDeps {
 export class MemoryStore implements Store {
   private players = new Map<string, PlayerRow>();
   private tokens: TokenRow[] = [];
-  private farms = new Map<string, FarmRow & { content_version: string; domain_version: string; state_schema_version: number }>();
+  private farms = new Map<string, FarmRow & { content_version: string; domain_version: string; state_schema_version: number; created_at: number }>();
   private creations = new Map<string, { key: string; hash: string; farmId: string }>();
   private commands = new Map<string, Map<string, CommandRecord>>();
+  private snapshots = new Map<string, { revision: number; taken_at: number; body: object }>();
 
   constructor(private deps: MemoryStoreDeps) {}
 
@@ -72,6 +73,40 @@ export class MemoryStore implements Store {
     return [...this.farms.values()].find(f => f.owner_id === ownerId) ?? null;
   }
 
+  async farmById(farmId: string) {
+    return this.farms.get(farmId) ?? null;
+  }
+
+  async nearby(regionId: string, excludeOwnerId: string, limit: number) {
+    // 与 PgStore 同一排序键 (created_at, id)：同毫秒建的农场靠 id 定序，两套实现才会给出
+    // 同样的列表——一致性套件抓过这里只按插入序的漂移。
+    const all = [...this.farms.values()]
+      .filter(f => f.region_id === regionId && f.visit_access === 'anyone' && f.owner_id !== excludeOwnerId)
+      .sort((a, b) => a.created_at - b.created_at || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    return { count: all.length, farms: all.slice(0, limit).map(({ created_at: _c, ...f }) => f as FarmRow) };
+  }
+
+  async snapshotGetOrCreate(farmId: string, slot: number, build: () => object) {
+    const prev = this.snapshots.get(farmId);
+    if (prev && prev.taken_at === slot) return prev;
+    const body = build();
+    const changed = !prev || canonicalJson(prev.body) !== canonicalJson(body);
+    const next = { revision: prev ? (changed ? prev.revision + 1 : prev.revision) : 1, taken_at: slot, body };
+    this.snapshots.set(farmId, next);
+    return next;
+  }
+
+  async ensureSystemFarm(playerHmac: string, farm: FarmRow) {
+    if (this.farms.has(farm.id)) return;
+    if (!this.players.has(farm.owner_id))
+      this.players.set(farm.owner_id, { id: farm.owner_id, install_key_hmac: playerHmac });
+    this.farms.set(farm.id, {
+      ...farm, content_version: this.deps.contentVersion,
+      domain_version: DOMAIN_VERSION, state_schema_version: STATE_SCHEMA_VERSION,
+      created_at: this.deps.now(),
+    });
+  }
+
   async createFarm(args: Parameters<Store['createFarm']>[0]) {
     const prior = this.creations.get(args.ownerId);
     if (prior) {
@@ -84,6 +119,7 @@ export class MemoryStore implements Store {
     this.farms.set(farm.id, {
       ...farm, content_version: this.deps.contentVersion,
       domain_version: DOMAIN_VERSION, state_schema_version: STATE_SCHEMA_VERSION,
+      created_at: this.deps.now(),
     });
     this.creations.set(args.ownerId, { key: args.idempotencyKey, hash: args.payloadHash, farmId: farm.id });
     return { kind: 'created' as const, farm };

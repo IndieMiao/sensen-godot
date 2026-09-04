@@ -307,3 +307,79 @@ describe('导演模式端到端', () => {
     expect(after.json().server_time).toBeGreaterThanOrEqual(fast.json().server_time);
   });
 });
+
+
+describe('访问骨架（G2）', () => {
+  const cmd = (token: string, body: object) =>
+    app.inject({ method: 'POST', url: '/v1/farms/me/commands', headers: authed(token), payload: body });
+  async function farmOf(token: string) {
+    const r = await makeFarm(token);
+    return { farm_id: r.json().farm_id as string, version: r.json().version as number,
+      cells: Object.keys(r.json().state.cells) as string[] };
+  }
+
+  it('nearby 需要登录，且 region_id 必须是已知地区', async () => {
+    const anon = await app.inject({ method: 'GET', url: '/v1/nearby?region_id=shanghai' });
+    expect(anon.statusCode).toBe(401);
+    const { token } = await login();
+    const bad = await app.inject({ method: 'GET', url: '/v1/nearby?region_id=mars', headers: authed(token) });
+    expect(bad.statusCode).toBe(400);
+    const none = await app.inject({ method: 'GET', url: '/v1/nearby?region_id=shanghai', headers: authed(token) });
+    expect(none.statusCode).toBe(200);
+    expect(none.json()).toMatchObject({ region_id: 'shanghai', count: 0, entries: [] });
+  });
+
+  it('NearbyEntry 字段集精确：farm_id / avatar_ref / nursery_stage (+region_id)', async () => {
+    const a = await login();
+    const fa = await farmOf(a.token);
+    await cmd(a.token, { idempotency_key: 'v1', base_version: fa.version, type: 'set_visit_access', payload: { access: 'anyone' } });
+    const b = await login();
+    const seen = await app.inject({ method: 'GET', url: '/v1/nearby?region_id=shanghai', headers: authed(b.token) });
+    const entry = seen.json().entries[0];
+    expect(Object.keys(entry).sort()).toEqual(['avatar_ref', 'farm_id', 'nursery_stage', 'region_id']);
+    expect(entry.avatar_ref).toMatch(/^seed:[0-9a-f]{8}$/);
+    expect(entry.farm_id).toBe(fa.farm_id);
+    // 关掉位置可见：region_id 消失，条目仍在
+    await cmd(a.token, { idempotency_key: 'l1', base_version: fa.version + 1, type: 'set_location_visible', payload: { visible: false } });
+    const hidden = await app.inject({ method: 'GET', url: '/v1/nearby?region_id=shanghai', headers: authed(b.token) });
+    expect(Object.keys(hidden.json().entries[0]).sort()).toEqual(['avatar_ref', 'farm_id', 'nursery_stage']);
+  });
+
+  it('快照四种组合：only_me 一律 404，anyone 200 且 location_visible 决定 region_id', async () => {
+    const a = await login();
+    const fa = await farmOf(a.token);
+    const b = await login();
+    const url = `/v1/farms/${fa.farm_id}/snapshot`;
+    let v = fa.version;
+    for (const combo of [
+      { access: 'only_me', visible: true, status: 404 },
+      { access: 'only_me', visible: false, status: 404 },
+      { access: 'anyone', visible: true, status: 200, region: true },
+      { access: 'anyone', visible: false, status: 200, region: false },
+    ]) {
+      await cmd(a.token, { idempotency_key: `a${v}`, base_version: v++, type: 'set_visit_access', payload: { access: combo.access } });
+      await cmd(a.token, { idempotency_key: `l${v}`, base_version: v++, type: 'set_location_visible', payload: { visible: combo.visible } });
+      clock += 15 * 60_000; // 每个组合换一个槽，避免上一组合的快照被复用
+      const r = await app.inject({ method: 'GET', url, headers: authed(b.token) });
+      expect(r.statusCode, JSON.stringify(combo)).toBe(combo.status);
+      if (combo.status === 200) expect('region_id' in r.json()).toBe(combo.region);
+    }
+    const missing = await app.inject({ method: 'GET', url: '/v1/farms/00000000-0000-4000-8000-000000000000/snapshot', headers: authed(b.token) });
+    expect(missing.statusCode).toBe(404);
+  });
+
+  it('快照不含任何主人私有字段', async () => {
+    const a = await login();
+    const fa = await farmOf(a.token);
+    await cmd(a.token, { idempotency_key: 'v1', base_version: fa.version, type: 'set_visit_access', payload: { access: 'anyone' } });
+    const b = await login();
+    const r = await app.inject({ method: 'GET', url: `/v1/farms/${fa.farm_id}/snapshot`, headers: authed(b.token) });
+    expect(Object.keys(r.json()).sort()).toEqual([
+      'avatar_ref', 'blueprint_revision', 'cells', 'farm_id', 'layout_patch_id', 'nursery',
+      'props', 'region_id', 'server_time', 'snapshot_revision', 'snapshot_taken_at', 'weather_snapshot',
+    ]);
+    const text = JSON.stringify(r.json());
+    for (const bad of ['wallet', 'owner_id', 'inventory', 'residents', 'xp', 'lat', 'lng', 'ready_at'])
+      expect(text, bad).not.toContain(`"${bad}"`);
+  });
+});

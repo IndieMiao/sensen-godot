@@ -6,6 +6,7 @@ import { PgStore } from './db/pg_store.js';
 import { migrate } from './db/migrate.js';
 import { contentVersion, loadContent } from './domain/content.js';
 import type { Ctx } from './domain/reducer.js';
+import { PRESET_SPECS, buildPresetFarm, presetHmac } from './domain/presets.js';
 
 const need = (k: string): string => {
   const v = process.env[k];
@@ -42,6 +43,14 @@ const store = new PgStore({
   blueprint: (id, rev) => bpCache.get(`${id}@${rev}`)!,
   now: () => Date.now(),
 });
+
+// 预置访客农场：幂等播种（PRD §8.4）。缺蓝图就跳过那一座并告警，不阻塞启动。
+for (const spec of PRESET_SPECS) {
+  const sets = bpCache.get(`${spec.layout}@${spec.revision}`);
+  const tz = regions.regions.find(r => r.id === spec.region)?.timezone;
+  if (!sets || !tz) { console.warn(`预置农场 ${spec.layout} 缺蓝图或地区，跳过`); continue; }
+  await store.ensureSystemFarm(presetHmac(spec.layout), buildPresetFarm(spec, sets, content, tz, Date.now()));
+}
 
 const app = await buildApp({
   store, content, contentVersion: cv,

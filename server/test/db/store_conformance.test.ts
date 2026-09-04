@@ -15,6 +15,7 @@ import { PgStore } from '../../src/db/pg_store.js';
 import { MemoryStore } from '../../src/http/memory_store.js';
 import { migrate, truncateAll } from '../../src/db/migrate.js';
 import { buildApp, blueprintSets, loadBlueprint } from '../../src/http/app.js';
+import type { Store } from '../../src/http/store.js';
 import { newInstallKey } from '../../src/http/auth.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/domain/content.js';
 import { at, SH } from '../domain/helpers.js';
@@ -54,13 +55,15 @@ const makers: [string, boolean, () => object][] = [
 for (const [name, enabled, makeStore] of makers) {
   describe.skipIf(!enabled)(`${name} 的跨实现不变量`, () => {
     let app: FastifyInstance;
+    let currentStore: Store;
 
     beforeEach(async () => {
       clock = T0;
       qa = new Set();
       if (pool) await truncateAll(pool);
+      currentStore = makeStore() as Store;
       app = await buildApp({
-        store: makeStore() as never, content, contentVersion: CV,
+        store: currentStore, content, contentVersion: CV,
         blueprintDir: BLUEPRINTS, regionsFile: REGIONS,
         pepper: 'test-pepper', now: () => clock, qaPlayerIds: qa,
       });
@@ -76,6 +79,7 @@ for (const [name, enabled, makeStore] of makers) {
         payload: { idempotency_key: 'seed', region_id: 'shanghai',
           layout_patch_id: 'sh_a', blueprint_revision: 2 } });
       return { token, player_id, version: farm.json().version as number,
+        farm_id: farm.json().farm_id as string,
         cells: Object.keys(farm.json().state.cells) as string[] };
     }
     const cmd = (token: string, body: object) =>
@@ -147,6 +151,66 @@ for (const [name, enabled, makeStore] of makers) {
       await cmd(s.token, { idempotency_key: 'm2', base_version: v,
         type: 'till_cells', payload: { cell_ids: [s.cells[0]] } });
       expect((await me(s.token)).json().state.clock.last_effective_now).toBeGreaterThanOrEqual(high);
+    });
+
+    it('G2：nearby 只列开放访问的、排除自己、按建场顺序', async () => {
+      const a = await seed();
+      const b = await seed();
+      const c = await seed();
+      for (const s of [a, b])
+        expect((await cmd(s.token, { idempotency_key: 'va', base_version: s.version,
+          type: 'set_visit_access', payload: { access: 'anyone' } })).statusCode).toBe(200);
+      const seen = await app.inject({ method: 'GET', url: '/v1/nearby?region_id=shanghai', headers: authed(c.token) });
+      expect(seen.statusCode).toBe(200);
+      expect(seen.json().count).toBe(2);
+      // 测试时钟不走，三座同毫秒建成 → 排序键 (created_at, id) 退化成按 id；两套 Store 必须一致。
+      expect(seen.json().entries.map((e: { farm_id: string }) => e.farm_id)).toEqual([a.farm_id, b.farm_id].sort());
+      const selfView = await app.inject({ method: 'GET', url: '/v1/nearby?region_id=shanghai', headers: authed(a.token) });
+      expect(selfView.json().entries.map((e: { farm_id: string }) => e.farm_id)).toEqual([b.farm_id]);
+      expect(selfView.json().count).toBe(1);
+    });
+
+    it('G2：快照同槽复用、跨槽内容不变 revision 不动、内容变了才 +1', async () => {
+      const a = await seed();
+      const v = await seed();
+      await cmd(a.token, { idempotency_key: 'va', base_version: a.version,
+        type: 'set_visit_access', payload: { access: 'anyone' } });
+      const url = `/v1/farms/${a.farm_id}/snapshot`;
+      const s1 = await app.inject({ method: 'GET', url, headers: authed(v.token) });
+      expect(s1.statusCode).toBe(200);
+      expect(s1.json().snapshot_revision).toBe(1);
+      // 同槽内主人操作了，访客仍拿到同一份——不暴露操作时刻。
+      await cmd(a.token, { idempotency_key: 'c1', base_version: a.version + 1,
+        type: 'clear_cells', payload: { cell_ids: [a.cells[0]] } });
+      const s2 = await app.inject({ method: 'GET', url, headers: authed(v.token) });
+      expect(s2.json().snapshot_taken_at).toBe(s1.json().snapshot_taken_at);
+      expect(s2.json().cells).toEqual(s1.json().cells);
+      // 跨槽：内容变了 → revision 2
+      clock += 15 * 60_000;
+      const s3 = await app.inject({ method: 'GET', url, headers: authed(v.token) });
+      expect(s3.json().snapshot_revision).toBe(2);
+      expect(s3.json().cells.find((c: { cell_id: string }) => c.cell_id === a.cells[0]).state).toBe('cleared');
+      // 再跨槽：内容没变 → revision 仍 2，只有 taken_at 推进
+      clock += 15 * 60_000;
+      const s4 = await app.inject({ method: 'GET', url, headers: authed(v.token) });
+      expect(s4.json().snapshot_revision).toBe(2);
+      expect(s4.json().snapshot_taken_at).toBe(s3.json().snapshot_taken_at + 15 * 60_000);
+    });
+
+    it('G2：ensureSystemFarm 幂等，且出现在 nearby 里', async () => {
+      const { PRESET_SPECS, buildPresetFarm, presetHmac } = await import('../../src/domain/presets.js');
+      const spec = PRESET_SPECS.find(s => s.region === 'shanghai')!;
+      const bpB = loadBlueprint(BLUEPRINTS, spec.layout, spec.revision)!;
+      const farm = buildPresetFarm(spec, blueprintSets(bpB), content, SH, clock);
+      await currentStore.ensureSystemFarm(presetHmac(spec.layout), farm);
+      await currentStore.ensureSystemFarm(presetHmac(spec.layout), farm);
+      const me = await seed();
+      const seen = await app.inject({ method: 'GET', url: '/v1/nearby?region_id=shanghai', headers: authed(me.token) });
+      expect(seen.json().entries.filter((e: { farm_id: string }) => e.farm_id === farm.id)).toHaveLength(1);
+      expect(seen.json().entries[0].avatar_ref).toBe(spec.avatar_ref);
+      const snap = await app.inject({ method: 'GET', url: `/v1/farms/${farm.id}/snapshot`, headers: authed(me.token) });
+      expect(snap.statusCode).toBe(200);
+      expect(snap.json().avatar_ref).toBe(spec.avatar_ref);
     });
 
     it('非白名单玩家发 QA 命令一律 403', async () => {
