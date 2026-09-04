@@ -194,3 +194,34 @@ func test_preview_lives_on_an_untinted_texture_rect_not_button_icon() -> void:
 	assert_bool(preview is TextureRect).is_true()
 	assert_object((preview as TextureRect).texture).is_equal(tex)
 	assert_object((preview as TextureRect).texture).is_not_null()
+
+## 2026-09-04 真机（vivo V2509A，360×800）：候选卡片的预览撑到整屏高、盖住「Create Farm」，
+## 名字与容量文案全部被顶出屏幕。根因：assets/blueprints/*/r1/preview.png 是 512×512，
+## TextureRect 默认 expand_mode=EXPAND_KEEP_SIZE 时最小尺寸就是纹理原始尺寸，
+## custom_minimum_size 的 (0, CARD_PREVIEW_H) 只是下限、顶不住 512。上面 D2 那条测试用的
+## PlaceholderTexture2D 恰好是 64×64、与 CARD_PREVIEW_H 相等，所以测不出——这里喂一张和
+## 真实资源同尺寸的 512×512 占位图，在 Root 的真实预算（328 宽）下断言：预览高度钉在
+## CARD_PREVIEW_H、两行文案仍在卡片矩形内、确认按钮不与任何卡片相交。
+func test_full_size_preview_texture_does_not_blow_the_card_open() -> void:
+	var tex := PlaceholderTexture2D.new()
+	tex.size = Vector2(512, 512)
+	var parent := Control.new()
+	add_child(auto_free(parent))
+	parent.size = Vector2(328, 768)
+	var p: SelectPanel = auto_free(SelectPanel.new())
+	parent.add_child(p)
+	p.set_candidates([
+		{"id": "a", "name": "Hengshan Road", "preview": tex},
+		{"id": "b", "name": "Old Town", "preview": tex},
+		{"id": "c", "name": "Yuyuan Road", "preview": tex}])
+	await get_tree().process_frame
+	await get_tree().process_frame # 自动折行的 Label 拿到宽度后会再改一次最小高度，等第二轮排版
+	var button_rect := p.confirm_button.get_global_rect()
+	for card in p.cards():
+		var card_rect: Rect2 = (card as Control).get_global_rect()
+		var preview := p.preview_node(card)
+		assert_float(preview.size.y).is_equal_approx(SelectPanel.CARD_PREVIEW_H, 0.5)
+		for label in [p.name_label(card), p.capacity_label(card)]:
+			var r: Rect2 = (label as Control).get_global_rect()
+			assert_float(r.position.y + r.size.y).is_less_equal(card_rect.position.y + card_rect.size.y + 0.01)
+		assert_bool(button_rect.intersects(card_rect)).is_false()

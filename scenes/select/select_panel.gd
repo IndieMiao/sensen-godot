@@ -31,11 +31,20 @@ const CAPACITY_TEXT := "9 plots · 12 in week one"
 ##   - 16（两条卡间距，2×DesignTokens.SPACE_2）
 ##   = 280，三等分 ≤93.33。取 88（4dp 栅格对齐）留一点余量——HBoxContainer 的
 ## SIZE_EXPAND_FILL 会把富余摊给三张卡，实际渲染宽度只会比 88 更宽，不会更窄。
-## y 比原来的 156 高，给两行折行的容量文案留够空间；真实层级下垂直方向仍有
-## ~460px 富余（Root 高度 800-32=768 远大于面板自身高度 ~300），不需要收紧。
-const CARD_MIN := Vector2(88, 172)
+## y 的推导（2026-09-04 真机复测后订正，之前的 172 是拍脑袋）。卡片内容自上而下：
+##   8（内边距）+ 64（预览）+ 4 + 名字 2 行 + 4 + 容量 3 行 + 8（内边距）
+## NotoSansSC 在 14/12 号字的行高是 22/18，Label 行距 3：名字 2 行 = 47，容量
+## "9 plots · 12 in week one" 在 77px 内容宽下折成 3 行 = 60，合计 195，取 196（4dp
+## 栅格）。两个 Label 都用 max_lines_visible 钉住行数上限，所以这个预算是上界而不是
+## 估计值——名字再长也只画两行，不会把容量文案顶出卡片。真实层级下垂直方向仍有
+## ~440px 富余（Root 高度 768，面板自身 ~330），不需要收紧。
+const CARD_MIN := Vector2(88, 196)
 ## 预览缩略图固定高度：卡片内容区（CARD_MIN 减去内边距）分给预览的那一份。
+## 预览 TextureRect 必须 EXPAND_IGNORE_SIZE（见 _build_card_content），否则这个值形同虚设。
 const CARD_PREVIEW_H := 64.0
+## 名字 / 容量文案的行数上限：CARD_MIN.y 的预算就是按这两个数算的，改一处必须改另一处。
+const NAME_MAX_LINES := 2
+const CAPACITY_MAX_LINES := 3
 
 var focused_id := ""
 var confirm_button: Button
@@ -114,6 +123,11 @@ func _build_card_content(card: Button, item: Dictionary) -> void:
 	preview.name = "Preview"
 	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	preview.texture = item.get("preview")
+	# D3（2026-09-04 真机）：TextureRect 默认 expand_mode=EXPAND_KEEP_SIZE，最小尺寸就是
+	# 纹理原始尺寸——preview.png 是 512×512，custom_minimum_size 的 64 只是下限、顶不住 512，
+	# 预览撑到整屏高、把两行文案顶出屏幕、盖住「Create Farm」。IGNORE_SIZE 之后最小尺寸
+	# 才真正由 custom_minimum_size 决定，KEEP_ASPECT_COVERED + clip 负责把方图裁成横条。
+	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	preview.custom_minimum_size = Vector2(0, CARD_PREVIEW_H)
 	preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -127,6 +141,7 @@ func _build_card_content(card: Button, item: Dictionary) -> void:
 	name_label.add_theme_font_size_override("font_size", DesignTokens.FONT_LABEL)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	name_label.max_lines_visible = NAME_MAX_LINES # 候选名字长度不受我们控制，超出部分不画
 	content.add_child(name_label)
 
 	# D1：容量文案挪到独立 Label，AUTOWRAP_WORD_SMART 折行——CJK 没有空格，
@@ -139,6 +154,7 @@ func _build_card_content(card: Button, item: Dictionary) -> void:
 	capacity.add_theme_color_override("font_color", DesignTokens.INK_SUB)
 	capacity.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	capacity.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	capacity.max_lines_visible = CAPACITY_MAX_LINES
 	content.add_child(capacity)
 
 ## 卡片内承载容量文案的节点——测试断言"三卡容量文案一致"要读它，而不是已经
