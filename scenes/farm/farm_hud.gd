@@ -82,7 +82,9 @@ func _build_top_right() -> void:
 	var box := VBoxContainer.new()
 	box.name = "TopRight"
 	box.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	box.offset_left = -140.0
+	# 列宽 210：chips 都是 SHRINK_END 靠右，加宽只是让「Pick a tool, then tap a plot」这种提示
+	# 有地方放。曾试过只把提示 chip 的最小宽设成 200——超出列宽会把整列撑开，Row tool 被推出屏幕。
+	box.offset_left = -210.0
 	box.offset_top = 60.0
 	box.offset_right = -8.0
 	box.alignment = BoxContainer.ALIGNMENT_END
@@ -303,7 +305,6 @@ func _build_status() -> void:
 	_status.name = "ActionStatus"
 	_status.theme_type_variation = &"ChipPanel"
 	_status.size_flags_horizontal = Control.SIZE_SHRINK_END
-	_status.custom_minimum_size.x = 200.0   # 右上列只有 132 宽，提示文案要探出去一点才不被省略号吃掉
 	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_status.visible = false
 	var v := VBoxContainer.new()
