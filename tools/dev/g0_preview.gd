@@ -14,13 +14,15 @@ extends Node
 ## G0_SHOT 指定截图路径（截完自动退出），G0_FRAMES 是截图前等待的帧数（农场要等
 ## Avatar 异步装配落地，≥120）。
 
-@export_enum("select", "farm") var mode := "select"
+@export_enum("select", "farm", "home") var mode := "select"
 
 const FARM_BLUEPRINT := "res://assets/blueprints/sh_a/r2/farm_blueprint.json"
 
 func _ready() -> void:
 	if mode == "farm":
 		_farm()
+	elif mode == "home":
+		_home()
 	else:
 		_select()
 	var shot := OS.get_environment("G0_SHOT")
@@ -71,3 +73,14 @@ func _farm() -> void:
 	var farm := (load("res://scenes/farm/farm.tscn") as PackedScene).instantiate()
 	farm.setup({"blueprint": FarmBlueprint.load_file(FARM_BLUEPRINT)})
 	add_child(farm)
+
+## mode = home：已有农场后的地图常态——Nearby Farmers + My Farm。桌面无地图桥，底图是
+## 「Map preview」占位；Net 尚未 boot 完成，所以条目来自随包样例（正好也验证兜底路径）。
+func _home() -> void:
+	FarmChoice.save("sh_a", 2)
+	FarmRegions.save_choice("shanghai")
+	var m := (load("res://scenes/map_poc/map_poc.tscn") as PackedScene).instantiate()
+	add_child(m)
+	await get_tree().process_frame
+	if m.nearby_panel and m.nearby_panel.card_count() > 0:
+		m.nearby_panel.focus(str(m.nearby_panel.cards()[0].get_meta("farm_id")))

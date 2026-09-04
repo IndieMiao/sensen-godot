@@ -145,6 +145,14 @@ var region: Dictionary = {}
 var pan_bounds := Rect2()
 var candidate_overlay: CandidateOverlay = null
 var select_panel: SelectPanel = null
+## 已有农场时的「家」模式：不再选地，底部是 Nearby Farmers，侧栏多一个 My Farm。
+var nearby_panel: NearbyPanel = null
+var my_farm_btn: Button = null
+var _nearby_from_presets := false
+var _farm_choice: Dictionary = {}
+## 上次拉取 Nearby 的地区。is_node_ready() 在 _ready() 内部就已经为真，所以
+## enter_street_mode() 与 _ready() 尾部会各进一次 _build_region_ui()——按地区去重，别刷两遍。
+var _nearby_region := ""
 var _candidate_bps: Dictionary = {} # layout_patch_id -> FarmBlueprint
 
 func _ready() -> void:
@@ -211,7 +219,7 @@ func _ready() -> void:
 		func(): _resolve_home(START_LAT, START_LNG, true))
 	if street_mode:
 		_resolve_home(float(region.center[0]), float(region.center[1]), false)
-		load_candidates(region)
+		_build_region_ui(region)
 	_camera_dirty = true
 
 ## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）；城市选择页共用同一工厂。
@@ -539,8 +547,19 @@ func enter_street_mode(r: Dictionary) -> void:
 			marker_layer.visible = false
 		if not _home_resolved:
 			_resolve_home(float(r.center[0]), float(r.center[1]), false)
-		load_candidates(r)
+		_build_region_ui(r)
 	_camera_dirty = true
+
+## 已经有农场就不再选地：候选层与 Create Farm 都不建，直接进「家」模式。
+## _ready() 与 enter_street_mode() 两个入口都走这里，且可重入。
+func _build_region_ui(r: Dictionary) -> void:
+	_farm_choice = FarmChoice.load()
+	if _farm_choice.is_empty():
+		load_candidates(r)
+	elif nearby_panel == null:
+		_enter_farm_home(r)
+	elif str(r.get("id", "")) != _nearby_region:
+		_refresh_nearby()
 
 func set_pan_bounds(center_lat: float, center_lng: float, half_m: float) -> void:
 	var dlat := half_m / MapGeoMath.M_PER_DEG_LAT
@@ -835,3 +854,82 @@ func _random_config() -> AvatarConfig:
 		if slot_def.required or _rng.randf() > 0.5:
 			cfg.slots[slot_def.slot_name] = pool[_rng.randi_range(0, pool.size() - 1)].id
 	return cfg
+
+
+## —— 家模式 + 访问骨架（PRD §3.3 / §8.4）——————————————————————————————————
+
+## 有农场之后地图的常态：相机停在自家蓝图中心，底部挂 Nearby Farmers。
+func _enter_farm_home(r: Dictionary) -> void:
+	var bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(
+		str(_farm_choice.get("layout_patch_id", "")), int(_farm_choice.get("revision", 1))))
+	if bp != null and not bp.overlay.is_empty():
+		var center: Vector2 = bp.overlay.center
+		fly_to(center.x, center.y)
+		set_pan_bounds(center.x, center.y, 300.0)
+	my_farm_btn = Button.new()
+	my_farm_btn.name = "MyFarm"
+	my_farm_btn.text = "My Farm"
+	my_farm_btn.theme_type_variation = &"AccentButton"
+	my_farm_btn.custom_minimum_size.y = 44.0
+	my_farm_btn.pressed.connect(_open_my_farm)
+	side_toolbar.get_node("VBox").add_child(my_farm_btn)
+	side_toolbar.get_node("VBox").move_child(my_farm_btn, 0)
+	nearby_panel = NearbyPanel.new()
+	nearby_panel.farm_focused.connect(_on_farm_focused)
+	nearby_panel.visit_requested.connect(_on_visit_requested)
+	$HUD/SafeArea/Root.add_child(nearby_panel)
+	_refresh_nearby()
+
+func _open_my_farm() -> void:
+	AppRouter.push_instance(AppRouter.FARM, {
+		"layout_patch_id": str(_farm_choice.get("layout_patch_id", "")),
+		"revision": int(_farm_choice.get("revision", 1)),
+	})
+
+## 服务端拿不到就落到随包样例（PRD §11.2）：D4 所需的两座系统农场不能被断网卡住。
+func _refresh_nearby() -> void:
+	var region_id := str(region.get("id", ""))
+	_nearby_region = region_id
+	var res := {"ok": false}
+	if Net and Net.logged_in():
+		res = await Net.nearby(region_id)
+	if nearby_panel == null:
+		return
+	if res.get("ok", false):
+		_nearby_from_presets = false
+		nearby_panel.set_entries(res.entries, int(res.count), false)
+	else:
+		_nearby_from_presets = true
+		var fallback := PresetSnapshots.entries(region_id)
+		nearby_panel.set_entries(fallback, fallback.size(), true)
+
+## 选中一张卡：先要线上快照，失败再看随包有没有这座；都没有就明说不可用。
+func _on_farm_focused(farm_id: String) -> void:
+	var snap := {}
+	if not _nearby_from_presets and Net and Net.logged_in():
+		var r: Dictionary = await Net.snapshot(farm_id)
+		if r.get("ok", false):
+			snap = r.snapshot
+	if snap.is_empty():
+		snap = PresetSnapshots.snapshot(farm_id)
+	if nearby_panel == null or nearby_panel.focused_id != farm_id:
+		return   # 等待期间用户换了卡
+	if snap.is_empty():
+		nearby_panel.set_preview_unavailable()
+	else:
+		_snapshots[farm_id] = snap
+		nearby_panel.set_preview(snap)
+
+var _snapshots: Dictionary = {}
+
+## 进独立访客实例：只读、挥手、印章；不复用主人的耕作工具栏（PRD §3.3）。
+func _on_visit_requested(farm_id: String) -> void:
+	var snap: Dictionary = _snapshots.get(farm_id, {})
+	if snap.is_empty():
+		return
+	var bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(
+		str(snap.layout_patch_id), int(snap.blueprint_revision)))
+	if bp == null:
+		nearby_panel.set_preview_unavailable()
+		return
+	AppRouter.push_instance(AppRouter.FARM, {"visitor": true, "snapshot": snap, "blueprint": bp})
