@@ -78,3 +78,16 @@ func test_idle_runner_emits_nothing() -> void:
 	assert_int(_started.size()).is_equal(0)
 	assert_int(_empty).is_equal(0)
 	assert_bool(r.is_busy()).is_false()
+
+func test_abort_current_skips_done_and_moves_on() -> void:
+	# 本地预测就判定不合法：放弃这格、不发 cell_done（也就不会发命令），后面的照常。
+	var r := _runner()
+	r.enqueue([Vector2i(1, 1), Vector2i(2, 1)], "clear")
+	r.step(0.0)
+	r.abort_current()
+	assert_int(_done.size()).is_equal(0)
+	r.step(0.0)
+	assert_that(r.current_cell()).is_equal(Vector2i(2, 1))
+	r.step(ActionRunner.ACTION_S)
+	assert_int(_done.size()).is_equal(1)
+	assert_int(_empty).is_equal(1)

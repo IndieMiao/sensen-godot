@@ -38,6 +38,9 @@ const REJECT_TEXT := {
 	"CELL_LOCKED": "This bed isn't unlocked yet",
 	"CHAPTER_LOCKED": "Not available in this chapter yet",
 	"OFFLINE": "You're offline",
+	"UNKNOWN_CELL": "That plot isn't part of this farm",
+	"CELL_NOT_CULTIVABLE": "That plot can't be farmed",
+	"NOT_PREDICTED": "Rejected",
 }
 const TOAST_S := 2.5
 const CARE_LABEL := {"sunny": "Water", "rain": "Drain", "wind": "Shelter"}
@@ -123,6 +126,7 @@ func _build_banner() -> void:
 	var l := Label.new()
 	l.text = "Offline — read only"
 	l.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
+	l.add_theme_color_override("font_color", DesignTokens.SURFACE)   # ToastPanel 是深底
 	_banner.add_child(l)
 	add_child(_banner)
 
@@ -311,6 +315,8 @@ func _build_status() -> void:
 	_toast.visible = false
 	_toast_label = Label.new()
 	_toast_label.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
+	# ToastPanel 是深底：2026-09-04 真机上黑底黑字，拒绝原因一个字都看不见。
+	_toast_label.add_theme_color_override("font_color", DesignTokens.SURFACE)
 	_toast.add_child(_toast_label)
 	add_child(_toast)
 
@@ -354,3 +360,19 @@ func _process(dt: float) -> void:
 		_toast_left -= dt
 		if _toast_left <= 0.0 and _toast:
 			_toast.visible = false
+
+## 只允许选当前章节已解锁的作物；锁着的按钮禁用。当前选中被锁时换到第一个可选的。
+func set_unlocked_crops(unlocked: Array) -> void:
+	for id in _crop_buttons:
+		(_crop_buttons[id] as Button).disabled = not unlocked.has(id)
+	if not unlocked.has(crop) and not unlocked.is_empty():
+		crop = str(unlocked[0])
+		emit_signal("crop_selected", crop)
+	_refresh_buttons()
+
+func unlocked_crop_ids() -> Array:
+	var out := []
+	for id in CROPS:
+		if not (_crop_buttons[id] as Button).disabled:
+			out.append(id)
+	return out

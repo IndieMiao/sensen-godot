@@ -121,3 +121,13 @@ func test_state_changed_carries_version() -> void:
 	s.state_changed.connect(func(st, v): seen.append([int(st.wallet), v]))
 	await s.refresh()
 	assert_array(seen[0]).is_equal([30, 3])
+
+func test_adopt_records_the_servers_blueprint() -> void:
+	# 服务端农场用哪张蓝图是权威：2026-09-04 真机上客户端按本地选的 sh_b 进场、服务端却是 sh_c。
+	var pair := _session([{"status": 200, "json": {"farm_id": "f1", "version": 2, "state": {},
+		"layout_patch_id": "sh_c", "blueprint_revision": 2, "region_id": "shanghai"}}])
+	var s: FarmSession = pair[0]
+	await s.refresh()
+	assert_str(s.layout_patch_id).is_equal("sh_c")
+	assert_int(s.blueprint_revision).is_equal(2)
+	assert_str(s.region_id).is_equal("shanghai")

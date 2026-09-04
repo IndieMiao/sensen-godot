@@ -125,3 +125,53 @@ func test_remembered_farm_no_longer_listed_is_ignored() -> void:
 	var m := _map()
 	await get_tree().process_frame
 	assert_str(m.nearby_panel.focused_id).is_equal("")
+
+func _login_with_farm(layout: String, extra_responses: Array = []) -> FakeTransport:
+	var t := FakeTransport.new(extra_responses)
+	Net.use_transport(t.callable())
+	Net.client.token = "tok"
+	Net.session.farm_id = "f1"
+	Net.session.layout_patch_id = layout
+	Net.session.blueprint_revision = 2
+	return t
+
+func test_server_farm_puts_map_in_home_mode_even_without_local_choice() -> void:
+	# 换手机 / 清过数据：本地没记录，但服务端有农场 → 直接进家，并把本地缓存补上。
+	FarmChoice.clear()
+	_login_with_farm("sh_c", [{"status": 200, "json": {"region_id": "shanghai", "count": 0, "entries": []}}])
+	var m := _map()
+	await get_tree().process_frame
+	assert_object(m.select_panel).is_null()
+	assert_object(m.nearby_panel).is_not_null()
+	assert_str(FarmChoice.load().layout_patch_id).is_equal("sh_c")
+
+func test_confirming_a_candidate_yields_to_the_servers_existing_farm() -> void:
+	# 2026-09-04 真机：服务端已有 sh_c，玩家在选地页点了 Old Town(sh_b) → 必须进 sh_c。
+	FarmChoice.clear()
+	var t := FakeTransport.new([
+		{"status": 200, "json": {"farm_id": "f1", "version": 3, "state": {},
+			"layout_patch_id": "sh_c", "blueprint_revision": 2, "region_id": "shanghai"}},  # GET /farms/me
+	])
+	Net.use_transport(t.callable())
+	Net.client.token = "tok"
+	var m := _map()
+	await get_tree().process_frame
+	var choice: Dictionary = await m._resolve_confirmed_farm("sh_b")
+	assert_str(str(choice.layout_patch_id)).is_equal("sh_c")
+	assert_str(FarmChoice.load().layout_patch_id).is_equal("sh_c")
+	assert_str(m.location_status.text).is_equal("You already have a farm at Yuyuan Road")
+
+func test_late_login_with_a_farm_switches_candidates_to_home() -> void:
+	# Net 在地图 _ready 之后才 boot 完：登录一到，选地面板要让位给家模式。
+	FarmChoice.clear()
+	Net.use_transport(FakeTransport.new([]).callable())
+	Net.client.token = ""
+	var m := _map()
+	await get_tree().process_frame
+	assert_object(m.select_panel).is_not_null()
+	_login_with_farm("sh_c", [{"status": 200, "json": {"region_id": "shanghai", "count": 0, "entries": []}}])
+	m._on_net_booted(true)
+	await get_tree().process_frame
+	assert_object(m.select_panel).is_null()
+	assert_object(m.candidate_overlay).is_null()
+	assert_object(m.nearby_panel).is_not_null()

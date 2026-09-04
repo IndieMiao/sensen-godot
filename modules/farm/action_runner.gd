@@ -48,6 +48,16 @@ func cancel_pending() -> int:
 	_queue.clear()
 	return n
 
+## 放弃**当前**这格（本地预测就判定不合法时用）：不发 cell_done，所以不会发命令；
+## 队列里后面的格照常继续。
+func abort_current() -> void:
+	if _current == null:
+		return
+	_current = null
+	_elapsed = 0.0
+	if _queue.is_empty():
+		emit_signal("queue_empty")
+
 func step(dt: float) -> void:
 	if _current == null:
 		if _queue.is_empty():

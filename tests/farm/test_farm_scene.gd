@@ -218,3 +218,56 @@ func test_server_rejection_is_shown_not_swallowed() -> void:
 	assert_bool(scene.hud._toast.visible).is_true()
 	assert_str(scene.hud._toast_label.text).is_equal("That plot isn't ready for this step")
 	assert_str(str(scene.predictor.view()["1,1"].state)).is_equal("wild")   # 预测已回滚
+
+func _session_with_farm(t: FakeTransport, layout := "", cells := {}) -> FarmSession:
+	var s := FarmSession.new(ApiClient.new("https://example.test/v1", t.callable()))
+	s.client.token = "tok"
+	s.farm_id = "f1"
+	s.layout_patch_id = layout
+	s.blueprint_revision = 2
+	s.state = {"cells": cells, "beds_unlocked": 3, "wallet": 180, "clock": {"chapter_index": 0, "field_condition": "sunny"}}
+	return s
+
+func test_servers_blueprint_beats_the_locally_chosen_one() -> void:
+	# 2026-09-04 真机：本地选 sh_b、服务端农场 sh_c → 客户端按 sh_b 进场，每一格都 CELL_NOT_CULTIVABLE。
+	var bp_c := FarmBlueprint.load_file(FarmBlueprint.asset_path("sh_c", 2))
+	var cells := {}
+	for bed in bp_c.beds():
+		for c in bed.cells:
+			cells["%d,%d" % [c.x, c.y]] = {"state": "wild"}
+	var s := _session_with_farm(FakeTransport.new([]), "sh_c", cells)
+	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
+	scene.setup({"blueprint": FarmBlueprint.load_file(FarmBlueprint.asset_path("sh_b", 2)), "session": s})
+	add_child(auto_free(scene))
+	assert_str(scene.bp.layout_patch_id).is_equal("sh_c")
+	assert_str(scene.title.text).is_equal(bp_c.display_name)
+	assert_int(int(scene.crop_field.cell_counts()["weed"])).is_equal(9)   # 草画在正确的畦上
+	assert_str(FarmChoice.load().layout_patch_id).is_equal("sh_c")          # 本地缓存跟着改
+	FarmChoice.clear()
+
+func test_locally_invalid_action_is_aborted_and_explained_without_a_request() -> void:
+	var t := FakeTransport.new([])
+	var s := _session_with_farm(t, "", {"1,1": {"state": "cleared"}})
+	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
+	scene.setup({"blueprint": FarmBlueprint.load_file(FIX), "session": s})
+	add_child(auto_free(scene))
+	scene.tool = "clear"
+	scene._enqueue_cells([Vector2i(1, 1)])          # 已清理过的格再清 → WRONG_STATE
+	scene._process(0.0)
+	assert_bool(scene.hud._toast.visible).is_true()
+	assert_str(scene.hud._toast_label.text).is_equal("That plot isn't ready for this step")
+	assert_bool(scene.runner.is_busy()).is_false()
+	scene._process(ActionRunner.ACTION_S + 0.1)
+	assert_int(t.requests.size()).is_equal(0)
+
+func test_locked_crops_are_disabled_in_chapter_zero() -> void:
+	var s := _session_with_farm(FakeTransport.new([]), "", {"1,1": {"state": "wild"}})
+	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
+	scene.setup({"blueprint": FarmBlueprint.load_file(FIX), "session": s})
+	add_child(auto_free(scene))
+	assert_array(scene.hud.unlocked_crop_ids()).is_equal(["R", "L"])
+	scene.hud._on_crop("C")                          # 就算硬选，播种 payload 也不会变成 C
+	assert_bool((scene.hud._crop_buttons["C"] as Button).disabled).is_true()
+	s.state.clock.chapter_index = 3
+	scene._refresh_hud()
+	assert_array(scene.hud.unlocked_crop_ids()).is_equal(["R", "L", "C", "H"])

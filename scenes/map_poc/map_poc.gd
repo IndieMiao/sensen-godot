@@ -167,6 +167,8 @@ func _ready() -> void:
 	if not street_mode:
 		_spawn_la_fixture() # 压测夹具先排队；home 队列等定位确定后再插
 	_wire_buttons()
+	if Net:
+		Net.booted.connect(_on_net_booted)
 
 	# marker 层：铺满 HUD 且排在最底，别挡住芯片和按钮。
 	# 自身 MOUSE_FILTER_IGNORE 只是让层本身不吞事件，图钉 Button 仍然可点。
@@ -553,7 +555,7 @@ func enter_street_mode(r: Dictionary) -> void:
 ## 已经有农场就不再选地：候选层与 Create Farm 都不建，直接进「家」模式。
 ## _ready() 与 enter_street_mode() 两个入口都走这里，且可重入。
 func _build_region_ui(r: Dictionary) -> void:
-	_farm_choice = FarmChoice.load()
+	_farm_choice = _resolve_farm_choice()
 	if _farm_choice.is_empty():
 		load_candidates(r)
 	elif nearby_panel == null:
@@ -609,15 +611,33 @@ func _save_choice(id: String) -> void:
 	FarmChoice.save(id, _candidate_bps[id].revision)
 
 func _on_candidate_confirmed(id: String) -> void:
-	_save_choice(id)
+	var choice := await _resolve_confirmed_farm(id)
+	AppRouter.push_instance(AppRouter.FARM, {
+		"layout_patch_id": choice.layout_patch_id, "revision": int(choice.revision)})
+
+## 玩家选了 id，但**服务端已有农场时以服务端为准**：ensure_farm 取回的是旧农场，客户端若
+## 仍按新选的蓝图进场，发出去的格子全在别的坐标上（2026-09-04 真机全程 CELL_NOT_CULTIVABLE）。
+## 失败不拦着玩家——退化成 G0 灰盒也能进能走，但要说清楚没存到线上。
+func _resolve_confirmed_farm(id: String) -> Dictionary:
 	var rev: int = _candidate_bps[id].revision
-	# 先在服务端建场，成功了再进。失败不拦着玩家——退化成 G0 灰盒也能进能走，
-	# 但要说清楚没存到线上，别让人以为种下去的东西还在。
 	if Net and Net.logged_in():
 		var ok: bool = await Net.session.ensure_farm(str(region.get("id", "")), id, rev)
 		if not ok:
 			location_status.text = "Offline — farm not saved online"
-	AppRouter.push_instance(AppRouter.FARM, {"layout_patch_id": id, "revision": rev})
+		elif not Net.session.layout_patch_id.is_empty() and Net.session.layout_patch_id != id:
+			var server_id := Net.session.layout_patch_id
+			rev = Net.session.blueprint_revision
+			location_status.text = "You already have a farm at %s" % _candidate_name(server_id)
+			FarmChoice.save(server_id, rev)
+			return {"layout_patch_id": server_id, "revision": rev}
+	_save_choice(id)
+	return {"layout_patch_id": id, "revision": rev}
+
+func _candidate_name(layout_id: String) -> String:
+	for c in region.get("candidates", []):
+		if str(c.get("layout_patch_id", "")) == layout_id:
+			return str(c.get("name", layout_id))
+	return layout_id
 
 func _clamp_to_bounds() -> void:
 	if pan_bounds.size == Vector2.ZERO:
@@ -857,6 +877,32 @@ func _random_config() -> AvatarConfig:
 
 
 ## —— 家模式 + 访问骨架（PRD §3.3 / §8.4）——————————————————————————————————
+
+## 我的农场用哪张蓝图：登录且服务端有农场 → 服务端说了算，并把本地缓存改成一致；
+## 否则用本地缓存（离线或还没建场）。
+func _resolve_farm_choice() -> Dictionary:
+	if Net and Net.logged_in() and Net.session.has_farm() and not Net.session.layout_patch_id.is_empty():
+		var server := {"layout_patch_id": Net.session.layout_patch_id, "revision": Net.session.blueprint_revision}
+		var local := FarmChoice.load()
+		if local.get("layout_patch_id", "") != server.layout_patch_id:
+			FarmChoice.save(server.layout_patch_id, server.revision)
+		return server
+	return FarmChoice.load()
+
+## Net 在地图 _ready() 之后才 boot 完的情况：登录一到就重看一遍——有农场就从选地切到家。
+func _on_net_booted(_ok: bool) -> void:
+	if not street_mode or nearby_panel != null:
+		return
+	if Net.session.has_farm():
+		if candidate_overlay:
+			remove_child(candidate_overlay)
+			candidate_overlay.queue_free()
+			candidate_overlay = null
+		if select_panel:
+			select_panel.get_parent().remove_child(select_panel)
+			select_panel.queue_free()
+			select_panel = null
+		_build_region_ui(region)
 
 ## 有农场之后地图的常态：相机停在自家蓝图中心，底部挂 Nearby Farmers。
 func _enter_farm_home(r: Dictionary) -> void:

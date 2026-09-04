@@ -65,6 +65,15 @@ func _ready() -> void:
 	visitor = bool(_args.get("visitor", false))
 	snapshot = _args.get("snapshot", {})
 	bp = _args.get("blueprint")
+	# 服务端农场的蓝图优先于本地选的：2026-09-04 真机上本地选了 sh_b、服务端农场是 sh_c，
+	# 客户端按 sh_b 进场，发出去的每一格都 CELL_NOT_CULTIVABLE，草还画在别的坐标上。
+	if not visitor:
+		var s0: FarmSession = _args.get("session", Net.session if Net else null)
+		if s0 and s0.has_farm() and not s0.layout_patch_id.is_empty():
+			var server_bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(s0.layout_patch_id, s0.blueprint_revision))
+			if server_bp != null:
+				bp = server_bp
+				FarmChoice.save(s0.layout_patch_id, s0.blueprint_revision)
 	if bp == null:
 		bp = FarmBlueprint.load_file(FarmBlueprint.asset_path(
 			str(_args.get("layout_patch_id", "")), int(_args.get("revision", 1))))
@@ -248,6 +257,13 @@ func _on_cell_started(cell: Vector2i, action: String) -> void:
 			session.server_now() if session else 0)
 		if r.ok:
 			_render()
+		else:
+			# 本地就判定不合法：说原因、放弃这格、不发命令。原来会照常干 2 秒再被服务端拒，
+			# 玩家看到的是白忙一场。
+			if hud:
+				hud.show_toast(FarmHud.reject_text(r.error))
+			runner.abort_current()
+			return
 	var clip := AnimPlaceholders.clip_for(action)
 	_play(clip)
 	# 占位动作只回退到 idle 的话玩家看到的是站着发呆 2 秒——至少俯身、至少面向那格。
@@ -301,6 +317,8 @@ func _refresh_hud() -> void:
 	var cells: Dictionary = predictor.view() if predictor else {}
 	hud.set_coins(int(session.state.get("wallet", 0)) if session else 0)
 	hud.set_condition(_field_condition())
+	var chapter := int((session.state.get("clock", {}) as Dictionary).get("chapter_index", 0)) if session else 0
+	hud.set_unlocked_crops(CropUnlocks.unlocked(FarmHud.CROPS, chapter))
 	hud.set_next_ripe(cells, now)
 	hud.set_offline(session.offline if session else false)
 

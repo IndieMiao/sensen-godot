@@ -17,6 +17,11 @@ const OFFLINE_AFTER_FAILURES := 2
 var client: ApiClient
 var player_id := ""
 var farm_id := ""
+## 服务端农场用的蓝图。**这才是权威**：2026-09-04 真机上客户端按本地选的 sh_b 进场，服务端
+## 农场却是 sh_c，发出去的格子全 CELL_NOT_CULTIVABLE，状态里的草画到了别的坐标上。
+var layout_patch_id := ""
+var blueprint_revision := 0
+var region_id := ""
 var version := -1
 var state: Dictionary = {}
 var offline := false
@@ -140,6 +145,12 @@ func _adopt(body: Dictionary) -> void:
 		clock_offset_ms = int(body.server_time) - int(Time.get_unix_time_from_system() * 1000.0)
 	if body.has("farm_id"):
 		farm_id = str(body.farm_id)
+	if body.has("layout_patch_id"):
+		layout_patch_id = str(body.layout_patch_id)
+	if body.has("blueprint_revision"):
+		blueprint_revision = int(body.blueprint_revision)
+	if body.has("region_id"):
+		region_id = str(body.region_id)
 	if body.has("version"):
 		version = int(body.version)
 	if body.has("state"):
