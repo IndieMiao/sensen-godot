@@ -44,7 +44,9 @@ export function derive(s: FarmState, now: number, timezone: string, c: Content):
     player_day_id: day,
     days_elapsed: elapsed,
     weather_day_index: weatherIndex,
-    field_condition: elapsed > 0 ? conditionFor(weatherIndex, c.weather.script) : s.clock.field_condition,
+    field_condition: elapsed > 0
+      ? (s.qa?.weather?.[String(weatherIndex)] ?? conditionFor(weatherIndex, c.weather.script))
+      : (s.qa?.weather?.[String(s.clock.weather_day_index)] ?? s.clock.field_condition),
     chapter_index: opens ? s.clock.chapter_index + 1 : s.clock.chapter_index,
     opens_new_chapter: opens,
     ripe_cells: ripe.sort(),

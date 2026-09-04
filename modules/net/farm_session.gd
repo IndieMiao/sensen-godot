@@ -24,6 +24,7 @@ var offline := false
 ## 玩家改系统时间不应该让作物提前熟（PRD §9.1 L668）。
 var clock_offset_ms := 0
 
+var last_error_code := ""
 var _failures := 0
 
 func _init(p_client: ApiClient) -> void:
@@ -83,6 +84,7 @@ func refresh() -> bool:
 ## 两次都不成就放弃，让上层回滚预测。
 func send(type: String, payload: Dictionary) -> bool:
 	if offline:
+		last_error_code = "OFFLINE"
 		emit_signal("rejected", "OFFLINE", "离线中，命令未发送")
 		return false
 	var key := _new_key()
@@ -100,9 +102,11 @@ func send(type: String, payload: Dictionary) -> bool:
 		if not _track(r):
 			return false
 	if r.is_success():
+		last_error_code = ""
 		_adopt(r.json)
 		return true
-	emit_signal("rejected", str(r.json.get("code", "UNKNOWN")), str(r.json.get("detail", "")))
+	last_error_code = str(r.json.get("code", "UNKNOWN"))
+	emit_signal("rejected", last_error_code, str(r.json.get("detail", "")))
 	return false
 
 func _post_command(key: String, base: int, type: String, payload: Dictionary) -> ApiClient.Response:

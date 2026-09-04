@@ -14,6 +14,7 @@ import type { Command, CommandEnvelope } from '../domain/commands.js';
 import { isQaCommand } from '../domain/commands.js';
 import { contentVersion, loadContent, type Content } from '../domain/content.js';
 import { derive } from '../domain/derive.js';
+import { effectiveNow as qaNow } from '../domain/qa.js';
 import type { Ctx } from '../domain/reducer.js';
 import { createInitialState } from '../domain/state.js';
 import { playerDayId } from '../domain/time.js';
@@ -143,7 +144,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const tz = timezoneOf(regions, farm.region_id);
     // 读路径同样先 clamp 成 max(采样, last) 再 derive，但**不写回**：时钟回拨时读取结果
     // 不会倒退（Codex 三审 O-I3）。
-    const now = Math.max(deps.now(), farm.state.clock.last_effective_now);
+    // 读路径也要过 QA 变换，否则加速后的农场在 GET 里看到的是没加速的时间。
+    const now = Math.max(qaNow(farm.state.qa, deps.now()), farm.state.clock.last_effective_now);
     return reply.send(ownerFarmView(farm, derive(farm.state, now, tz, deps.content), now));
   });
 
@@ -172,7 +174,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
         return reply.code(409).send({ code: 'IDEMPOTENCY_MISMATCH', server_time: deps.now() });
       case 'version_conflict': {
         const tz = timezoneOf(regions, out.farm.region_id);
-        const now = deps.now();
+        const now = Math.max(qaNow(out.farm.state.qa, deps.now()),
+          out.farm.state.clock.last_effective_now);
         return reply.code(409).send({ code: 'VERSION_CONFLICT',
           ...ownerFarmView(out.farm, derive(out.farm.state, now, tz, deps.content), now) });
       }

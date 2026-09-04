@@ -3,6 +3,7 @@
  * （Codex 二审 Minor 2：两处都有会出现「以哪边为准」的歧义）。
  */
 import type { CropId, DishId, FieldCondition, ResidentId } from './content.js';
+import { initialQa, type QaClock } from './qa.js';
 
 export const CELL_STATES = ['wild', 'cleared', 'tilled', 'sown', 'growing'] as const;
 export type CellState = (typeof CELL_STATES)[number];
@@ -79,6 +80,8 @@ export interface FarmState {
     dishes: Record<DishId, number>;
   };
   cells: Record<string, CellSlot>;
+  /** 导演模式时钟；正式农场是恒等变换。老农场缺这个字段时按未加速补齐。 */
+  qa?: QaClock;
   beds_unlocked: 3 | 4;
   tools: { row_tool: boolean };
   growth_choice: {
@@ -141,6 +144,7 @@ export function createInitialState(a: InitialArgs): FarmState {
       field_condition: a.field_condition,
       last_effective_now: a.now,
     },
+    qa: initialQa(a.now),
     wallet: a.wallet,
     inventory: {
       seeds: perCrop(() => ({ bought: 0, bound: 0 })),

@@ -16,11 +16,15 @@ import { materializeDay } from './handlers/day.js';
 import { applyEconomy } from './handlers/economy.js';
 import { applyFarming } from './handlers/farming.js';
 import { applyResidents } from './handlers/residents.js';
+import { applyQa } from './handlers/qa.js';
 import { applySettings } from './handlers/settings.js';
 import type { FarmState } from './state.js';
 
 export interface Ctx {
+  /** **有效**时间（QA 变换之后）；一切派生量都吃它。 */
   now: number;
+  /** 真实墙钟。只有 QA 命令用它重新锚定倍率——用有效时间锚定会自我放大。 */
+  realNow?: number;
   timezone: string;
   content: Content;
   /** 蓝图约束：哪些格可耕、哪三格属预留畦。 */
@@ -30,9 +34,12 @@ export interface Ctx {
 
 export function makeCtx(
   s: FarmState, now: number, timezone: string, content: Content,
-  blueprint: Ctx['blueprint'],
+  blueprint: Ctx['blueprint'], realNow?: number,
 ): Ctx {
-  return { now, timezone, content, blueprint, derived: derive(s, now, timezone, content) };
+  return {
+    now, realNow: realNow ?? now, timezone, content, blueprint,
+    derived: derive(s, now, timezone, content),
+  };
 }
 
 export function apply(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmState> {
@@ -52,6 +59,8 @@ export function apply(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmState> {
   if (residents) return residents;
   const settings = applySettings(base, cmd, ctx);
   if (settings) return settings;
+  const qa = applyQa(base, cmd, ctx);
+  if (qa) return qa;
 
   return err('NOT_AVAILABLE', `命令 ${cmd.type} 尚未实现（Task 5）`);
 }
@@ -59,9 +68,9 @@ export function apply(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmState> {
 /** 便捷入口：调用方通常没有现成的 Derived。 */
 export function applyAt(
   s: FarmState, cmd: Command, now: number, timezone: string, content: Content,
-  blueprint: Ctx['blueprint'],
+  blueprint: Ctx['blueprint'], realNow?: number,
 ): Result<FarmState> {
-  return apply(s, cmd, makeCtx(s, now, timezone, content, blueprint));
+  return apply(s, cmd, makeCtx(s, now, timezone, content, blueprint, realNow));
 }
 
 export type { FieldCondition };

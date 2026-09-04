@@ -29,6 +29,8 @@ var row_tool := false
 var _rig: AvatarRig
 var _anim := ""
 var _tap_start := Vector2.ZERO
+var director: DirectorPanel
+var _title_hold := 0.0
 var _drag_points := PackedVector2Array()
 var _dragging := false
 
@@ -75,6 +77,7 @@ func _ready() -> void:
 	hud.tool_selected.connect(func(t): tool = t)
 	hud.crop_selected.connect(func(c): sow_crop = c)
 	hud.row_tool_toggled.connect(func(on): row_tool = on)
+	_build_director()
 	_refresh_hud()
 	joystick.changed.connect(mover.set_joystick)
 	player.position = mover.position
@@ -131,6 +134,7 @@ func _process(dt: float) -> void:
 	player.position = mover.position
 	if runner:
 		runner.step(dt)
+	_tick_title_hold(dt)
 	# 劳作中锁住动画：否则 _process 每帧无条件用 walk/idle 覆盖，动作动画永远播不出来。
 	if not _action_locked():
 		if mover.is_moving():
@@ -266,3 +270,43 @@ func _refresh_hud() -> void:
 	hud.set_condition(_field_condition())
 	hud.set_next_ripe(cells, now)
 	hud.set_offline(session.offline if session else false)
+
+## 导演面板入口：长按标题三秒，或命令行 --qa 直接打开。不额外占屏幕——
+## QA 面板不该在正式玩家的界面上留按钮。
+func _build_director() -> void:
+	director = DirectorPanel.new()
+	director.name = "Director"
+	hud.add_child(director)
+	director.command_requested.connect(_on_director_command)
+	title.gui_input.connect(_on_title_input)
+	title.mouse_filter = Control.MOUSE_FILTER_STOP
+	if OS.get_cmdline_user_args().has("--qa"):
+		director.visible = true
+
+func _on_title_input(e: InputEvent) -> void:
+	if e is InputEventScreenTouch or e is InputEventMouseButton:
+		_title_hold = 0.0 if e.is_pressed() else -1.0
+
+func _tick_title_hold(dt: float) -> void:
+	if _title_hold < 0.0 or director == null:
+		return
+	_title_hold += dt
+	if _title_hold >= DirectorPanel.HOLD_S:
+		_title_hold = -1.0
+		director.toggle()
+
+## 导演命令直发服务端；客户端不本地加速时间。
+func _on_director_command(type: String, payload: Dictionary) -> void:
+	if session == null:
+		director.report(false, "OFFLINE")
+		return
+	var body := payload
+	if type == "qa_set_weather":
+		# 面板选的是「今天改成什么」，命令要的是天气日索引 → 田况。
+		var idx := int((session.state.get("clock", {}) as Dictionary).get("weather_day_index", 0))
+		body = {"overrides": {str(idx): payload.get("day", "sunny")}}
+	var accepted := session.send(type, body)
+	director.report(accepted, session.last_error_code)
+	if accepted:
+		predictor.commit(session.state.get("cells", {}), session.version) if predictor else null
+		_render()

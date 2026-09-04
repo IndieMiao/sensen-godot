@@ -11,6 +11,7 @@ import type { Command, CommandEnvelope } from '../domain/commands.js';
 import type { Content } from '../domain/content.js';
 import { derive } from '../domain/derive.js';
 import { apply, makeCtx, type Ctx } from '../domain/reducer.js';
+import { effectiveNow as qaNow } from '../domain/qa.js';
 import { DOMAIN_VERSION, STATE_SCHEMA_VERSION } from '../domain/version.js';
 import { MAX_ACTIVE_TOKENS, TOKEN_IDLE_MS, newToken, tokenHash } from '../http/auth.js';
 import { ownerFarmView, type FarmRow } from '../http/dto.js';
@@ -178,8 +179,11 @@ export class PgStore implements Store {
         return { kind: 'version_mismatch' };
       }
 
-      // 4. 锁后采样，单调 clamp。
-      const effectiveNow = Math.max(this.d.now(), farm.state.clock.last_effective_now);
+      // 4. 锁后采样，先过 QA 时间变换，再单调 clamp。
+      //    变换必须在 clamp 之前：QA 农场把倍率调回 1 时有效时间不该倒退，
+      //    clamp 是那条保证；正式农场 qa 为恒等变换，这一步是 no-op。
+      const realNow = this.d.now();
+      const effectiveNow = Math.max(qaNow(farm.state.qa, realNow), farm.state.clock.last_effective_now);
 
       if (env.base_version !== farm.version) {
         await client.query('COMMIT');
@@ -188,7 +192,7 @@ export class PgStore implements Store {
 
       const tz = this.d.timezone(farm.region_id);
       const ctx = makeCtx(farm.state, effectiveNow, tz,
-        this.d.content, this.d.blueprint(farm.layout_patch_id, farm.blueprint_revision));
+        this.d.content, this.d.blueprint(farm.layout_patch_id, farm.blueprint_revision), realNow);
       const r = apply(farm.state, cmd, ctx);
 
       if (!r.ok) {
