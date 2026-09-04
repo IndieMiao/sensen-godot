@@ -192,7 +192,7 @@ func test_action_progress_and_hint_are_visible_in_hud() -> void:
 	var f := _farm()
 	f.hud._on_tool("clear")
 	assert_bool(f.hud._status.visible).is_true()
-	assert_str(f.hud._status_label.text).is_equal("Tap or drag across plots")
+	assert_str(f.hud._status_label.text).is_equal("Tap or drag over plots")
 	f._enqueue_cells(f.bp.beds()[0].cells)
 	f._process(0.0)
 	f._process(1.0)

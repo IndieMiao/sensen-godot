@@ -104,13 +104,13 @@ func _ready() -> void:
 	exit_btn.pressed.connect(_leave)
 	hud.tool_selected.connect(func(t):
 		tool = t
-		hud.set_hint("" if t.is_empty() else "Tap or drag across plots"))
+		hud.set_hint("" if t.is_empty() else "Tap or drag over plots"))
 	hud.crop_selected.connect(func(c): sow_crop = c)
 	hud.row_tool_toggled.connect(func(on): row_tool = on)
 	if not visitor:
 		_build_director()
 		# 第一眼就告诉玩家怎么开始；选了工具后提示会换成下一步。
-		hud.set_hint("Pick a tool below, then tap a plot")
+		hud.set_hint("Pick a tool, then tap a plot")
 	_refresh_hud()
 	joystick.changed.connect(mover.set_joystick)
 	player.position = mover.position

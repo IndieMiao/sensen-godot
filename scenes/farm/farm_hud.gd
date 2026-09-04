@@ -15,7 +15,7 @@ signal stamp_pressed()
 
 const CROPS := ["R", "L", "C", "H"]
 ## 底栏一行放 4 个 → 每个约 86 px，"Lettuce" 这样的 7 字词正好放得下。
-const CROP_LABEL := {"R": "Radish", "L": "Lettuce", "C": "Carrot", "H": "Chamom"}
+const CROP_LABEL := {"R": "Radish", "L": "Lettuce", "C": "Carrot", "H": "Chamomile"}
 ## 触摸目标：主题给 Button 定的是 48 单位，RailButton 更紧凑，这里显式兜到 44。
 const BUTTON_H := 44.0
 ## 标签一律 ≤5 字符：360 宽的一行放 5 个按钮，长词会把同行的邻居挤出屏幕。
@@ -303,7 +303,7 @@ func _build_status() -> void:
 	_status.name = "ActionStatus"
 	_status.theme_type_variation = &"ChipPanel"
 	_status.size_flags_horizontal = Control.SIZE_SHRINK_END
-	_status.custom_minimum_size.x = 150.0
+	_status.custom_minimum_size.x = 200.0   # 右上列只有 132 宽，提示文案要探出去一点才不被省略号吃掉
 	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_status.visible = false
 	var v := VBoxContainer.new()
