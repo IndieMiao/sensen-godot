@@ -131,3 +131,21 @@ func test_adopt_records_the_servers_blueprint() -> void:
 	assert_str(s.layout_patch_id).is_equal("sh_c")
 	assert_int(s.blueprint_revision).is_equal(2)
 	assert_str(s.region_id).is_equal("shanghai")
+
+func test_sends_are_serialized_so_versions_never_go_stale() -> void:
+	# 并发两条：第二条必须等第一条回包、用新 version 发，而不是拿旧 version 撞 409。
+	var pair := _session([{"status": 200, "json": _state(4)},
+		{"status": 200, "json": {"version": 5, "state": {}}},
+		{"status": 200, "json": {"version": 6, "state": {}}}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	await s.ensure_farm("hk", "p", 2)
+	# 通过 Callable.call 起两条协程而不 await：语法层面只有这条路能"同时"发两条。
+	Callable(s, "send").call("clear_cells", {"cell_ids": ["1,1"]})
+	Callable(s, "send").call("clear_cells", {"cell_ids": ["2,1"]})
+	for i in 5:
+		await get_tree().process_frame
+	assert_int(t.requests.size()).is_equal(3)
+	assert_int(int(t.requests[1].body.base_version)).is_equal(4)
+	assert_int(int(t.requests[2].body.base_version)).is_equal(5)
+	assert_int(s.version).is_equal(6)

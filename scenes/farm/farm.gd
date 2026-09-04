@@ -49,6 +49,9 @@ var _title_hold := -1.0
 ## 当前这格的浮字（Label3D），干完就撤。
 var _work_label: Label3D
 var _last_bulk: Dictionary = {}
+## 还没回包的命令数。>0 时队列不往下走：下一格的本地校验要看的是权威状态，不是一条
+## 可能被服务端拒掉的预测（自动玩家：sow 被拒后紧跟的 care 照样发了出去）。
+var _in_flight := 0
 
 @onready var cam: Camera3D = $Camera3D
 @onready var ground: MeshInstance3D = $Ground
@@ -174,7 +177,7 @@ func _process(dt: float) -> void:
 		return
 	mover.step(dt)
 	player.position = mover.position
-	if runner:
+	if runner and _in_flight == 0:
 		# 先走到地头：到了才开工。
 		if runner.paused and not mover.is_moving():
 			runner.paused = false
@@ -380,7 +383,9 @@ func _on_cell_done(cell: Vector2i, action: String) -> void:
 		_refresh_hud()
 		return
 	var before := _state().duplicate(true)
+	_in_flight += 1
 	var accepted: bool = await session.send(type, payload)
+	_in_flight -= 1
 	if predictor:
 		if accepted:
 			predictor.commit(session.state.get("cells", {}), session.version)
@@ -503,7 +508,14 @@ func _float_label(cell: Vector2i, text: String, seconds: float) -> void:
 	label.position = bp.cell_to_world(cell, WORLD_SCALE) + Vector3(0, 1.1, 0)
 	crops_root.add_child(label)
 	_work_label = label
-	get_tree().create_timer(seconds).timeout.connect(func(): if is_instance_valid(label): label.queue_free())
+	# 计时器做标签的子节点：标签被提前 free 时计时器一起走，不会留下捕获着死对象的 lambda
+	#（自动玩家日志里刷屏的「Lambda capture at index 0 was freed」）。
+	var t := Timer.new()
+	t.one_shot = true
+	t.wait_time = seconds
+	t.autostart = true
+	t.timeout.connect(label.queue_free)
+	label.add_child(t)
 
 # —— 会话 ————————————————————————————————————————————————————————————————
 

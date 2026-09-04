@@ -31,6 +31,10 @@ var clock_offset_ms := 0
 
 var last_error_code := ""
 var _failures := 0
+## 命令串行：上一条还没回包就发下一条，base_version 必然过期 → 409 → 重发一次 → 若第三条
+## 又在路上就再 409 → 放弃。自动玩家跑批量清理时 9 格丢了 2 格，就是这么丢的。
+var _next_ticket := 0
+var _serving := 0
 
 func _init(p_client: ApiClient) -> void:
 	client = p_client
@@ -94,6 +98,15 @@ func refresh() -> bool:
 ##   409 VERSION_CONFLICT → 用回包里的新 version **换新 key** 重发一次
 ## 两次都不成就放弃，让上层回滚预测。
 func send(type: String, payload: Dictionary) -> bool:
+	var ticket := _next_ticket
+	_next_ticket += 1
+	while _serving != ticket:
+		await Engine.get_main_loop().process_frame
+	var result: bool = await _send_serialized(type, payload)
+	_serving += 1
+	return result
+
+func _send_serialized(type: String, payload: Dictionary) -> bool:
 	if offline:
 		last_error_code = "OFFLINE"
 		emit_signal("rejected", "OFFLINE", "离线中，命令未发送")
