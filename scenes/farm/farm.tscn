@@ -28,6 +28,8 @@ fov = 45.0
 
 [node name="Props" type="Node3D" parent="."]
 
+[node name="Crops" type="Node3D" parent="."]
+
 [node name="Player" type="Node3D" parent="."]
 
 [node name="HUD" type="CanvasLayer" parent="."]

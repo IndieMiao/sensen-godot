@@ -11,6 +11,7 @@ var bp: FarmBlueprint
 var grid: BlueprintGrid
 var mover: PlayerMover
 var _args := {}
+var crop_field: CropField
 var _rig: AvatarRig
 var _anim := ""
 var _tap_start := Vector2.ZERO
@@ -18,6 +19,7 @@ var _tap_start := Vector2.ZERO
 @onready var cam: Camera3D = $Camera3D
 @onready var ground: MeshInstance3D = $Ground
 @onready var props: Node3D = $Props
+@onready var crops_root: Node3D = $Crops
 @onready var player: Node3D = $Player
 @onready var title: Label = %Title
 @onready var exit_btn: Button = %ExitButton
@@ -43,6 +45,9 @@ func _ready() -> void:
 	ground.mesh = BlueprintGroundMesh.build(bp, WORLD_SCALE)
 	ground.material_override = BlueprintGroundMesh.material()
 	_build_props()
+	# 作物挂 Crops（Props 的同级）：prop_count() 只数锚点原语与畦面，作物不进去。
+	crop_field = CropField.new(bp, WORLD_SCALE)
+	crops_root.add_child(crop_field)
 	mover = PlayerMover.new(bp, grid, WORLD_SCALE)
 	_spawn_player()
 	title.text = bp.display_name
@@ -134,3 +139,9 @@ func _on_ground_tapped(world: Vector3) -> void:
 
 func is_back_navigation_locked() -> bool:
 	return false
+
+## 把（预测叠加后的）格子状态推给作物渲染。now_ms 必须是**服务端时间**
+## （FarmSession.server_now()）——本地时钟不可信，作物不该因为改系统时间提前熟。
+func render_cells(cells: Dictionary, now_ms: int) -> void:
+	if crop_field:
+		crop_field.sync(cells, now_ms)

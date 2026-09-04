@@ -94,3 +94,16 @@ func test_title_and_exit_button_do_not_overlap_on_phone_width() -> void:
 	var root_rect: Rect2 = (f.get_node("HUD/SafeArea/Root") as Control).get_global_rect()
 	assert_bool(root_rect.grow(0.5).encloses(title_rect)).is_true()
 	assert_bool(root_rect.grow(0.5).encloses(exit_rect)).is_true()
+
+func test_crops_render_outside_props() -> void:
+	# 作物必须挂 Crops（Props 的同级）。挪进 Props 会污染 prop_count() 的精确断言。
+	var f := _farm()
+	var before: int = f.prop_count()
+	var cells := {}
+	for bed in f.bp.beds():
+		for c in bed.cells:
+			cells["%d,%d" % [c.x, c.y]] = {"state": "growing", "crop": "R",
+				"care_done_at": 0, "ready_at": 400, "careful": false, "tutorial": false}
+	f.render_cells(cells, 400)
+	assert_int(f.prop_count()).is_equal(before)
+	assert_int(int(f.crop_field.cell_counts()["R"])).is_equal(9)
