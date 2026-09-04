@@ -14,7 +14,7 @@ extends Node
 ## G0_SHOT 指定截图路径（截完自动退出），G0_FRAMES 是截图前等待的帧数（农场要等
 ## Avatar 异步装配落地，≥120）。
 
-@export_enum("select", "farm", "home") var mode := "select"
+@export_enum("select", "farm", "home", "visit") var mode := "select"
 
 const FARM_BLUEPRINT := "res://assets/blueprints/sh_a/r2/farm_blueprint.json"
 
@@ -23,6 +23,8 @@ func _ready() -> void:
 		_farm()
 	elif mode == "home":
 		_home()
+	elif mode == "visit":
+		_visit()
 	else:
 		_select()
 	var shot := OS.get_environment("G0_SHOT")
@@ -84,3 +86,13 @@ func _home() -> void:
 	await get_tree().process_frame
 	if m.nearby_panel and m.nearby_panel.card_count() > 0:
 		m.nearby_panel.focus(str(m.nearby_panel.cards()[0].get_meta("farm_id")))
+
+## mode = visit：只读访客实例，喂随包的繁茂样例（sh_b）。
+func _visit() -> void:
+	var snap: Dictionary = PresetSnapshots.snapshot(PresetSnapshots.entries("shanghai")[0].farm_id)
+	var bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(str(snap.layout_patch_id), int(snap.blueprint_revision)))
+	var farm := (load("res://scenes/farm/farm.tscn") as PackedScene).instantiate()
+	farm.setup({"visitor": true, "snapshot": snap, "blueprint": bp})
+	add_child(farm)
+	await get_tree().create_timer(1.0).timeout
+	farm._stamp()

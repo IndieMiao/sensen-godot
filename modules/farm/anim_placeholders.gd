@@ -50,3 +50,13 @@ static func play_fallback(node: Node3D, seconds := 2.0) -> Tween:
 	tw.tween_interval(seconds * 0.5)
 	tw.tween_property(node, "rotation", base, seconds * 0.25)
 	return tw
+
+## 挥手占位：绕 Y 轴轻摆两下。真 clip 补齐前，访客至少看得出「打了个招呼」。
+static func play_wave_fallback(node: Node3D, seconds := 1.2) -> Tween:
+	var base := node.rotation
+	var tw := node.create_tween()
+	for i in 2:
+		tw.tween_property(node, "rotation", base + Vector3(0, deg_to_rad(18.0), 0), seconds * 0.25)
+		tw.tween_property(node, "rotation", base - Vector3(0, deg_to_rad(18.0), 0), seconds * 0.25)
+	tw.tween_property(node, "rotation", base, 0.05)
+	return tw

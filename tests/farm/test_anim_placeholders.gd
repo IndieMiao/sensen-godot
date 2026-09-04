@@ -6,7 +6,7 @@ const RIG := "res://assets/avatar/base/base_rig.tscn"
 const WEATHER := "res://assets/farm/data/weather_script.json"
 
 func test_every_tool_action_is_registered() -> void:
-	for action in FarmToolActions.ALL:
+	for action in FarmToolActions.ALL + FarmToolActions.EMOTES:
 		assert_bool(AnimPlaceholders.is_registered(action)).override_failure_message(
 			"动作 %s 既没有真实 clip 也没在 anim_placeholders.json 登记" % action).is_true()
 

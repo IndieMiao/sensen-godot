@@ -30,6 +30,13 @@ var _rig: AvatarRig
 var _anim := ""
 var _tap_start := Vector2.ZERO
 var director: DirectorPanel
+## 访客模式：只读、挥手、印章。零写入——不挂 session/predictor，工具不出现，命令不发。
+var visitor := false
+var snapshot: Dictionary = {}
+var _emote_lock_s := 0.0
+var _stamp_index := 0
+const STAMPS := ["Nice!", "Lovely", "Wow"]
+const STAMP_LIFETIME_S := 1.2
 var _title_hold := 0.0
 var _drag_points := PackedVector2Array()
 var _dragging := false
@@ -52,6 +59,8 @@ func _ready() -> void:
 	# "已经在栈里、被别人盖住/揭开"的场景）；自己的相机要不要成为当前相机，
 	# 得在第一次入树时自己抢——不抢的话会保留住下层地图冻结的位姿（2026-09-04 终审 C1）。
 	cam.make_current()
+	visitor = bool(_args.get("visitor", false))
+	snapshot = _args.get("snapshot", {})
 	bp = _args.get("blueprint")
 	if bp == null:
 		bp = FarmBlueprint.load_file(FarmBlueprint.asset_path(
@@ -74,17 +83,21 @@ func _ready() -> void:
 	_spawn_player()
 	_attach_session()
 	title.text = bp.display_name
+	if visitor:
+		_enter_visitor_mode()
 	exit_btn.pressed.connect(_leave)
 	hud.tool_selected.connect(func(t): tool = t)
 	hud.crop_selected.connect(func(c): sow_crop = c)
 	hud.row_tool_toggled.connect(func(on): row_tool = on)
-	_build_director()
+	if not visitor:
+		_build_director()
 	_refresh_hud()
 	joystick.changed.connect(mover.set_joystick)
 	player.position = mover.position
 	_update_camera()
 
 func _leave() -> void:
+	_record_visit()
 	AppRouter.pop_instance()
 
 func prop_count() -> int:
@@ -135,6 +148,8 @@ func _process(dt: float) -> void:
 	player.position = mover.position
 	if runner:
 		runner.step(dt)
+	if _emote_lock_s > 0.0:
+		_emote_lock_s -= dt
 	_tick_title_hold(dt)
 	# 劳作中锁住动画：否则 _process 每帧无条件用 walk/idle 覆盖，动作动画永远播不出来。
 	if not _action_locked():
@@ -199,7 +214,7 @@ func _projector() -> Callable:
 	return LabourBrush.ground_projector(cam, bp, WORLD_SCALE)
 
 func _action_locked() -> bool:
-	return runner != null and runner.is_busy()
+	return (runner != null and runner.is_busy()) or _emote_lock_s > 0.0
 
 func _finish_brush() -> void:
 	var cells := LabourBrush.trace(_drag_points, _projector())
@@ -209,7 +224,7 @@ func _finish_brush() -> void:
 
 ## 命中格 → 过滤 →（行级工具）扩畦 → 入队。返回入队格数，测试用。
 func _enqueue_cells(cells: Array) -> int:
-	if tool.is_empty() or cells.is_empty():
+	if visitor or tool.is_empty() or cells.is_empty():
 		return 0
 	var unlocked := 4 if predictor and predictor.beds_unlocked == 4 else 3
 	if row_tool:
@@ -333,3 +348,50 @@ func _on_server_state(state: Dictionary, version: int) -> void:
 		predictor.commit(state.get("cells", {}), version)
 		predictor.beds_unlocked = int(state.get("beds_unlocked", 3))
 	_render()
+
+
+## —— 访客模式（PRD §3.3 / §8.4）——————————————————————————————————————————
+
+func _enter_visitor_mode() -> void:
+	title.text = "Visiting · %s" % SeededOutfit.short_name(str(snapshot.get("avatar_ref", "seed:unknown")))
+	hud.set_visitor_mode(true)
+	hud.set_condition(str(snapshot.get("weather_snapshot", "sunny")))
+	hud.wave_pressed.connect(_wave)
+	hud.stamp_pressed.connect(_stamp)
+	if crop_field:
+		crop_field.sync_snapshot(snapshot.get("cells", []))
+
+## 挥手：本机动画，不发送给主人、不持久化、不产生任何资源。
+func _wave() -> void:
+	_emote_lock_s = 1.2
+	_play(AnimPlaceholders.clip_for("wave"))
+	if AnimPlaceholders.is_placeholder("wave") and _rig:
+		AnimPlaceholders.play_wave_fallback(_rig, 1.2)
+
+## 印章：头顶冒一个预设词，浮起淡出后消失；同样只在访客本机。
+func _stamp() -> void:
+	var label := Label3D.new()
+	label.name = "Stamp"
+	label.text = STAMPS[_stamp_index % STAMPS.size()]
+	_stamp_index += 1
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.font_size = 48
+	label.pixel_size = 0.01
+	label.modulate = DesignTokens.ACCENT_DEEP
+	label.position = Vector3(0, 1.9, 0)
+	var old := player.get_node_or_null("Stamp")
+	if old:
+		player.remove_child(old)
+		old.queue_free()
+	player.add_child(label)
+	var tw := label.create_tween()
+	tw.tween_property(label, "position:y", 2.6, STAMP_LIFETIME_S)
+	tw.parallel().tween_property(label, "modulate:a", 0.0, STAMP_LIFETIME_S)
+	tw.finished.connect(func(): if is_instance_valid(label): label.queue_free())
+
+## 离开访客农场时把「完成过一次访问」这条教学事实报给服务端（PRD §8.4 L655：零奖励）。
+## D4 之前服务端回 CHAPTER_LOCKED，静默即可；不等回包，别拖住返回。
+func _record_visit() -> void:
+	if not visitor or Net == null or not Net.logged_in() or not Net.session.has_farm():
+		return
+	Net.session.send("record_visit_return", {"visited_farm_id": str(snapshot.get("farm_id", ""))})

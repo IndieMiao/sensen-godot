@@ -10,6 +10,8 @@ extends Control
 signal tool_selected(tool: String)
 signal crop_selected(crop: String)
 signal row_tool_toggled(on: bool)
+signal wave_pressed()
+signal stamp_pressed()
 
 const CROPS := ["R", "L", "C", "H"]
 ## 底栏一行放 4 个 → 每个约 86 px，"Lettuce" 这样的 7 字词正好放得下。
@@ -39,6 +41,9 @@ var _banner: PanelContainer
 var _tool_buttons: Dictionary = {}
 var _crop_buttons: Dictionary = {}
 var _row_button: Button
+var _bottom: VBoxContainer
+var _visitor_bar: HBoxContainer
+var visitor := false
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -115,6 +120,7 @@ func _build_bottom() -> void:
 	box.offset_bottom = -180.0
 	box.add_theme_constant_override("separation", DesignTokens.SPACE_1)
 	add_child(box)
+	_bottom = box
 
 	var seeds := HBoxContainer.new()
 	seeds.name = "SeedBar"
@@ -219,3 +225,32 @@ static func format_countdown(ms: int) -> String:
 	if h > 0:
 		return "%dh%02dm" % [h, m]
 	return "%02d:%02d" % [m, s]
+
+## 访客模式（PRD §3.3 / §8.4）：不复用主人的耕作工具栏。金币、种子、工具、Row、倒计时
+## 全部隐藏，只留田况 chip（来自冻结快照）与 Wave / Stamp 两个本机动画按钮。
+func set_visitor_mode(on: bool) -> void:
+	visitor = on
+	_bottom.visible = not on
+	_coins.get_parent().visible = not on
+	_timer_label.get_parent().visible = not on
+	_row_button.visible = not on
+	if on and _visitor_bar == null:
+		_visitor_bar = HBoxContainer.new()
+		_visitor_bar.name = "VisitorBar"
+		_visitor_bar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+		_visitor_bar.offset_left = 8.0
+		_visitor_bar.offset_right = -8.0
+		_visitor_bar.offset_top = -232.0
+		_visitor_bar.offset_bottom = -180.0
+		_visitor_bar.add_theme_constant_override("separation", DesignTokens.SPACE_2)
+		add_child(_visitor_bar)
+		for spec in [["Wave", "wave_pressed"], ["Stamp", "stamp_pressed"]]:
+			var b := Button.new()
+			b.text = spec[0]
+			b.theme_type_variation = &"AccentButton"
+			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			b.custom_minimum_size.y = BUTTON_H
+			b.pressed.connect(func(): emit_signal(spec[1]))
+			_visitor_bar.add_child(b)
+	if _visitor_bar:
+		_visitor_bar.visible = on

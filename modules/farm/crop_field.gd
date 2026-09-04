@@ -80,6 +80,27 @@ static func layer_of(slot: Dictionary) -> String:
 		"sown", "growing": return str(slot.get("crop", ""))
 		_: return ""
 
+## 访客快照没有 ready_at（spec §7.5 故意不发），阶段只能按 ripe 标志粗分：
+## ripe → 成熟；growing → 阶段 1；sown → 阶段 0；wild → 杂草。冻结快照，不随时间走。
+static func stage_from_snapshot(c: Dictionary) -> int:
+	if bool(c.get("ripe", false)):
+		return STAGES - 1
+	return 1 if str(c.get("state", "")) == "growing" else 0
+
+func sync_snapshot(cells: Array) -> void:
+	var buckets := {"weed": []}
+	for crop in CROPS:
+		buckets[crop] = []
+	for c in cells:
+		var slot := {"state": c.get("state", ""), "crop": c.get("crop")}
+		var layer := layer_of(slot)
+		if layer == "" or not buckets.has(layer):
+			continue
+		buckets[layer].append({"cell": _parse_cell(str(c.get("cell_id", ""))),
+			"stage": 0 if layer == "weed" else stage_from_snapshot(c)})
+	for layer in buckets:
+		_fill(_mm[layer], buckets[layer], layer)
+
 func sync(cells: Dictionary, now_ms: int) -> void:
 	var buckets := {"weed": []}
 	for crop in CROPS:
