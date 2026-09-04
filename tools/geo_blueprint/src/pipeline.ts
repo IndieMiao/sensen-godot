@@ -70,6 +70,8 @@ export function buildFromLines(rawLines: LineString[], half: number, meta: Meta,
   const bp: Blueprint = {
     format: 1, layout_patch_id: meta.layout_patch_id, revision: meta.revision, region_id: meta.region_id, name: meta.name,
     checksum: '', source: meta.source,
+    // 权威尺寸是整数毫米（r2 起）；浮点字段留作展示用派生值，不进 canonical。
+    cell_mm: Math.round(config.CELL_M * 1000), play_area_mm: Math.round(config.PLAY_AREA_M * 1000),
     play_area_m: config.PLAY_AREA_M, cell_m: config.CELL_M, grid: [config.GRID, config.GRID],
     masks: m,
     paths: pathsPlay.map((l, i) => ({ id: `p${i}`, points: l.coordinates.map(([x, y]) => [round2(x), round2(y)] as [number, number]), width_m: config.PATH_WIDTH_M })),

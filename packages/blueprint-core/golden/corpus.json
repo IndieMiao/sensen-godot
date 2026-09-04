@@ -1,0 +1,1498 @@
+{
+ "entries": [
+  {
+   "name": "tiny_1000",
+   "blueprint": {
+    "format": 1,
+    "layout_patch_id": "tiny_1000",
+    "revision": 2,
+    "region_id": "test",
+    "name": "Tiny",
+    "checksum": "",
+    "source": {},
+    "cell_mm": 1000,
+    "play_area_mm": 4000,
+    "cell_m": 1.0,
+    "play_area_m": 4.0,
+    "grid": [
+     4,
+     4
+    ],
+    "masks": {
+     "walkable": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ],
+     "cultivable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "buildable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "visual": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ]
+    },
+    "paths": [],
+    "blocks": [],
+    "anchors": {
+     "spawn": [
+      0,
+      0
+     ],
+     "house": [
+      3,
+      0
+     ],
+     "storage": [
+      0,
+      3
+     ],
+     "well": [
+      1,
+      0
+     ],
+     "exit": [
+      0,
+      2
+     ],
+     "beds": [
+      {
+       "id": "bed0",
+       "cells": [
+        [
+         1,
+         1
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      {
+       "id": "bed1",
+       "cells": [
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         2
+        ],
+        [
+         3,
+         2
+        ]
+       ]
+      },
+      {
+       "id": "bed2",
+       "cells": [
+        [
+         0,
+         3
+        ],
+        [
+         1,
+         3
+        ],
+        [
+         2,
+         3
+        ]
+       ]
+      }
+     ],
+     "reserved_bed": {
+      "id": "bed3",
+      "cells": [
+       [
+        1,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ]
+     }
+    },
+    "overlay_wgs84": {
+     "center": [
+      0,
+      0
+     ],
+     "paths": [],
+     "blocks": []
+    }
+   },
+   "canonical": "tiny_1000|1|2|4,4|1000|4000|1111111111111111|0111011101111110|0111011101111110|1111111111111111|spawn:0,0;house:3,0;storage:0,3;well:1,0;exit:0,2;beds:1,1,2,1,3,1/1,2,2,2,3,2/0,3,1,3,2,3;reserved:1,0,2,0,3,0",
+   "checksum": "544b52e6c57a2a99b1f45e579ee8cd24701c91c3014dc93986022b5905bf83be"
+  },
+  {
+   "name": "tiny_2500",
+   "blueprint": {
+    "format": 1,
+    "layout_patch_id": "tiny_2500",
+    "revision": 2,
+    "region_id": "test",
+    "name": "Tiny",
+    "checksum": "",
+    "source": {},
+    "cell_mm": 2500,
+    "play_area_mm": 10000,
+    "cell_m": 2.5,
+    "play_area_m": 10.0,
+    "grid": [
+     4,
+     4
+    ],
+    "masks": {
+     "walkable": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ],
+     "cultivable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "buildable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "visual": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ]
+    },
+    "paths": [],
+    "blocks": [],
+    "anchors": {
+     "spawn": [
+      0,
+      0
+     ],
+     "house": [
+      3,
+      0
+     ],
+     "storage": [
+      0,
+      3
+     ],
+     "well": [
+      1,
+      0
+     ],
+     "exit": [
+      0,
+      2
+     ],
+     "beds": [
+      {
+       "id": "bed0",
+       "cells": [
+        [
+         1,
+         1
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      {
+       "id": "bed1",
+       "cells": [
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         2
+        ],
+        [
+         3,
+         2
+        ]
+       ]
+      },
+      {
+       "id": "bed2",
+       "cells": [
+        [
+         0,
+         3
+        ],
+        [
+         1,
+         3
+        ],
+        [
+         2,
+         3
+        ]
+       ]
+      }
+     ],
+     "reserved_bed": {
+      "id": "bed3",
+      "cells": [
+       [
+        1,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ]
+     }
+    },
+    "overlay_wgs84": {
+     "center": [
+      0,
+      0
+     ],
+     "paths": [],
+     "blocks": []
+    }
+   },
+   "canonical": "tiny_2500|1|2|4,4|2500|10000|1111111111111111|0111011101111110|0111011101111110|1111111111111111|spawn:0,0;house:3,0;storage:0,3;well:1,0;exit:0,2;beds:1,1,2,1,3,1/1,2,2,2,3,2/0,3,1,3,2,3;reserved:1,0,2,0,3,0",
+   "checksum": "dcdb05f3cb839123e95047b9d0530b99e4bd03dfd247575dfe2e290de8b461fd"
+  },
+  {
+   "name": "tiny_333",
+   "blueprint": {
+    "format": 1,
+    "layout_patch_id": "tiny_333",
+    "revision": 2,
+    "region_id": "test",
+    "name": "Tiny",
+    "checksum": "",
+    "source": {},
+    "cell_mm": 333,
+    "play_area_mm": 1332,
+    "cell_m": 0.333,
+    "play_area_m": 1.332,
+    "grid": [
+     4,
+     4
+    ],
+    "masks": {
+     "walkable": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ],
+     "cultivable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "buildable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "visual": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ]
+    },
+    "paths": [],
+    "blocks": [],
+    "anchors": {
+     "spawn": [
+      0,
+      0
+     ],
+     "house": [
+      3,
+      0
+     ],
+     "storage": [
+      0,
+      3
+     ],
+     "well": [
+      1,
+      0
+     ],
+     "exit": [
+      0,
+      2
+     ],
+     "beds": [
+      {
+       "id": "bed0",
+       "cells": [
+        [
+         1,
+         1
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      {
+       "id": "bed1",
+       "cells": [
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         2
+        ],
+        [
+         3,
+         2
+        ]
+       ]
+      },
+      {
+       "id": "bed2",
+       "cells": [
+        [
+         0,
+         3
+        ],
+        [
+         1,
+         3
+        ],
+        [
+         2,
+         3
+        ]
+       ]
+      }
+     ],
+     "reserved_bed": {
+      "id": "bed3",
+      "cells": [
+       [
+        1,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ]
+     }
+    },
+    "overlay_wgs84": {
+     "center": [
+      0,
+      0
+     ],
+     "paths": [],
+     "blocks": []
+    }
+   },
+   "canonical": "tiny_333|1|2|4,4|333|1332|1111111111111111|0111011101111110|0111011101111110|1111111111111111|spawn:0,0;house:3,0;storage:0,3;well:1,0;exit:0,2;beds:1,1,2,1,3,1/1,2,2,2,3,2/0,3,1,3,2,3;reserved:1,0,2,0,3,0",
+   "checksum": "68cae0a3e0d872fcff6c91edd7b38bc86f289f785cbd5bfad0f4c6fb5b09e475"
+  }
+ ],
+ "rejects": [
+  {
+   "name": "cell_mm_float",
+   "blueprint": {
+    "format": 1,
+    "layout_patch_id": "tiny_1000",
+    "revision": 2,
+    "region_id": "test",
+    "name": "Tiny",
+    "checksum": "",
+    "source": {},
+    "cell_mm": 1000.5,
+    "play_area_mm": 4000,
+    "cell_m": 1.0,
+    "play_area_m": 4.0,
+    "grid": [
+     4,
+     4
+    ],
+    "masks": {
+     "walkable": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ],
+     "cultivable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "buildable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "visual": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ]
+    },
+    "paths": [],
+    "blocks": [],
+    "anchors": {
+     "spawn": [
+      0,
+      0
+     ],
+     "house": [
+      3,
+      0
+     ],
+     "storage": [
+      0,
+      3
+     ],
+     "well": [
+      1,
+      0
+     ],
+     "exit": [
+      0,
+      2
+     ],
+     "beds": [
+      {
+       "id": "bed0",
+       "cells": [
+        [
+         1,
+         1
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      {
+       "id": "bed1",
+       "cells": [
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         2
+        ],
+        [
+         3,
+         2
+        ]
+       ]
+      },
+      {
+       "id": "bed2",
+       "cells": [
+        [
+         0,
+         3
+        ],
+        [
+         1,
+         3
+        ],
+        [
+         2,
+         3
+        ]
+       ]
+      }
+     ],
+     "reserved_bed": {
+      "id": "bed3",
+      "cells": [
+       [
+        1,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ]
+     }
+    },
+    "overlay_wgs84": {
+     "center": [
+      0,
+      0
+     ],
+     "paths": [],
+     "blocks": []
+    }
+   },
+   "reject": "INVALID_NUMBER"
+  },
+  {
+   "name": "cell_mm_zero",
+   "blueprint": {
+    "format": 1,
+    "layout_patch_id": "tiny_1000",
+    "revision": 2,
+    "region_id": "test",
+    "name": "Tiny",
+    "checksum": "",
+    "source": {},
+    "cell_mm": 0,
+    "play_area_mm": 4000,
+    "cell_m": 1.0,
+    "play_area_m": 4.0,
+    "grid": [
+     4,
+     4
+    ],
+    "masks": {
+     "walkable": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ],
+     "cultivable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "buildable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "visual": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ]
+    },
+    "paths": [],
+    "blocks": [],
+    "anchors": {
+     "spawn": [
+      0,
+      0
+     ],
+     "house": [
+      3,
+      0
+     ],
+     "storage": [
+      0,
+      3
+     ],
+     "well": [
+      1,
+      0
+     ],
+     "exit": [
+      0,
+      2
+     ],
+     "beds": [
+      {
+       "id": "bed0",
+       "cells": [
+        [
+         1,
+         1
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      {
+       "id": "bed1",
+       "cells": [
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         2
+        ],
+        [
+         3,
+         2
+        ]
+       ]
+      },
+      {
+       "id": "bed2",
+       "cells": [
+        [
+         0,
+         3
+        ],
+        [
+         1,
+         3
+        ],
+        [
+         2,
+         3
+        ]
+       ]
+      }
+     ],
+     "reserved_bed": {
+      "id": "bed3",
+      "cells": [
+       [
+        1,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ]
+     }
+    },
+    "overlay_wgs84": {
+     "center": [
+      0,
+      0
+     ],
+     "paths": [],
+     "blocks": []
+    }
+   },
+   "reject": "INVALID_NUMBER"
+  },
+  {
+   "name": "cell_mm_huge",
+   "blueprint": {
+    "format": 1,
+    "layout_patch_id": "tiny_1000",
+    "revision": 2,
+    "region_id": "test",
+    "name": "Tiny",
+    "checksum": "",
+    "source": {},
+    "cell_mm": 100001,
+    "play_area_mm": 4000,
+    "cell_m": 1.0,
+    "play_area_m": 4.0,
+    "grid": [
+     4,
+     4
+    ],
+    "masks": {
+     "walkable": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ],
+     "cultivable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "buildable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "visual": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ]
+    },
+    "paths": [],
+    "blocks": [],
+    "anchors": {
+     "spawn": [
+      0,
+      0
+     ],
+     "house": [
+      3,
+      0
+     ],
+     "storage": [
+      0,
+      3
+     ],
+     "well": [
+      1,
+      0
+     ],
+     "exit": [
+      0,
+      2
+     ],
+     "beds": [
+      {
+       "id": "bed0",
+       "cells": [
+        [
+         1,
+         1
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      {
+       "id": "bed1",
+       "cells": [
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         2
+        ],
+        [
+         3,
+         2
+        ]
+       ]
+      },
+      {
+       "id": "bed2",
+       "cells": [
+        [
+         0,
+         3
+        ],
+        [
+         1,
+         3
+        ],
+        [
+         2,
+         3
+        ]
+       ]
+      }
+     ],
+     "reserved_bed": {
+      "id": "bed3",
+      "cells": [
+       [
+        1,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ]
+     }
+    },
+    "overlay_wgs84": {
+     "center": [
+      0,
+      0
+     ],
+     "paths": [],
+     "blocks": []
+    }
+   },
+   "reject": "INVALID_NUMBER"
+  },
+  {
+   "name": "id_uppercase",
+   "blueprint": {
+    "format": 1,
+    "layout_patch_id": "Tiny",
+    "revision": 2,
+    "region_id": "test",
+    "name": "Tiny",
+    "checksum": "",
+    "source": {},
+    "cell_mm": 1000,
+    "play_area_mm": 4000,
+    "cell_m": 1.0,
+    "play_area_m": 4.0,
+    "grid": [
+     4,
+     4
+    ],
+    "masks": {
+     "walkable": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ],
+     "cultivable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "buildable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "visual": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ]
+    },
+    "paths": [],
+    "blocks": [],
+    "anchors": {
+     "spawn": [
+      0,
+      0
+     ],
+     "house": [
+      3,
+      0
+     ],
+     "storage": [
+      0,
+      3
+     ],
+     "well": [
+      1,
+      0
+     ],
+     "exit": [
+      0,
+      2
+     ],
+     "beds": [
+      {
+       "id": "bed0",
+       "cells": [
+        [
+         1,
+         1
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      {
+       "id": "bed1",
+       "cells": [
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         2
+        ],
+        [
+         3,
+         2
+        ]
+       ]
+      },
+      {
+       "id": "bed2",
+       "cells": [
+        [
+         0,
+         3
+        ],
+        [
+         1,
+         3
+        ],
+        [
+         2,
+         3
+        ]
+       ]
+      }
+     ],
+     "reserved_bed": {
+      "id": "bed3",
+      "cells": [
+       [
+        1,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ]
+     }
+    },
+    "overlay_wgs84": {
+     "center": [
+      0,
+      0
+     ],
+     "paths": [],
+     "blocks": []
+    }
+   },
+   "reject": "INVALID_ID"
+  },
+  {
+   "name": "mask_bad_char",
+   "blueprint": {
+    "format": 1,
+    "layout_patch_id": "tiny_1000",
+    "revision": 2,
+    "region_id": "test",
+    "name": "Tiny",
+    "checksum": "",
+    "source": {},
+    "cell_mm": 1000,
+    "play_area_mm": 4000,
+    "cell_m": 1.0,
+    "play_area_m": 4.0,
+    "grid": [
+     4,
+     4
+    ],
+    "masks": {
+     "walkable": [
+      "111x",
+      "1111",
+      "1111",
+      "1111"
+     ],
+     "cultivable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "buildable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "visual": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ]
+    },
+    "paths": [],
+    "blocks": [],
+    "anchors": {
+     "spawn": [
+      0,
+      0
+     ],
+     "house": [
+      3,
+      0
+     ],
+     "storage": [
+      0,
+      3
+     ],
+     "well": [
+      1,
+      0
+     ],
+     "exit": [
+      0,
+      2
+     ],
+     "beds": [
+      {
+       "id": "bed0",
+       "cells": [
+        [
+         1,
+         1
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      {
+       "id": "bed1",
+       "cells": [
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         2
+        ],
+        [
+         3,
+         2
+        ]
+       ]
+      },
+      {
+       "id": "bed2",
+       "cells": [
+        [
+         0,
+         3
+        ],
+        [
+         1,
+         3
+        ],
+        [
+         2,
+         3
+        ]
+       ]
+      }
+     ],
+     "reserved_bed": {
+      "id": "bed3",
+      "cells": [
+       [
+        1,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ]
+     }
+    },
+    "overlay_wgs84": {
+     "center": [
+      0,
+      0
+     ],
+     "paths": [],
+     "blocks": []
+    }
+   },
+   "reject": "INVALID_MASK"
+  },
+  {
+   "name": "mask_wrong_rows",
+   "blueprint": {
+    "format": 1,
+    "layout_patch_id": "tiny_1000",
+    "revision": 2,
+    "region_id": "test",
+    "name": "Tiny",
+    "checksum": "",
+    "source": {},
+    "cell_mm": 1000,
+    "play_area_mm": 4000,
+    "cell_m": 1.0,
+    "play_area_m": 4.0,
+    "grid": [
+     4,
+     4
+    ],
+    "masks": {
+     "walkable": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ],
+     "cultivable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "buildable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "visual": [
+      "1111",
+      "1111",
+      "1111"
+     ]
+    },
+    "paths": [],
+    "blocks": [],
+    "anchors": {
+     "spawn": [
+      0,
+      0
+     ],
+     "house": [
+      3,
+      0
+     ],
+     "storage": [
+      0,
+      3
+     ],
+     "well": [
+      1,
+      0
+     ],
+     "exit": [
+      0,
+      2
+     ],
+     "beds": [
+      {
+       "id": "bed0",
+       "cells": [
+        [
+         1,
+         1
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      {
+       "id": "bed1",
+       "cells": [
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         2
+        ],
+        [
+         3,
+         2
+        ]
+       ]
+      },
+      {
+       "id": "bed2",
+       "cells": [
+        [
+         0,
+         3
+        ],
+        [
+         1,
+         3
+        ],
+        [
+         2,
+         3
+        ]
+       ]
+      }
+     ],
+     "reserved_bed": {
+      "id": "bed3",
+      "cells": [
+       [
+        1,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ]
+     }
+    },
+    "overlay_wgs84": {
+     "center": [
+      0,
+      0
+     ],
+     "paths": [],
+     "blocks": []
+    }
+   },
+   "reject": "INVALID_MASK"
+  },
+  {
+   "name": "anchor_out_of_bounds",
+   "blueprint": {
+    "format": 1,
+    "layout_patch_id": "tiny_1000",
+    "revision": 2,
+    "region_id": "test",
+    "name": "Tiny",
+    "checksum": "",
+    "source": {},
+    "cell_mm": 1000,
+    "play_area_mm": 4000,
+    "cell_m": 1.0,
+    "play_area_m": 4.0,
+    "grid": [
+     4,
+     4
+    ],
+    "masks": {
+     "walkable": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ],
+     "cultivable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "buildable": [
+      "0111",
+      "0111",
+      "0111",
+      "1110"
+     ],
+     "visual": [
+      "1111",
+      "1111",
+      "1111",
+      "1111"
+     ]
+    },
+    "paths": [],
+    "blocks": [],
+    "anchors": {
+     "spawn": [
+      0,
+      0
+     ],
+     "house": [
+      4,
+      0
+     ],
+     "storage": [
+      0,
+      3
+     ],
+     "well": [
+      1,
+      0
+     ],
+     "exit": [
+      0,
+      2
+     ],
+     "beds": [
+      {
+       "id": "bed0",
+       "cells": [
+        [
+         1,
+         1
+        ],
+        [
+         2,
+         1
+        ],
+        [
+         3,
+         1
+        ]
+       ]
+      },
+      {
+       "id": "bed1",
+       "cells": [
+        [
+         1,
+         2
+        ],
+        [
+         2,
+         2
+        ],
+        [
+         3,
+         2
+        ]
+       ]
+      },
+      {
+       "id": "bed2",
+       "cells": [
+        [
+         0,
+         3
+        ],
+        [
+         1,
+         3
+        ],
+        [
+         2,
+         3
+        ]
+       ]
+      }
+     ],
+     "reserved_bed": {
+      "id": "bed3",
+      "cells": [
+       [
+        1,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        3,
+        0
+       ]
+      ]
+     }
+    },
+    "overlay_wgs84": {
+     "center": [
+      0,
+      0
+     ],
+     "paths": [],
+     "blocks": []
+    }
+   },
+   "reject": "INVALID_CELL"
+  }
+ ]
+}

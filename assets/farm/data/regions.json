@@ -14,17 +14,17 @@
    "candidates": [
     {
      "layout_patch_id": "sh_a",
-     "revision": 1,
+     "revision": 2,
      "name": "Hengshan Road"
     },
     {
      "layout_patch_id": "sh_b",
-     "revision": 1,
+     "revision": 2,
      "name": "Old Town"
     },
     {
      "layout_patch_id": "sh_c",
-     "revision": 1,
+     "revision": 2,
      "name": "Yuyuan Road"
     }
    ]
@@ -42,17 +42,17 @@
    "candidates": [
     {
      "layout_patch_id": "la_a",
-     "revision": 1,
+     "revision": 2,
      "name": "Historic Core"
     },
     {
      "layout_patch_id": "la_b",
-     "revision": 1,
+     "revision": 2,
      "name": "Venice Canals"
     },
     {
      "layout_patch_id": "la_c",
-     "revision": 1,
+     "revision": 2,
      "name": "Silver Lake"
     }
    ]

@@ -1,0 +1,9 @@
+packages:
+  - 'packages/*'
+  - 'tools/geo_blueprint'
+  - 'server'
+
+# 原本在 tools/geo_blueprint/pnpm-workspace.yaml 里；根 workspace 建立后，
+# 子包的 workspace 文件不再被 pnpm 读取，所以合并到这里。
+allowBuilds:
+  esbuild: true

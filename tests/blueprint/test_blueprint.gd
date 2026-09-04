@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## FarmBlueprint：加载、mask、坐标、canonical/checksum 与 Node 管线逐字一致。
 
 const FIX := "res://tests/fixtures/blueprints/fix_grid/r1/farm_blueprint.json"
-const CANON := "fix_grid|1|1111111111111111111111111111111111111111111111111111110011111100|0000000011101110000000000000000000000000111000000000000000000000|1110111111101111111011110000000011101111111011111110110011101100|1111111111111111111111111111111111111111111111111111111111111111|spawn:3,3;house:4,5;storage:5,5;well:3,2;exit:3,7;beds:0,1,1,1,2,1/4,1,5,1,6,1/0,5,1,5,2,5"
+const CANON := "fix_grid|1|1|8,8|1000|8000|1111111111111111111111111111111111111111111111111111110011111100|0000000011101110000000000000000000000000111000000000000011100000|1110111111101111111011110000000011101111111011111110110011101100|1111111111111111111111111111111111111111111111111111111111111111|spawn:3,3;house:4,5;storage:5,5;well:3,2;exit:3,7;beds:0,1,1,1,2,1/4,1,5,1,6,1/0,5,1,5,2,5;reserved:0,7,1,7,2,7"
 
 func test_load_fields() -> void:
 	var bp := FarmBlueprint.load_file(FIX)
@@ -29,7 +29,7 @@ func test_masks_and_bounds() -> void:
 func test_canonical_and_checksum_match_node_pipeline() -> void:
 	var bp := FarmBlueprint.load_file(FIX)
 	assert_str(bp.canonical()).is_equal(CANON)
-	assert_str(bp.compute_checksum()).is_equal("d74f428b8c7fe9131cb8c9191aaf1009c5e1f993a941465f53f0cd9cb1a20ca7")
+	assert_str(bp.compute_checksum()).is_equal("adc5ea8344b67820127cf6e7d8a62c672c2191802e2b4c0176a99e2e11b1cc27")
 	assert_bool(bp.verify_checksum()).is_true()
 	bp.masks.walkable[7] = "11111110"
 	assert_bool(bp.verify_checksum()).is_false()

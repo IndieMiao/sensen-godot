@@ -1,0 +1,8 @@
+{
+ "far_bed_9_s": 2,
+ "far_bed_12_s": 2.4,
+ "walk_tour_9_s": 5.6,
+ "walk_tour_12_s": 10.4,
+ "tour_s": 77.6,
+ "errors": []
+}

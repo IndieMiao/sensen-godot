@@ -1,9 +1,14 @@
 /** 输出：farm_blueprint.json / map_overlay.geojson / preview.png / report.json / regions.json。 */
-import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { PNG } from 'pngjs';
 import type { Region } from './config.js';
+import { canonical, checksum } from 'blueprint-core';
+
+// canonical/checksum 的实现已经搬到 packages/blueprint-core（管线、服务端、Godot 三方共用）。
+// 这里再导出一次，是因为「写文件」的调用方本来就从 writer 拿这两个函数，改导入路径会
+// 波及一串测试却不增加任何清晰度。
+export { canonical, checksum };
 import type { Blueprint } from './types.js';
 
 type RGB = [number, number, number];
@@ -12,25 +17,6 @@ const COLORS: Record<string, RGB> = {
   bed: [150, 105, 70], reserved: [200, 170, 140], spawn: [52, 211, 153], house: [60, 90, 200],
   storage: [120, 120, 120], well: [60, 160, 220], exit: [220, 80, 80],
 };
-
-// NOTE: canonical() covers the four masks plus point anchors and beds, but NOT grid, cell_m,
-// play_area_m, or reserved_bed. A blueprint whose grid is hand-edited from [64,64] to [32,128]
-// still passes checksum validation while the client reinterprets the same 4096 mask characters
-// as a different grid; cell_m (which drives every distance/time computation) is likewise
-// unprotected. Widening the formula needs a coordinated edit in three places — this file,
-// modules/blueprint/blueprint.gd, and the Godot fixture's pinned literal — pending a decision.
-export function canonical(bp: Blueprint): string {
-  const m = bp.masks, a = bp.anchors;
-  const beds = a.beds.map(b => b.cells.map(c => `${c[0]},${c[1]}`).join(',')).join('/');
-  const anchors = `spawn:${a.spawn[0]},${a.spawn[1]};house:${a.house[0]},${a.house[1]};` +
-    `storage:${a.storage[0]},${a.storage[1]};well:${a.well[0]},${a.well[1]};exit:${a.exit[0]},${a.exit[1]};beds:${beds}`;
-  return [bp.layout_patch_id, String(bp.revision), m.walkable.join(''), m.cultivable.join(''),
-    m.buildable.join(''), m.visual.join(''), anchors].join('|');
-}
-
-export function checksum(bp: Blueprint): string {
-  return createHash('sha256').update(canonical(bp), 'utf8').digest('hex');
-}
 
 export function renderPreview(bp: Blueprint, px = 8): Buffer {
   const g = bp.grid[0];

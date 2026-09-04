@@ -1,4 +1,5 @@
 /** 锚点摆放与蓝图校验。距离用 4 邻接 BFS（与 Godot 侧 AStarGrid2D DIAGONAL_MODE_NEVER 一致）。 */
+import * as core from 'blueprint-core';
 import * as config from './config.js';
 import { cellKey } from './masks.js';
 import type { Anchors, Bed, Blueprint, Cell, Masks, Report } from './types.js';
@@ -66,8 +67,10 @@ export function place(masks: Masks, pathCells: Set<number>, grid: number): Ancho
   const wellPool = pcs.filter(c => Math.abs(c[0] - spawn[0]) + Math.abs(c[1] - spawn[1]) === 1);
   const well = wellPool[0] ?? spawn;
   const cult = masks.walkable.map(() => Array(grid).fill('0') as string[]);
-  for (const r of beds.slice(0, config.INITIAL_BEDS)) for (const [i, j] of r) cult[j][i] = '1';
-  masks.cultivable = cult.map(row => row.join(''));
+  // 预留畦也记进 cultivable：它买下即为已翻土的田（2026-09-04 决策⑥），
+  // 服务端按 beds_unlocked 决定第四畦能不能种，mask 只表达「这格能不能是田」。
+  for (const r of beds.slice(0, config.INITIAL_BEDS + 1)) for (const [i, j] of r) cult[j][i] = '1';
+  masks.cultivable = cult.map((row: string[]) => row.join(''));
   const bed = (id: string, cells: Cell[]): Bed => ({ id, cells: cells.map(c => [c[0], c[1]]) });
   return {
     spawn, house, storage, well, exit,
@@ -76,29 +79,14 @@ export function place(masks: Masks, pathCells: Set<number>, grid: number): Ancho
   };
 }
 
+/**
+ * 校验 + 公平指标。规则与公式都在 packages/blueprint-core 里，Godot 侧走同一份实现；
+ * 这里只补一条管线自己的约束（区块数量），它不是蓝图契约的一部分。
+ */
 export function validate(bp: Blueprint): Report {
-  const walk = bp.masks.walkable, g = walk.length, a = bp.anchors;
-  const dist = bfs(walk, a.spawn);
-  const key = (c: Cell) => cellKey(c[0], c[1], g);
-  const errors: string[] = [];
-  for (const name of ['house', 'storage', 'well', 'exit'] as const)
-    if (!dist.has(key(a[name]))) errors.push(`${name} unreachable from spawn`);
-  let far = 0; const firsts: Cell[] = [];
-  for (const b of a.beds) {
-    for (const c of b.cells) {
-      if (!dist.has(key(c))) errors.push(`${b.id} cell ${c} unreachable`);
-      far = Math.max(far, dist.get(key(c)) ?? 1e6);
-    }
-    firsts.push(b.cells[0]);
-  }
+  const errors = [...core.validate(bp)];
   if (bp.blocks.length < config.MIN_BLOCKS || bp.blocks.length > config.MAX_BLOCKS)
     errors.push(`block count ${bp.blocks.length} outside ${config.MIN_BLOCKS}-${config.MAX_BLOCKS}`);
-  const ncult = bp.masks.cultivable.reduce((n, r) => n + (r.match(/1/g)?.length ?? 0), 0);
-  if (ncult !== config.INITIAL_BEDS * config.BED_CELLS) errors.push(`cultivable cells ${ncult} != 9`);
-  let tour = 0; let cur: Cell = a.spawn;
-  for (const nxt of [...firsts, a.spawn]) { tour += bfs(walk, cur).get(key(nxt)) ?? 1e6; cur = nxt; }
-  const farS = (far * bp.cell_m) / config.WALK_SPEED;
-  const tourS = (tour * bp.cell_m) / config.WALK_SPEED + config.INITIAL_BEDS * config.BED_CELLS * config.ACTION_S;
-  if (farS > config.MAX_FAR_BED_S) errors.push(`farthest bed ${farS.toFixed(1)}s > ${config.MAX_FAR_BED_S}s`);
-  return { far_bed_s: Math.round(farS * 100) / 100, tour_s: Math.round(tourS * 100) / 100, errors };
+  const m = core.metrics(bp);
+  return { ...m, errors: [...errors, ...m.errors] };
 }

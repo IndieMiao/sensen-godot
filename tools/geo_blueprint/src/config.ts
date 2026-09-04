@@ -14,9 +14,8 @@ export const PLAY_AREA_M = 64;
 export const GRID = 64;
 export const CELL_M = 1.0;
 export const PATH_WIDTH_M = 3.0;
-export const WALK_SPEED = 2.5;
-export const ACTION_S = 2.0;
-export const MAX_FAR_BED_S = 12.0;
+// 公平相关常量由 blueprint-core 拥有（管线与 Godot 两端必须同源），这里只再导出。
+export { WALK_SPEED, ACTION_S, MAX_FAR_BED_S, MAX_WALK_TOUR_SPREAD_S, ACTIONS_PER_ROUND } from 'blueprint-core';
 export const MIN_BLOCKS = 3;
 export const MAX_BLOCKS = 7;
 export const BED_CELLS = 3;

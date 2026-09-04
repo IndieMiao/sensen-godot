@@ -46,7 +46,7 @@ function wrapScene() {
 
 const bpOf = (m: Blueprint['masks'], a: Blueprint['anchors'], nblocks = 4): Blueprint => ({
   format: 1, layout_patch_id: 't', revision: 1, region_id: 'r', name: 't', checksum: '', source: {},
-  play_area_m: 64, cell_m: 1, grid: [64, 64], masks: m, paths: [],
+  play_area_m: 64, cell_m: 1, play_area_mm: 64000, cell_mm: 1000, grid: [64, 64], masks: m, paths: [],
   blocks: Array.from({ length: nblocks }, (_, i) => ({ id: `b${i}`, polygon: [], neighbors: [] })),
   anchors: a, overlay_wgs84: { center: [0, 0], paths: [], blocks: [] },
 });
@@ -58,10 +58,11 @@ describe('anchors', () => {
     expect(d.get(masks.cellKey(2, 2, 3))).toBe(4);
     expect(d.has(masks.cellKey(1, 1, 3))).toBe(false);
   });
-  it('place gives nine cultivable cells and reachable anchors', () => {
+  it('place gives twelve cultivable cells (three beds + reserved) and reachable anchors', () => {
     const { m, pcs } = scene();
     const a = anchors.place(m, pcs, 64);
-    expect(masks.count(m.cultivable)).toBe(9);
+    // 12 而不是 9：预留畦也记进 cultivable，它买下即为已翻土的田（2026-09-04 决策⑥）。
+    expect(masks.count(m.cultivable)).toBe(12);
     expect(a.beds).toHaveLength(3); expect(a.beds.every(b => b.cells.length === 3)).toBe(true);
     expect(a.reserved_bed.id).toBe('bed3');
     expect(pcs.has(masks.cellKey(a.spawn[0], a.spawn[1], 64))).toBe(true);
@@ -74,7 +75,7 @@ describe('anchors', () => {
     const a = anchors.place(m, pcs, 64);
     const r = anchors.validate(bpOf(m, a));
     expect(r.errors).toEqual([]);
-    expect(r.far_bed_s).toBeGreaterThan(0); expect(r.far_bed_s).toBeLessThanOrEqual(config.MAX_FAR_BED_S);
+    expect(r.far_bed_9_s).toBeGreaterThan(0); expect(r.far_bed_9_s).toBeLessThanOrEqual(config.MAX_FAR_BED_S);
     expect(r.tour_s).toBeGreaterThan(9 * config.ACTION_S);
   });
   it('validate flags unreachable house', () => {

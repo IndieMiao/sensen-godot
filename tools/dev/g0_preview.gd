@@ -16,7 +16,7 @@ extends Node
 
 @export_enum("select", "farm") var mode := "select"
 
-const FARM_BLUEPRINT := "res://assets/blueprints/sh_a/r1/farm_blueprint.json"
+const FARM_BLUEPRINT := "res://assets/blueprints/sh_a/r2/farm_blueprint.json"
 
 func _ready() -> void:
 	if mode == "farm":
