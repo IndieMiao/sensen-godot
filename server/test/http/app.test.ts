@@ -253,3 +253,57 @@ describe('健康检查', () => {
     expect(r.json()).toMatchObject({ ok: true, db: true, content_version: CV });
   });
 });
+
+describe('导演模式端到端', () => {
+  const cmd = (token: string, body: object) =>
+    app.inject({ method: 'POST', url: '/v1/farms/me/commands', headers: authed(token), payload: body });
+
+  it('480 倍下 3 分钟真实时间跨过一个玩家日，且读路径也看得到', async () => {
+    // 读路径必须同样过 QA 变换，否则加速后 GET /farms/me 看到的还是没加速的时间。
+    const { token, player_id } = await login();
+    await makeFarm(token);
+    qa.add(player_id);
+    const before = await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) });
+    expect(before.json().state.clock.player_day_id).toBe('2026-09-04');
+
+    const set = await cmd(token, {
+      idempotency_key: 'qa1', base_version: 0, type: 'qa_set_clock', payload: { scale: 480 } });
+    expect(set.statusCode).toBe(200);
+
+    clock += 3 * 60_000;                       // 真实过了 3 分钟
+    const after = await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) });
+    expect(after.json().server_time - before.json().server_time).toBe(24 * 3600_000);
+    expect(after.json().derived.player_day_id).toBe('2026-09-05');
+  });
+
+  it('qa_skip_days 之后新的一天真的被物化，不只是派生', async () => {
+    const { token, player_id } = await login();
+    await makeFarm(token);
+    qa.add(player_id);
+    const skip = await cmd(token, {
+      idempotency_key: 'qa2', base_version: 0, type: 'qa_skip_days', payload: { days: 1 } });
+    expect(skip.statusCode).toBe(200);
+    // 再发一条普通命令，materializeDay 会把换日写进状态。
+    const next = await cmd(token, {
+      idempotency_key: 'c1', base_version: skip.json().version,
+      type: 'clear_cells', payload: { cell_ids: [Object.keys(skip.json().state.cells)[0]] } });
+    expect(next.statusCode).toBe(200);
+    expect(next.json().state.clock.player_day_id).toBe('2026-09-05');
+    expect(next.json().state.clock.weather_day_index).toBe(1);
+  });
+
+  it('倍率调回 1 后有效时间不倒退', async () => {
+    const { token, player_id } = await login();
+    await makeFarm(token);
+    qa.add(player_id);
+    await cmd(token, { idempotency_key: 'f1', base_version: 0, type: 'qa_set_clock', payload: { scale: 60 } });
+    clock += 60_000;
+    const fast = await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) });
+    const back = await cmd(token, {
+      idempotency_key: 'f2', base_version: fast.json().version,
+      type: 'qa_set_clock', payload: { scale: 1 } });
+    expect(back.statusCode).toBe(200);
+    const after = await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) });
+    expect(after.json().server_time).toBeGreaterThanOrEqual(fast.json().server_time);
+  });
+});

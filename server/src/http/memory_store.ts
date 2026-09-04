@@ -7,6 +7,7 @@ import type { Command, CommandEnvelope } from '../domain/commands.js';
 import type { Content } from '../domain/content.js';
 import { derive } from '../domain/derive.js';
 import { apply, makeCtx, type Ctx } from '../domain/reducer.js';
+import { effectiveNow as qaNow } from '../domain/qa.js';
 import { DOMAIN_VERSION, STATE_SCHEMA_VERSION } from '../domain/version.js';
 import { ownerFarmView, type FarmRow } from './dto.js';
 import { MAX_ACTIVE_TOKENS, TOKEN_IDLE_MS, newToken, tokenHash } from './auth.js';
@@ -110,11 +111,15 @@ export class MemoryStore implements Store {
       return { kind: 'version_mismatch' };
 
     // 3. 锁后采样，单调 clamp。
-    const effectiveNow = Math.max(this.deps.now(), stored.state.clock.last_effective_now);
+    // QA 时间变换必须和 PgStore 走同一条路。只改一处的话，内存实现（测试与本地
+    // 开发用）会和线上表现不一致，而线上正是没人天天盯着的那个。
+    const realNow = this.deps.now();
+    const effectiveNow = Math.max(qaNow(stored.state.qa, realNow), stored.state.clock.last_effective_now);
 
     if (env.base_version !== stored.version) return { kind: 'version_conflict', farm: stored };
 
-    const ctx = makeCtx(stored.state, effectiveNow, this.deps.timezone, this.deps.content, this.deps.blueprint);
+    const ctx = makeCtx(stored.state, effectiveNow, this.deps.timezone, this.deps.content,
+      this.deps.blueprint, realNow);
     const r = apply(stored.state, cmd, ctx);
     const record: CommandRecord = {
       idempotency_key: env.idempotency_key, payload_hash: hash,
