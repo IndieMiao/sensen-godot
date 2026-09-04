@@ -276,7 +276,7 @@ func test_action_status_shows_walking_then_the_verb() -> void:
 	f._tap_cell(f.bp.beds()[0].cells[0])
 	f._process(0.0)
 	f._process(0.1)
-	assert_str(f.hud._status_label.text).starts_with("Walking over…")
+	assert_str(f.hud._status_label.text).starts_with("Walking…")
 	assert_bool(_run_until(f, func(): return not f.runner.paused and f.runner.is_busy())).is_true()
 	f._process(0.5)
 	assert_str(f.hud._status_label.text).starts_with("Clearing…")

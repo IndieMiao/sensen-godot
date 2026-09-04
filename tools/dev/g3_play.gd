@@ -52,8 +52,9 @@ func _ready() -> void:
 		if not enabled or label.begins_with("Sell") or label.begins_with("Buy"):
 			break
 		farm._on_cta()
-		var idle := await _until(func(): return not farm.runner.is_busy(), 240.0)
+		var idle := await _until(func(): return not farm.runner.is_busy() and farm._in_flight == 0, 240.0)
 		_ok(idle, "队列 %s 走完" % label)
+		await get_tree().process_frame
 		await get_tree().process_frame
 	Engine.time_scale = 1.0
 	_ok(seen.has("Clear 9 plots"), "见到 Clear 9 plots")
@@ -76,7 +77,7 @@ func _ready() -> void:
 	_ok(str(farm.hud._cta.text) == "Harvest 6 plots", "Harvest 6 plots")
 	Engine.time_scale = 4.0
 	farm._on_cta()
-	_ok(await _until(func(): return not farm.runner.is_busy(), 240.0), "收获队列走完")
+	_ok(await _until(func(): return not farm.runner.is_busy() and farm._in_flight == 0, 240.0), "收获队列走完")
 	Engine.time_scale = 1.0
 	await get_tree().process_frame
 	await session.refresh()

@@ -200,7 +200,7 @@ func _process(dt: float) -> void:
 		if runner.is_busy() and not runner.paused:
 			doing = NextStep.doing_label(runner.current_action(), hud.selected_crop, _field_condition())
 		elif runner.is_busy():
-			doing = "Walking over…"
+			doing = "Walking…"
 		hud.set_action(doing, runner.progress(), runner.pending_count())
 		var busy_now := runner.is_busy() or _in_flight > 0
 		if busy_now != _cta_was_busy:
@@ -209,7 +209,7 @@ func _process(dt: float) -> void:
 			if not busy_now:
 				_refresh_hud()
 		elif busy_now:
-			hud.set_cta_busy(maxi(runner.pending_count(), 1))
+			hud.set_cta_busy(runner.pending_count())
 	_tick_title_hold(dt)
 	_update_camera()
 

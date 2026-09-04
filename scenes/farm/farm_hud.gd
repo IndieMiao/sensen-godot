@@ -288,10 +288,9 @@ static func _tighten(b: Button) -> void:
 		dup.content_margin_right = 6.0
 		b.add_theme_stylebox_override(state, dup)
 
-## 大按钮：bulk = NextStep.bulk() 的结果。队列在跑时不改（见 set_cta_busy）。
+## 大按钮：bulk = NextStep.bulk() 的结果。调用它即视为忙碌结束。
 func set_cta(bulk: Dictionary) -> void:
-	if _cta_busy:
-		return
+	_cta_busy = false
 	_cta.text = str(bulk.get("label", ""))
 	_cta.disabled = offline or not bool(bulk.get("enabled", true))
 	_cta.theme_type_variation = &"AccentButton" if bulk.get("action", "") != "stall" else &"SecondaryButton"
@@ -299,11 +298,8 @@ func set_cta(bulk: Dictionary) -> void:
 ## 队列在跑：大按钮改成禁用的「Working… N plots left」。原来它仍显示可点的下一步，再按一下
 ## 就把同一批格再排一遍，然后一格格被拒。
 func set_cta_busy(pending: int) -> void:
-	if pending <= 0:
-		_cta_busy = false
-		return
 	_cta_busy = true
-	_cta.text = "Working… %d %s left" % [pending, "plot" if pending == 1 else "plots"]
+	_cta.text = "Working…" if pending <= 0 else "Working… %d %s left" % [pending, "plot" if pending == 1 else "plots"]
 	_cta.disabled = true
 	_cta.theme_type_variation = &"SecondaryButton"
 
@@ -382,7 +378,7 @@ func set_action(text: String, progress: float, pending: int) -> void:
 			_last_action_text = ""
 			_status.visible = false
 		return
-	var full := "%s %d%%" % [text, int(progress * 100.0)]
+	var full := text
 	if pending > 1:
 		full += " · %d left" % (pending - 1)
 	_last_action_text = full
