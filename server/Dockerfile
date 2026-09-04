@@ -21,6 +21,10 @@ USER farm
 ENV NODE_ENV=production ASSET_ROOT=/repo
 WORKDIR /repo/server
 EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
   CMD wget -qO- http://127.0.0.1:3000/v1/healthz || exit 1
-CMD ["node", "--experimental-strip-types", "src/index.ts"]
+# 用 tsx 而不是 node --experimental-strip-types：后者不把 `.js` 导入映射回 `.ts`
+# （TS 的 NodeNext 约定要求源码里写 .js），启动即 ERR_MODULE_NOT_FOUND。
+# tsx 是 esbuild 的薄封装，启动开销约 200ms，MVP 阶段可接受；要去掉它就得先把
+# blueprint-core 也编译成 dist 并改 workspace exports，那是另一件事。
+CMD ["./node_modules/.bin/tsx", "src/index.ts"]

@@ -3,6 +3,9 @@
 set -euo pipefail
 BASE="${BASE_URL:-https://farm.sensenjoy.cn/v1}"
 j() { python3 -c "import json,sys;print(json.load(sys.stdin)$1)"; }
+# 本机可能配了 HTTPS_PROXY；冒烟必须直连，否则测的是代理能不能连上而不是服务
+# （2026-09-04 实测代理会让 TLS 握手直接失败）。
+curl() { command curl --noproxy '*' "$@"; }
 
 echo "1. healthz"
 curl -fsS "$BASE/healthz" | j "['ok']" | grep -q True
@@ -15,7 +18,9 @@ tok=$(curl -fsS -X POST "$BASE/auth/anonymous" -H 'content-type: application/jso
 echo "3. 建农场"
 farm=$(curl -fsS -X POST "$BASE/farms" -H "authorization: Bearer $tok" -H 'content-type: application/json' \
   -d '{"idempotency_key":"smoke-1","region_id":"shanghai","layout_patch_id":"sh_a","blueprint_revision":2}')
-cells=$(echo "$farm" | python3 -c "import json,sys;print(' '.join(sorted(json.load(sys.stdin)['state']['cells'])[:3]))")
+# 必须挑**已解锁**的初始畦：按字典序取前三格会选中预留畦，那三格要扩地后才能动
+# （2026-09-04 实测报 CELL_LOCKED）。cells 的插入顺序就是「先九格初始畦，后三格预留畦」。
+cells=$(echo "$farm" | python3 -c "import json,sys;print(' '.join(list(json.load(sys.stdin)['state']['cells'])[:3]))")
 ver=$(echo "$farm" | j "['version']")
 
 echo "4. 三条命令"

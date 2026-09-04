@@ -3,15 +3,45 @@
 # digest 从 CI 产出的 release-manifest.json 里读。
 set -euo pipefail
 HOST="${DEPLOY_HOST:?需要 DEPLOY_HOST，如 farm@1.2.3.4}"
-MANIFEST="${1:?用法: deploy.sh <release-manifest.json>}"
-digest=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['image_digest'])" "$MANIFEST")
-sha=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['git_sha'])" "$MANIFEST")
-[[ "$digest" == *"@sha256:"* ]] || { echo "manifest 里的 image_digest 必须带 @sha256:"; exit 1; }
-
 here=$(dirname "$0")
+repo=$(cd "$here/../.." && pwd)
+sha=$(git -C "$repo" rev-parse --short HEAD)
+
+# 有 manifest 就用 CI 构建好的镜像；没有就**在服务器上构建**（本机没装 Docker）。
+# 无论哪条路，compose 最终都按 digest 引用——tag 可以被重新推送，digest 不能。
+if [ -n "${1:-}" ]; then
+  digest=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['image_digest'])" "$1")
+  sha=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['git_sha'])" "$1")
+  [[ "$digest" == *"@sha256:"* ]] || { echo "manifest 里的 image_digest 必须带 @sha256:"; exit 1; }
+  ssh "$HOST" "cd /opt/farm && docker pull '$digest'"
+else
+  echo "没有 manifest，改为在服务器上构建（本机无 Docker）"
+  ssh "$HOST" 'mkdir -p /opt/farm/src'
+  # 只传构建上下文需要的部分，与 .dockerignore 的放行清单一致。
+  # --exclude 必须在文件列表**之前**：BSD tar 会把它后面的当成路径（macOS 上实测）。
+  tar -C "$repo" --exclude 'node_modules' --exclude '.env' --exclude '.env.production' -czf - \
+    package.json pnpm-lock.yaml pnpm-workspace.yaml packages/blueprint-core server \
+    assets/farm/data $(cd "$repo" && ls -d assets/blueprints/*/r2/farm_blueprint.json) \
+    | ssh "$HOST" 'tar -C /opt/farm/src -xzf -'
+  ssh "$HOST" "cd /opt/farm/src && docker build -f server/Dockerfile -t farm-server:$sha ."
+  digest="farm-server:$sha"
+fi
+
 scp "$here/docker-compose.yml" "$here/Caddyfile" "$here/crontab" "$here/backup.sh" "$HOST:/opt/farm/"
 # .env 从本机推上去并立刻收紧权限；它不入库（Codex 三审 N-I9）。
 scp "$here/../.env.production" "$HOST:/opt/farm/.env"
 ssh "$HOST" "chmod 600 /opt/farm/.env && chmod +x /opt/farm/backup.sh"
-ssh "$HOST" "cd /opt/farm && APP_IMAGE='$digest' GIT_SHA='$sha' docker compose pull && APP_IMAGE='$digest' GIT_SHA='$sha' docker compose up -d"
-"$here/smoke.sh"
+
+# postgres / caddy 的 digest 从镜像源解析一次并固定下来。
+pgd=$(ssh "$HOST" "docker pull -q docker.m.daocloud.io/library/postgres:16-alpine >/dev/null && docker inspect --format '{{index .RepoDigests 0}}' docker.m.daocloud.io/library/postgres:16-alpine | cut -d@ -f2")
+cad=$(ssh "$HOST" "docker pull -q docker.m.daocloud.io/library/caddy:2-alpine >/dev/null && docker inspect --format '{{index .RepoDigests 0}}' docker.m.daocloud.io/library/caddy:2-alpine | cut -d@ -f2")
+# digest 必须写进 .env 而不是只在 up 那一刻传环境变量：否则之后任何 docker compose
+# 命令（ps / logs / restart）都会因缺变量而失败，运维时完全看不了状态（2026-09-04 实测）。
+ssh "$HOST" "cd /opt/farm && sed -i '/^APP_IMAGE=/d;/^GIT_SHA=/d;/^PG_DIGEST=/d;/^CADDY_DIGEST=/d' .env && cat >> .env <<EOF
+APP_IMAGE=$digest
+GIT_SHA=$sha
+PG_DIGEST=${pgd#sha256:}
+CADDY_DIGEST=${cad#sha256:}
+EOF
+chmod 600 .env && docker compose up -d"
+DEPLOY_HOST="$HOST" "$here/smoke.sh"
