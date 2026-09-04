@@ -11,6 +11,7 @@ run/main_scene="res://scenes/city_select/city_select.tscn"
 [autoload]
 Avatar="*res://modules/avatar/avatar_service.gd"
 AppRouter="*res://modules/ui/app_router.gd"
+Net="*res://modules/net/net_service.gd"
 
 [display]
 

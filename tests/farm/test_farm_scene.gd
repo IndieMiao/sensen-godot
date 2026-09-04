@@ -152,3 +152,35 @@ func test_works_without_a_server_session() -> void:
 	f._process(0.0)
 	f._process(ActionRunner.ACTION_S)
 	assert_bool(f.runner.is_busy()).is_false()
+
+func test_attaches_injected_session_and_sends_commands_on_cell_done() -> void:
+	# 有农场的会话 → 挂 predictor，动作收工时真的发命令并对账。
+	var t := FakeTransport.new([
+		{"status": 200, "json": {"version": 1, "state": {"cells": {"1,1": {"state": "cleared"}}}}},
+	])
+	var s := FarmSession.new(ApiClient.new("https://example.test/v1", t.callable()))
+	s.client.token = "tok"
+	s.farm_id = "f1"
+	s.version = 0
+	s.state = {"cells": {"1,1": {"state": "wild"}}, "beds_unlocked": 3, "wallet": 5}
+	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
+	scene.setup({"blueprint": FarmBlueprint.load_file(FIX), "session": s})
+	add_child(auto_free(scene))
+	assert_object(scene.predictor).is_not_null()
+	assert_that(scene.session).is_same(s)
+	scene.tool = "clear"
+	scene._on_cell_started(Vector2i(1, 1), "clear")
+	assert_str(str(scene.predictor.view()["1,1"].state)).is_equal("cleared")   # 本地预测先到
+	await scene._on_cell_done(Vector2i(1, 1), "clear")
+	assert_int(t.requests.size()).is_equal(1)
+	assert_str(str(t.requests[0].body.type)).is_equal("clear_cells")
+	assert_int(scene.predictor.version).is_equal(1)
+
+func test_without_farm_in_session_stays_offline_greybox() -> void:
+	var s := FarmSession.new(ApiClient.new("https://example.test/v1", FakeTransport.new([]).callable()))
+	s.client.token = "tok"      # 登录了但还没建场
+	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
+	scene.setup({"blueprint": FarmBlueprint.load_file(FIX), "session": s})
+	add_child(auto_free(scene))
+	assert_object(scene.session).is_null()
+	assert_object(scene.predictor).is_null()

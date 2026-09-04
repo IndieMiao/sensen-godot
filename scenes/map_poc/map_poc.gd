@@ -591,7 +591,14 @@ func _save_choice(id: String) -> void:
 
 func _on_candidate_confirmed(id: String) -> void:
 	_save_choice(id)
-	AppRouter.push_instance(AppRouter.FARM, {"layout_patch_id": id, "revision": _candidate_bps[id].revision})
+	var rev: int = _candidate_bps[id].revision
+	# 先在服务端建场，成功了再进。失败不拦着玩家——退化成 G0 灰盒也能进能走，
+	# 但要说清楚没存到线上，别让人以为种下去的东西还在。
+	if Net and Net.logged_in():
+		var ok: bool = await Net.session.ensure_farm(str(region.get("id", "")), id, rev)
+		if not ok:
+			location_status.text = "Offline — farm not saved online"
+	AppRouter.push_instance(AppRouter.FARM, {"layout_patch_id": id, "revision": rev})
 
 func _clamp_to_bounds() -> void:
 	if pan_bounds.size == Vector2.ZERO:

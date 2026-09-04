@@ -72,6 +72,7 @@ func _ready() -> void:
 	runner.cell_started.connect(_on_cell_started)
 	runner.cell_done.connect(_on_cell_done)
 	_spawn_player()
+	_attach_session()
 	title.text = bp.display_name
 	exit_btn.pressed.connect(_leave)
 	hud.tool_selected.connect(func(t): tool = t)
@@ -231,7 +232,7 @@ func _on_cell_done(cell: Vector2i, action: String) -> void:
 	var id := "%d,%d" % [cell.x, cell.y]
 	if session == null:
 		return
-	var accepted := session.send(TOOL_COMMAND.get(action, ""), _payload_for(action, [id]))
+	var accepted: bool = await session.send(TOOL_COMMAND.get(action, ""), _payload_for(action, [id]))
 	if predictor:
 		if accepted:
 			predictor.commit(session.state.get("cells", {}), session.version)
@@ -305,8 +306,30 @@ func _on_director_command(type: String, payload: Dictionary) -> void:
 		# 面板选的是「今天改成什么」，命令要的是天气日索引 → 田况。
 		var idx := int((session.state.get("clock", {}) as Dictionary).get("weather_day_index", 0))
 		body = {"overrides": {str(idx): payload.get("day", "sunny")}}
-	var accepted := session.send(type, body)
+	var accepted: bool = await session.send(type, body)
 	director.report(accepted, session.last_error_code)
 	if accepted:
 		predictor.commit(session.state.get("cells", {}), session.version) if predictor else null
 		_render()
+
+## 接上服务端会话。允许通过 setup 参数注入（测试用），否则取全局 Net。
+## 没有会话或会话里没有农场 → 退化成 G0 灰盒，照旧能进能出能走动。
+func _attach_session() -> void:
+	if _args.get("visitor", false):
+		return
+	var s: FarmSession = _args.get("session", Net.session if Net else null)
+	if s == null or not s.has_farm():
+		return
+	session = s
+	predictor = CellPredictor.from_blueprint(bp, session.state.get("cells", {}))
+	predictor.beds_unlocked = int(session.state.get("beds_unlocked", 3))
+	session.state_changed.connect(_on_server_state)
+	session.offline_changed.connect(func(off): if hud: hud.set_offline(off))
+	_render()
+
+## 服务端每次回包都整体覆盖预测器；漂移一律以服务端为准（方案 §3 D4）。
+func _on_server_state(state: Dictionary, version: int) -> void:
+	if predictor:
+		predictor.commit(state.get("cells", {}), version)
+		predictor.beds_unlocked = int(state.get("beds_unlocked", 3))
+	_render()

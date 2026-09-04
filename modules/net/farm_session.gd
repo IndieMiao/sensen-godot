@@ -30,12 +30,18 @@ var _failures := 0
 func _init(p_client: ApiClient) -> void:
 	client = p_client
 
+func logged_in() -> bool:
+	return client != null and not client.token.is_empty()
+
+func has_farm() -> bool:
+	return not farm_id.is_empty()
+
 ## 服务端「现在」的毫秒时间戳。
 func server_now() -> int:
 	return int(Time.get_unix_time_from_system() * 1000.0) + clock_offset_ms
 
 func login() -> bool:
-	var r := client.request("POST", "/auth/anonymous", {"install_key": ApiClient.install_key()})
+	var r: ApiClient.Response = await client.request("POST", "/auth/anonymous", {"install_key": ApiClient.install_key()})
 	if not _track(r):
 		return false
 	if not r.is_success():
@@ -46,7 +52,7 @@ func login() -> bool:
 
 ## 已有农场就取回来，没有就建一个。
 func ensure_farm(region_id: String, layout_patch_id: String, revision: int) -> bool:
-	var me := client.request("GET", "/farms/me")
+	var me: ApiClient.Response = await client.request("GET", "/farms/me")
 	if not _track(me):
 		return false
 	if me.is_success():
@@ -54,7 +60,7 @@ func ensure_farm(region_id: String, layout_patch_id: String, revision: int) -> b
 		return true
 	if me.status != 404:
 		return false
-	var r := client.request("POST", "/farms", {
+	var r: ApiClient.Response = await client.request("POST", "/farms", {
 		"idempotency_key": _new_key(),
 		"region_id": region_id,
 		"layout_patch_id": layout_patch_id,
@@ -69,7 +75,7 @@ func ensure_farm(region_id: String, layout_patch_id: String, revision: int) -> b
 	return true
 
 func refresh() -> bool:
-	var r := client.request("GET", "/farms/me")
+	var r: ApiClient.Response = await client.request("GET", "/farms/me")
 	if not _track(r):
 		return false
 	if r.is_success():
@@ -88,17 +94,17 @@ func send(type: String, payload: Dictionary) -> bool:
 		emit_signal("rejected", "OFFLINE", "离线中，命令未发送")
 		return false
 	var key := _new_key()
-	var r := _post_command(key, version, type, payload)
+	var r: ApiClient.Response = await _post_command(key, version, type, payload)
 	if not r.ok:
 		# 传输层失败：同 key 原样重发，服务端幂等保证不会应用两次。
-		r = _post_command(key, version, type, payload)
+		r = await _post_command(key, version, type, payload)
 	if not _track(r):
 		return false
 	if r.status == 409 and str(r.json.get("code", "")) == "VERSION_CONFLICT":
 		# 回包带着最新状态，先对账再用**新 key** 重发（同 key 换 base_version 会被判
 		# IDEMPOTENCY_MISMATCH）。
 		_adopt(r.json)
-		r = _post_command(_new_key(), version, type, payload)
+		r = await _post_command(_new_key(), version, type, payload)
 		if not _track(r):
 			return false
 	if r.is_success():
@@ -110,7 +116,7 @@ func send(type: String, payload: Dictionary) -> bool:
 	return false
 
 func _post_command(key: String, base: int, type: String, payload: Dictionary) -> ApiClient.Response:
-	return client.request("POST", "/farms/me/commands", {
+	return await client.request("POST", "/farms/me/commands", {
 		"idempotency_key": key, "base_version": base, "type": type, "payload": payload,
 	})
 

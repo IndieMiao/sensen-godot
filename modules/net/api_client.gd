@@ -54,6 +54,9 @@ static func install_key() -> String:
 		f.close()
 	return key
 
+## 协程：真实 HTTP 传输是异步的，调用方一律 `await`。
+## FakeTransport 是同步的——`await` 一个非协程值会立刻返回，所以单测不受影响。
+## G1-B 曾把这里写成同步，结果昨天 e2e 只能绕开 FarmSession 直接打传输层才跑通。
 func request(method: String, path: String, body: Variant = null) -> Response:
 	var headers := PackedStringArray(["content-type: application/json"])
 	if not token.is_empty():
@@ -61,7 +64,8 @@ func request(method: String, path: String, body: Variant = null) -> Response:
 	var text := "" if body == null else JSON.stringify(body)
 	if not transport.is_valid():
 		return Response.new(false, 0, {}, "no transport")
-	return transport.call(method, base_url + path, headers, text)
+	var r = await transport.call(method, base_url + path, headers, text)
+	return r if r is Response else Response.new(false, 0, {}, "bad transport result")
 
 ## 真实传输：需要一个在场景树里的 Node 来挂 HTTPRequest。
 static func make_http_transport(host: Node) -> Callable:
