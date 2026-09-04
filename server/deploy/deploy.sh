@@ -44,4 +44,16 @@ PG_DIGEST=${pgd#sha256:}
 CADDY_DIGEST=${cad#sha256:}
 EOF
 chmod 600 .env && docker compose up -d"
+
+# 等容器真的健康再冒烟。`up -d` 一返回就打过去必然 502——健康检查有 40 秒的
+# start-period，Caddy 在那之前没有可转发的上游（2026-09-04 连续两次踩到）。
+echo "等待 app 健康"
+for i in $(seq 1 60); do
+  st=$(ssh "$HOST" "docker inspect --format '{{.State.Health.Status}}' farm-app-1" 2>/dev/null || echo starting)
+  [ "$st" = healthy ] && break
+  [ "$st" = unhealthy ] && { echo "app 健康检查失败"; ssh "$HOST" 'cd /opt/farm && docker compose logs app --tail 40'; exit 1; }
+  sleep 3
+done
+[ "$st" = healthy ] || { echo "等待超时，app 仍是 $st"; exit 1; }
+
 DEPLOY_HOST="$HOST" "$here/smoke.sh"
