@@ -1,0 +1,35 @@
+{
+  "_source": "PRD §8 L596-635",
+  "format": 1,
+  "_residents_note": "L598-602：三名居民只有职务名，PRD 未给专有姓名。available_from_chapter 由登场章节推出（苗圃 D0、小馆 D1、修缮师 D5）。",
+  "residents": {
+    "nursery_keeper": { "_role": "苗圃管理员", "place": "corner_nursery", "available_from_chapter": 0, "full": true },
+    "bistro_owner":   { "_role": "小馆主理人", "place": "community_bistro", "available_from_chapter": 1, "full": true },
+    "restorer":       { "_role": "修缮师",     "place": "four_season_yard", "available_from_chapter": 5, "full": false }
+  },
+  "_stage_note": "L608-612：长期五阶段，MVP 只开放前三。熟悉必须完成一次共同事件，点数不足以单独晋级（L621）。",
+  "stages": [
+    { "id": "first_sight", "min": 0,  "max": 14 },
+    { "id": "acquainted", "min": 15, "max": 44, "requires": "first_met" },
+    { "id": "familiar",   "min": 45, "max": 89, "requires": "shared_event" }
+  ],
+  "_points_note": "L614-619。",
+  "points": {
+    "daily_first_talk":   { "points": 2,  "per": "resident_per_day" },
+    "clued_gift":         { "points": 6,  "per": "resident", "week_cap": 2 },
+    "personal_request":   { "points": 15, "per": "resident", "cap": 1, "_note": "L550 只有首个标记 personal_story 的请求给分，普通回购不计" },
+    "shared_event":       { "points": 25, "per": "resident", "cap": 1 }
+  },
+  "_clue_note": "PRD 未给完整线索→作物映射表，由 L635 的逐笔归属反推：D1 1R→苗圃；D2 1L、D3 1R→小馆；D5 1H、D6 1L→修缮师。",
+  "gift_clues": {
+    "nursery_keeper": ["R"],
+    "bistro_owner": ["L", "R"],
+    "restorer": ["H", "L"]
+  },
+  "_target_note": "L625-633 目标夹具，账本测试断言 D6 这一行。",
+  "target_points_by_day": {
+    "nursery_keeper": [2, 10, 12, 29, 29, 31, 58],
+    "bistro_owner":   [0, 17, 25, 58, 58, 60, 62],
+    "restorer":       [0, 0, 0, 0, 0, 23, 31]
+  }
+}

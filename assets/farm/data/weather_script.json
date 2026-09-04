@@ -1,0 +1,12 @@
+{
+  "_source": "PRD §6.6 L440-459",
+  "format": 1,
+  "_script_note": "L453 受控序列 晴→雨→晴→晴→雨→风→晴，对应 D0..D6。D7+ 按 weather_day_index mod 7 循环（SGODOT-30）。",
+  "script": ["sunny", "rain", "sunny", "sunny", "rain", "wind", "sunny"],
+  "_care_note": "L446-448：晴=浇水，雨=疏水扶叶，风=固定覆盖扶苗。三者都不改产量、不造成损失。",
+  "care_action": { "sunny": "water", "rain": "drain", "wind": "shelter" },
+  "_protected_note": "L459：D0 晴、D1 雨、D5 风是固定教学/剧情槽，任何 QA 种子都不得改写它们的完成条件。",
+  "protected_slots": [0, 1, 5],
+  "_rollover_note": "L666 §9.1：player_day_id 按所选城市时区的当地 04:00 生成。",
+  "day_rollover_hour": 4
+}

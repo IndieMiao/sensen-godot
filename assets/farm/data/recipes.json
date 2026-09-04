@@ -1,0 +1,11 @@
+{
+  "_source": "PRD §6.5 L435-438；摊位定价为 2026-09-04 用户决策⑦",
+  "format": 1,
+  "recipes": {
+    "salad": { "_name": "蔬菜沙拉", "_line": "L435 1C + 1L", "inputs": { "C": 1, "L": 1 }, "stall_price": 36 },
+    "tea":   { "_name": "洋甘菊茶", "_line": "L436 1H",      "inputs": { "H": 1 },         "stall_price": 24 }
+  },
+  "_premium_note": "决策⑦：料理上自助摊且溢价（原料售价和为 28 / 19）。Codex 二审算出溢价配合预算外的回购箱会把高频账户价值上界推到 1026，越过 PRD L431 的 1.8×=981 红线；决策是让回购箱计入摊位预算（见 economy.json buyback），模型回落 968。",
+  "_buyback_note": "L534：洋甘菊茶经农场门口回购箱换 24 金币且不加关系。",
+  "buyback": { "dish": "tea", "coins": 24, "per_player_day": 1, "counts_against_stall_budget": true }
+}

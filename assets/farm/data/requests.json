@@ -1,0 +1,27 @@
+{
+  "_source": "PRD §7.5 L529-535 的账本行 + L550 的口径说明",
+  "format": 1,
+  "_note": "L550：金币统计里的「居民请求」包含教学回购、生活回购与施工委托；只有首个标记 personal_story 的请求给 15 关系点。每个请求只能完成一次，提交必须原子（L588）。",
+  "requests": {
+    "d0_tutorial_buyback": {
+      "_line": "L530 D0「3R 教学回购 30」",
+      "chapter": 0, "resident": "nursery_keeper", "personal_story": false,
+      "items": { "R": 3 }, "coins": 30
+    },
+    "d1_bistro_lettuce": {
+      "_line": "L531 D1「3L 请求 45」；L635 personal_story 请求归属 D1 小馆",
+      "chapter": 1, "resident": "bistro_owner", "personal_story": true,
+      "items": { "L": 3 }, "coins": 45
+    },
+    "d3_nursery_basket": {
+      "_line": "L533 D3「2C1L 请求 55」；L635 personal_story 请求归属 D3 苗圃",
+      "chapter": 3, "resident": "nursery_keeper", "personal_story": true,
+      "items": { "C": 2, "L": 1 }, "coins": 55
+    },
+    "d5_restorer_salads": {
+      "_line": "L535 D5「两份沙拉…完成修缮师请求 70」；L635 personal_story 请求归属 D5 修缮师",
+      "chapter": 5, "resident": "restorer", "personal_story": true,
+      "dishes": { "salad": 2 }, "coins": 70
+    }
+  }
+}

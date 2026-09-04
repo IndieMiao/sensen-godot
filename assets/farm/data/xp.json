@@ -1,0 +1,25 @@
+{
+  "_source": "PRD §7.2 L476-505",
+  "format": 1,
+  "sources": {
+    "first_clear_cell":    { "xp": 1,  "_limit": "L477 每格一次" },
+    "harvest_plant":       { "xp": 2,  "daily_cap_plants": 9, "_limit": "L478 按株不按产量，每活跃日最多计 9 株" },
+    "first_harvest_crop":  { "xp": 8,  "_limit": "L479 每种作物一次" },
+    "daily_care_complete": { "xp": 15, "_limit": "L480 当前所有已播种田格完成本轮天气动作后，每活跃日一次" },
+    "first_weather_care":  { "xp": 5,  "_limit": "L481 每种田况一次" },
+    "first_recipe":        { "xp": 10, "_limit": "L483 每道配方一次" }
+  },
+  "_thresholds_note": "L488 累计阈值，索引 0 对应 Lv1。",
+  "level_thresholds": [0, 40, 80, 120, 160, 220, 290],
+  "_target_note": "L493-501 目标路径每日累计，账本测试断言这一列。",
+  "target_cumulative": [49, 95, 128, 179, 230, 268, 301],
+  "_unlock_note": "L493-501：等级只改信息效率与表达，不是章节门槛（L503-505）。",
+  "level_rewards": {
+    "2": "three_day_forecast,careful_mark",
+    "3": "gift_clue_highlight",
+    "4": "seed_bar_preset",
+    "5": "recipe_quick_redo",
+    "6": "tool_and_bed_preview",
+    "7": "week_handbook_frame"
+  }
+}

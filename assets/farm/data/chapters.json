@@ -1,0 +1,69 @@
+{
+  "_source": "PRD §9.2 L675-683（永久结果与解锁）、§9.3 L691-699（最小完成事实）、§7.5 L529-536（Grant）、L580（D6 合照分支）",
+  "format": 1,
+  "_grant_note": "L526：D0 的 6 枚教学小萝卜和表内其他绑定种子都是一次性剧情 Grant——不能转售、赠送或跨章囤积，种下后的收获物是正常可交易产物。物化顺序见 spec §4.2：只在真正开新章时先清 bound 再开章再发 Grant，否则 D6 刚发的 Grant 会被同一步清掉（Codex 二审 N-C1）。",
+  "_life_choice_note": "L580：六次用途选择（D1-D6 各一次），赠礼或保留累计 ≥4 次 → 生活优先。作物取自 L531-536 账本行的赠礼/保留项。",
+  "chapters": [
+    {
+      "index": 0, "_focus": "两层空间与基础劳作（L676）",
+      "min_facts": ["farm_created", "first_harvest", "next_batch_sown_and_cared"],
+      "_not_facts": "L692 定位授权、命名、换装不得作为完成条件",
+      "grants": { "R": 6, "L": 3 }, "_grants_line": "L530「6R 付费；3L 绑定」——6R 是教学 Grant，3L 是次日绑定种子",
+      "tutorial_crop": "R",
+      "unlocks": [], "nursery_stage": "derelict"
+    },
+    {
+      "index": 1, "_focus": "天气改变劳动（L677）",
+      "min_facts": ["rain_care_done", "request_d1_bistro_lettuce_done"],
+      "grants": { "L": 3 }, "_grants_line": "L531「4R+2L 付费；3L 绑定」",
+      "life_choice_crop": "R",
+      "unlocks": ["personal_requests", "gifts"], "subsidy": "weather_story",
+      "_permanent": "L678 获得苗圃所需作物线索"
+    },
+    {
+      "index": 2, "_focus": "收获的四种用途（L679）",
+      "min_facts": ["life_choice_resolved", "second_resident_remembers"],
+      "grants": { "C": 2 }, "_grants_line": "L532「2R+3L+2C 付费；2C 绑定」",
+      "life_choice_crop": "L",
+      "unlocks": ["crop_C"], "nursery_stage": "derelict",
+      "_permanent": "L679 苗圃入口显示明确缺口，开放工程篮预留"
+    },
+    {
+      "index": 3, "_focus": "料理（L680）",
+      "min_facts": ["first_salad_cooked", "request_d3_nursery_basket_done"],
+      "grants": { "H": 2 }, "_grants_line": "L533「4C+2L+1H 付费；2H 绑定」",
+      "life_choice_crop": "R",
+      "unlocks": ["kitchen", "crop_H", "engineering_basket"],
+      "shared_events": [{ "id": "cooking_together", "resident": "bistro_owner" }]
+    },
+    {
+      "index": 4, "_focus": "他人农场访问（L681）",
+      "min_facts": ["visit_tutorial_completed", "engineering_first_submitted"],
+      "grants": { "H": 2 }, "_grants_line": "L534「3C+3L+1H 付费；2H 绑定」",
+      "life_choice_crop": "L",
+      "unlocks": ["visit"], "nursery_stage": "cleared",
+      "_no_reward": "L655 访问不产生金币、XP、关系、其他任务进度或每日奖励"
+    },
+    {
+      "index": 5, "_focus": "成长路线选择（L682）",
+      "min_facts": ["growth_intent_set", "wind_care_done"],
+      "grants": {}, "_grants_line": "L535「3C+3H+3L 付费」——本章无绑定种子",
+      "life_choice_crop": "H",
+      "unlocks": ["growth_choice", "nursery_appearance"],
+      "_not_facts": "L697 同时购买两项、为选项补发隐藏金币不得作为完成条件"
+    },
+    {
+      "index": 6, "_focus": "周结算（L683）",
+      "min_facts": ["engineering_quota_complete", "shared_scene_done"],
+      "grants": { "C": 1, "H": 1, "L": 1 }, "_grants_line": "L536「2C+2H+2L 付费；C/H/L 各 1 绑定」",
+      "life_choice_crop": "L",
+      "unlocks": [], "nursery_stage": "built", "subsidy": "nursery_built",
+      "shared_events": [{ "id": "nursery_activity", "resident": "nursery_keeper" }],
+      "_photo": "L580 赠礼或保留累计 ≥4 次 → 生活优先，解锁两页手写手账 + 个性化合照站位 + 居民下周线索；0-3 次 → 出售优先"
+    }
+  ],
+  "_after_d6_note": "SGODOT-30 / 决策⑨：D6 完成后 chapter_index 冻结在 6，不再开新章；天气按独立的 weather_day_index mod 7 循环；一次性金币、Grant、请求全部停发（L590）。",
+  "life_priority_threshold": 4,
+  "max_new_chapters_per_player_day": 1,
+  "_one_per_day": "L667：每个 player_day_id 最多激活一个新章节；漏一天后继续未完成章节，不跳章不作废（L665）。"
+}
