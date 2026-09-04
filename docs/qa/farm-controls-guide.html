@@ -6,7 +6,7 @@
 <style>
 :root{
   --accent:#2fcf9f; --accent-deep:#13956f; --ink:#17211f; --ink-sub:#5f6f6a; --ink-muted:#899792;
-  --surface:#ffffff; --sunk:#f2f5f4; --tint:#e6f7f1; --border:#d9e1de; --marker:#ff765f; --danger:#d85f58;
+  --surface:#ffffff; --sunk:#f2f5f4; --tint:#e6f7f1; --border:#d9e1de; --marker:#ff765f;
   --weed:#75944c; --cleared:#9a7a5a; --tilled:#6b4529; --seedling:#6bc75c; --ripe:#dc5c5c; --reserved:#c7a98c;
   --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
@@ -34,18 +34,17 @@ ul,ol{margin:0 0 12px;padding-left:1.4em;max-width:65ch}
 li{margin:4px 0}
 kbd{font-family:var(--mono);font-size:13px;font-weight:500;background:var(--surface);border:1px solid var(--border);border-bottom-width:2px;border-radius:6px;padding:1px 7px;white-space:nowrap;color:var(--ink)}
 kbd.on{background:var(--accent);border-color:var(--accent);color:#0c2a20}
-kbd.off{color:var(--ink-muted)}
 .note{background:var(--tint);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0}
 .warn{background:var(--surface);border-left:3px solid var(--marker);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0}
-/* 上手路线 */
+.big{font-size:18px;font-weight:600;margin:16px 0 8px}
 .route{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:18px 0 8px}
 .route div{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.55}
 .route .n{font-family:var(--mono);font-size:12px;color:var(--accent-deep);display:block;margin-bottom:4px}
-/* 屏幕标注图 */
 .shot{display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start;margin:20px 0}
 @media (max-width:640px){.shot{grid-template-columns:1fr}}
 .phone{position:relative;width:300px;height:652px;background:#eef6e6;border:1px solid var(--border);border-radius:22px;overflow:hidden;font-size:11px;font-family:var(--mono);color:#17211f}
 .phone .b{position:absolute;background:#fff;border:1px solid #d9e1de;border-radius:10px;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 6px;box-sizing:border-box}
+.phone .goals{position:absolute;left:8px;top:64px;width:140px;background:#fff;border:1px solid #d9e1de;border-radius:10px;padding:8px 10px;font-size:10px;line-height:1.5}
 .phone .bed{position:absolute;height:28px;width:82px;background:#a07850;border-radius:3px}
 .phone .bed.weed{background:linear-gradient(90deg,var(--weed) 0 30%,#a07850 30% 36%,var(--weed) 36% 66%,#a07850 66% 72%,var(--weed) 72%)}
 .phone .bed.till{background:var(--tilled)}
@@ -57,14 +56,12 @@ kbd.off{color:var(--ink-muted)}
 .legend li{display:grid;grid-template-columns:24px 1fr;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border);align-items:start}
 .legend .tag{position:static;margin-top:3px}
 .legend b{display:block;font-weight:600}
-/* 状态机 */
 .chain{display:flex;flex-wrap:wrap;gap:6px 0;align-items:stretch;margin:18px 0 6px;font-size:13.5px}
 .state{flex:1 1 92px;min-width:92px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 10px 8px;display:flex;flex-direction:column;gap:6px}
 .state .sw{height:26px;border-radius:5px;border:1px solid rgba(0,0,0,.08)}
 .state .nm{font-weight:600}
 .state .hint{color:var(--ink-sub);font-size:12.5px;line-height:1.45}
 .arrow{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 4px;color:var(--ink-muted);font-size:12px;gap:2px}
-.arrow kbd{font-size:11.5px}
 table{border-collapse:collapse;width:100%;font-size:14.5px;margin:12px 0}
 th,td{text-align:left;vertical-align:top;padding:9px 10px;border-bottom:1px solid var(--border)}
 th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-sub);font-weight:500}
@@ -76,150 +73,128 @@ td:first-child{white-space:nowrap}
 
 <div class="page">
 <h1>街角四季操作指南</h1>
-<p class="sub">对应 2026-09-04 晚装在手机上的构建（main <b>8373e5e</b>，线上 farm.sensenjoy.cn）。所有界面文字是英文，这里写的 <kbd>按钮</kbd> 就是屏幕上的原文。</p>
+<p class="sub">对应 2026-09-05 凌晨的构建 <b>build/sensen-g3-debug.apk</b>（main <b>e924741</b>，线上 farm.sensenjoy.cn）。所有界面文字是英文，这里写的 <kbd>按钮</kbd> 就是屏幕上的原文。</p>
+
+<div class="note">
+<div class="big">整个农场只有一条规则</div>
+<b>点一块田，它自己做该做的下一步。</b>草地点了就清理，空地点了就翻土，翻过的点了就播种，播过的点了就浇水，熟了点了就收。不用选工具。人物会先走过去，再干 2 秒，田头浮着「Clearing…」告诉你在干什么。<br>
+底部那个<b>大绿按钮</b>永远写着整片田现在最该做的事——不想一格一格点，就按它。
+</div>
 
 <h2><small>Quick start</small>三分钟走完一次种收</h2>
-<p>先照这条路线走一遍，每一步都有可见反馈。第一批萝卜是教学作物，<b>三分钟</b>就熟。</p>
 <div class="route">
   <div><span class="n">1</span>冷启动 → 选城页点 <kbd>Shanghai</kbd></div>
-  <div><span class="n">2</span>地图右上 <kbd>My Farm</kbd>（已有农场时才有这个按钮）</div>
-  <div><span class="n">3</span>底部工具行点 <kbd>Clear</kbd>，再点一块长草的田格 → 草消失</div>
-  <div><span class="n">4</span>点 <kbd>Till</kbd>，再点同一格 → 变成深棕翻土板</div>
-  <div><span class="n">5</span>种子行选 <kbd class="on">Radish</kbd>，工具点 <kbd>Sow</kbd>，再点同一格 → 四棵亮绿苗</div>
-  <div><span class="n">6</span>点 <kbd>Care</kbd>，再点同一格 → 右上出现 <kbd>Next ripe 02:59</kbd></div>
-  <div><span class="n">7</span>等三分钟，苗长高变红</div>
-  <div><span class="n">8</span>点 <kbd>Reap</kbd>，再点那格 → 格子回到翻土态，萝卜进库存</div>
+  <div><span class="n">2</span>第一次：底部选一个街区 → <kbd>Create Farm</kbd>。以后：右上 <kbd>My Farm</kbd></div>
+  <div><span class="n">3</span>按大按钮 <kbd class="on">Clear 9 plots</kbd>，看人物走过去把草清掉</div>
+  <div><span class="n">4</span>按 <kbd class="on">Till 9 plots</kbd> → 深棕翻土板</div>
+  <div><span class="n">5</span>按 <kbd class="on">Sow 6 Radish</kbd> → 亮绿小苗（种子行显示还剩几颗）</div>
+  <div><span class="n">6</span>按 <kbd class="on">Water 6 plots</kbd> → 右上 <kbd>Next ripe 02:59</kbd> 开始倒计时</div>
+  <div><span class="n">7</span>剩下 3 格：<kbd class="on">Sow 3 Lettuce</kbd> → <kbd class="on">Water 3 plots</kbd>。按钮变成灰色的 <kbd>Crops are growing</kbd></div>
+  <div><span class="n">8</span>三分钟后按 <kbd class="on">Harvest 6 plots</kbd> → 田头飘「+1 Radish」</div>
+  <div><span class="n">9</span>按 <kbd class="on">Sell 6 at the stall</kbd> → 摊位 → <kbd>Sell all · +48</kbd> → 金币 180 → 228</div>
+  <div><span class="n">10</span>摊位里 <kbd>Buy 3 · 12 coins</kbd> 买种子 → 按钮又变回 <kbd class="on">Sow 3 Radish</kbd></div>
 </div>
-<div class="note">每格动作要 <b>2 秒</b>，期间右上角显示 <kbd>Tilling… 56%</kbd> 进度条，人物会俯身面向那格。看到进度条就是在干活，别连点。</div>
+<p>左上的 <kbd>Day 1 goals</kbd> 会一路打勾：清理 → 翻土 → 播种 → 浇水 → 收获 → 卖 → 种下一批。</p>
 
-<h2><small>Farm screen</small>农场界面：每个控件是什么</h2>
+<h2><small>Farm screen</small>农场界面：每个东西是什么</h2>
 <div class="shot">
   <div class="phone" aria-hidden="true">
     <div class="b" style="left:12px;top:22px;width:88px;height:34px;font-weight:500">Leave Farm</div><span class="tag" style="left:2px;top:12px">1</span>
-    <div style="position:absolute;right:16px;top:30px;font-size:12px;font-weight:600">Yuyuan Road</div><span class="tag" style="right:2px;top:8px">2</span>
+    <div style="position:absolute;right:16px;top:30px;font-size:12px;font-weight:600">Hengshan Road</div><span class="tag" style="right:2px;top:8px">2</span>
+    <div class="goals">Day 1 goals · 1/7 ▾<br><span style="color:#899792">✓ Clear a plot</span><br><span style="color:#13956f">○ Till it</span><br>○ Sow a radish<br>○ Water it<br>○ Harvest a radish<br>○ Sell at the stall<br>○ Sow next batch</div><span class="tag" style="left:2px;top:56px">3</span>
     <div class="b" style="right:10px;top:66px;width:74px;height:26px">Coins 180</div>
-    <div class="b" style="right:10px;top:98px;width:104px;height:26px">Sunny · Water</div>
+    <div class="b" style="right:10px;top:98px;width:118px;height:26px">Sunny · water today</div>
     <div class="b" style="right:10px;top:130px;width:110px;height:26px">Next ripe 02:59</div>
-    <div class="b" style="right:10px;top:162px;width:74px;height:26px;color:#899792">Row tool</div>
-    <div class="b" style="right:10px;top:194px;width:150px;height:26px">Tilling… 56%</div>
-    <span class="tag" style="right:2px;top:64px">3</span>
-    <span class="tag" style="right:2px;top:96px">4</span>
-    <span class="tag" style="right:2px;top:128px">5</span>
-    <span class="tag" style="right:2px;top:160px">6</span>
-    <span class="tag" style="right:2px;top:192px">7</span>
-    <div style="position:absolute;left:150px;top:222px;width:14px;height:34px;background:#fff;border-radius:6px 6px 3px 3px;border:1px solid #ccc"></div>
-    <div class="bed weed" style="left:10px;top:250px"></div><div class="bed weed" style="left:95px;top:250px"></div><div class="bed weed" style="left:180px;top:250px"></div>
-    <div class="bed till" style="left:22px;top:300px"></div><div class="bed" style="left:107px;top:300px"></div><div class="bed" style="left:192px;top:300px"></div>
-    <div class="bed weed" style="left:34px;top:350px"></div><div class="bed weed" style="left:119px;top:350px"></div><div class="bed weed" style="left:204px;top:350px"></div>
-    <div class="bed res" style="left:268px;top:300px"></div>
-    <span class="tag" style="left:2px;top:296px">8</span>
-    <div class="b" style="left:12px;top:426px;width:62px;height:40px;background:#e6f7f1;border-color:#2fcf9f">Radish</div>
-    <div class="b" style="left:80px;top:426px;width:62px;height:40px">Lettuce</div>
-    <div class="b" style="left:148px;top:426px;width:62px;height:40px;color:#899792">Carrot</div>
-    <div class="b" style="left:216px;top:426px;width:72px;height:40px;color:#899792">Chamomile</div>
-    <span class="tag" style="left:2px;top:418px">9</span>
-    <div class="b" style="left:12px;top:474px;width:50px;height:40px">Clear</div>
-    <div class="b" style="left:68px;top:474px;width:50px;height:40px;background:#2fcf9f;border-color:#2fcf9f;color:#0c2a20;font-weight:600">Till</div>
-    <div class="b" style="left:124px;top:474px;width:50px;height:40px">Sow</div>
-    <div class="b" style="left:180px;top:474px;width:50px;height:40px">Care</div>
-    <div class="b" style="left:236px;top:474px;width:52px;height:40px">Reap</div>
-    <span class="tag" style="left:2px;top:466px">10</span>
-    <div class="stick"></div><span class="tag" style="left:2px;top:540px">11</span>
+    <div class="b" style="right:10px;top:162px;width:128px;height:28px;font-size:10px">Clearing… 92% · 8 left</div>
+    <span class="tag" style="right:2px;top:64px">4</span>
+    <span class="tag" style="right:2px;top:96px">5</span>
+    <span class="tag" style="right:2px;top:128px">6</span>
+    <span class="tag" style="right:2px;top:160px">7</span>
+    <div style="position:absolute;left:150px;top:230px;width:14px;height:34px;background:#fff;border-radius:6px 6px 3px 3px;border:1px solid #ccc"></div>
+    <div style="position:absolute;left:118px;top:214px;font-size:10px;font-weight:700;color:#fff;text-shadow:0 0 3px #000">Clearing…</div>
+    <div class="bed weed" style="left:10px;top:270px"></div><div class="bed weed" style="left:95px;top:270px"></div><div class="bed weed" style="left:180px;top:270px"></div>
+    <div class="bed till" style="left:22px;top:320px"></div><div class="bed" style="left:107px;top:320px"></div><div class="bed" style="left:192px;top:320px"></div>
+    <div class="bed weed" style="left:34px;top:370px"></div><div class="bed weed" style="left:119px;top:370px"></div><div class="bed weed" style="left:204px;top:370px"></div>
+    <div class="bed res" style="left:268px;top:320px"></div>
+    <span class="tag" style="left:2px;top:316px">8</span>
+    <div class="b" style="left:12px;top:454px;width:134px;height:36px;background:#e6f7f1;border-color:#2fcf9f">Radish ×6</div>
+    <div class="b" style="left:154px;top:454px;width:134px;height:36px">Lettuce ×3</div>
+    <span class="tag" style="left:2px;top:446px">9</span>
+    <div class="b" style="left:12px;top:498px;width:276px;height:44px;background:#2fcf9f;border-color:#2fcf9f;color:#0c2a20;font-weight:600;font-size:13px">Clear 9 plots</div>
+    <span class="tag" style="left:2px;top:490px">10</span>
+    <div class="stick"></div><span class="tag" style="left:2px;top:560px">11</span>
+    <div class="b" style="right:10px;bottom:24px;width:100px;height:48px">Stall</div><span class="tag" style="right:2px;bottom:70px">12</span>
   </div>
   <ol class="legend">
-    <li><span class="tag">1</span><div><b><kbd>Leave Farm</kbd></b>回到地图。长按右侧的路名 3 秒会打开导演面板（见最后一节）。</div></li>
-    <li><span class="tag">2</span><div><b>路名</b>这座农场的街区。它由服务端决定——你在选地页选了别处也会被带回自己的农场。</div></li>
-    <li><span class="tag">3</span><div><b><kbd>Coins 180</kbd></b>金币。<b>现在收获不会加钱</b>：卖菜、摊位是下一阶段（G3）才有的内容。</div></li>
-    <li><span class="tag">4</span><div><b><kbd>Sunny · Water</kbd></b>今天的田况 · 今天必需的照料。三种：<kbd>Sunny · Water</kbd>、<kbd>Rain · Drain</kbd>、<kbd>Wind · Shelter</kbd>。点 <kbd>Care</kbd> 时自动按这个来。</div></li>
-    <li><span class="tag">5</span><div><b><kbd>Next ripe</kbd></b>最近一棵作物还差多久成熟；<kbd>--:--</kbd> 表示没有在长的作物；<kbd>ready</kbd> 表示有能收的。</div></li>
-    <li><span class="tag">6</span><div><b><kbd>Row tool</kbd></b>开关。打开后点一格等于选中整畦 3 格，但仍然一格一格干、一格 2 秒——只是省手势，不省时间。</div></li>
-    <li><span class="tag">7</span><div><b>状态条</b>没选工具时提示 <kbd>Pick a tool, then tap a plot</kbd>；选了工具提示 <kbd>Tap or drag over plots</kbd>；干活时显示动词和进度。</div></li>
-    <li><span class="tag">8</span><div><b>田畦</b>三畦九格；右侧浅色那一畦是第四畦，D5 扩地前锁着，点了会提示 <kbd>This bed isn't unlocked yet</kbd>。格子的颜色就是它的状态，见下一节。</div></li>
-    <li><span class="tag">9</span><div><b>种子行</b>选要种什么。灰色的 <kbd class="off">Carrot</kbd> <kbd class="off">Chamomile</kbd> 是当前章节还没解锁（分别到 D2、D3）。第 0 章送了 6 颗萝卜、3 颗生菜种子。</div></li>
-    <li><span class="tag">10</span><div><b>工具行</b>点一个变绿即选中；<b>再点一次取消</b>，回到移动模式。选中工具后点田格或拖过多格就是干活。</div></li>
-    <li><span class="tag">11</span><div><b>摇杆</b>移动人物。没选工具时点地面也能走过去。相机跟着人走，田畦不在屏幕里就往那边走几步。</div></li>
+    <li><span class="tag">1</span><div><b><kbd>Leave Farm</kbd></b>回到地图。长按右侧的路名 3 秒会打开导演面板（QA 用，见最后一节）。</div></li>
+    <li><span class="tag">2</span><div><b>路名</b>这座农场的街区，由服务端决定——选地页选了别处也会被带回自己的农场。</div></li>
+    <li><span class="tag">3</span><div><b><kbd>Day 1 goals</kbd></b>今天的目标清单，按顺序自动打勾，绿色那条就是「现在做什么」。完成第一条后自动折成一行，点标题展开。全部完成显示 <kbd>Day complete — come back tomorrow</kbd>。</div></li>
+    <li><span class="tag">4</span><div><b><kbd>Coins</kbd></b>金币。卖菜加、买种子减。</div></li>
+    <li><span class="tag">5</span><div><b><kbd>Sunny · water today</kbd></b>今天的田况和今天要做的照料。三种：晴浇水 <kbd>water</kbd>、雨疏水 <kbd>drain</kbd>、风加固 <kbd>shelter</kbd>。点田时自动按这个来，不用选。</div></li>
+    <li><span class="tag">6</span><div><b><kbd>Next ripe</kbd></b>最近一棵作物还差多久成熟；<kbd>--:--</kbd> 没有在长的；<kbd>ready</kbd> 有能收的。</div></li>
+    <li><span class="tag">7</span><div><b>状态条</b>正在干什么、进度、还剩几格：<kbd>Walking over… 0%</kbd> → <kbd>Clearing… 92% · 8 left</kbd>。没干活时是提示语 <kbd>Tap a plot to work it</kbd>。</div></li>
+    <li><span class="tag">8</span><div><b>田畦</b>三畦九格；右边浅色那一畦是第四畦，D5 扩地前锁着。格子的颜色就是它的状态（下一节）。<b>点它，或者拖过一排</b>，每格做各自的下一步。</div></li>
+    <li><span class="tag">9</span><div><b>种子行</b>只在有翻好的地时出现。<kbd>Radish ×6</kbd> 是还剩几颗；点谁就种谁。锁着的作物（胡萝卜 D2、洋甘菊 D3）不出现。</div></li>
+    <li><span class="tag">10</span><div><b>大按钮</b>整片田现在最该做的一件事，按了就批量做。干活中会变成灰色的 <kbd>Working… 8 plots left</kbd>；没事可做时是 <kbd>Crops are growing</kbd>；有收成时是 <kbd>Sell 6 at the stall</kbd>；没种子时是 <kbd>Buy seeds at the stall</kbd>。</div></li>
+    <li><span class="tag">11</span><div><b>摇杆</b>随便走走。点不是田的地面也能走过去。</div></li>
+    <li><span class="tag">12</span><div><b><kbd>Stall</kbd></b>路边摊：卖收成、买种子。每天最多卖 100 金币。</div></li>
   </ol>
 </div>
 
 <h2><small>Plot states</small>一格田从荒地到收获</h2>
-<p>颜色就是状态。每一步只接受上一步的结果，顺序不对会弹提示，不会扣什么。</p>
 <div class="chain">
-  <div class="state"><div class="sw" style="background:var(--weed)"></div><div class="nm">荒地</div><div class="hint">长着草</div></div>
-  <div class="arrow"><kbd>Clear</kbd>→</div>
-  <div class="state"><div class="sw" style="background:var(--cleared)"></div><div class="nm">空地</div><div class="hint">光秃的棕色</div></div>
-  <div class="arrow"><kbd>Till</kbd>→</div>
-  <div class="state"><div class="sw" style="background:var(--tilled)"></div><div class="nm">翻土</div><div class="hint">深棕板</div></div>
-  <div class="arrow"><kbd>Sow</kbd>→</div>
-  <div class="state"><div class="sw" style="background:var(--seedling)"></div><div class="nm">已播种</div><div class="hint">四棵亮绿小苗，<b>还没开始长</b></div></div>
-  <div class="arrow"><kbd>Care</kbd>→</div>
-  <div class="state"><div class="sw" style="background:linear-gradient(90deg,var(--seedling),#4d9a45)"></div><div class="nm">生长中</div><div class="hint">开始倒计时，逐渐长高</div></div>
-  <div class="arrow">到点→</div>
-  <div class="state"><div class="sw" style="background:var(--ripe)"></div><div class="nm">成熟</div><div class="hint">最高、颜色最亮</div></div>
-  <div class="arrow"><kbd>Reap</kbd>→</div>
-  <div class="state"><div class="sw" style="background:var(--tilled)"></div><div class="nm">回到翻土</div><div class="hint">直接可以再播种</div></div>
+  <div class="state"><div class="sw" style="background:var(--weed)"></div><div class="nm">荒地</div><div class="hint">长着草 → 点它清理</div></div>
+  <div class="arrow">→</div>
+  <div class="state"><div class="sw" style="background:var(--cleared)"></div><div class="nm">空地</div><div class="hint">棕色 → 点它翻土</div></div>
+  <div class="arrow">→</div>
+  <div class="state"><div class="sw" style="background:var(--tilled)"></div><div class="nm">翻土</div><div class="hint">深棕板 → 点它播种</div></div>
+  <div class="arrow">→</div>
+  <div class="state"><div class="sw" style="background:var(--seedling)"></div><div class="nm">已播种</div><div class="hint">亮绿小苗，<b>还没开始长</b> → 点它照料</div></div>
+  <div class="arrow">→</div>
+  <div class="state"><div class="sw" style="background:linear-gradient(90deg,var(--seedling),#4d9a45)"></div><div class="nm">生长中</div><div class="hint">倒计时；点它只显示还差多久</div></div>
+  <div class="arrow">→</div>
+  <div class="state"><div class="sw" style="background:var(--ripe)"></div><div class="nm">成熟</div><div class="hint">最高最亮 → 点它收获</div></div>
+  <div class="arrow">→</div>
+  <div class="state"><div class="sw" style="background:var(--tilled)"></div><div class="nm">回到翻土</div><div class="hint">直接再播</div></div>
 </div>
-<div class="warn"><b>播种不等于开始长。</b>必须再做一次 <kbd>Care</kbd>（按当天田况），倒计时才启动。这是刻意的规则：照料是每天的核心动作。</div>
+<div class="warn"><b>播种不等于开始长。</b>再点一次（浇水/疏水/加固）倒计时才启动。这是刻意的：照料是每天的核心动作。</div>
 <div class="tbl"><table>
-<tr><th>作物</th><th>解锁</th><th>成熟时长</th><th>说明</th></tr>
-<tr><td><kbd>Radish</kbd> 萝卜</td><td>D0</td><td class="num">4 小时</td><td>第 0 章送的 6 颗按 <b>3 分钟</b> 特例成熟，用来上手</td></tr>
-<tr><td><kbd>Lettuce</kbd> 生菜</td><td>D0</td><td class="num">8 小时</td><td>第 0 章送 3 颗</td></tr>
-<tr><td><kbd>Carrot</kbd> 胡萝卜</td><td>D2</td><td class="num">12 小时</td><td>当前灰色</td></tr>
-<tr><td><kbd>Chamomile</kbd> 洋甘菊</td><td>D3</td><td class="num">18 小时</td><td>当前灰色</td></tr>
+<tr><th>作物</th><th>解锁</th><th>成熟</th><th>卖价 / 种子价</th></tr>
+<tr><td>Radish 萝卜</td><td>D0</td><td class="num">4 小时（第 0 章送的 6 颗 <b>3 分钟</b>）</td><td class="num">8 / 4</td></tr>
+<tr><td>Lettuce 生菜</td><td>D0</td><td class="num">8 小时</td><td class="num">12 / 6</td></tr>
+<tr><td>Carrot 胡萝卜</td><td>D2</td><td class="num">12 小时</td><td class="num">16 / 8</td></tr>
+<tr><td>Chamomile 洋甘菊</td><td>D3</td><td class="num">18 小时</td><td class="num">19 / 10</td></tr>
 </table></div>
 
-<h2><small>Weather care</small>照料要对得上田况</h2>
+<h2><small>Messages</small>顶部弹出的提示</h2>
 <div class="tbl"><table>
-<tr><th>右上显示</th><th>意思</th><th>点 <kbd>Care</kbd> 实际做的</th></tr>
-<tr><td><kbd>Sunny · Water</kbd></td><td>晴</td><td>浇水</td></tr>
-<tr><td><kbd>Rain · Drain</kbd></td><td>雨</td><td>疏水</td></tr>
-<tr><td><kbd>Wind · Shelter</kbd></td><td>风</td><td>加固遮挡</td></tr>
-</table></div>
-<p>田况按玩家日轮换（每天凌晨 4 点换日）。一格作物要的照料是<b>播种当天</b>的那种；当天种、当天照料就不会错。隔天再照料若田况变了，会提示 <kbd>Wrong care for today's weather</kbd>。</p>
-
-<h2><small>Messages</small>顶部弹出的提示是什么意思</h2>
-<div class="tbl"><table>
-<tr><th>提示</th><th>为什么</th><th>怎么办</th></tr>
-<tr><td><kbd>That plot isn't ready for this step</kbd></td><td>顺序不对（比如没清理就翻土、没翻土就播种）</td><td>看格子颜色，按上一节顺序来</td></tr>
-<tr><td><kbd>Not ripe yet</kbd></td><td>还没熟就点了 <kbd>Reap</kbd></td><td>看 <kbd>Next ripe</kbd> 倒计时</td></tr>
-<tr><td><kbd>Wrong care for today's weather</kbd></td><td>照料种类和播种当天田况不符</td><td>一般是隔天照料才会遇到</td></tr>
-<tr><td><kbd>Not enough seeds</kbd></td><td>这种作物的种子用完了</td><td>买种子是 G3 内容，现在只有第 0 章送的</td></tr>
-<tr><td><kbd>This bed isn't unlocked yet</kbd></td><td>点到了第四畦</td><td>D5 扩地后才能用</td></tr>
-<tr><td><kbd>That plot can't be farmed</kbd></td><td>点到了不是田的地方</td><td>只有九格 + 预留三格是田</td></tr>
-<tr><td><kbd>You're offline</kbd></td><td>连不上服务端，两次失败后进只读态</td><td>恢复网络后自动回来</td></tr>
-<tr><td><kbd>Offline — read only</kbd>（横幅）</td><td>同上，持续显示</td><td>工具全部禁用，能看不能动</td></tr>
+<tr><th>提示</th><th>为什么</th></tr>
+<tr><td><kbd>That plot isn't ready for this step</kbd></td><td>顺序不对（几乎不会出现——现在是自动选下一步）</td></tr>
+<tr><td><kbd>Not ripe yet</kbd></td><td>还没熟</td></tr>
+<tr><td><kbd>Wrong care for today's weather</kbd></td><td>隔天照料，田况变了</td></tr>
+<tr><td><kbd>No Radish seeds left — buy some at the stall</kbd></td><td>点了翻好的地但没种子</td></tr>
+<tr><td><kbd>The stall is sold out for today</kbd></td><td>今天 100 金币预算卖完了</td></tr>
+<tr><td><kbd>This bed isn't unlocked yet</kbd></td><td>点到第四畦</td></tr>
+<tr><td><kbd>+48 coins</kbd> / <kbd>Bought 3 Radish seeds</kbd> / <kbd>+N XP</kbd></td><td>成交、买到、涨经验</td></tr>
+<tr><td><kbd>Offline — read only</kbd>（横幅）</td><td>连不上服务端；恢复后自动回来</td></tr>
 </table></div>
 
 <h2><small>Map</small>地图页</h2>
-<h3>还没有农场时</h3>
-<p>底部出现 <kbd>Pick a neighborhood for your farm</kbd>，三张街区卡。点卡片相机飞过去、地面高亮那块街区；<kbd>Create Farm</kbd> 建场并进入。农场建在服务端，换手机、清数据后仍然是同一座。</p>
-<h3>已有农场时</h3>
 <ul>
-  <li><kbd>My Farm</kbd>（右上）进自己的农场。</li>
-  <li><kbd>Edit</kbd> 换装房。</li>
-  <li>底部 <kbd>Nearby Farmers · N</kbd>：同城开放访问的农场。<kbd>Sample A</kbd> <kbd>Sample B</kbd> 是两座系统农场，<kbd>Farmer XXXX</kbd> 是真实玩家。点一张卡 → 下面出现街区缩略图和一行摘要（<kbd>3 growing · 6 ripe · Sunny</kbd>）→ <kbd>Visit Farm</kbd>。</li>
-  <li>副标题 <kbd>Offline · sample farms</kbd> 表示连不上服务端，列表来自随包样例，仍然能进。</li>
+  <li><b>还没有农场</b>：底部 <kbd>Pick a neighborhood for your farm</kbd> 三张街区卡 → <kbd>Create Farm</kbd>。农场建在服务端，换手机、清数据都还是同一座。</li>
+  <li><b>已有农场</b>：右上 <kbd>My Farm</kbd>；<kbd>Edit</kbd> 换装；底部 <kbd>Nearby Farmers · N</kbd> 是同城开放访问的农场——<kbd>Sample A</kbd> <kbd>Sample B</kbd> 是两座系统农场。点卡 → 预览 → <kbd>Visit Farm</kbd>。</li>
+  <li><b>访客农场</b>：标题 <kbd>Visiting · …</kbd>，只能走、看、<kbd>Wave</kbd>、<kbd>Stamp</kbd>；碰不到主人的东西。你自己的农场默认 <b>Only me</b>。</li>
 </ul>
-<h3>访客农场</h3>
-<p>标题 <kbd>Visiting · Sample A</kbd>。只能走动、看、<kbd>Wave</kbd> 挥手、<kbd>Stamp</kbd> 头顶冒一个词。没有任何耕作工具，主人的东西碰不到，这两个动作也不会发给主人。<kbd>Leave Farm</kbd> 回地图，刚才选中的卡还在。</p>
-<div class="note">你自己的农场默认 <b>Only me</b>，别人的 Nearby 里看不到你。开放访问的开关（<kbd>set_visit_access</kbd>）服务端已有，界面入口是后续内容。</div>
 
-<h2><small>Director</small>导演模式（QA 用）</h2>
-<p>在农场里<b>长按顶部路名 3 秒</b>，底部弹出 <kbd>Director</kbd> 面板：</p>
-<ul>
-  <li><kbd>Speed</kbd> <kbd>1x</kbd> <kbd>60x</kbd> <kbd>480x</kbd>：服务端时间倍率。480x = 3 分钟走完一个玩家日。</li>
-  <li><kbd>Skip</kbd> <kbd>+1 day</kbd> <kbd>+2 days</kbd>：跳日。</li>
-  <li><kbd>Weather</kbd> <kbd>Sunny</kbd> <kbd>Rain</kbd> <kbd>Wind</kbd>：改今天的田况。</li>
-</ul>
-<p>三者改的都是<b>服务端</b>的时间，不是手机的。没在白名单里会显示 <kbd>This farm is not a QA instance · player xxxxxxxx</kbd>——把那串 player id 发给我加进服务器白名单，重启后再按就生效。</p>
+<h2><small>Director</small>导演模式（QA）</h2>
+<p>农场里<b>长按路名 3 秒</b>：<kbd>Speed 1x/60x/480x</kbd>（480x = 3 分钟一天）、<kbd>Skip +1 day</kbd>、<kbd>Weather</kbd>。改的是服务端时间。没在白名单会显示 <kbd>This farm is not a QA instance · player xxxxxxxx</kbd>，把那串 id 发我加进服务器白名单。</p>
 
-<h2><small>Not yet</small>现在还没有的东西</h2>
+<h2><small>Not yet</small>这一版还没有的</h2>
 <ul>
-  <li><b>卖菜、摊位、金币变化、买种子、居民、料理、章节推进</b>——全部是 G3 七日纵切的内容。所以收获后 <kbd>Coins</kbd> 不变是正常的，萝卜只进了库存。</li>
-  <li>劳作动画都是占位：人物只是俯身两秒，没有挥锄、撒种的动作。</li>
+  <li>居民、请求、料理、章节推进、次日内容——G3。今天的目标清单是客户端按状态算的。</li>
+  <li>劳作动画是占位：人物俯身两秒，没有挥锄撒种。</li>
   <li>每次冷启动都要重新选城。</li>
   <li>第四畦（预留）锁着，要到 D5。</li>
-  <li>访客卡片是色块加短名，不是对方的 3D 形象。</li>
 </ul>
-
-<p class="foot">docs/qa/farm-controls-guide.html · 界面有改动时同步更新这份文档。</p>
+<p class="foot">docs/qa/farm-controls-guide.html · 界面有改动时同步更新。</p>
 </div>
