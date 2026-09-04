@@ -29,6 +29,10 @@ var _slot_region: int = DressingCamera.Region.FULL
 
 
 func _ready() -> void:
+	# 压栈进入的新实例不会经过 AppRouter 的 suspend/resume 协议；自己的相机要不要
+	# 成为当前相机得在第一次入树时自己抢，否则会保留住地图冻结的位姿
+	# （2026-09-04 终审 C1；同样的一行也补进了 farm.gd::_ready()）。
+	cam.make_current()
 	rig = Avatar.create_rig()
 	anchor.add_child(rig)
 	rig.config_applied.connect(_on_config_applied)
@@ -97,7 +101,7 @@ func _on_back() -> void:
 	if _committing:
 		return
 	# 当前 rig 是编辑草稿；不调用 save 即可丢弃改动。
-	AppRouter.go_to_map()
+	AppRouter.pop_instance()
 
 
 func is_back_navigation_locked() -> bool:
@@ -133,7 +137,7 @@ func _on_done() -> void:
 		_show_feedback("Couldn't save. Try again.")
 		_refresh_completion_state()
 		return
-	AppRouter.go_to_map()
+	AppRouter.pop_instance()
 
 
 func _refresh_completion_state() -> void:

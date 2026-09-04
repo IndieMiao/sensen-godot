@@ -963,7 +963,9 @@ const box = (x0: number, y0: number, x1: number, y1: number): Polygon =>
 
 function scene() {
   const paths = [line([[0, 32.5], [64, 32.5]]), line([[32.5, 0], [32.5, 64]])];
-  const blocks = [box(2, 2, 30, 30), box(35, 2, 62, 30), box(2, 35, 30, 62), box(35, 35, 62, 62)];
+  // 区块必须贴到步道走廊（列/行 31-33）上：真实数据里 polygonize 出的面直接抵着路中心线；
+  // 盒子若停在 30 就会留下 1 格“护城河”，四邻接 BFS 下区块与路不连通（2026-09-03 执行时发现并修正）。
+  const blocks = [box(2, 2, 31, 31), box(34, 2, 62, 31), box(2, 34, 31, 62), box(34, 34, 62, 62)];
   const m = masks.rasterize(paths, blocks, 64, 1, 3);
   const pcs = masks.pathCells(paths, 64, 1, 3);
   return { m, pcs };

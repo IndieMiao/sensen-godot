@@ -1,0 +1,1994 @@
+{
+ "version": 0.6,
+ "generator": "Overpass API 0.7.62.11 87bfad18",
+ "osm3s": {
+  "timestamp_osm_base": "2026-09-03T12:34:40Z",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+ },
+ "elements": [
+  {
+   "type": "node",
+   "id": 21098550,
+   "lat": 34.0446273,
+   "lon": -118.2506312,
+   "tags": {
+    "crossing": "marked",
+    "crossing:markings": "zebra",
+    "highway": "crossing",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 21098551,
+   "lat": 34.0466822,
+   "lon": -118.2485524,
+   "tags": {
+    "highway": "traffic_signals"
+   }
+  },
+  {
+   "type": "node",
+   "id": 26666267,
+   "lat": 34.0439323,
+   "lon": -118.2513808,
+   "tags": {
+    "highway": "traffic_signals"
+   }
+  },
+  {
+   "type": "node",
+   "id": 69091937,
+   "lat": 34.0485145,
+   "lon": -118.2447459,
+   "tags": {
+    "source": "survey;image;usgs_imagery",
+    "source_ref": "AM909_DSCR0360"
+   }
+  },
+  {
+   "type": "node",
+   "id": 69091973,
+   "lat": 34.0460601,
+   "lon": -118.2475961,
+   "tags": {
+    "highway": "traffic_signals"
+   }
+  },
+  {
+   "type": "node",
+   "id": 69091979,
+   "lat": 34.0445977,
+   "lon": -118.249019,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 69091989,
+   "lat": 34.043267,
+   "lon": -118.2504401,
+   "tags": {
+    "highway": "traffic_signals"
+   }
+  },
+  {
+   "type": "node",
+   "id": 69238335,
+   "lat": 34.0452738,
+   "lon": -118.24993,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 69238346,
+   "lat": 34.0459556,
+   "lon": -118.250988,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 71986991,
+   "lat": 34.0474086,
+   "lon": -118.2496714,
+   "tags": {
+    "highway": "traffic_signals"
+   }
+  },
+  {
+   "type": "node",
+   "id": 72017905,
+   "lat": 34.0466548,
+   "lon": -118.252042,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 72791992,
+   "lat": 34.0427546,
+   "lon": -118.2531745,
+   "tags": {
+    "highway": "traffic_signals"
+   }
+  },
+  {
+   "type": "node",
+   "id": 122641651,
+   "lat": 34.0456078,
+   "lon": -118.250439
+  },
+  {
+   "type": "node",
+   "id": 122718678,
+   "lat": 34.047037,
+   "lon": -118.2490955
+  },
+  {
+   "type": "node",
+   "id": 122718681,
+   "lat": 34.044235,
+   "lon": -118.2518715
+  },
+  {
+   "type": "node",
+   "id": 123111591,
+   "lat": 34.0471306,
+   "lon": -118.2473546
+  },
+  {
+   "type": "node",
+   "id": 123120125,
+   "lat": 34.0475579,
+   "lon": -118.2477311,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1736499184,
+   "lat": 34.046329,
+   "lon": -118.2515498
+  },
+  {
+   "type": "node",
+   "id": 1736499198,
+   "lat": 34.046269,
+   "lon": -118.2514592
+  },
+  {
+   "type": "node",
+   "id": 1736499203,
+   "lat": 34.0479736,
+   "lon": -118.2508088
+  },
+  {
+   "type": "node",
+   "id": 1736513666,
+   "lat": 34.0480791,
+   "lon": -118.2507157,
+   "tags": {
+    "highway": "traffic_signals"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1738802894,
+   "lat": 34.0463641,
+   "lon": -118.2480661
+  },
+  {
+   "type": "node",
+   "id": 1738803668,
+   "lat": 34.0478585,
+   "lon": -118.2453669
+  },
+  {
+   "type": "node",
+   "id": 1738803670,
+   "lat": 34.047641,
+   "lon": -118.2456085
+  },
+  {
+   "type": "node",
+   "id": 1788063388,
+   "lat": 34.0440438,
+   "lon": -118.247872,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1788063389,
+   "lat": 34.0439416,
+   "lon": -118.247942,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1788063390,
+   "lat": 34.0435726,
+   "lon": -118.24813
+  },
+  {
+   "type": "node",
+   "id": 1788063392,
+   "lat": 34.0436793,
+   "lon": -118.2480603
+  },
+  {
+   "type": "node",
+   "id": 1837240625,
+   "lat": 34.046689,
+   "lon": -118.246998
+  },
+  {
+   "type": "node",
+   "id": 1842091195,
+   "lat": 34.0434723,
+   "lon": -118.2471421,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3144591450,
+   "lat": 34.0476675,
+   "lon": -118.2476271
+  },
+  {
+   "type": "node",
+   "id": 3215836961,
+   "lat": 34.0473425,
+   "lon": -118.2497358,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3308560563,
+   "lat": 34.0473144,
+   "lon": -118.2461134,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:island": "no",
+    "crossing:markings": "ladder",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3596007788,
+   "lat": 34.0438634,
+   "lon": -118.2514851,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3596007789,
+   "lat": 34.0438677,
+   "lon": -118.2512903,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3596007790,
+   "lat": 34.043989,
+   "lon": -118.2514712,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3596007791,
+   "lat": 34.0440003,
+   "lon": -118.2513016,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3620867526,
+   "lat": 34.0435926,
+   "lon": -118.2481139
+  },
+  {
+   "type": "node",
+   "id": 3620867527,
+   "lat": 34.043622,
+   "lon": -118.2480903
+  },
+  {
+   "type": "node",
+   "id": 3620867528,
+   "lat": 34.0436482,
+   "lon": -118.2480764
+  },
+  {
+   "type": "node",
+   "id": 3620867529,
+   "lat": 34.0437126,
+   "lon": -118.2480442
+  },
+  {
+   "type": "node",
+   "id": 3663669097,
+   "lat": 34.048016,
+   "lon": -118.250771,
+   "tags": {
+    "button_operated": "no",
+    "crossing": "traffic_signals",
+    "crossing:island": "no",
+    "highway": "crossing",
+    "tactile_paving": "no",
+    "traffic_signals:sound": "no",
+    "traffic_signals:vibration": "no"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3663691134,
+   "lat": 34.0460026,
+   "lon": -118.2476483,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing_ref": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3663691135,
+   "lat": 34.0461264,
+   "lon": -118.2475283,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing_ref": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3663691136,
+   "lat": 34.0461224,
+   "lon": -118.2476772,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing_ref": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3663691139,
+   "lat": 34.0466367,
+   "lon": -118.248599,
+   "tags": {
+    "crossing": "traffic_signals",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3663691140,
+   "lat": 34.0467442,
+   "lon": -118.248497,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing",
+    "tactile_paving": "no"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3663692509,
+   "lat": 34.0428003,
+   "lon": -118.2531078,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3665224325,
+   "lat": 34.0435202,
+   "lon": -118.247229,
+   "tags": {
+    "crossing": "marked",
+    "crossing:markings": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3665224326,
+   "lat": 34.0438548,
+   "lon": -118.247981,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3665224327,
+   "lat": 34.0438767,
+   "lon": -118.247832,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3665224328,
+   "lat": 34.0439836,
+   "lon": -118.248011,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3665224329,
+   "lat": 34.0445139,
+   "lon": -118.249076,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3665224330,
+   "lat": 34.0445271,
+   "lon": -118.248911,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "highway": "crossing",
+    "tactile_paving": "no"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3665224331,
+   "lat": 34.0446659,
+   "lon": -118.249109,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3665224332,
+   "lat": 34.0446661,
+   "lon": -118.248956,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3665224334,
+   "lat": 34.0458966,
+   "lon": -118.250893,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3665224335,
+   "lat": 34.0460142,
+   "lon": -118.250933,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3665224336,
+   "lat": 34.0467729,
+   "lon": -118.2470575,
+   "tags": {
+    "crossing": "marked",
+    "crossing:island": "no",
+    "crossing:markings": "lines",
+    "highway": "crossing",
+    "tactile_paving": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3698094192,
+   "lat": 34.0433416,
+   "lon": -118.2503487,
+   "tags": {
+    "crossing": "traffic_signals",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 3698094901,
+   "lat": 34.0459862,
+   "lon": -118.2474745,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing_ref": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 4020055638,
+   "lat": 34.0436414,
+   "lon": -118.2509717
+  },
+  {
+   "type": "node",
+   "id": 4042791432,
+   "lat": 34.0438664,
+   "lon": -118.249788,
+   "tags": {
+    "crossing": "marked",
+    "crossing:markings": "ladder",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 4042791446,
+   "lat": 34.0452167,
+   "lon": -118.2498494,
+   "tags": {
+    "crossing": "traffic_signals",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 4042791447,
+   "lat": 34.0452134,
+   "lon": -118.249995,
+   "tags": {
+    "crossing": "traffic_signals",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 4042791448,
+   "lat": 34.045325,
+   "lon": -118.24988,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing",
+    "tactile_paving": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 4042791449,
+   "lat": 34.0453421,
+   "lon": -118.250034,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 4072284746,
+   "lat": 34.0479434,
+   "lon": -118.24738
+  },
+  {
+   "type": "node",
+   "id": 4073826747,
+   "lat": 34.0458509,
+   "lon": -118.2472873
+  },
+  {
+   "type": "node",
+   "id": 4073835296,
+   "lat": 34.0448642,
+   "lon": -118.2503747
+  },
+  {
+   "type": "node",
+   "id": 4073851789,
+   "lat": 34.0451119,
+   "lon": -118.2468831
+  },
+  {
+   "type": "node",
+   "id": 5104705250,
+   "lat": 34.0468461,
+   "lon": -118.2488035
+  },
+  {
+   "type": "node",
+   "id": 5104705251,
+   "lat": 34.0463884,
+   "lon": -118.2488226
+  },
+  {
+   "type": "node",
+   "id": 5336735282,
+   "lat": 34.0439724,
+   "lon": -118.2513354
+  },
+  {
+   "type": "node",
+   "id": 5336787595,
+   "lat": 34.0459046,
+   "lon": -118.251046,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 5336788221,
+   "lat": 34.0460134,
+   "lon": -118.251069,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "highway": "crossing",
+    "tactile_paving": "no"
+   }
+  },
+  {
+   "type": "node",
+   "id": 5336791391,
+   "lat": 34.0467111,
+   "lon": -118.2519886,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 5336791438,
+   "lat": 34.0466016,
+   "lon": -118.251961,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 5563883603,
+   "lat": 34.0454843,
+   "lon": -118.250247
+  },
+  {
+   "type": "node",
+   "id": 5680974444,
+   "lat": 34.0434403,
+   "lon": -118.25213,
+   "tags": {
+    "crossing": "uncontrolled",
+    "crossing:markings": "yes",
+    "highway": "crossing",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 5729519862,
+   "lat": 34.0431354,
+   "lon": -118.2485533
+  },
+  {
+   "type": "node",
+   "id": 6352157005,
+   "lat": 34.0466366,
+   "lon": -118.2503715
+  },
+  {
+   "type": "node",
+   "id": 6352157009,
+   "lat": 34.0463502,
+   "lon": -118.2506455
+  },
+  {
+   "type": "node",
+   "id": 6352157026,
+   "lat": 34.0455074,
+   "lon": -118.2502848
+  },
+  {
+   "type": "node",
+   "id": 6352157028,
+   "lat": 34.0456779,
+   "lon": -118.2495287
+  },
+  {
+   "type": "node",
+   "id": 6352157033,
+   "lat": 34.0454981,
+   "lon": -118.2497028
+  },
+  {
+   "type": "node",
+   "id": 6352157034,
+   "lat": 34.0455102,
+   "lon": -118.2496911
+  },
+  {
+   "type": "node",
+   "id": 6352584274,
+   "lat": 34.0435244,
+   "lon": -118.2520021
+  },
+  {
+   "type": "node",
+   "id": 6528285621,
+   "lat": 34.0444073,
+   "lon": -118.2487128
+  },
+  {
+   "type": "node",
+   "id": 6528285622,
+   "lat": 34.0448351,
+   "lon": -118.2493379
+  },
+  {
+   "type": "node",
+   "id": 6528285624,
+   "lat": 34.0443964,
+   "lon": -118.249206
+  },
+  {
+   "type": "node",
+   "id": 6726697851,
+   "lat": 34.0471832,
+   "lon": -118.2480736
+  },
+  {
+   "type": "node",
+   "id": 6726697855,
+   "lat": 34.0470693,
+   "lon": -118.2481778
+  },
+  {
+   "type": "node",
+   "id": 6726798444,
+   "lat": 34.0451898,
+   "lon": -118.2517419
+  },
+  {
+   "type": "node",
+   "id": 6726989700,
+   "lat": 34.0437225,
+   "lon": -118.2517004
+  },
+  {
+   "type": "node",
+   "id": 6732196314,
+   "lat": 34.0476932,
+   "lon": -118.2455505
+  },
+  {
+   "type": "node",
+   "id": 6735442270,
+   "lat": 34.0454515,
+   "lon": -118.2481736
+  },
+  {
+   "type": "node",
+   "id": 6735442280,
+   "lat": 34.045528,
+   "lon": -118.2513939
+  },
+  {
+   "type": "node",
+   "id": 6784553792,
+   "lat": 34.0442575,
+   "lon": -118.2510299
+  },
+  {
+   "type": "node",
+   "id": 6784591775,
+   "lat": 34.047223,
+   "lon": -118.2474363
+  },
+  {
+   "type": "node",
+   "id": 6784591778,
+   "lat": 34.0477163,
+   "lon": -118.2475792
+  },
+  {
+   "type": "node",
+   "id": 6785658271,
+   "lat": 34.0450751,
+   "lon": -118.2518482
+  },
+  {
+   "type": "node",
+   "id": 7069321017,
+   "lat": 34.0467699,
+   "lon": -118.2502484
+  },
+  {
+   "type": "node",
+   "id": 7069321031,
+   "lat": 34.0480438,
+   "lon": -118.2451924
+  },
+  {
+   "type": "node",
+   "id": 8243567525,
+   "lat": 34.0467993,
+   "lon": -118.250218,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "ladder",
+    "crossing:signals": "yes",
+    "highway": "crossing",
+    "traffic_signals": "pedestrian_crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 8385665279,
+   "lat": 34.0463085,
+   "lon": -118.2515182
+  },
+  {
+   "type": "node",
+   "id": 9480304830,
+   "lat": 34.0466339,
+   "lon": -118.24848,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9480304831,
+   "lat": 34.0467514,
+   "lon": -118.248645,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing",
+    "tactile_paving": "no"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9480310149,
+   "lat": 34.0471932,
+   "lon": -118.2462891,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:island": "no",
+    "crossing:markings": "ladder",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9480320780,
+   "lat": 34.0474991,
+   "lon": -118.247667,
+   "tags": {
+    "crossing": "marked",
+    "crossing:island": "no",
+    "crossing:markings": "zebra",
+    "highway": "crossing",
+    "tactile_paving": "no"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9480320781,
+   "lat": 34.0474845,
+   "lon": -118.247797,
+   "tags": {
+    "crossing": "marked",
+    "crossing:markings": "zebra",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9525636152,
+   "lat": 34.0453229,
+   "lon": -118.248292,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "ladder",
+    "highway": "crossing",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9525636170,
+   "lat": 34.0484456,
+   "lon": -118.2448104,
+   "tags": {
+    "button_operated": "no",
+    "crossing": "traffic_signals",
+    "crossing:island": "no",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing",
+    "lit": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9612291728,
+   "lat": 34.0443987,
+   "lon": -118.2508771
+  },
+  {
+   "type": "node",
+   "id": 9612291735,
+   "lat": 34.0458794,
+   "lon": -118.249327,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "highway": "crossing",
+    "tactile_paving": "incorrect",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9615046585,
+   "lat": 34.0473698,
+   "lon": -118.251372,
+   "tags": {
+    "crossing": "marked",
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 10672311213,
+   "lat": 34.0462684,
+   "lon": -118.248941
+  },
+  {
+   "type": "node",
+   "id": 10908683874,
+   "lat": 34.0477774,
+   "lon": -118.2509913
+  },
+  {
+   "type": "node",
+   "id": 11086015138,
+   "lat": 34.0473385,
+   "lon": -118.2495624,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11086704618,
+   "lat": 34.046631,
+   "lon": -118.2470526,
+   "tags": {
+    "crossing": "marked",
+    "crossing:island": "no",
+    "crossing:markings": "lines",
+    "highway": "crossing",
+    "tactile_paving": "yes"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11086704625,
+   "lat": 34.0467366,
+   "lon": -118.246931,
+   "tags": {
+    "button_operated": "yes",
+    "crossing": "traffic_signals",
+    "crossing:island": "no",
+    "crossing:markings": "ladder",
+    "highway": "crossing",
+    "tactile_paving": "yes",
+    "traffic_signals:sound": "no",
+    "traffic_signals:vibration": "no"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11267327727,
+   "lat": 34.0464706,
+   "lon": -118.2505298
+  },
+  {
+   "type": "node",
+   "id": 11473868656,
+   "lat": 34.0459288,
+   "lon": -118.2509463,
+   "tags": {
+    "crossing": "uncontrolled",
+    "crossing:markings": "yes",
+    "crossing:signals": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11473868664,
+   "lat": 34.0473714,
+   "lon": -118.2496131,
+   "tags": {
+    "crossing": "uncontrolled",
+    "crossing:markings": "yes",
+    "crossing:signals": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11473900700,
+   "lat": 34.0467312,
+   "lon": -118.2486179,
+   "tags": {
+    "crossing": "uncontrolled",
+    "crossing:markings": "yes",
+    "crossing:signals": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11473900702,
+   "lat": 34.0466495,
+   "lon": -118.2485858,
+   "tags": {
+    "crossing": "uncontrolled",
+    "crossing:markings": "yes",
+    "crossing:signals": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11473900714,
+   "lat": 34.0453202,
+   "lon": -118.2500007,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "yes",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11473900725,
+   "lat": 34.0439696,
+   "lon": -118.251441,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "yes",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11473900727,
+   "lat": 34.0439814,
+   "lon": -118.251324
+  },
+  {
+   "type": "node",
+   "id": 11473900749,
+   "lat": 34.0435311,
+   "lon": -118.2519919
+  },
+  {
+   "type": "node",
+   "id": 11473900751,
+   "lat": 34.0431824,
+   "lon": -118.2525237
+  },
+  {
+   "type": "node",
+   "id": 11473900758,
+   "lat": 34.0453063,
+   "lon": -118.2498983,
+   "tags": {
+    "crossing": "marked",
+    "crossing:markings": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11473900761,
+   "lat": 34.0446367,
+   "lon": -118.2489831,
+   "tags": {
+    "crossing": "uncontrolled",
+    "crossing:markings": "yes",
+    "crossing:signals": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11473900766,
+   "lat": 34.0440033,
+   "lon": -118.2478997,
+   "tags": {
+    "crossing": "traffic_signals",
+    "crossing:markings": "zebra",
+    "crossing:signals": "yes",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 11473900813,
+   "lat": 34.0460268,
+   "lon": -118.2476261,
+   "tags": {
+    "crossing": "uncontrolled",
+    "crossing:markings": "yes",
+    "crossing:signals": "no",
+    "highway": "crossing"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13022136114,
+   "lat": 34.0470938,
+   "lon": -118.2491835
+  },
+  {
+   "type": "node",
+   "id": 13143880499,
+   "lat": 34.045583,
+   "lon": -118.2480483
+  },
+  {
+   "type": "node",
+   "id": 13463325102,
+   "lat": 34.0484175,
+   "lon": -118.244837,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights",
+    "traffic_signals:direction": "backward"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13463333656,
+   "lat": 34.0472536,
+   "lon": -118.246202
+  },
+  {
+   "type": "node",
+   "id": 13463333657,
+   "lat": 34.0471662,
+   "lon": -118.2463272,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights",
+    "traffic_signals:direction": "backward"
+   }
+  },
+  {
+   "type": "node",
+   "id": 13463333658,
+   "lat": 34.0473376,
+   "lon": -118.2460775,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights",
+    "traffic_signals:direction": "forward"
+   }
+  },
+  {
+   "type": "way",
+   "id": 13458280,
+   "nodes": [
+    123120125,
+    9480320780,
+    6784591775,
+    123111591,
+    3665224336,
+    1837240625
+   ],
+   "tags": {
+    "highway": "residential",
+    "lit": "yes",
+    "name": "Winston Street",
+    "sidewalk:both": "separate",
+    "tiger:cfcc": "A41",
+    "tiger:county": "Los Angeles, CA",
+    "tiger:name_base": "Winston",
+    "tiger:name_type": "St",
+    "tiger:zip_left": "90013",
+    "tiger:zip_right": "90013"
+   }
+  },
+  {
+   "type": "way",
+   "id": 47805886,
+   "nodes": [
+    69091937,
+    9525636170,
+    13463325102,
+    7069321031,
+    1738803668,
+    6732196314,
+    1738803670,
+    13463333658,
+    3308560563,
+    13463333656,
+    9480310149,
+    13463333657,
+    11086704625,
+    1837240625,
+    11086704618,
+    3663691135,
+    69091973
+   ],
+   "tags": {
+    "highway": "secondary",
+    "lanes": "4",
+    "lit": "yes",
+    "name": "South Los Angeles Street",
+    "oneway": "no",
+    "sidewalk:both": "separate",
+    "source": "survey;image;usgs_imagery",
+    "source_ref": "AM909_DSCR0359"
+   }
+  },
+  {
+   "type": "way",
+   "id": 161689967,
+   "nodes": [
+    1788063389,
+    3665224326,
+    3620867529,
+    1788063392,
+    3620867528,
+    3620867527,
+    3620867526,
+    1788063390,
+    5729519862
+   ],
+   "tags": {
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "Maple Avenue",
+    "sidewalk:both": "separate",
+    "tiger:cfcc": "A41",
+    "tiger:county": "Los Angeles, CA",
+    "tiger:name_base": "Maple",
+    "tiger:name_direction_prefix": "S",
+    "tiger:name_type": "Ave",
+    "tiger:zip_left": "90014",
+    "tiger:zip_right": "90014"
+   }
+  },
+  {
+   "type": "way",
+   "id": 186070722,
+   "nodes": [
+    69091973,
+    3663691136,
+    1738802894,
+    9480304830,
+    21098551
+   ],
+   "tags": {
+    "cycleway:left": "separate",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "name": "East 5th Street",
+    "oneway": "yes",
+    "sidewalk:both": "separate"
+   }
+  },
+  {
+   "type": "way",
+   "id": 206354180,
+   "nodes": [
+    1788063389,
+    3665224327,
+    3665224325,
+    1842091195
+   ],
+   "tags": {
+    "cycleway:left": "separate",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "25 mph",
+    "name": "East 6th Street",
+    "oneway": "yes",
+    "sidewalk:both": "separate"
+   }
+  },
+  {
+   "type": "way",
+   "id": 206372068,
+   "nodes": [
+    26666267,
+    5336735282,
+    11473900727,
+    3596007791,
+    6784553792,
+    9612291728,
+    21098550,
+    4073835296
+   ],
+   "tags": {
+    "FIXME:lanes": "verify",
+    "cycleway:left": "separate",
+    "cycleway:left:oneway": "no",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "name": "South Main Street",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "sidewalk:both": "separate",
+    "source": "survey, image, usgs_imagery",
+    "source_ref": "AM909_DSCR0362"
+   }
+  },
+  {
+   "type": "way",
+   "id": 206372069,
+   "nodes": [
+    21098551,
+    3663691140,
+    6726697855,
+    6726697851,
+    9480320781,
+    123120125,
+    3144591450,
+    6784591778,
+    4072284746
+   ],
+   "tags": {
+    "FIXME:lanes": "verify",
+    "cycleway:left": "separate",
+    "cycleway:left:oneway": "no",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "name": "South Main Street",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "parking:both": "on_kerb",
+    "parking:both:orientation": "parallel",
+    "sidewalk:both": "separate",
+    "source": "survey, image, usgs_imagery",
+    "source_ref": "AM909_DSCR0362",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 234665444,
+   "nodes": [
+    69238335,
+    4042791446,
+    6528285622,
+    3665224331,
+    69091979
+   ],
+   "tags": {
+    "cycleway:left": "separate",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "25 mph",
+    "name": "East 6th Street",
+    "oneway": "yes",
+    "sidewalk:both": "separate"
+   }
+  },
+  {
+   "type": "way",
+   "id": 234667498,
+   "nodes": [
+    122718681,
+    3596007790,
+    11473900725,
+    26666267
+   ],
+   "tags": {
+    "cycleway:left": "separate",
+    "cycleway:right": "shared_lane",
+    "highway": "secondary",
+    "lanes": "3",
+    "lanes:backward": "1",
+    "lanes:forward": "2",
+    "lit": "yes",
+    "name": "West 7th Street",
+    "old_name": "Pacific Highway Auto Trail",
+    "old_ref": "US 101",
+    "sidewalk:both": "separate",
+    "source": "survey, image, usgs_imagery;survey;image;usgs_imagery",
+    "source_ref": "AM909_DSCR9527",
+    "turn:lanes:forward": "left|"
+   }
+  },
+  {
+   "type": "way",
+   "id": 382238932,
+   "nodes": [
+    72017905,
+    5336791391,
+    9615046585,
+    10908683874,
+    1736499203,
+    3663669097,
+    1736513666
+   ],
+   "tags": {
+    "highway": "secondary",
+    "lanes": "5",
+    "lit": "yes",
+    "name": "South Broadway",
+    "note:lanes": "2 southbound, 3 northbound",
+    "old_name": "National Old Trails Road",
+    "old_ref": "US 66",
+    "oneway": "no",
+    "sidewalk:both": "separate",
+    "source": "survey;image;usgs_imagery",
+    "source_ref": "AM909_DSCR0364",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 382241129,
+   "nodes": [
+    72017905,
+    5336791438,
+    1736499184,
+    8385665279,
+    1736499198,
+    5336788221,
+    69238346
+   ],
+   "tags": {
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "25 mph",
+    "name": "West 6th Street",
+    "oneway": "yes",
+    "sidewalk:both": "separate",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 382241130,
+   "nodes": [
+    69238346,
+    11473868656,
+    3665224334,
+    122641651
+   ],
+   "tags": {
+    "cycleway:left": "separate",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "25 mph",
+    "name": "West 6th Street",
+    "oneway": "yes",
+    "sidewalk:both": "separate"
+   }
+  },
+  {
+   "type": "way",
+   "id": 399270700,
+   "nodes": [
+    4073826747,
+    3698094901,
+    69091973
+   ],
+   "tags": {
+    "cycleway:left": "separate",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "name": "East 5th Street",
+    "oneway": "yes",
+    "sidewalk:both": "separate"
+   }
+  },
+  {
+   "type": "way",
+   "id": 399270702,
+   "nodes": [
+    4020055638,
+    3596007789,
+    26666267
+   ],
+   "tags": {
+    "highway": "secondary",
+    "lanes": "4",
+    "lanes:backward": "2",
+    "lanes:forward": "2",
+    "lit": "yes",
+    "name": "East 7th Street",
+    "sidewalk:both": "separate",
+    "source": "survey, image, usgs_imagery;survey;image;usgs_imagery",
+    "source_ref": "AM909_DSCR9527",
+    "surface": "asphalt",
+    "turn:lanes:forward": "|right"
+   }
+  },
+  {
+   "type": "way",
+   "id": 405163390,
+   "nodes": [
+    4073835296,
+    4042791447,
+    69238335
+   ],
+   "tags": {
+    "FIXME:lanes": "verify",
+    "cycleway:left": "separate",
+    "cycleway:left:oneway": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "South Main Street",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "sidewalk:both": "separate",
+    "source": "survey, image, usgs_imagery",
+    "source_ref": "AM909_DSCR0362"
+   }
+  },
+  {
+   "type": "way",
+   "id": 438256776,
+   "nodes": [
+    5104705250,
+    122718678,
+    13022136114,
+    11086015138,
+    11473868664,
+    71986991
+   ],
+   "tags": {
+    "cycleway:left": "track",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "name": "West 5th Street",
+    "oneway": "yes",
+    "sidewalk:both": "separate"
+   }
+  },
+  {
+   "type": "way",
+   "id": 438257924,
+   "nodes": [
+    71986991,
+    3215836961,
+    8243567525,
+    7069321017,
+    6352157005,
+    11267327727,
+    6352157009
+   ],
+   "tags": {
+    "bicycle": "yes",
+    "cycleway:left": "separate",
+    "cycleway:left:oneway": "no",
+    "cycleway:right": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "South Spring Street",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "sidewalk:both": "separate",
+    "source": "survey;image;usgs_imagery",
+    "source_ref": "AM909_DSCR0363"
+   }
+  },
+  {
+   "type": "way",
+   "id": 438274650,
+   "nodes": [
+    69091979,
+    3665224329,
+    6528285624,
+    4042791432,
+    3698094192,
+    69091989
+   ],
+   "tags": {
+    "highway": "secondary",
+    "lanes": "4",
+    "lit": "yes",
+    "name": "South Los Angeles Street",
+    "oneway": "no",
+    "sidewalk:both": "separate",
+    "source": "survey;image;usgs_imagery",
+    "source_ref": "AM909_DSCR0359"
+   }
+  },
+  {
+   "type": "way",
+   "id": 518244671,
+   "nodes": [
+    122641651,
+    6352157026,
+    5563883603,
+    4042791449,
+    11473900714,
+    69238335
+   ],
+   "tags": {
+    "cycleway:left": "separate",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "25 mph",
+    "name": "West 6th Street",
+    "oneway": "yes",
+    "sidewalk:both": "separate"
+   }
+  },
+  {
+   "type": "way",
+   "id": 524575358,
+   "nodes": [
+    21098551,
+    11473900700,
+    9480304831,
+    5104705250
+   ],
+   "tags": {
+    "cycleway:left": "separate",
+    "highway": "primary",
+    "lanes": "4",
+    "lit": "yes",
+    "name": "West 5th Street",
+    "oneway": "yes",
+    "sidewalk:both": "separate"
+   }
+  },
+  {
+   "type": "way",
+   "id": 524575359,
+   "nodes": [
+    5104705251,
+    3663691139,
+    11473900702,
+    21098551
+   ],
+   "tags": {
+    "FIXME:lanes": "verify",
+    "cycleway:left": "separate",
+    "cycleway:left:oneway": "no",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "name": "South Main Street",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "sidewalk:both": "separate",
+    "source": "survey, image, usgs_imagery",
+    "source_ref": "AM909_DSCR0362"
+   }
+  },
+  {
+   "type": "way",
+   "id": 524575360,
+   "nodes": [
+    69238335,
+    11473900758,
+    4042791448,
+    6352157033,
+    6352157034,
+    6352157028,
+    9612291735,
+    10672311213
+   ],
+   "tags": {
+    "FIXME:lanes": "verify",
+    "cycleway:left": "separate",
+    "cycleway:left:oneway": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "South Main Street",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "sidewalk:both": "separate",
+    "source": "survey, image, usgs_imagery",
+    "source_ref": "AM909_DSCR0362"
+   }
+  },
+  {
+   "type": "way",
+   "id": 603531506,
+   "nodes": [
+    72791992,
+    3663692509,
+    11473900751,
+    5680974444,
+    6352584274,
+    11473900749,
+    6726989700,
+    3596007788,
+    26666267
+   ],
+   "tags": {
+    "FIXME:lanes": "verify",
+    "cycleway:left": "track",
+    "cycleway:left:oneway": "no",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "name": "South Main Street",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "sidewalk:both": "separate",
+    "source": "survey, image, usgs_imagery",
+    "source_ref": "AM909_DSCR0362",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 603568541,
+   "nodes": [
+    4073851789,
+    1788063388,
+    11473900766,
+    1788063389
+   ],
+   "tags": {
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "Maple Avenue",
+    "sidewalk:both": "separate",
+    "tiger:cfcc": "A41",
+    "tiger:county": "Los Angeles, CA",
+    "tiger:name_base": "Maple",
+    "tiger:name_direction_prefix": "S",
+    "tiger:name_type": "Ave",
+    "tiger:zip_left": "90013",
+    "tiger:zip_right": "90013"
+   }
+  },
+  {
+   "type": "way",
+   "id": 603568542,
+   "nodes": [
+    69091979,
+    3665224330,
+    6528285621,
+    3665224328,
+    1788063389
+   ],
+   "tags": {
+    "cycleway:left": "separate",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "25 mph",
+    "name": "East 6th Street",
+    "oneway": "yes",
+    "sidewalk:both": "separate",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 604060339,
+   "nodes": [
+    69238346,
+    5336787595,
+    6735442280,
+    6726798444,
+    6785658271
+   ],
+   "tags": {
+    "bicycle": "yes",
+    "cycleway:left": "separate",
+    "cycleway:left:oneway": "no",
+    "cycleway:right": "no",
+    "highway": "primary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "South Spring Street",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "sidewalk:both": "separate",
+    "source": "survey;image;usgs_imagery",
+    "source_ref": "AM909_DSCR0363"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1014457434,
+   "nodes": [
+    69091973,
+    11473900813,
+    3663691134,
+    13143880499,
+    6735442270,
+    9525636152,
+    3665224332,
+    11473900761,
+    69091979
+   ],
+   "tags": {
+    "highway": "secondary",
+    "lanes": "4",
+    "lit": "yes",
+    "name": "South Los Angeles Street",
+    "oneway": "no",
+    "sidewalk:both": "separate",
+    "source": "survey;image;usgs_imagery",
+    "source_ref": "AM909_DSCR0359"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1051470208,
+   "nodes": [
+    6352157009,
+    3665224335,
+    69238346
+   ],
+   "tags": {
+    "bicycle": "yes",
+    "cycleway:left": "separate",
+    "cycleway:left:oneway": "no",
+    "cycleway:right": "no",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "name": "South Spring Street",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "sidewalk:both": "separate",
+    "source": "survey;image;usgs_imagery",
+    "source_ref": "AM909_DSCR0363",
+    "turn:lanes": "left||"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1146882440,
+   "nodes": [
+    10672311213,
+    5104705251
+   ],
+   "tags": {
+    "FIXME:lanes": "verify",
+    "cycleway:left": "separate",
+    "cycleway:left:oneway": "no",
+    "highway": "primary",
+    "lanes": "3",
+    "lit": "yes",
+    "name": "South Main Street",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "sidewalk:both": "separate",
+    "source": "survey, image, usgs_imagery",
+    "source_ref": "AM909_DSCR0362",
+    "turn:lanes": "left||"
+   }
+  }
+ ]
+}

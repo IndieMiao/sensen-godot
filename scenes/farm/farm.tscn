@@ -1,0 +1,79 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/farm/farm.gd" id="1_farm"]
+[ext_resource type="Script" path="res://modules/ui/safe_area_margin.gd" id="2_sa"]
+[ext_resource type="Script" path="res://modules/ui/touch_stick.gd" id="3_joy"]
+
+[sub_resource type="Environment" id="Environment_farm"]
+background_mode = 1
+background_color = Color(0.82, 0.9, 0.96, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.9, 0.92, 0.9, 1)
+ambient_light_energy = 0.6
+
+[node name="Farm" type="Node3D"]
+script = ExtResource("1_farm")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 20, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_farm")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+fov = 45.0
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+
+[node name="Props" type="Node3D" parent="."]
+
+[node name="Player" type="Node3D" parent="."]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="SafeArea" type="MarginContainer" parent="HUD"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("2_sa")
+
+[node name="Root" type="Control" parent="HUD/SafeArea"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TopBar" type="HBoxContainer" parent="HUD/SafeArea/Root"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 4.0
+offset_bottom = 56.0
+grow_horizontal = 2
+theme_override_constants/separation = 12
+
+[node name="ExitButton" type="Button" parent="HUD/SafeArea/Root/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
+text = "Leave Farm"
+
+[node name="Title" type="Label" parent="HUD/SafeArea/Root/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_type_variation = &"RailCaption"
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 2
+text_overrun_behavior = 3
+
+[node name="Joystick" type="Control" parent="HUD/SafeArea/Root"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -176.0
+offset_right = 176.0
+offset_bottom = -16.0
+script = ExtResource("3_joy")

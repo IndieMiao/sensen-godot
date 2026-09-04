@@ -74,9 +74,11 @@ func test_android_root_back_uses_move_task_to_back() -> void:
 	assert_bool(plugin_source.contains("moveTaskToBack(true)")).is_true()
 
 
-func test_android_stress_qa_entry_is_debug_only_and_keeps_map_as_default() -> void:
+func test_android_stress_qa_entry_is_debug_only_and_keeps_city_select_as_default() -> void:
+	# main_scene 自 Task 13 起是城市选择页（PRD §4.3 第 1 条），不再是地图；
+	# 本断言只守护「QA 压测入口不会悄悄顶替默认场景」这条不变量。
 	assert_str(ProjectSettings.get_setting(
-		"application/run/main_scene", "")).is_equal(RouterScript.MAP)
+		"application/run/main_scene", "")).is_equal(RouterScript.CITY_SELECT)
 	var plugin_source := FileAccess.get_file_as_string(
 		"res://tools/android/overlay/GodotMapPlugin.kt")
 	assert_bool(plugin_source.contains(

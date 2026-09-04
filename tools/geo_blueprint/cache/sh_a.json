@@ -1,0 +1,842 @@
+{
+ "version": 0.6,
+ "generator": "Overpass API 0.7.62.11 87bfad18",
+ "osm3s": {
+  "timestamp_osm_base": "2026-09-03T12:26:31Z",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+ },
+ "elements": [
+  {
+   "type": "node",
+   "id": 94632188,
+   "lat": 31.2065738,
+   "lon": 121.4443399
+  },
+  {
+   "type": "node",
+   "id": 94632194,
+   "lat": 31.2063002,
+   "lon": 121.4444157
+  },
+  {
+   "type": "node",
+   "id": 107723851,
+   "lat": 31.2016595,
+   "lon": 121.446958
+  },
+  {
+   "type": "node",
+   "id": 107724016,
+   "lat": 31.2020181,
+   "lon": 121.4479001
+  },
+  {
+   "type": "node",
+   "id": 107724065,
+   "lat": 31.2022404,
+   "lon": 121.4485752
+  },
+  {
+   "type": "node",
+   "id": 107724102,
+   "lat": 31.2026054,
+   "lon": 121.4497733,
+   "tags": {
+    "bus": "yes",
+    "name": "肇嘉浜路枫林路",
+    "name:zh": "肇嘉浜路枫林路",
+    "name:zh-Hans": "肇嘉浜路枫林路",
+    "name:zh-Hant": "肇嘉浜路楓林路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 107724243,
+   "lat": 31.2029098,
+   "lon": 121.4505666
+  },
+  {
+   "type": "node",
+   "id": 107724388,
+   "lat": 31.2031115,
+   "lon": 121.4511226,
+   "tags": {
+    "created_by": "JOSM"
+   }
+  },
+  {
+   "type": "node",
+   "id": 107743493,
+   "lat": 31.2019013,
+   "lon": 121.4467477
+  },
+  {
+   "type": "node",
+   "id": 107743526,
+   "lat": 31.2022189,
+   "lon": 121.4477013
+  },
+  {
+   "type": "node",
+   "id": 107743572,
+   "lat": 31.2024907,
+   "lon": 121.4484617
+  },
+  {
+   "type": "node",
+   "id": 107743698,
+   "lat": 31.2028486,
+   "lon": 121.4495346
+  },
+  {
+   "type": "node",
+   "id": 107743740,
+   "lat": 31.2031796,
+   "lon": 121.4503655,
+   "tags": {
+    "bus": "yes",
+    "name": "肇嘉浜路枫林路",
+    "name:zh": "肇嘉浜路枫林路",
+    "name:zh-Hans": "肇嘉浜路枫林路",
+    "name:zh-Hant": "肇嘉浜路楓林路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 107743786,
+   "lat": 31.2034912,
+   "lon": 121.4511106
+  },
+  {
+   "type": "node",
+   "id": 107758818,
+   "lat": 31.2015842,
+   "lon": 121.445824,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 107758853,
+   "lat": 31.2018231,
+   "lon": 121.4457384
+  },
+  {
+   "type": "node",
+   "id": 107758878,
+   "lat": 31.2026827,
+   "lon": 121.4454758,
+   "tags": {
+    "bus": "yes",
+    "name": "乌鲁木齐南路建国西路",
+    "name:zh": "乌鲁木齐南路建国西路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 267698895,
+   "lat": 31.2019624,
+   "lon": 121.4490652
+  },
+  {
+   "type": "node",
+   "id": 267698932,
+   "lat": 31.2030299,
+   "lon": 121.4486208
+  },
+  {
+   "type": "node",
+   "id": 267698933,
+   "lat": 31.204481,
+   "lon": 121.4483655,
+   "tags": {
+    "bus": "yes",
+    "name": "岳阳路建国西路",
+    "name:zh": "岳阳路建国西路",
+    "name:zh-Hans": "岳阳路建国西路",
+    "name:zh-Hant": "岳陽路建國西路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 267698934,
+   "lat": 31.2074908,
+   "lon": 121.4478442
+  },
+  {
+   "type": "node",
+   "id": 267698935,
+   "lat": 31.2087138,
+   "lon": 121.4475938
+  },
+  {
+   "type": "node",
+   "id": 267698936,
+   "lat": 31.2097436,
+   "lon": 121.4473544
+  },
+  {
+   "type": "node",
+   "id": 601669704,
+   "lat": 31.2079026,
+   "lon": 121.4477691
+  },
+  {
+   "type": "node",
+   "id": 601675009,
+   "lat": 31.2103594,
+   "lon": 121.4471874
+  },
+  {
+   "type": "node",
+   "id": 601675019,
+   "lat": 31.2025786,
+   "lon": 121.4487581,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 601675065,
+   "lat": 31.2045624,
+   "lon": 121.445855
+  },
+  {
+   "type": "node",
+   "id": 601675067,
+   "lat": 31.2050162,
+   "lon": 121.4470782
+  },
+  {
+   "type": "node",
+   "id": 601675069,
+   "lat": 31.2052919,
+   "lon": 121.4482179,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 601675073,
+   "lat": 31.2054719,
+   "lon": 121.4487471
+  },
+  {
+   "type": "node",
+   "id": 601675075,
+   "lat": 31.2061693,
+   "lon": 121.4510109,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 601675077,
+   "lat": 31.2069671,
+   "lon": 121.4535322,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights"
+   }
+  },
+  {
+   "type": "node",
+   "id": 601675165,
+   "lat": 31.2036755,
+   "lon": 121.451659,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights",
+    "traffic_signals:direction": "forward"
+   }
+  },
+  {
+   "type": "node",
+   "id": 601675168,
+   "lat": 31.203165,
+   "lon": 121.4513091,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "traffic_lights",
+    "traffic_signals:direction": "forward"
+   }
+  },
+  {
+   "type": "node",
+   "id": 601712324,
+   "lat": 31.2033528,
+   "lon": 121.4435133
+  },
+  {
+   "type": "node",
+   "id": 601712360,
+   "lat": 31.2021477,
+   "lon": 121.4396431
+  },
+  {
+   "type": "node",
+   "id": 601712362,
+   "lat": 31.2030457,
+   "lon": 121.4424599
+  },
+  {
+   "type": "node",
+   "id": 601712368,
+   "lat": 31.204041,
+   "lon": 121.4450104,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 601712376,
+   "lat": 31.2036051,
+   "lon": 121.445135
+  },
+  {
+   "type": "node",
+   "id": 601712422,
+   "lat": 31.2012915,
+   "lon": 121.4458524,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 603891424,
+   "lat": 31.2023397,
+   "lon": 121.4405878,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 640448687,
+   "lat": 31.2023162,
+   "lon": 121.4488871,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 856908984,
+   "lat": 31.2014839,
+   "lon": 121.4493275,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1577605553,
+   "lat": 31.2028966,
+   "lon": 121.4420234,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 1577605554,
+   "lat": 31.2056095,
+   "lon": 121.4445932
+  },
+  {
+   "type": "node",
+   "id": 2412392614,
+   "lat": 31.2019149,
+   "lon": 121.4385675
+  },
+  {
+   "type": "node",
+   "id": 4679395122,
+   "lat": 31.2088268,
+   "lon": 121.4475727
+  },
+  {
+   "type": "node",
+   "id": 4679395123,
+   "lat": 31.2089881,
+   "lon": 121.4475343
+  },
+  {
+   "type": "node",
+   "id": 4855777095,
+   "lat": 31.2051392,
+   "lon": 121.4475867
+  },
+  {
+   "type": "node",
+   "id": 4855777102,
+   "lat": 31.2048807,
+   "lon": 121.4465144,
+   "tags": {
+    "highway": "traffic_signals",
+    "traffic_signals": "signal"
+   }
+  },
+  {
+   "type": "node",
+   "id": 4855777107,
+   "lat": 31.2050004,
+   "lon": 121.4470123
+  },
+  {
+   "type": "node",
+   "id": 8314000815,
+   "lat": 31.2047379,
+   "lon": 121.4461729
+  },
+  {
+   "type": "node",
+   "id": 8339246221,
+   "lat": 31.2019378,
+   "lon": 121.4387807
+  },
+  {
+   "type": "node",
+   "id": 8902742827,
+   "lat": 31.2019311,
+   "lon": 121.4387182
+  },
+  {
+   "type": "node",
+   "id": 8955286896,
+   "lat": 31.202755,
+   "lon": 121.4492655
+  },
+  {
+   "type": "node",
+   "id": 8955286898,
+   "lat": 31.2025013,
+   "lon": 121.4494527
+  },
+  {
+   "type": "node",
+   "id": 9812010108,
+   "lat": 31.2051623,
+   "lon": 121.4476883,
+   "tags": {
+    "bus": "yes",
+    "name": "建国西路岳阳路",
+    "name:zh": "建国西路岳阳路",
+    "name:zh-Hans": "建国西路岳阳路",
+    "name:zh-Hant": "建國西路岳陽路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9812010110,
+   "lat": 31.2037811,
+   "lon": 121.4445408,
+   "tags": {
+    "bus": "yes",
+    "name": "建国西路乌鲁木齐南路",
+    "name:zh": "建国西路乌鲁木齐南路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9812031560,
+   "lat": 31.2022422,
+   "lon": 121.4401172,
+   "tags": {
+    "bus": "yes",
+    "name": "建国西路宛平路",
+    "name:zh": "建国西路宛平路",
+    "public_transport": "stop_position"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9857828751,
+   "lat": 31.2029292,
+   "lon": 121.4453917
+  },
+  {
+   "type": "node",
+   "id": 10222346876,
+   "lat": 31.2020411,
+   "lon": 121.4456813
+  },
+  {
+   "type": "node",
+   "id": 10222346879,
+   "lat": 31.2032199,
+   "lon": 121.4430643
+  },
+  {
+   "type": "node",
+   "id": 10222346901,
+   "lat": 31.203116,
+   "lon": 121.442702
+  },
+  {
+   "type": "node",
+   "id": 10222346934,
+   "lat": 31.2032843,
+   "lon": 121.4432841
+  },
+  {
+   "type": "node",
+   "id": 10222346938,
+   "lat": 31.2033685,
+   "lon": 121.4435822
+  },
+  {
+   "type": "node",
+   "id": 10222346943,
+   "lat": 31.2034933,
+   "lon": 121.4439781
+  },
+  {
+   "type": "node",
+   "id": 10222346946,
+   "lat": 31.2038113,
+   "lon": 121.4446026
+  },
+  {
+   "type": "node",
+   "id": 10222346948,
+   "lat": 31.2032663,
+   "lon": 121.4452647
+  },
+  {
+   "type": "node",
+   "id": 10222346949,
+   "lat": 31.2028054,
+   "lon": 121.4454355
+  },
+  {
+   "type": "node",
+   "id": 10664133542,
+   "lat": 31.2050816,
+   "lon": 121.4447133
+  },
+  {
+   "type": "node",
+   "id": 10664133543,
+   "lat": 31.2025088,
+   "lon": 121.4487924
+  },
+  {
+   "type": "node",
+   "id": 10664133544,
+   "lat": 31.2027063,
+   "lon": 121.4491253
+  },
+  {
+   "type": "node",
+   "id": 12338800543,
+   "lat": 31.2059957,
+   "lon": 121.4504493
+  },
+  {
+   "type": "node",
+   "id": 12338800568,
+   "lat": 31.2067092,
+   "lon": 121.4527245
+  },
+  {
+   "type": "way",
+   "id": 43763515,
+   "nodes": [
+    2412392614,
+    8902742827,
+    8339246221,
+    601712360,
+    9812031560,
+    603891424,
+    1577605553,
+    601712362,
+    10222346901,
+    10222346879,
+    10222346934,
+    601712324,
+    10222346938,
+    10222346943,
+    9812010110,
+    10222346946,
+    601712368
+   ],
+   "tags": {
+    "cycleway:both": "lane",
+    "cycleway:left:oneway": "-1",
+    "highway": "tertiary",
+    "lanes": "2",
+    "name": "建国西路",
+    "name:en": "West Jianguo Road",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 47226030,
+   "nodes": [
+    601675019,
+    267698932,
+    267698933,
+    601675069,
+    267698934,
+    601669704,
+    267698935,
+    4679395122,
+    4679395123,
+    267698936,
+    601675009
+   ],
+   "tags": {
+    "cycleway:both": "no",
+    "highway": "residential",
+    "name": "岳阳路",
+    "name:en": "Yueyang Road",
+    "oneway": "yes",
+    "oneway:bicycle": "no"
+   }
+  },
+  {
+   "type": "way",
+   "id": 438427487,
+   "nodes": [
+    601712368,
+    601675065,
+    8314000815,
+    4855777102,
+    4855777107,
+    601675067,
+    4855777095,
+    9812010108,
+    601675069,
+    601675073,
+    12338800543,
+    601675075,
+    12338800568,
+    601675077
+   ],
+   "tags": {
+    "cycleway:both": "lane",
+    "cycleway:left:oneway": "-1",
+    "highway": "tertiary",
+    "lane_markings": "yes",
+    "name": "建国西路",
+    "name:en": "West Jianguo Road",
+    "name:zh": "建国西路",
+    "name:zh-Hans": "建国西路",
+    "name:zh-Hant": "建國西路",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "surface": "asphalt",
+    "wikipedia": "zh:建国西路 (上海)"
+   }
+  },
+  {
+   "type": "way",
+   "id": 492977113,
+   "nodes": [
+    94632188,
+    94632194,
+    1577605554,
+    10664133542,
+    601712368,
+    601712376,
+    10222346948,
+    9857828751,
+    10222346949,
+    107758878,
+    10222346876,
+    107758853,
+    107758818
+   ],
+   "tags": {
+    "cycleway:both": "lane",
+    "cycleway:left:oneway": "-1",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "乌鲁木齐南路",
+    "name:en": "South Wulumuqi Road",
+    "name:zh": "乌鲁木齐南路",
+    "name:zh-Hans": "乌鲁木齐南路",
+    "name:zh-Hant": "烏魯木齊南路",
+    "oneway": "yes",
+    "oneway:bicycle": "no",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 654530823,
+   "nodes": [
+    640448687,
+    10664133543,
+    601675019
+   ],
+   "tags": {
+    "cycleway": "opposite_lane",
+    "cycleway:right": "lane",
+    "highway": "residential",
+    "name": "枫林路",
+    "name:en": "Fenglin Road",
+    "name:zh": "枫林路",
+    "name:zh-Hans": "枫林路",
+    "name:zh-Hant": "楓林路",
+    "oneway": "yes"
+   }
+  },
+  {
+   "type": "way",
+   "id": 967979540,
+   "nodes": [
+    601675165,
+    107743786,
+    107743740,
+    107743698,
+    8955286896,
+    10664133544,
+    601675019
+   ],
+   "tags": {
+    "cycleway:left": "no",
+    "cycleway:right": "lane",
+    "highway": "primary",
+    "lanes": "4",
+    "lit": "yes",
+    "name": "肇嘉浜路",
+    "name:en": "Zhaojiabang Road",
+    "name:zh": "肇嘉浜路",
+    "name:zh-Hans": "肇嘉浜路",
+    "name:zh-Hant": "肇嘉浜路",
+    "oneway": "yes",
+    "source": "estimation",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1005400043,
+   "nodes": [
+    640448687,
+    8955286898,
+    107724102,
+    107724243,
+    107724388,
+    601675168
+   ],
+   "tags": {
+    "cycleway:left": "no",
+    "cycleway:right": "lane",
+    "highway": "primary",
+    "lanes": "4",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "肇嘉浜路",
+    "name:en": "Zhaojiabang Road",
+    "name:zh": "肇嘉浜路",
+    "name:zh-Hans": "肇嘉浜路",
+    "name:zh-Hant": "肇嘉浜路",
+    "oneway": "yes",
+    "source": "estimation",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1074771158,
+   "nodes": [
+    601712422,
+    107723851,
+    107724016,
+    107724065,
+    640448687
+   ],
+   "tags": {
+    "cycleway:left": "no",
+    "cycleway:right": "lane",
+    "highway": "primary",
+    "lanes": "4",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "肇嘉浜路",
+    "name:en": "Zhaojiabang Road",
+    "name:zh": "肇嘉浜路",
+    "name:zh-Hans": "肇嘉浜路",
+    "name:zh-Hant": "肇嘉浜路",
+    "oneway": "yes",
+    "source": "estimation",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1270822636,
+   "nodes": [
+    601675019,
+    107743572,
+    107743526,
+    107743493,
+    107758818
+   ],
+   "tags": {
+    "cycleway:left": "no",
+    "cycleway:right": "lane",
+    "highway": "primary",
+    "lanes": "4",
+    "lit": "yes",
+    "name": "肇嘉浜路",
+    "name:en": "Zhaojiabang Road",
+    "name:zh": "肇嘉浜路",
+    "name:zh-Hans": "肇嘉浜路",
+    "name:zh-Hant": "肇嘉浜路",
+    "oneway": "yes",
+    "source": "estimation",
+    "surface": "asphalt"
+   }
+  },
+  {
+   "type": "way",
+   "id": 1270822637,
+   "nodes": [
+    856908984,
+    267698895,
+    640448687
+   ],
+   "tags": {
+    "cycleway": "opposite_lane",
+    "cycleway:right": "lane",
+    "highway": "residential",
+    "name": "枫林路",
+    "name:en": "Fenglin Road",
+    "name:zh": "枫林路",
+    "name:zh-Hans": "枫林路",
+    "name:zh-Hant": "楓林路",
+    "oneway": "yes"
+   }
+  }
+ ]
+}

@@ -50,6 +50,7 @@ const DOUBLE_TAP_MAX_PX := 32.0
 
 @onready var rigs: Node3D = $Rigs
 @onready var cam: Camera3D = $Camera3D
+@onready var world_env: WorldEnvironment = $WorldEnvironment
 @onready var safe_area: SafeAreaMargin = $HUD/SafeArea
 @onready var top_panel: PanelContainer = $HUD/SafeArea/Root/TopPanel
 @onready var status_dot: Panel = $HUD/SafeArea/Root/TopPanel/VBox/StatusRow/Dot
@@ -93,6 +94,9 @@ var pitch := 45.0
 var pixel_ratio := 1.0
 var _touch_count := 0
 var _camera_dirty := true
+## suspend() 里从 world_env.environment 摘下来的引用，resume() 时原样插回去
+## （suspend/resume 协议的一部分，见 app_router.gd::_suspend 的类注释）。
+var _saved_environment: Environment
 var _in_la := false
 var _rng := RandomNumberGenerator.new()
 ## 每项：{lat, lng, node: holder Node3D, activity: RigActivity}
@@ -134,13 +138,26 @@ var _zoom_vel := 0.0
 var _gesture_multi := false
 var _load_bar_started_ms := 0
 var _map_is_ready := false
+## 受限模式（PRD §3.1）：由 FarmRegions 的城市选择触发；为真时地图只做「看见、选择、返回」。
+var street_mode := false
+var region: Dictionary = {}
+## 平移边界（lat/lng）：position=(lat_min,lng_min)，size=(lat span,lng span)；零 size 不钳。
+var pan_bounds := Rect2()
+var candidate_overlay: CandidateOverlay = null
+var select_panel: SelectPanel = null
+var _candidate_bps: Dictionary = {} # layout_patch_id -> FarmBlueprint
 
 func _ready() -> void:
 	_load_bar_started_ms = Time.get_ticks_msec()
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
 	get_viewport().transparent_bg = true
 	$Sun.rotation_degrees = Vector3(-55, 30, 0)
-	_spawn_la_fixture() # 压测夹具先排队；home 队列等定位确定后再插
+	var choice := FarmRegions.load_choice()
+	var regions := FarmRegions.load_default()
+	if regions != null and not choice.is_empty() and not regions.region(choice).is_empty():
+		enter_street_mode(regions.region(choice))
+	if not street_mode:
+		_spawn_la_fixture() # 压测夹具先排队；home 队列等定位确定后再插
 	_wire_buttons()
 
 	# marker 层：铺满 HUD 且排在最底，别挡住芯片和按钮。
@@ -152,6 +169,7 @@ func _ready() -> void:
 	marker_layer.z_index = -10
 	$HUD.add_child(marker_layer)
 	$HUD.move_child(marker_layer, 0)
+	marker_layer.visible = not street_mode
 	_sync_marker_margins()
 	safe_area.margins_applied.connect(func(_m): call_deferred("_sync_marker_margins"))
 
@@ -175,9 +193,12 @@ func _ready() -> void:
 			location_status.text = "Check your connection"
 			_header_locked = true
 		else:
-			map.create_map(token, START_LAT, START_LNG, zoom)
+			var lat0 := float(region.center[0]) if street_mode else START_LAT
+			var lng0 := float(region.center[1]) if street_mode else START_LNG
+			map.create_map(token, lat0, lng0, zoom)
 			_set_dot(DOT_WAIT, true) # 连接中：呼吸闪烁
-		map.start_location()
+		if not street_mode:
+			map.start_location()
 	else:
 		_map_is_ready = true
 		_set_dot(DOT_WAIT, false)
@@ -188,15 +209,14 @@ func _ready() -> void:
 	# 没有这条，_spawn_home_cohort 永远不会被调用，地图上只剩洛杉矶夹具。
 	get_tree().create_timer(HOME_TIMEOUT_S).timeout.connect(
 		func(): _resolve_home(START_LAT, START_LNG, true))
+	if street_mode:
+		_resolve_home(float(region.center[0]), float(region.center[1]), false)
+		load_candidates(region)
 	_camera_dirty = true
 
-## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）
+## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）；城市选择页共用同一工厂。
 func _make_bridge() -> MapBridge:
-	if Engine.has_singleton("GodotMap"):
-		return MapBridgeAndroid.new()
-	if OS.get_name() == "iOS":
-		return MapBridgeIOS.new()
-	return null
+	return MapBridgeFactory.make()
 
 func _exit_tree() -> void:
 	# 场景切走的清理：transparent_bg 是根视口全局态，不还原会把换装房的
@@ -221,7 +241,7 @@ func _process(_dt: float) -> void:
 		_refresh_header()
 
 func _refresh_header() -> void:
-	nearby_count.text = _people_count_text(_visible_role_count())
+	nearby_count.text = _nearby_label_text()
 	if _header_locked:
 		return
 	region_title.text = _region_title_text()
@@ -229,6 +249,15 @@ func _refresh_header() -> void:
 
 func _people_count_text(count: int) -> String:
 	return "%d %s" % [count, "person" if count == 1 else "people"]
+
+## D4（2026-09-04 真机实测）：受限模式下按设计不生成近处路人（_spawn_home_cohort
+## 只排玩家自己），人数结构性恒为 0——"0 people" 是误导性的空信息。受限模式下
+## 改显示已选城市名字（region.name，来自 FarmRegions），比一个恒为零的数字更有
+## 意义；自由漫游路径的人数文案保持不变。
+func _nearby_label_text() -> String:
+	if street_mode:
+		return str(region.get("name", ""))
+	return _people_count_text(_visible_role_count())
 
 func _region_title_text() -> String:
 	if _in_la:
@@ -290,6 +319,7 @@ func _apply_world_delta(delta: Vector3) -> void:
 		center_lat + (-delta.z) / MapGeoMath.M_PER_DEG_LAT, -85.051129, 85.051129)
 	center_lng += delta.x / (MapGeoMath.M_PER_DEG_LAT * cos(deg_to_rad(anchor_lat)))
 	center_lng = wrapf(center_lng, -180.0, 180.0)
+	_clamp_to_bounds()
 
 func _update_cameras() -> void:
 	center_world = MapGeoMath.geo_to_world(center_lat, center_lng, anchor_lat, anchor_lng)
@@ -349,6 +379,8 @@ func _reposition_pawns() -> void:
 	for p in _pawns:
 		(p.node as Node3D).position = MapGeoMath.geo_to_world(
 			p.lat, p.lng, anchor_lat, anchor_lng)
+	if candidate_overlay:
+		candidate_overlay.reanchor(anchor_lat, anchor_lng)
 
 ## 相机射线与地面平面（y=0）的交点。近地平线的甩飞防护不在这里做——
 ## 在拖拽处对单次 delta 限幅（limit_length(d)），比丢弃命中点的手感更接近原生地图。
@@ -423,7 +455,8 @@ func _unhandled_input(e: InputEvent) -> void:
 			if _touch_count <= 1: # 第二指落下（捏合起手）不算双击，镜像拖拽路径的门禁
 				if _is_double_tap(Time.get_ticks_msec(), e.position):
 					_last_tap_ms = 0
-					_tween_zoom(zoom + 1.0)
+					if not street_mode:
+						_tween_zoom(zoom + 1.0)
 				else:
 					_last_tap_ms = Time.get_ticks_msec()
 					_last_tap_pos = e.position
@@ -446,13 +479,13 @@ func _unhandled_input(e: InputEvent) -> void:
 		_drag_accum_px += e.relative.length()
 		if _drag_accum_px > DOUBLE_TAP_MAX_PX:
 			_last_tap_ms = 0
-	elif e is InputEventMagnifyGesture:
+	elif e is InputEventMagnifyGesture and not street_mode:
 		# 与拖拽同款：应用之后把变化量换算成 zoom/秒 做 EMA 平滑，松手接着走。
 		var dz := log(e.factor) / log(2.0)
 		_set_zoom(zoom + dz)
 		var zdt := maxf(get_process_delta_time(), 0.001)
 		_zoom_vel = lerpf(_zoom_vel, dz / zdt, FLING_EMA)
-	elif e is InputEventPanGesture:
+	elif e is InputEventPanGesture and not street_mode:
 		_set_pitch(pitch - e.delta.y * 0.2)
 
 func _wire_buttons() -> void:
@@ -491,7 +524,115 @@ func _teleport(lat: float, lng: float) -> void:
 	_reposition_pawns()
 	_camera_dirty = true
 
+## —— 受限模式 ——————————————————————————————————————————————
+
+func enter_street_mode(r: Dictionary) -> void:
+	street_mode = true
+	region = r
+	zoom = float(r.get("street_zoom", 16.0))
+	pitch = float(r.get("pitch", 45.0))
+	bearing = 0.0
+	if is_node_ready():
+		view_mode_switch.get_parent().visible = false
+		travel_btn.get_parent().visible = false
+		if marker_layer:
+			marker_layer.visible = false
+		if not _home_resolved:
+			_resolve_home(float(r.center[0]), float(r.center[1]), false)
+		load_candidates(r)
+	_camera_dirty = true
+
+func set_pan_bounds(center_lat: float, center_lng: float, half_m: float) -> void:
+	var dlat := half_m / MapGeoMath.M_PER_DEG_LAT
+	var dlng := half_m / (MapGeoMath.M_PER_DEG_LAT * cos(deg_to_rad(center_lat)))
+	pan_bounds = Rect2(center_lat - dlat, center_lng - dlng, 2.0 * dlat, 2.0 * dlng)
+	_clamp_to_bounds()
+
+## —— 候选流（PRD §4.3）——————————————————————————————————————————
+
+func load_candidates(r: Dictionary) -> void:
+	if candidate_overlay:
+		return
+	_candidate_bps.clear()
+	var items: Array = []
+	for c in r.get("candidates", []):
+		var id := str(c.layout_patch_id)
+		var bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(id, int(c.get("revision", 1))))
+		if bp == null:
+			continue
+		_candidate_bps[id] = bp
+		var preview_path := "res://assets/blueprints/%s/r%d/preview.png" % [id, int(c.get("revision", 1))]
+		items.append({"id": id, "name": str(c.get("name", id)),
+			"preview": load(preview_path) if ResourceLoader.exists(preview_path) else null})
+	candidate_overlay = CandidateOverlay.new()
+	candidate_overlay.name = "Candidates"
+	add_child(candidate_overlay)
+	candidate_overlay.set_candidates(_candidate_bps.values(), anchor_lat, anchor_lng)
+	select_panel = SelectPanel.new()
+	$HUD/SafeArea/Root.add_child(select_panel)
+	select_panel.set_candidates(items)
+	select_panel.candidate_focused.connect(focus_candidate)
+	select_panel.confirmed.connect(_on_candidate_confirmed)
+	if not items.is_empty():
+		focus_candidate(items[0].id)
+
+func focus_candidate(id: String) -> void:
+	if not _candidate_bps.has(id):
+		return
+	var center: Vector2 = _candidate_bps[id].overlay.center
+	fly_to(center.x, center.y)
+	set_pan_bounds(center.x, center.y, 300.0)
+	candidate_overlay.select(id)
+	if select_panel.focused_id != id:
+		select_panel.focus(id)
+
+func _save_choice(id: String) -> void:
+	FarmChoice.save(id, _candidate_bps[id].revision)
+
+func _on_candidate_confirmed(id: String) -> void:
+	_save_choice(id)
+	AppRouter.push_instance(AppRouter.FARM, {"layout_patch_id": id, "revision": _candidate_bps[id].revision})
+
+func _clamp_to_bounds() -> void:
+	if pan_bounds.size == Vector2.ZERO:
+		return
+	center_lat = clampf(center_lat, pan_bounds.position.x, pan_bounds.position.x + pan_bounds.size.x)
+	center_lng = clampf(center_lng, pan_bounds.position.y, pan_bounds.position.y + pan_bounds.size.y)
+
+func fly_to(lat: float, lng: float) -> void:
+	_teleport(lat, lng)
+	_clamp_to_bounds()
+
+## 场景栈协议（AppRouter.push_instance）：进入第二层实例时地图完全隐藏并停渲染，
+## 同时交出相机与环境的所有权——只隐藏节点不够：Godot 4 里 Camera3D/WorldEnvironment
+## 不会因为父节点 visible=false 就失去"当前"身份，压栈场景会看见地图相机冻结的位姿
+## 和地图的天空/环境光（2026-09-04 终审 C1）。
+func suspend() -> void:
+	process_mode = Node.PROCESS_MODE_DISABLED
+	visible = false
+	$HUD.visible = false
+	if map:
+		map.set_map_visible(false)
+	get_viewport().transparent_bg = false
+	cam.current = false
+	if world_env.environment:
+		_saved_environment = world_env.environment
+	world_env.environment = null
+
+func resume() -> void:
+	process_mode = Node.PROCESS_MODE_INHERIT
+	visible = true
+	$HUD.visible = true
+	get_viewport().transparent_bg = true
+	if map:
+		map.set_map_visible(true)
+	_camera_dirty = true
+	cam.make_current()
+	world_env.environment = _saved_environment
+
 func _set_zoom(v: float) -> void:
+	if street_mode:
+		return
 	zoom = clampf(v, 3.0, 20.0)
 	_camera_dirty = true
 
@@ -541,7 +682,7 @@ func _spawn_home_cohort() -> void:
 	# push_front：自己排队头，第一个出队，玩家最先看到自己
 	_spawn_queue.push_front({"lat": home_lat, "lng": home_lng,
 		"cfg": self_config(), "anim": "idle", "cohort": "self"})
-	for i in PAWNS_NEAR_COUNT:
+	for i in (0 if street_mode else PAWNS_NEAR_COUNT):
 		var off := _rand_offset_deg(NEAR_SPREAD_M, home_lat)
 		_spawn_queue.append({"lat": home_lat + off.y, "lng": home_lng + off.x,
 			"cfg": _random_config(), "anim": _rand_anim(), "cohort": "near"})
@@ -642,6 +783,15 @@ func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String, cohort: 
 	_pawns.append(pawn)
 	_camera_dirty = true
 
+## D3（2026-09-04 真机实测）：受限模式顶栏卡死在「Loading map...」——这里原来
+## 无条件用自由漫游的 INITIAL_ROLE_COUNT（1 自己 + 12 近处路人 + 10 洛杉矶夹具
+## = 23）当门禁，但受限模式下 _spawn_home_cohort() 不排近处路人（for i in
+## (0 if street_mode else PAWNS_NEAR_COUNT)）、_spawn_la_fixture() 在 _ready()
+## 里被 `if not street_mode` 整个跳过——ready 顶多到 1（玩家自己），23 永远
+## 够不着，进度条永远不消失，_location_status_text() 也就永远卡在加载态。
+func _expected_role_count() -> int:
+	return 1 if street_mode else INITIAL_ROLE_COUNT
+
 func _update_load_bar() -> void:
 	if not load_bar.visible:
 		return
@@ -649,10 +799,11 @@ func _update_load_bar() -> void:
 	for p in _pawns:
 		if p.ready:
 			ready += 1
-	load_bar.max_value = INITIAL_ROLE_COUNT + 1
+	var expected := _expected_role_count()
+	load_bar.max_value = expected + 1
 	load_bar.value = ready + (1 if _map_is_ready else 0)
 	var elapsed_ms := Time.get_ticks_msec() - _load_bar_started_ms
-	if _map_is_ready and ready >= INITIAL_ROLE_COUNT and _spawn_queue.is_empty() \
+	if _map_is_ready and ready >= expected and _spawn_queue.is_empty() \
 			and elapsed_ms >= LOAD_BAR_MIN_VISIBLE_MS:
 		load_bar.visible = false
 		_refresh_header()

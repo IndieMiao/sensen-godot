@@ -1,0 +1,61 @@
+{
+ "format": 1,
+ "regions": [
+  {
+   "id": "shanghai",
+   "name": "Shanghai",
+   "timezone": "Asia/Shanghai",
+   "center": [
+    31.2304,
+    121.4737
+   ],
+   "street_zoom": 16,
+   "pitch": 45,
+   "candidates": [
+    {
+     "layout_patch_id": "sh_a",
+     "revision": 1,
+     "name": "Hengshan Road"
+    },
+    {
+     "layout_patch_id": "sh_b",
+     "revision": 1,
+     "name": "Old Town"
+    },
+    {
+     "layout_patch_id": "sh_c",
+     "revision": 1,
+     "name": "Yuyuan Road"
+    }
+   ]
+  },
+  {
+   "id": "los_angeles",
+   "name": "Los Angeles",
+   "timezone": "America/Los_Angeles",
+   "center": [
+    34.0522,
+    -118.2437
+   ],
+   "street_zoom": 16,
+   "pitch": 45,
+   "candidates": [
+    {
+     "layout_patch_id": "la_a",
+     "revision": 1,
+     "name": "Historic Core"
+    },
+    {
+     "layout_patch_id": "la_b",
+     "revision": 1,
+     "name": "Venice Canals"
+    },
+    {
+     "layout_patch_id": "la_c",
+     "revision": 1,
+     "name": "Silver Lake"
+    }
+   ]
+  }
+ ]
+}
