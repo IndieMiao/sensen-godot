@@ -53,6 +53,10 @@ var _last_bulk: Dictionary = {}
 ## 可能被服务端拒掉的预测（自动玩家：sow 被拒后紧跟的 care 照样发了出去）。
 var _in_flight := 0
 var _cta_was_busy := false
+## 每秒重画一次：成熟是时间派生的，没有回包也没有输入会通知它——不定时刷，倒计时不走、
+## 作物不变高、大按钮永远停在「Crops are growing」（自动玩家第四轮等了 260 秒）。
+var _tick := 0.0
+const TICK_S := 1.0
 
 @onready var cam: Camera3D = $Camera3D
 @onready var ground: MeshInstance3D = $Ground
@@ -211,6 +215,10 @@ func _process(dt: float) -> void:
 		elif busy_now:
 			hud.set_cta_busy(runner.pending_count())
 	_tick_title_hold(dt)
+	_tick += dt
+	if _tick >= TICK_S and not visitor and predictor:
+		_tick = 0.0
+		_render()
 	_update_camera()
 
 func _update_camera() -> void:
@@ -493,7 +501,8 @@ func _refresh_hud() -> void:
 		_last_bulk = {"action": "", "cells": [], "label": "Offline — farm not connected", "enabled": false}
 	else:
 		_last_bulk = NextStep.bulk(_actionable_view(), now, st, hud.selected_crop, unlocked)
-	hud.set_cta(_last_bulk)
+	if not _cta_was_busy:
+		hud.set_cta(_last_bulk)
 	hud.set_goals(DayGoals.evaluate(st, cells), chapter)
 	if stall and stall.visible:
 		# 延后到帧末：refresh 会重建按钮，而这里可能正处在某个按钮的 pressed 回调里。

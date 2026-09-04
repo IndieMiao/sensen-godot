@@ -299,3 +299,28 @@ func test_goals_collapse_after_the_first_goal_completes() -> void:
 	assert_str(f.hud._goals_header.text).is_equal("Goals · 1/7 ▸")
 	f.hud._goals_header.pressed.emit()
 	assert_bool(f.hud._goals_list.visible).is_true()
+
+func test_ripening_flips_the_cta_and_the_crop_without_any_input() -> void:
+	# 成熟是时间派生的：没有回包、没有输入，也必须靠每秒一次的刷新自己变过来。
+	var f: Node = await _online_farm(FakeTransport.new([]))
+	var cell: Vector2i = f.bp.beds()[0].cells[0]
+	var id := "%d,%d" % [cell.x, cell.y]
+	for k in f.predictor.cells:
+		f.predictor.cells[k] = {"state": "cleared", "crop": null, "ready_at": null}
+	f.predictor.cells[id] = {"state": "growing", "crop": "R", "care_done_at": f._now() - 1000, "ready_at": f._now() + 800}
+	f._refresh_hud()
+	assert_str(f.hud._cta.text).is_equal("Till 8 plots")
+	f.session.clock_offset_ms += 1000            # 服务端时间走过成熟点
+	f._process(f.TICK_S + 0.01)                   # 一个节拍
+	assert_str(f.hud._cta.text).is_equal("Harvest 1 plot")
+	assert_str(f.hud._timer_label.text).is_equal("Next ripe ready")
+	var mm: MultiMesh = f.crop_field._mm["R"].multimesh
+	assert_float(mm.get_instance_transform(0).basis.get_scale().y).is_equal_approx(CropField.STAGE_SIZE[3].y, 0.001)
+
+func test_periodic_refresh_does_not_unbusy_the_cta() -> void:
+	var f: Node = await _online_farm(FakeTransport.new([]))
+	f._on_cta()
+	f._process(0.0)
+	f._process(f.TICK_S + 0.01)
+	assert_bool(f.hud._cta.disabled).is_true()
+	assert_bool(f.hud._cta.text.begins_with("Working…")).is_true()
