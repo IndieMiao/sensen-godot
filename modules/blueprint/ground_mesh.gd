@@ -28,8 +28,12 @@ static func build(bp: FarmBlueprint, scale := 1.0) -> ArrayMesh:
 			var x1 := (i + 1) * s
 			var z0 := -j * s
 			var z1 := -(j + 1) * s
-			var quad := [Vector3(x0, 0, z0), Vector3(x1, 0, z0), Vector3(x1, 0, z1),
-				Vector3(x0, 0, z0), Vector3(x1, 0, z1), Vector3(x0, 0, z1)]
+			# Godot 的正面是顺时针（Mesh 文档："clockwise winding order for front faces"），
+			# 这里的顺序是从 +Y 往下看的顺时针；写成逆时针的话地表从上方看全是背面、被
+			# cull_back 整片剔掉——真机截图里农场"黑底"就是它（2026-09-04）。
+			# tests/blueprint/test_ground_mesh.gd 以 PlaneMesh 为基准守着这个方向。
+			var quad := [Vector3(x0, 0, z0), Vector3(x1, 0, z1), Vector3(x1, 0, z0),
+				Vector3(x0, 0, z0), Vector3(x0, 0, z1), Vector3(x1, 0, z1)]
 			for v in quad:
 				st.set_normal(Vector3.UP)
 				st.set_color(col)

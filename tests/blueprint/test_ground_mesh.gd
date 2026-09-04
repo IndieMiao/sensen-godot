@@ -62,3 +62,40 @@ func test_build_places_cell_colors_at_expected_offsets() -> void:
 		assert_float(colors[idx].r).is_equal_approx(BlueprintGroundMesh.COLOR_BLOCK.r, 0.01)
 		assert_float(colors[idx].g).is_equal_approx(BlueprintGroundMesh.COLOR_BLOCK.g, 0.01)
 		assert_float(colors[idx].b).is_equal_approx(BlueprintGroundMesh.COLOR_BLOCK.b, 0.01)
+
+## 2026-09-04 真机 + 桌面渲染：地表从上方看完全不可见（真机截图里整片黑底、桌面上整片
+## 天空色，田畦和房子却都在）。Godot 的正面缠绕是顺时针（Mesh 类文档："Godot uses clockwise
+## winding order for front faces of triangle primitive modes"），build() 之前按逆时针写
+## 三角形，从 +Y 往下看全是背面，被 StandardMaterial3D 默认的 cull_back 剔掉。以引擎自带、
+## 朝 +Y 的 PlaneMesh 为基准比较缠绕方向，不把手算的叉积符号写死进测试。
+func test_ground_triangles_wind_like_an_upward_plane_mesh() -> void:
+	var plane := PlaneMesh.new().get_mesh_arrays()
+	var reference := signf(_cross_y(plane, 0))
+	assert_float(reference).is_not_equal(0.0)
+	var bp := FarmBlueprint.load_file(FIX)
+	var arrays := BlueprintGroundMesh.build(bp).surface_get_arrays(0)
+	var tri_count := (arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 3
+	var flipped := 0
+	for t in tri_count:
+		if signf(_cross_y(arrays, t)) != reference:
+			flipped += 1
+	assert_int(flipped).is_equal(0)
+
+## 第 tri 个三角形 (b-a)×(c-a) 的 y 分量：符号即缠绕方向。兼容有/无索引数组两种网格
+## （PlaneMesh 带索引，SurfaceTool.commit() 不带）。
+static func _cross_y(arrays: Array, tri: int) -> float:
+	var v: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var idx = arrays[Mesh.ARRAY_INDEX]
+	var i0 := tri * 3
+	var a: Vector3
+	var b: Vector3
+	var c: Vector3
+	if idx != null and (idx as PackedInt32Array).size() > 0:
+		a = v[idx[i0]]
+		b = v[idx[i0 + 1]]
+		c = v[idx[i0 + 2]]
+	else:
+		a = v[i0]
+		b = v[i0 + 1]
+		c = v[i0 + 2]
+	return (b - a).cross(c - a).y
