@@ -39,7 +39,7 @@ func _ready() -> void:
 	add_child(farm)
 	await get_tree().process_frame
 	_ok(farm.session == session, "farm 挂上会话")
-	_ok(farm.hud._goals_header.text == "Day 1 goals · 0/7", "目标 0/7（实际 %s）" % farm.hud._goals_header.text)
+	_ok(farm.hud._goals_header.text.begins_with("Goals · 0/7"), "目标 0/7（实际 %s）" % farm.hud._goals_header.text)
 
 	print("\n2. 只按大按钮，直到没事可做")
 	Engine.time_scale = 4.0   # 走路与 2 秒/格只是节奏，加速不影响服务端
@@ -68,7 +68,7 @@ func _ready() -> void:
 		if str(session.state.cells[id].state) == "growing":
 			growing += 1
 	_ok(growing == 9, "服务端 9 格 growing（实际 %d）" % growing)
-	_ok(farm.hud._goals_header.text.begins_with("Day 1 goals · 4/7"), "目标 4/7（实际 %s）" % farm.hud._goals_header.text)
+	_ok(farm.hud._goals_header.text.begins_with("Goals · 4/7"), "目标 4/7（实际 %s）" % farm.hud._goals_header.text)
 	_ok(str(farm.hud._cta.text) == "Crops are growing", "等待态 CTA（实际 %s）" % farm.hud._cta.text)
 
 	print("\n3. 等教学萝卜成熟（3 分钟）")

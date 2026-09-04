@@ -73,9 +73,9 @@ func _build_top_right() -> void:
 	var box := VBoxContainer.new()
 	box.name = "TopRight"
 	box.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	# Root 只有 328 宽（360 减两侧 16 安全边距）：目标卡占 8..158，右上列占 166..320。
-	# 最宽的 chip「Sunny · water today」148，正好装下。
-	box.offset_left = -162.0
+	# Root 只有 328 宽（360 减两侧 16 安全边距）：目标卡占 8..138，右上列占 142..320。
+	# 状态 chip 要装下「Sowing Radish… · 5 left」，目标卡多数时候是折叠的一行，让它窄一点。
+	box.offset_left = -186.0
 	box.offset_top = 60.0
 	box.offset_right = -8.0
 	box.alignment = BoxContainer.ALIGNMENT_END
@@ -98,7 +98,7 @@ func _build_top_right() -> void:
 	_status_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	# 固定宽：省略号模式下 Label 最小宽是 1，SHRINK_END 的 chip 会缩成 29 px 的空白小丸；
 	# 不固定又会被长句撑到和左边的目标卡相撞。
-	_status_label.custom_minimum_size.x = 126.0
+	_status_label.custom_minimum_size.x = 150.0
 	v.add_child(_status_label)
 	_status_bar = ProgressBar.new()
 	_status_bar.show_percentage = false
@@ -128,12 +128,12 @@ func _build_goals() -> void:
 	_goals.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	_goals.offset_left = 8.0
 	_goals.offset_top = 60.0
-	_goals.offset_right = 150.0
+	_goals.offset_right = 138.0
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 2)
 	_goals.add_child(v)
 	_goals_header = Button.new()
-	_goals_header.text = "Day 1 goals · 0/7"
+	_goals_header.text = "Goals · 0/7 ▾"
 	_goals_header.flat = true
 	_goals_header.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_goals_header.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
@@ -153,13 +153,14 @@ func _build_goals() -> void:
 ## 行节点复用：_refresh_hud 每次回包都会调用，重建 Label 会留一堆等帧末释放的孤儿。
 func set_goals(goals: Array, day_index: int) -> void:
 	var done := DayGoals.done_count(goals)
-	_goals_header.text = "Day %d goals · %d/%d %s" % [day_index + 1, done, goals.size(), "▾" if _goals_open else "▸"]
+	# 「Goals · 2/7 ▾」而不是「Day 1 goals · 2/7」：卡只有 130 宽，长标题会把整张卡撑到和右上列相撞。
+	_goals_header.text = "Goals · %d/%d %s" % [done, goals.size(), "▾" if _goals_open else "▸"]
 	# 第一条完成后自动折叠成一行：整张卡展开着会一直挡住左上那一畦；点标题随时展开。
 	if done > 0 and not _goals_auto_collapsed:
 		_goals_auto_collapsed = true
 		_goals_open = false
 		_goals_list.visible = false
-		_goals_header.text = "Day %d goals · %d/%d ▸" % [day_index + 1, done, goals.size()]
+		_goals_header.text = "Goals · %d/%d ▸" % [done, goals.size()]
 	var rows: Array = []
 	var highlighted := false
 	for g in goals:

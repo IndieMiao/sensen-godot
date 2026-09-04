@@ -252,11 +252,11 @@ func test_server_rejection_is_shown_and_prediction_rolled_back() -> void:
 
 func test_goals_and_coins_follow_server_state() -> void:
 	var f: Node = await _online_farm(FakeTransport.new([]))
-	assert_bool(f.hud._goals_header.text.begins_with("Day 1 goals · 0/7")).is_true()
+	assert_bool(f.hud._goals_header.text.begins_with("Goals · 0/7")).is_true()
 	f.session.state.xp.first_harvest_crops = ["R"]
 	f.session.state.wallet = 204
 	f.session.state_changed.emit(f.session.state, 3)
-	assert_bool(f.hud._goals_header.text.begins_with("Day 1 goals · 5/7")).is_true()
+	assert_bool(f.hud._goals_header.text.begins_with("Goals · 5/7")).is_true()
 	assert_str(f.hud._coins.text).is_equal("Coins 204")
 
 func test_stall_sells_and_toasts_the_coins() -> void:
@@ -296,6 +296,6 @@ func test_goals_collapse_after_the_first_goal_completes() -> void:
 	f.session.state.xp.first_clear_cells = ["1,1"]
 	f.session.state_changed.emit(f.session.state, 2)
 	assert_bool(f.hud._goals_list.visible).is_false()
-	assert_str(f.hud._goals_header.text).is_equal("Day 1 goals · 1/7 ▸")
+	assert_str(f.hud._goals_header.text).is_equal("Goals · 1/7 ▸")
 	f.hud._goals_header.pressed.emit()
 	assert_bool(f.hud._goals_list.visible).is_true()
