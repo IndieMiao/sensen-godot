@@ -15,6 +15,8 @@ signal queue_empty()
 const ACTION_S := 2.0
 
 var _queue: Array = []          ## [{cell, action}]
+## 暂停：当前格已开工（cell_started 已发）但计时不走——宿主用它实现「先走到地头再干活」。
+var paused := false
 var _current = null
 var _elapsed := 0.0
 
@@ -64,6 +66,8 @@ func step(dt: float) -> void:
 			return
 		_start_next()
 		# 起手这一帧不计时：否则第一格会被吞掉一个 dt，长队列越走越偏。
+		return
+	if paused:
 		return
 	_elapsed += dt
 	if _elapsed < ACTION_S:

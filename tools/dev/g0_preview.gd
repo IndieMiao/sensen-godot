@@ -71,9 +71,34 @@ func _select() -> void:
 	panel.set_candidates(items)
 	panel.focus(items[0].id)
 
+## 喂一个假会话：第 0 章开局 + 一畦已翻土、一格在长、一格熟了，HUD 才有内容可看。
 func _farm() -> void:
+	var bp := FarmBlueprint.load_file(FARM_BLUEPRINT)
+	var cells := {}
+	var beds := bp.beds()
+	for b in beds.size():
+		for i in 3:
+			var c: Vector2i = beds[b].cells[i]
+			var slot := {"state": "wild", "crop": null, "care_done_at": null, "ready_at": null}
+			if b == 1:
+				slot.state = "tilled"
+			if b == 2 and i == 0:
+				slot = {"state": "growing", "crop": "R", "care_done_at": 0, "ready_at": 1}
+			if b == 2 and i == 1:
+				slot = {"state": "growing", "crop": "L", "care_done_at": 0, "ready_at": 1 << 60}
+			cells["%d,%d" % [c.x, c.y]] = slot
+	var s := FarmSession.new(ApiClient.new("https://example.test/v1", FakeTransport.new([]).callable()))
+	s.client.token = "tok"
+	s.farm_id = "preview"
+	s.layout_patch_id = bp.layout_patch_id
+	s.blueprint_revision = bp.revision
+	s.state = {"cells": cells, "beds_unlocked": 3, "wallet": 180,
+		"inventory": {"seeds": {"R": {"bought": 0, "bound": 6}, "L": {"bought": 0, "bound": 3},
+			"C": {"bought": 0, "bound": 0}, "H": {"bought": 0, "bound": 0}}, "produce": {"R": 0, "L": 0, "C": 0, "H": 0}},
+		"clock": {"chapter_index": 0, "field_condition": "sunny"},
+		"xp": {"total": 0, "first_clear_cells": ["x"], "first_harvest_crops": []}, "stall": {"settled": 0}, "sales_facts": {}}
 	var farm := (load("res://scenes/farm/farm.tscn") as PackedScene).instantiate()
-	farm.setup({"blueprint": FarmBlueprint.load_file(FARM_BLUEPRINT)})
+	farm.setup({"blueprint": bp, "session": s})
 	add_child(farm)
 
 ## mode = home：已有农场后的地图常态——Nearby Farmers + My Farm。桌面无地图桥，底图是

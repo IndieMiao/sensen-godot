@@ -1,0 +1,27 @@
+class_name CropInfo
+extends RefCounted
+## 作物名字、价格、时长——读与服务端同一份 assets/farm/data/crops.json。
+## 客户端**不用它算钱**：显示「+16」只是把服务端会给的数提前写在按钮上，成交额以回包为准。
+
+const PATH := "res://assets/farm/data/crops.json"
+const NAMES := {"R": "Radish", "L": "Lettuce", "C": "Carrot", "H": "Chamomile"}
+const ORDER := ["R", "L", "C", "H"]
+static var _table: Dictionary = {}
+
+static func _load() -> Dictionary:
+	if _table.is_empty():
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+		_table = (parsed as Dictionary).get("crops", {}) if parsed is Dictionary else {}
+	return _table
+
+static func name_of(crop: String) -> String:
+	return str(NAMES.get(crop, crop))
+
+static func unit_price(crop: String) -> int:
+	return int((_load().get(crop, {}) as Dictionary).get("unit_price", 0))
+
+static func seed_price(crop: String) -> int:
+	return int((_load().get(crop, {}) as Dictionary).get("seed_price", 0))
+
+static func duration_ms(crop: String) -> int:
+	return int((_load().get(crop, {}) as Dictionary).get("duration_ms", 0))

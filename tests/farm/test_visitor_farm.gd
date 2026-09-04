@@ -23,26 +23,28 @@ func _visitor() -> Node:
 	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
 	scene.setup({"visitor": true, "snapshot": snap, "blueprint": bp})
 	add_child(auto_free(scene))
+	await get_tree().process_frame
 	return scene
 
 func test_title_says_visiting_and_names_the_avatar() -> void:
-	var f := _visitor()
+	var f: Node = await _visitor()
 	assert_bool(f.visitor).is_true()
 	assert_str(f.title.text).starts_with("Visiting · ")
 	assert_str(f.title.text).is_equal("Visiting · Sample A")
 
 func test_no_session_no_predictor_no_director() -> void:
 	# 访客不挂任何能写的东西。
-	var f := _visitor()
+	var f: Node = await _visitor()
 	assert_object(f.session).is_null()
 	assert_object(f.predictor).is_null()
 	assert_object(f.director).is_null()
 
 func test_owner_tools_hidden_visitor_bar_shown() -> void:
-	var f := _visitor()
+	var f: Node = await _visitor()
 	assert_bool((f.hud.get_node("BottomBar") as Control).visible).is_false()
 	assert_bool(f.hud._coins.get_parent().visible).is_false()
-	assert_bool(f.hud._row_button.visible).is_false()
+	assert_bool(f.hud._stall.visible).is_false()
+	assert_bool(f.hud._goals.visible).is_false()
 	assert_bool(f.hud._condition.get_parent().visible).is_true()       # 田况来自冻结快照
 	var bar := f.hud.get_node("VisitorBar") as Control
 	assert_bool(bar.visible).is_true()
@@ -53,7 +55,7 @@ func test_owner_tools_hidden_visitor_bar_shown() -> void:
 	assert_array(texts).is_equal(["Wave", "Stamp"])
 
 func test_crops_render_from_snapshot_with_ripe_as_top_stage() -> void:
-	var f := _visitor()
+	var f: Node = await _visitor()
 	var counts: Dictionary = f.crop_field.cell_counts()
 	assert_int(int(counts["R"])).is_equal(6)
 	assert_int(int(counts["L"])).is_equal(3)
@@ -74,9 +76,9 @@ func test_zero_writes_even_if_a_tool_is_forced() -> void:
 	var t := FakeTransport.new([])
 	Net.use_transport(t.callable())
 	Net.client.token = "tok"
-	var f := _visitor()
-	f.tool = "clear"
-	assert_int(f._enqueue_cells(f.bp.beds()[0].cells)).is_equal(0)
+	var f: Node = await _visitor()
+	f._tap_cell(f.bp.beds()[0].cells[0])                       # 点田在访客这里什么都不做
+	assert_int(f._queue_plots(f.bp.beds()[0].cells)).is_equal(0)
 	assert_bool(f.runner.is_busy()).is_false()
 	f._process(0.016)
 	f._wave()
@@ -85,7 +87,7 @@ func test_zero_writes_even_if_a_tool_is_forced() -> void:
 	assert_int(t.requests.size()).is_equal(0)
 
 func test_wave_locks_the_animation_briefly_and_is_registered() -> void:
-	var f := _visitor()
+	var f: Node = await _visitor()
 	assert_bool(AnimPlaceholders.is_registered("wave")).is_true()
 	f._wave()
 	assert_bool(f._action_locked()).is_true()
@@ -93,7 +95,7 @@ func test_wave_locks_the_animation_briefly_and_is_registered() -> void:
 	assert_bool(f._action_locked()).is_false()
 
 func test_stamp_is_a_local_label_that_expires() -> void:
-	var f := _visitor()
+	var f: Node = await _visitor()
 	f._stamp()
 	var stamp: Node = f.player.get_node_or_null("Stamp")
 	assert_object(stamp).is_not_null()
@@ -111,7 +113,7 @@ func test_leaving_reports_visit_once_without_blocking() -> void:
 	Net.client.token = "tok"
 	Net.session.farm_id = "mine"
 	Net.session.version = 0
-	var f := _visitor()
+	var f: Node = await _visitor()
 	f._record_visit()
 	await get_tree().process_frame
 	assert_int(t.requests.size()).is_equal(1)
@@ -122,12 +124,12 @@ func test_visitor_without_own_farm_reports_nothing() -> void:
 	var t := FakeTransport.new([])
 	Net.use_transport(t.callable())
 	Net.client.token = "tok"                                # 登录了但还没建场
-	var f := _visitor()
+	var f: Node = await _visitor()
 	f._record_visit()
 	assert_int(t.requests.size()).is_equal(0)
 
 func test_hud_text_is_english() -> void:
-	var f := _visitor()
+	var f: Node = await _visitor()
 	var stack: Array = [f.hud]
 	while not stack.is_empty():
 		var n: Node = stack.pop_back()

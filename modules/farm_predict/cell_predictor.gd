@@ -44,6 +44,10 @@ static func from_blueprint(bp: FarmBlueprint, p_cells: Dictionary = {}) -> CellP
 		reserved.append("%d,%d" % [(c as Vector2i).x, (c as Vector2i).y])
 	return CellPredictor.new(p_cells, cultivable, reserved)
 
+## 这格现在能不能动：可耕作且（非预留畦或已扩地）。
+func is_unlocked(id: String) -> bool:
+	return _cultivable.has(id) and (not _reserved.has(id) or beds_unlocked == 4)
+
 ## 渲染用的视图：权威副本叠上未确认的预测。
 func view() -> Dictionary:
 	var out := cells.duplicate(true)
@@ -92,6 +96,21 @@ func predict(type: String, payload: Dictionary, now_ms: int) -> Dictionary:
 		_overlay[id] = changed[id]
 	_pending.append({"type": type, "payload": payload, "cell_ids": ids})
 	return {"ok": true, "error": "", "cells": changed}
+
+## 只判合法性、不写叠加层：人物走到地头之前先知道这一下会不会被拒。
+func check(type: String, payload: Dictionary, now_ms: int) -> Dictionary:
+	if not PREDICTED.has(type):
+		return {"ok": false, "error": "NOT_PREDICTED"}
+	var ids := _ids(payload)
+	var gate := _gate(ids)
+	if gate != "":
+		return {"ok": false, "error": gate}
+	var v := view()
+	for id in ids:
+		var step := _step(type, payload, (v[id] as Dictionary).duplicate(true), now_ms)
+		if step.has("error"):
+			return {"ok": false, "error": step.error}
+	return {"ok": true, "error": ""}
 
 ## 服务端回包：**整体覆盖**，不做 diff 合并——漂移一律服务端为准（方案 §3 D4）。
 func commit(server_cells: Dictionary, p_version: int) -> void:

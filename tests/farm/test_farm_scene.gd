@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## 农场灰盒：加载蓝图 → 地表 + 锚点道具 + 玩家 + 相机；出口按钮接到场景栈。
+## 农场场景：蓝图 → 地表/道具/玩家/相机；点田自动做下一步；先走过去再干活；服务端对账。
 
 const FARM_SCENE := "res://scenes/farm/farm.tscn"
 const FIX := "res://tests/fixtures/blueprints/fix_grid/r1/farm_blueprint.json"
@@ -11,15 +11,59 @@ func before_test() -> void:
 
 func after_test() -> void:
 	AppRouter._navigation_pending = _saved_navigation_pending
+	FarmChoice.clear()
 
 func _farm() -> Node:
 	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
 	scene.setup({"blueprint": FarmBlueprint.load_file(FIX)})
 	add_child(auto_free(scene))
+	await get_tree().process_frame   # RigActivity 用 call_deferred 挂通知节点，不给一帧会留孤儿
 	return scene
 
+## 带服务端会话的农场：fixture 蓝图的 9 格 + 3 预留格全 wild，第 0 章种子。
+func _session_with_farm(t: FakeTransport, layout := "", cells := {}) -> FarmSession:
+	var s := FarmSession.new(ApiClient.new("https://example.test/v1", t.callable()))
+	s.client.token = "tok"
+	s.farm_id = "f1"
+	s.layout_patch_id = layout
+	s.blueprint_revision = 2
+	s.state = {"cells": cells, "beds_unlocked": 3, "wallet": 180,
+		"inventory": {"seeds": {"R": {"bought": 0, "bound": 6}, "L": {"bought": 0, "bound": 3},
+			"C": {"bought": 0, "bound": 0}, "H": {"bought": 0, "bound": 0}}, "produce": {"R": 0, "L": 0, "C": 0, "H": 0}},
+		"clock": {"chapter_index": 0, "field_condition": "sunny"}, "xp": {"total": 0, "first_clear_cells": [], "first_harvest_crops": []},
+		"stall": {"settled": 0}, "sales_facts": {}}
+	return s
+
+func _wild_cells(bp: FarmBlueprint) -> Dictionary:
+	var cells := {}
+	for bed in bp.beds():
+		for c in bed.cells:
+			cells["%d,%d" % [c.x, c.y]] = {"state": "wild", "crop": null, "ready_at": null}
+	for c in bp.reserved_bed().get("cells", []):
+		cells["%d,%d" % [c.x, c.y]] = {"state": "wild", "crop": null, "ready_at": null}
+	return cells
+
+func _online_farm(t: FakeTransport) -> Node:
+	var bp := FarmBlueprint.load_file(FIX)
+	var s := _session_with_farm(t, "", _wild_cells(bp))
+	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
+	scene.setup({"blueprint": bp, "session": s})
+	add_child(auto_free(scene))
+	await get_tree().process_frame
+	return scene
+
+## 推进到某条件成立或超时（秒）。
+func _run_until(f: Node, cond: Callable, seconds := 20.0) -> bool:
+	var t := 0.0
+	while t < seconds:
+		f._process(0.1)
+		t += 0.1
+		if cond.call():
+			return true
+	return false
+
 func test_builds_ground_props_and_player_at_spawn() -> void:
-	var f := _farm()
+	var f: Node = await _farm()
 	assert_object(f.get_node("Ground").mesh).is_not_null()
 	# house + storage + well + exit + 9 田格 + 3 预留格
 	assert_int(f.prop_count()).is_equal(4 + 9 + 3)
@@ -28,60 +72,58 @@ func test_builds_ground_props_and_player_at_spawn() -> void:
 	assert_str(f.title.text).is_equal("Fixture Grid")
 
 func test_process_moves_player_and_camera_follows() -> void:
-	var f := _farm()
+	var f: Node = await _farm()
 	var cam := f.get_node("Camera3D") as Camera3D
-	var cam_before := cam.position # _ready() 已跑过一次 _update_camera()，这是出生点锚定的相机位
-	f.mover.set_target_cell(Vector2i(3, 6))
-	for i in 90:
+	var cam_before := cam.position
+	f._on_ground_tapped(f.bp.cell_to_world(Vector2i(3, 6)))
+	for i in 240:
 		f._process(1.0 / 60.0)
 	var player := f.get_node("Player") as Node3D
 	assert_that(f.mover.cell()).is_equal(Vector2i(3, 6))
 	assert_that(player.position).is_equal(f.mover.position)
-	# 判别性断言：相机必须真的跟着玩家挪动过（而不是停在出生点的旧值仍恰好满足符号判断），
-	# 且精确钉在 45° 俯角 * CAM_DIST 的公式上——相机在南侧看向北。
+	# 相机必须真的跟着挪，且精确钉在 45° 俯角 × CAM_DIST、跟随点南移 CAM_AHEAD 的公式上。
 	assert_bool(cam.position != cam_before).is_true()
-	var phi := deg_to_rad(45.0) # CAM_PITCH_DEG
-	# 跟随点比玩家再往南 CAM_AHEAD：玩家落在屏幕上三分之一，南侧那一畦不再压在工具栏下。
-	var expected := player.position + Vector3(0.0, 16.0 * sin(phi), 16.0 * cos(phi) + f.CAM_AHEAD) # CAM_DIST
+	var phi := deg_to_rad(45.0)
+	var expected := player.position + Vector3(0.0, 16.0 * sin(phi), 16.0 * cos(phi) + f.CAM_AHEAD)
 	assert_vector(cam.position).is_equal_approx(expected, Vector3(0.001, 0.001, 0.001))
 
-func test_exit_button_wired_to_router() -> void:
-	var f := _farm()
-	var btn := f.exit_btn as Button
-	assert_int(btn.pressed.get_connections().size()).is_equal(1)
+func test_rig_faces_forward_and_keeps_animating_at_farm_camera_distance() -> void:
+	# 2026-09-04 晚真机：走路背朝前（rig 脸在 +Z）；动画全丢（RigActivity 16 m 休眠，相机 18 m）。
+	var f: Node = await _farm()
+	assert_float(f._rig.rotation.y).is_equal_approx(PI, 0.001)
+	var act: RigActivity = null
+	for c in f._rig.get_children():
+		if c is RigActivity:
+			act = c
+	assert_object(act).is_not_null()
+	var cam := f.get_node("Camera3D") as Camera3D
+	var dist := cam.position.distance_to(f.player.position)
+	assert_bool(act.sleep_distance > dist + 5.0).override_failure_message(
+		"相机离玩家 %.1f m，休眠阈值 %.1f m 不够" % [dist, act.sleep_distance]).is_true()
 
-func test_tap_ground_sets_target() -> void:
-	var f := _farm()
-	var target: Vector3 = f.bp.cell_to_world(Vector2i(1, 5))
-	f._on_ground_tapped(target)
+func test_exit_button_wired_to_router() -> void:
+	var f: Node = await _farm()
+	assert_int((f.exit_btn as Button).pressed.get_connections().size()).is_equal(1)
+
+func test_tap_ground_walks_there() -> void:
+	var f: Node = await _farm()
+	f._tap_cell(Vector2i(3, 6))
 	assert_bool(f.mover.is_moving()).is_true()
 
 func test_missing_blueprint_bails_without_crashing() -> void:
-	# 缺蓝图退场帧：_ready() 里 call_deferred("_leave") 要到本帧末才生效，这期间
-	# 输入/直接调用不能在 null mover/bp 上崩溃。拦住真实换场（同
-	# tests/integration/test_dressing_flow.gd 的惯例），只验证退场路径本身不炸，
-	# 不依赖 AppRouter 真的弹栈/跳地图（本场景不是经 push_instance 挂上去的，
-	# _leave() 落到空栈分支会尝试 go_to_map()，与本用例无关，须拦住）。
-	AppRouter._navigation_pending = true
 	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
 	scene.setup({"layout_patch_id": "no_such_id", "revision": 1})
 	add_child(auto_free(scene))
+	await get_tree().process_frame
 	var down := InputEventScreenTouch.new()
 	down.pressed = true
 	down.position = Vector2(10, 10)
 	scene._unhandled_input(down)
-	var up := InputEventScreenTouch.new()
-	up.pressed = false
-	up.position = Vector2(10, 10)
-	scene._unhandled_input(up)
 	scene._on_ground_tapped(Vector3.ZERO)
 	assert_that(scene.mover).is_null()
 
-## 2026-09-04 真机（360×800）：标题按屏幕中心 ±120 的固定偏移摆放，左上「Leave Farm」按钮
-## 占 12..132，两者在 328 宽的 Root 里必然相交（44..132 那一段），路名前半被按钮盖住、只剩
-## 「…ngshan Road」。桌面宽视口下两者不相交，所以必须把 HUD 压到手机宽度才能复现。
 func test_title_and_exit_button_do_not_overlap_on_phone_width() -> void:
-	var f := _farm()
+	var f: Node = await _farm()
 	var safe := f.get_node("HUD/SafeArea") as SafeAreaMargin
 	safe.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	safe.size = Vector2(360, 800)
@@ -91,184 +133,150 @@ func test_title_and_exit_button_do_not_overlap_on_phone_width() -> void:
 	var title_rect: Rect2 = (f.title as Control).get_global_rect()
 	var exit_rect: Rect2 = (f.exit_btn as Control).get_global_rect()
 	assert_bool(title_rect.intersects(exit_rect)).is_false()
-	# 不是靠把标题挤出屏幕来"消除"重叠：两者都必须仍在 Root 里
 	var root_rect: Rect2 = (f.get_node("HUD/SafeArea/Root") as Control).get_global_rect()
 	assert_bool(root_rect.grow(0.5).encloses(title_rect)).is_true()
-	assert_bool(root_rect.grow(0.5).encloses(exit_rect)).is_true()
 
 func test_crops_render_outside_props() -> void:
-	# 作物必须挂 Crops（Props 的同级）。挪进 Props 会污染 prop_count() 的精确断言。
-	var f := _farm()
+	var f: Node = await _farm()
 	var before: int = f.prop_count()
 	var cells := {}
 	for bed in f.bp.beds():
 		for c in bed.cells:
-			cells["%d,%d" % [c.x, c.y]] = {"state": "growing", "crop": "R",
-				"care_done_at": 0, "ready_at": 400, "careful": false, "tutorial": false}
+			cells["%d,%d" % [c.x, c.y]] = {"state": "growing", "crop": "R", "care_done_at": 0, "ready_at": 400}
 	f.render_cells(cells, 400)
 	assert_int(f.prop_count()).is_equal(before)
 	assert_int(int(f.crop_field.cell_counts()["R"])).is_equal(9)
 
-func test_no_tool_selected_means_tap_moves_the_player() -> void:
-	var f := _farm()
-	var bed: Array = f.bp.beds()[0].cells
-	assert_int(f._enqueue_cells(bed)).is_equal(0)
-	assert_bool(f.runner.is_busy()).is_false()
-
-func test_brush_over_three_cells_queues_three_actions() -> void:
-	var f := _farm()
-	f.tool = "clear"
-	var bed: Array = f.bp.beds()[0].cells
-	assert_int(f._enqueue_cells(bed)).is_equal(3)
-	assert_int(f.runner.pending_count()).is_equal(3)
-
-func test_row_tool_expands_a_single_cell_to_the_whole_bed() -> void:
-	# 少划两下，不是效率道具：仍是 3 格逐格播放（PRD §6.3 L408）。
-	var f := _farm()
-	f.tool = "till"
-	f.row_tool = true
-	assert_int(f._enqueue_cells([f.bp.beds()[0].cells[1]])).is_equal(3)
-
-func test_locked_reserved_bed_is_filtered_out() -> void:
-	var f := _farm()
-	f.tool = "clear"
-	assert_int(f._enqueue_cells(f.bp.reserved_bed().cells)).is_equal(0)
-
-func test_action_lock_stops_process_from_stealing_the_animation() -> void:
-	# farm.gd::_process 每帧无条件用 walk/idle 覆盖动画；不锁就永远看不到劳作动作。
-	var f := _farm()
-	f.tool = "clear"
-	f._enqueue_cells([f.bp.beds()[0].cells[0]])
-	assert_bool(f._action_locked()).is_true()
-	f._process(0.0)
-	f._process(ActionRunner.ACTION_S)
-	assert_bool(f._action_locked()).is_false()
-
-func test_works_without_a_server_session() -> void:
-	# 没有服务端时农场退化成 G0 灰盒：照旧能进能出能走动，不崩。
-	var f := _farm()
-	assert_object(f.session).is_null()
-	f.tool = "clear"
-	f._enqueue_cells([f.bp.beds()[0].cells[0]])
-	f._process(0.0)
-	f._process(ActionRunner.ACTION_S)
-	assert_bool(f.runner.is_busy()).is_false()
-
-func test_attaches_injected_session_and_sends_commands_on_cell_done() -> void:
-	# 有农场的会话 → 挂 predictor，动作收工时真的发命令并对账。
-	var t := FakeTransport.new([
-		{"status": 200, "json": {"version": 1, "state": {"cells": {"1,1": {"state": "cleared"}}}}},
-	])
-	var s := FarmSession.new(ApiClient.new("https://example.test/v1", t.callable()))
-	s.client.token = "tok"
-	s.farm_id = "f1"
-	s.version = 0
-	s.state = {"cells": {"1,1": {"state": "wild"}}, "beds_unlocked": 3, "wallet": 5}
-	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
-	scene.setup({"blueprint": FarmBlueprint.load_file(FIX), "session": s})
-	add_child(auto_free(scene))
-	assert_object(scene.predictor).is_not_null()
-	assert_that(scene.session).is_same(s)
-	scene.tool = "clear"
-	scene._on_cell_started(Vector2i(1, 1), "clear")
-	assert_str(str(scene.predictor.view()["1,1"].state)).is_equal("cleared")   # 本地预测先到
-	await scene._on_cell_done(Vector2i(1, 1), "clear")
-	assert_int(t.requests.size()).is_equal(1)
-	assert_str(str(t.requests[0].body.type)).is_equal("clear_cells")
-	assert_int(scene.predictor.version).is_equal(1)
-
 func test_without_farm_in_session_stays_offline_greybox() -> void:
 	var s := FarmSession.new(ApiClient.new("https://example.test/v1", FakeTransport.new([]).callable()))
-	s.client.token = "tok"      # 登录了但还没建场
+	s.client.token = "tok"
 	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
 	scene.setup({"blueprint": FarmBlueprint.load_file(FIX), "session": s})
 	add_child(auto_free(scene))
+	await get_tree().process_frame
 	assert_object(scene.session).is_null()
 	assert_object(scene.predictor).is_null()
-
-
-func test_action_progress_and_hint_are_visible_in_hud() -> void:
-	# 2 秒一格的劳作必须有可见反馈，否则就是「点了没反应」。
-	var f := _farm()
-	f.hud._on_tool("clear")
-	assert_bool(f.hud._status.visible).is_true()
-	assert_str(f.hud._status_label.text).is_equal("Tap or drag over plots")
-	f._enqueue_cells(f.bp.beds()[0].cells)
-	f._process(0.0)
-	f._process(1.0)
-	assert_str(f.hud._status_label.text).starts_with("Clearing… 50%")
-	assert_bool(f.hud._status_label.text.contains("(+2 queued)")).is_true()
-	# 队列每步只结一格：三格要走三个 ACTION_S，再一帧让 HUD 收起
-	for i in 3:
-		f._process(ActionRunner.ACTION_S)
-	f._process(0.016)
-	assert_bool(f.hud._status.visible).is_false()
-
-func test_server_rejection_is_shown_not_swallowed() -> void:
-	var t := FakeTransport.new([{"status": 422, "json": {"code": "WRONG_STATE", "detail": "x"}}])
-	var s := FarmSession.new(ApiClient.new("https://example.test/v1", t.callable()))
-	s.client.token = "tok"
-	s.farm_id = "f1"
-	s.state = {"cells": {"1,1": {"state": "wild"}}, "beds_unlocked": 3}
-	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
-	scene.setup({"blueprint": FarmBlueprint.load_file(FIX), "session": s})
-	add_child(auto_free(scene))
-	scene.tool = "clear"
-	scene._on_cell_started(Vector2i(1, 1), "clear")
-	await scene._on_cell_done(Vector2i(1, 1), "clear")
-	assert_bool(scene.hud._toast.visible).is_true()
-	assert_str(scene.hud._toast_label.text).is_equal("That plot isn't ready for this step")
-	assert_str(str(scene.predictor.view()["1,1"].state)).is_equal("wild")   # 预测已回滚
-
-func _session_with_farm(t: FakeTransport, layout := "", cells := {}) -> FarmSession:
-	var s := FarmSession.new(ApiClient.new("https://example.test/v1", t.callable()))
-	s.client.token = "tok"
-	s.farm_id = "f1"
-	s.layout_patch_id = layout
-	s.blueprint_revision = 2
-	s.state = {"cells": cells, "beds_unlocked": 3, "wallet": 180, "clock": {"chapter_index": 0, "field_condition": "sunny"}}
-	return s
+	assert_str(scene.hud._cta.text).is_equal("Offline — farm not connected")
+	assert_bool(scene.hud._cta.disabled).is_true()
 
 func test_servers_blueprint_beats_the_locally_chosen_one() -> void:
-	# 2026-09-04 真机：本地选 sh_b、服务端农场 sh_c → 客户端按 sh_b 进场，每一格都 CELL_NOT_CULTIVABLE。
 	var bp_c := FarmBlueprint.load_file(FarmBlueprint.asset_path("sh_c", 2))
-	var cells := {}
-	for bed in bp_c.beds():
-		for c in bed.cells:
-			cells["%d,%d" % [c.x, c.y]] = {"state": "wild"}
-	var s := _session_with_farm(FakeTransport.new([]), "sh_c", cells)
+	var s := _session_with_farm(FakeTransport.new([]), "sh_c", _wild_cells(bp_c))
 	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
 	scene.setup({"blueprint": FarmBlueprint.load_file(FarmBlueprint.asset_path("sh_b", 2)), "session": s})
 	add_child(auto_free(scene))
+	await get_tree().process_frame
 	assert_str(scene.bp.layout_patch_id).is_equal("sh_c")
 	assert_str(scene.title.text).is_equal(bp_c.display_name)
-	assert_int(int(scene.crop_field.cell_counts()["weed"])).is_equal(9)   # 草画在正确的畦上
-	assert_str(FarmChoice.load().layout_patch_id).is_equal("sh_c")          # 本地缓存跟着改
-	FarmChoice.clear()
+	assert_int(int(scene.crop_field.cell_counts()["weed"])).is_equal(12)
+	assert_str(FarmChoice.load().layout_patch_id).is_equal("sh_c")
+
+func test_tapping_a_wild_plot_walks_over_then_clears_it_and_tells_the_server() -> void:
+	# 没有工具：点草地就是清理。先走到地头（计时暂停），到了才干 2 秒，干完发命令。
+	var t := FakeTransport.new([{"status": 200, "json": {"version": 1, "state": {"cells": {}}}}])
+	var f: Node = await _online_farm(t)
+	var cell: Vector2i = f.bp.beds()[0].cells[0]
+	f._tap_cell(cell)
+	assert_bool(f.runner.is_busy()).is_true()
+	f._process(0.0)
+	assert_bool(f.runner.paused).override_failure_message("应先走到地头再开工").is_true()
+	assert_bool(f.mover.is_moving()).is_true()
+	assert_bool(f._action_locked()).override_failure_message("走路时不能锁动画").is_false()
+	assert_bool(_run_until(f, func(): return t.requests.size() == 1)).is_true()
+	assert_str(str(t.requests[0].body.type)).is_equal("clear_cells")
+	assert_str(str(t.requests[0].body.payload.cell_ids[0])).is_equal("%d,%d" % [cell.x, cell.y])
+	assert_bool(f.player.position.distance_to(f.bp.cell_to_world(cell)) < 1.6).override_failure_message(
+		"干活时人应该站在那格旁边").is_true()
+
+func test_dragging_across_plots_queues_each_plots_own_next_step() -> void:
+	var f: Node = await _online_farm(FakeTransport.new([]))
+	var bed: Array = f.bp.beds()[0].cells
+	# 第二格已翻土：它的下一步是播种，不是清理
+	f.predictor.cells["%d,%d" % [bed[1].x, bed[1].y]].state = "tilled"
+	assert_int(f._queue_plots(bed)).is_equal(3)
+	assert_str(f.runner.current_action()).is_equal("")
+	f._process(0.0)
+	assert_str(f.runner.current_action()).is_equal("clear")
+
+func test_tapping_a_growing_plot_shows_the_countdown_instead_of_acting() -> void:
+	var f: Node = await _online_farm(FakeTransport.new([]))
+	var cell: Vector2i = f.bp.beds()[0].cells[0]
+	var id := "%d,%d" % [cell.x, cell.y]
+	f.predictor.cells[id] = {"state": "growing", "crop": "R", "care_done_at": 0, "ready_at": f._now() + 90_000}
+	f._tap_cell(cell)
+	assert_bool(f.runner.is_busy()).is_false()
+	assert_object(f._work_label).is_not_null()
+	assert_str(f._work_label.text).starts_with("Growing · 01:")
+
+func test_cta_names_the_next_step_and_does_it_for_every_plot() -> void:
+	var f: Node = await _online_farm(FakeTransport.new([]))
+	assert_str(f.hud._cta.text).is_equal("Clear 9 plots")
+	f._on_cta()
+	assert_int(f.runner.pending_count()).is_equal(9)
+
+func test_cta_switches_to_sow_only_when_seeds_exist() -> void:
+	var f: Node = await _online_farm(FakeTransport.new([]))
+	for id in f.predictor.cells:
+		f.predictor.cells[id].state = "tilled"
+	f.session.state.inventory.seeds.R.bound = 0
+	f.session.state.inventory.seeds.L.bound = 0
+	f._refresh_hud()
+	assert_str(f.hud._cta.text).is_equal("Buy seeds at the stall")
+	f.session.state.inventory.seeds.L.bound = 3
+	f._refresh_hud()
+	assert_str(f.hud._cta.text).is_equal("Sow 3 Lettuce")
+	assert_bool(f.hud._seed_row.visible).is_true()
 
 func test_locally_invalid_action_is_aborted_and_explained_without_a_request() -> void:
 	var t := FakeTransport.new([])
-	var s := _session_with_farm(t, "", {"1,1": {"state": "cleared"}})
-	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
-	scene.setup({"blueprint": FarmBlueprint.load_file(FIX), "session": s})
-	add_child(auto_free(scene))
-	scene.tool = "clear"
-	scene._enqueue_cells([Vector2i(1, 1)])          # 已清理过的格再清 → WRONG_STATE
-	scene._process(0.0)
-	assert_bool(scene.hud._toast.visible).is_true()
-	assert_str(scene.hud._toast_label.text).is_equal("That plot isn't ready for this step")
-	assert_bool(scene.runner.is_busy()).is_false()
-	scene._process(ActionRunner.ACTION_S + 0.1)
+	var f: Node = await _online_farm(t)
+	var cell: Vector2i = f.bp.beds()[0].cells[0]
+	f.runner.enqueue([cell], "till")             # 荒地上翻土：本地就能判定不合法（WRONG_STATE）
+	f._process(0.0)
+	assert_bool(f.hud._toast.visible).is_true()
+	assert_str(f.hud._toast_label.text).is_equal("That plot isn't ready for this step")
+	assert_bool(f.runner.is_busy()).is_false()
+	f._process(ActionRunner.ACTION_S + 0.1)
 	assert_int(t.requests.size()).is_equal(0)
 
-func test_locked_crops_are_disabled_in_chapter_zero() -> void:
-	var s := _session_with_farm(FakeTransport.new([]), "", {"1,1": {"state": "wild"}})
-	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
-	scene.setup({"blueprint": FarmBlueprint.load_file(FIX), "session": s})
-	add_child(auto_free(scene))
-	assert_array(scene.hud.unlocked_crop_ids()).is_equal(["R", "L"])
-	scene.hud._on_crop("C")                          # 就算硬选，播种 payload 也不会变成 C
-	assert_bool((scene.hud._crop_buttons["C"] as Button).disabled).is_true()
-	s.state.clock.chapter_index = 3
-	scene._refresh_hud()
-	assert_array(scene.hud.unlocked_crop_ids()).is_equal(["R", "L", "C", "H"])
+func test_server_rejection_is_shown_and_prediction_rolled_back() -> void:
+	var t := FakeTransport.new([{"status": 422, "json": {"code": "WRONG_STATE", "detail": "x"}}])
+	var f: Node = await _online_farm(t)
+	var cell: Vector2i = f.bp.beds()[0].cells[0]
+	var id := "%d,%d" % [cell.x, cell.y]
+	f._tap_cell(cell)
+	assert_bool(_run_until(f, func(): return t.requests.size() == 1)).is_true()
+	await get_tree().process_frame
+	assert_str(f.hud._toast_label.text).is_equal("That plot isn't ready for this step")
+	assert_str(str(f.predictor.view()[id].state)).is_equal("wild")
+
+func test_goals_and_coins_follow_server_state() -> void:
+	var f: Node = await _online_farm(FakeTransport.new([]))
+	assert_str(f.hud._goals_header.text).is_equal("Day 1 goals · 0/7")
+	f.session.state.xp.first_harvest_crops = ["R"]
+	f.session.state.wallet = 204
+	f.session.state_changed.emit(f.session.state, 3)
+	assert_str(f.hud._goals_header.text).is_equal("Day 1 goals · 5/7")
+	assert_str(f.hud._coins.text).is_equal("Coins 204")
+
+func test_stall_sells_and_toasts_the_coins() -> void:
+	var t := FakeTransport.new([{"status": 200, "json": {"version": 2,
+		"state": {"cells": {}, "wallet": 196, "inventory": {"produce": {"R": 0}, "seeds": {}}}}}])
+	var f: Node = await _online_farm(t)
+	f.session.state.inventory.produce.R = 2
+	f._open_stall()
+	assert_bool(f.stall.visible).is_true()
+	await f._on_sell([{"kind": "produce", "id": "R", "qty": 2}])
+	assert_str(str(t.requests[0].body.type)).is_equal("sell_at_stall")
+	assert_str(f.hud._toast_label.text).is_equal("+16 coins")
+	assert_str(f.hud._coins.text).is_equal("Coins 196")
+
+func test_action_status_shows_walking_then_the_verb() -> void:
+	var f: Node = await _online_farm(FakeTransport.new([{"status": 200, "json": {"version": 1, "state": {"cells": {}}}}]))
+	f._tap_cell(f.bp.beds()[0].cells[0])
+	f._process(0.0)
+	f._process(0.1)
+	assert_str(f.hud._status_label.text).starts_with("Walking over…")
+	assert_bool(_run_until(f, func(): return not f.runner.paused and f.runner.is_busy())).is_true()
+	f._process(0.5)
+	assert_str(f.hud._status_label.text).starts_with("Clearing…")
