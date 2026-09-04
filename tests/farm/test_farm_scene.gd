@@ -107,3 +107,48 @@ func test_crops_render_outside_props() -> void:
 	f.render_cells(cells, 400)
 	assert_int(f.prop_count()).is_equal(before)
 	assert_int(int(f.crop_field.cell_counts()["R"])).is_equal(9)
+
+func test_no_tool_selected_means_tap_moves_the_player() -> void:
+	var f := _farm()
+	var bed: Array = f.bp.beds()[0].cells
+	assert_int(f._enqueue_cells(bed)).is_equal(0)
+	assert_bool(f.runner.is_busy()).is_false()
+
+func test_brush_over_three_cells_queues_three_actions() -> void:
+	var f := _farm()
+	f.tool = "clear"
+	var bed: Array = f.bp.beds()[0].cells
+	assert_int(f._enqueue_cells(bed)).is_equal(3)
+	assert_int(f.runner.pending_count()).is_equal(3)
+
+func test_row_tool_expands_a_single_cell_to_the_whole_bed() -> void:
+	# 少划两下，不是效率道具：仍是 3 格逐格播放（PRD §6.3 L408）。
+	var f := _farm()
+	f.tool = "till"
+	f.row_tool = true
+	assert_int(f._enqueue_cells([f.bp.beds()[0].cells[1]])).is_equal(3)
+
+func test_locked_reserved_bed_is_filtered_out() -> void:
+	var f := _farm()
+	f.tool = "clear"
+	assert_int(f._enqueue_cells(f.bp.reserved_bed().cells)).is_equal(0)
+
+func test_action_lock_stops_process_from_stealing_the_animation() -> void:
+	# farm.gd::_process 每帧无条件用 walk/idle 覆盖动画；不锁就永远看不到劳作动作。
+	var f := _farm()
+	f.tool = "clear"
+	f._enqueue_cells([f.bp.beds()[0].cells[0]])
+	assert_bool(f._action_locked()).is_true()
+	f._process(0.0)
+	f._process(ActionRunner.ACTION_S)
+	assert_bool(f._action_locked()).is_false()
+
+func test_works_without_a_server_session() -> void:
+	# 没有服务端时农场退化成 G0 灰盒：照旧能进能出能走动，不崩。
+	var f := _farm()
+	assert_object(f.session).is_null()
+	f.tool = "clear"
+	f._enqueue_cells([f.bp.beds()[0].cells[0]])
+	f._process(0.0)
+	f._process(ActionRunner.ACTION_S)
+	assert_bool(f.runner.is_busy()).is_false()

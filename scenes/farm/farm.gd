@@ -6,15 +6,31 @@ const WORLD_SCALE := 1.0 # 逻辑米 → 世界米；G1 调观感时只改这里
 const CAM_DIST := 16.0
 const CAM_PITCH_DEG := 45.0
 const TAP_MAX_PX := 16.0
+## 工具 → 服务端命令。空工具名表示「移动模式」，点地就是走过去。
+const TOOL_COMMAND := {
+	"clear": "clear_cells", "till": "till_cells", "sow": "sow_cells",
+	"care": "apply_care", "harvest": "harvest_cells",
+}
 
 var bp: FarmBlueprint
 var grid: BlueprintGrid
 var mover: PlayerMover
 var _args := {}
 var crop_field: CropField
+var runner: ActionRunner
+## 这三样可以为 null：没有服务端时农场退化成 G0 的灰盒，照旧能进能出能走动。
+var session: FarmSession
+var predictor: CellPredictor
+## 当前工具与播种作物；空工具 = 移动模式。
+var tool := ""
+var sow_crop := "R"
+## 行级工具：一次手势覆盖整畦 3 格，但仍逐格播放（PRD §6.3 L408）。
+var row_tool := false
 var _rig: AvatarRig
 var _anim := ""
 var _tap_start := Vector2.ZERO
+var _drag_points := PackedVector2Array()
+var _dragging := false
 
 @onready var cam: Camera3D = $Camera3D
 @onready var ground: MeshInstance3D = $Ground
@@ -49,6 +65,9 @@ func _ready() -> void:
 	crop_field = CropField.new(bp, WORLD_SCALE)
 	crops_root.add_child(crop_field)
 	mover = PlayerMover.new(bp, grid, WORLD_SCALE)
+	runner = ActionRunner.new()
+	runner.cell_started.connect(_on_cell_started)
+	runner.cell_done.connect(_on_cell_done)
 	_spawn_player()
 	title.text = bp.display_name
 	exit_btn.pressed.connect(_leave)
@@ -105,11 +124,17 @@ func _process(dt: float) -> void:
 		return
 	mover.step(dt)
 	player.position = mover.position
-	if mover.is_moving():
+	if runner:
+		runner.step(dt)
+	# 劳作中锁住动画：否则 _process 每帧无条件用 walk/idle 覆盖，动作动画永远播不出来。
+	if not _action_locked():
+		if mover.is_moving():
+			player.look_at(player.position + mover.facing, Vector3.UP)
+			_play("walk")
+		else:
+			_play("idle")
+	elif mover.is_moving():
 		player.look_at(player.position + mover.facing, Vector3.UP)
-		_play("walk")
-	else:
-		_play("idle")
 	_update_camera()
 
 func _update_camera() -> void:
@@ -125,11 +150,25 @@ func _unhandled_input(e: InputEvent) -> void:
 	if e is InputEventScreenTouch:
 		if e.pressed:
 			_tap_start = e.position
+			_drag_points = PackedVector2Array([e.position])
+			_dragging = false
+		elif _dragging:
+			_drag_points.append(e.position)
+			_finish_brush()
 		elif e.position.distance_to(_tap_start) <= TAP_MAX_PX:
-			var hit = Plane(Vector3.UP, 0.0).intersects_ray(
-				cam.project_ray_origin(e.position), cam.project_ray_normal(e.position))
-			if hit != null:
-				_on_ground_tapped(hit as Vector3)
+			if tool.is_empty():
+				var hit = Plane(Vector3.UP, 0.0).intersects_ray(
+					cam.project_ray_origin(e.position), cam.project_ray_normal(e.position))
+				if hit != null:
+					_on_ground_tapped(hit as Vector3)
+			else:
+				# 选了工具时点按 = 对单格执行动作；没选工具才是移动。
+				_enqueue_cells(LabourBrush.trace(
+					PackedVector2Array([e.position]), _projector()))
+	elif e is InputEventScreenDrag and not tool.is_empty():
+		# 摇杆矩形内的 drag 已被 TouchStick._gui_input 吃掉（accept_event），不会打架。
+		_dragging = true
+		_drag_points.append(e.position)
 
 func _on_ground_tapped(world: Vector3) -> void:
 	# 同上：退场帧内测试/输入可能直接调用本函数，mover 为 null 时安全跳过。
@@ -145,3 +184,68 @@ func is_back_navigation_locked() -> bool:
 func render_cells(cells: Dictionary, now_ms: int) -> void:
 	if crop_field:
 		crop_field.sync(cells, now_ms)
+
+func _projector() -> Callable:
+	return LabourBrush.ground_projector(cam, bp, WORLD_SCALE)
+
+func _action_locked() -> bool:
+	return runner != null and runner.is_busy()
+
+func _finish_brush() -> void:
+	var cells := LabourBrush.trace(_drag_points, _projector())
+	_drag_points = PackedVector2Array()
+	_dragging = false
+	_enqueue_cells(cells)
+
+## 命中格 → 过滤 →（行级工具）扩畦 → 入队。返回入队格数，测试用。
+func _enqueue_cells(cells: Array) -> int:
+	if tool.is_empty() or cells.is_empty():
+		return 0
+	var unlocked := 4 if predictor and predictor.beds_unlocked == 4 else 3
+	if row_tool:
+		cells = LabourBrush.expand_rows(cells, bp)
+	cells = LabourBrush.filter_actionable(cells, bp, unlocked)
+	return runner.enqueue(cells, tool)
+
+## 每格开工：先本地预测（立刻有视觉反馈），再播动画。
+func _on_cell_started(cell: Vector2i, action: String) -> void:
+	var id := "%d,%d" % [cell.x, cell.y]
+	if predictor:
+		var r := predictor.predict(TOOL_COMMAND.get(action, ""), _payload_for(action, [id]),
+			session.server_now() if session else 0)
+		if r.ok:
+			_render()
+	_play(AnimPlaceholders.clip_for(action))
+
+## 每格收工：把命令发给服务端，回包对账；被拒就丢掉预测并把原因报出去。
+func _on_cell_done(cell: Vector2i, action: String) -> void:
+	var id := "%d,%d" % [cell.x, cell.y]
+	if session == null:
+		return
+	var accepted := session.send(TOOL_COMMAND.get(action, ""), _payload_for(action, [id]))
+	if predictor:
+		if accepted:
+			predictor.commit(session.state.get("cells", {}), session.version)
+		else:
+			predictor.rollback()
+		_render()
+
+func _payload_for(action: String, ids: Array) -> Dictionary:
+	var p := {"cell_ids": ids}
+	match action:
+		"sow":
+			p["crop"] = sow_crop
+			p["lot"] = "bound"
+			p["field_condition"] = _field_condition()
+		"care":
+			p["kind"] = AnimPlaceholders.CARE_ACTION.get(_field_condition(), "water")
+	return p
+
+func _field_condition() -> String:
+	if session == null:
+		return "sunny"
+	return str((session.state.get("clock", {}) as Dictionary).get("field_condition", "sunny"))
+
+func _render() -> void:
+	if predictor:
+		render_cells(predictor.view(), session.server_now() if session else 0)
