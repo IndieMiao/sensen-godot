@@ -110,7 +110,11 @@ export const parseCellId = (id: string): [number, number] => {
   return [i, j];
 };
 
-const zeroCrops = <T>(v: T): Record<CropId, T> => ({ R: v, L: v, C: v, H: v });
+/**
+ * 每种作物给一份**独立**的值。写成 `{ R: v, L: v, ... }` 会让四种作物共用同一个对象引用，
+ * 发 Grant 时 6R 与 3L 会写进同一个仓（测试 sow_cells 抓到过）。
+ */
+const perCrop = <T>(make: () => T): Record<CropId, T> => ({ R: make(), L: make(), C: make(), H: make() });
 
 export interface InitialArgs {
   player_day_id: string;
@@ -139,8 +143,8 @@ export function createInitialState(a: InitialArgs): FarmState {
     },
     wallet: a.wallet,
     inventory: {
-      seeds: zeroCrops({ bought: 0, bound: 0 }),
-      produce: zeroCrops(0),
+      seeds: perCrop(() => ({ bought: 0, bound: 0 })),
+      produce: perCrop(() => 0),
       dishes: { salad: 0, tea: 0 },
     },
     cells,
