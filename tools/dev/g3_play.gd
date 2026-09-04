@@ -79,9 +79,9 @@ func _ready() -> void:
 	_ok(str(farm.hud._cta.text) == "Crops are growing", "等待态 CTA（实际 %s）" % farm.hud._cta.text)
 
 	print("\n3. 等教学萝卜成熟（3 分钟）")
-	var ripe := await _until(func(): return str(farm.hud._cta.text).begins_with("Harvest"), 260.0)
+	# 六颗萝卜的浇水时刻差一两秒，会一颗一颗熟；等到六颗都能收再按。
+	var ripe := await _until(func(): return str(farm.hud._cta.text) == "Harvest 6 plots", 260.0)
 	_ok(ripe, "CTA 变成 %s" % farm.hud._cta.text)
-	_ok(str(farm.hud._cta.text) == "Harvest 6 plots", "Harvest 6 plots")
 	Engine.time_scale = 4.0
 	farm._on_cta()
 	_ok(await _until(func(): return not farm.runner.is_busy() and farm._in_flight == 0, 240.0), "收获队列走完")

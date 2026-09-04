@@ -19,7 +19,7 @@ const REJECT_TEXT := {
 	"WRONG_STATE": "That plot isn't ready for this step",
 	"NOT_RIPE": "Not ripe yet",
 	"WRONG_CARE": "Wrong care for today's weather",
-	"INSUFFICIENT_ITEMS": "Not enough seeds",
+	"INSUFFICIENT_ITEMS": "Not enough of that item",
 	"INSUFFICIENT_FUNDS": "Not enough coins",
 	"CELL_LOCKED": "This bed isn't unlocked yet",
 	"CHAPTER_LOCKED": "Not available in this chapter yet",
