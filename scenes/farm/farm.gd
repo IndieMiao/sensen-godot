@@ -19,8 +19,8 @@ var _tap_start := Vector2.ZERO
 @onready var ground: MeshInstance3D = $Ground
 @onready var props: Node3D = $Props
 @onready var player: Node3D = $Player
-@onready var title: Label = $HUD/SafeArea/Root/Title
-@onready var exit_btn: Button = $HUD/SafeArea/Root/ExitButton
+@onready var title: Label = %Title
+@onready var exit_btn: Button = %ExitButton
 @onready var joystick: TouchStick = $HUD/SafeArea/Root/Joystick
 
 func setup(args: Dictionary) -> void:

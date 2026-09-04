@@ -25,7 +25,7 @@ func test_builds_ground_props_and_player_at_spawn() -> void:
 	assert_int(f.prop_count()).is_equal(4 + 9 + 3)
 	assert_that(f.mover.cell()).is_equal(Vector2i(3, 3))
 	assert_bool(f.get_node("Player").get_child_count() >= 1).is_true()
-	assert_str(f.get_node("HUD/SafeArea/Root/Title").text).is_equal("Fixture Grid")
+	assert_str(f.title.text).is_equal("Fixture Grid")
 
 func test_process_moves_player_and_camera_follows() -> void:
 	var f := _farm()
@@ -46,7 +46,7 @@ func test_process_moves_player_and_camera_follows() -> void:
 
 func test_exit_button_wired_to_router() -> void:
 	var f := _farm()
-	var btn := f.get_node("HUD/SafeArea/Root/ExitButton") as Button
+	var btn := f.exit_btn as Button
 	assert_int(btn.pressed.get_connections().size()).is_equal(1)
 
 func test_tap_ground_sets_target() -> void:
@@ -75,3 +75,22 @@ func test_missing_blueprint_bails_without_crashing() -> void:
 	scene._unhandled_input(up)
 	scene._on_ground_tapped(Vector3.ZERO)
 	assert_that(scene.mover).is_null()
+
+## 2026-09-04 真机（360×800）：标题按屏幕中心 ±120 的固定偏移摆放，左上「Leave Farm」按钮
+## 占 12..132，两者在 328 宽的 Root 里必然相交（44..132 那一段），路名前半被按钮盖住、只剩
+## 「…ngshan Road」。桌面宽视口下两者不相交，所以必须把 HUD 压到手机宽度才能复现。
+func test_title_and_exit_button_do_not_overlap_on_phone_width() -> void:
+	var f := _farm()
+	var safe := f.get_node("HUD/SafeArea") as SafeAreaMargin
+	safe.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	safe.size = Vector2(360, 800)
+	safe.apply_margins(Rect2i(), Vector2i(360, 800), Vector2(360, 800))
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var title_rect: Rect2 = (f.title as Control).get_global_rect()
+	var exit_rect: Rect2 = (f.exit_btn as Control).get_global_rect()
+	assert_bool(title_rect.intersects(exit_rect)).is_false()
+	# 不是靠把标题挤出屏幕来"消除"重叠：两者都必须仍在 Root 里
+	var root_rect: Rect2 = (f.get_node("HUD/SafeArea/Root") as Control).get_global_rect()
+	assert_bool(root_rect.grow(0.5).encloses(title_rect)).is_true()
+	assert_bool(root_rect.grow(0.5).encloses(exit_rect)).is_true()
