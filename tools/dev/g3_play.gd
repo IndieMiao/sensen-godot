@@ -31,7 +31,14 @@ func _ready() -> void:
 	await get_tree().process_frame
 
 	print("\n1. 登录建场")
-	_ok(await session.login(), "login")
+	# 瞬时网络抖动不该让整轮作废：登录最多重试 3 次。
+	var logged := false
+	for attempt in 3:
+		logged = await session.login()
+		if logged:
+			break
+		await get_tree().create_timer(2.0).timeout
+	_ok(logged, "login")
 	_ok(await session.ensure_farm("shanghai", "sh_a", 2), "ensure_farm %s" % session.layout_patch_id)
 	var bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(session.layout_patch_id, session.blueprint_revision))
 	farm = (load("res://scenes/farm/farm.tscn") as PackedScene).instantiate()
