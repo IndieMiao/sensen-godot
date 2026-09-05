@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="Shader" id="Shader_opaque"]
+code = "shader_type canvas_item;
+render_mode unshaded, blend_disabled;
+uniform sampler2D scene_texture : hint_screen_texture, repeat_disable, filter_nearest;
+void fragment() {
+	COLOR = vec4(texture(scene_texture, SCREEN_UV).rgb, 1.0);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="Material_opaque"]
+shader = SubResource("Shader_opaque")
+
+[node name="OpaqueSceneLayer" type="CanvasLayer"]
+layer = 100
+
+[node name="Composite" type="ColorRect" parent="."]
+material = SubResource("Material_opaque")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2

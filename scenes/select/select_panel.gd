@@ -1,47 +1,18 @@
 class_name SelectPanel
 extends PanelContainer
-## 底部候选卡片（PRD §4.3 / §10.2）：三张卡容量文案一致，只有名字与缩略图不同。
-##
-## 卡片曾经是一个纯 Button：card.text 塞「名字\n容量文案」、card.icon 塞预览图。
-## 真机上炸了两个坑（2026-09-04，vivo V2509A，360×800 逻辑视口）：
-##   D1 Button 文字默认不折行，容量文案（13 个 CJK 字）撑出 237px 的卡片最小宽度，
-##      三张卡 + 两条 8px 间隙 = 727px，远超 360px 视口，2/3 号卡片跑到屏幕外。
-##   D2 app_theme.tres 的 Button/colors/icon_normal_color 是给侧栏白色描边 SVG
-##      调墨色用的乘色，顺带把预览缩略图乘成近黑色小方块。
-## 现在卡片仍然是 Button（要它的 toggle_mode / ButtonGroup 行为），但文字和图像
-## 挪到内部一个 MOUSE_FILTER_IGNORE 的 VBoxContainer 里：TextureRect（不经过
-## Button 的 icon 乘色）+ 两级字号的 Label（容量行开自动折行，不再撑宽度）。
+## Two-step farm setup: choose a blueprint, then confirm its position on the map.
 
 signal candidate_focused(id: String)
 signal confirmed(id: String)
+signal placement_cancelled
 
 const CAPACITY_TEXT := "9 plots · 12 in week one"
-## 卡片最小尺寸——刻意硬编码的一次性屏幕度量，不是要纳入 DesignTokens 的通用值
-## （plan 第 18 行的约束只管 UI 颜色：「UI 颜色只取 DesignTokens」，尺寸不在此列）。
-##
-## x 的推导（2026-09-04 code review 订正：round 1 算错了父容器）。SelectPanel
-## 不独占 360 逻辑视口——它是 $HUD/SafeArea/Root 的子节点，SafeArea
-## （MarginContainer + SafeAreaMargin 脚本，modules/ui/safe_area_margin.gd）
-## 每边至少留 min_margin=16px（modules/ui/ui_metrics.gd 的
-## maxf(实测值, min_margin)，「任何情况下都不贴边」），所以 Root 的真实宽度
-## 上限是 360-16-16=328，不是 360。预算：
-##   360（逻辑视口）
-##   - 32（安全区左右各 16，SafeAreaMargin.min_margin）
-##   - 32（SB_drawer 面板内边距左右各 16，assets/ui/app_theme.tres）
-##   - 16（两条卡间距，2×DesignTokens.SPACE_2）
-##   = 280，三等分 ≤93.33。取 88（4dp 栅格对齐）留一点余量——HBoxContainer 的
-## SIZE_EXPAND_FILL 会把富余摊给三张卡，实际渲染宽度只会比 88 更宽，不会更窄。
-## y 的推导（2026-09-04 真机复测后订正，之前的 172 是拍脑袋）。卡片内容自上而下：
-##   8（内边距）+ 64（预览）+ 4 + 名字 2 行 + 4 + 容量 3 行 + 8（内边距）
-## NotoSansSC 在 14/12 号字的行高是 22/18，Label 行距 3：名字 2 行 = 47，容量
-## "9 plots · 12 in week one" 在 77px 内容宽下折成 3 行 = 60，合计 195，取 196（4dp
-## 栅格）。两个 Label 都用 max_lines_visible 钉住行数上限，所以这个预算是上界而不是
-## 估计值——名字再长也只画两行，不会把容量文案顶出卡片。真实层级下垂直方向仍有
-## ~440px 富余（Root 高度 768，面板自身 ~330），不需要收紧。
-const CARD_MIN := Vector2(88, 196)
+## Three cards fit inside the 328px safe-area width of a 360px phone.
+## Shared capacity copy stays below the row, leaving the map visible.
+const CARD_MIN := Vector2(88, 104)
 ## 预览缩略图固定高度：卡片内容区（CARD_MIN 减去内边距）分给预览的那一份。
 ## 预览 TextureRect 必须 EXPAND_IGNORE_SIZE（见 _build_card_content），否则这个值形同虚设。
-const CARD_PREVIEW_H := 64.0
+const CARD_PREVIEW_H := 44.0
 ## 名字 / 容量文案的行数上限：CARD_MIN.y 的预算就是按这两个数算的，改一处必须改另一处。
 const NAME_MAX_LINES := 2
 const CAPACITY_MAX_LINES := 3
@@ -51,24 +22,42 @@ var confirm_button: Button
 var _cards: Array[Button] = []
 var _row: HBoxContainer
 var _group := ButtonGroup.new()
+var _title: Label
+var _capacity: Label
+var _cancel: Button
+var placing := false
 
 func _init() -> void:
 	name = "SelectPanel"
+	minimum_size_changed.connect(_apply_bottom_preset)
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", DesignTokens.SPACE_3)
 	add_child(vbox)
 	var title := Label.new()
-	title.text = "Pick a neighborhood for your farm"
+	_title = title
+	title.text = "Choose a farm layout"
 	title.add_theme_font_size_override("font_size", DesignTokens.FONT_LABEL)
 	vbox.add_child(title)
 	_row = HBoxContainer.new()
 	_row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	vbox.add_child(_row)
+	_capacity = GameUi.label(CAPACITY_TEXT, 12, GameUi.MUTED)
+	vbox.add_child(_capacity)
+	var actions := HBoxContainer.new()
+	vbox.add_child(actions)
+	_cancel = GameUi.button("arrow-left", "", "Change layout")
+	_cancel.visible = false
+	_cancel.pressed.connect(func(): placement_cancelled.emit())
+	actions.add_child(_cancel)
 	confirm_button = Button.new()
-	confirm_button.text = "Create Farm"
+	confirm_button.text = "Place Farm"
+	confirm_button.icon = GameUi.icon("map-pin")
+	confirm_button.theme_type_variation = &"AccentButton"
+	confirm_button.custom_minimum_size.y = 48
+	confirm_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	confirm_button.disabled = true
 	confirm_button.pressed.connect(func(): if not focused_id.is_empty(): confirmed.emit(focused_id))
-	vbox.add_child(confirm_button)
+	actions.add_child(confirm_button)
 	# 必须放在所有子节点加完之后：PRESET_MODE_MINSIZE（默认档）按调用时刻的
 	# get_combined_minimum_size() 算 offset_top，子节点还没挂上去时那是 0，
 	# 面板会整个长在父容器底边以下（C2，2026-09-04 终审）。真正的高度大头
@@ -89,6 +78,7 @@ func set_candidates(items: Array) -> void:
 	for item in items:
 		var card := Button.new()
 		card.toggle_mode = true
+		card.theme_type_variation = &"ChoiceButton"
 		card.button_group = _group
 		card.custom_minimum_size = CARD_MIN
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -148,6 +138,7 @@ func _build_card_content(card: Button, item: Dictionary) -> void:
 	# 普通 WORD 折行遇到一个装不下的整词会整段不折，SMART 会在词内断开兜底。
 	var capacity := Label.new()
 	capacity.name = "CapacityLabel"
+	capacity.visible = false
 	capacity.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	capacity.text = CAPACITY_TEXT
 	capacity.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
@@ -173,6 +164,8 @@ func preview_node(card: Button) -> TextureRect:
 func _on_card_pressed(card: Button) -> void:
 	focused_id = str(card.get_meta("id"))
 	card.button_pressed = true
+	for c in _cards:
+		c.theme_type_variation = &"ChoiceSelectedButton" if c == card else &"ChoiceButton"
 	confirm_button.disabled = false
 	candidate_focused.emit(focused_id)
 
@@ -184,6 +177,27 @@ func focus(id: String) -> void:
 
 func cards() -> Array[Button]:
 	return _cards
+
+func set_placement_mode(active: bool, valid := true) -> void:
+	placing = active
+	_row.visible = not active
+	_cancel.visible = active
+	_title.text = "Place your farm" if active else "Choose a farm layout"
+	_capacity.text = CAPACITY_TEXT if valid else "Outside the farm area"
+	_capacity.add_theme_color_override("font_color", GameUi.MUTED if valid else GameUi.CORAL)
+	confirm_button.text = "Create Farm" if active else "Place Farm"
+	confirm_button.icon = GameUi.icon("house" if active else "map-pin")
+	confirm_button.disabled = not valid or focused_id.is_empty()
+	_apply_bottom_preset()
+
+func set_saving(active: bool, error := "") -> void:
+	confirm_button.disabled = active
+	_cancel.disabled = active
+	confirm_button.text = "Saving..." if active else "Create Farm"
+	if not error.is_empty():
+		_capacity.text = error
+		_capacity.add_theme_color_override("font_color", GameUi.CORAL)
+	_apply_bottom_preset()
 
 func card_count() -> int:
 	return _cards.size()

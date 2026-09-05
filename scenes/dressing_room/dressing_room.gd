@@ -11,6 +11,7 @@ extends Node3D
 @onready var done_button: Button = $UI/SafeArea/VBox/TopBar/DoneButton
 @onready var feedback_panel: PanelContainer = $UI/SafeArea/VBox/Drawer/VBox/FeedbackPanel
 @onready var feedback_label: Label = $UI/SafeArea/VBox/Drawer/VBox/FeedbackPanel/FeedbackLabel
+@onready var room_background: TextureRect = $RoomBackground/Scenery
 
 ## 点角色（不拖动）在"全身"与"当前分类部位"之间切换取景。
 ## 判定为点击的最大位移，单位与视口一致；超过就当作转身拖拽。
@@ -29,6 +30,15 @@ var _slot_region: int = DressingCamera.Region.FULL
 
 
 func _ready() -> void:
+	safe_area.theme = GameUi.theme()
+	back_button.text = ""
+	back_button.icon = GameUi.icon("arrow-left")
+	back_button.tooltip_text = "Back"
+	back_button.theme_type_variation = &"SecondaryButton"
+	restore_button.theme_type_variation = &"SecondaryButton"
+	restore_button.icon = GameUi.icon("rotate-ccw")
+	done_button.theme_type_variation = &"AccentButton"
+	done_button.icon = GameUi.icon("circle-check")
 	# 压栈进入的新实例不会经过 AppRouter 的 suspend/resume 协议；自己的相机要不要
 	# 成为当前相机得在第一次入树时自己抢，否则会保留住地图冻结的位姿
 	# （2026-09-04 终审 C1；同样的一行也补进了 farm.gd::_ready()）。
@@ -54,6 +64,7 @@ func _ready() -> void:
 	done_button.pressed.connect(_on_done)
 	safe_area.margins_applied.connect(_on_safe_margins_applied)
 	get_viewport().size_changed.connect(_reframe)
+	drawer.resized.connect(_reframe)
 
 	rig.apply_config(Avatar.load_outfit())
 	# SafeArea 的首次信号早于父节点 _ready()；主动刷新，保证相机避开真实安全区。
@@ -151,7 +162,7 @@ func _refresh_completion_state() -> void:
 	if _committing:
 		done_button.text = "Saving..."
 	elif busy:
-		done_button.text = "Preparing..." if not _initial_ready else "Trying on..."
+		done_button.text = "Loading" if not _initial_ready else "Trying"
 	else:
 		done_button.text = "Done"
 
@@ -200,6 +211,9 @@ func _track_drag(relative: Vector2) -> void:
 
 
 func _reframe(animate := false) -> void:
+	var compact := get_viewport().get_visible_rect().size.y < 720.0
+	drawer.custom_minimum_size.y = 260.0 if compact else 292.0
+	parts_panel.set_compact(compact)
 	# 同一帧内的多次请求合并到下一帧执行；只要其中一次要求补间就补间
 	# （切分类与安全区回调可能同帧到达，硬落位会把推拉动画吃掉）。
 	_reframe_animated = _reframe_animated or animate
@@ -212,7 +226,12 @@ func _reframe(animate := false) -> void:
 	_reframe_animated = false
 	if not is_instance_valid(rig) or not is_instance_valid(cam):
 		return
+	# Canvas background stays fixed when category focus moves the 3D camera.
+	room_background.size = Vector2(get_viewport().get_visible_rect().size.x,
+		drawer.get_global_rect().position.y + 8.0)
+	$UI/FooterPaper.offset_top = drawer.get_global_rect().position.y
 	var header_height := maxf(top_bar.size.y, top_bar.get_combined_minimum_size().y)
+	$UI/HeaderPaper.size.y = _safe_margins.y + header_height + 8.0
 	cam.safe_margin_top = _safe_margins.y + header_height + 8.0
 	cam.safe_margin_bottom = _safe_margins.w
 	cam.drawer_height = drawer.size.y if drawer.size.y > 0.0 else drawer.custom_minimum_size.y

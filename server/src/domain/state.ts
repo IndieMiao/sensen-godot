@@ -2,7 +2,7 @@
  * 农场状态。**身份与索引字段只在数据库列上**（farms 表），这里只放可变玩法数据
  * （Codex 二审 Minor 2：两处都有会出现「以哪边为准」的歧义）。
  */
-import type { CropId, DishId, FieldCondition, ResidentId } from './content.js';
+import type { CropId, DecorationId, DishId, FieldCondition, ResidentId } from './content.js';
 import { initialQa, type QaClock } from './qa.js';
 
 export const CELL_STATES = ['wild', 'cleared', 'tilled', 'sown', 'growing'] as const;
@@ -12,6 +12,12 @@ export type CellState = (typeof CELL_STATES)[number];
 export type LifeChoice = 'gift' | 'keep' | 'sold';
 export type GrowthChoice = 'tool' | 'field';
 export type NurseryStage = 'derelict' | 'cleared' | 'built';
+
+export interface DecorationPlacement {
+  anchor_id: 'courtyard';
+  prop_id: DecorationId;
+  offset_q: [number, number];
+}
 
 export interface CellSlot {
   state: CellState;
@@ -35,6 +41,8 @@ export interface ResidentState {
   gifts_given: number;
   request_done: boolean;
   shared_event_done: boolean;
+  /** Choices explicitly discussed after resolution, separate from having talked earlier. */
+  choice_memories?: Record<number, LifeChoice>;
 }
 
 export interface ChapterState {
@@ -60,6 +68,24 @@ export interface HandbookEntry {
   day: string;
   careful?: boolean;
   life_priority?: boolean;
+}
+
+export interface WeekSummary {
+  id: 'first_week';
+  completed_day: string;
+  completed_at: number;
+  life_priority: boolean;
+  life_choice_count: number;
+  choices: Record<number, LifeChoice>;
+  photo_variant: 'personalized' | 'standard';
+  journal_pages: string[];
+  next_week_clue: 'resident_seed_exchange' | 'nursery_next_stage';
+  wallet: number;
+  xp: number;
+  level: number;
+  growth_choice: GrowthChoice | null;
+  nursery: { stage: NurseryStage; appearance: 'a' | 'b' | null };
+  relationships: Record<ResidentId, { points: number; stage: string }>;
 }
 
 export interface FarmState {
@@ -95,6 +121,8 @@ export interface FarmState {
   seedling_packs: { days: string[] };
   engineering: { reserved: Partial<Record<CropId, number>>; submitted: Partial<Record<CropId, number>> };
   nursery: { stage: NurseryStage; appearance: 'a' | 'b' | null };
+  /** Missing on earlier domain-2 farms; read as an empty courtyard without a read-time write. */
+  decorations?: DecorationPlacement[];
   residents: Record<ResidentId, ResidentState>;
   chapters: ChapterState[];
   requests_done: string[];
@@ -105,6 +133,8 @@ export interface FarmState {
   subsidies_claimed: string[];
   xp: XpState;
   handbook: HandbookEntry[];
+  /** First completed-week snapshot; later farming cannot rewrite its branch or balances. */
+  week_summary?: WeekSummary;
 }
 
 export const cellId = (i: number, j: number): string => `${i},${j}`;
@@ -160,15 +190,16 @@ export function createInitialState(a: InitialArgs): FarmState {
     seedling_packs: { days: [] },
     engineering: { reserved: {}, submitted: {} },
     nursery: { stage: 'derelict', appearance: null },
+    decorations: [],
     residents: {
       nursery_keeper: emptyResident(),
       bistro_owner: emptyResident(),
       restorer: emptyResident(),
     },
-    chapters: Array.from({ length: 7 }, (_, i) => ({
+    chapters: Array.from({ length: 7 }, (_, i): ChapterState => ({
       status: i === 0 ? 'active' : 'locked',
       activated_day: i === 0 ? a.player_day_id : null,
-      step_flags: {},
+      step_flags: i === 0 ? { farm_created: true } : {},
       grants_issued: false,
     })),
     requests_done: [],

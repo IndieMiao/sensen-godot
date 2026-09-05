@@ -1,13 +1,63 @@
 class_name DayGoals
 extends RefCounted
-## 第一天的目标清单，客户端按状态算（服务端的章节推进是 G3 的内容，目前没有任何东西把章节
-## 标成 done）。每条对应第 0 章 min_facts 里的一步：first_harvest / next_batch_sown_and_cared，
-## 中间补上清理→翻土→播种→照料，让玩家知道下一步在哪。
+## Chapter facts are server-owned; only D0's intermediate farming steps use the visible plots.
+
+const PATH := "res://assets/farm/data/chapters.json"
+const TITLES := ["First harvest", "A rainy day", "Share your harvest", "At the kitchen",
+	"Farm visits", "Room to grow", "A garden together"]
+const LABELS := {
+	"farm_created": "Create your farm",
+	"first_harvest": "Harvest your first crop",
+	"next_batch_sown_and_cared": "Sow and care for the next batch",
+	"rain_care_done": "Care for crops in the rain",
+	"request_d1_bistro_lettuce_done": "Complete the bistro's lettuce request",
+	"life_choice_resolved": "Choose a use for your harvest",
+	"second_resident_remembers": "Share your choice with another resident",
+	"first_salad_cooked": "Make your first salad together",
+	"request_d3_nursery_basket_done": "Complete the nursery request",
+	"visit_tutorial_completed": "Visit a farm and return",
+	"engineering_first_submitted": "Contribute to the nursery basket",
+	"growth_intent_set": "Choose tools or another garden bed",
+	"wind_care_done": "Care for crops in the wind",
+	"engineering_quota_complete": "Complete the nursery basket",
+	"shared_scene_done": "Join the garden gathering",
+}
+static var _chapters: Array = []
+
+static func definition(index: int) -> Dictionary:
+	if _chapters.is_empty():
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(PATH))
+		_chapters = parsed.get("chapters", []) if parsed is Dictionary else []
+	return _chapters[index] if index >= 0 and index < _chapters.size() else {}
+
+static func chapter_state(state: Dictionary, index: int) -> Dictionary:
+	var chapters = state.get("chapters", [])
+	if chapters is Array and index >= 0 and index < chapters.size() and chapters[index] is Dictionary:
+		return chapters[index]
+	return {}
+
+static func _confirmed(flags: Dictionary, fact: String) -> bool:
+	var value = flags.get(fact, false)
+	return value is bool and value
 
 static func evaluate(state: Dictionary, cells: Dictionary) -> Array:
+	var index := int((state.get("clock", {}) as Dictionary).get("chapter_index", 0))
+	var chapter := definition(index)
+	if chapter.is_empty(): return []
+	var current := chapter_state(state, index)
+	var raw_flags = current.get("step_flags", {})
+	var flags: Dictionary = raw_flags if raw_flags is Dictionary else {}
+	var goals := []
+	for fact in chapter.get("min_facts", []):
+		goals.append({"id": str(fact), "label": str(LABELS.get(fact, "Chapter goal")), "done": _confirmed(flags, str(fact))})
+	if index != 0: return goals
+	var steps := _farming_steps(state, cells, _confirmed(flags, "first_harvest"))
+	for i in steps.size():
+		goals.insert(i + 1, steps[i])
+	return goals
+
+static func _farming_steps(state: Dictionary, cells: Dictionary, first_harvest: bool) -> Array:
 	var xp: Dictionary = state.get("xp", {})
-	var inv: Dictionary = state.get("inventory", {})
-	var produce: Dictionary = inv.get("produce", {})
 	var states := []
 	for id in cells:
 		states.append(str((cells[id] as Dictionary).get("state", "")))
@@ -16,29 +66,37 @@ static func evaluate(state: Dictionary, cells: Dictionary) -> Array:
 			if list.has(s):
 				return true
 		return false
-	var harvested: bool = (xp.get("first_harvest_crops", []) as Array).size() > 0
-	# 收过就意味着前面每一步都做过——服务端只记「首次清理的格」和「首次收获的作物」两类事实。
+	var harvested: bool = first_harvest or (xp.get("first_harvest_crops", []) as Array).size() > 0
 	var cleared_any: bool = harvested or (xp.get("first_clear_cells", []) as Array).size() > 0 \
 		or any.call(["cleared", "tilled", "sown", "growing"])
 	var tilled_any: bool = harvested or any.call(["tilled", "sown", "growing"])
 	var sown_any: bool = harvested or any.call(["sown", "growing"])
 	var cared_any: bool = harvested or any.call(["growing"])
-	var sold: bool = int((state.get("stall", {}) as Dictionary).get("settled", 0)) > 0 \
-		or not (state.get("sales_facts", {}) as Dictionary).is_empty()
-	var produce_total := 0
-	for c in produce:
-		produce_total += int(produce[c])
-	var next_batch: bool = harvested and any.call(["growing"])
 	var fc := str((state.get("clock", {}) as Dictionary).get("field_condition", "sunny"))
 	return [
 		{"id": "clear", "label": "Clear a plot", "done": cleared_any},
 		{"id": "till", "label": "Till it", "done": tilled_any},
 		{"id": "sow", "label": "Sow a radish", "done": sown_any},
 		{"id": "care", "label": "%s it" % NextStep.care_verb(fc), "done": cared_any},
-		{"id": "harvest", "label": "Harvest a radish", "done": harvested},
-		{"id": "sell", "label": "Sell at the stall", "done": sold},
-		{"id": "next", "label": "Sow next batch", "done": next_batch},
 	]
+
+static func progress(state: Dictionary, derived: Dictionary = {}, now_ms := 0) -> Dictionary:
+	var index := int((state.get("clock", {}) as Dictionary).get("chapter_index", 0))
+	var chapter := definition(index)
+	var current := chapter_state(state, index)
+	var raw_flags = current.get("step_flags", {})
+	var flags: Dictionary = raw_flags if raw_flags is Dictionary else {}
+	var complete := str(current.get("status", "")) == "done" and not chapter.is_empty()
+	for fact in chapter.get("min_facts", []):
+		complete = complete and _confirmed(flags, str(fact))
+	var next_at = derived.get("next_chapter_opens_at")
+	var remaining := -1
+	if complete and not definition(index + 1).is_empty() and int(derived.get("chapter_index", index)) == index \
+			and (next_at is int or next_at is float) and next_at > 0:
+		remaining = maxi(0, int(next_at) - now_ms)
+	return {"index": index, "title": TITLES[index] if index >= 0 and index < TITLES.size() else "Chapter goals",
+		"complete": complete, "next_open_in_ms": remaining, "last_chapter": not chapter.is_empty() and definition(index + 1).is_empty(),
+		"pending": chapter.is_empty() or current.is_empty() or str(current.get("status", "")) == "done" and not complete}
 
 static func done_count(goals: Array) -> int:
 	var n := 0

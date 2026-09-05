@@ -30,6 +30,125 @@ curl localhost:3000/v1/healthz
 
 启动时会校验全部在架蓝图，任一不过直接退出——不带病上线。
 
+## 自由选址（SGODOT-37）
+
+`POST /v1/farms` 接受可选的 `location: {"lat": 31.225, "lng": 121.485}`。
+`layout_patch_id` 仍决定逻辑格、寻路和种植规则，位置只平移地图上的布局。
+同一模板可用于不同玩家的独立位置；每位玩家仍只有一座农场，接口不提供迁移或覆盖已有农场的行为。
+
+`GET /v1/regions` 返回 `farm_placement_version: 1`，以及每个地区的
+`placement_bounds: [south, west, north, east]`。这是游戏支持的选址范围，
+不是现实土地所有权或可耕种性判断；选址校验在边缘预留 300 米以容纳地图布局。
+客户端必须确认服务支持该版本，再发送带位置的建场请求，防止旧服务忽略新字段。
+
+迁移只新增可空的 `farms.location` JSONB 列，旧农场没有位置值，继续使用原蓝图位置。
+主人回包始终包含已保存位置；附近列表和访客快照仅在 `location_visible` 为真时包含位置。
+关闭位置展示即时覆盖同一时间槽中的缓存快照，不必等待 15 分钟。
+
+本地设备验证使用独立数据库，避免测试套件中的 `truncateAll` 清空正在体验的存档。
+数据库名通过 `DATABASE_URL` 指定，服务用 `PORT=3101` 启动后，可通过
+`adb reverse tcp:3101 tcp:3101` 和客户端 `user://server.txt` 中的
+`http://127.0.0.1:3101/v1` 连接。测试服务不需要发布到公网。
+
+## 领域语义 1 → 2（SGODOT-41）
+
+本次 `DOMAIN_VERSION` 从 `1` 升到 `2`，`STATE_SCHEMA_VERSION` 仍为 `1`。
+新增的居民 `choice_memories` 为可选字段，章节仍使用已有的 `step_flags`，无需改表结构。
+启动入口中的 `db/migrate.ts` 只负责幂等 DDL，**不会自动执行本次规则迁移**。
+未迁移的旧农场对新命令继续返回版本不匹配；旧幂等键仍先查历史命令，返回原结果。
+
+显式工具为 `tools/migrate_domain.ts`，仅接受独立设置的 `MIGRATION_DATABASE_URL`，
+不会加载 `.env` 或回退使用 `DATABASE_URL`。内容版本从本次发布的内容文件计算；
+设置 `ASSET_ROOT` 时与服务启动入口使用相同目录，否则使用仓库内容目录。
+
+```bash
+# 在 server/ 下运行；MIGRATION_DATABASE_URL 必须由执行环境显式设置。
+pnpm exec tsx tools/migrate_domain.ts          # 默认 dry-run，无持久化写入
+pnpm exec tsx tools/migrate_domain.ts --apply  # 明确提交迁移
+```
+
+JSON 报告列出 `eligible`、`already_current`、`blocked` 和 `migrated`。
+仅当前 `content_version`、结构版本 `1`、领域版本 `1` 的农场进入迁移；
+匹配当前内容的领域版本 `2` 农场列为已完成。未知领域版本、其他结构版本或任意内容不匹配
+会给出农场 ID、实际版本和拒绝原因，并阻止**整批 apply**，不会只迁移其中一部分。
+拒绝时进程退出码为 `2`，执行或连接异常为 `1`；成功预览/提交为 `0`。
+
+发布顺序：先备份并停止旧版本的写入实例，用待发布版本的同一份内容执行预览，
+核对目标农场与零 `blocked` 后显式 apply，成功后再启动领域版本 `2` 的服务。
+不要在旧写入实例仍会继续建场的情况下完成切换。内容不匹配应调查发布内容和存档来源，
+不能直接改写 `content_version` 来绕过门禁。
+
+apply 在一个事务内先取得 `farms` 的 EXCLUSIVE 写入屏障，再按 ID 排序取得行锁。
+普通 SELECT 仍可读取；新建农场、命令更新和其他迁移在写入窗口内等待。
+已开始的写事务先提交后才被检查，避免漏掉并发插入或覆盖刚提交的状态。
+锁等待超过 5 秒会失败并回滚，排查旧写事务后可重试。
+
+迁移只更新 `farms.domain_version`，保留 `state`、乐观版本计数、时间戳、钱包、库存、
+身份、选址、建场记录、访客快照以及历史 `commands` 的结果和旧版本字段。
+不会根据旧库存、收获记录或已做过的对话推断新的 D0 次批播种证据或选择回顾记录；
+缺少明确事实时由新领域逻辑保守处理。重复执行幂等，事务失败整批回滚。
+领域版本 `2` 已接受新命令后，不可只把版本列改回 `1`；应使用经过审查的前向修复，
+或按发布前备份执行完整恢复。
+
+迁移真库回归位于 `test/db/domain_migration.test.ts`。只使用新建的独立
+`TEST_DATABASE_URL`，数据库名须包含独立的 `test` 或 `migration` 段；
+该套件会清理测试表，不能传入运行中的服务数据库。
+
+## 庭院摆件存档（SGODOT-45）
+
+`save_decorations` 通过既有命令端点原子替换整份庭院布置。仅完成工具或扩地购买后开放，
+六件摆件免费，每种最多一件；空列表表示全部收起。命令仍受版本、幂等和主人身份校验保护。
+
+```json
+{
+  "type": "save_decorations",
+  "payload": {
+    "props": [{ "anchor_id": "courtyard", "prop_id": "bench", "offset_q": [-4, 3] }]
+  }
+}
+```
+
+封套还需提供 `idempotency_key` 和 `base_version`。六个 `prop_id` 为
+`bench / planter / lantern / fountain / sign / crate`，不接收旋转或额外私有字段。
+`offset_q` 是庭院独立实例的 `[x, z]` 整数坐标，每单位 0.5 米，不能当作农田 `cell_id`。
+共享内容表 `assets/farm/data/decorations.json` 定义合法区域、中央通道、固定布景避让和默认位置。
+当前可用区域为 `x = -6..-3 或 3..6`、`z = 3..5`，排除 `abs(x) >= 5 且 z <= 3`，
+任意两件中心间距至少 2 个量化单位。任一摆件非法时返回 422，原布置与版本不变。
+
+主人状态使用可选 `state.decorations`；早期领域版本 2 存档缺少此字段时按空列表读取，
+首次保存才写入，不在 GET 中补写数据库。新农场初始化为空列表。本变更不升级
+`DOMAIN_VERSION` 或 `STATE_SCHEMA_VERSION`，不修改自动或显式迁移工具。
+新增内容表参与 `content_version`；旧内容版本存档仍受现有门禁限制，不会自动改写版本。
+
+访客快照复用已有 `props` 白名单，只包含 `anchor_id / prop_id / offset_q`，
+按既有 15 分钟快照槽更新，不包含钱包、成长购买、库存或居民状态。
+保存、重载、幂等、失败不覆盖和访客隔离回归在 `test/db/decorations_conformance.test.ts`，
+同时覆盖内存 Store 与配置了独立 `TEST_DATABASE_URL` 的 PostgreSQL。
+
+## 首周结局（SGODOT-43 / SGODOT-46）
+
+`state.week_summary` 在 D6 章节完成且 `life_choices[6]` 已明确记录后生成。
+共同场景先完成但第六次用途尚未选择时不生成，也不会默认把缺失选择当作出售。
+不增加金币、物品、经验或关系；摘要记录首次满足条件时的真实状态，后续耕作与交易不改写它。
+
+摘要包含 `id: first_week`、服务器时间 `completed_at`、玩家日 `completed_day`、
+`wallet / xp / level`、已购买的 `growth_choice`、苗圃状态和三名居民的真实点数与阶段。
+`choices` 只含已确认的 D1-D6 用途，`life_choice_count` 是其中 `gift` 或 `keep` 的数量。
+达到内容表阈值 4 时 `life_priority=true`：`photo_variant=personalized`、
+`journal_pages=[shared_harvest,familiar_faces]`、`next_week_clue=resident_seed_exchange`；
+否则为合法出售结局：`photo_variant=standard`、空手写页列表、`next_week_clue=nursery_next_stage`。
+手账仅追加一次 `kind=week_summary / key=first_week`，访客快照不包含摘要及其分支。
+
+旧存档已满足条件时，GET 在克隆状态中按最后持久化动作时间确定性投影摘要，不写数据库；
+下一条成功命令持久化同一摘要。失败命令、重复请求和跨日读取不能重复生成手账页。
+摘要余额是完成时点的快照，可能与玩家之后交易后的当前钱包不同。
+
+`test/db/chapter_conformance.test.ts` 覆盖工具/扩地 × 生活/出售四路线，
+在上海及洛杉矶（含 DST）分别运行 MemoryStore 与 PostgreSQL HTTP 流程。
+最终钱包分别为工具生活 305、扩地生活 145、工具出售 376、扩地出售 200。
+最后一项沿用既有账本规则：D6 触及 100 金币摊位预算，2R 留在库存；
+不能为了达到旧 PRD 的 216 数字超额结算。所有路线验证重登、幂等和摘要不提前锁定。
+
 ## 测试分层
 
 | 目录 | 内容 |

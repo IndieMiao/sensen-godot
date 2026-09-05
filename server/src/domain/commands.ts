@@ -6,7 +6,7 @@
  * 「整批原子」——一条命令里的任意一格不合法，整条失败，状态不变（Codex 二审 Important 5）。
  */
 import type { CropId, DishId, GrowthChoiceId, ResidentId } from './content.js';
-import type { GrowthChoice, LifeChoice } from './state.js';
+import type { DecorationPlacement, GrowthChoice, LifeChoice } from './state.js';
 
 export const MAX_CELLS_PER_COMMAND = 12;
 
@@ -42,6 +42,7 @@ export type Command =
   | { type: 'set_growth_intent'; choice: GrowthChoice }
   | { type: 'purchase_growth_choice'; choice: GrowthChoice; transaction_id: string }
   | { type: 'choose_nursery_appearance'; appearance: 'a' | 'b' }
+  | { type: 'save_decorations'; props: DecorationPlacement[] }
   // —— 领取 ——
   | { type: 'claim_subsidy'; subsidy_id: string }
   | { type: 'claim_seedling_pack' }

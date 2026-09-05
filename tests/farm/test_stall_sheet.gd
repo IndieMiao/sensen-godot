@@ -41,6 +41,20 @@ func test_stall_budget_caps_the_sell_total() -> void:
 	var texts := s.row_buttons().map(func(b): return b.text)
 	assert_bool(texts.has("Sell all · +8")).is_true()
 
+func test_one_sale_contains_all_crops_and_respects_shared_budget_and_reservations() -> void:
+	var s := _sheet()
+	var state := _state({"R": 3, "L": 3}, 180, 60)
+	state.engineering = {"reserved": {"R": 1}}
+	s.refresh(state, ["R", "L"])
+	assert_str(s._sell_all.text).is_equal("Sell all · +40")
+	var got := []
+	s.sell_requested.connect(func(items): got.append(items))
+	s._sell_all.pressed.emit()
+	assert_that(got[0]).is_equal([
+		{"kind": "produce", "id": "R", "qty": 2},
+		{"kind": "produce", "id": "L", "qty": 3}])
+	assert_str(s._produce_rows.L.total.text).is_equal("24")
+
 func test_buy_buttons_need_coins_and_only_show_unlocked_crops() -> void:
 	var s := _sheet()
 	s.refresh(_state({}, 10), ["R", "L"])
@@ -51,7 +65,7 @@ func test_buy_buttons_need_coins_and_only_show_unlocked_crops() -> void:
 	s.buy_requested.connect(func(c, q): got.append([c, q]))
 	s.refresh(_state({}, 180), ["R", "L"])
 	for b in s.row_buttons():
-		if (b as Button).text == "Buy 3 · 12 coins":
+		if (b as Button).text == "Buy 3 · 12":
 			(b as Button).pressed.emit()
 	assert_array(got).is_equal([["R", 3]])
 
@@ -70,3 +84,63 @@ func test_all_text_is_english() -> void:
 			text = (n as Label).text
 		for ch in text:
 			assert_bool(ch.unicode_at(0) < 0x2E80).override_failure_message("含非英文: %s" % text).is_true()
+
+func test_seed_quantity_can_buy_the_exact_remaining_seed_count() -> void:
+	var s := _sheet()
+	s.refresh(_state({}, 10), ["R", "L"])
+	s.set_buy_quantity(1)
+	assert_str(s._seed_rows.R.button.text).is_equal("Buy 1 · 4")
+	assert_bool(s._seed_rows.R.button.disabled).is_false()
+	var got := []
+	s.buy_requested.connect(func(crop, quantity): got.append([crop, quantity]))
+	s._seed_rows.R.button.pressed.emit()
+	assert_that(got).is_equal([["R", 1]])
+	s.set_buy_quantity(100)
+	assert_int(s._buy_qty).is_equal(12)
+	s.set_buy_quantity(0)
+	assert_int(s._buy_qty).is_equal(1)
+
+func test_single_sales_keep_project_reservations_and_include_dishes() -> void:
+	var s := _sheet()
+	var state := _state({"C": 2})
+	state.engineering = {"reserved": {"C": 2}}
+	state.inventory.dishes = {"salad": 2, "tea": 1}
+	s.refresh(state, ["R", "L", "C", "H"])
+	assert_bool(s._produce_rows.C.button.disabled).is_true()
+	assert_bool(s._produce_rows.C.box.visible).is_true()
+	assert_bool(s._dish_rows.salad.box.visible).is_true()
+	var got := []
+	s.sell_requested.connect(func(items): got.append(items))
+	s._dish_rows.salad.button.pressed.emit()
+	assert_that(got).is_equal([[{"kind": "dish", "id": "salad", "qty": 1}]])
+	assert_str(s._sell_all.text).is_equal("Sell all · +96")
+
+func test_waiting_for_server_disables_all_trade_actions() -> void:
+	var s := _sheet()
+	s.refresh(_state({"R": 3}), ["R"])
+	s.set_busy(true)
+	assert_bool(s._sell_all.disabled).is_true()
+	assert_bool(s._produce_rows.R.button.disabled).is_true()
+	assert_bool(s._seed_rows.R.button.disabled).is_true()
+	assert_bool(s._quantity_plus.disabled).is_true()
+	s.set_busy(false)
+	assert_bool(s._sell_all.disabled).is_false()
+
+func test_uncertain_trade_offers_reload_without_resending_the_purchase() -> void:
+	var s := _sheet()
+	s.refresh(_state({"R": 3}), ["R"])
+	s.set_uncertain(true)
+	assert_bool(s.is_busy()).is_false()
+	assert_bool(s._sell_all.disabled).is_true()
+	assert_bool(s._seed_rows.R.button.disabled).is_true()
+	assert_bool(s._retry.visible).is_true()
+	var retries := []
+	var purchases := []
+	s.retry_requested.connect(func(): retries.append(true))
+	s.buy_requested.connect(func(crop, quantity): purchases.append([crop, quantity]))
+	s._retry.pressed.emit()
+	assert_array(retries).is_equal([true])
+	assert_array(purchases).is_empty()
+	s.set_uncertain(false)
+	assert_bool(s._retry.visible).is_false()
+	assert_bool(s._seed_rows.R.button.disabled).is_false()

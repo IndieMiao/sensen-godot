@@ -9,12 +9,11 @@ import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import type { Command, CommandEnvelope } from '../domain/commands.js';
 import type { Content } from '../domain/content.js';
-import { derive } from '../domain/derive.js';
 import { apply, makeCtx, type Ctx } from '../domain/reducer.js';
 import { effectiveNow as qaNow } from '../domain/qa.js';
 import { DOMAIN_VERSION, STATE_SCHEMA_VERSION } from '../domain/version.js';
 import { MAX_ACTIVE_TOKENS, TOKEN_IDLE_MS, newToken, tokenHash } from '../http/auth.js';
-import { ownerFarmView, type FarmRow } from '../http/dto.js';
+import { currentOwnerFarmView, type FarmRow } from '../http/dto.js';
 import { canonicalJson, payloadHash } from '../http/hash.js';
 import type { ApplyOutcome, CommandRecord, PlayerRow, Store } from '../http/store.js';
 
@@ -33,6 +32,7 @@ const rowToFarm = (r: Record<string, unknown>): FarmRow => ({
   region_id: r.region_id as string,
   layout_patch_id: r.layout_patch_id as string,
   blueprint_revision: r.blueprint_revision as number,
+  ...(r.location ? { location: r.location as FarmRow['location'] } : {}),
   version: r.version as number,
   location_visible: r.location_visible as boolean,
   visit_access: r.visit_access as 'only_me' | 'anyone',
@@ -169,12 +169,13 @@ export class PgStore implements Store {
       await client.query(
         `INSERT INTO farms (id, owner_id, region_id, layout_patch_id, blueprint_revision,
            blueprint_checksum, content_version, domain_version, state_schema_version,
-           version, state, visit_access, location_visible, created_at, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11,$12,$13,$13)
+           version, state, visit_access, location_visible, created_at, updated_at, location)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11,$12,$13,$13,$14)
          ON CONFLICT (id) DO NOTHING`,
         [farm.id, farm.owner_id, farm.region_id, farm.layout_patch_id, farm.blueprint_revision,
           '', this.d.contentVersion, DOMAIN_VERSION, STATE_SCHEMA_VERSION,
-          JSON.stringify(farm.state), farm.visit_access, farm.location_visible, now]);
+          JSON.stringify(farm.state), farm.visit_access, farm.location_visible, now,
+          farm.location ? JSON.stringify(farm.location) : null]);
       await client.query('COMMIT');
     } catch (e) {
       await client.query('ROLLBACK');
@@ -189,6 +190,8 @@ export class PgStore implements Store {
     const client = await this.d.pool.connect();
     try {
       await client.query('BEGIN');
+      // The creation record does not exist on first use; lock its existing owner to serialize retries.
+      await client.query('SELECT id FROM players WHERE id = $1 FOR UPDATE', [args.ownerId]);
       const prior = await client.query(
         'SELECT * FROM farm_creations WHERE player_id = $1 FOR UPDATE', [args.ownerId]);
       if (prior.rowCount) {
@@ -205,11 +208,12 @@ export class PgStore implements Store {
       await client.query(
         `INSERT INTO farms (id, owner_id, region_id, layout_patch_id, blueprint_revision,
            blueprint_checksum, content_version, domain_version, state_schema_version,
-           version, state, visit_access, location_visible, created_at, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11,$12,$13,$13)`,
+           version, state, visit_access, location_visible, created_at, updated_at, location)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11,$12,$13,$13,$14)`,
         [farm.id, farm.owner_id, farm.region_id, farm.layout_patch_id, farm.blueprint_revision,
           '', this.d.contentVersion, DOMAIN_VERSION, STATE_SCHEMA_VERSION,
-          JSON.stringify(farm.state), farm.visit_access, farm.location_visible, now]);
+          JSON.stringify(farm.state), farm.visit_access, farm.location_visible, now,
+          farm.location ? JSON.stringify(farm.location) : null]);
       await client.query(
         `INSERT INTO farm_creations (player_id, idempotency_key, payload_hash, farm_id, created_at)
          VALUES ($1,$2,$3,$4,$5)`,
@@ -288,9 +292,9 @@ export class PgStore implements Store {
         `UPDATE farms SET state = $2, version = version + 1, updated_at = $3,
            visit_access = $4, location_visible = $5 WHERE id = $1`,
         [farm.id, JSON.stringify(nextState), effectiveNow, settings.visit_access, settings.location_visible]);
-      const body = ownerFarmView(
+      const body = currentOwnerFarmView(
         { ...farm, ...settings, state: nextState, version: farm.version + 1 },
-        derive(nextState, effectiveNow, tz, this.d.content), effectiveNow);
+        effectiveNow, tz, this.d.content, ctx.blueprint);
       await this.logCommand(client, farm.id, env, hash, 'applied', body, effectiveNow);
       await client.query('COMMIT');
       return { kind: 'applied', body };

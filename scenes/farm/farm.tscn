@@ -1,13 +1,14 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/farm/farm.gd" id="1_farm"]
 [ext_resource type="Script" path="res://modules/ui/safe_area_margin.gd" id="2_sa"]
-[ext_resource type="Script" path="res://modules/ui/touch_stick.gd" id="3_joy"]
 [ext_resource type="Script" path="res://scenes/farm/farm_hud.gd" id="4_hud"]
+[ext_resource type="PackedScene" path="res://modules/ui/opaque_scene_layer.tscn" id="5_opaque"]
 
 [sub_resource type="Environment" id="Environment_farm"]
-background_mode = 1
-background_color = Color(0.82, 0.9, 0.96, 1)
+background_mode = 3
+background_canvas_max_layer = -1
+background_color = Color(0.906, 0.941, 0.875, 1)
 ambient_light_source = 2
 ambient_light_color = Color(0.9, 0.92, 0.9, 1)
 ambient_light_energy = 0.6
@@ -22,6 +23,16 @@ shadow_enabled = true
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_farm")
 
+[node name="FarmBackground" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Lawn" type="ColorRect" parent="FarmBackground"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.906, 0.941, 0.875, 1)
+
 [node name="Camera3D" type="Camera3D" parent="."]
 fov = 45.0
 
@@ -34,6 +45,8 @@ fov = 45.0
 [node name="Player" type="Node3D" parent="."]
 
 [node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="OpaqueSceneLayer" parent="." instance=ExtResource("5_opaque")]
 
 [node name="SafeArea" type="MarginContainer" parent="HUD"]
 anchors_preset = 15
@@ -50,7 +63,7 @@ layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 4.0
-offset_bottom = 56.0
+offset_bottom = 48.0
 grow_horizontal = 2
 theme_override_constants/separation = 12
 
@@ -78,14 +91,3 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("4_hud")
-
-[node name="Joystick" type="Control" parent="HUD/SafeArea/Root"]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = -176.0
-offset_right = 176.0
-offset_bottom = -16.0
-script = ExtResource("3_joy")

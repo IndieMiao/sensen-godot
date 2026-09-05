@@ -13,7 +13,7 @@ func _ready() -> void:
 
 func refresh() -> void:
 	apply_margins(
-		DisplayServer.get_display_safe_area(),
+		DisplayServer.get_display_safe_area() if OS.has_feature("android") or OS.has_feature("ios") else Rect2i(),
 		DisplayServer.window_get_size(),
 		get_viewport().get_visible_rect().size)
 

@@ -23,6 +23,9 @@ import com.mapbox.maps.extension.localization.localizeLabels
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
 import com.mapbox.maps.extension.style.layers.getLayerAs
+import com.mapbox.maps.plugin.attribution.attribution
+import com.mapbox.maps.plugin.compass.compass
+import com.mapbox.maps.plugin.logo.logo
 import org.godotengine.godot.Godot
 import org.godotengine.godot.plugin.GodotPlugin
 import org.godotengine.godot.plugin.SignalInfo
@@ -65,6 +68,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
     private var container: FrameLayout? = null
     private var mapView: MapView? = null
+    private var mapSceneVisible = true
 
     private var locationManager: LocationManager? = null
     private var locationStarted = false
@@ -125,7 +129,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
             if (mapView != null) {
                 // 幂等重入（从其他场景返回）：恢复可见并补发 ready 信号，
                 // 否则 GDScript 侧会永远停在"等待 map_ready"。
-                mapView?.visibility = View.VISIBLE
+                updateMapSceneVisibility(true)
                 emitSignal("map_ready")
                 return@runOnUiThread
             }
@@ -251,12 +255,24 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         return ctx.resources.displayMetrics.density.toDouble()
     }
 
-    /** 地图整体显隐：离开地图场景时关掉，省 GPU/电（保留实例，返回时秒恢复）。 */
+    /** Pause the map under opaque Godot scenes, retaining its last composed buffer. */
     @UsedByGodot
     fun setMapVisible(visible: Boolean) {
         runOnUiThread {
-            mapView?.visibility = if (visible) View.VISIBLE else View.GONE
+            updateMapSceneVisibility(visible)
         }
+    }
+
+    private fun updateMapSceneVisibility(visible: Boolean) {
+        val mv = mapView ?: return
+        if (mapSceneVisible == visible) return
+        mapSceneVisible = visible
+        // Removing the SurfaceView reveals the launcher while Godot submits its first opaque frame.
+        // onStop pauses rendering without removing that surface from Android's compositor.
+        mv.logo.enabled = visible
+        mv.attribution.enabled = visible
+        mv.compass.enabled = visible
+        if (visible) mv.onStart() else mv.onStop()
     }
 
     /** Android 根页返回遵循系统语义：任务进入后台并保留热启动状态。 */

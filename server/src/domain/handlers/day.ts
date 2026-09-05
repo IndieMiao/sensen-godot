@@ -28,9 +28,11 @@ export function materializeDay(s: FarmState, ctx: Ctx): Ok<FarmState> {
   next.clock.field_condition = d.field_condition;
 
   // 每日额度按玩家日重置（PRD §6.4 L431 摊位、L534 回购箱）。
-  next.stall = { day: d.player_day_id, settled: 0 };
-  next.buyback = { ...next.buyback, day: d.player_day_id, sold: 0 }; // week_total 跨日累计
-  next.xp.harvest_counted = { day: d.player_day_id, plants: 0 };
+  if (d.days_elapsed > 0) {
+    next.stall = { day: d.player_day_id, settled: 0 };
+    next.buyback = { ...next.buyback, day: d.player_day_id, sold: 0 }; // week_total 跨日累计
+    next.xp.harvest_counted = { day: d.player_day_id, plants: 0 };
+  }
 
   if (d.opens_new_chapter) {
     // 1. 先清：绑定种子是一次性剧情 Grant，不能跨章囤积（PRD §7.5 L526）。
@@ -48,7 +50,9 @@ export function materializeDay(s: FarmState, ctx: Ctx): Ok<FarmState> {
         if (!crop.startsWith('_')) next.inventory.seeds[crop as CropId].bound += n ?? 0;
       next.chapters[idx].grants_issued = true;
     }
-    if (ch.nursery_stage) next.nursery.stage = ch.nursery_stage as FarmState['nursery']['stage'];
+    // Construction is earned by submitted materials, never by opening the final chapter.
+    if (ch.nursery_stage && ch.nursery_stage !== 'built' && next.nursery.stage !== 'built')
+      next.nursery.stage = ch.nursery_stage as FarmState['nursery']['stage'];
   }
   return ok(next);
 }

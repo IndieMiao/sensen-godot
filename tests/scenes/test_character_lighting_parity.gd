@@ -58,16 +58,32 @@ func test_map_background_mode_keeps_transparency() -> void:
 	## 用 1（COLOR）会画一层实色盖掉底图，G1/G3 那套透明合成就废了。
 	assert_str(_val(MAP, "background_mode")).is_equal("0")
 
-## 换装房必须有实体背板，不能靠清屏色当背景。
-## 2026-09-01：真机上从地图进换装房时整屏透到桌面。已排除的两个原因——
-## transparent_bg 在地图 _exit_tree 里确实还原了（真机日志 [DR] enter transparent_bg=false），
-## DisplayServer.WINDOW_FLAG_TRANSPARENT 关掉也无效（背景像素逐字节不变）。
-## 根因在 Activity 级窗口透明（Godot 因 per_pixel_transparency/allowed=true 套的
-## translucent 主题），GDScript 管不到。与其跟引擎较劲，不如给场景一个真的背板——
-## 这本来也是对的：参考版的换装间是个真实房间，不是一块清屏色。
+## The translucent Android window needs opaque pixels across the whole viewport.
+## The room canvas provides them independently of the live avatar camera and lighting.
 func test_dressing_room_has_opaque_backdrop() -> void:
-	var src := FileAccess.get_file_as_string(ROOM)
-	assert_bool(src.contains('name="Backdrop"')).is_true()
-	assert_bool(src.contains('type="MeshInstance3D"')).is_true()
-	## 无光照（shading_mode = 0）：背板要的是确定的底色，不该跟着平行光变
-	assert_bool(src.contains("shading_mode = 0")).is_true()
+	var room := (load(ROOM) as PackedScene).instantiate()
+	auto_free(room)
+	var environment := (room.get_node("WorldEnvironment") as WorldEnvironment).environment
+	var background := room.get_node("RoomBackground") as CanvasLayer
+	var paper := background.get_node("Paper") as ColorRect
+	var scenery := background.get_node("Scenery") as TextureRect
+	assert_int(environment.background_mode).is_equal(Environment.BG_CANVAS)
+	assert_int(background.layer).is_less(0)
+	assert_int(background.layer).is_less_equal(environment.background_canvas_max_layer)
+	assert_bool(background.follow_viewport_enabled).is_false()
+	assert_object(background.get_parent()).is_same(room)
+	assert_object(room.get_node("RigAnchor").get_parent()).is_same(room)
+	assert_float(paper.color.a).is_equal(1.0)
+	assert_float(paper.modulate.a).is_equal(1.0)
+	assert_float(paper.self_modulate.a).is_equal(1.0)
+	assert_float(paper.anchor_left).is_equal(0.0)
+	assert_float(paper.anchor_top).is_equal(0.0)
+	assert_float(paper.anchor_right).is_equal(1.0)
+	assert_float(paper.anchor_bottom).is_equal(1.0)
+	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
+		assert_float(paper.get_offset(side)).is_equal(0.0)
+	assert_object(background.get_child(0)).is_same(paper)
+	assert_int(paper.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int(scenery.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_object(scenery.texture).is_not_null()
+	assert_int(scenery.texture.get_image().detect_alpha()).is_equal(Image.ALPHA_NONE)

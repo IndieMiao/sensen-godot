@@ -6,29 +6,31 @@ extends Node3D
 ##   0 / ⅓ / ⅔ / 成熟。ready_at 为 null（刚播种，或预测器预测了照料但服务端还没回包）
 ## 一律停在阶段 0——客户端不猜时长。
 ##
-## 灰盒外观：BoxMesh 按阶段缩放 + 顶点色。真美术进来时只换 mesh 与材质，分段逻辑不动。
+## 合并低面数植株：每种作物一个共享网格，植株数量不会增加场景节点。
+
+const PlantMesh = preload("res://modules/farm/crop_plant_mesh.gd")
 
 const CROPS := ["R", "L", "C", "H"]
 const STAGES := 4
-## 每种作物的灰盒色（成熟阶段整体提亮，见 _stage_color）。
+## 与种子袋和作物 PNG 一致的根茎色，叶片保留自己的绿色。
 const CROP_COLOR := {
-	"R": Color(0.86, 0.36, 0.36),   # 小萝卜
+	"R": Color(0.96, 0.92, 0.75),   # 白萝卜
 	"L": Color(0.46, 0.76, 0.40),   # 生菜
 	"C": Color(0.93, 0.60, 0.24),   # 胡萝卜
 	"H": Color(0.95, 0.90, 0.52),   # 洋甘菊
 }
 const WEED_COLOR := Color(0.46, 0.58, 0.30)
-## 翻土标记：一块压在畦面上的深色薄板——「翻过」与「只清理过」必须一眼能分。
+## 翻土层包含五条立体垄沟，与只清理过的平地分开。
 const SOIL_COLOR := Color(0.42, 0.27, 0.16)
 const SOIL_SIZE := Vector3(0.92, 0.05, 0.92)
 ## 刚播下的幼苗用亮绿：阶段 0 曾是 0.10 高的暗绿小块，埋在畦面里根本看不见。
-const SEEDLING_COLOR := Color(0.42, 0.78, 0.36)
-## 四阶段的盒体尺寸（逻辑米）；成熟那阶段明显更高更挺。
+const SEEDLING_COLOR := Color(0.72, 0.93, 0.52)
+## 四阶段的植株尺寸（逻辑米）；成熟株高低于地块提示，避免挤满田间视野。
 const STAGE_SIZE := [
-	Vector3(0.16, 0.16, 0.16),
-	Vector3(0.26, 0.30, 0.26),
-	Vector3(0.34, 0.48, 0.34),
-	Vector3(0.40, 0.66, 0.40),
+	Vector3(0.19, 0.16, 0.19),
+	Vector3(0.27, 0.24, 0.27),
+	Vector3(0.34, 0.34, 0.34),
+	Vector3(0.40, 0.44, 0.40),
 ]
 const WEED_SIZE := Vector3(0.24, 0.34, 0.24)
 ## 一格里散布几株，摆成 2×2。
@@ -41,6 +43,7 @@ var world_scale := 1.0
 ## 0.15 高的畦面盒子里，玩家清理了什么都看不见。
 var ground_y := 0.0
 var _mm: Dictionary = {}       ## crop_id / "weed" / "soil" → MultiMeshInstance3D
+var _detail_mm: Dictionary = {} # Roots and flowers appear only in their visible growth stage.
 
 func _init(p_bp: FarmBlueprint = null, p_scale := 1.0) -> void:
 	bp = p_bp
@@ -48,9 +51,11 @@ func _init(p_bp: FarmBlueprint = null, p_scale := 1.0) -> void:
 
 func _ready() -> void:
 	for crop in CROPS:
-		_mm[crop] = _make_layer(BoxMesh.new())
-	_mm["weed"] = _make_layer(BoxMesh.new())
-	_mm["soil"] = _make_layer(BoxMesh.new())
+		_mm[crop] = _make_layer(PlantMesh.build(crop, CROP_COLOR[crop]))
+	_mm["weed"] = _make_layer(PlantMesh.build("weed", WEED_COLOR))
+	_mm["soil"] = _make_layer(PlantMesh.build("soil", SOIL_COLOR))
+	for crop in ["R", "C", "H"]:
+		_detail_mm[crop] = _make_layer(PlantMesh.build(crop + "_detail", CROP_COLOR[crop]))
 
 func _make_layer(mesh: Mesh) -> MultiMeshInstance3D:
 	var mmi := MultiMeshInstance3D.new()
@@ -64,6 +69,8 @@ func _make_layer(mesh: Mesh) -> MultiMeshInstance3D:
 	mat.vertex_color_use_as_albedo = true
 	# 实例色是 8 位 sRGB；不声明的话会被当线性色，整体发白——真机上深棕翻土板成了浅褐。
 	mat.vertex_color_is_srgb = true
+	mat.roughness = 0.95
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	mmi.material_override = mat
 	add_child(mmi)
 	return mmi
@@ -111,8 +118,7 @@ func sync_snapshot(cells: Array) -> void:
 			continue
 		buckets[layer].append({"cell": _parse_cell(str(c.get("cell_id", ""))),
 			"stage": 0 if layer in ["weed", "soil"] else stage_from_snapshot(c)})
-	for layer in buckets:
-		_fill(_mm[layer], buckets[layer], layer)
+	_sync_buckets(buckets)
 
 func sync(cells: Dictionary, now_ms: int) -> void:
 	var buckets := {"weed": [], "soil": []}
@@ -126,8 +132,15 @@ func sync(cells: Dictionary, now_ms: int) -> void:
 		var cell := _parse_cell(str(id))
 		var stage := 0 if layer in ["weed", "soil"] else stage_of(slot, now_ms)
 		buckets[layer].append({"cell": cell, "stage": stage})
+	_sync_buckets(buckets)
+
+func _sync_buckets(buckets: Dictionary) -> void:
 	for layer in buckets:
 		_fill(_mm[layer], buckets[layer], layer)
+		if _detail_mm.has(layer):
+			var detail_stage := 3 if layer == "H" else 2
+			var detailed: Array = buckets[layer].filter(func(item): return int(item.stage) >= detail_stage)
+			_fill(_detail_mm[layer], detailed, layer)
 
 static func per_cell(layer: String) -> int:
 	return 1 if layer == "soil" else PER_CELL
@@ -149,23 +162,21 @@ func _fill(mmi: MultiMeshInstance3D, items: Array, layer: String) -> void:
 			var dx := 0.0 if per == 1 else (-1.0 if k % 2 == 0 else 1.0) * JITTER * world_scale
 			var dz := 0.0 if per == 1 else (-1.0 if k < 2 else 1.0) * JITTER * world_scale
 			# 从畦面顶部往上长，而不是从世界原点：否则矮的东西全埋在畦面盒子里
-			var t := Transform3D(Basis().scaled(size), base + Vector3(dx, ground_y + size.y * 0.5, dz))
+			var angle := float(posmod(item.cell.x * 7 + item.cell.y * 11 + k * 5, 16)) * TAU / 16.0
+			var rotation := Basis.IDENTITY if layer == "soil" else Basis(Vector3.UP, angle)
+			var t := Transform3D(rotation * Basis.from_scale(size), base + Vector3(dx, ground_y + size.y * 0.5, dz))
 			mm.set_instance_transform(n, t)
 			mm.set_instance_color(n, color)
 			n += 1
 
 static func _stage_color(layer: String, stage: int) -> Color:
 	if layer == "weed":
-		return WEED_COLOR
+		return Color.WHITE
 	if layer == "soil":
-		return SOIL_COLOR
+		return Color.WHITE
 	if stage == 0:
 		return SEEDLING_COLOR
-	var c: Color = CROP_COLOR[layer]
-	# 未成熟偏绿偏暗，成熟才回到作物本色并提亮——玩家一眼能挑出该收的格子。
-	if stage >= STAGES - 1:
-		return c.lightened(0.12)
-	return c.lerp(Color(0.36, 0.62, 0.34), 1.0 - float(stage) / float(STAGES - 1)).darkened(0.1)
+	return SEEDLING_COLOR.lerp(Color.WHITE, float(stage) / float(STAGES - 1))
 
 ## 每层的实例数（格数 × PER_CELL）；测试用。
 func counts() -> Dictionary:

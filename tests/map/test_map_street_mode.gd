@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## PRD §3.1：街区级固定浏览范围——固定 zoom/pitch/north-up，禁缩放旋转，只能在边界内平移。
+## Street mode keeps north/pitch fixed and permits zoom 15-18 with elastic limits.
 
 const MAP_POC_SCENE := "res://scenes/map_poc/map_poc.tscn"
 const REGION := {"id": "t", "name": "T", "street_zoom": 16.0, "pitch": 45.0, "center": [31.2, 121.4]}
@@ -10,22 +10,42 @@ func _map() -> Node:
 	scene.enter_street_mode(REGION)
 	return scene
 
-func test_zoom_and_pitch_locked() -> void:
+func test_zoom_is_available_with_elastic_limits_and_fixed_pitch() -> void:
 	var m := _map()
 	m._set_zoom(18.0)
-	assert_float(m.zoom).is_equal(16.0)
+	assert_float(m.zoom).is_equal(18.0)
 	var mag := InputEventMagnifyGesture.new()
 	mag.factor = 2.0
 	m._unhandled_input(mag)
-	assert_float(m.zoom).is_equal(16.0)
+	assert_float(m.zoom).is_equal(18.0)
+	assert_float(m._zoom_elastic).is_greater(0.0)
+	m._set_zoom(10.0)
+	assert_float(m.zoom).is_equal(15.0)
+	assert_float(m._zoom_elastic).is_less(0.0)
 	var pan := InputEventPanGesture.new()
 	pan.delta = Vector2(0, 100)
 	m._unhandled_input(pan)
 	assert_float(m.pitch).is_equal(45.0)
 	assert_float(m.bearing).is_equal(0.0)
 
-func test_double_tap_does_not_zoom() -> void:
+func test_zoom_buttons_reach_limits_from_a_fractional_pinch_level() -> void:
 	var m := _map()
+	m._set_zoom(17.6)
+	m._tween_zoom(m.zoom + 1)
+	await get_tree().create_timer(0.35).timeout
+	assert_float(m.zoom).is_equal(18.0)
+	m._set_zoom(15.4)
+	m._tween_zoom(m.zoom - 1)
+	await get_tree().create_timer(0.35).timeout
+	assert_float(m.zoom).is_equal(15.0)
+	m._tween_zoom(14)
+	assert_float(m._zoom_elastic).is_less(0)
+	await get_tree().create_timer(0.65).timeout
+	assert_float(m._zoom_elastic).is_equal_approx(0, 0.001)
+
+func test_double_tap_starts_a_zoom_tween() -> void:
+	var m := _map()
+	await get_tree().create_timer(0.01).timeout
 	for k in 2:
 		var down := InputEventScreenTouch.new()
 		down.pressed = true
@@ -36,7 +56,7 @@ func test_double_tap_does_not_zoom() -> void:
 		up.position = Vector2(100, 100)
 		m._unhandled_input(up)
 	assert_float(m.zoom).is_equal(16.0)
-	assert_object(m._zoom_tween).is_null()
+	assert_object(m._zoom_tween).is_not_null()
 
 func test_pan_clamped_to_bounds() -> void:
 	var m := _map()

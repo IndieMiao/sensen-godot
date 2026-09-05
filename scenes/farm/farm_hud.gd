@@ -1,47 +1,38 @@
 class_name FarmHud
 extends Control
-## 农场 HUD v2：不再有「工具」。玩家只面对三样东西——
-##   · 一个大按钮：现在最该做的一件事（Clear 9 plots / Water 3 plots / Sell 2 at the stall）
-##   · 一张今日目标清单：知道自己在往哪走
-##   · 田况与金币
-## 直接点田块也行：它自己知道下一步。所有新元素在底部与右侧，不碰顶栏（360 宽已无余量）。
-## 界面文案一律英文。
+## Status at the top, a clear playfield, and one bottom action dock.
 
 signal cta_pressed()
+signal cancel_pressed()
 signal seed_selected(crop: String)
 signal stall_pressed()
+signal life_pressed()
+signal reconnect_pressed()
 signal wave_pressed()
 signal stamp_pressed()
 
 const BUTTON_H := 48.0
-const TOAST_S := 2.5
-const REJECT_TEXT := {
-	"WRONG_STATE": "That plot isn't ready for this step",
-	"NOT_RIPE": "Not ripe yet",
-	"WRONG_CARE": "Wrong care for today's weather",
-	"INSUFFICIENT_ITEMS": "Not enough of that item",
-	"INSUFFICIENT_FUNDS": "Not enough coins",
-	"CELL_LOCKED": "This bed isn't unlocked yet",
-	"CHAPTER_LOCKED": "Not available in this chapter yet",
-	"STALL_BUDGET": "The stall is sold out for today",
-	"OFFLINE": "You're offline",
-	"UNKNOWN_CELL": "That plot isn't part of this farm",
-	"CELL_NOT_CULTIVABLE": "That plot can't be farmed",
-	"NOT_PREDICTED": "Rejected",
-}
+const TOAST_S := 3.0
+const REJECT_TEXT := {"WRONG_STATE": "That plot isn't ready for this step", "NOT_RIPE": "Not ripe yet",
+	"WRONG_CARE": "This crop needs different care", "INSUFFICIENT_ITEMS": "Not enough of that item",
+	"INSUFFICIENT_FUNDS": "Not enough coins", "CELL_LOCKED": "This bed isn't unlocked yet",
+	"CHAPTER_LOCKED": "Not available in this chapter yet", "STALL_BUDGET": "The stall is sold out for today",
+	"OFFLINE": "You're offline", "UNKNOWN_CELL": "That plot isn't part of this farm",
+	"PENDING_ACTION": "Check your previous visit, kitchen, project or trade first",
+	"CELL_NOT_CULTIVABLE": "That plot can't be farmed", "NOT_PREDICTED": "Action unavailable"}
 const CONDITION_TEXT := {"sunny": "Sunny · water today", "rain": "Rain · drain today", "wind": "Wind · shelter today"}
 
 var visitor := false
 var selected_crop := "R"
 var offline := false
-
 var _coins: Label
 var _condition: Label
+var _weather_icon: TextureRect
+var _weather := "sunny"
 var _timer_label: Label
-var _status: PanelContainer
+var _status: VBoxContainer
 var _status_label: Label
 var _status_bar: ProgressBar
-var _last_action_text := ""
 var _banner: PanelContainer
 var _toast: PanelContainer
 var _toast_label: Label
@@ -49,384 +40,471 @@ var _toast_left := 0.0
 var _goals: PanelContainer
 var _goals_header: Button
 var _goals_list: VBoxContainer
-var _goals_open := true
-var _goals_auto_collapsed := false
+var _goals_count: Label
+var _goals_title: Label
+var _goals_feedback: Label
+var _goals_open := false
 var _cta_busy := false
+var _cta_enabled := false
 var _cta: Button
-var _seed_row: HBoxContainer
+var _cancel: Button
+var _seed_row: GridContainer
 var _seed_buttons: Dictionary = {}
 var _stall: Button
 var _bottom: VBoxContainer
 var _visitor_bar: HBoxContainer
+var _scrim: ColorRect
+var _modal: Control
+var _last_action_text := ""
+var _coin_icon: TextureRect
+var _action := ""
+var _work_backing: Panel
+var _reconnect: Button
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_build_top_right()
-	_build_goals()
-	_build_banner_and_toast()
+	_build_status()
 	_build_bottom()
+	_build_modals()
+	_build_messages()
+	resized.connect(_layout)
+	call_deferred("_layout")
 
-# —— 右上：金币 / 田况 / 倒计时 / 进度 ——————————————————————————————————————
+func _small_icon(symbol: String, color: Color) -> TextureRect:
+	var t := TextureRect.new()
+	t.texture = GameUi.icon(symbol)
+	t.custom_minimum_size = Vector2(18, 18)
+	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	t.modulate = color
+	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return t
 
-func _build_top_right() -> void:
-	var box := VBoxContainer.new()
-	box.name = "TopRight"
-	box.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	# Root 只有 328 宽（360 减两侧 16 安全边距）：目标卡占 8..138，右上列占 142..320。
-	# 状态 chip 要装下「Sowing Radish… · 5 left」，目标卡多数时候是折叠的一行，让它窄一点。
-	box.offset_left = -186.0
-	box.offset_top = 60.0
-	box.offset_right = -8.0
-	box.alignment = BoxContainer.ALIGNMENT_END
-	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(box)
-	_coins = _chip(box, "Coins 0")
-	_condition = _chip(box, "Sunny · water today")
-	_timer_label = _chip(box, "Next ripe --:--")
-	_status = PanelContainer.new()
-	_status.name = "ActionStatus"
-	_status.theme_type_variation = &"ChipPanel"
-	_status.size_flags_horizontal = Control.SIZE_SHRINK_END
-	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+func _build_status() -> void:
+	var backing := Panel.new()
+	backing.name = "StatusBacking"
+	backing.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	backing.z_index = -1
+	backing.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	backing.offset_left = -32
+	backing.offset_right = 32
+	backing.offset_top = -80
+	backing.offset_bottom = 138
+	var style := GameUi.surface(Color(GameUi.PAPER, 0.94), 0, 0)
+	style.set_border_width_all(0)
+	backing.add_theme_stylebox_override("panel", style)
+	add_child(backing)
+	var top := HBoxContainer.new()
+	top.name = "TopRight"
+	top.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	top.offset_top = 54
+	top.offset_bottom = 86
+	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_theme_constant_override("separation", 6)
+	add_child(top)
+	_weather_icon = _small_icon("sun", GameUi.BLUE)
+	top.add_child(_weather_icon)
+	_condition = GameUi.label("Sunny · water today", 12)
+	_condition.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_condition.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	top.add_child(_condition)
+	_coin_icon = _small_icon("coins", Color("b58728"))
+	top.add_child(_coin_icon)
+	_coins = GameUi.label("0", 14)
+	top.add_child(_coins)
+	var meta := HBoxContainer.new()
+	meta.name = "Overview"
+	meta.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	meta.offset_top = 90
+	meta.offset_bottom = 134
+	meta.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(meta)
+	_goals_header = GameUi.button("list-checks", "Goals", "Chapter goals")
+	_goals_header.add_theme_font_size_override("font_size", 12)
+	_goals_header.pressed.connect(func(): show_modal(_goals))
+	meta.add_child(_goals_header)
+	var bag := GameUi.button("shopping-bag", "", "Harvest and supplies")
+	bag.name = "LifeButton"
+	bag.pressed.connect(func(): life_pressed.emit())
+	meta.add_child(bag)
+	_reconnect = GameUi.button("rotate-ccw", "", "Check connection and last action")
+	_reconnect.name = "ReconnectFarm"
+	_reconnect.visible = false
+	_reconnect.pressed.connect(func():
+		if not _reconnect.disabled: reconnect_pressed.emit())
+	meta.add_child(_reconnect)
+	_timer_label = GameUi.label("", 12, GameUi.MUTED)
+	_timer_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	meta.add_child(_timer_label)
+
+func _build_bottom() -> void:
+	_work_backing = Panel.new()
+	_work_backing.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_work_backing.add_theme_stylebox_override("panel", GameUi.surface(GameUi.PAPER, 0))
+	_work_backing.visible = false
+	add_child(_work_backing)
+	_bottom = VBoxContainer.new()
+	_bottom.name = "BottomBar"
+	_bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bottom.add_theme_constant_override("separation", 8)
+	add_child(_bottom)
+	_status = VBoxContainer.new()
 	_status.visible = false
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 2)
-	_status.add_child(v)
-	_status_label = Label.new()
-	_status_label.add_theme_font_size_override("font_size", DesignTokens.FONT_MICRO + 1)   # 「Clearing… 92% · 8 left」要装进 126 宽
+	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_status_label = GameUi.label("", 12)
+	_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_status_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	# 固定宽：省略号模式下 Label 最小宽是 1，SHRINK_END 的 chip 会缩成 29 px 的空白小丸；
-	# 不固定又会被长句撑到和左边的目标卡相撞。
-	_status_label.custom_minimum_size.x = 150.0
-	v.add_child(_status_label)
+	_status.add_child(_status_label)
 	_status_bar = ProgressBar.new()
 	_status_bar.show_percentage = false
-	_status_bar.custom_minimum_size.y = 6.0
-	_status_bar.max_value = 1.0
-	v.add_child(_status_bar)
-	box.add_child(_status)
+	_status_bar.max_value = 1
+	_status_bar.custom_minimum_size.y = 4
+	_status.add_child(_status_bar)
+	_bottom.add_child(_status)
+	_seed_row = GridContainer.new()
+	_seed_row.name = "SeedRow"
+	_seed_row.columns = 2
+	_seed_row.add_theme_constant_override("h_separation", 8)
+	_seed_row.add_theme_constant_override("v_separation", 6)
+	_seed_row.visible = false
+	_bottom.add_child(_seed_row)
+	for id in CropInfo.ORDER:
+		var b := GameUi.button("sprout", CropInfo.name_of(id), "Plant %s" % CropInfo.name_of(id))
+		b.icon = GameUi.crop_art(id)
+		b.custom_minimum_size.y = 58
+		b.add_theme_constant_override("icon_max_width", 36)
+		for state in ["normal", "hover", "pressed", "focus"]:
+			b.add_theme_color_override("icon_%s_color" % state, Color.WHITE)
+		b.add_theme_color_override("icon_disabled_color", Color(1, 1, 1, 0.45))
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.add_theme_font_size_override("font_size", 13)
+		b.pressed.connect(func():
+			selected_crop = id
+			_refresh_seed_buttons()
+			seed_selected.emit(id))
+		_seed_buttons[id] = b
+		_seed_row.add_child(b)
+	var dock := HBoxContainer.new()
+	dock.add_theme_constant_override("separation", 8)
+	_bottom.add_child(dock)
+	_cta = GameUi.button("sprout", "Loading...", "Work the ready plots", true)
+	_cta.name = "CTA"
+	_cta.custom_minimum_size.y = 52
+	_cta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_cta.clip_text = true
+	_cta.pressed.connect(func(): cta_pressed.emit())
+	dock.add_child(_cta)
+	_cancel = GameUi.button("x", "", "Cancel remaining work")
+	_cancel.visible = false
+	_cancel.pressed.connect(func(): cancel_pressed.emit())
+	dock.add_child(_cancel)
+	_stall = GameUi.button("store", "", "Roadside stall")
+	_stall.name = "Stall"
+	_stall.custom_minimum_size = Vector2(52, 52)
+	_stall.pressed.connect(func(): stall_pressed.emit())
+	dock.add_child(_stall)
+	_visitor_bar = HBoxContainer.new()
+	_visitor_bar.name = "VisitorBar"
+	_visitor_bar.add_theme_constant_override("separation", 8)
+	_visitor_bar.visible = false
+	add_child(_visitor_bar)
+	for spec in [["hand", "Wave", "wave_pressed"], ["heart", "Stamp", "stamp_pressed"]]:
+		var b := GameUi.button(spec[0], spec[1], spec[1], spec[0] == "hand")
+		b.custom_minimum_size.y = 52
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.pressed.connect(func(): emit_signal(spec[2]))
+		_visitor_bar.add_child(b)
 
-func _chip(parent: Node, text: String) -> Label:
-	var panel := PanelContainer.new()
-	panel.theme_type_variation = &"ChipPanel"
-	panel.size_flags_horizontal = Control.SIZE_SHRINK_END
-	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var label := Label.new()
-	label.text = text
-	label.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
-	panel.add_child(label)
-	parent.add_child(panel)
-	return label
-
-# —— 左上：今日目标 ——————————————————————————————————————————————————————
-
-func _build_goals() -> void:
+func _build_modals() -> void:
+	_scrim = ColorRect.new()
+	_scrim.name = "ModalScrim"
+	_scrim.color = Color(0.06, 0.13, 0.1, 0.28)
+	_scrim.z_index = 10
+	_scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_scrim.offset_left = -32
+	_scrim.offset_top = -80
+	_scrim.offset_right = 32
+	_scrim.offset_bottom = 80
+	_scrim.visible = false
+	_scrim.gui_input.connect(func(e):
+		if (e is InputEventScreenTouch or e is InputEventMouseButton) and e.is_pressed():
+			close_modal()
+			accept_event())
+	add_child(_scrim)
 	_goals = PanelContainer.new()
 	_goals.name = "Goals"
-	_goals.theme_type_variation = &"ChipPanel"
-	_goals.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
-	_goals.offset_left = 8.0
-	_goals.offset_top = 60.0
-	_goals.offset_right = 138.0
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 2)
-	_goals.add_child(v)
-	_goals_header = Button.new()
-	_goals_header.text = "Goals · 0/7 ▾"
-	_goals_header.flat = true
-	_goals_header.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_goals_header.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
-	_goals_header.custom_minimum_size.y = 28.0
-	_tighten(_goals_header)   # 默认 16 px 内边距会把整张卡撑到 159 宽、碰到右上列
-	_goals_header.pressed.connect(func():
-		_goals_open = not _goals_open
-		_goals_list.visible = _goals_open
-		_goals_header.text = _goals_header.text.trim_suffix("▾").trim_suffix("▸") + ("▾" if _goals_open else "▸"))
-	v.add_child(_goals_header)
-	_goals_list = VBoxContainer.new()
-	_goals_list.add_theme_constant_override("separation", 0)
-	v.add_child(_goals_list)
+	_goals.z_index = 11
+	_goals.visible = false
+	# Wrapped labels can briefly inflate the first layout before their width is known.
+	_goals.minimum_size_changed.connect(_layout, CONNECT_DEFERRED)
 	add_child(_goals)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 10)
+	_goals.add_child(v)
+	var head := HBoxContainer.new()
+	v.add_child(head)
+	_goals_title = GameUi.label("Chapter goals", 18)
+	_goals_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_goals_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	head.add_child(_goals_title)
+	var close := GameUi.button("x", "", "Close goals")
+	close.pressed.connect(close_modal)
+	head.add_child(close)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	v.add_child(scroll)
+	_goals_list = VBoxContainer.new()
+	_goals_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_goals_list.add_theme_constant_override("separation", 6)
+	scroll.add_child(_goals_list)
+	_goals_count = GameUi.label("", 16, GameUi.GREEN)
+	_goals_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(_goals_count)
+	_goals_feedback = GameUi.label("Progress pending", 12, GameUi.MUTED)
+	_goals_feedback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_goals_feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	v.add_child(_goals_feedback)
 
-## goals: [{id, label, done}]。完成的打勾变灰，第一条未完成的加亮——那就是「现在做什么」。
-## 行节点复用：_refresh_hud 每次回包都会调用，重建 Label 会留一堆等帧末释放的孤儿。
-func set_goals(goals: Array, day_index: int) -> void:
-	var done := DayGoals.done_count(goals)
-	# 「Goals · 2/7 ▾」而不是「Day 1 goals · 2/7」：卡只有 130 宽，长标题会把整张卡撑到和右上列相撞。
-	_goals_header.text = "Goals · %d/%d %s" % [done, goals.size(), "▾" if _goals_open else "▸"]
-	# 第一条完成后自动折叠成一行：整张卡展开着会一直挡住左上那一畦；点标题随时展开。
-	if done > 0 and not _goals_auto_collapsed:
-		_goals_auto_collapsed = true
-		_goals_open = false
-		_goals_list.visible = false
-		_goals_header.text = "Goals · %d/%d ▸" % [done, goals.size()]
-	var rows: Array = []
-	var highlighted := false
-	for g in goals:
-		var is_done := bool(g.done)
-		var color := DesignTokens.INK_MUTED if is_done else (DesignTokens.INK if highlighted else DesignTokens.ACCENT_DEEP)
-		if not is_done:
-			highlighted = true
-		rows.append([("✓ " if is_done else "○ ") + str(g.label), color])
-	if done == goals.size() and goals.size() > 0:
-		rows.append(["Day complete — come back tomorrow", DesignTokens.ACCENT_DEEP])
-	while _goals_list.get_child_count() < rows.size():
-		var l := Label.new()
-		l.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
-		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		l.clip_text = true   # 长句不能把整张卡撑宽到和右上列相撞
-		_goals_list.add_child(l)
-	var i := 0
-	for c in _goals_list.get_children():
-		var l := c as Label
-		if i < rows.size():
-			l.visible = true
-			l.text = rows[i][0]
-			l.add_theme_color_override("font_color", rows[i][1])
-		else:
-			l.visible = false
-		i += 1
-
-func goal_labels() -> Array:
-	var out := []
-	for c in _goals_list.get_children():
-		if (c as Label).visible:
-			out.append((c as Label).text)
-	return out
-
-# —— 顶部横幅 / toast ——————————————————————————————————————————————————————
-
-func _build_banner_and_toast() -> void:
+func _build_messages() -> void:
 	_banner = PanelContainer.new()
 	_banner.name = "OfflineBanner"
 	_banner.theme_type_variation = &"ToastPanel"
-	_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	_banner.offset_top = 60.0
-	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_banner.visible = false
-	var l := Label.new()
-	l.text = "Offline — read only"
-	l.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
-	l.add_theme_color_override("font_color", DesignTokens.SURFACE)   # ToastPanel 是深底
-	_banner.add_child(l)
+	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_banner.add_child(GameUi.label("Offline · reconnecting", 12, GameUi.PAPER))
 	add_child(_banner)
 	_toast = PanelContainer.new()
 	_toast.name = "Toast"
 	_toast.theme_type_variation = &"ToastPanel"
-	_toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	_toast.offset_top = 100.0
-	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_toast.z_index = 20
 	_toast.visible = false
-	_toast_label = Label.new()
-	_toast_label.add_theme_font_size_override("font_size", DesignTokens.FONT_LABEL)
-	_toast_label.add_theme_color_override("font_color", DesignTokens.SURFACE)
+	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_toast_label = GameUi.label("", 13, GameUi.PAPER)
+	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.add_child(_toast_label)
 	add_child(_toast)
 
-# —— 底部：种子行 + 大按钮 + 摊位 ——————————————————————————————————————————
+func _layout() -> void:
+	if _bottom == null: return
+	var h := _bottom.get_combined_minimum_size().y
+	_bottom.position = Vector2(0, size.y - h - 4)
+	_bottom.size = Vector2(size.x, h)
+	_work_backing.position = _bottom.position - Vector2(8, 12)
+	_work_backing.size = _bottom.size + Vector2(16, 32)
+	_work_backing.visible = _cta_busy and _bottom.visible
+	_visitor_bar.position = Vector2(0, size.y - 56)
+	_visitor_bar.size = Vector2(size.x, 52)
+	var goals_height := minf(maxf(366, _goals.get_combined_minimum_size().y + _goals_list.get_combined_minimum_size().y), size.y - 148)
+	_goals.position = Vector2(0, size.y - goals_height - 4)
+	_goals.size = Vector2(size.x, goals_height)
+	_banner.position = Vector2(0, 138)
+	_banner.size = Vector2(size.x, 38)
+	_toast.position = Vector2(8, 144 if not offline else 186)
+	_toast.size = Vector2(maxf(1, size.x - 16), 0)
+	if _modal and _modal != _goals and _modal.has_method("fit_height"):
+		_modal.fit_height(size)
 
-func _build_bottom() -> void:
-	_bottom = VBoxContainer.new()
-	_bottom.name = "BottomBar"
-	_bottom.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	_bottom.offset_left = 8.0
-	_bottom.offset_right = -8.0
-	_bottom.offset_top = -296.0
-	_bottom.offset_bottom = -188.0
-	_bottom.alignment = BoxContainer.ALIGNMENT_END
-	_bottom.add_theme_constant_override("separation", DesignTokens.SPACE_2)
-	add_child(_bottom)
-	_seed_row = HBoxContainer.new()
-	_seed_row.name = "SeedRow"
-	_seed_row.add_theme_constant_override("separation", DesignTokens.SPACE_1)
-	_seed_row.visible = false
-	_bottom.add_child(_seed_row)
-	for id in CropInfo.ORDER:
-		var b := Button.new()
-		b.text = CropInfo.name_of(id)
-		b.theme_type_variation = &"ChoiceButton"
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.custom_minimum_size.y = 40.0
-		b.clip_text = true
-		b.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
-		_tighten(b)
-		b.pressed.connect(func():
-			selected_crop = id
-			_refresh_seed_buttons()
-			emit_signal("seed_selected", id))
-		_seed_row.add_child(b)
-		_seed_buttons[id] = b
-	_cta = Button.new()
-	_cta.name = "CTA"
-	_cta.text = "Loading…"
-	_cta.theme_type_variation = &"AccentButton"
-	_cta.custom_minimum_size.y = 52.0
-	_cta.add_theme_font_size_override("font_size", DesignTokens.FONT_BODY)
-	_cta.pressed.connect(func(): emit_signal("cta_pressed"))
-	_bottom.add_child(_cta)
-	# 摊位在右下，和左下摇杆对称。
-	_stall = Button.new()
-	_stall.name = "Stall"
-	_stall.text = "Stall"
-	_stall.theme_type_variation = &"SecondaryButton"
-	_stall.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	_stall.offset_left = -128.0
-	_stall.offset_right = -8.0
-	_stall.offset_top = -84.0
-	_stall.offset_bottom = -24.0
-	_stall.pressed.connect(func(): emit_signal("stall_pressed"))
-	add_child(_stall)
+func show_modal(panel: Control) -> void:
+	if _modal and _modal.has_method("is_busy") and _modal.is_busy(): return
+	close_modal()
+	_modal = panel
+	panel.z_index = 11
+	panel.visible = true
+	_scrim.visible = true
+	_bottom.visible = false
+	_work_backing.visible = false
+	_visitor_bar.visible = false
+	_goals_open = panel == _goals
+	_layout()
 
-## 主题给 Button 的左右内边距是 16，一行四五个按钮时长词会被裁。收到 6，高度另有兜底。
-static func _tighten(b: Button) -> void:
-	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
-		var sb := b.get_theme_stylebox(state)
-		if sb == null:
-			continue
-		var dup := sb.duplicate() as StyleBox
-		dup.content_margin_left = 6.0
-		dup.content_margin_right = 6.0
-		b.add_theme_stylebox_override(state, dup)
+func close_modal() -> void:
+	if _modal and _modal.has_method("is_busy") and _modal.is_busy(): return
+	if _modal: _modal.visible = false
+	_modal = null
+	_goals_open = false
+	if _scrim: _scrim.visible = false
+	if _bottom: _bottom.visible = not visitor
+	if _visitor_bar: _visitor_bar.visible = visitor
+	call_deferred("_layout")
 
-## 大按钮：bulk = NextStep.bulk() 的结果。调用它即视为忙碌结束。
+func modal_open() -> bool:
+	return _modal != null and _modal.visible
+
+func set_goals(goals: Array, day_index: int, progress: Dictionary = {}) -> void:
+	var done := DayGoals.done_count(goals)
+	_goals_header.text = "Goals · %d/%d" % [done, goals.size()]
+	_goals_title.text = "Chapter %d · %s" % [day_index + 1, str(progress.get("title", "Goals"))]
+	_goals_header.tooltip_text = _goals_title.text
+	var complete := bool(progress.get("complete", false))
+	_goals_header.icon = GameUi.icon("circle-check" if complete else "list-checks")
+	var rows := []
+	var highlighted := false
+	for g in goals:
+		var is_done := bool(g.done)
+		rows.append([str(g.label), GameUi.MUTED if is_done else (GameUi.INK if highlighted else GameUi.GREEN), is_done])
+		if not is_done: highlighted = true
+	_goals_count.text = "%d/%d" % [done, goals.size()]
+	_goals_feedback.text = "Progress pending" if progress.is_empty() or bool(progress.get("pending", false)) else "Chapter in progress"
+	if complete:
+		_goals_feedback.text = "Week complete" if bool(progress.get("last_chapter", false)) else "Chapter complete"
+		var remaining := int(progress.get("next_open_in_ms", -1))
+		if remaining >= 0 and not bool(progress.get("last_chapter", false)):
+			_goals_feedback.text = "Checking next chapter..." if remaining == 0 else "Chapter complete · next in %s" % format_countdown(remaining)
+	_goals_feedback.add_theme_color_override("font_color", GameUi.GREEN if complete else GameUi.MUTED)
+	while _goals_list.get_child_count() < rows.size():
+		var row := HBoxContainer.new()
+		row.custom_minimum_size.y = 32
+		row.add_theme_constant_override("separation", 12)
+		row.add_child(_small_icon("circle", GameUi.MUTED))
+		var l := GameUi.label("", 14)
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		row.add_child(l)
+		_goals_list.add_child(row)
+	for i in _goals_list.get_child_count():
+		var row := _goals_list.get_child(i) as HBoxContainer
+		row.visible = i < rows.size()
+		if row.visible:
+			var l := row.get_child(1) as Label
+			l.text = rows[i][0]
+			l.add_theme_color_override("font_color", rows[i][1])
+			var mark := row.get_child(0) as TextureRect
+			mark.texture = GameUi.icon("check" if rows[i][2] else "circle")
+			mark.modulate = rows[i][1]
+			row.set_meta("goal_text", ("✓ " if rows[i][2] else "○ ") + l.text)
+	call_deferred("_layout")
+
+func goal_labels() -> Array:
+	var out := []
+	for c in _goals_list.get_children():
+		if c.visible: out.append(c.get_meta("goal_text"))
+	return out
+
 func set_cta(bulk: Dictionary) -> void:
 	_cta_busy = false
+	_action = str(bulk.get("action", ""))
+	_cta.remove_theme_stylebox_override("disabled")
+	_cta.remove_theme_color_override("font_disabled_color")
+	_cta.remove_theme_color_override("icon_disabled_color")
+	_cta_enabled = bool(bulk.get("enabled", true))
 	_cta.text = str(bulk.get("label", ""))
-	_cta.disabled = offline or not bool(bulk.get("enabled", true))
-	_cta.theme_type_variation = &"AccentButton" if bulk.get("action", "") != "stall" else &"SecondaryButton"
+	_cta.icon = GameUi.icon(GameUi.action_icon(str(bulk.get("action", "")), str(bulk.get("weather", _weather))))
+	_cta.disabled = offline or not _cta_enabled
+	_cta.theme_type_variation = &"AccentButton"
+	_cancel.visible = false
+	_status.visible = false
+	call_deferred("_layout")
 
-## 队列在跑：大按钮改成禁用的「Working… N plots left」。原来它仍显示可点的下一步，再按一下
-## 就把同一批格再排一遍，然后一格格被拒。
 func set_cta_busy(pending: int) -> void:
 	_cta_busy = true
-	_cta.text = "Working…" if pending <= 0 else "Working… %d %s left" % [pending, "plot" if pending == 1 else "plots"]
 	_cta.disabled = true
-	_cta.theme_type_variation = &"SecondaryButton"
+	_cta.text = _last_action_text if not _last_action_text.is_empty() else "Working..."
+	_status_label.text = "%d %s remaining" % [pending, "plot" if pending == 1 else "plots"] if pending > 0 else "Finishing..."
+	_status.visible = true
+	_cancel.visible = true
+	_seed_row.visible = false
+	var color := GameUi.BLUE if _action == "care" else GameUi.GREEN
+	_cta.add_theme_stylebox_override("disabled", GameUi.surface(color, 8))
+	_cta.add_theme_color_override("font_disabled_color", GameUi.PAPER)
+	_cta.add_theme_color_override("icon_disabled_color", GameUi.PAPER)
+	call_deferred("_layout")
 
-## 种子行：只在能播种时出现；每颗作物显示还剩几颗；锁着的不出现。
 func set_seeds(inventory: Dictionary, unlocked: Array, show: bool) -> void:
-	_seed_row.visible = show and not visitor
+	_seed_row.visible = show and not visitor and not _cta_busy
 	for id in _seed_buttons:
 		var b: Button = _seed_buttons[id]
 		var n := NextStep.seeds_of(inventory, id)
 		b.visible = unlocked.has(id)
-		b.text = "%s ×%d" % [CropInfo.name_of(id), n]
-		b.disabled = n == 0 or offline
+		b.text = "%s\n×%d" % [CropInfo.name_of(id), n]
+		b.disabled = n == 0 or offline or _cta_busy
 	if not unlocked.has(selected_crop) or NextStep.seeds_of(inventory, selected_crop) == 0:
 		for id in CropInfo.ORDER:
 			if unlocked.has(id) and NextStep.seeds_of(inventory, id) > 0:
 				selected_crop = id
 				break
 	_refresh_seed_buttons()
+	call_deferred("_layout")
 
 func _refresh_seed_buttons() -> void:
 	for id in _seed_buttons:
-		(_seed_buttons[id] as Button).theme_type_variation = \
-			&"ChoiceSelectedButton" if id == selected_crop else &"ChoiceButton"
+		_seed_buttons[id].theme_type_variation = &"ChoiceSelectedButton" if id == selected_crop else &"ChoiceButton"
 
 func set_offline(v: bool) -> void:
 	offline = v
 	_banner.visible = v
-	_cta.disabled = v or _cta.disabled
+	_cta.disabled = v or _cta_busy or not _cta_enabled
 	_stall.disabled = v
 
+func set_connection_recovery(needed: bool, busy := false) -> void:
+	_reconnect.visible = needed
+	_reconnect.disabled = busy
+
 func set_coins(n: int) -> void:
-	_coins.text = "Coins %d" % n
+	_coins.text = str(n)
 
 func set_condition(cond: String) -> void:
+	_weather = cond
 	_condition.text = str(CONDITION_TEXT.get(cond, cond))
+	_weather_icon.texture = GameUi.icon({"rain": "cloud-rain", "wind": "wind"}.get(cond, "sun"))
 
-## 下一次成熟的倒计时。`now_ms` 必须是服务端时间。
 func set_next_ripe(cells: Dictionary, now_ms: int) -> void:
-	_timer_label.text = "Next ripe %s" % format_countdown(next_ripe_ms(cells, now_ms))
+	var remaining := next_ripe_ms(cells, now_ms)
+	_timer_label.text = "Harvest ready" if remaining == 0 else ("Ripe in %s" % format_countdown(remaining) if remaining > 0 else "")
 
 static func next_ripe_ms(cells: Dictionary, now_ms: int) -> int:
 	var best := -1
 	for id in cells:
 		var ready = (cells[id] as Dictionary).get("ready_at")
-		if ready == null:
-			continue
+		if ready == null: continue
 		var delta := int(ready) - now_ms
-		if delta <= 0:
-			return 0
-		if best < 0 or delta < best:
-			best = delta
+		if delta <= 0: return 0
+		if best < 0 or delta < best: best = delta
 	return best
 
 static func format_countdown(ms: int) -> String:
-	if ms < 0:
-		return "--:--"
-	if ms == 0:
-		return "ready"
+	if ms < 0: return "--:--"
+	if ms == 0: return "ready"
 	var total := int(ms / 1000.0)
 	var h := total / 3600
 	var m := (total % 3600) / 60
-	var s := total % 60
-	if h > 0:
-		return "%dh%02dm" % [h, m]
-	return "%02d:%02d" % [m, s]
+	return "%dh%02dm" % [h, m] if h > 0 else "%02d:%02d" % [m, total % 60]
 
 func set_hint(text: String) -> void:
-	_status_bar.visible = false
-	_status_label.text = text
-	_status.visible = not text.is_empty()
+	if not text.is_empty() and text != "Tap a plot to work it": show_toast(text)
 
-## 每帧：有动作在跑就显示动词与进度；空闲时不改提示（提示由 set_hint 管）。
-func set_action(text: String, progress: float, pending: int) -> void:
-	if text.is_empty():
-		if not _last_action_text.is_empty():
-			_last_action_text = ""
-			_status.visible = false
-		return
-	var full := text
-	if pending > 1:
-		full += " · %d left" % (pending - 1)
-	_last_action_text = full
-	_status_label.text = full
-	_status_bar.visible = true
+func set_action(text: String, progress: float, _pending: int) -> void:
+	_last_action_text = text
 	_status_bar.value = progress
-	_status.visible = true
+	if _cta_busy and not text.is_empty(): _cta.text = text
 
 static func reject_text(code: String) -> String:
-	return str(REJECT_TEXT.get(code, "Rejected: %s" % code))
+	return str(REJECT_TEXT.get(code, "Action unavailable"))
 
 func show_toast(text: String) -> void:
+	var problem := text.begins_with("Can't") or text.begins_with("No ") or text.begins_with("That plot") or text.contains("unavailable")
+	_toast.add_theme_stylebox_override("panel", GameUi.surface(GameUi.PAPER if problem else GameUi.INK, 12))
+	_toast_label.add_theme_color_override("font_color", GameUi.CORAL if problem else GameUi.PAPER)
 	_toast_label.text = text
 	_toast.visible = true
 	_toast_left = TOAST_S
+	_layout()
 
 func _process(dt: float) -> void:
-	if _toast_left > 0.0:
+	if _toast_left > 0:
 		_toast_left -= dt
-		if _toast_left <= 0.0:
-			_toast.visible = false
+		if _toast_left <= 0: _toast.visible = false
 
-## 访客模式：只剩田况 chip 与 Wave / Stamp。
 func set_visitor_mode(on: bool) -> void:
 	visitor = on
 	_bottom.visible = not on
 	_stall.visible = not on
-	_goals.visible = not on
-	_coins.get_parent().visible = not on
-	_timer_label.get_parent().visible = not on
-	if on and _visitor_bar == null:
-		_visitor_bar = HBoxContainer.new()
-		_visitor_bar.name = "VisitorBar"
-		_visitor_bar.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-		_visitor_bar.offset_left = 8.0
-		_visitor_bar.offset_right = -8.0
-		_visitor_bar.offset_top = -240.0
-		_visitor_bar.offset_bottom = -188.0
-		_visitor_bar.add_theme_constant_override("separation", DesignTokens.SPACE_2)
-		add_child(_visitor_bar)
-		for spec in [["Wave", "wave_pressed"], ["Stamp", "stamp_pressed"]]:
-			var b := Button.new()
-			b.text = spec[0]
-			b.theme_type_variation = &"AccentButton"
-			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			b.custom_minimum_size.y = BUTTON_H
-			b.pressed.connect(func(): emit_signal(spec[1]))
-			_visitor_bar.add_child(b)
-	if _visitor_bar:
-		_visitor_bar.visible = on
+	_goals_header.visible = not on
+	_coins.visible = not on
+	_coin_icon.visible = not on
+	_timer_label.visible = not on
+	_visitor_bar.visible = on
+	call_deferred("_layout")

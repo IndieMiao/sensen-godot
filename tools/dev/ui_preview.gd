@@ -57,6 +57,11 @@ func _ready() -> void:
 	print("ui_preview: %s insets=%s" % [target, _insets])
 	if args.size() > 2:
 		await _preview_slot(inst, StringName(args[2]), args[3] if args.size() > 3 else "")
+	if OS.has_environment("QA_SHOT"):
+		for i in 180: await get_tree().process_frame
+		await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png(OS.get_environment("QA_SHOT"))
+		get_tree().quit()
 
 
 ## 切到指定槽位，可选再穿上指定部件；目标场景没有部件面板（例如地图）时安静跳过。

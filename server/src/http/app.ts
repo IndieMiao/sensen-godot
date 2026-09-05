@@ -18,11 +18,12 @@ import { effectiveNow as qaNow } from '../domain/qa.js';
 import type { Ctx } from '../domain/reducer.js';
 import { DOMAIN_VERSION } from '../domain/version.js';
 import { installKeyHmac, isValidInstallKey, safeEqualHex, tokenHash } from './auth.js';
-import { nearbyEntry, ownerFarmView, snapshotSlot, visitorSnapshot, type FarmRow } from './dto.js';
+import { currentOwnerFarmView, nearbyEntry, snapshotSlot, visitorSnapshot, type FarmRow } from './dto.js';
 import { avatarRef } from './avatar_ref.js';
 import { initialFarmState } from '../domain/farm_factory.js';
 import { payloadHash } from './hash.js';
 import type { Store } from './store.js';
+import { isFarmLocation, withinPlacementBounds, type FarmLocation, type PlacementBounds } from './farm_location.js';
 
 export interface AppDeps {
   store: Store;
@@ -35,10 +36,12 @@ export interface AppDeps {
   gitSha?: string;
   /** 哪些 player 建出来的农场带 qa 标记；客户端不能自设。 */
   qaPlayerIds?: Set<string>;
+  blueprint?: (id: string, revision: number) => Ctx['blueprint'] | undefined;
 }
 
 interface Regions {
-  regions: { id: string; timezone: string; candidates: { layout_patch_id: string; revision: number }[] }[];
+  regions: { id: string; timezone: string; placement_bounds?: PlacementBounds;
+    candidates: { layout_patch_id: string; revision: number }[] }[];
 }
 
 /** Nearby 列表上限：横向列表放不下更多，且越长越像在暴露整个城市的用户名单。 */
@@ -48,6 +51,21 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
   await app.register(rateLimit, { global: false });
   const regions = JSON.parse(readFileSync(deps.regionsFile, 'utf8')) as Regions;
+  const blueprintCache = new Map<string, Ctx['blueprint']>();
+  const ownerView = (farm: FarmRow, now: number, timezone: string) => {
+    const key = `${farm.layout_patch_id}@${farm.blueprint_revision}`;
+    let constraints = deps.blueprint?.(farm.layout_patch_id, farm.blueprint_revision)
+      ?? blueprintCache.get(key);
+    if (!constraints) {
+      const bp = loadBlueprint(deps.blueprintDir, farm.layout_patch_id, farm.blueprint_revision);
+      if (!bp) throw Object.assign(new Error('Farm blueprint is unavailable'), {
+        statusCode: 422, code: 'BLUEPRINT_MISMATCH',
+      });
+      constraints = blueprintSets(bp);
+      blueprintCache.set(key, constraints);
+    }
+    return currentOwnerFarmView(farm, now, timezone, deps.content, constraints);
+  };
 
   const auth = async (req: FastifyRequest): Promise<{ id: string } | null> => {
     const raw = req.headers.authorization;
@@ -100,8 +118,10 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
 
   /** 只给 id / timezone / candidates——名字、中心点由客户端从本地 regions.json 取（决策②）。 */
   app.get('/v1/regions', async (_req, reply) => reply.send({
+    farm_placement_version: 1,
     regions: regions.regions.map(r => ({
       id: r.id, timezone: r.timezone,
+      placement_bounds: r.placement_bounds,
       candidates: r.candidates.map(c => ({ layout_patch_id: c.layout_patch_id, revision: c.revision })),
     })),
     server_time: deps.now(),
@@ -110,12 +130,18 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   app.post('/v1/farms', async (req, reply) => {
     const p = await auth(req);
     if (!p) return reply.code(401).send({ code: 'UNAUTHENTICATED' });
-    const b = req.body as { idempotency_key?: string; region_id?: string; layout_patch_id?: string; blueprint_revision?: number };
+    const b = req.body as { idempotency_key?: string; region_id?: string; layout_patch_id?: string;
+      blueprint_revision?: number; location?: unknown };
     if (!b?.idempotency_key || !b.region_id || !b.layout_patch_id || !Number.isInteger(b.blueprint_revision))
       return reply.code(400).send({ code: 'SCHEMA' });
     const region = regions.regions.find(r => r.id === b.region_id);
     const cand = region?.candidates.find(c => c.layout_patch_id === b.layout_patch_id);
     if (!region || !cand) return reply.code(400).send({ code: 'SCHEMA', message: '未知候选' });
+    if (b.location !== undefined && !isFarmLocation(b.location))
+      return reply.code(400).send({ code: 'INVALID_LOCATION', message: '位置需为有效经纬度' });
+    if (b.location !== undefined && !withinPlacementBounds(b.location as FarmLocation, region.placement_bounds))
+      return reply.code(422).send({ code: 'LOCATION_OUTSIDE_REGION', message: '请选择当前城市范围内的位置' });
+    const location = b.location as FarmLocation | undefined;
     // 只接受 regions.json 当前 revision：旧 revision 用的是当时的 canonical 文法（V3-I2）。
     if (cand.revision !== b.blueprint_revision)
       return reply.code(422).send({ code: 'STALE_REVISION', message: `当前 revision 为 ${cand.revision}` });
@@ -126,17 +152,18 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const now = deps.now();
     const hash = payloadHash({
       idempotency_key: b.idempotency_key, base_version: 0, type: 'create_farm',
-      payload: { region_id: b.region_id, layout_patch_id: b.layout_patch_id, blueprint_revision: b.blueprint_revision },
+      payload: { region_id: b.region_id, layout_patch_id: b.layout_patch_id, blueprint_revision: b.blueprint_revision,
+        ...(location ? { location } : {}) },
     });
     const res = await deps.store.createFarm({
       ownerId: p.id, idempotencyKey: b.idempotency_key, payloadHash: hash,
       regionId: b.region_id, layoutPatchId: b.layout_patch_id, blueprintRevision: b.blueprint_revision,
-      build: () => buildFarmRow(p.id, region.id, region.timezone, bp, deps, now),
+      build: () => buildFarmRow(p.id, region.id, region.timezone, bp, deps, now, location),
     });
     if (res.kind === 'idempotency_mismatch')
       return reply.code(409).send({ code: 'IDEMPOTENCY_MISMATCH' });
-    const d = derive(res.farm.state, now, region.timezone, deps.content);
-    return reply.code(res.kind === 'created' ? 201 : 200).send(ownerFarmView(res.farm, d, now));
+    const effectiveNow = Math.max(qaNow(res.farm.state.qa, now), res.farm.state.clock.last_effective_now);
+    return reply.code(res.kind === 'created' ? 201 : 200).send(ownerView(res.farm, effectiveNow, region.timezone));
   });
 
   app.get('/v1/farms/me', async (req, reply) => {
@@ -149,7 +176,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     // 不会倒退（Codex 三审 O-I3）。
     // 读路径也要过 QA 变换，否则加速后的农场在 GET 里看到的是没加速的时间。
     const now = Math.max(qaNow(farm.state.qa, deps.now()), farm.state.clock.last_effective_now);
-    return reply.send(ownerFarmView(farm, derive(farm.state, now, tz, deps.content), now));
+    return reply.send(ownerView(farm, now, tz));
   });
 
   app.post('/v1/farms/me/commands', async (req, reply) => {
@@ -180,7 +207,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
         const now = Math.max(qaNow(out.farm.state.qa, deps.now()),
           out.farm.state.clock.last_effective_now);
         return reply.code(409).send({ code: 'VERSION_CONFLICT',
-          ...ownerFarmView(out.farm, derive(out.farm.state, now, tz, deps.content), now) });
+          ...ownerView(out.farm, now, tz) });
       }
       case 'version_mismatch':
         return reply.code(503).send({ code: 'VERSION_MISMATCH', server_time: deps.now() });
@@ -217,9 +244,15 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     // body 里**不放** taken_at / revision（都传 0）：Store 用 body 判「内容有没有变」，
     // 时间戳进了 body 就每槽都"变了"，revision 会跟着槽号一路涨。
     const snap = await deps.store.snapshotGetOrCreate(farm.id, slot,
-      () => visitorSnapshot(farm, derive(farm.state, now, tz, deps.content), 0, 0, [], avatarRef(farm)));
+      () => visitorSnapshot(farm, derive(farm.state, now, tz, deps.content), 0, 0, undefined, avatarRef(farm)));
+    // Location privacy takes effect immediately, including a cached snapshot from this time slot.
+    const body = { ...snap.body } as Record<string, unknown>;
+    delete body.region_id;
+    delete body.location;
     return reply.send({
-      ...snap.body, snapshot_revision: snap.revision, snapshot_taken_at: snap.taken_at, server_time: real,
+      ...body,
+      ...(farm.location_visible ? { region_id: farm.region_id, ...(farm.location ? { location: farm.location } : {}) } : {}),
+      snapshot_revision: snap.revision, snapshot_taken_at: snap.taken_at, server_time: real,
     });
   });
 
@@ -250,11 +283,13 @@ export function loadBlueprint(dir: string, id: string, rev: number) {
 function buildFarmRow(
   ownerId: string, regionId: string, timezone: string,
   bp: ReturnType<typeof parseBlueprint>, deps: AppDeps, now: number,
+  location?: FarmLocation,
 ): FarmRow {
   const state = initialFarmState(deps.content, blueprintSets(bp), timezone, now);
   return {
     id: cryptoRandomId(), owner_id: ownerId, region_id: regionId,
     layout_patch_id: bp.layout_patch_id, blueprint_revision: bp.revision,
+    ...(location ? { location } : {}),
     version: 0, location_visible: true, visit_access: 'only_me', state,
   };
 }

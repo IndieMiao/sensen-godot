@@ -30,24 +30,29 @@ func _fake_session(f: Node, responses: Array) -> FakeTransport:
 
 func test_speed_row_sends_qa_set_clock() -> void:
 	var f := _farm()
-	var t := _fake_session(f, [{"status": 200, "json": {"version": 2, "state": {}}}])
+	var t := _fake_session(f, [{"status": 200, "json": {"version": 2, "state": {}}},
+		{"status": 200, "json": {"version": 2, "state": {}}}])
 	f._on_director_command("qa_set_clock", {"scale": 480})
-	assert_str(str(t.last_body().type)).is_equal("qa_set_clock")
-	assert_int(int(t.last_body().payload.scale)).is_equal(480)
+	assert_str(str(t.requests[0].body.type)).is_equal("qa_set_clock")
+	assert_int(int(t.requests[0].body.payload.scale)).is_equal(480)
+	assert_str(t.requests[1].method).is_equal("GET")
 
 func test_skip_row_sends_qa_skip_days() -> void:
 	var f := _farm()
-	var t := _fake_session(f, [{"status": 200, "json": {"version": 2, "state": {}}}])
+	var t := _fake_session(f, [{"status": 200, "json": {"version": 2, "state": {"clock": {"chapter_index": 0}}}},
+		{"status": 200, "json": {"version": 2, "state": {"clock": {"chapter_index": 1}}}}])
 	f._on_director_command("qa_skip_days", {"days": 2})
-	assert_str(str(t.last_body().type)).is_equal("qa_skip_days")
-	assert_int(int(t.last_body().payload.days)).is_equal(2)
+	assert_str(str(t.requests[0].body.type)).is_equal("qa_skip_days")
+	assert_int(int(t.requests[0].body.payload.days)).is_equal(2)
+	assert_int(int(f.session.state.clock.chapter_index)).is_equal(1)
 
 func test_weather_row_keys_the_override_by_weather_day_index() -> void:
 	# 面板选的是「今天改成什么」，命令要的是天气日索引 → 田况。
 	var f := _farm()
-	var t := _fake_session(f, [{"status": 200, "json": {"version": 2, "state": {}}}])
+	var t := _fake_session(f, [{"status": 200, "json": {"version": 2, "state": {}}},
+		{"status": 200, "json": {"version": 2, "state": {}}}])
 	f._on_director_command("qa_set_weather", {"day": "wind"})
-	var overrides: Dictionary = t.last_body().payload.overrides
+	var overrides: Dictionary = t.requests[0].body.payload.overrides
 	assert_bool(overrides.has("3")).is_true()
 	assert_str(str(overrides["3"])).is_equal("wind")
 

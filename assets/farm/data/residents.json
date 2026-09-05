@@ -1,0 +1,61 @@
+{
+  "format": 1,
+  "residents": {
+    "nursery_keeper": {
+      "name": "Nursery keeper", "short_name": "Keeper", "place": "nursery", "chapter": 0,
+      "outfit": {"cloth": "cloth11", "hairHat": "hairhat20", "shoes": "shoes1", "glass": ""},
+      "gift_clue": "A crisp radish reminds me of the first seeds I grew here.",
+      "gift_replies": {"R": ["You kept a radish for me? Look at those bright leaves.", "I used to bring my first harvest to the keeper before me. There is room for your story here, too."]},
+      "dialogues": {
+        "0": ["Welcome to the corner nursery. It looks a little tired, but the roots below are still alive.", "Start with a small harvest. I can buy three radishes when they are ready, and the rest are yours to share or plant towards tomorrow.", "By the end of this week, I hope we can open this gate together. The courtyard has room for everyone."],
+        "1": ["The rain has gathered beside the beds. A narrow channel gives the water somewhere to go.", "Your lettuce will be welcome at the community bistro. The host has been waiting for a local harvest.", "For this nursery, we will need two carrots and four chamomile blooms. There is no hurry to hand them over before they grow."],
+        "2": ["Some harvests fill a basket, some pay for next season, and some become a gift.", "I have written the nursery's needs by the gate: two carrots and four chamomile blooms. Keep them in mind when you plant."],
+        "3": ["The bistro smells of fresh greens today. I came to ask a small favour.", "Could you bring two carrots and one lettuce for the nursery basket? The young planters need a proper meal after clearing the beds.", "The host can show you how to make a salad while we are here. A little of your farm will reach both our tables."],
+        "4": ["The path is clear now. The first basket of materials will help us begin rebuilding.", "I will be tending the seedlings. Enjoy your visit to the other farms."],
+        "5": ["The wind is testing every loose board. Cover your beds before it gets stronger.", "Our restorer is in the courtyard. There are two plans for the nursery entrance, and either one will feel like home."],
+        "6": ["I remember the first radishes you grew. Now there is a whole week's work around us.", "When the last materials are here, we can gather at the courtyard and open the nursery together.", "Next week, I want to grow something with a scent that reaches all the way to the gate."]
+      }
+    },
+    "bistro_owner": {
+      "name": "Bistro host", "short_name": "Host", "place": "bistro", "chapter": 1,
+      "outfit": {"cloth": "cloth28", "hairHat": "hairhat41", "shoes": "shoes2", "glass": ""},
+      "gift_clue": "Tender lettuce and crisp radishes always have a place at my table.",
+      "gift_replies": {
+        "L": ["These leaves are lovely. You saved the freshest one for this table.", "I will remember this when I set a place for you."],
+        "R": ["A radish from your own bed! It will bring a little crunch to lunch.", "Food tastes different when you know the person who grew it."]
+      },
+      "choice_replies": {
+        "gift": ["I remember the lettuce you shared. You could have sold it, but you brought it to someone instead.", "There will always be a place for you at this table. Tomorrow, let's turn a harvest into our first salad."],
+        "keep": ["You kept a lettuce for next week. Leaving something for tomorrow takes its own kind of care.", "I have kept a note of it. Tomorrow, bring a fresh carrot and lettuce, and we can make a salad together."],
+        "sold": ["You sold your lettuce to help the farm grow. Those coins have a job to do.", "I remember your plan. When you have fresh ingredients to spare, there is a chopping board waiting here."]
+      },
+      "dialogues": {
+        "1": ["Come in out of the rain. I run this little bistro, and today the salad bowl is waiting for fresh leaves.", "Three lettuces from your farm would be just right. I can pay forty-five coins for the basket.", "Bring them when they are ready. A good lunch is worth waiting for."],
+        "2": ["What did you decide to do with this harvest? A gift, a little saved for later, or coins for your next planting?", "Make your choice with one lettuce, then tell me. I would like to remember what matters to you."],
+        "3": ["The nursery keeper brought news of the garden. Today, our two tables are meeting in one kitchen.", "One carrot and one lettuce are enough for a bright salad. Shall we prepare the first bowl together?", "The kitchen is yours to use from today. The keeper's basket is a separate request, so leave enough for that, too."],
+        "4": ["A cup of chamomile tea is waiting to happen: one bloom, warm water, and a quiet moment.", "The farm's collection box can buy one cup this week. I will keep the kitchen ready while you visit the neighbourhood."],
+        "5": ["The restorer has been working through the wind. Two bowls of salad would make a good lunch.", "You know the recipe now. Bring the finished bowls to the courtyard whenever they are ready."],
+        "6": ["From your first lettuce to our first shared salad, this table has changed a little each day.", "I will bring a bowl to the courtyard gathering. A week like this deserves a place in the journal."]
+      }
+    },
+    "restorer": {
+      "name": "Restorer", "short_name": "Restorer", "place": "courtyard", "chapter": 5,
+      "outfit": {"cloth": "cloth42", "hairHat": "hairhat43", "shoes": "shoes3", "glass": "glass1"},
+      "gift_clue": "Chamomile after a day's repairs, or fresh lettuce with lunch. Either would be welcome.",
+      "gift_replies": {
+        "H": ["Chamomile! I will dry this beside the workbench.", "After a day of repairs, a quiet cup is exactly what I need."],
+        "L": ["A fresh leaf from your farm. Thank you for thinking of lunch.", "I will save a seat for you when we gather by the finished gate."]
+      },
+      "dialogues": {
+        "5": ["Mind that loose board. The wind found it before I did. I am here to help repair the nursery entrance.", "I have drawn two versions of the gate. Both will last; the colour and planting are yours to choose.", "Two salads would keep this small crew going. Bring them from the bistro when you have the ingredients.", "As for your own farm, a row tool saves time and another bed gives you room. Choose the one that suits the way you like to work."],
+        "6": ["The repaired pieces fit together better than I expected. Old things still have plenty to give.", "When everyone arrives, I will put the tools aside and join the photograph. Save me a little room at the edge."]
+      }
+    }
+  },
+  "requests": {
+    "d0_tutorial_buyback": {"title": "First harvest basket", "intro": "Three radishes for the nursery's first lunch.", "reply": ["Three bright radishes, just as promised. Here are your thirty coins.", "There is still time to plant the next batch. The farm will be waiting when you return."]},
+    "d1_bistro_lettuce": {"title": "Fresh leaves for lunch", "intro": "Three lettuces for the bistro's salad bowl.", "reply": ["These leaves are exactly what the table needed. Here are your forty-five coins.", "I will remember the farm that brought our first fresh basket."]},
+    "d3_nursery_basket": {"title": "The nursery basket", "intro": "Two carrots and one lettuce for the nursery's helpers.", "reply": ["This basket will feed everyone working at the nursery. Thank you.", "Here are fifty-five coins. What you grew is becoming part of this place."]},
+    "d5_restorer_salads": {"title": "Lunch for the crew", "intro": "Two prepared salads for the restorer's crew.", "reply": ["Two bowls, and not a moment too soon. The crew will be grateful.", "Seventy coins for lunch. After this, we can get back to the gate."]}
+  }
+}

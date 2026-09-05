@@ -13,7 +13,7 @@ import type { FarmState, ResidentState } from '../state.js';
 import { availableProduce, unlockChapter } from './economy.js';
 
 /** 阶段由点数 + 门槛条件共同决定：赠礼刷满点数也不能独立解锁「熟悉」（PRD §8.2 L621）。 */
-export function stageOf(r: ResidentState, ctx: Ctx): string {
+export function stageOf(r: ResidentState, ctx: Pick<Ctx, 'content'>): string {
   const stages = ctx.content.relationships.stages;
   let cur = stages[0].id;
   for (const st of stages) {
@@ -36,6 +36,8 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
 
   switch (cmd.type) {
     case 'talk_to_resident': {
+      if (typeof cmd.resident_id !== 'string' || !Object.hasOwn(rel.residents, cmd.resident_id))
+        return err('NOT_AVAILABLE', '未知居民');
       const meta = rel.residents[cmd.resident_id];
       if (!meta) return err('NOT_AVAILABLE', cmd.resident_id);
       if (s.clock.chapter_index < meta.available_from_chapter)
@@ -52,6 +54,8 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
     }
 
     case 'give_gift': {
+      if (typeof cmd.resident_id !== 'string' || !Object.hasOwn(rel.residents, cmd.resident_id))
+        return err('NOT_AVAILABLE', '未知居民');
       const meta = rel.residents[cmd.resident_id];
       if (!meta) return err('NOT_AVAILABLE', cmd.resident_id);
       if (s.clock.chapter_index < unlockChapter(ctx, 'gifts'))
@@ -78,6 +82,8 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
     }
 
     case 'resolve_life_choice': {
+      if (!Number.isInteger(cmd.chapter) || !['gift', 'keep', 'sold'].includes(cmd.choice))
+        return err('NOT_AVAILABLE', '用途选择非法');
       const ch = c.chapters.chapters[cmd.chapter];
       if (!ch?.life_choice_crop) return err('NOT_AVAILABLE', `第 ${cmd.chapter} 章没有用途选择`);
       if (s.clock.chapter_index !== cmd.chapter) return err('CHAPTER_LOCKED', '只能选当前章节');
@@ -99,6 +105,8 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
     }
 
     case 'submit_request': {
+      if (typeof cmd.request_id !== 'string' || !Object.hasOwn(c.requests.requests, cmd.request_id))
+        return err('NOT_AVAILABLE', '未知请求');
       const req = c.requests.requests[cmd.request_id];
       if (!req) return err('NOT_AVAILABLE', cmd.request_id);
       if (s.requests_done.includes(cmd.request_id)) return err('REQUEST_DONE', cmd.request_id);
@@ -154,6 +162,7 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
       return applyEngineering(s, cmd, ctx);
 
     case 'set_growth_intent': {
+      if (cmd.choice !== 'tool' && cmd.choice !== 'field') return err('NOT_AVAILABLE', '成长选择非法');
       if (s.clock.chapter_index < unlockChapter(ctx, 'growth_choice'))
         return err('CHAPTER_LOCKED', '成长选择尚未开放');
       if (s.growth_choice.purchase) return err('LOCKED_CHOICE', '已付款，不可改');
@@ -163,6 +172,9 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
     }
 
     case 'purchase_growth_choice': {
+      if (cmd.choice !== 'tool' && cmd.choice !== 'field') return err('NOT_AVAILABLE', '成长选择非法');
+      if (typeof cmd.transaction_id !== 'string' || cmd.transaction_id.trim().length === 0
+        || cmd.transaction_id.length > 128) return err('NOT_AVAILABLE', '交易标识非法');
       if (s.clock.chapter_index < unlockChapter(ctx, 'growth_choice'))
         return err('CHAPTER_LOCKED', '成长选择尚未开放');
       if (s.growth_choice.purchase) return err('LOCKED_CHOICE', '首周永久二选一');
@@ -189,13 +201,14 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
         for (const id of ctx.blueprint.reserved) next.cells[id].state = 'tilled';
       }
       next.growth_choice.purchase = cmd.choice;
-      next.growth_choice.intent ??= cmd.choice;
+      next.growth_choice.intent = cmd.choice;
       next.growth_choice.locked_at = ctx.now;
       next.growth_choice.transaction_id = cmd.transaction_id;
       return ok(next, [{ type: 'growth_purchased', choice: cmd.choice }]);
     }
 
     case 'choose_nursery_appearance': {
+      if (cmd.appearance !== 'a' && cmd.appearance !== 'b') return err('NOT_AVAILABLE', '外观选择非法');
       if (s.clock.chapter_index < unlockChapter(ctx, 'nursery_appearance'))
         return err('CHAPTER_LOCKED', '外观选择尚未开放');
       const next = structuredClone(s);
@@ -222,7 +235,18 @@ function applyEngineering(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmStat
   if (s.clock.chapter_index < unlockChapter(ctx, 'engineering_basket'))
     return err('CHAPTER_LOCKED', '工程篮尚未开放');
   const items = (cmd as { items: Partial<Record<CropId, number>> }).items;
-  if (!items || Object.keys(items).length === 0) return err('INSUFFICIENT_ITEMS', 'items 为空');
+  if (!items || typeof items !== 'object' || Array.isArray(items) || Object.keys(items).length === 0)
+    return err('INSUFFICIENT_ITEMS', 'items 为空');
+  const quota = c.economy.engineering_quota;
+  for (const [crop, n] of Object.entries(items)) {
+    if (!Object.hasOwn(quota, crop) || !Number.isSafeInteger(n) || (n ?? 0) < 1)
+      return err('INSUFFICIENT_ITEMS', '工程材料需为配额内的正整数');
+    if (cmd.type !== 'withdraw_engineering') {
+      const held = cmd.type === 'reserve_engineering' ? (s.engineering.reserved[crop as CropId] ?? 0) : 0;
+      const remaining = (quota[crop as CropId] ?? 0) - (s.engineering.submitted[crop as CropId] ?? 0) - held;
+      if ((n ?? 0) > remaining) return err('INSUFFICIENT_ITEMS', '超出工程剩余配额');
+    }
+  }
   const next = structuredClone(s);
 
   if (cmd.type === 'reserve_engineering') {
@@ -255,7 +279,6 @@ function applyEngineering(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmStat
     next.engineering.submitted[crop as CropId] =
       (next.engineering.submitted[crop as CropId] ?? 0) + (n ?? 0);
   }
-  const quota = c.economy.engineering_quota;
   const complete = Object.entries(quota).every(
     ([crop, need]) => (next.engineering.submitted[crop as CropId] ?? 0) >= (need ?? 0));
   if (complete && next.nursery.stage !== 'built') {

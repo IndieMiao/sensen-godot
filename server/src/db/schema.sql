@@ -37,6 +37,18 @@ CREATE TABLE IF NOT EXISTS farms (
   updated_at            bigint NOT NULL
 );
 
+-- Existing farms retain their blueprint's original position; new placements are independent.
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS location jsonb CHECK (
+  location IS NULL OR (
+    jsonb_typeof(location) = 'object'
+    AND location ?& ARRAY['lat', 'lng']
+    AND jsonb_typeof(location -> 'lat') = 'number'
+    AND jsonb_typeof(location -> 'lng') = 'number'
+    AND (location ->> 'lat')::double precision BETWEEN -85 AND 85
+    AND (location ->> 'lng')::double precision BETWEEN -180 AND 180
+  )
+);
+
 -- 建农场的幂等记录。payload_hash 是必需的：同 key 换地区不能被当成重试
 -- （Codex 二审 Important 2）。
 CREATE TABLE IF NOT EXISTS farm_creations (

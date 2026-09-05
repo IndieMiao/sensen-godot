@@ -41,6 +41,7 @@ const EYE_LIFT := 0.04
 enum Region { FULL, HEAD, TORSO, FEET }
 
 const FOCUS_TWEEN_S := 0.35
+const HEAD_DEPTH_MARGIN := 0.25
 
 ## 当前取景分区；改完要调 reframe() 才生效。
 var focus_region: int = Region.FULL
@@ -70,13 +71,11 @@ static func region_for_slot(slot: StringName) -> int:
 
 ## 分区取景盒。
 ##
-## HEAD 的上界取 1.85 而不是覆盖最高发型的 2.05：推近之后画面尺度被放大了近三倍，
-## 把最高发型的余量整个留在盒子里，普通发型的头顶就会空出一大块（试过，很明显）。
-## 与 FULL 同一套思路——按常见尺寸取景，最高的那几顶向上溢出到顶栏那条透明带子里。
+## Head focus includes the tallest hat and widest brim below the opaque header.
 static func region_box(region: int) -> AABB:
 	match region:
 		Region.HEAD:
-			return _span(1.12, 1.85, 0.62)
+			return _span(1.05, 2.02, 1.08)
 		# 竖屏视口很窄（宽/高 ≈ 0.46），"矮而宽"的盒子会被宽度约束反推出很远的距离，
 		# 纵向就多框进一大截无关的身体。TORSO / FEET 都刻意做窄，让高度成为约束项。
 		#
@@ -145,11 +144,14 @@ func reframe(subject_root: Node3D, viewport_size: Vector2, animate := false) -> 
 	var subject := region_box(focus_region)
 	var dist := UIMetrics.frame_distance(
 		subject, viewport_size.x / viewport_size.y, usable, FOV_DEG, PADDING)
+	if focus_region == Region.HEAD:
+		dist += HEAD_DEPTH_MARGIN
 	if dist <= 0.0:
 		return
 	var center := subject.position + subject.size * 0.5
 	var target_position := Vector3(center.x, center.y, center.z + dist)
-	var target_v_offset := UIMetrics.frame_v_offset(subject, usable, ratios.y + lift, PADDING)
+	var projected_height := 2.0 * dist * tan(deg_to_rad(FOV_DEG) * 0.5)
+	var target_v_offset := -projected_height * (0.5 - ratios.y - lift)
 	fov = FOV_DEG
 	rotation = Vector3.ZERO
 	if _tween and _tween.is_valid():

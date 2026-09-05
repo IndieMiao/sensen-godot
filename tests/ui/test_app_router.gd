@@ -37,6 +37,7 @@ func test_qa_scene_argument_ignores_unknown_or_unrelated_values() -> void:
 	assert_str(RouterScript.qa_scene_path(
 		PackedStringArray(["--remote-debug", "--qa-scene=unknown"]))).is_empty()
 	assert_str(RouterScript.qa_scene_path(PackedStringArray())).is_empty()
+	assert_str(RouterScript.qa_scene_path(PackedStringArray(["--qa-scene=week"]))).is_empty()
 
 
 func test_back_from_secondary_scenes_returns_to_map() -> void:

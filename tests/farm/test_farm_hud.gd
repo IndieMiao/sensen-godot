@@ -27,17 +27,29 @@ func _farm_at_phone_size() -> Node:
 	await get_tree().process_frame
 	return scene
 
-func test_nothing_collides_with_topbar_or_joystick() -> void:
+func test_status_and_dock_leave_a_clear_playfield_without_a_joystick() -> void:
 	var f := await _farm_at_phone_size()
 	var top: Rect2 = (f.get_node("HUD/SafeArea/Root/TopBar") as Control).get_global_rect()
-	var stick: Rect2 = (f.joystick as Control).get_global_rect()
-	for name in ["TopRight", "Goals", "BottomBar", "Stall"]:
+	assert_object(f.get_node_or_null("HUD/SafeArea/Root/Joystick")).is_null()
+	for name in ["TopRight", "Overview", "BottomBar"]:
 		var r: Rect2 = (f.hud.get_node(name) as Control).get_global_rect()
 		assert_bool(r.intersects(top)).override_failure_message("%s 与顶栏重叠" % name).is_false()
-		assert_bool(r.intersects(stick)).override_failure_message("%s 压住了摇杆" % name).is_false()
-	var goals: Rect2 = (f.hud.get_node("Goals") as Control).get_global_rect()
+	var goals: Rect2 = (f.hud.get_node("Overview") as Control).get_global_rect()
 	var right: Rect2 = (f.hud.get_node("TopRight") as Control).get_global_rect()
 	assert_bool(goals.intersects(right)).override_failure_message("目标卡与右上列重叠").is_false()
+	assert_bool(f.hud._goals.visible).is_false()
+	assert_float(f.hud._bottom.position.y).is_greater(550)
+
+func test_unknown_command_has_a_visible_single_flight_recovery_control() -> void:
+	var f := await _farm_at_phone_size()
+	assert_bool(f.hud._reconnect.visible).is_false()
+	f.hud.set_connection_recovery(true)
+	assert_bool(f.hud._reconnect.visible).is_true()
+	assert_bool(f.hud._reconnect.disabled).is_false()
+	f.hud.set_connection_recovery(true, true)
+	assert_bool(f.hud._reconnect.disabled).is_true()
+	f.hud.set_connection_recovery(false)
+	assert_bool(f.hud._reconnect.visible).is_false()
 
 func test_buttons_meet_touch_targets_and_stay_on_screen() -> void:
 	var f := await _farm_at_phone_size()
@@ -50,9 +62,10 @@ func test_buttons_meet_touch_targets_and_stay_on_screen() -> void:
 		var r: Rect2 = (b as Control).get_global_rect()
 		assert_bool(r.size.y >= 40.0).override_failure_message("%s 高度 %.1f 太矮" % [b.text, r.size.y]).is_true()
 		assert_bool(screen.grow(0.5).encloses(r)).override_failure_message("%s 被挤出屏幕: %s" % [b.text, r]).is_true()
-		assert_bool(r.size.x >= b.get_theme_font(&"font").get_string_size(b.text,
-			HORIZONTAL_ALIGNMENT_LEFT, -1, b.get_theme_font_size(&"font_size")).x + 8.0
-			).override_failure_message("%s 宽 %.1f 装不下自己的标签" % [b.text, r.size.x]).is_true()
+		for line in b.text.split("\n"):
+			assert_bool(r.size.x >= b.get_theme_font(&"font").get_string_size(line,
+				HORIZONTAL_ALIGNMENT_LEFT, -1, b.get_theme_font_size(&"font_size")).x + 8.0
+				).override_failure_message("%s 宽 %.1f 装不下自己的标签" % [b.text, r.size.x]).is_true()
 
 func test_all_hud_text_is_english() -> void:
 	var f := await _farm_at_phone_size()
@@ -91,7 +104,7 @@ func test_seed_row_shows_counts_hides_locked_and_auto_selects_a_crop_with_seeds(
 	var f := await _farm_at_phone_size()
 	f.hud.selected_crop = "R"
 	f.hud.set_seeds({"seeds": {"R": {"bound": 0}, "L": {"bound": 3}}}, ["R", "L"], true)
-	assert_str((f.hud._seed_buttons["R"] as Button).text).is_equal("Radish ×0")
+	assert_str((f.hud._seed_buttons["R"] as Button).text).is_equal("Radish\n×0")
 	assert_bool((f.hud._seed_buttons["R"] as Button).disabled).is_true()
 	assert_bool((f.hud._seed_buttons["C"] as Button).visible).is_false()
 	assert_str(f.hud.selected_crop).is_equal("L")
@@ -102,13 +115,78 @@ func test_goals_header_counts_and_highlights_the_next_open_goal() -> void:
 	var f := await _farm_at_phone_size()
 	f.hud.set_goals([{"id": "a", "label": "Clear a plot", "done": true}, {"id": "b", "label": "Till it", "done": false},
 		{"id": "c", "label": "Sow", "done": false}], 0)
-	assert_str(f.hud._goals_header.text).is_equal("Goals · 1/3 ▸")   # 首条完成后自动折叠
+	assert_str(f.hud._goals_header.text).is_equal("Goals · 1/3")
 	var labels: Array = f.hud.goal_labels()
 	assert_str(labels[0]).is_equal("✓ Clear a plot")
 	assert_str(labels[1]).is_equal("○ Till it")
 	f.hud.set_goals([{"id": "a", "label": "x", "done": true}], 2)
 	assert_bool(f.hud._goals_header.text.begins_with("Goals · 1/1")).is_true()
-	assert_bool(f.hud.goal_labels().has("Day complete — come back tomorrow")).is_true()
+	assert_str(f.hud._goals_feedback.text).is_equal("Progress pending")
+	assert_bool(f.hud.goal_labels().has("Day complete · see you tomorrow")).is_false()
+
+func test_chapter_completion_and_next_open_feedback_do_not_depend_on_local_checkmarks() -> void:
+	var f := await _farm_at_phone_size()
+	var goals := [{"id": "rain_care_done", "label": "Care for crops in the rain", "done": true},
+		{"id": "request_d1_bistro_lettuce_done", "label": "Complete the bistro's lettuce request", "done": true}]
+	var progress := {"title": "A rainy day", "complete": true, "next_open_in_ms": 90_000}
+	f.hud.set_goals(goals, 1, progress)
+	assert_str(f.hud._goals_title.text).is_equal("Chapter 2 · A rainy day")
+	assert_str(f.hud._goals_feedback.text).is_equal("Chapter complete · next in 01:30")
+	progress.next_open_in_ms = 0
+	f.hud.set_goals(goals, 1, progress)
+	assert_str(f.hud._goals_feedback.text).is_equal("Checking next chapter...")
+	progress.next_open_in_ms = -1
+	f.hud.set_goals(goals, 1, progress)
+	assert_str(f.hud._goals_feedback.text).is_equal("Chapter complete")
+	progress.last_chapter = true
+	f.hud.set_goals(goals, 6, progress)
+	assert_str(f.hud._goals_feedback.text).is_equal("Week complete")
+	progress.complete = false
+	progress.pending = true
+	f.hud.set_goals(goals, 6, progress)
+	assert_str(f.hud._goals_feedback.text).is_equal("Progress pending")
+
+func test_chapter_goals_replace_old_rows_and_fit_the_existing_exclusive_modal() -> void:
+	var f := await _farm_at_phone_size()
+	var state := {"clock": {"chapter_index": 3}, "chapters": [{}, {}, {}, {"status": "active", "step_flags": {}}]}
+	f.hud.set_goals(DayGoals.evaluate(state, {}), 3, DayGoals.progress(state))
+	f.hud.show_modal(f.hud._goals)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_int(f.hud.goal_labels().size()).is_equal(2)
+	assert_str(f.hud.goal_labels()[0]).is_equal("○ Make your first salad together")
+	assert_bool(f.hud._bottom.visible).is_false()
+	var panel: Rect2 = f.hud._goals.get_global_rect()
+	for label in [f.hud._goals_title, f.hud._goals_count, f.hud._goals_feedback]:
+		assert_bool(panel.grow(1).encloses(label.get_global_rect())).is_true()
+	for row in f.hud._goals_list.get_children():
+		assert_bool(row is Button).is_false()
+	f.hud.close_modal()
+	assert_bool(f.hud._bottom.visible).is_true()
+
+func test_first_open_seven_goal_modal_keeps_all_rows_and_feedback_inside_a_short_screen() -> void:
+	var stage := Control.new()
+	stage.position = Vector2(16, 16)
+	stage.size = Vector2(328, 608)
+	stage.theme = GameUi.theme()
+	add_child(auto_free(stage))
+	var hud := FarmHud.new()
+	stage.add_child(hud)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var state := {"clock": {"chapter_index": 0}, "chapters": [{"status": "active", "step_flags": {"farm_created": true}}]}
+	hud.set_goals(DayGoals.evaluate(state, {}), 0, DayGoals.progress(state))
+	hud.show_modal(hud._goals)
+	for frame in 3: await get_tree().process_frame
+	var screen := Rect2(Vector2.ZERO, Vector2(360, 640))
+	var panel := hud._goals.get_global_rect()
+	assert_bool(screen.encloses(panel)).is_true()
+	for label in [hud._goals_title, hud._goals_count, hud._goals_feedback]:
+		assert_bool(panel.encloses(label.get_global_rect())).is_true()
+	var scroll := hud._goals_list.get_parent() as ScrollContainer
+	assert_int(hud.goal_labels().size()).is_equal(7)
+	for row in hud._goals_list.get_children():
+		assert_bool(scroll.get_global_rect().grow(1).encloses(row.get_global_rect())).is_true()
 
 func test_offline_disables_actions_and_shows_the_banner() -> void:
 	var f := await _farm_at_phone_size()

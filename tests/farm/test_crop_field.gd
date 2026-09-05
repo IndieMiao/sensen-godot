@@ -108,3 +108,61 @@ func test_instance_colors_are_declared_srgb() -> void:
 	for layer in f._mm:
 		var mat := (f._mm[layer] as MultiMeshInstance3D).material_override as StandardMaterial3D
 		assert_bool(mat.vertex_color_is_srgb).is_true()
+
+func test_plants_and_furrows_are_nonempty_colored_meshes_in_fixed_shared_layers() -> void:
+	var f := _field()
+	assert_int(f.get_child_count()).is_equal(9)
+	for layer in f._mm:
+		var mesh: Mesh = f._mm[layer].multimesh.mesh
+		assert_int(mesh.get_surface_count()).is_equal(1)
+		var arrays := mesh.surface_get_arrays(0)
+		var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var colors: PackedColorArray = arrays[Mesh.ARRAY_COLOR]
+		assert_int(vertices.size()).is_greater(24)
+		assert_int(colors.size()).is_equal(vertices.size())
+		assert_bool(mesh.get_aabb().size.y > 0.65).is_true()
+		assert_bool(mesh.get_aabb().position.y >= -0.501).is_true()
+		assert_bool(mesh.get_faces().size() / 3 < 3000).is_true()
+		var palette := {}
+		for color in colors:
+			palette[color.to_html()] = true
+		assert_int(palette.size()).is_greater(1)
+
+func test_mature_crop_silhouettes_differ_and_four_plants_fit_each_bed() -> void:
+	var f := _field()
+	var cells := {}
+	for i in CropField.CROPS.size():
+		cells["%d,1" % i] = _slot("growing", CropField.CROPS[i], 0, 300)
+	f.sync(cells, 300)
+	var signatures := {}
+	for crop in CropField.CROPS:
+		var mm: MultiMesh = f._mm[crop].multimesh
+		signatures[mm.mesh.get_faces().size()] = true
+		assert_int(mm.instance_count).is_equal(4)
+		var vertices: PackedVector3Array = mm.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+		for instance in mm.instance_count:
+			var transform := mm.get_instance_transform(instance)
+			var crop_index := CropField.CROPS.find(crop)
+			var center := f.bp.cell_to_world(Vector2i(crop_index, 1))
+			var fits := true
+			for vertex in vertices:
+				var point: Vector3 = transform * vertex
+				fits = fits and absf(point.x - center.x) < 0.46 and absf(point.z - center.z) < 0.46 and point.y < 0.5
+			assert_bool(fits).override_failure_message("%s plant extends past the bed" % crop).is_true()
+	assert_int(signatures.size()).is_equal(4)
+
+func test_seedlings_have_no_roots_or_flowers_and_harvest_clears_both_parts() -> void:
+	var f := _field()
+	f.sync({"1,1": _slot("sown", "R"), "2,1": _slot("sown", "C"), "3,1": _slot("sown", "H")}, 0)
+	for crop in ["R", "C", "H"]:
+		assert_int(f._detail_mm[crop].multimesh.instance_count).is_equal(0)
+	f.sync({"1,1": _slot("growing", "R", 0, 300), "2,1": _slot("growing", "C", 0, 300),
+		"3,1": _slot("growing", "H", 0, 300)}, 250)
+	assert_int(f._detail_mm["R"].multimesh.instance_count).is_equal(4)
+	assert_int(f._detail_mm["C"].multimesh.instance_count).is_equal(4)
+	assert_int(f._detail_mm["H"].multimesh.instance_count).is_equal(0)
+	f.sync_snapshot([{"cell_id": "3,1", "state": "growing", "crop": "H", "ripe": true}])
+	assert_int(f._detail_mm["H"].multimesh.instance_count).is_equal(4)
+	f.sync({"3,1": _slot("tilled")}, 1000)
+	for crop in ["R", "C", "H"]:
+		assert_int(f._detail_mm[crop].multimesh.instance_count).is_equal(0)

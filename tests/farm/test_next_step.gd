@@ -79,3 +79,53 @@ func test_doing_labels_are_english_and_name_the_crop() -> void:
 	assert_str(NextStep.doing_label("sow", "L")).is_equal("Sowing Lettuce…")
 	assert_str(NextStep.doing_label("care", "", "rain")).is_equal("Draining…")
 	assert_str(NextStep.doing_label("harvest")).is_equal("Harvesting…")
+
+func test_d0_recommends_only_six_tutorial_radishes_before_first_harvest() -> void:
+	var state := _state({"R": 12, "L": 3})
+	state.clock.chapter_index = 0
+	state.chapters = [{"step_flags": {"farm_created": true}}]
+	var cells := {}
+	for index in 9: cells[str(index)] = _slot("tilled")
+	var bulk := NextStep.bulk(cells, 0, state, "L", ["R", "L"])
+	assert_str(bulk.action).is_equal("sow")
+	assert_str(bulk.crop).is_equal("R")
+	assert_int(bulk.cells.size()).is_equal(6)
+	cells["0"] = _slot("growing", "R", 999)
+	cells["1"] = _slot("growing", "R", 999)
+	assert_int(NextStep.bulk(cells, 0, state, "L", ["R", "L"]).cells.size()).is_equal(4)
+
+func test_d0_cares_then_waits_for_the_tutorial_instead_of_sowing_lettuce_early() -> void:
+	var state := _state({"R": 0, "L": 3})
+	state.clock.chapter_index = 0
+	var cells := {"a": _slot("sown", "R"), "b": _slot("growing", "R", 999), "c": _slot("tilled")}
+	assert_str(NextStep.bulk(cells, 0, state, "L", ["R", "L"]).action).is_equal("care")
+	cells.a = _slot("growing", "R", 999)
+	var bulk := NextStep.bulk(cells, 0, state, "L", ["R", "L"])
+	assert_str(bulk.action).is_equal("")
+	assert_bool(bulk.enabled).is_false()
+	assert_str(bulk.label).is_equal("First harvest is growing")
+	assert_str(NextStep.bulk(cells, 999, state, "L", ["R", "L"]).action).is_equal("harvest")
+
+func test_d0_after_confirmed_first_harvest_recommends_the_full_next_batch() -> void:
+	var state := _state({"R": 6, "L": 3})
+	state.clock.chapter_index = 0
+	state.chapters = [{"step_flags": {"first_harvest": true}}]
+	var cells := {}
+	for index in 9: cells[str(index)] = _slot("tilled")
+	var bulk := NextStep.bulk(cells, 0, state, "R", ["R", "L"])
+	assert_str(bulk.crop).is_equal("R")
+	assert_int(bulk.cells.size()).is_equal(6)
+	for index in 6: cells[str(index)] = _slot("growing", "R", 999)
+	state.inventory.seeds.R.bound = 0
+	bulk = NextStep.bulk(cells, 0, state, "R", ["R", "L"])
+	assert_str(bulk.crop).is_equal("L")
+	assert_int(bulk.cells.size()).is_equal(3)
+
+func test_legacy_harvest_fact_and_later_chapters_do_not_keep_the_tutorial_limit() -> void:
+	var state := _state({"R": 0, "L": 3})
+	state.clock.chapter_index = 0
+	state.xp = {"first_harvest_crops": ["R"]}
+	assert_str(NextStep.bulk({"a": _slot("tilled")}, 0, state, "L", ["R", "L"]).crop).is_equal("L")
+	state.clock.chapter_index = 1
+	state.xp = {}
+	assert_str(NextStep.bulk({"a": _slot("tilled")}, 0, state, "L", ["R", "L"]).crop).is_equal("L")

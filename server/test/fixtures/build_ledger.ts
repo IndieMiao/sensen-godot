@@ -68,6 +68,8 @@ function commonDays(style: Style): Step[] {
     s(2, { type: 'talk_to_resident', resident_id: 'nursery_keeper' }),
   );
   out.push(...lifeChoice(2, 'L', style, 'bistro_owner'));
+  // The resident remembers the resolved choice in this second conversation, without extra daily points.
+  out.push(s(2, { type: 'talk_to_resident', resident_id: 'bistro_owner' }));
   out.push(s(2, { type: 'sell_at_stall', items: [
     { kind: 'produce', id: 'R', qty: 4 }, { kind: 'produce', id: 'L', qty: 4 }] }));
   out.push(...sowRound(2, [['R', 2], ['L', 3], ['C', 2]],

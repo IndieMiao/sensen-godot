@@ -1,0 +1,8 @@
+{
+  "format": 1,
+  "places": [
+    {"id": "nursery", "name": "Corner Nursery", "icon": "sprout", "chapter": 0, "resident": "nursery_keeper", "intro": "A little space for the whole neighbourhood to grow."},
+    {"id": "bistro", "name": "Community Bistro", "icon": "store", "chapter": 1, "resident": "bistro_owner", "intro": "Fresh harvests, shared meals, and a seat at the table."},
+    {"id": "courtyard", "name": "Four Seasons Court", "icon": "house", "chapter": 0, "resident": "restorer", "intro": "A courtyard to restore together, one small piece at a time."}
+  ]
+}

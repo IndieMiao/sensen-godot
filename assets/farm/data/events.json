@@ -1,0 +1,104 @@
+{
+  "format": 1,
+  "events": [
+    {
+      "id": "rain_at_the_nursery", "title": "A path for the rain", "chapter": 1, "place": "nursery", "icon": "cloud-rain",
+      "intro": "Rain gathers beside the nursery beds. A small channel will give it somewhere to go.",
+      "steps": [
+        {"id": "rain_care", "label": "Rain care completed", "chapter": 1, "destination": "farm", "tab": "", "action": "Return to the beds"},
+        {"id": "first_request", "label": "The bistro's lettuce basket delivered", "chapter": 1, "destination": "bistro", "tab": "people", "action": "Visit the bistro host"}
+      ],
+      "before": [
+        {"speaker": "Nursery keeper", "line": "See where the water stops? The leaves are resting in it. A little drainage will help more than another drink."},
+        {"speaker": "Nursery keeper", "line": "When the lettuce is ready, take three heads to the bistro. The host will be glad of something fresh on a rainy day."}
+      ],
+      "after": [
+        {"speaker": "Nursery keeper", "line": "The water has a way out now. Sometimes caring for a garden means making a little room."},
+        {"speaker": "Bistro host", "line": "And the lettuce reached the table. Even a rainy day can end with a good lunch."}
+      ]
+    },
+    {
+      "id": "a_harvest_remembered", "title": "A harvest remembered", "chapter": 2, "place": "bistro", "icon": "heart",
+      "intro": "One lettuce can become a gift, a little saved for later, or coins for the farm.",
+      "steps": [
+        {"id": "harvest_choice", "label": "This harvest's use chosen", "chapter": 2, "destination": "bistro", "tab": "choices", "action": "Choose the harvest's use"},
+        {"id": "choice_remembered", "label": "The host remembers your choice", "chapter": 2, "destination": "bistro", "tab": "people", "action": "Tell the bistro host"}
+      ],
+      "before": [
+        {"speaker": "Bistro host", "line": "A gift, something kept for later, or coins for your next planting. Which feels right for this harvest?"},
+        {"speaker": "Bistro host", "line": "Make your choice with one lettuce, then come and tell me. I would like to remember it."}
+      ],
+      "after": []
+    },
+    {
+      "id": "our_first_meal", "title": "Our first meal", "chapter": 3, "place": "bistro", "icon": "utensils",
+      "intro": "The nursery keeper visits the bistro, and two tables meet in one kitchen.",
+      "steps": [
+        {"id": "first_salad", "label": "A first salad prepared", "chapter": 3, "destination": "bistro", "tab": "kitchen", "action": "Prepare a salad"},
+        {"id": "shared_meal", "label": "The first meal shared", "chapter": 3, "destination": "bistro", "tab": "kitchen", "action": "Set the table together"},
+        {"id": "nursery_request", "label": "The nursery's lunch basket delivered", "chapter": 3, "destination": "bistro", "tab": "people", "action": "Meet the nursery keeper"}
+      ],
+      "before": [
+        {"speaker": "Nursery keeper", "line": "The helpers at the nursery could use two carrots and one lettuce. I brought the basket here because I hoped to catch you."},
+        {"speaker": "Bistro host", "line": "There is also a place for your first salad at this table. A fresh carrot and a lettuce are all we need."}
+      ],
+      "after": [
+        {"speaker": "Bistro host", "line": "That first bowl tasted of your farm. I hope this is the beginning of many shared meals."},
+        {"speaker": "Nursery keeper", "line": "And the helpers have their lunch. What you grow is already finding its way around the neighbourhood."}
+      ]
+    },
+    {
+      "id": "beyond_the_gate", "title": "Beyond the gate", "chapter": 4, "place": "nursery", "icon": "footprints",
+      "intro": "The nursery path is clear. There is time to see another farmer's garden before the first building materials arrive.",
+      "steps": [
+        {"id": "visit_return", "label": "A farm visit completed and returned", "chapter": 4, "destination": "map", "tab": "farms", "action": "Visit another farm"},
+        {"id": "first_materials", "label": "The first project materials delivered", "chapter": 4, "destination": "nursery", "tab": "project", "action": "Bring project materials"},
+        {"id": "nursery_cleared", "label": "The nursery entrance cleared", "chapter": 4, "destination": "nursery", "tab": "project", "action": "See the nursery entrance"}
+      ],
+      "before": [
+        {"speaker": "A note at the gate", "line": "The path is open. The keeper is tending seedlings today."},
+        {"speaker": "A note at the gate", "line": "Have a look around the other farms, then bring the first materials when they are ready. Nothing in the basket will spoil while you are away."}
+      ],
+      "after": [
+        {"speaker": "Your journal", "line": "Another garden, another way of arranging the same small patch of ground. I came home with ideas."},
+        {"speaker": "Your journal", "line": "The first materials are at the nursery, and the cleared path makes the old gate feel closer."}
+      ]
+    },
+    {
+      "id": "wind_and_opening", "title": "A gate for everyone", "chapter": 5, "place": "courtyard", "icon": "wind",
+      "intro": "The restorer arrives with two plans for the nursery gate. First, there are beds to shelter from the wind.",
+      "steps": [
+        {"id": "wind_care", "label": "The beds sheltered from the wind", "chapter": 5, "destination": "farm", "tab": "", "action": "Shelter the beds"},
+        {"id": "growth_intent", "label": "A growth direction chosen", "chapter": 5, "destination": "courtyard", "tab": "growth", "action": "Choose the farm's next step"},
+        {"id": "project_complete", "label": "Two carrots and four chamomile delivered", "chapter": 6, "destination": "nursery", "tab": "project", "action": "Finish the nursery basket"},
+        {"id": "nursery_gathering", "label": "The nursery gathering completed", "chapter": 6, "destination": "courtyard", "tab": "events", "action": "Join the gathering"}
+      ],
+      "before": [
+        {"speaker": "Restorer", "line": "This wind has found every loose board. Cover your beds, and I will take care of the gate."},
+        {"speaker": "Restorer", "line": "A row tool or another bed: both are useful, but you only need to choose the direction today. The work can wait until you have saved enough."}
+      ],
+      "after": [
+        {"speaker": "Restorer", "line": "The beds are sheltered, and you have a plan for your own farm. That is a good day's work."},
+        {"speaker": "Nursery keeper", "line": "When the last two carrots and four chamomile blooms have arrived, there will be a gathering at the courtyard."}
+      ]
+    }
+  ],
+  "gathering": [
+    {"speaker": "Nursery keeper", "line": "Two carrots, four chamomile blooms, and a whole week's care. Every part of the basket has reached us."},
+    {"speaker": "Restorer", "line": "The gate is sound again. I left the old marks where I could; a repaired place should remember what came before."},
+    {"speaker": "Bistro host", "line": "I brought something for the table. From the first lettuce to the first salad, your farm has become part of our days."},
+    {"speaker": "Nursery keeper", "line": "Let us open this gate together. Then we can put the tools aside and gather for a photograph."}
+  ],
+  "journal_pages": {
+    "shared_harvest": {"title": "A little kept for someone", "text": "I began the week counting seeds. Somewhere between the first radish and the last lettuce, I began counting places at a table instead. Some of the harvest went into another person's hands; some stayed safely put for a later day. The farm grew, and so did the space I made for others."},
+    "familiar_faces": {"title": "Names beside the gate", "text": "The nursery keeper waits for rain to pass. The bistro host remembers what reaches the table. The restorer finds a second life in old wood. I know where to find them now. When we stood by the finished gate, the neighbourhood felt a little more like a place I belonged."}
+  },
+  "endings": {
+    "personalized": {"title": "A week of sharing", "text": "The garden kept a little room for stories, and familiar faces gather around the finished gate."},
+    "standard": {"title": "A week of growing", "text": "The harvest helped the farm take its next step. The finished gate is open, and everyone is here to mark the week together."}
+  },
+  "next_week_clues": {
+    "resident_seed_exchange": "Next week: the nursery keeper has a seed exchange in mind, and a place saved for your story.",
+    "nursery_next_stage": "Next week: help plan the nursery's next planting beds. The gate is only the beginning."
+  }
+}

@@ -56,6 +56,7 @@ const app = await buildApp({
   store, content, contentVersion: cv,
   blueprintDir: BLUEPRINT_DIR, regionsFile: path.join(CONTENT_DIR, 'regions.json'),
   pepper: need('TOKEN_PEPPER'), now: () => Date.now(),
+  blueprint: (id, rev) => bpCache.get(`${id}@${rev}`),
   gitSha: process.env.GIT_SHA,
   qaPlayerIds: new Set((process.env.QA_PLAYER_IDS ?? '').split(',').filter(Boolean)),
 });

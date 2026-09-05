@@ -27,7 +27,6 @@ function run(steps: Step[], sessions = 1): FarmState {
     const r = apply(s, step.cmd, makeCtx(s, now, SH, content, blueprint));
     if (!r.ok) throw new Error(`D${step.day} ${step.cmd.type}: ${r.code} ${r.detail ?? ''}`);
     s = r.state;
-    s.chapters[s.clock.chapter_index].status = 'done';
   }
   return s;
 }

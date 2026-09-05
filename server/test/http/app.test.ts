@@ -112,11 +112,13 @@ describe('鉴权', () => {
 });
 
 describe('regions 与建场', () => {
-  it('/regions 只给 id / timezone / candidates，不含名字与中心点', async () => {
+  it('/regions includes placement support and bounds without names or template centers', async () => {
     const r = await app.inject({ method: 'GET', url: '/v1/regions' });
-    const body = r.json() as { regions: Record<string, unknown>[] };
+    const body = r.json() as { farm_placement_version: number; regions: Record<string, unknown>[] };
+    expect(body.farm_placement_version).toBe(1);
     for (const region of body.regions) {
-      expect(Object.keys(region).sort()).toEqual(['candidates', 'id', 'timezone']);
+      expect(Object.keys(region).sort()).toEqual(['candidates', 'id', 'placement_bounds', 'timezone']);
+      expect(region.placement_bounds).toHaveLength(4);
       for (const c of region.candidates as Record<string, unknown>[])
         expect(Object.keys(c).sort()).toEqual(['blueprint_revision', 'layout_patch_id'].includes('blueprint_revision')
           ? ['layout_patch_id', 'revision'] : ['layout_patch_id', 'revision']);
@@ -375,7 +377,7 @@ describe('访问骨架（G2）', () => {
     const b = await login();
     const r = await app.inject({ method: 'GET', url: `/v1/farms/${fa.farm_id}/snapshot`, headers: authed(b.token) });
     expect(Object.keys(r.json()).sort()).toEqual([
-      'avatar_ref', 'blueprint_revision', 'cells', 'farm_id', 'layout_patch_id', 'nursery',
+      'avatar_ref', 'beds_unlocked', 'blueprint_revision', 'cells', 'farm_id', 'layout_patch_id', 'nursery',
       'props', 'region_id', 'server_time', 'snapshot_revision', 'snapshot_taken_at', 'weather_snapshot',
     ]);
     const text = JSON.stringify(r.json());

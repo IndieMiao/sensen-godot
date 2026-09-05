@@ -39,9 +39,6 @@ function runScript(steps: Step[]): { end: FarmState; byDay: DayResult[] } {
     if (!r.ok)
       throw new Error(`D${step.day} ${step.cmd.type} 失败: ${r.code} ${r.detail ?? ''}`);
     s = r.state;
-    // 每章的最小完成事实由脚本走完即视为完成——章节 flag 的细粒度校验不是本测试的目标，
-    // 这里只需要让下一天能开新章。
-    s.chapters[s.clock.chapter_index].status = 'done';
   }
   byDay.push(snapshot(s));
   return { end: s, byDay };
@@ -127,6 +124,9 @@ describe('七日账本：共有的结构性事实', () => {
     const { end } = runPath('tool', 'life');
     expect(end.nursery.stage).toBe('built');
     expect(end.engineering.submitted).toEqual(content.economy.engineering_quota);
+    expect(end.chapters.map(ch => ch.status)).toEqual(Array(7).fill('done'));
+    expect(end.handbook.filter(entry => entry.kind === 'chapter_done').map(entry => entry.key))
+      .toEqual(['0', '1', '2', '3', '4', '5', '6']);
   });
 
   it('等级路径 Lv2→Lv7', () => {

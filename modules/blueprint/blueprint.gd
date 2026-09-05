@@ -29,6 +29,37 @@ var overlay: Dictionary = {}
 static func asset_path(id: String, rev: int) -> String:
 	return "res://assets/blueprints/%s/r%d/farm_blueprint.json" % [id, rev]
 
+static func load_choice(choice: Dictionary) -> FarmBlueprint:
+	var bp := load_file(asset_path(str(choice.get("layout_patch_id", "")), int(choice.get("revision", choice.get("blueprint_revision", 2)))))
+	if bp != null:
+		return bp.with_location(choice.get("location", {}))
+	return null
+
+## Placement changes only the geographic overlay; logical cells and checksum stay identical.
+func with_location(location: Dictionary) -> FarmBlueprint:
+	if not FarmPlacement.is_valid(location):
+		return self
+	var placed := FarmBlueprint.new()
+	for field in ["layout_patch_id", "revision", "region_id", "display_name", "checksum",
+		"cell_mm", "play_area_mm", "play_area_m", "cell_m", "grid"]:
+		placed.set(field, get(field))
+	placed.masks = masks.duplicate(true)
+	placed.paths = paths.duplicate(true)
+	placed.blocks = blocks.duplicate(true)
+	placed.anchors = anchors.duplicate(true)
+	var origin: Vector2 = overlay.get("center", Vector2.ZERO)
+	var destination := Vector2(float(location.lat), float(location.lng))
+	var longitude_scale := cos(deg_to_rad(origin.x)) / cos(deg_to_rad(destination.x))
+	placed.overlay = {"center": destination, "paths": [], "blocks": []}
+	for group in ["paths", "blocks"]:
+		for polygon in overlay.get(group, []):
+			var points := PackedVector2Array()
+			for point in polygon:
+				var delta: Vector2 = point - origin
+				points.append(destination + Vector2(delta.x, delta.y * longitude_scale))
+			placed.overlay[group].append(points)
+	return placed
+
 static func load_file(path: String) -> FarmBlueprint:
 	if not FileAccess.file_exists(path):
 		push_error("FarmBlueprint: 文件不存在 %s" % path)

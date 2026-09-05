@@ -5,11 +5,11 @@ extends Node3D
 ## 重锚只需改子节点 position。
 
 const Y_LIFT := 0.3 # 贴地抬高，避开与 y=0 地面/角色底面的 z-fighting
-const ALPHA_IDLE := 0.16
-const ALPHA_SELECTED := 0.42
-const PATH_WIDTH_M := 4.0
+const OUTLINE_WIDTH_M := 3.0
+const IDLE_OUTLINE := Color("b7c8bc")
 
 var selected_id := ""
+var outline_only := false
 var _items: Dictionary = {} # id -> {node, mats: Array[StandardMaterial3D], center: Vector2(lat,lng)}
 var _anchor_lat := 0.0
 var _anchor_lng := 0.0
@@ -20,11 +20,10 @@ static func geo_to_local(lat: float, lng: float, anchor_lat: float, anchor_lng: 
 	var w := MapGeoMath.geo_to_world(lat, lng, anchor_lat, anchor_lng)
 	return Vector2(w.x, w.z)
 
-static func _material(alpha: float) -> StandardMaterial3D:
+static func _material(color: Color) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	m.albedo_color = Color(DesignTokens.ACCENT, alpha)
+	m.albedo_color = color
 	m.cull_mode = BaseMaterial3D.CULL_DISABLED
 	return m
 
@@ -77,28 +76,30 @@ func set_candidates(bps: Array, anchor_lat: float, anchor_lng: float) -> void:
 				local.append(geo_to_local(ll.x, ll.y, center.x, center.y))
 			if local.size() > 1 and local[0].is_equal_approx(local[local.size() - 1]):
 				local.remove_at(local.size() - 1)
-			mats.append(_add_mesh(node, block_mesh(local), ALPHA_IDLE))
-		for pl in bp.overlay.paths:
-			var local := PackedVector2Array()
-			for ll in pl:
-				local.append(geo_to_local(ll.x, ll.y, center.x, center.y))
-			mats.append(_add_mesh(node, path_mesh(local, PATH_WIDTH_M), ALPHA_IDLE))
+			if not local.is_empty():
+				local.append(local[0])
+				mats.append(_add_mesh(node, path_mesh(local, OUTLINE_WIDTH_M), GameUi.GOLD if outline_only else IDLE_OUTLINE))
 		_items[bp.layout_patch_id] = {"node": node, "mats": mats, "center": center}
 	reanchor(anchor_lat, anchor_lng)
 
-func _add_mesh(parent: Node3D, mesh: ArrayMesh, alpha: float) -> StandardMaterial3D:
+func _add_mesh(parent: Node3D, mesh: ArrayMesh, color: Color) -> StandardMaterial3D:
 	var mi := MeshInstance3D.new()
 	mi.mesh = mesh
-	mi.material_override = _material(alpha)
+	mi.material_override = _material(color)
 	parent.add_child(mi)
 	return mi.material_override
 
 func select(id: String) -> void:
 	selected_id = id
 	for key in _items:
-		var alpha := ALPHA_SELECTED if key == id else ALPHA_IDLE
 		for m in _items[key].mats:
-			m.albedo_color = Color(DesignTokens.ACCENT, alpha)
+			m.albedo_color = GameUi.GOLD if outline_only or key == id else IDLE_OUTLINE
+
+func move_candidate(id: String, center: Vector2) -> void:
+	if not _items.has(id): return
+	_items[id].center = center
+	var local := geo_to_local(center.x, center.y, _anchor_lat, _anchor_lng)
+	(_items[id].node as Node3D).position = Vector3(local.x, 0, local.y)
 
 func reanchor(anchor_lat: float, anchor_lng: float) -> void:
 	_anchor_lat = anchor_lat

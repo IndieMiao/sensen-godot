@@ -5,6 +5,7 @@ import { nearbyEntry, ownerFarmView, snapshotSlot, visitorSnapshot, type FarmRow
 import { DEFAULT_CONTENT_DIR, loadContent } from '../../src/domain/content.js';
 import { derive } from '../../src/domain/derive.js';
 import { createInitialState } from '../../src/domain/state.js';
+import { projectFarmState } from '../../src/domain/progress.js';
 import { at, SH } from '../domain/helpers.js';
 
 const content = loadContent(DEFAULT_CONTENT_DIR);
@@ -55,20 +56,41 @@ describe('VisitorSnapshot（G2）', () => {
 
   it('顶层字段集精确——不是靠扫禁用键名', () => {
     expect(Object.keys(snap()).sort()).toEqual([
-      'avatar_ref', 'blueprint_revision', 'cells', 'farm_id', 'layout_patch_id', 'nursery',
+      'avatar_ref', 'beds_unlocked', 'blueprint_revision', 'cells', 'farm_id', 'layout_patch_id', 'nursery',
       'props', 'region_id', 'snapshot_revision', 'snapshot_taken_at', 'weather_snapshot',
     ]);
+  });
+
+  it('exposes expansion for rendering untouched reserved beds', () => {
+    const f = farm();
+    expect(visitorSnapshot(f, d(f), 3, snapshotSlot(NOW)).beds_unlocked).toBe(3);
+    f.state.beds_unlocked = 4;
+    const expanded = visitorSnapshot(f, d(f), 3, snapshotSlot(NOW));
+    expect(expanded.beds_unlocked).toBe(4);
+    expect(expanded.cells.filter(c => sets.reserved.has(c.cell_id)).every(c => c.state === 'wild')).toBe(true);
   });
 
   it('不含主人的私有状态：钱包、库存、关系、章节、XP、owner_id', () => {
     const keys = allKeys(snap());
     for (const forbidden of ['owner_id', 'wallet', 'inventory', 'residents', 'chapters',
       'xp', 'growth_choice', 'engineering', 'requests_done', 'life_choices', 'sales_facts',
-      'handbook', 'subsidies_claimed', 'stall', 'buyback'])
+      'handbook', 'subsidies_claimed', 'stall', 'buyback', 'week_summary'])
       expect(keys.has(forbidden), `泄露了 ${forbidden}`).toBe(false);
   });
 
-  it('永远不含经纬度或街道名', () => {
+  it('keeps a completed week summary and its story branch private', () => {
+    const f = farm();
+    f.state.clock.chapter_index = 6;
+    f.state.chapters[6].status = 'done';
+    f.state.life_choices[6] = 'keep';
+    f.state = projectFarmState(f.state, NOW, SH, content, sets);
+    expect(f.state.week_summary).toBeDefined();
+    const keys = allKeys(visitorSnapshot(f, d(f), 3, snapshotSlot(NOW)));
+    for (const field of ['week_summary', 'life_priority', 'photo_variant', 'journal_pages',
+      'next_week_clue', 'relationships', 'wallet', 'xp']) expect(keys.has(field)).toBe(false);
+  });
+
+  it('legacy template farms do not add coordinates or street names', () => {
     const keys = allKeys(snap());
     for (const forbidden of ['overlay_wgs84', 'lat', 'lng', 'center', 'paths', 'blocks', 'name', 'display_name'])
       expect(keys.has(forbidden), `泄露了 ${forbidden}`).toBe(false);
@@ -79,11 +101,34 @@ describe('VisitorSnapshot（G2）', () => {
     expect(Object.keys(cells[0]).sort()).toEqual(['cell_id', 'crop', 'ripe', 'state']);
   });
 
+  it('uses saved decorations and copies only explicit public prop fields', () => {
+    const f = farm();
+    f.state.decorations = [{ anchor_id: 'courtyard', prop_id: 'bench', offset_q: [-4, 3] }];
+    const snapshot = visitorSnapshot(f, d(f), 3, snapshotSlot(NOW));
+    expect(snapshot.props).toEqual(f.state.decorations);
+    expect(Object.keys(snapshot.props[0]).sort()).toEqual(['anchor_id', 'offset_q', 'prop_id']);
+    snapshot.props[0].offset_q[0] = 99;
+    expect(f.state.decorations[0].offset_q[0]).toBe(-4);
+    delete f.state.decorations;
+    expect(visitorSnapshot(f, d(f), 3, snapshotSlot(NOW)).props).toEqual([]);
+    expect(f.state).not.toHaveProperty('decorations');
+  });
+
   it('location_visible 为假时连 region_id 一起省掉', () => {
     expect('region_id' in snap({ location_visible: false })).toBe(false);
     expect('region_id' in snap({ location_visible: true })).toBe(true);
     // layout_patch_id 仍在——访客要渲染农场就必须知道蓝图（MVP 折衷，SGODOT-29）
     expect(snap({ location_visible: false }).layout_patch_id).toBe('sh_a');
+  });
+
+  it('chosen location is public only when location visibility is enabled', () => {
+    const location = { lat: 31.225, lng: 121.485 };
+    expect(snap({ location }).location).toEqual(location);
+    expect(snap({ location, location_visible: false })).not.toHaveProperty('location');
+    const own = farm({ location, location_visible: false });
+    expect(ownerFarmView(own, d(own), NOW).location).toEqual(location);
+    expect(nearbyEntry(own, 'av1')).not.toHaveProperty('location');
+    expect(nearbyEntry(farm({ location }), 'av1').location).toEqual(location);
   });
 });
 

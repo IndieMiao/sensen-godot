@@ -5,11 +5,10 @@
 import { randomUUID } from 'node:crypto';
 import type { Command, CommandEnvelope } from '../domain/commands.js';
 import type { Content } from '../domain/content.js';
-import { derive } from '../domain/derive.js';
 import { apply, makeCtx, type Ctx } from '../domain/reducer.js';
 import { effectiveNow as qaNow } from '../domain/qa.js';
 import { DOMAIN_VERSION, STATE_SCHEMA_VERSION } from '../domain/version.js';
-import { ownerFarmView, type FarmRow } from './dto.js';
+import { currentOwnerFarmView, type FarmRow } from './dto.js';
 import { MAX_ACTIVE_TOKENS, TOKEN_IDLE_MS, newToken, tokenHash } from './auth.js';
 import type { ApplyOutcome, CommandRecord, PlayerRow, Store, TokenRow } from './store.js';
 import { canonicalJson, payloadHash } from './hash.js';
@@ -175,7 +174,8 @@ export class MemoryStore implements Store {
     stored.state = nextState;
     stored.version += 1;
     applySettingsSideEffects(stored, cmd);
-    const body = ownerFarmView(stored, derive(nextState, effectiveNow, this.deps.timezone, this.deps.content), effectiveNow);
+    const body = currentOwnerFarmView(stored, effectiveNow, this.deps.timezone,
+      this.deps.content, this.deps.blueprint);
     record.result = body;
     log.set(env.idempotency_key, record);
     this.commands.set(farm.id, log);

@@ -17,8 +17,8 @@ func _snapshot() -> Dictionary:
 	# 随包的繁茂样例：9 格 growing，6 格 ripe（萝卜），生菜没熟
 	return PresetSnapshots.snapshot(PresetSnapshots.entries("shanghai")[0].farm_id)
 
-func _visitor() -> Node:
-	var snap := _snapshot()
+func _visitor(snap: Dictionary = {}) -> Node:
+	if snap.is_empty(): snap = _snapshot()
 	var bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(str(snap.layout_patch_id), int(snap.blueprint_revision)))
 	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
 	scene.setup({"visitor": true, "snapshot": snap, "blueprint": bp})
@@ -42,7 +42,7 @@ func test_no_session_no_predictor_no_director() -> void:
 func test_owner_tools_hidden_visitor_bar_shown() -> void:
 	var f: Node = await _visitor()
 	assert_bool((f.hud.get_node("BottomBar") as Control).visible).is_false()
-	assert_bool(f.hud._coins.get_parent().visible).is_false()
+	assert_bool(f.hud._coins.visible).is_false()
 	assert_bool(f.hud._stall.visible).is_false()
 	assert_bool(f.hud._goals.visible).is_false()
 	assert_bool(f.hud._condition.get_parent().visible).is_true()       # 田况来自冻结快照
@@ -70,6 +70,44 @@ func test_snapshot_stage_mapping() -> void:
 	assert_int(CropField.stage_from_snapshot({"state": "growing", "ripe": true})).is_equal(CropField.STAGES - 1)
 	assert_int(CropField.stage_from_snapshot({"state": "growing", "ripe": false})).is_equal(1)
 	assert_int(CropField.stage_from_snapshot({"state": "sown", "ripe": false})).is_equal(0)
+
+func _reserved_props(scene: Node) -> Array:
+	return scene.props.get_children().filter(func(prop): return prop.has_meta("reserved"))
+
+func test_locked_reserved_beds_and_their_weeds_are_hidden_in_legacy_snapshot() -> void:
+	var f: Node = await _visitor()
+	assert_int(int(f.crop_field.cell_counts().weed)).is_equal(0)
+	assert_int(_reserved_props(f).size()).is_equal(3)
+	for prop in _reserved_props(f): assert_bool(prop.visible).is_false()
+
+func test_expanded_snapshot_shows_reserved_beds_even_before_clearing() -> void:
+	var snap := _snapshot()
+	snap.beds_unlocked = 4
+	var f: Node = await _visitor(snap)
+	assert_int(int(f.crop_field.cell_counts().weed)).is_equal(3)
+	for prop in _reserved_props(f): assert_bool(prop.visible).is_true()
+
+func _worked_reserved_snapshot() -> Dictionary:
+	var snap := _snapshot()
+	var source := FarmBlueprint.load_file(FarmBlueprint.asset_path(str(snap.layout_patch_id), int(snap.blueprint_revision)))
+	var reserved: Vector2i = source.reserved_bed().cells[0]
+	for cell in snap.cells:
+		if str(cell.cell_id) == "%d,%d" % [reserved.x, reserved.y]: cell.state = "tilled"
+	return snap
+
+func test_legacy_snapshot_with_worked_reserved_cell_shows_expansion() -> void:
+	var f: Node = await _visitor(_worked_reserved_snapshot())
+	assert_int(int(f.crop_field.cell_counts().soil)).is_equal(1)
+	assert_int(int(f.crop_field.cell_counts().weed)).is_equal(2)
+	for prop in _reserved_props(f): assert_bool(prop.visible).is_true()
+
+func test_explicit_locked_count_takes_precedence_over_legacy_inference() -> void:
+	var snap := _worked_reserved_snapshot()
+	snap.beds_unlocked = 3
+	var f: Node = await _visitor(snap)
+	assert_int(int(f.crop_field.cell_counts().soil)).is_equal(0)
+	assert_int(int(f.crop_field.cell_counts().weed)).is_equal(0)
+	for prop in _reserved_props(f): assert_bool(prop.visible).is_false()
 
 func test_zero_writes_even_if_a_tool_is_forced() -> void:
 	# 就算有人把工具塞进来，访客也一格都不入队、一条命令都不发。

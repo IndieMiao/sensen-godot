@@ -25,6 +25,8 @@ func _ready() -> void:
 		call_deferred("boot")
 
 static func is_test_process() -> bool:
+	if OS.is_debug_build() and OS.has_feature("g3_device_qa"):
+		return true
 	if DisplayServer.get_name() == "headless":
 		return true
 	for a in OS.get_cmdline_args():

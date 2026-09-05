@@ -23,6 +23,34 @@ static func pick_region(p_regions: Array, lat: float, lng: float, has_fix: bool,
 	return FarmRegions.nearest_region_id(p_regions, lat, lng) if has_fix else fallback
 
 func _ready() -> void:
+	theme = GameUi.theme()
+	var backdrop := ColorRect.new()
+	backdrop.color = GameUi.PAPER
+	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(backdrop)
+	move_child(backdrop, 0)
+	var background_path := "res://assets/ui/backgrounds/city-garden.png"
+	if ResourceLoader.exists(background_path):
+		var scenery := TextureRect.new()
+		scenery.name = "Scenery"
+		scenery.texture = load(background_path)
+		scenery.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		scenery.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		scenery.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		scenery.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(scenery)
+		move_child(scenery, 1)
+	$SafeArea/VBox.add_theme_constant_override("separation", 12)
+	$SafeArea/VBox/Title.text = "Choose a city"
+	$SafeArea/VBox/Title.add_theme_font_size_override("font_size", 20)
+	$SafeArea/VBox/Title.custom_minimum_size.y = 48
+	buttons.add_theme_constant_override("separation", 12)
+	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	status.add_theme_font_size_override("font_size", 12)
+	status.add_theme_color_override("font_outline_color", GameUi.PAPER)
+	status.add_theme_constant_override("outline_size", 4)
+	status.custom_minimum_size.y = 32
 	regions = FarmRegions.load_default()
 	if regions == null:
 		status.text = "Missing city configuration"
@@ -30,10 +58,13 @@ func _ready() -> void:
 	for r in regions.regions:
 		var b := Button.new()
 		b.text = str(r.name)
-		b.custom_minimum_size = Vector2(0, DesignTokens.BTN_PAD_V * 2 + DesignTokens.FONT_BODY)
+		b.icon = GameUi.icon("map-pin")
+		b.custom_minimum_size = Vector2(0, 54)
 		b.pressed.connect(choose.bind(str(r.id)))
 		buttons.add_child(b)
 	use_current.pressed.connect(locate)
+	use_current.icon = GameUi.icon("locate-fixed")
+	use_current.custom_minimum_size.y = 54
 	status.text = ""
 
 func region_buttons() -> Array[Button]:
@@ -44,6 +75,7 @@ func region_buttons() -> Array[Button]:
 	return out
 
 func choose(id: String) -> void:
+	if _locating: _cancel_locate()
 	FarmRegions.save_choice(id)
 	AppRouter.go_to_map()
 

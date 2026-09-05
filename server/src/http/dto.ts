@@ -5,7 +5,11 @@
  * 测试用**精确允许字段集**校验，而不是扫描禁用键名——后者只能挡住已知的坏字段。
  */
 import type { FarmState } from '../domain/state.js';
-import type { Derived } from '../domain/derive.js';
+import { derive, type Derived } from '../domain/derive.js';
+import type { Content } from '../domain/content.js';
+import type { Ctx } from '../domain/reducer.js';
+import { projectFarmState } from '../domain/progress.js';
+import type { FarmLocation } from './farm_location.js';
 
 export interface FarmRow {
   id: string;
@@ -13,6 +17,7 @@ export interface FarmRow {
   region_id: string;
   layout_patch_id: string;
   blueprint_revision: number;
+  location?: FarmLocation;
   version: number;
   location_visible: boolean;
   visit_access: 'only_me' | 'anyone';
@@ -26,6 +31,7 @@ export function ownerFarmView(f: FarmRow, d: Derived, serverTime: number) {
     region_id: f.region_id,
     layout_patch_id: f.layout_patch_id,
     blueprint_revision: f.blueprint_revision,
+    ...(f.location ? { location: f.location } : {}),
     version: f.version,
     location_visible: f.location_visible,
     visit_access: f.visit_access,
@@ -34,10 +40,19 @@ export function ownerFarmView(f: FarmRow, d: Derived, serverTime: number) {
       player_day_id: d.player_day_id,
       field_condition: d.field_condition,
       chapter_index: d.chapter_index,
+      next_chapter_opens_at: d.next_chapter_opens_at,
       ripe_cells: d.ripe_cells,
     },
     server_time: serverTime,
   };
+}
+
+/** Reads and command replies project the same chapter and grants without a database write. */
+export function currentOwnerFarmView(
+  f: FarmRow, serverTime: number, timezone: string, content: Content, blueprint: Ctx['blueprint'],
+) {
+  const state = projectFarmState(f.state, serverTime, timezone, content, blueprint);
+  return ownerFarmView({ ...f, state }, derive(state, serverTime, timezone, content), serverTime);
 }
 
 export interface VisitorProp {
@@ -48,13 +63,13 @@ export interface VisitorProp {
 
 /**
  * 访客快照（G2 用，本 Task 只定形状）。**不含** owner_id / wallet / inventory /
- * residents / chapters / xp / growth_choice / 任何经纬度。
+ * residents / chapters / xp / growth_choice。公开位置只来自玩家主动选址。
  *
  * `location_visible` 为假时连 region_id 一起省掉；`layout_patch_id` 仍要发——访客要渲染
  * 对方农场就必须知道用的哪张蓝图，这是 MVP 明确接受的折衷（SGODOT-29）。
  */
 export function visitorSnapshot(
-  f: FarmRow, d: Derived, snapshotRevision: number, takenAt: number, props: VisitorProp[] = [],
+  f: FarmRow, d: Derived, snapshotRevision: number, takenAt: number, props: VisitorProp[] = f.state.decorations ?? [],
   avatarRef = 'seed:unknown',
 ) {
   const cells = Object.entries(f.state.cells).map(([cell_id, c]) => ({
@@ -67,11 +82,13 @@ export function visitorSnapshot(
     blueprint_revision: f.blueprint_revision,
     snapshot_revision: snapshotRevision,
     snapshot_taken_at: takenAt,
+    beds_unlocked: f.state.beds_unlocked,
     cells,
     nursery: { stage: f.state.nursery.stage, appearance: f.state.nursery.appearance },
-    props,
+    props: props.map(prop => ({ anchor_id: prop.anchor_id, prop_id: prop.prop_id,
+      offset_q: [prop.offset_q[0], prop.offset_q[1]] as [number, number] })),
     weather_snapshot: d.field_condition,
-    ...(f.location_visible ? { region_id: f.region_id } : {}),
+    ...(f.location_visible ? { region_id: f.region_id, ...(f.location ? { location: f.location } : {}) } : {}),
   };
 }
 
@@ -80,7 +97,7 @@ export function nearbyEntry(f: FarmRow, avatarRef: string) {
     farm_id: f.id,
     avatar_ref: avatarRef,
     nursery_stage: f.state.nursery.stage,
-    ...(f.location_visible ? { region_id: f.region_id } : {}),
+    ...(f.location_visible ? { region_id: f.region_id, ...(f.location ? { location: f.location } : {}) } : {}),
   };
 }
 

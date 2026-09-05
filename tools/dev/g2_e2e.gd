@@ -52,7 +52,7 @@ func _initialize() -> void:
 	_ok(snap.is_success(), "GET snapshot → %d" % snap.status)
 	var keys: Array = snap.json.keys()
 	keys.sort()
-	_ok(keys == ["avatar_ref", "blueprint_revision", "cells", "farm_id", "layout_patch_id", "nursery",
+	_ok(keys == ["avatar_ref", "beds_unlocked", "blueprint_revision", "cells", "farm_id", "layout_patch_id", "nursery",
 		"props", "region_id", "server_time", "snapshot_revision", "snapshot_taken_at", "weather_snapshot"],
 		"快照字段集精确: %s" % str(keys))
 	var text := JSON.stringify(snap.json)

@@ -29,6 +29,8 @@ export const CARE_KINDS = ['water', 'drain', 'shelter'] as const;
 export type CareKind = (typeof CARE_KINDS)[number];
 export const GROWTH_CHOICE_IDS = ['tool', 'field'] as const;
 export type GrowthChoiceId = (typeof GROWTH_CHOICE_IDS)[number];
+export const DECORATION_IDS = ['bench', 'planter', 'lantern', 'fountain', 'sign', 'crate'] as const;
+export type DecorationId = (typeof DECORATION_IDS)[number];
 
 export type CropAmounts = Partial<Record<CropId, number>>;
 
@@ -95,10 +97,19 @@ export interface Content {
     sell_first_extra_coins: number;
     account_value_cap_multiplier: number;
   };
+  decorations: {
+    anchor_id: 'courtyard';
+    unit_m: number;
+    bounds_q: { min_x: number; max_x: number; min_z: number; max_z: number };
+    min_abs_x_q: number;
+    blocked_outer: { min_abs_x_q: number; max_z_q: number };
+    min_distance_q: number;
+    props: Record<DecorationId, { name: string; default_offset_q: [number, number] }>;
+  };
 }
 
 const FILES = [
-  'crops', 'weather_script', 'xp', 'relationships', 'chapters', 'requests', 'recipes', 'economy',
+  'crops', 'weather_script', 'xp', 'relationships', 'chapters', 'requests', 'recipes', 'economy', 'decorations',
 ] as const;
 
 /** 只做本层能判定的检查；跨表一致性（例如 grants 里的作物必须在 crops 里）单列在下面。 */
@@ -149,6 +160,24 @@ function checkContent(c: Content): void {
     for (const crop of c.relationships.gift_clues[rid] ?? [])
       if (!CROP_IDS.includes(crop)) throw new ContentError(`gift_clues.${rid} 含未知作物 ${crop}`);
   }
+  const decoration = c.decorations;
+  if (decoration.anchor_id !== 'courtyard' || !Number.isFinite(decoration.unit_m)
+    || decoration.unit_m <= 0 || decoration.min_distance_q <= 0)
+    throw new ContentError('decorations anchor/unit/distance 非法');
+  const bounds = decoration.bounds_q;
+  for (const value of [...Object.values(bounds), decoration.min_abs_x_q,
+    ...Object.values(decoration.blocked_outer), decoration.min_distance_q])
+    if (!Number.isSafeInteger(value)) throw new ContentError('decorations 必须使用整数格坐标');
+  if (bounds.min_x > bounds.max_x || bounds.min_z > bounds.max_z)
+    throw new ContentError('decorations bounds 非法');
+  if (Object.keys(decoration.props).length !== DECORATION_IDS.length)
+    throw new ContentError('decorations 必须恰好六件');
+  for (const id of DECORATION_IDS) {
+    if (!decoration.props[id]) throw new ContentError(`decorations.${id} 缺失`);
+    const offset = decoration.props[id].default_offset_q;
+    requireArray(offset, 2, `decorations.${id}.default_offset_q`);
+    if (!offset.every(Number.isSafeInteger)) throw new ContentError(`decorations.${id} 坐标非法`);
+  }
 }
 
 export function loadContent(dir: string): Content {
@@ -170,6 +199,7 @@ export function loadContent(dir: string): Content {
     requests: raw.requests as Content['requests'],
     recipes: raw.recipes as Content['recipes'],
     economy: raw.economy as Content['economy'],
+    decorations: raw.decorations as Content['decorations'],
   };
   checkContent(c);
   return c;

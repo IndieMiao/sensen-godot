@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scenes/dressing_room/dressing_room.gd" id="1_dress"]
 [ext_resource type="Script" path="res://scenes/dressing_room/parts_panel.gd" id="2_parts"]
@@ -6,9 +6,12 @@
 [ext_resource type="Script" path="res://scenes/dressing_room/dressing_camera.gd" id="4_dresscam"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/back.svg" id="5_ico_back"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/reset.svg" id="6_ico_reset"]
+[ext_resource type="Texture2D" path="res://assets/ui/backgrounds/dressing-room.png" id="7_room"]
+[ext_resource type="PackedScene" path="res://modules/ui/opaque_scene_layer.tscn" id="8_opaque"]
 
 [sub_resource type="Environment" id="Environment_room"]
-background_mode = 1
+background_mode = 3
+background_canvas_max_layer = -1
 background_color = Color(0.94902, 0.960784, 0.956863, 1)
 ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
@@ -16,15 +19,10 @@ ambient_light_energy = 0.3
 tonemap_mode = 2
 tonemap_exposure = 1.0
 
-[sub_resource type="QuadMesh" id="Mesh_backdrop"]
-size = Vector2(30, 30)
-
-[sub_resource type="StandardMaterial3D" id="Mat_backdrop"]
-shading_mode = 0
-albedo_color = Color(0.94902, 0.960784, 0.956863, 1)
-
 [node name="DressingRoom" type="Node3D"]
 script = ExtResource("1_dress")
+
+[node name="OpaqueSceneLayer" parent="." instance=ExtResource("8_opaque")]
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 5.5)
@@ -40,15 +38,36 @@ shadow_blur = 2.0
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_room")
 
-[node name="Backdrop" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
-cast_shadow = 0
-mesh = SubResource("Mesh_backdrop")
-surface_material_override/0 = SubResource("Mat_backdrop")
+[node name="RoomBackground" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Paper" type="ColorRect" parent="RoomBackground"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.973, 0.98, 0.973, 1)
+
+[node name="Scenery" type="TextureRect" parent="RoomBackground"]
+mouse_filter = 2
+texture = ExtResource("7_room")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="RigAnchor" type="Node3D" parent="."]
 
 [node name="UI" type="CanvasLayer" parent="."]
+
+[node name="HeaderPaper" type="ColorRect" parent="UI"]
+anchor_right = 1.0
+mouse_filter = 2
+color = Color(0.98, 0.988, 0.98, 1)
+
+[node name="FooterPaper" type="ColorRect" parent="UI"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.98, 0.988, 0.98, 1)
 
 [node name="SafeArea" type="MarginContainer" parent="UI"]
 anchor_right = 1.0
@@ -76,6 +95,17 @@ icon = ExtResource("5_ico_back")
 icon_alignment = 1
 tooltip_text = "Back"
 
+[node name="Title" type="Label" parent="UI/SafeArea/VBox/TopBar"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "Dressing"
+
+[node name="Spacer" type="Control" parent="UI/SafeArea/VBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
 [node name="RestoreButton" type="Button" parent="UI/SafeArea/VBox/TopBar"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
@@ -86,11 +116,6 @@ icon = ExtResource("6_ico_reset")
 icon_alignment = 1
 tooltip_text = "Reset"
 
-[node name="Spacer" type="Control" parent="UI/SafeArea/VBox/TopBar"]
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-
 [node name="DoneButton" type="Button" parent="UI/SafeArea/VBox/TopBar"]
 custom_minimum_size = Vector2(92, 48)
 layout_mode = 2
@@ -98,6 +123,7 @@ size_flags_vertical = 4
 focus_mode = 0
 theme_type_variation = &"AccentPillButton"
 text = "Done"
+clip_text = true
 
 [node name="Spacer" type="Control" parent="UI/SafeArea/VBox"]
 layout_mode = 2
@@ -121,6 +147,7 @@ vertical_scroll_mode = 0
 
 [node name="SlotTabs" type="HBoxContainer" parent="UI/SafeArea/VBox/Drawer/VBox/TabsScroll"]
 layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 1
 theme_override_constants/separation = 0
 
@@ -148,4 +175,3 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "Couldn't save. Try again."
 autowrap_mode = 2
-

@@ -15,12 +15,64 @@ func test_login_stores_token_and_player() -> void:
 	assert_str(s.player_id).is_equal("p1")
 	assert_str(s.client.token).is_equal("tok")
 
+func test_unresolved_kitchen_reply_blocks_trade_but_allows_its_reconciliation() -> void:
+	var pair := _session([{"status": 200, "json": _state(2)}])
+	var s: FarmSession = pair[0]
+	var transport: FakeTransport = pair[1]
+	s.set_meta("pending_kitchen_command", {"type": "cook_dish"})
+	assert_bool(await s.send("sell_at_stall", {"items": []})).is_false()
+	assert_str(s.last_error_code).is_equal("PENDING_ACTION")
+	assert_int(transport.requests.size()).is_equal(0)
+	assert_bool(await s.send("cook_dish", {"recipe": "salad"}, &"pending_kitchen_command")).is_true()
+	assert_int(transport.requests.size()).is_equal(1)
+
 func test_ensure_farm_adopts_existing() -> void:
 	var pair := _session([{"status": 200, "json": _state(7)}])
 	var s: FarmSession = pair[0]
 	assert_bool(await s.ensure_farm("hk", "patch", 2)).is_true()
 	assert_int(s.version).is_equal(7)
 	assert_int(int(s.state.wallet)).is_equal(30)
+
+func test_state_changed_observes_derived_from_the_same_accepted_response() -> void:
+	var body := _state(7)
+	body.state = {"clock": {"chapter_index": 1}}
+	body.derived = {"chapter_index": 1, "next_chapter_opens_at": 321000}
+	var pair := _session([{"status": 200, "json": body}])
+	var s: FarmSession = pair[0]
+	s.derived = {"chapter_index": 0, "next_chapter_opens_at": 1000}
+	var seen := []
+	var session_ref: WeakRef = weakref(s)
+	s.state_changed.connect(func(state, _version):
+		var current := session_ref.get_ref() as FarmSession
+		seen.append([state.clock.chapter_index, current.derived.chapter_index, current.derived.next_chapter_opens_at]))
+	assert_bool(await s.refresh()).is_true()
+	assert_that(seen).is_equal([[1, 1, 321000]])
+
+func test_legacy_response_clears_derived_instead_of_reusing_a_past_chapter_deadline() -> void:
+	var pair := _session([{"status": 200, "json": _state(8)}])
+	var s: FarmSession = pair[0]
+	s.derived = {"chapter_index": 0, "next_chapter_opens_at": 1000}
+	assert_bool(await s.refresh()).is_true()
+	assert_that(s.derived).is_equal({})
+
+func test_stale_response_cannot_replace_derived_or_the_authoritative_time_sample() -> void:
+	var pair := _session([])
+	var s: FarmSession = pair[0]
+	s._adopt({"version": 8, "server_time": 100000, "state": {"wallet": 40},
+		"derived": {"chapter_index": 1, "next_chapter_opens_at": null}})
+	s._adopt({"version": 7, "server_time": 900000, "state": {"wallet": 20},
+		"derived": {"chapter_index": 0, "next_chapter_opens_at": 910000}})
+	assert_int(s.state.wallet).is_equal(40)
+	assert_int(s.derived.chapter_index).is_equal(1)
+	assert_int(s.server_now()).is_less(200000)
+
+func test_accepted_server_clock_uses_monotonic_elapsed_time() -> void:
+	var pair := _session([])
+	var s: FarmSession = pair[0]
+	s._adopt({"version": 1, "server_time": 100000, "state": {}})
+	s.clock_offset_ms += 86_400_000
+	s._server_sample_ticks_ms -= 2000
+	assert_bool(absi(s.server_now() - 102000) < 1000).is_true()
 
 func test_ensure_farm_creates_when_404() -> void:
 	var pair := _session([{"status": 404, "json": {}}, {"status": 200, "json": _state(1)}])
@@ -31,6 +83,54 @@ func test_ensure_farm_creates_when_404() -> void:
 	assert_str(t.requests[1].method).is_equal("POST")
 	assert_str(t.requests[1].body.layout_patch_id).is_equal("patch_a")
 	assert_int(int(t.requests[1].body.blueprint_revision)).is_equal(2)
+
+func test_placement_is_saved_only_after_server_capability_check() -> void:
+	var location := {"lat": 31.225, "lng": 121.485}
+	var body := _state(0)
+	body["location"] = location
+	var pair := _session([{"status": 404, "json": {}},
+		{"status": 200, "json": {"farm_placement_version": 1}}, {"status": 201, "json": body}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	assert_bool(await s.ensure_farm("shanghai", "sh_a", 2, location)).is_true()
+	assert_str(t.requests[1].url).ends_with("/regions")
+	assert_that(t.requests[2].body.location).is_equal(location)
+	assert_that(s.location).is_equal(location)
+
+func test_old_server_cannot_silently_ignore_a_chosen_location() -> void:
+	var pair := _session([{"status": 404, "json": {}}, {"status": 200, "json": {"regions": []}}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	assert_bool(await s.ensure_farm("shanghai", "sh_a", 2, {"lat": 31.225, "lng": 121.485})).is_false()
+	assert_str(s.last_error_code).is_equal("LOCATION_UNSUPPORTED")
+	assert_int(t.requests.size()).is_equal(2)
+	assert_bool(s.has_farm()).is_false()
+
+func test_existing_farm_keeps_authoritative_location_even_when_another_is_selected() -> void:
+	var original := {"lat": 31.225, "lng": 121.485}
+	var body := _state(7)
+	body["location"] = original
+	var pair := _session([{"status": 200, "json": body}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	assert_bool(await s.ensure_farm("shanghai", "sh_a", 2, {"lat": 31.235, "lng": 121.495})).is_true()
+	assert_that(s.location).is_equal(original)
+	assert_int(t.requests.size()).is_equal(1)
+
+func test_old_farm_response_clears_stale_cached_placement() -> void:
+	var pair := _session([{"status": 200, "json": _state(7)}])
+	var s: FarmSession = pair[0]
+	s.location = {"lat": 31.225, "lng": 121.485}
+	await s.refresh()
+	assert_that(s.location).is_equal({})
+
+func test_malformed_placement_is_not_sent_to_server() -> void:
+	var pair := _session([{"status": 404, "json": {}}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	assert_bool(await s.ensure_farm("shanghai", "sh_a", 2, {"lat": "31.225", "lng": 121.485})).is_false()
+	assert_str(s.last_error_code).is_equal("INVALID_LOCATION")
+	assert_int(t.requests.size()).is_equal(1)
 
 func test_send_posts_base_version_and_adopts_new_version() -> void:
 	var pair := _session([{"status": 200, "json": _state(4)},
@@ -53,6 +153,121 @@ func test_send_retries_transport_failure_with_same_key() -> void:
 	await s.ensure_farm("hk", "p", 2)
 	assert_bool(await s.send("water", {})).is_true()
 	assert_str(t.requests[1].body.idempotency_key).is_equal(t.requests[2].body.idempotency_key)
+
+func test_refresh_resolves_a_lost_command_before_reading_or_spending_again() -> void:
+	var pair := _session([{"error": "timeout"}, {"error": "timeout"},
+		{"status": 200, "json": _state(5)}, {"status": 200, "json": _state(4)},
+		{"status": 200, "json": _state(6)}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	s._adopt(_state(4))
+	var payload := {"recipe": "salad"}
+	assert_bool(await s.send("cook_dish", payload)).is_false()
+	payload.recipe = "tea"
+	assert_bool(await s.send("sell_at_stall", {"items": []}, &"pending_kitchen_command")).is_false()
+	assert_str(s.last_error_code).is_equal("PENDING_ACTION")
+	assert_int(t.requests.size()).is_equal(2)
+	assert_bool(await s.refresh()).is_true()
+	assert_that(t.requests[2].body).is_equal(t.requests[0].body)
+	assert_str(str(t.requests[2].method)).is_equal("POST")
+	assert_str(str(t.requests[3].method)).is_equal("GET")
+	assert_int(s.version).is_equal(5)
+	assert_bool(await s.send("cook_dish", {"recipe": "tea"})).is_true()
+	assert_int(int(t.requests[4].body.base_version)).is_equal(5)
+	assert_str(t.requests[4].body.idempotency_key).is_not_equal(t.requests[0].body.idempotency_key)
+
+func test_failed_reconciliation_keeps_the_envelope_and_never_falls_through_to_get() -> void:
+	var pair := _session([{"error": "timeout"}, {"error": "timeout"},
+		{"error": "timeout"}, {"error": "timeout"},
+		{"status": 200, "json": _state(5)}, {"status": 200, "json": _state(5)}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	s._adopt(_state(4))
+	assert_bool(await s.send("give_gift", {"resident_id": "bistro_owner", "crop": "L"})).is_false()
+	assert_bool(await s.refresh()).is_false()
+	assert_bool(s.offline).is_true()
+	assert_int(t.requests.size()).is_equal(4)
+	assert_bool(await s.refresh()).is_true()
+	assert_bool(s.offline).is_false()
+	for index in range(1, 5):
+		assert_that(t.requests[index].body).is_equal(t.requests[0].body)
+		assert_str(str(t.requests[index].method)).is_equal("POST")
+	assert_str(str(t.requests[5].method)).is_equal("GET")
+
+func test_recovery_conflict_proves_no_application_without_automatically_resending() -> void:
+	var conflict := _state(9)
+	conflict.code = "VERSION_CONFLICT"
+	var pair := _session([{"error": "timeout"}, {"error": "timeout"},
+		{"status": 409, "json": conflict}, {"status": 200, "json": _state(9)},
+		{"status": 200, "json": _state(10)}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	s._adopt(_state(4))
+	assert_bool(await s.send("cook_dish", {"recipe": "salad"})).is_false()
+	assert_bool(await s.refresh()).is_true()
+	assert_that(t.requests[2].body).is_equal(t.requests[0].body)
+	assert_str(str(t.requests[3].method)).is_equal("GET")
+	assert_int(t.requests.size()).is_equal(4)
+	assert_bool(await s.send("cook_dish", {"recipe": "salad"})).is_true()
+	assert_int(int(t.requests[4].body.base_version)).is_equal(9)
+	assert_str(t.requests[4].body.idempotency_key).is_not_equal(t.requests[0].body.idempotency_key)
+
+func test_conflict_retry_that_loses_its_reply_retains_the_replacement_envelope() -> void:
+	var conflict := _state(9)
+	conflict.code = "VERSION_CONFLICT"
+	var pair := _session([{"status": 409, "json": conflict},
+		{"error": "timeout"}, {"error": "timeout"},
+		{"status": 200, "json": _state(10)}, {"status": 200, "json": _state(10)}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	s._adopt(_state(4))
+	assert_bool(await s.send("cook_dish", {"recipe": "salad"})).is_false()
+	assert_bool(await s.refresh()).is_true()
+	assert_str(t.requests[1].body.idempotency_key).is_not_equal(t.requests[0].body.idempotency_key)
+	assert_int(int(t.requests[1].body.base_version)).is_equal(9)
+	assert_that(t.requests[2].body).is_equal(t.requests[1].body)
+	assert_that(t.requests[3].body).is_equal(t.requests[1].body)
+	assert_str(str(t.requests[4].method)).is_equal("GET")
+
+func test_replayed_rejection_is_not_reported_as_a_successful_purchase() -> void:
+	var pair := _session([{"error": "timeout"}, {"status": 200, "json": {
+		"outcome": "replayed", "replayed_outcome": "rejected", "code": "INSUFFICIENT_FUNDS"}},
+		{"status": 200, "json": _state(4)}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	s._adopt(_state(4))
+	assert_bool(await s.send("buy_seeds", {"crop": "R", "qty": 1})).is_false()
+	assert_str(s.last_error_code).is_equal("INSUFFICIENT_FUNDS")
+	assert_int(s.version).is_equal(4)
+	assert_bool(await s.refresh()).is_true()
+	assert_str(str(t.requests[2].method)).is_equal("GET")
+
+func test_proxy_timeout_is_unconfirmed_even_when_http_transport_succeeds() -> void:
+	var pair := _session([{"status": 504, "json": {}},
+		{"status": 200, "json": _state(5)}, {"status": 200, "json": _state(5)}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	s._adopt(_state(4))
+	assert_bool(await s.send("buy_seeds", {"crop": "R", "qty": 1})).is_false()
+	assert_str(s.last_error_code).is_equal("TRANSPORT")
+	assert_bool(await s.refresh()).is_true()
+	assert_that(t.requests[1].body).is_equal(t.requests[0].body)
+	assert_str(str(t.requests[2].method)).is_equal("GET")
+
+func test_auth_failure_during_recovery_cannot_discard_an_unconfirmed_command() -> void:
+	var pair := _session([{"error": "timeout"}, {"error": "timeout"},
+		{"status": 401, "json": {"code": "UNAUTHENTICATED"}},
+		{"status": 200, "json": _state(5)}, {"status": 200, "json": _state(5)}])
+	var s: FarmSession = pair[0]
+	var t: FakeTransport = pair[1]
+	s._adopt(_state(4))
+	assert_bool(await s.send("cook_dish", {"recipe": "salad"})).is_false()
+	assert_bool(await s.refresh()).is_false()
+	assert_str(s.last_error_code).is_equal("TRANSPORT")
+	assert_int(t.requests.size()).is_equal(3)
+	assert_bool(await s.refresh()).is_true()
+	assert_that(t.requests[3].body).is_equal(t.requests[0].body)
+	assert_str(str(t.requests[4].method)).is_equal("GET")
 
 func test_send_reconciles_on_version_conflict_with_fresh_key() -> void:
 	# 409 回包带最新状态：先对账，再用**新** key 重发（同 key 换 base_version 会被判

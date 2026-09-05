@@ -10,7 +10,7 @@
  */
 import type { Content, FieldCondition } from './content.js';
 import type { FarmState } from './state.js';
-import { daysBetween, playerDayId } from './time.js';
+import { daysBetween, nextDayStartMs, playerDayId } from './time.js';
 
 export interface Derived {
   player_day_id: string;
@@ -21,6 +21,7 @@ export interface Derived {
   /** 下一章索引；只有上一章 done 且未到 6 时才前进。 */
   chapter_index: number;
   opens_new_chapter: boolean;
+  next_chapter_opens_at: number | null;
   ripe_cells: string[];
 }
 
@@ -36,7 +37,8 @@ export function derive(s: FarmState, now: number, timezone: string, c: Content):
   const lastChapter = c.chapters.chapters.length - 1;
   const prevDone = s.chapters[s.clock.chapter_index]?.status === 'done';
   // 每个玩家日最多激活一个新章节（PRD §9.1 L667）；漏一天后继续未完成章节，不跳章。
-  const opens = elapsed > 0 && prevDone && s.clock.chapter_index < lastChapter;
+  const activatedDay = s.chapters[s.clock.chapter_index]?.activated_day ?? s.clock.player_day_id;
+  const opens = prevDone && activatedDay < day && s.clock.chapter_index < lastChapter;
   const ripe: string[] = [];
   for (const [id, cell] of Object.entries(s.cells))
     if (cell.state === 'growing' && cell.ready_at !== null && cell.ready_at <= now) ripe.push(id);
@@ -49,6 +51,8 @@ export function derive(s: FarmState, now: number, timezone: string, c: Content):
       : (s.qa?.weather?.[String(s.clock.weather_day_index)] ?? s.clock.field_condition),
     chapter_index: opens ? s.clock.chapter_index + 1 : s.clock.chapter_index,
     opens_new_chapter: opens,
+    next_chapter_opens_at: prevDone && !opens && s.clock.chapter_index < lastChapter
+      ? nextDayStartMs(now, timezone) : null,
     ripe_cells: ripe.sort(),
   };
 }

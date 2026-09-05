@@ -32,7 +32,13 @@ export function applyEconomy(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
       const sold: { kind: string; id: string; qty: number; coins: number }[] = [];
       const unsold: { kind: string; id: string; qty: number }[] = [];
       for (const item of cmd.items) {
-        if (!Number.isInteger(item.qty) || item.qty < 1) return err('INSUFFICIENT_ITEMS', 'qty 非法');
+        if (!item || typeof item !== 'object' || !Number.isSafeInteger(item.qty) || item.qty < 1)
+          return err('INSUFFICIENT_ITEMS', 'qty 非法');
+        if (item.kind !== 'produce' && item.kind !== 'dish')
+          return err('INSUFFICIENT_ITEMS', '物品类别非法');
+        const catalog = item.kind === 'produce' ? c.crops.crops : c.recipes.recipes;
+        if (typeof item.id !== 'string' || !Object.hasOwn(catalog, item.id))
+          return err('INSUFFICIENT_ITEMS', '未知物品');
         const price = item.kind === 'produce'
           ? c.crops.crops[item.id as CropId]?.unit_price
           : c.recipes.recipes[item.id as DishId]?.stall_price;
@@ -85,6 +91,8 @@ export function applyEconomy(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
     }
 
     case 'cook_dish': {
+      if (typeof cmd.recipe !== 'string' || !Object.hasOwn(c.recipes.recipes, cmd.recipe))
+        return err('INSUFFICIENT_ITEMS', '未知配方');
       const recipe = c.recipes.recipes[cmd.recipe];
       if (!recipe) return err('INSUFFICIENT_ITEMS', `未知配方 ${cmd.recipe}`);
       const kitchenChapter = unlockChapter(ctx, 'kitchen');
@@ -108,6 +116,8 @@ export function applyEconomy(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
     }
 
     case 'claim_subsidy': {
+      if (typeof cmd.subsidy_id !== 'string' || !Object.hasOwn(c.economy.subsidies, cmd.subsidy_id))
+        return err('NOT_AVAILABLE', '未知补贴');
       const sub = c.economy.subsidies[cmd.subsidy_id];
       if (!sub) return err('NOT_AVAILABLE', `未知补贴 ${cmd.subsidy_id}`);
       if (s.subsidies_claimed.includes(cmd.subsidy_id)) return err('ALREADY_CLAIMED', cmd.subsidy_id);

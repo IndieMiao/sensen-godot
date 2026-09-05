@@ -154,8 +154,23 @@ var _farm_choice: Dictionary = {}
 ## enter_street_mode() 与 _ready() 尾部会各进一次 _build_region_ui()——按地区去重，别刷两遍。
 var _nearby_region := ""
 var _candidate_bps: Dictionary = {} # layout_patch_id -> FarmBlueprint
+const STREET_ZOOM_MIN := 15.0
+const STREET_ZOOM_MAX := 18.0
+var _zoom_elastic := 0.0
+var _focus_tween: Tween
+var farm_markers: FarmMarkers
+var farm_overlay: CandidateOverlay
+var _zoom_label: Label
+var _nearby_generation := 0
+var _map_controls_built := false
+var _placement_mode := false
+var _placement_location: Dictionary = {}
+var _placement_pin: TextureRect
+var _placing_busy := false
 
 func _ready() -> void:
+	safe_area.theme = GameUi.theme()
+	top_panel.add_theme_stylebox_override("panel", GameUi.surface(GameUi.PAPER, 10))
 	_load_bar_started_ms = Time.get_ticks_msec()
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
 	get_viewport().transparent_bg = true
@@ -239,6 +254,12 @@ func _process(_dt: float) -> void:
 	if map:
 		map.poll()
 	_step_fling(_dt)
+	if absf(_zoom_elastic) > 0.001 and _touch_count == 0:
+		_zoom_elastic = lerpf(_zoom_elastic, 0.0, 1.0 - exp(-12.0 * _dt))
+		_camera_dirty = true
+	elif _touch_count == 0 and _zoom_elastic != 0.0:
+		_zoom_elastic = 0.0
+		_camera_dirty = true
 	if not _spawn_queue.is_empty():
 		# 每帧 1 个：装配（部件加载+网格合并）摊薄到 ~23 帧，压掉加载期卡顿
 		var spec: Dictionary = _spawn_queue.pop_front()
@@ -247,6 +268,9 @@ func _process(_dt: float) -> void:
 		_camera_dirty = false
 		_update_cameras()
 	_update_load_bar()
+	_sync_farm_markers()
+	if _placement_mode and _placement_pin:
+		_placement_pin.position = cam.unproject_position(center_world) - _placement_pin.get_parent().global_position - Vector2(14, 28)
 	if Engine.get_process_frames() % 30 == 0:
 		_refresh_header()
 
@@ -255,7 +279,7 @@ func _refresh_header() -> void:
 	if _header_locked:
 		return
 	region_title.text = _region_title_text()
-	location_status.text = _location_status_text()
+	location_status.text = str(region.get("name", "")) if street_mode and not load_bar.visible else _location_status_text()
 
 func _people_count_text(count: int) -> String:
 	return "%d %s" % [count, "person" if count == 1 else "people"]
@@ -318,7 +342,7 @@ func _sync_marker_margins() -> void:
 func _cam_distance() -> float:
 	var h_logical := float(DisplayServer.window_get_size().y) / pixel_ratio
 	# 下限守卫：headless/未就绪时窗口尺寸可能为 0，避免 look_at 退化
-	return maxf(MapGeoMath.cam_distance_m(h_logical, MAP_FOV_DEG, center_lat, zoom), 1.0)
+	return maxf(MapGeoMath.cam_distance_m(h_logical, MAP_FOV_DEG, center_lat, zoom + _zoom_elastic), 1.0)
 
 ## 世界位移（米，来自拖拽）累加进 f64 权威中心。cos 用 anchor_lat 与
 ## geo_to_world 保持严格互逆（重锚半径内两者差异可忽略）。
@@ -349,7 +373,9 @@ func _update_cameras() -> void:
 		marker_layer.sync(cam, anchor_lat, anchor_lng, d * CULL_FACTOR, center_world)
 	# 同一份位姿喂给地图（单一权威）
 	if map:
-		map.set_camera(center_lat, center_lng, zoom, bearing, pitch)
+		map.set_camera(center_lat, center_lng, zoom + _zoom_elastic, bearing, pitch)
+	if _placement_mode:
+		_update_placement_preview()
 
 ## 浮动原点：地图中心跑远了就把锚点搬过来（f64 精确拷贝），所有几何重算。
 func _maybe_reanchor() -> void:
@@ -369,6 +395,9 @@ func _update_pawns(d: float) -> void:
 		# ready 门禁：装配完成+首帧姿态应用前绝不显示——半成品蒙皮网格在地图
 		# 缩放（~25×）下会渲染成通天拉伸毛刺（2026-08-29 真机截图实证）。
 		var vis: bool = p.ready and n.position.distance_to(center_world) <= cull_r
+		if street_mode and farm_markers:
+			var id := str(p.cohort).trim_prefix("farm:")
+			vis = vis and farm_markers.visible_farm_ids.has(id)
 		if n.visible != vis:
 			n.visible = vis
 			# 不等 RigActivity 的 0.25s 节流：隐藏立即停播，显形立即恢复
@@ -391,6 +420,8 @@ func _reposition_pawns() -> void:
 			p.lat, p.lng, anchor_lat, anchor_lng)
 	if candidate_overlay:
 		candidate_overlay.reanchor(anchor_lat, anchor_lng)
+	if farm_overlay:
+		farm_overlay.reanchor(anchor_lat, anchor_lng)
 
 ## 相机射线与地面平面（y=0）的交点。近地平线的甩飞防护不在这里做——
 ## 在拖拽处对单次 delta 限幅（limit_length(d)），比丢弃命中点的手感更接近原生地图。
@@ -438,38 +469,52 @@ func _tween_zoom(target: float) -> void:
 	_zoom_vel = 0.0 # 双击接管缩放，清掉残余的捏合惯性
 	if _zoom_tween:
 		_zoom_tween.kill()
+	if street_mode and ((zoom >= STREET_ZOOM_MAX and target > STREET_ZOOM_MAX) or (zoom <= STREET_ZOOM_MIN and target < STREET_ZOOM_MIN)):
+		_zoom_elastic = 0.16 if target > STREET_ZOOM_MAX else -0.16
+		_camera_dirty = true
+		return
 	_zoom_tween = create_tween()
-	_zoom_tween.tween_method(_set_zoom, zoom, clampf(target, 3.0, 20.0), 0.25) \
+	_zoom_tween.tween_method(_set_zoom, zoom, clampf(target, STREET_ZOOM_MIN if street_mode else 3.0, STREET_ZOOM_MAX if street_mode else 20.0), 0.25) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 ## —— 输入与 UI ————————————————————————————————————————————————
 
 func _unhandled_input(e: InputEvent) -> void:
+	if _placing_busy: return
 	if e is InputEventScreenTouch:
 		_touch_count += 1 if e.pressed else -1
 		_touch_count = maxi(_touch_count, 0)
 		if e.pressed:
 			_fling_vel = Vector3.ZERO # 新触摸立即打断惯性
 			_zoom_vel = 0.0 # 缩放轴同理
+			if _focus_tween: _focus_tween.kill()
+			if _zoom_tween:
+				_zoom_tween.kill()
+				_zoom_tween = null
+			if _touch_count == 1:
+				_drag_accum_px = 0.0
+				_fling_peak = 0.0
 			if _touch_count >= 2:
 				# 第二指落下：丢掉第一指此前攒的 pan 速度，本次手势按捏合处理
 				_gesture_multi = true
 				_fling_vel = Vector3.ZERO
 		elif _touch_count == 0:
-			_gesture_multi = false # 全部离手，下一次手势重新判定
-			if _zoom_tween: # 惯性的另一半：新触摸也要打断还在跑的双击变焦
-				_zoom_tween.kill()
-				_zoom_tween = null
-			_drag_accum_px = 0.0 # 新手势重新计里程，配合下面的拖拽门禁
-			_fling_peak = 0.0
-			if _touch_count <= 1: # 第二指落下（捏合起手）不算双击，镜像拖拽路径的门禁
-				if _is_double_tap(Time.get_ticks_msec(), e.position):
+			if not _gesture_multi and _drag_accum_px <= DOUBLE_TAP_MAX_PX:
+				if _placement_mode and not _placing_busy:
+					var point = _ground_point(e.position)
+					if point != null:
+						var delta := (point as Vector3) - center_world
+						_apply_world_delta(delta)
+						_camera_dirty = true
+				elif _is_double_tap(Time.get_ticks_msec(), e.position):
 					_last_tap_ms = 0
-					if not street_mode:
-						_tween_zoom(zoom + 1.0)
+					_tween_zoom(zoom + 1.0)
 				else:
 					_last_tap_ms = Time.get_ticks_msec()
 					_last_tap_pos = e.position
+			else:
+				_last_tap_ms = 0
+			_gesture_multi = false
 	if e is InputEventScreenDrag and _touch_count <= 1 and not _gesture_multi:
 		# 抓地拖拽：让按下时的地面点始终跟在手指下（倾角下精确）。
 		# 高 pitch 时屏幕上缘一像素对应的地面位移可达 ~0.4d，单次 delta 限幅到 d
@@ -489,7 +534,7 @@ func _unhandled_input(e: InputEvent) -> void:
 		_drag_accum_px += e.relative.length()
 		if _drag_accum_px > DOUBLE_TAP_MAX_PX:
 			_last_tap_ms = 0
-	elif e is InputEventMagnifyGesture and not street_mode:
+	elif e is InputEventMagnifyGesture:
 		# 与拖拽同款：应用之后把变化量换算成 zoom/秒 做 EMA 平滑，松手接着走。
 		var dz := log(e.factor) / log(2.0)
 		_set_zoom(zoom + dz)
@@ -550,6 +595,7 @@ func enter_street_mode(r: Dictionary) -> void:
 		if not _home_resolved:
 			_resolve_home(float(r.center[0]), float(r.center[1]), false)
 		_build_region_ui(r)
+		_build_map_controls()
 	_camera_dirty = true
 
 ## 已经有农场就不再选地：候选层与 Create Farm 都不建，直接进「家」模式。
@@ -559,6 +605,16 @@ func _build_region_ui(r: Dictionary) -> void:
 	if _farm_choice.is_empty():
 		load_candidates(r)
 	elif nearby_panel == null:
+		_placement_mode = false
+		if _placement_pin: _placement_pin.visible = false
+		if candidate_overlay:
+			remove_child(candidate_overlay)
+			candidate_overlay.queue_free()
+			candidate_overlay = null
+		if select_panel:
+			select_panel.get_parent().remove_child(select_panel)
+			select_panel.queue_free()
+			select_panel = null
 		_enter_farm_home(r)
 	elif str(r.get("id", "")) != _nearby_region:
 		_refresh_nearby()
@@ -594,6 +650,7 @@ func load_candidates(r: Dictionary) -> void:
 	select_panel.set_candidates(items)
 	select_panel.candidate_focused.connect(focus_candidate)
 	select_panel.confirmed.connect(_on_candidate_confirmed)
+	select_panel.placement_cancelled.connect(_cancel_placement)
 	if not items.is_empty():
 		focus_candidate(items[0].id)
 
@@ -601,19 +658,64 @@ func focus_candidate(id: String) -> void:
 	if not _candidate_bps.has(id):
 		return
 	var center: Vector2 = _candidate_bps[id].overlay.center
-	fly_to(center.x, center.y)
 	set_pan_bounds(center.x, center.y, 300.0)
+	fly_to(center.x, center.y)
 	candidate_overlay.select(id)
 	if select_panel.focused_id != id:
 		select_panel.focus(id)
 
 func _save_choice(id: String) -> void:
-	FarmChoice.save(id, _candidate_bps[id].revision)
+	FarmChoice.save(id, _candidate_bps[id].revision, _placement_location if _placement_mode else {})
 
 func _on_candidate_confirmed(id: String) -> void:
+	if _placing_busy: return
+	if not _placement_mode:
+		_begin_placement(id)
+		return
+	if not FarmPlacement.contains(region, _placement_location): return
+	_placing_busy = true
+	_reset_gesture()
+	select_panel.set_saving(true)
 	var choice := await _resolve_confirmed_farm(id)
-	AppRouter.push_instance(AppRouter.FARM, {
-		"layout_patch_id": choice.layout_patch_id, "revision": int(choice.revision)})
+	_placing_busy = false
+	if choice.is_empty():
+		select_panel.set_saving(false, location_status.text)
+		return
+	AppRouter.push_instance(AppRouter.FARM, choice)
+
+func _begin_placement(id: String) -> void:
+	if not _candidate_bps.has(id): return
+	_placement_mode = true
+	_reset_gesture()
+	var bounds: Array = region.get("placement_bounds", [])
+	if bounds.size() == 4:
+		pan_bounds = Rect2(float(bounds[0]), float(bounds[1]), float(bounds[2]) - float(bounds[0]), float(bounds[3]) - float(bounds[1]))
+	candidate_overlay.outline_only = true
+	var preview: FarmBlueprint = _candidate_bps[id].with_location({"lat": center_lat, "lng": center_lng})
+	candidate_overlay.set_candidates([preview], anchor_lat, anchor_lng)
+	candidate_overlay.select(id)
+	if _placement_pin == null:
+		_placement_pin = GameUi.picture(GameUi.icon("map-pin"), 28)
+		_placement_pin.modulate = GameUi.GREEN
+		$HUD/SafeArea/Root.add_child(_placement_pin)
+	_placement_pin.visible = true
+	_update_placement_preview()
+
+func _update_placement_preview() -> void:
+	if not _placement_mode or select_panel == null or _placing_busy: return
+	_placement_location = {"lat": snappedf(center_lat, 0.000001), "lng": snappedf(center_lng, 0.000001)}
+	candidate_overlay.move_candidate(select_panel.focused_id, Vector2(center_lat, center_lng))
+	select_panel.set_placement_mode(true, FarmPlacement.contains(region, _placement_location))
+
+func _cancel_placement() -> void:
+	if _placing_busy: return
+	_placement_mode = false
+	_placement_location.clear()
+	if _placement_pin: _placement_pin.visible = false
+	candidate_overlay.outline_only = false
+	candidate_overlay.set_candidates(_candidate_bps.values(), anchor_lat, anchor_lng)
+	select_panel.set_placement_mode(false)
+	focus_candidate(select_panel.focused_id)
 
 ## 玩家选了 id，但**服务端已有农场时以服务端为准**：ensure_farm 取回的是旧农场，客户端若
 ## 仍按新选的蓝图进场，发出去的格子全在别的坐标上（2026-09-04 真机全程 CELL_NOT_CULTIVABLE）。
@@ -621,15 +723,19 @@ func _on_candidate_confirmed(id: String) -> void:
 func _resolve_confirmed_farm(id: String) -> Dictionary:
 	var rev: int = _candidate_bps[id].revision
 	if Net and Net.logged_in():
-		var ok: bool = await Net.session.ensure_farm(str(region.get("id", "")), id, rev)
+		var ok: bool = await Net.session.ensure_farm(str(region.get("id", "")), id, rev, _placement_location if _placement_mode else {})
 		if not ok:
-			location_status.text = "Offline — farm not saved online"
-		elif not Net.session.layout_patch_id.is_empty() and Net.session.layout_patch_id != id:
+			location_status.text = "Farm placement unavailable" if Net.session.last_error_code == "LOCATION_UNSUPPORTED" else "Could not save farm. Try again."
+			return {}
+		elif not Net.session.layout_patch_id.is_empty():
 			var server_id := Net.session.layout_patch_id
 			rev = Net.session.blueprint_revision
-			location_status.text = "You already have a farm at %s" % _candidate_name(server_id)
-			FarmChoice.save(server_id, rev)
-			return {"layout_patch_id": server_id, "revision": rev}
+			if server_id != id: location_status.text = "You already have a farm at %s" % _candidate_name(server_id)
+			FarmChoice.save(server_id, rev, Net.session.location)
+			return {"layout_patch_id": server_id, "revision": rev, "location": Net.session.location}
+	if _placement_mode:
+		location_status.text = "Connect to save your farm"
+		return {}
 	_save_choice(id)
 	return {"layout_patch_id": id, "revision": rev}
 
@@ -654,11 +760,11 @@ func fly_to(lat: float, lng: float) -> void:
 ## 不会因为父节点 visible=false 就失去"当前"身份，压栈场景会看见地图相机冻结的位姿
 ## 和地图的天空/环境光（2026-09-04 终审 C1）。
 func suspend() -> void:
+	_reset_gesture()
 	process_mode = Node.PROCESS_MODE_DISABLED
 	visible = false
 	$HUD.visible = false
-	if map:
-		map.set_map_visible(false)
+	if map: map.set_map_visible(false)
 	get_viewport().transparent_bg = false
 	cam.current = false
 	if world_env.environment:
@@ -666,6 +772,8 @@ func suspend() -> void:
 	world_env.environment = null
 
 func resume() -> void:
+	_reset_gesture()
+	_refresh_self_outfit()
 	process_mode = Node.PROCESS_MODE_INHERIT
 	visible = true
 	$HUD.visible = true
@@ -675,11 +783,27 @@ func resume() -> void:
 	_camera_dirty = true
 	cam.make_current()
 	world_env.environment = _saved_environment
+	if street_mode: _build_region_ui(region)
+	if nearby_panel:
+		nearby_panel._apply_bottom_preset()
+		nearby_panel.set_place_state(Net.session.state if Net and Net.session else {})
+
+func _reset_gesture() -> void:
+	_touch_count = 0
+	_gesture_multi = false
+	_drag_accum_px = 0.0
+	_last_tap_ms = 0
+	_fling_vel = Vector3.ZERO
+	_zoom_vel = 0.0
+	if _focus_tween: _focus_tween.kill()
+	if _zoom_tween: _zoom_tween.kill()
 
 func _set_zoom(v: float) -> void:
-	if street_mode:
-		return
-	zoom = clampf(v, 3.0, 20.0)
+	zoom = clampf(v, STREET_ZOOM_MIN if street_mode else 3.0, STREET_ZOOM_MAX if street_mode else 20.0)
+	if street_mode and v != zoom:
+		_zoom_elastic = clampf((v - zoom) * 0.35, -0.16, 0.16)
+		_zoom_vel = 0
+	if _zoom_label: _zoom_label.text = "Zoom %.0f" % zoom
 	_camera_dirty = true
 
 func _set_pitch(v: float) -> void:
@@ -721,6 +845,31 @@ func _load_token() -> String:
 ## 内部已在无存档时回落 slot_table.default_config()，此处不需要再守卫 null。
 func self_config() -> AvatarConfig:
 	return Avatar.load_outfit()
+
+func _refresh_self_outfit() -> void:
+	var saved := self_config()
+	for spec in _spawn_queue:
+		if spec.cohort == "self" and not saved.changed_slots(spec.cfg).is_empty():
+			spec.cfg = saved
+	for pawn in _pawns:
+		if pawn.cohort != "self":
+			continue
+		var rig := pawn.get("rig") as AvatarRig
+		if rig == null or saved.changed_slots(rig.desired_config()).is_empty():
+			continue
+		pawn.ready = false
+		pawn.node.visible = false
+		rig.apply_config(saved)
+		if not rig.is_busy():
+			_finish_pawn_outfit(pawn)
+
+func _finish_pawn_outfit(pawn: Dictionary) -> void:
+	var rig := pawn.rig as AvatarRig
+	var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if ap:
+		ap.advance(0.0)
+	pawn.ready = true
+	_camera_dirty = true
 
 ## 自己 + 近处路人，全部相对 home 摆放。绝不写死经纬度：写死的话定位到任何
 ## 非上海的位置，这些角色都会落在 CULL_FACTOR×相机距离之外被剔除，地图空无一人。
@@ -816,7 +965,7 @@ func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String, cohort: 
 			break
 	# cohort 保留到 pawn 记录里：home 纠正（_correct_home）要靠它分清哪些已生成
 	# 的角色跟着 home 搬（self/near）、哪些是绝对坐标的洛杉矶夹具不能动。
-	var pawn := {"lat": lat, "lng": lng, "node": holder, "activity": activity, "ready": false,
+	var pawn := {"lat": lat, "lng": lng, "node": holder, "rig": rig, "activity": activity, "ready": false,
 		"cohort": cohort}
 	rig.config_applied.connect(func(_c):
 		var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
@@ -825,6 +974,10 @@ func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String, cohort: 
 			ap.advance(0.0) # 强制立刻应用首帧骨骼姿态，杜绝未蒙皮帧被渲染
 		pawn.ready = true
 		_camera_dirty = true) # 下一帧重跑剔除，按当前相机决定是否显示
+	# config_applied only covers initial loading; later outfit changes finish via busy_changed.
+	rig.busy_changed.connect(func(busy):
+		if not busy and not pawn.ready:
+			_finish_pawn_outfit(pawn))
 	rig.apply_config(cfg)
 	_pawns.append(pawn)
 	_camera_dirty = true
@@ -882,16 +1035,22 @@ func _random_config() -> AvatarConfig:
 ## 否则用本地缓存（离线或还没建场）。
 func _resolve_farm_choice() -> Dictionary:
 	if Net and Net.logged_in() and Net.session.has_farm() and not Net.session.layout_patch_id.is_empty():
-		var server := {"layout_patch_id": Net.session.layout_patch_id, "revision": Net.session.blueprint_revision}
+		var server := {"layout_patch_id": Net.session.layout_patch_id, "revision": Net.session.blueprint_revision, "location": Net.session.location}
 		var local := FarmChoice.load()
-		if local.get("layout_patch_id", "") != server.layout_patch_id:
-			FarmChoice.save(server.layout_patch_id, server.revision)
+		if local != server:
+			FarmChoice.save(server.layout_patch_id, server.revision, server.location)
 		return server
 	return FarmChoice.load()
 
 ## Net 在地图 _ready() 之后才 boot 完的情况：登录一到就重看一遍——有农场就从选地切到家。
 func _on_net_booted(_ok: bool) -> void:
-	if not street_mode or nearby_panel != null:
+	if not street_mode:
+		return
+	if nearby_panel != null:
+		nearby_panel.set_place_state(Net.session.state if Net and Net.session else {})
+		if _ok and Net.logged_in():
+			_snapshots.clear()
+			_refresh_nearby()
 		return
 	if Net.session.has_farm():
 		if candidate_overlay:
@@ -906,40 +1065,152 @@ func _on_net_booted(_ok: bool) -> void:
 
 ## 有农场之后地图的常态：相机停在自家蓝图中心，底部挂 Nearby Farmers。
 func _enter_farm_home(r: Dictionary) -> void:
-	var bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(
-		str(_farm_choice.get("layout_patch_id", "")), int(_farm_choice.get("revision", 1))))
+	var bp := FarmBlueprint.load_choice(_farm_choice)
 	if bp != null and not bp.overlay.is_empty():
 		var center: Vector2 = bp.overlay.center
-		fly_to(center.x, center.y)
 		set_pan_bounds(center.x, center.y, 300.0)
+		fly_to(center.x, center.y)
+		_anchor_self_to_farm(center)
+	farm_markers = FarmMarkers.new()
+	farm_markers.name = "FarmMarkers"
+	$HUD/SafeArea/Root.add_child(farm_markers)
+	$HUD/SafeArea/Root.move_child(farm_markers, 0)
+	farm_markers.focused.connect(func(id):
+		if id == "self": _focus_own_farm()
+		elif nearby_panel: nearby_panel.focus(id))
+	farm_markers.cluster_focused.connect(func(ids):
+		if nearby_panel:
+			var visitors: Array = ids.filter(func(id): return id != "self")
+			nearby_panel.show_group(visitors))
+	if bp: farm_markers.put("self", bp, "My Farm", true)
+	farm_overlay = CandidateOverlay.new()
+	farm_overlay.name = "FarmOverlay"
+	farm_overlay.outline_only = true
+	add_child(farm_overlay)
+	if bp:
+		farm_overlay.set_candidates([bp], anchor_lat, anchor_lng)
+		farm_overlay.select(bp.layout_patch_id)
 	my_farm_btn = Button.new()
 	my_farm_btn.name = "MyFarm"
 	my_farm_btn.text = "My Farm"
+	my_farm_btn.icon = GameUi.icon("house")
 	my_farm_btn.theme_type_variation = &"AccentButton"
 	my_farm_btn.custom_minimum_size.y = 44.0
 	my_farm_btn.pressed.connect(_open_my_farm)
-	side_toolbar.get_node("VBox").add_child(my_farm_btn)
-	side_toolbar.get_node("VBox").move_child(my_farm_btn, 0)
+	$HUD/SafeArea/Root.add_child(my_farm_btn)
+	my_farm_btn.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	my_farm_btn.offset_left = -104
+	my_farm_btn.offset_right = -4
+	my_farm_btn.offset_top = 4
+	my_farm_btn.offset_bottom = 48
+	_build_map_controls()
 	nearby_panel = NearbyPanel.new()
 	nearby_panel.farm_focused.connect(_on_farm_focused)
 	nearby_panel.visit_requested.connect(_on_visit_requested)
+	nearby_panel.place_requested.connect(_open_place)
 	$HUD/SafeArea/Root.add_child(nearby_panel)
+	nearby_panel.set_place_state(Net.session.state if Net and Net.session else {})
 	_refresh_nearby()
 
+func _open_place(id: String) -> void:
+	if AppRouter.top_instance() != null or not Net or not Net.session: return
+	if not PlaceCatalog.available(id, Net.session.state): return
+	AppRouter.push_instance(AppRouter.PLACE, {"place_id": id, "session": Net.session})
+
+func _anchor_self_to_farm(center: Vector2) -> void:
+	home_lat = center.x
+	home_lng = center.y
+	for list in [_pawns, _spawn_queue]:
+		for p in list:
+			if p.cohort == "self":
+				p.lat = center.x
+				p.lng = center.y
+	_reposition_pawns()
+
+func _build_map_controls() -> void:
+	if _map_controls_built: return
+	_map_controls_built = true
+	var rail := side_toolbar.get_node("VBox")
+	side_toolbar.offset_top = 58
+	rail.add_theme_constant_override("separation", 8)
+	top_panel.custom_minimum_size = Vector2(150, 68)
+	nearby_count.visible = false
+	region_title.add_theme_font_size_override("font_size", 16)
+	edit_avatar_btn.custom_minimum_size = Vector2(44, 44)
+	edit_avatar_btn.icon = GameUi.icon("user-round")
+	edit_avatar_btn.size_flags_horizontal = Control.SIZE_SHRINK_END
+	edit_avatar_btn.get_parent().get_node("EditLabel").visible = false
+	for spec in [["plus", "Zoom in", 1.0], ["minus", "Zoom out", -1.0]]:
+		var b := GameUi.button(spec[0], "", spec[1])
+		b.size_flags_horizontal = Control.SIZE_SHRINK_END
+		b.pressed.connect(func(): _tween_zoom(zoom + float(spec[2])))
+		rail.add_child(b)
+	_zoom_label = GameUi.label("Zoom %.0f" % zoom, 11, GameUi.BLUE)
+	top_panel.get_node("VBox").add_child(_zoom_label)
+	var home_button := GameUi.button("locate-fixed", "", "Focus my farm")
+	home_button.size_flags_horizontal = Control.SIZE_SHRINK_END
+	home_button.pressed.connect(_focus_own_farm)
+	rail.add_child(home_button)
+
+func _focus_own_farm() -> void:
+	if farm_markers == null or not farm_markers.points.has("self"): return
+	if nearby_panel:
+		nearby_panel.clear_focus()
+		nearby_panel.show_group([])
+	UiState.write({"selected_farm_id": ""})
+	var point: Dictionary = farm_markers.points.self
+	farm_markers.selected_id = "self"
+	_focus_blueprint(point.bp)
+
+func _focus_blueprint(bp: FarmBlueprint) -> void:
+	if bp.overlay.is_empty(): return
+	var center: Vector2 = bp.overlay.center
+	var from_lat := center_lat
+	var from_lng := center_lng
+	# Expand the bounds before flying; the old farm's clamp must not clip the target.
+	set_pan_bounds(center.x, center.y, 450)
+	center_lat = from_lat
+	center_lng = from_lng
+	_fling_vel = Vector3.ZERO
+	if _focus_tween: _focus_tween.kill()
+	_focus_tween = create_tween()
+	_focus_tween.tween_method(func(t: float):
+		center_lat = lerpf(from_lat, center.x, t)
+		center_lng = lerpf(from_lng, center.y, t)
+		_camera_dirty = true, 0.0, 1.0, 0.55).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	if farm_overlay:
+		farm_overlay.visible = true
+		farm_overlay.set_candidates([bp], anchor_lat, anchor_lng)
+		farm_overlay.select(bp.layout_patch_id)
+
+func _sync_farm_markers() -> void:
+	if farm_markers == null: return
+	var root := $HUD/SafeArea/Root as Control
+	var bottom := nearby_panel.position.y - 8 if nearby_panel else root.size.y - 24
+	farm_markers.sync(cam, anchor_lat, anchor_lng, Rect2(0, 110, root.size.x, maxf(0, bottom - 110)))
+	_update_pawns(_cam_distance())
+
 func _open_my_farm() -> void:
+	_focus_own_farm()
+	if farm_markers and farm_markers.points.has("self"):
+		var own_center: Vector2 = farm_markers.points.self.center
+		fly_to(own_center.x, own_center.y)
 	AppRouter.push_instance(AppRouter.FARM, {
 		"layout_patch_id": str(_farm_choice.get("layout_patch_id", "")),
 		"revision": int(_farm_choice.get("revision", 1)),
+		"location": _farm_choice.get("location", {}),
 	})
 
 ## 服务端拿不到就落到随包样例（PRD §11.2）：D4 所需的两座系统农场不能被断网卡住。
 func _refresh_nearby() -> void:
+	_nearby_generation += 1
+	var generation := _nearby_generation
 	var region_id := str(region.get("id", ""))
 	_nearby_region = region_id
 	var res := {"ok": false}
 	if Net and Net.logged_in():
 		res = await Net.nearby(region_id)
-	if nearby_panel == null:
+	if nearby_panel == null or generation != _nearby_generation:
 		return
 	if res.get("ok", false):
 		_nearby_from_presets = false
@@ -948,16 +1219,56 @@ func _refresh_nearby() -> void:
 		_nearby_from_presets = true
 		var fallback := PresetSnapshots.entries(region_id)
 		nearby_panel.set_entries(fallback, fallback.size(), true)
+	_clear_missing_farms(nearby_panel.entries.map(func(entry): return str(entry.farm_id)))
 	# 冷启动恢复上次选中的那张卡（仍在列表里才恢复）。
 	var remembered := str(UiState.read().get("selected_farm_id", ""))
 	if not remembered.is_empty() and nearby_panel.entries.any(func(e): return str(e.farm_id) == remembered):
 		nearby_panel.focus(remembered)
+	_load_farm_locations(generation)
+
+func _load_farm_locations(generation: int) -> void:
+	for entry in nearby_panel.entries:
+		var id := str(entry.farm_id)
+		var snap: Dictionary = _snapshots.get(id, {})
+		if snap.is_empty() and not _nearby_from_presets and Net and Net.logged_in():
+			var response: Dictionary = await Net.snapshot(id)
+			if response.get("ok", false): snap = response.snapshot
+		if snap.is_empty(): snap = PresetSnapshots.snapshot(id)
+		if generation != _nearby_generation or not is_inside_tree(): return
+		if not snap.is_empty() and str(snap.get("farm_id", "")) == id:
+			_snapshots[id] = snap
+			_place_farm(id, snap)
+			nearby_panel.set_thumbnail(snap)
+
+func _clear_missing_farms(ids: Array) -> void:
+	if farm_markers: farm_markers.remove_missing(ids)
+	for pawn in _pawns.duplicate():
+		if str(pawn.cohort).begins_with("farm:") and not ids.has(str(pawn.cohort).trim_prefix("farm:")):
+			pawn.node.queue_free()
+			_pawns.erase(pawn)
+	_spawn_queue = _spawn_queue.filter(func(pawn): return not str(pawn.cohort).begins_with("farm:") or ids.has(str(pawn.cohort).trim_prefix("farm:")))
+
+func _place_farm(id: String, snap: Dictionary) -> void:
+	if not snap.has("region_id") or str(snap.region_id) != str(region.get("id", "")):
+		if farm_markers:
+			farm_markers.remove_missing(farm_markers.points.keys().filter(func(key): return key != id))
+		return
+	if farm_markers == null or farm_markers.points.has(id): return
+	var bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(str(snap.get("layout_patch_id", "")), int(snap.get("blueprint_revision", 2))))
+	if bp == null or bp.overlay.is_empty(): return
+	bp = bp.with_location(snap.get("location", {}))
+	var ref := str(snap.get("avatar_ref", "seed:unknown"))
+	farm_markers.put(id, bp, SeededOutfit.short_name(ref))
+	var center: Vector2 = bp.overlay.center
+	_spawn_queue.append({"lat": center.x, "lng": center.y, "cfg": SeededOutfit.config_for(ref), "anim": "idle", "cohort": "farm:" + id})
 
 ## 选中一张卡：先要线上快照，失败再看随包有没有这座；都没有就明说不可用。
 func _on_farm_focused(farm_id: String) -> void:
 	UiState.write({"selected_farm_id": farm_id})
-	var snap := {}
-	if not _nearby_from_presets and Net and Net.logged_in():
+	if farm_markers: farm_markers.selected_id = farm_id
+	if farm_overlay: farm_overlay.visible = false
+	var snap: Dictionary = _snapshots.get(farm_id, {})
+	if snap.is_empty() and not _nearby_from_presets and Net and Net.logged_in():
 		var r: Dictionary = await Net.snapshot(farm_id)
 		if r.get("ok", false):
 			snap = r.snapshot
@@ -965,22 +1276,28 @@ func _on_farm_focused(farm_id: String) -> void:
 		snap = PresetSnapshots.snapshot(farm_id)
 	if nearby_panel == null or nearby_panel.focused_id != farm_id:
 		return   # 等待期间用户换了卡
-	if snap.is_empty():
+	if snap.is_empty() or str(snap.get("farm_id", "")) != farm_id:
 		nearby_panel.set_preview_unavailable()
 	else:
 		_snapshots[farm_id] = snap
 		nearby_panel.set_preview(snap)
+		_place_farm(farm_id, snap)
+		if farm_markers and farm_markers.points.has(farm_id):
+			farm_markers.selected_id = farm_id
+			_focus_blueprint(farm_markers.points[farm_id].bp)
 
 var _snapshots: Dictionary = {}
 
 ## 进独立访客实例：只读、挥手、印章；不复用主人的耕作工具栏（PRD §3.3）。
 func _on_visit_requested(farm_id: String) -> void:
+	if nearby_panel == null or nearby_panel.focused_id != farm_id: return
 	var snap: Dictionary = _snapshots.get(farm_id, {})
-	if snap.is_empty():
+	if snap.is_empty() or str(snap.get("farm_id", "")) != farm_id:
 		return
 	var bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(
 		str(snap.layout_patch_id), int(snap.blueprint_revision)))
 	if bp == null:
 		nearby_panel.set_preview_unavailable()
 		return
+	bp = bp.with_location(snap.get("location", {}))
 	AppRouter.push_instance(AppRouter.FARM, {"visitor": true, "snapshot": snap, "blueprint": bp})

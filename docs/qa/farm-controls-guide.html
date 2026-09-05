@@ -1,200 +1,138 @@
 <!doctype html>
+<html lang="zh-CN">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>街角四季操作指南</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<title>街角四季 · 操作指南</title>
 <style>
-:root{
-  --accent:#2fcf9f; --accent-deep:#13956f; --ink:#17211f; --ink-sub:#5f6f6a; --ink-muted:#899792;
-  --surface:#ffffff; --sunk:#f2f5f4; --tint:#e6f7f1; --border:#d9e1de; --marker:#ff765f;
-  --weed:#75944c; --cleared:#9a7a5a; --tilled:#6b4529; --seedling:#6bc75c; --ripe:#dc5c5c; --reserved:#c7a98c;
-  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  --sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --ink:#e8efec; --ink-sub:#a9b8b3; --ink-muted:#7d8c87; --surface:#141b19; --sunk:#1b2422; --tint:#163127; --border:#2b3834;
-    --accent:#3fd6a9; --accent-deep:#5fe0b9; --cleared:#a88663; --tilled:#8a5a35;
-  }
-}
-:root[data-theme="dark"]{
-  --ink:#e8efec; --ink-sub:#a9b8b3; --ink-muted:#7d8c87; --surface:#141b19; --sunk:#1b2422; --tint:#163127; --border:#2b3834;
-  --accent:#3fd6a9; --accent-deep:#5fe0b9; --cleared:#a88663; --tilled:#8a5a35;
-}
-body{margin:0;background:var(--sunk);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.7}
-.page{max-width:760px;margin:0 auto;padding:40px 20px 80px}
-h1{font-size:30px;line-height:1.25;margin:0 0 6px;text-wrap:balance;font-weight:700}
-.sub{color:var(--ink-sub);margin:0 0 36px;font-size:15px}
-.sub b{color:var(--ink);font-weight:500}
-h2{font-size:20px;margin:48px 0 14px;padding-top:24px;border-top:1px solid var(--border);text-wrap:balance}
-h2 small{display:block;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:6px}
-h3{font-size:16px;margin:24px 0 8px}
-p{margin:0 0 12px;max-width:65ch}
-ul,ol{margin:0 0 12px;padding-left:1.4em;max-width:65ch}
-li{margin:4px 0}
-kbd{font-family:var(--mono);font-size:13px;font-weight:500;background:var(--surface);border:1px solid var(--border);border-bottom-width:2px;border-radius:6px;padding:1px 7px;white-space:nowrap;color:var(--ink)}
-kbd.on{background:var(--accent);border-color:var(--accent);color:#0c2a20}
-.note{background:var(--tint);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0}
-.warn{background:var(--surface);border-left:3px solid var(--marker);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0}
-.big{font-size:18px;font-weight:600;margin:16px 0 8px}
-.route{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:18px 0 8px}
-.route div{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.55}
-.route .n{font-family:var(--mono);font-size:12px;color:var(--accent-deep);display:block;margin-bottom:4px}
-.shot{display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start;margin:20px 0}
-@media (max-width:640px){.shot{grid-template-columns:1fr}}
-.phone{position:relative;width:300px;height:652px;background:#eef6e6;border:1px solid var(--border);border-radius:22px;overflow:hidden;font-size:11px;font-family:var(--mono);color:#17211f}
-.phone .b{position:absolute;background:#fff;border:1px solid #d9e1de;border-radius:10px;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 6px;box-sizing:border-box}
-.phone .goals{position:absolute;left:8px;top:64px;width:140px;background:#fff;border:1px solid #d9e1de;border-radius:10px;padding:8px 10px;font-size:10px;line-height:1.5}
-.phone .bed{position:absolute;height:28px;width:82px;background:#a07850;border-radius:3px}
-.phone .bed.weed{background:linear-gradient(90deg,var(--weed) 0 30%,#a07850 30% 36%,var(--weed) 36% 66%,#a07850 66% 72%,var(--weed) 72%)}
-.phone .bed.till{background:var(--tilled)}
-.phone .bed.res{background:var(--reserved);width:26px}
-.phone .stick{position:absolute;left:22px;bottom:24px;width:90px;height:90px;border-radius:50%;background:rgba(23,33,31,.08);border:1px solid rgba(23,33,31,.2)}
-.phone .stick::after{content:"";position:absolute;left:29px;top:29px;width:32px;height:32px;border-radius:50%;background:#2fcf9f}
-.tag{position:absolute;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;font:600 11px/20px var(--mono);text-align:center;z-index:2}
-.legend{margin:0;padding:0;list-style:none;font-size:14.5px}
-.legend li{display:grid;grid-template-columns:24px 1fr;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border);align-items:start}
-.legend .tag{position:static;margin-top:3px}
-.legend b{display:block;font-weight:600}
-.chain{display:flex;flex-wrap:wrap;gap:6px 0;align-items:stretch;margin:18px 0 6px;font-size:13.5px}
-.state{flex:1 1 92px;min-width:92px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 10px 8px;display:flex;flex-direction:column;gap:6px}
-.state .sw{height:26px;border-radius:5px;border:1px solid rgba(0,0,0,.08)}
-.state .nm{font-weight:600}
-.state .hint{color:var(--ink-sub);font-size:12.5px;line-height:1.45}
-.arrow{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 4px;color:var(--ink-muted);font-size:12px;gap:2px}
-table{border-collapse:collapse;width:100%;font-size:14.5px;margin:12px 0}
-th,td{text-align:left;vertical-align:top;padding:9px 10px;border-bottom:1px solid var(--border)}
-th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-sub);font-weight:500}
-td:first-child{white-space:nowrap}
-.tbl{overflow-x:auto}
-.num{font-variant-numeric:tabular-nums}
-.foot{margin-top:56px;color:var(--ink-muted);font-size:13px}
+:root{color-scheme:light;--ink:#243d35;--muted:#64786e;--green:#287c59;--line:#d2e2d6;--paper:#fcfefa;--blue:#43869f;--coral:#ce705c}
+*{box-sizing:border-box;letter-spacing:0}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+main{max-width:1024px;margin:auto;padding:32px 24px 64px}
+h1{font-size:30px;line-height:1.3;margin:0 0 12px}h2{font-size:22px;line-height:1.4;margin:40px 0 16px;border-top:1px solid var(--line);padding-top:24px}h3{font-size:17px;margin:24px 0 8px}
+p{margin:0 0 14px}a{color:var(--green);text-underline-offset:3px}nav{display:flex;flex-wrap:wrap;gap:8px 24px;margin:20px 0}
+.meta,figcaption{color:var(--muted);font-size:13px}.intro{border-left:3px solid var(--green);padding-left:18px;margin:24px 0}
+.shots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin:24px 0}.shots figure{margin:0;min-width:0}.shots img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:8px}.shots a{display:block}figcaption{padding-top:8px}
+ol,ul{padding-left:22px}li{margin:8px 0}kbd,code{font:13px/1.6 ui-monospace,SFMono-Regular,monospace;background:#edf3ef;padding:2px 5px;border-radius:3px;overflow-wrap:anywhere}
+.table{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px}td,th{text-align:left;vertical-align:top;padding:12px 10px;border-bottom:1px solid var(--line)}th{font-weight:600;color:var(--muted)}.symbol{width:22px;height:22px;vertical-align:middle;filter:brightness(0) saturate(100%) invert(39%) sepia(21%) saturate(1220%) hue-rotate(102deg)}
+.note{color:var(--blue)}.limit{border-left:3px solid var(--coral);padding-left:18px}footer{border-top:1px solid var(--line);margin-top:40px;padding-top:20px}
+@media(max-width:640px){main{padding:24px 16px 48px}.shots{grid-template-columns:1fr;gap:24px}.shots figure{max-width:360px;margin:auto}h1{font-size:26px}h2{font-size:20px}td,th{padding:10px 6px}}
 </style>
+</head>
+<body><main>
+<h1>街角四季 · 操作指南</h1>
+<p class="meta">2026-09-05 · 分支 <code>feat/farm-ui-playability</code> · <a href="../../build/sensen-farm-ui-debug.apk">Android 调试安装包</a><br>本轮按认可设计稿实装，界面为英文，已通过 vivo 真机验收。原手机数据和生产连接已恢复，手机保留新包并运行原农场。完整证据与后端发布边界见<a href="../../design-qa.md">设计验收记录</a>。</p>
+<nav aria-label="章节"><a href="#map">地图与拜访</a><a href="#farm">种田与移动</a><a href="#hints">地块提示</a><a href="#panels">摊位与目标</a><a href="#dressing">城市与换装</a><a href="#qa">验证与限制</a><a href="../design/farm-ui-2026-09-05/index.html">AI 设计稿</a></nav>
+<div class="intro"><p><b>点一块田，人物先走过去，再完成这块田的下一步。</b><br>庭院将可用田畦排成三行九格。底部主按钮批量处理同一步骤；点空地可移动，落点圆环与路径圆点显示目的地。单摇杆已移除。</p></div>
+<p class="meta"><a href="../design/farm-ui-2026-09-05/qa/primary-comparison.png">地图、农场、摊位设计稿与真机对照</a> · 设计板是 AI 图像，以下是实际游戏画面。</p>
 
-<div class="page">
-<h1>街角四季操作指南</h1>
-<p class="sub">对应 2026-09-05 凌晨的构建 <b>build/sensen-g3-debug.apk</b>（main <b>e924741</b>，线上 farm.sensenjoy.cn）。所有界面文字是英文，这里写的 <kbd>按钮</kbd> 就是屏幕上的原文。</p>
-
-<div class="note">
-<div class="big">整个农场只有一条规则</div>
-<b>点一块田，它自己做该做的下一步。</b>草地点了就清理，空地点了就翻土，翻过的点了就播种，播过的点了就浇水，熟了点了就收。不用选工具。人物会先走过去，再干 2 秒，田头浮着「Clearing…」告诉你在干什么。<br>
-底部那个<b>大绿按钮</b>永远写着整片田现在最该做的事——不想一格一格点，就按它。
+<div class="shots">
+<figure><a href="../design/farm-ui-2026-09-05/qa/vivo/map-sample-b-final.png"><img src="../design/farm-ui-2026-09-05/qa/vivo/map-sample-b-final.png" alt="真机地图选中Sample B，角色与金色选中环居中，底部显示同一农场的Visit预览" width="1080" height="2344"></a><figcaption>vivo 真机 · 地图：选中 Sample B，镜头聚焦、角色、缩略图和访问预览同步。</figcaption></figure>
+<figure><a href="../design/farm-ui-2026-09-05/qa/vivo/farm-ripe-final.png"><img src="../design/farm-ui-2026-09-05/qa/vivo/farm-ripe-final.png" alt="最终真机农场的九格田畦、成熟提示、低模小屋与底部收获按钮" width="1080" height="2344"></a><figcaption>最终 vivo 真机 · 农场：六格萝卜可收获，三格生菜生长中。<a href="../design/farm-ui-2026-09-05/qa/farm-comparison.png">查看双状态设计对照</a></figcaption></figure>
+<figure><a href="../design/farm-ui-2026-09-05/qa/vivo/stall-final.png"><img src="../design/farm-ui-2026-09-05/qa/vivo/stall-final.png" alt="最终真机摊位，六颗萝卜总价48金币，下方显示同风格种子袋图标" width="1080" height="2344"></a><figcaption>最终 vivo 真机 · 摊位：六颗萝卜总价 48。<a href="../design/farm-ui-2026-09-05/qa/vivo/stall-sold-final.png">卖出后金币 180→228，目标 7/7</a></figcaption></figure>
 </div>
 
-<h2><small>Quick start</small>三分钟走完一次种收</h2>
-<div class="route">
-  <div><span class="n">1</span>冷启动 → 选城页点 <kbd>Shanghai</kbd></div>
-  <div><span class="n">2</span>第一次：底部选一个街区 → <kbd>Create Farm</kbd>。以后：右上 <kbd>My Farm</kbd></div>
-  <div><span class="n">3</span>按大按钮 <kbd class="on">Clear 9 plots</kbd>，看人物走过去把草清掉</div>
-  <div><span class="n">4</span>按 <kbd class="on">Till 9 plots</kbd> → 深棕翻土板</div>
-  <div><span class="n">5</span>按 <kbd class="on">Sow 6 Radish</kbd> → 亮绿小苗（种子行显示还剩几颗）</div>
-  <div><span class="n">6</span>按 <kbd class="on">Water 6 plots</kbd> → 右上 <kbd>Next ripe 02:59</kbd> 开始倒计时</div>
-  <div><span class="n">7</span>剩下 3 格：<kbd class="on">Sow 3 Lettuce</kbd> → <kbd class="on">Water 3 plots</kbd>。按钮变成灰色的 <kbd>Crops are growing</kbd></div>
-  <div><span class="n">8</span>三分钟后按 <kbd class="on">Harvest 6 plots</kbd> → 田头飘「+1 Radish」</div>
-  <div><span class="n">9</span>按 <kbd class="on">Sell 6 at the stall</kbd> → 摊位 → <kbd>Sell all · +48</kbd> → 金币 180 → 228</div>
-  <div><span class="n">10</span>摊位里 <kbd>Buy 3 · 12 coins</kbd> 买种子 → 按钮又变回 <kbd class="on">Sow 3 Radish</kbd></div>
-</div>
-<p>左上的 <kbd>Day 1 goals</kbd> 会一路打勾：清理 → 翻土 → 播种 → 浇水 → 收获 → 卖 → 种下一批。</p>
-
-<h2><small>Farm screen</small>农场界面：每个东西是什么</h2>
-<div class="shot">
-  <div class="phone" aria-hidden="true">
-    <div class="b" style="left:12px;top:22px;width:88px;height:34px;font-weight:500">Leave Farm</div><span class="tag" style="left:2px;top:12px">1</span>
-    <div style="position:absolute;right:16px;top:30px;font-size:12px;font-weight:600">Hengshan Road</div><span class="tag" style="right:2px;top:8px">2</span>
-    <div class="goals">Day 1 goals · 1/7 ▾<br><span style="color:#899792">✓ Clear a plot</span><br><span style="color:#13956f">○ Till it</span><br>○ Sow a radish<br>○ Water it<br>○ Harvest a radish<br>○ Sell at the stall<br>○ Sow next batch</div><span class="tag" style="left:2px;top:56px">3</span>
-    <div class="b" style="right:10px;top:66px;width:74px;height:26px">Coins 180</div>
-    <div class="b" style="right:10px;top:98px;width:118px;height:26px">Sunny · water today</div>
-    <div class="b" style="right:10px;top:130px;width:110px;height:26px">Next ripe 02:59</div>
-    <div class="b" style="right:10px;top:162px;width:128px;height:28px;font-size:10px">Clearing… 92% · 8 left</div>
-    <span class="tag" style="right:2px;top:64px">4</span>
-    <span class="tag" style="right:2px;top:96px">5</span>
-    <span class="tag" style="right:2px;top:128px">6</span>
-    <span class="tag" style="right:2px;top:160px">7</span>
-    <div style="position:absolute;left:150px;top:230px;width:14px;height:34px;background:#fff;border-radius:6px 6px 3px 3px;border:1px solid #ccc"></div>
-    <div style="position:absolute;left:118px;top:214px;font-size:10px;font-weight:700;color:#fff;text-shadow:0 0 3px #000">Clearing…</div>
-    <div class="bed weed" style="left:10px;top:270px"></div><div class="bed weed" style="left:95px;top:270px"></div><div class="bed weed" style="left:180px;top:270px"></div>
-    <div class="bed till" style="left:22px;top:320px"></div><div class="bed" style="left:107px;top:320px"></div><div class="bed" style="left:192px;top:320px"></div>
-    <div class="bed weed" style="left:34px;top:370px"></div><div class="bed weed" style="left:119px;top:370px"></div><div class="bed weed" style="left:204px;top:370px"></div>
-    <div class="bed res" style="left:268px;top:320px"></div>
-    <span class="tag" style="left:2px;top:316px">8</span>
-    <div class="b" style="left:12px;top:454px;width:134px;height:36px;background:#e6f7f1;border-color:#2fcf9f">Radish ×6</div>
-    <div class="b" style="left:154px;top:454px;width:134px;height:36px">Lettuce ×3</div>
-    <span class="tag" style="left:2px;top:446px">9</span>
-    <div class="b" style="left:12px;top:498px;width:276px;height:44px;background:#2fcf9f;border-color:#2fcf9f;color:#0c2a20;font-weight:600;font-size:13px">Clear 9 plots</div>
-    <span class="tag" style="left:2px;top:490px">10</span>
-    <div class="stick"></div><span class="tag" style="left:2px;top:560px">11</span>
-    <div class="b" style="right:10px;bottom:24px;width:100px;height:48px">Stall</div><span class="tag" style="right:2px;bottom:70px">12</span>
-  </div>
-  <ol class="legend">
-    <li><span class="tag">1</span><div><b><kbd>Leave Farm</kbd></b>回到地图。长按右侧的路名 3 秒会打开导演面板（QA 用，见最后一节）。</div></li>
-    <li><span class="tag">2</span><div><b>路名</b>这座农场的街区，由服务端决定——选地页选了别处也会被带回自己的农场。</div></li>
-    <li><span class="tag">3</span><div><b><kbd>Day 1 goals</kbd></b>今天的目标清单，按顺序自动打勾，绿色那条就是「现在做什么」。完成第一条后自动折成一行，点标题展开。全部完成显示 <kbd>Day complete — come back tomorrow</kbd>。</div></li>
-    <li><span class="tag">4</span><div><b><kbd>Coins</kbd></b>金币。卖菜加、买种子减。</div></li>
-    <li><span class="tag">5</span><div><b><kbd>Sunny · water today</kbd></b>今天的田况和今天要做的照料。三种：晴浇水 <kbd>water</kbd>、雨疏水 <kbd>drain</kbd>、风加固 <kbd>shelter</kbd>。点田时自动按这个来，不用选。</div></li>
-    <li><span class="tag">6</span><div><b><kbd>Next ripe</kbd></b>最近一棵作物还差多久成熟；<kbd>--:--</kbd> 没有在长的；<kbd>ready</kbd> 有能收的。</div></li>
-    <li><span class="tag">7</span><div><b>状态条</b>正在干什么、进度、还剩几格：<kbd>Walking over… 0%</kbd> → <kbd>Clearing… 92% · 8 left</kbd>。没干活时是提示语 <kbd>Tap a plot to work it</kbd>。</div></li>
-    <li><span class="tag">8</span><div><b>田畦</b>三畦九格；右边浅色那一畦是第四畦，D5 扩地前锁着。格子的颜色就是它的状态（下一节）。<b>点它，或者拖过一排</b>，每格做各自的下一步。</div></li>
-    <li><span class="tag">9</span><div><b>种子行</b>只在有翻好的地时出现。<kbd>Radish ×6</kbd> 是还剩几颗；点谁就种谁。锁着的作物（胡萝卜 D2、洋甘菊 D3）不出现。</div></li>
-    <li><span class="tag">10</span><div><b>大按钮</b>整片田现在最该做的一件事，按了就批量做。干活中会变成灰色的 <kbd>Working… 8 plots left</kbd>；没事可做时是 <kbd>Crops are growing</kbd>；有收成时是 <kbd>Sell 6 at the stall</kbd>；没种子时是 <kbd>Buy seeds at the stall</kbd>。</div></li>
-    <li><span class="tag">11</span><div><b>摇杆</b>随便走走。点不是田的地面也能走过去。</div></li>
-    <li><span class="tag">12</span><div><b><kbd>Stall</kbd></b>路边摊：卖收成、买种子。每天最多卖 100 金币。</div></li>
-  </ol>
-</div>
-
-<h2><small>Plot states</small>一格田从荒地到收获</h2>
-<div class="chain">
-  <div class="state"><div class="sw" style="background:var(--weed)"></div><div class="nm">荒地</div><div class="hint">长着草 → 点它清理</div></div>
-  <div class="arrow">→</div>
-  <div class="state"><div class="sw" style="background:var(--cleared)"></div><div class="nm">空地</div><div class="hint">棕色 → 点它翻土</div></div>
-  <div class="arrow">→</div>
-  <div class="state"><div class="sw" style="background:var(--tilled)"></div><div class="nm">翻土</div><div class="hint">深棕板 → 点它播种</div></div>
-  <div class="arrow">→</div>
-  <div class="state"><div class="sw" style="background:var(--seedling)"></div><div class="nm">已播种</div><div class="hint">亮绿小苗，<b>还没开始长</b> → 点它照料</div></div>
-  <div class="arrow">→</div>
-  <div class="state"><div class="sw" style="background:linear-gradient(90deg,var(--seedling),#4d9a45)"></div><div class="nm">生长中</div><div class="hint">倒计时；点它只显示还差多久</div></div>
-  <div class="arrow">→</div>
-  <div class="state"><div class="sw" style="background:var(--ripe)"></div><div class="nm">成熟</div><div class="hint">最高最亮 → 点它收获</div></div>
-  <div class="arrow">→</div>
-  <div class="state"><div class="sw" style="background:var(--tilled)"></div><div class="nm">回到翻土</div><div class="hint">直接再播</div></div>
-</div>
-<div class="warn"><b>播种不等于开始长。</b>再点一次（浇水/疏水/加固）倒计时才启动。这是刻意的：照料是每天的核心动作。</div>
-<div class="tbl"><table>
-<tr><th>作物</th><th>解锁</th><th>成熟</th><th>卖价 / 种子价</th></tr>
-<tr><td>Radish 萝卜</td><td>D0</td><td class="num">4 小时（第 0 章送的 6 颗 <b>3 分钟</b>）</td><td class="num">8 / 4</td></tr>
-<tr><td>Lettuce 生菜</td><td>D0</td><td class="num">8 小时</td><td class="num">12 / 6</td></tr>
-<tr><td>Carrot 胡萝卜</td><td>D2</td><td class="num">12 小时</td><td class="num">16 / 8</td></tr>
-<tr><td>Chamomile 洋甘菊</td><td>D3</td><td class="num">18 小时</td><td class="num">19 / 10</td></tr>
-</table></div>
-
-<h2><small>Messages</small>顶部弹出的提示</h2>
-<div class="tbl"><table>
-<tr><th>提示</th><th>为什么</th></tr>
-<tr><td><kbd>That plot isn't ready for this step</kbd></td><td>顺序不对（几乎不会出现——现在是自动选下一步）</td></tr>
-<tr><td><kbd>Not ripe yet</kbd></td><td>还没熟</td></tr>
-<tr><td><kbd>Wrong care for today's weather</kbd></td><td>隔天照料，田况变了</td></tr>
-<tr><td><kbd>No Radish seeds left — buy some at the stall</kbd></td><td>点了翻好的地但没种子</td></tr>
-<tr><td><kbd>The stall is sold out for today</kbd></td><td>今天 100 金币预算卖完了</td></tr>
-<tr><td><kbd>This bed isn't unlocked yet</kbd></td><td>点到第四畦</td></tr>
-<tr><td><kbd>+48 coins</kbd> / <kbd>Bought 3 Radish seeds</kbd> / <kbd>+N XP</kbd></td><td>成交、买到、涨经验</td></tr>
-<tr><td><kbd>Offline — read only</kbd>（横幅）</td><td>连不上服务端；恢复后自动回来</td></tr>
-</table></div>
-
-<h2><small>Map</small>地图页</h2>
+<h2 id="map">地图与拜访</h2>
 <ul>
-  <li><b>还没有农场</b>：底部 <kbd>Pick a neighborhood for your farm</kbd> 三张街区卡 → <kbd>Create Farm</kbd>。农场建在服务端，换手机、清数据都还是同一座。</li>
-  <li><b>已有农场</b>：右上 <kbd>My Farm</kbd>；<kbd>Edit</kbd> 换装；底部 <kbd>Nearby Farmers · N</kbd> 是同城开放访问的农场——<kbd>Sample A</kbd> <kbd>Sample B</kbd> 是两座系统农场。点卡 → 预览 → <kbd>Visit Farm</kbd>。</li>
-  <li><b>访客农场</b>：标题 <kbd>Visiting · …</kbd>，只能走、看、<kbd>Wave</kbd>、<kbd>Stamp</kbd>；碰不到主人的东西。你自己的农场默认 <b>Only me</b>。</li>
+<li>冷启动选择城市。已有农场时，<kbd>My Farm</kbd> 进入自家。连接支持自由选址的配套服务时，首次建场先选择蓝图缩略图，按 <kbd>Place Farm</kbd>，再拖动地图把位置标记移到希望放置的地方，最后按 <kbd>Create Farm</kbd>。不再局限于三个固定地点；超出支持区域时不可创建。</li>
+<li>地图展示农场的蓝图缩略标记和主人角色形象。点角色、缩略标记或底部 <kbd>Sample A</kbd>、<kbd>Sample B</kbd> 等条目，相机会飞到该农场，选中环、边界和访问预览同步更新。</li>
+<li>同一位置有多个农场时，显示人数入口。点人数后从展开的列表中选择具体农场；列表上的关闭图标返回全部附近农场。</li>
+<li><kbd>Visit</kbd> 进入当前选中的访客农场。可以点击移动、<kbd>Wave</kbd> 挥手和 <kbd>Stamp</kbd> 留印章；访客不操作主人的田地。返回后可以继续切换其他农场，<kbd>My Farm</kbd> 始终进入自家。</li>
+<li>右侧 <b>＋ / −</b>、双指捏合、双击地图均可缩放。开放 <b>15–18 级</b>；继续超过边界会轻微伸缩后回弹。单指拖动保留惯性。</li>
+<li>准星按钮重新聚焦自家农场，同时收起其他农场的访问预览。人物图标进入换装；完成后返回地图。</li>
+</ul>
+<p class="limit">自由选址已在本地隔离的真实数据库/HTTP 服务和真机上验证，配套后端尚未发布到当前公网服务。连接旧服务建场时会提示 <kbd>This server does not support choosing a farm location yet</kbd>；不会悄悄建到旧固定点。已有农场的进入、种田和本轮 UI 改进可以继续使用。</p>
+<p class="note">之前地图空白是客户端隐藏标记、角色锚点与农场位置不一致造成的。附近列表已有服务端公共农场和两座系统示例；当前显示的是快照对应的角色形象，不代表对方实时在线或移动。</p>
+
+<h2 id="farm">种田与移动</h2>
+<ol>
+<li>荒地：点田或 <kbd>Clear 9 plots</kbd> 清理；下一步图标变成铲子。</li>
+<li>空地：<kbd>Till</kbd> 翻土。出现可播种地块后，底部显示种子选择和库存。</li>
+<li>首次教学先播种并照料 6 格 <kbd>Radish</kbd>，等待首次收获。首收后可选择 <kbd>Radish</kbd> 或 <kbd>Lettuce</kbd>，再点田或 <kbd>Sow</kbd> 播种；后续解锁胡萝卜、洋甘菊后也会出现在这里。</li>
+<li>点田进行照料：晴天浇水 <kbd>Water</kbd>、雨天疏水 <kbd>Drain</kbd>、风天加固 <kbd>Shelter</kbd>。同一批操作包含不同田况时，主按钮显示 <kbd>Tend</kbd>，实际逐格执行正确照料。</li>
+<li>照料完成才开始生长；右上 <kbd>Ripe in</kbd> 显示最近成熟时间。成熟后自动出现麦穗提示和 <kbd>Harvest</kbd>，无需离开场景刷新。</li>
+<li>首收后可到摊位卖菜、补足 6 颗萝卜种子，搭配保留的 3 颗生菜种子，重新种满并照料九格，完成首章。卖菜本身不是章节完成条件。</li>
+</ol>
+<p>天气信息表示今天的田况；已播种作物按<b>播种时记录的照料要求</b>处理，因此跨日回来不会因为天气变化而照料失败。</p>
+<h3>移动与操作反馈</h3>
+<ul>
+<li>点可到达的空地：绿色落点圆环和路径圆点；到达后淡出。点不可到达位置：珊瑚色反馈和 <kbd>Can't reach that spot</kbd>。</li>
+<li>点田或田上小图标：人物先走过去，主按钮显示 <kbd>Walking…</kbd>，开工后显示 <kbd>Clearing…</kbd> 等动词，当前田格有细金色描边和进度环。</li>
+<li>主按钮上方显示进度条及剩余地块。旁边的 <b>×</b> 取消未开始的任务；正在执行的动作完成后停止。</li>
+<li>拖过一排田会依次加入每格当前可做的动作。点空地会取消后续劳作，当前动作完成后再移动。</li>
 </ul>
 
-<h2><small>Director</small>导演模式（QA）</h2>
-<p>农场里<b>长按路名 3 秒</b>：<kbd>Speed 1x/60x/480x</kbd>（480x = 3 分钟一天）、<kbd>Skip +1 day</kbd>、<kbd>Weather</kbd>。改的是服务端时间。没在白名单会显示 <kbd>This farm is not a QA instance · player xxxxxxxx</kbd>，把那串 id 发我加进服务器白名单。</p>
+<h2 id="hints">地块上的小图标</h2>
+<p>提示保持约 20 个逻辑像素，图形约 12 像素；镜头变化不让气泡无限变大。相邻提示过近时会避让隐藏，田格本身仍可点击。没有可执行动作时不显示提示。</p>
+<div class="table"><table><thead><tr><th>图形</th><th>地块状态</th><th>下一步</th></tr></thead><tbody>
+<tr><td><img class="symbol" src="../../assets/ui/icons/lucide/scissors.svg" alt="剪刀"></td><td>荒地</td><td>清理</td></tr>
+<tr><td><img class="symbol" src="../../assets/ui/icons/lucide/shovel.svg" alt="铲子"></td><td>已清理</td><td>翻土</td></tr>
+<tr><td><img class="symbol" src="../../assets/ui/icons/lucide/sprout.svg" alt="幼苗"></td><td>已翻土</td><td>播种</td></tr>
+<tr><td><img class="symbol" src="../../assets/ui/icons/lucide/droplet.svg" alt="水滴"> / <img class="symbol" src="../../assets/ui/icons/lucide/cloud-rain.svg" alt="雨云"> / <img class="symbol" src="../../assets/ui/icons/lucide/wind.svg" alt="风"></td><td>已播种，待照料</td><td>浇水 / 疏水 / 加固</td></tr>
+<tr><td><img class="symbol" src="../../assets/ui/icons/lucide/wheat.svg" alt="麦穗"></td><td>已成熟</td><td>收获，之后直接再播</td></tr>
+</tbody></table></div>
+<h3>作物时间</h3>
+<div class="table"><table><thead><tr><th>作物</th><th>解锁</th><th>成熟时间</th><th>卖价 / 种子价</th></tr></thead><tbody>
+<tr><td>Radish 萝卜</td><td>D0</td><td>4 小时；开局赠送的 6 颗为 3 分钟</td><td>8 / 4</td></tr>
+<tr><td>Lettuce 生菜</td><td>D0</td><td>8 小时</td><td>12 / 6</td></tr>
+<tr><td>Carrot 胡萝卜</td><td>D2</td><td>12 小时</td><td>16 / 8</td></tr>
+<tr><td>Chamomile 洋甘菊</td><td>D3</td><td>18 小时</td><td>19 / 10</td></tr>
+</tbody></table></div>
 
-<h2><small>Not yet</small>这一版还没有的</h2>
+<h2 id="panels">摊位、目标与提示</h2>
 <ul>
-  <li>居民、请求、料理、章节推进、次日内容——G3。今天的目标清单是客户端按状态算的。</li>
-  <li>劳作动画是占位：人物俯身两秒，没有挥锄撒种。</li>
-  <li>每次冷启动都要重新选城。</li>
-  <li>第四畦（预留）锁着，要到 D5。</li>
+<li>顶部 <kbd>Goals</kbd> 打开当前章节目标；D0 显示七个步骤，D1–D6 显示各章两项正式目标。标题、勾选和完成状态以服务端为准，不会把仍在生长的旧生菜当成新一批。</li>
+<li>完成后显示 <kbd>Chapter complete</kbd> 和下一章倒计时。按农场所在城市凌晨 4 点换日，每个玩家日最多开启一章，漏一天不跳章。倒计时到期会自动刷新；D6 完成后显示 <kbd>Week complete</kbd>。</li>
+<li>底部商店图标打开 <kbd>Roadside stall</kbd>。收成用作物图标，种子用对应种子袋图标；每行显示库存、单价和总价。<kbd>Sell all · +48</kbd> 汇总售出，<kbd>Buy 3 · 12</kbd> 买 3 颗种子。每日摊位销售额度为 100 金币，已用额度显示在标题下。</li>
+<li>一次只显示一个弹窗。目标、摊位和导演面板打开后，背景变暗、底部农场操作隐藏；点击 ×、遮罩或系统返回键先关闭弹窗。</li>
+<li>交易、拒绝原因与无法到达的反馈显示在状态区下方，文字自动换行，约 3 秒消失。断网横幅为 <kbd>Offline · reconnecting</kbd>。</li>
+<li><kbd>This crop needs different care</kbd> 表示服务器拒绝照料；<kbd>This bed isn't unlocked yet</kbd> 表示预留田畦尚未解锁；资金或种子不足时相应按钮不可用。</li>
 </ul>
-<p class="foot">docs/qa/farm-controls-guide.html · 界面有改动时同步更新。</p>
+<p class="meta">目标图已更新为本阶段 Android 模拟器的正式章节完成状态；移动和访客保留上轮 vivo 图。<a href="../design/farm-ui-2026-09-05/qa/panels-comparison.png">查看上轮设计稿与真机对照</a>。</p>
+<div class="shots">
+<figure><a href="chapters-2026-09-05/android-d0-complete.png"><img src="chapters-2026-09-05/android-d0-complete.png" alt="Android 模拟器首章正式完成，七项目标和次章倒计时" width="1280" height="2856" loading="lazy"></a><figcaption>Android 模拟器 · 首章完成：再次种满并照料九格后，服务端确认 7/7，显示次章倒计时。<a href="chapters-2026-09-05/android-d1-auto-open.png">凌晨 4 点自动切换为第二章两项目标</a>。</figcaption></figure>
+<figure><a href="../design/farm-ui-2026-09-05/qa/vivo/farm-movement-final.png"><img src="../design/farm-ui-2026-09-05/qa/vivo/farm-movement-final.png" alt="真机点击空地后，角色沿绿色路径圆点走向落点圆环" width="1080" height="2344" loading="lazy"></a><figcaption>vivo 真机 · 点击移动：落点圆环与路径圆点，买种子后库存显示三颗。</figcaption></figure>
+<figure><a href="../design/farm-ui-2026-09-05/qa/vivo/visitor-b-final.png"><img src="../design/farm-ui-2026-09-05/qa/vivo/visitor-b-final.png" alt="真机拜访Sample B，仅显示挥手和印章两个底部动作" width="1080" height="2344" loading="lazy"></a><figcaption>vivo 真机 · 拜访 Sample B：仅保留挥手、印章和移动。</figcaption></figure>
 </div>
+
+<h2 id="week">地点、居民与第一周</h2>
+<ul>
+<li>地图附近列表切到 <kbd>Places</kbd>，进入苗圃、小馆或庭院。地点随服务端章节开放，返回会恢复原地图；底部图标页签分别打开居民、收获用途、工程或成长、故事和手账。</li>
+<li>农场 <kbd>Goals</kbd> 旁的手提袋打开 <kbd>Harvest &amp; home</kbd>，可交教学篮、领取补助、决定收成用途、预留工程材料及选择成长。预留材料不会被出售、赠礼或料理消耗。</li>
+<li>居民支持分段对话、请求和按线索赠送作物。D2 选定生菜用途后，再与小馆主人交谈，听到针对该选择的回应。D6 庭院三人同场时，可点击居民姓名切换对象。</li>
+<li>D3 小馆厨房开放沙拉和洋甘菊茶。第一份沙拉做好后，继续共同备餐对白并确认分享；沙拉可以交请求，料理也可以在摊位出售，茶另有回购入口。</li>
+<li>苗圃需要累计交付 2 个胡萝卜和 4 份洋甘菊。D5 可切换两种入口外观；成长购买在排工具与第四畦中二选一。购入后可在庭院预览、移动、撤销和保存六种摆件，离开未保存布置时会确认保存或丢弃。</li>
+<li>D6 工程完成后，在庭院故事页加入聚会，最后一段确认才记录共同事件。六次收成用途里赠礼或保留达到四次，会获得生活优先结局、两页手账和个性化合照站位；出售优先也有完整结局。</li>
+<li>合照现场使用当前玩家装扮、三位居民和苗圃外观，点击 <kbd>Save photo</kbd> 保存实际渲染的照片。周总结记录完成时的数值，之后买卖仍会改变实时钱包。</li>
+<li>请求结果不明时，先点击相应页面的检查按钮。农场顶部会出现重新检查图标；恢复会先确认原请求，避免重复扣料。</li>
+</ul>
+<p>生活优先工具路线和出售优先扩地路线均已从实际 UI 经过 HTTP、PostgreSQL 完成七日；Android 模拟器也已完成生活工具路线、六件摆件保存恢复和现场合照。详细证据见<a href="g3-seven-day-2026-09-05.md">G3 验收记录</a>；演示顺序见<a href="g3-demo-runbook.md">十五分钟演示脚本</a>。本阶段真机尚未连接，不能把桌面或模拟器结果视作真机完成。</p>
+<div class="shots">
+<figure><a href="../../output/g3-week/ui-tool-life/d3-cook_dish.png"><img src="../../output/g3-week/ui-tool-life/d3-cook_dish.png" alt="真实七日流程中使用厨房制作沙拉" width="390" height="844" loading="lazy"></a><figcaption>桌面真实 HTTP 流程 · 厨房与统一料理 PNG。</figcaption></figure>
+<figure><a href="../../output/g3-week/ui-tool-life/group-photo.png"><img src="../../output/g3-week/ui-tool-life/group-photo.png" alt="玩家与三位居民在修好的苗圃前现场合照" width="390" height="844" loading="lazy"></a><figcaption>桌面真实流程 · 生活优先现场合照。</figcaption></figure>
+</div>
+
+<h2 id="dressing">城市与换装</h2>
+<ul>
+<li>城市页直接选择 <kbd>Shanghai</kbd>、<kbd>Los Angeles</kbd>，或按 <kbd>Use My Current City</kbd> 请求定位。定位失败后仍可手动选择。</li>
+<li>地图人物按钮打开 <kbd>Dressing</kbd>。房间中间是实时角色；拖动角色区域可转身，点击角色可在全身与当前分类近景间切换。</li>
+<li>下方五个图标分类分别为 <kbd>Hair</kbd>、<kbd>Outfits</kbd>、<kbd>Shoes</kbd>、<kbd>Bags</kbd>、<kbd>Glasses</kbd>。点击缩略图立即试穿；绿框表示当前选择。部件较多时保持三列两行，短屏采用紧凑布局。</li>
+<li>右上旋转箭头恢复默认装扮；<kbd>Done</kbd> 等待装配完成后保存。左上返回丢弃本次未保存更改。<kbd>Loading</kbd> / <kbd>Trying</kbd> 表示正在准备或试穿。</li>
+</ul>
+<p><a href="../design/farm-ui-2026-09-05/qa/secondary-device-comparison.png">查看城市、换装、导演设计稿与本轮真机的并排对照</a>。画面保留 1080×2344 的原始比例；人物装扮、天气和导演倍率取决于当前存档状态。</p>
+<div class="shots">
+<figure><a href="../design/farm-ui-2026-09-05/qa/vivo/city-final.png"><img src="../design/farm-ui-2026-09-05/qa/vivo/city-final.png" alt="真机城市选择页，街景背景和三个城市选择入口" width="1080" height="2344" loading="lazy"></a><figcaption>vivo 真机 · 城市选择。</figcaption></figure>
+<figure><a href="../design/farm-ui-2026-09-05/qa/vivo/dressing-final.png"><img src="../design/farm-ui-2026-09-05/qa/vivo/dressing-final.png" alt="真机换装页，实时人物和完整的五分类六项缩略图" width="1080" height="2344" loading="lazy"></a><figcaption>vivo 真机 · 换装：房间背景不随人物镜头缩放。</figcaption></figure>
+<figure><a href="../design/farm-ui-2026-09-05/qa/vivo/director-final.png"><img src="../design/farm-ui-2026-09-05/qa/vivo/director-final.png" alt="真机导演面板，倍率、跳日、天气三个分组及Applied反馈" width="1080" height="2344" loading="lazy"></a><figcaption>vivo 真机 · 导演：60x 生效，测试后恢复 1x。</figcaption></figure>
+</div>
+<p><a href="../design/farm-ui-2026-09-05/crop-seed-assets.png">作物与种子袋素材预览</a> · <a href="../design/farm-ui-2026-09-05/assets.md">素材来源及生图记录</a></p>
+
+<h2 id="qa">验证与当前限制</h2>
+<p>新增正式章节推进（SGODOT-41）：服务端全量 259/259 通过，包含真实 PostgreSQL、上海/洛杉矶时区与夏令时、幂等、重连和显式领域版本迁移。章节实现及本阶段设备证据见<a href="chapters-2026-09-05.md">章节验收记录</a>。以下 vivo 图与 7/7 数字属于上一轮 UI 验证，不代表新规则下章节已完成。</p>
+<p>Metal 全量回归 519/519 项通过，70 个套件无错误、失败、跳过或孤立节点。最后的地图装扮刷新修复另通过 29 项定向回归。地图切入农场的背景不透明像素测试及透明负对照通过。真实 HTTP 种田流程 42/42 通过，实际等待了教学萝卜 180 秒成熟，并完成收获、卖菜和买种子。小修后的 APK 已导出，详细报告及校验值见<a href="../../design-qa.md">设计验收记录</a>。</p>
+<p>本轮 APK 已安装到 vivo，已验证选址、清理、翻土、成熟、收获、取消、移动、卖菜、买种子、目标、访客、导演及换装界面。卖出萝卜后金币 180→228，买三颗种子后 228→216。农场和换装不再透出底层地图。最终包保存金发后地图即时更新，试穿银发后按返回取消，地图和存档仍保留已保存的金发。</p>
+<p>上一轮验证结束时，原手机五项配置已逐字节恢复，测试服务连接和端口转发已移除。当时连接默认生产服务后，正常进入<a href="../design/farm-ui-2026-09-05/qa/vivo/farm-original-restored-final.png">原 Yuyuan Road 农场：128 金币、旧目标 7/7、九格生长作物</a>，原装扮和点击移动正常。本阶段真机连接与新 APK 状态单独记录在章节验收文档。</p>
+<p>导演面板通过长按农场路名 3 秒打开。时间倍率、跳日和天气按钮会修改服务端 QA 农场状态，仅供测试使用。</p>
+<div class="limit"><p>小屋、井和木箱已换成原创低模环境并在最终真机显示。井的边缘轻微裁切、原有出口标记等观感差异记录在验收文档中。公共农场使用快照，没有实时多人位置同步。自由选址配套后端尚未发布到公网。四张<a href="../design/farm-ui-2026-09-05/index.html">认可设计稿</a>已用于当前布局、图标与 PNG 素材实装；具体差异与验证结果见设计验收记录。</p></div>
+<footer class="meta">源码：<code>docs/qa/farm-controls-guide.html</code> · 游戏行为或布局更新时同步维护。</footer>
+</main></body></html>

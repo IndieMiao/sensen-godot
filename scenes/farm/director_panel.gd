@@ -10,6 +10,7 @@ extends PanelContainer
 ## 而不是静默什么都不发生。
 
 signal command_requested(type: String, payload: Dictionary)
+signal closed()
 
 const HOLD_S := 3.0
 ## 480 倍 = 3 分钟走完一个玩家日（24×60÷480）。
@@ -18,6 +19,8 @@ const CONDITIONS := ["sunny", "rain", "wind"]
 const DENIED_TEXT := "This farm is not a QA instance"
 
 var _status: Label
+var _speed_buttons: Array[Button] = []
+var _weather_buttons: Array[Button] = []
 
 func _ready() -> void:
 	theme_type_variation = &"BottomSheet"
@@ -28,28 +31,55 @@ func _ready() -> void:
 	offset_bottom = -8.0
 	visible = false
 	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 16)
 	add_child(box)
-	var title := Label.new()
-	title.text = "Director"
-	title.add_theme_font_size_override("font_size", DesignTokens.FONT_LABEL)
-	box.add_child(title)
-	box.add_child(_row("Speed", SCALES.map(func(s): return "%dx" % s),
+	var head := HBoxContainer.new()
+	box.add_child(head)
+	var title := GameUi.label("Director", 16)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(title)
+	var close := GameUi.button("x", "", "Close director")
+	close.pressed.connect(func(): closed.emit())
+	head.add_child(close)
+	box.add_child(_row("Time rate", SCALES.map(func(s): return "%dx" % s),
 		func(i): _send("qa_set_clock", {"scale": SCALES[i]})))
-	box.add_child(_row("Skip", ["+1 day", "+2 days"],
+	box.add_child(HSeparator.new())
+	box.add_child(_row("Day skip", ["+1 day", "+2 days"],
 		func(i): _send("qa_skip_days", {"days": i + 1})))
-	box.add_child(_row("Weather", ["Sunny", "Rain", "Wind"],
-		func(i): _send("qa_set_weather", {"day": CONDITIONS[i]})))
+	box.add_child(HSeparator.new())
+	box.add_child(GameUi.label("Weather", 13))
+	var weather_row := HBoxContainer.new()
+	weather_row.add_theme_constant_override("separation", 8)
+	box.add_child(weather_row)
+	for i in CONDITIONS.size():
+		var b := GameUi.button(["sun", "cloud-rain", "wind"][i], ["Sunny", "Rain", "Wind"][i], "Set weather")
+		b.custom_minimum_size.y = 64
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.pressed.connect(func(): _send("qa_set_weather", {"day": CONDITIONS[i]}))
+		_weather_buttons.append(b)
+		weather_row.add_child(b)
 	_status = Label.new()
 	_status.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_status)
 
+func fit_height(area: Vector2) -> void:
+	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	size = Vector2(area.x, maxf(348, get_combined_minimum_size().y))
+	position = Vector2(0, area.y - size.y)
+
 func _row(label: String, options: Array, on_pick: Callable) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.name = label
+	row.add_theme_constant_override("separation", 6)
+	var symbol := GameUi.picture(GameUi.icon("clock-3" if label == "Time rate" else "calendar-days"), 18)
+	symbol.modulate = GameUi.INK
+	row.add_child(symbol)
 	var l := Label.new()
 	l.text = label
-	l.custom_minimum_size.x = 68.0
+	l.custom_minimum_size.x = 60.0
 	l.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
 	row.add_child(l)
 	for i in options.size():
@@ -58,11 +88,21 @@ func _row(label: String, options: Array, on_pick: Callable) -> HBoxContainer:
 		b.theme_type_variation = &"RailButton"
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.clip_text = true
-		b.custom_minimum_size.y = 40.0
+		b.custom_minimum_size.y = 44.0
 		b.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
 		b.pressed.connect(func(): on_pick.call(i))
 		row.add_child(b)
+		if label == "Time rate": _speed_buttons.append(b)
 	return row
+
+func sync_state(state: Dictionary) -> void:
+	var clock: Dictionary = state.get("clock", {})
+	var scale := int((state.get("qa", {}) as Dictionary).get("scale", 1))
+	var condition := str(clock.get("field_condition", "sunny"))
+	for i in _speed_buttons.size():
+		_speed_buttons[i].theme_type_variation = &"AccentButton" if SCALES[i] == scale else &"SecondaryButton"
+	for i in _weather_buttons.size():
+		_weather_buttons[i].theme_type_variation = &"ChoiceSelectedButton" if CONDITIONS[i] == condition else &"ChoiceButton"
 
 func _send(type: String, payload: Dictionary) -> void:
 	_status.text = ""

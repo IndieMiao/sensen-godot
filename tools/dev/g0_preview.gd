@@ -76,6 +76,7 @@ func _farm() -> void:
 	var bp := FarmBlueprint.load_file(FARM_BLUEPRINT)
 	var cells := {}
 	var beds := bp.beds()
+	var now := int(Time.get_unix_time_from_system() * 1000)
 	for b in beds.size():
 		for i in 3:
 			var c: Vector2i = beds[b].cells[i]
@@ -85,7 +86,9 @@ func _farm() -> void:
 			if b == 2 and i == 0:
 				slot = {"state": "growing", "crop": "R", "care_done_at": 0, "ready_at": 1}
 			if b == 2 and i == 1:
-				slot = {"state": "growing", "crop": "L", "care_done_at": 0, "ready_at": 1 << 60}
+				slot = {"state": "growing", "crop": "L", "care_done_at": now - 90000, "ready_at": now + 180000}
+			if OS.get_environment("G0_STATE") == "sow":
+				slot = {"state": "tilled", "crop": null, "care_done_at": null, "ready_at": null} if b == 0 else {"state": "growing", "crop": "R" if b == 1 else "L", "care_done_at": now - 90000, "ready_at": now + 180000}
 			cells["%d,%d" % [c.x, c.y]] = slot
 	var s := FarmSession.new(ApiClient.new("https://example.test/v1", FakeTransport.new([]).callable()))
 	s.client.token = "tok"
@@ -100,6 +103,13 @@ func _farm() -> void:
 	var farm := (load("res://scenes/farm/farm.tscn") as PackedScene).instantiate()
 	farm.setup({"blueprint": bp, "session": s})
 	add_child(farm)
+	await get_tree().process_frame
+	match OS.get_environment("G0_PANEL"):
+		"stall":
+			s.state.inventory.produce = {"R": 6, "L": 3}
+			farm._open_stall()
+		"goals": farm.hud.show_modal(farm.hud._goals)
+		"director": farm.hud.show_modal(farm.director)
 
 ## mode = home：已有农场后的地图常态——Nearby Farmers + My Farm。桌面无地图桥，底图是
 ## 「Map preview」占位；Net 尚未 boot 完成，所以条目来自随包样例（正好也验证兜底路径）。

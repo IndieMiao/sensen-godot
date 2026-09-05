@@ -9,15 +9,9 @@ signal slot_changed(slot: StringName)
 
 const TOUCH_HEIGHT := 48.0
 
-## 缩略图格子的实测最小高度。
-##
-## 注意这不是"52 图 + 文案 + 内边距"那样算出来的：Button 的最小尺寸参考的是
-## **纹理原始尺寸**（PartThumbnailer.RENDER_SIZE = 160），主题的 icon_max_width 只
-## 约束绘制宽度、不参与最小尺寸计算。所以这个数字是量出来的，不是推出来的。
-## 改 RENDER_SIZE / 字号 / icon_max_width 都会让它失准 ——
-## test_thumbnail_cell_height_matches_the_drawer_budget 会在失准时报红，
-## 提示重新量并同步调整抽屉高度。
+## expand_icon keeps the source thumbnail size out of the grid's layout budget.
 const THUMB_CELL_HEIGHT := 98.0
+const COMPACT_CELL_HEIGHT := 82.0
 ## "无"选项没有部件可渲，用一个灰色禁止符占位，保证格子高度与其它项一致。
 const ICON_NONE := preload("res://assets/ui/icons/none.svg")
 
@@ -28,6 +22,7 @@ const SLOT_LABELS := {
 	&"messengerBag": "Bags",
 	&"glass": "Glasses",
 }
+const SLOT_ICONS := {&"hairHat": "scissors", &"cloth": "shirt", &"shoes": "footprints", &"messengerBag": "shopping-bag", &"glass": "glasses"}
 
 const PART_LABELS := {
 	"hairhat0": "Silver Crop",
@@ -41,7 +36,7 @@ const PART_LABELS := {
 	"cloth1_1": "Blue Stripe",
 	"cloth11": "Garden Apron",
 	"cloth28": "Navy Utility",
-	"cloth42": "Blue Dungarees",
+	"cloth42": "Blue Overalls",
 	"shoes0": "Gray Sneakers",
 	"shoes1": "Cream Loafers",
 	"shoes2": "Coral Sneakers",
@@ -51,7 +46,7 @@ const PART_LABELS := {
 	"shoes4": "Graffiti Tops",
 	"shoes5": "Sand Boots",
 	"messengerbag1": "Coral Satchel",
-	"messengerbag2": "Basketball Sling",
+	"messengerbag2": "Court Sling",
 	"messengerbag3": "Explorer Kit",
 	"messengerbag4": "Playful Pack",
 	"glass0": "Classic Black",
@@ -65,6 +60,7 @@ var rig: AvatarRig
 var thumbnailer: PartThumbnailer
 var current_slot: StringName = &""
 var _interaction_enabled := true
+var _compact := false
 var _tab_buttons: Dictionary = {}
 var _choice_buttons: Dictionary = {}
 ## 每次 _show_slot 自增；异步补缩略图时用来判断"这批还是不是当前这批"，
@@ -86,7 +82,12 @@ func setup(p_rig: AvatarRig) -> void:
 			continue
 		var button := Button.new()
 		button.text = _slot_label(slot_def.slot_name)
+		button.icon = GameUi.icon(SLOT_ICONS.get(slot_def.slot_name, "shirt"))
+		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
 		button.custom_minimum_size.y = TOUCH_HEIGHT
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.expand_icon = true
 		button.focus_mode = Control.FOCUS_NONE
 		button.mouse_filter = Control.MOUSE_FILTER_PASS
 		button.theme_type_variation = &"TabButton"
@@ -104,6 +105,19 @@ func setup(p_rig: AvatarRig) -> void:
 func set_interaction_enabled(enabled: bool) -> void:
 	_interaction_enabled = enabled
 	_refresh_state()
+
+
+func set_compact(compact: bool) -> void:
+	if _compact == compact:
+		return
+	_compact = compact
+	for button in _choice_buttons.values():
+		_size_choice(button)
+
+
+func _size_choice(button: Button) -> void:
+	button.custom_minimum_size.y = COMPACT_CELL_HEIGHT if _compact else THUMB_CELL_HEIGHT
+	button.add_theme_constant_override("icon_max_width", 40 if _compact else 52)
 
 
 func refresh() -> void:
@@ -140,13 +154,15 @@ func _show_slot(slot: StringName, user_initiated := false) -> void:
 func _add_choice(part_id: String, label: String) -> void:
 	var button := Button.new()
 	button.text = label
-	button.custom_minimum_size = Vector2(0.0, THUMB_CELL_HEIGHT)
+	_size_choice(button)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.focus_mode = Control.FOCUS_NONE
 	# 短按由按钮处理，拖动继续冒泡给 ScrollContainer。
 	button.mouse_filter = Control.MOUSE_FILTER_PASS
 	button.clip_text = true
+	button.expand_icon = true
 	button.theme_type_variation = &"ThumbChoiceButton"
+	button.tooltip_text = label
 	# 图在上、文案在下。图标先留空，由 _fill_thumbnails 渲好后回填；
 	# 渲染失败也不影响可用性——文案一直都在。
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER

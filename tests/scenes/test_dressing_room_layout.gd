@@ -48,7 +48,8 @@ func test_drawer_sits_at_bottom_with_expected_height() -> void:
 	# 292 = 32 内边距 + 48 标签行 + 8 间距 + 204 列表区（2 行 × 98 + 8 间距）。
 	# 3 列 × 2 行 = 6 格，正好装下部件最多的槽位（shoes 6 件、glass 5+无 = 6），
 	# 所有分类都不需要滚动。缩略图换尺寸就得重算这一串。
-	assert_float(drawer.custom_minimum_size.y).is_equal(292.0)
+	var compact := s.get_viewport().get_visible_rect().size.y < 720.0
+	assert_float(drawer.custom_minimum_size.y).is_equal(260.0 if compact else 292.0)
 
 func test_spacer_passes_touches_through_for_rotation() -> void:
 	var s := _instantiate()
@@ -68,10 +69,7 @@ func test_spacer_passes_touches_through_for_rotation() -> void:
 	assert_int(safe_area.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 	assert_int(vbox.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 
-func test_top_bar_is_two_floating_actions_over_the_character() -> void:
-	## 顶栏原本是整条白卡片 + 两个 80 宽文字按钮 + 18 号标题，占掉角色的可视高度
-	## 又和下方抽屉抢注意力。现在只留"返回"圆形图标与右上角的 Done，卡片背景去掉，
-	## 中间必须是 IGNORE 才能继续把拖拽透给 _unhandled_input 转身。
+func test_top_bar_has_title_and_grouped_actions_without_blocking_rotation() -> void:
 	var s := _instantiate()
 	var top := s.get_node("UI/SafeArea/VBox/TopBar") as Control
 	var back := s.get_node("UI/SafeArea/VBox/TopBar/BackButton") as Button
@@ -82,7 +80,7 @@ func test_top_bar_is_two_floating_actions_over_the_character() -> void:
 		Control.MOUSE_FILTER_IGNORE)
 	# 返回是纯图标圆钮：没有 icon 就成了一个没有任何标识的空白圆
 	assert_object(back.icon).is_not_null()
-	assert_str(str(back.theme_type_variation)).is_equal("RoundButton")
+	assert_str(str(back.theme_type_variation)).is_equal("SecondaryButton")
 	assert_str(back.tooltip_text).is_equal("Back")
 	assert_float(back.get_combined_minimum_size().x).is_greater_equal(48.0)
 	assert_float(back.get_combined_minimum_size().y).is_greater_equal(48.0)
@@ -90,11 +88,14 @@ func test_top_bar_is_two_floating_actions_over_the_character() -> void:
 	assert_object(top.get_child(top.get_child_count() - 1)).is_same(done)
 	assert_float(done.get_combined_minimum_size().y).is_greater_equal(48.0)
 	assert_object(s.get_node_or_null("UI/SafeArea/VBox/Drawer/VBox/DoneButton")).is_null()
-	assert_object(top.get_node_or_null("Title")).is_null()
-	# 左侧一组图标圆钮、右侧一个实心胶囊：两端形状语言各自统一，中间是可穿透的空白
+	var title := top.get_node("Title") as Label
+	assert_str(title.text).is_equal("Dressing")
+	assert_int(title.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 	var restore := top.get_node("RestoreButton") as Button
 	assert_str(str(back.theme_type_variation)).is_equal(str(restore.theme_type_variation))
-	assert_bool(top.get_child(0) == back and top.get_child(1) == restore).is_true()
+	assert_object(top.get_child(0)).is_same(back)
+	assert_object(top.get_child(1)).is_same(title)
+	assert_object(top.get_child(top.get_child_count() - 2)).is_same(restore)
 
 
 func test_redundant_selection_status_row_is_gone() -> void:
@@ -143,10 +144,10 @@ func test_thumbnail_cell_height_matches_the_drawer_budget() -> void:
 		if measured > 0.0:
 			break
 	assert_float(measured).is_greater(0.0)
-	assert_float(measured).is_equal_approx(panel.THUMB_CELL_HEIGHT, 0.5)
-	# 抽屉必须装得下 2 行 + 标签行 + 内边距，否则第二行会被切
+	assert_float(measured).is_equal_approx(panel.COMPACT_CELL_HEIGHT if panel._compact else panel.THUMB_CELL_HEIGHT, 0.5)
+	# The real minimum grid fits both rows without relying on scroll clipping.
 	var drawer := s.get_node("UI/SafeArea/VBox/Drawer") as PanelContainer
-	var needed := 32.0 + 48.0 + 8.0 + measured * 2.0 + 8.0
+	var needed := 24.0 + 48.0 + 8.0 + measured * 2.0 + 8.0
 	assert_float(drawer.custom_minimum_size.y).is_greater_equal(needed)
 
 func test_slot_tabs_are_horizontally_scrollable() -> void:
@@ -298,7 +299,7 @@ func test_single_primary_action_replaces_demo_buttons() -> void:
 	var editor := s.get_node("UI/SafeArea/VBox/Drawer/VBox")
 	var done := s.get_node("UI/SafeArea/VBox/TopBar/DoneButton") as Button
 	assert_object(done).is_not_null()
-	assert_str(done.theme_type_variation).is_equal("AccentPillButton")
+	assert_str(done.theme_type_variation).is_equal("AccentButton")
 	assert_float(done.get_combined_minimum_size().y).is_greater_equal(48.0)
 	assert_object(editor.get_node_or_null("Buttons")).is_null()
 	for legacy in ["SaveButton", "ResetButton", "SceneButton", "MapButton"]:
@@ -311,7 +312,47 @@ func test_loading_state_disables_completion_and_is_visible() -> void:
 	var done := s.get_node("UI/SafeArea/VBox/TopBar/DoneButton") as Button
 	assert_bool(s.rig.is_busy()).is_true()
 	assert_bool(done.disabled).is_true()
-	assert_bool(done.text.contains("Preparing")).is_true()
+	assert_str(done.text).is_equal("Loading")
+	assert_bool(done.clip_text).is_true()
+
+
+func test_background_is_separate_from_camera_and_grid_fits_both_phone_heights() -> void:
+	for height in [640, 800]:
+		var viewport := SubViewport.new()
+		viewport.size = Vector2i(360, height)
+		add_child(auto_free(viewport))
+		var s := (load(SCENE) as PackedScene).instantiate()
+		viewport.add_child(s)
+		s.safe_area.apply_margins(Rect2i(16, 44, 328, height - 72),
+			Vector2i(360, height), Vector2(360, height))
+		for frame in 8:
+			await get_tree().process_frame
+		var environment := s.get_node("WorldEnvironment").environment as Environment
+		assert_int(environment.background_mode).is_equal(Environment.BG_CANVAS)
+		assert_int(environment.background_canvas_max_layer).is_equal(-1)
+		var background := s.get_node("RoomBackground/Scenery") as TextureRect
+		assert_object(background.texture).is_not_null()
+		var before := background.get_global_rect()
+		s.cam.position.z += 1.0
+		assert_object(background.get_parent()).is_same(s.get_node("RoomBackground"))
+		assert_bool(background.get_global_rect() == before).is_true()
+		assert_float(before.size.y).is_equal_approx(s.drawer.global_position.y + 8.0, 1.0)
+		var panel = s.parts_panel
+		var scroll := panel.get_node("PartsScroll") as ScrollContainer
+		for slot in panel.visible_slot_names():
+			panel._show_slot(slot)
+			await get_tree().process_frame
+			await get_tree().process_frame
+			assert_float(panel.grid.get_global_rect().end.y).is_less_equal(scroll.get_global_rect().end.y + 1.0)
+			for child in panel.grid.get_children():
+				var choice := child as Button
+				assert_bool(choice.expand_icon).is_true()
+				var text_width := choice.get_theme_font("font").get_string_size(choice.text,
+					HORIZONTAL_ALIGNMENT_LEFT, -1, choice.get_theme_font_size("font_size")).x
+				var content_padding := choice.get_theme_stylebox("normal").get_minimum_size().x
+				assert_float(text_width).override_failure_message("Clipped label: " + choice.text).is_less_equal(choice.size.x - content_padding)
+		var tabs := panel.tabs as Control
+		assert_float(tabs.get_global_rect().end.x).is_less_equal(s.drawer.get_global_rect().end.x - 12.0)
 
 func test_equip_taller_part_keeps_the_character_the_same_size() -> void:
 	## 产品口径（2026-09-02 改）：换装**不能**改变角色在画面中的比例。
@@ -447,7 +488,8 @@ func test_head_zoom_keeps_the_tallest_hair_on_screen() -> void:
 	var cx := box.position.x + box.size.x * 0.5
 	var cz := box.position.z + box.size.z * 0.5
 	var top_screen := cam.unproject_position(Vector3(cx, box.position.y + box.size.y, cz))
-	assert_float(top_screen.y).is_greater_equal(0.0)
+	var header := s.get_node("UI/HeaderPaper") as Control
+	assert_float(top_screen.y).is_greater_equal(header.size.y)
 
 
 func test_drawer_does_not_overflow_safe_area_on_four_part_slot() -> void:

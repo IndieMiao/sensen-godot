@@ -5,6 +5,7 @@
    "id": "shanghai",
    "name": "Shanghai",
    "timezone": "Asia/Shanghai",
+   "placement_bounds": [30.67, 120.86, 31.90, 122.20],
    "center": [
     31.2304,
     121.4737
@@ -33,6 +34,7 @@
    "id": "los_angeles",
    "name": "Los Angeles",
    "timezone": "America/Los_Angeles",
+   "placement_bounds": [33.70, -118.67, 34.35, -118.15],
    "center": [
     34.0522,
     -118.2437

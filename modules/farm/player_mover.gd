@@ -37,6 +37,14 @@ func set_joystick(v: Vector2) -> void:
 		_path.clear()
 		_path_idx = 0
 
+func stop() -> void:
+	joystick = Vector2.ZERO
+	_path.clear()
+	_path_idx = 0
+
+func remaining_path() -> Array[Vector2i]:
+	return _path.slice(_path_idx)
+
 func is_moving() -> bool:
 	return joystick != Vector2.ZERO or _path_idx < _path.size()
 

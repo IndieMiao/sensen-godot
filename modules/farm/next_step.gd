@@ -11,6 +11,7 @@ const COMMAND := {
 }
 const CARE_VERB := {"sunny": "Water", "rain": "Drain", "wind": "Shelter"}
 const VERB_ING := {"clear": "Clearing", "till": "Tilling", "sow": "Sowing", "care": "Tending", "harvest": "Harvesting"}
+const TUTORIAL_PLOTS := 6
 
 static func step_for(slot: Dictionary, now_ms: int) -> String:
 	match str(slot.get("state", "")):
@@ -43,6 +44,15 @@ static func seed_lot(inventory: Dictionary, crop: String) -> String:
 	var lot: Dictionary = (inventory.get("seeds", {}) as Dictionary).get(crop, {})
 	return "bound" if int(lot.get("bound", 0)) > 0 else "bought"
 
+static func sowing_options(cells: Dictionary, state: Dictionary, unlocked: Array) -> Dictionary:
+	if not _first_harvest_pending(state):
+		return {"crops": unlocked, "room": cells.size()}
+	var planted := 0
+	for slot in cells.values():
+		if str(slot.get("crop", "")) == "R" and str(slot.get("state", "")) in ["sown", "growing"]:
+			planted += 1
+	return {"crops": ["R"] if unlocked.has("R") else [], "room": maxi(0, TUTORIAL_PLOTS - planted)}
+
 ## 整片田现在最该做的一件事。返回 {action, cells: Array[String], label, enabled, crop}。
 ## 优先级：能收的先收（有产出）→ 待照料（否则不长）→ 能播就播 → 翻土 → 清理 → 卖菜 → 等。
 ## `action` 为 "stall" 表示该去摊位；"" 表示没事可做。
@@ -50,6 +60,8 @@ static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_cro
 		unlocked_crops: Array) -> Dictionary:
 	var by_step := {"harvest": [], "care": [], "sow": [], "till": [], "clear": []}
 	var growing_unripe := 0
+	var first_batch := _first_harvest_pending(state)
+	var sowing := sowing_options(cells, state, unlocked_crops)
 	var ids := cells.keys()
 	ids.sort()
 	for id in ids:
@@ -64,11 +76,21 @@ static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_cro
 	if not by_step.harvest.is_empty():
 		return _mk("harvest", by_step.harvest, "Harvest %d %s" % [by_step.harvest.size(), _plots(by_step.harvest.size())])
 	if not by_step.care.is_empty():
-		return _mk("care", by_step.care, "%s %d %s" % [care_verb(fc), by_step.care.size(), _plots(by_step.care.size())])
+		var conditions: Array = []
+		for id in by_step.care:
+			var recorded = cells[id].get("care_weather")
+			var condition := str(recorded) if recorded != null else fc
+			if not conditions.has(condition): conditions.append(condition)
+		var verb := care_verb(conditions[0]) if conditions.size() == 1 else "Tend"
+		var result := _mk("care", by_step.care, "%s %d %s" % [verb, by_step.care.size(), _plots(by_step.care.size())])
+		result.weather = conditions[0]
+		return result
 	if not by_step.sow.is_empty():
-		var crop := _crop_with_seeds(inventory, selected_crop, unlocked_crops)
-		if not crop.is_empty():
+		var crop := _crop_with_seeds(inventory, selected_crop, sowing.crops)
+		var room := int(sowing.room)
+		if not crop.is_empty() and room > 0:
 			var n := mini(by_step.sow.size(), seeds_of(inventory, crop))
+			n = mini(n, room)
 			var r := _mk("sow", by_step.sow.slice(0, n), "Sow %d %s" % [n, CropInfo.name_of(crop)])
 			r.crop = crop
 			return r
@@ -82,6 +104,11 @@ static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_cro
 		total += int(produce[c])
 	if total > 0:
 		return _mk("stall", [], "Sell %d at the stall" % total)
+	# D0's lettuce belongs to the post-harvest batch; planting it early delays that chapter fact.
+	if first_batch and growing_unripe > 0:
+		var waiting := _mk("", [], "First harvest is growing")
+		waiting.enabled = false
+		return waiting
 	if not by_step.sow.is_empty():
 		return _mk("stall", [], "Buy seeds at the stall")
 	if growing_unripe > 0:
@@ -91,6 +118,16 @@ static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_cro
 	var done := _mk("", [], "All done for today")
 	done.enabled = false
 	return done
+
+static func _first_harvest_pending(state: Dictionary) -> bool:
+	if int((state.get("clock", {}) as Dictionary).get("chapter_index", -1)) != 0:
+		return false
+	var chapters = state.get("chapters", [])
+	if chapters is Array and not chapters.is_empty() and chapters[0] is Dictionary:
+		var flags = chapters[0].get("step_flags", {})
+		if flags is Dictionary and flags.get("first_harvest") is bool and flags.first_harvest:
+			return false
+	return ((state.get("xp", {}) as Dictionary).get("first_harvest_crops", []) as Array).is_empty()
 
 static func _crop_with_seeds(inventory: Dictionary, selected: String, unlocked: Array) -> String:
 	if unlocked.has(selected) and seeds_of(inventory, selected) > 0:

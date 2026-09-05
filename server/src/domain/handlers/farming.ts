@@ -73,6 +73,9 @@ export function applyFarming(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
     }
 
     case 'sow_cells': {
+      if (typeof cmd.crop !== 'string' || !Object.hasOwn(c.crops.crops, cmd.crop)
+        || (cmd.lot !== 'bought' && cmd.lot !== 'bound'))
+        return err('INSUFFICIENT_ITEMS', '种子或来源非法');
       const gate = gateCells(s, ctx, cmd.cell_ids);
       if (!gate.ok) return gate;
       const unlockedCrop = cropUnlockChapter(ctx, cmd.crop);
@@ -171,6 +174,8 @@ export function applyFarming(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
     }
 
     case 'buy_seeds': {
+      if (typeof cmd.crop !== 'string' || !Object.hasOwn(c.crops.crops, cmd.crop))
+        return err('INSUFFICIENT_ITEMS', '未知种子');
       if (!Number.isInteger(cmd.qty) || cmd.qty < 1 || cmd.qty > 24)
         return err('INSUFFICIENT_ITEMS', 'qty 必须是 1..24');
       const unlockChapter = cropUnlockChapter(ctx, cmd.crop);

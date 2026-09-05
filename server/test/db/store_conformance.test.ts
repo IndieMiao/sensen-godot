@@ -87,6 +87,76 @@ for (const [name, enabled, makeStore] of makers) {
     const me = (token: string) =>
       app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) });
 
+    it('custom farm position persists across reads, commands and public snapshots', async () => {
+      const login = await app.inject({ method: 'POST', url: '/v1/auth/anonymous',
+        payload: { install_key: newInstallKey() } });
+      const token = login.json().token as string;
+      const location = { lat: 31.225, lng: 121.485 };
+      const created = await app.inject({ method: 'POST', url: '/v1/farms', headers: authed(token),
+        payload: { idempotency_key: 'placed', region_id: 'shanghai', layout_patch_id: 'sh_a',
+          blueprint_revision: 2, location } });
+      expect(created.statusCode).toBe(201);
+      expect(created.json().location).toEqual(location);
+      expect((await currentStore.farmById(created.json().farm_id))?.location).toEqual(location);
+      expect((await me(token)).json().location).toEqual(location);
+      const opened = await cmd(token, { idempotency_key: 'open', base_version: 0,
+        type: 'set_visit_access', payload: { access: 'anyone' } });
+      expect(opened.json().location).toEqual(location);
+      const visitor = await seed();
+      const nearby = await app.inject({ method: 'GET', url: '/v1/nearby?region_id=shanghai', headers: authed(visitor.token) });
+      expect(nearby.json().entries[0].location).toEqual(location);
+      const snapshotUrl = `/v1/farms/${created.json().farm_id}/snapshot`;
+      const snapshot = await app.inject({ method: 'GET', url: snapshotUrl, headers: authed(visitor.token) });
+      expect(snapshot.json().location).toEqual(location);
+      await cmd(token, { idempotency_key: 'hide', base_version: opened.json().version,
+        type: 'set_location_visible', payload: { visible: false } });
+      const hidden = await app.inject({ method: 'GET', url: snapshotUrl, headers: authed(visitor.token) });
+      expect(hidden.json().snapshot_taken_at).toBe(snapshot.json().snapshot_taken_at);
+      expect(hidden.json()).not.toHaveProperty('location');
+      expect(hidden.json()).not.toHaveProperty('region_id');
+      const hiddenNearby = await app.inject({ method: 'GET', url: '/v1/nearby?region_id=shanghai', headers: authed(visitor.token) });
+      expect(hiddenNearby.json().entries[0]).not.toHaveProperty('location');
+      expect((await me(token)).json().location).toEqual(location);
+    });
+
+    it('concurrent creation replays the chosen position and cannot move an existing farm', async () => {
+      const login = await app.inject({ method: 'POST', url: '/v1/auth/anonymous',
+        payload: { install_key: newInstallKey() } });
+      const token = login.json().token as string;
+      const location = { lat: 31.225, lng: 121.485 };
+      const payload = { idempotency_key: 'placed', region_id: 'shanghai', layout_patch_id: 'sh_a',
+        blueprint_revision: 2, location };
+      const create = (body: object) => app.inject({ method: 'POST', url: '/v1/farms',
+        headers: authed(token), payload: body });
+      const [first, retry] = await Promise.all([create(payload), create(payload)]);
+      expect([first.statusCode, retry.statusCode].sort()).toEqual([200, 201]);
+      expect(first.json().farm_id).toBe(retry.json().farm_id);
+      const different = await create({ ...payload, location: { lat: 31.235, lng: 121.495 } });
+      expect(different.statusCode).toBe(409);
+      expect(different.json().code).toBe('IDEMPOTENCY_MISMATCH');
+      const anotherKey = await create({ ...payload, idempotency_key: 'move' });
+      expect(anotherKey.statusCode).toBe(409);
+      expect((await me(token)).json().location).toEqual(location);
+    });
+
+    it('rejects invalid and cross-city positions before creating a farm; legacy farms stay unplaced', async () => {
+      const login = await app.inject({ method: 'POST', url: '/v1/auth/anonymous',
+        payload: { install_key: newInstallKey() } });
+      const token = login.json().token as string;
+      const payload = { idempotency_key: 'bad', region_id: 'shanghai', layout_patch_id: 'sh_a', blueprint_revision: 2 };
+      for (const [location, expected] of [[{ lat: '31.2', lng: 121.4 }, 400],
+        [{ lat: 34.05, lng: -118.24 }, 422], [{ lat: 30.6701, lng: 121.4 }, 422]]) {
+        const response = await app.inject({ method: 'POST', url: '/v1/farms', headers: authed(token),
+          payload: { ...payload, location } });
+        expect(response.statusCode).toBe(expected);
+      }
+      expect((await me(token)).statusCode).toBe(404);
+      const legacy = await app.inject({ method: 'POST', url: '/v1/farms', headers: authed(token), payload });
+      expect(legacy.statusCode).toBe(201);
+      expect(legacy.json()).not.toHaveProperty('location');
+      expect((await me(token)).json()).not.toHaveProperty('location');
+    });
+
     it('QA 时间变换在写路径上生效', async () => {
       // 这条就是 MemoryStore 曾经漏掉的那一处。
       const s = await seed();

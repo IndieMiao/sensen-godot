@@ -1,0 +1,17 @@
+{
+  "format": 1,
+  "anchor_id": "courtyard",
+  "unit_m": 0.5,
+  "bounds_q": { "min_x": -6, "max_x": 6, "min_z": 3, "max_z": 5 },
+  "min_abs_x_q": 3,
+  "blocked_outer": { "min_abs_x_q": 5, "max_z_q": 3 },
+  "min_distance_q": 2,
+  "props": {
+    "bench": { "name": "Garden bench", "default_offset_q": [-4, 3] },
+    "planter": { "name": "Flower planter", "default_offset_q": [-6, 5] },
+    "lantern": { "name": "Garden lantern", "default_offset_q": [-3, 5] },
+    "fountain": { "name": "Small fountain", "default_offset_q": [4, 3] },
+    "sign": { "name": "Garden sign", "default_offset_q": [6, 5] },
+    "crate": { "name": "Harvest crate", "default_offset_q": [3, 5] }
+  }
+}

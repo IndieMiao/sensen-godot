@@ -5,6 +5,7 @@ const MAP := "res://scenes/map_poc/map_poc.tscn"
 const DRESS := "res://scenes/dressing_room/dressing_room.tscn"
 const STRESS := "res://scenes/stress_test/stress_test.tscn"
 const FARM := "res://scenes/farm/farm.tscn"
+const PLACE := "res://scenes/place/place.tscn"
 const CITY_SELECT := "res://scenes/city_select/city_select.tscn"
 
 const BACK_IGNORE := 0
@@ -173,6 +174,10 @@ static func qa_scene_path(args: PackedStringArray) -> String:
 				return CITY_SELECT
 			"farm":
 				return FARM
+			"week":
+				var driver := "res://tools/dev/g3_week_ui.tscn"
+				if OS.is_debug_build() and OS.has_feature("g3_device_qa") and ResourceLoader.exists(driver):
+					return driver
 	return ""
 
 
@@ -188,7 +193,7 @@ static func back_action_for_scene(scene_path: String, back_locked := false) -> i
 	if back_locked:
 		return BACK_IGNORE
 	match scene_path:
-		DRESS, STRESS, FARM:
+		DRESS, STRESS, FARM, PLACE:
 			return BACK_TO_MAP
 		MAP, CITY_SELECT:
 			return BACK_LEAVE_APP

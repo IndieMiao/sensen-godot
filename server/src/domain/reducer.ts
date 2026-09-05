@@ -12,13 +12,14 @@ import type { Content, FieldCondition } from './content.js';
 import type { Command } from './commands.js';
 import { derive, type Derived } from './derive.js';
 import { err, ok, type Result } from './errors.js';
-import { materializeDay } from './handlers/day.js';
 import { applyEconomy } from './handlers/economy.js';
+import { applyDecorations } from './handlers/decorations.js';
 import { applyFarming } from './handlers/farming.js';
 import { applyResidents } from './handlers/residents.js';
 import { applyQa } from './handlers/qa.js';
 import { applySettings } from './handlers/settings.js';
 import type { FarmState } from './state.js';
+import { projectFarmState, recordChapterProgress } from './progress.js';
 
 export interface Ctx {
   /** **有效**时间（QA 变换之后）；一切派生量都吃它。 */
@@ -47,20 +48,18 @@ export function apply(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmState> {
   if (ctx.now < s.clock.last_effective_now) return err('CLOCK_REGRESSION');
 
   // 先把跨过的玩家日物化（换日、开章、发 Grant），再执行命令本身。
-  const day = materializeDay(s, ctx);
-  if (!day.ok) return day;
-  const base = day.state;
-
-  const farming = applyFarming(base, cmd, ctx);
-  if (farming) return farming;
-  const economy = applyEconomy(base, cmd, ctx);
-  if (economy) return economy;
-  const residents = applyResidents(base, cmd, ctx);
-  if (residents) return residents;
-  const settings = applySettings(base, cmd, ctx);
-  if (settings) return settings;
-  const qa = applyQa(base, cmd, ctx);
-  if (qa) return qa;
+  const base = projectFarmState(s, ctx.now, ctx.timezone, ctx.content, ctx.blueprint);
+  const currentCtx = { ...ctx, derived: derive(base, ctx.now, ctx.timezone, ctx.content) };
+  for (const handler of [applyFarming, applyEconomy, applyResidents, applyDecorations, applySettings, applyQa]) {
+    const result = handler(base, cmd, currentCtx);
+    if (!result) continue;
+    if (!result.ok) return result;
+    const progressed = recordChapterProgress(base, result.state, cmd, currentCtx);
+    const next = projectFarmState(progressed, ctx.now, ctx.timezone, ctx.content, ctx.blueprint);
+    const completed = next.handbook.filter(entry => entry.kind === 'chapter_done'
+      && !s.handbook.some(old => old.kind === entry.kind && old.key === entry.key));
+    return ok(next, [...result.events, ...completed.map(entry => ({ type: 'chapter_done', chapter: Number(entry.key) }))]);
+  }
 
   return err('NOT_AVAILABLE', `命令 ${cmd.type} 尚未实现（Task 5）`);
 }

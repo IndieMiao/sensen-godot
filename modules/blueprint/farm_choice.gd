@@ -4,12 +4,15 @@ extends RefCounted
 
 const PATH := "user://farm_choice.json"
 
-static func save(layout_patch_id: String, revision: int) -> void:
+static func save(layout_patch_id: String, revision: int, location: Dictionary = {}) -> void:
 	var f := FileAccess.open(PATH, FileAccess.WRITE)
 	if f == null:
 		push_error("FarmChoice: 选择保存失败 err=%d path=%s" % [FileAccess.get_open_error(), PATH])
 		return
-	f.store_string(JSON.stringify({"layout_patch_id": layout_patch_id, "revision": revision}))
+	var choice := {"layout_patch_id": layout_patch_id, "revision": revision}
+	if FarmPlacement.is_valid(location):
+		choice["location"] = {"lat": float(location.lat), "lng": float(location.lng)}
+	f.store_string(JSON.stringify(choice))
 
 static func load() -> Dictionary:
 	if not FileAccess.file_exists(PATH):
@@ -17,7 +20,10 @@ static func load() -> Dictionary:
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(PATH))
 	if typeof(parsed) != TYPE_DICTIONARY or not parsed.has("layout_patch_id"):
 		return {}
-	return {"layout_patch_id": str(parsed.layout_patch_id), "revision": int(parsed.get("revision", 1))}
+	var choice := {"layout_patch_id": str(parsed.layout_patch_id), "revision": int(parsed.get("revision", 1))}
+	if FarmPlacement.is_valid(parsed.get("location")):
+		choice["location"] = {"lat": float(parsed.location.lat), "lng": float(parsed.location.lng)}
+	return choice
 
 static func clear() -> void:
 	if FileAccess.file_exists(PATH):
