@@ -1,11 +1,17 @@
 class_name ApiClient
 extends RefCounted
 ## 服务端 HTTP 封装。**不做重试策略以外的任何判断**：状态码与 JSON 原样返回，
-## 由 FarmSession 决定怎么处理。
+## 由上层会话决定怎么处理。
 ##
-## 为什么可注入 transport：真实 HTTPRequest 需要场景树、需要网络、慢且不稳定。
+## 为什么可注入 transport：真实 HTTPRequest 需要场景树、需要网络，慢且不稳定。
 ## 把「发一次请求」抽成一个 Callable，单测就能覆盖 409/422/超时/断线这些真网络里
-## 很难稳定复现的分支（仓库里此前零 HTTPRequest 用例，没有现成模式可抄）。
+## 很难稳定复现的分支。
+##
+## A1 补三件事（08-30 调研 §3.1 网络层）：
+## - token_provider：每次请求现取 token（AuthSession.access_token），刷新后不用回填字段；
+## - on_unauthorized：401 时给会话一次刷新机会，成功就用新 token 重发一次；
+## - request_idempotent：带 Idempotency-Key 的写请求，传输层失败按同一把键重试，
+##   业务失败（4xx/5xx 已拿到响应）不重试——服务端按键去重，重发也没用。
 
 const DEFAULT_BASE := "https://farm.sensenjoy.cn/v1"
 const TIMEOUT_S := 10.0
@@ -28,8 +34,23 @@ class Response extends RefCounted:
 	func is_success() -> bool:
 		return ok and status >= 200 and status < 300
 
+	## 统一错误码：服务端 json.code 优先；没有就 HTTP_<status>；传输层失败给 error 文本或 TRANSPORT。
+	func code() -> String:
+		if not ok:
+			return error if not error.is_empty() else "TRANSPORT"
+		if json.has("code"):
+			return str(json.code)
+		return "HTTP_%d" % status
+
 var base_url := DEFAULT_BASE
+## 静态 token（农场匿名会话仍在用）。token_provider 返回非空时优先。
 var token := ""
+## () -> String
+var token_provider: Callable
+## () -> bool（可为协程）。401 时调用一次；返回 true 则用新 token 重发原请求一次。
+var on_unauthorized: Callable
+## 幂等重试的退避基数（秒）；测试置 0 跳过等待。
+var retry_delay_s := 0.5
 ## transport.call(method, url, headers, body_text) -> Response
 var transport: Callable
 
@@ -54,18 +75,61 @@ static func install_key() -> String:
 		f.close()
 	return key
 
+static func new_idempotency_key() -> String:
+	return Crypto.new().generate_random_bytes(16).hex_encode()
+
+func current_token() -> String:
+	if token_provider.is_valid():
+		var t = token_provider.call()
+		if t is String and not (t as String).is_empty():
+			return t
+	return token
+
 ## 协程：真实 HTTP 传输是异步的，调用方一律 `await`。
 ## FakeTransport 是同步的——`await` 一个非协程值会立刻返回，所以单测不受影响。
-## G1-B 曾把这里写成同步，结果昨天 e2e 只能绕开 FarmSession 直接打传输层才跑通。
-func request(method: String, path: String, body: Variant = null) -> Response:
+## G1-B 曾把这里写成同步，结果 e2e 只能绕开 FarmSession 直接打传输层才跑通。
+func request(method: String, path: String, body: Variant = null, extra_headers: PackedStringArray = PackedStringArray()) -> Response:
+	var r: Response = await _send(method, path, body, extra_headers)
+	if r.ok and r.status == 401 and on_unauthorized.is_valid():
+		var recovered = await on_unauthorized.call()
+		if recovered is bool and recovered:
+			r = await _send(method, path, body, extra_headers)
+	return r
+
+## 带幂等键的写请求。传输层失败（超时 / 断线）按同一把键重试至多 max_attempts 次；
+## 一旦拿到任何 HTTP 响应就返回，不管成败。
+func request_idempotent(method: String, path: String, body: Variant = null, idempotency_key := "", max_attempts := 3) -> Response:
+	var key := idempotency_key if not idempotency_key.is_empty() else new_idempotency_key()
+	var headers := PackedStringArray(["idempotency-key: %s" % key])
+	var r: Response = null
+	for attempt in range(maxi(1, max_attempts)):
+		r = await request(method, path, body, headers)
+		if r.ok:
+			return r
+		if attempt + 1 < max_attempts:
+			await _backoff(attempt)
+	return r
+
+func _send(method: String, path: String, body: Variant, extra_headers: PackedStringArray) -> Response:
 	var headers := PackedStringArray(["content-type: application/json"])
-	if not token.is_empty():
-		headers.append("authorization: Bearer %s" % token)
+	var tok := current_token()
+	if not tok.is_empty():
+		headers.append("authorization: Bearer %s" % tok)
+	for h in extra_headers:
+		headers.append(h)
 	var text := "" if body == null else JSON.stringify(body)
 	if not transport.is_valid():
 		return Response.new(false, 0, {}, "no transport")
 	var r = await transport.call(method, base_url + path, headers, text)
 	return r if r is Response else Response.new(false, 0, {}, "bad transport result")
+
+func _backoff(attempt: int) -> void:
+	var delay := retry_delay_s * float(1 << attempt)
+	if delay <= 0.0:
+		return
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree:
+		await tree.create_timer(delay).timeout
 
 ## 真实传输：需要一个在场景树里的 Node 来挂 HTTPRequest。
 static func make_http_transport(host: Node) -> Callable:
@@ -76,6 +140,8 @@ static func make_http_transport(host: Node) -> Callable:
 		var verb := HTTPClient.METHOD_GET
 		match method:
 			"POST": verb = HTTPClient.METHOD_POST
+			"PUT": verb = HTTPClient.METHOD_PUT
+			"PATCH": verb = HTTPClient.METHOD_PATCH
 			"DELETE": verb = HTTPClient.METHOD_DELETE
 		var err := req.request(url, headers, verb, body)
 		if err != OK:

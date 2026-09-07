@@ -28,8 +28,9 @@ func s_pick(regions: Array, lat: float, lng: float, has_fix: bool, fallback := "
 	var script := load("res://scenes/city_select/city_select.gd")
 	return script.pick_region(regions, lat, lng, has_fix, fallback)
 
-func test_main_scene_is_city_select() -> void:
-	assert_str(ProjectSettings.get_setting("application/run/main_scene")).is_equal(SCENE)
+func test_city_select_reachable_via_qa_scene_argument() -> void:
+	# A1 起主场景是 boot.tscn（社交主线）；农场分支的城市选择页保留为 --qa-scene=city 入口。
+	assert_str(AppRouter.qa_scene_path(PackedStringArray(["--qa-scene=city"]))).is_equal(SCENE)
 
 func test_timeout_cancels_pending_subscription() -> void:
 	var s := (load(SCENE) as PackedScene).instantiate()

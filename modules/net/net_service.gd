@@ -1,11 +1,12 @@
 extends Node
-## 全局网络服务（autoload `Net`）：一个 ApiClient + 一个 FarmSession，App 启动时登录。
+## 全局网络服务（autoload `Net`）：一个 ApiClient + 登录会话 AuthSession + WebSocket 客户端，
+## 外加农场分支遗留的 FarmSession（本分支不承接农场，但 --qa-scene=city/farm 仍可跑）。
 ##
 ## 为什么是 Node 而不是 RefCounted：真实 HTTPRequest 需要挂在场景树里，autoload 正好是
 ## 一直在树里的节点。
 ##
-## **测试与工具进程绝不自动联网**：headless 或带 gdUnit 参数时跳过 boot()。否则 396 条单测
-## 每次启动都会去打线上服务器——慢、抖，还会在生产库里留下一堆匿名账号。
+## **测试与工具进程绝不自动联网**：headless 或带 gdUnit 参数时跳过 boot()，也不读磁盘上的
+## 会话文件——否则开发机上一次「Dev 登录」留下的会话会漏进几百条单测里。
 
 signal booted(logged_in: bool)
 
@@ -14,15 +15,30 @@ const DEFAULT_BASE := "https://farm.sensenjoy.cn/v1"
 const SERVER_OVERRIDE := "user://server.txt"
 
 var client: ApiClient
+var auth: AuthSession
+var ws: WsClient
 var session: FarmSession
 var booting := false
 var booted_once := false
 
 func _ready() -> void:
-	client = ApiClient.new(base_url(), ApiClient.make_http_transport(self))
-	session = FarmSession.new(client)
+	auth = AuthSession.new()
 	if not is_test_process():
+		auth.restore()
+	client = ApiClient.new(base_url(), ApiClient.make_http_transport(self))
+	bind_auth(client)
+	session = FarmSession.new(client)
+	ws = WsClient.new()
+	ws.name = "Ws"
+	ws.token_provider = auth.access_token
+	add_child(ws)
+	if not is_test_process() and farm_boot_requested(OS.get_cmdline_user_args()):
 		call_deferred("boot")
+
+## 让 client 每次请求现取会话 token；401 时给会话一次刷新机会。
+func bind_auth(c: ApiClient) -> void:
+	c.token_provider = auth.access_token
+	c.on_unauthorized = auth.refresh
 
 static func is_test_process() -> bool:
 	if OS.is_debug_build() and OS.has_feature("g3_device_qa"):
@@ -32,6 +48,14 @@ static func is_test_process() -> bool:
 	for a in OS.get_cmdline_args():
 		if str(a).to_lower().contains("gdunit"):
 			return true
+	return false
+
+## 农场匿名登录只服务农场场景：社交主线的启动由 boot.tscn 按 AuthSession 决定去向。
+static func farm_boot_requested(args: PackedStringArray) -> bool:
+	for arg in args:
+		if not arg.begins_with("--qa-scene="):
+			continue
+		return arg.trim_prefix("--qa-scene=").to_lower() in ["city", "farm", "map", "week"]
 	return false
 
 static func base_url() -> String:
@@ -44,10 +68,11 @@ static func base_url() -> String:
 ## 测试注入假传输；同时重建会话，丢掉上一次的 token 与状态。
 func use_transport(t: Callable, p_base := "https://example.test/v1") -> void:
 	client = ApiClient.new(p_base, t)
+	bind_auth(client)
 	session = FarmSession.new(client)
 	booted_once = false
 
-## 登录 + 取回已有农场（404 是正常的：新玩家还没建场）。返回是否登录成功。
+## 农场分支：登录 + 取回已有农场（404 是正常的：新玩家还没建场）。返回是否登录成功。
 func boot() -> bool:
 	if booting:
 		return false

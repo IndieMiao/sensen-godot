@@ -7,6 +7,10 @@ const STRESS := "res://scenes/stress_test/stress_test.tscn"
 const FARM := "res://scenes/farm/farm.tscn"
 const PLACE := "res://scenes/place/place.tscn"
 const CITY_SELECT := "res://scenes/city_select/city_select.tscn"
+## 海外社交主线（08-30 调研 §3.1）：启动决策页 → 登录页 → 四 Tab 壳。路径与 AppRoutes 同源。
+const BOOT := "res://scenes/app/boot.tscn"
+const LOGIN := "res://scenes/app/login_page.tscn"
+const SHELL := "res://scenes/app/app_shell.tscn"
 
 const BACK_IGNORE := 0
 const BACK_TO_MAP := 1
@@ -35,6 +39,27 @@ func go_to_dressing() -> void:
 
 func go_to_stress() -> void:
 	_go_to(STRESS)
+
+
+## 整场景切换前清空实例栈：登出时若还有设置页压在壳上，change_scene 只换 current_scene，
+## 压栈的子页会继续挂在 root 下盖住登录页。
+func go_to_login() -> void:
+	_clear_stack()
+	_go_to(LOGIN)
+
+
+func go_to_shell() -> void:
+	_clear_stack()
+	_go_to(SHELL)
+
+
+func _clear_stack() -> void:
+	while not _stack.is_empty():
+		var top: Node = _stack.pop_back()
+		var parent := top.get_parent()
+		if parent:
+			parent.remove_child(top)
+		top.queue_free()
 
 
 func push_instance(scene_path: String, args := {}) -> Node:
@@ -109,6 +134,9 @@ func handle_back() -> void:
 		pop_instance()
 		return
 	var current := get_tree().current_scene
+	# 壳自己有 Tab 级返回语义（非首页 Tab → 回地图 Tab）；消费掉就不再往下走。
+	if current and current.has_method("handle_back") and bool(current.call("handle_back")):
+		return
 	match back_action_for_scene(
 			_current_scene_path(), scene_locks_back_navigation(current)):
 		BACK_TO_MAP:
@@ -174,6 +202,10 @@ static func qa_scene_path(args: PackedStringArray) -> String:
 				return CITY_SELECT
 			"farm":
 				return FARM
+			"login":
+				return LOGIN
+			"shell", "home":
+				return SHELL
 			"week":
 				var driver := "res://tools/dev/g3_week_ui.tscn"
 				if OS.is_debug_build() and OS.has_feature("g3_device_qa") and ResourceLoader.exists(driver):
@@ -195,7 +227,7 @@ static func back_action_for_scene(scene_path: String, back_locked := false) -> i
 	match scene_path:
 		DRESS, STRESS, FARM, PLACE:
 			return BACK_TO_MAP
-		MAP, CITY_SELECT:
+		MAP, CITY_SELECT, BOOT, LOGIN, SHELL:
 			return BACK_LEAVE_APP
 		_:
 			return BACK_IGNORE
