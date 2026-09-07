@@ -59,7 +59,7 @@ export class NullModerator implements TextModerator {
 // —— 举报 / 拉黑 / 封禁 ——
 
 export const REPORT_REASONS = new Set(['spam', 'harassment', 'sexual', 'violence', 'hate', 'self_harm', 'minor_safety', 'other']);
-export const REPORT_TARGETS = new Set(['post', 'comment', 'user']);
+export const REPORT_TARGETS = new Set(['post', 'comment', 'user', 'message']);
 export const REPORT_DETAIL_MAX = 500;
 /** 同一目标来自不同人的举报达到这个数就先自动隐藏，等人工——24h SLA 不能全靠人盯。 */
 export const REPORT_AUTO_HIDE = 3;
@@ -67,7 +67,7 @@ export const REPORT_AUTO_HIDE = 3;
 export interface ReportRow {
   id: string;
   reporter_id: string;
-  target_type: 'post' | 'comment' | 'user';
+  target_type: 'post' | 'comment' | 'user' | 'message';
   target_id: string;
   reason: string;
   detail: string;
@@ -106,7 +106,7 @@ export interface ModerationStore {
   exportUser(userId: string): Promise<{ reports_filed: ReportRow[]; blocks: BlockRow[] }>;
 }
 
-export type ReportInput = { ok: true; targetType: 'post' | 'comment' | 'user'; targetId: string; reason: string; detail: string } | { ok: false; field: string; reason: string };
+export type ReportInput = { ok: true; targetType: 'post' | 'comment' | 'user' | 'message'; targetId: string; reason: string; detail: string } | { ok: false; field: string; reason: string };
 
 export function validateReport(body: unknown): ReportInput {
   if (typeof body !== 'object' || body === null || Array.isArray(body)) return { ok: false, field: 'body', reason: 'OBJECT' };
@@ -117,7 +117,7 @@ export function validateReport(body: unknown): ReportInput {
   const detail = typeof b.detail === 'string' ? b.detail.trim() : '';
   if (b.detail !== undefined && typeof b.detail !== 'string') return { ok: false, field: 'detail', reason: 'STRING' };
   if ([...detail].length > REPORT_DETAIL_MAX) return { ok: false, field: 'detail', reason: 'LENGTH' };
-  return { ok: true, targetType: b.target_type as 'post' | 'comment' | 'user', targetId: b.target_id, reason: b.reason, detail };
+  return { ok: true, targetType: b.target_type as 'post' | 'comment' | 'user' | 'message', targetId: b.target_id, reason: b.reason, detail };
 }
 
 export const ADMIN_ACTIONS = new Set(['dismiss', 'remove_content', 'ban_user']);

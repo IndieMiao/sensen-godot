@@ -33,7 +33,7 @@ import { ownsKey, presignUpload, validateUploadRequest, type S3Config } from './
 import { ADMIN_ACTIONS, NullModerator, REPORT_AUTO_HIDE, decide, reportView, validateReport,
   type ModerationStore, type TextModerator } from './moderation.js';
 import { HISTORY_LIMIT_MAX, SYNC_LIMIT_MAX, conversationView, greetingBlocked, messageView, uniqueIds, validateGroup, validateMessage,
-  type ConversationRow, type ImStore, type LiveHub, type PeerCard, type UserEvent } from './im.js';
+  type ConversationRow, type ImStore, type LiveHub, type PeerCard, type UserEvent, memberView } from './im.js';
 import { registerImGateway, type SocketHub } from './ws_gateway.js';
 
 export interface AppDeps {
@@ -728,14 +728,19 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     let ownerId: string | null = null;
     if (v.targetType === 'post') ownerId = (await deps.feed?.post(v.targetId))?.author_id ?? null;
     else if (v.targetType === 'comment') ownerId = (await deps.feed?.comment(v.targetId))?.author_id ?? null;
-    else ownerId = (await deps.accounts!.userById(v.targetId))?.id ?? null;
+    else if (v.targetType === 'message') {
+      // 只有会话成员能举报里面的消息；已撤回的不再受理。
+      const m = await deps.im?.message(v.targetId);
+      ownerId = m && m.deleted_at === null && (await deps.im!.isMember(m.conversation_id, me.id)) ? m.sender_id : null;
+    } else ownerId = (await deps.accounts!.userById(v.targetId))?.id ?? null;
     if (!ownerId) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
     if (ownerId === me.id) return reply.code(400).send({ code: 'SELF_REPORT', server_time: deps.now() });
     const r = await deps.moderation!.addReport({ id: randomUUID(), reporter_id: me.id, target_type: v.targetType, target_id: v.targetId, reason: v.reason, detail: v.detail, created_at: deps.now() });
     let autoHidden = false;
-    if (r.created && r.distinctReporters >= REPORT_AUTO_HIDE && deps.feed) {
-      autoHidden = v.targetType === 'post' ? await deps.feed.setPostStatus(v.targetId, 'hidden')
-        : v.targetType === 'comment' ? await deps.feed.setCommentStatus(v.targetId, 'hidden') : false;
+    if (r.created && r.distinctReporters >= REPORT_AUTO_HIDE) {
+      if (v.targetType === 'post' && deps.feed) autoHidden = await deps.feed.setPostStatus(v.targetId, 'hidden');
+      else if (v.targetType === 'comment' && deps.feed) autoHidden = await deps.feed.setCommentStatus(v.targetId, 'hidden');
+      else if (v.targetType === 'message') autoHidden = await retractMessage(v.targetId);
     }
     return reply.code(r.created ? 201 : 200).send({ ...reportView(r.report), created: r.created, auto_hidden: autoHidden, server_time: deps.now() });
   });
@@ -772,6 +777,10 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       const c = await deps.feed?.comment(report.target_id);
       subjectId = c?.author_id ?? null;
       if (c) await deps.feed!.setCommentStatus(c.id, 'hidden');
+    } else if (report.target_type === 'message') {
+      const m = await deps.im?.message(report.target_id);
+      subjectId = m?.sender_id ?? null;
+      if (m) await retractMessage(m.id);
     } else subjectId = report.target_id;
     if (action === 'ban_user' && subjectId) await deps.moderation!.ban(subjectId, `report:${report.id}:${report.reason}`, me.id, deps.now());
     const n = await deps.moderation!.resolveTarget(report.target_type, report.target_id, me.id, action, deps.now());
@@ -812,6 +821,14 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   };
   const hub: LiveHub | undefined = deps.liveHub ?? deps.wsHub;
   const publish = (events: UserEvent[]) => { if (events.length) hub?.publish(events); };
+  /** 审核下架一条消息：软删 + 推 message_deleted 给全部成员（与发送者撤回同一条路）。 */
+  const retractMessage = async (messageId: string): Promise<boolean> => {
+    const m = await deps.im?.message(messageId);
+    if (!m || !deps.im) return false;
+    const deleted = await deps.im.deleteMessage(m.id, deps.now());
+    if (deleted) publish(await deps.im.pushEvent((await deps.im.members(m.conversation_id)).map(x => x.user_id), 'message_deleted', { conversation_id: m.conversation_id, message_id: m.id, message_seq: m.seq }, deps.now()));
+    return deleted;
+  };
   if (deps.wsHub && deps.im) await registerImGateway(app, deps.wsHub, currentUser, { now: deps.now, pingIntervalMs: deps.wsPingIntervalMs });
   const peerCardsOf = async (ids: string[]): Promise<Map<string, PeerCard>> => {
     const profiles = await deps.social!.profiles([...new Set(ids)]);
@@ -829,10 +846,10 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const conversationOut = async (me: UserRow, c: ConversationRow) => {
     const members = await deps.im!.members(c.id);
     const mine = members.find(m => m.user_id === me.id)!;
-    const peerId = c.kind === 'dm' ? members.find(m => m.user_id !== me.id)?.user_id ?? null : null;
-    const peer = peerId ? (await peerCardsOf([peerId])).get(peerId)! : null;
+    const peerRow = c.kind === 'dm' ? members.find(m => m.user_id !== me.id) ?? null : null;
+    const peer = peerRow ? (await peerCardsOf([peerRow.user_id])).get(peerRow.user_id)! : null;
     const last = (await deps.im!.messages(c.id, null, 1))[0] ?? null;
-    return conversationView(c, mine, last, peer, members.length);
+    return conversationView(c, mine, last, peer, members.length, peerRow?.last_read_seq ?? null);
   };
 
   app.post('/v1/im/dm', async (req, reply) => {
@@ -893,11 +910,20 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const items = [];
     for (const r of rows) {
       const members = await deps.im!.members(r.conversation.id);
-      const peerId = r.conversation.kind === 'dm' ? members.find(m => m.user_id !== me.id)?.user_id ?? null : null;
-      const peer = peerId ? (await peerCardsOf([peerId])).get(peerId)! : null;
-      items.push(conversationView(r.conversation, r.member, r.last_message, peer, members.length));
+      const peerRow = r.conversation.kind === 'dm' ? members.find(m => m.user_id !== me.id) ?? null : null;
+      const peer = peerRow ? (await peerCardsOf([peerRow.user_id])).get(peerRow.user_id)! : null;
+      items.push(conversationView(r.conversation, r.member, r.last_message, peer, members.length, peerRow?.last_read_seq ?? null));
     }
     return reply.send({ items, server_time: deps.now() });
+  });
+
+  /** 成员列表：群聊气泡上的昵称、「N 人已读」都靠它；非成员 404。 */
+  app.get('/v1/im/conversations/:id/members', async (req, reply) => {
+    const me = await imGuard(req, reply); if (!me) return;
+    const c = await myConversation(reply, me, paramId(req)); if (!c) return;
+    const members = await deps.im!.members(c.id);
+    const cards = await peerCardsOf(members.map(m => m.user_id));
+    return reply.send({ items: members.map(m => memberView(m, cards.get(m.user_id))), server_time: deps.now() });
   });
 
   app.get('/v1/im/conversations/:id/messages', async (req, reply) => {

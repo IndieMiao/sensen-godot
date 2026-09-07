@@ -156,12 +156,19 @@ export function messageView(m: MessageRow) {
 
 export interface PeerCard { user_id: string; display_name: string; handle: string | null; avatar: Record<string, unknown> | null }
 
-export function conversationView(c: ConversationRow, me: MemberRow, last: MessageRow | null, peer: PeerCard | null, memberCount: number) {
+/** peerReadSeq：单聊里对方的已读进度（已读回执的初始值；之后靠 `read` 事件推进），群聊为 null。 */
+export function conversationView(c: ConversationRow, me: MemberRow, last: MessageRow | null, peer: PeerCard | null, memberCount: number, peerReadSeq: number | null = null) {
   return {
-    id: c.id, kind: c.kind, title: c.title, peer, member_count: memberCount,
+    id: c.id, kind: c.kind, title: c.title, peer, member_count: memberCount, peer_read_seq: peerReadSeq,
     last_seq: c.last_seq, last_read_seq: me.last_read_seq, unread: Math.max(0, c.last_seq - me.last_read_seq),
     last_message: last ? messageView(last) : null, last_message_at: c.last_message_at, created_at: c.created_at,
   };
+}
+
+/** 成员列表：资料卡 + 入群时间 + 已读进度（群聊的「N 人已读」和气泡上的昵称都从这来）。 */
+export function memberView(m: MemberRow, card: PeerCard | undefined) {
+  return { user_id: m.user_id, display_name: card?.display_name ?? '', handle: card?.handle ?? null, avatar: card?.avatar ?? null,
+    joined_at: m.joined_at, last_read_seq: m.last_read_seq };
 }
 
 export const pairKey = (a: string, b: string): [string, string] => (a < b ? [a, b] : [b, a]);

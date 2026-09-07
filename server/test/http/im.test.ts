@@ -193,3 +193,42 @@ describe('其他', () => {
     expect((await app.inject({ method: 'GET', url: '/v1/healthz' })).json().im).toBe(false);
   });
 });
+
+describe('成员列表、对方已读进度、举报消息（B2 第二刀的服务端）', () => {
+  it('单聊带 peer_read_seq 并随对方已读推进；成员列表带昵称与已读进度；群聊 peer_read_seq 为 null；非成员 404', async () => {
+    const a = await signIn('alice'); const b = await signIn('bob'); await signIn('carol');
+    const conv = await dm('alice', b);
+    await send('alice', conv, 'hi');
+    expect((await get('alice', '/v1/im/conversations')).json().items[0].peer_read_seq).toBe(0);
+    await post('bob', `/v1/im/conversations/${conv}/read`, { seq: 1 });
+    expect((await get('alice', '/v1/im/conversations')).json().items[0].peer_read_seq).toBe(1);
+    const ms = await get('alice', `/v1/im/conversations/${conv}/members`);
+    expect(ms.statusCode).toBe(200);
+    const byId = new Map(ms.json().items.map((m: { user_id: string }) => [m.user_id, m]));
+    expect(byId.get(b)).toMatchObject({ last_read_seq: 1, display_name: 'bob' });
+    expect(byId.get(a)).toMatchObject({ display_name: 'alice' });
+    expect(typeof (byId.get(a) as { joined_at: number }).joined_at).toBe('number');
+    expect((await get('carol', `/v1/im/conversations/${conv}/members`)).statusCode).toBe(404);
+    const g = await post('alice', '/v1/im/groups', { title: 'T', member_ids: [b] });
+    expect(g.json().peer_read_seq).toBeNull();
+    expect((await get('bob', `/v1/im/conversations/${g.json().id}/members`)).json().items).toHaveLength(2);
+  });
+
+  it('举报消息：非成员 404；不能举报自己的；同一人去重；3 人举报自动撤回并推 message_deleted；撤回后不再受理', async () => {
+    await signIn('alice'); const b = await signIn('bob'); const c = await signIn('carol'); const d = await signIn('dave'); await signIn('eve');
+    const gid = (await post('alice', '/v1/im/groups', { title: 'T', member_ids: [b, c, d] })).json().id as string;
+    const m = (await send('alice', gid, 'rude')).json();
+    const report = (uid: string) => post(uid, '/v1/reports', { target_type: 'message', target_id: m.id, reason: 'harassment' });
+    expect((await report('eve')).statusCode).toBe(404);
+    expect((await report('alice')).json().code).toBe('SELF_REPORT');
+    expect((await report('bob')).statusCode).toBe(201);
+    expect((await report('bob')).statusCode).toBe(200);
+    expect((await report('carol')).json().auto_hidden).toBe(false);
+    const third = await report('dave');
+    expect(third.statusCode).toBe(201);
+    expect(third.json().auto_hidden).toBe(true);
+    expect(hub.published.at(-1)).toMatchObject({ type: 'message_deleted', payload: { conversation_id: gid, message_id: m.id, message_seq: 1 } });
+    expect((await get('bob', `/v1/im/conversations/${gid}/messages`)).json().items[0]).toMatchObject({ id: m.id, deleted: true, kind: 'system' });
+    expect((await post('eve', '/v1/reports', { target_type: 'message', target_id: m.id, reason: 'spam' })).statusCode).toBe(404);
+  });
+});

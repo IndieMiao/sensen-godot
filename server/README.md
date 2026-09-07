@@ -243,7 +243,8 @@ UNSIGNED-PAYLOAD），服务端不经手图片流量。key 形如 `u/<user_id>/<
 | POST | `/v1/im/dm` | `{user_id}` 找或建单聊；自己 400、拉黑 403 |
 | POST | `/v1/im/groups` | `{title, member_ids}`（≤50）；成员须存在且未互相拉黑 |
 | POST / DELETE | `/v1/im/groups/:id/members` · `…/members/me` | 拉人 / 退群 |
-| GET | `/v1/im/conversations` | 我的会话，按最近消息倒序，带 `unread`、`peer`（单聊对方） |
+| GET | `/v1/im/conversations` | 我的会话，按最近消息倒序，带 `unread`、`peer`（单聊对方）、`peer_read_seq`（单聊对方已读到哪，群聊 null） |
+| GET | `/v1/im/conversations/:id/members` | 成员列表：`{user_id, display_name, handle, avatar, joined_at, last_read_seq}`（群聊气泡昵称、「N 人已读」） |
 | GET | `/v1/im/conversations/:id/messages?before_seq&limit` | 历史，seq 倒序 |
 | POST | `/v1/im/conversations/:id/messages` | `{client_id, kind: text|image, text?, image?}`；同 client_id 重放 200 |
 | POST | `/v1/im/conversations/:id/read` | `{seq}` 已读；单聊推 `read` 事件给对方 |
@@ -252,7 +253,8 @@ UNSIGNED-PAYLOAD），服务端不经手图片流量。key 形如 `u/<user_id>/<
 
 陌生人规则（Follow Feature Requirements §3.3）：双方都没关注对方时，先开口的人只能发一条直到对方回复
 （403 `GREETING_LIMIT`）；拉黑双向：不能建单聊也不能发（403 `BLOCKED`）。文字过前置审核（D6）。
-不是成员的会话一律 404。
+不是成员的会话一律 404。举报消息走 `POST /v1/reports`（`target_type: message`，只有会话成员能举报，已撤回的 404）；
+3 个不同人举报同一条就自动撤回并推 `message_deleted`，管理员 `remove_content` / `ban_user` 处置同样撤回。
 
 **在线通道** `GET /v1/im/ws`（WebSocket 升级，握手头 `Authorization: Bearer <Firebase ID token>`）：连上先收
 `{type:'hello'}`，之后每条 inbox 事件推成 `{type, seq, …payload, event_at}`；上行只认 `{type:'ping'}`（回 `pong`），
