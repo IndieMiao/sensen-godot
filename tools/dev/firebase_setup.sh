@@ -49,12 +49,24 @@ if "error" in d: print("config PATCH error:", json.dumps(d["error"])[:400]); rai
 print("email/password enabled:", d.get("signIn",{}).get("email",{}))
 PY
 
-echo "== 4) write user://firebase.json =="
+echo "== 4) google provider web client (if enabled in console) =="
+GOOGLE_CLIENT_ID=$(curl -sS -H "Authorization: Bearer $TOKEN" \
+  "https://identitytoolkit.googleapis.com/admin/v2/projects/$PROJECT/defaultSupportedIdpConfigs" \
+  | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next((c.get("clientId","") for c in d.get("defaultSupportedIdpConfigs",[]) if c["name"].endswith("google.com") and c.get("enabled")), ""))' 2>/dev/null || true)
+echo "google web client id: ${GOOGLE_CLIENT_ID:-(Google provider not enabled yet — enable it in console: Authentication > Sign-in method > Google)}"
+
+echo "== 5) write user://firebase.json =="
 mkdir -p "$USER_DIR"
-python3 - "$USER_DIR/firebase.json" "$API_KEY" "$PROJECT" "$AUTH_DOMAIN" <<'PY'
-import json,sys
-p,key,proj,dom=sys.argv[1:]
-json.dump({"api_key":key,"project_id":proj,"auth_domain":dom}, open(p,"w"), indent=2)
-print("wrote", p)
+python3 - "$USER_DIR/firebase.json" "$API_KEY" "$PROJECT" "$AUTH_DOMAIN" "$GOOGLE_CLIENT_ID" <<'PY'
+import json,sys,os
+p,key,proj,dom,gcid=sys.argv[1:]
+d={}
+if os.path.exists(p):
+    try: d=json.load(open(p))
+    except Exception: d={}
+d.update({"api_key":key,"project_id":proj,"auth_domain":dom})
+if gcid: d["google_web_client_id"]=gcid
+json.dump(d, open(p,"w"), indent=2)
+print("wrote", p, "keys:", sorted(d))
 PY
 echo "DONE: project=$PROJECT"

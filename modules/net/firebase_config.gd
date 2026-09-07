@@ -18,3 +18,8 @@ static func load_config() -> Dictionary:
 
 static func api_key() -> String:
 	return str(load_config().get("api_key", ""))
+
+## Google 登录用的 Web client ID（Android Credential Manager 的 serverClientId；iOS 走 Apple 为主）。
+## 由 Firebase 开启 Google 提供方时自动生成；client secret 只存在 Firebase 侧，绝不进客户端。
+static func google_web_client_id() -> String:
+	return str(load_config().get("google_web_client_id", ""))

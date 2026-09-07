@@ -153,3 +153,20 @@ func test_config_prefers_user_override_then_res_file() -> void:
 		var back := FileAccess.open(FirebaseConfig.USER_PATH, FileAccess.WRITE)
 		back.store_string(real_text)
 		back.close()
+
+func test_config_exposes_google_web_client_id_and_never_a_secret() -> void:
+	var had_real := FileAccess.file_exists(FirebaseConfig.USER_PATH)
+	var real_text := FileAccess.get_file_as_string(FirebaseConfig.USER_PATH) if had_real else ""
+	var f := FileAccess.open(FirebaseConfig.USER_PATH, FileAccess.WRITE)
+	f.store_string(JSON.stringify({"api_key": "k", "google_web_client_id": "123-abc.apps.googleusercontent.com"}))
+	f.close()
+	assert_str(FirebaseConfig.google_web_client_id()).is_equal("123-abc.apps.googleusercontent.com")
+	# 模板里不得出现 client secret 字段：secret 只存在 Firebase 侧
+	var example := FileAccess.get_file_as_string("res://config/firebase.example.json")
+	assert_bool(example.contains("client_secret")).is_false()
+	if had_real:
+		var back := FileAccess.open(FirebaseConfig.USER_PATH, FileAccess.WRITE)
+		back.store_string(real_text)
+		back.close()
+	else:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(FirebaseConfig.USER_PATH))

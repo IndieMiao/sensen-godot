@@ -1,5 +1,6 @@
 {
-  "api_key": "<Firebase Web API key, from Firebase console > Project settings > General>",
+  "api_key": "<Firebase Web API key: Project settings > General > Web API key>",
   "project_id": "<firebase project id>",
-  "auth_domain": "<project>.firebaseapp.com"
+  "auth_domain": "<project>.firebaseapp.com",
+  "google_web_client_id": "<OAuth Web client ID auto-created when enabling Google sign-in; Android Credential Manager serverClientId. Never put the client secret here>"
 }
