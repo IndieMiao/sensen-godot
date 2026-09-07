@@ -232,6 +232,28 @@ UNSIGNED-PAYLOAD），服务端不经手图片流量。key 形如 `u/<user_id>/<
 - **管理队列**（`ADMIN_USER_IDS`）：`GET /v1/admin/reports`、`POST /v1/admin/reports/:id/resolve {action: dismiss|remove_content|ban_user}`、
   `GET /v1/admin/review`、`POST /v1/admin/review/:type/:id {decision: approve|hide}`。gensen_admin 工单页后续套在这组接口上。
 
+## IM（D3，自建）
+
+消息落 PostgreSQL（D0「统一 Node + 现有 PG」，不引 Mongo）。每个会话有自己的 `seq`；每个用户有一条
+**inbox 事件流**（用户级单调 `seq`），会话里的每条消息扇出成每个成员 inbox 里的一条事件。客户端只记
+一个 `last_seq`：在线时 WS 推事件（下一步），断线回来 `GET /v1/im/sync?since=last_seq` 补拉。
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| POST | `/v1/im/dm` | `{user_id}` 找或建单聊；自己 400、拉黑 403 |
+| POST | `/v1/im/groups` | `{title, member_ids}`（≤50）；成员须存在且未互相拉黑 |
+| POST / DELETE | `/v1/im/groups/:id/members` · `…/members/me` | 拉人 / 退群 |
+| GET | `/v1/im/conversations` | 我的会话，按最近消息倒序，带 `unread`、`peer`（单聊对方） |
+| GET | `/v1/im/conversations/:id/messages?before_seq&limit` | 历史，seq 倒序 |
+| POST | `/v1/im/conversations/:id/messages` | `{client_id, kind: text|image, text?, image?}`；同 client_id 重放 200 |
+| POST | `/v1/im/conversations/:id/read` | `{seq}` 已读；单聊推 `read` 事件给对方 |
+| DELETE | `/v1/im/messages/:id` | 发送者撤回（软删，推 `message_deleted`） |
+| GET | `/v1/im/sync?since&limit` | inbox 事件（`message` / `read` / `conversation_created` / `members_added` / `member_left` / `message_deleted`）+ `latest_seq`；事件的 `seq` 是用户级序号，消息在会话里的序号叫 `message_seq` |
+
+陌生人规则（Follow Feature Requirements §3.3）：双方都没关注对方时，先开口的人只能发一条直到对方回复
+（403 `GREETING_LIMIT`）；拉黑双向：不能建单聊也不能发（403 `BLOCKED`）。文字过前置审核（D6）。
+不是成员的会话一律 404。
+
 ## 测试分层
 
 | 目录 | 内容 |

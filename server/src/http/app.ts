@@ -32,6 +32,8 @@ import { canSeePost, commentView, postView, validateComment, validatePost, type 
 import { ownsKey, presignUpload, validateUploadRequest, type S3Config } from './uploads.js';
 import { ADMIN_ACTIONS, NullModerator, REPORT_AUTO_HIDE, decide, reportView, validateReport,
   type ModerationStore, type TextModerator } from './moderation.js';
+import { HISTORY_LIMIT_MAX, SYNC_LIMIT_MAX, conversationView, greetingBlocked, messageView, uniqueIds, validateGroup, validateMessage,
+  type ConversationRow, type ImStore, type LiveHub, type PeerCard, type UserEvent } from './im.js';
 
 export interface AppDeps {
   store: Store;
@@ -62,6 +64,10 @@ export interface AppDeps {
   textModerator?: TextModerator;
   /** 能看 /v1/admin/* 的自有 user id。 */
   adminUserIds?: Set<string>;
+  /** D3 IM；需要 social 判关系。缺省时相关路由 503 IM_NOT_CONFIGURED。 */
+  im?: ImStore;
+  /** 在线推送落点（WS 网关）；缺省不推，客户端靠 sync 补拉。 */
+  liveHub?: LiveHub;
 }
 
 interface Regions {
@@ -783,8 +789,170 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return reply.send({ ok: true, status, server_time: deps.now() });
   });
 
+  // —— D3 IM：会话 / 消息 / 已读 / 增量同步 ——
+  const imGuard = async (req: FastifyRequest, reply: FastifyReply): Promise<UserRow | null> => {
+    if (!deps.im || !deps.social) { await reply.code(503).send({ code: 'IM_NOT_CONFIGURED', server_time: deps.now() }); return null; }
+    const c = await currentUser(req);
+    if ('user' in c) return c.user;
+    await reply.code(c.status).send(c.body);
+    return null;
+  };
+  const publish = (events: UserEvent[]) => { if (events.length) deps.liveHub?.publish(events); };
+  const peerCardsOf = async (ids: string[]): Promise<Map<string, PeerCard>> => {
+    const profiles = await deps.social!.profiles([...new Set(ids)]);
+    const out = new Map<string, PeerCard>();
+    for (const id of ids) { const p = profiles.get(id); out.set(id, { user_id: id, display_name: p?.display_name ?? '', handle: p?.handle ?? null, avatar: p?.avatar ?? null }); }
+    return out;
+  };
+  /** 会话须存在且我是成员；否则一律 404（不暴露别人会话的存在）。 */
+  const myConversation = async (reply: FastifyReply, me: UserRow, id: string): Promise<ConversationRow | null> => {
+    const c = await deps.im!.conversation(id);
+    if (c && await deps.im!.isMember(c.id, me.id)) return c;
+    await reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    return null;
+  };
+  const conversationOut = async (me: UserRow, c: ConversationRow) => {
+    const members = await deps.im!.members(c.id);
+    const mine = members.find(m => m.user_id === me.id)!;
+    const peerId = c.kind === 'dm' ? members.find(m => m.user_id !== me.id)?.user_id ?? null : null;
+    const peer = peerId ? (await peerCardsOf([peerId])).get(peerId)! : null;
+    const last = (await deps.im!.messages(c.id, null, 1))[0] ?? null;
+    return conversationView(c, mine, last, peer, members.length);
+  };
+
+  app.post('/v1/im/dm', async (req, reply) => {
+    const me = await imGuard(req, reply); if (!me) return;
+    const other = String((req.body as Record<string, unknown> | undefined)?.user_id ?? '');
+    if (!/^[0-9a-f-]{36}$/i.test(other)) return reply.code(400).send({ code: 'SCHEMA', field: 'user_id', server_time: deps.now() });
+    if (other === me.id) return reply.code(400).send({ code: 'SELF_DM', server_time: deps.now() });
+    if (!(await deps.accounts!.userById(other))) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    if (await blockedEither(me.id, other)) return reply.code(403).send({ code: 'BLOCKED', server_time: deps.now() });
+    const r = await deps.im!.getOrCreateDm(me.id, other, deps.now());
+    return reply.code(r.created ? 201 : 200).send({ ...(await conversationOut(me, r.conversation)), created: r.created, server_time: deps.now() });
+  });
+
+  /** 群成员校验：存在、不是自己、和我没有互相拉黑。 */
+  const checkMembers = async (reply: FastifyReply, me: UserRow, ids: string[]): Promise<boolean> => {
+    for (const id of ids) {
+      if (id === me.id) continue;
+      if (!(await deps.accounts!.userById(id))) { await reply.code(400).send({ code: 'SCHEMA', field: 'member_ids', reason: 'UNKNOWN_USER', user_id: id, server_time: deps.now() }); return false; }
+      if (await blockedEither(me.id, id)) { await reply.code(403).send({ code: 'BLOCKED', user_id: id, server_time: deps.now() }); return false; }
+    }
+    return true;
+  };
+
+  app.post('/v1/im/groups', async (req, reply) => {
+    const me = await imGuard(req, reply); if (!me) return;
+    const v = validateGroup(req.body);
+    if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, reason: v.reason, server_time: deps.now() });
+    if (!(await checkMembers(reply, me, v.memberIds))) return;
+    const c = await deps.im!.createGroup({ id: randomUUID(), title: v.title, creatorId: me.id, memberIds: v.memberIds, now: deps.now() });
+    publish(await deps.im!.pushEvent((await deps.im!.members(c.id)).map(m => m.user_id), 'conversation_created', { conversation_id: c.id, kind: 'group', title: c.title, by: me.id }, deps.now()));
+    return reply.code(201).send({ ...(await conversationOut(me, c)), server_time: deps.now() });
+  });
+
+  app.post('/v1/im/groups/:id/members', async (req, reply) => {
+    const me = await imGuard(req, reply); if (!me) return;
+    const c = await myConversation(reply, me, paramId(req)); if (!c) return;
+    if (c.kind !== 'group') return reply.code(400).send({ code: 'NOT_GROUP', server_time: deps.now() });
+    const ids = uniqueIds((req.body as Record<string, unknown> | undefined)?.user_ids);
+    if (!ids || ids.length === 0) return reply.code(400).send({ code: 'SCHEMA', field: 'user_ids', server_time: deps.now() });
+    if (!(await checkMembers(reply, me, ids))) return;
+    const added = await deps.im!.addMembers(c.id, ids, deps.now());
+    if (added.length) publish(await deps.im!.pushEvent((await deps.im!.members(c.id)).map(m => m.user_id), 'members_added', { conversation_id: c.id, user_ids: added, by: me.id }, deps.now()));
+    return reply.send({ ok: true, added, server_time: deps.now() });
+  });
+
+  app.delete('/v1/im/groups/:id/members/me', async (req, reply) => {
+    const me = await imGuard(req, reply); if (!me) return;
+    const c = await myConversation(reply, me, paramId(req)); if (!c) return;
+    if (c.kind !== 'group') return reply.code(400).send({ code: 'NOT_GROUP', server_time: deps.now() });
+    const removed = await deps.im!.removeMember(c.id, me.id);
+    if (removed) publish(await deps.im!.pushEvent((await deps.im!.members(c.id)).map(m => m.user_id), 'member_left', { conversation_id: c.id, user_id: me.id }, deps.now()));
+    return reply.send({ ok: true, removed, server_time: deps.now() });
+  });
+
+  app.get('/v1/im/conversations', async (req, reply) => {
+    const me = await imGuard(req, reply); if (!me) return;
+    const rows = await deps.im!.conversationsOf(me.id);
+    const items = [];
+    for (const r of rows) {
+      const members = await deps.im!.members(r.conversation.id);
+      const peerId = r.conversation.kind === 'dm' ? members.find(m => m.user_id !== me.id)?.user_id ?? null : null;
+      const peer = peerId ? (await peerCardsOf([peerId])).get(peerId)! : null;
+      items.push(conversationView(r.conversation, r.member, r.last_message, peer, members.length));
+    }
+    return reply.send({ items, server_time: deps.now() });
+  });
+
+  app.get('/v1/im/conversations/:id/messages', async (req, reply) => {
+    const me = await imGuard(req, reply); if (!me) return;
+    const c = await myConversation(reply, me, paramId(req)); if (!c) return;
+    const q = req.query as Record<string, unknown>;
+    const before = Number.isInteger(Number(q.before_seq)) && q.before_seq !== undefined ? Number(q.before_seq) : null;
+    const limit = Math.min(clampLimit(q.limit), HISTORY_LIMIT_MAX);
+    const rows = await deps.im!.messages(c.id, before, limit);
+    return reply.send({ items: rows.map(messageView), server_time: deps.now() });
+  });
+
+  app.post('/v1/im/conversations/:id/messages', async (req, reply) => {
+    const me = await imGuard(req, reply); if (!me) return;
+    const c = await myConversation(reply, me, paramId(req)); if (!c) return;
+    const v = validateMessage(req.body);
+    if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, reason: v.reason, server_time: deps.now() });
+    if (v.kind === 'image' && !ownsKey(String(v.body.key), me.id))
+      return reply.code(400).send({ code: 'SCHEMA', field: 'image', reason: 'NOT_OWNED', server_time: deps.now() });
+    if (c.kind === 'dm') {
+      const peer = (await deps.im!.members(c.id)).find(m => m.user_id !== me.id)?.user_id;
+      if (!peer) return reply.code(410).send({ code: 'PEER_GONE', server_time: deps.now() });
+      if (await blockedEither(me.id, peer)) return reply.code(403).send({ code: 'BLOCKED', server_time: deps.now() });
+      const relation = await deps.social!.relation(me.id, peer);
+      if (greetingBlocked(relation, await deps.im!.dmExchange(c.id, me.id, peer)))
+        return reply.code(403).send({ code: 'GREETING_LIMIT', server_time: deps.now() });
+    }
+    const mod = await moderateText(v.text);
+    if (mod.status === 'rejected') return reply.code(422).send({ code: 'MODERATION_REJECTED', categories: mod.categories, server_time: deps.now() });
+    const r = await deps.im!.appendMessage({ id: randomUUID(), conversationId: c.id, senderId: me.id, clientId: v.clientId, kind: v.kind, body: v.body, now: deps.now(), moderation: mod });
+    publish(r.events);
+    return reply.code(r.created ? 201 : 200).send({ ...messageView(r.message), created: r.created, server_time: deps.now() });
+  });
+
+  /** 已读回执：单聊里推给对方；群聊只记自己的进度。 */
+  app.post('/v1/im/conversations/:id/read', async (req, reply) => {
+    const me = await imGuard(req, reply); if (!me) return;
+    const c = await myConversation(reply, me, paramId(req)); if (!c) return;
+    const seq = Number((req.body as Record<string, unknown> | undefined)?.seq);
+    if (!Number.isInteger(seq) || seq < 0) return reply.code(400).send({ code: 'SCHEMA', field: 'seq', server_time: deps.now() });
+    const r = await deps.im!.markRead(c.id, me.id, seq);
+    if (r.changed && c.kind === 'dm') {
+      const others = (await deps.im!.members(c.id)).filter(m => m.user_id !== me.id).map(m => m.user_id);
+      publish(await deps.im!.pushEvent(others, 'read', { conversation_id: c.id, user_id: me.id, read_seq: r.last_read_seq }, deps.now()));
+    }
+    return reply.send({ ok: true, last_read_seq: r.last_read_seq, server_time: deps.now() });
+  });
+
+  app.delete('/v1/im/messages/:id', async (req, reply) => {
+    const me = await imGuard(req, reply); if (!me) return;
+    const m = await deps.im!.message(paramId(req));
+    if (!m || !(await deps.im!.isMember(m.conversation_id, me.id))) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    if (m.sender_id !== me.id) return reply.code(403).send({ code: 'FORBIDDEN', server_time: deps.now() });
+    const deleted = await deps.im!.deleteMessage(m.id, deps.now());
+    if (deleted) publish(await deps.im!.pushEvent((await deps.im!.members(m.conversation_id)).map(x => x.user_id), 'message_deleted', { conversation_id: m.conversation_id, message_id: m.id, message_seq: m.seq }, deps.now()));
+    return reply.send({ ok: true, deleted, server_time: deps.now() });
+  });
+
+  /** 增量同步：since 之后的 inbox 事件；latest_seq 让客户端知道有没有拉完。 */
+  app.get('/v1/im/sync', async (req, reply) => {
+    const me = await imGuard(req, reply); if (!me) return;
+    const q = req.query as Record<string, unknown>;
+    const since = Number.isInteger(Number(q.since)) && q.since !== undefined ? Math.max(0, Number(q.since)) : 0;
+    const limit = Math.min(Number.isInteger(Number(q.limit)) && Number(q.limit) > 0 ? Number(q.limit) : SYNC_LIMIT_MAX, SYNC_LIMIT_MAX);
+    const [events, latest] = await Promise.all([deps.im!.eventsSince(me.id, since, limit), deps.im!.latestSeq(me.id)]);
+    return reply.send({ events: events.map(e => ({ seq: e.seq, type: e.type, ...e.payload, event_at: e.created_at })), latest_seq: latest, server_time: deps.now() });
+  });
+
   app.get('/v1/healthz', async (_req, reply) => reply.send({
-    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), feed: Boolean(deps.feed), uploads: Boolean(deps.uploads), moderation: Boolean(deps.moderation), text_moderator: Boolean(deps.textModerator), git_sha: deps.gitSha ?? 'dev',
+    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), feed: Boolean(deps.feed), uploads: Boolean(deps.uploads), moderation: Boolean(deps.moderation), text_moderator: Boolean(deps.textModerator), im: Boolean(deps.im), git_sha: deps.gitSha ?? 'dev',
     content_version: deps.contentVersion, domain_version: DOMAIN_VERSION,
     server_time: deps.now(),
   }));

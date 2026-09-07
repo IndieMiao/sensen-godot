@@ -225,3 +225,57 @@ CREATE TABLE IF NOT EXISTS account_bans (
   banned_by   uuid,
   created_at  bigint NOT NULL
 );
+
+-- D3 IM：会话（单聊 / 群聊）、成员、消息（会话内 seq）、每用户 inbox 事件流（用户级 seq，增量同步用）。
+CREATE TABLE IF NOT EXISTS conversations (
+  id               uuid PRIMARY KEY,
+  kind             text NOT NULL,
+  title            text,
+  created_by       uuid NOT NULL,
+  created_at       bigint NOT NULL,
+  last_seq         bigint NOT NULL DEFAULT 0,
+  last_message_at  bigint
+);
+CREATE TABLE IF NOT EXISTS conversation_members (
+  conversation_id  uuid NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+  user_id          uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  joined_at        bigint NOT NULL,
+  last_read_seq    bigint NOT NULL DEFAULT 0,
+  PRIMARY KEY (conversation_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS conversation_members_user_idx ON conversation_members(user_id);
+-- 一对用户只有一个单聊：(lo, hi) 是并发建会话的裁判。
+CREATE TABLE IF NOT EXISTS dm_pairs (
+  user_lo          uuid NOT NULL,
+  user_hi          uuid NOT NULL,
+  conversation_id  uuid NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+  PRIMARY KEY (user_lo, user_hi)
+);
+-- sender_id 不做外键：发送者删号后消息内容清空但行留着，对方的会话不会突然缺一段。
+CREATE TABLE IF NOT EXISTS messages (
+  id                     uuid PRIMARY KEY,
+  conversation_id        uuid NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+  seq                    bigint NOT NULL,
+  sender_id              uuid NOT NULL,
+  client_id              text NOT NULL,
+  kind                   text NOT NULL,
+  body                   jsonb NOT NULL,
+  created_at             bigint NOT NULL,
+  deleted_at             bigint,
+  moderation_status      text NOT NULL DEFAULT 'approved',
+  moderation_categories  jsonb NOT NULL DEFAULT '[]'::jsonb,
+  UNIQUE (conversation_id, seq),
+  UNIQUE (conversation_id, sender_id, client_id)
+);
+CREATE TABLE IF NOT EXISTS user_events (
+  user_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  seq         bigint NOT NULL,
+  type        text NOT NULL,
+  payload     jsonb NOT NULL,
+  created_at  bigint NOT NULL,
+  PRIMARY KEY (user_id, seq)
+);
+CREATE TABLE IF NOT EXISTS user_event_seq (
+  user_id   uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  next_seq  bigint NOT NULL DEFAULT 0
+);
