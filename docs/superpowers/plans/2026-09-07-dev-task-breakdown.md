@@ -4,6 +4,7 @@
 - 依据：`docs/superpowers/specs/2026-08-30-overseas-refactor-research.md`（§1 范围、§3 目标架构、§4 选型、§6.1 工作流、§6.3 里程碑、§6.4 MoSCoW）
 - **不依据**：`docs/product/map-farm-life-sim-direction.md` v0.4 与 09-03 农场实施方案——种田玩法在并行分支 `feat/farm-ui-playability` 推进，其任务在 Plane SGODOT 模块「F 街角四季 MVP」，本分支不承接
 - 任务系统：Plane **Sensen Godot（SGODOT）**，模块 A–E 与本文 §3 一致；跨分支模块 R 发布链 / X 工程债 / Z Won't；非开发事务在 Plane **SSLAUNCH**（`../../../sensen-overseas-ops/`）
+- 进度快照：`2026-09-08-remaining-tasks.md`（剩余任务与卡点标注，随 Plane 评论同步）
 - 性质：工程侧 WBS，估算沿用 08-30 文档的人周口径；每条开工时再按仓库 plan 格式写任务单
 
 ---
