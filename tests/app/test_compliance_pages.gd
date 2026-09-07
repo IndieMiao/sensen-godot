@@ -11,11 +11,14 @@ const TODAY := {"year": 2026, "month": 9, "day": 7}
 var nav: NavRecorder
 var fr: FirstRun
 var session: AuthSession
+## D2 服务端删号的假传输：默认一条成功响应；具体用例按需改 responses。
+var account_t: FakeTransport
 
 func before_test() -> void:
 	nav = NavRecorder.new()
 	fr = FirstRun.new()
 	session = AuthSession.new()
+	account_t = FakeTransport.new([{"status": 200, "json": {"ok": true, "deleted": true}}])
 	FirstRun.clear()
 	_clear_auth()
 
@@ -102,6 +105,7 @@ func _settings(t: FakeTransport, api_key := "k") -> Control:
 	var p := (load(AppRoutes.SETTINGS) as PackedScene).instantiate()
 	p.auth = session
 	p.firebase = FirebaseAuth.new(api_key, t.callable())
+	p.account = AccountApi.new(ApiClient.new("https://example.test/v1", account_t.callable()))
 	p.navigate = nav.go
 	add_child(auto_free(p))
 	return p
@@ -127,12 +131,48 @@ func test_delete_account_failure_keeps_session_and_explains() -> void:
 	assert_bool(p.delete_button.disabled).is_false()
 	assert_array(nav.routes).is_empty()
 
+## D2：先服务端级联再 Firebase——服务端要靠还有效的 ID token 认人。
+func test_delete_account_cascades_on_server_before_firebase() -> void:
+	session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	var t := FakeTransport.new([{"status": 200, "json": {}}])
+	var p := _settings(t)
+	assert_bool(await p._delete_account()).is_true()
+	assert_int(account_t.requests.size()).is_equal(1)
+	assert_str(account_t.requests[0].method).is_equal("DELETE")
+	assert_bool(str(account_t.requests[0].url).ends_with("/v1/users/me")).is_true()
+	assert_int(t.requests.size()).is_equal(1)
+	assert_array(nav.routes).is_equal([AppRoutes.LOGIN])
+
+func test_server_delete_failure_blocks_firebase_delete_and_keeps_session() -> void:
+	session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	account_t.responses = [{"error": "timeout"}]
+	var t := FakeTransport.new([{"status": 200, "json": {}}])
+	var p := _settings(t)
+	assert_bool(await p._delete_account()).is_false()
+	assert_int(t.requests.size()).is_equal(0) # 服务端还留着数据时绝不能先删 Firebase 账号
+	assert_bool(session.is_signed_in()).is_true()
+	assert_bool(p.status.text.contains("server")).is_true()
+	assert_bool(p.delete_button.disabled).is_false()
+	assert_array(nav.routes).is_empty()
+
+func test_old_server_or_unconfigured_accounts_do_not_block_delete() -> void:
+	for resp in [{"status": 404, "json": {"message": "Route DELETE:/v1/users/me not found"}}, {"status": 503, "json": {"code": "ACCOUNTS_NOT_CONFIGURED"}}]:
+		before_test()
+		session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+		account_t.responses = [resp]
+		var t := FakeTransport.new([{"status": 200, "json": {}}])
+		var p := _settings(t)
+		assert_bool(await p._delete_account()).override_failure_message(str(resp)).is_true()
+		assert_int(t.requests.size()).is_equal(1)
+		assert_bool(session.is_signed_in()).is_false()
+
 func test_delete_dev_session_skips_firebase() -> void:
 	session.complete_sign_in("dev-local", "dev-token", "", 3600, "dev", "dev@local")
 	var t := FakeTransport.new([])
 	var p := _settings(t, "")
 	assert_bool(await p._delete_account()).is_true()
 	assert_int(t.requests.size()).is_equal(0)
+	assert_int(account_t.requests.size()).is_equal(0)
 	assert_bool(session.is_signed_in()).is_false()
 	assert_array(nav.routes).is_equal([AppRoutes.LOGIN])
 

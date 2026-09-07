@@ -10,6 +10,7 @@ extends AppPage
 
 var auth: AuthSession
 var firebase: FirebaseAuth
+var account: AccountApi
 var navigate: Callable
 
 var email: LineEdit
@@ -83,6 +84,9 @@ func _fb() -> FirebaseAuth:
 func _session() -> AuthSession:
 	return auth if auth != null else Net.auth
 
+func _account() -> AccountApi:
+	return account if account != null else Net.account
+
 func _refresh_enabled() -> void:
 	var fb := _fb()
 	var ready: bool = fb != null and fb.configured() and not busy
@@ -137,6 +141,7 @@ func _password_flow(create: bool) -> void:
 		# 验证邮件发不出去不阻塞进壳；未验证状态由资料页与 UGC 门禁（E1）处理。
 		await _fb().send_verification_email(str(r.id_token))
 	s.complete_sign_in(str(r.user_id), str(r.id_token), str(r.refresh_token), int(r.expires_in_s), "password", str(r.email))
+	await _link_account(s)
 	busy = false
 	status.text = tr("Verification email sent.") if create else ""
 	_go()
@@ -155,6 +160,16 @@ func _on_forgot() -> void:
 	busy = false
 	_refresh_enabled()
 	status.text = tr("Password reset email sent.") if bool(r.get("ok", false)) else FirebaseAuth.describe(str(r.get("code", "")))
+
+## 登录后把 Firebase 身份映射到服务端自有 user id（D2）。失败不阻塞进壳：服务端没部署或
+## 断网时本地功能照常，资料页下次加载再试。Dev 会话没有真 token，不调。
+func _link_account(s: AuthSession) -> void:
+	var api := _account()
+	if api == null or s.provider == "dev":
+		return
+	var r: Dictionary = await api.sign_in()
+	if bool(r.get("ok", false)):
+		s.set_server_user(str(r.get("user_id", "")))
 
 func _on_dev_continue() -> void:
 	_session().complete_sign_in("dev-local", "dev-token", "", 3600, "dev", "dev@local")

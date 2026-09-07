@@ -1,11 +1,12 @@
 extends AppPage
 ## 设置（压栈子页）：语言 / 隐私政策 / 服务条款 / 联系我们 / 删除账号 / 登出。
 ## 政策与条款 OS.shell_open 跳外部浏览器（不做 WebView）；URL 在 LegalLinks，由 SSLAUNCH B2/B3/B6 提供。
-## 删号（R1，Apple 5.1.1(v)）：确认 → Firebase accounts:delete → 本地登出 → 登录页。
-## 服务端级联删除与 Apple token revocation 归 D2 账号服务，接口就位后在 _delete_account 里追加一步。
+## 删号（R1，Apple 5.1.1(v)）：确认 → 服务端级联（D2）→ Firebase accounts:delete → 本地登出 → 登录页。
+## 顺序不能反：服务端要靠还有效的 Firebase ID token 认人。Apple token revocation 在服务端队列里。
 
 var auth: AuthSession
 var firebase: FirebaseAuth
+var account: AccountApi
 var navigate: Callable
 
 var language_button: Button
@@ -62,6 +63,9 @@ func _session() -> AuthSession:
 func _fb() -> FirebaseAuth:
 	return firebase if firebase != null else Net.firebase
 
+func _account() -> AccountApi:
+	return account if account != null else Net.account
+
 func _link(text: String, url: String, node_name: String) -> void:
 	var b := GameUi.button("book-open", text, url if not url.is_empty() else "URL pending (SSLAUNCH B2/B3)")
 	b.name = node_name
@@ -97,6 +101,10 @@ func _delete_account() -> bool:
 	status.text = tr("Deleting account…")
 	var ok := true
 	if s.provider != "dev":
+		if not await _delete_on_server():
+			busy = false
+			delete_button.disabled = false
+			return false
 		var fb := _fb()
 		var r: Dictionary = await fb.delete_account(s.access_token()) if fb != null else {"ok": false, "code": "NOT_CONFIGURED"}
 		ok = bool(r.get("ok", false))
@@ -107,10 +115,22 @@ func _delete_account() -> bool:
 			busy = false
 			delete_button.disabled = false
 			return false
-	# TODO(D2)：这里追加服务端级联删除（资料 / IM / feed / 位置 / 关注 / 推送 token）与 Apple token revocation。
 	busy = false
 	_finish_sign_out()
 	return true
+
+## 服务端级联删除。放行的情况：删成功；老服务器没有这条路由（404）；服务端没开账号服务
+## （ACCOUNTS_NOT_CONFIGURED）——这两种都意味着服务端本来就没有这个人的数据。其他失败
+## （断网、DELETE_FAILED、401）一律停下让用户重试：不能在服务端还留着数据时告诉用户「已删除」。
+func _delete_on_server() -> bool:
+	var api := _account()
+	if api == null:
+		return true
+	var r: Dictionary = await api.delete_account()
+	if bool(r.get("ok", false)) or int(r.get("status", 0)) == 404 or str(r.get("code", "")) == "ACCOUNTS_NOT_CONFIGURED":
+		return true
+	status.text = tr("Couldn't delete your account on the server. Check your connection and try again.")
+	return false
 
 func _on_sign_out() -> void:
 	_finish_sign_out()

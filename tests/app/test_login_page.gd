@@ -11,10 +11,13 @@ class NavRecorder extends RefCounted:
 
 var nav: NavRecorder
 var session: AuthSession
+## D2 账号服务的假传输：默认没有脚本化响应（等于服务端不可达），单测里不能碰真网络。
+var account_t: FakeTransport
 
 func before_test() -> void:
 	nav = NavRecorder.new()
 	session = AuthSession.new()
+	account_t = FakeTransport.new([])
 	_cleanup()
 
 func after_test() -> void:
@@ -28,6 +31,7 @@ func _page(t: FakeTransport, api_key := "k") -> Control:
 	var p := (load(AppRoutes.LOGIN) as PackedScene).instantiate()
 	p.auth = session
 	p.firebase = FirebaseAuth.new(api_key, t.callable())
+	p.account = AccountApi.new(ApiClient.new("https://example.test/v1", account_t.callable()))
 	p.navigate = nav.go
 	add_child(auto_free(p))
 	return p
@@ -144,4 +148,36 @@ func test_dev_continue_creates_local_session_in_debug_builds() -> void:
 	p._on_dev_continue()
 	assert_bool(session.is_signed_in()).is_true()
 	assert_str(session.provider).is_equal("dev")
+	assert_int(nav.calls).is_equal(1)
+
+## D2：登录成功后把 Firebase 身份映射到服务端自有 user id；服务端不可达不阻塞进壳。
+func test_sign_in_links_server_account_and_stores_server_user_id() -> void:
+	account_t.responses = [{"status": 201, "json": {"user_id": "srv-1", "created": true}}]
+	var p := _page(FakeTransport.new([{"status": 200, "json": _session_json()}]))
+	p.email.text = "a@b.co"
+	p.password.text = "secret1"
+	await p._on_sign_in()
+	assert_str(session.server_user_id).is_equal("srv-1")
+	assert_int(account_t.requests.size()).is_equal(1)
+	assert_bool(str(account_t.requests[0].url).ends_with("/v1/auth/firebase")).is_true()
+	assert_int(nav.calls).is_equal(1)
+
+func test_sign_in_still_enters_shell_when_account_server_is_unreachable() -> void:
+	account_t.responses = [{"error": "timeout"}]
+	var p := _page(FakeTransport.new([{"status": 200, "json": _session_json()}]))
+	p.email.text = "a@b.co"
+	p.password.text = "secret1"
+	await p._on_sign_in()
+	assert_bool(session.is_signed_in()).is_true()
+	assert_str(session.server_user_id).is_empty()
+	assert_int(nav.calls).is_equal(1)
+	assert_bool(p.busy).is_false()
+
+func test_dev_continue_never_calls_the_account_server() -> void:
+	if not OS.is_debug_build():
+		return
+	var p := _page(FakeTransport.new([]), "")
+	p._on_dev_continue()
+	await get_tree().process_frame
+	assert_int(account_t.requests.size()).is_equal(0)
 	assert_int(nav.calls).is_equal(1)

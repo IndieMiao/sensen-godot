@@ -17,6 +17,7 @@ const SERVER_OVERRIDE := "user://server.txt"
 var client: ApiClient
 var auth: AuthSession
 var firebase: FirebaseAuth
+var account: AccountApi
 var ws: WsClient
 var session: FarmSession
 var booting := false
@@ -31,6 +32,7 @@ func _ready() -> void:
 	client = ApiClient.new(base_url(), ApiClient.make_http_transport(self))
 	bind_auth(client)
 	session = FarmSession.new(client)
+	account = AccountApi.new(client)
 	ws = WsClient.new()
 	ws.name = "Ws"
 	ws.token_provider = auth.access_token
@@ -73,6 +75,7 @@ func use_transport(t: Callable, p_base := "https://example.test/v1") -> void:
 	client = ApiClient.new(p_base, t)
 	bind_auth(client)
 	session = FarmSession.new(client)
+	account = AccountApi.new(client)
 	booted_once = false
 
 ## 农场分支：登录 + 取回已有农场（404 是正常的：新玩家还没建场）。返回是否登录成功。

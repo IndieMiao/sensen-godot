@@ -17,6 +17,8 @@ const REFRESH_SKEW_MS := 60_000
 
 var state := State.SIGNED_OUT
 var user_id := ""
+## D2 账号服务给的自有 user id；登录后 AccountApi.sign_in() 回填，服务端不可达时为空。
+var server_user_id := ""
 var email := ""
 var id_token := ""
 var refresh_token := ""
@@ -49,6 +51,7 @@ func begin_sign_in() -> void:
 
 func complete_sign_in(p_user_id: String, p_id_token: String, p_refresh_token: String, expires_in_s: int, p_provider: String, p_email := "") -> void:
 	user_id = p_user_id
+	server_user_id = ""
 	email = p_email
 	id_token = p_id_token
 	refresh_token = p_refresh_token
@@ -58,12 +61,18 @@ func complete_sign_in(p_user_id: String, p_id_token: String, p_refresh_token: St
 	persist()
 	_set_state(State.SIGNED_IN)
 
+## AccountApi.sign_in() 成功后回填并落盘。
+func set_server_user(id: String) -> void:
+	server_user_id = id
+	persist()
+
 func fail_sign_in(error: String) -> void:
 	last_error = error
 	_set_state(State.SIGNED_OUT)
 
 func sign_out() -> void:
 	user_id = ""
+	server_user_id = ""
 	email = ""
 	id_token = ""
 	refresh_token = ""
@@ -121,6 +130,7 @@ func restore() -> bool:
 	if tok.is_empty():
 		return false
 	user_id = str(d.get("user_id", ""))
+	server_user_id = str(d.get("server_user_id", ""))
 	email = str(d.get("email", ""))
 	id_token = tok
 	refresh_token = str(d.get("refresh_token", ""))
@@ -135,6 +145,7 @@ func persist() -> void:
 		return
 	f.store_string(JSON.stringify({
 		"user_id": user_id,
+		"server_user_id": server_user_id,
 		"email": email,
 		"id_token": id_token,
 		"refresh_token": refresh_token,

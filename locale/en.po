@@ -34,6 +34,9 @@ msgstr ""
 msgid "Continue with Google"
 msgstr ""
 
+msgid "Couldn't delete your account on the server. Check your connection and try again."
+msgstr ""
+
 msgid "Create account"
 msgstr ""
 

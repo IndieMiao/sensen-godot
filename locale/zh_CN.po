@@ -216,3 +216,6 @@ msgstr "已暂停"
 
 msgid "reconnecting"
 msgstr "重连中"
+
+msgid "Couldn't delete your account on the server. Check your connection and try again."
+msgstr "服务器上的账号删除失败，请检查网络后重试。"

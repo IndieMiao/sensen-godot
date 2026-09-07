@@ -125,3 +125,18 @@ func test_refresh_without_refresher_or_session_is_false() -> void:
 	s.complete_sign_in("u1", "id-1", "rt-1", 3600, "password")
 	assert_bool(await s.refresh()).is_false()
 	assert_bool(s.is_signed_in()).is_true()
+
+## D2：服务端自有 user id 随会话落盘；换人登录或登出都清掉，不能把上一个人的 id 带给下一个人。
+func test_server_user_id_persists_and_is_cleared_with_the_session() -> void:
+	var s := _session()
+	s.complete_sign_in("uid-1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	assert_str(s.server_user_id).is_empty()
+	s.set_server_user("srv-1")
+	var again := _session()
+	assert_bool(again.restore()).is_true()
+	assert_str(again.server_user_id).is_equal("srv-1")
+	again.complete_sign_in("uid-2", "id-2", "rt-2", 3600, "password", "b@b.co")
+	assert_str(again.server_user_id).is_empty()
+	again.set_server_user("srv-2")
+	again.sign_out()
+	assert_str(again.server_user_id).is_empty()

@@ -28,7 +28,7 @@ msgstr ""
 msgid "Clear log"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:29
+#: res://scenes/app/pages/settings_page.gd:30
 msgid "Contact us"
 msgstr ""
 
@@ -37,43 +37,47 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
-#: res://scenes/app/login_page.gd:60
+#: res://scenes/app/login_page.gd:61
 msgid "Continue with Apple"
 msgstr ""
 
-#: res://scenes/app/login_page.gd:64
+#: res://scenes/app/login_page.gd:65
 msgid "Continue with Google"
 msgstr ""
 
-#: res://scenes/app/login_page.gd:50
+#: res://scenes/app/pages/settings_page.gd:132
+msgid "Couldn't delete your account on the server. Check your connection and try again."
+msgstr ""
+
+#: res://scenes/app/login_page.gd:51
 msgid "Create account"
 msgstr ""
 
-#: res://scenes/app/login_page.gd:121
+#: res://scenes/app/login_page.gd:125
 msgid "Creating account…"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:55
+#: res://scenes/app/pages/settings_page.gd:56
 msgid "Delete"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:34
+#: res://scenes/app/pages/settings_page.gd:35
 msgid "Delete account"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:53
+#: res://scenes/app/pages/settings_page.gd:54
 msgid "Delete account?"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:97
+#: res://scenes/app/pages/settings_page.gd:101
 msgid "Deleting account…"
 msgstr ""
 
-#: res://scenes/app/login_page.gd:74
+#: res://scenes/app/login_page.gd:75
 msgid "Dev: continue offline"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:47
+#: res://scenes/app/pages/settings_page.gd:48
 msgid "Dev: lifecycle probe"
 msgstr ""
 
@@ -82,7 +86,7 @@ msgstr ""
 msgid "Dressing room"
 msgstr ""
 
-#: res://scenes/app/login_page.gd:32
+#: res://scenes/app/login_page.gd:33
 msgid "Email"
 msgstr ""
 
@@ -111,7 +115,7 @@ msgstr ""
 msgid "Feed lands in B3: timeline, photo composer, likes, comments and report."
 msgstr ""
 
-#: res://scenes/app/login_page.gd:55
+#: res://scenes/app/login_page.gd:56
 msgid "Forgot password"
 msgstr ""
 
@@ -119,7 +123,7 @@ msgstr ""
 msgid "I have read and agree to the Terms of Service and Privacy Policy."
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:73
+#: res://scenes/app/pages/settings_page.gd:77
 msgid "Language: %s"
 msgstr ""
 
@@ -150,7 +154,7 @@ msgstr ""
 msgid "Not signed in"
 msgstr ""
 
-#: res://scenes/app/login_page.gd:38
+#: res://scenes/app/login_page.gd:39
 msgid "Password (6+ characters)"
 msgstr ""
 
@@ -158,7 +162,7 @@ msgstr ""
 msgid "Password must be at least 6 characters."
 msgstr ""
 
-#: res://scenes/app/login_page.gd:157
+#: res://scenes/app/login_page.gd:162
 msgid "Password reset email sent."
 msgstr ""
 
@@ -166,12 +170,12 @@ msgstr ""
 msgid "Please select your full date of birth."
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:106
+#: res://scenes/app/pages/settings_page.gd:114
 msgid "Please sign in again, then delete your account."
 msgstr ""
 
 #: res://scenes/app/consent_page.gd:20
-#: res://scenes/app/pages/settings_page.gd:27
+#: res://scenes/app/pages/settings_page.gd:28
 msgid "Privacy policy"
 msgstr ""
 
@@ -188,16 +192,16 @@ msgid "Resend verification email"
 msgstr ""
 
 #: res://scenes/app/pages/profile_page.gd:40
-#: res://scenes/app/pages/settings_page.gd:18
+#: res://scenes/app/pages/settings_page.gd:19
 msgid "Settings"
 msgstr ""
 
-#: res://scenes/app/login_page.gd:27
-#: res://scenes/app/login_page.gd:43
+#: res://scenes/app/login_page.gd:28
+#: res://scenes/app/login_page.gd:44
 msgid "Sign in"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:38
+#: res://scenes/app/pages/settings_page.gd:39
 msgid "Sign out"
 msgstr ""
 
@@ -205,7 +209,7 @@ msgstr ""
 msgid "Sign-in failed (%s)."
 msgstr ""
 
-#: res://scenes/app/login_page.gd:93
+#: res://scenes/app/login_page.gd:97
 msgid "Sign-in is not configured yet (config/firebase.json)."
 msgstr ""
 
@@ -217,7 +221,7 @@ msgstr ""
 msgid "Signed in as %s (%s)"
 msgstr ""
 
-#: res://scenes/app/login_page.gd:121
+#: res://scenes/app/login_page.gd:125
 msgid "Signing in…"
 msgstr ""
 
@@ -238,7 +242,7 @@ msgid "Tell us your date of birth to get started."
 msgstr ""
 
 #: res://scenes/app/consent_page.gd:26
-#: res://scenes/app/pages/settings_page.gd:28
+#: res://scenes/app/pages/settings_page.gd:29
 msgid "Terms of service"
 msgstr ""
 
@@ -250,7 +254,7 @@ msgstr ""
 msgid "This community has zero tolerance for abusive content or behavior. Content you post can be reported and removed, and repeat offenders are banned."
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:54
+#: res://scenes/app/pages/settings_page.gd:55
 msgid "This permanently deletes your account and data. This cannot be undone."
 msgstr ""
 
@@ -262,7 +266,7 @@ msgstr ""
 msgid "Too many attempts. Try again later."
 msgstr ""
 
-#: res://scenes/app/login_page.gd:141
+#: res://scenes/app/login_page.gd:146
 #: res://scenes/app/pages/profile_page.gd:86
 msgid "Verification email sent."
 msgstr ""
