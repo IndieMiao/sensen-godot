@@ -9,10 +9,14 @@ extends Node
 ## 会话文件——否则开发机上一次「Dev 登录」留下的会话会漏进几百条单测里。
 
 signal booted(logged_in: bool)
+## 一条 IM inbox 事件（type / seq / …，见 server/README.md「IM」）；WS 实时推的和补拉回来的都从这里出。
+signal im_event(event: Dictionary)
 
 const DEFAULT_BASE := "https://farm.sensenjoy.cn/v1"
 ## 放一行 URL 就能把客户端指到别的服务器（局域网调试用），不用改代码重打包。
 const SERVER_OVERRIDE := "user://server.txt"
+## IM 增量同步游标（用户级 seq）落盘：重启后从上次位置补拉，不漏事件。
+const IM_SYNC_PATH := "user://im_sync.json"
 
 var client: ApiClient
 var auth: AuthSession
@@ -21,6 +25,10 @@ var account: AccountApi
 var profile: ProfileApi
 var feed: FeedApi
 var safety: SafetyApi
+var im: ImApi
+## 最后一条已交付给上层的 IM 事件 seq；-1 = 还没同步过。
+var im_last_seq := -1
+var im_syncing := false
 var ws: WsClient
 var session: FarmSession
 var booting := false
@@ -39,9 +47,14 @@ func _ready() -> void:
 	profile = ProfileApi.new(client)
 	feed = FeedApi.new(client)
 	safety = SafetyApi.new(client)
+	im = ImApi.new(client)
+	if not is_test_process():
+		im_last_seq = load_im_seq()
 	ws = WsClient.new()
 	ws.name = "Ws"
 	ws.token_provider = auth.access_token
+	ws.connected.connect(_on_ws_connected)
+	ws.message_received.connect(_on_ws_message)
 	add_child(ws)
 	if not is_test_process() and farm_boot_requested(OS.get_cmdline_user_args()):
 		call_deferred("boot")
@@ -85,6 +98,7 @@ func use_transport(t: Callable, p_base := "https://example.test/v1") -> void:
 	profile = ProfileApi.new(client)
 	feed = FeedApi.new(client)
 	safety = SafetyApi.new(client)
+	im = ImApi.new(client)
 	booted_once = false
 
 ## 农场分支：登录 + 取回已有农场（404 是正常的：新玩家还没建场）。返回是否登录成功。
@@ -117,3 +131,84 @@ func snapshot(farm_id: String) -> Dictionary:
 	if not r.is_success():
 		return {"ok": false, "snapshot": {}, "status": r.status, "error": r.error if not r.ok else str(r.json.get("code", r.status))}
 	return {"ok": true, "snapshot": r.json, "status": r.status, "error": ""}
+
+# —— D3 IM 在线通道与增量同步 ——
+
+## REST 基址 → WS 地址：https://host/v1 → wss://host/v1/im/ws。
+static func ws_url_for(base: String) -> String:
+	var b := base.trim_suffix("/")
+	if b.begins_with("https://"):
+		b = "wss://" + b.trim_prefix("https://")
+	elif b.begins_with("http://"):
+		b = "ws://" + b.trim_prefix("http://")
+	return b + "/im/ws"
+
+## 登录后调用。Dev 会话没有真 token 不连；重复调用只是重开。
+func connect_im() -> void:
+	if auth == null or not auth.is_signed_in() or auth.provider == "dev":
+		return
+	# 用 client 当前的基址而不是 base_url()：测试注入的假传输带自己的基址。
+	ws.open(ws_url_for(client.base_url))
+
+func disconnect_im() -> void:
+	ws.close()
+
+## 每次连上（首连与重连都算）先按落盘的 last_seq 补拉：WsClient 自己的 resync_needed 只在重连时发，
+## 而应用重启后的首连同样可能漏了事件，所以统一挂在 connected 上，不用 resync_needed。
+func _on_ws_connected() -> void:
+	await resync()
+
+func _on_ws_message(msg: Dictionary) -> void:
+	var t := str(msg.get("type", ""))
+	if t.is_empty() or t == "hello" or t == "pong":
+		return
+	_deliver(msg)
+
+## 从 im_last_seq 起拉到 latest_seq 为止。返回交付给上层的事件数；同一时刻只跑一份。
+func resync() -> int:
+	if im_syncing or im == null:
+		return 0
+	im_syncing = true
+	var total := 0
+	var cursor := maxi(im_last_seq, 0)
+	while true:
+		var r: Dictionary = await im.sync(cursor)
+		if not bool(r.get("ok", false)):
+			break
+		var events: Array = r.get("events", []) if r.get("events") is Array else []
+		for e in events:
+			_deliver(e)
+			cursor = maxi(cursor, int(e.get("seq", 0)))
+			total += 1
+		if events.is_empty() or cursor >= int(r.get("latest_seq", 0)):
+			break
+	im_syncing = false
+	return total
+
+## 交付给上层并推进游标；乱序 / 重复的旧事件丢掉（WS 推送与补拉可能重叠）。
+func _deliver(e: Dictionary) -> void:
+	var seq := int(e.get("seq", 0))
+	if seq > 0:
+		if seq <= im_last_seq:
+			return
+		im_last_seq = seq
+		ws.last_seq = maxi(ws.last_seq, seq)
+		if not is_test_process():
+			save_im_seq()
+	im_event.emit(e)
+
+func save_im_seq() -> void:
+	var f := FileAccess.open(IM_SYNC_PATH, FileAccess.WRITE)
+	if f != null:
+		f.store_string(JSON.stringify({"last_seq": im_last_seq, "user_id": auth.user_id if auth != null else ""}))
+
+## 换了账号就不能沿用上一个人的游标。
+func load_im_seq() -> int:
+	if not FileAccess.file_exists(IM_SYNC_PATH):
+		return -1
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(IM_SYNC_PATH))
+	if not (parsed is Dictionary):
+		return -1
+	if auth != null and str(parsed.get("user_id", "")) != auth.user_id:
+		return -1
+	return int(parsed.get("last_seq", -1))

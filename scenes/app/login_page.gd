@@ -170,6 +170,8 @@ func _link_account(s: AuthSession) -> void:
 	var r: Dictionary = await api.sign_in()
 	if bool(r.get("ok", false)):
 		s.set_server_user(str(r.get("user_id", "")))
+		if Net != null and s == Net.auth:
+			Net.connect_im()
 
 func _on_dev_continue() -> void:
 	_session().complete_sign_in("dev-local", "dev-token", "", 3600, "dev", "dev@local")
