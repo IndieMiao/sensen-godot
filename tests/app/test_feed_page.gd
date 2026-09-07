@@ -3,10 +3,12 @@ extends GdUnitTestSuite
 
 var session: AuthSession
 var feed_t: FakeTransport
+var safety_t: FakeTransport
 
 func before_test() -> void:
 	session = AuthSession.new()
 	feed_t = FakeTransport.new([])
+	safety_t = FakeTransport.new([])
 	_clear_auth()
 
 func after_test() -> void:
@@ -20,11 +22,12 @@ func _page() -> Control:
 	var p := (load(AppRoutes.tab_scene("feed")) as PackedScene).instantiate()
 	p.auth = session
 	p.feed = FeedApi.new(ApiClient.new("https://example.test/v1", feed_t.callable()))
+	p.safety = SafetyApi.new(ApiClient.new("https://example.test/v1", safety_t.callable()))
 	add_child(auto_free(p))
 	return p
 
-func _post(id: String, text: String, liked := false, likes := 0) -> Dictionary:
-	return {"id": id, "author": {"user_id": "u-a", "display_name": "Ali", "handle": "ali", "avatar": null},
+func _post(id: String, text: String, liked := false, likes := 0, author := "u-a") -> Dictionary:
+	return {"id": id, "author": {"user_id": author, "display_name": "Ali", "handle": "ali", "avatar": null},
 		"text": text, "images": [], "like_count": likes, "comment_count": 2, "liked": liked, "created_at": 0}
 
 func test_refresh_renders_timeline_cards_and_more_button() -> void:
@@ -109,3 +112,44 @@ func test_age_text_buckets() -> void:
 	assert_str(p.age_text(now, now - 3 * 3_600_000)).is_equal("3h ago")
 	assert_str(p.age_text(now, now - 2 * 86_400_000)).is_equal("2d ago")
 	assert_str(p.age_text(now, now + 99_000)).is_equal("just now")
+
+## E1：非本人的卡片有举报 / 拉黑；本人的没有。举报走原因菜单；拉黑确认后本地立刻撤掉该作者的卡片。
+func test_report_and_block_entries_only_on_other_peoples_posts() -> void:
+	session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	session.set_server_user("me-1")
+	feed_t.responses = [{"status": 200, "json": {"items": [_post("p1", "theirs"), _post("p2", "mine", false, 0, "me-1")], "next_cursor": null}}]
+	var p := _page()
+	await p.refresh()
+	assert_bool(p.list.get_child(0).find_child("Report", true, false) != null).is_true()
+	assert_bool(p.list.get_child(0).find_child("Block", true, false) != null).is_true()
+	assert_bool(p.list.get_child(1).find_child("Report", true, false) == null).is_true()
+	assert_bool(p.list.get_child(1).find_child("Block", true, false) == null).is_true()
+	assert_int(p.report_menu.item_count).is_equal(8)
+	assert_str(p.report_menu.get_item_text(6)).is_equal("Child safety")
+
+func test_report_sends_reason_from_menu_and_thanks() -> void:
+	session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	feed_t.responses = [{"status": 200, "json": {"items": [_post("p1", "x")], "next_cursor": null}}]
+	safety_t.responses = [{"status": 201, "json": {"id": "r1", "created": true, "auto_hidden": false}}, {"error": "timeout"}]
+	var p := _page()
+	await p.refresh()
+	p.open_report_menu("p1", "u-a")
+	await p._on_report_reason(1)
+	assert_that(safety_t.requests[0].body).is_equal({"target_type": "post", "target_id": "p1", "reason": "harassment"})
+	assert_bool(p.status.text.contains("received your report")).is_true()
+	assert_bool(await p.report_post("p1", "spam")).is_false()
+	assert_bool(p.status.text.contains("connection")).is_true()
+
+func test_block_removes_authors_cards_locally() -> void:
+	session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	feed_t.responses = [{"status": 200, "json": {"items": [_post("p1", "a1"), _post("p2", "b1", false, 0, "u-b"), _post("p3", "a2")], "next_cursor": null}}]
+	safety_t.responses = [{"status": 200, "json": {"ok": true, "created": true}}]
+	var p := _page()
+	await p.refresh()
+	p.open_block_confirm("p1", "u-a")
+	await p._on_block_confirmed()
+	assert_str(safety_t.requests[0].method).is_equal("PUT")
+	assert_bool(str(safety_t.requests[0].url).ends_with("/v1/users/u-a/block")).is_true()
+	assert_int(p.list.get_child_count()).is_equal(1)
+	assert_str(p.list.get_child(0).name).is_equal("Post_p2")
+	assert_bool(p.status.text.contains("Blocked")).is_true()

@@ -3,19 +3,19 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: res://scenes/app/pages/feed_page.gd:237
+#: res://scenes/app/pages/feed_page.gd:276
 msgid "%d comments"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:176
+#: res://scenes/app/pages/feed_page.gd:202
 msgid "%dd ago"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:175
+#: res://scenes/app/pages/feed_page.gd:201
 msgid "%dh ago"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:173
+#: res://scenes/app/pages/feed_page.gd:199
 msgid "%dm ago"
 msgstr ""
 
@@ -43,12 +43,25 @@ msgstr ""
 msgid "Bio"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:96
-#: res://scenes/app/pages/feed_page.gd:110
+#: res://scenes/app/pages/feed_page.gd:86
+#: res://scenes/app/pages/feed_page.gd:261
+msgid "Block"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:84
+msgid "Block this user?"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:333
+msgid "Blocked. You won't see their posts anymore."
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:118
+#: res://scenes/app/pages/feed_page.gd:132
 msgid "Can't load the feed. Check your connection."
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:156
+#: res://scenes/app/pages/feed_page.gd:182
 #: res://scenes/app/pages/profile_page.gd:162
 msgid "Can't reach the server. Check your connection and try again."
 msgstr ""
@@ -60,6 +73,10 @@ msgstr ""
 
 #: res://scenes/app/pages/im_page.gd:10
 msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:291
+msgid "Child safety"
 msgstr ""
 
 #: res://scenes/app/pages/lifecycle_probe_page.gd:46
@@ -149,7 +166,7 @@ msgid "Enter a valid email address."
 msgstr ""
 
 #: res://modules/app/app_routes.gd:28
-#: res://scenes/app/pages/feed_page.gd:25
+#: res://scenes/app/pages/feed_page.gd:31
 msgid "Feed"
 msgstr ""
 
@@ -159,6 +176,14 @@ msgstr ""
 
 #: res://scenes/app/pages/profile_page.gd:48
 msgid "Handle (letters, numbers, _)"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:286
+msgid "Harassment or bullying"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:289
+msgid "Hate speech"
 msgstr ""
 
 #: res://scenes/app/consent_page.gd:34
@@ -173,15 +198,15 @@ msgstr ""
 msgid "Lifecycle probe"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:236
+#: res://scenes/app/pages/feed_page.gd:275
 msgid "Like"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:236
+#: res://scenes/app/pages/feed_page.gd:275
 msgid "Liked"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:64
+#: res://scenes/app/pages/feed_page.gd:70
 msgid "Load more"
 msgstr ""
 
@@ -208,8 +233,8 @@ msgstr ""
 msgid "Not signed in"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:88
-#: res://scenes/app/pages/feed_page.gd:195
+#: res://scenes/app/pages/feed_page.gd:110
+#: res://scenes/app/pages/feed_page.gd:223
 msgid "Nothing here yet. Follow people to see their posts."
 msgstr ""
 
@@ -225,7 +250,7 @@ msgstr ""
 msgid "Password reset email sent."
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:158
+#: res://scenes/app/pages/feed_page.gd:184
 #: res://scenes/app/pages/profile_page.gd:160
 msgid "Please check the %s field."
 msgstr ""
@@ -238,15 +263,15 @@ msgstr ""
 msgid "Please sign in again, then delete your account."
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:38
+#: res://scenes/app/pages/feed_page.gd:44
 msgid "Post"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:138
+#: res://scenes/app/pages/feed_page.gd:160
 msgid "Posted."
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:127
+#: res://scenes/app/pages/feed_page.gd:149
 msgid "Posting…"
 msgstr ""
 
@@ -263,8 +288,12 @@ msgstr ""
 msgid "Realtime: %s"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:60
+#: res://scenes/app/pages/feed_page.gd:66
 msgid "Refresh"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:257
+msgid "Report"
 msgstr ""
 
 #: res://scenes/app/pages/profile_page.gd:35
@@ -279,9 +308,17 @@ msgstr ""
 msgid "Saving…"
 msgstr ""
 
+#: res://scenes/app/pages/feed_page.gd:290
+msgid "Self-harm"
+msgstr ""
+
 #: res://scenes/app/pages/profile_page.gd:67
 #: res://scenes/app/pages/settings_page.gd:19
 msgid "Settings"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:287
+msgid "Sexual content"
 msgstr ""
 
 #: res://scenes/app/login_page.gd:28
@@ -289,7 +326,7 @@ msgstr ""
 msgid "Sign in"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:160
+#: res://scenes/app/pages/feed_page.gd:186
 #: res://scenes/app/pages/profile_page.gd:116
 msgid "Sign in again to set up your profile."
 msgstr ""
@@ -318,8 +355,16 @@ msgstr ""
 msgid "Signing in…"
 msgstr ""
 
+#: res://scenes/app/pages/feed_page.gd:292
+msgid "Something else"
+msgstr ""
+
 #: res://scenes/app/age_gate_page.gd:77
 msgid "Sorry, you're not eligible to use this app."
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:285
+msgid "Spam or scam"
 msgstr ""
 
 #: res://scenes/app/pages/lifecycle_probe_page.gd:29
@@ -337,6 +382,10 @@ msgstr ""
 #: res://scenes/app/consent_page.gd:26
 #: res://scenes/app/pages/settings_page.gd:29
 msgid "Terms of service"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:314
+msgid "Thanks, we've received your report."
 msgstr ""
 
 #: res://scenes/app/pages/profile_page.gd:158
@@ -368,6 +417,10 @@ msgstr ""
 msgid "Verification email sent."
 msgstr ""
 
+#: res://scenes/app/pages/feed_page.gd:288
+msgid "Violence or threats"
+msgstr ""
+
 #: res://scenes/app/pages/profile_page.gd:63
 #: res://scenes/app/pages/voice_room_page.gd:5
 msgid "Voice room"
@@ -381,8 +434,12 @@ msgstr ""
 msgid "Welcome"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:33
+#: res://scenes/app/pages/feed_page.gd:39
 msgid "What's new?"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:85
+msgid "You won't see each other's posts or profiles, and you'll stop following each other."
 msgstr ""
 
 #: res://scenes/app/pages/im_page.gd:20
@@ -397,7 +454,7 @@ msgstr ""
 msgid "idle"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:171
+#: res://scenes/app/pages/feed_page.gd:197
 msgid "just now"
 msgstr ""
 

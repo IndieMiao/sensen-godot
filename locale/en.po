@@ -34,6 +34,15 @@ msgstr ""
 msgid "Bio"
 msgstr ""
 
+msgid "Block"
+msgstr ""
+
+msgid "Block this user?"
+msgstr ""
+
+msgid "Blocked. You won't see their posts anymore."
+msgstr ""
+
 msgid "Can't load the feed. Check your connection."
 msgstr ""
 
@@ -44,6 +53,9 @@ msgid "Chats"
 msgstr ""
 
 msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
+msgstr ""
+
+msgid "Child safety"
 msgstr ""
 
 msgid "Clear log"
@@ -116,6 +128,12 @@ msgid "Forgot password"
 msgstr ""
 
 msgid "Handle (letters, numbers, _)"
+msgstr ""
+
+msgid "Harassment or bullying"
+msgstr ""
+
+msgid "Hate speech"
 msgstr ""
 
 msgid "I have read and agree to the Terms of Service and Privacy Policy."
@@ -193,6 +211,9 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
+msgid "Report"
+msgstr ""
+
 msgid "Resend verification email"
 msgstr ""
 
@@ -202,7 +223,13 @@ msgstr ""
 msgid "Saving…"
 msgstr ""
 
+msgid "Self-harm"
+msgstr ""
+
 msgid "Settings"
+msgstr ""
+
+msgid "Sexual content"
 msgstr ""
 
 msgid "Sign in"
@@ -229,7 +256,13 @@ msgstr ""
 msgid "Signing in…"
 msgstr ""
 
+msgid "Something else"
+msgstr ""
+
 msgid "Sorry, you're not eligible to use this app."
+msgstr ""
+
+msgid "Spam or scam"
 msgstr ""
 
 msgid "Switch to another app and come back several times. Each PAUSED/RESUMED pair must increase by one."
@@ -242,6 +275,9 @@ msgid "Tell us your date of birth to get started."
 msgstr ""
 
 msgid "Terms of service"
+msgstr ""
+
+msgid "Thanks, we've received your report."
 msgstr ""
 
 msgid "That handle is already taken."
@@ -265,6 +301,9 @@ msgstr ""
 msgid "Verification email sent."
 msgstr ""
 
+msgid "Violence or threats"
+msgstr ""
+
 msgid "Voice room"
 msgstr ""
 
@@ -275,6 +314,9 @@ msgid "Welcome"
 msgstr ""
 
 msgid "What's new?"
+msgstr ""
+
+msgid "You won't see each other's posts or profiles, and you'll stop following each other."
 msgstr ""
 
 msgid "connected"

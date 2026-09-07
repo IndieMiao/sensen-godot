@@ -300,3 +300,45 @@ msgstr "有什么新鲜事？"
 
 msgid "just now"
 msgstr "刚刚"
+
+msgid "Block"
+msgstr "拉黑"
+
+msgid "Block this user?"
+msgstr "拉黑这个用户？"
+
+msgid "Blocked. You won't see their posts anymore."
+msgstr "已拉黑，你不会再看到对方的动态。"
+
+msgid "Child safety"
+msgstr "儿童安全"
+
+msgid "Harassment or bullying"
+msgstr "骚扰或霸凌"
+
+msgid "Hate speech"
+msgstr "仇恨言论"
+
+msgid "Report"
+msgstr "举报"
+
+msgid "Self-harm"
+msgstr "自残"
+
+msgid "Sexual content"
+msgstr "色情内容"
+
+msgid "Something else"
+msgstr "其他"
+
+msgid "Spam or scam"
+msgstr "垃圾信息或诈骗"
+
+msgid "Thanks, we've received your report."
+msgstr "谢谢，我们已收到你的举报。"
+
+msgid "Violence or threats"
+msgstr "暴力或威胁"
+
+msgid "You won't see each other's posts or profiles, and you'll stop following each other."
+msgstr "你们将看不到彼此的动态和主页，并会互相取消关注。"

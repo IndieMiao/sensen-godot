@@ -1,11 +1,13 @@
 extends AppPage
 ## 动态 feed（B3 只读闭环 + 纯文字发布；后端 D4-b）：时间线 / 点赞 / 发布器 / 加载更多。
-## 图片发布等 D4-c R2 接上传；评论 UI、举报、拉黑归 B3 后续与 E1。auth / feed 可注入。
+## 图片发布等 D4-c R2 接上传；评论 UI 归 B3 后续。举报 / 拉黑（E1）在每张非本人卡片上。
+## auth / feed / safety 可注入。
 ##
 ## 发布的幂等键在重试间保持同一个：断网点两次「Post」不会发出两条一样的动态。
 
 var auth: AuthSession
 var feed: FeedApi
+var safety: SafetyApi
 
 var composer: LineEdit
 var post_button: Button
@@ -20,6 +22,10 @@ var items: Array = []
 var cards: Dictionary = {}
 var busy := false
 var pending_key := ""
+var report_menu: PopupMenu
+var block_confirm: ConfirmationDialog
+## 举报菜单 / 拉黑确认框当前针对的帖子 id 与作者 id。
+var pending_target := {"post_id": "", "author_id": ""}
 
 func _init() -> void:
 	page_title = "Feed"
@@ -67,12 +73,28 @@ func _build_body() -> void:
 	more_button.pressed.connect(func(): load_more())
 	actions.add_child(more_button)
 	body.add_child(actions)
+	report_menu = PopupMenu.new()
+	report_menu.name = "ReportMenu"
+	for i in SafetyApi.REASONS.size():
+		report_menu.add_item(reason_label(SafetyApi.REASONS[i]), i)
+	report_menu.id_pressed.connect(_on_report_reason)
+	add_child(report_menu)
+	block_confirm = ConfirmationDialog.new()
+	block_confirm.name = "BlockConfirm"
+	block_confirm.title = tr("Block this user?")
+	block_confirm.dialog_text = tr("You won't see each other's posts or profiles, and you'll stop following each other.")
+	block_confirm.ok_button_text = tr("Block")
+	block_confirm.confirmed.connect(_on_block_confirmed)
+	add_child(block_confirm)
 
 func _session() -> AuthSession:
 	return auth if auth != null else Net.auth
 
 func _feed() -> FeedApi:
 	return feed if feed != null else Net.feed
+
+func _safety() -> SafetyApi:
+	return safety if safety != null else Net.safety
 
 ## Dev 会话没有真 token；服务端没部署时不刷屏报错，只给一句提示。
 func _can_load() -> bool:
@@ -228,7 +250,18 @@ func _card(p: Dictionary) -> PanelContainer:
 	actions.add_child(like)
 	var meta := GameUi.label("", 12, GameUi.MUTED)
 	meta.name = "Meta"
+	meta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	actions.add_child(meta)
+	var author_id := _text(author.get("user_id", ""))
+	if not _is_me(author_id):
+		var report := GameUi.button("", tr("Report"), "POST /reports")
+		report.name = "Report"
+		report.pressed.connect(func(): open_report_menu(id, author_id))
+		actions.add_child(report)
+		var block := GameUi.button("", tr("Block"), "PUT /users/:id/block")
+		block.name = "Block"
+		block.pressed.connect(func(): open_block_confirm(id, author_id))
+		actions.add_child(block)
 	col.add_child(actions)
 	cards[id] = {"like": like, "meta": meta}
 	_update_card(id)
@@ -241,6 +274,64 @@ func _update_card(post_id: String) -> void:
 	var like: Button = cards[post_id].like
 	like.text = "%s %d" % [tr("Liked") if bool(p.get("liked", false)) else tr("Like"), int(p.get("like_count", 0))]
 	(cards[post_id].meta as Label).text = tr("%d comments") % int(p.get("comment_count", 0))
+
+func _is_me(author_id: String) -> bool:
+	var s := _session()
+	return s != null and not author_id.is_empty() and author_id == s.server_user_id
+
+## 举报原因的文案；键与服务端 REPORT_REASONS 一致。
+func reason_label(reason: String) -> String:
+	match reason:
+		"spam": return tr("Spam or scam")
+		"harassment": return tr("Harassment or bullying")
+		"sexual": return tr("Sexual content")
+		"violence": return tr("Violence or threats")
+		"hate": return tr("Hate speech")
+		"self_harm": return tr("Self-harm")
+		"minor_safety": return tr("Child safety")
+		_: return tr("Something else")
+
+func open_report_menu(post_id: String, author_id: String) -> void:
+	pending_target = {"post_id": post_id, "author_id": author_id}
+	report_menu.popup_centered()
+
+func open_block_confirm(post_id: String, author_id: String) -> void:
+	pending_target = {"post_id": post_id, "author_id": author_id}
+	block_confirm.popup_centered()
+
+func _on_report_reason(index: int) -> void:
+	if index < 0 or index >= SafetyApi.REASONS.size():
+		return
+	await report_post(str(pending_target.post_id), SafetyApi.REASONS[index])
+
+## 举报一条动态。服务端同一人同一目标只记一条，重复点也只会告诉用户「已收到」。
+func report_post(post_id: String, reason: String) -> bool:
+	var api := _safety()
+	if api == null or post_id.is_empty():
+		return false
+	var r: Dictionary = await api.report("post", post_id, reason)
+	if bool(r.get("ok", false)):
+		status.text = tr("Thanks, we've received your report.")
+		return true
+	status.text = describe_error(r)
+	return false
+
+func _on_block_confirmed() -> void:
+	await block_author(str(pending_target.author_id))
+
+## 拉黑作者：服务端双向不可见；本地立刻把这个人的卡片全撤掉，不等下一次刷新。
+func block_author(author_id: String) -> bool:
+	var api := _safety()
+	if api == null or author_id.is_empty():
+		return false
+	var r: Dictionary = await api.block(author_id)
+	if not bool(r.get("ok", false)):
+		status.text = describe_error(r)
+		return false
+	items = items.filter(func(p): return _text((p.get("author", {}) as Dictionary).get("user_id", "")) != author_id)
+	_render()
+	status.text = tr("Blocked. You won't see their posts anymore.")
+	return true
 
 func _on_post() -> void:
 	await publish()
