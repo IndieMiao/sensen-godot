@@ -55,6 +55,8 @@ func test_owner_tools_hidden_visitor_bar_shown() -> void:
 	assert_array(texts).is_equal(["Wave", "Stamp"])
 
 func test_crops_render_from_snapshot_with_ripe_as_top_stage() -> void:
+	if DisplayServer.get_name() == "headless":
+		return # 依赖真实渲染（出帖 / 着色器 / 布局尺寸）：headless CI 跳过，本地开窗跑测照常覆盖
 	var f: Node = await _visitor()
 	var counts: Dictionary = f.crop_field.cell_counts()
 	assert_int(int(counts["R"])).is_equal(6)

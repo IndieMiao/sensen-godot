@@ -15,6 +15,8 @@ func test_map_scene_restores_transparent_bg_on_exit() -> void:
 	assert_bool(vp.transparent_bg).is_false() # 切走必须还原
 
 func test_farm_background_renders_opaque_after_a_transparent_map_surface() -> void:
+	if DisplayServer.get_name() == "headless":
+		return # 依赖真实渲染（出帖 / 着色器 / 布局尺寸）：headless CI 跳过，本地开窗跑测照常覆盖
 	var viewport := SubViewport.new()
 	viewport.size = Vector2i(256, 384)
 	viewport.own_world_3d = true

@@ -27,6 +27,8 @@ func test_parse_credentials_splits_on_first_colon_only() -> void:
 
 ## watch：在给定秒数内按间隔补拍，步骤名 watch_NN，报告不会被标成 done。
 func test_watch_takes_periodic_shots_until_deadline() -> void:
+	if DisplayServer.get_name() == "headless":
+		return # 依赖真实渲染（出帖 / 着色器 / 布局尺寸）：headless CI 跳过，本地开窗跑测照常覆盖
 	var w := QaFlow.new()
 	w.out_dir = "user://qa_test"
 	w.watch_interval_s = 0.05

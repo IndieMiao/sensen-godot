@@ -124,6 +124,8 @@ func test_parts_grid_has_three_responsive_columns() -> void:
 
 
 func test_thumbnail_cell_height_matches_the_drawer_budget() -> void:
+	if DisplayServer.get_name() == "headless":
+		return # 依赖真实渲染（出帖 / 着色器 / 布局尺寸）：headless CI 跳过，本地开窗跑测照常覆盖
 	## THUMB_CELL_HEIGHT 是量出来的（Button 的最小尺寸参考纹理原始尺寸，
 	## icon_max_width 只管绘制宽度）。一旦改了 RENDER_SIZE / 字号 / icon_max_width，
 	## 真实格子高度就会偏离这个常量，抽屉高度也得跟着重算——这条把偏离拦下来。
