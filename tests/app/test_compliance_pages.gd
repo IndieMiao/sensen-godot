@@ -248,9 +248,10 @@ func test_profile_save_sends_patch_and_explains_handle_conflict() -> void:
 	p.name_edit.text = " Sen Two "
 	p.handle_edit.text = ""
 	p.bio_edit.text = "bio"
+	p.visible_toggle.button_pressed = false
 	assert_bool(await p.save_profile()).is_true()
 	assert_str(profile_t.requests[0].method).is_equal("PUT")
-	assert_that(profile_t.requests[0].body).is_equal({"display_name": "Sen Two", "bio": "bio", "handle": null})
+	assert_that(profile_t.requests[0].body).is_equal({"display_name": "Sen Two", "bio": "bio", "handle": null, "following_visible": false})
 	assert_str(p.profile_label.text).is_equal("Sen Two · 3 followers · 2 following")
 	assert_str(p.profile_status.text).is_equal("Profile saved.")
 	p.handle_edit.text = "@Taken"

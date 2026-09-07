@@ -188,6 +188,14 @@ func run_login() -> void:
 			_error("send failed: %s" % chat.status.text)
 		await settle()
 		await shot("chat_sent")
+	# SENSEN_QA_PROFILE=1：顺手压栈对方的用户主页截一张（关注 / 发消息 / 举报 / 拉黑 + 动态列表），再弹回聊天页。
+	if OS.get_environment("SENSEN_QA_PROFILE") == "1":
+		AppRouter.push_instance(AppRoutes.USER, {"handle": dm})
+		await settle()
+		await settle()
+		await shot("user_page")
+		AppRouter.pop_instance()
+		await settle()
 	# SENSEN_QA_PHOTO=<路径>（user:// 或绝对路径）：不弹系统选图器，直接把这张图当选中的发出去——
 	# 图片消息的上传 / 发送 / 渲染整条链在桌面和真机上都能自动跑。
 	var photo := OS.get_environment("SENSEN_QA_PHOTO").strip_edges()

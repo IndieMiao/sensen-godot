@@ -540,3 +540,6 @@ msgstr "查看主页"
 
 msgid "Write a comment…"
 msgstr "写评论…"
+
+msgid "Show who I follow"
+msgstr "公开我关注的人"

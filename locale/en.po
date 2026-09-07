@@ -358,6 +358,9 @@ msgstr ""
 msgid "Sexual content"
 msgstr ""
 
+msgid "Show who I follow"
+msgstr ""
+
 msgid "Sign in"
 msgstr ""
 

@@ -16,6 +16,7 @@ var profile_label: Label
 var name_edit: LineEdit
 var handle_edit: LineEdit
 var bio_edit: LineEdit
+var visible_toggle: CheckButton
 var save_button: Button
 var profile_status: Label
 ## 最近一次从服务端拿到的资料；空字典表示还没拿到。
@@ -47,6 +48,12 @@ func _build_body() -> void:
 	name_edit = _field("DisplayName", tr("Display name"), 30)
 	handle_edit = _field("Handle", tr("Handle (letters, numbers, _)"), 20)
 	bio_edit = _field("Bio", tr("Bio"), 160)
+	# Follow v1.2 §隐私：关注列表默认公开，可关；关注者列表永远公开。
+	visible_toggle = CheckButton.new()
+	visible_toggle.name = "FollowingVisible"
+	visible_toggle.text = tr("Show who I follow")
+	visible_toggle.button_pressed = true
+	body.add_child(visible_toggle)
 	save_button = GameUi.button("check", tr("Save profile"), "PUT /users/me/profile")
 	save_button.name = "SaveProfile"
 	save_button.pressed.connect(_on_save)
@@ -126,6 +133,7 @@ func _show_profile(p: Dictionary) -> void:
 	name_edit.text = name
 	handle_edit.text = handle
 	bio_edit.text = _text(p.get("bio", ""))
+	visible_toggle.button_pressed = bool(p.get("following_visible", true)) if p.get("following_visible") != null else true
 
 ## 把三个输入框整体提交；handle 空则清空（null）。返回是否保存成功。
 func save_profile() -> bool:
@@ -137,6 +145,7 @@ func save_profile() -> bool:
 		"display_name": name_edit.text.strip_edges(),
 		"bio": bio_edit.text.strip_edges(),
 		"handle": handle if not handle.is_empty() else null,
+		"following_visible": visible_toggle.button_pressed,
 	}
 	saving = true
 	save_button.disabled = true
