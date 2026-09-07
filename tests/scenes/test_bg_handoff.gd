@@ -31,7 +31,10 @@ func test_farm_background_renders_opaque_after_a_transparent_map_surface() -> vo
 	viewport.add_child(farm)
 	farm.set_process(false)
 	await get_tree().process_frame
-	await RenderingServer.frame_post_draw
+	# 不等 frame_post_draw 而是 force_draw()：macOS 把被其他窗口完全遮住的 Godot 窗口判成
+	# 不可见后就停止绘制，信号永远不来（2026-09-07 本地被 Edge 盖住时整条测试超时 5 分钟）。
+	# force_draw 同步走一遍完整绘制，SubViewport(UPDATE_ALWAYS) 照样出图。
+	RenderingServer.force_draw()
 	var rendered := viewport.get_texture().get_image()
 	assert_bool(rendered.is_empty()).is_false()
 	for point in [Vector2i(1, 1), Vector2i(254, 1), Vector2i(1, 382), Vector2i(254, 382)]:
@@ -39,7 +42,7 @@ func test_farm_background_renders_opaque_after_a_transparent_map_surface() -> vo
 	# Native map surfaces can retain alpha even after the normal viewport handoff.
 	viewport.transparent_bg = true
 	await get_tree().process_frame
-	await RenderingServer.frame_post_draw
+	RenderingServer.force_draw()
 	var retained_alpha := viewport.get_texture().get_image()
 	for point in [Vector2i(1, 1), Vector2i(254, 1), Vector2i(128, 192), Vector2i(1, 382), Vector2i(254, 382)]:
 		assert_float(retained_alpha.get_pixelv(point).a).override_failure_message("Farm final pass leaks on transparent surface at %s" % point).is_greater_equal(0.99)
@@ -48,13 +51,13 @@ func test_farm_background_renders_opaque_after_a_transparent_map_surface() -> vo
 		farm.get_node(path).visible = false
 	viewport.transparent_bg = true
 	await get_tree().process_frame
-	await RenderingServer.frame_post_draw
+	RenderingServer.force_draw()
 	var transparent := viewport.get_texture().get_image().get_pixel(128, 192)
 	assert_float(transparent.a).is_less_equal(0.01)
 	farm.get_node("FarmBackground").visible = true
 	farm.get_node("OpaqueSceneLayer").visible = true
 	await get_tree().process_frame
-	await RenderingServer.frame_post_draw
+	RenderingServer.force_draw()
 	var lawn := viewport.get_texture().get_image().get_pixel(128, 192)
 	assert_float(lawn.a).is_greater_equal(0.99)
 	assert_float(lawn.g).is_greater(0.7)
