@@ -9,6 +9,8 @@ const PLACE := "res://scenes/place/place.tscn"
 const CITY_SELECT := "res://scenes/city_select/city_select.tscn"
 ## 海外社交主线（08-30 调研 §3.1）：启动决策页 → 登录页 → 四 Tab 壳。路径与 AppRoutes 同源。
 const BOOT := "res://scenes/app/boot.tscn"
+const AGE_GATE := "res://scenes/app/age_gate_page.tscn"
+const CONSENT := "res://scenes/app/consent_page.tscn"
 const LOGIN := "res://scenes/app/login_page.tscn"
 const SHELL := "res://scenes/app/app_shell.tscn"
 
@@ -60,6 +62,12 @@ func go_to_login() -> void:
 func go_to_shell() -> void:
 	_clear_stack()
 	_go_to(SHELL)
+
+
+## 按路径跳整场景（boot / 首启合规流用）。
+func go_to_route(scene_path: String) -> void:
+	_clear_stack()
+	_go_to(scene_path)
 
 
 ## 语言切换等需要整壳重建的场景：清栈后重载当前场景（_go_to 对同路径是 no-op）。
@@ -222,6 +230,10 @@ static func qa_scene_path(args: PackedStringArray) -> String:
 				return FARM
 			"login":
 				return LOGIN
+			"agegate", "age_gate":
+				return AGE_GATE
+			"consent":
+				return CONSENT
 			"shell", "home":
 				return SHELL
 			"week":
@@ -245,7 +257,7 @@ static func back_action_for_scene(scene_path: String, back_locked := false) -> i
 	match scene_path:
 		DRESS, STRESS, FARM, PLACE:
 			return BACK_TO_MAP
-		MAP, CITY_SELECT, BOOT, LOGIN, SHELL:
+		MAP, CITY_SELECT, BOOT, AGE_GATE, CONSENT, LOGIN, SHELL:
 			return BACK_LEAVE_APP
 		_:
 			return BACK_IGNORE

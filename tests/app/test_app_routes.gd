@@ -13,7 +13,7 @@ func test_every_tab_scene_and_stacked_page_exists() -> void:
 		assert_bool(ResourceLoader.exists(AppRoutes.tab_scene(tab))).override_failure_message("missing scene for %s" % tab).is_true()
 		assert_bool(AppRoutes.tab_icon(tab).is_empty()).is_false()
 		assert_bool(ResourceLoader.exists("res://assets/ui/icons/lucide/%s.svg" % AppRoutes.tab_icon(tab))).is_true()
-	for path in [AppRoutes.BOOT, AppRoutes.LOGIN, AppRoutes.SHELL, AppRoutes.SETTINGS, AppRoutes.VOICE_ROOM]:
+	for path in [AppRoutes.BOOT, AppRoutes.AGE_GATE, AppRoutes.CONSENT, AppRoutes.LOGIN, AppRoutes.SHELL, AppRoutes.SETTINGS, AppRoutes.VOICE_ROOM]:
 		assert_bool(ResourceLoader.exists(path)).override_failure_message("missing %s" % path).is_true()
 
 func test_unknown_tab_is_rejected() -> void:

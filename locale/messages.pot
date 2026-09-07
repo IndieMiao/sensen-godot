@@ -11,13 +11,26 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
-#: res://modules/app/app_routes.gd:25
+#: res://scenes/app/consent_page.gd:13
+msgid "Before you start"
+msgstr ""
+
+#: res://modules/app/app_routes.gd:28
 #: res://scenes/app/pages/im_page.gd:7
 msgid "Chats"
 msgstr ""
 
 #: res://scenes/app/pages/im_page.gd:10
 msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:29
+msgid "Contact us"
+msgstr ""
+
+#: res://scenes/app/age_gate_page.gd:30
+#: res://scenes/app/consent_page.gd:38
+msgid "Continue"
 msgstr ""
 
 #: res://scenes/app/login_page.gd:60
@@ -36,8 +49,20 @@ msgstr ""
 msgid "Creating account…"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:22
+#: res://scenes/app/pages/settings_page.gd:50
+msgid "Delete"
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:34
 msgid "Delete account"
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:48
+msgid "Delete account?"
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:92
+msgid "Deleting account…"
 msgstr ""
 
 #: res://scenes/app/login_page.gd:74
@@ -45,7 +70,7 @@ msgid "Dev: continue offline"
 msgstr ""
 
 #: res://scenes/app/pages/map_page.gd:10
-#: res://scenes/app/pages/profile_page.gd:17
+#: res://scenes/app/pages/profile_page.gd:32
 msgid "Dressing room"
 msgstr ""
 
@@ -53,15 +78,23 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+#: res://scenes/app/pages/profile_page.gd:76
+msgid "Email not verified"
+msgstr ""
+
 #: res://modules/net/firebase_auth.gd:111
 msgid "Email or password is incorrect."
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:76
+msgid "Email verified"
 msgstr ""
 
 #: res://modules/net/firebase_auth.gd:117
 msgid "Enter a valid email address."
 msgstr ""
 
-#: res://modules/app/app_routes.gd:25
+#: res://modules/app/app_routes.gd:28
 #: res://scenes/app/pages/feed_page.gd:5
 msgid "Feed"
 msgstr ""
@@ -74,11 +107,15 @@ msgstr ""
 msgid "Forgot password"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:39
+#: res://scenes/app/consent_page.gd:34
+msgid "I have read and agree to the Terms of Service and Privacy Policy."
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:68
 msgid "Language: %s"
 msgstr ""
 
-#: res://modules/app/app_routes.gd:25
+#: res://modules/app/app_routes.gd:28
 #: res://scenes/app/pages/map_page.gd:6
 msgid "Map"
 msgstr ""
@@ -87,8 +124,8 @@ msgstr ""
 msgid "Map home lands in B5: Mapbox underlay, friends' positions and 3D avatars. This tab stays resident so the native map view can be shown/hidden instead of rebuilt."
 msgstr ""
 
-#: res://modules/app/app_routes.gd:25
-#: res://scenes/app/pages/profile_page.gd:7
+#: res://modules/app/app_routes.gd:28
+#: res://scenes/app/pages/profile_page.gd:14
 msgid "Me"
 msgstr ""
 
@@ -97,7 +134,7 @@ msgstr ""
 msgid "No connection. Check your network and try again."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:32
+#: res://scenes/app/pages/profile_page.gd:54
 msgid "Not signed in"
 msgstr ""
 
@@ -113,11 +150,20 @@ msgstr ""
 msgid "Password reset email sent."
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:20
+#: res://scenes/app/age_gate_page.gd:68
+msgid "Please select your full date of birth."
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:101
+msgid "Please sign in again, then delete your account."
+msgstr ""
+
+#: res://scenes/app/consent_page.gd:20
+#: res://scenes/app/pages/settings_page.gd:27
 msgid "Privacy policy"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:16
+#: res://scenes/app/pages/profile_page.gd:31
 msgid "Profile lands in B4: profile card, edit, avatar entry, Space 3D."
 msgstr ""
 
@@ -125,8 +171,12 @@ msgstr ""
 msgid "Realtime: %s"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:25
-#: res://scenes/app/pages/settings_page.gd:9
+#: res://scenes/app/pages/profile_page.gd:23
+msgid "Resend verification email"
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:40
+#: res://scenes/app/pages/settings_page.gd:18
 msgid "Settings"
 msgstr ""
 
@@ -135,7 +185,7 @@ msgstr ""
 msgid "Sign in"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:26
+#: res://scenes/app/pages/settings_page.gd:38
 msgid "Sign out"
 msgstr ""
 
@@ -151,7 +201,7 @@ msgstr ""
 msgid "Sign-in is not configured yet."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:34
+#: res://scenes/app/pages/profile_page.gd:58
 msgid "Signed in as %s (%s)"
 msgstr ""
 
@@ -159,12 +209,29 @@ msgstr ""
 msgid "Signing in…"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:21
+#: res://scenes/app/age_gate_page.gd:77
+msgid "Sorry, you're not eligible to use this app."
+msgstr ""
+
+#: res://scenes/app/age_gate_page.gd:19
+msgid "Tell us your date of birth to get started."
+msgstr ""
+
+#: res://scenes/app/consent_page.gd:26
+#: res://scenes/app/pages/settings_page.gd:28
 msgid "Terms of service"
 msgstr ""
 
 #: res://modules/net/firebase_auth.gd:119
 msgid "This account has been disabled."
+msgstr ""
+
+#: res://scenes/app/consent_page.gd:16
+msgid "This community has zero tolerance for abusive content or behavior. Content you post can be reported and removed, and repeat offenders are banned."
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:49
+msgid "This permanently deletes your account and data. This cannot be undone."
 msgstr ""
 
 #: res://modules/net/firebase_auth.gd:123
@@ -176,16 +243,21 @@ msgid "Too many attempts. Try again later."
 msgstr ""
 
 #: res://scenes/app/login_page.gd:141
+#: res://scenes/app/pages/profile_page.gd:86
 msgid "Verification email sent."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:21
+#: res://scenes/app/pages/profile_page.gd:36
 #: res://scenes/app/pages/voice_room_page.gd:5
 msgid "Voice room"
 msgstr ""
 
 #: res://scenes/app/pages/voice_room_page.gd:9
 msgid "Voice room lands in B6 (UI), C4 (LiveKit bridge) and D5 (token/signaling)."
+msgstr ""
+
+#: res://scenes/app/age_gate_page.gd:16
+msgid "Welcome"
 msgstr ""
 
 #: res://scenes/app/pages/im_page.gd:20

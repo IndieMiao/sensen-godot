@@ -10,11 +10,20 @@ msgstr "该邮箱已注册。"
 msgid "Back"
 msgstr "返回"
 
+msgid "Before you start"
+msgstr "开始之前"
+
 msgid "Chats"
 msgstr "消息"
 
 msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
 msgstr "消息功能将在 B2 接入：会话列表、单聊与群聊、图片、已读回执。"
+
+msgid "Contact us"
+msgstr "联系我们"
+
+msgid "Continue"
+msgstr "继续"
 
 msgid "Continue with Apple"
 msgstr "通过 Apple 继续"
@@ -28,8 +37,17 @@ msgstr "创建账号"
 msgid "Creating account…"
 msgstr "正在创建账号…"
 
+msgid "Delete"
+msgstr "删除"
+
 msgid "Delete account"
 msgstr "删除账号"
+
+msgid "Delete account?"
+msgstr "删除账号？"
+
+msgid "Deleting account…"
+msgstr "正在删除账号…"
 
 msgid "Dev: continue offline"
 msgstr "开发：离线继续"
@@ -40,8 +58,14 @@ msgstr "换装房"
 msgid "Email"
 msgstr "邮箱"
 
+msgid "Email not verified"
+msgstr "邮箱未验证"
+
 msgid "Email or password is incorrect."
 msgstr "邮箱或密码不正确。"
+
+msgid "Email verified"
+msgstr "邮箱已验证"
 
 msgid "Enter a valid email address."
 msgstr "请输入有效的邮箱地址。"
@@ -54,6 +78,9 @@ msgstr "动态将在 B3 接入：时间线、图文发布、点赞、评论与�
 
 msgid "Forgot password"
 msgstr "忘记密码"
+
+msgid "I have read and agree to the Terms of Service and Privacy Policy."
+msgstr "我已阅读并同意《服务条款》与《隐私政策》。"
 
 msgid "Language: %s"
 msgstr "语言：%s"
@@ -82,6 +109,12 @@ msgstr "密码至少 6 位。"
 msgid "Password reset email sent."
 msgstr "重置密码邮件已发送。"
 
+msgid "Please select your full date of birth."
+msgstr "请选择完整的出生日期。"
+
+msgid "Please sign in again, then delete your account."
+msgstr "请重新登录后再删除账号。"
+
 msgid "Privacy policy"
 msgstr "隐私政策"
 
@@ -90,6 +123,9 @@ msgstr "我的主页将在 B4 接入：资料卡、编辑、形象入口、3D �
 
 msgid "Realtime: %s"
 msgstr "实时连接：%s"
+
+msgid "Resend verification email"
+msgstr "重发验证邮件"
 
 msgid "Settings"
 msgstr "设置"
@@ -115,11 +151,23 @@ msgstr "已登录：%s（%s）"
 msgid "Signing in…"
 msgstr "正在登录…"
 
+msgid "Sorry, you're not eligible to use this app."
+msgstr "很抱歉，你暂时不能使用本应用。"
+
+msgid "Tell us your date of birth to get started."
+msgstr "请填写出生日期以开始。"
+
 msgid "Terms of service"
 msgstr "服务条款"
 
 msgid "This account has been disabled."
 msgstr "该账号已被停用。"
+
+msgid "This community has zero tolerance for abusive content or behavior. Content you post can be reported and removed, and repeat offenders are banned."
+msgstr "本社区对辱骂、骚扰等不当内容与行为零容忍。你发布的内容可能被举报并移除，屡犯者将被封禁。"
+
+msgid "This permanently deletes your account and data. This cannot be undone."
+msgstr "这将永久删除你的账号与数据，且无法撤销。"
 
 msgid "This sign-in method is not enabled."
 msgstr "该登录方式未启用。"
@@ -135,6 +183,9 @@ msgstr "语音房"
 
 msgid "Voice room lands in B6 (UI), C4 (LiveKit bridge) and D5 (token/signaling)."
 msgstr "语音房将在 B6（界面）、C4（LiveKit 桥接）与 D5（令牌 / 信令）接入。"
+
+msgid "Welcome"
+msgstr "欢迎"
 
 msgid "connected"
 msgstr "已连接"

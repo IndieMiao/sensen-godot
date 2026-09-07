@@ -5,6 +5,9 @@ extends RefCounted
 ## Tab id 用 String 而不是 StringName：作为 Dictionary 键和 UiState 持久化值时少一次类型换算。
 
 const BOOT := "res://scenes/app/boot.tscn"
+## 首启合规流（R2 年龄门 → R3 同意 → 登录）
+const AGE_GATE := "res://scenes/app/age_gate_page.tscn"
+const CONSENT := "res://scenes/app/consent_page.tscn"
 const LOGIN := "res://scenes/app/login_page.tscn"
 const SHELL := "res://scenes/app/app_shell.tscn"
 

@@ -10,10 +10,19 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
+msgid "Before you start"
+msgstr ""
+
 msgid "Chats"
 msgstr ""
 
 msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
+msgstr ""
+
+msgid "Contact us"
+msgstr ""
+
+msgid "Continue"
 msgstr ""
 
 msgid "Continue with Apple"
@@ -28,7 +37,16 @@ msgstr ""
 msgid "Creating account…"
 msgstr ""
 
+msgid "Delete"
+msgstr ""
+
 msgid "Delete account"
+msgstr ""
+
+msgid "Delete account?"
+msgstr ""
+
+msgid "Deleting account…"
 msgstr ""
 
 msgid "Dev: continue offline"
@@ -40,7 +58,13 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+msgid "Email not verified"
+msgstr ""
+
 msgid "Email or password is incorrect."
+msgstr ""
+
+msgid "Email verified"
 msgstr ""
 
 msgid "Enter a valid email address."
@@ -53,6 +77,9 @@ msgid "Feed lands in B3: timeline, photo composer, likes, comments and report."
 msgstr ""
 
 msgid "Forgot password"
+msgstr ""
+
+msgid "I have read and agree to the Terms of Service and Privacy Policy."
 msgstr ""
 
 msgid "Language: %s"
@@ -82,6 +109,12 @@ msgstr ""
 msgid "Password reset email sent."
 msgstr ""
 
+msgid "Please select your full date of birth."
+msgstr ""
+
+msgid "Please sign in again, then delete your account."
+msgstr ""
+
 msgid "Privacy policy"
 msgstr ""
 
@@ -89,6 +122,9 @@ msgid "Profile lands in B4: profile card, edit, avatar entry, Space 3D."
 msgstr ""
 
 msgid "Realtime: %s"
+msgstr ""
+
+msgid "Resend verification email"
 msgstr ""
 
 msgid "Settings"
@@ -115,10 +151,22 @@ msgstr ""
 msgid "Signing in…"
 msgstr ""
 
+msgid "Sorry, you're not eligible to use this app."
+msgstr ""
+
+msgid "Tell us your date of birth to get started."
+msgstr ""
+
 msgid "Terms of service"
 msgstr ""
 
 msgid "This account has been disabled."
+msgstr ""
+
+msgid "This community has zero tolerance for abusive content or behavior. Content you post can be reported and removed, and repeat offenders are banned."
+msgstr ""
+
+msgid "This permanently deletes your account and data. This cannot be undone."
 msgstr ""
 
 msgid "This sign-in method is not enabled."
@@ -134,6 +182,9 @@ msgid "Voice room"
 msgstr ""
 
 msgid "Voice room lands in B6 (UI), C4 (LiveKit bridge) and D5 (token/signaling)."
+msgstr ""
+
+msgid "Welcome"
 msgstr ""
 
 msgid "connected"
