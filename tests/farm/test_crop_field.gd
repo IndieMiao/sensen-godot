@@ -79,6 +79,8 @@ func test_instances_land_on_their_cells() -> void:
 
 
 func test_everything_sits_on_top_of_the_bed_not_inside_it() -> void:
+	if DisplayServer.get_name() == "headless":
+		return # 依赖真实渲染（MultiMesh AABB）：headless CI 跳过
 	# 2026-09-04 真机：草 0.18 高、苗 0.10 高，全埋在 0.15 高的畦面盒子里，清理了什么都看不见。
 	var f := _field()
 	f.ground_y = 0.15

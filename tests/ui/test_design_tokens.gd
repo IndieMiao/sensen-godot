@@ -74,3 +74,26 @@ func test_selected_and_marker_colors_match_tokens() -> void:
 	assert_bool(selected.bg_color.is_equal_approx(DesignTokens.SURFACE_TINT)).is_true()
 	assert_bool(marker.bg_color.is_equal_approx(DesignTokens.MARKER)).is_true()
 	assert_bool(marker_pressed.bg_color.is_equal_approx(DesignTokens.MARKER_PRESSED)).is_true()
+
+## A7：GameUi 的色板 / 字号只是 DesignTokens 的别名——改 token 就换全局风格，别处不许再写字面值。
+func test_game_ui_palette_and_type_are_aliases_of_ui_tokens() -> void:
+	assert_bool(GameUi.INK.is_equal_approx(DesignTokens.UI_INK)).is_true()
+	assert_bool(GameUi.MUTED.is_equal_approx(DesignTokens.UI_MUTED)).is_true()
+	assert_bool(GameUi.GREEN.is_equal_approx(DesignTokens.UI_GREEN)).is_true()
+	assert_bool(GameUi.MINT.is_equal_approx(DesignTokens.UI_MINT)).is_true()
+	assert_bool(GameUi.PAPER.is_equal_approx(DesignTokens.UI_PAPER)).is_true()
+	assert_bool(GameUi.BORDER.is_equal_approx(DesignTokens.UI_BORDER)).is_true()
+	var t := GameUi.theme()
+	assert_int(t.default_font_size).is_equal(DesignTokens.UI_FONT_BODY)
+	assert_int(t.get_font_size(&"font_size", &"TabButton")).is_equal(DesignTokens.UI_FONT_TAB)
+	assert_bool((t.get_stylebox(&"disabled", &"SecondaryButton") as StyleBoxFlat).bg_color.is_equal_approx(DesignTokens.UI_SURFACE_DISABLED)).is_true()
+	assert_bool((t.get_stylebox(&"normal", &"LineEdit") as StyleBoxFlat).bg_color.is_equal_approx(DesignTokens.UI_FIELD)).is_true()
+	var b: Button = auto_free(GameUi.button("", "x", ""))
+	assert_float(b.custom_minimum_size.x).is_equal(float(DesignTokens.UI_TOUCH_MIN))
+	assert_int(DesignTokens.UI_TOUCH_MIN).is_greater_equal(44)
+
+func test_no_hex_color_literals_left_in_game_ui() -> void:
+	var src := FileAccess.get_file_as_string("res://modules/ui/game_ui.gd")
+	var re := RegEx.create_from_string('Color\\("[0-9a-fA-F]{6}"\\)')
+	assert_array(re.search_all(src)).is_empty()
+

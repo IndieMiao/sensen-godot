@@ -47,3 +47,34 @@ const FONT_PILL := 15
 ## 改这两个值会让真机按钮变得点不到（tests/ui/test_app_theme.gd 守护）。
 const BTN_PAD_V := 14
 const BTN_PAD_H := 16
+
+# —— 社交主线壳（GameUi）的纸色系 ——
+# A7（SGODOT-19）：GameUi 的常量全部指到这里；改这一组就换掉登录 / 四 Tab / 子页的全局风格。
+# 地图 HUD 与农场面板仍用上面的薄荷系（ACCENT / INK…），两套并存是现状，不在本卡里合并。
+const UI_INK := Color("243d35")
+const UI_MUTED := Color("64786e")
+const UI_GREEN := Color("287c59")
+const UI_MINT := Color("e8f4ed")
+const UI_PAPER := Color("fcfefa")
+const UI_BORDER := Color("d2e2d6")
+const UI_GOLD := Color("ecc568")
+const UI_CORAL := Color("ce705c")
+const UI_BLUE := Color("43869f")
+## 禁用态底、只读输入框底、输入框底。
+const UI_SURFACE_DISABLED := Color("edf1ed")
+const UI_SURFACE_SUNK := Color("f2f5f2")
+const UI_FIELD := Color("fbfcfb")
+
+# —— 壳的字阶与尺寸 ——
+## 壳的正文 14（比地图 / 农场的 FONT_BODY 16 小一号：手机上四 Tab 页信息密度更高）。
+const UI_FONT_BODY := 14
+const UI_FONT_TAB := 11
+const UI_FONT_CAPTION := 12
+const UI_FONT_TITLE := 20
+## 触摸目标最小边（Apple HIG 44pt）。
+const UI_TOUCH_MIN := 44
+const UI_ICON_MAX := 20
+const UI_TAB_ICON_MAX := 18
+const UI_RADIUS := 8
+const UI_PAD := 12
+
