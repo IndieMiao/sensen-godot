@@ -117,6 +117,7 @@ func _ensure_page(tab: String) -> AppPage:
 		return null
 	var p := packed.instantiate() as AppPage
 	p.name = "Page_%s" % tab
+	p.in_shell = true
 	p.visible = false
 	p.process_mode = Node.PROCESS_MODE_DISABLED
 	_page_host.add_child(p)

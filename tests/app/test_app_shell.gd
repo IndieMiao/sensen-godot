@@ -98,3 +98,16 @@ func test_login_page_keeps_idp_buttons_disabled_until_c1() -> void:
 		assert_bool(b.disabled).is_true()
 	for n in ["Email", "Password", "SignIn", "SignUp", "Forgot", "Status"]:
 		assert_object(login.find_child(n, true, false)).override_failure_message("missing %s" % n).is_not_null()
+
+## 真机截图（2026-09-07）：壳和页各套一层安全区，Tab 页标题比压栈页低 40 px。壳内页面不再用 SafeAreaMargin。
+func test_pages_inside_shell_do_not_apply_a_second_safe_area() -> void:
+	var shell := (load(AppRoutes.SHELL) as PackedScene).instantiate()
+	add_child(auto_free(shell))
+	await get_tree().process_frame
+	var page: AppPage = shell.page(AppRoutes.home_tab())
+	assert_bool(page.in_shell).is_true()
+	assert_bool(page.get_node("SafeArea") is SafeAreaMargin).is_false()
+	var standalone := (load(AppRoutes.SETTINGS) as PackedScene).instantiate()
+	add_child(auto_free(standalone))
+	await get_tree().process_frame
+	assert_bool(standalone.get_node("SafeArea") is SafeAreaMargin).is_true()

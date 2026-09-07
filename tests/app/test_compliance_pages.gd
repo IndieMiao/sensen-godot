@@ -274,3 +274,37 @@ func test_profile_refresh_is_silent_for_dev_sessions_and_unreachable_server() ->
 	assert_bool(q.profile_status.text.contains("Sign in again")).is_true()
 	assert_str(q.describe_save_error({"code": "SCHEMA", "field": "bio"})).is_equal("Please check the bio field.")
 	assert_str(q.describe_save_error({"code": "NETWORK"})).contains("connection")
+
+## 拦截后 debug 构建给一个重置入口；重置后可重新选择并继续。
+func test_blocked_age_gate_offers_dev_reset_in_debug_builds() -> void:
+	if not OS.is_debug_build():
+		return
+	var p := _age_gate()
+	_pick(p, 2026, 1, 1)
+	p._on_continue()
+	assert_bool(p.continue_button.disabled).is_true()
+	var reset: Button = p.find_child("DevReset", true, false)
+	assert_bool(reset != null).is_true()
+	p._on_dev_reset()
+	await get_tree().process_frame
+	assert_bool(p.continue_button.disabled).is_false()
+	assert_bool(p.year.disabled).is_false()
+	assert_bool(FirstRun.load_state().age_gate_blocked).is_false()
+	_pick(p, 2000, 1, 1)
+	p._on_continue()
+	assert_array(nav.routes).is_equal([AppRoutes.CONSENT])
+
+func test_age_gate_clears_hint_once_a_date_is_picked() -> void:
+	var p := _age_gate()
+	p._on_continue()
+	assert_bool(p.status.text.contains("full date")).is_true()
+	_pick(p, 2000, 1, 1)
+	# OptionButton.select() 不发 item_selected；真机上是用户点选触发，这里手动发信号走同一条线。
+	p.year.item_selected.emit(p.year.selected)
+	assert_str(p.status.text).is_empty()
+
+## 真机截图（2026-09-07）：语言按钮的图标压在文字上——建按钮时文字为空导致图标居中。
+func test_settings_language_button_keeps_icon_left_of_text() -> void:
+	var p := _settings(FakeTransport.new([]))
+	assert_bool(p.language_button.text.begins_with("Language: ")).is_true()
+	assert_int(p.language_button.icon_alignment).is_equal(HORIZONTAL_ALIGNMENT_LEFT)

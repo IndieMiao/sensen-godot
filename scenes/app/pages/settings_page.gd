@@ -75,6 +75,9 @@ func _link(text: String, url: String, node_name: String) -> void:
 
 func _refresh_language_label() -> void:
 	language_button.text = tr("Language: %s") % AppLocale.display_name(AppLocale.current())
+	# 建按钮时文字为空，GameUi.button 把图标居中；填上文字后不改回左对齐，图标会压在第一个字上
+	# （真机截图里「简」外面那个框）。
+	language_button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
 
 ## 切语言后整壳重建：Godot 只会自动重译场景文件里的文本，代码里 tr() 赋的字串不会自己换。
 func _on_language() -> void:

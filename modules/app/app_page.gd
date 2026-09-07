@@ -14,6 +14,8 @@ var hidden_count := 0
 var body: VBoxContainer
 var title_label: Label
 var keyboard_avoider: KeyboardAvoider
+## 由 AppShell 在 add_child 前置 true：壳已经按系统安全区内缩过，页面再套一层就是双倍留白（真机截图）。
+var in_shell := false
 
 func _ready() -> void:
 	theme = GameUi.theme()
@@ -24,7 +26,15 @@ func _ready() -> void:
 	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(backdrop)
-	var safe := SafeAreaMargin.new()
+	var safe: MarginContainer
+	if in_shell:
+		safe = MarginContainer.new()
+		for side in ["left", "right"]:
+			safe.add_theme_constant_override("margin_%s" % side, 16)
+		safe.add_theme_constant_override("margin_top", 8)
+		safe.add_theme_constant_override("margin_bottom", 0)
+	else:
+		safe = SafeAreaMargin.new()
 	safe.name = "SafeArea"
 	safe.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(safe)

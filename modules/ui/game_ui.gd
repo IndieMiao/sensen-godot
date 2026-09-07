@@ -116,6 +116,21 @@ static func theme() -> Theme:
 		t.set_font_size("font_size", variant, 11)
 		t.set_constant("icon_max_width", variant, 18)
 		t.set_constant("h_separation", variant, 3)
+	# LineEdit：引擎默认是深色底，纸色主题里像一块黑砖（真机截图）。浅底 + 细边，聚焦描绿。
+	var edit := surface(Color("fbfcfb"), 10, 8)
+	edit.border_color = BORDER
+	edit.set_border_width_all(1)
+	t.set_stylebox("normal", "LineEdit", edit)
+	t.set_stylebox("read_only", "LineEdit", surface(Color("f2f5f2"), 10, 8))
+	var edit_focus := surface(Color("fbfcfb"), 10, 8)
+	edit_focus.border_color = GREEN
+	edit_focus.set_border_width_all(2)
+	t.set_stylebox("focus", "LineEdit", edit_focus)
+	t.set_color("font_color", "LineEdit", INK)
+	t.set_color("font_placeholder_color", "LineEdit", MUTED)
+	t.set_color("caret_color", "LineEdit", INK)
+	t.set_color("selection_color", "LineEdit", MINT)
+	t.set_font_size("font_size", "LineEdit", 14)
 	t.set_stylebox("panel", "ToastPanel", surface(INK, 12))
 	t.set_stylebox("background", "ProgressBar", surface(BORDER, 0, 3))
 	t.set_stylebox("fill", "ProgressBar", surface(GREEN, 0, 3))
@@ -125,7 +140,9 @@ static func button(symbol: String, text: String, tip: String, accent := false) -
 	var b := Button.new()
 	b.text = text
 	b.icon = icon(symbol) if not symbol.is_empty() else null
-	b.tooltip_text = tip
+	# tip 是给开发者看的注记（接口名 / 卡号），只在桌面当 tooltip；触屏上 Godot 会把它画在
+	# 视口左上角（2026-09-07 真机截图抓到），用户看到的是一串英文内部名。
+	b.tooltip_text = tip if OS.has_feature("pc") else ""
 	b.theme_type_variation = &"AccentButton" if accent else &"SecondaryButton"
 	b.custom_minimum_size = Vector2(44, 44)
 	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER if text.is_empty() else HORIZONTAL_ALIGNMENT_LEFT
