@@ -100,32 +100,36 @@ static func error_code(r: ApiClient.Response) -> String:
 		return msg.substr(0, cut) if cut > 0 else msg
 	return "HTTP_%d" % r.status
 
-## 给玩家看的文案（A2 i18n 后走 tr）。
+## 给玩家看的文案，已翻译（静态函数拿不到 Object.tr，走 TranslationServer）；调用方直接显示，不要再包 tr()。
 static func describe(code: String) -> String:
+	return TranslationServer.translate(describe_key(code)) % code if describe_key(code).contains("%s") else TranslationServer.translate(describe_key(code))
+
+## 未翻译的 key（含 %s 占位），供 describe() 与 i18n 抽取。
+static func describe_key(code: String) -> String:
 	match code:
 		"EMAIL_NOT_FOUND", "INVALID_PASSWORD", "INVALID_LOGIN_CREDENTIALS":
-			return "Email or password is incorrect."
+			return "Email or password is incorrect." ## i18n
 		"EMAIL_EXISTS":
-			return "An account with this email already exists."
+			return "An account with this email already exists." ## i18n
 		"WEAK_PASSWORD":
-			return "Password must be at least 6 characters."
+			return "Password must be at least 6 characters." ## i18n
 		"INVALID_EMAIL":
-			return "Enter a valid email address."
+			return "Enter a valid email address." ## i18n
 		"USER_DISABLED":
-			return "This account has been disabled."
+			return "This account has been disabled." ## i18n
 		"TOO_MANY_ATTEMPTS_TRY_LATER":
-			return "Too many attempts. Try again later."
+			return "Too many attempts. Try again later." ## i18n
 		"OPERATION_NOT_ALLOWED":
-			return "This sign-in method is not enabled."
+			return "This sign-in method is not enabled." ## i18n
 		"NOT_CONFIGURED":
-			return "Sign-in is not configured yet."
+			return "Sign-in is not configured yet." ## i18n
 		"TRANSPORT":
-			return "No connection. Check your network and try again."
+			return "No connection. Check your network and try again." ## i18n
 	# Firebase 的业务码全是 UPPER_SNAKE；其余（HTTP_xxx、传输层文本如 "timeout" / "transport error: 3"）
 	# 对玩家来说都是"网络不通"。
 	if code.begins_with("HTTP_") or code != code.to_upper() or code.contains(" "):
-		return "No connection. Check your network and try again."
-	return "Sign-in failed (%s)." % code
+		return "No connection. Check your network and try again." ## i18n
+	return "Sign-in failed (%s)." ## i18n
 
 func _identity(action: String, body: Dictionary) -> ApiClient.Response:
 	if not configured():

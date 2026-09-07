@@ -17,7 +17,7 @@ func _build_body() -> void:
 
 func _on_ws_state(state: int) -> void:
 	var names := {
-		WsClient.State.IDLE: "idle", WsClient.State.CONNECTING: "connecting", WsClient.State.OPEN: "connected",
-		WsClient.State.RECONNECT_WAIT: "reconnecting", WsClient.State.PAUSED: "paused",
+		WsClient.State.IDLE: tr("idle"), WsClient.State.CONNECTING: tr("connecting"), WsClient.State.OPEN: tr("connected"),
+		WsClient.State.RECONNECT_WAIT: tr("reconnecting"), WsClient.State.PAUSED: tr("paused"),
 	}
 	realtime.text = tr("Realtime: %s") % str(names.get(state, state))

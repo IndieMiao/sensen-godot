@@ -9,7 +9,14 @@ func _init() -> void:
 	page_title = "Settings"
 	stacked = true
 
+var language_button: Button
+
 func _build_body() -> void:
+	language_button = GameUi.button("book-open", "", "AppLocale")
+	language_button.name = "Language"
+	language_button.pressed.connect(_on_language)
+	_refresh_language_label()
+	body.add_child(language_button)
 	_link(tr("Privacy policy"), PRIVACY_URL, "Privacy")
 	_link(tr("Terms of service"), TERMS_URL, "Terms")
 	var delete := GameUi.button("x", tr("Delete account"), "R1: not wired yet")
@@ -27,6 +34,15 @@ func _link(text: String, url: String, node_name: String) -> void:
 	b.disabled = url.is_empty()
 	b.pressed.connect(func(): OS.shell_open(url))
 	body.add_child(b)
+
+func _refresh_language_label() -> void:
+	language_button.text = tr("Language: %s") % AppLocale.display_name(AppLocale.current())
+
+## 切语言后整壳重建：Godot 只会自动重译场景文件里的文本，代码里 tr() 赋的字串不会自己换。
+func _on_language() -> void:
+	AppLocale.apply(AppLocale.next(AppLocale.current()))
+	_refresh_language_label()
+	AppRouter.reload_shell()
 
 func _on_sign_out() -> void:
 	Net.auth.sign_out()

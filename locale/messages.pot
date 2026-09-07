@@ -1,0 +1,210 @@
+# 由 tools/i18n/extract_pot.gd 生成，勿手改；翻译写在 locale/<lang>.po。
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: res://modules/net/firebase_auth.gd:113
+msgid "An account with this email already exists."
+msgstr ""
+
+#: res://modules/app/app_page.gd:38
+msgid "Back"
+msgstr ""
+
+#: res://modules/app/app_routes.gd:25
+#: res://scenes/app/pages/im_page.gd:7
+msgid "Chats"
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:10
+msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
+msgstr ""
+
+#: res://scenes/app/login_page.gd:60
+msgid "Continue with Apple"
+msgstr ""
+
+#: res://scenes/app/login_page.gd:64
+msgid "Continue with Google"
+msgstr ""
+
+#: res://scenes/app/login_page.gd:50
+msgid "Create account"
+msgstr ""
+
+#: res://scenes/app/login_page.gd:121
+msgid "Creating account…"
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:22
+msgid "Delete account"
+msgstr ""
+
+#: res://scenes/app/login_page.gd:74
+msgid "Dev: continue offline"
+msgstr ""
+
+#: res://scenes/app/pages/map_page.gd:10
+#: res://scenes/app/pages/profile_page.gd:17
+msgid "Dressing room"
+msgstr ""
+
+#: res://scenes/app/login_page.gd:32
+msgid "Email"
+msgstr ""
+
+#: res://modules/net/firebase_auth.gd:111
+msgid "Email or password is incorrect."
+msgstr ""
+
+#: res://modules/net/firebase_auth.gd:117
+msgid "Enter a valid email address."
+msgstr ""
+
+#: res://modules/app/app_routes.gd:25
+#: res://scenes/app/pages/feed_page.gd:5
+msgid "Feed"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:8
+msgid "Feed lands in B3: timeline, photo composer, likes, comments and report."
+msgstr ""
+
+#: res://scenes/app/login_page.gd:55
+msgid "Forgot password"
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:39
+msgid "Language: %s"
+msgstr ""
+
+#: res://modules/app/app_routes.gd:25
+#: res://scenes/app/pages/map_page.gd:6
+msgid "Map"
+msgstr ""
+
+#: res://scenes/app/pages/map_page.gd:9
+msgid "Map home lands in B5: Mapbox underlay, friends' positions and 3D avatars. This tab stays resident so the native map view can be shown/hidden instead of rebuilt."
+msgstr ""
+
+#: res://modules/app/app_routes.gd:25
+#: res://scenes/app/pages/profile_page.gd:7
+msgid "Me"
+msgstr ""
+
+#: res://modules/net/firebase_auth.gd:127
+#: res://modules/net/firebase_auth.gd:131
+msgid "No connection. Check your network and try again."
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:32
+msgid "Not signed in"
+msgstr ""
+
+#: res://scenes/app/login_page.gd:38
+msgid "Password (6+ characters)"
+msgstr ""
+
+#: res://modules/net/firebase_auth.gd:115
+msgid "Password must be at least 6 characters."
+msgstr ""
+
+#: res://scenes/app/login_page.gd:157
+msgid "Password reset email sent."
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:20
+msgid "Privacy policy"
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:16
+msgid "Profile lands in B4: profile card, edit, avatar entry, Space 3D."
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:23
+msgid "Realtime: %s"
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:25
+#: res://scenes/app/pages/settings_page.gd:9
+msgid "Settings"
+msgstr ""
+
+#: res://scenes/app/login_page.gd:27
+#: res://scenes/app/login_page.gd:43
+msgid "Sign in"
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:26
+msgid "Sign out"
+msgstr ""
+
+#: res://modules/net/firebase_auth.gd:132
+msgid "Sign-in failed (%s)."
+msgstr ""
+
+#: res://scenes/app/login_page.gd:93
+msgid "Sign-in is not configured yet (config/firebase.json)."
+msgstr ""
+
+#: res://modules/net/firebase_auth.gd:125
+msgid "Sign-in is not configured yet."
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:34
+msgid "Signed in as %s (%s)"
+msgstr ""
+
+#: res://scenes/app/login_page.gd:121
+msgid "Signing in…"
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:21
+msgid "Terms of service"
+msgstr ""
+
+#: res://modules/net/firebase_auth.gd:119
+msgid "This account has been disabled."
+msgstr ""
+
+#: res://modules/net/firebase_auth.gd:123
+msgid "This sign-in method is not enabled."
+msgstr ""
+
+#: res://modules/net/firebase_auth.gd:121
+msgid "Too many attempts. Try again later."
+msgstr ""
+
+#: res://scenes/app/login_page.gd:141
+msgid "Verification email sent."
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:21
+#: res://scenes/app/pages/voice_room_page.gd:5
+msgid "Voice room"
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:9
+msgid "Voice room lands in B6 (UI), C4 (LiveKit bridge) and D5 (token/signaling)."
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:20
+msgid "connected"
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:20
+msgid "connecting"
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:20
+msgid "idle"
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:21
+msgid "paused"
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:21
+msgid "reconnecting"
+msgstr ""
+

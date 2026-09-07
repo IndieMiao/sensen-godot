@@ -114,7 +114,7 @@ func _password_flow(create: bool) -> void:
 	var p := password.text
 	var invalid := validate(e, p)
 	if not invalid.is_empty():
-		status.text = tr(FirebaseAuth.describe(invalid))
+		status.text = FirebaseAuth.describe(invalid)
 		return
 	busy = true
 	_refresh_enabled()
@@ -129,7 +129,7 @@ func _password_flow(create: bool) -> void:
 	if not bool(r.get("ok", false)):
 		var code := str(r.get("code", "UNKNOWN"))
 		s.fail_sign_in(code)
-		status.text = tr(FirebaseAuth.describe(code))
+		status.text = FirebaseAuth.describe(code)
 		busy = false
 		_refresh_enabled()
 		return
@@ -147,14 +147,14 @@ func _on_forgot() -> void:
 	var e := email.text.strip_edges()
 	var invalid := validate(e, "", false)
 	if not invalid.is_empty():
-		status.text = tr(FirebaseAuth.describe(invalid))
+		status.text = FirebaseAuth.describe(invalid)
 		return
 	busy = true
 	_refresh_enabled()
 	var r: Dictionary = await _fb().send_password_reset(e)
 	busy = false
 	_refresh_enabled()
-	status.text = tr("Password reset email sent.") if bool(r.get("ok", false)) else tr(FirebaseAuth.describe(str(r.get("code", ""))))
+	status.text = tr("Password reset email sent.") if bool(r.get("ok", false)) else FirebaseAuth.describe(str(r.get("code", "")))
 
 func _on_dev_continue() -> void:
 	_session().complete_sign_in("dev-local", "dev-token", "", 3600, "dev", "dev@local")

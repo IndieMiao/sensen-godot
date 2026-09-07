@@ -30,6 +30,11 @@ common/default_scroll_deadzone=24
 theme/custom="res://assets/ui/app_theme.tres"
 theme/custom_font="res://assets/ui/fonts/NotoSansSC-Regular.otf"
 
+[internationalization]
+
+locale/fallback="en"
+locale/translations=PackedStringArray("res://locale/en.po", "res://locale/zh_CN.po")
+
 [input_devices]
 
 pointing/android/enable_pan_and_scale_gestures=true

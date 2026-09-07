@@ -1,0 +1,153 @@
+# en-US 源语言模板，由 tools/i18n/extract_pot.gd 生成，勿手改；msgstr 留空即回退 msgid。
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "An account with this email already exists."
+msgstr ""
+
+msgid "Back"
+msgstr ""
+
+msgid "Chats"
+msgstr ""
+
+msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
+msgstr ""
+
+msgid "Continue with Apple"
+msgstr ""
+
+msgid "Continue with Google"
+msgstr ""
+
+msgid "Create account"
+msgstr ""
+
+msgid "Creating account…"
+msgstr ""
+
+msgid "Delete account"
+msgstr ""
+
+msgid "Dev: continue offline"
+msgstr ""
+
+msgid "Dressing room"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "Email or password is incorrect."
+msgstr ""
+
+msgid "Enter a valid email address."
+msgstr ""
+
+msgid "Feed"
+msgstr ""
+
+msgid "Feed lands in B3: timeline, photo composer, likes, comments and report."
+msgstr ""
+
+msgid "Forgot password"
+msgstr ""
+
+msgid "Language: %s"
+msgstr ""
+
+msgid "Map"
+msgstr ""
+
+msgid "Map home lands in B5: Mapbox underlay, friends' positions and 3D avatars. This tab stays resident so the native map view can be shown/hidden instead of rebuilt."
+msgstr ""
+
+msgid "Me"
+msgstr ""
+
+msgid "No connection. Check your network and try again."
+msgstr ""
+
+msgid "Not signed in"
+msgstr ""
+
+msgid "Password (6+ characters)"
+msgstr ""
+
+msgid "Password must be at least 6 characters."
+msgstr ""
+
+msgid "Password reset email sent."
+msgstr ""
+
+msgid "Privacy policy"
+msgstr ""
+
+msgid "Profile lands in B4: profile card, edit, avatar entry, Space 3D."
+msgstr ""
+
+msgid "Realtime: %s"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Sign in"
+msgstr ""
+
+msgid "Sign out"
+msgstr ""
+
+msgid "Sign-in failed (%s)."
+msgstr ""
+
+msgid "Sign-in is not configured yet (config/firebase.json)."
+msgstr ""
+
+msgid "Sign-in is not configured yet."
+msgstr ""
+
+msgid "Signed in as %s (%s)"
+msgstr ""
+
+msgid "Signing in…"
+msgstr ""
+
+msgid "Terms of service"
+msgstr ""
+
+msgid "This account has been disabled."
+msgstr ""
+
+msgid "This sign-in method is not enabled."
+msgstr ""
+
+msgid "Too many attempts. Try again later."
+msgstr ""
+
+msgid "Verification email sent."
+msgstr ""
+
+msgid "Voice room"
+msgstr ""
+
+msgid "Voice room lands in B6 (UI), C4 (LiveKit bridge) and D5 (token/signaling)."
+msgstr ""
+
+msgid "connected"
+msgstr ""
+
+msgid "connecting"
+msgstr ""
+
+msgid "idle"
+msgstr ""
+
+msgid "paused"
+msgstr ""
+
+msgid "reconnecting"
+msgstr ""
+

@@ -21,9 +21,18 @@ var _navigation_pending := false
 var _stack: Array[Node] = []
 
 
+const NetScript := preload("res://modules/net/net_service.gd")
+
+
 func _ready() -> void:
 	# 项目设置是主配置；运行时再设一次，避免导出模板或测试环境覆盖它。
 	get_tree().quit_on_go_back = false
+	# 语言：读玩家选择或系统语言。测试进程固定 en——引擎启动会按系统语言选 locale，
+	# 中文开发机上注册了 zh_CN 翻译后，所有英文断言都会变成中文而失败。
+	if NetScript.is_test_process():
+		TranslationServer.set_locale("en")
+	else:
+		AppLocale.boot_apply()
 	var qa_scene := qa_scene_path(OS.get_cmdline_user_args())
 	if not qa_scene.is_empty():
 		call_deferred("_open_qa_scene", qa_scene)
@@ -51,6 +60,15 @@ func go_to_login() -> void:
 func go_to_shell() -> void:
 	_clear_stack()
 	_go_to(SHELL)
+
+
+## 语言切换等需要整壳重建的场景：清栈后重载当前场景（_go_to 对同路径是 no-op）。
+func reload_shell() -> void:
+	_clear_stack()
+	if _current_scene_path() == SHELL:
+		get_tree().reload_current_scene()
+	else:
+		_go_to(SHELL)
 
 
 func _clear_stack() -> void:

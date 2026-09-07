@@ -22,7 +22,7 @@ const TAB_SCENES := {
 	TAB_IM: "res://scenes/app/pages/im_page.tscn",
 	TAB_PROFILE: "res://scenes/app/pages/profile_page.tscn",
 }
-const TAB_TITLES := {TAB_MAP: "Map", TAB_FEED: "Feed", TAB_IM: "Chats", TAB_PROFILE: "Me"}
+const TAB_TITLES := {TAB_MAP: "Map", TAB_FEED: "Feed", TAB_IM: "Chats", TAB_PROFILE: "Me"} ## i18n 由 AppShell tr()
 const TAB_ICONS := {TAB_MAP: "map-pin", TAB_FEED: "book-open", TAB_IM: "users-round", TAB_PROFILE: "user-round"}
 
 ## 压栈子页（AppRouter.push_instance）：全屏、带返回按钮，弹出后回到壳的当前 Tab。

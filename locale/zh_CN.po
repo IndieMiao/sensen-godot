@@ -1,0 +1,152 @@
+# zh-CN 翻译。msgid 是源码里的 en-US 原文，翻译校对交 SSLAUNCH E10；导回时不要改 msgid。
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "An account with this email already exists."
+msgstr "该邮箱已注册。"
+
+msgid "Back"
+msgstr "返回"
+
+msgid "Chats"
+msgstr "消息"
+
+msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
+msgstr "消息功能将在 B2 接入：会话列表、单聊与群聊、图片、已读回执。"
+
+msgid "Continue with Apple"
+msgstr "通过 Apple 继续"
+
+msgid "Continue with Google"
+msgstr "通过 Google 继续"
+
+msgid "Create account"
+msgstr "创建账号"
+
+msgid "Creating account…"
+msgstr "正在创建账号…"
+
+msgid "Delete account"
+msgstr "删除账号"
+
+msgid "Dev: continue offline"
+msgstr "开发：离线继续"
+
+msgid "Dressing room"
+msgstr "换装房"
+
+msgid "Email"
+msgstr "邮箱"
+
+msgid "Email or password is incorrect."
+msgstr "邮箱或密码不正确。"
+
+msgid "Enter a valid email address."
+msgstr "请输入有效的邮箱地址。"
+
+msgid "Feed"
+msgstr "动态"
+
+msgid "Feed lands in B3: timeline, photo composer, likes, comments and report."
+msgstr "动态将在 B3 接入：时间线、图文发布、点赞、评论与举报。"
+
+msgid "Forgot password"
+msgstr "忘记密码"
+
+msgid "Language: %s"
+msgstr "语言：%s"
+
+msgid "Map"
+msgstr "地图"
+
+msgid "Map home lands in B5: Mapbox underlay, friends' positions and 3D avatars. This tab stays resident so the native map view can be shown/hidden instead of rebuilt."
+msgstr "地图主页将在 B5 接入：Mapbox 底图、好友位置与 3D 角色。此页常驻，原生地图只做显隐、不重建。"
+
+msgid "Me"
+msgstr "我"
+
+msgid "No connection. Check your network and try again."
+msgstr "网络不可用，请检查网络后重试。"
+
+msgid "Not signed in"
+msgstr "未登录"
+
+msgid "Password (6+ characters)"
+msgstr "密码（至少 6 位）"
+
+msgid "Password must be at least 6 characters."
+msgstr "密码至少 6 位。"
+
+msgid "Password reset email sent."
+msgstr "重置密码邮件已发送。"
+
+msgid "Privacy policy"
+msgstr "隐私政策"
+
+msgid "Profile lands in B4: profile card, edit, avatar entry, Space 3D."
+msgstr "我的主页将在 B4 接入：资料卡、编辑、形象入口、3D 空间。"
+
+msgid "Realtime: %s"
+msgstr "实时连接：%s"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "Sign in"
+msgstr "登录"
+
+msgid "Sign out"
+msgstr "退出登录"
+
+msgid "Sign-in failed (%s)."
+msgstr "登录失败（%s）。"
+
+msgid "Sign-in is not configured yet (config/firebase.json)."
+msgstr "登录尚未配置（config/firebase.json）。"
+
+msgid "Sign-in is not configured yet."
+msgstr "登录尚未配置。"
+
+msgid "Signed in as %s (%s)"
+msgstr "已登录：%s（%s）"
+
+msgid "Signing in…"
+msgstr "正在登录…"
+
+msgid "Terms of service"
+msgstr "服务条款"
+
+msgid "This account has been disabled."
+msgstr "该账号已被停用。"
+
+msgid "This sign-in method is not enabled."
+msgstr "该登录方式未启用。"
+
+msgid "Too many attempts. Try again later."
+msgstr "尝试次数过多，请稍后再试。"
+
+msgid "Verification email sent."
+msgstr "验证邮件已发送。"
+
+msgid "Voice room"
+msgstr "语音房"
+
+msgid "Voice room lands in B6 (UI), C4 (LiveKit bridge) and D5 (token/signaling)."
+msgstr "语音房将在 B6（界面）、C4（LiveKit 桥接）与 D5（令牌 / 信令）接入。"
+
+msgid "connected"
+msgstr "已连接"
+
+msgid "connecting"
+msgstr "连接中"
+
+msgid "idle"
+msgstr "空闲"
+
+msgid "paused"
+msgstr "已暂停"
+
+msgid "reconnecting"
+msgstr "重连中"

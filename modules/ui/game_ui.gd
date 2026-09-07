@@ -58,6 +58,8 @@ static func theme() -> Theme:
 	var font := FontVariation.new()
 	font.base_font = load("res://assets/ui/fonts/Nunito.ttf")
 	font.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 650.0}
+	# Nunito 没有 CJK 字形；zh_CN 下靠 Noto Sans SC 回退（A2 i18n）。
+	font.fallbacks = [load("res://assets/ui/fonts/NotoSansSC-Regular.otf")]
 	t.default_font = font
 	t.default_font_size = 14
 	t.set_color("font_color", "Label", INK)
