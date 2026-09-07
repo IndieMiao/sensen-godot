@@ -19,6 +19,9 @@ msgstr ""
 msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
 msgstr ""
 
+msgid "Clear log"
+msgstr ""
+
 msgid "Contact us"
 msgstr ""
 
@@ -52,6 +55,9 @@ msgstr ""
 msgid "Dev: continue offline"
 msgstr ""
 
+msgid "Dev: lifecycle probe"
+msgstr ""
+
 msgid "Dressing room"
 msgstr ""
 
@@ -83,6 +89,9 @@ msgid "I have read and agree to the Terms of Service and Privacy Policy."
 msgstr ""
 
 msgid "Language: %s"
+msgstr ""
+
+msgid "Lifecycle probe"
 msgstr ""
 
 msgid "Map"
@@ -152,6 +161,12 @@ msgid "Signing in…"
 msgstr ""
 
 msgid "Sorry, you're not eligible to use this app."
+msgstr ""
+
+msgid "Switch to another app and come back several times. Each PAUSED/RESUMED pair must increase by one."
+msgstr ""
+
+msgid "Tap here to test keyboard avoidance"
 msgstr ""
 
 msgid "Tell us your date of birth to get started."

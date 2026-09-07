@@ -7,7 +7,7 @@ msgstr ""
 msgid "An account with this email already exists."
 msgstr ""
 
-#: res://modules/app/app_page.gd:38
+#: res://modules/app/app_page.gd:39
 msgid "Back"
 msgstr ""
 
@@ -22,6 +22,10 @@ msgstr ""
 
 #: res://scenes/app/pages/im_page.gd:10
 msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
+msgstr ""
+
+#: res://scenes/app/pages/lifecycle_probe_page.gd:46
+msgid "Clear log"
 msgstr ""
 
 #: res://scenes/app/pages/settings_page.gd:29
@@ -49,7 +53,7 @@ msgstr ""
 msgid "Creating account…"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:50
+#: res://scenes/app/pages/settings_page.gd:55
 msgid "Delete"
 msgstr ""
 
@@ -57,16 +61,20 @@ msgstr ""
 msgid "Delete account"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:48
+#: res://scenes/app/pages/settings_page.gd:53
 msgid "Delete account?"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:92
+#: res://scenes/app/pages/settings_page.gd:97
 msgid "Deleting account…"
 msgstr ""
 
 #: res://scenes/app/login_page.gd:74
 msgid "Dev: continue offline"
+msgstr ""
+
+#: res://scenes/app/pages/settings_page.gd:47
+msgid "Dev: lifecycle probe"
 msgstr ""
 
 #: res://scenes/app/pages/map_page.gd:10
@@ -111,8 +119,12 @@ msgstr ""
 msgid "I have read and agree to the Terms of Service and Privacy Policy."
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:68
+#: res://scenes/app/pages/settings_page.gd:73
 msgid "Language: %s"
+msgstr ""
+
+#: res://scenes/app/pages/lifecycle_probe_page.gd:25
+msgid "Lifecycle probe"
 msgstr ""
 
 #: res://modules/app/app_routes.gd:28
@@ -154,7 +166,7 @@ msgstr ""
 msgid "Please select your full date of birth."
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:101
+#: res://scenes/app/pages/settings_page.gd:106
 msgid "Please sign in again, then delete your account."
 msgstr ""
 
@@ -213,6 +225,14 @@ msgstr ""
 msgid "Sorry, you're not eligible to use this app."
 msgstr ""
 
+#: res://scenes/app/pages/lifecycle_probe_page.gd:29
+msgid "Switch to another app and come back several times. Each PAUSED/RESUMED pair must increase by one."
+msgstr ""
+
+#: res://scenes/app/pages/lifecycle_probe_page.gd:38
+msgid "Tap here to test keyboard avoidance"
+msgstr ""
+
 #: res://scenes/app/age_gate_page.gd:19
 msgid "Tell us your date of birth to get started."
 msgstr ""
@@ -230,7 +250,7 @@ msgstr ""
 msgid "This community has zero tolerance for abusive content or behavior. Content you post can be reported and removed, and repeat offenders are banned."
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:49
+#: res://scenes/app/pages/settings_page.gd:54
 msgid "This permanently deletes your account and data. This cannot be undone."
 msgstr ""
 

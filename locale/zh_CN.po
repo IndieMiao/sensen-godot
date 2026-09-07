@@ -19,6 +19,9 @@ msgstr "消息"
 msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
 msgstr "消息功能将在 B2 接入：会话列表、单聊与群聊、图片、已读回执。"
 
+msgid "Clear log"
+msgstr "清空日志"
+
 msgid "Contact us"
 msgstr "联系我们"
 
@@ -52,6 +55,9 @@ msgstr "正在删除账号…"
 msgid "Dev: continue offline"
 msgstr "开发：离线继续"
 
+msgid "Dev: lifecycle probe"
+msgstr "开发：生命周期探针"
+
 msgid "Dressing room"
 msgstr "换装房"
 
@@ -84,6 +90,9 @@ msgstr "我已阅读并同意《服务条款》与《隐私政策》。"
 
 msgid "Language: %s"
 msgstr "语言：%s"
+
+msgid "Lifecycle probe"
+msgstr "生命周期探针"
 
 msgid "Map"
 msgstr "地图"
@@ -153,6 +162,12 @@ msgstr "正在登录…"
 
 msgid "Sorry, you're not eligible to use this app."
 msgstr "很抱歉，你暂时不能使用本应用。"
+
+msgid "Switch to another app and come back several times. Each PAUSED/RESUMED pair must increase by one."
+msgstr "切到别的应用再回来，重复几次。每次 PAUSED / RESUMED 都应各加一。"
+
+msgid "Tap here to test keyboard avoidance"
+msgstr "点这里测试键盘避让"
 
 msgid "Tell us your date of birth to get started."
 msgstr "请填写出生日期以开始。"

@@ -43,6 +43,11 @@ func _build_body() -> void:
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(status)
+	if OS.is_debug_build():
+		var probe := GameUi.button("timer", tr("Dev: lifecycle probe"), "A6 iOS/Android lifecycle notifications")
+		probe.name = "LifecycleProbe"
+		probe.pressed.connect(func(): AppRouter.push_instance(AppRoutes.LIFECYCLE_PROBE))
+		body.add_child(probe)
 	confirm = ConfirmationDialog.new()
 	confirm.name = "ConfirmDelete"
 	confirm.title = tr("Delete account?")
