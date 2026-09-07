@@ -342,3 +342,6 @@ msgstr "暴力或威胁"
 
 msgid "You won't see each other's posts or profiles, and you'll stop following each other."
 msgstr "你们将看不到彼此的动态和主页，并会互相取消关注。"
+
+msgid "Dev: reset age gate"
+msgstr "开发：重置年龄门"

@@ -87,7 +87,7 @@ msgstr ""
 msgid "Contact us"
 msgstr ""
 
-#: res://scenes/app/age_gate_page.gd:30
+#: res://scenes/app/age_gate_page.gd:32
 #: res://scenes/app/consent_page.gd:38
 msgid "Continue"
 msgstr ""
@@ -134,6 +134,10 @@ msgstr ""
 
 #: res://scenes/app/pages/settings_page.gd:48
 msgid "Dev: lifecycle probe"
+msgstr ""
+
+#: res://scenes/app/age_gate_page.gd:84
+msgid "Dev: reset age gate"
 msgstr ""
 
 #: res://scenes/app/pages/profile_page.gd:47
@@ -255,7 +259,7 @@ msgstr ""
 msgid "Please check the %s field."
 msgstr ""
 
-#: res://scenes/app/age_gate_page.gd:68
+#: res://scenes/app/age_gate_page.gd:70
 msgid "Please select your full date of birth."
 msgstr ""
 
@@ -359,7 +363,7 @@ msgstr ""
 msgid "Something else"
 msgstr ""
 
-#: res://scenes/app/age_gate_page.gd:77
+#: res://scenes/app/age_gate_page.gd:79
 msgid "Sorry, you're not eligible to use this app."
 msgstr ""
 
@@ -375,7 +379,7 @@ msgstr ""
 msgid "Tap here to test keyboard avoidance"
 msgstr ""
 
-#: res://scenes/app/age_gate_page.gd:19
+#: res://scenes/app/age_gate_page.gd:21
 msgid "Tell us your date of birth to get started."
 msgstr ""
 
@@ -430,7 +434,7 @@ msgstr ""
 msgid "Voice room lands in B6 (UI), C4 (LiveKit bridge) and D5 (token/signaling)."
 msgstr ""
 
-#: res://scenes/app/age_gate_page.gd:16
+#: res://scenes/app/age_gate_page.gd:18
 msgid "Welcome"
 msgstr ""
 

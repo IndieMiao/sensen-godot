@@ -11,6 +11,8 @@ var month: OptionButton
 var day: OptionButton
 var continue_button: Button
 var status: Label
+## debug 构建里拦截页上的重置入口：测试期误点年份就会被永久拦截，没有它设备等于死锁。
+var reset_button: Button
 
 func _init() -> void:
 	page_title = "Welcome"
@@ -26,6 +28,7 @@ func _build_body() -> void:
 	day = _picker("Day", range(1, 32))
 	for p in [year, month, day]:
 		p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		p.item_selected.connect(_on_picked)
 		row.add_child(p)
 	continue_button = GameUi.button("check", tr("Continue"), "record age gate", true)
 	continue_button.name = "Continue"
@@ -62,6 +65,11 @@ func selected_birth() -> Dictionary:
 		return {}
 	return {"year": year.get_selected_id(), "month": month.get_selected_id(), "day": day.get_selected_id()}
 
+## 选了日期就把「请选完整生日」的提示收掉；被拦截时提示不动。
+func _on_picked(_index: int) -> void:
+	if not _state().age_gate_blocked:
+		status.text = ""
+
 func _on_continue() -> void:
 	var birth := selected_birth()
 	if birth.is_empty():
@@ -78,6 +86,23 @@ func _show_blocked() -> void:
 	continue_button.disabled = true
 	for p in [year, month, day]:
 		p.disabled = true
+	if OS.is_debug_build() and reset_button == null:
+		reset_button = GameUi.button("x", tr("Dev: reset age gate"), "FirstRun.clear()")
+		reset_button.name = "DevReset"
+		reset_button.pressed.connect(_on_dev_reset)
+		body.add_child(reset_button)
+
+## 只在 debug 构建存在；正式包里被拦截就是被拦截。
+func _on_dev_reset() -> void:
+	FirstRun.clear()
+	first_run = FirstRun.new()
+	status.text = ""
+	continue_button.disabled = false
+	for p in [year, month, day]:
+		p.disabled = false
+		p.select(-1)
+	reset_button.queue_free()
+	reset_button = null
 
 func _go(route: String) -> void:
 	if navigate.is_valid():

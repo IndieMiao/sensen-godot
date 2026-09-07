@@ -38,6 +38,13 @@ func _ready() -> void:
 	var qa_scene := qa_scene_path(OS.get_cmdline_user_args())
 	if not qa_scene.is_empty():
 		call_deferred("_open_qa_scene", qa_scene)
+	# QA 流程步行器（模拟器 / 真机无人值守）：非测试进程且明确要求时才挂。
+	var flow := QaFlow.requested(OS.get_cmdline_user_args(), OS.get_environment("SENSEN_QA_FLOW"))
+	if not flow.is_empty() and not NetScript.is_test_process():
+		var walker := QaFlow.new()
+		walker.name = "QaFlow"
+		walker.flow = flow
+		add_child(walker)
 
 
 func go_to_map() -> void:
