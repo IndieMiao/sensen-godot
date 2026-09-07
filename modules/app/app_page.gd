@@ -13,6 +13,7 @@ var shown_count := 0
 var hidden_count := 0
 var body: VBoxContainer
 var title_label: Label
+var keyboard_avoider: KeyboardAvoider
 
 func _ready() -> void:
 	theme = GameUi.theme()
@@ -49,6 +50,11 @@ func _ready() -> void:
 	body.add_theme_constant_override("separation", 12)
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(body)
+	# 软键盘避让：所有带输入框的页面（登录 / 聊天 / 发布器 / 资料编辑）统一在这里挂，A5 专项。
+	keyboard_avoider = KeyboardAvoider.new()
+	keyboard_avoider.name = "KeyboardAvoider"
+	keyboard_avoider.target = column
+	add_child(keyboard_avoider)
 	_build_body()
 
 ## 子类填充页面内容。
