@@ -88,6 +88,12 @@ func test_list_renders_conversations_with_unread_and_preview() -> void:
 	assert_int(nav.calls.size()).is_equal(1)
 	assert_str(nav.calls[0].route).is_equal(AppRoutes.CHAT)
 	assert_str(nav.calls[0].args.conversation.id).is_equal("c1")
+	# 有最近消息时间就带相对时间
+	var recent := _conv("c3", "Cy", 0, "yo")
+	recent["last_message_at"] = int(Time.get_unix_time_from_system() * 1000.0) - 5 * 60 * 1000
+	im_t.responses.append({"status": 200, "json": {"items": [recent]}})
+	await p.refresh()
+	assert_str((p.list.get_child(0) as Button).text).is_equal("Cy · 5m ago\nyo")
 
 func test_start_chat_by_handle_looks_up_profile_then_opens_dm() -> void:
 	profile_t.responses = [{"status": 200, "json": {"user_id": "u-9", "display_name": "Nine"}}]

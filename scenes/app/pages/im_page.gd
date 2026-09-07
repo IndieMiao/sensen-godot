@@ -228,9 +228,14 @@ func _row(c: Dictionary) -> Button:
 	var last: Dictionary = c.get("last_message", {}) if c.get("last_message") is Dictionary else {}
 	var preview := preview_for(last)
 	var title := preload("res://scenes/app/pages/chat_page.gd").title_for(c)
-	b.text = "%s%s\n%s" % [title, "  (%d)" % unread if unread > 0 else "", preview]
+	var at := int(c.get("last_message_at", 0)) if c.get("last_message_at") != null else 0
+	var when := " · " + PostCard.age_text(_now_ms(), at) if at > 0 else ""
+	b.text = "%s%s%s\n%s" % [title, "  (%d)" % unread if unread > 0 else "", when, preview]
 	b.pressed.connect(open_conversation.bind(c))
 	return b
+
+func _now_ms() -> int:
+	return int(Time.get_unix_time_from_system() * 1000.0)
 
 func preview_for(last: Dictionary) -> String:
 	if last.is_empty():

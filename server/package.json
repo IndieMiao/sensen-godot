@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed:qa": "tsx scripts/seed_qa.ts"
   },
   "dependencies": {
     "@fastify/rate-limit": "^11.2.0",

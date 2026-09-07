@@ -345,3 +345,19 @@ app 容器重建后再按即生效；480x = 3 分钟走完一个玩家日。白�
 `pm clear` 之后是新玩家，要重新加。
 
 检查清单在 Plane SGODOT-33。
+
+## 环境分离与 QA 账号（D8）
+
+三套环境只靠环境变量区分，代码不分支：
+
+| 环境 | DATABASE_URL | FIREBASE_PROJECT_ID | 图片 | 用途 |
+|---|---|---|---|---|
+| dev | 本机 / 局域网 PG（`sensen_farm_dev`） | `gensen-overseas-dev` | `UPLOAD_LOCAL_DIR`（本地目录） | 开发机 + 真机联调 |
+| qa | QA 库（独立实例） | `gensen-overseas-dev` | R2 dev 桶 | 内测 / 演示包（B8），`QA_PLAYER_IDS` 白名单 |
+| prod | 生产库 | 生产 Firebase 项目（SSLAUNCH D1） | R2 生产桶 + 自定义域 | 上架 |
+
+各环境一份 `.env`（`.env.example` 是模板），部署时 `/opt/farm/.env`（chmod 600）。云区域与实例等 SSLAUNCH D5 定。
+
+QA / 演示账号用 `pnpm seed:qa`（`scripts/seed_qa.ts`）：Firebase 邮箱密码账号 → `POST /v1/auth/firebase` 建映射 →
+设 handle / 昵称 → 互相关注。幂等，可反复跑；内置 alice / bob / carol，也可传 accounts.json。
+
