@@ -34,6 +34,7 @@ import { ADMIN_ACTIONS, NullModerator, REPORT_AUTO_HIDE, decide, reportView, val
   type ModerationStore, type TextModerator } from './moderation.js';
 import { HISTORY_LIMIT_MAX, SYNC_LIMIT_MAX, conversationView, greetingBlocked, messageView, uniqueIds, validateGroup, validateMessage,
   type ConversationRow, type ImStore, type LiveHub, type PeerCard, type UserEvent } from './im.js';
+import { registerImGateway, type SocketHub } from './ws_gateway.js';
 
 export interface AppDeps {
   store: Store;
@@ -66,8 +67,12 @@ export interface AppDeps {
   adminUserIds?: Set<string>;
   /** D3 IM；需要 social 判关系。缺省时相关路由 503 IM_NOT_CONFIGURED。 */
   im?: ImStore;
-  /** 在线推送落点（WS 网关）；缺省不推，客户端靠 sync 补拉。 */
+  /** 在线推送落点；缺省不推，客户端靠 sync 补拉。测试用 RecordingHub。 */
   liveHub?: LiveHub;
+  /** 真 WS 网关：给了就注册 /v1/im/ws，并作为 liveHub 的默认值。 */
+  wsHub?: SocketHub;
+  /** 服务端 ping 间隔（测试缩短）。 */
+  wsPingIntervalMs?: number;
 }
 
 interface Regions {
@@ -797,7 +802,9 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     await reply.code(c.status).send(c.body);
     return null;
   };
-  const publish = (events: UserEvent[]) => { if (events.length) deps.liveHub?.publish(events); };
+  const hub: LiveHub | undefined = deps.liveHub ?? deps.wsHub;
+  const publish = (events: UserEvent[]) => { if (events.length) hub?.publish(events); };
+  if (deps.wsHub && deps.im) await registerImGateway(app, deps.wsHub, currentUser, { now: deps.now, pingIntervalMs: deps.wsPingIntervalMs });
   const peerCardsOf = async (ids: string[]): Promise<Map<string, PeerCard>> => {
     const profiles = await deps.social!.profiles([...new Set(ids)]);
     const out = new Map<string, PeerCard>();
@@ -952,7 +959,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   });
 
   app.get('/v1/healthz', async (_req, reply) => reply.send({
-    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), feed: Boolean(deps.feed), uploads: Boolean(deps.uploads), moderation: Boolean(deps.moderation), text_moderator: Boolean(deps.textModerator), im: Boolean(deps.im), git_sha: deps.gitSha ?? 'dev',
+    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), feed: Boolean(deps.feed), uploads: Boolean(deps.uploads), moderation: Boolean(deps.moderation), text_moderator: Boolean(deps.textModerator), im: Boolean(deps.im), ws: Boolean(deps.wsHub), git_sha: deps.gitSha ?? 'dev',
     content_version: deps.contentVersion, domain_version: DOMAIN_VERSION,
     server_time: deps.now(),
   }));

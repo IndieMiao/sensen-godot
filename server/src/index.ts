@@ -13,6 +13,7 @@ import { PgModerationStore } from './db/pg_moderation.js';
 import { OpenAiModerator, moderationAccountModule } from './http/moderation.js';
 import { PgImStore } from './db/pg_im.js';
 import { imAccountModule } from './http/im.js';
+import { SocketHub } from './http/ws_gateway.js';
 import { CachedJwks, googleJwksFetcher } from './http/firebase_token.js';
 import { migrate } from './db/migrate.js';
 import { contentVersion, loadContent } from './domain/content.js';
@@ -72,6 +73,7 @@ const feed = new PgFeedStore(pool);
 const uploads = s3ConfigFromEnv(process.env);
 const moderation = new PgModerationStore(pool);
 const im = new PgImStore(pool);
+const wsHub = new SocketHub();
 const textModerator = process.env.OPENAI_API_KEY ? new OpenAiModerator(process.env.OPENAI_API_KEY) : undefined;
 if (!textModerator) console.warn('未设置 OPENAI_API_KEY：文本不做前置过滤，全部进人工复审队列');
 if (!uploads) console.warn('未设置 R2_ENDPOINT / R2_BUCKET / R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY：图片直传路由返回 503');
@@ -79,7 +81,7 @@ if (!uploads) console.warn('未设置 R2_ENDPOINT / R2_BUCKET / R2_ACCESS_KEY_ID
 const app = await buildApp({
   store, content, contentVersion: cv,
   accounts: new PgAccountStore(pool),
-  social, feed, uploads, moderation, textModerator, im,
+  social, feed, uploads, moderation, textModerator, im, wsHub,
   adminUserIds: new Set((process.env.ADMIN_USER_IDS ?? '').split(',').map(x => x.trim()).filter(Boolean)),
   accountModules: [socialAccountModule(social), feedAccountModule(feed), moderationAccountModule(moderation), imAccountModule(im)],
   firebase: firebaseProjectId ? { projectId: firebaseProjectId, keys: jwks.keys, refreshKeys: jwks.refresh } : undefined,

@@ -254,6 +254,11 @@ UNSIGNED-PAYLOAD），服务端不经手图片流量。key 形如 `u/<user_id>/<
 （403 `GREETING_LIMIT`）；拉黑双向：不能建单聊也不能发（403 `BLOCKED`）。文字过前置审核（D6）。
 不是成员的会话一律 404。
 
+**在线通道** `GET /v1/im/ws`（WebSocket 升级，握手头 `Authorization: Bearer <Firebase ID token>`）：连上先收
+`{type:'hello'}`，之后每条 inbox 事件推成 `{type, seq, …payload, event_at}`；上行只认 `{type:'ping'}`（回 `pong`），
+业务都走 REST。鉴权失败关闭码 4401 / 4403（封禁）/ 4404（没账号）。服务端 30 s ping，两个周期没 pong 断开；
+不做离线队列——断线后按 `last_seq` 走 `/v1/im/sync` 补拉才是权威。
+
 ## 测试分层
 
 | 目录 | 内容 |

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@fastify/rate-limit": "^11.2.0",
+    "@fastify/websocket": "^11.3.0",
     "@sinclair/typebox": "^0.34.52",
     "blueprint-core": "workspace:*",
     "fastify": "^5.12.1",
