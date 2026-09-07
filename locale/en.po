@@ -4,6 +4,18 @@ msgstr ""
 "Language: en\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
+msgid "%d comments"
+msgstr ""
+
+msgid "%dd ago"
+msgstr ""
+
+msgid "%dh ago"
+msgstr ""
+
+msgid "%dm ago"
+msgstr ""
+
 msgid "%s · %d followers · %d following"
 msgstr ""
 
@@ -20,6 +32,9 @@ msgid "Before you start"
 msgstr ""
 
 msgid "Bio"
+msgstr ""
+
+msgid "Can't load the feed. Check your connection."
 msgstr ""
 
 msgid "Can't reach the server. Check your connection and try again."
@@ -97,9 +112,6 @@ msgstr ""
 msgid "Feed"
 msgstr ""
 
-msgid "Feed lands in B3: timeline, photo composer, likes, comments and report."
-msgstr ""
-
 msgid "Forgot password"
 msgstr ""
 
@@ -115,6 +127,15 @@ msgstr ""
 msgid "Lifecycle probe"
 msgstr ""
 
+msgid "Like"
+msgstr ""
+
+msgid "Liked"
+msgstr ""
+
+msgid "Load more"
+msgstr ""
+
 msgid "Map"
 msgstr ""
 
@@ -128,6 +149,9 @@ msgid "No connection. Check your network and try again."
 msgstr ""
 
 msgid "Not signed in"
+msgstr ""
+
+msgid "Nothing here yet. Follow people to see their posts."
 msgstr ""
 
 msgid "Password (6+ characters)"
@@ -148,6 +172,15 @@ msgstr ""
 msgid "Please sign in again, then delete your account."
 msgstr ""
 
+msgid "Post"
+msgstr ""
+
+msgid "Posted."
+msgstr ""
+
+msgid "Posting…"
+msgstr ""
+
 msgid "Privacy policy"
 msgstr ""
 
@@ -155,6 +188,9 @@ msgid "Profile saved."
 msgstr ""
 
 msgid "Realtime: %s"
+msgstr ""
+
+msgid "Refresh"
 msgstr ""
 
 msgid "Resend verification email"
@@ -238,6 +274,9 @@ msgstr ""
 msgid "Welcome"
 msgstr ""
 
+msgid "What's new?"
+msgstr ""
+
 msgid "connected"
 msgstr ""
 
@@ -245,6 +284,9 @@ msgid "connecting"
 msgstr ""
 
 msgid "idle"
+msgstr ""
+
+msgid "just now"
 msgstr ""
 
 msgid "paused"

@@ -19,6 +19,7 @@ var auth: AuthSession
 var firebase: FirebaseAuth
 var account: AccountApi
 var profile: ProfileApi
+var feed: FeedApi
 var ws: WsClient
 var session: FarmSession
 var booting := false
@@ -35,6 +36,7 @@ func _ready() -> void:
 	session = FarmSession.new(client)
 	account = AccountApi.new(client)
 	profile = ProfileApi.new(client)
+	feed = FeedApi.new(client)
 	ws = WsClient.new()
 	ws.name = "Ws"
 	ws.token_provider = auth.access_token
@@ -79,6 +81,7 @@ func use_transport(t: Callable, p_base := "https://example.test/v1") -> void:
 	session = FarmSession.new(client)
 	account = AccountApi.new(client)
 	profile = ProfileApi.new(client)
+	feed = FeedApi.new(client)
 	booted_once = false
 
 ## 农场分支：登录 + 取回已有农场（404 是正常的：新玩家还没建场）。返回是否登录成功。

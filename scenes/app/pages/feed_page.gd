@@ -1,8 +1,246 @@
 extends AppPage
-## 动态 feed 占位：B3 时间线 / 发布器 / 点赞 / 评论 / 举报。
+## 动态 feed（B3 只读闭环 + 纯文字发布；后端 D4-b）：时间线 / 点赞 / 发布器 / 加载更多。
+## 图片发布等 D4-c R2 接上传；评论 UI、举报、拉黑归 B3 后续与 E1。auth / feed 可注入。
+##
+## 发布的幂等键在重试间保持同一个：断网点两次「Post」不会发出两条一样的动态。
+
+var auth: AuthSession
+var feed: FeedApi
+
+var composer: LineEdit
+var post_button: Button
+var status: Label
+var list: VBoxContainer
+var more_button: Button
+var refresh_button: Button
+var next_cursor := ""
+## 服务端返回的帖子字典，按显示顺序。
+var items: Array = []
+## post id -> {"like": Button, "meta": Label}
+var cards: Dictionary = {}
+var busy := false
+var pending_key := ""
 
 func _init() -> void:
 	page_title = "Feed"
 
 func _build_body() -> void:
-	placeholder(tr("Feed lands in B3: timeline, photo composer, likes, comments and report."))
+	var row := HBoxContainer.new()
+	row.name = "Composer"
+	row.add_theme_constant_override("separation", 8)
+	composer = LineEdit.new()
+	composer.name = "Text"
+	composer.placeholder_text = tr("What's new?")
+	composer.max_length = 2000
+	composer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	composer.custom_minimum_size.y = 44
+	row.add_child(composer)
+	post_button = GameUi.button("", tr("Post"), "POST /posts")
+	post_button.name = "Post"
+	post_button.pressed.connect(_on_post)
+	row.add_child(post_button)
+	body.add_child(row)
+	status = GameUi.label("", 12, GameUi.MUTED)
+	status.name = "Status"
+	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_child(status)
+	var scroll := ScrollContainer.new()
+	scroll.name = "Scroll"
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	list = VBoxContainer.new()
+	list.name = "List"
+	list.add_theme_constant_override("separation", 10)
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(list)
+	body.add_child(scroll)
+	var actions := HBoxContainer.new()
+	actions.name = "Actions"
+	actions.add_theme_constant_override("separation", 8)
+	refresh_button = GameUi.button("", tr("Refresh"), "GET /feed")
+	refresh_button.name = "Refresh"
+	refresh_button.pressed.connect(func(): refresh())
+	actions.add_child(refresh_button)
+	more_button = GameUi.button("", tr("Load more"), "GET /feed?cursor")
+	more_button.name = "More"
+	more_button.visible = false
+	more_button.pressed.connect(func(): load_more())
+	actions.add_child(more_button)
+	body.add_child(actions)
+
+func _session() -> AuthSession:
+	return auth if auth != null else Net.auth
+
+func _feed() -> FeedApi:
+	return feed if feed != null else Net.feed
+
+## Dev 会话没有真 token；服务端没部署时不刷屏报错，只给一句提示。
+func _can_load() -> bool:
+	var s := _session()
+	return s != null and s.is_signed_in() and s.provider != "dev" and _feed() != null
+
+func on_tab_shown() -> void:
+	super()
+	await refresh()
+
+func refresh() -> bool:
+	if not _can_load():
+		status.text = tr("Nothing here yet. Follow people to see their posts.")
+		return false
+	if busy:
+		return false
+	busy = true
+	var r: Dictionary = await _feed().timeline()
+	busy = false
+	if not bool(r.get("ok", false)):
+		status.text = tr("Can't load the feed. Check your connection.")
+		return false
+	items = r.get("items", []) if r.get("items") is Array else []
+	next_cursor = _text(r.get("next_cursor"))
+	_render()
+	return true
+
+func load_more() -> bool:
+	if not _can_load() or busy or next_cursor.is_empty():
+		return false
+	busy = true
+	var r: Dictionary = await _feed().timeline(next_cursor)
+	busy = false
+	if not bool(r.get("ok", false)):
+		status.text = tr("Can't load the feed. Check your connection.")
+		return false
+	for p in r.get("items", []):
+		items.append(p)
+	next_cursor = _text(r.get("next_cursor"))
+	_render()
+	return true
+
+## 发布纯文字动态。返回是否成功。
+func publish() -> bool:
+	var text := composer.text.strip_edges()
+	if text.is_empty() or busy or _feed() == null:
+		return false
+	if pending_key.is_empty():
+		pending_key = ApiClient.new_idempotency_key()
+	busy = true
+	post_button.disabled = true
+	status.text = tr("Posting…")
+	var r: Dictionary = await _feed().create_post(text, [], pending_key)
+	busy = false
+	post_button.disabled = false
+	if not bool(r.get("ok", false)):
+		status.text = describe_error(r)
+		return false
+	pending_key = ""
+	composer.text = ""
+	items.push_front(r)
+	_render()
+	status.text = tr("Posted.")
+	return true
+
+func toggle_like(post_id: String) -> void:
+	var p := _item(post_id)
+	if p.is_empty() or _feed() == null:
+		return
+	var r: Dictionary
+	if bool(p.get("liked", false)):
+		r = await _feed().unlike(post_id)
+	else:
+		r = await _feed().like(post_id)
+	if not bool(r.get("ok", false)):
+		status.text = describe_error(r)
+		return
+	p["liked"] = bool(r.get("liked", false))
+	p["like_count"] = int(r.get("like_count", 0))
+	_update_card(post_id)
+
+func describe_error(r: Dictionary) -> String:
+	match str(r.get("code", "")):
+		"NETWORK":
+			return tr("Can't reach the server. Check your connection and try again.")
+		"SCHEMA":
+			return tr("Please check the %s field.") % str(r.get("field", ""))
+		"NO_ACCOUNT":
+			return tr("Sign in again to set up your profile.")
+		_:
+			return str(r.get("code", "UNKNOWN"))
+
+static func _text(v: Variant) -> String:
+	return "" if v == null else str(v)
+
+## 相对时间：列表里「3h ago」比完整时间戳好读。
+func age_text(now_ms: int, created_ms: int) -> String:
+	var d := maxi(0, now_ms - created_ms) / 1000
+	if d < 60:
+		return tr("just now")
+	if d < 3600:
+		return tr("%dm ago") % (d / 60)
+	if d < 86400:
+		return tr("%dh ago") % (d / 3600)
+	return tr("%dd ago") % (d / 86400)
+
+func _now_ms() -> int:
+	return int(Time.get_unix_time_from_system() * 1000.0)
+
+func _item(post_id: String) -> Dictionary:
+	for p in items:
+		if str(p.get("id", "")) == post_id:
+			return p
+	return {}
+
+func _render() -> void:
+	# 直接 free 而不是 queue_free：重绘只在按钮回调里发生，卡片不在自己的信号里被释放；
+	# queue_free 会让摘下来的卡片挂到帧尾，gdUnit 会把它们算成孤儿。
+	for c in list.get_children():
+		list.remove_child(c)
+		c.free()
+	cards.clear()
+	for p in items:
+		list.add_child(_card(p))
+	more_button.visible = not next_cursor.is_empty()
+	status.text = tr("Nothing here yet. Follow people to see their posts.") if items.is_empty() else ""
+
+func _card(p: Dictionary) -> PanelContainer:
+	var id := str(p.get("id", ""))
+	var panel := PanelContainer.new()
+	panel.name = "Post_%s" % id
+	panel.add_theme_stylebox_override("panel", GameUi.surface())
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 6)
+	panel.add_child(col)
+	var author: Dictionary = p.get("author", {}) if p.get("author") is Dictionary else {}
+	var handle := _text(author.get("handle", ""))
+	var who := _text(author.get("display_name", ""))
+	if not handle.is_empty():
+		who += " @%s" % handle
+	var head := GameUi.label("%s · %s" % [who, age_text(_now_ms(), int(p.get("created_at", 0)))], 12, GameUi.MUTED)
+	head.name = "Author"
+	col.add_child(head)
+	var text := GameUi.label(_text(p.get("text", "")), 14)
+	text.name = "Text"
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	col.add_child(text)
+	var actions := HBoxContainer.new()
+	actions.add_theme_constant_override("separation", 8)
+	var like := GameUi.button("", "", "PUT/DELETE /posts/:id/like")
+	like.name = "Like"
+	like.pressed.connect(func(): toggle_like(id))
+	actions.add_child(like)
+	var meta := GameUi.label("", 12, GameUi.MUTED)
+	meta.name = "Meta"
+	actions.add_child(meta)
+	col.add_child(actions)
+	cards[id] = {"like": like, "meta": meta}
+	_update_card(id)
+	return panel
+
+func _update_card(post_id: String) -> void:
+	var p := _item(post_id)
+	if p.is_empty() or not cards.has(post_id):
+		return
+	var like: Button = cards[post_id].like
+	like.text = "%s %d" % [tr("Liked") if bool(p.get("liked", false)) else tr("Like"), int(p.get("like_count", 0))]
+	(cards[post_id].meta as Label).text = tr("%d comments") % int(p.get("comment_count", 0))
+
+func _on_post() -> void:
+	await publish()

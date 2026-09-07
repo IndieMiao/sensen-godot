@@ -255,3 +255,48 @@ msgstr "请重新登录以建立你的资料。"
 
 msgid "That handle is already taken."
 msgstr "这个用户名已被占用。"
+
+msgid "%d comments"
+msgstr "%d 条评论"
+
+msgid "%dd ago"
+msgstr "%d 天前"
+
+msgid "%dh ago"
+msgstr "%d 小时前"
+
+msgid "%dm ago"
+msgstr "%d 分钟前"
+
+msgid "Can't load the feed. Check your connection."
+msgstr "动态加载失败，请检查网络。"
+
+msgid "Like"
+msgstr "赞"
+
+msgid "Liked"
+msgstr "已赞"
+
+msgid "Load more"
+msgstr "加载更多"
+
+msgid "Nothing here yet. Follow people to see their posts."
+msgstr "还没有内容。关注一些人就能看到他们的动态。"
+
+msgid "Post"
+msgstr "发布"
+
+msgid "Posted."
+msgstr "已发布。"
+
+msgid "Posting…"
+msgstr "发布中…"
+
+msgid "Refresh"
+msgstr "刷新"
+
+msgid "What's new?"
+msgstr "有什么新鲜事？"
+
+msgid "just now"
+msgstr "刚刚"

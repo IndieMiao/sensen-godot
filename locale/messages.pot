@@ -3,6 +3,22 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
+#: res://scenes/app/pages/feed_page.gd:237
+msgid "%d comments"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:176
+msgid "%dd ago"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:175
+msgid "%dh ago"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:173
+msgid "%dm ago"
+msgstr ""
+
 #: res://scenes/app/pages/profile_page.gd:125
 msgid "%s · %d followers · %d following"
 msgstr ""
@@ -27,6 +43,12 @@ msgstr ""
 msgid "Bio"
 msgstr ""
 
+#: res://scenes/app/pages/feed_page.gd:96
+#: res://scenes/app/pages/feed_page.gd:110
+msgid "Can't load the feed. Check your connection."
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:156
 #: res://scenes/app/pages/profile_page.gd:162
 msgid "Can't reach the server. Check your connection and try again."
 msgstr ""
@@ -127,12 +149,8 @@ msgid "Enter a valid email address."
 msgstr ""
 
 #: res://modules/app/app_routes.gd:28
-#: res://scenes/app/pages/feed_page.gd:5
+#: res://scenes/app/pages/feed_page.gd:25
 msgid "Feed"
-msgstr ""
-
-#: res://scenes/app/pages/feed_page.gd:8
-msgid "Feed lands in B3: timeline, photo composer, likes, comments and report."
 msgstr ""
 
 #: res://scenes/app/login_page.gd:56
@@ -153,6 +171,18 @@ msgstr ""
 
 #: res://scenes/app/pages/lifecycle_probe_page.gd:25
 msgid "Lifecycle probe"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:236
+msgid "Like"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:236
+msgid "Liked"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:64
+msgid "Load more"
 msgstr ""
 
 #: res://modules/app/app_routes.gd:28
@@ -178,6 +208,11 @@ msgstr ""
 msgid "Not signed in"
 msgstr ""
 
+#: res://scenes/app/pages/feed_page.gd:88
+#: res://scenes/app/pages/feed_page.gd:195
+msgid "Nothing here yet. Follow people to see their posts."
+msgstr ""
+
 #: res://scenes/app/login_page.gd:39
 msgid "Password (6+ characters)"
 msgstr ""
@@ -190,6 +225,7 @@ msgstr ""
 msgid "Password reset email sent."
 msgstr ""
 
+#: res://scenes/app/pages/feed_page.gd:158
 #: res://scenes/app/pages/profile_page.gd:160
 msgid "Please check the %s field."
 msgstr ""
@@ -200,6 +236,18 @@ msgstr ""
 
 #: res://scenes/app/pages/settings_page.gd:114
 msgid "Please sign in again, then delete your account."
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:38
+msgid "Post"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:138
+msgid "Posted."
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:127
+msgid "Posting…"
 msgstr ""
 
 #: res://scenes/app/consent_page.gd:20
@@ -213,6 +261,10 @@ msgstr ""
 
 #: res://scenes/app/pages/im_page.gd:23
 msgid "Realtime: %s"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:60
+msgid "Refresh"
 msgstr ""
 
 #: res://scenes/app/pages/profile_page.gd:35
@@ -237,6 +289,7 @@ msgstr ""
 msgid "Sign in"
 msgstr ""
 
+#: res://scenes/app/pages/feed_page.gd:160
 #: res://scenes/app/pages/profile_page.gd:116
 msgid "Sign in again to set up your profile."
 msgstr ""
@@ -328,6 +381,10 @@ msgstr ""
 msgid "Welcome"
 msgstr ""
 
+#: res://scenes/app/pages/feed_page.gd:33
+msgid "What's new?"
+msgstr ""
+
 #: res://scenes/app/pages/im_page.gd:20
 msgid "connected"
 msgstr ""
@@ -338,6 +395,10 @@ msgstr ""
 
 #: res://scenes/app/pages/im_page.gd:20
 msgid "idle"
+msgstr ""
+
+#: res://scenes/app/pages/feed_page.gd:171
+msgid "just now"
 msgstr ""
 
 #: res://scenes/app/pages/im_page.gd:21
