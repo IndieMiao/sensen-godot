@@ -95,3 +95,9 @@ QA 账号：qa-alice@sensen.test（handle alice）、qa-bob@sensen.test（handle
 - xcodebuild 用 Xcode GUI 同一份 DerivedData 会卡死；命令行构建单独给 `-derivedDataPath build/ios/derived-cli`。
 - codesign 第一次从终端签名会弹「钥匙串」密码框（进程里看到 SecurityAgent），要在图形界面输密码并点
   **始终允许**，否则命令行构建在 codesign 一步无限等。
+
+### 6.5 结果（2026-09-07 20:55）
+
+桌面 bob 发「hello from mac」→ 手机 alice 开单聊时历史已有 → 回「hello from iphone」→ 桌面 bob 页面
+经 WebSocket 即时收到。两端 login 流各 3 步、0 错误；截图在 `~/Downloads/sensen-qa-2026-09-07/e2e/`。
+键盘避让要在手机上手点（镜像不弹软键盘），见 §6.6。
