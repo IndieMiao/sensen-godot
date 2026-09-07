@@ -50,3 +50,11 @@
 ## 5. 下一步
 
 C1 原生登录插件（Android Credential Manager / iOS ASAuthorization → `FirebaseAuth.sign_in_with_idp`）→ A2 i18n。D0 后端栈决策仍待拍板（阻塞 D1 / D2）；A6 需 iOS 真机。
+
+## 6. 真实 Firebase 验证（2026-09-07 追加）
+
+- 项目：**gensen-overseas-dev**（Google 账号 zsjasper@gmail.com，开发 / 测试期专用，后续转公司账户）；Web 应用 `gensen-web`；Email/Password 已通过 Identity Toolkit Admin API 开启；Google / Apple 提供方待 C1 / SSLAUNCH A6。
+- 配置：开发机 `user://firebase.json` 已写入 api_key / project_id / auth_domain（`tools/dev/firebase_setup.sh <project>` 可一键重做：addFirebase → 建 Web 应用取 key → 开 Email/Password → 写本机配置）。
+- 探针 `tools/dev/firebase_auth_probe.gd`（`godot --headless --path . --script res://tools/dev/firebase_auth_probe.gd`）用仓库自己的 `FirebaseAuth` 走真实接口：sign_up ✔ → lookup ✔（email_verified=false）→ 错密码 `INVALID_LOGIN_CREDENTIALS` ✔ → securetoken refresh ✔ → delete ✔ → 删后登录被拒 ✔。项目里不留测试用户。
+- 顺带修的两处：① Godot HTTPRequest 不读系统代理，国内开发机直连 googleapis 超时（RESULT_TIMEOUT=13）——`ApiClient.make_http_transport` 现按 `HTTPS_PROXY` / `NO_PROXY` 环境变量走代理，生产设备无变量即直连；② `test_config_prefers_user_override_then_res_file` 曾直接删掉开发机的真实 `user://firebase.json`，改为备份还原。
+- 新增：`firebase-tools` 15.29 本机全局安装；CLI 登录态在 `~/.config/configstore/firebase-tools.json`。

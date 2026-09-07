@@ -138,3 +138,19 @@ func test_response_code_mapping() -> void:
 	assert_str(ApiClient.Response.new(false, 0, {}, "").code()).is_equal("TRANSPORT")
 	assert_str(ApiClient.Response.new(true, 422, {"code": "INVALID"}).code()).is_equal("INVALID")
 	assert_str(ApiClient.Response.new(true, 503, {}).code()).is_equal("HTTP_503")
+
+# ---- 开发机代理解析（生产无环境变量即直连） ----
+
+func test_proxy_for_parses_env_and_respects_no_proxy() -> void:
+	var p := ApiClient.proxy_for("https://identitytoolkit.googleapis.com/v1/x", "http://127.0.0.1:7890", "localhost,127.0.0.1,farm.sensenjoy.cn")
+	assert_str(p.host).is_equal("127.0.0.1")
+	assert_int(p.port).is_equal(7890)
+	var direct := ApiClient.proxy_for("https://farm.sensenjoy.cn/v1/farms/me", "http://127.0.0.1:7890", "localhost,farm.sensenjoy.cn")
+	assert_str(direct.host).is_empty()
+	var sub := ApiClient.proxy_for("https://api.sensenjoy.cn/v1", "http://127.0.0.1:7890", ".sensenjoy.cn")
+	assert_str(sub.host).is_empty()
+	assert_str(ApiClient.proxy_for("https://x.example/", "", "").host).is_empty()
+	assert_str(ApiClient.proxy_for("https://x.example/", "garbage", "").host).is_empty()
+	var bare := ApiClient.proxy_for("https://x.example/", "proxy.local:3128", "")
+	assert_str(bare.host).is_equal("proxy.local")
+	assert_int(bare.port).is_equal(3128)

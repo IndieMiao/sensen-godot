@@ -131,11 +131,62 @@ func _backoff(attempt: int) -> void:
 	if tree:
 		await tree.create_timer(delay).timeout
 
+## 开发机代理：Godot 的 HTTPRequest 不读系统代理，也不读环境变量；国内开发机直连 googleapis
+## 会超时。这里按 HTTPS_PROXY / HTTP_PROXY（形如 http://127.0.0.1:7890）与 NO_PROXY（逗号分隔的
+## 主机后缀）决定是否走代理。生产设备上没有这些环境变量，行为不变。
+## 返回 {host, port}；不走代理时 host 为空。
+static func proxy_for(url: String, https_proxy_env: String, no_proxy_env: String) -> Dictionary:
+	var none := {"host": "", "port": 0}
+	var proxy := https_proxy_env.strip_edges()
+	if proxy.is_empty():
+		return none
+	var target_host := url
+	var scheme_end := target_host.find("://")
+	if scheme_end >= 0:
+		target_host = target_host.substr(scheme_end + 3)
+	var slash := target_host.find("/")
+	if slash >= 0:
+		target_host = target_host.substr(0, slash)
+	var colon := target_host.find(":")
+	if colon >= 0:
+		target_host = target_host.substr(0, colon)
+	for raw in no_proxy_env.split(","):
+		var suffix := raw.strip_edges()
+		if suffix.is_empty():
+			continue
+		if target_host == suffix or target_host.ends_with("." + suffix.trim_prefix(".")):
+			return none
+	var p := proxy
+	var p_scheme := p.find("://")
+	if p_scheme >= 0:
+		p = p.substr(p_scheme + 3)
+	p = p.trim_suffix("/")
+	var p_colon := p.rfind(":")
+	if p_colon <= 0:
+		return none
+	var port := int(p.substr(p_colon + 1))
+	return {"host": p.substr(0, p_colon), "port": port} if port > 0 else none
+
+static func env_proxy_for(url: String) -> Dictionary:
+	var https := OS.get_environment("HTTPS_PROXY")
+	if https.is_empty():
+		https = OS.get_environment("https_proxy")
+	if https.is_empty():
+		https = OS.get_environment("HTTP_PROXY")
+	var no := OS.get_environment("NO_PROXY")
+	if no.is_empty():
+		no = OS.get_environment("no_proxy")
+	return proxy_for(url, https, no)
+
 ## 真实传输：需要一个在场景树里的 Node 来挂 HTTPRequest。
 static func make_http_transport(host: Node) -> Callable:
 	return func(method: String, url: String, headers: PackedStringArray, body: String) -> Response:
 		var req := HTTPRequest.new()
 		req.timeout = TIMEOUT_S
+		var proxy := env_proxy_for(url)
+		if not str(proxy.host).is_empty():
+			req.set_https_proxy(proxy.host, int(proxy.port))
+			req.set_http_proxy(proxy.host, int(proxy.port))
 		host.add_child(req)
 		var verb := HTTPClient.METHOD_GET
 		match method:

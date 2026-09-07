@@ -138,6 +138,9 @@ func test_describe_covers_common_codes() -> void:
 	assert_bool(FirebaseAuth.describe("SOMETHING_ODD").contains("SOMETHING_ODD")).is_true()
 
 func test_config_prefers_user_override_then_res_file() -> void:
+	# 开发机上 user://firebase.json 是真实配置：先备份，测完原样还原，不能像 2026-09-07 那次一样把它删了。
+	var had_real := FileAccess.file_exists(FirebaseConfig.USER_PATH)
+	var real_text := FileAccess.get_file_as_string(FirebaseConfig.USER_PATH) if had_real else ""
 	var f := FileAccess.open(FirebaseConfig.USER_PATH, FileAccess.WRITE)
 	f.store_string(JSON.stringify({"api_key": "from-user"}))
 	f.close()
@@ -146,3 +149,7 @@ func test_config_prefers_user_override_then_res_file() -> void:
 	# 仓库只提交 example，没有 config/firebase.json 时必须是空串而不是报错。
 	if not FileAccess.file_exists(FirebaseConfig.RES_PATH):
 		assert_str(FirebaseConfig.api_key()).is_empty()
+	if had_real:
+		var back := FileAccess.open(FirebaseConfig.USER_PATH, FileAccess.WRITE)
+		back.store_string(real_text)
+		back.close()
