@@ -17,6 +17,7 @@ const REFRESH_SKEW_MS := 60_000
 
 var state := State.SIGNED_OUT
 var user_id := ""
+var email := ""
 var id_token := ""
 var refresh_token := ""
 var expires_at_ms := 0
@@ -46,8 +47,9 @@ func begin_sign_in() -> void:
 	last_error = ""
 	_set_state(State.SIGNING_IN)
 
-func complete_sign_in(p_user_id: String, p_id_token: String, p_refresh_token: String, expires_in_s: int, p_provider: String) -> void:
+func complete_sign_in(p_user_id: String, p_id_token: String, p_refresh_token: String, expires_in_s: int, p_provider: String, p_email := "") -> void:
 	user_id = p_user_id
+	email = p_email
 	id_token = p_id_token
 	refresh_token = p_refresh_token
 	expires_at_ms = now_ms() + expires_in_s * 1000
@@ -62,6 +64,7 @@ func fail_sign_in(error: String) -> void:
 
 func sign_out() -> void:
 	user_id = ""
+	email = ""
 	id_token = ""
 	refresh_token = ""
 	expires_at_ms = 0
@@ -118,6 +121,7 @@ func restore() -> bool:
 	if tok.is_empty():
 		return false
 	user_id = str(d.get("user_id", ""))
+	email = str(d.get("email", ""))
 	id_token = tok
 	refresh_token = str(d.get("refresh_token", ""))
 	expires_at_ms = int(d.get("expires_at_ms", 0))
@@ -131,6 +135,7 @@ func persist() -> void:
 		return
 	f.store_string(JSON.stringify({
 		"user_id": user_id,
+		"email": email,
 		"id_token": id_token,
 		"refresh_token": refresh_token,
 		"expires_at_ms": expires_at_ms,

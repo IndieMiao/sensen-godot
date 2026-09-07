@@ -30,3 +30,6 @@ release-manifest.json
 .playwright-mcp/
 artifacts/
 output/
+
+# Firebase 项目配置（CI 注入；本地用 user://firebase.json 覆盖）
+config/firebase.json

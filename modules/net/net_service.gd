@@ -16,6 +16,7 @@ const SERVER_OVERRIDE := "user://server.txt"
 
 var client: ApiClient
 var auth: AuthSession
+var firebase: FirebaseAuth
 var ws: WsClient
 var session: FarmSession
 var booting := false
@@ -25,6 +26,8 @@ func _ready() -> void:
 	auth = AuthSession.new()
 	if not is_test_process():
 		auth.restore()
+	firebase = FirebaseAuth.new(FirebaseConfig.api_key(), ApiClient.make_http_transport(self))
+	auth.refresher = firebase.refresh
 	client = ApiClient.new(base_url(), ApiClient.make_http_transport(self))
 	bind_auth(client)
 	session = FarmSession.new(client)

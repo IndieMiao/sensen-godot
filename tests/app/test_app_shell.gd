@@ -89,10 +89,12 @@ func test_stacked_pages_carry_back_button_and_tab_pages_do_not() -> void:
 	assert_object(feed.find_child("Back", true, false)).is_null()
 	assert_str(feed.title_label.text).is_equal("Feed")
 
-func test_login_page_keeps_provider_buttons_disabled_until_b1() -> void:
+func test_login_page_keeps_idp_buttons_disabled_until_c1() -> void:
 	var login := (load(AppRoutes.LOGIN) as PackedScene).instantiate() as AppPage
 	add_child(auto_free(login))
-	for n in ["SendCode", "SignIn", "Apple", "Google"]:
+	for n in ["Apple", "Google"]:
 		var b := login.find_child(n, true, false) as Button
 		assert_object(b).override_failure_message("missing %s" % n).is_not_null()
 		assert_bool(b.disabled).is_true()
+	for n in ["Email", "Password", "SignIn", "SignUp", "Forgot", "Status"]:
+		assert_object(login.find_child(n, true, false)).override_failure_message("missing %s" % n).is_not_null()

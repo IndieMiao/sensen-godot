@@ -16,6 +16,7 @@ func callable() -> Callable:
 		requests.append({
 			"method": method, "url": url, "headers": headers,
 			"body": parsed if parsed is Dictionary else {},
+			"raw": body,
 		})
 		if _cursor >= responses.size():
 			return ApiClient.Response.new(false, 0, {}, "no scripted response")
