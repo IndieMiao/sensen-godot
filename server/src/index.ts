@@ -3,6 +3,8 @@ import path from 'node:path';
 import pg from 'pg';
 import { buildApp, blueprintSets, loadBlueprint } from './http/app.js';
 import { PgStore } from './db/pg_store.js';
+import { PgAccountStore } from './db/pg_accounts.js';
+import { CachedJwks, googleJwksFetcher } from './http/firebase_token.js';
 import { migrate } from './db/migrate.js';
 import { contentVersion, loadContent } from './domain/content.js';
 import type { Ctx } from './domain/reducer.js';
@@ -52,8 +54,15 @@ for (const spec of PRESET_SPECS) {
   await store.ensureSystemFarm(presetHmac(spec.layout), buildPresetFarm(spec, sets, content, tz, Date.now()));
 }
 
+// D2 账号服务：没配 FIREBASE_PROJECT_ID 就只告警不退出——农场路由不依赖它。
+const firebaseProjectId = process.env.FIREBASE_PROJECT_ID;
+if (!firebaseProjectId) console.warn('未设置 FIREBASE_PROJECT_ID：账号路由返回 503');
+const jwks = new CachedJwks(googleJwksFetcher(), () => Date.now());
+
 const app = await buildApp({
   store, content, contentVersion: cv,
+  accounts: new PgAccountStore(pool),
+  firebase: firebaseProjectId ? { projectId: firebaseProjectId, keys: jwks.keys, refreshKeys: jwks.refresh } : undefined,
   blueprintDir: BLUEPRINT_DIR, regionsFile: path.join(CONTENT_DIR, 'regions.json'),
   pepper: need('TOKEN_PEPPER'), now: () => Date.now(),
   blueprint: (id, rev) => bpCache.get(`${id}@${rev}`),
@@ -63,4 +72,4 @@ const app = await buildApp({
 
 const port = Number(process.env.PORT ?? 3000);
 await app.listen({ port, host: '0.0.0.0' });
-console.log(`farm-server listening on ${port} content=${cv}`);
+console.log(`farm-server listening on ${port} content=${cv} accounts=${firebaseProjectId ? 'on' : 'off'}`);

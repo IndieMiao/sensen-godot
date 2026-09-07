@@ -4,7 +4,7 @@
  * 错误码映射见 spec §7.4；所有响应带 `server_time`，命令响应里的 `server_time` 就是这次
  * 事务采样的 `effectiveNow`（Codex 三审 O-M1）。
  */
-import Fastify, { type FastifyInstance, type FastifyRequest } from 'fastify';
+import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import rateLimit from '@fastify/rate-limit';
 import { parseBlueprint, validate } from 'blueprint-core';
 import { randomUUID } from 'node:crypto';
@@ -24,6 +24,8 @@ import { initialFarmState } from '../domain/farm_factory.js';
 import { payloadHash } from './hash.js';
 import type { Store } from './store.js';
 import { isFarmLocation, withinPlacementBounds, type FarmLocation, type PlacementBounds } from './farm_location.js';
+import { IdTokenError, verifyFirebaseIdToken, type FirebaseIdentity, type KeySource } from './firebase_token.js';
+import { appleRevocationFor, userView, type AccountModule, type AccountStore } from './accounts.js';
 
 export interface AppDeps {
   store: Store;
@@ -37,6 +39,11 @@ export interface AppDeps {
   /** 哪些 player 建出来的农场带 qa 标记；客户端不能自设。 */
   qaPlayerIds?: Set<string>;
   blueprint?: (id: string, revision: number) => Ctx['blueprint'] | undefined;
+  /** D2 账号服务。accounts 与 firebase 都给才启用；缺一个账号路由一律 503 ACCOUNTS_NOT_CONFIGURED。 */
+  accounts?: AccountStore;
+  firebase?: { projectId: string; keys: KeySource; refreshKeys?: KeySource };
+  /** 后续模块在这里登记导出与级联删除，见 accounts.ts。 */
+  accountModules?: AccountModule[];
 }
 
 interface Regions {
@@ -256,8 +263,113 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     });
   });
 
+  // —— D2 账号服务（SGODOT-76）：每个请求都校验 Firebase ID token，不另发会话 token ——
+  const accountsReady = (): boolean => Boolean(deps.accounts && deps.firebase);
+  const notConfigured = (reply: FastifyReply) =>
+    reply.code(503).send({ code: 'ACCOUNTS_NOT_CONFIGURED', server_time: deps.now() });
+  const bearer = (req: FastifyRequest): string | undefined => {
+    const raw = req.headers.authorization;
+    return raw?.startsWith('Bearer ') ? raw.slice(7) : undefined;
+  };
+  type IdentityResult = { identity: FirebaseIdentity } | { error: string };
+  const identityFromToken = async (token: unknown): Promise<IdentityResult> => {
+    try {
+      return { identity: await verifyFirebaseIdToken(token, {
+        projectId: deps.firebase!.projectId, keys: deps.firebase!.keys,
+        refreshKeys: deps.firebase!.refreshKeys, now: deps.now,
+      }) };
+    } catch (e) {
+      if (e instanceof IdTokenError) return { error: e.code };
+      throw e;
+    }
+  };
+  /** 401 时把校验失败的原因带回去：客户端据此决定是刷新 token 还是重新登录。 */
+  const unauthenticated = (reply: FastifyReply, reason: string) =>
+    reply.code(401).send({ code: 'UNAUTHENTICATED', reason, server_time: deps.now() });
+
+  /** 删号级联：模块按登记顺序删，任一失败整个失败且用户保留（accounts.ts 的约定）。 */
+  const deleteAccount = async (identity: FirebaseIdentity, source: 'app' | 'web') => {
+    const store = deps.accounts!;
+    const user = await store.userByFirebaseUid(identity.uid);
+    if (!user) return { deleted: false as const };
+    for (const m of deps.accountModules ?? []) if (m.del) await m.del(user.id);
+    const deleted = await store.deleteUser(user.id, {
+      user_id: user.id, provider_uid: identity.uid, requested_at: deps.now(), source,
+      apple_revocation: appleRevocationFor(identity.signInProvider),
+    });
+    return { deleted, user_id: user.id };
+  };
+
+  app.post('/v1/auth/firebase', {
+    config: { rateLimit: { max: 60, timeWindow: '1 hour' } },
+  }, async (req, reply) => {
+    if (!accountsReady()) return notConfigured(reply);
+    const body = req.body as { id_token?: unknown } | undefined;
+    const r = await identityFromToken(body?.id_token ?? bearer(req));
+    if ('error' in r)
+      return reply.code(401).send({ code: 'INVALID_ID_TOKEN', reason: r.error, server_time: deps.now() });
+    const { user, created } = await deps.accounts!.signIn(r.identity, deps.now());
+    return reply.code(created ? 201 : 200).send({ ...userView(user), created, server_time: deps.now() });
+  });
+
+  app.get('/v1/users/me', async (req, reply) => {
+    if (!accountsReady()) return notConfigured(reply);
+    const r = await identityFromToken(bearer(req));
+    if ('error' in r) return unauthenticated(reply, r.error);
+    const user = await deps.accounts!.userByFirebaseUid(r.identity.uid);
+    if (!user) return reply.code(404).send({ code: 'NO_ACCOUNT', server_time: deps.now() });
+    return reply.send({ ...userView(user), server_time: deps.now() });
+  });
+
+  /** CCPA / GDPR 访问请求：账号 + 身份 + 各模块登记的导出，一份 JSON 附件。 */
+  app.get('/v1/users/me/export', async (req, reply) => {
+    if (!accountsReady()) return notConfigured(reply);
+    const r = await identityFromToken(bearer(req));
+    if ('error' in r) return unauthenticated(reply, r.error);
+    const user = await deps.accounts!.userByFirebaseUid(r.identity.uid);
+    if (!user) return reply.code(404).send({ code: 'NO_ACCOUNT', server_time: deps.now() });
+    const modules: Record<string, unknown> = {};
+    for (const m of deps.accountModules ?? []) if (m.export) modules[m.name] = await m.export(user.id);
+    const identities = (await deps.accounts!.identitiesOf(user.id)).map(i => ({
+      provider: i.provider, provider_uid: i.provider_uid, sign_in_provider: i.sign_in_provider, created_at: i.created_at,
+    }));
+    reply.header('content-disposition', `attachment; filename="sensen-account-${user.id}.json"`);
+    return reply.send({ exported_at: deps.now(), account: userView(user), identities, modules });
+  });
+
+  /** 应用内删号（Apple 5.1.1(v)）。幂等：已删或从未建过账号也返回 200，deleted=false。 */
+  app.delete('/v1/users/me', async (req, reply) => {
+    if (!accountsReady()) return notConfigured(reply);
+    const r = await identityFromToken(bearer(req));
+    if ('error' in r) return unauthenticated(reply, r.error);
+    try {
+      return reply.send({ ok: true, ...(await deleteAccount(r.identity, 'app')), server_time: deps.now() });
+    } catch {
+      return reply.code(500).send({ code: 'DELETE_FAILED', server_time: deps.now() });
+    }
+  });
+
+  /**
+   * 站外 Web 删号页（SSLAUNCH B4，Google Play 要求可在应用外删号）：网页用 Firebase JS
+   * 登录后把 ID token POST 过来。与应用内删号同一条级联，只是墓碑 source 记 web。
+   */
+  app.post('/v1/account/delete', {
+    config: { rateLimit: { max: 10, timeWindow: '1 hour' } },
+  }, async (req, reply) => {
+    if (!accountsReady()) return notConfigured(reply);
+    const body = req.body as { id_token?: unknown } | undefined;
+    const r = await identityFromToken(body?.id_token);
+    if ('error' in r)
+      return reply.code(401).send({ code: 'INVALID_ID_TOKEN', reason: r.error, server_time: deps.now() });
+    try {
+      return reply.send({ ok: true, ...(await deleteAccount(r.identity, 'web')), server_time: deps.now() });
+    } catch {
+      return reply.code(500).send({ code: 'DELETE_FAILED', server_time: deps.now() });
+    }
+  });
+
   app.get('/v1/healthz', async (_req, reply) => reply.send({
-    ok: true, db: true, git_sha: deps.gitSha ?? 'dev',
+    ok: true, db: true, accounts: accountsReady(), git_sha: deps.gitSha ?? 'dev',
     content_version: deps.contentVersion, domain_version: DOMAIN_VERSION,
     server_time: deps.now(),
   }));

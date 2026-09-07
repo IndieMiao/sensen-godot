@@ -89,3 +89,34 @@ CREATE TABLE IF NOT EXISTS farm_snapshots (
   content_version    text NOT NULL,
   domain_version     text NOT NULL
 );
+
+-- D2（SGODOT-76）账号：社交主线的自有 user id。players 是农场分支的匿名玩家，两者暂不关联。
+CREATE TABLE IF NOT EXISTS users (
+  id              uuid PRIMARY KEY,
+  email           text,
+  email_verified  boolean NOT NULL DEFAULT false,
+  display_name    text,
+  created_at      bigint NOT NULL,
+  last_seen_at    bigint NOT NULL
+);
+
+-- 一个用户可有多条身份（provider + 该方 uid）；(provider, provider_uid) 是并发首登的裁判。
+CREATE TABLE IF NOT EXISTS user_identities (
+  provider          text NOT NULL,
+  provider_uid      text NOT NULL,
+  user_id           uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  sign_in_provider  text,
+  created_at        bigint NOT NULL,
+  PRIMARY KEY (provider, provider_uid)
+);
+CREATE INDEX IF NOT EXISTS user_identities_user_idx ON user_identities(user_id);
+
+-- 删号墓碑：不带 FK（用户行已删）。只留 uid 与时间，够证明「删过」和排 Apple
+-- revocation 队列，不留邮箱等 PII。
+CREATE TABLE IF NOT EXISTS account_deletions (
+  user_id           uuid PRIMARY KEY,
+  provider_uid      text NOT NULL,
+  requested_at      bigint NOT NULL,
+  source            text NOT NULL,
+  apple_revocation  text NOT NULL
+);

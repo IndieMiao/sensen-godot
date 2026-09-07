@@ -149,6 +149,31 @@ apply 在一个事务内先取得 `farms` 的 EXCLUSIVE 写入屏障，再按 ID
 最后一项沿用既有账本规则：D6 触及 100 金币摊位预算，2R 留在库存；
 不能为了达到旧 PRD 的 216 数字超额结算。所有路线验证重登、幂等和摘要不提前锁定。
 
+## 账号服务（SGODOT-76 / D2）
+
+社交主线的账号：客户端用 Firebase Auth 登录（B1），服务端**每个请求**都用 Google 公开的
+JWKS 校验 Firebase ID token（RS256），不另发自己的会话 token。自有 `user_id`（uuid）是主键，
+Firebase uid 只是 `user_identities` 里的一条身份记录。`FIREBASE_PROJECT_ID` 不设时账号路由
+一律 503，农场路由不受影响。
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| POST | `/v1/auth/firebase` | body `{id_token}` 或 Bearer；找或建用户，首次 201 |
+| GET | `/v1/users/me` | Bearer = Firebase ID token；没登录过 404 `NO_ACCOUNT` |
+| GET | `/v1/users/me/export` | CCPA / GDPR 访问请求：账号 + 身份 + 各模块导出，JSON 附件 |
+| DELETE | `/v1/users/me` | 应用内删号（Apple 5.1.1(v)），幂等 |
+| POST | `/v1/account/delete` | 站外 Web 删号页（Google Play 要求）：body `{id_token}` |
+
+401 一律带 `reason`（`EXPIRED` / `BAD_SIGNATURE` / `UNKNOWN_KID` …），客户端据此决定刷新
+token 还是重新登录。JWKS 按 `max-age` 缓存，未知 kid 触发一次强制刷新（60 s 冷却），拉不到
+新钥匙时沿用旧钥匙。
+
+删号级联：后续模块（资料 / IM / feed / 关注 / 位置 / 推送 token / 举报）通过 `AppDeps.accountModules`
+登记 `del` 与 `export`；删号按登记顺序跑 `del`，任一失败整个 500 且用户保留。成功后删
+`users` 行（身份级联）并写 `account_deletions` 墓碑（只有 uid 与时间，不留邮箱）。Apple 登录
+的用户墓碑标 `apple_revocation = pending`，等拿到 Apple client secret（SSLAUNCH A6）后由队列
+撤销 token。Firebase 侧的用户删除由客户端 / 网页自己用 Firebase 调用完成。
+
 ## 测试分层
 
 | 目录 | 内容 |
