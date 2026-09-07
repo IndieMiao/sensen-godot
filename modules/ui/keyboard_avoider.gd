@@ -78,6 +78,10 @@ func _focus() -> Control:
 func _keyboard_px() -> int:
 	if keyboard_height_provider.is_valid():
 		return int(keyboard_height_provider.call())
+	# 桌面没有软键盘：每帧问 DisplayServer 会刷一屏「Virtual keyboard not supported」警告（桌面 QA 实例
+	# 18 秒刷了 1845 条），问一次 has_feature 就够。
+	if not DisplayServer.has_feature(DisplayServer.FEATURE_VIRTUAL_KEYBOARD):
+		return 0
 	return DisplayServer.virtual_keyboard_get_height()
 
 func _window_size() -> Vector2i:
