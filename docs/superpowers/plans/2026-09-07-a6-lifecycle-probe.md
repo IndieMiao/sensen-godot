@@ -47,13 +47,14 @@ WsClient 的 pause/resume、后续 IM 的「回前台补拉」、语聊的「后
 `APPLICATION_PAUSED / RESUMED` 作断连 / 重连触发点可以照用，不需要插件层桥 UIApplication 通知。
 注意 PAUSED 比 FOCUS_OUT 晚约 600 ms：需要「立刻」反应的逻辑（暂停语音采集等）应挂 FOCUS_OUT。
 
-键盘：镜像会话期间 Mac 键盘充当硬件键盘，iOS 不弹软键盘，`virtual_keyboard_get_height()` 恒为 0，
-所以 A5 的 iOS 键盘避让要在手机上手点输入框验证；探针页现在会把见过的最大键盘高度写进
-`lifecycle_probe.json`（`keyboard_max_px`），手点之后拉文件即可，不用盯屏幕。
+键盘：镜像会话期间 Mac 键盘充当硬件键盘，iOS 不弹软键盘，`virtual_keyboard_get_height()` 恒为 0。
+手点验证（19:5x）：探针页记录 `keyboard_max_px = 1008`——iPhone 13 是 3 倍屏，即 336 pt，正好是 iOS 键盘
+（约 291 pt）加联想栏（约 45 pt）的高度，**读数正确**。探针页的输入框在屏幕中部，本来就不会被键盘挡住，
+KeyboardAvoider 的位移逻辑要在底部有输入框的页面（B2 聊天页）上做真机验证。
 
 另：国行 iOS 首次联网会弹「允许使用无线数据」系统弹窗，会挡住页面；提审用的非国行机型没有此弹窗。
 
 ## 5. 对后续任务的约束
 
 - WsClient：`APPLICATION_PAUSED / RESUMED` 作断连 / 重连触发点，已验证可靠；语音采集类「必须立刻停」的逻辑挂 `APPLICATION_FOCUS_OUT`。
-- KeyboardAvoider：iOS 键盘高度读数待手点验证（见上）。
+- KeyboardAvoider：iOS 键盘高度读数已验证正确（1008 px / 336 pt）；位移效果在 B2 聊天页真机验证。
