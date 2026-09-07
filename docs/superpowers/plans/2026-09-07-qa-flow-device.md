@@ -58,3 +58,40 @@ Claude Code 的终端授权；`brew install cliclick`。
   两次点到了 Safari 和地图。
 - 镜像期间 Mac 键盘算硬件键盘，iOS 不弹软键盘——键盘相关验证要在手机上手点。
 - 国行 iOS 首次联网会弹「允许使用无线数据」，需要点一次。
+
+## 6. 真机端到端互聊（M2 alpha）：局域网服务 + 桌面实例 + 真机（2026-09-07）
+
+目标：手机与桌面各登一个 Firebase QA 账号，通过本机起的服务互发一句文本，顺带看聊天页底部输入框的键盘避让。
+
+### 6.1 各端怎么指到同一台服务
+
+- 本机起服务：`cd server && env $(cat .env 里的变量) PORT=3101 NODE_USE_ENV_PROXY=1 pnpm exec tsx src/index.ts`
+  （`NODE_USE_ENV_PROXY=1` 才会走 HTTPS_PROXY 去拉 Google JWKS；`healthz` 在 `/v1/healthz`）。
+- 桌面实例：`SENSEN_SERVER_BASE=http://127.0.0.1:3101/v1`（`Net.base_url()` 先看这个环境变量）。
+- 真机：`devicectl device copy to` 写 `Documents/server.txt` = `http://<Mac 局域网 IP>:3101/v1`（`user://server.txt`）。
+- 真机走明文 http 要两把 Info.plist 钥匙（导出预设 `additional_plist_content`）：
+  `NSAppTransportSecurity/NSAllowsLocalNetworking`（ATS 放行局域网），`NSLocalNetworkUsageDescription`
+  （iOS 14+ 本地网络权限；没这项 connect() 直接 EHOSTUNREACH，Godot 报 `request failed: 25`）。
+  **发布前要从预设里拿掉这两项**（记在 R 发布链）。
+
+### 6.2 真机连 Firebase：国内网络要经 Mac 的代理
+
+Godot 的 HTTPRequest 不读 iOS 系统代理；国内直连 googleapis 超时（`transport error: 13`）。客户端本来就按
+`HTTPS_PROXY` / `NO_PROXY` 环境变量走代理（api_client.gd `env_proxy_for`），而 `devicectl launch
+--environment-variables` 能给真机进程塞环境变量，所以不用改代码：
+
+- FlClash 只监听 `127.0.0.1:7890`，用 `tools/dev/proxy_relay.py 7891` 把它转到局域网口；
+- 启动真机时带 `"HTTPS_PROXY":"http://<Mac IP>:7891","NO_PROXY":"<Mac IP>"`（自家服务不走代理）。
+
+### 6.3 login 流
+
+`SENSEN_QA_FLOW=login SENSEN_QA_LOGIN=email:password [SENSEN_QA_DM=@handle] [SENSEN_QA_SAY=文字]`：
+真实 Firebase 密码登录 → `POST /v1/auth/firebase` 绑服务端 user → 连 IM WebSocket → 进壳 IM 页 →
+按 handle 开单聊 → 发一句；截图 `im_tab / chat_open / chat_sent`，report.json 同 §3。
+QA 账号：qa-alice@sensen.test（handle alice）、qa-bob@sensen.test（handle bob）。
+
+### 6.4 构建侧的两个坑
+
+- xcodebuild 用 Xcode GUI 同一份 DerivedData 会卡死；命令行构建单独给 `-derivedDataPath build/ios/derived-cli`。
+- codesign 第一次从终端签名会弹「钥匙串」密码框（进程里看到 SecurityAgent），要在图形界面输密码并点
+  **始终允许**，否则命令行构建在 codesign 一步无限等。
