@@ -127,3 +127,7 @@ xcrun devicectl device process launch --terminate-existing \
 （`keyboard_up_shrink_v1.png`）；但用户反馈输入框一直抖。原因：容器重排把子节点吸附到整像素，
 浮点位移与量回来的底边互相追着改，每帧在两个值间跳（测试用真 MarginContainer + VBoxContainer 复现，
 位移 405.13 → 每帧漂）。位移 ceil 到整像素 + 亚像素差不反馈，bc8841b。
+
+**第三轮（21:24–，取整后）**：按 report.json 顺序分组，键盘弹起前 147 帧一样，弹起过渡 2 帧，之后连续 8 帧
+（24 s）逐字节相同——不抖了。用户顺手用中文输入法发了「弟弟的姐姐」并在输入框里打「大家都开心」，
+CJK 字形正常、气泡在标题下正常排布（`keyboard_up_shrink_v2.png`）。A5 键盘避让在聊天页收口。
