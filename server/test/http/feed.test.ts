@@ -37,6 +37,7 @@ beforeEach(async () => {
     pepper: 'test-pepper', now: () => clock,
     accounts, firebase: { projectId: PROJECT, keys: k.keys }, social, feed,
     accountModules: [socialAccountModule(social), feedAccountModule(feed)],
+    uploads: { endpoint: 'https://acct.r2.cloudflarestorage.com', region: 'auto', bucket: 'ugc', accessKeyId: 'AK', secretAccessKey: 'SK', publicBase: 'https://img.example.test' },
   });
 });
 afterEach(async () => { await app.close(); });
@@ -60,9 +61,10 @@ describe('发布', () => {
   it('发帖 201 带作者卡；同 idempotency_key 重放 200 同一条', async () => {
     await signIn('alice');
     await put('alice', '/v1/users/me/profile', { handle: 'ali' });
-    const r = await post('alice', '/v1/posts', { idempotency_key: 'k1', text: '  hello  ', images: [{ key: 'img/a.jpg', w: 100, h: 50 }] });
+    const me = (await get('alice', '/v1/users/me')).json().user_id as string;
+    const r = await post('alice', '/v1/posts', { idempotency_key: 'k1', text: '  hello  ', images: [{ key: `u/${me}/20260907/a.jpg`, w: 100, h: 50 }] });
     expect(r.statusCode).toBe(201);
-    expect(r.json()).toMatchObject({ text: 'hello', images: [{ key: 'img/a.jpg', w: 100, h: 50 }], like_count: 0, comment_count: 0, liked: false, created: true,
+    expect(r.json()).toMatchObject({ text: 'hello', images: [{ key: `u/${me}/20260907/a.jpg`, w: 100, h: 50 }], like_count: 0, comment_count: 0, liked: false, created: true,
       author: { display_name: 'alice', handle: 'ali' }, created_at: clock });
     const again = await post('alice', '/v1/posts', { idempotency_key: 'k1', text: 'different' });
     expect(again.statusCode).toBe(200);
@@ -82,6 +84,10 @@ describe('发布', () => {
     await bad({ idempotency_key: 'k', text: 'ok', images: Array.from({ length: 10 }, (_, i) => ({ key: `i${i}` })) }, 'images');
     await bad({ idempotency_key: 'k', text: 'ok', images: [{ key: '../etc' }] }, 'images');
     await bad({ idempotency_key: 'k', text: 'ok', images: [{ key: 'a', w: -1 }] }, 'images');
+    // 别人前缀下的 key 不能引用
+    const other = await post('alice', '/v1/posts', { idempotency_key: 'k9', text: 'ok', images: [{ key: 'u/someone-else/20260907/x.jpg' }] });
+    expect(other.statusCode).toBe(400);
+    expect(other.json()).toMatchObject({ field: 'images', reason: 'NOT_OWNED' });
     await bad({ text: 'ok' }, 'idempotency_key');
     expect(validatePost({ idempotency_key: 'k', images: [{ key: 'only-image' }] })).toMatchObject({ ok: true, text: '' });
     expect((await post('alice', '/v1/posts', { idempotency_key: 'k', text: 'a\nb' })).statusCode).toBe(201); // 换行允许
@@ -201,5 +207,33 @@ describe('删除与级联', () => {
     expect(ids(await get('bob', '/v1/feed'))).toEqual([pb]);
     expect((await get('bob', `/v1/posts/${pb}`)).json()).toMatchObject({ like_count: 0, comment_count: 0 });
     expect(await feed.post(pa)).toBeNull();
+  });
+});
+
+describe('图片直传', () => {
+  it('POST /v1/uploads 给预签名 PUT，key 在本人前缀下，能直接用于发帖', async () => {
+    const me = await signIn('alice');
+    const r = await post('alice', '/v1/uploads', { kind: 'post_image', content_type: 'image/jpeg', size: 1234 });
+    expect(r.statusCode).toBe(201);
+    expect(r.json()).toMatchObject({ method: 'PUT', headers: { 'content-type': 'image/jpeg' }, expires_at: clock + 600_000 });
+    expect(r.json().key).toMatch(new RegExp(`^u/${me}/20260907/[0-9a-f]{24}\\.jpg$`));
+    expect(r.json().url).toContain('X-Amz-Signature=');
+    expect(r.json().public_url).toBe(`https://img.example.test/${r.json().key}`);
+    const p = await post('alice', '/v1/posts', { idempotency_key: 'k', images: [{ key: r.json().key, w: 10, h: 10 }] });
+    expect(p.statusCode).toBe(201);
+    expect((await post('alice', '/v1/uploads', { kind: 'post_image', content_type: 'text/plain', size: 1 })).statusCode).toBe(400);
+    expect((await app.inject({ method: 'POST', url: '/v1/uploads', payload: {} })).statusCode).toBe(401);
+  });
+
+  it('没配 R2 时 503', async () => {
+    await signIn('alice');
+    await app.close();
+    const store = new MemoryStore({ content, timezone: SH, blueprint: blueprintSets(bp), now: () => clock, contentVersion: CV });
+    app = await buildApp({ store, content, contentVersion: CV, blueprintDir: BLUEPRINTS, regionsFile: REGIONS, pepper: 'p', now: () => clock,
+      accounts, firebase: { projectId: PROJECT, keys: k.keys }, social, feed });
+    const r = await post('alice', '/v1/uploads', { kind: 'post_image', content_type: 'image/jpeg', size: 1 });
+    expect(r.statusCode).toBe(503);
+    expect(r.json().code).toBe('UPLOADS_NOT_CONFIGURED');
+    expect((await app.inject({ method: 'GET', url: '/v1/healthz' })).json().uploads).toBe(false);
   });
 });

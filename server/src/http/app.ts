@@ -29,6 +29,7 @@ import { appleRevocationFor, userView, type AccountModule, type AccountStore, ty
 import { clampLimit, defaultDisplayName, ownProfileView, publicProfileView, userCard, validatePatch,
   type FollowRow, type ProfileRow, type SocialStore } from './social.js';
 import { canSeePost, commentView, postView, validateComment, validatePost, type AuthorCard, type FeedStore, type PostRow } from './feed.js';
+import { ownsKey, presignUpload, validateUploadRequest, type S3Config } from './uploads.js';
 
 export interface AppDeps {
   store: Store;
@@ -51,6 +52,8 @@ export interface AppDeps {
   social?: SocialStore;
   /** D4-b feed；需要 social 判可见性。缺省时相关路由 503 FEED_NOT_CONFIGURED。 */
   feed?: FeedStore;
+  /** D4-c 图片直传（R2 / S3 兼容）；缺省时 POST /v1/uploads 503 UPLOADS_NOT_CONFIGURED。 */
+  uploads?: S3Config;
 }
 
 interface Regions {
@@ -528,6 +531,9 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const me = await feedGuard(req, reply); if (!me) return;
     const v = validatePost(req.body);
     if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, reason: v.reason, server_time: deps.now() });
+    // 只能引用自己上传的图：key 必须在本人前缀下（uploads.ts newObjectKey）。
+    if (v.images.some(im => !ownsKey(im.key, me.id)))
+      return reply.code(400).send({ code: 'SCHEMA', field: 'images', reason: 'NOT_OWNED', server_time: deps.now() });
     const r = await deps.feed!.createPost({ id: randomUUID(), authorId: me.id, idempotencyKey: v.idempotencyKey, text: v.text, images: v.images, now: deps.now() });
     const [view] = await postViews(me, [r.post]);
     return reply.code(r.created ? 201 : 200).send({ ...view, created: r.created, server_time: deps.now() });
@@ -614,8 +620,20 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return reply.send({ ok: true, deleted: await deps.feed!.deleteComment(c.id, deps.now()), server_time: deps.now() });
   });
 
+  /** D4-c：要一个预签名 PUT，客户端自己把图放到 R2。返回 key（发帖时引用）与 public_url。 */
+  app.post('/v1/uploads', {
+    config: { rateLimit: { max: 120, timeWindow: '1 hour' } },
+  }, async (req, reply) => {
+    const c = await currentUser(req);
+    if (!('user' in c)) return reply.code(c.status).send(c.body);
+    if (!deps.uploads) return reply.code(503).send({ code: 'UPLOADS_NOT_CONFIGURED', server_time: deps.now() });
+    const v = validateUploadRequest(req.body);
+    if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, reason: v.reason, server_time: deps.now() });
+    return reply.code(201).send({ ...presignUpload(deps.uploads, c.user.id, v, deps.now()), server_time: deps.now() });
+  });
+
   app.get('/v1/healthz', async (_req, reply) => reply.send({
-    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), feed: Boolean(deps.feed), git_sha: deps.gitSha ?? 'dev',
+    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), feed: Boolean(deps.feed), uploads: Boolean(deps.uploads), git_sha: deps.gitSha ?? 'dev',
     content_version: deps.contentVersion, domain_version: DOMAIN_VERSION,
     server_time: deps.now(),
   }));

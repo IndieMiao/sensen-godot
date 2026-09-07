@@ -209,6 +209,14 @@ token 还是重新登录。JWKS 按 `max-age` 缓存，未知 kid 触发一次�
 | GET / POST | `/v1/posts/:id/comments` | 一级评论；`{text}` ≤500 |
 | DELETE | `/v1/comments/:id` | 评论作者或帖主可删 |
 
+## 图片直传（D4-c）
+
+`POST /v1/uploads` `{kind: post_image|avatar, content_type, size}` → 201 `{key, url, method: PUT, headers, expires_at, public_url}`：
+客户端用返回的 `url` + `headers` 直接 PUT 字节到 R2（S3 兼容，SigV4 查询串预签名，10 分钟有效，
+UNSIGNED-PAYLOAD），服务端不经手图片流量。key 形如 `u/<user_id>/<yyyymmdd>/<random>.<ext>`，发帖时
+`images[].key` 必须在本人前缀下（否则 400 `SCHEMA` / `NOT_OWNED`）。支持 jpeg / png / webp / gif / heic，
+≤15 MB。环境变量 `R2_*` 缺一则 503 `UPLOADS_NOT_CONFIGURED`。审核挂钩（D6）在发帖路径上接。
+
 ## 测试分层
 
 | 目录 | 内容 |
