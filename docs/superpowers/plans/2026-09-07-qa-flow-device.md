@@ -87,7 +87,8 @@ Godot 的 HTTPRequest 不读 iOS 系统代理；国内直连 googleapis 超时�
 
 `SENSEN_QA_FLOW=login SENSEN_QA_LOGIN=email:password [SENSEN_QA_DM=@handle] [SENSEN_QA_SAY=文字]`：
 真实 Firebase 密码登录 → `POST /v1/auth/firebase` 绑服务端 user → 连 IM WebSocket → 进壳 IM 页 →
-按 handle 开单聊 → 发一句；截图 `im_tab / chat_open / chat_sent`，report.json 同 §3。
+按 handle 开单聊 → 发一句；`SENSEN_QA_PHOTO=<路径>` 再把这张图当选中的发成图片消息（不弹系统选图器）；
+截图 `im_tab / chat_open / chat_sent / photo_sent`，report.json 同 §3。
 QA 账号：qa-alice@sensen.test（handle alice）、qa-bob@sensen.test（handle bob）。
 
 ### 6.4 构建侧的两个坑
