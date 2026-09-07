@@ -279,3 +279,11 @@ CREATE TABLE IF NOT EXISTS user_event_seq (
   user_id   uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   next_seq  bigint NOT NULL DEFAULT 0
 );
+-- B5 好友位置：每人一行最新位置，不存轨迹；删号级联。
+CREATE TABLE IF NOT EXISTS user_locations (
+  user_id      uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  lat          double precision NOT NULL,
+  lng          double precision NOT NULL,
+  accuracy_m   double precision,
+  updated_at   bigint NOT NULL
+);

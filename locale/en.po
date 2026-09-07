@@ -223,9 +223,6 @@ msgstr ""
 msgid "Map"
 msgstr ""
 
-msgid "Map home lands in B5: Mapbox underlay, friends' positions and 3D avatars. This tab stays resident so the native map view can be shown/hidden instead of rebuilt."
-msgstr ""
-
 msgid "Me"
 msgstr ""
 

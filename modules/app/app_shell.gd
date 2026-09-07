@@ -15,6 +15,7 @@ var _pages := {}
 var _buttons := {}
 var _page_host: Control
 var _tab_bar: HBoxContainer
+var _backdrop: ColorRect
 
 func _ready() -> void:
 	theme = GameUi.theme()
@@ -25,6 +26,7 @@ func _ready() -> void:
 	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(backdrop)
+	_backdrop = backdrop
 	var safe := SafeAreaMargin.new()
 	safe.name = "SafeArea"
 	safe.min_margin = 0.0
@@ -73,6 +75,8 @@ func show_tab(tab: String) -> void:
 		var on: bool = id == tab
 		p.visible = on
 		p.process_mode = Node.PROCESS_MODE_INHERIT if on else Node.PROCESS_MODE_DISABLED
+	# 地图页要让原生 MapView 从底下透上来：壳自己的纸色底只在其他 Tab 画。
+	_backdrop.visible = tab != AppRoutes.TAB_MAP
 	if not previous.is_empty() and _pages.has(previous):
 		(_pages[previous] as AppPage).on_tab_hidden()
 	page.on_tab_shown()

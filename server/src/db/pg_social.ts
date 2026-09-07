@@ -93,6 +93,14 @@ export class PgSocialStore implements SocialStore {
               (SELECT count(*) FROM follows WHERE follower_id = $1)::int AS following`, [userId]);
     return { followers: r.rows[0].followers as number, following: r.rows[0].following as number };
   }
+  async mutualFollows(userId: string) {
+    if (!isUuid(userId)) return [];
+    const r = await this.pool.query(
+      `SELECT a.followee_id FROM follows a
+         JOIN follows b ON b.follower_id = a.followee_id AND b.followee_id = a.follower_id
+        WHERE a.follower_id = $1`, [userId]);
+    return r.rows.map(x => x.followee_id as string);
+  }
   async following(userId: string, cursor: string | null, limit: number) {
     return this.page('follower_id', 'followee_id', userId, cursor, limit);
   }

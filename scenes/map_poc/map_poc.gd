@@ -76,6 +76,11 @@ const ICON_VIEW_2D := preload("res://assets/ui/icons/view_2d.svg")
 const ICON_TRAVEL := preload("res://assets/ui/icons/travel.svg")
 const ICON_PIN := preload("res://assets/ui/icons/pin.svg")
 
+## 社交主线（B5）把演示内容关掉：不生成随机路人 / 洛杉矶夹具 / 便签气泡，人数按好友算。要在 add_child 前设。
+@export var demo_cohorts := true
+## 定位回传给宿主（地图 Tab 页据此节流上报服务端）。
+signal location_changed(lat: float, lng: float, accuracy: float)
+
 var map: MapBridge = null
 var anchor_lat := START_LAT # 浮动锚点（世界原点的地理坐标）
 var anchor_lng := START_LNG
@@ -179,9 +184,10 @@ func _ready() -> void:
 	var regions := FarmRegions.load_default()
 	if regions != null and not choice.is_empty() and not regions.region(choice).is_empty():
 		enter_street_mode(regions.region(choice))
-	if not street_mode:
+	if not street_mode and demo_cohorts:
 		_spawn_la_fixture() # 压测夹具先排队；home 队列等定位确定后再插
 	_wire_buttons()
+	travel_btn.get_parent().visible = demo_cohorts # 「飞去洛杉矶」是夹具，不进社交主线
 	if Net:
 		Net.booted.connect(_on_net_booted)
 
@@ -194,7 +200,7 @@ func _ready() -> void:
 	marker_layer.z_index = -10
 	$HUD.add_child(marker_layer)
 	$HUD.move_child(marker_layer, 0)
-	marker_layer.visible = not street_mode
+	marker_layer.visible = not street_mode and demo_cohorts
 	_sync_marker_margins()
 	safe_area.margins_applied.connect(func(_m): call_deferred("_sync_marker_margins"))
 
@@ -877,7 +883,7 @@ func _spawn_home_cohort() -> void:
 	# push_front：自己排队头，第一个出队，玩家最先看到自己
 	_spawn_queue.push_front({"lat": home_lat, "lng": home_lng,
 		"cfg": self_config(), "anim": "idle", "cohort": "self"})
-	for i in (0 if street_mode else PAWNS_NEAR_COUNT):
+	for i in (0 if street_mode or not demo_cohorts else PAWNS_NEAR_COUNT):
 		var off := _rand_offset_deg(NEAR_SPREAD_M, home_lat)
 		_spawn_queue.append({"lat": home_lat + off.y, "lng": home_lng + off.x,
 			"cfg": _random_config(), "anim": _rand_anim(), "cohort": "near"})
@@ -928,11 +934,11 @@ func _correct_home(lat: float, lng: float) -> void:
 	home_lat = lat
 	home_lng = lng
 	for spec in _spawn_queue:
-		if spec.cohort != "la":
+		if not _absolute_cohort(str(spec.cohort)):
 			spec.lat += d_lat
 			spec.lng += d_lng
 	for p in _pawns:
-		if p.cohort != "la":
+		if not _absolute_cohort(str(p.cohort)):
 			p.lat += d_lat
 			p.lng += d_lng
 	if not _in_la: # 同 _resolve_home：镜头已经飞去洛杉矶就不拽回来
@@ -945,8 +951,91 @@ func _correct_home(lat: float, lng: float) -> void:
 	if is_node_ready():
 		_refresh_header()
 
-func _on_location_update(lat: float, lng: float, _accuracy: float) -> void:
+## 绝对坐标的 cohort：洛杉矶夹具与好友（服务端给的是真经纬度）不跟 home 搬。
+static func _absolute_cohort(cohort: String) -> bool:
+	return cohort == "la" or cohort.begins_with("friend:")
+
+## B5：好友位置 → 地图上的 3D 角色。按 user_id 增量：新的排队生成，已有的挪位置 / 换装扮，
+## 不在列表里的移除。items 就是 GET /friends/locations 的 items。
+func set_friends(items: Array) -> void:
+	var keep := {}
+	for it in items:
+		if not (it is Dictionary):
+			continue
+		var uid := str(it.get("user_id", ""))
+		if uid.is_empty():
+			continue
+		var cohort := "friend:" + uid
+		keep[cohort] = true
+		var lat := float(it.get("lat", 0.0))
+		var lng := float(it.get("lng", 0.0))
+		var cfg: AvatarConfig = Avatar.config_from_remote(it.get("avatar"))
+		if cfg == null:
+			cfg = Avatar.slot_table.default_config()
+		var pawn := _pawn_for(cohort)
+		if pawn.is_empty():
+			var queued := _queued_for(cohort)
+			if queued.is_empty():
+				_spawn_queue.append({"lat": lat, "lng": lng, "cfg": cfg, "anim": "idle", "cohort": cohort})
+			else:
+				queued.lat = lat
+				queued.lng = lng
+				queued.cfg = cfg
+			continue
+		pawn.lat = lat
+		pawn.lng = lng
+		(pawn.node as Node3D).position = MapGeoMath.geo_to_world(lat, lng, anchor_lat, anchor_lng)
+		var rig := pawn.rig as AvatarRig
+		if rig != null and not cfg.changed_slots(rig.desired_config()).is_empty():
+			pawn.ready = false
+			pawn.node.visible = false
+			rig.apply_config(cfg)
+			if not rig.is_busy():
+				_finish_pawn_outfit(pawn)
+	for p in _pawns.duplicate():
+		if str(p.cohort).begins_with("friend:") and not keep.has(p.cohort):
+			_remove_pawn(p)
+	for i in range(_spawn_queue.size() - 1, -1, -1):
+		var c := str(_spawn_queue[i].cohort)
+		if c.begins_with("friend:") and not keep.has(c):
+			_spawn_queue.remove_at(i)
+	_camera_dirty = true
+	if is_node_ready():
+		_refresh_header()
+
+func friend_count() -> int:
+	var n := 0
+	for p in _pawns:
+		if str(p.cohort).begins_with("friend:"):
+			n += 1
+	for spec in _spawn_queue:
+		if str(spec.cohort).begins_with("friend:"):
+			n += 1
+	return n
+
+func _pawn_for(cohort: String) -> Dictionary:
+	for p in _pawns:
+		if str(p.cohort) == cohort:
+			return p
+	return {}
+
+func _queued_for(cohort: String) -> Dictionary:
+	for spec in _spawn_queue:
+		if str(spec.cohort) == cohort:
+			return spec
+	return {}
+
+func _remove_pawn(p: Dictionary) -> void:
+	_pawns.erase(p)
+	var n := p.get("node") as Node3D
+	if is_instance_valid(n):
+		if n.get_parent() != null:
+			n.get_parent().remove_child(n)
+		n.free()
+
+func _on_location_update(lat: float, lng: float, accuracy: float) -> void:
 	_resolve_home(lat, lng)
+	location_changed.emit(lat, lng, accuracy)
 
 func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String, cohort: String) -> void:
 	var holder := Node3D.new()
@@ -989,7 +1078,7 @@ func _add_pawn(lat: float, lng: float, cfg: AvatarConfig, anim: String, cohort: 
 ## 里被 `if not street_mode` 整个跳过——ready 顶多到 1（玩家自己），23 永远
 ## 够不着，进度条永远不消失，_location_status_text() 也就永远卡在加载态。
 func _expected_role_count() -> int:
-	return 1 if street_mode else INITIAL_ROLE_COUNT
+	return 1 if street_mode or not demo_cohorts else INITIAL_ROLE_COUNT
 
 func _update_load_bar() -> void:
 	if not load_bar.visible:

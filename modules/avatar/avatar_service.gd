@@ -84,6 +84,13 @@ static func config_from_dict(d: Variant) -> AvatarConfig:
 		return null
 	return AvatarConfig.from_json_text(JSON.stringify(d))
 
+## 服务端下来的装扮（好友卡 / 资料）→ 可直接装配的 AvatarConfig；不合法给 null，缺失部件按本地部件池清洗。
+func config_from_remote(d: Variant) -> AvatarConfig:
+	var cfg := config_from_dict(d)
+	if cfg != null:
+		_drop_missing_parts(cfg)
+	return cfg
+
 ## 服务端下来的装扮落到本地（换机 / 重装后第一次登录）；缺失部件按本地部件池清洗。
 func adopt_outfit(d: Variant) -> Error:
 	var cfg := config_from_dict(d)

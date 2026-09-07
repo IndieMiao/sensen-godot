@@ -27,6 +27,7 @@ var feed: FeedApi
 var safety: SafetyApi
 var im: ImApi
 var uploads: UploadApi
+var location: LocationApi
 var images: ImageCache
 ## 最后一条已交付给上层的 IM 事件 seq；-1 = 还没同步过。
 var im_last_seq := -1
@@ -106,6 +107,7 @@ func _build_apis() -> void:
 	safety = SafetyApi.new(client)
 	im = ImApi.new(client)
 	uploads = UploadApi.new(client)
+	location = LocationApi.new(client)
 	images = ImageCache.new(func(url: String): return await client.get_bytes(url))
 
 ## 图片统一从服务端 /files/<key> 读：本地模式直接给字节，R2 模式 302 到公网地址。

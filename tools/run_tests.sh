@@ -8,6 +8,6 @@ export GODOT_BIN="${GODOT_BIN:-$(command -v godot)}"
 "$GODOT_BIN" --headless --path . --import > /dev/null 2>&1 || true
 extra=()
 if [ "${GODOT_HEADLESS:-0}" = "1" ]; then
-  extra+=(--headless)
+  extra+=(--headless --ignoreHeadlessMode)
 fi
 exec ./addons/gdUnit4/runtest.sh "${extra[@]}" -a "${1:-res://tests}"

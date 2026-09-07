@@ -63,6 +63,8 @@ export interface SocialStore {
   following(userId: string, cursor: string | null, limit: number): Promise<Page<FollowRow>>;
   followers(userId: string, cursor: string | null, limit: number): Promise<Page<FollowRow>>;
   unseenFollowerCount(userId: string): Promise<number>;
+  /** 互相关注的人（= 好友）。B5 位置只在好友之间可见。 */
+  mutualFollows(userId: string): Promise<string[]>;
   markFollowersSeen(userId: string): Promise<void>;
 
   /** 删号级联：资料与两个方向的关注都删。 */

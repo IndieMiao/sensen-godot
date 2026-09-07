@@ -31,6 +31,7 @@ import { clampLimit, defaultDisplayName, ownProfileView, publicProfileView, user
 import { canSeePost, commentView, postView, validateComment, validatePost, type AuthorCard, type FeedStore, type PostRow } from './feed.js';
 import { UPLOAD_CONTENT_TYPES, UPLOAD_MAX_BYTES, ownsKey, presignUpload, publicUrl, validateUploadRequest, type S3Config } from './uploads.js';
 import type { LocalUploadStore } from './local_uploads.js';
+import { FRIENDS_LIMIT, friendLocationView, isFresh, validateLocation, type LocationStore } from './location.js';
 import { ADMIN_ACTIONS, NullModerator, REPORT_AUTO_HIDE, decide, reportView, validateReport,
   type ModerationStore, type TextModerator } from './moderation.js';
 import { HISTORY_LIMIT_MAX, SYNC_LIMIT_MAX, conversationView, greetingBlocked, messageView, uniqueIds, validateGroup, validateMessage,
@@ -62,6 +63,8 @@ export interface AppDeps {
   uploads?: S3Config;
   /** 没有 R2 时的开发期本地存储（二选一；两个都给以 R2 为准）。 */
   localUploads?: LocalUploadStore;
+  /** B5 好友位置；不配则位置路由 503。 */
+  locations?: LocationStore;
   /** D6 举报 / 拉黑 / 封禁 / 复审队列；缺省时相关路由 503 MODERATION_NOT_CONFIGURED。 */
   moderation?: ModerationStore;
   /** D6 文本前置过滤；缺省 = NullModerator（不拦，但全部进人工队列）。 */
@@ -449,6 +452,33 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return Promise.all(rows.map(async f =>
       userCard(profiles.get(pick(f)), pick(f), await deps.social!.relation(me.id, pick(f)), f.created_at)));
   };
+
+  // —— B5 好友位置：上报只在前台地图页；只有互相关注的人看得到彼此；陈旧位置不下发 ——
+  const locationGuard = async (req: FastifyRequest, reply: FastifyReply): Promise<UserRow | null> => {
+    if (!deps.locations) { await reply.code(503).send({ code: 'LOCATION_NOT_CONFIGURED', server_time: deps.now() }); return null; }
+    return socialGuard(req, reply);
+  };
+  app.put('/v1/location', async (req, reply) => {
+    const me = await locationGuard(req, reply); if (!me) return;
+    const v = validateLocation(req.body);
+    if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, reason: v.reason, server_time: deps.now() });
+    const row = await deps.locations!.upsert(me.id, v.lat, v.lng, v.accuracy_m, deps.now());
+    return reply.send({ ok: true, updated_at: row.updated_at, server_time: deps.now() });
+  });
+  app.delete('/v1/location', async (req, reply) => {
+    const me = await locationGuard(req, reply); if (!me) return;
+    await deps.locations!.remove(me.id);
+    return reply.send({ ok: true, server_time: deps.now() });
+  });
+  app.get('/v1/friends/locations', async (req, reply) => {
+    const me = await locationGuard(req, reply); if (!me) return;
+    const friends = (await deps.social!.mutualFollows(me.id)).slice(0, FRIENDS_LIMIT);
+    const rows = await deps.locations!.many(friends);
+    const now = deps.now();
+    const fresh = [...rows.values()].filter(r => isFresh(r, now)).sort((a, b) => b.updated_at - a.updated_at);
+    const profiles = await deps.social!.profiles(fresh.map(r => r.user_id));
+    return reply.send({ items: fresh.map(r => friendLocationView(r, profiles.get(r.user_id))), server_time: now });
+  });
 
   app.get('/v1/users/me/profile', async (req, reply) => {
     const me = await socialGuard(req, reply); if (!me) return;

@@ -61,6 +61,12 @@ export class MemorySocialStore implements SocialStore {
       following: this.follows.filter(f => f.follower_id === userId).length,
     };
   }
+  async mutualFollows(userId: string) {
+    const out: string[] = [];
+    for (const f of this.follows)
+      if (f.follower_id === userId && this.follows.some(g => g.follower_id === f.followee_id && g.followee_id === userId)) out.push(f.followee_id);
+    return out;
+  }
   async following(userId: string, cursor: string | null, limit: number) {
     return this.page(this.follows.filter(f => f.follower_id === userId), f => f.followee_id, cursor, limit);
   }

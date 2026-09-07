@@ -106,7 +106,7 @@ msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:367
 #: res://scenes/app/pages/feed_page.gd:245
-#: res://scenes/app/pages/follow_list_page.gd:174
+#: res://scenes/app/pages/follow_list_page.gd:177
 #: res://scenes/app/pages/im_page.gd:201
 #: res://scenes/app/pages/post_page.gd:343
 #: res://scenes/app/pages/profile_page.gd:242
@@ -144,7 +144,7 @@ msgstr ""
 msgid "Clear log"
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:127
+#: res://scenes/app/pages/follow_list_page.gd:129
 #: res://scenes/app/pages/user_page.gd:224
 msgid "Close friends"
 msgstr ""
@@ -219,7 +219,6 @@ msgstr ""
 msgid "Display name"
 msgstr ""
 
-#: res://scenes/app/pages/map_page.gd:10
 #: res://scenes/app/pages/profile_page.gd:99
 msgid "Dressing room"
 msgstr ""
@@ -254,20 +253,20 @@ msgstr ""
 msgid "Follow"
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:26
-#: res://scenes/app/pages/follow_list_page.gd:35
+#: res://scenes/app/pages/follow_list_page.gd:27
+#: res://scenes/app/pages/follow_list_page.gd:36
 #: res://scenes/app/pages/profile_page.gd:65
 msgid "Followers"
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:33
-#: res://scenes/app/pages/follow_list_page.gd:131
+#: res://scenes/app/pages/follow_list_page.gd:34
+#: res://scenes/app/pages/follow_list_page.gd:133
 #: res://scenes/app/pages/profile_page.gd:70
 #: res://scenes/app/pages/user_page.gd:229
 msgid "Following"
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:129
+#: res://scenes/app/pages/follow_list_page.gd:131
 #: res://scenes/app/pages/user_page.gd:222
 msgid "Follows you"
 msgstr ""
@@ -331,19 +330,15 @@ msgid "Lifecycle probe"
 msgstr ""
 
 #: res://scenes/app/pages/feed_page.gd:87
-#: res://scenes/app/pages/follow_list_page.gd:52
+#: res://scenes/app/pages/follow_list_page.gd:53
 #: res://scenes/app/pages/post_page.gd:60
 #: res://scenes/app/pages/user_page.gd:132
 msgid "Load more"
 msgstr ""
 
 #: res://modules/app/app_routes.gd:28
-#: res://scenes/app/pages/map_page.gd:6
+#: res://scenes/app/pages/map_page.gd:28
 msgid "Map"
-msgstr ""
-
-#: res://scenes/app/pages/map_page.gd:9
-msgid "Map home lands in B5: Mapbox underlay, friends' positions and 3D avatars. This tab stays resident so the native map view can be shown/hidden instead of rebuilt."
 msgstr ""
 
 #: res://modules/app/app_routes.gd:28
@@ -367,11 +362,11 @@ msgstr ""
 #: res://scenes/app/pages/chat_page.gd:468
 #: res://scenes/app/pages/chat_page.gd:475
 #: res://scenes/app/pages/chat_page.gd:531
-#: res://scenes/app/pages/im_page.gd:257
+#: res://scenes/app/pages/im_page.gd:259
 msgid "Message deleted"
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:34
+#: res://scenes/app/pages/follow_list_page.gd:35
 #: res://scenes/app/pages/profile_page.gd:75
 msgid "New followers"
 msgstr ""
@@ -385,15 +380,15 @@ msgstr ""
 msgid "No connection. Check your network and try again."
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:119
+#: res://scenes/app/pages/follow_list_page.gd:121
 msgid "No followers yet."
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:255
+#: res://scenes/app/pages/im_page.gd:257
 msgid "No messages yet"
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:118
+#: res://scenes/app/pages/follow_list_page.gd:120
 msgid "No new followers."
 msgstr ""
 
@@ -415,7 +410,7 @@ msgstr ""
 msgid "No posts yet."
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:117
+#: res://scenes/app/pages/follow_list_page.gd:119
 msgid "Not following anyone yet."
 msgstr ""
 
@@ -507,7 +502,7 @@ msgstr ""
 msgid "Read by %d"
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:268
+#: res://scenes/app/pages/im_page.gd:270
 msgid "Realtime: %s"
 msgstr ""
 
@@ -608,7 +603,7 @@ msgid "Signing in…"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:403
-#: res://scenes/app/pages/follow_list_page.gd:143
+#: res://scenes/app/pages/follow_list_page.gd:145
 #: res://scenes/app/pages/user_page.gd:206
 msgid "Someone"
 msgstr ""
@@ -697,12 +692,12 @@ msgstr ""
 msgid "This sign-in method is not enabled."
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:172
+#: res://scenes/app/pages/follow_list_page.gd:175
 #: res://scenes/app/pages/user_page.gd:394
 msgid "This user isn't available."
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:170
+#: res://scenes/app/pages/follow_list_page.gd:173
 msgid "This user keeps their following list private."
 msgstr ""
 
@@ -757,7 +752,7 @@ msgid "Write a comment…"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:400
-#: res://scenes/app/pages/follow_list_page.gd:124
+#: res://scenes/app/pages/follow_list_page.gd:126
 msgid "You"
 msgstr ""
 
@@ -782,27 +777,27 @@ msgid "You'll stop getting its messages."
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:473
-#: res://scenes/app/pages/im_page.gd:260
+#: res://scenes/app/pages/im_page.gd:262
 msgid "[Photo]"
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:265
+#: res://scenes/app/pages/im_page.gd:267
 msgid "connected"
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:265
+#: res://scenes/app/pages/im_page.gd:267
 msgid "connecting"
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:265
+#: res://scenes/app/pages/im_page.gd:267
 msgid "idle"
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:266
+#: res://scenes/app/pages/im_page.gd:268
 msgid "paused"
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:266
+#: res://scenes/app/pages/im_page.gd:268
 msgid "reconnecting"
 msgstr ""
 

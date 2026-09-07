@@ -361,3 +361,14 @@ app 容器重建后再按即生效；480x = 3 分钟走完一个玩家日。白�
 QA / 演示账号用 `pnpm seed:qa`（`scripts/seed_qa.ts`）：Firebase 邮箱密码账号 → `POST /v1/auth/firebase` 建映射 →
 设 handle / 昵称 → 互相关注。幂等，可反复跑；内置 alice / bob / carol，也可传 accounts.json。
 
+## 好友位置（B5）
+
+| 路由 | 说明 |
+|---|---|
+| `PUT /v1/location {lat, lng, accuracy_m?}` | 上报自己的最新位置。客户端只在地图页可见时上报（When-In-Use），30 s / 25 m 节流；服务端只存最新一条（`user_locations`），不存轨迹。越界 400 `SCHEMA`。 |
+| `DELETE /v1/location` | 停止分享：删掉自己的位置，好友立刻看不到。 |
+| `GET /v1/friends/locations` | 互相关注的人（好友）的最新位置 `{items:[{user_id, display_name, handle, avatar, lat, lng, accuracy_m, updated_at}]}`。单向关注、被拉黑的人不下发；超过 24 h 没更新的不下发；最多 200 个。 |
+
+未配置 `locations` 时三条路由 503 `LOCATION_NOT_CONFIGURED`。位置进删号级联与数据导出（`locationAccountModule`）。
+非好友「附近的人」（E2 的降精度网格）本期不做。
+
