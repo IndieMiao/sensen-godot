@@ -1,0 +1,171 @@
+name: godot
+
+# 发布链 B1（SGODOT-68）：Godot 客户端 CI——headless gdUnit4 全量 + i18n 键覆盖校验 + Android debug APK 产物。
+# 服务端有自己的 server.yml。Godot 与导出模板按版本号缓存，第一次拉 ~1 GB，之后命中缓存只剩解压。
+on:
+  push:
+    branches: [main, 'feat/**']
+    paths-ignore: ['server/**', 'packages/**', 'docs/**', '*.md']
+  pull_request:
+    paths-ignore: ['server/**', 'packages/**', 'docs/**', '*.md']
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: 4.7.2
+  GODOT_RELEASE: 4.7.2-stable
+
+concurrency:
+  group: godot-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: gdUnit4 + i18n
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot editor
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-editor-${{ env.GODOT_RELEASE }}-linux-x86_64
+
+      - name: Download Godot editor
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot
+          curl -fsSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip"
+          unzip -q /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_RELEASE}_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+
+      - name: Godot version
+        run: ~/godot/godot --version
+
+      # 第一次导入会报一堆「首次导入」噪音并返回非零，与本地 tools/run_tests.sh 一致：忽略退出码，
+      # 真正的失败由后面的测试与校验步骤兜住。
+      - name: Import project
+        run: ~/godot/godot --headless --path . --import > /tmp/import.log 2>&1 || true
+
+      - name: i18n keys covered (en / zh_CN)
+        run: ~/godot/godot --headless --path . --script res://tools/i18n/extract_pot.gd -- --check
+
+      # 退出时的 ObjectDB 泄漏警告不会让 gdUnit 判失败（Q6 / SGODOT-79 追过一次）：这里单独盯一眼。
+      - name: gdUnit4 (headless)
+        env:
+          GODOT_BIN: /home/runner/godot/godot
+          GODOT_HEADLESS: '1'
+        run: |
+          set -o pipefail
+          tools/run_tests.sh 2>&1 | tee /tmp/tests.log
+          if grep -q "ObjectDB instances leaked" /tmp/tests.log; then
+            echo "::error::ObjectDB instances leaked at exit — 见 /tmp/tests.log"; exit 1
+          fi
+
+      - name: Upload gdUnit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gdunit-reports
+          path: reports/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  android-debug-apk:
+    name: Android debug APK
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache Godot editor
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-editor-${{ env.GODOT_RELEASE }}-linux-x86_64
+
+      - name: Download Godot editor
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot
+          curl -fsSL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_linux.x86_64.zip"
+          unzip -q /tmp/godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_RELEASE}_linux.x86_64 ~/godot/godot
+          chmod +x ~/godot/godot
+
+      - name: Cache export templates
+        id: cache-templates
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/godot/export_templates
+          key: godot-templates-${{ env.GODOT_RELEASE }}
+
+      - name: Download export templates
+        if: steps.cache-templates.outputs.cache-hit != 'true'
+        run: |
+          curl -fsSL -o /tmp/templates.tpz \
+            "https://github.com/godotengine/godot-builds/releases/download/${GODOT_RELEASE}/Godot_v${GODOT_RELEASE}_export_templates.tpz"
+          mkdir -p ~/.local/share/godot/export_templates
+          unzip -q /tmp/templates.tpz -d /tmp/templates
+          mv /tmp/templates/templates ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      # 导出预设开着 gradle_build（Photo Picker 插件走 AAR），需要 android/build 里的 Gradle 构建模板；
+      # 仓库不收这个目录（.gitignore /android/），CI 从模板包里现装。
+      - name: Install Android build template
+        run: |
+          mkdir -p android/build
+          unzip -q ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip -d android/build
+          echo "${GODOT_VERSION}.stable" > android/.build_version
+
+      - name: Debug keystore
+        run: |
+          keytool -genkeypair -v -keystore "$HOME/debug.keystore" -alias androiddebugkey \
+            -storepass android -keypass android -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
+      - name: Editor settings (SDK / JDK / keystore)
+        run: |
+          mkdir -p ~/.config/godot
+          cat > ~/.config/godot/editor_settings-4.7.tres <<TRES
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "${ANDROID_HOME}"
+          export/android/java_sdk_path = "${JAVA_HOME}"
+          export/android/debug_keystore = "${HOME}/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          TRES
+          cat ~/.config/godot/editor_settings-4.7.tres
+
+      - name: Import project
+        run: ~/godot/godot --headless --path . --import > /tmp/import.log 2>&1 || true
+
+      - name: Export debug APK
+        run: |
+          mkdir -p build
+          ~/godot/godot --headless --path . --export-debug Android build/sensen-demo-debug.apk 2>&1 | tee /tmp/export.log
+          test -s build/sensen-demo-debug.apk
+
+      - name: Client release manifest
+        run: tools/release/manifest.sh build/sensen-demo-debug.apk > build/release-manifest-client.json && cat build/release-manifest-client.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sensen-demo-debug-apk
+          path: |
+            build/sensen-demo-debug.apk
+            build/release-manifest-client.json
+          retention-days: 14
