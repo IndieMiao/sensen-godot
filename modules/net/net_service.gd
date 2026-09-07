@@ -83,6 +83,10 @@ static func farm_boot_requested(args: PackedStringArray) -> bool:
 	return false
 
 static func base_url() -> String:
+	# 环境变量优先（桌面 QA 实例指到局域网服务），其次 user://server.txt（真机），最后默认。
+	var env := OS.get_environment("SENSEN_SERVER_BASE").strip_edges()
+	if env.begins_with("http"):
+		return env.trim_suffix("/")
 	if FileAccess.file_exists(SERVER_OVERRIDE):
 		var s := FileAccess.get_file_as_string(SERVER_OVERRIDE).strip_edges()
 		if s.begins_with("http"):

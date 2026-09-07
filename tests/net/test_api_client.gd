@@ -154,3 +154,15 @@ func test_proxy_for_parses_env_and_respects_no_proxy() -> void:
 	var bare := ApiClient.proxy_for("https://x.example/", "proxy.local:3128", "")
 	assert_str(bare.host).is_equal("proxy.local")
 	assert_int(bare.port).is_equal(3128)
+
+
+## 写方法不带 body 也要发 {}：Fastify 对「JSON content-type + 空 body」直接 400。
+func test_write_methods_without_body_send_empty_json_object() -> void:
+	var t := FakeTransport.new([{"status": 200, "json": {}}, {"status": 200, "json": {}}, {"status": 200, "json": {}}])
+	var c := ApiClient.new("https://example.test/v1", t.callable())
+	await c.request("POST", "/x")
+	await c.request("PUT", "/y")
+	await c.request("DELETE", "/z")
+	assert_str(t.requests[0].raw).is_equal("{}")
+	assert_str(t.requests[1].raw).is_equal("{}")
+	assert_str(t.requests[2].raw).is_equal("")

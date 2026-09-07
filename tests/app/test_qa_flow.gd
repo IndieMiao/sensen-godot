@@ -17,3 +17,9 @@ func test_select_id_picks_by_item_id() -> void:
 
 func test_walker_is_not_attached_in_test_process() -> void:
 	assert_bool(AppRouter.get_node_or_null("QaFlow") == null).is_true()
+
+func test_parse_credentials_splits_on_first_colon_only() -> void:
+	assert_that(QaFlow.parse_credentials("a@b.co:p:w:d")).is_equal({"email": "a@b.co", "password": "p:w:d"})
+	assert_that(QaFlow.parse_credentials("nocolon")).is_equal({})
+	assert_that(QaFlow.parse_credentials(":pw")).is_equal({})
+	assert_that(QaFlow.parse_credentials("a@b.co:")).is_equal({})

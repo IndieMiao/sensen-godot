@@ -34,6 +34,8 @@ func _run() -> void:
 	match flow:
 		"social":
 			await run_social()
+		"login":
+			await run_login()
 		_:
 			_error("unknown flow: %s" % flow)
 	report.done = true
@@ -121,6 +123,67 @@ func run_social() -> void:
 	await settle()
 	await shot("signed_out_login")
 	_expect(current(), AppRoutes.LOGIN)
+
+## 用真实账号登录并留在壳里（M2 alpha 端到端用）：SENSEN_QA_LOGIN=email:password；
+## 可选 SENSEN_QA_DM=@handle 直接打开与某人的单聊，SENSEN_QA_SAY=文字 再发一句。
+## 首启合规裁决直接写成通过（这是 QA 实例，不是用户）。
+func run_login() -> void:
+	var cred := parse_credentials(OS.get_environment("SENSEN_QA_LOGIN"))
+	if cred.is_empty():
+		_error("SENSEN_QA_LOGIN must be email:password")
+		return
+	var fr := FirstRun.load_state()
+	fr.record_age_gate({"year": 2000, "month": 1, "day": 1}, Time.get_date_dict_from_system())
+	fr.record_consent()
+	var r: Dictionary = await Net.firebase.sign_in_with_password(cred.email, cred.password)
+	if not bool(r.get("ok", false)):
+		_error("firebase sign-in failed: %s" % str(r.get("code", "")))
+		return
+	Net.auth.complete_sign_in(str(r.user_id), str(r.id_token), str(r.refresh_token), int(r.expires_in_s), "password", str(r.email))
+	var a: Dictionary = await Net.account.sign_in()
+	if bool(a.get("ok", false)):
+		Net.auth.set_server_user(str(a.get("user_id", "")))
+	else:
+		_error("account link failed: %s %s" % [str(a.get("code", "")), str(a.get("reason", ""))])
+		return
+	Net.connect_im()
+	AppRouter.go_to_shell()
+	await settle()
+	var shell := current()
+	if not _expect(shell, AppRoutes.SHELL):
+		return
+	shell.show_tab(AppRoutes.TAB_IM)
+	await settle()
+	await shot("im_tab")
+	var dm := OS.get_environment("SENSEN_QA_DM").strip_edges()
+	if dm.is_empty():
+		return
+	var page = shell.page(AppRoutes.TAB_IM)
+	page.handle_edit.text = dm
+	if not await page.start_chat():
+		_error("start_chat failed: %s" % page.status.text)
+		return
+	await settle()
+	await shot("chat_open")
+	var say := OS.get_environment("SENSEN_QA_SAY")
+	if say.is_empty():
+		return
+	var chat := AppRouter.top_instance()
+	if chat == null or not chat.has_method("send"):
+		_error("chat page not on top")
+		return
+	chat.composer.text = say
+	if not await chat.send():
+		_error("send failed: %s" % chat.status.text)
+	await settle()
+	await shot("chat_sent")
+
+## "email:password" → {email, password}；密码里可以带冒号（只按第一个冒号切）。
+static func parse_credentials(raw: String) -> Dictionary:
+	var i := raw.find(":")
+	if i <= 0 or i == raw.length() - 1:
+		return {}
+	return {"email": raw.substr(0, i).strip_edges(), "password": raw.substr(i + 1)}
 
 func current() -> Node:
 	return get_tree().current_scene

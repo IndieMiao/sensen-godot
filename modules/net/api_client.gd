@@ -117,7 +117,13 @@ func _send(method: String, path: String, body: Variant, extra_headers: PackedStr
 		headers.append("authorization: Bearer %s" % tok)
 	for h in extra_headers:
 		headers.append(h)
-	var text := "" if body == null else JSON.stringify(body)
+	# 带 content-type: application/json 却不带 body，Fastify 会报 FST_ERR_CTP_EMPTY_JSON_BODY（2026-09-07 桌面
+	# QA 实例撞到）。写方法没有 body 就发 {}；GET / DELETE 照旧不带。
+	var text := ""
+	if body != null:
+		text = JSON.stringify(body)
+	elif method in ["POST", "PUT", "PATCH"]:
+		text = "{}"
 	if not transport.is_valid():
 		return Response.new(false, 0, {}, "no transport")
 	var r = await transport.call(method, base_url + path, headers, text)

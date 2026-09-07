@@ -85,6 +85,14 @@ export const NEARBY_LIMIT = 20;
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
+  // 空 body 的 JSON 请求当 {}：移动端 HTTP 库常带 content-type 却不带 body（PUT /follow 之类），
+  // Fastify 默认对此报 FST_ERR_CTP_EMPTY_JSON_BODY（2026-09-07 桌面 QA 实例撞到）。
+  app.removeContentTypeParser('application/json');
+  app.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body, done) => {
+    const text = typeof body === 'string' ? body : String(body ?? '');
+    if (text.trim() === '') { done(null, {}); return; }
+    try { done(null, JSON.parse(text)); } catch (e) { done(Object.assign(e as Error, { statusCode: 400 }), undefined); }
+  });
   await app.register(rateLimit, { global: false });
   const regions = JSON.parse(readFileSync(deps.regionsFile, 'utf8')) as Regions;
   const blueprintCache = new Map<string, Ctx['blueprint']>();

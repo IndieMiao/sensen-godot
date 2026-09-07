@@ -68,9 +68,13 @@ describe('登录 → 自有 user id', () => {
     expect((await signIn(tok({ email_verified: true }, 'uid-a'))).json().email_verified).toBe(true);
   });
 
-  it('id_token 也可以放 Authorization: Bearer', async () => {
+  it('id_token 也可以放 Authorization: Bearer；JSON content-type 带空 body 当 {}', async () => {
     const r = await app.inject({ method: 'POST', url: '/v1/auth/firebase', headers: authed(tok()) });
     expect(r.statusCode).toBe(201);
+    const empty = await app.inject({ method: 'POST', url: '/v1/auth/firebase', headers: { ...authed(tok()), 'content-type': 'application/json' }, payload: '' });
+    expect(empty.statusCode).toBe(200);
+    const bad = await app.inject({ method: 'POST', url: '/v1/auth/firebase', headers: { ...authed(tok()), 'content-type': 'application/json' }, payload: '{not json' });
+    expect(bad.statusCode).toBe(400);
   });
 
   it('坏 token 401 INVALID_ID_TOKEN 并带原因', async () => {

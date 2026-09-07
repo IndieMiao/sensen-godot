@@ -78,3 +78,10 @@ func test_connect_im_skips_dev_sessions_and_opens_for_real_ones() -> void:
 	assert_bool(Array(peers.peer.handshake_headers).has("Authorization: Bearer id-1")).is_true()
 	net.disconnect_im()
 	assert_int(net.ws.state).is_equal(WsClient.State.IDLE)
+
+## 桌面 QA 实例用环境变量把服务指到局域网；不设时不影响默认。
+func test_base_url_honours_environment_override() -> void:
+	OS.set_environment("SENSEN_SERVER_BASE", "http://192.168.1.2:3101/v1/")
+	assert_str(NetScript.base_url()).is_equal("http://192.168.1.2:3101/v1")
+	OS.set_environment("SENSEN_SERVER_BASE", "")
+	assert_bool(NetScript.base_url().begins_with("http")).is_true()
