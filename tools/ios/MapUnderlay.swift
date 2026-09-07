@@ -4,19 +4,24 @@
 //      正式化时迁 GDExtension/插件）。
 // 协议（UTF-8 文本，'|' 分隔）：
 //   Godot → 本层：CREATE|token|lat|lng|zoom ／ CAM|lat|lng|zoom|bearing|pitch ／ VIS|0/1
+//               LOC|1（开始定位，When-In-Use 授权）／ LOC|0（停止定位）
 //   本层 → Godot：READY|pixelRatio（样式加载完成后，答复 CREATE 的来源端口）
+//               LOC|lat|lng|accuracyM（每次定位更新；B5 好友位置由 Godot 侧节流上报）
 import UIKit
 import Network
+import CoreLocation
 import MapboxMaps
 
 @objc(MapUnderlay)
-class MapUnderlay: NSObject {
+class MapUnderlay: NSObject, CLLocationManagerDelegate {
     @objc static let shared = MapUnderlay()
 
     private var mapView: MapView?
     private var listener: NWListener?
     private var replyConn: NWConnection?
     private var cancelables = Set<AnyCancelable>()
+    private var locationManager: CLLocationManager?
+    private var wantLocation = false
 
     @objc class func setup() {
         shared.start()
@@ -70,6 +75,9 @@ class MapUnderlay: NSObject {
                     pitch: Double(p[5]) ?? 0))
         case "VIS" where p.count >= 2:
             mapView?.isHidden = (p[1] == "0")
+        case "LOC" where p.count >= 2:
+            replyConn = conn
+            if p[1] == "1" { startLocation() } else { stopLocation() }
         default:
             NSLog("[MapUnderlay] unknown msg: \(msg)")
         }
@@ -80,6 +88,49 @@ class MapUnderlay: NSObject {
         replyConn?.send(content: s.data(using: .utf8),
                 completion: .contentProcessed { _ in })
         NSLog("[MapUnderlay] sent \(s)")
+    }
+
+    // MARK: - 定位（When-In-Use；只在地图页可见时开着，Godot 侧 suspend 时发 LOC|0）
+
+    private func startLocation() {
+        wantLocation = true
+        if locationManager == nil {
+            let m = CLLocationManager()
+            m.delegate = self
+            m.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            m.distanceFilter = 10
+            locationManager = m
+        }
+        guard let m = locationManager else { return }
+        switch m.authorizationStatus {
+        case .notDetermined:
+            m.requestWhenInUseAuthorization()
+        case .authorizedWhenInUse, .authorizedAlways:
+            m.startUpdatingLocation()
+        default:
+            NSLog("[MapUnderlay] location not authorized: \(m.authorizationStatus.rawValue)")
+        }
+    }
+
+    private func stopLocation() {
+        wantLocation = false
+        locationManager?.stopUpdatingLocation()
+    }
+
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        if wantLocation, manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways {
+            manager.startUpdatingLocation()
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let l = locations.last else { return }
+        let s = "LOC|\(l.coordinate.latitude)|\(l.coordinate.longitude)|\(max(l.horizontalAccuracy, 0))"
+        replyConn?.send(content: s.data(using: .utf8), completion: .contentProcessed { _ in })
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        NSLog("[MapUnderlay] location error: \(error)")
     }
 
     // MARK: - 地图

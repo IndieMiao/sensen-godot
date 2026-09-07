@@ -14,6 +14,9 @@ var _ratio := 1.0
 var _pending_create := ""
 var _got_ready := false
 var _frames := 0
+## 已请求定位但还没收到第一手数据：与 CREATE 同节奏重发 LOC|1（监听器晚启动会丢首发）。
+var _want_location := false
+var _got_location := false
 
 func _init() -> void:
 	_udp.connect_to_host("127.0.0.1", PORT)
@@ -36,17 +39,43 @@ func set_map_visible(visible: bool) -> void:
 func get_pixel_ratio() -> float:
 	return _ratio
 
+func start_location() -> void:
+	_want_location = true
+	_got_location = false
+	_send("LOC|1")
+
+func stop_location() -> void:
+	_want_location = false
+	_send("LOC|0")
+
+## "LOC|lat|lng|acc" → [lat, lng, acc]；格式不对返回空数组。
+static func parse_location(s: String) -> Array:
+	if not s.begins_with("LOC|"):
+		return []
+	var parts := s.split("|")
+	if parts.size() < 4 or not parts[1].is_valid_float() or not parts[2].is_valid_float():
+		return []
+	var acc := float(parts[3]) if parts[3].is_valid_float() else -1.0
+	return [float(parts[1]), float(parts[2]), acc]
+
 func poll() -> void:
 	_frames += 1
-	if not _got_ready and not _pending_create.is_empty() \
-			and _frames % CREATE_RESEND_FRAMES == 0:
-		_send(_pending_create)
+	if _frames % CREATE_RESEND_FRAMES == 0:
+		if not _got_ready and not _pending_create.is_empty():
+			_send(_pending_create)
+		if _want_location and not _got_location:
+			_send("LOC|1")
 	while _udp.get_available_packet_count() > 0:
 		var s := _udp.get_packet().get_string_from_utf8()
 		if s.begins_with("READY|"):
 			_ratio = maxf(float(s.get_slice("|", 1)), 1.0)
 			_got_ready = true
 			map_ready.emit()
+		elif s.begins_with("LOC|"):
+			var loc := parse_location(s)
+			if not loc.is_empty():
+				_got_location = true
+				location_update.emit(loc[0], loc[1], loc[2])
 
 func _send(s: String) -> void:
 	_udp.put_packet(s.to_utf8_buffer())

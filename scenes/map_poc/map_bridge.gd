@@ -29,6 +29,10 @@ func camera_info() -> String:
 func start_location() -> void:
 	pass
 
+## 停止定位订阅（地图页隐藏时，When-In-Use 只在可见时开着）。默认空转。
+func stop_location() -> void:
+	pass
+
 ## 每帧调用（收异步消息/重发）；无事可做的实现留空。
 func poll() -> void:
 	pass

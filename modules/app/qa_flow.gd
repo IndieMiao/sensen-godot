@@ -181,6 +181,21 @@ func run_login() -> void:
 			await shot("followers")
 			AppRouter.pop_instance()
 			await settle()
+	# SENSEN_QA_MAP=1：进地图 Tab（B5），等角色装配几秒再截；SENSEN_QA_FAKE_LOCATION=lat,lng 模拟一次定位
+	# （桌面没有 GPS、iOS 桥暂无定位）：地图落锚 + 页面按真实路径上报服务端。
+	if OS.get_environment("SENSEN_QA_MAP") == "1":
+		shell.show_tab(AppRoutes.TAB_MAP)
+		await settle()
+		var map_page = shell.page(AppRoutes.TAB_MAP)
+		var fake := OS.get_environment("SENSEN_QA_FAKE_LOCATION").split(",", false)
+		if fake.size() == 2 and map_page != null and map_page.map_scene != null and map_page.map_scene.has_method("_on_location_update"):
+			map_page.map_scene._on_location_update(float(fake[0]), float(fake[1]), 10.0)
+			await settle()
+			if map_page.has_method("refresh_friends"):
+				await map_page.refresh_friends()
+		for i in 4:
+			await settle()
+		await shot("map_tab")
 	shell.show_tab(AppRoutes.TAB_IM)
 	await settle()
 	await shot("im_tab")

@@ -770,7 +770,9 @@ func suspend() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 	visible = false
 	$HUD.visible = false
-	if map: map.set_map_visible(false)
+	if map:
+		map.set_map_visible(false)
+		map.stop_location() # When-In-Use：地图不可见就不要位置
 	get_viewport().transparent_bg = false
 	cam.current = false
 	if world_env.environment:
@@ -786,6 +788,8 @@ func resume() -> void:
 	get_viewport().transparent_bg = true
 	if map:
 		map.set_map_visible(true)
+		if not street_mode:
+			map.start_location()
 	_camera_dirty = true
 	cam.make_current()
 	world_env.environment = _saved_environment
