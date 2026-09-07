@@ -20,7 +20,7 @@ export class MemoryAccountStore implements AccountStore {
     }
     const user: UserRow = {
       id: randomUUID(), email: identity.email ?? null, email_verified: identity.emailVerified,
-      display_name: null, created_at: now, last_seen_at: now,
+      created_at: now, last_seen_at: now,
     };
     this.users.set(user.id, user);
     this.identities.set(key, {

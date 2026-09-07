@@ -25,7 +25,9 @@ import { payloadHash } from './hash.js';
 import type { Store } from './store.js';
 import { isFarmLocation, withinPlacementBounds, type FarmLocation, type PlacementBounds } from './farm_location.js';
 import { IdTokenError, verifyFirebaseIdToken, type FirebaseIdentity, type KeySource } from './firebase_token.js';
-import { appleRevocationFor, userView, type AccountModule, type AccountStore } from './accounts.js';
+import { appleRevocationFor, userView, type AccountModule, type AccountStore, type UserRow } from './accounts.js';
+import { clampLimit, defaultDisplayName, ownProfileView, publicProfileView, userCard, validatePatch,
+  type FollowRow, type ProfileRow, type SocialStore } from './social.js';
 
 export interface AppDeps {
   store: Store;
@@ -44,6 +46,8 @@ export interface AppDeps {
   firebase?: { projectId: string; keys: KeySource; refreshKeys?: KeySource };
   /** 后续模块在这里登记导出与级联删除，见 accounts.ts。 */
   accountModules?: AccountModule[];
+  /** D4-a 资料 + 关注；缺省时相关路由 503 SOCIAL_NOT_CONFIGURED。 */
+  social?: SocialStore;
 }
 
 interface Regions {
@@ -309,6 +313,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     if ('error' in r)
       return reply.code(401).send({ code: 'INVALID_ID_TOKEN', reason: r.error, server_time: deps.now() });
     const { user, created } = await deps.accounts!.signIn(r.identity, deps.now());
+    // 资料随账号一起就位：客户端登录后立刻能拿到自己的资料（M1 出口），不用再猜「有没有」。
+    if (deps.social) await deps.social.ensureProfile(user.id, defaultDisplayName(r.identity.email, r.identity.uid), deps.now());
     return reply.code(created ? 201 : 200).send({ ...userView(user), created, server_time: deps.now() });
   });
 
@@ -368,8 +374,122 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     }
   });
 
+  // —— D4-a 资料 + 关注 ——
+  type Current = { user: UserRow } | { status: number; body: object };
+  const currentUser = async (req: FastifyRequest): Promise<Current> => {
+    if (!accountsReady()) return { status: 503, body: { code: 'ACCOUNTS_NOT_CONFIGURED', server_time: deps.now() } };
+    const r = await identityFromToken(bearer(req));
+    if ('error' in r) return { status: 401, body: { code: 'UNAUTHENTICATED', reason: r.error, server_time: deps.now() } };
+    const user = await deps.accounts!.userByFirebaseUid(r.identity.uid);
+    if (!user) return { status: 404, body: { code: 'NO_ACCOUNT', server_time: deps.now() } };
+    return { user };
+  };
+  const socialGuard = async (req: FastifyRequest, reply: FastifyReply): Promise<UserRow | null> => {
+    if (!deps.social) { await reply.code(503).send({ code: 'SOCIAL_NOT_CONFIGURED', server_time: deps.now() }); return null; }
+    const c = await currentUser(req);
+    if ('user' in c) return c.user;
+    await reply.code(c.status).send(c.body);
+    return null;
+  };
+  /** 路径里的用户：me / @handle / uuid。 */
+  const resolveProfile = async (raw: string, me: UserRow): Promise<ProfileRow | null> => {
+    if (raw === 'me') return deps.social!.profile(me.id);
+    if (raw.startsWith('@')) return deps.social!.profileByHandle(raw.slice(1).toLowerCase());
+    return deps.social!.profile(raw);
+  };
+  const paramId = (req: FastifyRequest): string => String((req.params as Record<string, string>).id ?? '');
+  const cards = async (me: UserRow, rows: FollowRow[], pick: (f: FollowRow) => string) => {
+    const ids = rows.map(pick);
+    const profiles = await deps.social!.profiles(ids);
+    // 每张卡一次 relation 查询：列表最多 50 条，MVP 先不合并。
+    return Promise.all(rows.map(async f =>
+      userCard(profiles.get(pick(f)), pick(f), await deps.social!.relation(me.id, pick(f)), f.created_at)));
+  };
+
+  app.get('/v1/users/me/profile', async (req, reply) => {
+    const me = await socialGuard(req, reply); if (!me) return;
+    const p = await deps.social!.profile(me.id);
+    if (!p) return reply.code(404).send({ code: 'NO_PROFILE', server_time: deps.now() });
+    const [counts, unseen] = await Promise.all([deps.social!.counts(me.id), deps.social!.unseenFollowerCount(me.id)]);
+    return reply.send({ ...ownProfileView(p, counts, unseen), server_time: deps.now() });
+  });
+
+  app.put('/v1/users/me/profile', async (req, reply) => {
+    const me = await socialGuard(req, reply); if (!me) return;
+    const v = validatePatch(req.body);
+    if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, reason: v.reason, server_time: deps.now() });
+    const r = await deps.social!.updateProfile(me.id, v.patch, deps.now());
+    if (r === null) return reply.code(404).send({ code: 'NO_PROFILE', server_time: deps.now() });
+    if (r === 'HANDLE_TAKEN') return reply.code(409).send({ code: 'HANDLE_TAKEN', server_time: deps.now() });
+    const [counts, unseen] = await Promise.all([deps.social!.counts(me.id), deps.social!.unseenFollowerCount(me.id)]);
+    return reply.send({ ...ownProfileView(r, counts, unseen), server_time: deps.now() });
+  });
+
+  app.get('/v1/users/:id/profile', async (req, reply) => {
+    const me = await socialGuard(req, reply); if (!me) return;
+    const p = await resolveProfile(paramId(req), me);
+    if (!p) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    const self = p.user_id === me.id;
+    const [counts, relation] = await Promise.all([deps.social!.counts(p.user_id), deps.social!.relation(me.id, p.user_id)]);
+    return reply.send({ ...publicProfileView(p, counts, relation, self), server_time: deps.now() });
+  });
+
+  const followTarget = async (req: FastifyRequest, reply: FastifyReply, me: UserRow): Promise<string | null> => {
+    const p = await resolveProfile(paramId(req), me);
+    if (!p) { await reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() }); return null; }
+    if (p.user_id === me.id) { await reply.code(400).send({ code: 'SELF_FOLLOW', server_time: deps.now() }); return null; }
+    return p.user_id;
+  };
+
+  app.put('/v1/users/:id/follow', async (req, reply) => {
+    const me = await socialGuard(req, reply); if (!me) return;
+    const target = await followTarget(req, reply, me); if (!target) return;
+    const r = await deps.social!.follow(me.id, target, deps.now());
+    if (r.missing) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    return reply.send({ ok: true, created: r.created, relation: await deps.social!.relation(me.id, target), server_time: deps.now() });
+  });
+
+  app.delete('/v1/users/:id/follow', async (req, reply) => {
+    const me = await socialGuard(req, reply); if (!me) return;
+    const target = await followTarget(req, reply, me); if (!target) return;
+    const r = await deps.social!.unfollow(me.id, target);
+    return reply.send({ ok: true, removed: r.removed, relation: await deps.social!.relation(me.id, target), server_time: deps.now() });
+  });
+
+  /** 我关注的人：别人看要过隐私开关；粉丝列表永远公开。 */
+  app.get('/v1/users/:id/following', async (req, reply) => {
+    const me = await socialGuard(req, reply); if (!me) return;
+    const p = await resolveProfile(paramId(req), me);
+    if (!p) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    if (p.user_id !== me.id && !p.following_visible)
+      return reply.code(403).send({ code: 'FOLLOWING_PRIVATE', server_time: deps.now() });
+    const q = req.query as Record<string, unknown>;
+    const page = await deps.social!.following(p.user_id, typeof q.cursor === 'string' ? q.cursor : null, clampLimit(q.limit));
+    return reply.send({ items: await cards(me, page.items, f => f.followee_id), next_cursor: page.next_cursor, server_time: deps.now() });
+  });
+
+  app.get('/v1/users/:id/followers', async (req, reply) => {
+    const me = await socialGuard(req, reply); if (!me) return;
+    const p = await resolveProfile(paramId(req), me);
+    if (!p) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    const q = req.query as Record<string, unknown>;
+    const page = await deps.social!.followers(p.user_id, typeof q.cursor === 'string' ? q.cursor : null, clampLimit(q.limit));
+    return reply.send({ items: await cards(me, page.items, f => f.follower_id), next_cursor: page.next_cursor, server_time: deps.now() });
+  });
+
+  /** 「新粉丝」页：最近关注我的人，带未读数；读过即清。 */
+  app.get('/v1/users/me/new-followers', async (req, reply) => {
+    const me = await socialGuard(req, reply); if (!me) return;
+    const q = req.query as Record<string, unknown>;
+    const unread = await deps.social!.unseenFollowerCount(me.id);
+    const page = await deps.social!.followers(me.id, typeof q.cursor === 'string' ? q.cursor : null, clampLimit(q.limit));
+    const items = await cards(me, page.items, f => f.follower_id);
+    await deps.social!.markFollowersSeen(me.id);
+    return reply.send({ items, unread_count: unread, next_cursor: page.next_cursor, server_time: deps.now() });
+  });
+
   app.get('/v1/healthz', async (_req, reply) => reply.send({
-    ok: true, db: true, accounts: accountsReady(), git_sha: deps.gitSha ?? 'dev',
+    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), git_sha: deps.gitSha ?? 'dev',
     content_version: deps.contentVersion, domain_version: DOMAIN_VERSION,
     server_time: deps.now(),
   }));

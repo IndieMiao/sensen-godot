@@ -174,6 +174,24 @@ token 还是重新登录。JWKS 按 `max-age` 缓存，未知 kid 触发一次�
 的用户墓碑标 `apple_revocation = pending`，等拿到 Apple client secret（SSLAUNCH A6）后由队列
 撤销 token。Firebase 侧的用户删除由客户端 / 网页自己用 Firebase 调用完成。
 
+## 资料与关注（D4-a）
+
+规则来自 `Gensen_US/en-us/Gensen-follow-feature-requirements.md` v1.2：单向关注无需批准、不能关注
+自己、数量不限；互关即密友；取关只降级不通知；粉丝列表永远公开，「我关注的」可用隐私开关对他人
+隐藏（关掉后别人看不到关注数与列表）；新粉丝聚合成带未读的入口。所有路由 Bearer = Firebase ID token。
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET / PUT | `/v1/users/me/profile` | 自己的资料；PUT 只改给了的字段：`display_name`(1–30) `handle`(3–20 `[a-z0-9_]`，唯一，可 null) `bio`(≤160) `avatar`(对象 ≤4 KB) `following_visible` |
+| GET | `/v1/users/:id/profile` | `:id` = `me` / `@handle` / uuid；带 `relation` 与计数，`following_count` 受隐私开关 |
+| PUT / DELETE | `/v1/users/:id/follow` | 关注 / 取关，幂等；自己 400 `SELF_FOLLOW`；不存在 404 |
+| GET | `/v1/users/:id/following` | 别人的受隐私开关：403 `FOLLOWING_PRIVATE`；`cursor` / `limit`(≤50) |
+| GET | `/v1/users/:id/followers` | 永远公开 |
+| GET | `/v1/users/me/new-followers` | 最近关注我的人 + `unread_count`，读过即清 |
+
+首次登录时随账号建默认资料（昵称 = 邮箱本地部分）。资料与关注通过 `accountModules` 登记了导出与
+删号级联。陌生人「一条打招呼」的聊天限制归 D3 IM，用这里的 `relation` 判定。
+
 ## 测试分层
 
 | 目录 | 内容 |

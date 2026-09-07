@@ -95,7 +95,6 @@ CREATE TABLE IF NOT EXISTS users (
   id              uuid PRIMARY KEY,
   email           text,
   email_verified  boolean NOT NULL DEFAULT false,
-  display_name    text,
   created_at      bigint NOT NULL,
   last_seen_at    bigint NOT NULL
 );
@@ -120,3 +119,30 @@ CREATE TABLE IF NOT EXISTS account_deletions (
   source            text NOT NULL,
   apple_revocation  text NOT NULL
 );
+
+-- D2 首版把 display_name 放在了 users 上；资料自 D4 起归 profiles，老库把这列去掉。
+ALTER TABLE users DROP COLUMN IF EXISTS display_name;
+
+-- D4-a 资料：用户自己编辑、别人能看的东西，和账号（users）的读写权限与生命周期都不同。
+CREATE TABLE IF NOT EXISTS profiles (
+  user_id            uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  handle             text UNIQUE,
+  display_name       text NOT NULL,
+  bio                text NOT NULL DEFAULT '',
+  avatar             jsonb,
+  following_visible  boolean NOT NULL DEFAULT true,
+  created_at         bigint NOT NULL,
+  updated_at         bigint NOT NULL
+);
+
+-- D4-a 关注：单向；互关即密友由查询判定，不存第二份状态。seen 是「新粉丝」页的未读标记。
+CREATE TABLE IF NOT EXISTS follows (
+  follower_id  uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  followee_id  uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at   bigint NOT NULL,
+  seen         boolean NOT NULL DEFAULT false,
+  PRIMARY KEY (follower_id, followee_id),
+  CHECK (follower_id <> followee_id)
+);
+CREATE INDEX IF NOT EXISTS follows_followee_idx ON follows(followee_id, created_at DESC, follower_id DESC);
+CREATE INDEX IF NOT EXISTS follows_follower_idx ON follows(follower_id, created_at DESC, followee_id DESC);

@@ -12,7 +12,6 @@ export interface UserRow {
   id: string;
   email: string | null;
   email_verified: boolean;
-  display_name: string | null;
   created_at: number;
   last_seen_at: number;
 }
@@ -67,7 +66,6 @@ export function userView(u: UserRow) {
     user_id: u.id,
     email: u.email,
     email_verified: u.email_verified,
-    display_name: u.display_name,
     created_at: u.created_at,
     last_seen_at: u.last_seen_at,
   };

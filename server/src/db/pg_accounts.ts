@@ -8,7 +8,6 @@ const rowToUser = (r: Record<string, unknown>): UserRow => ({
   id: r.id as string,
   email: (r.email as string | null) ?? null,
   email_verified: r.email_verified as boolean,
-  display_name: (r.display_name as string | null) ?? null,
   created_at: Number(r.created_at),
   last_seen_at: Number(r.last_seen_at),
 });
@@ -37,8 +36,8 @@ export class PgAccountStore implements AccountStore {
       // 撤掉自己刚插的用户行，改用赢家的——两边都拿到同一个 user_id。
       const userId = randomUUID();
       await client.query(
-        `INSERT INTO users (id, email, email_verified, display_name, created_at, last_seen_at)
-         VALUES ($1, $2, $3, NULL, $4, $4)`,
+        `INSERT INTO users (id, email, email_verified, created_at, last_seen_at)
+         VALUES ($1, $2, $3, $4, $4)`,
         [userId, identity.email ?? null, identity.emailVerified, now]);
       const claimed = await client.query(
         `INSERT INTO user_identities (provider, provider_uid, user_id, sign_in_provider, created_at)
