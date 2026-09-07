@@ -7,6 +7,9 @@ msgstr ""
 msgid "%d comments"
 msgstr ""
 
+msgid "%d picked"
+msgstr ""
+
 msgid "%dd ago"
 msgstr ""
 
@@ -244,6 +247,9 @@ msgstr ""
 msgid "No one with the handle @%s."
 msgstr ""
 
+msgid "No picker on this platform."
+msgstr ""
+
 msgid "Not signed in"
 msgstr ""
 
@@ -260,6 +266,12 @@ msgid "Password must be at least 6 characters."
 msgstr ""
 
 msgid "Password reset email sent."
+msgstr ""
+
+msgid "Pick photos"
+msgstr ""
+
+msgid "Picking…"
 msgstr ""
 
 msgid "Please check the %s field."

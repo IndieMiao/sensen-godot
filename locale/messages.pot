@@ -7,6 +7,10 @@ msgstr ""
 msgid "%d comments"
 msgstr ""
 
+#: res://scenes/app/pages/lifecycle_probe_page.gd:139
+msgid "%d picked"
+msgstr ""
+
 #: res://scenes/app/pages/feed_page.gd:202
 msgid "%dd ago"
 msgstr ""
@@ -127,7 +131,7 @@ msgstr ""
 msgid "Child safety"
 msgstr ""
 
-#: res://scenes/app/pages/lifecycle_probe_page.gd:50
+#: res://scenes/app/pages/lifecycle_probe_page.gd:62
 msgid "Clear log"
 msgstr ""
 
@@ -276,7 +280,7 @@ msgstr ""
 msgid "Leave this group?"
 msgstr ""
 
-#: res://scenes/app/pages/lifecycle_probe_page.gd:29
+#: res://scenes/app/pages/lifecycle_probe_page.gd:30
 msgid "Lifecycle probe"
 msgstr ""
 
@@ -347,6 +351,10 @@ msgstr ""
 msgid "No one with the handle @%s."
 msgstr ""
 
+#: res://scenes/app/pages/lifecycle_probe_page.gd:131
+msgid "No picker on this platform."
+msgstr ""
+
 #: res://scenes/app/pages/profile_page.gd:93
 msgid "Not signed in"
 msgstr ""
@@ -370,6 +378,14 @@ msgstr ""
 
 #: res://scenes/app/login_page.gd:162
 msgid "Password reset email sent."
+msgstr ""
+
+#: res://scenes/app/pages/lifecycle_probe_page.gd:55
+msgid "Pick photos"
+msgstr ""
+
+#: res://scenes/app/pages/lifecycle_probe_page.gd:131
+msgid "Picking…"
 msgstr ""
 
 #: res://scenes/app/pages/feed_page.gd:184
@@ -522,11 +538,11 @@ msgstr ""
 msgid "Spam or scam"
 msgstr ""
 
-#: res://scenes/app/pages/lifecycle_probe_page.gd:33
+#: res://scenes/app/pages/lifecycle_probe_page.gd:34
 msgid "Switch to another app and come back several times. Each PAUSED/RESUMED pair must increase by one."
 msgstr ""
 
-#: res://scenes/app/pages/lifecycle_probe_page.gd:42
+#: res://scenes/app/pages/lifecycle_probe_page.gd:43
 msgid "Tap here to test keyboard avoidance"
 msgstr ""
 

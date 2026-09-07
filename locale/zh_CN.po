@@ -477,3 +477,15 @@ msgstr "你"
 
 msgid "You'll stop getting its messages."
 msgstr "你将不再收到这个群的消息。"
+
+msgid "%d picked"
+msgstr "选了 %d 张"
+
+msgid "No picker on this platform."
+msgstr "这个平台没有选图器。"
+
+msgid "Pick photos"
+msgstr "选照片"
+
+msgid "Picking…"
+msgstr "选图中…"

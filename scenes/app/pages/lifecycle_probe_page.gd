@@ -24,6 +24,7 @@ var keyboard_height_provider: Callable
 var summary: Label
 var log_label: Label
 var keyboard_label: Label
+var pick_label: Label
 
 func _init() -> void:
 	page_title = "Lifecycle probe"
@@ -47,6 +48,17 @@ func _build_body() -> void:
 	log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	log_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_child(log_label)
+	# C3 选图桥的真机验证入口：弹系统选图器，把回来的张数 / 尺寸 / 字节数打在下面。
+	pick_label = GameUi.label("", 12, GameUi.MUTED)
+	pick_label.name = "PickResult"
+	pick_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var pick := GameUi.button("", tr("Pick photos"), "PhotoPicker.pick(3)")
+	pick.name = "PickPhotos"
+	pick.pressed.connect(func(): pick_photos())
+	body.add_child(pick)
+	body.add_child(pick_label)
+	# 进页就把后端打出来：真机截图一眼看出 GDExtension 有没有装进包里。
+	pick_label.text = "picker: %s" % ("native" if PhotoPicker.native_available() else ("dialog" if PhotoPicker.dialog_available() else "none"))
 	var clear := GameUi.button("x", tr("Clear log"), "reset counters")
 	clear.name = "Clear"
 	clear.pressed.connect(_clear)
@@ -113,3 +125,16 @@ func _clear() -> void:
 	keyboard_max_px = 0
 	_save()
 	_refresh()
+
+
+func pick_photos() -> Dictionary:
+	pick_label.text = tr("Picking…") if PhotoPicker.available() else tr("No picker on this platform.")
+	var r: Dictionary = await PhotoPicker.new().pick(3)
+	if not bool(r.get("ok", false)):
+		pick_label.text = "pick failed: %s" % str(r.get("code", ""))
+		return r
+	var lines: Array = []
+	for it in r.get("items", []):
+		lines.append("%dx%d %d KB %s" % [int(it.width), int(it.height), int((it.bytes as PackedByteArray).size() / 1024), str(it.path).get_file()])
+	pick_label.text = tr("%d picked") % lines.size() + ("\n" + "\n".join(lines) if not lines.is_empty() else "")
+	return r

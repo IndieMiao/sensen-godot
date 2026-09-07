@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+# C3 Photo Picker GDExtension。只做 iOS（Android 走 Kotlin 插件，桌面走 DisplayServer 原生文件框）。
+# 用法见 build_ios.sh；godot-cpp 在 ../godot-cpp（已按本机 Godot 的 extension_api.json 生成绑定）。
+import os
+
+env = SConscript("../godot-cpp/SConstruct")
+env.Append(CPPPATH=["src/"])
+sources = Glob("src/*.cpp")
+if env["platform"] == "ios":
+    sources += Glob("src/*.mm")
+    env.Append(CXXFLAGS=["-fobjc-arc"])
+    library = env.StaticLibrary("bin/libsensen_photo_picker_objs{}{}".format(env["suffix"], env["LIBSUFFIX"]), source=sources)
+else:
+    # 桌面：空实现（src_stub），只为让编辑器 / 测试进程加载 .gdextension 时有库可载。
+    sources += Glob("src_stub/*.cpp")
+    library = env.SharedLibrary("bin/libsensen_photo_picker{}{}".format(env["suffix"], env["SHLIBSUFFIX"]), source=sources)
+Default(library)

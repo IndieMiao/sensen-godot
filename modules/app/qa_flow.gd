@@ -103,6 +103,13 @@ func run_social() -> void:
 	AppRouter.push_instance(AppRoutes.LIFECYCLE_PROBE)
 	await settle()
 	await shot("lifecycle_probe")
+	# SENSEN_QA_PICK=1：在探针页弹系统选图器（C3 真机验证）。人选完图流程才继续，结果打在页上再截一张。
+	if OS.get_environment("SENSEN_QA_PICK") == "1":
+		var probe := AppRouter.top_instance()
+		if probe != null and probe.has_method("pick_photos"):
+			await probe.pick_photos()
+			await settle()
+			await shot("photos_picked")
 	AppRouter.pop_instance()
 	await settle()
 	var settings := AppRouter.top_instance()
