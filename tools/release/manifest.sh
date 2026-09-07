@@ -28,7 +28,10 @@ ios_build=$(preset_field iOS application/version)
 sha256_of() {
   if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | cut -d' ' -f1; else shasum -a 256 "$1" | cut -d' ' -f1; fi
 }
-size_of() { stat -f %z "$1" 2>/dev/null || stat -c %s "$1"; }
+size_of() {
+  # GNU stat（Linux CI）用 -c；BSD stat（macOS）用 -f。反过来调用不会报错但会吐出别的东西，清单就成了非法 JSON。
+  if stat --version >/dev/null 2>&1; then stat -c %s "$1"; else stat -f %z "$1"; fi
+}
 
 artifacts="[]"
 for f in "$@"; do
