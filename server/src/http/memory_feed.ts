@@ -1,5 +1,6 @@
 /** 内存 FeedStore：HTTP 层测试用；语义与 PgFeedStore 保持一致（feed_conformance）。 */
-import { decodeCursor, encodeCursor, type CommentRow, type FeedStore, type Page, type PostImage, type PostRow } from './feed.js';
+import { decodeCursor, encodeCursor, type CommentRow, type FeedStore, type Moderation, type Page, type PostImage, type PostRow } from './feed.js';
+import type { ModerationStatus } from './moderation.js';
 
 export class MemoryFeedStore implements FeedStore {
   private posts = new Map<string, PostRow>();
@@ -10,12 +11,13 @@ export class MemoryFeedStore implements FeedStore {
   /** 时间线需要知道 viewer 关注谁：由调用方注入（测试里指向 MemorySocialStore）。 */
   constructor(private readonly followees: (viewerId: string) => Promise<string[]>) {}
 
-  async createPost(a: { id: string; authorId: string; idempotencyKey: string; text: string; images: PostImage[]; now: number }) {
+  async createPost(a: { id: string; authorId: string; idempotencyKey: string; text: string; images: PostImage[]; now: number; moderation: Moderation }) {
     const k = `${a.authorId}:${a.idempotencyKey}`;
     const existing = this.creations.get(k);
     if (existing) return { post: { ...this.posts.get(existing)! }, created: false };
     const post: PostRow = { id: a.id, author_id: a.authorId, text: a.text, images: a.images.map(i => ({ ...i })),
-      like_count: 0, comment_count: 0, created_at: a.now, deleted_at: null };
+      like_count: 0, comment_count: 0, created_at: a.now, deleted_at: null,
+      moderation_status: a.moderation.status, moderation_categories: [...a.moderation.categories] };
     this.posts.set(post.id, post);
     this.creations.set(k, post.id);
     return { post: { ...post }, created: true };
@@ -30,12 +32,14 @@ export class MemoryFeedStore implements FeedStore {
     p.deleted_at = now;
     return true;
   }
-  async timeline(viewerId: string, cursor: string | null, limit: number) {
+  async timeline(viewerId: string, cursor: string | null, limit: number, excludeAuthors: string[] = []) {
     const authors = new Set([viewerId, ...(await this.followees(viewerId))]);
-    return this.page([...this.posts.values()].filter(p => p.deleted_at === null && authors.has(p.author_id)), cursor, limit);
+    for (const x of excludeAuthors) if (x !== viewerId) authors.delete(x);
+    return this.page([...this.posts.values()].filter(p => p.deleted_at === null && authors.has(p.author_id)
+      && (p.author_id === viewerId ? p.moderation_status !== 'rejected' : (p.moderation_status === 'approved' || p.moderation_status === 'pending'))), cursor, limit);
   }
   async byAuthor(authorId: string, cursor: string | null, limit: number) {
-    return this.page([...this.posts.values()].filter(p => p.deleted_at === null && p.author_id === authorId), cursor, limit);
+    return this.page([...this.posts.values()].filter(p => p.deleted_at === null && p.author_id === authorId && p.moderation_status !== 'rejected'), cursor, limit);
   }
   private page(rows: PostRow[], cursor: string | null, limit: number): Page<PostRow> {
     const c = decodeCursor(cursor);
@@ -67,8 +71,9 @@ export class MemoryFeedStore implements FeedStore {
   async likedBy(postIds: string[], userId: string) {
     return new Set(postIds.filter(id => this.likes.has(`${id}:${userId}`)));
   }
-  async addComment(a: { id: string; postId: string; authorId: string; text: string; now: number }) {
-    const c: CommentRow = { id: a.id, post_id: a.postId, author_id: a.authorId, text: a.text, created_at: a.now, deleted_at: null };
+  async addComment(a: { id: string; postId: string; authorId: string; text: string; now: number; moderation: Moderation }) {
+    const c: CommentRow = { id: a.id, post_id: a.postId, author_id: a.authorId, text: a.text, created_at: a.now, deleted_at: null,
+      moderation_status: a.moderation.status, moderation_categories: [...a.moderation.categories] };
     this.commentsById.set(c.id, c);
     const p = this.posts.get(a.postId);
     if (p) p.comment_count += 1;
@@ -81,7 +86,7 @@ export class MemoryFeedStore implements FeedStore {
   async comments(postId: string, cursor: string | null, limit: number): Promise<Page<CommentRow>> {
     const c = decodeCursor(cursor);
     const sorted = [...this.commentsById.values()]
-      .filter(x => x.post_id === postId && x.deleted_at === null)
+      .filter(x => x.post_id === postId && x.deleted_at === null && x.moderation_status !== 'hidden' && x.moderation_status !== 'rejected')
       .filter(x => !c || x.created_at > c.createdAt || (x.created_at === c.createdAt && x.id > c.id))
       .sort((x, y) => x.created_at - y.created_at || (x.id < y.id ? -1 : x.id > y.id ? 1 : 0));
     const items = sorted.slice(0, limit).map(x => ({ ...x }));
@@ -95,6 +100,25 @@ export class MemoryFeedStore implements FeedStore {
     const p = this.posts.get(c.post_id);
     if (p) p.comment_count -= 1;
     return true;
+  }
+  async setPostStatus(id: string, status: ModerationStatus) {
+    const p = this.posts.get(id);
+    if (!p || p.deleted_at !== null) return false;
+    p.moderation_status = status;
+    return true;
+  }
+  async setCommentStatus(id: string, status: ModerationStatus) {
+    const c = this.commentsById.get(id);
+    if (!c || c.deleted_at !== null) return false;
+    c.moderation_status = status;
+    return true;
+  }
+  async pendingReview(limit: number) {
+    const by = (x: { created_at: number; id: string }, y: { created_at: number; id: string }) => x.created_at - y.created_at || (x.id < y.id ? -1 : 1);
+    return {
+      posts: [...this.posts.values()].filter(p => p.deleted_at === null && p.moderation_status === 'pending').sort(by).slice(0, limit).map(p => ({ ...p })),
+      comments: [...this.commentsById.values()].filter(c => c.deleted_at === null && c.moderation_status === 'pending').sort(by).slice(0, limit).map(c => ({ ...c })),
+    };
   }
   async deleteUser(userId: string) {
     for (const [id, p] of this.posts) if (p.author_id === userId) { this.posts.delete(id); for (const [cid, c] of this.commentsById) if (c.post_id === id) this.commentsById.delete(cid); }

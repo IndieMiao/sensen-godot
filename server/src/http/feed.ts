@@ -11,6 +11,7 @@
 import type { AccountModule } from './accounts.js';
 import { decodeCursor, encodeCursor } from './social.js';
 import type { Page, Relation } from './social.js';
+import type { ModerationStatus } from './moderation.js';
 
 export type { Page };
 
@@ -23,7 +24,10 @@ export interface PostRow {
   comment_count: number;
   created_at: number;
   deleted_at: number | null;
+  moderation_status: ModerationStatus;
+  moderation_categories: string[];
 }
+export interface Moderation { status: ModerationStatus; categories: string[] }
 export interface PostImage { key: string; w?: number; h?: number }
 export interface CommentRow {
   id: string;
@@ -32,28 +36,35 @@ export interface CommentRow {
   text: string;
   created_at: number;
   deleted_at: number | null;
+  moderation_status: ModerationStatus;
+  moderation_categories: string[];
 }
 
 export interface FeedStore {
   /** 同一作者同一 idempotency_key 只建一条；重放返回 created=false 与原帖。 */
-  createPost(args: { id: string; authorId: string; idempotencyKey: string; text: string; images: PostImage[]; now: number }):
+  createPost(args: { id: string; authorId: string; idempotencyKey: string; text: string; images: PostImage[]; now: number; moderation: Moderation }):
     Promise<{ post: PostRow; created: boolean }>;
   post(id: string): Promise<PostRow | null>;
   /** 软删；只有作者能删——调用方校验。返回是否真的删了（已删 / 不存在 false）。 */
   deletePost(id: string, authorId: string, now: number): Promise<boolean>;
-  /** 我 + 我关注的人的动态，倒序键集分页。 */
-  timeline(viewerId: string, cursor: string | null, limit: number): Promise<Page<PostRow>>;
+  /** 我 + 我关注的人的动态，倒序键集分页；excludeAuthors 是拉黑双向的对方。 */
+  timeline(viewerId: string, cursor: string | null, limit: number, excludeAuthors?: string[]): Promise<Page<PostRow>>;
   /** 某人的动态（可见性由调用方判定）。 */
   byAuthor(authorId: string, cursor: string | null, limit: number): Promise<Page<PostRow>>;
   like(postId: string, userId: string, now: number): Promise<{ created: boolean }>;
   unlike(postId: string, userId: string): Promise<{ removed: boolean }>;
   likedBy(postIds: string[], userId: string): Promise<Set<string>>;
-  addComment(args: { id: string; postId: string; authorId: string; text: string; now: number }): Promise<CommentRow>;
+  addComment(args: { id: string; postId: string; authorId: string; text: string; now: number; moderation: Moderation }): Promise<CommentRow>;
   comment(id: string): Promise<CommentRow | null>;
   /** 评论按时间正序（对话顺序），键集分页。 */
   comments(postId: string, cursor: string | null, limit: number): Promise<Page<CommentRow>>;
   /** 软删；作者或帖主可删——调用方校验。 */
   deleteComment(id: string, now: number): Promise<boolean>;
+  /** 审核处置：改状态（hidden 下架 / approved 放行）。 */
+  setPostStatus(id: string, status: ModerationStatus): Promise<boolean>;
+  setCommentStatus(id: string, status: ModerationStatus): Promise<boolean>;
+  /** 人工复审队列：pending 的帖子与评论，按时间正序。 */
+  pendingReview(limit: number): Promise<{ posts: PostRow[]; comments: CommentRow[] }>;
   /** 删号级联：帖子、评论、点赞全删（硬删：账号都没了，审核回看的对象也没了）。 */
   deleteUser(userId: string): Promise<void>;
   /** 导出：帖子与评论原文。 */
@@ -111,8 +122,12 @@ export function validateComment(body: unknown): { ok: true; text: string } | { o
 }
 
 /** 谁能看这条：作者本人，或关注了作者的人。 */
-export const canSeePost = (post: PostRow, viewerId: string, relationToAuthor: Relation): boolean =>
-  post.author_id === viewerId || relationToAuthor.following;
+export const canSeePost = (post: PostRow, viewerId: string, relationToAuthor: Relation): boolean => {
+  if (post.moderation_status === 'rejected') return false;
+  if (post.author_id === viewerId) return true;
+  if (post.moderation_status === 'hidden') return false;
+  return relationToAuthor.following;
+};
 
 export interface AuthorCard { user_id: string; display_name: string; handle: string | null; avatar: Record<string, unknown> | null }
 
@@ -120,6 +135,7 @@ export function postView(p: PostRow, author: AuthorCard, liked: boolean) {
   return {
     id: p.id, author, text: p.text, images: p.images,
     like_count: p.like_count, comment_count: p.comment_count, liked, created_at: p.created_at,
+    moderation_status: p.moderation_status,
   };
 }
 

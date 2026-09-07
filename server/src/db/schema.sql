@@ -181,3 +181,47 @@ CREATE TABLE IF NOT EXISTS post_comments (
 );
 CREATE INDEX IF NOT EXISTS post_comments_post_idx ON post_comments(post_id, created_at, id) WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS post_comments_author_idx ON post_comments(author_id);
+
+-- D6 审核：帖子 / 评论的前置过滤结果；approved / pending（进人工队列，可见）/ rejected（拒发）/ hidden（举报或人工下架）。
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS moderation_status text NOT NULL DEFAULT 'approved';
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS moderation_categories jsonb NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE post_comments ADD COLUMN IF NOT EXISTS moderation_status text NOT NULL DEFAULT 'approved';
+ALTER TABLE post_comments ADD COLUMN IF NOT EXISTS moderation_categories jsonb NOT NULL DEFAULT '[]'::jsonb;
+CREATE INDEX IF NOT EXISTS posts_review_idx ON posts(created_at) WHERE moderation_status = 'pending' AND deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS post_comments_review_idx ON post_comments(created_at) WHERE moderation_status = 'pending' AND deleted_at IS NULL;
+
+-- 举报：同一人对同一目标只记一条；target_id 是 text，用户 / 帖子 / 评论都可能是目标，不做外键（目标删了举报记录要留）。
+CREATE TABLE IF NOT EXISTS reports (
+  id           uuid PRIMARY KEY,
+  reporter_id  uuid NOT NULL,
+  target_type  text NOT NULL,
+  target_id    text NOT NULL,
+  reason       text NOT NULL,
+  detail       text NOT NULL DEFAULT '',
+  created_at   bigint NOT NULL,
+  status       text NOT NULL DEFAULT 'open',
+  resolved_at  bigint,
+  resolved_by  uuid,
+  action       text,
+  UNIQUE (reporter_id, target_type, target_id)
+);
+CREATE INDEX IF NOT EXISTS reports_open_idx ON reports(created_at, id) WHERE status = 'open';
+CREATE INDEX IF NOT EXISTS reports_target_idx ON reports(target_type, target_id);
+
+-- 拉黑：双向不可见由查询判定。
+CREATE TABLE IF NOT EXISTS blocks (
+  blocker_id  uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  blocked_id  uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at  bigint NOT NULL,
+  PRIMARY KEY (blocker_id, blocked_id),
+  CHECK (blocker_id <> blocked_id)
+);
+CREATE INDEX IF NOT EXISTS blocks_blocked_idx ON blocks(blocked_id);
+
+-- 封禁：账号还在（删号是用户的权利，封禁是我们的处置），但所有需要登录的路由 403 BANNED。
+CREATE TABLE IF NOT EXISTS account_bans (
+  user_id     uuid PRIMARY KEY,
+  reason      text NOT NULL,
+  banned_by   uuid,
+  created_at  bigint NOT NULL
+);

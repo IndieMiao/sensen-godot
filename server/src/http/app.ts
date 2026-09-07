@@ -30,6 +30,8 @@ import { clampLimit, defaultDisplayName, ownProfileView, publicProfileView, user
   type FollowRow, type ProfileRow, type SocialStore } from './social.js';
 import { canSeePost, commentView, postView, validateComment, validatePost, type AuthorCard, type FeedStore, type PostRow } from './feed.js';
 import { ownsKey, presignUpload, validateUploadRequest, type S3Config } from './uploads.js';
+import { ADMIN_ACTIONS, NullModerator, REPORT_AUTO_HIDE, decide, reportView, validateReport,
+  type ModerationStore, type TextModerator } from './moderation.js';
 
 export interface AppDeps {
   store: Store;
@@ -54,6 +56,12 @@ export interface AppDeps {
   feed?: FeedStore;
   /** D4-c 图片直传（R2 / S3 兼容）；缺省时 POST /v1/uploads 503 UPLOADS_NOT_CONFIGURED。 */
   uploads?: S3Config;
+  /** D6 举报 / 拉黑 / 封禁 / 复审队列；缺省时相关路由 503 MODERATION_NOT_CONFIGURED。 */
+  moderation?: ModerationStore;
+  /** D6 文本前置过滤；缺省 = NullModerator（不拦，但全部进人工队列）。 */
+  textModerator?: TextModerator;
+  /** 能看 /v1/admin/* 的自有 user id。 */
+  adminUserIds?: Set<string>;
 }
 
 interface Regions {
@@ -330,6 +338,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     if ('error' in r) return unauthenticated(reply, r.error);
     const user = await deps.accounts!.userByFirebaseUid(r.identity.uid);
     if (!user) return reply.code(404).send({ code: 'NO_ACCOUNT', server_time: deps.now() });
+    if (deps.moderation && await deps.moderation.isBanned(user.id)) return reply.code(403).send({ code: 'BANNED', server_time: deps.now() });
     return reply.send({ ...userView(user), server_time: deps.now() });
   });
 
@@ -340,6 +349,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     if ('error' in r) return unauthenticated(reply, r.error);
     const user = await deps.accounts!.userByFirebaseUid(r.identity.uid);
     if (!user) return reply.code(404).send({ code: 'NO_ACCOUNT', server_time: deps.now() });
+    if (deps.moderation && await deps.moderation.isBanned(user.id)) return reply.code(403).send({ code: 'BANNED', server_time: deps.now() });
     const modules: Record<string, unknown> = {};
     for (const m of deps.accountModules ?? []) if (m.export) modules[m.name] = await m.export(user.id);
     const identities = (await deps.accounts!.identitiesOf(user.id)).map(i => ({
@@ -388,6 +398,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     if ('error' in r) return { status: 401, body: { code: 'UNAUTHENTICATED', reason: r.error, server_time: deps.now() } };
     const user = await deps.accounts!.userByFirebaseUid(r.identity.uid);
     if (!user) return { status: 404, body: { code: 'NO_ACCOUNT', server_time: deps.now() } };
+    if (deps.moderation && await deps.moderation.isBanned(user.id)) return { status: 403, body: { code: 'BANNED', server_time: deps.now() } };
     return { user };
   };
   const socialGuard = async (req: FastifyRequest, reply: FastifyReply): Promise<UserRow | null> => {
@@ -397,6 +408,9 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     await reply.code(c.status).send(c.body);
     return null;
   };
+  const blockedEither = async (a: string, b: string): Promise<boolean> =>
+    a !== b && Boolean(deps.moderation) && await deps.moderation!.blockedEither(a, b);
+
   /** 路径里的用户：me / @handle / uuid。 */
   const resolveProfile = async (raw: string, me: UserRow): Promise<ProfileRow | null> => {
     if (raw === 'me') return deps.social!.profile(me.id);
@@ -434,7 +448,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   app.get('/v1/users/:id/profile', async (req, reply) => {
     const me = await socialGuard(req, reply); if (!me) return;
     const p = await resolveProfile(paramId(req), me);
-    if (!p) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    if (!p || await blockedEither(me.id, p.user_id)) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
     const self = p.user_id === me.id;
     const [counts, relation] = await Promise.all([deps.social!.counts(p.user_id), deps.social!.relation(me.id, p.user_id)]);
     return reply.send({ ...publicProfileView(p, counts, relation, self), server_time: deps.now() });
@@ -444,6 +458,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const p = await resolveProfile(paramId(req), me);
     if (!p) { await reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() }); return null; }
     if (p.user_id === me.id) { await reply.code(400).send({ code: 'SELF_FOLLOW', server_time: deps.now() }); return null; }
+    if (await blockedEither(me.id, p.user_id)) { await reply.code(403).send({ code: 'BLOCKED', server_time: deps.now() }); return null; }
     return p.user_id;
   };
 
@@ -518,7 +533,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   /** 取帖并判可见性；不可见与不存在都答 404——区分它们等于告诉人「有这条但不给你看」。 */
   const visiblePost = async (req: FastifyRequest, reply: FastifyReply, me: UserRow, postId: string): Promise<PostRow | null> => {
     const post = await deps.feed!.post(postId);
-    if (post && canSeePost(post, me.id, await deps.social!.relation(me.id, post.author_id))) return post;
+    if (post && canSeePost(post, me.id, await deps.social!.relation(me.id, post.author_id)) && !(await blockedEither(me.id, post.author_id))) return post;
     await reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
     return null;
   };
@@ -527,6 +542,10 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return { cursor: typeof q.cursor === 'string' ? q.cursor : null, limit: clampLimit(q.limit) };
   };
 
+  /** 前置过滤：文字过 omni-moderation；带图先进人工队列（Rekognition 等 AWS 开户）。 */
+  const moderator = (): TextModerator => deps.textModerator ?? new NullModerator();
+  const moderateText = async (text: string) => (text.length === 0 ? { status: 'approved' as const, categories: [] as string[] } : decide(await moderator().check(text)));
+
   app.post('/v1/posts', async (req, reply) => {
     const me = await feedGuard(req, reply); if (!me) return;
     const v = validatePost(req.body);
@@ -534,7 +553,11 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     // 只能引用自己上传的图：key 必须在本人前缀下（uploads.ts newObjectKey）。
     if (v.images.some(im => !ownsKey(im.key, me.id)))
       return reply.code(400).send({ code: 'SCHEMA', field: 'images', reason: 'NOT_OWNED', server_time: deps.now() });
-    const r = await deps.feed!.createPost({ id: randomUUID(), authorId: me.id, idempotencyKey: v.idempotencyKey, text: v.text, images: v.images, now: deps.now() });
+    const mod = await moderateText(v.text);
+    if (mod.status === 'rejected')
+      return reply.code(422).send({ code: 'MODERATION_REJECTED', categories: mod.categories, server_time: deps.now() });
+    const moderation = v.images.length > 0 && mod.status === 'approved' ? { status: 'pending' as const, categories: [] as string[] } : mod;
+    const r = await deps.feed!.createPost({ id: randomUUID(), authorId: me.id, idempotencyKey: v.idempotencyKey, text: v.text, images: v.images, now: deps.now(), moderation });
     const [view] = await postViews(me, [r.post]);
     return reply.code(r.created ? 201 : 200).send({ ...view, created: r.created, server_time: deps.now() });
   });
@@ -543,7 +566,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   app.get('/v1/feed', async (req, reply) => {
     const me = await feedGuard(req, reply); if (!me) return;
     const { cursor, limit } = pageQuery(req);
-    const page = await deps.feed!.timeline(me.id, cursor, limit);
+    const exclude = deps.moderation ? await deps.moderation.blockedIdsAround(me.id) : [];
+    const page = await deps.feed!.timeline(me.id, cursor, limit, exclude);
     return reply.send({ items: await postViews(me, page.items), next_cursor: page.next_cursor, server_time: deps.now() });
   });
 
@@ -551,7 +575,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   app.get('/v1/users/:id/posts', async (req, reply) => {
     const me = await feedGuard(req, reply); if (!me) return;
     const p = await resolveProfile(paramId(req), me);
-    if (!p) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    if (!p || await blockedEither(me.id, p.user_id)) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
     if (p.user_id !== me.id && !(await deps.social!.relation(me.id, p.user_id)).following)
       return reply.code(403).send({ code: 'FOLLOW_REQUIRED', server_time: deps.now() });
     const { cursor, limit } = pageQuery(req);
@@ -596,8 +620,11 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const post = await visiblePost(req, reply, me, paramId(req)); if (!post) return;
     const { cursor, limit } = pageQuery(req);
     const page = await deps.feed!.comments(post.id, cursor, limit);
-    const cards = await authorCards(page.items.map(c => c.author_id));
-    return reply.send({ items: page.items.map(c => commentView(c, cards.get(c.author_id)!)), next_cursor: page.next_cursor, server_time: deps.now() });
+    // 拉黑双向不可见也盖住评论；游标照常前进，少几条不补页。
+    const blocked = new Set(deps.moderation ? await deps.moderation.blockedIdsAround(me.id) : []);
+    const items = page.items.filter(c => !blocked.has(c.author_id));
+    const cards = await authorCards(items.map(c => c.author_id));
+    return reply.send({ items: items.map(c => commentView(c, cards.get(c.author_id)!)), next_cursor: page.next_cursor, server_time: deps.now() });
   });
 
   app.post('/v1/posts/:id/comments', async (req, reply) => {
@@ -605,7 +632,10 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const post = await visiblePost(req, reply, me, paramId(req)); if (!post) return;
     const v = validateComment(req.body);
     if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, reason: v.reason, server_time: deps.now() });
-    const c = await deps.feed!.addComment({ id: randomUUID(), postId: post.id, authorId: me.id, text: v.text, now: deps.now() });
+    const mod = await moderateText(v.text);
+    if (mod.status === 'rejected')
+      return reply.code(422).send({ code: 'MODERATION_REJECTED', categories: mod.categories, server_time: deps.now() });
+    const c = await deps.feed!.addComment({ id: randomUUID(), postId: post.id, authorId: me.id, text: v.text, now: deps.now(), moderation: mod });
     const cards = await authorCards([me.id]);
     return reply.code(201).send({ ...commentView(c, cards.get(me.id)!), server_time: deps.now() });
   });
@@ -632,8 +662,129 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return reply.code(201).send({ ...presignUpload(deps.uploads, c.user.id, v, deps.now()), server_time: deps.now() });
   });
 
+  // —— D6 / E1：拉黑、举报、封禁、管理队列 ——
+  const moderationGuard = async (req: FastifyRequest, reply: FastifyReply): Promise<UserRow | null> => {
+    if (!deps.moderation || !deps.social) { await reply.code(503).send({ code: 'MODERATION_NOT_CONFIGURED', server_time: deps.now() }); return null; }
+    const c = await currentUser(req);
+    if ('user' in c) return c.user;
+    await reply.code(c.status).send(c.body);
+    return null;
+  };
+
+  /** 拉黑：双向不可见 + 两个方向都取关。 */
+  app.put('/v1/users/:id/block', async (req, reply) => {
+    const me = await moderationGuard(req, reply); if (!me) return;
+    const p = await resolveProfile(paramId(req), me);
+    if (!p) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    if (p.user_id === me.id) return reply.code(400).send({ code: 'SELF_BLOCK', server_time: deps.now() });
+    const r = await deps.moderation!.block(me.id, p.user_id, deps.now());
+    await Promise.all([deps.social!.unfollow(me.id, p.user_id), deps.social!.unfollow(p.user_id, me.id)]);
+    return reply.send({ ok: true, created: r.created, server_time: deps.now() });
+  });
+
+  app.delete('/v1/users/:id/block', async (req, reply) => {
+    const me = await moderationGuard(req, reply); if (!me) return;
+    const r = await deps.moderation!.unblock(me.id, paramId(req));
+    return reply.send({ ok: true, removed: r.removed, server_time: deps.now() });
+  });
+
+  app.get('/v1/users/me/blocks', async (req, reply) => {
+    const me = await moderationGuard(req, reply); if (!me) return;
+    const rows = await deps.moderation!.blocks(me.id);
+    const profiles = await deps.social!.profiles(rows.map(b => b.blocked_id));
+    return reply.send({
+      items: rows.map(b => ({ user_id: b.blocked_id, display_name: profiles.get(b.blocked_id)?.display_name ?? '',
+        handle: profiles.get(b.blocked_id)?.handle ?? null, avatar: profiles.get(b.blocked_id)?.avatar ?? null, blocked_at: b.created_at })),
+      server_time: deps.now(),
+    });
+  });
+
+  /** 举报：目标须存在；同一人同一目标只记一条；不同举报人达到阈值先自动隐藏内容，等人工。 */
+  app.post('/v1/reports', {
+    config: { rateLimit: { max: 30, timeWindow: '1 hour' } },
+  }, async (req, reply) => {
+    const me = await moderationGuard(req, reply); if (!me) return;
+    const v = validateReport(req.body);
+    if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, reason: v.reason, server_time: deps.now() });
+    let ownerId: string | null = null;
+    if (v.targetType === 'post') ownerId = (await deps.feed?.post(v.targetId))?.author_id ?? null;
+    else if (v.targetType === 'comment') ownerId = (await deps.feed?.comment(v.targetId))?.author_id ?? null;
+    else ownerId = (await deps.accounts!.userById(v.targetId))?.id ?? null;
+    if (!ownerId) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    if (ownerId === me.id) return reply.code(400).send({ code: 'SELF_REPORT', server_time: deps.now() });
+    const r = await deps.moderation!.addReport({ id: randomUUID(), reporter_id: me.id, target_type: v.targetType, target_id: v.targetId, reason: v.reason, detail: v.detail, created_at: deps.now() });
+    let autoHidden = false;
+    if (r.created && r.distinctReporters >= REPORT_AUTO_HIDE && deps.feed) {
+      autoHidden = v.targetType === 'post' ? await deps.feed.setPostStatus(v.targetId, 'hidden')
+        : v.targetType === 'comment' ? await deps.feed.setCommentStatus(v.targetId, 'hidden') : false;
+    }
+    return reply.code(r.created ? 201 : 200).send({ ...reportView(r.report), created: r.created, auto_hidden: autoHidden, server_time: deps.now() });
+  });
+
+  const adminGuard = async (req: FastifyRequest, reply: FastifyReply): Promise<UserRow | null> => {
+    const me = await moderationGuard(req, reply); if (!me) return null;
+    if (!deps.adminUserIds?.has(me.id)) { await reply.code(403).send({ code: 'FORBIDDEN', server_time: deps.now() }); return null; }
+    return me;
+  };
+
+  app.get('/v1/admin/reports', async (req, reply) => {
+    const me = await adminGuard(req, reply); if (!me) return;
+    const rows = await deps.moderation!.openReports(clampLimit((req.query as Record<string, unknown>).limit));
+    return reply.send({ items: rows.map(reportView), server_time: deps.now() });
+  });
+
+  /** 处置：dismiss 只结单；remove_content 下架并结同目标全部举报；ban_user 封作者（或被举报用户）+ 下架。 */
+  app.post('/v1/admin/reports/:id/resolve', async (req, reply) => {
+    const me = await adminGuard(req, reply); if (!me) return;
+    const action = String((req.body as Record<string, unknown> | undefined)?.action ?? '');
+    if (!ADMIN_ACTIONS.has(action)) return reply.code(400).send({ code: 'SCHEMA', field: 'action', server_time: deps.now() });
+    const report = await deps.moderation!.report(paramId(req));
+    if (!report) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    if (action === 'dismiss') {
+      const r = await deps.moderation!.resolveReport(report.id, me.id, action, deps.now());
+      return reply.send({ ok: true, resolved: r ? 1 : 0, server_time: deps.now() });
+    }
+    let subjectId: string | null = null;
+    if (report.target_type === 'post') {
+      const post = await deps.feed?.post(report.target_id);
+      subjectId = post?.author_id ?? null;
+      if (post) await deps.feed!.setPostStatus(post.id, 'hidden');
+    } else if (report.target_type === 'comment') {
+      const c = await deps.feed?.comment(report.target_id);
+      subjectId = c?.author_id ?? null;
+      if (c) await deps.feed!.setCommentStatus(c.id, 'hidden');
+    } else subjectId = report.target_id;
+    if (action === 'ban_user' && subjectId) await deps.moderation!.ban(subjectId, `report:${report.id}:${report.reason}`, me.id, deps.now());
+    const n = await deps.moderation!.resolveTarget(report.target_type, report.target_id, me.id, action, deps.now());
+    return reply.send({ ok: true, resolved: n, banned: action === 'ban_user' ? subjectId : null, server_time: deps.now() });
+  });
+
+  app.get('/v1/admin/review', async (req, reply) => {
+    const me = await adminGuard(req, reply); if (!me) return;
+    if (!deps.feed) return reply.code(503).send({ code: 'FEED_NOT_CONFIGURED', server_time: deps.now() });
+    const q = await deps.feed.pendingReview(clampLimit((req.query as Record<string, unknown>).limit));
+    return reply.send({
+      posts: q.posts.map(p => ({ id: p.id, author_id: p.author_id, text: p.text, images: p.images, created_at: p.created_at, categories: p.moderation_categories })),
+      comments: q.comments.map(c => ({ id: c.id, post_id: c.post_id, author_id: c.author_id, text: c.text, created_at: c.created_at, categories: c.moderation_categories })),
+      server_time: deps.now(),
+    });
+  });
+
+  app.post('/v1/admin/review/:type/:id', async (req, reply) => {
+    const me = await adminGuard(req, reply); if (!me) return;
+    if (!deps.feed) return reply.code(503).send({ code: 'FEED_NOT_CONFIGURED', server_time: deps.now() });
+    const { type, id } = req.params as Record<string, string>;
+    const decision = String((req.body as Record<string, unknown> | undefined)?.decision ?? '');
+    if (!['approve', 'hide'].includes(decision) || !['post', 'comment'].includes(type))
+      return reply.code(400).send({ code: 'SCHEMA', server_time: deps.now() });
+    const status = decision === 'approve' ? 'approved' : 'hidden';
+    const ok = type === 'post' ? await deps.feed.setPostStatus(id, status) : await deps.feed.setCommentStatus(id, status);
+    if (!ok) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    return reply.send({ ok: true, status, server_time: deps.now() });
+  });
+
   app.get('/v1/healthz', async (_req, reply) => reply.send({
-    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), feed: Boolean(deps.feed), uploads: Boolean(deps.uploads), git_sha: deps.gitSha ?? 'dev',
+    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), feed: Boolean(deps.feed), uploads: Boolean(deps.uploads), moderation: Boolean(deps.moderation), text_moderator: Boolean(deps.textModerator), git_sha: deps.gitSha ?? 'dev',
     content_version: deps.contentVersion, domain_version: DOMAIN_VERSION,
     server_time: deps.now(),
   }));

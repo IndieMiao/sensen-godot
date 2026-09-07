@@ -9,6 +9,8 @@ import { socialAccountModule } from './http/social.js';
 import { PgFeedStore } from './db/pg_feed.js';
 import { feedAccountModule } from './http/feed.js';
 import { s3ConfigFromEnv } from './http/uploads.js';
+import { PgModerationStore } from './db/pg_moderation.js';
+import { OpenAiModerator, moderationAccountModule } from './http/moderation.js';
 import { CachedJwks, googleJwksFetcher } from './http/firebase_token.js';
 import { migrate } from './db/migrate.js';
 import { contentVersion, loadContent } from './domain/content.js';
@@ -66,12 +68,17 @@ const jwks = new CachedJwks(googleJwksFetcher(), () => Date.now());
 const social = new PgSocialStore(pool);
 const feed = new PgFeedStore(pool);
 const uploads = s3ConfigFromEnv(process.env);
+const moderation = new PgModerationStore(pool);
+const textModerator = process.env.OPENAI_API_KEY ? new OpenAiModerator(process.env.OPENAI_API_KEY) : undefined;
+if (!textModerator) console.warn('未设置 OPENAI_API_KEY：文本不做前置过滤，全部进人工复审队列');
 if (!uploads) console.warn('未设置 R2_ENDPOINT / R2_BUCKET / R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY：图片直传路由返回 503');
 
 const app = await buildApp({
   store, content, contentVersion: cv,
   accounts: new PgAccountStore(pool),
-  social, feed, uploads, accountModules: [socialAccountModule(social), feedAccountModule(feed)],
+  social, feed, uploads, moderation, textModerator,
+  adminUserIds: new Set((process.env.ADMIN_USER_IDS ?? '').split(',').map(x => x.trim()).filter(Boolean)),
+  accountModules: [socialAccountModule(social), feedAccountModule(feed), moderationAccountModule(moderation)],
   firebase: firebaseProjectId ? { projectId: firebaseProjectId, keys: jwks.keys, refreshKeys: jwks.refresh } : undefined,
   blueprintDir: BLUEPRINT_DIR, regionsFile: path.join(CONTENT_DIR, 'regions.json'),
   pepper: need('TOKEN_PEPPER'), now: () => Date.now(),

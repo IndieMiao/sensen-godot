@@ -217,6 +217,21 @@ UNSIGNED-PAYLOAD），服务端不经手图片流量。key 形如 `u/<user_id>/<
 `images[].key` 必须在本人前缀下（否则 400 `SCHEMA` / `NOT_OWNED`）。支持 jpeg / png / webp / gif / heic，
 ≤15 MB。环境变量 `R2_*` 缺一则 503 `UPLOADS_NOT_CONFIGURED`。审核挂钩（D6）在发帖路径上接。
 
+## 审核、举报、拉黑、封禁（D6 / E1）
+
+08-30 调研 §5.5「可辩护最小配置」：发布前自动过滤 → 人工复审队列 → 举报 24h 处置。
+
+- **前置过滤**：帖子与评论的文字过 OpenAI omni-moderation；命中 → 422 `MODERATION_REJECTED`（带 `categories`）；
+  审核服务出错 / 没配 key → 放行但 `moderation_status = pending` 进人工队列；带图的帖子一律 pending
+  （Rekognition 二道等 AWS 开户）。`hidden` 是举报或人工下架：除作者外都看不到。
+- **举报** `POST /v1/reports` `{target_type: post|comment|user, target_id, reason, detail?}`；同一人同一目标只记一条；
+  不同举报人达到 3 条自动隐藏内容（`auto_hidden`）。
+- **拉黑** `PUT/DELETE /v1/users/:id/block`、`GET /v1/users/me/blocks`：双向不可见（资料 / 动态 / 评论都 404），
+  拉黑时两个方向自动取关，关注被拉黑者 403 `BLOCKED`。
+- **封禁**：所有需要登录的路由 403 `BANNED`；账号仍在（删号是用户的权利，封禁是处置）。
+- **管理队列**（`ADMIN_USER_IDS`）：`GET /v1/admin/reports`、`POST /v1/admin/reports/:id/resolve {action: dismiss|remove_content|ban_user}`、
+  `GET /v1/admin/review`、`POST /v1/admin/review/:type/:id {decision: approve|hide}`。gensen_admin 工单页后续套在这组接口上。
+
 ## 测试分层
 
 | 目录 | 内容 |

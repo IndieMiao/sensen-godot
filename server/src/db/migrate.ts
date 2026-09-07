@@ -11,5 +11,5 @@ export async function migrate(pool: pg.Pool): Promise<void> {
 
 /** 测试用：清空所有表但保留结构。只允许在非生产 DSN 上调用。 */
 export async function truncateAll(pool: pg.Pool): Promise<void> {
-  await pool.query('TRUNCATE players, tokens, farms, farm_creations, commands, farm_snapshots, users, user_identities, account_deletions, profiles, follows, posts, post_likes, post_comments CASCADE');
+  await pool.query('TRUNCATE players, tokens, farms, farm_creations, commands, farm_snapshots, users, user_identities, account_deletions, profiles, follows, posts, post_likes, post_comments, reports, blocks, account_bans CASCADE');
 }

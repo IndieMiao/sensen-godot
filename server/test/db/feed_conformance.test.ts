@@ -40,8 +40,9 @@ const impls: [string, () => Promise<Impl>][] = [
   ...(DSN ? [['pg', async () => { await truncateAll(pool!); return { feed: new PgFeedStore(pool!), social: new PgSocialStore(pool!) }; }] as [string, () => Promise<Impl>]] : []),
 ];
 
+const OK = { status: 'approved' as const, categories: [] as string[] };
 const mkPost = (feed: FeedStore, authorId: string, key: string, now: number, text = key) =>
-  feed.createPost({ id: randomUUID(), authorId, idempotencyKey: key, text, images: [], now });
+  feed.createPost({ id: randomUUID(), authorId, idempotencyKey: key, text, images: [], now, moderation: OK });
 
 describe.each(impls)('FeedStore[%s]', (_name, make) => {
   let feed: FeedStore; let social: SocialStore;
@@ -91,7 +92,7 @@ describe.each(impls)('FeedStore[%s]', (_name, make) => {
     expect((await feed.post(p.id))!.like_count).toBe(1);
     expect(await feed.like('garbage', b, T0)).toEqual({ created: false });
     const cs = [];
-    for (let i = 0; i < 3; i++) cs.push(await feed.addComment({ id: randomUUID(), postId: p.id, authorId: b, text: `c${i}`, now: T0 + i }));
+    for (let i = 0; i < 3; i++) cs.push(await feed.addComment({ id: randomUUID(), postId: p.id, authorId: b, text: `c${i}`, now: T0 + i, moderation: OK }));
     expect((await feed.post(p.id))!.comment_count).toBe(3);
     const l1 = await feed.comments(p.id, null, 2);
     expect(l1.items.map(c => c.text)).toEqual(['c0', 'c1']);
@@ -109,8 +110,8 @@ describe.each(impls)('FeedStore[%s]', (_name, make) => {
     const pa = (await mkPost(feed, a, 'a', T0)).post;
     const pb = (await mkPost(feed, b, 'b', T0)).post;
     await feed.like(pb.id, a, T0); await feed.like(pb.id, b, T0);
-    await feed.addComment({ id: randomUUID(), postId: pb.id, authorId: a, text: 'hi', now: T0 });
-    await feed.addComment({ id: randomUUID(), postId: pa.id, authorId: b, text: 'yo', now: T0 });
+    await feed.addComment({ id: randomUUID(), postId: pb.id, authorId: a, text: 'hi', now: T0, moderation: OK });
+    await feed.addComment({ id: randomUUID(), postId: pa.id, authorId: b, text: 'yo', now: T0, moderation: OK });
     const ex = await feed.exportUser(a);
     expect(ex.posts.map(p => p.id)).toEqual([pa.id]);
     expect(ex.comments.map(c => c.text)).toEqual(['hi']);
@@ -119,5 +120,26 @@ describe.each(impls)('FeedStore[%s]', (_name, make) => {
     expect(await feed.post(pb.id)).toMatchObject({ like_count: 1, comment_count: 0 });
     // b 在 a 的帖子上的评论随帖子一起级联没了：账号都没了，帖子下的对话也没有落脚点。
     expect((await feed.exportUser(b)).comments).toHaveLength(0);
+  });
+
+  it('审核状态：pending 进队列且可见，hidden 只有作者的 byAuthor 能看，时间线排除，拉黑作者被剔除', async () => {
+    const me = await mkUser(); const f = await mkUser(); const blocked = await mkUser();
+    await social.follow(me, f, T0); await social.follow(me, blocked, T0);
+    const pend = (await feed.createPost({ id: randomUUID(), authorId: f, idempotencyKey: 'p', text: 'p', images: [], now: T0 + 1, moderation: { status: 'pending', categories: [] } })).post;
+    const hid = (await mkPost(feed, f, 'h', T0 + 2)).post;
+    const fromBlocked = (await mkPost(feed, blocked, 'b', T0 + 3)).post;
+    expect(await feed.setPostStatus(hid.id, 'hidden')).toBe(true);
+    expect(await feed.setPostStatus(randomUUID(), 'hidden')).toBe(false);
+    const tl = await feed.timeline(me, null, 10, [blocked]);
+    expect(tl.items.map(p => p.id)).toEqual([pend.id]);
+    expect((await feed.timeline(me, null, 10)).items.map(p => p.id)).toEqual([fromBlocked.id, pend.id]);
+    expect((await feed.byAuthor(f, null, 10)).items.map(p => p.id)).toEqual([hid.id, pend.id]);
+    const q = await feed.pendingReview(10);
+    expect(q.posts.map(p => p.id)).toEqual([pend.id]);
+    const c = await feed.addComment({ id: randomUUID(), postId: pend.id, authorId: me, text: 'c', now: T0 + 4, moderation: { status: 'pending', categories: ['x'] } });
+    expect((await feed.pendingReview(10)).comments.map(x => x.id)).toEqual([c.id]);
+    expect(await feed.setCommentStatus(c.id, 'hidden')).toBe(true);
+    expect((await feed.comments(pend.id, null, 10)).items).toEqual([]);
+    expect((await feed.post(pend.id))!.comment_count).toBe(1); // 隐藏不改计数，人工处置时再决定
   });
 });
