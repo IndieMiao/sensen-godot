@@ -219,3 +219,39 @@ msgstr "重连中"
 
 msgid "Couldn't delete your account on the server. Check your connection and try again."
 msgstr "服务器上的账号删除失败，请检查网络后重试。"
+
+msgid "%s · %d followers · %d following"
+msgstr "%s · %d 粉丝 · %d 关注"
+
+msgid "Avatar upload and Space 3D land later in B4."
+msgstr "形象上传与 3D 空间在 B4 后续接入。"
+
+msgid "Bio"
+msgstr "简介"
+
+msgid "Can't reach the server. Check your connection and try again."
+msgstr "连不上服务器，请检查网络后重试。"
+
+msgid "Display name"
+msgstr "昵称"
+
+msgid "Handle (letters, numbers, _)"
+msgstr "用户名（字母、数字、_）"
+
+msgid "Please check the %s field."
+msgstr "请检查 %s 字段。"
+
+msgid "Profile saved."
+msgstr "资料已保存。"
+
+msgid "Save profile"
+msgstr "保存资料"
+
+msgid "Saving…"
+msgstr "保存中…"
+
+msgid "Sign in again to set up your profile."
+msgstr "请重新登录以建立你的资料。"
+
+msgid "That handle is already taken."
+msgstr "这个用户名已被占用。"

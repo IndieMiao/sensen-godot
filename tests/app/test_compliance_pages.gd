@@ -13,12 +13,15 @@ var fr: FirstRun
 var session: AuthSession
 ## D2 服务端删号的假传输：默认一条成功响应；具体用例按需改 responses。
 var account_t: FakeTransport
+## D4 资料 API 的假传输：默认没有脚本化响应（服务端不可达）。
+var profile_t: FakeTransport
 
 func before_test() -> void:
 	nav = NavRecorder.new()
 	fr = FirstRun.new()
 	session = AuthSession.new()
 	account_t = FakeTransport.new([{"status": 200, "json": {"ok": true, "deleted": true}}])
+	profile_t = FakeTransport.new([])
 	FirstRun.clear()
 	_clear_auth()
 
@@ -187,6 +190,7 @@ func _profile(t: FakeTransport, api_key := "k") -> Control:
 	var p := (load(AppRoutes.tab_scene("profile")) as PackedScene).instantiate()
 	p.auth = session
 	p.firebase = FirebaseAuth.new(api_key, t.callable())
+	p.profile = ProfileApi.new(ApiClient.new("https://example.test/v1", profile_t.callable()))
 	add_child(auto_free(p))
 	return p
 
@@ -218,3 +222,55 @@ func test_profile_hides_verification_for_verified_or_non_password_sessions() -> 
 	await q.refresh_verification()
 	assert_str(q.verify_label.text).is_empty()
 	assert_bool(q.resend_button.visible).is_false()
+
+## D4-a：资料页从服务端拉自己的资料并填进编辑框；保存整体提交；handle 冲突与字段错误有提示。
+func _profile_json() -> Dictionary:
+	return {"user_id": "srv-1", "display_name": "Sen", "handle": "sen_01", "bio": "hi", "followers_count": 3, "following_count": 2, "new_followers_unread": 1}
+
+func test_profile_loads_server_profile_into_card_and_fields() -> void:
+	session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	profile_t.responses = [{"status": 200, "json": _profile_json()}]
+	var p := _profile(FakeTransport.new([]))
+	await p.refresh_profile()
+	assert_bool(str(profile_t.requests[0].url).ends_with("/v1/users/me/profile")).is_true()
+	assert_str(p.profile_label.text).is_equal("Sen @sen_01 · 3 followers · 2 following")
+	assert_str(p.name_edit.text).is_equal("Sen")
+	assert_str(p.handle_edit.text).is_equal("sen_01")
+	assert_str(p.bio_edit.text).is_equal("hi")
+
+func test_profile_save_sends_patch_and_explains_handle_conflict() -> void:
+	session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	var saved := _profile_json()
+	saved["display_name"] = "Sen Two"
+	saved["handle"] = null
+	profile_t.responses = [{"status": 200, "json": saved}, {"status": 409, "json": {"code": "HANDLE_TAKEN"}}]
+	var p := _profile(FakeTransport.new([]))
+	p.name_edit.text = " Sen Two "
+	p.handle_edit.text = ""
+	p.bio_edit.text = "bio"
+	assert_bool(await p.save_profile()).is_true()
+	assert_str(profile_t.requests[0].method).is_equal("PUT")
+	assert_that(profile_t.requests[0].body).is_equal({"display_name": "Sen Two", "bio": "bio", "handle": null})
+	assert_str(p.profile_label.text).is_equal("Sen Two · 3 followers · 2 following")
+	assert_str(p.profile_status.text).is_equal("Profile saved.")
+	p.handle_edit.text = "@Taken"
+	assert_bool(await p.save_profile()).is_false()
+	assert_str(profile_t.requests[1].body.handle).is_equal("taken")
+	assert_str(p.profile_status.text).is_equal("That handle is already taken.")
+	assert_bool(p.save_button.disabled).is_false()
+
+func test_profile_refresh_is_silent_for_dev_sessions_and_unreachable_server() -> void:
+	session.complete_sign_in("dev-local", "dev-token", "", 3600, "dev", "dev@local")
+	var p := _profile(FakeTransport.new([]), "")
+	await p.refresh_profile()
+	assert_int(profile_t.requests.size()).is_equal(0)
+	session.sign_out()
+	session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	profile_t.responses = [{"error": "timeout"}, {"status": 404, "json": {"code": "NO_ACCOUNT"}}]
+	var q := _profile(FakeTransport.new([]))
+	await q.refresh_profile()
+	assert_str(q.profile_label.text).is_empty()
+	await q.refresh_profile()
+	assert_bool(q.profile_status.text.contains("Sign in again")).is_true()
+	assert_str(q.describe_save_error({"code": "SCHEMA", "field": "bio"})).is_equal("Please check the bio field.")
+	assert_str(q.describe_save_error({"code": "NETWORK"})).contains("connection")

@@ -4,13 +4,25 @@ msgstr ""
 "Language: en\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
+msgid "%s · %d followers · %d following"
+msgstr ""
+
 msgid "An account with this email already exists."
+msgstr ""
+
+msgid "Avatar upload and Space 3D land later in B4."
 msgstr ""
 
 msgid "Back"
 msgstr ""
 
 msgid "Before you start"
+msgstr ""
+
+msgid "Bio"
+msgstr ""
+
+msgid "Can't reach the server. Check your connection and try again."
 msgstr ""
 
 msgid "Chats"
@@ -61,6 +73,9 @@ msgstr ""
 msgid "Dev: lifecycle probe"
 msgstr ""
 
+msgid "Display name"
+msgstr ""
+
 msgid "Dressing room"
 msgstr ""
 
@@ -86,6 +101,9 @@ msgid "Feed lands in B3: timeline, photo composer, likes, comments and report."
 msgstr ""
 
 msgid "Forgot password"
+msgstr ""
+
+msgid "Handle (letters, numbers, _)"
 msgstr ""
 
 msgid "I have read and agree to the Terms of Service and Privacy Policy."
@@ -121,6 +139,9 @@ msgstr ""
 msgid "Password reset email sent."
 msgstr ""
 
+msgid "Please check the %s field."
+msgstr ""
+
 msgid "Please select your full date of birth."
 msgstr ""
 
@@ -130,7 +151,7 @@ msgstr ""
 msgid "Privacy policy"
 msgstr ""
 
-msgid "Profile lands in B4: profile card, edit, avatar entry, Space 3D."
+msgid "Profile saved."
 msgstr ""
 
 msgid "Realtime: %s"
@@ -139,10 +160,19 @@ msgstr ""
 msgid "Resend verification email"
 msgstr ""
 
+msgid "Save profile"
+msgstr ""
+
+msgid "Saving…"
+msgstr ""
+
 msgid "Settings"
 msgstr ""
 
 msgid "Sign in"
+msgstr ""
+
+msgid "Sign in again to set up your profile."
 msgstr ""
 
 msgid "Sign out"
@@ -176,6 +206,9 @@ msgid "Tell us your date of birth to get started."
 msgstr ""
 
 msgid "Terms of service"
+msgstr ""
+
+msgid "That handle is already taken."
 msgstr ""
 
 msgid "This account has been disabled."

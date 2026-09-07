@@ -3,8 +3,16 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
+#: res://scenes/app/pages/profile_page.gd:125
+msgid "%s · %d followers · %d following"
+msgstr ""
+
 #: res://modules/net/firebase_auth.gd:113
 msgid "An account with this email already exists."
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:58
+msgid "Avatar upload and Space 3D land later in B4."
 msgstr ""
 
 #: res://modules/app/app_page.gd:39
@@ -13,6 +21,14 @@ msgstr ""
 
 #: res://scenes/app/consent_page.gd:13
 msgid "Before you start"
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:49
+msgid "Bio"
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:162
+msgid "Can't reach the server. Check your connection and try again."
 msgstr ""
 
 #: res://modules/app/app_routes.gd:28
@@ -81,8 +97,12 @@ msgstr ""
 msgid "Dev: lifecycle probe"
 msgstr ""
 
+#: res://scenes/app/pages/profile_page.gd:47
+msgid "Display name"
+msgstr ""
+
 #: res://scenes/app/pages/map_page.gd:10
-#: res://scenes/app/pages/profile_page.gd:32
+#: res://scenes/app/pages/profile_page.gd:59
 msgid "Dressing room"
 msgstr ""
 
@@ -90,7 +110,7 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:76
+#: res://scenes/app/pages/profile_page.gd:180
 msgid "Email not verified"
 msgstr ""
 
@@ -98,7 +118,7 @@ msgstr ""
 msgid "Email or password is incorrect."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:76
+#: res://scenes/app/pages/profile_page.gd:180
 msgid "Email verified"
 msgstr ""
 
@@ -117,6 +137,10 @@ msgstr ""
 
 #: res://scenes/app/login_page.gd:56
 msgid "Forgot password"
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:48
+msgid "Handle (letters, numbers, _)"
 msgstr ""
 
 #: res://scenes/app/consent_page.gd:34
@@ -141,7 +165,7 @@ msgid "Map home lands in B5: Mapbox underlay, friends' positions and 3D avatars.
 msgstr ""
 
 #: res://modules/app/app_routes.gd:28
-#: res://scenes/app/pages/profile_page.gd:14
+#: res://scenes/app/pages/profile_page.gd:26
 msgid "Me"
 msgstr ""
 
@@ -150,7 +174,7 @@ msgstr ""
 msgid "No connection. Check your network and try again."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:54
+#: res://scenes/app/pages/profile_page.gd:93
 msgid "Not signed in"
 msgstr ""
 
@@ -166,6 +190,10 @@ msgstr ""
 msgid "Password reset email sent."
 msgstr ""
 
+#: res://scenes/app/pages/profile_page.gd:160
+msgid "Please check the %s field."
+msgstr ""
+
 #: res://scenes/app/age_gate_page.gd:68
 msgid "Please select your full date of birth."
 msgstr ""
@@ -179,19 +207,27 @@ msgstr ""
 msgid "Privacy policy"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:31
-msgid "Profile lands in B4: profile card, edit, avatar entry, Space 3D."
+#: res://scenes/app/pages/profile_page.gd:150
+msgid "Profile saved."
 msgstr ""
 
 #: res://scenes/app/pages/im_page.gd:23
 msgid "Realtime: %s"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:23
+#: res://scenes/app/pages/profile_page.gd:35
 msgid "Resend verification email"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:40
+#: res://scenes/app/pages/profile_page.gd:50
+msgid "Save profile"
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:143
+msgid "Saving…"
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:67
 #: res://scenes/app/pages/settings_page.gd:19
 msgid "Settings"
 msgstr ""
@@ -199,6 +235,10 @@ msgstr ""
 #: res://scenes/app/login_page.gd:28
 #: res://scenes/app/login_page.gd:44
 msgid "Sign in"
+msgstr ""
+
+#: res://scenes/app/pages/profile_page.gd:116
+msgid "Sign in again to set up your profile."
 msgstr ""
 
 #: res://scenes/app/pages/settings_page.gd:39
@@ -217,7 +257,7 @@ msgstr ""
 msgid "Sign-in is not configured yet."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:58
+#: res://scenes/app/pages/profile_page.gd:97
 msgid "Signed in as %s (%s)"
 msgstr ""
 
@@ -246,6 +286,10 @@ msgstr ""
 msgid "Terms of service"
 msgstr ""
 
+#: res://scenes/app/pages/profile_page.gd:158
+msgid "That handle is already taken."
+msgstr ""
+
 #: res://modules/net/firebase_auth.gd:119
 msgid "This account has been disabled."
 msgstr ""
@@ -267,11 +311,11 @@ msgid "Too many attempts. Try again later."
 msgstr ""
 
 #: res://scenes/app/login_page.gd:146
-#: res://scenes/app/pages/profile_page.gd:86
+#: res://scenes/app/pages/profile_page.gd:190
 msgid "Verification email sent."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:36
+#: res://scenes/app/pages/profile_page.gd:63
 #: res://scenes/app/pages/voice_room_page.gd:5
 msgid "Voice room"
 msgstr ""

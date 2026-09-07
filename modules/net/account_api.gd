@@ -15,20 +15,21 @@ func _init(p_client: ApiClient) -> void:
 
 ## 登录后把 Firebase 身份映射到自有 user id。首次 201 created=true。
 func sign_in() -> Dictionary:
-	return _wrap(await client.request("POST", "/auth/firebase"))
+	return wrap_response(await client.request("POST", "/auth/firebase"))
 
 func me() -> Dictionary:
-	return _wrap(await client.request("GET", "/users/me"))
+	return wrap_response(await client.request("GET", "/users/me"))
 
 ## 应用内删号：服务端级联（资料 / IM / feed / …）。幂等：没账号也 200 deleted=false。
 func delete_account() -> Dictionary:
-	return _wrap(await client.request("DELETE", "/users/me"))
+	return wrap_response(await client.request("DELETE", "/users/me"))
 
 ## CCPA / GDPR 访问请求：一份 JSON。
 func export_data() -> Dictionary:
-	return _wrap(await client.request("GET", "/users/me/export"))
+	return wrap_response(await client.request("GET", "/users/me/export"))
 
-static func _wrap(r: ApiClient.Response) -> Dictionary:
+## 统一包装；ProfileApi 等其他 API 客户端复用。
+static func wrap_response(r: ApiClient.Response) -> Dictionary:
 	if not r.ok:
 		return {"ok": false, "status": 0, "code": "NETWORK", "reason": r.error}
 	var body: Dictionary = r.json if r.json is Dictionary else {}
