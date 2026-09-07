@@ -91,11 +91,11 @@
 
 | # | 任务 | 估算 | 截止 | 依赖 | 出口 |
 |---|---|---|---|---|---|
-| **D0** | **【决策】后端栈**：复用 Java 微服务（08-30 方案）vs 统一 Node（农场 server 已有）。输入：Java 维护人力（SSL-F1）、后端仓库位置、SSL-G1 Nacos 抢救结果 | — | **09-13** | SSL-F1 | D1–D7 估算定稿 |
-| D1 | 部署基建 + 配置重建 + 去 Nacos：单区域 AWS us-west / Hetzner，compose 合并 2–4 进程 + Mongo（Atlas M10 或容器）+ Redis + Caddy；compose DNS + `.env`；RocketMQ → Redis Stream；SchedulerX → `@Scheduled`；不上 K8s | 2–3 人周 | 09-20 | D0、SSL-G1、SSL-D5 | M1 骨架跑通 |
+| **D0** | **【已决策 2026-09-07】后端统一 Node**：在现有 `server/`（Fastify + TypeScript + PostgreSQL）上扩展，不复用 Java 微服务。后果：feed / 关注 / 资料 / 审核 / 推送全部新写，08-30 的 WS-D 人周按"重写"口径重估；Java 仓库与 Nacos 配置只作业务规则参考（SSL-G1 仍要抢救，用来核对限流阈值与业务参数） | — | 已定 | — | D1–D7 按 Node 口径开工 |
+| D1 | 部署基建（Node 口径）：现有 `server/deploy` compose（app + PostgreSQL + Caddy）已在香港 ECS 跑通，本项变成"迁到海外区域 + 加 Redis（会话 / 限流 / WebSocket 广播）+ 环境分离"；不再有 Nacos / RocketMQ / SchedulerX 迁移 | 1 人周 | 09-20 | SSL-D5 | M1 骨架跑通 |
 | D2 | 账号服务：Google JWKS 校验 Firebase ID token → 自有 user id 映射；删号级联（资料 / IM / feed / 位置 / 关注 / token / 举报）+ Apple revocation + Web 删号接口 + 数据导出 | 1.5–2 人周 | 09-27 | D1、SSL-D1 | M1 登录 → 资料 |
 | **D3** | **IM 服务端**：自建极简（Mongo 消息表 + seq 同步 + WS 网关 + 1v1 / 群 文本图片 + 推送 + 已读 + 举报拉黑 + 审核挂钩）**4–6 人周**，或 Tinode 自托管 1–1.5 周 | 4–6 人周 | 10-04 alpha → 10-18 | SSL-F4（W2 末） | M2 alpha，M3 端到端 |
-| D4 | feed / 主页 API 裁剪 + OSS → R2（Java AWS SDK v2 换 endpoint）+ 砍云信 / 短信 / 网关签名；R2 预签名直传 + CDN | 2–3 人周 | 10-04 | D1、SSL-D4 | M2 feed 只读 + R2 |
+| D4 | feed / 关注 / 资料 API（Node 新写：Note 时间线、点赞、一级评论、关注、资料、avatar 装扮）+ R2 预签名直传 + CDN；业务规则对照 Java gensen_api 代码 | 3 人周 | 10-04 | D1、SSL-D4 | M2 feed 只读 + R2 |
 | D5 | 语音房 token + 信令：Agora → LiveKit JWT（canPublish 上下麦）；room-socket-server 保留或并入 IM | 1.5–2 人周 | 10-11 | SSL-F2、SSL-D2 | M3 语音房 demo |
 | D6 | 审核管线 + 工单后台：omni-moderation + Rekognition 前置过滤 → 人工复审 → 24h 处置；reports / blocks；gensen_admin 最小工单页；PhotoDNA 接入位 | 1.5–2 人周 | 10-04 | SSL-D5、SSL-D6 | M2 管线接通 |
 | D7 | 推送服务：Firebase Admin SDK 统一发 FCM + APNs；token 表；IM 离线 / 点赞评论通知 | 0.5 人周 | 10-11 | SSL-D1 | M3 离线推送 |
