@@ -132,3 +132,11 @@ xcrun devicectl device process launch --terminate-existing \
 **第三轮（21:24–，取整后）**：按 report.json 顺序分组，键盘弹起前 147 帧一样，弹起过渡 2 帧，之后连续 8 帧
 （24 s）逐字节相同——不抖了。用户顺手用中文输入法发了「弟弟的姐姐」并在输入框里打「大家都开心」，
 CJK 字形正常、气泡在标题下正常排布（`keyboard_up_shrink_v2.png`）。A5 键盘避让在聊天页收口。
+
+## 7. 2026-09-08 新增钩子
+
+- `SENSEN_QA_ME=1`：登录后先进「我的」页拉资料（顺带 B7 装扮同步）截 `me_tab`；`SENSEN_QA_FOLLOWERS=1` 再压栈自己的关注者列表截 `followers`。
+- `SENSEN_QA_MAP=1`：进地图 Tab 等角色装配后截 `map_tab`；`SENSEN_QA_FAKE_LOCATION=lat,lng` 模拟一次定位（桌面没有 GPS）并走真实上报路径。
+- `SENSEN_PORTRAIT_DEBUG=1`：头像离屏渲染图落到 `user://qa/portrait_NN.png`。
+- iOS 带 Mapbox 的工程用 `tools/ios/setup_ios_g3.sh` 出（导出 + 注入 Swift / SPM），再按 §6 的 `xcodebuild -derivedDataPath build/ios/derived-cli` 构建；worktree 里要有 `mapbox_token.txt`（gitignored，从主检出拷）。
+

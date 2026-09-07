@@ -3,7 +3,8 @@
 - 基线：分支 `feat/next-feature` @ `c33f6ec`，已推 origin；自 `a7426ef` 起 48 个提交
 - 上游：`2026-09-07-dev-task-breakdown.md`（WBS 与 Plane 映射）；本文只回答「还剩什么、卡在哪、能先做什么」
 - 状态口径：Plane SGODOT 卡片状态 + 各任务单「未做 / 后续」节，逐条核对于 2026-09-08
-- 图例：🟢 不卡，可直接开工 ｜ 🟡 部分可做，剩余等外部输入 ｜ 🔴 硬卡，外部输入未到 ｜ ⚪ 待决策 / 条件项
+- 图例：✅ 已完成 ｜ 🟢 不卡，可直接开工 ｜ 🟡 部分可做，剩余等外部输入 ｜ 🔴 硬卡，外部输入未到 ｜ ⚪ 待决策 / 条件项
+- 2026-09-08 晚更新：无卡点的八项已全部开工，完成态见 §0 各行
 
 ---
 
@@ -11,14 +12,14 @@
 
 | 状态 | 任务 | Plane | 卡点（括号内为 SSLAUNCH 卡片当前状态） |
 |---|---|---|---|
-| 🟢 | B4 收尾：关注者 / 关注中列表页、用户主页头像、avatar 入口 | SGODOT-93 | 无 |
-| 🟢 | B2 收尾：会话列表头像、群聊实时「N 人已读」 | SGODOT-91 | 无 |
-| 🟢 | B7 avatar 装扮上服务端 + 主页 / 资料页接入 | SGODOT-95 | 无（D4 资料 API 已在） |
-| 🟢 | **B5 地图主页整合**（Mapbox 垫底 + 透明层 + 好友位置 + 3D 角色 + HUD） | SGODOT-94 | 无硬卡；用现有 Mapbox token 开发，新 token 等 SSLAUNCH D3（Backlog） |
-| 🟢 | 发布链 B1 Godot CI（headless gdUnit4 + server vitest + APK 产物） | SGODOT-68 | 无 |
-| 🟢 | 发布链 B7 发布流程与版本管理（tag / changelog / 回滚） | SGODOT-72 | 无 |
-| 🟢 | A7 GameUi / DesignTokens 单一来源 | SGODOT-19 | 无 |
-| 🟢 | Q6 测试退出 ObjectDB 警告 | SGODOT-79 | 无 |
+| ✅ | B4 收尾：关注者 / 关注中列表页、用户主页头像、avatar 入口 | SGODOT-93 | 09-08 完成（Done） |
+| ✅ | B2 收尾：会话列表头像、群聊实时「N 人已读」 | SGODOT-91 | 09-08 完成（Done） |
+| 🟡 | B7 avatar 装扮上服务端 + 主页 / 资料页接入 | SGODOT-95 | 接入与同步 09-08 完成；剩部件池扩充（要资产管线） |
+| 🟡 | **B5 地图主页整合**（Mapbox 垫底 + 透明层 + 好友位置 + 3D 角色 + HUD） | SGODOT-94 | 第一刀 09-08 完成（`2026-09-08-b5-map-home.md`）：服务端位置接口、地图 Tab、好友角色、iOS 定位桥；剩 HUD 好友列表、Android 验证、C5 决策；新 token 等 SSLAUNCH D3 |
+| 🟡 | 发布链 B1 Godot CI（headless gdUnit4 + server vitest + APK 产物） | SGODOT-68 | 工作流已上（`.github/workflows/godot.yml`）；headless 跳过 8 个渲染用例；等最新一轮绿与 APK 任务首跑 |
+| ✅ | 发布链 B7 发布流程与版本管理（tag / changelog / 回滚） | SGODOT-72 | 09-08 完成：`docs/release-process.md` + `tools/release/manifest.sh` |
+| 🟡 | A7 GameUi / DesignTokens 单一来源 | SGODOT-19 | 09-08：GameUi 色板 / 字号 / 触控尺寸全部指向 `DesignTokens.UI_*` 并有测试锁；剩散落的 `add_theme_*_override` 字面值收口 |
+| ✅ | Q6 测试退出 ObjectDB 警告 | SGODOT-79 | 09-08：全量 --verbose 不复现；CI 加守卫（Done） |
 | 🟡 | 语音房线 C4 LiveKit 桥 → D5 token 签发 → B6 UI | SGODOT-98 / 102 / 80 | 技术不卡（自托管 LiveKit 即可开发）；**是否进 Demo 一期 = SSLAUNCH F2（Backlog）未拍板**，云 key 等 D2（Backlog） |
 | 🟡 | D8 环境分离 prod / qa / dev | SGODOT-74 | dev / qa 本机可做；prod 一套等 D1 部署 |
 | 🟡 | E2 位置与聊天数据卫生 | SGODOT-62 | 日志 scrub 可做；非好友降精度等 B5 位置 API；Sentry / PostHog scrub 等 E4 / E5 |
