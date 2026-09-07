@@ -17,6 +17,10 @@ const WATCHED := {
 
 var counts := {}
 var entries: Array = []
+## 见过的最大软键盘高度（px）。镜像操作时 iOS 不弹软键盘，人手点一次后拉文件即可判定，不用盯屏幕。
+var keyboard_max_px := 0
+## () -> int；测试注入，默认 DisplayServer.virtual_keyboard_get_height()。
+var keyboard_height_provider: Callable
 var summary: Label
 var log_label: Label
 var keyboard_label: Label
@@ -50,9 +54,18 @@ func _build_body() -> void:
 	_load()
 	_refresh()
 
+func keyboard_height() -> int:
+	if keyboard_height_provider.is_valid():
+		return int(keyboard_height_provider.call())
+	return DisplayServer.virtual_keyboard_get_height()
+
 func _process(_delta: float) -> void:
-	keyboard_label.text = "virtual_keyboard_get_height() = %d px | ws: %s" % [
-		DisplayServer.virtual_keyboard_get_height(),
+	var h := keyboard_height()
+	if h > keyboard_max_px:
+		keyboard_max_px = h
+		_save()
+	keyboard_label.text = "virtual_keyboard_get_height() = %d px (max %d) | ws: %s" % [
+		h, keyboard_max_px,
 		str(Net.ws.state) if Net.ws != null else "-"]
 
 func _notification(what: int) -> void:
@@ -83,7 +96,7 @@ func _refresh() -> void:
 func _save() -> void:
 	var f := FileAccess.open(LOG_PATH, FileAccess.WRITE)
 	if f:
-		f.store_string(JSON.stringify({"counts": counts, "entries": entries, "os": OS.get_name(), "godot": Engine.get_version_info().string}))
+		f.store_string(JSON.stringify({"counts": counts, "entries": entries, "keyboard_max_px": keyboard_max_px, "os": OS.get_name(), "godot": Engine.get_version_info().string}))
 
 func _load() -> void:
 	if not FileAccess.file_exists(LOG_PATH):
@@ -92,9 +105,11 @@ func _load() -> void:
 	if parsed is Dictionary:
 		counts = parsed.get("counts", {})
 		entries = parsed.get("entries", [])
+		keyboard_max_px = int(parsed.get("keyboard_max_px", 0))
 
 func _clear() -> void:
 	counts = {}
 	entries = []
+	keyboard_max_px = 0
 	_save()
 	_refresh()

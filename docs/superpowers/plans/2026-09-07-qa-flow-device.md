@@ -42,3 +42,19 @@ iOS 26 模拟器运行时不再接受 x86_64 应用，所以模拟器路线走�
 
 两轮各 15 步、0 错误、约 9 秒。截图在 `~/Downloads/sensen-qa-2026-09-07/`。
 探针页可达；PAUSED / RESUMED 计数仍需人手切后台（步行器不能把应用切到后台）。
+
+## 5. 用「iPhone 镜像」从 Mac 上操作真机（2026-09-07 验证）
+
+前提：iPhone 与 Mac 同一 Apple 账户，Wi‑Fi + 蓝牙开；「系统设置 → 隐私与安全性 → 辅助功能」给运行
+Claude Code 的终端授权；`brew install cliclick`。
+
+- 找窗口：`CGWindowListCopyWindowInfo`（/tmp/winlist.swift 那种小脚本）拿「iPhone镜像」窗口的 bounds；
+  截图 `screencapture -x -R x,y,w,h`（`-l <windowid>` 对这个窗口无效）。
+- **坐标坑**：从 Read 工具看到的缩略图是 ~275 px 宽，不是 600；按缩略图坐标算出来的点要经两点校准
+  的线性映射再交给 cliclick（本次得到 `T = 0.46·R + (1081,125)`）。校准方法：`cliclick m:` 移到已知点，
+  `screencapture -C` 带光标截图看落点。
+- 切后台：⌘1（主屏）；回前台用 `xcrun devicectl device process launch <bundle>`（不带 `--terminate-existing`
+  会把后台进程唤到前台）。**不要用 Spotlight 点搜索结果**：国行输入法的候选栏和结果排布会变，
+  两次点到了 Safari 和地图。
+- 镜像期间 Mac 键盘算硬件键盘，iOS 不弹软键盘——键盘相关验证要在手机上手点。
+- 国行 iOS 首次联网会弹「允许使用无线数据」，需要点一次。

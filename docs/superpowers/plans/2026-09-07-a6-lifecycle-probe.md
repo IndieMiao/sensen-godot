@@ -27,24 +27,33 @@ WsClient 的 pause/resume、后续 IM 的「回前台补拉」、语聊的「后
   窗口后 `tests/scenes/test_bg_handoff.gd` 从 0.19 s 恶化到 5 min 超时。已改成
   `RenderingServer.force_draw()`（commit 863f02a），测试不再依赖桌面窗口层叠。
 
-## 4. 真机结果（iPhone 15，iOS 真机，bundle com.sensen.mapg3）
+## 4. 真机结果（iPhone 13，iOS 26.5，Godot 4.7.2，bundle com.sensen.mapg3，2026-09-07 19:03–19:05）
 
-待填：从设备拉取 `Documents/lifecycle_probe.json` 后补。
+用「iPhone 镜像」从 Mac 上操作：⌘1 回主屏 = 切后台；`xcrun devicectl device process launch`（不带
+`--terminate-existing`）把后台进程唤回前台。四个循环，原始数据见同目录
+`2026-09-07-a6-lifecycle-probe-iphone13.json`。
 
-```
-xcrun devicectl device copy from --device 0FAD60D2-1CFE-5883-A1A2-849346019F6C \
-  --domain-type appDataContainer --domain-identifier com.sensen.mapg3 \
-  --source Documents/lifecycle_probe.json --destination /tmp/lifecycle_probe.json
-```
+| 动作 | PAUSED | RESUMED | FOCUS_OUT | FOCUS_IN | WM_FOCUS_OUT | WM_FOCUS_IN |
+|---|---|---|---|---|---|---|
+| 切后台 → 回前台 ×4 | 4 | 4 | 4 | 4 | 4 | 4 |
 
-| 动作 | PAUSED | RESUMED | FOCUS_OUT | FOCUS_IN | 备注 |
-|---|---|---|---|---|---|
-| 切到桌面再回来 | | | | | |
-| 下拉控制中心 | | | | | |
-| 通知横幅 | | | | | |
-| 键盘弹出/收起 | | | | | 键盘高度读数、输入框是否被挡 |
+每次的顺序与间隔都稳定：
 
-## 5. 对后续任务的约束（待真机结果确认后定稿）
+- 切后台：`WM_WINDOW_FOCUS_OUT` → `APPLICATION_FOCUS_OUT`（+2 ms）→ `APPLICATION_PAUSED`（+600 ms 左右）。
+- 回前台：`WM_WINDOW_FOCUS_IN` → `APPLICATION_FOCUS_IN`（+1 ms）→ `APPLICATION_RESUMED`（+30 ms 左右）。
+- `WM_GO_BACK_REQUEST` 在 iOS 上从未出现（符合预期，那是 Android 的返回键）。
 
-- WsClient：以真机确认的 PAUSED/RESUMED 为断连/重连触发点。
-- KeyboardAvoider：iOS 键盘动画期高度读数是否跳变，决定要不要做平滑。
+**结论：godot #115936 的 iOS 生命周期通知回归不影响本构建**（4.7.2 + iOS 26.5），WsClient 以
+`APPLICATION_PAUSED / RESUMED` 作断连 / 重连触发点可以照用，不需要插件层桥 UIApplication 通知。
+注意 PAUSED 比 FOCUS_OUT 晚约 600 ms：需要「立刻」反应的逻辑（暂停语音采集等）应挂 FOCUS_OUT。
+
+键盘：镜像会话期间 Mac 键盘充当硬件键盘，iOS 不弹软键盘，`virtual_keyboard_get_height()` 恒为 0，
+所以 A5 的 iOS 键盘避让要在手机上手点输入框验证；探针页现在会把见过的最大键盘高度写进
+`lifecycle_probe.json`（`keyboard_max_px`），手点之后拉文件即可，不用盯屏幕。
+
+另：国行 iOS 首次联网会弹「允许使用无线数据」系统弹窗，会挡住页面；提审用的非国行机型没有此弹窗。
+
+## 5. 对后续任务的约束
+
+- WsClient：`APPLICATION_PAUSED / RESUMED` 作断连 / 重连触发点，已验证可靠；语音采集类「必须立刻停」的逻辑挂 `APPLICATION_FOCUS_OUT`。
+- KeyboardAvoider：iOS 键盘高度读数待手点验证（见上）。
