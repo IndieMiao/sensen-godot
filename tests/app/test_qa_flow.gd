@@ -23,3 +23,20 @@ func test_parse_credentials_splits_on_first_colon_only() -> void:
 	assert_that(QaFlow.parse_credentials("nocolon")).is_equal({})
 	assert_that(QaFlow.parse_credentials(":pw")).is_equal({})
 	assert_that(QaFlow.parse_credentials("a@b.co:")).is_equal({})
+
+
+## watch：在给定秒数内按间隔补拍，步骤名 watch_NN，报告不会被标成 done。
+func test_watch_takes_periodic_shots_until_deadline() -> void:
+	var w := QaFlow.new()
+	w.out_dir = "user://qa_test"
+	w.watch_interval_s = 0.05
+	add_child(w)
+	auto_free(w)
+	await w.watch(1)
+	assert_int(w.report.steps.size()).is_greater_equal(2)
+	assert_str(str(w.report.steps[0].name)).is_equal("watch_01")
+	assert_bool(bool(w.report.steps[-1].saved)).is_true()
+	assert_bool(bool(w.report.done)).is_false()
+	assert_bool(FileAccess.file_exists("user://qa_test/report.json")).is_true()
+	var span_ms: int = int(w.report.steps[-1].at_ms) - int(w.report.steps[0].at_ms)
+	assert_int(span_ms).is_less(1500)

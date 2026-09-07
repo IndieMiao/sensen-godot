@@ -11,6 +11,8 @@ extends Node
 ## 触控在模拟器里没法从外面注入，而这些函数就是按钮回调，覆盖到的逻辑一样。
 
 const OUT_DIR := "user://qa"
+var out_dir := OUT_DIR
+var watch_interval_s := 3.0
 const SETTLE_S := 0.35
 
 var flow := ""
@@ -27,8 +29,9 @@ static func requested(args: PackedStringArray, env_value: String) -> String:
 func _ready() -> void:
 	report.flow = flow
 	report.started_at = Time.get_datetime_string_from_system()
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT_DIR))
-	call_deferred("_run")
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(out_dir))
+	if not flow.is_empty():
+		call_deferred("_run")
 
 func _run() -> void:
 	match flow:
@@ -38,6 +41,7 @@ func _run() -> void:
 			await run_login()
 		_:
 			_error("unknown flow: %s" % flow)
+	await watch()
 	report.done = true
 	_write_report()
 	print("QaFlow: done, %d steps, %d errors" % [report.steps.size(), report.errors.size()])
@@ -198,11 +202,25 @@ func settle() -> void:
 	await get_tree().create_timer(SETTLE_S).timeout
 	await get_tree().process_frame
 
+## SENSEN_QA_WATCH=<秒>：流程跑完后在这段时间里每隔 watch_interval_s 补拍一张（watch_NN）。
+## 给真机上必须手点的验证留观察窗——键盘弹起、系统权限弹窗这类，镜像不弹软键盘，
+## devicectl 也拿不到屏幕；人点完，拉回截图看视口有没有按预期位移。
+func watch(secs: int = int(OS.get_environment("SENSEN_QA_WATCH"))) -> void:
+	if secs <= 0:
+		return
+	var deadline := Time.get_ticks_msec() + secs * 1000
+	var n := 0
+	while Time.get_ticks_msec() < deadline:
+		await get_tree().create_timer(watch_interval_s).timeout
+		n += 1
+		await shot("watch_%02d" % n)
+
 ## 截当前视口存 PNG，并记一条步骤（场景路径 + 栈顶 + 耗时）。
 func shot(name: String) -> void:
-	await RenderingServer.frame_post_draw
+	# 不等 frame_post_draw：被完全遮挡的窗口（测试进程常见）不出帧会永远等下去；同步强制画一帧再截。
+	RenderingServer.force_draw()
 	_index += 1
-	var file := "%s/%02d_%s.png" % [OUT_DIR, _index, name]
+	var file := "%s/%02d_%s.png" % [out_dir, _index, name]
 	var img := get_viewport().get_texture().get_image()
 	var err := OK if img == null else img.save_png(file)
 	var top := AppRouter.top_instance()
@@ -227,6 +245,6 @@ func _error(msg: String) -> void:
 	_write_report()
 
 func _write_report() -> void:
-	var f := FileAccess.open("%s/report.json" % OUT_DIR, FileAccess.WRITE)
+	var f := FileAccess.open("%s/report.json" % out_dir, FileAccess.WRITE)
 	if f != null:
 		f.store_string(JSON.stringify(report, "  "))

@@ -101,3 +101,19 @@ QA 账号：qa-alice@sensen.test（handle alice）、qa-bob@sensen.test（handle
 桌面 bob 发「hello from mac」→ 手机 alice 开单聊时历史已有 → 回「hello from iphone」→ 桌面 bob 页面
 经 WebSocket 即时收到。两端 login 流各 3 步、0 错误；截图在 `~/Downloads/sensen-qa-2026-09-07/e2e/`。
 键盘避让要在手机上手点（镜像不弹软键盘），见 §6.6。
+
+### 6.6 要手点的验证：SENSEN_QA_WATCH 观察窗
+
+镜像不弹软键盘、devicectl 拿不到屏幕，所以键盘弹起这类验证只能人在手机上点。步行器加了观察窗：
+`SENSEN_QA_WATCH=<秒>` 让流程跑完后每 3 秒补拍一张（`watch_NN.png`，同样进 report.json），人在这段
+时间里点输入框，拉回截图看视口有没有按预期上移（iOS 键盘是系统层，不在视口截图里；看到的是
+输入框位置变化 + 下方留白）。例：
+
+```
+xcrun devicectl device process launch --terminate-existing \
+  --environment-variables '{"SENSEN_QA_FLOW":"login","SENSEN_QA_LOGIN":"qa-alice@sensen.test:…",
+  "SENSEN_QA_DM":"@bob","SENSEN_QA_WATCH":"60","HTTPS_PROXY":"http://<Mac IP>:7891","NO_PROXY":"<Mac IP>"}' \
+  --device <UDID> com.sensen.mapg3
+```
+
+截图改用 `RenderingServer.force_draw()` 同步出帧：等 `frame_post_draw` 在被遮挡的窗口（测试进程）里永远不来。
