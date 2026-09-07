@@ -9,6 +9,7 @@ import { socialAccountModule } from './http/social.js';
 import { PgFeedStore } from './db/pg_feed.js';
 import { feedAccountModule } from './http/feed.js';
 import { s3ConfigFromEnv } from './http/uploads.js';
+import { LocalUploadStore } from './http/local_uploads.js';
 import { PgModerationStore } from './db/pg_moderation.js';
 import { OpenAiModerator, moderationAccountModule } from './http/moderation.js';
 import { PgImStore } from './db/pg_im.js';
@@ -76,12 +77,14 @@ const im = new PgImStore(pool);
 const wsHub = new SocketHub();
 const textModerator = process.env.OPENAI_API_KEY ? new OpenAiModerator(process.env.OPENAI_API_KEY) : undefined;
 if (!textModerator) console.warn('未设置 OPENAI_API_KEY：文本不做前置过滤，全部进人工复审队列');
-if (!uploads) console.warn('未设置 R2_ENDPOINT / R2_BUCKET / R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY：图片直传路由返回 503');
+const localUploads = !uploads && process.env.UPLOAD_LOCAL_DIR ? new LocalUploadStore(process.env.UPLOAD_LOCAL_DIR) : undefined;
+if (!uploads && !localUploads) console.warn('未设置 R2_*，也没设 UPLOAD_LOCAL_DIR：图片直传路由返回 503');
+if (localUploads) console.warn(`图片走开发期本地存储 ${localUploads.dir}（不是 R2）`);
 
 const app = await buildApp({
   store, content, contentVersion: cv,
   accounts: new PgAccountStore(pool),
-  social, feed, uploads, moderation, textModerator, im, wsHub,
+  social, feed, uploads, localUploads, moderation, textModerator, im, wsHub,
   adminUserIds: new Set((process.env.ADMIN_USER_IDS ?? '').split(',').map(x => x.trim()).filter(Boolean)),
   accountModules: [socialAccountModule(social), feedAccountModule(feed), moderationAccountModule(moderation), imAccountModule(im)],
   firebase: firebaseProjectId ? { projectId: firebaseProjectId, keys: jwks.keys, refreshKeys: jwks.refresh } : undefined,

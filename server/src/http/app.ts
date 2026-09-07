@@ -29,7 +29,8 @@ import { appleRevocationFor, userView, type AccountModule, type AccountStore, ty
 import { clampLimit, defaultDisplayName, ownProfileView, publicProfileView, userCard, validatePatch,
   type FollowRow, type ProfileRow, type SocialStore } from './social.js';
 import { canSeePost, commentView, postView, validateComment, validatePost, type AuthorCard, type FeedStore, type PostRow } from './feed.js';
-import { ownsKey, presignUpload, validateUploadRequest, type S3Config } from './uploads.js';
+import { UPLOAD_CONTENT_TYPES, UPLOAD_MAX_BYTES, ownsKey, presignUpload, publicUrl, validateUploadRequest, type S3Config } from './uploads.js';
+import type { LocalUploadStore } from './local_uploads.js';
 import { ADMIN_ACTIONS, NullModerator, REPORT_AUTO_HIDE, decide, reportView, validateReport,
   type ModerationStore, type TextModerator } from './moderation.js';
 import { HISTORY_LIMIT_MAX, SYNC_LIMIT_MAX, conversationView, greetingBlocked, messageView, uniqueIds, validateGroup, validateMessage,
@@ -59,6 +60,8 @@ export interface AppDeps {
   feed?: FeedStore;
   /** D4-c 图片直传（R2 / S3 兼容）；缺省时 POST /v1/uploads 503 UPLOADS_NOT_CONFIGURED。 */
   uploads?: S3Config;
+  /** 没有 R2 时的开发期本地存储（二选一；两个都给以 R2 为准）。 */
+  localUploads?: LocalUploadStore;
   /** D6 举报 / 拉黑 / 封禁 / 复审队列；缺省时相关路由 503 MODERATION_NOT_CONFIGURED。 */
   moderation?: ModerationStore;
   /** D6 文本前置过滤；缺省 = NullModerator（不拦，但全部进人工队列）。 */
@@ -94,6 +97,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     try { done(null, JSON.parse(text)); } catch (e) { done(Object.assign(e as Error, { statusCode: 400 }), undefined); }
   });
   await app.register(rateLimit, { global: false });
+  /** 对外地址按请求算：局域网调试时服务端不知道自己的 IP。 */
+  const baseUrlOf = (req: FastifyRequest): string => `${req.protocol}://${req.headers.host ?? 'localhost'}`;
   const regions = JSON.parse(readFileSync(deps.regionsFile, 'utf8')) as Regions;
   const blueprintCache = new Map<string, Ctx['blueprint']>();
   const ownerView = (farm: FarmRow, now: number, timezone: string) => {
@@ -675,10 +680,34 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   }, async (req, reply) => {
     const c = await currentUser(req);
     if (!('user' in c)) return reply.code(c.status).send(c.body);
-    if (!deps.uploads) return reply.code(503).send({ code: 'UPLOADS_NOT_CONFIGURED', server_time: deps.now() });
+    if (!deps.uploads && !deps.localUploads) return reply.code(503).send({ code: 'UPLOADS_NOT_CONFIGURED', server_time: deps.now() });
     const v = validateUploadRequest(req.body);
     if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, reason: v.reason, server_time: deps.now() });
-    return reply.code(201).send({ ...presignUpload(deps.uploads, c.user.id, v, deps.now()), server_time: deps.now() });
+    if (deps.uploads) return reply.code(201).send({ ...presignUpload(deps.uploads, c.user.id, v, deps.now()), server_time: deps.now() });
+    return reply.code(201).send({ ...deps.localUploads!.presign(c.user.id, v, deps.now(), baseUrlOf(req)), server_time: deps.now() });
+  });
+
+  // 开发期本地直传：PUT 原始字节（content-type 就是图片类型），GET 读回；R2 模式下 /v1/files 302 到公网地址。
+  app.addContentTypeParser([...Object.keys(UPLOAD_CONTENT_TYPES), 'application/octet-stream'], { parseAs: 'buffer', bodyLimit: UPLOAD_MAX_BYTES }, (_req, body, done) => done(null, body));
+  app.put('/v1/uploads/local/:token', async (req, reply) => {
+    if (!deps.localUploads) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    const body = Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0);
+    const r = await deps.localUploads.put(String((req.params as Record<string, string>).token ?? ''), body, String(req.headers['content-type'] ?? ''), deps.now());
+    if (!r.ok) {
+      const status = r.code === 'NOT_FOUND' ? 404 : r.code === 'EXPIRED' ? 410 : r.code === 'SIZE' ? 413 : 415;
+      return reply.code(status).send({ code: r.code, server_time: deps.now() });
+    }
+    return reply.send({ ok: true, key: r.key, server_time: deps.now() });
+  });
+  /** 图片读取的统一入口：客户端永远请求 <api>/v1/files/<key>，不用知道存在哪。 */
+  app.get('/v1/files/*', async (req, reply) => {
+    const key = String((req.params as Record<string, string>)['*'] ?? '');
+    if (deps.uploads) return reply.redirect(publicUrl(deps.uploads, key), 302);
+    if (!deps.localUploads) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    const f = await deps.localUploads.read(key);
+    if (!f) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    reply.header('cache-control', 'public, max-age=31536000, immutable');
+    return reply.type(f.contentType).send(f.bytes);
   });
 
   // —— D6 / E1：拉黑、举报、封禁、管理队列 ——
@@ -993,7 +1022,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   });
 
   app.get('/v1/healthz', async (_req, reply) => reply.send({
-    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), feed: Boolean(deps.feed), uploads: Boolean(deps.uploads), moderation: Boolean(deps.moderation), text_moderator: Boolean(deps.textModerator), im: Boolean(deps.im), ws: Boolean(deps.wsHub), git_sha: deps.gitSha ?? 'dev',
+    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), feed: Boolean(deps.feed), uploads: Boolean(deps.uploads || deps.localUploads), uploads_mode: deps.uploads ? 'r2' : deps.localUploads ? 'local' : 'off', moderation: Boolean(deps.moderation), text_moderator: Boolean(deps.textModerator), im: Boolean(deps.im), ws: Boolean(deps.wsHub), git_sha: deps.gitSha ?? 'dev',
     content_version: deps.contentVersion, domain_version: DOMAIN_VERSION,
     server_time: deps.now(),
   }));
