@@ -122,3 +122,8 @@ xcrun devicectl device process launch --terminate-existing \
 弹起后整页上移约一个键盘高，标题「QA bob」和两条消息都被推出屏幕，只剩输入框（截图在
 `~/Downloads/sensen-qa-2026-09-07/e2e/iphone-alice-keyboard/`）。这是 SHIFT 模式对聊天页的错误形态：
 改成 KeyboardAvoider.Mode.SHRINK（收 SafeArea 底边，列表变矮、输入框上浮、标题不动），26bf205。
+
+**第二轮（21:12–21:22，SHRINK）**：布局对了——标题「QA bob」和两条消息留在原位，输入框浮在键盘上方
+（`keyboard_up_shrink_v1.png`）；但用户反馈输入框一直抖。原因：容器重排把子节点吸附到整像素，
+浮点位移与量回来的底边互相追着改，每帧在两个值间跳（测试用真 MarginContainer + VBoxContainer 复现，
+位移 405.13 → 每帧漂）。位移 ceil 到整像素 + 亚像素差不反馈，bc8841b。
