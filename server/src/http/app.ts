@@ -28,6 +28,7 @@ import { IdTokenError, verifyFirebaseIdToken, type FirebaseIdentity, type KeySou
 import { appleRevocationFor, userView, type AccountModule, type AccountStore, type UserRow } from './accounts.js';
 import { clampLimit, defaultDisplayName, ownProfileView, publicProfileView, userCard, validatePatch,
   type FollowRow, type ProfileRow, type SocialStore } from './social.js';
+import { canSeePost, commentView, postView, validateComment, validatePost, type AuthorCard, type FeedStore, type PostRow } from './feed.js';
 
 export interface AppDeps {
   store: Store;
@@ -48,6 +49,8 @@ export interface AppDeps {
   accountModules?: AccountModule[];
   /** D4-a 资料 + 关注；缺省时相关路由 503 SOCIAL_NOT_CONFIGURED。 */
   social?: SocialStore;
+  /** D4-b feed；需要 social 判可见性。缺省时相关路由 503 FEED_NOT_CONFIGURED。 */
+  feed?: FeedStore;
 }
 
 interface Regions {
@@ -488,8 +491,131 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return reply.send({ items, unread_count: unread, next_cursor: page.next_cursor, server_time: deps.now() });
   });
 
+  // —— D4-b feed：图文动态 + 点赞 + 一级评论。可见性：作者本人或关注了作者的人 ——
+  const feedGuard = async (req: FastifyRequest, reply: FastifyReply): Promise<UserRow | null> => {
+    if (!deps.feed || !deps.social) { await reply.code(503).send({ code: 'FEED_NOT_CONFIGURED', server_time: deps.now() }); return null; }
+    const c = await currentUser(req);
+    if ('user' in c) return c.user;
+    await reply.code(c.status).send(c.body);
+    return null;
+  };
+  const authorCards = async (ids: string[]): Promise<Map<string, AuthorCard>> => {
+    const profiles = await deps.social!.profiles([...new Set(ids)]);
+    const out = new Map<string, AuthorCard>();
+    for (const id of ids) {
+      const p = profiles.get(id);
+      out.set(id, { user_id: id, display_name: p?.display_name ?? '', handle: p?.handle ?? null, avatar: p?.avatar ?? null });
+    }
+    return out;
+  };
+  const postViews = async (me: UserRow, posts: PostRow[]) => {
+    const [cards, liked] = await Promise.all([authorCards(posts.map(p => p.author_id)), deps.feed!.likedBy(posts.map(p => p.id), me.id)]);
+    return posts.map(p => postView(p, cards.get(p.author_id)!, liked.has(p.id)));
+  };
+  /** 取帖并判可见性；不可见与不存在都答 404——区分它们等于告诉人「有这条但不给你看」。 */
+  const visiblePost = async (req: FastifyRequest, reply: FastifyReply, me: UserRow, postId: string): Promise<PostRow | null> => {
+    const post = await deps.feed!.post(postId);
+    if (post && canSeePost(post, me.id, await deps.social!.relation(me.id, post.author_id))) return post;
+    await reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    return null;
+  };
+  const pageQuery = (req: FastifyRequest): { cursor: string | null; limit: number } => {
+    const q = req.query as Record<string, unknown>;
+    return { cursor: typeof q.cursor === 'string' ? q.cursor : null, limit: clampLimit(q.limit) };
+  };
+
+  app.post('/v1/posts', async (req, reply) => {
+    const me = await feedGuard(req, reply); if (!me) return;
+    const v = validatePost(req.body);
+    if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, reason: v.reason, server_time: deps.now() });
+    const r = await deps.feed!.createPost({ id: randomUUID(), authorId: me.id, idempotencyKey: v.idempotencyKey, text: v.text, images: v.images, now: deps.now() });
+    const [view] = await postViews(me, [r.post]);
+    return reply.code(r.created ? 201 : 200).send({ ...view, created: r.created, server_time: deps.now() });
+  });
+
+  /** 时间线 = 我 + 我关注的人的动态。 */
+  app.get('/v1/feed', async (req, reply) => {
+    const me = await feedGuard(req, reply); if (!me) return;
+    const { cursor, limit } = pageQuery(req);
+    const page = await deps.feed!.timeline(me.id, cursor, limit);
+    return reply.send({ items: await postViews(me, page.items), next_cursor: page.next_cursor, server_time: deps.now() });
+  });
+
+  /** 某人的动态：本人或关注了他的人；否则 403 FOLLOW_REQUIRED（资料本身可见，只是动态要先关注）。 */
+  app.get('/v1/users/:id/posts', async (req, reply) => {
+    const me = await feedGuard(req, reply); if (!me) return;
+    const p = await resolveProfile(paramId(req), me);
+    if (!p) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    if (p.user_id !== me.id && !(await deps.social!.relation(me.id, p.user_id)).following)
+      return reply.code(403).send({ code: 'FOLLOW_REQUIRED', server_time: deps.now() });
+    const { cursor, limit } = pageQuery(req);
+    const page = await deps.feed!.byAuthor(p.user_id, cursor, limit);
+    return reply.send({ items: await postViews(me, page.items), next_cursor: page.next_cursor, server_time: deps.now() });
+  });
+
+  app.get('/v1/posts/:id', async (req, reply) => {
+    const me = await feedGuard(req, reply); if (!me) return;
+    const post = await visiblePost(req, reply, me, paramId(req)); if (!post) return;
+    const [view] = await postViews(me, [post]);
+    return reply.send({ ...view, server_time: deps.now() });
+  });
+
+  app.delete('/v1/posts/:id', async (req, reply) => {
+    const me = await feedGuard(req, reply); if (!me) return;
+    const post = await deps.feed!.post(paramId(req));
+    if (!post) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    if (post.author_id !== me.id) return reply.code(403).send({ code: 'FORBIDDEN', server_time: deps.now() });
+    return reply.send({ ok: true, deleted: await deps.feed!.deletePost(post.id, me.id, deps.now()), server_time: deps.now() });
+  });
+
+  app.put('/v1/posts/:id/like', async (req, reply) => {
+    const me = await feedGuard(req, reply); if (!me) return;
+    const post = await visiblePost(req, reply, me, paramId(req)); if (!post) return;
+    const r = await deps.feed!.like(post.id, me.id, deps.now());
+    const fresh = await deps.feed!.post(post.id);
+    return reply.send({ ok: true, liked: true, created: r.created, like_count: fresh?.like_count ?? post.like_count, server_time: deps.now() });
+  });
+
+  app.delete('/v1/posts/:id/like', async (req, reply) => {
+    const me = await feedGuard(req, reply); if (!me) return;
+    const post = await visiblePost(req, reply, me, paramId(req)); if (!post) return;
+    const r = await deps.feed!.unlike(post.id, me.id);
+    const fresh = await deps.feed!.post(post.id);
+    return reply.send({ ok: true, liked: false, removed: r.removed, like_count: fresh?.like_count ?? post.like_count, server_time: deps.now() });
+  });
+
+  /** 一级评论，按时间正序。 */
+  app.get('/v1/posts/:id/comments', async (req, reply) => {
+    const me = await feedGuard(req, reply); if (!me) return;
+    const post = await visiblePost(req, reply, me, paramId(req)); if (!post) return;
+    const { cursor, limit } = pageQuery(req);
+    const page = await deps.feed!.comments(post.id, cursor, limit);
+    const cards = await authorCards(page.items.map(c => c.author_id));
+    return reply.send({ items: page.items.map(c => commentView(c, cards.get(c.author_id)!)), next_cursor: page.next_cursor, server_time: deps.now() });
+  });
+
+  app.post('/v1/posts/:id/comments', async (req, reply) => {
+    const me = await feedGuard(req, reply); if (!me) return;
+    const post = await visiblePost(req, reply, me, paramId(req)); if (!post) return;
+    const v = validateComment(req.body);
+    if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, reason: v.reason, server_time: deps.now() });
+    const c = await deps.feed!.addComment({ id: randomUUID(), postId: post.id, authorId: me.id, text: v.text, now: deps.now() });
+    const cards = await authorCards([me.id]);
+    return reply.code(201).send({ ...commentView(c, cards.get(me.id)!), server_time: deps.now() });
+  });
+
+  /** 评论作者或帖主可删。 */
+  app.delete('/v1/comments/:id', async (req, reply) => {
+    const me = await feedGuard(req, reply); if (!me) return;
+    const c = await deps.feed!.comment(paramId(req));
+    if (!c) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    const post = await deps.feed!.post(c.post_id);
+    if (c.author_id !== me.id && post?.author_id !== me.id) return reply.code(403).send({ code: 'FORBIDDEN', server_time: deps.now() });
+    return reply.send({ ok: true, deleted: await deps.feed!.deleteComment(c.id, deps.now()), server_time: deps.now() });
+  });
+
   app.get('/v1/healthz', async (_req, reply) => reply.send({
-    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), git_sha: deps.gitSha ?? 'dev',
+    ok: true, db: true, accounts: accountsReady(), social: Boolean(deps.social), feed: Boolean(deps.feed), git_sha: deps.gitSha ?? 'dev',
     content_version: deps.contentVersion, domain_version: DOMAIN_VERSION,
     server_time: deps.now(),
   }));

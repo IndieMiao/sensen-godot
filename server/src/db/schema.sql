@@ -146,3 +146,38 @@ CREATE TABLE IF NOT EXISTS follows (
 );
 CREATE INDEX IF NOT EXISTS follows_followee_idx ON follows(followee_id, created_at DESC, follower_id DESC);
 CREATE INDEX IF NOT EXISTS follows_follower_idx ON follows(follower_id, created_at DESC, followee_id DESC);
+
+-- D4-b feed：图文动态 + 点赞 + 一级评论。软删（deleted_at）：E1 审核与举报要能回看。
+CREATE TABLE IF NOT EXISTS posts (
+  id               uuid PRIMARY KEY,
+  author_id        uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  idempotency_key  text NOT NULL,
+  text             text NOT NULL,
+  images           jsonb NOT NULL DEFAULT '[]'::jsonb,
+  like_count       int  NOT NULL DEFAULT 0,
+  comment_count    int  NOT NULL DEFAULT 0,
+  created_at       bigint NOT NULL,
+  deleted_at       bigint,
+  UNIQUE (author_id, idempotency_key)
+);
+CREATE INDEX IF NOT EXISTS posts_author_idx ON posts(author_id, created_at DESC, id DESC) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS posts_created_idx ON posts(created_at DESC, id DESC) WHERE deleted_at IS NULL;
+
+CREATE TABLE IF NOT EXISTS post_likes (
+  post_id     uuid NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  user_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at  bigint NOT NULL,
+  PRIMARY KEY (post_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS post_likes_user_idx ON post_likes(user_id);
+
+CREATE TABLE IF NOT EXISTS post_comments (
+  id          uuid PRIMARY KEY,
+  post_id     uuid NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  author_id   uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  text        text NOT NULL,
+  created_at  bigint NOT NULL,
+  deleted_at  bigint
+);
+CREATE INDEX IF NOT EXISTS post_comments_post_idx ON post_comments(post_id, created_at, id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS post_comments_author_idx ON post_comments(author_id);

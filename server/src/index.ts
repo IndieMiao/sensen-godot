@@ -6,6 +6,8 @@ import { PgStore } from './db/pg_store.js';
 import { PgAccountStore } from './db/pg_accounts.js';
 import { PgSocialStore } from './db/pg_social.js';
 import { socialAccountModule } from './http/social.js';
+import { PgFeedStore } from './db/pg_feed.js';
+import { feedAccountModule } from './http/feed.js';
 import { CachedJwks, googleJwksFetcher } from './http/firebase_token.js';
 import { migrate } from './db/migrate.js';
 import { contentVersion, loadContent } from './domain/content.js';
@@ -61,11 +63,12 @@ const firebaseProjectId = process.env.FIREBASE_PROJECT_ID;
 if (!firebaseProjectId) console.warn('未设置 FIREBASE_PROJECT_ID：账号路由返回 503');
 const jwks = new CachedJwks(googleJwksFetcher(), () => Date.now());
 const social = new PgSocialStore(pool);
+const feed = new PgFeedStore(pool);
 
 const app = await buildApp({
   store, content, contentVersion: cv,
   accounts: new PgAccountStore(pool),
-  social, accountModules: [socialAccountModule(social)],
+  social, feed, accountModules: [socialAccountModule(social), feedAccountModule(feed)],
   firebase: firebaseProjectId ? { projectId: firebaseProjectId, keys: jwks.keys, refreshKeys: jwks.refresh } : undefined,
   blueprintDir: BLUEPRINT_DIR, regionsFile: path.join(CONTENT_DIR, 'regions.json'),
   pepper: need('TOKEN_PEPPER'), now: () => Date.now(),

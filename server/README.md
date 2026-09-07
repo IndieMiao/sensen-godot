@@ -192,6 +192,23 @@ token 还是重新登录。JWKS 按 `max-age` 缓存，未知 kid 触发一次�
 首次登录时随账号建默认资料（昵称 = 邮箱本地部分）。资料与关注通过 `accountModules` 登记了导出与
 删号级联。陌生人「一条打招呼」的聊天限制归 D3 IM，用这里的 `relation` 判定。
 
+## feed（D4-b）
+
+图文动态 + 点赞 + 一级评论。**可见性照关注规则**：作者本人，或关注了作者的人；密友与单向关注同一
+规则。时间线 = 我 + 我关注的人的动态，按发布时间倒序键集分页；评论按时间正序。不可见与不存在
+都答 404。删除是软删（审核与举报要能回看）；删号时硬删。图片只存引用（R2 对象 key，D4-c 接
+上传前客户端拿不到合法 key）。
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| POST | `/v1/posts` | `{idempotency_key, text?, images?:[{key,w?,h?}]}`；文字 ≤2000、图 ≤9、至少一样非空；重放 200 |
+| GET | `/v1/feed` | 时间线；`cursor` / `limit`(≤50) |
+| GET | `/v1/users/:id/posts` | 某人的动态；未关注 403 `FOLLOW_REQUIRED` |
+| GET / DELETE | `/v1/posts/:id` | 单条 / 作者删（他人 403） |
+| PUT / DELETE | `/v1/posts/:id/like` | 点赞 / 取消，幂等，回 `like_count` |
+| GET / POST | `/v1/posts/:id/comments` | 一级评论；`{text}` ≤500 |
+| DELETE | `/v1/comments/:id` | 评论作者或帖主可删 |
+
 ## 测试分层
 
 | 目录 | 内容 |
