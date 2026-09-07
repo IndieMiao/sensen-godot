@@ -30,6 +30,7 @@ func _ready() -> void:
 	report.flow = flow
 	report.started_at = Time.get_datetime_string_from_system()
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(out_dir))
+	clear_output()
 	if not flow.is_empty():
 		call_deferred("_run")
 
@@ -201,6 +202,16 @@ func settle() -> void:
 		await get_tree().process_frame
 	await get_tree().create_timer(SETTLE_S).timeout
 	await get_tree().process_frame
+
+## 清掉上一轮的截图与报告：步骤编号从 1 重排，短的一轮会留下上一轮的尾巴，按文件名分析就会混进旧帧
+## （2026-09-07 观察窗第三轮里混入了第二轮的 197–200 号）。
+func clear_output() -> void:
+	var dir := DirAccess.open(out_dir)
+	if dir == null:
+		return
+	for f in dir.get_files():
+		if f.ends_with(".png") or f == "report.json":
+			dir.remove(f)
 
 ## SENSEN_QA_WATCH=<秒>：流程跑完后在这段时间里每隔 watch_interval_s 补拍一张（watch_NN）。
 ## 给真机上必须手点的验证留观察窗——键盘弹起、系统权限弹窗这类，镜像不弹软键盘，

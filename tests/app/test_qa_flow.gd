@@ -40,3 +40,20 @@ func test_watch_takes_periodic_shots_until_deadline() -> void:
 	assert_bool(FileAccess.file_exists("user://qa_test/report.json")).is_true()
 	var span_ms: int = int(w.report.steps[-1].at_ms) - int(w.report.steps[0].at_ms)
 	assert_int(span_ms).is_less(1500)
+
+
+## 启动时清掉上一轮的 png 与 report.json，别的文件不动。
+func test_ready_clears_previous_round_output() -> void:
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://qa_test"))
+	for name in ["07_old.png", "report.json", "keep.txt"]:
+		var f := FileAccess.open("user://qa_test/%s" % name, FileAccess.WRITE)
+		f.store_string("x")
+		f.close()
+	var w := QaFlow.new()
+	w.out_dir = "user://qa_test"
+	add_child(w)
+	auto_free(w)
+	assert_bool(FileAccess.file_exists("user://qa_test/07_old.png")).is_false()
+	assert_bool(FileAccess.file_exists("user://qa_test/report.json")).is_false()
+	assert_bool(FileAccess.file_exists("user://qa_test/keep.txt")).is_true()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://qa_test/keep.txt"))
