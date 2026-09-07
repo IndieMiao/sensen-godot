@@ -33,6 +33,9 @@ const SETTINGS := "res://scenes/app/pages/settings_page.tscn"
 const VOICE_ROOM := "res://scenes/app/pages/voice_room_page.tscn"
 ## B2 聊天页：push_instance 时 args = {"conversation": 会话字典}。
 const CHAT := "res://scenes/app/pages/chat_page.tscn"
+## 用户主页：args = {"user_id": uuid} 或 {"handle": "ali"}；动态详情：args = {"post": 帖子字典} 或 {"post_id": id}。
+const USER := "res://scenes/app/pages/user_page.tscn"
+const POST := "res://scenes/app/pages/post_page.tscn"
 ## 调试构建才有入口（设置页）：A6 生命周期通知探针。
 const LIFECYCLE_PROBE := "res://scenes/app/pages/lifecycle_probe_page.tscn"
 

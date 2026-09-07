@@ -11,6 +11,8 @@ var safety: SafetyApi
 var uploads: UploadApi
 var images: ImageCache
 var picker: PhotoPicker
+## 压栈子页（动态详情 / 用户主页）；默认 AppRouter.push_instance。
+var navigate: Callable
 
 var composer: LineEdit
 var post_button: Button
@@ -253,14 +255,7 @@ static func _text(v: Variant) -> String:
 
 ## 相对时间：列表里「3h ago」比完整时间戳好读。
 func age_text(now_ms: int, created_ms: int) -> String:
-	var d := maxi(0, now_ms - created_ms) / 1000
-	if d < 60:
-		return tr("just now")
-	if d < 3600:
-		return tr("%dm ago") % (d / 60)
-	if d < 86400:
-		return tr("%dh ago") % (d / 3600)
-	return tr("%dd ago") % (d / 86400)
+	return PostCard.age_text(now_ms, created_ms)
 
 func _now_ms() -> int:
 	return int(Time.get_unix_time_from_system() * 1000.0)
@@ -284,74 +279,43 @@ func _render() -> void:
 	status.text = tr("Nothing here yet. Follow people to see their posts.") if items.is_empty() else ""
 
 func _card(p: Dictionary) -> PanelContainer:
-	var id := str(p.get("id", ""))
-	var panel := PanelContainer.new()
-	panel.name = "Post_%s" % id
-	panel.add_theme_stylebox_override("panel", GameUi.surface())
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 6)
-	panel.add_child(col)
-	var author: Dictionary = p.get("author", {}) if p.get("author") is Dictionary else {}
-	var handle := _text(author.get("handle", ""))
-	var who := _text(author.get("display_name", ""))
-	if not handle.is_empty():
-		who += " @%s" % handle
-	var head := GameUi.label("%s · %s" % [who, age_text(_now_ms(), int(p.get("created_at", 0)))], 12, GameUi.MUTED)
-	head.name = "Author"
-	col.add_child(head)
-	var text := GameUi.label(_text(p.get("text", "")), 14)
-	text.name = "Text"
-	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	text.visible = not text.text.is_empty()
-	col.add_child(text)
-	var pics: Array = p.get("images", []) if p.get("images") is Array else []
-	if not pics.is_empty():
-		var strip := HBoxContainer.new()
-		strip.name = "Pictures"
-		strip.add_theme_constant_override("separation", 6)
-		for im in pics:
-			if not (im is Dictionary):
-				continue
-			var frame := PanelContainer.new()
-			frame.add_theme_stylebox_override("panel", GameUi.surface(GameUi.PAPER, 0, 6))
-			var pic := PictureView.new()
-			pic.name = "Picture"
-			frame.add_child(pic)
-			strip.add_child(frame)
-			pic.show_picture(_images(), image_url(_text(im.get("key", ""))), int(im.get("w", 0)), int(im.get("h", 0)), Vector2(96, 96))
-		col.add_child(strip)
-	var actions := HBoxContainer.new()
-	actions.add_theme_constant_override("separation", 8)
-	var like := GameUi.button("", "", "PUT/DELETE /posts/:id/like")
-	like.name = "Like"
-	like.pressed.connect(func(): toggle_like(id))
-	actions.add_child(like)
-	var meta := GameUi.label("", 12, GameUi.MUTED)
-	meta.name = "Meta"
-	meta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	actions.add_child(meta)
-	var author_id := _text(author.get("user_id", ""))
-	if not _is_me(author_id):
-		var report := GameUi.button("", tr("Report"), "POST /reports")
-		report.name = "Report"
-		report.pressed.connect(func(): open_report_menu(id, author_id))
-		actions.add_child(report)
-		var block := GameUi.button("", tr("Block"), "PUT /users/:id/block")
-		block.name = "Block"
-		block.pressed.connect(func(): open_block_confirm(id, author_id))
-		actions.add_child(block)
-	col.add_child(actions)
-	cards[id] = {"like": like, "meta": meta}
-	_update_card(id)
+	var id := _text(p.get("id", ""))
+	var panel := PostCard.build(p, card_ctx())
+	cards[id] = panel
 	return panel
+
+## 三处列表（feed / 用户主页 / 详情）共用的卡片回调。
+func card_ctx() -> Dictionary:
+	var s := _session()
+	return {
+		"me_id": s.server_user_id if s != null else "", "now_ms": _now_ms, "images": _images(), "image_url": image_url,
+		"on_like": toggle_like, "on_comments": open_post, "on_author": open_user,
+		"on_report": open_report_menu, "on_block": open_block_confirm,
+	}
 
 func _update_card(post_id: String) -> void:
 	var p := _item(post_id)
 	if p.is_empty() or not cards.has(post_id):
 		return
-	var like: Button = cards[post_id].like
-	like.text = "%s %d" % [tr("Liked") if bool(p.get("liked", false)) else tr("Like"), int(p.get("like_count", 0))]
-	(cards[post_id].meta as Label).text = tr("%d comments") % int(p.get("comment_count", 0))
+	PostCard.update(cards[post_id], p)
+
+func open_post(post_id: String) -> void:
+	var p := _item(post_id)
+	if p.is_empty():
+		return
+	_push(AppRoutes.POST, {"post": p})
+
+func open_user(author: Dictionary) -> void:
+	var id := _text(author.get("user_id", ""))
+	if id.is_empty():
+		return
+	_push(AppRoutes.USER, {"user_id": id})
+
+func _push(route: String, args: Dictionary) -> void:
+	if navigate.is_valid():
+		navigate.call(route, args)
+	else:
+		AppRouter.push_instance(route, args)
 
 func _is_me(author_id: String) -> bool:
 	var s := _session()

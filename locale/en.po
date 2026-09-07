@@ -4,22 +4,16 @@ msgstr ""
 "Language: en\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
-msgid "%d comments"
+msgid "%d followers"
+msgstr ""
+
+msgid "%d following"
 msgstr ""
 
 msgid "%d photos attached"
 msgstr ""
 
 msgid "%d picked"
-msgstr ""
-
-msgid "%dd ago"
-msgstr ""
-
-msgid "%dh ago"
-msgstr ""
-
-msgid "%dm ago"
 msgstr ""
 
 msgid "%s · %d followers · %d following"
@@ -100,6 +94,9 @@ msgstr ""
 msgid "Clear log"
 msgstr ""
 
+msgid "Comments"
+msgstr ""
+
 msgid "Contact us"
 msgstr ""
 
@@ -169,6 +166,15 @@ msgstr ""
 msgid "Feed"
 msgstr ""
 
+msgid "Follow"
+msgstr ""
+
+msgid "Following"
+msgstr ""
+
+msgid "Follows you"
+msgstr ""
+
 msgid "Forgot password"
 msgstr ""
 
@@ -206,12 +212,6 @@ msgid "Leave this group?"
 msgstr ""
 
 msgid "Lifecycle probe"
-msgstr ""
-
-msgid "Like"
-msgstr ""
-
-msgid "Liked"
 msgstr ""
 
 msgid "Load more"
@@ -254,6 +254,9 @@ msgid "No one with the handle @%s."
 msgstr ""
 
 msgid "No picker on this platform."
+msgstr ""
+
+msgid "No posts yet."
 msgstr ""
 
 msgid "Not signed in"
@@ -305,6 +308,9 @@ msgid "Posting…"
 msgstr ""
 
 msgid "Privacy policy"
+msgstr ""
+
+msgid "Profile"
 msgstr ""
 
 msgid "Profile saved."
@@ -412,6 +418,9 @@ msgstr ""
 msgid "That's no longer available."
 msgstr ""
 
+msgid "That's you."
+msgstr ""
+
 msgid "They won't be able to message you, and you won't see each other's posts or profiles."
 msgstr ""
 
@@ -433,6 +442,9 @@ msgstr ""
 msgid "This sign-in method is not enabled."
 msgstr ""
 
+msgid "This user isn't available."
+msgstr ""
+
 msgid "Too many attempts. Try again later."
 msgstr ""
 
@@ -443,6 +455,9 @@ msgid "Uploading…"
 msgstr ""
 
 msgid "Verification email sent."
+msgstr ""
+
+msgid "View profile"
 msgstr ""
 
 msgid "Violence or threats"
@@ -458,6 +473,9 @@ msgid "Welcome"
 msgstr ""
 
 msgid "What's new?"
+msgstr ""
+
+msgid "Write a comment…"
 msgstr ""
 
 msgid "You"
@@ -485,9 +503,6 @@ msgid "connecting"
 msgstr ""
 
 msgid "idle"
-msgstr ""
-
-msgid "just now"
 msgstr ""
 
 msgid "paused"

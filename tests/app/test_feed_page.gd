@@ -1,6 +1,11 @@
 extends GdUnitTestSuite
 ## feed 页：拉时间线渲染卡片、点赞切换、纯文字发布（幂等键在重试间不变）、Dev 会话不联网。
 
+class NavRecorder extends RefCounted:
+	var calls: Array = []
+	func go(route: String, args: Dictionary) -> void:
+		calls.append({"route": route, "args": args})
+
 var session: AuthSession
 var feed_t: FakeTransport
 var safety_t: FakeTransport
@@ -43,7 +48,7 @@ func test_refresh_renders_timeline_cards_and_more_button() -> void:
 	assert_str((first.find_child("Text", true, false) as Label).text).is_equal("first")
 	assert_str((first.find_child("Like", true, false) as Button).text).is_equal("Like 0")
 	assert_str((p.list.get_child(1).find_child("Like", true, false) as Button).text).is_equal("Liked 3")
-	assert_str((first.find_child("Meta", true, false) as Label).text).is_equal("2 comments")
+	assert_str((first.find_child("Meta", true, false) as Button).text).is_equal("2 comments")
 	assert_bool(p.more_button.visible).is_true()
 	assert_str(p.status.text).is_empty()
 
@@ -226,3 +231,23 @@ func test_publish_with_attached_photos_uploads_then_posts_and_renders_thumbnails
 		await get_tree().process_frame
 	assert_bool(pic.loaded).is_true()
 	assert_int(int(pic.custom_minimum_size.x)).is_equal(48)
+
+
+func test_card_meta_opens_post_and_author_opens_user_page() -> void:
+	session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	feed_t.responses = [{"status": 200, "json": {"items": [_post("p1", "first")], "next_cursor": null}}]
+	var nav := NavRecorder.new()
+	var p := _page()
+	p.navigate = nav.go
+	await p.refresh()
+	var card: PanelContainer = p.list.get_child(0)
+	(card.find_child("Meta", true, false) as Button).pressed.emit()
+	assert_int(nav.calls.size()).is_equal(1)
+	assert_str(nav.calls[0].route).is_equal(AppRoutes.POST)
+	assert_str(nav.calls[0].args.post.id).is_equal("p1")
+	var tap := InputEventScreenTouch.new()
+	tap.pressed = true
+	(card.find_child("Author", true, false) as Label).gui_input.emit(tap)
+	assert_int(nav.calls.size()).is_equal(2)
+	assert_str(nav.calls[1].route).is_equal(AppRoutes.USER)
+	assert_str(nav.calls[1].args.user_id).is_equal("u-a")

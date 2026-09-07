@@ -11,7 +11,7 @@ const HISTORY_PAGE := 30
 const LONG_PRESS_S := 0.5
 const DRAG_CANCEL_PX := 12.0
 
-enum MenuItem { REPORT_MESSAGE, BLOCK_USER, DELETE_MESSAGE, REPORT_USER, MEMBERS, ADD_PEOPLE, LEAVE_GROUP }
+enum MenuItem { REPORT_MESSAGE, BLOCK_USER, DELETE_MESSAGE, REPORT_USER, MEMBERS, ADD_PEOPLE, LEAVE_GROUP, VIEW_PROFILE }
 
 var auth: AuthSession
 var im: ImApi
@@ -22,6 +22,8 @@ var images: ImageCache
 var picker: PhotoPicker
 ## 退群 / 拉黑对方后离开本页；默认 AppRouter.pop_instance。
 var leave_handler: Callable
+## 压栈别的页（对方主页）；默认 AppRouter.push_instance。
+var navigate: Callable
 var conversation: Dictionary = {}
 
 var scroll: ScrollContainer
@@ -534,6 +536,7 @@ func open_page_menu() -> void:
 		context_menu.add_item(tr("Add people"), MenuItem.ADD_PEOPLE)
 		context_menu.add_item(tr("Leave group"), MenuItem.LEAVE_GROUP)
 	else:
+		context_menu.add_item(tr("View profile"), MenuItem.VIEW_PROFILE)
 		context_menu.add_item(tr("Report user"), MenuItem.REPORT_USER)
 		context_menu.add_item(tr("Block user"), MenuItem.BLOCK_USER)
 	_popup(context_menu)
@@ -579,6 +582,12 @@ func _on_menu(id: int) -> void:
 			add_edit.grab_focus()
 		MenuItem.LEAVE_GROUP:
 			_popup(leave_confirm)
+		MenuItem.VIEW_PROFILE:
+			if not peer_id().is_empty():
+				if navigate.is_valid():
+					navigate.call(AppRoutes.USER, {"user_id": peer_id()})
+				else:
+					AppRouter.push_instance(AppRoutes.USER, {"user_id": peer_id()})
 
 func _on_report_reason(index: int) -> void:
 	if index < 0 or index >= SafetyApi.REASONS.size():

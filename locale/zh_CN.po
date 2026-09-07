@@ -504,3 +504,39 @@ msgstr "这个服务器还不能上传图片。"
 
 msgid "Uploading…"
 msgstr "上传中…"
+
+msgid "%d followers"
+msgstr "%d 位关注者"
+
+msgid "%d following"
+msgstr "关注 %d 人"
+
+msgid "Comments"
+msgstr "评论"
+
+msgid "Follow"
+msgstr "关注"
+
+msgid "Following"
+msgstr "已关注"
+
+msgid "Follows you"
+msgstr "关注了你"
+
+msgid "No posts yet."
+msgstr "还没有动态。"
+
+msgid "Profile"
+msgstr "主页"
+
+msgid "That's you."
+msgstr "这是你自己。"
+
+msgid "This user isn't available."
+msgstr "这个用户不可用。"
+
+msgid "View profile"
+msgstr "查看主页"
+
+msgid "Write a comment…"
+msgstr "写评论…"

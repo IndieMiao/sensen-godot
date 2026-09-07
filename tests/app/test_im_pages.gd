@@ -282,7 +282,11 @@ func test_chat_long_press_menu_reports_blocks_and_unsends() -> void:
 	assert_that(safety_t.requests[0].body).is_equal({"target_type": "message", "target_id": "m1", "reason": "harassment"})
 	assert_bool(p.status.text.contains("report")).is_true()
 	p.open_page_menu()
-	assert_int(p.context_menu.item_count).is_equal(2)
+	assert_int(p.context_menu.item_count).is_equal(3)
+	p.navigate = nav.go
+	p._on_menu(ChatScript.MenuItem.VIEW_PROFILE)
+	assert_str(nav.calls[-1].route).is_equal(AppRoutes.USER)
+	assert_str(nav.calls[-1].args.user_id).is_equal("u-c1")
 	p._on_menu(ChatScript.MenuItem.REPORT_USER)
 	assert_that(p.pending_report).is_equal({"type": "user", "id": "u-c1"})
 	assert_bool(p.open_message_menu("m1")).is_true()
