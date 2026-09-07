@@ -3,8 +3,8 @@ extends AppPage
 ## 发送带幂等 client_id：失败时文字留在输入框，重发用同一个 client_id，服务端不会存两条。
 ## 第二刀：群聊（别人的气泡带昵称；页头菜单看成员 / 拉人 / 退群）、已读回执（单聊「已读」、群聊
 ## 「N 人已读」，只标在最后一条被读到的自己的消息上）、长按或右键气泡 → 举报消息 / 拉黑发送者 /
-## 撤回自己的；单聊页头菜单 → 举报或拉黑对方。
-## auth / im / profile / safety / leave_handler 可注入；测试直接调 _on_im_event() 模拟推送。
+## 撤回自己的；单聊页头菜单 → 举报或拉黑对方。图片消息：「+」选一张 → 上传 → send_image，气泡里按尺寸占位后填图。
+## auth / im / profile / safety / uploads / images / picker / leave_handler 可注入；测试直接调 _on_im_event() 模拟推送。
 
 const HISTORY_PAGE := 30
 ## 长按判定：按住不动这么久弹菜单；期间移动超过 DRAG_CANCEL_PX 视为在滚列表，取消。
@@ -17,6 +17,9 @@ var auth: AuthSession
 var im: ImApi
 var profile: ProfileApi
 var safety: SafetyApi
+var uploads: UploadApi
+var images: ImageCache
+var picker: PhotoPicker
 ## 退群 / 拉黑对方后离开本页；默认 AppRouter.pop_instance。
 var leave_handler: Callable
 var conversation: Dictionary = {}
@@ -25,6 +28,8 @@ var scroll: ScrollContainer
 var list: VBoxContainer
 var composer: LineEdit
 var send_button: Button
+var attach_button: Button
+var attaching := false
 var status: Label
 var menu_button: Button
 var context_menu: PopupMenu
@@ -52,6 +57,8 @@ var pressed_at := Vector2.ZERO
 var menu_target := ""
 var pending_report: Dictionary = {}
 var block_target := ""
+
+signal picture_loaded(message_id: String)
 
 func _init() -> void:
 	keyboard_mode = KeyboardAvoider.Mode.SHRINK
@@ -112,6 +119,10 @@ func _build_body() -> void:
 	var row := HBoxContainer.new()
 	row.name = "Composer"
 	row.add_theme_constant_override("separation", 8)
+	attach_button = GameUi.button("", "+", "PhotoPicker → POST /uploads → send_image")
+	attach_button.name = "Attach"
+	attach_button.pressed.connect(func(): attach_photo())
+	row.add_child(attach_button)
 	composer = LineEdit.new()
 	composer.name = "Text"
 	composer.placeholder_text = tr("Message")
@@ -170,6 +181,20 @@ func _profile() -> ProfileApi:
 
 func _safety() -> SafetyApi:
 	return safety if safety != null else Net.safety
+
+func _uploads() -> UploadApi:
+	return uploads if uploads != null else Net.uploads
+
+func _images() -> ImageCache:
+	return images if images != null else Net.images
+
+func _picker() -> PhotoPicker:
+	if picker == null:
+		picker = PhotoPicker.new()
+	return picker
+
+func image_url(key: String) -> String:
+	return Net.file_url(key)
 
 func conversation_id() -> String:
 	return str(conversation.get("id", ""))
@@ -258,6 +283,43 @@ func send() -> bool:
 	_scroll_to_end()
 	return true
 
+## 「+」：选一张 → 上传 → 图片消息（输入框里的文字当图注一起发）。取消选图不算失败也不报错。
+func attach_photo() -> bool:
+	var api := _im()
+	if attaching or api == null or _uploads() == null:
+		return false
+	attaching = true
+	attach_button.disabled = true
+	status.text = tr("Choosing…")
+	var picked: Dictionary = await _picker().pick(1)
+	var items: Array = picked.get("items", []) if picked.get("items") is Array else []
+	if not bool(picked.get("ok", false)) or items.is_empty():
+		status.text = describe_error(picked) if not bool(picked.get("ok", false)) else ""
+		_attach_done()
+		return false
+	status.text = tr("Uploading…")
+	var up: Dictionary = await _uploads().upload_image(items[0])
+	if not bool(up.get("ok", false)):
+		status.text = describe_error(up)
+		_attach_done()
+		return false
+	var r: Dictionary = await api.send_image(conversation_id(), {"key": up.key, "w": int(up.w), "h": int(up.h)}, composer.text.strip_edges())
+	_attach_done()
+	if not bool(r.get("ok", false)):
+		status.text = describe_error(r)
+		return false
+	composer.text = ""
+	status.text = ""
+	_append(r)
+	conversation["last_read_seq"] = maxi(int(conversation.get("last_read_seq", 0)), int(r.get("seq", 0)))
+	_update_receipts()
+	_scroll_to_end()
+	return true
+
+func _attach_done() -> void:
+	attaching = false
+	attach_button.disabled = false
+
 ## Net.im_event：只吃本会话的事件；其他会话的由列表页处理。
 func _on_im_event(e: Dictionary) -> void:
 	if str(e.get("conversation_id", "")) != conversation_id():
@@ -294,6 +356,10 @@ func describe_error(r: Dictionary) -> String:
 			return tr("Can't reach the server. Check your connection and try again.")
 		"IM_NOT_CONFIGURED":
 			return tr("Chat isn't available on this server yet.")
+		"UPLOADS_NOT_CONFIGURED":
+			return tr("Photos can't be uploaded on this server yet.")
+		"UNSUPPORTED":
+			return tr("No picker on this platform.")
 		"NOT_GROUP":
 			return tr("This isn't a group chat.")
 		"FORBIDDEN":
@@ -362,6 +428,11 @@ func _append(m: Dictionary) -> void:
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.custom_minimum_size.x = 120
 	label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	if str(m.get("kind", "text")) == "image" and not bool(m.get("deleted", false)):
+		var pic := PictureView.new()
+		pic.name = "Picture"
+		box.add_child(pic)
+		_show_picture(pic, label, id, m.get("body", {}) if m.get("body") is Dictionary else {})
 	box.add_child(label)
 	if mine:
 		var receipt := GameUi.label("", 11, GameUi.MUTED)
@@ -429,13 +500,28 @@ func _update_receipts() -> void:
 		if r.visible:
 			r.text = caption
 
+## 图片气泡：先「[Photo]」占位，图到了换成图注（没有图注就只留图）。
+func _show_picture(pic: PictureView, label: Label, id: String, body: Dictionary) -> void:
+	var ok: bool = await pic.show_picture(_images(), image_url(_text(body.get("key", ""))), int(body.get("w", 0)), int(body.get("h", 0)), Vector2(220, 220))
+	if ok and is_instance_valid(label):
+		var cap := _text(body.get("text", ""))
+		label.text = cap
+		label.visible = not cap.is_empty()
+	picture_loaded.emit(id)
+
 func _mark_deleted(id: String) -> void:
 	if not bubbles.has(id):
 		return
 	for m in messages:
 		if str(m.get("id", "")) == id:
 			m["deleted"] = true
-	(bubbles[id].find_child("Text", true, false) as Label).text = tr("Message deleted")
+	var row: Node = bubbles[id]
+	var text := row.find_child("Text", true, false) as Label
+	text.text = tr("Message deleted")
+	text.visible = true
+	var pic := row.find_child("Picture", true, false)
+	if pic != null:
+		pic.visible = false
 	_update_receipts()
 
 # —— 菜单：页头「•••」与气泡长按 / 右键 ——

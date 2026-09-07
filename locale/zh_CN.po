@@ -489,3 +489,18 @@ msgstr "选照片"
 
 msgid "Picking…"
 msgstr "选图中…"
+
+msgid "%d photos attached"
+msgstr "已选 %d 张图"
+
+msgid "Choosing…"
+msgstr "选图中…"
+
+msgid "Photos"
+msgstr "图片"
+
+msgid "Photos can't be uploaded on this server yet."
+msgstr "这个服务器还不能上传图片。"
+
+msgid "Uploading…"
+msgstr "上传中…"

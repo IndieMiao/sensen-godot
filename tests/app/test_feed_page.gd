@@ -153,3 +153,76 @@ func test_block_removes_authors_cards_locally() -> void:
 	assert_int(p.list.get_child_count()).is_equal(1)
 	assert_str(p.list.get_child(0).name).is_equal("Post_p2")
 	assert_bool(p.status.text.contains("Blocked")).is_true()
+
+const PIC_DIR := "user://qa_test_pages"
+
+func _png_file(name: String, w: int, h: int) -> String:
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(PIC_DIR))
+	var img := Image.create_empty(w, h, false, Image.FORMAT_RGBA8)
+	img.fill(Color.CORAL)
+	var path := "%s/%s.png" % [PIC_DIR, name]
+	img.save_png(path)
+	return path
+
+## 把预签名 + 原始 PUT 都记在 box 里（lambda 捕获的是副本，要用引用类型带出来）。
+func _upload_api(presigned: Array, box: Dictionary) -> UploadApi:
+	var t := FakeTransport.new(presigned)
+	var c := ApiClient.new("https://example.test/v1", t.callable())
+	c.raw_transport = func(method: String, url: String, headers: PackedStringArray, bytes: PackedByteArray) -> ApiClient.Response:
+		box["puts"].append({"method": method, "url": url, "headers": headers, "bytes": bytes})
+		return ApiClient.Response.new(true, 200, {}, "")
+	box["presign"] = t
+	return UploadApi.new(c)
+
+func _presigned(key: String) -> Dictionary:
+	return {"status": 201, "json": {"key": key, "url": "http://h/v1/uploads/local/tok-%s" % key.get_file(), "method": "PUT", "headers": {"content-type": "image/jpeg"}, "expires_at": 1, "public_url": "http://h/v1/files/%s" % key}}
+
+func _serving(box: Dictionary) -> ImageCache:
+	return ImageCache.new(func(_url: String) -> ApiClient.Response:
+		var r := ApiClient.Response.new(true, 200, {}, "")
+		r.bytes = box["puts"][0].bytes if not box["puts"].is_empty() else PackedByteArray()
+		return r)
+
+func _picker_of(paths: Array) -> PhotoPicker:
+	var pp := PhotoPicker.new()
+	pp.max_side = 64
+	pp.picker = func(_n: int) -> PackedStringArray: return PackedStringArray(paths)
+	return pp
+
+func test_publish_with_attached_photos_uploads_then_posts_and_renders_thumbnails() -> void:
+	session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	var a := _png_file("f1", 30, 30)
+	var b := _png_file("f2", 30, 15)
+	var post := _post("p9", "", false, 0, "u1")
+	post["images"] = [{"key": "u/u1/20260907/k1.jpg", "w": 30, "h": 30}, {"key": "u/u1/20260907/k2.jpg", "w": 30, "h": 15}]
+	feed_t.responses = [{"status": 200, "json": {"items": [], "next_cursor": null}}, {"status": 201, "json": post}]
+	var box := {"puts": []}
+	var p := _page()
+	p.uploads = _upload_api([_presigned("u/u1/20260907/k1.jpg"), _presigned("u/u1/20260907/k2.jpg")], box)
+	p.picker = _picker_of([a, b])
+	p.images = _serving(box)
+	await p.refresh()
+	assert_bool(await p.publish()).is_false() # 没字也没图
+	assert_bool(await p.pick_photos()).is_true()
+	assert_str(p.attached_label.text).is_equal("2 photos attached")
+	assert_bool(p.attached_label.visible).is_true()
+	assert_bool(await p.publish()).is_true() # 只有图也能发
+	assert_int(box.puts.size()).is_equal(2)
+	var body: Dictionary = feed_t.requests[1].body
+	assert_int(body.images.size()).is_equal(2)
+	assert_str(str(body.images[0].key)).is_equal("u/u1/20260907/k1.jpg")
+	assert_int(int(body.images[1].h)).is_equal(15)
+	assert_int(p.attached.size()).is_equal(0)
+	assert_bool(p.attached_label.visible).is_false()
+	var card: PanelContainer = p.list.get_child(0)
+	var strip := card.find_child("Pictures", true, false)
+	assert_object(strip).is_not_null()
+	assert_int(strip.get_child_count()).is_equal(2)
+	assert_bool((card.find_child("Text", true, false) as Label).visible).is_false()
+	var pic := strip.get_child(0).get_child(0) as PictureView
+	for i in 60:
+		if pic.loaded:
+			break
+		await get_tree().process_frame
+	assert_bool(pic.loaded).is_true()
+	assert_int(int(pic.custom_minimum_size.x)).is_equal(48)

@@ -177,18 +177,28 @@ func run_login() -> void:
 		return
 	await settle()
 	await shot("chat_open")
-	var say := OS.get_environment("SENSEN_QA_SAY")
-	if say.is_empty():
-		return
 	var chat := AppRouter.top_instance()
 	if chat == null or not chat.has_method("send"):
 		_error("chat page not on top")
 		return
-	chat.composer.text = say
-	if not await chat.send():
-		_error("send failed: %s" % chat.status.text)
-	await settle()
-	await shot("chat_sent")
+	var say := OS.get_environment("SENSEN_QA_SAY")
+	if not say.is_empty():
+		chat.composer.text = say
+		if not await chat.send():
+			_error("send failed: %s" % chat.status.text)
+		await settle()
+		await shot("chat_sent")
+	# SENSEN_QA_PHOTO=<路径>（user:// 或绝对路径）：不弹系统选图器，直接把这张图当选中的发出去——
+	# 图片消息的上传 / 发送 / 渲染整条链在桌面和真机上都能自动跑。
+	var photo := OS.get_environment("SENSEN_QA_PHOTO").strip_edges()
+	if not photo.is_empty():
+		var pp := PhotoPicker.new()
+		pp.picker = func(_n: int) -> PackedStringArray: return PackedStringArray([photo])
+		chat.picker = pp
+		if not await chat.attach_photo():
+			_error("attach failed: %s" % chat.status.text)
+		await settle()
+		await shot("photo_sent")
 
 ## "email:password" → {email, password}；密码里可以带冒号（只按第一个冒号切）。
 static func parse_credentials(raw: String) -> Dictionary:

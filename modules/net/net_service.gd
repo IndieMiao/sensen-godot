@@ -26,6 +26,8 @@ var profile: ProfileApi
 var feed: FeedApi
 var safety: SafetyApi
 var im: ImApi
+var uploads: UploadApi
+var images: ImageCache
 ## 最后一条已交付给上层的 IM 事件 seq；-1 = 还没同步过。
 var im_last_seq := -1
 var im_syncing := false
@@ -41,13 +43,9 @@ func _ready() -> void:
 	firebase = FirebaseAuth.new(FirebaseConfig.api_key(), ApiClient.make_http_transport(self))
 	auth.refresher = firebase.refresh
 	client = ApiClient.new(base_url(), ApiClient.make_http_transport(self))
+	client.raw_transport = ApiClient.make_raw_http_transport(self)
 	bind_auth(client)
-	session = FarmSession.new(client)
-	account = AccountApi.new(client)
-	profile = ProfileApi.new(client)
-	feed = FeedApi.new(client)
-	safety = SafetyApi.new(client)
-	im = ImApi.new(client)
+	_build_apis()
 	if not is_test_process():
 		im_last_seq = load_im_seq()
 	ws = WsClient.new()
@@ -97,13 +95,22 @@ static func base_url() -> String:
 func use_transport(t: Callable, p_base := "https://example.test/v1") -> void:
 	client = ApiClient.new(p_base, t)
 	bind_auth(client)
+	_build_apis()
+	booted_once = false
+
+func _build_apis() -> void:
 	session = FarmSession.new(client)
 	account = AccountApi.new(client)
 	profile = ProfileApi.new(client)
 	feed = FeedApi.new(client)
 	safety = SafetyApi.new(client)
 	im = ImApi.new(client)
-	booted_once = false
+	uploads = UploadApi.new(client)
+	images = ImageCache.new(func(url: String): return await client.get_bytes(url))
+
+## 图片统一从服务端 /files/<key> 读：本地模式直接给字节，R2 模式 302 到公网地址。
+static func file_url(key: String) -> String:
+	return "%s/files/%s" % [base_url(), key]
 
 ## 农场分支：登录 + 取回已有农场（404 是正常的：新玩家还没建场）。返回是否登录成功。
 func boot() -> bool:

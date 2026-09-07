@@ -8,9 +8,16 @@ extends AppPage
 var auth: AuthSession
 var feed: FeedApi
 var safety: SafetyApi
+var uploads: UploadApi
+var images: ImageCache
+var picker: PhotoPicker
 
 var composer: LineEdit
 var post_button: Button
+var photos_button: Button
+var attached_label: Label
+## 已选好、待随下一条动态上传的图（ImagePrep 的 item）。
+var attached: Array = []
 var status: Label
 var list: VBoxContainer
 var more_button: Button
@@ -41,11 +48,19 @@ func _build_body() -> void:
 	composer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	composer.custom_minimum_size.y = 44
 	row.add_child(composer)
+	photos_button = GameUi.button("", tr("Photos"), "PhotoPicker.pick(9)")
+	photos_button.name = "Photos"
+	photos_button.pressed.connect(func(): pick_photos())
+	row.add_child(photos_button)
 	post_button = GameUi.button("", tr("Post"), "POST /posts")
 	post_button.name = "Post"
 	post_button.pressed.connect(_on_post)
 	row.add_child(post_button)
 	body.add_child(row)
+	attached_label = GameUi.label("", 12, GameUi.MUTED)
+	attached_label.name = "Attached"
+	attached_label.visible = false
+	body.add_child(attached_label)
 	status = GameUi.label("", 12, GameUi.MUTED)
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -96,6 +111,36 @@ func _feed() -> FeedApi:
 func _safety() -> SafetyApi:
 	return safety if safety != null else Net.safety
 
+func _uploads() -> UploadApi:
+	return uploads if uploads != null else Net.uploads
+
+func _images() -> ImageCache:
+	return images if images != null else Net.images
+
+func _picker() -> PhotoPicker:
+	if picker == null:
+		picker = PhotoPicker.new()
+	return picker
+
+func image_url(key: String) -> String:
+	return Net.file_url(key)
+
+## 选最多 9 张，先挂在发布器上，随下一条动态一起上传。
+func pick_photos() -> bool:
+	if busy:
+		return false
+	var picked: Dictionary = await _picker().pick(FeedApi.POST_IMAGES_MAX)
+	if not bool(picked.get("ok", false)):
+		status.text = describe_error(picked)
+		return false
+	var items: Array = picked.get("items", []) if picked.get("items") is Array else []
+	if items.is_empty():
+		return false
+	attached = items
+	attached_label.text = tr("%d photos attached") % attached.size()
+	attached_label.visible = true
+	return true
+
 ## Dev 会话没有真 token；服务端没部署时不刷屏报错，只给一句提示。
 func _can_load() -> bool:
 	var s := _session()
@@ -140,14 +185,28 @@ func load_more() -> bool:
 ## 发布纯文字动态。返回是否成功。
 func publish() -> bool:
 	var text := composer.text.strip_edges()
-	if text.is_empty() or busy or _feed() == null:
+	if (text.is_empty() and attached.is_empty()) or busy or _feed() == null:
 		return false
 	if pending_key.is_empty():
 		pending_key = ApiClient.new_idempotency_key()
 	busy = true
 	post_button.disabled = true
+	var image_refs: Array = []
+	if not attached.is_empty():
+		if _uploads() == null:
+			busy = false
+			post_button.disabled = false
+			return false
+		status.text = tr("Uploading…")
+		var up: Dictionary = await _uploads().upload_images(attached)
+		if not bool(up.get("ok", false)):
+			busy = false
+			post_button.disabled = false
+			status.text = describe_error(up)
+			return false
+		image_refs = up.get("images", [])
 	status.text = tr("Posting…")
-	var r: Dictionary = await _feed().create_post(text, [], pending_key)
+	var r: Dictionary = await _feed().create_post(text, image_refs, pending_key)
 	busy = false
 	post_button.disabled = false
 	if not bool(r.get("ok", false)):
@@ -155,6 +214,8 @@ func publish() -> bool:
 		return false
 	pending_key = ""
 	composer.text = ""
+	attached = []
+	attached_label.visible = false
 	items.push_front(r)
 	_render()
 	status.text = tr("Posted.")
@@ -241,7 +302,24 @@ func _card(p: Dictionary) -> PanelContainer:
 	var text := GameUi.label(_text(p.get("text", "")), 14)
 	text.name = "Text"
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text.visible = not text.text.is_empty()
 	col.add_child(text)
+	var pics: Array = p.get("images", []) if p.get("images") is Array else []
+	if not pics.is_empty():
+		var strip := HBoxContainer.new()
+		strip.name = "Pictures"
+		strip.add_theme_constant_override("separation", 6)
+		for im in pics:
+			if not (im is Dictionary):
+				continue
+			var frame := PanelContainer.new()
+			frame.add_theme_stylebox_override("panel", GameUi.surface(GameUi.PAPER, 0, 6))
+			var pic := PictureView.new()
+			pic.name = "Picture"
+			frame.add_child(pic)
+			strip.add_child(frame)
+			pic.show_picture(_images(), image_url(_text(im.get("key", ""))), int(im.get("w", 0)), int(im.get("h", 0)), Vector2(96, 96))
+		col.add_child(strip)
 	var actions := HBoxContainer.new()
 	actions.add_theme_constant_override("separation", 8)
 	var like := GameUi.button("", "", "PUT/DELETE /posts/:id/like")

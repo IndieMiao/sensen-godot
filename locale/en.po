@@ -7,6 +7,9 @@ msgstr ""
 msgid "%d comments"
 msgstr ""
 
+msgid "%d photos attached"
+msgstr ""
+
 msgid "%d picked"
 msgstr ""
 
@@ -89,6 +92,9 @@ msgid "Chats"
 msgstr ""
 
 msgid "Child safety"
+msgstr ""
+
+msgid "Choosing…"
 msgstr ""
 
 msgid "Clear log"
@@ -268,6 +274,12 @@ msgstr ""
 msgid "Password reset email sent."
 msgstr ""
 
+msgid "Photos"
+msgstr ""
+
+msgid "Photos can't be uploaded on this server yet."
+msgstr ""
+
 msgid "Pick photos"
 msgstr ""
 
@@ -425,6 +437,9 @@ msgid "Too many attempts. Try again later."
 msgstr ""
 
 msgid "Unsend"
+msgstr ""
+
+msgid "Uploading…"
 msgstr ""
 
 msgid "Verification email sent."

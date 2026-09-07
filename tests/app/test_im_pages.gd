@@ -330,3 +330,84 @@ func test_chat_group_menu_adds_people_and_leaves() -> void:
 	assert_str(im_t.requests[4].method).is_equal("DELETE")
 	assert_bool(str(im_t.requests[4].url).ends_with("/v1/im/groups/g1/members/me")).is_true()
 	assert_int(nav.left).is_equal(1)
+
+const PIC_DIR := "user://qa_test_pages"
+
+func _png_file(name: String, w: int, h: int) -> String:
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(PIC_DIR))
+	var img := Image.create_empty(w, h, false, Image.FORMAT_RGBA8)
+	img.fill(Color.CORAL)
+	var path := "%s/%s.png" % [PIC_DIR, name]
+	img.save_png(path)
+	return path
+
+## 把预签名 + 原始 PUT 都记在 box 里（lambda 捕获的是副本，要用引用类型带出来）。
+func _upload_api(presigned: Array, box: Dictionary) -> UploadApi:
+	var t := FakeTransport.new(presigned)
+	var c := ApiClient.new("https://example.test/v1", t.callable())
+	c.raw_transport = func(method: String, url: String, headers: PackedStringArray, bytes: PackedByteArray) -> ApiClient.Response:
+		box["puts"].append({"method": method, "url": url, "headers": headers, "bytes": bytes})
+		return ApiClient.Response.new(true, 200, {}, "")
+	box["presign"] = t
+	return UploadApi.new(c)
+
+func _presigned(key: String) -> Dictionary:
+	return {"status": 201, "json": {"key": key, "url": "http://h/v1/uploads/local/tok-%s" % key.get_file(), "method": "PUT", "headers": {"content-type": "image/jpeg"}, "expires_at": 1, "public_url": "http://h/v1/files/%s" % key}}
+
+func _serving(box: Dictionary) -> ImageCache:
+	return ImageCache.new(func(_url: String) -> ApiClient.Response:
+		var r := ApiClient.Response.new(true, 200, {}, "")
+		r.bytes = box["puts"][0].bytes if not box["puts"].is_empty() else PackedByteArray()
+		return r)
+
+func _picker_of(paths: Array) -> PhotoPicker:
+	var pp := PhotoPicker.new()
+	pp.max_side = 64
+	pp.picker = func(_n: int) -> PackedStringArray: return PackedStringArray(paths)
+	return pp
+
+func _img_msg(id: String, seq: int, sender: String, key: String, w: int, h: int, caption := "") -> Dictionary:
+	var body := {"key": key, "w": w, "h": h}
+	if not caption.is_empty():
+		body["text"] = caption
+	return {"id": id, "conversation_id": "c1", "seq": seq, "sender_id": sender, "client_id": id, "kind": "image", "body": body, "created_at": seq * 1000, "deleted": false}
+
+func test_chat_attach_photo_uploads_then_sends_image_and_fills_bubble() -> void:
+	var png := _png_file("pick1", 40, 20)
+	im_t.responses = [{"status": 200, "json": {"items": []}}, {"status": 201, "json": _img_msg("m7", 7, "me-1", "u/me-1/20260907/x.jpg", 40, 20, "cap")}]
+	var box := {"puts": []}
+	var p := _chat_page(_conv("c1", "Ali"))
+	p.uploads = _upload_api([_presigned("u/me-1/20260907/x.jpg")], box)
+	p.picker = _picker_of([png])
+	p.images = _serving(box)
+	await p.load_history()
+	p.composer.text = " cap "
+	assert_bool(await p.attach_photo()).is_true()
+	assert_int(box.puts.size()).is_equal(1)
+	assert_str(box.puts[0].url).is_equal("http://h/v1/uploads/local/tok-x.jpg")
+	assert_bool((box.puts[0].bytes as PackedByteArray).size() > 0).is_true()
+	assert_int(int(box.presign.requests[0].body.size)).is_equal((box.puts[0].bytes as PackedByteArray).size())
+	var sent: Dictionary = im_t.requests[1].body
+	assert_str(str(sent.kind)).is_equal("image")
+	assert_str(str(sent.image.key)).is_equal("u/me-1/20260907/x.jpg")
+	assert_int(int(sent.image.w)).is_equal(40)
+	assert_str(str(sent.text)).is_equal("cap")
+	assert_str(p.composer.text).is_empty()
+	assert_bool(p.attaching).is_false()
+	var pic := p.bubbles["m7"].find_child("Picture", true, false) as PictureView
+	assert_object(pic).is_not_null()
+	for i in 60:
+		if pic.loaded:
+			break
+		await get_tree().process_frame
+	assert_bool(pic.loaded).is_true()
+	assert_int(int(pic.custom_minimum_size.x)).is_equal(48) # 40x20 只缩不放，最小 48
+	assert_str((p.bubbles["m7"].find_child("Text", true, false) as Label).text).is_equal("cap")
+	# 取消选图：不算失败也不报错
+	p.picker = _picker_of([])
+	assert_bool(await p.attach_photo()).is_false()
+	assert_str(p.status.text).is_empty()
+	# 撤回图片消息：图藏起来、文字换成「已撤回」
+	p._on_im_event({"type": "message_deleted", "seq": 12, "conversation_id": "c1", "message_id": "m7", "message_seq": 7})
+	assert_bool(pic.visible).is_false()
+	assert_str((p.bubbles["m7"].find_child("Text", true, false) as Label).text).is_equal("Message deleted")

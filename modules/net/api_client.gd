@@ -24,6 +24,8 @@ class Response extends RefCounted:
 	var status := 0
 	var json: Dictionary = {}
 	var error := ""
+	## 原始响应体（只有 put_bytes / get_bytes 这类原始请求会填）。
+	var bytes := PackedByteArray()
 
 	func _init(p_ok := false, p_status := 0, p_json: Dictionary = {}, p_error := "") -> void:
 		ok = p_ok
@@ -53,6 +55,9 @@ var on_unauthorized: Callable
 var retry_delay_s := 0.5
 ## transport.call(method, url, headers, body_text) -> Response
 var transport: Callable
+## raw_transport.call(method, url, headers, bytes) -> Response（Response.bytes 带回响应体）。
+## 上传到预签名地址、读图这类不走 base_url、不带 token 的原始字节请求用它。
+var raw_transport: Callable
 
 func _init(p_base_url := DEFAULT_BASE, p_transport := Callable()) -> void:
 	base_url = p_base_url
@@ -183,6 +188,51 @@ static func env_proxy_for(url: String) -> Dictionary:
 	if no.is_empty():
 		no = OS.get_environment("no_proxy")
 	return proxy_for(url, https, no)
+
+## 原始字节 PUT 到任意 URL（预签名上传地址）。headers 形如 ["content-type: image/jpeg"]。
+func put_bytes(url: String, headers: PackedStringArray, bytes: PackedByteArray) -> Response:
+	return await _raw("PUT", url, headers, bytes)
+
+## 原始字节 GET（读图）。
+func get_bytes(url: String, headers := PackedStringArray()) -> Response:
+	return await _raw("GET", url, headers, PackedByteArray())
+
+func _raw(method: String, url: String, headers: PackedStringArray, bytes: PackedByteArray) -> Response:
+	if not raw_transport.is_valid():
+		return Response.new(false, 0, {}, "NO_RAW_TRANSPORT")
+	return await raw_transport.call(method, url, headers, bytes)
+
+## 真实原始字节传输：HTTPRequest.request_raw；响应是 JSON 才解析（图片字节喂给 JSON 会刷错误）。
+static func make_raw_http_transport(host: Node) -> Callable:
+	return func(method: String, url: String, headers: PackedStringArray, bytes: PackedByteArray) -> Response:
+		var req := HTTPRequest.new()
+		req.timeout = 60.0 # 上传几 MB 的图，弱网下比 API 请求慢得多
+		var proxy := env_proxy_for(url)
+		if not str(proxy.host).is_empty():
+			req.set_https_proxy(proxy.host, int(proxy.port))
+			req.set_http_proxy(proxy.host, int(proxy.port))
+		host.add_child(req)
+		var verb := HTTPClient.METHOD_GET
+		match method:
+			"PUT": verb = HTTPClient.METHOD_PUT
+			"POST": verb = HTTPClient.METHOD_POST
+		var err := req.request_raw(url, headers, verb, bytes)
+		if err != OK:
+			req.queue_free()
+			return Response.new(false, 0, {}, "request failed: %d" % err)
+		var result: Array = await req.request_completed
+		req.queue_free()
+		if int(result[0]) != HTTPRequest.RESULT_SUCCESS:
+			return Response.new(false, 0, {}, "transport error: %d" % int(result[0]))
+		var r := Response.new(true, int(result[1]), {}, "")
+		r.bytes = result[3]
+		for h in (result[2] as PackedStringArray):
+			if str(h).to_lower().begins_with("content-type:") and str(h).to_lower().contains("json"):
+				var parsed = JSON.parse_string(r.bytes.get_string_from_utf8())
+				if parsed is Dictionary:
+					r.json = parsed
+				break
+		return r
 
 ## 真实传输：需要一个在场景树里的 Node 来挂 HTTPRequest。
 static func make_http_transport(host: Node) -> Callable:

@@ -38,8 +38,16 @@
 - 真机：探针页多了「Pick photos」和 `picker: native/dialog/none` 标签；`SENSEN_QA_PICK=1` 让 social 流在探针页
   弹选图器，人选完截 `photos_picked`。iPhone 13 上标签显示 `picker: native`（GDExtension 已装进包并加载）。
 
-## 4. 待做
+## 4. 接线（同晚）
 
-- 把 `PhotoPicker.pick()` 接进聊天页（图片消息）与 feed 发布器（多图）；上传要 R2 真桶或开发期本地存储。
+- 服务端没有 R2 时走开发期本地存储（`UPLOAD_LOCAL_DIR`，3a602ce）：presign 形状不变，字节 PUT 回本服务，
+  客户端读图统一 `Net.file_url(key)` = `<api>/files/<key>`（R2 模式 302 到公网地址）。
+- 客户端：`ApiClient.put_bytes / get_bytes`（原始字节传输，`raw_transport` 可注入）→ `UploadApi.upload_image(s)`
+  （presign + PUT，headers 原样带）→ `ImageCache`（同 URL 只下一次，按魔数解码）→ `PictureView`（按尺寸占位后填图）。
+- 聊天页「+」：选一张 → 上传 → `send_image`（输入框文字当图注）；图片气泡先「[Photo]」占位，图到了换成图注；
+  撤回时藏图。feed 发布器「Photos」：选最多 9 张挂在发布器上，随动态一起上传（只有图也能发）；卡片下方缩略图条。
+- QA 流 `SENSEN_QA_PHOTO=<路径>` 绕过系统选图器直接发这张图，桌面与真机都能自动跑整条链。
+
+## 5. 待做
 - Android 真机验证（本机没有 Android 设备）；AAR 是否进仓库。
 - template_release 版 iOS 静态库（发布链 SGODOT-70）。

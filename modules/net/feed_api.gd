@@ -2,6 +2,9 @@ class_name FeedApi
 extends RefCounted
 ## D4-b feed 的客户端（server/README.md「feed」）。返回格式同 AccountApi.wrap_response。
 
+## 与服务端 POST_IMAGES_MAX 一致。
+const POST_IMAGES_MAX := 9
+
 var client: ApiClient
 
 func _init(p_client: ApiClient) -> void:
