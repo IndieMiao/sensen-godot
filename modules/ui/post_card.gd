@@ -24,16 +24,29 @@ static func build(p: Dictionary, ctx: Dictionary) -> PanelContainer:
 	if not handle.is_empty():
 		who += " @%s" % handle
 	var now_ms: int = int(ctx.now_ms.call()) if ctx.get("now_ms") is Callable and (ctx.now_ms as Callable).is_valid() else int(Time.get_unix_time_from_system() * 1000.0)
+	var head_row := HBoxContainer.new()
+	head_row.name = "Head"
+	head_row.add_theme_constant_override("separation", 8)
+	var thumb := AvatarThumb.new(28.0)
+	thumb.name = "Avatar"
+	head_row.add_child(thumb)
+	thumb.show_avatar(author.get("avatar"))
 	var head := GameUi.label("%s · %s" % [who, age_text(now_ms, int(p.get("created_at", 0)))], 12, GameUi.MUTED)
 	head.name = "Author"
+	head.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	var on_author: Callable = ctx.get("on_author", Callable())
 	if on_author.is_valid():
-		# 点作者名进主页：Label 默认不收输入，改成按钮外观更麻烦，这里让它吃点击。
-		head.mouse_filter = Control.MOUSE_FILTER_STOP
-		head.gui_input.connect(func(e: InputEvent):
+		# 点作者名或头像进主页：Label / TextureRect 默认不收输入，这里让它们吃点击。
+		var tap := func(e: InputEvent):
 			if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
-				on_author.call(author))
-	col.add_child(head)
+				on_author.call(author)
+		head.mouse_filter = Control.MOUSE_FILTER_STOP
+		head.gui_input.connect(tap)
+		thumb.mouse_filter = Control.MOUSE_FILTER_STOP
+		thumb.gui_input.connect(tap)
+	head_row.add_child(head)
+	col.add_child(head_row)
 	var text := GameUi.label(_text(p.get("text", "")), 14)
 	text.name = "Text"
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

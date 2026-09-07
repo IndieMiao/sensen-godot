@@ -994,7 +994,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const seq = Number((req.body as Record<string, unknown> | undefined)?.seq);
     if (!Number.isInteger(seq) || seq < 0) return reply.code(400).send({ code: 'SCHEMA', field: 'seq', server_time: deps.now() });
     const r = await deps.im!.markRead(c.id, me.id, seq);
-    if (r.changed && c.kind === 'dm') {
+    // 单聊与群聊都广播：群里的「N 人已读」要实时推进，不能只靠进页时拉一次成员列表。
+    if (r.changed) {
       const others = (await deps.im!.members(c.id)).filter(m => m.user_id !== me.id).map(m => m.user_id);
       publish(await deps.im!.pushEvent(others, 'read', { conversation_id: c.id, user_id: me.id, read_seq: r.last_read_seq }, deps.now()));
     }

@@ -543,3 +543,27 @@ msgstr "写评论…"
 
 msgid "Show who I follow"
 msgstr "公开我关注的人"
+
+msgid "%d new"
+msgstr "%d 位新粉丝"
+
+msgid "Close friends"
+msgstr "互相关注"
+
+msgid "Followers"
+msgstr "关注者"
+
+msgid "New followers"
+msgstr "新粉丝"
+
+msgid "No followers yet."
+msgstr "还没有关注者。"
+
+msgid "No new followers."
+msgstr "没有新粉丝。"
+
+msgid "Not following anyone yet."
+msgstr "还没有关注任何人。"
+
+msgid "This user keeps their following list private."
+msgstr "这位用户没有公开关注列表。"

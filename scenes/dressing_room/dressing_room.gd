@@ -148,7 +148,19 @@ func _on_done() -> void:
 		_show_feedback("Couldn't save. Try again.")
 		_refresh_completion_state()
 		return
+	_publish_outfit(rig.current_config())
 	AppRouter.pop_instance()
+
+
+## B7：装扮同步到服务端资料（PUT /users/me/profile {avatar}），别人在地图 / 资料 / 列表里才看得到。
+## 本地存档已经落盘，这里失败只记日志——下次进「我的」页会再对一次（profile_page.sync_avatar）。
+func _publish_outfit(config: AvatarConfig) -> void:
+	var net := get_node_or_null("/root/Net")
+	if net == null or net.auth == null or not net.auth.is_signed_in() or net.auth.provider == "dev" or net.profile == null:
+		return
+	var r: Dictionary = await net.profile.update({"avatar": Avatar.config_to_dict(config)})
+	if not bool(r.get("ok", false)):
+		push_warning("DressingRoom: outfit not published: %s" % str(r.get("code", "")))
 
 
 func _refresh_completion_state() -> void:

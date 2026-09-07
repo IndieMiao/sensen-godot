@@ -231,6 +231,19 @@ func _row(c: Dictionary) -> Button:
 	var at := int(c.get("last_message_at", 0)) if c.get("last_message_at") != null else 0
 	var when := " · " + PostCard.age_text(_now_ms(), at) if at > 0 else ""
 	b.text = "%s%s%s\n%s" % [title, "  (%d)" % unread if unread > 0 else "", when, preview]
+	# 单聊显示对方形象，群聊用群图标；真图渲好了再换。
+	var peer: Dictionary = c.get("peer", {}) if c.get("peer") is Dictionary else {}
+	var thumb := AvatarThumb.new(44.0)
+	thumb.name = "Avatar"
+	b.add_child(thumb)
+	b.expand_icon = true
+	b.add_theme_constant_override("h_separation", 8)
+	if peer.is_empty():
+		b.icon = GameUi.icon("users-round")
+	else:
+		b.icon = thumb.placeholder_icon()
+		thumb.texture_ready.connect(func(tex: Texture2D): if is_instance_valid(b): b.icon = tex)
+		thumb.show_avatar(peer.get("avatar"))
 	b.pressed.connect(open_conversation.bind(c))
 	return b
 

@@ -62,3 +62,32 @@ func _drop_missing_parts(cfg: AvatarConfig) -> void:
 
 func save_outfit(config: AvatarConfig) -> Error:
 	return store.save_outfit(user_id, config)
+
+## —— 与服务端资料里的 avatar 字段互转（B7）。服务端不解释内容，只存 AvatarConfig 的 JSON 字典。——
+
+func has_saved_outfit() -> bool:
+	return store.load_outfit(user_id) != null
+
+## 本地存档 → 可直接放进 PUT /users/me/profile {avatar} 的字典；没有存档返回空字典。
+func outfit_dict() -> Dictionary:
+	var cfg := store.load_outfit(user_id)
+	if cfg == null:
+		return {}
+	return config_to_dict(cfg)
+
+static func config_to_dict(cfg: AvatarConfig) -> Dictionary:
+	var parsed = JSON.parse_string(cfg.to_json_text())
+	return parsed if parsed is Dictionary else {}
+
+static func config_from_dict(d: Variant) -> AvatarConfig:
+	if not (d is Dictionary) or (d as Dictionary).is_empty():
+		return null
+	return AvatarConfig.from_json_text(JSON.stringify(d))
+
+## 服务端下来的装扮落到本地（换机 / 重装后第一次登录）；缺失部件按本地部件池清洗。
+func adopt_outfit(d: Variant) -> Error:
+	var cfg := config_from_dict(d)
+	if cfg == null:
+		return ERR_INVALID_DATA
+	_drop_missing_parts(cfg)
+	return store.save_outfit(user_id, cfg)

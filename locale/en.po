@@ -10,13 +10,13 @@ msgstr ""
 msgid "%d following"
 msgstr ""
 
+msgid "%d new"
+msgstr ""
+
 msgid "%d photos attached"
 msgstr ""
 
 msgid "%d picked"
-msgstr ""
-
-msgid "%s · %d followers · %d following"
 msgstr ""
 
 msgid "@handle to start a chat"
@@ -38,9 +38,6 @@ msgid "Add people"
 msgstr ""
 
 msgid "An account with this email already exists."
-msgstr ""
-
-msgid "Avatar upload and Space 3D land later in B4."
 msgstr ""
 
 msgid "Back"
@@ -92,6 +89,9 @@ msgid "Choosing…"
 msgstr ""
 
 msgid "Clear log"
+msgstr ""
+
+msgid "Close friends"
 msgstr ""
 
 msgid "Comments"
@@ -169,6 +169,9 @@ msgstr ""
 msgid "Follow"
 msgstr ""
 
+msgid "Followers"
+msgstr ""
+
 msgid "Following"
 msgstr ""
 
@@ -238,13 +241,22 @@ msgstr ""
 msgid "Message deleted"
 msgstr ""
 
+msgid "New followers"
+msgstr ""
+
 msgid "No chats yet. Start one with someone's @handle."
 msgstr ""
 
 msgid "No connection. Check your network and try again."
 msgstr ""
 
+msgid "No followers yet."
+msgstr ""
+
 msgid "No messages yet"
+msgstr ""
+
+msgid "No new followers."
 msgstr ""
 
 msgid "No one with that handle."
@@ -257,6 +269,9 @@ msgid "No picker on this platform."
 msgstr ""
 
 msgid "No posts yet."
+msgstr ""
+
+msgid "Not following anyone yet."
 msgstr ""
 
 msgid "Not signed in"
@@ -446,6 +461,9 @@ msgid "This sign-in method is not enabled."
 msgstr ""
 
 msgid "This user isn't available."
+msgstr ""
+
+msgid "This user keeps their following list private."
 msgstr ""
 
 msgid "Too many attempts. Try again later."

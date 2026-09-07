@@ -339,10 +339,19 @@ func _on_im_event(e: Dictionary) -> void:
 		"message_deleted":
 			_mark_deleted(str(e.get("message_id", "")))
 		"read":
-			# 单聊对方的已读进度；自己在另一台设备上的已读不算回执。
-			if not is_group() and str(e.get("user_id", "")) != my_id():
-				peer_read_seq = maxi(peer_read_seq, int(e.get("read_seq", 0)))
-				_update_receipts()
+			# 对方的已读进度；自己在另一台设备上的已读不算回执。群聊推进该成员卡上的 last_read_seq，
+			# 「N 人已读」随之实时变；成员卡还没拉到时（进页早于 load_members）先补一张只带进度的卡。
+			var who := str(e.get("user_id", ""))
+			if who.is_empty() or who == my_id():
+				return
+			var read_seq := int(e.get("read_seq", 0))
+			if is_group():
+				var card: Dictionary = members.get(who, {}) if members.get(who) is Dictionary else {"user_id": who, "display_name": "", "handle": null, "avatar": null}
+				card["last_read_seq"] = maxi(int(card.get("last_read_seq", 0)), read_seq)
+				members[who] = card
+			else:
+				peer_read_seq = maxi(peer_read_seq, read_seq)
+			_update_receipts()
 		"members_added", "member_left":
 			load_members()
 

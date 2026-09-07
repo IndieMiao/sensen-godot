@@ -186,11 +186,27 @@ func test_sign_out_clears_session_and_navigates() -> void:
 	assert_bool(session.is_signed_in()).is_false()
 	assert_array(nav.routes).is_equal([AppRoutes.LOGIN])
 
+## 替身 Avatar 门面：测试里绝不能碰真机 / 开发机的 user://avatar 存档。
+class StubAvatar extends Node:
+	var saved: Dictionary = {}
+	var adopted: Array = []
+	func has_saved_outfit() -> bool:
+		return not saved.is_empty()
+	func outfit_dict() -> Dictionary:
+		return saved
+	func adopt_outfit(d: Variant) -> Error:
+		adopted.append(d)
+		return OK
+
+var stub_avatar: StubAvatar
+
 func _profile(t: FakeTransport, api_key := "k") -> Control:
 	var p := (load(AppRoutes.tab_scene("profile")) as PackedScene).instantiate()
 	p.auth = session
 	p.firebase = FirebaseAuth.new(api_key, t.callable())
 	p.profile = ProfileApi.new(ApiClient.new("https://example.test/v1", profile_t.callable()))
+	stub_avatar = auto_free(StubAvatar.new())
+	p.avatar_api = stub_avatar
 	add_child(auto_free(p))
 	return p
 
@@ -233,7 +249,12 @@ func test_profile_loads_server_profile_into_card_and_fields() -> void:
 	var p := _profile(FakeTransport.new([]))
 	await p.refresh_profile()
 	assert_bool(str(profile_t.requests[0].url).ends_with("/v1/users/me/profile")).is_true()
-	assert_str(p.profile_label.text).is_equal("Sen @sen_01 · 3 followers · 2 following")
+	assert_str(p.profile_label.text).is_equal("Sen @sen_01")
+	assert_str(p.followers_button.text).is_equal("3 followers")
+	assert_str(p.following_button.text).is_equal("2 following")
+	assert_bool(p.new_followers_button.visible).is_true()
+	assert_str(p.new_followers_button.text).is_equal("1 new")
+	assert_object(p.find_child("Avatar", true, false)).is_not_null()
 	assert_str(p.name_edit.text).is_equal("Sen")
 	assert_str(p.handle_edit.text).is_equal("sen_01")
 	assert_str(p.bio_edit.text).is_equal("hi")
@@ -252,13 +273,41 @@ func test_profile_save_sends_patch_and_explains_handle_conflict() -> void:
 	assert_bool(await p.save_profile()).is_true()
 	assert_str(profile_t.requests[0].method).is_equal("PUT")
 	assert_that(profile_t.requests[0].body).is_equal({"display_name": "Sen Two", "bio": "bio", "handle": null, "following_visible": false})
-	assert_str(p.profile_label.text).is_equal("Sen Two · 3 followers · 2 following")
+	assert_str(p.profile_label.text).is_equal("Sen Two")
 	assert_str(p.profile_status.text).is_equal("Profile saved.")
 	p.handle_edit.text = "@Taken"
 	assert_bool(await p.save_profile()).is_false()
 	assert_str(profile_t.requests[1].body.handle).is_equal("taken")
 	assert_str(p.profile_status.text).is_equal("That handle is already taken.")
 	assert_bool(p.save_button.disabled).is_false()
+
+func test_profile_syncs_outfit_pushing_local_or_adopting_remote() -> void:
+	# 服务端没形象、本地有 → PUT 上去，并用返回值刷卡。
+	var outfit := {"version": 1, "slots": {"hair": "hair01"}}
+	var with_avatar := _profile_json()
+	with_avatar["avatar"] = outfit
+	session.complete_sign_in("u1", "id-1", "rt-1", 3600, "password", "a@b.co")
+	profile_t.responses = [{"status": 200, "json": _profile_json()}, {"status": 200, "json": with_avatar}]
+	var p := _profile(FakeTransport.new([]))
+	stub_avatar.saved = outfit
+	await p.refresh_profile()
+	assert_int(profile_t.requests.size()).is_equal(2)
+	assert_str(profile_t.requests[1].method).is_equal("PUT")
+	assert_that(profile_t.requests[1].body).is_equal({"avatar": {"version": 1.0, "slots": {"hair": "hair01"}}})
+	assert_that(p.loaded.get("avatar")).is_equal(with_avatar["avatar"])
+	# 服务端有、本地没有 → 落地本地，不发请求。
+	profile_t.responses.append({"status": 200, "json": with_avatar})
+	var q := _profile(FakeTransport.new([]))
+	await q.refresh_profile()
+	assert_int(profile_t.requests.size()).is_equal(3)
+	assert_int(stub_avatar.adopted.size()).is_equal(1)
+	# 两边都有 → 不动。
+	profile_t.responses.append({"status": 200, "json": with_avatar})
+	var r := _profile(FakeTransport.new([]))
+	stub_avatar.saved = outfit
+	await r.refresh_profile()
+	assert_int(profile_t.requests.size()).is_equal(4)
+	assert_int(stub_avatar.adopted.size()).is_equal(0)
 
 func test_profile_refresh_is_silent_for_dev_sessions_and_unreachable_server() -> void:
 	session.complete_sign_in("dev-local", "dev-token", "", 3600, "dev", "dev@local")

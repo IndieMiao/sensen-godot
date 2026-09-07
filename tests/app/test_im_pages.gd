@@ -236,6 +236,28 @@ func test_chat_group_shows_sender_names_and_read_counts() -> void:
 	assert_bool(p.status.text.contains("Ann")).is_true()
 	assert_bool(p.status.text.contains("You")).is_true()
 
+func test_chat_group_read_events_advance_read_by_count_live() -> void:
+	im_t.responses = [
+		{"status": 200, "json": {"items": [_msg("m2", 2, "me-1", "mine"), _msg("m1", 1, "u-a", "hi all")]}},
+		{"status": 200, "json": {"items": [_member("me-1", "Me", 2), _member("u-a", "Ann", 1), _member("u-b", "Ben", 1)]}},
+		{"status": 200, "json": {"ok": true, "last_read_seq": 2}},
+	]
+	var p := _chat_page(_group("g1", "Team"))
+	assert_bool(await p.load_history()).is_true()
+	var receipt := p.bubbles["m2"].find_child("Receipt", true, false) as Label
+	assert_bool(receipt.visible).is_false()
+	p._on_im_event({"type": "read", "conversation_id": "g1", "user_id": "u-a", "read_seq": 2})
+	assert_bool(receipt.visible).is_true()
+	assert_str(receipt.text).is_equal("Read by 1")
+	# 还没进成员表的人（刚被拉进群）也能计数；自己的已读不算；别的会话不影响。
+	p._on_im_event({"type": "read", "conversation_id": "g1", "user_id": "u-c", "read_seq": 2})
+	assert_str(receipt.text).is_equal("Read by 2")
+	p._on_im_event({"type": "read", "conversation_id": "g1", "user_id": "me-1", "read_seq": 2})
+	p._on_im_event({"type": "read", "conversation_id": "g2", "user_id": "u-b", "read_seq": 2})
+	assert_str(receipt.text).is_equal("Read by 2")
+	p._on_im_event({"type": "read", "conversation_id": "g1", "user_id": "u-b", "read_seq": 1})
+	assert_str(receipt.text).is_equal("Read by 2")
+
 func test_chat_dm_read_receipt_marks_last_read_own_message_and_follows_read_events() -> void:
 	im_t.responses = [
 		{"status": 200, "json": {"items": [_msg("m3", 3, "me-1", "three"), _msg("m2", 2, "u-c1", "two"), _msg("m1", 1, "me-1", "one")]}},

@@ -214,6 +214,20 @@ describe('成员列表、对方已读进度、举报消息（B2 第二刀的服�
     expect((await get('bob', `/v1/im/conversations/${g.json().id}/members`)).json().items).toHaveLength(2);
   });
 
+  it('群聊里成员已读也广播 read 事件给其他成员（「N 人已读」实时推进），自己不收', async () => {
+    const b = await signIn('bob'); const c = await signIn('carol'); await signIn('alice');
+    const g = (await post('alice', '/v1/im/groups', { title: 'T', member_ids: [b, c] })).json().id as string;
+    await send('alice', g, 'hi all');
+    const before = (await get('alice', '/v1/im/sync?since=0')).json().events.length as number;
+    await post('bob', `/v1/im/conversations/${g}/read`, { seq: 1 });
+    const alice = (await get('alice', `/v1/im/sync?since=${before}`)).json().events;
+    expect(alice).toEqual([expect.objectContaining({ type: 'read', conversation_id: g, user_id: b, read_seq: 1 })]);
+    const carol = (await get('carol', '/v1/im/sync?since=0')).json().events.filter((e: { type: string }) => e.type === 'read');
+    expect(carol).toHaveLength(1);
+    const bobReads = (await get('bob', '/v1/im/sync?since=0')).json().events.filter((e: { type: string }) => e.type === 'read');
+    expect(bobReads).toHaveLength(0);
+  });
+
   it('举报消息：非成员 404；不能举报自己的；同一人去重；3 人举报自动撤回并推 message_deleted；撤回后不再受理', async () => {
     await signIn('alice'); const b = await signIn('bob'); const c = await signIn('carol'); const d = await signIn('dave'); await signIn('eve');
     const gid = (await post('alice', '/v1/im/groups', { title: 'T', member_ids: [b, c, d] })).json().id as string;

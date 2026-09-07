@@ -18,6 +18,9 @@ var name_label: Label
 var handle_label: Label
 var bio_label: Label
 var counts_label: Label
+var avatar_thumb: AvatarThumb
+var followers_button: Button
+var following_button: Button
 var follow_button: Button
 var message_button: Button
 var report_button: Button
@@ -51,12 +54,23 @@ func _build_body() -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 4)
 	card.add_child(col)
+	var head := HBoxContainer.new()
+	head.name = "Head"
+	head.add_theme_constant_override("separation", 10)
+	avatar_thumb = AvatarThumb.new(64.0)
+	avatar_thumb.name = "Avatar"
+	head.add_child(avatar_thumb)
+	var names := VBoxContainer.new()
+	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	names.add_theme_constant_override("separation", 2)
 	name_label = GameUi.label("", 18)
 	name_label.name = "Name"
-	col.add_child(name_label)
+	names.add_child(name_label)
 	handle_label = GameUi.label("", 12, GameUi.MUTED)
 	handle_label.name = "Handle"
-	col.add_child(handle_label)
+	names.add_child(handle_label)
+	head.add_child(names)
+	col.add_child(head)
 	bio_label = GameUi.label("", 14)
 	bio_label.name = "Bio"
 	bio_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -64,6 +78,21 @@ func _build_body() -> void:
 	counts_label = GameUi.label("", 12, GameUi.MUTED)
 	counts_label.name = "Counts"
 	col.add_child(counts_label)
+	# 计数可点：进关注者 / 关注中列表（对方关了可见就没有第二个按钮）。
+	var counts_row := HBoxContainer.new()
+	counts_row.name = "CountsRow"
+	counts_row.add_theme_constant_override("separation", 8)
+	followers_button = GameUi.button("", "", "GET /users/:id/followers")
+	followers_button.name = "Followers"
+	followers_button.theme_type_variation = &"SecondaryButton"
+	followers_button.pressed.connect(func(): open_follow_list(FollowListPage.KIND_FOLLOWERS))
+	counts_row.add_child(followers_button)
+	following_button = GameUi.button("", "", "GET /users/:id/following")
+	following_button.name = "Following"
+	following_button.theme_type_variation = &"SecondaryButton"
+	following_button.pressed.connect(func(): open_follow_list(FollowListPage.KIND_FOLLOWING))
+	counts_row.add_child(following_button)
+	col.add_child(counts_row)
 	body.add_child(card)
 	var actions := HBoxContainer.new()
 	actions.name = "Actions"
@@ -181,13 +210,20 @@ func _show_user() -> void:
 	handle_label.visible = not handle.is_empty()
 	bio_label.text = _text(user.get("bio", ""))
 	bio_label.visible = not bio_label.text.is_empty()
-	var parts: Array = [tr("%d followers") % int(user.get("followers_count", 0))]
-	if user.has("following_count") and user.get("following_count") != null:
-		parts.append(tr("%d following") % int(user.get("following_count", 0)))
+	avatar_thumb.show_avatar(user.get("avatar"))
+	followers_button.text = tr("%d followers") % int(user.get("followers_count", 0))
+	var has_following := user.has("following_count") and user.get("following_count") != null
+	following_button.visible = has_following
+	if has_following:
+		following_button.text = tr("%d following") % int(user.get("following_count", 0))
 	var rel: Dictionary = user.get("relation", {}) if user.get("relation") is Dictionary else {}
+	var parts: Array = []
 	if bool(rel.get("followed_by", false)):
 		parts.append(tr("Follows you"))
+	if bool(rel.get("close_friends", false)):
+		parts.append(tr("Close friends"))
 	counts_label.text = " · ".join(parts)
+	counts_label.visible = not parts.is_empty()
 	var mine := user_id() == my_id()
 	(follow_button.get_parent() as Control).visible = not mine and not user_id().is_empty()
 	follow_button.text = tr("Following") if is_following() else tr("Follow")
@@ -254,6 +290,11 @@ func toggle_like(post_id: String) -> void:
 	p["like_count"] = int(r.get("like_count", 0))
 	if cards.has(post_id):
 		PostCard.update(cards[post_id], p)
+
+func open_follow_list(kind: String) -> void:
+	if user_id().is_empty():
+		return
+	_push(AppRoutes.FOLLOW_LIST, {"user_id": user_id(), "kind": kind})
 
 func open_post(post_id: String) -> void:
 	var p := _item(post_id)

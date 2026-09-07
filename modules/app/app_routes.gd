@@ -36,6 +36,8 @@ const CHAT := "res://scenes/app/pages/chat_page.tscn"
 ## 用户主页：args = {"user_id": uuid} 或 {"handle": "ali"}；动态详情：args = {"post": 帖子字典} 或 {"post_id": id}。
 const USER := "res://scenes/app/pages/user_page.tscn"
 const POST := "res://scenes/app/pages/post_page.tscn"
+## 关注者 / 关注中 / 新粉丝列表：args = {"user_id": uuid, "kind": "followers"|"following"|"new"}。
+const FOLLOW_LIST := "res://scenes/app/pages/follow_list_page.tscn"
 ## 调试构建才有入口（设置页）：A6 生命周期通知探针。
 const LIFECYCLE_PROBE := "res://scenes/app/pages/lifecycle_probe_page.tscn"
 
