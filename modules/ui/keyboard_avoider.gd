@@ -55,11 +55,14 @@ func poll() -> void:
 		var kb_vp := keyboard_height_in_viewport(kb_px, _window_size().y, vp_h)
 		# 用未平移前的位置算：控件全局矩形已含当前 shift，先加回去。
 		var bottom := focus.get_global_rect().end.y + current_shift
-		shift = shift_for(bottom, vp_h, kb_vp, margin)
+		# 取整：容器重排会把子节点吸附到整像素，浮点位移会和量回来的底边互相追着改，
+		# 真机上输入框每帧抖 1 px（2026-09-07 iPhone 13 观察窗）。
+		shift = ceilf(shift_for(bottom, vp_h, kb_vp, margin))
 	_apply(shift)
 
 func _apply(shift: float) -> void:
-	if is_equal_approx(shift, current_shift):
+	# 亚像素差不动：同上，吸附后的量测误差不能反馈成新位移。
+	if absf(shift - current_shift) < 1.0:
 		return
 	current_shift = shift
 	if mode == Mode.SHRINK:

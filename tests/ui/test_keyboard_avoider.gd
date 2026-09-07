@@ -152,3 +152,46 @@ func test_app_page_in_shrink_mode_targets_the_safe_area() -> void:
 	add_child(auto_free(plain))
 	assert_int(plain.keyboard_avoider.mode).is_equal(KeyboardAvoider.Mode.SHIFT)
 	assert_bool(plain.keyboard_avoider.target.is_ancestor_of(plain.body)).is_true()
+
+
+## SHRINK 下真容器会把子节点位置吸附到整像素，浮点位移会和量出来的底边互相追着改——真机上输入框每帧抖 1 px。
+## 位移必须取整并忽略亚像素差，连续几帧后不再变。
+func test_shrink_mode_settles_under_pixel_snapping_containers() -> void:
+	var root := Control.new()
+	root.size = Vector2(360, 800)
+	add_child(auto_free(root))
+	var area := Control.new()
+	area.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	root.add_child(area)
+	var margin := MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_bottom", 7)
+	area.add_child(margin)
+	var column := VBoxContainer.new()
+	margin.add_child(column)
+	var filler := Control.new()
+	filler.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	column.add_child(filler)
+	var field := LineEdit.new()
+	field.custom_minimum_size.y = 44
+	column.add_child(field)
+	var av := KeyboardAvoider.new()
+	av.mode = KeyboardAvoider.Mode.SHRINK
+	av.target = area
+	av.margin = 12.3
+	av.keyboard_height_provider = probe.keyboard
+	av.window_size_provider = probe.win
+	av.focus_provider = probe.focused
+	root.add_child(av)
+	await get_tree().process_frame
+	probe.focus = field
+	probe.kb_px = 901
+	var seen := []
+	for i in 6:
+		av.poll()
+		await get_tree().process_frame
+		seen.append(av.current_shift)
+	assert_bool(seen[0] > 0.0).is_true()
+	assert_float(seen[0]).is_equal_approx(floorf(seen[0]), 0.001) # 整像素
+	for i in range(1, seen.size()):
+		assert_float(seen[i]).is_equal_approx(seen[0], 0.001)
