@@ -133,6 +133,8 @@ func test_plants_and_furrows_are_nonempty_colored_meshes_in_fixed_shared_layers(
 		assert_int(palette.size()).is_greater(1)
 
 func test_mature_crop_silhouettes_differ_and_four_plants_fit_each_bed() -> void:
+	if DisplayServer.get_name() == "headless":
+		return # 依赖真实渲染（网格 AABB）：headless CI 跳过
 	var f := _field()
 	var cells := {}
 	for i in CropField.CROPS.size():
