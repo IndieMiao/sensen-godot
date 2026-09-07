@@ -23,6 +23,7 @@ var sending := false
 var loading := false
 
 func _init() -> void:
+	keyboard_mode = KeyboardAvoider.Mode.SHRINK
 	page_title = "Chat"
 	stacked = true
 

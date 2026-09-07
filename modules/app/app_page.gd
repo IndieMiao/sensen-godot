@@ -8,6 +8,8 @@ extends Control
 @export var page_title := ""
 ## 压栈子页有返回按钮（AppRouter.pop_instance）；Tab 页没有——Tab 级返回由壳处理。
 @export var stacked := false
+## 软键盘避让方式：默认整页平移；输入框固定在底部、中间是列表的页（聊天）改 SHRINK，见 KeyboardAvoider。
+@export var keyboard_mode := KeyboardAvoider.Mode.SHIFT
 
 var shown_count := 0
 var hidden_count := 0
@@ -63,7 +65,9 @@ func _ready() -> void:
 	# 软键盘避让：所有带输入框的页面（登录 / 聊天 / 发布器 / 资料编辑）统一在这里挂，A5 专项。
 	keyboard_avoider = KeyboardAvoider.new()
 	keyboard_avoider.name = "KeyboardAvoider"
-	keyboard_avoider.target = column
+	keyboard_avoider.mode = keyboard_mode
+	# SHRINK 收的是 SafeArea 的底边（父节点是本页这个普通 Control，offset 不会被容器盖掉）。
+	keyboard_avoider.target = safe if keyboard_mode == KeyboardAvoider.Mode.SHRINK else column
 	add_child(keyboard_avoider)
 	_build_body()
 

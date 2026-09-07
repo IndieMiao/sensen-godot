@@ -7,8 +7,15 @@ extends Node
 ## 高度 / 窗口 / 焦点全部可注入，单测不依赖真机。
 ## Android IME 光标不同步（godot #68338）是引擎层问题，GDScript 无解，只能靠真机回归盯着。
 
+## SHIFT：整页向上平移，表单类页用（登录 / 资料编辑）。
+## SHRINK：把 target 的底边收上来（offset_bottom），让中间可伸缩的列表变矮、底部输入框浮到键盘上方，
+## 标题与已有内容不动——聊天页用。真机截图（2026-09-07 iPhone 13）里 SHIFT 会把标题和消息全推出屏幕。
+## SHRINK 要求 target 的父节点不是 Container（容器每次重排会把 offset 盖掉），AppPage 里挂在 SafeArea 上。
+enum Mode { SHIFT, SHRINK }
+
 @export var target: Control
 @export var margin := 12.0
+@export var mode := Mode.SHIFT
 
 ## () -> int，物理像素。默认 DisplayServer.virtual_keyboard_get_height()。
 var keyboard_height_provider: Callable
@@ -55,7 +62,10 @@ func _apply(shift: float) -> void:
 	if is_equal_approx(shift, current_shift):
 		return
 	current_shift = shift
-	target.position.y = -shift
+	if mode == Mode.SHRINK:
+		target.offset_bottom = -shift
+	else:
+		target.position.y = -shift
 
 func _focus() -> Control:
 	if focus_provider.is_valid():
