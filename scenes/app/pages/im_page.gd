@@ -233,8 +233,10 @@ func _row(c: Dictionary) -> Button:
 	b.text = "%s%s%s\n%s" % [title, "  (%d)" % unread if unread > 0 else "", when, preview]
 	# 单聊显示对方形象，群聊用群图标；真图渲好了再换。
 	var peer: Dictionary = c.get("peer", {}) if c.get("peer") is Dictionary else {}
+	# 缩略图控件只负责取图，不显示（按钮自己的 icon 才是可见的那张，免得两张叠在一起）。
 	var thumb := AvatarThumb.new(44.0)
 	thumb.name = "Avatar"
+	thumb.visible = false
 	b.add_child(thumb)
 	b.expand_icon = true
 	b.add_theme_constant_override("h_separation", 8)
@@ -242,7 +244,7 @@ func _row(c: Dictionary) -> Button:
 		b.icon = GameUi.icon("users-round")
 	else:
 		b.icon = thumb.placeholder_icon()
-		thumb.texture_ready.connect(func(tex: Texture2D): if is_instance_valid(b): b.icon = tex)
+		thumb.texture_ready.connect(func(tex: Texture2D): AvatarThumb.apply_to_button(b, tex))
 		thumb.show_avatar(peer.get("avatar"))
 	b.pressed.connect(open_conversation.bind(c))
 	return b

@@ -23,6 +23,15 @@ func _init(p_side := 40.0) -> void:
 func placeholder_icon() -> Texture2D:
 	return GameUi.icon(PLACEHOLDER_ICON)
 
+## 把真图装到按钮 icon 上。主题给按钮 icon 的着色（icon_*_color = 墨色）是为单色 SVG 设计的，
+## 会把彩色头像染成一团黑，这里全部改成白（不着色）。
+static func apply_to_button(b: Button, tex: Texture2D) -> void:
+	if not is_instance_valid(b) or tex == null:
+		return
+	b.icon = tex
+	for key in ["icon_normal_color", "icon_pressed_color", "icon_hover_color", "icon_hover_pressed_color", "icon_focus_color", "icon_disabled_color"]:
+		b.add_theme_color_override(key, Color.WHITE)
+
 ## 服务端字段 → AvatarConfig；不是合法字典就当没有形象。
 static func config_from(avatar: Variant) -> AvatarConfig:
 	if not (avatar is Dictionary) or (avatar as Dictionary).is_empty():

@@ -164,6 +164,23 @@ func run_login() -> void:
 	var shell := current()
 	if not _expect(shell, AppRoutes.SHELL):
 		return
+	# SENSEN_QA_ME=1：先进「我的」Tab 拉资料（顺带把本地装扮同步到服务端，B7），截一张；
+	# SENSEN_QA_FOLLOWERS=1 再压栈自己的关注者列表截一张。
+	if OS.get_environment("SENSEN_QA_ME") == "1":
+		shell.show_tab(AppRoutes.TAB_PROFILE)
+		await settle()
+		var me_page = shell.page(AppRoutes.TAB_PROFILE)
+		if me_page != null and me_page.has_method("refresh_profile"):
+			await me_page.refresh_profile()
+		await settle()
+		await shot("me_tab")
+		if OS.get_environment("SENSEN_QA_FOLLOWERS") == "1":
+			AppRouter.push_instance(AppRoutes.FOLLOW_LIST, {"user_id": Net.auth.server_user_id, "kind": "followers"})
+			await settle()
+			await settle()
+			await shot("followers")
+			AppRouter.pop_instance()
+			await settle()
 	shell.show_tab(AppRoutes.TAB_IM)
 	await settle()
 	await shot("im_tab")

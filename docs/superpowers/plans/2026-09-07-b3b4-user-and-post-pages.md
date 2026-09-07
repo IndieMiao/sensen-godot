@@ -33,3 +33,16 @@ SGODOT-101（D4 关注 UI）。服务端早就有资料 / 关注 / 评论 / 举�
 ## 4. 仍待
 
 用户主页头像与「关注者 / 关注中」列表页；设置页的「关注列表可见」开关（`following_visible`）；评论的相对时间用页面时钟。
+
+## 5. 2026-09-08 收尾
+
+- 关注者 / 关注中 / 新粉丝列表页 `scenes/app/pages/follow_list_page.gd`（`AppRoutes.FOLLOW_LIST`，`setup({user_id, kind})`），
+  用户主页与「我的」页的计数变成可点按钮；「关注中」被对方关掉可见时服务端 403 → 「这位用户没有公开关注列表」。
+- 头像：`AvatarThumb`（`modules/ui/avatar_thumb.gd`）+ `AvatarPortraits`（`modules/avatar/thumbs/avatar_portraits.gd`，
+  挂在 Avatar 门面下的共享离屏渲染器，按装扮 JSON 缓存，头肩特写 192 px）。用户主页 / 我的页直接显示，
+  列表行与 feed 作者行用按钮 icon（着色覆盖成白，不然主题会把彩图染黑）。渲染失败或 headless 保持占位图标。
+- B7 装扮同步：换装房保存后 `PUT /users/me/profile {avatar}`；「我的」页 `sync_avatar`：服务端空而本地有 → 推；
+  服务端有而本地空 → 落地。测试里用 `avatar_api` 注入替身，绝不碰真机存档。
+- QA 钩子：`SENSEN_QA_ME=1`（进「我的」页并同步装扮）、`SENSEN_QA_FOLLOWERS=1`（截自己的关注者列表）、
+  `SENSEN_PORTRAIT_DEBUG=1`（头像渲染图落到 user://qa/portrait_NN.png）。
+
