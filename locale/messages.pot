@@ -23,6 +23,10 @@ msgstr ""
 msgid "%s · %d followers · %d following"
 msgstr ""
 
+#: res://scenes/app/pages/im_page.gd:27
+msgid "@handle to start a chat"
+msgstr ""
+
 #: res://modules/net/firebase_auth.gd:113
 msgid "An account with this email already exists."
 msgstr ""
@@ -31,7 +35,7 @@ msgstr ""
 msgid "Avatar upload and Space 3D land later in B4."
 msgstr ""
 
-#: res://modules/app/app_page.gd:39
+#: res://modules/app/app_page.gd:49
 msgid "Back"
 msgstr ""
 
@@ -61,25 +65,33 @@ msgstr ""
 msgid "Can't load the feed. Check your connection."
 msgstr ""
 
+#: res://scenes/app/pages/chat_page.gd:166
 #: res://scenes/app/pages/feed_page.gd:182
+#: res://scenes/app/pages/im_page.gd:133
 #: res://scenes/app/pages/profile_page.gd:162
 msgid "Can't reach the server. Check your connection and try again."
 msgstr ""
 
-#: res://modules/app/app_routes.gd:28
-#: res://scenes/app/pages/im_page.gd:7
-msgid "Chats"
+#: res://scenes/app/pages/chat_page.gd:26
+#: res://scenes/app/pages/im_page.gd:33
+msgid "Chat"
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:10
-msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
+#: res://scenes/app/pages/chat_page.gd:168
+#: res://scenes/app/pages/im_page.gd:135
+msgid "Chat isn't available on this server yet."
+msgstr ""
+
+#: res://modules/app/app_routes.gd:28
+#: res://scenes/app/pages/im_page.gd:19
+msgid "Chats"
 msgstr ""
 
 #: res://scenes/app/pages/feed_page.gd:291
 msgid "Child safety"
 msgstr ""
 
-#: res://scenes/app/pages/lifecycle_probe_page.gd:46
+#: res://scenes/app/pages/lifecycle_probe_page.gd:50
 msgid "Clear log"
 msgstr ""
 
@@ -87,7 +99,7 @@ msgstr ""
 msgid "Contact us"
 msgstr ""
 
-#: res://scenes/app/age_gate_page.gd:32
+#: res://scenes/app/age_gate_page.gd:33
 #: res://scenes/app/consent_page.gd:38
 msgid "Continue"
 msgstr ""
@@ -100,7 +112,7 @@ msgstr ""
 msgid "Continue with Google"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:132
+#: res://scenes/app/pages/settings_page.gd:135
 msgid "Couldn't delete your account on the server. Check your connection and try again."
 msgstr ""
 
@@ -124,7 +136,7 @@ msgstr ""
 msgid "Delete account?"
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:101
+#: res://scenes/app/pages/settings_page.gd:104
 msgid "Deleting account…"
 msgstr ""
 
@@ -136,7 +148,7 @@ msgstr ""
 msgid "Dev: lifecycle probe"
 msgstr ""
 
-#: res://scenes/app/age_gate_page.gd:84
+#: res://scenes/app/age_gate_page.gd:90
 msgid "Dev: reset age gate"
 msgstr ""
 
@@ -198,7 +210,7 @@ msgstr ""
 msgid "Language: %s"
 msgstr ""
 
-#: res://scenes/app/pages/lifecycle_probe_page.gd:25
+#: res://scenes/app/pages/lifecycle_probe_page.gd:29
 msgid "Lifecycle probe"
 msgstr ""
 
@@ -228,9 +240,32 @@ msgstr ""
 msgid "Me"
 msgstr ""
 
+#: res://scenes/app/pages/chat_page.gd:61
+msgid "Message"
+msgstr ""
+
+#: res://scenes/app/pages/chat_page.gd:210
+#: res://scenes/app/pages/chat_page.gd:217
+#: res://scenes/app/pages/chat_page.gd:227
+#: res://scenes/app/pages/im_page.gd:171
+msgid "Message deleted"
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:150
+msgid "No chats yet. Start one with someone's @handle."
+msgstr ""
+
 #: res://modules/net/firebase_auth.gd:127
 #: res://modules/net/firebase_auth.gd:131
 msgid "No connection. Check your network and try again."
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:169
+msgid "No messages yet"
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:104
+msgid "No one with that handle."
 msgstr ""
 
 #: res://scenes/app/pages/profile_page.gd:93
@@ -259,11 +294,11 @@ msgstr ""
 msgid "Please check the %s field."
 msgstr ""
 
-#: res://scenes/app/age_gate_page.gd:70
+#: res://scenes/app/age_gate_page.gd:76
 msgid "Please select your full date of birth."
 msgstr ""
 
-#: res://scenes/app/pages/settings_page.gd:114
+#: res://scenes/app/pages/settings_page.gd:117
 msgid "Please sign in again, then delete your account."
 msgstr ""
 
@@ -288,7 +323,7 @@ msgstr ""
 msgid "Profile saved."
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:23
+#: res://scenes/app/pages/im_page.gd:182
 msgid "Realtime: %s"
 msgstr ""
 
@@ -316,6 +351,10 @@ msgstr ""
 msgid "Self-harm"
 msgstr ""
 
+#: res://scenes/app/pages/chat_page.gd:67
+msgid "Send"
+msgstr ""
+
 #: res://scenes/app/pages/profile_page.gd:67
 #: res://scenes/app/pages/settings_page.gd:19
 msgid "Settings"
@@ -331,8 +370,13 @@ msgid "Sign in"
 msgstr ""
 
 #: res://scenes/app/pages/feed_page.gd:186
+#: res://scenes/app/pages/im_page.gd:137
 #: res://scenes/app/pages/profile_page.gd:116
 msgid "Sign in again to set up your profile."
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:79
+msgid "Sign in to chat."
 msgstr ""
 
 #: res://scenes/app/pages/settings_page.gd:39
@@ -363,7 +407,7 @@ msgstr ""
 msgid "Something else"
 msgstr ""
 
-#: res://scenes/app/age_gate_page.gd:79
+#: res://scenes/app/age_gate_page.gd:85
 msgid "Sorry, you're not eligible to use this app."
 msgstr ""
 
@@ -371,11 +415,11 @@ msgstr ""
 msgid "Spam or scam"
 msgstr ""
 
-#: res://scenes/app/pages/lifecycle_probe_page.gd:29
+#: res://scenes/app/pages/lifecycle_probe_page.gd:33
 msgid "Switch to another app and come back several times. Each PAUSED/RESUMED pair must increase by one."
 msgstr ""
 
-#: res://scenes/app/pages/lifecycle_probe_page.gd:38
+#: res://scenes/app/pages/lifecycle_probe_page.gd:42
 msgid "Tap here to test keyboard avoidance"
 msgstr ""
 
@@ -402,6 +446,10 @@ msgstr ""
 
 #: res://scenes/app/consent_page.gd:16
 msgid "This community has zero tolerance for abusive content or behavior. Content you post can be reported and removed, and repeat offenders are banned."
+msgstr ""
+
+#: res://scenes/app/pages/chat_page.gd:164
+msgid "This message was blocked by our content rules."
 msgstr ""
 
 #: res://scenes/app/pages/settings_page.gd:55
@@ -442,19 +490,33 @@ msgstr ""
 msgid "What's new?"
 msgstr ""
 
+#: res://scenes/app/pages/chat_page.gd:160
+msgid "You can send one message until they reply."
+msgstr ""
+
+#: res://scenes/app/pages/chat_page.gd:162
+#: res://scenes/app/pages/im_page.gd:131
+msgid "You can't message this user."
+msgstr ""
+
 #: res://scenes/app/pages/feed_page.gd:85
 msgid "You won't see each other's posts or profiles, and you'll stop following each other."
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:20
+#: res://scenes/app/pages/chat_page.gd:215
+#: res://scenes/app/pages/im_page.gd:174
+msgid "[Photo]"
+msgstr ""
+
+#: res://scenes/app/pages/im_page.gd:179
 msgid "connected"
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:20
+#: res://scenes/app/pages/im_page.gd:179
 msgid "connecting"
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:20
+#: res://scenes/app/pages/im_page.gd:179
 msgid "idle"
 msgstr ""
 
@@ -462,11 +524,11 @@ msgstr ""
 msgid "just now"
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:21
+#: res://scenes/app/pages/im_page.gd:180
 msgid "paused"
 msgstr ""
 
-#: res://scenes/app/pages/im_page.gd:21
+#: res://scenes/app/pages/im_page.gd:180
 msgid "reconnecting"
 msgstr ""
 

@@ -31,6 +31,8 @@ const TAB_ICONS := {TAB_MAP: "map-pin", TAB_FEED: "book-open", TAB_IM: "users-ro
 ## 压栈子页（AppRouter.push_instance）：全屏、带返回按钮，弹出后回到壳的当前 Tab。
 const SETTINGS := "res://scenes/app/pages/settings_page.tscn"
 const VOICE_ROOM := "res://scenes/app/pages/voice_room_page.tscn"
+## B2 聊天页：push_instance 时 args = {"conversation": 会话字典}。
+const CHAT := "res://scenes/app/pages/chat_page.tscn"
 ## 调试构建才有入口（设置页）：A6 生命周期通知探针。
 const LIFECYCLE_PROBE := "res://scenes/app/pages/lifecycle_probe_page.tscn"
 

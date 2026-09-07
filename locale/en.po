@@ -19,6 +19,9 @@ msgstr ""
 msgid "%s · %d followers · %d following"
 msgstr ""
 
+msgid "@handle to start a chat"
+msgstr ""
+
 msgid "An account with this email already exists."
 msgstr ""
 
@@ -49,10 +52,13 @@ msgstr ""
 msgid "Can't reach the server. Check your connection and try again."
 msgstr ""
 
-msgid "Chats"
+msgid "Chat"
 msgstr ""
 
-msgid "Chats land in B2: conversations, 1:1 and group chat, images, read receipts."
+msgid "Chat isn't available on this server yet."
+msgstr ""
+
+msgid "Chats"
 msgstr ""
 
 msgid "Child safety"
@@ -166,7 +172,22 @@ msgstr ""
 msgid "Me"
 msgstr ""
 
+msgid "Message"
+msgstr ""
+
+msgid "Message deleted"
+msgstr ""
+
+msgid "No chats yet. Start one with someone's @handle."
+msgstr ""
+
 msgid "No connection. Check your network and try again."
+msgstr ""
+
+msgid "No messages yet"
+msgstr ""
+
+msgid "No one with that handle."
 msgstr ""
 
 msgid "Not signed in"
@@ -229,6 +250,9 @@ msgstr ""
 msgid "Self-harm"
 msgstr ""
 
+msgid "Send"
+msgstr ""
+
 msgid "Settings"
 msgstr ""
 
@@ -239,6 +263,9 @@ msgid "Sign in"
 msgstr ""
 
 msgid "Sign in again to set up your profile."
+msgstr ""
+
+msgid "Sign in to chat."
 msgstr ""
 
 msgid "Sign out"
@@ -292,6 +319,9 @@ msgstr ""
 msgid "This community has zero tolerance for abusive content or behavior. Content you post can be reported and removed, and repeat offenders are banned."
 msgstr ""
 
+msgid "This message was blocked by our content rules."
+msgstr ""
+
 msgid "This permanently deletes your account and data. This cannot be undone."
 msgstr ""
 
@@ -319,7 +349,16 @@ msgstr ""
 msgid "What's new?"
 msgstr ""
 
+msgid "You can send one message until they reply."
+msgstr ""
+
+msgid "You can't message this user."
+msgstr ""
+
 msgid "You won't see each other's posts or profiles, and you'll stop following each other."
+msgstr ""
+
+msgid "[Photo]"
 msgstr ""
 
 msgid "connected"

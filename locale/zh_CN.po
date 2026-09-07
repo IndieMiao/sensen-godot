@@ -345,3 +345,45 @@ msgstr "你们将看不到彼此的动态和主页，并会互相取消关注。
 
 msgid "Dev: reset age gate"
 msgstr "开发：重置年龄门"
+
+msgid "@handle to start a chat"
+msgstr "输入 @用户名 发起聊天"
+
+msgid "Chat"
+msgstr "聊天"
+
+msgid "Chat isn't available on this server yet."
+msgstr "当前服务器尚未开通聊天。"
+
+msgid "Message"
+msgstr "消息"
+
+msgid "Message deleted"
+msgstr "消息已撤回"
+
+msgid "No chats yet. Start one with someone's @handle."
+msgstr "还没有会话。输入对方的 @用户名 开始聊天。"
+
+msgid "No messages yet"
+msgstr "还没有消息"
+
+msgid "No one with that handle."
+msgstr "没有这个用户名的人。"
+
+msgid "Send"
+msgstr "发送"
+
+msgid "Sign in to chat."
+msgstr "登录后即可聊天。"
+
+msgid "This message was blocked by our content rules."
+msgstr "这条消息违反内容规则，未能发送。"
+
+msgid "You can send one message until they reply."
+msgstr "对方回复前你只能发一条消息。"
+
+msgid "You can't message this user."
+msgstr "无法给这个用户发消息。"
+
+msgid "[Photo]"
+msgstr "[图片]"
