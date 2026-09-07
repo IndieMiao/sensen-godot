@@ -1,14 +1,20 @@
 extends GdUnitTestSuite
 ## B2：会话列表（渲染、@handle 发起单聊、点会话压栈）与聊天页（历史升序、已读、发送幂等、实时事件、撤回、错误文案）。
 
+const ChatScript := preload("res://scenes/app/pages/chat_page.gd")
+
 class NavRecorder extends RefCounted:
 	var calls: Array = []
+	var left := 0
 	func go(route: String, args: Dictionary) -> void:
 		calls.append({"route": route, "args": args})
+	func leave() -> void:
+		left += 1
 
 var session: AuthSession
 var im_t: FakeTransport
 var profile_t: FakeTransport
+var safety_t: FakeTransport
 var nav: NavRecorder
 
 func before_test() -> void:
@@ -17,6 +23,7 @@ func before_test() -> void:
 	session.set_server_user("me-1")
 	im_t = FakeTransport.new([])
 	profile_t = FakeTransport.new([])
+	safety_t = FakeTransport.new([])
 	nav = NavRecorder.new()
 
 func after_test() -> void:
@@ -45,9 +52,24 @@ func _chat_page(c: Dictionary) -> Control:
 	var p := (load(AppRoutes.CHAT) as PackedScene).instantiate()
 	p.auth = session
 	p.im = _im_api()
+	p.profile = ProfileApi.new(ApiClient.new("https://example.test/v1", profile_t.callable()))
+	p.safety = SafetyApi.new(ApiClient.new("https://example.test/v1", safety_t.callable()))
+	p.leave_handler = nav.leave
 	p.setup({"conversation": c})
 	add_child(auto_free(p))
 	return p
+
+func _group(id: String, title: String) -> Dictionary:
+	return {"id": id, "kind": "group", "title": title, "peer": null, "member_count": 3, "peer_read_seq": null,
+		"last_seq": 2, "last_read_seq": 0, "unread": 2, "last_message": {}, "last_message_at": 0, "created_at": 0}
+
+func _member(user_id: String, name: String, read_seq: int) -> Dictionary:
+	return {"user_id": user_id, "display_name": name, "handle": name.to_lower(), "avatar": null, "joined_at": 0, "last_read_seq": read_seq}
+
+func _drag(to: Vector2) -> InputEventScreenDrag:
+	var e := InputEventScreenDrag.new()
+	e.position = to
+	return e
 
 func _msg(id: String, seq: int, sender: String, text: String) -> Dictionary:
 	return {"id": id, "conversation_id": "c1", "seq": seq, "sender_id": sender, "client_id": id, "kind": "text", "body": {"text": text}, "created_at": seq * 1000, "deleted": false}
@@ -157,3 +179,154 @@ func test_chat_explains_greeting_limit_block_and_moderation() -> void:
 	assert_str(p.bubble_text({"kind": "image", "body": {"key": "k", "text": "cap"}})).is_equal("[Photo] cap")
 	assert_str(p.bubble_text({"kind": "text", "body": {"text": "x"}, "deleted": true})).is_equal("Message deleted")
 	assert_str(p.title_for({"kind": "group", "title": "Team"})).is_equal("Team")
+
+
+func test_list_creates_group_from_name_and_handles() -> void:
+	profile_t.responses = [{"status": 200, "json": {"user_id": "u-a", "display_name": "Ann"}}, {"status": 200, "json": {"user_id": "u-b", "display_name": "Ben"}}]
+	im_t.responses = [{"status": 201, "json": _group("g1", "Team")}]
+	var p := _list_page()
+	assert_bool(p.group_panel.visible).is_false()
+	p.group_toggle.pressed.emit()
+	assert_bool(p.group_panel.visible).is_true()
+	p.group_title_edit.text = " Team "
+	p.group_members_edit.text = "@Ann, ben ann"
+	assert_bool(await p.create_group()).is_true()
+	assert_int(profile_t.requests.size()).is_equal(2) # ann 去重
+	assert_bool(str(profile_t.requests[1].url).ends_with("/v1/users/%40ben/profile")).is_true()
+	assert_that(im_t.requests[0].body).is_equal({"title": "Team", "member_ids": ["u-a", "u-b"]})
+	assert_str(nav.calls[0].args.conversation.id).is_equal("g1")
+	assert_bool(p.group_panel.visible).is_false()
+	assert_bool(await p.create_group()).is_false()
+	assert_bool(p.status.text.contains("name")).is_true()
+	p.group_title_edit.text = "T"
+	assert_bool(await p.create_group()).is_false()
+	assert_bool(p.status.text.contains("@handle")).is_true()
+	profile_t.responses.append({"status": 404, "json": {"code": "NOT_FOUND"}})
+	p.group_members_edit.text = "ghost"
+	assert_bool(await p.create_group()).is_false()
+	assert_bool(p.status.text.contains("@ghost")).is_true()
+	assert_int(im_t.requests.size()).is_equal(1)
+
+func test_chat_group_shows_sender_names_and_read_counts() -> void:
+	im_t.responses = [
+		{"status": 200, "json": {"items": [_msg("m2", 2, "me-1", "mine"), _msg("m1", 1, "u-a", "hi all")]}},
+		{"status": 200, "json": {"items": [_member("me-1", "Me", 2), _member("u-a", "Ann", 2), _member("u-b", "Ben", 1)]}},
+		{"status": 200, "json": {"ok": true, "last_read_seq": 2}},
+	]
+	var p := _chat_page(_group("g1", "Team"))
+	assert_str(p.title_label.text).is_equal("Team")
+	assert_bool(await p.load_history()).is_true()
+	assert_bool(str(im_t.requests[1].url).ends_with("/v1/im/conversations/g1/members")).is_true()
+	assert_str((p.bubbles["m1"].find_child("Who", true, false) as Label).text).is_equal("Ann")
+	assert_object(p.bubbles["m2"].find_child("Who", true, false)).is_null()
+	var receipt := p.bubbles["m2"].find_child("Receipt", true, false) as Label
+	assert_bool(receipt.visible).is_true()
+	assert_str(receipt.text).is_equal("Read by 1")
+	im_t.responses.append({"status": 200, "json": {"items": [_member("me-1", "Me", 2), _member("u-a", "Ann", 2), _member("u-b", "Ben", 2)]}})
+	assert_bool(await p.load_members()).is_true()
+	assert_str(receipt.text).is_equal("Read by 2")
+	im_t.responses.append({"status": 200, "json": {"items": [_member("me-1", "Me", 2), _member("u-a", "Ann", 2)]}})
+	assert_bool(await p.show_members()).is_true()
+	assert_bool(p.status.text.contains("Ann")).is_true()
+	assert_bool(p.status.text.contains("You")).is_true()
+
+func test_chat_dm_read_receipt_marks_last_read_own_message_and_follows_read_events() -> void:
+	im_t.responses = [
+		{"status": 200, "json": {"items": [_msg("m3", 3, "me-1", "three"), _msg("m2", 2, "u-c1", "two"), _msg("m1", 1, "me-1", "one")]}},
+		{"status": 200, "json": {"ok": true, "last_read_seq": 3}},
+	]
+	var c := _conv("c1", "Ali", 0)
+	c["peer_read_seq"] = 1
+	var p := _chat_page(c)
+	assert_bool(await p.load_history()).is_true()
+	var r1 := p.bubbles["m1"].find_child("Receipt", true, false) as Label
+	var r3 := p.bubbles["m3"].find_child("Receipt", true, false) as Label
+	assert_bool(r1.visible).is_true()
+	assert_str(r1.text).is_equal("Read")
+	assert_bool(r3.visible).is_false()
+	assert_object(p.bubbles["m2"].find_child("Receipt", true, false)).is_null()
+	p._on_im_event({"type": "read", "seq": 7, "conversation_id": "c1", "user_id": "u-c1", "read_seq": 3})
+	assert_bool(r1.visible).is_false()
+	assert_bool(r3.visible).is_true()
+	p._on_im_event({"type": "read", "seq": 8, "conversation_id": "c1", "user_id": "me-1", "read_seq": 9})
+	assert_int(p.peer_read_seq).is_equal(3)
+	p._on_im_event({"type": "read", "seq": 9, "conversation_id": "OTHER", "user_id": "u-c1", "read_seq": 9})
+	assert_int(p.peer_read_seq).is_equal(3)
+
+func test_chat_long_press_menu_reports_blocks_and_unsends() -> void:
+	im_t.responses = [
+		{"status": 200, "json": {"items": [_msg("m2", 2, "me-1", "mine"), _msg("m1", 1, "u-c1", "theirs")]}},
+		{"status": 200, "json": {"ok": true, "last_read_seq": 2}},
+	]
+	safety_t.responses = [{"status": 201, "json": {"id": "r1", "created": true}}, {"status": 200, "json": {"ok": true}}]
+	var p := _chat_page(_conv("c1", "Ali"))
+	await p.load_history()
+	p._press("m1", true, Vector2.ZERO)
+	assert_str(p.pressed_id).is_equal("m1")
+	p._press("m1", false, Vector2.ZERO)
+	assert_str(p.pressed_id).is_empty()
+	p._press("m1", true, Vector2.ZERO)
+	p._on_bubble_input(_drag(Vector2(30, 0)), "m1") # 拖动超过阈值 = 在滚列表，取消
+	assert_str(p.pressed_id).is_empty()
+	p._press("m1", true, Vector2.ZERO)
+	p._on_bubble_input(_drag(Vector2(3, 2)), "m1")
+	assert_str(p.pressed_id).is_equal("m1")
+	p.long_press.timeout.emit()
+	assert_str(p.menu_target).is_equal("m1")
+	assert_int(p.context_menu.item_count).is_equal(2)
+	assert_str(p.context_menu.get_item_text(0)).is_equal("Report message")
+	assert_str(p.context_menu.get_item_text(1)).is_equal("Block Ali")
+	p._on_menu(ChatScript.MenuItem.REPORT_MESSAGE)
+	await p._on_report_reason(1)
+	assert_str(safety_t.requests[0].method).is_equal("POST")
+	assert_that(safety_t.requests[0].body).is_equal({"target_type": "message", "target_id": "m1", "reason": "harassment"})
+	assert_bool(p.status.text.contains("report")).is_true()
+	p.open_page_menu()
+	assert_int(p.context_menu.item_count).is_equal(2)
+	p._on_menu(ChatScript.MenuItem.REPORT_USER)
+	assert_that(p.pending_report).is_equal({"type": "user", "id": "u-c1"})
+	assert_bool(p.open_message_menu("m1")).is_true()
+	p._on_menu(ChatScript.MenuItem.BLOCK_USER)
+	assert_str(p.block_target).is_equal("u-c1")
+	await p._on_block_confirmed()
+	assert_str(safety_t.requests[1].method).is_equal("PUT")
+	assert_bool(str(safety_t.requests[1].url).ends_with("/v1/users/u-c1/block")).is_true()
+	assert_int(nav.left).is_equal(1)
+	assert_bool(p.open_message_menu("m2")).is_true()
+	assert_int(p.context_menu.item_count).is_equal(1)
+	assert_str(p.context_menu.get_item_text(0)).is_equal("Unsend")
+	im_t.responses.append({"status": 200, "json": {"ok": true, "deleted": true}})
+	assert_bool(await p.unsend("m2")).is_true()
+	# 这个会话 last_read_seq 已是 3，进页不会再发 read；撤回是第 2 个请求
+	assert_int(im_t.requests.size()).is_equal(2)
+	assert_str(im_t.requests[1].method).is_equal("DELETE")
+	assert_bool(str(im_t.requests[1].url).ends_with("/v1/im/messages/m2")).is_true()
+	assert_str((p.bubbles["m2"].find_child("Text", true, false) as Label).text).is_equal("Message deleted")
+	assert_bool(p.open_message_menu("m2")).is_false()
+
+func test_chat_group_menu_adds_people_and_leaves() -> void:
+	im_t.responses = [
+		{"status": 200, "json": {"items": []}},
+		{"status": 200, "json": {"items": [_member("me-1", "Me", 0), _member("u-a", "Ann", 0)]}},
+	]
+	var p := _chat_page(_group("g1", "Team"))
+	assert_bool(await p.load_history()).is_true()
+	p.open_page_menu()
+	assert_int(p.context_menu.item_count).is_equal(3)
+	assert_bool(p.add_row.visible).is_false()
+	p._on_menu(ChatScript.MenuItem.ADD_PEOPLE)
+	assert_bool(p.add_row.visible).is_true()
+	profile_t.responses = [{"status": 200, "json": {"user_id": "u-c", "display_name": "Cara"}}]
+	im_t.responses.append({"status": 200, "json": {"ok": true, "added": ["u-c"]}})
+	im_t.responses.append({"status": 200, "json": {"items": [_member("me-1", "Me", 0), _member("u-a", "Ann", 0), _member("u-c", "Cara", 0)]}})
+	p.add_edit.text = "@Cara"
+	assert_bool(await p.add_people()).is_true()
+	assert_bool(str(im_t.requests[2].url).ends_with("/v1/im/groups/g1/members")).is_true()
+	assert_that(im_t.requests[2].body).is_equal({"user_ids": ["u-c"]})
+	assert_bool(p.add_row.visible).is_false()
+	assert_str(p.name_for("u-c")).is_equal("Cara")
+	im_t.responses.append({"status": 200, "json": {"ok": true, "removed": true}})
+	assert_bool(await p.leave_group()).is_true()
+	assert_str(im_t.requests[4].method).is_equal("DELETE")
+	assert_bool(str(im_t.requests[4].url).ends_with("/v1/im/groups/g1/members/me")).is_true()
+	assert_int(nav.left).is_equal(1)

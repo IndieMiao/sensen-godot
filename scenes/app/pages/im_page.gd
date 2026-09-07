@@ -1,6 +1,7 @@
 extends AppPage
-## 消息 Tab（B2）：会话列表（对方 / 群名、最后一条、未读、时间）+ 用 @handle 发起单聊；
-## 点会话压栈聊天页。实时事件（Net.im_event）到了就刷新列表。auth / im / profile / navigate 可注入。
+## 消息 Tab（B2）：会话列表（对方 / 群名、最后一条、未读、时间）+ 用 @handle 发起单聊 + 建群
+##（群名 + 一串 @handle，展开面板）；点会话压栈聊天页。实时事件（Net.im_event）到了就刷新列表。
+## auth / im / profile / navigate 可注入。
 
 var auth: AuthSession
 var im: ImApi
@@ -10,6 +11,11 @@ var navigate: Callable
 var realtime: Label
 var handle_edit: LineEdit
 var new_chat_button: Button
+var group_toggle: Button
+var group_panel: VBoxContainer
+var group_title_edit: LineEdit
+var group_members_edit: LineEdit
+var create_group_button: Button
 var status: Label
 var list: VBoxContainer
 var items: Array = []
@@ -34,7 +40,36 @@ func _build_body() -> void:
 	new_chat_button.name = "StartChat"
 	new_chat_button.pressed.connect(func(): start_chat())
 	row.add_child(new_chat_button)
+	group_toggle = GameUi.button("", tr("Group"), "POST /im/groups")
+	group_toggle.name = "GroupToggle"
+	group_toggle.pressed.connect(func(): group_panel.visible = not group_panel.visible)
+	row.add_child(group_toggle)
 	body.add_child(row)
+	group_panel = VBoxContainer.new()
+	group_panel.name = "GroupPanel"
+	group_panel.add_theme_constant_override("separation", 8)
+	group_panel.visible = false
+	group_title_edit = LineEdit.new()
+	group_title_edit.name = "GroupTitle"
+	group_title_edit.placeholder_text = tr("Group name")
+	group_title_edit.max_length = 60
+	group_title_edit.custom_minimum_size.y = 44
+	group_panel.add_child(group_title_edit)
+	var members_row := HBoxContainer.new()
+	members_row.add_theme_constant_override("separation", 8)
+	group_members_edit = LineEdit.new()
+	group_members_edit.name = "GroupMembers"
+	group_members_edit.placeholder_text = tr("@handles, separated by commas")
+	group_members_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	group_members_edit.custom_minimum_size.y = 44
+	group_members_edit.text_submitted.connect(func(_t): create_group())
+	members_row.add_child(group_members_edit)
+	create_group_button = GameUi.button("", tr("Create"), "POST /im/groups")
+	create_group_button.name = "CreateGroup"
+	create_group_button.pressed.connect(func(): create_group())
+	members_row.add_child(create_group_button)
+	group_panel.add_child(members_row)
+	body.add_child(group_panel)
 	status = GameUi.label("", 12, GameUi.MUTED)
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -110,6 +145,39 @@ func start_chat() -> bool:
 		status.text = describe_error(c)
 		return false
 	handle_edit.text = ""
+	status.text = ""
+	open_conversation(c)
+	return true
+
+## 建群：群名 + 一串 @handle。逐个查资料拿 user_id，哪一个不存在就指出哪一个。
+func create_group() -> bool:
+	var title := group_title_edit.text.strip_edges()
+	var handles := ProfileApi.parse_handles(group_members_edit.text)
+	if busy or _profile() == null or _im() == null:
+		return false
+	if title.is_empty():
+		status.text = tr("Give the group a name.")
+		return false
+	if handles.is_empty():
+		status.text = tr("Add at least one @handle.")
+		return false
+	busy = true
+	create_group_button.disabled = true
+	var ids: Dictionary = await _profile().user_ids_for(handles)
+	var c: Dictionary = {}
+	if bool(ids.get("ok", false)):
+		c = await _im().create_group(title, ids.get("ids", []))
+	busy = false
+	create_group_button.disabled = false
+	if not bool(ids.get("ok", false)):
+		status.text = tr("No one with the handle @%s.") % str(ids.get("missing", "")) if int(ids.get("status", 0)) == 404 else describe_error(ids)
+		return false
+	if not bool(c.get("ok", false)):
+		status.text = describe_error(c)
+		return false
+	group_title_edit.text = ""
+	group_members_edit.text = ""
+	group_panel.visible = false
 	status.text = ""
 	open_conversation(c)
 	return true

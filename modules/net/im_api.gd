@@ -23,6 +23,10 @@ func leave_group(conversation_id: String) -> Dictionary:
 func conversations() -> Dictionary:
 	return AccountApi.wrap_response(await client.request("GET", "/im/conversations"))
 
+## 成员列表：{user_id, display_name, handle, avatar, joined_at, last_read_seq}——群聊气泡昵称与「N 人已读」。
+func members(conversation_id: String) -> Dictionary:
+	return AccountApi.wrap_response(await client.request("GET", "/im/conversations/%s/members" % conversation_id.uri_encode()))
+
 ## 历史：seq 倒序；before_seq <= 0 表示从最新开始。
 func messages(conversation_id: String, before_seq := 0, limit := 30) -> Dictionary:
 	var q := "?limit=%d" % limit

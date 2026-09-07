@@ -22,6 +22,21 @@ msgstr ""
 msgid "@handle to start a chat"
 msgstr ""
 
+msgid "@handles to add"
+msgstr ""
+
+msgid "@handles, separated by commas"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Add at least one @handle."
+msgstr ""
+
+msgid "Add people"
+msgstr ""
+
 msgid "An account with this email already exists."
 msgstr ""
 
@@ -40,7 +55,16 @@ msgstr ""
 msgid "Block"
 msgstr ""
 
+msgid "Block %s"
+msgstr ""
+
 msgid "Block this user?"
+msgstr ""
+
+msgid "Block user"
+msgstr ""
+
+msgid "Blocked."
 msgstr ""
 
 msgid "Blocked. You won't see their posts anymore."
@@ -80,6 +104,9 @@ msgid "Continue with Google"
 msgstr ""
 
 msgid "Couldn't delete your account on the server. Check your connection and try again."
+msgstr ""
+
+msgid "Create"
 msgstr ""
 
 msgid "Create account"
@@ -136,6 +163,15 @@ msgstr ""
 msgid "Forgot password"
 msgstr ""
 
+msgid "Give the group a name."
+msgstr ""
+
+msgid "Group"
+msgstr ""
+
+msgid "Group name"
+msgstr ""
+
 msgid "Handle (letters, numbers, _)"
 msgstr ""
 
@@ -149,6 +185,15 @@ msgid "I have read and agree to the Terms of Service and Privacy Policy."
 msgstr ""
 
 msgid "Language: %s"
+msgstr ""
+
+msgid "Leave"
+msgstr ""
+
+msgid "Leave group"
+msgstr ""
+
+msgid "Leave this group?"
 msgstr ""
 
 msgid "Lifecycle probe"
@@ -172,6 +217,12 @@ msgstr ""
 msgid "Me"
 msgstr ""
 
+msgid "Members"
+msgstr ""
+
+msgid "Members: %s"
+msgstr ""
+
 msgid "Message"
 msgstr ""
 
@@ -190,10 +241,16 @@ msgstr ""
 msgid "No one with that handle."
 msgstr ""
 
+msgid "No one with the handle @%s."
+msgstr ""
+
 msgid "Not signed in"
 msgstr ""
 
 msgid "Nothing here yet. Follow people to see their posts."
+msgstr ""
+
+msgid "Only the sender can unsend a message."
 msgstr ""
 
 msgid "Password (6+ characters)"
@@ -229,6 +286,12 @@ msgstr ""
 msgid "Profile saved."
 msgstr ""
 
+msgid "Read"
+msgstr ""
+
+msgid "Read by %d"
+msgstr ""
+
 msgid "Realtime: %s"
 msgstr ""
 
@@ -236,6 +299,12 @@ msgid "Refresh"
 msgstr ""
 
 msgid "Report"
+msgstr ""
+
+msgid "Report message"
+msgstr ""
+
+msgid "Report user"
 msgstr ""
 
 msgid "Resend verification email"
@@ -286,6 +355,9 @@ msgstr ""
 msgid "Signing in…"
 msgstr ""
 
+msgid "Someone"
+msgstr ""
+
 msgid "Something else"
 msgstr ""
 
@@ -313,10 +385,19 @@ msgstr ""
 msgid "That handle is already taken."
 msgstr ""
 
+msgid "That's no longer available."
+msgstr ""
+
+msgid "They won't be able to message you, and you won't see each other's posts or profiles."
+msgstr ""
+
 msgid "This account has been disabled."
 msgstr ""
 
 msgid "This community has zero tolerance for abusive content or behavior. Content you post can be reported and removed, and repeat offenders are banned."
+msgstr ""
+
+msgid "This isn't a group chat."
 msgstr ""
 
 msgid "This message was blocked by our content rules."
@@ -329,6 +410,9 @@ msgid "This sign-in method is not enabled."
 msgstr ""
 
 msgid "Too many attempts. Try again later."
+msgstr ""
+
+msgid "Unsend"
 msgstr ""
 
 msgid "Verification email sent."
@@ -349,6 +433,9 @@ msgstr ""
 msgid "What's new?"
 msgstr ""
 
+msgid "You"
+msgstr ""
+
 msgid "You can send one message until they reply."
 msgstr ""
 
@@ -356,6 +443,9 @@ msgid "You can't message this user."
 msgstr ""
 
 msgid "You won't see each other's posts or profiles, and you'll stop following each other."
+msgstr ""
+
+msgid "You'll stop getting its messages."
 msgstr ""
 
 msgid "[Photo]"

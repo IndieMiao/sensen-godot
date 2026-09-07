@@ -39,3 +39,25 @@ static func _paged(path: String, cursor: String, limit: int) -> String:
 	if not cursor.is_empty():
 		q += "&cursor=%s" % cursor.uri_encode()
 	return path + q
+
+
+## 用户输入的一串 handle（逗号 / 空格分隔，可带 @，大小写不敏感）→ 去重后的小写 handle 列表。
+static func parse_handles(raw: String) -> PackedStringArray:
+	var out := PackedStringArray()
+	for piece in raw.replace("，", ",").replace(",", " ").split(" ", false):
+		var h := str(piece).strip_edges().trim_prefix("@").to_lower()
+		if not h.is_empty() and not out.has(h):
+			out.append(h)
+	return out
+
+## 一组 handle → user_id 列表；任一查不到就整体失败并报出是哪一个（missing），调用方原样提示。
+func user_ids_for(handles: PackedStringArray) -> Dictionary:
+	var ids: Array = []
+	for h in handles:
+		var p: Dictionary = await get_profile("@" + h)
+		if not bool(p.get("ok", false)):
+			return {"ok": false, "missing": h, "status": int(p.get("status", 0)), "code": str(p.get("code", "")), "ids": ids}
+		var id := str(p.get("user_id", ""))
+		if not id.is_empty() and not ids.has(id):
+			ids.append(id)
+	return {"ok": true, "ids": ids}

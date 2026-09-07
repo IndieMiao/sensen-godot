@@ -387,3 +387,93 @@ msgstr "无法给这个用户发消息。"
 
 msgid "[Photo]"
 msgstr "[图片]"
+
+msgid "@handles to add"
+msgstr "要拉进来的 @handle"
+
+msgid "@handles, separated by commas"
+msgstr "@handle，用逗号分隔"
+
+msgid "Add"
+msgstr "添加"
+
+msgid "Add at least one @handle."
+msgstr "至少填一个 @handle。"
+
+msgid "Add people"
+msgstr "拉人进群"
+
+msgid "Block %s"
+msgstr "拉黑 %s"
+
+msgid "Block user"
+msgstr "拉黑对方"
+
+msgid "Blocked."
+msgstr "已拉黑。"
+
+msgid "Create"
+msgstr "创建"
+
+msgid "Give the group a name."
+msgstr "给群起个名字。"
+
+msgid "Group"
+msgstr "建群"
+
+msgid "Group name"
+msgstr "群名"
+
+msgid "Leave"
+msgstr "退出"
+
+msgid "Leave group"
+msgstr "退出群聊"
+
+msgid "Leave this group?"
+msgstr "退出这个群？"
+
+msgid "Members"
+msgstr "成员"
+
+msgid "Members: %s"
+msgstr "成员：%s"
+
+msgid "No one with the handle @%s."
+msgstr "没有 @%s 这个人。"
+
+msgid "Only the sender can unsend a message."
+msgstr "只有发送者能撤回消息。"
+
+msgid "Read"
+msgstr "已读"
+
+msgid "Read by %d"
+msgstr "%d 人已读"
+
+msgid "Report message"
+msgstr "举报这条消息"
+
+msgid "Report user"
+msgstr "举报对方"
+
+msgid "Someone"
+msgstr "某人"
+
+msgid "That's no longer available."
+msgstr "这条内容已经不在了。"
+
+msgid "They won't be able to message you, and you won't see each other's posts or profiles."
+msgstr "对方将无法给你发消息，你们也看不到彼此的动态和资料。"
+
+msgid "This isn't a group chat."
+msgstr "这不是群聊。"
+
+msgid "Unsend"
+msgstr "撤回"
+
+msgid "You"
+msgstr "你"
+
+msgid "You'll stop getting its messages."
+msgstr "你将不再收到这个群的消息。"

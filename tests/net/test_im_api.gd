@@ -73,3 +73,11 @@ func test_messages_send_read_delete_and_sync() -> void:
 	assert_int(int(t.requests[5].body.seq)).is_equal(6)
 	assert_bool(str(t.requests[6].url).ends_with("/v1/im/messages/m1")).is_true()
 	assert_bool(str(t.requests[7].url).ends_with("/v1/im/sync?since=0&limit=200")).is_true()
+
+
+func test_members_hits_conversation_members_url() -> void:
+	var t := FakeTransport.new([{"status": 200, "json": {"items": []}}])
+	var api := ImApi.new(ApiClient.new("https://example.test/v1", t.callable()))
+	var r: Dictionary = await api.members("c 1")
+	assert_bool(r.ok).is_true()
+	assert_bool(str(t.requests[0].url).ends_with("/v1/im/conversations/c%201/members")).is_true()

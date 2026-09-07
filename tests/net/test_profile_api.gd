@@ -64,3 +64,20 @@ func test_errors_carry_code_and_field() -> void:
 	var b: Dictionary = await api.update({"bio": "x"})
 	assert_str(b.code).is_equal("SCHEMA")
 	assert_str(b.field).is_equal("bio")
+
+
+## 一串 handle → 去重小写；批量查 id 遇到查不到的就整体失败并指出是谁。
+func test_parse_handles_and_user_ids_for() -> void:
+	assert_array(Array(ProfileApi.parse_handles(" @Ann, ben，ann  @Cy "))).is_equal(["ann", "ben", "cy"])
+	assert_int(ProfileApi.parse_handles("").size()).is_equal(0)
+	var t := FakeTransport.new([{"status": 200, "json": {"user_id": "u-a"}}, {"status": 404, "json": {"code": "NOT_FOUND"}}])
+	var api := ProfileApi.new(ApiClient.new("https://example.test/v1", t.callable()))
+	var r: Dictionary = await api.user_ids_for(PackedStringArray(["ann", "ghost", "cy"]))
+	assert_bool(r.ok).is_false()
+	assert_str(r.missing).is_equal("ghost")
+	assert_int(t.requests.size()).is_equal(2) # 第一个失败就停
+	t.responses.append({"status": 200, "json": {"user_id": "u-b"}})
+	t.responses.append({"status": 200, "json": {"user_id": "u-b"}})
+	var ok: Dictionary = await api.user_ids_for(PackedStringArray(["ben", "ben2"]))
+	assert_bool(ok.ok).is_true()
+	assert_that(ok.ids).is_equal(["u-b"])
