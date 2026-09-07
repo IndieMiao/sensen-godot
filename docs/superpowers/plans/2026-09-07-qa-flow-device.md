@@ -117,3 +117,8 @@ xcrun devicectl device process launch --terminate-existing \
 ```
 
 截图改用 `RenderingServer.force_draw()` 同步出帧：等 `frame_post_draw` 在被遮挡的窗口（测试进程）里永远不来。
+
+**首轮观察窗结果（21:06–21:16）**：47 张补拍分成两组——点输入框前 25 张一样，键盘弹起后 22 张一样；
+弹起后整页上移约一个键盘高，标题「QA bob」和两条消息都被推出屏幕，只剩输入框（截图在
+`~/Downloads/sensen-qa-2026-09-07/e2e/iphone-alice-keyboard/`）。这是 SHIFT 模式对聊天页的错误形态：
+改成 KeyboardAvoider.Mode.SHRINK（收 SafeArea 底边，列表变矮、输入框上浮、标题不动），26bf205。
