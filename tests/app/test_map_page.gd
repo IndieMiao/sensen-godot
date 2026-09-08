@@ -28,6 +28,9 @@ func before_test() -> void:
 	fake = FakeMap.new()
 
 func after_test() -> void:
+	# 没被页面收养的替身地图要自己回收，否则 gdUnit 记成 orphan（页面收养过的随页面一起走）。
+	if is_instance_valid(fake) and fake.get_parent() == null:
+		fake.free()
 	if FileAccess.file_exists(AuthSession.PATH):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(AuthSession.PATH))
 
