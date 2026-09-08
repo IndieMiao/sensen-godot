@@ -16,6 +16,9 @@ import { PgImStore } from './db/pg_im.js';
 import { PgLocationStore } from './db/pg_location.js';
 import { locationAccountModule } from './http/location.js';
 import { nullReporter, sentryReporter } from './http/telemetry.js';
+import { PgDeviceStore } from './db/pg_push.js';
+import { nullSender, pushAccountModule } from './http/push.js';
+import { fcmSender, parseServiceAccount } from './http/fcm.js';
 import { imAccountModule } from './http/im.js';
 import { SocketHub } from './http/ws_gateway.js';
 import { CachedJwks, googleJwksFetcher } from './http/firebase_token.js';
@@ -78,6 +81,21 @@ const uploads = s3ConfigFromEnv(process.env);
 const moderation = new PgModerationStore(pool);
 const im = new PgImStore(pool);
 const locations = new PgLocationStore(pool);
+const deviceStore = new PgDeviceStore(pool);
+// D7：服务账号 JSON 可以直接给内容，也可以给文件路径（部署时挂 secret 文件更常见）。
+const serviceAccountRaw = process.env.FIREBASE_SERVICE_ACCOUNT
+  ?? (process.env.FIREBASE_SERVICE_ACCOUNT_FILE
+    ? await import('node:fs').then(fs => fs.readFileSync(process.env.FIREBASE_SERVICE_ACCOUNT_FILE!, 'utf8'))
+    : '');
+const serviceAccount = serviceAccountRaw ? parseServiceAccount(serviceAccountRaw) : null;
+const pushSender = serviceAccount
+  ? fcmSender(serviceAccount, () => Date.now(), async (url, init) => {
+      const res = await fetch(url, init);
+      return { status: res.status, json: await res.json().catch(() => ({})) };
+    })
+  : nullSender;
+if (!serviceAccount) console.warn('未设置 FIREBASE_SERVICE_ACCOUNT[_FILE]：离线推送空转（设备 token 照常收）');
+
 const errorReporter = process.env.SENTRY_DSN
   ? sentryReporter(process.env.SENTRY_DSN, () => Date.now(), undefined, { release: process.env.GIT_SHA ?? '', environment: process.env.NODE_ENV ?? 'dev' })
   : nullReporter;
@@ -92,9 +110,9 @@ if (localUploads) console.warn(`图片走开发期本地存储 ${localUploads.di
 const app = await buildApp({
   store, content, contentVersion: cv,
   accounts: new PgAccountStore(pool),
-  social, feed, uploads, localUploads, moderation, textModerator, im, wsHub, locations, errors: errorReporter,
+  social, feed, uploads, localUploads, moderation, textModerator, im, wsHub, locations, errors: errorReporter, devices: deviceStore, pushSender,
   adminUserIds: new Set((process.env.ADMIN_USER_IDS ?? '').split(',').map(x => x.trim()).filter(Boolean)),
-  accountModules: [socialAccountModule(social), feedAccountModule(feed), moderationAccountModule(moderation), imAccountModule(im), locationAccountModule(locations)],
+  accountModules: [socialAccountModule(social), feedAccountModule(feed), moderationAccountModule(moderation), imAccountModule(im), locationAccountModule(locations), pushAccountModule(deviceStore)],
   firebase: firebaseProjectId ? { projectId: firebaseProjectId, keys: jwks.keys, refreshKeys: jwks.refresh } : undefined,
   blueprintDir: BLUEPRINT_DIR, regionsFile: path.join(CONTENT_DIR, 'regions.json'),
   pepper: need('TOKEN_PEPPER'), now: () => Date.now(),

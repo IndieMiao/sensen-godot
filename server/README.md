@@ -372,3 +372,25 @@ QA / 演示账号用 `pnpm seed:qa`（`scripts/seed_qa.ts`）：Firebase 邮箱�
 未配置 `locations` 时三条路由 503 `LOCATION_NOT_CONFIGURED`。位置进删号级联与数据导出（`locationAccountModule`）。
 非好友「附近的人」（E2 的降精度网格）本期不做。
 
+## 推送（D7）
+
+| 路由 | 说明 |
+|---|---|
+| `PUT /v1/devices {token, platform}` | 注册设备 token（`ios` / `android`）。token 唯一：同一台设备换账号登录时归属跟着换。 |
+| `DELETE /v1/devices {token}` | 注销；只能注销自己名下的 token。 |
+
+新消息落库后，会话成员里**不在线**（WebSocket 没连着）且不是发送者的人各收一条通知。
+通知里**不放消息正文**，只有「谁发来一条消息 / 一张图」+ `conversation_id`，点开由客户端按 seq 补拉——
+正文不经过 Google 的推送通道，锁屏也不泄露（E2）。已下架（hidden）的消息不推；
+幂等重放（`created=false`）不重复推。FCM 回报失效的 token 会立即从表里删掉。
+
+发送走 FCM HTTP v1，**不引 firebase-admin**：服务账号 JSON → RS256 assertion → OAuth2 access token（缓存到过期前 60 秒）
+→ `POST /v1/projects/<id>/messages:send`。iOS 由 FCM 代投 APNs，所以只需在 Firebase 控制台挂 APNs key（SSLAUNCH A9）。
+配置：`FIREBASE_SERVICE_ACCOUNT`（JSON 内容）或 `FIREBASE_SERVICE_ACCOUNT_FILE`（文件路径）；两者都没有时推送空转，
+设备 token 照常收（便于先接客户端）。设备 token 进删号级联与数据导出（导出只给平台与时间，不给 token 本身）。
+
+## 遥测（E2 / E4）
+
+`SENTRY_DSN` 配了才上报未捕获异常；内容先过 `src/http/telemetry.ts` 的脱敏（URL 去 query，
+经纬度 / 正文 / 昵称 / 邮箱 / token 一律 `[redacted]`）。没配就是空转，错误只留在进程日志里。
+

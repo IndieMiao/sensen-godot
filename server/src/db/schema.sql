@@ -287,3 +287,12 @@ CREATE TABLE IF NOT EXISTS user_locations (
   accuracy_m   double precision,
   updated_at   bigint NOT NULL
 );
+-- D7 推送：设备 token（token 唯一；同设备换账号时归属跟着换）。删号级联。
+CREATE TABLE IF NOT EXISTS device_tokens (
+  token       text PRIMARY KEY,
+  user_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  platform    text NOT NULL,
+  updated_at  bigint NOT NULL
+);
+CREATE INDEX IF NOT EXISTS device_tokens_user_idx ON device_tokens(user_id);
+

@@ -33,6 +33,7 @@ import { UPLOAD_CONTENT_TYPES, UPLOAD_MAX_BYTES, ownsKey, presignUpload, publicU
 import type { LocalUploadStore } from './local_uploads.js';
 import { FRIENDS_LIMIT, friendLocationView, isFresh, validateLocation, type LocationStore } from './location.js';
 import { nullReporter, scrubUrl, type ErrorReporter } from './telemetry.js';
+import { messageNotification, nullSender, offlineRecipients, validateRegister, type DeviceStore, type PushSender } from './push.js';
 import { ADMIN_ACTIONS, NullModerator, REPORT_AUTO_HIDE, decide, reportView, validateReport,
   type ModerationStore, type TextModerator } from './moderation.js';
 import { HISTORY_LIMIT_MAX, SYNC_LIMIT_MAX, conversationView, greetingBlocked, messageView, uniqueIds, validateGroup, validateMessage,
@@ -68,6 +69,9 @@ export interface AppDeps {
   locations?: LocationStore;
   /** E4 错误上报；不配则空转（不引 SDK，见 telemetry.ts）。 */
   errors?: ErrorReporter;
+  /** D7 推送：设备表与发送端；缺任一则注册路由 503、离线通知空转。 */
+  devices?: DeviceStore;
+  pushSender?: PushSender;
   /** D6 举报 / 拉黑 / 封禁 / 复审队列；缺省时相关路由 503 MODERATION_NOT_CONFIGURED。 */
   moderation?: ModerationStore;
   /** D6 文本前置过滤；缺省 = NullModerator（不拦，但全部进人工队列）。 */
@@ -902,6 +906,46 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return deleted;
   };
   if (deps.wsHub && deps.im) await registerImGateway(app, deps.wsHub, currentUser, { now: deps.now, pingIntervalMs: deps.wsPingIntervalMs });
+
+  // —— D7 推送：设备 token 注册 / 注销 + 新消息的离线通知 ——
+  const pushGuard = async (req: FastifyRequest, reply: FastifyReply): Promise<UserRow | null> => {
+    if (!deps.devices) { await reply.code(503).send({ code: 'PUSH_NOT_CONFIGURED', server_time: deps.now() }); return null; }
+    const c = await currentUser(req);
+    if ('user' in c) return c.user;
+    await reply.code(c.status).send(c.body);
+    return null;
+  };
+  app.put('/v1/devices', async (req, reply) => {
+    const me = await pushGuard(req, reply); if (!me) return;
+    const v = validateRegister(req.body);
+    if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, server_time: deps.now() });
+    await deps.devices!.upsert(me.id, v.token, v.platform, deps.now());
+    return reply.send({ ok: true, server_time: deps.now() });
+  });
+  app.delete('/v1/devices', async (req, reply) => {
+    const me = await pushGuard(req, reply); if (!me) return;
+    const raw = (req.body as Record<string, unknown> | undefined)?.token;
+    if (typeof raw !== 'string' || raw.trim().length === 0)
+      return reply.code(400).send({ code: 'SCHEMA', field: 'token', server_time: deps.now() });
+    // 只删自己的：token 是自报的，不能拿别人的 token 来注销。
+    const mine = await deps.devices!.tokensFor([me.id]);
+    if (mine.some(d => d.token === raw.trim())) await deps.devices!.remove(raw.trim());
+    return reply.send({ ok: true, server_time: deps.now() });
+  });
+
+  /** 新消息 → 不在线的成员收一条通知（正文不进推送，见 push.ts）。失效 token 顺手清掉。 */
+  const notifyOffline = async (conversationId: string, senderId: string, senderName: string, kind: string): Promise<number> => {
+    if (!deps.devices || !deps.pushSender || !deps.im) return 0;
+    const members = (await deps.im.members(conversationId)).map(m => m.user_id);
+    const isOnline = (id: string): boolean => Boolean(hub && 'has' in hub && (hub as { has(u: string): boolean }).has(id));
+    const targets = offlineRecipients(members, senderId, isOnline);
+    if (targets.length === 0) return 0;
+    const devices = await deps.devices.tokensFor(targets);
+    if (devices.length === 0) return 0;
+    const r = await deps.pushSender.send(devices, messageNotification(senderName, conversationId, kind));
+    for (const dead of r.invalid) await deps.devices.remove(dead);
+    return r.sent;
+  };
   const peerCardsOf = async (ids: string[]): Promise<Map<string, PeerCard>> => {
     const profiles = await deps.social!.profiles([...new Set(ids)]);
     const out = new Map<string, PeerCard>();
@@ -1027,6 +1071,13 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     if (mod.status === 'rejected') return reply.code(422).send({ code: 'MODERATION_REJECTED', categories: mod.categories, server_time: deps.now() });
     const r = await deps.im!.appendMessage({ id: randomUUID(), conversationId: c.id, senderId: me.id, clientId: v.clientId, kind: v.kind, body: v.body, now: deps.now(), moderation: mod });
     publish(r.events);
+    // 幂等重放（created=false）不重复推送；已下架（hidden）的不推。
+    // pending 照推：没配文本审核时所有消息都是 pending，而消息本身已经通过 WS 投出去了，
+    // 通知与投递必须一致，否则「在线看得到、离线永远收不到」。
+    if (r.created && mod.status !== 'hidden') {
+      const card = (await peerCardsOf([me.id])).get(me.id);
+      await notifyOffline(c.id, me.id, card?.display_name ?? '', v.kind);
+    }
     return reply.code(r.created ? 201 : 200).send({ ...messageView(r.message), created: r.created, server_time: deps.now() });
   });
 

@@ -39,6 +39,8 @@ export class SocketHub implements LiveHub {
   }
   connections(userId: string): number { return this.sockets.get(userId)?.size ?? 0; }
   online(): number { return this.sockets.size; }
+  /** 这个人当前有没有活着的连接——离线推送据此决定发不发（D7）。 */
+  has(userId: string): boolean { return (this.sockets.get(userId)?.size ?? 0) > 0; }
 
   publish(events: UserEvent[]): void {
     for (const e of events) {
