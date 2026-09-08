@@ -42,7 +42,8 @@ func _ready() -> void:
 	# qa_env 会先看 --qa-env=SENSEN_QA_FLOW=…（安卓没法设环境变量），再回落到环境变量。
 	var flow := QaFlow.requested(OS.get_cmdline_user_args(), QaFlow.qa_env("SENSEN_QA_FLOW"))
 	# 安卓上没有环境变量、日志是唯一的抓手：把这三样打出来，省得下次又靠猜。
-	if not NetScript.is_test_process():
+	# 只在 debug 包里打——正式包不需要这行。
+	if OS.is_debug_build() and not NetScript.is_test_process():
 		print("[qa] user_dir=%s cfg=%s flow='%s' test_process=%s" % [
 			OS.get_user_data_dir(), FileAccess.file_exists(QaFlow.QA_ENV_FILE),
 			flow, NetScript.is_test_process()])

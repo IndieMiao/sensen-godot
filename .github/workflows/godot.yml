@@ -128,6 +128,10 @@ jobs:
           mkdir -p android/build
           unzip -q ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip -d android/build
           echo "${GODOT_VERSION}.stable" > android/.build_version
+          # 没有 .gdignore 的话，导出前的文件系统扫描会把模板 res/ 里的 .webp 也导入一遍、
+          # 生成 .webp.import 旁文件，安卓资源合并器直接拒收（"file name must end with .xml or .png"），
+          # Gradle 失败但 Godot 只在末尾打一行 export failed——上一版 APK 还留在原地，很容易被当成成功。
+          touch android/.gdignore
 
       - name: Debug keystore
         run: |

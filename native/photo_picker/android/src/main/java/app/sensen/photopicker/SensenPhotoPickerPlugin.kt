@@ -1,7 +1,9 @@
 // C3 Photo Picker（Android）：系统 Photo Picker（Android 13+，`ACTION_PICK_IMAGES`，不要相册权限）薄桥接；
 // 老系统退回 `ACTION_OPEN_DOCUMENT`（同样免权限，只是界面是文档选择器）。选完在原生层解码、按 EXIF 摆正、
 // 长边缩到 maxSide、转 JPEG 落到 cacheDir，只把路径交回 Godot。接口与 iOS 桥一致：
-// isAvailable() / pickImages(maxCount, maxSide, quality) / 信号 picked(paths, error)。
+// is_available() / pick_images(max_count, max_side, quality) / 信号 picked(paths, error)。
+// 方法名必须与 GDScript 的 call() 逐字一致：Godot 安卓插件按 Kotlin 方法名原样暴露，
+// 不做驼峰↔下划线转换。2026-09-08 真机实测：这里原本是驼峰，安卓选图一直是哑的。
 package app.sensen.photopicker
 
 import android.app.Activity
@@ -38,14 +40,14 @@ class SensenPhotoPickerPlugin(godot: Godot) : GodotPlugin(godot) {
     override fun getPluginSignals() = setOf(SignalInfo(SIGNAL_PICKED, Array<String>::class.java, String::class.java))
 
     @UsedByGodot
-    fun isAvailable(): Boolean = activity != null
+    fun is_available(): Boolean = activity != null
 
     @UsedByGodot
-    fun isPicking(): Boolean = picking
+    fun is_picking(): Boolean = picking
 
     /** 弹系统选图器；结果走 picked 信号（取消 = 空数组）。返回 false = 没弹出来。 */
     @UsedByGodot
-    fun pickImages(maxCount: Int, maxSideArg: Int, jpegQuality: Float): Boolean {
+    fun pick_images(maxCount: Int, maxSideArg: Int, jpegQuality: Float): Boolean {
         val act = activity ?: return false
         if (picking) return false
         picking = true
