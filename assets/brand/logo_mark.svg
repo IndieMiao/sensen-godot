@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!--
+    应用身份占位标识（E6 / R11）。品牌决策 = SSLAUNCH B1，未拍板。
+    B1 落地后：整份替换本文件（保持 512x512 viewBox、内容居中、背景透明），
+    再跑 tools/brand/render.sh 重新生成三端 PNG。改色请改 modules/brand/brand.gd。
+  -->
+  <path d="M256 40c-79.5 0-144 64.5-144 144 0 100 144 288 144 288s144-188 144-288c0-79.5-64.5-144-144-144z" fill="#287c59"/>
+  <circle cx="256" cy="180" r="58" fill="#e8f4ed"/>
+</svg>

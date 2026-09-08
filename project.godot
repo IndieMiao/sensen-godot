@@ -4,9 +4,13 @@ config_version=5
 [application]
 config/name="SensenAvatar"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://icon.svg"
+config/icon="res://assets/brand/logo_mark.svg"
 config/quit_on_go_back=false
 run/main_scene="res://scenes/app/boot.tscn"
+boot_splash/bg_color=Color(0.988235, 0.996078, 0.980392, 1)
+boot_splash/image="res://assets/brand/generated/splash.png"
+boot_splash/fullsize=false
+boot_splash/use_filter=true
 
 [autoload]
 Avatar="*res://modules/avatar/avatar_service.gd"

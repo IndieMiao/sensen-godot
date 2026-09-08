@@ -50,6 +50,9 @@
 6. `config/firebase.json` 指向目标环境的 Firebase 项目；`mapbox_token.txt` 是目标主体的 token（SSLAUNCH D3 后换）。
 7. 服务端 `.env` 是目标环境（prod / qa）的一套，`UPLOAD_LOCAL_DIR` 关掉、`R2_*` 四项齐。
 8. 构建号 +1，marketing 版本按 §1；`CHANGELOG.md` 补齐当前节。
+9. **应用身份不是占位**：`Brand.PLACEHOLDER` 为 `false`，且 `assets/brand/logo_mark.svg` 已换成正式标识。
+   占位标识是个通用定位图钉，长得像"正常图标"，很容易带着出包。品牌决策 = SSLAUNCH B1，
+   未拍板前这条必然拦住提审（E6 / R11，SGODOT-66）。换素材见 §5.1.2 与 `assets/brand/README.md`。
 
 ### 5.1.1 Mapbox 安卓依赖必须用 `-ndk27` 后缀的 artifact
 
@@ -61,6 +64,26 @@ Mapbox 同一个版本发两套产物：默认的 `com.mapbox.maps:android` 是 
 
 - `native/map/android/build.gradle.kts` 的 `implementation`
 - `addons/sensen_map/export_plugin.gd` 的 `_get_android_dependencies`（APK 的 Gradle 构建按它解析）
+
+
+### 5.1.2 三端开屏：改一处会漏两处
+
+开屏取值同源于 `modules/brand/brand.gd`（`Brand`），但引擎和导出器各读自己配置文件里的**字面值**：
+
+| 端 | 实际读的地方 |
+|---|---|
+| Godot 引擎开屏 | `project.godot` → `[application]` 的 `boot_splash/*` 与 `config/icon` |
+| iOS 启动画面 | `export_presets.cfg` → `[preset.1.options]` 的 `storyboard/*` |
+| Android 12+ 系统开屏 | `export_presets.cfg` → `[preset.0.options]` 的 `launcher_icons/*` |
+
+安卓侧**不要**改 `android/build/res/values/themes.xml`：那份 `GodotAppSplashTheme` 是导出时自动生成的
+（文件头自己写着会被覆盖），而且 `android/build` 是 gitignore 的，重装模板即丢——同 B5 地图垫底
+改成独立 AAR 的原因。它引用的 `@mipmap/icon_background` 与 `@drawable/splash_icon` 由
+`launcher_icons/*` 和 `boot_splash/image` 在导出时生成，所以只改导出预设就够，不需要 `custom_theme_attributes`。
+
+Godot 4.7 的 iOS 侧没有 `use_launch_screen_storyboard` 开关（storyboard 常开），按旧版文档写这个键是死键。
+
+`tests/app/test_brand_splash.gd` 守护这三处不漂移：只改 `Brand` 忘了改配置、或反过来，都会红。
 
 ### 5.2 Android
 
