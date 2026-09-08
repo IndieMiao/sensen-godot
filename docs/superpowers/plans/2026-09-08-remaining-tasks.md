@@ -180,3 +180,27 @@
 - iPhone 首次定位授权弹窗要真人点一次「允许」，之后自己的位置才会上报。
 - `SENSEN_QA_PICK=1` 的选图器截图同样需要真人选图。
 
+---
+
+## 7. 2026-09-08 深夜：七项不卡任务全部完成
+
+| # | 任务 | 结果 |
+|---|---|---|
+| 1 | B5 第二刀 | 底部好友条（头像 + 昵称，点进主页）、点地图角色进主页、捏合与双击绕指尖缩放、地图 HUD 给底栏与好友条让位。真机验证：观察窗记录到 17 次平移 / 12 次缩放 |
+| 2 | A7 收口 | 壳里的间距与字号全部改走 `DesignTokens.UI_*` / `SPACE_*`；新增 lint 用例，禁止再写字面值 |
+| 3 | B7 部件池 | 29 → 38 件：新增面具 3 / 腰包 3 / 单肩包 2 / 挎包 1，全部只挑标准 toon shader 的干净件；分类标签栏改横滚并给最小触摸宽度 |
+| 4 | E2 数据卫生 | 两端各一份脱敏器（`modules/telemetry/scrub.gd`、`server/src/http/telemetry.ts`）：经纬度 / 正文 / 昵称 / 邮箱 / token 一律 `[redacted]`，URL 去 query |
+| 5 | E4 崩溃上报 | Sentry store 端点直发（不引 SDK），客户端面包屑 + 接口失败上报，服务端挂在 Fastify error handler；无 DSN 即空转 |
+| 5 | E5 埋点 | PostHog capture，事件白名单 13 个，属性过脱敏，离线退回队列；设置页「分享匿名使用数据」可关；无 key 即空转 |
+| 6 | D7 推送 | 设备 token 表与注册 / 注销路由、离线通知（**正文不进推送**，只说谁来了消息）、FCM HTTP v1 发送端（服务账号 JWT → OAuth2 → send，不引 firebase-admin）、客户端 `PushApi` |
+| 7 | 语音房线 | D5 服务端（房间 / 麦位 / 静音 / LiveKit token 签发，**canPublish 就是麦克风闸门**）、B6 页面（列表 / 建房 / 上下麦 / 房主静音 / 举报即本地静音 / 无原生桥时只读）、C4 `VoiceBridge` 抽象 + 原生桥包装 |
+
+测试：Godot 880 例、服务端 402 例，全绿零孤儿。
+
+### 7.1 这七项里仍然缺的
+
+- **C4 原生插件本体**：LiveKit iOS / Android SDK 的薄桥接还没写（现在是接口 + 工厂 + 原生包装，桌面与真机都返回 null → 页面只读）。要 SSLAUNCH F2 拍板进 Demo 之后再投 1.5–2 人周。
+- **C2 推送插件本体**：拿 FCM / APNs token 的原生插件没写，所以 `PushApi.register` 现在没人调用；服务端与客户端 API 已就位。
+- **E4 引擎级崩溃**：sentry-godot GDExtension 未接，现在只能上报自己捕获到的错误。
+- 正式密钥全部待 SSLAUNCH：PostHog（D8）、Sentry（D7）、LiveKit（D2）、Firebase 服务账号（D9 台账）。
+
