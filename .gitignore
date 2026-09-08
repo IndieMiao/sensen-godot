@@ -83,3 +83,10 @@ native/voice/android/build/
 native/voice/android/bin/*
 !native/voice/android/bin/*.aar
 native/voice/android/local.properties
+
+# B5 安卓地图插件：同上
+native/map/android/.gradle/
+native/map/android/build/
+native/map/android/bin/*
+!native/map/android/bin/*.aar
+native/map/android/local.properties
