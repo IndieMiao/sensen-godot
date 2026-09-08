@@ -19,6 +19,41 @@ var flow := ""
 var report := {"flow": "", "started_at": "", "steps": [], "errors": [], "done": false}
 var _index := 0
 
+## QA 开关的落脚点（每行 KEY=VALUE）。安卓上非有它不可：`adb shell am start` 没法给进程设
+## 环境变量，intent extra 又不一定能送到引擎手里，而 `adb push` + `run-as cp` 一定能把文件放进去。
+const QA_ENV_FILE := "user://qa_env.cfg"
+
+## 取一个 QA 开关，三处依次找：命令行 `--qa-env=KEY=VALUE` → user://qa_env.cfg → 环境变量。
+static func qa_env(name: String) -> String:
+	var prefix := "--qa-env=%s=" % name
+	for a in OS.get_cmdline_args():
+		if str(a).begins_with(prefix):
+			return str(a).trim_prefix(prefix)
+	for a in OS.get_cmdline_user_args():
+		if str(a).begins_with(prefix):
+			return str(a).trim_prefix(prefix)
+	var from_file: String = str(_qa_env_file().get(name, ""))
+	if not from_file.is_empty():
+		return from_file
+	return OS.get_environment(name)
+
+## 只读一次并缓存：qa_env 会被调十几次，不必每次开文件。
+static var _qa_file_cache: Dictionary = {}
+static var _qa_file_read := false
+
+static func _qa_env_file() -> Dictionary:
+	if _qa_file_read:
+		return _qa_file_cache
+	_qa_file_read = true
+	if not FileAccess.file_exists(QA_ENV_FILE):
+		return _qa_file_cache
+	for line in FileAccess.get_file_as_string(QA_ENV_FILE).split("\n"):
+		var text := str(line).strip_edges()
+		if text.is_empty() or text.begins_with("#") or not text.contains("="):
+			continue
+		_qa_file_cache[text.substr(0, text.find("="))] = text.substr(text.find("=") + 1)
+	return _qa_file_cache
+
 ## 从参数或环境变量里取要跑的流程名；没有返回空串。
 static func requested(args: PackedStringArray, env_value: String) -> String:
 	for a in args:
@@ -49,7 +84,7 @@ func _run() -> void:
 	report.done = true
 	_write_report()
 	print("QaFlow: done, %d steps, %d errors" % [report.steps.size(), report.errors.size()])
-	if OS.get_environment("SENSEN_QA_QUIT") == "1":
+	if qa_env("SENSEN_QA_QUIT") == "1":
 		get_tree().quit()
 
 ## 年龄门 → 同意页 → 登录（Dev）→ 四个 Tab → 设置 → 探针页 → 切中文 → 切回 → 登出。
@@ -107,7 +142,7 @@ func run_social() -> void:
 	await settle()
 	await shot("lifecycle_probe")
 	# SENSEN_QA_PICK=1：在探针页弹系统选图器（C3 真机验证）。人选完图流程才继续，结果打在页上再截一张。
-	if OS.get_environment("SENSEN_QA_PICK") == "1":
+	if qa_env("SENSEN_QA_PICK") == "1":
 		var probe := AppRouter.top_instance()
 		if probe != null and probe.has_method("pick_photos"):
 			await probe.pick_photos()
@@ -143,7 +178,7 @@ func run_social() -> void:
 ## 可选 SENSEN_QA_DM=@handle 直接打开与某人的单聊，SENSEN_QA_SAY=文字 再发一句。
 ## 首启合规裁决直接写成通过（这是 QA 实例，不是用户）。
 func run_login() -> void:
-	var cred := parse_credentials(OS.get_environment("SENSEN_QA_LOGIN"))
+	var cred := parse_credentials(qa_env("SENSEN_QA_LOGIN"))
 	if cred.is_empty():
 		_error("SENSEN_QA_LOGIN must be email:password")
 		return
@@ -169,7 +204,7 @@ func run_login() -> void:
 		return
 	# SENSEN_QA_ME=1：先进「我的」Tab 拉资料（顺带把本地装扮同步到服务端，B7），截一张；
 	# SENSEN_QA_FOLLOWERS=1 再压栈自己的关注者列表截一张。
-	if OS.get_environment("SENSEN_QA_ME") == "1":
+	if qa_env("SENSEN_QA_ME") == "1":
 		shell.show_tab(AppRoutes.TAB_PROFILE)
 		await settle()
 		var me_page = shell.page(AppRoutes.TAB_PROFILE)
@@ -177,7 +212,7 @@ func run_login() -> void:
 			await me_page.refresh_profile()
 		await settle()
 		await shot("me_tab")
-		if OS.get_environment("SENSEN_QA_FOLLOWERS") == "1":
+		if qa_env("SENSEN_QA_FOLLOWERS") == "1":
 			AppRouter.push_instance(AppRoutes.FOLLOW_LIST, {"user_id": Net.auth.server_user_id, "kind": "followers"})
 			await settle()
 			await settle()
@@ -186,11 +221,11 @@ func run_login() -> void:
 			await settle()
 	# SENSEN_QA_MAP=1：进地图 Tab（B5），等角色装配几秒再截；SENSEN_QA_FAKE_LOCATION=lat,lng 模拟一次定位
 	# （桌面没有 GPS、iOS 桥暂无定位）：地图落锚 + 页面按真实路径上报服务端。
-	if OS.get_environment("SENSEN_QA_MAP") == "1":
+	if qa_env("SENSEN_QA_MAP") == "1":
 		shell.show_tab(AppRoutes.TAB_MAP)
 		await settle()
 		var map_page = shell.page(AppRoutes.TAB_MAP)
-		var fake := OS.get_environment("SENSEN_QA_FAKE_LOCATION").split(",", false)
+		var fake := qa_env("SENSEN_QA_FAKE_LOCATION").split(",", false)
 		if fake.size() == 2 and map_page != null and map_page.map_scene != null and map_page.map_scene.has_method("_on_location_update"):
 			map_page.map_scene._on_location_update(float(fake[0]), float(fake[1]), 10.0)
 			await settle()
@@ -200,7 +235,7 @@ func run_login() -> void:
 			await settle()
 		await shot("map_tab")
 		# SENSEN_QA_MAP_ROUNDTRIP=1：地图 → 我的 → 地图，复现「切回来全黑」；每步都带 view 字段。
-		if OS.get_environment("SENSEN_QA_MAP_ROUNDTRIP") == "1":
+		if qa_env("SENSEN_QA_MAP_ROUNDTRIP") == "1":
 			shell.show_tab(AppRoutes.TAB_PROFILE)
 			await settle()
 			await shot("roundtrip_me")
@@ -209,7 +244,7 @@ func run_login() -> void:
 				await settle()
 			await shot("map_back")
 	# SENSEN_QA_VOICE=1：压栈语音房，建一个房间再截（没配 LiveKit 的服务器会显示「还没开语音房」）。
-	if OS.get_environment("SENSEN_QA_VOICE") == "1":
+	if qa_env("SENSEN_QA_VOICE") == "1":
 		AppRouter.push_instance(AppRoutes.VOICE_ROOM)
 		await settle()
 		await settle()
@@ -236,7 +271,7 @@ func run_login() -> void:
 	shell.show_tab(AppRoutes.TAB_IM)
 	await settle()
 	await shot("im_tab")
-	var dm := OS.get_environment("SENSEN_QA_DM").strip_edges()
+	var dm := qa_env("SENSEN_QA_DM").strip_edges()
 	if dm.is_empty():
 		return
 	var page = shell.page(AppRoutes.TAB_IM)
@@ -250,7 +285,7 @@ func run_login() -> void:
 	if chat == null or not chat.has_method("send"):
 		_error("chat page not on top")
 		return
-	var say := OS.get_environment("SENSEN_QA_SAY")
+	var say := qa_env("SENSEN_QA_SAY")
 	if not say.is_empty():
 		chat.composer.text = say
 		if not await chat.send():
@@ -258,7 +293,7 @@ func run_login() -> void:
 		await settle()
 		await shot("chat_sent")
 	# SENSEN_QA_PROFILE=1：顺手压栈对方的用户主页截一张（关注 / 发消息 / 举报 / 拉黑 + 动态列表），再弹回聊天页。
-	if OS.get_environment("SENSEN_QA_PROFILE") == "1":
+	if qa_env("SENSEN_QA_PROFILE") == "1":
 		AppRouter.push_instance(AppRoutes.USER, {"handle": dm})
 		await settle()
 		await settle()
@@ -267,7 +302,7 @@ func run_login() -> void:
 		await settle()
 	# SENSEN_QA_PHOTO=<路径>（user:// 或绝对路径）：不弹系统选图器，直接把这张图当选中的发出去——
 	# 图片消息的上传 / 发送 / 渲染整条链在桌面和真机上都能自动跑。
-	var photo := OS.get_environment("SENSEN_QA_PHOTO").strip_edges()
+	var photo := qa_env("SENSEN_QA_PHOTO").strip_edges()
 	if not photo.is_empty():
 		var pp := PhotoPicker.new()
 		pp.picker = func(_n: int) -> PackedStringArray: return PackedStringArray([photo])
@@ -355,7 +390,7 @@ func run_dressing() -> void:
 
 ## SENSEN_QA_STAY=map|feed|im|profile：观察窗开始前切到这个 Tab 并停在那儿——
 ## 真人要在某一页上手动操作（地图手势、系统权限弹窗）时，别让步行器把页面停在别处。
-func stay(tab: String = OS.get_environment("SENSEN_QA_STAY").strip_edges()) -> bool:
+func stay(tab: String = qa_env("SENSEN_QA_STAY").strip_edges()) -> bool:
 	if tab.is_empty() or not AppRoutes.is_tab(tab):
 		return false
 	var shell := current()
@@ -369,7 +404,7 @@ func stay(tab: String = OS.get_environment("SENSEN_QA_STAY").strip_edges()) -> b
 ## SENSEN_QA_WATCH=<秒>：流程跑完后在这段时间里每隔 watch_interval_s 补拍一张（watch_NN）。
 ## 给真机上必须手点的验证留观察窗——键盘弹起、系统权限弹窗这类，镜像不弹软键盘，
 ## devicectl 也拿不到屏幕；人点完，拉回截图看视口有没有按预期位移。
-func watch(secs: int = int(OS.get_environment("SENSEN_QA_WATCH"))) -> void:
+func watch(secs: int = int(qa_env("SENSEN_QA_WATCH"))) -> void:
 	if secs <= 0:
 		return
 	var deadline := Time.get_ticks_msec() + secs * 1000

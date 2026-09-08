@@ -74,6 +74,18 @@ Godot 插件 v2 靠 AAR 里 `AndroidManifest.xml` 的 `org.godotengine.plugin.v2
   要做常驻语音再单独申请，那一项审核会被重点问。
 - 桌面没有语音。要在 Mac 上联调得接社区的 godot-livekit GDExtension，本仓库暂不带。
 
+## 安卓启动时那三行 GDExtension 报错是正常的
+
+安卓包一启动会打三条 `No GDExtension library found for current OS and architecture (android.arm64)`，
+分别对应三个 `.gdextension`。原因是安卓侧的能力来自 Kotlin 插件，`.gdextension` 里本就没有 android 条目。
+**Godot 会强制把注册过的 `.gdextension` 打进包，导出预设的 exclude_filter 拦不住**（试过 `native/*`，无效），
+所以这三行去不掉。判断插件到底有没有到位，看 logcat 里的 `GodotPluginRegistry`：
+
+```
+adb logcat | grep GodotPluginRegistry
+# Initializing Godot plugin SensenPhotoPicker / SensenPush / SensenVoice
+```
+
 ## 排查
 
 - 真机上语音房显示「只能收听」→ 桥没给出来。依次看：`.gdextension` 的 `.a` 在不在、

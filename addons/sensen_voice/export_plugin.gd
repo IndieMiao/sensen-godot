@@ -25,3 +25,10 @@ func _get_android_dependencies(platform: EditorExportPlatform, debug: bool) -> P
 	if not _supports_platform(platform):
 		return PackedStringArray()
 	return PackedStringArray(["io.livekit:livekit-android:2.11.0"])
+
+## LiveKit 依赖 com.github.davidliu:audioswitch，只在 JitPack 上有，Maven Central 没有。
+## 不加这一条，APK 的 Gradle 构建会在解析依赖时失败（本地编 AAR 时同理，见 settings.gradle.kts）。
+func _get_android_dependencies_maven_repos(platform: EditorExportPlatform, debug: bool) -> PackedStringArray:
+	if not _supports_platform(platform):
+		return PackedStringArray()
+	return PackedStringArray(["https://jitpack.io"])

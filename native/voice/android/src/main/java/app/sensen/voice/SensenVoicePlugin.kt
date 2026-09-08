@@ -145,8 +145,9 @@ class SensenVoicePlugin(godot: Godot) : GodotPlugin(godot) {
     fun set_volume(identity: String, volume: Float) {
         val r = room ?: return
         val participant = r.remoteParticipants.values.firstOrNull { it.identity?.value == identity } ?: return
+        // Android 侧是方法 setVolume(double)，不是属性（iOS 那边才是 .volume）。
         participant.audioTrackPublications.forEach { (_, track) ->
-            (track as? RemoteAudioTrack)?.volume = volume.toDouble()
+            (track as? RemoteAudioTrack)?.setVolume(volume.toDouble())
         }
     }
 
