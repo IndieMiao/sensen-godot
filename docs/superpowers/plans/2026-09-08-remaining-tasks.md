@@ -118,3 +118,65 @@
 - 被外部卡住的卡统一加 `依赖SSLAUNCH`，并在评论里写明「卡点 = SSLAUNCH 编号 + 可先做的部分」，指回本文。
 - 语音房线 SGODOT-98 / 102 加 `待决策`（F2）；SGODOT-82 摘 `待决策`（F4 已由实现决定）。
 - 未改任何卡的状态：In Progress 卡保持，直到收尾项做完再置 Done。
+
+---
+
+## 6. 2026-09-08 收盘：做完了什么、还剩什么
+
+### 6.1 本日完成（Plane 已置 Done）
+
+| 卡 | 内容 |
+|---|---|
+| SGODOT-93 B4 | 关注者 / 关注中 / 新粉丝列表页；主页与用户主页装扮头像；计数可点 |
+| SGODOT-91 B2 | 会话列表头像；群聊「N 人已读」实时 |
+| SGODOT-92 B3 | feed 全套（时间线 / 多图发布 / 点赞 / 评论 / 举报 / 作者头像） |
+| SGODOT-68 发布链 B1 | Godot CI 首次全绿：headless gdUnit + i18n 校验 + ObjectDB 守卫 + Android debug APK 产物 |
+| SGODOT-72 发布链 B7 | `docs/release-process.md` + `tools/release/manifest.sh` |
+| SGODOT-79 Q6 | ObjectDB 警告不复现，CI 加守卫 |
+
+### 6.2 真机交互修复（当日下午，均带回归测试）
+
+| 现象 | 根因 | 处理 |
+|---|---|---|
+| 地图手势完全失效 | 壳 SafeArea / 主列、页面宿主、地图页容器都是满屏 Control，默认吃触摸 | 全链路改为不拦截；新增「推触摸/拖拽穿壳到地图」测试 + 反证用例 |
+| 没有双指缩放 | 只处理 `InputEventMagnifyGesture`，iOS 不合成该事件 | 从两触点距离比值自算 zoom；两指触摸时忽略 magnify |
+| 地图变全黑 | 透明视口下没有原生地图就是纯黑；切 Tab 回来 Metal 层被重置成不透明 | 未出画时盖纸色底（`presented` 信号）；每次显示地图补一遍 UIKit 透明化 |
+| 「我的」页键盘收不回 | 没有任何东西让输入框失焦 | 点输入框外 / 回车即失焦收键盘 |
+| 换装房预览空白 | 压栈时壳没隐藏，满屏纸色底盖住 3D（2D 永远在 3D 之上） | 壳被压栈时整个隐藏 |
+
+### 6.3 仍未完成（按能否开工分）
+
+**🟢 不卡，可直接做**
+
+1. B5 第二刀（SGODOT-94）：HUD 好友列表 / 点角色进主页；捏合绕两指中点；地图页与壳底栏的安全区协调。
+2. A7 收口（SGODOT-19）：页面里散落的 `add_theme_constant_override` 间距与 `GameUi.label` 字面字号收进 `DesignTokens`；地图 / 农场薄荷系与壳纸色系是否并一套（待设计定稿）。
+3. B7 部件池扩充（SGODOT-95）：Gensen 资产导入、剔除水晶族——要过一轮资产管线。
+4. E2 一半（SGODOT-62）：日志 / 崩溃 / 埋点剔除位置与消息内容（陌生人降精度网格属 B5 后续）。
+5. E4 / E5 接入代码（SGODOT-64 / 65）：Sentry 与 PostHog 的封装与事件口径先写好，key 走 env。
+6. D7 服务端发送链（SGODOT-104）：用 dev 项目的服务账号先跑通 FCM。
+7. 语音房线 C4 → D5 → B6（SGODOT-98 / 102 / 80）：自托管 LiveKit 即可开发，但**建议等 SSLAUNCH F2 拍板**再投 3–4 人周。
+
+**🟡 部分可做，其余等外部**
+
+| 卡 | 能做的部分 | 卡住的部分 |
+|---|---|---|
+| C3（97） | iOS 侧已完成 | Android 真机验证（无设备）；`template_release` 静态库随 SGODOT-70 |
+| A5（89） | iOS 键盘已打磨 | Android IME 光标同步与回归（无设备） |
+| R5（60）/ SGODOT-35 | 清单审计 | target 36 与 16 KB 真机回归（无设备） |
+| R4（59） | 自有 SDK 申报 | purpose strings 文案 = SSLAUNCH B8；加密申报口径 = E6 |
+| D1（100） | compose 加 Redis / 健康检查演练 | 云决策 = SSLAUNCH D5 |
+| D4（101） | 代码已通 | R2 真桶 = SSLAUNCH D4 |
+| D6（103） | 前置过滤 / 举报 / 封禁已通 | OpenAI key = D6；Rekognition = D5；PhotoDNA = C1 |
+| D2（76）/ R1（56） | App 内删号已通 | Apple revocation = A6；Web 删号页 = B4 |
+| E1（61） | 举报拉黑已全覆盖（除语音房） | EULA 零容忍文本 = B3；公开联系方式 = C6 |
+| D8（74） | dev / qa 两套已分开 | prod 一套等 D1 |
+
+**🔴 硬卡**：E6 / R11 应用身份（品牌 = SSLAUNCH B1）→ 发布链 B2 / B4 / B8 → E7 联调；C1（A9）、C2（A9）、D9（D4）。
+
+**⚪ 待决策**：C5 iOS 桥形态（UDP 加固 vs GDExtension，TestFlight 前定）；语音房是否进 Demo 一期（SSLAUNCH F2）。
+
+### 6.4 需要人肉确认的
+- 地图黑屏是否已消失（Godot 截图不含原生层，只能肉眼或 iPhone 镜像看）。
+- iPhone 首次定位授权弹窗要真人点一次「允许」，之后自己的位置才会上报。
+- `SENSEN_QA_PICK=1` 的选图器截图同样需要真人选图。
+
