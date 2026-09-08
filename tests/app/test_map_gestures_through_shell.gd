@@ -40,15 +40,23 @@ func _drag(pos: Vector2, rel: Vector2) -> InputEventScreenDrag:
 func test_drag_reaches_the_map_and_moves_the_camera() -> void:
 	var map := _map()
 	await get_tree().process_frame
-	var before := Vector2(map.center_lat, map.center_lng)
+	var before_lat: float = map.center_lat
+	var before_lng: float = map.center_lng
 	var mid := get_viewport().get_visible_rect().size * 0.5
 	_push(_touch(mid, true))
 	assert_int(map._touch_count).is_equal(1) # 触摸确实落到了地图
 	_push(_drag(mid + Vector2(0, 120), Vector2(0, 120)))
 	_push(_touch(mid + Vector2(0, 120), false))
 	await get_tree().process_frame
-	var after := Vector2(map.center_lat, map.center_lng)
-	assert_bool(before.is_equal_approx(after)).is_false() # 相机跟手了
+	var after_lat: float = map.center_lat
+	var after_lng: float = map.center_lng
+	# 断言方向，不断言"变了多少"：位移量 ∝ _cam_distance()，而它取 DisplayServer.window_get_size()，
+	# headless 下窗口尺寸为 0、被 map_poc 的下限守卫钳到 1 m，一次 120 px 拖拽只挪 ~1.4e-6°，
+	# 比 Vector2.is_equal_approx 的 1e-5 容差还小——用"约等于"会在 headless 误判成没动
+	# （2026-09-08 CI 连红 5 次的根因）。向下拖 → 内容跟着下移 → 视点北移，这条与量级无关。
+	# 也别把 lat/lng 塞进 Vector2 再比：Vector2 是 float32，31° 量级精度约 2e-6，正好把这点变化吃掉。
+	assert_float(after_lat).is_greater(before_lat)
+	assert_float(after_lng).is_equal(before_lng) # 纯竖直拖拽不该改经度
 
 func test_tab_bar_still_receives_taps() -> void:
 	var map := _map()
@@ -67,13 +75,17 @@ func test_a_full_screen_container_that_eats_touches_breaks_the_map() -> void:
 	await get_tree().process_frame
 	(shell.get_node("SafeArea") as Control).mouse_filter = Control.MOUSE_FILTER_STOP
 	var mid := get_viewport().get_visible_rect().size * 0.5
-	var before := Vector2(map.center_lat, map.center_lng)
+	var before_lat: float = map.center_lat
+	var before_lng: float = map.center_lng
 	_push(_touch(mid, true))
 	_push(_drag(mid + Vector2(0, 120), Vector2(0, 120)))
 	_push(_touch(mid + Vector2(0, 120), false))
 	await get_tree().process_frame
 	assert_int(map._touch_count).is_equal(0)
-	assert_bool(before.is_equal_approx(Vector2(map.center_lat, map.center_lng))).is_true()
+	# 严格相等而非约等于：headless 下单次拖拽的位移本就小于 is_equal_approx 的容差，
+	# 用约等于这条反证在"其实动了"时也会通过，就守不住东西了。
+	assert_float(map.center_lat).is_equal(before_lat)
+	assert_float(map.center_lng).is_equal(before_lng)
 
 ## 双指捏合：iOS 上 Godot 不合成 InputEventMagnifyGesture，必须从两个触点自己算（2026-09-08 真机没有缩放）。
 func test_pinch_with_two_fingers_zooms() -> void:
