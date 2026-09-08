@@ -75,6 +75,11 @@ class MapUnderlay: NSObject, CLLocationManagerDelegate {
                     pitch: Double(p[5]) ?? 0))
         case "VIS" where p.count >= 2:
             mapView?.isHidden = (p[1] == "0")
+            if p[1] != "0" {
+                // 切 Tab 回来再显示：UIKit 层可能被引擎重设成不透明（键盘弹过一次之后尤其），补一遍透明化。
+                applyTransparency()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.applyTransparency() }
+            }
         case "LOC" where p.count >= 2:
             replyConn = conn
             if p[1] == "1" { startLocation() } else { stopLocation() }
@@ -140,6 +145,7 @@ class MapUnderlay: NSObject, CLLocationManagerDelegate {
         if mapView != nil {
             // 幂等重入（场景返回）：恢复可见并补发 READY
             mapView?.isHidden = false
+            applyTransparency()
             sendReady()
             return
         }

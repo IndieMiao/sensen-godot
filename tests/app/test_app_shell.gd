@@ -111,3 +111,12 @@ func test_pages_inside_shell_do_not_apply_a_second_safe_area() -> void:
 	add_child(auto_free(standalone))
 	await get_tree().process_frame
 	assert_bool(standalone.get_node("SafeArea") is SafeAreaMargin).is_true()
+
+## 地图手势：壳与页面宿主不能吃触摸，否则 map_poc 的 _unhandled_input 收不到（2026-09-08 真机地图拖不动）。
+func test_shell_and_page_host_let_touches_fall_through() -> void:
+	var s := _shell()
+	assert_int(s.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int(s._page_host.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int((s.get_node("Backdrop") as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int(s.page(AppRoutes.TAB_MAP).mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+

@@ -358,3 +358,24 @@ func test_settings_language_button_keeps_icon_left_of_text() -> void:
 	var p := _settings(FakeTransport.new([]))
 	assert_bool(p.language_button.text.begins_with("Language: ")).is_true()
 	assert_int(p.language_button.icon_alignment).is_equal(HORIZONTAL_ALIGNMENT_LEFT)
+
+## 软键盘收回：点输入框以外的地方要让输入框失焦（Godot 失焦才收键盘）；点在框内不失焦；回车失焦。
+func test_tap_outside_an_input_releases_focus_and_enter_releases_too() -> void:
+	var p := _profile(FakeTransport.new([]))
+	await get_tree().process_frame
+	p.name_edit.grab_focus()
+	assert_object(get_viewport().gui_get_focus_owner()).is_same(p.name_edit)
+	var inside := InputEventScreenTouch.new()
+	inside.pressed = true
+	inside.position = p.name_edit.get_global_rect().get_center()
+	p._input(inside)
+	assert_object(get_viewport().gui_get_focus_owner()).is_same(p.name_edit)
+	var outside := InputEventScreenTouch.new()
+	outside.pressed = true
+	outside.position = p.name_edit.get_global_rect().position - Vector2(10, 200)
+	p._input(outside)
+	assert_object(get_viewport().gui_get_focus_owner()).is_null()
+	p.bio_edit.grab_focus()
+	p.bio_edit.text_submitted.emit("x")
+	assert_object(get_viewport().gui_get_focus_owner()).is_null()
+

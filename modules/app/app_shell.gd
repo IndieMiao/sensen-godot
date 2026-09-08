@@ -20,6 +20,8 @@ var _backdrop: ColorRect
 func _ready() -> void:
 	theme = GameUi.theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# 壳与页面宿主不吃触摸：地图页的手势靠事件落到 _unhandled_input；其他 Tab 页自己的根 Control 会兜住。
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var backdrop := ColorRect.new()
 	backdrop.name = "Backdrop"
 	backdrop.color = GameUi.PAPER
@@ -39,6 +41,7 @@ func _ready() -> void:
 	_page_host.name = "Pages"
 	_page_host.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_page_host.clip_contents = true
+	_page_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_child(_page_host)
 	_tab_bar = HBoxContainer.new()
 	_tab_bar.name = "TabBar"

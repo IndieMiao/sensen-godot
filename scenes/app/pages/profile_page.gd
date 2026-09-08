@@ -124,6 +124,8 @@ func _field(node_name: String, placeholder_text: String, max_len: int) -> LineEd
 	e.placeholder_text = placeholder_text
 	e.max_length = max_len
 	e.custom_minimum_size.y = 44
+	# 键盘上的「完成 / 换行」= 收键盘：资料字段没有提交动作，失焦即可。
+	e.text_submitted.connect(func(_t): e.release_focus())
 	body.add_child(e)
 	return e
 

@@ -75,6 +75,20 @@ func _ready() -> void:
 func _build_body() -> void:
 	pass
 
+## 点输入框以外的地方让输入框失焦——LineEdit 失焦时 Godot 才会收起软键盘。
+## 走 _input 而不是 gui_input：不管被哪个控件（滚动列表、按钮、空白）吃掉，按下都先经过这里。
+## 2026-09-08 真机：「我的」页拉起键盘后没有任何办法收回，就是因为页面上没有东西让它失焦。
+func _input(event: InputEvent) -> void:
+	var pressed: bool = (event is InputEventScreenTouch and event.pressed) \
+		or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
+	if not pressed or not is_visible_in_tree():
+		return
+	var focus := get_viewport().gui_get_focus_owner()
+	if focus == null or not (focus is LineEdit or focus is TextEdit):
+		return
+	if not focus.get_global_rect().has_point(event.position):
+		focus.release_focus()
+
 ## 占位说明：哪张卡会把这页做实。
 func placeholder(text: String) -> Label:
 	var l := GameUi.label(text, 14, GameUi.MUTED)

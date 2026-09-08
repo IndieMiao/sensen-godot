@@ -196,6 +196,15 @@ func run_login() -> void:
 		for i in 4:
 			await settle()
 		await shot("map_tab")
+		# SENSEN_QA_MAP_ROUNDTRIP=1：地图 → 我的 → 地图，复现「切回来全黑」；每步都带 view 字段。
+		if OS.get_environment("SENSEN_QA_MAP_ROUNDTRIP") == "1":
+			shell.show_tab(AppRoutes.TAB_PROFILE)
+			await settle()
+			await shot("roundtrip_me")
+			shell.show_tab(AppRoutes.TAB_MAP)
+			for i in 3:
+				await settle()
+			await shot("map_back")
 	shell.show_tab(AppRoutes.TAB_IM)
 	await settle()
 	await shot("im_tab")
@@ -298,8 +307,26 @@ func shot(name: String) -> void:
 		"top": top.scene_file_path if top else "",
 		"locale": TranslationServer.get_locale(),
 		"at_ms": Time.get_ticks_msec(),
+		"view": view_state(),
 	})
 	_write_report()
+
+## 视口 / 地图层状态：排查「地图回来全黑」这类问题时，截图里看不到原生层，只能靠这些字段。
+func view_state() -> Dictionary:
+	var vp := get_viewport()
+	var d := {"transparent_bg": vp.transparent_bg, "clear": RenderingServer.get_default_clear_color().to_html()}
+	var shell := current()
+	if shell != null and shell.has_method("page") and shell.has_page(AppRoutes.TAB_MAP):
+		var page = shell.page(AppRoutes.TAB_MAP)
+		var m = page.map_scene if page != null and "map_scene" in page else null
+		if m != null and is_instance_valid(m):
+			d["map"] = {
+				"visible": m.visible, "process": m.process_mode, "hud": m.get_node("HUD").visible,
+				"cam_current": m.cam.current, "env": m.world_env.environment != null,
+				"bridge": m.map != null, "ready": m._map_is_ready, "home": m._home_resolved,
+				"pawns": m._pawns.size(), "queue": m._spawn_queue.size(), "friends": m.friend_count(),
+			}
+	return d
 
 func _expect(node: Node, scene_path: String) -> bool:
 	if node != null and node.scene_file_path == scene_path:

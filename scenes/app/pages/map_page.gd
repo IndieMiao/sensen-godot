@@ -29,6 +29,9 @@ func _init() -> void:
 
 func _build_body() -> void:
 	# 地图要全屏透出来：本页自己的纸色底与标题栏都不画（HUD 在地图场景里）。
+	# 本页根 Control 默认 mouse_filter = STOP 会把整屏触摸吃掉，map_poc 的 _unhandled_input 永远收不到手势
+	#（2026-09-08 真机：地图完全拖不动）。改成 IGNORE，空白处的触摸一路落到 unhandled。
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var backdrop := get_node_or_null("Backdrop")
 	if backdrop != null:
 		backdrop.visible = false
