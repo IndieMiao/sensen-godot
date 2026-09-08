@@ -124,3 +124,15 @@ func test_tapping_a_friend_emits_friend_tapped_and_empty_space_does_not() -> voi
 	m._unhandled_input(release2)
 	assert_array(seen).is_equal(["u-b"])
 	assert_int(m._last_tap_ms).is_greater(0)
+
+## 社交主线的地图不该带农场那套 UI：设备上只要留着旧的 farm_choice.json 就会被拉起来
+## （2026-09-08 安卓真机：底图之上盖了「My Farm / Nearby Farmers / Sample A」）。
+func test_social_map_has_no_farm_ui() -> void:
+	var map: Node = auto_free((load("res://scenes/map_poc/map_poc.tscn") as PackedScene).instantiate())
+	map.demo_cohorts = false
+	add_child(map)
+	await get_tree().process_frame
+	assert_object(map.my_farm_btn).is_null()
+	assert_object(map.nearby_panel).is_null()
+	assert_bool(map.top_panel.visible).is_false()
+	map.suspend()

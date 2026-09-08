@@ -204,6 +204,9 @@ func _ready() -> void:
 		_spawn_la_fixture() # 压测夹具先排队；home 队列等定位确定后再插
 	_wire_buttons()
 	travel_btn.get_parent().visible = demo_cohorts # 「飞去洛杉矶」是夹具，不进社交主线
+	# 顶部那块「Near You / 地区 / Zoom 16」也是农场分支的调试面板：社交地图的顶部要留白，
+	# 位置信息在好友条上（B5 设计），侧栏的定位 / 缩放 / 头像三个按钮照旧保留。
+	top_panel.visible = demo_cohorts
 	if Net:
 		Net.booted.connect(_on_net_booted)
 
@@ -715,6 +718,11 @@ func enter_street_mode(r: Dictionary) -> void:
 ## 已经有农场就不再选地：候选层与 Create Farm 都不建，直接进「家」模式。
 ## _ready() 与 enter_street_mode() 两个入口都走这里，且可重入。
 func _build_region_ui(r: Dictionary) -> void:
+	# 社交主线（demo_cohorts=false）不进农场那套 UI：选地面板、Nearby Farmers、My Farm 按钮
+	# 都是农场分支的东西。设备上只要留着旧的 farm_choice.json 就会被拉起来——2026-09-08
+	# 安卓真机上就是这样：地图底图之上盖了一层「My Farm / Sample A / Sample B」。
+	if not demo_cohorts:
+		return
 	_farm_choice = _resolve_farm_choice()
 	if _farm_choice.is_empty():
 		load_candidates(r)
