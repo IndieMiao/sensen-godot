@@ -174,10 +174,15 @@ func _friend_chip(f: Dictionary) -> Button:
 	b.name = "Friend_%s" % uid
 	b.theme_type_variation = &"SecondaryButton"
 	b.focus_mode = Control.FOCUS_NONE
-	b.custom_minimum_size = Vector2(DesignTokens.UI_TOUCH_MIN, DesignTokens.UI_TOUCH_MIN)
+	b.custom_minimum_size = Vector2(DesignTokens.UI_TOUCH_MIN, 56)
 	var name := str(f.get("display_name", ""))
 	b.text = name if not name.is_empty() else "@" + str(f.get("handle", ""))
-	b.expand_icon = true
+	# 不能开 expand_icon：文字占满宽度后图标会被压成 0（真机上好友条只剩名字）。
+	# 固定一个图标尺寸，头像到货了直接换纹理。
+	b.expand_icon = false
+	b.add_theme_constant_override("icon_max_width", 36)
+	b.add_theme_constant_override("h_separation", DesignTokens.SPACE_2)
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var thumb := AvatarThumb.new(36.0)
 	thumb.name = "Avatar"
 	thumb.visible = false

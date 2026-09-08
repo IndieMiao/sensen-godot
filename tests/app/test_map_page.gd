@@ -146,6 +146,10 @@ func test_friend_strip_lists_friends_and_opens_their_page() -> void:
 	var chip := p.strip.get_node("Friend_u-a") as Button
 	assert_object(chip).is_not_null()
 	assert_str(chip.text).is_equal("u-a")
+	# 图标不能被文字挤没（expand_icon 会这么干）：占位图标就位、尺寸有上限。
+	assert_object(chip.icon).is_not_null()
+	assert_bool(chip.expand_icon).is_false()
+	assert_int(chip.get_theme_constant(&"icon_max_width")).is_equal(36)
 	assert_object(p.strip.get_node_or_null("Friend_u-b")).is_not_null()
 	chip.pressed.emit()
 	assert_str(nav.calls[-1].route).is_equal(AppRoutes.USER)
