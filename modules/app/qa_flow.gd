@@ -208,6 +208,28 @@ func run_login() -> void:
 			for i in 3:
 				await settle()
 			await shot("map_back")
+	# SENSEN_QA_VOICE=1：压栈语音房，建一个房间再截（没配 LiveKit 的服务器会显示「还没开语音房」）。
+	if OS.get_environment("SENSEN_QA_VOICE") == "1":
+		AppRouter.push_instance(AppRoutes.VOICE_ROOM)
+		await settle()
+		await settle()
+		var voice_page := AppRouter.top_instance()
+		if voice_page != null and voice_page.has_method("fetch_rooms"):
+			await voice_page.fetch_rooms()
+			await settle()
+			await shot("voice_rooms")
+			voice_page.title_edit.text = "QA 房间"
+			if await voice_page.create_room():
+				await settle()
+				await shot("voice_in_room")
+				await voice_page.toggle_stage()
+				await settle()
+				await shot("voice_on_mic")
+				await voice_page.leave()
+			else:
+				await shot("voice_error")
+		AppRouter.pop_instance()
+		await settle()
 	shell.show_tab(AppRoutes.TAB_IM)
 	await settle()
 	await shot("im_tab")
