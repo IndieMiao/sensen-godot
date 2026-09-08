@@ -69,3 +69,55 @@ func test_a_full_screen_container_that_eats_touches_breaks_the_map() -> void:
 	await get_tree().process_frame
 	assert_int(map._touch_count).is_equal(0)
 	assert_bool(before.is_equal_approx(Vector2(map.center_lat, map.center_lng))).is_true()
+
+## 双指捏合：iOS 上 Godot 不合成 InputEventMagnifyGesture，必须从两个触点自己算（2026-09-08 真机没有缩放）。
+func test_pinch_with_two_fingers_zooms() -> void:
+	var map := _map()
+	await get_tree().process_frame
+	var mid := get_viewport().get_visible_rect().size * 0.5
+	var before: float = map.zoom
+	get_viewport().push_input(_touch_at(0, mid - Vector2(40, 0), true))
+	get_viewport().push_input(_touch_at(1, mid + Vector2(40, 0), true))
+	assert_int(map._touch_count).is_equal(2)
+	# 两指各向外滑 40 px：间距 80 → 160，正好一级放大。
+	get_viewport().push_input(_drag_at(0, mid - Vector2(80, 0), Vector2(-40, 0)))
+	get_viewport().push_input(_drag_at(1, mid + Vector2(80, 0), Vector2(40, 0)))
+	await get_tree().process_frame
+	assert_float(map.zoom).is_greater(before)
+	assert_float(map.zoom).is_equal_approx(before + 1.0, 0.05)
+	# 收拢回去应该缩小。
+	var zoomed: float = map.zoom
+	get_viewport().push_input(_drag_at(0, mid - Vector2(40, 0), Vector2(40, 0)))
+	get_viewport().push_input(_drag_at(1, mid + Vector2(40, 0), Vector2(-40, 0)))
+	await get_tree().process_frame
+	assert_float(map.zoom).is_less(zoomed)
+	get_viewport().push_input(_touch_at(0, mid, false))
+	get_viewport().push_input(_touch_at(1, mid, false))
+	assert_int(map._touch_count).is_equal(0)
+	assert_bool(map._touch_pos.is_empty()).is_true()
+
+## 单指拖拽不该顺带缩放。
+func test_single_finger_drag_does_not_zoom() -> void:
+	var map := _map()
+	await get_tree().process_frame
+	var before: float = map.zoom
+	var mid := get_viewport().get_visible_rect().size * 0.5
+	get_viewport().push_input(_touch_at(0, mid, true))
+	get_viewport().push_input(_drag_at(0, mid + Vector2(0, 120), Vector2(0, 120)))
+	get_viewport().push_input(_touch_at(0, mid + Vector2(0, 120), false))
+	await get_tree().process_frame
+	assert_float(map.zoom).is_equal(before)
+
+func _touch_at(index: int, pos: Vector2, pressed: bool) -> InputEventScreenTouch:
+	var e := InputEventScreenTouch.new()
+	e.index = index
+	e.position = pos
+	e.pressed = pressed
+	return e
+
+func _drag_at(index: int, pos: Vector2, rel: Vector2) -> InputEventScreenDrag:
+	var e := InputEventScreenDrag.new()
+	e.index = index
+	e.position = pos
+	e.relative = rel
+	return e

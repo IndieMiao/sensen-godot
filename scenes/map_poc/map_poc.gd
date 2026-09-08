@@ -144,6 +144,11 @@ var _zoom_vel := 0.0
 ## "_touch_count <= 1" 门禁把 pan 速度灌进 _fling_vel，抬手甩出一段意外平移。
 ## 所以一旦升级成多指，本次手势剩余时间一律不再喂 pan 速度，直到所有手指离开。
 var _gesture_multi := false
+## 双指捏合自己算：InputEventMagnifyGesture 只有 macOS 触控板与 Android 会产生，
+## iOS 上 Godot 不合成，照抄 magnify 的话 iPhone 上永远没有缩放（2026-09-08 真机）。
+## index -> 屏幕坐标；两指都在时按两点距离比值换算 zoom。
+var _touch_pos: Dictionary = {}
+var _pinch_dist := 0.0
 var _load_bar_started_ms := 0
 var _map_is_ready := false
 ## 受限模式（PRD §3.1）：由 FarmRegions 的城市选择触发；为真时地图只做「看见、选择、返回」。
@@ -496,6 +501,11 @@ func _unhandled_input(e: InputEvent) -> void:
 		_touch_count += 1 if e.pressed else -1
 		_touch_count = maxi(_touch_count, 0)
 		if e.pressed:
+			_touch_pos[e.index] = e.position
+		else:
+			_touch_pos.erase(e.index)
+		_pinch_dist = _pinch_span() # 落指 / 抬指都重置基线，免得指数突变成一次跳变缩放
+		if e.pressed:
 			_fling_vel = Vector3.ZERO # 新触摸立即打断惯性
 			_zoom_vel = 0.0 # 缩放轴同理
 			if _focus_tween: _focus_tween.kill()
@@ -526,6 +536,10 @@ func _unhandled_input(e: InputEvent) -> void:
 			else:
 				_last_tap_ms = 0
 			_gesture_multi = false
+	if e is InputEventScreenDrag and _touch_pos.has(e.index):
+		_touch_pos[e.index] = e.position
+	if e is InputEventScreenDrag and _touch_pos.size() >= 2:
+		_apply_pinch()
 	if e is InputEventScreenDrag and _touch_count <= 1 and not _gesture_multi:
 		# 抓地拖拽：让按下时的地面点始终跟在手指下（倾角下精确）。
 		# 高 pitch 时屏幕上缘一像素对应的地面位移可达 ~0.4d，单次 delta 限幅到 d
@@ -545,7 +559,8 @@ func _unhandled_input(e: InputEvent) -> void:
 		_drag_accum_px += e.relative.length()
 		if _drag_accum_px > DOUBLE_TAP_MAX_PX:
 			_last_tap_ms = 0
-	elif e is InputEventMagnifyGesture:
+	elif e is InputEventMagnifyGesture and _touch_count < 2:
+		# 触控板 / Android 的系统捏合；两指真触摸时以 _apply_pinch 为准，避免双份缩放。
 		# 与拖拽同款：应用之后把变化量换算成 zoom/秒 做 EMA 平滑，松手接着走。
 		var dz := log(e.factor) / log(2.0)
 		_set_zoom(zoom + dz)
@@ -553,6 +568,28 @@ func _unhandled_input(e: InputEvent) -> void:
 		_zoom_vel = lerpf(_zoom_vel, dz / zdt, FLING_EMA)
 	elif e is InputEventPanGesture and not street_mode:
 		_set_pitch(pitch - e.delta.y * 0.2)
+
+## 前两个触点的距离；不足两指返回 0。
+func _pinch_span() -> float:
+	var keys := _touch_pos.keys()
+	if keys.size() < 2:
+		return 0.0
+	keys.sort()
+	return (_touch_pos[keys[0]] as Vector2).distance_to(_touch_pos[keys[1]] as Vector2)
+
+## 两点距离比值 → zoom 增量（距离翻倍 = 放大一级），并喂给缩放惯性。
+func _apply_pinch() -> void:
+	var span := _pinch_span()
+	if span <= 1.0 or _pinch_dist <= 1.0:
+		_pinch_dist = span
+		return
+	var dz := log(span / _pinch_dist) / log(2.0)
+	_pinch_dist = span
+	if is_zero_approx(dz):
+		return
+	_set_zoom(zoom + dz)
+	var zdt := maxf(get_process_delta_time(), 0.001)
+	_zoom_vel = lerpf(_zoom_vel, dz / zdt, FLING_EMA)
 
 func _wire_buttons() -> void:
 	view_mode_switch.toggled.connect(_on_view_mode_toggled)
@@ -805,6 +842,8 @@ func resume() -> void:
 
 func _reset_gesture() -> void:
 	_touch_count = 0
+	_touch_pos.clear()
+	_pinch_dist = 0.0
 	_gesture_multi = false
 	_drag_accum_px = 0.0
 	_last_tap_ms = 0
