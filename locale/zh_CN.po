@@ -567,3 +567,6 @@ msgstr "还没有关注任何人。"
 
 msgid "This user keeps their following list private."
 msgstr "这位用户没有公开关注列表。"
+
+msgid "Share anonymous usage data"
+msgstr "分享匿名使用数据"

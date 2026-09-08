@@ -75,6 +75,17 @@ func _ready() -> void:
 func _build_body() -> void:
 	pass
 
+## 埋点 / 错误上报的便捷入口：测试进程里没有 Net autoload，这里统一兜住。
+func _track(event: String, props: Dictionary = {}) -> void:
+	var net := get_node_or_null("/root/Net")
+	if net != null:
+		net.track(event, props)
+
+func _report_error(message: String, context: Dictionary = {}, level := "error") -> void:
+	var net := get_node_or_null("/root/Net")
+	if net != null:
+		net.report_error(message, context, level)
+
 ## 点输入框以外的地方让输入框失焦——LineEdit 失焦时 Godot 才会收起软键盘。
 ## 走 _input 而不是 gui_input：不管被哪个控件（滚动列表、按钮、空白）吃掉，按下都先经过这里。
 ## 2026-09-08 真机：「我的」页拉起键盘后没有任何办法收回，就是因为页面上没有东西让它失焦。

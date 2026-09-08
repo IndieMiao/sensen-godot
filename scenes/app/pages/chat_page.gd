@@ -277,6 +277,7 @@ func send() -> bool:
 		status.text = describe_error(r)
 		return false
 	pending_client_id = ""
+	_track("message_sent", {"kind": "text", "group": is_group()})
 	composer.text = ""
 	status.text = ""
 	_append(r)
@@ -310,6 +311,7 @@ func attach_photo() -> bool:
 	if not bool(r.get("ok", false)):
 		status.text = describe_error(r)
 		return false
+	_track("message_sent", {"kind": "image", "group": is_group()})
 	composer.text = ""
 	status.text = ""
 	_append(r)
@@ -610,6 +612,7 @@ func report(target_type: String, target_id: String, reason: String) -> bool:
 		return false
 	var r: Dictionary = await api.report(target_type, target_id, reason)
 	if bool(r.get("ok", false)):
+		_track("content_reported", {"target": target_type, "reason": reason})
 		status.text = tr("Thanks, we've received your report.")
 		return true
 	status.text = describe_error(r)

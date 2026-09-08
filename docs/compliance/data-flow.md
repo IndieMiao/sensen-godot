@@ -50,3 +50,26 @@
 - R2 上按 user 前缀的删号清理（`AccountModule` 加 uploads 模块）；
 - 上表「计划中」各项接入时改状态并补 purpose strings（R4）；
 - 与隐私政策（SSLAUNCH B2）和两个商店的申报表逐条对照一次（SSLAUNCH E1）。
+
+## 位置（B5，2026-09-08 新增）
+
+| 项 | 说明 |
+|---|---|
+| 采集时机 | 只在 App 前台且地图页可见时（iOS When-In-Use；地图页隐藏即 `stop_location`） |
+| 上报频率 | 30 秒 / 25 米节流，取先到者 |
+| 存储 | 服务端 `user_locations` 每人一行**最新**位置，不存轨迹 |
+| 可见范围 | 仅互相关注的人（好友）；单向关注与陌生人一律不下发；超过 24 小时未更新的不下发 |
+| 用户控制 | 设置里退出登录 / 删号即删；`DELETE /v1/location` 立即停止分享 |
+| 删除 | 删号级联（`locationAccountModule`）；导出包含最新一条 |
+| 不做 | 后台定位、轨迹历史、陌生人「附近的人」（E2 的降精度网格本期不做） |
+
+## 崩溃上报与埋点（E4 / E5，2026-09-08 新增）
+
+| 项 | 说明 |
+|---|---|
+| 崩溃 / 错误 | Sentry store 端点；**未配 DSN 时一条不发**。客户端只上报自己捕获到的错误，引擎级崩溃需 sentry-godot（SGODOT-64 剩余项） |
+| 埋点 | PostHog capture；**未配 key 时一条不发**；事件名白名单见 `modules/telemetry/analytics.gd`（注册 / 登录 / 发消息 / 发布 / 举报 / 删号 / 进地图 / 打开好友主页） |
+| 用户控制 | 设置页「分享匿名使用数据」开关，关掉后一条不发（持久化在 `user://ui_state.json`） |
+| 脱敏 | 两端统一：`modules/telemetry/scrub.gd` 与 `server/src/http/telemetry.ts`。经纬度、消息 / UGC 正文、昵称、邮箱、token、Authorization、长数字串一律替换成 `[redacted]`；URL 去掉 query |
+| 不采 | 位置、聊天与动态正文、通讯录、广告标识符；不弹 ATT |
+

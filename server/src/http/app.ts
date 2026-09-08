@@ -32,6 +32,7 @@ import { canSeePost, commentView, postView, validateComment, validatePost, type 
 import { UPLOAD_CONTENT_TYPES, UPLOAD_MAX_BYTES, ownsKey, presignUpload, publicUrl, validateUploadRequest, type S3Config } from './uploads.js';
 import type { LocalUploadStore } from './local_uploads.js';
 import { FRIENDS_LIMIT, friendLocationView, isFresh, validateLocation, type LocationStore } from './location.js';
+import { nullReporter, scrubUrl, type ErrorReporter } from './telemetry.js';
 import { ADMIN_ACTIONS, NullModerator, REPORT_AUTO_HIDE, decide, reportView, validateReport,
   type ModerationStore, type TextModerator } from './moderation.js';
 import { HISTORY_LIMIT_MAX, SYNC_LIMIT_MAX, conversationView, greetingBlocked, messageView, uniqueIds, validateGroup, validateMessage,
@@ -65,6 +66,8 @@ export interface AppDeps {
   localUploads?: LocalUploadStore;
   /** B5 好友位置；不配则位置路由 503。 */
   locations?: LocationStore;
+  /** E4 错误上报；不配则空转（不引 SDK，见 telemetry.ts）。 */
+  errors?: ErrorReporter;
   /** D6 举报 / 拉黑 / 封禁 / 复审队列；缺省时相关路由 503 MODERATION_NOT_CONFIGURED。 */
   moderation?: ModerationStore;
   /** D6 文本前置过滤；缺省 = NullModerator（不拦，但全部进人工队列）。 */
@@ -91,6 +94,16 @@ export const NEARBY_LIMIT = 20;
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
+  // E4：未捕获的处理器异常上报一份（内容先脱敏：URL 去 query，不带 body / header）。
+  // 响应体保持原样，不因为上报而改变对客户端的语义。
+  const errors: ErrorReporter = deps.errors ?? nullReporter;
+  app.setErrorHandler(async (err: unknown, req, reply) => {
+    const e = err as { message?: string; statusCode?: number; code?: string };
+    const status = e.statusCode ?? 500;
+    await errors.capture(`unhandled ${req.method} ${scrubUrl(req.url)}: ${e.message ?? ''}`,
+      { method: req.method, url: scrubUrl(req.url), status, code: e.code ?? '' });
+    return reply.code(status).send({ code: status >= 500 ? 'INTERNAL' : (e.code ?? 'BAD_REQUEST'), server_time: deps.now() });
+  });
   // 空 body 的 JSON 请求当 {}：移动端 HTTP 库常带 content-type 却不带 body（PUT /follow 之类），
   // Fastify 默认对此报 FST_ERR_CTP_EMPTY_JSON_BODY（2026-09-07 桌面 QA 实例撞到）。
   app.removeContentTypeParser('application/json');

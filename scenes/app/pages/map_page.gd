@@ -126,6 +126,7 @@ func on_tab_shown() -> void:
 	if not friends.is_empty() and map_scene.has_method("set_friends"):
 		map_scene.set_friends(friends)
 	friends_timer.start()
+	_track("map_opened")
 	await refresh_friends()
 
 ## 原生地图出画了就撤掉纸色底（让 Mapbox 透上来）；没出画就一直盖着。
@@ -197,6 +198,7 @@ func _friend_chip(f: Dictionary) -> Button:
 func open_user(user_id: String) -> void:
 	if user_id.strip_edges().is_empty():
 		return
+	_track("friend_opened")
 	if navigate.is_valid():
 		navigate.call(AppRoutes.USER, {"user_id": user_id})
 	else:

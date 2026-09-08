@@ -286,6 +286,7 @@ func report(target_type: String, id: String, reason: String) -> bool:
 		return false
 	var r: Dictionary = await api.report(target_type, id, reason)
 	if bool(r.get("ok", false)):
+		_track("content_reported", {"target": target_type, "reason": reason})
 		status.text = tr("Thanks, we've received your report.")
 		return true
 	status.text = describe_error(r)

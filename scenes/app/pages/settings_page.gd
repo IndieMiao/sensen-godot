@@ -19,6 +19,15 @@ func _init() -> void:
 	page_title = "Settings"
 	stacked = true
 
+var telemetry_toggle: CheckButton
+
+## 关掉就立刻生效（连同当前会话里的 Analytics 实例）。
+func _on_telemetry_toggled(on: bool) -> void:
+	Analytics.set_opt_out(not on)
+	var net := get_node_or_null("/root/Net")
+	if net != null and net.analytics != null:
+		net.analytics.opted_out = not on
+
 func _build_body() -> void:
 	language_button = GameUi.button("book-open", "", "AppLocale")
 	language_button.name = "Language"
@@ -32,6 +41,13 @@ func _build_body() -> void:
 	contact.disabled = LegalLinks.SUPPORT_EMAIL.is_empty()
 	contact.pressed.connect(func(): LegalLinks.open("mailto:%s" % LegalLinks.SUPPORT_EMAIL))
 	body.add_child(contact)
+	# E5：埋点默认开，但必须能关（合规与商店要求）。关掉后一条不发。
+	telemetry_toggle = CheckButton.new()
+	telemetry_toggle.name = "ShareUsage"
+	telemetry_toggle.text = tr("Share anonymous usage data")
+	telemetry_toggle.button_pressed = not Analytics.is_opted_out()
+	telemetry_toggle.toggled.connect(_on_telemetry_toggled)
+	body.add_child(telemetry_toggle)
 	delete_button = GameUi.button("x", tr("Delete account"), "Firebase accounts:delete + local sign-out")
 	delete_button.name = "DeleteAccount"
 	delete_button.pressed.connect(_on_delete_pressed)
@@ -89,6 +105,7 @@ func _on_delete_pressed() -> void:
 	confirm.popup_centered()
 
 func _on_delete_confirmed() -> void:
+	_track("account_deleted")
 	await _delete_account()
 
 ## 返回是否删除成功。Dev 会话（provider=dev）没有 Firebase 账号，直接本地登出。

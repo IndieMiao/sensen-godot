@@ -142,6 +142,8 @@ func _password_flow(create: bool) -> void:
 		await _fb().send_verification_email(str(r.id_token))
 	s.complete_sign_in(str(r.user_id), str(r.id_token), str(r.refresh_token), int(r.expires_in_s), "password", str(r.email))
 	await _link_account(s)
+	# E5：只记「注册 / 登录成功了」，不带邮箱等任何身份信息（属性照样过脱敏）。
+	_track("sign_up_completed" if create else "sign_in_completed", {"provider": "password"})
 	busy = false
 	status.text = tr("Verification email sent.") if create else ""
 	_go()

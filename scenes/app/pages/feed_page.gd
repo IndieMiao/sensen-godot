@@ -211,6 +211,8 @@ func publish() -> bool:
 	var r: Dictionary = await _feed().create_post(text, image_refs, pending_key)
 	busy = false
 	post_button.disabled = false
+	if bool(r.get("ok", false)):
+		_track("post_published", {"images": image_refs.size()})
 	if not bool(r.get("ok", false)):
 		status.text = describe_error(r)
 		return false
@@ -353,6 +355,7 @@ func report_post(post_id: String, reason: String) -> bool:
 		return false
 	var r: Dictionary = await api.report("post", post_id, reason)
 	if bool(r.get("ok", false)):
+		_track("content_reported", {"target": "post", "reason": reason})
 		status.text = tr("Thanks, we've received your report.")
 		return true
 	status.text = describe_error(r)

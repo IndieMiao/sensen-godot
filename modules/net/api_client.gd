@@ -235,6 +235,13 @@ static func make_raw_http_transport(host: Node) -> Callable:
 		return r
 
 ## 真实传输：需要一个在场景树里的 Node 来挂 HTTPRequest。
+## 遥测用的简化传输：只发 POST 到绝对 URL（Sentry store / PostHog batch），
+## 不带我们自己的 token，也不走 base_url。
+static func make_post_transport(host: Node) -> Callable:
+	var send := make_http_transport(host)
+	return func(url: String, headers: PackedStringArray, body: String) -> Response:
+		return await send.call("POST", url, headers, body)
+
 static func make_http_transport(host: Node) -> Callable:
 	return func(method: String, url: String, headers: PackedStringArray, body: String) -> Response:
 		var req := HTTPRequest.new()

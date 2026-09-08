@@ -15,6 +15,7 @@ import { OpenAiModerator, moderationAccountModule } from './http/moderation.js';
 import { PgImStore } from './db/pg_im.js';
 import { PgLocationStore } from './db/pg_location.js';
 import { locationAccountModule } from './http/location.js';
+import { nullReporter, sentryReporter } from './http/telemetry.js';
 import { imAccountModule } from './http/im.js';
 import { SocketHub } from './http/ws_gateway.js';
 import { CachedJwks, googleJwksFetcher } from './http/firebase_token.js';
@@ -77,6 +78,10 @@ const uploads = s3ConfigFromEnv(process.env);
 const moderation = new PgModerationStore(pool);
 const im = new PgImStore(pool);
 const locations = new PgLocationStore(pool);
+const errorReporter = process.env.SENTRY_DSN
+  ? sentryReporter(process.env.SENTRY_DSN, () => Date.now(), undefined, { release: process.env.GIT_SHA ?? '', environment: process.env.NODE_ENV ?? 'dev' })
+  : nullReporter;
+if (!process.env.SENTRY_DSN) console.warn('未设置 SENTRY_DSN：服务端错误只留在进程日志里');
 const wsHub = new SocketHub();
 const textModerator = process.env.OPENAI_API_KEY ? new OpenAiModerator(process.env.OPENAI_API_KEY) : undefined;
 if (!textModerator) console.warn('未设置 OPENAI_API_KEY：文本不做前置过滤，全部进人工复审队列');
@@ -87,7 +92,7 @@ if (localUploads) console.warn(`图片走开发期本地存储 ${localUploads.di
 const app = await buildApp({
   store, content, contentVersion: cv,
   accounts: new PgAccountStore(pool),
-  social, feed, uploads, localUploads, moderation, textModerator, im, wsHub, locations,
+  social, feed, uploads, localUploads, moderation, textModerator, im, wsHub, locations, errors: errorReporter,
   adminUserIds: new Set((process.env.ADMIN_USER_IDS ?? '').split(',').map(x => x.trim()).filter(Boolean)),
   accountModules: [socialAccountModule(social), feedAccountModule(feed), moderationAccountModule(moderation), imAccountModule(im), locationAccountModule(locations)],
   firebase: firebaseProjectId ? { projectId: firebaseProjectId, keys: jwks.keys, refreshKeys: jwks.refresh } : undefined,

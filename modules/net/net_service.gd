@@ -28,6 +28,9 @@ var safety: SafetyApi
 var im: ImApi
 var uploads: UploadApi
 var location: LocationApi
+## E4 / E5：没配 DSN / key 就是彻底关闭，一条不发。内容统一过 Scrub（E2）。
+var errors: ErrorReports
+var analytics: Analytics
 var images: ImageCache
 ## 最后一条已交付给上层的 IM 事件 seq；-1 = 还没同步过。
 var im_last_seq := -1
@@ -108,7 +111,23 @@ func _build_apis() -> void:
 	im = ImApi.new(client)
 	uploads = UploadApi.new(client)
 	location = LocationApi.new(client)
+	if errors == null:
+		errors = ErrorReports.new("", ApiClient.make_post_transport(self))
+	if analytics == null:
+		analytics = Analytics.new("", "", ApiClient.make_post_transport(self))
 	images = ImageCache.new(func(url: String): return await client.get_bytes(url))
+
+## 记一条埋点（未配 key 时空转）。distinct_id 默认取自有 user id。
+func track(event: String, props: Dictionary = {}) -> void:
+	if analytics == null:
+		return
+	await analytics.capture(event, auth.server_user_id if auth != null else "", props)
+
+## 记一条错误（未配 DSN 时空转）。
+func report_error(message: String, context: Dictionary = {}, level := "error") -> void:
+	if errors == null:
+		return
+	await errors.capture(message, context, level)
 
 ## 图片统一从服务端 /files/<key> 读：本地模式直接给字节，R2 模式 302 到公网地址。
 static func file_url(key: String) -> String:
