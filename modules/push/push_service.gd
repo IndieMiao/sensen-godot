@@ -12,6 +12,8 @@ extends RefCounted
 const STATE_KEY := "push_token"
 
 signal registered(token: String)
+## 用户点开了一条通知；payload 只有路由用的 id（正文不进推送）。转给上层做跳转。
+signal opened(payload: Dictionary)
 
 var bridge: PushBridge
 var api: PushApi
@@ -28,6 +30,7 @@ func _init(p_bridge: PushBridge = null, p_api: PushApi = null) -> void:
 		bridge.authorization.connect(_on_authorization)
 		bridge.token_ready.connect(_on_token)
 		bridge.token_failed.connect(_on_token_failed)
+		bridge.notification_opened.connect(func(p: Dictionary): opened.emit(p))
 
 func usable() -> bool:
 	return bridge != null and api != null and bridge.available()
@@ -39,6 +42,8 @@ func start() -> void:
 	bridge.request_authorization()
 
 ## 用户在设置里关掉通知，或者登出：把当前 token 从服务端撤掉。
+## 断网时撤不掉也照样忘记它——登出后没有 token 可以再调这个接口了，留着也没用。
+## 残留的后果有限：通知本来就不带正文，且下次有人在这台机器登录时服务端 upsert 会改归属。
 func stop() -> void:
 	var token := _saved_token()
 	if token.is_empty() or api == null:

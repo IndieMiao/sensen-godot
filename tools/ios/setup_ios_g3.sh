@@ -116,6 +116,10 @@ open(p, 'w').write(t)
 print('pbxproj 注入完成（spike + swift + Mapbox/LiveKit SPM）')
 PYEOF
 
+# SPM 的二进制产物不认环境代理，会让 xcodebuild 停在 "Resolve Package Graph" 一动不动。
+# 先用 curl 把它们塞进 SPM 缓存（幂等，已缓存就跳过）。
+tools/ios/prime_spm_cache.sh || echo '预热 SPM 缓存失败：xcodebuild 可能会卡在下载二进制产物'
+
 cat <<'TIP'
 构建装机（TEAM_ID：Xcode 选过一次 Team 后可从 pbxproj grep DEVELOPMENT_TEAM）：
   cd build/ios && xcodebuild -project sensen.xcodeproj -scheme sensen -configuration Debug \

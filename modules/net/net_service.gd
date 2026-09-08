@@ -11,6 +11,9 @@ extends Node
 signal booted(logged_in: bool)
 ## 一条 IM inbox 事件（type / seq / …，见 server/README.md「IM」）；WS 实时推的和补拉回来的都从这里出。
 signal im_event(event: Dictionary)
+## 用户点开了一条推送通知（payload 里只有路由 id）。跳转由上层决定——现在还没人接，
+## 但事件不该在桥那一层被丢掉。
+signal push_opened(payload: Dictionary)
 
 const DEFAULT_BASE := "https://farm.sensenjoy.cn/v1"
 ## 放一行 URL 就能把客户端指到别的服务器（局域网调试用），不用改代码重打包。
@@ -124,6 +127,7 @@ func _build_apis() -> void:
 	images = ImageCache.new(func(url: String): return await client.get_bytes(url))
 	push_service = PushService.new(PushBridgeFactory.make() if not is_test_process() else null, push)
 	push_service.on_error = func(code: String): report_error("push register failed", {"code": code}, "warning")
+	push_service.opened.connect(func(p: Dictionary): push_opened.emit(p))
 
 ## 记一条埋点（未配 key 时空转）。distinct_id 默认取自有 user id。
 func track(event: String, props: Dictionary = {}) -> void:

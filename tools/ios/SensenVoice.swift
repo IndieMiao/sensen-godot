@@ -45,7 +45,7 @@ public final class SensenVoiceCore: NSObject {
                     .playAndRecord, mode: .voiceChat, options: [.defaultToSpeaker, .allowBluetooth])
                 try await self.room.connect(url: url, token: token)
                 // 进房默认不开麦：上麦是显式动作（语音房页面的麦克风按钮）。
-                try? await self.room.localParticipant.setMicrophone(enabled: false)
+                _ = try? await self.room.localParticipant.setMicrophone(enabled: false)
             } catch {
                 self.setState(.idle, reason: "connect_failed")
                 self.report(error)
@@ -76,7 +76,8 @@ public final class SensenVoiceCore: NSObject {
         let target = Participant.Identity(from: identity)
         guard let participant = room.remoteParticipants[target] else { return }
         for publication in participant.audioTracks {
-            (publication.track as? RemoteAudioTrack)?.set(volume: volume)
+            // volume 是属性不是方法；0.0 静音，1.0 原样，SDK 自己夹在 0…10。
+            (publication.track as? RemoteAudioTrack)?.volume = volume
         }
     }
 
@@ -122,6 +123,8 @@ extension SensenVoiceCore: RoomDelegate {
             setState(.reconnecting)
         case .disconnected:
             setState(.idle, reason: lastReason.isEmpty ? "closed" : lastReason)
+        case .disconnecting:
+            break // 过渡态，等 .disconnected 再落地，免得 UI 闪一下「已断开」又变回来
         }
     }
 
