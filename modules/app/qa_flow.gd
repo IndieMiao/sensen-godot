@@ -42,6 +42,7 @@ func _run() -> void:
 			await run_login()
 		_:
 			_error("unknown flow: %s" % flow)
+	await stay()
 	await watch()
 	report.done = true
 	_write_report()
@@ -278,6 +279,19 @@ func clear_output() -> void:
 	for f in dir.get_files():
 		if f.ends_with(".png") or f == "report.json":
 			dir.remove(f)
+
+## SENSEN_QA_STAY=map|feed|im|profile：观察窗开始前切到这个 Tab 并停在那儿——
+## 真人要在某一页上手动操作（地图手势、系统权限弹窗）时，别让步行器把页面停在别处。
+func stay(tab: String = OS.get_environment("SENSEN_QA_STAY").strip_edges()) -> bool:
+	if tab.is_empty() or not AppRoutes.is_tab(tab):
+		return false
+	var shell := current()
+	if shell == null or not shell.has_method("show_tab"):
+		return false
+	shell.show_tab(tab)
+	await settle()
+	await shot("stay_%s" % tab)
+	return true
 
 ## SENSEN_QA_WATCH=<秒>：流程跑完后在这段时间里每隔 watch_interval_s 补拍一张（watch_NN）。
 ## 给真机上必须手点的验证留观察窗——键盘弹起、系统权限弹窗这类，镜像不弹软键盘，

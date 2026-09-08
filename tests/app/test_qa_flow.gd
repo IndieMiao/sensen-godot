@@ -59,3 +59,17 @@ func test_ready_clears_previous_round_output() -> void:
 	assert_bool(FileAccess.file_exists("user://qa_test/report.json")).is_false()
 	assert_bool(FileAccess.file_exists("user://qa_test/keep.txt")).is_true()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://qa_test/keep.txt"))
+
+func test_stay_switches_to_the_named_tab_and_shoots_once() -> void:
+	if DisplayServer.get_name() == "headless":
+		return # 依赖真实渲染出帧
+	var flow := auto_free(preload("res://modules/app/qa_flow.gd").new()) as Node
+	add_child(flow)
+	flow.out_dir = "user://qa_test_stay"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(flow.out_dir))
+	assert_bool(await flow.stay("")).is_false()
+	assert_bool(await flow.stay("nope")).is_false()
+	# 没有壳在场时也不该崩。
+	assert_bool(await flow.stay("map")).is_false()
+	assert_int(flow.report.steps.size()).is_equal(0)
+
