@@ -459,6 +459,215 @@
 			"thumb": "res://assets/avatar/thumbs/glass8.png",
 			"tier": 0,
 			"unity_guid": "a31a8ec11cac7794b9e67c558b7d6f0e"
+		},
+		{
+			"attach": "socket",
+			"id": "mask10",
+			"offset": {
+				"pos": [
+					0.0,
+					-0.02,
+					-0.01
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/mask10.res",
+			"slot": "mask",
+			"thumb": "res://assets/avatar/thumbs/mask10.png",
+			"tier": 0,
+			"unity_guid": "3928b9f6cc04ff94182a2490cee3e05f"
+		},
+		{
+			"attach": "socket",
+			"id": "mask11",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/mask11.res",
+			"slot": "mask",
+			"thumb": "res://assets/avatar/thumbs/mask11.png",
+			"tier": 0,
+			"unity_guid": "6e7a2702bc3f0814b8a4c6847829d55d"
+		},
+		{
+			"attach": "socket",
+			"id": "mask34",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/mask34.res",
+			"slot": "mask",
+			"thumb": "res://assets/avatar/thumbs/mask34.png",
+			"tier": 0,
+			"unity_guid": "27ec5ee9957923a488b3063bf5a21d47"
+		},
+		{
+			"attach": "socket",
+			"id": "pocketbag10",
+			"offset": {
+				"pos": [
+					-0.001,
+					0.016,
+					-0.171
+				],
+				"rot": [
+					278.38013,
+					286.29132,
+					162.60133
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/pocketbag10.res",
+			"slot": "pocketBag",
+			"thumb": "res://assets/avatar/thumbs/pocketbag10.png",
+			"tier": 0,
+			"unity_guid": "0e61c74d68188614ea4ab2ed88e77925"
+		},
+		{
+			"attach": "socket",
+			"id": "pocketbag11",
+			"offset": {
+				"pos": [
+					-0.002,
+					0.046,
+					-0.013
+				],
+				"rot": [
+					287.4332,
+					277.1218,
+					170.74586
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/pocketbag11.res",
+			"slot": "pocketBag",
+			"thumb": "res://assets/avatar/thumbs/pocketbag11.png",
+			"tier": 0,
+			"unity_guid": "30ca529b7eab8c54081444b1b68b37a1"
+		},
+		{
+			"attach": "socket",
+			"id": "pocketbag12",
+			"offset": {
+				"pos": [
+					-0.067,
+					-0.003,
+					0.0
+				],
+				"rot": [
+					275.71112,
+					337.22574,
+					113.35112
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/pocketbag12.res",
+			"slot": "pocketBag",
+			"thumb": "res://assets/avatar/thumbs/pocketbag12.png",
+			"tier": 0,
+			"unity_guid": "b2433f3c3d663854d8383f60e0320e12"
+		},
+		{
+			"attach": "mesh",
+			"id": "shouderbag10",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/shouderbag10.res",
+			"slot": "shoulderBag",
+			"thumb": "res://assets/avatar/thumbs/shouderbag10.png",
+			"tier": 0,
+			"unity_guid": "207438d69452138449505e9437bc635a"
+		},
+		{
+			"attach": "mesh",
+			"id": "shouderbag11",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/shouderbag11.res",
+			"slot": "shoulderBag",
+			"thumb": "res://assets/avatar/thumbs/shouderbag11.png",
+			"tier": 0,
+			"unity_guid": "6ab5ca0f40aef7441b1356717da75c08"
+		},
+		{
+			"attach": "socket",
+			"id": "messengerbag17",
+			"offset": {
+				"pos": [
+					0.135,
+					0.131,
+					-0.001
+				],
+				"rot": [
+					270.6635,
+					213.72745,
+					243.26367
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/messengerbag17.res",
+			"slot": "messengerBag",
+			"thumb": "res://assets/avatar/thumbs/messengerbag17.png",
+			"tier": 0,
+			"unity_guid": "0ffc8ab711f87bc42bf39171cc13f9a5"
 		}
 	],
 	"version": 1

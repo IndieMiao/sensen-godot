@@ -29,5 +29,34 @@
   },
   "messengerbag3": {
     "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin40/skin40/SK_dt_skin40.fbx"
+  },
+  "mask10": {
+    "folder": "Assets/_Gensen/Characters/AvatarPaks/mask/mask10"
+  },
+  "mask11": {
+    "folder": "Assets/_Gensen/Characters/AvatarPaks/mask/mask11"
+  },
+  "mask34": {
+    "folder": "Assets/_Gensen/Characters/AvatarPaks/mask/mask34"
+  },
+  "pocketbag10": {
+    "folder": "Assets/_Gensen/Characters/AvatarPaks/pocketBag/pocketBag10"
+  },
+  "pocketbag11": {
+    "folder": "Assets/_Gensen/Characters/AvatarPaks/pocketBag/pocketBag11"
+  },
+  "pocketbag12": {
+    "folder": "Assets/_Gensen/Characters/AvatarPaks/pocketBag/pocketBag12"
+  },
+  "shouderbag10": {
+    "folder": "Assets/_Gensen/Characters/AvatarPaks/shouderBag/shouderBag10",
+    "mesh_name": "shouderBag10"
+  },
+  "shouderbag11": {
+    "folder": "Assets/_Gensen/Characters/AvatarPaks/shouderBag/shouderBag11",
+    "mesh_name": "shouderBag11"
+  },
+  "messengerbag17": {
+    "folder": "Assets/_Gensen/Characters/AvatarPaks/messengerBag/messengerBag17"
   }
 }

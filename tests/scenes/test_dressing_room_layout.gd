@@ -167,11 +167,15 @@ func test_only_slots_with_real_choices_are_visible_and_named_in_english() -> voi
 	var labels: Array[String] = []
 	for child in tabs.get_children():
 		labels.append((child as Button).text)
-	assert_array(labels).contains_exactly(["Hair", "Outfits", "Shoes", "Bags", "Glasses"])
+	# B7 扩池后有 8 个分类（新增 Masks / Pouches / Slings）；顺序 = slot_table 顺序。
+	assert_array(labels).contains_exactly(["Hair", "Outfits", "Shoes", "Slings", "Bags", "Pouches", "Masks", "Glasses"])
 	assert_bool(labels.has("body")).is_false()
 	assert_bool(labels.has("eyes")).is_false()
-	# 360dp 设计宽度扣除抽屉左右 16dp 后仍应完整显示五个英文分类。
-	assert_float((tabs as Control).get_combined_minimum_size().x).is_less_equal(328.0)
+	# 一屏放不下 8 个分类了：标签栏必须能横滚，且每个分类仍是够大的触摸目标。
+	var scroll := s.get_node("UI/SafeArea/VBox/Drawer/VBox/TabsScroll") as ScrollContainer
+	assert_bool(scroll.horizontal_scroll_mode != ScrollContainer.SCROLL_MODE_DISABLED).is_true()
+	for child in tabs.get_children():
+		assert_float((child as Control).get_combined_minimum_size().x).is_greater_equal(56.0)
 
 func test_list_buttons_pass_touch_for_scroll() -> void:
 	## 回归（2026-08-29 真机）：ScrollContainer 触摸滚动依赖按压事件冒泡到容器
@@ -353,8 +357,10 @@ func test_background_is_separate_from_camera_and_grid_fits_both_phone_heights() 
 					HORIZONTAL_ALIGNMENT_LEFT, -1, choice.get_theme_font_size("font_size")).x
 				var content_padding := choice.get_theme_stylebox("normal").get_minimum_size().x
 				assert_float(text_width).override_failure_message("Clipped label: " + choice.text).is_less_equal(choice.size.x - content_padding)
-		var tabs := panel.tabs as Control
-		assert_float(tabs.get_global_rect().end.x).is_less_equal(s.drawer.get_global_rect().end.x - 12.0)
+		# 分类多到一屏放不下之后，内层 HBox 会比抽屉宽（本来就靠横滚看）；
+		# 要卡的是那个负责裁剪的 ScrollContainer 不越界。
+		var tabs_scroll := panel.get_node("TabsScroll") as Control
+		assert_float(tabs_scroll.get_global_rect().end.x).is_less_equal(s.drawer.get_global_rect().end.x - 12.0)
 
 func test_equip_taller_part_keeps_the_character_the_same_size() -> void:
 	## 产品口径（2026-09-02 改）：换装**不能**改变角色在画面中的比例。

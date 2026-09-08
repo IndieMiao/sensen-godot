@@ -12,6 +12,8 @@ const TOUCH_HEIGHT := 48.0
 ## expand_icon keeps the source thumbnail size out of the grid's layout budget.
 const THUMB_CELL_HEIGHT := 98.0
 const COMPACT_CELL_HEIGHT := 82.0
+## 分类标签的最小宽度（横滚时不至于挤成一条）。
+const TAB_MIN_WIDTH := 56.0
 ## "无"选项没有部件可渲，用一个灰色禁止符占位，保证格子高度与其它项一致。
 const ICON_NONE := preload("res://assets/ui/icons/none.svg")
 
@@ -21,10 +23,23 @@ const SLOT_LABELS := {
 	&"shoes": "Shoes",
 	&"messengerBag": "Bags",
 	&"glass": "Glasses",
+	&"mask": "Masks",
+	&"pocketBag": "Pouches",
+	&"shoulderBag": "Slings",
 }
-const SLOT_ICONS := {&"hairHat": "scissors", &"cloth": "shirt", &"shoes": "footprints", &"messengerBag": "shopping-bag", &"glass": "glasses"}
+const SLOT_ICONS := {&"hairHat": "scissors", &"cloth": "shirt", &"shoes": "footprints", &"messengerBag": "shopping-bag",
+	&"glass": "glasses", &"mask": "circle", &"pocketBag": "shopping-basket", &"shoulderBag": "store"}
 
 const PART_LABELS := {
+	"mask10": "Coral Mask",
+	"mask11": "Butter Patch",
+	"mask34": "Sunny Balloon",
+	"pocketbag10": "Lilac Strap",
+	"pocketbag11": "Charcoal Pouch",
+	"pocketbag12": "Blossom Pouch",
+	"shouderbag10": "Midnight Sling",
+	"shouderbag11": "Sand Sling",
+	"messengerbag17": "Coral Satchel",
 	"hairhat0": "Silver Crop",
 	"hairhat20": "Playful Hood",
 	"hairhat41": "Chestnut Long",
@@ -85,7 +100,8 @@ func setup(p_rig: AvatarRig) -> void:
 		button.icon = GameUi.icon(SLOT_ICONS.get(slot_def.slot_name, "shirt"))
 		button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-		button.custom_minimum_size.y = TOUCH_HEIGHT
+		# 分类多了以后标签栏要横滚：给每个分类一个最小宽度，别缩成 34 px 那么窄的触摸目标。
+		button.custom_minimum_size = Vector2(TAB_MIN_WIDTH, TOUCH_HEIGHT)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.expand_icon = true
 		button.focus_mode = Control.FOCUS_NONE

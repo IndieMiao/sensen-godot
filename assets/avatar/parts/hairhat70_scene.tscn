@@ -47,9 +47,9 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_q275j")
 
-[node name="SocketPart" type="Node3D" unique_id=887613490]
+[node name="SocketPart" type="Node3D" unique_id=1795525068]
 
-[node name="hairHat" type="MeshInstance3D" parent="." unique_id=1726608928]
+[node name="hairHat" type="MeshInstance3D" parent="." unique_id=118035530]
 transform = Transform3D(0, 0, 1, 0.9999355, -0.011353135, 0, 0.011353135, 0.9999355, 0, 0, 0, 0)
 cast_shadow = 0
 mesh = SubResource("ArrayMesh_jfico")
