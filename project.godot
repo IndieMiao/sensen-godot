@@ -40,7 +40,7 @@ locale/translations=PackedStringArray("res://locale/en.po", "res://locale/zh_CN.
 pointing/android/enable_pan_and_scale_gestures=true
 
 [editor_plugins]
-enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg", "res://addons/sensen_photo_picker/plugin.cfg")
+enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg", "res://addons/sensen_photo_picker/plugin.cfg", "res://addons/sensen_push/plugin.cfg")
 
 [rendering]
 renderer/rendering_method="mobile"

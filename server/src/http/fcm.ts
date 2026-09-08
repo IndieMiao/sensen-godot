@@ -1,7 +1,7 @@
 /**
  * FCM HTTP v1 发送端（不引 firebase-admin）。三步：服务账号私钥签一个 JWT →
  * 换 OAuth2 access token（缓存到过期前 60 秒）→ 逐 token POST /messages:send。
- * APNs 由 FCM 代投，所以 iOS 不需要另一条通道，只要在 Firebase 控制台挂上 APNs key（SSLAUNCH A9）。
+ * 只管 Android：iOS 走 apns.ts 直连，不经 FCM 代投（省掉客户端的 Firebase iOS SDK）。
  *
  * 失效 token（UNREGISTERED / INVALID_ARGUMENT）回给调用方删表——不删的话每次都白发一遍。
  */

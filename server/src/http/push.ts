@@ -1,5 +1,7 @@
 /**
- * D7 推送：设备 token 表 + 离线通知（FCM HTTP v1，APNs 由 FCM 代投）。
+ * D7 推送：设备 token 表 + 离线通知。Android 走 FCM HTTP v1（fcm.ts），iOS 直连 APNs（apns.ts），
+ * 由 platformSender 按 platform 分流——iOS 不经 FCM 代投，客户端就不必引 Firebase iOS SDK。
+ * 所以同一张表里两种 token：iOS 是 APNs device token，Android 是 FCM registration token。
  *
  * 为什么不引 firebase-admin：它只是替我们做「服务账号 JWT → OAuth2 access token → POST」
  * 这三步，而我们已经有 JWT 校验与 HTTP 客户端；引进来会把一整套 Google SDK 依赖带进

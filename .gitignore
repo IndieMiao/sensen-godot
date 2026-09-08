@@ -49,3 +49,20 @@ native/photo_picker/android/bin/*
 native/photo_picker/android/local.properties
 native/photo_picker/.sconsign.dblite
 native/photo_picker/src/*.o
+
+# C2 推送原生扩展：同上，只入库最终 .a / .dylib（编译中间产物不进）
+native/push/bin/*
+!native/push/bin/libsensen_push.ios.template_debug.arm64.a
+!native/push/bin/libsensen_push.ios.template_release.arm64.a
+!native/push/bin/libsensen_push.macos.template_debug.arm64.dylib
+!native/push/bin/libsensen_push.macos.template_release.arm64.dylib
+native/push/.sconsign.dblite
+native/push/src/*.o
+native/push/src/*.os
+native/push/src_stub/*.o
+native/push/src_stub/*.os
+native/push/android/.gradle/
+native/push/android/build/
+native/push/android/bin/*
+!native/push/android/bin/*.aar
+native/push/android/local.properties

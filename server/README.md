@@ -381,13 +381,24 @@ QA / 演示账号用 `pnpm seed:qa`（`scripts/seed_qa.ts`）：Firebase 邮箱�
 
 新消息落库后，会话成员里**不在线**（WebSocket 没连着）且不是发送者的人各收一条通知。
 通知里**不放消息正文**，只有「谁发来一条消息 / 一张图」+ `conversation_id`，点开由客户端按 seq 补拉——
-正文不经过 Google 的推送通道，锁屏也不泄露（E2）。已下架（hidden）的消息不推；
-幂等重放（`created=false`）不重复推。FCM 回报失效的 token 会立即从表里删掉。
+正文不经过第三方推送通道，锁屏也不泄露（E2）。已下架（hidden）的消息不推；
+幂等重放（`created=false`）不重复推。通道回报失效的 token 会立即从表里删掉。
 
-发送走 FCM HTTP v1，**不引 firebase-admin**：服务账号 JSON → RS256 assertion → OAuth2 access token（缓存到过期前 60 秒）
-→ `POST /v1/projects/<id>/messages:send`。iOS 由 FCM 代投 APNs，所以只需在 Firebase 控制台挂 APNs key（SSLAUNCH A9）。
-配置：`FIREBASE_SERVICE_ACCOUNT`（JSON 内容）或 `FIREBASE_SERVICE_ACCOUNT_FILE`（文件路径）；两者都没有时推送空转，
-设备 token 照常收（便于先接客户端）。设备 token 进删号级联与数据导出（导出只给平台与时间，不给 token 本身）。
+**两条通道，按 platform 分流**（`platformSender`）。表里因此有两种 token：iOS 存 APNs device token，
+Android 存 FCM registration token。
+
+- Android → FCM HTTP v1（`src/http/fcm.ts`），**不引 firebase-admin**：服务账号 JSON → RS256 assertion →
+  OAuth2 access token（缓存到过期前 60 秒）→ `POST /v1/projects/<id>/messages:send`。
+  配置 `FIREBASE_SERVICE_ACCOUNT`（JSON 内容）或 `FIREBASE_SERVICE_ACCOUNT_FILE`（文件路径）。
+- iOS → 直连 APNs（`src/http/apns.ts`）：p8 密钥 ES256 签 provider token（50 分钟换一次）→ HTTP/2
+  `POST /3/device/<token>`。配置 `APNS_KEY` / `APNS_KEY_ID` / `APNS_TEAM_ID` / `APNS_TOPIC`，
+  开发构建还要 `APNS_SANDBOX=1`（真机 Debug 包的 token 只有沙箱认）。
+
+**为什么 iOS 不走 FCM 代投**：那样客户端就得引 Firebase iOS SDK 才能拿到 FCM token，为一条推送通道
+把整套 Google SDK 装进 App——包体、隐私清单、审核问答都要多担一份。直连只多一个 p8 密钥。
+
+哪条都没配就那一侧空转，设备 token 照常收（便于先接客户端）。
+设备 token 进删号级联与数据导出（导出只给平台与时间，不给 token 本身）。
 
 ## 遥测（E2 / E4）
 

@@ -1,0 +1,9 @@
+[configuration]
+entry_symbol = "sensen_push_init"
+compatibility_minimum = "4.7"
+
+[libraries]
+ios.debug.arm64 = "res://native/push/bin/libsensen_push.ios.template_debug.arm64.a"
+ios.release.arm64 = "res://native/push/bin/libsensen_push.ios.template_release.arm64.a"
+macos.debug.arm64 = "res://native/push/bin/libsensen_push.macos.template_debug.arm64.dylib"
+macos.release.arm64 = "res://native/push/bin/libsensen_push.macos.template_release.arm64.dylib"

@@ -153,6 +153,9 @@ func _delete_on_server() -> bool:
 	return false
 
 func _on_sign_out() -> void:
+	# 先把设备 token 从服务端撤掉再登出：登出之后就没 token 打这个接口了。
+	if get_node_or_null("/root/Net") != null:
+		await Net.stop_push()
 	_finish_sign_out()
 
 func _finish_sign_out() -> void:

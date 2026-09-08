@@ -29,6 +29,8 @@ var im: ImApi
 var uploads: UploadApi
 var location: LocationApi
 var push: PushApi
+## C2：拿设备 token 并报给服务端；原生插件不在（桌面 / 没装）时 bridge 为 null，整条空转。
+var push_service: PushService
 var voice: VoiceApi
 ## E4 / E5：没配 DSN / key 就是彻底关闭，一条不发。内容统一过 Scrub（E2）。
 var errors: ErrorReports
@@ -120,6 +122,8 @@ func _build_apis() -> void:
 	if analytics == null:
 		analytics = Analytics.new("", "", ApiClient.make_post_transport(self))
 	images = ImageCache.new(func(url: String): return await client.get_bytes(url))
+	push_service = PushService.new(PushBridgeFactory.make() if not is_test_process() else null, push)
+	push_service.on_error = func(code: String): report_error("push register failed", {"code": code}, "warning")
 
 ## 记一条埋点（未配 key 时空转）。distinct_id 默认取自有 user id。
 func track(event: String, props: Dictionary = {}) -> void:
@@ -188,6 +192,16 @@ func connect_im() -> void:
 
 func disconnect_im() -> void:
 	ws.close()
+
+## 登录成功后：问通知权限并把设备 token 报上去（桌面 / 无插件时空转）。
+func start_push() -> void:
+	if push_service != null:
+		push_service.start()
+
+## 登出 / 删号前：把设备 token 从服务端撤掉，免得推送继续投到这台机器。
+func stop_push() -> void:
+	if push_service != null:
+		await push_service.stop()
 
 ## 每次连上（首连与重连都算）先按落盘的 last_seq 补拉：WsClient 自己的 resync_needed 只在重连时发，
 ## 而应用重启后的首连同样可能漏了事件，所以统一挂在 connected 上，不用 resync_needed。

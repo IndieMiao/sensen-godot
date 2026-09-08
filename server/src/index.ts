@@ -19,6 +19,7 @@ import { nullReporter, sentryReporter } from './http/telemetry.js';
 import { PgDeviceStore } from './db/pg_push.js';
 import { nullSender, pushAccountModule } from './http/push.js';
 import { fcmSender, parseServiceAccount } from './http/fcm.js';
+import { apnsSender, http2Post, parseApnsConfig, platformSender } from './http/apns.js';
 import { PgVoiceStore } from './db/pg_voice.js';
 import { liveKitFromEnv, voiceAccountModule } from './http/voice.js';
 import { imAccountModule } from './http/im.js';
@@ -93,13 +94,19 @@ const serviceAccountRaw = process.env.FIREBASE_SERVICE_ACCOUNT
     ? await import('node:fs').then(fs => fs.readFileSync(process.env.FIREBASE_SERVICE_ACCOUNT_FILE!, 'utf8'))
     : '');
 const serviceAccount = serviceAccountRaw ? parseServiceAccount(serviceAccountRaw) : null;
-const pushSender = serviceAccount
+// 两条通道各管各的平台：Android 走 FCM（服务账号），iOS 直连 APNs（p8 密钥）。
+// iOS 不经 FCM 代投，客户端就不用引 Firebase iOS SDK，只报 APNs device token。
+const androidSender = serviceAccount
   ? fcmSender(serviceAccount, () => Date.now(), async (url, init) => {
       const res = await fetch(url, init);
       return { status: res.status, json: await res.json().catch(() => ({})) };
     })
-  : nullSender;
-if (!serviceAccount) console.warn('未设置 FIREBASE_SERVICE_ACCOUNT[_FILE]：离线推送空转（设备 token 照常收）');
+  : null;
+const apnsConfig = parseApnsConfig(process.env);
+const iosSender = apnsConfig ? apnsSender(apnsConfig, () => Date.now(), http2Post()) : null;
+const pushSender = androidSender || iosSender ? platformSender(iosSender, androidSender) : nullSender;
+if (!serviceAccount) console.warn('未设置 FIREBASE_SERVICE_ACCOUNT[_FILE]：Android 推送空转（设备 token 照常收）');
+if (!apnsConfig) console.warn('未设置 APNS_KEY/APNS_KEY_ID/APNS_TEAM_ID/APNS_TOPIC：iOS 推送空转（设备 token 照常收）');
 
 const errorReporter = process.env.SENTRY_DSN
   ? sentryReporter(process.env.SENTRY_DSN, () => Date.now(), undefined, { release: process.env.GIT_SHA ?? '', environment: process.env.NODE_ENV ?? 'dev' })

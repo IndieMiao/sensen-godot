@@ -174,6 +174,7 @@ func _link_account(s: AuthSession) -> void:
 		s.set_server_user(str(r.get("user_id", "")))
 		if Net != null and s == Net.auth:
 			Net.connect_im()
+			Net.start_push() # C2：登录成功才问通知权限，冷启动就弹最容易被拒
 
 func _on_dev_continue() -> void:
 	_session().complete_sign_in("dev-local", "dev-token", "", 3600, "dev", "dev@local")

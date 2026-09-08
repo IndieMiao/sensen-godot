@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Android 13+ 通知要运行时权限；插件用 GodotPlugin 的权限接口去要。 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <application>
+        <meta-data
+            android:name="org.godotengine.plugin.v2.SensenPush"
+            android:value="app.sensen.push.SensenPushPlugin" />
+        <!-- 收 FCM 下行：新 token 与消息都从这里进，转交给插件单例。 -->
+        <service
+            android:name="app.sensen.push.SensenMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+    </application>
+</manifest>
