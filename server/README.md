@@ -394,3 +394,24 @@ QA / 演示账号用 `pnpm seed:qa`（`scripts/seed_qa.ts`）：Firebase 邮箱�
 `SENTRY_DSN` 配了才上报未捕获异常；内容先过 `src/http/telemetry.ts` 的脱敏（URL 去 query，
 经纬度 / 正文 / 昵称 / 邮箱 / token 一律 `[redacted]`）。没配就是空转，错误只留在进程日志里。
 
+## 语音房（D5）
+
+| 路由 | 说明 |
+|---|---|
+| `GET /v1/voice/rooms` | 开着的房间列表（最多 50） |
+| `POST /v1/voice/rooms {title}` | 建房，建者即房主并自动上麦 |
+| `POST /v1/voice/rooms/:id/join` | 进房，先当听众；返回房间状态 + 自己的 LiveKit token |
+| `POST /v1/voice/rooms/:id/leave` | 离开；**房主离开即关房**（没人主持的公共麦是审核风险） |
+| `POST /v1/voice/rooms/:id/stage {on, user_id?}` | 上下麦。自己上下自己；房主可带 `user_id` 请人下麦 |
+| `POST /v1/voice/rooms/:id/mute {user_id, muted}` | 房主静音 / 解除；被静音的人立刻下麦且上不去 |
+| `POST /v1/voice/rooms/:id/token` | 续一把 token（到期前换） |
+
+**能不能说话由服务端签的 token 决定**：每次上下麦 / 被静音 / 续期都返回一把新的 LiveKit
+access token，`video.canPublish` 就是麦克风闸门——客户端改本地代码也推不上流。房间状态
+（谁在麦上、谁被静音）在我们库里（`voice_rooms` / `voice_room_members`），LiveKit 只当音频管道，
+音频不经过我们、也不落库。麦位 8 个（含房主），房间 50 人。
+
+签名不引 livekit-server-sdk：HS256 + video grant 一共二十行（`src/http/voice.ts`）。
+配置：`LIVEKIT_URL` / `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET`，缺一则语音路由 503（SSLAUNCH D2 给正式 key）。
+删号级联：本人建的房关掉、从别人的房里退出。
+

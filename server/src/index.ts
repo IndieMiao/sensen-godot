@@ -19,6 +19,8 @@ import { nullReporter, sentryReporter } from './http/telemetry.js';
 import { PgDeviceStore } from './db/pg_push.js';
 import { nullSender, pushAccountModule } from './http/push.js';
 import { fcmSender, parseServiceAccount } from './http/fcm.js';
+import { PgVoiceStore } from './db/pg_voice.js';
+import { liveKitFromEnv, voiceAccountModule } from './http/voice.js';
 import { imAccountModule } from './http/im.js';
 import { SocketHub } from './http/ws_gateway.js';
 import { CachedJwks, googleJwksFetcher } from './http/firebase_token.js';
@@ -82,6 +84,9 @@ const moderation = new PgModerationStore(pool);
 const im = new PgImStore(pool);
 const locations = new PgLocationStore(pool);
 const deviceStore = new PgDeviceStore(pool);
+const voiceStore = new PgVoiceStore(pool);
+const livekit = liveKitFromEnv(process.env);
+if (!livekit) console.warn('未设置 LIVEKIT_URL / LIVEKIT_API_KEY / LIVEKIT_API_SECRET：语音房路由返回 503');
 // D7：服务账号 JSON 可以直接给内容，也可以给文件路径（部署时挂 secret 文件更常见）。
 const serviceAccountRaw = process.env.FIREBASE_SERVICE_ACCOUNT
   ?? (process.env.FIREBASE_SERVICE_ACCOUNT_FILE
@@ -110,9 +115,9 @@ if (localUploads) console.warn(`图片走开发期本地存储 ${localUploads.di
 const app = await buildApp({
   store, content, contentVersion: cv,
   accounts: new PgAccountStore(pool),
-  social, feed, uploads, localUploads, moderation, textModerator, im, wsHub, locations, errors: errorReporter, devices: deviceStore, pushSender,
+  social, feed, uploads, localUploads, moderation, textModerator, im, wsHub, locations, errors: errorReporter, devices: deviceStore, pushSender, voice: voiceStore, livekit,
   adminUserIds: new Set((process.env.ADMIN_USER_IDS ?? '').split(',').map(x => x.trim()).filter(Boolean)),
-  accountModules: [socialAccountModule(social), feedAccountModule(feed), moderationAccountModule(moderation), imAccountModule(im), locationAccountModule(locations), pushAccountModule(deviceStore)],
+  accountModules: [socialAccountModule(social), feedAccountModule(feed), moderationAccountModule(moderation), imAccountModule(im), locationAccountModule(locations), pushAccountModule(deviceStore), voiceAccountModule(voiceStore)],
   firebase: firebaseProjectId ? { projectId: firebaseProjectId, keys: jwks.keys, refreshKeys: jwks.refresh } : undefined,
   blueprintDir: BLUEPRINT_DIR, regionsFile: path.join(CONTENT_DIR, 'regions.json'),
   pepper: need('TOKEN_PEPPER'), now: () => Date.now(),

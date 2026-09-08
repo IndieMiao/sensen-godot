@@ -34,6 +34,8 @@ import type { LocalUploadStore } from './local_uploads.js';
 import { FRIENDS_LIMIT, friendLocationView, isFresh, validateLocation, type LocationStore } from './location.js';
 import { nullReporter, scrubUrl, type ErrorReporter } from './telemetry.js';
 import { messageNotification, nullSender, offlineRecipients, validateRegister, type DeviceStore, type PushSender } from './push.js';
+import { canPublishFor, memberView as voiceMemberView, roomView, signAccessToken, stageFull, validateRoom,
+  ROOM_MEMBERS_MAX, type LiveKitConfig, type Role, type VoiceStore } from './voice.js';
 import { ADMIN_ACTIONS, NullModerator, REPORT_AUTO_HIDE, decide, reportView, validateReport,
   type ModerationStore, type TextModerator } from './moderation.js';
 import { HISTORY_LIMIT_MAX, SYNC_LIMIT_MAX, conversationView, greetingBlocked, messageView, uniqueIds, validateGroup, validateMessage,
@@ -72,6 +74,9 @@ export interface AppDeps {
   /** D7 推送：设备表与发送端；缺任一则注册路由 503、离线通知空转。 */
   devices?: DeviceStore;
   pushSender?: PushSender;
+  /** D5 语音房：房间状态与 LiveKit 配置；缺任一则语音路由 503。 */
+  voice?: VoiceStore;
+  livekit?: LiveKitConfig;
   /** D6 举报 / 拉黑 / 封禁 / 复审队列；缺省时相关路由 503 MODERATION_NOT_CONFIGURED。 */
   moderation?: ModerationStore;
   /** D6 文本前置过滤；缺省 = NullModerator（不拦，但全部进人工队列）。 */
@@ -495,6 +500,121 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const fresh = [...rows.values()].filter(r => isFresh(r, now)).sort((a, b) => b.updated_at - a.updated_at);
     const profiles = await deps.social!.profiles(fresh.map(r => r.user_id));
     return reply.send({ items: fresh.map(r => friendLocationView(r, profiles.get(r.user_id))), server_time: now });
+  });
+
+  // —— D5 语音房：房间 / 麦位 / LiveKit token（谁能说话由服务端签的 token 决定）——
+  const voiceGuard = async (req: FastifyRequest, reply: FastifyReply): Promise<UserRow | null> => {
+    if (!deps.voice || !deps.livekit) { await reply.code(503).send({ code: 'VOICE_NOT_CONFIGURED', server_time: deps.now() }); return null; }
+    return socialGuard(req, reply);
+  };
+  const voiceCards = async (ids: string[]) => {
+    const profiles = await deps.social!.profiles([...new Set(ids)]);
+    return new Map([...profiles].map(([id, p]) => [id, { display_name: p.display_name, handle: p.handle, avatar: p.avatar }]));
+  };
+  /** 房间当前状态 + 给这个人的 token（角色变了就换一把新的）。 */
+  const roomState = async (roomId: string, me: UserRow) => {
+    const room = (await deps.voice!.room(roomId))!;
+    const members = await deps.voice!.members(roomId);
+    const cards = await voiceCards([...members.map(m => m.user_id), room.host_id]);
+    const mine = members.find(m => m.user_id === me.id) ?? null;
+    const token = mine
+      ? signAccessToken(deps.livekit!, {
+          identity: me.id, name: cards.get(me.id)?.display_name ?? '', room: room.id,
+          canPublish: canPublishFor(mine.role, mine.muted), nowMs: deps.now(),
+        })
+      : null;
+    return {
+      ...roomView(room, members, cards.get(room.host_id)),
+      members: members.map(m => voiceMemberView(m, cards.get(m.user_id))),
+      me: mine ? voiceMemberView(mine, cards.get(me.id)) : null,
+      livekit_url: deps.livekit!.url,
+      token,
+    };
+  };
+
+  app.get('/v1/voice/rooms', async (req, reply) => {
+    const me = await voiceGuard(req, reply); if (!me) return;
+    const rooms = await deps.voice!.openRooms(50);
+    const cards = await voiceCards(rooms.map(r => r.host_id));
+    const items = await Promise.all(rooms.map(async r => roomView(r, await deps.voice!.members(r.id), cards.get(r.host_id))));
+    return reply.send({ items, server_time: deps.now() });
+  });
+
+  app.post('/v1/voice/rooms', async (req, reply) => {
+    const me = await voiceGuard(req, reply); if (!me) return;
+    const v = validateRoom(req.body);
+    if (!v.ok) return reply.code(400).send({ code: 'SCHEMA', field: v.field, server_time: deps.now() });
+    const room = await deps.voice!.createRoom({ id: randomUUID(), title: v.title, host_id: me.id, created_at: deps.now(), closed_at: null });
+    await deps.voice!.join(room.id, me.id, 'host', deps.now());
+    return reply.code(201).send({ ...(await roomState(room.id, me)), server_time: deps.now() });
+  });
+
+  const openRoomOr404 = async (reply: FastifyReply, roomId: string) => {
+    const room = await deps.voice!.room(roomId);
+    if (!room || room.closed_at !== null) { await reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() }); return null; }
+    return room;
+  };
+
+  app.post('/v1/voice/rooms/:id/join', async (req, reply) => {
+    const me = await voiceGuard(req, reply); if (!me) return;
+    const room = await openRoomOr404(reply, paramId(req)); if (!room) return;
+    const members = await deps.voice!.members(room.id);
+    if (!members.some(m => m.user_id === me.id) && members.length >= ROOM_MEMBERS_MAX)
+      return reply.code(409).send({ code: 'ROOM_FULL', server_time: deps.now() });
+    // 进来先当听众；上麦要单独请求（房主可拒）。
+    await deps.voice!.join(room.id, me.id, room.host_id === me.id ? 'host' : 'listener', deps.now());
+    return reply.send({ ...(await roomState(room.id, me)), server_time: deps.now() });
+  });
+
+  app.post('/v1/voice/rooms/:id/leave', async (req, reply) => {
+    const me = await voiceGuard(req, reply); if (!me) return;
+    const room = await deps.voice!.room(paramId(req));
+    if (!room) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    // 房主离开 = 关房：没人主持的房间留着只会变成无人值守的公共麦（审核风险）。
+    if (room.host_id === me.id) await deps.voice!.closeRoom(room.id, deps.now());
+    else await deps.voice!.leave(room.id, me.id);
+    return reply.send({ ok: true, closed: room.host_id === me.id, server_time: deps.now() });
+  });
+
+  /** 上下麦。自己只能上下自己的麦；房主可以把别人请下麦（target）。 */
+  app.post('/v1/voice/rooms/:id/stage', async (req, reply) => {
+    const me = await voiceGuard(req, reply); if (!me) return;
+    const room = await openRoomOr404(reply, paramId(req)); if (!room) return;
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    const on = body.on === true;
+    const target = typeof body.user_id === 'string' && body.user_id.length > 0 ? body.user_id : me.id;
+    if (target !== me.id && room.host_id !== me.id)
+      return reply.code(403).send({ code: 'NOT_HOST', server_time: deps.now() });
+    const member = await deps.voice!.member(room.id, target);
+    if (!member) return reply.code(404).send({ code: 'NOT_IN_ROOM', server_time: deps.now() });
+    if (member.role === 'host') return reply.code(409).send({ code: 'HOST_ALWAYS_ON_STAGE', server_time: deps.now() });
+    if (on) {
+      if (member.muted) return reply.code(403).send({ code: 'MUTED', server_time: deps.now() });
+      if (stageFull(await deps.voice!.members(room.id))) return reply.code(409).send({ code: 'STAGE_FULL', server_time: deps.now() });
+    }
+    await deps.voice!.setRole(room.id, target, (on ? 'speaker' : 'listener') as Role);
+    return reply.send({ ...(await roomState(room.id, me)), server_time: deps.now() });
+  });
+
+  /** 房主静音 / 解除某人（举报即静音的处置口也走这里）。 */
+  app.post('/v1/voice/rooms/:id/mute', async (req, reply) => {
+    const me = await voiceGuard(req, reply); if (!me) return;
+    const room = await openRoomOr404(reply, paramId(req)); if (!room) return;
+    if (room.host_id !== me.id) return reply.code(403).send({ code: 'NOT_HOST', server_time: deps.now() });
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    const target = typeof body.user_id === 'string' ? body.user_id : '';
+    if (!target || target === me.id) return reply.code(400).send({ code: 'SCHEMA', field: 'user_id', server_time: deps.now() });
+    const m = await deps.voice!.setMuted(room.id, target, body.muted === true);
+    if (!m) return reply.code(404).send({ code: 'NOT_IN_ROOM', server_time: deps.now() });
+    return reply.send({ ...(await roomState(room.id, me)), server_time: deps.now() });
+  });
+
+  /** token 到期前换一把（角色没变也能续）。 */
+  app.post('/v1/voice/rooms/:id/token', async (req, reply) => {
+    const me = await voiceGuard(req, reply); if (!me) return;
+    const room = await openRoomOr404(reply, paramId(req)); if (!room) return;
+    if (!(await deps.voice!.member(room.id, me.id))) return reply.code(404).send({ code: 'NOT_IN_ROOM', server_time: deps.now() });
+    return reply.send({ ...(await roomState(room.id, me)), server_time: deps.now() });
   });
 
   app.get('/v1/users/me/profile', async (req, reply) => {

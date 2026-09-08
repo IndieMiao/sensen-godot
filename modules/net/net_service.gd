@@ -29,6 +29,7 @@ var im: ImApi
 var uploads: UploadApi
 var location: LocationApi
 var push: PushApi
+var voice: VoiceApi
 ## E4 / E5：没配 DSN / key 就是彻底关闭，一条不发。内容统一过 Scrub（E2）。
 var errors: ErrorReports
 var analytics: Analytics
@@ -113,6 +114,7 @@ func _build_apis() -> void:
 	uploads = UploadApi.new(client)
 	location = LocationApi.new(client)
 	push = PushApi.new(client)
+	voice = VoiceApi.new(client)
 	if errors == null:
 		errors = ErrorReports.new("", ApiClient.make_post_transport(self))
 	if analytics == null:

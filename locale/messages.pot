@@ -13,6 +13,10 @@ msgstr ""
 msgid "%d following"
 msgstr ""
 
+#: res://scenes/app/pages/voice_room_page.gd:158
+msgid "%d listening"
+msgstr ""
+
 #: res://scenes/app/pages/profile_page.gd:205
 msgid "%d new"
 msgstr ""
@@ -48,6 +52,10 @@ msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:547
 msgid "Add people"
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:362
+msgid "All mic seats are taken."
 msgstr ""
 
 #: res://modules/net/firebase_auth.gd:113
@@ -111,6 +119,7 @@ msgstr ""
 #: res://scenes/app/pages/post_page.gd:344
 #: res://scenes/app/pages/profile_page.gd:244
 #: res://scenes/app/pages/user_page.gd:403
+#: res://scenes/app/pages/voice_room_page.gd:368
 msgid "Can't reach the server. Check your connection and try again."
 msgstr ""
 
@@ -133,6 +142,7 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:335
 #: res://scenes/app/pages/post_page.gd:334
 #: res://scenes/app/pages/user_page.gd:391
+#: res://scenes/app/pages/voice_room_page.gd:352
 msgid "Child safety"
 msgstr ""
 
@@ -215,6 +225,14 @@ msgstr ""
 msgid "Dev: reset age gate"
 msgstr ""
 
+#: res://scenes/app/pages/voice_room_page.gd:356
+msgid "Disconnected from voice."
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:356
+msgid "Disconnected from voice: %s"
+msgstr ""
+
 #: res://scenes/app/pages/profile_page.gd:82
 msgid "Display name"
 msgstr ""
@@ -279,6 +297,10 @@ msgstr ""
 msgid "Give the group a name."
 msgstr ""
 
+#: res://scenes/app/pages/voice_room_page.gd:182
+msgid "Give the room a name."
+msgstr ""
+
 #: res://scenes/app/pages/im_page.gd:43
 msgid "Group"
 msgstr ""
@@ -295,6 +317,7 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:330
 #: res://scenes/app/pages/post_page.gd:329
 #: res://scenes/app/pages/user_page.gd:386
+#: res://scenes/app/pages/voice_room_page.gd:347
 msgid "Harassment or bullying"
 msgstr ""
 
@@ -302,7 +325,16 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:333
 #: res://scenes/app/pages/post_page.gd:332
 #: res://scenes/app/pages/user_page.gd:389
+#: res://scenes/app/pages/voice_room_page.gd:350
 msgid "Hate speech"
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:237
+msgid "Host"
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:157
+msgid "Host: %s"
 msgstr ""
 
 #: res://scenes/app/consent_page.gd:34
@@ -314,11 +346,16 @@ msgid "Language: %s"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:162
+#: res://scenes/app/pages/voice_room_page.gd:85
 msgid "Leave"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:548
 msgid "Leave group"
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:338
+msgid "Leave the mic"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:160
@@ -327,6 +364,10 @@ msgstr ""
 
 #: res://scenes/app/pages/lifecycle_probe_page.gd:30
 msgid "Lifecycle probe"
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:342
+msgid "Listening only: voice isn't available on this device yet."
 msgstr ""
 
 #: res://scenes/app/pages/feed_page.gd:87
@@ -364,6 +405,14 @@ msgstr ""
 #: res://scenes/app/pages/chat_page.gd:533
 #: res://scenes/app/pages/im_page.gd:259
 msgid "Message deleted"
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:251
+msgid "Mute"
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:241
+msgid "Muted"
 msgstr ""
 
 #: res://scenes/app/pages/follow_list_page.gd:35
@@ -410,6 +459,10 @@ msgstr ""
 msgid "No posts yet."
 msgstr ""
 
+#: res://scenes/app/pages/voice_room_page.gd:147
+msgid "No rooms yet. Start one."
+msgstr ""
+
 #: res://scenes/app/pages/follow_list_page.gd:119
 msgid "Not following anyone yet."
 msgstr ""
@@ -421,6 +474,14 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:157
 #: res://scenes/app/pages/feed_page.gd:281
 msgid "Nothing here yet. Follow people to see their posts."
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:239
+msgid "On mic"
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:364
+msgid "Only the host can do that."
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:379
@@ -512,6 +573,7 @@ msgstr ""
 
 #: res://scenes/app/pages/post_page.gd:225
 #: res://scenes/app/pages/user_page.gd:109
+#: res://scenes/app/pages/voice_room_page.gd:255
 msgid "Report"
 msgstr ""
 
@@ -527,6 +589,10 @@ msgstr ""
 msgid "Resend verification email"
 msgstr ""
 
+#: res://scenes/app/pages/voice_room_page.gd:45
+msgid "Room name"
+msgstr ""
+
 #: res://scenes/app/pages/profile_page.gd:91
 msgid "Save profile"
 msgstr ""
@@ -539,6 +605,7 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:334
 #: res://scenes/app/pages/post_page.gd:333
 #: res://scenes/app/pages/user_page.gd:390
+#: res://scenes/app/pages/voice_room_page.gd:351
 msgid "Self-harm"
 msgstr ""
 
@@ -556,6 +623,7 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:331
 #: res://scenes/app/pages/post_page.gd:330
 #: res://scenes/app/pages/user_page.gd:387
+#: res://scenes/app/pages/voice_room_page.gd:348
 msgid "Sexual content"
 msgstr ""
 
@@ -616,6 +684,7 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:336
 #: res://scenes/app/pages/post_page.gd:335
 #: res://scenes/app/pages/user_page.gd:392
+#: res://scenes/app/pages/voice_room_page.gd:353
 msgid "Something else"
 msgstr ""
 
@@ -627,11 +696,25 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:329
 #: res://scenes/app/pages/post_page.gd:328
 #: res://scenes/app/pages/user_page.gd:385
+#: res://scenes/app/pages/voice_room_page.gd:346
 msgid "Spam or scam"
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:243
+msgid "Speaking"
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:51
+msgid "Start"
 msgstr ""
 
 #: res://scenes/app/pages/lifecycle_probe_page.gd:34
 msgid "Switch to another app and come back several times. Each PAUSED/RESUMED pair must increase by one."
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:81
+#: res://scenes/app/pages/voice_room_page.gd:338
+msgid "Take the mic"
 msgstr ""
 
 #: res://scenes/app/pages/lifecycle_probe_page.gd:43
@@ -651,6 +734,7 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:359
 #: res://scenes/app/pages/post_page.gd:290
 #: res://scenes/app/pages/user_page.gd:363
+#: res://scenes/app/pages/voice_room_page.gd:326
 msgid "Thanks, we've received your report."
 msgstr ""
 
@@ -665,6 +749,14 @@ msgstr ""
 
 #: res://scenes/app/pages/user_page.gd:399
 msgid "That's you."
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:366
+msgid "The host is always on the mic."
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:363
+msgid "The host muted you."
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:154
@@ -692,6 +784,14 @@ msgstr ""
 msgid "This permanently deletes your account and data. This cannot be undone."
 msgstr ""
 
+#: res://scenes/app/pages/voice_room_page.gd:367
+msgid "This room has ended."
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:361
+msgid "This room is full."
+msgstr ""
+
 #: res://modules/net/firebase_auth.gd:123
 msgid "This sign-in method is not enabled."
 msgstr ""
@@ -707,6 +807,10 @@ msgstr ""
 
 #: res://modules/net/firebase_auth.gd:121
 msgid "Too many attempts. Try again later."
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:251
+msgid "Unmute"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:564
@@ -731,16 +835,21 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:332
 #: res://scenes/app/pages/post_page.gd:331
 #: res://scenes/app/pages/user_page.gd:388
+#: res://scenes/app/pages/voice_room_page.gd:349
 msgid "Violence or threats"
 msgstr ""
 
+#: res://scenes/app/pages/voice_room_page.gd:267
+msgid "Voice isn't available on this device yet."
+msgstr ""
+
 #: res://scenes/app/pages/profile_page.gd:103
-#: res://scenes/app/pages/voice_room_page.gd:5
+#: res://scenes/app/pages/voice_room_page.gd:32
 msgid "Voice room"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:9
-msgid "Voice room lands in B6 (UI), C4 (LiveKit bridge) and D5 (token/signaling)."
+#: res://scenes/app/pages/voice_room_page.gd:360
+msgid "Voice rooms aren't available on this server yet."
 msgstr ""
 
 #: res://scenes/app/age_gate_page.gd:18
@@ -778,6 +887,10 @@ msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:161
 msgid "You'll stop getting its messages."
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:365
+msgid "You're not in this room."
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:475

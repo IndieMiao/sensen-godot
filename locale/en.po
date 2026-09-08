@@ -10,6 +10,9 @@ msgstr ""
 msgid "%d following"
 msgstr ""
 
+msgid "%d listening"
+msgstr ""
+
 msgid "%d new"
 msgstr ""
 
@@ -35,6 +38,9 @@ msgid "Add at least one @handle."
 msgstr ""
 
 msgid "Add people"
+msgstr ""
+
+msgid "All mic seats are taken."
 msgstr ""
 
 msgid "An account with this email already exists."
@@ -142,6 +148,12 @@ msgstr ""
 msgid "Dev: reset age gate"
 msgstr ""
 
+msgid "Disconnected from voice."
+msgstr ""
+
+msgid "Disconnected from voice: %s"
+msgstr ""
+
 msgid "Display name"
 msgstr ""
 
@@ -184,6 +196,9 @@ msgstr ""
 msgid "Give the group a name."
 msgstr ""
 
+msgid "Give the room a name."
+msgstr ""
+
 msgid "Group"
 msgstr ""
 
@@ -199,6 +214,12 @@ msgstr ""
 msgid "Hate speech"
 msgstr ""
 
+msgid "Host"
+msgstr ""
+
+msgid "Host: %s"
+msgstr ""
+
 msgid "I have read and agree to the Terms of Service and Privacy Policy."
 msgstr ""
 
@@ -211,10 +232,16 @@ msgstr ""
 msgid "Leave group"
 msgstr ""
 
+msgid "Leave the mic"
+msgstr ""
+
 msgid "Leave this group?"
 msgstr ""
 
 msgid "Lifecycle probe"
+msgstr ""
+
+msgid "Listening only: voice isn't available on this device yet."
 msgstr ""
 
 msgid "Load more"
@@ -236,6 +263,12 @@ msgid "Message"
 msgstr ""
 
 msgid "Message deleted"
+msgstr ""
+
+msgid "Mute"
+msgstr ""
+
+msgid "Muted"
 msgstr ""
 
 msgid "New followers"
@@ -268,6 +301,9 @@ msgstr ""
 msgid "No posts yet."
 msgstr ""
 
+msgid "No rooms yet. Start one."
+msgstr ""
+
 msgid "Not following anyone yet."
 msgstr ""
 
@@ -275,6 +311,12 @@ msgid "Not signed in"
 msgstr ""
 
 msgid "Nothing here yet. Follow people to see their posts."
+msgstr ""
+
+msgid "On mic"
+msgstr ""
+
+msgid "Only the host can do that."
 msgstr ""
 
 msgid "Only the sender can unsend a message."
@@ -352,6 +394,9 @@ msgstr ""
 msgid "Resend verification email"
 msgstr ""
 
+msgid "Room name"
+msgstr ""
+
 msgid "Save profile"
 msgstr ""
 
@@ -415,7 +460,16 @@ msgstr ""
 msgid "Spam or scam"
 msgstr ""
 
+msgid "Speaking"
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
 msgid "Switch to another app and come back several times. Each PAUSED/RESUMED pair must increase by one."
+msgstr ""
+
+msgid "Take the mic"
 msgstr ""
 
 msgid "Tap here to test keyboard avoidance"
@@ -439,6 +493,12 @@ msgstr ""
 msgid "That's you."
 msgstr ""
 
+msgid "The host is always on the mic."
+msgstr ""
+
+msgid "The host muted you."
+msgstr ""
+
 msgid "They won't be able to message you, and you won't see each other's posts or profiles."
 msgstr ""
 
@@ -457,6 +517,12 @@ msgstr ""
 msgid "This permanently deletes your account and data. This cannot be undone."
 msgstr ""
 
+msgid "This room has ended."
+msgstr ""
+
+msgid "This room is full."
+msgstr ""
+
 msgid "This sign-in method is not enabled."
 msgstr ""
 
@@ -467,6 +533,9 @@ msgid "This user keeps their following list private."
 msgstr ""
 
 msgid "Too many attempts. Try again later."
+msgstr ""
+
+msgid "Unmute"
 msgstr ""
 
 msgid "Unsend"
@@ -484,10 +553,13 @@ msgstr ""
 msgid "Violence or threats"
 msgstr ""
 
+msgid "Voice isn't available on this device yet."
+msgstr ""
+
 msgid "Voice room"
 msgstr ""
 
-msgid "Voice room lands in B6 (UI), C4 (LiveKit bridge) and D5 (token/signaling)."
+msgid "Voice rooms aren't available on this server yet."
 msgstr ""
 
 msgid "Welcome"
@@ -512,6 +584,9 @@ msgid "You won't see each other's posts or profiles, and you'll stop following e
 msgstr ""
 
 msgid "You'll stop getting its messages."
+msgstr ""
+
+msgid "You're not in this room."
 msgstr ""
 
 msgid "[Photo]"

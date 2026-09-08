@@ -295,4 +295,21 @@ CREATE TABLE IF NOT EXISTS device_tokens (
   updated_at  bigint NOT NULL
 );
 CREATE INDEX IF NOT EXISTS device_tokens_user_idx ON device_tokens(user_id);
+-- D5 语音房：只存房间与麦位状态，音频不经过我们（LiveKit 传输）。
+CREATE TABLE IF NOT EXISTS voice_rooms (
+  id          uuid PRIMARY KEY,
+  title       text NOT NULL,
+  host_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at  bigint NOT NULL,
+  closed_at   bigint
+);
+CREATE INDEX IF NOT EXISTS voice_rooms_open_idx ON voice_rooms(created_at DESC) WHERE closed_at IS NULL;
+CREATE TABLE IF NOT EXISTS voice_room_members (
+  room_id    uuid NOT NULL REFERENCES voice_rooms(id) ON DELETE CASCADE,
+  user_id    uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role       text NOT NULL,
+  muted      boolean NOT NULL DEFAULT false,
+  joined_at  bigint NOT NULL,
+  PRIMARY KEY (room_id, user_id)
+);
 

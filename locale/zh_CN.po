@@ -570,3 +570,81 @@ msgstr "这位用户没有公开关注列表。"
 
 msgid "Share anonymous usage data"
 msgstr "分享匿名使用数据"
+
+msgid "%d listening"
+msgstr "%d 人在听"
+
+msgid "All mic seats are taken."
+msgstr "麦位已满。"
+
+msgid "Disconnected from voice."
+msgstr "语音已断开。"
+
+msgid "Disconnected from voice: %s"
+msgstr "语音已断开：%s"
+
+msgid "Give the room a name."
+msgstr "给房间起个名字。"
+
+msgid "Host"
+msgstr "房主"
+
+msgid "Host: %s"
+msgstr "房主：%s"
+
+msgid "Leave the mic"
+msgstr "下麦"
+
+msgid "Listening only: voice isn't available on this device yet."
+msgstr "只能收听：这台设备还不支持语音。"
+
+msgid "Mute"
+msgstr "静音"
+
+msgid "Muted"
+msgstr "已静音"
+
+msgid "No rooms yet. Start one."
+msgstr "还没有房间，开一个吧。"
+
+msgid "On mic"
+msgstr "麦上"
+
+msgid "Only the host can do that."
+msgstr "只有房主能这么做。"
+
+msgid "Room name"
+msgstr "房间名"
+
+msgid "Speaking"
+msgstr "正在说话"
+
+msgid "Start"
+msgstr "开房"
+
+msgid "Take the mic"
+msgstr "上麦"
+
+msgid "The host is always on the mic."
+msgstr "房主始终在麦上。"
+
+msgid "The host muted you."
+msgstr "房主把你静音了。"
+
+msgid "This room has ended."
+msgstr "这个房间已经结束了。"
+
+msgid "This room is full."
+msgstr "房间人满了。"
+
+msgid "Unmute"
+msgstr "解除静音"
+
+msgid "Voice isn't available on this device yet."
+msgstr "这台设备还不支持语音。"
+
+msgid "Voice rooms aren't available on this server yet."
+msgstr "这台服务器还没开语音房。"
+
+msgid "You're not in this room."
+msgstr "你不在这个房间里。"
