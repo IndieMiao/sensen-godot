@@ -7,6 +7,7 @@ class FakeBridge extends VoiceBridge:
 	var mic_calls: Array = []
 	var volumes: Dictionary = {}
 	var disconnects := 0
+	var polls := 0
 	var here := true
 	func available() -> bool:
 		return here
@@ -20,6 +21,8 @@ class FakeBridge extends VoiceBridge:
 		mic_calls.append(enabled)
 	func set_volume(identity: String, volume: float) -> void:
 		volumes[identity] = volume
+	func poll() -> void:
+		polls += 1
 
 var t: FakeTransport
 var safety_t: FakeTransport
@@ -194,3 +197,17 @@ func test_leaving_restores_the_list_and_create_row() -> void:
 	assert_bool(p.list_scroll.visible).is_true()
 	assert_bool(p.new_room_row.visible).is_true()
 
+
+## iOS 的原生桥不回调，靠每帧取状态快照差分出信号：页面不 poll 就永远收不到「连上了」。
+func test_page_polls_the_bridge_every_frame() -> void:
+	var p := _page()
+	assert_bool(p.is_processing()).is_true()
+	var before: int = fake.polls
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_int(fake.polls).is_greater(before)
+
+## 没有桥就别空转 _process。
+func test_no_bridge_means_no_polling() -> void:
+	var p := _page(false)
+	assert_bool(p.is_processing()).is_false()

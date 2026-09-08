@@ -107,7 +107,15 @@ func _build_body() -> void:
 		bridge.connected.connect(func(): _refresh_mic_label())
 		bridge.disconnected.connect(func(reason: String): status.text = describe_disconnect(reason))
 		bridge.speaking_changed.connect(_on_speaking)
+		# 原生桥的信号是 poll() 里对着状态快照差分出来的：不 poll 就什么都收不到。
+		set_process(true)
+	else:
+		set_process(false)
 	call_deferred("fetch_rooms")
+
+func _process(_delta: float) -> void:
+	if bridge != null:
+		bridge.poll()
 
 func _voice() -> VoiceApi:
 	if voice != null:

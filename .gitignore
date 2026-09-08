@@ -66,3 +66,20 @@ native/push/android/build/
 native/push/android/bin/*
 !native/push/android/bin/*.aar
 native/push/android/local.properties
+
+# C4 语音原生扩展：同上
+native/voice/bin/*
+!native/voice/bin/libsensen_voice.ios.template_debug.arm64.a
+!native/voice/bin/libsensen_voice.ios.template_release.arm64.a
+!native/voice/bin/libsensen_voice.macos.template_debug.arm64.dylib
+!native/voice/bin/libsensen_voice.macos.template_release.arm64.dylib
+native/voice/.sconsign.dblite
+native/voice/src/*.o
+native/voice/src/*.os
+native/voice/src_stub/*.o
+native/voice/src_stub/*.os
+native/voice/android/.gradle/
+native/voice/android/build/
+native/voice/android/bin/*
+!native/voice/android/bin/*.aar
+native/voice/android/local.properties

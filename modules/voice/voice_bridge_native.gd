@@ -4,6 +4,8 @@ extends VoiceBridge
 ## 插件未装时不会被构造（见 VoiceBridgeFactory）。
 ##
 ## 信号名与参数由插件约定：connected() / disconnected(reason) / speaking(identity, speaking) / error(message)。
+## iOS 侧的信号是 poll() 里对着状态快照差分出来的（Swift → C++ 不做回调），所以**每帧必须 poll**，
+## 否则连上了 UI 也不知道。
 
 var _plugin: Object
 
@@ -17,8 +19,9 @@ func _init() -> void:
 		if _plugin.has_signal(pair[0]):
 			_plugin.connect(pair[0], Callable(self, pair[1]), CONNECT_DEFERRED)
 
+## 单例存在不代表能说话：桌面的空实现与「没注入 LiveKit 的 iOS 包」都会回 false。
 func available() -> bool:
-	return _plugin != null
+	return _plugin != null and bool(_plugin.call("is_available"))
 
 func connect_room(url: String, token: String) -> void:
 	if _plugin == null:
@@ -39,6 +42,11 @@ func set_mic(enabled: bool) -> void:
 func set_volume(identity: String, volume: float) -> void:
 	if _plugin != null:
 		_plugin.call("set_volume", identity, clampf(volume, 0.0, 1.0))
+
+## 每帧调用：原生层在这里把状态变化翻成信号。
+func poll() -> void:
+	if _plugin != null and _plugin.has_method("poll"):
+		_plugin.call("poll")
 
 func speakers() -> PackedStringArray:
 	if _plugin == null:

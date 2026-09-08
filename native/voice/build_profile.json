@@ -1,0 +1,4 @@
+{
+  "_comment": "godot-cpp 只编语音插件用到的类，iOS 上整包编要十几分钟。",
+  "enabled_classes": ["Object", "RefCounted", "Engine", "OS", "ProjectSettings"]
+}

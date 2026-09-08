@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+# C2 语音 GDExtension。只做 iOS（Android 走 Kotlin 插件包 LiveKit Android SDK，桌面暂不带）。
+# 用法见 build_ios.sh；godot-cpp 在 ../godot-cpp。
+import os
+
+env = SConscript("../godot-cpp/SConstruct")
+env.Append(CPPPATH=["src/"])
+sources = Glob("src/*.cpp")
+if env["platform"] == "ios":
+    sources += Glob("src/*.mm")
+    env.Append(CXXFLAGS=["-fobjc-arc"])
+    library = env.StaticLibrary("bin/libsensen_voice_objs{}{}".format(env["suffix"], env["LIBSUFFIX"]), source=sources)
+else:
+    # 桌面：空实现（src_stub），只为让编辑器 / 测试进程加载 .gdextension 时有库可载。
+    sources += Glob("src_stub/*.cpp")
+    library = env.SharedLibrary("bin/libsensen_voice{}{}".format(env["suffix"], env["SHLIBSUFFIX"]), source=sources)
+Default(library)
