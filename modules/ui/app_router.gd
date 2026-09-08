@@ -41,6 +41,11 @@ func _ready() -> void:
 	# QA 流程步行器（模拟器 / 真机无人值守）：非测试进程且明确要求时才挂。
 	# qa_env 会先看 --qa-env=SENSEN_QA_FLOW=…（安卓没法设环境变量），再回落到环境变量。
 	var flow := QaFlow.requested(OS.get_cmdline_user_args(), QaFlow.qa_env("SENSEN_QA_FLOW"))
+	# 安卓上没有环境变量、日志是唯一的抓手：把这三样打出来，省得下次又靠猜。
+	if not NetScript.is_test_process():
+		print("[qa] user_dir=%s cfg=%s flow='%s' test_process=%s" % [
+			OS.get_user_data_dir(), FileAccess.file_exists(QaFlow.QA_ENV_FILE),
+			flow, NetScript.is_test_process()])
 	if not flow.is_empty() and not NetScript.is_test_process():
 		var walker := QaFlow.new()
 		walker.name = "QaFlow"
