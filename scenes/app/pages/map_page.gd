@@ -18,6 +18,9 @@ var map_scene: Node
 var friends: Array = []
 var friends_timer: Timer
 var shown := false
+## 原生地图层是否在出画；false 时本页盖一层纸色底，免得透明视口下面是纯黑。
+var presenting := false
+var backdrop: ColorRect
 var last_report_ms := 0
 var last_report_lat := 0.0
 var last_report_lng := 0.0
@@ -32,9 +35,13 @@ func _build_body() -> void:
 	# 本页根 Control 默认 mouse_filter = STOP 会把整屏触摸吃掉，map_poc 的 _unhandled_input 永远收不到手势
 	#（2026-09-08 真机：地图完全拖不动）。改成 IGNORE，空白处的触摸一路落到 unhandled。
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var backdrop := get_node_or_null("Backdrop")
+	# AppPage 建的 SafeArea / 列 / body 都是满屏容器，默认同样吃触摸——只放开根节点不够。
+	for node in [get_node_or_null("SafeArea"), body, body.get_parent() if body != null else null]:
+		if node is Control:
+			(node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	backdrop = get_node_or_null("Backdrop") as ColorRect
 	if backdrop != null:
-		backdrop.visible = false
+		backdrop.visible = true # 地图出画前先盖住，_on_presented 再决定
 	title_label.get_parent().visible = false
 	friends_timer = Timer.new()
 	friends_timer.name = "FriendsTimer"
@@ -67,6 +74,8 @@ func ensure_map() -> Node:
 		map_scene.demo_cohorts = false
 	if map_scene.has_signal("location_changed"):
 		map_scene.location_changed.connect(_on_location)
+	if map_scene.has_signal("presented"):
+		map_scene.presented.connect(_on_presented)
 	map_scene.name = "MapScene"
 	add_child(map_scene)
 	return map_scene
@@ -83,6 +92,12 @@ func on_tab_shown() -> void:
 		map_scene.set_friends(friends)
 	friends_timer.start()
 	await refresh_friends()
+
+## 原生地图出画了就撤掉纸色底（让 Mapbox 透上来）；没出画就一直盖着。
+func _on_presented(ok: bool) -> void:
+	presenting = ok
+	if backdrop != null:
+		backdrop.visible = not ok
 
 func on_tab_hidden() -> void:
 	super()

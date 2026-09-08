@@ -4,6 +4,7 @@ extends GdUnitTestSuite
 
 class FakeMap extends Node3D:
 	signal location_changed(lat: float, lng: float, accuracy: float)
+	signal presented(ok: bool)
 	var demo_cohorts := true
 	var suspended := 0
 	var resumed := 0
@@ -46,7 +47,7 @@ func test_first_show_builds_map_without_demo_content_and_pulls_friends() -> void
 	t.responses = [{"status": 200, "json": {"items": [_friend("u-a", 31.2, 121.5)]}}]
 	var p := _page()
 	assert_object(p.map_scene).is_null()
-	assert_bool(p.get_node("Backdrop").visible).is_false()
+	assert_bool(p.get_node("Backdrop").visible).is_true() # 地图出画前先盖着（见下一条用例）
 	await p.on_tab_shown()
 	assert_object(p.map_scene).is_same(fake)
 	assert_bool(fake.demo_cohorts).is_false()
@@ -103,3 +104,24 @@ func test_dev_session_neither_pulls_friends_nor_reports() -> void:
 	fake.location_changed.emit(31.0, 121.0, 5.0)
 	await get_tree().process_frame
 	assert_int(t.requests.size()).is_equal(0)
+
+func test_nothing_on_the_page_eats_touches_so_map_gestures_reach_unhandled_input() -> void:
+	var p := _page()
+	assert_int(p.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	for path in ["SafeArea", "Backdrop"]:
+		var n := p.get_node_or_null(path) as Control
+		assert_object(n).is_not_null()
+		assert_int(n.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int(p.body.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int((p.body.get_parent() as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+
+func test_paper_backdrop_covers_until_the_native_map_presents() -> void:
+	var p := _page()
+	assert_bool(p.backdrop.visible).is_true() # 建页时先盖住：透明视口下面没有地图就是纯黑
+	await p.on_tab_shown()
+	fake.presented.emit(true)
+	assert_bool(p.presenting).is_true()
+	assert_bool(p.backdrop.visible).is_false()
+	fake.presented.emit(false) # 没 token / 没桥 / 桌面
+	assert_bool(p.backdrop.visible).is_true()
+

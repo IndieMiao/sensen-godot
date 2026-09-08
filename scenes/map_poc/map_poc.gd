@@ -80,6 +80,9 @@ const ICON_PIN := preload("res://assets/ui/icons/pin.svg")
 @export var demo_cohorts := true
 ## 定位回传给宿主（地图 Tab 页据此节流上报服务端）。
 signal location_changed(lat: float, lng: float, accuracy: float)
+## 原生地图层是否真的在出画（收到 READY = true；没有桥 / 没有 token = false）。
+## 宿主据此决定要不要盖一层纸色底——透明视口下面没有地图就是纯黑（2026-09-08 真机）。
+signal presented(ok: bool)
 
 var map: MapBridge = null
 var anchor_lat := START_LAT # 浮动锚点（世界原点的地理坐标）
@@ -223,6 +226,7 @@ func _ready() -> void:
 			region_title.text = "Map unavailable"
 			location_status.text = "Check your connection"
 			_header_locked = true
+			presented.emit.call_deferred(false)
 		else:
 			var lat0 := float(region.center[0]) if street_mode else START_LAT
 			var lng0 := float(region.center[1]) if street_mode else START_LNG
@@ -236,6 +240,7 @@ func _ready() -> void:
 		region_title.text = "Map preview"
 		location_status.text = "Location unavailable"
 		_header_locked = true
+		presented.emit.call_deferred(false)
 	# 定位兜底：拒绝授权 / 定位慢 / 桌面无插件，3 秒后一律回落上海默认点。
 	# 没有这条，_spawn_home_cohort 永远不会被调用，地图上只剩洛杉矶夹具。
 	get_tree().create_timer(HOME_TIMEOUT_S).timeout.connect(
@@ -825,6 +830,7 @@ func _set_pitch(v: float) -> void:
 
 func _on_map_ready() -> void:
 	_map_is_ready = true
+	presented.emit(true)
 	_set_dot(DOT_OK, false) # 同步中：常亮薄荷绿
 	if map:
 		pixel_ratio = map.get_pixel_ratio() # iOS 桥的真实 scale 随 READY 到达
