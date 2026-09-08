@@ -217,9 +217,7 @@ func run_login() -> void:
 		# 原生桥在不在只能这么看：麦克风是真机上的东西，截图看不出来，日志能。
 		_log_bridges()
 		if voice_page != null and voice_page.has_method("fetch_rooms"):
-			print("[qa] voice bridge=%s state=%s" % [
-				"yes" if voice_page.bridge != null else "no",
-				str(voice_page.bridge.state) if voice_page.bridge != null else "-"])
+			report["bridges"]["voice"]["page_has_bridge"] = voice_page.bridge != null
 			await voice_page.fetch_rooms()
 			await settle()
 			await shot("voice_rooms")
@@ -436,11 +434,20 @@ func _write_report() -> void:
 		f.store_string(JSON.stringify(report, "  "))
 
 
-## 原生插件到位情况：单例在不在、能不能用、工厂给不给桥。真机排查第一手材料。
+## 原生插件到位情况写进 report.json：麦克风与推送截图上都看不出来，只能靠这个。
+## 「单例在不在」与「桥给不给」是两件事——桌面装的是空实现，单例在、桥不给。
 func _log_bridges() -> void:
-	for entry in [["SensenVoice", VoiceBridgeFactory.make()], ["SensenPush", PushBridgeFactory.make()],
-			["SensenPhotoPicker", null]]:
-		var singleton_name: String = entry[0]
-		var bridge = entry[1]
-		print("[qa] %s singleton=%s bridge=%s" % [
-			singleton_name, Engine.has_singleton(singleton_name), "yes" if bridge != null else "no"])
+	report["bridges"] = {
+		"voice": {
+			"singleton": Engine.has_singleton(VoiceBridgeFactory.SINGLETON),
+			"bridge": VoiceBridgeFactory.make() != null,
+		},
+		"push": {
+			"singleton": Engine.has_singleton(PushBridgeFactory.SINGLETON),
+			"bridge": PushBridgeFactory.make() != null,
+		},
+		"photo_picker": {
+			"singleton": Engine.has_singleton(PhotoPicker.SINGLETON),
+			"bridge": PhotoPicker.native_available(),
+		},
+	}
