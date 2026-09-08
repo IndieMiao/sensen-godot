@@ -125,3 +125,14 @@ func test_shell_and_page_host_let_touches_fall_through() -> void:
 	# Tab 按钮必须照常吃点击。
 	assert_int(s.tab_button(AppRoutes.TAB_IM).mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)
 
+## 压栈 3D 场景（换装房）时壳必须整个隐藏：否则壳的满屏纸色底盖住 3D 预览（2D 永远在 3D 之上）。
+func test_suspend_hides_the_shell_so_a_pushed_3d_scene_is_visible() -> void:
+	var s := _shell()
+	assert_bool(s.visible).is_true()
+	s.suspend()
+	assert_bool(s.visible).is_false()
+	assert_int(s.process_mode).is_equal(Node.PROCESS_MODE_DISABLED)
+	s.resume()
+	assert_bool(s.visible).is_true()
+	assert_int(s.process_mode).is_equal(Node.PROCESS_MODE_INHERIT)
+

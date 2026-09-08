@@ -109,13 +109,17 @@ func handle_back() -> bool:
 	return false
 
 ## 压栈协议：设置 / 语音房等子页压上来时停处理并通知当前 Tab 页（地图页借此隐藏原生 view）。
+## 还要把自己整个藏起来：3D 永远画在 2D 之下，壳这块满屏纸色底会把压在上面的 3D 场景
+## （换装房的人物预览）整个盖掉——2026-09-08 真机上「换装房上半部分是空的」就是这个。
 func suspend() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
+	visible = false
 	if _pages.has(current_tab):
 		(_pages[current_tab] as AppPage).on_tab_hidden()
 
 func resume() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
+	visible = true
 	if _pages.has(current_tab):
 		(_pages[current_tab] as AppPage).on_tab_shown()
 

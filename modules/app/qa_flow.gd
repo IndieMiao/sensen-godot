@@ -40,6 +40,8 @@ func _run() -> void:
 			await run_social()
 		"login":
 			await run_login()
+		"dressing":
+			await run_dressing()
 		_:
 			_error("unknown flow: %s" % flow)
 	await stay()
@@ -279,6 +281,52 @@ func clear_output() -> void:
 	for f in dir.get_files():
 		if f.ends_with(".png") or f == "report.json":
 			dir.remove(f)
+
+## 换装房：压栈进去、等装配收敛、截几张（预览取景 / 背景 / 抽屉）。
+func run_dressing() -> void:
+	# 先把首启裁决写成通过并进壳，否则 boot 的异步流程会把场景切回年龄门，压栈的换装房被顶掉。
+	var fr := FirstRun.load_state()
+	fr.record_age_gate({"year": 2000, "month": 1, "day": 1}, Time.get_date_dict_from_system())
+	fr.record_consent()
+	AppRouter.go_to_shell()
+	await settle()
+	await settle()
+	AppRouter.go_to_dressing()
+	await settle()
+	await shot("dressing_open")
+	var room := AppRouter.top_instance()
+	if room == null:
+		_error("dressing room not on top")
+		return
+	var rig = room.rig if "rig" in room else null
+	var waited := 0
+	while rig != null and rig.is_busy() and waited < 200:
+		await get_tree().process_frame
+		waited += 1
+	for i in 6:
+		await settle()
+	await shot("dressing_ready")
+	# 预览为什么空：相机是谁的、角色在不在、包围盒在哪。
+	var vp_cam := get_viewport().get_camera_3d()
+	var box: AABB = DressingCamera.merged_aabb(rig) if rig != null else AABB()
+	report["dressing"] = {
+		"rig_visible": rig != null and rig.visible,
+		"rig_children": rig.get_child_count() if rig != null else -1,
+		"rig_busy": rig != null and rig.is_busy(),
+		"box": [str(box.position), str(box.size)],
+		"room_cam": str(room.cam.global_position) if "cam" in room else "?",
+		"room_cam_current": room.cam.current if "cam" in room else false,
+		"viewport_cam": vp_cam.get_path() if vp_cam != null else "none",
+		"world_env": get_viewport().world_3d.environment != null,
+		"transparent_bg": get_viewport().transparent_bg,
+		"scene_root": get_tree().current_scene.scene_file_path if get_tree().current_scene else "",
+		"depth": AppRouter.instance_depth(),
+	}
+	_write_report()
+	if "parts_panel" in room and room.parts_panel != null and room.parts_panel.has_method("refresh"):
+		room.parts_panel.refresh()
+		await settle()
+		await shot("dressing_panel")
 
 ## SENSEN_QA_STAY=map|feed|im|profile：观察窗开始前切到这个 Tab 并停在那儿——
 ## 真人要在某一页上手动操作（地图手势、系统权限弹窗）时，别让步行器把页面停在别处。
