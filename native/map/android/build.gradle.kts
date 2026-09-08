@@ -21,7 +21,7 @@ android {
 
 dependencies {
     compileOnly("org.godotengine:godot:4.7.2.stable")
-    implementation("com.mapbox.maps:android:11.30.0")
+    implementation("com.mapbox.maps:android-ndk27:11.30.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.1.20")
 }
 

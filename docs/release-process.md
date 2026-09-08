@@ -51,14 +51,16 @@
 7. 服务端 `.env` 是目标环境（prod / qa）的一套，`UPLOAD_LOCAL_DIR` 关掉、`R2_*` 四项齐。
 8. 构建号 +1，marketing 版本按 §1；`CHANGELOG.md` 补齐当前节。
 
-### 5.1.1 已知阻塞：Mapbox 安卓库没有 16 KB 对齐
+### 5.1.1 Mapbox 安卓依赖必须用 `-ndk27` 后缀的 artifact
 
-`libmapbox-maps.so` 与 `libmapbox-common.so` 的 LOAD 段是 4 KB 对齐。**目前能拿到的所有 Mapbox
-Android 版本都这样**（实测 11.29.0 与最新的 11.30.0，`com.mapbox.common:common` 24.29/24.30 同样）。
-预编译库的对齐是链接期定的，我们改不了——只能等 Mapbox 出 16 KB 版本，或换地图供应商。
+Mapbox 同一个版本发两套产物：默认的 `com.mapbox.maps:android` 是 **4 KB** 对齐（NDK 26 编的），
+带 `-ndk27` 后缀的 `com.mapbox.maps:android-ndk27` 才是 **16 KB** 对齐（11.7.0 起提供）。
+名字看不出差别，扫一遍才知道——所以 §5.1 第 5 条那个脚本是必须跑的，别凭版本号判断。
 
-影响面：**只挡 Google Play 上架**，不挡 iOS、不挡侧载的内测 / 演示包（16 KB 页设备上会弹一个
-兼容模式提示，功能正常）。出 AAB 前必须重新扫一遍，别默认它已经修好了。
+本仓库两处都要写成 `-ndk27`，改一处漏一处会出现「AAR 对齐了但 APK 没对齐」：
+
+- `native/map/android/build.gradle.kts` 的 `implementation`
+- `addons/sensen_map/export_plugin.gd` 的 `_get_android_dependencies`（APK 的 Gradle 构建按它解析）
 
 ### 5.2 Android
 
