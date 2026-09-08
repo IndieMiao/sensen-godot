@@ -3,21 +3,21 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: res://scenes/app/pages/profile_page.gd:201
+#: res://scenes/app/pages/profile_page.gd:203
 #: res://scenes/app/pages/user_page.gd:216
 msgid "%d followers"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:202
+#: res://scenes/app/pages/profile_page.gd:204
 #: res://scenes/app/pages/user_page.gd:220
 msgid "%d following"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:158
+#: res://scenes/app/pages/voice_room_page.gd:169
 msgid "%d listening"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:205
+#: res://scenes/app/pages/profile_page.gd:207
 msgid "%d new"
 msgstr ""
 
@@ -54,7 +54,7 @@ msgstr ""
 msgid "Add people"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:362
+#: res://scenes/app/pages/voice_room_page.gd:386
 msgid "All mic seats are taken."
 msgstr ""
 
@@ -70,7 +70,7 @@ msgstr ""
 msgid "Before you start"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:84
+#: res://scenes/app/pages/profile_page.gd:85
 msgid "Bio"
 msgstr ""
 
@@ -114,12 +114,12 @@ msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:369
 #: res://scenes/app/pages/feed_page.gd:247
-#: res://scenes/app/pages/follow_list_page.gd:177
+#: res://scenes/app/pages/follow_list_page.gd:178
 #: res://scenes/app/pages/im_page.gd:201
 #: res://scenes/app/pages/post_page.gd:344
-#: res://scenes/app/pages/profile_page.gd:244
+#: res://scenes/app/pages/profile_page.gd:246
 #: res://scenes/app/pages/user_page.gd:403
-#: res://scenes/app/pages/voice_room_page.gd:368
+#: res://scenes/app/pages/voice_room_page.gd:392
 msgid "Can't reach the server. Check your connection and try again."
 msgstr ""
 
@@ -142,7 +142,7 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:335
 #: res://scenes/app/pages/post_page.gd:334
 #: res://scenes/app/pages/user_page.gd:391
-#: res://scenes/app/pages/voice_room_page.gd:352
+#: res://scenes/app/pages/voice_room_page.gd:376
 msgid "Child safety"
 msgstr ""
 
@@ -225,19 +225,19 @@ msgstr ""
 msgid "Dev: reset age gate"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:356
+#: res://scenes/app/pages/voice_room_page.gd:380
 msgid "Disconnected from voice."
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:356
+#: res://scenes/app/pages/voice_room_page.gd:380
 msgid "Disconnected from voice: %s"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:82
+#: res://scenes/app/pages/profile_page.gd:83
 msgid "Display name"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:99
+#: res://scenes/app/pages/profile_page.gd:100
 msgid "Dressing room"
 msgstr ""
 
@@ -245,7 +245,7 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:262
+#: res://scenes/app/pages/profile_page.gd:264
 msgid "Email not verified"
 msgstr ""
 
@@ -253,7 +253,7 @@ msgstr ""
 msgid "Email or password is incorrect."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:262
+#: res://scenes/app/pages/profile_page.gd:264
 msgid "Email verified"
 msgstr ""
 
@@ -273,13 +273,13 @@ msgstr ""
 
 #: res://scenes/app/pages/follow_list_page.gd:27
 #: res://scenes/app/pages/follow_list_page.gd:36
-#: res://scenes/app/pages/profile_page.gd:65
+#: res://scenes/app/pages/profile_page.gd:66
 msgid "Followers"
 msgstr ""
 
 #: res://scenes/app/pages/follow_list_page.gd:34
 #: res://scenes/app/pages/follow_list_page.gd:133
-#: res://scenes/app/pages/profile_page.gd:70
+#: res://scenes/app/pages/profile_page.gd:71
 #: res://scenes/app/pages/user_page.gd:231
 msgid "Following"
 msgstr ""
@@ -297,7 +297,7 @@ msgstr ""
 msgid "Give the group a name."
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:182
+#: res://scenes/app/pages/voice_room_page.gd:193
 msgid "Give the room a name."
 msgstr ""
 
@@ -309,7 +309,7 @@ msgstr ""
 msgid "Group name"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:83
+#: res://scenes/app/pages/profile_page.gd:84
 msgid "Handle (letters, numbers, _)"
 msgstr ""
 
@@ -317,7 +317,7 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:330
 #: res://scenes/app/pages/post_page.gd:329
 #: res://scenes/app/pages/user_page.gd:386
-#: res://scenes/app/pages/voice_room_page.gd:347
+#: res://scenes/app/pages/voice_room_page.gd:371
 msgid "Harassment or bullying"
 msgstr ""
 
@@ -325,15 +325,15 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:333
 #: res://scenes/app/pages/post_page.gd:332
 #: res://scenes/app/pages/user_page.gd:389
-#: res://scenes/app/pages/voice_room_page.gd:350
+#: res://scenes/app/pages/voice_room_page.gd:374
 msgid "Hate speech"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:237
+#: res://scenes/app/pages/voice_room_page.gd:252
 msgid "Host"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:157
+#: res://scenes/app/pages/voice_room_page.gd:168
 msgid "Host: %s"
 msgstr ""
 
@@ -346,7 +346,7 @@ msgid "Language: %s"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:162
-#: res://scenes/app/pages/voice_room_page.gd:85
+#: res://scenes/app/pages/voice_room_page.gd:90
 msgid "Leave"
 msgstr ""
 
@@ -354,7 +354,7 @@ msgstr ""
 msgid "Leave group"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:338
+#: res://scenes/app/pages/voice_room_page.gd:362
 msgid "Leave the mic"
 msgstr ""
 
@@ -366,7 +366,7 @@ msgstr ""
 msgid "Lifecycle probe"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:342
+#: res://scenes/app/pages/voice_room_page.gd:366
 msgid "Listening only: voice isn't available on this device yet."
 msgstr ""
 
@@ -407,16 +407,16 @@ msgstr ""
 msgid "Message deleted"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:251
+#: res://scenes/app/pages/voice_room_page.gd:266
 msgid "Mute"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:241
+#: res://scenes/app/pages/voice_room_page.gd:256
 msgid "Muted"
 msgstr ""
 
 #: res://scenes/app/pages/follow_list_page.gd:35
-#: res://scenes/app/pages/profile_page.gd:75
+#: res://scenes/app/pages/profile_page.gd:76
 msgid "New followers"
 msgstr ""
 
@@ -459,7 +459,7 @@ msgstr ""
 msgid "No posts yet."
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:147
+#: res://scenes/app/pages/voice_room_page.gd:158
 msgid "No rooms yet. Start one."
 msgstr ""
 
@@ -467,7 +467,7 @@ msgstr ""
 msgid "Not following anyone yet."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:135
+#: res://scenes/app/pages/profile_page.gd:136
 msgid "Not signed in"
 msgstr ""
 
@@ -476,11 +476,11 @@ msgstr ""
 msgid "Nothing here yet. Follow people to see their posts."
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:239
+#: res://scenes/app/pages/voice_room_page.gd:254
 msgid "On mic"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:364
+#: res://scenes/app/pages/voice_room_page.gd:388
 msgid "Only the host can do that."
 msgstr ""
 
@@ -517,7 +517,7 @@ msgid "Picking…"
 msgstr ""
 
 #: res://scenes/app/pages/feed_page.gd:249
-#: res://scenes/app/pages/profile_page.gd:242
+#: res://scenes/app/pages/profile_page.gd:244
 msgid "Please check the %s field."
 msgstr ""
 
@@ -551,7 +551,7 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:232
+#: res://scenes/app/pages/profile_page.gd:234
 msgid "Profile saved."
 msgstr ""
 
@@ -573,7 +573,7 @@ msgstr ""
 
 #: res://scenes/app/pages/post_page.gd:225
 #: res://scenes/app/pages/user_page.gd:109
-#: res://scenes/app/pages/voice_room_page.gd:255
+#: res://scenes/app/pages/voice_room_page.gd:270
 msgid "Report"
 msgstr ""
 
@@ -585,19 +585,19 @@ msgstr ""
 msgid "Report user"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:41
+#: res://scenes/app/pages/profile_page.gd:42
 msgid "Resend verification email"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:45
+#: res://scenes/app/pages/voice_room_page.gd:48
 msgid "Room name"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:91
+#: res://scenes/app/pages/profile_page.gd:92
 msgid "Save profile"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:225
+#: res://scenes/app/pages/profile_page.gd:227
 msgid "Saving…"
 msgstr ""
 
@@ -605,7 +605,7 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:334
 #: res://scenes/app/pages/post_page.gd:333
 #: res://scenes/app/pages/user_page.gd:390
-#: res://scenes/app/pages/voice_room_page.gd:351
+#: res://scenes/app/pages/voice_room_page.gd:375
 msgid "Self-harm"
 msgstr ""
 
@@ -614,7 +614,7 @@ msgstr ""
 msgid "Send"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:107
+#: res://scenes/app/pages/profile_page.gd:108
 #: res://scenes/app/pages/settings_page.gd:19
 msgid "Settings"
 msgstr ""
@@ -623,7 +623,7 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:331
 #: res://scenes/app/pages/post_page.gd:330
 #: res://scenes/app/pages/user_page.gd:387
-#: res://scenes/app/pages/voice_room_page.gd:348
+#: res://scenes/app/pages/voice_room_page.gd:372
 msgid "Sexual content"
 msgstr ""
 
@@ -631,7 +631,7 @@ msgstr ""
 msgid "Share anonymous usage data"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:88
+#: res://scenes/app/pages/profile_page.gd:89
 msgid "Show who I follow"
 msgstr ""
 
@@ -642,7 +642,7 @@ msgstr ""
 
 #: res://scenes/app/pages/feed_page.gd:251
 #: res://scenes/app/pages/im_page.gd:205
-#: res://scenes/app/pages/profile_page.gd:159
+#: res://scenes/app/pages/profile_page.gd:161
 msgid "Sign in again to set up your profile."
 msgstr ""
 
@@ -666,7 +666,7 @@ msgstr ""
 msgid "Sign-in is not configured yet."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:139
+#: res://scenes/app/pages/profile_page.gd:141
 msgid "Signed in as %s (%s)"
 msgstr ""
 
@@ -684,7 +684,7 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:336
 #: res://scenes/app/pages/post_page.gd:335
 #: res://scenes/app/pages/user_page.gd:392
-#: res://scenes/app/pages/voice_room_page.gd:353
+#: res://scenes/app/pages/voice_room_page.gd:377
 msgid "Something else"
 msgstr ""
 
@@ -696,15 +696,15 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:329
 #: res://scenes/app/pages/post_page.gd:328
 #: res://scenes/app/pages/user_page.gd:385
-#: res://scenes/app/pages/voice_room_page.gd:346
+#: res://scenes/app/pages/voice_room_page.gd:370
 msgid "Spam or scam"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:243
+#: res://scenes/app/pages/voice_room_page.gd:258
 msgid "Speaking"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:51
+#: res://scenes/app/pages/voice_room_page.gd:54
 msgid "Start"
 msgstr ""
 
@@ -712,8 +712,8 @@ msgstr ""
 msgid "Switch to another app and come back several times. Each PAUSED/RESUMED pair must increase by one."
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:81
-#: res://scenes/app/pages/voice_room_page.gd:338
+#: res://scenes/app/pages/voice_room_page.gd:86
+#: res://scenes/app/pages/voice_room_page.gd:362
 msgid "Take the mic"
 msgstr ""
 
@@ -734,11 +734,11 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:359
 #: res://scenes/app/pages/post_page.gd:290
 #: res://scenes/app/pages/user_page.gd:363
-#: res://scenes/app/pages/voice_room_page.gd:326
+#: res://scenes/app/pages/voice_room_page.gd:345
 msgid "Thanks, we've received your report."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:240
+#: res://scenes/app/pages/profile_page.gd:242
 msgid "That handle is already taken."
 msgstr ""
 
@@ -751,11 +751,11 @@ msgstr ""
 msgid "That's you."
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:366
+#: res://scenes/app/pages/voice_room_page.gd:390
 msgid "The host is always on the mic."
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:363
+#: res://scenes/app/pages/voice_room_page.gd:387
 msgid "The host muted you."
 msgstr ""
 
@@ -784,11 +784,11 @@ msgstr ""
 msgid "This permanently deletes your account and data. This cannot be undone."
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:367
+#: res://scenes/app/pages/voice_room_page.gd:391
 msgid "This room has ended."
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:361
+#: res://scenes/app/pages/voice_room_page.gd:385
 msgid "This room is full."
 msgstr ""
 
@@ -796,12 +796,12 @@ msgstr ""
 msgid "This sign-in method is not enabled."
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:175
+#: res://scenes/app/pages/follow_list_page.gd:176
 #: res://scenes/app/pages/user_page.gd:397
 msgid "This user isn't available."
 msgstr ""
 
-#: res://scenes/app/pages/follow_list_page.gd:173
+#: res://scenes/app/pages/follow_list_page.gd:174
 msgid "This user keeps their following list private."
 msgstr ""
 
@@ -809,7 +809,7 @@ msgstr ""
 msgid "Too many attempts. Try again later."
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:251
+#: res://scenes/app/pages/voice_room_page.gd:266
 msgid "Unmute"
 msgstr ""
 
@@ -823,7 +823,7 @@ msgid "Uploading…"
 msgstr ""
 
 #: res://scenes/app/login_page.gd:148
-#: res://scenes/app/pages/profile_page.gd:272
+#: res://scenes/app/pages/profile_page.gd:275
 msgid "Verification email sent."
 msgstr ""
 
@@ -835,20 +835,20 @@ msgstr ""
 #: res://scenes/app/pages/feed_page.gd:332
 #: res://scenes/app/pages/post_page.gd:331
 #: res://scenes/app/pages/user_page.gd:388
-#: res://scenes/app/pages/voice_room_page.gd:349
+#: res://scenes/app/pages/voice_room_page.gd:373
 msgid "Violence or threats"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:267
+#: res://scenes/app/pages/voice_room_page.gd:284
 msgid "Voice isn't available on this device yet."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:103
-#: res://scenes/app/pages/voice_room_page.gd:32
+#: res://scenes/app/pages/profile_page.gd:104
+#: res://scenes/app/pages/voice_room_page.gd:35
 msgid "Voice room"
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:360
+#: res://scenes/app/pages/voice_room_page.gd:384
 msgid "Voice rooms aren't available on this server yet."
 msgstr ""
 
@@ -889,8 +889,12 @@ msgstr ""
 msgid "You'll stop getting its messages."
 msgstr ""
 
-#: res://scenes/app/pages/voice_room_page.gd:365
+#: res://scenes/app/pages/voice_room_page.gd:389
 msgid "You're not in this room."
+msgstr ""
+
+#: res://scenes/app/pages/voice_room_page.gd:359
+msgid "You're the host"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:475

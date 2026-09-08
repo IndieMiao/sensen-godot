@@ -164,3 +164,33 @@ func test_server_errors_are_explained() -> void:
 	assert_str(p.describe_error({"code": "MUTED"})).is_equal("The host muted you.")
 	assert_str(p.describe_error({"code": "VOICE_NOT_CONFIGURED"})).is_equal("Voice rooms aren't available on this server yet.")
 	assert_str(p.describe_error({"code": "NOT_FOUND"})).is_equal("This room has ended.")
+
+## 真机复查修正：进房后列表与建房行让位（否则房间信息被空列表挤到屏幕最底）；
+## 房主的麦克风按钮直接禁用并说明，不再点出一句「房主始终在麦上」的报错。
+func test_entering_a_room_hides_the_list_and_host_cannot_toggle_the_mic() -> void:
+	t.responses = [{"status": 200, "json": _room_as_host()}]
+	var p := _page()
+	assert_bool(p.list_scroll.visible).is_true()
+	assert_bool(p.new_room_row.visible).is_true()
+	assert_bool(await p.join("r1")).is_true()
+	assert_bool(p.list_scroll.visible).is_false()
+	assert_bool(p.new_room_row.visible).is_false()
+	assert_int(p.room_panel.size_flags_vertical).is_equal(Control.SIZE_EXPAND_FILL)
+	assert_str(p.mic_button.text).is_equal("You're the host")
+	assert_bool(p.mic_button.disabled).is_true()
+	# 房主点上麦：什么也不发（服务端会 409，不该让用户看到报错）。
+	var before := t.requests.size()
+	assert_bool(await p.toggle_stage()).is_false()
+	assert_int(t.requests.size()).is_equal(before)
+	assert_str(p.status.text).is_empty()
+
+func test_leaving_restores_the_list_and_create_row() -> void:
+	t.responses = [{"status": 200, "json": _room()}, {"status": 200, "json": {"ok": true, "closed": false}},
+		{"status": 200, "json": {"items": []}}]
+	var p := _page()
+	assert_bool(await p.join("r1")).is_true()
+	assert_bool(p.list_scroll.visible).is_false()
+	assert_bool(await p.leave()).is_true()
+	assert_bool(p.list_scroll.visible).is_true()
+	assert_bool(p.new_room_row.visible).is_true()
+

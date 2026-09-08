@@ -589,6 +589,9 @@ msgstr ""
 msgid "You're not in this room."
 msgstr ""
 
+msgid "You're the host"
+msgstr ""
+
 msgid "[Photo]"
 msgstr ""
 

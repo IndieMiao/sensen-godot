@@ -648,3 +648,6 @@ msgstr "这台服务器还没开语音房。"
 
 msgid "You're not in this room."
 msgstr "你不在这个房间里。"
+
+msgid "You're the host"
+msgstr "你是房主"

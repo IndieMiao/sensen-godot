@@ -15,6 +15,8 @@ var status: Label
 var title_edit: LineEdit
 var create_button: Button
 var list: VBoxContainer
+var list_scroll: ScrollContainer
+var new_room_row: HBoxContainer
 var room_panel: VBoxContainer
 var room_title: Label
 var stage: VBoxContainer
@@ -54,6 +56,7 @@ func _build_body() -> void:
 	create_button.pressed.connect(func(): create_room())
 	row.add_child(create_button)
 	body.add_child(row)
+	new_room_row = row
 	var scroll := ScrollContainer.new()
 	scroll.name = "Scroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -64,6 +67,7 @@ func _build_body() -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 	body.add_child(scroll)
+	list_scroll = scroll
 
 	room_panel = VBoxContainer.new()
 	room_panel.name = "Room"
@@ -203,7 +207,11 @@ func create_room() -> bool:
 func _enter(state: Dictionary) -> void:
 	var was := _text(room.get("token", ""))
 	room = state
+	# 在房间里就只看房间：列表与建房行让位，免得房间信息被空列表挤到屏幕最底下（真机复查）。
 	room_panel.visible = true
+	room_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	list_scroll.visible = false
+	new_room_row.visible = false
 	room_title.text = _text(room.get("title", ""))
 	status.text = ""
 	_render_stage()
@@ -270,6 +278,8 @@ func toggle_stage() -> bool:
 	var api := _voice()
 	if api == null or room.is_empty() or busy:
 		return false
+	if me_role() == "host":
+		return false # 房主始终在麦上，没有上下麦这回事
 	if bridge == null and me_role() == "listener":
 		status.text = tr("Voice isn't available on this device yet.")
 		return false
@@ -305,6 +315,8 @@ func leave() -> bool:
 		bridge.disconnect_room()
 	room = {}
 	room_panel.visible = false
+	list_scroll.visible = true
+	new_room_row.visible = true
 	if not bool(r.get("ok", false)):
 		status.text = describe_error(r)
 	await fetch_rooms()
@@ -342,6 +354,11 @@ func _on_speaking(identity: String, is_speaking: bool) -> void:
 
 func _refresh_mic_label() -> void:
 	var speak := can_speak()
+	# 房主永远在麦上：按钮禁用并直说，别让人点出一句「房主始终在麦上」的报错（真机复查）。
+	if me_role() == "host":
+		mic_button.text = tr("You're the host")
+		mic_button.disabled = true
+		return
 	mic_button.text = tr("Leave the mic") if speak else tr("Take the mic")
 	# 没有原生桥就只能听：按钮禁用并把原因说清楚，别让人以为坏了。
 	mic_button.disabled = bridge == null and not speak

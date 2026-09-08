@@ -148,11 +148,12 @@ func _row(u: Dictionary) -> Button:
 	var rel := relation_text(u)
 	b.text = who if rel.is_empty() else "%s\n%s" % [who, rel]
 	# 缩略图控件只负责取图，不显示；可见的是按钮 icon。先连信号再取图：命中缓存时信号是同步发的。
-	var thumb := AvatarThumb.new()
+	var thumb := AvatarThumb.new(44.0)
 	thumb.name = "Avatar"
 	thumb.visible = false
 	b.add_child(thumb)
 	b.add_theme_constant_override("h_separation", DesignTokens.SPACE_2)
+	b.add_theme_constant_override("icon_max_width", 44)
 	b.icon = thumb.placeholder_icon()
 	b.expand_icon = true
 	thumb.texture_ready.connect(func(tex: Texture2D): AvatarThumb.apply_to_button(b, tex))

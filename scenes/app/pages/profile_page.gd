@@ -37,6 +37,7 @@ func _build_body() -> void:
 	body.add_child(user_label)
 	verify_label = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	verify_label.name = "Verify"
+	verify_label.visible = false # 空文案不占一行（真机上「我的」页顶部空一大块）
 	body.add_child(verify_label)
 	resend_button = GameUi.button("", tr("Resend verification email"), "Firebase sendOobCode VERIFY_EMAIL")
 	resend_button.name = "Resend"
@@ -134,6 +135,7 @@ func _refresh_user() -> void:
 	if s == null or not s.is_signed_in():
 		user_label.text = tr("Not signed in")
 		verify_label.text = ""
+		verify_label.visible = false
 		resend_button.visible = false
 		return
 	user_label.text = tr("Signed in as %s (%s)") % [s.email if not s.email.is_empty() else s.user_id, s.provider]
@@ -253,6 +255,7 @@ func refresh_verification() -> void:
 	var fb := _fb()
 	if s == null or not s.is_signed_in() or s.provider != "password" or fb == null or not fb.configured():
 		verify_label.text = ""
+		verify_label.visible = false
 		resend_button.visible = false
 		return
 	var info: Dictionary = await fb.lookup(s.access_token())
@@ -260,6 +263,7 @@ func refresh_verification() -> void:
 		return
 	email_verified = bool(info.get("email_verified", false))
 	verify_label.text = tr("Email verified") if email_verified else tr("Email not verified")
+	verify_label.visible = true
 	resend_button.visible = not email_verified
 
 func _on_resend() -> void:
