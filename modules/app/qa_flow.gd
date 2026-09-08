@@ -325,6 +325,8 @@ func view_state() -> Dictionary:
 				"cam_current": m.cam.current, "env": m.world_env.environment != null,
 				"bridge": m.map != null, "ready": m._map_is_ready, "home": m._home_resolved,
 				"pawns": m._pawns.size(), "queue": m._spawn_queue.size(), "friends": m.friend_count(),
+				"cam": [snappedf(m.center_lat, 0.000001), snappedf(m.center_lng, 0.000001),
+					snappedf(m.zoom, 0.01), snappedf(m.bearing, 0.1), snappedf(m.pitch, 0.1)],
 			}
 	return d
 

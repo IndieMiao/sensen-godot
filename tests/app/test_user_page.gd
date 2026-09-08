@@ -138,12 +138,21 @@ func test_blocked_or_missing_user_shows_hint_and_own_profile_hides_actions() -> 
 	assert_bool(await q.load()).is_true()
 	assert_bool((q.follow_button.get_parent() as Control).visible).is_false()
 
+func test_counts_row_is_hidden_until_the_profile_arrives() -> void:
+	profile_t.responses = [{"status": 404, "json": {"code": "NOT_FOUND"}}]
+	var p := _page({"user_id": "u-a"})
+	assert_bool((p.followers_button.get_parent() as Control).visible).is_false()
+	assert_bool(await p.load()).is_false()
+	assert_bool((p.followers_button.get_parent() as Control).visible).is_false()
+	assert_str(p.status.text).is_equal("This user isn't available.")
+
 func test_counts_open_follow_lists_and_hide_following_when_private() -> void:
 	profile_t.responses = [{"status": 200, "json": _profile(false, true)}]
 	feed_t.responses = [{"status": 200, "json": {"items": [], "next_cursor": null}}]
 	var p := _page({"user_id": "u-a"})
 	assert_bool(await p.load()).is_true()
 	assert_object(p.find_child("Avatar", true, false)).is_not_null()
+	assert_bool((p.followers_button.get_parent() as Control).visible).is_true()
 	assert_str(p.followers_button.text).is_equal("12 followers")
 	assert_str(p.following_button.text).is_equal("3 following")
 	assert_bool(p.following_button.visible).is_true()

@@ -92,6 +92,7 @@ func _build_body() -> void:
 	following_button.theme_type_variation = &"SecondaryButton"
 	following_button.pressed.connect(func(): open_follow_list(FollowListPage.KIND_FOLLOWING))
 	counts_row.add_child(following_button)
+	counts_row.visible = false # 资料到手前别露出两个空按钮
 	col.add_child(counts_row)
 	body.add_child(card)
 	var actions := HBoxContainer.new()
@@ -211,6 +212,7 @@ func _show_user() -> void:
 	bio_label.text = _text(user.get("bio", ""))
 	bio_label.visible = not bio_label.text.is_empty()
 	avatar_thumb.show_avatar(user.get("avatar"))
+	(followers_button.get_parent() as Control).visible = true
 	followers_button.text = tr("%d followers") % int(user.get("followers_count", 0))
 	var has_following := user.has("following_count") and user.get("following_count") != null
 	following_button.visible = has_following
