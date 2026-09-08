@@ -134,8 +134,10 @@ func test_double_tap_zoom_tween_replaces_previous() -> void:
 ## 场景树里（create_tween() 的前提是节点在树中，但这条只关心门禁，不关心 Tween 本身）。
 class SpyMapPoc extends MapPoc:
 	var zoom_tween_calls := 0
-	func _tween_zoom(_target: float) -> void:
+	var last_anchor := Vector2(-1.0, -1.0)
+	func _tween_zoom(_target: float, anchor := Vector2(-1.0, -1.0)) -> void:
 		zoom_tween_calls += 1
+		last_anchor = anchor
 
 ## —— 缩放轴惯性（2026-09-01 真机反馈：拖拽惯性有了，双指缩放松手即停）——
 

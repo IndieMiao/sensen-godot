@@ -5,6 +5,7 @@ extends GdUnitTestSuite
 class FakeMap extends Node3D:
 	signal location_changed(lat: float, lng: float, accuracy: float)
 	signal presented(ok: bool)
+	signal friend_tapped(user_id: String)
 	var demo_cohorts := true
 	var suspended := 0
 	var resumed := 0
@@ -16,9 +17,15 @@ class FakeMap extends Node3D:
 	func set_friends(items: Array) -> void:
 		friends_sets.append(items)
 
+class NavRecorder extends RefCounted:
+	var calls: Array = []
+	func go(route: String, args: Dictionary) -> void:
+		calls.append({"route": route, "args": args})
+
 var session: AuthSession
 var t: FakeTransport
 var fake: FakeMap
+var nav: NavRecorder
 
 func before_test() -> void:
 	session = AuthSession.new()
@@ -26,6 +33,7 @@ func before_test() -> void:
 	session.set_server_user("me-1")
 	t = FakeTransport.new([])
 	fake = FakeMap.new()
+	nav = NavRecorder.new()
 
 func after_test() -> void:
 	# 没被页面收养的替身地图要自己回收，否则 gdUnit 记成 orphan（页面收养过的随页面一起走）。
@@ -38,6 +46,7 @@ func _page() -> Control:
 	var p := (load(AppRoutes.tab_scene("map")) as PackedScene).instantiate()
 	p.auth = session
 	p.location = LocationApi.new(ApiClient.new("https://example.test/v1", t.callable()))
+	p.navigate = nav.go
 	p.make_map = func(): return fake
 	p.in_shell = true
 	add_child(auto_free(p))
@@ -127,4 +136,39 @@ func test_paper_backdrop_covers_until_the_native_map_presents() -> void:
 	assert_bool(p.backdrop.visible).is_false()
 	fake.presented.emit(false) # 没 token / 没桥 / 桌面
 	assert_bool(p.backdrop.visible).is_true()
+
+func test_friend_strip_lists_friends_and_opens_their_page() -> void:
+	t.responses = [{"status": 200, "json": {"items": [_friend("u-a", 31.2, 121.5), _friend("u-b", 31.3, 121.6)]}}]
+	var p := _page()
+	assert_bool(p.strip_panel.visible).is_false() # 没好友时整条收起
+	await p.on_tab_shown()
+	assert_bool(p.strip_panel.visible).is_true()
+	var chip := p.strip.get_node("Friend_u-a") as Button
+	assert_object(chip).is_not_null()
+	assert_str(chip.text).is_equal("u-a")
+	assert_object(p.strip.get_node_or_null("Friend_u-b")).is_not_null()
+	chip.pressed.emit()
+	assert_str(nav.calls[-1].route).is_equal(AppRoutes.USER)
+	assert_that(nav.calls[-1].args).is_equal({"user_id": "u-a"})
+	# 点地图上的角色同样进主页。
+	fake.friend_tapped.emit("u-b")
+	assert_that(nav.calls[-1].args).is_equal({"user_id": "u-b"})
+	# 好友都走光了：条收起来。
+	t.responses.append({"status": 200, "json": {"items": []}})
+	assert_bool(await p.refresh_friends()).is_true()
+	assert_bool(p.strip_panel.visible).is_false()
+	assert_object(p.strip.get_node_or_null("Friend_u-a")).is_null()
+
+func test_map_hud_leaves_room_for_the_tab_bar_and_the_friend_strip() -> void:
+	var p := _page()
+	var safe := auto_free(SafeAreaMargin.new()) as SafeAreaMargin
+	safe.name = "SafeArea"
+	var hud := Node.new()
+	hud.name = "HUD"
+	hud.add_child(safe)
+	fake.add_child(hud)
+	await p.on_tab_shown()
+	assert_float(safe.extra_bottom).is_equal(AppShell.TAB_BAR_HEIGHT + p.FRIEND_STRIP_H)
+	safe.apply_margins(Rect2i(), Vector2i(360, 640), Vector2(360, 640))
+	assert_float(float(safe.get_theme_constant(&"margin_bottom"))).is_greater(AppShell.TAB_BAR_HEIGHT)
 

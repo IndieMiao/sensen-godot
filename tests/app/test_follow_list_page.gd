@@ -85,17 +85,8 @@ func test_avatar_thumb_parses_server_field_and_falls_back_to_placeholder() -> vo
 	var thumb := auto_free(AvatarThumb.new(32.0)) as AvatarThumb
 	add_child(thumb)
 	assert_object(thumb.texture).is_equal(GameUi.icon("user-round"))
-	# 测试进程有窗口时渲染器会真出一张图；headless 则保持占位。两种都算对，但不能报错、不能留孤儿。
-	var got := await thumb.show_avatar({"version": 1, "slots": {"hair": "hair01"}})
-	if got:
-		assert_object(thumb.texture).is_instanceof(ImageTexture)
-		assert_object(thumb.ready_texture).is_same(thumb.texture)
-	else:
-		assert_object(thumb.texture).is_equal(GameUi.icon("user-round"))
-	# 同一套装扮第二次直接命中缓存。
-	var portraits := AvatarPortraits.shared()
-	assert_object(portraits).is_not_null()
-	var key := AvatarPortraits.cache_key(AvatarThumb.config_from({"version": 1, "slots": {"hair": "hair01"}}))
-	assert_bool(portraits._cache.has(key)).is_equal(got or DisplayServer.get_name() != "headless")
-	assert_bool(await thumb.show_avatar(null)).is_false()
+	# 测试进程里离屏渲染一律关掉（异步渲染会在测试结束时留下 orphan）：保持占位且不报错。
+	assert_bool(AvatarPortraits.shared().can_render()).is_false()
+	assert_bool(await thumb.show_avatar({"version": 1, "slots": {"hair": "hair01"}})).is_false()
 	assert_object(thumb.texture).is_equal(GameUi.icon("user-round"))
+	assert_bool(await thumb.show_avatar(null)).is_false()

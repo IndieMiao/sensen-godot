@@ -111,7 +111,11 @@ func push_instance(scene_path: String, args := {}) -> Node:
 
 func pop_instance() -> void:
 	if _stack.is_empty():
-		go_to_map() # 兼容 --qa-scene=dressing 直接以换装房为当前场景的情况
+		# 兼容 --qa-scene=dressing / stress 直接把这些场景当当前场景启动的情况：只有当前场景
+		# 真是它们时才回地图。否则（比如测试里把换装房当普通子节点挂着调 _on_back）会平白
+		# 切走整个主场景——2026-09-08 全量跑出 56 个 orphan 就是这样来的。
+		if _current_scene_path() in [DRESS, STRESS]:
+			go_to_map()
 		return
 	var top: Node = _stack.pop_back()
 	# 先解除父子关系再 queue_free：queue_free 要等到本帧末才真正生效，

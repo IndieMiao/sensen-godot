@@ -83,6 +83,10 @@ signal location_changed(lat: float, lng: float, accuracy: float)
 ## 原生地图层是否真的在出画（收到 READY = true；没有桥 / 没有 token = false）。
 ## 宿主据此决定要不要盖一层纸色底——透明视口下面没有地图就是纯黑（2026-09-08 真机）。
 signal presented(ok: bool)
+## 点到了某个好友角色（cohort friend:<user_id>）——宿主据此进他的主页。
+signal friend_tapped(user_id: String)
+## 点角色的判定半径（屏幕像素）。
+const FRIEND_TAP_PX := 56.0
 
 var map: MapBridge = null
 var anchor_lat := START_LAT # 浮动锚点（世界原点的地理坐标）
@@ -149,6 +153,8 @@ var _gesture_multi := false
 ## index -> 屏幕坐标；两指都在时按两点距离比值换算 zoom。
 var _touch_pos: Dictionary = {}
 var _pinch_dist := 0.0
+## 缩放补间的锚点（屏幕坐标）；x < 0 表示绕屏幕中心。
+var _zoom_anchor := Vector2(-1.0, -1.0)
 var _load_bar_started_ms := 0
 var _map_is_ready := false
 ## 受限模式（PRD §3.1）：由 FarmRegions 的城市选择触发；为真时地图只做「看见、选择、返回」。
@@ -481,8 +487,10 @@ func _is_double_tap(now_ms: int, pos: Vector2) -> bool:
 		and pos.distance_to(_last_tap_pos) <= DOUBLE_TAP_MAX_PX
 
 ## 双击放大走 Tween 而不是瞬变——瞬变在地图上很跳，是"不丝滑"的另一半。
-func _tween_zoom(target: float) -> void:
+## 缩放补间；anchor 给了就绕那个屏幕点缩放（双击 = 指尖），否则绕屏幕中心。
+func _tween_zoom(target: float, anchor := Vector2(-1.0, -1.0)) -> void:
 	_zoom_vel = 0.0 # 双击接管缩放，清掉残余的捏合惯性
+	_zoom_anchor = anchor
 	if _zoom_tween:
 		_zoom_tween.kill()
 	if street_mode and ((zoom >= STREET_ZOOM_MAX and target > STREET_ZOOM_MAX) or (zoom <= STREET_ZOOM_MIN and target < STREET_ZOOM_MIN)):
@@ -490,7 +498,7 @@ func _tween_zoom(target: float) -> void:
 		_camera_dirty = true
 		return
 	_zoom_tween = create_tween()
-	_zoom_tween.tween_method(_set_zoom, zoom, clampf(target, STREET_ZOOM_MIN if street_mode else 3.0, STREET_ZOOM_MAX if street_mode else 20.0), 0.25) \
+	_zoom_tween.tween_method(_set_zoom_step, zoom, clampf(target, STREET_ZOOM_MIN if street_mode else 3.0, STREET_ZOOM_MAX if street_mode else 20.0), 0.25) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 ## —— 输入与 UI ————————————————————————————————————————————————
@@ -529,10 +537,15 @@ func _unhandled_input(e: InputEvent) -> void:
 						_camera_dirty = true
 				elif _is_double_tap(Time.get_ticks_msec(), e.position):
 					_last_tap_ms = 0
-					_tween_zoom(zoom + 1.0)
+					_tween_zoom(zoom + 1.0, e.position) # 双击放大，锚在指尖
 				else:
-					_last_tap_ms = Time.get_ticks_msec()
-					_last_tap_pos = e.position
+					var who := friend_at(e.position)
+					if not who.is_empty():
+						_last_tap_ms = 0
+						friend_tapped.emit(who)
+					else:
+						_last_tap_ms = Time.get_ticks_msec()
+						_last_tap_pos = e.position
 			else:
 				_last_tap_ms = 0
 			_gesture_multi = false
@@ -569,6 +582,48 @@ func _unhandled_input(e: InputEvent) -> void:
 	elif e is InputEventPanGesture and not street_mode:
 		_set_pitch(pitch - e.delta.y * 0.2)
 
+## 补间每一步：有锚点就绕锚点缩放，否则退回原来的绕中心。
+func _set_zoom_step(v: float) -> void:
+	if _zoom_anchor.x < 0.0:
+		_set_zoom(v)
+	else:
+		_zoom_at(_zoom_anchor, v - zoom)
+
+## 绕屏幕上某点缩放：缩放前后让该点下的地面位置保持不动（真地图的手感）。
+## 屏幕点拿不到地面（指向天空）时退化为绕屏幕中心缩放。
+func _zoom_at(screen_pos: Vector2, dz: float) -> void:
+	var before = _ground_point(screen_pos)
+	_set_zoom(zoom + dz)
+	if before == null:
+		return
+	_update_cameras() # 先把相机推到新 zoom，再量同一屏幕点落在哪
+	var after = _ground_point(screen_pos)
+	if after == null:
+		return
+	_apply_world_delta((before as Vector3) - (after as Vector3))
+	_camera_dirty = true
+
+## 屏幕点附近的好友角色 user_id；没有返回空串。
+func friend_at(screen_pos: Vector2) -> String:
+	var best := ""
+	var best_d := FRIEND_TAP_PX
+	for p in _pawns:
+		var cohort := str(p.cohort)
+		if not cohort.begins_with("friend:") or not bool(p.ready):
+			continue
+		var node := p.node as Node3D
+		if node == null or not node.visible:
+			continue
+		# 取角色胸口高度而不是脚底：手指点的是人，不是脚下的影子。
+		var world := node.position + Vector3(0.0, node.scale.y * 0.9, 0.0)
+		if cam.is_position_behind(world):
+			continue
+		var d := cam.unproject_position(world).distance_to(screen_pos)
+		if d < best_d:
+			best_d = d
+			best = cohort.trim_prefix("friend:")
+	return best
+
 ## 前两个触点的距离；不足两指返回 0。
 func _pinch_span() -> float:
 	var keys := _touch_pos.keys()
@@ -587,9 +642,17 @@ func _apply_pinch() -> void:
 	_pinch_dist = span
 	if is_zero_approx(dz):
 		return
-	_set_zoom(zoom + dz)
+	_zoom_at(_pinch_center(), dz) # 绕两指中点缩放：捏住哪儿，哪儿就不动
 	var zdt := maxf(get_process_delta_time(), 0.001)
 	_zoom_vel = lerpf(_zoom_vel, dz / zdt, FLING_EMA)
+
+## 前两个触点的中点。
+func _pinch_center() -> Vector2:
+	var keys := _touch_pos.keys()
+	if keys.size() < 2:
+		return get_viewport().get_visible_rect().size * 0.5
+	keys.sort()
+	return ((_touch_pos[keys[0]] as Vector2) + (_touch_pos[keys[1]] as Vector2)) * 0.5
 
 func _wire_buttons() -> void:
 	view_mode_switch.toggled.connect(_on_view_mode_toggled)

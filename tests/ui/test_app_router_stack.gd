@@ -62,3 +62,13 @@ func test_back_action_table_includes_city_select() -> void:
 	assert_int(AppRouter.back_action_for_scene(AppRouter.CITY_SELECT)).is_equal(AppRouter.BACK_LEAVE_APP)
 	assert_str(AppRouter.qa_scene_path(PackedStringArray(["--qa-scene=city"]))).is_equal(AppRouter.CITY_SELECT)
 	assert_str(AppRouter.qa_scene_path(PackedStringArray(["--qa-scene=farm"]))).is_equal(AppRouter.FARM)
+
+## 空栈时的返回兜底只对「QA 直接以换装房 / 压测场为当前场景」生效；
+## 其他情况下不许平白切走主场景（2026-09-08：测试里把换装房当子节点调 _on_back，
+## 兜底把整张地图场景换了进来，全量跑出 56 个 orphan）。
+func test_pop_with_empty_stack_only_falls_back_for_qa_entry_scenes() -> void:
+	AppRouter._stack.clear()
+	var before := AppRouter._current_scene_path()
+	AppRouter.pop_instance()
+	assert_str(AppRouter._current_scene_path()).is_equal(before)
+	assert_bool(AppRouter._navigation_pending).is_false()

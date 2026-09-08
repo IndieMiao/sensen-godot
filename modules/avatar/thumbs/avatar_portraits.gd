@@ -66,7 +66,9 @@ func _ready() -> void:
 	_viewport.add_child(_stage)
 
 func can_render() -> bool:
-	return DisplayServer.get_name() != "headless" and is_inside_tree()
+	# 测试进程里一律不渲：离屏渲染是异步的，测试跑完时台上可能还挂着一具 rig，
+	# gdUnit 会把它记成 orphan（2026-09-08 全量跑出 56 个）。真机 / 桌面照常渲。
+	return not Net.is_test_process() and is_inside_tree()
 
 ## 取这套装扮的头像；首次渲一帧，之后走缓存。失败返回 null 并记入缓存（不反复重试）。
 func portrait(config: AvatarConfig) -> Texture2D:
