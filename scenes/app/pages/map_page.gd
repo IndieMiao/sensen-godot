@@ -9,6 +9,8 @@ const MAP_SCENE := "res://scenes/map_poc/map_poc.tscn"
 const FRIENDS_POLL_S := 30.0
 ## 好友条高度；地图 HUD 要在它之上收边。
 const FRIEND_STRIP_H := 72.0
+## 好友小卡高度（含与好友条之间的间隙）。
+const FRIEND_CARD_H := 116.0
 const REPORT_MIN_INTERVAL_S := 30.0
 const REPORT_MIN_MOVE_M := 25.0
 
@@ -24,10 +26,13 @@ var shown := false
 ## 原生地图层是否在出画；false 时本页盖一层纸色底，免得透明视口下面是纯黑。
 var presenting := false
 var backdrop: ColorRect
-## 底部好友条：头像 + 昵称，点进他的主页。没有好友时整条隐藏。
+## 底部好友条：头像 + 昵称 + 距离，按远近排序，点一下弹小卡。没有好友时整条隐藏。
 var strip_panel: PanelContainer
 var strip: HBoxContainer
 var strip_empty: Label
+## 点好友后弹出的小卡（同一时刻只有一张）；再点别人换人，点空白 / 关闭撤掉。
+var card_panel: PanelContainer
+var card_user_id := ""
 var last_report_ms := 0
 var last_report_lat := 0.0
 var last_report_lng := 0.0
@@ -106,7 +111,9 @@ func ensure_map() -> Node:
 	if map_scene.has_signal("presented"):
 		map_scene.presented.connect(_on_presented)
 	if map_scene.has_signal("friend_tapped"):
-		map_scene.friend_tapped.connect(open_user)
+		map_scene.friend_tapped.connect(show_card)
+	if map_scene.has_signal("map_tapped"):
+		map_scene.map_tapped.connect(hide_card)
 	# 地图 HUD 的安全区不知道壳底栏与好友条的存在，自己会贴到屏幕底：这里替它让位。
 	var hud_safe := map_scene.get_node_or_null("HUD/SafeArea")
 	if hud_safe != null and "extra_bottom" in hud_safe:
@@ -138,6 +145,7 @@ func _on_presented(ok: bool) -> void:
 func on_tab_hidden() -> void:
 	super()
 	shown = false
+	hide_card()
 	friends_timer.stop()
 	if map_scene != null and map_scene.has_method("suspend"):
 		map_scene.suspend()
@@ -151,7 +159,7 @@ func refresh_friends() -> bool:
 	busy = false
 	if not bool(r.get("ok", false)):
 		return false
-	friends = r.get("items", []) if r.get("items") is Array else []
+	friends = _by_distance(r.get("items", []) if r.get("items") is Array else [])
 	if map_scene != null and map_scene.has_method("set_friends"):
 		map_scene.set_friends(friends)
 	_render_strip()
@@ -177,7 +185,10 @@ func _friend_chip(f: Dictionary) -> Button:
 	b.focus_mode = Control.FOCUS_NONE
 	b.custom_minimum_size = Vector2(DesignTokens.UI_TOUCH_MIN, 56)
 	var name := str(f.get("display_name", ""))
-	b.text = name if not name.is_empty() else "@" + str(f.get("handle", ""))
+	var who := name if not name.is_empty() else "@" + str(f.get("handle", ""))
+	# 名字下一行给距离：好友条按远近排序，有个数字才看得出「排序是有道理的」。
+	b.text = "%s\n%s" % [who, FriendCard.distance_text(FriendCard.distance_m(f, last_report_lat, last_report_lng))] \
+		if report_count > 0 else who
 	# 不能开 expand_icon：文字占满宽度后图标会被压成 0（真机上好友条只剩名字）。
 	# 固定一个图标尺寸，头像到货了直接换纹理。
 	b.expand_icon = false
@@ -191,10 +202,75 @@ func _friend_chip(f: Dictionary) -> Button:
 	b.icon = thumb.placeholder_icon()
 	thumb.texture_ready.connect(func(tex: Texture2D): AvatarThumb.apply_to_button(b, tex))
 	thumb.show_avatar(f.get("avatar"))
-	b.pressed.connect(func(): open_user(uid))
+	b.pressed.connect(func(): show_card(uid))
 	return b
 
-## 进某人的主页（好友条与点地图角色共用）。
+## 好友按离我的远近排序：近的排在好友条最前面。不知道自己在哪（还没上报过）就保持服务端顺序。
+func _by_distance(items: Array) -> Array:
+	if report_count == 0:
+		return items
+	var out := items.duplicate()
+	out.sort_custom(func(a, b):
+		return FriendCard.distance_m(a, last_report_lat, last_report_lng) \
+			< FriendCard.distance_m(b, last_report_lat, last_report_lng))
+	return out
+
+func friend_by_id(user_id: String) -> Dictionary:
+	for f in friends:
+		if f is Dictionary and str((f as Dictionary).get("user_id", "")) == user_id:
+			return f
+	return {}
+
+## 弹出某人的小卡（点 3D 角色或点好友条都走这里）。再点同一个人就收起来。
+func show_card(user_id: String) -> void:
+	var f := friend_by_id(user_id)
+	if f.is_empty():
+		return
+	if card_user_id == user_id:
+		hide_card()
+		return
+	hide_card()
+	card_user_id = user_id
+	card_panel = FriendCard.build(f, {
+		"now_ms": func(): return int(Time.get_unix_time_from_system() * 1000.0),
+		"has_me": report_count > 0,
+		"me_lat": last_report_lat,
+		"me_lng": last_report_lng,
+		"on_profile": open_user,
+		"on_message": open_message,
+		"on_close": hide_card,
+	})
+	# 压在好友条之上；宽度与好友条对齐，视觉上是同一摞。
+	card_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	card_panel.offset_top = -(FRIEND_STRIP_H + FRIEND_CARD_H)
+	card_panel.offset_bottom = -FRIEND_STRIP_H
+	card_panel.offset_left = DesignTokens.SPACE_2
+	card_panel.offset_right = -DesignTokens.SPACE_2
+	add_child(card_panel)
+
+func hide_card() -> void:
+	card_user_id = ""
+	if card_panel != null:
+		card_panel.queue_free()
+		card_panel = null
+
+## 小卡上的「发消息」：找到或建一个单聊会话再进聊天页。地图上顺手说一句，不用绕主页。
+func open_message(user_id: String) -> void:
+	if user_id.strip_edges().is_empty():
+		return
+	var net := get_node_or_null("/root/Net")
+	if net == null or net.im == null:
+		return
+	var c: Dictionary = await net.im.open_dm(user_id)
+	if not bool(c.get("ok", false)):
+		return
+	hide_card()
+	if navigate.is_valid():
+		navigate.call(AppRoutes.CHAT, {"conversation": c})
+	else:
+		AppRouter.push_instance(AppRoutes.CHAT, {"conversation": c})
+
+## 进某人的主页（小卡上的「主页」按钮）。
 func open_user(user_id: String) -> void:
 	if user_id.strip_edges().is_empty():
 		return

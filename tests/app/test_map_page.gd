@@ -6,6 +6,7 @@ class FakeMap extends Node3D:
 	signal location_changed(lat: float, lng: float, accuracy: float)
 	signal presented(ok: bool)
 	signal friend_tapped(user_id: String)
+	signal map_tapped()
 	var demo_cohorts := true
 	var suspended := 0
 	var resumed := 0
@@ -137,7 +138,7 @@ func test_paper_backdrop_covers_until_the_native_map_presents() -> void:
 	fake.presented.emit(false) # 没 token / 没桥 / 桌面
 	assert_bool(p.backdrop.visible).is_true()
 
-func test_friend_strip_lists_friends_and_opens_their_page() -> void:
+func test_friend_strip_lists_friends() -> void:
 	t.responses = [{"status": 200, "json": {"items": [_friend("u-a", 31.2, 121.5), _friend("u-b", 31.3, 121.6)]}}]
 	var p := _page()
 	assert_bool(p.strip_panel.visible).is_false() # 没好友时整条收起
@@ -145,23 +146,63 @@ func test_friend_strip_lists_friends_and_opens_their_page() -> void:
 	assert_bool(p.strip_panel.visible).is_true()
 	var chip := p.strip.get_node("Friend_u-a") as Button
 	assert_object(chip).is_not_null()
-	assert_str(chip.text).is_equal("u-a")
+	assert_str(chip.text).is_equal("u-a") # 还没上报过自己的位置：不硬编一个距离出来
 	# 图标不能被文字挤没（expand_icon 会这么干）：占位图标就位、尺寸有上限。
 	assert_object(chip.icon).is_not_null()
 	assert_bool(chip.expand_icon).is_false()
 	assert_int(chip.get_theme_constant(&"icon_max_width")).is_equal(36)
 	assert_object(p.strip.get_node_or_null("Friend_u-b")).is_not_null()
-	chip.pressed.emit()
-	assert_str(nav.calls[-1].route).is_equal(AppRoutes.USER)
-	assert_that(nav.calls[-1].args).is_equal({"user_id": "u-a"})
-	# 点地图上的角色同样进主页。
-	fake.friend_tapped.emit("u-b")
-	assert_that(nav.calls[-1].args).is_equal({"user_id": "u-b"})
 	# 好友都走光了：条收起来。
 	t.responses.append({"status": 200, "json": {"items": []}})
 	assert_bool(await p.refresh_friends()).is_true()
 	assert_bool(p.strip_panel.visible).is_false()
 	assert_object(p.strip.get_node_or_null("Friend_u-a")).is_null()
+
+## 点好友先弹小卡，不再直接跳走——地图上多数时候只是想看一眼这人在哪。
+func test_tapping_a_friend_opens_a_card_and_the_card_opens_their_page() -> void:
+	t.responses = [{"status": 200, "json": {"items": [_friend("u-a", 31.2, 121.5), _friend("u-b", 31.3, 121.6)]}}]
+	var p := _page()
+	await p.on_tab_shown()
+	assert_object(p.card_panel).is_null()
+	(p.strip.get_node("Friend_u-a") as Button).pressed.emit()
+	assert_object(p.card_panel).is_not_null()
+	assert_str(p.card_user_id).is_equal("u-a")
+	assert_str((p.card_panel.find_child("Who", true, false) as Label).text).is_equal("u-a")
+	assert_int(nav.calls.size()).is_equal(0) # 弹卡不等于跳页
+	# 点地图上的角色换成另一个人。
+	fake.friend_tapped.emit("u-b")
+	assert_str(p.card_user_id).is_equal("u-b")
+	# 再点同一个人 = 收起来；点地图空处也收。
+	fake.friend_tapped.emit("u-b")
+	assert_object(p.card_panel).is_null()
+	fake.friend_tapped.emit("u-a")
+	fake.map_tapped.emit()
+	assert_object(p.card_panel).is_null()
+	# 卡上的「主页」才真的跳。
+	fake.friend_tapped.emit("u-a")
+	(p.card_panel.find_child("Profile", true, false) as Button).pressed.emit()
+	assert_str(nav.calls[-1].route).is_equal(AppRoutes.USER)
+	assert_that(nav.calls[-1].args).is_equal({"user_id": "u-a"})
+
+## 上报过自己的位置之后：好友条按远近排序，名字下面带距离。
+func test_friends_are_sorted_by_distance_once_we_know_where_we_are() -> void:
+	var far := _friend("u-far", 31.40, 121.50)   # 约 22 km
+	var near := _friend("u-near", 31.2015, 121.50) # 约 170 m
+	# 依次是：进页时的第一次好友拉取、位置上报、上报后的再拉一次。
+	t.responses = [{"status": 200, "json": {"items": []}}, {"status": 200, "json": {}},
+		{"status": 200, "json": {"items": [far, near]}}]
+	var p := _page()
+	await p.on_tab_shown()
+	p.shown = true
+	await p._on_location(31.20, 121.50, 10.0)
+	assert_int(p.report_count).is_equal(1)
+	assert_bool(await p.refresh_friends()).is_true()
+	assert_str(str(p.friends[0]["user_id"])).is_equal("u-near")
+	var chip := p.strip.get_node("Friend_u-near") as Button
+	assert_str(chip.text).contains("u-near")
+	assert_str(chip.text).contains("away")
+	assert_int(p.strip.get_children().find(chip)).is_less(
+		p.strip.get_children().find(p.strip.get_node("Friend_u-far")))
 
 func test_map_hud_leaves_room_for_the_tab_bar_and_the_friend_strip() -> void:
 	var p := _page()

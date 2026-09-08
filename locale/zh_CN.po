@@ -651,3 +651,18 @@ msgstr "你不在这个房间里。"
 
 msgid "You're the host"
 msgstr "你是房主"
+
+msgid "Close"
+msgstr "关闭"
+
+msgid "nearby"
+msgstr "就在附近"
+
+msgid "%d m away"
+msgstr "%d 米外"
+
+msgid "%.1f km away"
+msgstr "%.1f 公里外"
+
+msgid "%d km away"
+msgstr "%d 公里外"

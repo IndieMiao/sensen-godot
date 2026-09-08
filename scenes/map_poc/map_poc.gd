@@ -83,8 +83,10 @@ signal location_changed(lat: float, lng: float, accuracy: float)
 ## 原生地图层是否真的在出画（收到 READY = true；没有桥 / 没有 token = false）。
 ## 宿主据此决定要不要盖一层纸色底——透明视口下面没有地图就是纯黑（2026-09-08 真机）。
 signal presented(ok: bool)
-## 点到了某个好友角色（cohort friend:<user_id>）——宿主据此进他的主页。
+## 点到了某个好友角色（cohort friend:<user_id>）——宿主据此弹出这个人的小卡。
 signal friend_tapped(user_id: String)
+## 点在了地图空处（没打到角色、也不是双击）——宿主据此收掉浮层。
+signal map_tapped()
 ## 点角色的判定半径（屏幕像素）。
 const FRIEND_TAP_PX := 56.0
 
@@ -546,6 +548,7 @@ func _unhandled_input(e: InputEvent) -> void:
 					else:
 						_last_tap_ms = Time.get_ticks_msec()
 						_last_tap_pos = e.position
+						map_tapped.emit()
 			else:
 				_last_tap_ms = 0
 			_gesture_multi = false

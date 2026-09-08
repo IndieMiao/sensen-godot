@@ -3,6 +3,10 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
+#: res://modules/ui/friend_card.gd:16
+msgid "%.1f km away"
+msgstr ""
+
 #: res://scenes/app/pages/profile_page.gd:203
 #: res://scenes/app/pages/user_page.gd:216
 msgid "%d followers"
@@ -13,8 +17,16 @@ msgstr ""
 msgid "%d following"
 msgstr ""
 
+#: res://modules/ui/friend_card.gd:17
+msgid "%d km away"
+msgstr ""
+
 #: res://scenes/app/pages/voice_room_page.gd:169
 msgid "%d listening"
+msgstr ""
+
+#: res://modules/ui/friend_card.gd:15
+msgid "%d m away"
 msgstr ""
 
 #: res://scenes/app/pages/profile_page.gd:207
@@ -45,7 +57,7 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-#: res://scenes/app/pages/chat_page.gd:666
+#: res://scenes/app/pages/chat_page.gd:667
 #: res://scenes/app/pages/im_page.gd:162
 msgid "Add at least one @handle."
 msgstr ""
@@ -77,7 +89,7 @@ msgstr ""
 #: res://scenes/app/pages/chat_page.gd:155
 #: res://scenes/app/pages/feed_page.gd:103
 #: res://scenes/app/pages/post_page.gd:96
-#: res://scenes/app/pages/post_page.gd:229
+#: res://scenes/app/pages/post_page.gd:231
 #: res://scenes/app/pages/user_page.gd:113
 #: res://scenes/app/pages/user_page.gd:148
 msgid "Block"
@@ -98,12 +110,12 @@ msgstr ""
 msgid "Block user"
 msgstr ""
 
-#: res://scenes/app/pages/chat_page.gd:633
-#: res://scenes/app/pages/post_page.gd:323
+#: res://scenes/app/pages/chat_page.gd:634
+#: res://scenes/app/pages/post_page.gd:327
 msgid "Blocked."
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:378
+#: res://scenes/app/pages/feed_page.gd:381
 msgid "Blocked. You won't see their posts anymore."
 msgstr ""
 
@@ -113,12 +125,12 @@ msgid "Can't load the feed. Check your connection."
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:369
-#: res://scenes/app/pages/feed_page.gd:247
+#: res://scenes/app/pages/feed_page.gd:249
 #: res://scenes/app/pages/follow_list_page.gd:178
 #: res://scenes/app/pages/im_page.gd:201
-#: res://scenes/app/pages/post_page.gd:344
+#: res://scenes/app/pages/post_page.gd:348
 #: res://scenes/app/pages/profile_page.gd:246
-#: res://scenes/app/pages/user_page.gd:403
+#: res://scenes/app/pages/user_page.gd:406
 #: res://scenes/app/pages/voice_room_page.gd:392
 msgid "Can't reach the server. Check your connection and try again."
 msgstr ""
@@ -139,9 +151,9 @@ msgid "Chats"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:394
-#: res://scenes/app/pages/feed_page.gd:335
-#: res://scenes/app/pages/post_page.gd:334
-#: res://scenes/app/pages/user_page.gd:391
+#: res://scenes/app/pages/feed_page.gd:337
+#: res://scenes/app/pages/post_page.gd:338
+#: res://scenes/app/pages/user_page.gd:394
 #: res://scenes/app/pages/voice_room_page.gd:376
 msgid "Child safety"
 msgstr ""
@@ -152,6 +164,10 @@ msgstr ""
 
 #: res://scenes/app/pages/lifecycle_probe_page.gd:62
 msgid "Clear log"
+msgstr ""
+
+#: res://modules/ui/friend_card.gd:11
+msgid "Close"
 msgstr ""
 
 #: res://scenes/app/pages/follow_list_page.gd:129
@@ -196,7 +212,7 @@ msgstr ""
 msgid "Creating account…"
 msgstr ""
 
-#: res://scenes/app/pages/post_page.gd:220
+#: res://scenes/app/pages/post_page.gd:222
 #: res://scenes/app/pages/settings_page.gd:72
 msgid "Delete"
 msgstr ""
@@ -245,7 +261,7 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:264
+#: res://scenes/app/pages/profile_page.gd:265
 msgid "Email not verified"
 msgstr ""
 
@@ -253,7 +269,7 @@ msgstr ""
 msgid "Email or password is incorrect."
 msgstr ""
 
-#: res://scenes/app/pages/profile_page.gd:264
+#: res://scenes/app/pages/profile_page.gd:265
 msgid "Email verified"
 msgstr ""
 
@@ -314,17 +330,17 @@ msgid "Handle (letters, numbers, _)"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:389
-#: res://scenes/app/pages/feed_page.gd:330
-#: res://scenes/app/pages/post_page.gd:329
-#: res://scenes/app/pages/user_page.gd:386
+#: res://scenes/app/pages/feed_page.gd:332
+#: res://scenes/app/pages/post_page.gd:333
+#: res://scenes/app/pages/user_page.gd:389
 #: res://scenes/app/pages/voice_room_page.gd:371
 msgid "Harassment or bullying"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:392
-#: res://scenes/app/pages/feed_page.gd:333
-#: res://scenes/app/pages/post_page.gd:332
-#: res://scenes/app/pages/user_page.gd:389
+#: res://scenes/app/pages/feed_page.gd:335
+#: res://scenes/app/pages/post_page.gd:336
+#: res://scenes/app/pages/user_page.gd:392
 #: res://scenes/app/pages/voice_room_page.gd:374
 msgid "Hate speech"
 msgstr ""
@@ -378,7 +394,7 @@ msgid "Load more"
 msgstr ""
 
 #: res://modules/app/app_routes.gd:28
-#: res://scenes/app/pages/map_page.gd:38
+#: res://scenes/app/pages/map_page.gd:43
 msgid "Map"
 msgstr ""
 
@@ -391,10 +407,11 @@ msgstr ""
 msgid "Members"
 msgstr ""
 
-#: res://scenes/app/pages/chat_page.gd:656
+#: res://scenes/app/pages/chat_page.gd:657
 msgid "Members: %s"
 msgstr ""
 
+#: res://modules/ui/friend_card.gd:13
 #: res://scenes/app/pages/chat_page.gd:130
 #: res://scenes/app/pages/user_page.gd:105
 msgid "Message"
@@ -445,7 +462,7 @@ msgstr ""
 msgid "No one with that handle."
 msgstr ""
 
-#: res://scenes/app/pages/chat_page.gd:675
+#: res://scenes/app/pages/chat_page.gd:676
 #: res://scenes/app/pages/im_page.gd:173
 msgid "No one with the handle @%s."
 msgstr ""
@@ -472,7 +489,7 @@ msgid "Not signed in"
 msgstr ""
 
 #: res://scenes/app/pages/feed_page.gd:157
-#: res://scenes/app/pages/feed_page.gd:281
+#: res://scenes/app/pages/feed_page.gd:283
 msgid "Nothing here yet. Follow people to see their posts."
 msgstr ""
 
@@ -516,7 +533,7 @@ msgstr ""
 msgid "Picking…"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:249
+#: res://scenes/app/pages/feed_page.gd:251
 #: res://scenes/app/pages/profile_page.gd:244
 msgid "Please check the %s field."
 msgstr ""
@@ -547,6 +564,7 @@ msgstr ""
 msgid "Privacy policy"
 msgstr ""
 
+#: res://modules/ui/friend_card.gd:12
 #: res://scenes/app/pages/user_page.gd:43
 msgid "Profile"
 msgstr ""
@@ -571,7 +589,7 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
-#: res://scenes/app/pages/post_page.gd:225
+#: res://scenes/app/pages/post_page.gd:227
 #: res://scenes/app/pages/user_page.gd:109
 #: res://scenes/app/pages/voice_room_page.gd:270
 msgid "Report"
@@ -602,9 +620,9 @@ msgid "Saving…"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:393
-#: res://scenes/app/pages/feed_page.gd:334
-#: res://scenes/app/pages/post_page.gd:333
-#: res://scenes/app/pages/user_page.gd:390
+#: res://scenes/app/pages/feed_page.gd:336
+#: res://scenes/app/pages/post_page.gd:337
+#: res://scenes/app/pages/user_page.gd:393
 #: res://scenes/app/pages/voice_room_page.gd:375
 msgid "Self-harm"
 msgstr ""
@@ -620,9 +638,9 @@ msgid "Settings"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:390
-#: res://scenes/app/pages/feed_page.gd:331
-#: res://scenes/app/pages/post_page.gd:330
-#: res://scenes/app/pages/user_page.gd:387
+#: res://scenes/app/pages/feed_page.gd:333
+#: res://scenes/app/pages/post_page.gd:334
+#: res://scenes/app/pages/user_page.gd:390
 #: res://scenes/app/pages/voice_room_page.gd:372
 msgid "Sexual content"
 msgstr ""
@@ -640,7 +658,7 @@ msgstr ""
 msgid "Sign in"
 msgstr ""
 
-#: res://scenes/app/pages/feed_page.gd:251
+#: res://scenes/app/pages/feed_page.gd:253
 #: res://scenes/app/pages/im_page.gd:205
 #: res://scenes/app/pages/profile_page.gd:161
 msgid "Sign in again to set up your profile."
@@ -681,9 +699,9 @@ msgid "Someone"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:395
-#: res://scenes/app/pages/feed_page.gd:336
-#: res://scenes/app/pages/post_page.gd:335
-#: res://scenes/app/pages/user_page.gd:392
+#: res://scenes/app/pages/feed_page.gd:338
+#: res://scenes/app/pages/post_page.gd:339
+#: res://scenes/app/pages/user_page.gd:395
 #: res://scenes/app/pages/voice_room_page.gd:377
 msgid "Something else"
 msgstr ""
@@ -693,9 +711,9 @@ msgid "Sorry, you're not eligible to use this app."
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:388
-#: res://scenes/app/pages/feed_page.gd:329
-#: res://scenes/app/pages/post_page.gd:328
-#: res://scenes/app/pages/user_page.gd:385
+#: res://scenes/app/pages/feed_page.gd:331
+#: res://scenes/app/pages/post_page.gd:332
+#: res://scenes/app/pages/user_page.gd:388
 #: res://scenes/app/pages/voice_room_page.gd:370
 msgid "Spam or scam"
 msgstr ""
@@ -731,9 +749,9 @@ msgid "Terms of service"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:616
-#: res://scenes/app/pages/feed_page.gd:359
-#: res://scenes/app/pages/post_page.gd:290
-#: res://scenes/app/pages/user_page.gd:363
+#: res://scenes/app/pages/feed_page.gd:361
+#: res://scenes/app/pages/post_page.gd:293
+#: res://scenes/app/pages/user_page.gd:365
 #: res://scenes/app/pages/voice_room_page.gd:345
 msgid "Thanks, we've received your report."
 msgstr ""
@@ -743,11 +761,11 @@ msgid "That handle is already taken."
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:381
-#: res://scenes/app/pages/post_page.gd:340
+#: res://scenes/app/pages/post_page.gd:344
 msgid "That's no longer available."
 msgstr ""
 
-#: res://scenes/app/pages/user_page.gd:399
+#: res://scenes/app/pages/user_page.gd:402
 msgid "That's you."
 msgstr ""
 
@@ -776,7 +794,7 @@ msgid "This isn't a group chat."
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:367
-#: res://scenes/app/pages/post_page.gd:342
+#: res://scenes/app/pages/post_page.gd:346
 msgid "This message was blocked by our content rules."
 msgstr ""
 
@@ -797,7 +815,7 @@ msgid "This sign-in method is not enabled."
 msgstr ""
 
 #: res://scenes/app/pages/follow_list_page.gd:176
-#: res://scenes/app/pages/user_page.gd:397
+#: res://scenes/app/pages/user_page.gd:400
 msgid "This user isn't available."
 msgstr ""
 
@@ -823,7 +841,7 @@ msgid "Uploading…"
 msgstr ""
 
 #: res://scenes/app/login_page.gd:148
-#: res://scenes/app/pages/profile_page.gd:275
+#: res://scenes/app/pages/profile_page.gd:276
 msgid "Verification email sent."
 msgstr ""
 
@@ -832,9 +850,9 @@ msgid "View profile"
 msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:391
-#: res://scenes/app/pages/feed_page.gd:332
-#: res://scenes/app/pages/post_page.gd:331
-#: res://scenes/app/pages/user_page.gd:388
+#: res://scenes/app/pages/feed_page.gd:334
+#: res://scenes/app/pages/post_page.gd:335
+#: res://scenes/app/pages/user_page.gd:391
 #: res://scenes/app/pages/voice_room_page.gd:373
 msgid "Violence or threats"
 msgstr ""
@@ -875,7 +893,7 @@ msgstr ""
 
 #: res://scenes/app/pages/chat_page.gd:365
 #: res://scenes/app/pages/im_page.gd:199
-#: res://scenes/app/pages/user_page.gd:401
+#: res://scenes/app/pages/user_page.gd:404
 msgid "You can't message this user."
 msgstr ""
 
@@ -912,6 +930,10 @@ msgstr ""
 
 #: res://scenes/app/pages/im_page.gd:267
 msgid "idle"
+msgstr ""
+
+#: res://modules/ui/friend_card.gd:14
+msgid "nearby"
 msgstr ""
 
 #: res://scenes/app/pages/im_page.gd:268

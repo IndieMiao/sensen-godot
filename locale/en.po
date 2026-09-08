@@ -4,13 +4,22 @@ msgstr ""
 "Language: en\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
+msgid "%.1f km away"
+msgstr ""
+
 msgid "%d followers"
 msgstr ""
 
 msgid "%d following"
 msgstr ""
 
+msgid "%d km away"
+msgstr ""
+
 msgid "%d listening"
+msgstr ""
+
+msgid "%d m away"
 msgstr ""
 
 msgid "%d new"
@@ -95,6 +104,9 @@ msgid "Choosing…"
 msgstr ""
 
 msgid "Clear log"
+msgstr ""
+
+msgid "Close"
 msgstr ""
 
 msgid "Close friends"
@@ -602,6 +614,9 @@ msgid "connecting"
 msgstr ""
 
 msgid "idle"
+msgstr ""
+
+msgid "nearby"
 msgstr ""
 
 msgid "paused"

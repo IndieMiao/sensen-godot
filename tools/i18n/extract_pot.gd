@@ -2,13 +2,13 @@ extends SceneTree
 ## 用法：
 ##   godot --headless --path . --script res://tools/i18n/extract_pot.gd            # 写 locale/messages.pot 与 locale/en.po
 ##   godot --headless --path . --script res://tools/i18n/extract_pot.gd -- --check # 只校验 en/zh_CN 是否覆盖全部 key，缺失退出码 2
-## 抽取范围：社交主线代码（modules/app、scenes/app、modules/net/firebase_auth.gd、modules/net/ws_client.gd）。
+## 抽取范围：社交主线代码（modules/app、modules/ui、scenes/app、modules/net/firebase_auth.gd、modules/net/ws_client.gd）。
 ## 翻译后 PO 交 SSLAUNCH E10 校对，导回时不要改 msgid。
 
 ## 用 preload 而不是全局类名：独立 --script 运行时全局类缓存可能还没建（要先 --import）。
 const Tools := preload("res://modules/app/i18n_tools.gd")
 
-const ROOTS := ["res://modules/app", "res://scenes/app"]
+const ROOTS := ["res://modules/app", "res://modules/ui", "res://scenes/app"]
 const EXTRA_FILES := ["res://modules/net/firebase_auth.gd", "res://modules/net/ws_client.gd"]
 const POT := "res://locale/messages.pot"
 const PO_FILES := {"en": "res://locale/en.po", "zh_CN": "res://locale/zh_CN.po"}
