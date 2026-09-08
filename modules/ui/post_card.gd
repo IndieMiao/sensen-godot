@@ -16,7 +16,7 @@ static func build(p: Dictionary, ctx: Dictionary) -> PanelContainer:
 	panel.name = "Post_%s" % id
 	panel.add_theme_stylebox_override("panel", GameUi.surface())
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 6)
+	col.add_theme_constant_override("separation", DesignTokens.SPACE_1H)
 	panel.add_child(col)
 	var author: Dictionary = p.get("author", {}) if p.get("author") is Dictionary else {}
 	var handle := _text(author.get("handle", ""))
@@ -26,7 +26,7 @@ static func build(p: Dictionary, ctx: Dictionary) -> PanelContainer:
 	var now_ms: int = int(ctx.now_ms.call()) if ctx.get("now_ms") is Callable and (ctx.now_ms as Callable).is_valid() else int(Time.get_unix_time_from_system() * 1000.0)
 	var head_row := HBoxContainer.new()
 	head_row.name = "Head"
-	head_row.add_theme_constant_override("separation", 8)
+	head_row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	var thumb := AvatarThumb.new(28.0)
 	thumb.name = "Avatar"
 	head_row.add_child(thumb)
@@ -47,7 +47,7 @@ static func build(p: Dictionary, ctx: Dictionary) -> PanelContainer:
 		thumb.gui_input.connect(tap)
 	head_row.add_child(head)
 	col.add_child(head_row)
-	var text := GameUi.label(_text(p.get("text", "")), 14)
+	var text := GameUi.label(_text(p.get("text", "")), DesignTokens.UI_FONT_BODY)
 	text.name = "Text"
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.visible = not text.text.is_empty()
@@ -56,7 +56,7 @@ static func build(p: Dictionary, ctx: Dictionary) -> PanelContainer:
 	if not pics.is_empty():
 		var strip := HBoxContainer.new()
 		strip.name = "Pictures"
-		strip.add_theme_constant_override("separation", 6)
+		strip.add_theme_constant_override("separation", DesignTokens.SPACE_1H)
 		var images: ImageCache = ctx.get("images")
 		var image_url: Callable = ctx.get("image_url", Callable())
 		for im in pics:
@@ -73,7 +73,7 @@ static func build(p: Dictionary, ctx: Dictionary) -> PanelContainer:
 		col.add_child(strip)
 	var actions := HBoxContainer.new()
 	actions.name = "Actions"
-	actions.add_theme_constant_override("separation", 8)
+	actions.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	var like := GameUi.button("", "", "PUT/DELETE /posts/:id/like")
 	like.name = "Like"
 	var on_like: Callable = ctx.get("on_like", Callable())

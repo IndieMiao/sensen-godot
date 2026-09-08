@@ -46,7 +46,7 @@ func _build_body() -> void:
 	sign_in_button.pressed.connect(_on_sign_in)
 	body.add_child(sign_in_button)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	body.add_child(row)
 	sign_up_button = GameUi.button("plus", tr("Create account"), "Firebase signUp + verification email")
 	sign_up_button.name = "SignUp"
@@ -66,7 +66,7 @@ func _build_body() -> void:
 	google_button.name = "Google"
 	google_button.disabled = true
 	body.add_child(google_button)
-	status = GameUi.label("", 12, GameUi.MUTED)
+	status = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	status.custom_minimum_size.y = 32

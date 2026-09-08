@@ -44,18 +44,18 @@ func _build_body() -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 10)
+	col.add_theme_constant_override("separation", DesignTokens.SPACE_2H)
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(col)
 	card_slot = VBoxContainer.new()
 	card_slot.name = "CardSlot"
 	col.add_child(card_slot)
-	var heading := GameUi.label(tr("Comments"), 14, GameUi.MUTED)
+	var heading := GameUi.label(tr("Comments"), DesignTokens.UI_FONT_BODY, GameUi.MUTED)
 	heading.name = "CommentsHeading"
 	col.add_child(heading)
 	comment_list = VBoxContainer.new()
 	comment_list.name = "Comments"
-	comment_list.add_theme_constant_override("separation", 8)
+	comment_list.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	col.add_child(comment_list)
 	more_button = GameUi.button("", tr("Load more"), "GET /posts/:id/comments?cursor")
 	more_button.name = "More"
@@ -63,13 +63,13 @@ func _build_body() -> void:
 	more_button.pressed.connect(func(): load_comments(true))
 	col.add_child(more_button)
 	body.add_child(scroll)
-	status = GameUi.label("", 12, GameUi.MUTED)
+	status = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(status)
 	var row := HBoxContainer.new()
 	row.name = "Composer"
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	composer = LineEdit.new()
 	composer.name = "Text"
 	composer.placeholder_text = tr("Write a comment…")
@@ -199,22 +199,22 @@ func _row(c: Dictionary) -> PanelContainer:
 	panel.name = "Comment_%s" % id
 	panel.add_theme_stylebox_override("panel", GameUi.surface(GameUi.PAPER, 8, 8))
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 4)
+	col.add_theme_constant_override("separation", DesignTokens.SPACE_1)
 	panel.add_child(col)
 	var author: Dictionary = c.get("author", {}) if c.get("author") is Dictionary else {}
 	var who := _text(author.get("display_name", ""))
 	var handle := _text(author.get("handle", ""))
 	if not handle.is_empty():
 		who += " @%s" % handle
-	var head := GameUi.label("%s · %s" % [who, PostCard.age_text(int(Time.get_unix_time_from_system() * 1000.0), int(c.get("created_at", 0)))], 12, GameUi.MUTED)
+	var head := GameUi.label("%s · %s" % [who, PostCard.age_text(int(Time.get_unix_time_from_system() * 1000.0), int(c.get("created_at", 0)))], DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	head.name = "Author"
 	col.add_child(head)
-	var text := GameUi.label(_text(c.get("text", "")), 14)
+	var text := GameUi.label(_text(c.get("text", "")), DesignTokens.UI_FONT_BODY)
 	text.name = "Text"
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(text)
 	var actions := HBoxContainer.new()
-	actions.add_theme_constant_override("separation", 8)
+	actions.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	var author_id := _text(author.get("user_id", ""))
 	if author_id == my_id():
 		var del := GameUi.button("", tr("Delete"), "DELETE /comments/:id")

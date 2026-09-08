@@ -32,10 +32,10 @@ func _init() -> void:
 
 func _build_body() -> void:
 	placeholder(tr("Switch to another app and come back several times. Each PAUSED/RESUMED pair must increase by one."))
-	summary = GameUi.label("", 14)
+	summary = GameUi.label("", DesignTokens.UI_FONT_BODY)
 	summary.name = "Summary"
 	body.add_child(summary)
-	keyboard_label = GameUi.label("", 12, GameUi.MUTED)
+	keyboard_label = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	keyboard_label.name = "Keyboard"
 	body.add_child(keyboard_label)
 	var field := LineEdit.new()
@@ -43,13 +43,13 @@ func _build_body() -> void:
 	field.placeholder_text = tr("Tap here to test keyboard avoidance")
 	field.custom_minimum_size.y = 44
 	body.add_child(field)
-	log_label = GameUi.label("", 11, GameUi.MUTED)
+	log_label = GameUi.label("", DesignTokens.UI_FONT_TAB, GameUi.MUTED)
 	log_label.name = "Log"
 	log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	log_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_child(log_label)
 	# C3 选图桥的真机验证入口：弹系统选图器，把回来的张数 / 尺寸 / 字节数打在下面。
-	pick_label = GameUi.label("", 12, GameUi.MUTED)
+	pick_label = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	pick_label.name = "PickResult"
 	pick_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var pick := GameUi.button("", tr("Pick photos"), "PhotoPicker.pick(3)")

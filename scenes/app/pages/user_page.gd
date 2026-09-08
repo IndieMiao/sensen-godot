@@ -52,36 +52,36 @@ func _build_body() -> void:
 	card.name = "Card"
 	card.add_theme_stylebox_override("panel", GameUi.surface())
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 4)
+	col.add_theme_constant_override("separation", DesignTokens.SPACE_1)
 	card.add_child(col)
 	var head := HBoxContainer.new()
 	head.name = "Head"
-	head.add_theme_constant_override("separation", 10)
+	head.add_theme_constant_override("separation", DesignTokens.SPACE_2H)
 	avatar_thumb = AvatarThumb.new(64.0)
 	avatar_thumb.name = "Avatar"
 	head.add_child(avatar_thumb)
 	var names := VBoxContainer.new()
 	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	names.add_theme_constant_override("separation", 2)
-	name_label = GameUi.label("", 18)
+	names.add_theme_constant_override("separation", DesignTokens.SPACE_HALF)
+	name_label = GameUi.label("", DesignTokens.UI_FONT_LEAD)
 	name_label.name = "Name"
 	names.add_child(name_label)
-	handle_label = GameUi.label("", 12, GameUi.MUTED)
+	handle_label = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	handle_label.name = "Handle"
 	names.add_child(handle_label)
 	head.add_child(names)
 	col.add_child(head)
-	bio_label = GameUi.label("", 14)
+	bio_label = GameUi.label("", DesignTokens.UI_FONT_BODY)
 	bio_label.name = "Bio"
 	bio_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(bio_label)
-	counts_label = GameUi.label("", 12, GameUi.MUTED)
+	counts_label = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	counts_label.name = "Counts"
 	col.add_child(counts_label)
 	# 计数可点：进关注者 / 关注中列表（对方关了可见就没有第二个按钮）。
 	var counts_row := HBoxContainer.new()
 	counts_row.name = "CountsRow"
-	counts_row.add_theme_constant_override("separation", 8)
+	counts_row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	followers_button = GameUi.button("", "", "GET /users/:id/followers")
 	followers_button.name = "Followers"
 	followers_button.theme_type_variation = &"SecondaryButton"
@@ -97,7 +97,7 @@ func _build_body() -> void:
 	body.add_child(card)
 	var actions := HBoxContainer.new()
 	actions.name = "Actions"
-	actions.add_theme_constant_override("separation", 8)
+	actions.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	follow_button = GameUi.button("", tr("Follow"), "PUT/DELETE /users/:id/follow", true)
 	follow_button.name = "Follow"
 	follow_button.pressed.connect(func(): toggle_follow())
@@ -116,7 +116,7 @@ func _build_body() -> void:
 	actions.add_child(block_button)
 	actions.visible = false
 	body.add_child(actions)
-	status = GameUi.label("", 12, GameUi.MUTED)
+	status = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(status)
@@ -126,7 +126,7 @@ func _build_body() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	list = VBoxContainer.new()
 	list.name = "List"
-	list.add_theme_constant_override("separation", 10)
+	list.add_theme_constant_override("separation", DesignTokens.SPACE_2H)
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 	body.add_child(scroll)

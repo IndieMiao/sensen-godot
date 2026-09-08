@@ -27,7 +27,7 @@ func _init() -> void:
 func _build_body() -> void:
 	var row := HBoxContainer.new()
 	row.name = "NewChat"
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	handle_edit = LineEdit.new()
 	handle_edit.name = "Handle"
 	handle_edit.placeholder_text = tr("@handle to start a chat")
@@ -47,7 +47,7 @@ func _build_body() -> void:
 	body.add_child(row)
 	group_panel = VBoxContainer.new()
 	group_panel.name = "GroupPanel"
-	group_panel.add_theme_constant_override("separation", 8)
+	group_panel.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	group_panel.visible = false
 	group_title_edit = LineEdit.new()
 	group_title_edit.name = "GroupTitle"
@@ -56,7 +56,7 @@ func _build_body() -> void:
 	group_title_edit.custom_minimum_size.y = 44
 	group_panel.add_child(group_title_edit)
 	var members_row := HBoxContainer.new()
-	members_row.add_theme_constant_override("separation", 8)
+	members_row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	group_members_edit = LineEdit.new()
 	group_members_edit.name = "GroupMembers"
 	group_members_edit.placeholder_text = tr("@handles, separated by commas")
@@ -70,7 +70,7 @@ func _build_body() -> void:
 	members_row.add_child(create_group_button)
 	group_panel.add_child(members_row)
 	body.add_child(group_panel)
-	status = GameUi.label("", 12, GameUi.MUTED)
+	status = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(status)
@@ -80,11 +80,11 @@ func _build_body() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	list = VBoxContainer.new()
 	list.name = "List"
-	list.add_theme_constant_override("separation", 8)
+	list.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 	body.add_child(scroll)
-	realtime = GameUi.label("", 12, GameUi.MUTED)
+	realtime = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	realtime.name = "Realtime"
 	body.add_child(realtime)
 	if get_node_or_null("/root/Net") != null:
@@ -239,7 +239,7 @@ func _row(c: Dictionary) -> Button:
 	thumb.visible = false
 	b.add_child(thumb)
 	b.expand_icon = true
-	b.add_theme_constant_override("h_separation", 8)
+	b.add_theme_constant_override("h_separation", DesignTokens.SPACE_2)
 	if peer.is_empty():
 		b.icon = GameUi.icon("users-round")
 	else:

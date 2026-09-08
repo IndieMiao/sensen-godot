@@ -42,7 +42,7 @@ func _init() -> void:
 func _build_body() -> void:
 	var row := HBoxContainer.new()
 	row.name = "Composer"
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	composer = LineEdit.new()
 	composer.name = "Text"
 	composer.placeholder_text = tr("What's new?")
@@ -59,11 +59,11 @@ func _build_body() -> void:
 	post_button.pressed.connect(_on_post)
 	row.add_child(post_button)
 	body.add_child(row)
-	attached_label = GameUi.label("", 12, GameUi.MUTED)
+	attached_label = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	attached_label.name = "Attached"
 	attached_label.visible = false
 	body.add_child(attached_label)
-	status = GameUi.label("", 12, GameUi.MUTED)
+	status = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(status)
@@ -73,13 +73,13 @@ func _build_body() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	list = VBoxContainer.new()
 	list.name = "List"
-	list.add_theme_constant_override("separation", 10)
+	list.add_theme_constant_override("separation", DesignTokens.SPACE_2H)
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 	body.add_child(scroll)
 	var actions := HBoxContainer.new()
 	actions.name = "Actions"
-	actions.add_theme_constant_override("separation", 8)
+	actions.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	refresh_button = GameUi.button("", tr("Refresh"), "GET /feed")
 	refresh_button.name = "Refresh"
 	refresh_button.pressed.connect(func(): refresh())

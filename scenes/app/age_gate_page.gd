@@ -20,7 +20,7 @@ func _init() -> void:
 func _build_body() -> void:
 	placeholder(tr("Tell us your date of birth to get started."))
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	body.add_child(row)
 	var t := _today()
 	year = _picker("Year", range(int(t.year), int(t.year) - 100, -1))
@@ -34,7 +34,7 @@ func _build_body() -> void:
 	continue_button.name = "Continue"
 	continue_button.pressed.connect(_on_continue)
 	body.add_child(continue_button)
-	status = GameUi.label("", 12, GameUi.MUTED)
+	status = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	status.custom_minimum_size.y = 32

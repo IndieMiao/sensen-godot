@@ -15,7 +15,7 @@ func _init() -> void:
 func _build_body() -> void:
 	placeholder(tr("This community has zero tolerance for abusive content or behavior. Content you post can be reported and removed, and repeat offenders are banned."))
 	var links := HBoxContainer.new()
-	links.add_theme_constant_override("separation", 8)
+	links.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	body.add_child(links)
 	var privacy := GameUi.button("book-open", tr("Privacy policy"), LegalLinks.PRIVACY_URL)
 	privacy.name = "Privacy"

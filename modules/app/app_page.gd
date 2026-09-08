@@ -33,7 +33,7 @@ func _ready() -> void:
 		safe = MarginContainer.new()
 		for side in ["left", "right"]:
 			safe.add_theme_constant_override("margin_%s" % side, 16)
-		safe.add_theme_constant_override("margin_top", 8)
+		safe.add_theme_constant_override("margin_top", DesignTokens.SPACE_2)
 		safe.add_theme_constant_override("margin_bottom", 0)
 	else:
 		safe = SafeAreaMargin.new()
@@ -41,25 +41,25 @@ func _ready() -> void:
 	safe.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(safe)
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 12)
+	column.add_theme_constant_override("separation", DesignTokens.SPACE_3)
 	safe.add_child(column)
 	var header := HBoxContainer.new()
 	header.name = "Header"
-	header.add_theme_constant_override("separation", 8)
+	header.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	column.add_child(header)
 	if stacked:
 		var back := GameUi.button("arrow-left", "", tr("Back"))
 		back.name = "Back"
 		back.pressed.connect(_on_back)
 		header.add_child(back)
-	title_label = GameUi.label(tr(page_title), 20)
+	title_label = GameUi.label(tr(page_title), DesignTokens.UI_FONT_TITLE)
 	title_label.name = "Title"
 	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	header.add_child(title_label)
 	body = VBoxContainer.new()
 	body.name = "Body"
-	body.add_theme_constant_override("separation", 12)
+	body.add_theme_constant_override("separation", DesignTokens.SPACE_3)
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(body)
 	# 软键盘避让：所有带输入框的页面（登录 / 聊天 / 发布器 / 资料编辑）统一在这里挂，A5 专项。
@@ -91,7 +91,7 @@ func _input(event: InputEvent) -> void:
 
 ## 占位说明：哪张卡会把这页做实。
 func placeholder(text: String) -> Label:
-	var l := GameUi.label(text, 14, GameUi.MUTED)
+	var l := GameUi.label(text, DesignTokens.UI_FONT_BODY, GameUi.MUTED)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(l)
 	return l

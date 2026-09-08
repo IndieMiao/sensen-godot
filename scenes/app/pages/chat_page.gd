@@ -94,17 +94,17 @@ func _build_body() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	list = VBoxContainer.new()
 	list.name = "Messages"
-	list.add_theme_constant_override("separation", 6)
+	list.add_theme_constant_override("separation", DesignTokens.SPACE_1H)
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 	body.add_child(scroll)
-	status = GameUi.label("", 12, GameUi.MUTED)
+	status = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(status)
 	add_row = HBoxContainer.new()
 	add_row.name = "AddPeople"
-	add_row.add_theme_constant_override("separation", 8)
+	add_row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	add_row.visible = false
 	add_edit = LineEdit.new()
 	add_edit.name = "Handles"
@@ -120,7 +120,7 @@ func _build_body() -> void:
 	body.add_child(add_row)
 	var row := HBoxContainer.new()
 	row.name = "Composer"
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	attach_button = GameUi.button("", "+", "PhotoPicker → POST /uploads → send_image")
 	attach_button.name = "Attach"
 	attach_button.pressed.connect(func(): attach_photo())
@@ -428,13 +428,13 @@ func _append(m: Dictionary) -> void:
 	bubble.mouse_filter = Control.MOUSE_FILTER_PASS
 	bubble.gui_input.connect(_on_bubble_input.bind(id))
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 2)
+	box.add_theme_constant_override("separation", DesignTokens.SPACE_HALF)
 	bubble.add_child(box)
 	if is_group() and not mine:
-		var who := GameUi.label(name_for(sender), 11, GameUi.MUTED)
+		var who := GameUi.label(name_for(sender), DesignTokens.UI_FONT_TAB, GameUi.MUTED)
 		who.name = "Who"
 		box.add_child(who)
-	var label := GameUi.label(bubble_text(m), 14)
+	var label := GameUi.label(bubble_text(m), DesignTokens.UI_FONT_BODY)
 	label.name = "Text"
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.custom_minimum_size.x = 120
@@ -446,7 +446,7 @@ func _append(m: Dictionary) -> void:
 		_show_picture(pic, label, id, m.get("body", {}) if m.get("body") is Dictionary else {})
 	box.add_child(label)
 	if mine:
-		var receipt := GameUi.label("", 11, GameUi.MUTED)
+		var receipt := GameUi.label("", DesignTokens.UI_FONT_TAB, GameUi.MUTED)
 		receipt.name = "Receipt"
 		receipt.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		receipt.visible = false

@@ -32,10 +32,10 @@ func _init() -> void:
 	page_title = "Me"
 
 func _build_body() -> void:
-	user_label = GameUi.label("", 14)
+	user_label = GameUi.label("", DesignTokens.UI_FONT_BODY)
 	user_label.name = "User"
 	body.add_child(user_label)
-	verify_label = GameUi.label("", 12, GameUi.MUTED)
+	verify_label = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	verify_label.name = "Verify"
 	body.add_child(verify_label)
 	resend_button = GameUi.button("", tr("Resend verification email"), "Firebase sendOobCode VERIFY_EMAIL")
@@ -48,11 +48,11 @@ func _build_body() -> void:
 		_session().changed.connect(func(_s): _refresh_user())
 	var head := HBoxContainer.new()
 	head.name = "Head"
-	head.add_theme_constant_override("separation", 10)
+	head.add_theme_constant_override("separation", DesignTokens.SPACE_2H)
 	avatar_thumb = AvatarThumb.new(64.0)
 	avatar_thumb.name = "Avatar"
 	head.add_child(avatar_thumb)
-	profile_label = GameUi.label("", 14)
+	profile_label = GameUi.label("", DesignTokens.UI_FONT_BODY)
 	profile_label.name = "ProfileCard"
 	profile_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	profile_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -61,7 +61,7 @@ func _build_body() -> void:
 	body.add_child(head)
 	var counts_row := HBoxContainer.new()
 	counts_row.name = "CountsRow"
-	counts_row.add_theme_constant_override("separation", 8)
+	counts_row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	followers_button = GameUi.button("", tr("Followers"), "GET /users/me/followers")
 	followers_button.name = "Followers"
 	followers_button.theme_type_variation = &"SecondaryButton"
@@ -92,7 +92,7 @@ func _build_body() -> void:
 	save_button.name = "SaveProfile"
 	save_button.pressed.connect(_on_save)
 	body.add_child(save_button)
-	profile_status = GameUi.label("", 12, GameUi.MUTED)
+	profile_status = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	profile_status.name = "ProfileStatus"
 	profile_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(profile_status)

@@ -65,12 +65,20 @@ const UI_SURFACE_DISABLED := Color("edf1ed")
 const UI_SURFACE_SUNK := Color("f2f5f2")
 const UI_FIELD := Color("fbfcfb")
 
+## 4dp 栅格之间的半档：现有版式里 2 / 6 / 10 都在用，收口时保留原值而不是硬改成 4 的倍数
+## （改版式是设计的事，A7 只负责把取值收到一处）。
+const SPACE_HALF := 2
+const SPACE_1H := 6
+const SPACE_2H := 10
+
 # —— 壳的字阶与尺寸 ——
 ## 壳的正文 14（比地图 / 农场的 FONT_BODY 16 小一号：手机上四 Tab 页信息密度更高）。
 const UI_FONT_BODY := 14
 const UI_FONT_TAB := 11
 const UI_FONT_CAPTION := 12
 const UI_FONT_TITLE := 20
+## 卡片标题 / 主名字。
+const UI_FONT_LEAD := 18
 ## 触摸目标最小边（Apple HIG 44pt）。
 const UI_TOUCH_MIN := 44
 const UI_ICON_MAX := 20

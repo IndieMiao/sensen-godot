@@ -36,7 +36,7 @@ func setup(args: Dictionary) -> void:
 		_: page_title = "Followers"
 
 func _build_body() -> void:
-	status = GameUi.label("", 12, GameUi.MUTED)
+	status = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(status)
@@ -46,7 +46,7 @@ func _build_body() -> void:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	list = VBoxContainer.new()
 	list.name = "List"
-	list.add_theme_constant_override("separation", 8)
+	list.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
 	body.add_child(scroll)
@@ -152,7 +152,7 @@ func _row(u: Dictionary) -> Button:
 	thumb.name = "Avatar"
 	thumb.visible = false
 	b.add_child(thumb)
-	b.add_theme_constant_override("h_separation", 8)
+	b.add_theme_constant_override("h_separation", DesignTokens.SPACE_2)
 	b.icon = thumb.placeholder_icon()
 	b.expand_icon = true
 	thumb.texture_ready.connect(func(tex: Texture2D): AvatarThumb.apply_to_button(b, tex))

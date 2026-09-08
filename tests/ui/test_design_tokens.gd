@@ -97,3 +97,22 @@ func test_no_hex_color_literals_left_in_game_ui() -> void:
 	var re := RegEx.create_from_string('Color\\("[0-9a-fA-F]{6}"\\)')
 	assert_array(re.search_all(src)).is_empty()
 
+
+## A7 收口：壳的代码里不许再出现字面间距与字面字号——一律走 DesignTokens。
+## 0 是例外（底栏与主列故意贴合），其余都要能在 token 里找到出处。
+func test_shell_code_has_no_literal_spacing_or_font_sizes() -> void:
+	var dirs := ["res://modules/app", "res://scenes/app", "res://scenes/app/pages"]
+	var spacing := RegEx.create_from_string('add_theme_(constant)_override\\("(separation|h_separation|v_separation|margin_[a-z]+)", ([1-9][0-9]*)\\)')
+	var sizes := RegEx.create_from_string('GameUi\\.label\\([^\\n]*?, ([1-9][0-9]*)[,)]')
+	var offenders: Array[String] = []
+	for dir in dirs:
+		for file in DirAccess.get_files_at(dir):
+			if not file.ends_with(".gd"):
+				continue
+			var path := "%s/%s" % [dir, file]
+			var src := FileAccess.get_file_as_string(path)
+			for m in spacing.search_all(src):
+				offenders.append("%s: %s" % [path, m.get_string()])
+			for m in sizes.search_all(src):
+				offenders.append("%s: %s" % [path, m.get_string()])
+	assert_array(offenders).is_empty()

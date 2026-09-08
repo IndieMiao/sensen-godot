@@ -40,7 +40,7 @@ func _build_body() -> void:
 	sign_out.name = "SignOut"
 	sign_out.pressed.connect(_on_sign_out)
 	body.add_child(sign_out)
-	status = GameUi.label("", 12, GameUi.MUTED)
+	status = GameUi.label("", DesignTokens.UI_FONT_CAPTION, GameUi.MUTED)
 	status.name = "Status"
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body.add_child(status)
