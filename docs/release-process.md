@@ -43,10 +43,22 @@
 2. i18n：`godot --headless --path . --script res://tools/i18n/extract_pot.gd -- --check` 通过。
 3. **导出预设里去掉开发期钥匙**：iOS `additional_plist_content` 的 `NSAllowsLocalNetworking` 与
    `NSLocalNetworkUsageDescription`（真机连局域网服务用的，见 `2026-09-07-qa-flow-device.md` §6.1）。
-4. `native/photo_picker` 有 `template_release` 版 iOS 静态库（`build_ios.sh release`），`.gdextension` 指到它。
-5. `config/firebase.json` 指向目标环境的 Firebase 项目；`mapbox_token.txt` 是目标主体的 token（SSLAUNCH D3 后换）。
-6. 服务端 `.env` 是目标环境（prod / qa）的一套，`UPLOAD_LOCAL_DIR` 关掉、`R2_*` 四项齐。
-7. 构建号 +1，marketing 版本按 §1；`CHANGELOG.md` 补齐当前节。
+4. `native/photo_picker` / `native/push` / `native/voice` 都有 `template_release` 版 iOS 静态库（各自 `build_ios.sh template_release`），`.gdextension` 指到它；
+   四个安卓插件的 AAR 都跑过 `./gradlew copyAars`。
+5. **16 KB 页对齐**：`tools/release/check_elf_alignment.py <apk|aab>` 全绿。Google Play 从 2025-11 起要求
+   target Android 15+ 的应用满足这一条。⚠️ 已知不达标项见下方「已知阻塞」。
+6. `config/firebase.json` 指向目标环境的 Firebase 项目；`mapbox_token.txt` 是目标主体的 token（SSLAUNCH D3 后换）。
+7. 服务端 `.env` 是目标环境（prod / qa）的一套，`UPLOAD_LOCAL_DIR` 关掉、`R2_*` 四项齐。
+8. 构建号 +1，marketing 版本按 §1；`CHANGELOG.md` 补齐当前节。
+
+### 5.1.1 已知阻塞：Mapbox 安卓库没有 16 KB 对齐
+
+`libmapbox-maps.so` 与 `libmapbox-common.so` 的 LOAD 段是 4 KB 对齐。**目前能拿到的所有 Mapbox
+Android 版本都这样**（实测 11.29.0 与最新的 11.30.0，`com.mapbox.common:common` 24.29/24.30 同样）。
+预编译库的对齐是链接期定的，我们改不了——只能等 Mapbox 出 16 KB 版本，或换地图供应商。
+
+影响面：**只挡 Google Play 上架**，不挡 iOS、不挡侧载的内测 / 演示包（16 KB 页设备上会弹一个
+兼容模式提示，功能正常）。出 AAB 前必须重新扫一遍，别默认它已经修好了。
 
 ### 5.2 Android
 

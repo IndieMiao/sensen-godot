@@ -27,7 +27,7 @@ func _get_android_libraries(platform: EditorExportPlatform, debug: bool) -> Pack
 func _get_android_dependencies(platform: EditorExportPlatform, debug: bool) -> PackedStringArray:
 	if not _supports_platform(platform):
 		return PackedStringArray()
-	return PackedStringArray(["com.mapbox.maps:android:11.29.0"])
+	return PackedStringArray(["com.mapbox.maps:android:11.30.0"])
 
 ## Mapbox 在自家 maven 上，Maven Central 没有。
 func _get_android_dependencies_maven_repos(platform: EditorExportPlatform, debug: bool) -> PackedStringArray:
