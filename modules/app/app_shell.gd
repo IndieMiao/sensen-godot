@@ -33,9 +33,13 @@ func _ready() -> void:
 	safe.name = "SafeArea"
 	safe.min_margin = 0.0
 	safe.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# 满屏容器默认吃触摸：不放开的话地图手势永远到不了 _unhandled_input（2026-09-08 真机地图拖不动）。
+	# Tab 按钮与各页自己的控件仍是 STOP，照常点得到。
+	safe.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(safe)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 0)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	safe.add_child(column)
 	_page_host = Control.new()
 	_page_host.name = "Pages"

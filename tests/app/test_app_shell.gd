@@ -119,4 +119,9 @@ func test_shell_and_page_host_let_touches_fall_through() -> void:
 	assert_int(s._page_host.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 	assert_int((s.get_node("Backdrop") as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 	assert_int(s.page(AppRoutes.TAB_MAP).mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	var safe := s.get_node("SafeArea") as Control
+	assert_int(safe.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int((s._page_host.get_parent() as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	# Tab 按钮必须照常吃点击。
+	assert_int(s.tab_button(AppRoutes.TAB_IM).mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)
 
