@@ -70,6 +70,10 @@ func _ready() -> void:
 	var saved := str(UiState.read().get(UI_STATE_KEY, ""))
 	show_tab(saved if AppRoutes.is_tab(saved) else AppRoutes.home_tab())
 	_ensure_page(AppRoutes.home_tab())
+	# E5 DAU 口径：壳一辈子只建一次，这里就是「这次启动进到应用主体」。测试进程里没有 Net。
+	var net := get_node_or_null("/root/Net")
+	if net != null:
+		net.track("app_open")
 
 func show_tab(tab: String) -> void:
 	if not AppRoutes.is_tab(tab) or tab == current_tab:

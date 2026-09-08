@@ -630,6 +630,7 @@ func block_user(user_id: String) -> bool:
 	if not bool(r.get("ok", false)):
 		status.text = describe_error(r)
 		return false
+	_track("user_blocked", {"from": "chat"})
 	status.text = tr("Blocked.")
 	if not is_group():
 		_leave()

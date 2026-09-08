@@ -239,6 +239,8 @@ func toggle_like(post_id: String) -> void:
 		return
 	p["liked"] = bool(r.get("liked", false))
 	p["like_count"] = int(r.get("like_count", 0))
+	if p["liked"]:
+		_track("post_liked", {"from": "feed"})
 	_update_card(post_id)
 
 func describe_error(r: Dictionary) -> String:
@@ -373,6 +375,7 @@ func block_author(author_id: String) -> bool:
 	if not bool(r.get("ok", false)):
 		status.text = describe_error(r)
 		return false
+	_track("user_blocked", {"from": "feed"})
 	items = items.filter(func(p): return _text((p.get("author", {}) as Dictionary).get("user_id", "")) != author_id)
 	_render()
 	status.text = tr("Blocked. You won't see their posts anymore.")

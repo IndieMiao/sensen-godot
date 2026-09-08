@@ -163,6 +163,8 @@ func toggle_like(_id: String) -> void:
 		return
 	post["liked"] = bool(r.get("liked", false))
 	post["like_count"] = int(r.get("like_count", 0))
+	if post["liked"]:
+		_track("post_liked", {"from": "post"})
 	PostCard.update(card, post)
 
 func open_user(author: Dictionary) -> void:
@@ -250,6 +252,7 @@ func add_comment() -> bool:
 	comments.append(r)
 	comment_list.add_child(_row(r))
 	post["comment_count"] = int(post.get("comment_count", 0)) + 1
+	_track("comment_added")
 	PostCard.update(card, post)
 	return true
 
@@ -308,6 +311,7 @@ func block_user(user_id: String) -> bool:
 	if not bool(r.get("ok", false)):
 		status.text = describe_error(r)
 		return false
+	_track("user_blocked", {"from": "post"})
 	var post_author: Dictionary = post.get("author", {}) if post.get("author") is Dictionary else {}
 	if _text(post_author.get("user_id", "")) == user_id:
 		_leave()

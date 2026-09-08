@@ -72,3 +72,25 @@ func test_opt_out_persists_through_ui_state() -> void:
 	a.load_opt_out()
 	assert_bool(a.enabled()).is_true()
 	UiState.clear()
+
+## 白名单是「登记过的事件」，不是「打算做的事件」：每个名字都必须真有调用点，
+## 否则漏斗里会永远缺一段而没人发现（2026-09-08：四个事件登记了但从没挂上）。
+func test_every_whitelisted_event_has_a_call_site() -> void:
+	var src := _all_source("res://modules") + _all_source("res://scenes")
+	var missing: Array[String] = []
+	for event in Analytics.EVENTS:
+		# 找带引号的事件名，不强求紧跟 track(——登录页是三目里选名字的。
+		if not src.contains('"%s"' % event):
+			missing.append(event)
+	assert_array(missing).is_empty()
+
+## 递归读源码；白名单自己那一份不算调用点。
+func _all_source(dir: String) -> String:
+	var out := ""
+	for file in DirAccess.get_files_at(dir):
+		var path := "%s/%s" % [dir, file]
+		if file.ends_with(".gd") and path != "res://modules/telemetry/analytics.gd":
+			out += FileAccess.get_file_as_string(path)
+	for sub in DirAccess.get_directories_at(dir):
+		out += _all_source("%s/%s" % [dir, sub])
+	return out

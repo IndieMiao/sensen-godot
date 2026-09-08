@@ -290,6 +290,8 @@ func toggle_like(post_id: String) -> void:
 		return
 	p["liked"] = bool(r.get("liked", false))
 	p["like_count"] = int(r.get("like_count", 0))
+	if p["liked"]:
+		_track("post_liked", {"from": "profile"})
 	if cards.has(post_id):
 		PostCard.update(cards[post_id], p)
 
@@ -377,6 +379,7 @@ func block_user() -> bool:
 	if not bool(r.get("ok", false)):
 		status.text = describe_error(r)
 		return false
+	_track("user_blocked", {"from": "profile"})
 	_leave()
 	return true
 
