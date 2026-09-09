@@ -93,6 +93,8 @@ var bearing := 0.0
 var pitch := 45.0
 var pixel_ratio := 1.0
 var _touch_count := 0
+var _touch_points: Dictionary = {}
+var _touch_cooldown := 0.0
 var _camera_dirty := true
 ## suspend() 里从 world_env.environment 摘下来的引用，resume() 时原样插回去
 ## （suspend/resume 协议的一部分，见 app_router.gd::_suspend 的类注释）。
@@ -136,6 +138,7 @@ var _zoom_vel := 0.0
 ## "_touch_count <= 1" 门禁把 pan 速度灌进 _fling_vel，抬手甩出一段意外平移。
 ## 所以一旦升级成多指，本次手势剩余时间一律不再喂 pan 速度，直到所有手指离开。
 var _gesture_multi := false
+var _map_mouse_down := false
 var _load_bar_started_ms := 0
 var _map_is_ready := false
 ## 受限模式（PRD §3.1）：由 FarmRegions 的城市选择触发；为真时地图只做「看见、选择、返回」。
@@ -159,6 +162,11 @@ const STREET_ZOOM_MAX := 18.0
 var _zoom_elastic := 0.0
 var _focus_tween: Tween
 var farm_markers: FarmMarkers
+var journey_map: JourneyMap
+var neighbours_toggle: Button
+var journey_footer: HBoxContainer
+var journey_backdrop: ColorRect
+var journey_camera_controls: Array[Button] = []
 var farm_overlay: CandidateOverlay
 var _zoom_label: Label
 var _nearby_generation := 0
@@ -251,6 +259,7 @@ func _exit_tree() -> void:
 		map.set_map_visible(false)
 
 func _process(_dt: float) -> void:
+	_touch_cooldown = maxf(0.0, _touch_cooldown - _dt)
 	if map:
 		map.poll()
 	_step_fling(_dt)
@@ -340,9 +349,14 @@ func _sync_marker_margins() -> void:
 ## —— 相机同步核心 ————————————————————————————————————————————
 
 func _cam_distance() -> float:
-	var h_logical := float(DisplayServer.window_get_size().y) / pixel_ratio
+	var h_logical := _map_logical_height()
 	# 下限守卫：headless/未就绪时窗口尺寸可能为 0，避免 look_at 退化
 	return maxf(MapGeoMath.cam_distance_m(h_logical, MAP_FOV_DEG, center_lat, zoom + _zoom_elastic), 1.0)
+
+func _map_logical_height() -> float:
+	var height := float(DisplayServer.window_get_size().y)
+	if height <= 0: height = get_viewport().get_visible_rect().size.y
+	return maxf(1.0, height / pixel_ratio)
 
 ## 世界位移（米，来自拖拽）累加进 f64 权威中心。cos 用 anchor_lat 与
 ## geo_to_world 保持严格互逆（重锚半径内两者差异可忽略）。
@@ -481,9 +495,33 @@ func _tween_zoom(target: float) -> void:
 
 func _unhandled_input(e: InputEvent) -> void:
 	if _placing_busy: return
+	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and e.device != InputEvent.DEVICE_ID_EMULATION:
+		if not e.pressed and not _map_mouse_down: return
+		_map_mouse_down = e.pressed
+		var touch := InputEventScreenTouch.new()
+		touch.position = e.position
+		touch.pressed = e.pressed
+		_unhandled_input(touch)
+		return
+	if e is InputEventMouseMotion and _map_mouse_down:
+		var drag := InputEventScreenDrag.new()
+		drag.position = e.position
+		drag.relative = e.relative
+		_unhandled_input(drag)
+		return
 	if e is InputEventScreenTouch:
-		_touch_count += 1 if e.pressed else -1
-		_touch_count = maxi(_touch_count, 0)
+		if e.pressed:
+			if _touch_points.has(e.index): return
+			_touch_points[e.index] = e.position
+		else:
+			if not _touch_points.has(e.index): return
+			_touch_points.erase(e.index)
+		_touch_count = _touch_points.size()
+		_touch_cooldown = 0.12
+		if e.canceled:
+			_gesture_multi = true
+			_fling_vel = Vector3.ZERO
+			_zoom_vel = 0.0
 		if e.pressed:
 			_fling_vel = Vector3.ZERO # 新触摸立即打断惯性
 			_zoom_vel = 0.0 # 缩放轴同理
@@ -500,7 +538,11 @@ func _unhandled_input(e: InputEvent) -> void:
 				_fling_vel = Vector3.ZERO
 		elif _touch_count == 0:
 			if not _gesture_multi and _drag_accum_px <= DOUBLE_TAP_MAX_PX:
-				if _placement_mode and not _placing_busy:
+				if not e.canceled and journey_map and nearby_panel.visible:
+					_set_nearby_open(false)
+				elif not e.canceled and journey_map and journey_map.visible and journey_map.activate_at(e.position):
+					_last_tap_ms = 0
+				elif _placement_mode and not _placing_busy:
 					var point = _ground_point(e.position)
 					if point != null:
 						var delta := (point as Vector3) - center_world
@@ -515,7 +557,21 @@ func _unhandled_input(e: InputEvent) -> void:
 			else:
 				_last_tap_ms = 0
 			_gesture_multi = false
-	if e is InputEventScreenDrag and _touch_count <= 1 and not _gesture_multi:
+	if e is InputEventScreenDrag:
+		if not _touch_points.has(e.index): return
+		var previous: Vector2 = _touch_points[e.index]
+		_touch_points[e.index] = e.position
+		if _gesture_multi:
+			if _touch_count == 2:
+				var other: Vector2 = _touch_points.values()[0] if _touch_points.keys()[1] == e.index else _touch_points.values()[1]
+				var old_span := previous.distance_to(other)
+				var new_span: float = e.position.distance_to(other)
+				# Raw spans also cover pinches below Android's native minimum scaling span.
+				if old_span >= 16.0 and new_span >= 16.0:
+					_magnify(new_span / old_span)
+				if not street_mode:
+					_set_pitch(pitch - (e.position.y - previous.y) * 0.1)
+			return
 		# 抓地拖拽：让按下时的地面点始终跟在手指下（倾角下精确）。
 		# 高 pitch 时屏幕上缘一像素对应的地面位移可达 ~0.4d，单次 delta 限幅到 d
 		# 防止一次拖拽把地图甩出上百公里。
@@ -535,13 +591,17 @@ func _unhandled_input(e: InputEvent) -> void:
 		if _drag_accum_px > DOUBLE_TAP_MAX_PX:
 			_last_tap_ms = 0
 	elif e is InputEventMagnifyGesture:
-		# 与拖拽同款：应用之后把变化量换算成 zoom/秒 做 EMA 平滑，松手接着走。
-		var dz := log(e.factor) / log(2.0)
-		_set_zoom(zoom + dz)
-		var zdt := maxf(get_process_delta_time(), 0.001)
-		_zoom_vel = lerpf(_zoom_vel, dz / zdt, FLING_EMA)
-	elif e is InputEventPanGesture and not street_mode:
+		if _touch_count == 0 and _touch_cooldown <= 0.0:
+			_magnify(e.factor)
+	elif e is InputEventPanGesture and not street_mode and _touch_count == 0 and _touch_cooldown <= 0.0:
 		_set_pitch(pitch - e.delta.y * 0.2)
+
+func _magnify(factor: float) -> void:
+	if factor <= 0.0 or not is_finite(factor): return
+	var dz := log(factor) / log(2.0)
+	_set_zoom(zoom + dz)
+	var zdt := maxf(get_process_delta_time(), 0.001)
+	_zoom_vel = lerpf(_zoom_vel, dz / zdt, FLING_EMA)
 
 func _wire_buttons() -> void:
 	view_mode_switch.toggled.connect(_on_view_mode_toggled)
@@ -788,8 +848,15 @@ func resume() -> void:
 		nearby_panel._apply_bottom_preset()
 		nearby_panel.set_place_state(Net.session.state if Net and Net.session else {})
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_reset_gesture()
+
 func _reset_gesture() -> void:
+	if _touch_count > 0: _touch_cooldown = 0.12
 	_touch_count = 0
+	_touch_points.clear()
+	_map_mouse_down = false
 	_gesture_multi = false
 	_drag_accum_px = 0.0
 	_last_tap_ms = 0
@@ -1108,9 +1175,94 @@ func _enter_farm_home(r: Dictionary) -> void:
 	nearby_panel.farm_focused.connect(_on_farm_focused)
 	nearby_panel.visit_requested.connect(_on_visit_requested)
 	nearby_panel.place_requested.connect(_open_place)
+	nearby_panel.close_requested.connect(func(): _set_nearby_open(false))
 	$HUD/SafeArea/Root.add_child(nearby_panel)
 	nearby_panel.set_place_state(Net.session.state if Net and Net.session else {})
+	_setup_journey_map()
 	_refresh_nearby()
+
+func _setup_journey_map() -> void:
+	if not Net or not Net.session or not JourneyProgress.active(Net.session.state) or journey_map: return
+	journey_map = JourneyMap.new()
+	journey_map.configure(JourneyStreets.load_for(Net.session))
+	$HUD/SafeArea/Root.add_child(journey_map)
+	$HUD/SafeArea/Root.move_child(journey_map, 0)
+	journey_map.place_requested.connect(_open_place)
+	journey_map.street_requested.connect(func(target_id):
+		if AppRouter.top_instance() == null and Net and Net.session:
+			AppRouter.push_instance(AppRouter.STREET, {"session": Net.session, "target": target_id}))
+	journey_map.farm_requested.connect(_open_my_farm)
+	nearby_panel.hide()
+	journey_backdrop = ColorRect.new()
+	journey_backdrop.color = Color("d9e7d3")
+	journey_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	journey_backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	$HUD.add_child(journey_backdrop)
+	$HUD.move_child(journey_backdrop, 0)
+	var footer := HBoxContainer.new()
+	journey_footer = footer
+	footer.name = "JourneyFooter"
+	footer.alignment = BoxContainer.ALIGNMENT_END
+	footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	footer.offset_top = -48
+	$HUD/SafeArea/Root.add_child(footer)
+	for spec in [["plus", "Zoom in", 1.0], ["minus", "Zoom out", -1.0]]:
+		var b := GameUi.button(spec[0], "", spec[1])
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.pressed.connect(func(): _tween_zoom(zoom + float(spec[2])))
+		footer.add_child(b)
+		journey_camera_controls.append(b)
+	var focus := GameUi.button("locate-fixed", "", "My neighbourhood")
+	focus.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	focus.pressed.connect(_focus_own_farm)
+	footer.add_child(focus)
+	journey_camera_controls.append(focus)
+	var explore := GameUi.button("footprints", "", "Explore on foot")
+	explore.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	explore.pressed.connect(func(): AppRouter.push_instance(AppRouter.STREET, {"session": Net.session}))
+	footer.add_child(explore)
+	neighbours_toggle = GameUi.button("users-round", "", "Nearby farmers")
+	neighbours_toggle.name = "NearbyToggle"
+	neighbours_toggle.toggle_mode = true
+	neighbours_toggle.pressed.connect(func(): _set_nearby_open(not nearby_panel.visible))
+	neighbours_toggle.size_flags_horizontal = Control.SIZE_SHRINK_END
+	footer.add_child(neighbours_toggle)
+	var outfit := GameUi.button("user-round", "", "Your outfit")
+	outfit.size_flags_horizontal = Control.SIZE_SHRINK_END
+	outfit.pressed.connect(AppRouter.go_to_dressing)
+	footer.add_child(outfit)
+	nearby_panel.close_button.show()
+	footer.resized.connect(_layout_journey_drawer)
+	$HUD/SafeArea/Root.resized.connect(_layout_journey_drawer)
+	top_panel.resized.connect(_layout_journey_drawer)
+	_layout_journey_drawer()
+	call_deferred("_focus_journey_map", false)
+
+func _layout_journey_drawer() -> void:
+	if not journey_footer or not nearby_panel: return
+	var root := $HUD/SafeArea/Root as Control
+	var footer_height := maxf(48, journey_footer.get_combined_minimum_size().y)
+	journey_footer.offset_top = -footer_height
+	journey_footer.offset_bottom = 0
+	var reserved_top := top_panel.position.y + maxf(top_panel.size.y, top_panel.get_combined_minimum_size().y) + 12
+	nearby_panel.set_available_space(footer_height + 8, root.size.y - reserved_top - footer_height - 8)
+
+func _set_nearby_open(open: bool) -> void:
+	if not nearby_panel: return
+	_reset_gesture()
+	nearby_panel.visible = open
+	if neighbours_toggle:
+		neighbours_toggle.set_pressed_no_signal(open)
+		neighbours_toggle.icon = GameUi.icon("chevron-down" if open else "users-round")
+		neighbours_toggle.tooltip_text = "Close nearby panel" if open else "Nearby farmers"
+	_layout_journey_drawer()
+	_camera_dirty = true
+
+func is_back_navigation_locked() -> bool:
+	if nearby_panel and nearby_panel.visible and journey_map:
+		_set_nearby_open(false)
+		return true
+	return false
 
 func _open_place(id: String) -> void:
 	if AppRouter.top_instance() != null or not Net or not Net.session: return
@@ -1153,6 +1305,9 @@ func _build_map_controls() -> void:
 	rail.add_child(home_button)
 
 func _focus_own_farm() -> void:
+	if journey_map:
+		_focus_journey_map(true)
+		return
 	if farm_markers == null or not farm_markers.points.has("self"): return
 	if nearby_panel:
 		nearby_panel.clear_focus()
@@ -1161,6 +1316,56 @@ func _focus_own_farm() -> void:
 	var point: Dictionary = farm_markers.points.self
 	farm_markers.selected_id = "self"
 	_focus_blueprint(point.bp)
+
+func _journey_area() -> Rect2:
+	var root := $HUD/SafeArea/Root as Control
+	var top := maxf(130, top_panel.position.y + top_panel.size.y + 16)
+	var bottom := journey_footer.position.y - 48 if journey_footer else root.size.y - 96
+	return Rect2(4, top, root.size.x - 8, maxf(0, bottom - top))
+
+func _focus_journey_map(animate: bool) -> void:
+	if not journey_map or not journey_map.streets: return
+	var area := _journey_area()
+	if area.size.x < 120 or area.size.y < 100: return
+	_reset_gesture()
+	_zoom_elastic = 0.0
+	var origin := MapGeoMath.geo_to_world(home_lat, home_lng, anchor_lat, anchor_lng)
+	var bounds := AABB(origin, Vector3.ZERO)
+	for id in journey_map.streets.entrances:
+		bounds = bounds.expand(origin + journey_map.streets.offset_for(id))
+	var previous_transform := cam.transform
+	var previous_fov := cam.fov
+	var distance := MapGeoMath.cam_distance_m(_map_logical_height(), MAP_FOV_DEG, home_lat, 16.0)
+	var heading := Vector3(sin(deg_to_rad(bearing)), 0, -cos(deg_to_rad(bearing)))
+	cam.position = origin - heading * distance * sin(deg_to_rad(pitch)) + Vector3.UP * distance * cos(deg_to_rad(pitch))
+	cam.look_at(origin, heading)
+	cam.fov = MAP_FOV_DEG
+	# Fit the complete labels; derive the geographic pose before touching the map bridge.
+	var inset := Rect2(area.position + Vector2(54, 28), area.size - Vector2(108, 88))
+	preload("res://modules/farm/farm_camera.gd").fit(cam, bounds, Rect2(inset.position + journey_map.global_position, inset.size))
+	var target: Vector3 = Plane(Vector3.UP, 0).intersects_ray(cam.position, -cam.basis.z)
+	var fitted_distance := cam.position.distance_to(target)
+	cam.transform = previous_transform
+	cam.fov = previous_fov
+	var target_lat := anchor_lat - target.z / MapGeoMath.M_PER_DEG_LAT
+	var target_lng := anchor_lng + target.x / (MapGeoMath.M_PER_DEG_LAT * cos(deg_to_rad(anchor_lat)))
+	var target_zoom := clampf(16.0 + log(distance / fitted_distance) / log(2.0), STREET_ZOOM_MIN, STREET_ZOOM_MAX)
+	var from_lat := center_lat
+	var from_lng := center_lng
+	var from_zoom := zoom
+	set_pan_bounds(home_lat, home_lng, 450)
+	if animate:
+		center_lat = from_lat
+		center_lng = from_lng
+		_focus_tween = create_tween()
+		_focus_tween.tween_method(func(t: float):
+			center_lat = lerpf(from_lat, target_lat, t)
+			center_lng = lerpf(from_lng, target_lng, t)
+			_set_zoom(lerpf(from_zoom, target_zoom, t)), 0.0, 1.0, 0.55).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	else:
+		center_lat = target_lat
+		center_lng = target_lng
+		_set_zoom(target_zoom)
 
 func _focus_blueprint(bp: FarmBlueprint) -> void:
 	if bp.overlay.is_empty(): return
@@ -1186,8 +1391,24 @@ func _focus_blueprint(bp: FarmBlueprint) -> void:
 func _sync_farm_markers() -> void:
 	if farm_markers == null: return
 	var root := $HUD/SafeArea/Root as Control
-	var bottom := nearby_panel.position.y - 8 if nearby_panel else root.size.y - 24
+	_setup_journey_map()
+	var bottom := nearby_panel.position.y - 8 if nearby_panel and nearby_panel.visible else root.size.y - 24
 	farm_markers.sync(cam, anchor_lat, anchor_lng, Rect2(0, 110, root.size.x, maxf(0, bottom - 110)))
+	if journey_map:
+		side_toolbar.hide()
+		journey_map.visible = not nearby_panel.visible
+		farm_markers.visible = nearby_panel.visible
+		var fallback := map == null or _header_locked
+		for control in journey_camera_controls: control.visible = not fallback
+		journey_backdrop.visible = fallback
+		if fallback:
+			get_viewport().transparent_bg = false
+			farm_overlay.hide()
+			region_title.text = str(region.get("name", "Neighbourhood"))
+			location_status.text = "Neighbourhood"
+			_zoom_label.hide()
+		var origin := MapGeoMath.geo_to_world(home_lat, home_lng, anchor_lat, anchor_lng)
+		journey_map.sync(cam, origin, _journey_area(), JourneyProgress.goal_state(Net.session), fallback, Net.session.server_now())
 	_update_pawns(_cam_distance())
 
 func _open_my_farm() -> void:

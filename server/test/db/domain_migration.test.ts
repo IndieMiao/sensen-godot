@@ -8,6 +8,8 @@ import { migrate, truncateAll } from '../../src/db/migrate.js';
 import { PgStore } from '../../src/db/pg_store.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/domain/content.js';
 import { createInitialState } from '../../src/domain/state.js';
+import { DOMAIN_VERSION } from '../../src/domain/version.js';
+import { startJourney, reconcileJourney } from '../../src/domain/journey.js';
 import { blueprintSets, loadBlueprint } from '../../src/http/app.js';
 import { payloadHash } from '../../src/http/hash.js';
 import type { FarmRow } from '../../src/http/dto.js';
@@ -25,7 +27,7 @@ const sets = blueprintSets(loadBlueprint(path.join(ROOT, 'assets/blueprints'), '
 const cells = [...sets.cultivable].filter(id => !sets.reserved.has(id));
 const NOW = at('2026-09-04T10:00:00+08:00');
 
-describe.skipIf(!DSN)('Explicit domain 1 -> 2 migration', () => {
+describe.skipIf(!DSN)('Explicit domain 1/2/3/4/5/6/7/8/9/10/11/12 -> 13 migration', () => {
   let pool: pg.Pool;
   let store: PgStore;
   beforeAll(async () => {
@@ -96,7 +98,7 @@ describe.skipIf(!DSN)('Explicit domain 1 -> 2 migration', () => {
 
   it('defaults to a read-only report and preserves the complete database', async () => {
     const old = await seed();
-    const current = await seed('2');
+    const current = await seed(DOMAIN_VERSION);
     await addHistory(old);
     const before = await snapshot();
     const report = await migrateDomain(pool, { contentVersion: CV });
@@ -113,7 +115,7 @@ describe.skipIf(!DSN)('Explicit domain 1 -> 2 migration', () => {
     expect(first).toMatchObject({ status: 'applied', migrated: 1, eligible: [farm.id] });
     const after = await snapshot();
     expect(after).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
-      .map(row => ({ ...row, domain_version: '2' })) });
+      .map(row => ({ ...row, domain_version: DOMAIN_VERSION })) });
     expect((await store.farmById(farm.id))!.state.chapters[0].step_flags).toEqual({ farm_created: true });
     for (const outcome of ['applied', 'rejected']) {
       const env = envelope(`legacy-${outcome}`, outcome === 'applied' ? 'clear_cells' : 'till_cells');
@@ -127,7 +129,7 @@ describe.skipIf(!DSN)('Explicit domain 1 -> 2 migration', () => {
     expect(await snapshot()).toEqual(after);
   });
 
-  it('keeps new commands fail-closed until apply, then logs new commands under domain 2', async () => {
+  it('keeps new commands fail-closed until apply, then logs the current domain', async () => {
     const farm = await seed();
     await addHistory(farm);
     const env = envelope('new-command');
@@ -137,7 +139,7 @@ describe.skipIf(!DSN)('Explicit domain 1 -> 2 migration', () => {
     await migrateDomain(pool, { contentVersion: CV, apply: true });
     expect((await store.applyCommand(farm.owner_id, env, cmd)).kind).toBe('applied');
     const logged = await pool.query('SELECT domain_version FROM commands WHERE idempotency_key = $1', ['new-command']);
-    expect(logged.rows[0].domain_version).toBe('2');
+    expect(logged.rows[0].domain_version).toBe(DOMAIN_VERSION);
   });
 
   it.each([
@@ -157,13 +159,122 @@ describe.skipIf(!DSN)('Explicit domain 1 -> 2 migration', () => {
     }
   });
 
-  it('also refuses mismatched content on an already-domain-2 farm', async () => {
+  it('also refuses mismatched content on a current-domain farm', async () => {
     await seed();
-    const other = await seed('2');
+    const other = await seed(DOMAIN_VERSION);
     await pool.query('UPDATE farms SET content_version = $1 WHERE id = $2', ['old-content', other.id]);
     expect(await migrateDomain(pool, { contentVersion: CV, apply: true }))
       .toMatchObject({ status: 'refused', migrated: 0,
         blocked: [{ farm_id: other.id, reasons: ['content_version_mismatch'] }] });
+  });
+
+  it.each(['7', '8', '9', '10', '11', '12'])('upgrades domain %s resource trails without changing their unclaimed state or history', async domain => {
+    const farm = await seed(domain);
+    await addHistory(farm);
+    await pool.query('UPDATE farms SET content_version = $1 WHERE id = $2', ['previous-bundle-content', farm.id]);
+    const before = await snapshot();
+    const report = await migrateDomain(pool, { contentVersion: CV, previousContentVersion: 'previous-bundle-content', apply: true });
+    expect(report).toMatchObject({ status: 'applied', migrated: 1, to_domain_version: DOMAIN_VERSION });
+    expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
+      .map(row => ({ ...row, domain_version: DOMAIN_VERSION, content_version: CV })) });
+  });
+
+  it('continues a migrated farm through a saved display plan and replays each command without duplicate costs', async () => {
+    const farm = await seed('11');
+    const state = startJourney(farm.state, content);
+    state.journey!.facts.push('workbench', 'planter_crafted', 'side_path', 'crafted_lantern',
+      'shared_meal', 'project_terrace_0', 'project_terrace_1');
+    state.journey!.materials = { stone: 4, fiber: 2 };
+    state.journey!.workshop = { sequence: 0, stock: {}, displays: {} };
+    const initial = reconcileJourney(state, content);
+    await pool.query('UPDATE farms SET state = $1 WHERE id = $2', [initial, farm.id]);
+    await addHistory(farm);
+    const before = await snapshot();
+    expect(await migrateDomain(pool, { contentVersion: CV, apply: true })).toMatchObject({ status: 'applied', migrated: 1 });
+    expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
+      .map(row => ({ ...row, domain_version: DOMAIN_VERSION })) });
+
+    const plan = { idempotency_key: 'plan-fountain', base_version: 0, type: 'plan_journey_display' as const,
+      payload: { project: 'terrace', slot: 2, item: 'fountain', sequence: 0 } };
+    expect(await store.applyCommand(farm.owner_id, plan, { type: 'plan_journey_display', ...plan.payload }))
+      .toMatchObject({ kind: 'applied' });
+    const reload = new PgStore({ pool, content, contentVersion: CV, timezone: () => SH, blueprint: () => sets, now: () => NOW });
+    const planned = (await reload.farmById(farm.id))!;
+    expect(planned.version).toBe(1);
+    expect(planned.state.journey!.workshop!.planned).toEqual({ project: 'terrace', slot: 2, item: 'fountain' });
+    expect(planned.state.journey!.materials).toEqual(initial.journey!.materials);
+    expect(planned.state.inventory).toEqual(initial.inventory);
+    expect(planned.state.wallet).toBe(initial.wallet);
+    const plannedSnapshot = await snapshot();
+    expect(await reload.applyCommand(farm.owner_id, plan, { type: 'plan_journey_display', ...plan.payload }))
+      .toMatchObject({ kind: 'replayed' });
+    expect(await snapshot()).toEqual(plannedSnapshot);
+
+    const craft = { idempotency_key: 'craft-fountain', base_version: 1, type: 'craft_journey_item' as const,
+      payload: { item: 'fountain', sequence: 1 } };
+    expect(await reload.applyCommand(farm.owner_id, craft, { type: 'craft_journey_item', ...craft.payload }))
+      .toMatchObject({ kind: 'applied' });
+    const made = (await reload.farmById(farm.id))!;
+    expect(made.state.journey!.materials).toEqual({ stone: 0, fiber: 0 });
+    expect(made.state.journey!.workshop!.stock.fountain).toBe(1);
+    expect(made.state.journey!.workshop!.planned).toEqual(planned.state.journey!.workshop!.planned);
+    const craftedSnapshot = await snapshot();
+    expect(await reload.applyCommand(farm.owner_id, craft, { type: 'craft_journey_item', ...craft.payload }))
+      .toMatchObject({ kind: 'replayed' });
+    expect(await snapshot()).toEqual(craftedSnapshot);
+
+    const display = { idempotency_key: 'place-fountain', base_version: 2, type: 'display_journey_item' as const,
+      payload: { item: 'fountain', project: 'terrace', slot: 2, sequence: 2 } };
+    expect(await reload.applyCommand(farm.owner_id, display, { type: 'display_journey_item', ...display.payload }))
+      .toMatchObject({ kind: 'applied' });
+    const placed = (await reload.farmById(farm.id))!;
+    expect(placed.version).toBe(3);
+    expect(placed.state.journey!.workshop).toEqual({ sequence: 3, stock: { fountain: 0 }, displays: { terrace: ['', '', 'fountain'] } });
+    const placedSnapshot = await snapshot();
+    expect(await reload.applyCommand(farm.owner_id, display, { type: 'display_journey_item', ...display.payload }))
+      .toMatchObject({ kind: 'replayed' });
+    expect(await snapshot()).toEqual(placedSnapshot);
+  });
+
+  it('preserves domain 12 history and a tracked request across store reload and delivery retries', async () => {
+    const farm = await seed('12');
+    const state = startJourney(farm.state, content);
+    state.inventory.produce.L = 2;
+    const initial = reconcileJourney(state, content);
+    await pool.query('UPDATE farms SET state = $1 WHERE id = $2', [initial, farm.id]);
+    await addHistory(farm);
+    const before = await snapshot();
+    expect(await migrateDomain(pool, { contentVersion: CV, apply: true })).toMatchObject({ status: 'applied', migrated: 1 });
+    expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
+      .map(row => ({ ...row, domain_version: DOMAIN_VERSION })) });
+
+    const pin = { idempotency_key: 'track-leaves', base_version: 0, type: 'track_journey_opportunity' as const,
+      payload: { slot: 'nursery', sequence: 0, tracking: true } };
+    expect(await store.applyCommand(farm.owner_id, pin, { type: pin.type, ...pin.payload })).toMatchObject({ kind: 'applied' });
+    const reload = new PgStore({ pool, content, contentVersion: CV, timezone: () => SH, blueprint: () => sets, now: () => NOW });
+    const pinned = (await reload.farmById(farm.id))!;
+    expect(pinned.version).toBe(1);
+    expect(pinned.state.journey!.tracked_opportunity).toEqual({ slot: 'nursery', sequence: 0 });
+    expect(pinned.state.inventory).toEqual(initial.inventory);
+    expect(pinned.state.wallet).toBe(initial.wallet);
+    const afterPin = await snapshot();
+    expect(await reload.applyCommand(farm.owner_id, pin, { type: pin.type, ...pin.payload })).toMatchObject({ kind: 'replayed' });
+    expect(await snapshot()).toEqual(afterPin);
+
+    const deliver = { idempotency_key: 'deliver-leaves', base_version: 1, type: 'fulfill_opportunity' as const,
+      payload: { slot: 'nursery', sequence: 0 } };
+    expect(await reload.applyCommand(farm.owner_id, deliver, { type: deliver.type, ...deliver.payload })).toMatchObject({ kind: 'applied' });
+    const done = (await reload.farmById(farm.id))!;
+    expect(done.version).toBe(2);
+    expect(done.state.journey!.tracked_opportunity).toBeUndefined();
+    expect(done.state.journey!.opportunities.nursery.sequence).toBe(1);
+    expect(done.state.inventory.produce.L).toBe(0);
+    expect(done.state.wallet).toBe(initial.wallet + 18);
+    expect(done.state.journey!.contributions!.leaves).toBe(1);
+    const afterDelivery = await snapshot();
+    expect(await reload.applyCommand(farm.owner_id, deliver, { type: deliver.type, ...deliver.payload })).toMatchObject({ kind: 'replayed' });
+    expect(await reload.applyCommand(farm.owner_id, pin, { type: pin.type, ...pin.payload })).toMatchObject({ kind: 'replayed' });
+    expect(await snapshot()).toEqual(afterDelivery);
   });
 
   it('rolls back an update failure and leaves the connection usable for a retry', async () => {
@@ -205,7 +316,7 @@ describe.skipIf(!DSN)('Explicit domain 1 -> 2 migration', () => {
     }
   });
 
-  it('blocks a new command until migration commits, then applies it with domain 2', async () => {
+  it('blocks a new command until migration commits, then applies it with the current domain', async () => {
     const farm = await seed();
     const blocker = await pool.connect();
     let migration: ReturnType<typeof migrateDomain> | undefined;
@@ -243,5 +354,17 @@ describe.skipIf(!DSN)('Explicit domain 1 -> 2 migration', () => {
     expect(run()).toMatchObject({ mode: 'dry-run', eligible: [farm.id], migrated: 0 });
     expect((await pool.query('SELECT domain_version FROM farms WHERE id = $1', [farm.id])).rows[0].domain_version).toBe('1');
     expect(run('--apply')).toMatchObject({ mode: 'apply', status: 'applied', migrated: 1 });
+  });
+
+  it.each(['2', '3', '4', '5', '6', '8'])('accepts the exact previous content hash for domain %s while preserving state and history', async domain => {
+    const farm = await seed(domain);
+    await addHistory(farm);
+    const previous = contentVersion(DEFAULT_CONTENT_DIR, true);
+    await pool.query('UPDATE farms SET content_version = $1 WHERE id = $2', [previous, farm.id]);
+    const before = await snapshot();
+    expect(await migrateDomain(pool, { contentVersion: CV, previousContentVersion: previous, apply: true }))
+      .toMatchObject({ status: 'applied', migrated: 1 });
+    expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
+      .map(row => ({ ...row, content_version: CV, domain_version: DOMAIN_VERSION })) });
   });
 });

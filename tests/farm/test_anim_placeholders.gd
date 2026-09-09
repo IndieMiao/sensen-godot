@@ -31,9 +31,27 @@ func test_real_clips_list_matches_the_rig() -> void:
 
 func test_placeholder_actions_fall_back_to_idle() -> void:
 	# 播不出来也不能崩：玩家看到站着不动，而不是黑屏。
+	# 已由 Mixamo 管线转正的条目（clip_id 进了 real_clips）则必须播它自己的真 clip。
 	for action in AnimPlaceholders.placeholders():
-		assert_bool(AnimPlaceholders.is_placeholder(str(action))).is_true()
-		assert_str(AnimPlaceholders.clip_for(str(action))).is_equal("idle")
+		var clip_id := str(AnimPlaceholders.placeholders()[action].get("clip_id", ""))
+		if AnimPlaceholders.real_clips().has(clip_id):
+			assert_bool(AnimPlaceholders.is_placeholder(str(action))).is_false()
+			assert_str(AnimPlaceholders.clip_for(str(action))).is_equal(clip_id)
+		else:
+			assert_bool(AnimPlaceholders.is_placeholder(str(action))).is_true()
+			assert_str(AnimPlaceholders.clip_for(str(action))).is_equal("idle")
+
+func test_placeholder_is_promoted_when_its_clip_becomes_real() -> void:
+	# 登记表注入：labour_till 已是真 clip，till 就不再占位；labour_sow 没有，sow 仍回退 idle。
+	var saved := AnimPlaceholders._table
+	AnimPlaceholders._table = {"real_clips": ["idle", "labour_till"],
+		"placeholders": {"till": {"clip_id": "labour_till"}, "sow": {"clip_id": "labour_sow"}}}
+	assert_bool(AnimPlaceholders.is_registered("till")).is_true()
+	assert_bool(AnimPlaceholders.is_placeholder("till")).is_false()
+	assert_str(AnimPlaceholders.clip_for("till")).is_equal("labour_till")
+	assert_bool(AnimPlaceholders.is_placeholder("sow")).is_true()
+	assert_str(AnimPlaceholders.clip_for("sow")).is_equal("idle")
+	AnimPlaceholders._table = saved
 
 func test_real_clip_is_played_as_itself() -> void:
 	assert_str(AnimPlaceholders.clip_for("walk")).is_equal("walk")

@@ -13,6 +13,27 @@ export const MAX_CELLS_PER_COMMAND = 12;
 export type CareKindPayload = 'water' | 'drain' | 'shelter';
 
 export type Command =
+  | { type: 'start_journey' }
+  | { type: 'collect_resource'; node_id: string; round: number; choice?: 'primary' | 'alternate' }
+  | { type: 'next_exploration'; round: number; route?: string }
+  | { type: 'build_journey_project'; project: string; stage: number }
+  | { type: 'use_journey_facility'; project: string; choice: string; sequence: number }
+  | { type: 'plan_journey_gathering'; theme: string; sequence: number }
+  | { type: 'host_journey_gathering'; theme: string; sequence: number }
+  | { type: 'pack_journey_gathering'; sequence: number }
+  | { type: 'craft_journey_item'; item: string; sequence: number }
+  | { type: 'deliver_journey_item'; item: string; sequence: number }
+  | { type: 'display_journey_item'; project: string; slot: number; item: string; sequence: number }
+  | { type: 'plan_journey_display'; project: string; slot: number; item: string; sequence: number }
+  | { type: 'complete_journey_story'; resident_id: ResidentId; story: string }
+  | { type: 'track_journey_discovery'; discovery: string }
+  | { type: 'track_journey_project'; project: string }
+  | { type: 'track_journey_opportunity'; slot: string; sequence: number; tracking: boolean }
+  | { type: 'install_journey_discovery'; discovery: string; sequence: number }
+  | { type: 'harvest_journey_discovery'; discovery: string; choice: string; round: number }
+  | { type: 'journey_action'; action: 'repair_workbench' | 'craft_planter' | 'clear_side_path' | 'share_meal' | 'plant_planter' }
+  | { type: 'fulfill_opportunity'; slot: string; sequence: number }
+  | { type: 'decline_opportunity'; slot: string; sequence: number }
   // —— 建场与设置 ——
   | { type: 'create_farm'; region_id: string; layout_patch_id: string; blueprint_revision: number }
   | { type: 'set_location_visible'; visible: boolean }

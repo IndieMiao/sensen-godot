@@ -12,6 +12,7 @@ const COMMAND := {
 const CARE_VERB := {"sunny": "Water", "rain": "Drain", "wind": "Shelter"}
 const VERB_ING := {"clear": "Clearing", "till": "Tilling", "sow": "Sowing", "care": "Tending", "harvest": "Harvesting"}
 const TUTORIAL_PLOTS := 6
+static var _economy: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/farm/data/economy.json"))
 
 static func step_for(slot: Dictionary, now_ms: int) -> String:
 	match str(slot.get("state", "")):
@@ -45,6 +46,7 @@ static func seed_lot(inventory: Dictionary, crop: String) -> String:
 	return "bound" if int(lot.get("bound", 0)) > 0 else "bought"
 
 static func sowing_options(cells: Dictionary, state: Dictionary, unlocked: Array) -> Dictionary:
+	if JourneyProgress.active(state): return {"crops": unlocked, "room": cells.size()}
 	if not _first_harvest_pending(state):
 		return {"crops": unlocked, "room": cells.size()}
 	var planted := 0
@@ -57,7 +59,8 @@ static func sowing_options(cells: Dictionary, state: Dictionary, unlocked: Array
 ## 优先级：能收的先收（有产出）→ 待照料（否则不长）→ 能播就播 → 翻土 → 清理 → 卖菜 → 等。
 ## `action` 为 "stall" 表示该去摊位；"" 表示没事可做。
 static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_crop: String,
-		unlocked_crops: Array) -> Dictionary:
+		unlocked_crops: Array, prefer_selected := false) -> Dictionary:
+	if JourneyProgress.active(state): state = state.merged({"cells": cells}, true)
 	var by_step := {"harvest": [], "care": [], "sow": [], "till": [], "clear": []}
 	var growing_unripe := 0
 	var first_batch := _first_harvest_pending(state)
@@ -85,12 +88,45 @@ static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_cro
 		var result := _mk("care", by_step.care, "%s %d %s" % [verb, by_step.care.size(), _plots(by_step.care.size())])
 		result.weather = conditions[0]
 		return result
+	if prefer_selected and JourneyProgress.active(state) and not first_batch \
+			and sowing.crops.has(selected_crop) and not by_step.sow.is_empty():
+		var count := mini(by_step.sow.size(), mini(int(sowing.room), seeds_of(inventory, selected_crop)))
+		if count > 0:
+			var selected := _mk("sow", by_step.sow.slice(0, count), "Sow %d %s" % [count, CropInfo.name_of(selected_crop)])
+			selected.crop = selected_crop
+			return selected
+	if JourneyProgress.active(state) and (not str(state.journey.get("tracked_project", "")).is_empty() \
+			or not JourneyGatherings.planned(state).is_empty() or not JourneyRequests.tracked(state).is_empty()):
+		var goal := JourneyProgress.tracked_goal(state, now_ms)
+		if not goal.is_empty():
+			if goal.place == "farm" and goal.get("action") == "stall":
+				var buy := _mk("stall", [], str(goal.hint))
+				buy.crop = goal.crop
+				return buy
+			if goal.get("action") == "wait": goal = JourneyProgress._gather_goal(state)
+			if goal.place != "farm":
+				return _explore(goal)
+	if JourneyProgress.active(state):
+		var meal := JourneyProgress.first_meal_goal(state)
+		if not meal.is_empty():
+			return _explore(meal)
+	if JourneyProgress.active(state) and first_batch:
+		if growing_unripe > 0:
+			var goal := JourneyProgress.next_goal(state)
+			return _explore(goal)
+		by_step.clear = by_step.clear.slice(0, 3)
+	if JourneyProgress.active(state) and growing_unripe > 0 and JourneyProgress.needed_crop(state, cells).is_empty():
+		var goal := JourneyProgress.next_goal(state)
+		return _explore(goal)
 	if not by_step.sow.is_empty():
 		var crop := _crop_with_seeds(inventory, selected_crop, sowing.crops)
+		var needed := JourneyProgress.needed_crop(state, cells) if JourneyProgress.active(state) else ""
+		if not needed.is_empty() and seeds_of(inventory, needed) > 0: crop = needed
 		var room := int(sowing.room)
 		if not crop.is_empty() and room > 0:
 			var n := mini(by_step.sow.size(), seeds_of(inventory, crop))
 			n = mini(n, room)
+			if crop == needed: n = mini(n, 1)
 			var r := _mk("sow", by_step.sow.slice(0, n), "Sow %d %s" % [n, CropInfo.name_of(crop)])
 			r.crop = crop
 			return r
@@ -98,10 +134,19 @@ static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_cro
 		return _mk("till", by_step.till, "Till %d %s" % [by_step.till.size(), _plots(by_step.till.size())])
 	if not by_step.clear.is_empty():
 		return _mk("clear", by_step.clear, "Clear %d %s" % [by_step.clear.size(), _plots(by_step.clear.size())])
-	var produce: Dictionary = inventory.get("produce", {})
-	var total := 0
-	for c in produce:
-		total += int(produce[c])
+	if JourneyProgress.active(state):
+		var goal := JourneyProgress.next_goal(state)
+		if not by_step.sow.is_empty() and _crop_with_seeds(inventory, selected_crop, sowing.crops).is_empty() and not sowing.crops.is_empty():
+			var crop := JourneyProgress.needed_crop(state, cells)
+			if crop.is_empty(): crop = selected_crop if sowing.crops.has(selected_crop) else str(sowing.crops[0])
+			goal = JourneyProgress._crop_goal(state, crop, 1, now_ms)
+			if goal.get("action") == "stall":
+				var buy := _mk("stall", [], str(goal.hint))
+				buy.crop = crop
+				return buy
+		if goal.place == "farm": goal = JourneyProgress._gather_goal(state)
+		return _explore(goal)
+	var total := _sellable_produce(state)
 	if total > 0:
 		return _mk("stall", [], "Sell %d at the stall" % total)
 	# D0's lettuce belongs to the post-harvest batch; planting it early delays that chapter fact.
@@ -118,6 +163,27 @@ static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_cro
 	var done := _mk("", [], "All done for today")
 	done.enabled = false
 	return done
+
+static func _explore(goal: Dictionary) -> Dictionary:
+	var result := _mk("explore", [], str(goal.label))
+	result.place = goal.place
+	if goal.has("target"): result.target = goal.target
+	if goal.has("surface"): result.surface = goal.surface
+	return result
+
+static func _sellable_produce(state: Dictionary) -> int:
+	var produce: Dictionary = state.get("inventory", {}).get("produce", {})
+	var reserved: Dictionary = state.get("engineering", {}).get("reserved", {})
+	var room := maxi(0, int(_economy.get("stall_budget_per_day", 0)) - int(state.get("stall", {}).get("settled", 0)))
+	var total := 0
+	for crop in CropInfo.ORDER:
+		var price := CropInfo.unit_price(crop)
+		if price <= 0: continue
+		var available := maxi(0, int(produce.get(crop, 0)) - int(reserved.get(crop, 0)))
+		var sellable := mini(available, room / price)
+		total += sellable
+		room -= sellable * price
+	return total
 
 static func _first_harvest_pending(state: Dictionary) -> bool:
 	if int((state.get("clock", {}) as Dictionary).get("chapter_index", -1)) != 0:

@@ -7,10 +7,11 @@ import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../src/domain/
 
 async function main(): Promise<void> {
   const { values } = parseArgs({
-    options: { apply: { type: 'boolean', default: false }, help: { type: 'boolean', default: false } },
+    options: { apply: { type: 'boolean', default: false }, help: { type: 'boolean', default: false },
+      'previous-content-version': { type: 'string' } },
   });
   if (values.help) {
-    console.log('Usage: MIGRATION_DATABASE_URL=<dsn> pnpm exec tsx tools/migrate_domain.ts [--apply]');
+    console.log('Usage: MIGRATION_DATABASE_URL=<dsn> pnpm exec tsx tools/migrate_domain.ts [--apply] [--previous-content-version <hash>]');
     console.log('Defaults to dry-run. Uses ASSET_ROOT when set; never loads .env or runs schema migration.');
     return;
   }
@@ -22,7 +23,8 @@ async function main(): Promise<void> {
   const currentContentVersion = contentVersion(contentDir);
   const pool = new pg.Pool({ connectionString, max: 1, connectionTimeoutMillis: 5000 });
   try {
-    const report = await migrateDomain(pool, { contentVersion: currentContentVersion, apply: values.apply });
+    const report = await migrateDomain(pool, { contentVersion: currentContentVersion,
+      previousContentVersion: values['previous-content-version'] ?? contentVersion(contentDir, true), apply: values.apply });
     console.log(JSON.stringify(report, null, 2));
     if (report.status === 'refused') process.exitCode = 2;
   } finally {

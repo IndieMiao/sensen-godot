@@ -17,6 +17,7 @@ static func name_of(id: String) -> String:
 	return str(data().get("props", {}).get(id, {}).get("name", id.capitalize()))
 
 static func unlocked(state: Dictionary) -> bool:
+	if JourneyProgress.active(state): return JourneyProgress.fact(state, "planter_crafted") or JourneyProgress.unlocked(state, "decorations")
 	return state.get("growth_choice", {}).get("purchase") in ["tool", "field"]
 
 static func saved(state: Dictionary) -> Array:
@@ -26,7 +27,9 @@ static func saved(state: Dictionary) -> Array:
 static func canonical(props: Array) -> Array:
 	var result := []
 	for prop in props:
-		result.append(entry(str(prop.prop_id), Vector2i(int(prop.offset_q[0]), int(prop.offset_q[1]))))
+		var value := entry(str(prop.prop_id), Vector2i(int(prop.offset_q[0]), int(prop.offset_q[1])))
+		if int(prop.get("rotation_q", 0)) != 0: value.rotation_q = int(prop.rotation_q)
+		result.append(value)
 	result.sort_custom(func(a, b): return IDS.find(str(a.prop_id)) < IDS.find(str(b.prop_id)))
 	return result
 
@@ -43,7 +46,11 @@ static func is_valid(props: Array) -> bool:
 	var seen := {}
 	var positions: Array[Vector2i] = []
 	for value in props:
-		if not value is Dictionary or value.size() != 3: return false
+		if not value is Dictionary or value.size() < 3 or value.size() > 4: return false
+		for key in value:
+			if key not in ["anchor_id", "prop_id", "offset_q", "rotation_q"]: return false
+		var rotation = value.get("rotation_q", 0)
+		if not (rotation is int or rotation is float) or not is_finite(float(rotation)) or float(rotation) != roundf(float(rotation)) or rotation < 0 or rotation > 3: return false
 		if str(value.get("anchor_id", "")) != str(data().anchor_id): return false
 		var id := str(value.get("prop_id", ""))
 		if not IDS.has(id) or seen.has(id): return false
@@ -79,7 +86,7 @@ static func with_position(props: Array, id: String, q: Vector2i) -> Array:
 	var next := props.duplicate(true)
 	var index := index_of(next, id)
 	if index < 0: next.append(entry(id, q))
-	else: next[index] = entry(id, q)
+	else: next[index].offset_q = [q.x, q.y]
 	return canonical(next)
 
 static func first_position(id: String, props: Array) -> Variant:
@@ -94,15 +101,16 @@ static func first_position(id: String, props: Array) -> Variant:
 			if is_valid(with_position(props, id, q)): return q
 	return null
 
-static func build(props: Array, selected_id := "") -> Node3D:
+static func build(props: Array, selected_id := "", planted := true) -> Node3D:
 	var root := Node3D.new()
 	root.name = "Decorations"
 	if not is_valid(props): return root
 	for prop in props:
 		var id := str(prop.prop_id)
-		var mesh := _prop(id)
+		var mesh := _prop(id, planted)
 		mesh.name = id
 		mesh.position = world_position(prop)
+		mesh.rotation.y = int(prop.get("rotation_q", 0)) * PI * 0.5
 		mesh.set_meta("prop_id", id)
 		root.add_child(mesh)
 		if id == selected_id:
@@ -122,7 +130,7 @@ static func build(props: Array, selected_id := "") -> Node3D:
 			root.add_child(ring)
 	return root
 
-static func _prop(id: String) -> MeshInstance3D:
+static func _prop(id: String, planted := true) -> MeshInstance3D:
 	if id == "crate": return FarmProps.build("storage", Vector3.ZERO, 1.0)
 	var s := SurfaceTool.new()
 	s.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -130,7 +138,7 @@ static func _prop(id: String) -> MeshInstance3D:
 		"bench": Scenery._bench(s, Vector3.ZERO, Scenery.BLUE)
 		"planter":
 			Scenery._planter(s, Vector3.ZERO, Vector2(0.65, 0.6), Scenery.CORAL)
-			Scenery._plants(s, "H", [Vector3(-0.13, 0.57, 0), Vector3(0.14, 0.53, 0.08)], 0.48)
+			if planted: Scenery._plants(s, "H", [Vector3(-0.13, 0.57, 0), Vector3(0.14, 0.53, 0.08)], 0.48)
 		"lantern":
 			Scenery._cylinder(s, 0.25, 0.07, Vector3(0, 0.035, 0), Scenery.STONE)
 			Scenery._box(s, Vector3(0.07, 0.5, 0.07), Vector3(0, 0.30, 0), Scenery.GREEN)

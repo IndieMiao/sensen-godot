@@ -4,6 +4,8 @@ Target: 15 minutes, an isolated QA farm, and the current development build.
 Production time, crop durations, rewards and chapter requirements stay unchanged.
 The Director only changes the server QA clock; never edit chapter flags in a save.
 
+Physical feature verification on vivo `10AFAF162200319` is complete, including a continuous seven-chapter touch route and ordinary-APK restart recovery. Follow [G3 Physical Android Validation](g3-physical-2026-09-05.md) for evidence and completed device restoration. Human presentation and performance acceptance remain open; the automated route took 18m24.493s.
+
 ## Before Starting
 
 - Start `pnpm --dir server exec tsx tools/g3_qa_server.ts` from the repository root. It listens only on `127.0.0.1:3103` and uses `sensen_farm_g3_ui_qa`.
@@ -29,11 +31,12 @@ R = radish, L = lettuce, C = carrot, H = chamomile. The exact four-route action 
 ## Alternate Ending And Recovery
 
 - For the selling branch, sell each chapter's designated single crop and record that sale instead of a gift/keep. The six use decisions determine the ending; four or more gift/keep decisions unlock two journal pages and personalized photo staging.
-- Final life-route balances: tools 305, fourth bed 145; account value 545 and XP 301. Final selling-route balances: tools 376, fourth bed 200 with two radishes unsold because the daily stall budget is 100.
+- Final life-route balances: tools 305, fourth bed 145; account value 545 and XP 301. Final selling-route balances: tools 376, fourth bed 200 with two radishes unsold: D6 settles 95/100 coins, and the remaining five cannot buy another eight-coin radish.
 - The week summary records its first valid completion moment. Later sales or purchases change the live wallet, not the recorded photograph/journal snapshot.
-- During a failed request, use the panel's check/reconnect control. Confirm the original action before making another purchase, gift, meal or layout save.
+- If a request finishes without a confirmed result, use the panel's check/reconnect control. Normal in-flight plot commands do not show the farm reconnect control solely because their envelope has been saved.
+- The ordinary APK persists the original envelope before sending it. After force-stop, retain the same installation key/account and server URL: login and farm identification precede recovery with the original idempotency key. Wait for reconciliation before another purchase, gift, meal or layout save. Do not switch between the direct QA server and a fault-proxy URL while an action remains unresolved; endpoint identity is part of the journal scope.
 - The automated desktop runner is `godot --path . --resolution 390x844 tools/dev/g3_week_ui.tscn -- --week-path=tool --week-style=life`. It drives real controls and plot callbacks over HTTP, saves screenshots and a JSON report, and restores its local installation/farm settings.
 
 ## Acceptance Boundary
 
-Domain tests, public HTTP persistence tests, desktop controls and Android rendering are separate evidence. An emulator run does not complete physical-device acceptance. After testing, restore all device settings byte-for-byte, remove the temporary endpoint override and stop the loopback QA server.
+Domain tests, public HTTP persistence tests, desktop controls and Android rendering are separate evidence. The earlier desktop/emulator checkpoint in [G3 Playable Week](g3-seven-day-2026-09-05.md) is historical evidence; an emulator run does not complete physical-device acceptance. After testing, restore all device settings byte-for-byte, remove the temporary endpoint override and stop the loopback QA server. Record completion of those steps in the physical validation record; the instructions here do not assert that restoration has already occurred.

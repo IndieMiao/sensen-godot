@@ -38,7 +38,7 @@ export function derive(s: FarmState, now: number, timezone: string, c: Content):
   const prevDone = s.chapters[s.clock.chapter_index]?.status === 'done';
   // 每个玩家日最多激活一个新章节（PRD §9.1 L667）；漏一天后继续未完成章节，不跳章。
   const activatedDay = s.chapters[s.clock.chapter_index]?.activated_day ?? s.clock.player_day_id;
-  const opens = prevDone && activatedDay < day && s.clock.chapter_index < lastChapter;
+  const opens = !s.journey && prevDone && activatedDay < day && s.clock.chapter_index < lastChapter;
   const ripe: string[] = [];
   for (const [id, cell] of Object.entries(s.cells))
     if (cell.state === 'growing' && cell.ready_at !== null && cell.ready_at <= now) ripe.push(id);
@@ -51,7 +51,7 @@ export function derive(s: FarmState, now: number, timezone: string, c: Content):
       : (s.qa?.weather?.[String(s.clock.weather_day_index)] ?? s.clock.field_condition),
     chapter_index: opens ? s.clock.chapter_index + 1 : s.clock.chapter_index,
     opens_new_chapter: opens,
-    next_chapter_opens_at: prevDone && !opens && s.clock.chapter_index < lastChapter
+    next_chapter_opens_at: !s.journey && prevDone && !opens && s.clock.chapter_index < lastChapter
       ? nextDayStartMs(now, timezone) : null,
     ripe_cells: ripe.sort(),
   };

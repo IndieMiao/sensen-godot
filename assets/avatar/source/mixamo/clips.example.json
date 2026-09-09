@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "_note": "复制为 clips.json 并把 file 改成实际下载的 Mixamo FBX 文件名。key 必须与 anim_placeholders.json 里占位条目的 clip_id 一致，管线才会自动把动作转正。",
+  "fps": 30,
+  "clips": {
+    "labour_till":    {"file": "Digging.fbx",        "loop": true,  "in_place": true},
+    "labour_clear":   {"file": "Digging.fbx",        "loop": true,  "in_place": true, "speed": 1.2},
+    "labour_sow":     {"file": "Picking Up.fbx",     "loop": true,  "in_place": true},
+    "labour_water":   {"file": "Crouch Idle.fbx",    "loop": true,  "in_place": true},
+    "labour_drain":   {"file": "Crouch Idle.fbx",    "loop": true,  "in_place": true},
+    "labour_shelter": {"file": "Picking Up.fbx",     "loop": true,  "in_place": true},
+    "labour_harvest": {"file": "Picking Up.fbx",     "loop": true,  "in_place": true},
+    "emote_wave":     {"file": "Waving.fbx",         "loop": false, "in_place": true}
+  }
+}

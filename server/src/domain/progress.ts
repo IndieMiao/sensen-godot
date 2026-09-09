@@ -5,6 +5,7 @@ import { materializeDay } from './handlers/day.js';
 import type { Ctx } from './reducer.js';
 import type { FarmState } from './state.js';
 import { reconcileWeekSummary } from './week_summary.js';
+import { reconcileJourney } from './journey.js';
 
 const nextSown = (id: string) => `next_batch_sown:${id}`;
 const nextCared = (id: string) => `next_batch_cared:${id}`;
@@ -64,6 +65,7 @@ function reconcileChapter(s: FarmState, content: Content, blueprint: Ctx['bluepr
 
 /** Called only after a successful command. Rejections cannot leave progress evidence. */
 export function recordChapterProgress(before: FarmState, after: FarmState, cmd: Command, ctx: Ctx): FarmState {
+  if (after.journey) return reconcileJourney(after, ctx.content);
   const next = structuredClone(after);
   const index = next.clock.chapter_index;
   const chapter = next.chapters[index];
@@ -102,6 +104,10 @@ export function projectFarmState(
   s: FarmState, now: number, timezone: string, content: Content, blueprint: Ctx['blueprint'],
 ): FarmState {
   const next = structuredClone(s);
+  if (next.journey) {
+    const ctx: Ctx = { now, timezone, content, blueprint, derived: derive(next, now, timezone, content) };
+    return reconcileJourney(materializeDay(next, ctx).state, content);
+  }
   reconcileChapter(next, content, blueprint);
   // Legacy completed saves project the same snapshot repeatedly, anchored to their last persisted action.
   reconcileWeekSummary(next, content, next.clock.last_effective_now);

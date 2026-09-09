@@ -98,7 +98,7 @@ for (const storage of ['memory', 'postgres'] as const) {
           ? new MemoryStore({ content, contentVersion: cv, timezone: city.zone, blueprint: sets, now: () => clock })
           : new PgStore({ pool: pool!, content, contentVersion: cv, timezone: () => city.zone,
             blueprint: () => sets, now: () => clock });
-        app = await buildApp({ store, content, contentVersion: cv, blueprintDir,
+        app = await buildApp({ store, content, contentVersion: cv, blueprintDir, legacyGameplay: true,
           regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: 'chapter-test', now: () => clock });
         installKey = newInstallKey();
         await login();

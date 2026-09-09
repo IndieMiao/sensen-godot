@@ -18,5 +18,6 @@ static func unlock_chapter(crop: String) -> int:
 		_table["_loaded"] = 1
 	return int(_table.get(crop, 0))
 
-static func unlocked(crops: Array, chapter_index: int) -> Array:
+static func unlocked(crops: Array, chapter_index: int, state: Dictionary = {}) -> Array:
+	if JourneyProgress.active(state): return crops.filter(func(id): return JourneyProgress.crops(state).has(id))
 	return crops.filter(func(c): return unlock_chapter(str(c)) <= chapter_index)

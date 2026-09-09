@@ -10,5 +10,6 @@ static func find(id: String) -> Dictionary:
 	return {}
 
 static func available(id: String, state: Dictionary) -> bool:
+	if JourneyProgress.active(state): return id in ["nursery", "courtyard"] or id == "bistro" and JourneyProgress.unlocked(state, "bistro")
 	var place := find(id)
 	return not place.is_empty() and state.has("clock") and int(state.clock.get("chapter_index", -1)) >= int(place.chapter)

@@ -32,7 +32,8 @@ theme/custom_font="res://assets/ui/fonts/NotoSansSC-Regular.otf"
 
 [input_devices]
 
-pointing/android/enable_pan_and_scale_gestures=true
+pointing/android/enable_pan_and_scale_gestures=false
+pointing/android/disable_scroll_deadzone=true
 
 [editor_plugins]
 enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")

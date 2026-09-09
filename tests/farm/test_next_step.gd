@@ -60,6 +60,46 @@ func test_produce_in_hand_points_to_the_stall_before_waiting() -> void:
 	assert_str(b.action).is_equal("stall")
 	assert_str(b.label).is_equal("Sell 2 at the stall")
 
+func test_stall_budget_too_small_for_one_item_falls_back_to_growing() -> void:
+	var state := _state({}, {"R": 2})
+	state.stall = {"settled": 95}
+	state.inventory.dishes = {"salad": 1}
+	var bulk := NextStep.bulk({"a": _slot("growing", "R", 999)}, 0, state, "R", ["R"])
+	assert_str(bulk.action).is_equal("")
+	assert_str(bulk.label).is_equal("Crops are growing")
+	assert_bool(bulk.enabled).is_false()
+
+func test_stall_recommendation_counts_only_the_quantity_that_fits_the_budget() -> void:
+	var state := _state({}, {"R": 3})
+	state.stall = {"settled": 84}
+	var bulk := NextStep.bulk({}, 0, state, "R", ["R"])
+	assert_str(bulk.action).is_equal("stall")
+	assert_str(bulk.label).is_equal("Sell 2 at the stall")
+	assert_bool(bulk.enabled).is_true()
+	state.stall.settled = 100
+	bulk = NextStep.bulk({"a": _slot("tilled")}, 0, state, "R", ["R"])
+	assert_str(bulk.label).is_equal("Buy seeds at the stall")
+
+func test_stall_recommendation_shares_the_budget_in_stall_crop_order() -> void:
+	var state := _state({}, {"L": 2, "R": 2})
+	state.stall = {"settled": 76}
+	var bulk := NextStep.bulk({}, 0, state, "R", ["R", "L"])
+	assert_str(bulk.label).is_equal("Sell 2 at the stall")
+	assert_dict(state.inventory.produce).is_equal({"L": 2, "R": 2})
+	assert_int(state.stall.settled).is_equal(76)
+
+func test_engineering_reservations_reduce_sale_count_and_preserve_other_next_steps() -> void:
+	var state := _state({}, {"C": 3, "H": 4})
+	state.engineering = {"reserved": {"C": 2, "H": 4}}
+	var bulk := NextStep.bulk({}, 0, state, "C", CropInfo.ORDER)
+	assert_str(bulk.label).is_equal("Sell 1 at the stall")
+	state.inventory.produce.C = 2
+	bulk = NextStep.bulk({"a": _slot("growing", "C", 999)}, 0, state, "C", CropInfo.ORDER)
+	assert_str(bulk.label).is_equal("Crops are growing")
+	assert_bool(bulk.enabled).is_false()
+	bulk = NextStep.bulk({"a": _slot("tilled")}, 0, state, "C", CropInfo.ORDER)
+	assert_str(bulk.label).is_equal("Buy seeds at the stall")
+
 func test_waiting_and_done_are_disabled_states() -> void:
 	var growing := NextStep.bulk({"a": _slot("growing", "R", 999)}, 0, _state({}), "R", ["R"])
 	assert_bool(growing.enabled).is_false()

@@ -122,6 +122,28 @@ func test_pending_resident_interaction_cannot_be_bypassed_from_economy_tab() -> 
 	assert_bool(await panel._resolve(2, "keep")).is_false()
 	assert_int(pair[2].requests.size()).is_equal(0)
 
+func test_online_panel_offers_recovery_for_a_command_restored_after_restart() -> void:
+	var initial := _state(2)
+	var saved := initial.duplicate(true)
+	saved.engineering.reserved = {"C": 1}
+	var pair := _panel(initial, "project", [_reply(saved), _reply(saved)])
+	var envelope := {"idempotency_key": "saved-before-restart", "base_version": 1,
+		"type": "reserve_engineering", "payload": {"items": {"C": 1}}}
+	pair[1]._unconfirmed_command = envelope.duplicate(true)
+	var panel: EconomyPanel = pair[0]
+	await get_tree().process_frame
+	assert_bool(pair[1].offline).is_false()
+	var reconnect := _button(panel, "ReconnectSession")
+	assert_object(reconnect).is_not_null()
+	assert_bool(reconnect.disabled).is_false()
+	reconnect.pressed.emit()
+	for index in 3: await get_tree().process_frame
+	assert_bool(pair[1].has_unconfirmed_command()).is_false()
+	assert_that(pair[2].requests.map(func(request): return request.method)).is_equal(["POST", "GET"])
+	assert_that(pair[2].requests[0].body).is_equal(JSON.parse_string(JSON.stringify(envelope)))
+	assert_int(pair[1].state.engineering.reserved.C).is_equal(1)
+	assert_object(_button(panel, "ReconnectSession")).is_null()
+
 func test_choice_sale_is_disabled_at_daily_budget_and_keep_excludes_project_reservations() -> void:
 	var initial := _state(5)
 	initial.stall.settled = 100

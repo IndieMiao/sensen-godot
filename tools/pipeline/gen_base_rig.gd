@@ -1,6 +1,7 @@
 ## 用法: godot --headless --path . --script res://tools/pipeline/gen_base_rig.gd
 ## 生成 base_rig.tscn —— 所有场景实例化角色的唯一入口：
-## AvatarRig 根 + 62 骨 Skeleton3D（无网格子节点）+ idle/walk/run 动画库。
+## AvatarRig 根 + 62 骨 Skeleton3D（无网格子节点）+ idle/walk/run 动画库；
+## 若存在 Mixamo 清单，再把劳作/表情 clip 重定向进同一个动画库（见 mixamo_retarget.gd）。
 extends SceneTree
 
 const BASE_FBX := "res://assets/avatar/source/base/SK_DtBase.fbx"
@@ -90,7 +91,13 @@ func _initialize() -> void:
 	src.free()
 	rig.free()
 	print("base_rig 生成完成 err=%d 骨骼数=%d" % [err, bone_count])
-	quit(0 if err == OK else 1)
+	# Mixamo clip 与 idle/walk/run 同库；这里重跑一遍，否则全量重生成会把它们冲掉。
+	var mixamo_code := 0
+	if FileAccess.file_exists(MixamoRetarget.DEFAULT_MANIFEST):
+		mixamo_code = MixamoRetarget.build_from_manifest(MixamoRetarget.DEFAULT_MANIFEST, OUT_LIB, true)
+	else:
+		print("未发现 Mixamo 清单 %s，跳过劳作 clip（见 assets/avatar/source/mixamo/README.md）" % MixamoRetarget.DEFAULT_MANIFEST)
+	quit(0 if err == OK and mixamo_code == 0 else 1)
 
 func _normalize_track_paths(anim: Animation, anim_key: String) -> void:
 	var samples := 0

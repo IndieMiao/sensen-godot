@@ -42,15 +42,20 @@ var _next_ticket := 0
 var _serving := 0
 ## Retain the exact envelope until the server has resolved a response that may have been lost.
 var _unconfirmed_command: Dictionary = {}
+var _journal_directory := FarmCommandJournal.DEFAULT_DIRECTORY
+var _journal: FarmCommandJournal
+var _installation_digest := ""
+var _authenticated_endpoint := ""
 
-func _init(p_client: ApiClient) -> void:
+func _init(p_client: ApiClient, journal_directory := FarmCommandJournal.DEFAULT_DIRECTORY) -> void:
 	client = p_client
+	_journal_directory = journal_directory
 
 func logged_in() -> bool:
 	return client != null and not client.token.is_empty()
 
 func has_unconfirmed_command() -> bool:
-	return not _unconfirmed_command.is_empty()
+	return not _unconfirmed_command.is_empty() or (_journal != null and _journal.error != OK)
 
 func has_farm() -> bool:
 	return not farm_id.is_empty()
@@ -62,7 +67,19 @@ func server_now() -> int:
 	return int(Time.get_unix_time_from_system() * 1000.0) + clock_offset_ms
 
 func login() -> bool:
-	var r: ApiClient.Response = await client.request("POST", "/auth/anonymous", {"install_key": ApiClient.install_key()})
+	# Authentication must wait for old requests to finish adopting/clearing their account's journal.
+	var ticket := _next_ticket
+	_next_ticket += 1
+	while _serving != ticket:
+		await Engine.get_main_loop().process_frame
+	var result := await _login_serialized()
+	_serving += 1
+	return result
+
+func _login_serialized() -> bool:
+	var installation_key := ApiClient.install_key()
+	var endpoint := client.base_url
+	var r: ApiClient.Response = await client.request("POST", "/auth/anonymous", {"install_key": installation_key})
 	if not _track(r):
 		last_error_code = "TRANSPORT"
 		return false
@@ -70,19 +87,41 @@ func login() -> bool:
 		# 429 = 登录限流（每 IP 每小时 10 次）；记下来，否则「登录失败」和断网分不清。
 		last_error_code = str(r.json.get("code", "HTTP_%d" % r.status))
 		return false
-	player_id = str(r.json.get("player_id", ""))
+	if endpoint != client.base_url:
+		last_error_code = "SESSION_CHANGED"
+		rejected.emit(last_error_code, "Reconnect to the selected server")
+		return false
+	var authenticated_player := str(r.json.get("player_id", ""))
+	if not _installation_digest.is_empty() and (player_id != authenticated_player \
+			or _installation_digest != installation_key.sha256_text() or _authenticated_endpoint != client.base_url):
+		_reset_authenticated_farm()
+	player_id = authenticated_player
 	client.token = str(r.json.get("token", ""))
+	_installation_digest = installation_key.sha256_text()
+	_authenticated_endpoint = client.base_url
 	return not client.token.is_empty()
 
 ## 已有农场就取回来，没有就建一个。
 func ensure_farm(region_id: String, layout_patch_id: String, revision: int, placement: Dictionary = {}) -> bool:
+	var ticket := _next_ticket
+	_next_ticket += 1
+	while _serving != ticket:
+		await Engine.get_main_loop().process_frame
+	var result := await _ensure_farm_serialized(region_id, layout_patch_id, revision, placement)
+	_serving += 1
+	return result
+
+func _ensure_farm_serialized(region_id: String, layout_patch_id: String, revision: int, placement: Dictionary) -> bool:
 	last_error_code = ""
-	var me: ApiClient.Response = await client.request("GET", "/farms/me")
+	if not _journal_ready(): return false
+	var request_client := _command_client_snapshot()
+	var me: ApiClient.Response = await request_client.request("GET", "/farms/me")
 	if not _track(me):
 		last_error_code = "TRANSPORT"
 		return false
 	if me.is_success():
 		_adopt(me.json)
+		if has_unconfirmed_command(): return await _refresh_serialized(request_client)
 		return true
 	if me.status != 404:
 		last_error_code = str(me.json.get("code", "HTTP_%d" % me.status))
@@ -91,7 +130,7 @@ func ensure_farm(region_id: String, layout_patch_id: String, revision: int, plac
 		if not FarmPlacement.is_valid(placement):
 			return _reject_placement("INVALID_LOCATION", "Choose a valid farm location")
 		# An older server ignores unknown create fields, which would silently create at the template.
-		var regions: ApiClient.Response = await client.request("GET", "/regions")
+		var regions: ApiClient.Response = await request_client.request("GET", "/regions")
 		if not _track(regions):
 			last_error_code = "TRANSPORT"
 			return false
@@ -105,7 +144,7 @@ func ensure_farm(region_id: String, layout_patch_id: String, revision: int, plac
 	}
 	if not placement.is_empty():
 		payload["location"] = placement.duplicate()
-	var r: ApiClient.Response = await client.request("POST", "/farms", payload)
+	var r: ApiClient.Response = await request_client.request("POST", "/farms", payload)
 	if not _track(r):
 		last_error_code = "TRANSPORT"
 		return false
@@ -128,15 +167,28 @@ func refresh() -> bool:
 	_next_ticket += 1
 	while _serving != ticket:
 		await Engine.get_main_loop().process_frame
+	var result := await _refresh_serialized()
+	_serving += 1
+	return result
+
+func _refresh_serialized(request_client: ApiClient = null) -> bool:
+	if not _journal_ready(request_client): return false
+	if request_client == null: request_client = _command_client_snapshot()
+	if _unconfirmed_command.is_empty():
+		if not await _read_farm(request_client): return false
+		# Startup must authenticate and identify the farm before loading its journal.
+		if not _journal_ready(request_client): return false
+		if _unconfirmed_command.is_empty(): return true
 	if not _unconfirmed_command.is_empty():
-		var replay := await _request_command(_unconfirmed_command.duplicate(true), true)
+		var replay := await _request_command(_unconfirmed_command.duplicate(true), true, request_client)
 		if not _track(replay):
-			_serving += 1
 			return false
 		if _command_succeeded(replay) or str(replay.json.get("code", "")) == "VERSION_CONFLICT":
 			_adopt(replay.json)
-	var r: ApiClient.Response = await client.request("GET", "/farms/me")
-	_serving += 1
+	return await _read_farm(request_client)
+
+func _read_farm(request_client: ApiClient) -> bool:
+	var r: ApiClient.Response = await request_client.request("GET", "/farms/me")
 	if not _track(r):
 		return false
 	if r.is_success():
@@ -154,6 +206,9 @@ func send(type: String, payload: Dictionary, pending_owner: StringName = &"") ->
 	_next_ticket += 1
 	while _serving != ticket:
 		await Engine.get_main_loop().process_frame
+	if not _journal_ready():
+		_serving += 1
+		return false
 	if not _unconfirmed_command.is_empty():
 		_serving += 1
 		last_error_code = "PENDING_ACTION"
@@ -174,14 +229,19 @@ func _send_serialized(type: String, payload: Dictionary) -> bool:
 		last_error_code = "OFFLINE"
 		emit_signal("rejected", "OFFLINE", "离线中，命令未发送")
 		return false
-	var r := await _request_command(_command_envelope(type, payload))
+	if not _installation_digest.is_empty() and _journal == null:
+		last_error_code = "NO_FARM"
+		rejected.emit(last_error_code, "Reload your farm before sending commands")
+		return false
+	var command_client := _command_client_snapshot()
+	var r := await _request_command(_command_envelope(type, payload), false, command_client)
 	if not _track(r):
 		return false
 	if r.status == 409 and str(r.json.get("code", "")) == "VERSION_CONFLICT":
 		# 回包带着最新状态，先对账再用**新 key** 重发（同 key 换 base_version 会被判
 		# IDEMPOTENCY_MISMATCH）。
 		_adopt(r.json)
-		r = await _request_command(_command_envelope(type, payload))
+		r = await _request_command(_command_envelope(type, payload), false, command_client)
 		if not _track(r):
 			return false
 	if _command_succeeded(r):
@@ -195,12 +255,16 @@ func _send_serialized(type: String, payload: Dictionary) -> bool:
 func _command_envelope(type: String, payload: Dictionary) -> Dictionary:
 	return {"idempotency_key": _new_key(), "base_version": version, "type": type, "payload": payload.duplicate(true)}
 
-func _request_command(envelope: Dictionary, recovering := false) -> ApiClient.Response:
+func _request_command(envelope: Dictionary, recovering := false, command_client: ApiClient = null) -> ApiClient.Response:
+	if _journal != null and not _journal.write_command(envelope):
+		return ApiClient.Response.new(false, 0, {"code": "LOCAL_STORAGE"})
+	_unconfirmed_command = envelope.duplicate(true)
+	if command_client == null: command_client = _command_client_snapshot()
 	var uncertain := recovering
-	var r := await _post_command(str(envelope.idempotency_key), int(envelope.base_version), str(envelope.type), envelope.payload)
+	var r := await _post_command(command_client, str(envelope.idempotency_key), int(envelope.base_version), str(envelope.type), envelope.payload)
 	if not r.ok:
 		uncertain = true
-		r = await _post_command(str(envelope.idempotency_key), int(envelope.base_version), str(envelope.type), envelope.payload)
+		r = await _post_command(command_client, str(envelope.idempotency_key), int(envelope.base_version), str(envelope.type), envelope.payload)
 	var final_response := r.is_success() or r.status == 422 \
 		or (r.status == 409 and str(r.json.get("code", "")) == "VERSION_CONFLICT") \
 		or (r.status == 503 and str(r.json.get("code", "")) == "VERSION_MISMATCH")
@@ -208,19 +272,67 @@ func _request_command(envelope: Dictionary, recovering := false) -> ApiClient.Re
 	if not r.ok or (r.status >= 500 and not final_response) or (uncertain and not final_response):
 		_unconfirmed_command = envelope.duplicate(true)
 		return ApiClient.Response.new(false, r.status, r.json, r.error)
+	if _journal != null and not _journal.clear():
+		return ApiClient.Response.new(false, 0, {"code": "LOCAL_STORAGE"})
 	_unconfirmed_command.clear()
 	return r
+
+func _command_client_snapshot() -> ApiClient:
+	var snapshot := ApiClient.new(client.base_url, client.transport)
+	snapshot.token = client.token
+	return snapshot
+
+func _journal_ready(request_client: ApiClient = null) -> bool:
+	var endpoint := request_client.base_url if request_client != null else client.base_url
+	if not _authenticated_endpoint.is_empty() and endpoint != _authenticated_endpoint:
+		last_error_code = "SESSION_CHANGED"
+		rejected.emit(last_error_code, "Reconnect to the selected server")
+		return false
+	if _journal != null and _journal.error != OK:
+		var recovered := _journal.read_command()
+		if _journal.error != OK:
+			last_error_code = "LOCAL_STORAGE"
+			rejected.emit(last_error_code, "Could not read the previous action")
+			return false
+		if not recovered.is_empty(): _unconfirmed_command = recovered
+	return true
+
+func _restore_command_journal() -> void:
+	# Unauthenticated fixtures have no persistent account. A real login supplies this scope.
+	if player_id.is_empty() or farm_id.is_empty() or _installation_digest.is_empty(): return
+	var journal := FarmCommandJournal.new(_journal_directory, _authenticated_endpoint, _installation_digest, player_id, farm_id)
+	if _journal != null and _journal.scope == journal.scope: return
+	_journal = journal
+	_unconfirmed_command = _journal.read_command()
+
+func _reset_authenticated_farm() -> void:
+	_journal = null
+	_unconfirmed_command.clear()
+	farm_id = ""
+	layout_patch_id = ""
+	blueprint_revision = 0
+	region_id = ""
+	location.clear()
+	version = -1
+	state = {}
+	derived = {}
+	for key in PENDING_COMMANDS:
+		if has_meta(key): remove_meta(key)
 
 static func _command_succeeded(response: ApiClient.Response) -> bool:
 	return response.is_success() and str(response.json.get("replayed_outcome", "")) != "rejected"
 
-func _post_command(key: String, base: int, type: String, payload: Dictionary) -> ApiClient.Response:
-	return await client.request("POST", "/farms/me/commands", {
+func _post_command(command_client: ApiClient, key: String, base: int, type: String, payload: Dictionary) -> ApiClient.Response:
+	return await command_client.request("POST", "/farms/me/commands", {
 		"idempotency_key": key, "base_version": base, "type": type, "payload": payload,
 	})
 
 ## 记录传输层成败并维护离线态。返回 false 表示这次连响应都没拿到。
 func _track(r: ApiClient.Response) -> bool:
+	if not r.ok and str(r.json.get("code", "")) == "LOCAL_STORAGE":
+		last_error_code = "LOCAL_STORAGE"
+		rejected.emit(last_error_code, "Could not save the previous action")
+		return false
 	if r.ok:
 		_failures = 0
 		if offline:
@@ -246,6 +358,7 @@ func _adopt(body: Dictionary) -> void:
 	if body.has("farm_id"):
 		farm_id = str(body.farm_id)
 		location = body.get("location", {}).duplicate() if FarmPlacement.is_valid(body.get("location")) else {}
+		_restore_command_journal()
 	if body.has("layout_patch_id"):
 		layout_patch_id = str(body.layout_patch_id)
 	if body.has("blueprint_revision"):

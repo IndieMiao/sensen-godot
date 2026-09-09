@@ -10,6 +10,7 @@ extends PanelContainer
 signal farm_focused(farm_id: String)
 signal visit_requested(farm_id: String)
 signal place_requested(place_id: String)
+signal close_requested()
 
 const CARD_MIN := Vector2(124, 52)
 const PREVIEW_H := 64.0
@@ -40,6 +41,11 @@ var _place_buttons: Dictionary = {}
 var _place_tab: Button
 var _farm_tab: Button
 var places_open := false
+var close_button: Button
+var bottom_inset := 0.0
+var max_height := 0.0
+var _body_scroll: ScrollContainer
+var _body: VBoxContainer
 
 func _init() -> void:
 	name = "NearbyPanel"
@@ -57,10 +63,22 @@ func _init() -> void:
 		tabs.add_child(tab)
 	_farm_tab.pressed.connect(func(): show_places(false))
 	_place_tab.pressed.connect(func(): show_places(true))
+	close_button = GameUi.button("x", "", "Close nearby panel")
+	close_button.name = "CloseNearby"
+	close_button.hide()
+	close_button.pressed.connect(func(): close_requested.emit())
+	tabs.add_child(close_button)
+	_body_scroll = ScrollContainer.new()
+	_body_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_body_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	vbox.add_child(_body_scroll)
+	_body = VBoxContainer.new()
+	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_body_scroll.add_child(_body)
 	_farm_content = VBoxContainer.new()
-	vbox.add_child(_farm_content)
+	_body.add_child(_farm_content)
 	_places = VBoxContainer.new()
-	vbox.add_child(_places)
+	_body.add_child(_places)
 	for place in PlaceCatalog.all():
 		var button := GameUi.button(str(place.icon), str(place.name), str(place.name))
 		button.pressed.connect(func(): place_requested.emit(str(place.id)))
@@ -93,6 +111,7 @@ func _init() -> void:
 	_row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	scroll.add_child(_row)
 	_build_preview(_farm_content)
+	_body.minimum_size_changed.connect(_apply_bottom_preset)
 	_apply_bottom_preset()
 
 func show_places(open: bool) -> void:
@@ -151,7 +170,20 @@ func _build_preview(parent: Node) -> void:
 ## 与 SelectPanel 同一个坑：PRESET_MODE_MINSIZE 按调用时刻的最小尺寸算 offset_top，
 ## 子节点变了必须重算，否则面板长到父容器底边以下。
 func _apply_bottom_preset() -> void:
+	if _body_scroll and _body:
+		var content_height := _body.get_combined_minimum_size().y
+		var chrome := get_combined_minimum_size().y - _body_scroll.get_combined_minimum_size().y
+		if max_height > 0: content_height = minf(content_height, maxf(44, max_height - chrome))
+		_body_scroll.custom_minimum_size.y = content_height
 	set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	offset_bottom = -bottom_inset
+	offset_top = offset_bottom - get_combined_minimum_size().y
+
+func set_available_space(bottom: float, height: float) -> void:
+	if is_equal_approx(bottom_inset, bottom) and is_equal_approx(max_height, height): return
+	bottom_inset = bottom
+	max_height = height
+	_apply_bottom_preset()
 
 ## `count` 是同城开放访问的总人数（人数簇）；`offline` 为真时说明条目来自随包样例。
 func set_entries(p_entries: Array, count: int, offline := false) -> void:

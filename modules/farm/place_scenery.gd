@@ -15,13 +15,16 @@ const WOOD := Color("b99773")
 const STONE := Color("d4ded5")
 const SOIL := Color("7b6957")
 
-static func build(place_id: String, state: Dictionary) -> Node3D:
+static func build(place_id: String, state: Dictionary, neighbourhood := false) -> Node3D:
 	var root := Node3D.new()
 	root.name = "PlaceScenery"
 	root.set_meta("place_id", place_id)
 	var surface := SurfaceTool.new()
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
-	_ground(surface)
+	_ground(surface, neighbourhood)
+	if neighbourhood:
+		for side in [-1.0, 1.0]:
+			root.add_child(FarmProps.build("house", Vector3(side * 4.8, -0.12, -8.2), 2.2))
 	match place_id:
 		"nursery":
 			var nursery: Dictionary = state.get("nursery", {})
@@ -50,8 +53,11 @@ static func build(place_id: String, state: Dictionary) -> Node3D:
 	root.add_child(scenery)
 	return root
 
-static func _ground(s: SurfaceTool) -> void:
-	_cylinder(s, 1.0, 0.14, Vector3(0, -0.07, 0), GRASS, Vector3(5, 1, 4), 40)
+static func _ground(s: SurfaceTool, neighbourhood := false) -> void:
+	if neighbourhood:
+		_neighbourhood_ground(s)
+	else:
+		_cylinder(s, 1.0, 0.14, Vector3(0, -0.07, 0), GRASS, Vector3(5, 1, 4), 40)
 	_box(s, Vector3(1.35, 0.025, 5.8), Vector3(0, 0.0125, 0.9), STONE)
 	for index in 9:
 		_box(s, Vector3(1.28, 0.008, 0.017), Vector3(0, 0.029, -1.6 + index * 0.64), STONE.darkened(0.08))
@@ -63,6 +69,28 @@ static func _ground(s: SurfaceTool) -> void:
 		_box(s, Vector3(0.10, 0.68, 0.10), Vector3(x, 0.34, -3.25), PAPER.darkened(0.08))
 	for y in [0.25, 0.52]:
 		_box(s, Vector3(5.1, 0.08, 0.08), Vector3(0, y, -3.25), PAPER.darkened(0.04))
+
+static func _neighbourhood_ground(s: SurfaceTool) -> void:
+	_box(s, Vector3(64, 0.15, 64), Vector3(0, -0.16, 0), GRASS.darkened(0.06))
+	for z in [-5.8, 6.2]:
+		_box(s, Vector3(64, 0.03, 2.5), Vector3(0, -0.06, z), Color("879b9d"))
+		for side in [-1.0, 1.0]:
+			_box(s, Vector3(64, 0.07, 0.75), Vector3(0, -0.025, z + side * 1.65), STONE)
+		for x in range(-12, 13, 2):
+			_box(s, Vector3(0.7, 0.005, 0.045), Vector3(x, -0.041, z), PAPER)
+	_box(s, Vector3(1.35, 0.07, 2.2), Vector3(0, -0.025, 4.35), STONE)
+	for i in 5:
+		_box(s, Vector3(1.35, 0.006, 0.21), Vector3(0, -0.04, 5.3 + i * 0.43), PAPER)
+	for side in [-1.0, 1.0]:
+		for z in [-10.6, 9.3]:
+			_tree(s, Vector3(side * 3.8, -0.09, z), 1.3)
+		for z in [-0.3, 1.1, 2.5]:
+			_oval(s, Vector3(0.8, 0.65, 1.2), Vector3(side * 5.1, 0.23, z), LEAF)
+	_box(s, Vector3(0.09, 0.95, 0.09), Vector3(1.05, 0.475, 3.7), WOOD)
+	_box(s, Vector3(0.72, 0.34, 0.07), Vector3(1.05, 0.96, 3.7), BLUE)
+	_box(s, Vector3(0.42, 0.055, 0.02), Vector3(1.05, 0.96, 3.745), PAPER)
+	_beam(s, Vector3(1.26, 0.96, 3.75), Vector3(1.1, 1.08, 3.75), 0.045, PAPER)
+	_beam(s, Vector3(1.26, 0.96, 3.75), Vector3(1.1, 0.84, 3.75), 0.045, PAPER)
 
 static func _nursery(s: SurfaceTool, stage: String, appearance: String) -> void:
 	var center := Vector3(0, 0, -1.85)

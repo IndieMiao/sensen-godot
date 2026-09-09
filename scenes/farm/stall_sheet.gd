@@ -13,6 +13,7 @@ const BUY_QTY := 3
 var _title: Label
 var _budget: Label
 var _rows: VBoxContainer
+var _scroll: ScrollContainer
 var _sell_all: Button
 var _sell_items: Array = []
 var _buy_qty := BUY_QTY
@@ -57,14 +58,14 @@ func _init() -> void:
 	_retry.pressed.connect(func():
 		if not _retry.disabled: retry_requested.emit())
 	v.add_child(_retry)
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	v.add_child(scroll)
+	_scroll = ScrollContainer.new()
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	v.add_child(_scroll)
 	_rows = VBoxContainer.new()
 	_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_rows.add_theme_constant_override("separation", 12)
-	scroll.add_child(_rows)
+	_scroll.add_child(_rows)
 
 func fit_height(area: Vector2) -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
@@ -85,9 +86,24 @@ func refresh(state: Dictionary, unlocked: Array, budget_per_day := 100) -> void:
 	_retry.disabled = _busy
 	var settled := int((state.get("stall", {}) as Dictionary).get("settled", 0))
 	_budget.text = "Today's sales %d / %d coins" % [settled, budget_per_day]
+	if JourneyProgress.active(state):
+		budget_per_day = 2147483647
+		_budget.text = "Neighbourhood stall"
 	var inv: Dictionary = state.get("inventory", {})
 	var produce: Dictionary = inv.get("produce", {})
 	var reserved: Dictionary = (state.get("engineering", {}) as Dictionary).get("reserved", {})
+	var project := str(state.get("journey", {}).get("tracked_project", ""))
+	var goal_crops := JourneyProgress.project_crop_needs(state, project)
+	var goal_dishes := {}
+	if JourneyProgress.project_available(state, project) and not JourneyProgress.project_complete(state, project):
+		goal_dishes = JourneyProgress.data().projects[project].stages[JourneyProgress.project_stage(state, project)].dishes
+	var gathering := JourneyGatherings.planned(state)
+	if not gathering.is_empty():
+		goal_crops = JourneyGatherings.crop_needs(state)
+		goal_dishes = {JourneyGatherings.themes()[gathering].dish: 1}
+	if not JourneyRequests.tracked(state).is_empty():
+		goal_crops = JourneyRequests.crop_needs(state)
+		goal_dishes = JourneyRequests.dish_needs(state)
 	_sell_items.clear()
 	var room := maxi(0, budget_per_day - settled)
 	var initial_room := room
@@ -99,35 +115,51 @@ func refresh(state: Dictionary, unlocked: Array, budget_per_day := 100) -> void:
 		_qty[id] = n
 		(row.box as Control).visible = n > 0 or int(reserved.get(id, 0)) > 0
 		(row.label as Label).text = "%s\n%d available%s" % [CropInfo.name_of(id), n, " / %d reserved" % int(reserved[id]) if int(reserved.get(id, 0)) > 0 else ""]
-		(row.button as Button).disabled = blocked or n <= 0 or initial_room < CropInfo.unit_price(id)
+		(row.button as Button).disabled = blocked or n <= 0 or initial_room < CropInfo.unit_price(id, state)
 		if n <= 0:
 			(row.total as Label).text = "0"
 			continue
 		any_produce = true
-		var price := CropInfo.unit_price(id)
+		var price := CropInfo.unit_price(id, state)
 		var can := mini(n, room / maxi(price, 1))
 		(row.price as Label).text = "%d each" % price
 		(row.total as Label).text = str(can * price)
-		_sell_items.append({"kind": "produce", "id": id, "qty": n})
-		total += can * price
-		room -= can * price
+		var keep := 0
+		if JourneyProgress.active(state):
+			if id in ["C", "L"] and not JourneyProgress.fact(state, "shared_meal"): keep = 1
+			if id == "H" and not JourneyProgress.fact(state, "planter_planted"): keep = 1
+		keep = maxi(keep, int(goal_crops.get(id, 0)))
+		if int(goal_crops.get(id, 0)) > 0:
+			(row.label as Label).text += "\n%d for your goal" % mini(n, int(goal_crops[id]))
+		var batch := maxi(0, n - keep)
+		if batch > 0: _sell_items.append({"kind": "produce", "id": id, "qty": batch})
+		var batch_value := mini(batch, can) * price
+		total += batch_value
+		room -= batch_value
 	for id in ["salad", "tea"]:
 		var n := int(inv.get("dishes", {}).get(id, 0))
 		var row: Dictionary = _dish_rows[id]
 		(row.box as Control).visible = n > 0
 		if n <= 0: continue
 		any_produce = true
-		var price := int(_recipes[id].stall_price)
+		var price := int(JourneyProgress.data().dish_prices[id]) if JourneyProgress.active(state) else int(_recipes[id].stall_price)
 		var can := mini(n, room / maxi(price, 1))
 		(row.label as Label).text = "%s\n%d available" % ["Vegetable salad" if id == "salad" else "Chamomile tea", n]
 		(row.price as Label).text = "%d each" % price
 		(row.total as Label).text = str(can * price)
 		(row.button as Button).disabled = blocked or initial_room < price
-		_sell_items.append({"kind": "dish", "id": id, "qty": n})
-		total += can * price
-		room -= can * price
+		var keep := 1 if JourneyProgress.active(state) and id == "salad" and not JourneyProgress.fact(state, "shared_meal") else 0
+		keep = maxi(keep, int(goal_dishes.get(id, 0)))
+		if int(goal_dishes.get(id, 0)) > 0:
+			(row.label as Label).text += "\n%d for your goal" % mini(n, int(goal_dishes[id]))
+		var batch := maxi(0, n - keep)
+		if batch > 0: _sell_items.append({"kind": "dish", "id": id, "qty": batch})
+		var batch_value := mini(batch, can) * price
+		total += batch_value
+		room -= batch_value
 	_empty.visible = not any_produce
 	_sell_all.text = "Sell all · +%d" % total
+	if JourneyProgress.active(state): _sell_all.text = "Sell surplus - +%d" % total
 	_sell_all.disabled = blocked or total <= 0
 	_sell_all.visible = any_produce
 	var wallet := int(state.get("wallet", 0))
@@ -139,11 +171,11 @@ func refresh(state: Dictionary, unlocked: Array, budget_per_day := 100) -> void:
 		var have := NextStep.seeds_of(inv, id)
 		var cost := CropInfo.seed_price(id) * _buy_qty
 		var bound := int(inv.get("seeds", {}).get(id, {}).get("bound", 0))
-		(row.label as Label).text = "%s\n%d owned%s" % [CropInfo.name_of(id), have, " / %d chapter" % bound if bound > 0 else ""]
+		(row.label as Label).text = "%s\n%d owned%s" % [CropInfo.name_of(id), have, "\n%d gifted" % bound if bound > 0 else ""]
 		(row.price as Label).text = "%d each" % CropInfo.seed_price(id)
 		(row.button as Button).text = "Buy %d · %d" % [_buy_qty, cost]
 		(row.button as Button).disabled = blocked or wallet < cost
-	_quantity.text = "%d seeds" % _buy_qty
+	_quantity.text = "%d seed%s" % [_buy_qty, "" if _buy_qty == 1 else "s"]
 	_quantity_minus.disabled = blocked or _buy_qty <= 1
 	_quantity_plus.disabled = blocked or _buy_qty >= 12
 	if get_parent() is Control: fit_height((get_parent() as Control).size)
@@ -204,7 +236,7 @@ func _row(crop: String, seed: bool, dish := false) -> Dictionary:
 	h.add_child(GameUi.picture(GameUi.dish_art(crop) if dish else GameUi.crop_art(crop, seed), 40))
 	var l := GameUi.label("", 12)
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	h.add_child(l)
 	var price := GameUi.label("", 11, GameUi.MUTED)
 	h.add_child(price)
@@ -237,6 +269,14 @@ func set_buy_quantity(quantity: int) -> void:
 	if _busy or _uncertain: return
 	_buy_qty = clampi(quantity, 1, 12)
 	refresh(_last_state, _last_unlocked, _last_budget)
+
+func focus_seed(crop: String) -> void:
+	if not _seed_rows.has(crop) or not _last_unlocked.has(crop): return
+	set_buy_quantity(1)
+	# Modal sizing and row visibility settle after opening the sheet.
+	for frame in 2: await get_tree().process_frame
+	if visible and _seed_rows[crop].box.is_visible_in_tree():
+		_scroll.ensure_control_visible(_seed_rows[crop].box)
 
 func set_busy(value: bool) -> void:
 	_busy = value

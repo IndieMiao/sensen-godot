@@ -6,7 +6,7 @@ signal candidate_focused(id: String)
 signal confirmed(id: String)
 signal placement_cancelled
 
-const CAPACITY_TEXT := "9 plots · 12 in week one"
+const CAPACITY_TEXT := "9 plots · expandable to 12"
 ## Three cards fit inside the 328px safe-area width of a 360px phone.
 ## Shared capacity copy stays below the row, leaving the map visible.
 const CARD_MIN := Vector2(88, 104)

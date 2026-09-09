@@ -69,6 +69,8 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     private var container: FrameLayout? = null
     private var mapView: MapView? = null
     private var mapSceneVisible = true
+    @Volatile private var mainLoopStarted = false
+    private var renderPausedEarly = false
 
     private var locationManager: LocationManager? = null
     private var locationStarted = false
@@ -122,6 +124,27 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
     // 垫底：本插件的 View 加到 Godot 视图层级 index 0（Godot 渲染面之下）。
     override fun shouldBeOnTop() = false
+
+    override fun onGodotMainLoopStarted() {
+        mainLoopStarted = true
+    }
+
+    override fun onMainPause() {
+        val renderView = godot.renderView ?: return
+        if (mainLoopStarted) {
+            // Godot 4.7 pauses Vulkan only onStop, after Android can retire the window surface.
+            renderView.onActivityStopped()
+            renderPausedEarly = true
+        }
+    }
+
+    override fun onMainResume() {
+        if (renderPausedEarly) {
+            // onResume can follow a translucent activity without another onStart.
+            godot.renderView?.onActivityStarted()
+            renderPausedEarly = false
+        }
+    }
 
     @UsedByGodot
     fun createMap(token: String, lat: Double, lng: Double, zoom: Double) {

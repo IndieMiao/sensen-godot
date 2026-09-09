@@ -100,10 +100,11 @@ func test_second_finger_press_does_not_trigger_double_tap() -> void:
 	## 拖拽路径加 _touch_count 门禁，会被误判成双击，在用户捏合手势中途
 	## 叠加一次意外缩放。
 	var n = auto_free(SpyMapPoc.new())
-	n._touch_count = 1 # 已有一指按下
+	_press(n, Vector2(100, 100))
 	n._last_tap_ms = Time.get_ticks_msec()
 	n._last_tap_pos = Vector2(100, 100)
 	var ev := InputEventScreenTouch.new()
+	ev.index = 1
 	ev.pressed = true
 	ev.position = Vector2(102, 101) # 时间、距离都落在双击判定窗口内
 	n._unhandled_input(ev)
@@ -192,20 +193,24 @@ func test_pan_and_zoom_fling_are_independent() -> void:
 ## 它的 drag 事件会通过 "_touch_count <= 1" 门禁把 pan 速度灌进 _fling_vel，
 ## 抬手就甩出一段用户没要的平移。
 
-func _press(n, pos: Vector2) -> void:
+func _press(n, pos: Vector2, index := 0) -> void:
 	var e := InputEventScreenTouch.new()
+	e.index = index
 	e.pressed = true
 	e.position = pos
 	n._unhandled_input(e)
 
-func _release(n, pos: Vector2) -> void:
+func _release(n, pos: Vector2, index := 0, canceled := false) -> void:
 	var e := InputEventScreenTouch.new()
+	e.index = index
+	e.canceled = canceled
 	e.pressed = false
 	e.position = pos
 	n._unhandled_input(e)
 
-func _drag(n, pos: Vector2, rel: Vector2) -> void:
+func _drag(n, pos: Vector2, rel: Vector2, index := 0) -> void:
 	var e := InputEventScreenDrag.new()
+	e.index = index
 	e.position = pos
 	e.relative = rel
 	n._unhandled_input(e)
@@ -214,7 +219,7 @@ func test_second_finger_discards_pan_velocity_accumulated_by_first() -> void:
 	var n = auto_free(MapPoc.new())
 	_press(n, Vector2(100, 100))
 	n._fling_vel = Vector3(200.0, 0.0, 0.0) # 第一指已攒出速度
-	_press(n, Vector2(300, 100)) # 第二指落下 → 转为捏合
+	_press(n, Vector2(300, 100), 1) # 第二指落下 → 转为捏合
 	assert_float(n._fling_vel.length()).is_equal(0.0)
 	assert_bool(n._gesture_multi).is_true()
 
@@ -222,18 +227,60 @@ func test_lifting_one_finger_of_a_pinch_does_not_resume_pan_velocity() -> void:
 	## 这是真机上"缩放时冒出一段平移惯性"的确切路径
 	var n = auto_free(MapPoc.new())
 	_press(n, Vector2(100, 100))
-	_press(n, Vector2(300, 100)) # 双指
-	_release(n, Vector2(300, 100)) # 抬起一根 → _touch_count 回到 1
+	_press(n, Vector2(300, 100), 1) # 双指
+	_release(n, Vector2(300, 100), 1) # 抬起一根 → _touch_count 回到 1
 	_drag(n, Vector2(160, 100), Vector2(60, 0)) # 剩下那根还在动
 	assert_float(n._fling_vel.length()).is_equal(0.0) # 不得攒出 pan 速度
 
 func test_gesture_multi_resets_after_all_fingers_lift() -> void:
 	var n = auto_free(MapPoc.new())
 	_press(n, Vector2(100, 100))
-	_press(n, Vector2(300, 100))
-	_release(n, Vector2(300, 100))
+	_press(n, Vector2(300, 100), 1)
+	_release(n, Vector2(300, 100), 1)
 	_release(n, Vector2(100, 100)) # 全部离手
 	assert_bool(n._gesture_multi).is_false()
 	# 下一次单指拖拽必须恢复正常
 	_press(n, Vector2(100, 100))
 	assert_bool(n._gesture_multi).is_false()
+
+func test_short_span_raw_pinch_scales_once_and_coasts_on_release() -> void:
+	var n = auto_free(MapPoc.new())
+	n.street_mode = true
+	n.zoom = 17.0
+	_press(n, Vector2(140, 340), 4)
+	_press(n, Vector2(220, 340), 9)
+	_drag(n, Vector2(150, 340), Vector2(10, 0), 4)
+	_drag(n, Vector2(210, 340), Vector2(-10, 0), 9)
+	var expected := 17.0 + log(0.75) / log(2.0)
+	assert_float(n.zoom).is_equal_approx(expected, 0.00001)
+	var native := InputEventMagnifyGesture.new()
+	native.factor = 0.75
+	n._unhandled_input(native)
+	assert_float(n.zoom).is_equal_approx(expected, 0.00001)
+	_release(n, Vector2(150, 340), 4)
+	_drag(n, Vector2(240, 340), Vector2(30, 0), 9)
+	assert_float(n.zoom).is_equal_approx(expected, 0.00001)
+	_release(n, Vector2(240, 340), 9)
+	n._unhandled_input(native)
+	assert_float(n.zoom).is_equal_approx(expected, 0.00001)
+	n._step_fling(1.0 / 60.0)
+	assert_float(n.zoom).is_less(expected)
+	assert_float(n._fling_vel.length()).is_equal(0.0)
+
+func test_cancel_and_scene_reset_discard_touch_identity_and_pending_taps() -> void:
+	var n = auto_free(SpyMapPoc.new())
+	_press(n, Vector2(100, 100), 4)
+	n._last_tap_ms = Time.get_ticks_msec()
+	n._last_tap_pos = Vector2(100, 100)
+	n._zoom_vel = 2.0
+	_release(n, Vector2(100, 100), 4, true)
+	assert_int(n.zoom_tween_calls).is_equal(0)
+	assert_float(n._zoom_vel).is_equal(0.0)
+	_press(n, Vector2(100, 100), 9)
+	_press(n, Vector2(100, 100), 9)
+	assert_int(n._touch_count).is_equal(1)
+	n._notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	_release(n, Vector2(100, 100), 9)
+	assert_int(n._touch_count).is_equal(0)
+	assert_dict(n._touch_points).is_empty()
+	assert_int(n.zoom_tween_calls).is_equal(0)

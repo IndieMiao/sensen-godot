@@ -4,11 +4,17 @@ extends SceneTree
 const PRESETS := "res://export_presets.cfg"
 const BACKUP := "res://output/g3-week/device-backup/export_presets.cfg"
 const DRIVER_FILES := ["res://tools/dev/g3_week_ui.gd", "res://tools/dev/g3_week_ui.tscn", "res://tools/dev/g3_week_ui.gd.uid"]
+var _week_args := {"path": "tool", "style": "life", "base": "http://10.0.2.2:3103/v1", "out": "user://g3-week-device", "touch": "false", "run": "", "resume": ""}
+var _apk := "build/sensen-g3-week-qa.apk"
 
 func _init() -> void:
 	var mode := ""
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--g3-device-export="): mode = arg.trim_prefix("--g3-device-export=")
+		if arg.begins_with("--g3-device-apk="): _apk = arg.trim_prefix("--g3-device-apk=")
+		for key in _week_args:
+			var prefix := "--week-%s=" % key
+			if arg.begins_with(prefix): _week_args[key] = arg.trim_prefix(prefix)
 	match mode:
 		"prepare": _prepare()
 		"restore": _restore()
@@ -17,6 +23,7 @@ func _init() -> void:
 			quit(2)
 
 func _prepare() -> void:
+	if not _valid_args(): return
 	var config := ConfigFile.new()
 	if config.load(PRESETS) != OK:
 		_fail("Could not read export_presets.cfg")
@@ -56,7 +63,7 @@ func _prepare() -> void:
 	var section := "preset.%d" % target
 	config.set_value(section, "name", "Android G3 QA")
 	config.set_value(section, "runnable", false)
-	config.set_value(section, "export_path", "build/sensen-g3-week-qa.apk")
+	config.set_value(section, "export_path", _apk)
 	var features := str(config.get_value(section, "custom_features", ""))
 	config.set_value(section, "custom_features", features + ("," if not features.is_empty() else "") + "g3_device_qa")
 	var exclusions := str(config.get_value(section, "exclude_filter", "")).split(",", false)
@@ -64,13 +71,39 @@ func _prepare() -> void:
 	for path in _tool_exclusions("res://tools"):
 		exclusions.append(path.trim_prefix("res://"))
 	config.set_value(section, "exclude_filter", ",".join(exclusions))
-	config.set_value(section + ".options", "command_line/extra_args",
-		"++ --qa-scene=week --week-path=tool --week-style=life --week-base=http://10.0.2.2:3103/v1 --week-out=user://g3-week-device")
+	var args := ["++", "--qa-scene=week"]
+	for key in _week_args:
+		if not str(_week_args[key]).is_empty(): args.append("--week-%s=%s" % [key, _week_args[key]])
+	config.set_value(section + ".options", "command_line/extra_args", " ".join(args))
 	if config.save(PRESETS) != OK:
 		_fail("Could not save temporary QA preset; restore from the backup")
 		return
-	print("G3_DEVICE_EXPORT_PREPARED Android G3 QA -> build/sensen-g3-week-qa.apk")
+	print("G3_DEVICE_EXPORT_PREPARED ", JSON.stringify({"preset": "Android G3 QA", "apk": _apk, "args": _week_args}))
 	quit(0)
+
+func _valid_args() -> bool:
+	if _week_args.path not in ["tool", "field"] or _week_args.style not in ["life", "sell"] or _week_args.touch not in ["true", "false"]:
+		_fail("Use --week-path=tool|field, --week-style=life|sell and --week-touch=true|false")
+		return false
+	var allowed := RegEx.new()
+	allowed.compile("^[A-Za-z0-9_./:=+-]+$")
+	for value in _week_args.values() + [_apk]:
+		if not str(value).is_empty() and allowed.search(str(value)) == null:
+			_fail("Export arguments must not contain whitespace or command-line quotes")
+			return false
+	if not str(_week_args.base).begins_with("http://") or not str(_week_args.base).ends_with("/v1") or not _apk.ends_with(".apk"):
+		_fail("Use an explicit HTTP QA /v1 endpoint and an .apk output path")
+		return false
+	if _week_args.touch == "true" and str(_week_args.run).is_empty():
+		_fail("Touch exports require --week-run matching the host worker")
+		return false
+	if not str(_week_args.resume).is_empty() and (_week_args.resume not in ["g3_vivo_tool_life_03", "g3_vivo_tool_life_04"]
+		or _week_args.touch != "true" or _week_args.path != "tool" or _week_args.style != "life"
+		or _week_args.run in ["g3_vivo_tool_life_03", "g3_vivo_tool_life_04"] or _week_args.base != "http://127.0.0.1:3103/v1"
+		or str(_week_args.out).simplify_path().trim_suffix("/") in ["user://g3-vivo-tool-life-03", "user://g3-vivo-tool-life-04"]):
+		_fail("Resume is restricted to the known tool/life 03/04 failures, with a new run and output")
+		return false
+	return true
 
 func _restore() -> void:
 	if not FileAccess.file_exists(BACKUP):

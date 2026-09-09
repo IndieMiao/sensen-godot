@@ -154,7 +154,7 @@ func test_offline_preview_never_sends_a_save_and_removal_can_be_undone() -> void
 	panel.undo()
 	assert_that(panel.preview()).is_equal(saved)
 	assert_int(pair[2].requests.size()).is_equal(0)
-	assert_bool(panel.mouse_filter == Control.MOUSE_FILTER_STOP).is_true()
+	assert_bool(panel.mouse_filter == Control.MOUSE_FILTER_PASS).is_true()
 
 func test_saved_json_numbers_normalize_without_creating_unsaved_changes() -> void:
 	var props: Array = JSON.parse_string('[{"anchor_id":"courtyard","prop_id":"bench","offset_q":[-4,3]}]')
@@ -258,3 +258,87 @@ func test_world_taps_pick_or_place_pieces_but_panel_taps_and_drags_do_not_edit()
 	scene._unhandled_input(release)
 	assert_that(panel.preview()).is_equal(before)
 	assert_int(pair[2].requests.size()).is_equal(0)
+
+func _touch(position: Vector2, pressed: bool, index := 0, canceled := false) -> void:
+	var event := InputEventScreenTouch.new()
+	event.position = position
+	event.pressed = pressed
+	event.index = index
+	event.canceled = canceled
+	get_viewport().push_input(event, true)
+
+func test_touch_input_places_once_and_ignores_canceled_and_dragged_gestures() -> void:
+	var pair := _scene(_state())
+	var scene: Node = pair[0]
+	await _frames()
+	scene.select_tab("decorations")
+	await _frames()
+	var panel := scene.active_panel as DecorationPanel
+	var position: Vector2 = scene.cam.unproject_position(Vector3(-2, 0, 1.5))
+	_touch(position, true)
+	assert_that(panel.preview()).is_equal([])
+	_touch(position, false)
+	assert_int(panel.preview().size()).is_equal(1)
+	assert_int(panel._history.size()).is_equal(1)
+	var before := panel.preview()
+	position = scene.cam.unproject_position(Vector3(-3, 0, 2.5))
+	_touch(position, true)
+	_touch(position, false, 0, true)
+	assert_that(panel.preview()).is_equal(before)
+	_touch(position, true)
+	var drag := InputEventScreenDrag.new()
+	drag.position = position + Vector2(25, 0)
+	drag.relative = Vector2(25, 0)
+	get_viewport().push_input(drag, true)
+	_touch(position, false)
+	assert_that(panel.preview()).is_equal(before)
+	_touch(position, true)
+	_touch(scene.body.get_global_rect().get_center(), false)
+	assert_int(scene._pointer_id).is_equal(-2)
+	_touch(position, true)
+	_touch(position, false)
+	assert_that(panel.preview()).is_not_equal(before)
+	assert_int(pair[2].requests.size()).is_equal(0)
+
+func test_swiping_from_decoration_text_scrolls_the_panel_without_editing_the_world() -> void:
+	var pair := _scene(_state())
+	var scene: Node = pair[0]
+	await _frames()
+	scene.select_tab("decorations")
+	await _frames()
+	_swipe_up(scene.scroll.get_global_rect().position + Vector2(12, 16))
+	assert_int(scene.scroll.scroll_vertical).is_greater(0)
+	assert_that(scene.active_panel.preview()).is_equal([])
+
+func test_swiping_from_decoration_button_scrolls_without_placing_a_piece() -> void:
+	var pair := _scene(_state())
+	var scene: Node = pair[0]
+	await _frames()
+	scene.select_tab("decorations")
+	await _frames()
+	var button := scene.active_panel.find_child("PlaceDecoration", true, false) as Button
+	scene.scroll.ensure_control_visible(button)
+	await _frames()
+	var before: int = scene.scroll.scroll_vertical
+	_swipe_up(button.get_global_rect().get_center())
+	assert_int(scene.scroll.scroll_vertical).is_greater(before)
+	assert_that(scene.active_panel.preview()).is_equal([])
+
+func _swipe_up(position: Vector2) -> void:
+	var previous_emulation := Input.emulate_touch_from_mouse
+	Input.emulate_touch_from_mouse = true
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	press.position = position
+	get_viewport().push_input(press, true)
+	var motion := InputEventMouseMotion.new()
+	motion.position = press.position + Vector2(0, -60)
+	motion.relative = Vector2(0, -60)
+	motion.button_mask = MOUSE_BUTTON_MASK_LEFT
+	get_viewport().push_input(motion, true)
+	var release := InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.position = motion.position
+	get_viewport().push_input(release, true)
+	Input.emulate_touch_from_mouse = previous_emulation

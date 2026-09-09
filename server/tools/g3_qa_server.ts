@@ -10,6 +10,7 @@ import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../src/domain/
 import { PRESET_SPECS, buildPresetFarm, presetHmac } from '../src/domain/presets.js';
 import { ledgerScript, type Path, type Style } from '../test/fixtures/build_ledger.js';
 import { BEDS, RESERVED } from '../test/domain/helpers.js';
+import { registerG3TouchQueue } from './g3_touch_queue.js';
 
 const env = parseEnv(readFileSync(new URL('../.env', import.meta.url), 'utf8'));
 const dsn = new URL(env.TEST_DATABASE_URL);
@@ -45,6 +46,7 @@ app.get('/v1/qa/ledger', async request => {
   const style: Style = query.style === 'sell' ? 'sell' : 'life';
   return { path: route, style, beds: BEDS, reserved: RESERVED, steps: ledgerScript(route, style) };
 });
+await registerG3TouchQueue(app);
 const port = Number(process.env.G3_QA_PORT ?? 3103);
 await app.listen({ host: '127.0.0.1', port });
 console.log(JSON.stringify({ listening: `http://127.0.0.1:${port}`, database: 'sensen_farm_g3_ui_qa', content: cv }));

@@ -2,9 +2,10 @@ class_name AnimPlaceholders
 extends RefCounted
 ## 劳作动画登记表。
 ##
-## rig 目前只有 idle / run / walk 三条真实 clip，六条劳作动作全是占位。占位本身不是
-## 问题，**悄悄占位**才是：所以规则写成「数据引用的每个动作，要么有真实 clip，要么在
-## 登记表里」，新增动作忘了登记会被守卫测试当场打回（方案 D9）。
+## rig 自带 idle / run / walk 三条真实 clip；劳作/表情动作先登记为占位，等 Mixamo 重定向
+## 管线产出 labour_* / emote_* 真 clip 后自动转正。占位本身不是问题，**悄悄占位**才是：
+## 所以规则写成「数据引用的每个动作，要么有真实 clip，要么在登记表里」，新增动作忘了
+## 登记会被守卫测试当场打回（方案 D9）。
 
 const TABLE_PATH := "res://assets/avatar/base/anim_placeholders.json"
 ## 田况 → 必需照料动作，与 assets/farm/data/weather_script.json 的 care_action 同源。
@@ -38,8 +39,16 @@ static func clip_for(action: String) -> String:
 		return str(entry.clip_id)
 	return "idle"
 
+## 仍是占位：既没有同名真 clip，登记条目指向的 clip_id 也还没变成真 clip。
+## Mixamo 管线（tools/pipeline/gen_mixamo_clips.gd）把 labour_* 登记进 real_clips 后，
+## 对应动作自动"转正"——farm.gd 据此停掉程序化俯身，只播真 clip。
 static func is_placeholder(action: String) -> bool:
-	return not real_clips().has(action) and placeholders().has(action)
+	if real_clips().has(action):
+		return false
+	var entry = placeholders().get(action)
+	if entry == null:
+		return false
+	return not real_clips().has(str(entry.get("clip_id", "")))
 
 ## 占位时的程序化俯身：真 clip 补齐前，让玩家至少看到「弯下腰在干活」。
 ## 返回 Tween 供调用方等待或提前 kill。

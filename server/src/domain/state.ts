@@ -17,6 +17,7 @@ export interface DecorationPlacement {
   anchor_id: 'courtyard';
   prop_id: DecorationId;
   offset_q: [number, number];
+  rotation_q?: number;
 }
 
 export interface CellSlot {
@@ -89,6 +90,8 @@ export interface WeekSummary {
 }
 
 export interface FarmState {
+  /** Absent on G3 saves; upgrading is an explicit, idempotent owner command. */
+  journey?: JourneyState;
   clock: {
     player_day_id: string;
     /** 章节日索引，到 6 冻结（决策⑨）。 */
@@ -138,6 +141,28 @@ export interface FarmState {
 }
 
 export const cellId = (i: number, j: number): string => `${i},${j}`;
+
+export interface JourneyState {
+  version: 1;
+  facts: string[];
+  completed: string[];
+  unlocks: string[];
+  wood: number;
+  materials?: { stone: number; fiber: number };
+  facility_uses?: Record<string, number>;
+  exploration: { round: number; collected: string[]; route?: string; routes_by_place?: Record<string, string>;
+    branching_places?: string[]; choices?: Record<string, 'primary' | 'alternate'> };
+  gift_rounds?: Partial<Record<ResidentId, number>>;
+  workshop?: { sequence: number; stock: Record<string, number>; displays: Record<string, string[]>;
+    planned?: { project: string; slot: number; item: string } };
+  tracked_discovery?: string;
+  tracked_project?: string;
+  tracked_opportunity?: { slot: string; sequence: number };
+  discovery_choices?: Record<string, string>;
+  contributions?: Record<string, number>;
+  gathering?: { sequence: number; planned?: string; current?: string; memories: string[] };
+  opportunities: Record<string, { sequence: number; variant: number }>;
+}
 export const parseCellId = (id: string): [number, number] => {
   const [i, j] = id.split(',').map(Number);
   return [i, j];

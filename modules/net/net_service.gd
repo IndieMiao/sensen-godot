@@ -25,7 +25,7 @@ func _ready() -> void:
 		call_deferred("boot")
 
 static func is_test_process() -> bool:
-	if OS.is_debug_build() and OS.has_feature("g3_device_qa"):
+	if OS.is_debug_build() and (OS.has_feature("g3_device_qa") or OS.has_feature("journey_device_qa")):
 		return true
 	if DisplayServer.get_name() == "headless":
 		return true
@@ -39,7 +39,7 @@ static func base_url() -> String:
 		var s := FileAccess.get_file_as_string(SERVER_OVERRIDE).strip_edges()
 		if s.begins_with("http"):
 			return s.trim_suffix("/")
-	return DEFAULT_BASE
+	return str(ProjectSettings.get_setting("sensen/network/base_url", DEFAULT_BASE)).trim_suffix("/")
 
 ## 测试注入假传输；同时重建会话，丢掉上一次的 token 与状态。
 func use_transport(t: Callable, p_base := "https://example.test/v1") -> void:

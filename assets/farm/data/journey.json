@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "contribution_steps": 3,
+  "gatherings": {
+    "requires": ["project_seedbeds_1", "project_waystation_1", "project_terrace_1", "story_bistro_guests"],
+    "themes": {
+      "garden": {"name": "Garden tea walk", "place": "nursery", "item": "planter", "dish": "tea", "coins": 24, "icon": "flower-2"},
+      "lantern": {"name": "Lantern supper", "place": "courtyard", "item": "lantern", "dish": "salad", "coins": 30, "icon": "utensils"}
+    }
+  },
+  "crops": {
+    "R": {"duration_ms": 180000, "unit_price": 5},
+    "L": {"duration_ms": 360000, "unit_price": 8},
+    "C": {"duration_ms": 720000, "unit_price": 12},
+    "H": {"duration_ms": 1080000, "unit_price": 16}
+  },
+  "dish_prices": {"salad": 24, "tea": 18},
+  "discoveries": {
+    "stone_hollow": {"name": "Lantern hollow", "place": "nursery", "position": [2.45, 1.0], "item": "lantern", "requires": ["side_path"], "hint": "A garden lantern lights the old stone hollow. Bring one handmade lantern.", "benefit": "Choose stone or timber on each nursery trail.", "choices": {
+      "stone": {"name": "Loose stone", "materials": {"stone": 3}, "produce": {}, "seeds": {}},
+      "timber": {"name": "Fallen timber", "materials": {"wood": 3}, "produce": {}, "seeds": {}}
+    }},
+    "reed_garden": {"name": "Weaving garden", "place": "courtyard", "position": [0.0, 1.75], "item": "planter", "requires": ["planter_placed", "met_bistro"], "hint": "A woven planter gives the keeper a place to grow reeds and save seeds. Bring one handmade planter.", "benefit": "Choose reeds or lettuce seeds on each courtyard trail.", "choices": {
+      "reeds": {"name": "Weaving reeds", "materials": {"fiber": 3}, "produce": {}, "seeds": {}},
+      "seeds": {"name": "Lettuce seeds", "materials": {}, "produce": {}, "seeds": {"L": 2}}
+    }},
+    "kitchen_garden": {"name": "Kitchen garden", "place": "bistro", "position": [-2.4, 0.15], "item": "fountain", "requires": ["shared_meal", "crafted_lantern"], "hint": "A small fountain restores water to the host's kitchen beds. Bring one handmade fountain.", "benefit": "Choose salad greens or chamomile on each bistro trail.", "choices": {
+      "salad": {"name": "Salad harvest", "materials": {}, "produce": {"C": 1, "L": 1}, "seeds": {}},
+      "flowers": {"name": "Chamomile harvest", "materials": {}, "produce": {"H": 1}, "seeds": {}, "requires": "crop_H"}
+    }}
+  },
+  "costs": {"repair_workbench": 4, "craft_planter": 2, "clear_side_path": 2},
+  "workshop": {
+    "display_slots": 3,
+    "recipes": {
+      "planter": {"name": "Woven flower planter", "requires": ["planter_crafted"], "materials": {"wood": 2, "fiber": 2}, "produce": {}, "dishes": {}, "coins": 18},
+      "lantern": {"name": "Stone garden lantern", "requires": ["side_path"], "materials": {"wood": 1, "stone": 2, "fiber": 1}, "produce": {}, "dishes": {}, "coins": 20},
+      "fountain": {"name": "Small garden fountain", "requires": ["crafted_lantern"], "materials": {"stone": 4, "fiber": 2}, "produce": {}, "dishes": {}, "coins": 28}
+    }
+  },
+  "stories": {
+    "nursery_keeper": [
+      {"id": "nursery_seeds", "name": "Seeds worth keeping", "requires": ["met_nursery", "workbench"], "hint": "The keeper is sorting seeds beside the repaired workbench.", "materials": {}, "produce": {"R": 1}, "dishes": {}, "points": 15, "shared": false, "quote": "I saved seeds from your radish. Shall we grow something together in the new beds?"},
+      {"id": "nursery_bloom", "name": "A garden together", "requires": ["story_nursery_seeds", "project_seedbeds_1"], "hint": "Finish the propagation beds and bring a chamomile flower.", "materials": {}, "produce": {"H": 1}, "dishes": {}, "points": 25, "shared": true, "quote": "That first flower is ours. I have kept a place for your next handmade planter."}
+    ],
+    "bistro_owner": [
+      {"id": "bistro_recipes", "name": "The host's recipe book", "requires": ["shared_meal"], "hint": "The host has another recipe to compare after your first meal together.", "materials": {}, "produce": {"C": 1, "L": 1}, "dishes": {}, "points": 15, "shared": false, "quote": "Your harvest belongs in my recipe book. Let us set a table outside for the neighbours."},
+      {"id": "bistro_guests", "name": "Tea with the neighbours", "requires": ["story_bistro_recipes", "project_terrace_1"], "hint": "Finish the tea terrace and bring a pot of tea.", "materials": {}, "produce": {}, "dishes": {"tea": 1}, "points": 10, "shared": true, "quote": "The neighbours asked about your tea. Your garden lantern would suit this table."}
+    ],
+    "restorer": [
+      {"id": "restorer_craft", "name": "Stone and woven reeds", "requires": ["planter_crafted"], "hint": "Bring stone and reeds to compare materials with the restorer.", "materials": {"stone": 1, "fiber": 1}, "produce": {}, "dishes": {}, "points": 15, "shared": false, "quote": "Stone holds the shape; reeds hold it together. I would like to see your first lantern."},
+      {"id": "restorer_light", "name": "Light along the path", "requires": ["story_restorer_craft", "crafted_lantern"], "hint": "Make a garden lantern at the nursery workbench, then bring two pieces of wood.", "materials": {"wood": 2}, "produce": {}, "dishes": {}, "points": 25, "shared": true, "quote": "We made this corner together. Try a fountain next; I can find homes for your spare pieces."}
+    ]
+  },
+  "routes": {
+    "neighbourhood": {"name": "Neighbourhood paths", "place": "courtyard", "material": "stone", "bonus": 0},
+    "woodland": {"name": "Nursery timber trail", "place": "nursery", "material": "wood", "bonus": 1},
+    "riverside": {"name": "Courtyard stone trail", "place": "courtyard", "material": "stone", "bonus": 2},
+    "gardens": {"name": "Bistro reed trail", "place": "bistro", "material": "fiber", "bonus": 2, "requires": "bistro"},
+    "stone_walk": {"name": "Bistro stone walk", "place": "bistro", "material": "stone", "bonus": 2, "requires": "crafting", "surface": "street"}
+  },
+  "projects": {
+    "seedbeds": {"name": "Propagation beds", "place": "nursery", "position": [-2.5, -0.25], "requires": "workbench", "benefit": "A seed or flower basket on each exploration.", "stages": [
+      {"name": "Set the raised beds", "materials": {"wood": 2, "stone": 2}, "produce": {}, "dishes": {}},
+      {"name": "Weave the nursery canopy", "materials": {"fiber": 2}, "produce": {"L": 1}, "dishes": {}}
+    ]},
+    "terrace": {"name": "Neighbourhood tea terrace", "place": "bistro", "position": [2.0, -1.65], "requires": "shared_meal", "benefit": "Host the neighbours with salad or tea.", "stages": [
+      {"name": "Build the shaded table", "materials": {"wood": 3, "fiber": 2}, "produce": {}, "dishes": {}},
+      {"name": "Set out the first tea service", "materials": {}, "produce": {}, "dishes": {"salad": 1, "tea": 1}}
+    ]},
+    "waystation": {"name": "Garden supply stop", "place": "courtyard", "position": [-1.9, -0.8], "requires": "side_path", "benefit": "Exchange timber for stone or reeds; take the nursery shortcut.", "stages": [
+      {"name": "Lay the stone landing", "materials": {"stone": 3, "wood": 2}, "produce": {}, "dishes": {}},
+      {"name": "Hang the flower baskets", "materials": {"fiber": 2}, "produce": {"H": 1}, "dishes": {}}
+    ]}
+  },
+  "milestones": [
+    {"id": "first_harvest", "name": "A harvest to share", "facts": ["first_harvest", "met_nursery"], "unlocks": ["bistro", "crop_C", "kitchen", "gifts", "visit"], "grants": {"C": 2}},
+    {"id": "workbench", "name": "A place to make things", "facts": ["workbench"], "unlocks": ["crafting"], "grants": {}},
+    {"id": "first_meal", "name": "Our first meal", "facts": ["shared_meal"], "unlocks": ["crop_H", "tea"], "grants": {"H": 2}},
+    {"id": "first_planter", "name": "Made by you", "facts": ["planter_placed"], "unlocks": ["decorations"], "grants": {}},
+    {"id": "side_path", "name": "Another way through", "facts": ["side_path"], "unlocks": ["growth", "nursery_appearance"], "grants": {}},
+    {"id": "garden", "name": "A corner in bloom", "facts": ["side_path", "planter_planted"], "unlocks": ["garden"], "grants": {}}
+  ],
+  "nodes": [
+    {"id": "nursery_west", "place": "nursery", "position": [-3.8, 2.6], "wood": 1, "alternative": {"position": [-2.4, 3.25], "requires": "side_path", "materials": {"stone": 1}}},
+    {"id": "nursery_east", "place": "nursery", "position": [3.8, 2.5], "wood": 1, "alternative": {"position": [2.4, 3.25], "requires": "side_path", "materials": {"stone": 1}}},
+    {"id": "bistro_west", "place": "bistro", "position": [-3.6, 2.5], "wood": 1, "alternative": {"position": [-2.2, 3.25], "requires": "workbench", "materials": {"wood": 3}}},
+    {"id": "bistro_east", "place": "bistro", "position": [3.7, 2.6], "wood": 1, "alternative": {"position": [2.3, 3.25], "requires": "workbench", "materials": {"wood": 3}}},
+    {"id": "courtyard_west", "place": "courtyard", "position": [-3.8, 2.5], "wood": 1, "alternative": {"position": [-2.4, 3.25], "requires": "workbench", "materials": {"wood": 3}}},
+    {"id": "courtyard_east", "place": "courtyard", "position": [3.8, 2.5], "wood": 1, "alternative": {"position": [2.4, 3.25], "requires": "workbench", "materials": {"wood": 3}}},
+    {"id": "side_path", "place": "nursery", "position": [3.9, 0.1], "wood": 2, "requires": "side_path", "alternative": {"position": [4.25, 1.5], "requires": "side_path", "materials": {"stone": 2}}}
+  ],
+  "opportunities": {
+    "bistro": [
+      {"name": "Lunch at the little table", "effect": "picnic", "dishes": {"salad": 1}, "wood": 0, "produce": {}, "coins": 28},
+      {"name": "Tea for the neighbours", "effect": "tea", "dishes": {"tea": 1}, "wood": 0, "produce": {}, "coins": 22, "requires": "tea"}
+    ],
+    "nursery": [
+      {"name": "Fresh leaves for the nursery", "effect": "leaves", "dishes": {}, "wood": 0, "produce": {"L": 2}, "coins": 18},
+      {"name": "A basket of flowers", "effect": "flowers", "dishes": {}, "wood": 0, "produce": {"H": 1}, "coins": 18, "requires": "crop_H"}
+    ],
+    "restorer": [
+      {"name": "Wood for the next repair", "effect": "benches", "dishes": {}, "wood": 3, "produce": {}, "coins": 9},
+      {"name": "Supplies for the workshop", "effect": "baskets", "dishes": {}, "wood": 2, "produce": {"R": 1}, "coins": 12}
+    ]
+  }
+}

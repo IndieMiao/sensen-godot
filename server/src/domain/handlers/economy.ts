@@ -15,6 +15,7 @@ import type { CropId, DishId } from '../content.js';
 import { err, ok, type DomainEvent, type Result } from '../errors.js';
 import type { Ctx } from '../reducer.js';
 import type { FarmState } from '../state.js';
+import { canUse } from '../journey.js';
 
 /** 工程篮预留物不进入出售、赠礼、料理候选（PRD §7.5 L574）。 */
 export function availableProduce(s: FarmState, crop: CropId): number {
@@ -23,12 +24,14 @@ export function availableProduce(s: FarmState, crop: CropId): number {
 
 export function applyEconomy(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmState> | null {
   const c = ctx.content;
+  if (s.journey && ['claim_subsidy', 'claim_seedling_pack', 'sell_to_buyback_box'].includes(cmd.type))
+    return err('NOT_AVAILABLE', 'Use neighbourhood supplies and requests');
   switch (cmd.type) {
     case 'sell_at_stall': {
       if (!Array.isArray(cmd.items) || cmd.items.length === 0 || cmd.items.length > 12)
         return err('INSUFFICIENT_ITEMS', 'items 需 1..12 项');
       const next = structuredClone(s);
-      const budget = c.economy.stall_budget_per_day;
+      const budget = s.journey ? Number.MAX_SAFE_INTEGER : c.economy.stall_budget_per_day;
       const sold: { kind: string; id: string; qty: number; coins: number }[] = [];
       const unsold: { kind: string; id: string; qty: number }[] = [];
       for (const item of cmd.items) {
@@ -96,7 +99,7 @@ export function applyEconomy(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
       const recipe = c.recipes.recipes[cmd.recipe];
       if (!recipe) return err('INSUFFICIENT_ITEMS', `未知配方 ${cmd.recipe}`);
       const kitchenChapter = unlockChapter(ctx, 'kitchen');
-      if (s.clock.chapter_index < kitchenChapter)
+      if (!canUse(s, 'kitchen', kitchenChapter) || (s.journey && cmd.recipe === 'tea' && !canUse(s, 'tea', 3)))
         return err('CHAPTER_LOCKED', `厨房需第 ${kitchenChapter} 章开放`);
       for (const [crop, n] of Object.entries(recipe.inputs))
         if (availableProduce(s, crop as CropId) < (n ?? 0))

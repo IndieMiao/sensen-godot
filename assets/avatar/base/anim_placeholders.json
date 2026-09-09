@@ -1,59 +1,67 @@
 {
-  "format": 1,
   "_note": "劳作动作登记表。rig 的 animations.res 目前只有 idle / run / walk 三条真实 clip；六条劳作动作全部是占位。守卫测试要求：数据引用的每个动作，要么有真实 clip，要么在这里登记（方案 D9）。",
-  "real_clips": [
-    "idle",
-    "run",
-    "walk"
-  ],
+  "format": 1,
   "placeholders": {
     "clear": {
       "clip_id": "labour_clear",
+      "fallback": "idle + 程序化俯身",
       "referenced_by": "farm.gd 工具 clear → clear_cells",
-      "fallback": "idle + 程序化俯身",
-      "status": "placeholder"
-    },
-    "till": {
-      "clip_id": "labour_till",
-      "referenced_by": "farm.gd 工具 till → till_cells",
-      "fallback": "idle + 程序化俯身",
-      "status": "placeholder"
-    },
-    "sow": {
-      "clip_id": "labour_sow",
-      "referenced_by": "farm.gd 工具 sow → sow_cells",
-      "fallback": "idle + 程序化俯身",
-      "status": "placeholder"
-    },
-    "water": {
-      "clip_id": "labour_water",
-      "referenced_by": "晴天必需照料 (weather_script.care_action.sunny)",
-      "fallback": "idle + 程序化俯身",
-      "status": "placeholder"
+      "status": "real"
     },
     "drain": {
       "clip_id": "labour_drain",
+      "fallback": "idle + 程序化俯身",
       "referenced_by": "雨天必需照料 (weather_script.care_action.rain)",
-      "fallback": "idle + 程序化俯身",
-      "status": "placeholder"
-    },
-    "shelter": {
-      "clip_id": "labour_shelter",
-      "referenced_by": "风天必需照料 (weather_script.care_action.wind)",
-      "fallback": "idle + 程序化俯身",
-      "status": "placeholder"
+      "status": "real"
     },
     "harvest": {
       "clip_id": "labour_harvest",
-      "referenced_by": "farm.gd 工具 harvest → harvest_cells",
       "fallback": "idle + 程序化俯身",
-      "status": "placeholder"
+      "referenced_by": "farm.gd 工具 harvest → harvest_cells",
+      "status": "real"
+    },
+    "shelter": {
+      "clip_id": "labour_shelter",
+      "fallback": "idle + 程序化俯身",
+      "referenced_by": "风天必需照料 (weather_script.care_action.wind)",
+      "status": "real"
+    },
+    "sow": {
+      "clip_id": "labour_sow",
+      "fallback": "idle + 程序化俯身",
+      "referenced_by": "farm.gd 工具 sow → sow_cells",
+      "status": "real"
+    },
+    "till": {
+      "clip_id": "labour_till",
+      "fallback": "idle + 程序化俯身",
+      "referenced_by": "farm.gd 工具 till → till_cells",
+      "status": "real"
+    },
+    "water": {
+      "clip_id": "labour_water",
+      "fallback": "idle + 程序化俯身",
+      "referenced_by": "晴天必需照料 (weather_script.care_action.sunny)",
+      "status": "real"
     },
     "wave": {
       "clip_id": "emote_wave",
-      "referenced_by": "farm.gd 访客模式 Wave（PRD §3.3：访客本机即时动画，不发送不持久化）",
       "fallback": "idle + 程序化挥臂（绕 Y 轻摆）",
-      "status": "placeholder"
+      "referenced_by": "farm.gd 访客模式 Wave（PRD §3.3：访客本机即时动画，不发送不持久化）",
+      "status": "real"
     }
-  }
+  },
+  "real_clips": [
+    "idle",
+    "run",
+    "walk",
+    "labour_till",
+    "labour_clear",
+    "labour_sow",
+    "labour_water",
+    "labour_drain",
+    "labour_shelter",
+    "labour_harvest",
+    "emote_wave"
+  ]
 }

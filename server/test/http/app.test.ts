@@ -19,6 +19,7 @@ const bp = loadBlueprint(BLUEPRINTS, 'sh_a', 2)!;
 let app: FastifyInstance;
 let clock = at('2026-09-04T10:00:00+08:00');
 let qa: Set<string>;
+let memoryStore: MemoryStore;
 
 beforeEach(async () => {
   clock = at('2026-09-04T10:00:00+08:00');
@@ -27,6 +28,7 @@ beforeEach(async () => {
     content, timezone: SH, blueprint: blueprintSets(bp),
     now: () => clock, contentVersion: CV,
   });
+  memoryStore = store;
   app = await buildApp({
     store, content, contentVersion: CV, blueprintDir: BLUEPRINTS, regionsFile: REGIONS,
     pepper: 'test-pepper', now: () => clock, qaPlayerIds: qa,
@@ -47,6 +49,59 @@ async function makeFarm(token: string, key = 'k1') {
     payload: { idempotency_key: key, region_id: 'shanghai', layout_patch_id: 'sh_a', blueprint_revision: 2 },
   });
 }
+
+describe('journey HTTP commands', () => {
+  it('persists a hosted gathering once and rejects another owner or a stale replay', async () => {
+    const { token, player_id } = await login();
+    const created = (await makeFarm(token)).json();
+    const farm = (await memoryStore.farmByOwner(player_id))!;
+    farm.state.journey!.facts.push(...content.journey.gatherings.requires);
+    farm.state.journey!.workshop = { sequence: 0, stock: { planter: 1 }, displays: {} };
+    farm.state.journey!.gathering = { sequence: 1, planned: 'garden', memories: [] };
+    farm.state.inventory.dishes.tea = 1;
+    const payload = { idempotency_key: 'host-garden', base_version: created.version,
+      type: 'host_journey_gathering', payload: { theme: 'garden', sequence: 1 } };
+    const request = { method: 'POST' as const, url: '/v1/farms/me/commands', headers: authed(token), payload };
+    const first = await app.inject(request);
+    expect(first.statusCode).toBe(200);
+    expect(first.json().state.journey.gathering).toEqual({ sequence: 2, current: 'garden', memories: ['garden'] });
+    expect(first.json().state.inventory.dishes.tea).toBe(0);
+    const replay = await app.inject(request);
+    expect(replay.json().outcome).toBe('replayed');
+    expect(replay.json().state).toEqual(first.json().state);
+    const duplicate = await app.inject({ ...request, payload: { ...payload, idempotency_key: 'another-host', base_version: first.json().version } });
+    expect(duplicate.statusCode).toBe(422);
+    const visitor = await login();
+    await makeFarm(visitor.token);
+    const forbidden = await app.inject({ ...request, headers: authed(visitor.token) });
+    expect(forbidden.statusCode).toBe(422);
+    const saved = (await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) })).json();
+    expect(saved.state).toEqual(first.json().state);
+  });
+  it('starts normal farms on the journey and replays an accepted gathering only once', async () => {
+    const { token } = await login();
+    const farm = (await makeFarm(token)).json();
+    expect(farm.state.journey.version).toBe(1);
+    const payload = { idempotency_key: 'gather', base_version: farm.version,
+      type: 'collect_resource', payload: { node_id: 'nursery_west', round: 0 } };
+    const request = { method: 'POST' as const, url: '/v1/farms/me/commands', headers: authed(token), payload };
+    const first = await app.inject(request);
+    expect(first.statusCode).toBe(200);
+    expect(first.json().state.journey.wood).toBe(1);
+    const replay = (await app.inject(request)).json();
+    expect(replay.outcome).toBe('replayed');
+    expect(replay.state).toEqual(first.json().state);
+    expect(replay.version).toEqual(first.json().version);
+    const duplicate = await app.inject({ ...request, payload: { ...payload, idempotency_key: 'duplicate', base_version: first.json().version } });
+    expect(duplicate.statusCode).toBe(422);
+    for (const bad of [{ node_id: 'nursery_east', round: -1 }, { node_id: {}, round: 0 }, { node_id: 'nursery_east' }]) {
+      const result = await app.inject({ ...request, payload: { ...payload, idempotency_key: JSON.stringify(bad), base_version: first.json().version, payload: bad } });
+      expect(result.statusCode).toBe(422);
+    }
+    const state = (await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) })).json();
+    expect(state.state.journey.wood).toBe(1);
+  });
+});
 
 describe('鉴权', () => {
   it('同一 install_key 返回同一 player，但每次签发新 token', async () => {

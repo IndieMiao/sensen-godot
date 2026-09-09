@@ -21,6 +21,7 @@ import { installKeyHmac, isValidInstallKey, safeEqualHex, tokenHash } from './au
 import { currentOwnerFarmView, nearbyEntry, snapshotSlot, visitorSnapshot, type FarmRow } from './dto.js';
 import { avatarRef } from './avatar_ref.js';
 import { initialFarmState } from '../domain/farm_factory.js';
+import { startJourney } from '../domain/journey.js';
 import { payloadHash } from './hash.js';
 import type { Store } from './store.js';
 import { isFarmLocation, withinPlacementBounds, type FarmLocation, type PlacementBounds } from './farm_location.js';
@@ -34,8 +35,12 @@ export interface AppDeps {
   pepper: string;
   now: () => number;
   gitSha?: string;
+  /** Only these reverse proxies may supply the client IP used by login rate limits. */
+  trustedProxies?: string[];
   /** 哪些 player 建出来的农场带 qa 标记；客户端不能自设。 */
   qaPlayerIds?: Set<string>;
+  /** Compatibility switch for the archived G3 QA journey. */
+  legacyGameplay?: boolean;
   blueprint?: (id: string, revision: number) => Ctx['blueprint'] | undefined;
 }
 
@@ -48,7 +53,7 @@ interface Regions {
 export const NEARBY_LIMIT = 20;
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
-  const app = Fastify({ logger: false });
+  const app = Fastify({ logger: false, trustProxy: deps.trustedProxies?.length ? deps.trustedProxies : false });
   await app.register(rateLimit, { global: false });
   const regions = JSON.parse(readFileSync(deps.regionsFile, 'utf8')) as Regions;
   const blueprintCache = new Map<string, Ctx['blueprint']>();
@@ -285,7 +290,8 @@ function buildFarmRow(
   bp: ReturnType<typeof parseBlueprint>, deps: AppDeps, now: number,
   location?: FarmLocation,
 ): FarmRow {
-  const state = initialFarmState(deps.content, blueprintSets(bp), timezone, now);
+  let state = initialFarmState(deps.content, blueprintSets(bp), timezone, now);
+  if (!deps.legacyGameplay && !deps.qaPlayerIds?.has(ownerId)) state = startJourney(state, deps.content);
   return {
     id: cryptoRandomId(), owner_id: ownerId, region_id: regionId,
     layout_patch_id: bp.layout_patch_id, blueprint_revision: bp.revision,

@@ -19,9 +19,10 @@ func _ready() -> void:
 	content = VBoxContainer.new()
 	content.add_theme_constant_override("separation", 8)
 	add_child(content)
-	message = GameUi.label("", 12, GameUi.MUTED)
-	message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	add_child(message)
+	if message == null:
+		message = GameUi.label("", 12, GameUi.MUTED)
+		message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		add_child(message)
 	if session:
 		session.state_changed.connect(func(_s, _v): refresh())
 		session.offline_changed.connect(func(_offline): refresh())
@@ -48,11 +49,15 @@ func _rebuild() -> void:
 		content.remove_child(child)
 		child.queue_free()
 	_render()
-	if session and session.offline:
-		var reconnect := GameUi.button("rotate-ccw", "Reconnect", "Reload your farm")
+	if session and (session.offline or session.has_unconfirmed_command()):
+		var reconnect := GameUi.button("rotate-ccw", "Reconnect" if session.offline else "Check previous action", "Reload your farm")
+		reconnect.name = "ReconnectSession"
 		reconnect.disabled = busy
 		reconnect.pressed.connect(_reconnect)
 		content.add_child(reconnect)
+	# ScrollContainer cancels a button press once the shared touch gesture starts scrolling.
+	for button in content.find_children("*", "BaseButton", true, false):
+		(button as BaseButton).mouse_filter = Control.MOUSE_FILTER_PASS
 
 func _reconnect() -> void:
 	if busy or session == null: return
@@ -106,12 +111,19 @@ func command(type: String, payload: Dictionary, success := "Saved") -> bool:
 	busy = false
 	if not is_inside_tree(): return ok
 	message.text = success if ok else error_text(session.last_error_code)
+	if not ok and JourneyProgress.active(state()):
+		match session.last_error_code:
+			"NOT_AVAILABLE", "CHAPTER_LOCKED": message.text = "Complete the earlier step of this project first."
+			"INSUFFICIENT_ITEMS": message.text = "More supplies are needed for this activity."
+			"DECORATION_LOCKED": message.text = "Make your first planter at the workbench."
 	feedback.emit(message.text)
 	refresh()
 	return ok
 
 static func error_text(code: String) -> String:
 	match code:
+		"LOCAL_STORAGE": return "Could not save on this device. Free some space, then check the previous action."
+		"SESSION_CHANGED": return "The farm connection changed. Reconnect before continuing."
 		"PENDING_ACTION": return "Check the previous visit, kitchen, project or trade before changing your basket."
 		"DECORATION_LOCKED": return "Complete a growth purchase before saving your courtyard."
 		"INVALID_DECORATION": return "Choose a clear spot beside the path."

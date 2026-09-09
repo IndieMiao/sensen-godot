@@ -42,6 +42,7 @@ static func action_icon(action: String, weather := "sunny") -> String:
 		"care": return "wind" if weather == "wind" else ("cloud-rain" if weather == "rain" else "droplet")
 		"harvest": return "wheat"
 		"stall": return "store"
+		"explore": return "compass"
 	return "timer"
 
 static func surface(color := PAPER, pad := 12, radius := 8) -> StyleBoxFlat:
@@ -62,7 +63,7 @@ static func theme() -> Theme:
 	t.default_font_size = 14
 	t.set_color("font_color", "Label", INK)
 	t.set_constant("line_spacing", "Label", 0)
-	for variant in ["Button", "AccentButton", "SecondaryButton", "ChoiceButton", "ChoiceSelectedButton", "GhostButton", "RailButton"]:
+	for variant in ["Button", "OptionButton", "AccentButton", "SecondaryButton", "ChoiceButton", "ChoiceSelectedButton", "GhostButton", "RailButton"]:
 		var accent: bool = variant == "AccentButton"
 		var selected: bool = variant == "ChoiceSelectedButton"
 		var base: Color = GREEN if accent else (MINT if selected else PAPER)
@@ -88,6 +89,22 @@ static func theme() -> Theme:
 		t.set_font_size("font_size", variant, 14)
 		t.set_constant("icon_max_width", variant, 20)
 		t.set_constant("h_separation", variant, 6)
+	t.set_icon("arrow", "OptionButton", icon("chevron-down"))
+	t.set_constant("modulate_arrow", "OptionButton", 1)
+	t.set_constant("arrow_margin", "OptionButton", 8)
+	t.set_stylebox("panel", "PopupMenu", surface(PAPER, 8))
+	t.set_stylebox("hover", "PopupMenu", surface(MINT, 4, 4))
+	t.set_color("font_color", "PopupMenu", INK)
+	t.set_color("font_hover_color", "PopupMenu", GREEN)
+	t.set_color("font_disabled_color", "PopupMenu", MUTED)
+	var radio_checked := icon("circle-check")
+	var radio_unchecked := icon("circle")
+	for key in ["radio_checked", "radio_checked_disabled"]:
+		t.set_icon(key, "PopupMenu", radio_checked)
+	for key in ["radio_unchecked", "radio_unchecked_disabled"]:
+		t.set_icon(key, "PopupMenu", radio_unchecked)
+	var row_height := maxi(ceili(font.get_height(14)), maxi(radio_checked.get_height(), radio_unchecked.get_height()))
+	t.set_constant("v_separation", "PopupMenu", maxi(0, 44 - row_height))
 	for variant in ["PanelContainer", "ChipPanel", "BottomSheet"]:
 		t.set_stylebox("panel", variant, surface())
 	for variant in ["ThumbChoiceButton", "ThumbChoiceSelectedButton"]:

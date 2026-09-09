@@ -12,6 +12,7 @@ var weather := "sunny"
 var active = null
 var progress := 0.0
 var world_rect := Rect2()
+var path_origin := Vector3.ZERO
 var _targets := {}
 var _icons := {}
 var _destination := Vector3.ZERO
@@ -19,7 +20,9 @@ var _destination_visible := false
 var _reachable := true
 var _age := 0.0
 var _arrival := -1.0
-var _path: Array[Vector2i] = []
+var _path: Array[Vector3] = []
+var _cell_visuals: Array = []
+var _last_visuals: Array = []
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -31,8 +34,12 @@ func sync(view: Dictionary, now: int, condition: String) -> void:
 	cells = view
 	now_ms = now
 	weather = condition
+	_cell_visuals = []
+	for id in cells:
+		var slot: Dictionary = cells[id]
+		_cell_visuals.append([id, NextStep.step_for(slot, now_ms), str(slot.get("care_weather", weather))])
 
-func destination(world: Vector3, reachable: bool, path: Array[Vector2i]) -> void:
+func destination(world: Vector3, reachable: bool, path: Array[Vector3]) -> void:
 	_destination = world
 	_reachable = reachable
 	_path = path
@@ -40,13 +47,20 @@ func destination(world: Vector3, reachable: bool, path: Array[Vector2i]) -> void
 	_age = 0
 	_arrival = -1
 
-func update_motion(moving: bool, path: Array[Vector2i], dt: float) -> void:
+func update_motion(moving: bool, path: Array[Vector3], dt: float) -> void:
 	_path = path
 	_age += dt
 	if not moving and _arrival < 0: _arrival = _age
 	if (_arrival >= 0 and _age - _arrival > 0.6) or (not _reachable and _age > 0.8):
 		_destination_visible = false
-	queue_redraw()
+	if cam == null: return
+	# Retain static canvas geometry; rebuilding the hint arcs each frame allocates GPU buffers.
+	var visuals := [cam.get_camera_transform(), cam.get_camera_projection(), get_global_transform(),
+		world_rect, bp, _cell_visuals, active, progress, _destination_visible, path_origin]
+	if _destination_visible: visuals.append_array([_destination, _reachable, _path, _age])
+	if visuals != _last_visuals:
+		_last_visuals = visuals
+		queue_redraw()
 
 func pick(point: Vector2):
 	var local := point - global_position
@@ -60,10 +74,10 @@ func _screen(world: Vector3) -> Vector2:
 
 func _draw() -> void:
 	_targets.clear()
-	if cam == null or bp == null or world_rect.size.x < 24 or world_rect.size.y < 24: return
+	if cam == null or world_rect.size.x < 24 or world_rect.size.y < 24: return
 	if _destination_visible:
-		for cell in _path:
-			var dot := _screen(bp.cell_to_world(cell) + Vector3(0, 0.03, 0))
+		for point in _path:
+			var dot := _screen(point + path_origin + Vector3(0, 0.03, 0))
 			if world_rect.has_point(dot): draw_circle(dot, 2, Color(GameUi.GREEN, 0.45))
 		var p := _screen(_destination + Vector3(0, 0.06, 0))
 		if world_rect.has_point(p):
@@ -73,6 +87,7 @@ func _draw() -> void:
 			draw_arc(p, radius, 0, TAU, 40, color, 2, true)
 			draw_circle(p, 3, color)
 			if not _reachable: draw_texture_rect(_icons.x, Rect2(p - Vector2(8, 8), Vector2(16, 16)), false, color)
+	if bp == null: return
 	for id in cells:
 		var slot: Dictionary = cells[id]
 		var action := NextStep.step_for(slot, now_ms)

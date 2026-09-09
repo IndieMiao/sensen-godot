@@ -58,6 +58,7 @@ const app = await buildApp({
   pepper: need('TOKEN_PEPPER'), now: () => Date.now(),
   blueprint: (id, rev) => bpCache.get(`${id}@${rev}`),
   gitSha: process.env.GIT_SHA,
+  trustedProxies: (process.env.TRUSTED_PROXIES ?? '').split(',').map(value => value.trim()).filter(Boolean),
   qaPlayerIds: new Set((process.env.QA_PLAYER_IDS ?? '').split(',').filter(Boolean)),
 });
 

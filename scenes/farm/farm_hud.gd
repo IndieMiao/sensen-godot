@@ -343,7 +343,8 @@ func set_goals(goals: Array, day_index: int, progress: Dictionary = {}) -> void:
 	_goals_header.icon = GameUi.icon("circle-check" if complete else "list-checks")
 	var rows := []
 	var highlighted := false
-	for g in goals:
+	var ordered := goals.filter(func(g): return not bool(g.done)) + goals.filter(func(g): return bool(g.done))
+	for g in ordered:
 		var is_done := bool(g.done)
 		rows.append([str(g.label), GameUi.MUTED if is_done else (GameUi.INK if highlighted else GameUi.GREEN), is_done])
 		if not is_done: highlighted = true
@@ -355,6 +356,10 @@ func set_goals(goals: Array, day_index: int, progress: Dictionary = {}) -> void:
 		if remaining >= 0 and not bool(progress.get("last_chapter", false)):
 			_goals_feedback.text = "Checking next chapter..." if remaining == 0 else "Chapter complete · next in %s" % format_countdown(remaining)
 	_goals_feedback.add_theme_color_override("font_color", GameUi.GREEN if complete else GameUi.MUTED)
+	if bool(progress.get("journey", false)):
+		_goals_title.text = str(progress.title)
+		_goals_header.tooltip_text = _goals_title.text
+		_goals_feedback.text = "A corner in bloom" if complete else str(progress.title)
 	while _goals_list.get_child_count() < rows.size():
 		var row := HBoxContainer.new()
 		row.custom_minimum_size.y = 32
@@ -413,7 +418,7 @@ func set_cta_busy(pending: int) -> void:
 	_cta.add_theme_color_override("icon_disabled_color", GameUi.PAPER)
 	call_deferred("_layout")
 
-func set_seeds(inventory: Dictionary, unlocked: Array, show: bool) -> void:
+func set_seeds(inventory: Dictionary, unlocked: Array, show: bool, preserve_selection := false) -> void:
 	_seed_row.visible = show and not visitor and not _cta_busy
 	for id in _seed_buttons:
 		var b: Button = _seed_buttons[id]
@@ -421,7 +426,7 @@ func set_seeds(inventory: Dictionary, unlocked: Array, show: bool) -> void:
 		b.visible = unlocked.has(id)
 		b.text = "%s\n×%d" % [CropInfo.name_of(id), n]
 		b.disabled = n == 0 or offline or _cta_busy
-	if not unlocked.has(selected_crop) or NextStep.seeds_of(inventory, selected_crop) == 0:
+	if not preserve_selection and (not unlocked.has(selected_crop) or NextStep.seeds_of(inventory, selected_crop) == 0):
 		for id in CropInfo.ORDER:
 			if unlocked.has(id) and NextStep.seeds_of(inventory, id) > 0:
 				selected_crop = id

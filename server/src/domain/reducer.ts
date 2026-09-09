@@ -20,6 +20,7 @@ import { applyQa } from './handlers/qa.js';
 import { applySettings } from './handlers/settings.js';
 import type { FarmState } from './state.js';
 import { projectFarmState, recordChapterProgress } from './progress.js';
+import { applyJourney, journeyContent } from './journey.js';
 
 export interface Ctx {
   /** **有效**时间（QA 变换之后）；一切派生量都吃它。 */
@@ -38,7 +39,7 @@ export function makeCtx(
   blueprint: Ctx['blueprint'], realNow?: number,
 ): Ctx {
   return {
-    now, realNow: realNow ?? now, timezone, content, blueprint,
+    now, realNow: realNow ?? now, timezone, content: journeyContent(s, content), blueprint,
     derived: derive(s, now, timezone, content),
   };
 }
@@ -49,8 +50,8 @@ export function apply(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmState> {
 
   // 先把跨过的玩家日物化（换日、开章、发 Grant），再执行命令本身。
   const base = projectFarmState(s, ctx.now, ctx.timezone, ctx.content, ctx.blueprint);
-  const currentCtx = { ...ctx, derived: derive(base, ctx.now, ctx.timezone, ctx.content) };
-  for (const handler of [applyFarming, applyEconomy, applyResidents, applyDecorations, applySettings, applyQa]) {
+  const currentCtx = { ...ctx, content: journeyContent(base, ctx.content), derived: derive(base, ctx.now, ctx.timezone, ctx.content) };
+  for (const handler of [applyJourney, applyFarming, applyEconomy, applyResidents, applyDecorations, applySettings, applyQa]) {
     const result = handler(base, cmd, currentCtx);
     if (!result) continue;
     if (!result.ok) return result;
@@ -58,7 +59,9 @@ export function apply(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmState> {
     const next = projectFarmState(progressed, ctx.now, ctx.timezone, ctx.content, ctx.blueprint);
     const completed = next.handbook.filter(entry => entry.kind === 'chapter_done'
       && !s.handbook.some(old => old.kind === entry.kind && old.key === entry.key));
-    return ok(next, [...result.events, ...completed.map(entry => ({ type: 'chapter_done', chapter: Number(entry.key) }))]);
+    const milestones = next.journey?.completed.filter(id => !s.journey?.completed.includes(id)) ?? [];
+    return ok(next, [...result.events, ...completed.map(entry => ({ type: 'chapter_done', chapter: Number(entry.key) })),
+      ...milestones.map(id => ({ type: 'milestone_unlocked', id }))]);
   }
 
   return err('NOT_AVAILABLE', `命令 ${cmd.type} 尚未实现（Task 5）`);

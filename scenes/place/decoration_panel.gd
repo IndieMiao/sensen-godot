@@ -12,6 +12,9 @@ var _draft: Array = []
 var _baseline: Array = []
 var _history: Array = []
 var _confirm_leave := false
+var compact := false
+var _drag_active := false
+var _drag_origin: Array = []
 
 func pending_key() -> StringName:
 	return PENDING_META
@@ -20,19 +23,16 @@ func setup(value: FarmSession) -> void:
 	super.setup(value)
 	_baseline = DecorationLayout.saved(state())
 	_draft = _baseline.duplicate(true)
+	if JourneyProgress.active(state()): selected_prop = "planter"
 	if session and session.has_meta(PENDING_META):
 		_draft = session.get_meta(PENDING_META).get("props", _baseline).duplicate(true)
 	dirty = _draft != _baseline
 
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_PASS
 	super._ready()
 	if session: session.state_changed.connect(_server_changed)
 	preview_changed.emit(_draft.duplicate(true))
-
-func _gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton or event is InputEventScreenTouch or event is InputEventScreenDrag:
-		accept_event()
 
 func preview() -> Array:
 	return _draft.duplicate(true)
@@ -63,6 +63,9 @@ func _render() -> void:
 		_local_action("x", "Discard changes", "Restore the saved arrangement", _discard_and_leave).name = "DiscardDecorationChanges"
 		_local_action("arrow-left", "Keep editing", "Return to the arrangement", _keep_editing).name = "KeepEditingDecorations"
 		return
+	if compact:
+		_render_compact()
+		return
 	heading("Courtyard pieces")
 	paragraph("%d / 6 placed" % _draft.size())
 	if not DecorationLayout.unlocked(state()):
@@ -73,10 +76,14 @@ func _render() -> void:
 	picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	picker.disabled = busy
 	for id in DecorationLayout.IDS:
+		if JourneyProgress.active(state()) and not JourneyProgress.unlocked(state(), "decorations") and id != "planter": continue
 		var placed := DecorationLayout.index_of(_draft, str(id)) >= 0
 		picker.add_item(DecorationLayout.name_of(str(id)) + (" (placed)" if placed else ""))
-	picker.selected = DecorationLayout.IDS.find(selected_prop)
-	picker.item_selected.connect(func(index: int): select_prop(str(DecorationLayout.IDS[index])))
+		picker.get_popup().set_item_icon_modulate(picker.item_count - 1, GameUi.GREEN if id == selected_prop else GameUi.MUTED)
+	var allowed := ["planter"] if JourneyProgress.active(state()) and not JourneyProgress.unlocked(state(), "decorations") else DecorationLayout.IDS
+	if not allowed.has(selected_prop): selected_prop = "planter"
+	picker.selected = allowed.find(selected_prop)
+	picker.item_selected.connect(func(index: int): select_prop(str(allowed[index])))
 	content.add_child(picker)
 	var existing := DecorationLayout.index_of(_draft, selected_prop)
 	if existing < 0:
@@ -97,6 +104,7 @@ func _render() -> void:
 			button.pressed.connect(func(): adjust(spec[1]))
 			row.add_child(button)
 		_local_action("minus", "Remove", "Remove selected piece", remove_selected).name = "RemoveDecoration"
+		_local_action("rotate-cw", "", "Rotate selected piece", rotate_selected).name = "RotateDecoration"
 	var history := HBoxContainer.new()
 	history.add_theme_constant_override("separation", 8)
 	content.add_child(history)
@@ -108,6 +116,34 @@ func _render() -> void:
 		button.pressed.connect(spec[2])
 		history.add_child(button)
 	action("check", "Save layout", save_layout, dirty and DecorationLayout.unlocked(state()), true).name = "SaveDecorations"
+
+func _render_compact() -> void:
+	var allowed: Array = ["planter"] if JourneyProgress.active(state()) and not JourneyProgress.unlocked(state(), "decorations") else DecorationLayout.IDS
+	if not allowed.has(selected_prop): selected_prop = str(allowed[0])
+	var picker := OptionButton.new()
+	picker.name = "DecorationPicker"
+	picker.custom_minimum_size.y = 44
+	picker.disabled = busy
+	for id in allowed: picker.add_item(DecorationLayout.name_of(str(id)))
+	picker.selected = allowed.find(selected_prop)
+	picker.item_selected.connect(func(index): select_prop(str(allowed[index])))
+	content.add_child(picker)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	content.add_child(row)
+	var placed := DecorationLayout.index_of(_draft, selected_prop) >= 0
+	for spec in [["plus", "Place selected piece", place_selected, not placed],
+		["rotate-cw", "Rotate selected piece", rotate_selected, placed],
+		["rotate-ccw", "Undo arrangement", undo, not _history.is_empty()],
+		["minus", "Remove selected piece", remove_selected, placed],
+		["x", "Cancel arrangement", cancel_preview, dirty],
+		["check", "Save layout", save_layout, dirty and DecorationLayout.unlocked(state())]]:
+		var button := GameUi.button(str(spec[0]), "", str(spec[1]), spec[0] == "check")
+		button.custom_minimum_size = Vector2(44, 44)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.disabled = busy or not bool(spec[3]) or (spec[0] == "check" and (session == null or session.offline))
+		button.pressed.connect(spec[2])
+		row.add_child(button)
 
 func _local_action(icon: String, text: String, tooltip: String, callback: Callable, enabled := true) -> Button:
 	var button := GameUi.button(icon, text, tooltip)
@@ -169,16 +205,44 @@ func remove_selected() -> void:
 	next.remove_at(index)
 	_change(next)
 
+func rotate_selected() -> bool:
+	if busy or _uncertain() or _confirm_leave: return false
+	var next := preview()
+	var index := DecorationLayout.index_of(next, selected_prop)
+	if index < 0: return false
+	next[index].rotation_q = (int(next[index].get("rotation_q", 0)) + 1) % 4
+	return _change(DecorationLayout.canonical(next))
+
 func _change(next: Array) -> bool:
 	if next == _draft or not DecorationLayout.is_valid(next): return false
-	_history.append(preview())
-	if _history.size() > 50: _history.pop_front()
+	if not _drag_active:
+		_history.append(preview())
+		if _history.size() > 50: _history.pop_front()
 	_draft = next.duplicate(true)
 	dirty = _draft != _baseline
 	if message: message.text = ""
 	preview_changed.emit(preview())
 	refresh()
 	return true
+
+func begin_drag() -> void:
+	if _drag_active or busy or _uncertain() or _confirm_leave: return
+	_drag_active = true
+	_drag_origin = preview()
+
+func end_drag(canceled := false) -> void:
+	if not _drag_active: return
+	_drag_active = false
+	if _draft != _drag_origin:
+		if canceled:
+			_draft = _drag_origin.duplicate(true)
+			dirty = _draft != _baseline
+			preview_changed.emit(preview())
+		else:
+			_history.append(_drag_origin.duplicate(true))
+			if _history.size() > 50: _history.pop_front()
+	_drag_origin.clear()
+	refresh()
 
 func undo() -> void:
 	if busy or _uncertain() or _confirm_leave or _history.is_empty(): return

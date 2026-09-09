@@ -16,6 +16,11 @@ static func definition(id: String) -> Dictionary:
 	return data().get("residents", {}).get(id, {})
 
 static func present(place_id: String, farm_state: Dictionary) -> Array:
+	if JourneyProgress.active(farm_state):
+		var resident := {"nursery": "nursery_keeper", "bistro": "bistro_owner", "courtyard": "restorer"}
+		if place_id == "bistro" and JourneyProgress.project_complete(farm_state, "terrace"):
+			return ["bistro_owner", "nursery_keeper"]
+		return [resident[place_id]] if resident.has(place_id) and PlaceCatalog.available(place_id, farm_state) else []
 	var chapter := int(farm_state.get("clock", {}).get("chapter_index", -1))
 	var out := []
 	for id in ORDER:
@@ -46,6 +51,28 @@ static func outfit(id: String) -> AvatarConfig:
 	for slot in choices: config.slots[StringName(slot)] = str(choices[slot])
 	return config
 
+static func journey_position(place_id: String, resident_id: String) -> Vector3:
+	return Vector3(1.1, 0.04, 1.05) if place_id == "bistro" and resident_id == "nursery_keeper" else Vector3(0.35, 0.04, 0.25)
+
+static func activities(place_id: String, state: Dictionary) -> Array:
+	var out := []
+	if place_id == "nursery" and JourneyProgress.project_complete(state, "seedbeds"):
+		out.append({"resident": "nursery_keeper", "point": Vector3(-3.7, 0.04, 0.35), "facing": Vector3(-2.5, 0.6, -0.25),
+			"animation": "labour_water", "seconds": 4.0, "label": "Tending seedlings"})
+	if place_id == "bistro" and JourneyProgress.fact(state, "met_bistro"):
+		out.append({"resident": "bistro_owner", "point": Vector3(-1.1, 0.04, 0.45), "facing": Vector3(-1.1, 0.9, -0.7),
+			"animation": "labour_sow", "seconds": 4.0, "label": "Preparing the counter"})
+		if JourneyProgress.project_complete(state, "terrace"):
+			out.append({"resident": "nursery_keeper", "point": Vector3(3.55, 0.04, -0.65), "facing": Vector3(2, 0.96, -1.65),
+				"animation": "idle", "seconds": 5.0, "label": "At the tea terrace"})
+	if place_id == "courtyard" and JourneyProgress.fact(state, "planter_planted"):
+		var planters := DecorationLayout.saved(state).filter(func(prop): return prop.prop_id == "planter")
+		if not planters.is_empty():
+			var planter := DecorationLayout.world_position(planters[0])
+			out.append({"resident": "restorer", "point": planter + Vector3(0.8, 0.04, 0.65), "facing": planter,
+				"animation": "labour_water", "seconds": 4.0, "label": "Tending the flowers"})
+	return out
+
 static func build(place_id: String, farm_state: Dictionary) -> Node3D:
 	var root := Node3D.new()
 	root.name = "Residents"
@@ -56,6 +83,9 @@ static func build(place_id: String, farm_state: Dictionary) -> Node3D:
 		rig.name = id
 		rig.position = Vector3((index - (residents.size() - 1) * 0.5) * 1.5, 0.04, 0.25)
 		rig.rotation.y = 0.5
+		if JourneyProgress.active(farm_state):
+			rig.position = journey_position(place_id, id)
+			rig.rotation.y = PI * 0.5 if place_id == "bistro" and id == "nursery_keeper" else 0.5
 		rig.scale = Vector3.ONE * 1.05
 		for child in rig.get_children():
 			if child is RigActivity:

@@ -17,11 +17,13 @@ static func _load() -> Dictionary:
 static func name_of(crop: String) -> String:
 	return str(NAMES.get(crop, crop))
 
-static func unit_price(crop: String) -> int:
+static func unit_price(crop: String, state: Dictionary = {}) -> int:
+	if JourneyProgress.active(state): return int(JourneyProgress.data().crops.get(crop, {}).get("unit_price", 0))
 	return int((_load().get(crop, {}) as Dictionary).get("unit_price", 0))
 
 static func seed_price(crop: String) -> int:
 	return int((_load().get(crop, {}) as Dictionary).get("seed_price", 0))
 
-static func duration_ms(crop: String) -> int:
+static func duration_ms(crop: String, state: Dictionary = {}) -> int:
+	if JourneyProgress.active(state): return int(JourneyProgress.data().crops.get(crop, {}).get("duration_ms", 0))
 	return int((_load().get(crop, {}) as Dictionary).get("duration_ms", 0))

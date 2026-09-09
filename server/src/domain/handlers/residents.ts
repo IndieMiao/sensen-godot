@@ -11,6 +11,7 @@ import { err, ok, type DomainEvent, type Result } from '../errors.js';
 import type { Ctx } from '../reducer.js';
 import type { FarmState, ResidentState } from '../state.js';
 import { availableProduce, unlockChapter } from './economy.js';
+import { canUse } from '../journey.js';
 
 /** 阶段由点数 + 门槛条件共同决定：赠礼刷满点数也不能独立解锁「熟悉」（PRD §8.2 L621）。 */
 export function stageOf(r: ResidentState, ctx: Pick<Ctx, 'content'>): string {
@@ -33,6 +34,9 @@ const gainPoints = (r: ResidentState, n: number, events: DomainEvent[], reason: 
 export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmState> | null {
   const c = ctx.content;
   const rel = c.relationships;
+  if (s.journey && ['submit_request', 'resolve_life_choice', 'attend_shared_event',
+    'reserve_engineering', 'withdraw_engineering', 'submit_engineering'].includes(cmd.type))
+    return err('NOT_AVAILABLE', 'Use the current neighbourhood activity');
 
   switch (cmd.type) {
     case 'talk_to_resident': {
@@ -40,7 +44,8 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
         return err('NOT_AVAILABLE', '未知居民');
       const meta = rel.residents[cmd.resident_id];
       if (!meta) return err('NOT_AVAILABLE', cmd.resident_id);
-      if (s.clock.chapter_index < meta.available_from_chapter)
+      if (s.journey ? cmd.resident_id === 'bistro_owner' && !canUse(s, 'bistro', 1)
+        : s.clock.chapter_index < meta.available_from_chapter)
         return err('NOT_AVAILABLE', `${cmd.resident_id} 尚未登场`);
       const next = structuredClone(s);
       const r = next.residents[cmd.resident_id];
@@ -58,20 +63,25 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
         return err('NOT_AVAILABLE', '未知居民');
       const meta = rel.residents[cmd.resident_id];
       if (!meta) return err('NOT_AVAILABLE', cmd.resident_id);
-      if (s.clock.chapter_index < unlockChapter(ctx, 'gifts'))
+      if (!canUse(s, 'gifts', unlockChapter(ctx, 'gifts')))
         return err('CHAPTER_LOCKED', '赠礼尚未开放');
-      if (s.clock.chapter_index < meta.available_from_chapter)
+      if (s.journey ? cmd.resident_id === 'bistro_owner' && !canUse(s, 'bistro', 1)
+        : s.clock.chapter_index < meta.available_from_chapter)
         return err('NOT_AVAILABLE', `${cmd.resident_id} 尚未登场`);
       if (!(rel.gift_clues[cmd.resident_id] ?? []).includes(cmd.crop))
         return err('NOT_AVAILABLE', `${cmd.resident_id} 的线索里没有 ${cmd.crop}`);
-      const cap = rel.points.clued_gift.week_cap ?? Infinity;
-      if (s.residents[cmd.resident_id].gifts_given >= cap) return err('ALREADY_CLAIMED', '赠礼次数已满');
+      if (s.journey) {
+        if (s.journey.gift_rounds?.[cmd.resident_id] === s.journey.exploration.round)
+          return err('ALREADY_CLAIMED', 'A new gift after your next trail');
+      } else if (s.residents[cmd.resident_id].gifts_given >= (rel.points.clued_gift.week_cap ?? Infinity))
+        return err('ALREADY_CLAIMED', '赠礼次数已满');
       if (availableProduce(s, cmd.crop) < 1) return err('INSUFFICIENT_ITEMS', cmd.crop);
       const next = structuredClone(s);
       const r = next.residents[cmd.resident_id];
       const events: DomainEvent[] = [];
       next.inventory.produce[cmd.crop] -= 1;
       r.gifts_given += 1;
+      if (next.journey) (next.journey.gift_rounds ??= {})[cmd.resident_id] = next.journey.exploration.round;
       r.first_met_day ??= next.clock.player_day_id;
       gainPoints(r, rel.points.clued_gift.points, events, 'clued_gift');
       // 记下本章赠礼的作物，供 resolve_life_choice(gift) 校验。
@@ -163,9 +173,9 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
 
     case 'set_growth_intent': {
       if (cmd.choice !== 'tool' && cmd.choice !== 'field') return err('NOT_AVAILABLE', '成长选择非法');
-      if (s.clock.chapter_index < unlockChapter(ctx, 'growth_choice'))
+      if (!canUse(s, 'growth', unlockChapter(ctx, 'growth_choice')))
         return err('CHAPTER_LOCKED', '成长选择尚未开放');
-      if (s.growth_choice.purchase) return err('LOCKED_CHOICE', '已付款，不可改');
+      if (!s.journey && s.growth_choice.purchase) return err('LOCKED_CHOICE', '已付款，不可改');
       const next = structuredClone(s);
       next.growth_choice.intent = cmd.choice; // 付款前可改选（PRD §7.5 L556）
       return ok(next);
@@ -175,9 +185,10 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
       if (cmd.choice !== 'tool' && cmd.choice !== 'field') return err('NOT_AVAILABLE', '成长选择非法');
       if (typeof cmd.transaction_id !== 'string' || cmd.transaction_id.trim().length === 0
         || cmd.transaction_id.length > 128) return err('NOT_AVAILABLE', '交易标识非法');
-      if (s.clock.chapter_index < unlockChapter(ctx, 'growth_choice'))
+      if (!canUse(s, 'growth', unlockChapter(ctx, 'growth_choice')))
         return err('CHAPTER_LOCKED', '成长选择尚未开放');
-      if (s.growth_choice.purchase) return err('LOCKED_CHOICE', '首周永久二选一');
+      if (s.journey ? (cmd.choice === 'tool' ? s.tools.row_tool : s.beds_unlocked === 4) : s.growth_choice.purchase)
+        return err('LOCKED_CHOICE', 'Already purchased');
       const gc = c.economy.growth_choice;
       const next = structuredClone(s);
       if (cmd.choice === 'tool') {
@@ -209,7 +220,7 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
 
     case 'choose_nursery_appearance': {
       if (cmd.appearance !== 'a' && cmd.appearance !== 'b') return err('NOT_AVAILABLE', '外观选择非法');
-      if (s.clock.chapter_index < unlockChapter(ctx, 'nursery_appearance'))
+      if (!canUse(s, 'nursery_appearance', unlockChapter(ctx, 'nursery_appearance')))
         return err('CHAPTER_LOCKED', '外观选择尚未开放');
       const next = structuredClone(s);
       next.nursery.appearance = cmd.appearance; // 两种等价值外观（PRD §9.2 L682）
@@ -217,7 +228,7 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
     }
 
     case 'record_visit_return': {
-      if (s.clock.chapter_index < unlockChapter(ctx, 'visit'))
+      if (!canUse(s, 'visit', unlockChapter(ctx, 'visit')))
         return err('CHAPTER_LOCKED', '访问尚未开放');
       const next = structuredClone(s);
       // 只写教学事实，零资源：访问不产生金币、XP、关系、任务进度或每日奖励（PRD §8.4 L655）。

@@ -7,8 +7,10 @@ var world_env: WorldEnvironment
 var canvas: CanvasLayer
 var root: Control
 var content: VBoxContainer
+var scroll: ScrollContainer
 var tabs: HBoxContainer
 var status: Label
+var feedback: Label
 var body: PanelContainer
 var scenery: Node3D
 var _environment: Environment
@@ -27,6 +29,7 @@ var _pointer_id := -2
 var _pointer_start := Vector2.ZERO
 var _pointer_dragged := false
 var photo: WeekPhoto
+var journey_scene: JourneyPlace
 
 func setup(args: Dictionary) -> void:
 	_args = args
@@ -37,6 +40,13 @@ func setup(args: Dictionary) -> void:
 func _ready() -> void:
 	if session == null or not PlaceCatalog.available(place_id, session.state):
 		call_deferred("_leave")
+		return
+	if JourneyProgress.active(session.state):
+		journey_scene = JourneyPlace.new()
+		journey_scene.place_id = place_id
+		journey_scene.session = session
+		journey_scene.initial_target = str(_args.get("target", ""))
+		add_child(journey_scene)
 		return
 	_build_world()
 	_build_ui()
@@ -97,7 +107,7 @@ func _build_ui() -> void:
 	body.add_child(col)
 	tabs = HBoxContainer.new()
 	col.add_child(tabs)
-	var scroll := ScrollContainer.new()
+	scroll = ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(scroll)
@@ -105,6 +115,11 @@ func _build_ui() -> void:
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation", 8)
 	scroll.add_child(content)
+	feedback = GameUi.label("", 12, GameUi.INK)
+	feedback.name = "PlaceFeedback"
+	feedback.custom_minimum_size.y = 32
+	feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	col.add_child(feedback)
 	status = GameUi.label("", 12, GameUi.MUTED)
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(status)
@@ -141,6 +156,8 @@ func select_tab(id: String) -> void:
 func _activate_tab(id: String) -> void:
 	selected_tab = id
 	_pointer_id = -2
+	scroll.scroll_vertical = 0
+	feedback.text = ""
 	for child in content.get_children():
 		content.remove_child(child)
 		child.queue_free()
@@ -151,6 +168,7 @@ func _activate_tab(id: String) -> void:
 	if id == "events": path = "res://scenes/place/events_panel.gd"
 	if ResourceLoader.exists(path):
 		active_panel = load(path).new()
+		active_panel.message = feedback
 		if id in ["people", "events"]: active_panel.place_id = place_id
 		elif id != "decorations": active_panel.section = id
 		if id == "people": active_panel.selected_resident = str(_args.get("resident_id", ""))
@@ -352,6 +370,7 @@ func _leave() -> void:
 	AppRouter.pop_instance()
 
 func is_back_navigation_locked() -> bool:
+	if journey_scene: return journey_scene.is_back_navigation_locked()
 	if photo: return photo.consume_back()
 	if active_panel == null: return false
 	if active_panel.busy: return true
@@ -359,6 +378,9 @@ func is_back_navigation_locked() -> bool:
 	return active_panel.consume_back()
 
 func suspend() -> void:
+	if journey_scene:
+		journey_scene.suspend()
+		return
 	process_mode = Node.PROCESS_MODE_DISABLED
 	visible = false
 	canvas.visible = false
@@ -366,6 +388,9 @@ func suspend() -> void:
 	world_env.environment = null
 
 func resume() -> void:
+	if journey_scene:
+		journey_scene.resume()
+		return
 	process_mode = Node.PROCESS_MODE_INHERIT
 	visible = true
 	canvas.visible = true

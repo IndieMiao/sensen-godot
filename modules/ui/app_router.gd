@@ -6,6 +6,7 @@ const DRESS := "res://scenes/dressing_room/dressing_room.tscn"
 const STRESS := "res://scenes/stress_test/stress_test.tscn"
 const FARM := "res://scenes/farm/farm.tscn"
 const PLACE := "res://scenes/place/place.tscn"
+const STREET := "res://scenes/map/journey_street.tscn"
 const CITY_SELECT := "res://scenes/city_select/city_select.tscn"
 
 const BACK_IGNORE := 0

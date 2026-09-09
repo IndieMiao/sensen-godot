@@ -19,6 +19,19 @@ const edit = (dir: string, name: string, mutate: (d: any) => void): void => {
 };
 
 describe('content tables', () => {
+  it.each(['requirements', 'theme', 'item', 'dish', 'coins', 'null'])('rejects invalid gathering %s', invalid => {
+    const dir = scratch();
+    edit(dir, 'journey', d => {
+      const g = d.gatherings;
+      if (invalid === 'requirements') g.requires = ['missing_fact'];
+      if (invalid === 'theme') { g.themes.unknown = g.themes.garden; delete g.themes.garden; }
+      if (invalid === 'item') g.themes.garden.item = 'unknown';
+      if (invalid === 'dish') g.themes.garden.dish = 'unknown';
+      if (invalid === 'coins') g.themes.garden.coins = -1;
+      if (invalid === 'null') g.themes.garden = null;
+    });
+    expect(() => loadContent(dir)).toThrowError(ContentError);
+  });
   it('八张表全部加载并通过校验', () => {
     const c = loadContent(DEFAULT_CONTENT_DIR);
     expect(Object.keys(c.crops.crops).sort()).toEqual([...CROP_IDS].sort());

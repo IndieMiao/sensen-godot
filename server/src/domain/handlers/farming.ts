@@ -6,6 +6,7 @@
  */
 import { checkCellIds } from '../commands.js';
 import type { Command } from '../commands.js';
+import { canUse } from '../journey.js';
 import type { CropId } from '../content.js';
 import { err, ok, type DomainEvent, type Result } from '../errors.js';
 import type { Ctx } from '../reducer.js';
@@ -79,7 +80,7 @@ export function applyFarming(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
       const gate = gateCells(s, ctx, cmd.cell_ids);
       if (!gate.ok) return gate;
       const unlockedCrop = cropUnlockChapter(ctx, cmd.crop);
-      if (s.clock.chapter_index < unlockedCrop)
+      if (!(cmd.crop === 'R' || cmd.crop === 'L' || canUse(s, `crop_${cmd.crop}`, unlockedCrop)))
         return err('CHAPTER_LOCKED', `${cmd.crop} 需第 ${unlockedCrop} 章开放`);
       const next = structuredClone(s);
       const lot = next.inventory.seeds[cmd.crop];
@@ -179,7 +180,7 @@ export function applyFarming(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
       if (!Number.isInteger(cmd.qty) || cmd.qty < 1 || cmd.qty > 24)
         return err('INSUFFICIENT_ITEMS', 'qty 必须是 1..24');
       const unlockChapter = cropUnlockChapter(ctx, cmd.crop);
-      if (s.clock.chapter_index < unlockChapter)
+      if (!(cmd.crop === 'R' || cmd.crop === 'L' || canUse(s, `crop_${cmd.crop}`, unlockChapter)))
         return err('CHAPTER_LOCKED', `${cmd.crop} 需第 ${unlockChapter} 章开放`);
       const cost = c.crops.crops[cmd.crop].seed_price * cmd.qty;
       if (s.wallet < cost) return err('INSUFFICIENT_FUNDS', `需要 ${cost}`);

@@ -4,6 +4,8 @@ extends GdUnitTestSuite
 const FARM_SCENE := "res://scenes/farm/farm.tscn"
 const FIX := "res://tests/fixtures/blueprints/fix_grid/r1/farm_blueprint.json"
 
+signal release_farm_command
+
 var _saved_navigation_pending: bool
 
 func before_test() -> void:
@@ -53,6 +55,30 @@ func _online_farm(t: FakeTransport) -> Node:
 	await get_tree().process_frame
 	return scene
 
+func test_seed_destination_opens_requested_goods_even_with_other_crops_ready() -> void:
+	var transport := FakeTransport.new([])
+	var bp := FarmBlueprint.load_file(FIX)
+	var s := _session_with_farm(transport, "", _wild_cells(bp))
+	s.state.journey = {"version": 1, "facts": ["first_harvest", "shared_meal"],
+		"unlocks": ["crop_C", "crop_H"], "exploration": {"round": 1, "collected": []}}
+	s.state.xp.first_harvest_crops = ["R"]
+	var cell: Vector2i = bp.beds()[0].cells[0]
+	s.state.cells["%d,%d" % [cell.x, cell.y]] = {"state": "growing", "crop": "C", "ready_at": 1}
+	var original := s.state.duplicate(true)
+	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
+	scene.setup({"blueprint": bp, "session": s, "seed_crop": "H"})
+	add_child(auto_free(scene))
+	for frame in 10: await get_tree().process_frame
+	assert_str(scene._last_bulk.action).is_equal("harvest")
+	assert_bool(scene.stall.visible).is_true()
+	assert_bool(scene.hud.modal_open()).is_true()
+	assert_bool(scene.stall._scroll.get_global_rect().encloses(scene.stall._seed_rows.H.box.get_global_rect())).is_true()
+	assert_array(transport.requests).is_empty()
+	assert_dict(s.state).is_equal(original)
+	assert_bool(scene.is_back_navigation_locked()).is_true()
+	assert_bool(scene.stall.visible).is_false()
+	assert_bool(scene.hud.modal_open()).is_false()
+
 ## 推进到某条件成立或超时（秒）。
 func _run_until(f: Node, cond: Callable, seconds := 20.0) -> bool:
 	var t := 0.0
@@ -81,6 +107,99 @@ func test_purchased_row_tool_expands_only_matching_actions_in_the_same_bed() -> 
 	assert_array(f._expand_tool_plots([row[2]], view, f._now(), 3)).is_equal([row[2]])
 	for cell in row: view[f._id(cell)] = {"state": "wild", "ready_at": null}
 	assert_array(f._expand_tool_plots([row[0]], view, f._now(), 3)).is_equal([row[0]])
+
+func test_seed_button_intent_survives_refresh_but_not_automatic_seed_fallback() -> void:
+	var f := await _online_farm(FakeTransport.new([]))
+	f.set_process(false)
+	f.session.state.journey = {"version": 1, "facts": ["met_nursery", "met_bistro", "shared_meal"],
+		"unlocks": ["bistro", "kitchen", "crop_C"], "exploration": {"round": 1, "collected": []}}
+	f.session.state.xp.first_harvest_crops = ["R"]
+	var cells: Dictionary = f.session.state.cells
+	var ids := cells.keys()
+	cells[ids[0]] = {"crop": "R", "state": "growing", "ready_at": f._now() + 100000}
+	cells[ids[1]] = {"state": "tilled", "crop": null}
+	f.predictor.commit(f.interior.local_cells(cells), f.session.version)
+	f._refresh_hud()
+	assert_str(f._last_bulk.action).is_equal("explore")
+	f.hud._seed_buttons.L.pressed.emit()
+	assert_str(f._last_bulk.crop).is_equal("L")
+	f._refresh_hud()
+	assert_str(f._last_bulk.crop).is_equal("L")
+	f.session.state.inventory.seeds.L.bound = 0
+	f._refresh_hud()
+	assert_str(f.hud.selected_crop).is_equal("R")
+	assert_str(f._explicit_crop).is_empty()
+	assert_str(f._last_bulk.action).is_equal("explore")
+
+func _salad_farm(transport: FakeTransport) -> Node:
+	var f := await _online_farm(transport)
+	f.set_process(false)
+	f.session.state.journey = {"version": 1, "facts": ["met_nursery", "workbench"],
+		"unlocks": ["bistro", "kitchen", "crop_C"], "exploration": {"round": 1, "collected": []}}
+	f.session.state.xp.first_harvest_crops = ["R"]
+	f.session.state.inventory.seeds.C.bound = 2
+	for cell in f.bp.beds()[0].cells:
+		f.session.state.cells[f.interior.source_id(f._id(cell))] = {"state": "tilled", "crop": null}
+	f.predictor.commit(f.interior.local_cells(f.session.state.cells), f.session.version)
+	return f
+
+func test_recommended_crop_is_selected_and_sent_from_a_world_plot_after_work_finishes() -> void:
+	var transport := FakeTransport.new([])
+	var f := await _salad_farm(transport)
+	f.hud.set_cta_busy(1)
+	f._refresh_hud()
+	assert_str(f.hud._cta.text).is_equal("Sow 1 Carrot")
+	assert_str(f.hud.selected_crop).is_equal("C")
+	assert_bool(f.hud._seed_row.visible).is_true()
+	assert_bool(f.hud._seed_buttons.C.disabled).is_false()
+	assert_str(str(f.hud._seed_buttons.C.theme_type_variation)).is_equal("ChoiceSelectedButton")
+	var next: Dictionary = f.session.state.duplicate(true)
+	var cell: Vector2i = f.bp.beds()[0].cells[0]
+	next.cells[f.interior.source_id(f._id(cell))] = {"state": "sown", "crop": "C", "care_weather": "sunny"}
+	next.inventory.seeds.C.bound -= 1
+	transport.responses.append({"status": 200, "json": {"version": 1, "state": next}})
+	f._tap_cell(cell)
+	assert_bool(_run_until(f, func(): return transport.requests.size() == 1)).is_true()
+	assert_str(transport.requests[0].body.type).is_equal("sow_cells")
+	assert_str(transport.requests[0].body.payload.crop).is_equal("C")
+	assert_str(transport.requests[0].body.payload.lot).is_equal("bound")
+
+func test_manual_sow_queue_keeps_its_crop_when_recommendations_or_seed_counts_change() -> void:
+	var f := await _salad_farm(FakeTransport.new([]))
+	f._refresh_hud()
+	f.hud._seed_buttons.L.pressed.emit()
+	assert_str(f.hud._cta.text).is_equal("Sow 3 Lettuce")
+	f._on_cta()
+	assert_int(f.runner.pending_count()).is_equal(3)
+	f._explicit_crop = ""
+	f._refresh_hud()
+	assert_str(f._last_bulk.crop).is_equal("C")
+	assert_str(f._payload_for("sow", ["4,6"]).crop).is_equal("L")
+	f.session.state.inventory.seeds.L.bound = 0
+	f._refresh_hud()
+	assert_str(f.hud.selected_crop).is_equal("L")
+	f.runner.cancel_pending()
+	f._refresh_hud()
+	assert_str(f.hud.selected_crop).is_equal("C")
+
+func test_journey_bag_opens_inventory_in_the_farm_and_back_only_closes_it() -> void:
+	var transport := FakeTransport.new([])
+	var f := await _salad_farm(transport)
+	var original: Dictionary = f.session.state.duplicate(true)
+	f.hud.get_node("Overview/LifeButton").pressed.emit()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_bool(f.hud.modal_open()).is_true()
+	assert_bool(f.life_sheet.visible).is_true()
+	assert_str(f.life_sheet._title.text).is_equal("Your bag")
+	assert_str(f.life_sheet.active.target).is_equal("supplies")
+	assert_bool(f.life_sheet._journey_button.visible).is_false()
+	assert_bool(f.life_sheet._tabs_row.visible).is_false()
+	assert_bool(f.is_back_navigation_locked()).is_true()
+	assert_bool(f.hud.modal_open()).is_false()
+	assert_bool(f.hud._bottom.visible).is_true()
+	assert_int(transport.requests.size()).is_equal(0)
+	assert_that(f.session.state).is_equal(original)
 
 func test_authoritative_chapter_response_updates_goals_weather_and_completion_feedback_once() -> void:
 	var f := await _online_farm(FakeTransport.new([]))
@@ -156,8 +275,8 @@ func test_failed_chapter_refresh_is_throttled_and_offline_never_advances_the_cha
 func test_builds_ground_props_and_player_at_spawn() -> void:
 	var f: Node = await _farm()
 	assert_object(f.get_node("Ground").mesh).is_not_null()
-	# house + storage + well + exit + 9 田格 + 3 预留格
-	assert_int(f.prop_count()).is_equal(4 + 9 + 3)
+	# house + storage + well + 9 田格 + 3 预留格
+	assert_int(f.prop_count()).is_equal(3 + 9 + 3)
 	assert_that(f.mover.cell()).is_equal(f.bp.anchor("spawn"))
 	assert_bool(f.get_node("Player").get_child_count() >= 1).is_true()
 	assert_str(f.title.text).is_equal("Fixture Grid")
@@ -310,7 +429,51 @@ func test_tapping_a_wild_plot_walks_over_then_clears_it_and_tells_the_server() -
 	assert_bool(f.player.position.distance_to(f.bp.cell_to_world(cell)) < 1.6).override_failure_message(
 		"干活时人应该站在那格旁边").is_true()
 
-func test_dragging_across_plots_queues_each_plots_own_next_step() -> void:
+func test_normal_in_flight_plot_command_does_not_flash_the_reconnect_control() -> void:
+	var f := await _online_farm(FakeTransport.new([]))
+	f.set_process(false)
+	var next: Dictionary = f.session.state.duplicate(true)
+	f.session.client.transport = func(_method, _url, _headers, _body):
+		await release_farm_command
+		return ApiClient.Response.new(true, 200, {"version": 1, "state": next})
+	f._on_cell_done(f.bp.beds()[0].cells[0], "clear")
+	assert_int(f._in_flight).is_equal(1)
+	assert_bool(f.session.has_unconfirmed_command()).is_true()
+	f._refresh_hud()
+	assert_bool(f.hud._reconnect.visible).is_false()
+	release_farm_command.emit()
+	await get_tree().process_frame
+	assert_int(f._in_flight).is_equal(0)
+	assert_bool(f.session.has_unconfirmed_command()).is_false()
+	assert_bool(f.hud._reconnect.visible).is_false()
+
+func test_unresolved_plot_reply_shows_recovery_only_after_the_request_finishes() -> void:
+	var f := await _online_farm(FakeTransport.new([]))
+	f.set_process(false)
+	var calls := [0]
+	f.session.client.transport = func(_method, _url, _headers, _body):
+		calls[0] += 1
+		await release_farm_command
+		return ApiClient.Response.new(true, 504, {})
+	f._on_cell_done(f.bp.beds()[0].cells[0], "clear")
+	f._refresh_hud()
+	assert_bool(f.hud._reconnect.visible).is_false()
+	release_farm_command.emit()
+	await get_tree().process_frame
+	assert_int(f._in_flight).is_equal(0)
+	assert_bool(f.session.offline).is_false()
+	assert_bool(f.hud._reconnect.visible).is_true()
+	assert_bool(await f.session.send("buy_seeds", {"crop": "R", "qty": 1})).is_false()
+	assert_str(f.session.last_error_code).is_equal("PENDING_ACTION")
+	assert_int(calls[0]).is_equal(1)
+	var body := {"version": 1, "state": f.session.state.duplicate(true)}
+	f.session.client.transport = FakeTransport.new([
+		{"status": 200, "json": body}, {"status": 200, "json": body}]).callable()
+	await f._recover_connection()
+	assert_bool(f.session.has_unconfirmed_command()).is_false()
+	assert_bool(f.hud._reconnect.visible).is_false()
+
+func test_batch_queues_each_plots_own_next_step() -> void:
 	var f: Node = await _online_farm(FakeTransport.new([]))
 	var bed: Array = f.bp.beds()[0].cells
 	# 第二格已翻土：它的下一步是播种，不是清理

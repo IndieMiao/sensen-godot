@@ -41,6 +41,7 @@ static func _confirmed(flags: Dictionary, fact: String) -> bool:
 	return value is bool and value
 
 static func evaluate(state: Dictionary, cells: Dictionary) -> Array:
+	if JourneyProgress.active(state): return JourneyProgress.goals(state)
 	var index := int((state.get("clock", {}) as Dictionary).get("chapter_index", 0))
 	var chapter := definition(index)
 	if chapter.is_empty(): return []
@@ -81,6 +82,9 @@ static func _farming_steps(state: Dictionary, cells: Dictionary, first_harvest: 
 	]
 
 static func progress(state: Dictionary, derived: Dictionary = {}, now_ms := 0) -> Dictionary:
+	if JourneyProgress.active(state):
+		return {"index": 0, "title": str(JourneyProgress.next_goal(state).label), "journey": true,
+			"complete": JourneyProgress.unlocked(state, "garden"), "next_open_in_ms": -1, "last_chapter": true, "pending": false}
 	var index := int((state.get("clock", {}) as Dictionary).get("chapter_index", 0))
 	var chapter := definition(index)
 	var current := chapter_state(state, index)

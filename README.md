@@ -1,5 +1,15 @@
 # SensenAvatar
 
+当前产品首要目标是做成更好玩的基于地图的游戏。下一轮玩法方向、首日节奏、3D 交互与验收以
+[`以好玩为先的改造方案`](docs/product/fun-first-rework-2026-09-07.md) 为准，优先于历史策划中的冲突约束。
+首个旅程切片已接入分钟级种植、采集制作、料理、庭院布置和地图地点交互；G3 存档保留兼容路径。
+实现范围、验证证据与待试玩问题见 [旅程切片记录](docs/qa/journey-slice-2026-09-07.md)。
+资源路线、持续设施和场景操作见 [第二轮记录](docs/qa/journey-expansion-2026-09-07.md)。手工作品修复地点、每轮补给选择和持久目标追踪见 [场景发现记录](docs/qa/journey-discoveries-2026-09-08.md)。本轮接入实物陈列操作、可行走侧径、来访居民交互与紧凑工作台，最新验证见 [场景操作记录](docs/qa/journey-spatial-2026-09-08.md)。
+
+本地试玩：`node tools/dev/run_journey.mjs`。需要 Godot、Node、已安装的服务端依赖，以及
+`server/.env` 中可访问的测试数据库配置。启动器创建独立的旅程试玩数据库与客户端存档，使用自然时间。
+下文保留 Avatar 模块的开发说明。
+
 Godot 4.7（Mobile 渲染管线）实现的角色换装（avatar）模块一期：从 Unity 项目迁移部件资产，
 在 Godot 侧完成装配、换装、存档与轻量压测。目标是把 Unity 侧已经生产的角色/部件资产
 （FBX + 材质）转换为 Godot 原生资源，并提供一套可换装、可存档、可压测的角色系统，供后续
@@ -81,7 +91,12 @@ godot --headless --path . --import
 godot --headless --path . --script res://tools/pipeline/extract_parts.gd -- tools/unity_export/out/recipes.json
 
 # 4. Godot 阶段：生成基础角色骨架 + idle/walk/run 动画库
+#    （若存在 assets/avatar/source/mixamo/clips.json，会顺带把 Mixamo 劳作/表情 clip 重定向进同一个库）
 godot --headless --path . --script res://tools/pipeline/gen_base_rig.gd
+
+# 5.（可选，快）只刷新 Mixamo clip：下载好的 Y Bot 版 FBX 放进 assets/avatar/source/mixamo/，
+#    写 clips.json，先 --import 再跑。细节见 assets/avatar/source/mixamo/README.md
+godot --headless --path . --script res://tools/pipeline/gen_mixamo_clips.gd
 ```
 
 第 1 步的报告（`tools/unity_export/out/report.txt`）里出现 ERROR 时命令会以非 0 退出；

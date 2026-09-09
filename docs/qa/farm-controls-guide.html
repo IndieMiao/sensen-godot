@@ -21,10 +21,10 @@ ol,ul{padding-left:22px}li{margin:8px 0}kbd,code{font:13px/1.6 ui-monospace,SFMo
 </head>
 <body><main>
 <h1>街角四季 · 操作指南</h1>
-<p class="meta">2026-09-05 · 分支 <code>feat/farm-ui-playability</code> · <a href="../../build/sensen-farm-ui-debug.apk">Android 调试安装包</a><br>本轮按认可设计稿实装，界面为英文，已通过 vivo 真机验收。原手机数据和生产连接已恢复，手机保留新包并运行原农场。完整证据与后端发布边界见<a href="../../design-qa.md">设计验收记录</a>。</p>
+<p class="meta">2026-09-06 · 分支 <code>feat/farm-ui-playability</code> · <a href="../../build/sensen-g3-physical-final.apk">Android 调试安装包</a><br>UI 按认可设计稿实装，界面为英文。G3 已完成 vivo <code>10AFAF162200319</code> 真机功能验证：870 次触控连续完成七章，并验证强退恢复与两种实存合照。原账号配置和装扮已恢复，最新普通包留在手机上；证据、性能与人工演示的剩余验收项见<a href="g3-physical-2026-09-05.md">本轮真机记录</a>。此前 UI 设计对照见<a href="../../design-qa.md">设计验收记录</a>。</p>
 <nav aria-label="章节"><a href="#map">地图与拜访</a><a href="#farm">种田与移动</a><a href="#hints">地块提示</a><a href="#panels">摊位与目标</a><a href="#dressing">城市与换装</a><a href="#qa">验证与限制</a><a href="../design/farm-ui-2026-09-05/index.html">AI 设计稿</a></nav>
-<div class="intro"><p><b>点一块田，人物先走过去，再完成这块田的下一步。</b><br>庭院将可用田畦排成三行九格。底部主按钮批量处理同一步骤；点空地可移动，落点圆环与路径圆点显示目的地。单摇杆已移除。</p></div>
-<p class="meta"><a href="../design/farm-ui-2026-09-05/qa/primary-comparison.png">地图、农场、摊位设计稿与真机对照</a> · 设计板是 AI 图像，以下是实际游戏画面。</p>
+<div class="intro"><p><b>点一块田，人物先走过去，再完成这块田的下一步。</b><br>初始农场为三行九格，扩建后增加第四行；镜头会为全部田块和底部选种栏留出空间。底部主按钮批量处理同一步骤；点空地可移动，落点圆环与路径圆点显示目的地。单摇杆已移除。</p></div>
+<p class="meta"><a href="../design/farm-ui-2026-09-05/qa/primary-comparison.png">地图、农场、摊位设计稿与真机对照</a> · 设计板是 AI 图像，以下实际游戏画面来自此前 UI 验收阶段。</p>
 
 <div class="shots">
 <figure><a href="../design/farm-ui-2026-09-05/qa/vivo/map-sample-b-final.png"><img src="../design/farm-ui-2026-09-05/qa/vivo/map-sample-b-final.png" alt="真机地图选中Sample B，角色与金色选中环居中，底部显示同一农场的Visit预览" width="1080" height="2344"></a><figcaption>vivo 真机 · 地图：选中 Sample B，镜头聚焦、角色、缩略图和访问预览同步。</figcaption></figure>
@@ -104,9 +104,9 @@ ol,ul{padding-left:22px}li{margin:8px 0}kbd,code{font:13px/1.6 ui-monospace,SFMo
 <li>苗圃需要累计交付 2 个胡萝卜和 4 份洋甘菊。D5 可切换两种入口外观；成长购买在排工具与第四畦中二选一。购入后可在庭院预览、移动、撤销和保存六种摆件，离开未保存布置时会确认保存或丢弃。</li>
 <li>D6 工程完成后，在庭院故事页加入聚会，最后一段确认才记录共同事件。六次收成用途里赠礼或保留达到四次，会获得生活优先结局、两页手账和个性化合照站位；出售优先也有完整结局。</li>
 <li>合照现场使用当前玩家装扮、三位居民和苗圃外观，点击 <kbd>Save photo</kbd> 保存实际渲染的照片。周总结记录完成时的数值，之后买卖仍会改变实时钱包。</li>
-<li>请求结果不明时，先点击相应页面的检查按钮。农场顶部会出现重新检查图标；恢复会先确认原请求，避免重复扣料。</li>
+<li>请求结束但结果不明时，先点击相应页面的检查按钮；农场顶部会出现重新检查图标，正常照料请求进行中不会因此闪现。普通 APK 已在发送前保存未确认命令；强退后以同一安装账号、同一服务器地址重进，会先确认农场，再用原请求标识检查或恢复该动作。等待权威状态恢复后再继续买卖、赠礼、料理或保存布置，避免重复扣料。</li>
 </ul>
-<p>生活优先工具路线和出售优先扩地路线均已从实际 UI 经过 HTTP、PostgreSQL 完成七日；Android 模拟器也已完成生活工具路线、六件摆件保存恢复和现场合照。详细证据见<a href="g3-seven-day-2026-09-05.md">G3 验收记录</a>；演示顺序见<a href="g3-demo-runbook.md">十五分钟演示脚本</a>。本阶段真机尚未连接，不能把桌面或模拟器结果视作真机完成。</p>
+<p>此前桌面和模拟器证据保留在<a href="g3-seven-day-2026-09-05.md">G3 阶段记录</a>中。本次 vivo 已通过出售优先扩地路线的连续七日真实触控：最终 200 金币、301 XP、四畦十二格，摊位结算 95/100，余款不足收购的两颗萝卜保留。生活工具路线主线、普通包强退恢复、六种摆件、五段事件和两种合照的详细证据见<a href="g3-physical-2026-09-05.md">本轮真机记录</a>；演示顺序见<a href="g3-demo-runbook.md">十五分钟演示脚本</a>。自动化使用 QA 时间控制，不能代替正常种植节奏或人工演示验收。</p>
 <div class="shots">
 <figure><a href="../../output/g3-week/ui-tool-life/d3-cook_dish.png"><img src="../../output/g3-week/ui-tool-life/d3-cook_dish.png" alt="真实七日流程中使用厨房制作沙拉" width="390" height="844" loading="lazy"></a><figcaption>桌面真实 HTTP 流程 · 厨房与统一料理 PNG。</figcaption></figure>
 <figure><a href="../../output/g3-week/ui-tool-life/group-photo.png"><img src="../../output/g3-week/ui-tool-life/group-photo.png" alt="玩家与三位居民在修好的苗圃前现场合照" width="390" height="844" loading="lazy"></a><figcaption>桌面真实流程 · 生活优先现场合照。</figcaption></figure>
@@ -119,7 +119,7 @@ ol,ul{padding-left:22px}li{margin:8px 0}kbd,code{font:13px/1.6 ui-monospace,SFMo
 <li>下方五个图标分类分别为 <kbd>Hair</kbd>、<kbd>Outfits</kbd>、<kbd>Shoes</kbd>、<kbd>Bags</kbd>、<kbd>Glasses</kbd>。点击缩略图立即试穿；绿框表示当前选择。部件较多时保持三列两行，短屏采用紧凑布局。</li>
 <li>右上旋转箭头恢复默认装扮；<kbd>Done</kbd> 等待装配完成后保存。左上返回丢弃本次未保存更改。<kbd>Loading</kbd> / <kbd>Trying</kbd> 表示正在准备或试穿。</li>
 </ul>
-<p><a href="../design/farm-ui-2026-09-05/qa/secondary-device-comparison.png">查看城市、换装、导演设计稿与本轮真机的并排对照</a>。画面保留 1080×2344 的原始比例；人物装扮、天气和导演倍率取决于当前存档状态。</p>
+<p><a href="../design/farm-ui-2026-09-05/qa/secondary-device-comparison.png">查看城市、换装、导演设计稿与此前 UI 真机检查的并排对照</a>。画面保留 1080×2344 的原始比例；人物装扮、天气和导演倍率取决于截图时的存档状态。</p>
 <div class="shots">
 <figure><a href="../design/farm-ui-2026-09-05/qa/vivo/city-final.png"><img src="../design/farm-ui-2026-09-05/qa/vivo/city-final.png" alt="真机城市选择页，街景背景和三个城市选择入口" width="1080" height="2344" loading="lazy"></a><figcaption>vivo 真机 · 城市选择。</figcaption></figure>
 <figure><a href="../design/farm-ui-2026-09-05/qa/vivo/dressing-final.png"><img src="../design/farm-ui-2026-09-05/qa/vivo/dressing-final.png" alt="真机换装页，实时人物和完整的五分类六项缩略图" width="1080" height="2344" loading="lazy"></a><figcaption>vivo 真机 · 换装：房间背景不随人物镜头缩放。</figcaption></figure>
@@ -128,11 +128,11 @@ ol,ul{padding-left:22px}li{margin:8px 0}kbd,code{font:13px/1.6 ui-monospace,SFMo
 <p><a href="../design/farm-ui-2026-09-05/crop-seed-assets.png">作物与种子袋素材预览</a> · <a href="../design/farm-ui-2026-09-05/assets.md">素材来源及生图记录</a></p>
 
 <h2 id="qa">验证与当前限制</h2>
-<p>新增正式章节推进（SGODOT-41）：服务端全量 259/259 通过，包含真实 PostgreSQL、上海/洛杉矶时区与夏令时、幂等、重连和显式领域版本迁移。章节实现及本阶段设备证据见<a href="chapters-2026-09-05.md">章节验收记录</a>。以下 vivo 图与 7/7 数字属于上一轮 UI 验证，不代表新规则下章节已完成。</p>
-<p>Metal 全量回归 519/519 项通过，70 个套件无错误、失败、跳过或孤立节点。最后的地图装扮刷新修复另通过 29 项定向回归。地图切入农场的背景不透明像素测试及透明负对照通过。真实 HTTP 种田流程 42/42 通过，实际等待了教学萝卜 180 秒成熟，并完成收获、卖菜和买种子。小修后的 APK 已导出，详细报告及校验值见<a href="../../design-qa.md">设计验收记录</a>。</p>
-<p>本轮 APK 已安装到 vivo，已验证选址、清理、翻土、成熟、收获、取消、移动、卖菜、买种子、目标、访客、导演及换装界面。卖出萝卜后金币 180→228，买三颗种子后 228→216。农场和换装不再透出底层地图。最终包保存金发后地图即时更新，试穿银发后按返回取消，地图和存档仍保留已保存的金发。</p>
-<p>上一轮验证结束时，原手机五项配置已逐字节恢复，测试服务连接和端口转发已移除。当时连接默认生产服务后，正常进入<a href="../design/farm-ui-2026-09-05/qa/vivo/farm-original-restored-final.png">原 Yuyuan Road 农场：128 金币、旧目标 7/7、九格生长作物</a>，原装扮和点击移动正常。本阶段真机连接与新 APK 状态单独记录在章节验收文档。</p>
+<p>此前正式章节推进检查（SGODOT-41）：服务端全量 259/259 通过，包含真实 PostgreSQL、上海/洛杉矶时区与夏令时、幂等、重连和显式领域版本迁移。该阶段证据见<a href="chapters-2026-09-05.md">章节验收记录</a>。本页旧 vivo 图与 7/7 数字属于更早的 UI 验证，不代表新规则下章节已完成。</p>
+<p>此前 UI 阶段的 Metal 全量回归 519/519 项通过，70 个套件无错误、失败、跳过或孤立节点。当时最后的地图装扮刷新修复另通过 29 项定向回归。地图切入农场的背景不透明像素测试及透明负对照通过。真实 HTTP 种田流程 42/42 通过，实际等待了教学萝卜 180 秒成熟，并完成收获、卖菜和买种子。该阶段 APK 的详细报告及校验值见<a href="../../design-qa.md">设计验收记录</a>。</p>
+<p>此前 UI 阶段的 APK 安装到 vivo 后，已验证选址、清理、翻土、成熟、收获、取消、移动、卖菜、买种子、目标、访客、导演及换装界面。卖出萝卜后金币 180→228，买三颗种子后 228→216。农场和换装不再透出底层地图。当时最终包保存金发后地图即时更新，试穿银发后按返回取消，地图和存档仍保留已保存的金发。</p>
+<p>此前 UI 验证曾恢复并进入<a href="../design/farm-ui-2026-09-05/qa/vivo/farm-original-restored-final.png">原 Yuyuan Road 农场：128 金币、旧目标 7/7、九格生长作物</a>。本次 G3 测试结束后也已独立完成原配置和装扮的字节校验、默认地图入口检查、临时服务连接与测试文件清理；手机保留最新普通 APK。完整校验和发布边界见<a href="g3-physical-2026-09-05.md">G3 真机记录</a>。</p>
 <p>导演面板通过长按农场路名 3 秒打开。时间倍率、跳日和天气按钮会修改服务端 QA 农场状态，仅供测试使用。</p>
-<div class="limit"><p>小屋、井和木箱已换成原创低模环境并在最终真机显示。井的边缘轻微裁切、原有出口标记等观感差异记录在验收文档中。公共农场使用快照，没有实时多人位置同步。自由选址配套后端尚未发布到公网。四张<a href="../design/farm-ui-2026-09-05/index.html">认可设计稿</a>已用于当前布局、图标与 PNG 素材实装；具体差异与验证结果见设计验收记录。</p></div>
+<div class="limit"><p>小屋、井和木箱已换成原创低模环境，并在此前 UI 阶段的真机画面中显示。当时记录的井边裁切、旧出口标记等观感差异保留为历史证据；本轮修正及复测见 G3 真机记录。公共农场使用快照，没有实时多人位置同步。自由选址配套后端尚未发布到公网。四张<a href="../design/farm-ui-2026-09-05/index.html">认可设计稿</a>已用于当前布局、图标与 PNG 素材实装；具体差异与验证结果见设计验收记录。</p></div>
 <footer class="meta">源码：<code>docs/qa/farm-controls-guide.html</code> · 游戏行为或布局更新时同步维护。</footer>
 </main></body></html>
