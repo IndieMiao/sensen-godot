@@ -6,7 +6,7 @@ signal candidate_focused(id: String)
 signal confirmed(id: String)
 signal placement_cancelled
 
-const CAPACITY_TEXT := "9 plots · expandable to 12"
+const CAPACITY_TEXT := "4 plots · unlock 6, then 9"
 ## Three cards fit inside the 328px safe-area width of a 360px phone.
 ## Shared capacity copy stays below the row, leaving the map visible.
 const CARD_MIN := Vector2(88, 104)
@@ -118,7 +118,7 @@ func _build_card_content(card: Button, item: Dictionary) -> void:
 	# 预览撑到整屏高、把两行文案顶出屏幕、盖住「Create Farm」。IGNORE_SIZE 之后最小尺寸
 	# 才真正由 custom_minimum_size 决定，KEEP_ASPECT_COVERED + clip 负责把方图裁成横条。
 	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	preview.custom_minimum_size = Vector2(0, CARD_PREVIEW_H)
 	preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	preview.clip_contents = true

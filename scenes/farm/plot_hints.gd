@@ -10,6 +10,7 @@ var cells := {}
 var now_ms := 0
 var weather := "sunny"
 var active = null
+var queued: Array = []
 var progress := 0.0
 var world_rect := Rect2()
 var path_origin := Vector3.ZERO
@@ -56,7 +57,7 @@ func update_motion(moving: bool, path: Array[Vector3], dt: float) -> void:
 	if cam == null: return
 	# Retain static canvas geometry; rebuilding the hint arcs each frame allocates GPU buffers.
 	var visuals := [cam.get_camera_transform(), cam.get_camera_projection(), get_global_transform(),
-		world_rect, bp, _cell_visuals, active, progress, _destination_visible, path_origin]
+		world_rect, bp, _cell_visuals, active, queued.duplicate(), progress, _destination_visible, path_origin]
 	if _destination_visible: visuals.append_array([_destination, _reachable, _path, _age])
 	if visuals != _last_visuals:
 		_last_visuals = visuals
@@ -88,6 +89,16 @@ func _draw() -> void:
 			draw_circle(p, 3, color)
 			if not _reachable: draw_texture_rect(_icons.x, Rect2(p - Vector2(8, 8), Vector2(16, 16)), false, color)
 	if bp == null: return
+	for cell in queued:
+		var world := bp.cell_to_world(cell)
+		if cam.is_position_behind(world): continue
+		var corners := PackedVector2Array()
+		for offset in [Vector3(-0.46, 0.22, -0.46), Vector3(0.46, 0.22, -0.46), Vector3(0.46, 0.22, 0.46), Vector3(-0.46, 0.22, 0.46)]:
+			corners.append(_screen(world + offset))
+		if not world_rect.encloses(Rect2(corners[0], Vector2.ZERO).expand(corners[1]).expand(corners[2]).expand(corners[3])): continue
+		draw_colored_polygon(corners, Color(GameUi.MINT, 0.38))
+		corners.append(corners[0])
+		draw_polyline(corners, Color(GameUi.GREEN, 0.75), 2, true)
 	for id in cells:
 		var slot: Dictionary = cells[id]
 		var action := NextStep.step_for(slot, now_ms)

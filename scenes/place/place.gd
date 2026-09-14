@@ -17,7 +17,7 @@ var _environment: Environment
 var _args: Dictionary
 var _exit: Button
 var active_panel: SessionPanel
-var selected_tab := "people"
+var selected_tab := L10n.text("people")
 var _tab_buttons: Dictionary = {}
 var _cast: Node3D
 var _cast_key := ""
@@ -35,7 +35,7 @@ func setup(args: Dictionary) -> void:
 	_args = args
 	place_id = str(args.get("place_id", ""))
 	session = args.get("session")
-	selected_tab = str(args.get("tab", "people"))
+	selected_tab = str(args.get("tab", L10n.text("people")))
 
 func _ready() -> void:
 	if session == null or not PlaceCatalog.available(place_id, session.state):
@@ -94,10 +94,10 @@ func _build_ui() -> void:
 	head.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	head.add_theme_constant_override("separation", 8)
 	root.add_child(head)
-	_exit = GameUi.button("arrow-left", "", "Back to map")
+	_exit = GameUi.button("arrow-left", "", L10n.text("Back to map"))
 	_exit.pressed.connect(_leave)
 	head.add_child(_exit)
-	var title := GameUi.label(str(PlaceCatalog.find(place_id).name), 17)
+	var title := GameUi.label(L10n.text(str(PlaceCatalog.find(place_id).name)), 17)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	head.add_child(title)
@@ -127,14 +127,14 @@ func _build_ui() -> void:
 	call_deferred("_layout")
 
 func _build_tabs() -> void:
-	var specs: Array = [["people", "users-round", "Residents"], ["choices", "heart", "Harvest uses"]]
-	if place_id == "nursery": specs.append(["project", "shopping-basket", "Nursery project"])
+	var specs: Array = [[L10n.text("people"), "users-round", L10n.text("Residents")], ["choices", "heart", L10n.text("Harvest uses")]]
+	if place_id == "nursery": specs.append(["project", "shopping-basket", L10n.text("Nursery project")])
 	if place_id == "courtyard":
-		specs.append(["growth", "shovel", "Growth choice"])
-		specs.append(["decorations", "house", "Courtyard pieces"])
-	if place_id == "bistro": specs.append(["kitchen", "utensils", "Kitchen"])
-	specs.append(["events", "calendar-days", "Neighbourhood stories"])
-	specs.append(["journal", "book-open", "Handbook"])
+		specs.append(["growth", "shovel", L10n.text("Growth choice")])
+		specs.append(["decorations", "house", L10n.text("Courtyard pieces")])
+	if place_id == "bistro": specs.append(["kitchen", "utensils", L10n.text("Kitchen")])
+	specs.append(["events", "calendar-days", L10n.text("Neighbourhood stories")])
+	specs.append(["journal", "book-open", L10n.text("Handbook")])
 	for spec in specs:
 		var button := GameUi.button(spec[1], "", spec[2])
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -162,14 +162,14 @@ func _activate_tab(id: String) -> void:
 		content.remove_child(child)
 		child.queue_free()
 	active_panel = null
-	var path := "res://scenes/place/resident_panel.gd" if id == "people" else "res://scenes/place/economy_panel.gd"
+	var path := "res://scenes/place/resident_panel.gd" if id == L10n.text("people") else "res://scenes/place/economy_panel.gd"
 	if id in ["kitchen", "journal"]: path = "res://scenes/place/kitchen_panel.gd"
 	if id == "decorations": path = "res://scenes/place/decoration_panel.gd"
 	if id == "events": path = "res://scenes/place/events_panel.gd"
 	if ResourceLoader.exists(path):
 		active_panel = load(path).new()
 		active_panel.message = feedback
-		if id in ["people", "events"]: active_panel.place_id = place_id
+		if id in [L10n.text("people"), "events"]: active_panel.place_id = place_id
 		elif id != "decorations": active_panel.section = id
 		if id == "people": active_panel.selected_resident = str(_args.get("resident_id", ""))
 		active_panel.setup(session)
@@ -276,10 +276,10 @@ func decoration_tap(screen: Vector2) -> bool:
 func _visit_resident(resident: String) -> void:
 	var destination := {"nursery_keeper": "nursery", "bistro_owner": "bistro", "restorer": "courtyard"}
 	if str(destination.get(resident, "")) == place_id:
-		select_tab("people")
+		select_tab(L10n.text("people"))
 		if active_panel is ResidentPanel: active_panel._select(resident)
 	else:
-		AppRouter.push_instance(AppRouter.PLACE, {"place_id": destination.get(resident, "nursery"), "session": session, "resident_id": resident})
+		AppRouter.open_instance(AppRouter.PLACE, {"place_id": destination.get(resident, "nursery"), "session": session, "resident_id": resident})
 
 func _event_navigate(destination: String, tab: String) -> void:
 	if destination == place_id:
@@ -287,9 +287,9 @@ func _event_navigate(destination: String, tab: String) -> void:
 	elif destination == "map":
 		while AppRouter.instance_depth() > 0: AppRouter.pop_instance()
 	elif destination == "farm":
-		AppRouter.push_instance(AppRouter.FARM, {"session": session})
+		AppRouter.open_instance(AppRouter.FARM, {"session": session})
 	else:
-		AppRouter.push_instance(AppRouter.PLACE, {"place_id": destination, "tab": tab, "session": session})
+		AppRouter.open_instance(AppRouter.PLACE, {"place_id": destination, "tab": tab, "session": session})
 
 func _open_photo(summary: Dictionary) -> void:
 	if photo != null or summary.is_empty(): return
@@ -346,7 +346,7 @@ func _state_changed(_state: Dictionary, _version: int) -> void:
 
 func _refresh() -> void:
 	if not is_inside_tree() or session == null: return
-	status.text = "Offline" if session.offline else "Chapter %d" % (int(session.state.clock.chapter_index) + 1)
+	status.text = L10n.text("Offline") if session.offline else L10n.format_text("Chapter %d", (int(session.state.clock.chapter_index) + 1))
 	var scenery_key := JSON.stringify(session.state.get("nursery", {}))
 	if scenery_key != _scenery_key:
 		_scenery_key = scenery_key

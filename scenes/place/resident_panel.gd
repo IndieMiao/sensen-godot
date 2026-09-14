@@ -32,8 +32,8 @@ func _render() -> void:
 		return
 	var present := ResidentCast.present(place_id, state())
 	if present.is_empty():
-		heading("A quiet courtyard")
-		paragraph("The restorer arrives in Chapter 6.")
+		heading(L10n.text("A quiet courtyard"))
+		paragraph(L10n.text("The restorer arrives in Chapter 6."))
 		return
 	if not present.has(selected_resident):
 		selected_resident = str(present[0])
@@ -43,16 +43,16 @@ func _render() -> void:
 		selector.add_theme_constant_override("separation", 8)
 		content.add_child(selector)
 		for id in present:
-			var button := GameUi.button("user-round", str(ResidentCast.definition(id).short_name), str(ResidentCast.definition(id).name))
+			var button := GameUi.button("user-round", L10n.text(str(ResidentCast.definition(id).short_name)), L10n.text(str(ResidentCast.definition(id).name)))
 			button.name = "Select_" + str(id)
 			button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			button.theme_type_variation = &"ChoiceSelectedButton" if id == selected_resident else &"ChoiceButton"
 			button.disabled = busy
 			button.pressed.connect(_select.bind(str(id)))
 			selector.add_child(button)
-	heading(str(ResidentCast.definition(selected_resident).get("name", "Resident")))
+	heading(str(ResidentCast.definition(selected_resident).get("name", L10n.text("Resident"))))
 	var resident := _resident()
-	paragraph("%s / %d friendship" % [ResidentCast.relationship_stage(resident), int(resident.get("points", 0))])
+	paragraph(L10n.format_text("%s / %d friendship", [ResidentCast.relationship_stage(resident), int(resident.get("points", 0))]))
 	match _view:
 		"dialogue": _render_dialogue()
 		"request": _render_request()
@@ -62,85 +62,85 @@ func _render() -> void:
 func _render_home() -> void:
 	var resident := _resident()
 	var needs_memory := selected_resident == "bistro_owner" and chapter() == 2 and not _choice().is_empty() and _remembered_choice() != _choice()
-	var talk := "Tell me about your harvest" if needs_memory else "Talk"
+	var talk := L10n.text("Tell me about your harvest") if needs_memory else L10n.text("Talk")
 	action("hand", talk, _talk, true, true).name = "Talk"
 	if needs_memory:
-		paragraph("Your %s choice is ready to share." % {"gift": "gift", "keep": "saved harvest", "sold": "sale"}.get(_choice(), "harvest"))
+		paragraph(L10n.format_text("Your %s choice is ready to share.", {"gift": "gift", "keep": L10n.text("saved harvest"), "sold": "sale"}.get(_choice(), "harvest")))
 	elif str(resident.get("talked_day", "")) == _day():
-		paragraph("Already caught up today")
+		paragraph(L10n.text("Already caught up today"))
 	for id in _requests:
 		var request: Dictionary = _requests[id]
 		if request.resident != selected_resident or int(request.chapter) > chapter(): continue
-		var title := str(_request_text(str(id)).get("title", "Harvest request"))
+		var title := str(_request_text(str(id)).get("title", L10n.text("Harvest request")))
 		if state().get("requests_done", []).has(id):
-			paragraph("%s / Delivered" % title)
+			paragraph(L10n.format_text("%s / Delivered", title))
 		else:
 			action("shopping-basket", title, _open_request.bind(str(id))).name = "Request_%s" % id
 	if chapter() >= 1:
-		action("heart", "Bring a gift", _open_gifts, _gifts_left() > 0).name = "Gifts"
-		if _gifts_left() == 0: paragraph("Both gifts shared this week")
+		action("heart", L10n.text("Bring a gift"), _open_gifts, _gifts_left() > 0).name = "Gifts"
+		if _gifts_left() == 0: paragraph(L10n.text("Both gifts shared this week"))
 	else:
-		paragraph("Gifts open in Chapter 2")
+		paragraph(L10n.text("Gifts open in Chapter 2"))
 	if int(resident.get("points", 0)) >= 45 and not bool(resident.get("shared_event_done", false)):
-		paragraph("Shared activity still ahead")
+		paragraph(L10n.text("Shared activity still ahead"))
 
 func _render_dialogue() -> void:
 	if _lines.is_empty():
 		_view = "home"
 		_render_home()
 		return
-	paragraph("%d / %d" % [_line_index + 1, _lines.size()])
+	paragraph(L10n.format_text("%d / %d", [_line_index + 1, _lines.size()]))
 	var line := GameUi.label(str(_lines[_line_index]), 15)
 	line.name = "DialogueLine"
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	content.add_child(line)
 	if _line_index + 1 < _lines.size():
-		_local_action("chevron-right", "Continue", _next_line, true).name = "Continue"
+		_local_action("chevron-right", L10n.text("Continue"), _next_line, true).name = "Continue"
 	else:
-		_local_action("check", "See you soon", _home, true).name = "FinishDialogue"
+		_local_action("check", L10n.text("See you soon"), _home, true).name = "FinishDialogue"
 	if _line_index > 0:
-		_local_action("arrow-left", "Previous", _previous_line).name = "Previous"
-	_local_action("x", "Back", _home).name = "Back"
+		_local_action("arrow-left", L10n.text("Previous"), _previous_line).name = "Previous"
+	_local_action("x", L10n.text("Back"), _home).name = "Back"
 
 func _render_request() -> void:
 	var request: Dictionary = _requests.get(_request_id, {})
 	if request.is_empty(): return
 	var text := _request_text(_request_id)
-	heading(str(text.get("title", "Harvest request")))
+	heading(str(text.get("title", L10n.text("Harvest request"))))
 	paragraph(str(text.get("intro", "")))
 	for crop in request.get("items", {}):
 		_ingredient(str(crop), available(str(crop)), int(request.items[crop]))
 	for dish in request.get("dishes", {}):
-		paragraph("%s / %d available / %d needed" % [_dish_name(str(dish)), int(state().get("inventory", {}).get("dishes", {}).get(dish, 0)), int(request.dishes[dish])])
-	paragraph("%d coins%s" % [int(request.get("coins", 0)), " / a personal request" if bool(request.get("personal_story", false)) else ""])
+		paragraph(L10n.format_text("%s / %d available / %d needed", [_dish_name(str(dish)), int(state().get("inventory", {}).get("dishes", {}).get(dish, 0)), int(request.dishes[dish])]))
+	paragraph(L10n.format_text("%d coins%s", [int(request.get("coins", 0)), L10n.text(" / a personal request") if bool(request.get("personal_story", false)) else ""]))
 	var done: bool = state().get("requests_done", []).has(_request_id)
-	action("shopping-basket", "Delivered" if done else "Deliver basket", _deliver, not done and _can_deliver(request), true).name = "Deliver"
-	_local_action("arrow-left", "Back", _home).name = "Back"
+	action("shopping-basket", L10n.text("Delivered") if done else L10n.text("Deliver basket"), _deliver, not done and _can_deliver(request), true).name = "Deliver"
+	_local_action("arrow-left", L10n.text("Back"), _home).name = "Back"
 
 func _render_gifts() -> void:
 	paragraph(str(ResidentCast.definition(selected_resident).get("gift_clue", "")))
-	paragraph("%d gifts left this week" % _gifts_left())
+	paragraph(L10n.format_text("%d gifts left this week", _gifts_left()))
 	for crop in _relationships.get("gift_clues", {}).get(selected_resident, []):
 		_ingredient(str(crop), available(str(crop)), 1)
-		action("heart", "Give 1 %s" % CropInfo.name_of(str(crop)), _give.bind(str(crop)), available(str(crop)) > 0 and _gifts_left() > 0, true).name = "Give_%s" % crop
-	_local_action("arrow-left", "Back", _home).name = "Back"
+		action("heart", L10n.format_text("Give 1 %s", CropInfo.name_of(str(crop))), _give.bind(str(crop)), available(str(crop)) > 0 and _gifts_left() > 0, true).name = "Give_%s" % crop
+	_local_action("arrow-left", L10n.text("Back"), _home).name = "Back"
 
 func _render_pending() -> void:
-	heading("Checking your visit")
-	paragraph("The last reply did not arrive. Your basket is unchanged here until the farm confirms it.")
-	_local_action("rotate-ccw", "Check and continue", _retry_pending, true).name = "Retry"
+	heading(L10n.text("Checking your visit"))
+	paragraph(L10n.text("The last reply did not arrive. Your basket is unchanged here until the farm confirms it."))
+	_local_action("rotate-ccw", L10n.text("Check and continue"), _retry_pending, true).name = "Retry"
 
 func _ingredient(crop: String, have: int, need: int) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	row.add_child(GameUi.picture(GameUi.crop_art(crop), 36))
-	var label := GameUi.label("%s / %d available / %d needed" % [CropInfo.name_of(crop), have, need], 13)
+	var label := GameUi.label(L10n.format_text("%s / %d available / %d needed", [CropInfo.name_of(crop), have, need]), 13)
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	row.add_child(label)
 	content.add_child(row)
 	var reserved := int(state().get("engineering", {}).get("reserved", {}).get(crop, 0))
-	if reserved > 0: paragraph("%d held in the project basket" % reserved)
+	if reserved > 0: paragraph(L10n.format_text("%d held in the project basket", reserved))
 
 func _local_action(symbol: String, text: String, callback: Callable, accent := false) -> Button:
 	var button := GameUi.button(symbol, text, text, accent)
@@ -205,7 +205,7 @@ func _perform(type: String, payload: Dictionary) -> void:
 
 func _send_pending() -> void:
 	session.last_error_code = ""
-	var accepted := await command(str(_pending.type), _pending.payload, "Visit saved")
+	var accepted := await command(str(_pending.type), _pending.payload, L10n.text("Visit saved"))
 	if not is_inside_tree(): return
 	if accepted:
 		_finish_pending()
@@ -217,13 +217,13 @@ func _send_pending() -> void:
 func _retry_pending() -> void:
 	if busy or _pending.is_empty() or session == null: return
 	busy = true
-	message.text = "Checking your farm..."
+	message.text = L10n.text("Checking your farm...")
 	refresh()
 	var reconciled := await session.refresh()
 	busy = false
 	if not is_inside_tree(): return
 	if not reconciled:
-		message.text = "Could not connect. Your delivery is still pending."
+		message.text = L10n.text("Could not connect. Your delivery is still pending.")
 		feedback.emit(message.text)
 		refresh()
 		return
@@ -251,16 +251,16 @@ func _finish_pending() -> void:
 	var change := int(_resident().get("points", 0)) - int(operation.points_before)
 	var coins := int(state().get("wallet", 0)) - int(operation.wallet_before)
 	var result := []
-	if change > 0: result.append("+%d friendship" % change)
-	if coins > 0: result.append("+%d coins" % coins)
+	if change > 0: result.append(L10n.format_text("+%d friendship", change))
+	if coins > 0: result.append(L10n.format_text("+%d coins", coins))
 	var stage := ResidentCast.relationship_stage(_resident())
 	if str(operation.stage_before) != stage: result.append(stage)
-	message.text = " / ".join(result) if not result.is_empty() else "Good to see you again"
+	message.text = " / ".join(result) if not result.is_empty() else L10n.text("Good to see you again")
 	feedback.emit(message.text)
 	match str(operation.type):
 		"talk_to_resident": _lines = ResidentCast.dialogue(selected_resident, state())
-		"give_gift": _lines = ResidentCast.definition(selected_resident).get("gift_replies", {}).get(str(operation.payload.crop), ["Thank you for thinking of me."]).duplicate()
-		"submit_request": _lines = _request_text(str(operation.payload.request_id)).get("reply", ["Thank you for the basket."]).duplicate()
+		"give_gift": _lines = ResidentCast.definition(selected_resident).get("gift_replies", {}).get(str(operation.payload.crop), [L10n.text("Thank you for thinking of me.")]).duplicate()
+		"submit_request": _lines = _request_text(str(operation.payload.request_id)).get("reply", [L10n.text("Thank you for the basket.")]).duplicate()
 	_line_index = 0
 	_view = "dialogue"
 	refresh()
@@ -298,4 +298,4 @@ static func _read_json(path: String) -> Dictionary:
 	return parsed if parsed is Dictionary else {}
 
 static func _dish_name(id: String) -> String:
-	return {"salad": "Vegetable salad", "tea": "Chamomile tea"}.get(id, id)
+	return {"salad": L10n.text("Vegetable salad"), "tea": L10n.text("Chamomile tea")}.get(id, id)

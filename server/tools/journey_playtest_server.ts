@@ -6,6 +6,7 @@ import { buildApp, blueprintSets, loadBlueprint } from '../src/http/app.js';
 import { PgStore } from '../src/db/pg_store.js';
 import { migrate } from '../src/db/migrate.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../src/domain/content.js';
+import { PRESET_SPECS, buildPresetFarm, presetHmac } from '../src/domain/presets.js';
 
 const env = parseEnv(readFileSync(new URL('../.env', import.meta.url), 'utf8'));
 const database = process.env.JOURNEY_DATABASE ?? 'sensen_farm_journey_playtest';
@@ -28,6 +29,10 @@ const blueprint = (id: string, revision: number) => blueprintSets(loadBlueprint(
 const timezone = (id: string) => regions.find((r: { id: string }) => r.id === id).timezone as string;
 const now = () => Date.now();
 const store = new PgStore({ pool, content, contentVersion: cv, timezone, blueprint, now });
+for (const spec of PRESET_SPECS) {
+  await store.ensureSystemFarm(presetHmac(spec.id ?? spec.layout),
+    buildPresetFarm(spec, blueprint(spec.layout, spec.revision), content, timezone(spec.region), now()));
+}
 const app = await buildApp({ store, content, contentVersion: cv, blueprintDir, regionsFile,
   pepper: env.TOKEN_PEPPER, now, blueprint });
 // Device inspection is opt-in and confined to this loopback playtest service.

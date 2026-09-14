@@ -35,7 +35,7 @@ func setup(value: JourneyStreets, state: Dictionary) -> void:
 		rig.position = home
 		rig.config_applied.connect(ResidentCast._play_idle.bind(rig))
 		add_child(rig)
-		rig.apply_config(ResidentCast.outfit(str(rig.name)))
+		rig.apply_config(ResidentCast.outfit(L10n.text(str(rig.name))))
 		moments[slot] = ResidentMoment.new(rig, Vector3.ZERO)
 		waits[slot] = 1.0 + moments.size() * 1.2
 	set_gathering(JourneyGatherings.current(state))

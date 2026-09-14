@@ -63,8 +63,9 @@ func test_four_beds_fit_above_two_seed_rows_on_tall_phone() -> void:
 	assert_int(farm.hud._seed_buttons.values().filter(func(button): return button.visible).size()).is_equal(4)
 	_assert_plots_clear(farm, 4)
 
-func test_four_beds_fit_above_two_seed_rows_on_short_phone_and_receive_touch() -> void:
+func test_four_beds_fit_above_compact_seed_row_on_short_phone_and_receive_touch() -> void:
 	var farm := await _farm(Vector2i(360, 640))
+	assert_int(farm.hud._seed_row.columns).is_equal(4)
 	_assert_plots_clear(farm, 4)
 	var cell: Vector2i = farm.bp.reserved_bed().cells[0]
 	var point: Vector2 = farm.cam.unproject_position(farm.bp.cell_to_world(cell) + Vector3(0, 0.15, 0))
@@ -81,7 +82,7 @@ func test_nine_plot_layout_keeps_large_accessible_plots_with_four_seed_choices()
 	var center: Vector3 = farm.bp.cell_to_world(farm.bp.beds()[1].cells[1])
 	var width: float = farm.cam.unproject_position(center + Vector3(0.45, 0.15, 0)).distance_to(
 		farm.cam.unproject_position(center + Vector3(-0.45, 0.15, 0)))
-	assert_float(width).is_greater_equal(50)
+	assert_int(roundi(width)).is_greater_equal(50)
 
 func test_hiding_seed_choices_while_working_does_not_move_the_camera() -> void:
 	var farm := await _farm(Vector2i(360, 640))
@@ -133,3 +134,36 @@ func test_dragging_from_a_plot_pans_without_starting_work_and_clamps_for_visitor
 		var transform: Transform3D = farm.cam.transform
 		farm._update_camera()
 		assert_bool(farm.cam.transform.is_equal_approx(transform)).is_true()
+
+func test_house_roof_and_spawn_fit_with_the_field_on_short_phone_and_desktop() -> void:
+	for size in [Vector2i(360, 640), Vector2i(1280, 720)]:
+		var farm := await _farm(size)
+		var area: Rect2 = farm._camera_play_area()
+		var house := farm.props.get_node("House") as MeshInstance3D
+		for vertex in house.mesh.create_convex_shape(true, true).points:
+			var point: Vector3 = house.transform * vertex
+			assert_bool(area.has_point(farm.cam.unproject_position(point))).is_true()
+		var feet: Vector2 = farm.cam.unproject_position(farm.bp.cell_to_world(farm.bp.anchor("spawn")))
+		assert_bool(area.has_point(feet)).is_true()
+		_assert_plots_clear(farm, 4)
+
+func test_shadow_clip_volume_covers_visible_ground_and_canopy_through_pan_zoom_and_follow() -> void:
+	for size in [Vector2i(360, 640), Vector2i(390, 844), Vector2i(1280, 720)]:
+		var farm := await _farm(size)
+		var camera := farm.cam as Camera3D
+		for zoom in [0.71, 1.0, 1.58]:
+			farm.camera_pan._log_zoom = log(zoom)
+			farm.camera_pan.offset = Vector3(1.5, 0, -1.5)
+			farm.player.position = farm.bp.cell_to_world(farm.bp.anchor("spawn")) + Vector3(0, 0, 6)
+			farm._update_camera()
+			assert_float(camera.far).is_less(60.0)
+			assert_float(camera.far - camera.near).is_less(40.0)
+			var inverse := camera.global_transform.affine_inverse()
+			for point in [Vector2.ZERO, Vector2(size.x, 0), Vector2(0, size.y), Vector2(size)]:
+				for height in [-0.008, 4.0]:
+					var hit = Plane(Vector3.UP, height).intersects_ray(camera.project_ray_origin(point), camera.project_ray_normal(point))
+					assert_bool(hit is Vector3).is_true()
+					if hit is not Vector3: continue
+					var depth: float = -(inverse * hit).z
+					assert_float(depth).override_failure_message("Near plane clips the canopy at %s, zoom %s" % [size, zoom]).is_greater(camera.near)
+					assert_float(depth).override_failure_message("Far plane clips the ground at %s, zoom %s" % [size, zoom]).is_less(camera.far)

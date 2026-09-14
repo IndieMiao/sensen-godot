@@ -1,0 +1,93 @@
+[
+	{
+		"animated_sample_pixels": 313,
+		"draw_calls": 41.0,
+		"frame_ms_mean": 8.32794,
+		"frame_ms_p95": 9.466,
+		"primitives": 72068.0,
+		"render_cpu_ms": 0.0740000009536743,
+		"render_gpu_ms": 0.0,
+		"render_objects": 45.0,
+		"samples": 150,
+		"size": "(480, 900)",
+		"style": "cottage"
+	},
+	{
+		"animated_sample_pixels": 317,
+		"draw_calls": 41.0,
+		"frame_ms_mean": 8.35542,
+		"frame_ms_p95": 9.772,
+		"primitives": 61900.0,
+		"render_cpu_ms": 0.180000007152557,
+		"render_gpu_ms": 0.0,
+		"render_objects": 45.0,
+		"samples": 150,
+		"size": "(480, 900)",
+		"style": "mushroom"
+	},
+	{
+		"animated_sample_pixels": 271,
+		"draw_calls": 47.0,
+		"frame_ms_mean": 8.33594666666666,
+		"frame_ms_p95": 9.432,
+		"primitives": 133286.0,
+		"render_cpu_ms": 0.0529999993741512,
+		"render_gpu_ms": 0.0,
+		"render_objects": 51.0,
+		"samples": 150,
+		"size": "(480, 900)",
+		"style": "thatch"
+	},
+	{
+		"animated_sample_pixels": 247,
+		"draw_calls": 47.0,
+		"frame_ms_mean": 8.33592666666667,
+		"frame_ms_p95": 9.527,
+		"primitives": 118904.0,
+		"render_cpu_ms": 0.0509999990463257,
+		"render_gpu_ms": 0.0,
+		"render_objects": 52.0,
+		"samples": 150,
+		"size": "(480, 900)",
+		"style": "dome"
+	},
+	{
+		"animated_sample_pixels": 248,
+		"draw_calls": 47.0,
+		"frame_ms_mean": 8.3324,
+		"frame_ms_p95": 9.425,
+		"primitives": 148762.0,
+		"render_cpu_ms": 0.101000003516674,
+		"render_gpu_ms": 0.0,
+		"render_objects": 53.0,
+		"samples": 150,
+		"size": "(480, 900)",
+		"style": "east_asian"
+	},
+	{
+		"animated_sample_pixels": 262,
+		"draw_calls": 47.0,
+		"frame_ms_mean": 8.32769333333333,
+		"frame_ms_p95": 9.46,
+		"primitives": 149866.0,
+		"render_cpu_ms": 0.061999998986721,
+		"render_gpu_ms": 0.0,
+		"render_objects": 53.0,
+		"samples": 150,
+		"size": "(480, 900)",
+		"style": "barn"
+	},
+	{
+		"animated_sample_pixels": 1181,
+		"draw_calls": 49.0,
+		"frame_ms_mean": 8.33196,
+		"frame_ms_p95": 9.48,
+		"primitives": 151746.0,
+		"render_cpu_ms": 0.136000007390976,
+		"render_gpu_ms": 0.0,
+		"render_objects": 55.0,
+		"samples": 150,
+		"size": "(480, 900)",
+		"style": "windmill"
+	}
+]

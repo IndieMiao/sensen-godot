@@ -3,51 +3,13 @@ package com.sensen.map
 import java.util.Locale
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 class GodotMapPluginTest {
     @Test
-    fun mapLabelsAlwaysRequestEnglish() {
-        assertEquals(Locale.ENGLISH, GodotMapPlugin.MAP_LABEL_LOCALE)
-    }
-
-    @Test
-    fun englishOnlyFilterSelectsEveryTextLabelCategory() {
-        val selected = listOf(
-            "poi-label",
-            "building-number-label",
-            "waterway-label",
-            "water-line-label",
-            "water-point-label",
-            "transit-label",
-            "airport-label",
-            "natural-line-label",
-            "NATURAL-POINT-LABEL",
-            "road-label",
-            "settlement-major-label",
-            "city-label",
-            "state-label",
-            "country-label",
-            "airport-road-label",
-        )
-
-        selected.forEach { layerId ->
-            assertTrue(
-                GodotMapPlugin.shouldRequireEnglishName(layerId),
-                "Expected English-only filtering for $layerId",
-            )
-        }
-    }
-
-    @Test
-    fun englishOnlyFilterIgnoresNonLabelLayerIds() {
-        for (layerId in listOf("poi", "poi-icon", "water", "building-extrusion")) {
-            assertFalse(
-                GodotMapPlugin.shouldRequireEnglishName(layerId),
-                "Expected non-label layer to remain unchanged for $layerId",
-            )
-        }
+    fun mapLabelsFollowTheSelectedLanguageAndDefaultToChinese() {
+        assertEquals(Locale.ENGLISH, GodotMapPlugin.mapLabelLocale("en"))
+        assertEquals(Locale.SIMPLIFIED_CHINESE, GodotMapPlugin.mapLabelLocale("zh_CN"))
+        assertEquals(Locale.SIMPLIFIED_CHINESE, GodotMapPlugin.mapLabelLocale(""))
     }
 
     @Test

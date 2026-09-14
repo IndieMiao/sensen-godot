@@ -27,7 +27,7 @@ const sets = blueprintSets(loadBlueprint(path.join(ROOT, 'assets/blueprints'), '
 const cells = [...sets.cultivable].filter(id => !sets.reserved.has(id));
 const NOW = at('2026-09-04T10:00:00+08:00');
 
-describe.skipIf(!DSN)('Explicit domain 1/2/3/4/5/6/7/8/9/10/11/12 -> 13 migration', () => {
+describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
   let pool: pg.Pool;
   let store: PgStore;
   beforeAll(async () => {
@@ -168,7 +168,7 @@ describe.skipIf(!DSN)('Explicit domain 1/2/3/4/5/6/7/8/9/10/11/12 -> 13 migratio
         blocked: [{ farm_id: other.id, reasons: ['content_version_mismatch'] }] });
   });
 
-  it.each(['7', '8', '9', '10', '11', '12'])('upgrades domain %s resource trails without changing their unclaimed state or history', async domain => {
+  it.each(['7', '8', '9', '10', '11', '12', '13'])('upgrades domain %s resource trails without changing their unclaimed state or history', async domain => {
     const farm = await seed(domain);
     await addHistory(farm);
     await pool.query('UPDATE farms SET content_version = $1 WHERE id = $2', ['previous-bundle-content', farm.id]);

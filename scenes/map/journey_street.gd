@@ -3,7 +3,7 @@ extends Node3D
 
 const NAMES := {"farm": "My farm", "nursery": "Nursery", "bistro": "Bistro", "courtyard": "Courtyard"}
 const ICONS := {"farm": "sprout", "nursery": "flower-2", "bistro": "utensils", "courtyard": "hammer"}
-const FOLLOW_VIEW_SIZE := 24.0
+const FOLLOW_VIEW_SIZE := 16.0
 var session: FarmSession
 var layout: JourneyStreets
 var cam: Camera3D
@@ -25,6 +25,7 @@ var commons: Node3D
 var gatherings: Node3D
 var residents: StreetResidents
 var dialogue: PanelContainer
+var confirmation: CanvasLayer
 var dialogue_scroll: ScrollContainer
 var active_panel: SessionPanel
 var selected_slot := ""
@@ -50,9 +51,23 @@ var _start_place := "farm"
 var _start_target := ""
 var _walk_place := ""
 var _status_elapsed := 0.0
+var visitor_snapshot: Dictionary = {}
+var visitor_blueprint: FarmBlueprint
 
 func setup(args: Dictionary) -> void:
 	session = args.get("session", Net.session)
+	visitor_snapshot = args.get("visitor_snapshot", {})
+	visitor_blueprint = args.get("blueprint")
+	if not visitor_snapshot.is_empty():
+		# This scene has no authenticated client; all public scenery comes from the visitor DTO.
+		session = FarmSession.new(null)
+		session.layout_patch_id = str(visitor_snapshot.layout_patch_id)
+		session.blueprint_revision = int(visitor_snapshot.blueprint_revision)
+		var street: Dictionary = visitor_snapshot.get("street_snapshot", {})
+		session.state = {"nursery": visitor_snapshot.get("nursery", {}), "journey": {
+			"version": 1, "facts": ["side_path"] if street.get("side_path", false) else [], "unlocks": [],
+			"contributions": street.get("contributions", {}), "gathering": {"current": street.get("gathering", "")},
+			"exploration": {"round": 0, "collected": []}}}
 	_start_place = str(args.get("from", "farm"))
 	_start_target = str(args.get("target", ""))
 	_walk_place = str(args.get("walk_place", "bistro" if JourneyStreets.WALK_STOPS.has(_start_target) else ""))
@@ -94,6 +109,8 @@ func _ready() -> void:
 	_rig.config_applied.connect(func(_config): _play("idle"))
 	_rig.apply_config(Avatar.load_outfit())
 	_build_ui()
+	confirmation = preload("res://modules/ui/entry_confirmation.gd").new()
+	add_child(confirmation)
 	camera_pan.radius = 18.0
 	camera_pan.min_zoom = 0.65
 	camera_pan.max_zoom = 1.6
@@ -131,14 +148,14 @@ func _build_ui() -> void:
 	ui.add_child(header)
 	var row := HBoxContainer.new()
 	header.add_child(row)
-	var back := GameUi.button("arrow-left", "", "Back to map")
+	var back := GameUi.button("arrow-left", "", L10n.text("Back to map"))
 	back.pressed.connect(_leave)
 	row.add_child(back)
-	var title := GameUi.label(JourneyStreets.load_for(session).display_name, 17)
+	var title := GameUi.label(JourneyStreets.load_for(session).display_name if visitor_snapshot.is_empty() else L10n.format_text("%s's neighbourhood", SeededOutfit.short_name(str(visitor_snapshot.avatar_ref))), 17)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	row.add_child(title)
-	var overview := GameUi.button("map", "", "Whole neighbourhood")
+	var overview := GameUi.button("map", "", L10n.text("Whole neighbourhood"))
 	overview.pressed.connect(func(): _focus_view(Vector3(19.2, 0, -19.2), 45.0))
 	row.add_child(overview)
 	status = GameUi.label("", 12, GameUi.GREEN)
@@ -150,7 +167,7 @@ func _build_ui() -> void:
 	objective.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	objective.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	goal_row.add_child(objective)
-	objective_action = GameUi.button("compass", "", "Go to current goal")
+	objective_action = GameUi.button("compass", "", L10n.text("Go to current goal"))
 	objective_action.name = "ObjectiveAction"
 	objective_action.pressed.connect(_act_on_goal)
 	goal_row.add_child(objective_action)
@@ -158,8 +175,9 @@ func _build_ui() -> void:
 	footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	footer.offset_top = -48
 	ui.add_child(footer)
-	for spec in [["map", "Neighbourhood map"], ["locate-fixed", "Follow my character"], ["sprout", "Return to your farm"]]:
+	for spec in [["map", L10n.text("Neighbourhood map")], ["locate-fixed", L10n.text("Follow my character")], ["sprout", L10n.text("Return to your farm")]]:
 		var button := GameUi.button(spec[0], "", spec[1])
+		if spec[0] == "sprout" and not visitor_snapshot.is_empty(): button.tooltip_text = L10n.text("Visit Farm")
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		footer.add_child(button)
 		if spec[0] == "map": button.pressed.connect(_leave)
@@ -174,7 +192,7 @@ func _build_ui() -> void:
 	notice.add_theme_color_override("font_outline_color", GameUi.PAPER)
 	notice.add_theme_constant_override("outline_size", 3)
 	ui.add_child(notice)
-	var credit := GameUi.label("OpenStreetMap contributors", 9, GameUi.MUTED)
+	var credit := GameUi.label(L10n.text("OpenStreetMap contributors"), 9, GameUi.MUTED)
 	credit.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	credit.position.y -= 103
 	ui.add_child(credit)
@@ -184,7 +202,7 @@ func _build_ui() -> void:
 	ui.add_child(dialogue)
 	var column := VBoxContainer.new()
 	dialogue.add_child(column)
-	var close := GameUi.button("x", "", "Close conversation")
+	var close := GameUi.button("x", "", L10n.text("Close conversation"))
 	close.size_flags_horizontal = Control.SIZE_SHRINK_END
 	close.pressed.connect(_close_dialogue)
 	column.add_child(close)
@@ -199,7 +217,7 @@ func _refresh() -> void:
 	var key := JSON.stringify([JourneyProgress.fact(session.state, "side_path"), session.state.get("nursery", {})])
 	if layout == null or key != _world_key:
 		var previous := mover.position if mover else Vector3.ZERO
-		layout = JourneyStreets.new(JourneyStreets.load_for(session), JourneyProgress.fact(session.state, "side_path"))
+		layout = JourneyStreets.new(visitor_blueprint if visitor_blueprint else JourneyStreets.load_for(session), JourneyProgress.fact(session.state, "side_path"))
 		mover = PlayerMover.new(layout.nav, layout.grid)
 		if layout.nav.is_walkable(layout.nav.world_to_cell(previous)): mover.position = previous
 		_build_scenery()
@@ -220,16 +238,21 @@ func _refresh() -> void:
 		child.queue_free()
 	targets.clear()
 	for id in layout.entrances:
-		_add_target(id, NAMES[id], ICONS[id], layout.buildings[id] + Vector3(0, 1.5, 0), layout.entrances[id])
+		if not visitor_snapshot.is_empty() and id != "farm": continue
+		_add_target(id, L10n.text("Visit Farm") if not visitor_snapshot.is_empty() else NAMES[id], ICONS[id], layout.buildings[id] + Vector3(0, 1.5, 0), layout.entrances[id])
+	if not visitor_snapshot.is_empty():
+		_refresh_status()
+		_sync_markers()
+		return
 	if JourneyGatherings.available(session.state):
 		for theme in layout.gatherings:
 			var venue: Dictionary = layout.gatherings[theme]
 			var spec: Dictionary = JourneyGatherings.themes()[theme]
-			_add_target("gathering:" + str(theme), "Tea walk" if theme == "garden" else "Lantern supper", str(spec.icon), venue.position + Vector3(0, 1.6, 0), venue.approach)
+			_add_target("gathering:" + str(theme), L10n.text("Tea walk") if theme == "garden" else L10n.text("Lantern supper"), str(spec.icon), venue.position + Vector3(0, 1.6, 0), venue.approach)
 			targets["gathering:" + str(theme)].gathering = theme
 	for slot in residents.moments:
 		var actor: Node3D = residents.moments[slot].actor
-		_add_target("resident:" + slot, str(ResidentCast.definition(str(actor.name)).name), "message-circle", actor.position + Vector3(0, 1.8, 0), actor.position)
+		_add_target("resident:" + slot, L10n.text(str(ResidentCast.definition(str(actor.name)).name)), "message-circle", actor.position + Vector3(0, 1.8, 0), actor.position)
 		targets["resident:" + slot].slot = slot
 		if not JourneyGatherings.current(session.state).is_empty():
 			targets["resident:" + slot].button.text = ""
@@ -316,7 +339,9 @@ func _build_scenery() -> void:
 		for point in pair: PlaceScenery._cylinder(surface, 0.85, 0.03, point + Vector3(0, 0.035, 0), PlaceScenery.STONE, Vector3.ONE, 16)
 	for id in layout.buildings:
 		var position: Vector3 = layout.buildings[id]
-		if id == "farm": scenery.add_child(PlaceScenery.FarmProps.build("house", position, 1.5))
+		if id == "farm":
+			var art = preload("res://modules/farm/farm_art.gd")
+			scenery.add_child(art.instance("house_" + art.style_for(layout.source.region_id, layout.source.layout_patch_id), position, 1.5))
 		else:
 			var miniature := PlaceScenery.build(id, session.state)
 			miniature.position = position
@@ -431,16 +456,20 @@ func _current_goal() -> Dictionary:
 	return JourneyProgress.next_goal(JourneyProgress.goal_state(session), session.server_now())
 
 func _refresh_status() -> void:
-	status.text = "%d coins / %d wood / %d stone / %d reeds" % [session.state.get("wallet", 0), JourneyProgress.material(session.state, "wood"), JourneyProgress.material(session.state, "stone"), JourneyProgress.material(session.state, "fiber")]
+	if not visitor_snapshot.is_empty():
+		status.text = L10n.text("Visiting neighbourhood")
+		objective.get_parent().hide()
+		return
+	status.text = L10n.format_text("%d coins / %d wood / %d stone / %d reeds", [session.state.get("wallet", 0), JourneyProgress.material(session.state, "wood"), JourneyProgress.material(session.state, "stone"), JourneyProgress.material(session.state, "fiber")])
 	var goal := _current_goal()
 	_goal_target = _goal_target_id(goal)
 	if pending.is_empty():
 		objective.text = JourneyProgress.goal_label(goal)
-	else: objective.text = str(targets.get(pending, {}).get("text", "Following the path"))
-	if session.offline: objective.text = "Waiting for connection"
+	else: objective.text = str(targets.get(pending, {}).get("text", L10n.text("Following the path")))
+	if session.offline: objective.text = L10n.text("Waiting for connection")
 	var walking := mover != null and (mover.is_moving() or not pending.is_empty())
 	objective_action.icon = GameUi.icon("x" if walking else "compass")
-	objective_action.tooltip_text = "Stop walking" if walking else "Go to current goal"
+	objective_action.tooltip_text = L10n.text("Stop walking") if walking else L10n.text("Go to current goal")
 	objective_action.disabled = busy or dialogue.visible or (not walking and (session.offline or session.has_unconfirmed_command() or _goal_target.is_empty()))
 
 func _goal_target_id(goal: Dictionary) -> String:
@@ -465,9 +494,10 @@ func _act_on_goal() -> void:
 	select_target(_goal_target_id(goal), goal)
 
 func select_target(id: String, goal: Dictionary = {}) -> void:
-	if busy or dialogue.visible or not targets.has(id) or session.offline or session.has_unconfirmed_command(): return
+	if not visitor_snapshot.is_empty() and id != "farm": return
+	if busy or dialogue.visible or confirmation.visible or not targets.has(id) or session.offline or session.has_unconfirmed_command(): return
 	if NAMES.has(id) and id != "farm" and not PlaceCatalog.available(id, session.state):
-		_message("First harvest opens the bistro")
+		_message(L10n.text("First harvest opens the bistro"))
 		return
 	mover.grid = residents.navigation(residents.positions(), mover.position)
 	if targets[id].has("slot"):
@@ -480,7 +510,7 @@ func select_target(id: String, goal: Dictionary = {}) -> void:
 				found = true
 				break
 		if not found:
-			_message("The path is busy. Try again in a moment.")
+			_message(L10n.text("The path is busy. Try again in a moment."))
 			return
 	var accepted := mover.set_target_position(targets[id].approach)
 	hints.destination(targets[id].approach, accepted, mover.remaining_path())
@@ -488,10 +518,10 @@ func select_target(id: String, goal: Dictionary = {}) -> void:
 		pending = id
 		_destination_goal = goal.duplicate(true) if NAMES.has(id) and goal.get("place") == id else {}
 		_refresh_status()
-	else: _message("That path is not reachable")
+	else: _message(L10n.text("That path is not reachable"))
 
 func _ground_tap(screen: Vector2) -> void:
-	if busy or dialogue.visible or session.offline or session.has_unconfirmed_command() or not _world_area().has_point(screen - ui.global_position): return
+	if busy or dialogue.visible or confirmation.visible or session.offline or session.has_unconfirmed_command() or not _world_area().has_point(screen - ui.global_position): return
 	var id: String = _pick_target(screen) if _pressed_target == null else str(_pressed_target)
 	if not id.is_empty():
 		select_target(id)
@@ -504,7 +534,7 @@ func _ground_tap(screen: Vector2) -> void:
 	var accepted := mover.set_target_position(point)
 	hints.destination(point, accepted, mover.remaining_path())
 	_refresh_status()
-	if not accepted: _message("Stay on the neighbourhood paths")
+	if not accepted: _message(L10n.text("That spot is not reachable"))
 
 func _pick_target(screen: Vector2) -> String:
 	if dialogue.visible or not _world_area().has_point(screen - ui.global_position): return ""
@@ -558,6 +588,7 @@ func _process(dt: float) -> void:
 
 func _arrive(id: String) -> void:
 	if not targets.has(id): return
+	if not visitor_snapshot.is_empty() and id != "farm": return
 	if targets[id].has("gathering"):
 		_show_gathering(str(targets[id].gathering))
 		return
@@ -569,10 +600,18 @@ func _arrive(id: String) -> void:
 	if NAMES.has(id):
 		var goal := _destination_goal
 		_destination_goal = {}
+		camera_pan.cancel()
+		mover.stop()
+		confirmation.ask(L10n.text("Farm") if not visitor_snapshot.is_empty() else str(NAMES[id]))
+		var enter: bool = await confirmation.answered
+		if not enter: return
+		if not visitor_snapshot.is_empty():
+			AppRouter.open_instance(AppRouter.FARM, {"visitor": true, "snapshot": visitor_snapshot, "blueprint": visitor_blueprint})
+			return
 		if id == "farm":
-			AppRouter.push_instance(AppRouter.FARM, {"session": session,
+			AppRouter.open_instance(AppRouter.FARM, {"session": session,
 				"seed_crop": str(goal.get("crop", "")) if goal.get("action") == "stall" else ""})
-		else: AppRouter.push_instance(AppRouter.PLACE, {"session": session, "place_id": id, "target": str(goal.get("target", ""))})
+		else: AppRouter.open_instance(AppRouter.PLACE, {"session": session, "place_id": id, "target": str(goal.get("target", ""))})
 		return
 	var bundle: Dictionary = targets[id].bundle
 	var materials: Dictionary = bundle.materials
@@ -582,7 +621,7 @@ func _arrive(id: String) -> void:
 	await get_tree().create_timer(0.9).timeout
 	var accepted := await session.send("collect_resource", {"node_id": bundle.node, "round": round_id, "choice": bundle.choice})
 	busy = false
-	_message("+" + JourneyProgress.material_label(materials) if accepted else "Supplies changed. Try again.")
+	_message("+" + JourneyProgress.material_label(materials) if accepted else L10n.text("Supplies changed. Try again."))
 	_refresh()
 
 func _show_dialogue(slot: String) -> void:
@@ -678,17 +717,16 @@ func _message(text: String) -> void:
 	_notice_left = 5
 
 func _play(id: String) -> void:
-	var animation := _rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
-	if animation and animation.has_animation(id) and animation.current_animation != id: animation.play(id)
+	_rig.play_motion(id)
 
 func _input(event: InputEvent) -> void:
-	if dialogue.visible: return
+	if dialogue.visible or confirmation.visible: return
 	if camera_pan.handle(event, cam):
 		if not camera_pan.active() or camera_pan.dragged or camera_pan.multi: _pressed_target = null
 		get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if busy or dialogue.visible: return
+	if busy or dialogue.visible or confirmation.visible: return
 	if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and event.device != InputEvent.DEVICE_ID_EMULATION):
 		_pressed_target = _pick_target(event.position)
 	if camera_pan.handle(event, cam, true): get_viewport().set_input_as_handled()
@@ -699,6 +737,9 @@ func _notification(what: int) -> void:
 		camera_pan.cancel()
 
 func is_back_navigation_locked() -> bool:
+	if confirmation.visible:
+		confirmation.dismiss(false)
+		return true
 	if dialogue.visible:
 		_close_dialogue()
 		return true

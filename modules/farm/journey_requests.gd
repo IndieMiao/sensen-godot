@@ -35,7 +35,7 @@ static func goal(state: Dictionary, now_ms := -1, slot := "") -> Dictionary:
 	var next := {}
 	if JourneyProgress.material(state, "wood") < int(spec.wood):
 		next = JourneyProgress._material_goal(state, "wood")
-		next.hint = "Wood %d/%d" % [JourneyProgress.material(state, "wood"), int(spec.wood)]
+		next.hint = L10n.format_text("Wood %d/%d", [JourneyProgress.material(state, "wood"), int(spec.wood)])
 	if next.is_empty():
 		var candidates := []
 		var needs := crop_needs(state, slot)
@@ -48,11 +48,11 @@ static func goal(state: Dictionary, now_ms := -1, slot := "") -> Dictionary:
 	if next.is_empty():
 		for dish in spec.dishes:
 			if int(state.get("inventory", {}).get("dishes", {}).get(dish, 0)) < int(spec.dishes[dish]):
-				next = {"place": "bistro", "target": "counter", "hint": "Prepare " + str(dish).capitalize(), "icon": "utensils"}
+				next = {"place": "bistro", "target": "counter", "hint": L10n.format_text("Prepare %s", str(dish).capitalize()), "icon": "utensils"}
 				break
 	if next.is_empty():
 		next = {"place": "bistro", "target": "table", "icon": "utensils"} if slot == "bistro" else \
 			JourneyProgress._resident_goal(str(StreetCommons.RESIDENTS[slot]), "", "package-check")
-		next.hint = "Ready to deliver"
-	next.label = "%s: %s" % [spec.name, next.hint]
+		next.hint = L10n.text("Ready to deliver")
+	next.label = L10n.format_text("%s: %s", [spec.name, next.hint])
 	return next

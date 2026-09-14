@@ -33,6 +33,21 @@ func test_ensure_farm_adopts_existing() -> void:
 	assert_int(s.version).is_equal(7)
 	assert_int(int(s.state.wallet)).is_equal(30)
 
+func test_farm_lookup_distinguishes_missing_farm_from_connection_failure() -> void:
+	var pair := _session([
+		{"status": 404, "json": {"code": "NO_FARM"}},
+		{"error": "connection failed"},
+		{"status": 200, "json": _state(7)},
+	])
+	var s: FarmSession = pair[0]
+	assert_bool(await s.refresh()).is_false()
+	assert_str(s.last_error_code).is_equal("NO_FARM")
+	assert_bool(await s.refresh()).is_false()
+	assert_str(s.last_error_code).is_equal("TRANSPORT")
+	assert_bool(await s.refresh()).is_true()
+	assert_str(s.last_error_code).is_empty()
+	assert_bool(s.has_farm()).is_true()
+
 func test_state_changed_observes_derived_from_the_same_accepted_response() -> void:
 	var body := _state(7)
 	body.state = {"clock": {"chapter_index": 1}}

@@ -1,0 +1,53 @@
+{
+	"failures": [],
+	"results": [
+		{
+			"camera_far": 23.5,
+			"camera_near": 0.5,
+			"min_plot_width_px": 49.5440101623535,
+			"plots": 9,
+			"unique_sample_colors": 1139,
+			"viewport": "(360, 640)"
+		},
+		{
+			"camera_far": 23.5,
+			"camera_near": 0.5,
+			"min_plot_width_px": 49.0740242004395,
+			"plots": 12,
+			"unique_sample_colors": 1184,
+			"viewport": "(360, 640)"
+		},
+		{
+			"camera_far": 23.0,
+			"camera_near": 3.0,
+			"min_plot_width_px": 56.6628723144531,
+			"plots": 9,
+			"unique_sample_colors": 1264,
+			"viewport": "(390, 844)"
+		},
+		{
+			"camera_far": 23.0,
+			"camera_near": 3.0,
+			"min_plot_width_px": 56.6628723144531,
+			"plots": 12,
+			"unique_sample_colors": 1338,
+			"viewport": "(390, 844)"
+		},
+		{
+			"camera_far": 19.0,
+			"camera_near": 0.5,
+			"min_plot_width_px": 54.9940605163574,
+			"plots": 9,
+			"unique_sample_colors": 2138,
+			"viewport": "(1280, 720)"
+		},
+		{
+			"camera_far": 19.0,
+			"camera_near": 0.0500000007450581,
+			"min_plot_width_px": 54.4272422790527,
+			"plots": 12,
+			"unique_sample_colors": 2115,
+			"viewport": "(1280, 720)"
+		}
+	]
+}

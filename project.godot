@@ -9,6 +9,7 @@ config/quit_on_go_back=false
 run/main_scene="res://scenes/city_select/city_select.tscn"
 
 [autoload]
+Localization="*res://modules/ui/localization.gd"
 Avatar="*res://modules/avatar/avatar_service.gd"
 AppRouter="*res://modules/ui/app_router.gd"
 Net="*res://modules/net/net_service.gd"
@@ -34,6 +35,10 @@ theme/custom_font="res://assets/ui/fonts/NotoSansSC-Regular.otf"
 
 pointing/android/enable_pan_and_scale_gestures=false
 pointing/android/disable_scroll_deadzone=true
+
+[internationalization]
+
+locale/fallback="en"
 
 [editor_plugins]
 enabled=PackedStringArray("res://addons/gdUnit4/plugin.cfg")

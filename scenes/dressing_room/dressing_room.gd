@@ -33,7 +33,7 @@ func _ready() -> void:
 	safe_area.theme = GameUi.theme()
 	back_button.text = ""
 	back_button.icon = GameUi.icon("arrow-left")
-	back_button.tooltip_text = "Back"
+	back_button.tooltip_text = L10n.text("Back")
 	back_button.theme_type_variation = &"SecondaryButton"
 	restore_button.theme_type_variation = &"SecondaryButton"
 	restore_button.icon = GameUi.icon("rotate-ccw")
@@ -145,7 +145,7 @@ func _on_done() -> void:
 	if error != OK:
 		_committing = false
 		push_warning("DressingRoom: save failed with error %d" % error)
-		_show_feedback("Couldn't save. Try again.")
+		_show_feedback(L10n.text("Couldn't save. Try again."))
 		_refresh_completion_state()
 		return
 	AppRouter.pop_instance()
@@ -160,11 +160,11 @@ func _refresh_completion_state() -> void:
 	restore_button.disabled = _committing
 	parts_panel.set_interaction_enabled(not _committing)
 	if _committing:
-		done_button.text = "Saving..."
+		done_button.text = L10n.text("Saving...")
 	elif busy:
-		done_button.text = "Loading" if not _initial_ready else "Trying"
+		done_button.text = L10n.text("Loading") if not _initial_ready else L10n.text("Trying")
 	else:
-		done_button.text = "Done"
+		done_button.text = L10n.text("Done")
 
 
 func _show_feedback(message: String) -> void:

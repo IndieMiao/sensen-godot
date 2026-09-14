@@ -24,6 +24,14 @@ static func pick_region(p_regions: Array, lat: float, lng: float, has_fix: bool,
 
 func _ready() -> void:
 	theme = GameUi.theme()
+	var language_layer := Control.new()
+	language_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$SafeArea.add_child(language_layer)
+	var language := LanguageButton.new()
+	language_layer.add_child(language)
+	language.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	language.offset_left = -44
+	language.offset_bottom = 44
 	var backdrop := ColorRect.new()
 	backdrop.color = GameUi.PAPER
 	backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

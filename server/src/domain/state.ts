@@ -90,6 +90,8 @@ export interface WeekSummary {
 }
 
 export interface FarmState {
+  /** Created only with a new ordinary farm. Absence preserves legacy 9/12 plots. */
+  field_progress?: { order: string[]; planted: number; harvested: number; plots: 4 | 6 | 9 };
   /** Absent on G3 saves; upgrading is an explicit, idempotent owner command. */
   journey?: JourneyState;
   clock: {

@@ -23,6 +23,9 @@ class NativePlugin extends Node:
 	func startLocation() -> void:
 		calls.append(["location"])
 
+	func setLanguage(locale: String) -> void:
+		calls.append(["language", locale])
+
 class GrantedBridge extends MapBridgeAndroid:
 	func _has_location_permission() -> bool:
 		return true
@@ -51,6 +54,8 @@ func test_live_plugin_receives_commands_and_forwards_deferred_signals() -> void:
 	bridge.create_map("token", 31.0, 121.0, 16.0)
 	bridge.set_camera(32.0, 122.0, 17.0, 20.0, 30.0)
 	bridge.set_map_visible(false)
+	bridge.set_language("zh_CN")
+	bridge.set_language("en")
 	bridge.start_location()
 	bridge._awaiting_permission = true
 	bridge._poll_frames = MapBridgeAndroid.PERMISSION_POLL_EVERY - 1
@@ -58,7 +63,7 @@ func test_live_plugin_receives_commands_and_forwards_deferred_signals() -> void:
 	assert_that(_native.calls).is_equal([
 		["create", "token", 31.0, 121.0, 16.0],
 		["camera", 32.0, 122.0, 17.0, 20.0, 30.0],
-		["visible", false], ["location"], ["location"],
+		["visible", false], ["language", "zh_CN"], ["language", "en"], ["location"], ["location"],
 	])
 	assert_float(bridge.get_pixel_ratio()).is_equal(2.0)
 	assert_str(bridge.camera_info()).is_equal("native camera")
@@ -82,6 +87,7 @@ func test_missing_native_plugin_uses_safe_defaults() -> void:
 	_assert_unavailable_bridge(GrantedBridge.new())
 
 func _assert_unavailable_bridge(bridge: MapBridgeAndroid) -> void:
+	bridge.set_language("zh_CN")
 	bridge.create_map("token", 31.0, 121.0, 16.0)
 	bridge.set_camera(32.0, 122.0, 17.0, 20.0, 30.0)
 	bridge.set_map_visible(false)

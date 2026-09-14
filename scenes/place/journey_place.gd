@@ -218,18 +218,18 @@ func _build_ui() -> void:
 	header.resized.connect(_layout)
 	var row := HBoxContainer.new()
 	header.add_child(row)
-	var back := GameUi.button("arrow-left", "", "Return")
+	var back := GameUi.button("arrow-left", "", L10n.text("Return"))
 	back.pressed.connect(_leave)
 	row.add_child(back)
-	var title := GameUi.label(str(PlaceCatalog.find(place_id).name), 17)
+	var title := GameUi.label(L10n.text(str(PlaceCatalog.find(place_id).name)), 17)
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(title)
-	display_done = GameUi.button("check", "", "Finish arranging")
+	display_done = GameUi.button("check", "", L10n.text("Finish arranging"))
 	display_done.visible = false
 	display_done.pressed.connect(_finish_display)
 	row.add_child(display_done)
-	var bag := GameUi.button("backpack", "", "Neighbourhood supplies")
+	var bag := GameUi.button("backpack", "", L10n.text("Neighbourhood supplies"))
 	bag.pressed.connect(func(): _show_panel("board"))
 	row.add_child(bag)
 	status = GameUi.label("", 13, GameUi.GREEN)
@@ -241,7 +241,7 @@ func _build_ui() -> void:
 	var goal_row := HBoxContainer.new()
 	header.add_child(goal_row)
 	goal_row.add_child(objective)
-	follow_goal = GameUi.button("compass", "", "Go to current goal")
+	follow_goal = GameUi.button("compass", "", L10n.text("Go to current goal"))
 	follow_goal.name = "FollowGoal"
 	follow_goal.pressed.connect(_follow_goal)
 	goal_row.add_child(follow_goal)
@@ -256,7 +256,7 @@ func _build_ui() -> void:
 	feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	feedback.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	close_row.add_child(feedback)
-	var close := GameUi.button("x", "", "Close")
+	var close := GameUi.button("x", "", L10n.text("Close"))
 	close.pressed.connect(_close_panel)
 	close_row.add_child(close)
 	panel_scroll = ScrollContainer.new()
@@ -268,12 +268,12 @@ func _build_ui() -> void:
 	footer.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	footer.offset_top = -48
 	ui.add_child(footer)
-	farm_return = GameUi.button("sprout", "My farm", "Return to your farm")
+	farm_return = GameUi.button("sprout", L10n.text("My farm"), L10n.text("Return to your farm"))
 	farm_return.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	farm_return.clip_text = true
 	farm_return.pressed.connect(_go_farm)
 	footer.add_child(farm_return)
-	var map_button := GameUi.button("map", "", "Neighbourhood map")
+	var map_button := GameUi.button("map", "", L10n.text("Neighbourhood map"))
 	map_button.pressed.connect(_go_map)
 	footer.add_child(map_button)
 	world_notice = PanelContainer.new()
@@ -326,7 +326,7 @@ func _refresh() -> void:
 		display_project = ""
 		display_done.hide()
 	_refresh_farm_hint()
-	status.text = "%d coins / %d wood / %d stone / %d reeds%s" % [int(session.state.wallet), int(session.state.journey.wood), JourneyProgress.material(session.state, "stone"), JourneyProgress.material(session.state, "fiber"), " / Offline" if session.offline else ""]
+	status.text = L10n.format_text("%d coins / %d wood / %d stone / %d reeds%s", [int(session.state.wallet), int(session.state.journey.wood), JourneyProgress.material(session.state, "stone"), JourneyProgress.material(session.state, "fiber"), L10n.text(" / Offline") if session.offline else ""])
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_refresh_goal()
 	var key := JSON.stringify([session.state.journey, session.state.get("decorations", []), session.state.nursery, session.state.inventory.dishes])
@@ -382,7 +382,7 @@ func _refresh() -> void:
 		add_child(decorations)
 	for resident in cast.get_children():
 		var id := "resident" if resident.name == JourneyActivityPanel.RESIDENTS[place_id] else "resident:" + str(resident.name)
-		_add_target(id, "Talk" if id == "resident" else "Talk to " + str(ResidentCast.definition(str(resident.name)).name), "message-circle",
+		_add_target(id, L10n.text("Talk") if id == "resident" else L10n.text("Talk to ") + L10n.text(str(ResidentCast.definition(str(resident.name)).name)), "message-circle",
 			resident.position + Vector3(0, 2.96, 0), resident.position + Vector3(-0.2, 0, 0.85))
 		targets[id].resident = str(resident.name)
 		targets[id].body = resident.position + Vector3(0, 1.35, 0)
@@ -394,7 +394,7 @@ func _refresh() -> void:
 			_resource_pile(pos, bundle.materials)
 			var approach := Vector3(4.2, 0, 0.1) if str(bundle.id) == "side_path" else pos - pos.normalized() * 0.65
 			var label := JourneyProgress.material_label(bundle.materials)
-			_add_target(str(bundle.id), ("Take " if bundles.size() > 1 else "Gather ") + label, "axe", pos + Vector3(0, 0.45, 0), approach)
+			_add_target(str(bundle.id), (L10n.text("Take ") if bundles.size() > 1 else L10n.text("Gather ")) + label, "axe", pos + Vector3(0, 0.45, 0), approach)
 			targets[bundle.id].bundle = bundle
 			if bundles.size() > 1:
 				targets[bundle.id].badge = false
@@ -408,7 +408,7 @@ func _refresh() -> void:
 		PlaceScenery._box(surface, Vector3(0.09, 0.9, 0.09), pos + Vector3(0, 0.45, 0), PlaceScenery.WOOD)
 		PlaceScenery._box(surface, Vector3(0.65, 0.3, 0.08), pos + Vector3(0, 0.85, 0), PlaceScenery.GREEN)
 		objects.add_child(_mesh(surface, "TrailSign"))
-		var trail_name := str(JourneyProgress.route_for(session.state, place_id).name) if JourneyProgress.street_supplies(session.state, place_id) else str(JourneyProgress.data().routes[trail].name)
+		var trail_name := L10n.text(str(JourneyProgress.route_for(session.state, place_id).name)) if JourneyProgress.street_supplies(session.state, place_id) else L10n.text(str(JourneyProgress.data().routes[trail].name))
 		_add_target("trail", trail_name, "route", pos + Vector3(0, 1.15, 0), pos - pos.normalized() * 0.7)
 	for id in JourneyProgress.data().projects:
 		var spec: Dictionary = JourneyProgress.data().projects[id]
@@ -435,13 +435,13 @@ func _refresh() -> void:
 			piece.position = JourneyProjects.display_position(str(id), index)
 			piece.scale = Vector3.ONE * 0.7
 			display.add_child(piece)
-			var label := str(JourneyProgress.data().workshop.recipes[item].name) if not item.is_empty() else "Empty display %d" % (index + 1)
-			if not preview.is_empty(): label = "Planned " + str(JourneyProgress.data().workshop.recipes[preview].name)
+			var label := L10n.text(str(JourneyProgress.data().workshop.recipes[item].name)) if not item.is_empty() else L10n.format_text("Empty display %d", (index + 1))
+			if not preview.is_empty(): label = L10n.text("Planned ") + L10n.text(str(JourneyProgress.data().workshop.recipes[preview].name))
 			var target_id := "display:%s:%d" % [id, index]
 			_add_target(target_id, label, "plus" if preview.is_empty() else "hammer", piece.position + Vector3(0, 0.3, 0), piece.position + Vector3(-signf(piece.position.x) * 0.85, 0, 0.55))
 			targets[target_id].body = piece.position + Vector3(0, 0.3, 0)
 			targets[target_id].badge = item.is_empty()
-		_add_target("project_" + str(id), str(spec.name), "sprout" if id == "seedbeds" else "hammer", project.position + Vector3(0, 1.1, 0), project.position + Vector3(0, 0, 1.5))
+		_add_target("project_" + str(id), L10n.text(str(spec.name)), "sprout" if id == "seedbeds" else "hammer", project.position + Vector3(0, 1.1, 0), project.position + Vector3(0, 0, 1.5))
 		if id == "terrace" and JourneyProgress.project_complete(session.state, "terrace"):
 			targets.project_terrace.approach = _reachable_approach(Vector3(2, 0, -0.65))
 	if JourneyProgress.fact(session.state, "planter_crafted"):
@@ -450,18 +450,18 @@ func _refresh() -> void:
 			if spec.place != place_id: continue
 			var discovery := JourneyProjects.build_discovery(str(id), session.state)
 			objects.add_child(discovery)
-			_add_target("discovery_" + str(id), str(spec.name), "sprout" if JourneyProgress.fact(session.state, "discovery_" + str(id)) else "compass",
+			_add_target("discovery_" + str(id), L10n.text(str(spec.name)), "sprout" if JourneyProgress.fact(session.state, "discovery_" + str(id)) else "compass",
 				discovery.position + Vector3(0, 1.05, 0), discovery.position + Vector3(0, 0, 1.05))
 			if JourneyProgress.discovery_harvest_ready(session.state, str(id)):
 				targets["discovery_" + str(id)].badge = false
 				for choice in JourneyProjects.discovery_choices(str(id), session.state):
 					var pos: Vector3 = choice.position
 					var label := JourneyProgress.discovery_reward_label(choice.reward)
-					_add_target(str(choice.id), "Take %s / one harvest this trail" % label, "sprout", pos + Vector3(0, 1.05, 0), pos + Vector3(0, 0, 0.8))
+					_add_target(str(choice.id), L10n.format_text("Take %s / one harvest this trail", label), "sprout", pos + Vector3(0, 1.05, 0), pos + Vector3(0, 0, 0.8))
 					targets[choice.id].harvest = choice
 					targets[choice.id].body = pos + Vector3(0, 0.45, 0)
 					targets[choice.id].badge = false
-					_add_target_caption(str(choice.id), label.replace(" + ", "\n").replace(" seeds", "\nseeds"))
+					_add_target_caption(str(choice.id), label.replace(" + ", "\n").replace(L10n.text(" seeds"), "\nseeds"))
 	if place_id == "nursery":
 		var surface := SurfaceTool.new()
 		surface.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -470,20 +470,20 @@ func _refresh() -> void:
 		else:
 			PlaceScenery._box(surface, Vector3(1.5, 0.12, 0.8), Vector3(-1.55, 0.24, 1), PlaceScenery.WOOD)
 			PlaceScenery._beam(surface, Vector3(-2.1, 0.1, 1.4), Vector3(-1.3, 0.4, 0.65), 0.12, PlaceScenery.WOOD)
-		objects.add_child(_mesh(surface, "Workbench"))
-		_add_target("workbench", "Workbench", "hammer", Vector3(-1.55, 0.95, 1), Vector3(-1.55, 0, 1.95))
+		objects.add_child(_mesh(surface, L10n.text("Workbench")))
+		_add_target("workbench", L10n.text("Workbench"), "hammer", Vector3(-1.55, 0.95, 1), Vector3(-1.55, 0, 1.95))
 		_build_side_path()
 	elif place_id == "bistro":
-		_add_target("counter", "Prepare a meal", "utensils", Vector3(-1.1, 1, -0.7), Vector3(-1.1, 0, 0.6))
-		_add_target("table", "Share a meal", "heart", Vector3(2, 1, 0.3), Vector3(2, 0, 1.35))
+		_add_target("counter", L10n.text("Prepare a meal"), "utensils", Vector3(-1.1, 1, -0.7), Vector3(-1.1, 0, 0.6))
+		_add_target("table", L10n.text("Share a meal"), "heart", Vector3(2, 1, 0.3), Vector3(2, 0, 1.35))
 		var dishes: Dictionary = session.state.inventory.dishes
 		if int(dishes.get("salad", 0)) + int(dishes.get("tea", 0)) > 0:
 			var dish_mesh := _dish_mesh("salad" if int(dishes.get("salad", 0)) > 0 else "tea", "PreparedDish")
 			dish_mesh.position = Vector3(-0.85, 0.96, -0.35)
 			objects.add_child(dish_mesh)
 	else:
-		_add_target("planter", "Your courtyard", "move", Vector3(-2.7, 0.8, 2.4), Vector3(-1.7, 0, 2.8))
-	_add_target("exit", "Street exit", "map", Vector3(1.05, 1.45, 3.7), Vector3(0.4, 0, 3.5))
+		_add_target("planter", L10n.text("Your courtyard"), "move", Vector3(-2.7, 0.8, 2.4), Vector3(-1.7, 0, 2.8))
+	_add_target("exit", L10n.text("Street exit"), "map", Vector3(1.05, 1.45, 3.7), Vector3(0.4, 0, 3.5))
 	_refresh_goal()
 	_sync_markers()
 
@@ -515,11 +515,11 @@ func _build_side_path() -> void:
 	if not opened:
 		for height in [0.28, 0.55]:
 			PlaceScenery._box(surface, Vector3(0.95, 0.12, 0.13), Vector3(4.3, height, 0.55), PlaceScenery.WOOD)
-		_add_target("path", "Garden side path", "route", Vector3(4.25, 0.85, 0.55), Vector3(4.2, 0, 1.2))
+		_add_target("path", L10n.text("Garden side path"), "route", Vector3(4.25, 0.85, 0.55), Vector3(4.2, 0, 1.2))
 	else:
 		PlaceScenery._box(surface, Vector3(0.08, 1.0, 0.08), Vector3(3.85, 0.5, -0.9), PlaceScenery.WOOD)
 		PlaceScenery._box(surface, Vector3(0.7, 0.25, 0.08), Vector3(3.85, 0.9, -0.9), PlaceScenery.GREEN)
-		_add_target("path", "Courtyard via side path", "route", Vector3(3.85, 1.45, -0.9), Vector3(4.2, 0, -1.5))
+		_add_target("path", L10n.text("Courtyard via side path"), "route", Vector3(3.85, 1.45, -0.9), Vector3(4.2, 0, -1.5))
 	objects.add_child(_mesh(surface, "GardenSidePath"))
 
 func _log_pile(pos: Vector3) -> void:
@@ -527,7 +527,7 @@ func _log_pile(pos: Vector3) -> void:
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for i in 3:
 		PlaceScenery._beam(surface, pos + Vector3(-0.32, 0.12 + i * 0.10, -0.12), pos + Vector3(0.34, 0.12 + i * 0.1, 0.13), 0.12, PlaceScenery.WOOD)
-	objects.add_child(_mesh(surface, "Timber"))
+	objects.add_child(_mesh(surface, L10n.text("Timber")))
 
 func _resource_pile(pos: Vector3, materials: Dictionary) -> void:
 	if int(materials.get("wood", 0)) > 0: _log_pile(pos)
@@ -538,7 +538,7 @@ func _resource_pile(pos: Vector3, materials: Dictionary) -> void:
 	elif materials.has("fiber"):
 		for i in 5: PlaceScenery._beam(surface, pos + Vector3(-0.3 + i * 0.15, 0, 0.3), pos + Vector3(-0.4 + i * 0.18, 0.85, 0.35), 0.04, PlaceScenery.LEAF)
 	else: return
-	objects.add_child(_mesh(surface, "Supplies"))
+	objects.add_child(_mesh(surface, L10n.text("Supplies")))
 
 func _reachable_approach(approach: Vector3) -> Vector3:
 	var cell := nav.world_to_cell(approach - NAV_ORIGIN)
@@ -642,7 +642,7 @@ func select_target(id: String) -> bool:
 	var cell := nav.world_to_cell(target.approach - NAV_ORIGIN)
 	if not mover.set_target_cell(cell):
 		ground_feedback.destination(target.approach, false, [])
-		objective.text = "That spot is not reachable"
+		objective.text = L10n.text("That spot is not reachable")
 		return false
 	pending_target = id
 	ground_feedback.destination(nav.cell_to_world(cell) + NAV_ORIGIN, true, mover.remaining_path())
@@ -682,7 +682,7 @@ func _refresh_farm_hint() -> void:
 	_farm_hint_elapsed = 0.0
 	if farm_return == null or session == null: return
 	var hint := JourneyProgress.farm_hint(JourneyProgress.goal_state(session), session.server_now())
-	farm_return.text = "My farm" if hint.is_empty() else "My farm: " + hint
+	farm_return.text = L10n.text("My farm") if hint.is_empty() else L10n.text("My farm: ") + hint
 	if pending_target.is_empty(): _refresh_goal()
 
 func _refresh_goal() -> void:
@@ -708,8 +708,7 @@ func _go_goal(goal: Dictionary) -> void:
 		if _prepare_destination(_go_goal.bind(goal)): select_target(str(goal.target))
 
 func _play(id: String) -> void:
-	var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
-	if ap and ap.has_animation(id) and ap.current_animation != id: ap.play(id)
+	rig.play_motion(id)
 
 func _arrived(id: String) -> void:
 	if not targets.has(id): return
@@ -806,8 +805,8 @@ func _go_place(id: String, target_id := "") -> void:
 	if not _prepare_destination(_go_place.bind(id, target_id)): return
 	var shared_session := session
 	while AppRouter.instance_depth() > 0: AppRouter.pop_instance()
-	if id == "street": AppRouter.push_instance(AppRouter.STREET, {"session": shared_session, "from": place_id, "target": target_id, "walk_place": "" if target_id.begins_with("gathering:") else place_id})
-	else: AppRouter.push_instance(AppRouter.PLACE, {"place_id": id, "session": shared_session, "target": target_id})
+	if id == "street": AppRouter.open_instance(AppRouter.STREET, {"session": shared_session, "from": place_id, "target": target_id, "walk_place": "" if target_id.begins_with("gathering:") else place_id})
+	else: AppRouter.open_instance(AppRouter.PLACE, {"place_id": id, "session": shared_session, "target": target_id})
 
 func _world_action(id: String) -> void:
 	var result := feedback.text
@@ -861,12 +860,12 @@ func _meal_served(dish: String, target := "table") -> void:
 		meal_moment = resident_moments.bistro_owner
 		meal_moment.start(Vector3(0.7, 0.04, -0.7) if target == "project_terrace" else Vector3(0.6, 0.04, 1.6), served_dish.position)
 		_meal_residents.append("bistro_owner")
-		resident_activities.bistro_owner = "Sharing " + dish
+		resident_activities.bistro_owner = L10n.text("Sharing ") + dish
 	if target == "project_terrace" and resident_moments.has("nursery_keeper"):
 		var guest: ResidentMoment = resident_moments.nursery_keeper
 		guest.start(Vector3(3.55, 0.04, -0.65), served_dish.position)
 		_meal_residents.append("nursery_keeper")
-		resident_activities.nursery_keeper = "Sharing " + dish
+		resident_activities.nursery_keeper = L10n.text("Sharing ") + dish
 
 func _meal_route(destination: Vector3) -> PlayerMover:
 	return _resident_route(destination, meal_moment)
@@ -1061,7 +1060,7 @@ func _ground_tap(screen: Vector2) -> void:
 	_build_navigation()
 	var reachable := mover.set_target_position(point - NAV_ORIGIN)
 	ground_feedback.destination(point, reachable, mover.remaining_path())
-	if not reachable: objective.text = "Can't reach that spot"
+	if not reachable: objective.text = L10n.text("Can't reach that spot")
 
 func _pick_target(screen: Vector2) -> String:
 	var nearest := 28.0
@@ -1107,7 +1106,7 @@ func _go_street() -> void:
 		var street := AppRouter.top_instance() as JourneyStreet
 		if street and street.session == shared_session: return
 		AppRouter.pop_instance()
-	AppRouter.push_instance(AppRouter.STREET, {"session": shared_session, "from": departure})
+	AppRouter.open_instance(AppRouter.STREET, {"session": shared_session, "from": departure})
 
 func _go_map() -> void:
 	if not _prepare_destination(_go_map): return
@@ -1116,7 +1115,7 @@ func _go_map() -> void:
 func _go_farm(seed_crop := "") -> void:
 	if not _prepare_destination(_go_farm.bind(seed_crop)): return
 	while AppRouter.instance_depth() > 0: AppRouter.pop_instance()
-	AppRouter.push_instance(AppRouter.FARM, {"session": session, "seed_crop": seed_crop})
+	AppRouter.open_instance(AppRouter.FARM, {"session": session, "seed_crop": seed_crop})
 
 func _prepare_destination(destination := Callable()) -> bool:
 	if busy or (active_panel and active_panel.busy): return false

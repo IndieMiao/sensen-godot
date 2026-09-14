@@ -231,13 +231,13 @@ func _on_busy_changed(_busy: bool) -> void:
 
 func _on_part_load_failed(slot: StringName, part_id: String, _err: int) -> void:
 	var label := _part_label(slot, part_id)
-	selection_failed.emit("Couldn't load %s. Previous look kept." % label)
+	selection_failed.emit(L10n.format_text("Couldn't load %s. Previous look kept.", label))
 	# AvatarRig 在发出失败信号后才回退 desired，延迟刷新才能读到最终目标态。
 	call_deferred("_refresh_state")
 
 
 func _slot_label(slot: StringName) -> String:
-	return String(SLOT_LABELS.get(slot, "Other"))
+	return String(SLOT_LABELS.get(slot, L10n.text("Other")))
 
 
 func _part_label(slot: StringName, part_id: String, fallback_index := -1) -> String:
@@ -249,17 +249,17 @@ func _part_label(slot: StringName, part_id: String, fallback_index := -1) -> Str
 			if parts[i].id == part_id:
 				fallback_index = i
 				break
-	return "%s Style %d" % [_slot_label(slot), maxi(fallback_index + 1, 1)]
+	return L10n.format_text("%s Style %d", [_slot_label(slot), maxi(fallback_index + 1, 1)])
 
 
 func _none_label(slot: StringName) -> String:
 	match slot:
 		&"glass":
-			return "No Glasses"
+			return L10n.text("No Glasses")
 		&"messengerBag":
-			return "No Bag"
+			return L10n.text("No Bag")
 		_:
-			return "None"
+			return L10n.text("None")
 
 
 func _clear(container: Node) -> void:

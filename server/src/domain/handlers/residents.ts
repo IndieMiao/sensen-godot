@@ -183,6 +183,8 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
 
     case 'purchase_growth_choice': {
       if (cmd.choice !== 'tool' && cmd.choice !== 'field') return err('NOT_AVAILABLE', '成长选择非法');
+      if (cmd.choice === 'field' && s.field_progress && s.field_progress.plots < 9)
+        return err('CHAPTER_LOCKED', '先完成九块田地的新手目标');
       if (typeof cmd.transaction_id !== 'string' || cmd.transaction_id.trim().length === 0
         || cmd.transaction_id.length > 128) return err('NOT_AVAILABLE', '交易标识非法');
       if (!canUse(s, 'growth', unlockChapter(ctx, 'growth_choice')))

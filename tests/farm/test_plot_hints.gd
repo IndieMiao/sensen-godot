@@ -82,3 +82,17 @@ func test_destination_animates_then_clears_without_continuous_redraw() -> void:
 	await _frame()
 	await _frame()
 	assert_int(draws).is_equal(initial)
+
+func test_queued_plots_refresh_on_enqueue_and_clear_without_idle_redraws() -> void:
+	hints.sync({"3,3": {"state": "wild"}, "4,3": {"state": "wild"}}, 1000, "sunny")
+	await _frame()
+	var initial := draws
+	hints.queued = [Vector2i(3, 3), Vector2i(4, 3)]
+	await _frame()
+	assert_int(draws).is_greater(initial)
+	initial = draws
+	await _frame()
+	assert_int(draws).is_equal(initial)
+	hints.queued.clear()
+	await _frame()
+	assert_int(draws).is_greater(initial)

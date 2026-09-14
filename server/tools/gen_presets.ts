@@ -30,7 +30,7 @@ for (const spec of PRESET_SPECS) {
   const tz = regions.regions.find(r => r.id === spec.region)!.timezone;
   const farm = buildPresetFarm(spec, blueprintSets(bp), content, tz, T_BUILD);
   const snap = visitorSnapshot(farm, derive(farm.state, T_SNAP, tz, content), 1, snapshotSlot(T_SNAP), [], spec.avatar_ref);
-  const file = path.join(OUT, `${spec.layout}.json`);
+  const file = path.join(OUT, `${spec.id ?? spec.layout}.json`);
   writeFileSync(file, JSON.stringify(snap, null, 2) + '\n');
   const ripe = snap.cells.filter(c => c.ripe).length;
   const growing = snap.cells.filter(c => c.state === 'growing').length;

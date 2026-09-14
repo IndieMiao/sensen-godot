@@ -50,7 +50,7 @@ static func evaluate(state: Dictionary, cells: Dictionary) -> Array:
 	var flags: Dictionary = raw_flags if raw_flags is Dictionary else {}
 	var goals := []
 	for fact in chapter.get("min_facts", []):
-		goals.append({"id": str(fact), "label": str(LABELS.get(fact, "Chapter goal")), "done": _confirmed(flags, str(fact))})
+		goals.append({"id": str(fact), "label": str(LABELS.get(fact, L10n.text("Chapter goal"))), "done": _confirmed(flags, str(fact))})
 	if index != 0: return goals
 	var steps := _farming_steps(state, cells, _confirmed(flags, "first_harvest"))
 	for i in steps.size():
@@ -75,10 +75,10 @@ static func _farming_steps(state: Dictionary, cells: Dictionary, first_harvest: 
 	var cared_any: bool = harvested or any.call(["growing"])
 	var fc := str((state.get("clock", {}) as Dictionary).get("field_condition", "sunny"))
 	return [
-		{"id": "clear", "label": "Clear a plot", "done": cleared_any},
-		{"id": "till", "label": "Till it", "done": tilled_any},
-		{"id": "sow", "label": "Sow a radish", "done": sown_any},
-		{"id": "care", "label": "%s it" % NextStep.care_verb(fc), "done": cared_any},
+		{"id": "clear", "label": L10n.text("Clear a plot"), "done": cleared_any},
+		{"id": "till", "label": L10n.text("Till it"), "done": tilled_any},
+		{"id": "sow", "label": L10n.text("Sow a radish"), "done": sown_any},
+		{"id": "care", "label": L10n.format_text("%s it", NextStep.care_verb(fc)), "done": cared_any},
 	]
 
 static func progress(state: Dictionary, derived: Dictionary = {}, now_ms := 0) -> Dictionary:
@@ -98,7 +98,7 @@ static func progress(state: Dictionary, derived: Dictionary = {}, now_ms := 0) -
 	if complete and not definition(index + 1).is_empty() and int(derived.get("chapter_index", index)) == index \
 			and (next_at is int or next_at is float) and next_at > 0:
 		remaining = maxi(0, int(next_at) - now_ms)
-	return {"index": index, "title": TITLES[index] if index >= 0 and index < TITLES.size() else "Chapter goals",
+	return {"index": index, "title": TITLES[index] if index >= 0 and index < TITLES.size() else L10n.text("Chapter goals"),
 		"complete": complete, "next_open_in_ms": remaining, "last_chapter": not chapter.is_empty() and definition(index + 1).is_empty(),
 		"pending": chapter.is_empty() or current.is_empty() or str(current.get("status", "")) == "done" and not complete}
 

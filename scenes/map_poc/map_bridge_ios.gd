@@ -14,6 +14,7 @@ var _ratio := 1.0
 var _pending_create := ""
 var _got_ready := false
 var _frames := 0
+var _locale := "zh_CN"
 
 func _init() -> void:
 	_udp.connect_to_host("127.0.0.1", PORT)
@@ -33,11 +34,16 @@ func set_camera(lat: float, lng: float, zoom: float, bearing: float, pitch: floa
 func set_map_visible(visible: bool) -> void:
 	_send("VIS|%d" % (1 if visible else 0))
 
+func set_language(locale: String) -> void:
+	_locale = locale
+	_send("LANG|" + _locale)
+
 func get_pixel_ratio() -> float:
 	return _ratio
 
 func poll() -> void:
 	_frames += 1
+	if _frames % CREATE_RESEND_FRAMES == 0: _send("LANG|" + _locale)
 	if not _got_ready and not _pending_create.is_empty() \
 			and _frames % CREATE_RESEND_FRAMES == 0:
 		_send(_pending_create)

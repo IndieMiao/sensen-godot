@@ -1,5 +1,46 @@
 extends GdUnitTestSuite
 
+func test_visitor_street_uses_public_scene_and_confirmation_cancel_keeps_it_open() -> void:
+	var snap := PresetSnapshots.snapshot(str(PresetSnapshots.entries("shanghai")[0].farm_id))
+	var source := FarmBlueprint.load_file(FarmBlueprint.asset_path(str(snap.layout_patch_id), int(snap.blueprint_revision)))
+	var street := auto_free(JourneyStreet.new()) as JourneyStreet
+	street.setup({"visitor_snapshot": snap, "blueprint": source})
+	add_child(street)
+	await get_tree().process_frame
+	assert_object(street.session.client).is_null()
+	assert_array(street.targets.keys()).is_equal(["farm"])
+	assert_str(street.layout.source.layout_patch_id).is_equal(source.layout_patch_id)
+	street._arrive("farm")
+	assert_bool(street.confirmation.visible).is_true()
+	assert_int(AppRouter.instance_depth()).is_equal(0)
+	assert_bool(street.is_back_navigation_locked()).is_true()
+	assert_bool(street.confirmation.visible).is_false()
+	assert_bool(street.is_inside_tree()).is_true()
+	assert_int(AppRouter.instance_depth()).is_equal(0)
+	street._arrive("farm")
+	street.confirmation.cancel_button.pressed.emit()
+	assert_bool(street.confirmation.visible).is_false()
+
+func test_visitor_confirmation_enters_the_selected_farm_and_returns_to_street() -> void:
+	var snap := PresetSnapshots.snapshot(str(PresetSnapshots.entries("los_angeles")[0].farm_id))
+	var source := FarmBlueprint.load_file(FarmBlueprint.asset_path(str(snap.layout_patch_id), int(snap.blueprint_revision)))
+	var street := AppRouter.push_instance(AppRouter.STREET, {"visitor_snapshot": snap, "blueprint": source}) as JourneyStreet
+	await get_tree().process_frame
+	street._arrive("farm")
+	street.confirmation.enter_button.pressed.emit()
+	assert_bool(AppRouter._navigation_pending).is_true()
+	while AppRouter._navigation_pending: await get_tree().process_frame
+	var farm := AppRouter.top_instance()
+	assert_bool(farm.visitor).is_true()
+	assert_str(str(farm.snapshot.farm_id)).is_equal(str(snap.farm_id))
+	assert_bool(street.visible).is_false()
+	AppRouter.pop_instance()
+	assert_object(AppRouter.top_instance()).is_same(street)
+	assert_bool(street.visible).is_true()
+	assert_bool(street.confirmation.visible).is_false()
+	AppRouter.pop_instance()
+	await get_tree().process_frame
+
 func _state() -> Dictionary:
 	return {"clock": {"chapter_index": 0}, "wallet": 40, "inventory": {"produce": {"R": 2, "L": 0, "C": 0, "H": 1}, "dishes": {"tea": 1, "salad": 0}},
 		"engineering": {"reserved": {}}, "residents": {"nursery_keeper": {"points": 17}, "bistro_owner": {"points": 27}},

@@ -192,7 +192,10 @@ func _read_farm(request_client: ApiClient) -> bool:
 	if not _track(r):
 		return false
 	if r.is_success():
+		last_error_code = ""
 		_adopt(r.json)
+	else:
+		last_error_code = str(r.json.get("code", "HTTP_%d" % r.status))
 	return r.is_success()
 
 ## 发一条命令。返回是否被服务端接受（applied 或 replayed）。

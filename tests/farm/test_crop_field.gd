@@ -156,6 +156,7 @@ func test_seedlings_have_no_roots_or_flowers_and_harvest_clears_both_parts() -> 
 	f.sync({"1,1": _slot("sown", "R"), "2,1": _slot("sown", "C"), "3,1": _slot("sown", "H")}, 0)
 	for crop in ["R", "C", "H"]:
 		assert_int(f._detail_mm[crop].multimesh.instance_count).is_equal(0)
+
 	f.sync({"1,1": _slot("growing", "R", 0, 300), "2,1": _slot("growing", "C", 0, 300),
 		"3,1": _slot("growing", "H", 0, 300)}, 250)
 	assert_int(f._detail_mm["R"].multimesh.instance_count).is_equal(4)
@@ -166,3 +167,15 @@ func test_seedlings_have_no_roots_or_flowers_and_harvest_clears_both_parts() -> 
 	f.sync({"3,1": _slot("tilled")}, 1000)
 	for crop in ["R", "C", "H"]:
 		assert_int(f._detail_mm[crop].multimesh.instance_count).is_equal(0)
+
+func test_twelve_mature_chamomile_plots_stay_within_the_plant_mesh_budget() -> void:
+	var field := _field()
+	var cells := {}
+	for i in 12: cells["%d,%d" % [i % 3, i / 3]] = _slot("growing", "H", 0, 300)
+	field.sync(cells, 300)
+	var triangles := 0
+	for layer in field._mm.values() + field._detail_mm.values():
+		var multimesh: MultiMesh = layer.multimesh
+		triangles += (multimesh.mesh.get_faces().size() / 3) * multimesh.instance_count
+	assert_int(field.counts()["H"]).is_equal(48)
+	assert_int(triangles).is_less(75000)

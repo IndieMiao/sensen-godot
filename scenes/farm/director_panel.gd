@@ -35,24 +35,24 @@ func _ready() -> void:
 	add_child(box)
 	var head := HBoxContainer.new()
 	box.add_child(head)
-	var title := GameUi.label("Director", 16)
+	var title := GameUi.label(L10n.text("Director"), 16)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(title)
-	var close := GameUi.button("x", "", "Close director")
+	var close := GameUi.button("x", "", L10n.text("Close director"))
 	close.pressed.connect(func(): closed.emit())
 	head.add_child(close)
-	box.add_child(_row("Time rate", SCALES.map(func(s): return "%dx" % s),
+	box.add_child(_row(L10n.text("Time rate"), SCALES.map(func(s): return "%dx" % s),
 		func(i): _send("qa_set_clock", {"scale": SCALES[i]})))
 	box.add_child(HSeparator.new())
-	box.add_child(_row("Day skip", ["+1 day", "+2 days"],
+	box.add_child(_row(L10n.text("Day skip"), [L10n.text("+1 day"), L10n.text("+2 days")],
 		func(i): _send("qa_skip_days", {"days": i + 1})))
 	box.add_child(HSeparator.new())
-	box.add_child(GameUi.label("Weather", 13))
+	box.add_child(GameUi.label(L10n.text("Weather"), 13))
 	var weather_row := HBoxContainer.new()
 	weather_row.add_theme_constant_override("separation", 8)
 	box.add_child(weather_row)
 	for i in CONDITIONS.size():
-		var b := GameUi.button(["sun", "cloud-rain", "wind"][i], ["Sunny", "Rain", "Wind"][i], "Set weather")
+		var b := GameUi.button(["sun", "cloud-rain", "wind"][i], [L10n.text("Sunny"), L10n.text("Rain"), L10n.text("Wind")][i], L10n.text("Set weather"))
 		b.custom_minimum_size.y = 64
 		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
@@ -74,7 +74,7 @@ func _row(label: String, options: Array, on_pick: Callable) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.name = label
 	row.add_theme_constant_override("separation", 6)
-	var symbol := GameUi.picture(GameUi.icon("clock-3" if label == "Time rate" else "calendar-days"), 18)
+	var symbol := GameUi.picture(GameUi.icon("clock-3" if label == L10n.text("Time rate") else "calendar-days"), 18)
 	symbol.modulate = GameUi.INK
 	row.add_child(symbol)
 	var l := Label.new()
@@ -92,7 +92,7 @@ func _row(label: String, options: Array, on_pick: Callable) -> HBoxContainer:
 		b.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
 		b.pressed.connect(func(): on_pick.call(i))
 		row.add_child(b)
-		if label == "Time rate": _speed_buttons.append(b)
+		if label == L10n.text("Time rate"): _speed_buttons.append(b)
 	return row
 
 func sync_state(state: Dictionary) -> void:
@@ -113,11 +113,11 @@ func _send(type: String, payload: Dictionary) -> void:
 ## 别处看不到它，而去库里翻「最近注册的匿名玩家」在多台测试机同时在线时根本分不清。
 func report(ok: bool, code: String, player_id := "") -> void:
 	if ok:
-		_status.text = "Applied"
+		_status.text = L10n.text("Applied")
 	elif code == "QA_ONLY":
-		_status.text = DENIED_TEXT if player_id.is_empty() else "%s · player %s" % [DENIED_TEXT, player_id]
+		_status.text = DENIED_TEXT if player_id.is_empty() else L10n.format_text("%s · player %s", [DENIED_TEXT, player_id])
 	else:
-		_status.text = "Rejected: %s" % code
+		_status.text = L10n.format_text("Rejected: %s", code)
 
 func toggle() -> void:
 	visible = not visible

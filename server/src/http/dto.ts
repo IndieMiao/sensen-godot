@@ -6,7 +6,7 @@
  */
 import type { FarmState } from '../domain/state.js';
 import { derive, type Derived } from '../domain/derive.js';
-import type { Content } from '../domain/content.js';
+import { STREET_EFFECT_IDS, type Content } from '../domain/content.js';
 import type { Ctx } from '../domain/reducer.js';
 import { projectFarmState } from '../domain/progress.js';
 import type { FarmLocation } from './farm_location.js';
@@ -83,11 +83,20 @@ export function visitorSnapshot(
     snapshot_revision: snapshotRevision,
     snapshot_taken_at: takenAt,
     beds_unlocked: f.state.beds_unlocked,
+    ...(f.state.field_progress ? { unlocked_cell_ids: [
+      ...f.state.field_progress.order.slice(0, f.state.field_progress.plots),
+      ...(f.state.beds_unlocked === 4 ? Object.keys(f.state.cells).filter(id => !f.state.field_progress!.order.includes(id)) : []),
+    ] } : {}),
     cells,
     nursery: { stage: f.state.nursery.stage, appearance: f.state.nursery.appearance },
     props: props.map(prop => ({ anchor_id: prop.anchor_id, prop_id: prop.prop_id,
       offset_q: [prop.offset_q[0], prop.offset_q[1]] as [number, number] })),
     weather_snapshot: d.field_condition,
+    ...(f.state.journey ? { street_snapshot: {
+      side_path: f.state.journey.facts.includes('side_path'),
+      contributions: Object.fromEntries(STREET_EFFECT_IDS.map(id => [id, f.state.journey!.contributions?.[id] ?? 0])),
+      gathering: f.state.journey.gathering?.current ?? '',
+    } } : {}),
     ...(f.location_visible ? { region_id: f.region_id, ...(f.location ? { location: f.location } : {}) } : {}),
   };
 }

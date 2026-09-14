@@ -46,6 +46,32 @@ func _wild_cells(bp: FarmBlueprint) -> Dictionary:
 		cells["%d,%d" % [c.x, c.y]] = {"state": "wild", "crop": null, "ready_at": null}
 	return cells
 
+func test_new_field_shows_only_authoritative_four_six_nine_plots_and_filters_actions() -> void:
+	var source := FarmBlueprint.load_file(FarmBlueprint.asset_path("sh_b", 2))
+	var s := _session_with_farm(FakeTransport.new([]), "sh_b", _wild_cells(source))
+	var ids := []
+	for bed in source.beds():
+		for cell in bed.cells: ids.append(FarmBlueprint._cs(cell))
+	var order := []
+	for index in JourneyProgress.data().field_growth.order: order.append(ids[int(index)])
+	s.state.field_progress = {"order": order, "plots": 4, "planted": 0, "harvested": 0}
+	var scene := (load(FARM_SCENE) as PackedScene).instantiate()
+	scene.setup({"blueprint": source, "session": s})
+	add_child(auto_free(scene))
+	await get_tree().process_frame
+	for count in [4, 6, 9]:
+		s.state.field_progress.plots = count
+		s.state.field_progress.planted = 4 if count >= 6 else 0
+		s.state.field_progress.harvested = 6 if count == 9 else 0
+		scene._on_server_state(s.state, count)
+		assert_int(scene._actionable_view().size()).is_equal(count)
+		assert_int(scene.props.get_children().filter(func(prop): return prop.has_meta("cell_id") and prop.visible).size()).is_equal(count)
+		for prop in scene.props.get_children():
+			if not prop.has_meta("cell_id") or prop.visible: continue
+			assert_str(scene.predictor.check("clear_cells", {"cell_ids": [str(prop.get_meta("cell_id"))]}, 0).error).is_equal("CELL_LOCKED")
+		assert_bool(scene.hud._field_goal.visible).is_equal(count < 9)
+	assert_int(s.state.cells.size()).is_equal(12)
+
 func _online_farm(t: FakeTransport) -> Node:
 	var bp := FarmBlueprint.load_file(FIX)
 	var s := _session_with_farm(t, "", _wild_cells(bp))

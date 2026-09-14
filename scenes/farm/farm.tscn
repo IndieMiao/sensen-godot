@@ -10,15 +10,26 @@ background_mode = 3
 background_canvas_max_layer = -1
 background_color = Color(0.906, 0.941, 0.875, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.9, 0.92, 0.9, 1)
-ambient_light_energy = 0.6
+ambient_light_color = Color(0.79, 0.88, 0.94, 1)
+ambient_light_energy = 0.42
+tonemap_mode = 0
 
 [node name="Farm" type="Node3D"]
 script = ExtResource("1_farm")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 20, 0)
+rotation_degrees = Vector3(-51, -38, 0)
+light_color = Color(1.0, 0.96, 0.87, 1)
+light_energy = 1.1
 shadow_enabled = true
+shadow_opacity = 0.82
+shadow_bias = 0.1
+shadow_normal_bias = 1.0
+shadow_blur = 0.9
+directional_shadow_max_distance = 0.0
+directional_shadow_fade_start = 1.0
+directional_shadow_pancake_size = 4.0
+directional_shadow_mode = 0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_farm")
@@ -35,6 +46,8 @@ color = Color(0.906, 0.941, 0.875, 1)
 
 [node name="Camera3D" type="Camera3D" parent="."]
 fov = 45.0
+near = 1.0
+far = 32.0
 
 [node name="Ground" type="MeshInstance3D" parent="."]
 

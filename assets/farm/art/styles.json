@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "default": "cottage",
+  "regions": {"shanghai": "east_asian", "los_angeles": "barn"},
+  "layouts": {
+    "sh_a": "cottage",
+    "sh_b": "east_asian",
+    "sh_c": "thatch",
+    "la_a": "barn",
+    "la_b": "windmill",
+    "la_c": "dome"
+  }
+}

@@ -14,10 +14,13 @@ import type { Command } from './commands.js';
 import { applyAt, type Ctx } from './reducer.js';
 import type { FarmState } from './state.js';
 import { initialFarmState } from './farm_factory.js';
+import type { FarmLocation } from '../http/farm_location.js';
 
 export type PresetStyle = 'lush' | 'early';
 
 export interface PresetSpec {
+  id?: string;
+  location?: FarmLocation;
   layout: string;
   revision: number;
   region: string;
@@ -31,7 +34,34 @@ export const PRESET_SPECS: PresetSpec[] = [
   { layout: 'sh_c', revision: 2, region: 'shanghai', style: 'early', avatar_ref: 'preset_b' },
   { layout: 'la_b', revision: 2, region: 'los_angeles', style: 'lush', avatar_ref: 'preset_a' },
   { layout: 'la_c', revision: 2, region: 'los_angeles', style: 'early', avatar_ref: 'preset_b' },
+  { id: 'demo_sh_01', layout: 'sh_b', revision: 2, region: 'shanghai', style: 'lush', avatar_ref: 'demo_sh_01', location: { lat: 31.2315, lng: 121.4722 } },
+  { id: 'demo_sh_02', layout: 'sh_a', revision: 2, region: 'shanghai', style: 'lush', avatar_ref: 'demo_sh_02', location: { lat: 31.2315, lng: 121.4752 } },
+  { id: 'demo_sh_03', layout: 'sh_c', revision: 2, region: 'shanghai', style: 'early', avatar_ref: 'demo_sh_03', location: { lat: 31.2293, lng: 121.4722 } },
+  { id: 'demo_sh_04', layout: 'sh_b', revision: 2, region: 'shanghai', style: 'lush', avatar_ref: 'demo_sh_04', location: { lat: 31.2293, lng: 121.4752 } },
+  { id: 'demo_la_01', layout: 'la_a', revision: 2, region: 'los_angeles', style: 'lush', avatar_ref: 'demo_la_01', location: { lat: 34.0533, lng: -118.2452 } },
+  { id: 'demo_la_02', layout: 'la_b', revision: 2, region: 'los_angeles', style: 'lush', avatar_ref: 'demo_la_02', location: { lat: 34.0533, lng: -118.2422 } },
+  { id: 'demo_la_03', layout: 'la_c', revision: 2, region: 'los_angeles', style: 'early', avatar_ref: 'demo_la_03', location: { lat: 34.0511, lng: -118.2452 } },
+  { id: 'demo_la_04', layout: 'la_a', revision: 2, region: 'los_angeles', style: 'lush', avatar_ref: 'demo_la_04', location: { lat: 34.0511, lng: -118.2422 } },
 ];
+
+// Four neighbours around each selectable neighbourhood, visible at its initial zoom.
+const DEMO_NEIGHBOURHOODS = [
+  { layout: 'sh_a', region: 'shanghai', center: [31.204, 121.447] },
+  { layout: 'sh_b', region: 'shanghai', center: [31.2265, 121.4915] },
+  { layout: 'sh_c', region: 'shanghai', center: [31.22, 121.438] },
+  { layout: 'la_a', region: 'los_angeles', center: [34.0455, -118.2495] },
+  { layout: 'la_b', region: 'los_angeles', center: [33.9822, -118.4665] },
+  { layout: 'la_c', region: 'los_angeles', center: [34.087, -118.2745] },
+] as const;
+for (const [index, neighbourhood] of DEMO_NEIGHBOURHOODS.entries()) {
+  for (const [slot, offset] of [[0.00125, -0.0014], [-0.00015, -0.00165], [-0.0014, 0.0014], [0.00105, 0.00165]].entries()) {
+    const prefix = neighbourhood.region === 'shanghai' ? 'sh' : 'la';
+    const id = `demo_${prefix}_${String(5 + (index % 3) * 4 + slot).padStart(2, '0')}`;
+    PRESET_SPECS.push({ id, layout: neighbourhood.layout, revision: 2, region: neighbourhood.region,
+      style: slot === 1 ? 'early' : 'lush', avatar_ref: id,
+      location: { lat: neighbourhood.center[0] + offset[0]!, lng: neighbourhood.center[1] + offset[1]! } });
+  }
+}
 
 /** sha1 → 合法 UUID（版本位 5，变体位 10xx），pg 的 uuid 列才收。 */
 export function deterministicUuid(name: string): string {
@@ -47,10 +77,11 @@ export const presetOwnerId = (layout: string): string => deterministicUuid(`pres
 /** 系统玩家没有安装密钥；这个值只用来占住 players.install_key_hmac 的唯一列。 */
 export const presetHmac = (layout: string): string => `preset:${layout}`;
 
-const PRESET_BY_FARM_ID = new Map(PRESET_SPECS.map(s => [presetFarmId(s.layout), s]));
+const PRESET_BY_FARM_ID = new Map(PRESET_SPECS.map(s => [presetFarmId(s.id ?? s.layout), s]));
 export const presetByFarmId = (farmId: string): PresetSpec | undefined => PRESET_BY_FARM_ID.get(farmId);
 
 export interface PresetFarmRow {
+  location?: FarmLocation;
   id: string;
   owner_id: string;
   region_id: string;
@@ -91,7 +122,8 @@ export function buildPresetFarm(
   }
   if (spec.style === 'lush') state.nursery.stage = 'cleared';
   return {
-    id: presetFarmId(spec.layout), owner_id: presetOwnerId(spec.layout),
+    id: presetFarmId(spec.id ?? spec.layout), owner_id: presetOwnerId(spec.id ?? spec.layout),
+    ...(spec.location ? { location: { ...spec.location } } : {}),
     region_id: spec.region, layout_patch_id: spec.layout, blueprint_revision: spec.revision,
     version: 0, location_visible: true, visit_access: 'anyone', state,
   };

@@ -11,7 +11,7 @@ static func count(state: Dictionary, effect: String) -> int:
 	return clampi(int(state.get("journey", {}).get("contributions", {}).get(effect, 0)), 0, int(JourneyProgress.data().contribution_steps))
 
 static func progress(state: Dictionary, effect: String) -> String:
-	return "%s %d/%d" % [EFFECTS.get(effect, "Street garden"), count(state, effect), int(JourneyProgress.data().contribution_steps)]
+	return L10n.format_text("%s %d/%d", [EFFECTS.get(effect, L10n.text("Street garden")), count(state, effect), int(JourneyProgress.data().contribution_steps)])
 
 static func available(state: Dictionary, slot: String) -> bool:
 	return slot != "bistro" or JourneyProgress.fact(state, "shared_meal")

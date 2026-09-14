@@ -38,6 +38,8 @@ func test_self_config_falls_back_when_no_save() -> void:
 	assert_object(node.self_config()).is_not_null()
 
 func _map_scene() -> Node:
+	FarmChoice.clear()
+	FarmRegions.clear_choice()
 	var scene := MAP_SCENE.instantiate()
 	scene.enter_street_mode(REGION)
 	add_child(auto_free(scene))

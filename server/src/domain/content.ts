@@ -45,6 +45,7 @@ export interface JourneyProjectStage {
 
 export interface JourneyContent {
   version: 1;
+  field_growth: { order: number[]; plant_target: number; harvest_target: number };
   contribution_steps: number;
   gatherings: { requires: string[]; themes: Record<string, { name: string; place: string;
     item: string; dish: DishId; coins: number; icon: string }> };
@@ -155,6 +156,11 @@ function requireArray(v: unknown, len: number, what: string): void {
 function checkContent(c: Content): void {
   if (c.journey.version !== 1) throw new ContentError('journey.version unsupported');
   const positive = (n: unknown): boolean => Number.isSafeInteger(n) && Number(n) > 0;
+  const field = c.journey.field_growth;
+  if (!field || !positive(field.plant_target) || !positive(field.harvest_target)
+    || field.order.length !== 9 || new Set(field.order).size !== 9
+    || field.order.some(index => !Number.isInteger(index) || index < 0 || index > 8))
+    throw new ContentError('journey.field_growth invalid');
   for (const id of CROP_IDS)
     if (!positive(c.journey.crops[id]?.duration_ms) || !positive(c.journey.crops[id]?.unit_price))
       throw new ContentError(`journey.crops.${id} invalid`);

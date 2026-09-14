@@ -44,6 +44,9 @@ func is_busy() -> bool:
 func pending_count() -> int:
 	return _queue.size() + (1 if _current != null else 0)
 
+func queued_cells() -> Array:
+	return _queue.map(func(item): return item.cell)
+
 func current_cell():
 	return _current.cell if _current != null else null
 

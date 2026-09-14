@@ -5,5 +5,5 @@
  *
  * state 结构版本单列：它决定要不要跑启动前迁移脚本。
  */
-export const DOMAIN_VERSION = '13';
+export const DOMAIN_VERSION = '14';
 export const STATE_SCHEMA_VERSION = 1;

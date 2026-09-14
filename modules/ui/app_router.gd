@@ -14,6 +14,7 @@ const BACK_TO_MAP := 1
 const BACK_LEAVE_APP := 2
 
 var _navigation_pending := false
+var _loading: CanvasLayer
 ## 实例栈（PRD §3.2 第二层空间）：地图常驻为底，农场/地点/换装房压在上面。
 var _stack: Array[Node] = []
 
@@ -31,7 +32,7 @@ func go_to_map() -> void:
 
 
 func go_to_dressing() -> void:
-	push_instance(DRESS)
+	open_instance(DRESS)
 
 
 func go_to_stress() -> void:
@@ -43,6 +44,10 @@ func push_instance(scene_path: String, args := {}) -> Node:
 	if packed == null:
 		push_error("AppRouter 无法加载实例场景 %s" % scene_path)
 		return null
+	return _push_packed(packed, args)
+
+
+func _push_packed(packed: PackedScene, args: Dictionary) -> Node:
 	var inst := packed.instantiate()
 	if inst.has_method("setup"):
 		inst.call("setup", args)
@@ -50,6 +55,51 @@ func push_instance(scene_path: String, args := {}) -> Node:
 	_stack.append(inst)
 	get_tree().root.add_child(inst)
 	return inst
+
+
+func open_instance(scene_path: String, args := {}) -> void:
+	if _navigation_pending: return
+	var packed := await _load_with_feedback(scene_path)
+	if packed == null: return
+	_push_packed(packed, args)
+	await _end_transition()
+
+
+func _load_with_feedback(scene_path: String) -> PackedScene:
+	_navigation_pending = true
+	_loading = preload("res://modules/ui/loading_overlay.gd").new()
+	add_child(_loading)
+	await _render_frame()
+	var error := ResourceLoader.load_threaded_request(scene_path, "PackedScene")
+	if error == OK:
+		var started := Time.get_ticks_msec()
+		while ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			if Time.get_ticks_msec() - started > 30000: break
+			await get_tree().process_frame
+		if ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_LOADED:
+			return ResourceLoader.load_threaded_get(scene_path) as PackedScene
+	_loading.failed()
+	_loading.close_button.pressed.connect(_clear_transition, CONNECT_ONE_SHOT)
+	return null
+
+
+func _render_frame() -> void:
+	await get_tree().process_frame
+	if DisplayServer.get_name() != "headless": await RenderingServer.frame_post_draw
+
+
+func _end_transition() -> void:
+	await _render_frame()
+	await get_tree().create_timer(0.12).timeout
+	_clear_transition()
+
+
+func _clear_transition() -> void:
+	if is_instance_valid(_loading):
+		remove_child(_loading)
+		_loading.queue_free()
+	_loading = null
+	_navigation_pending = false
 
 
 func pop_instance() -> void:
@@ -102,6 +152,9 @@ func _resume(node: Node) -> void:
 
 
 func handle_back() -> void:
+	if _navigation_pending:
+		if _loading and _loading.close_button.visible: _clear_transition()
+		return
 	if not _stack.is_empty():
 		# 栈顶也要尊重返回锁：换装房保存中（_committing）被系统返回键弹栈会中断保存。
 		# 与下方 current_scene 分支同一语义（2026-09-04 执行时补上，原计划漏了这一层）。
@@ -126,13 +179,15 @@ func _notification(what: int) -> void:
 func _go_to(scene_path: String) -> void:
 	if _navigation_pending or _current_scene_path() == scene_path:
 		return
-	_navigation_pending = true
-	var error := get_tree().change_scene_to_file(scene_path)
+	var packed := await _load_with_feedback(scene_path)
+	if packed == null: return
+	var error := get_tree().change_scene_to_packed(packed)
 	if error != OK:
 		push_error("AppRouter 无法打开场景 %s（错误 %d）" % [scene_path, error])
-		_navigation_pending = false
+		_clear_transition()
 	else:
-		call_deferred("_finish_navigation")
+		await get_tree().scene_changed
+		await _end_transition()
 
 
 func _finish_navigation() -> void:

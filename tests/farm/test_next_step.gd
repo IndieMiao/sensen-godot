@@ -18,6 +18,30 @@ func test_each_state_has_exactly_one_next_step() -> void:
 	assert_str(NextStep.step_for(_slot("growing", "R", 500), 499)).is_equal("")      # 没熟：没事可做
 	assert_str(NextStep.step_for(_slot("growing", "R", 500), 500)).is_equal("harvest")
 
+func test_field_onboarding_finishes_visible_plots_before_suggesting_the_street() -> void:
+	var state := _state()
+	state.clock.chapter_index = 0
+	state.journey = {"version": 1, "facts": [], "unlocks": [], "completed": []}
+	state.field_progress = {"plots": 4, "planted": 0, "harvested": 0}
+	var cells := {}
+	for index in 4: cells[str(index)] = _slot("wild")
+	assert_int(NextStep.bulk(cells, 0, state, "R", ["R", "L"]).cells.size()).is_equal(4)
+	for index in 3: cells[str(index)] = _slot("growing", "R", 999)
+	state.field_progress.planted = 3
+	for status in ["wild", "cleared", "tilled"]:
+		cells["3"] = _slot(status)
+		var action := NextStep.bulk(cells, 0, state, "R", ["R", "L"])
+		assert_str(action.action).is_equal(NextStep.step_for(cells["3"], 0))
+		assert_array(action.cells).is_equal(["3"])
+	cells["3"] = _slot("growing", "R", 999)
+	state.field_progress = {"plots": 6, "planted": 4, "harvested": 0}
+	cells["4"] = _slot("wild")
+	cells["5"] = _slot("wild")
+	assert_array(NextStep.bulk(cells, 0, state, "R", ["R", "L"]).cells).is_equal(["4", "5"])
+	for index in 6: cells[str(index)] = _slot("growing", "R", 999)
+	assert_str(NextStep.bulk(cells, 0, state, "R", ["R", "L"]).action).is_equal("explore")
+	assert_str(NextStep.bulk(cells, 999, state, "R", ["R", "L"]).action).is_equal("harvest")
+
 func test_bulk_prefers_harvest_then_care_then_sow() -> void:
 	var cells := {"a": _slot("growing", "R", 100), "b": _slot("sown", "R"), "c": _slot("tilled"), "d": _slot("wild")}
 	var b := NextStep.bulk(cells, 100, _state(), "R", ["R", "L"])

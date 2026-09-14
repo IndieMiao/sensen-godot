@@ -19,6 +19,7 @@ import type { Ctx } from '../domain/reducer.js';
 import { DOMAIN_VERSION } from '../domain/version.js';
 import { installKeyHmac, isValidInstallKey, safeEqualHex, tokenHash } from './auth.js';
 import { currentOwnerFarmView, nearbyEntry, snapshotSlot, visitorSnapshot, type FarmRow } from './dto.js';
+import { beginFieldGrowth } from '../domain/field_growth.js';
 import { avatarRef } from './avatar_ref.js';
 import { initialFarmState } from '../domain/farm_factory.js';
 import { startJourney } from '../domain/journey.js';
@@ -291,7 +292,10 @@ function buildFarmRow(
   location?: FarmLocation,
 ): FarmRow {
   let state = initialFarmState(deps.content, blueprintSets(bp), timezone, now);
-  if (!deps.legacyGameplay && !deps.qaPlayerIds?.has(ownerId)) state = startJourney(state, deps.content);
+  if (!deps.legacyGameplay && !deps.qaPlayerIds?.has(ownerId)) {
+    state = startJourney(state, deps.content);
+    state = beginFieldGrowth(state, bp.anchors.beds.flatMap(bed => bed.cells.map(cell => `${cell[0]},${cell[1]}`)), deps.content);
+  }
   return {
     id: cryptoRandomId(), owner_id: ownerId, region_id: regionId,
     layout_patch_id: bp.layout_patch_id, blueprint_revision: bp.revision,

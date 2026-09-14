@@ -58,6 +58,7 @@ static func theme() -> Theme:
 	var t := (load("res://assets/ui/app_theme.tres") as Theme).duplicate() as Theme
 	var font := FontVariation.new()
 	font.base_font = load("res://assets/ui/fonts/Nunito.ttf")
+	font.fallbacks = [load("res://assets/ui/fonts/NotoSansSC-Regular.otf")]
 	font.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 650.0}
 	t.default_font = font
 	t.default_font_size = 14

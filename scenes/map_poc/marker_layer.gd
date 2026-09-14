@@ -62,7 +62,7 @@ func _build() -> void:
 		pin.focus_mode = Control.FOCUS_NONE
 		pin.flat = true
 		pin.text = ""
-		pin.tooltip_text = "Open note"
+		pin.tooltip_text = L10n.text("Open note")
 		pin.visible = false
 		pin.z_index = 1
 		var empty_style := StyleBoxEmpty.new()

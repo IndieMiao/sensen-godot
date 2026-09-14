@@ -1,0 +1,20 @@
+[
+	{
+		"animated_sample_pixels": 1747,
+		"camera_far": 23.5,
+		"camera_near": 2.5,
+		"draw_calls": 43.0,
+		"frame_ms_mean": 8.32950666666667,
+		"frame_ms_p95": 8.913,
+		"primitives": 175070.0,
+		"render_cpu_ms": 0.0640000030398369,
+		"render_gpu_ms": 0.0,
+		"render_objects": 49.0,
+		"samples": 150,
+		"shadow_atlas_size": 1024,
+		"shadow_filter": 2,
+		"shadow_sample_pixels": 15083,
+		"size": "(480, 900)",
+		"style": "windmill"
+	}
+]

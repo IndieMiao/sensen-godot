@@ -52,6 +52,9 @@ func test_close_button_toggle_and_router_back_all_dismiss_the_drawer() -> void:
 		map.neighbours_toggle.pressed.emit()
 		assert_bool(map.nearby_panel.visible).is_true()
 		assert_bool(map.neighbours_toggle.button_pressed).is_true()
+		map.nearby_panel.focus(str(map.nearby_panel.entries[0].farm_id))
+		await _settle()
+		assert_bool(map.farm_overlay.visible).is_false()
 		map.nearby_panel.show_places(true)
 		match method:
 			"button": map.nearby_panel.close_button.pressed.emit()
@@ -60,7 +63,12 @@ func test_close_button_toggle_and_router_back_all_dismiss_the_drawer() -> void:
 		await _settle()
 		assert_bool(map.nearby_panel.visible).is_false()
 		assert_bool(map.neighbours_toggle.button_pressed).is_false()
-		assert_bool(map.journey_map.visible).is_true()
+		assert_str(map.farm_markers.selected_id).is_empty()
+		assert_str(map.nearby_panel.focused_id).is_empty()
+		assert_bool(map.farm_markers.miniature.visible).is_false()
+		assert_bool(map.journey_map.visible).is_false()
+		assert_bool(map.farm_markers.visible).is_true()
+		assert_bool(map.nearby_panel._place_tab.visible).is_false()
 		assert_bool(AppRouter.scene_locks_back_navigation(map)).is_false()
 
 func test_map_background_tap_closes_without_opening_a_place_or_zooming() -> void:
@@ -80,6 +88,37 @@ func test_map_background_tap_closes_without_opening_a_place_or_zooming() -> void
 	assert_int(map._touch_count).is_equal(0)
 	assert_int(map._last_tap_ms).is_equal(0)
 	assert_int(AppRouter.instance_depth()).is_equal(0)
+
+func test_background_tap_clears_self_selection_without_an_open_drawer() -> void:
+	var map := _map()
+	await _settle()
+	map._focus_own_farm()
+	await _settle()
+	assert_bool(map.nearby_panel.visible).is_false()
+	assert_str(map.farm_markers.selected_id).is_equal("self")
+	assert_bool(map.farm_overlay.visible).is_false()
+	for pressed in [true, false]:
+		var event := InputEventScreenTouch.new()
+		event.position = Vector2(200, 300)
+		event.pressed = pressed
+		map._unhandled_input(event)
+	assert_str(map.farm_markers.selected_id).is_empty()
+	assert_bool(map.farm_markers.miniature.visible).is_false()
+
+func test_only_selected_map_character_uses_full_scale() -> void:
+	var map := _map()
+	await get_tree().create_timer(0.6).timeout
+	await _settle()
+	var own: Dictionary = map._pawns.filter(func(p): return p.cohort == "self")[0]
+	var base_scale: float = map._cam_distance() / map.CHAR_DIST_PER_SCALE
+	map._update_pawns(map._cam_distance())
+	assert_float(own.node.scale.x / base_scale).is_equal_approx(0.8, 0.0001)
+	map.farm_markers.selected_id = "self"
+	map._update_pawns(map._cam_distance())
+	assert_float(own.node.scale.x / base_scale).is_equal_approx(1.0, 0.0001)
+	map._clear_farm_selection()
+	map._update_pawns(map._cam_distance())
+	assert_float(own.node.scale.x / base_scale).is_equal_approx(0.8, 0.0001)
 
 func test_neighbourhood_focus_fits_all_entrance_labels_and_does_not_recenter_on_sync() -> void:
 	var map := _map()

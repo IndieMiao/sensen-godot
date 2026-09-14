@@ -24,6 +24,16 @@ func _ready() -> void:
 	if skeleton == null:
 		skeleton = _find_skeleton(self)
 
+func play_motion(id: String) -> void:
+	var player := get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if player == null or not player.has_animation(id): return
+	if player.current_animation == id and player.is_playing(): return
+	# Locomotion clips omit tracks written by full-body labour clips.
+	player.stop()
+	if skeleton: skeleton.reset_bone_poses()
+	player.play(id)
+	player.advance(0)
+
 func setup(p_loader: PartLoader) -> void:
 	loader = p_loader
 	loader.load_finished.connect(_on_load_finished)

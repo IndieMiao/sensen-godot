@@ -80,8 +80,8 @@ static func _chamomile_flowers(surface: SurfaceTool) -> void:
 			var angle := TAU * float(petal) / 6.0
 			var radial := Vector3(sin(angle), 0, cos(angle))
 			_oval(surface, Vector3(0.10, 0.065, 0.21), head + radial * 0.115,
-				Color(1.0, 0.98, 0.89), Basis(Vector3.UP, angle))
-		_oval(surface, Vector3(0.15, 0.10, 0.15), head + Vector3(0, 0.028, 0), Color(1.0, 0.75, 0.12))
+				Color(1.0, 0.98, 0.89), Basis(Vector3.UP, angle), 6, 2)
+		_oval(surface, Vector3(0.15, 0.10, 0.15), head + Vector3(0, 0.028, 0), Color(1.0, 0.75, 0.12), Basis.IDENTITY, 6, 2)
 
 static func _weeds(surface: SurfaceTool, body_color: Color) -> void:
 	for i in 7:
@@ -99,17 +99,24 @@ static func _weeds(surface: SurfaceTool, body_color: Color) -> void:
 		_triangle(surface, ridge, tip, middle + side * 0.09, color.darkened(0.07))
 
 static func _soil(surface: SurfaceTool, body_color: Color) -> void:
-	_box(surface, Vector3(1.0, 0.24, 1.0), Vector3(0, -0.38, 0), body_color.darkened(0.14))
+	var outline := PackedVector2Array([Vector2(-0.38, -0.49), Vector2(0.38, -0.49), Vector2(0.49, -0.38),
+		Vector2(0.49, 0.38), Vector2(0.38, 0.49), Vector2(-0.38, 0.49), Vector2(-0.49, 0.38), Vector2(-0.49, -0.38)])
+	for i in outline.size():
+		var a := Vector3(outline[i].x, -0.26, outline[i].y)
+		var b := Vector3(outline[(i + 1) % outline.size()].x, -0.26, outline[(i + 1) % outline.size()].y)
+		_triangle(surface, Vector3(0, -0.26, 0), a, b, body_color)
+		_triangle(surface, a, a - Vector3(0, 0.24, 0), b, body_color.darkened(0.10))
+		_triangle(surface, b, a - Vector3(0, 0.24, 0), b - Vector3(0, 0.24, 0), body_color.darkened(0.10))
 	for i in 5:
-		_box(surface, Vector3(0.13, 0.76, 0.92), Vector3(-0.36 + float(i) * 0.18, 0.12, 0),
+		_oval(surface, Vector3(0.15, 0.76, 0.87), Vector3(-0.34 + float(i) * 0.17, 0.12, 0),
 			body_color.lightened(0.09 if i % 2 == 0 else 0.04))
 
-static func _oval(surface: SurfaceTool, size: Vector3, center: Vector3, color: Color, basis := Basis.IDENTITY) -> void:
+static func _oval(surface: SurfaceTool, size: Vector3, center: Vector3, color: Color, basis := Basis.IDENTITY, radial := 10, rings := 4) -> void:
 	var mesh := SphereMesh.new()
 	mesh.radius = 0.5
 	mesh.height = 1.0
-	mesh.radial_segments = 8
-	mesh.rings = 3
+	mesh.radial_segments = radial
+	mesh.rings = rings
 	_append(surface, mesh, Transform3D(basis * Basis.from_scale(size), center), color)
 
 static func _cone(surface: SurfaceTool, start: Vector3, end: Vector3, bottom: float, top: float, color: Color) -> void:

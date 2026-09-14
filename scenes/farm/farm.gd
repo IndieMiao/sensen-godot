@@ -9,6 +9,8 @@ extends Node3D
 const WORLD_SCALE := 1.0 # 逻辑米 → 世界米；G1 调观感时只改这里，时长不变量不受影响
 const FarmProps = preload("res://modules/farm/farm_props.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
+const FarmScenery = preload("res://modules/farm/farm_scenery.gd")
+const FarmArt = preload("res://modules/farm/farm_art.gd")
 const CAM_DIST := 11.0
 ## 相机跟随点比玩家再往南（+z）偏这么多米：HUD 占掉屏幕下方约 40%，玩家若在正中，南侧那一畦
 ## 永远压在按钮下面点不到。偏移后玩家落在上三分之一。
@@ -65,6 +67,9 @@ var _field_center := Vector3.ZERO
 var _field_width := 5.0
 var _field_bounds := AABB()
 var _camera_has_fourth_bed := false
+var scenery: Node3D
+var farm_style := "cottage"
+var _house_outline := PackedVector3Array()
 ## 每秒重画一次：成熟是时间派生的，没有回包也没有输入会通知它——不定时刷，倒计时不走、
 ## 作物不变高、大按钮永远停在「Crops are growing」（自动玩家第四轮等了 260 秒）。
 var _tick := 0.0
@@ -93,7 +98,7 @@ func _ready() -> void:
 	$HUD/SafeArea.theme = GameUi.theme()
 	exit_btn.text = ""
 	exit_btn.icon = GameUi.icon("arrow-left")
-	exit_btn.tooltip_text = "Return"
+	exit_btn.tooltip_text = L10n.text("Return")
 	exit_btn.custom_minimum_size = Vector2(44, 44)
 	title.theme_type_variation = &""
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -124,14 +129,18 @@ func _ready() -> void:
 	grid = BlueprintGrid.new(bp)
 	_frame_field()
 	var lawn := PlaneMesh.new()
-	lawn.size = Vector2.ONE * bp.play_area_m * WORLD_SCALE
+	lawn.size = Vector2.ONE * 96.0 * WORLD_SCALE
 	ground.mesh = lawn
-	ground.position = Vector3(lawn.size.x * 0.5, 0, -lawn.size.y * 0.5)
-	var grass := StandardMaterial3D.new()
-	grass.albedo_color = Color("dcebd4")
-	grass.roughness = 1.0
+	ground.position = Vector3(bp.play_area_m * 0.5, -0.008, -bp.play_area_m * 0.5)
+	var grass := ShaderMaterial.new()
+	grass.shader = preload("res://modules/farm/shaders/meadow.gdshader")
+	grass.set_shader_parameter("meadow_texture", preload("res://assets/farm/art/meadow.png"))
 	ground.material_override = grass
+	farm_style = FarmArt.style_for(bp.region_id, bp.layout_patch_id, str(_args.get("farm_style", "")))
 	_build_props()
+	scenery = FarmScenery.new()
+	add_child(scenery)
+	scenery.build(bp, farm_style)
 	# 作物挂 Crops（Props 的同级）：prop_count() 只数锚点原语与畦面，作物不进去。
 	crop_field = CropField.new(bp, WORLD_SCALE)
 	crop_field.ground_y = BED_H * WORLD_SCALE
@@ -165,7 +174,7 @@ func _ready() -> void:
 	else:
 		_build_director()
 		_build_stall()
-		hud.set_hint("Tap a plot to work it")
+		hud.set_hint(L10n.text("Tap a plot to work it"))
 	_refresh_hud()
 	var seed_crop := str(_args.get("seed_crop", ""))
 	if not visitor and CropInfo.ORDER.has(seed_crop):
@@ -178,27 +187,25 @@ func _leave() -> void:
 func prop_count() -> int:
 	return props.get_child_count()
 
-func _box(pos: Vector3, size: Vector3, color: Color) -> void:
-	var mi := MeshInstance3D.new()
-	var mesh := BoxMesh.new()
-	mesh.size = size
-	mi.mesh = mesh
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = color
-	mi.material_override = mat
-	mi.position = pos + Vector3(0, size.y * 0.5, 0)
-	props.add_child(mi)
-
 func _build_props() -> void:
 	var s := WORLD_SCALE
 	for kind in ["house", "storage", "well"]:
-		props.add_child(FarmProps.build(kind, bp.cell_to_world(bp.anchor(kind), s), s))
+		props.add_child(FarmProps.build(kind, bp.cell_to_world(bp.anchor(kind), s), s, farm_style))
+	var house := props.get_node("House") as MeshInstance3D
+	# Compute the hull once. A box includes empty space above the eaves and shrinks touch targets.
+	for point in house.mesh.create_convex_shape(true, true).points:
+		_house_outline.append(house.transform * point)
+	_house_outline.append(house.position + Vector3(-0.53, house.mesh.get_aabb().end.y + 0.45, -0.37))
+	if farm_style == "windmill":
+		_house_outline.append(house.position + Vector3(0, 3.55, 1.28))
 	for bed in bp.beds():
 		for c in bed.cells:
-			_box(bp.cell_to_world(c, s), Vector3(0.9, BED_H, 0.9) * s, BlueprintGroundMesh.COLOR_BED)
+			props.add_child(FarmArt.instance("plot", bp.cell_to_world(c, s), s))
+			props.get_child(-1).set_meta("cell_id", _id(c))
 	for c in bp.reserved_bed().get("cells", []):
-		_box(bp.cell_to_world(c, s), Vector3(0.9, 0.08, 0.9) * s, Color(0.78, 0.66, 0.55))
+		props.add_child(FarmArt.instance("plot", bp.cell_to_world(c, s), s))
 		props.get_child(-1).set_meta("reserved", true)
+		props.get_child(-1).set_meta("cell_id", _id(c))
 		props.get_child(-1).visible = false
 
 func _spawn_player() -> void:
@@ -216,12 +223,9 @@ func _spawn_player() -> void:
 	_rig.apply_config(Avatar.load_outfit())
 
 func _play(anim: String) -> void:
-	if _anim == anim or _rig == null:
-		return
-	var ap := _rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
-	if ap and ap.has_animation(anim):
-		ap.play(anim)
-		_anim = anim
+	if _rig == null: return
+	_rig.play_motion(anim)
+	_anim = anim
 
 func _process(dt: float) -> void:
 	if mover == null:
@@ -274,6 +278,7 @@ func _process(dt: float) -> void:
 	_update_camera()
 	if hints:
 		hints.active = runner.current_cell()
+		hints.queued = runner.queued_cells()
 		hints.progress = runner.progress()
 		var root := $HUD/SafeArea/Root as Control
 		var bottom: float = hud._bottom.position.y if not visitor else hud._visitor_bar.position.y
@@ -289,28 +294,40 @@ func _update_camera() -> void:
 			break
 	if fourth_bed_visible != _camera_has_fourth_bed:
 		_frame_field(fourth_bed_visible)
-	var phi := deg_to_rad(CAM_PITCH_DEG)
+	if scenery:
+		var count := 0
+		for prop in props.get_children():
+			if prop.has_meta("cell_id") and prop.visible: count += 1
+		scenery.set_plot_count(count)
+	var viewport_size := get_viewport().get_visible_rect().size
+	var short_phone := viewport_size.y < 700 and viewport_size.x < 600
+	var phi := deg_to_rad(40.0 if short_phone else CAM_PITCH_DEG)
 	var yaw := deg_to_rad(CAM_YAW_DEG)
 	var travel := player.position - _field_center
 	var follow := travel - travel.limit_length(5.0)
 	var target := _field_center + follow + Vector3(0.0, 0.0, CAM_AHEAD)
-	var viewport_size := get_viewport().get_visible_rect().size
 	var aspect := viewport_size.x / maxf(viewport_size.y, 1)
 	var distance := maxf(CAM_DIST, (_field_width + 2.4) / (2.0 * tan(deg_to_rad(cam.fov * 0.5)) * aspect))
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	cam.keep_aspect = Camera3D.KEEP_WIDTH
-	cam.size = _field_width + 1.6
+	cam.size = _field_width + 2.5
 	cam.position = target + Vector3(sin(yaw) * distance * cos(phi), distance * sin(phi), cos(yaw) * distance * cos(phi))
 	cam.look_at(target + Vector3(0, 0.8, 0), Vector3.UP)
 	var bounds := AABB(_field_bounds.position + follow, _field_bounds.size)
-	FarmCamera.fit(cam, bounds, _camera_play_area())
+	var features := PackedVector3Array()
+	for point in _house_outline: features.append(point + follow)
+	var spawn_bounds := AABB(bp.cell_to_world(bp.anchor("spawn")) + follow + Vector3(-0.25, 0, -0.15), Vector3(0.5, 1.4, 0.3))
+	for index in 8: features.append(spawn_bounds.get_endpoint(index))
+	FarmCamera.fit(cam, bounds, _camera_play_area(), features)
 	cam.size /= camera_pan.zoom
 	cam.position += camera_pan.offset
+	FarmCamera.fit_ground_depth(cam)
 
 func _camera_play_area() -> Rect2:
 	if hud == null or hud.size.x < 48 or hud.size.y < 200:
 		return Rect2()
 	var top := (hud.get_node("StatusBacking") as Control).get_global_rect().end.y
+	if hud._field_goal.visible: top = maxf(top, hud._field_goal.get_global_rect().end.y)
 	var bottom := hud.get_global_rect().end.y - 4.0
 	if visitor:
 		bottom -= hud._visitor_bar.get_combined_minimum_size().y
@@ -326,13 +343,15 @@ func _camera_play_area() -> Rect2:
 		if rows > 0:
 			bottom -= rows * row_height + (rows - 1) * hud._seed_row.get_theme_constant("v_separation") \
 				+ hud._bottom.get_theme_constant("separation")
-	return Rect2(hud.global_position.x, top, hud.size.x, maxf(0, bottom - top)).grow(-10)
+	var margin := 4.0 if get_viewport().get_visible_rect().size.y < 700 else 8.0
+	return Rect2(hud.global_position.x, top, hud.size.x, maxf(0, bottom - top)).grow(-margin)
 
 func _frame_field(include_reserved := false) -> void:
 	var low := Vector3(INF, 0, INF)
 	var high := Vector3(-INF, 0, -INF)
 	for bed in bp.beds():
 		for cell in bed.cells:
+			if not _plot_unlocked(_id(cell)): continue
 			var p := bp.cell_to_world(cell)
 			low.x = minf(low.x, p.x)
 			low.z = minf(low.z, p.z)
@@ -405,7 +424,7 @@ func _on_ground_tapped(world: Vector3) -> void:
 			return
 	var reachable := mover.set_target_position(world)
 	if hints: hints.destination(world, reachable, mover.remaining_path())
-	if not reachable: hud.show_toast("Can't reach that spot")
+	if not reachable: hud.show_toast(L10n.text("Can't reach that spot"), true)
 
 func _cancel_work() -> void:
 	runner.cancel_pending()
@@ -436,11 +455,11 @@ func _open_life() -> void:
 
 func _visit_resident(resident: String) -> void:
 	if runner.is_busy() or _in_flight > 0:
-		hud.show_toast("Finish your current work first")
+		hud.show_toast(L10n.text("Finish your current work first"), true)
 		return
 	var destination := {"nursery_keeper": "nursery", "bistro_owner": "bistro", "restorer": "courtyard"}
 	hud.close_modal()
-	AppRouter.push_instance(AppRouter.PLACE, {"place_id": destination.get(resident, "nursery"), "session": session, "resident_id": resident})
+	AppRouter.open_instance(AppRouter.PLACE, {"place_id": destination.get(resident, "nursery"), "session": session, "resident_id": resident})
 
 func suspend() -> void:
 	camera_pan.cancel()
@@ -477,7 +496,12 @@ func _projector() -> Callable:
 		return bp.world_to_cell(ground_hit, WORLD_SCALE) if ground_hit != null else null
 
 func _is_plot(cell: Vector2i) -> bool:
-	return bp.mask_has("cultivable", cell)
+	return bp.mask_has("cultivable", cell) and _plot_unlocked(_id(cell))
+
+func _plot_unlocked(local_id: String) -> bool:
+	if visitor and snapshot.has("unlocked_cell_ids"):
+		return snapshot.unlocked_cell_ids.has(interior.source_id(local_id))
+	return predictor.is_unlocked(local_id) if predictor else true
 
 func _action_locked() -> bool:
 	return (runner != null and runner.is_busy() and not runner.paused) or _emote_lock_s > 0.0
@@ -496,7 +520,7 @@ func _queue_plots(cells: Array) -> int:
 	var added := 0
 	for c in plots:
 		var id := _id(c)
-		if not view.has(id) or runner.contains(c):
+		if not view.has(id) or not _plot_unlocked(id) or runner.contains(c):
 			continue
 		var step := NextStep.step_for(view[id], now)
 		if step.is_empty():
@@ -504,10 +528,10 @@ func _queue_plots(cells: Array) -> int:
 		if step == "sow":
 			var reason := _sow_block_reason(sowing)
 			if not reason.is_empty():
-				hud.show_toast(reason)
+				hud.show_toast(reason, true)
 				continue
 			if NextStep.seeds_of(_state().get("inventory", {}), hud.selected_crop) == 0:
-				hud.show_toast("No %s seeds left — buy some at the stall" % CropInfo.name_of(hud.selected_crop))
+				hud.show_toast(L10n.format_text("No %s seeds left — buy some at the stall", CropInfo.name_of(hud.selected_crop)), true)
 				continue
 		var count := runner.enqueue([c], step)
 		added += count
@@ -539,9 +563,9 @@ func _sowing_options(include_pending := false) -> Dictionary:
 
 func _sow_block_reason(options: Dictionary) -> String:
 	if not options.crops.has(hud.selected_crop):
-		return "First harvest starts with radishes"
+		return L10n.text("First harvest starts with radishes")
 	if int(options.room) <= 0:
-		return "Harvest the first batch before sowing more"
+		return L10n.text("Harvest the first batch before sowing more")
 	return ""
 
 ## 点了一块现在没事可做的田：说清楚为什么。
@@ -549,13 +573,13 @@ func _explain_plot(cell: Vector2i) -> void:
 	var id := _id(cell)
 	var view := _cells_view()
 	if not view.has(id):
-		hud.show_toast(FarmHud.reject_text("CELL_LOCKED") if bp.reserved_bed().get("cells", []).has(cell) else FarmHud.reject_text("CELL_NOT_CULTIVABLE"))
+		hud.show_toast(FarmHud.reject_text("CELL_LOCKED") if bp.reserved_bed().get("cells", []).has(cell) else FarmHud.reject_text("CELL_NOT_CULTIVABLE"), true)
 		return
 	var slot: Dictionary = view[id]
 	if str(slot.get("state", "")) == "growing":
 		var ra = slot.get("ready_at")
 		var left := (int(ra) - _now()) if ra != null else -1
-		_float_label(cell, "Growing · %s" % FarmHud.format_countdown(maxi(left, 0)), 1.5)
+		_float_label(cell, L10n.format_text("Growing · %s", FarmHud.format_countdown(maxi(left, 0))), 1.5)
 
 func _on_seed_selected(crop: String) -> void:
 	_explicit_crop = crop
@@ -572,8 +596,8 @@ func _on_cta() -> void:
 			_open_stall(str(bulk.get("crop", "")))
 		"explore":
 			if bulk.get("surface") == "street":
-				AppRouter.push_instance(AppRouter.STREET, {"session": session, "target": str(bulk.get("target", ""))})
-			else: AppRouter.push_instance(AppRouter.PLACE, {"place_id": str(bulk.get("place", "nursery")), "session": session, "target": str(bulk.get("target", ""))})
+				AppRouter.open_instance(AppRouter.STREET, {"session": session, "target": str(bulk.get("target", ""))})
+			else: AppRouter.open_instance(AppRouter.PLACE, {"place_id": str(bulk.get("place", "nursery")), "session": session, "target": str(bulk.get("target", ""))})
 		"":
 			pass
 		_:
@@ -592,13 +616,13 @@ func _on_cell_started(cell: Vector2i, action: String) -> void:
 	if action == "sow":
 		var reason := _sow_block_reason(_sowing_options())
 		if not reason.is_empty():
-			hud.show_toast(reason)
+			hud.show_toast(reason, true)
 			runner.abort_current()
 			return
 	if predictor:
 		var r := predictor.check(NextStep.COMMAND.get(action, ""), _payload_for(action, [id]), _now())
 		if not r.ok:
-			hud.show_toast(FarmHud.reject_text(r.error))
+			hud.show_toast(FarmHud.reject_text(r.error), true)
 			runner.abort_current()
 			return
 	var stand := _stand_cell_for(cell)
@@ -671,11 +695,11 @@ func _celebrate(action: String, before: Dictionary, cell: Vector2i) -> void:
 	for c in pa:
 		var gained := int(pa[c]) - int(pb.get(c, 0))
 		if gained > 0:
-			_float_label(cell, "+%d %s" % [gained, CropInfo.name_of(c)], 1.6)
+			_float_label(cell, L10n.format_text("+%d %s", [gained, CropInfo.name_of(c)]), 1.6)
 	var xb := int(before.get("xp", {}).get("total", 0))
 	var xa := int(_state().get("xp", {}).get("total", 0))
 	if xa > xb:
-		hud.show_toast("+%d XP" % (xa - xb))
+		hud.show_toast(L10n.format_text("+%d XP", (xa - xb)))
 
 func _payload_for(action: String, ids: Array) -> Dictionary:
 	var p := {"cell_ids": ids}
@@ -707,7 +731,10 @@ func _now() -> int:
 	return session.server_now() if session else int(Time.get_unix_time_from_system() * 1000.0)
 
 func _cells_view() -> Dictionary:
-	return predictor.view() if predictor else {}
+	var view := predictor.view() if predictor else {}
+	for id in view.keys():
+		if not _plot_unlocked(str(id)): view.erase(id)
+	return view
 
 ## 只含现在能动的格（预留畦扩地前不算）：大按钮别把锁着的格数进去。
 func _actionable_view() -> Dictionary:
@@ -729,8 +756,8 @@ func _parse(id: String) -> Vector2i:
 func render_cells(cells: Dictionary, now_ms: int) -> void:
 	if crop_field:
 		var visible_cells := cells.duplicate()
-		if predictor and predictor.beds_unlocked < 4:
-			for cell in bp.reserved_bed().get("cells", []): visible_cells.erase(_id(cell))
+		for id in visible_cells.keys():
+			if not _plot_unlocked(str(id)): visible_cells.erase(id)
 		crop_field.sync(visible_cells, now_ms)
 	if hints and not visitor:
 		var hint_cells := _actionable_view()
@@ -773,7 +800,7 @@ func _refresh_hud() -> void:
 			or NextStep.seeds_of(st.get("inventory", {}), _explicit_crop) == 0:
 		_explicit_crop = ""
 	if session == null:
-		_last_bulk = {"action": "", "cells": [], "label": "Offline — farm not connected", "enabled": false}
+		_last_bulk = {"action": "", "cells": [], "label": L10n.text("Offline — farm not connected"), "enabled": false}
 	else:
 		_last_bulk = NextStep.bulk(_actionable_view(), now, st, hud.selected_crop, unlocked, not _explicit_crop.is_empty())
 	var working := (runner != null and runner.is_busy()) or _in_flight > 0
@@ -784,10 +811,11 @@ func _refresh_hud() -> void:
 	hud.set_seeds(st.get("inventory", {}), sowing.crops, has_tilled and int(sowing.room) > 0, working)
 	var progress := DayGoals.progress(st.merged({"cells": _actionable_view()}, true), session.derived if session else {}, now)
 	hud.set_goals(DayGoals.evaluate(st, cells), chapter, progress)
+	hud.set_field_goal(FieldGrowth.goal(st))
 	if not JourneyProgress.active(st) and _chapter_seen_index == chapter and not _chapter_seen_complete and progress.complete:
-		hud.show_toast("Chapter %d complete" % (chapter + 1))
+		hud.show_toast(L10n.format_text("Chapter %d complete", (chapter + 1)))
 	elif not JourneyProgress.active(st) and _chapter_seen_index >= 0 and chapter > _chapter_seen_index:
-		hud.show_toast("Chapter %d · %s" % [chapter + 1, progress.title])
+		hud.show_toast(L10n.format_text("Chapter %d · %s", [chapter + 1, progress.title]))
 	_chapter_seen_index = chapter
 	_chapter_seen_complete = bool(progress.complete)
 	if progress.complete and int(progress.next_open_in_ms) == 0:
@@ -795,6 +823,7 @@ func _refresh_hud() -> void:
 	if director: director.sync_state(st)
 	for prop in props.get_children():
 		if prop.has_meta("reserved"): prop.visible = int(st.get("beds_unlocked", 3)) == 4
+		if prop.has_meta("cell_id"): prop.visible = _plot_unlocked(str(prop.get_meta("cell_id")))
 	if stall and stall.visible:
 		# 延后到帧末：refresh 会重建按钮，而这里可能正处在某个按钮的 pressed 回调里。
 		stall.call_deferred("refresh", st, unlocked, STALL_BUDGET)
@@ -846,10 +875,11 @@ func _attach_session() -> void:
 	session = s
 	predictor = CellPredictor.from_blueprint(bp, interior.local_cells(session.state.get("cells", {})))
 	predictor.beds_unlocked = int(session.state.get("beds_unlocked", 3))
+	_sync_field_unlocks(session.state)
 	session.state_changed.connect(_on_server_state)
 	session.offline_changed.connect(func(off): if hud: hud.set_offline(off))
 	# 服务端拒绝必须说出来：静默回滚在玩家眼里就是「点了没反应」。
-	session.rejected.connect(func(code, _detail): if hud: hud.show_toast(FarmHud.reject_text(code)))
+	session.rejected.connect(func(code, _detail): if hud: hud.show_toast(FarmHud.reject_text(code), true))
 	_render()
 
 ## 服务端每次回包都整体覆盖预测器；漂移一律以服务端为准（方案 §3 D4）。
@@ -857,7 +887,25 @@ func _on_server_state(state: Dictionary, version: int) -> void:
 	if predictor:
 		predictor.commit(interior.local_cells(state.get("cells", {})), version)
 		predictor.beds_unlocked = int(state.get("beds_unlocked", 3))
+		_sync_field_unlocks(state)
 	_render()
+
+func _sync_field_unlocks(state: Dictionary) -> void:
+	var previous_count := predictor.cells.size() - predictor.locked_cells.size()
+	predictor.locked_cells.clear()
+	for id in predictor.cells:
+		if not FieldGrowth.allows(state, interior.source_id(str(id))): predictor.locked_cells[id] = true
+	var current_count := predictor.cells.size() - predictor.locked_cells.size()
+	for id in predictor.cells:
+		var cell := _parse(str(id))
+		var row: String = bp.masks.walkable[cell.y]
+		row[cell.x] = "0" if predictor.is_unlocked(str(id)) else "1"
+		bp.masks.walkable[cell.y] = row
+	grid = BlueprintGrid.new(bp)
+	if mover: mover.grid = grid
+	if current_count > previous_count and previous_count < 9:
+		hud.show_toast(L10n.format_text("%d plots unlocked", FieldGrowth.count(state)))
+	_frame_field(int(state.get("beds_unlocked", 3)) == 4)
 
 # —— 摊位 ————————————————————————————————————————————————————————————————
 
@@ -891,7 +939,7 @@ func _on_sell(items: Array) -> void:
 	if stall: stall.set_busy(false)
 	if ok:
 		var gained := int(_state().get("wallet", 0)) - before
-		hud.show_toast("+%d coins" % gained)
+		hud.show_toast(L10n.format_text("+%d coins", gained))
 	_render()
 
 func _on_buy(crop: String, qty: int) -> void:
@@ -904,7 +952,7 @@ func _on_buy(crop: String, qty: int) -> void:
 	if stall: stall.set_uncertain(_stall_uncertain)
 	if stall: stall.set_busy(false)
 	if ok:
-		hud.show_toast("Bought %d %s seeds" % [qty, CropInfo.name_of(crop)])
+		hud.show_toast(L10n.format_text("Bought %d %s seeds", [qty, CropInfo.name_of(crop)]))
 		hud.selected_crop = crop
 		_explicit_crop = crop
 	_render()
@@ -920,9 +968,9 @@ func _retry_stall() -> void:
 		_stall_uncertain = false
 		if session.has_meta("pending_stall_command"): session.remove_meta("pending_stall_command")
 		stall.set_uncertain(false)
-		hud.show_toast("Trade checked. Your basket is up to date.")
+		hud.show_toast(L10n.text("Trade checked. Your basket is up to date."))
 	else:
-		hud.show_toast("Could not connect. Try again.")
+		hud.show_toast(L10n.text("Could not connect. Try again."), true)
 	_render()
 
 func _recover_connection() -> void:
@@ -931,7 +979,7 @@ func _recover_connection() -> void:
 	_refresh_hud()
 	var ok := await session.refresh()
 	_connection_recovery_busy = false
-	hud.show_toast("Farm synced" if ok else "Could not connect. Try again.")
+	hud.show_toast(L10n.text("Farm synced") if ok else L10n.text("Could not connect. Try again."), not ok)
 	_render()
 
 ## 入口：长按标题三秒。不额外占屏幕——QA 面板不该在正式玩家的界面上留按钮。
@@ -980,7 +1028,7 @@ func _on_director_command(type: String, payload: Dictionary) -> void:
 # —— 访客模式（PRD §3.3 / §8.4）——————————————————————————————————————————
 
 func _enter_visitor_mode() -> void:
-	title.text = "Visiting · %s" % SeededOutfit.short_name(str(snapshot.get("avatar_ref", "seed:unknown")))
+	title.text = L10n.format_text("Visiting · %s", SeededOutfit.short_name(str(snapshot.get("avatar_ref", "seed:unknown"))))
 	hud.set_visitor_mode(true)
 	hud.set_condition(str(snapshot.get("weather_snapshot", "sunny")))
 	hud.wave_pressed.connect(_wave)
@@ -996,8 +1044,13 @@ func _enter_visitor_mode() -> void:
 				break
 	for prop in props.get_children():
 		if prop.has_meta("reserved"): prop.visible = reserved_unlocked
+		if snapshot.has("unlocked_cell_ids") and prop.has_meta("cell_id"):
+			prop.visible = _plot_unlocked(str(prop.get_meta("cell_id")))
 	if not reserved_unlocked:
 		local_cells = local_cells.filter(func(cell): return not reserved_ids.has(str(cell.cell_id)))
+	if snapshot.has("unlocked_cell_ids"):
+		local_cells = local_cells.filter(func(cell): return _plot_unlocked(str(cell.cell_id)))
+	_frame_field(reserved_unlocked)
 	if crop_field:
 		crop_field.sync_snapshot(local_cells)
 
@@ -1010,7 +1063,7 @@ func _wave() -> void:
 func _stamp() -> void:
 	var label := Label3D.new()
 	label.name = "Stamp"
-	label.text = STAMPS[_stamp_index % STAMPS.size()]
+	label.text = L10n.text(STAMPS[_stamp_index % STAMPS.size()])
 	_stamp_index += 1
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.font_size = 28

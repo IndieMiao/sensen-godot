@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## HUD v2：360×800 下不与顶栏/摇杆重叠、可点、英文；大按钮/种子行/目标/倒计时。
+## HUD layout and English compatibility; bilingual flows live in tests/localization.
 
 const FARM_SCENE := "res://scenes/farm/farm.tscn"
 const FIX := "res://tests/fixtures/blueprints/fix_grid/r1/farm_blueprint.json"
@@ -67,7 +67,7 @@ func test_buttons_meet_touch_targets_and_stay_on_screen() -> void:
 				HORIZONTAL_ALIGNMENT_LEFT, -1, b.get_theme_font_size(&"font_size")).x + 8.0
 				).override_failure_message("%s 宽 %.1f 装不下自己的标签" % [b.text, r.size.x]).is_true()
 
-func test_all_hud_text_is_english() -> void:
+func test_hud_retains_english_support() -> void:
 	var f := await _farm_at_phone_size()
 	var stack: Array = [f.hud]
 	var seen := 0
@@ -117,8 +117,9 @@ func test_goals_header_counts_and_highlights_the_next_open_goal() -> void:
 		{"id": "c", "label": "Sow", "done": false}], 0)
 	assert_str(f.hud._goals_header.text).is_equal("Goals · 1/3")
 	var labels: Array = f.hud.goal_labels()
-	assert_str(labels[0]).is_equal("✓ Clear a plot")
-	assert_str(labels[1]).is_equal("○ Till it")
+	assert_str(labels[0]).is_equal("○ Till it")
+	assert_str(labels[1]).is_equal("○ Sow")
+	assert_str(labels[2]).is_equal("✓ Clear a plot")
 	f.hud.set_goals([{"id": "a", "label": "x", "done": true}], 2)
 	assert_bool(f.hud._goals_header.text.begins_with("Goals · 1/1")).is_true()
 	assert_str(f.hud._goals_feedback.text).is_equal("Progress pending")

@@ -161,7 +161,7 @@ func _ui_bounds(node: Node, viewport_rect: Rect2, errors: Array[String]) -> void
 			if scroll:
 				var clip := scroll.get_global_rect()
 				# Vertical content outside a ScrollContainer is expected; horizontal overflow is not.
-				if bounds.intersects(clip) and (bounds.position.x < clip.position.x - 1 or bounds.end.x > clip.end.x + 1):
+				if scroll.horizontal_scroll_mode == ScrollContainer.SCROLL_MODE_DISABLED and bounds.intersects(clip) and (bounds.position.x < clip.position.x - 1 or bounds.end.x > clip.end.x + 1):
 					errors.append("Horizontal scroll-content overflow: %s %s" % [control.get_path(), bounds])
 			elif not viewport_rect.grow(1).encloses(bounds):
 				errors.append("Control outside viewport: %s %s" % [control.get_path(), bounds])

@@ -34,6 +34,9 @@ func _ready() -> void:
 		var probe := load("res://tools/dev/journey_smoke.gd").new() as Node
 		get_tree().root.add_child(probe)
 		return
+	if "--journey-city-select" in OS.get_cmdline_user_args():
+		AppRouter._go_to(AppRouter.CITY_SELECT)
+		return
 	if not Net.session.farm_id.is_empty():
 		FarmRegions.save_choice(Net.session.region_id)
 		FarmChoice.save(Net.session.layout_patch_id, Net.session.blueprint_revision, Net.session.location)

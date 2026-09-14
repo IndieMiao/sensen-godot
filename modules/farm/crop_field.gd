@@ -14,15 +14,15 @@ const CROPS := ["R", "L", "C", "H"]
 const STAGES := 4
 ## 与种子袋和作物 PNG 一致的根茎色，叶片保留自己的绿色。
 const CROP_COLOR := {
-	"R": Color(0.96, 0.92, 0.75),   # 白萝卜
+	"R": Color(0.97, 0.96, 0.85),   # 白萝卜
 	"L": Color(0.46, 0.76, 0.40),   # 生菜
 	"C": Color(0.93, 0.60, 0.24),   # 胡萝卜
 	"H": Color(0.95, 0.90, 0.52),   # 洋甘菊
 }
 const WEED_COLOR := Color(0.46, 0.58, 0.30)
 ## 翻土层包含五条立体垄沟，与只清理过的平地分开。
-const SOIL_COLOR := Color(0.42, 0.27, 0.16)
-const SOIL_SIZE := Vector3(0.92, 0.05, 0.92)
+const SOIL_COLOR := Color(0.55, 0.38, 0.23)
+const SOIL_SIZE := Vector3(0.86, 0.035, 0.86)
 ## 刚播下的幼苗用亮绿：阶段 0 曾是 0.10 高的暗绿小块，埋在畦面里根本看不见。
 const SEEDLING_COLOR := Color(0.72, 0.93, 0.52)
 ## 四阶段的植株尺寸（逻辑米）；成熟株高低于地块提示，避免挤满田间视野。

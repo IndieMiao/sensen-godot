@@ -4,7 +4,12 @@ extends GdUnitTestSuite
 const MAP_POC_SCENE := "res://scenes/map_poc/map_poc.tscn"
 
 func after_test() -> void:
+	while AppRouter._navigation_pending: await get_tree().process_frame
+	while AppRouter.instance_depth() > 0:
+		AppRouter.pop_instance()
+		await get_tree().process_frame
 	FarmChoice.clear()
+	Net.use_transport(FakeTransport.new([]).callable())
 
 func _map_with_region() -> Node:
 	var scene := (load(MAP_POC_SCENE) as PackedScene).instantiate()
@@ -68,5 +73,29 @@ func test_offline_placement_failure_keeps_the_preview_without_saving() -> void:
 	assert_bool(m._placement_mode).is_true()
 	assert_bool(FarmChoice.load().is_empty()).is_true()
 	assert_bool(m.select_panel.confirm_button.disabled).is_false()
-	assert_str(m.select_panel._capacity.text).is_equal("Connect to save your farm")
+	assert_str(m.select_panel._capacity.text).is_equal("Could not connect. Try again.")
 	await get_tree().process_frame
+
+func test_missing_farm_can_be_placed_and_enters_with_a_server_session() -> void:
+	var t := FakeTransport.new([])
+	Net.use_transport(t.callable())
+	Net.client.token = "tok"
+	Net.session.last_error_code = "NO_FARM"
+	var m := _map_with_region()
+	var id: String = m.select_panel.focused_id
+	m._begin_placement(id)
+	var location: Dictionary = m._placement_location.duplicate()
+	t.responses = [
+		{"status": 404, "json": {"code": "NO_FARM"}},
+		{"status": 200, "json": {"farm_placement_version": 1}},
+		{"status": 201, "json": {"farm_id": "new_farm", "version": 0, "state": {},
+			"layout_patch_id": id, "blueprint_revision": 2, "region_id": "shanghai", "location": location}},
+	]
+	await m._on_candidate_confirmed(id)
+	while AppRouter._navigation_pending: await get_tree().process_frame
+	assert_int(AppRouter.instance_depth()).is_equal(1)
+	assert_object(AppRouter.top_instance().session).is_not_null()
+	assert_str(AppRouter.top_instance().session.farm_id).is_equal("new_farm")
+	for stored: Dictionary in [t.last_body().location, FarmChoice.load().location]:
+		assert_float(float(stored.lat)).is_equal_approx(float(location.lat), 0.000000001)
+		assert_float(float(stored.lng)).is_equal_approx(float(location.lng), 0.000000001)

@@ -3,7 +3,7 @@
 //      本机 UDP(46464) 接收 GDScript 指令（Mapbox v11 纯 Swift API，PoC 用回环桥，
 //      正式化时迁 GDExtension/插件）。
 // 协议（UTF-8 文本，'|' 分隔）：
-//   Godot → 本层：CREATE|token|lat|lng|zoom ／ CAM|lat|lng|zoom|bearing|pitch ／ VIS|0/1
+//   Godot → 本层：CREATE|token|lat|lng|zoom ／ CAM|lat|lng|zoom|bearing|pitch ／ VIS|0/1 ／ LANG|locale
 //   本层 → Godot：READY|pixelRatio（样式加载完成后，答复 CREATE 的来源端口）
 import UIKit
 import Network
@@ -17,6 +17,8 @@ class MapUnderlay: NSObject {
     private var listener: NWListener?
     private var replyConn: NWConnection?
     private var cancelables = Set<AnyCancelable>()
+    private var mapLocale = Locale(identifier: "zh-Hans")
+    private var styleLoaded = false
 
     @objc class func setup() {
         shared.start()
@@ -70,6 +72,12 @@ class MapUnderlay: NSObject {
                     pitch: Double(p[5]) ?? 0))
         case "VIS" where p.count >= 2:
             mapView?.isHidden = (p[1] == "0")
+        case "LANG" where p.count >= 2:
+            let locale = Locale(identifier: p[1] == "en" ? "en" : "zh-Hans")
+            if locale != mapLocale {
+                mapLocale = locale
+                localizeMap()
+            }
         default:
             NSLog("[MapUnderlay] unknown msg: \(msg)")
         }
@@ -104,6 +112,8 @@ class MapUnderlay: NSObject {
         mapView = mv
         mv.mapboxMap.onStyleLoaded.observeNext { [weak self] _ in
             NSLog("[MapUnderlay] style loaded")
+            self?.styleLoaded = true
+            self?.localizeMap()
             self?.sendReady()
         }.store(in: &cancelables)
         // 地图挂上后再补一次透明化（防层级变动）
@@ -111,6 +121,15 @@ class MapUnderlay: NSObject {
             self?.applyTransparency()
         }
         NSLog("[MapUnderlay] MapView created @(\(lat),\(lng)) z=\(zoom)")
+    }
+
+    private func localizeMap() {
+        guard styleLoaded, let map = mapView?.mapboxMap else { return }
+        do {
+            try map.localizeLabels(into: mapLocale)
+        } catch {
+            NSLog("[MapUnderlay] localization failed: \(error)")
+        }
     }
 
     // MARK: - 透明化（G3 spike 已验证逻辑）

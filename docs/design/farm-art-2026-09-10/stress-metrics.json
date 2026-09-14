@@ -1,0 +1,15 @@
+[
+	{
+		"animated_sample_pixels": 1199,
+		"draw_calls": 43.0,
+		"frame_ms_mean": 8.33664,
+		"frame_ms_p95": 9.462,
+		"primitives": 175266.0,
+		"render_cpu_ms": 0.0700000002980232,
+		"render_gpu_ms": 0.0,
+		"render_objects": 49.0,
+		"samples": 150,
+		"size": "(480, 900)",
+		"style": "windmill"
+	}
+]

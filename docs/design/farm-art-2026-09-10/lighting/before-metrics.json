@@ -1,0 +1,18 @@
+[
+	{
+		"animated_sample_pixels": 306,
+		"camera_far": 4000.0,
+		"camera_near": 0.0500000007450581,
+		"draw_calls": 41.0,
+		"frame_ms_mean": 8.33180000000001,
+		"frame_ms_p95": 8.708,
+		"primitives": 72068.0,
+		"render_cpu_ms": 0.063000001013279,
+		"render_gpu_ms": 0.0,
+		"render_objects": 45.0,
+		"samples": 150,
+		"shadow_atlas_size": 1024,
+		"size": "(480, 900)",
+		"style": "cottage"
+	}
+]

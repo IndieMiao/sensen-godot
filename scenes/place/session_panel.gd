@@ -50,7 +50,7 @@ func _rebuild() -> void:
 		child.queue_free()
 	_render()
 	if session and (session.offline or session.has_unconfirmed_command()):
-		var reconnect := GameUi.button("rotate-ccw", "Reconnect" if session.offline else "Check previous action", "Reload your farm")
+		var reconnect := GameUi.button("rotate-ccw", L10n.text("Reconnect") if session.offline else L10n.text("Check previous action"), L10n.text("Reload your farm"))
 		reconnect.name = "ReconnectSession"
 		reconnect.disabled = busy
 		reconnect.pressed.connect(_reconnect)
@@ -66,7 +66,7 @@ func _reconnect() -> void:
 	var ok := await session.refresh()
 	busy = false
 	if not is_inside_tree(): return
-	message.text = "Connected" if ok else "Could not connect. Try again."
+	message.text = L10n.text("Connected") if ok else L10n.text("Could not connect. Try again.")
 	refresh()
 
 func _render() -> void:
@@ -105,7 +105,7 @@ func command(type: String, payload: Dictionary, success := "Saved") -> bool:
 		message.text = error_text("OFFLINE")
 		return false
 	busy = true
-	message.text = "Saving..."
+	message.text = L10n.text("Saving...")
 	refresh()
 	var ok := await session.send(type, payload, pending_key())
 	busy = false
@@ -113,28 +113,28 @@ func command(type: String, payload: Dictionary, success := "Saved") -> bool:
 	message.text = success if ok else error_text(session.last_error_code)
 	if not ok and JourneyProgress.active(state()):
 		match session.last_error_code:
-			"NOT_AVAILABLE", "CHAPTER_LOCKED": message.text = "Complete the earlier step of this project first."
-			"INSUFFICIENT_ITEMS": message.text = "More supplies are needed for this activity."
-			"DECORATION_LOCKED": message.text = "Make your first planter at the workbench."
+			"NOT_AVAILABLE", "CHAPTER_LOCKED": message.text = L10n.text("Complete the earlier step of this project first.")
+			"INSUFFICIENT_ITEMS": message.text = L10n.text("More supplies are needed for this activity.")
+			"DECORATION_LOCKED": message.text = L10n.text("Make your first planter at the workbench.")
 	feedback.emit(message.text)
 	refresh()
 	return ok
 
 static func error_text(code: String) -> String:
 	match code:
-		"LOCAL_STORAGE": return "Could not save on this device. Free some space, then check the previous action."
-		"SESSION_CHANGED": return "The farm connection changed. Reconnect before continuing."
-		"PENDING_ACTION": return "Check the previous visit, kitchen, project or trade before changing your basket."
-		"DECORATION_LOCKED": return "Complete a growth purchase before saving your courtyard."
-		"INVALID_DECORATION": return "Choose a clear spot beside the path."
-		"DECORATION_OVERLAP": return "Leave more room between the pieces."
-		"OFFLINE", "TRANSPORT": return "Could not connect. Reconnect and try again."
-		"INSUFFICIENT_ITEMS": return "Not enough available ingredients. Check your project basket."
-		"INSUFFICIENT_FUNDS": return "Not enough coins."
-		"CHAPTER_LOCKED", "NOT_AVAILABLE": return "This is not available in your chapter yet."
-		"ALREADY_CLAIMED", "REQUEST_DONE": return "Already completed."
-		"SLOT_TAKEN": return "This chapter's choice is already saved."
-		"LOCKED_CHOICE": return "Your growth purchase is already final."
-		"REQUEST_MISMATCH": return "Complete the matching gift or sale first."
-		"VERSION_CONFLICT": return "Your farm changed. Try again."
-	return "Could not save. Try again."
+		"LOCAL_STORAGE": return L10n.text("Could not save on this device. Free some space, then check the previous action.")
+		"SESSION_CHANGED": return L10n.text("The farm connection changed. Reconnect before continuing.")
+		"PENDING_ACTION": return L10n.text("Check the previous visit, kitchen, project or trade before changing your basket.")
+		"DECORATION_LOCKED": return L10n.text("Complete a growth purchase before saving your courtyard.")
+		"INVALID_DECORATION": return L10n.text("Choose a clear spot beside the path.")
+		"DECORATION_OVERLAP": return L10n.text("Leave more room between the pieces.")
+		"OFFLINE", "TRANSPORT": return L10n.text("Could not connect. Reconnect and try again.")
+		"INSUFFICIENT_ITEMS": return L10n.text("Not enough available ingredients. Check your project basket.")
+		"INSUFFICIENT_FUNDS": return L10n.text("Not enough coins.")
+		"CHAPTER_LOCKED", "NOT_AVAILABLE": return L10n.text("This is not available in your chapter yet.")
+		"ALREADY_CLAIMED", "REQUEST_DONE": return L10n.text("Already completed.")
+		"SLOT_TAKEN": return L10n.text("This chapter's choice is already saved.")
+		"LOCKED_CHOICE": return L10n.text("Your growth purchase is already final.")
+		"REQUEST_MISMATCH": return L10n.text("Complete the matching gift or sale first.")
+		"VERSION_CONFLICT": return L10n.text("Your farm changed. Try again.")
+	return L10n.text("Could not save. Try again.")

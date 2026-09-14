@@ -48,28 +48,28 @@ func _server_changed(_state: Dictionary, _version: int) -> void:
 
 func _render() -> void:
 	if _uncertain():
-		heading("Check your arrangement")
-		paragraph("Your last save needs to be checked.")
-		var check := GameUi.button("rotate-ccw", "Check saved layout", "Reload the saved arrangement", true)
+		heading(L10n.text("Check your arrangement"))
+		paragraph(L10n.text("Your last save needs to be checked."))
+		var check := GameUi.button("rotate-ccw", L10n.text("Check saved layout"), L10n.text("Reload the saved arrangement"), true)
 		check.name = "CheckSavedLayout"
 		check.disabled = busy
 		check.pressed.connect(reconcile_save)
 		content.add_child(check)
 		return
 	if _confirm_leave:
-		heading("Unsaved arrangement")
-		paragraph("Save this arrangement before leaving?")
-		action("check", "Save and continue", _save_before_leave, DecorationLayout.unlocked(state()), true).name = "SaveAndLeaveDecorations"
-		_local_action("x", "Discard changes", "Restore the saved arrangement", _discard_and_leave).name = "DiscardDecorationChanges"
-		_local_action("arrow-left", "Keep editing", "Return to the arrangement", _keep_editing).name = "KeepEditingDecorations"
+		heading(L10n.text("Unsaved arrangement"))
+		paragraph(L10n.text("Save this arrangement before leaving?"))
+		action("check", L10n.text("Save and continue"), _save_before_leave, DecorationLayout.unlocked(state()), true).name = "SaveAndLeaveDecorations"
+		_local_action("x", L10n.text("Discard changes"), L10n.text("Restore the saved arrangement"), _discard_and_leave).name = "DiscardDecorationChanges"
+		_local_action("arrow-left", L10n.text("Keep editing"), L10n.text("Return to the arrangement"), _keep_editing).name = "KeepEditingDecorations"
 		return
 	if compact:
 		_render_compact()
 		return
-	heading("Courtyard pieces")
-	paragraph("%d / 6 placed" % _draft.size())
+	heading(L10n.text("Courtyard pieces"))
+	paragraph(L10n.format_text("%d / 6 placed", _draft.size()))
 	if not DecorationLayout.unlocked(state()):
-		paragraph("Preview only until your first growth purchase.")
+		paragraph(L10n.text("Preview only until your first growth purchase."))
 	var picker := OptionButton.new()
 	picker.name = "DecorationPicker"
 	picker.custom_minimum_size.y = 44
@@ -87,13 +87,13 @@ func _render() -> void:
 	content.add_child(picker)
 	var existing := DecorationLayout.index_of(_draft, selected_prop)
 	if existing < 0:
-		_local_action("plus", "Place", "Place selected piece", place_selected, DecorationLayout.first_position(selected_prop, _draft) != null).name = "PlaceDecoration"
+		_local_action("plus", L10n.text("Place"), L10n.text("Place selected piece"), place_selected, DecorationLayout.first_position(selected_prop, _draft) != null).name = "PlaceDecoration"
 	else:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
 		content.add_child(row)
-		var moves := [["arrow-left", Vector2i(-1, 0), "Move left"], ["chevron-up", Vector2i(0, -1), "Move back"],
-			["chevron-down", Vector2i(0, 1), "Move forward"], ["chevron-right", Vector2i(1, 0), "Move right"]]
+		var moves := [["arrow-left", Vector2i(-1, 0), L10n.text("Move left")], ["chevron-up", Vector2i(0, -1), L10n.text("Move back")],
+			["chevron-down", Vector2i(0, 1), L10n.text("Move forward")], ["chevron-right", Vector2i(1, 0), L10n.text("Move right")]]
 		for index in moves.size():
 			var spec: Array = moves[index]
 			var button := GameUi.button(str(spec[0]), "", str(spec[2]))
@@ -103,19 +103,19 @@ func _render() -> void:
 			button.disabled = busy or not can_adjust(spec[1])
 			button.pressed.connect(func(): adjust(spec[1]))
 			row.add_child(button)
-		_local_action("minus", "Remove", "Remove selected piece", remove_selected).name = "RemoveDecoration"
-		_local_action("rotate-cw", "", "Rotate selected piece", rotate_selected).name = "RotateDecoration"
+		_local_action("minus", L10n.text("Remove"), L10n.text("Remove selected piece"), remove_selected).name = "RemoveDecoration"
+		_local_action("rotate-cw", "", L10n.text("Rotate selected piece"), rotate_selected).name = "RotateDecoration"
 	var history := HBoxContainer.new()
 	history.add_theme_constant_override("separation", 8)
 	content.add_child(history)
-	for spec in [["rotate-ccw", "Undo", undo, not _history.is_empty()], ["x", "Cancel", cancel_preview, dirty]]:
+	for spec in [["rotate-ccw", L10n.text("Undo"), undo, not _history.is_empty()], ["x", L10n.text("Cancel"), cancel_preview, dirty]]:
 		var button := GameUi.button(str(spec[0]), str(spec[1]), str(spec[1]))
 		button.name = str(spec[1]) + "Decoration"
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.disabled = busy or not bool(spec[3])
 		button.pressed.connect(spec[2])
 		history.add_child(button)
-	action("check", "Save layout", save_layout, dirty and DecorationLayout.unlocked(state()), true).name = "SaveDecorations"
+	action("check", L10n.text("Save layout"), save_layout, dirty and DecorationLayout.unlocked(state()), true).name = "SaveDecorations"
 
 func _render_compact() -> void:
 	var allowed: Array = ["planter"] if JourneyProgress.active(state()) and not JourneyProgress.unlocked(state(), "decorations") else DecorationLayout.IDS
@@ -132,12 +132,12 @@ func _render_compact() -> void:
 	row.add_theme_constant_override("separation", 4)
 	content.add_child(row)
 	var placed := DecorationLayout.index_of(_draft, selected_prop) >= 0
-	for spec in [["plus", "Place selected piece", place_selected, not placed],
-		["rotate-cw", "Rotate selected piece", rotate_selected, placed],
-		["rotate-ccw", "Undo arrangement", undo, not _history.is_empty()],
-		["minus", "Remove selected piece", remove_selected, placed],
-		["x", "Cancel arrangement", cancel_preview, dirty],
-		["check", "Save layout", save_layout, dirty and DecorationLayout.unlocked(state())]]:
+	for spec in [["plus", L10n.text("Place selected piece"), place_selected, not placed],
+		["rotate-cw", L10n.text("Rotate selected piece"), rotate_selected, placed],
+		["rotate-ccw", L10n.text("Undo arrangement"), undo, not _history.is_empty()],
+		["minus", L10n.text("Remove selected piece"), remove_selected, placed],
+		["x", L10n.text("Cancel arrangement"), cancel_preview, dirty],
+		["check", L10n.text("Save layout"), save_layout, dirty and DecorationLayout.unlocked(state())]]:
 		var button := GameUi.button(str(spec[0]), "", str(spec[1]), spec[0] == "check")
 		button.custom_minimum_size = Vector2(44, 44)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -181,7 +181,7 @@ func place_at(world: Vector3) -> bool:
 	if busy or _uncertain() or _confirm_leave or not is_finite(world.x) or not is_finite(world.z): return false
 	var next := DecorationLayout.with_position(_draft, selected_prop, DecorationLayout.quantize(world))
 	if not DecorationLayout.is_valid(next):
-		if message: message.text = "This spot needs more room."
+		if message: message.text = L10n.text("This spot needs more room.")
 		return false
 	return _change(next)
 
@@ -265,7 +265,7 @@ func save_layout() -> bool:
 	if busy or _uncertain() or not dirty or session == null or session.offline or not DecorationLayout.unlocked(state()): return false
 	if not DecorationLayout.is_valid(_draft): return false
 	session.set_meta(PENDING_META, {"props": preview(), "uncertain": false})
-	var ok := await command("save_decorations", {"props": preview()}, "Layout saved")
+	var ok := await command("save_decorations", {"props": preview()}, L10n.text("Layout saved"))
 	if ok:
 		session.remove_meta(PENDING_META)
 		_baseline = DecorationLayout.saved(state())
@@ -279,9 +279,9 @@ func save_layout() -> bool:
 	if is_inside_tree():
 		if not ok:
 			match session.last_error_code:
-				"DECORATION_LOCKED": message.text = "Complete your first growth purchase before saving."
-				"INVALID_DECORATION": message.text = "This arrangement contains a spot that cannot be used."
-				"DECORATION_OVERLAP": message.text = "Leave more room between the pieces."
+				"DECORATION_LOCKED": message.text = L10n.text("Complete your first growth purchase before saving.")
+				"INVALID_DECORATION": message.text = L10n.text("This arrangement contains a spot that cannot be used.")
+				"DECORATION_OVERLAP": message.text = L10n.text("Leave more room between the pieces.")
 			feedback.emit(message.text)
 		preview_changed.emit(preview())
 		refresh()
@@ -338,7 +338,7 @@ func reconcile_save() -> bool:
 		dirty = _draft != _baseline
 		if not dirty: _history.clear()
 	if is_inside_tree():
-		message.text = ("Layout saved" if not dirty else "Saved layout checked. Your preview is retained.") if ok else "Could not connect. Try again."
+		message.text = (L10n.text("Layout saved") if not dirty else L10n.text("Saved layout checked. Your preview is retained.")) if ok else L10n.text("Could not connect. Try again.")
 		preview_changed.emit(preview())
 		refresh()
 		if ok and not dirty and _confirm_leave:

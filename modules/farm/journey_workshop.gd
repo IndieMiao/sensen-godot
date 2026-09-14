@@ -22,21 +22,21 @@ static func goal(state: Dictionary) -> Dictionary:
 	var next := {}
 	if JourneyProgress.stock(state, str(plan.item)) > 0:
 		next = {"place": JourneyProgress.data().projects[plan.project].place, "target": "display:%s:%d" % [plan.project, plan.slot],
-			"icon": "plus", "hint": "Ready to place"}
+			"icon": "plus", "hint": L10n.text("Ready to place")}
 	else:
 		for project in JourneyProgress.data().projects:
 			var display := JourneyProgress.display_items(state, str(project))
 			if display.has(plan.item):
 				next = {"place": JourneyProgress.data().projects[project].place, "target": "display:%s:%d" % [project, display.find(plan.item)],
-					"icon": "backpack", "hint": "Collect your piece"}
+					"icon": "backpack", "hint": L10n.text("Collect your piece")}
 				break
 		if next.is_empty():
 			for item in recipe.materials:
 				var have := JourneyProgress.material(state, str(item))
 				if have >= int(recipe.materials[item]): continue
 				next = JourneyProgress._material_goal(state, str(item))
-				next.hint = "%s %d/%d" % ["Reeds" if item == "fiber" else str(item).capitalize(), have, int(recipe.materials[item])]
+				next.hint = L10n.format_text("%s %d/%d", [L10n.text("Reeds") if item == "fiber" else str(item).capitalize(), have, int(recipe.materials[item])])
 				break
-		if next.is_empty(): next = {"place": "nursery", "target": "workbench", "icon": "hammer", "hint": "Ready to make"}
-	next.label = "%s: %s" % [recipe.name, next.hint]
+		if next.is_empty(): next = {"place": "nursery", "target": "workbench", "icon": "hammer", "hint": L10n.text("Ready to make")}
+	next.label = L10n.format_text("%s: %s", [recipe.name, next.hint])
 	return next

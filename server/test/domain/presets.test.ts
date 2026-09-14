@@ -13,6 +13,23 @@ const T0 = at('2026-09-04T10:00:00+08:00');
 const tzOf = (region: string) => region === 'shanghai' ? 'Asia/Shanghai' : 'America/Los_Angeles';
 
 describe('预置农场', () => {
+  it('provides distinct public neighbours around every selectable neighbourhood', () => {
+    for (const region of ['shanghai', 'los_angeles']) {
+      const specs = PRESET_SPECS.filter(s => s.region === region);
+      expect(specs).toHaveLength(18);
+      expect(new Set(specs.map(s => presetFarmId(s.id ?? s.layout))).size).toBe(18);
+      const demos = specs.filter(s => s.id?.startsWith('demo_'));
+      expect(demos).toHaveLength(16);
+      expect(new Set(demos.map(s => JSON.stringify(s.location))).size).toBe(16);
+      for (const spec of demos) expect(presetByFarmId(presetFarmId(spec.id!))).toEqual(spec);
+      for (const layout of (region === 'shanghai' ? ['sh_a', 'sh_b', 'sh_c'] : ['la_a', 'la_b', 'la_c'])) {
+        const bp = loadBlueprint(path.join(ROOT, 'assets', 'blueprints'), layout, 2)!;
+        const [lat, lng] = bp.overlay_wgs84!.center;
+        const neighbours = demos.filter(s => Math.abs(s.location!.lat - lat) < .0016 && Math.abs(s.location!.lng - lng) < .0018);
+        expect(neighbours.length).toBeGreaterThanOrEqual(4);
+      }
+    }
+  });
   it('id 确定且是合法 UUID；随包快照与线上因此是同一座农场', () => {
     const a = presetFarmId('sh_b');
     expect(a).toBe(presetFarmId('sh_b'));

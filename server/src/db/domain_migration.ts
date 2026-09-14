@@ -2,8 +2,8 @@
 import type pg from 'pg';
 import { DOMAIN_VERSION, STATE_SCHEMA_VERSION } from '../domain/version.js';
 
-const FROM_DOMAIN_VERSION = '1,2,3,4,5,6,7,8,9,10,11,12';
-const TO_DOMAIN_VERSION = '13';
+const FROM_DOMAIN_VERSION = '1,2,3,4,5,6,7,8,9,10,11,12,13';
+const TO_DOMAIN_VERSION = '14';
 const SCHEMA_VERSION = 1;
 const VERSION_ROWS = `SELECT id AS farm_id, content_version, domain_version, state_schema_version
   FROM farms ORDER BY id`;
@@ -47,7 +47,7 @@ function inspect(rows: VersionRow[], options: DomainMigrationOptions): DomainMig
       ? [options.contentVersion] : [options.contentVersion, options.previousContentVersion];
     if (!allowedContent.includes(row.content_version)) reasons.push('content_version_mismatch');
     if (row.state_schema_version !== SCHEMA_VERSION) reasons.push('state_schema_version_mismatch');
-    if (!['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', TO_DOMAIN_VERSION].includes(row.domain_version))
+    if (![...FROM_DOMAIN_VERSION.split(','), TO_DOMAIN_VERSION].includes(row.domain_version))
       reasons.push('unknown_domain_version');
     if (reasons.length) report.blocked.push({ ...row, reasons });
     else if (row.domain_version !== TO_DOMAIN_VERSION) report.eligible.push(row.farm_id);
@@ -62,7 +62,7 @@ export async function migrateDomain(
 ): Promise<DomainMigrationReport> {
   if (!options.contentVersion) throw new Error('contentVersion is required');
   if (DOMAIN_VERSION !== TO_DOMAIN_VERSION || STATE_SCHEMA_VERSION !== SCHEMA_VERSION)
-    throw new Error('This migration only supports domain 1/2/3/4/5/6/7/8/9/10/11/12 -> 13 with state schema 1');
+    throw new Error('This migration only supports domain 1..13 -> 14 with state schema 1');
   if (!options.apply) {
     const rows = await pool.query<VersionRow>(VERSION_ROWS);
     return inspect(rows.rows, options);
@@ -85,7 +85,7 @@ export async function migrateDomain(
         `UPDATE farms SET domain_version = $1, content_version = $6
           WHERE id = ANY($2::uuid[]) AND domain_version = ANY($3::text[])
             AND content_version = ANY($4::text[]) AND state_schema_version = $5`,
-        [TO_DOMAIN_VERSION, report.eligible, ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+        [TO_DOMAIN_VERSION, report.eligible, FROM_DOMAIN_VERSION.split(','),
           [options.contentVersion, options.previousContentVersion].filter(Boolean), SCHEMA_VERSION, options.contentVersion],
       );
       if (updated.rowCount !== report.eligible.length)

@@ -42,10 +42,10 @@ func _init() -> void:
 	add_child(v)
 	var head := HBoxContainer.new()
 	v.add_child(head)
-	_title = GameUi.label("Roadside stall", 18)
+	_title = GameUi.label(L10n.text("Roadside stall"), 18)
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(_title)
-	var close := GameUi.button("x", "", "Close stall")
+	var close := GameUi.button("x", "", L10n.text("Close stall"))
 	close.pressed.connect(func():
 		if _busy: return
 		visible = false
@@ -53,7 +53,7 @@ func _init() -> void:
 	head.add_child(close)
 	_budget = GameUi.label("", 12, GameUi.MUTED)
 	v.add_child(_budget)
-	_retry = GameUi.button("rotate-ccw", "Check last trade", "Reload the last trade result")
+	_retry = GameUi.button("rotate-ccw", L10n.text("Check last trade"), L10n.text("Reload the last trade result"))
 	_retry.visible = false
 	_retry.pressed.connect(func():
 		if not _retry.disabled: retry_requested.emit())
@@ -85,10 +85,10 @@ func refresh(state: Dictionary, unlocked: Array, budget_per_day := 100) -> void:
 	_retry.visible = _uncertain
 	_retry.disabled = _busy
 	var settled := int((state.get("stall", {}) as Dictionary).get("settled", 0))
-	_budget.text = "Today's sales %d / %d coins" % [settled, budget_per_day]
+	_budget.text = L10n.format_text("Today's sales %d / %d coins", [settled, budget_per_day])
 	if JourneyProgress.active(state):
 		budget_per_day = 2147483647
-		_budget.text = "Neighbourhood stall"
+		_budget.text = L10n.text("Neighbourhood stall")
 	var inv: Dictionary = state.get("inventory", {})
 	var produce: Dictionary = inv.get("produce", {})
 	var reserved: Dictionary = (state.get("engineering", {}) as Dictionary).get("reserved", {})
@@ -114,7 +114,7 @@ func refresh(state: Dictionary, unlocked: Array, budget_per_day := 100) -> void:
 		var row: Dictionary = _produce_rows[id]
 		_qty[id] = n
 		(row.box as Control).visible = n > 0 or int(reserved.get(id, 0)) > 0
-		(row.label as Label).text = "%s\n%d available%s" % [CropInfo.name_of(id), n, " / %d reserved" % int(reserved[id]) if int(reserved.get(id, 0)) > 0 else ""]
+		(row.label as Label).text = L10n.format_text("%s\n%d available%s", [CropInfo.name_of(id), n, L10n.format_text(" / %d reserved", int(reserved[id])) if int(reserved.get(id, 0)) > 0 else ""])
 		(row.button as Button).disabled = blocked or n <= 0 or initial_room < CropInfo.unit_price(id, state)
 		if n <= 0:
 			(row.total as Label).text = "0"
@@ -122,7 +122,7 @@ func refresh(state: Dictionary, unlocked: Array, budget_per_day := 100) -> void:
 		any_produce = true
 		var price := CropInfo.unit_price(id, state)
 		var can := mini(n, room / maxi(price, 1))
-		(row.price as Label).text = "%d each" % price
+		(row.price as Label).text = L10n.format_text("%d each", price)
 		(row.total as Label).text = str(can * price)
 		var keep := 0
 		if JourneyProgress.active(state):
@@ -130,7 +130,7 @@ func refresh(state: Dictionary, unlocked: Array, budget_per_day := 100) -> void:
 			if id == "H" and not JourneyProgress.fact(state, "planter_planted"): keep = 1
 		keep = maxi(keep, int(goal_crops.get(id, 0)))
 		if int(goal_crops.get(id, 0)) > 0:
-			(row.label as Label).text += "\n%d for your goal" % mini(n, int(goal_crops[id]))
+			(row.label as Label).text += L10n.format_text("\n%d for your goal", mini(n, int(goal_crops[id])))
 		var batch := maxi(0, n - keep)
 		if batch > 0: _sell_items.append({"kind": "produce", "id": id, "qty": batch})
 		var batch_value := mini(batch, can) * price
@@ -144,22 +144,22 @@ func refresh(state: Dictionary, unlocked: Array, budget_per_day := 100) -> void:
 		any_produce = true
 		var price := int(JourneyProgress.data().dish_prices[id]) if JourneyProgress.active(state) else int(_recipes[id].stall_price)
 		var can := mini(n, room / maxi(price, 1))
-		(row.label as Label).text = "%s\n%d available" % ["Vegetable salad" if id == "salad" else "Chamomile tea", n]
-		(row.price as Label).text = "%d each" % price
+		(row.label as Label).text = L10n.format_text("%s\n%d available", [L10n.text("Vegetable salad") if id == "salad" else L10n.text("Chamomile tea"), n])
+		(row.price as Label).text = L10n.format_text("%d each", price)
 		(row.total as Label).text = str(can * price)
 		(row.button as Button).disabled = blocked or initial_room < price
 		var keep := 1 if JourneyProgress.active(state) and id == "salad" and not JourneyProgress.fact(state, "shared_meal") else 0
 		keep = maxi(keep, int(goal_dishes.get(id, 0)))
 		if int(goal_dishes.get(id, 0)) > 0:
-			(row.label as Label).text += "\n%d for your goal" % mini(n, int(goal_dishes[id]))
+			(row.label as Label).text += L10n.format_text("\n%d for your goal", mini(n, int(goal_dishes[id])))
 		var batch := maxi(0, n - keep)
 		if batch > 0: _sell_items.append({"kind": "dish", "id": id, "qty": batch})
 		var batch_value := mini(batch, can) * price
 		total += batch_value
 		room -= batch_value
 	_empty.visible = not any_produce
-	_sell_all.text = "Sell all · +%d" % total
-	if JourneyProgress.active(state): _sell_all.text = "Sell surplus - +%d" % total
+	_sell_all.text = L10n.format_text("Sell all · +%d", total)
+	if JourneyProgress.active(state): _sell_all.text = L10n.format_text("Sell surplus - +%d", total)
 	_sell_all.disabled = blocked or total <= 0
 	_sell_all.visible = any_produce
 	var wallet := int(state.get("wallet", 0))
@@ -171,11 +171,11 @@ func refresh(state: Dictionary, unlocked: Array, budget_per_day := 100) -> void:
 		var have := NextStep.seeds_of(inv, id)
 		var cost := CropInfo.seed_price(id) * _buy_qty
 		var bound := int(inv.get("seeds", {}).get(id, {}).get("bound", 0))
-		(row.label as Label).text = "%s\n%d owned%s" % [CropInfo.name_of(id), have, "\n%d gifted" % bound if bound > 0 else ""]
-		(row.price as Label).text = "%d each" % CropInfo.seed_price(id)
-		(row.button as Button).text = "Buy %d · %d" % [_buy_qty, cost]
+		(row.label as Label).text = L10n.format_text("%s\n%d owned%s", [CropInfo.name_of(id), have, L10n.format_text("\n%d gifted", bound) if bound > 0 else ""])
+		(row.price as Label).text = L10n.format_text("%d each", CropInfo.seed_price(id))
+		(row.button as Button).text = L10n.format_text("Buy %d · %d", [_buy_qty, cost])
 		(row.button as Button).disabled = blocked or wallet < cost
-	_quantity.text = "%d seed%s" % [_buy_qty, "" if _buy_qty == 1 else "s"]
+	_quantity.text = L10n.count_text("%d seed", "%d seeds", _buy_qty)
 	_quantity_minus.disabled = blocked or _buy_qty <= 1
 	_quantity_plus.disabled = blocked or _buy_qty >= 12
 	if get_parent() is Control: fit_height((get_parent() as Control).size)
@@ -191,30 +191,30 @@ func _ensure_rows() -> void:
 	if _built:
 		return
 	_built = true
-	_rows.add_child(GameUi.label("Harvested", 12, GameUi.GREEN))
+	_rows.add_child(GameUi.label(L10n.text("Harvested"), 12, GameUi.GREEN))
 	for id in CropInfo.ORDER:
 		_produce_rows[id] = _row(id, false)
 	for id in ["salad", "tea"]:
 		_dish_rows[id] = _row(id, false, true)
 	_empty = Label.new()
-	_empty.text = "No harvest in your basket yet"
+	_empty.text = L10n.text("No harvest in your basket yet")
 	_empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_empty.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
 	_empty.add_theme_color_override("font_color", DesignTokens.INK_SUB)
 	_rows.add_child(_empty)
-	_sell_all = GameUi.button("shopping-basket", "Sell all", "Sell harvested produce")
+	_sell_all = GameUi.button("shopping-basket", L10n.text("Sell all"), L10n.text("Sell harvested produce"))
 	_sell_all.pressed.connect(func():
 		if not _sell_all.disabled: sell_requested.emit(_sell_items.duplicate(true)))
 	_rows.add_child(_sell_all)
 	_rows.add_child(HSeparator.new())
 	var seeds_title := Label.new()
-	seeds_title.text = "Seeds"
+	seeds_title.text = L10n.text("Seeds")
 	seeds_title.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
 	seeds_title.add_theme_color_override("font_color", DesignTokens.INK_SUB)
 	_rows.add_child(seeds_title)
 	var quantity_row := HBoxContainer.new()
 	quantity_row.add_theme_constant_override("separation", 8)
-	_quantity_minus = GameUi.button("minus", "", "Buy one fewer seed")
+	_quantity_minus = GameUi.button("minus", "", L10n.text("Buy one fewer seed"))
 	_quantity_minus.pressed.connect(func(): set_buy_quantity(_buy_qty - 1))
 	quantity_row.add_child(_quantity_minus)
 	_quantity = GameUi.label("", 13)
@@ -222,7 +222,7 @@ func _ensure_rows() -> void:
 	_quantity.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_quantity.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	quantity_row.add_child(_quantity)
-	_quantity_plus = GameUi.button("plus", "", "Buy one more seed")
+	_quantity_plus = GameUi.button("plus", "", L10n.text("Buy one more seed"))
 	_quantity_plus.pressed.connect(func(): set_buy_quantity(_buy_qty + 1))
 	quantity_row.add_child(_quantity_plus)
 	_rows.add_child(quantity_row)
@@ -243,7 +243,7 @@ func _row(crop: String, seed: bool, dish := false) -> Dictionary:
 	var b: Button
 	var total: Label
 	if seed:
-		b = GameUi.button("coins", "", "Buy %s seeds" % CropInfo.name_of(crop))
+		b = GameUi.button("coins", "", L10n.format_text("Buy %s seeds", CropInfo.name_of(crop)))
 		b.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		b.add_theme_constant_override("icon_max_width", 14)
 		b.custom_minimum_size = Vector2(100, 44)
@@ -256,7 +256,7 @@ func _row(crop: String, seed: bool, dish := false) -> Dictionary:
 		total.custom_minimum_size.x = 40
 		total.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		h.add_child(total)
-		b = GameUi.button("coins", "1", "Sell one %s" % crop)
+		b = GameUi.button("coins", "1", L10n.format_text("Sell one %s", CropInfo.name_of(crop)))
 		b.custom_minimum_size = Vector2(48, 44)
 		b.pressed.connect(func():
 			if not b.disabled: sell_requested.emit([{"kind": "dish" if dish else "produce", "id": crop, "qty": 1}]))

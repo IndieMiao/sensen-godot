@@ -8,6 +8,7 @@ import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/doma
 import { at, SH } from '../domain/helpers.js';
 import { ownerFarmView, visitorSnapshot, nearbyEntry, snapshotSlot } from '../../src/http/dto.js';
 import { derive } from '../../src/domain/derive.js';
+import { PRESET_SPECS, buildPresetFarm, presetHmac, presetFarmId } from '../../src/domain/presets.js';
 
 const ROOT = path.resolve(DEFAULT_CONTENT_DIR, '..', '..', '..');
 const BLUEPRINTS = path.join(ROOT, 'assets', 'blueprints');
@@ -51,6 +52,27 @@ async function makeFarm(token: string, key = 'k1') {
 }
 
 describe('journey HTTP commands', () => {
+  it('creates four plots and replays the unlock command without counting sowing twice', async () => {
+    const { token } = await login();
+    let farm = (await makeFarm(token)).json();
+    expect(farm.state.field_progress.plots).toBe(4);
+    const cells = farm.state.field_progress.order.slice(0, 4);
+    for (const type of ['clear_cells', 'till_cells']) {
+      const result = await app.inject({ method: 'POST', url: '/v1/farms/me/commands', headers: authed(token),
+        payload: { type, idempotency_key: type, base_version: farm.version, payload: { cell_ids: cells } } });
+      expect(result.statusCode).toBe(200);
+      farm = result.json();
+    }
+    const request = { method: 'POST' as const, url: '/v1/farms/me/commands', headers: authed(token),
+      payload: { type: 'sow_cells', idempotency_key: 'unlock-six', base_version: farm.version,
+        payload: { cell_ids: cells, crop: 'R', lot: 'bound' } } };
+    const result = await app.inject(request);
+    expect(result.statusCode).toBe(200);
+    expect(result.json().state.field_progress).toMatchObject({ plots: 6, planted: 4 });
+    const replay = await app.inject(request);
+    expect(replay.json().outcome).toBe('replayed');
+    expect(replay.json().state).toEqual(result.json().state);
+  });
   it('persists a hosted gathering once and rejects another owner or a stale replay', async () => {
     const { token, player_id } = await login();
     const created = (await makeFarm(token)).json();
@@ -367,6 +389,36 @@ describe('导演模式端到端', () => {
 
 
 describe('访问骨架（G2）', () => {
+  it('lets an ordinary account find and visit all twelve seeded farms without modifying them', async () => {
+    for (const spec of PRESET_SPECS) {
+      const source = loadBlueprint(BLUEPRINTS, spec.layout, spec.revision)!;
+      const farm = buildPresetFarm(spec, blueprintSets(source), content,
+        spec.region === 'shanghai' ? SH : 'America/Los_Angeles', clock);
+      await memoryStore.ensureSystemFarm(presetHmac(spec.id ?? spec.layout), farm);
+      await memoryStore.ensureSystemFarm(presetHmac(spec.id ?? spec.layout), farm);
+    }
+    const { token } = await login();
+    const readFarms = () => Promise.all(PRESET_SPECS.map(spec => memoryStore.farmById(presetFarmId(spec.id ?? spec.layout))));
+    const before = structuredClone(await readFarms());
+    for (const region of ['shanghai', 'los_angeles']) {
+      const list = await app.inject({ method: 'GET', url: `/v1/nearby?region_id=${region}`, headers: authed(token) });
+      expect(list.statusCode).toBe(200);
+      expect(list.json().count).toBe(6);
+      for (const spec of PRESET_SPECS.filter(s => s.region === region)) {
+        const id = presetFarmId(spec.id ?? spec.layout);
+        expect(list.json().entries).toContainEqual(expect.objectContaining({ farm_id: id, avatar_ref: spec.avatar_ref }));
+        const response = await app.inject({ method: 'GET', url: `/v1/farms/${id}/snapshot`, headers: authed(token) });
+        expect(response.statusCode).toBe(200);
+        expect(response.json()).toMatchObject({ farm_id: id, region_id: region, layout_patch_id: spec.layout, avatar_ref: spec.avatar_ref });
+        if (spec.location) expect(response.json().location).toEqual(spec.location);
+        for (const key of ['owner_id', 'inventory', 'wallet', 'residents', 'field_progress']) expect(response.json()).not.toHaveProperty(key);
+        const denied = await app.inject({ method: 'POST', url: `/v1/farms/${id}/commands`, headers: authed(token), payload: {} });
+        expect(denied.statusCode).toBe(404);
+      }
+    }
+    expect(await readFarms()).toEqual(before);
+  });
+
   const cmd = (token: string, body: object) =>
     app.inject({ method: 'POST', url: '/v1/farms/me/commands', headers: authed(token), payload: body });
   async function farmOf(token: string) {
@@ -433,7 +485,7 @@ describe('访问骨架（G2）', () => {
     const r = await app.inject({ method: 'GET', url: `/v1/farms/${fa.farm_id}/snapshot`, headers: authed(b.token) });
     expect(Object.keys(r.json()).sort()).toEqual([
       'avatar_ref', 'beds_unlocked', 'blueprint_revision', 'cells', 'farm_id', 'layout_patch_id', 'nursery',
-      'props', 'region_id', 'server_time', 'snapshot_revision', 'snapshot_taken_at', 'weather_snapshot',
+      'props', 'region_id', 'server_time', 'snapshot_revision', 'snapshot_taken_at', 'street_snapshot', 'unlocked_cell_ids', 'weather_snapshot',
     ]);
     const text = JSON.stringify(r.json());
     for (const bad of ['wallet', 'owner_id', 'inventory', 'residents', 'xp', 'lat', 'lng', 'ready_at'])

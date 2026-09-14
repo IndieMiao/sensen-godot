@@ -44,6 +44,7 @@ var _goals_count: Label
 var _goals_title: Label
 var _goals_feedback: Label
 var _goals_open := false
+var _field_goal: Label
 var _cta_busy := false
 var _cta_enabled := false
 var _cta: Button
@@ -105,7 +106,7 @@ func _build_status() -> void:
 	add_child(top)
 	_weather_icon = _small_icon("sun", GameUi.BLUE)
 	top.add_child(_weather_icon)
-	_condition = GameUi.label("Sunny · water today", 12)
+	_condition = GameUi.label(L10n.text("Sunny · water today"), 12)
 	_condition.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_condition.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	top.add_child(_condition)
@@ -120,15 +121,15 @@ func _build_status() -> void:
 	meta.offset_bottom = 134
 	meta.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(meta)
-	_goals_header = GameUi.button("list-checks", "Goals", "Chapter goals")
+	_goals_header = GameUi.button("list-checks", L10n.text("Goals"), L10n.text("Chapter goals"))
 	_goals_header.add_theme_font_size_override("font_size", 12)
 	_goals_header.pressed.connect(func(): show_modal(_goals))
 	meta.add_child(_goals_header)
-	var bag := GameUi.button("shopping-bag", "", "Harvest and supplies")
+	var bag := GameUi.button("shopping-bag", "", L10n.text("Harvest and supplies"))
 	bag.name = "LifeButton"
 	bag.pressed.connect(func(): life_pressed.emit())
 	meta.add_child(bag)
-	_reconnect = GameUi.button("rotate-ccw", "", "Check connection and last action")
+	_reconnect = GameUi.button("rotate-ccw", "", L10n.text("Check connection and last action"))
 	_reconnect.name = "ReconnectFarm"
 	_reconnect.visible = false
 	_reconnect.pressed.connect(func():
@@ -138,6 +139,19 @@ func _build_status() -> void:
 	_timer_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	meta.add_child(_timer_label)
+	_field_goal = GameUi.label("", 12, GameUi.GREEN)
+	_field_goal.name = "FieldGrowthGoal"
+	_field_goal.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_field_goal.offset_top = 137
+	_field_goal.offset_bottom = 159
+	_field_goal.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_field_goal.hide()
+	add_child(_field_goal)
+
+func set_field_goal(text: String) -> void:
+	_field_goal.text = text
+	_field_goal.visible = not text.is_empty()
+	get_node("StatusBacking").offset_bottom = 166 if _field_goal.visible else 138
 
 func _build_bottom() -> void:
 	_work_backing = Panel.new()
@@ -171,7 +185,7 @@ func _build_bottom() -> void:
 	_seed_row.visible = false
 	_bottom.add_child(_seed_row)
 	for id in CropInfo.ORDER:
-		var b := GameUi.button("sprout", CropInfo.name_of(id), "Plant %s" % CropInfo.name_of(id))
+		var b := GameUi.button("sprout", CropInfo.name_of(id), L10n.format_text("Plant %s", CropInfo.name_of(id)))
 		b.icon = GameUi.crop_art(id)
 		b.custom_minimum_size.y = 58
 		b.add_theme_constant_override("icon_max_width", 36)
@@ -189,18 +203,18 @@ func _build_bottom() -> void:
 	var dock := HBoxContainer.new()
 	dock.add_theme_constant_override("separation", 8)
 	_bottom.add_child(dock)
-	_cta = GameUi.button("sprout", "Loading...", "Work the ready plots", true)
+	_cta = GameUi.button("sprout", L10n.text("Loading..."), L10n.text("Work the ready plots"), true)
 	_cta.name = "CTA"
 	_cta.custom_minimum_size.y = 52
 	_cta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_cta.clip_text = true
 	_cta.pressed.connect(func(): cta_pressed.emit())
 	dock.add_child(_cta)
-	_cancel = GameUi.button("x", "", "Cancel remaining work")
+	_cancel = GameUi.button("x", "", L10n.text("Cancel remaining work"))
 	_cancel.visible = false
 	_cancel.pressed.connect(func(): cancel_pressed.emit())
 	dock.add_child(_cancel)
-	_stall = GameUi.button("store", "", "Roadside stall")
+	_stall = GameUi.button("store", "", L10n.text("Roadside stall"))
 	_stall.name = "Stall"
 	_stall.custom_minimum_size = Vector2(52, 52)
 	_stall.pressed.connect(func(): stall_pressed.emit())
@@ -210,7 +224,7 @@ func _build_bottom() -> void:
 	_visitor_bar.add_theme_constant_override("separation", 8)
 	_visitor_bar.visible = false
 	add_child(_visitor_bar)
-	for spec in [["hand", "Wave", "wave_pressed"], ["heart", "Stamp", "stamp_pressed"]]:
+	for spec in [["hand", L10n.text("Wave"), "wave_pressed"], ["heart", L10n.text("Stamp"), "stamp_pressed"]]:
 		var b := GameUi.button(spec[0], spec[1], spec[1], spec[0] == "hand")
 		b.custom_minimum_size.y = 52
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -245,11 +259,11 @@ func _build_modals() -> void:
 	_goals.add_child(v)
 	var head := HBoxContainer.new()
 	v.add_child(head)
-	_goals_title = GameUi.label("Chapter goals", 18)
+	_goals_title = GameUi.label(L10n.text("Chapter goals"), 18)
 	_goals_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_goals_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	head.add_child(_goals_title)
-	var close := GameUi.button("x", "", "Close goals")
+	var close := GameUi.button("x", "", L10n.text("Close goals"))
 	close.pressed.connect(close_modal)
 	head.add_child(close)
 	var scroll := ScrollContainer.new()
@@ -263,7 +277,7 @@ func _build_modals() -> void:
 	_goals_count = GameUi.label("", 16, GameUi.GREEN)
 	_goals_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(_goals_count)
-	_goals_feedback = GameUi.label("Progress pending", 12, GameUi.MUTED)
+	_goals_feedback = GameUi.label(L10n.text("Progress pending"), 12, GameUi.MUTED)
 	_goals_feedback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_goals_feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	v.add_child(_goals_feedback)
@@ -274,7 +288,7 @@ func _build_messages() -> void:
 	_banner.theme_type_variation = &"ToastPanel"
 	_banner.visible = false
 	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_banner.add_child(GameUi.label("Offline · reconnecting", 12, GameUi.PAPER))
+	_banner.add_child(GameUi.label(L10n.text("Offline · reconnecting"), 12, GameUi.PAPER))
 	add_child(_banner)
 	_toast = PanelContainer.new()
 	_toast.name = "Toast"
@@ -290,6 +304,7 @@ func _build_messages() -> void:
 
 func _layout() -> void:
 	if _bottom == null: return
+	_layout_seed_row()
 	var h := _bottom.get_combined_minimum_size().y
 	_bottom.position = Vector2(0, size.y - h - 4)
 	_bottom.size = Vector2(size.x, h)
@@ -336,8 +351,8 @@ func modal_open() -> bool:
 
 func set_goals(goals: Array, day_index: int, progress: Dictionary = {}) -> void:
 	var done := DayGoals.done_count(goals)
-	_goals_header.text = "Goals · %d/%d" % [done, goals.size()]
-	_goals_title.text = "Chapter %d · %s" % [day_index + 1, str(progress.get("title", "Goals"))]
+	_goals_header.text = L10n.format_text("Goals · %d/%d", [done, goals.size()])
+	_goals_title.text = L10n.format_text("Chapter %d · %s", [day_index + 1, str(progress.get("title", L10n.text("Goals")))])
 	_goals_header.tooltip_text = _goals_title.text
 	var complete := bool(progress.get("complete", false))
 	_goals_header.icon = GameUi.icon("circle-check" if complete else "list-checks")
@@ -348,18 +363,18 @@ func set_goals(goals: Array, day_index: int, progress: Dictionary = {}) -> void:
 		var is_done := bool(g.done)
 		rows.append([str(g.label), GameUi.MUTED if is_done else (GameUi.INK if highlighted else GameUi.GREEN), is_done])
 		if not is_done: highlighted = true
-	_goals_count.text = "%d/%d" % [done, goals.size()]
-	_goals_feedback.text = "Progress pending" if progress.is_empty() or bool(progress.get("pending", false)) else "Chapter in progress"
+	_goals_count.text = L10n.format_text("%d/%d", [done, goals.size()])
+	_goals_feedback.text = L10n.text("Progress pending") if progress.is_empty() or bool(progress.get("pending", false)) else L10n.text("Chapter in progress")
 	if complete:
-		_goals_feedback.text = "Week complete" if bool(progress.get("last_chapter", false)) else "Chapter complete"
+		_goals_feedback.text = L10n.text("Week complete") if bool(progress.get("last_chapter", false)) else L10n.text("Chapter complete")
 		var remaining := int(progress.get("next_open_in_ms", -1))
 		if remaining >= 0 and not bool(progress.get("last_chapter", false)):
-			_goals_feedback.text = "Checking next chapter..." if remaining == 0 else "Chapter complete · next in %s" % format_countdown(remaining)
+			_goals_feedback.text = L10n.text("Checking next chapter...") if remaining == 0 else L10n.format_text("Chapter complete · next in %s", format_countdown(remaining))
 	_goals_feedback.add_theme_color_override("font_color", GameUi.GREEN if complete else GameUi.MUTED)
 	if bool(progress.get("journey", false)):
 		_goals_title.text = str(progress.title)
 		_goals_header.tooltip_text = _goals_title.text
-		_goals_feedback.text = "A corner in bloom" if complete else str(progress.title)
+		_goals_feedback.text = L10n.text("A corner in bloom") if complete else str(progress.title)
 	while _goals_list.get_child_count() < rows.size():
 		var row := HBoxContainer.new()
 		row.custom_minimum_size.y = 32
@@ -407,8 +422,8 @@ func set_cta(bulk: Dictionary) -> void:
 func set_cta_busy(pending: int) -> void:
 	_cta_busy = true
 	_cta.disabled = true
-	_cta.text = _last_action_text if not _last_action_text.is_empty() else "Working..."
-	_status_label.text = "%d %s remaining" % [pending, "plot" if pending == 1 else "plots"] if pending > 0 else "Finishing..."
+	_cta.text = _last_action_text if not _last_action_text.is_empty() else L10n.text("Working...")
+	_status_label.text = L10n.format_text("%d %s remaining", [pending, L10n.text("plot" if pending == 1 else "plots")]) if pending > 0 else L10n.text("Finishing...")
 	_status.visible = true
 	_cancel.visible = true
 	_seed_row.visible = false
@@ -424,7 +439,8 @@ func set_seeds(inventory: Dictionary, unlocked: Array, show: bool, preserve_sele
 		var b: Button = _seed_buttons[id]
 		var n := NextStep.seeds_of(inventory, id)
 		b.visible = unlocked.has(id)
-		b.text = "%s\n×%d" % [CropInfo.name_of(id), n]
+		b.set_meta("seed_count", n)
+		b.text = L10n.format_text("%s\n×%d", [CropInfo.name_of(id), n])
 		b.disabled = n == 0 or offline or _cta_busy
 	if not preserve_selection and (not unlocked.has(selected_crop) or NextStep.seeds_of(inventory, selected_crop) == 0):
 		for id in CropInfo.ORDER:
@@ -432,7 +448,24 @@ func set_seeds(inventory: Dictionary, unlocked: Array, show: bool, preserve_sele
 				selected_crop = id
 				break
 	_refresh_seed_buttons()
+	_layout_seed_row()
 	call_deferred("_layout")
+
+func _layout_seed_row() -> void:
+	if _seed_row == null: return
+	var visible_count := 0
+	for button in _seed_buttons.values():
+		if button.visible: visible_count += 1
+	var compact := size.x < 600 and size.y < 700 and visible_count > 2
+	_seed_row.columns = 4 if compact or size.x >= 600 else 2
+	for id in _seed_buttons:
+		var button: Button = _seed_buttons[id]
+		if not button.has_meta("seed_count"): continue
+		var count := int(button.get_meta("seed_count"))
+		button.text = L10n.format_text("×%d", count) if compact else L10n.format_text("%s\n×%d", [CropInfo.name_of(id), count])
+		button.custom_minimum_size.y = 52 if compact else 58
+		button.add_theme_constant_override("icon_max_width", 28 if compact else 36)
+		button.add_theme_constant_override("h_separation", 4 if compact else 6)
 
 func _refresh_seed_buttons() -> void:
 	for id in _seed_buttons:
@@ -458,7 +491,7 @@ func set_condition(cond: String) -> void:
 
 func set_next_ripe(cells: Dictionary, now_ms: int) -> void:
 	var remaining := next_ripe_ms(cells, now_ms)
-	_timer_label.text = "Harvest ready" if remaining == 0 else ("Ripe in %s" % format_countdown(remaining) if remaining > 0 else "")
+	_timer_label.text = L10n.text("Harvest ready") if remaining == 0 else (L10n.format_text("Ripe in %s", format_countdown(remaining)) if remaining > 0 else "")
 
 static func next_ripe_ms(cells: Dictionary, now_ms: int) -> int:
 	var best := -1
@@ -472,14 +505,14 @@ static func next_ripe_ms(cells: Dictionary, now_ms: int) -> int:
 
 static func format_countdown(ms: int) -> String:
 	if ms < 0: return "--:--"
-	if ms == 0: return "ready"
+	if ms == 0: return L10n.text("ready")
 	var total := int(ms / 1000.0)
 	var h := total / 3600
 	var m := (total % 3600) / 60
-	return "%dh%02dm" % [h, m] if h > 0 else "%02d:%02d" % [m, total % 60]
+	return L10n.format_text("%dh%02dm", [h, m]) if h > 0 else L10n.format_text("%02d:%02d", [m, total % 60])
 
 func set_hint(text: String) -> void:
-	if not text.is_empty() and text != "Tap a plot to work it": show_toast(text)
+	if not text.is_empty() and text != L10n.text("Tap a plot to work it"): show_toast(text)
 
 func set_action(text: String, progress: float, _pending: int) -> void:
 	_last_action_text = text
@@ -487,10 +520,9 @@ func set_action(text: String, progress: float, _pending: int) -> void:
 	if _cta_busy and not text.is_empty(): _cta.text = text
 
 static func reject_text(code: String) -> String:
-	return str(REJECT_TEXT.get(code, "Action unavailable"))
+	return L10n.text(str(REJECT_TEXT.get(code, "Action unavailable")))
 
-func show_toast(text: String) -> void:
-	var problem := text.begins_with("Can't") or text.begins_with("No ") or text.begins_with("That plot") or text.contains("unavailable")
+func show_toast(text: String, problem := false) -> void:
 	_toast.add_theme_stylebox_override("panel", GameUi.surface(GameUi.PAPER if problem else GameUi.INK, 12))
 	_toast_label.add_theme_color_override("font_color", GameUi.CORAL if problem else GameUi.PAPER)
 	_toast_label.text = text

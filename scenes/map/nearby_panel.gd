@@ -5,11 +5,13 @@ extends PanelContainer
 ## 同时只能选中一张卡、只开一张预览。预览绑 farm_id，不绑任何经纬度——面板在地图 UI 里，
 ## 不贴合、不连线到现实地块。
 ##
-## 走 BottomSheet，不碰顶栏与侧栏：TopPanel 被测试钉在 ≤220×64。界面文案一律英文。
+## BottomSheet keeps its own layout; display text follows the selected language.
 
 signal farm_focused(farm_id: String)
 signal visit_requested(farm_id: String)
 signal place_requested(place_id: String)
+signal street_requested(farm_id: String)
+var street_button: Button
 signal close_requested()
 
 const CARD_MIN := Vector2(124, 52)
@@ -39,6 +41,7 @@ var _places: VBoxContainer
 var _farm_content: VBoxContainer
 var _place_buttons: Dictionary = {}
 var _place_tab: Button
+var social_only := false
 var _farm_tab: Button
 var places_open := false
 var close_button: Button
@@ -46,6 +49,20 @@ var bottom_inset := 0.0
 var max_height := 0.0
 var _body_scroll: ScrollContainer
 var _body: VBoxContainer
+var _preview_counts := Vector2i(-1, -1)
+
+func refresh_language() -> void:
+	_title.text = L10n.format_text("%d farms here", _group_ids.size()) if not _group_ids.is_empty() else L10n.format_text("Nearby Farmers · %d", _count)
+	for card in _cards:
+		var id := str(card.get_meta("farm_id"))
+		for entry in entries:
+			if str(entry.farm_id) != id: continue
+			var label := card.find_child("FarmerName", true, false) as Label
+			label.text = SeededOutfit.short_name(str(entry.get("avatar_ref", "seed:unknown")))
+			if id == focused_id: _preview_name.text = label.text
+	if _preview_counts.x >= 0:
+		_preview_text.text = L10n.format_text("%d growing · %d ripe", [_preview_counts.x, _preview_counts.y])
+	_apply_bottom_preset()
 
 func _init() -> void:
 	name = "NearbyPanel"
@@ -115,6 +132,7 @@ func _init() -> void:
 	_apply_bottom_preset()
 
 func show_places(open: bool) -> void:
+	if social_only: open = false
 	places_open = open
 	_places.visible = open
 	_farm_content.visible = not open
@@ -122,11 +140,16 @@ func show_places(open: bool) -> void:
 	_place_tab.theme_type_variation = &"TabSelectedButton" if open else &"TabButton"
 	_apply_bottom_preset()
 
+func set_social_only() -> void:
+	social_only = true
+	_place_tab.hide()
+	show_places(false)
+
 func set_place_state(state: Dictionary) -> void:
 	for place in PlaceCatalog.all():
 		var button: Button = _place_buttons[str(place.id)]
 		button.disabled = not PlaceCatalog.available(str(place.id), state)
-		button.text = str(place.name) if not button.disabled else "%s · Ch. %d" % [place.name, int(place.chapter) + 1]
+		button.text = str(place.name) if not button.disabled else L10n.format_text("%s · Ch. %d", [place.name, int(place.chapter) + 1])
 		button.tooltip_text = "Connect to load your chapter" if state.is_empty() else str(place.intro)
 
 func _build_preview(parent: Node) -> void:
@@ -165,6 +188,13 @@ func _build_preview(parent: Node) -> void:
 	h.add_child(visit_button)
 	visit_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	visit_button.text = "Visit"
+	var actions := VBoxContainer.new()
+	h.remove_child(visit_button)
+	h.add_child(actions)
+	actions.add_child(visit_button)
+	street_button = GameUi.button("footprints", "Street", "Visit neighbourhood")
+	street_button.pressed.connect(func(): if not focused_id.is_empty(): street_requested.emit(focused_id))
+	actions.add_child(street_button)
 	parent.add_child(_preview)
 
 ## 与 SelectPanel 同一个坑：PRESET_MODE_MINSIZE 按调用时刻的最小尺寸算 offset_top，
@@ -198,7 +228,8 @@ func set_entries(p_entries: Array, count: int, offline := false) -> void:
 	_group_back.visible = false
 	focused_id = ""
 	_preview.visible = false
-	_title.text = "Nearby Farmers · %d" % count
+	_preview_counts = Vector2i(-1, -1)
+	_title.text = L10n.format_text("Nearby Farmers · %d", count)
 	_subtitle.visible = offline or p_entries.is_empty()
 	_subtitle.text = "Offline · sample farms" if offline else ("No open farms nearby yet" if p_entries.is_empty() else "")
 	for e in p_entries:
@@ -236,6 +267,7 @@ func _build_card(card: Button, e: Dictionary) -> void:
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.add_child(col)
 	var name_l := Label.new()
+	name_l.name = "FarmerName"
 	name_l.text = SeededOutfit.short_name(ref)
 	name_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_l.add_theme_font_size_override("font_size", 12)
@@ -255,6 +287,7 @@ func _on_card_pressed(card: Button) -> void:
 func clear_focus() -> void:
 	focused_id = ""
 	_preview.visible = false
+	_preview_counts = Vector2i(-1, -1)
 	for c in _cards:
 		c.set_pressed_no_signal(false)
 		if c.has_focus(): c.release_focus()
@@ -269,6 +302,7 @@ func focus(farm_id: String) -> void:
 	if focused_id == farm_id:
 		return
 	focused_id = farm_id
+	_preview_counts = Vector2i(-1, -1)
 	for c in _cards:
 		var selected := str(c.get_meta("farm_id")) == farm_id
 		c.set_pressed_no_signal(selected)
@@ -280,6 +314,7 @@ func focus(farm_id: String) -> void:
 		if str(e.farm_id) == farm_id:
 			_preview_name.text = SeededOutfit.short_name(str(e.get("avatar_ref", "seed:unknown")))
 	visit_button.disabled = true
+	street_button.disabled = true
 	_apply_bottom_preset()
 	farm_focused.emit(farm_id)
 
@@ -287,25 +322,25 @@ func focus(farm_id: String) -> void:
 func set_preview(snapshot: Dictionary) -> void:
 	if snapshot.is_empty() or str(snapshot.get("farm_id", "")) != focused_id:
 		return
-	var png := FarmBlueprint.asset_path(str(snapshot.layout_patch_id), int(snapshot.blueprint_revision)).get_base_dir() + "/preview.png"
-	_preview_img.texture = load(png) if ResourceLoader.exists(png) else null
+	_preview_img.texture = preload("res://modules/farm/farm_art.gd").preview_for(str(snapshot.layout_patch_id), str(snapshot.get("region_id", "")))
 	set_thumbnail(snapshot)
 	var counts := crop_counts(snapshot)
-	_preview_text.text = "%d growing · %d ripe" % [counts.x, counts.y]
+	_preview_counts = counts
+	_preview_text.text = L10n.format_text("%d growing · %d ripe", [counts.x, counts.y])
 	_preview.visible = true
 	visit_button.disabled = false
+	street_button.disabled = false
 	_apply_bottom_preset()
 
 func set_thumbnail(snapshot: Dictionary) -> void:
 	var id := str(snapshot.get("farm_id", ""))
 	if not _card_images.has(id): return
-	var path := FarmBlueprint.asset_path(str(snapshot.get("layout_patch_id", "")), int(snapshot.get("blueprint_revision", 2))).get_base_dir() + "/preview.png"
-	(_card_images[id] as TextureRect).texture = load(path) if ResourceLoader.exists(path) else null
+	(_card_images[id] as TextureRect).texture = preload("res://modules/farm/farm_art.gd").preview_for(str(snapshot.get("layout_patch_id", "")), str(snapshot.get("region_id", "")))
 
 func show_group(ids: Array) -> void:
 	_group_ids = ids
 	_group_back.visible = not ids.is_empty()
-	_title.text = "%d farms here" % ids.size() if not ids.is_empty() else "Nearby Farmers · %d" % _count
+	_title.text = L10n.format_text("%d farms here", ids.size()) if not ids.is_empty() else L10n.format_text("Nearby Farmers · %d", _count)
 	for card in _cards:
 		card.visible = ids.is_empty() or ids.has(str(card.get_meta("farm_id")))
 	_scroll.scroll_horizontal = 0
@@ -313,16 +348,18 @@ func show_group(ids: Array) -> void:
 
 ## 预览拿不到（线上失败且没有随包）：卡还在，但说清楚。
 func set_preview_unavailable() -> void:
+	_preview_counts = Vector2i(-1, -1)
 	_preview_img.texture = null
 	_preview_text.text = "Farm unavailable right now"
 	_preview.visible = true
 	visit_button.disabled = true
+	street_button.disabled = true
 	_apply_bottom_preset()
 
 static func summary(snapshot: Dictionary) -> String:
 	var counts := crop_counts(snapshot)
-	var parts := ["%d growing" % counts.x, "%d ripe" % counts.y,
-		str(WEATHER_LABEL.get(str(snapshot.get("weather_snapshot", "")), "—"))]
+	var parts := [L10n.format_text("%d growing", counts.x), L10n.format_text("%d ripe", counts.y),
+		L10n.text(str(WEATHER_LABEL.get(str(snapshot.get("weather_snapshot", "")), "—")))]
 	return " · ".join(parts)
 
 static func crop_counts(snapshot: Dictionary) -> Vector2i:

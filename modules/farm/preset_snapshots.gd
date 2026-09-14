@@ -13,7 +13,7 @@ static func _load_all() -> Array:
 	for f in d.get_files():
 		if not f.ends_with(".json"):
 			continue
-		var parsed = JSON.parse_string(FileAccess.get_file_as_string("%s/%s" % [DIR, f]))
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(L10n.format_text("%s/%s", [DIR, f])))
 		if parsed is Dictionary:
 			out.append(parsed)
 	out.sort_custom(func(a, b): return str(a.farm_id) < str(b.farm_id))

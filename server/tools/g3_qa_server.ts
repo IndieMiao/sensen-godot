@@ -26,7 +26,7 @@ const zone = (id: string) => regions.find((r: {id: string}) => r.id === id).time
 const now = () => Date.now();
 const store = new PgStore({ pool, content, contentVersion: cv, timezone: zone, blueprint: setsFor, now });
 for (const spec of PRESET_SPECS) {
-  await store.ensureSystemFarm(presetHmac(spec.layout),
+  await store.ensureSystemFarm(presetHmac(spec.id ?? spec.layout),
     buildPresetFarm(spec, setsFor(spec.layout, spec.revision), content, zone(spec.region), now()));
 }
 const qaPlayerIds = new Set<string>();

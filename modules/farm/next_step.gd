@@ -27,14 +27,14 @@ static func step_for(slot: Dictionary, now_ms: int) -> String:
 
 ## 照料动词按田况：晴浇水、雨疏水、风加固。
 static func care_verb(field_condition: String) -> String:
-	return str(CARE_VERB.get(field_condition, "Tend"))
+	return L10n.text(str(CARE_VERB.get(field_condition, "Tend")))
 
 ## 干活时的现在进行时，播种带作物名。
 static func doing_label(action: String, crop := "", field_condition := "sunny") -> String:
 	match action:
-		"sow": return "Sowing %s…" % CropInfo.name_of(crop)
-		"care": return "%sing…" % care_verb(field_condition).trim_suffix("e")
-	return "%s…" % str(VERB_ING.get(action, action.capitalize()))
+		"sow": return L10n.format_text("Sowing %s…", CropInfo.name_of(crop))
+		"care": return L10n.text({"sunny": "Watering…", "rain": "Draining…", "wind": "Sheltering…"}.get(field_condition, "Tending…"))
+	return L10n.format_text("%s…", str(VERB_ING.get(action, action.capitalize())))
 
 ## 一颗种子还有几颗可播：先用绑定的（章节送的），再用买的。
 static func seeds_of(inventory: Dictionary, crop: String) -> int:
@@ -76,23 +76,25 @@ static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_cro
 		by_step[step].append(id)
 	var fc := str((state.get("clock", {}) as Dictionary).get("field_condition", "sunny"))
 	var inventory: Dictionary = state.get("inventory", {})
+	var field_onboarding := state.has("field_progress") and int(state.field_progress.get("plots", 9)) < 9
+	var field_work_pending: bool = field_onboarding and (not by_step.clear.is_empty() or not by_step.till.is_empty() or not by_step.sow.is_empty())
 	if not by_step.harvest.is_empty():
-		return _mk("harvest", by_step.harvest, "Harvest %d %s" % [by_step.harvest.size(), _plots(by_step.harvest.size())])
+		return _mk("harvest", by_step.harvest, L10n.format_text("Harvest %d %s", [by_step.harvest.size(), _plots(by_step.harvest.size())]))
 	if not by_step.care.is_empty():
 		var conditions: Array = []
 		for id in by_step.care:
 			var recorded = cells[id].get("care_weather")
 			var condition := str(recorded) if recorded != null else fc
 			if not conditions.has(condition): conditions.append(condition)
-		var verb := care_verb(conditions[0]) if conditions.size() == 1 else "Tend"
-		var result := _mk("care", by_step.care, "%s %d %s" % [verb, by_step.care.size(), _plots(by_step.care.size())])
+		var verb := care_verb(conditions[0]) if conditions.size() == 1 else L10n.text("Tend")
+		var result := _mk("care", by_step.care, L10n.format_text("%s %d %s", [verb, by_step.care.size(), _plots(by_step.care.size())]))
 		result.weather = conditions[0]
 		return result
 	if prefer_selected and JourneyProgress.active(state) and not first_batch \
 			and sowing.crops.has(selected_crop) and not by_step.sow.is_empty():
 		var count := mini(by_step.sow.size(), mini(int(sowing.room), seeds_of(inventory, selected_crop)))
 		if count > 0:
-			var selected := _mk("sow", by_step.sow.slice(0, count), "Sow %d %s" % [count, CropInfo.name_of(selected_crop)])
+			var selected := _mk("sow", by_step.sow.slice(0, count), L10n.format_text("Sow %d %s", [count, CropInfo.name_of(selected_crop)]))
 			selected.crop = selected_crop
 			return selected
 	if JourneyProgress.active(state) and (not str(state.journey.get("tracked_project", "")).is_empty() \
@@ -106,16 +108,16 @@ static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_cro
 			if goal.get("action") == "wait": goal = JourneyProgress._gather_goal(state)
 			if goal.place != "farm":
 				return _explore(goal)
-	if JourneyProgress.active(state):
+	if JourneyProgress.active(state) and not field_work_pending:
 		var meal := JourneyProgress.first_meal_goal(state)
 		if not meal.is_empty():
 			return _explore(meal)
 	if JourneyProgress.active(state) and first_batch:
-		if growing_unripe > 0:
+		if growing_unripe > 0 and not field_work_pending:
 			var goal := JourneyProgress.next_goal(state)
 			return _explore(goal)
-		by_step.clear = by_step.clear.slice(0, 3)
-	if JourneyProgress.active(state) and growing_unripe > 0 and JourneyProgress.needed_crop(state, cells).is_empty():
+		if not field_onboarding: by_step.clear = by_step.clear.slice(0, 3)
+	if JourneyProgress.active(state) and growing_unripe > 0 and not field_work_pending and JourneyProgress.needed_crop(state, cells).is_empty():
 		var goal := JourneyProgress.next_goal(state)
 		return _explore(goal)
 	if not by_step.sow.is_empty():
@@ -127,13 +129,13 @@ static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_cro
 			var n := mini(by_step.sow.size(), seeds_of(inventory, crop))
 			n = mini(n, room)
 			if crop == needed: n = mini(n, 1)
-			var r := _mk("sow", by_step.sow.slice(0, n), "Sow %d %s" % [n, CropInfo.name_of(crop)])
+			var r := _mk("sow", by_step.sow.slice(0, n), L10n.format_text("Sow %d %s", [n, CropInfo.name_of(crop)]))
 			r.crop = crop
 			return r
 	if not by_step.till.is_empty():
-		return _mk("till", by_step.till, "Till %d %s" % [by_step.till.size(), _plots(by_step.till.size())])
+		return _mk("till", by_step.till, L10n.format_text("Till %d %s", [by_step.till.size(), _plots(by_step.till.size())]))
 	if not by_step.clear.is_empty():
-		return _mk("clear", by_step.clear, "Clear %d %s" % [by_step.clear.size(), _plots(by_step.clear.size())])
+		return _mk("clear", by_step.clear, L10n.format_text("Clear %d %s", [by_step.clear.size(), _plots(by_step.clear.size())]))
 	if JourneyProgress.active(state):
 		var goal := JourneyProgress.next_goal(state)
 		if not by_step.sow.is_empty() and _crop_with_seeds(inventory, selected_crop, sowing.crops).is_empty() and not sowing.crops.is_empty():
@@ -148,19 +150,19 @@ static func bulk(cells: Dictionary, now_ms: int, state: Dictionary, selected_cro
 		return _explore(goal)
 	var total := _sellable_produce(state)
 	if total > 0:
-		return _mk("stall", [], "Sell %d at the stall" % total)
+		return _mk("stall", [], L10n.format_text("Sell %d at the stall", total))
 	# D0's lettuce belongs to the post-harvest batch; planting it early delays that chapter fact.
 	if first_batch and growing_unripe > 0:
-		var waiting := _mk("", [], "First harvest is growing")
+		var waiting := _mk("", [], L10n.text("First harvest is growing"))
 		waiting.enabled = false
 		return waiting
 	if not by_step.sow.is_empty():
-		return _mk("stall", [], "Buy seeds at the stall")
+		return _mk("stall", [], L10n.text("Buy seeds at the stall"))
 	if growing_unripe > 0:
-		var r := _mk("", [], "Crops are growing")
+		var r := _mk("", [], L10n.text("Crops are growing"))
 		r.enabled = false
 		return r
-	var done := _mk("", [], "All done for today")
+	var done := _mk("", [], L10n.text("All done for today"))
 	done.enabled = false
 	return done
 
@@ -204,7 +206,7 @@ static func _crop_with_seeds(inventory: Dictionary, selected: String, unlocked: 
 	return ""
 
 static func _plots(n: int) -> String:
-	return "plot" if n == 1 else "plots"
+	return L10n.text("plot" if n == 1 else "plots")
 
 static func _mk(action: String, cells: Array, label: String) -> Dictionary:
 	return {"action": action, "cells": cells, "label": label, "enabled": true, "crop": ""}

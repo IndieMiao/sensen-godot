@@ -40,7 +40,7 @@ func _on_count_changed(value: float) -> void:
 
 func _toggle_strategy() -> void:
 	_merged = not _merged
-	strategy_btn.text = "Assembly: %s" % ("Merged" if _merged else "Direct")
+	strategy_btn.text = L10n.format_text("Assembly: %s", (L10n.text("Merged") if _merged else L10n.text("Direct")))
 	_respawn(rigs_root.get_child_count())
 
 func _respawn(count: int) -> void:
@@ -72,11 +72,11 @@ func _random_config() -> AvatarConfig:
 	return cfg
 
 func _process(_delta: float) -> void:
-	stats.text = "Characters %d  ·  %s Assembly\nFPS %d  ·  Frame %.2f ms\nDraw Calls %d  ·  VRAM %.1f MB" % [
+	stats.text = L10n.format_text("Characters %d  ·  %s Assembly\nFPS %d  ·  Frame %.2f ms\nDraw Calls %d  ·  VRAM %.1f MB", [
 		rigs_root.get_child_count(),
-		"Merged" if _merged else "Direct",
+		L10n.text("Merged") if _merged else L10n.text("Direct"),
 		Performance.get_monitor(Performance.TIME_FPS),
 		Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
 		RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
 		RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_VIDEO_MEM_USED) / 1048576.0,
-	]
+	])

@@ -1,0 +1,41 @@
+{
+	"failures": [],
+	"results": [
+		{
+			"min_plot_width_px": 49.544017791748,
+			"plots": 9,
+			"unique_sample_colors": 840,
+			"viewport": "(360, 640)"
+		},
+		{
+			"min_plot_width_px": 49.0740242004395,
+			"plots": 12,
+			"unique_sample_colors": 852,
+			"viewport": "(360, 640)"
+		},
+		{
+			"min_plot_width_px": 56.6628723144531,
+			"plots": 9,
+			"unique_sample_colors": 936,
+			"viewport": "(390, 844)"
+		},
+		{
+			"min_plot_width_px": 56.6628723144531,
+			"plots": 12,
+			"unique_sample_colors": 951,
+			"viewport": "(390, 844)"
+		},
+		{
+			"min_plot_width_px": 54.994068145752,
+			"plots": 9,
+			"unique_sample_colors": 1233,
+			"viewport": "(1280, 720)"
+		},
+		{
+			"min_plot_width_px": 54.4272422790527,
+			"plots": 12,
+			"unique_sample_colors": 1248,
+			"viewport": "(1280, 720)"
+		}
+	]
+}

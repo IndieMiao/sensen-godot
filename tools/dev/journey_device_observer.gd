@@ -14,6 +14,8 @@ var feedback_key := ""
 var camera_samples: Array = []
 var camera_was_moving := false
 var gesture_events: Array = []
+var queue_events: Array = []
+var queue_key := ""
 
 func _ready() -> void:
 	launch_id = str(Time.get_unix_time_from_system())
@@ -52,9 +54,21 @@ func _publish() -> void:
 		"controls": controls, "touches": touches.duplicate(true), "motion": motion.duplicate(true), "state": Net.session.state,
 		"version": Net.session.version, "offline": Net.session.offline,
 		"fps": Engine.get_frames_per_second(), "native_map_plugin": Engine.has_singleton("GodotMap")}
-	if scene and scene.get("journey_map") != null:
-		snapshot.map_fallback = scene.journey_map.fallback
+	if scene and scene.scene_file_path == AppRouter.MAP:
+		snapshot.map_fallback = scene.map == null or scene._header_locked
 		snapshot.map_camera = _map_camera(scene)
+		if scene.get("farm_markers") != null:
+			var markers: FarmMarkers = scene.farm_markers
+			var character_scales := {}
+			var base_scale: float = maxf(scene._cam_distance() / scene.CHAR_DIST_PER_SCALE, 0.001)
+			for pawn in scene._pawns:
+				if pawn.node.visible:
+					character_scales[str(pawn.cohort).trim_prefix("farm:")] = pawn.node.scale.x / base_scale
+			snapshot.social = {"selected": markers.selected_id, "expanded": markers.expanded_ids.duplicate(),
+				"character_scales": character_scales, "plot_outline_visible": scene.farm_overlay and scene.farm_overlay.is_visible_in_tree(),
+				"visible_characters": markers.visible_farm_ids.duplicate(), "model_visible": markers.miniature.is_visible_in_tree(),
+				"model_type": markers.miniature.get_class(), "model_scale": _vector(markers.miniature.scale),
+				"model_position": _vector(markers.miniature.position)}
 	var place: JourneyPlace = scene if scene is JourneyPlace else (scene.get("journey_scene") as JourneyPlace if scene else null)
 	if place: snapshot.world = _world(place)
 	if scene is JourneyStreet:
@@ -64,13 +78,17 @@ func _publish() -> void:
 		snapshot.world = {"place": "farm", "controls": [], "moving": scene.mover.is_moving(),
 			"busy": scene.runner.is_busy() or scene._in_flight > 0, "camera_pan": _vector(scene.camera_pan.offset),
 			"camera": _vector(scene.cam.position), "zoom": scene.camera_pan.zoom, "player": _vector(scene.player.position)}
+		snapshot.world.queued = hints.queued.map(func(cell): return FarmBlueprint._cs(cell))
+		snapshot.world.animation = scene._rig.get_node("AnimationPlayer").current_animation
 		_ground_controls(scene.cam, scene.bp, Vector3.ZERO, scene._camera_play_area(), snapshot.world.controls, scene)
 		for id in hints._targets:
+			if not hints.cells.has(id): continue
 			var point: Vector2 = get_viewport().get_screen_transform() * (hints._targets[id] + hints.global_position)
 			snapshot.world.controls.append({"path": "plot:" + str(id), "text": "", "tooltip": "", "button": true,
-				"disabled": snapshot.world.busy, "rect": [point.x - 2, point.y - 2, 4, 4], "source": "rendered_plot_hint",
+				"disabled": false, "rect": [point.x - 2, point.y - 2, 4, 4], "source": "rendered_plot_hint",
 				"action": NextStep.step_for(hints.cells[id], hints.now_ms)})
 	snapshot.feedback_events = feedback_events.duplicate(true)
+	snapshot.queue_events = queue_events.duplicate(true)
 	snapshot.camera_samples = camera_samples.duplicate(true)
 	snapshot.gesture_events = gesture_events.duplicate(true)
 	snapshot.resident_motion = resident_motion.duplicate(true)
@@ -109,6 +127,8 @@ func _record_camera() -> void:
 
 func _map_camera(scene: Node) -> Dictionary:
 	return {"zoom": scene.zoom, "elastic": scene._zoom_elastic, "pitch": scene.pitch,
+		"region": str(scene.region.get("id", "")), "center": [scene.center_lat, scene.center_lng],
+		"home": [scene.home_lat, scene.home_lng], "anchor": [scene.anchor_lat, scene.anchor_lng],
 		"zoom_velocity": scene._zoom_vel, "velocity": _vector(scene._fling_vel), "pointers": scene._touch_count}
 
 func _record_feedback() -> void:
@@ -116,6 +136,13 @@ func _record_feedback() -> void:
 	if scene == null: return
 	var place := scene.get("journey_scene") as JourneyPlace
 	var hints: PlotHints = place.ground_feedback if place else scene.get("hints") as PlotHints
+	if hints and scene.get("runner") != null:
+		var queued: Array = hints.queued.map(func(cell): return FarmBlueprint._cs(cell))
+		var key := JSON.stringify(queued)
+		if key != queue_key:
+			queue_key = key
+			queue_events.append({"ticks_ms": Time.get_ticks_msec(), "queued": queued, "visible": hints.is_visible_in_tree()})
+			if queue_events.size() > 120: queue_events.pop_front()
 	if hints == null or not hints._destination_visible: return
 	var key := str(scene.get_instance_id()) + str(hints._destination) + str(hints._reachable)
 	if key == feedback_key: return
@@ -132,7 +159,7 @@ func _record_motion() -> void:
 	var mover := source.get("mover") as PlayerMover
 	if mover == null: return
 	var moving := mover.is_moving()
-	if moving or was_moving or (place and place.busy) or (source is JourneyStreet and source.busy):
+	if moving or was_moving or (place and place.busy) or (source is JourneyStreet and source.busy) or (source.get("runner") != null and source.runner.is_busy()):
 		var rig: Node = place.rig if place else source.get("_rig") as Node
 		var animation := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer if rig else null
 		motion.append({"ticks_ms": Time.get_ticks_msec(), "scene": str(scene.get_path()),

@@ -15,17 +15,26 @@ func test_packaged_streets_connect_four_distinct_entrances_and_cache_choices() -
 		for pair in streets.caches.values():
 			for point in pair: assert_array(streets.grid.point_path(streets.entrances.farm, point)).is_not_empty()
 
-func test_restored_shortcut_changes_walkable_connections_without_relocating_places() -> void:
+func test_restored_shortcut_changes_road_art_without_restricting_free_ground() -> void:
 	var source := FarmBlueprint.load_file(FarmBlueprint.asset_path("sh_b", 2))
 	var before := JourneyStreets.new(source)
 	var after := JourneyStreets.new(source, true)
 	assert_that(after.entrances).is_equal(before.entrances)
 	assert_that(after.caches).is_equal(before.caches)
 	assert_int(after.roads.size()).is_equal(before.roads.size() + 1)
-	assert_that(after.nav.masks).is_not_equal(before.nav.masks)
+	assert_that(after.nav.masks).is_equal(before.nav.masks)
 	var old_path := before.grid.path(before.nav.world_to_cell(before.entrances.nursery), before.nav.world_to_cell(before.entrances.courtyard))
 	var new_path := after.grid.path(after.nav.world_to_cell(after.entrances.nursery), after.nav.world_to_cell(after.entrances.courtyard))
-	assert_int(new_path.size()).is_less(old_path.size())
+	assert_int(new_path.size()).is_equal(old_path.size())
+	var off_road := 0
+	for z in before.nav.grid.y:
+		for x in before.nav.grid.x:
+			var cell := Vector2i(x, z)
+			if before.nav.is_walkable(cell) and before.road_distance(before.nav.cell_to_world(cell)) > 3:
+				off_road += 1
+	assert_int(off_road).is_greater(1000)
+	for building in before.buildings.values():
+		assert_bool(before.nav.is_walkable(before.nav.world_to_cell(building))).is_false()
 
 func test_street_and_place_supply_represent_the_same_receipt() -> void:
 	var state := {"journey": {"version": 1, "facts": ["workbench", "side_path"], "unlocks": ["bistro"],

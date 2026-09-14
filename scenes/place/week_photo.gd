@@ -32,7 +32,7 @@ func _ready() -> void:
 		add_child(rig)
 		if bool(farm_state.get("week_summary", {}).get("life_priority", false)):
 			var label := Label3D.new()
-			label.text = "You" if index == 0 else str(ResidentCast.definition(ResidentCast.ORDER[index - 1]).short_name)
+			label.text = L10n.text("You") if index == 0 else L10n.text(str(ResidentCast.definition(ResidentCast.ORDER[index - 1]).short_name))
 			label.position = rig.position + Vector3(0, 2.3, 0)
 			label.font_size = 30
 			label.pixel_size = 0.008
@@ -58,11 +58,11 @@ func _ready() -> void:
 	safe.add_child(column)
 	var header := HBoxContainer.new()
 	column.add_child(header)
-	var close := GameUi.button("arrow-left", "", "Back to nursery")
+	var close := GameUi.button("arrow-left", "", L10n.text("Back to nursery"))
 	close.pressed.connect(func():
 		if not _saving: closed.emit())
 	header.add_child(close)
-	header.add_child(GameUi.label("Our first week", 18))
+	header.add_child(GameUi.label(L10n.text("Our first week"), 18))
 	var spacer := Control.new()
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -70,7 +70,7 @@ func _ready() -> void:
 	_status = GameUi.label("", 13)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(_status)
-	var capture := GameUi.button("camera", "Save photo", "Save our group photo", true)
+	var capture := GameUi.button("camera", L10n.text("Save photo"), L10n.text("Save our group photo"), true)
 	capture.name = "SavePhoto"
 	capture.pressed.connect(capture_photo)
 	column.add_child(capture)
@@ -78,7 +78,7 @@ func _ready() -> void:
 func capture_photo() -> void:
 	if _saving: return
 	if _ready_count < 4:
-		_status.text = "Getting everyone ready..."
+		_status.text = L10n.text("Getting everyone ready...")
 		return
 	_saving = true
 	canvas.hide()
@@ -92,7 +92,7 @@ func capture_photo() -> void:
 	var result := picture.save_png(target)
 	canvas.show()
 	_saving = false
-	_status.text = "Photo saved" if result == OK else "Could not save photo. Try again."
+	_status.text = L10n.text("Photo saved") if result == OK else L10n.text("Could not save photo. Try again.")
 	if result == OK: saved.emit(ProjectSettings.globalize_path(target))
 
 func consume_back() -> bool:

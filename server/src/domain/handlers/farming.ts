@@ -7,6 +7,7 @@
 import { checkCellIds } from '../commands.js';
 import type { Command } from '../commands.js';
 import { canUse } from '../journey.js';
+import { advanceFieldGrowth, fieldCellUnlocked } from '../field_growth.js';
 import type { CropId } from '../content.js';
 import { err, ok, type DomainEvent, type Result } from '../errors.js';
 import type { Ctx } from '../reducer.js';
@@ -15,7 +16,8 @@ import type { CellSlot, FarmState } from '../state.js';
 /** 第四畦要买下才能动（PRD §6.1）；mask 表达「这格能不能是田」，解锁与否看 beds_unlocked。 */
 function unlocked(s: FarmState, ctx: Ctx, id: string): boolean {
   if (!ctx.blueprint.cultivable.has(id)) return false;
-  return !ctx.blueprint.reserved.has(id) || s.beds_unlocked === 4;
+  if (ctx.blueprint.reserved.has(id)) return s.beds_unlocked === 4;
+  return fieldCellUnlocked(s, id);
 }
 
 function gateCells(s: FarmState, ctx: Ctx, ids: string[]): Result<string[]> {
@@ -23,7 +25,7 @@ function gateCells(s: FarmState, ctx: Ctx, ids: string[]): Result<string[]> {
   if (bad) return err('DUPLICATE_CELL', bad);
   for (const id of ids) {
     if (!ctx.blueprint.cultivable.has(id)) return err('CELL_NOT_CULTIVABLE', id);
-    if (!unlocked(s, ctx, id)) return err('CELL_LOCKED', `${id} 属预留畦，尚未扩地`);
+    if (!unlocked(s, ctx, id)) return err('CELL_LOCKED', `${id} 尚未解锁`);
   }
   return ok(ids);
 }
@@ -100,6 +102,7 @@ export function applyFarming(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
         };
       }
       lot[cmd.lot] -= need;
+      advanceFieldGrowth(next, 'planted', need, c);
       return ok(next, [{ type: 'sown', crop: cmd.crop, count: need, tutorial }]);
     }
 
@@ -171,6 +174,7 @@ export function applyFarming(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
           ready_at: null, careful: false, tutorial: false,
         };
       }
+      advanceFieldGrowth(next, 'harvested', cmd.cell_ids.length, c);
       return ok(next, events);
     }
 

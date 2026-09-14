@@ -3,6 +3,17 @@ extends GdUnitTestSuite
 
 const PROBE := "res://tests/fixtures/scenes/stack_probe.tscn"
 
+func test_loading_navigation_blocks_duplicate_requests_and_back_until_ready() -> void:
+	AppRouter.open_instance(PROBE, {"loading": true})
+	assert_bool(AppRouter._navigation_pending).is_true()
+	assert_bool(AppRouter._loading.visible).is_true()
+	AppRouter.open_instance(PROBE)
+	AppRouter.handle_back()
+	while AppRouter._navigation_pending: await get_tree().process_frame
+	assert_int(AppRouter.instance_depth()).is_equal(1)
+	assert_that(AppRouter.top_instance().args).is_equal({"loading": true})
+	assert_that(AppRouter._loading).is_null()
+
 func after_test() -> void:
 	while AppRouter.instance_depth() > 0:
 		AppRouter.pop_instance()

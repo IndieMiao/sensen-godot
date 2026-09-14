@@ -22,7 +22,7 @@ func _ready() -> void:
 	add_child(col)
 	var head := HBoxContainer.new()
 	col.add_child(head)
-	var journey := GameUi.button("compass", "Explore the neighbourhood", "Begin your neighbourhood journey", true)
+	var journey := GameUi.button("compass", L10n.text("Explore the neighbourhood"), L10n.text("Begin your neighbourhood journey"), true)
 	_journey_button = journey
 	journey.pressed.connect(func():
 		if is_busy(): return
@@ -34,20 +34,20 @@ func _ready() -> void:
 		if accepted: closed.emit()
 		else: journey.text = SessionPanel.error_text(session.last_error_code))
 	col.add_child(journey)
-	var title := GameUi.label("Harvest & home", 18)
+	var title := GameUi.label(L10n.text("Harvest & home"), 18)
 	_title = title
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(title)
-	var close := GameUi.button("x", "", "Close")
+	var close := GameUi.button("x", "", L10n.text("Close"))
 	close.pressed.connect(func():
 		if not is_busy(): closed.emit())
 	head.add_child(close)
 	var tabs := HBoxContainer.new()
 	_tabs_row = tabs
 	col.add_child(tabs)
-	for spec in [["supplies", "shopping-bag", "Supplies"], ["choices", "heart", "Harvest uses"],
-		["project", "shopping-basket", "Project basket"], ["growth", "shovel", "Growth"],
-		["journal", "book-open", "Handbook"]]:
+	for spec in [["supplies", "shopping-bag", L10n.text("Supplies")], ["choices", "heart", L10n.text("Harvest uses")],
+		["project", "shopping-basket", L10n.text("Project basket")], ["growth", "shovel", L10n.text("Growth")],
+		["journal", "book-open", L10n.text("Handbook")]]:
 		var button := GameUi.button(spec[1], "", spec[2])
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.pressed.connect(func(): select_section(spec[0]))
@@ -65,7 +65,7 @@ func select_section(value: String) -> void:
 	section = "supplies" if journey else value
 	_journey_button.visible = not journey
 	_tabs_row.visible = not journey
-	_title.text = "Your bag" if journey else "Harvest & home"
+	_title.text = L10n.text("Your bag") if journey else L10n.text("Harvest & home")
 	if active:
 		_scroll.remove_child(active)
 		active.queue_free()

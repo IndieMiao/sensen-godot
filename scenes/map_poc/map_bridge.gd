@@ -18,6 +18,9 @@ func set_camera(_lat: float, _lng: float, _zoom: float, _bearing: float, _pitch:
 func set_map_visible(_visible: bool) -> void:
 	pass
 
+func set_language(_locale: String) -> void:
+	pass
+
 func get_pixel_ratio() -> float:
 	return 1.0
 

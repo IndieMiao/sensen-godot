@@ -1,0 +1,94 @@
+{
+  "farm_id": "16b0ecfe-3598-50bc-af1e-4b4c4f417050",
+  "avatar_ref": "demo_la_09",
+  "layout_patch_id": "la_b",
+  "blueprint_revision": 2,
+  "snapshot_revision": 1,
+  "snapshot_taken_at": 1788508800000,
+  "beds_unlocked": 3,
+  "cells": [
+    {
+      "cell_id": "37,28",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "38,28",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "39,28",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "36,31",
+      "state": "growing",
+      "crop": "L",
+      "ripe": false
+    },
+    {
+      "cell_id": "37,31",
+      "state": "growing",
+      "crop": "L",
+      "ripe": false
+    },
+    {
+      "cell_id": "38,31",
+      "state": "growing",
+      "crop": "L",
+      "ripe": false
+    },
+    {
+      "cell_id": "37,33",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "38,33",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "39,33",
+      "state": "growing",
+      "crop": "R",
+      "ripe": true
+    },
+    {
+      "cell_id": "37,35",
+      "state": "wild",
+      "crop": null,
+      "ripe": false
+    },
+    {
+      "cell_id": "38,35",
+      "state": "wild",
+      "crop": null,
+      "ripe": false
+    },
+    {
+      "cell_id": "39,35",
+      "state": "wild",
+      "crop": null,
+      "ripe": false
+    }
+  ],
+  "nursery": {
+    "stage": "cleared",
+    "appearance": null
+  },
+  "props": [],
+  "weather_snapshot": "sunny",
+  "region_id": "los_angeles",
+  "location": {
+    "lat": 33.98345,
+    "lng": -118.4679
+  }
+}

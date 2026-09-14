@@ -58,6 +58,8 @@ func boot() -> bool:
 		await session.refresh()
 	booting = false
 	booted_once = true
+	if OS.is_debug_build():
+		print("Farm connection: logged_in=", ok, " has_farm=", session.has_farm(), " result=", session.last_error_code)
 	emit_signal("booted", ok)
 	return ok
 

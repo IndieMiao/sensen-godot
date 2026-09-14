@@ -36,6 +36,7 @@ func test_boot_with_no_farm_yet_is_still_logged_in() -> void:
 	assert_bool(await n.boot()).is_true()
 	assert_bool(n.logged_in()).is_true()
 	assert_bool(n.session.has_farm()).is_false()
+	assert_str(n.session.last_error_code).is_equal("NO_FARM")
 
 func test_boot_failure_does_not_crash_and_reports_false() -> void:
 	var pair := _net([{"error": "down"}])
@@ -63,9 +64,10 @@ func test_nearby_and_snapshot_wrap_status() -> void:
 	assert_str(str(hit.snapshot.farm_id)).is_equal("a")
 
 func test_base_url_override_file() -> void:
+	var configured_base := Net.base_url()
 	var f := FileAccess.open(Net.SERVER_OVERRIDE, FileAccess.WRITE)
 	f.store_string("http://192.168.124.53:3000/v1/\n")
 	f.close()
 	assert_str(Net.base_url()).is_equal("http://192.168.124.53:3000/v1")
 	DirAccess.remove_absolute(Net.SERVER_OVERRIDE)
-	assert_str(Net.base_url()).is_equal(Net.DEFAULT_BASE)
+	assert_str(Net.base_url()).is_equal(configured_base)

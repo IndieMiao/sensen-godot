@@ -25,6 +25,7 @@ var _pending: Array = []
 var _cultivable: Dictionary = {}   ## cell_id → true
 var _reserved: Dictionary = {}
 var beds_unlocked := 3
+var locked_cells: Dictionary = {}
 
 func _init(p_cells: Dictionary = {}, p_cultivable: Array = [], p_reserved: Array = []) -> void:
 	cells = p_cells.duplicate(true)
@@ -46,7 +47,7 @@ static func from_blueprint(bp: FarmBlueprint, p_cells: Dictionary = {}) -> CellP
 
 ## 这格现在能不能动：可耕作且（非预留畦或已扩地）。
 func is_unlocked(id: String) -> bool:
-	return _cultivable.has(id) and (not _reserved.has(id) or beds_unlocked == 4)
+	return _cultivable.has(id) and not locked_cells.has(id) and (not _reserved.has(id) or beds_unlocked == 4)
 
 ## 渲染用的视图：权威副本叠上未确认的预测。
 func view() -> Dictionary:
@@ -141,7 +142,7 @@ func _gate(ids: Array) -> String:
 		seen[id] = true
 		if not _cultivable.has(id):
 			return "CELL_NOT_CULTIVABLE"
-		if _reserved.has(id) and beds_unlocked != 4:
+		if not is_unlocked(id):
 			return "CELL_LOCKED"
 		if not cells.has(id) and not _overlay.has(id):
 			return "UNKNOWN_CELL"

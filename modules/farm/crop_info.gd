@@ -15,7 +15,7 @@ static func _load() -> Dictionary:
 	return _table
 
 static func name_of(crop: String) -> String:
-	return str(NAMES.get(crop, crop))
+	return L10n.text(str(NAMES.get(crop, crop)))
 
 static func unit_price(crop: String, state: Dictionary = {}) -> int:
 	if JourneyProgress.active(state): return int(JourneyProgress.data().crops.get(crop, {}).get("unit_price", 0))

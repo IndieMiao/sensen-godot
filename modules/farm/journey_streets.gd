@@ -72,7 +72,7 @@ func _init(blueprint: FarmBlueprint, opened := false) -> void:
 		venue.guests = [venue.position + basis * Vector3(-1.85, 0, 0), venue.position + basis * Vector3(1.85, 0, 0), venue.position + basis * Vector3(0, 0, -1.85)]
 		gatherings[theme] = venue
 	if opened: roads.append(shortcut)
-	_rasterize()
+	_rasterize(true)
 	nav.anchors = {"spawn": nav.world_to_cell(entrances.farm)}
 	grid = BlueprintGrid.new(nav)
 	var center: Vector2 = source.overlay.get("center", Vector2.ZERO)
@@ -83,19 +83,22 @@ func _init(blueprint: FarmBlueprint, opened := false) -> void:
 			radius = maxf(radius, maxf(absf(world.x), absf(world.z)))
 	if radius > 0: map_scale = radius / (32 * SCALE)
 
-func _rasterize() -> void:
+func _rasterize(free_ground := false) -> void:
 	nav.masks = {"walkable": []}
 	for z in nav.grid.y:
 		var row := ""
 		for x in nav.grid.x:
 			var point := nav.cell_to_world(Vector2i(x, z))
-			var walk := road_distance(point) <= WIDTH
+			var walk := free_ground or road_distance(point) <= WIDTH
 			for pair in all_caches():
 				for cache in pair:
 					if point.distance_to(cache) < 0.95: walk = true
 			for venue in gatherings.values():
 				if point.distance_to(venue.position) <= 3.25: walk = true
 				if point.distance_to(venue.position) < 1.15: walk = false
+			if free_ground:
+				for building in buildings.values():
+					if point.distance_to(building) < 1.65: walk = false
 			row += "1" if walk else "0"
 		nav.masks.walkable.append(row)
 

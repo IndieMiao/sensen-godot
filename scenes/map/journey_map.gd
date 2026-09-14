@@ -123,7 +123,7 @@ func sync(camera: Camera3D, origin: Vector3, area: Rect2, farm_state: Dictionary
 		labels[id].modulate.a = 0.5 if b.disabled else 0.9
 		labels[id].add_theme_color_override("font_color", GameUi.GREEN if tracked.get("place") == id else GameUi.INK)
 		status_labels[id].text = str(tracked.hint) if tracked.get("place") == id else (farm_hint if id == "farm" else JourneyProgress.place_hint(state, str(id)))
-		b.tooltip_text = labels[id].text + ": " + (status_labels[id].text if not status_labels[id].text.is_empty() else "Growing & harvesting")
+		b.tooltip_text = L10n.format_text("%s: %s", [labels[id].text, status_labels[id].text if not status_labels[id].text.is_empty() else "Growing & harvesting"])
 	for button in _walk_buttons.values(): button.hide()
 	for button in _gathering_buttons.values(): button.hide()
 	if streets and JourneyGatherings.available(state):
@@ -171,7 +171,7 @@ func sync(camera: Camera3D, origin: Vector3, area: Rect2, farm_state: Dictionary
 			var center: Vector3 = (streets.walk_caches[id][0] + streets.walk_caches[id][1]) * 0.5
 			var point := _project_street(center, camera, origin)
 			button.position = point - Vector2(22, 22)
-			button.tooltip_text = str(JourneyStreets.WALK_STOPS[id]) + ": " + JourneyProgress.material_label(JourneyProgress.node_materials(state, node))
+			button.tooltip_text = L10n.format_text("%s: %s", [JourneyStreets.WALK_STOPS[id], JourneyProgress.material_label(JourneyProgress.node_materials(state, node))])
 			button.visible = area.encloses(button.get_rect()) and (fallback or not camera.is_position_behind(origin + (center - streets.entrances.farm) * streets.map_scale))
 			button.disabled = false
 	queue_redraw()

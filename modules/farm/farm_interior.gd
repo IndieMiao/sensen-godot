@@ -3,6 +3,8 @@ extends RefCounted
 ## The private farm presents the same server cells in an ergonomic three-row garden.
 ## IDs are translated only at the session boundary; saved blueprints stay authoritative.
 
+const SCENERY_TREE_CELLS := [Vector2i(1, 13), Vector2i(13, 13), Vector2i(0, 6), Vector2i(14, 7), Vector2i(5, 17), Vector2i(11, 18)]
+
 var blueprint: FarmBlueprint
 var _to_source := {}
 var _to_local := {}
@@ -17,8 +19,8 @@ func _init(source: FarmBlueprint) -> void:
 	blueprint.play_area_m = 13.0
 	blueprint.play_area_mm = 13000
 	blueprint.overlay = source.overlay.duplicate(true)
-	blueprint.anchors = {"spawn": Vector2i(3, 7), "house": Vector2i(6, 12),
-		"storage": Vector2i(10, 13), "well": Vector2i(10, 8), "exit": Vector2i(3, 1), "beds": []}
+	blueprint.anchors = {"spawn": Vector2i(6, 1), "house": Vector2i(7, 11),
+		"storage": Vector2i(10, 11), "well": Vector2i(10, 6), "exit": Vector2i(3, 1), "beds": []}
 	var all_beds := source.beds().duplicate()
 	all_beds.append(source.reserved_bed())
 	for row in all_beds.size():
@@ -38,7 +40,12 @@ func _init(source: FarmBlueprint) -> void:
 		var walkable := ""
 		for x in blueprint.grid.x:
 			cultivable += "1" if _to_source.has(_id(Vector2i(x, y))) else "0"
-			var obstacle := _to_source.has(_id(Vector2i(x, y))) or (x >= 5 and x <= 7 and y >= 11 and y <= 13) or (x == 10 and y in [8, 13])
+			var obstacle := _to_source.has(_id(Vector2i(x, y))) \
+				or (x >= 6 and x <= 9 and y >= 10 and y <= 12) \
+				or (x == 10 and y in [6, 11]) \
+				or (y == 14 and x >= 2 and x <= 11) or (x == 2 and y >= 10 and y <= 13) \
+				or (x == 3 and y == 11) \
+				or Vector2i(x, y) in SCENERY_TREE_CELLS
 			walkable += "0" if obstacle else "1"
 		blueprint.masks.visual.append("1".repeat(blueprint.grid.x))
 		blueprint.masks.walkable.append(walkable)

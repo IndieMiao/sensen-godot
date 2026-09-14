@@ -15,7 +15,8 @@ func after_test() -> void:
 
 func _snapshot() -> Dictionary:
 	# 随包的繁茂样例：9 格 growing，6 格 ripe（萝卜），生菜没熟
-	return PresetSnapshots.snapshot(PresetSnapshots.entries("shanghai")[0].farm_id)
+	var sample: Dictionary = PresetSnapshots.entries("shanghai").filter(func(entry): return entry.avatar_ref == "preset_a")[0]
+	return PresetSnapshots.snapshot(sample.farm_id)
 
 func _visitor(snap: Dictionary = {}) -> Node:
 	if snap.is_empty(): snap = _snapshot()
@@ -89,6 +90,7 @@ func test_expanded_snapshot_shows_reserved_beds_even_before_clearing() -> void:
 
 func _worked_reserved_snapshot() -> Dictionary:
 	var snap := _snapshot()
+	snap.erase("beds_unlocked")
 	var source := FarmBlueprint.load_file(FarmBlueprint.asset_path(str(snap.layout_patch_id), int(snap.blueprint_revision)))
 	var reserved: Vector2i = source.reserved_bed().cells[0]
 	for cell in snap.cells:

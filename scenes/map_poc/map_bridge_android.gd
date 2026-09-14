@@ -51,6 +51,10 @@ func get_pixel_ratio() -> float:
 		return 1.0
 	return maxf(float(_plugin.getPixelRatio()), 0.5)
 
+func set_language(locale: String) -> void:
+	if is_instance_valid(_plugin) and _plugin.has_method("setLanguage"):
+		_plugin.setLanguage(locale)
+
 func camera_info() -> String:
 	if not is_instance_valid(_plugin):
 		return ""

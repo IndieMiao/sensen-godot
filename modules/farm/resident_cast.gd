@@ -32,9 +32,9 @@ static func present(place_id: String, farm_state: Dictionary) -> Array:
 
 static func relationship_stage(resident: Dictionary) -> String:
 	var points := int(resident.get("points", 0))
-	if points >= 45 and bool(resident.get("shared_event_done", false)): return "Familiar"
-	if points >= 15 and resident.get("first_met_day") != null: return "Acquainted"
-	return "First meeting"
+	if points >= 45 and bool(resident.get("shared_event_done", false)): return L10n.text("Familiar")
+	if points >= 15 and resident.get("first_met_day") != null: return L10n.text("Acquainted")
+	return L10n.text("First meeting")
 
 static func dialogue(id: String, farm_state: Dictionary) -> Array:
 	var resident := definition(id)
@@ -43,7 +43,7 @@ static func dialogue(id: String, farm_state: Dictionary) -> Array:
 		var memories: Dictionary = farm_state.get("residents", {}).get(id, {}).get("choice_memories", {})
 		var memory := str(memories.get("2", memories.get(2, "")))
 		if not memory.is_empty(): return resident.get("choice_replies", {}).get(memory, []).duplicate()
-	return resident.get("dialogues", {}).get(str(chapter), ["It is good to see you again."]).duplicate()
+	return resident.get("dialogues", {}).get(str(chapter), [L10n.text("It is good to see you again.")]).duplicate()
 
 static func outfit(id: String) -> AvatarConfig:
 	var config: AvatarConfig = (load("res://modules/avatar/data/slot_table.tres") as AvatarSlotTable).default_config()
@@ -58,19 +58,19 @@ static func activities(place_id: String, state: Dictionary) -> Array:
 	var out := []
 	if place_id == "nursery" and JourneyProgress.project_complete(state, "seedbeds"):
 		out.append({"resident": "nursery_keeper", "point": Vector3(-3.7, 0.04, 0.35), "facing": Vector3(-2.5, 0.6, -0.25),
-			"animation": "labour_water", "seconds": 4.0, "label": "Tending seedlings"})
+			"animation": "labour_water", "seconds": 4.0, "label": L10n.text("Tending seedlings")})
 	if place_id == "bistro" and JourneyProgress.fact(state, "met_bistro"):
 		out.append({"resident": "bistro_owner", "point": Vector3(-1.1, 0.04, 0.45), "facing": Vector3(-1.1, 0.9, -0.7),
-			"animation": "labour_sow", "seconds": 4.0, "label": "Preparing the counter"})
+			"animation": "labour_sow", "seconds": 4.0, "label": L10n.text("Preparing the counter")})
 		if JourneyProgress.project_complete(state, "terrace"):
 			out.append({"resident": "nursery_keeper", "point": Vector3(3.55, 0.04, -0.65), "facing": Vector3(2, 0.96, -1.65),
-				"animation": "idle", "seconds": 5.0, "label": "At the tea terrace"})
+				"animation": "idle", "seconds": 5.0, "label": L10n.text("At the tea terrace")})
 	if place_id == "courtyard" and JourneyProgress.fact(state, "planter_planted"):
 		var planters := DecorationLayout.saved(state).filter(func(prop): return prop.prop_id == "planter")
 		if not planters.is_empty():
 			var planter := DecorationLayout.world_position(planters[0])
 			out.append({"resident": "restorer", "point": planter + Vector3(0.8, 0.04, 0.65), "facing": planter,
-				"animation": "labour_water", "seconds": 4.0, "label": "Tending the flowers"})
+				"animation": "labour_water", "seconds": 4.0, "label": L10n.text("Tending the flowers")})
 	return out
 
 static func build(place_id: String, farm_state: Dictionary) -> Node3D:

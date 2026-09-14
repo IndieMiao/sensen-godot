@@ -49,7 +49,7 @@ for (const spec of PRESET_SPECS) {
   const sets = bpCache.get(`${spec.layout}@${spec.revision}`);
   const tz = regions.regions.find(r => r.id === spec.region)?.timezone;
   if (!sets || !tz) { console.warn(`预置农场 ${spec.layout} 缺蓝图或地区，跳过`); continue; }
-  await store.ensureSystemFarm(presetHmac(spec.layout), buildPresetFarm(spec, sets, content, tz, Date.now()));
+  await store.ensureSystemFarm(presetHmac(spec.id ?? spec.layout), buildPresetFarm(spec, sets, content, tz, Date.now()));
 }
 
 const app = await buildApp({
