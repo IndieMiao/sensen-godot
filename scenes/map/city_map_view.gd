@@ -21,8 +21,8 @@ const DINING_QUOTA := 4
 const DINING_ARTS := ["restaurant", "chinese_restaurant", "cafe", "bakery"]
 ## Design: the soft shadow is a flat screen-space ellipse hugging the artwork's
 ## VISUAL bottom edge (per-art footprint), bleeding slightly past the base.
-const SHADOW_WIDTH_MULT := 1.15
-const SHADOW_FLATTEN := 0.30
+const SHADOW_WIDTH_MULT := 1.1
+const SHADOW_FLATTEN := 0.34
 var host: Node
 var filter := "all"
 var selected: Dictionary = {}
@@ -70,7 +70,7 @@ static func ground_shadow_texture() -> GradientTexture2D:
 	if _shadow_texture: return _shadow_texture
 	var gradient := Gradient.new()
 	gradient.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
-	gradient.colors = PackedColorArray([Color(0.13, 0.17, 0.13, 0.30), Color(0.13, 0.17, 0.13, 0.13), Color(0.13, 0.17, 0.13, 0.0)])
+	gradient.colors = PackedColorArray([Color(0.13, 0.17, 0.13, 0.34), Color(0.13, 0.17, 0.13, 0.15), Color(0.13, 0.17, 0.13, 0.0)])
 	_shadow_texture = GradientTexture2D.new()
 	_shadow_texture.gradient = gradient
 	_shadow_texture.fill = GradientTexture2D.FILL_RADIAL
@@ -410,7 +410,7 @@ func select(entry: Dictionary) -> void:
 	if not selected.is_empty() and str(selected.get("id", "")) != str(entry.get("id", "")):
 		_animate_focus(str(selected.get("id", "")), 1.0, 0.14)
 	selected = entry
-	_animate_focus(str(entry.get("id", "")), 1.15, 0.28)
+	_animate_focus(str(entry.get("id", "")), 1.3, 0.28)
 	info_title.text = _name(entry)
 	info_category.text = L10n.text(str(entry.get("category", "Place"))) + " · " + L10n.text(str(host.region.get("name", "Los Angeles")))
 	info_address.text = str(entry.get("address", ""))

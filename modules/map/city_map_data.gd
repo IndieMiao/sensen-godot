@@ -70,22 +70,23 @@ static func normalize(raw: Variant) -> Array:
 		if result.size() >= 100: break
 	return result
 
-## 视觉足迹：贴图中实体像素（alpha>0.5、行密度>=3%）的底边/底座范围，
-## 由 tools/art/gen_poi_footprints.gd 离线烘焙；地图阴影据此贴住可视底座。
+## 视觉足迹：bottom = 实体像素（alpha>0.5、行密度>=3%）的可视底边；
+## cx/width = 整张贴图实体像素的外接范围（阴影撑起素材的视觉体量）。
+## 由 tools/art/gen_poi_footprints.gd 离线烘焙。
 const ART_FOOTPRINTS := {
-	"bakery": {"cx": -0.014, "bottom": 0.938, "width": 0.645},
-	"beach": {"cx": -0.014, "bottom": 0.938, "width": 0.574},
-	"cafe": {"cx": -0.021, "bottom": 0.934, "width": 0.551},
-	"chinese_restaurant": {"cx": 0.014, "bottom": 0.938, "width": 0.668},
-	"flower_shop": {"cx": 0.018, "bottom": 0.938, "width": 0.684},
-	"griffith_observatory": {"cx": -0.002, "bottom": 0.938, "width": 0.855},
-	"hollywood_sign": {"cx": 0.066, "bottom": 0.953, "width": 0.766},
-	"museum": {"cx": -0.006, "bottom": 0.938, "width": 0.605},
-	"park": {"cx": 0.053, "bottom": 0.934, "width": 0.684},
-	"restaurant": {"cx": 0.021, "bottom": 0.938, "width": 0.699},
-	"santa_monica_pier": {"cx": 0.254, "bottom": 0.949, "width": 0.391},
-	"shop": {"cx": 0.010, "bottom": 0.938, "width": 0.637},
-	"theme_park": {"cx": 0.016, "bottom": 0.938, "width": 0.742},
+	"bakery": {"cx": -0.002, "bottom": 0.938, "width": 0.871},
+	"beach": {"cx": -0.002, "bottom": 0.938, "width": 0.902},
+	"cafe": {"cx": -0.002, "bottom": 0.934, "width": 0.762},
+	"chinese_restaurant": {"cx": 0.000, "bottom": 0.938, "width": 0.852},
+	"flower_shop": {"cx": -0.002, "bottom": 0.938, "width": 0.871},
+	"griffith_observatory": {"cx": -0.002, "bottom": 0.938, "width": 0.871},
+	"hollywood_sign": {"cx": -0.002, "bottom": 0.953, "width": 0.902},
+	"museum": {"cx": -0.002, "bottom": 0.938, "width": 0.871},
+	"park": {"cx": -0.002, "bottom": 0.934, "width": 0.871},
+	"restaurant": {"cx": -0.002, "bottom": 0.938, "width": 0.871},
+	"santa_monica_pier": {"cx": -0.002, "bottom": 0.949, "width": 0.902},
+	"shop": {"cx": -0.002, "bottom": 0.938, "width": 0.871},
+	"theme_park": {"cx": -0.002, "bottom": 0.938, "width": 0.902},
 }
 
 static func art_footprint(key: String) -> Dictionary:

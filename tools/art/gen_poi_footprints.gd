@@ -25,9 +25,11 @@ func _init() -> void:
 			if count >= min_density: bottom_y = y
 			y -= 2
 		if bottom_y < 0: continue
+		# 宽度/中心取整张贴图实体像素的外接范围：阴影要撑起素材的视觉体量，
+		# 只按底部条带量会把斜向素材（码头）的阴影缩成一小角。
 		var min_x := w
 		var max_x := 0
-		for by in range(maxi(0, bottom_y - int(h * 0.1)), bottom_y + 1, 2):
+		for by in range(0, h, 2):
 			for x in range(0, w, 2):
 				if image.get_pixel(x, by).a > 0.5:
 					min_x = mini(min_x, x)
