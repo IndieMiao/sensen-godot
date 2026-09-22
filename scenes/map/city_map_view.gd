@@ -392,7 +392,7 @@ func select(entry: Dictionary) -> void:
 	if not selected.is_empty() and str(selected.get("id", "")) != str(entry.get("id", "")):
 		_animate_focus(str(selected.get("id", "")), 1.0, 0.14)
 	selected = entry
-	_animate_focus(str(entry.get("id", "")), 1.3, 0.28)
+	_animate_focus(str(entry.get("id", "")), 1.8, 0.28)
 	info_title.text = _name(entry)
 	info_category.text = L10n.text(str(entry.get("category", "Place"))) + " · " + L10n.text(str(host.region.get("name", "Los Angeles")))
 	info_address.text = str(entry.get("address", ""))
