@@ -1,6 +1,17 @@
 class_name PlotHints
 extends Control
-## Screen-sized symbols track the world without filling the field with labels.
+## 触屏必需的世界反馈：去哪、走不走得到、正在做哪一格。
+##
+## **逐格动作图标已随自由格子种田退役**（SGODOT-128）。过去每块田头顶浮一个白底圆加
+## Lucide 小图标，12 格时是提示，几百格时是一屏糊住画面的白点；而且它的 22px 命中热区
+## 在 `_tap_scene` 里优先级高于射线，0.5m 格上会让精确选格变成不可能。
+##
+## 地块状态改由地面表达：未开垦草地 → 已开垦深棕垄土 → 浇过水的深色湿土 → 作物四阶段，
+## 见 `modules/farm/plot_surface.gd` 与 `shaders/plot_ground.gdshader`。
+## 这里只留三样东西——没有它们玩家无法判断自己那一下被识别成了什么：
+##   1. 移动目标圈与路径点（触屏没有指针，不画就不知道点中了走路还是干活）
+##   2. 不可达的红色 ×
+##   3. 当前作业格的进度弧
 
 signal plot_pressed(cell: Vector2i)
 
@@ -14,7 +25,6 @@ var queued: Array = []
 var progress := 0.0
 var world_rect := Rect2()
 var path_origin := Vector3.ZERO
-var _targets := {}
 var _icons := {}
 var _destination := Vector3.ZERO
 var _destination_visible := false
@@ -22,23 +32,17 @@ var _reachable := true
 var _age := 0.0
 var _arrival := -1.0
 var _path: Array[Vector3] = []
-var _cell_visuals: Array = []
 var _last_visuals: Array = []
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for key in ["scissors", "shovel", "sprout", "wind", "cloud-rain", "droplet", "wheat", "x"]:
-		_icons[key] = GameUi.icon(key)
+	_icons["x"] = GameUi.icon("x")
 
 func sync(view: Dictionary, now: int, condition: String) -> void:
 	cells = view
 	now_ms = now
 	weather = condition
-	_cell_visuals = []
-	for id in cells:
-		var slot: Dictionary = cells[id]
-		_cell_visuals.append([id, NextStep.step_for(slot, now_ms), str(slot.get("care_weather", weather))])
 
 func destination(world: Vector3, reachable: bool, path: Array[Vector3]) -> void:
 	_destination = world
@@ -55,26 +59,18 @@ func update_motion(moving: bool, path: Array[Vector3], dt: float) -> void:
 	if (_arrival >= 0 and _age - _arrival > 0.6) or (not _reachable and _age > 0.8):
 		_destination_visible = false
 	if cam == null: return
-	# Retain static canvas geometry; rebuilding the hint arcs each frame allocates GPU buffers.
-	var visuals := [cam.get_camera_transform(), cam.get_camera_projection(), get_global_transform(),
-		world_rect, bp, _cell_visuals, active, queued.duplicate(), progress, _destination_visible, path_origin]
+	# 静止时不重绘：每帧重建画布几何会持续分配 GPU 缓冲。
+	var visuals := [cam.global_position.round(), cam.size, world_rect,
+		active, progress, _destination_visible, path_origin]
 	if _destination_visible: visuals.append_array([_destination, _reachable, _path, _age])
 	if visuals != _last_visuals:
 		_last_visuals = visuals
 		queue_redraw()
 
-func pick(point: Vector2):
-	var local := point - global_position
-	for id in _targets:
-		if local.distance_to(_targets[id]) <= 22:
-			return CropField._parse_cell(id)
-	return null
-
 func _screen(world: Vector3) -> Vector2:
 	return cam.unproject_position(world) - global_position
 
 func _draw() -> void:
-	_targets.clear()
 	if cam == null or world_rect.size.x < 24 or world_rect.size.y < 24: return
 	if _destination_visible:
 		for point in _path:
@@ -88,42 +84,10 @@ func _draw() -> void:
 			draw_arc(p, radius, 0, TAU, 40, color, 2, true)
 			draw_circle(p, 3, color)
 			if not _reachable: draw_texture_rect(_icons.x, Rect2(p - Vector2(8, 8), Vector2(16, 16)), false, color)
-	if bp == null: return
-	for cell in queued:
-		var world := bp.cell_to_world(cell)
-		if cam.is_position_behind(world): continue
-		var corners := PackedVector2Array()
-		for offset in [Vector3(-0.46, 0.22, -0.46), Vector3(0.46, 0.22, -0.46), Vector3(0.46, 0.22, 0.46), Vector3(-0.46, 0.22, 0.46)]:
-			corners.append(_screen(world + offset))
-		if not world_rect.encloses(Rect2(corners[0], Vector2.ZERO).expand(corners[1]).expand(corners[2]).expand(corners[3])): continue
-		draw_colored_polygon(corners, Color(GameUi.MINT, 0.38))
-		corners.append(corners[0])
-		draw_polyline(corners, Color(GameUi.GREEN, 0.75), 2, true)
-	for id in cells:
-		var slot: Dictionary = cells[id]
-		var action := NextStep.step_for(slot, now_ms)
-		if action.is_empty(): continue
-		var cell := CropField._parse_cell(str(id))
-		var world := bp.cell_to_world(cell)
-		if cam.is_position_behind(world): continue
-		var p := _screen(world + Vector3(0, 0.7, 0))
-		if not world_rect.grow(-12).has_point(p): continue
-		var crowded := false
-		for shown in _targets.values():
-			if p.distance_to(shown) < 27: crowded = true
-		if crowded: continue
-		_targets[id] = p
-		var selected: bool = active != null and active == cell
-		var color := GameUi.GOLD if action == "harvest" else (GameUi.BLUE if action == "care" else GameUi.GREEN)
-		if selected:
-			var corners := PackedVector2Array()
-			for offset in [Vector3(-0.48, 0.2, -0.48), Vector3(0.48, 0.2, -0.48), Vector3(0.48, 0.2, 0.48), Vector3(-0.48, 0.2, 0.48), Vector3(-0.48, 0.2, -0.48)]:
-				corners.append(_screen(world + offset))
-			draw_polyline(corners, GameUi.GOLD, 2, true)
-		draw_circle(p + Vector2(0, 1), 11, Color(0.1, 0.2, 0.1, 0.2))
-		draw_circle(p, 10, GameUi.PAPER if not selected else GameUi.MINT)
-		draw_arc(p, 10, 0, TAU, 24, color, 1, true)
-		if selected and progress > 0:
-			draw_arc(p, 13, -PI * 0.5, -PI * 0.5 + TAU * progress, 32, GameUi.GOLD, 2, true)
-		var symbol := GameUi.action_icon(action, str(slot.get("care_weather", weather)))
-		draw_texture_rect(_icons[symbol], Rect2(p - Vector2(6, 6), Vector2(12, 12)), false, color)
+	if bp == null or active == null or progress <= 0.0: return
+	# 当前正在做的那一格：脚下一圈进度弧。只画一个，不随格数增长。
+	var world: Vector3 = bp.cell_to_world(active)
+	if cam.is_position_behind(world): return
+	var centre := _screen(world)
+	if not world_rect.has_point(centre): return
+	draw_arc(centre, 14, -PI * 0.5, -PI * 0.5 + TAU * progress, 32, GameUi.GOLD, 2, true)

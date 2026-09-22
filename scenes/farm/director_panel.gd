@@ -24,6 +24,8 @@ var _weather_buttons: Array[Button] = []
 
 func _ready() -> void:
 	theme_type_variation = &"BottomSheet"
+	GameUi.register_modal(self)
+	add_theme_stylebox_override("panel", GameUi.panel_style(14))
 	set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	offset_top = -168.0
 	offset_left = 8.0
@@ -67,8 +69,8 @@ func _ready() -> void:
 
 func fit_height(area: Vector2) -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
-	size = Vector2(area.x, maxf(348, get_combined_minimum_size().y))
-	position = Vector2(0, area.y - size.y)
+	size = Vector2(minf(520, maxf(1, area.x - 8)), minf(maxf(348, get_combined_minimum_size().y), area.y - 72))
+	position = Vector2((area.x - size.x) * 0.5, area.y - size.y - 4)
 
 func _row(label: String, options: Array, on_pick: Callable) -> HBoxContainer:
 	var row := HBoxContainer.new()

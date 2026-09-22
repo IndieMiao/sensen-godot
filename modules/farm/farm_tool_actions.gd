@@ -1,15 +1,14 @@
 class_name FarmToolActions
 extends RefCounted
-## 玩家能选的六种劳作动作。单独成表，是为了让动画守卫测试有个**唯一的引用源**：
-## 新增工具必须同时出现在这里和 anim_placeholders.json，漏一边就红。
+## 四步生命周期的劳作动作，外加铲平。单独成表，是为了让动画守卫测试有个**唯一的引用源**：
+## 新增动作必须同时出现在这里和动画登记表，漏一边就红。
 
-const CLEAR := "clear"
 const TILL := "till"
 const SOW := "sow"
-const CARE := "care"
+const WATER := "water"
 const HARVEST := "harvest"
+const CLEAR := "clear"
 
-## `care` 在运行时按田况展开成 water / drain / shelter，登记表里那三条单独登记。
-const ALL := [CLEAR, TILL, SOW, HARVEST, "water", "drain", "shelter"]
+const ALL := [TILL, SOW, WATER, HARVEST, CLEAR]
 ## 访客表情：本机动画，不产生命令。也走同一张登记表。
 const EMOTES := ["wave"]

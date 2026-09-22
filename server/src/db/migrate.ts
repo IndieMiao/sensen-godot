@@ -11,5 +11,14 @@ export async function migrate(pool: pg.Pool): Promise<void> {
 
 /** 测试用：清空所有表但保留结构。只允许在非生产 DSN 上调用。 */
 export async function truncateAll(pool: pg.Pool): Promise<void> {
-  await pool.query('TRUNCATE players, tokens, farms, farm_creations, commands, farm_snapshots CASCADE');
+  // Fastify's post-response token lookup can still be completing during test
+  // teardown. A deadlocked TRUNCATE rolls back completely and is safe to retry.
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await pool.query('TRUNCATE tokens, players, farms, farm_creations, commands, farm_snapshots CASCADE');
+      return;
+    } catch (error) {
+      if ((error as { code?: string }).code !== '40P01' || attempt >= 2) throw error;
+    }
+  }
 }

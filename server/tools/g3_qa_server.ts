@@ -3,7 +3,7 @@ import path from 'node:path';
 import { readFileSync } from 'node:fs';
 import { parseEnv } from 'node:util';
 import pg from 'pg';
-import { buildApp, blueprintSets, loadBlueprint } from '../src/http/app.js';
+import { buildApp, loadBlueprint, plotFor } from '../src/http/app.js';
 import { PgStore } from '../src/db/pg_store.js';
 import { migrate } from '../src/db/migrate.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../src/domain/content.js';
@@ -21,10 +21,11 @@ const content = loadContent(DEFAULT_CONTENT_DIR);
 const cv = contentVersion(DEFAULT_CONTENT_DIR);
 const blueprintDir = path.resolve(DEFAULT_CONTENT_DIR, '../../blueprints');
 const regions = JSON.parse(readFileSync(path.join(DEFAULT_CONTENT_DIR, 'regions.json'), 'utf8')).regions;
-const setsFor = (id: string, revision: number) => blueprintSets(loadBlueprint(blueprintDir, id, revision)!);
+// 农场地面来自 content.farm_plot，与具体街区蓝图无关。
+const setsFor = (_id: string, _revision: number) => plotFor(content);
 const zone = (id: string) => regions.find((r: {id: string}) => r.id === id).timezone as string;
 const now = () => Date.now();
-const store = new PgStore({ pool, content, contentVersion: cv, timezone: zone, blueprint: setsFor, now });
+const store = new PgStore({ pool, content, contentVersion: cv, timezone: zone, plot: plotFor(content), now });
 for (const spec of PRESET_SPECS) {
   await store.ensureSystemFarm(presetHmac(spec.id ?? spec.layout),
     buildPresetFarm(spec, setsFor(spec.layout, spec.revision), content, zone(spec.region), now()));
@@ -32,7 +33,7 @@ for (const spec of PRESET_SPECS) {
 const qaPlayerIds = new Set<string>();
 const app = await buildApp({ store, content, contentVersion: cv, blueprintDir,
   regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: env.TOKEN_PEPPER,
-  now, blueprint: setsFor, qaPlayerIds });
+  now, plot: plotFor(content), qaPlayerIds });
 app.addHook('onSend', async (request, _reply, payload) => {
   if (request.url === '/v1/auth/anonymous' && typeof payload === 'string') {
     const body = JSON.parse(payload);

@@ -2,11 +2,51 @@
   "_source": "PRD docs/product/map-farm-life-sim-direction.md §6.4 L420-429",
   "format": 1,
   "crops": {
-    "R": { "_name": "小萝卜", "duration_ms": 14400000, "_duration": "4 小时 L425", "seed_price": 4, "yield": 1, "unit_price": 8 },
-    "L": { "_name": "生菜", "duration_ms": 28800000, "_duration": "8 小时 L426", "seed_price": 6, "yield": 1, "unit_price": 12 },
-    "C": { "_name": "胡萝卜", "duration_ms": 43200000, "_duration": "12 小时 L427", "seed_price": 8, "yield": 1, "unit_price": 16 },
-    "H": { "_name": "洋甘菊", "duration_ms": 64800000, "_duration": "18 小时 L428", "seed_price": 10, "yield": 1, "unit_price": 19 }
+    "R": {
+      "_name": "小萝卜",
+      "duration_ms": 14400000,
+      "_duration": "4 小时 L425",
+      "seed_price": 4,
+      "yield": 1,
+      "unit_price": 8,
+      "woody": false
+    },
+    "L": {
+      "_name": "生菜",
+      "duration_ms": 28800000,
+      "_duration": "8 小时 L426",
+      "seed_price": 6,
+      "yield": 1,
+      "unit_price": 12,
+      "woody": false
+    },
+    "C": {
+      "_name": "胡萝卜",
+      "duration_ms": 43200000,
+      "_duration": "12 小时 L427",
+      "seed_price": 8,
+      "yield": 1,
+      "unit_price": 16,
+      "woody": false
+    },
+    "H": {
+      "_name": "洋甘菊",
+      "duration_ms": 64800000,
+      "_duration": "18 小时 L428",
+      "seed_price": 10,
+      "yield": 1,
+      "unit_price": 19,
+      "woody": false
+    },
+    "T": {
+      "_name": "果树",
+      "duration_ms": 172800000,
+      "_duration": "48 小时：木本作物长得慢，但成熟后占地不走",
+      "seed_price": 40,
+      "yield": 3,
+      "unit_price": 14,
+      "woody": true
+    }
   },
-  "_d0_note": "L429：只有 D0 首次播种的 6 株教学小萝卜用 3 分钟特例；首次收获后所有小萝卜恢复 4 小时。",
-  "d0_tutorial": { "crop": "R", "count": 6, "duration_ms": 180000 }
+  "_woody_note": "woody=true 的作物占住格子并阻挡通行（果树、藤架类）；一年生作物可以直接踩过去。"
 }

@@ -8,6 +8,7 @@
  * 状态用**真实归约器**跑出来而不是手写 JSON：手写的很容易出现服务端永远不会产生的组合
  * （比如 growing 却没有 ready_at），访客渲染就会撞上没测过的分支。
  */
+import { isTillable, type PlotLayout } from './plot.js';
 import { createHash } from 'node:crypto';
 import type { Content } from './content.js';
 import type { Command } from './commands.js';
@@ -93,30 +94,35 @@ export interface PresetFarmRow {
   state: FarmState;
 }
 
-const chunk3 = (xs: string[]): string[][] => [xs.slice(0, 3), xs.slice(3, 6), xs.slice(6, 9)];
+/** 在布局中央挑一块可开垦的矩形当预置田；预置农场只是给访客看的展示柜，形状固定即可。 */
+function demoPatch(plot: PlotLayout, w: number, h: number): string[] {
+  const cells: string[] = [];
+  for (let j = 0; j < plot.gy && cells.length < w * h; j++)
+    for (let i = 0; i < plot.gx && cells.length < w * h; i++)
+      if (isTillable(plot, `${i},${j}`)) cells.push(`${i},${j}`);
+  return cells;
+}
 
 export function buildPresetFarm(
-  spec: PresetSpec, sets: Ctx['blueprint'], content: Content, timezone: string, now: number,
+  spec: PresetSpec, plot: PlotLayout, content: Content, timezone: string, now: number,
 ): PresetFarmRow {
-  let state = initialFarmState(content, sets, timezone, now);
-  const beds = chunk3([...sets.cultivable].filter(x => !sets.reserved.has(x)));
-  const all9 = beds.flat();
-  const care = content.weather.care_action[content.weather.script[0]];
+  let state = initialFarmState(content, plot, timezone, now);
+  // 9 格三行，正好吃掉第 0 章 Grant 的 6R + 3L。
+  const patch = demoPatch(plot, 3, 3);
+  const rows = [patch.slice(0, 3), patch.slice(3, 6), patch.slice(6, 9)];
   const script: Command[] = spec.style === 'lush'
     ? [
-      { type: 'clear_cells', cell_ids: all9 },
-      { type: 'till_cells', cell_ids: all9 },
-      { type: 'sow_cells', cell_ids: beds[0]!, crop: 'R', lot: 'bound' },
-      { type: 'sow_cells', cell_ids: beds[1]!, crop: 'L', lot: 'bound' },
-      { type: 'sow_cells', cell_ids: beds[2]!, crop: 'R', lot: 'bound' },
-      { type: 'apply_care', cell_ids: all9, kind: care },
+      { type: 'till_cells', cell_ids: patch },
+      { type: 'sow_cells', cell_ids: rows[0]!, crop: 'R', lot: 'bound' },
+      { type: 'sow_cells', cell_ids: rows[1]!, crop: 'L', lot: 'bound' },
+      { type: 'sow_cells', cell_ids: rows[2]!, crop: 'R', lot: 'bound' },
+      { type: 'water_cells', cell_ids: patch },
     ]
     : [
-      { type: 'clear_cells', cell_ids: [...beds[0]!, ...beds[1]!] },
-      { type: 'till_cells', cell_ids: beds[0]! },
+      { type: 'till_cells', cell_ids: rows[0]! },
     ];
   for (const cmd of script) {
-    const r = applyAt(state, cmd, now, timezone, content, sets);
+    const r = applyAt(state, cmd, now, timezone, content, plot);
     if (!r.ok) throw new Error(`预置农场 ${spec.layout} 脚本失败于 ${cmd.type}: ${r.code} ${r.detail ?? ''}`);
     state = r.state;
   }

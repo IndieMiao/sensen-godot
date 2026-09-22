@@ -10,14 +10,6 @@ func test_every_tool_action_is_registered() -> void:
 		assert_bool(AnimPlaceholders.is_registered(action)).override_failure_message(
 			"动作 %s 既没有真实 clip 也没在 anim_placeholders.json 登记" % action).is_true()
 
-func test_every_weather_care_action_is_registered() -> void:
-	var w: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(WEATHER))
-	for cond in (w.care_action as Dictionary):
-		var action := str(w.care_action[cond])
-		assert_bool(AnimPlaceholders.is_registered(action)).override_failure_message(
-			"田况 %s 的照料动作 %s 未登记" % [cond, action]).is_true()
-		assert_str(str(AnimPlaceholders.CARE_ACTION.get(cond, ""))).override_failure_message(
-			"CARE_ACTION 与 weather_script.json 的 care_action 不同源").is_equal(action)
 
 func test_real_clips_list_matches_the_rig() -> void:
 	# 登记表声称的真实 clip 必须真的在 rig 里；否则守卫会放过一个播不出来的动作。

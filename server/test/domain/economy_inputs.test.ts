@@ -6,7 +6,7 @@ function fundedFarm() {
   const state = freshFarm();
   state.clock.chapter_index = 5;
   state.wallet = 1000;
-  state.inventory.produce = { R: 5, L: 5, C: 5, H: 5 };
+  state.inventory.produce = { R: 5, L: 5, C: 5, H: 5, T: 0 };
   state.inventory.dishes = { salad: 2, tea: 1 };
   return state;
 }

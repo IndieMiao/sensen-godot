@@ -35,7 +35,7 @@ func write_command(command: Dictionary) -> bool:
 	if file == null:
 		error = FileAccess.get_open_error()
 		return false
-	file.store_string(JSON.stringify({"format": 1, "scope": scope, "command": command}))
+	file.store_string(JSON.stringify({"format": 1, "scope": scope, "command": command}, "", true, true))
 	file.flush()
 	error = file.get_error()
 	file.close()

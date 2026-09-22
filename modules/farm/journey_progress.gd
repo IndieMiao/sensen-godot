@@ -21,7 +21,6 @@ static func goal_state(session: FarmSession) -> Dictionary:
 	var cells := {}
 	for id in _bed_cells[path]:
 		if _bed_cells[path][id] and int(state.get("beds_unlocked", 3)) < 4: continue
-		if not FieldGrowth.allows(state, str(id)): continue
 		if state.get("cells", {}).has(id): cells[id] = state.cells[id]
 	# Guidance reads a filtered view; the server snapshot and its reserved beds stay intact.
 	return state.merged({"cells": cells}, true)
@@ -33,6 +32,18 @@ static func data() -> Dictionary:
 static func recipes() -> Dictionary:
 	if _recipes.is_empty(): _recipes = JSON.parse_string(FileAccess.get_file_as_string("res://assets/farm/data/recipes.json")).recipes
 	return _recipes
+
+static func recipe_unlocked(state: Dictionary, id: String) -> bool:
+	if not recipes().has(id) or not unlocked(state, "kitchen"): return false
+	if id == "tea" and not unlocked(state, "tea"): return false
+	return unlocked(state, str(recipes()[id].requires)) if recipes()[id].has("requires") else true
+
+static func recipe_ready(state: Dictionary, id: String) -> bool:
+	if not recipe_unlocked(state, id): return false
+	var recipe: Dictionary = recipes()[id]
+	for crop in recipe.get("inputs", {}):
+		if available(state, str(crop)) < int(recipe.inputs[crop]): return false
+	return cost_ready(state, recipe)
 
 static func active(state: Dictionary) -> bool:
 	return int(state.get("journey", {}).get("version", 0)) == 1
@@ -132,7 +143,7 @@ static func tracked_goal(state: Dictionary, now_ms := -1) -> Dictionary:
 	var spec: Dictionary = data().discoveries[id]
 	if stock(state, str(spec.item)) > 0:
 		return _goal(str(spec.place), L10n.text("Restore ") + L10n.text(str(spec.name)), "hammer").merged({"hint": L10n.text("Ready to restore"), "target": "discovery_" + id})
-	var recipe: Dictionary = data().workshop.recipes[spec.item]
+	var recipe := CharacterModel.craft_recipe(state, data().workshop.recipes[spec.item])
 	# A displayed piece is still owned; retrieval must not suggest crafting another one.
 	for project in data().projects:
 		if display_items(state, str(project)).has(spec.item):
@@ -142,7 +153,7 @@ static func tracked_goal(state: Dictionary, now_ms := -1) -> Dictionary:
 		var have := material(state, str(material_id))
 		if have < need:
 			var destination := _material_goal(state, str(material_id))
-			var label := L10n.text("Reeds") if material_id == "fiber" else str(material_id).capitalize()
+			var label := L10n.material_name(str(material_id))
 			destination.label = L10n.format_text("%s: %s %d/%d", [spec.name, label, have, need])
 			destination.hint = L10n.format_text("%s %d/%d", [label, have, need])
 			return destination
@@ -174,7 +185,7 @@ static func project_goal(state: Dictionary, id: String, now_ms := -1) -> Diction
 		var need := int(stage.materials[item])
 		if have >= need: continue
 		goal = _material_goal(state, str(item))
-		goal.hint = L10n.format_text("%s %d/%d", [L10n.text("Reeds") if item == "fiber" else str(item).capitalize(), have, need])
+		goal.hint = L10n.format_text("%s %d/%d", [L10n.material_name(str(item)), have, need])
 		break
 	if goal.is_empty():
 		var recipes := recipes()
@@ -189,7 +200,7 @@ static func project_goal(state: Dictionary, id: String, now_ms := -1) -> Diction
 		for crop in needs:
 			if available(state, str(crop)) < int(needs[crop]):
 				candidates.append(_crop_goal(state, str(crop), int(needs[crop]), now_ms))
-		var order := {"harvest": 0, "care": 1, "gather": 2, "sow": 3, "stall": 4, "wait": 5}
+		var order := {"harvest": 0, "water": 1, "gather": 2, "sow": 3, "stall": 4, "wait": 5}
 		candidates.sort_custom(func(a, b): return order[a.action] < order[b.action])
 		if not candidates.is_empty(): goal = candidates[0]
 	if goal.is_empty():
@@ -207,7 +218,7 @@ static func _crop_goal(state: Dictionary, crop: String, quantity: int, now_ms: i
 	if cells.any(func(cell): return cell.get("state") == "growing" and cell.get("ready_at") != null and int(cell.ready_at) <= time):
 		return goal.merged({"action": "harvest", "hint": L10n.text("Harvest ") + name}, true)
 	if cells.any(func(cell): return cell.get("state") == "sown"):
-		return goal.merged({"action": "care", "hint": L10n.text("Tend ") + name}, true)
+		return goal.merged({"action": "water", "hint": L10n.text("Water ") + name}, true)
 	var harvest := discovery_supply_goal(state, "produce", crop)
 	if not harvest.is_empty(): return goal.merged(harvest, true)
 	if crop == "H" and unlocked(state, "crop_H") and project_complete(state, "seedbeds"):
@@ -222,7 +233,7 @@ static func _crop_goal(state: Dictionary, crop: String, quantity: int, now_ms: i
 		if farm_cells.any(func(cell): return cell.get("state") == "growing" and cell.get("ready_at") != null and int(cell.ready_at) <= time):
 			return goal.merged({"action": "harvest", "hint": L10n.text("Harvest to make room for ") + name}, true)
 		if farm_cells.any(func(cell): return cell.get("state") == "sown"):
-			return goal.merged({"action": "care", "hint": L10n.text("Tend the occupied beds")}, true)
+			return goal.merged({"action": "water", "hint": L10n.text("Water the planted ground")}, true)
 		var supplies := discovery_supply_goal(state, "produce", crop, true)
 		if not supplies.is_empty(): return goal.merged(supplies, true)
 		return goal.merged({"action": "wait", "hint": L10n.text("Beds full; crops growing")}, true)
@@ -246,12 +257,12 @@ static func seed_money_goal(state: Dictionary, crop: String) -> Dictionary:
 	goal.action = "gather"
 	if material(state, "wood") < int(spec.wood):
 		goal = _material_goal(state, "wood").merged({"action": "gather", "hint": L10n.format_text("Wood for seed money (%d/%d)", [material(state, "wood"), int(spec.wood)])}, true)
-	elif not spec.produce.keys().all(func(id): return available(state, str(id)) >= int(spec.produce[id])) \
-			or not spec.dishes.keys().all(func(id): return int(state.get("inventory", {}).get("dishes", {}).get(id, 0)) >= int(spec.dishes[id])):
+	elif not JourneyRequests.supplies_ready(state, "restorer"):
 		goal.hint = L10n.text("Ask for timber-only work")
 		goal.change_request = "restorer"
 	else:
-		goal.hint = L10n.format_text("Deliver wood for seed money (+%d)", int(spec.coins))
+		var delivery := "Deliver wood for seed money (+%d)" if spec.get("id") == "timber_for_repairs" else "Deliver supplies for seed money (+%d)"
+		goal.hint = L10n.format_text(delivery if JourneyRequests.accepted(state, "restorer") else "Accept work for seed money (+%d)", int(spec.coins))
 	goal.label = str(goal.hint)
 	return goal
 
@@ -276,6 +287,8 @@ static func discovery_supply_goal(state: Dictionary, kind: String, item: String,
 	return {}
 
 static func _material_goal(state: Dictionary, item: String) -> Dictionary:
+	if item in ["copper_ore", "rock_salt"]:
+		return _goal("farm", L10n.format_text("Mine for %s", L10n.material_name(item)), "pickaxe", "mine")
 	var harvest := discovery_supply_goal(state, "materials", item)
 	if not harvest.is_empty(): return harvest
 	for node in remaining_nodes(state):
@@ -291,6 +304,13 @@ static func display_items(state: Dictionary, project: String) -> Array:
 
 static func material(state: Dictionary, id: String) -> int:
 	return _wood(state) if id == "wood" else int(state.get("journey", {}).get("materials", {}).get(id, 0))
+
+static func materials(state: Dictionary) -> Dictionary:
+	var result := {"wood": material(state, "wood"), "stone": material(state, "stone"), "fiber": material(state, "fiber")}
+	for id in state.get("journey", {}).get("materials", {}):
+		result[id] = material(state, str(id))
+	for id in ["copper_ore", "rock_salt"]: result[id] = material(state, id)
+	return result
 
 static func node_materials(state: Dictionary, node: Dictionary) -> Dictionary:
 	var result := {"wood": int(node.wood)}
@@ -309,6 +329,7 @@ static func node_bundles(state: Dictionary, node: Dictionary) -> Array:
 			and fact(state, str(alternative.requires)):
 		bundles.append({"id": "bundle:" + str(node.id), "node": str(node.id), "choice": "alternate",
 			"position": alternative.position, "materials": alternative.materials})
+	for bundle in bundles: bundle.materials = CharacterModel.gathered_materials(state, bundle.materials)
 	return bundles
 
 static func material_bundle(state: Dictionary, node: Dictionary, item: String) -> Dictionary:
@@ -329,8 +350,8 @@ static func bundle_hint(state: Dictionary, place: String) -> String:
 
 static func material_label(cost: Dictionary) -> String:
 	var parts: Array[String] = []
-	for id in ["wood", "stone", "fiber"]:
-		if int(cost.get(id, 0)) > 0: parts.append(L10n.format_text("%d %s", [int(cost[id]), "reeds" if id == "fiber" else id]))
+	for id in cost:
+		if int(cost.get(id, 0)) > 0: parts.append(L10n.format_text("%d %s", [int(cost[id]), "reeds" if id == "fiber" else str(id)]))
 	return " + ".join(parts)
 
 static func project_stage(state: Dictionary, id: String) -> int:
@@ -387,8 +408,9 @@ static func next_goal(state: Dictionary, now_ms := -1) -> Dictionary:
 		if _wood(state) >= int(data().costs.repair_workbench): return _goal("nursery", L10n.text("Repair the workbench"), "hammer", "workbench")
 		return _wood_goal(state, L10n.text("the workbench"), int(data().costs.repair_workbench))
 	if not fact(state, "planter_crafted"):
-		if _wood(state) >= int(data().costs.craft_planter): return _goal("nursery", L10n.text("Make your first planter"), "hammer", "workbench")
-		return _wood_goal(state, L10n.text("your first planter"), int(data().costs.craft_planter))
+		var planter_cost := int(CharacterModel.craft_materials(state, {"wood": int(data().costs.craft_planter)}).wood)
+		if _wood(state) >= planter_cost: return _goal("nursery", L10n.text("Make your first planter"), "hammer", "workbench")
+		return _wood_goal(state, L10n.text("your first planter"), planter_cost)
 	if not fact(state, "planter_placed"): return _goal("courtyard", L10n.text("Find a spot for your planter"), "house", "planter")
 	if fact(state, "shared_meal") and not fact(state, "side_path"):
 		if _wood(state) >= int(data().costs.clear_side_path): return _goal("nursery", L10n.text("Open the garden side path"), "route", "path")
@@ -412,7 +434,7 @@ static func next_goal(state: Dictionary, now_ms := -1) -> Dictionary:
 		return _goal("nursery", L10n.text("Choose a nursery basket"), "sprout", "project_seedbeds")
 	for id in data().workshop.recipes:
 		var recipe: Dictionary = data().workshop.recipes[id]
-		if not fact(state, "crafted_" + str(id)) and requirements_met(state, recipe) and cost_ready(state, recipe):
+		if not fact(state, "crafted_" + str(id)) and requirements_met(state, recipe) and cost_ready(state, CharacterModel.craft_recipe(state, recipe)):
 			return _goal("nursery", L10n.text("Make ") + L10n.text(str(recipe.name)), "hammer", "workbench")
 	if not fact(state, "workshop_displayed") and data().workshop.recipes.keys().any(func(id): return stock(state, str(id)) > 0):
 		for id in data().projects:
@@ -517,13 +539,7 @@ static func offer(state: Dictionary, slot: String) -> Dictionary:
 	return variants[index] if index >= 0 and index < variants.size() else {}
 
 static func offer_ready(state: Dictionary, slot: String) -> bool:
-	var spec := offer(state, slot)
-	if spec.is_empty() or _wood(state) < int(spec.wood): return false
-	for crop in spec.produce:
-		if available(state, str(crop)) < int(spec.produce[crop]): return false
-	for dish in spec.dishes:
-		if int(state.get("inventory", {}).get("dishes", {}).get(dish, 0)) < int(spec.dishes[dish]): return false
-	return true
+	return JourneyRequests.accepted(state, slot) and JourneyRequests.supplies_ready(state, slot)
 
 static func place_hint(state: Dictionary, place: String) -> String:
 	if place == "bistro" and not unlocked(state, "bistro"): return L10n.text("First harvest")

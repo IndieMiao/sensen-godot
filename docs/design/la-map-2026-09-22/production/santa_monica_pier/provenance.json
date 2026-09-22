@@ -1,0 +1,63 @@
+{
+  "asset": "assets/map/poi/santa_monica_pier.png",
+  "provider": "Sensenjoy API",
+  "base_url": "https://sub.sensenjoy.cn/v1",
+  "mode": "bundled image_gen.py edit with style-reference image",
+  "model": "gpt-image-2",
+  "requested_size": "1024x1024",
+  "returned_size": [
+    1254,
+    1254
+  ],
+  "quality": "high",
+  "input_reference": "reference-crop.png",
+  "reference_source": "docs/design/la-map-2026-09-22/generated/la-map-main-v1.png",
+  "reference_crop_source_pixels": [
+    3,
+    541,
+    382,
+    799
+  ],
+  "prompt": "prompt.txt",
+  "background": "solid magenta #ff00ff followed by bundled remove_chroma_key.py",
+  "alpha_extraction": {
+    "soft_matte": true,
+    "transparent_threshold": 18,
+    "opaque_threshold": 110,
+    "spill_cleanup": true
+  },
+  "final_size": [
+    512,
+    512
+  ],
+  "final_mode": "RGBA",
+  "content_bbox": [
+    24,
+    147,
+    488,
+    488
+  ],
+  "ground_anchor_normalized": [
+    0.5,
+    0.953125
+  ],
+  "sha256": "b6d35951df63b595a019463441808aeb21f8ddd767c237ef656a32f00a8e01ec",
+  "normalization": {
+    "source_alpha_bbox_threshold": 32,
+    "source_bbox": [
+      31,
+      199,
+      1224,
+      1077
+    ],
+    "final_alpha_noise_floor": 8,
+    "full_base_padding_px": 24
+  },
+  "visual_validation": [
+    "full base and ferris wheel unclipped",
+    "no giant ocean rectangle",
+    "no people UI or text",
+    "reviewed on cream and dark blue backgrounds",
+    "reviewed at 160 112 and 80 px"
+  ]
+}

@@ -1,8 +1,15 @@
 extends RefCounted
 
 signal tapped(position: Vector2)
+## 长按起刷：按住一格超过 HOLD_S 之后，这一次按压不再平移相机，改成沿轨迹刷格。
+## 默认关闭（hold_enabled = false），所以旧场景与旧测试一个字都不用改。
+signal hold_began(position: Vector2)
+signal hold_moved(position: Vector2)
+signal hold_ended(position: Vector2)
+signal hold_canceled()
 
 const DRAG_THRESHOLD := 12.0
+const HOLD_S := 0.28
 const PAN_ELASTIC := 0.55
 const ZOOM_ELASTIC := 0.12
 const DECAY := 5.5
@@ -11,6 +18,7 @@ const RELEASE_TIMEOUT := 0.12
 
 var offset := Vector3.ZERO
 var radius := 1.6
+var free_pan := false
 var min_zoom := 0.8
 var max_zoom := 1.4
 var zoom: float:
@@ -18,6 +26,11 @@ var zoom: float:
 var velocity := Vector3.ZERO
 var zoom_velocity := 0.0
 var pointers: Dictionary = {}
+## 由宿主打开；关着时下面的长按分支永不进入。
+var hold_enabled := false
+## 本次按压已让渡给刷子：后续 motion/end 都不再喂相机。
+var yielded := false
+var _hold_age := 0.0
 var dragged := false
 var multi := false
 var _start := Vector2.ZERO
@@ -36,10 +49,11 @@ func active() -> bool:
 
 func moving() -> bool:
 	return velocity.length() > 0.001 or absf(zoom_velocity) > 0.001 \
-		or offset.length() > radius + 0.001 or _log_zoom < log(min_zoom) - 0.001 or _log_zoom > log(max_zoom) + 0.001
+		or (not free_pan and offset.length() > radius + 0.001) or _log_zoom < log(min_zoom) - 0.001 or _log_zoom > log(max_zoom) + 0.001
 
 func begin(index: int, point: Vector2) -> void:
 	if pointers.has(index): return
+	if yielded: hold_canceled.emit()
 	velocity = Vector3.ZERO
 	zoom_velocity = 0
 	_native_hold = 0
@@ -55,9 +69,15 @@ func begin(index: int, point: Vector2) -> void:
 	if pointers.size() > 1:
 		multi = true
 		dragged = true
+	_hold_age = 0.0
+	yielded = false
 	_touch_cooldown = RELEASE_TIMEOUT
 
 func motion(index: int, point: Vector2, camera: Camera3D) -> void:
+	if yielded:
+		pointers[index] = point
+		hold_moved.emit(point)
+		return
 	if not pointers.has(index): return
 	var previous: Vector2 = pointers[index]
 	if multi:
@@ -80,6 +100,14 @@ func motion(index: int, point: Vector2, camera: Camera3D) -> void:
 
 func end(index: int, point: Vector2, canceled := false) -> void:
 	if not pointers.has(index): return
+	if yielded:
+		pointers.erase(index)
+		yielded = false
+		_hold_age = 0.0
+		_touch_cooldown = RELEASE_TIMEOUT
+		if canceled: hold_canceled.emit()
+		else: hold_ended.emit(point)
+		return
 	var is_tap := not canceled and not multi and not dragged and point.distance_to(_start) <= DRAG_THRESHOLD
 	pointers.erase(index)
 	if canceled:
@@ -97,7 +125,10 @@ func cancel() -> void:
 	velocity = Vector3.ZERO
 	zoom_velocity = 0
 	_native_hold = 0
-	offset = offset.limit_length(radius)
+	# 切后台走这里：不清掉就会留着一把卡住的刷子，回来第一下拖动直接画格。
+	yielded = false
+	_hold_age = 0.0
+	if not free_pan: offset = offset.limit_length(radius)
 	_log_zoom = clampf(_log_zoom, log(min_zoom), log(max_zoom))
 
 func reset() -> void:
@@ -178,6 +209,12 @@ func magnify(camera: Camera3D, focus: Vector2, factor: float) -> void:
 	_apply_zoom(camera, before)
 
 func step(dt: float, camera: Camera3D) -> void:
+	# 单指按住不动超过阈值 → 让渡给刷子。多指、已拖动、已让渡都不触发。
+	if hold_enabled and pointers.size() == 1 and not dragged and not multi and not yielded:
+		_hold_age += dt
+		if _hold_age > HOLD_S:
+			yielded = true
+			hold_began.emit(pointers.values()[0])
 	_pan_age += dt
 	_zoom_age += dt
 	_touch_cooldown = maxf(0, _touch_cooldown - dt)
@@ -189,7 +226,7 @@ func step(dt: float, camera: Camera3D) -> void:
 		var h := minf(remaining, 1.0 / 120.0)
 		remaining -= h
 		var before := offset
-		var bound := offset.limit_length(radius)
+		var bound := offset if free_pan else offset.limit_length(radius)
 		if offset.distance_to(bound) > 0.0001:
 			var displacement := offset - bound
 			var j := velocity + displacement * SPRING
@@ -200,8 +237,8 @@ func step(dt: float, camera: Camera3D) -> void:
 			var decay := exp(-DECAY * h)
 			offset += velocity * (1.0 - decay) / DECAY
 			velocity *= decay
-		if velocity.length() < 0.003 and offset.length() < radius + 0.001:
-			offset = offset.limit_length(radius)
+		if velocity.length() < 0.003 and (free_pan or offset.length() < radius + 0.001):
+			if not free_pan: offset = offset.limit_length(radius)
 			velocity = Vector3.ZERO
 		camera.position += offset - before
 		var old_zoom := _log_zoom
@@ -237,9 +274,11 @@ func _ground(camera: Camera3D, point: Vector2) -> Variant:
 	return Plane(Vector3.UP, 0).intersects_ray(camera.project_ray_origin(point), camera.project_ray_normal(point))
 
 func _rubber_offset(value: Vector3) -> Vector3:
+	if free_pan: return value
 	return value.normalized() * _rubber(value.length(), 0, radius, PAN_ELASTIC)
 
 func _unrubber_offset(value: Vector3) -> Vector3:
+	if free_pan: return value
 	return value.normalized() * _unrubber(value.length(), 0, radius, PAN_ELASTIC)
 
 func _rubber(value: float, low: float, high: float, elasticity: float) -> float:

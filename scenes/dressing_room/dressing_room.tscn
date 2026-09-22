@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scenes/dressing_room/dressing_room.gd" id="1_dress"]
 [ext_resource type="Script" path="res://scenes/dressing_room/parts_panel.gd" id="2_parts"]
@@ -8,6 +8,8 @@
 [ext_resource type="Texture2D" path="res://assets/ui/icons/reset.svg" id="6_ico_reset"]
 [ext_resource type="Texture2D" path="res://assets/ui/backgrounds/dressing-room.png" id="7_room"]
 [ext_resource type="PackedScene" path="res://modules/ui/opaque_scene_layer.tscn" id="8_opaque"]
+
+[ext_resource type="Script" path="res://modules/ui/touch_scroll_container.gd" id="9_scroll"]
 
 [sub_resource type="Environment" id="Environment_room"]
 background_mode = 3
@@ -140,6 +142,7 @@ layout_mode = 2
 script = ExtResource("2_parts")
 
 [node name="TabsScroll" type="ScrollContainer" parent="UI/SafeArea/VBox/Drawer/VBox"]
+script = ExtResource("9_scroll")
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 horizontal_scroll_mode = 3
@@ -152,6 +155,7 @@ mouse_filter = 1
 theme_override_constants/separation = 0
 
 [node name="PartsScroll" type="ScrollContainer" parent="UI/SafeArea/VBox/Drawer/VBox"]
+script = ExtResource("9_scroll")
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 size_flags_vertical = 3

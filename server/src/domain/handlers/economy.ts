@@ -11,11 +11,11 @@
  * 回购**周上限 1 次**（PRD 全周恰好用一次）与种苗包周上限 2，实测宽松上界 972 ≤ 981。
  */
 import type { Command } from '../commands.js';
-import type { CropId, DishId } from '../content.js';
+import type { CropId, DishId, JourneyMaterial } from '../content.js';
 import { err, ok, type DomainEvent, type Result } from '../errors.js';
 import type { Ctx } from '../reducer.js';
 import type { FarmState } from '../state.js';
-import { canUse } from '../journey.js';
+import { canUse, materialCount } from '../journey.js';
 
 /** 工程篮预留物不进入出售、赠礼、料理候选（PRD §7.5 L574）。 */
 export function availableProduce(s: FarmState, crop: CropId): number {
@@ -48,7 +48,7 @@ export function applyEconomy(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
         if (price === undefined) return err('INSUFFICIENT_ITEMS', `未知物品 ${item.id}`);
         const have = item.kind === 'produce'
           ? availableProduce(next, item.id as CropId)
-          : next.inventory.dishes[item.id as DishId];
+          : next.inventory.dishes[item.id as DishId] ?? 0;
         if (have < item.qty) return err('INSUFFICIENT_ITEMS', `${item.id} 不足`);
         // 按顺序成交到预算为止；装不下的原样留库存、不降价。
         const room = Math.max(0, budget - next.stall.settled);
@@ -66,7 +66,7 @@ export function applyEconomy(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
           next.sales_facts[chap][item.id as CropId] =
             (next.sales_facts[chap][item.id as CropId] ?? 0) + canSell;
         } else {
-          next.inventory.dishes[item.id as DishId] -= canSell;
+          next.inventory.dishes[item.id as DishId] = (next.inventory.dishes[item.id as DishId] ?? 0) - canSell;
         }
         sold.push({ ...item, qty: canSell, coins });
         if (canSell < item.qty) unsold.push({ ...item, qty: item.qty - canSell });
@@ -81,9 +81,9 @@ export function applyEconomy(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
       if (s.buyback.day === s.clock.player_day_id && s.buyback.sold >= bb.per_player_day)
         return err('BUYBACK_LIMIT', `每玩家日 ${bb.per_player_day} 份`);
       if (s.buyback.week_total >= bb.per_week) return err('BUYBACK_LIMIT', `首周 ${bb.per_week} 份`);
-      if (s.inventory.dishes[bb.dish] < 1) return err('INSUFFICIENT_ITEMS', bb.dish);
+      if ((s.inventory.dishes[bb.dish] ?? 0) < 1) return err('INSUFFICIENT_ITEMS', bb.dish);
       const next = structuredClone(s);
-      next.inventory.dishes[bb.dish] -= 1;
+      next.inventory.dishes[bb.dish] = (next.inventory.dishes[bb.dish] ?? 0) - 1;
       next.wallet += bb.coins;
       next.buyback = {
         day: next.clock.player_day_id,
@@ -104,11 +104,21 @@ export function applyEconomy(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
       for (const [crop, n] of Object.entries(recipe.inputs))
         if (availableProduce(s, crop as CropId) < (n ?? 0))
           return err('INSUFFICIENT_ITEMS', `${crop} 不足`);
+      for (const [material, n] of Object.entries(recipe.materials ?? {}))
+        if (materialCount(s, material as JourneyMaterial) < (n ?? 0))
+          return err('INSUFFICIENT_ITEMS', material);
       const next = structuredClone(s);
       const events: DomainEvent[] = [];
       for (const [crop, n] of Object.entries(recipe.inputs))
         next.inventory.produce[crop as CropId] -= n ?? 0;
-      next.inventory.dishes[cmd.recipe] += 1;
+      for (const [material, n] of Object.entries(recipe.materials ?? {})) {
+        if (material === 'wood') next.journey!.wood -= n!;
+        else {
+          const id = material as Exclude<JourneyMaterial, 'wood'>;
+          next.journey!.materials![id] = (next.journey!.materials![id] ?? 0) - n!;
+        }
+      }
+      next.inventory.dishes[cmd.recipe] = (next.inventory.dishes[cmd.recipe] ?? 0) + 1;
       if (!next.xp.first_recipes.includes(cmd.recipe)) {
         next.xp.first_recipes.push(cmd.recipe);
         next.xp.total += c.xp.sources.first_recipe.xp;
@@ -146,7 +156,7 @@ export function applyEconomy(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
       const hasProduce = Object.values(s.inventory.produce).some(n => n > 0);
       const hasDishes = Object.values(s.inventory.dishes).some(n => n > 0);
       const hasReserved = Object.values(s.engineering.reserved).some(n => (n ?? 0) > 0);
-      const growing = Object.values(s.cells).some(x => x.state === 'sown' || x.state === 'growing');
+      const growing = Object.values(s.cells).some(x => x?.state === 'sown' || x?.state === 'growing');
       if (hasSeeds || hasProduce || hasDishes || hasReserved || growing)
         return err('NOT_AVAILABLE', '仍有可回收资产');
       const next = structuredClone(s);

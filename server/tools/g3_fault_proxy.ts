@@ -44,8 +44,8 @@ function snapshot(body: Json): Snapshot | null {
   const counts = (source: Json | undefined, keys: string[]) => Object.fromEntries(keys.map(key => [key, numeric(source?.[key])]));
   // JSONB can reorder object keys; hash the schema fields in a fixed tuple order.
   const decorations = (state.decorations ?? []) as DecorationPlacement[];
-  const decorationFields = decorations.map(({ anchor_id, prop_id, offset_q }) =>
-    [anchor_id, prop_id, offset_q[0], offset_q[1]]);
+  // 摘要按固定字段顺序算，与 JSON 的键序无关——这正是这个代理要证明的事。
+  const decorationFields = decorations.map(({ prop_id, cell }) => [prop_id, cell[0], cell[1]]);
   return {
     farm_digest: digest(body.farm_id).slice(0, 16), version: numeric(body.version),
     wallet: numeric(state.wallet), xp: numeric(state.xp?.total), seeds,

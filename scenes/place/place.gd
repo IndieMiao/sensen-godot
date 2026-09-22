@@ -46,6 +46,7 @@ func _ready() -> void:
 		journey_scene.place_id = place_id
 		journey_scene.session = session
 		journey_scene.initial_target = str(_args.get("target", ""))
+		journey_scene.initial_prop = str(_args.get("selected_prop", ""))
 		add_child(journey_scene)
 		return
 	_build_world()
@@ -92,7 +93,16 @@ func _build_ui() -> void:
 	root.resized.connect(_layout)
 	var head := HBoxContainer.new()
 	head.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	head.offset_left = 8
+	head.offset_right = -8
+	head.offset_top = 8
 	head.add_theme_constant_override("separation", 8)
+	var head_paper := Panel.new()
+	head_paper.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	head_paper.add_theme_stylebox_override("panel", GameUi.card_style(false, 8))
+	head_paper.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	head_paper.offset_bottom = 60
+	root.add_child(head_paper)
 	root.add_child(head)
 	_exit = GameUi.button("arrow-left", "", L10n.text("Back to map"))
 	_exit.pressed.connect(_leave)
@@ -102,12 +112,20 @@ func _build_ui() -> void:
 	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	head.add_child(title)
 	body = PanelContainer.new()
+	body.add_theme_stylebox_override("panel", GameUi.panel_style(12))
 	root.add_child(body)
 	var col := VBoxContainer.new()
 	body.add_child(col)
+	var tab_scroll := TouchScrollContainer.new()
+	tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tab_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	tab_scroll.custom_minimum_size.y = 46
+	col.add_child(tab_scroll)
 	tabs = HBoxContainer.new()
-	col.add_child(tabs)
-	scroll = ScrollContainer.new()
+	tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tabs.add_theme_constant_override("separation", 6)
+	tab_scroll.add_child(tabs)
+	scroll = TouchScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(scroll)
@@ -137,6 +155,7 @@ func _build_tabs() -> void:
 	specs.append(["journal", "book-open", L10n.text("Handbook")])
 	for spec in specs:
 		var button := GameUi.button(spec[1], "", spec[2])
+		button.custom_minimum_size = Vector2(44, 44)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.pressed.connect(func(): select_tab(spec[0]))
 		tabs.add_child(button)
@@ -180,6 +199,7 @@ func _activate_tab(id: String) -> void:
 			active_panel.connect("photo_requested", _open_photo)
 		if active_panel is DecorationPanel:
 			var decorations := active_panel as DecorationPanel
+			if not str(_args.get("selected_prop", "")).is_empty(): decorations.select_prop(str(_args.selected_prop))
 			decorations.preview_changed.connect(_preview_decorations)
 			decorations.navigation_confirmed.connect(_finish_decoration_navigation)
 			decorations.navigation_cancelled.connect(func(): _navigation_target = "")
@@ -315,9 +335,10 @@ func _close_photo() -> void:
 
 func _layout() -> void:
 	if body == null: return
-	var height := minf(310, root.size.y * 0.46)
-	body.position = Vector2(0, root.size.y - height)
-	body.size = Vector2(root.size.x, height)
+	var height := minf(400, root.size.y * 0.50)
+	var width := minf(620, root.size.x)
+	body.position = Vector2((root.size.x - width) * 0.5, root.size.y - height)
+	body.size = Vector2(width, height)
 	_frame_world()
 
 func _frame_world() -> void:

@@ -44,6 +44,7 @@ func _render() -> void:
 func _render_home() -> void:
 	heading(L10n.text("Around the neighbourhood"))
 	for event in _data.get("events", []):
+		section_card()
 		var unlocked := chapter() >= int(event.chapter)
 		var button := _local_action(str(event.icon), str(event.title), open_event.bind(str(event.id)))
 		button.name = "Event_%s" % event.id
@@ -151,14 +152,15 @@ func _step_row(text: String, done: bool) -> void:
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(label)
-	content.add_child(row)
+	append_content(row)
 
 func _local_action(symbol: String, text: String, callback: Callable, accent := false) -> Button:
 	var button := GameUi.button(symbol, text, text, accent)
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.disabled = busy
 	button.pressed.connect(func():
 		if not button.disabled: callback.call())
-	content.add_child(button)
+	append_content(button)
 	return button
 
 func open_event(id: String) -> void:

@@ -2,7 +2,7 @@ import path from 'node:path';
 import { readFileSync } from 'node:fs';
 import { parseEnv } from 'node:util';
 import pg from 'pg';
-import { buildApp, blueprintSets, loadBlueprint } from '../src/http/app.js';
+import { buildApp, loadBlueprint, plotFor } from '../src/http/app.js';
 import { PgStore } from '../src/db/pg_store.js';
 import { migrate } from '../src/db/migrate.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../src/domain/content.js';
@@ -25,16 +25,17 @@ const cv = contentVersion(DEFAULT_CONTENT_DIR);
 const blueprintDir = path.resolve(DEFAULT_CONTENT_DIR, '../../blueprints');
 const regionsFile = path.join(DEFAULT_CONTENT_DIR, 'regions.json');
 const regions = JSON.parse(readFileSync(regionsFile, 'utf8')).regions;
-const blueprint = (id: string, revision: number) => blueprintSets(loadBlueprint(blueprintDir, id, revision)!);
+// 农场地面来自 content.farm_plot；地理蓝图只在建场时校验 layout 是否在架。
+const plot = plotFor(content);
 const timezone = (id: string) => regions.find((r: { id: string }) => r.id === id).timezone as string;
 const now = () => Date.now();
-const store = new PgStore({ pool, content, contentVersion: cv, timezone, blueprint, now });
+const store = new PgStore({ pool, content, contentVersion: cv, timezone, plot, now });
 for (const spec of PRESET_SPECS) {
   await store.ensureSystemFarm(presetHmac(spec.id ?? spec.layout),
-    buildPresetFarm(spec, blueprint(spec.layout, spec.revision), content, timezone(spec.region), now()));
+    buildPresetFarm(spec, plot, content, timezone(spec.region), now()));
 }
 const app = await buildApp({ store, content, contentVersion: cv, blueprintDir, regionsFile,
-  pepper: env.TOKEN_PEPPER, now, blueprint });
+  pepper: env.TOKEN_PEPPER, now, plot });
 // Device inspection is opt-in and confined to this loopback playtest service.
 if (process.env.JOURNEY_DEVICE_INSPECT === '1') {
   let snapshot: unknown = null;

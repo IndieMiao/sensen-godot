@@ -30,7 +30,7 @@ func test_gift_button_reflects_exploration_eligibility_including_old_saves() -> 
 	add_child(panel)
 	await get_tree().process_frame
 	var gift: Button
-	for child in panel.content.get_children():
+	for child in panel.content.find_children("*", "Button", true, false):
 		if child is Button and child.text.begins_with("Give a "): gift = child
 	assert_object(gift).is_not_null()
 	assert_bool(gift.disabled).is_true()
@@ -110,6 +110,7 @@ func test_host_leads_first_meal_to_world_objects_before_repeat_orders() -> void:
 	assert_array(destinations).is_equal(["counter", "table"])
 	assert_int(st.inventory.dishes.salad).is_equal(1)
 	st.journey.facts.append("shared_meal")
+	st.journey.opportunities.bistro.accepted = true
 	panel.refresh()
 	for frame in 3: await get_tree().process_frame
 	buttons = panel.content.find_children("*", "Button", true, false)
@@ -182,7 +183,8 @@ func test_visiting_keeper_uses_own_story_and_gift_eligibility() -> void:
 	panel.setup(session)
 	add_child(panel)
 	await get_tree().process_frame
-	assert_str(panel.content.get_child(0).text).is_equal(str(ResidentCast.definition("nursery_keeper").name))
+	var titles := panel.content.find_children("*", "Label", true, false).map(func(label): return label.text)
+	assert_array(titles).contains([str(ResidentCast.definition("nursery_keeper").name)])
 	var gifts := panel.content.find_children("*", "Button", true, false).filter(func(button): return button.text.begins_with("Give a "))
 	assert_bool(gifts.is_empty()).is_false()
 	for gift in gifts: assert_bool(gift.disabled).is_true()

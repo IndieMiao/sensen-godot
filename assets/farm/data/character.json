@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "base": {
+    "tool_scope": 1,
+    "gather_bonus": 0,
+    "mining_bonus": 0,
+    "craft_savings": 0,
+    "max_hp": 100,
+    "move_speed": 3.75,
+    "defense": 0
+  },
+  "equipment": {
+    "copper_pickaxe": {
+      "slot": "main_hand",
+      "modifiers": {
+        "mining_bonus": 1
+      },
+      "materials": {
+        "wood": 3,
+        "copper_ore": 4,
+        "stone": 2
+      }
+    },
+    "foraging_gloves": {
+      "slot": "gloves",
+      "modifiers": {
+        "gather_bonus": 1
+      },
+      "materials": {
+        "fiber": 4,
+        "wood": 2
+      }
+    },
+    "artisan_apron": {
+      "slot": "gloves",
+      "modifiers": {
+        "craft_savings": 1
+      },
+      "materials": {
+        "fiber": 4,
+        "copper_ore": 2
+      }
+    },
+    "rusty_sword": {
+      "slot": "main_hand",
+      "modifiers": {},
+      "materials": {},
+      "starter": true
+    },
+    "copper_sword": {
+      "slot": "main_hand",
+      "modifiers": {},
+      "materials": {
+        "wood": 3,
+        "copper_ore": 5,
+        "stone": 2
+      }
+    },
+    "trail_boots": {
+      "slot": "gloves",
+      "modifiers": {
+        "max_hp": 20,
+        "move_speed": 0.5,
+        "defense": 2
+      },
+      "materials": {
+        "fiber": 6,
+        "copper_ore": 2
+      }
+    },
+    "copper_knife": {
+      "slot": "main_hand",
+      "modifiers": {},
+      "materials": {
+        "wood": 2,
+        "copper_ore": 3
+      }
+    },
+    "copper_axe": {
+      "slot": "main_hand",
+      "modifiers": {},
+      "materials": {
+        "wood": 3,
+        "copper_ore": 4
+      }
+    },
+    "copper_ring": {
+      "slot": "ring_1",
+      "modifiers": {
+        "defense": 1
+      },
+      "materials": {
+        "copper_ore": 3
+      }
+    },
+    "wooden_ring": {
+      "slot": "ring_1",
+      "modifiers": {
+        "max_hp": 10
+      },
+      "materials": {
+        "wood": 3,
+        "fiber": 2
+      }
+    },
+    "copper_necklace": {
+      "slot": "necklace",
+      "modifiers": {
+        "max_hp": 10,
+        "defense": 1
+      },
+      "materials": {
+        "copper_ore": 4,
+        "fiber": 2
+      }
+    },
+    "starter_fishing_rod": {
+      "slot": "fishing_rod",
+      "modifiers": {},
+      "materials": {},
+      "starter": true
+    }
+  },
+  "consumables": {
+    "salad": {
+      "buff_id": "gathering_meal",
+      "stat": "gather_bonus",
+      "amount": 1,
+      "uses": 3,
+      "heal": 25
+    },
+    "tea": {
+      "buff_id": "crafting_tea",
+      "stat": "craft_savings",
+      "amount": 1,
+      "uses": 3,
+      "heal": 15
+    },
+    "vegetable_soup": {
+      "buff_id": "mining_meal",
+      "stat": "mining_bonus",
+      "amount": 1,
+      "uses": 3,
+      "heal": 40
+    }
+  },
+  "auto_grant_starter_rod": true,
+  "starter_rod": "starter_fishing_rod",
+  "main_hand_base": {
+    "damage": 1,
+    "speed": 1.2,
+    "range": 1.1,
+    "knockback": 0.1,
+    "crop_power": 0.5,
+    "ore_power": 0.25,
+    "wood_power": 0.3
+  }
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import path from 'node:path';
-import { blueprintSets, loadBlueprint } from '../../src/http/app.js';
+import { plotFor, loadBlueprint } from '../../src/http/app.js';
 import { nearbyEntry, ownerFarmView, snapshotSlot, visitorSnapshot, type FarmRow } from '../../src/http/dto.js';
 import { DEFAULT_CONTENT_DIR, loadContent } from '../../src/domain/content.js';
 import { derive } from '../../src/domain/derive.js';
@@ -11,14 +11,12 @@ import { at, SH } from '../domain/helpers.js';
 const content = loadContent(DEFAULT_CONTENT_DIR);
 const ROOT = path.resolve(DEFAULT_CONTENT_DIR, '..', '..', '..');
 const bp = loadBlueprint(path.join(ROOT, 'assets', 'blueprints'), 'sh_a', 2)!;
-const sets = blueprintSets(bp);
+const sets = plotFor(content);
 const NOW = at('2026-09-04T10:07:00+08:00');
 
 function farm(over: Partial<FarmRow> = {}): FarmRow {
   const state = createInitialState({
     player_day_id: '2026-09-04', field_condition: 'sunny', now: NOW, wallet: 180,
-    bed_cells: [...sets.cultivable].filter(x => !sets.reserved.has(x)),
-    reserved_cells: [...sets.reserved],
   });
   state.wallet = 999;
   state.residents.bistro_owner.points = 42;
@@ -43,7 +41,7 @@ describe('OwnerFarmView', () => {
     const f = farm();
     expect(Object.keys(ownerFarmView(f, d(f), NOW)).sort()).toEqual([
       'blueprint_revision', 'derived', 'farm_id', 'layout_patch_id', 'location_visible',
-      'region_id', 'server_time', 'state', 'version', 'visit_access',
+      'region_id', 'relocation', 'server_time', 'state', 'version', 'visit_access',
     ]);
   });
 });
@@ -67,7 +65,6 @@ describe('VisitorSnapshot（G2）', () => {
     f.state.beds_unlocked = 4;
     const expanded = visitorSnapshot(f, d(f), 3, snapshotSlot(NOW));
     expect(expanded.beds_unlocked).toBe(4);
-    expect(expanded.cells.filter(c => sets.reserved.has(c.cell_id)).every(c => c.state === 'wild')).toBe(true);
   });
 
   it('不含主人的私有状态：钱包、库存、关系、章节、XP、owner_id', () => {
@@ -97,18 +94,21 @@ describe('VisitorSnapshot（G2）', () => {
   });
 
   it('每格只给 cell_id / state / crop / ripe', () => {
-    const cells = snap().cells as Record<string, unknown>[];
-    expect(Object.keys(cells[0]).sort()).toEqual(['cell_id', 'crop', 'ripe', 'state']);
+    // 自由格子种田：开局没有格子，先开垦一块再看快照。
+    const f = farm();
+    f.state.cells['0,0'] = { state: 'tilled', crop: null, watered_at: null, ready_at: null };
+    const cells = visitorSnapshot(f, d(f), 3, snapshotSlot(NOW)).cells as Record<string, unknown>[];
+    expect(Object.keys(cells[0]!).sort()).toEqual(['cell_id', 'crop', 'ripe', 'state']);
   });
 
   it('uses saved decorations and copies only explicit public prop fields', () => {
     const f = farm();
-    f.state.decorations = [{ anchor_id: 'courtyard', prop_id: 'bench', offset_q: [-4, 3] }];
+    f.state.decorations = [{ prop_id: 'bench', cell: [24, 3] }];
     const snapshot = visitorSnapshot(f, d(f), 3, snapshotSlot(NOW));
     expect(snapshot.props).toEqual(f.state.decorations);
-    expect(Object.keys(snapshot.props[0]).sort()).toEqual(['anchor_id', 'offset_q', 'prop_id']);
-    snapshot.props[0].offset_q[0] = 99;
-    expect(f.state.decorations[0].offset_q[0]).toBe(-4);
+    expect(Object.keys(snapshot.props[0]).sort()).toEqual(['cell', 'prop_id']);
+    snapshot.props[0].cell[0] = 99;
+    expect(f.state.decorations[0].cell[0]).toBe(24);
     delete f.state.decorations;
     expect(visitorSnapshot(f, d(f), 3, snapshotSlot(NOW)).props).toEqual([]);
     expect(f.state).not.toHaveProperty('decorations');

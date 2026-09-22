@@ -10,10 +10,11 @@ func _state() -> Dictionary:
 		"xp": {"first_harvest_crops": []}, "journey": {"version": 1, "facts": [], "unlocks": [],
 			"wood": 0, "completed": [], "exploration": {"round": 0, "collected": []}, "opportunities": {}}}
 
-func test_first_batch_recommends_three_plots_then_an_available_world_action() -> void:
+func test_first_batch_recommends_tilled_plots_then_an_available_world_action() -> void:
 	var st := _state()
 	var cells := {}
-	for i in 9: cells[str(i)] = {"state": "wild", "crop": null}
+	# 自由种植：荒地不进状态，CTA 只对已开垦的地提建议。
+	for i in 3: cells["%d,0" % i] = {"state": "tilled", "crop": null}
 	var first := NextStep.bulk(cells, 0, st, "R", ["R", "L"])
 	assert_int(first.cells.size()).is_equal(3)
 	for id in first.cells: cells[id] = {"state": "growing", "crop": "R", "ready_at": 180000}
@@ -41,15 +42,19 @@ func test_bag_shows_owned_supplies_and_refreshes_without_gameplay_commands() -> 
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var texts := panel.content.find_children("*", "Label", true, false).map(func(label): return label.text)
-	for expected in ["Carrot\n2 seeds / 2 harvested", "1 reserved", "4 wood / 2 stone / 3 reeds", "Vegetable salad: 1", "Chamomile tea: 2"]:
+	for expected in ["Carrot\n2 seeds / 2 harvested", "1 reserved", "Wood: 4", "Stone: 2", "Reeds: 3",
+			"Copper ore: 0", "Rock salt: 0", "Vegetable salad: 1", "Chamomile tea: 2", "Rock-salt vegetable soup: 0"]:
 		assert_array(texts).contains([expected])
 	assert_array(texts).contains([str(JourneyProgress.data().workshop.recipes.lantern.name) + ": 2"])
 	st.inventory.produce.C = 3
+	st.journey.materials.copper_ore = 2
+	st.journey.materials.rock_salt = 1
+	st.inventory.dishes.vegetable_soup = 1
 	session.state_changed.emit(st, 1)
 	await get_tree().process_frame
 	await get_tree().process_frame
 	texts = panel.content.find_children("*", "Label", true, false).map(func(label): return label.text)
-	assert_array(texts).contains(["Carrot\n2 seeds / 3 harvested"])
+	assert_array(texts).contains(["Carrot\n2 seeds / 3 harvested", "Copper ore: 2", "Rock salt: 1", "Rock-salt vegetable soup: 1"])
 	assert_int(transport.requests.size()).is_equal(0)
 
 func test_farm_hint_uses_the_supplied_clock_without_changing_crop_state() -> void:
@@ -101,7 +106,7 @@ func test_first_meal_ready_takes_priority_over_replanting_but_not_harvest_or_car
 	cells.a = {"state": "growing", "ready_at": 1000}
 	assert_str(NextStep.bulk(cells, 1000, st, "R", JourneyProgress.crops(st)).action).is_equal("harvest")
 	cells.a = {"state": "sown", "crop": "R"}
-	assert_str(NextStep.bulk(cells, 1000, st, "R", JourneyProgress.crops(st)).action).is_equal("care")
+	assert_str(NextStep.bulk(cells, 1000, st, "R", JourneyProgress.crops(st)).action).is_equal("water")
 	cells.a = {"state": "tilled"}
 	st.inventory.dishes.salad = 1
 	assert_str(NextStep.bulk(cells, 1000, st, "R", JourneyProgress.crops(st)).label).is_equal("Share your first meal")
@@ -162,7 +167,8 @@ func test_planter_can_rotate_move_undo_and_save_its_orientation() -> void:
 	assert_bool(panel.place_at(Vector3(-2, 0, 2))).is_true()
 	assert_int(panel.preview()[0].rotation_q).is_equal(1)
 	panel.undo()
-	assert_that(panel.preview()[0].offset_q).is_equal([-6, 5])
+	var want: Array = DecorationLayout.data().props.planter.default_cell
+	assert_that(panel.preview()[0].cell).is_equal([int(want[0]), int(want[1])])
 	var saved := panel.preview()
 	assert_bool(DecorationLayout.is_valid(saved)).is_true()
 	saved[0].rotation_q = 4

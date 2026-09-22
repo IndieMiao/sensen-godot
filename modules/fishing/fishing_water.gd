@@ -1,0 +1,179 @@
+class_name FishingWater
+extends Node3D
+
+var water_material: ShaderMaterial
+var site_id := ""
+var site_spec: Dictionary = {}
+const FLOW = preload("res://assets/farm/art/water/surface_flow.png")
+
+func interact(point: Vector3, strength: float) -> void:
+	if water_material:
+		water_material.set_shader_parameter("interaction", Vector4(point.x, point.z, 0, strength))
+
+static func build(site_id: String, site_override: Dictionary = {}) -> FishingWater:
+	var water := FishingWater.new()
+	water.name = site_id
+	water.site_id = site_id
+	var spec := FishingModel.site(site_id, site_override).duplicate(true)
+	water.site_spec = spec
+	var outline := PackedVector3Array()
+	if spec.has("center"):
+		for i in 64:
+			var angle := float(i) / 64.0 * TAU
+			outline.append(Vector3(float(spec.center[0]) + cos(angle) * float(spec.radii[0]), 0.055, float(spec.center[1]) + sin(angle) * float(spec.radii[1])))
+	else:
+		var left := PackedVector3Array()
+		var right := PackedVector3Array()
+		for i in spec.path.size():
+			var p: Array = spec.path[i]
+			var a: Array = spec.path[maxi(0, i - 1)]
+			var b: Array = spec.path[mini(spec.path.size() - 1, i + 1)]
+			var dir := Vector3(float(b[0]) - float(a[0]), 0, float(b[1]) - float(a[1])).normalized()
+			var normal := Vector3(-dir.z, 0, dir.x) * float(spec.width) * 0.5
+			var point := Vector3(p[0], 0.055, p[1])
+			left.append(point + normal)
+			right.append(point - normal)
+		outline.append_array(left)
+		# Rounded ends match the shared capsule geometry used for cast validation.
+		for endpoint in [spec.path.size() - 1, 0]:
+			var at: Array = spec.path[endpoint]
+			var neighbour: Array = spec.path[endpoint - 1 if endpoint > 0 else 1]
+			var outward := Vector2(float(at[0]) - float(neighbour[0]), float(at[1]) - float(neighbour[1])).normalized()
+			var normal := Vector2(-outward.y, outward.x)
+			var angle := normal.angle()
+			for i in range(1, 13):
+				var offset := Vector2.from_angle(angle - float(i) / 12.0 * PI) * float(spec.width) * 0.5
+				outline.append(Vector3(float(at[0]) + offset.x, 0.055, float(at[1]) + offset.y))
+			if endpoint > 0:
+				right.reverse()
+				outline.append_array(right)
+	var polygon := PackedVector2Array()
+	for point in outline: polygon.append(Vector2(point.x, point.z))
+	var triangles := Geometry2D.triangulate_polygon(polygon)
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for index in triangles:
+		surface.set_normal(Vector3.UP)
+		surface.add_vertex(outline[index])
+	var mesh := MeshInstance3D.new()
+	mesh.name = "FishingWaterSurface"
+	mesh.mesh = surface.commit()
+	var material := ShaderMaterial.new()
+	material.shader = preload("res://modules/fishing/water.gdshader")
+	material.set_shader_parameter("pebble_bed", preload("res://assets/farm/art/water/sediment.png"))
+	material.set_shader_parameter("surface_flow", FLOW)
+	material.set_shader_parameter("caustics", preload("res://assets/farm/art/water/caustic_light.png"))
+	mesh.layers = 2
+	mesh.material_override = material
+	mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	water.water_material = material
+	if spec.has("center"):
+		material.set_shader_parameter("basin", Vector4(spec.center[0], spec.center[1], spec.radii[0], spec.radii[1]))
+	else:
+		material.set_shader_parameter("river", true)
+		material.set_shader_parameter("river_half_width", float(spec.width) * 0.5)
+		for index in 3:
+			var a: Array = spec.path[index]
+			var b: Array = spec.path[index + 1]
+			material.set_shader_parameter(["river_a", "river_b", "river_c"][index], Vector4(a[0], a[1], b[0], b[1]))
+	water.add_child(mesh)
+	var visibility := VisibleOnScreenNotifier3D.new()
+	visibility.name = "WaterVisibility"
+	visibility.aabb = mesh.mesh.get_aabb().grow(0.4)
+	water.add_child(visibility)
+	if spec.has("center"): water._build_lilies(spec)
+	water.add_child(WaterShore.build(site_id, spec))
+	return water
+
+func _ready() -> void:
+	_setup_reflections.call_deferred()
+
+func _setup_reflections() -> void:
+	if DisplayServer.get_name() == "headless" or RenderingServer.get_current_rendering_method() == "gl_compatibility": return
+	var scenery: Node = get_parent().get_node_or_null("Scenery")
+	if scenery == null and site_spec.get("space", "") == "street": scenery = get_parent()
+	if scenery == null: return
+	for node in scenery.find_children("*", "GeometryInstance3D", true, false):
+		if not (node is MeshInstance3D or node is MultiMeshInstance3D): continue
+		if node.name in ["NeighbourhoodRoads", "BankGround"]: continue
+		var parent: Node = node
+		var is_water := false
+		var is_bank := false
+		while parent and parent != scenery:
+			if parent is WaterShore: is_bank = true
+			if parent is FishingWater: is_water = true
+			parent = parent.get_parent()
+		if not is_water or is_bank: node.set_layer_mask_value(3, true)
+	# Farm water is a sibling of Scenery, so its own bank needs explicit tagging.
+	for node in get_node("NaturalWaterBank").find_children("*", "MeshInstance3D", true, false):
+		if node.name != "BankGround": node.set_layer_mask_value(3, true)
+	var reflection := WaterReflection.new()
+	reflection.name = "PlanarBankReflection"
+	reflection.material = water_material
+	add_child(reflection)
+
+func _build_lilies(spec: Dictionary) -> void:
+	var surface := SurfaceTool.new()
+	var flowers := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	flowers.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 190924 if site_id == "farm_pond" else 190925
+	for angle in [2.3, 0.55, 4.1]:
+		var cluster := Vector3(float(spec.center[0]) + cos(angle) * float(spec.radii[0]) * 0.72, 0.088,
+			float(spec.center[1]) + sin(angle) * float(spec.radii[1]) * 0.72)
+		for leaf in 7:
+			var offset := Vector3(cos(leaf * 2.4), 0, sin(leaf * 2.4)) * sqrt(float(leaf)) * 0.16
+			var point := cluster + offset + Vector3.UP * (float(leaf) * 0.002)
+			var radius := rng.randf_range(0.12, 0.22)
+			_lily_leaf(surface, point, radius, rng.randf_range(0, TAU), Color("80993c").lerp(Color("b7c962"), rng.randf()))
+		for ring in 2:
+			var count := 10 if ring == 0 else 7
+			for petal in count:
+				var a := float(petal) / count * TAU + ring * 0.4
+				var size := Vector3(0.16, 0.03, 0.06) if ring == 0 else Vector3(0.115, 0.034, 0.055)
+				var offset := Vector3(cos(a), 0, sin(a)) * (0.065 if ring == 0 else 0.035)
+				var basis := Basis(Vector3.UP, -a) * Basis(Vector3.FORWARD, -0.20 if ring == 0 else -0.50)
+				PlaceScenery._oval(flowers, size, cluster + offset + Vector3.UP * (0.035 + ring * 0.025), Color("fff6dc").srgb_to_linear(), basis)
+		PlaceScenery._oval(flowers, Vector3(0.06, 0.045, 0.06), cluster + Vector3.UP * 0.07, Color("e6bd4a").srgb_to_linear())
+		# Small floating leaves break up the edge of each patch without a solid mat.
+		for leaf in 18:
+			var point := cluster + Vector3(rng.randf_range(-0.5, 0.5), 0, rng.randf_range(-0.5, 0.5))
+			if FishingModel.contains(site_id, point, -0.20, site_spec):
+				_lily_leaf(surface, point, rng.randf_range(0.018, 0.040), rng.randf_range(0, TAU), Color("b2bc54"))
+	var leaves := MeshInstance3D.new()
+	leaves.name = "FloatingLilies"
+	surface.index()
+	leaves.mesh = surface.commit()
+	var leaf_material := ShaderMaterial.new()
+	leaf_material.shader = preload("res://modules/fishing/lily_leaf.gdshader")
+	leaves.material_override = leaf_material
+	leaves.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(leaves)
+	var blooms := MeshInstance3D.new()
+	blooms.name = "WaterLilies"
+	flowers.index()
+	blooms.mesh = flowers.commit()
+	var material := StandardMaterial3D.new()
+	material.vertex_color_use_as_albedo = true
+	material.roughness = 0.60
+	blooms.material_override = material
+	blooms.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(blooms)
+
+static func _lily_leaf(surface: SurfaceTool, center: Vector3, radius: float, yaw: float, color: Color) -> void:
+	for ring in 4:
+		for step in 32:
+			var a := yaw + 0.14 + float(step) / 32.0 * (TAU - 0.28)
+			var b := yaw + 0.14 + float(step + 1) / 32.0 * (TAU - 0.28)
+			var inner := float(ring) / 4.0
+			var outer := float(ring + 1) / 4.0
+			var coords := [Vector2(cos(a), sin(a)) * inner, Vector2(cos(b), sin(b)) * inner,
+				Vector2(cos(b), sin(b)) * outer, Vector2(cos(a), sin(a)) * outer]
+			for index in [0, 2, 1, 0, 3, 2]:
+				var q: Vector2 = coords[index]
+				var lift := q.length_squared() * 0.012 + sin(q.angle() * 4.0) * q.length_squared() * 0.003
+				surface.set_normal(Vector3.UP)
+				surface.set_uv(q * 0.5 + Vector2.ONE * 0.5)
+				surface.set_color(color.srgb_to_linear())
+				surface.add_vertex(center + Vector3(q.x * radius, lift, q.y * radius))

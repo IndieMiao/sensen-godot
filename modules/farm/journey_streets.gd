@@ -99,6 +99,7 @@ func _rasterize(free_ground := false) -> void:
 			if free_ground:
 				for building in buildings.values():
 					if point.distance_to(building) < 1.65: walk = false
+			if free_ground and FishingModel.water_at("street", point): walk = false
 			row += "1" if walk else "0"
 		nav.masks.walkable.append(row)
 

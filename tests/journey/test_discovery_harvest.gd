@@ -96,7 +96,8 @@ func test_tapping_a_harvest_walks_before_sending_and_removes_both_choices_after_
 				scene._process(0.05)
 			assert_bool(scene.busy).is_true()
 			assert_bool(scene.select_target(target_id)).is_false()
-			var deadline := Time.get_ticks_msec() + 2000
+			var work_seconds := CharacterModel.gather_seconds(st, CharacterModel.resource_kind(reward.materials))
+			var deadline := Time.get_ticks_msec() + ceili(work_seconds * 1000) + 1500
 			while scene.busy and Time.get_ticks_msec() < deadline: await get_tree().process_frame
 			for frame in 3: await get_tree().process_frame
 			assert_bool(scene.busy).is_false()

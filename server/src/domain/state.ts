@@ -2,10 +2,10 @@
  * 农场状态。**身份与索引字段只在数据库列上**（farms 表），这里只放可变玩法数据
  * （Codex 二审 Minor 2：两处都有会出现「以哪边为准」的歧义）。
  */
-import type { CropId, DecorationId, DishId, FieldCondition, ResidentId } from './content.js';
+import { CROP_IDS, type CropId, type DecorationId, type DishId, type FieldCondition, type JourneyMaterial, type ResidentId } from './content.js';
 import { initialQa, type QaClock } from './qa.js';
 
-export const CELL_STATES = ['wild', 'cleared', 'tilled', 'sown', 'growing'] as const;
+export const CELL_STATES = ['tilled', 'sown', 'growing'] as const;
 export type CellState = (typeof CELL_STATES)[number];
 /** 没有 `ripe`：成熟是 `ready_at <= now` 的**派生**结果，不是存下来的状态（Codex 二审 Critical 2）。 */
 
@@ -14,26 +14,53 @@ export type GrowthChoice = 'tool' | 'field';
 export type NurseryStage = 'derelict' | 'cleared' | 'built';
 
 export interface DecorationPlacement {
-  anchor_id: 'courtyard';
   prop_id: DecorationId;
-  offset_q: [number, number];
+  /** 农场格坐标 `[i, j]`。过去是「相对 courtyard 锚点的四分之一米偏移」，
+   *  自由格子种田后农场格本身就是 0.5m，锚点这一层没有存在必要了。 */
+  cell: [number, number];
   rotation_q?: number;
 }
 
 export interface CellSlot {
   state: CellState;
   crop: CropId | null;
-  /** 播种时冻结的今日田况；必需照料绑定它（PRD §6.2 L391）。 */
-  care_weather: FieldCondition | null;
-  care_done_at: number | null;
-  /** 只在本轮必需照料成功时写入（PRD §11.1 L785）；播种但未照料为 null。 */
+  /** 浇水完成时刻。客户端按 `watered_at → ready_at` 四等分画生长阶段。 */
+  watered_at: number | null;
+  /** 只在浇水成功那一刻写入；播下但未浇水为 null，作物停在起点不开始成长。 */
   ready_at: number | null;
-  careful: boolean;
-  /** D0 教学那 6 株用 3 分钟特例，其余用作物正式时长（PRD §6.4 L429）。 */
-  tutorial: boolean;
 }
 
 export interface SeedLot { bought: number; bound: number }
+
+export interface BagStack {
+  id: string;
+  item_id: string;
+  quantity: number;
+  quality: string;
+  seed_lot?: 'bought' | 'bound';
+  instance_id?: string;
+  attributes?: Record<string, string | number | boolean>;
+}
+
+export interface BagState {
+  version: 1 | 2;
+  sequence: number;
+  capacity: number;
+  starter_rod_granted?: boolean;
+  next_id: number;
+  slots: BagStack[];
+  /** Legacy holdings and automatic rewards retain ownership even when slots are full. */
+  overflow: BagStack[];
+  equipped: Partial<Record<'main_hand' | 'fishing_rod' | 'ring_1' | 'ring_2' | 'necklace' | 'gloves' | 'tool' | 'accessory' | 'weapon', BagStack | null>>;
+}
+
+export interface CharacterState {
+  version: 1;
+  hp?: number;
+  starter_weapon_granted?: boolean;
+  last_gather_at?: number;
+  buffs: { id: string; source_item_id: string; remaining_uses: number }[];
+}
 
 export interface ResidentState {
   points: number;
@@ -55,12 +82,9 @@ export interface ChapterState {
 
 export interface XpState {
   total: number;
-  first_clear_cells: string[];
   first_harvest_crops: CropId[];
-  first_weather: FieldCondition[];
   first_recipes: DishId[];
   harvest_counted: { day: string | null; plants: number };
-  care_bonus_day: string | null;
 }
 
 export interface HandbookEntry {
@@ -90,8 +114,13 @@ export interface WeekSummary {
 }
 
 export interface FarmState {
-  /** Created only with a new ordinary farm. Absence preserves legacy 9/12 plots. */
-  field_progress?: { order: string[]; planted: number; harvested: number; plots: 4 | 6 | 9 };
+  fishing?: import('./fishing.js').FishingState;
+  /** Equipment attributes are derived; only remaining successful meal uses are persisted. */
+  character?: CharacterState;
+  /** Missing legacy bags are imported without loss; once present this is the inventory authority. */
+  bag?: BagState;
+  /** Missing on previous saves; created by the first owner mine entry. */
+  mine?: MineState;
   /** Absent on G3 saves; upgrading is an explicit, idempotent owner command. */
   journey?: JourneyState;
   clock: {
@@ -108,9 +137,10 @@ export interface FarmState {
   inventory: {
     seeds: Record<CropId, SeedLot>;
     produce: Record<CropId, number>;
-    dishes: Record<DishId, number>;
+    dishes: Record<'salad' | 'tea', number> & Partial<Record<DishId, number>>;
   };
-  cells: Record<string, CellSlot>;
+  /** 稀疏：有 key = 已开垦。没有 key = 荒地，不占存储。 */
+  cells: Record<string, CellSlot | undefined>;
   /** 导演模式时钟；正式农场是恒等变换。老农场缺这个字段时按未加速补齐。 */
   qa?: QaClock;
   beds_unlocked: 3 | 4;
@@ -144,13 +174,29 @@ export interface FarmState {
 
 export const cellId = (i: number, j: number): string => `${i},${j}`;
 
+export interface MineState {
+  version: 1;
+  run: number;
+  /** Zero is the farm; active mine floors are one through five. */
+  floor: number;
+  deepest_floor: number;
+  cleared_floors: number[];
+  broken: Record<string, string[]>;
+  elevator_unlocked: boolean;
+  combat?: { version: 1 | 2; sequence: number; monsters: Record<string, number[]>;
+    last_attack_at?: number; last_hurt_at?: number; defeats: number;
+    last_result?: { damage: number; hurt: number; defeated: string[]; rescued: boolean;
+      materials: Partial<Record<JourneyMaterial, number>>; loot?: Record<string, number> } };
+  last_drop?: { floor: number; node_id: string; materials: Partial<Record<JourneyMaterial, number>> };
+}
+
 export interface JourneyState {
   version: 1;
   facts: string[];
   completed: string[];
   unlocks: string[];
   wood: number;
-  materials?: { stone: number; fiber: number };
+  materials?: { stone: number; fiber: number } & Partial<Record<Exclude<JourneyMaterial, 'wood'>, number>>;
   facility_uses?: Record<string, number>;
   exploration: { round: number; collected: string[]; route?: string; routes_by_place?: Record<string, string>;
     branching_places?: string[]; choices?: Record<string, 'primary' | 'alternate'> };
@@ -163,7 +209,13 @@ export interface JourneyState {
   discovery_choices?: Record<string, string>;
   contributions?: Record<string, number>;
   gathering?: { sequence: number; planned?: string; current?: string; memories: string[] };
-  opportunities: Record<string, { sequence: number; variant: number }>;
+  opportunities: Record<string, {
+    sequence: number;
+    variant: number;
+    accepted?: boolean;
+    last_completed?: { offer_id: string; resident_id: ResidentId; sequence: number;
+      consumed: Record<string, number>; coins: number; effect: string; contribution: number };
+  }>;
 }
 export const parseCellId = (id: string): [number, number] => {
   const [i, j] = id.split(',').map(Number);
@@ -174,25 +226,19 @@ export const parseCellId = (id: string): [number, number] => {
  * 每种作物给一份**独立**的值。写成 `{ R: v, L: v, ... }` 会让四种作物共用同一个对象引用，
  * 发 Grant 时 6R 与 3L 会写进同一个仓（测试 sow_cells 抓到过）。
  */
-const perCrop = <T>(make: () => T): Record<CropId, T> => ({ R: make(), L: make(), C: make(), H: make() });
+const perCrop = <T>(make: () => T): Record<CropId, T> =>
+  Object.fromEntries(CROP_IDS.map(id => [id, make()])) as Record<CropId, T>;
 
 export interface InitialArgs {
   player_day_id: string;
   field_condition: FieldCondition;
   now: number;
   wallet: number;
-  /** 蓝图里 cultivable 的全部 12 格；前 9 格属初始三畦，后 3 格是预留畦。 */
-  bed_cells: string[];
-  reserved_cells: string[];
 }
 
 export function createInitialState(a: InitialArgs): FarmState {
-  const cells: Record<string, CellSlot> = {};
-  for (const id of [...a.bed_cells, ...a.reserved_cells])
-    cells[id] = {
-      state: 'wild', crop: null, care_weather: null, care_done_at: null,
-      ready_at: null, careful: false, tutorial: false,
-    };
+  // 开局一格未开垦：cells 为空字典，玩家自己决定在哪下锄。
+  const cells: Record<string, CellSlot | undefined> = {};
   return {
     clock: {
       player_day_id: a.player_day_id,
@@ -234,8 +280,8 @@ export function createInitialState(a: InitialArgs): FarmState {
     sales_facts: {},
     subsidies_claimed: [],
     xp: {
-      total: 0, first_clear_cells: [], first_harvest_crops: [], first_weather: [],
-      first_recipes: [], harvest_counted: { day: a.player_day_id, plants: 0 }, care_bonus_day: null,
+      total: 0, first_harvest_crops: [], first_recipes: [],
+      harvest_counted: { day: a.player_day_id, plants: 0 },
     },
     handbook: [],
   };

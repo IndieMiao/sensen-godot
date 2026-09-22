@@ -14,6 +14,9 @@ var regions: FarmRegions
 var _bridge: MapBridge = null
 var _located := false
 var _locating := false
+var _city_card: Panel
+var _city_column: VBoxContainer
+var _city_card_layer: Control
 
 @onready var buttons: VBoxContainer = %Buttons
 @onready var use_current: Button = %UseCurrent
@@ -38,7 +41,8 @@ func _ready() -> void:
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(backdrop)
 	move_child(backdrop, 0)
-	var background_path := "res://assets/ui/backgrounds/city-garden.png"
+	var background_path := "res://assets/ui/game/city-background.png"
+	if not ResourceLoader.exists(background_path): background_path = "res://assets/ui/backgrounds/city-garden.png"
 	if ResourceLoader.exists(background_path):
 		var scenery := TextureRect.new()
 		scenery.name = "Scenery"
@@ -51,29 +55,54 @@ func _ready() -> void:
 		move_child(scenery, 1)
 	$SafeArea/VBox.add_theme_constant_override("separation", 12)
 	$SafeArea/VBox/Title.text = "Choose a city"
-	$SafeArea/VBox/Title.add_theme_font_size_override("font_size", 20)
+	$SafeArea/VBox/Title.add_theme_font_size_override("font_size", 24)
 	$SafeArea/VBox/Title.custom_minimum_size.y = 48
 	buttons.add_theme_constant_override("separation", 12)
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	status.add_theme_font_size_override("font_size", 12)
-	status.add_theme_color_override("font_outline_color", GameUi.PAPER)
-	status.add_theme_constant_override("outline_size", 4)
+	status.add_theme_color_override("font_color", GameUi.MUTED)
 	status.custom_minimum_size.y = 32
 	regions = FarmRegions.load_default()
 	if regions == null:
 		status.text = "Missing city configuration"
 		return
 	for r in regions.regions:
-		var b := Button.new()
-		b.text = str(r.name)
-		b.icon = GameUi.icon("map-pin")
+		var b := GameUi.button("map-pin", str(r.name), str(r.name))
+		b.theme_type_variation = &"ChoiceButton"
 		b.custom_minimum_size = Vector2(0, 54)
 		b.pressed.connect(choose.bind(str(r.id)))
 		buttons.add_child(b)
 	use_current.pressed.connect(locate)
 	use_current.icon = GameUi.icon("locate-fixed")
 	use_current.custom_minimum_size.y = 54
+	use_current.theme_type_variation = &"AccentButton"
 	status.text = ""
+	_city_column = $SafeArea/VBox
+	_city_column.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_city_card_layer = Control.new()
+	_city_card_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$SafeArea.add_child(_city_card_layer)
+	$SafeArea.move_child(_city_card_layer, 0)
+	_city_card = Panel.new()
+	_city_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_city_card.add_theme_stylebox_override("panel", GameUi.panel_style(18))
+	_city_card_layer.add_child(_city_card)
+	var symbol := GameUi.picture(GameUi.icon("map-pin"), 42)
+	symbol.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_city_column.add_child(symbol)
+	_city_column.move_child(symbol, 0)
+	_city_card_layer.resized.connect(_layout_city_card)
+	_city_column.minimum_size_changed.connect(_layout_city_card.call_deferred)
+	_layout_city_card.call_deferred()
+
+func _layout_city_card() -> void:
+	if not is_instance_valid(_city_card): return
+	var area := _city_card_layer.size
+	var width := minf(408, maxf(1, area.x - 16))
+	_city_column.custom_minimum_size.x = maxf(1, width - 36)
+	var height := minf(area.y, _city_column.get_combined_minimum_size().y + 36)
+	_city_card.position = Vector2((area.x - width) * 0.5, (area.y - height) * 0.5)
+	_city_card.size = Vector2(width, height)
 
 func region_buttons() -> Array[Button]:
 	var out: Array[Button] = []

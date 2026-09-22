@@ -1,0 +1,59 @@
+{
+  "provider": "Sensenjoy",
+  "model": "gpt-image-2",
+  "asset_count": 13,
+  "assets": [
+    {
+      "asset": "bakery",
+      "provenance": "docs/design/la-map-2026-09-22/production/bakery/provenance.json"
+    },
+    {
+      "asset": "beach",
+      "provenance": "docs/design/la-map-2026-09-22/production/beach/provenance.json"
+    },
+    {
+      "asset": "cafe",
+      "provenance": "docs/design/la-map-2026-09-22/production/cafe/provenance.json"
+    },
+    {
+      "asset": "chinese_restaurant",
+      "provenance": "docs/design/la-map-2026-09-22/production/chinese_restaurant/provenance.json"
+    },
+    {
+      "asset": "flower_shop",
+      "provenance": "docs/design/la-map-2026-09-22/production/flower_shop/provenance.json"
+    },
+    {
+      "asset": "griffith_observatory",
+      "provenance": "docs/design/la-map-2026-09-22/production/griffith_observatory/provenance.json"
+    },
+    {
+      "asset": "hollywood_sign",
+      "provenance": "docs/design/la-map-2026-09-22/production/hollywood_sign/provenance.json"
+    },
+    {
+      "asset": "museum",
+      "provenance": "docs/design/la-map-2026-09-22/production/museum/provenance.json"
+    },
+    {
+      "asset": "park",
+      "provenance": "docs/design/la-map-2026-09-22/production/park/provenance.json"
+    },
+    {
+      "asset": "restaurant",
+      "provenance": "docs/design/la-map-2026-09-22/production/restaurant/provenance.json"
+    },
+    {
+      "asset": "santa_monica_pier",
+      "provenance": "docs/design/la-map-2026-09-22/production/santa_monica_pier/provenance.json"
+    },
+    {
+      "asset": "shop",
+      "provenance": "docs/design/la-map-2026-09-22/production/shop/provenance.json"
+    },
+    {
+      "asset": "theme_park",
+      "provenance": "docs/design/la-map-2026-09-22/production/theme_park/provenance.json"
+    }
+  ]
+}

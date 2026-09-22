@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import path from 'node:path';
 import { PRESET_SPECS, buildPresetFarm, deterministicUuid, presetByFarmId, presetFarmId } from '../../src/domain/presets.js';
-import { blueprintSets, loadBlueprint } from '../../src/http/app.js';
+import { plotFor, loadBlueprint } from '../../src/http/app.js';
 import { DEFAULT_CONTENT_DIR, loadContent } from '../../src/domain/content.js';
 import { derive } from '../../src/domain/derive.js';
 import { at } from './helpers.js';
@@ -43,10 +43,10 @@ describe('预置农场', () => {
     it(`${spec.layout} (${spec.style}) 能用真实归约器建出来`, () => {
       const bp = loadBlueprint(path.join(ROOT, 'assets', 'blueprints'), spec.layout, spec.revision);
       expect(bp, '蓝图必须在架').toBeTruthy();
-      const farm = buildPresetFarm(spec, blueprintSets(bp!), content, tzOf(spec.region), T0);
+      const farm = buildPresetFarm(spec, plotFor(content), content, tzOf(spec.region), T0);
       expect(farm.visit_access).toBe('anyone');
       expect(farm.location_visible).toBe(true);
-      const cells = Object.values(farm.state.cells);
+      const cells = Object.values(farm.state.cells).filter(c => c !== undefined);
       const growing = cells.filter(c => c.state === 'growing');
       if (spec.style === 'lush') {
         expect(growing).toHaveLength(9);
@@ -56,10 +56,10 @@ describe('预置农场', () => {
         expect(d.ripe_cells).toHaveLength(6);
         expect(farm.state.nursery.stage).toBe('cleared');
       } else {
+        // 自由格子种田起，荒地不进状态：early 风格就是「开垦了三格，还没种」。
         expect(growing).toHaveLength(0);
         expect(cells.filter(c => c.state === 'tilled')).toHaveLength(3);
-        expect(cells.filter(c => c.state === 'cleared')).toHaveLength(3);
-        expect(cells.filter(c => c.state === 'wild')).toHaveLength(6);
+        expect(cells).toHaveLength(3);
       }
     });
   }
@@ -68,9 +68,9 @@ describe('预置农场', () => {
     const [lush, early] = ['sh_b', 'sh_c'].map(l => {
       const spec = PRESET_SPECS.find(s => s.layout === l)!;
       const bp = loadBlueprint(path.join(ROOT, 'assets', 'blueprints'), l, 2)!;
-      return buildPresetFarm(spec, blueprintSets(bp), content, 'Asia/Shanghai', T0);
+      return buildPresetFarm(spec, plotFor(content), content, 'Asia/Shanghai', T0);
     });
-    const hist = (f: typeof lush) => Object.values(f.state.cells).map(c => c.state).sort().join(',');
+    const hist = (f: typeof lush) => Object.values(f.state.cells).map(c => c?.state).sort().join(',');
     expect(hist(lush)).not.toBe(hist(early));
   });
 });

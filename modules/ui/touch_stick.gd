@@ -59,7 +59,10 @@ func _update_vector(v: Vector2, knob_pos: Vector2) -> void:
 
 func _draw() -> void:
 	var c := _center if _touch_index >= 0 else size * 0.5
-	draw_circle(c, radius, Color(DesignTokens.INK, 0.12))
-	draw_arc(c, radius, 0.0, TAU, 48, Color(DesignTokens.INK, 0.35), 2.0)
+	draw_circle(c + Vector2(0, 3), radius, Color(GameUi.BLUE, 0.12))
+	draw_circle(c, radius, Color(GameUi.PAPER, 0.54))
+	draw_arc(c, radius, 0.0, TAU, 48, Color(GameUi.BLUE, 0.6), 2.0)
 	var k := c + vector * radius if _touch_index >= 0 else c
-	draw_circle(k, radius * 0.4, Color(DesignTokens.ACCENT, 0.9))
+	draw_circle(k + Vector2(0, 3), radius * 0.4, Color(GameUi.BLUE, 0.28))
+	draw_circle(k, radius * 0.4, GameUi.PAPER)
+	draw_circle(k, radius * 0.29, GameUi.BLUE)

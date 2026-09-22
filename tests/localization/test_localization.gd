@@ -32,9 +32,7 @@ func test_dynamic_quantities_and_ingredients_use_chinese_without_changing_ids() 
 	assert_str(L10n.format_text("Prepare %s", "tea")).is_equal("制作茶")
 	for count in [0, 1, 2, 12]:
 		assert_str(L10n.count_text("%d seed", "%d seeds", count)).is_equal("%d 颗种子" % count)
-	assert_str(NextStep.doing_label("care", "R", "sunny")).is_equal("正在浇水…")
-	assert_str(NextStep.doing_label("care", "R", "rain")).is_equal("正在排水…")
-	assert_str(NextStep.doing_label("care", "R", "wind")).is_equal("正在加固…")
+	assert_str(NextStep.doing_label("water")).is_equal("正在浇水…")
 	assert_str(FarmHud.format_countdown(3_660_000)).is_equal("1 小时 01 分")
 	assert_str(FarmHud.format_countdown(0)).is_equal("已就绪")
 	assert_str(JourneyProgress.material_label({"wood": 2, "stone": 3, "fiber": 1})).is_equal("2 木料 + 3 石料 + 1 芦苇")
@@ -44,7 +42,6 @@ func test_dynamic_quantities_and_ingredients_use_chinese_without_changing_ids() 
 	assert_str(CropInfo.name_of("C")).is_equal("Carrot")
 	assert_str(L10n.count_text("%d seed", "%d seeds", 1)).is_equal("1 seed")
 	assert_str(L10n.count_text("%d seed", "%d seeds", 2)).is_equal("2 seeds")
-	assert_str(NextStep.doing_label("care", "R", "rain")).is_equal("Draining…")
 
 func test_catalog_preserves_format_specifiers_and_bundled_font_has_all_glyphs() -> void:
 	var messages: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/localization/zh_CN.json"))
@@ -59,6 +56,14 @@ func test_catalog_preserves_format_specifiers_and_bundled_font_has_all_glyphs() 
 	assert_dict(missing).is_empty()
 	var fallback := GameUi.theme().default_font.fallbacks
 	assert_bool(fallback.any(func(f): return f.has_char("中".unicode_at(0)))).is_true()
+
+func test_mined_materials_and_their_recipes_have_localized_names() -> void:
+	assert_str(JourneyProgress.material_label({"copper_ore": 3, "rock_salt": 1})).is_equal("3 铜矿石 + 1 岩盐")
+	assert_str(L10n.dish_name("vegetable_soup")).is_equal("岩盐蔬菜汤")
+	assert_str(L10n.text(str(JourneyProgress.data().workshop.recipes.crate.name))).is_equal("铜箍木箱")
+	TranslationServer.set_locale("en")
+	assert_str(L10n.material_name("copper_ore")).is_equal("Copper ore")
+	assert_str(L10n.dish_name("vegetable_soup")).is_equal("Rock-salt vegetable soup")
 
 func test_shared_content_stays_in_source_language_and_state_is_unchanged() -> void:
 	var state := {"journey": {"version": 1, "facts": [], "unlocks": [], "wood": 0, "exploration": {"collected": [], "round": 0}}, "cells": {}, "inventory": {"seeds": {}, "produce": {}}, "wallet": 0}

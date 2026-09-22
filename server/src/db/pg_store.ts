@@ -1,3 +1,7 @@
+import { plotForFarm } from '../geography/farm_terrain.js';
+import { relocateFarmState, relocationAvailable, relocationBlocked, relocationCommandMatches, relocationConfirmError, relocationEnvelope,
+  RelocationError, type RelocationConfirm, type RelocationDraft, type RelocationOutcome } from '../domain/farm_relocation.js';
+import type { FishingPresenceReader } from '../domain/fishing.js';
 /**
  * PostgreSQL 实现。**单写者**靠一句 `SELECT ... FOR UPDATE`：同一农场的命令被行锁串行化，
  * 不同农场并行。
@@ -5,7 +9,10 @@
  * `applyCommand` 里的步骤顺序与 spec §7.3 的伪代码逐条对应，顺序本身是被测对象
  * （test/db/concurrency.test.ts）。
  */
+import type { PlotLayout } from '../domain/plot.js';
 import { randomUUID } from 'node:crypto';
+import { changeDirectory } from '../realtime/directory.js';
+import { applyEffects, type Checkpoint, type DirectoryAction, type DirectoryPlayer, type PartyHome, type Effect, type Expedition, type Party } from '../realtime/model.js';
 import type pg from 'pg';
 import type { Command, CommandEnvelope } from '../domain/commands.js';
 import type { Content } from '../domain/content.js';
@@ -14,7 +21,7 @@ import { effectiveNow as qaNow } from '../domain/qa.js';
 import { DOMAIN_VERSION, STATE_SCHEMA_VERSION } from '../domain/version.js';
 import { MAX_ACTIVE_TOKENS, TOKEN_IDLE_MS, newToken, tokenHash } from '../http/auth.js';
 import { currentOwnerFarmView, type FarmRow } from '../http/dto.js';
-import { canonicalJson, payloadHash } from '../http/hash.js';
+import { canonicalJson, commandRecordResult, payloadHash } from '../http/hash.js';
 import type { ApplyOutcome, CommandRecord, PlayerRow, Store } from '../http/store.js';
 
 export interface PgStoreDeps {
@@ -22,7 +29,7 @@ export interface PgStoreDeps {
   content: Content;
   contentVersion: string;
   timezone: (regionId: string) => string;
-  blueprint: (layoutPatchId: string, revision: number) => Ctx['blueprint'];
+  plot: PlotLayout;
   now: () => number;
 }
 
@@ -32,7 +39,11 @@ const rowToFarm = (r: Record<string, unknown>): FarmRow => ({
   region_id: r.region_id as string,
   layout_patch_id: r.layout_patch_id as string,
   blueprint_revision: r.blueprint_revision as number,
+  ...(r.farm_terrain ? { farm_terrain: r.farm_terrain as FarmRow['farm_terrain'] } : {}),
   ...(r.location ? { location: r.location as FarmRow['location'] } : {}),
+  relocation_available: r.relocation_available === true,
+  relocation_used: r.relocation_used === true,
+  relocation_draft: (r.relocation_draft ?? null) as FarmRow['relocation_draft'],
   version: r.version as number,
   location_visible: r.location_visible as boolean,
   visit_access: r.visit_access as 'only_me' | 'anyone',
@@ -41,6 +52,92 @@ const rowToFarm = (r: Record<string, unknown>): FarmRow => ({
 
 export class PgStore implements Store {
   constructor(private d: PgStoreDeps) {}
+
+  async realtimeLoad(key: string): Promise<Checkpoint | null> {
+    const result = await this.d.pool.query('SELECT revision, commit_id, state, rescued FROM online_rooms WHERE id=$1', [key]);
+    const row = result.rows[0];
+    return row ? { revision: row.revision, commit: row.commit_id, mine: row.state, rescued: row.rescued } : null;
+  }
+
+  async realtimeCommit(key: string, expected: number, commit: string, mine: Expedition, effects: Effect[]) {
+    const client = await this.d.pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 72))', [key]);
+      const prior = (await client.query('SELECT * FROM online_rooms WHERE id=$1 FOR UPDATE', [key])).rows[0];
+      const owners = [...new Set(effects.map(e => e.player))].sort();
+      const rows = await client.query('SELECT * FROM farms WHERE owner_id=ANY($1::uuid[]) ORDER BY owner_id FOR UPDATE', [owners]);
+      if (rows.rows.length !== owners.length) throw new Error('NO_FARM');
+      if (prior?.commit_id === commit) {
+        await client.query('COMMIT');
+        return { checkpoint: { revision: prior.revision, commit, mine: prior.state as Expedition, rescued: prior.rescued }, farms: rows.rows.map(rowToFarm) };
+      }
+      if ((prior?.revision ?? 0) !== expected) throw new Error('ROOM_CONFLICT');
+      for (const row of rows.rows) {
+        if (row.domain_version !== DOMAIN_VERSION || row.content_version !== this.d.contentVersion)
+          throw new Error('VERSION_MISMATCH');
+      }
+      const rescued: string[] = [];
+      const farms = rows.rows.map(row => applyEffects(rowToFarm(row), effects, this.d.content, rescued));
+      if (farms.length) await client.query(`UPDATE farms AS f SET state=data.state, version=data.version, updated_at=$2
+        FROM jsonb_to_recordset($1::jsonb) AS data(id uuid, state jsonb, version int) WHERE f.id=data.id`,
+        [JSON.stringify(farms.map(f => ({ id: f.id, state: f.state, version: f.version }))), this.d.now()]);
+      const checkpoint = { revision: expected + 1, commit, mine, rescued };
+      await client.query(`INSERT INTO online_rooms(id, revision, commit_id, state, updated_at, rescued) VALUES($1,$2,$3,$4,$5,$6)
+        ON CONFLICT(id) DO UPDATE SET revision=$2, commit_id=$3, state=$4, updated_at=$5, rescued=$6`,
+        [key, checkpoint.revision, commit, JSON.stringify(mine), this.d.now(), JSON.stringify(rescued)]);
+      await client.query('COMMIT');
+      return { checkpoint, farms };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally { client.release(); }
+  }
+
+  async realtimeDirectory(player: string, action: DirectoryAction = 'get', value = '') {
+    if (action === 'get') {
+      const row = (await this.d.pool.query(`SELECT op.instance_id, op.party_farm_access, p.state AS party
+        FROM online_players op LEFT JOIN online_parties p ON p.id=op.party_id WHERE op.player_id=$1`, [player])).rows[0];
+      return { instance: row?.instance_id ?? '', party: (row?.party as Party | undefined) ?? null,
+        farm_access: Boolean(row?.party && row.party_farm_access === row.party.id) };
+    }
+    const client = await this.d.pool.connect();
+    try {
+      await client.query('BEGIN');
+      // Party operations are infrequent. One transaction lock makes join/transfer/kick atomic.
+      await client.query('SELECT pg_advisory_xact_lock(735920161)');
+      const own = (await client.query('SELECT * FROM online_players WHERE player_id=$1', [player])).rows[0];
+      const records = await client.query('SELECT * FROM online_parties WHERE id=$1 OR code=$2', [own?.party_id ?? '', value.toUpperCase()]);
+      const parties = new Map<string, Party>(records.rows.map(row => [row.id, row.state]));
+      const ids = [...new Set([player, ...records.rows.flatMap(row => (row.state as Party).members)])];
+      const members = await client.query('SELECT * FROM online_players WHERE player_id=ANY($1::uuid[])', [ids]);
+      const players = new Map<string, DirectoryPlayer>(members.rows.map(row =>
+        [row.player_id, { instance: row.instance_id, party: row.party_id, farm_access: row.party_farm_access }]));
+      const before = new Map([...players].map(([id, entry]) => [id, JSON.stringify(entry)]));
+      const result = changeDirectory(players, parties, player, action, value);
+      const changed = [...players].filter(([id, entry]) => before.get(id) !== JSON.stringify(entry)).map(([player_id, entry]) =>
+        ({ player_id, instance_id: entry.instance, party_id: entry.party, party_farm_access: entry.farm_access ?? '' }));
+      if (changed.length) await client.query(`INSERT INTO online_players(player_id, instance_id, party_id, party_farm_access)
+        SELECT player_id, instance_id, party_id, party_farm_access FROM jsonb_to_recordset($1::jsonb)
+        AS input(player_id uuid, instance_id text, party_id text, party_farm_access text)
+        ON CONFLICT(player_id) DO UPDATE SET instance_id=EXCLUDED.instance_id, party_id=EXCLUDED.party_id,
+        party_farm_access=EXCLUDED.party_farm_access`, [JSON.stringify(changed)]);
+      for (const row of records.rows) if (!parties.has(row.id)) await client.query('DELETE FROM online_parties WHERE id=$1', [row.id]);
+      for (const party of parties.values()) await client.query(`INSERT INTO online_parties(id, code, state) VALUES($1,$2,$3)
+        ON CONFLICT(id) DO UPDATE SET state=$3`, [party.id, party.code, JSON.stringify(party)]);
+      await client.query('COMMIT');
+      return result;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally { client.release(); }
+  }
+
+  async realtimeHomes(players: string[]): Promise<PartyHome[]> {
+    return (await this.d.pool.query(`SELECT f.id, f.owner_id, f.region_id, f.layout_patch_id, f.blueprint_revision,
+      f.visit_access, COALESCE(op.party_farm_access, '') AS party_farm_access
+      FROM farms f LEFT JOIN online_players op ON op.player_id=f.owner_id WHERE f.owner_id=ANY($1::uuid[])`, [players])).rows;
+  }
 
   async authAnonymous(hmac: string) {
     const now = this.d.now();
@@ -124,20 +221,85 @@ export class PgStore implements Store {
     return { count: count.rows[0].n as number, farms: rows.rows.map(rowToFarm) };
   }
 
-  async snapshotGetOrCreate(farmId: string, slot: number, build: () => object) {
+  async saveRelocationPreview(ownerId: string, draft: RelocationDraft) {
     const client = await this.d.pool.connect();
     try {
       await client.query('BEGIN');
+      const row = (await client.query('SELECT * FROM farms WHERE owner_id=$1 FOR UPDATE', [ownerId])).rows[0];
+      let code: string | undefined;
+      if (!row) code = 'NO_FARM';
+      else {
+        const farm = rowToFarm(row);
+        if (row.domain_version !== DOMAIN_VERSION || row.content_version !== this.d.contentVersion
+          || row.state_schema_version !== STATE_SCHEMA_VERSION) code = 'VERSION_MISMATCH';
+        else if (!relocationAvailable(farm)) code = 'RELOCATION_UNAVAILABLE';
+        else if (relocationBlocked(farm, this.d.now(), this.d.content)) code = 'RELOCATION_BUSY';
+        else if (farm.version !== draft.base_version || farm.region_id !== draft.region_id) code = 'RELOCATION_CONFLICT';
+      }
+      if (!code) await client.query('UPDATE farms SET relocation_draft=$2 WHERE owner_id=$1', [ownerId, JSON.stringify(draft)]);
+      await client.query('COMMIT');
+      return code ? { code } : {};
+    } catch (error) { await client.query('ROLLBACK'); throw error; }
+    finally { client.release(); }
+  }
+
+  async confirmFarmRelocation(ownerId: string, input: RelocationConfirm): Promise<RelocationOutcome> {
+    const client = await this.d.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const row = (await client.query('SELECT * FROM farms WHERE owner_id=$1 FOR UPDATE', [ownerId])).rows[0];
+      if (!row) { await client.query('ROLLBACK'); return { kind: 'rejected', code: 'NO_FARM' }; }
+      const farm = rowToFarm(row), env = relocationEnvelope(input), hash = payloadHash(env);
+      const prior = (await client.query('SELECT * FROM commands WHERE farm_id=$1 AND idempotency_key=$2', [farm.id, input.idempotency_key])).rows[0];
+      if (prior) {
+        await client.query('COMMIT');
+        if (prior.payload_hash !== hash) return { kind: 'rejected', code: 'IDEMPOTENCY_MISMATCH' };
+        return prior.outcome === 'applied' ? { kind: 'replayed', farm } : { kind: 'rejected', code: prior.result.code };
+      }
+      if (row.domain_version !== DOMAIN_VERSION || row.content_version !== this.d.contentVersion || row.state_schema_version !== STATE_SCHEMA_VERSION) {
+        await client.query('ROLLBACK'); return { kind: 'rejected', code: 'VERSION_MISMATCH' };
+      }
+      const now = this.d.now();
+      const reject = async (code: string): Promise<RelocationOutcome> => {
+        await this.logCommand(client, farm.id, env, hash, 'rejected', { code }, now);
+        await client.query('COMMIT'); return { kind: 'rejected', code };
+      };
+      const code = relocationConfirmError(farm, input, now, this.d.content);
+      if (code) return await reject(code);
+      const draft = farm.relocation_draft!;
+      let moved;
+      try { moved = relocateFarmState(farm.state, plotForFarm({ farm_terrain: draft.farm_terrain }, this.d.plot), this.d.content); }
+      catch (error) { if (error instanceof RelocationError) return await reject(error.code); throw error; }
+      const result = await client.query(`UPDATE farms SET state=$2, location=$3, farm_terrain=$4,
+        layout_patch_id=$5, blueprint_revision=$6, blueprint_checksum=$7, version=version+1,
+        relocation_available=false, relocation_used=true, relocation_draft=NULL, updated_at=$8 WHERE id=$1 RETURNING *`,
+      [farm.id, JSON.stringify(moved.state), JSON.stringify(draft.location), JSON.stringify(draft.farm_terrain),
+        draft.farm_terrain.layout_id, draft.farm_terrain.plot.revision, draft.farm_terrain.plot.checksum, now]);
+      await client.query('DELETE FROM farm_snapshots WHERE farm_id=$1', [farm.id]);
+      await this.logCommand(client, farm.id, env, hash, 'applied', { version: farm.version + 1, events: [{ type: 'farm_relocated' }] }, now);
+      await client.query('COMMIT');
+      return { kind: 'applied', farm: rowToFarm(result.rows[0]) };
+    } catch (error) { await client.query('ROLLBACK'); throw error; }
+    finally { client.release(); }
+  }
+
+  async snapshotGetOrCreate(farmId: string, slot: number, build: (current: FarmRow) => object) {
+    const client = await this.d.pool.connect();
+    try {
+      await client.query('BEGIN');
+      // Same lock order as relocation: an in-flight old read must not recreate a stale snapshot after commit.
+      const saved = (await client.query('SELECT * FROM farms WHERE id=$1 FOR UPDATE', [farmId])).rows[0];
+      if (!saved) throw new Error('NO_FARM');
+      const farm = rowToFarm(saved);
       const prev = await client.query('SELECT * FROM farm_snapshots WHERE farm_id = $1 FOR UPDATE', [farmId]);
       if (prev.rowCount && Number(prev.rows[0].snapshot_taken_at) === slot) {
         await client.query('COMMIT');
-        return { revision: prev.rows[0].snapshot_revision as number, taken_at: slot, body: prev.rows[0].body as object };
+        return { revision: prev.rows[0].snapshot_revision as number, taken_at: slot, body: prev.rows[0].body as object, farm };
       }
-      const body = build();
+      const body = build(farm);
       const old = prev.rowCount ? prev.rows[0] : null;
       const changed = !old || canonicalJson(old.body) !== canonicalJson(body);
       const revision = old ? (changed ? (old.snapshot_revision as number) + 1 : old.snapshot_revision as number) : 1;
-      const farm = await client.query('SELECT blueprint_revision FROM farms WHERE id = $1', [farmId]);
       await client.query(
         `INSERT INTO farm_snapshots (farm_id, snapshot_revision, snapshot_taken_at, body,
            blueprint_revision, content_version, domain_version)
@@ -146,10 +308,10 @@ export class PgStore implements Store {
            snapshot_taken_at = EXCLUDED.snapshot_taken_at, body = EXCLUDED.body,
            blueprint_revision = EXCLUDED.blueprint_revision, content_version = EXCLUDED.content_version,
            domain_version = EXCLUDED.domain_version`,
-        [farmId, revision, slot, JSON.stringify(body), farm.rows[0]?.blueprint_revision ?? 0,
+        [farmId, revision, slot, JSON.stringify(body), farm.blueprint_revision,
           this.d.contentVersion, DOMAIN_VERSION]);
       await client.query('COMMIT');
-      return { revision, taken_at: slot, body };
+      return { revision, taken_at: slot, body, farm };
     } catch (e) {
       await client.query('ROLLBACK');
       throw e;
@@ -169,13 +331,13 @@ export class PgStore implements Store {
       await client.query(
         `INSERT INTO farms (id, owner_id, region_id, layout_patch_id, blueprint_revision,
            blueprint_checksum, content_version, domain_version, state_schema_version,
-           version, state, visit_access, location_visible, created_at, updated_at, location)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11,$12,$13,$13,$14)
+           version, state, visit_access, location_visible, created_at, updated_at, location, farm_terrain)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11,$12,$13,$13,$14,$15)
          ON CONFLICT (id) DO NOTHING`,
         [farm.id, farm.owner_id, farm.region_id, farm.layout_patch_id, farm.blueprint_revision,
           '', this.d.contentVersion, DOMAIN_VERSION, STATE_SCHEMA_VERSION,
           JSON.stringify(farm.state), farm.visit_access, farm.location_visible, now,
-          farm.location ? JSON.stringify(farm.location) : null]);
+          farm.location ? JSON.stringify(farm.location) : null, farm.farm_terrain ? JSON.stringify(farm.farm_terrain) : null]);
       await client.query('COMMIT');
     } catch (e) {
       await client.query('ROLLBACK');
@@ -204,16 +366,16 @@ export class PgStore implements Store {
         await client.query('COMMIT');
         return { kind: 'replayed' as const, farm: rowToFarm(f.rows[0]) };
       }
-      const farm = args.build();
+      const farm = await args.build();
       await client.query(
         `INSERT INTO farms (id, owner_id, region_id, layout_patch_id, blueprint_revision,
            blueprint_checksum, content_version, domain_version, state_schema_version,
-           version, state, visit_access, location_visible, created_at, updated_at, location)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11,$12,$13,$13,$14)`,
+           version, state, visit_access, location_visible, created_at, updated_at, location, farm_terrain)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,0,$10,$11,$12,$13,$13,$14,$15)`,
         [farm.id, farm.owner_id, farm.region_id, farm.layout_patch_id, farm.blueprint_revision,
           '', this.d.contentVersion, DOMAIN_VERSION, STATE_SCHEMA_VERSION,
           JSON.stringify(farm.state), farm.visit_access, farm.location_visible, now,
-          farm.location ? JSON.stringify(farm.location) : null]);
+          farm.location ? JSON.stringify(farm.location) : null, farm.farm_terrain ? JSON.stringify(farm.farm_terrain) : null]);
       await client.query(
         `INSERT INTO farm_creations (player_id, idempotency_key, payload_hash, farm_id, created_at)
          VALUES ($1,$2,$3,$4,$5)`,
@@ -228,7 +390,7 @@ export class PgStore implements Store {
     }
   }
 
-  async applyCommand(ownerId: string, env: CommandEnvelope, cmd: Command): Promise<ApplyOutcome> {
+  async applyCommand(ownerId: string, env: CommandEnvelope, cmd: Command, fishingPresence?: FishingPresenceReader): Promise<ApplyOutcome> {
     const client = await this.d.pool.connect();
     try {
       await client.query('BEGIN');
@@ -247,7 +409,7 @@ export class PgStore implements Store {
         const p = prior.rows[0] as CommandRecord;
         await client.query('COMMIT');
         return p.payload_hash === hash
-          ? { kind: 'replayed', record: p }
+          ? { kind: 'replayed', record: p, farm }
           : { kind: 'idempotency_mismatch' };
       }
 
@@ -257,6 +419,12 @@ export class PgStore implements Store {
         || row.state_schema_version !== STATE_SCHEMA_VERSION) {
         await client.query('ROLLBACK');
         return { kind: 'version_mismatch' };
+      }
+
+      if (!relocationCommandMatches(farm, env)) {
+        await this.logCommand(client, farm.id, env, hash, 'rejected', { code: 'FARM_RELOCATED' }, this.d.now());
+        await client.query('COMMIT');
+        return { kind: 'rejected', code: 'FARM_RELOCATED' };
       }
 
       // 4. 锁后采样，先过 QA 时间变换，再单调 clamp。
@@ -272,7 +440,8 @@ export class PgStore implements Store {
 
       const tz = this.d.timezone(farm.region_id);
       const ctx = makeCtx(farm.state, effectiveNow, tz,
-        this.d.content, this.d.blueprint(farm.layout_patch_id, farm.blueprint_revision), realNow);
+        this.d.content, plotForFarm(farm, this.d.plot), realNow, farm.id);
+      ctx.fishingPresence = fishingPresence?.();
       const r = apply(farm.state, cmd, ctx);
 
       if (!r.ok) {
@@ -292,10 +461,14 @@ export class PgStore implements Store {
         `UPDATE farms SET state = $2, version = version + 1, updated_at = $3,
            visit_access = $4, location_visible = $5 WHERE id = $1`,
         [farm.id, JSON.stringify(nextState), effectiveNow, settings.visit_access, settings.location_visible]);
-      const body = currentOwnerFarmView(
+      const body = { ...currentOwnerFarmView(
         { ...farm, ...settings, state: nextState, version: farm.version + 1 },
-        effectiveNow, tz, this.d.content, ctx.blueprint);
-      await this.logCommand(client, farm.id, env, hash, 'applied', body, effectiveNow);
+        effectiveNow, tz, this.d.content, ctx.plot), events: r.events };
+      // 日志只记版本与事件，**不记整份农场**：自由格子种田下一份状态可达几十 KB，
+      // 而 commands 表每条命令一行且永久保留。重放时用当前农场行重建视图——
+      // 那也更正确：客户端的预测层是整体覆盖，喂它一份过期快照会把状态往回倒。
+      await this.logCommand(client, farm.id, env, hash, 'applied',
+        { version: farm.version + 1, events: r.events }, effectiveNow);
       await client.query('COMMIT');
       return { kind: 'applied', body };
     } catch (e) {
@@ -307,7 +480,7 @@ export class PgStore implements Store {
   }
 
   private async logCommand(
-    client: pg.PoolClient, farmId: string, env: CommandEnvelope, hash: string,
+    client: pg.PoolClient, farmId: string, env: Omit<CommandEnvelope, 'type'> & { type: string }, hash: string,
     outcome: 'applied' | 'rejected', result: unknown, effectiveNow: number,
   ) {
     await client.query(
@@ -315,7 +488,7 @@ export class PgStore implements Store {
          outcome, result, effective_now, content_version, domain_version, applied_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$9)`,
       [farmId, env.idempotency_key, env.base_version, env.type, JSON.stringify(env.payload ?? {}),
-        hash, outcome, JSON.stringify(result), effectiveNow, this.d.contentVersion, DOMAIN_VERSION]);
+        hash, outcome, JSON.stringify(commandRecordResult(env, result)), effectiveNow, this.d.contentVersion, DOMAIN_VERSION]);
   }
 }
 

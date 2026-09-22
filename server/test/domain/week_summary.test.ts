@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { projectFarmState } from '../../src/domain/progress.js';
 import type { FarmState } from '../../src/domain/state.js';
-import { blueprint, content, freshFarm, HOUR, run, SH, T0 } from './helpers.js';
+import { plot, content, freshFarm, HOUR, run, SH, T0 } from './helpers.js';
 
 function awaitingChoice(): FarmState {
   const state = freshFarm();
@@ -23,7 +23,7 @@ function awaitingChoice(): FarmState {
 describe('first-week summary', () => {
   it('does not freeze three life choices as a sale ending before the last choice', () => {
     const state = awaitingChoice();
-    const projected = projectFarmState(state, T0, SH, content, blueprint);
+    const projected = projectFarmState(state, T0, SH, content, plot);
     expect(projected.week_summary).toBeUndefined();
     expect(projected.handbook.some(entry => entry.kind === 'week_summary')).toBe(false);
     const result = run(state, { type: 'resolve_life_choice', chapter: 6, choice: 'keep' }, T0 + 1);
@@ -58,7 +58,7 @@ describe('first-week summary', () => {
     state.chapters[6].step_flags = { engineering_quota_complete: true };
     state.residents.nursery_keeper.shared_event_done = false;
     state.life_choices[6] = 'keep';
-    expect(projectFarmState(state, T0, SH, content, blueprint).week_summary).toBeUndefined();
+    expect(projectFarmState(state, T0, SH, content, plot).week_summary).toBeUndefined();
     const result = run(state, { type: 'attend_shared_event', event_id: 'nursery_activity' });
     expect(result.ok && result.state.week_summary?.life_priority).toBe(true);
   });
@@ -81,7 +81,7 @@ describe('first-week summary', () => {
     if (!bought.ok) return;
     expect(bought.state.wallet).toBe(119);
     expect(bought.state.week_summary).toEqual(summary);
-    const projected = projectFarmState(bought.state, T0 + 48 * HOUR, SH, content, blueprint);
+    const projected = projectFarmState(bought.state, T0 + 48 * HOUR, SH, content, plot);
     expect(projected.week_summary).toEqual(summary);
     expect(projected.handbook.filter(entry => entry.kind === 'week_summary')).toEqual([
       { kind: 'week_summary', key: 'first_week', day: summary!.completed_day, life_priority: true },
@@ -93,8 +93,8 @@ describe('first-week summary', () => {
     const state = awaitingChoice();
     state.life_choices[6] = 'keep';
     const before = structuredClone(state);
-    const first = projectFarmState(state, T0 + HOUR, SH, content, blueprint);
-    const later = projectFarmState(state, T0 + 2 * HOUR, SH, content, blueprint);
+    const first = projectFarmState(state, T0 + HOUR, SH, content, plot);
+    const later = projectFarmState(state, T0 + 2 * HOUR, SH, content, plot);
     expect(first.week_summary).toEqual(later.week_summary);
     expect(first.week_summary?.completed_at).toBe(state.clock.last_effective_now);
     expect(state).toEqual(before);

@@ -48,7 +48,7 @@ static func goal(state: Dictionary, now_ms := -1) -> Dictionary:
 	var theme := planned(state)
 	if theme.is_empty() or not available(state): return {}
 	var spec: Dictionary = themes()[theme]
-	var recipe: Dictionary = JourneyProgress.data().workshop.recipes[spec.item]
+	var recipe := CharacterModel.craft_recipe(state, JourneyProgress.data().workshop.recipes[spec.item])
 	var next := {}
 	if not piece_ready(state, theme):
 		for project in JourneyProgress.data().projects:
@@ -62,7 +62,7 @@ static func goal(state: Dictionary, now_ms := -1) -> Dictionary:
 				var have := JourneyProgress.material(state, str(material))
 				if have >= int(recipe.materials[material]): continue
 				next = JourneyProgress._material_goal(state, str(material))
-				next.hint = L10n.format_text("%s %d/%d", [L10n.text("Reeds") if material == "fiber" else str(material).capitalize(), have, int(recipe.materials[material])])
+				next.hint = L10n.format_text("%s %d/%d", [L10n.material_name(str(material)), have, int(recipe.materials[material])])
 				break
 		if next.is_empty(): next = {"place": "nursery", "target": "workbench", "icon": "hammer", "hint": L10n.text("Make ") + L10n.text(str(recipe.name))}
 	elif int(state.get("inventory", {}).get("dishes", {}).get(spec.dish, 0)) < 1:

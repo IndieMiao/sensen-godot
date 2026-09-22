@@ -1,17 +1,14 @@
 extends GdUnitTestSuite
 ## 作物渲染：阶段分段、各层实例数、以及「阶段是派生量」的边界。
 
-const FIX := "res://tests/fixtures/blueprints/fix_grid/r1/farm_blueprint.json"
-
 func _field() -> CropField:
-	var bp := FarmBlueprint.load_file(FIX)
+	var bp := FarmPlot.blueprint_for()
 	var f := CropField.new(bp, 1.0)
 	add_child(auto_free(f))
 	return f
 
 func _slot(state: String, crop = null, started = null, ready = null) -> Dictionary:
-	return {"state": state, "crop": crop, "care_weather": null,
-		"care_done_at": started, "ready_at": ready, "careful": false, "tutorial": false}
+	return {"state": state, "crop": crop, "watered_at": started, "ready_at": ready}
 
 func test_stage_splits_progress_into_quarters() -> void:
 	var s := _slot("growing", "R", 0, 300)
@@ -29,23 +26,21 @@ func test_unknown_ready_at_stays_at_stage_zero() -> void:
 	assert_int(CropField.stage_of(_slot("sown", "R"), 999_999)).is_equal(0)
 	assert_int(CropField.stage_of(_slot("growing", "R", 100, null), 999_999)).is_equal(0)
 
-func test_empty_states_draw_nothing_and_wild_draws_weeds() -> void:
-	# 只有 cleared 是真正的空地；tilled 画翻土板——两个服务端状态在画面上必须是两个样子。
-	assert_str(CropField.layer_of(_slot("cleared"))).is_equal("")
-	assert_str(CropField.layer_of(_slot("tilled"))).is_equal("soil")
-	assert_str(CropField.layer_of(_slot("wild"))).is_equal("weed")
+func test_only_planted_ground_draws_a_crop_layer() -> void:
+	# 荒地与开垦过的空地都由地面 shader 表达；这一层只画立体作物。
+	assert_str(CropField.layer_of({})).is_equal("")
+	assert_str(CropField.layer_of(_slot("tilled"))).is_equal("")
 	assert_str(CropField.layer_of(_slot("sown", "L"))).is_equal("L")
 
 func test_sync_buckets_cells_per_crop() -> void:
 	var f := _field()
 	f.sync({
-		"1,1": _slot("wild"), "2,1": _slot("wild"),
-		"3,1": _slot("tilled"), "1,2": _slot("cleared"),
+		"3,1": _slot("tilled"),
 		"2,2": _slot("sown", "R"), "3,2": _slot("growing", "R", 0, 400),
 		"1,3": _slot("growing", "L", 0, 400), "2,3": _slot("growing", "C", 0, 400),
 		"3,3": _slot("growing", "H", 0, 400),
 	}, 200)
-	assert_that(f.cell_counts()).is_equal({"R": 2, "L": 1, "C": 1, "H": 1, "weed": 2, "soil": 1})
+	assert_that(f.cell_counts()).is_equal({"R": 2, "L": 1, "C": 1, "H": 1, "T": 0, "weed": 0, "soil": 0})
 	assert_int(f.counts()["R"]).is_equal(2 * CropField.PER_CELL)
 
 func test_sync_is_idempotent_and_shrinks() -> void:
@@ -76,12 +71,12 @@ func test_instances_land_on_their_cells() -> void:
 		assert_bool(p.y > 0.0).is_true()   # 立在地面之上，不半埋
 
 
-func test_everything_sits_on_top_of_the_bed_not_inside_it() -> void:
-	# 2026-09-04 真机：草 0.18 高、苗 0.10 高，全埋在 0.15 高的畦面盒子里，清理了什么都看不见。
+func test_everything_sits_on_top_of_the_ground_not_inside_it() -> void:
+	# 2026-09-04 真机教训：矮的东西全埋进地里，玩家看不到自己种了什么。
 	var f := _field()
 	f.ground_y = 0.15
-	f.sync({"1,1": _slot("wild"), "2,1": _slot("tilled"), "3,1": _slot("sown", "R")}, 0)
-	for layer in ["weed", "soil", "R"]:
+	f.sync({"3,1": _slot("sown", "R")}, 0)
+	for layer in ["R"]:
 		var mm: MultiMesh = f._mm[layer].multimesh
 		assert_bool(mm.instance_count > 0).is_true()
 		for i in mm.instance_count:
@@ -90,16 +85,15 @@ func test_everything_sits_on_top_of_the_bed_not_inside_it() -> void:
 			assert_bool(bottom >= 0.15 - 0.001).override_failure_message(
 				"%s 第 %d 个实例底面 %.3f 低于畦面 0.15" % [layer, i, bottom]).is_true()
 
-func test_wild_tilled_sown_look_different_from_each_other_and_from_cleared() -> void:
+func test_planted_and_growing_look_different_from_each_other() -> void:
+	# 播下与生长中必须是两个样子；开垦与荒地的差别交给地面 shader。
 	var f := _field()
-	f.sync({"1,1": _slot("wild"), "2,1": _slot("cleared"), "3,1": _slot("tilled"), "1,2": _slot("sown", "R")}, 0)
-	var c: Dictionary = f.cell_counts()
-	assert_int(int(c["weed"])).is_equal(1)
-	assert_int(int(c["soil"])).is_equal(1)
-	assert_int(int(c["R"])).is_equal(1)
-	# 草要明显高出畦面，苗要比草矮但亮
-	assert_bool(CropField.WEED_SIZE.y >= 0.3).is_true()
-	assert_bool(CropField._stage_color("R", 0).g > CropField.WEED_COLOR.g).is_true()
+	f.sync({"1,2": _slot("sown", "R"), "2,2": _slot("growing", "R", 0, 400)}, 200)
+	var mm: MultiMesh = f._mm["R"].multimesh
+	assert_int(mm.instance_count).is_equal(2)
+	var a := mm.get_instance_transform(0).basis.get_scale()
+	var b := mm.get_instance_transform(1).basis.get_scale()
+	assert_bool(a.is_equal_approx(b)).is_false()
 
 
 func test_instance_colors_are_declared_srgb() -> void:
@@ -111,7 +105,7 @@ func test_instance_colors_are_declared_srgb() -> void:
 
 func test_plants_and_furrows_are_nonempty_colored_meshes_in_fixed_shared_layers() -> void:
 	var f := _field()
-	assert_int(f.get_child_count()).is_equal(9)
+	assert_int(f.get_child_count()).is_equal(10)
 	for layer in f._mm:
 		var mesh: Mesh = f._mm[layer].multimesh.mesh
 		assert_int(mesh.get_surface_count()).is_equal(1)
@@ -128,28 +122,15 @@ func test_plants_and_furrows_are_nonempty_colored_meshes_in_fixed_shared_layers(
 			palette[color.to_html()] = true
 		assert_int(palette.size()).is_greater(1)
 
-func test_mature_crop_silhouettes_differ_and_four_plants_fit_each_bed() -> void:
+func test_mature_crop_silhouettes_differ_and_one_plant_per_cell() -> void:
+	# 一格一株：0.5m 格里塞 4 株会糊成一团，实例数也翻四倍。
 	var f := _field()
-	var cells := {}
-	for i in CropField.CROPS.size():
-		cells["%d,1" % i] = _slot("growing", CropField.CROPS[i], 0, 300)
-	f.sync(cells, 300)
-	var signatures := {}
-	for crop in CropField.CROPS:
-		var mm: MultiMesh = f._mm[crop].multimesh
-		signatures[mm.mesh.get_faces().size()] = true
-		assert_int(mm.instance_count).is_equal(4)
-		var vertices: PackedVector3Array = mm.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
-		for instance in mm.instance_count:
-			var transform := mm.get_instance_transform(instance)
-			var crop_index := CropField.CROPS.find(crop)
-			var center := f.bp.cell_to_world(Vector2i(crop_index, 1))
-			var fits := true
-			for vertex in vertices:
-				var point: Vector3 = transform * vertex
-				fits = fits and absf(point.x - center.x) < 0.46 and absf(point.z - center.z) < 0.46 and point.y < 0.5
-			assert_bool(fits).override_failure_message("%s plant extends past the bed" % crop).is_true()
-	assert_int(signatures.size()).is_equal(4)
+	f.sync({"1,2": _slot("growing", "R", 0, 100), "2,2": _slot("growing", "H", 0, 100)}, 100)
+	assert_int(f.counts()["R"]).is_equal(1)
+	assert_int(CropField.PER_CELL).is_equal(1)
+	# 成熟株不能宽过一格，否则邻格的作物互相穿插。
+	assert_bool(CropField.STAGE_SIZE[3].x < 1.0).is_true()
+
 
 func test_seedlings_have_no_roots_or_flowers_and_harvest_clears_both_parts() -> void:
 	var f := _field()
@@ -159,23 +140,21 @@ func test_seedlings_have_no_roots_or_flowers_and_harvest_clears_both_parts() -> 
 
 	f.sync({"1,1": _slot("growing", "R", 0, 300), "2,1": _slot("growing", "C", 0, 300),
 		"3,1": _slot("growing", "H", 0, 300)}, 250)
-	assert_int(f._detail_mm["R"].multimesh.instance_count).is_equal(4)
-	assert_int(f._detail_mm["C"].multimesh.instance_count).is_equal(4)
+	assert_int(f._detail_mm["R"].multimesh.instance_count).is_equal(1)
+	assert_int(f._detail_mm["C"].multimesh.instance_count).is_equal(1)
 	assert_int(f._detail_mm["H"].multimesh.instance_count).is_equal(0)
 	f.sync_snapshot([{"cell_id": "3,1", "state": "growing", "crop": "H", "ripe": true}])
-	assert_int(f._detail_mm["H"].multimesh.instance_count).is_equal(4)
+	assert_int(f._detail_mm["H"].multimesh.instance_count).is_equal(1)
 	f.sync({"3,1": _slot("tilled")}, 1000)
 	for crop in ["R", "C", "H"]:
 		assert_int(f._detail_mm[crop].multimesh.instance_count).is_equal(0)
 
-func test_twelve_mature_chamomile_plots_stay_within_the_plant_mesh_budget() -> void:
-	var field := _field()
+func test_a_full_field_of_mature_crops_stays_within_the_plant_mesh_budget() -> void:
+	# 自由种植下同时在种的格数由服务端软上限（600）兜底；这里验证渲染侧的实例预算。
+	var f := _field()
 	var cells := {}
-	for i in 12: cells["%d,%d" % [i % 3, i / 3]] = _slot("growing", "H", 0, 300)
-	field.sync(cells, 300)
-	var triangles := 0
-	for layer in field._mm.values() + field._detail_mm.values():
-		var multimesh: MultiMesh = layer.multimesh
-		triangles += (multimesh.mesh.get_faces().size() / 3) * multimesh.instance_count
-	assert_int(field.counts()["H"]).is_equal(48)
-	assert_int(triangles).is_less(75000)
+	for i in 200: cells["%d,%d" % [i % 20, i / 20]] = _slot("growing", "H", 0, 100)
+	f.sync(cells, 100)
+	# 一格一株 + 成熟期的花朵细节层，总实例数与格数同阶，不随格数平方增长。
+	assert_int(f.counts()["H"]).is_equal(200)
+	assert_int(f._detail_mm["H"].multimesh.instance_count).is_equal(200)

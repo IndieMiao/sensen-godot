@@ -21,9 +21,9 @@ func test_runs_cells_one_at_a_time_in_order() -> void:
 	r.step(0.0)                                    # 起手第一格
 	assert_that(r.current_cell()).is_equal(Vector2i(1, 1))
 	assert_int(_started.size()).is_equal(1)
-	r.step(1.9)
-	assert_int(_done.size()).is_equal(0)            # 还没满 2 秒
-	r.step(0.1)
+	r.step(ActionRunner.ACTION_S - 0.01)
+	assert_int(_done.size()).is_equal(0)            # 还没满一格的时长
+	r.step(0.01)
 	assert_int(_done.size()).is_equal(1)
 	assert_that(r.current_cell()).is_equal(Vector2i(2, 1))
 	r.step(ActionRunner.ACTION_S)
@@ -65,11 +65,11 @@ func test_enqueue_while_running_appends_without_restarting() -> void:
 	var r := _runner()
 	r.enqueue([Vector2i(1, 1)], "till")
 	r.step(0.0)
-	r.step(1.0)
+	r.step(ActionRunner.ACTION_S * 0.5)
 	r.enqueue([Vector2i(2, 1)], "till")
 	assert_that(r.current_cell()).is_equal(Vector2i(1, 1))
 	assert_int(r.pending_count()).is_equal(2)
-	r.step(1.0)
+	r.step(ActionRunner.ACTION_S * 0.5)
 	assert_that(r.current_cell()).is_equal(Vector2i(2, 1))
 
 func test_idle_runner_emits_nothing() -> void:

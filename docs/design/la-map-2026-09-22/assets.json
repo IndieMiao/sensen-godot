@@ -1,0 +1,70 @@
+{
+  "date": "2026-09-22",
+  "status": "visual_approved_by_user",
+  "approval": {
+    "date": "2026-09-22",
+    "user_feedback": "这个主视觉ok",
+    "scope": "Selected Los Angeles map visual direction; implementation not yet started"
+  },
+  "provider": "Sensenjoy OpenAI-compatible API",
+  "base_url": "https://sub.sensenjoy.cn/v1",
+  "model": "gpt-image-2",
+  "method": "imagegen bundled CLI edit with image references",
+  "requested_size": [
+    1024,
+    2240
+  ],
+  "quality": "high",
+  "count": 1,
+  "prompt": "docs/design/la-map-2026-09-22/prompts/la-map-main-visual.txt",
+  "references": [
+    {
+      "file": "docs/design/la-map-2026-09-22/references/existing-player-outfit.png",
+      "sha256": "75879267dd91a6cc60243571b349ce92ebf916194b88d8b48180b497715b3f75"
+    },
+    {
+      "file": "docs/design/la-map-2026-09-22/references/gensen-map-reference.png",
+      "sha256": "c486b88a21e7ce4047c61f40cedf5787e8130a888fade2fb267e3c2e550ba105"
+    },
+    {
+      "file": "docs/design/la-map-2026-09-22/references/los-angeles-reference-detail.png",
+      "sha256": "7d0b1a18f7176b0c943c9c50346322afc06fda421fcf56175c1120cb4ee45d6a"
+    }
+  ],
+  "secrets": "Environment only; no key stored",
+  "scope": "Approved visual reference; no game implementation or deployment",
+  "actual_size": [
+    848,
+    1855
+  ],
+  "outputs": [
+    {
+      "file": "output/imagegen/la-map-2026-09-22/la-map-main-v1.png",
+      "review_copy": "docs/design/la-map-2026-09-22/generated/la-map-main-v1.png",
+      "sha256": "41905d15eda5e0be02b2dadc692920e563f7afd62c988a1080c0c9a102bbc711",
+      "pixels": [
+        848,
+        1855
+      ],
+      "mode": "RGB"
+    }
+  ],
+  "visual_review": {
+    "full_body_map_characters": 1,
+    "other_player_portrait_markers": 5,
+    "npc_portrait_markers": 3,
+    "place_detail": "Griffith Observatory; category/city/address only",
+    "ui": "light floating controls, Chinese labels, four-item bottom dock",
+    "limits": [
+      "AI visual concept; map distances/geometry are illustrative, not live Mapbox output",
+      "Category icon inventory and tappable interaction are not implemented",
+      "Provider returned 848x1855 for the 1024x2240 request; original output kept without artificial upscaling"
+    ]
+  },
+  "implementation": {
+    "status": "android_development_sample",
+    "qa": "docs/qa/la-map-2026-09-22.md",
+    "runtime_screenshots": "docs/design/la-map-2026-09-22/qa/",
+    "published": false
+  }
+}

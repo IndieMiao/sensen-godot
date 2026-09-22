@@ -49,7 +49,7 @@ func _cooked(before: Dictionary, recipe: String) -> Dictionary:
 
 func _journal_rows(panel: KitchenPanel) -> Array:
 	var rows := []
-	for child in panel.content.get_children():
+	for child in panel.content.find_children("*", "HBoxContainer", true, false):
 		if child.has_meta("journal_kind"): rows.append(child)
 	return rows
 
@@ -72,6 +72,26 @@ func test_kitchen_unlock_and_engineering_reservations_control_real_recipe_button
 	assert_bool(_button(panel, "Cook_salad").disabled).is_true()
 	assert_bool(_button(panel, "Cook_tea").disabled).is_false()
 	assert_object(_button(panel, "SharedCooking")).is_null()
+	assert_int(pair[1].requests.size()).is_equal(0)
+
+func test_mine_soup_requires_rock_salt_and_uses_journey_kitchen_unlock() -> void:
+	var before := _farm(0)
+	before.journey = {"version": 1, "unlocks": ["kitchen"], "facts": [], "materials": {}}
+	var pair := _session(before, [])
+	var panel := _panel(pair[0])
+	await _frames()
+	assert_object(_button(panel, "Cook_vegetable_soup")).is_not_null()
+	assert_bool(_button(panel, "Cook_vegetable_soup").disabled).is_true()
+	assert_str(_labels(panel)).contains("Rock salt")
+	assert_str(_labels(panel)).contains("0 / 1")
+	pair[0].state.journey.materials.rock_salt = 1
+	pair[0].state_changed.emit(pair[0].state, 1)
+	await _frames()
+	assert_bool(_button(panel, "Cook_vegetable_soup").disabled).is_false()
+	pair[0].state.engineering.reserved = {"R": 1}
+	pair[0].state_changed.emit(pair[0].state, 1)
+	await _frames()
+	assert_bool(_button(panel, "Cook_vegetable_soup").disabled).is_true()
 	assert_int(pair[1].requests.size()).is_equal(0)
 
 func test_first_recipe_uses_command_reply_for_ingredients_xp_and_level_feedback() -> void:

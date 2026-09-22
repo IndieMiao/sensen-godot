@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Command } from '../../src/domain/commands.js';
 import { reconcileJourney, startJourney } from '../../src/domain/journey.js';
-import { content, freshFarm, run } from './helpers.js';
+import { content, editInventory, freshFarm, run } from './helpers.js';
 
 function ready() {
   const state = startJourney(freshFarm(), content);
@@ -25,7 +25,7 @@ describe('Player-selected construction goals', () => {
     expect(state.journey!.tracked_project).toBe('terrace');
     expect(state.journey!.wood).toBe(5);
     expect(state.journey!.materials!.fiber).toBe(2);
-    state.inventory.dishes = { salad: 1, tea: 1 };
+    editInventory(state, draft => { draft.inventory.dishes = { salad: 1, tea: 1 }; });
     state = apply(state, { type: 'build_journey_project', project: 'terrace', stage: 1 });
     expect(state.journey!.tracked_project).toBeUndefined();
   });
@@ -85,7 +85,7 @@ describe('Player-selected construction goals', () => {
     const before = structuredClone(state);
     expect(run(state, { type: 'build_journey_project', project: 'terrace', stage: 1 }).ok).toBe(false);
     expect(state).toEqual(before);
-    state.inventory.dishes = { salad: 1, tea: 1 };
+    editInventory(state, draft => { draft.inventory.dishes = { salad: 1, tea: 1 }; });
     state = apply(state, { type: 'build_journey_project', project: 'terrace', stage: 1 });
     expect(state.inventory.dishes).toEqual({ salad: 0, tea: 0 });
     expect(state.journey!.tracked_project).toBeUndefined();
@@ -95,7 +95,7 @@ describe('Player-selected construction goals', () => {
   it('does not clear a different project when another construction completes', () => {
     let state = apply(ready(), { type: 'track_journey_project', project: 'terrace' });
     state.journey!.facts.push('project_seedbeds_0');
-    state.inventory.produce.L = 1;
+    editInventory(state, draft => { draft.inventory.produce.L = 1; });
     state = apply(state, { type: 'build_journey_project', project: 'seedbeds', stage: 1 });
     expect(state.journey!.tracked_project).toBe('terrace');
   });

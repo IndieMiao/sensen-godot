@@ -115,6 +115,22 @@ func test_single_sales_keep_project_reservations_and_include_dishes() -> void:
 	assert_that(got).is_equal([[{"kind": "dish", "id": "salad", "qty": 1}]])
 	assert_str(s._sell_all.text).is_equal("Sell all · +96")
 
+func test_mine_soup_appears_with_its_own_name_price_and_sale_id() -> void:
+	var sheet := _sheet()
+	var state := _state({})
+	state.journey = {"version": 1, "facts": ["shared_meal"], "unlocks": ["kitchen"]}
+	state.inventory.dishes = {"vegetable_soup": 2}
+	sheet.refresh(state, ["R", "L"])
+	var row: Dictionary = sheet._dish_rows.vegetable_soup
+	assert_bool(row.box.visible).is_true()
+	assert_str(row.label.text).contains("Rock-salt vegetable soup")
+	assert_str(row.price.text).is_equal("16 each")
+	assert_str(sheet._sell_all.text).is_equal("Sell surplus - +32")
+	var sales := []
+	sheet.sell_requested.connect(func(items): sales.append(items))
+	row.button.pressed.emit()
+	assert_array(sales).is_equal([[{"kind": "dish", "id": "vegetable_soup", "qty": 1}]])
+
 func test_waiting_for_server_disables_all_trade_actions() -> void:
 	var s := _sheet()
 	s.refresh(_state({"R": 3}), ["R"])

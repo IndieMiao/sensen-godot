@@ -1,7 +1,8 @@
+import { editInventory } from '../domain/helpers.js';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import path from 'node:path';
-import { buildApp, blueprintSets, loadBlueprint } from '../../src/http/app.js';
+import { buildApp, plotFor, loadBlueprint } from '../../src/http/app.js';
 import { MemoryStore } from '../../src/http/memory_store.js';
 import { newInstallKey } from '../../src/http/auth.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/domain/content.js';
@@ -26,7 +27,7 @@ beforeEach(async () => {
   clock = at('2026-09-04T10:00:00+08:00');
   qa = new Set();
   const store = new MemoryStore({
-    content, timezone: SH, blueprint: blueprintSets(bp),
+    content, timezone: SH, plot: plotFor(content),
     now: () => clock, contentVersion: CV,
   });
   memoryStore = store;
@@ -52,23 +53,24 @@ async function makeFarm(token: string, key = 'k1') {
 }
 
 describe('journey HTTP commands', () => {
-  it('creates four plots and replays the unlock command without counting sowing twice', async () => {
+  it('tills player-chosen ground and replays a sow without sowing twice', async () => {
     const { token } = await login();
     let farm = (await makeFarm(token)).json();
-    expect(farm.state.field_progress.plots).toBe(4);
-    const cells = farm.state.field_progress.order.slice(0, 4);
-    for (const type of ['clear_cells', 'till_cells']) {
-      const result = await app.inject({ method: 'POST', url: '/v1/farms/me/commands', headers: authed(token),
-        payload: { type, idempotency_key: type, base_version: farm.version, payload: { cell_ids: cells } } });
-      expect(result.statusCode).toBe(200);
-      farm = result.json();
-    }
+    // 自由格子种田：开局一格未开垦，玩家自己挑地。
+    expect(Object.keys(farm.state.cells)).toHaveLength(0);
+    const cells = ['0,0', '1,0', '2,0', '3,0'];
+    const tilled = await app.inject({ method: 'POST', url: '/v1/farms/me/commands', headers: authed(token),
+      payload: { type: 'till_cells', idempotency_key: 'till', base_version: farm.version, payload: { cell_ids: cells } } });
+    expect(tilled.statusCode).toBe(200);
+    farm = tilled.json();
+    expect(Object.keys(farm.state.cells)).toHaveLength(4);
+
     const request = { method: 'POST' as const, url: '/v1/farms/me/commands', headers: authed(token),
-      payload: { type: 'sow_cells', idempotency_key: 'unlock-six', base_version: farm.version,
+      payload: { type: 'sow_cells', idempotency_key: 'sow-four', base_version: farm.version,
         payload: { cell_ids: cells, crop: 'R', lot: 'bound' } } };
     const result = await app.inject(request);
     expect(result.statusCode).toBe(200);
-    expect(result.json().state.field_progress).toMatchObject({ plots: 6, planted: 4 });
+    expect(result.json().state.inventory.seeds.R.bound).toBe(2); // 6 - 4
     const replay = await app.inject(request);
     expect(replay.json().outcome).toBe('replayed');
     expect(replay.json().state).toEqual(result.json().state);
@@ -78,9 +80,8 @@ describe('journey HTTP commands', () => {
     const created = (await makeFarm(token)).json();
     const farm = (await memoryStore.farmByOwner(player_id))!;
     farm.state.journey!.facts.push(...content.journey.gatherings.requires);
-    farm.state.journey!.workshop = { sequence: 0, stock: { planter: 1 }, displays: {} };
     farm.state.journey!.gathering = { sequence: 1, planned: 'garden', memories: [] };
-    farm.state.inventory.dishes.tea = 1;
+    editInventory(farm.state, draft => { draft.journey!.workshop = { sequence: 0, stock: { planter: 1 }, displays: {} }; draft.inventory.dishes.tea = 1; });
     const payload = { idempotency_key: 'host-garden', base_version: created.version,
       type: 'host_journey_gathering', payload: { theme: 'garden', sequence: 1 } };
     const request = { method: 'POST' as const, url: '/v1/farms/me/commands', headers: authed(token), payload };
@@ -232,10 +233,11 @@ describe('regions 与建场', () => {
     expect(r.json().code).toBe('STALE_REVISION');
   });
 
-  it('新农场是 12 格荒地、钱包 180、已发第 0 章 Grant', async () => {
+  it('新农场一格未开垦、钱包 180、已发第 0 章 Grant', async () => {
     const { token } = await login();
     const body = (await makeFarm(token)).json();
-    expect(Object.keys(body.state.cells)).toHaveLength(12);
+    // 自由格子种田：荒地不进状态，开局 cells 为空。
+    expect(Object.keys(body.state.cells)).toHaveLength(0);
     expect(body.state.wallet).toBe(180);
     expect(body.state.inventory.seeds.R.bound).toBe(6);
     expect(body.state.inventory.seeds.L.bound).toBe(3);
@@ -251,10 +253,10 @@ describe('命令端点', () => {
   it('版本递增，base_version 过期返回 409 并带最新状态', async () => {
     const { token } = await login();
     await makeFarm(token);
-    const a = await cmd(token, { idempotency_key: 'c1', base_version: 0, type: 'clear_cells', payload: { cell_ids: ['26,42'] } });
+    const a = await cmd(token, { idempotency_key: 'c1', base_version: 0, type: 'till_cells', payload: { cell_ids: ['0,0'] } });
     expect(a.statusCode).toBe(200);
     expect(a.json().version).toBe(1);
-    const stale = await cmd(token, { idempotency_key: 'c2', base_version: 0, type: 'clear_cells', payload: { cell_ids: ['27,42'] } });
+    const stale = await cmd(token, { idempotency_key: 'c2', base_version: 0, type: 'till_cells', payload: { cell_ids: ['1,0'] } });
     expect(stale.statusCode).toBe(409);
     expect(stale.json().code).toBe('VERSION_CONFLICT');
     expect(stale.json().version).toBe(1);
@@ -263,13 +265,14 @@ describe('命令端点', () => {
   it('同 key 同 payload 重放拿回原结果，applied 与 rejected 都能重放', async () => {
     const { token } = await login();
     await makeFarm(token);
-    const env = { idempotency_key: 'c1', base_version: 0, type: 'clear_cells', payload: { cell_ids: ['26,42'] } };
+    const env = { idempotency_key: 'c1', base_version: 0, type: 'till_cells', payload: { cell_ids: ['0,0'] } };
     const a = await cmd(token, env);
     const b = await cmd(token, env);
     expect(b.json().outcome).toBe('replayed');
     expect(b.json().version).toBe(a.json().version);
 
-    const bad = { idempotency_key: 'c2', base_version: 1, type: 'till_cells', payload: { cell_ids: ['27,42'] } };
+    // 房子占的格永远不可开垦，用它来制造一条稳定被领域层拒绝的命令。
+    const bad = { idempotency_key: 'c2', base_version: 1, type: 'till_cells', payload: { cell_ids: [plotFor(content).anchors.house.join(',')] } };
     const r1 = await cmd(token, bad);
     expect(r1.statusCode).toBe(422);
     const r2 = await cmd(token, bad);
@@ -277,11 +280,27 @@ describe('命令端点', () => {
     expect(r2.json().replayed_outcome).toBe('rejected');
   });
 
+  it('重放返回的是当前农场，不是写命令那一刻的旧快照', async () => {
+    const { token } = await login();
+    await makeFarm(token);
+    const first = { idempotency_key: 'r1', base_version: 0, type: 'till_cells', payload: { cell_ids: ['0,0'] } };
+    const a = await cmd(token, first);
+    expect(a.statusCode).toBe(200);
+    // 在两次重放之间再开一块地：农场往前走了一个版本。
+    await cmd(token, { idempotency_key: 'r2', base_version: a.json().version,
+      type: 'till_cells', payload: { cell_ids: ['1,0'] } });
+    const replay = await cmd(token, first);
+    expect(replay.json().outcome).toBe('replayed');
+    expect(replay.json().replayed_outcome).toBe('applied');
+    // 命令日志只存 {version, events}，视图由当前农场行重建，所以两块地都在。
+    expect(Object.keys(replay.json().state.cells).sort()).toEqual(['0,0', '1,0']);
+  });
+
   it('同 key 不同 payload 返回 409 IDEMPOTENCY_MISMATCH', async () => {
     const { token } = await login();
     await makeFarm(token);
-    await cmd(token, { idempotency_key: 'c1', base_version: 0, type: 'clear_cells', payload: { cell_ids: ['26,42'] } });
-    const r = await cmd(token, { idempotency_key: 'c1', base_version: 0, type: 'clear_cells', payload: { cell_ids: ['27,42'] } });
+    await cmd(token, { idempotency_key: 'c1', base_version: 0, type: 'till_cells', payload: { cell_ids: ['0,0'] } });
+    const r = await cmd(token, { idempotency_key: 'c1', base_version: 0, type: 'till_cells', payload: { cell_ids: ['1,0'] } });
     expect(r.statusCode).toBe(409);
     expect(r.json().code).toBe('IDEMPOTENCY_MISMATCH');
   });
@@ -289,9 +308,10 @@ describe('命令端点', () => {
   it('领域错误返回 422 且版本不变', async () => {
     const { token } = await login();
     await makeFarm(token);
-    const r = await cmd(token, { idempotency_key: 'x', base_version: 0, type: 'till_cells', payload: { cell_ids: ['26,42'] } });
+    // 房子占的格不可开垦：一条稳定的领域错误。
+    const r = await cmd(token, { idempotency_key: 'x', base_version: 0, type: 'till_cells', payload: { cell_ids: [plotFor(content).anchors.house.join(',')] } });
     expect(r.statusCode).toBe(422);
-    expect(r.json().code).toBe('WRONG_STATE');
+    expect(r.json().code).toBe('CELL_NOT_CULTIVABLE');
     const me = await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) });
     expect(me.json().version).toBe(0);
   });
@@ -310,14 +330,14 @@ describe('命令端点', () => {
   it('响应的 server_time 就是本次采样的时间', async () => {
     const { token } = await login();
     await makeFarm(token);
-    const r = await cmd(token, { idempotency_key: 'c1', base_version: 0, type: 'clear_cells', payload: { cell_ids: ['26,42'] } });
+    const r = await cmd(token, { idempotency_key: 'c1', base_version: 0, type: 'till_cells', payload: { cell_ids: ['0,0'] } });
     expect(r.json().server_time).toBe(clock);
   });
 
   it('读路径不因时钟回拨而倒退', async () => {
     const { token } = await login();
     await makeFarm(token);
-    await cmd(token, { idempotency_key: 'c1', base_version: 0, type: 'clear_cells', payload: { cell_ids: ['26,42'] } });
+    await cmd(token, { idempotency_key: 'c1', base_version: 0, type: 'till_cells', payload: { cell_ids: ['0,0'] } });
     const before = (await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) })).json();
     clock -= 3600_000;
     const after = (await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) })).json();
@@ -365,7 +385,7 @@ describe('导演模式端到端', () => {
     // 再发一条普通命令，materializeDay 会把换日写进状态。
     const next = await cmd(token, {
       idempotency_key: 'c1', base_version: skip.json().version,
-      type: 'clear_cells', payload: { cell_ids: [Object.keys(skip.json().state.cells)[0]] } });
+      type: 'till_cells', payload: { cell_ids: ['0,0'] } });
     expect(next.statusCode).toBe(200);
     expect(next.json().state.clock.player_day_id).toBe('2026-09-05');
     expect(next.json().state.clock.weather_day_index).toBe(1);
@@ -389,10 +409,10 @@ describe('导演模式端到端', () => {
 
 
 describe('访问骨架（G2）', () => {
-  it('lets an ordinary account find and visit all twelve seeded farms without modifying them', async () => {
+  it('lets an ordinary account find and visit every seeded farm without modifying them', async () => {
     for (const spec of PRESET_SPECS) {
       const source = loadBlueprint(BLUEPRINTS, spec.layout, spec.revision)!;
-      const farm = buildPresetFarm(spec, blueprintSets(source), content,
+      const farm = buildPresetFarm(spec, plotFor(content), content,
         spec.region === 'shanghai' ? SH : 'America/Los_Angeles', clock);
       await memoryStore.ensureSystemFarm(presetHmac(spec.id ?? spec.layout), farm);
       await memoryStore.ensureSystemFarm(presetHmac(spec.id ?? spec.layout), farm);
@@ -403,7 +423,7 @@ describe('访问骨架（G2）', () => {
     for (const region of ['shanghai', 'los_angeles']) {
       const list = await app.inject({ method: 'GET', url: `/v1/nearby?region_id=${region}`, headers: authed(token) });
       expect(list.statusCode).toBe(200);
-      expect(list.json().count).toBe(6);
+      expect(list.json().count).toBe(PRESET_SPECS.filter(spec => spec.region === region).length);
       for (const spec of PRESET_SPECS.filter(s => s.region === region)) {
         const id = presetFarmId(spec.id ?? spec.layout);
         expect(list.json().entries).toContainEqual(expect.objectContaining({ farm_id: id, avatar_ref: spec.avatar_ref }));
@@ -485,7 +505,7 @@ describe('访问骨架（G2）', () => {
     const r = await app.inject({ method: 'GET', url: `/v1/farms/${fa.farm_id}/snapshot`, headers: authed(b.token) });
     expect(Object.keys(r.json()).sort()).toEqual([
       'avatar_ref', 'beds_unlocked', 'blueprint_revision', 'cells', 'farm_id', 'layout_patch_id', 'nursery',
-      'props', 'region_id', 'server_time', 'snapshot_revision', 'snapshot_taken_at', 'street_snapshot', 'unlocked_cell_ids', 'weather_snapshot',
+      'props', 'region_id', 'server_time', 'snapshot_revision', 'snapshot_taken_at', 'street_snapshot', 'weather_snapshot',
     ]);
     const text = JSON.stringify(r.json());
     for (const bad of ['wallet', 'owner_id', 'inventory', 'residents', 'xp', 'lat', 'lng', 'ready_at'])

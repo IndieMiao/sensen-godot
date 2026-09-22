@@ -1,0 +1,770 @@
+{
+  "version": 1,
+  "capacity": 24,
+  "items": {
+    "rusty_sword": {
+      "name": "Old shortsword",
+      "description": "A reliable first weapon, supplied at the mine entrance.",
+      "icon": "res://assets/ui/farm/items/rusty_sword.png",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip",
+        "Attack"
+      ],
+      "properties": {
+        "damage": 14,
+        "speed": 1.8,
+        "range": 1.65,
+        "knockback": 0.7,
+        "crop_power": 0.75,
+        "ore_power": 0.4,
+        "wood_power": 0.5
+      },
+      "source": {
+        "kind": "equipment",
+        "id": "rusty_sword"
+      }
+    },
+    "copper_sword": {
+      "name": "Copper sword",
+      "description": "A longer blade forged from mine copper.",
+      "icon": "res://assets/ui/farm/items/copper_sword.png",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip",
+        "Attack"
+      ],
+      "properties": {
+        "damage": 24,
+        "speed": 2,
+        "range": 1.9,
+        "knockback": 1,
+        "crop_power": 0.9,
+        "ore_power": 0.55,
+        "wood_power": 0.65
+      },
+      "source": {
+        "kind": "equipment",
+        "id": "copper_sword"
+      }
+    },
+    "trail_boots": {
+      "name": "Trail boots",
+      "description": "Protective boots for steadier steps in the mine.",
+      "icon": "res://assets/ui/farm/items/trail_boots.png",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "equipment",
+        "id": "trail_boots"
+      }
+    },
+    "seed_R": {
+      "name": "Radish seeds",
+      "description": "Seeds for growing radishes in your farm.",
+      "icon": "res://assets/ui/farm/seeds/radish.png",
+      "category": "seeds",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Plant"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "seed",
+        "id": "R"
+      }
+    },
+    "seed_L": {
+      "name": "Lettuce seeds",
+      "description": "Seeds for growing lettuce in your farm.",
+      "icon": "res://assets/ui/farm/seeds/lettuce.png",
+      "category": "seeds",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Plant"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "seed",
+        "id": "L"
+      }
+    },
+    "seed_C": {
+      "name": "Carrot seeds",
+      "description": "Seeds for growing carrots in your farm.",
+      "icon": "res://assets/ui/farm/seeds/carrot.png",
+      "category": "seeds",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Plant"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "seed",
+        "id": "C"
+      }
+    },
+    "seed_H": {
+      "name": "Chamomile seeds",
+      "description": "Seeds for growing chamomile in your farm.",
+      "icon": "res://assets/ui/farm/seeds/chamomile.png",
+      "category": "seeds",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Plant"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "seed",
+        "id": "H"
+      }
+    },
+    "R": {
+      "name": "Radish",
+      "description": "A fresh harvest for meals, gifts and neighbour requests.",
+      "icon": "res://assets/ui/farm/crops/radish.png",
+      "category": "crops",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Cook",
+        "Give",
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "produce",
+        "id": "R"
+      }
+    },
+    "L": {
+      "name": "Lettuce",
+      "description": "Fresh greens for cooking and neighbour requests.",
+      "icon": "res://assets/ui/farm/crops/lettuce.png",
+      "category": "crops",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Cook",
+        "Give",
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "produce",
+        "id": "L"
+      }
+    },
+    "C": {
+      "name": "Carrot",
+      "description": "A crisp harvest for salad and neighbour requests.",
+      "icon": "res://assets/ui/farm/crops/carrot.png",
+      "category": "crops",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Cook",
+        "Give",
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "produce",
+        "id": "C"
+      }
+    },
+    "H": {
+      "name": "Chamomile",
+      "description": "A fragrant flower for tea, gifts and garden projects.",
+      "icon": "res://assets/ui/farm/crops/chamomile.png",
+      "category": "crops",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Cook",
+        "Give",
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "produce",
+        "id": "H"
+      }
+    },
+    "wood": {
+      "name": "Timber",
+      "description": "Gathered timber for handmade pieces and neighbourhood construction.",
+      "icon": "res://assets/ui/farm/items/wood.png",
+      "category": "material",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Craft",
+        "Build",
+        "Deliver"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "material",
+        "id": "wood"
+      }
+    },
+    "stone": {
+      "name": "Stone",
+      "description": "Stone from gathering and mining, used in handmade pieces and construction.",
+      "icon": "res://assets/ui/farm/items/stone.png",
+      "category": "material",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Craft",
+        "Build",
+        "Deliver"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "material",
+        "id": "stone"
+      }
+    },
+    "fiber": {
+      "name": "Reeds",
+      "description": "Flexible reeds for weaving and neighbourhood construction.",
+      "icon": "res://assets/ui/farm/items/fiber.png",
+      "category": "material",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Craft",
+        "Build",
+        "Deliver"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "material",
+        "id": "fiber"
+      }
+    },
+    "copper_ore": {
+      "name": "Copper ore",
+      "description": "A mineral found in the starter mine, used to make a harvest crate.",
+      "icon": "res://assets/ui/farm/items/copper_ore.png",
+      "category": "mineral",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Craft"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "material",
+        "id": "copper_ore"
+      }
+    },
+    "rock_salt": {
+      "name": "Rock salt",
+      "description": "A mineral found in the starter mine, used to season vegetable soup.",
+      "icon": "res://assets/ui/farm/items/rock_salt.png",
+      "category": "mineral",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Cook"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "material",
+        "id": "rock_salt"
+      }
+    },
+    "salad": {
+      "name": "Vegetable salad",
+      "description": "A prepared meal for sharing, neighbour requests and the stall.",
+      "icon": "res://assets/ui/farm/dishes/salad.png",
+      "category": "dish",
+      "max_stack": 20,
+      "discardable": true,
+      "uses": [
+        "Eat",
+        "Share",
+        "Deliver",
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "dish",
+        "id": "salad"
+      }
+    },
+    "tea": {
+      "name": "Chamomile tea",
+      "description": "A warm drink for gatherings, neighbour requests and the stall.",
+      "icon": "res://assets/ui/farm/dishes/tea.png",
+      "category": "dish",
+      "max_stack": 20,
+      "discardable": true,
+      "uses": [
+        "Eat",
+        "Share",
+        "Deliver",
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "dish",
+        "id": "tea"
+      }
+    },
+    "vegetable_soup": {
+      "name": "Rock-salt vegetable soup",
+      "description": "A meal cooked with radish, lettuce and rock salt from the mine.",
+      "icon": "res://assets/ui/farm/dishes/vegetable_soup.png",
+      "category": "dish",
+      "max_stack": 20,
+      "discardable": true,
+      "uses": [
+        "Eat",
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "dish",
+        "id": "vegetable_soup"
+      }
+    },
+    "bench": {
+      "name": "Garden bench",
+      "description": "A bench decoration for your farm courtyard.",
+      "icon": "res://assets/ui/farm/items/bench.png",
+      "category": "prop",
+      "max_stack": 20,
+      "discardable": true,
+      "uses": [
+        "Decorate"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "prop",
+        "id": "bench"
+      }
+    },
+    "planter": {
+      "name": "Flower planter",
+      "description": "A handmade planter for displays, garden restoration and gatherings.",
+      "icon": "res://assets/ui/farm/items/planter.png",
+      "category": "prop",
+      "max_stack": 20,
+      "discardable": true,
+      "uses": [
+        "Display",
+        "Install",
+        "Deliver"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "prop",
+        "id": "planter"
+      }
+    },
+    "lantern": {
+      "name": "Garden lantern",
+      "description": "A handmade lantern for displays and restoring the stone hollow.",
+      "icon": "res://assets/ui/farm/items/lantern.png",
+      "category": "prop",
+      "max_stack": 20,
+      "discardable": true,
+      "uses": [
+        "Display",
+        "Install",
+        "Deliver"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "prop",
+        "id": "lantern"
+      }
+    },
+    "fountain": {
+      "name": "Small fountain",
+      "description": "A handmade fountain for displays and restoring the kitchen garden.",
+      "icon": "res://assets/ui/farm/items/fountain.png",
+      "category": "prop",
+      "max_stack": 20,
+      "discardable": true,
+      "uses": [
+        "Display",
+        "Install",
+        "Deliver"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "prop",
+        "id": "fountain"
+      }
+    },
+    "sign": {
+      "name": "Garden sign",
+      "description": "A sign decoration for your farm courtyard.",
+      "icon": "res://assets/ui/farm/items/sign.png",
+      "category": "prop",
+      "max_stack": 20,
+      "discardable": true,
+      "uses": [
+        "Decorate"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "prop",
+        "id": "sign"
+      }
+    },
+    "crate": {
+      "name": "Copper-bound crate",
+      "description": "A handmade crate reinforced with copper from the mine.",
+      "icon": "res://assets/ui/farm/items/crate.png",
+      "category": "prop",
+      "max_stack": 20,
+      "discardable": true,
+      "uses": [
+        "Display",
+        "Deliver"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "prop",
+        "id": "crate"
+      }
+    },
+    "hand_tools": {
+      "name": "Hand tools",
+      "description": "Your basic tools for working one plot at a time.",
+      "icon": "res://assets/ui/farm/items/hand_tools.png",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {
+        "tool_scope": 1,
+        "damage": 3,
+        "speed": 1.6,
+        "range": 1.3,
+        "knockback": 0.25,
+        "crop_power": 1,
+        "ore_power": 0.5,
+        "wood_power": 0.6
+      },
+      "source": {
+        "kind": "tool",
+        "id": "hand_tools"
+      }
+    },
+    "row_tool": {
+      "name": "Row tool",
+      "description": "An upgraded tool for working up to three plots together.",
+      "icon": "res://assets/ui/farm/items/row_tool.png",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {
+        "tool_scope": 3,
+        "damage": 4,
+        "speed": 1.4,
+        "range": 1.3,
+        "knockback": 0.3,
+        "crop_power": 1.6,
+        "ore_power": 0.5,
+        "wood_power": 0.6
+      },
+      "source": {
+        "kind": "tool",
+        "id": "row_tool"
+      }
+    },
+    "copper_pickaxe": {
+      "name": "Copper pickaxe",
+      "description": "A copper pickaxe that yields one extra stone from every mine rock.",
+      "icon": "res://assets/ui/farm/items/copper_pickaxe.png",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {
+        "damage": 7,
+        "speed": 1.2,
+        "range": 1.4,
+        "knockback": 0.4,
+        "crop_power": 0.6,
+        "ore_power": 2,
+        "wood_power": 0.5
+      },
+      "source": {
+        "kind": "equipment",
+        "id": "copper_pickaxe"
+      }
+    },
+    "foraging_gloves": {
+      "name": "Foraging gloves",
+      "description": "Gathering gloves that add one unit of the main material in each resource bundle.",
+      "icon": "res://assets/ui/farm/items/foraging_gloves.png",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "equipment",
+        "id": "foraging_gloves"
+      }
+    },
+    "artisan_apron": {
+      "name": "Artisan apron",
+      "description": "A work apron that saves one basic material when crafting at the workbench.",
+      "icon": "res://assets/ui/farm/items/artisan_apron.png",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "equipment",
+        "id": "artisan_apron"
+      }
+    },
+    "seed_T": {
+      "name": "Fruit tree sapling",
+      "description": "A sapling that grows into a fruit tree. Trees take up their square and block the way.",
+      "icon": "res://assets/ui/farm/seeds/chamomile.png",
+      "category": "seeds",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Plant"
+      ],
+      "properties": {
+        "woody": true
+      },
+      "source": {
+        "kind": "seed",
+        "id": "T"
+      }
+    },
+    "T": {
+      "name": "Orchard fruit",
+      "description": "Fruit from your own tree, for meals, gifts and neighbour requests.",
+      "icon": "res://assets/ui/farm/crops/chamomile.png",
+      "category": "crops",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Cook",
+        "Give",
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "produce",
+        "id": "T"
+      }
+    },
+    "fish_crucian": {
+      "name": "Pond crucian",
+      "description": "A fresh catch. Sell it from your bag or keep it for your collection.",
+      "icon": "res://assets/ui/farm/items/fish_crucian.svg",
+      "category": "fish",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "fish",
+        "id": "fish_crucian"
+      }
+    },
+    "fish_perch": {
+      "name": "River perch",
+      "description": "A fresh catch. Sell it from your bag or keep it for your collection.",
+      "icon": "res://assets/ui/farm/items/fish_perch.svg",
+      "category": "fish",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "fish",
+        "id": "fish_perch"
+      }
+    },
+    "fish_koi": {
+      "name": "Golden koi",
+      "description": "A fresh catch. Sell it from your bag or keep it for your collection.",
+      "icon": "res://assets/ui/farm/items/fish_koi.svg",
+      "category": "fish",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "fish",
+        "id": "fish_koi"
+      }
+    },
+    "fish_sturgeon": {
+      "name": "Silver sturgeon",
+      "description": "A fresh catch. Sell it from your bag or keep it for your collection.",
+      "icon": "res://assets/ui/farm/items/fish_sturgeon.svg",
+      "category": "fish",
+      "max_stack": 99,
+      "discardable": true,
+      "uses": [
+        "Sell"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "fish",
+        "id": "fish_sturgeon"
+      }
+    },
+    "copper_knife": {
+      "name": "Copper knife",
+      "description": "Copper knife",
+      "icon": "res://assets/ui/icons/lucide/sword.svg",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {
+        "damage": 12,
+        "speed": 2.4,
+        "range": 1.35,
+        "knockback": 0.35,
+        "crop_power": 1.3,
+        "ore_power": 0.45,
+        "wood_power": 0.8
+      },
+      "source": {
+        "kind": "equipment",
+        "id": "copper_knife"
+      }
+    },
+    "copper_axe": {
+      "name": "Copper axe",
+      "description": "Copper axe",
+      "icon": "res://assets/ui/icons/lucide/axe.svg",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {
+        "damage": 10,
+        "speed": 1.2,
+        "range": 1.5,
+        "knockback": 0.7,
+        "crop_power": 0.7,
+        "ore_power": 0.6,
+        "wood_power": 2
+      },
+      "source": {
+        "kind": "equipment",
+        "id": "copper_axe"
+      }
+    },
+    "copper_ring": {
+      "name": "Copper ring",
+      "description": "Copper ring",
+      "icon": "res://assets/ui/icons/lucide/circle.svg",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "equipment",
+        "id": "copper_ring"
+      }
+    },
+    "wooden_ring": {
+      "name": "Wooden ring",
+      "description": "Wooden ring",
+      "icon": "res://assets/ui/icons/lucide/circle.svg",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "equipment",
+        "id": "wooden_ring"
+      }
+    },
+    "copper_necklace": {
+      "name": "Copper necklace",
+      "description": "Copper necklace",
+      "icon": "res://assets/ui/icons/lucide/gem.svg",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "equipment",
+        "id": "copper_necklace"
+      }
+    },
+    "starter_fishing_rod": {
+      "name": "Starter fishing rod",
+      "description": "A starter rod. Equip it in the fishing rod slot to fish.",
+      "icon": "res://assets/ui/farm/items/starter_fishing_rod.svg",
+      "category": "equipment",
+      "max_stack": 1,
+      "discardable": false,
+      "uses": [
+        "Equip"
+      ],
+      "properties": {},
+      "source": {
+        "kind": "equipment",
+        "id": "starter_fishing_rod"
+      }
+    }
+  }
+}

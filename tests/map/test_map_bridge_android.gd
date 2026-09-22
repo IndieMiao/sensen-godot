@@ -30,6 +30,20 @@ class GrantedBridge extends MapBridgeAndroid:
 	func _has_location_permission() -> bool:
 		return true
 
+class JavaWrapper extends Node:
+	var invoked := false
+	func has_java_method(method: String) -> bool:
+		return method == "queryCityPois" or method == "setCityStyle"
+
+func test_java_wrapper_uses_native_capability_check() -> void:
+	var bridge := MapBridgeAndroid.new()
+	var wrapper: JavaWrapper = auto_free(JavaWrapper.new())
+	bridge._plugin = wrapper
+	assert_bool(wrapper.has_method("queryCityPois")).is_false()
+	assert_bool(bridge._supports("queryCityPois")).is_true()
+	assert_bool(bridge._supports("setCityStyle")).is_true()
+	assert_bool(bridge._supports("missing")).is_false()
+
 var _native: NativePlugin
 var _registered := false
 

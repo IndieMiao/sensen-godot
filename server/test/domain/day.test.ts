@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { BEDS, SH, at, advance, content, freshFarm, run, runAll } from './helpers.js';
 import { makeCtx } from '../../src/domain/reducer.js';
 import { materializeDay } from '../../src/domain/handlers/day.js';
-import { blueprint } from './helpers.js';
 
 const D = (n: number) => at(`2026-09-0${4 + n}T10:00:00+08:00`);
 const done = (s = freshFarm()) => { s.chapters[s.clock.chapter_index].status = 'done'; return s; };
@@ -54,15 +53,14 @@ describe('章节 Grant 的物化顺序', () => {
 
   it('已播种的种子在格子里，不受清零影响', () => {
     const s = runAll(freshFarm(), [
-      [{ type: 'clear_cells', cell_ids: BEDS.slice(0, 3) }],
-      [{ type: 'till_cells', cell_ids: BEDS.slice(0, 3) }],
+        [{ type: 'till_cells', cell_ids: BEDS.slice(0, 3) }],
       [{ type: 'sow_cells', cell_ids: BEDS.slice(0, 3), crop: 'R', lot: 'bound' }],
     ]);
     s.chapters[0].status = 'done';
     const next = advance(s, D(1));
     expect(next.inventory.seeds.R.bound).toBe(0); // 仓里剩的 3R 作废
-    expect(next.cells['1,1'].crop).toBe('R');     // 已下地的没事
-    expect(next.cells['1,1'].state).toBe('sown');
+    expect(next.cells[BEDS[0]!]!.crop).toBe('R');     // 已下地的没事
+    expect(next.cells[BEDS[0]!]!.state).toBe('sown');
   });
 });
 
@@ -91,7 +89,7 @@ describe('时钟单调守卫', () => {
   it('时间倒退时拒绝执行命令', () => {
     const s = freshFarm();
     s.clock.last_effective_now = D(1);
-    const r = run(s, { type: 'clear_cells', cell_ids: BEDS.slice(0, 1) }, D(0));
+    const r = run(s, { type: 'till_cells', cell_ids: [BEDS[0]!] });
     expect(r.ok === false && r.code).toBe('CLOCK_REGRESSION');
   });
 });

@@ -1,31 +1,42 @@
 extends Node3D
 ## 私有农场实例（PRD §3.2 第二层）。
 ##
-## 交互模型 v2（2026-09-04 晚真机反馈后重做）：**没有工具**。点一块田，它自己做该做的下一步
-## （草→清理，空地→翻土，翻土→播种，已播→照料，熟了→收获）；人物先走到地头再干活，头顶
-## 浮字说明在干什么；底部一个大按钮永远写着现在最该做的事；左上是今天的目标清单。
-## 客户端不算钱、不算 XP、不算 ready_at——只预测格子状态跃迁给即时反馈，其余以服务端回包为准。
+## 默认行走：点空地、耕地或作物只移动。明确选择劳作后，点按做下一步，长按拖动刷格。
+## 客户端仅预测格子变化；物品、奖励与成熟时间仍由服务端确认。
 
 const WORLD_SCALE := 1.0 # 逻辑米 → 世界米；G1 调观感时只改这里，时长不变量不受影响
 const FarmProps = preload("res://modules/farm/farm_props.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const FarmScenery = preload("res://modules/farm/farm_scenery.gd")
 const FarmArt = preload("res://modules/farm/farm_art.gd")
+const MineArt = preload("res://modules/mining/mine_art.gd")
+const AvatarFocus = preload("res://modules/ui/avatar_focus_button.gd")
 const CAM_DIST := 11.0
-## 相机跟随点比玩家再往南（+z）偏这么多米：HUD 占掉屏幕下方约 40%，玩家若在正中，南侧那一畦
-## 永远压在按钮下面点不到。偏移后玩家落在上三分之一。
-const CAM_AHEAD := -1.0
 ## AvatarRig 的活动度控制默认 16 m 休眠动画。农场相机到玩家的距离约 18 m——不把阈值抬高，
 ## 走路和俯身动画就全没了（2026-09-04 晚真机：「动画完全丢失」）。
 const RIG_SLEEP_DIST := 60.0
 const RIG_REDUCED_DIST := 40.0
-const CAM_PITCH_DEG := 48.0
+const CAM_PITCH_DEG := 43.0
 const CAM_YAW_DEG := 14.5
-## 田畦盒子高度；作物层从它的顶面往上长。
-const BED_H := 0.15
+## 地面是平的（田畦盒子随自由格子种田退役）；作物直接从 y=0 往上长。
+const BED_H := 0.0
 const STAMPS := ["Nice!", "Lovely", "Wow"]
 const STAMP_LIFETIME_S := 1.2
 const STALL_BUDGET := 100
+
+## 矿洞位置来自布局的 mine 锚点，不写死世界坐标：原来的 (6.65, 0, -5.8) 是按旧 13m 场地
+## 量出来的，换到 32m 场地后矿洞会杵在田中间——真机上它就落在玩家刚开垦的地旁边。
+## 做成静态函数而不是成员，是因为矿井场景的测试按 `Farm.mine_approach()` 直接取值，
+## 不实例化农场；FarmPlot.blueprint_for() 本身带静态缓存，重复调用不重读文件。
+static func mine_position(plot: FarmBlueprint = null) -> Vector3:
+	if plot == null: plot = FarmPlot.blueprint_for()
+	return plot.cell_to_world(plot.anchor("mine"))
+
+## 站位取锚点正南两格：锚点那格是 mine_mouth 的岩石、不可通行，南边两格是土。
+## tests/mining/test_mine_scene.gd 会断言这一格可通行且从出生点走得到。
+static func mine_approach(plot: FarmBlueprint = null) -> Vector3:
+	if plot == null: plot = FarmPlot.blueprint_for()
+	return plot.cell_to_world(plot.anchor("mine") + Vector2i(0, -2))
 
 var bp: FarmBlueprint
 var grid: BlueprintGrid
@@ -41,10 +52,29 @@ var life_sheet: PanelContainer
 var _saved_farm_environment: Environment
 var _stall_uncertain := false
 var _connection_recovery_busy := false
+var _pending_state_refresh := false
 ## 访客模式：只读、挥手、印章。零写入。
 var visitor := false
+var work_mode := false
 var snapshot: Dictionary = {}
-var interior: FarmInterior
+## 地理蓝图：只留给标题、选城与地图叠加；农场地面属性来自 FarmPlot。
+var geo_blueprint: FarmBlueprint
+var farm_activities: FarmActivities
+var activity_sheet: PanelContainer
+var _activity_pending := ""
+var _activity_busy := false
+var _activity_args: Dictionary = {}
+var _relocate_button: Button
+var _terrain_stale := false
+var _terrain_refresh_busy := false
+var _terrain_loading: CanvasLayer
+var plot_surface: PlotSurface
+## 长按刷子沿途命中的格；松手才真正提交。
+## 当前被木本作物挡住的格；与新状态比对后只翻转差集。
+var _woody_blocked: Dictionary = {}
+var _brush_cells: Array = []
+var _brush_points := PackedVector2Array()
+var online: OnlineSpace
 var _args := {}
 var _rig: AvatarRig
 var _anim := ""
@@ -63,13 +93,24 @@ var _in_flight := 0
 var _cta_was_busy := false
 var hints: PlotHints
 var _queued_move = null
+## 走不动兜底用：上次记下的位置与静止累计时长。见 _watch_walk_stall。
+var _walk_stall_pos := Vector3.ZERO
+var _walk_stall_s := 0.0
 var _field_center := Vector3.ZERO
-var _field_width := 5.0
-var _field_bounds := AABB()
-var _camera_has_fourth_bed := false
+var _camera_center := Vector3.ZERO
+var _camera_initialized := false
+var _camera_recenter: Tween
+var _focus_button: Button
 var scenery: Node3D
 var farm_style := "cottage"
 var _house_outline := PackedVector3Array()
+var mine_entrance: Node3D
+var _mine_pending := false
+var fishing_panel: FishingPanel
+var fishing_view: FishingPresentation
+var fishing_site: Dictionary = {}
+var _fishing_pending := false
+var _fishing_plan: Dictionary = {}
 ## 每秒重画一次：成熟是时间派生的，没有回包也没有输入会通知它——不定时刷，倒计时不走、
 ## 作物不变高、大按钮永远停在「Crops are growing」（自动玩家第四轮等了 260 秒）。
 var _tick := 0.0
@@ -84,7 +125,7 @@ var _next_chapter_refresh_ticks := 0
 @onready var props: Node3D = $Props
 @onready var crops_root: Node3D = $Crops
 @onready var player: Node3D = $Player
-@onready var title: Label = %Title
+@onready var title: Button = %Title
 @onready var exit_btn: Button = %ExitButton
 @onready var hud: FarmHud = %Hud
 
@@ -92,6 +133,12 @@ func setup(args: Dictionary) -> void:
 	_args = args
 
 func _ready() -> void:
+	# Each stacked farm owns its environment. Multiple BG_CANVAS layers at -1 can cover the new 3D view.
+	get_viewport().transparent_bg = false
+	var own_environment := ($WorldEnvironment.environment as Environment).duplicate() as Environment
+	own_environment.background_mode = Environment.BG_COLOR
+	$WorldEnvironment.environment = own_environment
+	$FarmBackground.hide()
 	# 压栈进入的新实例不会经过 AppRouter 的 suspend/resume 协议；自己的相机要自己抢
 	# （2026-09-04 终审 C1）。
 	cam.make_current()
@@ -100,21 +147,31 @@ func _ready() -> void:
 	exit_btn.icon = GameUi.icon("arrow-left")
 	exit_btn.tooltip_text = L10n.text("Return")
 	exit_btn.custom_minimum_size = Vector2(44, 44)
-	title.theme_type_variation = &""
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	title.theme_type_variation = &"ChoiceButton"
+	title.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	title.icon = GameUi.icon("sprout")
+	title.clip_text = true
+	title.add_theme_constant_override("icon_max_width", 22)
+	title.custom_minimum_size = Vector2(88, 44)
+	hud.attach_status_to($HUD/SafeArea/Root/TopBar)
 	title.add_theme_color_override("font_color", GameUi.INK)
 	visitor = bool(_args.get("visitor", false))
 	snapshot = _args.get("snapshot", {})
+	var terrain: Dictionary = snapshot.get("farm_terrain", {}) if visitor else {}
 	bp = _args.get("blueprint")
 	# 服务端农场的蓝图优先于本地选的：本地选了 sh_b、服务端农场是 sh_c 时，客户端按 sh_b 进场，
 	# 发出去的每一格都 CELL_NOT_CULTIVABLE，草还画在别的坐标上（2026-09-04 真机）。
 	if not visitor:
 		var s0: FarmSession = _args.get("session", Net.session if Net else null)
 		if s0 and s0.has_farm() and not s0.layout_patch_id.is_empty():
-			var server_bp := FarmBlueprint.load_file(FarmBlueprint.asset_path(s0.layout_patch_id, s0.blueprint_revision))
+			terrain = s0.farm_terrain
+			var server_bp := FarmBlueprint.load_choice(s0.farm_choice())
 			if server_bp != null:
-				bp = server_bp.with_location(s0.location)
-				FarmChoice.save(s0.layout_patch_id, s0.blueprint_revision, s0.location)
+				bp = server_bp
+				# FarmSession owns saving generated choices; do not drop its persisted terrain.
+				if terrain.is_empty(): FarmChoice.save(s0.layout_patch_id, s0.blueprint_revision, s0.location)
+	if visitor and not terrain.is_empty():
+		bp = FarmBlueprint.load_choice(snapshot)
 	if bp == null:
 		bp = FarmBlueprint.load_file(FarmBlueprint.asset_path(
 			str(_args.get("layout_patch_id", "")), int(_args.get("revision", 1))))
@@ -124,8 +181,13 @@ func _ready() -> void:
 		return
 	if visitor and snapshot.get("location") is Dictionary:
 		bp = bp.with_location(snapshot.location)
-	interior = FarmInterior.new(bp)
-	bp = interior.blueprint
+	geo_blueprint = bp
+	bp = FarmPlot.register_terrain(terrain) if not terrain.is_empty() else FarmPlot.blueprint_for()
+	if bp == null:
+		push_error("Farm: invalid persisted terrain")
+		call_deferred("_leave")
+		return
+	fishing_site = FishingModel.site_for_plot("farm_pond", bp)
 	grid = BlueprintGrid.new(bp)
 	_frame_field()
 	var lawn := PlaneMesh.new()
@@ -135,18 +197,29 @@ func _ready() -> void:
 	var grass := ShaderMaterial.new()
 	grass.shader = preload("res://modules/farm/shaders/meadow.gdshader")
 	grass.set_shader_parameter("meadow_texture", preload("res://assets/farm/art/meadow.png"))
+	grass.set_shader_parameter("woodland_start", -bp.cell_to_world(bp.anchor("house")).z + 3.75)
 	ground.material_override = grass
-	farm_style = FarmArt.style_for(bp.region_id, bp.layout_patch_id, str(_args.get("farm_style", "")))
+	farm_style = FarmArt.style_for(geo_blueprint.region_id, geo_blueprint.layout_patch_id,
+		str(_args.get("farm_style", terrain.get("farm_style", ""))))
 	_build_props()
+	_build_mine_entrance()
 	scenery = FarmScenery.new()
 	add_child(scenery)
 	scenery.build(bp, farm_style)
+	add_child(FishingWater.build("farm_pond", fishing_site))
 	# 作物挂 Crops（Props 的同级）：prop_count() 只数锚点原语与畦面，作物不进去。
+	# 地面状态层：取代逐格动作图标，用一张 64×64 纹理喂给 shader，1 个 draw call。
+	plot_surface = PlotSurface.new(bp, WORLD_SCALE)
+	add_child(plot_surface)
 	crop_field = CropField.new(bp, WORLD_SCALE)
 	crop_field.ground_y = BED_H * WORLD_SCALE
 	crops_root.add_child(crop_field)
 	mover = PlayerMover.new(bp, grid, WORLD_SCALE)
 	runner = ActionRunner.new()
+	runner.duration_for = func(cell: Vector2i, action: String):
+		if action != "harvest": return ActionRunner.ACTION_S
+		var crop := str(_state().get("cells", {}).get(_id(cell), {}).get("crop", ""))
+		return CharacterModel.gather_seconds(_state(), "wood" if CropInfo.is_woody(crop) else "crop", ActionRunner.ACTION_S)
 	runner.cell_started.connect(_on_cell_started)
 	runner.cell_done.connect(_on_cell_done)
 	runner.queue_empty.connect(func(): _refresh_hud())
@@ -157,10 +230,40 @@ func _ready() -> void:
 	$HUD/SafeArea/Root.add_child(hints)
 	$HUD/SafeArea/Root.move_child(hints, 0)
 	_spawn_player()
+	_build_focus_button()
+	camera_pan.free_pan = true
 	camera_pan.tapped.connect(_tap_scene)
+	# 长按起刷：按住一块地 0.28 秒后拖动，沿轨迹连续开垦/播种/浇水/收割。
+	# 单指拖动仍然是相机平移，双指仍然是缩放——肌肉记忆不变。
+	camera_pan.hold_enabled = false
+	camera_pan.hold_began.connect(_brush_begin)
+	camera_pan.hold_moved.connect(_brush_move)
+	camera_pan.hold_ended.connect(_brush_end)
+	camera_pan.hold_canceled.connect(_discard_brush)
 	_attach_session()
-	title.text = bp.display_name
+	fishing_panel = FishingPanel.new()
+	add_child(fishing_panel)
+	fishing_panel.opened.connect(_begin_fishing_view)
+	fishing_panel.closed.connect(_end_fishing_view)
+	var fish_button := GameUi.button("fish", L10n.text("Go fishing"), L10n.text("Go fishing"))
+	fish_button.name = "GoFishing"
+	fish_button.pressed.connect(func():
+		hud.close_modal()
+		_go_fishing())
+	hud.add_farm_action(fish_button)
+	_relocate_button = GameUi.button("map-pin", L10n.text("Relocate farm"), L10n.text("Choose a new farm location · one chance"))
+	_relocate_button.name = "RelocateFarm"
+	_relocate_button.add_theme_font_size_override("font_size", 12)
+	_relocate_button.pressed.connect(func():
+		hud.close_modal()
+		_begin_relocation())
+	hud.add_farm_action(_relocate_button)
+	title.text = L10n.text("My Farm")
+	title.tooltip_text = title.text
+	hud.set_farm_title(title.text)
+	title.pressed.connect(hud.open_farm_actions)
 	exit_btn.pressed.connect(_leave)
+	hud.work_mode_changed.connect(_set_work_mode)
 	hud.cta_pressed.connect(_on_cta)
 	hud.cancel_pressed.connect(_cancel_work)
 	hud.seed_selected.connect(_on_seed_selected)
@@ -174,15 +277,200 @@ func _ready() -> void:
 	else:
 		_build_director()
 		_build_stall()
+		farm_activities = FarmActivities.new()
+		farm_activities.setup(bp)
+		add_child(farm_activities)
+		farm_activities.sync(_state())
 		hud.set_hint(L10n.text("Tap a plot to work it"))
 	_refresh_hud()
-	var seed_crop := str(_args.get("seed_crop", ""))
-	if not visitor and CropInfo.ORDER.has(seed_crop):
-		_open_stall.call_deferred(seed_crop)
+	if not visitor: focus_destination.call_deferred(_args)
+	var live_session: FarmSession = Net.session if visitor else session
+	if live_session and live_session.logged_in():
+		var online_args := {"farm_id": str(snapshot.get("farm_id", "")) if visitor else session.farm_id}
+		online_args.merge(_args.get("online_join", {}), true)
+		online_args.terrain_checksum = bp.checksum
+		online = OnlineSpace.attach(self, live_session, "farm", online_args,
+			func(): return mover, func(): return _anim)
+		online.farm_relocated.connect(_on_farm_relocated)
+
+func _begin_relocation() -> void:
+	if visitor or session == null or not session.relocation_available(): return
+	if not party_travel_ready() or session.offline or session.has_unconfirmed_command():
+		hud.show_toast(L10n.text("Finish your current work first"), true)
+		return
+	AppRouter.begin_farm_relocation(session, self)
+
+func _on_farm_relocated() -> void:
+	_terrain_stale = true
+	if online: online.stop()
+	if mover: mover.stop()
+	if runner: runner.cancel_pending()
+	_set_work_mode(false)
+	_reload_relocated_farm.call_deferred()
+
+func _own_terrain_changed() -> bool:
+	if visitor or session == null or geo_blueprint == null: return false
+	return not session.layout_patch_id.is_empty() and session.layout_patch_id != geo_blueprint.layout_patch_id
+
+func _reload_relocated_farm() -> void:
+	if _terrain_refresh_busy or process_mode == Node.PROCESS_MODE_DISABLED or AppRouter.top_instance() != self: return
+	_terrain_refresh_busy = true
+	if _terrain_loading == null:
+		_terrain_loading = preload("res://modules/ui/loading_overlay.gd").new()
+		add_child(_terrain_loading)
+		_terrain_loading.close_button.pressed.connect(_leave)
+	hud.show_toast(L10n.text("This farm has moved. Reloading its new ground…"))
+	var args: Dictionary = {"session": session}
+	var ok := false
+	if visitor:
+		var response := await Net.snapshot(str(snapshot.get("farm_id", "")))
+		if not is_inside_tree(): return
+		ok = bool(response.get("ok", false))
+		if ok:
+			var updated: Dictionary = response.snapshot
+			var blueprint := FarmBlueprint.load_choice(updated)
+			ok = blueprint != null
+			args = {"visitor": true, "snapshot": updated, "blueprint": blueprint}
+	else:
+		ok = await session.refresh()
+		if not is_inside_tree(): return
+		if ok:
+			FarmChoice.save_choice(session.farm_choice())
+			var root_map := get_tree().current_scene
+			if root_map and root_map.has_method("refresh_owned_farm_after_relocation"):
+				root_map.call("refresh_owned_farm_after_relocation", session.farm_choice())
+	if ok:
+		hud.close_modal()
+		# Keep the stale-scene guard until replacement has actually completed. A DTO
+		# adoption emits state_changed and may have queued another reload callback.
+		await AppRouter.replace_farm_instance(self, args)
+		if not is_inside_tree(): return
+	hud.show_toast(L10n.text("Could not connect. Reconnect and try again."), true)
+	_terrain_loading.failed()
+	_terrain_refresh_busy = false
 
 func _leave() -> void:
+	if _activity_busy or (activity_sheet and activity_sheet.is_busy()): return
 	_record_visit()
 	AppRouter.pop_instance()
+
+## Called by historical street goals and router redirects; reuse this private instance.
+func focus_destination(args: Dictionary) -> void:
+	if visitor or session == null or farm_activities == null or not party_travel_ready(): return
+	if session.offline or session.has_unconfirmed_command():
+		hud.show_toast(SessionPanel.error_text("PENDING_ACTION"), true)
+		return
+	var target := str(args.get("target", ""))
+	var seed_crop := str(args.get("seed_crop", ""))
+	var plant_crop := str(args.get("plant_crop", ""))
+	if CropInfo.ORDER.has(plant_crop):
+		hud.selected_crop = plant_crop
+		_on_seed_selected(plant_crop)
+	if target == "stall" or CropInfo.ORDER.has(seed_crop):
+		_open_stall(seed_crop)
+		return
+	if target == "mine":
+		_go_mine()
+		return
+	if target in ["", "farm"] and str(args.get("walk_place", args.get("place", ""))) in ["", "farm"] and not args.has("resident"): return
+	farm_activities.sync(_state())
+	if not farm_activities.targets.has(target):
+		var place := str(args.get("walk_place", args.get("place", "")))
+		if args.has("resident"):
+			target = "resident:" + str(StreetCommons.RESIDENTS.find_key(str(args.resident)))
+		elif not place.is_empty():
+			for id in farm_activities.targets:
+				var entry: Dictionary = farm_activities.targets[id]
+				if entry.kind == "resource" and entry.place == place:
+					target = id
+					break
+	if not farm_activities.targets.has(target):
+		# Indoor work areas remain available from farm signposts.
+		var place := str(args.get("place", ""))
+		if place in ["nursery", "bistro", "courtyard"]:
+			AppRouter.open_instance(AppRouter.PLACE, {"session": session, "place_id": place, "target": target})
+		return
+	hud.close_modal()
+	_set_work_mode(false)
+	var destination: Vector3 = farm_activities.targets[target].approach
+	_on_ground_tapped(destination)
+	_activity_args = args.duplicate(true)
+	if mover.position.distance_to(destination) < 0.5:
+		_arrive_activity(target)
+	elif mover.is_moving():
+		_activity_pending = target
+
+func _arrive_activity(id: String) -> void:
+	if visitor or session == null or not farm_activities.targets.has(id): return
+	var target: Dictionary = farm_activities.targets[id]
+	mover.stop()
+	_clear_brush()
+	match str(target.kind):
+		"place":
+			AppRouter.open_instance(AppRouter.PLACE, {"session": session, "place_id": str(target.place)})
+		"resource":
+			_collect_activity(target.bundle)
+		"resident":
+			var panel := JourneyActivityPanel.new()
+			panel.place_id = "street" # Historical command identity, no public room.
+			panel.target = "resident:" + str(target.resident)
+			panel.prefer_timber_only = str(_activity_args.get("request_timber_slot", _activity_args.get("change_request", ""))) == id.trim_prefix("resident:")
+			panel.goal_requested.connect(_activity_goal)
+			panel.destination_requested.connect(func(place): _activity_goal({"place": place, "target": place}))
+			panel.target_requested.connect(func(target_id): _activity_goal({"place": str(target.place), "target": target_id}))
+			panel.requests_requested.connect(func():
+				hud.close_modal()
+				_open_life()
+				if life_sheet and life_sheet.active is BagPanel: life_sheet.active.select_page("requests"))
+			_show_activity_panel(panel)
+			panel.command("talk_to_resident", {"resident_id": str(target.resident)}, "")
+		"gathering":
+			var panel := JourneyGatheringPanel.new()
+			panel.theme_id = str(target.theme)
+			panel.goal_requested.connect(_activity_goal)
+			_show_activity_panel(panel)
+
+func _collect_activity(bundle: Dictionary) -> void:
+	if _activity_busy or session.has_unconfirmed_command(): return
+	_activity_busy = true
+	var round_id := int(session.state.journey.exploration.round)
+	var materials: Dictionary = bundle.materials
+	_play("labour_till" if materials.has("stone") else "labour_clear")
+	await get_tree().create_timer(CharacterModel.gather_seconds(session.state, CharacterModel.resource_kind(materials))).timeout
+	if not is_inside_tree(): return
+	var accepted := await session.send("collect_resource", {"node_id": bundle.node, "round": round_id, "choice": bundle.choice})
+	if not is_inside_tree(): return
+	_activity_busy = false
+	_play("idle")
+	hud.show_toast("+" + JourneyProgress.material_label(materials) if accepted else SessionPanel.error_text(session.last_error_code), not accepted)
+	farm_activities.sync(_state())
+	_refresh_hud()
+
+func _show_activity_panel(panel: SessionPanel) -> void:
+	if activity_sheet == null:
+		activity_sheet = preload("res://scenes/farm/farm_activity_sheet.gd").new()
+		hud.add_child(activity_sheet)
+		activity_sheet.closed.connect(hud.close_modal)
+	panel.setup(session)
+	activity_sheet.show_panel(panel)
+	hud.show_modal(activity_sheet)
+
+func _activity_goal(goal: Dictionary) -> void:
+	if activity_sheet and activity_sheet.is_busy(): return
+	hud.close_modal()
+	if goal.get("place") == "farm":
+		var destination := goal.duplicate(true)
+		if goal.get("action") == "stall":
+			destination.target = "stall"
+			destination.seed_crop = str(goal.get("crop", ""))
+		elif goal.get("action") == "sow" and goal.has("crop"):
+			destination.plant_crop = str(goal.crop)
+		focus_destination(destination)
+		return
+	if goal.get("surface") == "street" or goal.get("place") == "street" or goal.has("resident"):
+		focus_destination(goal)
+	else:
+		AppRouter.open_instance(AppRouter.PLACE, {"session": session, "place_id": str(goal.get("place", "nursery")), "target": str(goal.get("target", ""))})
 
 func prop_count() -> int:
 	return props.get_child_count()
@@ -198,15 +486,6 @@ func _build_props() -> void:
 	_house_outline.append(house.position + Vector3(-0.53, house.mesh.get_aabb().end.y + 0.45, -0.37))
 	if farm_style == "windmill":
 		_house_outline.append(house.position + Vector3(0, 3.55, 1.28))
-	for bed in bp.beds():
-		for c in bed.cells:
-			props.add_child(FarmArt.instance("plot", bp.cell_to_world(c, s), s))
-			props.get_child(-1).set_meta("cell_id", _id(c))
-	for c in bp.reserved_bed().get("cells", []):
-		props.add_child(FarmArt.instance("plot", bp.cell_to_world(c, s), s))
-		props.get_child(-1).set_meta("reserved", true)
-		props.get_child(-1).set_meta("cell_id", _id(c))
-		props.get_child(-1).visible = false
 
 func _spawn_player() -> void:
 	_rig = Avatar.create_rig()
@@ -220,7 +499,91 @@ func _spawn_player() -> void:
 			c.reduced_distance = RIG_REDUCED_DIST
 	player.add_child(_rig)
 	_rig.config_applied.connect(func(_c): _play("idle"))
-	_rig.apply_config(Avatar.load_outfit())
+	Avatar.follow_saved_outfit(_rig)
+
+func _build_mine_entrance() -> void:
+	mine_entrance = MineArt.entrance()
+	mine_entrance.position = mine_position(bp)
+	mine_entrance.scale = Vector3.ONE * 0.7
+	add_child(mine_entrance)
+
+func _begin_fishing_view(_site: String) -> void:
+	_stop_camera_recenter()
+	_end_fishing_view()
+	fishing_view = FishingPresentation.new()
+	add_child(fishing_view)
+	fishing_view.configure(fishing_panel, player, _rig, cam,
+		[$HUD/SafeArea/Root, online.hud if online else null])
+
+func _end_fishing_view() -> void:
+	if is_instance_valid(fishing_view): fishing_view.finish()
+	fishing_view = null
+
+func _go_fishing(clicked := Vector3.INF) -> void:
+	if _terrain_stale: return
+	if _activity_busy: return
+	_activity_pending = ""
+	var own_session: FarmSession = online.session if online else session
+	if _in_flight > 0 or own_session == null or _connection_recovery_busy: return
+	if not CharacterModel.has_fishing_rod(own_session.state):
+		hud.show_toast(L10n.text("Equip a fishing rod on the character page first."), true)
+		return
+	if own_session.offline or own_session.has_unconfirmed_command():
+		hud.show_toast(L10n.text("Check previous action"), true)
+		return
+	hud.close_modal()
+	_cancel_work()
+	runner.abort_current()
+	runner.paused = false
+	_mine_pending = false
+	_set_work_mode(false)
+	_fishing_plan = FishingModel.plan("farm_pond", mover.position, clicked, grid, fishing_site)
+	if _fishing_plan.is_empty():
+		hud.show_toast(L10n.text("Can't reach that spot"), true)
+		return
+	var target: Vector3 = _fishing_plan.origin
+	_fishing_pending = mover.set_target_position(target)
+	if hints: hints.destination(target, _fishing_pending, mover.remaining_path())
+	if not _fishing_pending: hud.show_toast(L10n.text("Can't reach that spot"), true)
+
+func _go_mine() -> void:
+	if _terrain_stale: return
+	if _activity_busy: return
+	if fishing_panel and fishing_panel.visible: return
+	_fishing_pending = false
+	var connected: FarmSession = online.session if visitor and online else session
+	if connected == null or (visitor and not Net.online_available): return
+	if connected.offline or connected.has_unconfirmed_command():
+		hud.show_toast(L10n.text("Check the connection to continue mining"), true)
+		return
+	if (runner and runner.is_busy()) or _in_flight > 0:
+		hud.show_toast(L10n.text("Finish your current work first"), true)
+		return
+	hud.close_modal()
+	_on_ground_tapped(mine_approach(bp))
+	_mine_pending = mover.is_moving()
+	if not _mine_pending and mover.position.distance_to(mine_approach(bp)) < 0.4:
+		AppRouter.open_instance(AppRouter.mine_scene(), {"session": connected})
+
+func _pick_mine(point: Vector2) -> bool:
+	if (visitor and (online == null or not Net.online_available)) or _world_modal_open(): return false
+	return _mine_pick_rect().has_point(point)
+
+func _mine_pick_rect() -> Rect2:
+	if not is_instance_valid(mine_entrance) or not mine_entrance.is_visible_in_tree(): return Rect2()
+	var model := mine_entrance.get_node_or_null("MineArch") as MeshInstance3D
+	if model == null or not model.is_visible_in_tree(): return Rect2()
+	var bounds := model.get_aabb()
+	var rect := Rect2()
+	for corner in 8:
+		var world := model.global_transform * bounds.get_endpoint(corner)
+		if cam.is_position_behind(world): return Rect2()
+		var point := cam.unproject_position(world)
+		rect = Rect2(point, Vector2.ZERO) if corner == 0 else rect.expand(point)
+	if not rect.has_area(): return rect
+	# Match the visible arch and rails, with the same minimum touch area as mine models.
+	var touch_size := Vector2(maxf(44, rect.size.x + 12), maxf(44, rect.size.y + 12))
+	return Rect2(rect.get_center() - touch_size * 0.5, touch_size).intersection(_camera_play_area())
 
 func _play(anim: String) -> void:
 	if _rig == null: return
@@ -228,12 +591,51 @@ func _play(anim: String) -> void:
 	_anim = anim
 
 func _process(dt: float) -> void:
+	if _focus_button and (_terrain_stale or _world_modal_open() or (fishing_panel and fishing_panel.visible)):
+		_focus_button.hide()
+	if _terrain_stale:
+		if mover: mover.stop()
+		return
 	if mover == null:
 		return
-	if hud.modal_open(): camera_pan.cancel()
+	if online and online.travel_busy:
+		# 这一支只想跳过劳作与 HUD 的处理，**不能**把人冻在半路：mover.step 是全场唯一
+		# 推进移动的地方，跳过它 is_moving() 就永远为真，runner.paused 也就永远清不掉，
+		# 队列会一直停在「正在前往…」（真机 2026-09-17 两次复现，掉线重连时触发）。
+		mover.step(dt)
+		player.position = mover.position
+		if runner and _in_flight == 0: runner.step(dt)
+		_update_camera(dt)
+		return
+	if fishing_panel and fishing_panel.visible:
+		mover.stop()
+		player.position = mover.position
+		return
+	if _activity_busy: return
+	if _world_modal_open(): _clear_brush()
+	if session: mover.speed = CharacterModel.current(session.state, "move_speed")
+	elif online and online.session: mover.speed = CharacterModel.current(online.session.state, "move_speed")
+
 	camera_pan.step(dt, cam)
 	mover.step(dt)
 	player.position = mover.position
+	if not _activity_pending.is_empty() and not mover.is_moving():
+		var arrived := _activity_pending
+		_activity_pending = ""
+		if farm_activities and farm_activities.targets.has(arrived) and player.position.distance_to(farm_activities.targets[arrived].approach) < 0.5:
+			_arrive_activity(arrived)
+	_watch_walk_stall(dt)
+	if _fishing_pending and not mover.is_moving():
+		_fishing_pending = false
+		if not _fishing_plan.is_empty() and player.position.distance_to(_fishing_plan.origin) < 0.3:
+			_clear_brush()
+			_play("idle")
+			fishing_panel.open(online.session if online else session, "farm_pond", _fishing_plan.target, fishing_site)
+			return
+	if _mine_pending and not mover.is_moving() and not runner.is_busy() and _in_flight == 0:
+		_mine_pending = false
+		AppRouter.open_instance(AppRouter.mine_scene(), {"session": online.session if visitor and online else session})
+		return
 	if runner and _in_flight == 0:
 		# 先走到地头：到了才开工。
 		if runner.paused and not mover.is_moving():
@@ -254,9 +656,12 @@ func _process(dt: float) -> void:
 	if hud and runner and not visitor:
 		var doing := ""
 		if runner.is_busy() and not runner.paused:
-			doing = NextStep.doing_label(runner.current_action(), hud.selected_crop, _care_condition(runner.current_cell()))
+			doing = NextStep.doing_label(runner.current_action(), hud.selected_crop)
 		elif runner.is_busy():
-			doing = "Walking…"
+			# 暂停中有两种：真在赶路，和在等上一条命令的回包。两种都写「正在前往」，
+			# 网络一卡就看起来像人走不动了——真机验收时正是被这条误导的。
+			# 字面量要和词表的键逐字一致（三个点，不是省略号字符），否则翻译查不到。
+			doing = L10n.text("Walking...") if mover.is_moving() else L10n.text("Syncing...")
 		hud.set_action(doing, runner.progress(), runner.pending_count())
 		var busy_now := runner.is_busy() or _in_flight > 0
 		if busy_now != _cta_was_busy:
@@ -275,119 +680,179 @@ func _process(dt: float) -> void:
 	if _tick >= TICK_S and not visitor and predictor:
 		_tick = 0.0
 		_render()
-	_update_camera()
+	_update_camera(dt)
 	if hints:
 		hints.active = runner.current_cell()
-		hints.queued = runner.queued_cells()
 		hints.progress = runner.progress()
-		var root := $HUD/SafeArea/Root as Control
-		var bottom: float = hud._bottom.position.y if not visitor else hud._visitor_bar.position.y
-		hints.world_rect = Rect2(0, 138, root.size.x, maxf(0, bottom - 146))
-		hints.visible = not hud.modal_open()
+		hints.world_rect = _camera_play_area()
+		hints.visible = not _world_modal_open()
 		hints.update_motion(mover.is_moving(), mover.remaining_path(), dt)
 
-func _update_camera() -> void:
-	var fourth_bed_visible := false
-	for prop in props.get_children():
-		if prop.has_meta("reserved") and prop.visible:
-			fourth_bed_visible = true
-			break
-	if fourth_bed_visible != _camera_has_fourth_bed:
-		_frame_field(fourth_bed_visible)
-	if scenery:
-		var count := 0
-		for prop in props.get_children():
-			if prop.has_meta("cell_id") and prop.visible: count += 1
-		scenery.set_plot_count(count)
+## 走不动的兜底。`runner.paused` 只在「走到了」时清除，而「走到了」完全依赖 mover 推进——
+## 任何让 mover 停下来的原因（提前返回、场景被挂起、路径被外部清空）都会把队列永久钉在
+## 「正在前往…」上，玩家除了点取消没有别的出路。位置连续不动超过阈值就主动停表：
+## is_moving() 转 false，下一帧照常在当前位置开工，而不是无限期等下去。
+func _watch_walk_stall(dt: float) -> void:
+	if runner == null or not runner.is_busy() or not runner.paused or _in_flight > 0:
+		_walk_stall_s = 0.0
+		return
+	if mover.position.distance_to(_walk_stall_pos) > 0.01:
+		_walk_stall_pos = mover.position
+		_walk_stall_s = 0.0
+		return
+	_walk_stall_s += dt
+	if _walk_stall_s >= WALK_STALL_S:
+		_walk_stall_s = 0.0
+		mover.stop()
+
+func _build_focus_button() -> void:
+	_focus_button = AvatarFocus.new()
+	$HUD/SafeArea/Root.add_child(_focus_button)
+	_focus_button.pressed.connect(recenter_on_player)
+
+func _update_camera(_delta := 0.0) -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
-	var short_phone := viewport_size.y < 700 and viewport_size.x < 600
-	var phi := deg_to_rad(40.0 if short_phone else CAM_PITCH_DEG)
-	var yaw := deg_to_rad(CAM_YAW_DEG)
-	var travel := player.position - _field_center
-	var follow := travel - travel.limit_length(5.0)
-	var target := _field_center + follow + Vector3(0.0, 0.0, CAM_AHEAD)
 	var aspect := viewport_size.x / maxf(viewport_size.y, 1)
-	var distance := maxf(CAM_DIST, (_field_width + 2.4) / (2.0 * tan(deg_to_rad(cam.fov * 0.5)) * aspect))
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	cam.keep_aspect = Camera3D.KEEP_WIDTH
-	cam.size = _field_width + 2.5
-	cam.position = target + Vector3(sin(yaw) * distance * cos(phi), distance * sin(phi), cos(yaw) * distance * cos(phi))
-	cam.look_at(target + Vector3(0, 0.8, 0), Vector3.UP)
-	var bounds := AABB(_field_bounds.position + follow, _field_bounds.size)
-	var features := PackedVector3Array()
-	for point in _house_outline: features.append(point + follow)
-	var spawn_bounds := AABB(bp.cell_to_world(bp.anchor("spawn")) + follow + Vector3(-0.25, 0, -0.15), Vector3(0.5, 1.4, 0.3))
-	for index in 8: features.append(spawn_bounds.get_endpoint(index))
-	FarmCamera.fit(cam, bounds, _camera_play_area(), features)
-	cam.size /= camera_pan.zoom
+	var view_width := VIEW_M * 1.2 if viewport_size.y < 700 and viewport_size.x < 600 else VIEW_M
+	cam.size = maxf(view_width, 7.2 * aspect) * WORLD_SCALE / camera_pan.zoom
+	if not _camera_initialized:
+		_camera_center = player.position + Vector3.UP * 0.7
+		_camera_initialized = true
+	# Released pan and zoom-anchor adjustments become the persistent view position.
+	if not camera_pan.active():
+		_camera_center += camera_pan.offset
+		camera_pan.offset = Vector3.ZERO
+		camera_pan._raw_offset = Vector3.ZERO
+	_place_camera(_camera_center)
 	cam.position += camera_pan.offset
 	FarmCamera.fit_ground_depth(cam)
+	_update_focus_indicator()
+
+func _update_focus_indicator() -> void:
+	if _focus_button == null or player == null or cam == null: return
+	var viewport_rect := get_viewport().get_visible_rect()
+	var point := player.position + Vector3.UP * 0.7
+	var behind := cam.is_position_behind(point)
+	var projected := cam.unproject_position(point)
+	if behind or not projected.is_finite():
+		# Perspective projection flips points behind the lens. Camera-local axes
+		# retain their true direction and also handle the orthographic edge case.
+		var local := cam.to_local(point)
+		var direction := Vector2(local.x, -local.y)
+		if direction.is_zero_approx(): direction = Vector2.DOWN
+		projected = viewport_rect.get_center() + direction.normalized() * viewport_rect.size.length()
+	_focus_button.update_indicator(projected, viewport_rect, _camera_play_area(), behind,
+		_terrain_stale or _world_modal_open() or (fishing_panel != null and fishing_panel.visible))
+
+func _place_camera(center: Vector3) -> void:
+	var phi := deg_to_rad(CAM_PITCH_DEG)
+	var yaw := deg_to_rad(CAM_YAW_DEG)
+	cam.position = center + Vector3(sin(yaw) * CAM_DIST * cos(phi), CAM_DIST * sin(phi), cos(yaw) * CAM_DIST * cos(phi))
+	cam.look_at(center, Vector3.UP)
+
+func _stop_camera_recenter() -> void:
+	if _camera_recenter:
+		_camera_recenter.kill()
+		_camera_recenter = null
+
+func recenter_on_player() -> void:
+	if player == null or _terrain_stale or _world_modal_open() or (fishing_panel and fishing_panel.visible): return
+	_stop_camera_recenter()
+	_clear_brush()
+	_camera_center += camera_pan.offset
+	camera_pan.offset = Vector3.ZERO
+	camera_pan._raw_offset = Vector3.ZERO
+	var start := _camera_center
+	_camera_recenter = create_tween()
+	_camera_recenter.tween_method(func(weight: float):
+		_camera_center = start.lerp(player.position + Vector3.UP * 0.7, weight)
+		_update_camera(), 0.0, 1.0, 0.34).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 func _camera_play_area() -> Rect2:
-	if hud == null or hud.size.x < 48 or hud.size.y < 200:
-		return Rect2()
-	var top := (hud.get_node("StatusBacking") as Control).get_global_rect().end.y
-	if hud._field_goal.visible: top = maxf(top, hud._field_goal.get_global_rect().end.y)
-	var bottom := hud.get_global_rect().end.y - 4.0
-	if visitor:
-		bottom -= hud._visitor_bar.get_combined_minimum_size().y
-	else:
-		bottom -= hud._cta.get_parent().get_combined_minimum_size().y
-		# Keep the same clearance while working temporarily hides the seed chooser.
-		var chapter := int(_state().get("clock", {}).get("chapter_index", 0))
-		var unlocked := CropUnlocks.unlocked(CropInfo.ORDER, chapter, _state())
-		var rows := ceili(float(unlocked.size()) / float(hud._seed_row.columns))
-		var row_height := 0.0
-		for crop in unlocked:
-			row_height = maxf(row_height, hud._seed_buttons[crop].get_combined_minimum_size().y)
-		if rows > 0:
-			bottom -= rows * row_height + (rows - 1) * hud._seed_row.get_theme_constant("v_separation") \
-				+ hud._bottom.get_theme_constant("separation")
-	var margin := 4.0 if get_viewport().get_visible_rect().size.y < 700 else 8.0
-	return Rect2(hud.global_position.x, top, hud.size.x, maxf(0, bottom - top)).grow(-margin)
+	if hud == null or hud.size.x < 48 or hud.size.y < 200: return Rect2()
+	var top := hud.top_content_bottom() + 4
+	var bottom := hud.get_global_rect().end.y - 4
+	if visitor and hud._visitor_bar.visible: bottom = minf(bottom, hud._visitor_bar.global_position.y - 4)
+	elif hud._bottom.visible: bottom = minf(bottom, hud._bottom.global_position.y - 4)
+	return Rect2(hud.global_position.x + 4, top, hud.size.x - 8, maxf(0, bottom - top))
 
-func _frame_field(include_reserved := false) -> void:
-	var low := Vector3(INF, 0, INF)
-	var high := Vector3(-INF, 0, -INF)
-	for bed in bp.beds():
-		for cell in bed.cells:
-			if not _plot_unlocked(_id(cell)): continue
-			var p := bp.cell_to_world(cell)
-			low.x = minf(low.x, p.x)
-			low.z = minf(low.z, p.z)
-			high.x = maxf(high.x, p.x)
-			high.z = maxf(high.z, p.z)
-	_field_center = (low + high) * 0.5
-	_field_width = high.x - low.x + 1.0
-	# Preserve the original nine-plot camera as the baseline, even after expansion.
-	if include_reserved:
-		for cell in bp.reserved_bed().get("cells", []):
-			var p := bp.cell_to_world(cell)
-			low.x = minf(low.x, p.x)
-			low.z = minf(low.z, p.z)
-			high.x = maxf(high.x, p.x)
-			high.z = maxf(high.z, p.z)
-	_field_bounds = AABB(low - Vector3(0.5, 0, 0.5), high - low + Vector3(1, 0.75, 1))
-	_camera_has_fourth_bed = include_reserved
+func _world_modal_open() -> bool:
+	return (hud != null and hud.modal_open()) or GameUi.modal_is_open(self)
+
+## 约 6m 横向近景，对应参考图中可辨认的人物、房屋与身边几块田。
+const VIEW_M := 6.0
+## 赶路卡住时终止本格，避免队列永久等待。
+const WALK_STALL_S := 2.5
+
+func _frame_field() -> void:
+	_field_center = bp.cell_to_world(bp.anchor("spawn"), WORLD_SCALE)
 
 ## Taps work plots or move the player; drags pan the scene, including visitor farms.
 func _input(e: InputEvent) -> void:
+	if _world_modal_open():
+		_clear_brush()
+		return
+	if _terrain_stale: return
+	if _activity_busy: return
+	if fishing_panel and fishing_panel.visible: return
+	if online and (online.travel_busy or is_instance_valid(online.panel)): return
 	if mover == null: return
 	if camera_pan.handle(e, cam):
-		_update_camera()
+		_stop_camera_recenter()
+		_update_camera(get_process_delta_time())
 		get_viewport().set_input_as_handled()
 
 func _unhandled_input(e: InputEvent) -> void:
-	if mover == null or hud.modal_open(): return
+	if _terrain_stale: return
+	if _activity_busy: return
+	if fishing_panel and fishing_panel.visible: return
+	if online and (online.travel_busy or is_instance_valid(online.panel)): return
+	if mover == null or _world_modal_open(): return
 	if camera_pan.handle(e, cam, true):
-		_update_camera()
+		_stop_camera_recenter()
+		_update_camera(get_process_delta_time())
 		get_viewport().set_input_as_handled()
 
-func _tap_scene(point: Vector2) -> void:
-	var indicated = hints.pick(point) if hints else null
-	if indicated != null:
-		_tap_cell(indicated)
+func _brush_begin(point: Vector2) -> void:
+	if not work_mode or visitor or _world_modal_open(): return
+	_brush_points = PackedVector2Array([point])
+	_brush_cells = LabourBrush.filter_actionable(LabourBrush.trace(_brush_points, _projector()), bp)
+	_render()
+
+func _brush_move(point: Vector2) -> void:
+	if not work_mode or visitor or _brush_points.is_empty(): return
+	_brush_points.append(point)
+	_brush_cells = LabourBrush.filter_actionable(LabourBrush.trace(_brush_points, _projector()), bp)
+	_render()
+
+func _brush_end(point: Vector2) -> void:
+	if not work_mode or visitor or _brush_points.is_empty(): return
+	_brush_points.append(point)
+	var cells := LabourBrush.filter_actionable(LabourBrush.trace(_brush_points, _projector()), bp)
+	_brush_points = PackedVector2Array()
+	_brush_cells = []
+	if cells.is_empty():
+		_render()
 		return
+	_queue_plots(cells)
+
+func _tap_scene(point: Vector2) -> void:
+	if _activity_busy or _world_modal_open(): return
+	if fishing_panel and fishing_panel.visible: return
+	var fishing_hit = Plane(Vector3.UP, 0).intersects_ray(cam.project_ray_origin(point), cam.project_ray_normal(point))
+	if fishing_hit is Vector3 and FishingModel.contains("farm_pond", fishing_hit, 0.0, fishing_site):
+		_go_fishing(fishing_hit)
+		return
+	if _pick_mine(point):
+		_go_mine()
+		return
+	if farm_activities and not work_mode:
+		var activity := farm_activities.pick(cam, point, _camera_play_area())
+		if not activity.is_empty():
+			focus_destination({"target": activity})
+			return
 	var hit = _projector().call(point)
 	if hit != null:
 		if _is_plot(hit as Vector2i):
@@ -396,19 +861,38 @@ func _tap_scene(point: Vector2) -> void:
 			var world = Plane(Vector3.UP, 0).intersects_ray(cam.project_ray_origin(point), cam.project_ray_normal(point))
 			if world is Vector3: _on_ground_tapped(world)
 
+func _clear_brush() -> void:
+	camera_pan.cancel()
+	_discard_brush()
+
+func _discard_brush() -> void:
+	_brush_points = PackedVector2Array()
+	_brush_cells.clear()
+	if plot_surface: plot_surface.highlight(runner.queued_cells() if runner else [], [], runner.current_cell() if runner else null)
+
+func _set_work_mode(enabled: bool) -> void:
+	work_mode = enabled and not visitor
+	_clear_brush()
+	camera_pan.hold_enabled = work_mode
+	if not work_mode and runner: _cancel_work()
+	hud.set_work_mode(work_mode)
+
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: camera_pan.cancel()
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT: _clear_brush()
 
 func _tap_cell(cell: Vector2i) -> void:
-	if _is_plot(cell):
-		if visitor:
-			return
+	if _is_plot(cell) and work_mode and not visitor:
 		if _queue_plots([cell]) == 0:
 			_explain_plot(cell)
 	else:
 		_on_ground_tapped(bp.cell_to_world(cell, WORLD_SCALE))
 
 func _on_ground_tapped(world: Vector3) -> void:
+	if _activity_busy: return
+	_activity_pending = ""
+	if fishing_panel and fishing_panel.visible: return
+	_fishing_pending = false
+	_mine_pending = false
 	# 退场帧内测试/输入可能直接调用本函数，mover 为 null 时安全跳过。
 	if mover == null:
 		return
@@ -434,8 +918,17 @@ func _cancel_work() -> void:
 		mover.stop()
 	_queued_move = null
 
+func party_travel_ready() -> bool:
+	return not _terrain_stale and not _activity_busy and not (activity_sheet and activity_sheet.is_busy()) and not (fishing_panel and fishing_panel.visible) and _in_flight == 0 and not runner.is_busy() and not _stall_uncertain and not _connection_recovery_busy
+
 func is_back_navigation_locked() -> bool:
+	if _activity_busy or (activity_sheet and activity_sheet.visible and activity_sheet.is_busy()): return true
+	if fishing_panel and fishing_panel.visible:
+		fishing_panel.close()
+		return true
+	if online and online.consume_back(): return true
 	if life_sheet and life_sheet.visible and life_sheet.is_busy(): return true
+	if life_sheet and life_sheet.visible and life_sheet.consume_back(): return true
 	if hud and hud.modal_open():
 		hud.close_modal()
 		return true
@@ -449,9 +942,36 @@ func _open_life() -> void:
 		hud.add_child(life_sheet)
 		life_sheet.closed.connect(hud.close_modal)
 		life_sheet.gift_requested.connect(_visit_resident)
+		life_sheet.goal_requested.connect(_bag_goal)
 	else:
 		life_sheet.select_section(life_sheet.section)
 	hud.show_modal(life_sheet)
+
+func show_mine_rescue() -> void:
+	if visitor or session == null: return
+	mover.stop()
+	_open_life()
+	if life_sheet.active is BagPanel: life_sheet.active.select_page("character")
+	hud.show_toast(L10n.text("Rescued to the farm. Your items are safe."))
+
+func _bag_goal(goal: Dictionary) -> void:
+	if runner.is_busy() or _in_flight > 0:
+		hud.show_toast(L10n.text("Finish your current work first"), true)
+		return
+	if goal.get("place") == "farm":
+		hud.close_modal()
+		if goal.get("action") == "stall":
+			_open_stall(str(goal.get("crop", "")))
+		elif goal.has("crop") and goal.get("action") == "sow":
+			hud.selected_crop = str(goal.crop)
+			_on_seed_selected(str(goal.crop))
+		elif goal.has("plant_crop"):
+			hud.selected_crop = str(goal.plant_crop)
+			_on_seed_selected(str(goal.plant_crop))
+		elif goal.get("target") == "stall": _open_stall()
+		elif goal.get("target") == "mine": _go_mine()
+		return
+	BagNavigation.follow(life_sheet.active, goal)
 
 func _visit_resident(resident: String) -> void:
 	if runner.is_busy() or _in_flight > 0:
@@ -462,7 +982,12 @@ func _visit_resident(resident: String) -> void:
 	AppRouter.open_instance(AppRouter.PLACE, {"place_id": destination.get(resident, "nursery"), "session": session, "resident_id": resident})
 
 func suspend() -> void:
-	camera_pan.cancel()
+	_stop_camera_recenter()
+	_end_fishing_view()
+	_fishing_pending = false
+	if fishing_panel: fishing_panel.interrupt()
+	if online: online.suspend()
+	_clear_brush()
 	process_mode = Node.PROCESS_MODE_DISABLED
 	visible = false
 	for child in get_children():
@@ -472,57 +997,63 @@ func suspend() -> void:
 	$WorldEnvironment.environment = null
 
 func resume() -> void:
+	if _own_terrain_changed(): _terrain_stale = true
+	if online and not _terrain_stale: online.resume()
 	process_mode = Node.PROCESS_MODE_INHERIT
 	visible = true
 	for child in get_children():
-		if child is CanvasLayer: child.visible = true
+		if child is CanvasLayer and child != fishing_panel: child.visible = true
+	$FarmBackground.hide()
 	get_viewport().transparent_bg = false
 	$WorldEnvironment.environment = _saved_farm_environment
 	cam.make_current()
-	_refresh_hud()
+	if _terrain_stale:
+		_reload_relocated_farm.call_deferred()
+		return
+	if _pending_state_refresh and session:
+		_pending_state_refresh = false
+		_on_server_state(session.state, session.version)
+	else:
+		_refresh_hud()
 
+## 屏幕点 → 格坐标。地面是平的（没有田畦盒子了），所以一次射线加一次除法就够，
+## 不必再遍历田畦列表、也不需要方盒容差——那套容差是为 1.3m 畦间距调的。
 func _projector() -> Callable:
 	return func(point: Vector2):
-		var hit = Plane(Vector3.UP, BED_H * WORLD_SCALE).intersects_ray(
+		var hit = Plane(Vector3.UP, 0.0).intersects_ray(
 			cam.project_ray_origin(point), cam.project_ray_normal(point))
 		if hit == null: return null
-		for bed in bp.beds() + [bp.reserved_bed()]:
-			for cell in bed.cells:
-				var center := bp.cell_to_world(cell, WORLD_SCALE)
-				if absf(hit.x - center.x) <= 0.45 * WORLD_SCALE and absf(hit.z - center.z) <= 0.45 * WORLD_SCALE:
-					return cell
-		var ground_hit = Plane(Vector3.UP, 0).intersects_ray(
-			cam.project_ray_origin(point), cam.project_ray_normal(point))
-		return bp.world_to_cell(ground_hit, WORLD_SCALE) if ground_hit != null else null
+		var cell := bp.world_to_cell(hit as Vector3, WORLD_SCALE)
+		return cell if bp.in_bounds(cell) else null
 
 func _is_plot(cell: Vector2i) -> bool:
-	return bp.mask_has("cultivable", cell) and _plot_unlocked(_id(cell))
+	return bp.mask_has("cultivable", cell)
 
-func _plot_unlocked(local_id: String) -> bool:
-	if visitor and snapshot.has("unlocked_cell_ids"):
-		return snapshot.unlocked_cell_ids.has(interior.source_id(local_id))
-	return predictor.is_unlocked(local_id) if predictor else true
+func _plot_unlocked(cell_id: String) -> bool:
+	return predictor.is_unlocked(cell_id) if predictor else true
 
 func _action_locked() -> bool:
 	return (runner != null and runner.is_busy() and not runner.paused) or _emote_lock_s > 0.0
 
 ## 每格按自己的状态入队下一步。返回入队格数。
 func _queue_plots(cells: Array) -> int:
+	if _terrain_stale: return 0
+	_mine_pending = false
 	if visitor or cells.is_empty() or session == null or session.offline:
 		return 0
-	var unlocked := 4 if predictor and predictor.beds_unlocked == 4 else 3
-	var plots := LabourBrush.filter_actionable(cells, bp, unlocked)
+	var plots: Array = LabourBrush.filter_actionable(cells, bp)
 	var view := _cells_view()
 	var now := _now()
-	if bool(_state().get("tools", {}).get("row_tool", false)):
-		plots = _expand_tool_plots(plots, view, now, unlocked)
+	if BagModel.tool_scope(_state()) > 1:
+		plots = _expand_tool_plots(plots, view, now)
 	var sowing := _sowing_options(true)
 	var added := 0
 	for c in plots:
 		var id := _id(c)
-		if not view.has(id) or not _plot_unlocked(id) or runner.contains(c):
+		# 荒地不在 view 里（稀疏存储）——那正是「可以开垦」，不能当成没这格。
+		if not _plot_unlocked(id) or runner.contains(c):
 			continue
-		var step := NextStep.step_for(view[id], now)
+		var step := NextStep.step_for(view.get(id, {}), now)
 		if step.is_empty():
 			continue
 		if step == "sow":
@@ -540,12 +1071,12 @@ func _queue_plots(cells: Array) -> int:
 		hud.set_hint("")
 	return added
 
-func _expand_tool_plots(plots: Array, view: Dictionary, now: int, unlocked: int) -> Array:
+func _expand_tool_plots(plots: Array, view: Dictionary, now: int) -> Array:
 	var out := plots.duplicate()
 	for cell in plots:
 		var action := NextStep.step_for(view.get(_id(cell), {}), now)
-		if not ["till", "care", "harvest"].has(action): continue
-		for neighbour in LabourBrush.filter_actionable(LabourBrush.expand_rows([cell], bp), bp, unlocked):
+		if not ["till", "water", "harvest"].has(action): continue
+		for neighbour in LabourBrush.thicken([cell], bp):
 			if not out.has(neighbour) and NextStep.step_for(view.get(_id(neighbour), {}), now) == action:
 				out.append(neighbour)
 	return out
@@ -587,6 +1118,8 @@ func _on_seed_selected(crop: String) -> void:
 
 ## 大按钮：对整片田做最该做的那件事。
 func _on_cta() -> void:
+	if _terrain_stale: return
+	if _activity_busy: return
 	if runner.is_busy() or _in_flight > 0 or session == null or session.offline: return
 	var bulk := _last_bulk
 	if bulk.is_empty() or not bool(bulk.get("enabled", true)):
@@ -596,7 +1129,7 @@ func _on_cta() -> void:
 			_open_stall(str(bulk.get("crop", "")))
 		"explore":
 			if bulk.get("surface") == "street":
-				AppRouter.open_instance(AppRouter.STREET, {"session": session, "target": str(bulk.get("target", ""))})
+				focus_destination(bulk)
 			else: AppRouter.open_instance(AppRouter.PLACE, {"place_id": str(bulk.get("place", "nursery")), "session": session, "target": str(bulk.get("target", ""))})
 		"":
 			pass
@@ -620,7 +1153,7 @@ func _on_cell_started(cell: Vector2i, action: String) -> void:
 			runner.abort_current()
 			return
 	if predictor:
-		var r := predictor.check(NextStep.COMMAND.get(action, ""), _payload_for(action, [id]), _now())
+		var r: Dictionary = predictor.check(NextStep.COMMAND.get(action, ""), _payload_for(action, [id]), _now())
 		if not r.ok:
 			hud.show_toast(FarmHud.reject_text(r.error), true)
 			runner.abort_current()
@@ -642,7 +1175,7 @@ func _begin_work(cell, action: String) -> void:
 	var clip := AnimPlaceholders.clip_for(action)
 	_play(clip)
 	if AnimPlaceholders.is_placeholder(action) and _rig:
-		AnimPlaceholders.play_fallback(_rig, ActionRunner.ACTION_S)
+		AnimPlaceholders.play_fallback(_rig, runner.action_seconds)
 
 ## 田不可走，站到它旁边最近的可走格。找不到就原地干。
 func _stand_cell_for(cell: Vector2i) -> Vector2i:
@@ -674,11 +1207,11 @@ func _on_cell_done(cell: Vector2i, action: String) -> void:
 		return
 	var before := _state().duplicate(true)
 	_in_flight += 1
-	var accepted: bool = await session.send(type, interior.server_payload(payload))
+	var accepted: bool = await session.send(type, payload)
 	_in_flight -= 1
 	if predictor:
 		if accepted:
-			predictor.commit(interior.local_cells(session.state.get("cells", {})), session.version)
+			predictor.commit(session.state.get("cells", {}), session.version)
 		else:
 			predictor.rollback()
 	if accepted:
@@ -708,16 +1241,7 @@ func _payload_for(action: String, ids: Array) -> Dictionary:
 			p["crop"] = hud.selected_crop
 			p["lot"] = NextStep.seed_lot(_state().get("inventory", {}), hud.selected_crop)
 			p["field_condition"] = _field_condition()
-		"care":
-			var condition := _care_condition(_parse(str(ids[0]))) if not ids.is_empty() else _field_condition()
-			p["kind"] = AnimPlaceholders.CARE_ACTION.get(condition, "water")
 	return p
-
-func _care_condition(cell) -> String:
-	if cell != null:
-		var slot: Dictionary = _cells_view().get(_id(cell), {})
-		if slot.get("care_weather") != null: return str(slot.care_weather)
-	return _field_condition()
 
 func _field_condition() -> String:
 	if session == null:
@@ -754,40 +1278,50 @@ func _parse(id: String) -> Vector2i:
 
 ## 把（预测叠加后的）格子状态推给作物渲染。now_ms 必须是**服务端时间**。
 func render_cells(cells: Dictionary, now_ms: int) -> void:
+	if scenery: scenery.sync_ground(cells)
 	if crop_field:
-		var visible_cells := cells.duplicate()
-		for id in visible_cells.keys():
-			if not _plot_unlocked(str(id)): visible_cells.erase(id)
-		crop_field.sync(visible_cells, now_ms)
-	if hints and not visitor:
-		var hint_cells := _actionable_view()
-		var sowing := _sowing_options(true)
-		var has_seed := false
-		for crop in sowing.crops:
-			has_seed = has_seed or NextStep.seeds_of(_state().get("inventory", {}), str(crop)) > 0
-		if int(sowing.room) <= 0 or not has_seed:
-			for id in hint_cells.keys():
-				if NextStep.step_for(hint_cells[id], now_ms) == "sow" and not runner.contains(_parse(str(id))):
-					hint_cells.erase(id)
-		hints.sync(hint_cells, now_ms, _field_condition())
+		crop_field.sync(cells, now_ms)
+	_sync_woody_blocking(cells)
+	if plot_surface:
+		plot_surface.sync(cells, now_ms)
+		plot_surface.highlight(runner.queued_cells() if runner else [], _brush_cells,
+			runner.current_cell() if runner else null)
+
+## 木本作物（果树）占住格子并阻挡通行；一年生作物可以直接踩过去。
+## 只对变化的格调增量 API，不为此重建整张寻路图。
+func _sync_woody_blocking(cells: Dictionary) -> void:
+	if grid == null: return
+	var blocked := {}
+	for id in cells:
+		if CropInfo.blocks_movement(cells[id]): blocked[str(id)] = true
+	for id in blocked:
+		if not _woody_blocked.has(id): grid.set_solid(_parse(str(id)), true)
+	for id in _woody_blocked:
+		if not blocked.has(id): grid.set_solid(_parse(str(id)), false)
+	_woody_blocked = blocked
 
 func _render() -> void:
 	if predictor:
 		render_cells(predictor.view(), _now())
+	if farm_activities: farm_activities.sync(_state())
 	_refresh_hud()
 
 ## 把权威状态（叠上预测）刷到 HUD：金币、田况、倒计时、目标、大按钮、种子行。
 func _refresh_hud() -> void:
+	if _relocate_button:
+		_relocate_button.visible = not visitor and session != null and session.relocation_available()
+		_relocate_button.disabled = _terrain_stale or _terrain_refresh_busy or (session != null and (session.offline or session.has_unconfirmed_command()))
 	if hud == null or visitor:
 		return
 	var st := _state()
 	var cells := _cells_view()
 	var now := _now()
+	hud.set_bag_alert(not BagModel.snapshot(st).get("overflow", []).is_empty())
 	hud.set_coins(int(st.get("wallet", 0)))
 	hud.set_condition(_field_condition())
 	hud.set_next_ripe(cells, now)
 	hud.set_offline(session.offline if session else false)
-	hud.set_connection_recovery(session != null and (session.offline or (_in_flight == 0 and session.has_unconfirmed_command())), _connection_recovery_busy)
+	hud.set_connection_recovery(_terrain_stale or (session != null and (session.offline or (_in_flight == 0 and session.has_unconfirmed_command()))), _connection_recovery_busy or _terrain_refresh_busy)
 	var chapter := int((st.get("clock", {}) as Dictionary).get("chapter_index", 0))
 	var unlocked := CropUnlocks.unlocked(CropInfo.ORDER, chapter, st)
 	var has_tilled := false
@@ -811,7 +1345,6 @@ func _refresh_hud() -> void:
 	hud.set_seeds(st.get("inventory", {}), sowing.crops, has_tilled and int(sowing.room) > 0, working)
 	var progress := DayGoals.progress(st.merged({"cells": _actionable_view()}, true), session.derived if session else {}, now)
 	hud.set_goals(DayGoals.evaluate(st, cells), chapter, progress)
-	hud.set_field_goal(FieldGrowth.goal(st))
 	if not JourneyProgress.active(st) and _chapter_seen_index == chapter and not _chapter_seen_complete and progress.complete:
 		hud.show_toast(L10n.format_text("Chapter %d complete", (chapter + 1)))
 	elif not JourneyProgress.active(st) and _chapter_seen_index >= 0 and chapter > _chapter_seen_index:
@@ -821,9 +1354,6 @@ func _refresh_hud() -> void:
 	if progress.complete and int(progress.next_open_in_ms) == 0:
 		call_deferred("_refresh_next_chapter")
 	if director: director.sync_state(st)
-	for prop in props.get_children():
-		if prop.has_meta("reserved"): prop.visible = int(st.get("beds_unlocked", 3)) == 4
-		if prop.has_meta("cell_id"): prop.visible = _plot_unlocked(str(prop.get_meta("cell_id")))
 	if stall and stall.visible:
 		# 延后到帧末：refresh 会重建按钮，而这里可能正处在某个按钮的 pressed 回调里。
 		stall.call_deferred("refresh", st, unlocked, STALL_BUDGET)
@@ -873,39 +1403,28 @@ func _attach_session() -> void:
 	if s == null or not s.has_farm():
 		return
 	session = s
-	predictor = CellPredictor.from_blueprint(bp, interior.local_cells(session.state.get("cells", {})))
-	predictor.beds_unlocked = int(session.state.get("beds_unlocked", 3))
-	_sync_field_unlocks(session.state)
+	predictor = CellPredictor.from_blueprint(bp, session.state.get("cells", {}))
 	session.state_changed.connect(_on_server_state)
 	session.offline_changed.connect(func(off): if hud: hud.set_offline(off))
 	# 服务端拒绝必须说出来：静默回滚在玩家眼里就是「点了没反应」。
-	session.rejected.connect(func(code, _detail): if hud: hud.show_toast(FarmHud.reject_text(code), true))
+	session.rejected.connect(func(code, _detail):
+		if code == "FARM_RELOCATED": _on_farm_relocated()
+		if hud: hud.show_toast(FarmHud.reject_text(code), true))
 	_render()
 
 ## 服务端每次回包都整体覆盖预测器；漂移一律以服务端为准（方案 §3 D4）。
 func _on_server_state(state: Dictionary, version: int) -> void:
+	if _own_terrain_changed():
+		_terrain_stale = true
+		if process_mode != Node.PROCESS_MODE_DISABLED: _on_farm_relocated()
+		return
+	if process_mode == Node.PROCESS_MODE_DISABLED:
+		_pending_state_refresh = true
+		return
 	if predictor:
-		predictor.commit(interior.local_cells(state.get("cells", {})), version)
-		predictor.beds_unlocked = int(state.get("beds_unlocked", 3))
-		_sync_field_unlocks(state)
+		predictor.commit(state.get("cells", {}), version)
 	_render()
 
-func _sync_field_unlocks(state: Dictionary) -> void:
-	var previous_count := predictor.cells.size() - predictor.locked_cells.size()
-	predictor.locked_cells.clear()
-	for id in predictor.cells:
-		if not FieldGrowth.allows(state, interior.source_id(str(id))): predictor.locked_cells[id] = true
-	var current_count := predictor.cells.size() - predictor.locked_cells.size()
-	for id in predictor.cells:
-		var cell := _parse(str(id))
-		var row: String = bp.masks.walkable[cell.y]
-		row[cell.x] = "0" if predictor.is_unlocked(str(id)) else "1"
-		bp.masks.walkable[cell.y] = row
-	grid = BlueprintGrid.new(bp)
-	if mover: mover.grid = grid
-	if current_count > previous_count and previous_count < 9:
-		hud.show_toast(L10n.format_text("%d plots unlocked", FieldGrowth.count(state)))
-	_frame_field(int(state.get("beds_unlocked", 3)) == 4)
 
 # —— 摊位 ————————————————————————————————————————————————————————————————
 
@@ -913,6 +1432,7 @@ func _build_stall() -> void:
 	stall = StallSheet.new()
 	hud.add_child(stall)
 	stall.sell_requested.connect(_on_sell)
+	stall.fish_sell_requested.connect(_on_sell_fish)
 	stall.buy_requested.connect(_on_buy)
 	stall.retry_requested.connect(_retry_stall)
 	stall.closed.connect(hud.close_modal)
@@ -928,6 +1448,7 @@ func _open_stall(crop := "") -> void:
 	if not crop.is_empty(): stall.focus_seed(crop)
 
 func _on_sell(items: Array) -> void:
+	if _terrain_stale: return
 	if session == null or (stall and stall.is_busy()):
 		return
 	if stall: stall.set_busy(true)
@@ -942,7 +1463,21 @@ func _on_sell(items: Array) -> void:
 		hud.show_toast(L10n.format_text("+%d coins", gained))
 	_render()
 
+func _on_sell_fish(stack_id: String, quantity: int) -> void:
+	if _terrain_stale: return
+	if session == null or stall.is_busy(): return
+	stall.set_busy(true)
+	var before := int(session.state.wallet)
+	var accepted := await session.send("sell_fish", {"sequence": int(session.state.bag.sequence), "stack_id": stack_id, "quantity": quantity})
+	_stall_uncertain = session.has_unconfirmed_command()
+	if _stall_uncertain: session.set_meta("pending_stall_command", true)
+	stall.set_uncertain(_stall_uncertain)
+	stall.set_busy(false)
+	hud.show_toast(L10n.format_text("+%d coins", int(session.state.wallet) - before) if accepted else SessionPanel.error_text(session.last_error_code), not accepted)
+	_render()
+
 func _on_buy(crop: String, qty: int) -> void:
+	if _terrain_stale: return
 	if session == null or (stall and stall.is_busy()):
 		return
 	if stall: stall.set_busy(true)
@@ -974,6 +1509,9 @@ func _retry_stall() -> void:
 	_render()
 
 func _recover_connection() -> void:
+	if _terrain_stale:
+		_reload_relocated_farm()
+		return
 	if session == null or _connection_recovery_busy or _in_flight > 0: return
 	_connection_recovery_busy = true
 	_refresh_hud()
@@ -1022,37 +1560,33 @@ func _on_director_command(type: String, payload: Dictionary) -> void:
 	director.report(accepted, session.last_error_code, session.player_id)
 	if accepted:
 		if predictor:
-			predictor.commit(interior.local_cells(session.state.get("cells", {})), session.version)
+			predictor.commit(session.state.get("cells", {}), session.version)
 		_render()
 
 # —— 访客模式（PRD §3.3 / §8.4）——————————————————————————————————————————
 
 func _enter_visitor_mode() -> void:
 	title.text = L10n.format_text("Visiting · %s", SeededOutfit.short_name(str(snapshot.get("avatar_ref", "seed:unknown"))))
+	title.tooltip_text = title.text
+	hud.set_farm_title(title.text)
 	hud.set_visitor_mode(true)
 	hud.set_condition(str(snapshot.get("weather_snapshot", "sunny")))
 	hud.wave_pressed.connect(_wave)
 	hud.stamp_pressed.connect(_stamp)
-	var local_cells := interior.local_snapshot(snapshot.get("cells", []))
-	var reserved_ids: Array = bp.reserved_bed().get("cells", []).map(func(cell): return _id(cell))
-	var reserved_unlocked := int(snapshot.get("beds_unlocked", 3)) == 4
-	# Older snapshots omit the unlock count; a worked reserved cell proves expansion.
-	if not snapshot.has("beds_unlocked"):
-		for cell in local_cells:
-			if reserved_ids.has(str(cell.cell_id)) and str(cell.get("state", "wild")) in ["cleared", "tilled", "sown", "growing"]:
-				reserved_unlocked = true
-				break
-	for prop in props.get_children():
-		if prop.has_meta("reserved"): prop.visible = reserved_unlocked
-		if snapshot.has("unlocked_cell_ids") and prop.has_meta("cell_id"):
-			prop.visible = _plot_unlocked(str(prop.get_meta("cell_id")))
-	if not reserved_unlocked:
-		local_cells = local_cells.filter(func(cell): return not reserved_ids.has(str(cell.cell_id)))
-	if snapshot.has("unlocked_cell_ids"):
-		local_cells = local_cells.filter(func(cell): return _plot_unlocked(str(cell.cell_id)))
-	_frame_field(reserved_unlocked)
+	# 访客看到的就是主人实际开垦过的那些格——没有解锁概念要过滤了。
+	var local_cells: Array = snapshot.get("cells", [])
+	_frame_field()
 	if crop_field:
 		crop_field.sync_snapshot(local_cells)
+	var ground_cells := {}
+	for entry in local_cells:
+		var slot: Dictionary = entry.duplicate(true)
+		# Snapshot ripeness is frozen. Derive surface color without writing timestamps or saves.
+		slot["ready_at"] = 0 if bool(entry.get("ripe", false)) else null
+		ground_cells[str(entry.get("cell_id", ""))] = slot
+	plot_surface.sync(ground_cells, 0)
+	scenery.sync_ground(ground_cells)
+	_sync_woody_blocking(ground_cells)
 
 func _wave() -> void:
 	_emote_lock_s = 1.2

@@ -22,10 +22,10 @@ rotation_degrees = Vector3(-51, -38, 0)
 light_color = Color(1.0, 0.96, 0.87, 1)
 light_energy = 1.1
 shadow_enabled = true
-shadow_opacity = 0.82
+shadow_opacity = 0.58
 shadow_bias = 0.1
 shadow_normal_bias = 1.0
-shadow_blur = 0.9
+shadow_blur = 1.4
 directional_shadow_max_distance = 0.0
 directional_shadow_fade_start = 1.0
 directional_shadow_pancake_size = 4.0
@@ -78,7 +78,7 @@ anchor_right = 1.0
 offset_top = 4.0
 offset_bottom = 48.0
 grow_horizontal = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
 [node name="ExitButton" type="Button" parent="HUD/SafeArea/Root/TopBar"]
 unique_name_in_owner = true
@@ -86,15 +86,16 @@ layout_mode = 2
 theme_type_variation = &"SecondaryButton"
 text = "Leave Farm"
 
-[node name="Title" type="Label" parent="HUD/SafeArea/Root/TopBar"]
+[node name="Title" type="Button" parent="HUD/SafeArea/Root/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-theme_type_variation = &"RailCaption"
-theme_override_font_sizes/font_size = 16
-horizontal_alignment = 2
-text_overrun_behavior = 3
+custom_minimum_size = Vector2(88, 44)
+theme_type_variation = &"ChoiceButton"
+theme_override_font_sizes/font_size = 15
+alignment = 0
+clip_text = true
 
 [node name="Hud" type="Control" parent="HUD/SafeArea/Root"]
 unique_name_in_owner = true

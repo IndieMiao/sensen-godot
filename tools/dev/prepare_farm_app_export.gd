@@ -4,13 +4,24 @@ extends SceneTree
 const DRIVER_FILES := ["journey_playtest.gd", "journey_playtest.tscn", "journey_device_observer.gd"]
 
 func _initialize() -> void:
+	# Android's generated build tree is ignored; always restore tracked native sources.
+	var voice_prepare: Array = []
+	if OS.execute("python3", [ProjectSettings.globalize_path("res://tools/android/prepare_voice_plugin.py")], voice_prepare, true) != 0:
+		push_error("GodotVoice preparation failed: " + "\n".join(voice_prepare))
+		quit(1)
+		return
 	var qa := "--farm-app-qa" in OS.get_cmdline_user_args()
 	var investor := "--farm-app-investor" in OS.get_cmdline_user_args()
+	var combat := "--farm-app-combat" in OS.get_cmdline_user_args()
+	var free_farm := "--farm-app-free-farm" in OS.get_cmdline_user_args()
+	var online := "--farm-app-online" in OS.get_cmdline_user_args() or free_farm
 	var default_app := "--farm-app-default" in OS.get_cmdline_user_args()
 	var usb := "--farm-app-usb" in OS.get_cmdline_user_args()
 	var partner := "--farm-app-partner" in OS.get_cmdline_user_args()
 	var public_workshop := "--farm-app-public-workshop" in OS.get_cmdline_user_args()
 	var public_app := partner or public_workshop
+	assert(not combat or public_app)
+	assert(not online or public_app)
 	assert(not (partner and public_workshop))
 	assert(not (public_app and (qa or default_app or usb)))
 	assert(not (qa and default_app))
@@ -19,6 +30,9 @@ func _initialize() -> void:
 	if usb: staging_name = "usb-project"
 	if public_app: staging_name = "partner-project" if partner else "public-workshop-project"
 	var release_date := "2026-09-13" if investor else "2026-09-10"
+	if combat: release_date = "2026-09-15"
+	if online: release_date = "2026-09-16"
+	if free_farm: release_date = "2026-09-18"
 	var directory := ProjectSettings.globalize_path("res://output/farm-app-" + release_date + "/" + staging_name)
 	DirAccess.make_dir_recursive_absolute(directory)
 	var config := ConfigFile.new()
@@ -71,6 +85,8 @@ func _initialize() -> void:
 	if usb: apk_name = "sensen-workshop-farm-art-usb-2026-09-10.apk"
 	if public_app: apk_name = "sensen-journey-farm-2026-09-10.apk" if partner else "sensen-workshop-online-2026-09-10.apk"
 	if investor: apk_name = apk_name.replace("2026-09-10", release_date + "-r4")
+	if combat: apk_name = "sensen-combat-online-2026-09-15-r5.apk" if partner else "sensen-workshop-combat-online-2026-09-15-r5.apk"
+	if online: apk_name = "sensen-party-voice-online-2026-09-16.apk" if partner else "sensen-workshop-party-voice-online-2026-09-16.apk"
 	preset.set_value("preset.0", "export_path", "../" + apk_name)
 	if not default_app:
 		preset.set_value("preset.0.options", "package/unique_name", "com.sensen.journeyfarmartqa" if qa else "com.sensen.workshoppreview0909")
@@ -86,6 +102,19 @@ func _initialize() -> void:
 		preset.set_value("preset.0", "include_filter", str(preset.get_value("preset.0", "include_filter")) + ",assets/farm/art/styles.json,assets/farm/presets/*.json")
 		if qa: preset.set_value("preset.0.options", "package/unique_name", "com.sensen.journeyinvestorqa")
 	if public_app: preset.set_value("preset.0.options", "command_line/extra_args", "")
+	if combat:
+		preset.set_value("preset.0.options", "version/code", 2026091507)
+		preset.set_value("preset.0.options", "version/name", "0.9.0-combat-online.20260915")
+		preset.set_value("preset.0", "include_filter", str(preset.get_value("preset.0", "include_filter")) + ",assets/farm/data/*.json,assets/farm/art/styles.json,assets/farm/presets/*.json")
+	if online:
+		preset.set_value("preset.0.options", "version/code", 2026091607)
+		preset.set_value("preset.0.options", "version/name", "0.11.0-party-voice.20260916")
+		preset.set_value("preset.0", "include_filter", str(preset.get_value("preset.0", "include_filter")) + ",assets/farm/data/*.json,assets/farm/art/styles.json,assets/farm/presets/*.json")
+	if free_farm:
+		assert(partner, "Free farm delivery uses the single existing Journey package")
+		preset.set_value("preset.0", "export_path", "../sensen-journey-farm-view-0.14.0.apk")
+		preset.set_value("preset.0.options", "version/code", 2026091801)
+		preset.set_value("preset.0.options", "version/name", "0.14.0-farm-view")
 	if not default_app and not public_app:
 		var host := "127.0.0.1" if usb else "10.0.2.2"
 		preset.set_value("preset.0.options", "command_line/extra_args", "++ --journey-base=http://" + host + ":3134/v1")

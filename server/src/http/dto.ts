@@ -1,9 +1,11 @@
+import { plotForFarm, visitorTerrain, type FarmTerrain } from '../geography/farm_terrain.js';
 /**
  * 三个显式 DTO（Codex 二审 Critical 4）。原设计只有一个 `publicView(state)` 且计划被 G2
  * 访客接口复用，那会把 owner_id、钱包、库存、关系、剧情全发给访客。
  *
  * 测试用**精确允许字段集**校验，而不是扫描禁用键名——后者只能挡住已知的坏字段。
  */
+import type { PlotLayout } from '../domain/plot.js';
 import type { FarmState } from '../domain/state.js';
 import { derive, type Derived } from '../domain/derive.js';
 import { STREET_EFFECT_IDS, type Content } from '../domain/content.js';
@@ -18,6 +20,10 @@ export interface FarmRow {
   layout_patch_id: string;
   blueprint_revision: number;
   location?: FarmLocation;
+  farm_terrain?: FarmTerrain;
+  relocation_available?: boolean;
+  relocation_used?: boolean;
+  relocation_draft?: import('../domain/farm_relocation.js').RelocationDraft | null;
   version: number;
   location_visible: boolean;
   visit_access: 'only_me' | 'anyone';
@@ -31,10 +37,13 @@ export function ownerFarmView(f: FarmRow, d: Derived, serverTime: number) {
     region_id: f.region_id,
     layout_patch_id: f.layout_patch_id,
     blueprint_revision: f.blueprint_revision,
+    ...(f.farm_terrain ? { farm_terrain: f.farm_terrain } : {}),
     ...(f.location ? { location: f.location } : {}),
     version: f.version,
     location_visible: f.location_visible,
     visit_access: f.visit_access,
+    relocation: { available: f.relocation_available === true && !f.relocation_used && !f.farm_terrain,
+      used: f.relocation_used === true },
     state: f.state,
     derived: {
       player_day_id: d.player_day_id,
@@ -49,16 +58,16 @@ export function ownerFarmView(f: FarmRow, d: Derived, serverTime: number) {
 
 /** Reads and command replies project the same chapter and grants without a database write. */
 export function currentOwnerFarmView(
-  f: FarmRow, serverTime: number, timezone: string, content: Content, blueprint: Ctx['blueprint'],
+  f: FarmRow, serverTime: number, timezone: string, content: Content, plot: PlotLayout,
 ) {
-  const state = projectFarmState(f.state, serverTime, timezone, content, blueprint);
+  const state = projectFarmState(f.state, serverTime, timezone, content, plotForFarm(f, plot));
   return ownerFarmView({ ...f, state }, derive(state, serverTime, timezone, content), serverTime);
 }
 
 export interface VisitorProp {
-  anchor_id: string;
   prop_id: string;
-  offset_q: [number, number];
+  cell: [number, number];
+  rotation_q?: number;
 }
 
 /**
@@ -72,25 +81,23 @@ export function visitorSnapshot(
   f: FarmRow, d: Derived, snapshotRevision: number, takenAt: number, props: VisitorProp[] = f.state.decorations ?? [],
   avatarRef = 'seed:unknown',
 ) {
-  const cells = Object.entries(f.state.cells).map(([cell_id, c]) => ({
+  const cells = Object.entries(f.state.cells).flatMap(([cell_id, c]) => c ? [{
     cell_id, state: c.state, crop: c.crop, ripe: d.ripe_cells.includes(cell_id),
-  }));
+  }] : []);
   return {
     farm_id: f.id,
     avatar_ref: avatarRef,
     layout_patch_id: f.layout_patch_id,
     blueprint_revision: f.blueprint_revision,
+    ...(f.farm_terrain ? { farm_terrain: visitorTerrain(f.farm_terrain) } : {}),
     snapshot_revision: snapshotRevision,
     snapshot_taken_at: takenAt,
     beds_unlocked: f.state.beds_unlocked,
-    ...(f.state.field_progress ? { unlocked_cell_ids: [
-      ...f.state.field_progress.order.slice(0, f.state.field_progress.plots),
-      ...(f.state.beds_unlocked === 4 ? Object.keys(f.state.cells).filter(id => !f.state.field_progress!.order.includes(id)) : []),
-    ] } : {}),
     cells,
     nursery: { stage: f.state.nursery.stage, appearance: f.state.nursery.appearance },
-    props: props.map(prop => ({ anchor_id: prop.anchor_id, prop_id: prop.prop_id,
-      offset_q: [prop.offset_q[0], prop.offset_q[1]] as [number, number] })),
+    props: props.map(prop => ({ prop_id: prop.prop_id,
+      cell: [prop.cell[0], prop.cell[1]] as [number, number],
+      ...(prop.rotation_q ? { rotation_q: prop.rotation_q } : {}) })),
     weather_snapshot: d.field_condition,
     ...(f.state.journey ? { street_snapshot: {
       side_path: f.state.journey.facts.includes('side_path'),

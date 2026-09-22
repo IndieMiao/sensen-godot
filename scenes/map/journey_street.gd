@@ -12,6 +12,8 @@ var environment: Environment
 var canvas: CanvasLayer
 var ui: Control
 var header: VBoxContainer
+var header_backdrop: Panel
+var dialogue_title: Label
 var markers: Control
 var status: Label
 var objective: Label
@@ -28,6 +30,7 @@ var dialogue: PanelContainer
 var confirmation: CanvasLayer
 var dialogue_scroll: ScrollContainer
 var active_panel: SessionPanel
+var bag_sheet: BagSheet
 var selected_slot := ""
 var _commons_key := ""
 var _residents_key := ""
@@ -41,6 +44,9 @@ var camera_pan := preload("res://modules/farm/scene_pan.gd").new()
 var targets: Dictionary = {}
 var pending := ""
 var busy := false
+var fishing_panel: FishingPanel
+var fishing_view: FishingPresentation
+var _fishing_plan: Dictionary = {}
 var _world_key := ""
 var _notice_left := 0.0
 # Null means no gesture; an empty ID preserves a press on the ground.
@@ -49,12 +55,17 @@ var _base_size := FOLLOW_VIEW_SIZE
 var _camera_center := Vector3(19.2, 0, -19.2)
 var _start_place := "farm"
 var _start_target := ""
+var _request_timber_slot := ""
 var _walk_place := ""
 var _status_elapsed := 0.0
 var visitor_snapshot: Dictionary = {}
 var visitor_blueprint: FarmBlueprint
+var online: OnlineSpace
+var _online_join: Dictionary = {}
+var _online_animation := "idle"
 
 func setup(args: Dictionary) -> void:
+	_online_join = args.get("online_join", {})
 	session = args.get("session", Net.session)
 	visitor_snapshot = args.get("visitor_snapshot", {})
 	visitor_blueprint = args.get("blueprint")
@@ -70,6 +81,7 @@ func setup(args: Dictionary) -> void:
 			"exploration": {"round": 0, "collected": []}}}
 	_start_place = str(args.get("from", "farm"))
 	_start_target = str(args.get("target", ""))
+	_request_timber_slot = str(args.get("request_timber_slot", ""))
 	_walk_place = str(args.get("walk_place", "bistro" if JourneyStreets.WALK_STOPS.has(_start_target) else ""))
 
 func _ready() -> void:
@@ -107,8 +119,12 @@ func _ready() -> void:
 			child.sleep_distance = 80
 	player.add_child(_rig)
 	_rig.config_applied.connect(func(_config): _play("idle"))
-	_rig.apply_config(Avatar.load_outfit())
+	Avatar.follow_saved_outfit(_rig)
 	_build_ui()
+	fishing_panel = FishingPanel.new()
+	add_child(fishing_panel)
+	fishing_panel.opened.connect(_begin_fishing_view)
+	fishing_panel.closed.connect(_end_fishing_view)
 	confirmation = preload("res://modules/ui/entry_confirmation.gd").new()
 	add_child(confirmation)
 	camera_pan.radius = 18.0
@@ -124,6 +140,12 @@ func _ready() -> void:
 	_update_camera()
 	_sync_markers()
 	if not _start_target.is_empty(): select_target(_start_target)
+	var live_session: FarmSession = Net.session if not visitor_snapshot.is_empty() else session
+	if live_session and live_session.logged_in():
+		var args := {} if visitor_snapshot.is_empty() else {"farm_id": str(visitor_snapshot.get("farm_id", ""))}
+		args.merge(_online_join, true)
+		online = OnlineSpace.attach(self, live_session, "street", args, func(): return mover,
+			func(): return _online_animation)
 
 func _build_ui() -> void:
 	canvas = CanvasLayer.new()
@@ -136,6 +158,10 @@ func _build_ui() -> void:
 	ui = Control.new()
 	ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	safe.add_child(ui)
+	header_backdrop = Panel.new()
+	header_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	header_backdrop.add_theme_stylebox_override("panel", GameUi.card_style(false, 8))
+	ui.add_child(header_backdrop)
 	markers = Control.new()
 	markers.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	markers.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -145,7 +171,12 @@ func _build_ui() -> void:
 	ui.add_child(hints)
 	header = VBoxContainer.new()
 	header.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	header.offset_left = 8
+	header.offset_right = -8
+	header.offset_top = 8
+	header.add_theme_constant_override("separation", 4)
 	ui.add_child(header)
+	header.resized.connect(_update_camera)
 	var row := HBoxContainer.new()
 	header.add_child(row)
 	var back := GameUi.button("arrow-left", "", L10n.text("Back to map"))
@@ -158,6 +189,11 @@ func _build_ui() -> void:
 	var overview := GameUi.button("map", "", L10n.text("Whole neighbourhood"))
 	overview.pressed.connect(func(): _focus_view(Vector3(19.2, 0, -19.2), 45.0))
 	row.add_child(overview)
+	if visitor_snapshot.is_empty():
+		var bag := GameUi.button("backpack", "", L10n.text("Your bag"))
+		bag.name = "OpenBag"
+		bag.pressed.connect(_open_bag)
+		row.add_child(bag)
 	status = GameUi.label("", 12, GameUi.GREEN)
 	header.add_child(status)
 	var goal_row := HBoxContainer.new()
@@ -198,15 +234,23 @@ func _build_ui() -> void:
 	ui.add_child(credit)
 	dialogue = PanelContainer.new()
 	dialogue.name = "StreetDialogue"
-	dialogue.add_theme_stylebox_override("panel", GameUi.surface(GameUi.PAPER, 12, 8))
+	dialogue.add_theme_stylebox_override("panel", GameUi.panel_style(12))
+	GameUi.register_modal(dialogue)
 	ui.add_child(dialogue)
 	var column := VBoxContainer.new()
 	dialogue.add_child(column)
+	var dialogue_header := HBoxContainer.new()
+	dialogue_header.add_theme_constant_override("separation", 8)
+	column.add_child(dialogue_header)
+	dialogue_header.add_child(GameUi.picture(GameUi.icon("users-round"), 24))
+	dialogue_title = GameUi.label(L10n.text("Residents"), 17)
+	dialogue_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	dialogue_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	dialogue_header.add_child(dialogue_title)
 	var close := GameUi.button("x", "", L10n.text("Close conversation"))
-	close.size_flags_horizontal = Control.SIZE_SHRINK_END
 	close.pressed.connect(_close_dialogue)
-	column.add_child(close)
-	dialogue_scroll = ScrollContainer.new()
+	dialogue_header.add_child(close)
+	dialogue_scroll = TouchScrollContainer.new()
 	dialogue_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	dialogue_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(dialogue_scroll)
@@ -347,16 +391,22 @@ func _build_scenery() -> void:
 			miniature.position = position
 			miniature.scale = Vector3.ONE * 0.4
 			scenery.add_child(miniature)
+	for id in FishingModel.data().sites:
+		if FishingModel.site(id).space == "street": scenery.add_child(FishingWater.build(id))
+	var tree_surface := SurfaceTool.new()
+	tree_surface.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for x in range(2, 39, 4):
 		for z in range(2, 39, 4):
 			var point := Vector3(x, 0, -z)
+			if FishingModel.water_at("street", point, 1.5): continue
 			if layout.road_distance(point) < 2.7: continue
 			if layout.buildings.values().any(func(p): return p.distance_to(point) < 4): continue
 			if layout.all_caches().any(func(pair): return pair[0].distance_to(point) < 2 or pair[1].distance_to(point) < 2): continue
 			if layout.commons.values().any(func(common): return common.position.distance_to(point) < 3.6): continue
 			if layout.gatherings.values().any(func(venue): return venue.position.distance_to(point) < 3.8): continue
-			PlaceScenery._tree(surface, point, 0.75 + float((x + z) % 3) * 0.15)
+			PlaceScenery._tree(tree_surface, point, 0.75 + float((x + z) % 3) * 0.15)
 	scenery.add_child(_mesh(surface, "NeighbourhoodRoads"))
+	scenery.add_child(_mesh(tree_surface, "NeighbourhoodTrees"))
 
 func _mesh(surface: SurfaceTool, object_name: String) -> MeshInstance3D:
 	surface.index()
@@ -386,9 +436,9 @@ func _add_target(id: String, text: String, icon: String, world: Vector3, approac
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.custom_minimum_size = Vector2(44, 44)
 	label.add_theme_font_size_override("font_size", 11)
-	label.add_theme_color_override("font_outline_color", GameUi.PAPER)
-	label.add_theme_constant_override("outline_size", 4)
-	for style in ["normal", "hover", "pressed", "disabled"]: label.add_theme_stylebox_override(style, StyleBoxEmpty.new())
+	label.add_theme_color_override("font_color", GameUi.INK)
+	label.add_theme_color_override("icon_normal_color", GameUi.BLUE)
+	for style in ["normal", "hover", "pressed", "disabled"]: label.add_theme_stylebox_override(style, GameUi.card_style(false, 5))
 	markers.add_child(label)
 	label.size = label.get_combined_minimum_size()
 	targets[id] = {"button": label, "world": world, "approach": approach, "text": text}
@@ -415,6 +465,8 @@ func _world_area() -> Rect2:
 
 func _update_camera() -> void:
 	if cam == null: return
+	if header_backdrop and header:
+		header_backdrop.size = Vector2(ui.size.x, header.position.y + header.size.y + 8)
 	var center := _camera_center + camera_pan.offset
 	if dialogue and dialogue.visible and residents.moments.has(selected_slot):
 		center = player.position.lerp(residents.moments[selected_slot].actor.position, 0.5)
@@ -427,9 +479,10 @@ func _update_camera() -> void:
 	cam.size = _base_size * maxf(1, width / _world_area().size.y) / camera_pan.zoom
 	cam.v_offset = 0
 	if dialogue:
-		var height := minf(320, ui.size.y * 0.44)
-		dialogue.position = Vector2(10, maxf(header.size.y + 8, ui.size.y - height - 100))
-		dialogue.size = Vector2(maxf(1, ui.size.x - 20), maxf(1, ui.size.y - dialogue.position.y - 100))
+		var height := minf(410, ui.size.y * 0.50)
+		var dialogue_width := minf(620, ui.size.x)
+		dialogue.position = Vector2((ui.size.x - dialogue_width) * 0.5, maxf(header.size.y + 16, ui.size.y - height - 100))
+		dialogue.size = Vector2(maxf(1, dialogue_width), maxf(1, ui.size.y - dialogue.position.y - 100))
 		if dialogue.visible:
 			var top := header.global_position.y + header.size.y + 12
 			var bottom := dialogue.global_position.y - 12
@@ -461,6 +514,9 @@ func _refresh_status() -> void:
 		objective.get_parent().hide()
 		return
 	status.text = L10n.format_text("%d coins / %d wood / %d stone / %d reeds", [session.state.get("wallet", 0), JourneyProgress.material(session.state, "wood"), JourneyProgress.material(session.state, "stone"), JourneyProgress.material(session.state, "fiber")])
+	var effect_status := CharacterModel.action_status(session.state, "gather_bonus")
+	if not effect_status.is_empty(): status.text += "\n" + effect_status
+	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var goal := _current_goal()
 	_goal_target = _goal_target_id(goal)
 	if pending.is_empty():
@@ -494,6 +550,8 @@ func _act_on_goal() -> void:
 	select_target(_goal_target_id(goal), goal)
 
 func select_target(id: String, goal: Dictionary = {}) -> void:
+	_fishing_plan = {}
+	if fishing_panel and fishing_panel.visible: return
 	if not visitor_snapshot.is_empty() and id != "farm": return
 	if busy or dialogue.visible or confirmation.visible or not targets.has(id) or session.offline or session.has_unconfirmed_command(): return
 	if NAMES.has(id) and id != "farm" and not PlaceCatalog.available(id, session.state):
@@ -521,6 +579,7 @@ func select_target(id: String, goal: Dictionary = {}) -> void:
 	else: _message(L10n.text("That path is not reachable"))
 
 func _ground_tap(screen: Vector2) -> void:
+	if fishing_panel and fishing_panel.visible: return
 	if busy or dialogue.visible or confirmation.visible or session.offline or session.has_unconfirmed_command() or not _world_area().has_point(screen - ui.global_position): return
 	var id: String = _pick_target(screen) if _pressed_target == null else str(_pressed_target)
 	if not id.is_empty():
@@ -528,6 +587,11 @@ func _ground_tap(screen: Vector2) -> void:
 		return
 	var point = Plane(Vector3.UP, 0).intersects_ray(cam.project_ray_origin(screen), cam.project_ray_normal(screen))
 	if not point is Vector3: return
+	for water_id in FishingModel.data().sites:
+		if FishingModel.site(water_id).space == "street" and FishingModel.contains(water_id, point):
+			_go_fishing(water_id, point)
+			return
+	_fishing_plan = {}
 	pending = ""
 	_destination_goal = {}
 	mover.grid = residents.navigation(residents.positions(), mover.position)
@@ -559,6 +623,14 @@ func _pick_target(screen: Vector2) -> String:
 
 func _process(dt: float) -> void:
 	if not mover: return
+	if fishing_panel and fishing_panel.visible:
+		mover.stop()
+		return
+	if online and online.travel_busy:
+		_update_camera()
+		return
+	if online and online.session: mover.speed = CharacterModel.current(online.session.state, "move_speed")
+	elif session: mover.speed = CharacterModel.current(session.state, "move_speed")
 	_status_elapsed += dt
 	if _status_elapsed >= 1.0:
 		_status_elapsed = 0.0
@@ -568,6 +640,14 @@ func _process(dt: float) -> void:
 	residents.step(dt, mover.is_moving() or not pending.is_empty() or busy or dialogue.visible or holding_resident, player.position)
 	mover.step(dt)
 	player.position = mover.position
+	if not _fishing_plan.is_empty() and not mover.is_moving():
+		var plan := _fishing_plan
+		_fishing_plan = {}
+		if player.position.distance_to(plan.origin) < 0.3:
+			camera_pan.cancel()
+			_play("idle")
+			fishing_panel.open(online.session if online else session, plan.site, plan.target)
+			return
 	if mover.is_moving():
 		_rig.rotation.y = atan2(mover.facing.x, mover.facing.z)
 		_play("run")
@@ -585,6 +665,34 @@ func _process(dt: float) -> void:
 	hints.update_motion(mover.is_moving(), mover.remaining_path(), dt)
 	_notice_left = maxf(0, _notice_left - dt)
 	notice.visible = _notice_left > 0
+
+func _go_fishing(id: String, clicked: Vector3) -> void:
+	var own_session: FarmSession = online.session if online else session
+	if own_session == null or own_session.offline or own_session.has_unconfirmed_command(): return
+	if not CharacterModel.has_fishing_rod(own_session.state):
+		_message(L10n.text("Equip a fishing rod on the character page first."))
+		return
+	pending = ""
+	_destination_goal = {}
+	mover.grid = residents.navigation(residents.positions(), mover.position)
+	_fishing_plan = FishingModel.plan(id, mover.position, clicked, mover.grid)
+	if _fishing_plan.is_empty():
+		_message(L10n.text("Can't reach that spot"))
+		return
+	_fishing_plan.site = id
+	var accepted := mover.set_target_position(_fishing_plan.origin)
+	hints.destination(_fishing_plan.origin, accepted, mover.remaining_path())
+	if not accepted: _fishing_plan = {}
+
+func _begin_fishing_view(_site: String) -> void:
+	_end_fishing_view()
+	fishing_view = FishingPresentation.new()
+	add_child(fishing_view)
+	fishing_view.configure(fishing_panel, player, _rig, cam, [ui, online.hud if online else null])
+
+func _end_fishing_view() -> void:
+	if is_instance_valid(fishing_view): fishing_view.finish()
+	fishing_view = null
 
 func _arrive(id: String) -> void:
 	if not targets.has(id): return
@@ -606,11 +714,20 @@ func _arrive(id: String) -> void:
 		var enter: bool = await confirmation.answered
 		if not enter: return
 		if not visitor_snapshot.is_empty():
-			AppRouter.open_instance(AppRouter.FARM, {"visitor": true, "snapshot": visitor_snapshot, "blueprint": visitor_blueprint})
+			var farm_snapshot := visitor_snapshot
+			if has_meta("party_travel"):
+				var response := await Net.snapshot(str(visitor_snapshot.farm_id))
+				if not is_inside_tree(): return
+				if not response.ok:
+					_message(L10n.text("Ask the owner to allow party farm visits"))
+					return
+				farm_snapshot = response.snapshot
+			AppRouter.open_instance(AppRouter.FARM, {"visitor": true, "snapshot": farm_snapshot, "blueprint": visitor_blueprint,
+				"online_join": {"channel": int(online.join_args.get("channel", 1)) if online else 1}})
 			return
 		if id == "farm":
 			AppRouter.open_instance(AppRouter.FARM, {"session": session,
-				"seed_crop": str(goal.get("crop", "")) if goal.get("action") == "stall" else ""})
+				"seed_crop": str(goal.get("crop", "")) if goal.get("action") == "stall" else "", "target": str(goal.get("target", ""))})
 		else: AppRouter.open_instance(AppRouter.PLACE, {"session": session, "place_id": id, "target": str(goal.get("target", ""))})
 		return
 	var bundle: Dictionary = targets[id].bundle
@@ -618,10 +735,13 @@ func _arrive(id: String) -> void:
 	var round_id := int(session.state.journey.exploration.round)
 	busy = true
 	_play("labour_till" if materials.has("stone") else ("labour_sow" if materials.has("fiber") else "labour_clear"))
-	await get_tree().create_timer(0.9).timeout
+	await get_tree().create_timer(CharacterModel.gather_seconds(session.state, CharacterModel.resource_kind(materials))).timeout
 	var accepted := await session.send("collect_resource", {"node_id": bundle.node, "round": round_id, "choice": bundle.choice})
 	busy = false
-	_message("+" + JourneyProgress.material_label(materials) if accepted else L10n.text("Supplies changed. Try again."))
+	var result := "+" + JourneyProgress.material_label(materials)
+	var effect_status := CharacterModel.action_status(session.state, "gather_bonus")
+	if not effect_status.is_empty(): result += "\n" + effect_status
+	_message(result if accepted else SessionPanel.error_text(session.last_error_code))
 	_refresh()
 
 func _show_dialogue(slot: String) -> void:
@@ -640,11 +760,14 @@ func _show_dialogue(slot: String) -> void:
 	var panel := JourneyActivityPanel.new()
 	active_panel = panel
 	panel.target = "resident:" + str(StreetCommons.RESIDENTS[slot])
+	dialogue_title.text = L10n.text(str(ResidentCast.definition(str(StreetCommons.RESIDENTS[slot])).name))
+	panel.prefer_timber_only = _request_timber_slot == slot
 	panel.place_id = "street"
 	active_panel.setup(session)
 	panel.contribution_completed.connect(_contribution_completed)
 	panel.resident_interaction_completed.connect(_resident_interaction_completed)
 	panel.goal_requested.connect(_gathering_destination)
+	panel.requests_requested.connect(_open_requests)
 	panel.destination_requested.connect(func(id):
 		_close_dialogue()
 		if not dialogue.visible: select_target(id))
@@ -655,6 +778,7 @@ func _show_dialogue(slot: String) -> void:
 	_sync_markers()
 
 func _show_gathering(theme: String) -> void:
+	dialogue_title.text = L10n.text(str(JourneyGatherings.themes()[theme].name))
 	camera_pan.cancel()
 	mover.stop()
 	pending = ""
@@ -685,6 +809,7 @@ func _gathering_destination(goal: Dictionary) -> void:
 	_close_dialogue()
 	if dialogue.visible: return
 	_walk_place = ""
+	_request_timber_slot = str(goal.get("change_request", ""))
 	select_target(_goal_target_id(goal), goal)
 
 func _close_dialogue() -> void:
@@ -717,15 +842,22 @@ func _message(text: String) -> void:
 	_notice_left = 5
 
 func _play(id: String) -> void:
+	_online_animation = id
 	_rig.play_motion(id)
 
 func _input(event: InputEvent) -> void:
+	if fishing_panel and fishing_panel.visible: return
+	if online and (online.travel_busy or is_instance_valid(online.panel)): return
+	if bag_sheet and bag_sheet.visible: return
 	if dialogue.visible or confirmation.visible: return
 	if camera_pan.handle(event, cam):
 		if not camera_pan.active() or camera_pan.dragged or camera_pan.multi: _pressed_target = null
 		get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if fishing_panel and fishing_panel.visible: return
+	if online and (online.travel_busy or is_instance_valid(online.panel)): return
+	if bag_sheet and bag_sheet.visible: return
 	if busy or dialogue.visible or confirmation.visible: return
 	if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and event.device != InputEvent.DEVICE_ID_EMULATION):
 		_pressed_target = _pick_target(event.position)
@@ -737,6 +869,11 @@ func _notification(what: int) -> void:
 		camera_pan.cancel()
 
 func is_back_navigation_locked() -> bool:
+	if fishing_panel and fishing_panel.visible:
+		fishing_panel.close()
+		return true
+	if online and online.consume_back(): return true
+	if bag_sheet and bag_sheet.consume_back(): return true
 	if confirmation.visible:
 		confirmation.dismiss(false)
 		return true
@@ -754,7 +891,29 @@ func is_back_navigation_locked() -> bool:
 func _leave() -> void:
 	if not is_back_navigation_locked(): AppRouter.pop_instance()
 
+func _open_bag() -> void:
+	if busy or confirmation.visible or (active_panel and active_panel.busy): return
+	_close_dialogue()
+	pending = ""
+	mover.stop()
+	camera_pan.cancel()
+	_pressed_target = null
+	if bag_sheet == null:
+		bag_sheet = BagSheet.new()
+		bag_sheet.setup(session)
+		ui.add_child(bag_sheet)
+	bag_sheet.open()
+
+func _open_requests() -> void:
+	_open_bag()
+	if bag_sheet and bag_sheet.visible: bag_sheet.active.select_page("requests")
+
 func suspend() -> void:
+	_end_fishing_view()
+	if fishing_panel:
+		fishing_panel.interrupt()
+		fishing_panel.hide()
+	if online: online.suspend()
 	_pressed_target = null
 	camera_pan.cancel()
 	process_mode = Node.PROCESS_MODE_DISABLED
@@ -764,6 +923,7 @@ func suspend() -> void:
 	world_env.environment = null
 
 func resume() -> void:
+	if online: online.resume()
 	get_viewport().transparent_bg = false
 	process_mode = Node.PROCESS_MODE_INHERIT
 	show()
@@ -771,3 +931,6 @@ func resume() -> void:
 	world_env.environment = environment
 	cam.make_current()
 	_refresh()
+
+func party_travel_ready() -> bool:
+	return not (fishing_panel and fishing_panel.visible) and not busy and not session.has_unconfirmed_command()

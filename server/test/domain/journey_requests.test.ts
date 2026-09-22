@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import type { Command } from '../../src/domain/commands.js';
 import type { FarmState } from '../../src/domain/state.js';
 import { reconcileJourney, startJourney } from '../../src/domain/journey.js';
-import { content, freshFarm, run } from './helpers.js';
+import { content, editInventory, freshFarm, run } from './helpers.js';
+import { ensureBag } from '../../src/domain/bag.js';
+import { ensureCharacter } from '../../src/domain/character.js';
 
 function ready() {
   const s = startJourney(freshFarm(), content);
@@ -25,13 +27,18 @@ const track = (s: FarmState, slot = 'nursery', tracking = true) => apply(s, {
 
 describe('neighbour request tracking', () => {
   it('tracks, switches and cancels exact offers without costs, rewards or advancing requests', () => {
-    const s = ready(), before = structuredClone(s);
+    const s = ready();
+    ensureBag(s, content);
+    ensureCharacter(s, content);
+    const before = structuredClone(s);
     const pinned = track(s);
     expect(pinned.journey!.tracked_opportunity).toEqual({ slot: 'nursery', sequence: 0 });
     const switched = track(pinned, 'restorer');
     expect(switched.journey!.tracked_opportunity).toEqual({ slot: 'restorer', sequence: 0 });
     expect(track(switched, 'restorer', false)).toEqual({ ...s,
-      journey: { ...s.journey, facility_uses: {} } });
+      journey: { ...s.journey, facility_uses: {}, opportunities: { ...s.journey!.opportunities,
+        nursery: { ...s.journey!.opportunities.nursery, accepted: true },
+        restorer: { ...s.journey!.opportunities.restorer, accepted: true } } } });
     expect(s).toEqual(before);
   });
 
@@ -58,6 +65,7 @@ describe('neighbour request tracking', () => {
 
   it.each(['fulfill_opportunity', 'decline_opportunity'] as const)('%s clears only its own pin and leaves the next request untracked', type => {
     const s = track(ready());
+    s.journey!.opportunities.restorer.accepted = true;
     const other = apply(s, { type, slot: 'restorer', sequence: 0 });
     expect(other.journey!.tracked_opportunity).toEqual(s.journey!.tracked_opportunity);
     const done = apply(other, { type, slot: 'nursery', sequence: 0 });
@@ -68,7 +76,7 @@ describe('neighbour request tracking', () => {
 
   it('keeps the pin when a delivery fails and does not override it during unrelated construction', () => {
     const s = track(ready());
-    s.inventory.produce.L = 0;
+    editInventory(s, draft => { draft.inventory.produce.L = 0; });
     expect(run(s, { type: 'fulfill_opportunity', slot: 'nursery', sequence: 0 }).ok).toBe(false);
     const built = apply(s, { type: 'build_journey_project', project: 'waystation', stage: 0 });
     expect(built.journey!.tracked_project).toBeUndefined();

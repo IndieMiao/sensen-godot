@@ -3,6 +3,7 @@
   "residents": {
     "nursery_keeper": {
       "name": "Nursery keeper", "short_name": "Keeper", "place": "nursery", "chapter": 0,
+      "profile": "A patient grower who cares about fresh harvests and the nursery's neighbours.",
       "outfit": {"cloth": "cloth11", "hairHat": "hairhat20", "shoes": "shoes1", "glass": ""},
       "gift_clue": "A crisp radish reminds me of the first seeds I grew here.",
       "gift_replies": {"R": ["You kept a radish for me? Look at those bright leaves.", "I used to bring my first harvest to the keeper before me. There is room for your story here, too."]},
@@ -18,6 +19,7 @@
     },
     "bistro_owner": {
       "name": "Bistro host", "short_name": "Host", "place": "bistro", "chapter": 1,
+      "profile": "A welcoming cook who brings neighbours together with meals from your farm.",
       "outfit": {"cloth": "cloth28", "hairHat": "hairhat41", "shoes": "shoes2", "glass": ""},
       "gift_clue": "Tender lettuce and crisp radishes always have a place at my table.",
       "gift_replies": {
@@ -40,6 +42,7 @@
     },
     "restorer": {
       "name": "Restorer", "short_name": "Restorer", "place": "courtyard", "chapter": 5,
+      "profile": "A practical craftsperson who turns local materials into useful neighbourhood corners.",
       "outfit": {"cloth": "cloth42", "hairHat": "hairhat43", "shoes": "shoes3", "glass": "glass1"},
       "gift_clue": "Chamomile after a day's repairs, or fresh lettuce with lunch. Either would be welcome.",
       "gift_replies": {

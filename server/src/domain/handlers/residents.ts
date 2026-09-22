@@ -125,13 +125,13 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
       for (const [crop, n] of Object.entries(req.items ?? {}))
         if (availableProduce(s, crop as CropId) < (n ?? 0)) return err('INSUFFICIENT_ITEMS', crop);
       for (const [dish, n] of Object.entries(req.dishes ?? {}))
-        if (s.inventory.dishes[dish as DishId] < (n ?? 0)) return err('INSUFFICIENT_ITEMS', dish);
+        if ((s.inventory.dishes[dish as DishId] ?? 0) < (n ?? 0)) return err('INSUFFICIENT_ITEMS', dish);
       const next = structuredClone(s);
       const events: DomainEvent[] = [];
       for (const [crop, n] of Object.entries(req.items ?? {}))
         next.inventory.produce[crop as CropId] -= n ?? 0;
       for (const [dish, n] of Object.entries(req.dishes ?? {}))
-        next.inventory.dishes[dish as DishId] -= n ?? 0;
+        next.inventory.dishes[dish as DishId] = (next.inventory.dishes[dish as DishId] ?? 0) - (n ?? 0);
       next.wallet += req.coins;
       next.requests_done.push(cmd.request_id);
       // 只有首个标记 personal_story 的请求给 15 点；教学/生活/施工回购不刷关系（L550）。
@@ -183,8 +183,6 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
 
     case 'purchase_growth_choice': {
       if (cmd.choice !== 'tool' && cmd.choice !== 'field') return err('NOT_AVAILABLE', '成长选择非法');
-      if (cmd.choice === 'field' && s.field_progress && s.field_progress.plots < 9)
-        return err('CHAPTER_LOCKED', '先完成九块田地的新手目标');
       if (typeof cmd.transaction_id !== 'string' || cmd.transaction_id.trim().length === 0
         || cmd.transaction_id.length > 128) return err('NOT_AVAILABLE', '交易标识非法');
       if (!canUse(s, 'growth', unlockChapter(ctx, 'growth_choice')))
@@ -198,20 +196,19 @@ export function applyResidents(s: FarmState, cmd: Command, ctx: Ctx): Result<Far
         next.wallet -= gc.tool.price;
         next.tools.row_tool = true;
       } else {
-        // 扩地是一次原子事务：400 + 固定篮 12 枚种子。篮子固定而不是玩家任选——任选时
-        // 12R 只要 48、12H 要 120，都推不出账本里的 84（Codex 二审 Critical 1）。
+        // 扩地是一次原子事务：定价 + 固定篮种子。篮子固定而不是玩家任选，避免同一笔钱
+        // 因作物单价不同而买到差距悬殊的东西。
         const basket = gc.field.seed_basket;
         const seedCost = Object.entries(basket)
           .reduce((sum, [crop, n]) => sum + c.crops.crops[crop as CropId].seed_price * (n ?? 0), 0);
         const total = gc.field.price + seedCost;
         if (next.wallet < total) return err('INSUFFICIENT_FUNDS', `需要 ${total}`);
         next.wallet -= total;
+        // 自由格子种田起，扩地不再赠送地块（地本来就随便开）。beds_unlocked 退化成
+        // 「买过这一项」的标记，保留是为了不动 journey / week_summary / 访客快照那几处读法。
         next.beds_unlocked = 4;
         for (const [crop, n] of Object.entries(basket))
           next.inventory.seeds[crop as CropId].bought += n ?? 0;
-        // 预留畦到手即已清理已翻土，不计首次清理 XP（决策⑥）——否则 D5/D6 累计会变成
-        // 271/304，与 PRD L567/L570 的 268/301 矛盾。
-        for (const id of ctx.blueprint.reserved) next.cells[id].state = 'tilled';
       }
       next.growth_choice.purchase = cmd.choice;
       next.growth_choice.intent = cmd.choice;

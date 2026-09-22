@@ -5,9 +5,9 @@ func _state(slot := "nursery", variant := 0) -> Dictionary:
 		"inventory": {"produce": {}, "dishes": {}, "seeds": {"R": {"bound": 3}, "L": {"bound": 2}, "H": {"bound": 2}}},
 		"cells": {}, "nursery": {}, "engineering": {"reserved": {}}, "residents": {}, "journey": {"version": 1, "completed": [],
 		"facts": ["met_nursery", "met_bistro", "shared_meal", "workbench", "planter_crafted", "planter_placed", "side_path", "planter_planted"],
-		"unlocks": ["bistro", "kitchen", "crop_C", "crop_H", "tea"], "wood": 0, "materials": {"stone": 0, "fiber": 0},
+		"unlocks": ["bistro", "kitchen", "crop_C", "crop_H", "tea", "crafting"], "wood": 0, "materials": {"stone": 0, "fiber": 0},
 		"tracked_opportunity": {"slot": slot, "sequence": 4}, "exploration": {"round": 1, "collected": []},
-		"opportunities": {slot: {"sequence": 4, "variant": variant}}}}
+		"opportunities": {slot: {"sequence": 4, "variant": variant, "accepted": true}}}}
 
 func test_mixed_request_keeps_its_purpose_from_materials_to_delivery() -> void:
 	var st := _state("restorer", 1)
@@ -52,7 +52,7 @@ func test_request_crop_recommendations_cover_shortfall_and_respect_manual_seeds(
 	assert_str(NextStep.bulk(st.cells, 1000, st, "R", CropInfo.ORDER).action).is_equal("explore")
 	assert_str(JourneyProgress.tracked_goal(st, 2000).action).is_equal("harvest")
 	st.cells.b.state = "sown"
-	assert_str(JourneyProgress.tracked_goal(st, 1000).action).is_equal("care")
+	assert_str(JourneyProgress.tracked_goal(st, 1000).action).is_equal("water")
 
 func test_missing_seeds_and_restored_garden_are_concrete_destinations() -> void:
 	var st := _state("bistro", 1)
@@ -105,18 +105,21 @@ func test_tracking_and_cancellation_wait_for_server_acceptance() -> void:
 			if tracking: result.journey.tracked_opportunity = {"slot": "nursery", "sequence": 4}
 			else: result.journey.erase("tracked_opportunity")
 			var reply := {"status": 200, "json": {"version": 2, "state": result}} if accepted else {"status": 422, "json": {"code": "REQUEST_DONE"}}
-			var transport := FakeTransport.new([reply])
+			var responses := [reply]
+			if not accepted: responses.append({"status": 200, "json": {"version": 1, "state": st}})
+			var transport := FakeTransport.new(responses)
 			var panel := await _panel(st, transport)
 			var goals := []
 			panel.goal_requested.connect(func(goal): goals.append(goal))
 			var button := panel.content.find_child("TrackRequest_nursery", true, false) as Button
 			button.pressed.emit()
 			for frame in 5: await get_tree().process_frame
-			assert_str(transport.last_body().type).is_equal("track_journey_opportunity")
-			assert_dict(transport.last_body().payload).is_equal({"slot": "nursery", "sequence": 4.0, "tracking": tracking})
+			assert_str(transport.requests[0].body.type).is_equal("track_journey_opportunity")
+			assert_dict(transport.requests[0].body.payload).is_equal({"slot": "nursery", "sequence": 4.0, "tracking": tracking})
+			assert_int(transport.requests.size()).is_equal(1 if accepted else 2)
+			if not accepted: assert_str(transport.requests[1].method).is_equal("GET")
 			assert_dict(panel.session.state).is_equal(result if accepted else st)
-			assert_int(goals.size()).is_equal(1 if accepted and tracking else 0)
-			if not goals.is_empty(): assert_str(goals[0].crop).is_equal("L")
+			assert_array(goals).is_empty()
 
 func test_lost_tracking_response_recovers_exact_command_and_ui() -> void:
 	var st := _state()

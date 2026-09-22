@@ -26,6 +26,8 @@ func _init() -> void:
 		return
 	# 插件在 Android UI 线程 emitSignal，必须 deferred 回主循环再碰场景树
 	_plugin.connect("map_ready", func(): map_ready.emit(), CONNECT_DEFERRED)
+	if _plugin.has_signal("pois_received"):
+		_plugin.connect("pois_received", func(id: int, json: String): pois_received.emit(id, json), CONNECT_DEFERRED)
 	_plugin.connect("location_update",
 		func(lat: float, lng: float, acc: float): location_update.emit(lat, lng, acc),
 		CONNECT_DEFERRED)
@@ -52,13 +54,29 @@ func get_pixel_ratio() -> float:
 	return maxf(float(_plugin.getPixelRatio()), 0.5)
 
 func set_language(locale: String) -> void:
-	if is_instance_valid(_plugin) and _plugin.has_method("setLanguage"):
+	if _supports("setLanguage"):
 		_plugin.setLanguage(locale)
+
+func _supports(method: String) -> bool:
+	if not is_instance_valid(_plugin): return false
+	# Android singletons are JavaObject wrappers; Object.has_method sees only the wrapper.
+	if _plugin.has_method("has_java_method"): return _plugin.has_java_method(method)
+	return _plugin.has_method(method)
 
 func camera_info() -> String:
 	if not is_instance_valid(_plugin):
 		return ""
 	return _plugin.getCameraInfo()
+
+func request_pois(request_id: int) -> void:
+	if _supports("queryCityPois"):
+		_plugin.queryCityPois(request_id)
+	else:
+		super.request_pois(request_id)
+
+func set_city_style(enabled: bool) -> void:
+	if _supports("setCityStyle"):
+		_plugin.setCityStyle(enabled)
 
 func start_location() -> void:
 	if not is_instance_valid(_plugin):

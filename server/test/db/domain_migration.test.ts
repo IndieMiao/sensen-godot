@@ -3,6 +3,8 @@ import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import pg from 'pg';
+import { ensureBag } from '../../src/domain/bag.js';
+import type { FarmState } from '../../src/domain/state.js';
 import { migrateDomain } from '../../src/db/domain_migration.js';
 import { migrate, truncateAll } from '../../src/db/migrate.js';
 import { PgStore } from '../../src/db/pg_store.js';
@@ -10,10 +12,21 @@ import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/doma
 import { createInitialState } from '../../src/domain/state.js';
 import { DOMAIN_VERSION } from '../../src/domain/version.js';
 import { startJourney, reconcileJourney } from '../../src/domain/journey.js';
-import { blueprintSets, loadBlueprint } from '../../src/http/app.js';
+import { loadBlueprint, plotFor } from '../../src/http/app.js';
 import { payloadHash } from '../../src/http/hash.js';
 import type { FarmRow } from '../../src/http/dto.js';
 import { SH, at } from '../domain/helpers.js';
+import { isTillable, type PlotLayout } from '../../src/domain/plot.js';
+
+/** 一小片可开垦格，代替过去写死的固定田畦（SGODOT-128 自由格子种田）。 */
+function soilCells(p: PlotLayout, count: number): string[] {
+  const out: string[] = [];
+  for (let j = 0; j < p.gy && out.length < count; j++)
+    for (let i = 0; i < p.gx && out.length < count; i++)
+      if (isTillable(p, `${i},${j}`)) out.push(`${i},${j}`);
+  return out;
+}
+
 
 const DSN = process.env.TEST_DATABASE_URL;
 if (process.env.CI === '1' && !DSN) throw new Error('CI requires an isolated TEST_DATABASE_URL');
@@ -23,18 +36,23 @@ if (DSN && !/(?:^|_)(?:test|migration)(?:_|$)/i.test(new URL(DSN).pathname.slice
 const ROOT = path.resolve(DEFAULT_CONTENT_DIR, '../../..');
 const CV = contentVersion(DEFAULT_CONTENT_DIR);
 const content = loadContent(DEFAULT_CONTENT_DIR);
-const sets = blueprintSets(loadBlueprint(path.join(ROOT, 'assets/blueprints'), 'sh_a', 2)!);
-const cells = [...sets.cultivable].filter(id => !sets.reserved.has(id));
+const sets = plotFor(content);
+const cells = soilCells(sets, 12);
+function equipmentState(value: unknown): FarmState {
+  const state = structuredClone(value) as FarmState;
+  ensureBag(state, content);
+  return state;
+}
 const NOW = at('2026-09-04T10:00:00+08:00');
 
-describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
+describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () => {
   let pool: pg.Pool;
   let store: PgStore;
   beforeAll(async () => {
     pool = new pg.Pool({ connectionString: DSN, max: 8, application_name: 'domain-migration-test' });
     await migrate(pool);
     store = new PgStore({ pool, content, contentVersion: CV, timezone: () => SH,
-      blueprint: () => sets, now: () => NOW });
+      plot: sets, now: () => NOW });
   });
   afterAll(async () => { await pool?.end(); });
   beforeEach(async () => { await truncateAll(pool); });
@@ -42,7 +60,7 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
   async function seed(domainVersion = '1'): Promise<FarmRow> {
     const { player } = await store.authAnonymous(`migration-${randomUUID()}`);
     const state = createInitialState({ player_day_id: '2026-09-04', field_condition: 'sunny',
-      now: NOW, wallet: 321, bed_cells: cells, reserved_cells: [...sets.reserved] });
+      now: NOW, wallet: 321 });
     state.inventory.seeds.R = { bought: 4, bound: 5 };
     state.inventory.produce.R = 9;
     state.xp.first_harvest_crops = ['R'];
@@ -66,13 +84,13 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
     return result;
   }
 
-  const envelope = (key: string, type: 'clear_cells' | 'till_cells' = 'clear_cells') => ({
+  const envelope = (key: string, type: 'till_cells' = 'till_cells') => ({
     idempotency_key: key, base_version: 0, type, payload: { cell_ids: [cells[0]] },
   });
 
   async function addHistory(farm: FarmRow) {
     for (const outcome of ['applied', 'rejected']) {
-      const env = envelope(`legacy-${outcome}`, outcome === 'applied' ? 'clear_cells' : 'till_cells');
+      const env = envelope(`legacy-${outcome}`, outcome === 'applied' ? 'till_cells' : 'till_cells');
       const result = { old_rule_result: outcome, wallet: 321, lesson: 'domain 1 result' };
       await pool.query(`INSERT INTO commands (farm_id,idempotency_key,base_version,type,payload,
         payload_hash,outcome,result,effective_now,content_version,domain_version,applied_at)
@@ -101,30 +119,30 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
     const current = await seed(DOMAIN_VERSION);
     await addHistory(old);
     const before = await snapshot();
-    const report = await migrateDomain(pool, { contentVersion: CV });
+    const report = await migrateDomain(pool, { plot: sets, contentVersion: CV });
     expect(report).toMatchObject({ mode: 'dry-run', status: 'ready', migrated: 0,
       eligible: [old.id], already_current: [current.id], blocked: [] });
     expect(await snapshot()).toEqual(before);
   });
 
-  it('changes only farm domain versions, preserves old results, and is idempotent', async () => {
+  it('migrates equipment with domain versions, preserves old results, and is idempotent', async () => {
     const farm = await seed();
     await addHistory(farm);
     const before = await snapshot();
-    const first = await migrateDomain(pool, { contentVersion: CV, apply: true });
+    const first = await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true });
     expect(first).toMatchObject({ status: 'applied', migrated: 1, eligible: [farm.id] });
     const after = await snapshot();
     expect(after).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
-      .map(row => ({ ...row, domain_version: DOMAIN_VERSION })) });
+      .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION })) });
     expect((await store.farmById(farm.id))!.state.chapters[0].step_flags).toEqual({ farm_created: true });
     for (const outcome of ['applied', 'rejected']) {
-      const env = envelope(`legacy-${outcome}`, outcome === 'applied' ? 'clear_cells' : 'till_cells');
+      const env = envelope(`legacy-${outcome}`, outcome === 'applied' ? 'till_cells' : 'till_cells');
       const retry = await store.applyCommand(farm.owner_id, env, { type: env.type, cell_ids: [cells[0]] });
       expect(retry).toMatchObject({ kind: 'replayed', record: { outcome,
         result: { old_rule_result: outcome, wallet: 321, lesson: 'domain 1 result' } } });
     }
     expect(await snapshot()).toEqual(after);
-    expect(await migrateDomain(pool, { contentVersion: CV, apply: true }))
+    expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true }))
       .toMatchObject({ status: 'applied', migrated: 0, eligible: [], already_current: [farm.id] });
     expect(await snapshot()).toEqual(after);
   });
@@ -133,10 +151,10 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
     const farm = await seed();
     await addHistory(farm);
     const env = envelope('new-command');
-    const cmd = { type: 'clear_cells' as const, cell_ids: [cells[0]] };
+    const cmd = { type: 'till_cells' as const, cell_ids: [cells[0]] };
     expect((await store.applyCommand(farm.owner_id, env, cmd)).kind).toBe('version_mismatch');
     expect((await store.applyCommand(farm.owner_id, envelope('legacy-applied'), cmd)).kind).toBe('replayed');
-    await migrateDomain(pool, { contentVersion: CV, apply: true });
+    await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true });
     expect((await store.applyCommand(farm.owner_id, env, cmd)).kind).toBe('applied');
     const logged = await pool.query('SELECT domain_version FROM commands WHERE idempotency_key = $1', ['new-command']);
     expect(logged.rows[0].domain_version).toBe(DOMAIN_VERSION);
@@ -152,7 +170,7 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
     await pool.query(`UPDATE farms SET ${column} = $1 WHERE id = $2`, [value, blocked.id]);
     const before = await snapshot();
     for (const apply of [false, true]) {
-      const report = await migrateDomain(pool, { contentVersion: CV, apply });
+      const report = await migrateDomain(pool, { plot: sets, contentVersion: CV, apply });
       expect(report).toMatchObject({ status: 'refused', migrated: 0, eligible: [eligible.id],
         blocked: [{ farm_id: blocked.id, reasons: [reason] }] });
       expect(await snapshot()).toEqual(before);
@@ -163,7 +181,7 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
     await seed();
     const other = await seed(DOMAIN_VERSION);
     await pool.query('UPDATE farms SET content_version = $1 WHERE id = $2', ['old-content', other.id]);
-    expect(await migrateDomain(pool, { contentVersion: CV, apply: true }))
+    expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true }))
       .toMatchObject({ status: 'refused', migrated: 0,
         blocked: [{ farm_id: other.id, reasons: ['content_version_mismatch'] }] });
   });
@@ -173,10 +191,10 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
     await addHistory(farm);
     await pool.query('UPDATE farms SET content_version = $1 WHERE id = $2', ['previous-bundle-content', farm.id]);
     const before = await snapshot();
-    const report = await migrateDomain(pool, { contentVersion: CV, previousContentVersion: 'previous-bundle-content', apply: true });
+    const report = await migrateDomain(pool, { plot: sets, contentVersion: CV, previousContentVersion: 'previous-bundle-content', apply: true });
     expect(report).toMatchObject({ status: 'applied', migrated: 1, to_domain_version: DOMAIN_VERSION });
     expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
-      .map(row => ({ ...row, domain_version: DOMAIN_VERSION, content_version: CV })) });
+      .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION, content_version: CV })) });
   });
 
   it('continues a migrated farm through a saved display plan and replays each command without duplicate costs', async () => {
@@ -190,15 +208,15 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
     await pool.query('UPDATE farms SET state = $1 WHERE id = $2', [initial, farm.id]);
     await addHistory(farm);
     const before = await snapshot();
-    expect(await migrateDomain(pool, { contentVersion: CV, apply: true })).toMatchObject({ status: 'applied', migrated: 1 });
+    expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true })).toMatchObject({ status: 'applied', migrated: 1 });
     expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
-      .map(row => ({ ...row, domain_version: DOMAIN_VERSION })) });
+      .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION })) });
 
     const plan = { idempotency_key: 'plan-fountain', base_version: 0, type: 'plan_journey_display' as const,
       payload: { project: 'terrace', slot: 2, item: 'fountain', sequence: 0 } };
     expect(await store.applyCommand(farm.owner_id, plan, { type: 'plan_journey_display', ...plan.payload }))
       .toMatchObject({ kind: 'applied' });
-    const reload = new PgStore({ pool, content, contentVersion: CV, timezone: () => SH, blueprint: () => sets, now: () => NOW });
+    const reload = new PgStore({ pool, content, contentVersion: CV, timezone: () => SH, plot: sets, now: () => NOW });
     const planned = (await reload.farmById(farm.id))!;
     expect(planned.version).toBe(1);
     expect(planned.state.journey!.workshop!.planned).toEqual({ project: 'terrace', slot: 2, item: 'fountain' });
@@ -229,7 +247,7 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
       .toMatchObject({ kind: 'applied' });
     const placed = (await reload.farmById(farm.id))!;
     expect(placed.version).toBe(3);
-    expect(placed.state.journey!.workshop).toEqual({ sequence: 3, stock: { fountain: 0 }, displays: { terrace: ['', '', 'fountain'] } });
+    expect(placed.state.journey!.workshop).toEqual({ sequence: 3, stock: { ...made.state.journey!.workshop!.stock, fountain: 0 }, displays: { terrace: ['', '', 'fountain'] } });
     const placedSnapshot = await snapshot();
     expect(await reload.applyCommand(farm.owner_id, display, { type: 'display_journey_item', ...display.payload }))
       .toMatchObject({ kind: 'replayed' });
@@ -244,14 +262,14 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
     await pool.query('UPDATE farms SET state = $1 WHERE id = $2', [initial, farm.id]);
     await addHistory(farm);
     const before = await snapshot();
-    expect(await migrateDomain(pool, { contentVersion: CV, apply: true })).toMatchObject({ status: 'applied', migrated: 1 });
+    expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true })).toMatchObject({ status: 'applied', migrated: 1 });
     expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
-      .map(row => ({ ...row, domain_version: DOMAIN_VERSION })) });
+      .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION })) });
 
     const pin = { idempotency_key: 'track-leaves', base_version: 0, type: 'track_journey_opportunity' as const,
       payload: { slot: 'nursery', sequence: 0, tracking: true } };
     expect(await store.applyCommand(farm.owner_id, pin, { type: pin.type, ...pin.payload })).toMatchObject({ kind: 'applied' });
-    const reload = new PgStore({ pool, content, contentVersion: CV, timezone: () => SH, blueprint: () => sets, now: () => NOW });
+    const reload = new PgStore({ pool, content, contentVersion: CV, timezone: () => SH, plot: sets, now: () => NOW });
     const pinned = (await reload.farmById(farm.id))!;
     expect(pinned.version).toBe(1);
     expect(pinned.state.journey!.tracked_opportunity).toEqual({ slot: 'nursery', sequence: 0 });
@@ -286,13 +304,13 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
     await pool.query(`CREATE TRIGGER reject_domain_test BEFORE UPDATE OF domain_version ON farms
       FOR EACH ROW EXECUTE FUNCTION reject_domain_test()`);
     try {
-      await expect(migrateDomain(pool, { contentVersion: CV, apply: true })).rejects.toThrow('injected migration failure');
+      await expect(migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true })).rejects.toThrow('injected migration failure');
       expect(await snapshot()).toEqual(before);
     } finally {
       await pool.query('DROP TRIGGER reject_domain_test ON farms');
       await pool.query('DROP FUNCTION reject_domain_test()');
     }
-    expect(await migrateDomain(pool, { contentVersion: CV, apply: true })).toMatchObject({ migrated: 2 });
+    expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true })).toMatchObject({ migrated: 2 });
   });
 
   it('waits for an existing writer and preserves its committed state before migrating', async () => {
@@ -303,7 +321,7 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
       await writer.query('BEGIN');
       await writer.query('SELECT id FROM farms WHERE id = $1 FOR UPDATE', [farm.id]);
       const pid = (await writer.query('SELECT pg_backend_pid() AS pid')).rows[0].pid as number;
-      migration = migrateDomain(pool, { contentVersion: CV, apply: true });
+      migration = migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true });
       await waitForBlocked(pid);
       await writer.query(`UPDATE farms SET state = jsonb_set(state, '{wallet}', '456'::jsonb) WHERE id = $1`, [farm.id]);
       await writer.query('COMMIT');
@@ -328,10 +346,10 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
     try {
       await blocker.query('SELECT pg_advisory_lock(41002)');
       const pid = (await blocker.query('SELECT pg_backend_pid() AS pid')).rows[0].pid as number;
-      migration = migrateDomain(pool, { contentVersion: CV, apply: true });
+      migration = migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true });
       const migratorPid = await waitForBlocked(pid);
       command = store.applyCommand(farm.owner_id, envelope('during-migration'),
-        { type: 'clear_cells', cell_ids: [cells[0]] });
+        { type: 'till_cells', cell_ids: [cells[0]] });
       await waitForBlocked(migratorPid);
       await blocker.query('SELECT pg_advisory_unlock(41002)');
       expect(await migration).toMatchObject({ migrated: 1 });
@@ -356,15 +374,15 @@ describe.skipIf(!DSN)('Explicit domain 1 through 13 -> 14 migration', () => {
     expect(run('--apply')).toMatchObject({ mode: 'apply', status: 'applied', migrated: 1 });
   });
 
-  it.each(['2', '3', '4', '5', '6', '8'])('accepts the exact previous content hash for domain %s while preserving state and history', async domain => {
+  it.each(['2', '3', '4', '5', '6', '8', '20', '21', '22', '23', '24'])('accepts the exact previous content hash for domain %s while preserving state and history', async domain => {
     const farm = await seed(domain);
     await addHistory(farm);
     const previous = contentVersion(DEFAULT_CONTENT_DIR, true);
     await pool.query('UPDATE farms SET content_version = $1 WHERE id = $2', [previous, farm.id]);
     const before = await snapshot();
-    expect(await migrateDomain(pool, { contentVersion: CV, previousContentVersion: previous, apply: true }))
+    expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, previousContentVersion: previous, apply: true }))
       .toMatchObject({ status: 'applied', migrated: 1 });
     expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
-      .map(row => ({ ...row, content_version: CV, domain_version: DOMAIN_VERSION })) });
+      .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, content_version: CV, domain_version: DOMAIN_VERSION })) });
   });
 });

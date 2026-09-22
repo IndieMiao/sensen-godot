@@ -1,0 +1,12 @@
+Use case: stylized-concept
+Asset type: one production generic neighborhood market/shop category sprite for a mobile Los Angeles map.
+Primary request: create one isolated small general neighborhood market miniature matching the softly rounded pastel matte clay-toy visual language of the approved map shop-style reference crop.
+Input images: Image 1 is a style, lighting and material reference from the approved map. It shows a cafe, but the new subject must be a general neighborhood market with a plain shopping-bag pictorial sign. Do not copy its coffee cup or letters.
+Subject: a compact welcoming cream one-story neighborhood market with a broad pastel sage-green fabric awning above the front entrance and windows. A small plain pictorial shopping-bag sign identifies the shop without text: one simple raised cream shopping bag symbol on a sage plaque. Place two small natural wood produce baskets of muted red/yellow fruit and greens beside the entrance, and one tiny potted plant. All objects rest on a single very low compact pale mint and cream sidewalk base.
+Style/medium: premium softly rounded matte 3D miniature, clean readable massing, gentle ambient occlusion and restrained charming detail. Match the approved map's miniature storefront art; distinguish this general shop from the taller cafe with a squat broad footprint and produce baskets.
+Composition/framing: elevated three-quarter front view with right wall visible. Entire storefront, sign, baskets and base inside the image. Center the isolated asset; leave at least 12 percent empty margin on every side. Low base with soft edges, no tall plinth. Shop silhouette must read at tiny map icon sizes.
+Lighting/mood: soft neutral daylight from upper left, calm welcoming mood, shading contained on the object.
+Color palette: creamy ivory walls, muted pastel sage awning and trim, muted teal windows, light warm wood baskets, small warm fruit accents, pale mint base.
+Scene/backdrop: perfectly flat vivid magenta chroma-key background, RGB 255 0 255. No gradient, vignette, floor or cast shadow on the background. No magenta materials or reflections on the asset.
+Text: none. No words, letters, numbers or brand names. The sign is pictorial only.
+Constraints: one complete isolated market/shop asset only. No people, animals, coffee cup, coffee tables, map, road, UI, captions, lettering, logos, watermarks, selection rings or glow. Avoid photorealism, glossy plastic, heavy outlines, excessive produce, scattered detached objects, enormous sign, and any clipped edge.

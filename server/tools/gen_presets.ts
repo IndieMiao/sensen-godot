@@ -9,7 +9,7 @@ import path from 'node:path';
 import { DEFAULT_CONTENT_DIR, loadContent } from '../src/domain/content.js';
 import { derive } from '../src/domain/derive.js';
 import { PRESET_SPECS, buildPresetFarm } from '../src/domain/presets.js';
-import { blueprintSets, loadBlueprint } from '../src/http/app.js';
+import { loadBlueprint, plotFor } from '../src/http/app.js';
 import { snapshotSlot, visitorSnapshot } from '../src/http/dto.js';
 import { at } from '../test/domain/helpers.js';
 
@@ -28,7 +28,7 @@ for (const spec of PRESET_SPECS) {
   const bp = loadBlueprint(path.join(ROOT, 'assets', 'blueprints'), spec.layout, spec.revision);
   if (!bp) throw new Error(`蓝图 ${spec.layout} r${spec.revision} 校验失败`);
   const tz = regions.regions.find(r => r.id === spec.region)!.timezone;
-  const farm = buildPresetFarm(spec, blueprintSets(bp), content, tz, T_BUILD);
+  const farm = buildPresetFarm(spec, plotFor(content), content, tz, T_BUILD);
   const snap = visitorSnapshot(farm, derive(farm.state, T_SNAP, tz, content), 1, snapshotSlot(T_SNAP), [], spec.avatar_ref);
   const file = path.join(OUT, `${spec.id ?? spec.layout}.json`);
   writeFileSync(file, JSON.stringify(snap, null, 2) + '\n');

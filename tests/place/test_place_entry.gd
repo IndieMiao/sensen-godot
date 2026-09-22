@@ -1,13 +1,29 @@
 extends GdUnitTestSuite
 
+func _wait_navigation() -> void:
+	var deadline := Time.get_ticks_msec() + 10000
+	while AppRouter._navigation_pending and Time.get_ticks_msec() < deadline:
+		await get_tree().create_timer(0.01).timeout
+
 func after_test() -> void:
+	await _wait_navigation()
+	assert_bool(AppRouter._navigation_pending).is_false()
 	while AppRouter.instance_depth() > 0:
 		AppRouter.pop_instance()
 		await get_tree().process_frame
+	var current := get_tree().current_scene
+	if current != null and current.scene_file_path == AppRouter.MAP:
+		get_tree().current_scene = null
+		current.queue_free()
+	for frame in 3: await get_tree().process_frame
 
 func _session(chapter: int) -> FarmSession:
 	var s := FarmSession.new(ApiClient.new("http://test", FakeTransport.new([]).callable()))
-	s.state = {"clock": {"chapter_index": chapter}, "nursery": {"stage": "derelict", "appearance": null}}
+	s.farm_id = "place-entry-test"
+	s.layout_patch_id = "sh_a"
+	s.blueprint_revision = 2
+	s.region_id = "shanghai"
+	s.state = {"clock": {"chapter_index": chapter}, "nursery": {"stage": "derelict", "appearance": null}, "cells": {}, "xp": {"total": 0, "first_harvest_crops": []}, "engineering": {"reserved": {}}}
 	return s
 
 func test_place_access_uses_authoritative_chapter() -> void:
@@ -51,45 +67,49 @@ func test_journey_exit_arrival_stops_updates_after_removing_the_scene() -> void:
 	journey.header.size.y = 100
 	assert_bool(journey.select_target("exit")).is_true()
 	journey._process(10.0)
-	assert_int(AppRouter.instance_depth()).is_equal(1)
-	var street := AppRouter.top_instance() as JourneyStreet
-	assert_object(street).is_not_null()
-	assert_that(street.player.position).is_equal(street.layout.entrances.nursery)
 	assert_bool(journey.is_inside_tree()).is_false()
+	# The legacy place exit now returns to the unified private farm asynchronously.
+	await _wait_navigation()
+	assert_bool(AppRouter._navigation_pending).is_false()
+	assert_int(AppRouter.instance_depth()).is_equal(1)
+	var farm := AppRouter.top_instance()
+	assert_object(farm).is_not_null()
+	if farm == null: return
+	assert_str(farm.scene_file_path).is_equal(AppRouter.FARM)
+	assert_object(farm.session).is_same(session)
 	await get_tree().process_frame
 	assert_bool(is_instance_valid(place)).is_false()
 
-func test_physical_place_exits_resume_the_same_walk_camera_and_session() -> void:
+func test_physical_place_exits_resume_the_same_private_farm_camera_and_session() -> void:
 	var session := _session(1)
 	session.state.wallet = 0
 	session.state.inventory = {"produce": {}, "dishes": {}, "seeds": {}}
 	session.state.journey = {"version": 1, "facts": [], "unlocks": ["bistro"], "completed": [],
 		"wood": 0, "exploration": {"round": 0, "collected": []}, "opportunities": {}}
 	var original := session.state.duplicate(true)
-	var street := AppRouter.push_instance(AppRouter.STREET, {"session": session}) as JourneyStreet
+	var farm := AppRouter.push_instance(AppRouter.STREET, {"session": session})
+	for frame in 3: await get_tree().process_frame
 	for id in ["nursery", "bistro", "courtyard"]:
-		street.mover.position = street.layout.entrances[id]
-		street.player.position = street.mover.position
-		street._camera_center = street.player.position
-		street.camera_pan.offset = Vector3(0.6, 0, -0.4)
-		street.camera_pan._log_zoom = log(1.2)
-		street._update_camera()
-		var camera := street.cam.transform
-		var size := street.cam.size
-		var actors := street.residents.moments.values().map(func(moment): return moment.actor.get_instance_id())
+		farm.camera_pan.offset = Vector3(0.6, 0, -0.4)
+		farm.camera_pan._log_zoom = log(1.2)
+		farm._update_camera()
+		var camera: Transform3D = farm.cam.transform
+		var size: float = farm.cam.size
+		var avatar_id: int = farm.player.get_instance_id()
+		var position: Vector3 = farm.player.position
 		var place := AppRouter.push_instance(AppRouter.PLACE, {"place_id": id, "session": session})
 		await get_tree().process_frame
 		place.journey_scene._arrived("exit")
 		await get_tree().process_frame
 		assert_int(AppRouter.instance_depth()).is_equal(1)
-		assert_object(AppRouter.top_instance()).is_same(street)
+		assert_object(AppRouter.top_instance()).is_same(farm)
 		assert_bool(is_instance_valid(place)).is_false()
-		assert_that(street.player.position).is_equal(street.layout.entrances[id])
-		assert_that(street.cam.transform).is_equal(camera)
-		assert_float(street.cam.size).is_equal(size)
-		assert_bool(street.cam.current).is_true()
-		assert_bool(street.canvas.visible).is_true()
-		assert_array(street.residents.moments.values().map(func(moment): return moment.actor.get_instance_id())).is_equal(actors)
+		assert_that(farm.player.position).is_equal(position)
+		assert_that(farm.cam.transform).is_equal(camera)
+		assert_float(farm.cam.size).is_equal(size)
+		assert_bool(farm.cam.current).is_true()
+		assert_bool(farm.hud.visible).is_true()
+		assert_int(farm.player.get_instance_id()).is_equal(avatar_id)
 		assert_that(session.state).is_equal(original)
 	var place := AppRouter.push_instance(AppRouter.PLACE, {"place_id": "nursery", "session": session})
 	await get_tree().process_frame
@@ -100,7 +120,7 @@ func test_physical_place_exits_resume_the_same_walk_camera_and_session() -> void
 	place.journey_scene._go_map()
 	assert_int(AppRouter.instance_depth()).is_equal(0)
 	await get_tree().process_frame
-	assert_bool(is_instance_valid(street)).is_false()
+	assert_bool(is_instance_valid(farm)).is_false()
 
 func test_places_tab_preserves_farm_selection_and_scroll() -> void:
 	var panel := NearbyPanel.new()

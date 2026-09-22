@@ -3,7 +3,7 @@ extends RefCounted
 ## 薄预测器：只预测**格子状态跃迁**，让手势有即时反馈；不预测钱、XP、关系、成熟时刻。
 ##
 ## 为什么不算 ready_at（方案 §3 D4）：成熟时刻由服务端按作物时长与教学特例决定，
-## 客户端连作物表都不该有权威副本。所以 apply_care 预测到 `growing` 就停手，
+## 客户端连作物表都不该有权威副本。所以 water_cells 预测到 `growing` 就停手，
 ## `ready_at` 留 null，作物渲染在阶段 0 等服务端回包填真值——「动作已登记」是真的，
 ## 「还剩多久」不装懂。
 ##
@@ -13,7 +13,7 @@ extends RefCounted
 
 const STATES := ["wild", "cleared", "tilled", "sown", "growing"]
 ## 预测器只认这五条；其余命令一律不预测。
-const PREDICTED := ["clear_cells", "till_cells", "sow_cells", "apply_care", "harvest_cells"]
+const PREDICTED := ["till_cells", "clear_plot", "sow_cells", "water_cells", "harvest_cells"]
 
 ## 权威副本（服务端最后一次回包）。
 var cells: Dictionary = {}
@@ -23,16 +23,11 @@ var _overlay: Dictionary = {}
 var _pending: Array = []
 
 var _cultivable: Dictionary = {}   ## cell_id → true
-var _reserved: Dictionary = {}
-var beds_unlocked := 3
-var locked_cells: Dictionary = {}
 
-func _init(p_cells: Dictionary = {}, p_cultivable: Array = [], p_reserved: Array = []) -> void:
+func _init(p_cells: Dictionary = {}, p_cultivable: Array = []) -> void:
 	cells = p_cells.duplicate(true)
 	for id in p_cultivable:
 		_cultivable[str(id)] = true
-	for id in p_reserved:
-		_reserved[str(id)] = true
 
 static func from_blueprint(bp: FarmBlueprint, p_cells: Dictionary = {}) -> CellPredictor:
 	var cultivable: Array = []
@@ -40,20 +35,21 @@ static func from_blueprint(bp: FarmBlueprint, p_cells: Dictionary = {}) -> CellP
 		for x in bp.grid.x:
 			if bp.mask_has("cultivable", Vector2i(x, y)):
 				cultivable.append("%d,%d" % [x, y])
-	var reserved: Array = []
-	for c in bp.reserved_bed().get("cells", []):
-		reserved.append("%d,%d" % [(c as Vector2i).x, (c as Vector2i).y])
-	return CellPredictor.new(p_cells, cultivable, reserved)
+	return CellPredictor.new(p_cells, cultivable)
 
-## 这格现在能不能动：可耕作且（非预留畦或已扩地）。
+## 这格能不能动：地面属性说可开垦就行。渐进解锁随自由格子种田退役。
 func is_unlocked(id: String) -> bool:
-	return _cultivable.has(id) and not locked_cells.has(id) and (not _reserved.has(id) or beds_unlocked == 4)
+	return _cultivable.has(id)
 
 ## 渲染用的视图：权威副本叠上未确认的预测。
 func view() -> Dictionary:
 	var out := cells.duplicate(true)
 	for id in _overlay:
-		out[id] = (_overlay[id] as Dictionary).duplicate(true)
+		var slot: Dictionary = _overlay[id]
+		if slot.is_empty():
+			out.erase(id)        # 预测的铲平：格子回到荒地
+		else:
+			out[id] = slot.duplicate(true)
 	return out
 
 func pending() -> Array:
@@ -88,13 +84,17 @@ func predict(type: String, payload: Dictionary, now_ms: int) -> Dictionary:
 	var v := view()
 	var changed := {}
 	for id in ids:
-		var slot: Dictionary = (v[id] as Dictionary).duplicate(true)
+		var slot: Dictionary = (v.get(id, {}) as Dictionary).duplicate(true)
 		var step := _step(type, payload, slot, now_ms)
 		if step.has("error"):
 			return {"ok": false, "error": step.error, "cells": {}}
 		changed[id] = step.slot
 	for id in changed:
-		_overlay[id] = changed[id]
+		if (changed[id] as Dictionary).is_empty():
+			# 铲平：格子回到荒地，也就是从状态里消失。
+			_overlay[id] = {}
+		else:
+			_overlay[id] = changed[id]
 	_pending.append({"type": type, "payload": payload, "cell_ids": ids})
 	return {"ok": true, "error": "", "cells": changed}
 
@@ -108,7 +108,7 @@ func check(type: String, payload: Dictionary, now_ms: int) -> Dictionary:
 		return {"ok": false, "error": gate}
 	var v := view()
 	for id in ids:
-		var step := _step(type, payload, (v[id] as Dictionary).duplicate(true), now_ms)
+		var step := _step(type, payload, (v.get(id, {}) as Dictionary).duplicate(true), now_ms)
 		if step.has("error"):
 			return {"ok": false, "error": step.error}
 	return {"ok": true, "error": ""}
@@ -142,45 +142,34 @@ func _gate(ids: Array) -> String:
 		seen[id] = true
 		if not _cultivable.has(id):
 			return "CELL_NOT_CULTIVABLE"
-		if not is_unlocked(id):
-			return "CELL_LOCKED"
-		if not cells.has(id) and not _overlay.has(id):
-			return "UNKNOWN_CELL"
 	return ""
 
+## 逐条复刻 server/src/domain/handlers/farming.ts 的状态跃迁。两边必须一字不差，
+## 否则玩家会看到「本地变了、服务端拒绝、又弹回去」的闪烁。
 func _step(type: String, payload: Dictionary, slot: Dictionary, now_ms: int) -> Dictionary:
 	match type:
-		"clear_cells":
-			if slot.state != "wild":
-				return {"error": "WRONG_STATE"}
-			slot.state = "cleared"
 		"till_cells":
-			if slot.state != "cleared":
+			# 空槽（荒地）才能开垦；已经开垦过的地再点一次是 WRONG_STATE。
+			if not str(slot.get("state", "")).is_empty():
 				return {"error": "WRONG_STATE"}
-			slot.state = "tilled"
+			slot = {"state": "tilled", "crop": null, "watered_at": null, "ready_at": null}
+		"clear_plot":
+			if str(slot.get("state", "")) != "tilled":
+				return {"error": "WRONG_STATE"}
+			slot = {}   # 铲平：格子从状态里消失，回到荒地
 		"sow_cells":
-			if slot.state != "tilled":
+			if str(slot.get("state", "")) != "tilled":
 				return {"error": "WRONG_STATE"}
-			# care_weather 绑播种时的今日田况；tutorial 与 ready_at 由服务端裁决。
-			slot = {
-				"state": "sown", "crop": str(payload.get("crop", "")),
-				"care_weather": payload.get("field_condition"),
-				"care_done_at": null, "ready_at": null, "careful": false, "tutorial": false,
-			}
-		"apply_care":
-			if slot.state != "sown":
+			slot = {"state": "sown", "crop": str(payload.get("crop", "")),
+				"watered_at": null, "ready_at": null}
+		"water_cells":
+			if str(slot.get("state", "")) != "sown":
 				return {"error": "WRONG_STATE"}
-			var want = payload.get("expected_kind")
-			if want != null and str(want) != str(payload.get("kind", "")):
-				return {"error": "WRONG_CARE"}
 			slot.state = "growing"
-			slot.care_done_at = now_ms
-			slot.ready_at = null   # 时长归服务端；渲染在阶段 0 等真值
+			slot.watered_at = now_ms
+			slot.ready_at = null   # 时长归服务端；渲染停在阶段 0 等真值
 		"harvest_cells":
 			if not is_ripe(slot, now_ms):
 				return {"error": "NOT_RIPE"}
-			slot = {
-				"state": "tilled", "crop": null, "care_weather": null, "care_done_at": null,
-				"ready_at": null, "careful": false, "tutorial": false,
-			}
+			slot = {"state": "tilled", "crop": null, "watered_at": null, "ready_at": null}
 	return {"slot": slot}

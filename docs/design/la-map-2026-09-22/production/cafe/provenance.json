@@ -1,0 +1,62 @@
+{
+  "asset": "Generic cafe category miniature",
+  "provider": "Sensenjoy API",
+  "base_url": "https://sub.sensenjoy.cn/v1",
+  "model": "gpt-image-2",
+  "mode": "imagegen bundled fallback CLI edit using approved cafe reference crop",
+  "requested_size": [
+    1024,
+    1024
+  ],
+  "actual_raw_size": [
+    1254,
+    1254
+  ],
+  "quality": "high",
+  "reference": "docs/design/la-map-2026-09-22/generated/la-map-main-v1.png",
+  "reference_crop_xyxy": [
+    204,
+    808,
+    358,
+    978
+  ],
+  "prompt_file": "prompt.txt",
+  "raw_file": "raw.png",
+  "extracted_file": "extracted-rgba.png",
+  "final_file": "assets/map/poi/cafe.png",
+  "final_size": [
+    512,
+    512
+  ],
+  "final_mode": "RGBA",
+  "ground_anchor_px": [
+    256,
+    480
+  ],
+  "source_alpha_bbox": [
+    162,
+    128,
+    1081,
+    1142
+  ],
+  "final_alpha_bbox": [
+    60,
+    48,
+    452,
+    480
+  ],
+  "processing": "remove_chroma_key.py --auto-key corners --soft-matte --transparent-threshold 16 --opaque-threshold 160 --spill-cleanup; alpha crop, Lanczos fit 448x432, ground at y=480 on 512 square RGBA canvas",
+  "sha256": "8c1d37e876de248c097b5f78617299162338a84ec20bb552c161667cae338125",
+  "generated_utc": "2026-09-22T04:32:02.475233+00:00",
+  "visual_status": "Passed: complete cafe/base, mint awning, pictorial cup sign, no text or people; all edges and chair gaps inspected on cream and navy, including 112px thumbnail; no visible magenta fringe.",
+  "scope_note": "Generic category illustration, not a depiction of a particular real cafe. Coordinates and classification assigned separately. No source or live state modified.",
+  "validation": {
+    "corner_alpha": 0,
+    "opaque_magenta_pixels": 0,
+    "actual_mode": "RGBA",
+    "actual_dimensions": [
+      512,
+      512
+    ]
+  }
+}

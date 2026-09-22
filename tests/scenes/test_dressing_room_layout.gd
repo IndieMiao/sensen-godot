@@ -43,13 +43,10 @@ func test_drawer_sits_at_bottom_with_expected_height() -> void:
 	var s := _instantiate()
 	var drawer := s.get_node("UI/SafeArea/VBox/Drawer") as PanelContainer
 	assert_object(drawer).is_not_null()
-	# 演进：312 → 268（Done 移到右上角）→ 208（删掉冗余的状态行）→ 292（上缩略图）。
-	# 缩略图把每格顶到 98 高，抽屉只能重新变高——换来的是不必试穿就看得出是什么。
-	# 292 = 32 内边距 + 48 标签行 + 8 间距 + 204 列表区（2 行 × 98 + 8 间距）。
-	# 3 列 × 2 行 = 6 格，正好装下部件最多的槽位（shoes 6 件、glass 5+无 = 6），
-	# 所有分类都不需要滚动。缩略图换尺寸就得重算这一串。
-	var compact := s.get_viewport().get_visible_rect().size.y < 720.0
-	assert_float(drawer.custom_minimum_size.y).is_equal(260.0 if compact else 292.0)
+	# Leave most of the viewport for the character; smaller screens retain scrolling.
+	var viewport_height := s.get_viewport().get_visible_rect().size.y
+	assert_float(drawer.custom_minimum_size.y).is_less_equal(viewport_height * 0.44)
+	assert_float(drawer.custom_minimum_size.y).is_greater_equal(180.0)
 
 func test_spacer_passes_touches_through_for_rotation() -> void:
 	var s := _instantiate()
@@ -145,10 +142,14 @@ func test_thumbnail_cell_height_matches_the_drawer_budget() -> void:
 			break
 	assert_float(measured).is_greater(0.0)
 	assert_float(measured).is_equal_approx(panel.COMPACT_CELL_HEIGHT if panel._compact else panel.THUMB_CELL_HEIGHT, 0.5)
-	# The real minimum grid fits both rows without relying on scroll clipping.
+	# A standard viewport fits two rows; shorter viewports retain the scrolling list.
 	var drawer := s.get_node("UI/SafeArea/VBox/Drawer") as PanelContainer
 	var needed := 24.0 + 48.0 + 8.0 + measured * 2.0 + 8.0
-	assert_float(drawer.custom_minimum_size.y).is_greater_equal(needed)
+	var viewport_height := s.get_viewport().get_visible_rect().size.y
+	if viewport_height * 0.44 >= needed:
+		assert_float(drawer.custom_minimum_size.y).is_greater_equal(needed)
+	else:
+		assert_int((grid.get_parent() as ScrollContainer).vertical_scroll_mode).is_not_equal(ScrollContainer.SCROLL_MODE_DISABLED)
 
 func test_slot_tabs_are_horizontally_scrollable() -> void:
 	var s := _instantiate()
@@ -336,7 +337,7 @@ func test_background_is_separate_from_camera_and_grid_fits_both_phone_heights() 
 		s.cam.position.z += 1.0
 		assert_object(background.get_parent()).is_same(s.get_node("RoomBackground"))
 		assert_bool(background.get_global_rect() == before).is_true()
-		assert_float(before.size.y).is_equal_approx(s.drawer.global_position.y + 8.0, 1.0)
+		assert_float(before.size.y).is_equal_approx(float(height), 1.0)
 		var panel = s.parts_panel
 		var scroll := panel.get_node("PartsScroll") as ScrollContainer
 		for slot in panel.visible_slot_names():

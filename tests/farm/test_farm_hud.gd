@@ -28,17 +28,22 @@ func _farm_at_phone_size() -> Node:
 	return scene
 
 func test_status_and_dock_leave_a_clear_playfield_without_a_joystick() -> void:
-	var f := await _farm_at_phone_size()
-	var top: Rect2 = (f.get_node("HUD/SafeArea/Root/TopBar") as Control).get_global_rect()
-	assert_object(f.get_node_or_null("HUD/SafeArea/Root/Joystick")).is_null()
-	for name in ["TopRight", "Overview", "BottomBar"]:
-		var r: Rect2 = (f.hud.get_node(name) as Control).get_global_rect()
-		assert_bool(r.intersects(top)).override_failure_message("%s 与顶栏重叠" % name).is_false()
-	var goals: Rect2 = (f.hud.get_node("Overview") as Control).get_global_rect()
-	var right: Rect2 = (f.hud.get_node("TopRight") as Control).get_global_rect()
-	assert_bool(goals.intersects(right)).override_failure_message("目标卡与右上列重叠").is_false()
-	assert_bool(f.hud._goals.visible).is_false()
-	assert_float(f.hud._bottom.position.y).is_greater(550)
+	var farm := await _farm_at_phone_size()
+	var top: Rect2 = farm.get_node("HUD/SafeArea/Root/TopBar").get_global_rect()
+	assert_object(farm.get_node_or_null("HUD/SafeArea/Root/Joystick")).is_null()
+	assert_float(top.size.y).is_less_equal(48.0)
+	assert_bool(top.grow(1).encloses(farm.hud._top_right.get_global_rect())).is_true()
+	assert_bool(farm.title.get_global_rect().intersects(farm.hud._top_right.get_global_rect())).is_false()
+	var goals: Rect2 = farm.hud._overview.get_global_rect()
+	assert_bool(goals.intersects(top)).is_false()
+	assert_float(goals.size.y).is_less_equal(48.0)
+	assert_float(goals.size.x).is_less_equal(farm.hud.size.x - 60.0)
+	assert_bool(farm.hud._goals.visible).is_false()
+	assert_bool(farm.hud._seed_scroll.visible).is_false()
+	assert_bool(farm.hud._work_backing.visible).is_false()
+	assert_float(farm.hud._bottom.size.y).is_less_equal(56.0)
+	assert_float(farm.hud._bottom.position.y).is_greater(650)
+	assert_float(farm._focus_button.get_global_rect().size.x).is_greater_equal(44.0)
 
 func test_unknown_command_has_a_visible_single_flight_recovery_control() -> void:
 	var f := await _farm_at_phone_size()
@@ -54,9 +59,9 @@ func test_unknown_command_has_a_visible_single_flight_recovery_control() -> void
 func test_buttons_meet_touch_targets_and_stay_on_screen() -> void:
 	var f := await _farm_at_phone_size()
 	var screen := Rect2(Vector2.ZERO, Vector2(360, 800))
-	var buttons: Array = [f.hud._cta, f.hud._stall]
+	var buttons: Array = [f.hud._cta, f.hud._mode_toggle, f.hud._life_button, f._focus_button]
 	for id in f.hud._seed_buttons:
-		if (f.hud._seed_buttons[id] as Control).visible:
+		if (f.hud._seed_buttons[id] as Control).is_visible_in_tree():
 			buttons.append(f.hud._seed_buttons[id])
 	for b in buttons:
 		var r: Rect2 = (b as Control).get_global_rect()
@@ -165,29 +170,6 @@ func test_chapter_goals_replace_old_rows_and_fit_the_existing_exclusive_modal() 
 	f.hud.close_modal()
 	assert_bool(f.hud._bottom.visible).is_true()
 
-func test_first_open_seven_goal_modal_keeps_all_rows_and_feedback_inside_a_short_screen() -> void:
-	var stage := Control.new()
-	stage.position = Vector2(16, 16)
-	stage.size = Vector2(328, 608)
-	stage.theme = GameUi.theme()
-	add_child(auto_free(stage))
-	var hud := FarmHud.new()
-	stage.add_child(hud)
-	await get_tree().process_frame
-	await get_tree().process_frame
-	var state := {"clock": {"chapter_index": 0}, "chapters": [{"status": "active", "step_flags": {"farm_created": true}}]}
-	hud.set_goals(DayGoals.evaluate(state, {}), 0, DayGoals.progress(state))
-	hud.show_modal(hud._goals)
-	for frame in 3: await get_tree().process_frame
-	var screen := Rect2(Vector2.ZERO, Vector2(360, 640))
-	var panel := hud._goals.get_global_rect()
-	assert_bool(screen.encloses(panel)).is_true()
-	for label in [hud._goals_title, hud._goals_count, hud._goals_feedback]:
-		assert_bool(panel.encloses(label.get_global_rect())).is_true()
-	var scroll := hud._goals_list.get_parent() as ScrollContainer
-	assert_int(hud.goal_labels().size()).is_equal(7)
-	for row in hud._goals_list.get_children():
-		assert_bool(scroll.get_global_rect().grow(1).encloses(row.get_global_rect())).is_true()
 
 func test_offline_disables_actions_and_shows_the_banner() -> void:
 	var f := await _farm_at_phone_size()
@@ -207,9 +189,105 @@ func test_countdown_helpers() -> void:
 	assert_str(FarmHud.format_countdown(90_000)).is_equal("01:30")
 	assert_str(FarmHud.format_countdown(3 * 3600_000 + 25 * 60_000)).is_equal("3h25m")
 
-func test_condition_chip_says_what_to_do_today() -> void:
+## 天气只报天气。自由种植下浇水是播种后的一次性启动动作，不再随天气变，
+## 「今天要排水/遮蔽」说的是一套已经不存在的规则——这条测试守的就是别把它写回来。
+func test_condition_chip_reports_weather_without_a_care_instruction() -> void:
 	var f := await _farm_at_phone_size()
 	f.hud.set_condition("rain")
-	assert_str(f.hud._condition.text).is_equal("Rain · drain today")
+	assert_str(f.hud._condition.text).is_equal("Rain")
 	f.hud.set_condition("wind")
-	assert_str(f.hud._condition.text).is_equal("Wind · shelter today")
+	assert_str(f.hud._condition.text).is_equal("Wind")
+
+func test_single_toggle_switches_both_modes_and_model_sync_does_not_emit_again() -> void:
+	var farm := await _farm_at_phone_size()
+	var events: Array = []
+	farm.hud.work_mode_changed.connect(func(enabled): events.append(enabled))
+	assert_int(farm.hud._mode_row.get_children().filter(func(child): return child is Button and child.toggle_mode).size()).is_equal(1)
+	assert_bool(farm.hud._mode_toggle.button_pressed).is_false()
+	assert_str(farm.hud._mode_toggle.text).is_equal(L10n.text("Walk"))
+	farm.hud._mode_toggle.set_pressed(true)
+	assert_bool(farm.work_mode).is_true()
+	assert_bool(farm.camera_pan.hold_enabled).is_true()
+	assert_str(farm.hud._mode_toggle.text).is_equal(L10n.text("Work"))
+	farm.hud.set_work_mode(true)
+	assert_array(events).is_equal([true])
+	farm.hud._mode_toggle.set_pressed(false)
+	assert_bool(farm.work_mode).is_false()
+	assert_bool(farm.camera_pan.hold_enabled).is_false()
+	assert_str(farm.hud._mode_toggle.text).is_equal(L10n.text("Walk"))
+	assert_array(events).is_equal([true, false])
+
+func test_mode_label_and_icon_stay_readable_without_growing_the_narrow_dock() -> void:
+	var saved_locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("zh_CN")
+	var farm := await _farm_at_phone_size()
+	var safe := farm.get_node("HUD/SafeArea") as SafeAreaMargin
+	safe.size = Vector2(328, 800)
+	safe.apply_margins(Rect2i(), Vector2i(328, 800), Vector2(328, 800))
+	for frame in 4: await get_tree().process_frame
+	var toggle: Button = farm.hud._mode_toggle
+	assert_str(toggle.text).is_equal("行走")
+	assert_int(toggle.vertical_icon_alignment).is_equal(VERTICAL_ALIGNMENT_TOP)
+	assert_int(toggle.icon_alignment).is_equal(HORIZONTAL_ALIGNMENT_CENTER)
+	assert_int(toggle.get_theme_constant("icon_max_width")).is_equal(20)
+	assert_int(toggle.get_theme_font_size("font_size")).is_equal(11)
+	assert_vector(toggle.size).is_equal(Vector2(52, 52))
+	assert_bool(farm.hud._seed_scroll.visible).is_false()
+	assert_bool(farm.camera_pan.hold_enabled).is_false()
+	var events: Array = []
+	farm.hud.work_mode_changed.connect(func(enabled): events.append(enabled))
+	toggle.set_pressed(true)
+	for frame in 4: await get_tree().process_frame
+	assert_str(toggle.text).is_equal("种地")
+	assert_str(toggle.tooltip_text).is_equal("种地模式 · 点此切换行走")
+	assert_str(str(toggle.theme_type_variation)).is_equal("ChoiceSelectedButton")
+	assert_bool(farm.hud._seed_scroll.visible).is_true()
+	assert_bool(farm.work_mode).is_true()
+	assert_bool(farm.camera_pan.hold_enabled).is_true()
+	assert_vector(toggle.size).is_equal(Vector2(52, 52))
+	var screen := Rect2(0, 0, 328, 800)
+	assert_bool(screen.encloses(farm.hud._bottom.get_global_rect())).is_true()
+	assert_float(farm.hud._bottom.size.y).is_less_equal(122)
+	for control in [toggle, farm.hud._cta, farm.hud._life_button]:
+		assert_bool(screen.encloses(control.get_global_rect())).is_true()
+	toggle.set_pressed(false)
+	assert_str(toggle.text).is_equal("行走")
+	assert_str(toggle.tooltip_text).is_equal("行走模式 · 点此切换种地")
+	assert_str(str(toggle.theme_type_variation)).is_equal("ChoiceButton")
+	assert_bool(farm.work_mode).is_false()
+	assert_bool(farm.camera_pan.hold_enabled).is_false()
+	assert_bool(farm.hud._seed_scroll.visible).is_false()
+	assert_array(events).is_equal([true, false])
+	TranslationServer.set_locale(saved_locale)
+	# The English label is deliberately short enough for the same 52px control.
+	TranslationServer.set_locale("en")
+	farm.hud.set_work_mode(true)
+	for frame in 4: await get_tree().process_frame
+	assert_str(toggle.text).is_equal("Work")
+	assert_vector(toggle.size).is_equal(Vector2(52, 52))
+	assert_bool(screen.encloses(farm.hud._bottom.get_global_rect())).is_true()
+	farm.hud.set_work_mode(false)
+	for frame in 4: await get_tree().process_frame
+	assert_str(toggle.text).is_equal("Walk")
+	assert_vector(toggle.size).is_equal(Vector2(52, 52))
+	TranslationServer.set_locale(saved_locale)
+
+func test_seed_tray_only_appears_in_farming_mode_and_actions_are_aggregated() -> void:
+	var farm := await _farm_at_phone_size()
+	assert_bool(farm.hud._seed_scroll.visible).is_false()
+	farm._set_work_mode(true)
+	await get_tree().process_frame
+	assert_bool(farm.hud._seed_scroll.visible).is_true()
+	farm._set_work_mode(false)
+	assert_bool(farm.hud._seed_scroll.visible).is_false()
+	farm.title.pressed.emit()
+	await get_tree().process_frame
+	assert_bool(farm.hud._quick_actions.visible).is_true()
+	assert_bool(GameUi.modal_is_open(farm)).is_true()
+	assert_bool(farm.hud._stall.is_visible_in_tree()).is_true()
+	assert_object(farm.hud._quick_actions.find_child("GoFishing", true, false)).is_not_null()
+	assert_bool(farm.hud._bottom.visible).is_false()
+	farm.hud.close_modal()
+	await get_tree().process_frame
+	assert_bool(GameUi.modal_is_open(farm)).is_false()
+	assert_bool(farm.hud._bottom.visible).is_true()

@@ -12,13 +12,17 @@ signal cell_started(cell: Vector2i, action: String)
 signal cell_done(cell: Vector2i, action: String)
 signal queue_empty()
 
-const ACTION_S := 2.0
+## 单格动作时长。星露谷挥一次锄约 0.5 秒；自由种植下一笔能刷二三十格，
+## 原来的 2.0 秒意味着一次要等一分钟。
+const ACTION_S := 0.45
 
 var _queue: Array = []          ## [{cell, action}]
 ## 暂停：当前格已开工（cell_started 已发）但计时不走——宿主用它实现「先走到地头再干活」。
 var paused := false
 var _current = null
 var _elapsed := 0.0
+var duration_for := Callable()
+var action_seconds := ACTION_S
 
 ## 已在队列里（或正在做）的格不重复入队：大按钮连按两下不该把 9 格清理排成 18 格。
 func contains(cell: Vector2i) -> bool:
@@ -55,7 +59,7 @@ func current_action() -> String:
 
 ## 当前格已走完的比例 0..1，给进度圈用。
 func progress() -> float:
-	return 0.0 if _current == null else clampf(_elapsed / ACTION_S, 0.0, 1.0)
+	return 0.0 if _current == null else clampf(_elapsed / action_seconds, 0.0, 1.0)
 
 ## 取消尚未开始的格；**正在进行的那格照常走完**——命令可能已经发出去了，
 ## 中途丢弃会让本地与服务端对不上。
@@ -66,7 +70,12 @@ func cancel_pending() -> int:
 
 ## 放弃**当前**这格（本地预测就判定不合法时用）：不发 cell_done，所以不会发命令；
 ## 队列里后面的格照常继续。
+##
+## paused 描述的是**当前这格**的「先走到地头」阶段，所以放弃当前格必须一并清掉：
+## 否则下一格即使不需要走路也会卡在 step() 的 `if paused: return`，表现为
+## 「忙着但永远不前进」，HUD 还一直显示在赶路。
 func abort_current() -> void:
+	paused = false
 	if _current == null:
 		return
 	_current = null
@@ -84,7 +93,7 @@ func step(dt: float) -> void:
 	if paused:
 		return
 	_elapsed += dt
-	if _elapsed < ACTION_S:
+	if _elapsed < action_seconds:
 		return
 	var done: Dictionary = _current
 	_current = null
@@ -97,5 +106,6 @@ func step(dt: float) -> void:
 
 func _start_next() -> void:
 	_current = _queue.pop_front()
+	action_seconds = maxf(0.05, float(duration_for.call(_current.cell, _current.action))) if duration_for.is_valid() else ACTION_S
 	_elapsed = 0.0
 	emit_signal("cell_started", _current.cell, _current.action)

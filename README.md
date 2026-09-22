@@ -1,5 +1,53 @@
 # SensenAvatar
 
+**2026-09-22 最新线上版：Journey Preview 0.16.12。** 农场左下角恢复明确的“行走 / 种地”切换文字，保持52px按钮和紧凑HUD。保留上一版高清UI、离屏方向头像、鱼塘对齐及原账号、地形和资产。
+[美国 DMIT 下载 Journey 更新 APK](https://download-us.sensenjoy.cn:8443/farm/releases/farm-mode-20260922-e6913c40e35e/sensen-journey-farm-mode-0.16.12.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/farm-mode-20260922-e6913c40e35e/sensen-journey-farm-mode-0.16.12.apk) · [验证与发布记录](docs/qa/farm-mode-2026-09-22.md)。模拟器买种、翻土、播种、浇水和模式切换通过；最终无观察器包已安装到 V2509A，原身份与存档保留、双端下载校验均通过。
+
+以下为历史功能迭代说明。
+
+已加入街区、农场多人空间及组队矿井副本，单实例上限 300 人；共享矿物、怪物和清层进度，
+角色位置、动作、血量实时同步。矿井按队伍与队长当前所在实例决定重新入场后的绑定，
+组队时不会立即传送；保留旧个人矿井存档。见[产品规则](docs/product/multiplayer-spaces-2026-09-16.md)、
+[架构与协议](docs/architecture/online-spaces.md)和[验证记录](docs/qa/multiplayer-spaces-2026-09-16.md)。
+0.10.2 已上线，同步其他玩家实际保存的衣服、发型、鞋子与配饰，覆盖换装、重连和后来加入。
+见[装扮同步验证与发布](docs/qa/appearance-sync-2026-09-16.md)。保留 0.10.1 的跨区汇合和队伍农场授权，
+见[汇合规则](docs/product/party-cross-region-travel-2026-09-16.md)。
+[0.10.2 历史 Journey APK](https://oss.sensenjoy.cn/farm/releases/appearance-20260916-ed867c8e4d68/sensen-appearance-online-2026-09-16.apk)
+可覆盖旧版，保留原账号与存档；双方均需更新。下方 R5 链接保留为历史版本。
+
+`farm-dev` 已加入矿井即时战斗：第三层 1 只史莱姆、第四层 3 只、第五层 1 只精英，
+配套生命、移速、防御、独立武器位、铜剑与探矿靴制作、料理回血和倒下救援。
+Godot 独立试玩：`node tools/dev/run_journey.mjs --journey-combat`，或运行
+[`open_combat.command`](tools/dev/open_combat.command)。需要下述 Godot、Node 和测试数据库依赖。
+规则见[矿井战斗](docs/product/mine-combat-2026-09-15.md)，证据与限制见[验证记录](docs/qa/mine-combat-2026-09-15.md)。
+模拟器独立包 `com.sensen.journeycombatqa`；保留此前应用与存档。
+2026-09-15 已按用户要求[更新线上服务并通过飞书交付](docs/qa/combat-public-release-2026-09-15.md)，
+[Journey 战斗 R5 APK](https://oss.sensenjoy.cn/farm/releases/combat-20260915-r5-cb01c70e296a/sensen-combat-online-2026-09-15-r5.apk)可覆盖原 Journey Preview。
+R5 已上线：地图缩略图缩小并保持在角色右侧；第三、四层可清怪或清矿下楼，第五层只保留强化精英，击杀获得随机种子或矿石。见[验证与发布记录](docs/qa/mine-routes-2026-09-16.md)。
+保留 R4 仅在挥砍时显示宝剑的规则，见[验证记录](docs/qa/weapon-visibility-2026-09-15.md)。
+保留 R3 的死亡返回和命中延迟修复，见[验证记录](docs/qa/combat-latency-rescue-2026-09-15.md)。
+保留 R2 的摇杆障碍边缘滑动，见[移动验证](docs/qa/movement-sliding-2026-09-15.md)。
+
+`farm-dev` 已加入 SGODOT-114 邻里委托：三人需求比较、独立接取与单一追踪、放弃/换单、矿物/手作/料理交付及最近回应记录。
+Godot 独立试玩：`node tools/dev/run_journey.mjs --journey-requests`，或运行
+[`open_requests.command`](tools/dev/open_requests.command)。规则见[邻里委托](docs/product/npc-requests-2026-09-14.md)，Godot、模拟器与真机安装检查见[验证记录](docs/qa/npc-requests-2026-09-14.md)。114 R2 已单独安装真机，农场矿坑入口直接点击 3D 模型；原 113 应用及存档保留，尚未发布线上版本。
+
+`farm-dev` 已加入 SGODOT-113 人物属性、工具/配件装备、三件装备制作与按次数生效的料理加成。
+Godot 独立试玩：`node tools/dev/run_journey.mjs --journey-character`，或运行
+[`open_character.command`](tools/dev/open_character.command)。使用独立人物试玩存档和数据库。
+规则见[人物属性与装备](docs/product/character-equipment-2026-09-14.md)，Godot、模拟器及真机证据见[验证记录](docs/qa/character-equipment-2026-09-14.md)。113 已安装真机并完成核心流程测试，尚未发布线上版本。
+
+`farm-dev` 已加入 SGODOT-112 物品与背包：24 格、物品属性、堆叠拆合、整理筛选、工具装备、满包回退与旧档暂存。
+Godot 独立试玩：`node tools/dev/run_journey.mjs --journey-inventory`，或运行
+[`open_inventory.command`](tools/dev/open_inventory.command)。沿用下述开发依赖，使用独立背包存档和数据库。
+规则见[物品与背包](docs/product/inventory-2026-09-14.md)，Godot、模拟器及后续真机安装检查见[验证记录](docs/qa/inventory-2026-09-14.md)。尚未发布线上版本。
+
+`farm-dev` 已接入五层新手矿坑：农场入口、逐层开采、通关后的 1/5 层电梯，以及铜箍木箱和岩盐蔬菜汤。
+本地独立试玩：`node tools/dev/run_journey.mjs --journey-mining`，或运行
+[`open_mine.command`](tools/dev/open_mine.command)。需要 Godot、Node、已安装的服务端依赖及
+`server/.env` 中可用的测试数据库配置。使用独立矿坑试玩身份与数据库，关闭窗口后停止本地服务。
+规则与验证见[新手矿坑设计](docs/product/starter-mine-2026-09-14.md)和[验证记录](docs/qa/starter-mine-2026-09-14.md)。独立 Android 本地测试包已通过 vivo 真机矿坑验证；尚未部署线上或更新正式 APK。
+
 当前产品首要目标是做成更好玩的基于地图的游戏。下一轮玩法方向、首日节奏、3D 交互与验收以
 [`以好玩为先的改造方案`](docs/product/fun-first-rework-2026-09-07.md) 为准，优先于历史策划中的冲突约束。
 首个旅程切片已接入分钟级种植、采集制作、料理、庭院布置和地图地点交互；G3 存档保留兼容路径。

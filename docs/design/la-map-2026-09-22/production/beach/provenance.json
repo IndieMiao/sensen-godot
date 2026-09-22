@@ -1,0 +1,69 @@
+{
+  "asset": "assets/map/poi/beach.png",
+  "provider": "Sensenjoy API",
+  "base_url": "https://sub.sensenjoy.cn/v1",
+  "mode": "bundled image_gen.py edit with style-reference image",
+  "model": "gpt-image-2",
+  "requested_size": "1024x1024",
+  "returned_size": [
+    1254,
+    1254
+  ],
+  "quality": "high",
+  "input_reference": "reference-crop.png",
+  "reference_source": "docs/design/la-map-2026-09-22/generated/la-map-main-v1.png",
+  "reference_crop_source_pixels": [
+    164,
+    1216,
+    354,
+    1407
+  ],
+  "prompt": "prompt.txt",
+  "background": "solid magenta #ff00ff followed by bundled remove_chroma_key.py",
+  "alpha_extraction": {
+    "soft_matte": true,
+    "transparent_threshold": 18,
+    "opaque_threshold": 110,
+    "spill_cleanup": true
+  },
+  "normalization": {
+    "source_alpha_bbox_threshold": 32,
+    "source_bbox": [
+      113,
+      113,
+      1176,
+      1122
+    ],
+    "final_alpha_noise_floor": 8,
+    "full_base_padding_px": 32
+  },
+  "final_size": [
+    512,
+    512
+  ],
+  "final_mode": "RGBA",
+  "content_bbox": [
+    24,
+    40,
+    488,
+    480
+  ],
+  "ground_anchor_pixels": [
+    256,
+    480
+  ],
+  "ground_anchor_normalized": [
+    0.5,
+    0.9375
+  ],
+  "sha256": "f3ddf14a40ec7cc57d4d96353d9bfc762f51cfddeed4bd34d148c6141d5e7edf",
+  "visual_validation": [
+    "complete hut palms surfboards and sand base unclipped",
+    "exactly two surfboards",
+    "no people UI or text",
+    "no large ocean rectangle",
+    "reviewed on cream and dark blue backgrounds",
+    "reviewed at 160 112 and 80 px",
+    "no visible magenta halo"
+  ]
+}

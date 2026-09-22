@@ -1,0 +1,57 @@
+{
+  "asset": "assets/map/poi/museum.png",
+  "source": "Sensenjoy Image API",
+  "base_url": "https://sub.sensenjoy.cn/v1",
+  "model": "gpt-image-2",
+  "endpoint": "/images/edits",
+  "quality": "high",
+  "requested_size": [
+    1024,
+    1024
+  ],
+  "generated_size": [
+    1254,
+    1254
+  ],
+  "prompt": "prompt.txt",
+  "actual_reference_inputs": [
+    "reference-museum.png",
+    "assets/map/poi/restaurant.png"
+  ],
+  "reference_source": "docs/design/la-map-2026-09-22/generated/la-map-main-v1.png",
+  "reference_crop_pixels": [
+    542,
+    975,
+    723,
+    1159
+  ],
+  "raw_output": "raw-magenta.png",
+  "keyed_output": "keyed.png",
+  "chroma_key": "#FF00FF",
+  "extraction": "imagegen bundled remove_chroma_key.py, soft matte thresholds 64/128 and spill cleanup",
+  "production_size": [
+    512,
+    512
+  ],
+  "source_alpha_bbox": [
+    76,
+    93,
+    1180,
+    1170
+  ],
+  "production_alpha_bbox": [
+    32,
+    43,
+    480,
+    480
+  ],
+  "bottom_center_anchor_pixels": [
+    256,
+    480
+  ],
+  "bottom_center_anchor_normalized": [
+    0.5,
+    0.9375
+  ],
+  "sha256": "16eddb0a22ba904b4350e4fc59e800b4e9f333dd8aa4b8c96dc4eaea8ca6478a"
+}

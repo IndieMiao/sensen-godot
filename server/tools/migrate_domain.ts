@@ -4,6 +4,7 @@ import { parseArgs } from 'node:util';
 import pg from 'pg';
 import { migrateDomain } from '../src/db/domain_migration.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../src/domain/content.js';
+import { loadPlot } from '../src/domain/plot.js';
 
 async function main(): Promise<void> {
   const { values } = parseArgs({
@@ -19,11 +20,13 @@ async function main(): Promise<void> {
   if (!connectionString) throw new Error('MIGRATION_DATABASE_URL must be explicitly set');
   const contentDir = process.env.ASSET_ROOT
     ? path.join(process.env.ASSET_ROOT, 'assets', 'farm', 'data') : DEFAULT_CONTENT_DIR;
-  loadContent(contentDir);
+  const content = loadContent(contentDir);
+  const plot = loadPlot(content.farm_plot);
+  const decorationFootprints = Object.fromEntries(Object.entries(content.decorations.props).map(([id, prop]) => [id, prop.footprint]));
   const currentContentVersion = contentVersion(contentDir);
   const pool = new pg.Pool({ connectionString, max: 1, connectionTimeoutMillis: 5000 });
   try {
-    const report = await migrateDomain(pool, { contentVersion: currentContentVersion,
+    const report = await migrateDomain(pool, { plot, content, decorationFootprints, contentVersion: currentContentVersion,
       previousContentVersion: values['previous-content-version'] ?? contentVersion(contentDir, true), apply: values.apply });
     console.log(JSON.stringify(report, null, 2));
     if (report.status === 'refused') process.exitCode = 2;

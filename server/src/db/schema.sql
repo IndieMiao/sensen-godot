@@ -49,7 +49,18 @@ ALTER TABLE farms ADD COLUMN IF NOT EXISTS location jsonb CHECK (
   )
 );
 
+-- Frozen geographic terrain is independent of save JSON; legacy farms retain their original plot.
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS farm_terrain jsonb CHECK (
+  farm_terrain IS NULL OR (jsonb_typeof(farm_terrain) = 'object'
+    AND farm_terrain ->> 'format' = '1' AND farm_terrain ?& ARRAY['layout_id', 'plot', 'source'])
+);
+
 -- 建农场的幂等记录。payload_hash 是必需的：同 key 换地区不能被当成重试
+-- Entitlement is granted only by explicit domain migration, never on read or new creation.
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS relocation_available boolean NOT NULL DEFAULT false;
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS relocation_used boolean NOT NULL DEFAULT false;
+ALTER TABLE farms ADD COLUMN IF NOT EXISTS relocation_draft jsonb;
+
 -- （Codex 二审 Important 2）。
 CREATE TABLE IF NOT EXISTS farm_creations (
   player_id        uuid PRIMARY KEY REFERENCES players(id) ON DELETE CASCADE,
@@ -80,6 +91,27 @@ CREATE TABLE IF NOT EXISTS commands (
 );
 
 -- G2 的访客快照。三个版本列让「旧快照能不能继续下发」可判定（Codex 三审 O-I5）。
+CREATE TABLE IF NOT EXISTS online_rooms (
+  id text PRIMARY KEY,
+  revision int NOT NULL,
+  commit_id uuid NOT NULL,
+  state jsonb NOT NULL,
+  updated_at bigint NOT NULL
+);
+CREATE TABLE IF NOT EXISTS online_parties (
+  id text PRIMARY KEY,
+  code text NOT NULL UNIQUE,
+  state jsonb NOT NULL
+);
+ALTER TABLE online_rooms ADD COLUMN IF NOT EXISTS rescued jsonb NOT NULL DEFAULT '[]';
+CREATE TABLE IF NOT EXISTS online_players (
+  player_id uuid PRIMARY KEY REFERENCES players(id) ON DELETE CASCADE,
+  instance_id text NOT NULL DEFAULT '',
+  party_id text NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS online_players_instance ON online_players(instance_id);
+ALTER TABLE online_players ADD COLUMN IF NOT EXISTS party_farm_access text NOT NULL DEFAULT '';
+
 CREATE TABLE IF NOT EXISTS farm_snapshots (
   farm_id            uuid PRIMARY KEY REFERENCES farms(id) ON DELETE CASCADE,
   snapshot_revision  int  NOT NULL,

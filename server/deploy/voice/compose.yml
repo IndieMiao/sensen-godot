@@ -1,0 +1,19 @@
+services:
+  livekit-prod:
+    image: livekit/livekit-server:v1.13.7
+    restart: unless-stopped
+    network_mode: host
+    command: ["--config", "/etc/livekit.yaml"]
+    volumes: ["./prod.yaml:/etc/livekit.yaml:ro"]
+    mem_limit: 512m
+    cpus: 0.8
+    logging: {driver: json-file, options: {max-size: "10m", max-file: "3"}}
+  livekit-dev:
+    image: livekit/livekit-server:v1.13.7
+    restart: unless-stopped
+    network_mode: host
+    command: ["--config", "/etc/livekit.yaml"]
+    volumes: ["./dev.yaml:/etc/livekit.yaml:ro"]
+    mem_limit: 384m
+    cpus: 0.4
+    logging: {driver: json-file, options: {max-size: "10m", max-file: "3"}}

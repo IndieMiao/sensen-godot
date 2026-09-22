@@ -22,6 +22,9 @@ tools/geo_blueprint/.tmp/
 node_modules/
 
 server/.env
+server/.env.voice.local
+native/voice/apple/.build/
+native/voice/apple/.swiftpm/
 
 .env.production
 release-manifest.json

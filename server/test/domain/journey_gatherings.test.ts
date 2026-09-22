@@ -2,14 +2,16 @@ import { describe, expect, it } from 'vitest';
 import type { Command } from '../../src/domain/commands.js';
 import { reconcileJourney, startJourney } from '../../src/domain/journey.js';
 import type { FarmState } from '../../src/domain/state.js';
-import { content, freshFarm, run } from './helpers.js';
+import { content, editInventory, freshFarm, run } from './helpers.js';
 
 function ready() {
   const s = startJourney(freshFarm(), content);
   s.journey!.facts.push(...content.journey.gatherings.requires, 'workbench', 'side_path', 'shared_meal', 'planter_crafted');
   s.journey!.workshop = { sequence: 0, stock: { planter: 1, lantern: 1 }, displays: {} };
   s.inventory.dishes = { tea: 3, salad: 3 };
-  return reconcileJourney(s, content);
+  const ready = reconcileJourney(s, content);
+  editInventory(ready, draft => { draft.journey!.workshop!.stock = { planter: 1, lantern: 1 }; });
+  return ready;
 }
 
 function apply(s: FarmState, cmd: Command) {
@@ -83,11 +85,13 @@ describe('street gatherings', () => {
   it('does not take a displayed piece or partially pay a failed meal', () => {
     for (const missing of ['dish', 'piece']) {
       const s = plan(ready(), 'garden');
-      if (missing === 'dish') s.inventory.dishes.tea = 0;
-      else {
-        s.journey!.workshop!.stock.planter = 0;
-        s.journey!.workshop!.displays.terrace = ['planter', '', ''];
-      }
+      editInventory(s, draft => {
+        if (missing === 'dish') draft.inventory.dishes.tea = 0;
+        else {
+          draft.journey!.workshop!.stock.planter = 0;
+          draft.journey!.workshop!.displays.terrace = ['planter', '', ''];
+        }
+      });
       const before = structuredClone(s);
       expect(run(s, { type: 'host_journey_gathering', theme: 'garden', sequence: 1 })).toMatchObject({ ok: false, code: 'INSUFFICIENT_ITEMS' });
       expect(s).toEqual(before);

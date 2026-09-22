@@ -58,3 +58,27 @@ static func fit(camera: Camera3D, bounds: AABB, area: Rect2, features := PackedV
 	var horizontal := clampf(0, min_shift.x - bottom_right.x * back, max_shift.x - top_left.x * back)
 	var vertical := clampf(0, min_shift.y - top_left.y * back, max_shift.y - bottom_right.y * back)
 	camera.global_position += camera.global_basis * Vector3(horizontal, vertical, back)
+
+## The tracking box is centred in the full viewport. HUD clearance is mirrored
+## across the opposite edge instead of moving the box toward the bottom.
+static func symmetric_area(view: Vector2, visible: Rect2) -> Rect2:
+	if visible.size.x < 48 or visible.size.y < 48:
+		return Rect2(view * 0.3, view * 0.4)
+	var margin := visible.position.max(view - visible.end).max(Vector2.ZERO)
+	var size := (view - margin * 2).max(Vector2(48, 48))
+	return Rect2((view - size) * 0.5, size)
+
+static func follow_shift(camera: Camera3D, focus: Vector3, zone: Rect2) -> Vector3:
+	var screen := camera.unproject_position(focus)
+	var limited := screen.clamp(zone.position, zone.end)
+	if screen.is_equal_approx(limited): return Vector3.ZERO
+	# An off-screen orthographic origin may lie below the focus plane after a
+	# teleport or large drag. Intersect the full line, including negative t.
+	var normal_a := camera.project_ray_normal(screen)
+	var normal_b := camera.project_ray_normal(limited)
+	if absf(normal_a.y) < 0.0001 or absf(normal_b.y) < 0.0001: return Vector3.ZERO
+	var a := camera.project_ray_origin(screen)
+	var b := camera.project_ray_origin(limited)
+	a += normal_a * ((focus.y - a.y) / normal_a.y)
+	b += normal_b * ((focus.y - b.y) / normal_b.y)
+	return a - b

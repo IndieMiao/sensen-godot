@@ -61,7 +61,7 @@ func request(method: String, path: String, body: Variant = null) -> Response:
 	var headers := PackedStringArray(["content-type: application/json"])
 	if not token.is_empty():
 		headers.append("authorization: Bearer %s" % token)
-	var text := "" if body == null else JSON.stringify(body)
+	var text := "" if body == null else JSON.stringify(body, "", true, true)
 	if not transport.is_valid():
 		return Response.new(false, 0, {}, "no transport")
 	var r = await transport.call(method, base_url + path, headers, text)
@@ -72,6 +72,10 @@ static func make_http_transport(host: Node) -> Callable:
 	return func(method: String, url: String, headers: PackedStringArray, body: String) -> Response:
 		var req := HTTPRequest.new()
 		req.timeout = TIMEOUT_S
+		if method == "POST" and url.ends_with("/relocation/preview"): req.timeout = 45.0
+		if method == "POST" and url.ends_with("/farms"):
+			var payload = JSON.parse_string(body)
+			if payload is Dictionary and payload.has("generation_version"): req.timeout = 45.0
 		host.add_child(req)
 		var verb := HTTPClient.METHOD_GET
 		match method:

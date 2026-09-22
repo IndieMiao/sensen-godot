@@ -13,6 +13,7 @@ var farm_state: Dictionary = {}
 
 func _ready() -> void:
 	name = "WeekPhoto"
+	GameUi.register_modal(self)
 	add_child(PlaceScenery.build("nursery", farm_state))
 	if bool(farm_state.get("week_summary", {}).get("life_priority", false)):
 		add_child(DecorationLayout.build(DecorationLayout.saved(farm_state)))
@@ -57,23 +58,39 @@ func _ready() -> void:
 	var column := VBoxContainer.new()
 	safe.add_child(column)
 	var header := HBoxContainer.new()
-	column.add_child(header)
+	header.add_theme_constant_override("separation", 8)
+	var header_card := PanelContainer.new()
+	header_card.add_theme_stylebox_override("panel", GameUi.panel_style(10))
+	column.add_child(header_card)
+	header_card.add_child(header)
 	var close := GameUi.button("arrow-left", "", L10n.text("Back to nursery"))
 	close.pressed.connect(func():
 		if not _saving: closed.emit())
 	header.add_child(close)
-	header.add_child(GameUi.label(L10n.text("Our first week"), 18))
+	var title := GameUi.label(L10n.text("Our first week"), 18)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	header.add_child(title)
+	header.add_child(GameUi.picture(GameUi.icon("camera"), 26))
 	var spacer := Control.new()
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(spacer)
 	_status = GameUi.label("", 13)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	column.add_child(_status)
+	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var footer_card := PanelContainer.new()
+	footer_card.add_theme_stylebox_override("panel", GameUi.panel_style(12))
+	column.add_child(footer_card)
+	var footer := VBoxContainer.new()
+	footer.add_theme_constant_override("separation", 8)
+	footer_card.add_child(footer)
+	footer.add_child(_status)
 	var capture := GameUi.button("camera", L10n.text("Save photo"), L10n.text("Save our group photo"), true)
 	capture.name = "SavePhoto"
+	capture.custom_minimum_size.y = 50
 	capture.pressed.connect(capture_photo)
-	column.add_child(capture)
+	footer.add_child(capture)
 
 func capture_photo() -> void:
 	if _saving: return

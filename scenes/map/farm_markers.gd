@@ -1,10 +1,13 @@
 class_name FarmMarkers
 extends Control
-## Screen-space clusters keep co-located owners identifiable and every farm selectable.
+## City portraits/selected actors stay at geographic anchors. Legacy maps retain clusters.
 signal focused(farm_id: String)
 signal cluster_focused(farm_ids: Array)
 const MARKER_SIZE := Vector2(88, 28)
 const CLUSTER_DISTANCE := 80.0
+const MINIATURE_OFFSET := Vector2(106, -24)
+const MINIATURE_SCALE := 0.195
+const MINIATURE_HALF_WIDTH := 54.0
 const FarmArt = preload("res://modules/farm/farm_art.gd")
 var points := {}
 var selected_id := "":
@@ -25,6 +28,29 @@ var _show_ring := false
 var miniature: Node3D
 var expanded_ids: Array = []
 var world_positions := {}
+var city_mode := false:
+	set(value):
+		if city_mode == value: return
+		city_mode = value
+		if not value:
+			for id in _buttons:
+				var button: Button = _buttons[id]
+				button.mouse_filter = Control.MOUSE_FILTER_STOP
+				_avatar_targets[id].mouse_filter = Control.MOUSE_FILTER_STOP
+				_avatar_targets[id].size = Vector2(70, 92)
+				for portrait in _avatar_targets[id].get_children():
+					portrait.position = Vector2(17, 46)
+					portrait.show()
+				button.custom_minimum_size = MARKER_SIZE
+				button.size = MARKER_SIZE
+				button.get_child(0).offset_top = 4
+				button.get_child(0).offset_bottom = -3
+				_owner_labels[id].add_theme_font_size_override("font_size", 11)
+				for state in ["normal", "hover", "pressed", "focus"]:
+					button.remove_theme_stylebox_override(state)
+			_city_styled.clear()
+var _city_styled := {}
+var expanded_avatar_id := ""
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -41,6 +67,7 @@ func put(id: String, bp: FarmBlueprint, owner_name: String, own := false, avatar
 	points[id] = {"center": bp.overlay.center, "bp": bp, "own": own, "owner_name": owner_name, "avatar_ref": avatar_ref}
 	if _buttons.has(id): return
 	var avatar_target := Button.new()
+	avatar_target.name = "MapPlayer_" + id.validate_node_name()
 	avatar_target.size = Vector2(70, 92)
 	avatar_target.tooltip_text = L10n.format_text("Select %s", owner_name)
 	avatar_target.focus_mode = Control.FOCUS_NONE
@@ -49,6 +76,11 @@ func put(id: String, bp: FarmBlueprint, owner_name: String, own := false, avatar
 	avatar_target.pressed.connect(_on_marker_pressed.bind(id))
 	add_child(avatar_target)
 	_avatar_targets[id] = avatar_target
+	if not own:
+		var portrait := MapPortrait.new()
+		portrait.config = SeededOutfit.config_for(avatar_ref)
+		avatar_target.add_child(portrait)
+		portrait.position = Vector2(17, 46)
 	var b := Button.new()
 	b.custom_minimum_size = MARKER_SIZE
 	b.size = b.custom_minimum_size
@@ -103,7 +135,9 @@ func remove_missing(ids: Array) -> void:
 		_badges.erase(id)
 		_avatar_targets.erase(id)
 		_owner_labels.erase(id)
+		_city_styled.erase(id)
 	if not points.has(selected_id): selected_id = ""
+	if not points.has(expanded_avatar_id): expanded_avatar_id = ""
 	expanded_ids = expanded_ids.filter(func(id): return points.has(id))
 
 func _toggle_cluster(id: String) -> void:
@@ -115,6 +149,9 @@ func _on_marker_pressed(id: String) -> void:
 	focused.emit(id)
 
 func sync(cam: Camera3D, lat: float, lng: float, visible_area: Rect2) -> void:
+	if city_mode:
+		_sync_city(cam, lat, lng)
+		return
 	visible_farm_ids.clear()
 	world_positions.clear()
 	_clusters.clear()
@@ -155,6 +192,8 @@ func sync(cam: Camera3D, lat: float, lng: float, visible_area: Rect2) -> void:
 			point.x = clampf(point.x, visible_area.position.x + 46, visible_area.end.x - 46)
 			point.y = clampf(point.y, visible_area.position.y + 96, visible_area.end.y - 48)
 			projected[expanded[index]] = point
+	if projected.has(selected_id):
+		projected[selected_id] = _selected_layout_anchor(projected[selected_id], visible_area)
 	var visible_badges: Array = []
 	for id in _clusters:
 		var anchor: Vector2 = projected[id]
@@ -165,8 +204,8 @@ func sync(cam: Camera3D, lat: float, lng: float, visible_area: Rect2) -> void:
 		_avatar_targets[id].position.x = clampf(_avatar_targets[id].position.x, visible_area.position.x, visible_area.end.x - 70)
 		_avatar_targets[id].visible = true
 		b.visible = true
-		b.position = anchor + Vector2(-MARKER_SIZE.x * 0.5, 12)
-		b.position.x = clampf(b.position.x, visible_area.position.x, visible_area.end.x - MARKER_SIZE.x)
+		b.position = anchor + Vector2(-b.size.x * 0.5, 12)
+		b.position.x = clampf(b.position.x, visible_area.position.x, visible_area.end.x - b.size.x)
 		b.theme_type_variation = &"ChoiceSelectedButton" if id == selected_id else &"ChoiceButton"
 		visible_farm_ids.append(id)
 		if _clusters[id].size() > 1 or (expanded.size() > 1 and id == expanded[0]):
@@ -188,7 +227,7 @@ func sync(cam: Camera3D, lat: float, lng: float, visible_area: Rect2) -> void:
 			var model_anchor := _model_anchor(anchor, projected, visible_area)
 			var model_world = Plane(Vector3.UP, 0).intersects_ray(cam.project_ray_origin(model_anchor + global_position), cam.project_ray_normal(model_anchor + global_position))
 			miniature.position = model_world if model_world is Vector3 else base
-			miniature.scale = Vector3.ONE * unit * 0.26
+			miniature.scale = Vector3.ONE * unit * MINIATURE_SCALE
 			miniature.show_farm(id, points[id].bp.region_id, points[id].bp.layout_patch_id, int(points[id].get("plots", 9)))
 	for id in _buttons:
 		_buttons[id].visible = visible_farm_ids.has(id)
@@ -197,23 +236,89 @@ func sync(cam: Camera3D, lat: float, lng: float, visible_area: Rect2) -> void:
 	if not _show_ring: miniature.hide()
 	queue_redraw()
 
+func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
+	visible_farm_ids.clear()
+	world_positions.clear()
+	_clusters.clear()
+	expanded_ids.clear()
+	_show_ring = false
+	miniature.hide()
+	var area := Rect2(-global_position, get_viewport_rect().size).grow(140)
+	var ids := points.keys()
+	ids.sort()
+	for id in ids:
+		var ll: Vector2 = points[id].center
+		var world := MapGeoMath.geo_to_world(ll.x, ll.y, lat, lng)
+		var anchor := cam.unproject_position(world) - global_position
+		var shown := not cam.is_position_behind(world) and area.has_point(anchor)
+		world_positions[id] = world
+		var target: Button = _avatar_targets[id]
+		var label: Button = _buttons[id]
+		if not _city_styled.has(id):
+			_city_styled[id] = true
+			label.custom_minimum_size = Vector2(66, 20)
+			label.size = label.custom_minimum_size
+			_owner_labels[id].add_theme_font_size_override("font_size", 9)
+			label.get_child(0).offset_top = 1
+			label.get_child(0).offset_bottom = -1
+			for state in ["normal", "hover", "pressed", "focus"]:
+				label.add_theme_stylebox_override(state, CityMapView.marker_style())
+		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		target.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_badges[id].visible = false
+		var full_body: bool = id == "self" or id == expanded_avatar_id
+		target.size = Vector2(70, 130) if full_body else Vector2(44, 44)
+		target.position = anchor - Vector2(target.size.x * 0.5, target.size.y - 2)
+		for portrait in target.get_children():
+			portrait.visible = not full_body
+			portrait.position = Vector2(4, 4)
+		label.position = anchor + Vector2(-label.size.x * 0.5, 6)
+		label.visible = shown
+		target.visible = shown
+		if shown: visible_farm_ids.append(id)
+	# Deterministic paint order; selecting never relocates neighbouring portraits.
+	if visible_farm_ids.has(selected_id):
+		move_child(_avatar_targets[selected_id], -1)
+		move_child(_buttons[selected_id], -1)
+	queue_redraw()
+
+func activate_at(screen: Vector2) -> bool:
+	var ids := visible_farm_ids.duplicate()
+	if city_mode:
+		ids.reverse()
+		if ids.has(selected_id):
+			ids.erase(selected_id)
+			ids.push_front(selected_id)
+	for id in ids:
+		if _badges[id].visible and _badges[id].get_global_rect().has_point(screen):
+			_toggle_cluster(id)
+			return true
+		if _avatar_targets[id].get_global_rect().has_point(screen) or _buttons[id].get_global_rect().has_point(screen):
+			_on_marker_pressed(id)
+			return true
+	return false
+
+func _selected_layout_anchor(anchor: Vector2, area: Rect2) -> Vector2:
+	# Reserve space for the owner and farm together, so the farm never changes sides.
+	var right := maxf(area.position.x + 44, area.end.x - MINIATURE_OFFSET.x - MINIATURE_HALF_WIDTH)
+	var bottom := maxf(area.position.y + 100, area.end.y - 84)
+	return Vector2(clampf(anchor.x, area.position.x + 44, right),
+		clampf(anchor.y, area.position.y + 100, bottom))
+
 func _model_anchor(anchor: Vector2, projected: Dictionary, area: Rect2) -> Vector2:
-	var best := anchor
+	var best := anchor + MINIATURE_OFFSET
 	var best_score := INF
-	for offset in [Vector2(96, 0), Vector2(-96, 0), Vector2(0, 135), Vector2(96, 135), Vector2(-96, 135), Vector2(0, -150)]:
-		var candidate: Vector2 = anchor + offset
-		candidate.x = clampf(candidate.x, area.position.x + 72, area.end.x - 72)
-		candidate.y = clampf(candidate.y, area.position.y + 82, area.end.y - 32)
-		var bounds := Rect2(candidate - Vector2(72, 82), Vector2(144, 114))
-		var score: float = offset.length() * 0.01
+	for offset_y in [-24.0, 12.0, 48.0, 84.0, -60.0, -96.0]:
+		var candidate := Vector2(anchor.x + MINIATURE_OFFSET.x,
+			clampf(anchor.y + offset_y, area.position.y + 62, maxf(area.position.y + 62, area.end.y - 24)))
+		var bounds := Rect2(candidate - Vector2(MINIATURE_HALF_WIDTH, 62), Vector2(108, 86))
+		var score := absf(offset_y - MINIATURE_OFFSET.y) * 0.01
 		for id in projected:
 			if not _clusters.has(id): continue
-			var actor := Rect2(projected[id] - Vector2(44, 100), Vector2(88, 144))
-			score += bounds.intersection(actor).get_area()
-			if _clusters[id].size() > 1 or (not expanded_ids.is_empty() and id == expanded_ids[0]):
-				var badge_size: Vector2 = _badges[id].size
-				var badge_rect := Rect2(projected[id] + Vector2(-badge_size.x * 0.5, 46), badge_size)
-				score += bounds.intersection(badge_rect).get_area()
+			score += bounds.intersection(Rect2(projected[id] - Vector2(44, 100), Vector2(88, 144))).get_area()
+			if _clusters[id].size() > 1:
+				var badge: Button = _badges[id]
+				score += bounds.intersection(Rect2(projected[id] + Vector2(-badge.size.x * 0.5, 46), badge.size)).get_area()
 		if score < best_score:
 			best_score = score
 			best = candidate

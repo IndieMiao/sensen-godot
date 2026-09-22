@@ -30,6 +30,17 @@ static func asset_path(id: String, rev: int) -> String:
 	return "res://assets/blueprints/%s/r%d/farm_blueprint.json" % [id, rev]
 
 static func load_choice(choice: Dictionary) -> FarmBlueprint:
+	var terrain = choice.get("farm_terrain", {})
+	if choice.has("farm_terrain") and not terrain is Dictionary: return null
+	if terrain is Dictionary and not terrain.is_empty():
+		if str(choice.get("layout_patch_id", "")) != str(terrain.get("layout_id", "")): return null
+		if not terrain.get("plot") is Dictionary: return null
+		var revision = choice.get("revision", choice.get("blueprint_revision", 0))
+		if not (revision is int or revision is float) or not is_finite(float(revision)) or float(revision) != floor(float(revision)): return null
+		if revision != terrain.plot.get("revision", -1): return null
+		if choice.has("blueprint_revision") and choice.blueprint_revision != revision: return null
+		return FarmPlot.geography_for(terrain, str(choice.get("region_id", "")))
+	if str(choice.get("layout_patch_id", "")).begins_with("geo_"): return null
 	var bp := load_file(asset_path(str(choice.get("layout_patch_id", "")), int(choice.get("revision", choice.get("blueprint_revision", 2)))))
 	if bp != null:
 		return bp.with_location(choice.get("location", {}))

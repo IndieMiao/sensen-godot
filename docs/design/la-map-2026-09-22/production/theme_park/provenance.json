@@ -1,0 +1,84 @@
+{
+  "asset": "assets/map/poi/theme_park.png",
+  "provider": "Sensenjoy API",
+  "base_url": "https://sub.sensenjoy.cn/v1",
+  "mode": "bundled image_gen.py edit with subject and style references",
+  "model": "gpt-image-2",
+  "requested_size": "1024x1024",
+  "returned_size": [
+    1254,
+    1254
+  ],
+  "quality": "high",
+  "input_references": [
+    {
+      "file": "reference-globe-crop.png",
+      "source": "docs/design/la-map-2026-09-22/references/gensen-map-reference.png",
+      "role": "subject reference",
+      "source_crop_pixels": [
+        394,
+        801,
+        443,
+        850
+      ]
+    },
+    {
+      "file": "reference-approved-style.png",
+      "source": "docs/design/la-map-2026-09-22/generated/la-map-main-v1.png",
+      "role": "style reference only",
+      "source_crop_pixels": [
+        573,
+        347,
+        806,
+        501
+      ]
+    }
+  ],
+  "prompt": "prompt.txt",
+  "background": "solid magenta #ff00ff followed by bundled remove_chroma_key.py",
+  "alpha_extraction": {
+    "soft_matte": true,
+    "transparent_threshold": 18,
+    "opaque_threshold": 110,
+    "spill_cleanup": true
+  },
+  "normalization": {
+    "source_alpha_bbox_threshold": 32,
+    "source_bbox": [
+      116,
+      198,
+      1181,
+      1019
+    ],
+    "final_alpha_noise_floor": 8,
+    "full_base_padding_px": 32
+  },
+  "final_size": [
+    512,
+    512
+  ],
+  "final_mode": "RGBA",
+  "content_bbox": [
+    24,
+    122,
+    488,
+    480
+  ],
+  "ground_anchor_pixels": [
+    256,
+    480
+  ],
+  "ground_anchor_normalized": [
+    0.5,
+    0.9375
+  ],
+  "sha256": "49bf435cc78bba501dc9781d9b9a945e843ff7a7c5966cb658ed91ae8a4d9bd6",
+  "visual_validation": [
+    "full globe palm crowns entrance and base unclipped",
+    "blank equator ring and entrance",
+    "no people UI or readable text",
+    "reviewed on cream and dark blue backgrounds",
+    "reviewed at 160 112 and 80 px",
+    "no visible magenta halo"
+  ]
+}

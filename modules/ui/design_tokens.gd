@@ -6,19 +6,19 @@ extends RefCounted
 ## 场景只选择语义化的 Theme variation，不再自己拼 StyleBox。
 
 # —— 色板 ——
-# 薄荷绿承接角色资产；珊瑚色只用于地图动态，避免界面变成单一绿色系。
-const ACCENT := Color("#2fcf9f")
-const ACCENT_DEEP := Color("#13956f")
-const INK := Color("#17211f")
-const INK_SUB := Color("#5f6f6a")
-const INK_MUTED := Color("#899792")
-const SURFACE := Color("#ffffff")
-const SURFACE_SUNK := Color("#f2f5f4")
-const SURFACE_TINT := Color("#e6f7f1")
-const BORDER := Color("#d9e1de")
-const MARKER := Color("#ff765f")
-const MARKER_PRESSED := Color("#e56a58")
-const DANGER := Color("#d85f58")
+# 青绿主操作、奶油白面板、蓝紫定位标记；深色文字保持对比度。
+const ACCENT := Color("#239f9f")
+const ACCENT_DEEP := Color("#167e88")
+const INK := Color("#34416f")
+const INK_SUB := Color("#56617d")
+const INK_MUTED := Color("#7d86a5")
+const SURFACE := Color("#fffdf8")
+const SURFACE_SUNK := Color("#f0f1fc")
+const SURFACE_TINT := Color("#e4eaff")
+const BORDER := Color("#b9c4f2")
+const MARKER := Color("#ccd5ff")
+const MARKER_PRESSED := Color("#b0bfef")
+const DANGER := Color("#d8787a")
 
 # —— 4dp 间距栅格 ——
 const SPACE_1 := 4
@@ -29,7 +29,7 @@ const SPACE_6 := 24
 
 # —— 圆角三档 ——
 const RADIUS_SHEET := 16 # 底部编辑器
-const RADIUS_CARD := 8 # 卡片 / 选项 / 普通按钮
+const RADIUS_CARD := 12 # 卡片 / 选项 / 普通按钮
 const RADIUS_PILL := 24 # 仅用于圆形地图控件
 
 # —— 字阶五档 ——

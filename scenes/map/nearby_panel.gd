@@ -14,8 +14,8 @@ signal street_requested(farm_id: String)
 var street_button: Button
 signal close_requested()
 
-const CARD_MIN := Vector2(124, 52)
-const PREVIEW_H := 64.0
+const CARD_MIN := Vector2(118, 48)
+const PREVIEW_H := 50.0
 const STAGE_LABEL := {"derelict": "Wild plot", "cleared": "Cleared plot", "built": "Nursery"}
 const WEATHER_LABEL := {"sunny": "Sunny", "rain": "Rain", "wind": "Wind"}
 
@@ -50,6 +50,23 @@ var max_height := 0.0
 var _body_scroll: ScrollContainer
 var _body: VBoxContainer
 var _preview_counts := Vector2i(-1, -1)
+var _tabs: HBoxContainer
+var _heading: HBoxContainer
+
+static func _button_style(button: Button, accent := false) -> void:
+	button.add_theme_font_size_override("font_size", 11)
+	button.add_theme_color_override("font_color", CityMapView.INK)
+	button.add_theme_color_override("font_hover_color", CityMapView.INK)
+	button.add_theme_color_override("font_pressed_color", CityMapView.INK)
+	button.add_theme_color_override("icon_normal_color", CityMapView.INK)
+	button.add_theme_color_override("icon_pressed_color", CityMapView.INK)
+	button.add_theme_constant_override("icon_max_width", 16)
+	for state in ["normal", "hover", "focus", "pressed", "hover_pressed", "disabled"]:
+		var active: bool = accent or state in ["pressed", "hover_pressed"]
+		var style := CityMapView.surface(CityMapView.LIME if active else Color("f3f5ef"), 12)
+		style.shadow_size = 0
+		if state == "disabled": style.bg_color = Color("e9ece6")
+		button.add_theme_stylebox_override(state, style)
 
 func refresh_language() -> void:
 	_title.text = L10n.format_text("%d farms here", _group_ids.size()) if not _group_ids.is_empty() else L10n.format_text("Nearby Farmers · %d", _count)
@@ -67,11 +84,14 @@ func refresh_language() -> void:
 func _init() -> void:
 	name = "NearbyPanel"
 	theme_type_variation = &"BottomSheet"
+	add_theme_stylebox_override("panel", CityMapView.surface(Color.WHITE, 18))
 	minimum_size_changed.connect(_apply_bottom_preset)
 	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", DesignTokens.SPACE_2)
+	vbox.add_theme_constant_override("separation", 4)
 	add_child(vbox)
 	var tabs := HBoxContainer.new()
+	_tabs = tabs
+	tabs.add_theme_constant_override("separation", 4)
 	vbox.add_child(tabs)
 	_farm_tab = GameUi.button("users-round", "Farmers", "Nearby farmers")
 	_place_tab = GameUi.button("map-pin", "Places", "Neighbourhood places")
@@ -81,11 +101,12 @@ func _init() -> void:
 	_farm_tab.pressed.connect(func(): show_places(false))
 	_place_tab.pressed.connect(func(): show_places(true))
 	close_button = GameUi.button("x", "", "Close nearby panel")
+	CityMapView.compact_round_button(close_button)
 	close_button.name = "CloseNearby"
 	close_button.hide()
 	close_button.pressed.connect(func(): close_requested.emit())
 	tabs.add_child(close_button)
-	_body_scroll = ScrollContainer.new()
+	_body_scroll = TouchScrollContainer.new()
 	_body_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_body_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	vbox.add_child(_body_scroll)
@@ -93,39 +114,47 @@ func _init() -> void:
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body_scroll.add_child(_body)
 	_farm_content = VBoxContainer.new()
+	_farm_content.add_theme_constant_override("separation", 4)
 	_body.add_child(_farm_content)
 	_places = VBoxContainer.new()
 	_body.add_child(_places)
 	for place in PlaceCatalog.all():
 		var button := GameUi.button(str(place.icon), str(place.name), str(place.name))
+		_button_style(button)
 		button.pressed.connect(func(): place_requested.emit(str(place.id)))
 		_place_buttons[str(place.id)] = button
 		_places.add_child(button)
 	show_places(false)
 	_title = Label.new()
 	_title.text = "Nearby Farmers"
-	_title.add_theme_font_size_override("font_size", DesignTokens.FONT_LABEL)
+	_title.add_theme_font_size_override("font_size", 13)
+	_title.add_theme_color_override("font_color", CityMapView.INK)
+	_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	var heading := HBoxContainer.new()
+	_heading = heading
 	_farm_content.add_child(heading)
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	heading.add_child(_title)
-	_group_back = GameUi.button("x", "", "Show all nearby farms")
-	_group_back.custom_minimum_size = Vector2(32, 32)
+	_group_back = GameUi.button("arrow-left", "", "Show all nearby farms")
+	CityMapView.compact_round_button(_group_back)
+	_group_back.custom_minimum_size = Vector2(44, 44)
 	_group_back.visible = false
 	_group_back.pressed.connect(func(): show_group([]))
 	heading.add_child(_group_back)
 	_subtitle = Label.new()
-	_subtitle.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
+	_subtitle.add_theme_font_size_override("font_size", 10)
+	_subtitle.add_theme_color_override("font_color", CityMapView.MUTED)
 	_subtitle.visible = false
 	_farm_content.add_child(_subtitle)
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScrollContainer.new()
 	_scroll = scroll
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.custom_minimum_size.y = CARD_MIN.y + 4.0
 	_farm_content.add_child(scroll)
 	_row = HBoxContainer.new()
-	_row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
+	_row.add_theme_constant_override("separation", 6)
 	scroll.add_child(_row)
 	_build_preview(_farm_content)
 	_body.minimum_size_changed.connect(_apply_bottom_preset)
@@ -138,11 +167,22 @@ func show_places(open: bool) -> void:
 	_farm_content.visible = not open
 	_farm_tab.theme_type_variation = &"TabButton" if open else &"TabSelectedButton"
 	_place_tab.theme_type_variation = &"TabSelectedButton" if open else &"TabButton"
+	_button_style(_farm_tab, not open)
+	_button_style(_place_tab, open)
 	_apply_bottom_preset()
 
 func set_social_only() -> void:
 	social_only = true
 	_place_tab.hide()
+	_farm_tab.hide()
+	if _title.get_parent() != _tabs:
+		_heading.remove_child(_title)
+		_heading.remove_child(_group_back)
+		_tabs.add_child(_title)
+		_tabs.move_child(_title, 0)
+		_tabs.add_child(_group_back)
+		_tabs.move_child(_group_back, 1)
+		_heading.hide()
 	show_places(false)
 
 func set_place_state(state: Dictionary) -> void:
@@ -155,10 +195,12 @@ func set_place_state(state: Dictionary) -> void:
 func _build_preview(parent: Node) -> void:
 	_preview = PanelContainer.new()
 	_preview.name = "Preview"
-	_preview.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+	var preview_style := CityMapView.surface(Color("f4f6f0"), 12)
+	preview_style.shadow_size = 0
+	_preview.add_theme_stylebox_override("panel", preview_style)
 	_preview.visible = false
 	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", DesignTokens.SPACE_2)
+	h.add_theme_constant_override("separation", 6)
 	_preview.add_child(h)
 	_preview_img = TextureRect.new()
 	_preview_img.custom_minimum_size = Vector2(PREVIEW_H, PREVIEW_H)
@@ -168,22 +210,26 @@ func _build_preview(parent: Node) -> void:
 	h.add_child(_preview_img)
 	var col := VBoxContainer.new()
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	col.add_theme_constant_override("separation", 2)
 	h.add_child(col)
-	_preview_name = GameUi.label("", 15)
+	_preview_name = GameUi.label("", 12, CityMapView.INK)
 	_preview_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	col.add_child(_preview_name)
 	_preview_text = Label.new()
 	# **不要 autowrap**：首帧容器宽度还是 1 px 时，autowrap 标签会按每字一行算最小高度
 	# （26 个字 ≈ 470 px），面板被一次性撑到 668 高，之后也不会自动缩回。单行 + 省略号。
 	_preview_text.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	_preview_text.add_theme_font_size_override("font_size", DesignTokens.FONT_CAPTION)
-	_preview_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_preview_text.add_theme_font_size_override("font_size", 10)
+	_preview_text.add_theme_color_override("font_color", CityMapView.MUTED)
+	_preview_text.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	col.add_child(_preview_text)
 	visit_button = Button.new()
 	visit_button.text = "Visit Farm"
 	visit_button.icon = GameUi.icon("house")
 	visit_button.theme_type_variation = &"AccentButton"
 	visit_button.custom_minimum_size.y = 44.0
+	_button_style(visit_button, true)
 	visit_button.pressed.connect(func(): if not focused_id.is_empty(): visit_requested.emit(focused_id))
 	h.add_child(visit_button)
 	visit_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -193,8 +239,10 @@ func _build_preview(parent: Node) -> void:
 	h.add_child(actions)
 	actions.add_child(visit_button)
 	street_button = GameUi.button("footprints", "Street", "Visit neighbourhood")
+	_button_style(street_button)
 	street_button.pressed.connect(func(): if not focused_id.is_empty(): street_requested.emit(focused_id))
 	actions.add_child(street_button)
+	street_button.hide()
 	parent.add_child(_preview)
 
 ## 与 SelectPanel 同一个坑：PRESET_MODE_MINSIZE 按调用时刻的最小尺寸算 offset_top，
@@ -238,6 +286,7 @@ func set_entries(p_entries: Array, count: int, offline := false) -> void:
 		card.button_group = _group
 		card.custom_minimum_size = CARD_MIN
 		card.theme_type_variation = &"ChoiceButton"
+		_button_style(card)
 		card.set_meta("farm_id", str(e.farm_id))
 		card.pressed.connect(_on_card_pressed.bind(card))
 		_build_card(card, e)
@@ -248,14 +297,18 @@ func set_entries(p_entries: Array, count: int, offline := false) -> void:
 func _build_card(card: Button, e: Dictionary) -> void:
 	var ref := str(e.get("avatar_ref", "seed:unknown"))
 	var v := HBoxContainer.new()
-	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 6)
+	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	v.offset_left = 6
+	v.offset_right = -6
+	v.offset_top = 4
+	v.offset_bottom = -4
 	v.add_theme_constant_override("separation", 6)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
 	card.add_child(v)
 	var thumbnail := TextureRect.new()
 	thumbnail.name = "FarmThumbnail"
-	thumbnail.custom_minimum_size = Vector2(34, 34)
+	thumbnail.custom_minimum_size = Vector2(32, 32)
 	thumbnail.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	thumbnail.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	thumbnail.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -265,19 +318,21 @@ func _build_card(card: Button, e: Dictionary) -> void:
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_theme_constant_override("separation", 1)
 	v.add_child(col)
 	var name_l := Label.new()
 	name_l.name = "FarmerName"
 	name_l.text = SeededOutfit.short_name(ref)
 	name_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	name_l.add_theme_font_size_override("font_size", 12)
+	name_l.add_theme_font_size_override("font_size", 11)
+	name_l.add_theme_color_override("font_color", CityMapView.INK)
 	name_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(name_l)
 	var stage_l := Label.new()
 	stage_l.text = str(STAGE_LABEL.get(str(e.get("nursery_stage", "derelict")), "Plot"))
 	stage_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	stage_l.add_theme_font_size_override("font_size", 11)
-	stage_l.add_theme_color_override("font_color", GameUi.MUTED)
+	stage_l.add_theme_font_size_override("font_size", 10)
+	stage_l.add_theme_color_override("font_color", CityMapView.MUTED)
 	stage_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(stage_l)
 

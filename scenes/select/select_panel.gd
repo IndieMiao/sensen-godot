@@ -6,7 +6,8 @@ signal candidate_focused(id: String)
 signal confirmed(id: String)
 signal placement_cancelled
 
-const CAPACITY_TEXT := "4 plots · unlock 6, then 9"
+## 渐进解锁已退役：地是一整片，开局就能随处开垦，没有「几块田」这回事了。
+const CAPACITY_TEXT := "Open ground · till anywhere"
 ## Three cards fit inside the 328px safe-area width of a 360px phone.
 ## Shared capacity copy stays below the row, leaving the map visible.
 const CARD_MIN := Vector2(88, 104)
@@ -26,9 +27,12 @@ var _title: Label
 var _capacity: Label
 var _cancel: Button
 var placing := false
+var generation_mode := false
+var relocation_mode := false
 
 func _init() -> void:
 	name = "SelectPanel"
+	add_theme_stylebox_override("panel", GameUi.panel_style(14))
 	minimum_size_changed.connect(_apply_bottom_preset)
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", DesignTokens.SPACE_3)
@@ -36,14 +40,15 @@ func _init() -> void:
 	var title := Label.new()
 	_title = title
 	title.text = "Choose a farm layout"
-	title.add_theme_font_size_override("font_size", DesignTokens.FONT_LABEL)
+	title.add_theme_font_size_override("font_size", 17)
 	vbox.add_child(title)
 	_row = HBoxContainer.new()
 	_row.add_theme_constant_override("separation", DesignTokens.SPACE_2)
 	vbox.add_child(_row)
-	_capacity = GameUi.label(CAPACITY_TEXT, 12, GameUi.MUTED)
+	_capacity = GameUi.label(CAPACITY_TEXT, 13, GameUi.MUTED)
 	vbox.add_child(_capacity)
 	var actions := HBoxContainer.new()
+	actions.add_theme_constant_override("separation", 9)
 	vbox.add_child(actions)
 	_cancel = GameUi.button("arrow-left", "", "Change layout")
 	_cancel.visible = false
@@ -53,7 +58,7 @@ func _init() -> void:
 	confirm_button.text = "Place Farm"
 	confirm_button.icon = GameUi.icon("map-pin")
 	confirm_button.theme_type_variation = &"AccentButton"
-	confirm_button.custom_minimum_size.y = 48
+	confirm_button.custom_minimum_size.y = 50
 	confirm_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	confirm_button.disabled = true
 	confirm_button.pressed.connect(func(): if not focused_id.is_empty(): confirmed.emit(focused_id))
@@ -66,6 +71,10 @@ func _init() -> void:
 
 func _apply_bottom_preset() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	offset_left = 4
+	offset_right = -4
+	offset_bottom = -4
+	offset_top = -get_combined_minimum_size().y - 4
 
 func set_candidates(items: Array) -> void:
 	# 必须先 remove_child 立即解除父子关系，再 queue_free 释放。queue_free 同帧内不解除父子关系。
@@ -188,12 +197,36 @@ func set_placement_mode(active: bool, valid := true) -> void:
 	confirm_button.text = "Create Farm" if active else "Place Farm"
 	confirm_button.icon = GameUi.icon("house" if active else "map-pin")
 	confirm_button.disabled = not valid or focused_id.is_empty()
+	if generation_mode:
+		_row.hide()
+		_cancel.show()
+		_cancel.tooltip_text = L10n.text("Change city")
+		_title.text = "Choose your farm location"
+		_capacity.text = "Move the map to choose an area. Your private farm includes a pond and a mine." if valid else "Choose an area inside this city"
+		_capacity.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		confirm_button.text = "Generate farm here"
+	if relocation_mode:
+		_cancel.tooltip_text = L10n.text("Keep current farm")
+		_title.text = "Choose a new farm location"
+		_capacity.text = "Move the map within your current city. Preview first; your current farm stays unchanged until you confirm." if valid else "Choose an area inside this city"
+		confirm_button.text = "Preview this location"
 	_apply_bottom_preset()
+
+func set_relocation_mode() -> void:
+	relocation_mode = true
+	set_generation_mode()
+
+func set_generation_mode() -> void:
+	generation_mode = true
+	focused_id = "map_selection"
+	set_placement_mode(true)
 
 func set_saving(active: bool, error := "") -> void:
 	confirm_button.disabled = active
 	_cancel.disabled = active
 	confirm_button.text = "Saving..." if active else "Create Farm"
+	if generation_mode: confirm_button.text = "Checking land and generating…" if active else "Generate farm here"
+	if relocation_mode: confirm_button.text = "Checking land and generating…" if active else "Preview this location"
 	if not error.is_empty():
 		_capacity.text = error
 		_capacity.add_theme_color_override("font_color", GameUi.CORAL)

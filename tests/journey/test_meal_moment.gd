@@ -8,7 +8,7 @@ func _state() -> Dictionary:
 	return {"clock": {"chapter_index": 0}, "wallet": 40, "inventory": {"produce": {"R": 2, "L": 2, "C": 2, "H": 2}, "dishes": {"tea": 1, "salad": 1}},
 		"engineering": {"reserved": {}}, "journey": {"version": 1, "facts": ["met_bistro", "shared_meal"],
 		"unlocks": ["bistro", "kitchen", "tea"], "completed": [], "wood": 0, "materials": {},
-		"exploration": {"round": 0, "collected": []}, "opportunities": {"bistro": {"sequence": 4, "variant": 1}}}}
+		"exploration": {"round": 0, "collected": []}, "opportunities": {"bistro": {"sequence": 4, "variant": 1, "accepted": true}}}}
 
 func test_failed_meal_does_not_present_success_or_change_food() -> void:
 	var initial := _state()
@@ -36,7 +36,7 @@ func test_accepted_tea_uses_delivered_recipe_even_after_request_rotates() -> voi
 	served.inventory.dishes.tea = 0
 	served.wallet += 22
 	served.journey.opportunities.bistro = {"sequence": 5, "variant": 0}
-	var transport := FakeTransport.new([{"status": 200, "json": {"version": 2, "state": served}}])
+	var transport := FakeTransport.new([{"status": 200, "json": {"version": 2, "state": served, "outcome": "applied", "events": [{"type": "opportunity_completed", "slot": "bistro"}]}}])
 	var session := FarmSession.new(ApiClient.new("https://example.test/v1", transport.callable()))
 	session.state = initial
 	session.version = 1
@@ -51,8 +51,38 @@ func test_accepted_tea_uses_delivered_recipe_even_after_request_rotates() -> voi
 	panel.meal_served.connect(func(id): results.append(id))
 	await panel._deliver_offer("bistro", JourneyProgress.offer(initial, "bistro"))
 	assert_array(results).is_equal(["table", "tea"])
-	assert_str(panel.message.text).is_equal("Tea served. +22 coins")
+	assert_str(panel.message.text).is_equal("Chamomile tea served. +22 coins")
 	assert_int(session.state.inventory.dishes.tea).is_equal(0)
+
+func test_soup_delivery_emits_the_actual_recipe_and_replay_does_not_repeat_the_reward() -> void:
+	for replay in [false, true]:
+		var initial := _state()
+		initial.inventory.dishes.vegetable_soup = 1
+		initial.journey.opportunities.bistro.variant = 2
+		var served := initial.duplicate(true)
+		served.inventory.dishes.vegetable_soup = 0
+		served.journey.opportunities.bistro = {"sequence": 5, "variant": 0, "accepted": false,
+			"last_completed": {"offer_id": "soup_for_neighbours", "resident_id": "bistro_owner", "sequence": 4, "consumed": {"vegetable_soup": 1}, "coins": 24, "effect": "picnic", "contribution": 1}}
+		var response := {"version": 2, "state": served, "outcome": "replayed" if replay else "applied", "events": [{"type": "opportunity_completed", "slot": "bistro"}]}
+		if replay: response.replayed_outcome = "applied"
+		var transport := FakeTransport.new([{"status": 200, "json": response}])
+		var session := FarmSession.new(ApiClient.new("https://example.test/v1", transport.callable()))
+		session.state = initial
+		session.version = 1
+		var panel := auto_free(JourneyActivityPanel.new()) as JourneyActivityPanel
+		panel.place_id = "bistro"
+		panel.target = "table"
+		panel.setup(session)
+		add_child(panel)
+		await get_tree().process_frame
+		var results := []
+		panel.meal_served.connect(func(dish): results.append(dish))
+		await panel._deliver_offer("bistro", JourneyProgress.offer(initial, "bistro"))
+		assert_array(results).is_equal([] if replay else ["vegetable_soup"])
+		if replay: assert_str(panel.message.text).is_equal("Delivery confirmed.")
+		else:
+			assert_str(panel.message.text).contains("rock salt")
+			assert_str(panel.message.text).contains("+24 coins")
 
 func test_resident_route_pauses_and_replans_after_player_input_without_teleporting() -> void:
 	var actor := auto_free(Node3D.new()) as Node3D

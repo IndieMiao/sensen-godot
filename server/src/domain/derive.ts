@@ -41,7 +41,7 @@ export function derive(s: FarmState, now: number, timezone: string, c: Content):
   const opens = !s.journey && prevDone && activatedDay < day && s.clock.chapter_index < lastChapter;
   const ripe: string[] = [];
   for (const [id, cell] of Object.entries(s.cells))
-    if (cell.state === 'growing' && cell.ready_at !== null && cell.ready_at <= now) ripe.push(id);
+    if (cell && cell.state === 'growing' && cell.ready_at !== null && cell.ready_at <= now) ripe.push(id);
   return {
     player_day_id: day,
     days_elapsed: elapsed,

@@ -13,9 +13,9 @@ export function isFarmLocation(value: unknown): value is FarmLocation {
 }
 
 /** Supported city bounds leave room for the template's full map footprint. */
-export function withinPlacementBounds(location: FarmLocation, bounds?: PlacementBounds): boolean {
+export function withinPlacementBounds(location: FarmLocation, bounds?: PlacementBounds, marginM = FOOTPRINT_MARGIN_M): boolean {
   if (!bounds) return false;
-  const dlat = FOOTPRINT_MARGIN_M / METERS_PER_DEGREE;
+  const dlat = marginM / METERS_PER_DEGREE;
   const dlng = dlat / Math.cos(location.lat * Math.PI / 180);
   return location.lat - dlat >= bounds[0] && location.lng - dlng >= bounds[1]
     && location.lat + dlat <= bounds[2] && location.lng + dlng <= bounds[3];

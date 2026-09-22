@@ -1,0 +1,117 @@
+{
+  "provider": "Sensenjoy OpenAI-compatible API",
+  "base_url": "https://sub.sensenjoy.cn/v1",
+  "model": "gpt-image-2",
+  "method": "imagegen bundled image_gen.py edit; user supplied reference images",
+  "secrets": "Environment only; no key stored",
+  "outputs": [
+    {
+      "file": "output/imagegen/game-ui-2026-09-21/farm-design.png",
+      "pixels": [
+        848,
+        1855
+      ],
+      "sha256": "18d52a2412e510c495835b90451832d5135a198e664a6a2a8b68834b69904377"
+    },
+    {
+      "file": "output/imagegen/game-ui-2026-09-21/bag-design.png",
+      "pixels": [
+        848,
+        1855
+      ],
+      "sha256": "e03755fb6e8b7741fc8318550d027c9d77a6b8f32893068021fe7a78ec9862ba"
+    },
+    {
+      "file": "output/imagegen/game-ui-2026-09-21/secondary-design.png",
+      "pixels": [
+        1448,
+        1086
+      ],
+      "sha256": "795d3e224c6b304b2a15fed79ff403506e1e01da858104f554f9c9699e062d4f"
+    },
+    {
+      "file": "output/imagegen/game-ui-2026-09-21/panel-raw.png",
+      "pixels": [
+        1254,
+        1254
+      ],
+      "sha256": "bb6e5a1526cc7b9b69f8f93a60defdddc07cd8aeebb1e860ec24efbea567c5fb"
+    },
+    {
+      "file": "output/imagegen/game-ui-2026-09-21/button-raw.png",
+      "pixels": [
+        1536,
+        1024
+      ],
+      "sha256": "64d46f6e642310cdc9de200f7b80f8f5e751983c05dedc31b64af8f158855797"
+    },
+    {
+      "file": "output/imagegen/game-ui-2026-09-21/city-background.png",
+      "pixels": [
+        848,
+        1855
+      ],
+      "sha256": "58265842d3d86e35c6cd7074f917ac05ecf1077f10841cc123376bbae1cc28d1"
+    }
+  ],
+  "runtime_assets": [
+    "assets/ui/game/control-teal.png",
+    "assets/ui/game/panel-frame.png",
+    "assets/ui/game/control-violet.png",
+    "assets/ui/game/button-violet.png",
+    "assets/ui/game/control-frame.png",
+    "assets/ui/game/city-background.png",
+    "assets/ui/game/button-teal.png"
+  ],
+  "processing": {
+    "panel": {
+      "raw_dimensions": [
+        1254,
+        1254
+      ],
+      "trim_bounds": [
+        131,
+        130,
+        1124,
+        1114
+      ],
+      "runtime_dimensions": [
+        256,
+        254
+      ],
+      "matte": "magenta extraction and unmix; weak-background pixels removed; only resampled, not redrawn"
+    },
+    "button": {
+      "raw_dimensions": [
+        1536,
+        1024
+      ],
+      "trim_bounds": [
+        133,
+        324,
+        1403,
+        663
+      ],
+      "runtime_dimensions": [
+        256,
+        68
+      ],
+      "matte": "magenta extraction and unmix; weak-background pixels removed; only resampled, not redrawn"
+    }
+  },
+  "compact_derivatives": {
+    "control-frame.png": [
+      128,
+      127
+    ],
+    "control-teal.png": [
+      128,
+      34
+    ],
+    "control-violet.png": [
+      128,
+      34
+    ],
+    "method": "Lanczos resampling of the generated material; small-control slice margins remain below half of its 44px touch height"
+  }
+}

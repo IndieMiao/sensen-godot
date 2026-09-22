@@ -2,8 +2,6 @@ class_name KitchenPanel
 extends SessionPanel
 
 const PENDING_META := &"pending_kitchen_command"
-const RECIPE_ORDER := ["salad", "tea"]
-const DISH_NAMES := {"salad": "Vegetable salad", "tea": "Chamomile tea"}
 const SHARED_LINES := [
 	{"speaker": "Bistro host", "line": "Look at the colours in this bowl. A carrot and a lettuce, both from your own beds."},
 	{"speaker": "Nursery keeper", "line": "I will set three places. The nursery basket can wait a moment while we share the first taste."},
@@ -36,7 +34,8 @@ func _render() -> void:
 	if not _pending.is_empty():
 		_render_pending()
 		return
-	if chapter() < 3:
+	var kitchen_open := JourneyProgress.unlocked(state(), "kitchen") if JourneyProgress.active(state()) else chapter() >= 3
+	if not kitchen_open:
 		heading(L10n.text("The kitchen opens in Chapter 4"))
 		paragraph(L10n.text("The bistro host is getting the table ready."))
 		return
@@ -50,22 +49,32 @@ func _render() -> void:
 		action("users-round", L10n.text("Set the table together"), _open_shared, true, true).name = "SharedCooking"
 	elif _shared_done():
 		paragraph(L10n.text("First meal shared with the bistro host"))
-	for id in RECIPE_ORDER:
+	var recipe_order: Array = _recipes.keys().filter(func(id): return JourneyProgress.active(state()) or _recipes[id].get("materials", {}).is_empty())
+	for id in recipe_order:
 		_render_recipe(id)
-		if id != RECIPE_ORDER.back(): content.add_child(HSeparator.new())
+		if id != recipe_order.back(): append_content(HSeparator.new())
 
 func _render_recipe(id: String) -> void:
+	section_card()
 	var recipe: Dictionary = _recipes.get(id, {})
 	var subtitle := L10n.format_text("%d prepared", _dish_count(id))
 	if _first_recipe(id): subtitle += L10n.text(" / In your journal")
 	else: subtitle += L10n.text(" / First recipe")
 	_picture_row(GameUi.dish_art(id), _dish_name(id), subtitle, 56)
+	var ingredients := HFlowContainer.new()
+	ingredients.add_theme_constant_override("h_separation", 7)
+	ingredients.add_theme_constant_override("v_separation", 7)
+	append_content(ingredients)
 	for crop in recipe.get("inputs", {}):
 		var reserved := int(state().get("engineering", {}).get("reserved", {}).get(crop, 0))
 		var label := L10n.format_text("%d available / %d needed", [available(str(crop)), int(recipe.inputs[crop])])
 		if reserved > 0: label += L10n.format_text(" / %d reserved", reserved)
-		_picture_row(GameUi.crop_art(str(crop)), CropInfo.name_of(str(crop)), label, 32)
-	var title := L10n.text("Make salad") if id == "salad" else L10n.text("Brew tea")
+		var item := ingredient_card(GameUi.crop_art(str(crop)), CropInfo.name_of(str(crop)), available(str(crop)), int(recipe.inputs[crop]))
+		item.tooltip_text = label
+		ingredients.add_child(item)
+	for item in recipe.get("materials", {}):
+		ingredients.add_child(ingredient_card(ItemCatalog.texture(str(item)), L10n.material_name(str(item)), JourneyProgress.material(state(), str(item)), int(recipe.materials[item])))
+	var title := L10n.text("Make salad") if id == "salad" else (L10n.text("Brew tea") if id == "tea" else L10n.format_text("Prepare %s", _dish_name(id)))
 	action("utensils", title, _cook.bind(id), _can_cook(id), true).name = "Cook_%s" % id
 	if chapter() >= 5 and id == "salad" and not state().get("requests_done", []).has("d5_restorer_salads"):
 		paragraph(L10n.format_text("The restorer's lunch: %d / 2 salads prepared", mini(2, _dish_count(id))))
@@ -112,11 +121,11 @@ func _render_journal() -> void:
 	meter.show_percentage = false
 	meter.max_value = 1
 	meter.value = 1.0 if level == thresholds.size() else clampf(float(total - int(thresholds[level - 1])) / float(int(thresholds[level]) - int(thresholds[level - 1])), 0.0, 1.0)
-	content.add_child(meter)
+	append_content(meter)
 	paragraph(L10n.text("Top garden level this week") if level == thresholds.size() else L10n.format_text("%d XP to level %d", [int(thresholds[level]) - total, level + 1]))
 	var levels := HBoxContainer.new()
 	levels.add_theme_constant_override("separation", 2)
-	content.add_child(levels)
+	append_content(levels)
 	for index in thresholds.size():
 		var label := GameUi.label(str(index + 1), 12, GameUi.GREEN if index < level else GameUi.MUTED)
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -124,7 +133,7 @@ func _render_journal() -> void:
 		levels.add_child(label)
 	var filters := HBoxContainer.new()
 	filters.add_theme_constant_override("separation", 2)
-	content.add_child(filters)
+	append_content(filters)
 	for filter in [["all", L10n.text("All")], ["first_harvest", "Crops"], ["first_recipe", L10n.text("Food")], ["week", L10n.text("Week")]]:
 		var button := GameUi.button("", str(filter[1]), str(filter[1]))
 		button.name = "Journal_%s" % filter[0]
@@ -154,6 +163,7 @@ func _render_journal() -> void:
 				paragraph(page)
 
 func _render_entry(entry: Dictionary) -> void:
+	section_card()
 	var kind := str(entry.get("kind", ""))
 	var key := str(entry.get("key", ""))
 	var texture: Texture2D = GameUi.icon("book-open")
@@ -192,15 +202,16 @@ func _picture_row(texture: Texture2D, title: String, detail: String, side: int) 
 	var sub := GameUi.label(detail, 12, GameUi.MUTED)
 	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.add_child(sub)
-	content.add_child(row)
+	append_content(row)
 	return row
 
 func _local_action(symbol: String, title: String, callback: Callable, accent := false) -> Button:
 	var button := GameUi.button(symbol, title, title, accent)
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.disabled = busy
 	button.pressed.connect(func():
 		if not button.disabled: callback.call())
-	content.add_child(button)
+	append_content(button)
 	return button
 
 func _cook(recipe: String) -> void:
@@ -328,9 +339,13 @@ func _load_pending() -> void:
 		_pending.clear()
 
 func _can_cook(recipe: String) -> bool:
-	if chapter() < 3 or not _recipes.has(recipe): return false
+	if not _recipes.has(recipe): return false
+	if JourneyProgress.active(state()): return JourneyProgress.recipe_ready(state(), recipe)
+	if chapter() < 3: return false
 	for crop in _recipes[recipe].get("inputs", {}):
 		if available(str(crop)) < int(_recipes[recipe].inputs[crop]): return false
+	for item in _recipes[recipe].get("materials", {}):
+		if JourneyProgress.material(state(), str(item)) < int(_recipes[recipe].materials[item]): return false
 	return true
 
 func _dish_count(recipe: String) -> int:
@@ -365,7 +380,7 @@ static func level_of(total: int, thresholds: Array) -> int:
 	return level
 
 static func _dish_name(id: String) -> String:
-	return str(DISH_NAMES.get(id, id))
+	return L10n.dish_name(id)
 
 static func _read_json(path: String) -> Dictionary:
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))

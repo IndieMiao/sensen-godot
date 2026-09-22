@@ -106,6 +106,7 @@ func test_marker_uses_non_accent_signal_color() -> void:
 	var accent := (theme.get_stylebox(&"normal", &"AccentButton") as StyleBoxFlat).bg_color
 	var marker := (theme.get_stylebox(&"normal", &"MarkerButton") as StyleBoxFlat).bg_color
 	assert_bool(marker.is_equal_approx(accent)).is_false()
-	assert_float(marker.r).is_greater(marker.g)
+	# The selected game palette uses a pale violet marker with dark text.
+	assert_float(marker.b).is_greater(marker.g)
 	assert_bool(theme.get_color(&"font_color", &"MarkerButton").is_equal_approx(
 		DesignTokens.INK)).is_true()

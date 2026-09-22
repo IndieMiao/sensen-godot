@@ -72,7 +72,7 @@ func _render_supplies() -> void:
 	action("shopping-basket", L10n.text("First basket delivered") if bought_back else L10n.format_text("Deliver %d radishes - +%d coins", [count, int(tutorial.get("coins", 30))]),
 		func(): command("submit_request", {"request_id": "d0_tutorial_buyback"}, L10n.text("First harvest delivered")),
 		not bought_back and available("R") >= count).name = "TutorialBuyback"
-	content.add_child(HSeparator.new())
+	append_content(HSeparator.new())
 	var pack: Dictionary = _economy.seedling_pack
 	var used: Array = state().get("seedling_packs", {}).get("days", [])
 	paragraph(L10n.format_text("Seedling support: %d / %d packs remaining", [maxi(0, int(pack.week_cap) - used.size()), int(pack.week_cap)]))
@@ -87,7 +87,7 @@ func _render_supplies() -> void:
 		if qty > 0: bound.append(L10n.format_text("%d %s", [qty, CropInfo.name_of(crop)]))
 	if not bound.is_empty(): paragraph(L10n.format_text("Chapter seedlings: %s\nPlant before the next chapter opens.", ", ".join(bound)))
 	if chapter() >= _unlock_chapter("kitchen"):
-		content.add_child(HSeparator.new())
+		append_content(HSeparator.new())
 		var buyback: Dictionary = _recipes.buyback
 		var history: Dictionary = state().get("buyback", {})
 		var tea := int(state().get("inventory", {}).get("dishes", {}).get(str(buyback.dish), 0))
@@ -132,7 +132,7 @@ func _render_choices() -> void:
 	var selected = _chapter_value(state().get("life_choices", {}), day)
 	var art := GameUi.picture(GameUi.crop_art(crop), 56)
 	art.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	content.add_child(art)
+	append_content(art)
 	paragraph(L10n.format_text("%s - %d available", [CropInfo.name_of(crop), available(crop)]))
 	if selected != null:
 		var labels := {"gift": L10n.text("Shared with a resident"), "keep": L10n.text("Set aside for next week"), "sold": L10n.text("Sold at the roadside stall")}
@@ -173,6 +173,7 @@ func _render_project() -> void:
 	var reserve_all := {}
 	var submit_all := {}
 	for crop in _economy.engineering_quota:
+		section_card()
 		var progress := project_status(str(crop))
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
@@ -181,16 +182,16 @@ func _render_project() -> void:
 		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(text)
-		content.add_child(row)
+		append_content(row)
 		var bar := ProgressBar.new()
 		bar.max_value = progress.quota
 		bar.value = progress.submitted
 		bar.show_percentage = false
 		bar.custom_minimum_size.y = 6
-		content.add_child(bar)
+		append_content(bar)
 		var controls := HBoxContainer.new()
 		controls.add_theme_constant_override("separation", 8)
-		content.add_child(controls)
+		append_content(controls)
 		var minus := GameUi.button("minus", "", L10n.format_text("Return 1 %s to your basket", CropInfo.name_of(str(crop))))
 		minus.name = "Withdraw_" + str(crop)
 		minus.disabled = not unlocked or busy or session == null or session.offline or int(progress.reserved) <= 0
@@ -214,7 +215,7 @@ func _render_project() -> void:
 	action("check", L10n.text("Deliver reserved materials"), func(): command("submit_engineering", {"items": submit_all}, L10n.text("Nursery materials delivered")), unlocked and not submit_all.is_empty(), true).name = "SubmitAll"
 	paragraph(L10n.text("Reserved crops stay out of sales, gifts and recipes."))
 	if chapter() >= _unlock_chapter("nursery_appearance"):
-		content.add_child(HSeparator.new())
+		append_content(HSeparator.new())
 		heading(L10n.text("Entrance style"))
 		for appearance in ["a", "b"]:
 			var selected: bool = nursery.get("appearance") == appearance
@@ -241,7 +242,7 @@ func _render_growth() -> void:
 		var chosen: bool = growth.get("intent") == choice
 		var name := L10n.text("Row tools") if choice == "tool" else L10n.text("Fourth garden bed")
 		var cost := growth_cost(choice)
-		content.add_child(HSeparator.new())
+		append_content(HSeparator.new())
 		heading(name)
 		if choice == "tool":
 			paragraph(L10n.format_text("%d coins\nTend a whole row with one touch. Each plot keeps its usual pace and yield.", cost))

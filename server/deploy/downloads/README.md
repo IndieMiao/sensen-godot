@@ -1,0 +1,75 @@
+# Journey APK 的美国下载镜像
+
+用户于 2026-09-18 反馈美国访问原 OSS 慢，要求将 APK 上传到现有 DMIT。
+已部署到 DMIT 洛杉矶主机；仅托管公开发布物，游戏 API 和存档仍使用原香港服务。
+
+- SSH 别名：`dmit-crs2ddcugh`；主机 `179.255.158.180`。
+- 域名：`download-us.sensenjoy.cn`，阿里云 DNS A 记录，TTL 600。
+- HTTPS 下载：`https://download-us.sensenjoy.cn:8443/farm/releases/` 加版本目录和文件名。
+- 系统 Caddy 服务，配置 `/etc/caddy/Caddyfile`，源码配置见同目录 [Caddyfile](Caddyfile)。
+- `/srv/sensen-downloads` 仅保存公开 APK、`release.json`、`SHA256SUMS`，关闭目录列表；每次发布使用版本与哈希组成的新目录。
+- TCP 80 用于证书 HTTP challenge 和 HTTPS 跳转；8443 用于独立 HTTPS 下载。443 及 18443 的现有 Xray、1194 的 OpenVPN 与原 nftables 规则保持。
+- Caddy 自动申请/续期证书，开机启动；支持 Range 断点续传、明确 APK MIME/附件下载与不可变缓存。
+
+## 当前版本
+
+[Journey Preview 0.16.9 / 2026092105](https://download-us.sensenjoy.cn:8443/farm/releases/shoreline-farm-20260921-9d30d59440c7/sensen-journey-shoreline-farm-0.16.9.apk)。
+[OSS 备用](https://oss.sensenjoy.cn/farm/releases/shoreline-farm-20260921-9d30d59440c7/sensen-journey-shoreline-farm-0.16.9.apk)。
+
+156414135 bytes；SHA-256 `9d30d59440c78917d0d93ae3b45598b2d29934136c8e61642cd969b0c5ad1735`。
+服务端 `shoreline-farm-20260921` 已上线，domain 27 / content `50c2dbdde04c9678` 不变。OSM 标注不足时补充 ESA WorldCover 2021 的可靠地表覆盖，原失败选址现在可生成；真实水体保留，未知区域不直接变为陆地。32 米规格、旧地形与冻结预览保持，切换前后 9 张表精确一致。836 项服务端测试及实际选址的隔离搬迁、钓鱼和矿井检查通过。
+**手机保留 0.16.8 的当前预览页面，未安装 0.16.9。** 原选址在新线上服务下预览成功，尚未发送搬迁确认；原 47 个作物格、资产、旧地形和一次选址机会保留。新 0.16.9 APK 的错误提示及水岸表现改进已在模拟器验证，原签名与无观察器状态核对通过。公开清单分别标明新包未真机安装、0.16.8 的线上预览已验证，未把预览成功当作完整搬迁验收。
+DMIT 与 OSS 的完整下载、SHA-256、Range 206、清单及校验文件均已回读通过。详见 `docs/qa/farm-generation-error-2026-09-21.md`。
+
+## 上一版 0.16.8
+
+[Journey Preview 0.16.8 / 2026092104](https://download-us.sensenjoy.cn:8443/farm/releases/compact-farm-20260921-f230b7776070/sensen-journey-compact-farm-0.16.8.apk)。
+[OSS 备用](https://oss.sensenjoy.cn/farm/releases/compact-farm-20260921-f230b7776070/sensen-journey-compact-farm-0.16.8.apk)。
+
+156413227 bytes；SHA-256 `f230b7776070301f2d92b20ae6543b615b31e1f583fb36f4d01ac8d217dcbbaa`。
+新客户端的新建农场与新选址预览使用精确 32×32 米布局（40×40 格、800mm/格、160 米真实地理选区）；旧存档和已有 v1 预览不改变。选址框采用清晰蓝色，拖动、缩放与地图保持一致。服务端 `compact-farm-20260921` 已上线，domain 27 / content `50c2dbdde04c9678` 不变，切换前后 9 张表、原始状态、地形及冻结预览逐项一致。
+同一原签名、无观察器正式 APK 已在 V2509A 和模拟器覆盖安装并核对哈希，线上切换后的冷启动登录通过；手机选址拖动、缩放和取消验证通过。原账号、47 个作物格、资产和旧地形保留，重新选址机会未使用；真机未进行搬迁确认，公开清单明确完整真机搬迁流程未验证。DMIT 与 OSS 的完整下载、SHA-256、Range 206、清单及校验文件均已回读通过。详见 `docs/qa/compact-farm-2026-09-21.md`。
+
+## 历史版本 0.16.6
+
+[Journey Preview 0.16.6 / 2026092102](https://download-us.sensenjoy.cn:8443/farm/releases/farm-relocation-20260921-d3dc5e2037fc/sensen-journey-farm-relocation-0.16.6.apk)。
+[OSS 备用](https://oss.sensenjoy.cn/farm/releases/farm-relocation-20260921-d3dc5e2037fc/sensen-journey-farm-relocation-0.16.6.apk)。
+
+156409751 bytes；SHA-256 `d3dc5e2037fcb79700926746911a92ae403fe6d15877842b303087b429b099df`。
+配套 domain 27 / content `50c2dbdde04c9678` 已上线，74 份旧农场获得一次主动重新选址机会，迁移保留原始存档、版本、身份、资产及历史记录，不自动搬迁。预览和取消不消耗机会，用户原账号的机会仍未使用。
+原签名、无观察器正式包已在模拟器验证，DMIT 与 OSS 的完整下载、SHA-256、Range 206、公开清单及校验文件均通过回读核对。用户随后连接 V2509A，**同一公开 0.16.6 APK 已覆盖安装并通过冷启动登录检查**；安装包哈希、原签名及五份身份文件一致，原账号、47 个作物格、资产和旧地形保留，重新选址机会仍未使用。
+真机截图停留在城市选择页，未进入农场，也未发送选址预览或确认请求；本次真机证据仅覆盖安装与登录，不能视为搬迁流程验收。不可变公开清单继续保留首次发布时 `physical_validation: false` 的记录，后补真机证据见 `docs/qa/farm-relocation-2026-09-21.md`。
+
+## 历史版本 0.16.5
+
+[Journey Preview 0.16.5 / 2026092101](https://download-us.sensenjoy.cn:8443/farm/releases/private-geographic-farm-20260921-79f86aaf9465/sensen-journey-geographic-farm-0.16.5.apk)。
+[OSS 备用](https://oss.sensenjoy.cn/farm/releases/private-geographic-farm-20260921-79f86aaf9465/sensen-journey-geographic-farm-0.16.5.apk)。
+
+156390062 bytes；SHA-256 `79f86aaf9465ed5b90bf0548bd398d655ca5907a855dc0e32b4363c83ab8f0d4`。
+街区与农场统一为私有农场，新建按真实地理生成，保留旧地形、作物和资产。配套 domain 26 / content `50c2dbdde04c9678` 已上线，74 份旧农场完整迁移。原签名、无观察器更新包已在 V2509A 安装并冷启动验证，两个下载站完整下载与 Range 校验通过。详见 `docs/qa/private-geographic-farm-2026-09-21.md`。
+
+## 历史版本 0.16.4
+
+[Journey Preview 0.16.4 / 2026091905](https://download-us.sensenjoy.cn:8443/farm/releases/water-detail-20260919-f6d05bc633f4/sensen-journey-water-detail-0.16.4.apk)。
+[OSS 备用](https://oss.sensenjoy.cn/farm/releases/water-detail-20260919-f6d05bc633f4/sensen-journey-water-detail-0.16.4.apk)。
+
+156355815 bytes；SHA-256 `f6d05bc633f45b315025e14f6e81cd0ec5ee81bf9c425ca08fd3bc1cc753148f`。
+农场池塘、街区湖泊/河流增加沉积石床、局部光纹、平面岸景倒影、自然岸石和植被。
+35 项 Godot 测试和模拟器钓鱼验证通过；正式包已在模拟器覆盖安装并核对 APK 哈希及原存档。
+用户随后重连 V2509A，**同一公开 0.16.4 APK 已真机安装和验证**，原身份、装备、47 个作物格及金币保留。
+不可变公共清单保留初次发布时的模拟器验证状态；后补真机证据见 QA 文档。
+保留原 Journey 包名和签名；服务端 domain 25 / content 50c2dbdde04c9678 不变。
+DMIT 与 OSS 均通过全量下载、哈希及 Range 206 校验，旧版本路径保持。
+详见 `docs/qa/water-detail-2026-09-19.md`。未经用户明确要求，不向 Joey 发送消息或 APK 链接。
+
+## 后续发布
+
+1. 构建并核对唯一 `com.sensen.journeypreview` 更新包、原签名、版本递增。
+2. 在用户目录准备临时上传目录；上传 APK、清单和 SHA256SUMS，先核对服务器哈希。
+3. 在 `/srv/sensen-downloads/farm/releases/` 创建新的版本/哈希目录，以 `.part` 写入 APK，完成后原子重命名；文件 root 所有、0644，目录 0755。不要覆盖已有版本文件，也不要上传配置、账号或备份。
+4. Caddy 的配置支持所有新版本路径；仅增加文件不需要重载服务。
+5. 从公开 HTTPS 地址完整下载并校验，验证 Range 返回 206 且字节与原包一致，再发下载链接。海外优先提供 DMIT，保留 OSS 备用。
+
+首轮部署脚本、DNS 回执、下载/Range 校验和飞书回执见
+`output/farm-composition-2026-09-18/dmit/`；原 Caddy 配置备份保存在
+`/var/backups/sensen-downloads/Caddyfile.before-farm-view-20260918`。

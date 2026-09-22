@@ -16,6 +16,7 @@ static func build(kind: String, body_color: Color) -> ArrayMesh:
 		"C_detail": _carrot_root(surface, body_color)
 		"H": _chamomile(surface)
 		"H_detail": _chamomile_flowers(surface)
+		"T": _tree(surface, body_color)
 		"weed": _weeds(surface, body_color)
 		"soil": _soil(surface, body_color)
 	surface.index()
@@ -153,3 +154,9 @@ static func _triangle(surface: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, 
 		surface.set_color(color)
 		surface.set_normal(normal)
 		surface.add_vertex(vertex)
+
+## 果树：一根树干加两层树冠。木本作物占住整格并阻挡通行，所以它明显比蔬菜高大。
+static func _tree(surface: SurfaceTool, color: Color) -> void:
+	_stem(surface, Vector3(0, -0.5, 0), Vector3(0, 0.05, 0), 0.07)
+	_oval(surface, Vector3(0.72, 0.58, 0.72), Vector3(0, 0.12, 0), color)
+	_oval(surface, Vector3(0.48, 0.40, 0.48), Vector3(0, 0.38, 0), color.lightened(0.10))

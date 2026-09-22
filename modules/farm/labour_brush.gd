@@ -5,11 +5,19 @@ extends RefCounted
 ## 纯函数（投影方式由调用方以 Callable 注入），因为真正难对的是几何而不是输入管线：
 ## 单测能直接喂一串屏幕点，不必造相机、场景树和触摸事件。
 
+## 相邻两个采样点之间最多补多少格。手指抬起再落下、或者投影掠过地平线时，
+## 前后两点可能相隔半张地图——那不是一笔划过，不该凭空刷出一长条。
+const MAX_BRIDGE := 32
+
 ## 轨迹点 → 格列表。`project.call(Vector2) -> Variant`：返回 Vector2i 命中格，
 ## 或 null 表示这一点没打到地面（射线与地平面平行/朝天）。
 ##
 ## 去重规则是「压掉**连续**重复」而不是「整条去重」：来回描同一格应当只算一次，
 ## 但 A→B→A 这种画回头路，第二次经过 A 仍是玩家的真实意图。
+##
+## 相邻采样点之间要**补格**：输入事件是离散的，手指划快一点前后两点就能差出好几格，
+## 只记录命中点会在刷过的带子上留下窟窿（真机实测 0.5m 格下一划三格里漏一格）。
+## 屏幕上的直线段反投影到地平面仍是直线，所以按格坐标线性插值就是手指真实走过的格。
 static func trace(points: PackedVector2Array, project: Callable) -> Array:
 	var out: Array = []
 	for p in points:
@@ -17,54 +25,51 @@ static func trace(points: PackedVector2Array, project: Callable) -> Array:
 		if hit == null:
 			continue
 		var cell: Vector2i = hit
-		if out.is_empty() or out[-1] != cell:
+		if out.is_empty():
 			out.append(cell)
+			continue
+		if out[-1] == cell:
+			continue
+		for mid in _bridge(out[-1], cell):
+			if out[-1] != mid:
+				out.append(mid)
+		out.append(cell)
 	return out
 
-## 只保留可耕作、且当前解锁的格；顺序不变。
-static func filter_actionable(cells: Array, bp: FarmBlueprint, beds_unlocked: int) -> Array:
-	var reserved := {}
-	for c in bp.reserved_bed().get("cells", []):
-		reserved[c] = true
+## from 与 to 之间的中间格（不含两端）。相邻或同格时没有空档，返回空。
+static func _bridge(from: Vector2i, to: Vector2i) -> Array:
+	var delta := to - from
+	var steps := maxi(absi(delta.x), absi(delta.y))
+	if steps <= 1 or steps > MAX_BRIDGE:
+		return []
+	var out: Array = []
+	for i in range(1, steps):
+		var t := float(i) / float(steps)
+		out.append(Vector2i(roundi(from.x + delta.x * t), roundi(from.y + delta.y * t)))
+	return out
+
+## 只保留地面属性允许开垦的格；顺序不变、去重。
+static func filter_actionable(cells: Array, bp: FarmBlueprint) -> Array:
 	var out: Array = []
 	var seen := {}
 	for c in cells:
 		var cell: Vector2i = c
 		if seen.has(cell) or not bp.mask_has("cultivable", cell):
 			continue
-		if reserved.has(cell) and beds_unlocked != 4:
-			continue
 		seen[cell] = true
 		out.append(cell)
 	return out
 
-## 行级工具：把命中格扩到它所在的整畦。**仍逐格播放**，不改产量也不缩短时长
-## （PRD §6.3 L408）——row_tool 只是一次手势少划两下，不是效率道具。
-static func expand_rows(cells: Array, bp: FarmBlueprint) -> Array:
-	var beds: Array = bp.beds().duplicate()
-	var rb := bp.reserved_bed()
-	if not rb.is_empty():
-		beds.append(rb)
+## 行级工具：把选中的格沿四邻加粗一圈。过去是「扩到整条田畦」，自由格子下没有畦了，
+## 加粗笔刷是同一个意图的自然表达——少划几下，不改产量也不缩短时长。
+static func thicken(cells: Array, bp: FarmBlueprint) -> Array:
 	var out: Array = []
 	var seen := {}
 	for c in cells:
-		var cell: Vector2i = c
-		var row: Array = [cell]
-		for bed in beds:
-			if (bed.get("cells", []) as Array).has(cell):
-				row = bed.cells
-				break
-		for r in row:
-			if not seen.has(r):
-				seen[r] = true
-				out.append(r)
+		for delta in [Vector2i.ZERO, Vector2i.RIGHT, Vector2i.LEFT, Vector2i.UP, Vector2i.DOWN]:
+			var cell: Vector2i = (c as Vector2i) + delta
+			if seen.has(cell) or not bp.mask_has("cultivable", cell):
+				continue
+			seen[cell] = true
+			out.append(cell)
 	return out
-
-## 屏幕点 → 地面格的投影器，交给 trace() 用。
-static func ground_projector(cam: Camera3D, bp: FarmBlueprint, world_scale := 1.0) -> Callable:
-	return func(p: Vector2):
-		var hit = Plane(Vector3.UP, 0.0).intersects_ray(
-			cam.project_ray_origin(p), cam.project_ray_normal(p))
-		if hit == null:
-			return null
-		return bp.world_to_cell(hit as Vector3, world_scale)

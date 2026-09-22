@@ -13,6 +13,7 @@ signal offline_changed(offline: bool)
 signal rejected(code: String, detail: String)
 
 const OFFLINE_AFTER_FAILURES := 2
+const TERRAIN_COMMANDS := ["till_cells", "sow_cells", "water_cells", "harvest_cells", "clear_plot", "save_decorations"]
 const PENDING_COMMANDS := [&"pending_resident_command", &"pending_kitchen_command", &"pending_economy_command", &"pending_decoration_command", &"pending_event_command", &"pending_stall_command"]
 
 var client: ApiClient
@@ -24,6 +25,10 @@ var layout_patch_id := ""
 var blueprint_revision := 0
 var region_id := ""
 var location: Dictionary = {}
+var farm_terrain: Dictionary = {}
+var relocation: Dictionary = {}
+var _pending_relocation: Dictionary = {}
+var _relocation_journal: FarmCommandJournal
 var version := -1
 var state: Dictionary = {}
 var derived: Dictionary = {}
@@ -35,6 +40,8 @@ var _server_time_ms := -1
 var _server_sample_ticks_ms := 0
 
 var last_error_code := ""
+## Transient feedback only; replayed commands and read responses never re-emit effects.
+var last_command_events: Array = []
 var _failures := 0
 ## 命令串行：上一条还没回包就发下一条，base_version 必然过期 → 409 → 重发一次 → 若第三条
 ## 又在路上就再 409 → 放弃。自动玩家跑批量清理时 9 格丢了 2 格，就是这么丢的。
@@ -55,10 +62,174 @@ func logged_in() -> bool:
 	return client != null and not client.token.is_empty()
 
 func has_unconfirmed_command() -> bool:
-	return not _unconfirmed_command.is_empty() or (_journal != null and _journal.error != OK)
+	return not _unconfirmed_command.is_empty() or relocation_pending() or (_journal != null and _journal.error != OK)
 
 func has_farm() -> bool:
 	return not farm_id.is_empty()
+
+func farm_choice() -> Dictionary:
+	var result := {"layout_patch_id": layout_patch_id, "revision": blueprint_revision, "location": location.duplicate(true)}
+	if not farm_terrain.is_empty():
+		result.farm_terrain = farm_terrain.duplicate(true)
+		result.region_id = region_id
+	return result
+
+## Missing capability metadata is deliberately unavailable on older services.
+func relocation_available() -> bool:
+	return has_farm() and bool(relocation.get("available", false)) and not bool(relocation.get("used", false))
+
+func relocation_pending() -> bool:
+	return not _pending_relocation.is_empty() or (_relocation_journal != null and _relocation_journal.error != OK)
+
+func preview_relocation(city_id: String, placement: Dictionary) -> Dictionary:
+	var ticket := _next_ticket
+	_next_ticket += 1
+	while _serving != ticket:
+		await Engine.get_main_loop().process_frame
+	var result := await _preview_relocation_serialized(city_id, placement)
+	_serving += 1
+	return result
+
+func _preview_relocation_serialized(city_id: String, placement: Dictionary) -> Dictionary:
+	last_error_code = ""
+	if not _journal_ready(): return {}
+	if has_unconfirmed_command():
+		_reject_placement("PENDING_ACTION", "Check the previous action first")
+		return {}
+	if not relocation_available():
+		_reject_placement("RELOCATION_UNAVAILABLE", "This farm cannot be relocated")
+		return {}
+	if city_id != region_id or not FarmPlacement.is_valid(placement):
+		_reject_placement("LOCATION_OUTSIDE_REGION", "Choose an area inside this city")
+		return {}
+	var request_client := _command_client_snapshot()
+	if not await _supports_current_generation(request_client): return {}
+	var response: ApiClient.Response = await request_client.request("POST", "/farms/me/relocation/preview", {
+		"generation_version": FarmPlacement.GENERATION_VERSION,
+		"region_id": city_id, "location": placement.duplicate(true)})
+	if not _track(response): return {}
+	if not response.is_success():
+		_reject_placement(str(response.json.get("code", "UNKNOWN")), str(response.json.get("message", "")))
+		return {}
+	var preview := response.json
+	if relocation_blueprint(preview, city_id) == null or str(preview.get("preview_id", "")).is_empty() \
+			or not preview.has("base_version") or not preview.has("expires_at"):
+		_reject_placement("INVALID_FARM_TERRAIN", "The farm terrain could not be verified. Retry loading it.")
+		return {}
+	return preview.duplicate(true)
+
+static func relocation_blueprint(preview: Dictionary, city_id: String) -> FarmBlueprint:
+	var terrain = preview.get("farm_terrain")
+	if not terrain is Dictionary or not terrain.get("plot") is Dictionary: return null
+	return FarmBlueprint.load_choice({"layout_patch_id": terrain.get("layout_id", ""),
+		"revision": terrain.plot.get("revision", 0), "region_id": city_id, "farm_terrain": terrain})
+
+func confirm_relocation(preview: Dictionary) -> bool:
+	var ticket := _next_ticket
+	_next_ticket += 1
+	while _serving != ticket:
+		await Engine.get_main_loop().process_frame
+	var result := await _confirm_relocation_serialized(preview)
+	_serving += 1
+	return result
+
+func _confirm_relocation_serialized(preview: Dictionary) -> bool:
+	last_error_code = ""
+	if not _journal_ready(): return false
+	if _pending_relocation.is_empty():
+		if not relocation_available(): return _reject_placement("RELOCATION_UNAVAILABLE", "This farm cannot be relocated")
+		if has_unconfirmed_command(): return _reject_placement("PENDING_ACTION", "Check the previous action first")
+		for key in PENDING_COMMANDS:
+			if has_meta(key): return _reject_placement("PENDING_ACTION", "Check the previous action first")
+		if str(preview.get("preview_id", "")).is_empty() or not preview.has("base_version"):
+			return _reject_placement("RELOCATION_EXPIRED", "Preview again before confirming")
+		_pending_relocation = {"idempotency_key": _new_key(), "base_version": int(preview.base_version),
+			"type": "relocation", "payload": {"preview_id": str(preview.preview_id)}}
+		if _relocation_journal != null and not _relocation_journal.write_command(_pending_relocation):
+			return _reject_placement("LOCAL_STORAGE", "Could not save the previous action")
+	return await _recover_relocation(_command_client_snapshot())
+
+func _recover_relocation(request_client: ApiClient) -> bool:
+	if _pending_relocation.is_empty(): return not relocation_pending()
+	var envelope := _pending_relocation.duplicate(true)
+	if _relocation_journal != null and not _relocation_journal.write_command(envelope):
+		return _reject_placement("LOCAL_STORAGE", "Could not save the previous action")
+	var payload := {"preview_id": envelope.payload.preview_id, "idempotency_key": envelope.idempotency_key,
+		"base_version": envelope.base_version}
+	var response: ApiClient.Response = await request_client.request("POST", "/farms/me/relocation/confirm", payload)
+	if not response.ok or response.status >= 500:
+		response = await request_client.request("POST", "/farms/me/relocation/confirm", payload)
+	if not _track(response): return false
+	if response.is_success():
+		if str(response.json.get("farm_id", "")) != farm_id or not str(response.json.get("layout_patch_id", "")).begins_with("geo_"):
+			return _reject_farm_geometry()
+		if not _adopt(response.json): return false
+		if not _clear_relocation_journal(): return false
+		last_error_code = ""
+		return true
+	var code := str(response.json.get("code", "UNKNOWN"))
+	# Only definitive application rejections resolve the envelope. Auth/proxy errors
+	# cannot prove that an earlier confirmation failed to commit.
+	if response.status in [409, 422] and code in ["RELOCATION_UNAVAILABLE", "RELOCATION_EXPIRED", "RELOCATION_CONFLICT", "RELOCATION_BUSY", "RELOCATION_NO_SPACE", "IDEMPOTENCY_MISMATCH"]:
+		if not _clear_relocation_journal(): return false
+	return _reject_placement(code, str(response.json.get("message", "")))
+
+func _clear_relocation_journal() -> bool:
+	if _relocation_journal != null and not _relocation_journal.clear():
+		return _reject_placement("LOCAL_STORAGE", "Could not save the previous action")
+	_pending_relocation.clear()
+	return true
+
+## Generation is capability-gated so older servers cannot silently create a template.
+func ensure_generated_farm(city_id: String, placement: Dictionary) -> bool:
+	var ticket := _next_ticket
+	_next_ticket += 1
+	while _serving != ticket:
+		await Engine.get_main_loop().process_frame
+	var result := await _ensure_generated_farm_serialized(city_id, placement)
+	_serving += 1
+	return result
+
+func _ensure_generated_farm_serialized(city_id: String, placement: Dictionary) -> bool:
+	last_command_events.clear()
+	last_error_code = ""
+	if not _journal_ready(): return false
+	var request_client := _command_client_snapshot()
+	var me: ApiClient.Response = await request_client.request("GET", "/farms/me")
+	if not _track(me):
+		last_error_code = "TRANSPORT"
+		return false
+	if me.is_success():
+		if not _adopt(me.json): return false
+		if has_unconfirmed_command(): return await _refresh_serialized(request_client)
+		return true
+	if me.status != 404:
+		last_error_code = str(me.json.get("code", "HTTP_%d" % me.status))
+		return false
+	if not FarmPlacement.is_valid(placement):
+		return _reject_placement("INVALID_LOCATION", "Choose a valid farm location")
+	if not await _supports_current_generation(request_client): return false
+	var response: ApiClient.Response = await request_client.request("POST", "/farms", {
+		"idempotency_key": _new_key(), "generation_version": FarmPlacement.GENERATION_VERSION,
+		"region_id": city_id, "location": placement.duplicate(true),
+	})
+	if not _track(response):
+		last_error_code = "TRANSPORT"
+		return false
+	if not response.is_success():
+		last_error_code = str(response.json.get("code", "UNKNOWN"))
+		rejected.emit(last_error_code, str(response.json.get("message", "")))
+		return false
+	if not str(response.json.get("layout_patch_id", "")).begins_with("geo_"):
+		return _reject_farm_geometry()
+	return _adopt(response.json)
+
+func _supports_current_generation(request_client: ApiClient) -> bool:
+	var regions: ApiClient.Response = await request_client.request("GET", "/regions")
+	if not _track(regions): return false
+	if not regions.is_success() or int(regions.json.get("farm_generation_version", 0)) < FarmPlacement.GENERATION_VERSION:
+		return _reject_placement("GENERATION_UNSUPPORTED", "This server needs the compact farm update. Try again after updating.")
+	return true
 
 ## 服务端「现在」的毫秒时间戳。
 func server_now() -> int:
@@ -77,6 +248,7 @@ func login() -> bool:
 	return result
 
 func _login_serialized() -> bool:
+	last_command_events.clear()
 	var installation_key := ApiClient.install_key()
 	var endpoint := client.base_url
 	var r: ApiClient.Response = await client.request("POST", "/auth/anonymous", {"install_key": installation_key})
@@ -112,6 +284,7 @@ func ensure_farm(region_id: String, layout_patch_id: String, revision: int, plac
 	return result
 
 func _ensure_farm_serialized(region_id: String, layout_patch_id: String, revision: int, placement: Dictionary) -> bool:
+	last_command_events.clear()
 	last_error_code = ""
 	if not _journal_ready(): return false
 	var request_client := _command_client_snapshot()
@@ -120,7 +293,7 @@ func _ensure_farm_serialized(region_id: String, layout_patch_id: String, revisio
 		last_error_code = "TRANSPORT"
 		return false
 	if me.is_success():
-		_adopt(me.json)
+		if not _adopt(me.json): return false
 		if has_unconfirmed_command(): return await _refresh_serialized(request_client)
 		return true
 	if me.status != 404:
@@ -152,13 +325,20 @@ func _ensure_farm_serialized(region_id: String, layout_patch_id: String, revisio
 		last_error_code = str(r.json.get("code", "UNKNOWN"))
 		emit_signal("rejected", last_error_code, str(r.json.get("message", "")))
 		return false
-	_adopt(r.json)
-	return true
+	return _adopt(r.json)
 
 func _reject_placement(code: String, detail: String) -> bool:
 	last_error_code = code
 	emit_signal("rejected", code, detail)
 	return false
+
+func _reject_farm_geometry() -> bool:
+	# A successful command may already be committed. Keep its old local state for
+	# display, but require a valid reload before another write can use that state.
+	if not offline:
+		offline = true
+		offline_changed.emit(true)
+	return _reject_placement("INVALID_FARM_TERRAIN", "The farm terrain could not be verified. Retry loading it.")
 
 func refresh() -> bool:
 	# 和命令走同一条串行队列：GET 与在途命令并发时，先回来的旧状态会盖掉后回来的新状态
@@ -172,19 +352,22 @@ func refresh() -> bool:
 	return result
 
 func _refresh_serialized(request_client: ApiClient = null) -> bool:
+	last_command_events.clear()
 	if not _journal_ready(request_client): return false
 	if request_client == null: request_client = _command_client_snapshot()
+	if relocation_pending() and not await _recover_relocation(request_client): return false
 	if _unconfirmed_command.is_empty():
 		if not await _read_farm(request_client): return false
 		# Startup must authenticate and identify the farm before loading its journal.
 		if not _journal_ready(request_client): return false
+		if relocation_pending() and not await _recover_relocation(request_client): return false
 		if _unconfirmed_command.is_empty(): return true
 	if not _unconfirmed_command.is_empty():
 		var replay := await _request_command(_unconfirmed_command.duplicate(true), true, request_client)
 		if not _track(replay):
 			return false
 		if _command_succeeded(replay) or str(replay.json.get("code", "")) == "VERSION_CONFLICT":
-			_adopt(replay.json)
+			if not _adopt(replay.json): return false
 	return await _read_farm(request_client)
 
 func _read_farm(request_client: ApiClient) -> bool:
@@ -193,7 +376,7 @@ func _read_farm(request_client: ApiClient) -> bool:
 		return false
 	if r.is_success():
 		last_error_code = ""
-		_adopt(r.json)
+		return _adopt(r.json)
 	else:
 		last_error_code = str(r.json.get("code", "HTTP_%d" % r.status))
 	return r.is_success()
@@ -205,14 +388,18 @@ func _read_farm(request_client: ApiClient) -> bool:
 ##   409 VERSION_CONFLICT → 用回包里的新 version **换新 key** 重发一次
 ## 两次都不成就放弃，让上层回滚预测。
 func send(type: String, payload: Dictionary, pending_owner: StringName = &"") -> bool:
+	# Geometry belongs to the input intent, before any pending request can adopt another map.
+	var intent_layout := layout_patch_id
+	var terrain_checksum := str(farm_terrain.get("plot", {}).get("checksum", "")) if type in TERRAIN_COMMANDS else ""
 	var ticket := _next_ticket
 	_next_ticket += 1
 	while _serving != ticket:
 		await Engine.get_main_loop().process_frame
+	last_command_events.clear()
 	if not _journal_ready():
 		_serving += 1
 		return false
-	if not _unconfirmed_command.is_empty():
+	if not _unconfirmed_command.is_empty() or relocation_pending():
 		_serving += 1
 		last_error_code = "PENDING_ACTION"
 		rejected.emit(last_error_code, "Check the previous command before sending another")
@@ -223,11 +410,13 @@ func send(type: String, payload: Dictionary, pending_owner: StringName = &"") ->
 			last_error_code = "PENDING_ACTION"
 			rejected.emit(last_error_code, str(key))
 			return false
-	var result: bool = await _send_serialized(type, payload)
+	var result: bool = await _send_serialized(type, payload, intent_layout, terrain_checksum)
 	_serving += 1
 	return result
 
-func _send_serialized(type: String, payload: Dictionary) -> bool:
+func _send_serialized(type: String, payload: Dictionary, intent_layout: String, terrain_checksum: String) -> bool:
+	if type in TERRAIN_COMMANDS and intent_layout != layout_patch_id:
+		return _reject_placement("FARM_RELOCATED", "This farm has moved. Reloading its new ground…")
 	if offline:
 		last_error_code = "OFFLINE"
 		emit_signal("rejected", "OFFLINE", "离线中，命令未发送")
@@ -237,26 +426,36 @@ func _send_serialized(type: String, payload: Dictionary) -> bool:
 		rejected.emit(last_error_code, "Reload your farm before sending commands")
 		return false
 	var command_client := _command_client_snapshot()
-	var r := await _request_command(_command_envelope(type, payload), false, command_client)
+	var r := await _request_command(_command_envelope(type, payload, terrain_checksum), false, command_client)
 	if not _track(r):
 		return false
 	if r.status == 409 and str(r.json.get("code", "")) == "VERSION_CONFLICT":
 		# 回包带着最新状态，先对账再用**新 key** 重发（同 key 换 base_version 会被判
 		# IDEMPOTENCY_MISMATCH）。
-		_adopt(r.json)
-		r = await _request_command(_command_envelope(type, payload), false, command_client)
+		if not _adopt(r.json): return false
+		if type in TERRAIN_COMMANDS and intent_layout != layout_patch_id:
+			return _reject_placement("FARM_RELOCATED", "This farm has moved. Reloading its new ground…")
+		r = await _request_command(_command_envelope(type, payload, terrain_checksum), false, command_client)
 		if not _track(r):
 			return false
 	if _command_succeeded(r):
 		last_error_code = ""
-		_adopt(r.json)
+		if r.json.get("outcome", "") == "applied" and r.json.get("events") is Array:
+			last_command_events = r.json.events.filter(func(event): return event is Dictionary).duplicate(true)
+		if not _adopt(r.json):
+			last_command_events.clear()
+			return false
 		return true
-	last_error_code = str(r.json.get("code", "UNKNOWN"))
+	var rejection_code := str(r.json.get("code", "UNKNOWN"))
+	if rejection_code == "FARM_RELOCATED": await _read_farm(command_client)
+	last_error_code = rejection_code
 	emit_signal("rejected", last_error_code, str(r.json.get("detail", "")))
 	return false
 
-func _command_envelope(type: String, payload: Dictionary) -> Dictionary:
-	return {"idempotency_key": _new_key(), "base_version": version, "type": type, "payload": payload.duplicate(true)}
+func _command_envelope(type: String, payload: Dictionary, terrain_checksum := "") -> Dictionary:
+	var envelope := {"idempotency_key": _new_key(), "base_version": version, "type": type, "payload": payload.duplicate(true)}
+	if not terrain_checksum.is_empty(): envelope.terrain_checksum = terrain_checksum
+	return envelope
 
 func _request_command(envelope: Dictionary, recovering := false, command_client: ApiClient = null) -> ApiClient.Response:
 	if _journal != null and not _journal.write_command(envelope):
@@ -264,10 +463,10 @@ func _request_command(envelope: Dictionary, recovering := false, command_client:
 	_unconfirmed_command = envelope.duplicate(true)
 	if command_client == null: command_client = _command_client_snapshot()
 	var uncertain := recovering
-	var r := await _post_command(command_client, str(envelope.idempotency_key), int(envelope.base_version), str(envelope.type), envelope.payload)
+	var r := await _post_command(command_client, str(envelope.idempotency_key), int(envelope.base_version), str(envelope.type), envelope.payload, str(envelope.get("terrain_checksum", "")))
 	if not r.ok:
 		uncertain = true
-		r = await _post_command(command_client, str(envelope.idempotency_key), int(envelope.base_version), str(envelope.type), envelope.payload)
+		r = await _post_command(command_client, str(envelope.idempotency_key), int(envelope.base_version), str(envelope.type), envelope.payload, str(envelope.get("terrain_checksum", "")))
 	var final_response := r.is_success() or r.status == 422 \
 		or (r.status == 409 and str(r.json.get("code", "")) == "VERSION_CONFLICT") \
 		or (r.status == 503 and str(r.json.get("code", "")) == "VERSION_MISMATCH")
@@ -298,6 +497,10 @@ func _journal_ready(request_client: ApiClient = null) -> bool:
 			rejected.emit(last_error_code, "Could not read the previous action")
 			return false
 		if not recovered.is_empty(): _unconfirmed_command = recovered
+	if _relocation_journal != null and _relocation_journal.error != OK:
+		var pending := _relocation_journal.read_command()
+		if _relocation_journal.error != OK: return _reject_placement("LOCAL_STORAGE", "Could not read the previous action")
+		if not pending.is_empty(): _pending_relocation = pending
 	return true
 
 func _restore_command_journal() -> void:
@@ -307,15 +510,22 @@ func _restore_command_journal() -> void:
 	if _journal != null and _journal.scope == journal.scope: return
 	_journal = journal
 	_unconfirmed_command = _journal.read_command()
+	_relocation_journal = FarmCommandJournal.new(_journal_directory.path_join("relocations"), _authenticated_endpoint, _installation_digest, player_id, farm_id)
+	_pending_relocation = _relocation_journal.read_command()
 
 func _reset_authenticated_farm() -> void:
+	last_command_events.clear()
 	_journal = null
+	_relocation_journal = null
+	_pending_relocation.clear()
+	relocation.clear()
 	_unconfirmed_command.clear()
 	farm_id = ""
 	layout_patch_id = ""
 	blueprint_revision = 0
 	region_id = ""
 	location.clear()
+	farm_terrain.clear()
 	version = -1
 	state = {}
 	derived = {}
@@ -325,10 +535,10 @@ func _reset_authenticated_farm() -> void:
 static func _command_succeeded(response: ApiClient.Response) -> bool:
 	return response.is_success() and str(response.json.get("replayed_outcome", "")) != "rejected"
 
-func _post_command(command_client: ApiClient, key: String, base: int, type: String, payload: Dictionary) -> ApiClient.Response:
-	return await command_client.request("POST", "/farms/me/commands", {
-		"idempotency_key": key, "base_version": base, "type": type, "payload": payload,
-	})
+func _post_command(command_client: ApiClient, key: String, base: int, type: String, payload: Dictionary, terrain_checksum := "") -> ApiClient.Response:
+	var envelope := {"idempotency_key": key, "base_version": base, "type": type, "payload": payload}
+	if not terrain_checksum.is_empty(): envelope.terrain_checksum = terrain_checksum
+	return await command_client.request("POST", "/farms/me/commands", envelope)
 
 ## 记录传输层成败并维护离线态。返回 false 表示这次连响应都没拿到。
 func _track(r: ApiClient.Response) -> bool:
@@ -350,10 +560,18 @@ func _track(r: ApiClient.Response) -> bool:
 	return false
 
 ## 用回包整体覆盖本地状态。**不做 diff 合并**：漂移一律以服务端为准（方案 §3 D4）。
-func _adopt(body: Dictionary) -> void:
+func _adopt(body: Dictionary) -> bool:
+	# Validate immutable geography before changing identity, version, clock or state.
+	# Partial command fixtures without farm metadata keep their established geometry.
+	var supplied_layout := str(body.get("layout_patch_id", layout_patch_id if body.has("farm_id") else ""))
+	if supplied_layout.begins_with("geo_") or body.has("farm_terrain"):
+		if not body.get("farm_terrain") is Dictionary or body.farm_terrain.is_empty() \
+			or str(body.get("farm_id", "")).is_empty() or not body.has("layout_patch_id") or not body.has("blueprint_revision") \
+			or FarmBlueprint.load_choice(body) == null:
+			return _reject_farm_geometry()
 	# 版本只增不减：比手上还旧的回包（并发 GET、迟到的重试）一律丢弃，否则状态倒退。
 	if body.has("version") and int(body.version) < version:
-		return
+		return true
 	if body.has("server_time"):
 		_server_time_ms = int(body.server_time)
 		_server_sample_ticks_ms = Time.get_ticks_msec()
@@ -361,6 +579,8 @@ func _adopt(body: Dictionary) -> void:
 	if body.has("farm_id"):
 		farm_id = str(body.farm_id)
 		location = body.get("location", {}).duplicate() if FarmPlacement.is_valid(body.get("location")) else {}
+		farm_terrain = body.farm_terrain.duplicate(true) if body.get("farm_terrain") is Dictionary else {}
+		relocation = body.relocation.duplicate(true) if body.get("relocation") is Dictionary else {}
 		_restore_command_journal()
 	if body.has("layout_patch_id"):
 		layout_patch_id = str(body.layout_patch_id)
@@ -374,6 +594,7 @@ func _adopt(body: Dictionary) -> void:
 		state = body.state
 		derived = body.derived if body.get("derived") is Dictionary else {}
 		emit_signal("state_changed", state, version)
+	return true
 
 func _new_key() -> String:
 	return Crypto.new().generate_random_bytes(16).hex_encode()

@@ -2,7 +2,19 @@
 
 街角四季的权威状态服务。数值逻辑全部在这里，客户端不算钱（方案 D4）。
 
+当前线上服务：`shoreline-farm-20260921`，domain `27` / content `50c2dbdde04c9678`；最新下载客户端为 Journey 0.16.9。OSM 陆地标注不足时，补充 ESA WorldCover 2021 地表覆盖数据，保留真实水体，不把未知区域当作土地。32×32 米布局、旧 v1/v2 地形和冻结预览保持兼容，无领域或数据迁移。836 项服务端测试通过；原失败选址、47 格真实存档的隔离副本搬迁、钓鱼和矿井验证通过，628 个原水体格全部保留。
+
+手机继续运行 0.16.8：同一原选址已通过线上预览，当前页面保留，尚未确认搬迁；原账号、47 个作物格、资产、旧地形及选址机会保持。0.16.9 改善错误提示与水岸表现，原签名、无观察器 APK 已在模拟器验证并完成两站完整下载、哈希与 Range 核对；为保留当前预览，**未在手机安装 0.16.9**。见[发布与验证记录](../docs/qa/farm-generation-error-2026-09-21.md)。
+
+多人服务使用同源 `/v1/online` WebSocket，默认启用。生产入口通过 PostgreSQL 会话锁保证
+同一数据库只有一个实时进程；HTTP 副本可设置 `REALTIME_ENABLED=0`，反向代理将该路径
+固定送至实时进程。现有 Caddy `reverse_proxy` 支持 WebSocket；不可将多个独立房间进程随机负载均衡。
+新增 `online_rooms`、`online_players`、`online_parties` 表由启动迁移创建，不重写旧农场存档。
+协议、容量、恢复及测试命令见[多人架构](../docs/architecture/online-spaces.md)。
+
 ## 本地开发
+
+Journey 钓鱼首版使用领域版本 `23`，结构版本仍为 `1`。domain 22 → 23 保留存档 JSON 与历史命令，钓鱼会话在首次主动抛竿时建立；见[钓鱼发布与真机验证](../docs/qa/fishing-2026-09-18.md)。存档内容版本不一致会拒绝写入，不能仅以 GET 或健康检查成功判断可玩。用 `tools/migrate_domain.ts` 先 dry-run，指定精确旧内容指纹，再于备份和停止旧 writer 后 apply；旧作物、成熟时间和历史命令保留。见[完整闭环、迁移与线上发布](../docs/qa/free-farm-online-2026-09-17.md)。本文下方带旧版本号的章节保留为历史说明。
 
 数据库跑在局域网测试机 devserver（`192.168.124.53`）的容器里，本机不装 Docker 也不装
 PostgreSQL。
@@ -14,7 +26,7 @@ ssh zhangshaojie@192.168.124.53 'cd ~/pg16-farm && echo "POSTGRES_PASSWORD=$(ope
 
 cp .env.example .env      # 填 DATABASE_URL / TEST_DATABASE_URL / TOKEN_PEPPER
 pnpm install              # 在仓库根跑，workspace 会带上 blueprint-core
-pnpm test                 # 154 个用例；没有 TEST_DATABASE_URL 时 DB 套件跳过
+pnpm test                 # 当前 836 个用例；没有 TEST_DATABASE_URL 时 DB 套件跳过
 pnpm typecheck
 ```
 
@@ -24,11 +36,32 @@ pnpm typecheck
 ## 跑起来
 
 ```bash
-node --experimental-strip-types src/index.ts     # 需要 DATABASE_URL 与 TOKEN_PEPPER
+pnpm exec tsx src/index.ts     # 需要 DATABASE_URL 与 TOKEN_PEPPER
 curl localhost:3000/v1/healthz
 ```
 
 启动时会校验全部在架蓝图，任一不过直接退出——不带病上线。
+
+## 矿井战斗（领域版本 19）
+
+共享数值位于 `mining.json`、`character.json` 和 `items.json`。
+`mine_combat` 使用 `{run, floor, sequence, targets, hurt_by?}`，目标 ID 为本层的
+`slime_1..3`；客户端上报命中，服务端从装备和怪物配置结算伤害、真实时钟攻击间隔、
+全局受击保护、怪物生命、材料掉落及救援。客户端不指定伤害或奖励数量。
+场景位置、AI 和命中几何使用客户端 Godot 导航；当前是单人战斗，不能当作联网动作防作弊方案。
+
+新增独立 `weapon` 槽。首次入矿补发一次旧短剑，旧档已在矿中时也会投影补齐；
+背包 ID 分配器与序号单调推进，原工具与所有物品保留。
+角色保存 `hp`，穿脱装备只改变派生上限、不回血；`rest_character` 只在矿外恢复。
+`use_bag_item` 同时支持料理回血，有效加成存在时不刷新次数。
+怪物掉落属于自动奖励，可在满包时进入暂存；普通岩石保持原有满包回滚。
+
+显式迁移接受领域 `1..18 -> 19`，原始存档和历史命令结果不重写。
+旧档已清楼层不追补怪物，电梯解锁永久保留。规则和技术边界见
+[战斗规则](../docs/product/mine-combat-2026-09-15.md)。
+独立数据库回归：`node server/tools/test_combat_isolated.mjs`（仓库根目录）。
+模拟器人工夹具：在 `server` 目录运行 `pnpm exec tsx tools/prepare_combat_qa.ts materials|full|restore`，
+该工具只操作固定的战斗测试库、要求恰好一个普通农场，并在每次写入前备份完整行。
 
 ## 自由选址（SGODOT-37）
 
@@ -94,10 +127,151 @@ apply 在一个事务内先取得 `farms` 的 EXCLUSIVE 写入屏障，再按 ID
 `TEST_DATABASE_URL`，数据库名须包含独立的 `test` 或 `migration` 段；
 该套件会清理测试表，不能传入运行中的服务数据库。
 
+## 居民委托（SGODOT-114，领域版本 18）
+
+沿用 `journey.opportunities` 三个槽和原六个变体顺序，每份定义补充稳定 `id`、
+`resident_id`、需求原因 `description` 与完成回应 `reply`。新增蔬菜汤、铜矿石和铜箍木箱需求。
+原 `wood/produce/dishes` 字段保持兼容，增加 `materials/props`，内部规范化为物品 ID 与数量；
+永久装备与不可制作的摆件不能作为交付物。多份委托可以贡献同一种现有街边成果。
+
+每槽保存 `accepted`，独立于唯一的 `tracked_opportunity`：
+
+| 命令，均需 `slot/sequence` | 行为 |
+| --- | --- |
+| `accept_opportunity` | 接取并追踪；不推进序号，不收费；重复接取拒绝 |
+| `track_journey_opportunity` | `tracking:true` 兼容接取并追踪；`false` 只取消地图追踪，保留已接委托 |
+| `abandon_opportunity` | 清除接取与本次追踪，序号加一，保留同一变体，不扣物或金币 |
+| `decline_opportunity` | 换至下一份已解锁需求，清接取与本次追踪，序号加一 |
+| `fulfill_opportunity` | 必须已接取；完整扣料并发金币、推进街边成果，清本次接取与追踪，序号加一 |
+
+所有操作共用可用条件；小馆始终需要首次共同用餐 `shared_meal`。
+`decline_opportunity` 可选 `timber_only:true` 仅用于修缮师，直接换成已有纯木料工作，
+使缺钱恢复不依赖矿坑或作物。已是纯木料时拒绝且保留接取，错误类型或其他人物的定向换单拒绝。
+正常委托交付不增加友情点，不消耗 113 料理效果次数；手作品交付推进工作台序号。
+最近完成结果保存在槽内 `last_completed:{offer_id,resident_id,sequence,consumed,coins,effect,contribution}`，
+其中 `contribution` 是该成果完成后的阶段总数，封顶后仍按配方支付金币。
+成功事件 `opportunity_completed` 包含同一结果及 `slot`；GET 可恢复结果，历史请求重放不重新结算。
+
+显式迁移接受领域 `1..17` 到 `18`，只更新领域/内容版本列。
+有效旧追踪在投影时成为已接委托；旧序号不能被当作完成数、关系奖励或成果证据。
+17 版背包、装备、料理效果、矿坑与历史响应保持原样。
+测试入口 `node tools/test_requests_isolated.mjs` 固定使用
+`sensen_farm_journey_requests_test_20260914`。
+模拟器夹具 `FARM_ID=<uuid> pnpm exec tsx tools/prepare_requests_qa.ts materials|shortage`
+只访问 `sensen_farm_journey_requests_emulator_20260914`，先备份完整农场行，再递增版本。
+夹具中的原料、解锁和指定需求均为人工开发条件，不是自然玩家成果。
+
+## 人物属性与装备（SGODOT-113，领域版本 17）
+
+共享规则位于 `assets/farm/data/character.json`，装备与料理仍来自统一 `items.json`。
+基础属性为农具范围 `1`、采集加成 `0`、采矿加成 `0`、制作节省 `0`，整畦工具保留范围 `3`。
+`bag.equipped` 增加 `accessory` 位，装备和料理属性相加，属性总值不写入存档。
+铜镐在工具位使每块矿石多得一份石料，采集手套在配件位增加一份采集主材料，工匠围裙
+在配件位节省一份工作台基础材料。三件装备在工作台修好后以材料制作，每种最多拥有一件，
+制作后进入背包，不自动换装，不可丢弃。成本、加成和料理次数以共享配置为准。
+
+沙拉、矿盐蔬菜汤、花草茶分别增强随后三次有效采集、采矿和工作台制作。`state.character`
+保存 `{version:1,buffs:[{id,source_item_id,remaining_uses}]}`；同种效果未结束时拒绝重复食用，
+不同效果可以并存。采集主材料按数量最大选择，同数按木料、石料、芦苇顺序；只作用于
+`collect_resource`，不作用于设施、发现点或农田收获。矿坑只增加石料，矿物抽签保持原哈希。
+工作台节省先应用装备、再应用茶，按木料、石料、芦苇逐份减少，每项最低保留一份，
+铜矿石和岩盐不打折；茶只有额外贡献时才扣一次。首次花箱、重复手作与装备制作都适用，
+料理和工程建设不适用。所有效果次数与成本、产物、世界状态在同一事务里成功或回滚。
+
+新增主人命令 `use_bag_item {stack_id,sequence}` 和 `craft_equipment {item_id,sequence}`。
+`unequip_bag_item` 新增可选 `slot:tool/accessory`，缺省仍卸下工具。
+成功命令返回顶层 `events`，制作事件包含 `actual_saved` 材料数量，普通 GET 不重发事件；
+幂等重放返回该次历史状态和事件，不能再次扣料或扣效果次数。新增错误为
+`EFFECT_ACTIVE`、`EQUIPMENT_OWNED`，沿用满包、序号与材料错误。
+
+显式迁移接受领域 `1..16` 到 `17`，只更新领域/内容版本列，旧命令与存档原文保留。
+旧背包缺少配件位时补空位，旧人物状态补空效果，不发放新装备、不导入过期汇总。
+本轮隔离回归使用 `node tools/test_character_isolated.mjs`，固定数据库
+`sensen_farm_journey_character_test_20260914`，不会操作运行中的试玩数据库。
+
+## 统一背包（SGODOT-112，领域版本 16）
+
+`assets/farm/data/items.json` 为双方共用的物品目录。背包初始 24 格，种子、作物、材料与矿物
+每堆最多 99，料理与摆件每堆最多 20；工具是数量为 1 的独立实例。基础工具和整行工具
+共用一个装备位，装备位不占格。首次购买整行工具自动装备，旧工具进入背包；之后可显式换装。
+
+`state.bag` 是库存权威，包含 `version`、`sequence`、`capacity`、`next_id`、`slots`、
+`overflow` 和 `equipped.tool`。每堆具有稳定 `id`、`item_id`、`quantity`、`quality`，
+种子保留 `seed_lot`，工具保留 `instance_id`。品质、种子来源或实例属性不同不会合堆。
+旧的 `inventory`、`journey.wood/materials/workshop.stock`、`tools.row_tool` 是兼容汇总；
+其中 `row_tool` 表示拥有，不表示当前装备。工程预留是已有产物的标签，不另计一份物品。
+
+所有普通获取、消费与制作在 reducer 中先整笔扣料再尝试装入产出。满包返回 `BAG_FULL`，
+不会消耗成本、破坏矿石、收获作物或提前领取奖励。纯消费仍可在满包时进行，优先消耗暂存物品。
+旧存档与自动章节奖励超出容量时进入 `overflow`，保留全部数量；可整理、消费或领取回空格。
+
+背包命令通过已有主人命令端点提交，并要求当前 `sequence`：
+
+| 命令 | 其他字段 |
+| --- | --- |
+| `split_bag_stack` | `stack_id`, `quantity` |
+| `merge_bag_stacks` | `source_id`, `target_id`，目标填满后保留来源余量 |
+| `sort_bag` | `mode: category/name` |
+| `discard_bag_stack` | `stack_id`, `quantity`，保护工具和工程预留产物 |
+| `equip_bag_item` | `stack_id` |
+| `unequip_bag_item` | 无，背包满时拒绝 |
+| `claim_bag_overflow` | `stack_id`，只领取可装下的部分 |
+
+背包改变后序号增加，过期操作返回 `BAG_CHANGED`；HTTP 幂等重放仍返回原结果。
+旅程模式的首次花箱进入背包，庭院 `save_decorations` 新增扣物、移除返物，移动旋转不扣物。
+旧旅程的免费庭院道具按解锁权限转换为一次持有权：已摆放者留在场景，未摆放者进入背包，
+原工作台库存额外完整保留。非旅程模式沿用历史免费庭院规则，开始旅程时再转换。
+
+显式迁移接受领域 `1..15` 到 `16`，只更新领域/内容版本列，保留结构版本 `1` 与历史命令。
+缺少背包的状态在主人投影中确定性转换，首次成功命令持久保存；已有背包不会再导入旧汇总。
+部署时先记录旧内容哈希，再按下节命令传 `--previous-content-version` 预览并应用。
+本地隔离验证可运行 `node tools/test_inventory_isolated.mjs`，仅使用固定的背包测试数据库。
+
+## 新手矿坑（领域版本 15）
+
+普通新农场直接开放五层矿坑，每层六块矿石。共享配置为
+`assets/farm/data/mining.json`；每块固定获得一份石料，并按配置权重额外获得铜矿石、
+岩盐或无额外材料。掉落由服务端农场 ID、探矿轮次、楼层和矿石 ID 确定，重试、
+改变挖掘顺序、离开重进不会重新抽取。没有战斗、体力或现实时间刷新要求。
+
+主人首次 `enter_mine {run: 0}` 才建立可选的 `state.mine`，不会在读取旧存档时写入。
+`floor: 0` 表示农场，`1..5` 表示矿层；`broken` 按楼层字符串保存已挖矿石，
+`cleared_floors` 保存本轮完成楼层。`mine_rock {run, floor, node_id}` 必须在当前楼层，
+`descend_mine {run, floor}` 要求挖完本层全部矿石，`ascend_mine {run, floor}` 可返回上一层。
+`leave_mine {run, floor}` 回农场并保留进度；再次进入从第一层开始。
+
+第五层全部挖完后永久开放电梯，`use_mine_elevator {run, floor}` 仅在第一层和第五层互通。
+完成第五层且已回农场后，`restart_mine {run}` 才能显式开始下一轮；保留全部库存与电梯，
+增加 `run` 并清空矿石和本轮楼层完成记录。所有命令还需现有的 `base_version`、
+`idempotency_key`，过期轮次、重复矿石与非法楼层被拒绝。矿坑进度和掉落不出现在访客快照中。
+客户端在全部五层已完成后的下一次访问，自动顺序调用 `restart_mine` 和 `enter_mine`。
+部分完成时仍进入原轮；只完成第五层时可从第一层的明确按钮主动重开。
+这是客户端流程衔接，未改变读取接口、命令载荷或存档格式。
+
+铜矿石和岩盐保存在可选的 `journey.materials.copper_ore/rock_salt`，旧存档缺失值按零读取。
+铜箍木箱复用工作台制作、库存及设施陈列：消耗 2 木料、3 铜矿石和 1 石料。
+岩盐蔬菜汤复用厨房与摊位：消耗 1 萝卜、1 生菜和 1 岩盐，售价 16 金币。
+扣料与产出原子结算，不改旧配方、存量物品或历史命令结果。
+
+该次版本的显式迁移接受领域版本 `1..14` 到 `15`；当前目标版本见“统一背包”。保持结构版本 `1`，只更新农场的领域版本和
+内容版本。先记录旧服务 `/v1/healthz` 的 `content_version`，用新内容运行预览：
+
+```bash
+# 在 server/ 下运行，MIGRATION_DATABASE_URL 指向明确要升级的数据库。
+pnpm exec tsx tools/migrate_domain.ts --previous-content-version "$PREVIOUS_CONTENT_VERSION"
+pnpm exec tsx tools/migrate_domain.ts --previous-content-version "$PREVIOUS_CONTENT_VERSION" --apply
+```
+
+预览有 `blocked` 时先解决版本来源，不改写状态绕过检查。普通服务启动不会自动执行规则迁移。
+旧幂等键仍可返回历史结果；未迁移农场的新命令继续返回 `VERSION_MISMATCH`。
+验证入口为 `test/domain/mining.test.ts`、`test/db/store_conformance.test.ts` 与
+`test/db/domain_migration.test.ts`，数据库套件须使用独立测试库。
+
 ## 庭院摆件存档（SGODOT-45）
 
 `save_decorations` 通过既有命令端点原子替换整份庭院布置。仅完成工具或扩地购买后开放，
-六件摆件免费，每种最多一件；空列表表示全部收起。命令仍受版本、幂等和主人身份校验保护。
+历史非旅程模式的六件摆件免费，每种最多一件；旅程模式现在使用统一背包扣返，见上文。
+空列表表示全部收起。命令仍受版本、幂等和主人身份校验保护。
 
 ```json
 {
@@ -233,3 +407,37 @@ app 容器重建后再按即生效；480x = 3 分钟走完一个玩家日。白�
 `pm clear` 之后是新玩家，要重新加。
 
 检查清单在 Plane SGODOT-33。
+
+### Private geographic farms (domain 26, deployed 2026-09-21)
+
+`GET /v1/regions` advertises `farm_generation_version: 1` and a 240 m geographic sample. New clients create with `POST /v1/farms` and `{generation_version:1, region_id, location:{lat,lng}, idempotency_key}`. The server retrieves OSM geometry, rejects unsupported locations, and freezes a 48 m / 64×64 / 0.75 m terrain in `farms.farm_terrain`. Existing creation payloads and farms retain their original ground layout. Domain 25 migration updates version columns without rewriting state JSON.
+
+`GEOGRAPHY_OVERPASS_URL` optionally configures the Overpass interpreter endpoint (default `https://overpass-api.de/api/interpreter`). Fetches have a 30 second deadline and 8 MiB response cap. Tests inject `AppDeps.geographyProvider`; production does not substitute synthetic terrain when the provider fails. Duplicate creation requests serialize on the owner, and a completed creation replays without contacting the provider.
+
+Generation uses tagged land cover, closed water/desert polygons (including enclosing polygons and multipolygon holes), and roads. Unknown land remains blocked. A site needs at least 1,024 connected cells of positively identified habitable land before fitting facilities; the final spawn must connect to the pond shore and mine approach and at least 128 tillable cells. The fixed home and pond preserve existing fishing/facility geometry. If that fitting would cover more than 128 source water cells, creation is rejected. These are generation constraints, not claims that OSM is complete: sparse coverage returns `GEOGRAPHY_UNAVAILABLE`, including unmapped offshore areas. No road/water absence is treated as evidence of land.
+
+All ordinary realtime joins use a private `farm:<farm-id>:<channel>` space. Legacy `street` joins normalize to that farm and require the same owner/visitor permission. Visitor terrain carries local geometry and checksum but omits geographic source coordinates and OSM feature references. Owner terrain supplies full provenance. The generated checksum also includes ground kinds and anchors; legacy checksums are unchanged.
+
+Checks: `node tools/test_geography_isolated.mjs` runs the server suite against a separate PostgreSQL test database; `pnpm typecheck` checks TypeScript. Real-source acceptance artifacts are stored under `output/private-geographic-farm-2026-09-21/geo/`; `tests/fixtures/generated_farm_terrain.json` is explicitly synthetic test data. The user-authorized public deployment on 2026-09-21 preserves all 74 existing farm states; release and device evidence is recorded in the linked QA document.
+
+### Voluntary legacy farm relocation (domain 27)
+
+The explicit domain migration grants one relocation to existing farms whose `farm_terrain` is null. Reads and new farm creation never grant or consume it. Domain 25/26 farm state JSON, identity, ownership and command history remain unchanged during migration.
+
+Owner DTOs include `relocation: { available, used }`. The owner may call `POST /v1/farms/me/relocation/preview` with `{ region_id, location: { lat, lng } }` in the farm's existing city. The server freezes verified real geographic terrain in a private draft, valid for 30 minutes, and returns `preview_id`, `base_version`, `expires_at`, `farm_terrain`, `location`, `moved_cells`, and `moved_decorations`. Previewing or cancelling changes neither gameplay state nor the opportunity.
+
+`POST /v1/farms/me/relocation/confirm` accepts `{ preview_id, base_version, idempotency_key }`. Under the farm row lock it replays known requests first, checks the current version and opportunity, rejects active fishing/mining, relocates conflicting crop/decoration coordinates, and atomically commits the new terrain plus one-use consumption and command receipt. The same farm ID, original crop records/deadlines, all non-position state and decoration rotations survive. Placement checks footprints and reachable land, including dynamic woody/prop obstruction; insufficient space fails without losing ownership. Confirm retries return the current owner DTO. Realtime casts/travel and room invalidation share a transition lock; visitors must refresh after a confirmed move. Visitor snapshots build from the farm row locked in the same order as confirmation, preventing stale geometry from being re-cached.
+
+Errors include `RELOCATION_UNAVAILABLE`, `RELOCATION_EXPIRED`, `RELOCATION_CONFLICT`, `RELOCATION_BUSY`, and `RELOCATION_NO_SPACE`, plus the existing geography and idempotency errors. New previews after a rejected confirmation must use a fresh confirmation idempotency key. Run `node server/tools/test_relocation_isolated.mjs` from the repository root for the complete server suite against the dedicated relocation test database.
+
+After a farm has moved, new `till_cells`, `sow_cells`, `water_cells`, `harvest_cells`, `clear_plot` and `save_decorations` envelopes must carry `terrain_checksum` matching the persisted terrain plot checksum. Clients freeze this optional field when the player queues the spatial edit and retain it through retries, journal recovery and version rebasing. A missing/old checksum returns HTTP 422 `FARM_RELOCATED` without changing state, clock or version. Idempotent historical replay precedes this guard. Optional checksum fields participate in the payload hash and new receipt metadata; envelopes without the field keep their historical hashes. Farms that have never moved retain the previous command compatibility.
+
+The OSM provider reuses successfully parsed real responses for five minutes in a private eight-entry LRU cache, keyed by the exact latitude/longitude/extent. Identical concurrent requests share the same network request; every caller receives its own deep clone. Failed or expired responses are never substituted as usable geography. The unconfigured default tries `overpass-api.de` then `overpass.kumi.systems` within one overall 30-second fetch/body-read budget. An explicit `endpoint` option or `GEOGRAPHY_OVERPASS_URL` disables fallback. Optional internal `onDiagnostic` callbacks receive only endpoint index, failure category and HTTP status, without locations, queries or endpoint credentials.
+
+### Compact generation 2 (new farms and voluntary relocation only)
+
+Generation 2 creates an exact **32×32m** farm with **40×40 cells at 800mm** from a **160×160m** real source window. Avatar and asset sizes stay unchanged. Its homestead coordinates move by `(-4,-8)` cells, and its outer cliffs fit the smaller boundary. Legacy layouts and all persisted generation 1 geometry retain their original 64×64 cells at 750mm / 48m world / 240m source; no existing farm is resized or re-generated.
+
+`GET /v1/regions` advertises `farm_generation_version: 2`, `farm_geography_extent_m: 160` and `farm_generations` entries with `generation_version`, `grid`, `cell_mm`, `play_area_m`, and `geography_extent_m`. New clients send `generation_version: 2` on creation and relocation preview. Version 1 requests remain supported, and relocation preview requests that omit the field retain version 1 semantics. Confirmation always commits the exact frozen preview, including a saved version 1 preview resumed after an update.
+
+Pond bounds are derived from the joined host farm's verified water ellipse, and supplied through trusted realtime fishing presence. An owner or visitor casts, hooks and settles against that host pond; rewards still go to the acting player's own bag. Legacy pond geometry and fishing probabilities remain unchanged. Relocation preserves all cell records, mature timestamps and holdings; a valid dense legacy farm that cannot fit is rejected with `RELOCATION_NO_SPACE` before spending its opportunity.

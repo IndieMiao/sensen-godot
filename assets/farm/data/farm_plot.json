@@ -1,0 +1,437 @@
+{
+  "_source": "SGODOT-128 自由格子种田。农场内部的地面属性来源。",
+  "_scope": "与 assets/blueprints/ 的地理蓝图无关：那边继续负责街道折线、地图叠加、选城与 checksum，本文件只管农场里那块地。",
+  "_rasterize": "All cells start at default_kind; later regions overwrite earlier ones. rect=[i0,j0,w,h]; ellipse=[center_i,center_j,radius_i,radius_j]; path=[[cell_i,cell_j],...] uses 8 Catmull-Rom subdivisions per span, width in cell units.",
+  "_axes": "i 向东、j 向北。cell_to_world: x=(i+0.5)*cell_m, z=-(j+0.5)*cell_m。",
+  "format": 1,
+  "default_layout": "homestead_a",
+  "_kinds_note": "kind → 属性的映射固定在两端代码里（server/src/domain/plot.ts 与 modules/farm/farm_plot.gd）；这里列出可用值供校验与阅读。",
+  "kinds": {
+    "soil": {
+      "till": true,
+      "place": true,
+      "walk": true
+    },
+    "path": {
+      "till": false,
+      "place": true,
+      "walk": true
+    },
+    "lawn": {
+      "till": false,
+      "place": true,
+      "walk": true
+    },
+    "water": {
+      "till": false,
+      "place": false,
+      "walk": false
+    },
+    "building": {
+      "till": false,
+      "place": false,
+      "walk": false
+    },
+    "rock": {
+      "till": false,
+      "place": false,
+      "walk": false
+    }
+  },
+  "layouts": {
+    "homestead_a": {
+      "revision": 2,
+      "name": "Homestead",
+      "grid": [
+        64,
+        64
+      ],
+      "cell_mm": 750,
+      "default_kind": "soil",
+      "anchors": {
+        "spawn": [
+          28,
+          35
+        ],
+        "exit": [
+          26,
+          4
+        ],
+        "stall": [
+          31,
+          32
+        ],
+        "house": [
+          28,
+          38
+        ],
+        "storage": [
+          26,
+          32
+        ],
+        "well": [
+          31,
+          35
+        ],
+        "mine": [
+          25,
+          36
+        ]
+      },
+      "_regions_note": "Rectangles, ellipses and sampled Catmull-Rom paths share one authoritative cell mask. Artwork uses the same shapes at higher resolution.",
+      "regions": [
+        {
+          "id": "north_cliff",
+          "kind": "rock",
+          "path": [
+            [
+              0,
+              61
+            ],
+            [
+              12,
+              62.5
+            ],
+            [
+              24,
+              61
+            ],
+            [
+              36,
+              63
+            ],
+            [
+              50,
+              61
+            ],
+            [
+              64,
+              62
+            ]
+          ],
+          "width": 14
+        },
+        {
+          "id": "east_cliff",
+          "kind": "rock",
+          "path": [
+            [
+              64,
+              20
+            ],
+            [
+              62,
+              27
+            ],
+            [
+              63.5,
+              36
+            ],
+            [
+              61.9,
+              45
+            ],
+            [
+              64,
+              54
+            ]
+          ],
+          "width": 8
+        },
+        {
+          "id": "west_cliff",
+          "kind": "rock",
+          "path": [
+            [
+              -1,
+              20
+            ],
+            [
+              1.2,
+              26
+            ],
+            [
+              0.5,
+              34
+            ],
+            [
+              1.8,
+              43
+            ],
+            [
+              0,
+              54
+            ]
+          ],
+          "width": 8
+        },
+        {
+          "id": "pond",
+          "kind": "water",
+          "ellipse": [
+            12,
+            41,
+            4.8,
+            3.1
+          ]
+        },
+        {
+          "id": "homestead_yard",
+          "kind": "lawn",
+          "ellipse": [
+            28,
+            39,
+            5.2,
+            3.6
+          ]
+        },
+        {
+          "id": "mine_yard",
+          "kind": "lawn",
+          "ellipse": [
+            25,
+            36,
+            1.4,
+            1.35
+          ]
+        },
+        {
+          "id": "well_yard",
+          "kind": "lawn",
+          "ellipse": [
+            31,
+            35,
+            1.15,
+            1.05
+          ]
+        },
+        {
+          "id": "storage_yard",
+          "kind": "lawn",
+          "ellipse": [
+            26,
+            32,
+            1.05,
+            0.85
+          ]
+        },
+        {
+          "id": "main_path",
+          "kind": "path",
+          "path": [
+            [
+              31,
+              1
+            ],
+            [
+              32,
+              9
+            ],
+            [
+              30.5,
+              19
+            ],
+            [
+              31.2,
+              27
+            ],
+            [
+              30,
+              32
+            ],
+            [
+              29.4,
+              35
+            ],
+            [
+              28,
+              36.4
+            ]
+          ],
+          "width": 1
+        },
+        {
+          "id": "mine_spur",
+          "kind": "path",
+          "path": [
+            [
+              25,
+              34
+            ],
+            [
+              25.8,
+              34.1
+            ],
+            [
+              26.6,
+              35.4
+            ],
+            [
+              28,
+              36.4
+            ]
+          ],
+          "width": 0.8
+        },
+        {
+          "id": "well_spur",
+          "kind": "path",
+          "path": [
+            [
+              28,
+              36.4
+            ],
+            [
+              29.5,
+              36.1
+            ],
+            [
+              30.1,
+              35.2
+            ],
+            [
+              31,
+              34
+            ]
+          ],
+          "width": 0.8
+        },
+        {
+          "id": "storage_spur",
+          "kind": "path",
+          "path": [
+            [
+              26,
+              31
+            ],
+            [
+              27.2,
+              31.4
+            ],
+            [
+              28.3,
+              32.4
+            ],
+            [
+              30,
+              32
+            ]
+          ],
+          "width": 0.8
+        },
+        {
+          "id": "house",
+          "kind": "building",
+          "rect": [
+            27,
+            37,
+            4,
+            3
+          ]
+        },
+        {
+          "id": "storage",
+          "kind": "building",
+          "rect": [
+            26,
+            32,
+            1,
+            1
+          ]
+        },
+        {
+          "id": "well",
+          "kind": "building",
+          "rect": [
+            31,
+            35,
+            1,
+            1
+          ]
+        },
+        {
+          "id": "mine_mouth",
+          "kind": "rock",
+          "ellipse": [
+            25,
+            36.2,
+            1,
+            1.1
+          ]
+        },
+        {
+          "id": "tree_west",
+          "kind": "rock",
+          "ellipse": [
+            24.2,
+            40.5,
+            0.65,
+            0.65
+          ]
+        },
+        {
+          "id": "tree_north_west",
+          "kind": "rock",
+          "ellipse": [
+            26,
+            42,
+            0.65,
+            0.65
+          ]
+        },
+        {
+          "id": "tree_north_east",
+          "kind": "rock",
+          "ellipse": [
+            30,
+            42.1,
+            0.65,
+            0.65
+          ]
+        },
+        {
+          "id": "tree_east",
+          "kind": "rock",
+          "ellipse": [
+            32.2,
+            40.5,
+            0.65,
+            0.65
+          ]
+        },
+        {
+          "id": "tree_back_west",
+          "kind": "rock",
+          "ellipse": [
+            22,
+            44,
+            0.65,
+            0.65
+          ]
+        },
+        {
+          "id": "tree_back_east",
+          "kind": "rock",
+          "ellipse": [
+            34,
+            44,
+            0.65,
+            0.65
+          ]
+        },
+        {
+          "id": "back_fence",
+          "kind": "rock",
+          "rect": [
+            26,
+            41,
+            6,
+            1
+          ]
+        }
+      ],
+      "checksum": "13e324021b1024a6cb496d8a5ecd2807318c3206f881be8974001549632e8911",
+      "ground_texture": "res://assets/farm/art/homestead_ground.png"
+    }
+  }
+}

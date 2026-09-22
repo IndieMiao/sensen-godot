@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { DAY_MS, MAX_SCALE, effectiveNow, initialQa, normalizeQa, reanchor } from '../../src/domain/qa.js';
 import { derive } from '../../src/domain/derive.js';
-import { at, blueprint, content, freshFarm, run, SH, T0 } from './helpers.js';
+import { at, BEDS, content, freshFarm, run, SH, T0 } from './helpers.js';
 
 describe('QA 时钟', () => {
   it('正式农场是恒等变换', () => {
@@ -122,10 +122,10 @@ describe('验收：三分钟走完一日', () => {
     const set = run(s, { type: 'qa_set_clock', scale: 60 } as never, T0);
     expect(set.ok).toBe(true);
     if (!set.ok) return;
-    const cells = { ...set.state.cells };
-    const id = Object.keys(cells)[0];
-    cells[id] = { ...cells[id], state: 'growing', crop: 'R',
-      care_done_at: T0, ready_at: T0 + 4 * 3600_000 };
+    // 开局一格未开垦：直接放一格生长中的作物进去。
+    const id = BEDS[0]!;
+    const cells = { ...set.state.cells,
+      [id]: { state: 'growing' as const, crop: 'R' as const, watered_at: T0, ready_at: T0 + 4 * 3600_000 } };
     const withCrop = { ...set.state, cells };
     expect(derive(withCrop, T0 + 3 * 3600_000, SH, content).ripe_cells).toHaveLength(0);
     expect(derive(withCrop, T0 + 4 * 3600_000, SH, content).ripe_cells).toEqual([id]);

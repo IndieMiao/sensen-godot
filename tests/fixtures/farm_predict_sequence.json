@@ -1,736 +1,183 @@
 {
-  "cultivable": [
-    "1,1",
-    "2,1",
-    "3,1",
-    "1,2",
-    "2,2",
-    "3,2",
-    "1,3",
-    "2,3",
-    "3,3",
-    "5,1",
-    "6,1",
-    "7,1"
-  ],
-  "reserved": [
-    "5,1",
-    "6,1",
-    "7,1"
-  ],
-  "cells0": {
-    "1,1": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
+ "_source": "由 server 的真实归约器导出（server/test/domain/export_predict_fixture.test.ts）。",
+ "_contract": "客户端 CellPredictor 必须逐字复现这里的每一格状态；荒地表示为 null。",
+ "cultivable": [
+  "0,0",
+  "1,0",
+  "2,0",
+  "3,0",
+  "4,0",
+  "5,0",
+  "6,0",
+  "7,0",
+  "8,0",
+  "9,0",
+  "10,0",
+  "11,0",
+  "12,0",
+  "13,0",
+  "14,0",
+  "15,0",
+  "16,0",
+  "17,0",
+  "18,0",
+  "19,0",
+  "20,0",
+  "21,0",
+  "22,0",
+  "23,0"
+ ],
+ "cells0": {},
+ "steps": [
+  {
+   "name": "till",
+   "type": "till_cells",
+   "now": 1788487200000,
+   "cell_ids": [
+    "0,0",
+    "1,0",
+    "2,0",
+    "3,0"
+   ],
+   "cells": {
+    "0,0": {
+     "state": "tilled",
+     "crop": null,
+     "watered_at": null,
+     "ready_at": null
     },
-    "2,1": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
+    "1,0": {
+     "state": "tilled",
+     "crop": null,
+     "watered_at": null,
+     "ready_at": null
     },
-    "3,1": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
+    "2,0": {
+     "state": "tilled",
+     "crop": null,
+     "watered_at": null,
+     "ready_at": null
     },
-    "1,2": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
-    },
-    "2,2": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
-    },
-    "3,2": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
-    },
-    "1,3": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
-    },
-    "2,3": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
-    },
-    "3,3": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
-    },
-    "5,1": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
-    },
-    "6,1": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
-    },
-    "7,1": {
-      "state": "wild",
-      "crop": null,
-      "care_weather": null,
-      "care_done_at": null,
-      "ready_at": null,
-      "careful": false,
-      "tutorial": false
+    "3,0": {
+     "state": "tilled",
+     "crop": null,
+     "watered_at": null,
+     "ready_at": null
     }
+   }
   },
-  "field_condition": "sunny",
-  "care_kind": "water",
-  "crop": "R",
-  "steps": [
-    {
-      "name": "clear",
-      "type": "clear_cells",
-      "cell_ids": [
-        "1,1",
-        "2,1",
-        "3,1"
-      ],
-      "now": 1788487200000,
-      "cells": {
-        "1,1": {
-          "state": "cleared",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,1": {
-          "state": "cleared",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,1": {
-          "state": "cleared",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "1,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "1,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "5,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "6,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "7,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        }
-      }
+  {
+   "name": "sow",
+   "type": "sow_cells",
+   "now": 1788487200000,
+   "cell_ids": [
+    "0,0",
+    "1,0",
+    "2,0",
+    "3,0"
+   ],
+   "crop": "R",
+   "lot": "bound",
+   "cells": {
+    "0,0": {
+     "state": "sown",
+     "crop": "R",
+     "watered_at": null,
+     "ready_at": null
     },
-    {
-      "name": "till",
-      "type": "till_cells",
-      "cell_ids": [
-        "1,1",
-        "2,1",
-        "3,1"
-      ],
-      "now": 1788487200000,
-      "cells": {
-        "1,1": {
-          "state": "tilled",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,1": {
-          "state": "tilled",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,1": {
-          "state": "tilled",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "1,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "1,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "5,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "6,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "7,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        }
-      }
+    "1,0": {
+     "state": "sown",
+     "crop": "R",
+     "watered_at": null,
+     "ready_at": null
     },
-    {
-      "name": "sow",
-      "type": "sow_cells",
-      "cell_ids": [
-        "1,1",
-        "2,1",
-        "3,1"
-      ],
-      "now": 1788487200000,
-      "cells": {
-        "1,1": {
-          "state": "sown",
-          "crop": "R",
-          "care_weather": "sunny",
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": true
-        },
-        "2,1": {
-          "state": "sown",
-          "crop": "R",
-          "care_weather": "sunny",
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": true
-        },
-        "3,1": {
-          "state": "sown",
-          "crop": "R",
-          "care_weather": "sunny",
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": true
-        },
-        "1,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "1,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "5,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "6,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "7,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        }
-      }
+    "2,0": {
+     "state": "sown",
+     "crop": "R",
+     "watered_at": null,
+     "ready_at": null
     },
-    {
-      "name": "care",
-      "type": "apply_care",
-      "cell_ids": [
-        "1,1",
-        "2,1",
-        "3,1"
-      ],
-      "now": 1788487200000,
-      "cells": {
-        "1,1": {
-          "state": "growing",
-          "crop": "R",
-          "care_weather": "sunny",
-          "care_done_at": 1788487200000,
-          "ready_at": 1788487380000,
-          "careful": false,
-          "tutorial": true
-        },
-        "2,1": {
-          "state": "growing",
-          "crop": "R",
-          "care_weather": "sunny",
-          "care_done_at": 1788487200000,
-          "ready_at": 1788487380000,
-          "careful": false,
-          "tutorial": true
-        },
-        "3,1": {
-          "state": "growing",
-          "crop": "R",
-          "care_weather": "sunny",
-          "care_done_at": 1788487200000,
-          "ready_at": 1788487380000,
-          "careful": false,
-          "tutorial": true
-        },
-        "1,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "1,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "5,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "6,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "7,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        }
-      }
-    },
-    {
-      "name": "harvest",
-      "type": "harvest_cells",
-      "cell_ids": [
-        "1,1",
-        "2,1",
-        "3,1"
-      ],
-      "now": 1788487800000,
-      "cells": {
-        "1,1": {
-          "state": "tilled",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,1": {
-          "state": "tilled",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,1": {
-          "state": "tilled",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "1,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,2": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "1,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "2,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "3,3": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "5,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "6,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        },
-        "7,1": {
-          "state": "wild",
-          "crop": null,
-          "care_weather": null,
-          "care_done_at": null,
-          "ready_at": null,
-          "careful": false,
-          "tutorial": false
-        }
-      }
+    "3,0": {
+     "state": "sown",
+     "crop": "R",
+     "watered_at": null,
+     "ready_at": null
     }
-  ]
+   }
+  },
+  {
+   "name": "water",
+   "type": "water_cells",
+   "now": 1788487200000,
+   "cell_ids": [
+    "0,0",
+    "1,0",
+    "2,0",
+    "3,0"
+   ],
+   "cells": {
+    "0,0": {
+     "state": "growing",
+     "crop": "R",
+     "watered_at": 1788487200000,
+     "ready_at": 1788501600000
+    },
+    "1,0": {
+     "state": "growing",
+     "crop": "R",
+     "watered_at": 1788487200000,
+     "ready_at": 1788501600000
+    },
+    "2,0": {
+     "state": "growing",
+     "crop": "R",
+     "watered_at": 1788487200000,
+     "ready_at": 1788501600000
+    },
+    "3,0": {
+     "state": "growing",
+     "crop": "R",
+     "watered_at": 1788487200000,
+     "ready_at": 1788501600000
+    }
+   }
+  },
+  {
+   "name": "harvest",
+   "type": "harvest_cells",
+   "now": 1788501600000,
+   "cell_ids": [
+    "0,0",
+    "1,0",
+    "2,0",
+    "3,0"
+   ],
+   "cells": {
+    "0,0": {
+     "state": "tilled",
+     "crop": null,
+     "watered_at": null,
+     "ready_at": null
+    },
+    "1,0": {
+     "state": "tilled",
+     "crop": null,
+     "watered_at": null,
+     "ready_at": null
+    },
+    "2,0": {
+     "state": "tilled",
+     "crop": null,
+     "watered_at": null,
+     "ready_at": null
+    },
+    "3,0": {
+     "state": "tilled",
+     "crop": null,
+     "watered_at": null,
+     "ready_at": null
+    }
+   }
+  }
+ ]
 }

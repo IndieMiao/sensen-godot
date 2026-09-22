@@ -210,3 +210,17 @@ func test_android_native_pinch_scales_once_and_keeps_zoom_inertia() -> void:
 	controller.end(1, Vector2(230, 340))
 	controller.step(0.05, camera)
 	assert_float(controller.zoom).is_greater(1.2)
+
+func test_free_pan_has_no_radius_spring_and_cancel_keeps_the_view() -> void:
+	var camera := _camera()
+	var controller := ScenePan.new()
+	controller.free_pan = true
+	var end := _swipe(controller, camera, Vector2(240, 120))
+	assert_float(controller.offset.length()).is_greater(controller.radius + ScenePan.PAN_ELASTIC)
+	controller.end(0, end)
+	_settle(controller, camera)
+	assert_float(controller.offset.length()).is_greater(controller.radius + ScenePan.PAN_ELASTIC)
+	var settled: Vector3 = controller.offset
+	controller.cancel()
+	assert_vector(controller.offset).is_equal(settled)
+	assert_bool(controller.moving()).is_false()

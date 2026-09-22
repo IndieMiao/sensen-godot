@@ -48,13 +48,13 @@ func test_manual_seed_selection_overrides_exploration_and_project_crop_recommend
 	assert_int(manual.cells.size()).is_equal(2)
 	assert_str(st.journey.tracked_project).is_equal("terrace")
 
-func test_manual_seed_selection_keeps_harvest_and_care_priority() -> void:
+func test_manual_seed_selection_keeps_harvest_and_water_priority() -> void:
 	var st := _state()
 	var cells := {"a": {"crop": "C", "state": "growing", "ready_at": 1000},
 		"b": {"crop": "R", "state": "sown"}, "c": {"state": "tilled"}}
 	assert_str(NextStep.bulk(cells, 1000, st, "H", CropInfo.ORDER, true).action).is_equal("harvest")
 	cells.erase("a")
-	assert_str(NextStep.bulk(cells, 1000, st, "H", CropInfo.ORDER, true).action).is_equal("care")
+	assert_str(NextStep.bulk(cells, 1000, st, "H", CropInfo.ORDER, true).action).is_equal("water")
 	cells.erase("b")
 	assert_str(NextStep.bulk(cells, 1000, st, "H", CropInfo.ORDER, true).crop).is_equal("H")
 
@@ -153,7 +153,7 @@ func test_ready_or_uncared_chamomile_keeps_priority_over_refreshing_the_nursery(
 	st.cells = {"0,0": {"crop": "H", "state": "growing", "ready_at": 1000}}
 	assert_str(JourneyProgress.tracked_goal(st, 1000).action).is_equal("harvest")
 	st.cells["0,0"].state = "sown"
-	assert_str(JourneyProgress.tracked_goal(st, 1000).action).is_equal("care")
+	assert_str(JourneyProgress.tracked_goal(st, 1000).action).is_equal("water")
 
 func test_unavailable_and_complete_projects_are_not_trackable_client_goals() -> void:
 	var st := _state()

@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { resourceNodes, startJourney } from '../../src/domain/journey.js';
 import { stageOf } from '../../src/domain/handlers/residents.js';
 import type { Command } from '../../src/domain/commands.js';
-import { content, freshFarm, run, T0 } from './helpers.js';
+import { content, editInventory, freshFarm, run, T0 } from './helpers.js';
+import { ensureBag } from '../../src/domain/bag.js';
 
 function player() {
   let state = startJourney(freshFarm(), content);
@@ -55,9 +56,12 @@ describe('Journey continuation', () => {
 
   it('makes repeat crafts, unlocks a recipe, conserves displayed stock and rejects stale commands', () => {
     const p = player();
+    ensureBag(p.state, content);
     p.state.journey!.facts.push('workbench', 'planter_crafted', 'side_path', 'project_seedbeds_0', 'project_seedbeds_1');
-    p.state.journey!.wood = 20;
-    p.state.journey!.materials = { stone: 20, fiber: 20 };
+    editInventory(p.state, draft => {
+      draft.journey!.wood = 20;
+      draft.journey!.materials = { stone: 20, fiber: 20 };
+    });
     expect(run(p.state, { type: 'craft_journey_item', item: 'fountain', sequence: 0 }).ok).toBe(false);
     for (const sequence of [0, 1]) p.act({ type: 'craft_journey_item', item: 'planter', sequence });
     p.act({ type: 'craft_journey_item', item: 'lantern', sequence: 2 });
@@ -85,6 +89,7 @@ describe('Journey continuation', () => {
 
   it('cannot craft, deliver or display resources that are not owned', () => {
     const p = player();
+    ensureBag(p.state, content);
     p.state.journey!.facts.push('workbench', 'planter_crafted', 'project_seedbeds_0', 'project_seedbeds_1');
     for (const command of [
       { type: 'craft_journey_item', item: 'planter', sequence: 0 },
@@ -100,7 +105,7 @@ describe('Journey continuation', () => {
     p.state.journey!.facts.push('workbench', 'planter_crafted', 'shared_meal', 'project_seedbeds_1', 'project_terrace_1', 'crafted_lantern');
     p.state.journey!.wood = 5;
     p.state.journey!.materials = { stone: 3, fiber: 3 };
-    p.state.inventory.produce = { R: 3, L: 3, C: 3, H: 3 };
+    p.state.inventory.produce = { R: 3, L: 3, C: 3, H: 3, T: 0 };
     p.state.inventory.dishes.tea = 2;
     if (resident === 'bistro_owner') p.state.residents[resident].points = 25;
     p.act({ type: 'talk_to_resident', resident_id: resident });

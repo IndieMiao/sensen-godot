@@ -13,6 +13,10 @@ import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import java.util.Locale
+import org.json.JSONArray
+import org.json.JSONObject
+import com.mapbox.bindgen.Value
+import com.mapbox.maps.SourceQueryOptions
 import com.mapbox.common.MapboxOptions
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
@@ -61,6 +65,9 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     private var mapView: MapView? = null
     private var mapLocale: Locale = Locale.SIMPLIFIED_CHINESE
     private var mapSceneVisible = true
+    private var cityStyle = false
+    private var styleIsReady = false
+    private val originalCityProperties = mutableMapOf<Pair<String, String>, Value>()
     @Volatile private var mainLoopStarted = false
     private var renderPausedEarly = false
 
@@ -92,6 +99,7 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
 
     override fun getPluginSignals() = setOf(
         SignalInfo("map_ready"),
+        SignalInfo("pois_received", Long::class.javaObjectType, String::class.java),
         SignalInfo(
             "location_update",
             Double::class.javaObjectType,
@@ -168,7 +176,9 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
                     .build()
             )
             mv.mapboxMap.loadStyle(Style.MAPBOX_STREETS) { style ->
+                styleIsReady = true
                 style.localizeLabels(mapLocale)
+                applyCityStyle(style)
                 Log.i(TAG, "style loaded")
                 emitSignal("map_ready")
             }
@@ -189,6 +199,94 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         runOnUiThread {
             mapLocale = mapLabelLocale(language)
             mapView?.mapboxMap?.getStyle { style -> style.localizeLabels(mapLocale) }
+        }
+    }
+
+    @UsedByGodot
+    fun setCityStyle(enabled: Boolean) {
+        runOnUiThread {
+            cityStyle = enabled
+
+            mapView?.mapboxMap?.getStyle { applyCityStyle(it) }
+        }
+    }
+
+    private fun applyCityStyle(style: Style) {
+        if (!cityStyle) {
+            originalCityProperties.forEach { (key, value) -> style.setStyleLayerProperty(key.first, key.second, value) }
+            originalCityProperties.clear()
+            return
+        }
+        fun set(id: String, property: String, value: String) {
+            val key = id to property
+            if (!originalCityProperties.containsKey(key)) {
+                originalCityProperties[key] = style.getStyleLayerProperty(id, property).value
+            }
+            style.setStyleLayerProperty(id, property, Value(value))
+        }
+        for (layer in style.styleLayers) {
+            val id = layer.id
+            when {
+                id == "land" -> set(id, "background-color", "#f4f1e7")
+                id == "water" -> set(id, "fill-color", "#a3dcea")
+                id == "water-shadow" -> set(id, "fill-color", "#8ec4d0")
+                id == "waterway" -> set(id, "line-color", "#a3dcea")
+                id == "landuse" || id == "national-park" -> set(id, "fill-color", "#d4e5c8")
+                id == "landcover" -> set(id, "fill-color", "#e1ebd8")
+                id == "building" -> set(id, "fill-color", "#e6e1d4")
+                layer.type == "line" && (id.startsWith("road-") || id.startsWith("bridge-")) && !id.contains("rail") ->
+                    set(id, "line-color", if (id.endsWith("case")) "#e3d8c5" else if (id.contains("motorway")) "#ead2af" else "#fffdf7")
+                id == "poi-label" || id.contains("road-number") || id.contains("airport-label") || id.contains("transit-label") || id.contains("settlement-subdivision") -> set(id, "visibility", "none")
+                layer.type == "symbol" -> {
+                    set(id, "text-color", "#77877c")
+                    set(id, "text-halo-color", "#faf8f0")
+                    val key = id to "text-size"
+                    if (!originalCityProperties.containsKey(key)) originalCityProperties[key] = style.getStyleLayerProperty(id,"text-size").value
+                    style.setStyleLayerProperty(id, "text-size", Value(11.0))
+                }
+            }
+        }
+    }
+
+    /** Read only loaded vector tiles. No persistent Search Box cache or user-location query. */
+    @UsedByGodot
+    fun queryCityPois(requestId: Long) {
+        runOnUiThread {
+            val mv = mapView
+            if (mv == null || !styleIsReady) {
+                emitSignal("pois_received", requestId, "{\"features\":[],\"error\":\"loading\"}")
+                return@runOnUiThread
+            }
+            mv.mapboxMap.querySourceFeatures("composite", SourceQueryOptions(listOf("poi_label"), Value(true))) { result ->
+                if (result.isError) {
+                    Log.w(TAG, "POI query: ${result.error}")
+                    emitSignal("pois_received", requestId, "{\"features\":[],\"error\":\"unavailable\"}")
+                } else {
+                    val rows = JSONArray()
+                    val seen = HashSet<String>()
+                    val center = mv.mapboxMap.cameraState.center
+                    val features = result.value.orEmpty().map { it.queriedFeature.feature }
+                        .filter { it.geometry() is Point }
+                        .sortedBy { val p = it.geometry() as Point; kotlin.math.abs(p.latitude() - center.latitude()) + kotlin.math.abs(p.longitude() - center.longitude()) }
+                    for (f in features) {
+                        val point = f.geometry() as Point
+                        val pixel = mv.mapboxMap.pixelForCoordinate(point)
+                        if (pixel.x < 0 || pixel.y < 0 || pixel.x > mv.width || pixel.y > mv.height) continue
+                        val props = f.properties() ?: continue
+                        fun field(key: String): String = props.get(key)?.takeUnless { it.isJsonNull }?.asString.orEmpty()
+                        val name = field(if (mapLocale.language == "en") "name_en" else "name_zh-Hans").ifBlank { field("name") }
+                        if (name.isBlank()) continue
+                        val id = "tile:" + (f.id() ?: (name + ":" + point.longitude() + ":" + point.latitude()))
+                        if (!seen.add(id)) continue
+                        rows.put(JSONObject().put("id", id).put("name", name).put("lat", point.latitude()).put("lng", point.longitude())
+                            .put("maki", field("maki")).put("class", field("class"))
+                            .put("category", field(if (mapLocale.language == "en") "category_en" else "category_zh-Hans"))
+                            .put("rank", field("filterrank").toDoubleOrNull() ?: 5.0))
+                        if (rows.length() >= 100) break
+                    }
+                    emitSignal("pois_received", requestId, JSONObject().put("features", rows).toString())
+                }
+            }
         }
     }
 

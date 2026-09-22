@@ -1,0 +1,12 @@
+Use case: stylized-concept
+Asset type: one production generic park-category sprite for a mobile Los Angeles map.
+Primary request: create one isolated small grassy pocket park miniature in the softly rounded pastel matte toy style of the supplied user-approved map scenery crop.
+Input images: Image 1 is only a style, greenery, lighting and path-color reference from the approved map. Build a new compact park asset; do not reproduce the map, terrain outside its base, or any other elements from the reference.
+Subject: a welcoming little neighborhood pocket park on one low mint-green landscaped base. Two mature rounded broadleaf trees and one slender mature California palm shade fresh grass. A cream gently winding pedestrian path crosses the park. Add one small warm light-wood bench beside the path and one modest flower patch with soft pastel flowers. Every tree, bench, path and flower is contained on the same compact base.
+Style/medium: premium softly rounded matte 3D miniature, gentle ambient occlusion, restrained clean detail, airy pastel colors. Match the dimensional greenery and landforms of the approved map. Readable park silhouette at small map-marker scale.
+Composition/framing: elevated three-quarter isometric view, complete single low rounded landscaped island visible, all tree crowns and ground included. Center composition; leave at least 12 percent empty margin on every side. Show path and bench clearly between the trees. Base has only a slim softly rounded edge, no tall raised plinth.
+Lighting/mood: soft neutral daylight from upper left, quiet inviting mood, shading contained on the object.
+Color palette: gentle pale mint and sage grass, fresh muted greens on tree crowns, warm cream paths, warm light wood bench, a few soft pink and yellow flowers; restrained and harmonious.
+Scene/backdrop: perfectly flat solid vivid magenta chroma-key background, RGB 255 0 255. No background gradient, vignette, floor or cast shadow. No magenta reflections or magenta materials on the subject.
+Text: none.
+Constraints: one complete isolated park asset only, with full base within frame. No buildings, houses, people, animals, UI, roads, map lines, labels, lettering, signs, symbols, watermarks, selection rings, glow or floating detached pieces. Avoid realistic photography, glossy plastic, heavy outlines, dense forest, excessive flowers, enormous bench, sharp rocky terrain and clipped branches.

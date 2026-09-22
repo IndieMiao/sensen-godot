@@ -1,8 +1,11 @@
 import type { Command } from './commands.js';
-import type { Content, CropId, DishId, JourneyMaterial, JourneyProjectStage } from './content.js';
+import { craftingMaterials, gatheringMaterials, spendCharacterBuff, gatherSeconds, gatheringReady, resourceKind } from './character.js';
+import { DISH_IDS, type Content, type CropId, type DishId, type JourneyMaterial, type JourneyProjectStage } from './content.js';
 import { err, ok, type Result } from './errors.js';
 import type { Ctx } from './reducer.js';
 import type { FarmState, JourneyState } from './state.js';
+import { importLegacyCourtyardStock, reconcileBagChanges } from './bag.js';
+import { applyOpportunities, reconcileOpportunities } from './opportunities.js';
 
 export const hasFact = (s: FarmState, fact: string): boolean => s.journey?.facts.includes(fact) ?? false;
 export const canUse = (s: FarmState, capability: string, legacyChapter: number): boolean =>
@@ -13,7 +16,7 @@ export function journeyContent(s: FarmState, content: Content): Content {
   const crops = structuredClone(content.crops);
   for (const id of ['R', 'L', 'C', 'H'] as const) Object.assign(crops.crops[id], content.journey.crops[id]);
   const recipes = structuredClone(content.recipes);
-  for (const id of ['salad', 'tea'] as const) recipes.recipes[id].stall_price = content.journey.dish_prices[id];
+  for (const id of DISH_IDS) recipes.recipes[id].stall_price = content.journey.dish_prices[id];
   return { ...content, crops, recipes };
 }
 
@@ -31,7 +34,13 @@ export function startJourney(s: FarmState, content: Content): FarmState {
   if (s.tools.row_tool || s.beds_unlocked === 4) next.journey.unlocks.push('growth', 'decorations');
   if (s.residents.bistro_owner.shared_event_done && s.xp.first_recipes.includes('salad'))
     next.journey.facts.push('shared_meal');
-  return reconcileJourney(next, content);
+  // An already-upgraded legacy bag still owns its old free courtyard palette when starting the journey.
+  if (s.bag) importLegacyCourtyardStock(next);
+  const reconciled = reconcileJourney(next, content);
+  if (!s.bag) return reconciled;
+  const inventory = reconcileBagChanges(s, reconciled, content, true);
+  if (!inventory.ok) throw new Error(`Journey inventory migration failed: ${inventory.code}`);
+  return inventory.state;
 }
 
 export function reconcileJourney(s: FarmState, content: Content): FarmState {
@@ -54,6 +63,7 @@ export function reconcileJourney(s: FarmState, content: Content): FarmState {
   }
   if (j.completed.includes('garden')) next.nursery.stage = 'built';
   else if (hasFact(next, 'side_path') && next.nursery.stage === 'derelict') next.nursery.stage = 'cleared';
+  reconcileOpportunities(next, content);
   return next;
 }
 
@@ -78,8 +88,8 @@ export function projectStage(s: FarmState, id: string, content: Content): number
   return project.stages.filter((_, index) => hasFact(s, `project_${id}_${index}`)).length;
 }
 
-function materialCount(s: FarmState, id: JourneyMaterial): number {
-  return id === 'wood' ? s.journey!.wood : s.journey!.materials?.[id] ?? 0;
+export function materialCount(s: FarmState, id: JourneyMaterial): number {
+  return id === 'wood' ? s.journey?.wood ?? 0 : s.journey?.materials?.[id] ?? 0;
 }
 
 function clearDisplayPlan(j: JourneyState): void {
@@ -95,21 +105,26 @@ function payStage(s: FarmState, cost: JourneyProjectStage): Result<FarmState> {
     if (s.inventory.produce[id as CropId] - (s.engineering.reserved[id as CropId] ?? 0) < qty!)
       return err('INSUFFICIENT_ITEMS', id);
   for (const [id, qty] of Object.entries(cost.dishes))
-    if (s.inventory.dishes[id as DishId] < qty!) return err('INSUFFICIENT_ITEMS', id);
+    if ((s.inventory.dishes[id as DishId] ?? 0) < qty!) return err('INSUFFICIENT_ITEMS', id);
   for (const [id, qty] of Object.entries(cost.materials)) {
     if (id === 'wood') s.journey!.wood -= qty!;
-    else s.journey!.materials![id as 'stone' | 'fiber'] -= qty!;
+    else {
+      const material = id as Exclude<JourneyMaterial, 'wood'>;
+      s.journey!.materials![material] = (s.journey!.materials![material] ?? 0) - qty!;
+    }
   }
   for (const [id, qty] of Object.entries(cost.produce)) s.inventory.produce[id as CropId] -= qty!;
-  for (const [id, qty] of Object.entries(cost.dishes)) s.inventory.dishes[id as DishId] -= qty!;
+  for (const [id, qty] of Object.entries(cost.dishes)) s.inventory.dishes[id as DishId] = (s.inventory.dishes[id as DishId] ?? 0) - qty!;
   return ok(s);
 }
 
 export function applyJourney(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmState> | null {
   if (cmd.type === 'start_journey') return ok(startJourney(s, ctx.content));
-  if (!['collect_resource', 'next_exploration', 'journey_action', 'fulfill_opportunity', 'decline_opportunity',
+  const opportunity = applyOpportunities(s, cmd, ctx);
+  if (opportunity) return opportunity;
+  if (!['collect_resource', 'next_exploration', 'journey_action',
     'build_journey_project', 'use_journey_facility', 'craft_journey_item', 'deliver_journey_item',
-    'display_journey_item', 'plan_journey_display', 'complete_journey_story', 'track_journey_discovery', 'track_journey_project', 'track_journey_opportunity',
+    'display_journey_item', 'plan_journey_display', 'complete_journey_story', 'track_journey_discovery', 'track_journey_project',
     'install_journey_discovery', 'harvest_journey_discovery', 'plan_journey_gathering',
     'host_journey_gathering', 'pack_journey_gathering'].includes(cmd.type)) return null;
   if (!s.journey) return err('NOT_AVAILABLE', 'Start your neighbourhood journey first');
@@ -151,14 +166,14 @@ export function applyJourney(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
           const theme = themes[cmd.theme];
           const workshop = j.workshop ??= { sequence: 0, stock: {}, displays: {} };
           const reuse = current?.item === theme.item;
-          if ((!reuse && !(workshop.stock[theme.item] > 0)) || next.inventory.dishes[theme.dish] < 1)
+          if ((!reuse && !(workshop.stock[theme.item] > 0)) || (next.inventory.dishes[theme.dish] ?? 0) < 1)
             return err('INSUFFICIENT_ITEMS', 'Bring the handmade piece and the meal');
           if (!reuse) {
             workshop.stock[theme.item] -= 1;
             if (current) workshop.stock[current.item] = (workshop.stock[current.item] ?? 0) + 1;
             workshop.sequence += 1;
           }
-          next.inventory.dishes[theme.dish] -= 1;
+          next.inventory.dishes[theme.dish] = (next.inventory.dishes[theme.dish] ?? 0) - 1;
           next.wallet += theme.coins;
           gathering.current = cmd.theme;
           delete gathering.planned;
@@ -227,6 +242,7 @@ export function applyJourney(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
       if (typeof cmd.choice !== 'string' || !Object.hasOwn(discovery.choices, cmd.choice))
         return err('NOT_AVAILABLE', 'Unknown harvest');
       const choice = discovery.choices[cmd.choice];
+      if (!gatheringReady(s, next, ctx, gatherSeconds(s, ctx.content, resourceKind(choice.materials)))) return err('WORK_COOLDOWN');
       if (choice.requires && !canUse(s, choice.requires, 99)) return err('NOT_AVAILABLE', 'Discover this crop first');
       for (const [id, qty] of Object.entries(choice.materials)) {
         if (id === 'wood') j.wood += qty!;
@@ -248,13 +264,16 @@ export function applyJourney(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
       const alternative = node.alternative;
       if (choice === 'alternate' && (!alternative || !j.exploration.branching_places?.includes(node.place)
         || !hasFact(s, alternative.requires))) return err('NOT_AVAILABLE', 'This bundle is not available on this trail');
-      const materials = choice === 'alternate' ? alternative!.materials : node.materials;
+      const gathered = gatheringMaterials(s, choice === 'alternate' ? alternative!.materials : node.materials, ctx.content);
+      const materials = gathered.materials;
+      if (!gatheringReady(s, next, ctx, gatherSeconds(s, ctx.content, resourceKind(materials)))) return err('WORK_COOLDOWN');
       j.exploration.collected.push(node.id);
       if (j.exploration.branching_places?.includes(node.place)) (j.exploration.choices ??= {})[node.id] = choice;
       for (const [id, qty] of Object.entries(materials)) {
         if (id === 'wood') j.wood += qty!;
         else j.materials[id as 'stone' | 'fiber'] += qty!;
       }
+      if (gathered.bonus > 0) spendCharacterBuff(next, 'gather_bonus', ctx.content);
       return ok(next, [{ type: 'resource_collected', node_id: node.id, choice, wood: materials.wood ?? 0, materials }]);
     }
     case 'next_exploration': {
@@ -322,11 +341,15 @@ export function applyJourney(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
       if (typeof cmd.item !== 'string' || (cmd.item !== '' && !Object.hasOwn(config.workshop.recipes, cmd.item)))
         return err('NOT_AVAILABLE', 'Unknown workshop item');
       const recipe = config.workshop.recipes[cmd.item];
+      let actual_saved: Partial<Record<JourneyMaterial, number>> = {};
       if (cmd.type === 'craft_journey_item') {
         if (!recipe || !hasFact(s, 'workbench') || !recipe.requires.every(f => hasFact(s, f)))
           return err('NOT_AVAILABLE', 'Discover this recipe first');
-        const paid = payStage(next, recipe);
+        const cost = craftingMaterials(s, recipe.materials, ctx.content);
+        const paid = payStage(next, { ...recipe, materials: cost.materials });
         if (!paid.ok) return paid;
+        actual_saved = cost.actual_saved;
+        if (cost.meal_saved > 0) spendCharacterBuff(next, 'craft_savings', ctx.content);
         workshop.stock[cmd.item] = (workshop.stock[cmd.item] ?? 0) + 1;
         if (!hasFact(next, `crafted_${cmd.item}`)) j.facts.push(`crafted_${cmd.item}`);
       } else if (cmd.type === 'deliver_journey_item') {
@@ -351,7 +374,7 @@ export function applyJourney(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
         if (cmd.item && !hasFact(next, 'workshop_displayed')) j.facts.push('workshop_displayed');
       }
       workshop.sequence += 1;
-      return ok(next, [{ type: 'workshop_changed', item: cmd.item, action: cmd.type }]);
+      return ok(next, [{ type: 'workshop_changed', item: cmd.item, action: cmd.type, actual_saved }]);
     }
     case 'complete_journey_story': {
       if (typeof cmd.resident_id !== 'string' || !Object.hasOwn(config.stories, cmd.resident_id))
@@ -418,6 +441,7 @@ export function applyJourney(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
     }
     case 'journey_action': {
       const action = cmd.action;
+      let actual_saved: Partial<Record<JourneyMaterial, number>> = {};
       const facts = { repair_workbench: 'workbench', craft_planter: 'planter_crafted',
         clear_side_path: 'side_path', share_meal: 'shared_meal', plant_planter: 'planter_planted' };
       if (typeof action !== 'string' || !Object.hasOwn(facts, action)) return err('NOT_AVAILABLE', 'Unknown activity');
@@ -439,69 +463,22 @@ export function applyJourney(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmS
         if (next.inventory.produce.H - (next.engineering.reserved.H ?? 0) < 1) return err('INSUFFICIENT_ITEMS', 'Harvest a chamomile flower');
         next.inventory.produce.H -= 1;
       } else {
-        const cost = config.costs[action];
+        const saving = action === 'craft_planter' ? craftingMaterials(s, { wood: config.costs[action] }, ctx.content) : undefined;
+        const cost = saving?.materials.wood ?? config.costs[action];
         if (j.wood < cost) return err('INSUFFICIENT_ITEMS', `Gather ${cost} wood`);
         j.wood -= cost;
+        if (saving) {
+          actual_saved = saving.actual_saved;
+          if (saving.meal_saved > 0) spendCharacterBuff(next, 'craft_savings', ctx.content);
+        }
+      }
+      if (action === 'craft_planter') {
+        const workshop = j.workshop ??= { sequence: 0, stock: {}, displays: {} };
+        workshop.stock.planter = (workshop.stock.planter ?? 0) + 1;
+        workshop.sequence += 1;
       }
       j.facts.push(fact);
-      return ok(next, [{ type: 'world_changed', fact }]);
-    }
-    case 'track_journey_opportunity': {
-      if (typeof cmd.slot !== 'string' || !Object.hasOwn(j.opportunities, cmd.slot)
-        || !Object.hasOwn(config.opportunities, cmd.slot) || typeof cmd.tracking !== 'boolean')
-        return err('NOT_AVAILABLE', 'Unknown request');
-      const slot = j.opportunities[cmd.slot];
-      if (!Number.isSafeInteger(cmd.sequence) || cmd.sequence !== slot.sequence) return err('REQUEST_DONE');
-      const tracked = j.tracked_opportunity;
-      if (!cmd.tracking) {
-        if (tracked?.slot !== cmd.slot || tracked.sequence !== cmd.sequence) return err('REQUEST_DONE');
-        delete j.tracked_opportunity;
-      } else {
-        const offer = config.opportunities[cmd.slot][slot.variant];
-        if (!offer || (offer.requires && !canUse(s, offer.requires, 99))
-          || (cmd.slot === 'bistro' && !hasFact(s, 'shared_meal')))
-          return err('NOT_AVAILABLE', 'Discover this request first');
-        if (tracked?.slot === cmd.slot && tracked.sequence === cmd.sequence) return err('ALREADY_CLAIMED');
-        j.tracked_opportunity = { slot: cmd.slot, sequence: cmd.sequence };
-        delete j.tracked_project;
-        delete j.tracked_discovery;
-        if (j.gathering) delete j.gathering.planned;
-        clearDisplayPlan(j);
-      }
-      return ok(next);
-    }
-    case 'decline_opportunity':
-    case 'fulfill_opportunity': {
-      if (typeof cmd.slot !== 'string' || !Object.hasOwn(j.opportunities, cmd.slot)) return err('NOT_AVAILABLE');
-      const slot = j.opportunities[cmd.slot];
-      if (!Number.isSafeInteger(cmd.sequence) || cmd.sequence !== slot.sequence) return err('REQUEST_DONE');
-      if (cmd.slot === 'bistro' && !canUse(s, 'bistro', 1)) return err('NOT_AVAILABLE');
-      const variants = config.opportunities[cmd.slot];
-      const offer = variants[slot.variant];
-      if (!offer || (offer.requires && !canUse(s, offer.requires, 99))) return err('NOT_AVAILABLE');
-      if (cmd.type === 'fulfill_opportunity') {
-        if (j.wood < offer.wood) return err('INSUFFICIENT_ITEMS', 'Wood');
-        for (const [id, qty] of Object.entries(offer.produce))
-          if (next.inventory.produce[id as CropId] - (next.engineering.reserved[id as CropId] ?? 0) < (qty ?? 0)) return err('INSUFFICIENT_ITEMS', id);
-        for (const [id, qty] of Object.entries(offer.dishes))
-          if (next.inventory.dishes[id as DishId] < (qty ?? 0)) return err('INSUFFICIENT_ITEMS', id);
-        j.wood -= offer.wood;
-        for (const [id, qty] of Object.entries(offer.produce)) next.inventory.produce[id as CropId] -= qty ?? 0;
-        for (const [id, qty] of Object.entries(offer.dishes)) next.inventory.dishes[id as DishId] -= qty ?? 0;
-        next.wallet += offer.coins;
-        j.contributions ??= {};
-        j.contributions[offer.effect] = Math.min(config.contribution_steps, (j.contributions[offer.effect] ?? 0) + 1);
-      }
-      if (j.tracked_opportunity?.slot === cmd.slot && j.tracked_opportunity.sequence === cmd.sequence)
-        delete j.tracked_opportunity;
-      slot.sequence += 1;
-      // Freeze the next visible offer; repeated requests cannot select a different reward.
-      for (let offset = 1; offset <= variants.length; offset++) {
-        const index = (slot.variant + offset) % variants.length;
-        if (!variants[index].requires || canUse(next, variants[index].requires!, 99)) { slot.variant = index; break; }
-      }
-      return ok(next, [{ type: cmd.type === 'fulfill_opportunity' ? 'opportunity_completed' : 'opportunity_declined',
-        slot: cmd.slot, sequence: cmd.sequence, coins: cmd.type === 'fulfill_opportunity' ? offer.coins : 0 }]);
+      return ok(next, [{ type: 'world_changed', fact, actual_saved }]);
     }
   }
   return err('NOT_AVAILABLE');

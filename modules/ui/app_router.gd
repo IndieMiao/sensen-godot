@@ -5,6 +5,8 @@ const MAP := "res://scenes/map_poc/map_poc.tscn"
 const DRESS := "res://scenes/dressing_room/dressing_room.tscn"
 const STRESS := "res://scenes/stress_test/stress_test.tscn"
 const FARM := "res://scenes/farm/farm.tscn"
+const MINE := "res://scenes/mine/mine.tscn"
+const ONLINE_MINE := "res://scenes/mine/online_mine.tscn"
 const PLACE := "res://scenes/place/place.tscn"
 const STREET := "res://scenes/map/journey_street.tscn"
 const CITY_SELECT := "res://scenes/city_select/city_select.tscn"
@@ -17,6 +19,9 @@ var _navigation_pending := false
 var _loading: CanvasLayer
 ## 实例栈（PRD §3.2 第二层空间）：地图常驻为底，农场/地点/换装房压在上面。
 var _stack: Array[Node] = []
+var _relocation_source: Node
+var _relocation_map: Node
+var _relocation_session: FarmSession
 
 
 func _ready() -> void:
@@ -30,6 +35,112 @@ func _ready() -> void:
 func go_to_map() -> void:
 	_go_to(MAP)
 
+func go_to_city_select() -> void:
+	_go_to(CITY_SELECT)
+
+## Old goal IDs still say street, but all playable surface routes now use the farm.
+func _farm_destination_args(args: Dictionary) -> Dictionary:
+	var result := args.duplicate()
+	if not result.get("visitor_snapshot", {}).is_empty():
+		result.visitor = true
+		result.snapshot = result.visitor_snapshot
+		result.erase("visitor_snapshot")
+	return result
+
+func _reuse_farm(args: Dictionary) -> bool:
+	var current := top_instance()
+	if current == null or current.scene_file_path != FARM or bool(args.get("visitor", false)): return false
+	if bool(current.get("visitor")) or current.get("session") != args.get("session", Net.session): return false
+	if current.has_method("focus_destination"): current.call("focus_destination", args)
+	return true
+
+## Resume the owner's existing farm below a place/bag scene, preserving camera and position.
+func return_to_farm(session: FarmSession) -> void:
+	while instance_depth() > 0:
+		var current := top_instance()
+		if current.scene_file_path == FARM and not bool(current.get("visitor")) and current.get("session") == session: return
+		pop_instance()
+
+## Keep the old scene and its camera until the owner explicitly commits a new layout.
+func begin_farm_relocation(session: FarmSession, source: Node) -> void:
+	if _navigation_pending or is_instance_valid(_relocation_map) or session == null: return
+	if not session.relocation_available() or session.offline or session.has_unconfirmed_command(): return
+	if source != top_instance() and source != get_tree().current_scene: return
+	if source.scene_file_path == FARM and (bool(source.get("visitor")) or source.get("session") != session): return
+	if source.has_method("party_travel_ready") and not source.call("party_travel_ready"): return
+	var regions := FarmRegions.load_default()
+	var region := regions.region(session.region_id) if regions else {}
+	if region.is_empty(): return
+	var packed := await _load_with_feedback(MAP)
+	if packed == null: return
+	if not is_instance_valid(source) or (source != top_instance() and source != get_tree().current_scene):
+		_clear_transition()
+		return
+	_relocation_source = source
+	_relocation_session = session
+	_relocation_map = _push_packed(packed, {})
+	_relocation_map.set_meta("farm_relocation", true)
+	_relocation_map.call("enter_relocation_mode", region, session)
+	await _end_transition()
+
+func cancel_farm_relocation() -> void:
+	if _navigation_pending or not is_instance_valid(_relocation_map) or top_instance() != _relocation_map: return
+	if bool(_relocation_map.get("_relocation_committed")): return
+	if _relocation_session and _relocation_session.relocation_pending(): return
+	_clear_relocation()
+	pop_instance()
+
+func complete_farm_relocation(choice: Dictionary) -> void:
+	if _navigation_pending or not is_instance_valid(_relocation_map) or top_instance() != _relocation_map: return
+	var session := _relocation_session
+	if session == null or session.relocation_pending() or FarmBlueprint.load_choice(choice) == null: return
+	if not bool(session.relocation.get("used", false)) or session.farm_terrain.is_empty(): return
+	# Use the just-adopted server response; no local selection becomes authoritative here.
+	if choice.get("layout_patch_id") != session.layout_patch_id: return
+	var packed := await _load_with_feedback(FARM)
+	if packed == null: return
+	if not is_instance_valid(_relocation_map) or top_instance() != _relocation_map:
+		_clear_transition()
+		return
+	var source := _relocation_source
+	_discard_top()
+	if is_instance_valid(source) and top_instance() == source and source.scene_file_path == FARM:
+		_discard_top()
+	_clear_relocation()
+	FarmChoice.save_choice(session.farm_choice())
+	FarmRegions.save_choice(session.region_id)
+	var root_map := get_tree().current_scene
+	if root_map and root_map.has_method("refresh_owned_farm_after_relocation"):
+		root_map.call("refresh_owned_farm_after_relocation", session.farm_choice())
+	_push_packed(packed, {"session": session})
+	await _end_transition()
+
+func _clear_relocation() -> void:
+	_relocation_source = null
+	_relocation_map = null
+	_relocation_session = null
+
+func _discard_top() -> void:
+	if _stack.is_empty(): return
+	var node: Node = _stack.pop_back()
+	_suspend(node)
+	if node.get_parent(): node.get_parent().remove_child(node)
+	node.queue_free()
+
+## A relocation by another device/owner replaces the whole scene after a fresh DTO.
+func replace_farm_instance(source: Node, args: Dictionary) -> void:
+	if _navigation_pending or source != top_instance(): return
+	var packed := await _load_with_feedback(FARM)
+	if packed == null: return
+	if not is_instance_valid(source) or source != top_instance():
+		_clear_transition()
+		return
+	var is_party := source.has_meta("party_travel")
+	_discard_top()
+	var destination := _push_packed(packed, args, false)
+	if is_party: destination.set_meta("party_travel", true)
+	await _end_transition()
+
 
 func go_to_dressing() -> void:
 	open_instance(DRESS)
@@ -38,8 +149,15 @@ func go_to_dressing() -> void:
 func go_to_stress() -> void:
 	_go_to(STRESS)
 
+func mine_scene() -> String:
+	return ONLINE_MINE if Net.online_available else MINE
+
 
 func push_instance(scene_path: String, args := {}) -> Node:
+	if scene_path == STREET:
+		scene_path = FARM
+		args = _farm_destination_args(args)
+	if scene_path == FARM and _reuse_farm(args): return top_instance()
 	var packed := load(scene_path) as PackedScene
 	if packed == null:
 		push_error("AppRouter 无法加载实例场景 %s" % scene_path)
@@ -47,18 +165,43 @@ func push_instance(scene_path: String, args := {}) -> Node:
 	return _push_packed(packed, args)
 
 
-func _push_packed(packed: PackedScene, args: Dictionary) -> Node:
+func _push_packed(packed: PackedScene, args: Dictionary, suspend_previous := true) -> Node:
 	var inst := packed.instantiate()
 	if inst.has_method("setup"):
 		inst.call("setup", args)
-	_suspend(top_instance() if not _stack.is_empty() else get_tree().current_scene)
+	if suspend_previous: _suspend(top_instance() if not _stack.is_empty() else get_tree().current_scene)
 	_stack.append(inst)
 	get_tree().root.add_child(inst)
 	return inst
 
+func open_party_destination(manifest: Dictionary, session: FarmSession, source: Node) -> void:
+	if _navigation_pending: return
+	var path := PartyTravel.scene_path(manifest)
+	var args := PartyTravel.scene_args(manifest, session)
+	if path.is_empty() or args.is_empty(): return
+	var packed := await _load_with_feedback(path)
+	if packed == null: return
+	if not is_instance_valid(source) or source != top_instance():
+		_clear_transition()
+		return
+	# Discard prior visits/mines, keeping the suspended home scene as the return destination.
+	var replace := source.has_meta("party_travel") or source.scene_file_path in [MINE, ONLINE_MINE]
+	if replace:
+		_stack.pop_back()
+		_suspend(source)
+		get_tree().root.remove_child(source)
+		source.queue_free()
+	var destination := _push_packed(packed, args, not replace)
+	destination.set_meta("party_travel", true)
+	await _end_transition()
+
 
 func open_instance(scene_path: String, args := {}) -> void:
 	if _navigation_pending: return
+	if scene_path == STREET:
+		scene_path = FARM
+		args = _farm_destination_args(args)
+	if scene_path == FARM and _reuse_farm(args): return
 	var packed := await _load_with_feedback(scene_path)
 	if packed == null: return
 	_push_packed(packed, args)
@@ -103,6 +246,10 @@ func _clear_transition() -> void:
 
 
 func pop_instance() -> void:
+	if is_instance_valid(_relocation_map) and top_instance() == _relocation_map:
+		if bool(_relocation_map.get("_relocation_committed")): return
+		if _relocation_session and _relocation_session.relocation_pending(): return
+		_clear_relocation()
 	if _stack.is_empty():
 		go_to_map() # 兼容 --qa-scene=dressing 直接以换装房为当前场景的情况
 		return
@@ -154,6 +301,10 @@ func _resume(node: Node) -> void:
 func handle_back() -> void:
 	if _navigation_pending:
 		if _loading and _loading.close_button.visible: _clear_transition()
+		return
+	if is_instance_valid(_relocation_map) and top_instance() == _relocation_map:
+		if _relocation_map.has_method("is_back_navigation_locked") and _relocation_map.call("is_back_navigation_locked"): return
+		cancel_farm_relocation()
 		return
 	if not _stack.is_empty():
 		# 栈顶也要尊重返回锁：换装房保存中（_committing）被系统返回键弹栈会中断保存。
@@ -230,6 +381,8 @@ static func qa_scene_path(args: PackedStringArray) -> String:
 				return CITY_SELECT
 			"farm":
 				return FARM
+			"mine":
+				return MINE
 			"week":
 				var driver := "res://tools/dev/g3_week_ui.tscn"
 				if OS.is_debug_build() and OS.has_feature("g3_device_qa") and ResourceLoader.exists(driver):
@@ -249,7 +402,7 @@ static func back_action_for_scene(scene_path: String, back_locked := false) -> i
 	if back_locked:
 		return BACK_IGNORE
 	match scene_path:
-		DRESS, STRESS, FARM, PLACE:
+		DRESS, STRESS, FARM, PLACE, MINE:
 			return BACK_TO_MAP
 		MAP, CITY_SELECT:
 			return BACK_LEAVE_APP

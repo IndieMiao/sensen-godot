@@ -10,8 +10,8 @@ signal slot_changed(slot: StringName)
 const TOUCH_HEIGHT := 48.0
 
 ## expand_icon keeps the source thumbnail size out of the grid's layout budget.
-const THUMB_CELL_HEIGHT := 98.0
-const COMPACT_CELL_HEIGHT := 82.0
+const THUMB_CELL_HEIGHT := 100.0
+const COMPACT_CELL_HEIGHT := 84.0
 ## "无"选项没有部件可渲，用一个灰色禁止符占位，保证格子高度与其它项一致。
 const ICON_NONE := preload("res://assets/ui/icons/none.svg")
 
@@ -91,6 +91,7 @@ func setup(p_rig: AvatarRig) -> void:
 		button.focus_mode = Control.FOCUS_NONE
 		button.mouse_filter = Control.MOUSE_FILTER_PASS
 		button.theme_type_variation = &"TabButton"
+		button.add_theme_font_size_override("font_size", 12)
 		button.pressed.connect(_show_slot.bind(slot_def.slot_name, true))
 		tabs.add_child(button)
 		_tab_buttons[slot_def.slot_name] = button

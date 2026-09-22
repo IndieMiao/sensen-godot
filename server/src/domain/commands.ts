@@ -1,18 +1,38 @@
 /**
- * 26 条命令的载荷定义与封套。HTTP 层用同一份定义生成 TypeBox schema
- * （`additionalProperties: false`），领域层按 `type` 分发。
+ * 命令的载荷定义与封套。领域层按 `type` 分发；payload 校验在各 handler 手写。
  *
- * 数组字段统一约束：非空、至多 12 项（一个农场最多 12 格）、不得重复。
+ * 数组字段统一约束：非空、至多 MAX_CELLS_PER_COMMAND 项、不得重复。
  * 「整批原子」——一条命令里的任意一格不合法，整条失败，状态不变（Codex 二审 Important 5）。
  */
 import type { CropId, DishId, GrowthChoiceId, ResidentId } from './content.js';
 import type { DecorationPlacement, GrowthChoice, LifeChoice } from './state.js';
 
-export const MAX_CELLS_PER_COMMAND = 12;
-
-export type CareKindPayload = 'water' | 'drain' | 'shelter';
+export const MAX_CELLS_PER_COMMAND = 64;
 
 export type Command =
+  | { type: 'cast_fishing'; sequence: number; site_id: string; target?: [number, number] }
+  | { type: 'hook_fishing'; sequence: number }
+  | { type: 'finish_fishing'; sequence: number; inputs: string }
+  | { type: 'cancel_fishing'; sequence: number }
+  | { type: 'sell_fish'; sequence: number; stack_id: string; quantity: number }
+  | { type: 'split_bag_stack'; sequence: number; stack_id: string; quantity: number }
+  | { type: 'merge_bag_stacks'; sequence: number; source_id: string; target_id: string }
+  | { type: 'sort_bag'; sequence: number; mode: 'category' | 'name' }
+  | { type: 'discard_bag_stack'; sequence: number; stack_id: string; quantity: number }
+  | { type: 'equip_bag_item'; sequence: number; stack_id: string; slot?: import('./content.js').EquipmentSlot }
+  | { type: 'unequip_bag_item'; sequence: number; slot?: import('./content.js').EquipmentSlot }
+  | { type: 'claim_bag_overflow'; sequence: number; stack_id: string }
+  | { type: 'use_bag_item'; sequence: number; stack_id: string }
+  | { type: 'craft_equipment'; sequence: number; item_id: string }
+  | { type: 'mine_combat'; run: number; floor: number; sequence: number; targets: string[]; hurt_by?: string }
+  | { type: 'rest_character' }
+  | { type: 'enter_mine'; run: number }
+  | { type: 'leave_mine'; run: number; floor: number }
+  | { type: 'mine_rock'; run: number; floor: number; node_id: string }
+  | { type: 'descend_mine'; run: number; floor: number }
+  | { type: 'ascend_mine'; run: number; floor: number }
+  | { type: 'use_mine_elevator'; run: number; floor: number }
+  | { type: 'restart_mine'; run: number }
   | { type: 'start_journey' }
   | { type: 'collect_resource'; node_id: string; round: number; choice?: 'primary' | 'alternate' }
   | { type: 'next_exploration'; round: number; route?: string }
@@ -29,22 +49,23 @@ export type Command =
   | { type: 'track_journey_discovery'; discovery: string }
   | { type: 'track_journey_project'; project: string }
   | { type: 'track_journey_opportunity'; slot: string; sequence: number; tracking: boolean }
+  | { type: 'accept_opportunity'; slot: string; sequence: number }
+  | { type: 'abandon_opportunity'; slot: string; sequence: number }
   | { type: 'install_journey_discovery'; discovery: string; sequence: number }
   | { type: 'harvest_journey_discovery'; discovery: string; choice: string; round: number }
   | { type: 'journey_action'; action: 'repair_workbench' | 'craft_planter' | 'clear_side_path' | 'share_meal' | 'plant_planter' }
   | { type: 'fulfill_opportunity'; slot: string; sequence: number }
-  | { type: 'decline_opportunity'; slot: string; sequence: number }
+  | { type: 'decline_opportunity'; slot: string; sequence: number; timber_only?: boolean }
   // —— 建场与设置 ——
   | { type: 'create_farm'; region_id: string; layout_patch_id: string; blueprint_revision: number }
   | { type: 'set_location_visible'; visible: boolean }
   | { type: 'set_visit_access'; access: 'only_me' | 'anyone' }
-  // —— 农事（G1 客户端用的 9 条）——
-  | { type: 'clear_cells'; cell_ids: string[] }
+  // —— 农事：开垦 → 播种 → 浇水 → 收割，外加铲平与买种 ——
   | { type: 'till_cells'; cell_ids: string[] }
   | { type: 'sow_cells'; cell_ids: string[]; crop: CropId; lot: 'bought' | 'bound' }
-  | { type: 'apply_care'; cell_ids: string[]; kind: CareKindPayload }
-  | { type: 'apply_optional_care'; cell_ids: string[] }
+  | { type: 'water_cells'; cell_ids: string[] }
   | { type: 'harvest_cells'; cell_ids: string[] }
+  | { type: 'clear_plot'; cell_ids: string[] }
   | { type: 'buy_seeds'; crop: CropId; qty: number }
   // —— 经济 ——
   | { type: 'sell_at_stall'; items: { kind: 'produce' | 'dish'; id: string; qty: number }[] }
@@ -80,6 +101,8 @@ export type CommandType = Command['type'];
 export interface CommandEnvelope {
   idempotency_key: string;
   base_version: number;
+  /** Frozen coordinate-space identity of a queued spatial edit; not refreshed during version rebasing. */
+  terrain_checksum?: string;
   type: CommandType;
   payload: Record<string, unknown>;
 }

@@ -1,0 +1,12 @@
+Use case: stylized-concept
+Asset type: one production landmark sprite for a mobile Los Angeles map.
+Primary request: create one isolated miniature of Griffith Observatory in the exact softly rounded pastel clay-toy visual language of the supplied reference crop.
+Input images: Image 1 is a style and composition reference cropped from the user-approved map design; use only the observatory building and its planted base, not the map behind it.
+Subject: recognizable ivory Griffith Observatory, a large central blue-grey dome and two smaller blue-grey side domes, classical entrance, tiny muted blue windows, a few restrained mint-green shrubs, all on one very low compact pale mint landscaped base.
+Style/medium: premium soft matte 3D miniature, gently rounded edges, clean readable massing, delicate architectural detail, restrained ambient occlusion.
+Composition/framing: three-quarter front view with elevated isometric camera, same facing direction and dome arrangement as the reference. Entire building and entire base visible. Center the isolated landmark; leave at least 12 percent empty margin around it. Keep the base near the lower part of the object; no tall plinth. A readable landmark silhouette at small map icon sizes.
+Lighting/mood: soft neutral daylight from upper left, warm and welcoming; gentle shading contained on the object.
+Color palette: creamy ivory architecture, subdued slate blue-grey domes, pale fresh mint vegetation, tiny sky-blue fountain accents.
+Scene/backdrop: perfectly flat solid vivid magenta chroma-key background, RGB 255 0 255. No gradient, vignette, floor or cast shadow on the background. No magenta material or reflection on the asset.
+Text: none.
+Constraints: one single complete isolated landmark asset only; same three domes and visual direction as reference; no map, people, UI, labels, captions, letters, logos, signs, numbers, watermark, white selection ring or glow. Avoid realistic photography, glossy plastic, heavy outlines, floating detached pieces, excessive vegetation, exaggerated tall tower, clipping.

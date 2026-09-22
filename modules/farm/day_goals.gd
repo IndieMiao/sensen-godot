@@ -8,7 +8,6 @@ const TITLES := ["First harvest", "A rainy day", "Share your harvest", "At the k
 const LABELS := {
 	"farm_created": "Create your farm",
 	"first_harvest": "Harvest your first crop",
-	"next_batch_sown_and_cared": "Sow and care for the next batch",
 	"rain_care_done": "Care for crops in the rain",
 	"request_d1_bistro_lettuce_done": "Complete the bistro's lettuce request",
 	"life_choice_resolved": "Choose a use for your harvest",
@@ -68,17 +67,15 @@ static func _farming_steps(state: Dictionary, cells: Dictionary, first_harvest: 
 				return true
 		return false
 	var harvested: bool = first_harvest or (xp.get("first_harvest_crops", []) as Array).size() > 0
-	var cleared_any: bool = harvested or (xp.get("first_clear_cells", []) as Array).size() > 0 \
-		or any.call(["cleared", "tilled", "sown", "growing"])
-	var tilled_any: bool = harvested or any.call(["tilled", "sown", "growing"])
+	# 四步生命周期：开垦 → 播种 → 浇水 → 收割。
+	var tilled_any: bool = harvested or int(xp.get("tilled_total", 0)) > 0 \
+		or any.call(["tilled", "sown", "growing"])
 	var sown_any: bool = harvested or any.call(["sown", "growing"])
-	var cared_any: bool = harvested or any.call(["growing"])
-	var fc := str((state.get("clock", {}) as Dictionary).get("field_condition", "sunny"))
+	var watered_any: bool = harvested or any.call(["growing"])
 	return [
-		{"id": "clear", "label": L10n.text("Clear a plot"), "done": cleared_any},
-		{"id": "till", "label": L10n.text("Till it"), "done": tilled_any},
+		{"id": "till", "label": L10n.text("Till a plot"), "done": tilled_any},
 		{"id": "sow", "label": L10n.text("Sow a radish"), "done": sown_any},
-		{"id": "care", "label": L10n.format_text("%s it", NextStep.care_verb(fc)), "done": cared_any},
+		{"id": "water", "label": L10n.text("Water it"), "done": watered_any},
 	]
 
 static func progress(state: Dictionary, derived: Dictionary = {}, now_ms := 0) -> Dictionary:

@@ -1,0 +1,57 @@
+{
+  "asset": "assets/map/poi/restaurant.png",
+  "source": "Sensenjoy Image API",
+  "base_url": "https://sub.sensenjoy.cn/v1",
+  "model": "gpt-image-2",
+  "endpoint": "/images/edits",
+  "quality": "high",
+  "requested_size": [
+    1024,
+    1024
+  ],
+  "generated_size": [
+    1254,
+    1254
+  ],
+  "prompt": "prompt.txt",
+  "actual_reference_inputs": [
+    "reference-style-cafe.png",
+    "assets/map/poi/hollywood_sign.png"
+  ],
+  "reference_source": "docs/design/la-map-2026-09-22/generated/la-map-main-v1.png",
+  "reference_crop_pixels": [
+    190,
+    793,
+    355,
+    968
+  ],
+  "raw_output": "raw-magenta.png",
+  "keyed_output": "keyed.png",
+  "chroma_key": "#FF00FF",
+  "extraction": "imagegen bundled remove_chroma_key.py, soft matte thresholds 64/128 and spill cleanup",
+  "production_size": [
+    512,
+    512
+  ],
+  "source_alpha_bbox": [
+    121,
+    209,
+    1132,
+    1087
+  ],
+  "production_alpha_bbox": [
+    32,
+    91,
+    480,
+    480
+  ],
+  "bottom_center_anchor_pixels": [
+    256,
+    480
+  ],
+  "bottom_center_anchor_normalized": [
+    0.5,
+    0.9375
+  ],
+  "sha256": "ea280bdb78ded3da0e9e01e5a13bbdd8551b40dd0bb2dab65a7892554d5894b8"
+}

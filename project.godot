@@ -13,6 +13,7 @@ Localization="*res://modules/ui/localization.gd"
 Avatar="*res://modules/avatar/avatar_service.gd"
 AppRouter="*res://modules/ui/app_router.gd"
 Net="*res://modules/net/net_service.gd"
+Voice="*res://modules/net/voice_session.gd"
 
 [display]
 

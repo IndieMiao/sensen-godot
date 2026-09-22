@@ -8,6 +8,48 @@ func _session(responses: Array) -> Array:
 func _state(version: int) -> Dictionary:
 	return {"version": version, "farm_id": "f1", "state": {"wallet": 30}}
 
+func test_applied_feedback_events_are_transient_and_cleared_by_reads_and_rejections() -> void:
+	var event := {"type": "equipment_crafted", "item_id": "foraging_gloves", "actual_saved": {"wood": 1}}
+	var applied := _state(2).merged({"outcome": "applied", "events": [event]})
+	var pair := _session([
+		{"status": 200, "json": applied},
+		{"status": 200, "json": _state(2)},
+		{"status": 200, "json": _state(3).merged({"outcome": "applied", "events": [event]})},
+		{"status": 422, "json": {"outcome": "rejected", "code": "BAG_FULL"}}])
+	var session: FarmSession = pair[0]
+	assert_bool(await session.send("craft_equipment", {"item_id": "foraging_gloves", "sequence": 1})).is_true()
+	assert_that(session.last_command_events).is_equal([event])
+	assert_bool(await session.refresh()).is_true()
+	assert_array(session.last_command_events).is_empty()
+	assert_bool(await session.send("craft_equipment", {"item_id": "artisan_apron", "sequence": 2})).is_true()
+	assert_int(session.last_command_events.size()).is_equal(1)
+	assert_bool(await session.send("craft_equipment", {"item_id": "copper_pickaxe", "sequence": 3})).is_false()
+	assert_array(session.last_command_events).is_empty()
+
+func test_replayed_command_adopts_state_without_repeating_feedback_events() -> void:
+	var event := {"type": "workshop_changed", "actual_saved": {"wood": 1}}
+	var pair := _session([{"error": "lost response"},
+		{"status": 200, "json": _state(2).merged({"outcome": "replayed", "replayed_outcome": "applied", "events": [event]})}])
+	var session: FarmSession = pair[0]
+	assert_bool(await session.send("craft_journey_item", {"item": "planter", "sequence": 1})).is_true()
+	assert_int(session.version).is_equal(2)
+	assert_array(session.last_command_events).is_empty()
+	assert_str(pair[1].requests[0].body.idempotency_key).is_equal(pair[1].requests[1].body.idempotency_key)
+
+func test_blocked_or_offline_commands_cannot_reuse_earlier_feedback_events() -> void:
+	var pair := _session([])
+	var session: FarmSession = pair[0]
+	session.last_command_events = [{"type": "equipment_crafted"}]
+	session.set_meta("pending_kitchen_command", {})
+	assert_bool(await session.send("craft_equipment", {"item_id": "foraging_gloves", "sequence": 1})).is_false()
+	assert_array(session.last_command_events).is_empty()
+	session.remove_meta("pending_kitchen_command")
+	session.last_command_events = [{"type": "equipment_crafted"}]
+	session.offline = true
+	assert_bool(await session.send("craft_equipment", {"item_id": "foraging_gloves", "sequence": 1})).is_false()
+	assert_array(session.last_command_events).is_empty()
+	assert_int(pair[1].requests.size()).is_zero()
+
 func test_login_stores_token_and_player() -> void:
 	var pair := _session([{"status": 200, "json": {"player_id": "p1", "token": "tok"}}])
 	var s: FarmSession = pair[0]

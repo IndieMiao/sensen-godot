@@ -107,7 +107,7 @@ func _rebuild() -> void:
 	_stage = Node3D.new()
 	add_child(_stage)
 	var source := FarmBlueprint.load_file("res://assets/blueprints/sh_a/r2/farm_blueprint.json")
-	var bp := FarmInterior.new(source).blueprint
+	var bp := FarmPlot.blueprint_for()
 	var count: int = PLOT_COUNTS[_style]
 	_count.text = "%d 田块" % count
 	var scenery := Scenery.new()

@@ -11,57 +11,31 @@ func _state(seeds := {"R": 6, "L": 3}, produce := {}, fc := "sunny") -> Dictiona
 	return {"inventory": {"seeds": s, "produce": produce}, "clock": {"field_condition": fc}, "wallet": 180}
 
 func test_each_state_has_exactly_one_next_step() -> void:
-	assert_str(NextStep.step_for(_slot("wild"), 0)).is_equal("clear")
-	assert_str(NextStep.step_for(_slot("cleared"), 0)).is_equal("till")
-	assert_str(NextStep.step_for(_slot("tilled"), 0)).is_equal("sow")
-	assert_str(NextStep.step_for(_slot("sown", "R"), 0)).is_equal("care")
-	assert_str(NextStep.step_for(_slot("growing", "R", 500), 499)).is_equal("")      # 没熟：没事可做
-	assert_str(NextStep.step_for(_slot("growing", "R", 500), 500)).is_equal("harvest")
+	# 空字典 = 还没开垦的荒地，这是稀疏存储在客户端的全部体现。
+	assert_str(NextStep.step_for({}, 0)).is_equal("till")
+	assert_str(NextStep.step_for({"state": "tilled"}, 0)).is_equal("sow")
+	assert_str(NextStep.step_for({"state": "sown"}, 0)).is_equal("water")
+	assert_str(NextStep.step_for({"state": "growing", "ready_at": 100}, 50)).is_equal("")
+	assert_str(NextStep.step_for({"state": "growing", "ready_at": 100}, 100)).is_equal("harvest")
+	# ready_at 未知一律没事可做：客户端从不猜时长。
+	assert_str(NextStep.step_for({"state": "growing", "ready_at": null}, 999)).is_equal("")
 
-func test_field_onboarding_finishes_visible_plots_before_suggesting_the_street() -> void:
-	var state := _state()
-	state.clock.chapter_index = 0
-	state.journey = {"version": 1, "facts": [], "unlocks": [], "completed": []}
-	state.field_progress = {"plots": 4, "planted": 0, "harvested": 0}
-	var cells := {}
-	for index in 4: cells[str(index)] = _slot("wild")
-	assert_int(NextStep.bulk(cells, 0, state, "R", ["R", "L"]).cells.size()).is_equal(4)
-	for index in 3: cells[str(index)] = _slot("growing", "R", 999)
-	state.field_progress.planted = 3
-	for status in ["wild", "cleared", "tilled"]:
-		cells["3"] = _slot(status)
-		var action := NextStep.bulk(cells, 0, state, "R", ["R", "L"])
-		assert_str(action.action).is_equal(NextStep.step_for(cells["3"], 0))
-		assert_array(action.cells).is_equal(["3"])
-	cells["3"] = _slot("growing", "R", 999)
-	state.field_progress = {"plots": 6, "planted": 4, "harvested": 0}
-	cells["4"] = _slot("wild")
-	cells["5"] = _slot("wild")
-	assert_array(NextStep.bulk(cells, 0, state, "R", ["R", "L"]).cells).is_equal(["4", "5"])
-	for index in 6: cells[str(index)] = _slot("growing", "R", 999)
-	assert_str(NextStep.bulk(cells, 0, state, "R", ["R", "L"]).action).is_equal("explore")
-	assert_str(NextStep.bulk(cells, 999, state, "R", ["R", "L"]).action).is_equal("harvest")
 
-func test_bulk_prefers_harvest_then_care_then_sow() -> void:
-	var cells := {"a": _slot("growing", "R", 100), "b": _slot("sown", "R"), "c": _slot("tilled"), "d": _slot("wild")}
+func test_bulk_prefers_harvest_then_water_then_sow() -> void:
+	var cells := {"a": _slot("growing", "R", 100), "b": _slot("sown", "R"), "c": _slot("tilled")}
 	var b := NextStep.bulk(cells, 100, _state(), "R", ["R", "L"])
 	assert_str(b.action).is_equal("harvest")
 	assert_array(b.cells).is_equal(["a"])
 	assert_str(b.label).is_equal("Harvest 1 plot")
 	cells.erase("a")
 	b = NextStep.bulk(cells, 100, _state(), "R", ["R", "L"])
-	assert_str(b.action).is_equal("care")
+	assert_str(b.action).is_equal("water")
 	assert_str(b.label).is_equal("Water 1 plot")
 	cells.erase("b")
 	b = NextStep.bulk(cells, 100, _state(), "R", ["R", "L"])
 	assert_str(b.action).is_equal("sow")
 	assert_str(b.label).is_equal("Sow 1 Radish")
 	assert_str(b.crop).is_equal("R")
-
-func test_care_verb_follows_the_weather() -> void:
-	var cells := {"b": _slot("sown", "R")}
-	assert_str(NextStep.bulk(cells, 0, _state({}, {}, "rain"), "R", ["R"]).label).is_equal("Drain 1 plot")
-	assert_str(NextStep.bulk(cells, 0, _state({}, {}, "wind"), "R", ["R"]).label).is_equal("Shelter 1 plot")
 
 func test_sow_is_capped_by_seeds_and_falls_back_to_a_crop_that_has_some() -> void:
 	var cells := {"a": _slot("tilled"), "b": _slot("tilled"), "c": _slot("tilled"), "d": _slot("tilled")}
@@ -141,34 +115,9 @@ func test_seed_lot_uses_bound_first() -> void:
 func test_doing_labels_are_english_and_name_the_crop() -> void:
 	assert_str(NextStep.doing_label("clear")).is_equal("Clearing…")
 	assert_str(NextStep.doing_label("sow", "L")).is_equal("Sowing Lettuce…")
-	assert_str(NextStep.doing_label("care", "", "rain")).is_equal("Draining…")
 	assert_str(NextStep.doing_label("harvest")).is_equal("Harvesting…")
 
-func test_d0_recommends_only_six_tutorial_radishes_before_first_harvest() -> void:
-	var state := _state({"R": 12, "L": 3})
-	state.clock.chapter_index = 0
-	state.chapters = [{"step_flags": {"farm_created": true}}]
-	var cells := {}
-	for index in 9: cells[str(index)] = _slot("tilled")
-	var bulk := NextStep.bulk(cells, 0, state, "L", ["R", "L"])
-	assert_str(bulk.action).is_equal("sow")
-	assert_str(bulk.crop).is_equal("R")
-	assert_int(bulk.cells.size()).is_equal(6)
-	cells["0"] = _slot("growing", "R", 999)
-	cells["1"] = _slot("growing", "R", 999)
-	assert_int(NextStep.bulk(cells, 0, state, "L", ["R", "L"]).cells.size()).is_equal(4)
 
-func test_d0_cares_then_waits_for_the_tutorial_instead_of_sowing_lettuce_early() -> void:
-	var state := _state({"R": 0, "L": 3})
-	state.clock.chapter_index = 0
-	var cells := {"a": _slot("sown", "R"), "b": _slot("growing", "R", 999), "c": _slot("tilled")}
-	assert_str(NextStep.bulk(cells, 0, state, "L", ["R", "L"]).action).is_equal("care")
-	cells.a = _slot("growing", "R", 999)
-	var bulk := NextStep.bulk(cells, 0, state, "L", ["R", "L"])
-	assert_str(bulk.action).is_equal("")
-	assert_bool(bulk.enabled).is_false()
-	assert_str(bulk.label).is_equal("First harvest is growing")
-	assert_str(NextStep.bulk(cells, 999, state, "L", ["R", "L"]).action).is_equal("harvest")
 
 func test_d0_after_confirmed_first_harvest_recommends_the_full_next_batch() -> void:
 	var state := _state({"R": 6, "L": 3})

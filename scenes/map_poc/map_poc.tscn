@@ -136,7 +136,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/background = SubResource("SB_load_bg")
 theme_override_styles/fill = SubResource("SB_load_fill")
-max_value = 24.0
+max_value = 2.0
 show_percentage = false
 
 [node name="SideToolbar" type="PanelContainer" parent="HUD/SafeArea/Root"]

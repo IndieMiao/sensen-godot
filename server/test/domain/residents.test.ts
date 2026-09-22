@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { content, freshFarm, run } from './helpers.js';
 import { stageOf } from '../../src/domain/handlers/residents.js';
 import { makeCtx } from '../../src/domain/reducer.js';
-import { blueprint, SH, T0 } from './helpers.js';
+import { plot, SH, T0 } from './helpers.js';
 import type { FarmState } from '../../src/domain/state.js';
 
-const ctx = (s: FarmState) => makeCtx(s, T0, SH, content, blueprint);
+const ctx = (s: FarmState) => makeCtx(s, T0, SH, content, plot);
 const atChapter = (n: number): FarmState => {
   const s = freshFarm();
   s.clock.chapter_index = n;
-  s.inventory.produce = { R: 5, L: 5, C: 5, H: 5 };
+  s.inventory.produce = { R: 5, L: 5, C: 5, H: 5, T: 0 };
   return s;
 };
 
@@ -141,7 +141,7 @@ describe('生活选择槽（Codex 三审 N-I11）', () => {
 describe('工程篮与成长选择', () => {
   it('预留 → 提交，交齐 2C+4H 即竣工', () => {
     let s = atChapter(3);
-    s.inventory.produce = { R: 0, L: 0, C: 5, H: 5 };
+    s.inventory.produce = { R: 0, L: 0, C: 5, H: 5, T: 0 };
     const a = run(s, { type: 'reserve_engineering', items: { C: 2, H: 4 } });
     expect(a.ok).toBe(true);
     if (!a.ok) return;
@@ -170,7 +170,7 @@ describe('工程篮与成长选择', () => {
       .toBe('LOCKED_CHOICE');
   });
 
-  it('扩地是原子事务：400 + 固定篮 84，第四畦到手即已翻土', () => {
+  it('扩地是原子事务：400 + 固定篮 84，不再附赠地块', () => {
     const s = atChapter(5);
     s.wallet = 484;
     const r = run(s, { type: 'purchase_growth_choice', choice: 'field', transaction_id: 'tx' });
@@ -179,7 +179,8 @@ describe('工程篮与成长选择', () => {
     expect(r.state.wallet).toBe(0);
     expect(r.state.beds_unlocked).toBe(4);
     expect(r.state.inventory.seeds.R.bought).toBe(3);
-    expect(r.state.cells['5,1'].state).toBe('tilled'); // 不用再清理翻土
+    // 自由格子种田起，扩地只是一笔钱换一篮种子，不再附赠已翻好的地。
+    expect(Object.keys(r.state.cells)).toHaveLength(0);
   });
 
   it('钱不够 400+84 时整条失败，intent 保留（L561）', () => {

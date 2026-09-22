@@ -44,7 +44,7 @@ func test_farm_background_renders_opaque_after_a_transparent_map_surface() -> vo
 	for point in [Vector2i(1, 1), Vector2i(254, 1), Vector2i(128, 192), Vector2i(1, 382), Vector2i(254, 382)]:
 		assert_float(retained_alpha.get_pixelv(point).a).override_failure_message("Farm final pass leaks on transparent surface at %s" % point).is_greater_equal(0.99)
 	# A transparent negative control verifies that alpha readback is meaningful.
-	for path in ["FarmBackground", "HUD", "Ground", "Props", "Crops", "Player", "OpaqueSceneLayer"]:
+	for path in ["FarmBackground", "HUD", "Ground", "PlotSurface", "Scenery", "Props", "Crops", "Player", "OpaqueSceneLayer"]:
 		farm.get_node(path).visible = false
 	viewport.transparent_bg = true
 	await get_tree().process_frame

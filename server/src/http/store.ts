@@ -1,3 +1,4 @@
+import type { FishingPresenceReader } from '../domain/fishing.js';
 /**
  * 存储抽象。HTTP 层只认这个接口，Task 7 用 PostgreSQL 实现它，测试用内存实现。
  *
@@ -7,6 +8,8 @@
  */
 import type { Command, CommandEnvelope } from '../domain/commands.js';
 import type { FarmRow } from './dto.js';
+import type { RealtimePersistence } from '../realtime/model.js';
+import type { RelocationConfirm, RelocationDraft, RelocationOutcome } from '../domain/farm_relocation.js';
 
 export interface PlayerRow { id: string; install_key_hmac: string }
 export interface TokenRow { id: string; player_id: string; token_hash: string; last_used_at: number }
@@ -21,13 +24,14 @@ export interface CommandRecord {
 export type ApplyOutcome =
   | { kind: 'applied'; body: unknown }
   | { kind: 'rejected'; code: string; detail?: string }
-  | { kind: 'replayed'; record: CommandRecord }
+  /** `farm` 是**当前**农场行：applied 的重放要用它重建视图，而不是回放一份过期快照。 */
+  | { kind: 'replayed'; record: CommandRecord; farm: FarmRow }
   | { kind: 'idempotency_mismatch' }
   | { kind: 'version_conflict'; farm: FarmRow }
   | { kind: 'version_mismatch' }
   | { kind: 'no_farm' };
 
-export interface Store {
+export interface Store extends RealtimePersistence {
   /** 同 install_key 返回同一 player；每次调用签发新 token 并淘汰超出上限的旧 token。 */
   authAnonymous(installKeyHmac: string): Promise<{ player: PlayerRow; token: string }>;
   revokeToken(tokenHash: string): Promise<void>;
@@ -37,14 +41,16 @@ export interface Store {
   playerHmac(playerId: string): Promise<string | null>;
 
   farmByOwner(ownerId: string): Promise<FarmRow | null>;
+  saveRelocationPreview(ownerId: string, draft: RelocationDraft): Promise<{ code?: string }>;
+  confirmFarmRelocation(ownerId: string, input: RelocationConfirm): Promise<RelocationOutcome>;
   createFarm(args: {
     ownerId: string; idempotencyKey: string; payloadHash: string;
     regionId: string; layoutPatchId: string; blueprintRevision: number;
-    build: () => FarmRow;
+    build: () => FarmRow | Promise<FarmRow>;
   }): Promise<{ kind: 'created' | 'replayed'; farm: FarmRow } | { kind: 'idempotency_mismatch' }>;
 
   /** 事务内：行锁 → 幂等查表 → 版本门控 → 采样时间 → reducer → 写日志与状态。 */
-  applyCommand(ownerId: string, env: CommandEnvelope, cmd: Command): Promise<ApplyOutcome>;
+  applyCommand(ownerId: string, env: CommandEnvelope, cmd: Command, fishingPresence?: FishingPresenceReader): Promise<ApplyOutcome>;
 
   // —— G2 访问骨架 ——
   farmById(farmId: string): Promise<FarmRow | null>;
@@ -58,8 +64,8 @@ export interface Store {
    * `build` 产出的 body 里 snapshot_revision / snapshot_taken_at 都是占位 0，调用方用返回值覆盖——
    * 时间戳进了 body，跨槽就永远"内容变了"。
    */
-  snapshotGetOrCreate(farmId: string, slot: number, build: () => object):
-    Promise<{ revision: number; taken_at: number; body: object }>;
+  snapshotGetOrCreate(farmId: string, slot: number, build: (current: FarmRow) => object):
+    Promise<{ revision: number; taken_at: number; body: object; farm: FarmRow }>;
   /** 幂等写入系统农场（预置访客农场）。已存在就什么都不做。 */
   ensureSystemFarm(playerHmac: string, farm: FarmRow): Promise<void>;
 }

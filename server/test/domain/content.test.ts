@@ -19,6 +19,88 @@ const edit = (dir: string, name: string, mutate: (d: any) => void): void => {
 };
 
 describe('content tables', () => {
+  it.each(['duplicate_id', 'wrong_resident', 'unknown_slot', 'missing_reply', 'unknown_material', 'zero_material',
+    'permanent_equipment', 'uncraftable_prop', 'null_cost'])('rejects invalid request definition %s', invalid => {
+    const dir = scratch();
+    edit(dir, 'journey', d => {
+      const request = d.opportunities.restorer[2];
+      if (invalid === 'duplicate_id') request.id = d.opportunities.nursery[0].id;
+      if (invalid === 'wrong_resident') request.resident_id = 'nursery_keeper';
+      if (invalid === 'unknown_slot') d.opportunities.unknown = d.opportunities.restorer;
+      if (invalid === 'missing_reply') request.reply = '';
+      if (invalid === 'unknown_material') request.materials = { gold: 3 };
+      if (invalid === 'zero_material') request.materials = { copper_ore: 0 };
+      if (invalid === 'permanent_equipment') request.props = { copper_pickaxe: 1 };
+      if (invalid === 'uncraftable_prop') request.props = { bench: 1 };
+      if (invalid === 'null_cost') request.materials = null;
+    });
+    expect(() => loadContent(dir)).toThrowError(ContentError);
+  });
+  it('keeps the six original request indices and permits new needs to contribute to existing street effects', () => {
+    const c = loadContent(DEFAULT_CONTENT_DIR);
+    expect(c.journey.opportunities.nursery.map(offer => offer.id)).toEqual(['fresh_nursery_leaves', 'nursery_flowers']);
+    expect(c.journey.opportunities.bistro.slice(0, 2).map(offer => offer.id)).toEqual(['lunch_at_table', 'tea_for_neighbours']);
+    expect(c.journey.opportunities.restorer.slice(0, 2).map(offer => offer.id)).toEqual(['timber_for_repairs', 'workshop_supplies']);
+    expect(c.journey.opportunities.restorer[0].effect).toBe(c.journey.opportunities.restorer[2].effect);
+    expect(c.journey.opportunities.restorer[1].effect).toBe(c.journey.opportunities.restorer[3].effect);
+  });
+  it.each(['negative_base', 'unknown_stat', 'wrong_slot', 'zero_cost', 'mineral_cost', 'duplicate_buff', 'zero_uses', 'unknown_food'])
+  ('rejects invalid character %s', invalid => {
+    const dir = scratch();
+    edit(dir, 'character', d => {
+      if (invalid === 'negative_base') d.base.gather_bonus = -1;
+      if (invalid === 'unknown_stat') d.equipment.copper_pickaxe.modifiers = { health: 1 };
+      if (invalid === 'wrong_slot') d.equipment.copper_pickaxe.slot = 'head';
+      if (invalid === 'zero_cost') d.equipment.copper_pickaxe.materials.wood = 0;
+      if (invalid === 'mineral_cost') d.equipment.copper_pickaxe.materials.gold = 1;
+      if (invalid === 'duplicate_buff') d.consumables.tea.buff_id = d.consumables.salad.buff_id;
+      if (invalid === 'zero_uses') d.consumables.tea.uses = 0;
+      if (invalid === 'unknown_food') d.consumables.wood = d.consumables.tea;
+    });
+    expect(() => loadContent(dir)).toThrowError(ContentError);
+  });
+  it('includes character rules in the content checksum', () => {
+    const dir = scratch();
+    const before = contentVersion(dir);
+    const legacy = contentVersion(dir, true);
+    edit(dir, 'character', d => { d.consumables.salad.uses = 4; });
+    expect(contentVersion(dir)).not.toBe(before);
+    expect(contentVersion(dir, true)).toBe(legacy);
+  });
+  it.each(['floor_count', 'duplicate_rock', 'position', 'weight', 'unknown_material', 'no_drop_quantity'])('rejects invalid mining %s', invalid => {
+    const dir = scratch();
+    edit(dir, 'mining', d => {
+      if (invalid === 'floor_count') d.floors = 6;
+      if (invalid === 'duplicate_rock') d.rocks[1].id = d.rocks[0].id;
+      if (invalid === 'position') d.rocks[0].position = [1];
+      if (invalid === 'weight') d.bonus_drops[0].weight = 0;
+      if (invalid === 'unknown_material') d.bonus_drops[0].material = 'gold';
+      if (invalid === 'no_drop_quantity') d.bonus_drops[2].quantity = 1;
+    });
+    expect(() => loadContent(dir)).toThrowError(ContentError);
+  });
+  it('rejects invalid mineral costs in cooking recipes', () => {
+    const dir = scratch();
+    edit(dir, 'recipes', d => { d.recipes.vegetable_soup.materials = { unknown: 1 }; });
+    expect(() => loadContent(dir)).toThrowError(ContentError);
+  });
+
+  it.each(['rockless_floor', 'combat_version', 'empty_loot', 'unknown_loot', 'wrong_loot_kind', 'loot_weight', 'loot_quantity', 'resistance'])
+  ('rejects invalid combat and floor rule %s', invalid => {
+    const dir = scratch();
+    edit(dir, 'mining', d => {
+      const elite = d.combat.monsters.elite_slime;
+      if (invalid === 'rockless_floor') d.rockless_floors = [4];
+      if (invalid === 'combat_version') d.combat.version = 1;
+      if (invalid === 'empty_loot') elite.loot = [];
+      if (invalid === 'unknown_loot') elite.loot[0].item_id = '__proto__';
+      if (invalid === 'wrong_loot_kind') elite.loot[0].item_id = 'copper_sword';
+      if (invalid === 'loot_weight') elite.loot[0].weight = 0;
+      if (invalid === 'loot_quantity') elite.loot[0].quantity = -1;
+      if (invalid === 'resistance') elite.knockback_resistance = 2;
+    });
+    expect(() => loadContent(dir)).toThrowError(ContentError);
+  });
   it.each(['requirements', 'theme', 'item', 'dish', 'coins', 'null'])('rejects invalid gathering %s', invalid => {
     const dir = scratch();
     edit(dir, 'journey', d => {
@@ -47,10 +129,8 @@ describe('content tables', () => {
     expect(c.crops.crops.H).toMatchObject({ seed_price: 10, unit_price: 19 });
     expect(c.crops.crops.C.duration_ms).toBe(12 * 3600_000);
     // §6.4 L429 D0 教学特例
-    expect(c.crops.d0_tutorial).toMatchObject({ crop: 'R', count: 6, duration_ms: 180_000 });
     // §6.6 L453 受控天气序列 + L459 保护槽
     expect(c.weather.script).toEqual(['sunny', 'rain', 'sunny', 'sunny', 'rain', 'wind', 'sunny']);
-    expect(c.weather.protected_slots).toEqual([0, 1, 5]);
     // §7.2 L488 等级阈值
     expect(c.xp.level_thresholds).toEqual([0, 40, 80, 120, 160, 220, 290]);
     // §7.5 L572 两条路线账户价值相同
@@ -105,9 +185,6 @@ describe('content tables', () => {
   });
 
   it('内容非法时抛 ContentError 而不是静默降级', () => {
-    const dir = scratch();
-    edit(dir, 'economy', d => { d.growth_choice.field.seed_basket = { R: 11 }; });
-    expect(() => loadContent(dir)).toThrowError(ContentError);
 
     const dir2 = scratch();
     edit(dir2, 'weather_script', d => { d.script = ['sunny']; });

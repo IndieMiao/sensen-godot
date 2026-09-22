@@ -73,7 +73,7 @@ func test_growing_and_owned_seeds_keep_the_existing_plan_before_refreshing_suppl
 	assert_str(JourneyProgress.tracked_goal(st, 1000).action).is_equal("wait")
 	assert_str(JourneyProgress.tracked_goal(st, 2000).action).is_equal("harvest")
 	st.cells.a.state = "sown"
-	assert_str(JourneyProgress.tracked_goal(st, 1000).action).is_equal("care")
+	assert_str(JourneyProgress.tracked_goal(st, 1000).action).is_equal("water")
 
 func test_supply_guidance_never_invents_an_unrestored_or_locked_reward() -> void:
 	var st := _state()
@@ -183,6 +183,6 @@ func test_recovery_offer_button_sends_nothing_until_the_player_chooses() -> void
 	change.pressed.emit()
 	for frame in 5: await get_tree().process_frame
 	assert_str(transport.last_body().type).is_equal("decline_opportunity")
-	assert_dict(transport.last_body().payload).is_equal({"slot": "restorer", "sequence": 1.0})
+	assert_dict(transport.last_body().payload).is_equal({"slot": "restorer", "sequence": 1.0, "timber_only": true})
 	assert_dict(panel.session.state.journey.tracked_opportunity).is_equal(st.journey.tracked_opportunity)
 	assert_int(panel.session.state.wallet).is_equal(0)

@@ -1,0 +1,503 @@
+{
+  "normalization": "Screens 360 px wide, preserve aspect ratio; Android 720x1560 downsampled 2:1 to 360x780. No CSS/browser frame or screen substitution. Concept secondary board quadrants retain their 724x543 aspect ratio.",
+  "pairs": [
+    {
+      "comparison": "docs/design/game-ui-2026-09-21/qa/farm-comparison-final.png",
+      "source": "docs/design/game-ui-2026-09-21/generated/farm-design.png",
+      "implementation": "output/ui-redesign-2026-09-21/android/01-farm.png",
+      "source_pixels": [
+        848,
+        1855
+      ],
+      "implementation_pixels": [
+        720,
+        1560
+      ],
+      "normalized_width": 360,
+      "normalized_sizes": [
+        [
+          360,
+          788
+        ],
+        [
+          360,
+          780
+        ]
+      ],
+      "crop": null,
+      "sha256": "94a7f71b037515785eca3e2307f4cc0c3457ea0a23c6e43debbf6fa8857087af"
+    },
+    {
+      "comparison": "docs/design/game-ui-2026-09-21/qa/bag-comparison-final.png",
+      "source": "docs/design/game-ui-2026-09-21/generated/bag-design.png",
+      "implementation": "output/ui-redesign-2026-09-21/android/05-bag-details.png",
+      "source_pixels": [
+        848,
+        1855
+      ],
+      "implementation_pixels": [
+        720,
+        1560
+      ],
+      "normalized_width": 360,
+      "normalized_sizes": [
+        [
+          360,
+          788
+        ],
+        [
+          360,
+          780
+        ]
+      ],
+      "crop": null,
+      "sha256": "c2f7a04651f5d11b74b25513550725a37b62ce434b1cecf546a08cb96566bf20"
+    },
+    {
+      "comparison": "docs/design/game-ui-2026-09-21/qa/secondary-stall-comparison.png",
+      "source": "docs/design/game-ui-2026-09-21/generated/secondary-design.png",
+      "implementation": "output/ui-redesign-2026-09-21/android/10-stall.png",
+      "source_pixels": [
+        1448,
+        1086
+      ],
+      "implementation_pixels": [
+        720,
+        1560
+      ],
+      "normalized_width": 360,
+      "normalized_sizes": [
+        [
+          360,
+          270
+        ],
+        [
+          360,
+          780
+        ]
+      ],
+      "crop": {
+        "source": [
+          0,
+          0,
+          724,
+          543
+        ]
+      },
+      "sha256": "11b9ac815ea9977909d6f480d0e9a1ee163152fbdb9dceef622b0dcefe005044"
+    },
+    {
+      "comparison": "docs/design/game-ui-2026-09-21/qa/secondary-request-comparison.png",
+      "source": "docs/design/game-ui-2026-09-21/generated/secondary-design.png",
+      "implementation": "output/ui-redesign-2026-09-21/gallery/39-request-nursery.png",
+      "source_pixels": [
+        1448,
+        1086
+      ],
+      "implementation_pixels": [
+        360,
+        780
+      ],
+      "normalized_width": 360,
+      "normalized_sizes": [
+        [
+          360,
+          270
+        ],
+        [
+          360,
+          780
+        ]
+      ],
+      "crop": {
+        "source": [
+          724,
+          0,
+          1448,
+          543
+        ]
+      },
+      "sha256": "3a657eb402b37023b8828f97138846ad52a5a0adb4df3a9252f03882a6c7dd5b"
+    },
+    {
+      "comparison": "docs/design/game-ui-2026-09-21/qa/secondary-kitchen-comparison.png",
+      "source": "docs/design/game-ui-2026-09-21/generated/secondary-design.png",
+      "implementation": "output/ui-redesign-2026-09-21/gallery/51-bistro-counter.png",
+      "source_pixels": [
+        1448,
+        1086
+      ],
+      "implementation_pixels": [
+        360,
+        780
+      ],
+      "normalized_width": 360,
+      "normalized_sizes": [
+        [
+          360,
+          270
+        ],
+        [
+          360,
+          780
+        ]
+      ],
+      "crop": {
+        "source": [
+          0,
+          543,
+          724,
+          1086
+        ]
+      },
+      "sha256": "f0873d75e7a64aa9e3e246c66a5d9c6d5379dc8d6984fe05bd77534c77b7007a"
+    },
+    {
+      "comparison": "docs/design/game-ui-2026-09-21/qa/secondary-party-comparison.png",
+      "source": "docs/design/game-ui-2026-09-21/generated/secondary-design.png",
+      "implementation": "output/ui-redesign-2026-09-21/android/12-party.png",
+      "source_pixels": [
+        1448,
+        1086
+      ],
+      "implementation_pixels": [
+        720,
+        1560
+      ],
+      "normalized_width": 360,
+      "normalized_sizes": [
+        [
+          360,
+          270
+        ],
+        [
+          360,
+          780
+        ]
+      ],
+      "crop": {
+        "source": [
+          724,
+          543,
+          1448,
+          1086
+        ]
+      },
+      "sha256": "71f8042012677e90b3fd0ad85831187243ea51a1d755c32e22de2b54e8545910"
+    },
+    {
+      "comparison": "docs/design/game-ui-2026-09-21/qa/selected-tab-history.png",
+      "source": "docs/design/game-ui-2026-09-21/qa/bag-pre-font-fix.png",
+      "implementation": "output/ui-redesign-2026-09-21/android/05-bag-details.png",
+      "source_pixels": [
+        360,
+        780
+      ],
+      "implementation_pixels": [
+        720,
+        1560
+      ],
+      "normalized_width": 360,
+      "normalized_sizes": [
+        [
+          360,
+          63
+        ],
+        [
+          360,
+          64
+        ]
+      ],
+      "crop": {
+        "normalized_source": [
+          0,
+          290,
+          360,
+          353
+        ],
+        "normalized_implementation": [
+          0,
+          296,
+          360,
+          360
+        ]
+      },
+      "sha256": "9e2265848e6d7dcf0f10ab158fbb601ae57d53b46e3c24263d52136b589504c8"
+    }
+  ],
+  "focused_and_state_images": {
+    "farm-controls-focused.png": {
+      "inputs": [
+        "docs/design/game-ui-2026-09-21/generated/farm-design.png",
+        "output/ui-redesign-2026-09-21/android/01-farm.png"
+      ],
+      "normalized_crops": [
+        [
+          [
+            0,
+            30,
+            360,
+            140
+          ],
+          [
+            0,
+            10,
+            360,
+            120
+          ]
+        ],
+        [
+          [
+            0,
+            684,
+            360,
+            774
+          ],
+          [
+            0,
+            700,
+            360,
+            778
+          ]
+        ]
+      ],
+      "pixels": [
+        756,
+        310
+      ],
+      "sha256": "e0f40dc44080189e004f33188763899422c73cb7add241399cf32d85d25616b5"
+    },
+    "bag-selected-focused.png": {
+      "inputs": [
+        "docs/design/game-ui-2026-09-21/generated/bag-design.png",
+        "output/ui-redesign-2026-09-21/android/05-bag-details.png"
+      ],
+      "normalized_crops": [
+        [
+          [
+            0,
+            228,
+            360,
+            296
+          ],
+          [
+            0,
+            296,
+            360,
+            360
+          ]
+        ],
+        [
+          [
+            0,
+            296,
+            360,
+            380
+          ],
+          [
+            0,
+            360,
+            360,
+            465
+          ]
+        ],
+        [
+          [
+            0,
+            380,
+            360,
+            588
+          ],
+          [
+            0,
+            465,
+            360,
+            688
+          ]
+        ]
+      ],
+      "pixels": [
+        756,
+        554
+      ],
+      "sha256": "690b84c09e5d045f1e7f9e1e732861c71bb9fbe887fcdd6942b2df5114610cf2"
+    },
+    "menus-focused.png": {
+      "inputs": [
+        "docs/design/game-ui-2026-09-21/generated/bag-design.png",
+        "output/ui-redesign-2026-09-21/gallery/42-bag-category-menu.png",
+        "output/ui-redesign-2026-09-21/gallery/43-bag-sort-menu.png"
+      ],
+      "normalized_crops": [
+        [
+          0,
+          380,
+          360,
+          431
+        ],
+        [
+          0,
+          207,
+          360,
+          621
+        ],
+        [
+          0,
+          175,
+          360,
+          297
+        ]
+      ],
+      "state_note": "Mock contains menu triggers only. Open menu states are actual runtime coverage.",
+      "pixels": [
+        756,
+        650
+      ],
+      "sha256": "ab6a01364c32c4a213d3deea206cb184503b97ed723d3d8fc4ac2ebb09c9ad58"
+    },
+    "final-state-evidence.png": {
+      "inputs": [
+        "output/ui-redesign-2026-09-21/android/02-free-camera.png",
+        "output/ui-redesign-2026-09-21/android/07-character.png",
+        "output/ui-redesign-2026-09-21/gallery/23-farm-toast.png",
+        "output/ui-redesign-2026-09-21/gallery/73-mine-rescue.png",
+        "output/ui-redesign-2026-09-21/gallery/70-mine-floor-3.png",
+        "output/ui-redesign-2026-09-21/gallery/01-city.png"
+      ],
+      "normalized_width": 360,
+      "pixels": [
+        1112,
+        1660
+      ],
+      "sha256": "85257dd6532df02c2e0b2be39393e13b104e8fffd2d88136a197740e0266b038"
+    }
+  },
+  "originals": {
+    "docs/design/game-ui-2026-09-21/generated/farm-design.png": {
+      "pixels": [
+        848,
+        1855
+      ],
+      "sha256": "18d52a2412e510c495835b90451832d5135a198e664a6a2a8b68834b69904377"
+    },
+    "output/ui-redesign-2026-09-21/android/01-farm.png": {
+      "pixels": [
+        720,
+        1560
+      ],
+      "sha256": "57065489bd683c67862f798aaa5ab5376c87066f8d1bb659247e346d467d1ff3"
+    },
+    "docs/design/game-ui-2026-09-21/generated/bag-design.png": {
+      "pixels": [
+        848,
+        1855
+      ],
+      "sha256": "e03755fb6e8b7741fc8318550d027c9d77a6b8f32893068021fe7a78ec9862ba"
+    },
+    "output/ui-redesign-2026-09-21/android/05-bag-details.png": {
+      "pixels": [
+        720,
+        1560
+      ],
+      "sha256": "4ed3f1cfabd46c84aaf094103ae9965255ae1abd84246206896755ac2fd8cf66"
+    },
+    "docs/design/game-ui-2026-09-21/generated/secondary-design.png": {
+      "pixels": [
+        1448,
+        1086
+      ],
+      "sha256": "795d3e224c6b304b2a15fed79ff403506e1e01da858104f554f9c9699e062d4f"
+    },
+    "output/ui-redesign-2026-09-21/android/10-stall.png": {
+      "pixels": [
+        720,
+        1560
+      ],
+      "sha256": "6431b91f77b8179d6797204b8e160c1e59897ed9305d223d4822b224c50ae78e"
+    },
+    "output/ui-redesign-2026-09-21/gallery/39-request-nursery.png": {
+      "pixels": [
+        360,
+        780
+      ],
+      "sha256": "93f2cf0e2cfd52a8b2ac46b88af75d1333362b3f232679aca03cdb41d2d04ce4"
+    },
+    "output/ui-redesign-2026-09-21/gallery/51-bistro-counter.png": {
+      "pixels": [
+        360,
+        780
+      ],
+      "sha256": "a5fd55998a36b98b113612964763d0ae64b0292cc762a843f4629170f644c6b2"
+    },
+    "output/ui-redesign-2026-09-21/android/12-party.png": {
+      "pixels": [
+        720,
+        1560
+      ],
+      "sha256": "da50a0222ab97b77eae90d8c16f631de84ae819df34ac6ceb270343e017b2f2f"
+    },
+    "docs/design/game-ui-2026-09-21/qa/bag-pre-font-fix.png": {
+      "pixels": [
+        360,
+        780
+      ],
+      "sha256": "3bd5310f324f19d2b1f648fbbfa00877638d591918c7e3c61319d9f8c65f1e4c"
+    },
+    "output/ui-redesign-2026-09-21/gallery/42-bag-category-menu.png": {
+      "pixels": [
+        360,
+        780
+      ],
+      "sha256": "5ce5785bfe4c77a48996b9ef0c2cc7d340ea2feeb43ad6961c0c6437115d6dd1"
+    },
+    "output/ui-redesign-2026-09-21/gallery/43-bag-sort-menu.png": {
+      "pixels": [
+        360,
+        780
+      ],
+      "sha256": "84f32eff4728e06b6beae7e98e37621267366d793c277915881b1c39d66afb44"
+    },
+    "output/ui-redesign-2026-09-21/android/02-free-camera.png": {
+      "pixels": [
+        720,
+        1560
+      ],
+      "sha256": "735db7ccddabb773882339b5ce4486a0ef701078aafafac0ee84d885e58ff7e1"
+    },
+    "output/ui-redesign-2026-09-21/android/07-character.png": {
+      "pixels": [
+        720,
+        1560
+      ],
+      "sha256": "6dd4e099721c93ea6444212b872726a98afec16538b282a5cb6d1c071cfa1cda"
+    },
+    "output/ui-redesign-2026-09-21/gallery/23-farm-toast.png": {
+      "pixels": [
+        360,
+        780
+      ],
+      "sha256": "703c6fafefe7ae6e00cbb6a76def88b1ccbce0ae188b18e6a8439da4874ceb7c"
+    },
+    "output/ui-redesign-2026-09-21/gallery/73-mine-rescue.png": {
+      "pixels": [
+        360,
+        780
+      ],
+      "sha256": "9c43557f99d7e3a7e52ad3826c6ee4da06dbc3db8b6ade5ebe44f43e73ad0983"
+    },
+    "output/ui-redesign-2026-09-21/gallery/70-mine-floor-3.png": {
+      "pixels": [
+        360,
+        780
+      ],
+      "sha256": "4fa309d81dd48cf1f9f168911f6f83e1ad0e1ae561d5ca7455c3c2191891b755"
+    },
+    "output/ui-redesign-2026-09-21/gallery/01-city.png": {
+      "pixels": [
+        360,
+        780
+      ],
+      "sha256": "4370cce89f8fa70f9dd1a27d51532f9d5b5a822a5c3bf4e69c7009087a0bc7e5"
+    }
+  }
+}

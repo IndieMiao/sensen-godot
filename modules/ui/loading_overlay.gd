@@ -5,19 +5,31 @@ var close_button: Button
 
 func _ready() -> void:
 	layer = 120
+	GameUi.register_modal(self)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var background := ColorRect.new()
 	background.color = GameUi.PAPER
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.theme = GameUi.theme()
 	add_child(background)
+	var scenery := TextureRect.new()
+	scenery.texture = load("res://assets/ui/game/city-background.png")
+	scenery.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scenery.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	scenery.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	scenery.modulate.a = 0.38
+	scenery.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	background.add_child(scenery)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.add_child(center)
+	var card := PanelContainer.new()
+	card.add_theme_stylebox_override("panel", GameUi.panel_style(20))
+	center.add_child(card)
 	var column := VBoxContainer.new()
 	column.custom_minimum_size = Vector2(220, 0)
 	column.add_theme_constant_override("separation", 16)
-	center.add_child(column)
+	card.add_child(column)
 	var symbol := GameUi.picture(GameUi.icon("sprout"), 36)
 	symbol.modulate = GameUi.GREEN
 	column.add_child(symbol)
@@ -25,7 +37,7 @@ func _ready() -> void:
 	message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(message)
 	progress = ProgressBar.new()
-	progress.custom_minimum_size = Vector2(220, 4)
+	progress.custom_minimum_size = Vector2(220, 8)
 	progress.show_percentage = false
 	progress.indeterminate = true
 	column.add_child(progress)

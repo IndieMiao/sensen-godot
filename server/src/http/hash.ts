@@ -14,7 +14,14 @@ export function canonicalJson(v: unknown): string {
   return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalJson((v as Record<string, unknown>)[k])}`).join(',')}}`;
 }
 
-export const payloadHash = (env: CommandEnvelope): string =>
+export const payloadHash = (env: Omit<CommandEnvelope, 'type'> & { type: string }): string =>
   createHash('sha256')
-    .update(canonicalJson({ type: env.type, payload: env.payload, base_version: env.base_version }), 'utf8')
+    .update(canonicalJson({ type: env.type, payload: env.payload, base_version: env.base_version,
+      ...(env.terrain_checksum !== undefined ? { terrain_checksum: env.terrain_checksum } : {}) }), 'utf8')
     .digest('hex');
+
+/** Retain optional envelope identity for audit without rewriting existing command payloads or receipts. */
+export function commandRecordResult(env: { terrain_checksum?: string }, result: unknown): unknown {
+  return env.terrain_checksum !== undefined && result && typeof result === 'object'
+    ? { ...result, terrain_checksum: env.terrain_checksum } : result;
+}

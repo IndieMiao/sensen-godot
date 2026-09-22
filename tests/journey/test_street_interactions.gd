@@ -1,6 +1,12 @@
 extends GdUnitTestSuite
 
-func test_visitor_street_uses_public_scene_and_confirmation_cancel_keeps_it_open() -> void:
+func after_test() -> void:
+	while AppRouter._navigation_pending: await get_tree().process_frame
+	while AppRouter.instance_depth() > 0:
+		AppRouter.pop_instance()
+		await get_tree().process_frame
+
+func test_archived_visitor_street_confirmation_cancel_keeps_legacy_scene_open() -> void:
 	var snap := PresetSnapshots.snapshot(str(PresetSnapshots.entries("shanghai")[0].farm_id))
 	var source := FarmBlueprint.load_file(FarmBlueprint.asset_path(str(snap.layout_patch_id), int(snap.blueprint_revision)))
 	var street := auto_free(JourneyStreet.new()) as JourneyStreet
@@ -21,24 +27,21 @@ func test_visitor_street_uses_public_scene_and_confirmation_cancel_keeps_it_open
 	street.confirmation.cancel_button.pressed.emit()
 	assert_bool(street.confirmation.visible).is_false()
 
-func test_visitor_confirmation_enters_the_selected_farm_and_returns_to_street() -> void:
+func test_legacy_visitor_street_route_enters_selected_farm_directly_and_returns_to_map() -> void:
+	var home := FarmChoice.load().duplicate(true)
 	var snap := PresetSnapshots.snapshot(str(PresetSnapshots.entries("los_angeles")[0].farm_id))
 	var source := FarmBlueprint.load_file(FarmBlueprint.asset_path(str(snap.layout_patch_id), int(snap.blueprint_revision)))
-	var street := AppRouter.push_instance(AppRouter.STREET, {"visitor_snapshot": snap, "blueprint": source}) as JourneyStreet
+	var farm := AppRouter.push_instance(AppRouter.STREET, {"visitor_snapshot": snap, "blueprint": source})
 	await get_tree().process_frame
-	street._arrive("farm")
-	street.confirmation.enter_button.pressed.emit()
-	assert_bool(AppRouter._navigation_pending).is_true()
-	while AppRouter._navigation_pending: await get_tree().process_frame
-	var farm := AppRouter.top_instance()
+	assert_str(farm.scene_file_path).is_equal(AppRouter.FARM)
+	assert_int(AppRouter.instance_depth()).is_equal(1)
 	assert_bool(farm.visitor).is_true()
 	assert_str(str(farm.snapshot.farm_id)).is_equal(str(snap.farm_id))
-	assert_bool(street.visible).is_false()
+	assert_str(farm.geo_blueprint.layout_patch_id).is_equal(source.layout_patch_id)
+	assert_object(farm.farm_activities).is_null()
+	assert_that(FarmChoice.load()).is_equal(home)
 	AppRouter.pop_instance()
-	assert_object(AppRouter.top_instance()).is_same(street)
-	assert_bool(street.visible).is_true()
-	assert_bool(street.confirmation.visible).is_false()
-	AppRouter.pop_instance()
+	assert_int(AppRouter.instance_depth()).is_zero()
 	await get_tree().process_frame
 
 func _state() -> Dictionary:
@@ -46,7 +49,7 @@ func _state() -> Dictionary:
 		"engineering": {"reserved": {}}, "residents": {"nursery_keeper": {"points": 17}, "bistro_owner": {"points": 27}},
 		"journey": {"version": 1, "facts": ["met_nursery", "met_bistro", "workbench", "planter_crafted", "planter_placed", "planter_planted", "side_path", "shared_meal", "story_nursery_seeds", "project_seedbeds_0", "project_seedbeds_1"],
 		"unlocks": ["bistro", "kitchen", "tea", "gifts", "crop_H"], "completed": [], "wood": 0, "materials": {},
-		"exploration": {"round": 3, "collected": ["seedbeds"]}, "opportunities": {"nursery": {"sequence": 1, "variant": 1}, "bistro": {"sequence": 0, "variant": 0}}}}
+		"exploration": {"round": 3, "collected": ["seedbeds"]}, "opportunities": {"nursery": {"sequence": 1, "variant": 1, "accepted": true}, "bistro": {"sequence": 0, "variant": 0, "accepted": true}}}}
 
 func test_goal_routes_to_the_same_resident_or_their_place_when_absent() -> void:
 	var goal := JourneyProgress.next_goal(_state())
@@ -68,6 +71,7 @@ func test_early_nursery_conversation_prioritizes_workbench_but_keeps_requests_av
 		var initial := _state()
 		initial.journey.facts = ["met_nursery"]
 		initial.journey.unlocks = []
+		initial.journey.opportunities.nursery = {"sequence": 0, "variant": 0, "accepted": false}
 		var original := initial.duplicate(true)
 		var session := FarmSession.new(ApiClient.new())
 		session.state = initial
@@ -89,18 +93,19 @@ func test_early_nursery_conversation_prioritizes_workbench_but_keeps_requests_av
 		optional.pressed.emit()
 		for frame in 3: await get_tree().process_frame
 		buttons = panel.content.find_children("*", "Button", true, false)
-		assert_bool(buttons.any(func(button): return button.text.begins_with("Deliver -"))).is_true()
+		assert_bool(buttons.any(func(button): return button.name == "AcceptRequest_nursery" and not button.disabled)).is_true()
+		assert_bool(buttons.any(func(button): return button.text.begins_with("Deliver -") and not button.disabled)).is_false()
 		assert_that(session.state).is_equal(original)
 		panel.refresh()
 		for frame in 3: await get_tree().process_frame
 		buttons = panel.content.find_children("*", "Button", true, false)
-		assert_bool(buttons.any(func(button): return button.text.begins_with("Deliver -"))).is_true()
+		assert_bool(buttons.any(func(button): return button.name == "AcceptRequest_nursery" and not button.disabled)).is_true()
 		initial.journey.facts.append("workbench")
 		panel.refresh()
 		for frame in 3: await get_tree().process_frame
 		buttons = panel.content.find_children("*", "Button", true, false)
 		assert_bool(buttons.any(func(button): return button.text == "Inspect the workbench" or button.text == "Visit the nursery")).is_false()
-		assert_bool(buttons.any(func(button): return button.text.begins_with("Deliver -"))).is_true()
+		assert_bool(buttons.any(func(button): return button.name == "AcceptRequest_nursery" and not button.disabled)).is_true()
 
 func test_street_story_has_the_same_command_and_only_responds_after_acceptance() -> void:
 	for accepted in [false, true]:

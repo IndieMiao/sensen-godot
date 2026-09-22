@@ -1,0 +1,62 @@
+{
+  "asset": "Generic pocket park category miniature",
+  "provider": "Sensenjoy API",
+  "base_url": "https://sub.sensenjoy.cn/v1",
+  "model": "gpt-image-2",
+  "mode": "imagegen bundled fallback CLI edit using approved greenery reference crop",
+  "requested_size": [
+    1024,
+    1024
+  ],
+  "actual_raw_size": [
+    1374,
+    1145
+  ],
+  "quality": "high",
+  "reference": "docs/design/la-map-2026-09-22/generated/la-map-main-v1.png",
+  "reference_crop_xyxy": [
+    310,
+    50,
+    575,
+    190
+  ],
+  "prompt_file": "prompt.txt",
+  "raw_file": "raw.png",
+  "extracted_file": "extracted-rgba.png",
+  "final_file": "assets/map/poi/park.png",
+  "final_size": [
+    512,
+    512
+  ],
+  "final_mode": "RGBA",
+  "ground_anchor_px": [
+    256,
+    480
+  ],
+  "source_alpha_bbox": [
+    188,
+    113,
+    1192,
+    982
+  ],
+  "final_alpha_bbox": [
+    32,
+    92,
+    480,
+    480
+  ],
+  "processing": "remove_chroma_key.py --auto-key corners --soft-matte --transparent-threshold 16 --opaque-threshold 160 --spill-cleanup; alpha crop, Lanczos fit 448x432, ground at y=480 on 512 square RGBA canvas",
+  "sha256": "c73b9626d11abca812500a48130b5fb0df87a707fa9f12282c904f20beb4507b",
+  "generated_utc": "2026-09-22T04:38:27.067774+00:00",
+  "visual_status": "Passed: complete park base and crowns, path/bench/flower patch clear, no buildings/people/text; edges and palm-frond gaps inspected on cream and navy, including 112px thumbnail; no visible magenta fringe.",
+  "scope_note": "Generic park illustration; real coordinates and classification assigned separately. No source or live state modified.",
+  "validation": {
+    "corner_alpha": 0,
+    "opaque_magenta_pixels": 0,
+    "actual_mode": "RGBA",
+    "actual_dimensions": [
+      512,
+      512
+    ]
+  }
+}

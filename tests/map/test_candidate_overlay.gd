@@ -50,3 +50,26 @@ func test_set_candidates_twice_does_not_accumulate() -> void:
 	assert_int(ov.get_child_count()).is_equal(1)
 	assert_int(ov.candidate_ids().size()).is_equal(1)
 	await get_tree().process_frame # 断言已完成；让第一次调用 remove_child 后排队的 queue_free 落地，避免误报 orphan
+
+func test_placement_outline_keeps_blue_stroke_and_visible_white_border_when_selected() -> void:
+	var ov := auto_free(CandidateOverlay.new()) as CandidateOverlay
+	ov.outline_only = true
+	ov.placement_outline = true
+	add_child(ov)
+	ov.set_candidates([FarmBlueprint.load_file(FIX)], 31.2, 121.4)
+	var node := ov.get_child(0) as Node3D
+	assert_int(node.get_child_count()).is_equal(2)
+	var border := node.get_child(0) as MeshInstance3D
+	var outline := node.get_child(1) as MeshInstance3D
+	var border_material := border.material_override as StandardMaterial3D
+	var outline_material := outline.material_override as StandardMaterial3D
+	assert_float(border.mesh.get_aabb().size.x).is_greater(outline.mesh.get_aabb().size.x)
+	assert_int(outline_material.render_priority).is_greater(border_material.render_priority)
+	for selected in ["fix_grid", ""]:
+		ov.select(selected)
+		assert_that(outline_material.albedo_color).is_equal(CandidateOverlay.PLACEMENT_OUTLINE)
+		assert_that(border_material.albedo_color).is_equal(CandidateOverlay.PLACEMENT_BORDER)
+	ov.move_candidate("fix_grid", Vector2(31.201, 121.401))
+	ov.reanchor(31.199, 121.399)
+	assert_that(border.global_transform).is_equal(outline.global_transform)
+	assert_that(border_material.albedo_color).is_equal(CandidateOverlay.PLACEMENT_BORDER)

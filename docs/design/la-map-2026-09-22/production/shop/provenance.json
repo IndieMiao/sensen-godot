@@ -1,0 +1,69 @@
+{
+  "asset": "Generic neighborhood market/shop category miniature",
+  "provider": "Sensenjoy API",
+  "base_url": "https://sub.sensenjoy.cn/v1",
+  "model": "gpt-image-2",
+  "mode": "imagegen bundled fallback CLI edit using approved storefront-style reference crop",
+  "requested_size": [
+    1024,
+    1024
+  ],
+  "actual_raw_size": [
+    1312,
+    1199
+  ],
+  "quality": "high",
+  "reference": "docs/design/la-map-2026-09-22/generated/la-map-main-v1.png",
+  "reference_crop_xyxy": [
+    204,
+    808,
+    358,
+    978
+  ],
+  "prompt_file": "prompt.txt",
+  "raw_file": "raw.png",
+  "extracted_file": "extracted-rgba.png",
+  "final_file": "assets/map/poi/shop.png",
+  "final_size": [
+    512,
+    512
+  ],
+  "final_mode": "RGBA",
+  "ground_anchor_px": [
+    256,
+    480
+  ],
+  "source_alpha_bbox": [
+    114,
+    137,
+    1209,
+    1062
+  ],
+  "final_alpha_bbox": [
+    32,
+    102,
+    480,
+    480
+  ],
+  "processing": "remove_chroma_key.py --auto-key corners --soft-matte --transparent-threshold 16 --opaque-threshold 160 --spill-cleanup; remove alpha noise <=16, alpha crop, Lanczos fit 448x432, ground at y=480 on 512 square RGBA canvas",
+  "sha256": "70bd7fec81b7573c2143b02971824c5ff81ff21c0c29e2e90232c54e96c66161",
+  "generated_utc": "2026-09-22T04:44:22.089577+00:00",
+  "visual_status": "Passed: complete shop/base, sage awning, pictorial bag plaque, produce baskets, no text or people; edges inspected on cream and navy, including 112px thumbnail; no visible magenta fringe. Faint isolated alpha noise removed so ground anchor aligns with visible base.",
+  "scope_note": "Generic shop illustration; actual place coordinates and classification assigned separately. No source or live state modified.",
+  "cleaned_extracted_file": "extracted-clean-rgba.png",
+  "validation": {
+    "corner_alpha": 0,
+    "opaque_magenta_pixels": 0,
+    "actual_mode": "RGBA",
+    "actual_dimensions": [
+      512,
+      512
+    ],
+    "alpha_over_32_bbox": [
+      32,
+      102,
+      480,
+      480
+    ]
+  }
+}

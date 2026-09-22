@@ -1,4 +1,5 @@
 extends Node
+signal outfit_saved(config: AvatarConfig)
 ## Autoload 名: Avatar —— avatar 模块唯一门面。
 ## 二期原生嵌入时，消息桥只与本类交互。
 
@@ -61,4 +62,11 @@ func _drop_missing_parts(cfg: AvatarConfig) -> void:
 			% [id, slot_def.slot_name, replacement])
 
 func save_outfit(config: AvatarConfig) -> Error:
-	return store.save_outfit(user_id, config)
+	var error := store.save_outfit(user_id, config)
+	if error == OK: outfit_saved.emit(config.duplicate_config())
+	return error
+
+## Local player rigs follow committed outfits; editor drafts and remote rigs do not.
+func follow_saved_outfit(rig: AvatarRig) -> void:
+	rig.apply_config(load_outfit())
+	outfit_saved.connect(rig.apply_config)

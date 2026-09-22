@@ -41,7 +41,7 @@ func _render() -> void:
 	if present.size() > 1 and _view == "home":
 		var selector := HBoxContainer.new()
 		selector.add_theme_constant_override("separation", 8)
-		content.add_child(selector)
+		append_content(selector)
 		for id in present:
 			var button := GameUi.button("user-round", L10n.text(str(ResidentCast.definition(id).short_name)), L10n.text(str(ResidentCast.definition(id).name)))
 			button.name = "Select_" + str(id)
@@ -50,7 +50,7 @@ func _render() -> void:
 			button.disabled = busy
 			button.pressed.connect(_select.bind(str(id)))
 			selector.add_child(button)
-	heading(str(ResidentCast.definition(selected_resident).get("name", L10n.text("Resident"))))
+	heading(L10n.text(str(ResidentCast.definition(selected_resident).get("name", L10n.text("Resident")))))
 	var resident := _resident()
 	paragraph(L10n.format_text("%s / %d friendship", [ResidentCast.relationship_stage(resident), int(resident.get("points", 0))]))
 	match _view:
@@ -93,7 +93,7 @@ func _render_dialogue() -> void:
 	var line := GameUi.label(str(_lines[_line_index]), 15)
 	line.name = "DialogueLine"
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	content.add_child(line)
+	append_content(line)
 	if _line_index + 1 < _lines.size():
 		_local_action("chevron-right", L10n.text("Continue"), _next_line, true).name = "Continue"
 	else:
@@ -111,7 +111,7 @@ func _render_request() -> void:
 	for crop in request.get("items", {}):
 		_ingredient(str(crop), available(str(crop)), int(request.items[crop]))
 	for dish in request.get("dishes", {}):
-		paragraph(L10n.format_text("%s / %d available / %d needed", [_dish_name(str(dish)), int(state().get("inventory", {}).get("dishes", {}).get(dish, 0)), int(request.dishes[dish])]))
+		append_content(ingredient_card(GameUi.dish_art(str(dish)), _dish_name(str(dish)), int(state().get("inventory", {}).get("dishes", {}).get(dish, 0)), int(request.dishes[dish])))
 	paragraph(L10n.format_text("%d coins%s", [int(request.get("coins", 0)), L10n.text(" / a personal request") if bool(request.get("personal_story", false)) else ""]))
 	var done: bool = state().get("requests_done", []).has(_request_id)
 	action("shopping-basket", L10n.text("Delivered") if done else L10n.text("Deliver basket"), _deliver, not done and _can_deliver(request), true).name = "Deliver"
@@ -121,6 +121,7 @@ func _render_gifts() -> void:
 	paragraph(str(ResidentCast.definition(selected_resident).get("gift_clue", "")))
 	paragraph(L10n.format_text("%d gifts left this week", _gifts_left()))
 	for crop in _relationships.get("gift_clues", {}).get(selected_resident, []):
+		section_card()
 		_ingredient(str(crop), available(str(crop)), 1)
 		action("heart", L10n.format_text("Give 1 %s", CropInfo.name_of(str(crop))), _give.bind(str(crop)), available(str(crop)) > 0 and _gifts_left() > 0, true).name = "Give_%s" % crop
 	_local_action("arrow-left", L10n.text("Back"), _home).name = "Back"
@@ -131,23 +132,17 @@ func _render_pending() -> void:
 	_local_action("rotate-ccw", L10n.text("Check and continue"), _retry_pending, true).name = "Retry"
 
 func _ingredient(crop: String, have: int, need: int) -> void:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	row.add_child(GameUi.picture(GameUi.crop_art(crop), 36))
-	var label := GameUi.label(L10n.format_text("%s / %d available / %d needed", [CropInfo.name_of(crop), have, need]), 13)
-	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	row.add_child(label)
-	content.add_child(row)
+	append_content(ingredient_card(GameUi.crop_art(crop), CropInfo.name_of(crop), have, need))
 	var reserved := int(state().get("engineering", {}).get("reserved", {}).get(crop, 0))
 	if reserved > 0: paragraph(L10n.format_text("%d held in the project basket", reserved))
 
 func _local_action(symbol: String, text: String, callback: Callable, accent := false) -> Button:
 	var button := GameUi.button(symbol, text, text, accent)
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.disabled = busy
 	button.pressed.connect(func():
 		if not button.disabled: callback.call())
-	content.add_child(button)
+	append_content(button)
 	return button
 
 func _select(id: String) -> void:
@@ -298,4 +293,4 @@ static func _read_json(path: String) -> Dictionary:
 	return parsed if parsed is Dictionary else {}
 
 static func _dish_name(id: String) -> String:
-	return {"salad": L10n.text("Vegetable salad"), "tea": L10n.text("Chamomile tea")}.get(id, id)
+	return L10n.dish_name(id)

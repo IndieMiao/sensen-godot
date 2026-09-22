@@ -5,6 +5,7 @@ const NAV_ORIGIN := Vector3(-5, 0, 4)
 const RESIDENT_CLEARANCE := 0.5
 var place_id := "nursery"
 var initial_target := ""
+var initial_prop := ""
 var session: FarmSession
 var cam: Camera3D
 var world_env: WorldEnvironment
@@ -18,6 +19,7 @@ var panel: PanelContainer
 var panel_scroll: ScrollContainer
 var active_panel: SessionPanel
 var feedback: Label
+var panel_title: Label
 var status: Label
 var objective: Label
 var follow_goal: Button
@@ -75,7 +77,16 @@ func _ready() -> void:
 	session.state_changed.connect(_changed)
 	session.offline_changed.connect(func(_offline): _refresh())
 	_refresh()
-	if not initial_target.is_empty(): select_target.call_deferred(initial_target)
+	if initial_target == "decorations": _open_courtyard_piece.call_deferred()
+	elif not initial_target.is_empty(): select_target.call_deferred(initial_target)
+
+func _open_courtyard_piece() -> void:
+	if place_id != "courtyard" or not DecorationLayout.unlocked(session.state): return
+	_arrange()
+	panel.show()
+	if not initial_prop.is_empty(): (active_panel as DecorationPanel).select_prop(initial_prop)
+	_layout()
+	_sync_markers()
 
 func _build_world() -> void:
 	get_viewport().transparent_bg = false
@@ -185,14 +196,14 @@ func _navigation_blueprint(residents: Array[Vector3]) -> FarmBlueprint:
 		blueprint.masks.walkable.append(row)
 	return blueprint
 
+var bag_sheet: BagSheet
+
 func _build_ui() -> void:
 	canvas = CanvasLayer.new()
 	add_child(canvas)
 	header_backdrop = Panel.new()
 	header_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var backdrop := GameUi.surface(Color(0.988, 0.996, 0.98, 0.94), 0, 0)
-	backdrop.set_border_width_all(0)
-	header_backdrop.add_theme_stylebox_override("panel", backdrop)
+	header_backdrop.add_theme_stylebox_override("panel", GameUi.card_style(false, 8))
 	var safe := SafeAreaMargin.new()
 	safe.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	safe.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -214,6 +225,10 @@ func _build_ui() -> void:
 	ui.add_child(ground_feedback)
 	header = VBoxContainer.new()
 	header.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	header.offset_left = 8
+	header.offset_right = -8
+	header.offset_top = 8
+	header.add_theme_constant_override("separation", 4)
 	ui.add_child(header)
 	header.resized.connect(_layout)
 	var row := HBoxContainer.new()
@@ -229,8 +244,9 @@ func _build_ui() -> void:
 	display_done.visible = false
 	display_done.pressed.connect(_finish_display)
 	row.add_child(display_done)
-	var bag := GameUi.button("backpack", "", L10n.text("Neighbourhood supplies"))
-	bag.pressed.connect(func(): _show_panel("board"))
+	var bag := GameUi.button("backpack", "", L10n.text("Your bag"))
+	bag.name = "OpenBag"
+	bag.pressed.connect(_open_bag)
 	row.add_child(bag)
 	status = GameUi.label("", 13, GameUi.GREEN)
 	header.add_child(status)
@@ -246,20 +262,26 @@ func _build_ui() -> void:
 	follow_goal.pressed.connect(_follow_goal)
 	goal_row.add_child(follow_goal)
 	panel = PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", GameUi.panel_style(12))
 	panel.visible = false
 	ui.add_child(panel)
 	var col := VBoxContainer.new()
 	panel.add_child(col)
 	var close_row := HBoxContainer.new()
+	close_row.add_theme_constant_override("separation", 8)
 	col.add_child(close_row)
-	feedback = GameUi.label("", 12, GameUi.GREEN)
-	feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	close_row.add_child(feedback)
+	close_row.add_child(GameUi.picture(GameUi.icon(str(PlaceCatalog.find(place_id).icon)), 24))
+	panel_title = GameUi.label(L10n.text(str(PlaceCatalog.find(place_id).name)), 17)
+	panel_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	close_row.add_child(panel_title)
 	var close := GameUi.button("x", "", L10n.text("Close"))
 	close.pressed.connect(_close_panel)
 	close_row.add_child(close)
-	panel_scroll = ScrollContainer.new()
+	feedback = GameUi.label("", 12, GameUi.GREEN)
+	feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	col.add_child(feedback)
+	panel_scroll = TouchScrollContainer.new()
 	panel_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	panel_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(panel_scroll)
@@ -279,13 +301,14 @@ func _build_ui() -> void:
 	world_notice = PanelContainer.new()
 	world_notice.name = "WorldResult"
 	world_notice.theme_type_variation = &"ToastPanel"
+	world_notice.add_theme_stylebox_override("panel", GameUi.panel_style(12))
 	world_notice.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	world_notice.visible = false
 	world_notice.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	world_notice.offset_top = -128
 	world_notice.offset_bottom = -56
 	ui.add_child(world_notice)
-	world_notice_label = GameUi.label("", 13, GameUi.PAPER)
+	world_notice_label = GameUi.label("", 13, GameUi.INK)
 	world_notice_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	world_notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	world_notice_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -295,19 +318,40 @@ func _build_ui() -> void:
 
 func _layout() -> void:
 	if panel == null: return
-	var viewport_size := get_viewport().get_visible_rect().size
 	_update_camera()
 	var compact_editor := active_panel is DecorationPanel and not (active_panel as DecorationPanel)._confirm_leave
 	var object_actions := selected_target.begins_with("display:") or selected_target.begins_with("project_") \
 		or selected_target == "resident" or selected_target.begins_with("resident:")
-	var h := minf(190 if compact_editor else 290, ui.size.y * (0.44 if object_actions else 0.39))
+	var h := minf(220 if compact_editor else 360, ui.size.y * (0.50 if object_actions else 0.46))
 	if selected_target == "workbench" and JourneyProgress.fact(session.state, "planter_crafted"):
-		h = minf(310, ui.size.y * 0.49)
-	panel.position = Vector2(0, ui.size.y - h - 56)
-	panel.size = Vector2(ui.size.x, h)
-	header_backdrop.position = -ui.global_position
-	header_backdrop.size = Vector2(viewport_size.x, header.global_position.y + header.size.y + 8)
+		h = minf(410, ui.size.y * 0.55)
+	var width := minf(620, ui.size.x)
+	panel.position = Vector2((ui.size.x - width) * 0.5, ui.size.y - h - 56)
+	panel.size = Vector2(width, h)
+	header_backdrop.position = Vector2.ZERO
+	header_backdrop.size = Vector2(ui.size.x, header.position.y + header.size.y + 8)
+	if compact_editor:
+		if panel.is_in_group(GameUi.MODAL_GROUP): panel.remove_from_group(GameUi.MODAL_GROUP)
+	else:
+		GameUi.register_modal(panel)
 	_sync_markers()
+
+func _open_bag() -> void:
+	if busy or (active_panel and active_panel.busy) or session == null: return
+	if not _prepare_destination(_open_bag): return
+	pending_target = ""
+	mover.stop()
+	camera_pan.cancel()
+	_pressed_target = null
+	if bag_sheet == null:
+		bag_sheet = BagSheet.new()
+		bag_sheet.setup(session)
+		ui.add_child(bag_sheet)
+	bag_sheet.open()
+
+func _open_requests() -> void:
+	_open_bag()
+	if bag_sheet and bag_sheet.visible: bag_sheet.active.select_page("requests")
 
 func _update_camera() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
@@ -327,9 +371,11 @@ func _refresh() -> void:
 		display_done.hide()
 	_refresh_farm_hint()
 	status.text = L10n.format_text("%d coins / %d wood / %d stone / %d reeds%s", [int(session.state.wallet), int(session.state.journey.wood), JourneyProgress.material(session.state, "stone"), JourneyProgress.material(session.state, "fiber"), L10n.text(" / Offline") if session.offline else ""])
+	var effect_status := CharacterModel.action_status(session.state, "gather_bonus")
+	if not effect_status.is_empty(): status.text += "\n" + effect_status
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_refresh_goal()
-	var key := JSON.stringify([session.state.journey, session.state.get("decorations", []), session.state.nursery, session.state.inventory.dishes])
+	var key := JSON.stringify([session.state.journey, session.state.get("decorations", []), session.state.nursery, session.state.inventory.dishes, CharacterModel.current(session.state, "gather_bonus")])
 	if key == _world_key: return
 	_world_key = key
 	var prop_key := JSON.stringify(session.state.get("decorations", []))
@@ -477,8 +523,9 @@ func _refresh() -> void:
 		_add_target("counter", L10n.text("Prepare a meal"), "utensils", Vector3(-1.1, 1, -0.7), Vector3(-1.1, 0, 0.6))
 		_add_target("table", L10n.text("Share a meal"), "heart", Vector3(2, 1, 0.3), Vector3(2, 0, 1.35))
 		var dishes: Dictionary = session.state.inventory.dishes
-		if int(dishes.get("salad", 0)) + int(dishes.get("tea", 0)) > 0:
-			var dish_mesh := _dish_mesh("salad" if int(dishes.get("salad", 0)) > 0 else "tea", "PreparedDish")
+		var prepared: Array = JourneyProgress.recipes().keys().filter(func(id): return int(dishes.get(id, 0)) > 0)
+		if not prepared.is_empty():
+			var dish_mesh := _dish_mesh(str(prepared[0]), "PreparedDish")
 			dish_mesh.position = Vector3(-0.85, 0.96, -0.35)
 			objects.add_child(dish_mesh)
 	else:
@@ -571,12 +618,13 @@ func _add_target(id: String, label: String, icon: String, world: Vector3, approa
 	badge.position = Vector2(8, 8)
 	badge.size = Vector2(28, 28)
 	var style := GameUi.surface(GameUi.PAPER, 0, 14)
-	style.shadow_color = Color(0.1, 0.2, 0.15, 0.14)
+	style.shadow_color = Color(GameUi.INK, 0.18)
+	style.border_color = GameUi.BLUE
 	style.shadow_size = 2
 	badge.add_theme_stylebox_override("panel", style)
 	button.add_child(badge)
 	var symbol := GameUi.picture(GameUi.icon(icon), 16)
-	symbol.self_modulate = GameUi.INK
+	symbol.modulate = GameUi.BLUE
 	symbol.position = Vector2(6, 6)
 	symbol.size = Vector2(16, 16)
 	badge.add_child(symbol)
@@ -656,6 +704,7 @@ func _process(dt: float) -> void:
 		_world_notice_left = maxf(0, _world_notice_left - dt)
 		world_notice.visible = _world_notice_left > 0
 	if mover == null: return
+	if session: mover.speed = CharacterModel.current(session.state, "move_speed")
 	if busy or (panel.visible and not active_panel is DecorationPanel): camera_pan.cancel()
 	camera_pan.step(dt, cam)
 	_update_camera()
@@ -701,8 +750,9 @@ func _follow_goal() -> void:
 
 func _go_goal(goal: Dictionary) -> void:
 	if goal.is_empty() or busy or session.offline or session.has_unconfirmed_command(): return
-	if goal.get("surface") == "street": _go_place("street", str(goal.get("target", "")))
-	elif goal.place == "farm": _go_farm(str(goal.get("crop", "")) if goal.get("action") == "stall" else "")
+	if goal.has("change_request"): _go_place("street", "resident:" + str(goal.change_request), str(goal.change_request))
+	elif goal.get("surface") == "street": _go_place("street", str(goal.get("target", "")))
+	elif goal.place == "farm": _go_farm(str(goal.get("crop", "")) if goal.get("action") == "stall" else "", str(goal.get("target", "")))
 	elif goal.place != place_id: _go_place(str(goal.place), str(goal.get("target", "")))
 	elif goal.has("target"):
 		if _prepare_destination(_go_goal.bind(goal)): select_target(str(goal.target))
@@ -737,7 +787,7 @@ func _arrived(id: String) -> void:
 	var bundle: Dictionary = target.get("bundle", {})
 	var materials: Dictionary = harvest.reward.materials if not harvest.is_empty() else bundle.materials
 	_play("labour_harvest" if not harvest.is_empty() else ("labour_till" if materials.has("stone") else ("labour_sow" if materials.has("fiber") else "labour_clear")))
-	await get_tree().create_timer(0.9).timeout
+	await get_tree().create_timer(CharacterModel.gather_seconds(session.state, CharacterModel.resource_kind(materials))).timeout
 	var accepted := await session.send("harvest_journey_discovery", {"discovery": harvest.discovery, "choice": harvest.choice, "round": round_id}) if not harvest.is_empty() \
 		else await session.send("collect_resource", {"node_id": bundle.node, "round": round_id, "choice": bundle.choice})
 	busy = false
@@ -745,6 +795,8 @@ func _arrived(id: String) -> void:
 	_play("idle")
 	if accepted:
 		world_notice_label.text = "+" + (JourneyProgress.discovery_reward_label(harvest.reward) if not harvest.is_empty() else JourneyProgress.material_label(materials))
+		var effect_status := CharacterModel.action_status(session.state, "gather_bonus")
+		if harvest.is_empty() and not effect_status.is_empty(): world_notice_label.text += "\n" + effect_status
 		_world_notice_left = 4.0
 		world_notice.show()
 	else:
@@ -753,6 +805,9 @@ func _arrived(id: String) -> void:
 	_refresh()
 
 func _show_panel(id: String) -> void:
+	if id == "supplies":
+		_open_bag()
+		return
 	if busy or (active_panel and active_panel.busy): return
 	if active_panel is DecorationPanel and (active_panel as DecorationPanel).request_leave(): return
 	world_notice.hide()
@@ -763,6 +818,7 @@ func _show_panel(id: String) -> void:
 		panel_scroll.remove_child(active_panel)
 		active_panel.queue_free()
 	selected_target = id
+	panel_title.text = L10n.text({"workbench": "Workbench", "counter": "Kitchen", "resident": "Residents", "planter": "Courtyard pieces"}.get(id, str(PlaceCatalog.find(place_id).name)))
 	var activity := JourneyActivityPanel.new()
 	activity.target = id
 	activity.place_id = place_id
@@ -774,6 +830,7 @@ func _show_panel(id: String) -> void:
 	activity.destination_requested.connect(_go_place)
 	activity.target_requested.connect(select_target)
 	activity.goal_requested.connect(_go_goal)
+	activity.requests_requested.connect(_open_requests)
 	activity.world_action_completed.connect(_world_action)
 	activity.meal_served.connect(_meal_served)
 	activity.terrace_served.connect(_meal_served.bind("project_terrace"))
@@ -801,11 +858,11 @@ func _finish_display() -> void:
 	_world_key = ""
 	_refresh()
 
-func _go_place(id: String, target_id := "") -> void:
-	if not _prepare_destination(_go_place.bind(id, target_id)): return
+func _go_place(id: String, target_id := "", request_timber_slot := "") -> void:
+	if not _prepare_destination(_go_place.bind(id, target_id, request_timber_slot)): return
 	var shared_session := session
-	while AppRouter.instance_depth() > 0: AppRouter.pop_instance()
-	if id == "street": AppRouter.open_instance(AppRouter.STREET, {"session": shared_session, "from": place_id, "target": target_id, "walk_place": "" if target_id.begins_with("gathering:") else place_id})
+	AppRouter.return_to_farm(shared_session)
+	if id == "street": AppRouter.open_instance(AppRouter.STREET, {"session": shared_session, "from": place_id, "target": target_id, "request_timber_slot": request_timber_slot, "walk_place": "" if target_id.begins_with("gathering:") or target_id.begins_with("resident:") else place_id})
 	else: AppRouter.open_instance(AppRouter.PLACE, {"place_id": id, "session": shared_session, "target": target_id})
 
 func _world_action(id: String) -> void:
@@ -836,13 +893,21 @@ func _dish_mesh(dish: String, object_name: String) -> MeshInstance3D:
 		PlaceScenery._oval(surface, Vector3(0.45, 0.14, 0.38), Vector3(0, 0.09, 0), PlaceScenery.GREEN)
 		for offset in [Vector3(-0.12, 0.16, 0.03), Vector3(0.06, 0.15, -0.07), Vector3(0.1, 0.16, 0.1)]:
 			PlaceScenery._cylinder(surface, 0.055, 0.035, offset, PlaceScenery.CORAL)
+	elif dish == "vegetable_soup":
+		PlaceScenery._cylinder(surface, 0.24, 0.16, Vector3(0, 0.095, 0), Color("568b94"))
+		PlaceScenery._cylinder(surface, 0.22, 0.018, Vector3(0, 0.18, 0), PlaceScenery.PAPER)
+		PlaceScenery._cylinder(surface, 0.195, 0.012, Vector3(0, 0.191, 0), Color("e9bd66"))
+		for offset in [Vector3(-0.08, 0.205, 0.07), Vector3(0.1, 0.205, -0.045)]:
+			PlaceScenery._cylinder(surface, 0.048, 0.02, offset, PlaceScenery.PAPER)
+		for offset in [Vector3(-0.055, 0.203, -0.09), Vector3(0.07, 0.203, 0.09)]:
+			PlaceScenery._oval(surface, Vector3(0.09, 0.025, 0.06), offset, PlaceScenery.GREEN)
 	else:
 		PlaceScenery._cylinder(surface, 0.14, 0.21, Vector3(0, 0.1, 0), PlaceScenery.CORAL)
 		PlaceScenery._cylinder(surface, 0.11, 0.01, Vector3(0, 0.21, 0), PlaceScenery.WOOD.darkened(0.2))
 	return _mesh(surface, object_name)
 
 func _meal_served(dish: String, target := "table") -> void:
-	if place_id != "bistro" or dish not in ["salad", "tea"]: return
+	if place_id != "bistro" or dish not in ["salad", "tea", "vegetable_soup"]: return
 	if is_instance_valid(served_dish):
 		remove_child(served_dish)
 		served_dish.queue_free()
@@ -860,12 +925,12 @@ func _meal_served(dish: String, target := "table") -> void:
 		meal_moment = resident_moments.bistro_owner
 		meal_moment.start(Vector3(0.7, 0.04, -0.7) if target == "project_terrace" else Vector3(0.6, 0.04, 1.6), served_dish.position)
 		_meal_residents.append("bistro_owner")
-		resident_activities.bistro_owner = L10n.text("Sharing ") + dish
+		resident_activities.bistro_owner = L10n.text("Sharing ") + L10n.dish_name(dish)
 	if target == "project_terrace" and resident_moments.has("nursery_keeper"):
 		var guest: ResidentMoment = resident_moments.nursery_keeper
 		guest.start(Vector3(3.55, 0.04, -0.65), served_dish.position)
 		_meal_residents.append("nursery_keeper")
-		resident_activities.nursery_keeper = L10n.text("Sharing ") + dish
+		resident_activities.nursery_keeper = L10n.text("Sharing ") + L10n.dish_name(dish)
 
 func _meal_route(destination: Vector3) -> PlayerMover:
 	return _resident_route(destination, meal_moment)
@@ -933,6 +998,7 @@ func _step_meal(dt: float) -> void:
 	resident_activities[activity.resident] = activity.label
 
 func _arrange() -> void:
+	panel_title.text = L10n.text("Courtyard pieces")
 	if active_panel:
 		panel_scroll.remove_child(active_panel)
 		active_panel.queue_free()
@@ -975,6 +1041,7 @@ func _close_panel() -> void:
 	_sync_markers()
 
 func _input(event: InputEvent) -> void:
+	if bag_sheet and bag_sheet.visible: return
 	if _drag_prop:
 		if event is InputEventScreenTouch and event.pressed and event.index != _pointer:
 			# A second finger changes the gesture to a pinch, canceling the draft move.
@@ -1002,6 +1069,7 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if bag_sheet and bag_sheet.visible: return
 	if busy or (panel.visible and not active_panel is DecorationPanel): return
 	if (event is InputEventScreenTouch and event.pressed) or (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and event.device != InputEvent.DEVICE_ID_EMULATION):
 		_press = event.position
@@ -1084,6 +1152,7 @@ func _pick_target(screen: Vector2) -> String:
 	return hit
 
 func is_back_navigation_locked() -> bool:
+	if bag_sheet and bag_sheet.consume_back(): return true
 	if busy or (active_panel and active_panel.busy): return true
 	if panel.visible:
 		if active_panel is DecorationPanel and (active_panel as DecorationPanel).consume_back(): return true
@@ -1101,21 +1170,18 @@ func _go_street() -> void:
 	if not _prepare_destination(_go_street): return
 	var shared_session := session
 	var departure := place_id
-	# A physical exit resumes the walk that brought the player here.
-	while AppRouter.instance_depth() > 0:
-		var street := AppRouter.top_instance() as JourneyStreet
-		if street and street.session == shared_session: return
-		AppRouter.pop_instance()
-	AppRouter.open_instance(AppRouter.STREET, {"session": shared_session, "from": departure})
+	# A physical exit resumes the private farm without moving the avatar to another room.
+	AppRouter.return_to_farm(shared_session)
+	AppRouter.open_instance(AppRouter.FARM, {"session": shared_session, "from": departure})
 
 func _go_map() -> void:
 	if not _prepare_destination(_go_map): return
 	while AppRouter.instance_depth() > 0: AppRouter.pop_instance()
 
-func _go_farm(seed_crop := "") -> void:
-	if not _prepare_destination(_go_farm.bind(seed_crop)): return
-	while AppRouter.instance_depth() > 0: AppRouter.pop_instance()
-	AppRouter.open_instance(AppRouter.FARM, {"session": session, "seed_crop": seed_crop})
+func _go_farm(seed_crop := "", target_id := "") -> void:
+	if not _prepare_destination(_go_farm.bind(seed_crop, target_id)): return
+	AppRouter.return_to_farm(session)
+	AppRouter.open_instance(AppRouter.FARM, {"session": session, "seed_crop": seed_crop, "target": target_id})
 
 func _prepare_destination(destination := Callable()) -> bool:
 	if busy or (active_panel and active_panel.busy): return false

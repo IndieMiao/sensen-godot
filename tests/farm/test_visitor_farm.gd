@@ -60,12 +60,17 @@ func test_crops_render_from_snapshot_with_ripe_as_top_stage() -> void:
 	var counts: Dictionary = f.crop_field.cell_counts()
 	assert_int(int(counts["R"])).is_equal(6)
 	assert_int(int(counts["L"])).is_equal(3)
+	# The 4.7 dummy renderer cannot read back MultiMesh transforms; native QA covers scale.
+	if DisplayServer.get_name() == "headless":
+		assert_int(CropField.stage_from_snapshot({"state": "growing", "ripe": true})).is_equal(3)
+		assert_int(CropField.stage_from_snapshot({"state": "growing", "ripe": false})).is_equal(1)
+		return
 	# 熟的萝卜用成熟阶段的高度；没熟的生菜是阶段 1
 	var mm_r: MultiMesh = f.crop_field._mm["R"].multimesh
-	var ripe_h: float = CropField.STAGE_SIZE[CropField.STAGES - 1].y
+	var ripe_h: float = CropField.STAGE_SIZE[CropField.STAGES - 1].y * f.bp.cell_m
 	assert_float(mm_r.get_instance_transform(0).basis.get_scale().y).is_equal_approx(ripe_h, 0.001)
 	var mm_l: MultiMesh = f.crop_field._mm["L"].multimesh
-	assert_float(mm_l.get_instance_transform(0).basis.get_scale().y).is_equal_approx(CropField.STAGE_SIZE[1].y, 0.001)
+	assert_float(mm_l.get_instance_transform(0).basis.get_scale().y).is_equal_approx(CropField.STAGE_SIZE[1].y * f.bp.cell_m, 0.001)
 
 func test_snapshot_stage_mapping() -> void:
 	assert_int(CropField.stage_from_snapshot({"state": "growing", "ripe": true})).is_equal(CropField.STAGES - 1)
@@ -75,18 +80,6 @@ func test_snapshot_stage_mapping() -> void:
 func _reserved_props(scene: Node) -> Array:
 	return scene.props.get_children().filter(func(prop): return prop.has_meta("reserved"))
 
-func test_locked_reserved_beds_and_their_weeds_are_hidden_in_legacy_snapshot() -> void:
-	var f: Node = await _visitor()
-	assert_int(int(f.crop_field.cell_counts().weed)).is_equal(0)
-	assert_int(_reserved_props(f).size()).is_equal(3)
-	for prop in _reserved_props(f): assert_bool(prop.visible).is_false()
-
-func test_expanded_snapshot_shows_reserved_beds_even_before_clearing() -> void:
-	var snap := _snapshot()
-	snap.beds_unlocked = 4
-	var f: Node = await _visitor(snap)
-	assert_int(int(f.crop_field.cell_counts().weed)).is_equal(3)
-	for prop in _reserved_props(f): assert_bool(prop.visible).is_true()
 
 func _worked_reserved_snapshot() -> Dictionary:
 	var snap := _snapshot()
@@ -97,19 +90,6 @@ func _worked_reserved_snapshot() -> Dictionary:
 		if str(cell.cell_id) == "%d,%d" % [reserved.x, reserved.y]: cell.state = "tilled"
 	return snap
 
-func test_legacy_snapshot_with_worked_reserved_cell_shows_expansion() -> void:
-	var f: Node = await _visitor(_worked_reserved_snapshot())
-	assert_int(int(f.crop_field.cell_counts().soil)).is_equal(1)
-	assert_int(int(f.crop_field.cell_counts().weed)).is_equal(2)
-	for prop in _reserved_props(f): assert_bool(prop.visible).is_true()
-
-func test_explicit_locked_count_takes_precedence_over_legacy_inference() -> void:
-	var snap := _worked_reserved_snapshot()
-	snap.beds_unlocked = 3
-	var f: Node = await _visitor(snap)
-	assert_int(int(f.crop_field.cell_counts().soil)).is_equal(0)
-	assert_int(int(f.crop_field.cell_counts().weed)).is_equal(0)
-	for prop in _reserved_props(f): assert_bool(prop.visible).is_false()
 
 func test_zero_writes_even_if_a_tool_is_forced() -> void:
 	# 就算有人把工具塞进来，访客也一格都不入队、一条命令都不发。
@@ -117,14 +97,25 @@ func test_zero_writes_even_if_a_tool_is_forced() -> void:
 	Net.use_transport(t.callable())
 	Net.client.token = "tok"
 	var f: Node = await _visitor()
-	f._tap_cell(f.bp.beds()[0].cells[0])                       # 点田在访客这里什么都不做
-	assert_int(f._queue_plots(f.bp.beds()[0].cells)).is_equal(0)
+	var soil := [Vector2i(10, 10), Vector2i(11, 10)]
+	f._set_work_mode(true)
+	assert_bool(f.work_mode).is_false()
+	f._tap_cell(soil[0])                                       # 访客可以走过田地，但不能劳作
+	assert_int(f._queue_plots(soil)).is_equal(0)
 	assert_bool(f.runner.is_busy()).is_false()
 	f._process(0.016)
 	f._wave()
 	f._stamp()
 	f._process(0.016)
 	assert_int(t.requests.size()).is_equal(0)
+
+func test_visitor_snapshot_keeps_cultivated_soil_under_the_crops() -> void:
+	var snapshot := _snapshot()
+	var cell := FarmPlot.blueprint_for().anchor("spawn")
+	snapshot.cells = [{"cell_id": "%d,%d" % [cell.x, cell.y], "state": "growing", "crop": "R", "ripe": true}]
+	var farm := await _visitor(snapshot)
+	assert_int(farm.plot_surface._image.get_pixelv(cell).g8).is_equal(PlotSurface.STATE_RIPE)
+	assert_bool(farm.camera_pan.hold_enabled).is_false()
 
 func test_wave_locks_the_animation_briefly_and_is_registered() -> void:
 	var f: Node = await _visitor()

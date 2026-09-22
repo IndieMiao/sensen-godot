@@ -9,15 +9,16 @@ var busy := false
 var content: VBoxContainer
 var message: Label
 var _refresh_queued := false
+var _section: VBoxContainer
 
 func setup(value: FarmSession) -> void:
 	session = value
 
 func _ready() -> void:
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	add_theme_constant_override("separation", 8)
+	add_theme_constant_override("separation", 10)
 	content = VBoxContainer.new()
-	content.add_theme_constant_override("separation", 8)
+	content.add_theme_constant_override("separation", 10)
 	add_child(content)
 	if message == null:
 		message = GameUi.label("", 12, GameUi.MUTED)
@@ -45,6 +46,7 @@ func refresh() -> void:
 func _rebuild() -> void:
 	_refresh_queued = false
 	if not is_inside_tree() or content == null: return
+	_section = null
 	for child in content.get_children():
 		content.remove_child(child)
 		child.queue_free()
@@ -78,24 +80,61 @@ func consume_back() -> bool:
 func pending_key() -> StringName:
 	return &""
 
+func section_card(selected := false) -> VBoxContainer:
+	var card := PanelContainer.new()
+	card.name = "ActivityCard"
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card.add_theme_stylebox_override("panel", GameUi.card_style(selected, 12))
+	content.add_child(card)
+	_section = VBoxContainer.new()
+	_section.add_theme_constant_override("separation", 9)
+	card.add_child(_section)
+	return _section
+
 func heading(text: String) -> Label:
-	var label := GameUi.label(text, 16)
+	section_card()
+	var label := GameUi.label(text, 17)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	content.add_child(label)
+	_section.add_child(label)
 	return label
 
+func append_content(node: Control) -> void:
+	(_section if is_instance_valid(_section) else content).add_child(node)
+
+func ingredient_card(texture: Texture2D, text: String, have: int, need: int) -> PanelContainer:
+	var card := PanelContainer.new()
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.custom_minimum_size = Vector2(66, 0)
+	card.add_theme_stylebox_override("panel", GameUi.card_style(false, 7))
+	var column := VBoxContainer.new()
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_theme_constant_override("separation", 3)
+	card.add_child(column)
+	var art := GameUi.picture(texture, 30)
+	art.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	column.add_child(art)
+	var title := GameUi.label(text, 12)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(title)
+	var amount := GameUi.label("%d / %d" % [have, need], 14, GameUi.GREEN if have >= need else GameUi.CORAL)
+	amount.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(amount)
+	return card
+
 func paragraph(text: String) -> Label:
-	var label := GameUi.label(text, 13, GameUi.MUTED)
+	var label := GameUi.label(text, 14, GameUi.MUTED)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	content.add_child(label)
+	append_content(label)
 	return label
 
 func action(symbol: String, text: String, callback: Callable, enabled := true, accent := false) -> Button:
 	var button := GameUi.button(symbol, text, text, accent)
+	button.custom_minimum_size.y = 46
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.disabled = not enabled or busy or session == null or session.offline
 	button.pressed.connect(func():
 		if not button.disabled: callback.call())
-	content.add_child(button)
+	append_content(button)
 	return button
 
 func command(type: String, payload: Dictionary, success := "Saved") -> bool:
@@ -122,6 +161,13 @@ func command(type: String, payload: Dictionary, success := "Saved") -> bool:
 
 static func error_text(code: String) -> String:
 	match code:
+		"WORK_COOLDOWN": return L10n.text("The current main hand is still recovering. Try again shortly.")
+		"FISHING_ROD_REQUIRED": return L10n.text("Equip a fishing rod on the character page first.")
+		"BAG_FULL": return L10n.text("Your bag is full. Merge stacks, use items or free a slot.")
+		"BAG_CHANGED": return L10n.text("Your bag changed. Select the item again.")
+		"INVALID_BAG_ACTION": return L10n.text("This item cannot be moved or used that way.")
+		"EFFECT_ACTIVE": return L10n.text("This meal effect is still active. No item was consumed.")
+		"EQUIPMENT_OWNED": return L10n.text("You already own this equipment.")
 		"LOCAL_STORAGE": return L10n.text("Could not save on this device. Free some space, then check the previous action.")
 		"SESSION_CHANGED": return L10n.text("The farm connection changed. Reconnect before continuing.")
 		"PENDING_ACTION": return L10n.text("Check the previous visit, kitchen, project or trade before changing your basket.")
@@ -129,6 +175,7 @@ static func error_text(code: String) -> String:
 		"INVALID_DECORATION": return L10n.text("Choose a clear spot beside the path.")
 		"DECORATION_OVERLAP": return L10n.text("Leave more room between the pieces.")
 		"OFFLINE", "TRANSPORT": return L10n.text("Could not connect. Reconnect and try again.")
+		"INVALID_FARM_TERRAIN": return L10n.text("The farm terrain could not be verified. Retry loading it.")
 		"INSUFFICIENT_ITEMS": return L10n.text("Not enough available ingredients. Check your project basket.")
 		"INSUFFICIENT_FUNDS": return L10n.text("Not enough coins.")
 		"CHAPTER_LOCKED", "NOT_AVAILABLE": return L10n.text("This is not available in your chapter yet.")

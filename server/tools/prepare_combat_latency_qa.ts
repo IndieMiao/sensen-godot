@@ -1,0 +1,35 @@
+import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
+import {parseEnv} from 'node:util';
+import pg from 'pg';
+import {initialMineState} from '../src/domain/mining.js';
+import {ensureMineCombat} from '../src/domain/combat.js';
+import {characterStats} from '../src/domain/character.js';
+import {loadContent,DEFAULT_CONTENT_DIR,contentVersion} from '../src/domain/content.js';
+import {DOMAIN_VERSION} from '../src/domain/version.js';
+const mode=process.argv[2];
+if(!['combat','rescue'].includes(mode))throw new Error('Use combat or rescue');
+const content=loadContent(DEFAULT_CONTENT_DIR);
+const address=new URL(parseEnv(readFileSync(new URL('../.env',import.meta.url),'utf8')).TEST_DATABASE_URL);
+address.pathname='/sensen_farm_journey_combat_emulator_20260915';
+const pool=new pg.Pool({connectionString:address.toString(),max:1});
+const client=await pool.connect();
+const dir=new URL('../../output/combat-latency-emulator-2026-09-15/fixtures/',import.meta.url);
+mkdirSync(dir,{recursive:true});
+try{
+  await client.query('BEGIN');
+  const rows=(await client.query(`SELECT f.* FROM farms f JOIN players p ON p.id=f.owner_id WHERE p.install_key_hmac NOT LIKE 'preset:%' FOR UPDATE OF f`)).rows;
+  if(rows.length!==1)throw new Error('Expected one ordinary farm in the isolated combat QA database');
+  const row=rows[0];
+  if(row.domain_version!==DOMAIN_VERSION||row.content_version!==contentVersion(DEFAULT_CONTENT_DIR))throw new Error('Wrong test farm version');
+  const stamp=new Date().toISOString().replaceAll(':','-');
+  writeFileSync(new URL(`${stamp}-${mode}-before.json`,dir),JSON.stringify({artificial_qa:true,row},null,2),{mode:0o600,flag:'wx'});
+  const state=structuredClone(row.state);
+  state.mine={...initialMineState(),run:state.mine.run+1,floor:5,deepest_floor:5,elevator_unlocked:true};
+  ensureMineCombat(state.mine,content);
+  state.character.hp=mode==='rescue'?1:characterStats(state,content).max_hp;
+  const updated=await client.query('UPDATE farms SET state=$1, version=version+1 WHERE id=$2 RETURNING version',[state,row.id]);
+  await client.query('COMMIT');
+  const report={artificial_qa:true,mode,farm_id:row.id,version:updated.rows[0].version,state};
+  writeFileSync(new URL(`${stamp}-${mode}-after.json`,dir),JSON.stringify(report,null,2),{mode:0o600});
+  console.log(JSON.stringify({mode,artificial_qa:true,farm_id:row.id,version:report.version}));
+}catch(error){await client.query('ROLLBACK');throw error;}finally{client.release();await pool.end();}

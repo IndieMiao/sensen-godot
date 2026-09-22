@@ -22,6 +22,21 @@ func _init(p_bp: FarmBlueprint) -> void:
 				var half := bp.cell_m * 0.5
 				_obstacles.append(AABB(bp.cell_to_world(c) - Vector3(half, 0.5, half), Vector3(bp.cell_m, 1, bp.cell_m)))
 
+## 运行时开关一格的通行性。木本作物与道具会挡路，而它们随时增删——
+## 为此重建整张 AStar（64×64 扫一遍 + 重建障碍表）是纯浪费，这里只动一个点。
+func set_solid(c: Vector2i, solid: bool) -> void:
+	if not bp.in_bounds(c) or astar.is_point_solid(c) == solid: return
+	astar.set_point_solid(c, solid)
+	var half := bp.cell_m * 0.5
+	var box := AABB(bp.cell_to_world(c) - Vector3(half, 0.5, half), Vector3(bp.cell_m, 1, bp.cell_m))
+	if solid:
+		_obstacles.append(box)
+	else:
+		for index in _obstacles.size():
+			if _obstacles[index].position.is_equal_approx(box.position):
+				_obstacles.remove_at(index)
+				break
+
 func path(from: Vector2i, to: Vector2i) -> Array[Vector2i]:
 	if not bp.in_bounds(from) or not bp.in_bounds(to):
 		return []

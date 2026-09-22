@@ -5,7 +5,7 @@
  * 服务端却说没熟。
  */
 import type { Command } from '../commands.js';
-import type { FieldCondition } from '../content.js';
+import { FIELD_CONDITIONS, type FieldCondition } from '../content.js';
 import { err, ok, type Result } from '../errors.js';
 import type { Ctx } from '../reducer.js';
 import type { FarmState } from '../state.js';
@@ -35,7 +35,7 @@ export function applyQa(s: FarmState, cmd: Command, ctx: Ctx): Result<FarmState>
     case 'qa_set_weather': {
       const next = structuredClone(s);
       const q = normalizeQa(next.qa, ctx.realNow ?? ctx.now);
-      const allowed = new Set(Object.keys(ctx.content.weather.care_action));
+      const allowed = new Set<string>(FIELD_CONDITIONS);
       const weather: Record<string, FieldCondition> = { ...q.weather };
       for (const [k, v] of Object.entries(cmd.overrides)) {
         if (!/^\d+$/.test(k)) return err('BAD_QA_PARAM', `天气覆写的键须是天气日索引：${k}`);

@@ -12,27 +12,25 @@ const T0 = at('2026-09-04T10:00:00+08:00');
 
 const state = (): FarmState => createInitialState({
   player_day_id: '2026-09-04', field_condition: 'sunny', now: T0, wallet: 180,
-  bed_cells: ['1,1', '2,1', '3,1', '1,2', '2,2', '3,2', '1,3', '2,3', '3,3'],
-  reserved_cells: ['5,1', '6,1', '7,1'],
 });
 
 describe('成熟是派生的，不是存下来的状态', () => {
   it('ready_at 为 null 的格子永远不成熟——播种但未照料时安全暂停', () => {
     const s = state();
-    s.cells['1,1'] = { ...s.cells['1,1'], state: 'sown', crop: 'R', care_weather: 'sunny' };
+    s.cells['1,1'] = { state: 'sown', crop: 'R', watered_at: null, ready_at: null };
     expect(derive(s, T0 + 10 * 86400_000, SH, c).ripe_cells).toEqual([]);
   });
 
   it('ready_at <= now 即成熟，无需任何 tick', () => {
     const s = state();
-    s.cells['1,1'] = { ...s.cells['1,1'], state: 'growing', crop: 'R', ready_at: T0 + 1000 };
+    s.cells['1,1'] = { state: 'growing', crop: 'R', watered_at: T0, ready_at: T0 + 1000 };
     expect(derive(s, T0 + 999, SH, c).ripe_cells).toEqual([]);
     expect(derive(s, T0 + 1000, SH, c).ripe_cells).toEqual(['1,1']);
   });
 
   it('成熟后永久停留，不因换日清除（PRD §6.2 L393）', () => {
     const s = state();
-    s.cells['1,1'] = { ...s.cells['1,1'], state: 'growing', crop: 'R', ready_at: T0 };
+    s.cells['1,1'] = { state: 'growing', crop: 'R', watered_at: T0, ready_at: T0 };
     expect(derive(s, T0 + 30 * 86400_000, SH, c).ripe_cells).toEqual(['1,1']);
   });
 });

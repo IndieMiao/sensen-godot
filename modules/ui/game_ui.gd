@@ -1,18 +1,45 @@
 class_name GameUi
 extends RefCounted
-## Shared, compact game chrome. World-space hints use the same Lucide symbols.
+## Game UI art is generated through the selected Sensenjoy API; native controls
+## retain editable text, real input targets and the existing game contracts.
 
-const INK := Color("243d35")
-const MUTED := Color("64786e")
-const GREEN := Color("287c59")
-const MINT := Color("e8f4ed")
-const PAPER := Color("fcfefa")
-const BORDER := Color("d2e2d6")
-const GOLD := Color("ecc568")
-const CORAL := Color("ce705c")
-const BLUE := Color("43869f")
+const INK := Color("34416f")
+const MUTED := Color("67718f")
+const GREEN := Color("239f9f")
+const MINT := Color("e9ecff")
+const PAPER := Color("fffdf8")
+const BORDER := Color("b9c4f2")
+const GOLD := Color("b57a1b")
+const CORAL := Color("d8787a")
+const BLUE := Color("586bd7")
+const VIOLET := Color("9273dd")
+const MODAL_GROUP := &"game_ui_modal"
+
+static var _art: Dictionary = {}
+const MATERIAL_LOGICAL_SIZE := {
+	"panel-frame.png": Vector2i(256, 254), "control-frame.png": Vector2i(128, 127),
+	"button-teal.png": Vector2i(256, 68), "button-violet.png": Vector2i(256, 68),
+	"control-teal.png": Vector2i(128, 34), "control-violet.png": Vector2i(128, 34),
+}
+
+static func _density_texture(path: String, logical_size: Vector2i) -> Texture2D:
+	if _art.has(path): return _art[path]
+	var source := load(path) as Texture2D
+	var pixels := source.get_image()
+	if pixels.is_compressed(): pixels.decompress()
+	var result := ImageTexture.create_from_image(pixels)
+	# Keep physical pixels while layout and nine-slice margins use logical units.
+	result.set_size_override(logical_size)
+	result.set_meta("ui_source", path)
+	_art[path] = result
+	return result
+
+static func is_game_icon(texture: Texture2D) -> bool:
+	return texture != null and str(texture.get_meta("ui_source", texture.resource_path)).begins_with("res://assets/ui/icons/game/")
 
 static func icon(id: String) -> Texture2D:
+	var game_path := "res://assets/ui/icons/game/%s.svg" % id
+	if ResourceLoader.exists(game_path): return _density_texture(game_path, Vector2i(24, 24))
 	var path := "res://assets/ui/icons/lucide/%s.svg" % id
 	return load(path) if ResourceLoader.exists(path) else null
 
@@ -24,6 +51,8 @@ static func crop_art(crop: String, seed := false) -> Texture2D:
 static func picture(texture: Texture2D, side := 44.0) -> TextureRect:
 	var p := TextureRect.new()
 	p.texture = texture
+	if is_game_icon(texture):
+		p.modulate = BLUE
 	p.custom_minimum_size = Vector2(side, side)
 	p.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	p.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -45,46 +74,116 @@ static func action_icon(action: String, weather := "sunny") -> String:
 		"explore": return "compass"
 	return "timer"
 
-static func surface(color := PAPER, pad := 12, radius := 8) -> StyleBoxFlat:
+static func surface(color := PAPER, pad := 12, radius := 12) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = color
 	sb.set_corner_radius_all(radius)
 	sb.set_content_margin_all(pad)
 	sb.border_color = BORDER
 	sb.set_border_width_all(1)
+	if color.a > 0.8:
+		sb.shadow_color = Color(0.19, 0.23, 0.48, 0.15)
+		sb.shadow_size = 3
+		sb.shadow_offset = Vector2(0, 2)
 	return sb
+
+static func _texture_style(file: String, pad: int, slice: int, tint := Color.WHITE) -> StyleBox:
+	var path := "res://assets/ui/game/" + file
+	if not ResourceLoader.exists(path): return surface(PAPER, pad)
+	var style := StyleBoxTexture.new()
+	style.texture = _density_texture(path, MATERIAL_LOGICAL_SIZE.get(file, Vector2i(128, 128)))
+	style.modulate_color = tint
+	style.set_texture_margin_all(slice)
+	style.set_content_margin_all(pad)
+	return style
+
+static func panel_style(pad := 12) -> StyleBox:
+	return _texture_style("control-frame.png", pad, 16) if pad <= 8 else _texture_style("panel-frame.png", pad, 32)
+
+static func card_style(selected := false, pad := 8) -> StyleBoxFlat:
+	var style := surface(Color("f0f1fc") if not selected else Color("e4eaff"), pad, 10)
+	style.border_color = BLUE if selected else Color("d9def6")
+	style.set_border_width_all(2 if selected else 1)
+	style.shadow_size = 1
+	style.shadow_offset = Vector2(0, 1)
+	return style
+
+static func _menu_radio(id: String) -> Texture2D:
+	# PopupMenu draws check textures directly, unlike Button's icon color tint.
+	# Keep the library silhouette and give this native menu a visible blue mark.
+	var key := "menu-radio/" + id
+	if _art.has(key): return _art[key]
+	var source := icon(id)
+	var pixels := source.get_image()
+	if pixels.is_compressed(): pixels.decompress()
+	pixels.convert(Image.FORMAT_RGBA8)
+	for y in pixels.get_height():
+		for x in pixels.get_width():
+			pixels.set_pixel(x, y, Color(BLUE, pixels.get_pixel(x, y).a))
+	_art[key] = ImageTexture.create_from_image(pixels)
+	_art[key].set_size_override(Vector2i(24, 24))
+	return _art[key]
+
+static func register_modal(node: Node) -> void:
+	if not node.is_in_group(MODAL_GROUP): node.add_to_group(MODAL_GROUP)
+
+static func _visible_branch(node: Node) -> bool:
+	var current: Node = node
+	while current:
+		if current.process_mode == Node.PROCESS_MODE_DISABLED: return false
+		if current is Window and not current.visible: return false
+		if current is CanvasLayer and not current.visible: return false
+		if current is CanvasItem and not current.visible: return false
+		if current is Node3D and not current.visible: return false
+		current = current.get_parent()
+	return node.is_inside_tree()
+
+static func modal_is_open(context: Node, excluding: Node = null) -> bool:
+	if not is_instance_valid(context) or not context.is_inside_tree(): return false
+	for modal in context.get_tree().get_nodes_in_group(MODAL_GROUP):
+		if modal != excluding and not modal.is_queued_for_deletion() and _visible_branch(modal): return true
+	return false
 
 static func theme() -> Theme:
 	var t := (load("res://assets/ui/app_theme.tres") as Theme).duplicate() as Theme
 	var font := FontVariation.new()
 	font.base_font = load("res://assets/ui/fonts/Nunito.ttf")
-	font.fallbacks = [load("res://assets/ui/fonts/NotoSansSC-Regular.otf")]
-	font.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 650.0}
+	var chinese := FontVariation.new()
+	chinese.base_font = load("res://assets/ui/fonts/NotoSansSC-Regular.otf")
+	chinese.variation_embolden = 0.45
+	font.fallbacks = [chinese]
+	font.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 750.0}
 	t.default_font = font
 	t.default_font_size = 14
 	t.set_color("font_color", "Label", INK)
 	t.set_constant("line_spacing", "Label", 0)
-	for variant in ["Button", "OptionButton", "AccentButton", "SecondaryButton", "ChoiceButton", "ChoiceSelectedButton", "GhostButton", "RailButton"]:
+	for variant in ["Button", "OptionButton", "AccentButton", "SecondaryButton", "ChoiceButton", "ChoiceSelectedButton", "GhostButton", "RailButton", "IconButton", "DockButton", "ItemSlotButton", "ItemSlotSelectedButton"]:
+		if variant not in ["Button", "OptionButton"]: t.set_type_variation(variant, "Button")
 		var accent: bool = variant == "AccentButton"
-		var selected: bool = variant == "ChoiceSelectedButton"
-		var base: Color = GREEN if accent else (MINT if selected else PAPER)
+		var selected: bool = variant in ["ChoiceSelectedButton", "ItemSlotSelectedButton"]
 		t.set_color("font_color", variant, PAPER if accent else INK)
-		for state in ["normal", "hover", "pressed", "disabled"]:
-			var bg := base
-			if state == "hover": bg = base.lightened(0.06)
-			if state == "pressed": bg = base.darkened(0.08)
-			if state == "disabled": bg = Color("edf1ed")
-			var sb := surface(bg, 8)
-			if accent: sb.border_color = GREEN
-			if selected: sb.border_color = GREEN
+		for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
+			var tint := Color.WHITE
+			if state == "hover": tint = Color(1.04, 1.04, 1.04)
+			elif state in ["pressed", "hover_pressed"]: tint = Color(0.88, 0.9, 0.96)
+			elif state == "disabled": tint = Color(0.82, 0.83, 0.88, 0.75)
+			var sb: StyleBox = _texture_style("control-teal.png", 8, 14, tint) if accent else _texture_style("control-frame.png", 8, 16, tint)
+			if variant in ["ItemSlotButton", "ItemSlotSelectedButton"]: sb = card_style(selected, 4)
+			elif selected: sb = card_style(true, 8)
+			elif variant == "GhostButton": sb = surface(Color(0.94, 0.95, 1.0, 0.9), 6)
 			t.set_stylebox(state, variant, sb)
 		var focus := surface(Color.TRANSPARENT, 0)
 		focus.border_color = GOLD
 		focus.set_border_width_all(2)
 		t.set_stylebox("focus", variant, focus)
-		for state in ["normal", "hover", "pressed", "focus"]:
+		for state in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
 			t.set_color("font_%s_color" % state, variant, PAPER if accent else INK)
 			t.set_color("icon_%s_color" % state, variant, PAPER if accent else INK)
+		if accent:
+			t.set_color("font_outline_color", variant, Color("246677"))
+			t.set_constant("outline_size", variant, 1)
+			t.set_color("font_shadow_color", variant, Color(0.1, 0.2, 0.34, 0.4))
+			t.set_constant("shadow_offset_y", variant, 1)
 		t.set_color("font_disabled_color", variant, MUTED)
 		t.set_color("icon_disabled_color", variant, MUTED)
 		t.set_font_size("font_size", variant, 14)
@@ -93,13 +192,13 @@ static func theme() -> Theme:
 	t.set_icon("arrow", "OptionButton", icon("chevron-down"))
 	t.set_constant("modulate_arrow", "OptionButton", 1)
 	t.set_constant("arrow_margin", "OptionButton", 8)
-	t.set_stylebox("panel", "PopupMenu", surface(PAPER, 8))
+	t.set_stylebox("panel", "PopupMenu", panel_style(10))
 	t.set_stylebox("hover", "PopupMenu", surface(MINT, 4, 4))
 	t.set_color("font_color", "PopupMenu", INK)
 	t.set_color("font_hover_color", "PopupMenu", GREEN)
 	t.set_color("font_disabled_color", "PopupMenu", MUTED)
-	var radio_checked := icon("circle-check")
-	var radio_unchecked := icon("circle")
+	var radio_checked := _menu_radio("circle-check")
+	var radio_unchecked := _menu_radio("circle")
 	for key in ["radio_checked", "radio_checked_disabled"]:
 		t.set_icon(key, "PopupMenu", radio_checked)
 	for key in ["radio_unchecked", "radio_unchecked_disabled"]:
@@ -107,34 +206,42 @@ static func theme() -> Theme:
 	var row_height := maxi(ceili(font.get_height(14)), maxi(radio_checked.get_height(), radio_unchecked.get_height()))
 	t.set_constant("v_separation", "PopupMenu", maxi(0, 44 - row_height))
 	for variant in ["PanelContainer", "ChipPanel", "BottomSheet"]:
-		t.set_stylebox("panel", variant, surface())
+		t.set_stylebox("panel", variant, panel_style(8 if variant == "ChipPanel" else 12))
 	for variant in ["ThumbChoiceButton", "ThumbChoiceSelectedButton"]:
 		var selected: bool = variant == "ThumbChoiceSelectedButton"
-		var sb := surface(PAPER if selected else Color("f2f5f2"), 8)
-		sb.border_color = GREEN if selected else BORDER
-		for state in ["normal", "hover", "pressed", "disabled"]:
+		t.set_color("font_color", variant, GREEN if selected else INK)
+		var sb := card_style(selected, 6)
+		for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 			t.set_stylebox(state, variant, sb)
-		for state in ["normal", "hover", "pressed", "focus"]:
+		for state in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
 			t.set_color("font_%s_color" % state, variant, GREEN if selected else INK)
 			t.set_color("icon_%s_color" % state, variant, Color.WHITE)
 	for variant in ["TabButton", "TabSelectedButton"]:
 		var selected: bool = variant == "TabSelectedButton"
-		var sb := surface(Color.TRANSPARENT, 6, 0)
-		sb.set_border_width_all(0)
+		t.set_color("font_color", variant, PAPER if selected else INK)
 		if selected:
-			sb.border_width_bottom = 2
-			sb.border_color = GREEN
-		for state in ["normal", "hover", "pressed", "disabled"]:
+			t.set_color("font_outline_color", variant, Color("514278"))
+			t.set_constant("outline_size", variant, 1)
+		var sb: StyleBox = _texture_style("control-violet.png", 8, 14) if selected else card_style(false, 8)
+		for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 			t.set_stylebox(state, variant, sb)
-		for state in ["normal", "hover", "pressed", "focus"]:
-			t.set_color("font_%s_color" % state, variant, GREEN if selected else MUTED)
-			t.set_color("icon_%s_color" % state, variant, GREEN if selected else MUTED)
+		for state in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
+			t.set_color("font_%s_color" % state, variant, PAPER if selected else INK)
+			t.set_color("icon_%s_color" % state, variant, PAPER if selected else BLUE)
 		t.set_font_size("font_size", variant, 11)
 		t.set_constant("icon_max_width", variant, 18)
 		t.set_constant("h_separation", variant, 3)
 	t.set_stylebox("panel", "ToastPanel", surface(INK, 12))
 	t.set_stylebox("background", "ProgressBar", surface(BORDER, 0, 3))
 	t.set_stylebox("fill", "ProgressBar", surface(GREEN, 0, 3))
+	for type in ["LineEdit", "TextEdit"]:
+		t.set_stylebox("normal", type, card_style(false, 8))
+		t.set_stylebox("focus", type, card_style(true, 8))
+		t.set_color("font_color", type, INK)
+		t.set_color("font_placeholder_color", type, MUTED)
+		t.set_color("caret_color", type, BLUE)
+	t.set_stylebox("panel", "AcceptDialog", panel_style(14))
+	t.set_stylebox("panel", "Window", panel_style(14))
 	return t
 
 static func button(symbol: String, text: String, tip: String, accent := false) -> Button:

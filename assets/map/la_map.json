@@ -1,0 +1,81 @@
+{
+  "format": 1,
+  "landmarks": [
+    {
+      "id": "hollywood_sign",
+      "name": "Hollywood Sign",
+      "zh": "好莱坞标志",
+      "lat": 34.134115,
+      "lng": -118.321548,
+      "category": "Landmark",
+      "art": "hollywood_sign",
+      "source": "https://www.hollywoodsign.org/"
+    },
+    {
+      "id": "griffith_observatory",
+      "name": "Griffith Observatory",
+      "zh": "格里菲斯天文台",
+      "lat": 34.118434,
+      "lng": -118.300393,
+      "category": "Observatory",
+      "address": "2800 E Observatory Rd",
+      "art": "griffith_observatory",
+      "source": "https://griffithobservatory.org/visit/"
+    },
+    {
+      "id": "santa_monica_pier",
+      "name": "Santa Monica Pier",
+      "zh": "圣莫尼卡码头",
+      "lat": 34.009242,
+      "lng": -118.497604,
+      "category": "Pier",
+      "address": "200 Santa Monica Pier",
+      "art": "santa_monica_pier",
+      "source": "https://www.santamonicapier.org/"
+    },
+    {
+      "id": "venice_beach",
+      "name": "Venice Beach",
+      "zh": "威尼斯海滩",
+      "lat": 33.98504,
+      "lng": -118.46948,
+      "category": "Beach",
+      "art": "beach",
+      "source": "https://www.laparks.org/venice"
+    },
+    {
+      "id": "universal_studios",
+      "name": "Universal Studios Hollywood",
+      "zh": "好莱坞环球影城",
+      "lat": 34.138117,
+      "lng": -118.353378,
+      "category": "Theme park",
+      "address": "100 Universal City Plaza",
+      "art": "theme_park",
+      "source": "https://www.universalstudioshollywood.com/"
+    }
+  ],
+  "residents": [
+    {
+      "id": "nursery_keeper",
+      "place": "nursery",
+      "slot": "nursery",
+      "lat": 34.0815,
+      "lng": -118.4142
+    },
+    {
+      "id": "bistro_owner",
+      "place": "bistro",
+      "slot": "bistro",
+      "lat": 34.05123,
+      "lng": -118.24872
+    },
+    {
+      "id": "restorer",
+      "place": "courtyard",
+      "slot": "restorer",
+      "lat": 34.0261,
+      "lng": -118.4766
+    }
+  ]
+}

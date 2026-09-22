@@ -14,7 +14,7 @@ import path from 'node:path';
 import { PgStore } from '../../src/db/pg_store.js';
 import { MemoryStore } from '../../src/http/memory_store.js';
 import { migrate, truncateAll } from '../../src/db/migrate.js';
-import { buildApp, blueprintSets, loadBlueprint } from '../../src/http/app.js';
+import { buildApp, loadBlueprint, plotFor } from '../../src/http/app.js';
 import type { Store } from '../../src/http/store.js';
 import { newInstallKey } from '../../src/http/auth.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/domain/content.js';
@@ -30,7 +30,7 @@ const ROOT = path.resolve(DEFAULT_CONTENT_DIR, '..', '..', '..');
 const BLUEPRINTS = path.join(ROOT, 'assets', 'blueprints');
 const REGIONS = path.join(DEFAULT_CONTENT_DIR, 'regions.json');
 const bp = loadBlueprint(BLUEPRINTS, 'sh_a', 2)!;
-const sets = blueprintSets(bp);
+const sets = plotFor(content);
 const T0 = at('2026-09-04T10:00:00+08:00');
 
 let pool: pg.Pool | undefined;
@@ -46,10 +46,10 @@ afterAll(async () => { await pool?.end(); });
 
 const makers: [string, boolean, () => object][] = [
   ['MemoryStore', true, () => new MemoryStore({
-    content, timezone: SH, blueprint: sets, now: () => clock, contentVersion: CV })],
+    content, timezone: SH, plot: sets, now: () => clock, contentVersion: CV })],
   ['PgStore', Boolean(DSN), () => new PgStore({
     pool: pool!, content, contentVersion: CV, timezone: () => SH,
-    blueprint: () => sets, now: () => clock })],
+    plot: sets, now: () => clock })],
 ];
 
 for (const [name, enabled, makeStore] of makers) {
@@ -80,7 +80,8 @@ for (const [name, enabled, makeStore] of makers) {
           layout_patch_id: 'sh_a', blueprint_revision: 2 } });
       return { token, player_id, version: farm.json().version as number,
         farm_id: farm.json().farm_id as string,
-        cells: Object.keys(farm.json().state.cells) as string[] };
+        // 开局一格未开垦；j=0/1 两行在布局里是纯土地，拿来当稳定的工作面。
+        cells: ["0,0", "1,0", "2,0", "3,0"] };
     }
     const cmd = (token: string, body: object) =>
       app.inject({ method: 'POST', url: '/v1/farms/me/commands', headers: authed(token), payload: body });
@@ -165,7 +166,7 @@ for (const [name, enabled, makeStore] of makers) {
         type: 'qa_skip_days', payload: { days: 1 } });
       expect(skip.statusCode).toBe(200);
       const next = await cmd(s.token, { idempotency_key: 'c1', base_version: skip.json().version,
-        type: 'clear_cells', payload: { cell_ids: [s.cells[0]] } });
+        type: 'till_cells', payload: { cell_ids: [s.cells[0]] } });
       expect(next.statusCode).toBe(200);
       expect(next.json().state.clock.player_day_id).toBe('2026-09-05');
       expect(next.json().state.clock.weather_day_index).toBe(1);
@@ -184,7 +185,7 @@ for (const [name, enabled, makeStore] of makers) {
     it('同一幂等键重放不产生第二次副作用', async () => {
       const s = await seed();
       const body = { idempotency_key: 'dup', base_version: s.version,
-        type: 'clear_cells', payload: { cell_ids: [s.cells[0]] } };
+        type: 'till_cells', payload: { cell_ids: [s.cells[0]] } };
       const a = await cmd(s.token, body);
       const b = await cmd(s.token, body);
       expect(a.json().outcome).toBe('applied');
@@ -195,17 +196,18 @@ for (const [name, enabled, makeStore] of makers) {
     it('base_version 落后时报 409 而不是覆盖', async () => {
       const s = await seed();
       await cmd(s.token, { idempotency_key: 'x1', base_version: s.version,
-        type: 'clear_cells', payload: { cell_ids: [s.cells[0]] } });
+        type: 'till_cells', payload: { cell_ids: [s.cells[0]] } });
       const stale = await cmd(s.token, { idempotency_key: 'x2', base_version: s.version,
-        type: 'clear_cells', payload: { cell_ids: [s.cells[1]] } });
+        type: 'till_cells', payload: { cell_ids: [s.cells[1]] } });
       expect(stale.statusCode).toBe(409);
       expect(stale.json().code).toBe('VERSION_CONFLICT');
     });
 
     it('被拒的命令不涨版本', async () => {
       const s = await seed();
+      // 房子占的格永远不可开垦：一条稳定被领域层拒绝的命令。
       const r = await cmd(s.token, { idempotency_key: 'bad', base_version: s.version,
-        type: 'till_cells', payload: { cell_ids: [s.cells[0]] } });   // 没清理就翻土
+        type: 'till_cells', payload: { cell_ids: [sets.anchors.house.join(',')] } });
       expect(r.statusCode).toBe(422);
       expect((await me(s.token)).json().version).toBe(s.version);
     });
@@ -214,7 +216,7 @@ for (const [name, enabled, makeStore] of makers) {
       const s = await seed();
       clock = T0 + 60_000;
       await cmd(s.token, { idempotency_key: 'm1', base_version: s.version,
-        type: 'clear_cells', payload: { cell_ids: [s.cells[0]] } });
+        type: 'till_cells', payload: { cell_ids: [s.cells[0]] } });
       const high = (await me(s.token)).json().state.clock.last_effective_now;
       clock = T0;
       const v = (await me(s.token)).json().version;
@@ -251,7 +253,7 @@ for (const [name, enabled, makeStore] of makers) {
       expect(s1.json().snapshot_revision).toBe(1);
       // 同槽内主人操作了，访客仍拿到同一份——不暴露操作时刻。
       await cmd(a.token, { idempotency_key: 'c1', base_version: a.version + 1,
-        type: 'clear_cells', payload: { cell_ids: [a.cells[0]] } });
+        type: 'till_cells', payload: { cell_ids: [a.cells[0]] } });
       const s2 = await app.inject({ method: 'GET', url, headers: authed(v.token) });
       expect(s2.json().snapshot_taken_at).toBe(s1.json().snapshot_taken_at);
       expect(s2.json().cells).toEqual(s1.json().cells);
@@ -259,7 +261,7 @@ for (const [name, enabled, makeStore] of makers) {
       clock += 15 * 60_000;
       const s3 = await app.inject({ method: 'GET', url, headers: authed(v.token) });
       expect(s3.json().snapshot_revision).toBe(2);
-      expect(s3.json().cells.find((c: { cell_id: string }) => c.cell_id === a.cells[0]).state).toBe('cleared');
+      expect(s3.json().cells.find((c: { cell_id: string }) => c.cell_id === a.cells[0]).state).toBe('tilled');
       // 再跨槽：内容没变 → revision 仍 2，只有 taken_at 推进
       clock += 15 * 60_000;
       const s4 = await app.inject({ method: 'GET', url, headers: authed(v.token) });
@@ -271,7 +273,7 @@ for (const [name, enabled, makeStore] of makers) {
       const { PRESET_SPECS, buildPresetFarm, presetHmac } = await import('../../src/domain/presets.js');
       const spec = PRESET_SPECS.find(s => s.region === 'shanghai')!;
       const bpB = loadBlueprint(BLUEPRINTS, spec.layout, spec.revision)!;
-      const farm = buildPresetFarm(spec, blueprintSets(bpB), content, SH, clock);
+      const farm = buildPresetFarm(spec, plotFor(content), content, SH, clock);
       await currentStore.ensureSystemFarm(presetHmac(spec.layout), farm);
       await currentStore.ensureSystemFarm(presetHmac(spec.layout), farm);
       const me = await seed();

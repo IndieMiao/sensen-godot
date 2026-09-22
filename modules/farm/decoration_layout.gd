@@ -27,78 +27,114 @@ static func saved(state: Dictionary) -> Array:
 static func canonical(props: Array) -> Array:
 	var result := []
 	for prop in props:
-		var value := entry(str(prop.prop_id), Vector2i(int(prop.offset_q[0]), int(prop.offset_q[1])))
+		var value := entry(str(prop.prop_id), Vector2i(int(prop.cell[0]), int(prop.cell[1])))
 		if int(prop.get("rotation_q", 0)) != 0: value.rotation_q = int(prop.rotation_q)
 		result.append(value)
 	result.sort_custom(func(a, b): return IDS.find(str(a.prop_id)) < IDS.find(str(b.prop_id)))
 	return result
 
-static func offset_allowed(q: Vector2i) -> bool:
-	var config := data()
-	var bounds: Dictionary = config.bounds_q
-	var blocked: Dictionary = config.blocked_outer
-	return q.x >= int(bounds.min_x) and q.x <= int(bounds.max_x) and q.y >= int(bounds.min_z) and q.y <= int(bounds.max_z) \
-		and absi(q.x) >= int(config.min_abs_x_q) \
-		and not (absi(q.x) >= int(blocked.min_abs_x_q) and q.y <= int(blocked.max_z_q))
+## 一个道具占的全部格；左上角为锚点，向东南铺开。与服务端 footprintCells 同一套规则。
+static func footprint_cells(id: String, q: Vector2i) -> Array:
+	var size: Array = data().props.get(id, {}).get("footprint", [1, 1])
+	var out: Array = []
+	for dj in int(size[1]):
+		for di in int(size[0]):
+			out.append(q + Vector2i(di, dj))
+	return out
+
+## 能不能放在这里：地面「可放置」属性 ∧ 没有开垦过的地 ∧ 不与别的道具重叠。
+## 与 server/src/domain/handlers/decorations.ts 的 propPlacementAllowed 三条判据一致。
+static func cell_allowed(bp: FarmBlueprint, cells: Dictionary, taken: Dictionary, id: String, q: Vector2i) -> bool:
+	if bp == null: return false
+	for cell in footprint_cells(id, q):
+		if not bp.mask_has("buildable", cell): return false
+		if cells.has("%d,%d" % [(cell as Vector2i).x, (cell as Vector2i).y]): return false
+		if taken.has(cell): return false
+	return true
 
 static func is_valid(props: Array) -> bool:
 	if props.size() > IDS.size(): return false
 	var seen := {}
 	var positions: Array[Vector2i] = []
 	for value in props:
-		if not value is Dictionary or value.size() < 3 or value.size() > 4: return false
+		if not value is Dictionary or value.size() < 2 or value.size() > 3: return false
 		for key in value:
-			if key not in ["anchor_id", "prop_id", "offset_q", "rotation_q"]: return false
+			if key not in ["prop_id", "cell", "rotation_q"]: return false
 		var rotation = value.get("rotation_q", 0)
 		if not (rotation is int or rotation is float) or not is_finite(float(rotation)) or float(rotation) != roundf(float(rotation)) or rotation < 0 or rotation > 3: return false
-		if str(value.get("anchor_id", "")) != str(data().anchor_id): return false
 		var id := str(value.get("prop_id", ""))
 		if not IDS.has(id) or seen.has(id): return false
-		var offset = value.get("offset_q")
+		var offset = value.get("cell")
 		if not offset is Array or offset.size() != 2: return false
 		for number in offset:
 			if not (number is int or number is float) or not is_finite(float(number)) or float(number) != roundf(float(number)): return false
 		var q := Vector2i(int(offset[0]), int(offset[1]))
-		if not offset_allowed(q): return false
-		for previous in positions:
-			if Vector2(q).distance_squared_to(Vector2(previous)) < pow(float(data().min_distance_q), 2): return false
-		positions.append(q)
+		for cell in footprint_cells(id, q):
+			if positions.has(cell): return false
+			positions.append(cell)
 		seen[id] = true
 	return true
 
 static func entry(id: String, q: Vector2i) -> Dictionary:
-	return {"anchor_id": str(data().anchor_id), "prop_id": id, "offset_q": [q.x, q.y]}
+	return {"prop_id": id, "cell": [q.x, q.y]}
 
 static func index_of(props: Array, id: String) -> int:
 	for index in props.size():
 		if str(props[index].get("prop_id", "")) == id: return index
 	return -1
 
+## 摆件区的局部原点。**存档坐标是农场格**（服务端按 farm_plot 的「可放置」属性校验），
+## 但布置界面目前挂在 journey 的 courtyard 场景里，那里的相机在自己的原点附近。
+## 这个偏移是两套坐标之间的唯一换算点；把面板搬进农场场景后可以直接去掉。
+const LOCAL_ORIGIN := Vector2i(32, 12)
+
 static func world_position(prop: Dictionary) -> Vector3:
-	var q: Array = prop.get("offset_q", [0, 0])
+	var q: Array = prop.get("cell", [0, 0])
 	var unit := float(data().unit_m)
-	return Vector3(float(q[0]) * unit, 0, float(q[1]) * unit)
+	return Vector3((float(q[0]) - float(LOCAL_ORIGIN.x)) * unit, 0,
+		-(float(q[1]) - float(LOCAL_ORIGIN.y)) * unit)
 
 static func quantize(world: Vector3) -> Vector2i:
-	return Vector2i(roundi(world.x / float(data().unit_m)), roundi(world.z / float(data().unit_m)))
+	var unit := float(data().unit_m)
+	return LOCAL_ORIGIN + Vector2i(roundi(world.x / unit), roundi(-world.z / unit))
 
 static func with_position(props: Array, id: String, q: Vector2i) -> Array:
 	var next := props.duplicate(true)
 	var index := index_of(next, id)
 	if index < 0: next.append(entry(id, q))
-	else: next[index].offset_q = [q.x, q.y]
+	else: next[index].cell = [q.x, q.y]
 	return canonical(next)
 
-static func first_position(id: String, props: Array) -> Variant:
+static func first_position(id: String, props: Array, bp: FarmBlueprint = null, cells: Dictionary = {}) -> Variant:
 	if not IDS.has(id): return null
-	var preferred: Array = data().props[id].default_offset_q
+	var preferred: Array = data().props[id].default_cell
 	var q := Vector2i(int(preferred[0]), int(preferred[1]))
+	if bp != null:
+		var taken := {}
+		for prop in props:
+			if str(prop.prop_id) == id: continue
+			for cell in footprint_cells(str(prop.prop_id), Vector2i(int(prop.cell[0]), int(prop.cell[1]))): taken[cell] = true
+		if cell_allowed(bp, cells, taken, id, q): return q
+		var closest: Variant = null
+		var distance := INF
+		for y in bp.grid.y:
+			for x in bp.grid.x:
+				var candidate := Vector2i(x, y)
+				var candidate_distance := Vector2(candidate - q).length_squared()
+				if candidate_distance >= distance or not cell_allowed(bp, cells, taken, id, candidate): continue
+				closest = candidate
+				distance = candidate_distance
+		return closest
 	if is_valid(with_position(props, id, q)): return q
-	var bounds: Dictionary = data().bounds_q
-	for z in range(int(bounds.min_z), int(bounds.max_z) + 1):
-		for x in range(int(bounds.min_x), int(bounds.max_x) + 1):
-			q = Vector2i(x, z)
-			if is_valid(with_position(props, id, q)): return q
+	# 默认位置被占了：在它附近螺旋找一格空的。真正的可放置性由 cell_allowed 判定，
+	# 这里只保证不与已放的道具重叠。
+	for radius in range(1, 8):
+		for dj in range(-radius, radius + 1):
+			for di in range(-radius, radius + 1):
+				if maxi(absi(di), absi(dj)) != radius: continue
+				var near := q + Vector2i(di, dj)
+				if near.x < 0 or near.y < 0: continue
+				if is_valid(with_position(props, id, near)): return near
 	return null
 
 static func build(props: Array, selected_id := "", planted := true) -> Node3D:

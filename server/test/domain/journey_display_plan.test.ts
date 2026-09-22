@@ -3,6 +3,8 @@ import type { Command } from '../../src/domain/commands.js';
 import type { FarmState } from '../../src/domain/state.js';
 import { reconcileJourney, startJourney } from '../../src/domain/journey.js';
 import { content, freshFarm, run } from './helpers.js';
+import { ensureBag } from '../../src/domain/bag.js';
+import { ensureCharacter } from '../../src/domain/character.js';
 
 function ready() {
   const s = startJourney(freshFarm(), content);
@@ -25,6 +27,8 @@ const plan = (s: FarmState, item = 'fountain', slot = 0) => apply(s, {
 describe('handmade display plans', () => {
   it('plans, switches and cancels without consuming or granting resources', () => {
     const original = ready();
+    ensureBag(original, content);
+    ensureCharacter(original, content);
     const first = plan(original);
     expect(first.journey!.workshop!.planned).toEqual({ item: 'fountain', project: 'terrace', slot: 0 });
     const next = plan(plan(first, 'planter', 2), '', 2);

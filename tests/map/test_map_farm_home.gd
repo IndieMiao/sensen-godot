@@ -183,13 +183,14 @@ func test_selected_city_keeps_its_camera_and_demo_farmers_with_a_farm_abroad() -
 	Net.session.state = {"journey": {"version": 1, "unlocks": [], "facts": []}}
 	var m := _map()
 	await get_tree().create_timer(0.7).timeout
-	var center: Vector2 = FarmBlueprint.load_choice({"layout_patch_id": "la_a", "revision": 2}).overlay.center
+	var city: Dictionary = FarmRegions.load_default().region("los_angeles")
+	var center := {"x":34.065,"y":-118.365} # Keep geographic expectations in f64, like the camera.
 	assert_float(m.center_lat).is_equal_approx(center.x, 0.000001)
 	assert_float(m.center_lng).is_equal_approx(center.y, 0.000001)
 	assert_str(m.region.id).is_equal("los_angeles")
 	assert_str(m._nearby_region).is_equal("los_angeles")
-	assert_int(m.nearby_panel.entries.size()).is_equal(18)
-	for entry in m.nearby_panel.entries:
+	assert_int(m._nearby_entries.size()).is_equal(18)
+	for entry in m._nearby_entries:
 		assert_str(entry.region_id).is_equal("los_angeles")
 	assert_str(m.farm_markers.selected_id).is_empty()
 	assert_bool(m.farm_markers.miniature.visible).is_false()
@@ -213,7 +214,7 @@ func test_late_login_does_not_pull_selected_city_back_to_own_farm() -> void:
 	m._on_net_booted(true)
 	await get_tree().create_timer(0.7).timeout
 	assert_object(m.select_panel).is_null()
-	assert_object(m.journey_footer).is_not_null()
+	assert_object(m.city_map).is_not_null()
 	assert_float(m.center_lng).is_less(-118.0)
 	assert_str(m._nearby_region).is_equal("los_angeles")
 	assert_str(FarmChoice.load().layout_patch_id).is_equal("sh_c")
@@ -230,7 +231,7 @@ func test_explicit_home_focus_switches_both_camera_and_nearby_city() -> void:
 	assert_str(m._nearby_region).is_equal("shanghai")
 	assert_str(FarmRegions.load_choice()).is_equal("shanghai")
 	assert_str(m.farm_markers.selected_id).is_equal("self")
-	for entry in m.nearby_panel.entries:
+	for entry in m._nearby_entries:
 		assert_str(entry.region_id).is_equal("shanghai")
 
 func test_shanghai_selection_with_la_farm_uses_shanghai_demo_neighbourhood() -> void:
@@ -276,14 +277,14 @@ func test_my_farm_then_sample_b_opens_two_distinct_farm_identities() -> void:
 	_login_with_farm("sh_a", [{"error": "nearby unavailable"}])
 	var m := _map()
 	await get_tree().process_frame
-	var sample_b := str(m.nearby_panel.entries.filter(func(e): return e.avatar_ref == "preset_b")[0].farm_id)
+	var sample_b := str(m._nearby_entries.filter(func(e): return e.avatar_ref == "preset_b")[0].farm_id)
 	m.nearby_panel.focus(sample_b)
 	await m._open_my_farm()
 	while AppRouter._navigation_pending: await get_tree().process_frame
 	var own := AppRouter.top_instance()
 	assert_bool(own.visitor).is_false()
 	assert_bool(own.snapshot.is_empty()).is_true()
-	assert_str(own.bp.layout_patch_id).is_equal("sh_a")
+	assert_str(own.bp.layout_patch_id).is_equal("homestead_a")
 	assert_str(m.nearby_panel.focused_id).is_empty()
 	AppRouter.pop_instance()
 	await get_tree().process_frame
@@ -299,7 +300,8 @@ func test_my_farm_then_sample_b_opens_two_distinct_farm_identities() -> void:
 	assert_bool(visit.visitor).is_true()
 	assert_str(str(visit.snapshot.farm_id)).is_equal(sample_b)
 	assert_str(str(visit.snapshot.avatar_ref)).is_equal("preset_b")
-	assert_str(visit.bp.layout_patch_id).is_not_equal("sh_a")
+	# 农场地面布局对所有人是同一份；身份由 farm_id 与 avatar_ref 区分（上面两条）。
+	assert_str(visit.bp.layout_patch_id).is_equal("homestead_a")
 
 func test_cached_choice_is_not_an_owned_farm_when_server_reports_no_farm() -> void:
 	var t := _login_fake([])
@@ -356,7 +358,7 @@ func test_connection_failure_keeps_entry_retryable_and_recovers_server_farm() ->
 	while AppRouter._navigation_pending: await get_tree().process_frame
 	assert_int(AppRouter.instance_depth()).is_equal(1)
 	assert_object(AppRouter.top_instance().session).is_not_null()
-	assert_str(AppRouter.top_instance().bp.layout_patch_id).is_equal("sh_c")
+	assert_str(AppRouter.top_instance().bp.layout_patch_id).is_equal("homestead_a")
 
 func test_opening_during_login_waits_and_ignores_duplicate_entry() -> void:
 	Net.use_transport(FakeTransport.new([]).callable())
@@ -379,13 +381,13 @@ func test_private_farm_snapshot_remains_visitable_without_map_location() -> void
 	Net.client.token = ""
 	var m := _map()
 	await get_tree().process_frame
-	var snapshot := PresetSnapshots.snapshot(str(m.nearby_panel.entries[0].farm_id))
+	var snapshot := PresetSnapshots.snapshot(str(m._nearby_entries[0].farm_id))
 	var id := str(snapshot.farm_id)
 	snapshot.erase("region_id")
 	snapshot.erase("location")
 	m._place_farm(id, snapshot)
 	assert_bool(m.farm_markers.points.has(id)).is_false()
-	assert_bool(m.nearby_panel.entries.any(func(entry): return str(entry.farm_id) == id)).is_true()
+	assert_bool(m._nearby_entries.any(func(entry): return str(entry.farm_id) == id)).is_true()
 
 func test_suspended_gesture_cannot_block_returned_map_selection() -> void:
 	Net.use_transport(FakeTransport.new([]).callable())

@@ -13,6 +13,8 @@ var joystick := Vector2.ZERO
 var _path: Array[Vector3] = []
 var _path_idx := 0
 
+const JOYSTICK_STEP_CELL_RATIO := 0.2
+
 func _init(p_bp: FarmBlueprint, p_grid: BlueprintGrid, p_scale := 1.0) -> void:
 	bp = p_bp
 	grid = p_grid
@@ -55,9 +57,7 @@ func step(dt: float) -> void:
 	var stride := speed * world_scale * maxf(dt, 0.0)
 	if joystick != Vector2.ZERO:
 		var dir := Vector3(joystick.x, 0.0, joystick.y).limit_length(1.0)
-		var next := position + dir * stride
-		if grid.segment_walkable(position, next, world_scale):
-			position = next
+		_move_joystick(dir * stride)
 		facing = dir.normalized()
 		return
 	# Carry unused distance across turns so frame rate does not change travel speed.
@@ -73,3 +73,25 @@ func step(dt: float) -> void:
 		else:
 			position += facing * stride
 			break
+
+func _move_joystick(displacement: Vector3) -> void:
+	var max_step := bp.cell_m * world_scale * JOYSTICK_STEP_CELL_RATIO
+	var steps := maxi(1, ceili(displacement.length() / max_step))
+	var increment := displacement / steps
+	for index in steps:
+		if _try_move(increment): continue
+		# Preserve the free component of a blocked diagonal without adding sideways input.
+		var along_x := Vector3(increment.x, 0, 0)
+		var along_z := Vector3(0, 0, increment.z)
+		var first := along_x if absf(increment.x) >= absf(increment.z) else along_z
+		var second := along_z if absf(increment.x) >= absf(increment.z) else along_x
+		var moved := _try_move(first)
+		moved = _try_move(second) or moved
+		if not moved: break
+
+func _try_move(displacement: Vector3) -> bool:
+	if displacement.is_zero_approx(): return false
+	var target := position + displacement
+	if not grid.segment_walkable(position, target, world_scale): return false
+	position = target
+	return true

@@ -4,7 +4,7 @@ import type { FarmState } from '../../src/domain/state.js';
 
 const stocked = (over: Partial<FarmState> = {}): FarmState => {
   const s = freshFarm();
-  s.inventory.produce = { R: 10, L: 10, C: 10, H: 10 };
+  s.inventory.produce = { R: 10, L: 10, C: 10, H: 10, T: 0 };
   return { ...s, ...over };
 };
 
@@ -85,7 +85,7 @@ describe('门口回购箱（PRD L534 / 决策⑦）', () => {
 describe('料理', () => {
   it('厨房需第 3 章开放', () => {
     const s = freshFarm();
-    s.inventory.produce = { R: 0, L: 1, C: 1, H: 1 };
+    s.inventory.produce = { R: 0, L: 1, C: 1, H: 1, T: 0 };
     expect((run(s, { type: 'cook_dish', recipe: 'salad' }) as { code: string }).code).toBe('CHAPTER_LOCKED');
     s.clock.chapter_index = 3;
     const r = run(s, { type: 'cook_dish', recipe: 'salad' });
@@ -101,7 +101,7 @@ describe('安全线种苗包（PRD §7.6 L587）', () => {
   const broke = () => {
     const s = freshFarm();
     s.wallet = 0;
-    s.inventory.seeds = { R: { bought: 0, bound: 0 }, L: { bought: 0, bound: 0 },
+    s.inventory.seeds = { T: { bought: 0, bound: 0 }, R: { bought: 0, bound: 0 }, L: { bought: 0, bound: 0 },
       C: { bought: 0, bound: 0 }, H: { bought: 0, bound: 0 } };
     return s;
   };
@@ -119,7 +119,7 @@ describe('安全线种苗包（PRD §7.6 L587）', () => {
       (s: FarmState) => { s.inventory.dishes.tea = 1; },
       (s: FarmState) => { s.inventory.seeds.R.bought = 1; },
       (s: FarmState) => { s.engineering.reserved = { C: 1 }; },
-      (s: FarmState) => { s.cells[BEDS[0]].state = 'growing'; },
+      (s: FarmState) => { s.cells[BEDS[0]!] = { state: 'growing', crop: 'R', watered_at: 0, ready_at: 1 }; },
     ]) {
       const s = broke();
       mutate(s);

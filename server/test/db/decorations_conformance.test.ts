@@ -6,7 +6,7 @@ import pg from 'pg';
 import { PgStore } from '../../src/db/pg_store.js';
 import { migrate, truncateAll } from '../../src/db/migrate.js';
 import { MemoryStore } from '../../src/http/memory_store.js';
-import { buildApp, blueprintSets, loadBlueprint } from '../../src/http/app.js';
+import { buildApp, loadBlueprint, plotFor } from '../../src/http/app.js';
 import type { FarmRow } from '../../src/http/dto.js';
 import type { Store } from '../../src/http/store.js';
 import { newInstallKey } from '../../src/http/auth.js';
@@ -19,9 +19,9 @@ if (process.env.CI === '1' && !DSN) throw new Error('TEST_DATABASE_URL is requir
 const content = loadContent(DEFAULT_CONTENT_DIR);
 const cv = contentVersion(DEFAULT_CONTENT_DIR);
 const blueprintDir = path.resolve(DEFAULT_CONTENT_DIR, '../../blueprints');
-const blueprint = blueprintSets(loadBlueprint(blueprintDir, 'sh_a', 2)!);
-const props: DecorationPlacement[] = [{ anchor_id: 'courtyard', prop_id: 'bench', offset_q: [-4, 3] },
-  { anchor_id: 'courtyard', prop_id: 'planter', offset_q: [4, 3] }];
+const plot = plotFor(content);
+const props: DecorationPlacement[] = [{ prop_id: 'bench', cell: [24, 3] },
+  { prop_id: 'planter', cell: [27, 3] }];
 let pool: pg.Pool | undefined;
 beforeAll(async () => {
   if (!DSN) return;
@@ -56,9 +56,9 @@ for (const storage of ['memory', 'postgres'] as const) {
       if (pool) await truncateAll(pool);
       clock = T0;
       store = storage === 'memory'
-        ? new MemoryStore({ content, contentVersion: cv, timezone: SH, blueprint, now: () => clock })
+        ? new MemoryStore({ content, contentVersion: cv, timezone: SH, plot, now: () => clock })
         : new PgStore({ pool: pool!, content, contentVersion: cv, timezone: () => SH,
-          blueprint: () => blueprint, now: () => clock });
+          plot, now: () => clock });
       app = await build();
       key = newInstallKey();
       const identity = await login(key);
@@ -66,8 +66,7 @@ for (const storage of ['memory', 'postgres'] as const) {
       ownerId = identity.player_id;
       farmId = randomUUID();
       const state = createInitialState({ player_day_id: '2026-09-04', field_condition: 'sunny', now: clock,
-        wallet: 218, bed_cells: [...blueprint.cultivable].filter(id => !blueprint.reserved.has(id)),
-        reserved_cells: [...blueprint.reserved] });
+        wallet: 218 });
       state.clock.chapter_index = 5;
       state.chapters[5] = { status: 'active', activated_day: state.clock.player_day_id, step_flags: {}, grants_issued: true };
       state.growth_choice = { intent: 'tool', purchase: 'tool', locked_at: clock, transaction_id: 'paid' };
@@ -94,7 +93,7 @@ for (const storage of ['memory', 'postgres'] as const) {
       expect(replay.json().version).toBe(1);
       await app.close();
       if (storage === 'postgres') store = new PgStore({ pool: pool!, content, contentVersion: cv,
-        timezone: () => SH, blueprint: () => blueprint, now: () => clock });
+        timezone: () => SH, plot, now: () => clock });
       app = await build();
       token = (await login(key)).token;
       expect((await me()).json().state.decorations).toEqual(props);
@@ -108,7 +107,7 @@ for (const storage of ['memory', 'postgres'] as const) {
       expect((await save(props, 'save')).statusCode).toBe(200);
       const invalid = await save([...props, { ...props[0], prop_id: 'lantern' }], 'invalid', 1);
       expect(invalid.statusCode).toBe(422);
-      expect(invalid.json().code).toBe('DECORATION_OVERLAP');
+      expect(invalid.json().code).toBe('INVALID_DECORATION');   // 两件道具压在同一格
       expect((await save([], 'stale', 0)).statusCode).toBe(409);
       expect((await save([], 'save', 0)).json().code).toBe('IDEMPOTENCY_MISMATCH');
       const actual = (await me()).json();
@@ -128,7 +127,7 @@ for (const storage of ['memory', 'postgres'] as const) {
       clock += 15 * 60_000;
       const published = (await snapshot()).json();
       expect(published.props).toEqual(props);
-      expect(Object.keys(published.props[0]).sort()).toEqual(['anchor_id', 'offset_q', 'prop_id']);
+      expect(Object.keys(published.props[0]).sort()).toEqual(['cell', 'prop_id']);
       for (const privateField of ['owner_id', 'wallet', 'inventory', 'growth_choice', 'decorations', 'location'])
         expect(published).not.toHaveProperty(privateField);
       expect((await save([], 'intruder', 1, visitorHeaders)).statusCode).toBe(404);

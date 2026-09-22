@@ -1,0 +1,12 @@
+Use case: stylized-concept
+Asset type: one production generic cafe-category sprite for a mobile Los Angeles map.
+Primary request: create one isolated cafe miniature matching the softly rounded pastel clay-toy visual language of the supplied approved map crop.
+Input images: Image 1 is a style and composition reference from the user-approved map; use its cream cafe, mint striped awning and cup silhouette as inspiration, excluding all map context and text.
+Subject: compact cream two-story neighborhood cafe with a mint-and-ivory striped front awning, small teal windows, welcoming dark entry, and a simple small ivory coffee-cup sign above the storefront. A tiny potted plant and one modest outdoor cafe table with two chairs may sit directly on its low compact pale mint and cream base. Keep all details attached to that single base.
+Style/medium: premium soft matte 3D miniature, rounded edges, clean readable massing, delicate restrained detail and gentle ambient occlusion. Match the approved map's playful dimensional landmark art.
+Composition/framing: elevated three-quarter front view with visible right side, consistent isometric miniature camera. Entire building, cup sign, awning and base visible. Center the isolated building; leave at least 12 percent empty margin around it. Low base, no tall plinth. Clear readable cafe silhouette at small map icon sizes.
+Lighting/mood: soft neutral daylight from upper left, warm welcoming restrained shading contained on the object.
+Color palette: warm creamy ivory architecture, fresh muted mint awning and vegetation, subdued teal and sky-blue accents, warm light wood furniture.
+Scene/backdrop: perfectly flat solid vivid magenta chroma-key background, RGB 255 0 255. No gradient, vignette, floor or cast shadow on the background. No magenta materials or reflections on the asset.
+Text: none. The shop sign is pictorial only: a simple cup with no words, letters or numbers. Remove the CAFE lettering visible in the reference.
+Constraints: one complete isolated cafe asset only; no people, map, road, UI, labels, captions, words, logos, numbers, watermark, selection ring or glow. Avoid photorealism, glossy plastic, heavy outlines, huge coffee cup, floating detached objects, excessive plants, or any cropped piece.

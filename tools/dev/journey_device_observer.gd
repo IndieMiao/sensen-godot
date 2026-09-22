@@ -64,7 +64,10 @@ func _publish() -> void:
 			for pawn in scene._pawns:
 				if pawn.node.visible:
 					character_scales[str(pawn.cohort).trim_prefix("farm:")] = pawn.node.scale.x / base_scale
+			var owner_screen: Vector2 = get_viewport().get_screen_transform() * (markers._selected_anchor + markers.global_position)
+			var model_screen: Vector2 = get_viewport().get_screen_transform() * scene.cam.unproject_position(markers.miniature.position)
 			snapshot.social = {"selected": markers.selected_id, "expanded": markers.expanded_ids.duplicate(),
+				"owner_screen": [owner_screen.x, owner_screen.y], "model_screen": [model_screen.x, model_screen.y],
 				"character_scales": character_scales, "plot_outline_visible": scene.farm_overlay and scene.farm_overlay.is_visible_in_tree(),
 				"visible_characters": markers.visible_farm_ids.duplicate(), "model_visible": markers.miniature.is_visible_in_tree(),
 				"model_type": markers.miniature.get_class(), "model_scale": _vector(markers.miniature.scale),
@@ -73,6 +76,8 @@ func _publish() -> void:
 	if place: snapshot.world = _world(place)
 	if scene is JourneyStreet:
 		snapshot.world = _street_world(scene)
+	elif scene and scene.scene_file_path == AppRouter.MINE:
+		snapshot.world = _mine_world(scene)
 	elif scene and scene.get("hints") is PlotHints:
 		var hints := scene.hints as PlotHints
 		snapshot.world = {"place": "farm", "controls": [], "moving": scene.mover.is_moving(),
@@ -87,6 +92,7 @@ func _publish() -> void:
 			snapshot.world.controls.append({"path": "plot:" + str(id), "text": "", "tooltip": "", "button": true,
 				"disabled": false, "rect": [point.x - 2, point.y - 2, 4, 4], "source": "rendered_plot_hint",
 				"action": NextStep.step_for(hints.cells[id], hints.now_ms)})
+		_farm_mine_entrance(scene, snapshot.world)
 	snapshot.feedback_events = feedback_events.duplicate(true)
 	snapshot.queue_events = queue_events.duplicate(true)
 	snapshot.camera_samples = camera_samples.duplicate(true)
@@ -118,7 +124,7 @@ func _record_camera() -> void:
 	if controller == null: return
 	var moving: bool = controller.active() or controller.moving()
 	if moving or camera_was_moving:
-		camera_samples.append({"ticks_ms": Time.get_ticks_msec(), "place": place.place_id if place else ("street" if source is JourneyStreet else "farm"),
+		camera_samples.append({"ticks_ms": Time.get_ticks_msec(), "place": place.place_id if place else ("street" if source is JourneyStreet else ("mine" if source.scene_file_path == AppRouter.MINE else "farm")),
 			"pan": _vector(controller.offset), "zoom": controller.zoom, "velocity": _vector(controller.velocity),
 			"zoom_velocity": controller.zoom_velocity, "pointers": controller.pointers.size(),
 			"camera_size": source.cam.size, "player": _vector(source.player.position)})
@@ -159,15 +165,22 @@ func _record_motion() -> void:
 	var mover := source.get("mover") as PlayerMover
 	if mover == null: return
 	var moving := mover.is_moving()
-	if moving or was_moving or (place and place.busy) or (source is JourneyStreet and source.busy) or (source.get("runner") != null and source.runner.is_busy()):
-		var rig: Node = place.rig if place else source.get("_rig") as Node
+	var mine := source.scene_file_path == AppRouter.MINE
+	var mine_busy: bool = mine and (source.busy or not source._dig_target.is_empty())
+	if moving or was_moving or mine_busy or (place and place.busy) or (source is JourneyStreet and source.busy) or (source.get("runner") != null and source.runner.is_busy()):
+		var rig: Node = place.rig if place else (source.rig if mine else source.get("_rig") as Node)
 		var animation := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer if rig else null
 		motion.append({"ticks_ms": Time.get_ticks_msec(), "scene": str(scene.get_path()),
-			"place": place.place_id if place else ("street" if source is JourneyStreet else "farm"), "position": [mover.position.x, mover.position.z],
+			"place": place.place_id if place else ("street" if source is JourneyStreet else ("mine" if mine else "farm")), "position": [mover.position.x, mover.position.z],
 			"moving": moving, "speed": mover.speed, "world_scale": mover.world_scale,
-			"busy": place.busy if place else (source.busy if source is JourneyStreet else false),
+			"busy": place.busy if place else (source.busy if source is JourneyStreet else mine_busy),
 			"animation": animation.current_animation if animation else "",
 			"animation_position": animation.current_animation_position if animation and not animation.current_animation.is_empty() else 0.0})
+		if mine:
+			motion[-1].floor = source.current_floor()
+			motion[-1].pending = source.pending_target
+			motion[-1].dig_target = source._dig_target
+			motion[-1].dig_elapsed = source._dig_elapsed
 		if motion.size() > 120: motion.pop_front()
 	was_moving = moving
 	if source is JourneyStreet and source.residents:
@@ -195,7 +208,8 @@ func _record_motion() -> void:
 func _walk(node: Node, result: Array) -> void:
 	if node is Control and not node.is_visible_in_tree(): return
 	if node is CanvasLayer and not node.visible: return
-	if node is BaseButton or node is Label:
+	if node is Window and not node.visible: return
+	if node is BaseButton or node is Label or node is LineEdit or node is SpinBox or node is TouchStick:
 		var control := node as Control
 		var rect := control.get_global_rect()
 		var parent := control.get_parent()
@@ -205,10 +219,83 @@ func _walk(node: Node, result: Array) -> void:
 		rect = rect.intersection(get_viewport().get_visible_rect())
 		if rect.has_area():
 			var screen := get_viewport().get_screen_transform() * rect
-			result.append({"path": str(node.get_path()), "text": str(node.get("text")), "tooltip": control.tooltip_text,
-				"button": node is BaseButton, "disabled": node.disabled if node is BaseButton else false,
+			result.append({"path": str(node.get_path()), "text": str(node.value) if node is SpinBox else str(node.get("text")), "tooltip": control.tooltip_text,
+				"button": node is BaseButton or node is LineEdit or node is SpinBox or node is TouchStick, "disabled": node.disabled if node is BaseButton else (not node.editable if node is LineEdit or node is SpinBox else false),
 				"rect": [screen.position.x, screen.position.y, screen.size.x, screen.size.y]})
 	for child in node.get_children(): _walk(child, result)
+
+func _farm_mine_entrance(farm: Node, world: Dictionary) -> void:
+	var entrance := farm.get("mine_entrance") as Node3D
+	if not is_instance_valid(entrance) or not farm.has_method("_mine_pick_rect"): return
+	world.mine_entrance = {"position": _vector(entrance.position), "pending": farm._mine_pending,
+		"visible": entrance.is_visible_in_tree(), "button_visible": false,
+		"player_distance": farm.player.position.distance_to(entrance.position)}
+	if farm.visitor or not entrance.is_visible_in_tree() or farm.hud.modal_open(): return
+	var rect: Rect2 = farm._mine_pick_rect()
+	if not rect.has_area(): return
+	var point := get_viewport().get_screen_transform() * rect.get_center()
+	world.controls.append({"path": "body:mine_entrance", "text": "", "tooltip": L10n.text("Starter mine"),
+		"button": true, "disabled": world.busy or farm.session == null or farm.session.offline or farm.session.has_unconfirmed_command(),
+		"rect": [point.x - 2, point.y - 2, 4, 4], "source": "camera_projected_mine_entrance"})
+
+func _mine_world(mine: Node) -> Dictionary:
+	var state: Dictionary = mine.mine_state()
+	var mover := mine.mover as PlayerMover
+	var camera := mine.cam as Camera3D
+	var can_act: bool = mine._can_act()
+	var result := {"place": "mine", "floor": mine.current_floor(), "run": int(state.get("run", 0)),
+		"cleared": mine.cleared(), "completed": mine.completed(), "cleared_floors": state.get("cleared_floors", []).duplicate(),
+		"broken": mine.broken().duplicate(), "elevator_unlocked": bool(state.get("elevator_unlocked", false)),
+		"player": _vector(mine.player.position), "moving": mover.is_moving() if mover else false,
+		"busy": mine.busy or not mine._dig_target.is_empty() or (mine.session != null and mine.session.has_unconfirmed_command()),
+		"command_busy": mine.busy, "can_act": can_act, "pending": mine.pending_target,
+		"dig": {"target": mine._dig_target, "elapsed": mine._dig_elapsed, "duration": mine.DIG_SECONDS, "progress": mine.progress.value},
+		"animation": mine._anim, "camera_pan": _vector(mine.camera_pan.offset), "camera": _vector(camera.position),
+		"zoom": mine.camera_pan.zoom, "camera_size": camera.size, "controls": [], "markers": {}, "path": []}
+	if mover:
+		for point in mover.remaining_path(): result.path.append(_vector(point))
+		result.navigation = {"cell_m": mover.bp.cell_m, "walkable": mover.bp.masks.walkable,
+			"joystick": [mover.joystick.x, mover.joystick.y], "speed": mover.speed}
+		for y in mover.bp.grid.y:
+			for x in mover.bp.grid.x:
+				var cell := Vector2i(x, y)
+				if not mover.bp.is_walkable(cell): continue
+				var world := mover.bp.cell_to_world(cell)
+				var point := camera.unproject_position(world)
+				if not mine.world_area().has_point(point) or not mine._pick_target(point).is_empty(): continue
+				var screen := get_viewport().get_screen_transform() * point
+				result.controls.append({"path": "walk:%d,%d" % [x, y], "world": _vector(world), "text": "", "tooltip": "", "button": true,
+					"disabled": not can_act, "rect": [screen.x - 2, screen.y - 2, 4, 4], "source": "camera_projected_ground"})
+	if mine.get("combat") != null:
+		result.combat = {"paused": mine._paused, "focused": mine._focused, "cooldown": mine.combat.cooldown,
+			"invulnerability": mine.combat.invulnerability, "grace": mine.combat.grace, "enemies": {},
+			"sending": mine._combat_sending, "pending": mine.prediction.pending.size(),
+			"swing_left": mine.combat._swing_left, "weapon_visible": is_instance_valid(mine._weapon_model) and mine._weapon_model.is_visible_in_tree(),
+			"predicted_hp": CharacterModel.hp(mine._combat_view), "stalled": mine._combat_stalled()}
+		for id in mine.combat.enemies:
+			var enemy: Dictionary = mine.combat.enemies[id]
+			result.combat.enemies[id] = {"position": _vector(enemy.node.position), "hp": enemy.hp,
+				"max_hp": enemy.spec.hp, "move_speed": enemy.spec.move_speed, "stun_resistant": enemy.spec.stun_resistant,
+				"phase": enemy.phase, "timer": enemy.timer, "direction": _vector(enemy.direction)}
+	for id in mine.targets:
+		var target: Dictionary = mine.targets[id]
+		var button := target.button as Button
+		var anchor := camera.unproject_position(target.world)
+		result.markers[id] = {"world": _vector(target.world), "body": _vector(target.body), "approach": _vector(target.approach),
+			"anchor": [anchor.x, anchor.y], "visible": button.is_visible_in_tree(), "disabled": button.disabled,
+			"error": anchor.distance_to(button.get_global_rect().get_center())}
+		var body := camera.unproject_position(target.body)
+		if not camera.is_position_behind(target.body) and mine.world_area().has_point(body) and mine._pick_target(body) == id:
+			var screen := get_viewport().get_screen_transform() * body
+			result.controls.append({"path": "body:" + str(id), "text": "", "tooltip": button.tooltip_text, "button": true,
+				"disabled": button.disabled or not can_act, "rect": [screen.x - 2, screen.y - 2, 4, 4], "source": "camera_projected_mine_body"})
+		if not button.is_visible_in_tree(): continue
+		var center := button.get_global_rect().get_center()
+		if mine._pick_target(center) != id: continue
+		var screen := get_viewport().get_screen_transform() * center
+		result.controls.append({"path": "mine:" + str(id), "text": "", "tooltip": button.tooltip_text, "button": true,
+			"disabled": button.disabled or not can_act, "rect": [screen.x - 2, screen.y - 2, 4, 4], "source": "camera_projected_mine_target"})
+	return result
 
 func _world(place: JourneyPlace) -> Dictionary:
 	var result := {"place": place.place_id, "player": [place.player.position.x, place.player.position.z],

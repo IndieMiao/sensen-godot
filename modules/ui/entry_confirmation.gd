@@ -6,8 +6,9 @@ var enter_button: Button
 
 func _ready() -> void:
 	layer = 60
+	GameUi.register_modal(self)
 	var scrim := ColorRect.new()
-	scrim.color = Color(0.08, 0.15, 0.12, 0.4)
+	scrim.color = Color(GameUi.INK, 0.32)
 	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scrim.theme = GameUi.theme()
 	add_child(scrim)
@@ -18,11 +19,15 @@ func _ready() -> void:
 	var center := CenterContainer.new()
 	margin.add_child(center)
 	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", GameUi.panel_style(18))
 	panel.custom_minimum_size.x = 280
 	center.add_child(panel)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 20)
 	panel.add_child(column)
+	var symbol := GameUi.picture(GameUi.icon("door-open"), 36)
+	symbol.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	column.add_child(symbol)
 	title = GameUi.label("", 18)
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.custom_minimum_size = Vector2(240, 48)

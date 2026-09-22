@@ -1,5 +1,10 @@
 extends GdUnitTestSuite
 
+func after_test() -> void:
+	# Refresh removes old cards with queue_free; drain before orphan accounting.
+	await get_tree().process_frame
+	await get_tree().process_frame
+
 func _state(chapter := 5) -> Dictionary:
 	return {"clock": {"chapter_index": chapter, "player_day_id": "2026-09-05"},
 		"wallet": 483, "inventory": {"seeds": {}, "produce": {"R": 3, "L": 2, "C": 2, "H": 4}, "dishes": {"tea": 1}},

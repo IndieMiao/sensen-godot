@@ -23,6 +23,70 @@ func test_display_goal_follows_materials_workbench_and_original_slot() -> void:
 	assert_str(JourneyWorkshop.preview_item(st, "terrace", 2)).is_equal("fountain")
 	assert_str(JourneyWorkshop.preview_item(st, "terrace", 0)).is_empty()
 
+func test_copper_crate_goal_returns_to_farm_mine_then_workbench() -> void:
+	var state := _state()
+	state.journey.workshop.planned.item = "crate"
+	state.journey.wood = 2
+	var original := state.duplicate(true)
+	var goal := JourneyWorkshop.goal(state)
+	assert_str(goal.place).is_equal("farm")
+	assert_str(goal.target).is_equal("mine")
+	assert_str(goal.hint).is_equal("Copper ore 0/3")
+	assert_int(JourneyProgress.material(state, "rock_salt")).is_equal(0)
+	assert_dict(state).is_equal(original)
+	state.journey.materials.copper_ore = 3
+	assert_str(JourneyWorkshop.goal(state).target).is_equal("workbench")
+	state.journey.workshop.stock.crate = 1
+	assert_str(JourneyWorkshop.goal(state).target).is_equal("display:terrace:2")
+
+func test_copper_crate_is_offered_after_workbench_before_first_planter() -> void:
+	var state := _state()
+	state.journey.facts = ["workbench"]
+	state.journey.wood = 2
+	state.journey.materials.copper_ore = 3
+	state.journey.workshop.erase("planned")
+	var session := FarmSession.new(ApiClient.new("https://example.test/v1", FakeTransport.new([]).callable()))
+	session.state = state
+	var panel := auto_free(JourneyActivityPanel.new()) as JourneyActivityPanel
+	panel.place_id = "nursery"
+	panel.target = "workbench"
+	panel.setup(session)
+	add_child(panel)
+	for frame in 3: await get_tree().process_frame
+	var make := panel.find_child("Craft_crate", true, false) as Button
+	assert_object(make).is_not_null()
+	assert_bool(make.disabled).is_false()
+
+func test_kitchen_counter_guides_missing_salt_to_the_farm_mine() -> void:
+	var state := _state()
+	state.journey.unlocks.append("kitchen")
+	state.inventory.produce = {"R": 1, "L": 1}
+	var transport := FakeTransport.new([])
+	var session := FarmSession.new(ApiClient.new("https://example.test/v1", transport.callable()))
+	session.state = state
+	var panel := auto_free(JourneyActivityPanel.new()) as JourneyActivityPanel
+	panel.place_id = "bistro"
+	panel.target = "counter"
+	panel.setup(session)
+	var goals := []
+	panel.goal_requested.connect(func(goal): goals.append(goal))
+	add_child(panel)
+	for frame in 3: await get_tree().process_frame
+	var make := panel.find_child("Cook_vegetable_soup", true, false) as Button
+	assert_object(make).is_not_null()
+	assert_bool(make.disabled).is_true()
+	var gather := panel.find_child("Gather_rock_salt", true, false) as Button
+	assert_object(gather).is_not_null()
+	gather.pressed.emit()
+	assert_str(goals[0].place).is_equal("farm")
+	assert_str(goals[0].target).is_equal("mine")
+	session.state.journey.materials.rock_salt = 1
+	session.state_changed.emit(session.state, 1)
+	for frame in 3: await get_tree().process_frame
+	assert_bool((panel.find_child("Cook_vegetable_soup", true, false) as Button).disabled).is_false()
+	assert_object(panel.find_child("Gather_rock_salt", true, false)).is_null()
+	assert_array(transport.requests).is_empty()
+
 func test_already_displayed_piece_can_be_moved_without_crafting_another() -> void:
 	var st := _state()
 	st.journey.facts.append_array(["project_seedbeds_0", "project_seedbeds_1"])

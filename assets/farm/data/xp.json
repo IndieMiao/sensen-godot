@@ -1,12 +1,10 @@
 {
   "_source": "PRD §7.2 L476-505",
   "format": 1,
+  "_sources_note": "自由格子种田起：按格计的 first_clear_cell 随「清理」一同退役（几百格会给出几百 XP 且是 O(N²) 查找）；daily_care_complete 与 first_weather_care 随天气三选一照料退役。",
   "sources": {
-    "first_clear_cell":    { "xp": 1,  "_limit": "L477 每格一次" },
-    "harvest_plant":       { "xp": 2,  "daily_cap_plants": 9, "_limit": "L478 按株不按产量，每活跃日最多计 9 株" },
+    "harvest_plant":       { "xp": 2,  "daily_cap_plants": 60, "_limit": "按株不按产量，每活跃日封顶。自由种植下从 9 提到 60。" },
     "first_harvest_crop":  { "xp": 8,  "_limit": "L479 每种作物一次" },
-    "daily_care_complete": { "xp": 15, "_limit": "L480 当前所有已播种田格完成本轮天气动作后，每活跃日一次" },
-    "first_weather_care":  { "xp": 5,  "_limit": "L481 每种田况一次" },
     "first_recipe":        { "xp": 10, "_limit": "L483 每道配方一次" }
   },
   "_thresholds_note": "L488 累计阈值，索引 0 对应 Lv1。",

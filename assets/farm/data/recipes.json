@@ -11,6 +11,12 @@
    },
    "stall_price": 36
   },
+  "vegetable_soup": {
+   "_name": "Rock-salt vegetable soup",
+   "inputs": {"R": 1, "L": 1},
+   "materials": {"rock_salt": 1},
+   "stall_price": 16
+  },
   "tea": {
    "_name": "洋甘菊茶",
    "_line": "L436 1H",

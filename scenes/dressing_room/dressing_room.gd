@@ -31,6 +31,13 @@ var _slot_region: int = DressingCamera.Region.FULL
 
 func _ready() -> void:
 	safe_area.theme = GameUi.theme()
+	drawer.add_theme_stylebox_override("panel", GameUi.panel_style(14))
+	feedback_panel.add_theme_stylebox_override("panel", GameUi.card_style(false, 8))
+	$UI/HeaderPaper.color = Color.TRANSPARENT
+	$UI/FooterPaper.color = Color.TRANSPARENT
+	$UI/SafeArea/VBox/TopBar/Title.add_theme_font_size_override("font_size", 18)
+	$UI/SafeArea/VBox/TopBar/Title.add_theme_color_override("font_color", GameUi.INK)
+	$UI/SafeArea/VBox/TopBar/Title.add_theme_color_override("font_shadow_color", GameUi.PAPER)
 	back_button.text = ""
 	back_button.icon = GameUi.icon("arrow-left")
 	back_button.tooltip_text = L10n.text("Back")
@@ -212,7 +219,7 @@ func _track_drag(relative: Vector2) -> void:
 
 func _reframe(animate := false) -> void:
 	var compact := get_viewport().get_visible_rect().size.y < 720.0
-	drawer.custom_minimum_size.y = 260.0 if compact else 292.0
+	drawer.custom_minimum_size.y = minf(276.0 if compact else 312.0, get_viewport().get_visible_rect().size.y * 0.44)
 	parts_panel.set_compact(compact)
 	# 同一帧内的多次请求合并到下一帧执行；只要其中一次要求补间就补间
 	# （切分类与安全区回调可能同帧到达，硬落位会把推拉动画吃掉）。
@@ -227,8 +234,7 @@ func _reframe(animate := false) -> void:
 	if not is_instance_valid(rig) or not is_instance_valid(cam):
 		return
 	# Canvas background stays fixed when category focus moves the 3D camera.
-	room_background.size = Vector2(get_viewport().get_visible_rect().size.x,
-		drawer.get_global_rect().position.y + 8.0)
+	room_background.size = get_viewport().get_visible_rect().size
 	$UI/FooterPaper.offset_top = drawer.get_global_rect().position.y
 	var header_height := maxf(top_bar.size.y, top_bar.get_combined_minimum_size().y)
 	$UI/HeaderPaper.size.y = _safe_margins.y + header_height + 8.0

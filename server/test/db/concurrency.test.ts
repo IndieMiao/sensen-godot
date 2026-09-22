@@ -4,7 +4,7 @@ import path from 'node:path';
 import { PgStore } from '../../src/db/pg_store.js';
 import { migrate, truncateAll } from '../../src/db/migrate.js';
 import { assertResettable, ResetRefused } from '../../src/db/reset.js';
-import { blueprintSets, loadBlueprint } from '../../src/http/app.js';
+import { loadBlueprint, plotFor } from '../../src/http/app.js';
 import { installKeyHmac, newInstallKey } from '../../src/http/auth.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/domain/content.js';
 import { createInitialState } from '../../src/domain/state.js';
@@ -12,6 +12,17 @@ import { at, SH } from '../domain/helpers.js';
 import { payloadHash } from '../../src/http/hash.js';
 import type { FarmRow } from '../../src/http/dto.js';
 import { randomUUID } from 'node:crypto';
+import { isTillable, type PlotLayout } from '../../src/domain/plot.js';
+
+/** 一小片可开垦格，代替过去写死的固定田畦（SGODOT-128 自由格子种田）。 */
+function soilCells(p: PlotLayout, count: number): string[] {
+  const out: string[] = [];
+  for (let j = 0; j < p.gy && out.length < count; j++)
+    for (let i = 0; i < p.gx && out.length < count; i++)
+      if (isTillable(p, `${i},${j}`)) out.push(`${i},${j}`);
+  return out;
+}
+
 
 const DSN = process.env.TEST_DATABASE_URL;
 /**
@@ -25,7 +36,7 @@ const content = loadContent(DEFAULT_CONTENT_DIR);
 const CV = contentVersion(DEFAULT_CONTENT_DIR);
 const ROOT = path.resolve(DEFAULT_CONTENT_DIR, '..', '..', '..');
 const bp = loadBlueprint(path.join(ROOT, 'assets', 'blueprints'), 'sh_a', 2)!;
-const sets = blueprintSets(bp);
+const sets = plotFor(content);
 const NOW = at('2026-09-04T10:00:00+08:00');
 
 describe.skipIf(!DSN)('PostgreSQL 单写者与幂等', () => {
@@ -41,7 +52,7 @@ describe.skipIf(!DSN)('PostgreSQL 单写者与幂等', () => {
     await truncateAll(pool);
     store = new PgStore({
       pool, content, contentVersion: CV, timezone: () => SH,
-      blueprint: () => sets, now: () => NOW,
+      plot: sets, now: () => NOW,
     });
   });
 
@@ -50,8 +61,6 @@ describe.skipIf(!DSN)('PostgreSQL 单写者与幂等', () => {
     blueprint_revision: 2, version: 0, location_visible: true, visit_access: 'only_me',
     state: createInitialState({
       player_day_id: '2026-09-04', field_condition: 'sunny', now: NOW, wallet: 180,
-      bed_cells: [...sets.cultivable].filter(x => !sets.reserved.has(x)),
-      reserved_cells: [...sets.reserved],
     }),
   });
 
@@ -66,9 +75,9 @@ describe.skipIf(!DSN)('PostgreSQL 单写者与幂等', () => {
     return player.id;
   }
 
-  const cells = [...sets.cultivable].filter(x => !sets.reserved.has(x));
+  const cells = soilCells(sets, 12);
   const env = (key: string, base: number, ids: string[]) => ({
-    idempotency_key: key, base_version: base, type: 'clear_cells' as const,
+    idempotency_key: key, base_version: base, type: 'till_cells' as const,
     payload: { cell_ids: ids },
   });
 
@@ -76,7 +85,7 @@ describe.skipIf(!DSN)('PostgreSQL 单写者与幂等', () => {
     const owner = await seedFarm();
     const results = await Promise.all(Array.from({ length: 20 }, (_, i) =>
       store.applyCommand(owner, env(`k${i}`, 0, [cells[i % cells.length]]),
-        { type: 'clear_cells', cell_ids: [cells[i % cells.length]] })));
+        { type: 'till_cells', cell_ids: [cells[i % cells.length]] })));
     const applied = results.filter(r => r.kind === 'applied');
     const conflicts = results.filter(r => r.kind === 'version_conflict');
     expect(applied).toHaveLength(1);
@@ -94,7 +103,7 @@ describe.skipIf(!DSN)('PostgreSQL 单写者与幂等', () => {
       for (;;) {
         const farm = await store.farmByOwner(owner);
         const out = await store.applyCommand(owner, env(`b${i}-${attempt}`, farm!.version, [cell]),
-          { type: 'clear_cells', cell_ids: [cell] });
+          { type: 'till_cells', cell_ids: [cell] });
         if (out.kind === 'applied') { applied += 1; break; }
         expect(out.kind).toBe('version_conflict');
         attempt += 1;
@@ -112,7 +121,7 @@ describe.skipIf(!DSN)('PostgreSQL 单写者与幂等', () => {
   it('同一幂等键并发只应用一次', async () => {
     const owner = await seedFarm();
     const e = env('same', 0, [cells[0]]);
-    const cmd = { type: 'clear_cells' as const, cell_ids: [cells[0]] };
+    const cmd = { type: 'till_cells' as const, cell_ids: [cells[0]] };
     const results = await Promise.all(Array.from({ length: 10 }, () => store.applyCommand(owner, e, cmd)));
     expect(results.filter(r => r.kind === 'applied')).toHaveLength(1);
     expect(results.filter(r => r.kind === 'replayed').length).toBeGreaterThan(0);
@@ -124,8 +133,8 @@ describe.skipIf(!DSN)('PostgreSQL 单写者与幂等', () => {
     const a = await seedFarm();
     const b = await seedFarm();
     const [ra, rb] = await Promise.all([
-      store.applyCommand(a, env('a', 0, [cells[0]]), { type: 'clear_cells', cell_ids: [cells[0]] }),
-      store.applyCommand(b, env('b', 0, [cells[0]]), { type: 'clear_cells', cell_ids: [cells[0]] }),
+      store.applyCommand(a, env('a', 0, [cells[0]]), { type: 'till_cells', cell_ids: [cells[0]] }),
+      store.applyCommand(b, env('b', 0, [cells[0]]), { type: 'till_cells', cell_ids: [cells[0]] }),
     ]);
     expect(ra.kind).toBe('applied');
     expect(rb.kind).toBe('applied');
@@ -133,11 +142,11 @@ describe.skipIf(!DSN)('PostgreSQL 单写者与幂等', () => {
 
   it('失败命令也落日志，同 key 重放拿回失败结果', async () => {
     const owner = await seedFarm();
-    const bad = { idempotency_key: 'bad', base_version: 0, type: 'till_cells' as const,
+    const bad = { idempotency_key: 'bad', base_version: 0, type: 'water_cells' as const,
       payload: { cell_ids: [cells[0]] } };
-    const first = await store.applyCommand(owner, bad, { type: 'till_cells', cell_ids: [cells[0]] });
+    const first = await store.applyCommand(owner, bad, { type: 'water_cells', cell_ids: [cells[0]] });
     expect(first.kind).toBe('rejected');
-    const again = await store.applyCommand(owner, bad, { type: 'till_cells', cell_ids: [cells[0]] });
+    const again = await store.applyCommand(owner, bad, { type: 'water_cells', cell_ids: [cells[0]] });
     expect(again.kind).toBe('replayed');
     const farm = await store.farmByOwner(owner);
     expect(farm!.version).toBe(0); // 失败不推进版本
@@ -146,15 +155,15 @@ describe.skipIf(!DSN)('PostgreSQL 单写者与幂等', () => {
   it('版本不匹配的农场 fail closed，但旧命令的重试仍能拿回结果', async () => {
     const owner = await seedFarm();
     const e = env('v1', 0, [cells[0]]);
-    await store.applyCommand(owner, e, { type: 'clear_cells', cell_ids: [cells[0]] });
+    await store.applyCommand(owner, e, { type: 'till_cells', cell_ids: [cells[0]] });
     // 模拟部署了新内容
     const stale = new PgStore({
-      pool, content, contentVersion: 'CHANGED', timezone: () => SH, blueprint: () => sets, now: () => NOW,
+      pool, content, contentVersion: 'CHANGED', timezone: () => SH, plot: sets, now: () => NOW,
     });
-    const replay = await stale.applyCommand(owner, e, { type: 'clear_cells', cell_ids: [cells[0]] });
+    const replay = await stale.applyCommand(owner, e, { type: 'till_cells', cell_ids: [cells[0]] });
     expect(replay.kind).toBe('replayed'); // 幂等查表先于版本门控
     const fresh = await stale.applyCommand(owner, env('v2', 1, [cells[1]]),
-      { type: 'clear_cells', cell_ids: [cells[1]] });
+      { type: 'till_cells', cell_ids: [cells[1]] });
     expect(fresh.kind).toBe('version_mismatch');
   });
 

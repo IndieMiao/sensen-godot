@@ -15,6 +15,12 @@ func _render() -> void:
 	if not JourneyGatherings.available(state()): return
 	if current: paragraph(L10n.text("The neighbours are gathered here."))
 	var recipe: Dictionary = JourneyProgress.data().workshop.recipes[spec.item]
+	var requirements := HFlowContainer.new()
+	requirements.add_theme_constant_override("h_separation", 8)
+	requirements.add_theme_constant_override("v_separation", 8)
+	append_content(requirements)
+	requirements.add_child(ingredient_card(ItemCatalog.texture(str(spec.item)), L10n.text(str(recipe.name)), 1 if current or JourneyGatherings.piece_ready(state(), theme_id) else 0, 1))
+	requirements.add_child(ingredient_card(GameUi.dish_art(str(spec.dish)), L10n.text("Chamomile tea") if spec.dish == "tea" else L10n.text("Vegetable salad"), int(state().get("inventory", {}).get("dishes", {}).get(spec.dish, 0)), 1))
 	paragraph(L10n.format_text("%s: %s\n%s: %d/1", [recipe.name, L10n.text("On the table") if current else (L10n.text("In your bag") if JourneyGatherings.piece_ready(state(), theme_id) else L10n.text("Needed")),
 		L10n.text("Chamomile tea") if spec.dish == "tea" else L10n.text("Vegetable salad"), int(state().get("inventory", {}).get("dishes", {}).get(spec.dish, 0))]))
 	if selected:

@@ -5,6 +5,13 @@ extends RefCounted
 ## （UDP 回环 → MapUnderlay.swift）；未来 MapLibre 逃生通道也从这里换实现。
 
 signal map_ready
+signal pois_received(request_id: int, payload: String)
+
+func request_pois(request_id: int) -> void:
+	pois_received.emit(request_id, '{"features":[],"error":"unsupported"}')
+
+func set_city_style(_enabled: bool) -> void:
+	pass
 
 ## 定位回传（Android 实现发出；无定位能力的平台不发）。accuracy 单位米，越小越准。
 signal location_update(lat: float, lng: float, accuracy: float)

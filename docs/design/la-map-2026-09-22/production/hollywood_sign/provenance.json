@@ -1,0 +1,54 @@
+{
+  "asset": "assets/map/poi/hollywood_sign.png",
+  "source": "Sensenjoy Image API",
+  "base_url": "https://sub.sensenjoy.cn/v1",
+  "model": "gpt-image-2",
+  "endpoint": "/images/edits",
+  "quality": "high",
+  "requested_size": [
+    1024,
+    1024
+  ],
+  "generated_size": [
+    1254,
+    1254
+  ],
+  "prompt": "prompt.txt",
+  "actual_reference_input": "reference-hollywood.png",
+  "reference_source": "docs/design/la-map-2026-09-22/generated/la-map-main-v1.png",
+  "reference_crop_pixels": [
+    212,
+    254,
+    555,
+    396
+  ],
+  "raw_output": "raw-magenta.png",
+  "keyed_output": "keyed.png",
+  "chroma_key": "#FF00FF",
+  "extraction": "imagegen bundled remove_chroma_key.py, soft matte thresholds 64/128 and spill cleanup",
+  "production_size": [
+    512,
+    512
+  ],
+  "source_alpha_bbox": [
+    34,
+    324,
+    1221,
+    962
+  ],
+  "production_alpha_bbox": [
+    24,
+    239,
+    488,
+    488
+  ],
+  "bottom_center_anchor_pixels": [
+    256,
+    488
+  ],
+  "bottom_center_anchor_normalized": [
+    0.5,
+    0.953125
+  ],
+  "sha256": "8eefad3580cb148e510100991bbddc1dcdd8347958b874a8e01e8aecafff4a9c"
+}

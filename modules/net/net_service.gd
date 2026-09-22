@@ -17,6 +17,7 @@ var client: ApiClient
 var session: FarmSession
 var booting := false
 var booted_once := false
+var online_available := false
 
 func _ready() -> void:
 	client = ApiClient.new(base_url(), ApiClient.make_http_transport(self))
@@ -25,6 +26,7 @@ func _ready() -> void:
 		call_deferred("boot")
 
 static func is_test_process() -> bool:
+	if bool(ProjectSettings.get_setting("sensen/network/online_qa", false)): return true
 	if OS.is_debug_build() and (OS.has_feature("g3_device_qa") or OS.has_feature("journey_device_qa")):
 		return true
 	if DisplayServer.get_name() == "headless":
@@ -43,6 +45,7 @@ static func base_url() -> String:
 
 ## 测试注入假传输；同时重建会话，丢掉上一次的 token 与状态。
 func use_transport(t: Callable, p_base := "https://example.test/v1") -> void:
+	online_available = false
 	client = ApiClient.new(p_base, t)
 	session = FarmSession.new(client)
 	booted_once = false
@@ -56,6 +59,8 @@ func boot() -> bool:
 	if ok:
 		# 已有农场就带回来；没有（404）也算 boot 成功，建场交给选地流程。
 		await session.refresh()
+		var capabilities := await client.request("GET", "/online/status")
+		online_available = capabilities.is_success() and int(capabilities.json.get("protocol", 0)) == 1
 	booting = false
 	booted_once = true
 	if OS.is_debug_build():

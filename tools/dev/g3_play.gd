@@ -107,7 +107,7 @@ func _ready() -> void:
 	add_child(farm)
 	await get_tree().process_frame
 	_ok(farm.session == session, "farm 挂上会话")
-	_ok(farm.interior != null and farm.bp.grid == Vector2i(20, 20), "进入 3x3 FarmInterior")
+	_ok(farm.bp != null and farm.bp.grid == Vector2i(64, 64), "进入自由格子农场")
 	var remapped := true
 	for local_id in farm.predictor.cells:
 		var source_id: String = farm.interior.source_id(str(local_id))

@@ -2,7 +2,7 @@ class_name CropField
 extends Node3D
 ## 作物渲染：4 作物 × 4 可见阶段，每种作物一个 MultiMesh；另有一份杂草 MultiMesh 画荒地。
 ##
-## **阶段是渲染派生量，从不进状态**（PRD §6.2）。进度按 `care_done_at → ready_at` 分四段：
+## **阶段是渲染派生量，从不进状态**。进度按 `watered_at → ready_at` 分四段：
 ##   0 / ⅓ / ⅔ / 成熟。ready_at 为 null（刚播种，或预测器预测了照料但服务端还没回包）
 ## 一律停在阶段 0——客户端不猜时长。
 ##
@@ -10,7 +10,7 @@ extends Node3D
 
 const PlantMesh = preload("res://modules/farm/crop_plant_mesh.gd")
 
-const CROPS := ["R", "L", "C", "H"]
+const CROPS := ["R", "L", "C", "H", "T"]
 const STAGES := 4
 ## 与种子袋和作物 PNG 一致的根茎色，叶片保留自己的绿色。
 const CROP_COLOR := {
@@ -18,29 +18,31 @@ const CROP_COLOR := {
 	"L": Color(0.46, 0.76, 0.40),   # 生菜
 	"C": Color(0.93, 0.60, 0.24),   # 胡萝卜
 	"H": Color(0.95, 0.90, 0.52),   # 洋甘菊
+	"T": Color(0.36, 0.52, 0.28),   # 果树：木本，阻挡通行
 }
 const WEED_COLOR := Color(0.46, 0.58, 0.30)
 ## 翻土层包含五条立体垄沟，与只清理过的平地分开。
 const SOIL_COLOR := Color(0.55, 0.38, 0.23)
-const SOIL_SIZE := Vector3(0.86, 0.035, 0.86)
+## 翻土层已交给地面 shader；这一层只在没有 PlotSurface 的旧场景里兜底。
+const SOIL_SIZE := Vector3(0.92, 0.035, 0.92)
 ## 刚播下的幼苗用亮绿：阶段 0 曾是 0.10 高的暗绿小块，埋在畦面里根本看不见。
 const SEEDLING_COLOR := Color(0.72, 0.93, 0.52)
-## 四阶段的植株尺寸（逻辑米）；成熟株高低于地块提示，避免挤满田间视野。
+## 四阶段的植株尺寸，单位是**格边长的倍数**而不是绝对米：过去这些数字是为 1.3m 的
+## 田畦间距调的，0.5m 紧邻格下会让邻格的作物互相穿插。
 const STAGE_SIZE := [
-	Vector3(0.19, 0.16, 0.19),
-	Vector3(0.27, 0.24, 0.27),
-	Vector3(0.34, 0.34, 0.34),
-	Vector3(0.40, 0.44, 0.40),
+	Vector3(0.38, 0.32, 0.38),
+	Vector3(0.54, 0.48, 0.54),
+	Vector3(0.68, 0.68, 0.68),
+	Vector3(0.80, 0.88, 0.80),
 ]
-const WEED_SIZE := Vector3(0.24, 0.34, 0.24)
-## 一格里散布几株，摆成 2×2。
-const PER_CELL := 4
-const JITTER := 0.22
+const WEED_SIZE := Vector3(0.48, 0.68, 0.48)
+## 一格一株：0.5m 格里塞 4 株是 16 株/m²，视觉糊成一团且实例数翻四倍。
+const PER_CELL := 1
+const JITTER := 0.0
 
 var bp: FarmBlueprint
 var world_scale := 1.0
-## 田畦盒子的顶面高度。作物与杂草都从这里往上长——2026-09-04 真机上草和苗全埋在
-## 0.15 高的畦面盒子里，玩家清理了什么都看不见。
+## 作物从地面往上长。田畦盒子随自由格子种田退役，这里通常是 0。
 var ground_y := 0.0
 var _mm: Dictionary = {}       ## crop_id / "weed" / "soil" → MultiMeshInstance3D
 var _detail_mm: Dictionary = {} # Roots and flowers appear only in their visible growth stage.
@@ -78,7 +80,7 @@ func _make_layer(mesh: Mesh) -> MultiMeshInstance3D:
 ## 阶段号 0..3。**派生量**：ready_at 为 null 一律阶段 0，不猜时长。
 static func stage_of(slot: Dictionary, now_ms: int) -> int:
 	var ready = slot.get("ready_at")
-	var started = slot.get("care_done_at")
+	var started = slot.get("watered_at")
 	if ready == null or started == null:
 		return 0
 	var span := int(ready) - int(started)
@@ -91,17 +93,15 @@ static func stage_of(slot: Dictionary, now_ms: int) -> int:
 		return 0
 	return clampi(int(progress * float(STAGES - 1)), 0, STAGES - 2)
 
-## 这格该画什么：`""` 表示不画（只有 cleared 是真正的空地）。
-## tilled 画深色翻土板：清理过与翻过土在服务端是两个状态，画面上也必须是两个样子。
+## 这格该画什么：`""` 表示不画。
+## 开垦过的空地由地面 shader 画垄沟，这里只负责立体的作物。
 static func layer_of(slot: Dictionary) -> String:
 	match str(slot.get("state", "")):
-		"wild": return "weed"
-		"tilled": return "soil"
 		"sown", "growing": return str(slot.get("crop", ""))
 		_: return ""
 
 ## 访客快照没有 ready_at（spec §7.5 故意不发），阶段只能按 ripe 标志粗分：
-## ripe → 成熟；growing → 阶段 1；sown → 阶段 0；wild → 杂草。冻结快照，不随时间走。
+## ripe → 成熟；growing → 阶段 1；sown → 阶段 0。冻结快照，不随时间走。
 static func stage_from_snapshot(c: Dictionary) -> int:
 	if bool(c.get("ripe", false)):
 		return STAGES - 1
@@ -152,15 +152,16 @@ func _fill(mmi: MultiMeshInstance3D, items: Array, layer: String) -> void:
 	var n := 0
 	for item in items:
 		var base: Vector3 = bp.cell_to_world(item.cell, world_scale)
+		var unit := bp.cell_m * world_scale
 		var size: Vector3
 		match layer:
-			"weed": size = WEED_SIZE * world_scale
-			"soil": size = SOIL_SIZE * world_scale
-			_: size = STAGE_SIZE[item.stage] * world_scale
+			"weed": size = WEED_SIZE * unit
+			"soil": size = SOIL_SIZE * unit
+			_: size = STAGE_SIZE[item.stage] * unit
 		var color := _stage_color(layer, item.stage)
 		for k in per:
-			var dx := 0.0 if per == 1 else (-1.0 if k % 2 == 0 else 1.0) * JITTER * world_scale
-			var dz := 0.0 if per == 1 else (-1.0 if k < 2 else 1.0) * JITTER * world_scale
+			var dx := 0.0 if per == 1 else (-1.0 if k % 2 == 0 else 1.0) * JITTER * unit
+			var dz := 0.0 if per == 1 else (-1.0 if k < 2 else 1.0) * JITTER * unit
 			# 从畦面顶部往上长，而不是从世界原点：否则矮的东西全埋在畦面盒子里
 			var angle := float(posmod(item.cell.x * 7 + item.cell.y * 11 + k * 5, 16)) * TAU / 16.0
 			var rotation := Basis.IDENTITY if layer == "soil" else Basis(Vector3.UP, angle)

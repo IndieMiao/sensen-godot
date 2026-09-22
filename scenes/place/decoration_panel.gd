@@ -54,7 +54,7 @@ func _render() -> void:
 		check.name = "CheckSavedLayout"
 		check.disabled = busy
 		check.pressed.connect(reconcile_save)
-		content.add_child(check)
+		append_content(check)
 		return
 	if _confirm_leave:
 		heading(L10n.text("Unsaved arrangement"))
@@ -72,26 +72,29 @@ func _render() -> void:
 		paragraph(L10n.text("Preview only until your first growth purchase."))
 	var picker := OptionButton.new()
 	picker.name = "DecorationPicker"
+	GameUi.register_modal(picker.get_popup())
 	picker.custom_minimum_size.y = 44
 	picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	picker.disabled = busy
-	for id in DecorationLayout.IDS:
-		if JourneyProgress.active(state()) and not JourneyProgress.unlocked(state(), "decorations") and id != "planter": continue
-		var placed := DecorationLayout.index_of(_draft, str(id)) >= 0
-		picker.add_item(DecorationLayout.name_of(str(id)) + (" (placed)" if placed else ""))
+	var allowed := _allowed_props()
+	if allowed.is_empty():
+		picker.free()
+		paragraph(L10n.text("No courtyard pieces"))
+		return
+	for id in allowed:
+		picker.add_item(_picker_label(str(id)))
 		picker.get_popup().set_item_icon_modulate(picker.item_count - 1, GameUi.GREEN if id == selected_prop else GameUi.MUTED)
-	var allowed := ["planter"] if JourneyProgress.active(state()) and not JourneyProgress.unlocked(state(), "decorations") else DecorationLayout.IDS
-	if not allowed.has(selected_prop): selected_prop = "planter"
+	if not allowed.has(selected_prop): selected_prop = str(allowed[0])
 	picker.selected = allowed.find(selected_prop)
 	picker.item_selected.connect(func(index: int): select_prop(str(allowed[index])))
-	content.add_child(picker)
+	append_content(picker)
 	var existing := DecorationLayout.index_of(_draft, selected_prop)
 	if existing < 0:
-		_local_action("plus", L10n.text("Place"), L10n.text("Place selected piece"), place_selected, DecorationLayout.first_position(selected_prop, _draft) != null).name = "PlaceDecoration"
+		_local_action("plus", L10n.text("Place"), L10n.text("Place selected piece"), place_selected, _can_place(selected_prop) and _new_prop_position(selected_prop) != null).name = "PlaceDecoration"
 	else:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
-		content.add_child(row)
+		append_content(row)
 		var moves := [["arrow-left", Vector2i(-1, 0), L10n.text("Move left")], ["chevron-up", Vector2i(0, -1), L10n.text("Move back")],
 			["chevron-down", Vector2i(0, 1), L10n.text("Move forward")], ["chevron-right", Vector2i(1, 0), L10n.text("Move right")]]
 		for index in moves.size():
@@ -107,7 +110,7 @@ func _render() -> void:
 		_local_action("rotate-cw", "", L10n.text("Rotate selected piece"), rotate_selected).name = "RotateDecoration"
 	var history := HBoxContainer.new()
 	history.add_theme_constant_override("separation", 8)
-	content.add_child(history)
+	append_content(history)
 	for spec in [["rotate-ccw", L10n.text("Undo"), undo, not _history.is_empty()], ["x", L10n.text("Cancel"), cancel_preview, dirty]]:
 		var button := GameUi.button(str(spec[0]), str(spec[1]), str(spec[1]))
 		button.name = str(spec[1]) + "Decoration"
@@ -118,21 +121,26 @@ func _render() -> void:
 	action("check", L10n.text("Save layout"), save_layout, dirty and DecorationLayout.unlocked(state()), true).name = "SaveDecorations"
 
 func _render_compact() -> void:
-	var allowed: Array = ["planter"] if JourneyProgress.active(state()) and not JourneyProgress.unlocked(state(), "decorations") else DecorationLayout.IDS
+	var allowed := _allowed_props()
+	if allowed.is_empty():
+		paragraph(L10n.text("No courtyard pieces"))
+		return
 	if not allowed.has(selected_prop): selected_prop = str(allowed[0])
 	var picker := OptionButton.new()
 	picker.name = "DecorationPicker"
+	GameUi.register_modal(picker.get_popup())
 	picker.custom_minimum_size.y = 44
 	picker.disabled = busy
-	for id in allowed: picker.add_item(DecorationLayout.name_of(str(id)))
+	for id in allowed: picker.add_item(_picker_label(str(id)))
 	picker.selected = allowed.find(selected_prop)
 	picker.item_selected.connect(func(index): select_prop(str(allowed[index])))
-	content.add_child(picker)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 4)
-	content.add_child(row)
+	append_content(picker)
+	var row := HFlowContainer.new()
+	row.add_theme_constant_override("h_separation", 4)
+	row.add_theme_constant_override("v_separation", 4)
+	append_content(row)
 	var placed := DecorationLayout.index_of(_draft, selected_prop) >= 0
-	for spec in [["plus", L10n.text("Place selected piece"), place_selected, not placed],
+	for spec in [["plus", L10n.text("Place selected piece"), place_selected, not placed and _can_place(selected_prop)],
 		["rotate-cw", L10n.text("Rotate selected piece"), rotate_selected, placed],
 		["rotate-ccw", L10n.text("Undo arrangement"), undo, not _history.is_empty()],
 		["minus", L10n.text("Remove selected piece"), remove_selected, placed],
@@ -145,11 +153,38 @@ func _render_compact() -> void:
 		button.pressed.connect(spec[2])
 		row.add_child(button)
 
+func _managed_inventory() -> bool:
+	return JourneyProgress.active(state()) and BagModel.canonical(state())
+
+func _owned_count(id: String) -> int:
+	var total := 1 if DecorationLayout.index_of(_baseline, id) >= 0 else 0
+	var bag := BagModel.snapshot(state())
+	for entry in bag.get("slots", []) + bag.get("overflow", []):
+		if entry.get("item_id") == id: total += int(entry.quantity)
+	return total
+
+func _allowed_props() -> Array:
+	var allowed: Array = ["planter"] if JourneyProgress.active(state()) and not JourneyProgress.unlocked(state(), "decorations") else DecorationLayout.IDS
+	if _managed_inventory():
+		return allowed.filter(func(id): return _owned_count(str(id)) > 0 or DecorationLayout.index_of(_draft, str(id)) >= 0)
+	return allowed
+
+func _can_place(id: String) -> bool:
+	return not _managed_inventory() or _owned_count(id) > 0
+
+func _picker_label(id: String) -> String:
+	var label := ItemCatalog.name_of(id) if _managed_inventory() else L10n.text(DecorationLayout.name_of(id))
+	var placed := DecorationLayout.index_of(_draft, id) >= 0
+	if _managed_inventory(): label += " x%d" % maxi(0, _owned_count(id) - (1 if placed else 0))
+	if placed: label += " (" + L10n.text("Placed") + ")"
+	return label
+
 func _local_action(icon: String, text: String, tooltip: String, callback: Callable, enabled := true) -> Button:
 	var button := GameUi.button(icon, text, tooltip)
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.disabled = busy or not enabled
 	button.pressed.connect(callback)
-	content.add_child(button)
+	append_content(button)
 	return button
 
 func select_prop(id: String) -> void:
@@ -171,14 +206,19 @@ func pick_at(world: Vector3) -> bool:
 	select_prop(id)
 	return true
 
+func _new_prop_position(id: String) -> Variant:
+	var plot: FarmBlueprint = null
+	if session != null and not session.farm_terrain.is_empty(): plot = FarmPlot.register_terrain(session.farm_terrain)
+	return DecorationLayout.first_position(id, _draft, plot, state().get("cells", {}))
+
 func place_selected() -> bool:
-	if busy or _uncertain() or _confirm_leave: return false
-	var q = DecorationLayout.first_position(selected_prop, _draft)
+	if busy or _uncertain() or _confirm_leave or not _can_place(selected_prop): return false
+	var q = _new_prop_position(selected_prop)
 	if q == null: return false
 	return _change(DecorationLayout.with_position(_draft, selected_prop, q))
 
 func place_at(world: Vector3) -> bool:
-	if busy or _uncertain() or _confirm_leave or not is_finite(world.x) or not is_finite(world.z): return false
+	if busy or _uncertain() or _confirm_leave or not _can_place(selected_prop) or not is_finite(world.x) or not is_finite(world.z): return false
 	var next := DecorationLayout.with_position(_draft, selected_prop, DecorationLayout.quantize(world))
 	if not DecorationLayout.is_valid(next):
 		if message: message.text = L10n.text("This spot needs more room.")
@@ -188,13 +228,13 @@ func place_at(world: Vector3) -> bool:
 func can_adjust(delta: Vector2i) -> bool:
 	var index := DecorationLayout.index_of(_draft, selected_prop)
 	if index < 0: return false
-	var q: Array = _draft[index].offset_q
+	var q: Array = _draft[index].cell
 	return DecorationLayout.is_valid(DecorationLayout.with_position(_draft, selected_prop, Vector2i(int(q[0]), int(q[1])) + delta))
 
 func adjust(delta: Vector2i) -> bool:
 	if busy or _uncertain() or _confirm_leave or not can_adjust(delta): return false
 	var index := DecorationLayout.index_of(_draft, selected_prop)
-	var q: Array = _draft[index].offset_q
+	var q: Array = _draft[index].cell
 	return _change(DecorationLayout.with_position(_draft, selected_prop, Vector2i(int(q[0]), int(q[1])) + delta))
 
 func remove_selected() -> void:

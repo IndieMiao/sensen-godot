@@ -56,3 +56,27 @@ func test_cluster_filter_keeps_all_farms_and_each_card_identity() -> void:
 	panel._group_back.pressed.emit()
 	assert_int(panel.cards().filter(func(card): return card.visible).size()).is_equal(3)
 	assert_str(panel.focused_id).is_equal("b")
+
+func test_selected_farm_stays_to_the_right_and_within_map_bounds() -> void:
+	var markers := auto_free(FarmMarkers.new()) as FarmMarkers
+	for size in [Vector2(320, 350), Vector2(390, 600), Vector2(960, 500)]:
+		var area := Rect2(Vector2(12, 110), size)
+		for requested in [area.position, area.get_center(), area.end, Vector2(area.end.x, area.get_center().y)]:
+			var owner := markers._selected_layout_anchor(requested, area)
+			var farm := owner + FarmMarkers.MINIATURE_OFFSET
+			assert_float(farm.x - FarmMarkers.MINIATURE_HALF_WIDTH).is_greater(owner.x + 44)
+			assert_float(farm.x + FarmMarkers.MINIATURE_HALF_WIDTH).is_less_equal(area.end.x)
+			assert_float(farm.y - 62).is_greater_equal(area.position.y)
+			assert_float(farm.y + 24).is_less_equal(area.end.y)
+	assert_float(FarmMarkers.MINIATURE_SCALE).is_equal(0.195)
+
+func test_right_side_preview_avoids_a_neighbour_name_by_moving_vertically() -> void:
+	var markers := auto_free(FarmMarkers.new()) as FarmMarkers
+	markers._clusters = {"self": ["self"], "neighbour": ["neighbour"]}
+	var owner := Vector2(180, 360)
+	var neighbour := owner + Vector2(156, -45)
+	var area := Rect2(0, 110, 390, 500)
+	var preview := markers._model_anchor(owner, {"self": owner, "neighbour": neighbour}, area)
+	assert_float(preview.x).is_equal(owner.x + FarmMarkers.MINIATURE_OFFSET.x)
+	var bounds := Rect2(preview - Vector2(54, 62), Vector2(108, 86))
+	assert_bool(bounds.intersects(Rect2(neighbour - Vector2(44, 100), Vector2(88, 144)))).is_false()

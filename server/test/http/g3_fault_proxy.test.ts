@@ -29,8 +29,8 @@ describe('loopback G3 fault proxy', () => {
       response.setHeader('content-type', 'application/json');
       if (request.url === '/v1/farms/me') {
         const stored = view();
-        stored.state.decorations = stored.state.decorations.map(({ anchor_id, prop_id, offset_q }: DecorationPlacement) =>
-          ({ prop_id, offset_q: [...offset_q], anchor_id }));
+        stored.state.decorations = (stored.state.decorations ?? []).map(({ prop_id, cell }: DecorationPlacement) =>
+          ({ cell: [...cell] as [number, number], prop_id }));   // 故意反转键序
         response.end(JSON.stringify(stored)); return;
       }
       if (request.url === '/v1/auth/anonymous') {
@@ -87,7 +87,7 @@ describe('loopback G3 fault proxy', () => {
 
   it.each(['buy_seeds', 'cook_dish', 'save_decorations'])('holds %s after commit and passes a same-key replay without repeating costs', async type => {
     await management('arm', { type, mode: 'after_commit', replay: 'hold' });
-    const body = envelope(type, 'a'.repeat(32), { props: [{ anchor_id: 'courtyard', prop_id: 'bench', offset_q: [-4, 3] }] });
+    const body = envelope(type, 'a'.repeat(32), { props: [{ prop_id: 'bench', cell: [24, 3] }] });
     let received = false;
     const lost = command(body, true).then(() => { received = true; }).catch(() => null);
     await waitHeld(1);
@@ -114,12 +114,13 @@ describe('loopback G3 fault proxy', () => {
   });
 
   it('ignores JSONB object-key order while detecting an actual layout change', async () => {
-    const props: DecorationPlacement[] = [{ anchor_id: 'courtyard', prop_id: 'bench', offset_q: [-4, 3] }];
+    const props: DecorationPlacement[] = [{ prop_id: 'bench', cell: [24, 3] }];
     await management('arm', { type: 'save_decorations', mode: 'after_commit', replay: 'hold' });
     const pending = command(envelope('save_decorations', 'c'.repeat(32), { props }), true).catch(() => null);
     await waitHeld(1);
     const reloaded = await (await fetch(base + '/v1/farms/me', { headers: { authorization: credentials.authorization } })).json() as any;
     expect(reloaded.state.decorations).toEqual(props);
+    // 上游把键序反过来了，但摘要按固定字段顺序算，所以内容视为未变。
     expect(JSON.stringify(reloaded.state.decorations)).not.toBe(JSON.stringify(props));
     heldRequests[0].abort();
     await pending;
@@ -131,7 +132,7 @@ describe('loopback G3 fault proxy', () => {
     expect(result.fault.after_first_commit.decorations_digest).toBe(result.fault.latest.decorations_digest);
     expect(result.fault.applied_responses).toBe(1);
     expect(result.fault.replayed_responses).toBe(1);
-    state.decorations[0].offset_q = [4, 3];
+    state.decorations[0].cell = [28, 3];   // 真的挪了位置：摘要必须跟着变
     const changed = (await management('verify', {})).body.fault;
     expect(changed.unchanged_since_first_commit).toBe(false);
     expect(changed.latest.decorations_digest).not.toBe(changed.after_first_commit.decorations_digest);

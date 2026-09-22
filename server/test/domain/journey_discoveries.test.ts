@@ -80,6 +80,7 @@ describe('Handmade discoveries', () => {
 
   it('never consumes a displayed piece or the original courtyard planter', () => {
     const p = player();
+    p.state.decorations = [{ prop_id: 'planter', cell: [27, 3] }];
     p.state.journey!.workshop = { sequence: 1, stock: {}, displays: { seedbeds: ['lantern', '', ''] } };
     const before = structuredClone(p.state);
     expect(run(p.state, { type: 'install_journey_discovery', discovery: 'stone_hollow', sequence: 1 }).ok).toBe(false);

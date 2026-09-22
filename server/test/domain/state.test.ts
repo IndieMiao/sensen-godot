@@ -5,15 +5,13 @@ import { accountValue, cellId, createInitialState, levelOf, parseCellId } from '
 const c = loadContent(DEFAULT_CONTENT_DIR);
 const s0 = () => createInitialState({
   player_day_id: '2026-09-04', field_condition: 'sunny', now: 0, wallet: c.economy.initial_wallet,
-  bed_cells: ['1,1', '2,1', '3,1', '1,2', '2,2', '3,2', '1,3', '2,3', '3,3'],
-  reserved_cells: ['5,1', '6,1', '7,1'],
 });
 
 describe('createInitialState', () => {
-  it('12 格全部从荒地开始，初始只解锁三畦', () => {
+  it('开局一格未开垦：地由玩家自己开', () => {
     const s = s0();
-    expect(Object.keys(s.cells)).toHaveLength(12);
-    expect(Object.values(s.cells).every(x => x.state === 'wild')).toBe(true);
+    // 荒地不进状态——cells 为空正是「整片地都还没动过」。
+    expect(Object.keys(s.cells)).toHaveLength(0);
     expect(s.beds_unlocked).toBe(3);
   });
 
