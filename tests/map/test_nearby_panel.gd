@@ -112,3 +112,7 @@ func test_all_text_is_english() -> void:
 			assert_bool(ch.unicode_at(0) < 0x2E80).override_failure_message("含非英文: %s" % text).is_true()
 	assert_str(SeededOutfit.short_name("preset_a")).is_equal("Sample A")
 	assert_str(SeededOutfit.short_name("seed:abcd1234")).is_equal("Farmer 1234")
+	# 填充农场直接用人名，不带“· Demo/演示”后缀（2026-09-23 用户要求）。
+	assert_str(SeededOutfit.short_name("demo_la_01")).is_equal("Mia")
+	assert_str(SeededOutfit.short_name("demo_la_07")).is_equal("Luna 07")
+	assert_bool(SeededOutfit.short_name("demo_sh_02").contains("·")).is_false()

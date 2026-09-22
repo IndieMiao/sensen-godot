@@ -1,0 +1,290 @@
+{
+  "bakery_2": {
+    "asset": "assets/map/poi/bakery_2.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-bakery_2.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/bakery.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "6a93df1e8cb6f58f13db4445a90feb6a870ebfd56b7d6a5e0e9a181c9fd15b93"
+  },
+  "bakery_3": {
+    "asset": "assets/map/poi/bakery_3.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-bakery_3.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/bakery.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "5a7f458df9295177c273f9d28175e7037e7fc4a99567de6ddb524de180743746"
+  },
+  "bakery_4": {
+    "asset": "assets/map/poi/bakery_4.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-bakery_4.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/bakery.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "ab055eb70407edc002dd3dcd0416da231da1d2480d64a16ae1b3291c9447c94b"
+  },
+  "cafe_2": {
+    "asset": "assets/map/poi/cafe_2.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-cafe_2.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/cafe.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "f96c8a822edf7424abdf79524284b6a556b10aa0252543aeefdbab1760194b6a"
+  },
+  "cafe_3": {
+    "asset": "assets/map/poi/cafe_3.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-cafe_3.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/cafe.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "6458a73d1fdc42b97fb79b196effb39caadef8ce2d8af92f54fdc8b2b3071fad"
+  },
+  "cafe_4": {
+    "asset": "assets/map/poi/cafe_4.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-cafe_4.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/cafe.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "d8276f7ff984a6ceb3e2bb01de1d64959bd4090a8d2220e2905434e85c64878d"
+  },
+  "chinese_restaurant_2": {
+    "asset": "assets/map/poi/chinese_restaurant_2.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-chinese_restaurant_2.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/chinese_restaurant.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "db7adce39c8456215b0d028d87b5a537f0031b4e004f00af36a388522ffde1bb"
+  },
+  "chinese_restaurant_3": {
+    "asset": "assets/map/poi/chinese_restaurant_3.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-chinese_restaurant_3.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/chinese_restaurant.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "01373f58886af6e3a1866cb64693ec75626b259a063eaa7b96c6b9729de896fe"
+  },
+  "chinese_restaurant_4": {
+    "asset": "assets/map/poi/chinese_restaurant_4.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-chinese_restaurant_4.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/chinese_restaurant.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "e10de2752c77fc6d3aa79ff3292c55f0748438486b0ad00b571179b6212d47a7"
+  },
+  "restaurant_2": {
+    "asset": "assets/map/poi/restaurant_2.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-restaurant_2.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/restaurant.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "cac803c3895e45c76eeab4fd9e3b742c5135d30214c585962537395ef263d47f"
+  },
+  "restaurant_3": {
+    "asset": "assets/map/poi/restaurant_3.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-restaurant_3.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/restaurant.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "1411c8df682aca9515869341b2f76d6d34160b2ad4dc031ded64421472e2b19f"
+  },
+  "restaurant_4": {
+    "asset": "assets/map/poi/restaurant_4.png",
+    "source": "Sensenjoy Image API",
+    "base_url": "https://sub.sensenjoy.cn/v1",
+    "model": "gpt-image-2",
+    "endpoint": "/images/edits",
+    "quality": "high",
+    "prompt": "prompt-restaurant_4.txt",
+    "reference_inputs": [
+      "docs/design/la-map-2026-09-22/production/restaurant/reference-style-cafe.png",
+      "assets/map/poi/restaurant.png"
+    ],
+    "chroma_key": "#FF00FF",
+    "extraction": "soft matte thresholds 64/128 with edge spill cleanup",
+    "production_size": [
+      512,
+      512
+    ],
+    "bottom_center_anchor_pixels": [
+      256,
+      480
+    ],
+    "sha256": "46b85edfa51a1a03e5801239b6876684f9dfa64b2c4c017d37d33ba2240eb0e1"
+  }
+}

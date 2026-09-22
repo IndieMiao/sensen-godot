@@ -33,12 +33,13 @@ static func badge_color(avatar_ref: String) -> Color:
 	return Color.from_hsv(rng.randf(), 0.45, 0.85)
 
 ## 卡片上的短名。不发主人名字（匿名玩家没有名字，也不该有），用种子后四位区分。
+## 填充农场直接用人名，不再带“· 演示”后缀（2026-09-23 用户要求去掉）。
 static func short_name(avatar_ref: String) -> String:
-	if DEMO_NAMES.has(avatar_ref): return L10n.format_text("%s · Demo", L10n.text(str(DEMO_NAMES[avatar_ref])))
+	if DEMO_NAMES.has(avatar_ref): return L10n.text(str(DEMO_NAMES[avatar_ref]))
 	if avatar_ref.begins_with("demo_sh_") or avatar_ref.begins_with("demo_la_"):
 		var number := avatar_ref.get_slice("_", 2).to_int()
 		var base := avatar_ref.substr(0, 8) + "%02d" % (1 + posmod(number - 1, 4))
-		return L10n.format_text("%s · Demo", L10n.text(str(DEMO_NAMES.get(base, "Farmer")))) + " %02d" % number
+		return L10n.text(str(DEMO_NAMES.get(base, "Farmer"))) + " %02d" % number
 	match avatar_ref:
 		"preset_a": return L10n.text("Sample A")
 		"preset_b": return L10n.text("Sample B")

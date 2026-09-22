@@ -172,6 +172,15 @@ func put(id: String, bp: FarmBlueprint, owner_name: String, own := false, avatar
 	add_child(badge)
 	_badges[id] = badge
 
+## 该玩家 pin 当前画好的头像贴图；真头像还没渲染完成时返回 null（占位图不算）。
+func portrait_texture(id: String) -> Texture2D:
+	var target = _avatar_targets.get(id)
+	if target == null: return null
+	for child in target.get_children():
+		if child is MapPortrait and not child._shown_key.is_empty() and child._shown_key == child._desired_key:
+			return child.portrait.texture
+	return null
+
 func refresh_language() -> void:
 	for id in points:
 		var entry: Dictionary = points[id]

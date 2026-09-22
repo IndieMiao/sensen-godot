@@ -1841,7 +1841,30 @@ func _select_city_player(id: String) -> void:
 	var point: Vector2 = entry.center
 	_spawn_queue.push_front({"lat": point.x, "lng": point.y,
 		"cfg": SeededOutfit.config_for(str(entry.avatar_ref)), "anim": "idle", "cohort": "farm:" + id})
+	# 与 POI 一致的底部详情卡：头像 + 名字 + “拜访农场”跳转按钮（反馈 round 9）。
+	var owner := str(entry.owner_name) if str(entry.avatar_ref).is_empty() else SeededOutfit.short_name(str(entry.avatar_ref))
+	city_map.select_player({"id": "player:" + id, "farm_id": id, "kind": "player", "name": owner},
+		farm_markers.portrait_texture(id))
 	_camera_dirty = true
+
+## 城市地图玩家卡上的“拜访农场”：拉快照进只读访客实例（空间跳转）。
+func _on_city_visit_requested(farm_id: String) -> void:
+	if farm_id.is_empty(): return
+	var snap: Dictionary = _snapshots.get(farm_id, {})
+	if snap.is_empty() and not _nearby_from_presets and Net and Net.logged_in():
+		var r: Dictionary = await Net.snapshot(farm_id)
+		if r.get("ok", false): snap = r.snapshot
+	if snap.is_empty(): snap = PresetSnapshots.snapshot(farm_id)
+	if snap.is_empty() or str(snap.get("farm_id", "")) != farm_id:
+		if city_map: city_map.status.text = L10n.text("Farm unavailable right now")
+		return
+	_snapshots[farm_id] = snap
+	var bp := FarmBlueprint.load_choice(snap)
+	if bp == null:
+		if city_map: city_map.status.text = L10n.text("Farm unavailable right now")
+		return
+	bp = bp.with_location(snap.get("location", {}))
+	AppRouter.open_instance(AppRouter.FARM, {"visitor": true, "snapshot": snap, "blueprint": bp})
 
 func _clear_city_player() -> void:
 	_spawn_queue = _spawn_queue.filter(func(p): return not str(p.cohort).begins_with("farm:"))
@@ -1929,6 +1952,8 @@ func _install_city_map() -> void:
 	city_map.resident_requested.connect(func(entry):
 		if Net and Net.session and ResidentCast.present(str(entry.place), Net.session.state).has(str(entry.id)):
 			AppRouter.open_instance(AppRouter.PLACE, {"place_id": str(entry.place), "resident_id": str(entry.id), "target": "resident", "session": Net.session}))
+	city_map.player_visit_requested.connect(_on_city_visit_requested)
+	city_map.player_deselected.connect(_clear_farm_selection)
 	for control in [top_panel, side_toolbar, my_farm_btn, journey_footer]:
 		if is_instance_valid(control):
 			_city_hidden[control] = control.visible

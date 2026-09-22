@@ -330,6 +330,83 @@ func test_selection_builds_only_one_matching_actor_without_moving_camera() -> vo
 	assert_int(m._pawns.filter(func(p): return p.cohort != "self").size()).is_equal(0)
 	assert_str(m.farm_markers.expanded_avatar_id).is_empty()
 
+func test_selected_marker_label_expands_to_the_full_name() -> void:
+	var m := _map()
+	await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	city.entries = []
+	var lat: float = m.home_lat + 0.02
+	var lng: float = m.home_lng + 0.02
+	m.center_lat = lat
+	m.center_lng = lng
+	m.zoom = 16.0
+	m._update_cameras()
+	m._sync_farm_markers()
+	var long_name := "La Brea Tar Pits and Museum"
+	city.live_pois = [{"id": "long", "kind": "poi", "name": long_name, "lat": lat, "lng": lng, "art": "museum", "rank": 1}]
+	city._update_markers()
+	# 未选中：名牌按缺省 48 宽，长名允许省略。
+	var label: Label = city.markers["long"].label
+	assert_float(label.size.x).is_equal_approx(48.0, 0.5)
+	city.select(city.live_pois[0])
+	city._update_markers()
+	# 选中：名牌放宽到完整文本宽度，不再截成 “La Brea…”；占位随之变宽。
+	assert_str(label.text).is_equal(long_name)
+	var needed: float = label.get_theme_font("font").get_string_size(long_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x
+	assert_float(label.size.x).is_greater_equal(needed)
+	assert_float(city.markers["long"].rect.size.x).is_greater_equal(needed)
+	# 贴近右缘时名牌夹回屏内，不被右侧缩放按钮列压住；贴图锚点不动。
+	m.center_lng = lng - 0.0035
+	m._update_cameras()
+	city._update_markers()
+	var node: Control = city.markers["long"].node
+	var right: float = node.position.x + (label.position.x + label.size.x) * city.FOCUS_SCALE
+	assert_float(node.position.x).is_greater(city.size.x - 80.0)
+	assert_float(right).is_less_equal(city.size.x - 56.0 + 0.5)
+
+func test_player_card_offers_a_visit_jump_and_clears_with_selection() -> void:
+	var m := _map()
+	await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	var visits: Array = []
+	var deselects: Array = []
+	city.player_visit_requested.connect(func(id): visits.append(str(id)))
+	city.player_deselected.connect(func(): deselects.append(true))
+	city.select_player({"id": "player:f1", "farm_id": "f1", "kind": "player", "name": "Mia"}, null)
+	assert_bool(city.info.visible).is_true()
+	assert_str(city.info_title.text).is_equal("Mia")
+	assert_bool(city.info_action.visible).is_true()
+	assert_str(city.info_action.text).is_equal(L10n.text("Visit Farm"))
+	# 卡上的跳转按钮带出该农场的访客跳转请求。
+	city._on_info_action()
+	assert_array(visits).contains_exactly(["f1"])
+	# 关卡片（点 X / 返回键）同步通知宿主清掉 pin 选中与 3D 角色。
+	assert_bool(city.consume_back()).is_true()
+	assert_array(deselects).has_size(1)
+	assert_bool(city.info.visible).is_false()
+	# 居民卡把行动按钮换回“拜访居民”，不受玩家卡影响。
+	var resident := {"id": "npc", "kind": "resident", "name": "Ivy", "place": "nursery", "status": "Talk", "lat": 34.09, "lng": -118.3}
+	city.select(resident)
+	assert_str(city.info_action.text).is_equal(L10n.text("Visit resident"))
+	city._on_info_action()
+	assert_array(visits).has_size(1) # 居民路径不再发玩家跳转
+
+func test_dining_variants_pick_by_name_hash_deterministically() -> void:
+	var a := {"id": "1", "kind": "poi", "name": "Señor Fish", "art": "restaurant"}
+	var again := {"id": "2", "kind": "poi", "name": "Señor Fish", "art": "restaurant"}
+	# 同名永远同图（跨条目也一样），保证重进/换端不换脸。
+	assert_object(CityMapData.art_texture(a)).is_same(CityMapData.art_texture(again))
+	# 变体集合覆盖：不同名字至少命中两张不同贴图（3/4 概率分散，取样 12 个名字必然分散）。
+	var seen := {}
+	for i in 12:
+		seen[CityMapData.art_texture({"id": str(i), "kind": "poi", "name": "Diner %d" % i, "art": "restaurant"}).resource_path] = true
+	assert_int(seen.size()).is_greater(1)
+	# 地标与居民不参与变体：仍拿原图。
+	var landmark := {"id": "lm", "kind": "landmark", "name": "Griffith", "art": "restaurant"}
+	assert_str(CityMapData.art_texture(landmark).resource_path).contains("restaurant.png")
+
 func test_cancelled_pending_selection_cannot_resurrect_a_rig() -> void:
 	var m := _map()
 	await get_tree().process_frame

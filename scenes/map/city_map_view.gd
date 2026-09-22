@@ -3,6 +3,10 @@ extends Control
 ## Geographic browsing UI. All marker taps are resolved after the map's tap-slop guard.
 signal focus_requested(entry: Dictionary)
 signal resident_requested(entry: Dictionary)
+## 玩家详情卡上的“拜访农场”按钮：跳转到该玩家的空间（访客实例）。
+signal player_visit_requested(farm_id: String)
+## 玩家详情卡被关闭（点 X、切筛选、开列表等）：宿主借此清掉 pin 选中与 3D 角色。
+signal player_deselected
 signal action_requested(action: String)
 signal sheet_opened
 const INK := Color("232b30")
@@ -288,7 +292,7 @@ func _build_info() -> void:
 		action_style.expand_margin_bottom = -4
 		action_style.shadow_size = 0
 		info_action.add_theme_stylebox_override(state, action_style)
-	info_action.pressed.connect(func(): resident_requested.emit(selected))
+	info_action.pressed.connect(_on_info_action)
 	text.add_child(info_action)
 	var close := flat_button("x", "", "MapCloseInfo")
 	compact_round_button(close)
@@ -357,6 +361,7 @@ func clear_selection() -> void:
 	if not selected.is_empty():
 		_animate_focus(str(selected.get("id", "")), 1.0, 0.14)
 		_set_marker_front(str(selected.get("id", "")), false)
+		if str(selected.get("kind", "")) == "player": player_deselected.emit()
 	selected = {}
 	if info: info.hide()
 	if is_instance_valid(recenter): _layout()
@@ -374,7 +379,7 @@ func refresh_content() -> void:
 	for entry in entries:
 		var b := flat_button("map-pin" if entry.kind == "landmark" else "user-round", _name(entry), "MapPlace_" + str(entry.id))
 		if entry.kind == "landmark":
-			b.icon = CityMapData.texture(CityMapData.art_key(entry))
+			b.icon = CityMapData.art_texture(entry)
 			b.add_theme_constant_override("icon_max_width", 28)
 			for state_name in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
 				b.add_theme_color_override("icon_" + state_name + "_color", Color.WHITE)
@@ -388,6 +393,17 @@ func refresh_content() -> void:
 
 func _name(entry: Dictionary) -> String:
 	return str(entry.get("zh", entry.name)) if TranslationServer.get_locale().begins_with("zh") else str(entry.name)
+
+func _label_text(entry: Dictionary) -> String:
+	if entry.kind == "resident" and str(entry.get("status", "")) == "Ready to deliver":
+		return _name(entry) + " · " + L10n.text("Ready to deliver")
+	return _name(entry)
+
+## 选中项名牌需要的完整宽度：按 9 号字实测文本宽 + 样式内边距，封顶防异常长名。
+func _label_width(entry: Dictionary) -> float:
+	var font := get_theme_font("font", "Label")
+	if font == null: return 48.0
+	return minf(200.0, font.get_string_size(_label_text(entry), HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x + 18.0)
 
 func select(entry: Dictionary) -> void:
 	sheet_opened.emit()
@@ -404,14 +420,43 @@ func select(entry: Dictionary) -> void:
 	info_address.text = str(entry.get("address", ""))
 	info_address.visible = not info_address.text.is_empty()
 	info_action.visible = entry.kind == "resident"
-	if entry.kind == "resident": info_category.text = L10n.text("Resident") + " · " + L10n.text(str(entry.get("status", "Talk")))
-	info_art.texture = CityMapData.texture(CityMapData.art_key(entry))
+	if entry.kind == "resident":
+		info_category.text = L10n.text("Resident") + " · " + L10n.text(str(entry.get("status", "Talk")))
+		info_action.text = L10n.text("Visit resident")
+		info_action.icon = GameUi.icon("message-circle")
+	info_art.texture = CityMapData.art_texture(entry)
 	info_art.modulate = Color.WHITE
 	if entry.kind == "resident" and markers.has(entry.id): info_art.texture = markers[entry.id].portrait.portrait.texture
 	info.show()
 	_layout()
 	_settle_info.call_deferred()
 	if host: host._reset_gesture()
+
+## 选中其他玩家：底部详情卡与 POI 同款，行动按钮“拜访农场”跳到对方的空间。
+## 不发 sheet_opened——那个信号会让宿主清空玩家选中，与本卡互斥。
+func select_player(entry: Dictionary, portrait: Texture2D) -> void:
+	list_panel.hide()
+	if not selected.is_empty() and str(selected.get("id", "")) != str(entry.get("id", "")):
+		_animate_focus(str(selected.get("id", "")), 1.0, 0.14)
+		_set_marker_front(str(selected.get("id", "")), false)
+	selected = entry
+	info_title.text = str(entry.get("name", ""))
+	info_category.text = L10n.text("Farm") + " · " + L10n.text(str(host.region.get("name", "Los Angeles")))
+	info_address.text = ""
+	info_address.visible = false
+	info_action.visible = true
+	info_action.text = L10n.text("Visit Farm")
+	info_action.icon = GameUi.icon("footprints")
+	info_art.texture = portrait if portrait != null else GameUi.icon("user-round")
+	info_art.modulate = Color.WHITE
+	info.show()
+	_layout()
+	_settle_info.call_deferred()
+	if host: host._reset_gesture()
+
+func _on_info_action() -> void:
+	if str(selected.get("kind", "")) == "player": player_visit_requested.emit(str(selected.get("farm_id", "")))
+	else: resident_requested.emit(selected)
 
 func attach_bridge(bridge: MapBridge) -> void:
 	if bridge == _attached_bridge: return
@@ -510,7 +555,7 @@ func _make_marker(entry: Dictionary) -> Dictionary:
 		node.add_child(portrait)
 		result.portrait = portrait
 	else:
-		var texture := CityMapData.texture(CityMapData.art_key(entry))
+		var texture := CityMapData.art_texture(entry)
 		var sprite := Sprite3D.new()
 		sprite.name = "CityArt_" + str(entry.id).validate_node_name()
 		sprite.texture = texture
@@ -572,13 +617,16 @@ func _update_markers() -> void:
 		var point: Vector2 = host.cam.unproject_position(world) - global_position
 		if not area.has_point(point): continue
 		var width := 82.0 if entry.kind == "landmark" else 78.0 if entry.kind == "resident" else 48.0
+		var is_sel: bool = selected.get("id", null) == entry.get("id")
+		# 选中项名牌放宽到完整名称宽度（不再省略号截断）；占位一起变宽让邻居让位。
+		if is_sel: width = maxf(width, _label_width(entry))
 		# 视野最大（低 zoom）时 POI 也要有存在感：下限 42px（≈原 32 的 1.3 倍）。
 		var art_side: float = 88 if entry.kind == "landmark" else lerpf(42, 64, clampf((host.zoom - 13) / 3, 0, 1))
 		var top := 40.0 if entry.kind == "resident" else 54.0 if art_key in ["hollywood_sign", "griffith_observatory", "santa_monica_pier"] else 80.0 if entry.kind == "landmark" else 56.0
 		if entry.kind == "poi": top = maxf(36, art_side * 0.94)
 		var side := maxf(width, art_side)
 		# 选中项的占位随果冻放大同步变大，邻居的贴图和名牌为它让位。
-		if selected.get("id", null) == entry.get("id"):
+		if is_sel:
 			side *= FOCUS_SCALE
 			top *= FOCUS_SCALE
 		var bounds := Rect2(point - Vector2(side * 0.5, top), Vector2(side, top + 20))
@@ -618,6 +666,12 @@ func _update_markers() -> void:
 		var portrait: MapPortrait = markers[selected.id].portrait
 		if not portrait._shown_key.is_empty() and portrait._shown_key == portrait._desired_key:
 			info_art.texture = portrait.portrait.texture
+	elif selected.get("kind") == "player":
+		# 玩家头像是异步装配的：卡片打开时可能还没画好，好了就补上。
+		var fm = host.get("farm_markers")
+		if fm and fm.has_method("portrait_texture"):
+			var tex: Texture2D = fm.portrait_texture(str(selected.get("farm_id", "")))
+			if tex != null: info_art.texture = tex
 	# Keep controls on top even when dynamically creating markers.
 
 ## One placement attempt. Anchors never move: on success the marker is laid out
@@ -648,11 +702,18 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	marker.anchor = c.point
 	if entry.kind == "resident":
 		marker.portrait.position = Vector2(-18, -38)
-		marker.label.text = _name(entry) + (" · " + L10n.text(entry.status) if entry.status == "Ready to deliver" else "")
 	else:
 		_place_art(marker, c)
-	if entry.kind != "resident": marker.label.text = _name(entry)
+	marker.label.text = _label_text(entry)
 	marker.label.position = Vector2(-c.width * 0.5, 3)
+	if is_selected:
+		# 放大后的全名名牌夹在屏内，并避开右侧缩放/定位按钮列（贴图锚点不动）。
+		var half: float = c.width * 0.5 * FOCUS_SCALE
+		var dx := 0.0
+		var hi: float = size.x - 56.0
+		if c.point.x + half > hi: dx = hi - (c.point.x + half)
+		if c.point.x - half + dx < 8.0: dx = 8.0 - (c.point.x - half)
+		marker.label.position.x += dx / FOCUS_SCALE
 	marker.label.size = Vector2(c.width, 16)
 	marker.label.add_theme_font_size_override("font_size", 9)
 	marker.label.visible = label_fits and (entry.kind != "poi" or is_selected or host.zoom >= 16)
