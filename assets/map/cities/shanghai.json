@@ -1,0 +1,89 @@
+{
+  "format": 1,
+  "overview": {
+    "lat": 31.228,
+    "lng": 121.478,
+    "zoom": 12.2,
+    "bearing": 18.0
+  },
+  "landmarks": [
+    {
+      "id": "oriental_pearl_tower",
+      "name": "Oriental Pearl Tower",
+      "zh": "东方明珠",
+      "lat": 31.2397,
+      "lng": 121.49979,
+      "category": "Tower",
+      "address": "1 Century Ave, Pudong",
+      "art": "oriental_pearl_tower",
+      "source": "https://www.orientalpearltower.com/"
+    },
+    {
+      "id": "the_bund",
+      "name": "The Bund",
+      "zh": "外滩",
+      "lat": 31.2398,
+      "lng": 121.4905,
+      "category": "Waterfront",
+      "address": "Zhongshan East 1st Rd",
+      "art": "the_bund",
+      "source": "https://en.wikipedia.org/wiki/The_Bund"
+    },
+    {
+      "id": "yu_garden",
+      "name": "Yu Garden",
+      "zh": "豫园",
+      "lat": 31.2272,
+      "lng": 121.4921,
+      "category": "Garden",
+      "address": "218 Anren St",
+      "art": "yu_garden",
+      "source": "https://en.wikipedia.org/wiki/Yu_Garden"
+    },
+    {
+      "id": "shanghai_tower",
+      "name": "Shanghai Tower",
+      "zh": "上海中心",
+      "lat": 31.2335,
+      "lng": 121.5055,
+      "category": "Tower",
+      "address": "501 Yincheng Middle Rd",
+      "art": "shanghai_tower",
+      "source": "https://en.wikipedia.org/wiki/Shanghai_Tower"
+    },
+    {
+      "id": "jingan_temple",
+      "name": "Jing'an Temple",
+      "zh": "静安寺",
+      "lat": 31.2235,
+      "lng": 121.4453,
+      "category": "Temple",
+      "address": "1686 West Nanjing Rd",
+      "art": "jingan_temple",
+      "source": "https://en.wikipedia.org/wiki/Jing%27an_Temple"
+    }
+  ],
+  "residents": [
+    {
+      "id": "nursery_keeper",
+      "place": "nursery",
+      "slot": "nursery",
+      "lat": 31.2175,
+      "lng": 121.4686
+    },
+    {
+      "id": "bistro_owner",
+      "place": "bistro",
+      "slot": "bistro",
+      "lat": 31.2197,
+      "lng": 121.475
+    },
+    {
+      "id": "restorer",
+      "place": "courtyard",
+      "slot": "restorer",
+      "lat": 31.2107,
+      "lng": 121.4687
+    }
+  ]
+}

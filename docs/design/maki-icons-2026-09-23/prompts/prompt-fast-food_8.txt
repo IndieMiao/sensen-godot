@@ -1,0 +1,6 @@
+Use case: production map POI icon for a cozy mobile life-sim game.
+Input image: a reference map screenshot showing the target icon style ONLY - glossy, chunky, softly rounded 3D objects (a burger, a gingerbread cookie, a movie clapperboard, a basketball, a fork and spoon) floating as map markers. Match that exact rendering style: soft studio lighting from upper left, subtle specular highlights, gentle ambient occlusion, saturated but friendly colors, clean simple shapes, no outlines. Do not reproduce the map, text, logo, or any object from the reference.
+Primary request: ONE single isolated icon object: a milkshake with whipped cream and a cherry. It must instantly read as "fast food" at 40 pixels on a phone map. Simple silhouette, at most two or three parts, no tiny details, no base, no ground, no platform, no building unless stated.
+Composition: centered, three-quarter front view slightly from above, the whole object fully visible with generous padding, square image.
+Backdrop: absolutely flat uniform vivid magenta #FF00FF everywhere outside the object for chroma-key extraction. No gradient, no floor, no cast shadow on the backdrop.
+Constraints: no text, no letters, no numbers, no logos, no people, no faces unless stated, no pin or badge shape behind the object, no watermark, no magenta in the object.

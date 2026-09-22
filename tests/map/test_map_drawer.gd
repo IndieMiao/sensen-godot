@@ -1,12 +1,15 @@
 extends GdUnitTestSuite
 
 func before_test() -> void:
+	# 覆盖没有城市配置时的旧附近列表 UI（上海已改用城市地图框架）。
+	CityMapData.force_legacy = true
 	FarmChoice.save("sh_a", 2)
 	FarmRegions.save_choice("shanghai")
 	Net.use_transport(FakeTransport.new([]).callable())
 	Net.session.state = {"journey": {"version": 1, "unlocks": ["bistro"], "facts": []}, "clock": {"chapter_index": 0}}
 
 func after_test() -> void:
+	CityMapData.force_legacy = false
 	FarmChoice.clear()
 	FarmRegions.clear_choice()
 	UiState.clear()

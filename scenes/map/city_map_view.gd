@@ -131,7 +131,8 @@ func _ready() -> void:
 	name = "CityMap"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var city := flat_button("chevron-down", L10n.text("Los Angeles"), "MapCity")
+	var city_name := str(host.region.get("name", "Los Angeles")) if host else "Los Angeles"
+	var city := flat_button("chevron-down", L10n.text(city_name), "MapCity")
 	city.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	city.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	city.add_theme_font_size_override("font_size", 22)
@@ -141,14 +142,14 @@ func _ready() -> void:
 	city.position = Vector2(5, 0)
 	add_child(city)
 	city.size = Vector2(city.get_combined_minimum_size().x, 44)
-	subtitle = GameUi.label("Los Angeles", 10, MUTED)
+	subtitle = GameUi.label(city_name, 10, MUTED)
 	subtitle.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	subtitle.position = Vector2(6, 34)
 	add_child(subtitle)
 	var underline := ColorRect.new()
 	underline.color = LIME
 	underline.position = Vector2(4, 31)
-	underline.size = Vector2(75, 4)
+	underline.size = Vector2(maxf(40.0, city.size.x - 22.0), 4)
 	underline.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(underline)
 	move_child(underline, 0)

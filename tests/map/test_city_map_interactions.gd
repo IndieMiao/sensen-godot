@@ -408,15 +408,16 @@ func test_poi_icons_follow_maki_and_pick_by_name_hash() -> void:
 	var seen := {}
 	for i in 12:
 		seen[CityMapData.art_texture({"id": str(i), "kind": "poi", "name": "Diner %d" % i, "maki": "fast-food"}).resource_path] = true
-	assert_int(seen.size()).is_equal(CityMapData.ICON_VARIANTS)
-	# 10 种高频 maki × 2 张 WebP 必须全部随包。
-	for key in CityMapData.ICON_MAKI:
-		for n in range(1, CityMapData.ICON_VARIANTS + 1):
+	assert_int(seen.size()).is_greater(1)
+	# 每种 maki 的全部图标（共 125 张）必须随包，否则哈希落空。
+	for key in CityMapData.ICON_VARIANTS:
+		for n in range(1, int(CityMapData.ICON_VARIANTS[key]) + 1):
 			assert_bool(ResourceLoader.exists("%s%s_%d.webp" % [CityMapData.ICON_PATH, key, n])).override_failure_message("missing %s_%d" % [key, n]).is_true()
 	# 低频/无意义 maki 没有图标，不上图；地标仍用建筑贴图。
 	assert_str(CityMapData.icon_key({"maki": "marker"})).is_empty()
 	assert_str(CityMapData.icon_key({"maki": "bridge"})).is_empty()
-	assert_str(CityMapData.icon_key({"maki": "convenience"})).is_equal("grocery")
+	assert_str(CityMapData.icon_key({"maki": "supermarket"})).is_equal("grocery")
+	assert_str(CityMapData.icon_key({"maki": "restaurant-pizza"})).is_equal("restaurant-pizza")
 	var landmark := {"id": "lm", "kind": "landmark", "name": "Griffith", "art": "griffith_observatory"}
 	assert_str(CityMapData.art_texture(landmark).resource_path).contains("griffith_observatory.png")
 

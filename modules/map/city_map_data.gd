@@ -1,22 +1,33 @@
 class_name CityMapData
 extends RefCounted
 ## Authored landmarks are independent of temporary provider POI results.
-const PATH := "res://assets/map/la_map.json"
+## 每座城市一份配置：总览视角、地标、居民锚点。有配置的城市就启用城市地图框架。
+const CITY_DIR := "res://assets/map/cities/"
 const ART_PATH := "res://assets/map/poi/"
 const CATEGORIES := {"restaurant": "Restaurant", "chinese_restaurant": "Chinese restaurant", "cafe": "Café", "bakery": "Bakery", "park": "Park", "museum": "Museum", "shop": "Shop", "flower_shop": "Florist", "beach": "Beach", "theme_park": "Attraction", "place": "Place"}
 const SHOP_MAKI := ["grocery", "shop", "clothing-store", "convenience", "supermarket", "shoe", "jewelry-store", "gift", "hardware", "furniture", "mobile-phone", "alcohol-shop", "watch", "department-store", "optician", "laundry"]
 
+## 测试开关：为没有城市配置的城市保留的旧附近列表 UI 写测试时置 true。
+static var force_legacy := false
+
+static func has_city(region_id: String) -> bool:
+	return not force_legacy and not region_id.is_empty() and FileAccess.file_exists(CITY_DIR + region_id + ".json")
+
+static func city(region_id: String) -> Dictionary:
+	if not has_city(region_id): return {}
+	var data = JSON.parse_string(FileAccess.get_file_as_string(CITY_DIR + region_id + ".json"))
+	return data if data is Dictionary else {}
+
 static func landmarks(region_id: String) -> Array:
-	if region_id != "los_angeles": return []
-	var result: Array = JSON.parse_string(FileAccess.get_file_as_string(PATH)).landmarks
+	var result: Array = city(region_id).get("landmarks", [])
 	for p in result:
 		p.kind = "landmark"
 	return result
 
 static func residents(region_id: String, state: Dictionary) -> Array:
-	if region_id != "los_angeles" or state.is_empty(): return []
+	if state.is_empty(): return []
 	var result := []
-	for p in JSON.parse_string(FileAccess.get_file_as_string(PATH)).residents:
+	for p in city(region_id).get("residents", []):
 		if not ResidentCast.present(str(p.place), state).has(str(p.id)): continue
 		p.kind = "resident"
 		p.name = L10n.text(str(ResidentCast.definition(str(p.id)).name))
@@ -75,15 +86,18 @@ static func texture(key: String) -> Texture2D:
 	if ResourceLoader.exists(path): return load(path)
 	return GameUi.icon({"place":"map-pin", "beach":"sun", "theme_park":"star"}.get(key, "map-pin"))
 
-## 普通 POI 用 Mapbox maki 语义的简单 3D 图标（不画建筑，地标除外），2026-09-23 定案：
-## 取洛杉矶实测高频（filterrank≤3）的 10 种 maki，每种 2 张、256px WebP，按名字哈希固定选一张。
+## 普通 POI 用 Mapbox maki 语义的简单 3D 图标（不画建筑，地标除外），256px WebP。
+## 每种 maki 的图标数 = ceil(洛杉矶 filterrank<5 采样数 / 10)，最少 2（2026-09-23 定案），
+## 按名字哈希固定选一张。marker / parking / bridge 不上图。
 const ICON_PATH := "res://assets/map/poi/icons/"
-const ICON_MAKI := ["park", "restaurant", "school", "religious-christian", "fast-food", "shop", "grocery", "fuel", "lodging", "cafe"]
-const ICON_VARIANTS := 2
-## 同义 maki 共用图标；不在这里、也不在 ICON_MAKI 里的 maki 不上图。
-const ICON_ALIAS := {"restaurant-pizza": "restaurant", "restaurant-noodle": "restaurant", "restaurant-seafood": "restaurant",
-	"restaurant-sushi": "restaurant", "restaurant-bbq": "restaurant", "bar": "restaurant", "beer": "restaurant",
-	"teahouse": "cafe", "convenience": "grocery", "supermarket": "grocery",
+const ICON_VARIANTS := {"park": 20, "restaurant": 14, "school": 12, "fast-food": 10, "religious-christian": 9,
+	"shop": 7, "grocery": 4, "fuel": 4, "lodging": 3, "cafe": 3, "bank": 3, "convenience": 3, "harbor": 3,
+	"fire-station": 3, "pitch": 3, "doctor": 2, "information": 2, "restaurant-pizza": 2, "car-repair": 2,
+	"fitness-centre": 2, "museum": 2, "theatre": 2, "beer": 2, "town-hall": 2, "bar": 2, "library": 2, "car": 2}
+## 同义 maki 共用图标；既不在 ICON_VARIANTS 也不在这里的 maki 不上图。
+const ICON_ALIAS := {"restaurant-noodle": "restaurant", "restaurant-seafood": "restaurant",
+	"restaurant-sushi": "restaurant", "restaurant-bbq": "restaurant",
+	"teahouse": "cafe", "supermarket": "grocery", "art-gallery": "museum",
 	"garden": "park", "picnic-site": "park", "playground": "park", "dog-park": "park",
 	"clothing-store": "shop", "shoe": "shop", "jewelry-store": "shop", "gift": "shop", "hardware": "shop",
 	"furniture": "shop", "mobile-phone": "shop", "watch": "shop", "department-store": "shop", "optician": "shop"}
@@ -92,7 +106,7 @@ const ICON_FROM_ART := {"restaurant": "restaurant", "chinese_restaurant": "resta
 
 static func icon_key(poi: Dictionary) -> String:
 	var maki := str(poi.get("maki", ""))
-	if maki in ICON_MAKI: return maki
+	if ICON_VARIANTS.has(maki): return maki
 	if ICON_ALIAS.has(maki): return str(ICON_ALIAS[maki])
 	if maki.is_empty(): return str(ICON_FROM_ART.get(art_key(poi), ""))
 	return ""
@@ -102,6 +116,6 @@ static func art_texture(poi: Dictionary) -> Texture2D:
 	if str(poi.get("kind", "")) != "poi": return texture(art_key(poi))
 	var key := icon_key(poi)
 	if key.is_empty(): return texture("place")
-	var pick := absi(str(poi.get("name", "")).hash()) % ICON_VARIANTS + 1
+	var pick := absi(str(poi.get("name", "")).hash()) % int(ICON_VARIANTS[key]) + 1
 	var path := "%s%s_%d.webp" % [ICON_PATH, key, pick]
 	return load(path) if ResourceLoader.exists(path) else texture("place")

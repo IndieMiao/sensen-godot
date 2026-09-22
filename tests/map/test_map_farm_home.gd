@@ -6,10 +6,13 @@ const MAP_POC_SCENE := "res://scenes/map_poc/map_poc.tscn"
 var _saved_transport: Callable
 
 func before_test() -> void:
+	# 覆盖没有城市配置时的旧附近列表 UI（上海已改用城市地图框架）。
+	CityMapData.force_legacy = true
 	FarmChoice.save("sh_a", 2)
 	FarmRegions.save_choice("shanghai")
 
 func after_test() -> void:
+	CityMapData.force_legacy = false
 	while AppRouter._navigation_pending: await get_tree().process_frame
 	while AppRouter.instance_depth() > 0:
 		AppRouter.pop_instance()
@@ -179,6 +182,7 @@ func test_server_farm_puts_map_in_home_mode_even_without_local_choice() -> void:
 
 func test_selected_city_keeps_its_camera_and_demo_farmers_with_a_farm_abroad() -> void:
 	FarmRegions.save_choice("los_angeles")
+	CityMapData.force_legacy = false
 	_login_with_farm("sh_b", [{"error": "down"}])
 	Net.session.state = {"journey": {"version": 1, "unlocks": [], "facts": []}}
 	var m := _map()
@@ -203,6 +207,7 @@ func test_selected_city_keeps_its_camera_and_demo_farmers_with_a_farm_abroad() -
 func test_late_login_does_not_pull_selected_city_back_to_own_farm() -> void:
 	FarmChoice.clear()
 	FarmRegions.save_choice("los_angeles")
+	CityMapData.force_legacy = false
 	Net.use_transport(FakeTransport.new([]).callable())
 	Net.client.token = ""
 	var m := _map()
@@ -221,6 +226,7 @@ func test_late_login_does_not_pull_selected_city_back_to_own_farm() -> void:
 
 func test_explicit_home_focus_switches_both_camera_and_nearby_city() -> void:
 	FarmRegions.save_choice("los_angeles")
+	CityMapData.force_legacy = false
 	_login_with_farm("sh_b", [{"error": "down"}, {"error": "down"}])
 	var m := _map()
 	await get_tree().process_frame

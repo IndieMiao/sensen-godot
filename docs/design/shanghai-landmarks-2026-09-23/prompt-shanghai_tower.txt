@@ -1,0 +1,7 @@
+Use case: stylized-concept
+Asset type: one production landmark sprite for a mobile Shanghai map, part of a set whose Los Angeles landmarks are already shipped.
+Input images: Image 1 and Image 2 are finished landmark sprites from the same game (Griffith Observatory, Santa Monica Pier). Match their exact visual language: premium soft matte pastel clay-toy miniature, gently rounded edges, clean readable massing, delicate detail, a very low compact pale mint landscaped base, three-quarter elevated isometric camera, soft daylight from upper left. Do not reproduce their subjects.
+Subject: a recognizable Shanghai Tower: a tall twisting spiral glass skyscraper in pale blue-silver glass with a gentle curved notch spiralling to the top, softly stylized, on a small landscaped base.
+Composition: one isolated landmark, entire object and base fully visible, centered, at least 12 percent empty margin, readable silhouette at small map icon size.
+Backdrop: absolutely flat uniform vivid magenta #FF00FF outside the object for chroma-key extraction; no gradient, no floor, no shadow on the backdrop, no magenta in the object.
+Constraints: no text, no letters, no signage lettering, no people, no vehicles, no watermark, no surrounding city.

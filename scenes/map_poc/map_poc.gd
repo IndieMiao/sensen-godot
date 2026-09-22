@@ -697,7 +697,7 @@ func _teleport(lat: float, lng: float) -> void:
 func enter_street_mode(r: Dictionary) -> void:
 	street_mode = true
 	region = r
-	if is_instance_valid(city_map) and str(r.get("id", "")) != "los_angeles": _remove_city_map()
+	if is_instance_valid(city_map) and not CityMapData.has_city(str(r.get("id", ""))): _remove_city_map()
 	zoom = float(r.get("street_zoom", 16.0))
 	pitch = float(r.get("pitch", 45.0))
 	bearing = 0.0
@@ -1451,7 +1451,7 @@ func _enter_farm_home(r: Dictionary) -> void:
 	_refresh_nearby()
 
 func _ensure_legacy_nearby_panel() -> void:
-	if str(region.get("id", "")) == "los_angeles" or nearby_panel: return
+	if CityMapData.has_city(str(region.get("id", ""))) or nearby_panel: return
 	nearby_panel = NearbyPanel.new()
 	nearby_panel.farm_focused.connect(_on_farm_focused)
 	nearby_panel.visit_requested.connect(_on_visit_requested)
@@ -1463,7 +1463,7 @@ func _ensure_legacy_nearby_panel() -> void:
 	nearby_panel.set_social_only()
 
 func _setup_journey_map() -> void:
-	if str(region.get("id", "")) == "los_angeles" or not nearby_panel: return
+	if CityMapData.has_city(str(region.get("id", ""))) or not nearby_panel: return
 	if not Net or not Net.session or not JourneyProgress.active(Net.session.state) or journey_map: return
 	journey_map = JourneyMap.new()
 	if Net.session.farm_terrain.is_empty(): journey_map.configure(JourneyStreets.load_for(Net.session))
@@ -1922,10 +1922,12 @@ func _minimum_zoom() -> float:
 	return 9.5 if city_map else STREET_ZOOM_MIN if street_mode else 3.0
 
 func _city_bounds() -> void:
-	pan_bounds = Rect2(33.70, -118.67, 0.65, 0.52) if str(region.get("id")) == "los_angeles" else Rect2()
+	# 可拖动范围 = 该城市的选址范围 [south, west, north, east]。
+	var b: Array = region.get("placement_bounds", [])
+	pan_bounds = Rect2(float(b[0]), float(b[1]), float(b[2]) - float(b[0]), float(b[3]) - float(b[1])) if city_map and b.size() == 4 else Rect2()
 
 func _install_city_map() -> void:
-	if _relocation_mode or _placement_mode or str(region.get("id", "")) != "los_angeles": return
+	if _relocation_mode or _placement_mode or not CityMapData.has_city(str(region.get("id", ""))): return
 	if city_map: return
 	_clear_farm_selection()
 	# The city uses geographic markers directly, with no nearby list or visit route.
@@ -1984,10 +1986,11 @@ func _city_action(action: String) -> void:
 			_clear_farm_selection()
 			if city_map: city_map.dismiss_overlays()
 			_city_bounds()
-			bearing = 42.0
+			var overview: Dictionary = CityMapData.city(str(region.get("id", ""))).get("overview", {})
+			bearing = float(overview.get("bearing", 0.0))
 			pitch = 35.0
-			fly_to(34.065, -118.365)
-			_set_zoom(10.5)
+			fly_to(float(overview.get("lat", region.get("center", [0, 0])[0])), float(overview.get("lng", region.get("center", [0, 0])[1])))
+			_set_zoom(float(overview.get("zoom", 11.0)))
 		"north":
 			bearing = 0.0
 			_camera_dirty = true

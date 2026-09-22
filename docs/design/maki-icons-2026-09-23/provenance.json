@@ -1,4 +1,39 @@
 {
+  "bank_1": {
+    "asset": "assets/map/poi/icons/bank_1.webp",
+    "bytes": 12138,
+    "sha256": "f57b99f99170164eb7116d4a6c455edbcfb127811981093643a34d9722a0cf2c"
+  },
+  "bank_2": {
+    "asset": "assets/map/poi/icons/bank_2.webp",
+    "bytes": 11568,
+    "sha256": "75f433ee7cd28d459b208a0fb4ba989398b2f595c206ed7e3ce7e59ad19cca78"
+  },
+  "bank_3": {
+    "asset": "assets/map/poi/icons/bank_3.webp",
+    "bytes": 13400,
+    "sha256": "66f8525de4ffd3cdfdd4a9fa465c1286e84bf7bc7c1d86eea2a947a01b138f71"
+  },
+  "bar_1": {
+    "asset": "assets/map/poi/icons/bar_1.webp",
+    "bytes": 10408,
+    "sha256": "a5b32441de01ed10b7a90c67f5d48f5adf1a77c7e4e148143c3ebdb7d776ca8e"
+  },
+  "bar_2": {
+    "asset": "assets/map/poi/icons/bar_2.webp",
+    "bytes": 13770,
+    "sha256": "55ff2c3eae42f1fbcb540bb90d40e254f3e30b142389361afd798d542f137d49"
+  },
+  "beer_1": {
+    "asset": "assets/map/poi/icons/beer_1.webp",
+    "bytes": 13080,
+    "sha256": "daff7d5396af635e04e9badfee58745ed3da3dfcf0919b105c2578141fe98e70"
+  },
+  "beer_2": {
+    "asset": "assets/map/poi/icons/beer_2.webp",
+    "bytes": 13044,
+    "sha256": "a3159fc88fbbe6da6a945e4a259d0bc3279d6ca39b219e772dbad69f0e9429de"
+  },
   "cafe_1": {
     "asset": "assets/map/poi/icons/cafe_1.webp",
     "bytes": 12904,
@@ -9,15 +44,130 @@
     "bytes": 8818,
     "sha256": "26727c2bd4758546aed8f76c0a37d3b567e5c1c17f64762ba55ea60d5d8cd2da"
   },
+  "cafe_3": {
+    "asset": "assets/map/poi/icons/cafe_3.webp",
+    "bytes": 13722,
+    "sha256": "e9ebd0e3a73372396283d0dc83a9ee7e9a4a31a07c4436dcb46fdab65ab5b3d0"
+  },
+  "car-repair_1": {
+    "asset": "assets/map/poi/icons/car-repair_1.webp",
+    "bytes": 15398,
+    "sha256": "2710a62e171d81def5b6a60a866588008b3fea07654f3cfdaf2be077b2ee81a0"
+  },
+  "car-repair_2": {
+    "asset": "assets/map/poi/icons/car-repair_2.webp",
+    "bytes": 11310,
+    "sha256": "b465e3349dec01fccc74e744f8020ce7305e748bfeed876eec8650708e4b95e7"
+  },
+  "car_1": {
+    "asset": "assets/map/poi/icons/car_1.webp",
+    "bytes": 13230,
+    "sha256": "17cc99bc024f2fcd8450c7f9ee330d5b3996df7794cb2f319cad1bcca191c583"
+  },
+  "car_2": {
+    "asset": "assets/map/poi/icons/car_2.webp",
+    "bytes": 13226,
+    "sha256": "45ad9a071d59d599940974c1dafe57fcd4d884f419d56035dbcb95a2e75ca908"
+  },
+  "convenience_1": {
+    "asset": "assets/map/poi/icons/convenience_1.webp",
+    "bytes": 13928,
+    "sha256": "ff610d53c45ab24213a0db476eaa016da724377351b01ebb89daf550b8a28b01"
+  },
+  "convenience_2": {
+    "asset": "assets/map/poi/icons/convenience_2.webp",
+    "bytes": 16242,
+    "sha256": "f2fc603702bccdbbf7d3abbc2e555e8cfad8c2bbc510128710d2c757b3a98e54"
+  },
+  "convenience_3": {
+    "asset": "assets/map/poi/icons/convenience_3.webp",
+    "bytes": 13032,
+    "sha256": "f52e6cc8f80510b377f8777a66727156b7d29db78bad4c4791c405f4560cd5ef"
+  },
+  "doctor_1": {
+    "asset": "assets/map/poi/icons/doctor_1.webp",
+    "bytes": 15024,
+    "sha256": "b6abbe02fb2c7a69298e7eb68385a56a3a14c68918b0919bc07c8e01ae23ff5a"
+  },
+  "doctor_2": {
+    "asset": "assets/map/poi/icons/doctor_2.webp",
+    "bytes": 10680,
+    "sha256": "998c9935f2dca69ede9d1c3033e3ab2000018de3d2553fb8e05babc2d1b0a0d8"
+  },
   "fast-food_1": {
     "asset": "assets/map/poi/icons/fast-food_1.webp",
     "bytes": 14754,
     "sha256": "c54b65451856983268559303eb6d80bbb5ba3ff46ac58d63c99431ab41e2ecb2"
   },
+  "fast-food_10": {
+    "asset": "assets/map/poi/icons/fast-food_10.webp",
+    "bytes": 7610,
+    "sha256": "7ccb9774ec8408528b78d1e39f5e96c8258701e66680c37e4694fee98e359b25"
+  },
   "fast-food_2": {
     "asset": "assets/map/poi/icons/fast-food_2.webp",
     "bytes": 14396,
     "sha256": "495ff66a2b9a810ab8502f8049098e5b1359bbf0b0c8cd8903c32172fee8ecf6"
+  },
+  "fast-food_3": {
+    "asset": "assets/map/poi/icons/fast-food_3.webp",
+    "bytes": 10748,
+    "sha256": "e04e921bc0d0e5deb927b35bdeaaa10b0cc7996c7fbc32c048397a90338ed271"
+  },
+  "fast-food_4": {
+    "asset": "assets/map/poi/icons/fast-food_4.webp",
+    "bytes": 11724,
+    "sha256": "e8055a2ef68f5f358137584a8bac2aae7329507256bd5dca3b0ad11ea3fa6a99"
+  },
+  "fast-food_5": {
+    "asset": "assets/map/poi/icons/fast-food_5.webp",
+    "bytes": 11796,
+    "sha256": "dbee892beb57ab662c91c0cfeb6139e334b0500a718e839457dfae18bc637030"
+  },
+  "fast-food_6": {
+    "asset": "assets/map/poi/icons/fast-food_6.webp",
+    "bytes": 14316,
+    "sha256": "d6b6d55dca997b7e20d13957d5067c033173f59459590a90d61e60a6a3ac1d9f"
+  },
+  "fast-food_7": {
+    "asset": "assets/map/poi/icons/fast-food_7.webp",
+    "bytes": 13922,
+    "sha256": "b785c7c340331962543953e6b6603bdbaeae9b6ea4d9ff7359154f474210f1df"
+  },
+  "fast-food_8": {
+    "asset": "assets/map/poi/icons/fast-food_8.webp",
+    "bytes": 9836,
+    "sha256": "9a90bb1744acc08652a78f86ee26b02d18325e4a9c0ac3f4ced1d4901e9e3cca"
+  },
+  "fast-food_9": {
+    "asset": "assets/map/poi/icons/fast-food_9.webp",
+    "bytes": 15782,
+    "sha256": "1318c36f8e880a1ad42f72457328f7920107a1f3fde4e0d1ee74a910cce8e074"
+  },
+  "fire-station_1": {
+    "asset": "assets/map/poi/icons/fire-station_1.webp",
+    "bytes": 11148,
+    "sha256": "833e4b4528bca24a45105c613b824efa011460799d65f86b1f734299aadfc01f"
+  },
+  "fire-station_2": {
+    "asset": "assets/map/poi/icons/fire-station_2.webp",
+    "bytes": 16446,
+    "sha256": "5d730cf1248a9ddcad93f04b98d019a5e04dc0677091e1f96281c10a82cfc700"
+  },
+  "fire-station_3": {
+    "asset": "assets/map/poi/icons/fire-station_3.webp",
+    "bytes": 11430,
+    "sha256": "2062e13cc3291dacfb936936fe6a671908b49461917459b0f8397e04be6903ff"
+  },
+  "fitness-centre_1": {
+    "asset": "assets/map/poi/icons/fitness-centre_1.webp",
+    "bytes": 12268,
+    "sha256": "64bc96ed2db3150a2cd602cdcc222d4d3329d8bf3509bd21454eeee615f00baa"
+  },
+  "fitness-centre_2": {
+    "asset": "assets/map/poi/icons/fitness-centre_2.webp",
+    "bytes": 11164,
+    "sha256": "5133386ce5d96fdaa472c27b6e39a15c9665a1018c7116222751144283c1e42a"
   },
   "fuel_1": {
     "asset": "assets/map/poi/icons/fuel_1.webp",
@@ -29,6 +179,16 @@
     "bytes": 12376,
     "sha256": "a0e7bc07735494d718296af73e6dbd1822a39fdf476ebca26ea824c524d5333c"
   },
+  "fuel_3": {
+    "asset": "assets/map/poi/icons/fuel_3.webp",
+    "bytes": 11146,
+    "sha256": "c2d1c5dded3d7703714b7d9a1fb716fc39c7c324e85c3dc5a187f8e5dc4d7509"
+  },
+  "fuel_4": {
+    "asset": "assets/map/poi/icons/fuel_4.webp",
+    "bytes": 10602,
+    "sha256": "6a6d08cb625676886cabcee78d315718d5bb35eb5fe39ee73ab2b652281903f5"
+  },
   "grocery_1": {
     "asset": "assets/map/poi/icons/grocery_1.webp",
     "bytes": 17512,
@@ -38,6 +198,51 @@
     "asset": "assets/map/poi/icons/grocery_2.webp",
     "bytes": 18410,
     "sha256": "d7eaf875d299f69b8fa5e95ad7b85552817b278aa9f9bd7e342fc52d9494893b"
+  },
+  "grocery_3": {
+    "asset": "assets/map/poi/icons/grocery_3.webp",
+    "bytes": 12734,
+    "sha256": "6defd82397a2b8dfc6d079586e7576d8dadbe910d4169bf15bad2929eb6233a4"
+  },
+  "grocery_4": {
+    "asset": "assets/map/poi/icons/grocery_4.webp",
+    "bytes": 11402,
+    "sha256": "afff7307a6841426447e09c686e31a65ad8205f02f6492f5cdc038c3de2614aa"
+  },
+  "harbor_1": {
+    "asset": "assets/map/poi/icons/harbor_1.webp",
+    "bytes": 13902,
+    "sha256": "26994342dc43ec06ebec8f70ab11f882c9914c2df87ebcdc05a90735ed6c634f"
+  },
+  "harbor_2": {
+    "asset": "assets/map/poi/icons/harbor_2.webp",
+    "bytes": 10788,
+    "sha256": "daa804a15286821e7b8f29006f8fedf75a60856705e681569751ae15eecbf64e"
+  },
+  "harbor_3": {
+    "asset": "assets/map/poi/icons/harbor_3.webp",
+    "bytes": 13514,
+    "sha256": "b7723a7e59c23486af0716568c4dc65146fa6047bfcfc6308fc35a8413e7fb5d"
+  },
+  "information_1": {
+    "asset": "assets/map/poi/icons/information_1.webp",
+    "bytes": 10256,
+    "sha256": "dd067f270c848b8417ac587f6e3007bdcfc5e36fe5f29c76d9f5a8176e962c03"
+  },
+  "information_2": {
+    "asset": "assets/map/poi/icons/information_2.webp",
+    "bytes": 12586,
+    "sha256": "5d3b50338d43c5aaae0ecae2a6b316fc661d7122a8ec33be1f2c9f5a2409f137"
+  },
+  "library_1": {
+    "asset": "assets/map/poi/icons/library_1.webp",
+    "bytes": 15038,
+    "sha256": "5dccbf9f7695d1c68d8e735bc1f366371ad58bcf87b4b7cf69202e834216dde7"
+  },
+  "library_2": {
+    "asset": "assets/map/poi/icons/library_2.webp",
+    "bytes": 10504,
+    "sha256": "b9ada0695f42a9d47ac25b5486ea2dcaea218278e366d4da0657bfe40ae43911"
   },
   "lodging_1": {
     "asset": "assets/map/poi/icons/lodging_1.webp",
@@ -49,15 +254,135 @@
     "bytes": 12482,
     "sha256": "15f163d5dd135b6eef96e5b25ed53316d0711df4955608f1a959de2d3d1d1c42"
   },
+  "lodging_3": {
+    "asset": "assets/map/poi/icons/lodging_3.webp",
+    "bytes": 14448,
+    "sha256": "6b5ec81a6bf03292fa05d2725e1ff3d02c352a5e22abfa0e9bd2a449788e8379"
+  },
+  "museum_1": {
+    "asset": "assets/map/poi/icons/museum_1.webp",
+    "bytes": 8842,
+    "sha256": "687ed657e563c311fdcca487222f2fc00893344130d9c381d3c06272c8b919e5"
+  },
+  "museum_2": {
+    "asset": "assets/map/poi/icons/museum_2.webp",
+    "bytes": 15848,
+    "sha256": "00de1eb1d28f08c91566d26ed6c5b9fc8b8caecbefb4d1a26d0c90c6df115741"
+  },
   "park_1": {
     "asset": "assets/map/poi/icons/park_1.webp",
     "bytes": 10064,
     "sha256": "4530f65f37d861fedafe5d2558c38207aa8017aeee6f08ba7f1d3cfba4fd747e"
   },
+  "park_10": {
+    "asset": "assets/map/poi/icons/park_10.webp",
+    "bytes": 9040,
+    "sha256": "ffc97429fa1685800a4a7ba72a53cc5c95fb41d19f9e91f893012d08ce26f67e"
+  },
+  "park_11": {
+    "asset": "assets/map/poi/icons/park_11.webp",
+    "bytes": 6386,
+    "sha256": "c1d6fb4cc5930b9e37edeec89847c6ed0ec4139dbe3fcf8adaf9bb34b8e03dec"
+  },
+  "park_12": {
+    "asset": "assets/map/poi/icons/park_12.webp",
+    "bytes": 12202,
+    "sha256": "a7b8479f407baabc9e99ab4b35abe470ff906d2809c1eec88598a65abcbc33a8"
+  },
+  "park_13": {
+    "asset": "assets/map/poi/icons/park_13.webp",
+    "bytes": 11864,
+    "sha256": "ff4e2490c4ff13dfde5f7bdf017c122af8f5dc067b08a23bb871fc6476eeb218"
+  },
+  "park_14": {
+    "asset": "assets/map/poi/icons/park_14.webp",
+    "bytes": 13440,
+    "sha256": "1fc591ab6575d5ed79166c7c2281e02b46e49df8490463605d7a18a4412ad6b0"
+  },
+  "park_15": {
+    "asset": "assets/map/poi/icons/park_15.webp",
+    "bytes": 13368,
+    "sha256": "23e4b8d44759861d8ab13acae27b49ac046f0bebd0c6deab02bc0ec76324e8f3"
+  },
+  "park_16": {
+    "asset": "assets/map/poi/icons/park_16.webp",
+    "bytes": 13734,
+    "sha256": "d6cbe1a4b027c6c613b79ea965d1d8614ea21eba87526d6f2ebcb25b21a11d18"
+  },
+  "park_17": {
+    "asset": "assets/map/poi/icons/park_17.webp",
+    "bytes": 13352,
+    "sha256": "29f7ea859a07166a0d1e46bc357e48ecc08c47ddf49850bb5d389e3eed0383d0"
+  },
+  "park_18": {
+    "asset": "assets/map/poi/icons/park_18.webp",
+    "bytes": 11044,
+    "sha256": "86fd940be479eacc1b8a3ff848d3d1761d0f4819ef5fd511b177b0867845f4b5"
+  },
+  "park_19": {
+    "asset": "assets/map/poi/icons/park_19.webp",
+    "bytes": 18322,
+    "sha256": "57c35e98fc3d0c7f2f8db6c42c1f679d5a3bcebfe6d44241e6283efd1c6b00a7"
+  },
   "park_2": {
     "asset": "assets/map/poi/icons/park_2.webp",
     "bytes": 12174,
     "sha256": "4fa5f7d78a4259c291950af4ba37e58111f73cd652f80cd4dd63683e7489089d"
+  },
+  "park_20": {
+    "asset": "assets/map/poi/icons/park_20.webp",
+    "bytes": 10384,
+    "sha256": "59dddba17644856e59a6890dc00fcefff742f0ca77bff3fa11c295f7e06ddf67"
+  },
+  "park_3": {
+    "asset": "assets/map/poi/icons/park_3.webp",
+    "bytes": 15066,
+    "sha256": "151818b73e0eddead7ea00230fbafc6e69f8b123effc8d6f771f5dfda9d84613"
+  },
+  "park_4": {
+    "asset": "assets/map/poi/icons/park_4.webp",
+    "bytes": 14874,
+    "sha256": "f27336584393990d7c125ad71396d866e50645280b51a7c4eb3c1daa23254fb6"
+  },
+  "park_5": {
+    "asset": "assets/map/poi/icons/park_5.webp",
+    "bytes": 18466,
+    "sha256": "ae5ad8cea3707beeda4b4ca3694a9b7dfa3b9fa0c9ca9554301f853c7bb875f3"
+  },
+  "park_6": {
+    "asset": "assets/map/poi/icons/park_6.webp",
+    "bytes": 9624,
+    "sha256": "712e900ef929ec4724c79b8229806c3f58c31c6ad64c36bbaa66c2be00c347b1"
+  },
+  "park_7": {
+    "asset": "assets/map/poi/icons/park_7.webp",
+    "bytes": 16508,
+    "sha256": "3857b6492253cf2f446b50011c36b512fb80fe96bab6c1f5a62da2b681d7084b"
+  },
+  "park_8": {
+    "asset": "assets/map/poi/icons/park_8.webp",
+    "bytes": 17078,
+    "sha256": "a8ed4f54e3bbd4d0bcf980ec96bfc8a77fa01c0edafb5d9017b620b86b0d51dc"
+  },
+  "park_9": {
+    "asset": "assets/map/poi/icons/park_9.webp",
+    "bytes": 11378,
+    "sha256": "f7519eabc9dd17ac6c94e872fdb8b1db83c09640a6fce178c02ad69482d96989"
+  },
+  "pitch_1": {
+    "asset": "assets/map/poi/icons/pitch_1.webp",
+    "bytes": 10632,
+    "sha256": "b01058da9e7718a87c3b441af5d3adb6c7c48892c8985732bcf78378b2a34c80"
+  },
+  "pitch_2": {
+    "asset": "assets/map/poi/icons/pitch_2.webp",
+    "bytes": 12554,
+    "sha256": "06cf5420126047b72f3368d9e2ff30fcad767554d5c167cbeb568af503893eba"
+  },
+  "pitch_3": {
+    "asset": "assets/map/poi/icons/pitch_3.webp",
+    "bytes": 14304,
+    "sha256": "f8aa9d2a1e44c123310af4e42432f9f52055d3f1ed9faada7580b76834a4afbb"
   },
   "religious-christian_1": {
     "asset": "assets/map/poi/icons/religious-christian_1.webp",
@@ -69,25 +394,180 @@
     "bytes": 7686,
     "sha256": "ee878df7c840e5b47c9488ddebd79d010fc06950545bcf88eead40bbdead0f7f"
   },
+  "religious-christian_3": {
+    "asset": "assets/map/poi/icons/religious-christian_3.webp",
+    "bytes": 11174,
+    "sha256": "74dbff3940b35a411cea2b156c714929639dd268a458bb4d74876ef3e412d49d"
+  },
+  "religious-christian_4": {
+    "asset": "assets/map/poi/icons/religious-christian_4.webp",
+    "bytes": 10432,
+    "sha256": "1010ca2fc9c9867380fc76b2432bf0bf59567552f7d074f40bd3964b23a3027a"
+  },
+  "religious-christian_5": {
+    "asset": "assets/map/poi/icons/religious-christian_5.webp",
+    "bytes": 11374,
+    "sha256": "0041532bc4dea5373285ba15b6540c4462b564bb4414da174319fbc87facfade"
+  },
+  "religious-christian_6": {
+    "asset": "assets/map/poi/icons/religious-christian_6.webp",
+    "bytes": 10904,
+    "sha256": "0ab7042659c20ea20ce093686a6869d11bd220fde2e1348a0c843b6f66aa3737"
+  },
+  "religious-christian_7": {
+    "asset": "assets/map/poi/icons/religious-christian_7.webp",
+    "bytes": 13840,
+    "sha256": "343eca582626dc5d8ac551779d26eb067e568f845874516f6fd4193a40cd9f9f"
+  },
+  "religious-christian_8": {
+    "asset": "assets/map/poi/icons/religious-christian_8.webp",
+    "bytes": 12376,
+    "sha256": "2e466e5bc6879117426d794efc244c70159c27e7f1874de93187cea864ac51c6"
+  },
+  "religious-christian_9": {
+    "asset": "assets/map/poi/icons/religious-christian_9.webp",
+    "bytes": 11124,
+    "sha256": "2d8204de6302cfd2195fc523f1a900dd7544891da1e7b370f6b951505b3b9f3c"
+  },
+  "restaurant-pizza_1": {
+    "asset": "assets/map/poi/icons/restaurant-pizza_1.webp",
+    "bytes": 17212,
+    "sha256": "c1c797f410207bfdf4f0384ac1f33f0780f02c4467e393386ef1330c46171ce8"
+  },
+  "restaurant-pizza_2": {
+    "asset": "assets/map/poi/icons/restaurant-pizza_2.webp",
+    "bytes": 15350,
+    "sha256": "efbfecb938a62aec70d15701010aff703836c6ef633099159763498410fc6663"
+  },
   "restaurant_1": {
     "asset": "assets/map/poi/icons/restaurant_1.webp",
     "bytes": 15398,
     "sha256": "94e0e0b42e5f79a41082df5cffe8d0accd94211fd43894a3d8639da2f496c7b6"
+  },
+  "restaurant_10": {
+    "asset": "assets/map/poi/icons/restaurant_10.webp",
+    "bytes": 10504,
+    "sha256": "2c73f2eb14d5272bc317b6e1d8811a00be93bc61afaf66ada7f9835972a5a54b"
+  },
+  "restaurant_11": {
+    "asset": "assets/map/poi/icons/restaurant_11.webp",
+    "bytes": 12844,
+    "sha256": "ffcaa62e0eadd8db0fc94d5c8191030ea153cac51fb60a0ab46c723b77d4b6c5"
+  },
+  "restaurant_12": {
+    "asset": "assets/map/poi/icons/restaurant_12.webp",
+    "bytes": 14314,
+    "sha256": "e8b4f074063b128632ab4d3fd43e364a6d105a3e10d2f2e4f33d30a6ba1937ff"
+  },
+  "restaurant_13": {
+    "asset": "assets/map/poi/icons/restaurant_13.webp",
+    "bytes": 14058,
+    "sha256": "16135d7b54edd1bc870a53698334cda27baeec0eb37da2d0d633a45b3a97c19e"
+  },
+  "restaurant_14": {
+    "asset": "assets/map/poi/icons/restaurant_14.webp",
+    "bytes": 10738,
+    "sha256": "837f35dc51de06a69c4d1c75ca841aa9ef8422a11b8b4dbb1f2f0067f5c16206"
   },
   "restaurant_2": {
     "asset": "assets/map/poi/icons/restaurant_2.webp",
     "bytes": 11462,
     "sha256": "dc929d0ea32a457b438e3b7dd03c2922ff3c832aa2e623b62d7be5af651a8b39"
   },
+  "restaurant_3": {
+    "asset": "assets/map/poi/icons/restaurant_3.webp",
+    "bytes": 14102,
+    "sha256": "2f0704c6376212648698738b00db5d253cec5a85f6e5db659bf002fb3e609f90"
+  },
+  "restaurant_4": {
+    "asset": "assets/map/poi/icons/restaurant_4.webp",
+    "bytes": 6916,
+    "sha256": "b3f86eedd5ae5f567fa2ad508d68818722c5151c3dc5965d8ea7ddcc5b8a34ea"
+  },
+  "restaurant_5": {
+    "asset": "assets/map/poi/icons/restaurant_5.webp",
+    "bytes": 12378,
+    "sha256": "5b73f0c5cdecca03b851e772eed0f5b55d39b0d49a826ca5b5e4586d2deb8866"
+  },
+  "restaurant_6": {
+    "asset": "assets/map/poi/icons/restaurant_6.webp",
+    "bytes": 14826,
+    "sha256": "85bf25c6a53e49057663ac411e127b28a3d358c7eff8f265a443e30918d7f533"
+  },
+  "restaurant_7": {
+    "asset": "assets/map/poi/icons/restaurant_7.webp",
+    "bytes": 13608,
+    "sha256": "670db3dae122998b6576d2523d9d081018982143e57adb78908335ee30601a80"
+  },
+  "restaurant_8": {
+    "asset": "assets/map/poi/icons/restaurant_8.webp",
+    "bytes": 14054,
+    "sha256": "34e286dfdc95a64c95edd19558c1cc21a4485c59df71a4b245cfc644fb993826"
+  },
+  "restaurant_9": {
+    "asset": "assets/map/poi/icons/restaurant_9.webp",
+    "bytes": 14206,
+    "sha256": "b410cd0b261ac473e291cec14f8e01fcbc87eab80f4c96a90c835174b850f83b"
+  },
   "school_1": {
     "asset": "assets/map/poi/icons/school_1.webp",
     "bytes": 14230,
     "sha256": "d2938d38ffc9fe59d10d1e3021b978374061cc18df1771897e479f8a12d232fc"
   },
+  "school_10": {
+    "asset": "assets/map/poi/icons/school_10.webp",
+    "bytes": 10548,
+    "sha256": "52b5c618ac4846593a4760206aaf4147c0e06083898fcf5f93df9008162bb085"
+  },
+  "school_11": {
+    "asset": "assets/map/poi/icons/school_11.webp",
+    "bytes": 14260,
+    "sha256": "f4eca8a5d789c56b5d5905ad9baa5a3e0695c3e55ecd47dda89d49c65c225bf3"
+  },
+  "school_12": {
+    "asset": "assets/map/poi/icons/school_12.webp",
+    "bytes": 9142,
+    "sha256": "efb476dbd852187a12d59facd32df1e5abc2e11d116f6979ea8af36793ec0fe9"
+  },
   "school_2": {
     "asset": "assets/map/poi/icons/school_2.webp",
     "bytes": 13816,
     "sha256": "74ec00a07c531e8137836f2dd401964db55e0c9d69fa442093e8333635a5225d"
+  },
+  "school_3": {
+    "asset": "assets/map/poi/icons/school_3.webp",
+    "bytes": 8164,
+    "sha256": "e2450507c2003daea5a46c2c7bab577c862a519a1feb4355345abad25cb06503"
+  },
+  "school_4": {
+    "asset": "assets/map/poi/icons/school_4.webp",
+    "bytes": 13104,
+    "sha256": "7a0ac222ca6fcf6f840cae9886572b32947c96173d603c35c06ddce986f2e6f9"
+  },
+  "school_5": {
+    "asset": "assets/map/poi/icons/school_5.webp",
+    "bytes": 10278,
+    "sha256": "61caf08abbbe0290616339fb61ba4001253be9e59f7338ed91275bac6a33a58b"
+  },
+  "school_6": {
+    "asset": "assets/map/poi/icons/school_6.webp",
+    "bytes": 11960,
+    "sha256": "5f68b14f2015f92f87acde50a5c5041d5d120f5e418093bd99e30098e1e1acb0"
+  },
+  "school_7": {
+    "asset": "assets/map/poi/icons/school_7.webp",
+    "bytes": 16098,
+    "sha256": "aa9ae40a46fe6e5dec181f19b1309b6c219467f1801f74fc31004296f934b389"
+  },
+  "school_8": {
+    "asset": "assets/map/poi/icons/school_8.webp",
+    "bytes": 15038,
+    "sha256": "428658ff76ddb42f8af6ff866170442dc070f306acb6a4e0e7648abba852ecb3"
+  },
+  "school_9": {
+    "asset": "assets/map/poi/icons/school_9.webp",
+    "bytes": 10166,
+    "sha256": "11152dee7f0e8953fa08a1ffe503861b0877282ea80c369947127dc5b100a785"
   },
   "shop_1": {
     "asset": "assets/map/poi/icons/shop_1.webp",
@@ -98,5 +578,50 @@
     "asset": "assets/map/poi/icons/shop_2.webp",
     "bytes": 9606,
     "sha256": "b7da30d0f44fb0302ec691c841a81e58627eff3852b91555641a7bff7b276888"
+  },
+  "shop_3": {
+    "asset": "assets/map/poi/icons/shop_3.webp",
+    "bytes": 12016,
+    "sha256": "beb882c55a6eed6c33804e1e315a512456b279ff24419b160d49e6b6c51ad6bb"
+  },
+  "shop_4": {
+    "asset": "assets/map/poi/icons/shop_4.webp",
+    "bytes": 11756,
+    "sha256": "8af59a68c467268d1607fdcf473febab15141b4caaec57aae10d5ce3697d6dba"
+  },
+  "shop_5": {
+    "asset": "assets/map/poi/icons/shop_5.webp",
+    "bytes": 9180,
+    "sha256": "a9b8aae07823f7e24512ddd29882dd70072780a75cbb0369550e8e120553e2f7"
+  },
+  "shop_6": {
+    "asset": "assets/map/poi/icons/shop_6.webp",
+    "bytes": 12782,
+    "sha256": "f11d99f7e32bb17c942766f63d92fc583a2d7186f336f58669748fc7185884ab"
+  },
+  "shop_7": {
+    "asset": "assets/map/poi/icons/shop_7.webp",
+    "bytes": 10924,
+    "sha256": "b94fee1b438e9d74c0ce1ec9836c8d920412c57c4c1b01dd1139cc17d89d481e"
+  },
+  "theatre_1": {
+    "asset": "assets/map/poi/icons/theatre_1.webp",
+    "bytes": 9732,
+    "sha256": "83c74f1f64426c0dc1d1c5ab438c751f14500cac531a9626f600df0b040685ed"
+  },
+  "theatre_2": {
+    "asset": "assets/map/poi/icons/theatre_2.webp",
+    "bytes": 13152,
+    "sha256": "20877ead8715bf6224bbb5d292794966b36c6eaebe119c00a8d474decb910503"
+  },
+  "town-hall_1": {
+    "asset": "assets/map/poi/icons/town-hall_1.webp",
+    "bytes": 11942,
+    "sha256": "b91623743b312e6bda3929613f91610f55bcfc1bf502da3acc4ef2e581dd4384"
+  },
+  "town-hall_2": {
+    "asset": "assets/map/poi/icons/town-hall_2.webp",
+    "bytes": 9998,
+    "sha256": "b2939d6e2d46216037109079b96d3129739772dac118dc6506342d92eebb54b3"
   }
 }

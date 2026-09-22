@@ -27,7 +27,12 @@ func test_provider_results_validate_coordinates_and_deduplicate() -> void:
 	assert_bool(points[0].has("address")).is_false()
 
 func test_landmark_coordinates_are_independent_of_player_save() -> void:
-	assert_array(CityMapData.landmarks("shanghai")).is_empty()
+	assert_array(CityMapData.landmarks("tokyo")).is_empty()
+	for sh in CityMapData.landmarks("shanghai"):
+		assert_float(float(sh.lat)).is_between(31.1, 31.35)
+		assert_float(float(sh.lng)).is_between(121.35, 121.6)
+		assert_bool(ResourceLoader.exists("res://assets/map/poi/%s.png" % sh.art)).override_failure_message("missing art " + str(sh.art)).is_true()
+	assert_int(CityMapData.landmarks("shanghai").size()).is_equal(5)
 	var points := CityMapData.landmarks("los_angeles")
 	assert_int(points.size()).is_equal(5)
 	for point in points:
@@ -37,7 +42,7 @@ func test_landmark_coordinates_are_independent_of_player_save() -> void:
 
 func test_residents_follow_existing_unlock_rules() -> void:
 	assert_array(CityMapData.residents("los_angeles", {})).is_empty()
-	assert_array(CityMapData.residents("shanghai", {"clock":{"chapter_index":6}})).is_empty()
+	assert_array(CityMapData.residents("tokyo", {"clock":{"chapter_index":0}})).is_empty()
 	var state := {"clock":{"chapter_index":0}}
 	var actual := CityMapData.residents("los_angeles", state).map(func(p): return str(p.id))
 	var expected := []
@@ -116,5 +121,29 @@ func test_city_has_no_neighbour_list_or_jump_entry_at_any_size() -> void:
 		m._city_action("map")
 		assert_bool(m.city_map.list_panel.visible).is_false()
 	assert_that(FarmChoice.load()).is_equal(saved)
+	FarmChoice.clear()
+	FarmRegions.clear_choice()
+
+func test_shanghai_uses_the_same_city_map_framework() -> void:
+	FarmChoice.save("sh_a", 2)
+	FarmRegions.save_choice("shanghai")
+	Net.use_transport(FakeTransport.new([]).callable())
+	var m := load("res://scenes/map_poc/map_poc.tscn").instantiate() as Node
+	add_child(auto_free(m))
+	await get_tree().process_frame
+	# 有城市配置就装城市地图，不再走旧的附近列表/旅程地图。
+	assert_object(m.city_map).is_not_null()
+	assert_object(m.nearby_panel).is_null()
+	assert_str(m.city_map.get_node("MapCity").text).is_equal(L10n.text("Shanghai"))
+	var ids: Array = m.city_map.entries.filter(func(e): return e.kind == "landmark").map(func(e): return str(e.id))
+	assert_array(ids).contains(["oriental_pearl_tower", "the_bund", "yu_garden"])
+	# 可拖动范围取上海的选址范围，总览飞到上海市区。
+	m._city_bounds()
+	assert_bool(m.pan_bounds.has_point(Vector2(31.2304, 121.4737))).is_true()
+	assert_bool(m.pan_bounds.has_point(Vector2(34.05, -118.24))).is_false()
+	m._city_action("map")
+	await get_tree().create_timer(0.7).timeout
+	assert_float(m.center_lat).is_between(31.1, 31.35)
+	assert_float(m.center_lng).is_between(121.35, 121.6)
 	FarmChoice.clear()
 	FarmRegions.clear_choice()
