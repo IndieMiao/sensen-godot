@@ -10,6 +10,19 @@ const MUTED := Color("69716e")
 const LIME := Color("cafa91")
 const CONTENT_TOP := 108.0
 const POI_CACHE_LIMIT := 400
+## Anti-flicker: packing tests use a dead zone (incumbents keep their slot until
+## overlap exceeds the margin; newcomers need clearance plus the margin), and a
+## marker that lost its slot cannot re-enter within the cooldown.
+const PACK_MARGIN := 8.0
+const REAPPEAR_COOLDOWN_MS := 400
+## Display diversity: once this many dining markers are placed, remaining dining
+## candidates wait until every non-dining candidate had its chance at the space.
+const DINING_QUOTA := 4
+const DINING_ARTS := ["restaurant", "chinese_restaurant", "cafe", "bakery"]
+## Design: the soft shadow is larger than the artwork's baked base and bleeds
+## out around it; sized relative to the billboard's world height.
+const SHADOW_WIDTH := 1.35
+const SHADOW_DEPTH := 0.7
 var host: Node
 var filter := "all"
 var selected: Dictionary = {}
@@ -47,14 +60,16 @@ var _art_root: Node3D
 ## Ids displayed last frame: ties in screen-space packing keep the incumbent,
 ## so pan/zoom never flickers between two equally-ranked neighbours.
 var _shown_last: Dictionary = {}
+## id -> ticks_msec before which a culled marker may not reappear.
+var _hidden_until: Dictionary = {}
 static var _shadow_mesh: QuadMesh
 
 ## Shared flat ellipse under each artwork (design: very light soft shadow).
 static func ground_shadow_mesh() -> QuadMesh:
 	if _shadow_mesh: return _shadow_mesh
 	var gradient := Gradient.new()
-	gradient.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
-	gradient.colors = PackedColorArray([Color(0.13, 0.17, 0.13, 0.30), Color(0.13, 0.17, 0.13, 0.12), Color(0.13, 0.17, 0.13, 0.0)])
+	gradient.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
+	gradient.colors = PackedColorArray([Color(0.13, 0.17, 0.13, 0.34), Color(0.13, 0.17, 0.13, 0.15), Color(0.13, 0.17, 0.13, 0.0)])
 	var texture := GradientTexture2D.new()
 	texture.gradient = gradient
 	texture.fill = GradientTexture2D.FILL_RADIAL
@@ -361,6 +376,8 @@ func dismiss_overlays() -> void:
 	clear_selection()
 
 func clear_selection() -> void:
+	# 取消时快速缩回（比选中弹入快，见设计反馈 #7）。
+	if not selected.is_empty(): _animate_focus(str(selected.get("id", "")), 1.0, 0.14)
 	selected = {}
 	if info: info.hide()
 	if is_instance_valid(recenter): _layout()
@@ -396,7 +413,11 @@ func _name(entry: Dictionary) -> String:
 func select(entry: Dictionary) -> void:
 	sheet_opened.emit()
 	list_panel.hide()
+	# 果冻式弹起标记选中项；换选时旧项快速缩回。
+	if not selected.is_empty() and str(selected.get("id", "")) != str(entry.get("id", "")):
+		_animate_focus(str(selected.get("id", "")), 1.0, 0.14)
 	selected = entry
+	_animate_focus(str(entry.get("id", "")), 1.15, 0.28)
 	info_title.text = _name(entry)
 	info_category.text = L10n.text(str(entry.get("category", "Place"))) + " · " + L10n.text(str(host.region.get("name", "Los Angeles")))
 	info_address.text = str(entry.get("address", ""))
@@ -466,6 +487,9 @@ func _merge_pois(incoming: Array) -> void:
 		if known.has(id):
 			entry.lat = known[id].lat
 			entry.lng = known[id].lng
+			# Rank keeps its first-seen value: filterrank drifts between tile
+			# zoom levels and would otherwise toggle displayed markers mid-pan.
+			if known[id].has("rank"): entry.rank = known[id].rank
 			known.erase(id)
 		known[id] = entry
 	# Bounded in-memory cache; evict oldest offscreen entries only.
@@ -497,7 +521,7 @@ func _make_marker(entry: Dictionary) -> Dictionary:
 	node.name = "CityMarker_" + str(entry.id).validate_node_name()
 	add_child(node)
 	move_child(node, 0)
-	var result := {"node": node, "entry": entry, "rect": Rect2()}
+	var result := {"node": node, "entry": entry, "rect": Rect2(), "on": false, "pop": 0.0, "focus": 1.0}
 	if entry.kind == "resident":
 		var portrait := MapPortrait.new()
 		portrait.npc = true
@@ -560,53 +584,35 @@ func _update_markers() -> void:
 		var side := maxf(width, art_side)
 		var bounds := Rect2(point - Vector2(side * 0.5, top), Vector2(side, top + 20))
 		candidates.append({"entry": entry, "id": id, "world": world, "point": point,
-			"bounds": bounds, "width": width, "art_side": art_side})
+			"bounds": bounds, "width": width, "art_side": art_side, "art": art_key})
 	# Screen-space packing: anchors never move; a marker either shows in place
 	# or yields entirely. Order: selected, landmarks, residents, then POIs by
 	# incumbency (anti-flicker), source rank and id — fully deterministic.
 	candidates.sort_custom(func(a, b): return _pack_key(a) < _pack_key(b))
 	var blockers := _player_blockers()
+	var now := Time.get_ticks_msec()
 	var occupied: Array = []
+	# Dining quota: deferred dining candidates fill whatever space remains after
+	# every non-dining candidate was offered its spot (skipped under the food filter).
+	var deferred: Array = []
+	var dining := 0
 	for c in candidates:
-		var entry: Dictionary = c.entry
-		var id: String = c.id
-		var is_selected: bool = selected.get("id", null) == entry.get("id")
-		var label_fits := true
-		if entry.kind == "landmark":
-			# Landmark artwork is the city's identity: never culled, only its label yields.
-			label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
-		elif not is_selected:
-			if _hits(occupied, c.bounds): continue
-			# People stay readable: markers yield to player/avatar footprints.
-			if _hits(blockers, c.bounds): continue
-		occupied.append(c.bounds)
-		if not markers.has(id): markers[id] = _make_marker(entry)
-		var marker: Dictionary = markers[id]
-		marker.entry = entry
-		marker.node.position = c.point
-		marker.rect = c.bounds
-		marker.anchor = c.point
-		if entry.kind == "resident":
-			marker.portrait.position = Vector2(-18, -38)
-			marker.label.text = _name(entry) + (" · " + L10n.text(entry.status) if entry.status == "Ready to deliver" else "")
-		else:
-			_place_art(marker, c)
-		if entry.kind != "resident": marker.label.text = _name(entry)
-		marker.label.position = Vector2(-c.width * 0.5, 3)
-		marker.label.size = Vector2(c.width, 16)
-		marker.label.add_theme_font_size_override("font_size", 9)
-		marker.label.visible = label_fits and (entry.kind != "poi" or is_selected or host.zoom >= 16)
-		displayed.append(marker)
+		if filter != "food" and c.entry.kind == "poi" and dining >= DINING_QUOTA and str(c.art) in DINING_ARTS:
+			deferred.append(c)
+			continue
+		if _place_candidate(c, occupied, blockers, now) and c.entry.kind == "poi" and str(c.art) in DINING_ARTS:
+			dining += 1
+	for c in deferred:
+		_place_candidate(c, occupied, blockers, now)
 	var shown := displayed.map(func(m): return str(m.entry.id))
 	_shown_last = {}
 	for id in shown: _shown_last[id] = true
 	for id in markers.keys():
-		var on: bool = shown.has(id)
-		markers[id].node.visible = on
-		if markers[id].has("sprite"):
-			markers[id].sprite.visible = on
-			markers[id].shadow.visible = on
+		_set_marker_shown(markers[id], shown.has(id))
 		if not keep.has(id): _free_marker(id)
+	if _hidden_until.size() > 256:
+		for id in _hidden_until.keys():
+			if now >= int(_hidden_until[id]): _hidden_until.erase(id)
 	if _provider_error.is_empty():
 		status.text = L10n.text("No dining places in view. Move or zoom the map.") if filter == "food" and displayed.is_empty() else ""
 	if selected.get("kind") == "resident" and markers.has(selected.id):
@@ -614,6 +620,94 @@ func _update_markers() -> void:
 		if not portrait._shown_key.is_empty() and portrait._shown_key == portrait._desired_key:
 			info_art.texture = portrait.portrait.texture
 	# Keep controls on top even when dynamically creating markers.
+
+## One placement attempt. Anchors never move: on success the marker is laid out
+## in place, on failure it stays hidden this frame. Dead-zone margins plus the
+## reappear cooldown keep boundary oscillation from flickering markers.
+func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int) -> bool:
+	var entry: Dictionary = c.entry
+	var id: String = c.id
+	var is_selected: bool = selected.get("id", null) == entry.get("id")
+	var incumbent: bool = _shown_last.has(id)
+	var label_fits := true
+	if entry.kind == "landmark":
+		# Landmark artwork is the city's identity: never culled, only its label yields.
+		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
+	elif not is_selected:
+		if not incumbent and now < int(_hidden_until.get(id, 0)): return false
+		var probe: Rect2 = c.bounds.grow(-PACK_MARGIN if incumbent else PACK_MARGIN)
+		# People stay readable: markers yield to player/avatar footprints too.
+		if _hits(occupied, probe) or _hits(blockers, probe):
+			if incumbent: _hidden_until[id] = now + REAPPEAR_COOLDOWN_MS
+			return false
+	occupied.append(c.bounds)
+	if not markers.has(id): markers[id] = _make_marker(entry)
+	var marker: Dictionary = markers[id]
+	marker.entry = entry
+	marker.node.position = c.point
+	marker.rect = c.bounds
+	marker.anchor = c.point
+	if entry.kind == "resident":
+		marker.portrait.position = Vector2(-18, -38)
+		marker.label.text = _name(entry) + (" · " + L10n.text(entry.status) if entry.status == "Ready to deliver" else "")
+	else:
+		_place_art(marker, c)
+	if entry.kind != "resident": marker.label.text = _name(entry)
+	marker.label.position = Vector2(-c.width * 0.5, 3)
+	marker.label.size = Vector2(c.width, 16)
+	marker.label.add_theme_font_size_override("font_size", 9)
+	marker.label.visible = label_fits and (entry.kind != "poi" or is_selected or host.zoom >= 16)
+	displayed.append(marker)
+	return true
+
+## Marker scale = pop (appear/disappear) x focus (selection jelly), anchored at
+## the geographic point: the 2D node scales around its origin, the billboard and
+## shadow scale in world space so camera motion never drags a mid-animation art.
+func _apply_marker_scale(marker: Dictionary) -> void:
+	var s := maxf(0.001, float(marker.get("pop", 1.0)) * float(marker.get("focus", 1.0)))
+	marker.node.scale = Vector2.ONE * s
+	if marker.has("sprite"):
+		var h := float(marker.get("world_h", 1.0))
+		marker.sprite.scale = Vector3.ONE * h * s
+		marker.shadow.scale = Vector3(h * SHADOW_WIDTH, 1.0, h * SHADOW_DEPTH) * s
+
+func _set_marker_shown(marker: Dictionary, on: bool) -> void:
+	if bool(marker.get("on", false)) == on: return
+	marker.on = on
+	if marker.get("pop_tween") is Tween: (marker.pop_tween as Tween).kill()
+	var tween := create_tween()
+	marker.pop_tween = tween
+	if on:
+		marker.node.visible = true
+		if marker.has("sprite"):
+			marker.sprite.visible = true
+			marker.shadow.visible = true
+		tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_method(func(v: float):
+			marker.pop = v
+			_apply_marker_scale(marker), float(marker.get("pop", 0.0)), 1.0, 0.22)
+	else:
+		# 标签立即让位；世界空间贴图快速缩没（比弹入快），拖动中也不会漂移。
+		marker.node.visible = false
+		tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tween.tween_method(func(v: float):
+			marker.pop = v
+			_apply_marker_scale(marker), float(marker.get("pop", 1.0)), 0.0, 0.12)
+		tween.tween_callback(func():
+			if marker.has("sprite"):
+				marker.sprite.visible = false
+				marker.shadow.visible = false)
+
+func _animate_focus(id: String, to: float, duration: float) -> void:
+	if not markers.has(id): return
+	var marker: Dictionary = markers[id]
+	if marker.get("focus_tween") is Tween: (marker.focus_tween as Tween).kill()
+	var tween := create_tween()
+	marker.focus_tween = tween
+	if to > 1.0: tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_method(func(v: float):
+		marker.focus = v
+		_apply_marker_scale(marker), float(marker.get("focus", 1.0)), to, duration)
 
 func _pack_key(c: Dictionary) -> Array:
 	var kind_order := {"landmark": 0, "resident": 1, "poi": 2}
@@ -644,20 +738,23 @@ func _place_art(marker: Dictionary, c: Dictionary) -> void:
 	var dist := maxf(0.01, host.cam.global_position.distance_to(world))
 	var viewport_h := maxf(1.0, get_viewport_rect().size.y)
 	var world_h: float = c.art_side * 2.0 * dist * tan(deg_to_rad(host.cam.fov) * 0.5) / viewport_h
-	var sprite: Sprite3D = marker.sprite
-	sprite.position = world
-	sprite.scale = Vector3.ONE * world_h
-	var shadow: MeshInstance3D = marker.shadow
-	shadow.position = world
-	shadow.scale = Vector3(world_h * 0.8, 1.0, world_h * 0.45)
+	marker.world_h = world_h
+	marker.sprite.position = world
+	# 阴影大于素材底座并向屏幕下方微偏，让它像设计稿那样从底座四周溢出。
+	var heading := Vector3(sin(deg_to_rad(host.bearing)), 0.0, -cos(deg_to_rad(host.bearing)))
+	marker.shadow.position = world - heading * (world_h * 0.06)
+	_apply_marker_scale(marker)
 
 func _free_marker(id: String) -> void:
 	var marker: Dictionary = markers[id]
+	if marker.get("pop_tween") is Tween: (marker.pop_tween as Tween).kill()
+	if marker.get("focus_tween") is Tween: (marker.focus_tween as Tween).kill()
 	marker.node.queue_free()
 	if marker.has("sprite"):
 		marker.sprite.queue_free()
 		marker.shadow.queue_free()
 	markers.erase(id)
+	_hidden_until.erase(id)
 
 func activate_at(screen: Vector2) -> bool:
 	var local := screen - global_position

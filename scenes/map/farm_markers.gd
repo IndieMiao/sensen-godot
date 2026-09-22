@@ -51,6 +51,9 @@ var city_mode := false:
 			_city_styled.clear()
 var _city_styled := {}
 var expanded_avatar_id := ""
+## 城市模式玩家 pin 打包：上帧在位者带 8px 死区防闪烁；被折叠者计入幸存者的 +N。
+const CITY_PACK_MARGIN := 8.0
+var _city_shown_last: Dictionary = {}
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -246,12 +249,23 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 	var area := Rect2(-global_position, get_viewport_rect().size).grow(140)
 	var ids := points.keys()
 	ids.sort()
+	# 打包顺序：3D 的自己永不被盖 > 展开全身者 > 选中者 > 其余（id 稳定序）。
+	# 锚点绝不挪动：重叠的 pin 整个折叠，计入幸存者名牌的 +N；被折叠的玩家
+	# 仍然在附近农场主面板里可选。
+	for priority in [selected_id, expanded_avatar_id, "self"]:
+		if ids.has(priority):
+			ids.erase(priority)
+			ids.push_front(priority)
+	var occupied: Array = []
+	var pile: Dictionary = {}
+	var shown_now: Dictionary = {}
+	var anchors: Dictionary = {}
 	for id in ids:
 		var ll: Vector2 = points[id].center
 		var world := MapGeoMath.geo_to_world(ll.x, ll.y, lat, lng)
 		var anchor := cam.unproject_position(world) - global_position
-		var shown := not cam.is_position_behind(world) and area.has_point(anchor)
 		world_positions[id] = world
+		anchors[id] = anchor
 		var target: Button = _avatar_targets[id]
 		var label: Button = _buttons[id]
 		if not _city_styled.has(id):
@@ -268,14 +282,37 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 		_badges[id].visible = false
 		var full_body: bool = id == "self" or id == expanded_avatar_id
 		target.size = Vector2(70, 130) if full_body else Vector2(44, 44)
-		target.position = anchor - Vector2(target.size.x * 0.5, target.size.y - 2)
-		for portrait in target.get_children():
-			portrait.visible = not full_body
-			portrait.position = Vector2(4, 4)
-		label.position = anchor + Vector2(-label.size.x * 0.5, 6)
-		label.visible = shown
-		target.visible = shown
-		if shown: visible_farm_ids.append(id)
+		var rect := Rect2(anchor - Vector2(target.size.x * 0.5, target.size.y - 2), target.size).merge(
+			Rect2(anchor + Vector2(-label.size.x * 0.5, 6), label.size))
+		var placed := not cam.is_position_behind(world) and area.has_point(anchor)
+		if placed and not (id == "self" or id == expanded_avatar_id or id == selected_id):
+			var probe := rect.grow(-CITY_PACK_MARGIN if _city_shown_last.has(id) else CITY_PACK_MARGIN)
+			for pair in occupied:
+				if (pair[0] as Rect2).intersects(probe):
+					placed = false
+					pile[pair[1]] = int(pile.get(pair[1], 0)) + 1
+					break
+		if placed:
+			occupied.append([rect, id])
+			shown_now[id] = true
+			target.position = anchor - Vector2(target.size.x * 0.5, target.size.y - 2)
+			for portrait in target.get_children():
+				portrait.visible = not full_body
+				portrait.position = Vector2(4, 4)
+			label.position = anchor + Vector2(-label.size.x * 0.5, 6)
+			visible_farm_ids.append(id)
+		label.visible = placed
+		target.visible = placed
+	for id in visible_farm_ids:
+		var entry: Dictionary = points[id]
+		var owner := str(entry.owner_name) if str(entry.avatar_ref).is_empty() else SeededOutfit.short_name(str(entry.avatar_ref))
+		# 折叠数量的 +N 不能被省略号吃掉：带后缀时名牌加宽并保持锚点居中。
+		var label: Button = _buttons[id]
+		label.custom_minimum_size.x = 96.0 if pile.has(id) else 66.0
+		label.size = Vector2(label.custom_minimum_size.x, 20)
+		label.position.x = (anchors[id] as Vector2).x - label.size.x * 0.5
+		_owner_labels[id].text = L10n.text(owner) + (" +%d" % int(pile[id]) if pile.has(id) else "")
+	_city_shown_last = shown_now
 	# Deterministic paint order; selecting never relocates neighbouring portraits.
 	if visible_farm_ids.has(selected_id):
 		move_child(_avatar_targets[selected_id], -1)

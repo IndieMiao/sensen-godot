@@ -87,6 +87,74 @@ func test_marker_packing_prefers_rank_keeps_incumbents_and_never_shows_fallback_
 	city._update_markers()
 	assert_array(city.displayed).is_empty()
 
+func test_marker_packing_diversifies_dining_and_keeps_first_seen_rank() -> void:
+	var m := _map()
+	await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	city.entries = []
+	var lat: float = m.home_lat + 0.02
+	var lng: float = m.home_lng + 0.02
+	m.center_lat = lat
+	m.center_lng = lng
+	m.zoom = 16.0
+	m._update_cameras()
+	m._sync_farm_markers()
+	# 四家分散的餐饮把配额吃满后，与第五家餐饮同点的商店优先拿到空间。
+	city.live_pois = [
+		{"id": "a_d1", "kind": "poi", "name": "D1", "lat": lat, "lng": lng - 0.004, "art": "restaurant", "rank": 1},
+		{"id": "a_d2", "kind": "poi", "name": "D2", "lat": lat, "lng": lng - 0.002, "art": "cafe", "rank": 1},
+		{"id": "a_d3", "kind": "poi", "name": "D3", "lat": lat, "lng": lng + 0.002, "art": "bakery", "rank": 1},
+		{"id": "a_d4", "kind": "poi", "name": "D4", "lat": lat, "lng": lng + 0.004, "art": "chinese_restaurant", "rank": 1},
+		{"id": "b_shop", "kind": "poi", "name": "Shop", "lat": lat + 0.002, "lng": lng, "art": "shop", "rank": 5},
+		{"id": "z_d5", "kind": "poi", "name": "D5", "lat": lat + 0.002, "lng": lng, "art": "restaurant", "rank": 1},
+	]
+	city._update_markers()
+	var shown: Array = city.displayed.map(func(mk): return str(mk.entry.id))
+	assert_array(shown).contains(["a_d1", "a_d2", "a_d3", "a_d4", "b_shop"])
+	assert_bool(shown.has("z_d5")).is_false()
+	# 餐饮筛选下配额不生效：同点只剩餐饮时 z_d5 直接上位。
+	city.filter = "food"
+	city._update_markers()
+	shown = city.displayed.map(func(mk): return str(mk.entry.id))
+	assert_bool(shown.has("z_d5")).is_true()
+	city.filter = "all"
+	# rank 保持首见值：回包里同一 POI 的 filterrank 漂移不再挤掉在位标记。
+	city._merge_pois([{"id": "a_d1", "kind": "poi", "name": "D1", "lat": lat, "lng": lng - 0.004, "art": "restaurant", "rank": 9}])
+	assert_int(int(city.live_pois.filter(func(p): return str(p.id) == "a_d1")[0].rank)).is_equal(1)
+
+func test_culled_marker_waits_out_the_reappear_cooldown() -> void:
+	var m := _map()
+	await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	city.entries = []
+	var lat: float = m.home_lat + 0.02
+	var lng: float = m.home_lng + 0.02
+	m.center_lat = lat
+	m.center_lng = lng
+	m.zoom = 16.0
+	m._update_cameras()
+	m._sync_farm_markers()
+	city.live_pois = [{"id": "poi_p", "kind": "poi", "name": "P", "lat": lat, "lng": lng, "art": "restaurant", "rank": 1}]
+	city._update_markers()
+	assert_bool(city.displayed.any(func(mk): return str(mk.entry.id) == "poi_p")).is_true()
+	# 一个地标扫过它的位置：在位者被挤掉并进入重现冷却。
+	city.entries = [{"id": "lm", "kind": "landmark", "name": "LM", "lat": lat, "lng": lng, "art": "hollywood_sign"}]
+	city._update_markers()
+	assert_bool(city.displayed.any(func(mk): return str(mk.entry.id) == "poi_p")).is_false()
+	# 地标离开后冷却未到，marker 不立刻回来——这是拖动防闪烁的核心。
+	city.entries = []
+	city._update_markers()
+	assert_bool(city.displayed.any(func(mk): return str(mk.entry.id) == "poi_p")).is_false()
+	# 冷却按墙钟计（Time.get_ticks_msec）；无头跑帧的游戏时间快于墙钟，
+	# 所以这里按墙钟轮询等待而不是 create_timer。
+	var deadline := Time.get_ticks_msec() + 450
+	while Time.get_ticks_msec() < deadline:
+		await get_tree().process_frame
+	city._update_markers()
+	assert_bool(city.displayed.any(func(mk): return str(mk.entry.id) == "poi_p")).is_true()
+
 func test_city_pois_yield_to_player_footprints() -> void:
 	var m := _map()
 	await get_tree().process_frame
@@ -107,7 +175,7 @@ func test_city_pois_yield_to_player_footprints() -> void:
 	city._update_markers()
 	assert_bool(city.displayed.any(func(mk): return str(mk.entry.id) == "onp")).is_true()
 
-func test_city_owners_never_cluster_clamp_or_shift_for_selection() -> void:
+func test_city_owner_pins_collapse_overlaps_without_shifting_anchors() -> void:
 	var m := _map()
 	await get_tree().process_frame
 	m.set_process(false)
@@ -118,20 +186,32 @@ func test_city_owners_never_cluster_clamp_or_shift_for_selection() -> void:
 	m.center_lng = bp.overlay.center.y
 	m.zoom = 15
 	m._update_cameras()
-	for selected in ["", "overlap_a", "overlap_b", ""]:
-		markers.selected_id = selected
-		markers.expanded_avatar_id = selected
-		markers.sync(m.cam, m.anchor_lat, m.anchor_lng, Rect2(1, 1, 2, 2))
-		for id in ["overlap_a", "overlap_b"]:
-			var expected := MapGeoMath.geo_to_world(bp.overlay.center.x, bp.overlay.center.y, m.anchor_lat, m.anchor_lng)
-			assert_vector(markers.world_positions[id]).is_equal(expected)
-			var anchor: Vector2 = m.cam.unproject_position(expected) - markers.global_position
-			var target: Button = markers._avatar_targets[id]
-			assert_float((target.position + Vector2(target.size.x / 2, target.size.y - 2)).distance_to(anchor)).is_less(0.001)
-			assert_bool(target.visible).is_true()
-			assert_bool(markers._badges[id].visible).is_false()
-			assert_bool(target.get_child(0).visible).is_equal(id != selected)
-		assert_bool(markers.miniature.visible).is_false()
+	# 三个 pin 同点堆叠：3D 的自己永不被盖，其余折叠进幸存者名牌的 +N。
+	markers.selected_id = ""
+	markers.expanded_avatar_id = ""
+	markers.sync(m.cam, m.anchor_lat, m.anchor_lng, Rect2(1, 1, 2, 2))
+	assert_array(markers.visible_farm_ids).contains_exactly(["self"])
+	var expected := MapGeoMath.geo_to_world(bp.overlay.center.x, bp.overlay.center.y, m.anchor_lat, m.anchor_lng)
+	var anchor: Vector2 = m.cam.unproject_position(expected) - markers.global_position
+	var self_target: Button = markers._avatar_targets["self"]
+	assert_float((self_target.position + Vector2(self_target.size.x / 2, self_target.size.y - 2)).distance_to(anchor)).is_less(0.001)
+	# 洛杉矶夹具农场也会folded进来，数量随夹具变化——只锁定"名字 +N"的形态。
+	assert_bool(str(markers._owner_labels["self"].text).begins_with("My Farm +")).is_true()
+	for id in ["overlap_a", "overlap_b"]:
+		assert_vector(markers.world_positions[id]).is_equal(expected)
+		assert_bool(markers._avatar_targets[id].visible).is_false()
+		assert_bool(markers._badges[id].visible).is_false()
+	# 选中被折叠的玩家：其 pin 无条件回到精确锚点，自己也不消失。
+	markers.selected_id = "overlap_a"
+	markers.expanded_avatar_id = "overlap_a"
+	markers.sync(m.cam, m.anchor_lat, m.anchor_lng, Rect2(1, 1, 2, 2))
+	var a_target: Button = markers._avatar_targets["overlap_a"]
+	assert_bool(a_target.visible).is_true()
+	assert_float((a_target.position + Vector2(a_target.size.x / 2, a_target.size.y - 2)).distance_to(anchor)).is_less(0.001)
+	assert_bool(markers._avatar_targets["self"].visible).is_true()
+	assert_bool(markers._avatar_targets["overlap_b"].visible).is_false()
+	assert_bool(a_target.get_child(0).visible).is_false()
+	assert_bool(markers.miniature.visible).is_false()
 
 func test_partial_empty_and_failed_tile_results_retain_known_pois_and_coordinates() -> void:
 	var m := _map()
