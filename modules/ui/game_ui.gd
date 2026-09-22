@@ -3,16 +3,22 @@ extends RefCounted
 ## Game UI art is generated through the selected Sensenjoy API; native controls
 ## retain editable text, real input targets and the existing game contracts.
 
-const INK := Color("34416f")
-const MUTED := Color("67718f")
-const GREEN := Color("239f9f")
-const MINT := Color("e9ecff")
+## 全 app 与城市地图同一视觉语言（2026-09-23 设计稿 farm-restyle-mockup-v1）：
+## 奶油白卡 + 墨色字 + 青柠主按钮，柔和阴影，不再用紫/青贴图边框。
+const INK := Color("232b30")
+const MUTED := Color("69716e")
+const GREEN := Color("5d8f2e")
+const MINT := Color("f1f6e6")
 const PAPER := Color("fffdf8")
-const BORDER := Color("b9c4f2")
+const BORDER := Color("e4e2d6")
 const GOLD := Color("b57a1b")
 const CORAL := Color("d8787a")
-const BLUE := Color("586bd7")
-const VIOLET := Color("9273dd")
+## 次强调色（图标着色、选中描边、摇杆）：深鼠尾草绿。
+const BLUE := Color("4f7d32")
+const VIOLET := Color("8cc85a")
+const LIME := Color("cafa91")
+const LIME_EDGE := Color("a6dc6c")
+const CARD := Color(1, 1, 1, 0.97)
 const MODAL_GROUP := &"game_ui_modal"
 
 static var _art: Dictionary = {}
@@ -82,9 +88,17 @@ static func surface(color := PAPER, pad := 12, radius := 12) -> StyleBoxFlat:
 	sb.border_color = BORDER
 	sb.set_border_width_all(1)
 	if color.a > 0.8:
-		sb.shadow_color = Color(0.19, 0.23, 0.48, 0.15)
+		sb.shadow_color = Color(0.2, 0.23, 0.2, 0.1)
 		sb.shadow_size = 3
 		sb.shadow_offset = Vector2(0, 2)
+	return sb
+
+## 地图页同款卡面：白底、无描边、大圆角、柔和投影。
+static func card_surface(color := CARD, pad := 8, radius := 16) -> StyleBoxFlat:
+	var sb := surface(color, pad, radius)
+	sb.set_border_width_all(0)
+	sb.shadow_color = Color(0.2, 0.23, 0.2, 0.1)
+	sb.shadow_size = 3 if color.a > 0.1 else 0
 	return sb
 
 static func _texture_style(file: String, pad: int, slice: int, tint := Color.WHITE) -> StyleBox:
@@ -98,11 +112,11 @@ static func _texture_style(file: String, pad: int, slice: int, tint := Color.WHI
 	return style
 
 static func panel_style(pad := 12) -> StyleBox:
-	return _texture_style("control-frame.png", pad, 16) if pad <= 8 else _texture_style("panel-frame.png", pad, 32)
+	return card_surface(CARD, pad, 14 if pad <= 8 else 20)
 
 static func card_style(selected := false, pad := 8) -> StyleBoxFlat:
-	var style := surface(Color("f0f1fc") if not selected else Color("e4eaff"), pad, 10)
-	style.border_color = BLUE if selected else Color("d9def6")
+	var style := surface(Color("f6f5ef") if not selected else Color("eefbe0"), pad, 12)
+	style.border_color = LIME_EDGE if selected else BORDER
 	style.set_border_width_all(2 if selected else 1)
 	style.shadow_size = 1
 	style.shadow_offset = Vector2(0, 1)
@@ -161,13 +175,14 @@ static func theme() -> Theme:
 		if variant not in ["Button", "OptionButton"]: t.set_type_variation(variant, "Button")
 		var accent: bool = variant == "AccentButton"
 		var selected: bool = variant in ["ChoiceSelectedButton", "ItemSlotSelectedButton"]
-		t.set_color("font_color", variant, PAPER if accent else INK)
+		t.set_color("font_color", variant, INK)
 		for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 			var tint := Color.WHITE
 			if state == "hover": tint = Color(1.04, 1.04, 1.04)
 			elif state in ["pressed", "hover_pressed"]: tint = Color(0.88, 0.9, 0.96)
 			elif state == "disabled": tint = Color(0.82, 0.83, 0.88, 0.75)
-			var sb: StyleBox = _texture_style("control-teal.png", 8, 14, tint) if accent else _texture_style("control-frame.png", 8, 16, tint)
+			var sb: StyleBox = card_surface((LIME if accent else CARD) * tint, 8, 16)
+			if state in ["pressed", "hover_pressed"] and not accent: sb = card_surface(LIME, 8, 16)
 			if variant in ["ItemSlotButton", "ItemSlotSelectedButton"]: sb = card_style(selected, 4)
 			elif selected: sb = card_style(true, 8)
 			elif variant == "GhostButton": sb = surface(Color(0.94, 0.95, 1.0, 0.9), 6)
@@ -177,13 +192,8 @@ static func theme() -> Theme:
 		focus.set_border_width_all(2)
 		t.set_stylebox("focus", variant, focus)
 		for state in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
-			t.set_color("font_%s_color" % state, variant, PAPER if accent else INK)
-			t.set_color("icon_%s_color" % state, variant, PAPER if accent else INK)
-		if accent:
-			t.set_color("font_outline_color", variant, Color("246677"))
-			t.set_constant("outline_size", variant, 1)
-			t.set_color("font_shadow_color", variant, Color(0.1, 0.2, 0.34, 0.4))
-			t.set_constant("shadow_offset_y", variant, 1)
+			t.set_color("font_%s_color" % state, variant, INK)
+			t.set_color("icon_%s_color" % state, variant, INK)
 		t.set_color("font_disabled_color", variant, MUTED)
 		t.set_color("icon_disabled_color", variant, MUTED)
 		t.set_font_size("font_size", variant, 14)
@@ -218,22 +228,19 @@ static func theme() -> Theme:
 			t.set_color("icon_%s_color" % state, variant, Color.WHITE)
 	for variant in ["TabButton", "TabSelectedButton"]:
 		var selected: bool = variant == "TabSelectedButton"
-		t.set_color("font_color", variant, PAPER if selected else INK)
-		if selected:
-			t.set_color("font_outline_color", variant, Color("514278"))
-			t.set_constant("outline_size", variant, 1)
-		var sb: StyleBox = _texture_style("control-violet.png", 8, 14) if selected else card_style(false, 8)
+		t.set_color("font_color", variant, INK)
+		var sb: StyleBox = card_surface(LIME, 8, 14) if selected else card_style(false, 8)
 		for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
 			t.set_stylebox(state, variant, sb)
 		for state in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
-			t.set_color("font_%s_color" % state, variant, PAPER if selected else INK)
-			t.set_color("icon_%s_color" % state, variant, PAPER if selected else BLUE)
+			t.set_color("font_%s_color" % state, variant, INK)
+			t.set_color("icon_%s_color" % state, variant, INK)
 		t.set_font_size("font_size", variant, 11)
 		t.set_constant("icon_max_width", variant, 18)
 		t.set_constant("h_separation", variant, 3)
 	t.set_stylebox("panel", "ToastPanel", surface(INK, 12))
-	t.set_stylebox("background", "ProgressBar", surface(BORDER, 0, 3))
-	t.set_stylebox("fill", "ProgressBar", surface(GREEN, 0, 3))
+	t.set_stylebox("background", "ProgressBar", surface(Color("ebe9e0"), 0, 3))
+	t.set_stylebox("fill", "ProgressBar", surface(LIME_EDGE, 0, 3))
 	for type in ["LineEdit", "TextEdit"]:
 		t.set_stylebox("normal", type, card_style(false, 8))
 		t.set_stylebox("focus", type, card_style(true, 8))

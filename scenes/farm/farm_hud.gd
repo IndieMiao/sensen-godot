@@ -281,6 +281,7 @@ func _build_bottom() -> void:
 	_cta.add_theme_font_size_override("font_size", 14)
 	_cta.add_theme_constant_override("icon_max_width", 24)
 	_cta.clip_text = true
+	_cta.resized.connect(_fit_cta_text)
 	_cta.pressed.connect(func(): cta_pressed.emit())
 	_mode_row.add_child(_cta)
 	_cancel = GameUi.button("x", "", L10n.text("Cancel remaining work"))
@@ -585,6 +586,7 @@ func set_cta(bulk: Dictionary) -> void:
 	_cta_enabled = bool(bulk.get("enabled", true))
 	_cta.text = str(bulk.get("label", ""))
 	_cta.tooltip_text = _cta.text
+	_fit_cta_text()
 	_cta.icon = GameUi.icon(GameUi.action_icon(str(bulk.get("action", "")), str(bulk.get("weather", _weather))))
 	_cta.disabled = offline or not _cta_enabled
 	_cta.theme_type_variation = &"AccentButton"
@@ -597,6 +599,7 @@ func set_cta_busy(pending: int) -> void:
 	_cta_busy = true
 	_cta.disabled = true
 	_cta.text = _last_action_text if not _last_action_text.is_empty() else L10n.text("Working...")
+	_fit_cta_text()
 	_status_label.text = L10n.format_text("%d %s remaining", [pending, L10n.text("plot" if pending == 1 else "plots")]) if pending > 0 else L10n.text("Finishing...")
 	_status.visible = true
 	_cancel.visible = true
@@ -696,7 +699,9 @@ func set_hint(text: String) -> void:
 func set_action(text: String, progress: float, _pending: int) -> void:
 	_last_action_text = text
 	_status_bar.value = progress
-	if _cta_busy and not text.is_empty(): _cta.text = text
+	if _cta_busy and not text.is_empty():
+		_cta.text = text
+		_fit_cta_text()
 
 static func reject_text(code: String) -> String:
 	if code == "FARM_RELOCATED": return L10n.text("This farm has moved. Reloading its new ground…")
@@ -730,3 +735,15 @@ func set_visitor_mode(on: bool) -> void:
 	_timer_label.visible = not on
 	_visitor_bar.visible = on
 	call_deferred("_layout")
+
+## 主按钮文案放不下时逐级缩小字号（14→11），不截断“（0/4）”这类进度。
+func _fit_cta_text() -> void:
+	if _cta == null: return
+	var font := _cta.get_theme_font("font")
+	if font == null: return
+	var style := _cta.get_theme_stylebox("normal")
+	var room := _cta.size.x - (style.get_margin(SIDE_LEFT) + style.get_margin(SIDE_RIGHT) if style else 16.0) - 24.0 - 6.0 - 4.0
+	var font_size := 14
+	while font_size > 11 and font.get_string_size(_cta.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x > room:
+		font_size -= 1
+	_cta.add_theme_font_size_override("font_size", font_size)

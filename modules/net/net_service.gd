@@ -10,6 +10,7 @@ extends Node
 signal booted(logged_in: bool)
 
 const DEFAULT_BASE := "https://farm.sensenjoy.cn/v1"
+const MOBILE_BASE := "https://farm.sensenjoy.cn/preview/journey/v1"
 ## 放一行 URL 就能把客户端指到别的服务器（局域网调试用），不用改代码重打包。
 const SERVER_OVERRIDE := "user://server.txt"
 
@@ -41,6 +42,9 @@ static func base_url() -> String:
 		var s := FileAccess.get_file_as_string(SERVER_OVERRIDE).strip_edges()
 		if s.begins_with("http"):
 			return s.trim_suffix("/")
+	# 手机包连 Journey 公开服务（domain 27）；根路径 /v1 是早期旧服，不支持当前农场生成。
+	if OS.has_feature("mobile"):
+		return str(ProjectSettings.get_setting("sensen/network/mobile_base_url", MOBILE_BASE)).trim_suffix("/")
 	return str(ProjectSettings.get_setting("sensen/network/base_url", DEFAULT_BASE)).trim_suffix("/")
 
 ## 测试注入假传输；同时重建会话，丢掉上一次的 token 与状态。

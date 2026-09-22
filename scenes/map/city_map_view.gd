@@ -399,11 +399,20 @@ func _label_text(entry: Dictionary) -> String:
 		return _name(entry) + " · " + L10n.text("Ready to deliver")
 	return _name(entry)
 
-## 选中项名牌需要的完整宽度：按 9 号字实测文本宽 + 样式内边距，封顶防异常长名。
+## 选中项名牌宽度：按 9 号字实测文本宽 + 样式内边距；超过上限就折行而不是继续变宽。
+const LABEL_MAX_W := 120.0
+const LABEL_PAD := 18.0
 func _label_width(entry: Dictionary) -> float:
 	var font := get_theme_font("font", "Label")
 	if font == null: return 48.0
-	return minf(200.0, font.get_string_size(_label_text(entry), HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x + 18.0)
+	return minf(LABEL_MAX_W, font.get_string_size(_label_text(entry), HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x + LABEL_PAD)
+
+## 名牌在给定宽度下按词折行需要的高度（最多 3 行）。
+func _label_height(entry: Dictionary, width: float) -> float:
+	var font := get_theme_font("font", "Label")
+	if font == null: return 16.0
+	var h := font.get_multiline_string_size(_label_text(entry), HORIZONTAL_ALIGNMENT_CENTER, width - LABEL_PAD, 9, 3).y
+	return maxf(16.0, h + 4.0)
 
 func select(entry: Dictionary) -> void:
 	sheet_opened.emit()
@@ -624,14 +633,20 @@ func _update_markers() -> void:
 		var art_side: float = 88 if entry.kind == "landmark" else lerpf(42, 64, clampf((host.zoom - 13) / 3, 0, 1))
 		var top := 40.0 if entry.kind == "resident" else 54.0 if art_key in ["hollywood_sign", "griffith_observatory", "santa_monica_pier"] else 80.0 if entry.kind == "landmark" else 56.0
 		if entry.kind == "poi": top = maxf(36, art_side * 0.94)
+		var label_h := _label_height(entry, width) if is_sel else 16.0
+		var art_w := 36.0 if entry.kind == "resident" else art_side
+		var art_h := top
 		var side := maxf(width, art_side)
+		var below := 3.0 + label_h + 1.0
 		# 选中项的占位随果冻放大同步变大，邻居的贴图和名牌为它让位。
-		if is_sel:
-			side *= FOCUS_SCALE
-			top *= FOCUS_SCALE
-		var bounds := Rect2(point - Vector2(side * 0.5, top), Vector2(side, top + 20))
+		var k := FOCUS_SCALE if is_sel else 1.0
+		side *= k
+		top *= k
+		below *= k
+		var bounds := Rect2(point - Vector2(side * 0.5, top), Vector2(side, top + below))
 		candidates.append({"entry": entry, "id": id, "world": world, "point": point,
-			"bounds": bounds, "width": width, "art_side": art_side, "art": art_key})
+			"bounds": bounds, "width": width, "art_side": art_side, "art": art_key,
+			"label_h": label_h, "art_w": art_w, "art_h": art_h, "k": k})
 	# Screen-space packing: anchors never move; a marker either shows in place
 	# or yields entirely. Order: selected, landmarks, residents, then POIs by
 	# incumbency (anti-flicker), source rank and id — fully deterministic.
@@ -705,18 +720,19 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	else:
 		_place_art(marker, c)
 	marker.label.text = _label_text(entry)
+	# 名牌永远跟随图标居中（出屏也不挪）；选中项长名按词折行，不再省略号截断。
+	marker.label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if is_selected else TextServer.AUTOWRAP_OFF
+	marker.label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if is_selected else TextServer.OVERRUN_TRIM_ELLIPSIS
 	marker.label.position = Vector2(-c.width * 0.5, 3)
-	if is_selected:
-		# 放大后的全名名牌夹在屏内，并避开右侧缩放/定位按钮列（贴图锚点不动）。
-		var half: float = c.width * 0.5 * FOCUS_SCALE
-		var dx := 0.0
-		var hi: float = size.x - 56.0
-		if c.point.x + half > hi: dx = hi - (c.point.x + half)
-		if c.point.x - half + dx < 8.0: dx = 8.0 - (c.point.x - half)
-		marker.label.position.x += dx / FOCUS_SCALE
-	marker.label.size = Vector2(c.width, 16)
+	marker.label.size = Vector2(c.width, c.label_h)
 	marker.label.add_theme_font_size_override("font_size", 9)
 	marker.label.visible = label_fits and (entry.kind != "poi" or is_selected or host.zoom >= 16)
+	# 点击热区只取可见的贴图与名牌，不用（为让位而放大的）占位框：
+	# 否则长名选中后旁边的空地也算点中自己，点空白取消不了选择。
+	var k: float = c.k
+	marker.hit = [Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h) * k, Vector2(c.art_w, c.art_h) * k)]
+	if marker.label.visible:
+		marker.hit.append(Rect2(c.point + Vector2(-c.width * 0.5, 3) * k, Vector2(c.width, c.label_h) * k))
 	displayed.append(marker)
 	return true
 
@@ -786,6 +802,11 @@ func _pack_key(c: Dictionary) -> Array:
 		float(c.entry.get("rank", 5)),
 		c.id]
 
+static func _hits_point(rects: Array, point: Vector2) -> bool:
+	for r in rects:
+		if (r as Rect2).has_point(point): return true
+	return false
+
 static func _hits(rects: Array, rect: Rect2) -> bool:
 	for r in rects:
 		if (r as Rect2).intersects(rect): return true
@@ -829,7 +850,7 @@ func _free_marker(id: String) -> void:
 func activate_at(screen: Vector2) -> bool:
 	var local := screen - global_position
 	for marker in displayed:
-		if marker.rect.has_point(local): select(marker.entry); return true
+		if _hits_point(marker.get("hit", [marker.rect]), local): select(marker.entry); return true
 	return false
 
 func consume_back() -> bool:

@@ -351,19 +351,25 @@ func test_selected_marker_label_expands_to_the_full_name() -> void:
 	assert_float(label.size.x).is_equal_approx(48.0, 0.5)
 	city.select(city.live_pois[0])
 	city._update_markers()
-	# 选中：名牌放宽到完整文本宽度，不再截成 “La Brea…”；占位随之变宽。
+	# 选中：全名显示不再截断；超过上限宽度就按词折行，名牌变高而不是无限变宽。
 	assert_str(label.text).is_equal(long_name)
-	var needed: float = label.get_theme_font("font").get_string_size(long_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x
-	assert_float(label.size.x).is_greater_equal(needed)
-	assert_float(city.markers["long"].rect.size.x).is_greater_equal(needed)
-	# 贴近右缘时名牌夹回屏内，不被右侧缩放按钮列压住；贴图锚点不动。
+	assert_int(label.text_overrun_behavior).is_equal(TextServer.OVERRUN_NO_TRIMMING)
+	assert_int(label.autowrap_mode).is_equal(TextServer.AUTOWRAP_WORD_SMART)
+	assert_float(label.size.x).is_less_equal(city.LABEL_MAX_W)
+	assert_float(label.size.y).is_greater(20.0)
+	# 名牌跟随图标居中，即使贴近屏幕边缘也不挪。
 	m.center_lng = lng - 0.0035
 	m._update_cameras()
 	city._update_markers()
 	var node: Control = city.markers["long"].node
-	var right: float = node.position.x + (label.position.x + label.size.x) * city.FOCUS_SCALE
 	assert_float(node.position.x).is_greater(city.size.x - 80.0)
-	assert_float(right).is_less_equal(city.size.x - 56.0 + 0.5)
+	assert_float(label.position.x).is_equal_approx(-label.size.x * 0.5, 0.01)
+	# 点击热区只含贴图与名牌：放大占位框里、贴图右上方的空地点不中，点空白能取消。
+	var marker: Dictionary = city.markers["long"]
+	var empty := Vector2(marker.rect.end.x - 2.0, marker.rect.position.y + 2.0)
+	assert_bool(marker.rect.has_point(empty)).is_true()
+	assert_bool(city.activate_at(empty + city.global_position)).is_false()
+	assert_bool(city.activate_at(node.position + Vector2(0, -10) + city.global_position)).is_true()
 
 func test_player_card_offers_a_visit_jump_and_clears_with_selection() -> void:
 	var m := _map()
@@ -403,6 +409,10 @@ func test_dining_variants_pick_by_name_hash_deterministically() -> void:
 	for i in 12:
 		seen[CityMapData.art_texture({"id": str(i), "kind": "poi", "name": "Diner %d" % i, "art": "restaurant"}).resource_path] = true
 	assert_int(seen.size()).is_greater(1)
+	# 餐饮四类与博物馆各 20 套（含原图）必须全部随包：缺图会让哈希落到原图、分布失衡。
+	for key in CityMapData.ART_VARIANTS:
+		for n in range(2, int(CityMapData.ART_VARIANTS[key]) + 1):
+			assert_bool(ResourceLoader.exists("res://assets/map/poi/%s_%d.png" % [key, n])).override_failure_message("missing %s_%d" % [key, n]).is_true()
 	# 地标与居民不参与变体：仍拿原图。
 	var landmark := {"id": "lm", "kind": "landmark", "name": "Griffith", "art": "restaurant"}
 	assert_str(CityMapData.art_texture(landmark).resource_path).contains("restaurant.png")

@@ -76,7 +76,7 @@ static func texture(key: String) -> Texture2D:
 	return GameUi.icon({"place":"map-pin", "beach":"sun", "theme_park":"star"}.get(key, "map-pin"))
 
 ## 每类可用的贴图套数（含基础图）。变体文件名：<key>_2.png、<key>_3.png……
-const ART_VARIANTS := {"restaurant": 4, "chinese_restaurant": 4, "cafe": 4, "bakery": 4}
+const ART_VARIANTS := {"restaurant": 20, "chinese_restaurant": 20, "cafe": 20, "bakery": 20, "museum": 20}
 
 ## 同类 POI 在多套贴图间按名字哈希固定选择：同一家店永远同一张图，
 ## 不同店大概率不同图（餐饮同图扎堆的观感问题，2026-09-23 反馈）。

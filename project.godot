@@ -49,3 +49,8 @@ renderer/rendering_method="mobile"
 renderer/rendering_method.mobile="mobile"
 anti_aliasing/quality/msaa_3d=2
 textures/vram_compression/import_etc2_astc=true
+
+[sensen]
+
+network/base_url="https://farm.sensenjoy.cn/v1"
+network/mobile_base_url="https://farm.sensenjoy.cn/preview/journey/v1"
