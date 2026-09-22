@@ -19,10 +19,10 @@ const REAPPEAR_COOLDOWN_MS := 400
 ## candidates wait until every non-dining candidate had its chance at the space.
 const DINING_QUOTA := 4
 const DINING_ARTS := ["restaurant", "chinese_restaurant", "cafe", "bakery"]
-## Design: the soft shadow is a flat screen-space ellipse hugging the artwork's
-## VISUAL bottom edge (per-art footprint), bleeding slightly past the base.
-const SHADOW_WIDTH_MULT := 1.1
-const SHADOW_FLATTEN := 0.34
+## Design: the shadow is the artwork's own silhouette — the same transparent
+## layer tinted translucent ink, offset down-right beneath the art.
+const SHADOW_TINT := Color(0.07, 0.1, 0.07, 0.24)
+const SHADOW_OFFSET := Vector2(0.035, 0.055) # 相对贴图高度的右/下偏移
 var host: Node
 var filter := "all"
 var selected: Dictionary = {}
@@ -62,24 +62,6 @@ var _art_root: Node3D
 var _shown_last: Dictionary = {}
 ## id -> ticks_msec before which a culled marker may not reappear.
 var _hidden_until: Dictionary = {}
-static var _shadow_texture: GradientTexture2D
-
-## Shared soft ellipse texture (128x64): radial gradient fading to zero at the
-## edges, tinted the map's ink green. Drawn as a billboard under each artwork.
-static func ground_shadow_texture() -> GradientTexture2D:
-	if _shadow_texture: return _shadow_texture
-	var gradient := Gradient.new()
-	gradient.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
-	gradient.colors = PackedColorArray([Color(0.13, 0.17, 0.13, 0.34), Color(0.13, 0.17, 0.13, 0.15), Color(0.13, 0.17, 0.13, 0.0)])
-	_shadow_texture = GradientTexture2D.new()
-	_shadow_texture.gradient = gradient
-	_shadow_texture.fill = GradientTexture2D.FILL_RADIAL
-	_shadow_texture.fill_from = Vector2(0.5, 0.5)
-	_shadow_texture.fill_to = Vector2(0.5, 0.0)
-	_shadow_texture.width = 128
-	_shadow_texture.height = 64
-	return _shadow_texture
-
 static func surface(color := Color(1, 1, 1, 0.97), radius := 16) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = color
@@ -533,11 +515,15 @@ func _make_marker(entry: Dictionary) -> Dictionary:
 		sprite.offset = Vector2(0, texture.get_height() * 0.44)
 		_art_parent().add_child(sprite)
 		result.sprite = sprite
+		# 阴影 = 素材自身的剪影：同一张贴图染成半透明墨色，右下偏移垫底，
+		# 形状永远与素材吻合、边缘沿用贴图自带的柔边。
 		var shadow := Sprite3D.new()
 		shadow.name = "CityShadow_" + str(entry.id).validate_node_name()
-		shadow.texture = ground_shadow_texture()
+		shadow.texture = texture
+		shadow.modulate = SHADOW_TINT
 		shadow.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-		shadow.pixel_size = 1.0 / 128.0 # 基准：宽 1m x 高 0.5m
+		shadow.pixel_size = sprite.pixel_size
+		shadow.offset = sprite.offset
 		shadow.render_priority = -1 # 永远垫在建筑贴图之下
 		_art_parent().add_child(shadow)
 		result.shadow = shadow
@@ -580,7 +566,8 @@ func _update_markers() -> void:
 		var point: Vector2 = host.cam.unproject_position(world) - global_position
 		if not area.has_point(point): continue
 		var width := 82.0 if entry.kind == "landmark" else 78.0 if entry.kind == "resident" else 48.0
-		var art_side: float = 88 if entry.kind == "landmark" else lerpf(32, 64, clampf((host.zoom - 13) / 3, 0, 1))
+		# 视野最大（低 zoom）时 POI 也要有存在感：下限 42px（≈原 32 的 1.3 倍）。
+		var art_side: float = 88 if entry.kind == "landmark" else lerpf(42, 64, clampf((host.zoom - 13) / 3, 0, 1))
 		var top := 40.0 if entry.kind == "resident" else 54.0 if art_key in ["hollywood_sign", "griffith_observatory", "santa_monica_pier"] else 80.0 if entry.kind == "landmark" else 56.0
 		if entry.kind == "poi": top = maxf(36, art_side * 0.94)
 		var side := maxf(width, art_side)
@@ -632,16 +619,16 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	var is_selected: bool = selected.get("id", null) == entry.get("id")
 	var incumbent: bool = _shown_last.has(id)
 	var label_fits := true
-	if entry.kind == "landmark":
-		# Landmark artwork is the city's identity: never culled, only its label yields.
-		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
-	elif not is_selected:
+	if not is_selected:
 		if not incumbent and now < int(_hidden_until.get(id, 0)): return false
 		var probe: Rect2 = c.bounds.grow(-PACK_MARGIN if incumbent else PACK_MARGIN)
-		# People stay readable: markers yield to player/avatar footprints too.
-		if _hits(occupied, probe) or _hits(blockers, probe):
+		# 地标相互之间也做遮挡剔除，但不给玩家 pin 让位；其余标记两者都让。
+		var blocked: bool = _hits(occupied, probe) or (entry.kind != "landmark" and _hits(blockers, probe))
+		if blocked:
 			if incumbent: _hidden_until[id] = now + REAPPEAR_COOLDOWN_MS
 			return false
+	if entry.kind == "landmark":
+		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
 	occupied.append(c.bounds)
 	if not markers.has(id): markers[id] = _make_marker(entry)
 	var marker: Dictionary = markers[id]
@@ -671,9 +658,7 @@ func _apply_marker_scale(marker: Dictionary) -> void:
 	if marker.has("sprite"):
 		var h := float(marker.get("world_h", 1.0))
 		marker.sprite.scale = Vector3.ONE * h * s
-		var sw := float(marker.get("shadow_w", h))
-		# 纹理纵横比 2:1，scale.y 乘 2 折算成期望的屏幕高度。
-		marker.shadow.scale = Vector3(sw, sw * SHADOW_FLATTEN * 2.0, 1.0) * s
+		marker.shadow.scale = Vector3.ONE * h * s
 
 func _set_marker_shown(marker: Dictionary, on: bool) -> void:
 	if bool(marker.get("on", false)) == on: return
@@ -744,14 +729,10 @@ func _place_art(marker: Dictionary, c: Dictionary) -> void:
 	var world_h: float = c.art_side * 2.0 * dist * tan(deg_to_rad(host.cam.fov) * 0.5) / viewport_h
 	marker.world_h = world_h
 	marker.sprite.position = world
-	# 阴影是屏幕空间扁椭圆，按素材足迹贴住可视底边（沿相机轴定位，
-	# 任意 bearing/pitch 下都不歪、不脱离底座）。
-	var fp: Dictionary = CityMapData.art_footprint(str(c.art))
-	marker.shadow_w = world_h * float(fp.width) * SHADOW_WIDTH_MULT
+	# 剪影阴影沿相机轴向右下偏移，任意 bearing/pitch 下方向一致。
 	var down: Vector3 = -host.cam.global_transform.basis.y
 	var right: Vector3 = host.cam.global_transform.basis.x
-	var base_down := world_h * (0.06 - (1.0 - float(fp.bottom)))
-	marker.shadow.position = world + down * (base_down + world_h * 0.01) + right * (world_h * float(fp.cx))
+	marker.shadow.position = world + down * (world_h * SHADOW_OFFSET.y) + right * (world_h * SHADOW_OFFSET.x)
 	_apply_marker_scale(marker)
 
 func _free_marker(id: String) -> void:

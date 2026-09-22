@@ -81,10 +81,11 @@ func test_marker_packing_prefers_rank_keeps_incumbents_and_never_shows_fallback_
 	assert_object(city.markers["z_win"].sprite).is_instanceof(Sprite3D)
 	assert_bool(city.markers["z_win"].sprite.visible).is_true()
 	assert_bool(city.markers["z_win"].shadow.visible).is_true()
-	# 阴影是屏幕空间 billboard 扁椭圆：任意 bearing/pitch 下贴住可视底座不歪。
-	assert_object(city.markers["z_win"].shadow).is_instanceof(Sprite3D)
-	assert_int(city.markers["z_win"].shadow.billboard).is_equal(BaseMaterial3D.BILLBOARD_ENABLED)
-	assert_float(float(city.markers["z_win"].shadow_w)).is_greater(0.0)
+	# 阴影是素材自身的剪影：同贴图、半透明墨色、billboard，任意视角不歪。
+	var z_shadow: Sprite3D = city.markers["z_win"].shadow
+	assert_object(z_shadow.texture).is_same(city.markers["z_win"].sprite.texture)
+	assert_int(z_shadow.billboard).is_equal(BaseMaterial3D.BILLBOARD_ENABLED)
+	assert_float(z_shadow.modulate.a).is_less(0.5)
 	# Below the city-detail zoom band no provider POI renders at all.
 	m.zoom = 12.0
 	m._update_cameras()
@@ -150,6 +151,36 @@ func test_marker_packing_diversifies_dining_and_keeps_first_seen_rank() -> void:
 	assert_bool(shown.has("s_low")).is_true()
 	assert_bool(shown.has("s_low4")).is_false()
 	assert_bool(shown.has("d_low")).is_false()
+
+func test_landmarks_cull_each_other_but_ignore_player_footprints() -> void:
+	var m := _map()
+	await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	var lat: float = m.home_lat + 0.02
+	var lng: float = m.home_lng + 0.02
+	m.center_lat = lat
+	m.center_lng = lng
+	m.zoom = 16.0
+	m._update_cameras()
+	m._sync_farm_markers()
+	city.live_pois = []
+	# 两个地标同点：id 序靠前者在位，另一个整颗让位（带出现/消失动画的通用路径）。
+	city.entries = [
+		{"id": "a_lm", "kind": "landmark", "name": "A", "lat": lat, "lng": lng, "art": "hollywood_sign"},
+		{"id": "b_lm", "kind": "landmark", "name": "B", "lat": lat, "lng": lng, "art": "griffith_observatory"},
+	]
+	city._update_markers()
+	var shown: Array = city.displayed.map(func(mk): return str(mk.entry.id))
+	assert_array(shown).contains_exactly(["a_lm"])
+	# 地标不给玩家足迹让位：挪到自己农场正上方仍然显示。
+	m.center_lat = m.home_lat
+	m.center_lng = m.home_lng
+	m._update_cameras()
+	m._sync_farm_markers()
+	city.entries = [{"id": "on_self", "kind": "landmark", "name": "L", "lat": m.home_lat, "lng": m.home_lng, "art": "hollywood_sign"}]
+	city._update_markers()
+	assert_bool(city.displayed.any(func(mk): return str(mk.entry.id) == "on_self")).is_true()
 
 func test_culled_marker_waits_out_the_reappear_cooldown() -> void:
 	var m := _map()

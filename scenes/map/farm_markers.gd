@@ -63,6 +63,11 @@ var _city_shown_last: Dictionary = {}
 ## pin 显隐动画状态：id -> {on, pop}；出现果冻弹入、消失快速缩没（与 POI 一致）。
 var _pin_anim: Dictionary = {}
 var _pin_tweens: Dictionary = {}
+## 城市地图当前 zoom（宿主每帧喂入）：视野最大时玩家 pin 放大到 1.3 倍。
+var city_zoom := 16.0
+
+func _pin_zoom_boost() -> float:
+	return lerpf(1.3, 1.0, clampf((city_zoom - 11.0) / 4.0, 0.0, 1.0))
 
 func _set_pin_shown(id: String, on: bool) -> void:
 	if not _pin_anim.has(id):
@@ -84,7 +89,7 @@ func _set_pin_shown(id: String, on: bool) -> void:
 	label.pivot_offset = Vector2(label.size.x * 0.5, -6.0)
 	var apply := func(value: float):
 		state.pop = value
-		target.scale = Vector2.ONE * maxf(0.001, value)
+		target.scale = Vector2.ONE * maxf(0.001, value * _pin_zoom_boost())
 		label.scale = target.scale
 	if not on and float(state.pop) <= 0.0:
 		target.visible = false
@@ -334,8 +339,9 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 		_badges[id].visible = false
 		var full_body: bool = id == "self" or id == expanded_avatar_id
 		target.size = Vector2(70, 130) if full_body else Vector2(44, 44)
+		var boost := _pin_zoom_boost()
 		var rect := Rect2(anchor - Vector2(target.size.x * 0.5, target.size.y - 2), target.size).merge(
-			Rect2(anchor + Vector2(-label.size.x * 0.5, 6), label.size))
+			Rect2(anchor + Vector2(-label.size.x * 0.5, 6), label.size)).grow((boost - 1.0) * 22.0)
 		var placed := not cam.is_position_behind(world) and area.has_point(anchor)
 		if placed and not (id == "self" or id == expanded_avatar_id or id == selected_id):
 			var probe := rect.grow(-CITY_PACK_MARGIN if _city_shown_last.has(id) else CITY_PACK_MARGIN)
@@ -353,6 +359,13 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 				portrait.position = Vector2(4, 4)
 			label.position = anchor + Vector2(-label.size.x * 0.5, 6)
 			visible_farm_ids.append(id)
+			# 在位 pin 每帧应用 zoom 放大系数（动画进行中的由 tween 内部乘算）。
+			if not (_pin_tweens.get(id) is Tween and (_pin_tweens[id] as Tween).is_running()):
+				target.pivot_offset = Vector2(target.size.x * 0.5, target.size.y - 2)
+				label.pivot_offset = Vector2(label.size.x * 0.5, -6.0)
+				var steady_pop := float((_pin_anim.get(id, {}) as Dictionary).get("pop", 1.0))
+				target.scale = Vector2.ONE * maxf(0.001, steady_pop * boost)
+				label.scale = target.scale
 		_set_pin_shown(id, placed)
 	for id in visible_farm_ids:
 		var entry: Dictionary = points[id]

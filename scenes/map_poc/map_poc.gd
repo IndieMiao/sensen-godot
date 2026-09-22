@@ -1718,6 +1718,7 @@ func _sync_farm_markers() -> void:
 	_setup_journey_map()
 	var bottom := nearby_panel.position.y - 8 if nearby_panel and nearby_panel.visible else journey_footer.position.y - 8 if journey_footer else root.size.y - 24
 	if city_map:
+		farm_markers.city_zoom = zoom
 		bottom = city_map.info.position.y - 8 if city_map.info.visible else city_map.dock.position.y - 8
 		if nearby_panel and nearby_panel.visible: bottom = minf(bottom, nearby_panel.position.y - 8)
 	var marker_top := CityMapView.CONTENT_TOP if city_map else 110.0
