@@ -81,6 +81,13 @@ func test_marker_packing_prefers_rank_keeps_incumbents_and_never_shows_fallback_
 	assert_object(city.markers["z_win"].sprite).is_instanceof(Sprite3D)
 	assert_bool(city.markers["z_win"].sprite.visible).is_true()
 	assert_bool(city.markers["z_win"].shadow.visible).is_true()
+	# 阴影长轴跟随相机 bearing 对齐屏幕横向，地图旋转时不歪。
+	m.bearing = 42.0
+	m._update_cameras()
+	city._update_markers()
+	assert_float(city.markers["z_win"].shadow.rotation.y).is_equal_approx(-deg_to_rad(42.0), 0.001)
+	m.bearing = 0.0
+	m._update_cameras()
 	# Below the city-detail zoom band no provider POI renders at all.
 	m.zoom = 12.0
 	m._update_cameras()
@@ -122,6 +129,30 @@ func test_marker_packing_diversifies_dining_and_keeps_first_seen_rank() -> void:
 	# rank 保持首见值：回包里同一 POI 的 filterrank 漂移不再挤掉在位标记。
 	city._merge_pois([{"id": "a_d1", "kind": "poi", "name": "D1", "lat": lat, "lng": lng - 0.004, "art": "restaurant", "rank": 9}])
 	assert_int(int(city.live_pois.filter(func(p): return str(p.id) == "a_d1")[0].rank)).is_equal(1)
+	# 非餐饮不吃中档 zoom 的 rank 阈值：z14 下 rank5 商店照样补位，rank3 餐饮仍被收紧。
+	m.zoom = 14.0
+	m._update_cameras()
+	city.live_pois = [
+		{"id": "s_mid", "kind": "poi", "name": "S", "lat": lat, "lng": lng, "art": "shop", "rank": 5},
+		{"id": "d_mid", "kind": "poi", "name": "D", "lat": lat + 0.004, "lng": lng, "art": "restaurant", "rank": 3},
+	]
+	city._update_markers()
+	shown = city.displayed.map(func(mk): return str(mk.entry.id))
+	assert_bool(shown.has("s_mid")).is_true()
+	assert_bool(shown.has("d_mid")).is_false()
+	# 低 zoom 全景由高价值非餐饮填补：rank≤3 放行，rank4 与所有餐饮不上图。
+	m.zoom = 11.0
+	m._update_cameras()
+	city.live_pois = [
+		{"id": "s_low", "kind": "poi", "name": "SL", "lat": lat, "lng": lng, "art": "museum", "rank": 3},
+		{"id": "s_low4", "kind": "poi", "name": "SL4", "lat": lat + 0.01, "lng": lng, "art": "shop", "rank": 4},
+		{"id": "d_low", "kind": "poi", "name": "DL", "lat": lat - 0.01, "lng": lng, "art": "restaurant", "rank": 1},
+	]
+	city._update_markers()
+	shown = city.displayed.map(func(mk): return str(mk.entry.id))
+	assert_bool(shown.has("s_low")).is_true()
+	assert_bool(shown.has("s_low4")).is_false()
+	assert_bool(shown.has("d_low")).is_false()
 
 func test_culled_marker_waits_out_the_reappear_cooldown() -> void:
 	var m := _map()

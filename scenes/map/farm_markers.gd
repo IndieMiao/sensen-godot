@@ -33,8 +33,14 @@ var city_mode := false:
 		if city_mode == value: return
 		city_mode = value
 		if not value:
+			for id in _pin_tweens:
+				if _pin_tweens[id] is Tween: (_pin_tweens[id] as Tween).kill()
+			_pin_tweens.clear()
+			_pin_anim.clear()
 			for id in _buttons:
 				var button: Button = _buttons[id]
+				button.scale = Vector2.ONE
+				_avatar_targets[id].scale = Vector2.ONE
 				button.mouse_filter = Control.MOUSE_FILTER_STOP
 				_avatar_targets[id].mouse_filter = Control.MOUSE_FILTER_STOP
 				_avatar_targets[id].size = Vector2(70, 92)
@@ -54,6 +60,49 @@ var expanded_avatar_id := ""
 ## 城市模式玩家 pin 打包：上帧在位者带 8px 死区防闪烁；被折叠者计入幸存者的 +N。
 const CITY_PACK_MARGIN := 8.0
 var _city_shown_last: Dictionary = {}
+## pin 显隐动画状态：id -> {on, pop}；出现果冻弹入、消失快速缩没（与 POI 一致）。
+var _pin_anim: Dictionary = {}
+var _pin_tweens: Dictionary = {}
+
+func _set_pin_shown(id: String, on: bool) -> void:
+	if not _pin_anim.has(id):
+		# put() 创建的按钮默认可见；以城市打包记录为准初始化，别信 Button 现状。
+		var was := _city_shown_last.has(id)
+		_pin_anim[id] = {"on": was, "pop": 1.0 if was else 0.0}
+	var state: Dictionary = _pin_anim[id]
+	var target: Button = _avatar_targets[id]
+	var label: Button = _buttons[id]
+	if bool(state.on) == on:
+		# 状态没变也要纠正可见性：首次进入城市模式时按钮还带着 put() 的默认可见。
+		target.visible = on or float(state.pop) > 0.0
+		label.visible = target.visible
+		return
+	state.on = on
+	if _pin_tweens.get(id) is Tween: (_pin_tweens[id] as Tween).kill()
+	# 围绕地理锚点缩放：热区的锚点在底部中心，名牌的锚点在其上方 6px。
+	target.pivot_offset = Vector2(target.size.x * 0.5, target.size.y - 2)
+	label.pivot_offset = Vector2(label.size.x * 0.5, -6.0)
+	var apply := func(value: float):
+		state.pop = value
+		target.scale = Vector2.ONE * maxf(0.001, value)
+		label.scale = target.scale
+	if not on and float(state.pop) <= 0.0:
+		target.visible = false
+		label.visible = false
+		return
+	var tween := create_tween()
+	_pin_tweens[id] = tween
+	if on:
+		target.visible = true
+		label.visible = true
+		tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_method(apply, float(state.pop), 1.0, 0.22)
+	else:
+		tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tween.tween_method(apply, float(state.pop), 0.0, 0.12)
+		tween.tween_callback(func():
+			target.visible = false
+			label.visible = false)
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -131,6 +180,9 @@ func remove_missing(ids: Array) -> void:
 	for id in points.keys():
 		if id == "self" or ids.has(id): continue
 		points.erase(id)
+		if _pin_tweens.get(id) is Tween: (_pin_tweens[id] as Tween).kill()
+		_pin_tweens.erase(id)
+		_pin_anim.erase(id)
 		_buttons[id].queue_free()
 		_badges[id].queue_free()
 		_avatar_targets[id].queue_free()
@@ -301,8 +353,7 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 				portrait.position = Vector2(4, 4)
 			label.position = anchor + Vector2(-label.size.x * 0.5, 6)
 			visible_farm_ids.append(id)
-		label.visible = placed
-		target.visible = placed
+		_set_pin_shown(id, placed)
 	for id in visible_farm_ids:
 		var entry: Dictionary = points[id]
 		var owner := str(entry.owner_name) if str(entry.avatar_ref).is_empty() else SeededOutfit.short_name(str(entry.avatar_ref))

@@ -569,10 +569,16 @@ func _update_markers() -> void:
 		if entry.kind == "poi":
 			# Fallback art means "no artwork for this category": search/list only.
 			if art_key == "place": continue
-			if host.zoom < 13.0: continue
-			# Source rank and zoom set the density budget before screen packing.
-			var rank_limit := 2 if host.zoom < 15 else 3 if host.zoom < 16 else 5
-			if float(entry.get("rank", 5)) > rank_limit: continue
+			var rank := float(entry.get("rank", 5))
+			if art_key in DINING_ARTS:
+				# 餐饮供给过剩：z13 以下不上图，中档 zoom 收紧预算。
+				if host.zoom < 13.0: continue
+				var rank_limit := 2 if host.zoom < 15 else 3 if host.zoom < 16 else 5
+				if rank > rank_limit: continue
+			elif host.zoom < 13.0 and rank > 3.0:
+				# 非餐饮是稀缺内容：低 zoom 放行高价值条目填补全景，
+				# 中高 zoom 不设 rank 门槛——密度全部交给屏幕打包。
+				continue
 		var world := MapGeoMath.geo_to_world(float(entry.lat), float(entry.lng), host.anchor_lat, host.anchor_lng)
 		if host.cam.is_position_behind(world): continue
 		var point: Vector2 = host.cam.unproject_position(world) - global_position
@@ -740,9 +746,11 @@ func _place_art(marker: Dictionary, c: Dictionary) -> void:
 	var world_h: float = c.art_side * 2.0 * dist * tan(deg_to_rad(host.cam.fov) * 0.5) / viewport_h
 	marker.world_h = world_h
 	marker.sprite.position = world
-	# 阴影大于素材底座并向屏幕下方微偏，让它像设计稿那样从底座四周溢出。
+	# 阴影大于素材底座并向屏幕下方微偏，让它像设计稿那样从底座四周溢出；
+	# 椭圆长轴必须跟随相机 bearing 对齐屏幕横向，否则地图一旋转就歪。
 	var heading := Vector3(sin(deg_to_rad(host.bearing)), 0.0, -cos(deg_to_rad(host.bearing)))
 	marker.shadow.position = world - heading * (world_h * 0.06)
+	marker.shadow.rotation.y = -deg_to_rad(host.bearing)
 	_apply_marker_scale(marker)
 
 func _free_marker(id: String) -> void:
