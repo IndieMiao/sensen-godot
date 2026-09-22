@@ -23,6 +23,8 @@ const DINING_ARTS := ["restaurant", "chinese_restaurant", "cafe", "bakery"]
 ## layer tinted translucent ink, offset down-right beneath the art.
 const SHADOW_TINT := Color(0.07, 0.1, 0.07, 0.24)
 const SHADOW_OFFSET := Vector2(0.035, 0.055) # 相对贴图高度的右/下偏移
+## 选中项果冻放大倍数；占位与渲染层级同步提升，压在其他标记之上。
+const FOCUS_SCALE := 1.6
 var host: Node
 var filter := "all"
 var selected: Dictionary = {}
@@ -352,7 +354,9 @@ func dismiss_overlays() -> void:
 
 func clear_selection() -> void:
 	# 取消时快速缩回（比选中弹入快，见设计反馈 #7）。
-	if not selected.is_empty(): _animate_focus(str(selected.get("id", "")), 1.0, 0.14)
+	if not selected.is_empty():
+		_animate_focus(str(selected.get("id", "")), 1.0, 0.14)
+		_set_marker_front(str(selected.get("id", "")), false)
 	selected = {}
 	if info: info.hide()
 	if is_instance_valid(recenter): _layout()
@@ -391,8 +395,10 @@ func select(entry: Dictionary) -> void:
 	# 果冻式弹起标记选中项；换选时旧项快速缩回。
 	if not selected.is_empty() and str(selected.get("id", "")) != str(entry.get("id", "")):
 		_animate_focus(str(selected.get("id", "")), 1.0, 0.14)
+		_set_marker_front(str(selected.get("id", "")), false)
 	selected = entry
-	_animate_focus(str(entry.get("id", "")), 1.8, 0.28)
+	_animate_focus(str(entry.get("id", "")), FOCUS_SCALE, 0.28)
+	_set_marker_front(str(entry.get("id", "")), true)
 	info_title.text = _name(entry)
 	info_category.text = L10n.text(str(entry.get("category", "Place"))) + " · " + L10n.text(str(host.region.get("name", "Los Angeles")))
 	info_address.text = str(entry.get("address", ""))
@@ -571,6 +577,10 @@ func _update_markers() -> void:
 		var top := 40.0 if entry.kind == "resident" else 54.0 if art_key in ["hollywood_sign", "griffith_observatory", "santa_monica_pier"] else 80.0 if entry.kind == "landmark" else 56.0
 		if entry.kind == "poi": top = maxf(36, art_side * 0.94)
 		var side := maxf(width, art_side)
+		# 选中项的占位随果冻放大同步变大，邻居的贴图和名牌为它让位。
+		if selected.get("id", null) == entry.get("id"):
+			side *= FOCUS_SCALE
+			top *= FOCUS_SCALE
 		var bounds := Rect2(point - Vector2(side * 0.5, top), Vector2(side, top + 20))
 		candidates.append({"entry": entry, "id": id, "world": world, "point": point,
 			"bounds": bounds, "width": width, "art_side": art_side, "art": art_key})
@@ -686,6 +696,15 @@ func _set_marker_shown(marker: Dictionary, on: bool) -> void:
 			if marker.has("sprite"):
 				marker.sprite.visible = false
 				marker.shadow.visible = false)
+
+## 选中项压在其他标记之上：贴图/剪影提升渲染优先级，名牌移到标记层顶。
+func _set_marker_front(id: String, front: bool) -> void:
+	if not markers.has(id): return
+	var marker: Dictionary = markers[id]
+	if marker.has("sprite"):
+		marker.sprite.render_priority = 2 if front else 0
+		marker.shadow.render_priority = 1 if front else -1
+	if front: move_child(marker.node, maxi(0, markers.size() - 1))
 
 func _animate_focus(id: String, to: float, duration: float) -> void:
 	if not markers.has(id): return
