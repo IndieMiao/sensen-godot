@@ -72,7 +72,7 @@ func test_marker_packing_prefers_rank_keeps_incumbents_and_never_shows_fallback_
 	assert_array(shown).contains_exactly(["z_win"])
 	assert_bool(city.markers.has("pin")).is_false() # fallback pins never become markers
 	# Incumbency: an equal-rank newcomer with a smaller id still loses to the shown marker.
-	city.live_pois.append({"id": "a_new", "kind": "poi", "name": "New", "lat": lat, "lng": lng, "art": "bakery", "rank": 1})
+	city.live_pois.append({"id": "a_new", "kind": "poi", "name": "New", "lat": lat, "lng": lng, "art": "cafe", "rank": 1})
 	city._update_markers()
 	shown = city.displayed.map(func(mk): return str(mk.entry.id))
 	assert_array(shown).contains_exactly(["z_win"])
@@ -109,7 +109,7 @@ func test_marker_packing_diversifies_dining_and_keeps_first_seen_rank() -> void:
 	city.live_pois = [
 		{"id": "a_d1", "kind": "poi", "name": "D1", "lat": lat, "lng": lng - 0.004, "art": "restaurant", "rank": 1},
 		{"id": "a_d2", "kind": "poi", "name": "D2", "lat": lat, "lng": lng - 0.002, "art": "cafe", "rank": 1},
-		{"id": "a_d3", "kind": "poi", "name": "D3", "lat": lat, "lng": lng + 0.002, "art": "bakery", "rank": 1},
+		{"id": "a_d3", "kind": "poi", "name": "D3", "lat": lat, "lng": lng + 0.002, "maki": "fast-food", "rank": 1},
 		{"id": "a_d4", "kind": "poi", "name": "D4", "lat": lat, "lng": lng + 0.004, "art": "chinese_restaurant", "rank": 1},
 		{"id": "b_shop", "kind": "poi", "name": "Shop", "lat": lat + 0.002, "lng": lng, "art": "shop", "rank": 5},
 		{"id": "z_d5", "kind": "poi", "name": "D5", "lat": lat + 0.002, "lng": lng, "art": "restaurant", "rank": 1},
@@ -142,7 +142,7 @@ func test_marker_packing_diversifies_dining_and_keeps_first_seen_rank() -> void:
 	m.zoom = 11.0
 	m._update_cameras()
 	city.live_pois = [
-		{"id": "s_low", "kind": "poi", "name": "SL", "lat": lat, "lng": lng, "art": "museum", "rank": 3},
+		{"id": "s_low", "kind": "poi", "name": "SL", "lat": lat, "lng": lng, "maki": "school", "rank": 3},
 		{"id": "s_low4", "kind": "poi", "name": "SL4", "lat": lat + 0.01, "lng": lng, "art": "shop", "rank": 4},
 		{"id": "d_low", "kind": "poi", "name": "DL", "lat": lat - 0.01, "lng": lng, "art": "restaurant", "rank": 1},
 	]
@@ -344,7 +344,7 @@ func test_selected_marker_label_expands_to_the_full_name() -> void:
 	m._update_cameras()
 	m._sync_farm_markers()
 	var long_name := "La Brea Tar Pits and Museum"
-	city.live_pois = [{"id": "long", "kind": "poi", "name": long_name, "lat": lat, "lng": lng, "art": "museum", "rank": 1}]
+	city.live_pois = [{"id": "long", "kind": "poi", "name": long_name, "lat": lat, "lng": lng, "maki": "lodging", "rank": 1}]
 	city._update_markers()
 	# 未选中：名牌按缺省 48 宽，长名允许省略。
 	var label: Label = city.markers["long"].label
@@ -399,23 +399,26 @@ func test_player_card_offers_a_visit_jump_and_clears_with_selection() -> void:
 	city._on_info_action()
 	assert_array(visits).has_size(1) # 居民路径不再发玩家跳转
 
-func test_dining_variants_pick_by_name_hash_deterministically() -> void:
-	var a := {"id": "1", "kind": "poi", "name": "Señor Fish", "art": "restaurant"}
-	var again := {"id": "2", "kind": "poi", "name": "Señor Fish", "art": "restaurant"}
-	# 同名永远同图（跨条目也一样），保证重进/换端不换脸。
+func test_poi_icons_follow_maki_and_pick_by_name_hash() -> void:
+	var a := {"id": "1", "kind": "poi", "name": "Señor Fish", "maki": "restaurant"}
+	var again := {"id": "2", "kind": "poi", "name": "Señor Fish", "maki": "restaurant-seafood"}
+	# 同名永远同图；同义 maki 共用同一组图标。
 	assert_object(CityMapData.art_texture(a)).is_same(CityMapData.art_texture(again))
-	# 变体集合覆盖：不同名字至少命中两张不同贴图（3/4 概率分散，取样 12 个名字必然分散）。
+	assert_str(CityMapData.art_texture(a).resource_path).contains("icons/restaurant_")
 	var seen := {}
 	for i in 12:
-		seen[CityMapData.art_texture({"id": str(i), "kind": "poi", "name": "Diner %d" % i, "art": "restaurant"}).resource_path] = true
-	assert_int(seen.size()).is_greater(1)
-	# 餐饮四类与博物馆各 20 套（含原图）必须全部随包：缺图会让哈希落到原图、分布失衡。
-	for key in CityMapData.ART_VARIANTS:
-		for n in range(2, int(CityMapData.ART_VARIANTS[key]) + 1):
-			assert_bool(ResourceLoader.exists("res://assets/map/poi/%s_%d.png" % [key, n])).override_failure_message("missing %s_%d" % [key, n]).is_true()
-	# 地标与居民不参与变体：仍拿原图。
-	var landmark := {"id": "lm", "kind": "landmark", "name": "Griffith", "art": "restaurant"}
-	assert_str(CityMapData.art_texture(landmark).resource_path).contains("restaurant.png")
+		seen[CityMapData.art_texture({"id": str(i), "kind": "poi", "name": "Diner %d" % i, "maki": "fast-food"}).resource_path] = true
+	assert_int(seen.size()).is_equal(CityMapData.ICON_VARIANTS)
+	# 10 种高频 maki × 2 张 WebP 必须全部随包。
+	for key in CityMapData.ICON_MAKI:
+		for n in range(1, CityMapData.ICON_VARIANTS + 1):
+			assert_bool(ResourceLoader.exists("%s%s_%d.webp" % [CityMapData.ICON_PATH, key, n])).override_failure_message("missing %s_%d" % [key, n]).is_true()
+	# 低频/无意义 maki 没有图标，不上图；地标仍用建筑贴图。
+	assert_str(CityMapData.icon_key({"maki": "marker"})).is_empty()
+	assert_str(CityMapData.icon_key({"maki": "bridge"})).is_empty()
+	assert_str(CityMapData.icon_key({"maki": "convenience"})).is_equal("grocery")
+	var landmark := {"id": "lm", "kind": "landmark", "name": "Griffith", "art": "griffith_observatory"}
+	assert_str(CityMapData.art_texture(landmark).resource_path).contains("griffith_observatory.png")
 
 func test_cancelled_pending_selection_cannot_resurrect_a_rig() -> void:
 	var m := _map()

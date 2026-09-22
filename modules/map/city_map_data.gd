@@ -75,17 +75,33 @@ static func texture(key: String) -> Texture2D:
 	if ResourceLoader.exists(path): return load(path)
 	return GameUi.icon({"place":"map-pin", "beach":"sun", "theme_park":"star"}.get(key, "map-pin"))
 
-## 每类可用的贴图套数（含基础图）。变体文件名：<key>_2.png、<key>_3.png……
-const ART_VARIANTS := {"restaurant": 20, "chinese_restaurant": 20, "cafe": 20, "bakery": 20, "museum": 20}
+## 普通 POI 用 Mapbox maki 语义的简单 3D 图标（不画建筑，地标除外），2026-09-23 定案：
+## 取洛杉矶实测高频（filterrank≤3）的 10 种 maki，每种 2 张、256px WebP，按名字哈希固定选一张。
+const ICON_PATH := "res://assets/map/poi/icons/"
+const ICON_MAKI := ["park", "restaurant", "school", "religious-christian", "fast-food", "shop", "grocery", "fuel", "lodging", "cafe"]
+const ICON_VARIANTS := 2
+## 同义 maki 共用图标；不在这里、也不在 ICON_MAKI 里的 maki 不上图。
+const ICON_ALIAS := {"restaurant-pizza": "restaurant", "restaurant-noodle": "restaurant", "restaurant-seafood": "restaurant",
+	"restaurant-sushi": "restaurant", "restaurant-bbq": "restaurant", "bar": "restaurant", "beer": "restaurant",
+	"teahouse": "cafe", "convenience": "grocery", "supermarket": "grocery",
+	"garden": "park", "picnic-site": "park", "playground": "park", "dog-park": "park",
+	"clothing-store": "shop", "shoe": "shop", "jewelry-store": "shop", "gift": "shop", "hardware": "shop",
+	"furniture": "shop", "mobile-phone": "shop", "watch": "shop", "department-store": "shop", "optician": "shop"}
+## 没有 maki 的旧数据/测试条目按语义族兜底。
+const ICON_FROM_ART := {"restaurant": "restaurant", "chinese_restaurant": "restaurant", "cafe": "cafe", "park": "park", "shop": "shop"}
 
-## 同类 POI 在多套贴图间按名字哈希固定选择：同一家店永远同一张图，
-## 不同店大概率不同图（餐饮同图扎堆的观感问题，2026-09-23 反馈）。
+static func icon_key(poi: Dictionary) -> String:
+	var maki := str(poi.get("maki", ""))
+	if maki in ICON_MAKI: return maki
+	if ICON_ALIAS.has(maki): return str(ICON_ALIAS[maki])
+	if maki.is_empty(): return str(ICON_FROM_ART.get(art_key(poi), ""))
+	return ""
+
+## 地标用建筑贴图；普通 POI 用 maki 图标，同名永远同一张；无图标返回通用图钉（只用于卡片兜底）。
 static func art_texture(poi: Dictionary) -> Texture2D:
-	var key := art_key(poi)
-	var count := int(ART_VARIANTS.get(key, 1))
-	if count > 1 and str(poi.get("kind", "")) == "poi":
-		var pick := absi(str(poi.get("name", "")).hash()) % count
-		if pick > 0:
-			var path := "%s%s_%d.png" % [ART_PATH, key, pick + 1]
-			if ResourceLoader.exists(path): return load(path)
-	return texture(key)
+	if str(poi.get("kind", "")) != "poi": return texture(art_key(poi))
+	var key := icon_key(poi)
+	if key.is_empty(): return texture("place")
+	var pick := absi(str(poi.get("name", "")).hash()) % ICON_VARIANTS + 1
+	var path := "%s%s_%d.webp" % [ICON_PATH, key, pick]
+	return load(path) if ResourceLoader.exists(path) else texture("place")

@@ -1,0 +1,102 @@
+{
+  "cafe_1": {
+    "asset": "assets/map/poi/icons/cafe_1.webp",
+    "bytes": 12904,
+    "sha256": "52535a303a41d4a5559c2759baeb308dea7c97cc5a95fffe1e4c72b5c8b6d966"
+  },
+  "cafe_2": {
+    "asset": "assets/map/poi/icons/cafe_2.webp",
+    "bytes": 8818,
+    "sha256": "26727c2bd4758546aed8f76c0a37d3b567e5c1c17f64762ba55ea60d5d8cd2da"
+  },
+  "fast-food_1": {
+    "asset": "assets/map/poi/icons/fast-food_1.webp",
+    "bytes": 14754,
+    "sha256": "c54b65451856983268559303eb6d80bbb5ba3ff46ac58d63c99431ab41e2ecb2"
+  },
+  "fast-food_2": {
+    "asset": "assets/map/poi/icons/fast-food_2.webp",
+    "bytes": 14396,
+    "sha256": "495ff66a2b9a810ab8502f8049098e5b1359bbf0b0c8cd8903c32172fee8ecf6"
+  },
+  "fuel_1": {
+    "asset": "assets/map/poi/icons/fuel_1.webp",
+    "bytes": 12976,
+    "sha256": "0765883c62a5ac2ec6f58abf184185dfd898c23555f1fa540608bbf729b5092d"
+  },
+  "fuel_2": {
+    "asset": "assets/map/poi/icons/fuel_2.webp",
+    "bytes": 12376,
+    "sha256": "a0e7bc07735494d718296af73e6dbd1822a39fdf476ebca26ea824c524d5333c"
+  },
+  "grocery_1": {
+    "asset": "assets/map/poi/icons/grocery_1.webp",
+    "bytes": 17512,
+    "sha256": "5021a15956d8d05dcd1f21c889b4962a0463e7cb33466771349f28b0740bed07"
+  },
+  "grocery_2": {
+    "asset": "assets/map/poi/icons/grocery_2.webp",
+    "bytes": 18410,
+    "sha256": "d7eaf875d299f69b8fa5e95ad7b85552817b278aa9f9bd7e342fc52d9494893b"
+  },
+  "lodging_1": {
+    "asset": "assets/map/poi/icons/lodging_1.webp",
+    "bytes": 10960,
+    "sha256": "c7a43b1970c7bcebfc814a9cae9255decf94f5556ecf52d5c471195f8b700f19"
+  },
+  "lodging_2": {
+    "asset": "assets/map/poi/icons/lodging_2.webp",
+    "bytes": 12482,
+    "sha256": "15f163d5dd135b6eef96e5b25ed53316d0711df4955608f1a959de2d3d1d1c42"
+  },
+  "park_1": {
+    "asset": "assets/map/poi/icons/park_1.webp",
+    "bytes": 10064,
+    "sha256": "4530f65f37d861fedafe5d2558c38207aa8017aeee6f08ba7f1d3cfba4fd747e"
+  },
+  "park_2": {
+    "asset": "assets/map/poi/icons/park_2.webp",
+    "bytes": 12174,
+    "sha256": "4fa5f7d78a4259c291950af4ba37e58111f73cd652f80cd4dd63683e7489089d"
+  },
+  "religious-christian_1": {
+    "asset": "assets/map/poi/icons/religious-christian_1.webp",
+    "bytes": 12012,
+    "sha256": "e5fbdad6e030c126cb6a51c608211360bc3c9d15d8ca5475032dccfd0a8573c1"
+  },
+  "religious-christian_2": {
+    "asset": "assets/map/poi/icons/religious-christian_2.webp",
+    "bytes": 7686,
+    "sha256": "ee878df7c840e5b47c9488ddebd79d010fc06950545bcf88eead40bbdead0f7f"
+  },
+  "restaurant_1": {
+    "asset": "assets/map/poi/icons/restaurant_1.webp",
+    "bytes": 15398,
+    "sha256": "94e0e0b42e5f79a41082df5cffe8d0accd94211fd43894a3d8639da2f496c7b6"
+  },
+  "restaurant_2": {
+    "asset": "assets/map/poi/icons/restaurant_2.webp",
+    "bytes": 11462,
+    "sha256": "dc929d0ea32a457b438e3b7dd03c2922ff3c832aa2e623b62d7be5af651a8b39"
+  },
+  "school_1": {
+    "asset": "assets/map/poi/icons/school_1.webp",
+    "bytes": 14230,
+    "sha256": "d2938d38ffc9fe59d10d1e3021b978374061cc18df1771897e479f8a12d232fc"
+  },
+  "school_2": {
+    "asset": "assets/map/poi/icons/school_2.webp",
+    "bytes": 13816,
+    "sha256": "74ec00a07c531e8137836f2dd401964db55e0c9d69fa442093e8333635a5225d"
+  },
+  "shop_1": {
+    "asset": "assets/map/poi/icons/shop_1.webp",
+    "bytes": 10914,
+    "sha256": "332da6682d342dfcb70cb49d34dd240432b403f40853e59aad8b77cc3edda88d"
+  },
+  "shop_2": {
+    "asset": "assets/map/poi/icons/shop_2.webp",
+    "bytes": 9606,
+    "sha256": "b7da30d0f44fb0302ec691c841a81e58627eff3852b91555641a7bff7b276888"
+  }
+}

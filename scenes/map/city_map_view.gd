@@ -609,8 +609,8 @@ func _update_markers() -> void:
 		if not _entry_visible(entry): continue
 		var art_key := CityMapData.art_key(entry)
 		if entry.kind == "poi":
-			# Fallback art means "no artwork for this category": search/list only.
-			if art_key == "place": continue
+			# 只有高频 maki 才有图标；其余（含通用 marker）不上图，只留在搜索/列表。
+			if CityMapData.icon_key(entry).is_empty(): continue
 			var rank := float(entry.get("rank", 5))
 			if art_key in DINING_ARTS:
 				# 餐饮供给过剩：z13 以下不上图，中档 zoom 收紧预算。
