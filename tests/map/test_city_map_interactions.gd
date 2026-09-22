@@ -81,13 +81,10 @@ func test_marker_packing_prefers_rank_keeps_incumbents_and_never_shows_fallback_
 	assert_object(city.markers["z_win"].sprite).is_instanceof(Sprite3D)
 	assert_bool(city.markers["z_win"].sprite.visible).is_true()
 	assert_bool(city.markers["z_win"].shadow.visible).is_true()
-	# 阴影长轴跟随相机 bearing 对齐屏幕横向，地图旋转时不歪。
-	m.bearing = 42.0
-	m._update_cameras()
-	city._update_markers()
-	assert_float(city.markers["z_win"].shadow.rotation.y).is_equal_approx(-deg_to_rad(42.0), 0.001)
-	m.bearing = 0.0
-	m._update_cameras()
+	# 阴影是屏幕空间 billboard 扁椭圆：任意 bearing/pitch 下贴住可视底座不歪。
+	assert_object(city.markers["z_win"].shadow).is_instanceof(Sprite3D)
+	assert_int(city.markers["z_win"].shadow.billboard).is_equal(BaseMaterial3D.BILLBOARD_ENABLED)
+	assert_float(float(city.markers["z_win"].shadow_w)).is_greater(0.0)
 	# Below the city-detail zoom band no provider POI renders at all.
 	m.zoom = 12.0
 	m._update_cameras()

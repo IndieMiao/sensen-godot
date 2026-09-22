@@ -6,6 +6,13 @@ func test_poi_categories_do_not_guess_cuisine_from_a_name() -> void:
 	assert_str(CityMapData.art_key({"maki":"cafe"})).is_equal("cafe")
 	assert_str(CityMapData.art_key({"class":"unknown"})).is_equal("place")
 
+func test_art_footprints_stay_normalized_with_safe_fallback() -> void:
+	for key in ["restaurant", "cafe", "santa_monica_pier", "hollywood_sign", "museum", "shop", "not_a_key"]:
+		var footprint: Dictionary = CityMapData.art_footprint(key)
+		assert_float(float(footprint.width)).is_between(0.2, 1.0)
+		assert_float(float(footprint.bottom)).is_between(0.8, 1.0)
+		assert_float(absf(float(footprint.cx))).is_less(0.35)
+
 func test_poi_art_covers_more_provider_categories() -> void:
 	assert_str(CityMapData.art_key({"maki":"fast-food"})).is_equal("restaurant")
 	assert_str(CityMapData.art_key({"maki":"bar"})).is_equal("restaurant")

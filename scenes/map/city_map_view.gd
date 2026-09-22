@@ -19,10 +19,10 @@ const REAPPEAR_COOLDOWN_MS := 400
 ## candidates wait until every non-dining candidate had its chance at the space.
 const DINING_QUOTA := 4
 const DINING_ARTS := ["restaurant", "chinese_restaurant", "cafe", "bakery"]
-## Design: the soft shadow is larger than the artwork's baked base and bleeds
-## out around it; sized relative to the billboard's world height.
-const SHADOW_WIDTH := 1.35
-const SHADOW_DEPTH := 0.7
+## Design: the soft shadow is a flat screen-space ellipse hugging the artwork's
+## VISUAL bottom edge (per-art footprint), bleeding slightly past the base.
+const SHADOW_WIDTH_MULT := 1.15
+const SHADOW_FLATTEN := 0.30
 var host: Node
 var filter := "all"
 var selected: Dictionary = {}
@@ -62,30 +62,23 @@ var _art_root: Node3D
 var _shown_last: Dictionary = {}
 ## id -> ticks_msec before which a culled marker may not reappear.
 var _hidden_until: Dictionary = {}
-static var _shadow_mesh: QuadMesh
+static var _shadow_texture: GradientTexture2D
 
-## Shared flat ellipse under each artwork (design: very light soft shadow).
-static func ground_shadow_mesh() -> QuadMesh:
-	if _shadow_mesh: return _shadow_mesh
+## Shared soft ellipse texture (128x64): radial gradient fading to zero at the
+## edges, tinted the map's ink green. Drawn as a billboard under each artwork.
+static func ground_shadow_texture() -> GradientTexture2D:
+	if _shadow_texture: return _shadow_texture
 	var gradient := Gradient.new()
 	gradient.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
-	gradient.colors = PackedColorArray([Color(0.13, 0.17, 0.13, 0.34), Color(0.13, 0.17, 0.13, 0.15), Color(0.13, 0.17, 0.13, 0.0)])
-	var texture := GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.fill = GradientTexture2D.FILL_RADIAL
-	texture.fill_from = Vector2(0.5, 0.5)
-	texture.fill_to = Vector2(0.5, 0.0)
-	var material := StandardMaterial3D.new()
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.albedo_texture = texture
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	material.render_priority = -1 # under the billboard within the transparent pass
-	_shadow_mesh = QuadMesh.new()
-	_shadow_mesh.orientation = PlaneMesh.FACE_Y
-	_shadow_mesh.size = Vector2.ONE
-	_shadow_mesh.material = material
-	return _shadow_mesh
+	gradient.colors = PackedColorArray([Color(0.13, 0.17, 0.13, 0.30), Color(0.13, 0.17, 0.13, 0.13), Color(0.13, 0.17, 0.13, 0.0)])
+	_shadow_texture = GradientTexture2D.new()
+	_shadow_texture.gradient = gradient
+	_shadow_texture.fill = GradientTexture2D.FILL_RADIAL
+	_shadow_texture.fill_from = Vector2(0.5, 0.5)
+	_shadow_texture.fill_to = Vector2(0.5, 0.0)
+	_shadow_texture.width = 128
+	_shadow_texture.height = 64
+	return _shadow_texture
 
 static func surface(color := Color(1, 1, 1, 0.97), radius := 16) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
@@ -540,9 +533,12 @@ func _make_marker(entry: Dictionary) -> Dictionary:
 		sprite.offset = Vector2(0, texture.get_height() * 0.44)
 		_art_parent().add_child(sprite)
 		result.sprite = sprite
-		var shadow := MeshInstance3D.new()
+		var shadow := Sprite3D.new()
 		shadow.name = "CityShadow_" + str(entry.id).validate_node_name()
-		shadow.mesh = ground_shadow_mesh()
+		shadow.texture = ground_shadow_texture()
+		shadow.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		shadow.pixel_size = 1.0 / 128.0 # 基准：宽 1m x 高 0.5m
+		shadow.render_priority = -1 # 永远垫在建筑贴图之下
 		_art_parent().add_child(shadow)
 		result.shadow = shadow
 	var label := GameUi.label(_name(entry), 10, INK)
@@ -675,7 +671,9 @@ func _apply_marker_scale(marker: Dictionary) -> void:
 	if marker.has("sprite"):
 		var h := float(marker.get("world_h", 1.0))
 		marker.sprite.scale = Vector3.ONE * h * s
-		marker.shadow.scale = Vector3(h * SHADOW_WIDTH, 1.0, h * SHADOW_DEPTH) * s
+		var sw := float(marker.get("shadow_w", h))
+		# 纹理纵横比 2:1，scale.y 乘 2 折算成期望的屏幕高度。
+		marker.shadow.scale = Vector3(sw, sw * SHADOW_FLATTEN * 2.0, 1.0) * s
 
 func _set_marker_shown(marker: Dictionary, on: bool) -> void:
 	if bool(marker.get("on", false)) == on: return
@@ -746,11 +744,14 @@ func _place_art(marker: Dictionary, c: Dictionary) -> void:
 	var world_h: float = c.art_side * 2.0 * dist * tan(deg_to_rad(host.cam.fov) * 0.5) / viewport_h
 	marker.world_h = world_h
 	marker.sprite.position = world
-	# 阴影大于素材底座并向屏幕下方微偏，让它像设计稿那样从底座四周溢出；
-	# 椭圆长轴必须跟随相机 bearing 对齐屏幕横向，否则地图一旋转就歪。
-	var heading := Vector3(sin(deg_to_rad(host.bearing)), 0.0, -cos(deg_to_rad(host.bearing)))
-	marker.shadow.position = world - heading * (world_h * 0.06)
-	marker.shadow.rotation.y = -deg_to_rad(host.bearing)
+	# 阴影是屏幕空间扁椭圆，按素材足迹贴住可视底边（沿相机轴定位，
+	# 任意 bearing/pitch 下都不歪、不脱离底座）。
+	var fp: Dictionary = CityMapData.art_footprint(str(c.art))
+	marker.shadow_w = world_h * float(fp.width) * SHADOW_WIDTH_MULT
+	var down: Vector3 = -host.cam.global_transform.basis.y
+	var right: Vector3 = host.cam.global_transform.basis.x
+	var base_down := world_h * (0.06 - (1.0 - float(fp.bottom)))
+	marker.shadow.position = world + down * (base_down + world_h * 0.01) + right * (world_h * float(fp.cx))
 	_apply_marker_scale(marker)
 
 func _free_marker(id: String) -> void:
