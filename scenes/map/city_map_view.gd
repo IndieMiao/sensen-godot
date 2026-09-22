@@ -41,6 +41,36 @@ var _provider_error := ""
 var _attached_bridge: MapBridge
 var _nav_icons: Dictionary = {}
 var _nav_labels: Dictionary = {}
+## POI/landmark artwork lives in the 3D world (billboards), so avatars and
+## buildings occlude each other by depth instead of UI always winning.
+var _art_root: Node3D
+## Ids displayed last frame: ties in screen-space packing keep the incumbent,
+## so pan/zoom never flickers between two equally-ranked neighbours.
+var _shown_last: Dictionary = {}
+static var _shadow_mesh: QuadMesh
+
+## Shared flat ellipse under each artwork (design: very light soft shadow).
+static func ground_shadow_mesh() -> QuadMesh:
+	if _shadow_mesh: return _shadow_mesh
+	var gradient := Gradient.new()
+	gradient.offsets = PackedFloat32Array([0.0, 0.55, 1.0])
+	gradient.colors = PackedColorArray([Color(0.13, 0.17, 0.13, 0.30), Color(0.13, 0.17, 0.13, 0.12), Color(0.13, 0.17, 0.13, 0.0)])
+	var texture := GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.fill = GradientTexture2D.FILL_RADIAL
+	texture.fill_from = Vector2(0.5, 0.5)
+	texture.fill_to = Vector2(0.5, 0.0)
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_texture = texture
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	material.render_priority = -1 # under the billboard within the transparent pass
+	_shadow_mesh = QuadMesh.new()
+	_shadow_mesh.orientation = PlaneMesh.FACE_Y
+	_shadow_mesh.size = Vector2.ONE
+	_shadow_mesh.material = material
+	return _shadow_mesh
 
 static func surface(color := Color(1, 1, 1, 0.97), radius := 16) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
@@ -451,6 +481,16 @@ func _entry_visible(entry: Dictionary) -> bool:
 	if filter == "food": return entry.kind == "poi" and CityMapData.art_key(entry) in ["restaurant", "chinese_restaurant", "cafe", "bakery"]
 	return true
 
+func _art_parent() -> Node3D:
+	if _art_root == null or not is_instance_valid(_art_root):
+		_art_root = Node3D.new()
+		_art_root.name = "CityMarkerArt"
+		host.add_child(_art_root)
+	return _art_root
+
+func _exit_tree() -> void:
+	if is_instance_valid(_art_root): _art_root.queue_free()
+
 func _make_marker(entry: Dictionary) -> Dictionary:
 	var node := Control.new()
 	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -465,9 +505,22 @@ func _make_marker(entry: Dictionary) -> Dictionary:
 		node.add_child(portrait)
 		result.portrait = portrait
 	else:
-		var art := GameUi.picture(CityMapData.texture(CityMapData.art_key(entry)), 1)
-		node.add_child(art)
-		result.art = art
+		var texture := CityMapData.texture(CityMapData.art_key(entry))
+		var sprite := Sprite3D.new()
+		sprite.name = "CityArt_" + str(entry.id).validate_node_name()
+		sprite.texture = texture
+		sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		# Base world height 1m at scale 1; bottom overhangs the anchor by 6%,
+		# matching the previous 2D layout (art top = anchor - 0.94 * side).
+		sprite.pixel_size = 1.0 / maxf(1.0, texture.get_height())
+		sprite.offset = Vector2(0, texture.get_height() * 0.44)
+		_art_parent().add_child(sprite)
+		result.sprite = sprite
+		var shadow := MeshInstance3D.new()
+		shadow.name = "CityShadow_" + str(entry.id).validate_node_name()
+		shadow.mesh = ground_shadow_mesh()
+		_art_parent().add_child(shadow)
+		result.shadow = shadow
 	var label := GameUi.label(_name(entry), 10, INK)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -481,49 +534,79 @@ func _update_markers() -> void:
 	# Cull only outside the screen plus the artwork's extent. UI panels cover
 	# geography; they never move or hide its anchors to make room for themselves.
 	var area := Rect2(-global_position, get_viewport_rect().size).grow(120)
-	var all := entries.filter(func(e):return e.kind == "resident") + entries.filter(func(e):return e.kind == "landmark") + live_pois
+	var all := entries.filter(func(e):return e.kind == "landmark") + entries.filter(func(e):return e.kind == "resident") + live_pois
 	var keep := {}
+	var candidates: Array = []
 	for entry in all:
 		var id := str(entry.id)
 		keep[id] = true
 		if not _entry_visible(entry): continue
+		var art_key := CityMapData.art_key(entry)
 		if entry.kind == "poi":
-			# Source rank and zoom determine detail independently of screen neighbours.
+			# Fallback art means "no artwork for this category": search/list only.
+			if art_key == "place": continue
+			if host.zoom < 13.0: continue
+			# Source rank and zoom set the density budget before screen packing.
 			var rank_limit := 2 if host.zoom < 15 else 3 if host.zoom < 16 else 5
 			if float(entry.get("rank", 5)) > rank_limit: continue
-			if host.zoom < 12.5 and CityMapData.art_key(entry) == "place": continue
 		var world := MapGeoMath.geo_to_world(float(entry.lat), float(entry.lng), host.anchor_lat, host.anchor_lng)
 		if host.cam.is_position_behind(world): continue
 		var point: Vector2 = host.cam.unproject_position(world) - global_position
 		if not area.has_point(point): continue
 		var width := 82.0 if entry.kind == "landmark" else 78.0 if entry.kind == "resident" else 48.0
-		var art_key := CityMapData.art_key(entry)
-		var art_side: float = 88 if entry.kind == "landmark" else 28 if art_key == "place" else lerpf(32, 64, clampf((host.zoom - 13) / 3, 0, 1))
+		var art_side: float = 88 if entry.kind == "landmark" else lerpf(32, 64, clampf((host.zoom - 13) / 3, 0, 1))
 		var top := 40.0 if entry.kind == "resident" else 54.0 if art_key in ["hollywood_sign", "griffith_observatory", "santa_monica_pier"] else 80.0 if entry.kind == "landmark" else 56.0
 		if entry.kind == "poi": top = maxf(36, art_side * 0.94)
-		var bounds := Rect2(point - Vector2(width * 0.5, top), Vector2(width, top + 20))
+		var side := maxf(width, art_side)
+		var bounds := Rect2(point - Vector2(side * 0.5, top), Vector2(side, top + 20))
+		candidates.append({"entry": entry, "id": id, "world": world, "point": point,
+			"bounds": bounds, "width": width, "art_side": art_side})
+	# Screen-space packing: anchors never move; a marker either shows in place
+	# or yields entirely. Order: selected, landmarks, residents, then POIs by
+	# incumbency (anti-flicker), source rank and id — fully deterministic.
+	candidates.sort_custom(func(a, b): return _pack_key(a) < _pack_key(b))
+	var blockers := _player_blockers()
+	var occupied: Array = []
+	for c in candidates:
+		var entry: Dictionary = c.entry
+		var id: String = c.id
+		var is_selected: bool = selected.get("id", null) == entry.get("id")
+		var label_fits := true
+		if entry.kind == "landmark":
+			# Landmark artwork is the city's identity: never culled, only its label yields.
+			label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
+		elif not is_selected:
+			if _hits(occupied, c.bounds): continue
+			# People stay readable: markers yield to player/avatar footprints.
+			if _hits(blockers, c.bounds): continue
+		occupied.append(c.bounds)
 		if not markers.has(id): markers[id] = _make_marker(entry)
 		var marker: Dictionary = markers[id]
 		marker.entry = entry
-		marker.node.position = point
-		marker.rect = bounds
-		marker.anchor = point
+		marker.node.position = c.point
+		marker.rect = c.bounds
+		marker.anchor = c.point
 		if entry.kind == "resident":
 			marker.portrait.position = Vector2(-18, -38)
 			marker.label.text = _name(entry) + (" · " + L10n.text(entry.status) if entry.status == "Ready to deliver" else "")
 		else:
-			marker.art.position = Vector2(-art_side * 0.5, -art_side * 0.94)
-			marker.art.size = Vector2.ONE * art_side
+			_place_art(marker, c)
 		if entry.kind != "resident": marker.label.text = _name(entry)
-		marker.label.position = Vector2(-width * 0.5, 3)
-		marker.label.size = Vector2(width, 16)
+		marker.label.position = Vector2(-c.width * 0.5, 3)
+		marker.label.size = Vector2(c.width, 16)
 		marker.label.add_theme_font_size_override("font_size", 9)
-		marker.label.visible = entry.kind != "poi" or selected.get("id") == id or host.zoom >= 16
+		marker.label.visible = label_fits and (entry.kind != "poi" or is_selected or host.zoom >= 16)
 		displayed.append(marker)
 	var shown := displayed.map(func(m): return str(m.entry.id))
+	_shown_last = {}
+	for id in shown: _shown_last[id] = true
 	for id in markers.keys():
-		markers[id].node.visible = shown.has(id)
-		if not keep.has(id): markers[id].node.queue_free(); markers.erase(id)
+		var on: bool = shown.has(id)
+		markers[id].node.visible = on
+		if markers[id].has("sprite"):
+			markers[id].sprite.visible = on
+			markers[id].shadow.visible = on
+		if not keep.has(id): _free_marker(id)
 	if _provider_error.is_empty():
 		status.text = L10n.text("No dining places in view. Move or zoom the map.") if filter == "food" and displayed.is_empty() else ""
 	if selected.get("kind") == "resident" and markers.has(selected.id):
@@ -531,6 +614,50 @@ func _update_markers() -> void:
 		if not portrait._shown_key.is_empty() and portrait._shown_key == portrait._desired_key:
 			info_art.texture = portrait.portrait.texture
 	# Keep controls on top even when dynamically creating markers.
+
+func _pack_key(c: Dictionary) -> Array:
+	var kind_order := {"landmark": 0, "resident": 1, "poi": 2}
+	return [0 if selected.get("id", null) == c.entry.get("id") else 1,
+		kind_order.get(c.entry.kind, 3),
+		0 if _shown_last.has(c.id) else 1,
+		float(c.entry.get("rank", 5)),
+		c.id]
+
+static func _hits(rects: Array, rect: Rect2) -> bool:
+	for r in rects:
+		if (r as Rect2).intersects(rect): return true
+	return false
+
+## Screen footprints of the player and other players, in this view's space.
+func _player_blockers() -> Array:
+	var result: Array = []
+	var fm = host.get("farm_markers")
+	if fm == null or not fm.has_method("blocker_rects"): return result
+	for r in fm.blocker_rects():
+		result.append(Rect2((r as Rect2).position + fm.global_position - global_position, (r as Rect2).size))
+	return result
+
+## Position and size the world-space billboard so it stays glued to the 2D
+## anchor: world height h keeps the artwork at art_side logical pixels.
+func _place_art(marker: Dictionary, c: Dictionary) -> void:
+	var world: Vector3 = c.world
+	var dist := maxf(0.01, host.cam.global_position.distance_to(world))
+	var viewport_h := maxf(1.0, get_viewport_rect().size.y)
+	var world_h: float = c.art_side * 2.0 * dist * tan(deg_to_rad(host.cam.fov) * 0.5) / viewport_h
+	var sprite: Sprite3D = marker.sprite
+	sprite.position = world
+	sprite.scale = Vector3.ONE * world_h
+	var shadow: MeshInstance3D = marker.shadow
+	shadow.position = world
+	shadow.scale = Vector3(world_h * 0.8, 1.0, world_h * 0.45)
+
+func _free_marker(id: String) -> void:
+	var marker: Dictionary = markers[id]
+	marker.node.queue_free()
+	if marker.has("sprite"):
+		marker.sprite.queue_free()
+		marker.shadow.queue_free()
+	markers.erase(id)
 
 func activate_at(screen: Vector2) -> bool:
 	var local := screen - global_position

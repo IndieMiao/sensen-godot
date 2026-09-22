@@ -18,7 +18,7 @@ func _map() -> Node:
 	viewport.add_child(map)
 	return map
 
-func test_dense_city_markers_keep_exact_anchors_during_pan_zoom_and_panel_changes() -> void:
+func test_dense_city_markers_keep_exact_anchors_and_collapse_overlaps_deterministically() -> void:
 	var m := _map()
 	await get_tree().process_frame
 	m.set_process(false)
@@ -39,12 +39,73 @@ func test_dense_city_markers_keep_exact_anchors_during_pan_zoom_and_panel_change
 		if frame == 10: city.select(landmark)
 		if frame == 20: city.clear_selection()
 		city._update_markers()
-		assert_int(city.displayed.size()).is_equal(21)
+		# 20 cafés stacked on the observatory collapse into the landmark alone.
+		# What shows sits exactly on its geographic anchor; nothing is relocated.
+		assert_int(city.displayed.size()).is_equal(1)
+		assert_str(str(city.displayed[0].entry.id)).is_equal(str(landmark.id))
 		for marker in city.displayed:
 			var world := MapGeoMath.geo_to_world(marker.entry.lat, marker.entry.lng, m.anchor_lat, m.anchor_lng)
 			var expected: Vector2 = m.cam.unproject_position(world) - city.global_position
 			assert_float(marker.node.position.distance_to(expected)).is_less(0.001)
 			assert_bool(marker.node.visible).is_true()
+
+func test_marker_packing_prefers_rank_keeps_incumbents_and_never_shows_fallback_pins() -> void:
+	var m := _map()
+	await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	city.entries = []
+	var lat: float = m.home_lat + 0.02 # away from the farm so player footprints stay clear
+	var lng: float = m.home_lng + 0.02
+	m.center_lat = lat
+	m.center_lng = lng
+	m.zoom = 16.0
+	m._update_cameras()
+	m._sync_farm_markers()
+	city.live_pois = [
+		{"id": "pin", "kind": "poi", "name": "Mystery", "lat": lat, "lng": lng, "art": "place", "rank": 1},
+		{"id": "z_win", "kind": "poi", "name": "Ramen", "lat": lat, "lng": lng, "art": "restaurant", "rank": 1},
+		{"id": "a_lose", "kind": "poi", "name": "Cafe", "lat": lat, "lng": lng, "art": "cafe", "rank": 2},
+	]
+	city._update_markers()
+	var shown: Array = city.displayed.map(func(mk): return str(mk.entry.id))
+	assert_array(shown).contains_exactly(["z_win"])
+	assert_bool(city.markers.has("pin")).is_false() # fallback pins never become markers
+	# Incumbency: an equal-rank newcomer with a smaller id still loses to the shown marker.
+	city.live_pois.append({"id": "a_new", "kind": "poi", "name": "New", "lat": lat, "lng": lng, "art": "bakery", "rank": 1})
+	city._update_markers()
+	shown = city.displayed.map(func(mk): return str(mk.entry.id))
+	assert_array(shown).contains_exactly(["z_win"])
+	# Artwork is a world-space billboard with a soft ground shadow, so 3D avatars
+	# and buildings occlude each other by depth.
+	assert_object(city.markers["z_win"].sprite).is_instanceof(Sprite3D)
+	assert_bool(city.markers["z_win"].sprite.visible).is_true()
+	assert_bool(city.markers["z_win"].shadow.visible).is_true()
+	# Below the city-detail zoom band no provider POI renders at all.
+	m.zoom = 12.0
+	m._update_cameras()
+	city._update_markers()
+	assert_array(city.displayed).is_empty()
+
+func test_city_pois_yield_to_player_footprints() -> void:
+	var m := _map()
+	await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	city.entries = []
+	m.center_lat = m.home_lat
+	m.center_lng = m.home_lng
+	m.zoom = 16.0
+	m._update_cameras()
+	m._sync_farm_markers()
+	assert_array(m.farm_markers.blocker_rects()).is_not_empty()
+	city.live_pois = [{"id": "onp", "kind": "poi", "name": "Blocked", "lat": m.home_lat, "lng": m.home_lng, "art": "restaurant", "rank": 1}]
+	city._update_markers()
+	assert_bool(city.displayed.any(func(mk): return str(mk.entry.id) == "onp")).is_false()
+	# Away from people the same POI shows again.
+	city.live_pois[0].lat = m.home_lat + 0.004
+	city._update_markers()
+	assert_bool(city.displayed.any(func(mk): return str(mk.entry.id) == "onp")).is_true()
 
 func test_city_owners_never_cluster_clamp_or_shift_for_selection() -> void:
 	var m := _map()

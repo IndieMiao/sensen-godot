@@ -282,6 +282,20 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 		move_child(_buttons[selected_id], -1)
 	queue_redraw()
 
+## City-mode screen footprints of players (local space): the city POI layer
+## packs its markers around people so artwork never buries an avatar's pin.
+func blocker_rects() -> Array:
+	var result: Array = []
+	if not city_mode: return result
+	for id in visible_farm_ids:
+		var target: Control = _avatar_targets[id]
+		var rect := Rect2(target.position, target.size)
+		if id == "self" or id == expanded_avatar_id:
+			# The full-body 3D actor draws wider and taller than its tap target.
+			rect = rect.grow_individual(26, 84, 26, 0)
+		result.append(rect.merge(Rect2(_buttons[id].position, _buttons[id].size)))
+	return result
+
 func activate_at(screen: Vector2) -> bool:
 	var ids := visible_farm_ids.duplicate()
 	if city_mode:

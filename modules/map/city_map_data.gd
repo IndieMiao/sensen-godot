@@ -3,7 +3,8 @@ extends RefCounted
 ## Authored landmarks are independent of temporary provider POI results.
 const PATH := "res://assets/map/la_map.json"
 const ART_PATH := "res://assets/map/poi/"
-const CATEGORIES := {"restaurant": "Restaurant", "chinese_restaurant": "Chinese restaurant", "cafe": "Café", "bakery": "Bakery", "park": "Park", "museum": "Museum", "shop": "Shop", "flower_shop": "Florist", "place": "Place"}
+const CATEGORIES := {"restaurant": "Restaurant", "chinese_restaurant": "Chinese restaurant", "cafe": "Café", "bakery": "Bakery", "park": "Park", "museum": "Museum", "shop": "Shop", "flower_shop": "Florist", "beach": "Beach", "theme_park": "Attraction", "place": "Place"}
+const SHOP_MAKI := ["grocery", "shop", "clothing-store", "convenience", "supermarket", "shoe", "jewelry-store", "gift", "hardware", "furniture", "mobile-phone", "alcohol-shop", "watch", "department-store", "optician", "laundry"]
 
 static func landmarks(region_id: String) -> Array:
 	if region_id != "los_angeles": return []
@@ -30,12 +31,19 @@ static func art_key(poi: Dictionary) -> String:
 	var category := str(poi.get("category", "")).to_lower()
 	# Cuisine is never inferred from a shop's name or from the broad food category.
 	if category in ["chinese restaurant", "中餐厅", "中餐馆"]: return "chinese_restaurant"
-	if maki.begins_with("restaurant"): return "restaurant"
-	if maki in ["cafe", "bakery", "museum"]: return maki
-	if maki in ["park", "garden", "picnic-site", "playground"]: return "park"
-	if maki == "florist": return "flower_shop"
-	if maki in ["grocery", "shop", "clothing-store", "convenience", "supermarket"]: return "shop"
-	if str(poi.get("class", "")) == "food_and_drink": return "restaurant"
+	if maki.begins_with("restaurant") or maki in ["fast-food", "bar", "beer"]: return "restaurant"
+	if maki in ["cafe", "bakery", "museum", "beach"]: return maki
+	if maki in ["teahouse", "ice-cream"]: return "cafe"
+	if maki == "confectionery": return "bakery"
+	if maki in ["park", "garden", "picnic-site", "playground", "zoo", "dog-park"]: return "park"
+	if maki in ["florist", "garden-centre"]: return "flower_shop"
+	if maki == "art-gallery": return "museum"
+	if maki in ["attraction", "amusement-park"]: return "theme_park"
+	if maki in SHOP_MAKI: return "shop"
+	var cls := str(poi.get("class", ""))
+	if cls == "food_and_drink": return "restaurant"
+	if cls == "park_like": return "park"
+	if cls in ["store_like", "food_and_drink_stores"]: return "shop"
 	return "place"
 
 static func normalize(raw: Variant) -> Array:

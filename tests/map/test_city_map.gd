@@ -6,6 +6,19 @@ func test_poi_categories_do_not_guess_cuisine_from_a_name() -> void:
 	assert_str(CityMapData.art_key({"maki":"cafe"})).is_equal("cafe")
 	assert_str(CityMapData.art_key({"class":"unknown"})).is_equal("place")
 
+func test_poi_art_covers_more_provider_categories() -> void:
+	assert_str(CityMapData.art_key({"maki":"fast-food"})).is_equal("restaurant")
+	assert_str(CityMapData.art_key({"maki":"bar"})).is_equal("restaurant")
+	assert_str(CityMapData.art_key({"maki":"ice-cream"})).is_equal("cafe")
+	assert_str(CityMapData.art_key({"maki":"jewelry-store"})).is_equal("shop")
+	assert_str(CityMapData.art_key({"maki":"attraction"})).is_equal("theme_park")
+	assert_str(CityMapData.art_key({"maki":"art-gallery"})).is_equal("museum")
+	assert_str(CityMapData.art_key({"maki":"zoo"})).is_equal("park")
+	assert_str(CityMapData.art_key({"maki":"beach"})).is_equal("beach")
+	assert_str(CityMapData.art_key({"class":"park_like"})).is_equal("park")
+	assert_str(CityMapData.art_key({"class":"store_like"})).is_equal("shop")
+	assert_str(CityMapData.art_key({"class":"food_and_drink_stores"})).is_equal("shop")
+
 func test_provider_results_validate_coordinates_and_deduplicate() -> void:
 	var good := {"id":"1", "name":"Park", "lat":34.1, "lng":-118.3, "maki":"park"}
 	var points := CityMapData.normalize([good, good, {"id":"2", "name":"Invalid", "lat":99, "lng":2}, {"id":"3", "lat":0, "lng":0}, {"id":"4", "name":"Bad", "lat":"oops", "lng":1}])
