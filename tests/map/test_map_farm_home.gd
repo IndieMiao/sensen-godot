@@ -231,7 +231,9 @@ func test_explicit_home_focus_switches_both_camera_and_nearby_city() -> void:
 	var m := _map()
 	await get_tree().process_frame
 	m._focus_own_farm()
-	await get_tree().create_timer(0.7).timeout
+	# 跨城回到自己的农场走飞行动画（spec 2026-09-23），城市在起飞时就切过去。
+	assert_str(m.region.id).is_equal("shanghai")
+	await get_tree().create_timer(MapFlight.MAX_DURATION + 0.3).timeout
 	assert_float(m.center_lng).is_greater(121.0)
 	assert_str(m.region.id).is_equal("shanghai")
 	assert_str(m._nearby_region).is_equal("shanghai")

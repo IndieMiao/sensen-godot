@@ -24,6 +24,9 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.ScreenCoordinate
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.localization.localizeLabels
+import com.mapbox.maps.extension.style.layers.properties.generated.ProjectionName
+import com.mapbox.maps.extension.style.projection.generated.projection
+import com.mapbox.maps.extension.style.projection.generated.setProjection
 import com.mapbox.maps.plugin.attribution.attribution
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.logo.logo
@@ -177,6 +180,9 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
             )
             mv.mapboxMap.loadStyle(Style.MAPBOX_STREETS) { style ->
                 styleIsReady = true
+                // Streets v12 在低 zoom 默认 globe：Godot 叠加层按 Web Mercator 投影标记，
+                // 必须锁死 Mercator，否则国家级视野下 pin 与底图错位。
+                style.setProjection(projection(ProjectionName.MERCATOR))
                 style.localizeLabels(mapLocale)
                 applyCityStyle(style)
                 Log.i(TAG, "style loaded")
@@ -242,7 +248,13 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
                     set(id, "text-halo-color", "#faf8f0")
                     val key = id to "text-size"
                     if (!originalCityProperties.containsKey(key)) originalCityProperties[key] = style.getStyleLayerProperty(id,"text-size").value
-                    style.setStyleLayerProperty(id, "text-size", Value(11.0))
+                    // 国家级视野要分得出层级：国名 > 省州名 > 其余（城市街区统一 11）。
+                    val size = when {
+                        id.startsWith("country-label") || id.startsWith("continent-label") -> 14.0
+                        id.startsWith("state-label") -> 12.0
+                        else -> 11.0
+                    }
+                    style.setStyleLayerProperty(id, "text-size", Value(size))
                 }
             }
         }

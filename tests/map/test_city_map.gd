@@ -137,10 +137,9 @@ func test_shanghai_uses_the_same_city_map_framework() -> void:
 	assert_str(m.city_map.get_node("MapCity").text).is_equal(L10n.text("Shanghai"))
 	var ids: Array = m.city_map.entries.filter(func(e): return e.kind == "landmark").map(func(e): return str(e.id))
 	assert_array(ids).contains(["oriental_pearl_tower", "the_bund", "yu_garden"])
-	# 可拖动范围取上海的选址范围，总览飞到上海市区。
+	# 城市地图可无缝缩放到国家级、自由拖到任何地方：不钳平移范围；总览飞到上海市区。
 	m._city_bounds()
-	assert_bool(m.pan_bounds.has_point(Vector2(31.2304, 121.4737))).is_true()
-	assert_bool(m.pan_bounds.has_point(Vector2(34.05, -118.24))).is_false()
+	assert_that(m.pan_bounds).is_equal(Rect2())
 	m._city_action("map")
 	await get_tree().create_timer(0.7).timeout
 	assert_float(m.center_lat).is_between(31.1, 31.35)

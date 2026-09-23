@@ -8,6 +8,8 @@ signal player_visit_requested(farm_id: String)
 ## 玩家详情卡被关闭（点 X、切筛选、开列表等）：宿主借此清掉 pin 选中与 3D 角色。
 signal player_deselected
 signal action_requested(action: String)
+## 城市面板选中或低 zoom 点城市气泡：宿主飞到该城总览。
+signal city_requested(region_id: String)
 signal sheet_opened
 const INK := Color("232b30")
 const MUTED := Color("69716e")
@@ -68,6 +70,17 @@ var _art_root: Node3D
 var _shown_last: Dictionary = {}
 ## id -> ticks_msec before which a culled marker may not reappear.
 var _hidden_until: Dictionary = {}
+## 左上角标题：随中心所在位置变化（已开通城市名 / 瓦片地名）。
+var city_button: Button
+var _underline: ColorRect
+var _header_key := ""
+## 标题地名来源（反向地理编码）；测试可直接写 places 覆盖。
+var geocoder: PlaceGeocoder
+var places: Dictionary = {}
+## 城市气泡：region_id -> {node, name, count}；只在国家/省级视野显示。
+var bubbles: Dictionary = {}
+var city_panel: PanelContainer
+var city_rows: VBoxContainer
 static func surface(color := Color(1, 1, 1, 0.97), radius := 16) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = color
@@ -137,10 +150,13 @@ func _ready() -> void:
 	city.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	city.add_theme_font_size_override("font_size", 22)
 	city.add_theme_constant_override("icon_max_width", 12)
-	city.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+	# 标题是纯文字入口：任何状态都不画底板（按下时曾露出白色 focus 底）。
+	for state in ["normal", "hover", "pressed", "hover_pressed", "focus"]: city.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	city.pressed.connect(func(): action_requested.emit("city"))
 	city.position = Vector2(5, 0)
+	city.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	add_child(city)
+	city_button = city
 	city.size = Vector2(city.get_combined_minimum_size().x, 44)
 	subtitle = GameUi.label(city_name, 10, MUTED)
 	subtitle.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -151,6 +167,7 @@ func _ready() -> void:
 	underline.position = Vector2(4, 31)
 	underline.size = Vector2(maxf(40.0, city.size.x - 22.0), 4)
 	underline.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_underline = underline
 	add_child(underline)
 	move_child(underline, 0)
 	var places := flat_button("list-checks", "", "MapLandmarkList")
@@ -245,6 +262,7 @@ func _ready() -> void:
 		_nav_labels[spec[0]] = label
 	_build_info()
 	_build_list()
+	_build_city_panel()
 	recenter = flat_button("locate-fixed", "", "MapRecenter")
 	compact_round_button(recenter)
 	recenter.pressed.connect(func(): action_requested.emit("recenter"))
@@ -350,11 +368,13 @@ func _toggle_places() -> void:
 	if opening:
 		sheet_opened.emit()
 		clear_selection()
+		city_panel.hide()
 	list_panel.visible = opening
 	if host: host._reset_gesture()
 
 func dismiss_overlays() -> void:
 	if list_panel: list_panel.hide()
+	if city_panel: city_panel.hide()
 	clear_selection()
 
 func clear_selection() -> void:
@@ -480,6 +500,13 @@ func attach_bridge(bridge: MapBridge) -> void:
 func tick(dt: float) -> void:
 	if host == null: return
 	attach_bridge(host.map)
+	# 地图桥在城市层之后才创建；桌面/测试没有桥（也就没有 token），标题回落 Explore。
+	if geocoder == null and host.map:
+		var token: String = host._load_token()
+		if not token.is_empty():
+			geocoder = PlaceGeocoder.new()
+			geocoder.token = token
+			add_child(geocoder)
 	get_node("MapNorth").tooltip_text = L10n.text("North up")
 	get_node("MapNorth/Arrow").rotation = deg_to_rad(-host.bearing)
 	_timer += dt
@@ -490,13 +517,19 @@ func tick(dt: float) -> void:
 		var pose := "%.4f,%.4f,%.2f,%.1f,%.1f,%s,%s" % [host.center_lat, host.center_lng, host.zoom,
 			host.bearing, host.pitch, get_viewport().get_visible_rect().size, TranslationServer.get_locale()]
 		if _pending and _request_age > 8: _pending = false; _received_pose = ""
-		if not _pending and _attached_bridge and host._map_is_ready and host._touch_count == 0 and host._fling_vel.length() <= host.FLING_MIN_SPEED and (pose != _received_pose or _request_age > 15):
+		if not _pending and _attached_bridge and host._map_is_ready and host.city_detail_visible() and host._touch_count == 0 and host._fling_vel.length() <= host.FLING_MIN_SPEED and (pose != _received_pose or _request_age > 15):
 			_request += 1
 			_pending = true
 			_request_age = 0
 			_last_pose = pose
 			_attached_bridge.request_pois(_request)
+		# 标题地名只在手指离开、惯性停下后查（与 POI 同一节奏）。
+		if geocoder and host._touch_count == 0 and host._fling_vel.length() <= host.FLING_MIN_SPEED:
+			geocoder.lookup(host.center_lat, host.center_lng, host.zoom, TranslationServer.get_locale())
+	if geocoder: places = geocoder.places
 	_update_markers()
+	_update_bubbles()
+	_update_header()
 
 func _on_pois(id: int, payload: String) -> void:
 	if id != _request: return
@@ -604,10 +637,12 @@ func _update_markers() -> void:
 	var all := entries.filter(func(e):return e.kind == "landmark") + entries.filter(func(e):return e.kind == "resident") + live_pois
 	var keep := {}
 	var candidates: Array = []
+	# 国家/省级视野只剩城市气泡与自己的头像：细节标记全部让出（带消失动画）。
+	var detail: bool = host.city_detail_visible()
 	for entry in all:
 		var id := str(entry.id)
 		keep[id] = true
-		if not _entry_visible(entry): continue
+		if not detail or not _entry_visible(entry): continue
 		var art_key := CityMapData.art_key(entry)
 		if entry.kind == "poi":
 			# 只有高频 maki 才有图标；其余（含通用 marker）不上图，只留在搜索/列表。
@@ -623,8 +658,9 @@ func _update_markers() -> void:
 				# 中高 zoom 不设 rank 门槛——密度全部交给屏幕打包。
 				continue
 		var world := MapGeoMath.geo_to_world(float(entry.lat), float(entry.lng), host.anchor_lat, host.anchor_lng)
-		if host.cam.is_position_behind(world): continue
-		var point: Vector2 = host.cam.unproject_position(world) - global_position
+		var projected = host.geo_to_screen(float(entry.lat), float(entry.lng))
+		if projected == null: continue
+		var point: Vector2 = (projected as Vector2) - global_position
 		if not area.has_point(point): continue
 		var width := 82.0 if entry.kind == "landmark" else 78.0 if entry.kind == "resident" else 48.0
 		var is_sel: bool = selected.get("id", null) == entry.get("id")
@@ -850,11 +886,19 @@ func _free_marker(id: String) -> void:
 
 func activate_at(screen: Vector2) -> bool:
 	var local := screen - global_position
+	if not host.city_detail_visible():
+		for id in bubbles:
+			var node: Control = bubbles[id].node
+			if node.visible and Rect2(node.position, node.size).grow(6).has_point(local):
+				city_requested.emit(str(id))
+				return true
+		return false
 	for marker in displayed:
 		if _hits_point(marker.get("hit", [marker.rect]), local): select(marker.entry); return true
 	return false
 
 func consume_back() -> bool:
+	if city_panel.visible: city_panel.hide(); return true
 	if list_panel.visible: list_panel.hide(); return true
 	if not selected.is_empty(): clear_selection(); return true
 	return false
@@ -863,3 +907,155 @@ func _settle_info() -> void:
 	await get_tree().process_frame
 	if not is_inside_tree(): return
 	_layout()
+
+## —— 城市切换 UI（spec 2026-09-23）——————————————————————————————————
+
+## 宿主轻量切城后调用：换标题、地标居民；地理 POI 缓存与城市无关，保留。
+func region_changed() -> void:
+	_last_state = ""
+	_header_key = ""
+	clear_selection()
+	refresh_content()
+	_update_header()
+
+## 标题口径：中心在已开通城市里 → 城市名；否则按 zoom 取瓦片地名（城市/省州/国家），
+## 未开通地点副标题提示没有农场。没有地名数据（iOS/桌面）时显示 Explore。
+static func header_for(in_city: bool, city_name: String, zoom: float, place_names: Dictionary) -> Array:
+	if in_city: return [L10n.text(city_name), city_name]
+	var tier := "settlement" if zoom >= 7.0 else "state" if zoom >= 4.0 else "country"
+	var order: Array = {"settlement": ["settlement", "state", "country"], "state": ["state", "country"], "country": ["country"]}[tier]
+	var title := ""
+	for key in order:
+		title = str(place_names.get(key, ""))
+		if not title.is_empty(): break
+	if title.is_empty(): title = L10n.text("Explore")
+	return [title, L10n.text("No farms here yet") if tier == "settlement" else L10n.text("Zoom in to explore")]
+
+func _update_header() -> void:
+	if city_button == null: return
+	var h := header_for(host.in_active_city(), str(host.region.get("name", "")), float(host.zoom), places)
+	var key := str(h) + TranslationServer.get_locale()
+	if key == _header_key: return
+	_header_key = key
+	city_button.text = str(h[0])
+	subtitle.text = str(h[1])
+	# 按字体实测宽度（开了省略号后 Button 的最小尺寸不含文字）；长地名在右侧按钮前截断。
+	var font := city_button.get_theme_font("font")
+	var text_w := font.get_string_size(city_button.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x if font else 120.0
+	var width := minf(text_w + 34.0, maxf(120.0, size.x - 140.0))
+	city_button.size = Vector2(width, 44)
+	_underline.size.x = maxf(40.0, width - 22.0)
+
+func _update_bubbles() -> void:
+	var detail: bool = host.city_detail_visible()
+	var area := Rect2(-global_position, get_viewport_rect().size).grow(60)
+	for r in host.city_regions():
+		var id := str(r.id)
+		if not bubbles.has(id): bubbles[id] = _make_bubble(id)
+		var bubble: Dictionary = bubbles[id]
+		var overview: Dictionary = CityMapData.city(id).get("overview", {})
+		var projected = host.geo_to_screen(float(overview.get("lat", r.center[0])), float(overview.get("lng", r.center[1])))
+		var point: Vector2 = (projected as Vector2) - global_position if projected != null else Vector2(-1e6, -1e6)
+		var node: Control = bubble.node
+		node.visible = not detail and area.has_point(point)
+		if not node.visible: continue
+		bubble.name.text = L10n.text(str(r.get("name", id)))
+		var count := int(host.city_farm_counts.get(id, -1))
+		bubble.count.text = L10n.count_text("%d farm", "%d farms", count) if count >= 0 else ""
+		bubble.count.visible = count >= 0
+		node.size = node.get_combined_minimum_size()
+		# 气泡挂在城市点下方，自己的头像站在点上方，两者在同一城市也不互相遮挡。
+		node.position = point + Vector2(-node.size.x * 0.5, 6)
+		bubble.dot.position = point - Vector2(5, 5)
+		bubble.dot.visible = true
+	for id in bubbles:
+		if not bubbles[id].node.visible: bubbles[id].dot.visible = false
+
+func _make_bubble(id: String) -> Dictionary:
+	var node := PanelContainer.new()
+	node.name = "MapCityBubble_" + id.validate_node_name()
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var style := surface(Color.WHITE, 14)
+	style.content_margin_left = 10
+	style.content_margin_right = 10
+	style.content_margin_top = 4
+	style.content_margin_bottom = 4
+	node.add_theme_stylebox_override("panel", style)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 0)
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	node.add_child(column)
+	var name_label := GameUi.label("", 12, INK)
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(name_label)
+	var count_label := GameUi.label("", 9, MUTED)
+	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(count_label)
+	add_child(node)
+	move_child(node, 0)
+	var dot := Panel.new()
+	dot.name = "MapCityDot_" + id.validate_node_name()
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dot.size = Vector2(10, 10)
+	var dot_style := StyleBoxFlat.new()
+	dot_style.bg_color = Color("609f28")
+	dot_style.border_color = Color.WHITE
+	dot_style.set_border_width_all(2)
+	dot_style.set_corner_radius_all(5)
+	dot.add_theme_stylebox_override("panel", dot_style)
+	add_child(dot)
+	move_child(dot, 0)
+	return {"node": node, "name": name_label, "count": count_label, "dot": dot}
+
+func _build_city_panel() -> void:
+	city_panel = PanelContainer.new()
+	city_panel.name = "MapCityPanel"
+	var style := surface()
+	style.content_margin_left = 6
+	style.content_margin_right = 6
+	style.content_margin_top = 6
+	style.content_margin_bottom = 6
+	city_panel.add_theme_stylebox_override("panel", style)
+	city_panel.position = Vector2(4, 48)
+	city_panel.custom_minimum_size = Vector2(200, 0)
+	city_rows = VBoxContainer.new()
+	city_rows.add_theme_constant_override("separation", 0)
+	city_panel.add_child(city_rows)
+	city_panel.hide()
+	add_child(city_panel)
+
+## 左上角城市名：打开/收起地图内城市面板（已开通城市 + 农场数），不再离开地图页。
+func toggle_city_panel() -> void:
+	var opening := not city_panel.visible
+	if opening:
+		sheet_opened.emit()
+		clear_selection()
+		list_panel.hide()
+		_fill_city_rows()
+	city_panel.visible = opening
+	city_panel.size = city_panel.get_combined_minimum_size()
+	if host: host._reset_gesture()
+
+func _fill_city_rows() -> void:
+	for child in city_rows.get_children():
+		city_rows.remove_child(child)
+		child.queue_free()
+	var header := GameUi.label(L10n.text("Cities"), 10, MUTED)
+	header.custom_minimum_size.y = 22
+	city_rows.add_child(header)
+	for r in host.city_regions():
+		var id := str(r.id)
+		var current: bool = id == str(host.region.get("id", "")) and host.in_active_city()
+		var count := int(host.city_farm_counts.get(id, -1))
+		var text := L10n.text(str(r.get("name", id)))
+		if count >= 0: text += "  ·  " + L10n.count_text("%d farm", "%d farms", count)
+		var b := flat_button("check" if current else "map-pin", text, "MapCityRow_" + id)
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.add_theme_font_size_override("font_size", 12)
+		b.custom_minimum_size = Vector2(188, 44)
+		for sty in ["normal", "hover", "focus"]: b.add_theme_stylebox_override(sty, StyleBoxEmpty.new())
+		b.pressed.connect(func():
+			city_panel.hide()
+			city_requested.emit(id))
+		city_rows.add_child(b)
+	host._refresh_city_counts()

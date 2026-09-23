@@ -162,6 +162,19 @@ var _nearby_region := ""
 var _candidate_bps: Dictionary = {} # layout_patch_id -> FarmBlueprint
 const STREET_ZOOM_MIN := 15.0
 const STREET_ZOOM_MAX := 18.0
+## 城市地图的无缝缩放（spec 2026-09-23-map-seamless-zoom-city-switch）：
+## 下限 z2 = 竖屏能放下中国/美国本土全境；低于 CITY_DETAIL_ZOOM 只剩城市气泡与自己的 2D 头像。
+const CITY_MIN_ZOOM := 2.0
+const CITY_DETAIL_ZOOM := 9.0
+## 城市地图 pitch 随 zoom 压平：z≥PITCH_FULL_ZOOM 为 CITY_PITCH，z≤PITCH_FLAT_ZOOM 为 0。
+## pitch=0 时标记走精确 Mercator 投影（geo_to_screen），所以压平区必须覆盖全部低 zoom。
+const CITY_PITCH := 35.0
+const PITCH_FLAT_ZOOM := 8.0
+const PITCH_FULL_ZOOM := 11.0
+## 自动切城：z≥AUTO_SWITCH_ZOOM 且屏幕中心落进某座已开通城市的 placement_bounds；
+## 当前城市的边界外扩 CITY_EXIT_MARGIN（按跨度比例）才算离开，边界上来回拖不抖动。
+const AUTO_SWITCH_ZOOM := 7.0
+const CITY_EXIT_MARGIN := 0.1
 var _zoom_elastic := 0.0
 var _focus_tween: Tween
 var city_map: CityMapView
@@ -186,6 +199,14 @@ var _relocation_session: FarmSession
 var _relocation_preview: FarmRelocationPreview
 var _relocation_generation := 0
 var _relocation_committed := false
+## 城市气泡上的各城农场数（region_id -> int），进入低 zoom 时拉取，60 秒内不重拉。
+var city_farm_counts := {}
+var _counts_fetched_ms := -1
+var _last_city_detail := true
+## 为真时清选中不 kill _focus_tween（低 zoom 门槛在飞行途中被跨过）。
+var _hold_motion := false
+## 城市视角的"静止"罗盘方向；实际 bearing = city_bearing × city_view_factor(zoom)。
+var city_bearing := 0.0
 
 func _ready() -> void:
 	# A new picker can sit above a suspended map whose camera is still registered.
@@ -303,7 +324,10 @@ func _process(_dt: float) -> void:
 		_update_cameras()
 	_update_load_bar()
 	_sync_farm_markers()
-	if city_map: city_map.tick(_dt)
+	if city_map:
+		_update_active_city()
+		_update_city_detail()
+		city_map.tick(_dt)
 	if _placement_mode and _placement_pin:
 		_placement_pin.position = cam.unproject_position(center_world) - _placement_pin.get_parent().global_position - Vector2(14, 28)
 	if Engine.get_process_frames() % 30 == 0:
@@ -430,7 +454,9 @@ func _update_cameras() -> void:
 
 ## 浮动原点：地图中心跑远了就把锚点搬过来（f64 精确拷贝），所有几何重算。
 func _maybe_reanchor() -> void:
-	if center_world.length() < REANCHOR_DIST_M:
+	# 低 zoom 一帧能拖出上千公里：阈值随相机距离放宽，避免每帧重锚；
+	# 精度只影响 3D 内容，而 3D 内容只在高 zoom（d 小）时出现。
+	if center_world.length() < maxf(REANCHOR_DIST_M, _cam_distance() * 0.25):
 		return
 	anchor_lat = center_lat
 	anchor_lng = center_lng
@@ -446,7 +472,7 @@ func _update_pawns(d: float) -> void:
 		var character_scale := 1.15 if city_map else 0.8
 		# ready 门禁：装配完成+首帧姿态应用前绝不显示——半成品蒙皮网格在地图
 		# 缩放（~25×）下会渲染成通天拉伸毛刺（2026-08-29 真机截图实证）。
-		var vis: bool = p.ready and n.position.distance_to(center_world) <= cull_r
+		var vis: bool = p.ready and n.position.distance_to(center_world) <= cull_r and city_detail_visible()
 		if city_map and str(p.cohort).begins_with("farm:"):
 			vis = vis and farm_markers.selected_id == str(p.cohort).trim_prefix("farm:")
 		if street_mode and farm_markers and city_map == null:
@@ -1090,6 +1116,10 @@ func _set_zoom(v: float) -> void:
 	if street_mode and v != zoom:
 		_zoom_elastic = clampf((v - zoom) * 0.35, -0.16, 0.16)
 		_zoom_vel = 0
+	if city_map:
+		# pitch 与 bearing 一起随 zoom 回正：国家级是正北朝上的平面图，放大回城市恢复城市视角。
+		pitch = city_pitch_for(zoom)
+		bearing = city_bearing * city_view_factor(zoom)
 	if _zoom_label: _zoom_label.text = L10n.format_text("Zoom %.0f", zoom)
 	_camera_dirty = true
 
@@ -1548,7 +1578,7 @@ func _set_nearby_open(open: bool) -> void:
 	_camera_dirty = true
 
 func _clear_farm_selection() -> void:
-	if _focus_tween: _focus_tween.kill()
+	if _focus_tween and not _hold_motion: _focus_tween.kill()
 	_clear_city_player()
 	if nearby_panel:
 		nearby_panel.clear_focus()
@@ -1619,7 +1649,19 @@ func _focus_own_farm(highlight := true) -> void:
 	_clear_city_player()
 	var point: Dictionary = farm_markers.points.self
 	var own_region_id: String = point.bp.region_id
-	if own_region_id != str(region.get("id", "")):
+	if city_map:
+		var own_city := FarmRegions.load_default().region(own_region_id)
+		var farm_center: Vector2 = point.bp.overlay.center
+		var far := not city_detail_visible() or MapGeoMath.geo_to_world(farm_center.x, farm_center.y, center_lat, center_lng).length() > 50000.0
+		if CityMapData.has_city(own_region_id) and not own_city.is_empty(): _switch_city(own_city)
+		if far:
+			UiState.write({"selected_farm_id": ""})
+			farm_markers.selected_id = ""
+			# 飞行途中会跨过低 zoom 门槛（那里清选中），高亮等落地再给。
+			_fly_to(farm_center.x, farm_center.y, 16.0, city_bearing, func():
+				if highlight and farm_markers: farm_markers.selected_id = "self")
+			return
+	elif own_region_id != str(region.get("id", "")):
 		var own_region := FarmRegions.load_default().region(own_region_id)
 		if not own_region.is_empty():
 			FarmRegions.save_choice(own_region_id)
@@ -1719,6 +1761,8 @@ func _sync_farm_markers() -> void:
 	var bottom := nearby_panel.position.y - 8 if nearby_panel and nearby_panel.visible else journey_footer.position.y - 8 if journey_footer else root.size.y - 24
 	if city_map:
 		farm_markers.city_zoom = zoom
+		farm_markers.low_detail = not city_detail_visible()
+		if not farm_markers.projector.is_valid(): farm_markers.projector = geo_to_screen
 		bottom = city_map.info.position.y - 8 if city_map.info.visible else city_map.dock.position.y - 8
 		if nearby_panel and nearby_panel.visible: bottom = minf(bottom, nearby_panel.position.y - 8)
 	var marker_top := CityMapView.CONTENT_TOP if city_map else 110.0
@@ -1919,12 +1963,147 @@ func _on_street_visit_requested(farm_id: String) -> void:
 
 
 func _minimum_zoom() -> float:
-	return 9.5 if city_map else STREET_ZOOM_MIN if street_mode else 3.0
+	return CITY_MIN_ZOOM if city_map else STREET_ZOOM_MIN if street_mode else 3.0
+
+static func city_view_factor(z: float) -> float:
+	return clampf((z - PITCH_FLAT_ZOOM) / (PITCH_FULL_ZOOM - PITCH_FLAT_ZOOM), 0.0, 1.0)
+
+static func city_pitch_for(z: float) -> float:
+	return CITY_PITCH * city_view_factor(z)
+
+## 城市地图细节层（地标/POI/其他玩家/3D 角色）是否可见；低于门槛只剩城市气泡与自己的头像。
+func city_detail_visible() -> bool:
+	return city_map == null or zoom + _zoom_elastic >= CITY_DETAIL_ZOOM
 
 func _city_bounds() -> void:
-	# 可拖动范围 = 该城市的选址范围 [south, west, north, east]。
-	var b: Array = region.get("placement_bounds", [])
-	pan_bounds = Rect2(float(b[0]), float(b[1]), float(b[2]) - float(b[0]), float(b[3]) - float(b[1])) if city_map and b.size() == 4 else Rect2()
+	# 城市地图可以无缝缩放到国家级、自由拖到任何地方：不钳平移范围（纬度 ±85° 由
+	# _apply_world_delta 保证）。选址/搬家模式各自设置自己的范围，与此无关。
+	if city_map: pan_bounds = Rect2()
+
+## 地理坐标 → 视口像素（与 cam.unproject_position 同一坐标系；背后返回 null）。
+## pitch=0 时用精确 Web Mercator：局部等距近似只在城市尺度准确，国家级会与底图错位。
+## 全程标量 f64 运算——Vector2 是 float32，高 zoom 下 Mercator 差值会丢到十几像素。
+func geo_to_screen(lat: float, lng: float) -> Variant:
+	if pitch <= 0.01:
+		var vp := get_viewport().get_visible_rect().size
+		var scale := vp.y / _map_logical_height() * 512.0 * pow(2.0, zoom + _zoom_elastic)
+		var dx := fposmod(MapGeoMath.mercator_x(lng) - MapGeoMath.mercator_x(center_lng) + 0.5, 1.0) - 0.5
+		var dy := MapGeoMath.mercator_y(lat) - MapGeoMath.mercator_y(center_lat)
+		var b := deg_to_rad(bearing)
+		var sx := (dx * cos(b) + dy * sin(b)) * scale
+		var sy := (-dx * sin(b) + dy * cos(b)) * scale
+		return vp * 0.5 + Vector2(sx, sy)
+	var world := MapGeoMath.geo_to_world(lat, lng, anchor_lat, anchor_lng)
+	if cam.is_position_behind(world): return null
+	return cam.unproject_position(world)
+
+## —— 城市切换（spec 2026-09-23）——————————————————————————————————
+
+## 已开通城市（regions.json 里有城市地图配置的）。
+func city_regions() -> Array:
+	var regions := FarmRegions.load_default()
+	if regions == null: return []
+	return regions.regions.filter(func(r): return CityMapData.has_city(str(r.get("id", ""))))
+
+static func _bounds_contain(r: Dictionary, lat: float, lng: float, margin: float) -> bool:
+	var b: Array = r.get("placement_bounds", [])
+	if b.size() != 4: return false
+	var dlat := (float(b[2]) - float(b[0])) * margin
+	var dlng := (float(b[3]) - float(b[1])) * margin
+	return lat >= float(b[0]) - dlat and lat <= float(b[2]) + dlat and lng >= float(b[1]) - dlng and lng <= float(b[3]) + dlng
+
+## 中心点所在的已开通城市 id；当前城市享有外扩边界（滞回）。都不在就返回 ""。
+static func city_at(regions: Array, lat: float, lng: float, current_id: String) -> String:
+	for r in regions:
+		if str(r.get("id", "")) == current_id and _bounds_contain(r, lat, lng, CITY_EXIT_MARGIN): return current_id
+	for r in regions:
+		if _bounds_contain(r, lat, lng, 0.0): return str(r.get("id", ""))
+	return ""
+
+## 屏幕中心当前是否落在（已激活的）城市里——标题据此决定显示城市名还是瓦片地名。
+func in_active_city() -> bool:
+	return zoom >= AUTO_SWITCH_ZOOM and city_at(city_regions(), center_lat, center_lng, str(region.get("id", ""))) == str(region.get("id", ""))
+
+func _update_active_city(force := false) -> void:
+	if _relocation_mode or _placement_mode or zoom < AUTO_SWITCH_ZOOM: return
+	if _touch_count == 0 and _focus_tween and _focus_tween.is_running(): return # 飞行途中不切，落地再判
+	if not force and Engine.get_process_frames() % 10 != 0: return
+	var regions := city_regions()
+	var id := city_at(regions, center_lat, center_lng, str(region.get("id", "")))
+	if id.is_empty() or id == str(region.get("id", "")): return
+	for r in regions:
+		if str(r.id) == id: _switch_city(r)
+
+## 进入国家/省级视野：清掉选中（其标记已让出），拉一次各城农场数给城市气泡。
+func _update_city_detail() -> void:
+	var detail := city_detail_visible()
+	if detail == _last_city_detail: return
+	_last_city_detail = detail
+	if detail: return
+	# 缩放/飞行途中跨过门槛：只清选中，不打断正在进行的相机动画。
+	_hold_motion = true
+	_clear_farm_selection()
+	city_map.clear_selection()
+	_hold_motion = false
+	_refresh_city_counts()
+
+func _refresh_city_counts() -> void:
+	if _counts_fetched_ms >= 0 and Time.get_ticks_msec() - _counts_fetched_ms < 60000: return
+	_counts_fetched_ms = Time.get_ticks_msec()
+	var own_region := ""
+	if farm_markers and farm_markers.points.has("self"): own_region = str(farm_markers.points.self.bp.region_id)
+	for r in city_regions():
+		var id := str(r.id)
+		var count := PresetSnapshots.entries(id).size()
+		if Net and Net.logged_in():
+			var res: Dictionary = await Net.nearby(id)
+			if not is_inside_tree(): return
+			if res.get("ok", false): count = int(res.count)
+		# 气泡口径 = 该城全部农场（含自己的）。
+		city_farm_counts[id] = count + (1 if own_region == id else 0)
+
+## 轻量切城：相机不动，只换 region、标题、地标居民与附近农场；写入城市选择（下次启动落在这里）。
+func _switch_city(r: Dictionary) -> void:
+	if not city_map or str(r.get("id", "")) == str(region.get("id", "")): return
+	_clear_farm_selection()
+	city_map.dismiss_overlays()
+	region = r
+	FarmRegions.save_choice(str(r.get("id", "")))
+	city_map.region_changed()
+	_refresh_nearby()
+
+## 城市面板/城市气泡：飞到该城总览。
+func fly_to_city(id: String) -> void:
+	for r in city_regions():
+		if str(r.id) != id: continue
+		var overview: Dictionary = CityMapData.city(id).get("overview", {})
+		_clear_farm_selection()
+		if city_map: city_map.dismiss_overlays()
+		_switch_city(r)
+		_fly_to(float(overview.get("lat", r.center[0])), float(overview.get("lng", r.center[1])),
+			float(overview.get("zoom", 11.0)), float(overview.get("bearing", 0.0)))
+		return
+
+## van Wijk 飞行：先拉远、平移、再拉近。任何新触摸都会打断（_focus_tween 被按下事件 kill）。
+func _fly_to(lat: float, lng: float, target_zoom: float, target_bearing: float, on_land := Callable()) -> void:
+	_reset_gesture()
+	_city_bounds()
+	if _focus_tween: _focus_tween.kill()
+	var vp := get_viewport().get_visible_rect().size
+	var view_w := vp.x * _map_logical_height() / maxf(1.0, vp.y)
+	var flight := MapFlight.plan(center_lat, center_lng, zoom, lat, lng, target_zoom, view_w)
+	var from_bearing := city_bearing
+	var turn := wrapf(target_bearing - from_bearing, -180.0, 180.0)
+	_focus_tween = create_tween()
+	_focus_tween.tween_method(func(t: float):
+		var p := flight.sample(t)
+		center_lat = lat if t >= 1.0 else p.x
+		center_lng = lng if t >= 1.0 else p.y
+		city_bearing = from_bearing + turn * t
+		bearing = city_bearing
+		_set_zoom(target_zoom if t >= 1.0 else p.z)
+		_camera_dirty = true, 0.0, 1.0, flight.duration()).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	if on_land.is_valid(): _focus_tween.tween_callback(on_land)
 
 func _install_city_map() -> void:
 	if _relocation_mode or _placement_mode or not CityMapData.has_city(str(region.get("id", ""))): return
@@ -1955,6 +2134,7 @@ func _install_city_map() -> void:
 		if Net and Net.session and ResidentCast.present(str(entry.place), Net.session.state).has(str(entry.id)):
 			AppRouter.open_instance(AppRouter.PLACE, {"place_id": str(entry.place), "resident_id": str(entry.id), "target": "resident", "session": Net.session}))
 	city_map.player_visit_requested.connect(_on_city_visit_requested)
+	city_map.city_requested.connect(fly_to_city)
 	city_map.player_deselected.connect(_clear_farm_selection)
 	for control in [top_panel, side_toolbar, my_farm_btn, journey_footer]:
 		if is_instance_valid(control):
@@ -1977,7 +2157,10 @@ func _remove_city_map() -> void:
 		for control in _city_hidden:
 			if is_instance_valid(control): control.visible = bool(_city_hidden[control])
 		_city_hidden.clear()
-		if farm_markers: farm_markers.city_mode = false
+		if farm_markers:
+			farm_markers.city_mode = false
+			farm_markers.projector = Callable()
+			farm_markers.low_detail = false
 
 func _city_action(action: String) -> void:
 	_reset_gesture()
@@ -1987,14 +2170,18 @@ func _city_action(action: String) -> void:
 			if city_map: city_map.dismiss_overlays()
 			_city_bounds()
 			var overview: Dictionary = CityMapData.city(str(region.get("id", ""))).get("overview", {})
-			bearing = float(overview.get("bearing", 0.0))
+			city_bearing = float(overview.get("bearing", 0.0))
+			bearing = city_bearing
 			pitch = 35.0
 			fly_to(float(overview.get("lat", region.get("center", [0, 0])[0])), float(overview.get("lng", region.get("center", [0, 0])[1])))
 			_set_zoom(float(overview.get("zoom", 11.0)))
 		"north":
+			city_bearing = 0.0
 			bearing = 0.0
 			_camera_dirty = true
 		"farm": _open_my_farm()
 		"outfit": AppRouter.go_to_dressing()
-		"city": AppRouter.go_to_city_select()
+		"city":
+			if city_map: city_map.toggle_city_panel()
+			else: AppRouter.go_to_city_select()
 		"recenter": _focus_own_farm(false)

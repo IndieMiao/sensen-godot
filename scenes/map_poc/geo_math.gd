@@ -33,3 +33,11 @@ static func meters_per_logical_px(lat: float, zoom: float) -> float:
 static func cam_distance_m(viewport_h_logical_px: float, fov_deg: float, lat: float, zoom: float) -> float:
 	return (viewport_h_logical_px * 0.5) / tan(deg_to_rad(fov_deg * 0.5)) \
 			* meters_per_logical_px(lat, zoom)
+
+## Web Mercator 归一化坐标 [0,1)（x 向东、y 向南），与 Mapbox 一致；纬度钳在 ±85.051129°。
+static func mercator_x(lng: float) -> float:
+	return (lng + 180.0) / 360.0
+
+static func mercator_y(lat: float) -> float:
+	var phi := deg_to_rad(clampf(lat, -85.051129, 85.051129))
+	return (1.0 - log(tan(PI * 0.25 + phi * 0.5)) / PI) * 0.5

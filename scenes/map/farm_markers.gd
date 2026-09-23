@@ -65,6 +65,10 @@ var _pin_anim: Dictionary = {}
 var _pin_tweens: Dictionary = {}
 ## 城市地图当前 zoom（宿主每帧喂入）：视野最大时玩家 pin 放大到 1.3 倍。
 var city_zoom := 16.0
+## 城市模式投影（宿主喂入 geo_to_screen：pitch=0 时是精确 Mercator）。未设置时用相机投影。
+var projector: Callable
+## 国家/省级视野（宿主喂入）：只显示自己，且用 2D 头像代替 3D 全身。
+var low_detail := false
 
 func _pin_zoom_boost() -> float:
 	return lerpf(1.3, 1.0, clampf((city_zoom - 11.0) / 4.0, 0.0, 1.0))
@@ -171,6 +175,13 @@ func put(id: String, bp: FarmBlueprint, owner_name: String, own := false, avatar
 	badge.pressed.connect(_toggle_cluster.bind(id))
 	add_child(badge)
 	_badges[id] = badge
+
+## 国家/省级视野下自己不画 3D 全身，改用与其他玩家同款的 2D 头像（跟随换装保存）。
+func _add_self_portrait(target: Button) -> void:
+	var portrait := MapPortrait.new()
+	portrait.config = Avatar.load_outfit()
+	target.add_child(portrait)
+	Avatar.outfit_saved.connect(portrait.set_outfit)
 
 ## 该玩家 pin 当前画好的头像贴图；真头像还没渲染完成时返回 null（占位图不算）。
 func portrait_texture(id: String) -> Texture2D:
@@ -329,7 +340,8 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 	for id in ids:
 		var ll: Vector2 = points[id].center
 		var world := MapGeoMath.geo_to_world(ll.x, ll.y, lat, lng)
-		var anchor := cam.unproject_position(world) - global_position
+		var projected = projector.call(ll.x, ll.y) if projector.is_valid() else (null if cam.is_position_behind(world) else cam.unproject_position(world))
+		var anchor: Vector2 = (projected as Vector2) - global_position if projected != null else Vector2(-1e6, -1e6)
 		world_positions[id] = world
 		anchors[id] = anchor
 		var target: Button = _avatar_targets[id]
@@ -346,12 +358,13 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		target.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_badges[id].visible = false
-		var full_body: bool = id == "self" or id == expanded_avatar_id
+		var full_body: bool = (id == "self" or id == expanded_avatar_id) and not low_detail
+		if id == "self" and low_detail and target.get_child_count() == 0: _add_self_portrait(target)
 		target.size = Vector2(70, 130) if full_body else Vector2(44, 44)
 		var boost := _pin_zoom_boost()
 		var rect := Rect2(anchor - Vector2(target.size.x * 0.5, target.size.y - 2), target.size).merge(
 			Rect2(anchor + Vector2(-label.size.x * 0.5, 6), label.size)).grow((boost - 1.0) * 22.0)
-		var placed := not cam.is_position_behind(world) and area.has_point(anchor)
+		var placed: bool = projected != null and area.has_point(anchor) and (id == "self" or not low_detail)
 		if placed and not (id == "self" or id == expanded_avatar_id or id == selected_id):
 			var probe := rect.grow(-CITY_PACK_MARGIN if _city_shown_last.has(id) else CITY_PACK_MARGIN)
 			for pair in occupied:
@@ -376,6 +389,8 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 				target.scale = Vector2.ONE * maxf(0.001, steady_pop * boost)
 				label.scale = target.scale
 		_set_pin_shown(id, placed)
+		# 国家级：自己只留头像，名牌会压在城市气泡上。
+		if low_detail and id == "self": label.visible = false
 	for id in visible_farm_ids:
 		var entry: Dictionary = points[id]
 		var owner := str(entry.owner_name) if str(entry.avatar_ref).is_empty() else SeededOutfit.short_name(str(entry.avatar_ref))
@@ -400,7 +415,7 @@ func blocker_rects() -> Array:
 	for id in visible_farm_ids:
 		var target: Control = _avatar_targets[id]
 		var rect := Rect2(target.position, target.size)
-		if id == "self" or id == expanded_avatar_id:
+		if (id == "self" or id == expanded_avatar_id) and not low_detail:
 			# The full-body 3D actor draws wider and taller than its tap target.
 			rect = rect.grow_individual(26, 84, 26, 0)
 		result.append(rect.merge(Rect2(_buttons[id].position, _buttons[id].size)))

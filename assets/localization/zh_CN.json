@@ -1661,5 +1661,11 @@
   "Florist": "花店",
   "Places unavailable. Move the map to retry.": "地点暂不可用，移动地图重试",
   "No dining places in view. Move or zoom the map.": "当前视野暂无餐饮，试着移动或放大地图",
-  "North up": "正北朝上"
+  "North up": "正北朝上",
+  "Explore": "探索",
+  "No farms here yet": "这里还没有农场",
+  "Zoom in to explore": "放大地图查看城市",
+  "Cities": "城市",
+  "%d farm": "%d 个农场",
+  "%d farms": "%d 个农场"
 }
