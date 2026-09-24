@@ -1,5 +1,24 @@
 # Product Direction
 
+- Integrated public release on 2026-09-24: Journey `0.16.36 / 2026092404`
+  publishes 12 fixed system ponds (six per city, three small shapes), clearer
+  2.2x-flow water, reviewed five-floor mine art/free camera/reconnect framing,
+  and the Griffith map entrance. Backend `integrated-20260924` retains domain 27 /
+  content 50c2dbdde04c9678; all nine tables, 75 farms, 1599 commands and 39 creation
+  records were exact across the switch. Retain the 1500ms Node address-attempt
+  setting, original database/voice configuration and both networks. 842 server
+  checks, 423 native checks and 54 Android inputs passed; isolated production-host
+  HTTP/WebSocket pond settlement and restart passed. Both public APK full downloads,
+  hashes, Range and manifests passed. At the user's explicit reminder, the exact
+  signed observer-free APK is installed/readback/cold-login verified on V2509A
+  as well as the emulator. Each device's five fresh identity/appearance/preferences
+  files and current farm/assets are preserved; phone currently has 0 cells,
+  180 coins and 2 bag stacks. Never restore historical farm/identity snapshots.
+  Complete new gameplay was checked on isolated emulator data, not repeated on
+  the user's phone. No new Slack/Feishu delivery. Original dirty workspace stays
+  intact; integrated runtime source is commit 8008bdae in the isolated
+  sensen-godot-release-20260924 worktree. See docs/qa/integrated-release-2026-09-24.md.
+
 - Mine-scene MR review on 2026-09-24 fixes authoritative online arrival framing:
   use the server-selected spawn, retain the camera through temporary empty worlds
   on same-instance/same-floor reconnect, and reframe new instances/floors/runs.

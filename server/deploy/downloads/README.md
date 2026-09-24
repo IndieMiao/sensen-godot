@@ -13,6 +13,14 @@
 
 ## 当前版本
 
+[Journey 0.16.36 / 2026092404](https://download-us.sensenjoy.cn:8443/farm/releases/integrated-20260924-931618e56d20/sensen-journey-integrated-0.16.36.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/integrated-20260924-931618e56d20/sensen-journey-integrated-0.16.36.apk)。
+
+178410540 字节；SHA-256 `931618e56d206529e8bec54f3685c8d7e1e9de8dcf27e7a64f526e0dab7a950b`。整合两城 12 个固定系统鱼塘/三种场景、明亮清澈的 2.2 倍流速水面、五层矿坑美术与自由镜头修复，保留 Griffith 场景入口。服务 `integrated-20260924` 已上线，domain 27 / content 50c2dbdde04c9678 不变，75 个农场和全部历史数据保留。
+
+原包名、原证书、无观察器；842 项服务端和 423 项原生检查通过，隔离 Android 54 次实际输入通过。**同一正式包已在 V2509A 和模拟器覆盖安装、回读与冷登录验证**，各自当前身份和资产保持。手机本轮未重复完整新玩法。两个站点全量、SHA-256、Range 206 和清单校验均通过。本轮没有新增外部消息交付。详见 `docs/qa/integrated-release-2026-09-24.md`。
+
+## 历史版本 0.16.32
+
 [Journey 0.16.32 / 2026092311](https://download-us.sensenjoy.cn:8443/farm/releases/map-20260923-fea6a68ead20/sensen-journey-map-0.16.32.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/map-20260923-fea6a68ead20/sensen-journey-map-0.16.32.apk)。
 
 170969957 字节；SHA-256 `fea6a68ead20b45a8a123347cdaa7cf8acf2912e8a0f65b469e9bf00ff87d25a`。LA/上海、125张语义POI图标、国家级缩放与城市飞行、统一白卡/青柠UI；不含地标3D跳转。原包名、原签名、无观察器；179项原生地图检查、模拟器原身份覆盖更新验证通过；用户安装到V2509A的同一包已回读核对。两个站点全量与Range校验通过，2026-09-23已将下载域名更新到当前DMIT地址。
