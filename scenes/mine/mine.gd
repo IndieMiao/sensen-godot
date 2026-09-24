@@ -4,6 +4,7 @@ const Layout = preload("res://modules/mining/mine_layout.gd")
 const Art = preload("res://modules/mining/mine_art.gd")
 const Combat = preload("res://modules/mining/mine_combat.gd")
 const CameraFit = preload("res://modules/farm/farm_camera.gd")
+const AvatarFocus = preload("res://modules/ui/avatar_focus_button.gd")
 const DIG_SECONDS := 1.0
 
 var session: FarmSession
@@ -35,6 +36,10 @@ var mover: PlayerMover
 var busy := false
 var pending_target := ""
 var camera_pan := preload("res://modules/farm/scene_pan.gd").new()
+var _camera_center := Vector3.ZERO
+var _camera_initialized := false
+var _camera_recenter: Tween
+var _focus_button: Button
 var _world_key := ""
 var _rendered_floor := -1
 var _rendered_run := -1
@@ -83,9 +88,7 @@ func _ready() -> void:
 	combat.name = "MineCombat"
 	combat.contact.connect(func(id): _pending_hurt = id)
 	add_child(combat)
-	camera_pan.radius = 1.0
-	camera_pan.min_zoom = 0.9
-	camera_pan.max_zoom = 1.45
+	camera_pan.free_pan = true
 	camera_pan.tapped.connect(_tap_scene)
 	if session:
 		session.state_changed.connect(_state_changed)
@@ -131,18 +134,23 @@ func _build_world() -> void:
 	get_viewport().transparent_bg = false
 	environment = Environment.new()
 	environment.background_mode = Environment.BG_COLOR
-	environment.background_color = Color("71877e")
+	environment.background_color = Color("242125")
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color("e4eee9")
+	environment.ambient_light_color = Color("e8dfea")
 	environment.ambient_light_energy = 0.48
 	world_env = WorldEnvironment.new()
 	world_env.environment = environment
 	add_child(world_env)
 	var sun := DirectionalLight3D.new()
-	sun.rotation_degrees = Vector3(-62, -25, 0)
-	sun.light_color = Color("f3f4e7")
-	sun.light_energy = 0.7
+	sun.rotation_degrees = Vector3(-51, -38, 0)
+	sun.light_color = Color("ffe8ce")
+	sun.light_energy = 1.15
 	sun.shadow_enabled = true
+	sun.shadow_opacity = 0.58
+	sun.shadow_bias = 0.04
+	sun.shadow_normal_bias = 0.45
+	sun.shadow_blur = 1.6
+	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
 	add_child(sun)
 	cam = Camera3D.new()
 	cam.name = "Camera3D"
@@ -301,6 +309,9 @@ func _build_ui() -> void:
 	restart.name = "MineRestart"
 	restart.pressed.connect(_restart)
 	footer.add_child(restart)
+	_focus_button = AvatarFocus.new()
+	ui.add_child(_focus_button)
+	_focus_button.pressed.connect(recenter_on_player)
 	_layout.call_deferred()
 
 func _layout() -> void:
@@ -328,15 +339,60 @@ func world_area() -> Rect2:
 func _update_camera() -> void:
 	if not is_inside_tree() or is_queued_for_deletion() or cam == null or ui == null: return
 	if not cam.is_inside_tree(): return
-	var center := Vector3(4.75, 0, -3.8)
-	cam.size = 10.8
-	cam.position = center + Vector3(0, 13, 12)
-	cam.look_at(center)
-	CameraFit.fit(cam, AABB(Vector3(0, 0, -8.0), Vector3(9.5, 2.0, 8.2)), world_area())
-	cam.size /= camera_pan.zoom
+	cam.size = CameraFit.close_view_size(get_viewport().get_visible_rect().size) / camera_pan.zoom
+	if not _camera_initialized:
+		_camera_center = player.position + Vector3.UP * 0.7
+		_camera_initialized = true
+	# Keep the released view, including the point under a pinch. Walking and
+	# same-floor snapshots never take camera ownership away from the player.
+	if not camera_pan.active():
+		_camera_center += camera_pan.offset
+		camera_pan.offset = Vector3.ZERO
+		camera_pan._raw_offset = Vector3.ZERO
+	CameraFit.place(cam, _camera_center)
 	cam.position += camera_pan.offset
 	CameraFit.fit_ground_depth(cam)
 	_sync_markers()
+	_update_focus_indicator()
+
+func _camera_modal_open() -> bool:
+	return (bag_sheet != null and bag_sheet.visible) or GameUi.modal_is_open(self)
+
+func _update_focus_indicator() -> void:
+	if _focus_button == null or player == null or cam == null: return
+	var viewport_rect := get_viewport().get_visible_rect()
+	var point := player.position + Vector3.UP * 0.7
+	var behind := cam.is_position_behind(point)
+	var projected := cam.unproject_position(point)
+	if behind or not projected.is_finite():
+		var local := cam.to_local(point)
+		var direction := Vector2(local.x, -local.y)
+		if direction.is_zero_approx(): direction = Vector2.DOWN
+		projected = viewport_rect.get_center() + direction.normalized() * viewport_rect.size.length()
+	_focus_button.update_indicator(projected, viewport_rect, world_area(), behind,
+		_camera_modal_open() or _rescued or current_floor() <= 0)
+
+func _stop_camera_recenter() -> void:
+	if _camera_recenter:
+		_camera_recenter.kill()
+		_camera_recenter = null
+
+func recenter_on_player() -> void:
+	if player == null or _camera_modal_open() or _rescued or current_floor() <= 0: return
+	_stop_camera_recenter()
+	camera_pan.cancel()
+	_camera_center += camera_pan.offset
+	camera_pan.offset = Vector3.ZERO
+	camera_pan._raw_offset = Vector3.ZERO
+	var start := _camera_center
+	_camera_recenter = create_tween()
+	_camera_recenter.tween_method(func(weight: float):
+		_camera_center = start.lerp(player.position + Vector3.UP * 0.7, weight)
+		_update_camera(), 0.0, 1.0, 0.34).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_camera_recenter.finished.connect(func(): _camera_recenter = null)
+
+func _exit_tree() -> void:
+	_stop_camera_recenter()
 
 func _state_changed(_state: Dictionary, _version: int) -> void:
 	if _combat_sending: return
@@ -426,6 +482,9 @@ func _rebuild_floor() -> void:
 	var changed_floor := _rendered_floor != current_floor() or _rendered_run != run or _rendered_farm != farm_id
 	var previous := mover.position if mover and not changed_floor else Layout.SPAWN
 	if changed_floor:
+		_stop_camera_recenter()
+		camera_pan.reset()
+		_camera_initialized = false
 		_dig_target = ""
 		_dig_elapsed = 0
 		progress.value = 0
@@ -562,6 +621,7 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	if camera_pan.handle(event, cam):
+		_stop_camera_recenter()
 		if not camera_pan.active(): _pressed_target = null
 		_update_camera()
 		get_viewport().set_input_as_handled()
@@ -576,11 +636,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	var allow := point is Vector2 and world_area().has_point(point)
 	if event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]: allow = world_area().has_point(event.position)
 	if camera_pan.handle(event, cam, allow):
+		_stop_camera_recenter()
 		_update_camera()
 		get_viewport().set_input_as_handled()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_stop_camera_recenter()
 		_focused = false
 		_attack_held = false
 		if mover: mover.stop()
@@ -624,6 +686,8 @@ func select_target(id: String) -> void:
 
 func _process(delta: float) -> void:
 	if mover == null: return
+	if _focused and not _camera_modal_open() and not _rescued:
+		camera_pan.step(delta, cam)
 	var frozen := _paused or not _focused or (bag_sheet and bag_sheet.visible) or busy or _connection_blocked() or _combat_stalled() or _predicted_defeat() or _rescued or _exit_after_combat
 	combat.step(delta, mover, frozen)
 	_sync_weapon_visibility()
@@ -637,9 +701,9 @@ func _process(delta: float) -> void:
 	var keyboard := Vector2(float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT)) - float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT)), float(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN)) - float(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP)))
 	if keyboard != Vector2.ZERO:
 		_cancel_dig()
-		mover.set_joystick(keyboard.limit_length())
+		mover.set_joystick(_camera_direction(keyboard.limit_length()))
 	elif stick.vector != Vector2.ZERO:
-		mover.set_joystick(stick.vector)
+		mover.set_joystick(_camera_direction(stick.vector))
 	elif mover.joystick != Vector2.ZERO:
 		mover.set_joystick(Vector2.ZERO)
 	if (_attack_held or Input.is_physical_key_pressed(KEY_SPACE)) and combat.cooldown <= 0: _attack()
@@ -647,7 +711,6 @@ func _process(delta: float) -> void:
 	if not _pending_hurt.is_empty() and not busy:
 		_resolve_combat([])
 	var arrived_this_frame := false
-	camera_pan.step(delta, cam)
 	mover.step(delta)
 	player.position = mover.position
 	if mover.is_moving():
@@ -817,6 +880,7 @@ func _open_bag() -> void:
 		feedback.text = L10n.text("Syncing combat...")
 		return
 	pending_target = ""
+	_stop_camera_recenter()
 	if mover: mover.stop()
 	_attack_held = false
 	_attack_touch_index = -1
@@ -828,8 +892,10 @@ func _open_bag() -> void:
 		bag_sheet.setup(session)
 		ui.add_child(bag_sheet)
 	bag_sheet.open()
+	_update_focus_indicator()
 
 func suspend() -> void:
+	_stop_camera_recenter()
 	_attack_held = false
 	if stick: stick._release_stick()
 	camera_pan.cancel()
@@ -866,8 +932,17 @@ func _stick_changed(vector: Vector2) -> void:
 	if busy or _paused or not _focused or _connection_blocked() or _combat_stalled() or _predicted_defeat(): return
 	var was_digging := not _dig_target.is_empty()
 	_cancel_dig()
-	mover.set_joystick(vector)
+	mover.set_joystick(_camera_direction(vector))
 	if was_digging: _refresh()
+
+func _camera_direction(vector: Vector2) -> Vector2:
+	# Preserve screen-relative controls after adopting the farm's diagonal view.
+	var right := cam.global_basis.x
+	var down := cam.global_basis.z
+	right.y = 0
+	down.y = 0
+	var direction := right.normalized() * vector.x + down.normalized() * vector.y
+	return Vector2(direction.x, direction.z)
 
 func _attack(target_id := "") -> void:
 	if combat == null or busy or _paused or not _focused or _rescued or current_floor() <= 0 or _connection_blocked() or _combat_stalled() or _predicted_defeat() or _exit_after_combat or (bag_sheet and bag_sheet.visible): return
@@ -982,6 +1057,7 @@ func _drain_combat() -> void:
 		_leave.call_deferred()
 
 func _schedule_rescue() -> void:
+	_stop_camera_recenter()
 	_attack_held = false
 	_attack_touch_index = -1
 	_pending_hurt = ""

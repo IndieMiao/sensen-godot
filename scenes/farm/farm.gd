@@ -11,13 +11,13 @@ const FarmScenery = preload("res://modules/farm/farm_scenery.gd")
 const FarmArt = preload("res://modules/farm/farm_art.gd")
 const MineArt = preload("res://modules/mining/mine_art.gd")
 const AvatarFocus = preload("res://modules/ui/avatar_focus_button.gd")
-const CAM_DIST := 11.0
+const CAM_DIST := FarmCamera.DISTANCE
 ## AvatarRig 的活动度控制默认 16 m 休眠动画。农场相机到玩家的距离约 18 m——不把阈值抬高，
 ## 走路和俯身动画就全没了（2026-09-04 晚真机：「动画完全丢失」）。
 const RIG_SLEEP_DIST := 60.0
 const RIG_REDUCED_DIST := 40.0
-const CAM_PITCH_DEG := 43.0
-const CAM_YAW_DEG := 14.5
+const CAM_PITCH_DEG := FarmCamera.PITCH_DEG
+const CAM_YAW_DEG := FarmCamera.YAW_DEG
 ## 地面是平的（田畦盒子随自由格子种田退役）；作物直接从 y=0 往上长。
 const BED_H := 0.0
 const STAMPS := ["Nice!", "Lovely", "Wow"]
@@ -712,11 +712,9 @@ func _build_focus_button() -> void:
 
 func _update_camera(_delta := 0.0) -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
-	var aspect := viewport_size.x / maxf(viewport_size.y, 1)
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	cam.keep_aspect = Camera3D.KEEP_WIDTH
-	var view_width := VIEW_M * 1.2 if viewport_size.y < 700 and viewport_size.x < 600 else VIEW_M
-	cam.size = maxf(view_width, 7.2 * aspect) * WORLD_SCALE / camera_pan.zoom
+	cam.size = FarmCamera.close_view_size(viewport_size) * WORLD_SCALE / camera_pan.zoom
 	if not _camera_initialized:
 		_camera_center = player.position + Vector3.UP * 0.7
 		_camera_initialized = true
@@ -747,10 +745,7 @@ func _update_focus_indicator() -> void:
 		_terrain_stale or _world_modal_open() or (fishing_panel != null and fishing_panel.visible))
 
 func _place_camera(center: Vector3) -> void:
-	var phi := deg_to_rad(CAM_PITCH_DEG)
-	var yaw := deg_to_rad(CAM_YAW_DEG)
-	cam.position = center + Vector3(sin(yaw) * CAM_DIST * cos(phi), CAM_DIST * sin(phi), cos(yaw) * CAM_DIST * cos(phi))
-	cam.look_at(center, Vector3.UP)
+	FarmCamera.place(cam, center)
 
 func _stop_camera_recenter() -> void:
 	if _camera_recenter:
@@ -782,7 +777,7 @@ func _world_modal_open() -> bool:
 	return (hud != null and hud.modal_open()) or GameUi.modal_is_open(self)
 
 ## 约 6m 横向近景，对应参考图中可辨认的人物、房屋与身边几块田。
-const VIEW_M := 6.0
+const VIEW_M := FarmCamera.VIEW_M
 ## 赶路卡住时终止本格，避免队列永久等待。
 const WALK_STALL_S := 2.5
 

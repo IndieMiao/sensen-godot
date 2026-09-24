@@ -51,6 +51,12 @@ func _scene_with_session(session: FarmSession) -> Node3D:
 	scene.set_process(false)
 	return scene
 
+func _pan_to(mine: Node3D, world: Vector3) -> void:
+	# A close view intentionally cannot contain every target at once.
+	mine.camera_pan.drag(mine.cam, mine.cam.unproject_position(world), mine.world_area().get_center())
+	mine.camera_pan.velocity = Vector3.ZERO
+	mine._update_camera()
+
 func _pick_box(mine: Node3D, position: Vector3, size := Vector3.ONE) -> MeshInstance3D:
 	var model := MeshInstance3D.new()
 	var mesh := BoxMesh.new()
@@ -100,6 +106,7 @@ func test_reentry_uses_saved_floor_and_broken_rocks_without_issuing_a_command() 
 func test_locked_elevator_has_feedback_and_never_sends_a_command() -> void:
 	var transport := FakeTransport.new([])
 	var mine := await _scene(transport, _state())
+	_pan_to(mine, Layout.ELEVATOR + Vector3(0.8, 0.68, 0.4))
 	var point: Vector2 = mine.cam.unproject_position(Layout.ELEVATOR + Vector3(0.8, 0.68, 0.4))
 	mine._tap_scene(point)
 	assert_str(mine.feedback.text).is_equal(L10n.text("Clear floor 5 to unlock the elevator"))
@@ -121,6 +128,7 @@ func test_navigation_models_are_pickable_across_their_visible_bodies() -> void:
 		for id in samples:
 			assert_bool(mine.targets[id].button.is_visible_in_tree()).is_false()
 			for world in samples[id]:
+				_pan_to(mine, world)
 				var point: Vector2 = mine.cam.unproject_position(world)
 				assert_bool(mine.world_area().has_point(point)).override_failure_message("Model sample outside play area: %s %s" % [id, world]).is_true()
 				assert_str(mine._pick_target(point)).override_failure_message("Model sample is not selectable: %s %s" % [id, world]).is_equal(id)
@@ -177,6 +185,7 @@ func test_rock_models_are_pickable_at_their_transformed_body_centers() -> void:
 			var model: MeshInstance3D = mine.targets[id].model
 			assert_object(model).is_equal(mine.objects.get_node(id + "/Rock"))
 			var world := model.global_transform * model.get_aabb().get_center()
+			_pan_to(mine, world)
 			var point: Vector2 = mine.cam.unproject_position(world)
 			assert_bool(mine.world_area().has_point(point)).override_failure_message("Rock body outside play area: " + id).is_true()
 			assert_str(mine._pick_target(point)).override_failure_message("Rock body is not selectable: " + id).is_equal(id)
@@ -227,6 +236,7 @@ func test_confirmed_stairs_and_elevator_arrivals_clear_walking_feedback() -> voi
 		next.mine.deepest_floor = 5
 		var transport := FakeTransport.new([{"status": 200, "json": {"state": next, "version": 1}}])
 		var mine := await _scene(transport, state)
+		_pan_to(mine, mine.targets[route.target].body)
 		var point: Vector2 = mine.cam.unproject_position(mine.targets[route.target].body)
 		mine._tap_scene(point)
 		assert_str(mine.pending_target).is_equal(route.target)
@@ -267,6 +277,7 @@ func test_clicking_rock_walks_then_digs_and_adopts_server_drop_once() -> void:
 	assert_object(mine.targets.rock_1.button.icon).is_null()
 	var model: MeshInstance3D = mine.targets.rock_1.model
 	assert_object(model).is_equal(mine.objects.get_node("rock_1/Rock"))
+	_pan_to(mine, model.global_transform * model.get_aabb().get_center())
 	var point: Vector2 = mine.cam.unproject_position(model.global_transform * model.get_aabb().get_center())
 	assert_str(mine._pick_target(point)).is_equal("rock_1")
 	mine._tap_scene(point)
@@ -587,6 +598,38 @@ func test_mine_has_router_and_qa_entry() -> void:
 	assert_str(AppRouter.qa_scene_path(PackedStringArray(["--qa-scene=mine"]))).is_equal(AppRouter.MINE)
 	assert_int(AppRouter.back_action_for_scene(AppRouter.MINE)).is_equal(AppRouter.BACK_TO_MAP)
 
+func test_diagonal_mine_camera_matches_farm_and_controls_follow_the_screen() -> void:
+	var mine := await _scene(FakeTransport.new([]), _state())
+	var expected := auto_free(Camera3D.new()) as Camera3D
+	add_child(expected)
+	Farm.FarmCamera.place(expected, Vector3.ZERO)
+	assert_int(mine.cam.projection).is_equal(Camera3D.PROJECTION_ORTHOGONAL)
+	assert_bool(mine.cam.global_basis.is_equal_approx(expected.global_basis)).is_true()
+	for input in [Vector2.RIGHT,Vector2.LEFT,Vector2.UP,Vector2.DOWN]:
+		var direction: Vector2 = mine._camera_direction(input)
+		assert_float(direction.length()).is_equal_approx(1.0,0.001)
+		var origin := Vector3(4.75,0,-3.8)
+		var projected: Vector2 = mine.cam.unproject_position(origin+Vector3(direction.x,0,direction.y)) - mine.cam.unproject_position(origin)
+		assert_float(projected.normalized().dot(input)).is_greater(0.999)
+
+func test_floor_rebuild_keeps_art_independent_and_all_saved_targets_pickable_after_panning() -> void:
+	var mine := await _scene(FakeTransport.new([]), _state())
+	for floor_number in range(1,6):
+		mine.session.state.mine.floor = floor_number
+		mine.session.state.mine.cleared_floors = [floor_number]
+		mine._refresh()
+		await get_tree().process_frame
+		for id in mine.targets:
+			var model: MeshInstance3D = mine.targets[id].model
+			var center: Vector3 = model.global_transform * model.get_aabb().get_center()
+			_pan_to(mine, center)
+			var point: Vector2 = mine.cam.unproject_position(center)
+			assert_bool(mine.world_area().has_point(point)).override_failure_message("Target clipped: %d / %s" % [floor_number,id]).is_true()
+			assert_str(mine._pick_target(point)).override_failure_message("Target obstructed: %d / %s" % [floor_number,id]).is_equal(id)
+	var next := await _scene(FakeTransport.new([]), _state(5))
+	assert_bool(mine.scenery != next.scenery).is_true()
+	assert_bool(mine.scenery.get_node("MineElevator") != next.scenery.get_node("MineElevator")).is_true()
+
 func test_passable_floors_with_unmined_rocks_are_not_automatically_restarted() -> void:
 	var state := _state(0)
 	state.mine.cleared_floors = [1, 2, 3, 4, 5]
@@ -614,4 +657,5 @@ func test_floor_transition_rebinds_monster_picking_to_the_new_actor() -> void:
 	assert_bool(is_instance_valid(model)).is_true()
 	assert_int(model.get_instance_id()).is_not_equal(old_id)
 	assert_object(model).is_equal(mine.combat.enemies.slime_1.node.get_node("Body"))
+	_pan_to(mine, model.global_position)
 	assert_str(mine._pick_target(mine.cam.unproject_position(model.global_position))).is_equal("slime_1")
