@@ -2134,6 +2134,8 @@ func _install_city_map() -> void:
 		if Net and Net.session and ResidentCast.present(str(entry.place), Net.session.state).has(str(entry.id)):
 			AppRouter.open_instance(AppRouter.PLACE, {"place_id": str(entry.place), "resident_id": str(entry.id), "target": "resident", "session": Net.session}))
 	city_map.player_visit_requested.connect(_on_city_visit_requested)
+	city_map.landmark_requested.connect(_on_city_landmark_requested)
+	city_map.pond_requested.connect(_on_city_pond_requested)
 	city_map.city_requested.connect(fly_to_city)
 	city_map.player_deselected.connect(_clear_farm_selection)
 	for control in [top_panel, side_toolbar, my_farm_btn, journey_footer]:
@@ -2147,6 +2149,21 @@ func _install_city_map() -> void:
 			child.hide()
 	_city_action("map")
 	_layout_journey_drawer()
+
+func _on_city_landmark_requested(entry: Dictionary) -> void:
+	if _relocation_mode or _placement_mode or AppRouter.top_instance() != null or AppRouter._navigation_pending: return
+	var path := LandmarkScenes.path_for(str(region.get("id", "")), entry)
+	if path.is_empty(): return
+	_reset_gesture()
+	AppRouter.open_instance(path)
+
+func _on_city_pond_requested(entry: Dictionary) -> void:
+	if _relocation_mode or _placement_mode or AppRouter.top_instance() != null or AppRouter._navigation_pending: return
+	if Net.session == null or not Net.session.logged_in() or Net.session.has_unconfirmed_command(): return
+	var pond := SystemPonds.location(str(entry.get("id", "")))
+	if pond.is_empty(): return
+	_reset_gesture()
+	AppRouter.open_instance(SystemPonds.SCENE, {"pond_id": pond.id, "session": Net.session})
 
 func _remove_city_map() -> void:
 	if city_map:

@@ -12,6 +12,7 @@ import { Room, type Member, type Transport } from './room.js';
 import { PartyTravel, type SpacePresence } from './party_travel.js';
 import { AppearanceCatalog, defaultAppearance } from './appearance.js';
 import { PartyVoice } from './voice.js';
+import { PondCatalog, type PondRoom } from '../ponds/catalog.js';
 
 interface Connection { ws: WebSocket; player: string; hash: string; room?: Room; member?: Member; openedAt: number; resumeNonce: string;
   space?: Pick<SpacePresence, 'home' | 'channel' | 'region' | 'layout' | 'revision' | 'terrain'>;
@@ -22,6 +23,7 @@ export class OnlineGateway {
   readonly rooms = new Map<string, Room>();
   readonly connections = new Set<Connection>();
   readonly travel: PartyTravel;
+  readonly ponds: PondCatalog;
   readonly voice?: PartyVoice;
   private voiceSweep?: ReturnType<typeof setInterval>;
   private voiceSweeping = false;
@@ -36,6 +38,7 @@ export class OnlineGateway {
   private relocationRefresh = new Map<string, Set<string>>();
 
   constructor(readonly app: FastifyInstance, readonly deps: AppDeps) {
+    this.ponds = deps.pondCatalog ?? new PondCatalog();
     this.maps = JSON.parse(readFileSync(path.join(path.dirname(deps.regionsFile), 'online_navigation.json'), 'utf8')).maps;
     this.appearances = new AppearanceCatalog(deps.regionsFile);
     if (deps.voice) {
@@ -52,7 +55,7 @@ export class OnlineGateway {
     }
     this.travel = new PartyTravel(deps, player => this.presence(player), (key, player) => {
       const room = this.rooms.get(key);
-      return !room || room.members.has(player) || room.members.size < CAPACITY;
+      return !room || room.members.has(player) || room.members.size < room.capacity;
     });
     this.wss = new WebSocketServer({ noServer: true, maxPayload: 4096, perMessageDeflate: false });
     app.server.on('upgrade', (req, socket, head) => {
@@ -102,6 +105,7 @@ export class OnlineGateway {
     const member = c.member, nav = c.room.nav(member.floor);
     return { space: c.room.kind, home: c.space.home, room: c.room.key, nonce: c.resumeNonce, x: member.x, z: member.z,
       ...(c.room.farmFishingSite ? { farm_site: c.room.farmFishingSite } : {}),
+      ...(c.room.pond ? { pond: { id: c.room.pond.location.id, site: c.room.pond.site } } : {}),
       walkable: (point: [number, number]) => walkable(nav, point),
       validSequence: (sequence: number) => sequence > (member.invalidFishingSequence ?? -1) };
   }
@@ -287,15 +291,24 @@ export class OnlineGateway {
     if (grant) {
       if (b.resume) throw new Error('SCHEMA');
       await this.travel.validate(grant, c.player);
-      b = { ...b, kind: grant.destination.kind, farm_id: grant.destination.home, channel: grant.destination.channel };
+      b = { ...b, kind: grant.destination.kind, farm_id: grant.destination.home, channel: grant.destination.channel,
+        ...(grant.destination.kind === 'pond' ? { pond_id: grant.destination.home, catalog_revision: grant.destination.terrain } : {}) };
     }
-    if (!['street', 'farm', 'mine'].includes(String(b.kind))) throw new Error('SCHEMA');
+    if (!['street', 'farm', 'mine', 'pond'].includes(String(b.kind))) throw new Error('SCHEMA');
     // Legacy clients naming their home street enter the same private farm.
     const kind = b.kind === 'street' ? 'farm' : b.kind;
     const farm = await this.deps.store.farmByOwner(c.player);
     if (!farm?.state.journey) throw new Error('NO_FARM');
     let key = '', nav: Navigation, partyId = '', resumeFloor = 1, host = farm;
-    if (kind === 'mine') {
+    let pond: PondRoom | undefined;
+    if (kind === 'pond') {
+      if (b.resume) throw new Error('SCHEMA');
+      const channel = b.channel ?? 1;
+      if (!Number.isInteger(channel) || Number(channel) < 1 || Number(channel) > 100) throw new Error('SCHEMA');
+      pond = this.ponds.room(b.pond_id, b.catalog_revision, this.deps.content);
+      key = 'pond:' + pond.location.id + ':' + channel;
+      nav = pond.template.navigation;
+    } else if (kind === 'mine') {
       const directory = await this.deps.store.realtimeDirectory(c.player);
       partyId = directory.party?.id ?? '';
       const recovery = b.resume ? this.readResume(String(b.resume), c.player) : null;
@@ -338,17 +351,18 @@ export class OnlineGateway {
       key = kind === 'farm' ? 'farm:' + host.id + ':' + channel :
         'street:' + host.region_id + ':' + host.layout_patch_id + ':' + host.blueprint_revision + ':' + channel;
     }
-    const room = await this.getRoom(key, kind as Room['kind'], nav, kind === 'farm' ? host : undefined);
+    const room = await this.getRoom(key, kind as Room['kind'], nav, kind === 'farm' ? host : undefined, pond);
     if (grant && key !== grant.destination.key) throw new Error('DESTINATION_CHANGED');
-    if (room.members.size >= CAPACITY) throw new Error('ROOM_FULL');
+    if (room.members.size >= room.capacity) throw new Error('ROOM_FULL');
     if (c.ws.readyState !== WebSocket.OPEN) return;
     const wire: Transport = { buffered: () => c.ws.bufferedAmount,
       send: data => { if (c.ws.readyState === WebSocket.OPEN) c.ws.send(data); },
       close: (code, reason) => c.ws.close(code, reason),
       resume: floor => kind === 'mine' ? this.resumeTicket(c, key, floor) : '' };
     c.room = room;
-    c.space = { home: host.id, channel: kind === 'mine' ? 0 : Number(b.channel ?? 1), region: host.region_id,
-      layout: host.layout_patch_id, revision: host.blueprint_revision, terrain: host.farm_terrain?.plot.checksum ?? '' };
+    c.space = { home: pond?.location.id ?? host.id, channel: kind === 'mine' ? 0 : Number(b.channel ?? 1), region: pond?.location.region_id ?? host.region_id,
+      layout: pond?.template.id ?? host.layout_patch_id, revision: pond?.template.revision ?? host.blueprint_revision,
+      terrain: pond?.revision ?? host.farm_terrain?.plot.checksum ?? '' };
     c.member = await room.join(farm, wire, async () => {
       if (c.ws.readyState !== WebSocket.OPEN) throw new Error('CONNECTION_CLOSED');
       if (grant) await this.travel.validate(grant, c.player);
@@ -374,14 +388,14 @@ export class OnlineGateway {
       return value;
     } catch { return null; }
   }
-  private async getRoom(key: string, kind: Room['kind'], nav: Navigation, host?: FarmRow): Promise<Room> {
+  private async getRoom(key: string, kind: Room['kind'], nav: Navigation, host?: FarmRow, pond?: PondRoom): Promise<Room> {
     const existing = this.rooms.get(key);
     if (existing && !existing.failed) return existing;
     if (this.loading.has(key)) return this.loading.get(key)!;
     if (this.rooms.size >= 256) throw new Error('SERVER_FULL');
     const loading = (async () => {
       const site = kind === 'farm' ? farmPondSite(host?.farm_terrain, this.deps.content.fishing.sites.farm_pond) : undefined;
-      const room = new Room(key, kind, nav, this.deps.store, this.deps.content, this.deps.now, site);
+      const room = new Room(key, kind, nav, this.deps.store, this.deps.content, this.deps.now, site, pond);
       await room.load();
       this.rooms.set(key, room);
       return room;

@@ -1,0 +1,6 @@
+# Runtime networking for the existing Journey service. The validated production
+# compose has this setting inline; retain it when preparing later deployments.
+services:
+  journey-app:
+    environment:
+      NODE_OPTIONS: --network-family-autoselection-attempt-timeout=1500

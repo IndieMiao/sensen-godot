@@ -351,7 +351,7 @@ func _send_input() -> void:
 	_prediction_history.erase(_seq - 128)
 	var message := {"t": "input", "seq": _seq, "epoch": epoch, "x": target.x, "z": target.z,
 		"yaw": atan2(mover.facing.x, mover.facing.z), "action": animation}
-	var fishing: FishingPanel = get_parent().get("fishing_panel") if kind in ["farm", "street"] else null
+	var fishing: FishingPanel = get_parent().get("fishing_panel") if kind in ["farm", "street", "pond"] else null
 	if fishing and fishing.visible:
 		var direction := fishing.landing - mover.position
 		message.yaw = atan2(direction.x, direction.z)
@@ -980,13 +980,15 @@ func _reset_mine() -> void:
 	if is_instance_valid(panel): await _refresh_party()
 
 static func error_text(code: String) -> String:
-	var messages := {"ROOM_FULL": "This space has 300 players. Choose another channel or wait.",
+	var messages := {"ROOM_FULL": "This space is full. Choose another channel or wait.",
 		"NOT_LEADER": "Only the party leader can do that.", "PARTY_NOT_FOUND": "Party not found. Check the invite code.",
 		"ALREADY_IN_PARTY": "Leave your current party first.", "INSTANCE_OCCUPIED": "Everyone must leave the mine before resetting.",
 		"INSTANCE_NOT_EXHAUSTED": "Unclaimed mine resources remain.", "OUT_OF_RANGE": "Move closer first.",
 		"SESSION_REPLACED": "This account connected on another device.", "PARTY_FULL": "This party has 300 members.",
 		"UNAUTHENTICATED": "Please reconnect your account.", "NOT_FOUND": "This farm is not open to visitors."}
 	messages["RESUME_EXPIRED"] = "Recovery expired. Re-enter the mine to continue."
+	messages["POND_UPDATE_REQUIRED"] = "This pond needs an app update."
+	messages["POND_NOT_FOUND"] = "This pond is unavailable. Return to the map."
 	messages.merge({"PARTY_CHANGED": "The party changed. Choose your destination again.",
 		"FARM_RELOCATED": "This farm has moved. Reloading its new ground…",
 		"FARM_UPDATE_REQUIRED": "This server needs the farm update before you can join that teammate.",

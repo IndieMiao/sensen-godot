@@ -17,8 +17,22 @@ static func build(id: String, site_override: Dictionary = {}) -> WaterShore:
 	shore._plants.begin(Mesh.PRIMITIVE_TRIANGLES)
 	shore._flowers.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var spec := FishingModel.site(id, site_override)
+	if spec.has("decoration_seed"): shore._rng.seed = int(spec.decoration_seed)
 	if spec.space == "street": shore._street_ground(spec)
-	if spec.has("center"):
+	if spec.has("polygon"):
+		var polygon := FishingModel._polygon(spec)
+		var index := 0
+		for i in polygon.size():
+			var a := polygon[i]
+			var b := polygon[(i + 1) % polygon.size()]
+			var tangent := (b - a).normalized()
+			var normal := Vector2(-tangent.y, tangent.x)
+			var midpoint := (a + b) * 0.5
+			if Geometry2D.is_point_in_polygon(midpoint + normal * 0.04, polygon): normal = -normal
+			if i % 2 != 0: continue
+			shore._bank_group(Vector3(midpoint.x, 0, midpoint.y), Vector3(normal.x, 0, normal.y), index, true)
+			index += 1
+	elif spec.has("center"):
 		var center := Vector3(float(spec.center[0]), 0, float(spec.center[1]))
 		var count := 48 if id == "farm_pond" else 34
 		for index in count:

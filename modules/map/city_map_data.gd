@@ -37,6 +37,7 @@ static func residents(region_id: String, state: Dictionary) -> Array:
 	return result
 
 static func art_key(poi: Dictionary) -> String:
+	if poi.get("kind") == "pond": return "pond_" + str(poi.get("template_id", ""))
 	if poi.has("art"): return str(poi.art)
 	var maki := str(poi.get("maki", ""))
 	var category := str(poi.get("category", "")).to_lower()
@@ -113,6 +114,7 @@ static func icon_key(poi: Dictionary) -> String:
 
 ## 地标用建筑贴图；普通 POI 用 maki 图标，同名永远同一张；无图标返回通用图钉（只用于卡片兜底）。
 static func art_texture(poi: Dictionary) -> Texture2D:
+	if poi.get("kind") == "pond": return SystemPonds.texture(str(poi.template_id))
 	if str(poi.get("kind", "")) != "poi": return texture(art_key(poi))
 	var key := icon_key(poi)
 	if key.is_empty(): return texture("place")

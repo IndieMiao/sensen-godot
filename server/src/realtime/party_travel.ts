@@ -8,7 +8,7 @@ import { derive } from '../domain/derive.js';
 import { effectiveNow } from '../domain/qa.js';
 
 export interface SpacePresence {
-  kind: 'street' | 'farm' | 'mine'; key: string; home: string; channel: number; floor: number;
+  kind: 'street' | 'farm' | 'mine' | 'pond'; key: string; home: string; channel: number; floor: number;
   region: string; layout: string; revision: number; nonce: string; epoch: number;
   terrain?: string;
 }
@@ -81,7 +81,7 @@ export class PartyTravel {
     const grant: TravelGrant = { purpose: 'party-travel', player, target, party: entry.party!.id, mode, destination, expires: Date.now() + 60000 };
     await this.validate(grant, player);
     let snapshot: ReturnType<typeof visitorSnapshot> | Record<string, unknown> | undefined;
-    if (destination.kind !== 'mine') {
+    if (destination.kind !== 'mine' && destination.kind !== 'pond') {
       const farm = await this.deps.store.farmById(destination.home);
       if (!farm) fail('NOT_FOUND');
       const now = Math.max(effectiveNow(farm!.state.qa, this.deps.now()), farm!.state.clock.last_effective_now);
@@ -96,6 +96,7 @@ export class PartyTravel {
     return { travel_version: 1, kind: destination.kind, room: destination.key, floor: destination.floor,
       farm_id: destination.home, channel: destination.channel, layout_patch_id: destination.layout,
       blueprint_revision: destination.revision, expires_at: grant.expires, ticket,
+      ...(destination.kind === 'pond' ? { pond_id: destination.home, catalog_revision: destination.terrain } : {}),
       replaces_instance: destination.kind === 'mine' && Boolean(entry.instance && 'mine:' + entry.instance !== destination.key),
       ...(snapshot ? { snapshot } : {}) };
   }
@@ -125,7 +126,7 @@ export class PartyTravel {
     }
     if (destination.kind === 'mine') {
       if (entry.party!.leader !== grant.target) fail('FOLLOW_LEADER_MINE');
-    } else {
+    } else if (destination.kind !== 'pond') {
       const farm = await this.deps.store.farmById(destination.home);
       if (!farm) fail('NOT_FOUND');
       if (farm!.layout_patch_id !== destination.layout || farm!.blueprint_revision !== destination.revision || farm!.region_id !== destination.region) fail('DESTINATION_CHANGED');

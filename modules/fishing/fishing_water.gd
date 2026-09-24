@@ -17,7 +17,9 @@ static func build(site_id: String, site_override: Dictionary = {}) -> FishingWat
 	var spec := FishingModel.site(site_id, site_override).duplicate(true)
 	water.site_spec = spec
 	var outline := PackedVector3Array()
-	if spec.has("center"):
+	if spec.has("polygon"):
+		for point in spec.polygon: outline.append(Vector3(point[0], 0.055, point[1]))
+	elif spec.has("center"):
 		for i in 64:
 			var angle := float(i) / 64.0 * TAU
 			outline.append(Vector3(float(spec.center[0]) + cos(angle) * float(spec.radii[0]), 0.055, float(spec.center[1]) + sin(angle) * float(spec.radii[1])))
@@ -67,7 +69,12 @@ static func build(site_id: String, site_override: Dictionary = {}) -> FishingWat
 	mesh.material_override = material
 	mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	water.water_material = material
-	if spec.has("center"):
+	if spec.has("polygon"):
+		material.set_shader_parameter("polygon_water", true)
+		material.set_shader_parameter("pond_shore", load("res://assets/ponds/%s_shore.png" % str(spec.template_id)))
+		material.set_shader_parameter("pond_extent", Vector2(spec.extent[0], spec.extent[1]))
+		material.set_shader_parameter("basin", Vector4(6, -8, 6, 8))
+	elif spec.has("center"):
 		material.set_shader_parameter("basin", Vector4(spec.center[0], spec.center[1], spec.radii[0], spec.radii[1]))
 	else:
 		material.set_shader_parameter("river", true)
@@ -82,6 +89,7 @@ static func build(site_id: String, site_override: Dictionary = {}) -> FishingWat
 	visibility.aabb = mesh.mesh.get_aabb().grow(0.4)
 	water.add_child(visibility)
 	if spec.has("center"): water._build_lilies(spec)
+	if spec.has("polygon"): water._build_pond_lilies(spec)
 	water.add_child(WaterShore.build(site_id, spec))
 	return water
 
@@ -111,6 +119,33 @@ func _setup_reflections() -> void:
 	reflection.name = "PlanarBankReflection"
 	reflection.material = water_material
 	add_child(reflection)
+
+func _build_pond_lilies(spec: Dictionary) -> void:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = int(spec.decoration_seed)
+	var count := 0
+	var maximum := 20 if spec.template_id == "crescent" else 10 if spec.template_id == "gourd" else 5
+	for attempt in 180:
+		var point := Vector3(rng.randf_range(2, 10), 0.09, rng.randf_range(-12, -4))
+		if not FishingModel.contains(site_id, point, 0, spec): continue
+		var edge := FishingModel._nearest_polygon(Vector2(point.x, point.z), FishingModel._polygon(spec))
+		var depth := Vector2(point.x, point.z).distance_to(edge)
+		if depth < 0.3 or depth > 0.8: continue
+		_lily_leaf(surface, point, rng.randf_range(.10, .18), rng.randf_range(0, TAU), Color("88aa54"))
+		count += 1
+		if count >= maximum: break
+	if count == 0: return
+	var material := StandardMaterial3D.new()
+	material.vertex_color_use_as_albedo = true
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	material.roughness = .72
+	var leaves := MeshInstance3D.new()
+	leaves.name = "PondLilies"
+	leaves.mesh = surface.commit()
+	leaves.material_override = material
+	add_child(leaves)
 
 func _build_lilies(spec: Dictionary) -> void:
 	var surface := SurfaceTool.new()

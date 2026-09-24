@@ -6,6 +6,7 @@
 !packages/blueprint-core/**
 !server/**
 !assets/farm/data/**
+!assets/ponds/catalog.json
 !assets/avatar/parts_manifest.json
 !assets/avatar/demo_denylist.json
 !assets/blueprints/*/r*/farm_blueprint.json

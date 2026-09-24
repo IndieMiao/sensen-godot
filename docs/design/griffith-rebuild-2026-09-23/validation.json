@@ -1,0 +1,115 @@
+{
+  "native_checks_per_viewport": 12,
+  "native_viewports": [
+    "360x640",
+    "390x844",
+    "480x900"
+  ],
+  "android_touches": 42,
+  "android_viewports": [
+    "720x1280",
+    "780x1688",
+    "1080x2340"
+  ],
+  "android_captures": 21,
+  "offline": true,
+  "physical_scene_acceptance": false,
+  "asset_count": 24,
+  "asset_bytes": 16610048,
+  "qa_apk_sha256": "0dd55e0bb258d8479302108874dd2feb797dc3dadf5d1593aa1e180856912a19",
+  "qa_package": "com.sensen.griffithqa",
+  "scene_in_public_journey": false,
+  "projection": {
+    "original": {
+      "max_error_px": 129.41382313147489,
+      "mean_error_px": 14.661248056722515,
+      "samples": 44
+    },
+    "rebuilt": {
+      "max_error_px": 0.03936127840943779,
+      "mean_error_px": 0.020511231477271255,
+      "samples": 44
+    },
+    "scope": "Traced tree base projection only; not a whole-image similarity score."
+  },
+  "native_metrics": [
+    {
+      "draw_calls": 58,
+      "rendered_primitives": 253764,
+      "frame_p95_ms": 8.33333333333333,
+      "view": "short-phone"
+    },
+    {
+      "draw_calls": 64,
+      "rendered_primitives": 257902,
+      "frame_p95_ms": 10.3543333333333,
+      "view": "phone"
+    },
+    {
+      "draw_calls": 61,
+      "rendered_primitives": 257204,
+      "frame_p95_ms": 10.0,
+      "view": "large-phone"
+    },
+    {
+      "draw_calls": 60,
+      "rendered_primitives": 268570,
+      "frame_p95_ms": 9.08,
+      "view": "overview"
+    },
+    {
+      "draw_calls": 57,
+      "rendered_primitives": 262546,
+      "frame_p95_ms": 8.33333333333333,
+      "view": "closeup"
+    }
+  ],
+  "water_visibility": {
+    "passed": true,
+    "screen_crop": [
+      410,
+      475,
+      500,
+      500
+    ],
+    "blue_pixels": {
+      "before": 0,
+      "after": 2175
+    },
+    "scope": "actual rendered front half of central fountain basin"
+  },
+  "opaque_preview_background": true,
+  "opaque_composite": "same OpaqueSceneLayer used by farm",
+  "android_runtime_mode": "16 KB page-size compatibility mode",
+  "source_hashes": {
+    "tools/art/build_griffith_observatory.py": "129ab2ba957706332808c269d252bb8776e19694262337300e27088c325d5e68",
+    "tools/art/landmark_kit.py": "fad8f3070ff42b36b1cc7319929afd37c667102a2d638eee8da15f0b95499cc3",
+    "tools/dev/landmark_preview.gd": "b10c630e658605ca6ccb7387879f45563da0c3547109fcb93f06a3d0cc7d0555",
+    "tools/dev/landmark_preview.tscn": "a571be4b5035fb66cebfb77191a52c46d3553290aba58ec920f2e234acb953b6",
+    "tools/dev/prepare_landmark_preview.gd": "b0f5883c26d50941d552db8fd4539b899b8c1cda8138454a46afe83e06d4ae15",
+    "modules/landmark/shaders/landmark_paint.gdshader": "c9af62bdf29a334b872ac24e97551518324c9f08a50055c0815f2b01cc1bc27b",
+    "modules/landmark/shaders/landmark_terrain.gdshader": "8ff12fc907c0557c65e582dfb18febdc1006eda2be5cdf8c6c4c041191f3324b",
+    "modules/landmark/shaders/landmark_city.gdshader": "06dd5e01798805d5b3b2bd76a09ba165b2276cc26c626df48c2e2e4749b799e8"
+  },
+  "physical_installation": {
+    "date": "2026-09-24",
+    "device": "V2509A",
+    "package": "com.sensen.griffithqa",
+    "version": "0.1-art-review",
+    "versionCode": 2026092312,
+    "apk_readback_sha256": "0dd55e0bb258d8479302108874dd2feb797dc3dadf5d1593aa1e180856912a19",
+    "native_resolution": [
+      1080,
+      2344
+    ],
+    "smoke_passed": true,
+    "touches": 5,
+    "network_never_booted": true,
+    "journey_identity_files_unchanged": 5,
+    "display_unchanged": true,
+    "density_unchanged": true,
+    "qa_process_stopped": true,
+    "scope": "physical install and launch / overview / short walk / recenter / zoom smoke; not complete visual or performance acceptance",
+    "evidence_directory": "output/griffith-rebuild-2026-09-23/physical-2026-09-24"
+  }
+}
