@@ -11,6 +11,7 @@ const adb=args=>run('adb',['-s',serial,...args],{encoding:'buffer',maxBuffer:16*
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 let operations=0;
 const verifyMotion=process.env.POND_QA_MOTION==='1', motionChecks=[];
+const fishingMotionOnly=process.env.POND_QA_FISHING_MOTION_ONLY==='1';
 async function state(){
   for(let attempt=0;attempt<8;attempt++){
     try{return JSON.parse((await adb(['exec-out','run-as',pkg,'cat','files/pond-proof/state.json'])).stdout);}
@@ -47,6 +48,7 @@ async function sampleMotion(label,clip,count=7){
   const first=selected[0].motion.bones;
   const moving=Object.keys(first).filter(b=>selected.some(s=>s.motion.bones[b]?.some((value,i)=>Math.abs(value-first[b][i])>.00001)));
   assert(moving.length>=2,label+': skeleton poses are frozen');
+  if(clip===null&&fishingMotionOnly)assert(new Set(selected.map(s=>s.fishing_motion.crank.toFixed(3))).size>=2,label+': reel crank did not turn while held');
   motionChecks.push({label,clip,samples:selected.length,moving_bones:moving});
 }
 async function select(entry){
@@ -70,10 +72,17 @@ async function returnToMap(pose){
 async function catchFish(){
   await tap('PondFish');await until(s=>s.phase==='ready','reachable fishing shore');
   await shot('fishing-ready');await tap('FishingAction');await until(s=>s.phase==='hook','bite',12000);await tap('FishingAction');
-  let s=await until(s=>s.phase==='playing','hook');await shot('fishing-playing');
-  await sampleMotion('fishing-reel',null,4);
+  let s=await until(s=>s.phase==='playing','hook');
   const [x,y,w,h]=s.controls.find(c=>c.name==='FishingAction').bounds;
   const p=[String(Math.round(x+w/2)),String(Math.round(y+h/2))];let held=false;
+  if(fishingMotionOnly){
+    await adb(['shell','input','motionevent','DOWN',...p]);operations++;
+    try{await sampleMotion('fishing-reel',null,4);}
+    finally{await adb(['shell','input','motionevent','UP',...p]);operations++;}
+    return 'motion_verified';
+  }
+  await shot('fishing-playing');
+  await sampleMotion('fishing-reel',null,4);
   const end=Date.now()+38000;
   try{
     while(s.phase==='playing'&&Date.now()<end){
@@ -112,8 +121,13 @@ try{
     await sampleMotion(shape+'-overview-idle','idle');
     await tap('PondOverview');
     if(shape==='crescent'){
-      let outcome;for(let attempt=0;attempt<3;attempt++){outcome=await catchFish();await back();await until(s=>s.phase==='closed','fishing closed');if(outcome==='caught')break;}
-      assert.equal(outcome,'caught','a real touch-controlled catch');
+      if(fishingMotionOnly){
+        // Use the outer bank for the bounded physical motion check.
+        const s=await state(), target=s.pond.targets.find(t=>t.walkable&&t.world[0]===8&&t.world[1]===-2);
+        assert(target);await point(...target.screen);await until(s=>!s.pond.moving,'outer bank approach');
+      }
+      let outcome;for(let attempt=0;attempt<3;attempt++){outcome=await catchFish();await back();await until(s=>s.phase==='closed','fishing closed');if(outcome===(fishingMotionOnly?'motion_verified':'caught'))break;}
+      assert.equal(outcome,fishingMotionOnly?'motion_verified':'caught',fishingMotionOnly?'real hold/release reel motion':'a real touch-controlled catch');
       await sampleMotion(shape+'-after-fishing','idle');
       await tap('PondBag');await shot('pond-bag');await back();
     }
@@ -135,11 +149,12 @@ try{
   await adb(['shell','wm','size',originalSize]);changed=false;await delay(800);
   const after=await shot('map-returned');assert.equal(after.farm_id,before.farm_id);assert.equal(after.wallet,before.wallet);assert.deepEqual(after.cells,before.cells);assert.deepEqual(after.map.ponds,first);
   const count=s=>[...s.bag.slots,...s.bag.overflow].filter(p=>p.item_id.startsWith('fish_')).reduce((n,p)=>n+p.quantity,0);
-  assert(count(after)>count(before));
+  if(fishingMotionOnly)assert.deepEqual(after.bag,before.bag,'motion-only fishing must not grant or consume inventory');
+  else assert(count(after)>count(before));
   const pid=(await adb(['shell','pidof','-s',pkg])).stdout.toString().trim();
   const log=(await adb(['logcat','-d','--pid',pid,'-s','godot','GodotMapPlugin'])).stdout.toString();await writeFile(out+'/runtime.log',log);
   assert(!/SCRIPT ERROR|Parse Error|Compile Error/.test(log));
-  const report={passed:true,operations,results,fish_gain:count(after)-count(before),farm_preserved:true,locations_fixed:true,motion_checks:motionChecks};
+  const report={passed:true,operations,results,fish_gain:count(after)-count(before),farm_preserved:true,locations_fixed:true,motion_checks:motionChecks,fishing_motion_only:fishingMotionOnly,catch_verified:!fishingMotionOnly};
   await writeFile(out+'/validation.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));
 }catch(error){await shot('failure').catch(()=>{});await writeFile(out+'/failure.txt',String(error.stack??error));throw error;}
 finally{if(changed)await adb(['shell','wm','size',originalSize]);}
