@@ -8,6 +8,9 @@ func _show_offscreen(button: Button) -> void:
 func _wait_for_portrait(button: Button) -> void:
 	for frame in 180:
 		if not button._rendering and button._shown_key == button._desired_key: return
+		# The suite can have no active world camera after a SubViewport fixture
+		# exits. Drive real draw frames for the portrait's UPDATE_ONCE viewport.
+		if DisplayServer.get_name() != "headless": RenderingServer.force_draw()
 		await get_tree().process_frame
 	assert_bool(button._rendering).is_false()
 	assert_str(button._shown_key).is_equal(button._desired_key)

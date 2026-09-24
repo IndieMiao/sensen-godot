@@ -1,5 +1,39 @@
 # Product Direction
 
+- Mine-scene MR review on 2026-09-24 fixes authoritative online arrival framing:
+  use the server-selected spawn, retain the camera through temporary empty worlds
+  on same-instance/same-floor reconnect, and reframe new instances/floors/runs.
+  113 native checks and a rebuilt isolated Android QA run (36 operations,
+  three display sizes) passed. The extra client packet-sequence regression failed
+  before the fix and passed afterward. No server/save changes or phone/production
+  update. See docs/qa/mine-camera-2026-09-24.md for review evidence.
+
+- Mine viewport feedback on 2026-09-24 supersedes whole-chamber framing:
+  use the farm's close orthographic scale (6m, 7.2m on small portrait screens),
+  allow the mine offscreen, free persistent pan and anchored pinch/wheel zoom.
+  Walking and same-floor snapshots never follow/reframe. Show the saved-outfit
+  directional portrait only offscreen; tap to recenter smoothly without changing
+  movement or zoom. New floors frame arrival; suspend/resume retains the view.
+  98 native checks and 36 isolated Android touches at three display sizes passed.
+  No phone or production update. Four updated screenshots were added to the
+  same authorized Slack self-DM review thread and read back; no APK/Joey delivery. See
+  docs/product/mine-camera-2026-09-24.md and docs/qa/mine-camera-2026-09-24.md.
+
+- Local mine art iteration on 2026-09-24 follows the user's five-floor reference:
+  terracotta, moss stone, mushroom, blue crystal and violet elite chambers;
+  carved walls, sand, ore seams, teal-framed ladders, hoist elevator, supplies,
+  warm lanterns and crowned jelly slimes. Mine and farm share the same 43-degree
+  pitch / 14.5-degree yaw orthographic view, with mine controls relative to the
+  screen. Keep authoritative navigation, rock seeds/anchors, combat and saves;
+  the reference's narrow double room / S-shaped passages / central obstacle are
+  not new collision geometry. 87 native checks and 30 isolated Android touches
+  at three requested display sizes passed. QA uses local command fixtures, not
+  public settlement; no original Journey update, phone installation or server
+  change. The user subsequently requested screenshots in their own Slack;
+  nine PNGs were sent to their verified self-DM and read back. No Joey or APK
+  delivery. See docs/product/mine-art-2026-09-24.md and
+  docs/qa/mine-art-2026-09-24.md.
+
 - Physical-feedback iteration on 2026-09-22: Journey `0.16.14 / 2026092208`
   keeps LA map landmarks, NPCs, POIs and player portraits at their direct
   geographic projection. Remove city collision avoidance, screen clamping,

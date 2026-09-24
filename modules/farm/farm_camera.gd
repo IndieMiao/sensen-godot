@@ -1,5 +1,21 @@
 extends RefCounted
 
+const PITCH_DEG := 43.0
+const YAW_DEG := 14.5
+const DISTANCE := 11.0
+const VIEW_M := 6.0
+
+static func close_view_size(viewport_size: Vector2) -> float:
+	var aspect := viewport_size.x / maxf(viewport_size.y, 1)
+	var width := VIEW_M * 1.2 if viewport_size.y < 700 and viewport_size.x < 600 else VIEW_M
+	return maxf(width, 7.2 * aspect)
+
+static func place(camera: Camera3D, center: Vector3) -> void:
+	var pitch := deg_to_rad(PITCH_DEG)
+	var yaw := deg_to_rad(YAW_DEG)
+	camera.position = center + Vector3(sin(yaw) * DISTANCE * cos(pitch), DISTANCE * sin(pitch), cos(yaw) * DISTANCE * cos(pitch))
+	camera.look_at(center, Vector3.UP)
+
 static func fit_ground_depth(camera: Camera3D, ground_y := -0.02, canopy_y := 4.0) -> void:
 	if camera.projection != Camera3D.PROJECTION_ORTHOGONAL: return
 	var forward := -camera.global_basis.z

@@ -3,6 +3,7 @@ extends Node3D
 signal contact(monster_id: String)
 
 const Layout = preload("res://modules/mining/mine_layout.gd")
+const Meshes = preload("res://modules/mining/mine_mesh.gd")
 const SPAWNS := [Vector3(4.75, 0, -5.0), Vector3(2.0, 0, -4.5), Vector3(7.5, 0, -5.5)]
 var enemies: Dictionary = {}
 var _actors: Dictionary = {}
@@ -234,24 +235,50 @@ func _mesh(shape: Mesh, color: Color, point: Vector3) -> MeshInstance3D:
 
 func _slime(spec: Dictionary, elite: bool) -> Node3D:
 	var root := Node3D.new()
-	var color := Color("44bd9c") if not elite else Color("ba62a5")
+	var color := Color("79cdb6") if not elite else Color("ad7cda")
 	root.set_meta("color", color)
 	var radius := float(spec.radius)
-	var sphere := SphereMesh.new()
-	sphere.radius = radius
-	sphere.height = radius * 1.65
-	var body := _mesh(sphere, color, Vector3(0, radius * 0.75, 0))
+	var body := _mesh(_slime_body(radius), color, Vector3.ZERO)
 	body.name = "Body"
+	var jelly := body.material_override as StandardMaterial3D
+	jelly.roughness = 0.29
+	jelly.rim_enabled = true
+	jelly.rim = 0.28
+	jelly.rim_tint = 0.65
 	root.add_child(body)
+	BlobShadow.attach(root,radius*1.15)
 	for side in [-1, 1]:
 		var eye := SphereMesh.new()
-		eye.radius = radius * 0.17
-		eye.height = radius * 0.38
-		root.add_child(_mesh(eye, Color("153b36"), Vector3(side * radius * 0.35, radius * 0.95, radius * 0.83)))
+		eye.radius = radius * 0.09
+		eye.height = radius * 0.27
+		body.add_child(_mesh(eye, Color("333345"), Vector3(side * radius * 0.30, radius * 0.69, radius * 0.92)))
+		var glint := SphereMesh.new()
+		glint.radius = radius * 0.026
+		glint.height = radius * 0.058
+		body.add_child(_mesh(glint, Color("fff9e7"), Vector3(side * radius * 0.30 - radius * 0.02, radius * 0.76, radius * 1.002)))
+		var cheek := SphereMesh.new()
+		cheek.radius = radius * 0.10
+		cheek.height = radius * 0.10
+		var blush := _mesh(cheek, Color("e5a7ca") if elite else Color("b8e1cb"), Vector3(side * radius * 0.51, radius * 0.53, radius * 0.89))
+		blush.scale.z = 0.36
+		body.add_child(blush)
+	var smile := Meshes.surface()
+	Meshes.ribbon(smile,[Vector3(-0.09,0.61,0.986)*radius,Vector3(0,0.57,1.015)*radius,Vector3(0.09,0.61,0.986)*radius],radius*0.033,Color("494056"),Vector3.FORWARD)
+	body.add_child(Meshes.finish(smile,"Smile"))
 	if elite:
-		var gem := PrismMesh.new()
-		gem.size = Vector3(0.3, 0.35, 0.25)
-		root.add_child(_mesh(gem, Color("ffe19c"), Vector3(0, radius * 1.9, 0)))
+		var crown := Meshes.surface()
+		var base := Vector3(0,radius*1.42,0)
+		Meshes.ring(crown,base,radius*0.24,radius*0.035,Color("e9b34e"))
+		for i in 5:
+			var a := TAU*i/5
+			var b := TAU*(i+1)/5
+			var p := Vector3(cos(a)*radius*0.24,0,sin(a)*radius*0.24)
+			var q := Vector3(cos(b)*radius*0.24,0,sin(b)*radius*0.24)
+			var tip := p + Vector3.UP*radius*0.23
+			Meshes.tri(crown,base+p,base+q,base+tip,Color("f1c05b"))
+			Meshes.tri(crown,base+p,base+tip,base+q,Color("c9913d"))
+			Meshes.oval(crown,base+tip,Vector3.ONE*radius*0.09,Color("ffe09a"))
+		body.add_child(Meshes.finish(crown,"Crown","metal"))
 	var warning := TorusMesh.new()
 	warning.inner_radius = radius + 0.04
 	warning.outer_radius = radius + 0.16
@@ -272,6 +299,22 @@ func _slime(spec: Dictionary, elite: bool) -> Node3D:
 		health.name = "HealthFill" if is_fill else "HealthTrack"
 		root.add_child(health)
 	return root
+
+func _slime_body(radius: float) -> ArrayMesh:
+	var surface := Meshes.surface()
+	var profile := [Vector2(0.78,0.025),Vector2(0.98,0.10),Vector2(1.0,0.32),Vector2(0.94,0.60),
+		Vector2(0.83,0.88),Vector2(0.65,1.12),Vector2(0.40,1.33),Vector2(0.04,1.43)]
+	for tier in range(profile.size()-1):
+		for i in 32:
+			var a := TAU*i/32
+			var b := TAU*(i+1)/32
+			var p: Vector2 = profile[tier]*radius
+			var q: Vector2 = profile[tier+1]*radius
+			Meshes.quad(surface,Vector3(cos(a)*p.x,p.y,sin(a)*p.x),Vector3(cos(b)*p.x,p.y,sin(b)*p.x),
+				Vector3(cos(b)*q.x,q.y,sin(b)*q.x),Vector3(cos(a)*q.x,q.y,sin(a)*q.x),Color.WHITE)
+	surface.generate_normals()
+	surface.index()
+	return surface.commit()
 
 func _show_swing(origin: Vector3, facing: Vector3, reach: float) -> void:
 	if is_instance_valid(_swing): _swing.queue_free()
