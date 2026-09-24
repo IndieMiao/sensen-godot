@@ -15,6 +15,11 @@
   integrated-20260924/domain27; no deployment or data migration. Temporary phone QA
   package/port forward removed; display settings retained. No external delivery.
   See docs/qa/avatar-motion-2026-09-24.md.
+  The user subsequently explicitly requested this APK plus brief recent-release
+  notes to Joey via both Slack and Feishu. Slack's full APK attachment and message
+  are readback-verified. Feishu IM's 100MB limit required the full APK in Drive,
+  explicit Joey view access and a DM link; full-download hash, member grant and
+  message are verified. This request does not authorize future version delivery.
 
 - Integrated public release on 2026-09-24: Journey `0.16.36 / 2026092404`
   publishes 12 fixed system ponds (six per city, three small shapes), clearer

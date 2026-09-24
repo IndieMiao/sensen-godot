@@ -34,3 +34,13 @@
 公开修复包：[DMIT](https://download-us.sensenjoy.cn:8443/farm/releases/motion-20260924-b0bf11c1c6cf/sensen-journey-motion-0.16.37.apk) · [OSS](https://oss.sensenjoy.cn/farm/releases/motion-20260924-b0bf11c1c6cf/sensen-journey-motion-0.16.37.apk)。两个站点完整 HTTPS 下载、SHA-256、Range 206 与对应字节、release.json 和 SHA256SUMS 全部通过回读验证。
 
 [MR #3](https://github.com/IndieMiao/sensen-godot/pull/3)；运行修复提交 `68c933a626b46f5a91c10825f127e8ed5b39a6cd`。手机临时 QA 包与 3201 转发已移除，显示设置不变，原 Journey 测试进程按 runner 规则正常停止。
+
+## 后续授权交付 · 2026-09-24
+
+用户随后明确要求“更新到线上，并发送 apk 给 joey slack 和飞书”，并补充简要更新说明。确认线上仍为 0.16.37，两条下载的清单和 Range 字节正确，未重复部署客户端补丁所不需要的服务端。
+
+已向核实的 Joey 本人 Slack 私聊发送 178,410,560 字节的完整 APK 附件，并附五项更新摘要及两个备用下载入口；消息和文件 ID 已回读。飞书 IM 文件接口拒绝超过 100 MB 的附件，因此将同一完整 APK 上传飞书云盘，仅额外授予 Joey 查看权限，并通过本人私聊发送云盘链接和相同摘要。云盘完整下载 SHA-256 与正式 APK 一致，授权成员与消息正文均已回读核对。
+
+摘要涵盖 12 个系统鱼塘/三种池形、清澈加速水面、五层矿坑及自由镜头、Griffith 地图入口和本轮角色动作恢复。不声称 Joey 已阅读或安装；本次授权不延续到后续版本自动发送。
+
+[交付回执](../../output/avatar-motion-20260924/delivery/receipt.json)。
