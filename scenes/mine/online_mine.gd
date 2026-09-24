@@ -46,6 +46,15 @@ func _display_state() -> Dictionary:
 		state.character.hp = int(online.self_state.hp)
 	return state
 
+func _floor_spawn() -> Vector3:
+	# joined/floor selects a collision-free seat before world rebuilds the scene.
+	if online and online._arrival_pending: return online._arrival_position
+	return super._floor_spawn()
+
+func _camera_context_key() -> String:
+	var key := super._camera_context_key()
+	return online.room + ":" + key if online and not online.world.is_empty() and not key.is_empty() else ""
+
 func _floor_navigation(number: int, run: int, farm_id: String) -> FarmBlueprint:
 	if online == null or online.world.is_empty(): return super._floor_navigation(number, run, farm_id)
 	var nav: Dictionary = online.world.navigation

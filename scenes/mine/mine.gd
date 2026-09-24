@@ -38,6 +38,7 @@ var pending_target := ""
 var camera_pan := preload("res://modules/farm/scene_pan.gd").new()
 var _camera_center := Vector3.ZERO
 var _camera_initialized := false
+var _camera_context := ""
 var _camera_recenter: Tween
 var _focus_button: Button
 var _world_key := ""
@@ -475,16 +476,28 @@ func _refresh() -> void:
 	primary.tooltip_text = primary.text
 	_layout.call_deferred()
 
+func _floor_spawn() -> Vector3:
+	return Layout.SPAWN
+
+func _camera_context_key() -> String:
+	if current_floor() <= 0: return ""
+	return "%s:%d:%d" % [session.farm_id if session else "", int(mine_state().get("run", 0)), current_floor()]
+
 func _rebuild_floor() -> void:
 	var number := maxi(1, current_floor())
 	var run := int(mine_state().get("run", 0))
 	var farm_id := session.farm_id if session else ""
 	var changed_floor := _rendered_floor != current_floor() or _rendered_run != run or _rendered_farm != farm_id
-	var previous := mover.position if mover and not changed_floor else Layout.SPAWN
-	if changed_floor:
+	var previous := mover.position if mover and not changed_floor else _floor_spawn()
+	var camera_context := _camera_context_key()
+	# A temporary empty world during reconnect is not a new destination. Keep
+	# its view; only an authoritative new floor/run/instance reframes arrival.
+	if not camera_context.is_empty() and camera_context != _camera_context:
 		_stop_camera_recenter()
 		camera_pan.reset()
 		_camera_initialized = false
+		_camera_context = camera_context
+	if changed_floor:
 		_dig_target = ""
 		_dig_elapsed = 0
 		progress.value = 0

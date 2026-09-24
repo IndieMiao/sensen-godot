@@ -44,3 +44,17 @@ tools/android/run_test.sh --serial emulator-5560 com.sensen.journeymineartqa -- 
 双指用例使用模拟器已有 `/data/local/tmp/journey-touch.dex`（源码 `tools/dev/JourneyTouch.java`）。
 
 沿用用户本次矿坑截图检查的明确授权，已将四张 PNG（第一/四层近景对照、离屏头像、电梯平移细节）补充到同一已验证的 Slack 自聊线程。[更新消息](https://gensenapp.slack.com/archives/D0C0V4YULKT/p1790228821391249?thread_ts=1790226637.901109&cid=D0C0V4YULKT)。四份上传 HTTP 200，分享成功并经线程回读核对文件 ID；回执与哈希在 `output/mine-camera-2026-09-24/delivery/`。没有发送 APK 或投递给其他人。
+
+## MR 独立复核与联机相机修正
+
+2026-09-24 从远端 `wt/mine-scene` 的 `520b2c9` 建立独立工作区，对照目标 `farm-dev` 的 `b31cfd1` 复核；没有混入主工作区尚未提交的鱼塘或地标改动。
+
+额外的联机报文回放复现了两个问题：服务器分配 `(6.75, -0.75)` 的入场站位时，镜头仍停在默认 `(4.75, -0.75)`；同层重连时，`joined` 与 `world` 之间的临时空场景会重置已平移的镜头。换层到偏移站位和同楼层进入另一矿坑也纳入检查。
+
+修正后，场景从服务器的待应用到达站位建立新楼层，并单独保存有效的相机目的地标识。临时空场景不触发取景重置；新的矿坑实例、轮次或楼层才重置。相机代码不提交移动、采矿、战斗或存档命令。
+
+新增 [test_online_mine_camera.gd](../../tests/mining/test_online_mine_camera.gd) 在修正前产生四处位置/视角断言失败，修正后通过。完整复跑矿坑、农场相机、ScenePan、头像与 OnlineSpace 套件共 **113 项通过**，0 错误、0 失败、0 孤立节点。
+
+重新构建的独立 Android QA 包完成 **36 次系统输入和 24 张截图**，覆盖三个请求尺寸的采矿、自由拖动、离屏回中、真实双指事件、背包和五层切换；日志无脚本/资源错误，结束恢复 720×1560 并停止 QA 进程。包 SHA-256 为 `e07803a7946edb9da5225ea6793f1f6e49ebfd5b7c7973dbb24f611399e621c8`。另从包内加载编译脚本，确认包含新的到达站位钩子和相机目的地状态。
+
+复核证据位于独立工作区 `output/mine-scene-review-20260924/`，Android 操作证据位于该工作区 `output/mine-camera-2026-09-24/android/`。联机回归使用真实客户端报文处理路径，Android 仍使用本地命令夹具；不将其表述为新增生产结算或真机验收。

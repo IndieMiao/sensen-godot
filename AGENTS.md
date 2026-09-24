@@ -1,5 +1,13 @@
 # Product Direction
 
+- Mine-scene MR review on 2026-09-24 fixes authoritative online arrival framing:
+  use the server-selected spawn, retain the camera through temporary empty worlds
+  on same-instance/same-floor reconnect, and reframe new instances/floors/runs.
+  113 native checks and a rebuilt isolated Android QA run (36 operations,
+  three display sizes) passed. The extra client packet-sequence regression failed
+  before the fix and passed afterward. No server/save changes or phone/production
+  update. See docs/qa/mine-camera-2026-09-24.md for review evidence.
+
 - Mine viewport feedback on 2026-09-24 supersedes whole-chamber framing:
   use the farm's close orthographic scale (6m, 7.2m on small portrait screens),
   allow the mine offscreen, free persistent pan and anchored pinch/wheel zoom.
