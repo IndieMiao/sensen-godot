@@ -13,6 +13,12 @@
 
 ## 当前版本
 
+[Journey 0.16.37 / 2026092405](https://download-us.sensenjoy.cn:8443/farm/releases/motion-20260924-b0bf11c1c6cf/sensen-journey-motion-0.16.37.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/motion-20260924-b0bf11c1c6cf/sensen-journey-motion-0.16.37.apk)。
+
+178410560 字节；SHA-256 `b0bf11c1c6cf4e70e04e20dfb556d4455ddea60c316d256a18b2e24b4acf9d96`。修复鱼塘相机距离导致可见角色待机、跑步被冻结，统一动作切换姿势重置。66 项原生检查、124 次模拟器输入和 33 次隔离真机动作输入通过。原签名正式包已在 V2509A 与模拟器覆盖安装、回读与冷登录核验，当前身份和存档保持；两站全量、哈希、Range、清单均通过。服务端保持 integrated-20260924；本轮没有新消息交付。详见 `docs/qa/avatar-motion-2026-09-24.md`。
+
+## 历史版本 0.16.36
+
 [Journey 0.16.36 / 2026092404](https://download-us.sensenjoy.cn:8443/farm/releases/integrated-20260924-931618e56d20/sensen-journey-integrated-0.16.36.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/integrated-20260924-931618e56d20/sensen-journey-integrated-0.16.36.apk)。
 
 178410540 字节；SHA-256 `931618e56d206529e8bec54f3685c8d7e1e9de8dcf27e7a64f526e0dab7a950b`。整合两城 12 个固定系统鱼塘/三种场景、明亮清澈的 2.2 倍流速水面、五层矿坑美术与自由镜头修复，保留 Griffith 场景入口。服务 `integrated-20260924` 已上线，domain 27 / content 50c2dbdde04c9678 不变，75 个农场和全部历史数据保留。
