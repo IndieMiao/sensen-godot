@@ -73,6 +73,12 @@ func _ready() -> void:
 	add_child(player)
 	_rig = Avatar.create_rig()
 	_rig.assembler = AvatarAssemblerMerged.new()
+	# The orthographic pond camera sits 40m away even in the close view.
+	# Match the other world scenes instead of using the dressing room's 8/16m LOD.
+	for child in _rig.get_children():
+		if child is RigActivity:
+			child.reduced_distance = 50
+			child.sleep_distance = 80
 	player.add_child(_rig)
 	_rig.config_applied.connect(func(_config): _animation = ""; _play("idle"))
 	Avatar.follow_saved_outfit(_rig)
@@ -183,8 +189,7 @@ func _process(delta: float) -> void:
 func _play(animation: String) -> void:
 	if _animation == animation: return
 	_animation = animation
-	var ap := _rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
-	if ap and ap.has_animation(animation): ap.play(animation)
+	_rig.play_motion(animation)
 
 func _tap(position: Vector2) -> void:
 	var origin := cam.project_ray_origin(position)

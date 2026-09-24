@@ -3,7 +3,10 @@ extends SceneTree
 func _initialize() -> void:
 	var water_pass := "--water-clarity" in OS.get_cmdline_user_args()
 	var output_root := "res://output/pond-water-2026-09-24" if water_pass else "res://output/system-ponds-2026-09-24"
-	var directory := ProjectSettings.globalize_path(output_root.path_join("qa-project"))
+	var motion_fix := "--motion-fix" in OS.get_cmdline_user_args()
+	if motion_fix: output_root = "res://output/avatar-motion-20260924"
+	var phone := "--phone" in OS.get_cmdline_user_args()
+	var directory := ProjectSettings.globalize_path(output_root.path_join("qa-phone-project" if phone else "qa-project"))
 	DirAccess.make_dir_recursive_absolute(directory)
 	var config := ConfigFile.new()
 	assert(config.load("res://project.godot") == OK)
@@ -14,6 +17,7 @@ func _initialize() -> void:
 	config.set_value("sensen", "network/online_qa", true)
 	config.set_value("sensen", "network/base_url", "http://127.0.0.1:3201/v1")
 	config.set_value("sensen", "network/mobile_base_url", "http://10.0.2.2:3201/v1")
+	if phone: config.set_value("sensen", "network/mobile_base_url", "http://127.0.0.1:3201/v1")
 	config.set_value("editor_plugins", "enabled", PackedStringArray())
 	assert(config.save(directory.path_join("project.godot")) == OK)
 	var source := DirAccess.open("res://")
@@ -41,6 +45,9 @@ func _initialize() -> void:
 	preset.set_value("preset.0.options", "package/name", "Journey Pond QA")
 	preset.set_value("preset.0.options", "version/code", 2026092403 if water_pass else 2026092402)
 	preset.set_value("preset.0.options", "version/name", "0.16.35-waterqa" if water_pass else "0.16.34-pondqa")
+	if motion_fix:
+		preset.set_value("preset.0.options", "version/code", 2026092405)
+		preset.set_value("preset.0.options", "version/name", "0.16.37-motionqa")
 	assert(preset.save(directory.path_join("export_presets.cfg")) == OK)
 	print("POND_QA_PROJECT ", directory)
 	quit()
