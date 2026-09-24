@@ -1,5 +1,21 @@
 # Product Direction
 
+- Avatar motion correction on 2026-09-24: Journey `0.16.37 / 2026092405`
+  fixes visible pond idle/run freezing: the orthographic camera was about 37m
+  from the avatar but RigActivity still slept past 16m. Use the world scenes'
+  50/80m thresholds and shared play_motion pose reset; animation assets are intact.
+  66 native checks, 124 emulator inputs and 33 isolated V2509A inputs passed,
+  including animation-time/bone changes and hold/release reel-crank movement.
+  Physical QA uses its own local account; its inventory stays unchanged. Physical
+  automated catches/full-shore coverage are not claimed; an initial shore attempt
+  hit FISHING_LOCATION and is recorded separately. The original signed observer-free
+  APK is installed/readback/cold-login verified on phone and emulator, retaining
+  each device's five fresh identity/appearance/preferences files and current farm.
+  Both public full downloads, hashes, Range and manifests passed. Backend stays
+  integrated-20260924/domain27; no deployment or data migration. Temporary phone QA
+  package/port forward removed; display settings retained. No external delivery.
+  See docs/qa/avatar-motion-2026-09-24.md.
+
 - Integrated public release on 2026-09-24: Journey `0.16.36 / 2026092404`
   publishes 12 fixed system ponds (six per city, three small shapes), clearer
   2.2x-flow water, reviewed five-floor mine art/free camera/reconnect framing,

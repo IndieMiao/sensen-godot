@@ -16,8 +16,7 @@ func _boot() -> void:
 	if ApiClient.install_key() != str(account.key):
 		FileAccess.open(ApiClient.INSTALL_KEY_PATH, FileAccess.WRITE).store_string(str(account.key))
 		FarmChoice.clear()
-	var host := "10.0.2.2" if OS.get_name() == "Android" else "127.0.0.1"
-	Net.use_transport(ApiClient.make_http_transport(self), "http://%s:3201/v1" % host)
+	Net.use_transport(ApiClient.make_http_transport(self), Net.base_url())
 	if not await Net.boot(): push_error("POND_QA_LOGIN_FAILED"); return
 	FarmRegions.save_choice(Net.session.region_id)
 	FarmChoice.save_choice(Net.session.farm_choice())
@@ -46,6 +45,20 @@ func _screen(camera: Camera3D, point: Vector3) -> Array:
 	var p: Vector2 = get_viewport().get_screen_transform() * camera.unproject_position(point)
 	return [p.x, p.y]
 
+func _motion(rig: AvatarRig) -> Dictionary:
+	var ap := rig.get_node("AnimationPlayer") as AnimationPlayer
+	var result := {"clip": ap.current_animation, "time": ap.current_animation_position if not ap.current_animation.is_empty() else 0.0,
+		"active": ap.playback_active, "playing": ap.is_playing(), "bones": {}, "activity": -1}
+	for child in rig.get_children():
+		if child is RigActivity: result.activity = child.current_level
+	for bone in ["Root_M", "Shoulder_L", "Elbow_L", "Shoulder_R", "Elbow_R", "Hip_L", "Knee_L", "Hip_R", "Knee_R"]:
+		var index := rig.skeleton.find_bone(bone)
+		if index < 0: continue
+		var pose := rig.skeleton.get_bone_pose(index)
+		var q := pose.basis.get_rotation_quaternion()
+		result.bones[bone] = [pose.origin.x, pose.origin.y, pose.origin.z, q.x, q.y, q.z, q.w]
+	return result
+
 func _process(delta: float) -> void:
 	_elapsed += delta
 	if _elapsed < .10: return
@@ -61,6 +74,7 @@ func _process(delta: float) -> void:
 		"wallet": Net.session.state.get("wallet", 0), "cells": Net.session.state.get("cells", {}), "unconfirmed": Net.session.has_unconfirmed_command(),
 		"fps": Engine.get_frames_per_second()}
 	if scene is FishingPondScene:
+		data.motion = _motion(scene._rig)
 		data.pond = {"id": scene.entry.id, "template": scene.entry.template_id, "geometry_ready": scene._geometry_ready,
 			"joined": scene.online.joined if scene.online else false, "room": scene.online.room if scene.online else "", "position": [scene.mover.position.x,scene.mover.position.z],
 			"moving": scene.mover.is_moving(), "camera": [scene.cam.position.x,scene.cam.position.y,scene.cam.position.z],
@@ -74,6 +88,7 @@ func _process(delta: float) -> void:
 		data.fishing = Net.session.state.get("fishing", {})
 		data.busy = panel.busy
 		data.fishing_message = panel._status.text
+		data.fishing_motion = {"cast_age": scene.fishing_view._cast_age, "crank": scene.fishing_view._crank_angle} if is_instance_valid(scene.fishing_view) else {}
 	elif scene.scene_file_path == AppRouter.MAP and scene.city_map:
 		var city: CityMapView = scene.city_map
 		data.map = {"selected":city.selected,"ponds":city.pond_locations,"filter":city.filter,"markers":[],"pose":[scene.center_lat,scene.center_lng,scene.zoom,scene.bearing],"status":city.status.text}
