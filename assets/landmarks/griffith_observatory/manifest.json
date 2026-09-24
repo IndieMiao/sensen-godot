@@ -1,0 +1,102 @@
+{
+  "generator": "tools/art/build_griffith_observatory.py",
+  "design": "docs/design/landmark-scenes-2026-09-23/griffith_observatory_scene_v1.png",
+  "assets": {
+    "terrain": {
+      "triangles": 52560,
+      "bytes": 1274368
+    },
+    "lawns": {
+      "triangles": 936,
+      "bytes": 29504
+    },
+    "observatory": {
+      "triangles": 53024,
+      "bytes": 3070064
+    },
+    "terrace": {
+      "triangles": 14936,
+      "bytes": 1354228
+    },
+    "plaza": {
+      "triangles": 1996,
+      "bytes": 98220
+    },
+    "fountain_0": {
+      "triangles": 964,
+      "bytes": 30416
+    },
+    "fountain_1": {
+      "triangles": 964,
+      "bytes": 30416
+    },
+    "fountain_2": {
+      "triangles": 964,
+      "bytes": 30412
+    },
+    "cafe": {
+      "triangles": 7538,
+      "bytes": 483020
+    },
+    "city": {
+      "triangles": 96240,
+      "bytes": 9625352
+    },
+    "tree_round": {
+      "triangles": 2388,
+      "bytes": 105244
+    },
+    "tree_big": {
+      "triangles": 2388,
+      "bytes": 105244
+    },
+    "tree_olive": {
+      "triangles": 2388,
+      "bytes": 105244
+    },
+    "cypress": {
+      "triangles": 416,
+      "bytes": 14088
+    },
+    "bush": {
+      "triangles": 672,
+      "bytes": 25572
+    },
+    "bush_round": {
+      "triangles": 388,
+      "bytes": 15072
+    },
+    "grass_clump": {
+      "triangles": 144,
+      "bytes": 13048
+    },
+    "rock": {
+      "triangles": 80,
+      "bytes": 12356
+    },
+    "lamp": {
+      "triangles": 376,
+      "bytes": 16972
+    },
+    "bench": {
+      "triangles": 972,
+      "bytes": 92648
+    },
+    "fence_post": {
+      "triangles": 220,
+      "bytes": 11072
+    },
+    "rope": {
+      "triangles": 96,
+      "bytes": 10336
+    },
+    "flowers": {
+      "triangles": 900,
+      "bytes": 39504
+    },
+    "telescope": {
+      "triangles": 216,
+      "bytes": 17648
+    }
+  }
+}

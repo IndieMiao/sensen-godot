@@ -1,0 +1,13 @@
+{
+  "original": {
+    "max_error_px": 129.41382313147489,
+    "mean_error_px": 14.661248056722515,
+    "samples": 44
+  },
+  "rebuilt": {
+    "max_error_px": 0.03936127840943779,
+    "mean_error_px": 0.020511231477271255,
+    "samples": 44
+  },
+  "scope": "Traced tree base projection only; not a whole-image similarity score."
+}

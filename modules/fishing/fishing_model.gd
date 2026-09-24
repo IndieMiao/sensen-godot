@@ -8,7 +8,7 @@ static func data() -> Dictionary:
 	return _data
 
 static func site(id: String, pond: Dictionary = {}) -> Dictionary:
-	return pond if id == "farm_pond" and not pond.is_empty() else data().sites.get(id, {})
+	return pond if not pond.is_empty() and (id == "farm_pond" or pond.get("space") == "pond") else data().sites.get(id, {})
 
 ## Geometry belongs to the farm being visited, never a process-wide mutable setting.
 ## Legacy farms retain the original fishing coordinates. Generated compact farms
@@ -41,6 +41,10 @@ static func tier_name(id: String) -> String:
 
 static func contains(id: String, point: Vector3, padding := 0.0, pond: Dictionary = {}) -> bool:
 	var spec := site(id, pond)
+	if spec.has("polygon"):
+		var p := Vector2(point.x, point.z)
+		var polygon := _polygon(spec)
+		return Geometry2D.is_point_in_polygon(p, polygon) or p.distance_to(_nearest_polygon(p, polygon)) <= maxf(padding, 0.0000001)
 	if spec.has("center"):
 		var center := Vector2(float(spec.center[0]), float(spec.center[1]))
 		var radius := Vector2(float(spec.radii[0]), float(spec.radii[1])) + Vector2.ONE * padding
@@ -84,6 +88,9 @@ static func nearest_water(id: String, point: Vector3, pond: Dictionary = {}) -> 
 	if contains(id, point, 0.0, pond): return Vector3(point.x, 0, point.z)
 	var spec := site(id, pond)
 	var p := Vector2(point.x, point.z)
+	if spec.has("polygon"):
+		var q := _nearest_polygon(p, _polygon(spec))
+		return Vector3(q.x, 0, q.y)
 	if spec.has("center"):
 		var center := Vector2(spec.center[0], spec.center[1])
 		var a := Vector2(spec.radii[0], spec.radii[1])
@@ -102,6 +109,18 @@ static func nearest_water(id: String, point: Vector3, pond: Dictionary = {}) -> 
 		if candidate.distance_squared_to(p) < nearest.distance_squared_to(p): nearest = candidate
 	nearest += (p - nearest).normalized() * float(spec.width) * 0.5
 	return Vector3(nearest.x, 0, nearest.y)
+
+static func _polygon(spec: Dictionary) -> PackedVector2Array:
+	var polygon := PackedVector2Array()
+	for p in spec.polygon: polygon.append(Vector2(p[0], p[1]))
+	return polygon
+
+static func _nearest_polygon(p: Vector2, polygon: PackedVector2Array) -> Vector2:
+	var nearest := polygon[0]
+	for i in polygon.size():
+		var q := Geometry2D.get_closest_point_to_segment(p, polygon[i], polygon[(i + 1) % polygon.size()])
+		if p.distance_squared_to(q) < p.distance_squared_to(nearest): nearest = q
+	return nearest
 
 static func default_target(id: String, origin: Vector3, pond: Dictionary = {}) -> Vector3:
 	var edge := nearest_water(id, origin, pond)

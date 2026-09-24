@@ -3,7 +3,7 @@
 用户于 2026-09-18 反馈美国访问原 OSS 慢，要求将 APK 上传到现有 DMIT。
 已部署到 DMIT 洛杉矶主机；仅托管公开发布物，游戏 API 和存档仍使用原香港服务。
 
-- SSH 别名：`dmit-crs2ddcugh`；主机 `179.255.158.180`。
+- SSH 别名：`dmit-crs2ddcugh`；主机 `179.255.151.51`。
 - 域名：`download-us.sensenjoy.cn`，阿里云 DNS A 记录，TTL 600。
 - HTTPS 下载：`https://download-us.sensenjoy.cn:8443/farm/releases/` 加版本目录和文件名。
 - 系统 Caddy 服务，配置 `/etc/caddy/Caddyfile`，源码配置见同目录 [Caddyfile](Caddyfile)。
@@ -12,6 +12,14 @@
 - Caddy 自动申请/续期证书，开机启动；支持 Range 断点续传、明确 APK MIME/附件下载与不可变缓存。
 
 ## 当前版本
+
+[Journey 0.16.32 / 2026092311](https://download-us.sensenjoy.cn:8443/farm/releases/map-20260923-fea6a68ead20/sensen-journey-map-0.16.32.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/map-20260923-fea6a68ead20/sensen-journey-map-0.16.32.apk)。
+
+170969957 字节；SHA-256 `fea6a68ead20b45a8a123347cdaa7cf8acf2912e8a0f65b469e9bf00ff87d25a`。LA/上海、125张语义POI图标、国家级缩放与城市飞行、统一白卡/青柠UI；不含地标3D跳转。原包名、原签名、无观察器；179项原生地图检查、模拟器原身份覆盖更新验证通过；用户安装到V2509A的同一包已回读核对。两个站点全量与Range校验通过，2026-09-23已将下载域名更新到当前DMIT地址。
+
+用户本人飞书交付已发送回读；本会话Slack缺少可调用接口，未发送。首次建场的OSM连接失败已通过1500ms Node地址尝试等待配置修复；原有74个农场及历史记录未变。用户清数据后的新身份后来新增1份农场，旧身份的原农场仍保留。见 `docs/qa/map-release-2026-09-23.md` 和 `docs/qa/fresh-install-geography-2026-09-23.md`。
+
+## 历史版本 0.16.9
 
 [Journey Preview 0.16.9 / 2026092105](https://download-us.sensenjoy.cn:8443/farm/releases/shoreline-farm-20260921-9d30d59440c7/sensen-journey-shoreline-farm-0.16.9.apk)。
 [OSS 备用](https://oss.sensenjoy.cn/farm/releases/shoreline-farm-20260921-9d30d59440c7/sensen-journey-shoreline-farm-0.16.9.apk)。

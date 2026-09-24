@@ -1,4 +1,5 @@
 import type { FishingCast, FishingSite } from '../domain/fishing.js';
+import type { PondRoom } from '../ponds/catalog.js';
 import { randomUUID } from 'node:crypto';
 import type { Content } from '../domain/content.js';
 import type { FarmRow } from '../http/dto.js';
@@ -35,9 +36,10 @@ export class Room {
   private interests = new Map<number, Set<number>>();
   readonly metrics = { ticks: 0, maxTickMs: 0, skipped: 0, bytes: 0, snapshots: 0, slowCloses: 0 };
 
-  constructor(readonly key: string, readonly kind: 'street' | 'farm' | 'mine',
+  get capacity() { return this.pond?.capacity ?? CAPACITY; }
+  constructor(readonly key: string, readonly kind: 'street' | 'farm' | 'mine' | 'pond',
     readonly navigation: Navigation, readonly store: Store, readonly content: Content, readonly realNow: () => number = Date.now,
-    readonly farmFishingSite?: FishingSite) {
+    readonly farmFishingSite?: FishingSite, readonly pond?: PondRoom) {
     this.mine = initialExpedition(content);
   }
   async load() {
@@ -62,7 +64,7 @@ export class Room {
   async join(farm: FarmRow, wire: Transport, beforeJoin?: () => Promise<void>, partyId = '', resumeFloor = 1, appearance = defaultAppearance()): Promise<Member> {
     return this.exclusive(async () => {
       if (this.failed) throw new Error('ROOM_UNAVAILABLE');
-      if (this.members.size >= CAPACITY && !this.members.has(farm.owner_id)) throw new Error('ROOM_FULL');
+      if (this.members.size >= this.capacity && !this.members.has(farm.owner_id)) throw new Error('ROOM_FULL');
       if (this.kind === 'mine') {
         this.mine.owner ??= farm.owner_id;
         if (partyId) this.mine.party = partyId;
@@ -82,7 +84,7 @@ export class Room {
         action: 0, actionSerial: 0, attackAt: -100, hurtAt: -100, grace: this.now + 1.5 };
       this.members.set(m.player, m);
       this.interests.clear();
-      this.send(m, { t: 'joined', protocol: 1, room: this.key, kind: this.kind, capacity: CAPACITY,
+      this.send(m, { t: 'joined', protocol: 1, room: this.key, kind: this.kind, capacity: this.capacity,
         self: m.id, floor, epoch: m.epoch, spawn: [x, z], tick_hz: 20, snapshot_hz: 10, resume: wire.resume?.(floor) });
       this.sendWorld(m);
       this.roster(m);
@@ -403,6 +405,8 @@ export class Room {
   }
   sendWorld(m: Member) {
     this.send(m, { t: 'world', epoch: m.epoch, navigation: this.nav(m.floor),
+      ...(this.pond ? { pond_id: this.pond.location.id, catalog_revision: this.pond.revision,
+        template_id: this.pond.template.id, site: this.pond.site } : {}),
       ...(this.kind === 'mine' ? { instance: this.key.slice(5), run: this.mine.run, floor: m.floor,
         cleared: Object.entries(this.mine.floors).filter(([, f]) => f.cleared).map(([id]) => Number(id)),
         elevator: this.mine.elevator, floors: Object.fromEntries(Object.entries(this.mine.floors).map(([id, f]) =>

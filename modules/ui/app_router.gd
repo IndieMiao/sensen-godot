@@ -402,7 +402,7 @@ static func back_action_for_scene(scene_path: String, back_locked := false) -> i
 	if back_locked:
 		return BACK_IGNORE
 	match scene_path:
-		DRESS, STRESS, FARM, PLACE, MINE:
+		DRESS, STRESS, FARM, PLACE, MINE, LandmarkScenes.GRIFFITH:
 			return BACK_TO_MAP
 		MAP, CITY_SELECT:
 			return BACK_LEAVE_APP

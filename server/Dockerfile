@@ -16,6 +16,7 @@ RUN corepack enable && addgroup -S farm && adduser -S farm -G farm
 COPY --from=build /repo /repo
 # 内容表与蓝图打进镜像：它们是单一来源，运行时不从外部挂载（spec §3 铁律 3）。
 COPY assets/farm/data assets/farm/data
+COPY assets/ponds/catalog.json assets/ponds/catalog.json
 COPY assets/blueprints assets/blueprints
 COPY assets/avatar/parts_manifest.json assets/avatar/parts_manifest.json
 COPY assets/avatar/demo_denylist.json assets/avatar/demo_denylist.json

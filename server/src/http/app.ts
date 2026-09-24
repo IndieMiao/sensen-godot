@@ -1,4 +1,5 @@
 import { createOsmProvider } from '../geography/osm.js';
+import { PondCatalog } from '../ponds/catalog.js';
 import { createLandCoverProvider } from '../geography/land_cover.js';
 import { relocateFarmState, relocationAvailable, relocationBlocked, RELOCATION_PREVIEW_TTL, RelocationError,
   type RelocationConfirm } from '../domain/farm_relocation.js';
@@ -52,6 +53,7 @@ export interface AppDeps {
   legacyGameplay?: boolean;
   /** HTTP replicas can disable room ownership and route WSS to a dedicated realtime process. */
   realtimeEnabled?: boolean;
+  pondCatalog?: PondCatalog;
   voice?: VoiceConfig;
   voiceMedia?: VoiceMedia;
   /** 覆写农场地面布局；默认读 content.farm_plot 的 default_layout。 */
@@ -112,7 +114,13 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return deps.store.playerByToken(tokenHash(raw.slice(7)), deps.now());
   };
 
-  const online = deps.realtimeEnabled !== false ? registerOnline(app, deps, auth) : null;
+  const ponds = deps.pondCatalog ?? new PondCatalog();
+  const online = deps.realtimeEnabled !== false ? registerOnline(app, { ...deps, pondCatalog: ponds }, auth) : null;
+  app.get('/v1/ponds', async (req, reply) => {
+    const region = (req.query as { region_id?: unknown }).region_id;
+    if (typeof region !== 'string' || !regions.regions.some(r => r.id === region)) return reply.code(400).send({ code: 'SCHEMA' });
+    return { version: 1, catalog_revision: ponds.revision, available: Boolean(online), locations: ponds.list(region) };
+  });
 
   const installationLoginLimit = app.createRateLimit({ max: 10, timeWindow: '1 hour', keyGenerator: req => {
     const key = (req.body as { install_key?: unknown })?.install_key;

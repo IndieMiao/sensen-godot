@@ -33,6 +33,117 @@
   nine PNGs were sent to their verified self-DM and read back. No Joey or APK
   delivery. See docs/product/mine-art-2026-09-24.md and
   docs/qa/mine-art-2026-09-24.md.
+- Pond water reference pass on 2026-09-24: local Journey `0.16.35 / 2026092403`
+  brightens shared fishing water toward clear turquoise/blue, reveals the stone
+  bed, softens refraction and dark reflection coverage, and uses 2.2x texture
+  flow time. System pond ground is now excluded from the shoreline reflection
+  layer. Preserve pond shapes, navigation, fishing timing, inventory and saves.
+  27 targeted native checks and 66 Android operations at three sizes passed;
+  all three ponds sampled at 60 FPS after warm-up on the emulator. This is not
+  phone performance or visual acceptance. The original-certificate observer-free
+  APK is built/inspected, and 29 runtime resources match QA. No new server change,
+  public publication, phone installation or message delivery; the system pond
+  backend from the preceding iteration is still pending deployment. See
+  docs/qa/pond-water-clarity-2026-09-24.md for before/after images and motion video.
+  The user subsequently requested the PNG and MP4 via Slack to self; both were
+  sent to the verified self DM and read back. No APK or other-recipient delivery.
+
+- System fishing ponds implemented locally on 2026-09-24: Journey
+  `0.16.34 / 2026092402` has 12 persisted game locations (six per city) and three
+  small polygon pond templates. Seeded assignment and decoration stay fixed;
+  map previews, navigation, shoreline rendering and authoritative fishing share
+  the catalog. Use the farm ScenePan and existing fishing/equipment/bag rules.
+  Pond rooms have 16 seats per channel, independent catches and party follow;
+  existing farm geometry, domain 27 and content 50c2dbdde04c9678 remain unchanged.
+  843 distinct server/PostgreSQL checks, 328 native checks, nine native rendering
+  profiles and 76 Android inputs passed on isolated data. Original-package,
+  original-certificate observer-free APK is built and inspected; 33 runtime
+  resources match the tested QA APK. No production deployment, public publication,
+  original Journey/device replacement or external delivery occurred. New pond
+  entries require the compatible backend. Phone and iOS acceptance remain pending.
+  See docs/product/system-fishing-ponds-2026-09-24.md and
+  docs/qa/system-fishing-ponds-2026-09-24.md.
+  The user then explicitly requested the pond images through Slack to self:
+  the comparison plus three individual PNGs were sent to the verified self DM
+  and read back on 2026-09-24. This authorizes no future or other-recipient delivery;
+  APK publication, backend deployment and phone installation remain pending.
+
+- Map fishing scope selected on 2026-09-24: this iteration uses system-generated
+  game ponds only. Mapping a large real lake or river to a 1–2-screen pond would
+  mismatch the player's spatial expectation; real-water POI conversion is deferred.
+  Use fixed, persisted map locations and assign one of three small pond templates
+  once per location. The entry name, preview and entered scene must agree; all
+  players share the same location/layout, and re-entry must not reroll it. Preserve
+  existing farm ponds, identity, equipment and saves. The proposal uses configured
+  generation areas and the existing map POI presentation, ScenePan and authoritative
+  fishing flow; template art, dimensions and density still need validation. This is
+  a scope/design decision, not implemented or released functionality. See
+  docs/product/map-fishing-ponds-proposal-2026-09-24.md.
+
+- Griffith map entry on 2026-09-24: Journey `0.16.33 / 2026092401` is built
+  locally with the original package/certificate and the 24 rebuilt landmark
+  models. Selecting Griffith Observatory on the LA map exposes an Enter scene
+  action; only that authored landmark is enabled. The local visit preserves
+  the saved outfit, farm state and map camera/selection on return. Use the
+  farm ScenePan controller: free drag, decaying inertia, new-touch stop, focal
+  pinch with elastic zoom, background cancellation and offscreen portrait
+  recenter; no farming. Independent navigation maps are released on exit.
+  42 distinct native checks and 29 Android operations at three resolutions
+  passed. The final observer-free APK is installed/readback/cold-login verified
+  on the emulator; its five identity files and existing server farm/assets are
+  preserved. The user then reconnected V2509A and requested installation:
+  this exact integrated APK is now installed/readback-verified on the phone,
+  with the original certificate, five current identity/appearance/preferences
+  files and the current server farm/assets preserved. Fresh cold-login logging
+  and the city screen passed; the full integrated scene flow remains emulator-
+  verified and awaits the user's phone review. Phone display settings retained;
+  test process stopped normally. No backend deployment, public APK publication
+  or message delivery. See docs/qa/griffith-map-entry-2026-09-24.md.
+
+- Griffith scene reference rebuild on 2026-09-23 is a separate offline review,
+  not public landmark travel. The former Opus scene had reversed roof/paving
+  faces, drifting hillside placements and disconnected terrace navigation.
+  Rebuild architecture, cafe, paving, planting and scenery; keep the actual
+  avatar, free camera and touch movement. Traced tree-base projection error is
+  below 0.04px (not a whole-image fidelity metric). Twelve native check types
+  passed at three window sizes; 42 emulator inputs passed at three resolutions.
+  Use tools/dev/open_landmark_art.command / the isolated preview project, which
+  disables network boot. At the user's request on 2026-09-24, the exact
+  com.sensen.griffithqa / 0.1-art-review / 2026092312 preview is installed and
+  APK-readback-verified on V2509A. Cold launch and five physical inputs covering
+  overview, short walk, recenter and zoom passed; network never booted and five
+  current Journey identity/appearance/preferences files stayed byte-identical.
+  Phone display settings were retained and the QA process stopped after testing.
+  This is a separate development preview, not public scene integration or full
+  physical visual/performance acceptance; no publication or message delivery.
+  Realtime hand-painted
+  lighting, distant city and vegetation detail still differ from the concept;
+  do not claim a pixel-identical or user-approved visual. See
+  docs/design/griffith-rebuild-2026-09-23/README.md and validation.json.
+
+- Map release and fresh-install repair on 2026-09-23: Journey `0.16.32 / 2026092311`
+  publishes the current LA/Shanghai map, 27 semantic POI categories / 125 icons,
+  zoom to country level, automatic city switching, city flights and white/lime UI.
+  Landmark 3D scene travel and experimental landmark resources are excluded.
+  Original package/certificate retained; 179 native map checks and emulator
+  update/cold-login/identity preservation passed. Both public full downloads and
+  Range verified; download-us DNS corrected to current DMIT 179.255.151.51.
+  User's own Feishu delivery is sent/readback-verified; Slack remains pending
+  until its callable connector is exposed. Do not send to Joey instead of self.
+  User then installed on V2509A and reported first-farm generation failure.
+  The reinstall initially had a new identity / NO_FARM; do not silently
+  restore a historical identity/farm or confirm creation for the user.
+  Production OSM connections failed at Node's default 250ms address-attempt
+  limit. Setting NODE_OPTIONS=--network-family-autoselection-attempt-timeout=1500
+  passed LA, Shanghai and shoreline production-host replays; retain this setting
+  on future deploys. Same business image/domain27/content50c2dbdde04c9678;
+  74 farms, 1599 commands and 38 creation records hash-identical across restart.
+  User then successfully created a farm under the new install identity; total
+  farms is now 75. The original 74 farm rows remain hash-identical. Their old
+  phone identity still resolves to the existing 58-cell / 187-coin farm; no
+  identity or historical farm restore was performed. Landmark reference rebuild is
+  separate work in progress, never part of the public APK yet. See
+  docs/qa/map-release-2026-09-23.md and docs/qa/fresh-install-geography-2026-09-23.md.
 
 - Physical-feedback iteration on 2026-09-22: Journey `0.16.14 / 2026092208`
   keeps LA map landmarks, NPCs, POIs and player portraits at their direct

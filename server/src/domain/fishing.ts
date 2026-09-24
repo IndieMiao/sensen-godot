@@ -6,8 +6,8 @@ import { addBagItem, ensureBag, projectBagAggregates } from './bag.js';
 import { err, ok, type Result } from './errors.js';
 
 export interface FishingTier { name: string; bar_size: number; fish_speed: number; turn_steps: number; gain: number; loss: number }
-export interface FishingSite { name: string; space: 'farm' | 'street'; stand: [number, number];
-  center?: [number, number]; radii?: [number, number]; path?: [number, number][]; width?: number; fish_weights: number[] }
+export interface FishingSite { name: string; space: 'farm' | 'street' | 'pond'; stand: [number, number];
+  center?: [number, number]; radii?: [number, number]; path?: [number, number][]; width?: number; polygon?: FishingPoint[]; fish_weights: number[] }
 export interface FishingContent { version: 1; step_ms: number; max_steps: number; bite_min_ms: number; bite_spread_ms: number;
   hook_window_ms: number; settle_grace_ms: number; stand_radius: number; shore_range: number; max_cast: number; anchor_tolerance: number; bar_acceleration: number; bar_max_speed: number;
   initial_progress: number; tiers: Record<string, FishingTier>; fish: Record<string, { name: string; tier: number; price: number }>;
@@ -16,6 +16,8 @@ export interface FishingContent { version: 1; step_ms: number; max_steps: number
 export interface FishingPresence { space: string; home: string; nonce: string; x: number; z: number; room?: string;
   /** Authoritative pond geometry of the joined host farm, including for visitors. */
   farm_site?: FishingSite;
+  /** Only the joined server room can provide a public pond definition. */
+  pond?: { id: string; site: FishingSite };
   validSequence?: (sequence: number) => boolean; walkable?: (point: FishingPoint) => boolean }
 export type FishingPresenceReader = () => FishingPresence | null;
 export interface FishingCast { site: string; fish_id: string; seed: number; bite_at: number; hook_until: number;
@@ -56,12 +58,29 @@ function nearestSegment(p: FishingPoint, a: FishingPoint, b: FishingPoint): Fish
   return [a[0] + dx * t, a[1] + dz * t];
 }
 export function waterContains(site: FishingSite, p: FishingPoint): boolean {
+  if (site.polygon) {
+    let inside = false;
+    for (let i = 0; i < site.polygon.length; i++) {
+      const a = site.polygon[i], b = site.polygon[(i + 1) % site.polygon.length];
+      if (length(p, nearestSegment(p, a, b)) < 1e-7) return true;
+      if ((a[1] > p[1]) !== (b[1] > p[1]) && p[0] < (b[0] - a[0]) * (p[1] - a[1]) / (b[1] - a[1]) + a[0]) inside = !inside;
+    }
+    return inside;
+  }
   if (site.center && site.radii) return ((p[0] - site.center[0]) / site.radii[0]) ** 2 + ((p[1] - site.center[1]) / site.radii[1]) ** 2 <= 1;
   return site.path!.slice(1).some((b, i) => length(p, nearestSegment(p, site.path![i], b)) <= site.width! / 2);
 }
 /** Exact closest point for an outside ellipse; capsules use segment projection. */
 export function nearestWater(site: FishingSite, p: FishingPoint): FishingPoint {
   if (waterContains(site, p)) return [...p];
+  if (site.polygon) {
+    let nearest = site.polygon[0];
+    for (let i = 0; i < site.polygon.length; i++) {
+      const q = nearestSegment(p, site.polygon[i], site.polygon[(i + 1) % site.polygon.length]);
+      if (length(p, q) < length(p, nearest)) nearest = q;
+    }
+    return [...nearest];
+  }
   if (site.center && site.radii) {
     const q = [p[0] - site.center[0], p[1] - site.center[1]], a = site.radii;
     let lo = 0, hi = Math.max(...a) * Math.hypot(...q);
@@ -110,6 +129,10 @@ function atSite(ctx: Ctx, site: FishingSite, active?: FishingCast, sequence = 0)
 }
 
 function siteFor(ctx: Ctx, id: string): FishingSite | undefined {
+  if (ctx.fishingPresence?.space === 'pond') {
+    const pond = ctx.fishingPresence.pond;
+    return pond?.id === id ? pond.site : undefined;
+  }
   if (!Object.hasOwn(ctx.content.fishing.sites, id)) return undefined;
   return id === 'farm_pond' && ctx.fishingPresence?.space === 'farm' && ctx.fishingPresence.farm_site
     ? ctx.fishingPresence.farm_site : ctx.content.fishing.sites[id];
