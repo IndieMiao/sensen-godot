@@ -87,6 +87,8 @@ error: exportArchive No signing certificate "iOS Distribution" found
 
 TestFlight 安装中弹出“此 App 已经安装”属于确认阶段，不能把安装请求的 XCTest 返回 0 当作安装已完成。要继续核实安装后的“打开”和对应 build。CoreDevice 的 **`builtByDeveloper=true` 不能单独区分开发直装和 TestFlight**，本次两个渠道均观察到该值。
 
+**2026-09-26 补充（0.16.42）：** TestFlight 常驻时详情页会缓存旧 build（列表已显示新版本、详情仍是 0.16.37 Build 1），必须 `terminate` 后重新启动再进详情；版本标签数字带空格（`版本:0 . 16 . 42 Build 1`），比较前去空格。确认"此 App 已经安装"那一步不能重启 TestFlight，否则提示框消失。通用方法 `testInstallExpectedTestFlightBuild` / `testConfirmExpectedTestFlightReplacement` 已按此实现，期望版本写在测试文件常量里。Organizer 会把 `open` 过的归档复制进 `~/Library/Developer/Xcode/Archives`，同版本多份时按 native UUID 选定并移走作废副本。
+
 实际 IPA 应在分发临时文件清理前保存到本次输出目录。路径从本次 Xcode 分发日志发现，不重用旧 `XcodeDistPipeline.*` 路径。核对实际 IPA 的 PCK 与已验证归档一致，native UUID 与被测试的 Release 二进制一致；开发重签后的整包哈希无需与分发 IPA 相等。
 
 ## 真机数据和地图黑屏回归

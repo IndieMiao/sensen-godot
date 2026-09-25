@@ -205,23 +205,40 @@ final class JourneyDeviceUITests: XCTestCase {
     private let expectedTestFlightVersion = "0.16.42"
     private let expectedTestFlightBuild = "Build 1"
 
-    private func openTestFlightDetails() -> XCUIApplication {
+    private func openTestFlightDetails(fresh: Bool = true) -> XCUIApplication {
         let tf = XCUIApplication(bundleIdentifier: "com.apple.TestFlight")
-        tf.activate()
+        // A running TestFlight can keep a stale detail page (an older build)
+        // while its list already shows the new one; start it fresh.
+        if fresh {
+            tf.terminate()
+            tf.launch()
+            sleep(4)
+        } else {
+            tf.activate()
+        }
         XCTAssertTrue(tf.wait(for: .runningForeground, timeout: 15))
         let details = tf.scrollViews["AppDetails"]
-        if details.exists {
-            details.swipeDown()
-            details.swipeDown()
+        if !fresh { return tf }
+        if !details.exists {
+            // TestFlight opened on its app list: open the Gensen detail page.
+            let row = tf.staticTexts["Gensen"].firstMatch
+            XCTAssertTrue(row.waitForExistence(timeout: 10))
+            row.tap()
+            XCTAssertTrue(details.waitForExistence(timeout: 10))
         }
+        details.swipeDown()
+        details.swipeDown()
         return tf
     }
 
     private func assertExpectedTestFlightBuild(_ tf: XCUIApplication) {
-        let version = tf.staticTexts["TestFlight.appDetails.shortVersion"]
+        let version = tf.staticTexts["TestFlight.appDetails.shortVersion"].firstMatch
         XCTAssertTrue(version.waitForExistence(timeout: 10))
-        XCTAssertTrue(version.label.contains(expectedTestFlightVersion)
-                      && version.label.hasSuffix(expectedTestFlightBuild),
+        capture("testflight-details", application: tf)
+        // The label spaces out the digits ("版本:0 . 16 . 42 Build 1").
+        let label = version.label.replacingOccurrences(of: " ", with: "")
+        XCTAssertTrue(label.contains(expectedTestFlightVersion)
+                      && label.hasSuffix(expectedTestFlightBuild.replacingOccurrences(of: " ", with: "")),
                       "TestFlight offers \(version.label), not the expected build")
         XCTAssertEqual(tf.staticTexts["TestFlight.appDetails.title"].label, "Gensen")
     }
@@ -248,7 +265,8 @@ final class JourneyDeviceUITests: XCTestCase {
 
     /// Confirm TestFlight's "already installed" replacement for the expected build.
     func testConfirmExpectedTestFlightReplacement() {
-        let tf = openTestFlightDetails()
+        // Keep the pending "already installed" alert: do not restart TestFlight.
+        let tf = openTestFlightDetails(fresh: false)
         assertExpectedTestFlightBuild(tf)
         let alert = tf.alerts["此 App 已经安装。"]
         XCTAssertTrue(alert.exists)

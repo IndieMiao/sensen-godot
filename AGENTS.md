@@ -10,6 +10,11 @@
   persistent system-property change, global adb shutdown or game-data operation.
   See tools/android/README.md for reconnect guidance.
 
+- iOS TestFlight 0.16.42 (1) on 2026-09-26: fresh iOS pack from farm-dev (farm-home
+  launch plus everything since 0.16.37), Mapbox scale bar/compass hidden (5c6fc90),
+  uploaded via Organizer (CLI still No Accounts), installed from TestFlight on the
+  iPhone 14 Pro and verified (owner cold launch lands on farm; data unchanged).
+  See docs/qa/ios-testflight-0.16.42-2026-09-26.md.
 - Farm-home launch on 2026-09-25: Journey 0.16.42 / 2026092505 (source ab9920e).
   Cold launch with a usable cached farm skips city select, saves the farm's city and
   lands the city map on the farm at zoom 16; players without a farm still pick a city.
