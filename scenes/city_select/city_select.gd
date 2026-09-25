@@ -10,6 +10,9 @@ extends Control
 ## 要么让 city_select 反向依赖具体子类，两者都不值得为这条时序换。
 const LOCATE_TIMEOUT_S := 3.0
 
+## 只在冷启动的第一张选城页判断跳过；之后 change_scene 回来的选城页 current_scene 也是自己。
+static var _boot_checked := false
+
 var regions: FarmRegions
 var _bridge: MapBridge = null
 var _located := false
@@ -25,7 +28,22 @@ var _city_card_layer: Control
 static func pick_region(p_regions: Array, lat: float, lng: float, has_fix: bool, fallback := "") -> String:
 	return FarmRegions.nearest_region_id(p_regions, lat, lng) if has_fix else fallback
 
+## 已选定农场的玩家：返回农场所在城市 id（没有可用农场缓存则为空）。
+static func owned_farm_region(p_regions: FarmRegions, choice: Dictionary) -> String:
+	if p_regions == null or choice.is_empty(): return ""
+	var bp := FarmBlueprint.load_choice(choice)
+	if bp == null or bp.overlay.is_empty(): return ""
+	return bp.region_id if not p_regions.region(bp.region_id).is_empty() else ""
+
 func _ready() -> void:
+	# 启动页才跳过：已有农场直接进地图并落在自己农场上；从地图主动回到选城页时照常显示。
+	if not _boot_checked and get_tree().current_scene == self:
+		_boot_checked = true
+		var own_region := owned_farm_region(FarmRegions.load_default(), FarmChoice.load())
+		if not own_region.is_empty():
+			FarmRegions.save_choice(own_region)
+			AppRouter.go_to_map.call_deferred()
+			return
 	theme = GameUi.theme()
 	var language_layer := Control.new()
 	language_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -56,3 +56,12 @@ func test_relocate_after_timeout_does_not_double_connect() -> void:
 	assert_int(stub.location_update.get_connections().size()).is_equal(0)
 	s.locate() # 超时收回后重新点按「使用当前城市」：应该干净地重新订阅一次
 	assert_int(stub.location_update.get_connections().size()).is_equal(1)
+
+func test_owned_farm_region_skips_picker_only_with_usable_farm() -> void:
+	var script := load("res://scenes/city_select/city_select.gd")
+	var regions := FarmRegions.load_default()
+	assert_str(script.owned_farm_region(regions, {})).is_equal("")
+	assert_str(script.owned_farm_region(regions, {"layout_patch_id": "missing", "revision": 1})).is_equal("")
+	var bp := FarmBlueprint.load_choice({"layout_patch_id": "sh_a", "revision": 2})
+	assert_object(bp).is_not_null()
+	assert_str(script.owned_farm_region(regions, {"layout_patch_id": "sh_a", "revision": 2})).is_equal(bp.region_id)

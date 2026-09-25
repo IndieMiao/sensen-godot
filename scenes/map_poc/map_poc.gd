@@ -2072,6 +2072,18 @@ func _switch_city(r: Dictionary) -> void:
 	city_map.region_changed()
 	_refresh_nearby()
 
+## 有农场的玩家进城直接落在自己农场上（不飞行），而不是城市总览；农场不在当前城市则保持总览。
+func _land_on_own_farm() -> void:
+	if _relocation_mode or farm_markers == null or not farm_markers.points.has("self"): return
+	var bp: FarmBlueprint = farm_markers.points.self.bp
+	if bp == null or bp.overlay.is_empty() or bp.region_id != str(region.get("id", "")): return
+	if _focus_tween: _focus_tween.kill()
+	var farm_center: Vector2 = bp.overlay.center
+	center_lat = farm_center.x
+	center_lng = farm_center.y
+	_set_zoom(16.0)
+	_camera_dirty = true
+
 ## 城市面板/城市气泡：飞到该城总览。
 func fly_to_city(id: String) -> void:
 	for r in city_regions():
@@ -2148,6 +2160,7 @@ func _install_city_map() -> void:
 			_city_hidden[child] = child.visible
 			child.hide()
 	_city_action("map")
+	_land_on_own_farm()
 	_layout_journey_drawer()
 
 func _on_city_landmark_requested(entry: Dictionary) -> void:
