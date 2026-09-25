@@ -535,3 +535,50 @@ func test_conversion_artifacts_present_otherwise_regressions_silently_skip() -> 
 	# 汇总——产物一旦丢失，套件依然报"全部通过"，但最重要的几条回归实际一条
 	# 都没跑。这条用例把"产物是否存在"变成一处显式失败，防止误报绿色。
 	assert_bool(FileAccess.file_exists("res://assets/avatar/parts_manifest.json")).is_true()
+
+
+func test_voice_profile_entry_floats_right_above_drawer_and_is_tappable() -> void:
+	## 声音画像入口：右对齐安全区、贴在抽屉上方，不能压到抽屉或顶栏，且真能点到。
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(360, 640)
+	viewport.handle_input_locally = true
+	viewport.gui_disable_input = false
+	add_child(auto_free(viewport))
+	var s := (load(SCENE) as PackedScene).instantiate()
+	viewport.add_child(s)
+	for i in 4:
+		await get_tree().process_frame
+	var button := s.get_node("UI/VoiceProfileButton") as Button
+	assert_object(button).is_not_null()
+	assert_str(button.text).is_equal("Voice Profile")
+	var rect := button.get_global_rect()
+	var drawer := (s.get_node("UI/SafeArea/VBox/Drawer") as Control).get_global_rect()
+	var top_bar := (s.get_node("UI/SafeArea/VBox/TopBar") as Control).get_global_rect()
+	assert_float(rect.end.y).is_less_equal(drawer.position.y)
+	assert_float(rect.position.y).is_greater(top_bar.end.y)
+	assert_float(rect.end.x).is_less_equal(360.0)
+	assert_float(rect.position.x).is_greater(180.0)
+	assert_float(rect.size.y).is_greater_equal(44.0)
+	# 桌面没有原生插件会走 OS.shell_open；这里只验证命中链路，不真的触发打开。
+	button.pressed.disconnect(s._on_voice_profile)
+	var hits: Array[bool] = []
+	button.pressed.connect(func(): hits.append(true))
+	for pressed in [true, false]:
+		var touch := InputEventScreenTouch.new()
+		touch.index = 0
+		touch.position = rect.get_center()
+		touch.pressed = pressed
+		viewport.push_input(touch, true)
+	await get_tree().process_frame
+	assert_int(hits.size()).is_equal(1)
+
+
+func test_voice_match_url_carries_embed_theme_mode_and_english() -> void:
+	var url := VoiceMatchLink.url_for("solo")
+	assert_str(url).starts_with("https://match.sensenapp.com/?")
+	assert_str(url).contains("embed=1").contains("theme=gensen").contains("mode=solo").contains("lang=en")
+	# 游戏是中文界面时 H5 也固定英文
+	var previous := TranslationServer.get_locale()
+	TranslationServer.set_locale("zh_CN")
+	assert_str(VoiceMatchLink.url_for("pair")).contains("mode=pair").contains("lang=en")
+	TranslationServer.set_locale(previous)

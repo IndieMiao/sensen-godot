@@ -33,3 +33,15 @@ Verify runner behavior with `node --test tools/android/run_test.test.mjs`.
 
 Background CPU measurements and limitations are recorded in
 [`docs/qa/android-background-cpu-2026-09-15.md`](../../docs/qa/android-background-cpu-2026-09-15.md).
+
+## In-app WebView (voice-match H5)
+
+After `setup_android_build.sh` (and `prepare_voice_plugin.py`), run
+`python3 tools/android/prepare_webview_plugin.py` to install `GodotWebView`
+from `native/webview/android/`. Godot 4.7 ignores `onMainBackPressed()` return
+values, so GDScript must swallow the back press that closed the page
+(`VoiceMatchLink.blocks_back_navigation()`).
+
+Debug builds can point the page at a local dev server:
+`adb reverse tcp:5173 tcp:5173`, then write `http://localhost:5173/` into the
+app's `files/voice_match_base_url.txt` via `run-as`. Delete it afterwards.

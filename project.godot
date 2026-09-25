@@ -7,6 +7,8 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 config/quit_on_go_back=false
 run/main_scene="res://scenes/city_select/city_select.tscn"
+boot_splash/bg_color=Color(1, 0.992157, 0.972549, 1)
+boot_splash/show_image=false
 
 [autoload]
 Localization="*res://modules/ui/localization.gd"
