@@ -1,5 +1,89 @@
 # Product Direction
 
+- iOS automation reference recorded on 2026-09-25 at the user's request:
+  read docs/qa/ios-testflight-automation.md and tools/ios/README.md before the
+  next iOS release/device task. CLI No Accounts or an empty CLI preference list
+  does not prove the GUI account is logged out. If the live Xcode GUI confirms
+  shaojie@gensen.app / Gensen, use the validated Organizer/cloud-signing fallback
+  within the authorized release instead of repeatedly requesting login.
+  Keep upload, TestFlight availability, channel installation and device-map
+  verification as separate evidence-backed results. Discover the current device
+  and target build, preserve fresh current data, and never reuse stale UI
+  coordinates or historical identity snapshots. The CLI/GUI mismatch itself
+  remains unresolved; the fallback and final TestFlight build 3 delivery passed.
+
+- iOS black-map repair on 2026-09-25: direct iPhone TestFlight UI confirmed
+  Gensen/Journey `0.16.37 (1)` installed before the repair. The
+  CoreDevice builtByDeveloper flag alone must not determine its install source.
+  City selection reproduced a black/loading map backdrop with a visible
+  avatar/HUD and no native map controls; a cold restart of the same installed
+  build restored map creation/style/READY. Subsequent fast and delayed entry
+  both rendered. The first process's underlying startup error is not captured.
+  Native listener failure recovery/backoff, failed-peer cleanup, foreground
+  window handling and truthful READY are implemented and locally archived as
+  `0.16.37 (3)`, retaining build 1's game PCK and the location purpose fix.
+  Controlled device regression failed at the intended map-recovery assertion
+  with old code and passed with the fix. The actual Release executable,
+  re-signed under separate app.gensen.maps.mapqa with a localhost:9 game
+  endpoint, passed 2 tests for recovery/city reentry/Shanghai/foreground/gestures;
+  executable UUID matches the archive and screenshots were reviewed.
+  The original app was first updated in place to development-signed Release
+  build 3 and passed its map/gesture test, then replaced through TestFlight
+  with the uploaded build 3. Final TestFlight cold/foreground/map/gesture
+  checks passed (2 tests, 0 failures, screenshots reviewed). Current post-
+  TestFlight install_key/region_choice files remain byte-identical before/after
+  both updates and testing; no farm action or historical restore.
+  QA app and runner removed; TestFlight build 3 left on phone. CLI distribution still
+  reports No Accounts although the GUI shows shaojie@gensen.app / Gensen Admin.
+  Organizer acquired correct cloud-managed distribution signing and uploaded
+  build 3 at 12:38:46 CST. Actual IPA signature/entitlements/location purpose,
+  PCK and Release native UUID verified. TestFlight processing, availability
+  and installation on this phone confirmed. Mapbox dSYM warnings remain.
+  See docs/qa/ios-map-black-2026-09-25.md.
+
+- iOS metadata follow-up on 2026-09-24: Apple's email for `0.16.37 (1)`
+  confirms successful delivery with ITMS-90683, missing
+  `NSLocationWhenInUseUsageDescription` required by SDK API references. Add the
+  foreground location purpose string in the iOS preset and export preparation;
+  `0.16.37 (2)` is locally archived and its actual plist verified. Its game PCK
+  is identical to build 1. No location bridge implementation or new permission
+  request was added. Build 2 App Store export is blocked by new `No Accounts`
+  errors; CLI account list was 0, versus 2 during the first successful
+  upload. Later GUI evidence confirmed the account remained logged in and
+  Organizer successfully uploaded build 3. Build 2 is not
+  uploaded or installed; its metadata fix is included in build 3, which now
+  supersedes build 2 and is the latest completed TestFlight upload.
+  This warning is not proven to cause the missing invitation. See
+  docs/qa/ios-location-purpose-2026-09-24.md.
+
+- iOS / TestFlight preparation on 2026-09-24: Journey `0.16.37 (1)` uses
+  `app.gensen.maps`, Gensen team `XN4Z77ZX73`, App Store Connect app `6815092667`,
+  as supplied by the user for `shaojie@gensen.app`. Build/archive with automatic
+  Apple Development signing; let App Store export apply distribution signing.
+  The signed development build is installed/readback-verified on iPhone 14 Pro
+  / iOS 26.3. Two XCTest cases and screenshot review cover cold launch,
+  foreground recovery, native map/3D rendering, drag and pinch (zoom 16→17).
+  No farm creation/relocation or asset operation was confirmed. Temporary XCTest
+  runner removed and QA app process stopped; current iOS identity/preferences
+  retained. Gensen distribution IPA and upload succeeded; the user's subsequent
+  App Store Connect screenshots confirm processing complete and build 1 assigned
+  to GensenMap Internal. The user added two internal testers; the latest group
+  Builds screenshot showed green Ready to Test for 0.16.37 (1). On 2026-09-25,
+  the same group's build initially showed Testing while both testers showed
+  No Builds Available. A later user screenshot now confirms both are Invited
+  dated 2026-09-25; the precise backend action is not independently confirmed.
+  A later direct phone TestFlight check confirmed Gensen / build 1 / Open;
+  installation through TestFlight was completed before the black-map repair.
+  Earlier empty-list and Redeem-button observations are historical.
+  gensen.app routes mail to Google, and the Lark
+  connection has no corresponding mailbox. Gmail access is not yet connected;
+  no inbox/spam search or invite resend is claimed. Mapbox native
+  dSYM warnings remain. iOS game POIs/city styling/location and Godot voice
+  adapter remain incomplete; full gameplay/performance acceptance is not claimed.
+  Runtime source is release worktree commit 514fec6b with the documented iOS
+  export overlay. No backend deployment/migration or chat delivery. See
+  docs/qa/ios-testflight-2026-09-24.md and docs/qa/ios-readiness-2026-09-24.md.
+
 - Avatar motion correction on 2026-09-24: Journey `0.16.37 / 2026092405`
   fixes visible pond idle/run freezing: the orthographic camera was about 37m
   from the avatar but RigActivity still slept past 16m. Use the world scenes'
