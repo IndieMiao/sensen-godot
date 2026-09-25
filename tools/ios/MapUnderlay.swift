@@ -206,6 +206,11 @@ class MapUnderlay: NSObject {
                 styleURI: .streets)
         let mv = MapView(frame: window.bounds, mapInitOptions: options)
         mv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        // The game drives the camera every frame, so "adaptive" ornaments never hide:
+        // the scale bar sat over the city title and the compass over the task button.
+        // The game has its own north/zoom controls; keep the logo and attribution.
+        mv.ornaments.options.scaleBar.visibility = .hidden
+        mv.ornaments.options.compass.visibility = .hidden
         window.insertSubview(mv, at: 0) // 垫底：Godot 透明视图之下
         mapView = mv
         mv.mapboxMap.onStyleLoaded.observe { [weak self] _ in
