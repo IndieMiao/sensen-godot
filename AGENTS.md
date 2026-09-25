@@ -1,5 +1,21 @@
 # Product Direction
 
+- Mine maximum default view on 2026-09-25: Journey 0.16.41 / 2026092504
+  (source 2185e00) starts new mine floors/runs/instances at zoom 0.8, the widest
+  existing view, 25% wider than before. Retain 0.8–1.4 anchored pinch, free pan,
+  authoritative arrival and custom views through same-floor reconnect/foreground.
+  113 native checks and 36 isolated Android touches at three sizes passed,
+  including three foreground cycles. Two runtime scripts match QA; 1549 asset
+  entries match 0.16.40 and 12 decoded scenes retain identical nodes/properties.
+  Original signed observer-free APK (24562afc8bc8…) is published and installed
+  via freshly discovered Tailscale ADB on V2509A. Full APK readback, current-process
+  cold login and screenshot passed; 5 current files and 3 absences retained.
+  Preserve the latest 0 cells / 180 coins / 5 bag stacks and full current farm;
+  never restore the earlier 4- or 2-stack snapshots. Both public downloads, hashes,
+  Range and manifests passed. Backend stays pond-retirement-20260925/domain 28.
+  Complete camera gestures were emulator-tested; no new full phone gameplay,
+  server migration or Slack/Feishu delivery. See docs/qa/mine-max-view-2026-09-25.md.
+
 - Physical follow-up on 2026-09-25: the user requested installation and enabled
   Tailscale remote ADB. Fresh discovery confirmed V2509A / serial 10AFAF162200319
   running 0.16.39. The exact public Journey 0.16.40 / 2026092503 APK is now
