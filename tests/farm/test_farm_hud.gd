@@ -285,7 +285,7 @@ func test_seed_tray_only_appears_in_farming_mode_and_actions_are_aggregated() ->
 	assert_bool(farm.hud._quick_actions.visible).is_true()
 	assert_bool(GameUi.modal_is_open(farm)).is_true()
 	assert_bool(farm.hud._stall.is_visible_in_tree()).is_true()
-	assert_object(farm.hud._quick_actions.find_child("GoFishing", true, false)).is_not_null()
+	assert_object(farm.hud._quick_actions.find_child("GoFishing", true, false)).is_null()
 	assert_bool(farm.hud._bottom.visible).is_false()
 	farm.hud.close_modal()
 	await get_tree().process_frame

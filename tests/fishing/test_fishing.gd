@@ -19,12 +19,13 @@ func test_street_water_and_fishing_spots_keep_all_destinations_reachable() -> vo
 						if FishingModel.water_at("street", layout.nav.cell_to_world(cell)):
 							assert_bool(layout.nav.is_walkable(cell)).is_false()
 
-func test_farm_uses_existing_water_mask_and_reachable_shore() -> void:
+func test_former_farm_pond_is_reachable_farmable_land() -> void:
 	var bp := FarmPlot.blueprint_for()
 	var target := FishingModel.stand("farm_pond")
 	assert_bool(bp.is_walkable(bp.world_to_cell(target))).is_true()
 	assert_bool(BlueprintGrid.new(bp).point_path(bp.cell_to_world(bp.anchor("spawn")), target).is_empty()).is_false()
-	assert_bool(bp.is_walkable(bp.world_to_cell(Vector3(9, 0, -30.75)))).is_false()
+	assert_bool(bp.is_walkable(bp.world_to_cell(Vector3(9, 0, -30.75)))).is_true()
+	assert_bool(bp.mask_has("cultivable", Vector2i(12, 41))).is_true()
 
 func test_all_tiers_can_be_caught_and_abandoned_input_loses() -> void:
 	for tier in FishingModel.data().tiers.values():

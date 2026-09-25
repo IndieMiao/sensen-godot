@@ -108,7 +108,7 @@ func test_compact_water_shore_and_panel_keep_geometry_local_when_old_farm_is_als
 	assert_float(absf(bank_center.z + 26.4)).is_less(0.5)
 	var surface := auto_free(PlotSurface.new(bp)) as PlotSurface
 	add_child(surface)
-	assert_that(surface._material.get_shader_parameter("water_basin")).is_equal(Vector4(6.4, -26.4, 3.84, 2.48))
+	assert_bool(surface.get_node("GeographicWater").material_override.get_shader_parameter("exclude_farm_basin")).is_false()
 	var panel := auto_free(FishingPanel.new()) as FishingPanel
 	add_child(panel)
 	var session := FarmSession.new(null)

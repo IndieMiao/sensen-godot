@@ -42,18 +42,21 @@ func _ready() -> void:
 	add_child((load("res://modules/ui/opaque_scene_layer.tscn") as PackedScene).instantiate())
 	environment = Environment.new()
 	environment.background_mode = Environment.BG_COLOR
-	environment.background_color = Color("bac8a0")
+	environment.background_color = Color("d8e9ad")
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color("edf2dc")
-	environment.ambient_light_energy = 0.50
+	environment.ambient_light_color = Color("e4f0ff")
+	environment.ambient_light_energy = 0.65
 	world_env = WorldEnvironment.new()
 	world_env.environment = environment
 	add_child(world_env)
 	var sun := DirectionalLight3D.new()
-	sun.rotation_degrees = Vector3(-55, -28, 0)
-	sun.light_color = Color("fff1d1")
-	sun.light_energy = 0.90
+	sun.rotation_degrees = Vector3(-55, -137, 0)
+	sun.light_color = Color("fff3dc")
+	sun.light_energy = 1.15
 	sun.shadow_enabled = true
+	sun.shadow_blur = 2.0
+	sun.shadow_opacity = 0.82
+	sun.light_angular_distance = 1.5
 	sun.directional_shadow_max_distance = 65
 	add_child(sun)
 	cam = Camera3D.new()
@@ -141,8 +144,12 @@ func _build_ui() -> void:
 	var fish := GameUi.button("fish", L10n.text("Go fishing"), "PondFish", true)
 	fish.name = "PondFish"
 	fish.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	fish.position = Vector2(-112, -48)
-	fish.size = Vector2(112, 44)
+	fish.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	fish.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	# The English label is wider than 112px. Size before placing so its minimum
+	# width grows into the safe area instead of extending past the screen edge.
+	fish.size = fish.get_combined_minimum_size().max(Vector2(112, 44))
+	fish.position = -fish.size - Vector2(0, 4)
 	fish.pressed.connect(func(): _go_fishing(Vector3.INF))
 	ui.add_child(fish)
 	notice = GameUi.label("", 12)

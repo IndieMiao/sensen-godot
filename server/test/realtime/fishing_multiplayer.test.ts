@@ -1,3 +1,4 @@
+import { registeredPondFixture } from './pond_fixture.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import pg from 'pg';
 import { randomUUID } from 'node:crypto';
@@ -16,6 +17,7 @@ afterAll(async () => { await pool?.end(); });
 for (const backend of ['memory', 'postgres']) describe.skipIf(backend === 'postgres' && !process.env.TEST_DATABASE_URL)(`${backend} shared shoreline`, () => {
   it('simultaneous casts, late join, bounded/private poses, visitor loot, cancellation and leave cleanup', async () => {
     let now = Date.now();
+    const pond = registeredPondFixture(content);
     const store = backend === 'memory' ? new MemoryStore({ content, contentVersion: cv, plot: sets, timezone: 'Asia/Shanghai', now: () => now })
       : new PgStore({ pool: pool!, content, contentVersion: cv, plot: sets, timezone: () => 'Asia/Shanghai', now: () => now });
     const app = await buildApp({ store, content, contentVersion: cv, blueprintDir, regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: 'shared-fishing', now: () => now });
@@ -31,16 +33,16 @@ for (const backend of ['memory', 'postgres']) describe.skipIf(backend === 'postg
     try {
       for (const i of [0, 1]) {
         const client = new Client(address.replace('http:', 'ws:') + '/v1/online'); clients.push(client);
-        await client.connect(accounts[i].token); await client.join('farm', { farm_id: accounts[0].farm.id });
+        await client.connect(accounts[i].token); await client.join('pond', { pond_id: pond.id, catalog_revision: pond.revision });
       }
       const room = onlineGateways.get(app)!.rooms.get(clients[0].joined.room)!;
       const members = accounts.slice(0, 2).map(a => room.members.get(a.player)!);
-      for (const [i, m] of members.entries()) { m.x = 9.15 + i * .25; m.z = -27.4; m.target = [m.x, m.z]; }
-      const casts = await Promise.all([0, 1].map(i => command(i, 'cast_fishing', { sequence: 0, site_id: 'farm_pond', target: [9.2, -29.2] })));
+      for (const [i, m] of members.entries()) { m.x = pond.origin[0]; m.z = pond.origin[1]; m.target = [m.x, m.z]; }
+      const casts = await Promise.all([0, 1].map(i => command(i, 'cast_fishing', { sequence: 0, site_id: pond.id, target: pond.target })));
       expect(casts.map(c => c.status)).toEqual([200, 200]);
       const hostAfterCast = structuredClone((await store.farmByOwner(accounts[0].player))!);
       const observer = new Client(address.replace('http:', 'ws:') + '/v1/online'); clients.push(observer);
-      await observer.connect(accounts[2].token); await observer.join('farm', { farm_id: accounts[0].farm.id });
+      await observer.connect(accounts[2].token); await observer.join('pond', { pond_id: pond.id, catalog_revision: pond.revision });
       const visible = await observer.next('fishing', m => m.members.length === 2);
       expect(visible.members.map((m: any) => m.id).sort()).toEqual(members.map(m => m.id).sort());
       expect(JSON.stringify(visible)).not.toMatch(/seed|nonce|wallet|bag|fish_id|hook_until/);
@@ -62,7 +64,7 @@ for (const backend of ['memory', 'postgres']) describe.skipIf(backend === 'postg
       await command(0, 'cancel_fishing', { sequence: 1 });
       now += 2000;
       await observer.next('fishing', m => m.members.length === 0);
-      const next = await command(1, 'cast_fishing', { sequence: 1, site_id: 'farm_pond', target: [9, -29] });
+      const next = await command(1, 'cast_fishing', { sequence: 1, site_id: pond.id, target: pond.target });
       expect(next.status).toBe(200);
       members[1].x += 1; members[1].target = [members[1].x, members[1].z];
       await room.tick();
@@ -70,7 +72,7 @@ for (const backend of ['memory', 'postgres']) describe.skipIf(backend === 'postg
       now = next.state.fishing.active.bite_at;
       expect((await command(1, 'hook_fishing', { sequence: 2 })).code).toBe('FISHING_LOCATION');
       await command(1, 'cancel_fishing', { sequence: 2 });
-      expect((await command(1, 'cast_fishing', { sequence: 2, site_id: 'farm_pond' })).status).toBe(200);
+      expect((await command(1, 'cast_fishing', { sequence: 2, site_id: pond.id })).status).toBe(200);
       clients[1].send({ t: 'leave' }); await clients[1].next('departed');
       await observer.next('left', m => m.id === members[1].id);
       await observer.next('fishing', m => m.members.length === 0);

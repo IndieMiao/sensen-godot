@@ -7,7 +7,7 @@ import { migrateDomain } from '../../src/db/domain_migration.js';
 import { contentVersion,loadContent,DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
 import { initialFarmState } from '../../src/domain/farm_factory.js';
 import { plotFor } from '../../src/http/app.js';
-import { generateFarmTerrain } from '../../src/geography/farm_terrain.js';
+import { generateFarmTerrain, retireFarmPond } from '../../src/geography/farm_terrain.js';
 import type { FarmRow } from '../../src/http/dto.js';
 import { CENTER,fixtureGeography } from '../geography/fixtures.js';
 import type { RelocationDraft } from '../../src/domain/farm_relocation.js';
@@ -34,7 +34,7 @@ describe.skipIf(!DSN)('PostgreSQL atomic legacy relocation',()=>{
   await pool.query("UPDATE farms SET domain_version='26'");
   const before=(await pool.query('SELECT id,state::text AS state,version,owner_id,layout_patch_id,location FROM farms ORDER BY id')).rows;
   expect(await migrateDomain(pool,{plot,content,contentVersion:cv,apply:true})).toMatchObject({migrated:2});
-  expect((await pool.query('SELECT id,state::text AS state,version,owner_id,layout_patch_id,location FROM farms ORDER BY id')).rows).toEqual(before);
+  expect((await pool.query('SELECT id,state::text AS state,version,owner_id,layout_patch_id,location FROM farms ORDER BY id')).rows).toEqual(before.map(row=>row.id===geo.id?{...row,layout_patch_id:retireFarmPond(terrain).layout_id}:row));
   expect((await store.farmById(legacy.id))!.relocation_available).toBe(true);expect((await store.farmById(geo.id))!.relocation_available).toBe(false);
   const newer=await seed();expect((await store.farmById(newer.id))!.relocation_available).toBe(false);
   await pool.query('UPDATE farms SET relocation_available=false,relocation_used=true WHERE id=$1',[legacy.id]);

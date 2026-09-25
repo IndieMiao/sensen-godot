@@ -1,4 +1,4 @@
-import { farmPondSite, terrainNavigation } from '../geography/farm_terrain.js';
+import { terrainNavigation } from '../geography/farm_terrain.js';
 import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -394,8 +394,7 @@ export class OnlineGateway {
     if (this.loading.has(key)) return this.loading.get(key)!;
     if (this.rooms.size >= 256) throw new Error('SERVER_FULL');
     const loading = (async () => {
-      const site = kind === 'farm' ? farmPondSite(host?.farm_terrain, this.deps.content.fishing.sites.farm_pond) : undefined;
-      const room = new Room(key, kind, nav, this.deps.store, this.deps.content, this.deps.now, site, pond);
+      const room = new Room(key, kind, nav, this.deps.store, this.deps.content, this.deps.now, undefined, pond);
       await room.load();
       this.rooms.set(key, room);
       return room;

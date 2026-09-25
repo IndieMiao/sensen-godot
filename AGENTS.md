@@ -1,5 +1,66 @@
 # Product Direction
 
+- Farm pond retirement requested on 2026-09-25 is implemented locally: remove
+  farm water/shore rendering, fishing UI and water-tap fishing; reclaim the
+  authored pond as walkable/tillable/placeable soil. Preserve real geographic
+  water and all 12 system pond locations. New generation 3 retains 32m/40x40/
+  0.8m/160m sizing and stops reserving a pond. Domain 28 / content 761deabf2a207d3e
+  requires an explicit migration: preserve assets/coordinates/opportunities,
+  retire only the authored pond, cancel active farm casts without rewards,
+  invalidate stale relocation drafts/derived snapshots, retain command and
+  creation history. Canonical raster identity handles JSONB key ordering.
+  851 server/PostgreSQL and 295 native checks passed; three actual emulator
+  inputs walked into the old pond and obtained server-confirmed tilling there.
+  Test data is isolated; no production migration/deployment or further phone
+  update. The phone remains on 0.16.39; current release preparation targets
+  0.16.40 only with the matching backend. Prior mandatory farm-pond requirements
+  are superseded. See docs/product/farm-pond-retirement-2026-09-25.md and
+  docs/qa/farm-pond-removal-2026-09-25.md.
+
+- Pond art phone update on 2026-09-25, explicitly requested by the user:
+  Journey 0.16.39 / 2026092502 is installed/readback/cold-login verified on
+  V2509A, original package and certificate, final observer-free APK SHA-256
+  1d6ab80170024d8064206f1f288b224ecabf6dad20eb21c47669673de2adb6b6.
+  Fresh inspection found the installed 0.16.37 already contained Voice Profile;
+  build from isolated integration source aaf4585 plus this pond art, retaining
+  the exact installed voice-entry scripts, WebView plugin and splash. Do not
+  overwrite that feature by rebuilding solely from the older art branch base.
+  58 distinct native checks and 52 physical inputs passed; three ponds,
+  walking, pan/pinch, map return, bag viewing and same-process foreground.
+  Mali-G1-Ultra MC12 / Vulkan Mobile, warmed medians 90–91 FPS, minima 89–90;
+  initial entry samples were lower, not sustained performance acceptance.
+  Fixed the English fishing button overflowing by 15px; final right edge 1032
+  is within the 1080px phone safe area. Five CURRENT files (key, city, farm,
+  UI choice, language) are byte-identical; outfit/server files were absent
+  and remain absent. Preserve current 0 cells / 180 coins / 2 bag stacks and
+  the full current server state; no historical restore or real-user catches.
+  Final clean package matches tested scripts/shaders/textures; inspection
+  artifacts and this task's touch dex removed, app stopped, display retained.
+  No backend/public-download release, iOS check or external delivery. See
+  docs/qa/pond-pitch-phone-2026-09-25.md for scope and build provenance.
+
+- Pond pitch art on 2026-09-25 is implemented locally in the rapid-harbor
+  worktree: warm rounded bank stones, flowering cushions, bright meadow,
+  shore-derived optical depth absorption/scattering, moving caustics and sun
+  glints. Retain all 12 location seeds, three polygons, navigation, fishing and
+  saves. Near-bank stones spread along the bank so the float remains visible;
+  the new occlusion regression failed before that correction and passed after.
+  32 native checks passed. Five matched Metal/Mobile vs Vulkan/Mobile captures
+  have 3D RGB mean differences 0.0502–0.1160/255, not reference-fidelity scores.
+  Explicit 2048 directional shadows / filter quality 2 fix differing desktop
+  and Android defaults; phone safe-area HUD offsets are intentional. Android
+  motion video was re-recorded after dismissing fresh-AVD system tips and reviewed.
+  Short emulator samples: median 60/minimum 54 in the multi-scene pass, then 24/24
+  at 60 during recording; no phone/iOS or whole-game performance acceptance.
+  QA uses com.sensen.pondart.rapidharbor, emulator-5580 and private ADB port 5041.
+  Godot defaults to shutdown_adb_on_exit=true: use the pond_art_godot.sh and
+  pond_art_adb.sh wrappers so export cannot stop another branch's ADB session.
+  No release, original Journey/device replacement, production data operation or
+  external delivery. Reference lighting/vegetation/character fidelity remains
+  a visual review, not a claim of a pixel-identical result. See
+  docs/design/pond-pitch-2026-09-25/README.md, docs/qa/pond-pitch-2026-09-25.md
+  and docs/qa/parallel-godot-android.md.
+
 - iOS automation reference recorded on 2026-09-25 at the user's request:
   read docs/qa/ios-testflight-automation.md and tools/ios/README.md before the
   next iOS release/device task. CLI No Accounts or an empty CLI preference list

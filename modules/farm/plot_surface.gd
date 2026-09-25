@@ -70,14 +70,12 @@ func _ready() -> void:
 	_material.set_shader_parameter("meadow_texture", preload("res://assets/farm/art/meadow.png"))
 	_material.set_shader_parameter("grid_size", Vector2(bp.grid.x, bp.grid.y))
 	_material.set_shader_parameter("cell_m", bp.cell_m * world_scale)
-	var pond := FishingModel.site_for_plot("farm_pond", bp)
-	_material.set_shader_parameter("water_basin", Vector4(pond.center[0], pond.center[1], pond.radii[0], pond.radii[1]) * world_scale)
 	_material.set_shader_parameter("woodland_start", -bp.cell_to_world(bp.anchor("house")).z + 3.75)
 	material_override = _material
 	cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	if bp.layout_patch_id.begins_with("geo_"): _add_geographic_water(terrain_texture, pond, plane.size)
+	if bp.layout_patch_id.begins_with("geo_"): _add_geographic_water(terrain_texture, plane.size)
 
-func _add_geographic_water(terrain_texture: Texture2D, pond: Dictionary, extent: Vector2) -> void:
+func _add_geographic_water(terrain_texture: Texture2D, extent: Vector2) -> void:
 	var water := MeshInstance3D.new()
 	water.name = "GeographicWater"
 	var plane := PlaneMesh.new()
@@ -91,7 +89,7 @@ func _add_geographic_water(terrain_texture: Texture2D, pond: Dictionary, extent:
 	material.set_shader_parameter("geographic_water", true)
 	material.set_shader_parameter("geographic_mask", terrain_texture)
 	material.set_shader_parameter("geographic_extent", extent)
-	material.set_shader_parameter("basin", Vector4(pond.center[0], pond.center[1], pond.radii[0], pond.radii[1]) * world_scale)
+	material.set_shader_parameter("exclude_farm_basin", false)
 	material.set_shader_parameter("pebble_bed", preload("res://assets/farm/art/water/sediment.png"))
 	material.set_shader_parameter("surface_flow", preload("res://assets/farm/art/water/surface_flow.png"))
 	material.set_shader_parameter("caustics", preload("res://assets/farm/art/water/caustic_light.png"))

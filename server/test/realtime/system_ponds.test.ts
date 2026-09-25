@@ -31,7 +31,7 @@ describe('published system ponds', () => {
       rows[0].lat = 0;
       expect(a.list(city)[0].lat).not.toBe(0);
     }
-    expect(cv).toBe('50c2dbdde04c9678');
+    expect(a.revision).toBe('2c6e2a2f5f6efa3742912257fa8a0b4844cbf89277e5867ac88157784770a187');
     expect(() => a.room('invented-pond', a.revision, content)).toThrow('POND_NOT_FOUND');
     expect(() => a.room(a.list('shanghai')[0].id, 'stale', content)).toThrow('POND_UPDATE_REQUIRED');
   });

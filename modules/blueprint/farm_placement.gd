@@ -4,7 +4,7 @@ extends RefCounted
 
 const METERS_PER_DEGREE := 111320.0
 const FOOTPRINT_MARGIN_M := 300.0
-const GENERATION_VERSION := 2
+const GENERATION_VERSION := 3
 const GENERATED_EXTENT_M := 160.0
 
 static func is_valid(value: Variant) -> bool:

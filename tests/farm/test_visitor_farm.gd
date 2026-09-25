@@ -51,7 +51,7 @@ func test_owner_tools_hidden_visitor_bar_shown() -> void:
 	assert_bool(bar.visible).is_true()
 	var texts := []
 	for b in bar.get_children():
-		texts.append((b as Button).text)
+		texts.append((b as Button).tooltip_text)
 		assert_bool((b as Control).custom_minimum_size.y >= 44.0).is_true()
 	assert_array(texts).is_equal(["Wave", "Stamp"])
 

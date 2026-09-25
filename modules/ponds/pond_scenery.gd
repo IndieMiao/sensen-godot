@@ -12,6 +12,8 @@ static func build(entry: Dictionary) -> PondScenery:
 	ground.size = Vector2(256, 256)
 	var material := ShaderMaterial.new()
 	material.shader = preload("res://modules/ponds/pond_ground.gdshader")
+	material.set_shader_parameter("grass_detail", preload("res://assets/farm/art/water/bank_grass.png"))
+	material.set_shader_parameter("surface_flow", preload("res://assets/farm/art/water/surface_flow.png"))
 	scene._mesh(ground, Vector3(6, -0.025, -8), material).name = "BankGround"
 	# Trunks and rocks remain in the blocked perimeter, clear of the shared nav.
 	var trees: Array = []
@@ -29,6 +31,19 @@ static func build(entry: Dictionary) -> PondScenery:
 		var scale_value := scene._rng.randf_range(.55, .90) if asset == "bush" else scene._rng.randf_range(.35, .60)
 		layers[asset].append(Transform3D(Basis(Vector3.UP, scene._rng.randf_range(0, TAU)).scaled(Vector3.ONE * scale_value), point))
 	for asset in layers: scene.add_child(Art.batch(asset, layers[asset], asset == "bush"))
+	# Small batched tufts give the meadow a soft pile instead of a flat plane.
+	var turf: Array = []
+	for index in 4200:
+		var point := Vector3(scene._rng.randf_range(-3,15), 0.0, scene._rng.randf_range(-19,2))
+		if FishingModel.contains(str(entry.id), point, .10, spec): continue
+		var scale_value := scene._rng.randf_range(.09,.18)
+		turf.append(Transform3D(Basis(Vector3.UP, scene._rng.randf_range(0,TAU)).scaled(Vector3(scale_value,scale_value*.65,scale_value)),point))
+	var pile := Art.batch("grass_clump", turf, false)
+	pile.name = "MeadowTurf"
+	var turf_material := ShaderMaterial.new()
+	turf_material.shader = preload("res://modules/ponds/pond_turf.gdshader")
+	pile.material_override = turf_material
+	scene.add_child(pile)
 	var pebbles := SurfaceTool.new()
 	pebbles.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for i in 36:

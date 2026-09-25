@@ -1,3 +1,4 @@
+import { retireFarmPond } from '../../src/geography/farm_terrain.js';
 import { afterEach,describe,expect,it,vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -28,7 +29,7 @@ describe('real shoreline fallback is evidence-based and bounded',()=>{
  it('previews and confirms the original real failure point without mutating the old save during preview',async()=>{
   const {calls,store,account,post,preview}=await setup();const before=structuredClone((await store.farmByOwner(account.player_id))!);
   const response=await preview();expect(response.statusCode).toBe(200);const draft=response.json();expect(calls).toEqual({osm:1,cover:1});
-  expect(draft.farm_terrain).toEqual(read('generated_shoreline_farm_terrain.json'));
+  expect(draft.farm_terrain).toEqual(retireFarmPond(read('generated_shoreline_farm_terrain.json')));
   const shown=(await store.farmByOwner(account.player_id))!;expect(shown.state).toEqual(before.state);expect(shown.version).toBe(before.version);expect(shown.relocation_available).toBe(true);
   const input={preview_id:draft.preview_id,base_version:draft.base_version,idempotency_key:'shore-confirm'};
   expect((await post('/v1/farms/me/relocation/confirm',input)).statusCode).toBe(200);expect((await post('/v1/farms/me/relocation/confirm',input)).statusCode).toBe(200);

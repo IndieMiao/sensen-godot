@@ -1,0 +1,25 @@
+{
+  "server_tests": 851,
+  "godot_tests": 295,
+  "android": {
+    "passed": true,
+    "inputs": 3,
+    "walked_into_former_pond": true,
+    "server_confirmed_cell": {
+      "crop": null,
+      "ready_at": null,
+      "state": "tilled",
+      "watered_at": null
+    },
+    "server_version": 1,
+    "farm_fishing_removed": true,
+    "isolated_account": true,
+    "serial": "emulator-5580"
+  },
+  "domain_version": "28",
+  "content_version": "761deabf2a207d3e",
+  "migration_applied_to_production": false,
+  "public_release": false,
+  "phone_update_for_retirement": false,
+  "catalog_sha256": "2c6e2a2f5f6efa3742912257fa8a0b4844cbf89277e5867ac88157784770a187"
+}

@@ -115,4 +115,4 @@ func test_geographic_water_mask_does_not_draw_a_shifted_second_pond_outside_the_
 				var point: Vector2 = edge + outward * float(offset)
 				var pixel := Vector2i(floori(point.x / bp.play_area_m * mask.get_width()), floori(-point.y / bp.play_area_m * mask.get_height()))
 				var water := mask.get_pixelv(pixel).b > 0.5
-				assert_bool(water).override_failure_message("Unexpected water-mask side at angle %s / offset %s in %s" % [angle, offset, bp.layout_patch_id]).is_equal(offset < 0)
+				assert_bool(water).override_failure_message("Unexpected water-mask side at angle %s / offset %s in %s" % [angle, offset, bp.layout_patch_id]).is_equal(offset < 0 and bp.layout_patch_id.begins_with("geo_"))

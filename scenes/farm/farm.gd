@@ -106,11 +106,6 @@ var farm_style := "cottage"
 var _house_outline := PackedVector3Array()
 var mine_entrance: Node3D
 var _mine_pending := false
-var fishing_panel: FishingPanel
-var fishing_view: FishingPresentation
-var fishing_site: Dictionary = {}
-var _fishing_pending := false
-var _fishing_plan: Dictionary = {}
 ## 每秒重画一次：成熟是时间派生的，没有回包也没有输入会通知它——不定时刷，倒计时不走、
 ## 作物不变高、大按钮永远停在「Crops are growing」（自动玩家第四轮等了 260 秒）。
 var _tick := 0.0
@@ -187,7 +182,6 @@ func _ready() -> void:
 		push_error("Farm: invalid persisted terrain")
 		call_deferred("_leave")
 		return
-	fishing_site = FishingModel.site_for_plot("farm_pond", bp)
 	grid = BlueprintGrid.new(bp)
 	_frame_field()
 	var lawn := PlaneMesh.new()
@@ -206,7 +200,6 @@ func _ready() -> void:
 	scenery = FarmScenery.new()
 	add_child(scenery)
 	scenery.build(bp, farm_style)
-	add_child(FishingWater.build("farm_pond", fishing_site))
 	# 作物挂 Crops（Props 的同级）：prop_count() 只数锚点原语与畦面，作物不进去。
 	# 地面状态层：取代逐格动作图标，用一张 64×64 纹理喂给 shader，1 个 draw call。
 	plot_surface = PlotSurface.new(bp, WORLD_SCALE)
@@ -241,16 +234,6 @@ func _ready() -> void:
 	camera_pan.hold_ended.connect(_brush_end)
 	camera_pan.hold_canceled.connect(_discard_brush)
 	_attach_session()
-	fishing_panel = FishingPanel.new()
-	add_child(fishing_panel)
-	fishing_panel.opened.connect(_begin_fishing_view)
-	fishing_panel.closed.connect(_end_fishing_view)
-	var fish_button := GameUi.button("fish", L10n.text("Go fishing"), L10n.text("Go fishing"))
-	fish_button.name = "GoFishing"
-	fish_button.pressed.connect(func():
-		hud.close_modal()
-		_go_fishing())
-	hud.add_farm_action(fish_button)
 	_relocate_button = GameUi.button("map-pin", L10n.text("Relocate farm"), L10n.text("Choose a new farm location · one chance"))
 	_relocate_button.name = "RelocateFarm"
 	_relocate_button.add_theme_font_size_override("font_size", 12)
@@ -507,50 +490,9 @@ func _build_mine_entrance() -> void:
 	mine_entrance.scale = Vector3.ONE * 0.7
 	add_child(mine_entrance)
 
-func _begin_fishing_view(_site: String) -> void:
-	_stop_camera_recenter()
-	_end_fishing_view()
-	fishing_view = FishingPresentation.new()
-	add_child(fishing_view)
-	fishing_view.configure(fishing_panel, player, _rig, cam,
-		[$HUD/SafeArea/Root, online.hud if online else null])
-
-func _end_fishing_view() -> void:
-	if is_instance_valid(fishing_view): fishing_view.finish()
-	fishing_view = null
-
-func _go_fishing(clicked := Vector3.INF) -> void:
-	if _terrain_stale: return
-	if _activity_busy: return
-	_activity_pending = ""
-	var own_session: FarmSession = online.session if online else session
-	if _in_flight > 0 or own_session == null or _connection_recovery_busy: return
-	if not CharacterModel.has_fishing_rod(own_session.state):
-		hud.show_toast(L10n.text("Equip a fishing rod on the character page first."), true)
-		return
-	if own_session.offline or own_session.has_unconfirmed_command():
-		hud.show_toast(L10n.text("Check previous action"), true)
-		return
-	hud.close_modal()
-	_cancel_work()
-	runner.abort_current()
-	runner.paused = false
-	_mine_pending = false
-	_set_work_mode(false)
-	_fishing_plan = FishingModel.plan("farm_pond", mover.position, clicked, grid, fishing_site)
-	if _fishing_plan.is_empty():
-		hud.show_toast(L10n.text("Can't reach that spot"), true)
-		return
-	var target: Vector3 = _fishing_plan.origin
-	_fishing_pending = mover.set_target_position(target)
-	if hints: hints.destination(target, _fishing_pending, mover.remaining_path())
-	if not _fishing_pending: hud.show_toast(L10n.text("Can't reach that spot"), true)
-
 func _go_mine() -> void:
 	if _terrain_stale: return
 	if _activity_busy: return
-	if fishing_panel and fishing_panel.visible: return
-	_fishing_pending = false
 	var connected: FarmSession = online.session if visitor and online else session
 	if connected == null or (visitor and not Net.online_available): return
 	if connected.offline or connected.has_unconfirmed_command():
@@ -591,7 +533,7 @@ func _play(anim: String) -> void:
 	_anim = anim
 
 func _process(dt: float) -> void:
-	if _focus_button and (_terrain_stale or _world_modal_open() or (fishing_panel and fishing_panel.visible)):
+	if _focus_button and (_terrain_stale or _world_modal_open()):
 		_focus_button.hide()
 	if _terrain_stale:
 		if mover: mover.stop()
@@ -607,10 +549,6 @@ func _process(dt: float) -> void:
 		if runner and _in_flight == 0: runner.step(dt)
 		_update_camera(dt)
 		return
-	if fishing_panel and fishing_panel.visible:
-		mover.stop()
-		player.position = mover.position
-		return
 	if _activity_busy: return
 	if _world_modal_open(): _clear_brush()
 	if session: mover.speed = CharacterModel.current(session.state, "move_speed")
@@ -625,13 +563,6 @@ func _process(dt: float) -> void:
 		if farm_activities and farm_activities.targets.has(arrived) and player.position.distance_to(farm_activities.targets[arrived].approach) < 0.5:
 			_arrive_activity(arrived)
 	_watch_walk_stall(dt)
-	if _fishing_pending and not mover.is_moving():
-		_fishing_pending = false
-		if not _fishing_plan.is_empty() and player.position.distance_to(_fishing_plan.origin) < 0.3:
-			_clear_brush()
-			_play("idle")
-			fishing_panel.open(online.session if online else session, "farm_pond", _fishing_plan.target, fishing_site)
-			return
 	if _mine_pending and not mover.is_moving() and not runner.is_busy() and _in_flight == 0:
 		_mine_pending = false
 		AppRouter.open_instance(AppRouter.mine_scene(), {"session": online.session if visitor and online else session})
@@ -742,7 +673,7 @@ func _update_focus_indicator() -> void:
 		if direction.is_zero_approx(): direction = Vector2.DOWN
 		projected = viewport_rect.get_center() + direction.normalized() * viewport_rect.size.length()
 	_focus_button.update_indicator(projected, viewport_rect, _camera_play_area(), behind,
-		_terrain_stale or _world_modal_open() or (fishing_panel != null and fishing_panel.visible))
+		_terrain_stale or _world_modal_open())
 
 func _place_camera(center: Vector3) -> void:
 	FarmCamera.place(cam, center)
@@ -753,7 +684,7 @@ func _stop_camera_recenter() -> void:
 		_camera_recenter = null
 
 func recenter_on_player() -> void:
-	if player == null or _terrain_stale or _world_modal_open() or (fishing_panel and fishing_panel.visible): return
+	if player == null or _terrain_stale or _world_modal_open(): return
 	_stop_camera_recenter()
 	_clear_brush()
 	_camera_center += camera_pan.offset
@@ -791,7 +722,6 @@ func _input(e: InputEvent) -> void:
 		return
 	if _terrain_stale: return
 	if _activity_busy: return
-	if fishing_panel and fishing_panel.visible: return
 	if online and (online.travel_busy or is_instance_valid(online.panel)): return
 	if mover == null: return
 	if camera_pan.handle(e, cam):
@@ -802,7 +732,6 @@ func _input(e: InputEvent) -> void:
 func _unhandled_input(e: InputEvent) -> void:
 	if _terrain_stale: return
 	if _activity_busy: return
-	if fishing_panel and fishing_panel.visible: return
 	if online and (online.travel_busy or is_instance_valid(online.panel)): return
 	if mover == null or _world_modal_open(): return
 	if camera_pan.handle(e, cam, true):
@@ -835,11 +764,6 @@ func _brush_end(point: Vector2) -> void:
 
 func _tap_scene(point: Vector2) -> void:
 	if _activity_busy or _world_modal_open(): return
-	if fishing_panel and fishing_panel.visible: return
-	var fishing_hit = Plane(Vector3.UP, 0).intersects_ray(cam.project_ray_origin(point), cam.project_ray_normal(point))
-	if fishing_hit is Vector3 and FishingModel.contains("farm_pond", fishing_hit, 0.0, fishing_site):
-		_go_fishing(fishing_hit)
-		return
 	if _pick_mine(point):
 		_go_mine()
 		return
@@ -885,8 +809,6 @@ func _tap_cell(cell: Vector2i) -> void:
 func _on_ground_tapped(world: Vector3) -> void:
 	if _activity_busy: return
 	_activity_pending = ""
-	if fishing_panel and fishing_panel.visible: return
-	_fishing_pending = false
 	_mine_pending = false
 	# 退场帧内测试/输入可能直接调用本函数，mover 为 null 时安全跳过。
 	if mover == null:
@@ -914,13 +836,10 @@ func _cancel_work() -> void:
 	_queued_move = null
 
 func party_travel_ready() -> bool:
-	return not _terrain_stale and not _activity_busy and not (activity_sheet and activity_sheet.is_busy()) and not (fishing_panel and fishing_panel.visible) and _in_flight == 0 and not runner.is_busy() and not _stall_uncertain and not _connection_recovery_busy
+	return not _terrain_stale and not _activity_busy and not (activity_sheet and activity_sheet.is_busy()) and _in_flight == 0 and not runner.is_busy() and not _stall_uncertain and not _connection_recovery_busy
 
 func is_back_navigation_locked() -> bool:
 	if _activity_busy or (activity_sheet and activity_sheet.visible and activity_sheet.is_busy()): return true
-	if fishing_panel and fishing_panel.visible:
-		fishing_panel.close()
-		return true
 	if online and online.consume_back(): return true
 	if life_sheet and life_sheet.visible and life_sheet.is_busy(): return true
 	if life_sheet and life_sheet.visible and life_sheet.consume_back(): return true
@@ -978,9 +897,6 @@ func _visit_resident(resident: String) -> void:
 
 func suspend() -> void:
 	_stop_camera_recenter()
-	_end_fishing_view()
-	_fishing_pending = false
-	if fishing_panel: fishing_panel.interrupt()
 	if online: online.suspend()
 	_clear_brush()
 	process_mode = Node.PROCESS_MODE_DISABLED
@@ -997,7 +913,7 @@ func resume() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
 	visible = true
 	for child in get_children():
-		if child is CanvasLayer and child != fishing_panel: child.visible = true
+		if child is CanvasLayer: child.visible = true
 	$FarmBackground.hide()
 	get_viewport().transparent_bg = false
 	$WorldEnvironment.environment = _saved_farm_environment

@@ -1,7 +1,7 @@
 extends GdUnitTestSuite
 
-const FIXTURE := "res://tests/fixtures/generated_shoreline_farm_terrain.json"
-const CHECKSUM := "60c376d6bd1207be96537ea361a5975b37c81ef5378c3fabbaa9693a88586513"
+const FIXTURE := "res://tests/fixtures/retired_shoreline_farm_terrain.json"
+const CHECKSUM := "3de5304ed60875cae325f3debb6e9811ed26d3621c6179a6c79f900a0d57dcaa"
 const CAPTURES := "res://output/farm-generation-error-2026-09-21/native"
 
 func _terrain() -> Dictionary:
@@ -57,11 +57,11 @@ func test_recorded_geography_passes_unmodified_checksum_and_preserves_all_628_re
 		for x in 40:
 			walks += int(bp.is_walkable(Vector2i(x, y)))
 			tills += int(bp.mask_has("cultivable", Vector2i(x, y)))
-	assert_int(walks).is_equal(730)
-	assert_int(tills).is_equal(397)
+	assert_int(walks).is_equal(777)
+	assert_int(tills).is_equal(444)
 	var grid := BlueprintGrid.new(bp)
 	var origin := bp.cell_to_world(bp.anchor("spawn"))
-	for key in ["mine_approach", "pond_stand", "pond_shore", "stall", "exit"]:
+	for key in ["mine_approach", "stall", "exit"]:
 		assert_array(grid.point_path(origin, bp.cell_to_world(bp.anchor(key)))).is_not_empty()
 	var pond := FishingModel.site_for_plot("farm_pond", bp)
 	var plan := FishingModel.plan("farm_pond", origin, Vector3.INF, grid, pond)
@@ -114,7 +114,7 @@ func _capture(scene: Node, name: String) -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(CAPTURES))
 	assert_int(get_viewport().get_texture().get_image().save_png(CAPTURES.path_join(name + ".png"))).is_equal(OK)
 
-func test_full_owner_and_visitor_render_recorded_shoreline_with_reachable_pond_and_mine() -> void:
+func test_full_owner_and_visitor_render_real_shoreline_without_artificial_pond() -> void:
 	var session := FarmSession.new(ApiClient.new("https://recorded-shoreline.invalid/v1", FakeTransport.new([]).callable()))
 	assert_bool(session._adopt(_body())).is_true()
 	var original_site := FishingModel.site("farm_pond").duplicate(true)
@@ -129,9 +129,7 @@ func test_full_owner_and_visitor_render_recorded_shoreline_with_reachable_pond_a
 	assert_vector(owner.bp.anchor("mine")).is_equal(Vector2i(19, 31))
 	assert_object(owner.plot_surface.get_node_or_null("GeographicWater")).is_not_null()
 	_assert_dry_outer_boundary(owner)
-	owner._go_fishing()
-	assert_bool(owner._fishing_plan.is_empty()).is_false()
-	assert_bool(FishingModel.valid_cast("farm_pond", owner._fishing_plan.origin, owner._fishing_plan.target, owner.grid, owner.fishing_site)).is_true()
+	assert_object(owner.get_node_or_null("farm_pond")).is_null()
 	assert_array(owner.grid.point_path(owner.mover.position, owner.mine_approach(owner.bp))).is_not_empty()
 	await _capture(owner, "recorded-shore-owner")
 	owner.suspend()
@@ -148,7 +146,7 @@ func test_full_owner_and_visitor_render_recorded_shoreline_with_reachable_pond_a
 	for frame in 3: await get_tree().process_frame
 	assert_bool(visitor.visitor).is_true()
 	assert_str(visitor.bp.checksum).is_equal(CHECKSUM)
-	assert_that(visitor.fishing_site).is_equal(owner.fishing_site)
+	assert_object(visitor.get_node_or_null("farm_pond")).is_null()
 	assert_object(visitor.farm_activities).is_null()
 	_assert_dry_outer_boundary(visitor)
 	await _capture(visitor, "recorded-shore-visitor")

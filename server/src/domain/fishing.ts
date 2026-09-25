@@ -129,13 +129,14 @@ function atSite(ctx: Ctx, site: FishingSite, active?: FishingCast, sequence = 0)
 }
 
 function siteFor(ctx: Ctx, id: string): FishingSite | undefined {
+  // Farm ponds are retired; forged/stale farm casts must not award fish.
+  if (id === 'farm_pond' || ctx.fishingPresence?.space === 'farm') return undefined;
   if (ctx.fishingPresence?.space === 'pond') {
     const pond = ctx.fishingPresence.pond;
     return pond?.id === id ? pond.site : undefined;
   }
   if (!Object.hasOwn(ctx.content.fishing.sites, id)) return undefined;
-  return id === 'farm_pond' && ctx.fishingPresence?.space === 'farm' && ctx.fishingPresence.farm_site
-    ? ctx.fishingPresence.farm_site : ctx.content.fishing.sites[id];
+  return ctx.content.fishing.sites[id];
 }
 
 export function applyFishing(state: FarmState, cmd: Command, ctx: Ctx): Result<FarmState> | null {

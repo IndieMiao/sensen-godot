@@ -241,7 +241,7 @@ func test_woody_blocked_paths_are_used_when_relocating_activity_targets() -> voi
 
 func test_compact_owner_scene_uses_32_meter_plot_with_reachable_facilities_and_residents() -> void:
 	var session := _session()
-	session.farm_terrain = JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/generated_compact_farm_terrain.json"))
+	session.farm_terrain = JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/retired_compact_farm_terrain.json"))
 	session.layout_patch_id = session.farm_terrain.layout_id
 	session.location = session.farm_terrain.source.center
 	var scene := (load("res://scenes/farm/farm.tscn") as PackedScene).instantiate()
@@ -250,8 +250,8 @@ func test_compact_owner_scene_uses_32_meter_plot_with_reachable_facilities_and_r
 	await get_tree().process_frame
 	assert_vector(scene.bp.grid).is_equal(Vector2i(40, 40))
 	assert_float(scene.bp.play_area_m).is_equal(32.0)
-	assert_float(float(scene.fishing_site.center[0])).is_equal_approx(6.4, 0.0001)
-	assert_float(float(scene.fishing_site.center[1])).is_equal_approx(-26.4, 0.0001)
+	assert_object(scene.get_node_or_null("farm_pond")).is_null()
+	assert_bool(scene.bp.is_walkable(Vector2i(8,33))).is_true()
 	assert_bool(FarmPlot.verify_checksum(scene.bp)).is_true()
 	assert_object(scene.grid.bp).is_same(scene.bp)
 	assert_bool(scene.grid.point_path(scene.mover.position, scene.mine_approach(scene.bp)).is_empty()).is_false()
@@ -265,7 +265,7 @@ func test_compact_owner_scene_uses_32_meter_plot_with_reachable_facilities_and_r
 func test_compact_visitor_scene_keeps_own_saved_farm_and_uses_host_dimensions() -> void:
 	FarmChoice.save("sh_b", 2)
 	var own := FarmChoice.load()
-	var terrain: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/generated_compact_farm_terrain.json"))
+	var terrain: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/retired_compact_farm_terrain.json"))
 	terrain.erase("source")
 	var snapshot := {"farm_id": "compact-host", "layout_patch_id": terrain.layout_id, "blueprint_revision": 1,
 		"farm_terrain": terrain, "avatar_ref": "seed:other", "cells": [], "props": []}
@@ -274,8 +274,8 @@ func test_compact_visitor_scene_keeps_own_saved_farm_and_uses_host_dimensions() 
 	add_child(auto_free(scene))
 	await get_tree().process_frame
 	assert_float(scene.bp.play_area_m).is_equal(32.0)
-	assert_float(float(scene.fishing_site.center[0])).is_equal_approx(6.4, 0.0001)
-	assert_float(float(scene.fishing_site.center[1])).is_equal_approx(-26.4, 0.0001)
+	assert_object(scene.get_node_or_null("farm_pond")).is_null()
+	assert_bool(scene.bp.is_walkable(Vector2i(8,33))).is_true()
 	assert_str(scene.bp.checksum).is_equal(str(terrain.plot.checksum))
 	assert_object(scene.farm_activities).is_null()
 	assert_bool(scene.work_mode).is_false()

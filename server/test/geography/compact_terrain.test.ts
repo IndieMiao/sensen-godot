@@ -70,7 +70,7 @@ describe('generation 2 compact geographic farms',()=>{
  it('rejects a valid dense legacy farm atomically when its complete holdings cannot fit',()=>{
   const state=createInitialState({now:100,player_day_id:'2026-09-21',field_condition:'sunny',wallet:187});
   for(let j=0;j<64;j++)for(let i=0;i<64;i++)if(isTillable(oldPlot,`${i},${j}`))state.cells[`${i},${j}`]={state:'tilled',crop:null,watered_at:null,ready_at:null};
-  expect(Object.keys(state.cells)).toHaveLength(3003);const before=structuredClone(state);
+  expect(Object.keys(state.cells)).toHaveLength(3050);const before=structuredClone(state);
   expect(()=>relocateFarmState(state,plotForFarm({farm_terrain:compact()},oldPlot),content)).toThrow('RELOCATION_NO_SPACE');expect(state).toEqual(before);
  });
 });

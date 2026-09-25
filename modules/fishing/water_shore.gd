@@ -8,6 +8,7 @@ var _rng := RandomNumberGenerator.new()
 var _rocks := SurfaceTool.new()
 var _plants := SurfaceTool.new()
 var _flowers := SurfaceTool.new()
+var _pond := false
 
 static func build(id: String, site_override: Dictionary = {}) -> WaterShore:
 	var shore := WaterShore.new()
@@ -20,18 +21,8 @@ static func build(id: String, site_override: Dictionary = {}) -> WaterShore:
 	if spec.has("decoration_seed"): shore._rng.seed = int(spec.decoration_seed)
 	if spec.space == "street": shore._street_ground(spec)
 	if spec.has("polygon"):
-		var polygon := FishingModel._polygon(spec)
-		var index := 0
-		for i in polygon.size():
-			var a := polygon[i]
-			var b := polygon[(i + 1) % polygon.size()]
-			var tangent := (b - a).normalized()
-			var normal := Vector2(-tangent.y, tangent.x)
-			var midpoint := (a + b) * 0.5
-			if Geometry2D.is_point_in_polygon(midpoint + normal * 0.04, polygon): normal = -normal
-			if i % 2 != 0: continue
-			shore._bank_group(Vector3(midpoint.x, 0, midpoint.y), Vector3(normal.x, 0, normal.y), index, true)
-			index += 1
+		shore._pond = true
+		shore._pond_bank(FishingModel._polygon(spec))
 	elif spec.has("center"):
 		var center := Vector3(float(spec.center[0]), 0, float(spec.center[1]))
 		var count := 48 if id == "farm_pond" else 34
@@ -58,6 +49,7 @@ static func build(id: String, site_override: Dictionary = {}) -> WaterShore:
 					index += 1
 	var rock_material := ShaderMaterial.new()
 	rock_material.shader = preload("res://modules/fishing/shore_rock.gdshader")
+	if shore._pond: rock_material.shader = preload("res://modules/ponds/pond_stone.gdshader")
 	rock_material.set_shader_parameter("stone_detail", preload("res://assets/farm/art/water/shore_stone.png"))
 	rock_material.set_shader_parameter("surface_flow", preload("res://assets/farm/art/water/surface_flow.png"))
 	shore._finish(shore._rocks, "BankStones", rock_material, true)
@@ -115,9 +107,10 @@ func _bank_group(point: Vector3, outward: Vector3, index: int, lake: bool) -> vo
 func _rock(center: Vector3, radius: Vector3, yaw: float) -> void:
 	var seed_value := _rng.randf_range(0, TAU)
 	var tint := Color("d0cbb4").lerp(Color("829181"), _rng.randf()).srgb_to_linear()
+	if _pond: tint = Color("eee0c9").lerp(Color("cfc9bf"), _rng.randf_range(0.0, 0.6)).srgb_to_linear()
 	var basis := Basis(Vector3.UP, yaw)
-	var segments := 18
-	var rings := 10
+	var segments := 28 if _pond else 18
+	var rings := 16 if _pond else 10
 	for ring in rings:
 		for segment in segments:
 			var points: Array[Vector3] = []
@@ -127,14 +120,77 @@ func _rock(center: Vector3, radius: Vector3, yaw: float) -> void:
 				var b: float = corner.y / rings * PI
 				var normal := Vector3(sin(b) * cos(a), cos(b), sin(b) * sin(a))
 				var lump := 1.0 + sin(a * 3.0 + seed_value) * sin(b) * 0.15 + cos(b * 4.0 + seed_value) * 0.095
+				if _pond: lump = 1.0 + sin(a * 3.0 + seed_value) * sin(b) * 0.065 + cos(b * 3.0 + seed_value) * 0.04
 				var vertex := normal * radius * lump
 				vertex.y = maxf(-radius.y * 0.40, vertex.y)
 				points.append(center + basis * vertex + Vector3.UP * radius.y * 0.34)
-				normals.append(basis * normal)
+				normals.append(basis * ((normal / radius).normalized() if _pond else normal))
 			for i in [0, 2, 1, 0, 3, 2]:
 				_rocks.set_color(tint)
 				_rocks.set_normal(normals[i])
 				_rocks.add_vertex(points[i])
+
+func _pond_bank(polygon: PackedVector2Array) -> void:
+	# Sample arc length, not polygon vertices: even tessellation must not turn
+	# every corner into a pebble pile. Large stones sit on the water side of the
+	# immutable bank so they do not obstruct the server's walkable shoreline.
+	var cursor := 0.0
+	var next_stone := 0.15
+	var index := 0
+	for segment in polygon.size():
+		var a := polygon[segment]
+		var b := polygon[(segment + 1) % polygon.size()]
+		var length := a.distance_to(b)
+		var tangent := (b - a).normalized()
+		var normal := Vector2(-tangent.y, tangent.x)
+		if Geometry2D.is_point_in_polygon((a + b) * .5 + normal * .04, polygon): normal = -normal
+		var out := Vector3(normal.x, 0, normal.y)
+		var side := Vector3(tangent.x, 0, tangent.y)
+		while next_stone < cursor + length:
+			var at := a.lerp(b, (next_stone - cursor) / length)
+			var point := Vector3(at.x, 0, at.y)
+			var hero := index % 5 == 0 or index % 7 == 2
+			var radius := _rng.randf_range(.38, .55) if hero else _rng.randf_range(.16, .30)
+			var near := out.dot(Vector3(.16, 0, 1).normalized()) > .08
+			var across := minf(radius * .60, .22) if near else radius * .78
+			var height := minf(radius * .50, .16) if near else radius * .70
+			# The reference's large stones spread ALONG the approach bank. Keep
+			# their cross-bank extent and height low: the existing 0.55m default
+			# landing must remain visible rather than disappearing inside a rock.
+			var yaw := atan2(-out.z, out.x) + _rng.randf_range(-.12,.12)
+			_rock(point - out * across * .50, Vector3(across, height, radius), yaw)
+			if hero:
+				_rock(point + side * radius * .94 - out * .10, Vector3(.14,.11,.20), _rng.randf_range(0, TAU))
+			for blade in (30 if hero else 16):
+				var base := point + out * _rng.randf_range(.06,.18) + side * _rng.randf_range(-.3,.3)
+				_blade(base, _rng.randf_range(0, TAU), _rng.randf_range(.09,.23), false)
+			if index % 6 == 3:
+				for flower in 5: _daisy(point + out * .3 + side * _rng.randf_range(-.25,.25), _rng.randf_range(.17,.30))
+			if index % 8 == 3:
+				_flowering_cushion(point - out * .18, side)
+			next_stone += radius * 1.7 + _rng.randf_range(.15,.34)
+			index += 1
+		# A continuous low grass lip hides the straight polygon facets.
+		for blade in maxi(1, ceili(length * 36)):
+			var at := a.lerp(b, _rng.randf())
+			var base := Vector3(at.x, 0, at.y) + out * _rng.randf_range(.025,.14)
+			_blade(base, _rng.randf_range(0,TAU), _rng.randf_range(.045,.12), false)
+		cursor += length
+
+func _flowering_cushion(center: Vector3, tangent: Vector3) -> void:
+	# Low bank planting grows between the stones. Individual fleshy leaves and
+	# white flowers read at the close fishing camera without a billboard.
+	for leaf in 60:
+		var angle := _rng.randf_range(0,TAU)
+		var radial := sqrt(_rng.randf())
+		var point := center + Vector3(cos(angle)*.40*radial, .08 + (1-radial)*.31, sin(angle)*.30*radial)
+		var basis := Basis(Vector3.UP,-angle) * Basis(Vector3.FORWARD, _rng.randf_range(-.65,.35))
+		var tint := Color("709b39").lerp(Color("cadb72"),_rng.randf()).srgb_to_linear()
+		_plants.set_uv(Vector2(.5,.7))
+		PlaceScenery._oval(_plants,Vector3(.24,.055,.12),point,tint,basis)
+	for flower in 9:
+		var point := center + tangent * _rng.randf_range(-.29,.29) + Vector3(_rng.randf_range(-.1,.1),0,_rng.randf_range(-.15,.15))
+		_daisy(point,_rng.randf_range(.29,.44))
 
 func _blade(base: Vector3, yaw: float, height: float, reed: bool) -> void:
 	var direction := Vector3(cos(yaw), 0, sin(yaw))
@@ -155,7 +211,8 @@ func _daisy(base: Vector3, height: float) -> void:
 	var center := base + Vector3.UP * height
 	for petal in 6:
 		var a := float(petal) / 6.0 * TAU
-		PlaceScenery._oval(_flowers, Vector3(0.035, 0.009, 0.014), center + Vector3(cos(a), 0, sin(a)) * 0.028, Color("fff4ce").srgb_to_linear(), Basis(Vector3.UP, -a))
+		var size := 1.65 if _pond else 1.0
+		PlaceScenery._oval(_flowers, Vector3(0.035, 0.009, 0.014) * size, center + Vector3(cos(a), 0, sin(a)) * 0.028 * size, Color("fff4ce").srgb_to_linear(), Basis(Vector3.UP, -a))
 	PlaceScenery._oval(_flowers, Vector3(0.016, 0.013, 0.016), center + Vector3.UP * 0.008, Color("dbb64a").srgb_to_linear())
 
 static func _quad(surface: SurfaceTool, points: Array, color: Color, v0 := 0.0, v1 := 1.0) -> void:

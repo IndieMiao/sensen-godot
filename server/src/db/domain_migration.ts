@@ -5,9 +5,10 @@ import { loadContent, DEFAULT_CONTENT_DIR, type Content } from '../domain/conten
 import { DOMAIN_VERSION, STATE_SCHEMA_VERSION } from '../domain/version.js';
 import { upgradeFreeFarmState } from '../domain/free_farm_migration.js';
 import type { PlotLayout } from '../domain/plot.js';
+import { retireFarmPond } from '../geography/farm_terrain.js';
 
-const FROM_DOMAIN_VERSION = '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26';
-const TO_DOMAIN_VERSION = '27';
+const FROM_DOMAIN_VERSION = '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27';
+const TO_DOMAIN_VERSION = '28';
 const SCHEMA_VERSION = 1;
 const VERSION_ROWS = `SELECT id AS farm_id, content_version, domain_version, state_schema_version
   FROM farms ORDER BY id`;
@@ -31,6 +32,9 @@ export interface DomainMigrationReport {
   blocked: (VersionRow & { reasons: string[] })[];
   migrated: number;
   relocated_cells: number;
+  retired_ponds: number;
+  cancelled_farm_casts: number;
+  expired_previews: number;
 }
 
 export interface DomainMigrationOptions {
@@ -48,6 +52,7 @@ function inspect(rows: VersionRow[], options: DomainMigrationOptions): DomainMig
     from_domain_version: FROM_DOMAIN_VERSION, to_domain_version: TO_DOMAIN_VERSION,
     content_version: options.contentVersion, state_schema_version: SCHEMA_VERSION,
     eligible: [], already_current: [], blocked: [], migrated: 0, relocated_cells: 0,
+    retired_ponds: 0, cancelled_farm_casts: 0, expired_previews: 0,
   };
   for (const row of rows) {
     const reasons: string[] = [];
@@ -71,7 +76,7 @@ export async function migrateDomain(
   if (!options.contentVersion) throw new Error('contentVersion is required');
   if (!options.plot) throw new Error('Target farm layout is required');
   if (DOMAIN_VERSION !== TO_DOMAIN_VERSION || STATE_SCHEMA_VERSION !== SCHEMA_VERSION)
-    throw new Error('This migration only supports domain 1..26 -> 27 with state schema 1');
+    throw new Error('This migration only supports domain 1..27 -> 28 with state schema 1');
   if (!options.apply) {
     const rows = await pool.query<VersionRow>(VERSION_ROWS);
     return inspect(rows.rows, options);
@@ -91,19 +96,36 @@ export async function migrateDomain(
     }
     if (report.eligible.length) {
       const equipmentContent = options.content ?? loadContent(DEFAULT_CONTENT_DIR);
-      const saves = await client.query('SELECT id, state, domain_version FROM farms WHERE id = ANY($1::uuid[])', [report.eligible]);
+      const saves = await client.query('SELECT id, state, domain_version, farm_terrain, relocation_draft FROM farms WHERE id = ANY($1::uuid[])', [report.eligible]);
       for (const row of saves.rows) {
-        // Relocation remains voluntary; existing domain 25/26 state JSON is byte-for-byte intact.
-        if (['25', '26'].includes(row.domain_version)) continue;
-        const upgraded = ['22', '23', '24'].includes(row.domain_version) ? row.state
+        // Current crops, inventory, equipment, facilities and coordinates stay put.
+        const upgraded = ['22', '23', '24', '25', '26', '27'].includes(row.domain_version) ? structuredClone(row.state)
           : upgradeFreeFarmState(row.state, options.plot, options.decorationFootprints);
         report.relocated_cells += Object.keys(upgraded.cells).filter(id => !Object.hasOwn(row.state.cells, id)).length;
-        ensureBag(upgraded, equipmentContent);
-        await client.query('UPDATE farms SET state = $2 WHERE id = $1', [row.id, JSON.stringify(upgraded)]);
+        if (!['25', '26', '27'].includes(row.domain_version)) ensureBag(upgraded, equipmentContent);
+        if (upgraded.fishing?.active?.site === 'farm_pond') {
+          upgraded.fishing.last = { sequence: upgraded.fishing.sequence, outcome: 'cancelled' };
+          upgraded.fishing.active = null;
+          report.cancelled_farm_casts++;
+        }
+        if (JSON.stringify(upgraded) !== JSON.stringify(row.state))
+          await client.query('UPDATE farms SET state = $2 WHERE id = $1', [row.id, JSON.stringify(upgraded)]);
+        if (row.farm_terrain) {
+          const terrain = retireFarmPond(row.farm_terrain);
+          if (terrain !== row.farm_terrain) {
+            await client.query(`UPDATE farms SET farm_terrain=$2, layout_patch_id=$3,
+              blueprint_revision=$4, blueprint_checksum=$5 WHERE id=$1`,
+            [row.id, JSON.stringify(terrain), terrain.layout_id, terrain.plot.revision, terrain.plot.checksum]);
+            report.retired_ponds++;
+          }
+        }
+        // A frozen pre-upgrade preview must not reintroduce a retired pond.
+        if (row.relocation_draft) report.expired_previews++;
       }
       const updated = await client.query(
         `UPDATE farms SET domain_version = $1, content_version = $6,
-           relocation_available = (farm_terrain IS NULL AND NOT relocation_used)
+           relocation_available = CASE WHEN domain_version = '27' THEN relocation_available ELSE (farm_terrain IS NULL AND NOT relocation_used) END,
+           relocation_draft = NULL
           WHERE id = ANY($2::uuid[]) AND domain_version = ANY($3::text[])
             AND content_version = ANY($4::text[]) AND state_schema_version = $5`,
         [TO_DOMAIN_VERSION, report.eligible, FROM_DOMAIN_VERSION.split(','),
@@ -111,6 +133,9 @@ export async function migrateDomain(
       );
       if (updated.rowCount !== report.eligible.length)
         throw new Error('Farm versions changed during domain migration');
+      // Same-slot visitor caches must not keep the removed pond's old geometry.
+      // These are derived snapshots, not command/creation history.
+      await client.query('DELETE FROM farm_snapshots WHERE farm_id = ANY($1::uuid[])', [report.eligible]);
       report.migrated = updated.rowCount;
     }
     await client.query('COMMIT');

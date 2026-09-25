@@ -3,7 +3,7 @@ import { PondCatalog } from '../ponds/catalog.js';
 import { createLandCoverProvider } from '../geography/land_cover.js';
 import { relocateFarmState, relocationAvailable, relocationBlocked, RELOCATION_PREVIEW_TTL, RelocationError,
   type RelocationConfirm } from '../domain/farm_relocation.js';
-import { farmStyleForRegion, generateFarmTerrain, supplementGeography, FARM_GENERATIONS, LATEST_FARM_GENERATION, GeographyError, plotForFarm, type GeographyProvider, type LandCoverProvider, type FarmGenerationVersion, type LandCoverSupplement } from '../geography/farm_terrain.js';
+import { farmStyleForRegion, generateFarmTerrain, retireFarmPond, supplementGeography, FARM_GENERATIONS, LATEST_FARM_GENERATION, GeographyError, plotForFarm, type GeographyProvider, type LandCoverProvider, type FarmGenerationVersion, type LandCoverSupplement } from '../geography/farm_terrain.js';
 /**
  * Fastify 应用。测试用 `app.inject`，不起真实端口。
  *
@@ -81,11 +81,11 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const extent = FARM_GENERATIONS[generation].geography_extent_m;
     // A failed OSM request must remain a failed request; land cover supplements missing classifications only.
     const geography = await geographyProvider(location, extent);
-    const build = (data: typeof geography) => generateFarmTerrain(location, data,
-      deps.content.farm_plot.layouts[deps.content.farm_plot.default_layout], farmStyleForRegion(regionId), generation);
+    const build = (data: typeof geography) => retireFarmPond(generateFarmTerrain(location, data,
+      deps.content.farm_plot.layouts[deps.content.farm_plot.default_layout], farmStyleForRegion(regionId), generation));
     try { return build(geography); }
     catch (error) {
-      if (generation !== 2 || !(error instanceof GeographyError) || error.code !== 'GEOGRAPHY_INCOMPLETE') throw error;
+      if (generation < 2 || !(error instanceof GeographyError) || error.code !== 'GEOGRAPHY_INCOMPLETE') throw error;
       let timer: ReturnType<typeof setTimeout> | undefined;
       try {
         const supplement = await Promise.race([landCoverProvider(location, extent), new Promise<LandCoverSupplement>((_resolve, reject) => {
@@ -192,7 +192,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     if (!p) return reply.code(401).send({ code: 'UNAUTHENTICATED' });
     const generated = req.body as { generation_version?: unknown; idempotency_key?: unknown; region_id?: unknown; location?: unknown };
     if (generated?.generation_version !== undefined) {
-      if ((generated.generation_version !== 1 && generated.generation_version !== 2)
+      if ((generated.generation_version !== 1 && generated.generation_version !== 2 && generated.generation_version !== 3)
         || typeof generated.idempotency_key !== 'string' || !generated.idempotency_key
         || generated.idempotency_key.length > 128 || typeof generated.region_id !== 'string')
         return reply.code(400).send({ code: 'SCHEMA' });
@@ -282,7 +282,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const body = req.body as { region_id?: unknown; location?: unknown; generation_version?: unknown };
     if (!body || typeof body.region_id !== 'string') return reply.code(400).send({ code: 'SCHEMA' });
     const generationVersion = body.generation_version === undefined ? 1 : body.generation_version;
-    if (generationVersion !== 1 && generationVersion !== 2) return reply.code(400).send({ code: 'SCHEMA' });
+    if (generationVersion !== 1 && generationVersion !== 2 && generationVersion !== 3) return reply.code(400).send({ code: 'SCHEMA' });
     const generation = FARM_GENERATIONS[generationVersion];
     if (!isFarmLocation(body.location)) return reply.code(400).send({ code: 'INVALID_LOCATION' });
     const farm = await deps.store.farmByOwner(player.id);

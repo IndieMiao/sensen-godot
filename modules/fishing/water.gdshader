@@ -11,6 +11,7 @@ uniform vec4 river_b = vec4(0.0);
 uniform vec4 river_c = vec4(0.0);
 uniform float river_half_width = 0.55;
 uniform bool geographic_water = false;
+uniform bool exclude_farm_basin = true;
 uniform sampler2D geographic_mask : filter_linear_mipmap, repeat_disable;
 uniform vec2 geographic_extent = vec2(48.0);
 uniform vec4 interaction = vec4(0.0);
@@ -57,7 +58,7 @@ void fragment() {
     if (geographic_water) {
         vec2 uv = vec2(p.x, -p.y) / geographic_extent;
         vec4 mask = texture(geographic_mask, uv);
-        if (mask.b < 0.5 || normalized_depth > -0.012) discard;
+        if (mask.b < 0.5 || (exclude_farm_basin && normalized_depth > -0.012)) discard;
         // Alpha stores the frozen polygon's distance from shore, including islands.
         shore_distance = max(0.01, mask.a * 1.8);
         normalized_depth = shore_distance / 1.8;

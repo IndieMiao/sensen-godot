@@ -19,7 +19,7 @@ describe('farm plot', () => {
       if (isTillable(plot, `${i},${j}`)) till++;
     // 2495：房子周围新增的 homestead_yard（草地，不可开垦）从可耕地里划走了 184 格。
     // 那圈院子是给既有美术构图留的地方——栅栏、树、灌木要长在不会被开垦的地上。
-    expect(till).toBe(3003);
+    expect(till).toBe(3050);
     // 建筑不可开垦不可放置；路可放置不可开垦
     expect(isTillable(plot, '28,38')).toBe(false);
     expect(isPlaceable(plot, '28,38')).toBe(false);

@@ -25,7 +25,6 @@ uniform vec3 soil_dry : source_color = vec3(0.55, 0.38, 0.23);
 uniform vec3 soil_wet : source_color = vec3(0.30, 0.20, 0.12);
 uniform vec3 ripe_glow : source_color = vec3(1.0, 0.82, 0.35);
 uniform vec3 shore_color : source_color = vec3(0.73, 0.69, 0.49);
-uniform vec4 water_basin = vec4(9.0, -30.75, 3.6, 2.325);
 
 varying vec2 world_position;
 
@@ -92,15 +91,6 @@ void fragment() {
 	// Bedrock and ponds have soft, irregular shores instead of grey grid rectangles.
 	vec3 rock = mix(meadow, vec3(0.48, 0.52, 0.39), 0.20) * (0.94 + grain * 0.12);
 	albedo = mix(albedo, rock, smoothstep(0.10, 0.95, terrain.g));
-	// Match the rendered basin exactly; the legacy terrain mask becomes dry/wet bank.
-	float bank_distance = (length((world_position - water_basin.xy) / water_basin.zw) - 1.0) * min(water_basin.z, water_basin.w);
-	float shore = 1.0 - smoothstep(0.0, 0.11 + grain * 0.16, bank_distance);
-	float bank_detail = 1.0 - smoothstep(0.5, 5.0, abs(bank_distance));
-	vec3 grass_detail = texture(bank_grass, world_position * 1.05).rgb;
-	albedo = mix(albedo, grass_detail * 1.18, bank_detail * (1.0 - trail) * 0.58);
-	vec3 bank = shore_color * (0.74 + grain * 0.16);
-	bank *= mix(0.64, 1.0, smoothstep(-0.03, 0.24, bank_distance));
-	albedo = mix(albedo, bank, shore);
 	if (state > 0) {
 		// Adjacent cultivated cells share a bed; only exposed borders have a rounded soil lip.
 		vec2 half_size = vec2(0.5);

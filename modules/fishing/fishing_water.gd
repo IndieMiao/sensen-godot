@@ -70,6 +70,7 @@ static func build(site_id: String, site_override: Dictionary = {}) -> FishingWat
 	mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	water.water_material = material
 	if spec.has("polygon"):
+		material.shader = preload("res://modules/ponds/pond_water.gdshader")
 		material.set_shader_parameter("polygon_water", true)
 		material.set_shader_parameter("pond_shore", load("res://assets/ponds/%s_shore.png" % str(spec.template_id)))
 		material.set_shader_parameter("pond_extent", Vector2(spec.extent[0], spec.extent[1]))
@@ -122,30 +123,55 @@ func _setup_reflections() -> void:
 
 func _build_pond_lilies(spec: Dictionary) -> void:
 	var surface := SurfaceTool.new()
+	var flowers := SurfaceTool.new()
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	flowers.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(spec.decoration_seed)
-	var count := 0
-	var maximum := 20 if spec.template_id == "crescent" else 10 if spec.template_id == "gourd" else 5
-	for attempt in 180:
+	var clusters: Array[Vector3] = []
+	for attempt in 240:
 		var point := Vector3(rng.randf_range(2, 10), 0.09, rng.randf_range(-12, -4))
 		if not FishingModel.contains(site_id, point, 0, spec): continue
 		var edge := FishingModel._nearest_polygon(Vector2(point.x, point.z), FishingModel._polygon(spec))
 		var depth := Vector2(point.x, point.z).distance_to(edge)
-		if depth < 0.3 or depth > 0.8: continue
-		_lily_leaf(surface, point, rng.randf_range(.10, .18), rng.randf_range(0, TAU), Color("88aa54"))
-		count += 1
-		if count >= maximum: break
-	if count == 0: return
-	var material := StandardMaterial3D.new()
-	material.vertex_color_use_as_albedo = true
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	material.roughness = .72
+		if depth < .65 or depth > 1.15: continue
+		var separate := true
+		for center in clusters:
+			if center.distance_to(point) < 2.0: separate = false
+		if not separate: continue
+		clusters.append(point)
+		for leaf in 5:
+			var offset := Vector3(cos(leaf * 2.4), 0, sin(leaf * 2.4)) * sqrt(float(leaf)) * .25
+			var at := point + offset + Vector3.UP * leaf * .003
+			if not FishingModel.contains(site_id, at, -.28, spec): continue
+			_lily_leaf(surface, at, rng.randf_range(.18,.29), rng.randf_range(0,TAU), Color("a4cb52").lerp(Color("c2d86b"), rng.randf()))
+		if clusters.size() % 2 == 1:
+			for ring in 2:
+				for petal in 8:
+					var angle := TAU * petal / 8.0 + ring * .35
+					var at := point + Vector3(cos(angle), 0, sin(angle)) * (.07 - ring * .025) + Vector3.UP * (.05 + ring * .05)
+					var basis := Basis(Vector3.UP,-angle) * Basis(Vector3.FORWARD,-.3 - ring * .3)
+					PlaceScenery._oval(flowers, Vector3(.12,.035,.055),at,Color("ffc6d7").lerp(Color("fff1e5"),ring*.65).srgb_to_linear(),basis)
+			PlaceScenery._oval(flowers,Vector3(.048,.04,.048),point + Vector3.UP*.12,Color("ffdb75").srgb_to_linear())
+		if clusters.size() >= 3: break
+	if clusters.is_empty(): return
+	var material := ShaderMaterial.new()
+	material.shader = preload("res://modules/fishing/lily_leaf.gdshader")
 	var leaves := MeshInstance3D.new()
 	leaves.name = "PondLilies"
+	surface.index()
 	leaves.mesh = surface.commit()
 	leaves.material_override = material
 	add_child(leaves)
+	var blooms := MeshInstance3D.new()
+	blooms.name = "PondBlooms"
+	flowers.index()
+	blooms.mesh = flowers.commit()
+	var bloom_material := StandardMaterial3D.new()
+	bloom_material.vertex_color_use_as_albedo = true
+	bloom_material.roughness = .75
+	blooms.material_override = bloom_material
+	add_child(blooms)
 
 func _build_lilies(spec: Dictionary) -> void:
 	var surface := SurfaceTool.new()

@@ -167,7 +167,7 @@
         },
         {
           "id": "pond",
-          "kind": "water",
+          "kind": "soil",
           "ellipse": [
             12,
             41,
@@ -430,8 +430,9 @@
           ]
         }
       ],
-      "checksum": "13e324021b1024a6cb496d8a5ecd2807318c3206f881be8974001549632e8911",
+      "checksum": "5b2c00dfae25db4fd33ded7801b644c75c6c83748907907edde6f4b58ab8568c",
       "ground_texture": "res://assets/farm/art/homestead_ground.png"
     }
-  }
+  },
+  "_retired_pond": "The former authored pond is now soil. Its ellipse remains for historical generation recipes; current farms do not render or fish here."
 }

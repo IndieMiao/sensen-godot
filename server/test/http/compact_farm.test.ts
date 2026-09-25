@@ -22,7 +22,7 @@ async function setup(legacy=false){
 describe('additive compact farm generation API',()=>{
  it('advertises both generation contracts and creates only the explicitly requested size',async()=>{
   const {post,extents,headers}=await setup();const capabilities=(await app.inject({method:'GET',url:'/v1/regions'})).json();
-  expect(capabilities).toMatchObject({farm_generation_version:2,farm_geography_extent_m:160,farm_generations:Object.values(FARM_GENERATIONS)});
+  expect(capabilities).toMatchObject({farm_generation_version:3,farm_geography_extent_m:160,farm_generations:Object.values(FARM_GENERATIONS)});
   const input={generation_version:2,idempotency_key:'new-compact',region_id:'shanghai',location:CENTER};
   const first=await post('/v1/farms',input);expect(first.statusCode).toBe(201);const farm=first.json();
   expect(farm.farm_terrain.plot.grid).toEqual([40,40]);expect(farm.farm_terrain.source).toMatchObject({generator_version:2,extent_m:160});expect(extents).toEqual([160]);
@@ -33,12 +33,12 @@ describe('additive compact farm generation API',()=>{
  });
  it('still creates 48m version 1 farms for old clients and rejects unsupported generation values',async()=>{
   const {post,extents}=await setup();const base={idempotency_key:'old-client',region_id:'shanghai',location:CENTER};
-  for(const generation_version of [3,'2',2.5])expect((await post('/v1/farms',{...base,generation_version})).statusCode).toBe(400);
+  for(const generation_version of [4,'2',2.5])expect((await post('/v1/farms',{...base,generation_version})).statusCode).toBe(400);
   const result=await post('/v1/farms',{...base,generation_version:1});expect(result.statusCode).toBe(201);expect(result.json().farm_terrain.plot.grid).toEqual([64,64]);expect(extents).toEqual([240]);
  });
  it('keeps omitted preview generation as v1 and confirms its original frozen size',async()=>{
   const {post,store,auth,extents}=await setup(true);
-  for(const generation_version of [3,'2',null])expect((await post('/v1/farms/me/relocation/preview',{region_id:'shanghai',location:CENTER,generation_version})).statusCode).toBe(400);
+  for(const generation_version of [4,'2',null])expect((await post('/v1/farms/me/relocation/preview',{region_id:'shanghai',location:CENTER,generation_version})).statusCode).toBe(400);
   const draft=(await post('/v1/farms/me/relocation/preview',{region_id:'shanghai',location:CENTER})).json();
   expect(draft.generation_version).toBe(1);expect(draft.farm_terrain.plot.grid).toEqual([64,64]);expect(extents).toEqual([240]);
   const result=await post('/v1/farms/me/relocation/confirm',{preview_id:draft.preview_id,base_version:draft.base_version,idempotency_key:'confirm-v1'});

@@ -36,18 +36,14 @@ describe('continuous shore geometry', () => {
     expect(validFishingCast(site, [9.375, -27.375], [9, -30], c, () => false)).toBe(false);
     expect(validFishingCast(site, [9.375, -27.375], [9, -30], c, p => p[1] > -27.5)).toBe(false);
   });
-  it('allows an admitted visitor while binding the cast to that shore, room and connection', () => {
-    const state = freshFarm(), ctx = makeCtx(state, T0, SH, content, plot, T0, 'my-farm');
-    ctx.fishingPresence = { space: 'farm', home: 'hosts-farm', room: 'hosts-room', nonce: 'one', x: 9.123, z: -27.4 };
-    const out = apply(state, { type: 'cast_fishing', sequence: 0, site_id: 'farm_pond', target: [9, -29] }, ctx);
-    expect(out.ok).toBe(true);
-    if (!out.ok) return;
-    expect(out.state.cells).toEqual(state.cells);
-    expect(out.state.fishing!.active).toMatchObject({ origin: [9.123, -27.4], target: [9, -29], home: 'hosts-farm' });
-    for (const overrides of [{ home: 'elsewhere' }, { room: 'other-channel' }, { nonce: 'two' }, { x: 10 }, { validSequence: () => false }]) {
-      const next = { ...ctx, now: out.state.fishing!.active!.bite_at, realNow: out.state.fishing!.active!.bite_at,
-        fishingPresence: { ...ctx.fishingPresence!, ...overrides } };
-      expect(apply(out.state, { type: 'hook_fishing', sequence: 1 }, next)).toMatchObject({ ok: false, code: 'FISHING_LOCATION' });
+  it('rejects old owner and visitor farm casts without changing their state', () => {
+    const state = freshFarm(), before = structuredClone(state);
+    for (const home of ['my-farm', 'hosts-farm']) {
+      const ctx = makeCtx(state, T0, SH, content, plot, T0, 'my-farm');
+      ctx.fishingPresence = { space: 'farm', home, room: 'old-room', nonce: 'one', x: 9.123, z: -27.4 };
+      expect(apply(state, { type: 'cast_fishing', sequence: 0, site_id: 'farm_pond', target: [9,-29] }, ctx))
+        .toMatchObject({ ok: false, code: 'FISHING_LOCATION' });
+      expect(state).toEqual(before);
     }
   });
 });

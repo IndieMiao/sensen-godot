@@ -1,3 +1,4 @@
+import { fishingPondPresence } from './fishing_fixture.js';
 import { describe, expect, it } from 'vitest';
 import { apply, makeCtx } from '../../src/domain/reducer.js';
 import { initialFishingSimulation, stepFishing, type FishingPresence } from '../../src/domain/fishing.js';
@@ -6,10 +7,10 @@ import type { Command } from '../../src/domain/commands.js';
 import type { FarmState } from '../../src/domain/state.js';
 import { content, freshFarm, plot, SH, T0 } from './helpers.js';
 
-const location: FishingPresence = { space: 'farm', home: 'owner-farm', nonce: 'connection-1', x: 9.375, z: -27.375 };
+const location: FishingPresence = fishingPondPresence(content);
 function send(s: FarmState, cmd: Command, now = T0, presence: FishingPresence | null = location, config = content) {
   const ctx = makeCtx(s, now, SH, config, plot, now, 'owner-farm');
-  ctx.fishingPresence = presence;
+  ctx.fishingPresence = presence ? { ...presence, pond: fishingPondPresence(config).pond } : null;
   return apply(s, cmd, ctx);
 }
 function accepted(s: FarmState, cmd: Command, now = T0, config = content) {
@@ -20,7 +21,7 @@ function accepted(s: FarmState, cmd: Command, now = T0, config = content) {
 function cast(tier = 1) {
   const config = structuredClone(content);
   config.fishing.sites.farm_pond.fish_weights = [1, 2, 3, 4].map(n => Number(n === tier));
-  let state = accepted(freshFarm(), { type: 'cast_fishing', sequence: 0, site_id: 'farm_pond' }, T0, config);
+  let state = accepted(freshFarm(), { type: 'cast_fishing', sequence: 0, site_id: 'test_pond' }, T0, config);
   const now = state.fishing!.active!.bite_at;
   state = accepted(state, { type: 'hook_fishing', sequence: 1 }, now, config);
   return { state, config, now };
@@ -39,15 +40,15 @@ const fishCount = (s: FarmState) => allBagStacks(s.bag!).filter(stack => stack.i
 
 describe('authoritative fishing loop', () => {
   it.each([null, { ...location, space: 'mine' }, { ...location, x: 25 }])('rejects casts outside the authenticated fishing spot: %j', p => {
-    expect(send(freshFarm(), { type: 'cast_fishing', sequence: 0, site_id: 'farm_pond' }, T0, p)).toMatchObject({ ok: false, code: 'FISHING_LOCATION' });
+    expect(send(freshFarm(), { type: 'cast_fishing', sequence: 0, site_id: 'test_pond' }, T0, p)).toMatchObject({ ok: false, code: 'FISHING_LOCATION' });
   });
   it('rejects unknown sites and cannot replace an active cast to reroll its fish', () => {
     expect(send(freshFarm(), { type: 'cast_fishing', sequence: 0, site_id: '__proto__' })).toMatchObject({ ok: false });
     const { state } = cast();
-    expect(send(state, { type: 'cast_fishing', sequence: 1, site_id: 'farm_pond' })).toMatchObject({ ok: false, code: 'FISHING_ACTIVE' });
+    expect(send(state, { type: 'cast_fishing', sequence: 1, site_id: 'test_pond' })).toMatchObject({ ok: false, code: 'FISHING_ACTIVE' });
   });
   it('requires a real bite window and permits only one hook', () => {
-    const state = accepted(freshFarm(), { type: 'cast_fishing', sequence: 0, site_id: 'farm_pond' });
+    const state = accepted(freshFarm(), { type: 'cast_fishing', sequence: 0, site_id: 'test_pond' });
     const active = state.fishing!.active!;
     for (const now of [active.bite_at - 1, active.hook_until + 1])
       expect(send(state, { type: 'hook_fishing', sequence: 1 }, now)).toMatchObject({ ok: false, code: 'FISHING_TIMING' });

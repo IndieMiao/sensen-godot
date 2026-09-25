@@ -1,3 +1,4 @@
+import { fishingPondPresence } from './fishing_fixture.js';
 import { describe, expect, it } from 'vitest';
 import { addBagItem, allBagStacks, ensureBag } from '../../src/domain/bag.js';
 import { mainHandStats, characterStats, gatherSeconds } from '../../src/domain/character.js';
@@ -26,10 +27,10 @@ describe('six-slot equipment contract',()=>{
   let s=fresh();expect(s.bag!.equipped.fishing_rod?.item_id).toBe('starter_fishing_rod');
   const out=command(s,{type:'unequip_bag_item',sequence:s.bag!.sequence,slot:'fishing_rod'});expect(out.ok).toBe(true);if(!out.ok)return;s=out.state;
   ensureBag(s,content);expect(s.bag!.equipped.fishing_rod).toBeNull();expect(allBagStacks(s.bag!).filter(v=>v.item_id==='starter_fishing_rod')).toHaveLength(1);
-  const ctx=makeCtx(s,T0,SH,content,plot,T0,'owner');ctx.fishingPresence={space:'farm',home:'owner',nonce:'one',x:9.375,z:-27.375};
-  expect(apply(s,{type:'cast_fishing',sequence:0,site_id:'farm_pond'},ctx)).toMatchObject({ok:false,code:'FISHING_ROD_REQUIRED'});
+  const ctx=makeCtx(s,T0,SH,content,plot,T0,'owner');ctx.fishingPresence=fishingPondPresence(content);
+  expect(apply(s,{type:'cast_fishing',sequence:0,site_id:'test_pond'},ctx)).toMatchObject({ok:false,code:'FISHING_ROD_REQUIRED'});
   s=equip(s,'starter_fishing_rod','fishing_rod');const ready={...ctx};
-  expect(apply(s,{type:'cast_fishing',sequence:0,site_id:'farm_pond'},ready).ok).toBe(true);
+  expect(apply(s,{type:'cast_fishing',sequence:0,site_id:'test_pond'},ready).ok).toBe(true);
   const future=structuredClone(content);future.character.auto_grant_starter_rod=false;const freshFuture=freshFarm();ensureBag(freshFuture,future);expect(freshFuture.bag!.equipped.fishing_rod).toBeNull();
  });
  it('two ring slots are independent, contribute once each, and reject foreign item slots',()=>{
@@ -65,8 +66,8 @@ describe('authoritative collection and rod lifetime',()=>{
   expect(faster.state.journey!.exploration.collected.filter(id=>id==='nursery_east')).toHaveLength(1);
  });
  it('removing the rod after casting prevents hooking, while cancellation remains available',()=>{
-  let s=fresh();const ctx=makeCtx(s,T0,SH,content,plot,T0,'owner');ctx.fishingPresence={space:'farm',home:'owner',nonce:'one',x:9.375,z:-27.375};
-  const cast=apply(s,{type:'cast_fishing',sequence:0,site_id:'farm_pond'},ctx);expect(cast.ok).toBe(true);if(!cast.ok)return;s=cast.state;
+  let s=fresh();const ctx=makeCtx(s,T0,SH,content,plot,T0,'owner');ctx.fishingPresence=fishingPondPresence(content);
+  const cast=apply(s,{type:'cast_fishing',sequence:0,site_id:'test_pond'},ctx);expect(cast.ok).toBe(true);if(!cast.ok)return;s=cast.state;
   const unequip=command(s,{type:'unequip_bag_item',sequence:s.bag!.sequence,slot:'fishing_rod'});if(!unequip.ok)throw Error(unequip.code);s=unequip.state;
   const now=s.fishing!.active!.bite_at;
   expect(apply(s,{type:'hook_fishing',sequence:1},{...ctx,realNow:now,now})).toMatchObject({ok:false,code:'FISHING_ROD_REQUIRED'});

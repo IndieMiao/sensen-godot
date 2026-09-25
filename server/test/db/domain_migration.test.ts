@@ -132,7 +132,7 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     const first = await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true });
     expect(first).toMatchObject({ status: 'applied', migrated: 1, eligible: [farm.id] });
     const after = await snapshot();
-    expect(after).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
+    expect(after).toEqual({ ...before, farm_snapshots: [], farms: (before.farms as Record<string, unknown>[])
       .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION })) });
     expect((await store.farmById(farm.id))!.state.chapters[0].step_flags).toEqual({ farm_created: true });
     for (const outcome of ['applied', 'rejected']) {
@@ -193,7 +193,7 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     const before = await snapshot();
     const report = await migrateDomain(pool, { plot: sets, contentVersion: CV, previousContentVersion: 'previous-bundle-content', apply: true });
     expect(report).toMatchObject({ status: 'applied', migrated: 1, to_domain_version: DOMAIN_VERSION });
-    expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
+    expect(await snapshot()).toEqual({ ...before, farm_snapshots: [], farms: (before.farms as Record<string, unknown>[])
       .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION, content_version: CV })) });
   });
 
@@ -209,7 +209,7 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     await addHistory(farm);
     const before = await snapshot();
     expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true })).toMatchObject({ status: 'applied', migrated: 1 });
-    expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
+    expect(await snapshot()).toEqual({ ...before, farm_snapshots: [], farms: (before.farms as Record<string, unknown>[])
       .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION })) });
 
     const plan = { idempotency_key: 'plan-fountain', base_version: 0, type: 'plan_journey_display' as const,
@@ -263,7 +263,7 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     await addHistory(farm);
     const before = await snapshot();
     expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, apply: true })).toMatchObject({ status: 'applied', migrated: 1 });
-    expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
+    expect(await snapshot()).toEqual({ ...before, farm_snapshots: [], farms: (before.farms as Record<string, unknown>[])
       .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, domain_version: DOMAIN_VERSION })) });
 
     const pin = { idempotency_key: 'track-leaves', base_version: 0, type: 'track_journey_opportunity' as const,
@@ -382,7 +382,7 @@ describe.skipIf(!DSN)('Explicit saved-farm migration to the current domain', () 
     const before = await snapshot();
     expect(await migrateDomain(pool, { plot: sets, contentVersion: CV, previousContentVersion: previous, apply: true }))
       .toMatchObject({ status: 'applied', migrated: 1 });
-    expect(await snapshot()).toEqual({ ...before, farms: (before.farms as Record<string, unknown>[])
+    expect(await snapshot()).toEqual({ ...before, farm_snapshots: [], farms: (before.farms as Record<string, unknown>[])
       .map(row => ({ ...row, state: equipmentState(row.state), relocation_available: true, content_version: CV, domain_version: DOMAIN_VERSION })) });
   });
 });

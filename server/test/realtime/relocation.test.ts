@@ -105,7 +105,7 @@ describe('one-time farm relocation realtime boundary', () => {
     await gateway.withFarmRelocation(owner.player, farm.id, commit); expect(commits).toBe(1);
   });
 
-  it('serializes an in-flight visitor fishing write before relocation and observes its committed cast', async () => {
+  it('serializes and rejects a retired farm cast without blocking relocation', async () => {
     const { owner, visitor, gateway, connect, store, relocate } = await harness();
     const b = await connect(visitor), joined = await b.join('farm', { farm_id: owner.farm.id });
     const member = gateway.rooms.get(joined.room)!.members.get(visitor.player)!;
@@ -117,8 +117,7 @@ describe('one-time farm relocation realtime boundary', () => {
       payload: { type: 'cast_fishing', payload: { site_id: 'farm_pond', sequence: 0 }, idempotency_key: 'concurrent-visitor-cast', base_version: visitor.farm.version } }));
     await entered.promise; let called = false;
     const relocating = gateway.withFarmRelocation(owner.player, owner.farm.id, async () => { called = true; return relocate(); });
-    const rejected = expect(relocating).rejects.toThrow('RELOCATION_BUSY');
-    release.resolve(); expect((await fishing).statusCode).toBe(200); await rejected; expect(called).toBe(false);
+    release.resolve(); expect((await fishing).statusCode).toBe(422); await relocating; expect(called).toBe(true);
   });
 
   it('holds new joins and casts behind the commit, then rejects the evicted generation', async () => {

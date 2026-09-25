@@ -1,0 +1,45 @@
+extends SceneTree
+
+func _initialize() -> void:
+	var directory := ProjectSettings.globalize_path("res://output/farm-pond-removal-2026-09-25/project")
+	DirAccess.make_dir_recursive_absolute(directory.path_join("tools/dev"))
+	var config := ConfigFile.new()
+	assert(config.load("res://project.godot") == OK)
+	config.set_value("application","config/name","Farm Pond Retirement QA")
+	config.set_value("application","config/use_custom_user_dir",true)
+	config.set_value("application","config/custom_user_dir_name","sensen-farm-pond-retirement-qa")
+	config.set_value("application","run/main_scene","res://tools/dev/farm_pond_removal_qa.tscn")
+	config.set_value("sensen","network/online_qa",true)
+	config.set_value("sensen","network/base_url","http://127.0.0.1:3214/v1")
+	config.set_value("sensen","network/mobile_base_url","http://10.0.2.2:3214/v1")
+	config.set_value("editor_plugins","enabled",PackedStringArray())
+	assert(config.save(directory.path_join("project.godot")) == OK)
+	var source := DirAccess.open("res://")
+	for name in ["assets","modules","scenes","icon.svg"]:
+		if not DirAccess.open(directory).is_link(name):
+			assert(source.create_link(ProjectSettings.globalize_path("res://"+name),directory.path_join(name)) == OK)
+	for name in ["farm_pond_removal_qa.gd","farm_pond_removal_qa.tscn"]:
+		assert(DirAccess.copy_absolute(ProjectSettings.globalize_path("res://tools/dev/"+name),directory.path_join("tools/dev/"+name)) == OK)
+	assert(DirAccess.copy_absolute(ProjectSettings.globalize_path("res://output/farm-pond-removal-2026-09-25/private/account.json"),directory.path_join("farm_pond_qa_account.json")) == OK)
+	DirAccess.make_dir_recursive_absolute(directory.path_join(".godot"))
+	if not DirAccess.dir_exists_absolute(directory.path_join(".godot/imported")):
+		assert(source.create_link(ProjectSettings.globalize_path("res://.godot/imported"),directory.path_join(".godot/imported")) == OK)
+	assert(DirAccess.copy_absolute(ProjectSettings.globalize_path("res://.godot/global_script_class_cache.cfg"),directory.path_join(".godot/global_script_class_cache.cfg")) == OK)
+	var original := ConfigFile.new()
+	assert(original.load("res://export_presets.cfg") == OK)
+	var preset := ConfigFile.new()
+	for section in ["preset.0","preset.0.options"]:
+		for key in original.get_section_keys(section): preset.set_value(section,key,original.get_value(section,key))
+	preset.set_value("preset.0","name","Android Farm Pond Retirement QA")
+	preset.set_value("preset.0","include_filter","farm_pond_qa_account.json,assets/**/*.json")
+	preset.set_value("preset.0","exclude_filter","addons/*,tests/*,docs/*,reports/*,build/*,output/*,server/*,packages/*,assets/avatar/source/*.fbx")
+	preset.set_value("preset.0.options","gradle_build/use_gradle_build",false)
+	preset.set_value("preset.0.options","permissions/internet",true)
+	preset.set_value("preset.0.options","permissions/access_network_state",true)
+	preset.set_value("preset.0.options","package/unique_name","com.sensen.farmpondremovalqa")
+	preset.set_value("preset.0.options","package/name","Farm Pond Retirement QA")
+	preset.set_value("preset.0.options","version/code",2026092503)
+	preset.set_value("preset.0.options","version/name","0.16.40-farmqa")
+	assert(preset.save(directory.path_join("export_presets.cfg")) == OK)
+	print("FARM_POND_QA_PROJECT ",directory)
+	quit()

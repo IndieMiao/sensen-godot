@@ -6,15 +6,16 @@ import type { FishingSite } from '../domain/fishing.js';
 
 /** Legacy generation remains available for old clients and stored previews. */
 export const GEOGRAPHY_EXTENT_M = 240;
-export type FarmGenerationVersion = 1 | 2;
+export type FarmGenerationVersion = 1 | 2 | 3;
 export const FARM_GENERATIONS: Record<FarmGenerationVersion, {
   generation_version: FarmGenerationVersion; grid: [number, number]; cell_mm: number;
   play_area_m: number; geography_extent_m: number;
 }> = {
   1: { generation_version: 1, grid: [64, 64], cell_mm: 750, play_area_m: 48, geography_extent_m: 240 },
   2: { generation_version: 2, grid: [40, 40], cell_mm: 800, play_area_m: 32, geography_extent_m: 160 },
+  3: { generation_version: 3, grid: [40, 40], cell_mm: 800, play_area_m: 32, geography_extent_m: 160 },
 };
-export const LATEST_FARM_GENERATION: FarmGenerationVersion = 2;
+export const LATEST_FARM_GENERATION: FarmGenerationVersion = 3;
 export const MAX_FACILITY_RASTERIZATIONS = 96;
 export const MAX_FACILITY_CANDIDATES = 4096;
 /** Optional internal instrumentation for bounded-generation regression checks. */
@@ -205,7 +206,7 @@ function protectedGeography(classified: Uint8Array, size: number, osmWater: Plot
   return [...regions, ...structuredClone(osmWater)];
 }
 
-function fitCompactFacilities(base: PlotLayoutSource, geographic: PlotRegion[], classified: Uint8Array, osmWater: PlotRegion[], diagnostics?: FarmGenerationDiagnostics): PlotLayoutSource {
+function fitCompactFacilities(base: PlotLayoutSource, geographic: PlotRegion[], classified: Uint8Array, osmWater: PlotRegion[], diagnostics?: FarmGenerationDiagnostics, includePond = true): PlotLayoutSource {
   const size = 40, dry = (x: number, y: number) => x >= 0 && y >= 0 && x < size && y < size && classified[y * size + x] === 1;
   const components = new Uint16Array(size * size); let component = 0;
   for (let first = 0; first < classified.length; first++) {
@@ -239,8 +240,8 @@ function fitCompactFacilities(base: PlotLayoutSource, geographic: PlotRegion[], 
     if ((x / (pond[2] + 1)) ** 2 + (y / (pond[3] + 1)) ** 2 <= 1.00001) bankOffsets.push([x, y]);
   }
   bankOffsets.push([0, -5]);
-  const ponds = positions([pond[0], pond[1]]).filter(([x, y]) => x - pond[2] >= 0 && x + pond[2] <= size
-    && y - pond[3] >= 0 && y + pond[3] <= size && bankOffsets.every(([i, j]) => dry(x + i, y + j)));
+  const ponds: GeoPoint[] = includePond ? positions([pond[0], pond[1]]).filter(([x, y]) => x - pond[2] >= 0 && x + pond[2] <= size
+    && y - pond[3] >= 0 && y + pond[3] <= size && bankOffsets.every(([i, j]) => dry(x + i, y + j))) : [[0, 0]];
   if (!homes.length || !ponds.length) throw new GeographyError('LOCATION_UNSUITABLE');
   const protections = protectedGeography(classified, size, osmWater);
   const skeleton: PlotLayoutSource = { revision: 1, name: 'Farm', grid: [size, size], cell_mm: 800, default_kind: 'rock', anchors: base.anchors, regions: geographic };
@@ -267,9 +268,10 @@ function fitCompactFacilities(base: PlotLayoutSource, geographic: PlotRegion[], 
     if (++candidates > MAX_FACILITY_CANDIDATES) throw new GeographyError('LOCATION_UNSUITABLE');
     if (diagnostics) diagnostics.facility_candidates = candidates;
     const occupied = new Set(required.map(([x, y]) => `${x + dx},${y + dy}`));
-    if (pondOffsets.some(([x, y]) => occupied.has(`${px + x},${py + y}`))) return undefined;
+    if (includePond && pondOffsets.some(([x, y]) => occupied.has(`${px + x},${py + y}`))) return undefined;
     const anchors = Object.fromEntries(Object.entries(base.anchors).map(([name, [x, y]]) => [name, [x + dx, y + dy] as GeoPoint]));
     anchors.pond_shore = [px, py - 4]; anchors.pond_stand = [px, py - 5];
+    if (!includePond) { delete anchors.pond_shore; delete anchors.pond_stand; }
     const start = anchors.spawn;
     const facilities: PlotRegion[] = [
         { id: 'facility_pond_bank', kind: 'soil', rect: [px - 7, py - 7, 15, 14] },
@@ -277,13 +279,17 @@ function fitCompactFacilities(base: PlotLayoutSource, geographic: PlotRegion[], 
         { id: 'facility_pond_approach', kind: 'lawn', path: [anchors.pond_shore, [(px + start[0]) / 2, py - 6], start], width: 2 },
         ...structuredClone(edges), ...core.map(region => translateRegion(region, dx, dy)),
         { id: 'pond', kind: 'water', ellipse: [px, py, pond[2], pond[3]] }];
+    if (!includePond) {
+      for (let i = facilities.length - 1; i >= 0; i--)
+        if (['pond', 'facility_pond_bank', 'facility_pond_approach'].includes(facilities[i].id ?? '')) facilities.splice(i, 1);
+    }
     const plot: PlotLayoutSource = { revision: 1, name: 'Farm', grid: [size, size], cell_mm: 800, default_kind: 'rock', anchors,
       regions: [...geographic, ...facilities, ...protections] };
     if (plot.regions.length > 1024) throw new GeographyError('GEOGRAPHY_UNAVAILABLE');
     if (rasterizations >= MAX_FACILITY_RASTERIZATIONS) throw new GeographyError('LOCATION_UNSUITABLE');
     rasterizations++; if (diagnostics) diagnostics.facility_rasterizations = rasterizations;
     const raster = rasterFacilities(plot, facilities), reachable = reachableCells(raster, start);
-    for (const name of ['pond_shore', 'pond_stand', 'mine_approach', 'stall']) {
+    for (const name of [...(includePond ? ['pond_shore', 'pond_stand'] : []), 'mine_approach', 'stall']) {
       const point = anchors[name]; if (!reachable[point[1] * size + point[0]]) return undefined;
     }
     if (reachable.reduce((sum, value, n) => sum + value * raster.till[n], 0) < 128) return undefined;
@@ -294,6 +300,10 @@ function fitCompactFacilities(base: PlotLayoutSource, geographic: PlotRegion[], 
     anchors.exit = exit;
     return plot;
   };
+  if (!includePond) {
+    for (const home of homes) { const fit = tryLayout(home, [0, 0]); if (fit) return fit; }
+    throw new GeographyError('LOCATION_UNSUITABLE');
+  }
   // Prefer the familiar relative composition; if the shoreline is narrow, fit the pond independently.
   const pondKeys = new Set(ponds.map(point => point.join(',')));
   const homeGroup = ([dx, dy]: GeoPoint) => components[(base.anchors.spawn[1] + dy) * size + base.anchors.spawn[0] + dx];
@@ -316,7 +326,14 @@ export function generateFarmTerrain(center: FarmLocation, geography: Geography, 
   const spec = FARM_GENERATIONS[generationVersion];
   if (!spec) throw new GeographyError('GEOGRAPHY_UNAVAILABLE');
   const size = spec.grid[0], total = size * size;
-  if (generationVersion === 2) base = compactBase(base);
+  // Reproduce historical generation recipes for frozen previews and fixtures.
+  // New requests use v3; API persistence also retires ponds from legacy recipes.
+  base = structuredClone(base);
+  if (generationVersion < 3) {
+    const historicalPond = base.regions.find(region => region.id === 'pond' && region.ellipse);
+    if (historicalPond) historicalPond.kind = 'water';
+  }
+  if (generationVersion >= 2) base = compactBase(base);
   const vertexCount = (features: GeoFeature[]) => features.reduce((total, f) => total + (f.polygon?.length ?? 0) + (f.line?.length ?? 0) + (f.holes ?? []).reduce((n, h) => n + h.length, 0), 0);
   const primary = geography.features.filter(feature => feature.layer !== 'supplement');
   if (primary.length > 450 || vertexCount(primary) > 7500 || geography.features.length > 1024 || vertexCount(geography.features) > 18000)
@@ -363,7 +380,7 @@ export function generateFarmTerrain(center: FarmLocation, geography: Geography, 
     throw new GeographyError(unknown > 0 && possible >= total / 4 ? 'GEOGRAPHY_INCOMPLETE' : 'LOCATION_UNSUITABLE');
   }
   if (regions.length + base.regions.length + 3 > 1024) throw new GeographyError('GEOGRAPHY_UNAVAILABLE');
-  const plot: PlotLayoutSource = generationVersion === 2 ? fitCompactFacilities(base, regions, classified, osmWater, diagnostics)
+  const plot: PlotLayoutSource = generationVersion >= 2 ? fitCompactFacilities(base, regions, classified, osmWater, diagnostics, generationVersion < 3)
     : { revision: 1, name: 'Farm', grid: [...spec.grid], cell_mm: spec.cell_mm,
     default_kind: 'rock', anchors: structuredClone(base.anchors), regions: [
       ...regions,
@@ -386,7 +403,7 @@ export function generateFarmTerrain(center: FarmLocation, geography: Geography, 
       if (next >= 0 && preliminary.walk[next] && !reachable[next]) { reachable[next] = 1; queue.push(next); }
   }
   const pondShore = plot.anchors.pond_shore ?? [12, 37], mineApproach = plot.anchors.mine_approach ?? [25, 34];
-  if (!reachable[pondShore[1] * size + pondShore[0]] || !reachable[mineApproach[1] * size + mineApproach[0]]
+  if ((generationVersion < 3 && !reachable[pondShore[1] * size + pondShore[0]]) || !reachable[mineApproach[1] * size + mineApproach[0]]
     || queue.reduce((total, n) => total + preliminary.till[n], 0) < 128) throw new GeographyError('LOCATION_UNSUITABLE');
   const source: FarmTerrain['source'] = { provider: 'osm', generator_version: generationVersion, center: { ...center }, extent_m: spec.geography_extent_m,
     attribution: geography.attribution, license: geography.license, fetched_at: geography.fetched_at, source_checksum: geography.source_checksum,
@@ -396,6 +413,27 @@ export function generateFarmTerrain(center: FarmLocation, geography: Geography, 
   const layout_id = 'geo_' + identity.slice(0, 20);
   plot.checksum = rasterize(layout_id, plot).checksum;
   return { format: 1, layout_id, plot, source, ...(validFarmStyle(farmStyle) ? { farm_style: farmStyle } : {}) };
+}
+
+/** Lossless retirement of the authored pond, never real geographic water.
+ * Coordinates, provenance and all non-pond regions remain unchanged. The new
+ * checksum/id prevents a stale client or cache from reusing the blocked basin.
+ */
+export function retireFarmPond(terrain: FarmTerrain): FarmTerrain {
+  plotForFarm({ farm_terrain: terrain }, null as unknown as PlotLayout);
+  if (!terrain.plot.regions.some(region => region.id === 'pond' && region.kind === 'water' && region.ellipse)) return terrain;
+  const next = structuredClone(terrain);
+  for (const region of next.plot.regions)
+    if (region.id === 'pond' && region.kind === 'water' && region.ellipse) region.kind = 'soil';
+  delete next.plot.anchors.pond_shore;
+  delete next.plot.anchors.pond_stand;
+  delete next.plot.checksum;
+  // JSONB reorders object keys. Derive identity from the canonical raster so
+  // memory, database, owner and visitor paths produce exactly the same layout.
+  const signature = rasterize('geo_retired_pond_v1', next.plot).checksum;
+  next.layout_id = 'geo_' + createHash('sha256').update(terrain.layout_id + ':' + signature).digest('hex').slice(0, 20);
+  next.plot.checksum = rasterize(next.layout_id, next.plot).checksum;
+  return next;
 }
 
 const terrainPlots = new Map<string, PlotLayout>();

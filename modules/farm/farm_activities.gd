@@ -7,7 +7,6 @@ const PLACE_NAMES := {"nursery": "Nursery", "bistro": "Bistro", "courtyard": "Co
 const PLACES := {"nursery": Vector2i(19, 33), "bistro": Vector2i(34, 32), "courtyard": Vector2i(33, 39)}
 var targets: Dictionary = {}
 var _blueprint: FarmBlueprint
-var _fishing_site: Dictionary = {}
 var _key := ""
 
 static func entries(state: Dictionary) -> Array[Dictionary]:
@@ -33,7 +32,6 @@ static func entries(state: Dictionary) -> Array[Dictionary]:
 
 func setup(blueprint: FarmBlueprint) -> void:
 	_blueprint = blueprint
-	_fishing_site = FishingModel.site_for_plot("farm_pond", blueprint)
 	name = "FarmActivities"
 
 func sync(state: Dictionary) -> void:
@@ -79,7 +77,6 @@ func _space(desired: Vector2i, occupied: Array, used: Array[Vector2i], navigatio
 			if Vector2(cell - _blueprint.anchor("spawn")).length() < 3.0: continue
 			if Vector2(cell - _blueprint.anchor("mine")).length() < 3.5: continue
 			if Vector2(cell - _blueprint.anchor("house")).length() < 3.5: continue
-			if FishingModel.contains("farm_pond", _blueprint.cell_to_world(cell), 0.0, _fishing_site): continue
 			candidates.append(cell)
 	if candidates.has(previous) and not navigation.path(_blueprint.anchor("spawn"), previous).is_empty(): return previous
 	candidates.sort_custom(func(a, b):

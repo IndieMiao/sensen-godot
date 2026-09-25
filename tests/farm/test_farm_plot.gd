@@ -26,8 +26,8 @@ func test_counts_match_the_server_side_rasteriser() -> void:
 			if bp.mask_has("buildable", c): place += 1
 	# 与 server/test/domain/plot.test.ts 的同一组数字。2495：房子周围的 homestead_yard
 	# （草地）从可耕地里划走了 184 格——那圈院子是给既有美术构图留的地方。
-	assert_int(till).is_equal(3003)
-	assert_int(place).is_equal(3086)
+	assert_int(till).is_equal(3050)
+	assert_int(place).is_equal(3133)
 
 func test_separates_farmable_ground_from_placeable_ground() -> void:
 	var bp := FarmPlot.blueprint_for()

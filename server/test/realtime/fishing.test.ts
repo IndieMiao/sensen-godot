@@ -1,3 +1,4 @@
+import { registeredPondFixture } from './pond_fixture.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import pg from 'pg';
 import { randomUUID } from 'node:crypto';
@@ -22,6 +23,7 @@ afterAll(async () => { await pool?.end(); });
 for (const backend of ['memory', 'postgres']) describe.skipIf(backend === 'postgres' && !process.env.TEST_DATABASE_URL)(`${backend} fishing HTTP/WebSocket settlement`, () => {
   it('checks real presence, saves a catch once, recovers its response after leaving, and sells without duplication', async () => {
     let now = Date.now();
+    const pond = registeredPondFixture(content);
     const store = backend === 'memory'
       ? new MemoryStore({ content, contentVersion: cv, plot: sets, timezone: 'Asia/Shanghai', now: () => now })
       : new PgStore({ pool: pool!, content, contentVersion: cv, plot: sets, timezone: () => 'Asia/Shanghai', now: () => now });
@@ -38,13 +40,13 @@ for (const backend of ['memory', 'postgres']) describe.skipIf(backend === 'postg
     const command = async (type: string, payload: object) => post({ type, payload, idempotency_key: randomUUID(), base_version: (await store.farmByOwner(account.player))!.version });
     try {
       await client.connect(account.token);
-      const missing = await command('cast_fishing', { site_id: 'farm_pond', sequence: 0,
+      const missing = await command('cast_fishing', { site_id: pond.id, sequence: 0,
         fishingPresence: { space: 'farm', home: account.farm.id, x: 9.375, z: -27.375 } });
       expect(missing.body.code).toBe('FISHING_LOCATION');
-      const joined = await client.join('farm', { farm_id: account.farm.id });
+      const joined = await client.join('pond', { pond_id: pond.id, catalog_revision: pond.revision });
       const member = onlineGateways.get(app)!.rooms.get(joined.room)!.members.get(account.player)!;
-      member.x = 9.375; member.z = -27.375; member.target = [member.x, member.z];
-      const cast = await command('cast_fishing', { site_id: 'farm_pond', sequence: 0 });
+      member.x = pond.origin[0]; member.z = pond.origin[1]; member.target = [member.x, member.z];
+      const cast = await command('cast_fishing', { site_id: pond.id, sequence: 0 });
       expect(cast.status).toBe(200);
       const active = cast.body.state.fishing.active;
       now = active.bite_at;

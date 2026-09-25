@@ -71,7 +71,7 @@ describe('courtyard decoration placement', () => {
     [{ prop_id: 'bench', cell: [24, 3], owner_id: 'private' }],
         [placement('bench', [24.5, 3])],              // 非整数格
     [placement('bench', [28, 38])],               // 房子占的格
-    [placement('bench', [8, 40])],                // 池塘
+    [placement('bench', [25, 36])],               // 矿口
     [placement('bench', [2, 30])],                // 西侧崖壁
     [placement('bench', [-1, 3])],                // 越界
     [placement('bench', [63, 63])],               // 北面崖壁
