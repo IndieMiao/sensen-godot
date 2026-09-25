@@ -13,6 +13,12 @@
 
 ## 当前版本
 
+[Journey 0.16.40 / 2026092503](https://download-us.sensenjoy.cn:8443/farm/releases/pond-retirement-20260925-190aa3e7d38f/sensen-journey-pond-retirement-0.16.40.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/pond-retirement-20260925-190aa3e7d38f/sensen-journey-pond-retirement-0.16.40.apk)。
+
+178346711 字节；SHA-256 `190aa3e7d38f810866be0ea1185e1aac5f1582ff608ed903be46288f221cdc09`。农场人工塘退役并恢复地面，真实地理水域和 12 个地图钓鱼点保留；包含鱼塘美术、Voice Profile 与原生 WebView。原包名／原签名／无观察器。后端 `pond-retirement-20260925` / domain 28 / content `761deabf2a207d3e` 已配套上线，77 个农场及资产和历史保留。851 项服务端与 290 项原生检查通过，正式包模拟器覆盖安装、包回读、冷登录及当前身份保留通过；本轮未安装用户手机。两站完整下载、Range、哈希和清单验证通过。详见 `docs/qa/pond-retirement-release-2026-09-25.md`。
+
+## 历史版本 0.16.38
+
 [Journey 0.16.38 / 2026092501](https://download-us.sensenjoy.cn:8443/farm/releases/voicematch-20260925-a651401ae41c/sensen-journey-voicematch-0.16.38.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/voicematch-20260925-a651401ae41c/sensen-journey-voicematch-0.16.38.apk)。
 
 178431631 字节；SHA-256 `a651401ae41ccf19984d4fefbf054ab7ac1753596bb0cb5cf476a36f86423566`。换装页新增 Voice Profile 入口（安卓应用内 WebView 打开 match.sensenapp.com，Gensen 主题、英文），去掉启动 Godot logo。原证书；模拟器覆盖安装保留身份与登录，V2509A 覆盖安装哈希与身份文件核验。服务端保持 integrated-20260924。详见 `docs/qa/voice-match-android-2026-09-25.md`。

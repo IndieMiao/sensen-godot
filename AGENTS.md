@@ -1,5 +1,25 @@
 # Product Direction
 
+- Farm pond retirement released on 2026-09-25 at the user's request: source
+  a303b16 fast-forwarded into farm-dev and pushed. Journey 0.16.40 / 2026092503
+  retains the original package/certificate, pond art and Voice Profile/WebView.
+  Backend pond-retirement-20260925 uses domain 28 / content 761deabf2a207d3e.
+  Fresh production-copy rehearsal and the maintenance-window migration preserved
+  77 farms, 1655 historical commands, 41 creation records, assets, coordinates,
+  natural water and relocation opportunities; 4 authored geographic ponds retired.
+  Keep the existing database/voice configuration, both networks and 1500ms Node
+  address-attempt setting. Never roll domain-28 saves back to old snapshots.
+  851 server/PostgreSQL and 290 native checks passed; isolated real HTTP/WebSocket
+  pond settlement and restart passed. Original signed observer-free APK passed
+  emulator installation/readback/cold login, retaining 4 fresh current files and
+  3 absences. Both public full downloads, hashes, Range and manifests passed.
+  No phone installation, iOS acceptance or new Slack/Feishu delivery this round.
+  The merged rapid-harbor local/remote branch and both linked worktrees are
+  removed; artifacts and uncommitted integration edits are hash-verified in
+  output/worktree-cleanup-20260925-pond-retirement. Original output paths remain
+  available through links; main workspace's 78 pre-existing files are retained.
+  See docs/qa/pond-retirement-release-2026-09-25.md.
+
 - Farm pond retirement requested on 2026-09-25 is implemented locally: remove
   farm water/shore rendering, fishing UI and water-tap fishing; reclaim the
   authored pond as walkable/tillable/placeable soil. Preserve real geographic
