@@ -1,5 +1,15 @@
 # Product Direction
 
+- Android remote ADB preference on 2026-09-25: user requested a fixed remote
+  debugging endpoint. Enabled TCP port 5555 on the freshly verified V2509A
+  (10AFAF162200319); Tailscale 100.114.132.11:5555 connected and reconnected,
+  service.adb.tcp.port=5555 and ro.adb.secure=1. Discover the current Tailscale
+  peer first, then try port 5555 before requesting the changing Android wireless
+  TLS port. The settings page still shows its separate dynamic TLS port; this
+  runtime TCP setting is not guaranteed across reboot/debugging disable. No root,
+  persistent system-property change, global adb shutdown or game-data operation.
+  See tools/android/README.md for reconnect guidance.
+
 - Mine maximum default view on 2026-09-25: Journey 0.16.41 / 2026092504
   (source 2185e00) starts new mine floors/runs/instances at zoom 0.8, the widest
   existing view, 25% wider than before. Retain 0.8–1.4 anchored pinch, free pan,

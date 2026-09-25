@@ -34,6 +34,32 @@ Verify runner behavior with `node --test tools/android/run_test.test.mjs`.
 Background CPU measurements and limitations are recorded in
 [`docs/qa/android-background-cpu-2026-09-15.md`](../../docs/qa/android-background-cpu-2026-09-15.md).
 
+## Tailscale remote ADB
+
+The user requested a stable remote connection on 2026-09-25. V2509A was verified
+as serial `10AFAF162200319`; its current Tailscale endpoint is
+`100.114.132.11:5555`. TCP mode was enabled through the already-authorized
+connection using `adb -s "$PHONE_ADB_SERIAL" tcpip 5555`. Disconnect/reconnect
+passed and `ro.adb.secure` remains `1`; existing ADB authorization is retained.
+
+Check the live Tailscale peer before using a recorded address, then connect to
+port 5555 and verify the physical serial. Do not select an emulator or shut down
+other ADB servers while reconnecting.
+
+```sh
+adb connect 100.114.132.11:5555
+adb -s 100.114.132.11:5555 shell getprop ro.serialno
+```
+
+Android's Wireless debugging page shows a separate automatically assigned TLS
+port, which can change whenever that service restarts or the network changes.
+It need not match 5555. The TCP setting is for the current boot and may need to
+be enabled again after reboot or disabling debugging. If 5555 is unavailable,
+discover the current TLS endpoint with `adb mdns services` on the same LAN or
+the phone's current Wireless debugging page, connect through that authorized
+endpoint, and enable TCP mode again. This does not configure persistent/root
+settings or require changing the game or its data.
+
 ## In-app WebView (voice-match H5)
 
 After `setup_android_build.sh` (and `prepare_voice_plugin.py`), run
