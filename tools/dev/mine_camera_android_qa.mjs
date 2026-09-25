@@ -6,13 +6,17 @@ import assert from 'node:assert/strict';
 const run=promisify(execFile), serial=process.env.JOURNEY_SERIAL, pkg=process.env.JOURNEY_PACKAGE;
 assert.equal(pkg,'com.sensen.journeymineartqa');
 assert.ok(serial?.startsWith('emulator-'),'Use the emulator test runner');
-const folder='output/mine-camera-2026-09-24/android';
+const folder=process.env.MINE_CAMERA_QA_OUTPUT??'output/mine-max-view-2026-09-25/android';
 await mkdir(folder,{recursive:true});
 const adb=args=>run('adb',['-s',serial,...args],{encoding:'buffer',timeout:30000,maxBuffer:16e6});
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 let touches=0, pid;
 const evidence=[];
-const state=async()=>JSON.parse((await adb(['exec-out','run-as',pkg,'cat','files/mine-art-state.json'])).stdout);
+const state=async()=>{
+  const s=JSON.parse((await adb(['exec-out','run-as',pkg,'cat','files/mine-art-state.json'])).stdout);
+  assert.equal(String(s.pid),pid,'State must belong to the current app process');
+  return s;
+};
 const distance=(a,b)=>Math.hypot(...a.map((n,i)=>n-b[i]));
 async function until(test,label,timeout=16000){
   const end=Date.now()+timeout;let s;
@@ -56,11 +60,11 @@ const sizeText=(await adb(['shell','wm','size'])).stdout.toString();
 const override=/Override size: (\d+x\d+)/.exec(sizeText)?.[1];
 try{
   await dismissDialogs();pid=(await adb(['shell','pidof','-s',pkg])).stdout.toString().trim();
-  await until(s=>s.floor===1&&s.camera_center&&s.camera_size<8,'Close camera loaded');
+  await until(s=>s.floor===1&&s.camera_center&&Math.abs(s.zoom-.8)<.001,'Widest default view loaded');
   for(const resolution of ['720x1280','780x1688','960x720']){
     await adb(['shell','wm','size',resolution]);await delay(650);
     await button('ReviewFloor1');await delay(500);
-    let s=await state();assert.ok(s.camera_size<=7.21,'Farm-sized close view');
+    let s=await state();assert.ok(Math.abs(s.zoom-.8)<.001,'New floor starts at maximum field of view');
     assert.ok(!s.focus_visible);await capture(`${resolution}-default`);
 
     const rock=s.targets.find(t=>t.id.startsWith('rock_')&&t.id===t.pick);
@@ -82,13 +86,21 @@ try{
     await capture(`${resolution}-recentered`);
 
     const commandCount=s.commands.length;
+    const defaultZoom=s.zoom;
     await pinch(1.28);
-    s=await state();assert.ok(s.zoom>1.12,'Two-finger zoom in');
+    s=await state();assert.ok(s.zoom>defaultZoom+.1,'Two-finger zoom in from maximum field of view');
     assert.equal(s.commands.length,commandCount,'Pinch cannot mine');
     await capture(`${resolution}-zoom-in`);
     const closeZoom=s.zoom;
     await pinch(.75);
     s=await state();assert.ok(s.zoom<closeZoom-.1,'Two-finger zoom out');
+    const chosenZoom=s.zoom, chosenCenter=s.camera_center;
+    await adb(['shell','input','keyevent','3']);await delay(400);
+    const component=(await adb(['shell','cmd','package','resolve-activity','--brief',pkg])).stdout.toString().trim().split(/\r?\n/).at(-1);
+    await adb(['shell','am','start','-W','-n',component]);await delay(650);
+    assert.equal((await adb(['shell','pidof','-s',pkg])).stdout.toString().trim(),pid,'Foreground resumes the same process');
+    s=await state();assert.ok(Math.abs(s.zoom-chosenZoom)<.001,'Foreground keeps chosen zoom');
+    assert.ok(distance(s.camera_center,chosenCenter)<.01,'Foreground keeps chosen pan');
 
     const beforeBag=s.camera_center;
     await button('OpenBag');await until(s=>s.bag,'Open bag');
@@ -98,7 +110,7 @@ try{
     for(const number of [2,3,4,5]){
       await button(`ReviewFloor${number}`);await until(s=>s.floor===number,'Change fixture floor');await delay(250);
       s=await state();assert.ok(distance(s.camera_center,s.player)<.002,'New floor frames arrival');
-      assert.ok(Math.abs(s.zoom-1)<.001);await capture(`${resolution}-floor-${number}`);
+      assert.ok(Math.abs(s.zoom-.8)<.001);await capture(`${resolution}-floor-${number}`);
     }
   }
   await writeFile(`${folder}/report.json`,JSON.stringify({passed:true,touches,evidence,serial,package:pkg,source:'Native Android OS touch; isolated local command fixtures'},null,2));

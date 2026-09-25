@@ -494,7 +494,7 @@ func _rebuild_floor() -> void:
 	# its view; only an authoritative new floor/run/instance reframes arrival.
 	if not camera_context.is_empty() and camera_context != _camera_context:
 		_stop_camera_recenter()
-		camera_pan.reset()
+		camera_pan.reset(camera_pan.min_zoom)
 		_camera_initialized = false
 		_camera_context = camera_context
 	if changed_floor:

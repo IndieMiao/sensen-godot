@@ -27,12 +27,18 @@ func test_online_arrival_frames_server_spawn_and_same_floor_updates_keep_pan() -
 	for frame in 3: await get_tree().process_frame
 	assert_vector(mine.player.position).is_equal_approx(spawn, Vector3.ONE * 0.001)
 	assert_vector(mine._camera_center).is_equal_approx(spawn + Vector3.UP * 0.7, Vector3.ONE * 0.001)
+	assert_float(mine.camera_pan.zoom).is_equal_approx(mine.camera_pan.min_zoom, 0.001)
 	mine._camera_center += Vector3(3, 0, 2)
 	mine._update_camera()
+	mine.camera_pan.magnify(mine.cam, mine.world_area().get_center(), 1.3)
+	mine.camera_pan.cancel()
+	mine._update_camera()
 	var panned: Vector3 = mine._camera_center
+	var zoom: float = mine.camera_pan.zoom
 	mine.online._message(world.duplicate(true))
 	for frame in 3: await get_tree().process_frame
 	assert_vector(mine._camera_center).is_equal_approx(panned, Vector3.ONE * 0.001)
+	assert_float(mine.camera_pan.zoom).is_equal_approx(zoom, 0.001)
 	# A reconnect temporarily clears world while joined/world arrive separately.
 	# Retain the same room/floor view even if its newly admitted seat is elsewhere.
 	spawn = Vector3(4.25, 0, -1.25)
@@ -42,6 +48,7 @@ func test_online_arrival_frames_server_spawn_and_same_floor_updates_keep_pan() -
 	for frame in 3: await get_tree().process_frame
 	assert_vector(mine._camera_center).is_equal_approx(panned, Vector3.ONE * 0.001)
 	assert_vector(mine.player.position).is_equal_approx(spawn, Vector3.ONE * 0.001)
+	assert_float(mine.camera_pan.zoom).is_equal_approx(zoom, 0.001)
 	# Stairs should frame the actual arrival, then a different mine instance on
 	# the same floor/run must take ownership of its new arrival view as well.
 	spawn = Vector3(3.75, 0, -1.25)
@@ -52,8 +59,11 @@ func test_online_arrival_frames_server_spawn_and_same_floor_updates_keep_pan() -
 	mine.online._message(world.duplicate(true))
 	for frame in 3: await get_tree().process_frame
 	assert_vector(mine._camera_center).is_equal_approx(spawn + Vector3.UP * 0.7, Vector3.ONE * 0.001)
+	assert_float(mine.camera_pan.zoom).is_equal_approx(mine.camera_pan.min_zoom, 0.001)
 	mine._camera_center += Vector3(3, 0, 2)
 	mine._update_camera()
+	mine.camera_pan.magnify(mine.cam, mine.world_area().get_center(), 1.3)
+	mine.camera_pan.cancel()
 	spawn = Vector3(5.25, 0, -1.25)
 	mine.online._message({"t": "joined", "self": 3, "room": "mine:another-instance", "epoch": 4, "floor": 2, "spawn": [spawn.x, spawn.z]})
 	world.epoch = 4
@@ -61,3 +71,4 @@ func test_online_arrival_frames_server_spawn_and_same_floor_updates_keep_pan() -
 	mine.online._message(world.duplicate(true))
 	for frame in 3: await get_tree().process_frame
 	assert_vector(mine._camera_center).is_equal_approx(spawn + Vector3.UP * 0.7, Vector3.ONE * 0.001)
+	assert_float(mine.camera_pan.zoom).is_equal_approx(mine.camera_pan.min_zoom, 0.001)

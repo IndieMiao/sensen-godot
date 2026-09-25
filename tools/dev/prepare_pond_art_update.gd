@@ -9,6 +9,7 @@ func _initialize() -> void:
 	assert(FileAccess.file_exists("res://android/build/src/main/java/com/sensen/webview/GodotWebViewPlugin.kt"), "Prepare the native WebView plugin before exporting.")
 	var destination := ""
 	var inspect := "--inspect" in OS.get_cmdline_user_args()
+	var mine_max_view := "--mine-max-view" in OS.get_cmdline_user_args()
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--destination="): destination = arg.trim_prefix("--destination=")
 	assert(destination.is_absolute_path())
@@ -40,7 +41,7 @@ func _initialize() -> void:
 	var preset := ConfigFile.new()
 	for section in ["preset.0", "preset.0.options"]:
 		for key in original.get_section_keys(section): preset.set_value(section,key,original.get_value(section,key))
-	preset.set_value("preset.0", "name", "Android Pond Art Update")
+	preset.set_value("preset.0", "name", "Android Mine Camera Update" if mine_max_view else "Android Pond Art Update")
 	preset.set_value("preset.0", "custom_features", "")
 	preset.set_value("preset.0", "include_filter", "mapbox_token.txt,assets/ponds/*.json,assets/map/*.json,assets/map/cities/*.json,assets/localization/*.json,assets/landmarks/griffith_observatory/layout.json,assets/farm/data/*.json,assets/farm/art/styles.json,assets/farm/presets/*.json,assets/blueprints/**/*.json,assets/avatar/**/*.json,assets/ui/icons/game/LICENSE.txt,assets/ui/icons/lucide/LICENSE,assets/ui/fonts/LICENSE-NotoSansSC.txt,assets/ui/fonts/Nunito-OFL.txt")
 	preset.set_value("preset.0", "exclude_filter", "addons/*,tests/*,assets/avatar/source/*.fbx,tools/*,docs/*,reports/*,artifacts/*,build/*,output/*,server/*,packages/*,tmp/*,native/*,*probe*,*qa_account*,gallery_*.json,.playwright-mcp/*" + ("" if inspect else ",*observer*"))
@@ -48,8 +49,8 @@ func _initialize() -> void:
 	preset.set_value("preset.0.options", "package/name", "Sensen Journey Preview")
 	preset.set_value("preset.0.options", "package/signed", true)
 	preset.set_value("preset.0.options", "command_line/extra_args", "")
-	preset.set_value("preset.0.options", "version/code", VERSION_CODE)
-	preset.set_value("preset.0.options", "version/name", VERSION)
+	preset.set_value("preset.0.options", "version/code", 2026092504 if mine_max_view else VERSION_CODE)
+	preset.set_value("preset.0.options", "version/name", "0.16.41" if mine_max_view else VERSION)
 	assert(preset.save(folder.path_join("export_presets.cfg")) == OK)
 	print("POND_UPDATE_PROJECT ",folder)
 	quit()

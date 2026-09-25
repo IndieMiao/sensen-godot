@@ -177,7 +177,7 @@ func _process(delta: float) -> void:
 	var stick_rect: Rect2 = transform * mine.stick.get_global_rect()
 	var area: Rect2 = transform * mine.world_area()
 	var screen: Vector2 = transform * mine.cam.unproject_position(mine.player.position)
-	var state := {"floor":mine.current_floor(),"targets":targets,"controls":controls,"commands":commands,"moving":mine.mover.is_moving(),
+	var state := {"pid":OS.get_process_id(),"floor":mine.current_floor(),"targets":targets,"controls":controls,"commands":commands,"moving":mine.mover.is_moving(),
 		"busy":mine.busy,"digging":mine._dig_target,"feedback":mine.feedback.text,"player":[mine.player.position.x,mine.player.position.z],"player_screen":[screen.x,screen.y],
 		"stick":[stick_rect.position.x,stick_rect.position.y,stick_rect.size.x,stick_rect.size.y],"bag":mine.bag_sheet!=null and mine.bag_sheet.visible,
 		"zoom":mine.camera_pan.zoom,"pan":[mine.camera_pan.offset.x,mine.camera_pan.offset.z],"camera_size":mine.cam.size,

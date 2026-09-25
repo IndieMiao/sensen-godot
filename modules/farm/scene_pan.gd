@@ -131,11 +131,11 @@ func cancel() -> void:
 	if not free_pan: offset = offset.limit_length(radius)
 	_log_zoom = clampf(_log_zoom, log(min_zoom), log(max_zoom))
 
-func reset() -> void:
+func reset(initial_zoom := 1.0) -> void:
 	cancel()
 	offset = Vector3.ZERO
 	_raw_offset = Vector3.ZERO
-	_log_zoom = clampf(0.0, log(min_zoom), log(max_zoom))
+	_log_zoom = log(clampf(initial_zoom, min_zoom, max_zoom))
 	_raw_zoom = _log_zoom
 
 func handle(event: InputEvent, camera: Camera3D, allow_start := false) -> bool:

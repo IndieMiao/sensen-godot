@@ -35,13 +35,14 @@ func _drag(mine: Node3D, from: Vector2, to: Vector2) -> void:
 	mine.camera_pan.velocity = Vector3.ZERO
 	mine._update_camera()
 
-func test_initial_view_matches_farm_scale_and_allows_chamber_edges_offscreen() -> void:
+func test_initial_view_uses_the_widest_allowed_zoom() -> void:
 	for size in [Vector2i(360,640),Vector2i(390,844),Vector2i(960,720)]:
 		var mine := await _mine(size)
-		assert_float(mine.cam.size).is_equal_approx(Camera.close_view_size(size),0.001)
+		assert_float(mine.camera_pan.zoom).is_equal_approx(mine.camera_pan.min_zoom,0.001)
+		assert_float(mine.cam.size).is_equal_approx(Camera.close_view_size(size)/mine.camera_pan.min_zoom,0.001)
 		var head: Vector2 = mine.cam.unproject_position(mine.player.position+Vector3.UP*1.4)
 		var feet: Vector2 = mine.cam.unproject_position(mine.player.position)
-		assert_float(head.distance_to(feet)).is_greater(50)
+		assert_float(head.distance_to(feet)).is_greater(40)
 		assert_bool(mine.world_area().has_point(feet)).is_true()
 		var outside := 0
 		for corner in 8:
@@ -130,18 +131,24 @@ func test_manual_pan_interrupts_recenter_and_modal_suppresses_portrait() -> void
 	mine._update_camera()
 	assert_bool(mine._focus_button.visible).is_true()
 
-func test_new_floor_frames_arrival_and_suspend_keeps_existing_view() -> void:
+func test_new_floor_restores_widest_view_and_suspend_keeps_custom_zoom() -> void:
 	var mine := await _mine()
 	mine._camera_center += Vector3(7,0,2)
 	mine._update_camera()
+	mine.camera_pan.magnify(mine.cam,mine.world_area().get_center(),1.25)
+	mine.camera_pan.cancel()
+	mine._update_camera()
 	var before: Vector3 = mine._camera_center
+	var zoom: float = mine.camera_pan.zoom
 	mine.suspend()
 	mine.resume()
 	mine._update_camera()
 	assert_vector(mine._camera_center).is_equal(before)
+	assert_float(mine.camera_pan.zoom).is_equal_approx(zoom,0.001)
 	mine.session.state.mine.floor = 2
 	mine._refresh()
 	await get_tree().process_frame
 	mine._update_camera()
 	assert_vector(mine._camera_center).is_equal_approx(mine.player.position+Vector3.UP*0.7,Vector3.ONE*0.001)
+	assert_float(mine.camera_pan.zoom).is_equal_approx(mine.camera_pan.min_zoom,0.001)
 	assert_bool(mine._focus_button.visible).is_false()
