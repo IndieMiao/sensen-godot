@@ -12,6 +12,7 @@ func _initialize() -> void:
 	var integrated := "--integrated" in OS.get_cmdline_user_args()
 	var motion_fix := "--motion-fix" in OS.get_cmdline_user_args()
 	var voice_match := "--voice-match" in OS.get_cmdline_user_args()
+	var farm_home := "--farm-home" in OS.get_cmdline_user_args()
 	if integrated:
 		release_root = "res://output/integrated-release-20260924/release"
 		version = "0.16.36"
@@ -24,6 +25,10 @@ func _initialize() -> void:
 		release_root = "res://output/voice-match-20260925/release"
 		version = "0.16.38"
 		version_code = 2026092501
+	if farm_home:
+		release_root = "res://output/farm-home-2026-09-25/release"
+		version = "0.16.42"
+		version_code = 2026092505
 	var folder := ProjectSettings.globalize_path(release_root.path_join("project"))
 	assert(DirAccess.make_dir_recursive_absolute(folder) == OK)
 	var config := ConfigFile.new()
@@ -64,6 +69,8 @@ func _initialize() -> void:
 		preset.set_value("preset.0", "name", "Android Motion Update")
 	if voice_match:
 		preset.set_value("preset.0", "name", "Android Voice Match Update")
+	if farm_home:
+		preset.set_value("preset.0", "name", "Android Farm Home Update")
 	preset.set_value("preset.0", "custom_features", "")
 	preset.set_value("preset.0", "include_filter", "mapbox_token.txt,assets/ponds/*.json,assets/map/*.json,assets/map/cities/*.json,assets/localization/*.json,assets/landmarks/griffith_observatory/layout.json,assets/farm/data/*.json,assets/farm/art/styles.json,assets/farm/presets/*.json,assets/blueprints/**/*.json,assets/avatar/**/*.json,assets/ui/icons/game/LICENSE.txt,assets/ui/icons/lucide/LICENSE,assets/ui/fonts/LICENSE-NotoSansSC.txt,assets/ui/fonts/Nunito-OFL.txt")
 	preset.set_value("preset.0", "exclude_filter", "addons/*,tests/*,assets/avatar/source/*.fbx,tools/*,docs/*,reports/*,artifacts/*,build/*,output/*,server/*,tmp/*,native/*,*observer*,*probe*,*qa_account*,gallery_*.json,.playwright-mcp/*")
@@ -74,6 +81,8 @@ func _initialize() -> void:
 		preset.set_value("preset.0", "export_path", "../sensen-journey-motion-" + version + ".apk")
 	if voice_match:
 		preset.set_value("preset.0", "export_path", "../sensen-journey-voicematch-" + version + ".apk")
+	if farm_home:
+		preset.set_value("preset.0", "export_path", "../sensen-journey-farm-home-" + version + ".apk")
 	preset.set_value("preset.0.options", "package/unique_name", "com.sensen.journeypreview")
 	preset.set_value("preset.0.options", "package/name", "Sensen Journey Preview")
 	preset.set_value("preset.0.options", "package/signed", true)
@@ -83,7 +92,7 @@ func _initialize() -> void:
 	assert(preset.save(folder.path_join("export_presets.cfg")) == OK)
 	var provenance := {
 		"package": "com.sensen.journeypreview", "version": version, "versionCode": version_code,
-		"project": folder, "client_only": motion_fix or voice_match, "required_backend_feature": "system_ponds_v1", "backend_deployed": motion_fix or voice_match,
+		"project": folder, "client_only": motion_fix or voice_match or farm_home, "required_backend_feature": "system_ponds_v1", "backend_deployed": motion_fix or voice_match or farm_home,
 		"observer_included": false, "qa_feature_enabled": false,
 		"source_files_are_symlinks": true, "original_signing_configuration_retained": true,
 		"source_project_sha256": FileAccess.get_sha256("res://project.godot"),

@@ -10,6 +10,15 @@
   persistent system-property change, global adb shutdown or game-data operation.
   See tools/android/README.md for reconnect guidance.
 
+- Farm-home launch on 2026-09-25: Journey 0.16.42 / 2026092505 (source ab9920e).
+  Cold launch with a usable cached farm skips city select, saves the farm's city and
+  lands the city map on the farm at zoom 16; players without a farm still pick a city.
+  Built from the 0.16.41 release project with only version changes; original
+  certificate 38771d94…, 2127 zip entries identical, only city_select/map_poc scripts
+  changed. Installed on V2509A (readback, 5 identity files, cold login). DMIT + OSS
+  verified; backend unchanged (pond-retirement-20260925/domain 28). Sent to Joey on
+  Slack (APK attachment) and Feishu (Drive link, view-only). No emulator pass.
+  See docs/qa/farm-home-launch-2026-09-25.md.
 - Mine maximum default view on 2026-09-25: Journey 0.16.41 / 2026092504
   (source 2185e00) starts new mine floors/runs/instances at zoom 0.8, the widest
   existing view, 25% wider than before. Retain 0.8–1.4 anchored pinch, free pan,

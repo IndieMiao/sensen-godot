@@ -13,6 +13,12 @@
 
 ## 当前版本
 
+[Journey 0.16.42 / 2026092505](https://download-us.sensenjoy.cn:8443/farm/releases/farm-home-20260925-9c53f5335566/sensen-journey-farm-home-0.16.42.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/farm-home-20260925-9c53f5335566/sensen-journey-farm-home-0.16.42.apk)。
+
+178347467 字节；SHA-256 `9c53f53355669b94936c143bb7d4733f7a33d23491908f72335c1c0607b4e4a4`。已有农场的玩家冷启动跳过选城页，直接进地图并落在自己农场。原签名无观察器；V2509A 覆盖安装、整包回读、身份文件与冷登录核验。两站全量、Range、哈希和清单通过。后端保持 `pond-retirement-20260925` / domain 28。详见 `docs/qa/farm-home-launch-2026-09-25.md`。
+
+## 历史版本 0.16.41
+
 [Journey 0.16.41 / 2026092504](https://download-us.sensenjoy.cn:8443/farm/releases/mine-camera-20260925-24562afc8bc8/sensen-journey-mine-camera-0.16.41.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/mine-camera-20260925-24562afc8bc8/sensen-journey-mine-camera-0.16.41.apk)。
 
 178346759 字节；SHA-256 `24562afc8bc8addd9e9c42461cfd75e7d3941e9a0805f964c177047d4b267754`。矿井新楼层默认最远视野 0.8，宽度增加 25%；保留双指缩放及同层重连／前后台时的自选视角。113 项原生检查、三种尺寸的 36 次 Android 触摸通过。原签名无观察器 APK 已在模拟器和 V2509A 覆盖安装、回读和冷登录核验，各自当前数据保持；新相机完整交互为隔离模拟器证据。两站全量、Range、哈希和清单通过。后端保持 `pond-retirement-20260925` / domain 28，无新迁移。详见 `docs/qa/mine-max-view-2026-09-25.md`。
