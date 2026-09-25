@@ -13,6 +13,12 @@
 
 ## 当前版本
 
+[Journey 0.16.38 / 2026092501](https://download-us.sensenjoy.cn:8443/farm/releases/voicematch-20260925-a651401ae41c/sensen-journey-voicematch-0.16.38.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/voicematch-20260925-a651401ae41c/sensen-journey-voicematch-0.16.38.apk)。
+
+178431631 字节；SHA-256 `a651401ae41ccf19984d4fefbf054ab7ac1753596bb0cb5cf476a36f86423566`。换装页新增 Voice Profile 入口（安卓应用内 WebView 打开 match.sensenapp.com，Gensen 主题、英文），去掉启动 Godot logo。原证书；模拟器覆盖安装保留身份与登录，V2509A 覆盖安装哈希与身份文件核验。服务端保持 integrated-20260924。详见 `docs/qa/voice-match-android-2026-09-25.md`。
+
+## 历史版本 0.16.37
+
 [Journey 0.16.37 / 2026092405](https://download-us.sensenjoy.cn:8443/farm/releases/motion-20260924-b0bf11c1c6cf/sensen-journey-motion-0.16.37.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/motion-20260924-b0bf11c1c6cf/sensen-journey-motion-0.16.37.apk)。
 
 178410560 字节；SHA-256 `b0bf11c1c6cf4e70e04e20dfb556d4455ddea60c316d256a18b2e24b4acf9d96`。修复鱼塘相机距离导致可见角色待机、跑步被冻结，统一动作切换姿势重置。66 项原生检查、124 次模拟器输入和 33 次隔离真机动作输入通过。原签名正式包已在 V2509A 与模拟器覆盖安装、回读与冷登录核验，当前身份和存档保持；两站全量、哈希、Range、清单均通过。服务端保持 integrated-20260924；本轮没有新消息交付。详见 `docs/qa/avatar-motion-2026-09-24.md`。

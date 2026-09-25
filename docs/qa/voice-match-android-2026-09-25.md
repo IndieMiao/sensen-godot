@@ -44,3 +44,18 @@ plus a 600 ms swallow window in `VoiceMatchLink`.
 - Incoming call interruption.
 - Strict mode (server fallback to demo data still on in prod), iOS.
 - Mic-denied notice screen in the Gensen theme (not reachable in headless browser).
+
+## Release 0.16.38 and delivery (2026-09-25)
+
+Source `aaf4585` (farm-dev). Release project from `prepare_system_pond_release.gd --voice-match`;
+original certificate `38771d94…`; 178,431,631 bytes, SHA-256 `a651401a…23566`. Client-only;
+backend stays integrated-20260924 (domain 27). Full suite: 1176 cases, 6 failures, all
+reproduced on unchanged code (visitor farm, touch scroll, app theme ×2, design tokens, stress HUD).
+
+- Emulator: over-install kept identity files, logged in, Voice Profile opens the live Gensen/English page.
+- V2509A: over-install hash and identity files verified; launched to city select (login log not
+  captured on vivo; no taps on the personal phone beyond the installer confirmation).
+- DMIT + OSS: full download hash, Range 206, release.json, SHA256SUMS verified.
+- User requested delivery to Joey: Slack DM with the full APK attachment (file F0C4GEU2HKK);
+  Feishu Drive upload (IM limit 100 MB), view access for Joey only, DM with the link; Drive
+  download hash and message read back. Not a standing authorization for future versions.
