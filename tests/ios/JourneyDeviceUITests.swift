@@ -200,6 +200,64 @@ final class JourneyDeviceUITests: XCTestCase {
         capture("qa-map-after-gestures", application: qaApp)
     }
 
+    /// The TestFlight build this delivery expects. Update per upload; the tests
+    /// refuse to install anything else that TestFlight happens to offer.
+    private let expectedTestFlightVersion = "0.16.42"
+    private let expectedTestFlightBuild = "Build 1"
+
+    private func openTestFlightDetails() -> XCUIApplication {
+        let tf = XCUIApplication(bundleIdentifier: "com.apple.TestFlight")
+        tf.activate()
+        XCTAssertTrue(tf.wait(for: .runningForeground, timeout: 15))
+        let details = tf.scrollViews["AppDetails"]
+        if details.exists {
+            details.swipeDown()
+            details.swipeDown()
+        }
+        return tf
+    }
+
+    private func assertExpectedTestFlightBuild(_ tf: XCUIApplication) {
+        let version = tf.staticTexts["TestFlight.appDetails.shortVersion"]
+        XCTAssertTrue(version.waitForExistence(timeout: 10))
+        XCTAssertTrue(version.label.contains(expectedTestFlightVersion)
+                      && version.label.hasSuffix(expectedTestFlightBuild),
+                      "TestFlight offers \(version.label), not the expected build")
+        XCTAssertEqual(tf.staticTexts["TestFlight.appDetails.title"].label, "Gensen")
+    }
+
+    /// Install only the expected Gensen build and wait for TestFlight's Open.
+    func testInstallExpectedTestFlightBuild() {
+        let tf = openTestFlightDetails()
+        assertExpectedTestFlightBuild(tf)
+        capture("testflight-before-install", application: tf)
+        let install = tf.buttons["TestFlight.offerButton.install"]
+        XCTAssertTrue(install.exists && install.isHittable)
+        install.tap()
+        sleep(3)
+        capture("testflight-after-install-request", application: tf)
+        let system = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        if tf.alerts.count > 0 || system.alerts.count > 0 {
+            capture("testflight-install-alert", application: system)
+            return
+        }
+        let opened = tf.buttons["打开"].firstMatch.waitForExistence(timeout: 120)
+        capture("testflight-install-finished", application: tf)
+        XCTAssertTrue(opened, "TestFlight has not confirmed installation with Open")
+    }
+
+    /// Confirm TestFlight's "already installed" replacement for the expected build.
+    func testConfirmExpectedTestFlightReplacement() {
+        let tf = openTestFlightDetails()
+        assertExpectedTestFlightBuild(tf)
+        let alert = tf.alerts["此 App 已经安装。"]
+        XCTAssertTrue(alert.exists)
+        alert.buttons["安装"].tap()
+        let opened = tf.buttons["打开"].firstMatch.waitForExistence(timeout: 120)
+        capture("testflight-installed", application: tf)
+        XCTAssertTrue(opened, "TestFlight has not confirmed installation with Open")
+    }
+
     private func capture(_ name: String, application: XCUIApplication? = nil) {
         let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         screenshot.name = name
