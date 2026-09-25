@@ -15,7 +15,7 @@
 
 [Journey 0.16.40 / 2026092503](https://download-us.sensenjoy.cn:8443/farm/releases/pond-retirement-20260925-190aa3e7d38f/sensen-journey-pond-retirement-0.16.40.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/pond-retirement-20260925-190aa3e7d38f/sensen-journey-pond-retirement-0.16.40.apk)。
 
-178346711 字节；SHA-256 `190aa3e7d38f810866be0ea1185e1aac5f1582ff608ed903be46288f221cdc09`。农场人工塘退役并恢复地面，真实地理水域和 12 个地图钓鱼点保留；包含鱼塘美术、Voice Profile 与原生 WebView。原包名／原签名／无观察器。后端 `pond-retirement-20260925` / domain 28 / content `761deabf2a207d3e` 已配套上线，77 个农场及资产和历史保留。851 项服务端与 290 项原生检查通过，正式包模拟器覆盖安装、包回读、冷登录及当前身份保留通过；本轮未安装用户手机。两站完整下载、Range、哈希和清单验证通过。详见 `docs/qa/pond-retirement-release-2026-09-25.md`。
+178346711 字节；SHA-256 `190aa3e7d38f810866be0ea1185e1aac5f1582ff608ed903be46288f221cdc09`。农场人工塘退役并恢复地面，真实地理水域和 12 个地图钓鱼点保留；包含鱼塘美术、Voice Profile 与原生 WebView。原包名／原签名／无观察器。后端 `pond-retirement-20260925` / domain 28 / content `761deabf2a207d3e` 已配套上线，77 个农场及资产和历史保留。851 项服务端与 290 项原生检查通过，正式包模拟器覆盖安装、包回读、冷登录及当前身份保留通过；用户随后要求真机安装：同一包已在 V2509A 通过 Tailscale ADB 覆盖安装、整包回读及冷登录核验，5 个当前文件和农场资产保持。两站完整下载、Range、哈希和清单验证通过；不可变清单保留首发状态，后补手机证据详见 `docs/qa/pond-retirement-release-2026-09-25.md`。
 
 ## 历史版本 0.16.38
 

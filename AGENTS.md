@@ -1,5 +1,18 @@
 # Product Direction
 
+- Physical follow-up on 2026-09-25: the user requested installation and enabled
+  Tailscale remote ADB. Fresh discovery confirmed V2509A / serial 10AFAF162200319
+  running 0.16.39. The exact public Journey 0.16.40 / 2026092503 APK is now
+  installed, original-certificate and full-APK-readback verified (190aa3e7d38f…).
+  Current-process cold login and city screenshot passed. Five fresh current
+  identity/choice/language files are byte-identical; outfit, server override and
+  voice-page override remain absent. Preserve the CURRENT 0 cells / 180 coins /
+  4 bag stacks and full farm state, not earlier two-stack snapshots. Display
+  settings retained; runner stopped the app after checking. No farming, catches,
+  relocation, historical restore or full phone gameplay acceptance. The immutable
+  public manifest retains its initial emulator-only status; this later phone
+  evidence is in docs/qa/pond-retirement-release-2026-09-25.md.
+
 - Farm pond retirement released on 2026-09-25 at the user's request: source
   a303b16 fast-forwarded into farm-dev and pushed. Journey 0.16.40 / 2026092503
   retains the original package/certificate, pond art and Voice Profile/WebView.

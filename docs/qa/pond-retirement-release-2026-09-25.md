@@ -37,7 +37,7 @@
 - APK 检查包名、递增版本、签名、启动场景、公开接口、5 个正式 autoload、原用户目录和无观察器／QA 入口。地形及地图鱼塘目录与合并源码一致；Voice Profile 和换装脚本与此前 0.16.39 包逐字节一致。
 - `emulator-5560` 覆盖安装并回读同一 APK；本次冷启动 PID 16256 确认 `logged_in=true has_farm=true`，城市选择页截图已检查。4 个当前身份／选择／偏好文件逐字节一致，另 3 个原本不存在的文件仍不存在。测试进程由 runner 正常停止，模拟器保留。
 
-本轮未安装用户手机、未进行新的真机全玩法或 iOS 验收。此前 0.16.39 的手机验证仍是该包的历史证据，不能作为 0.16.40 的手机验收。未发送新的 Slack／飞书消息。
+首发时未安装用户手机；后续用户要求的真机覆盖安装结果见下文。未进行新的真机全玩法或 iOS 验收，此前 0.16.39 的完整交互结果仍是该包的历史证据。未发送新的 Slack／飞书消息。
 
 原始日志、发布清单、数据保留报告和截图在 [本轮产物目录](../../output/pond-retirement-release-20260925/)；[下载验证](../../output/pond-retirement-release-20260925/release/download/verification.json)、[APK 检查](../../output/pond-retirement-release-20260925/release/artifact-verification.json)、[模拟器验证](../../output/pond-retirement-release-20260925/release/emulator-verification.json)。
 
@@ -46,3 +46,15 @@
 `worktree/rapid-harbor-4666` 的本地和远端分支均已删除，父工作区和嵌套 integration 工作区已移除登记。清理前归档了 **18,543 个文件／链接、5,820,868,433 字节文件内容**，逐文件 SHA-256 或链接目标核对通过；嵌套工作区未提交改动另存二进制补丁。只排除了可重建的 `.godot`、`node_modules` 和 Git 工作区指针，没有丢弃视频、APK、QA 证据或集成改动。
 
 归档位于 [worktree-cleanup-20260925-pond-retirement](../../output/worktree-cleanup-20260925-pond-retirement/)，清单为该目录的 `manifest.json`。主工作区的 `output/pond-pitch-2026-09-25` 与 `output/farm-pond-removal-2026-09-25` 已链接到保留产物，两个此前发送的 MP4 哈希再次核对一致。
+
+## 用户要求的真机后续安装
+
+用户随后要求安装到自己的真机，并授权 Tailscale 远程 ADB。当前 Tailscale 状态及用户提供的无线调试页面确认连接，实际读取设备为 **V2509A / 10AFAF162200319**，安装前为 **0.16.39 / 2026092502**。没有套用历史手机身份快照。
+
+已覆盖安装同一公开 **0.16.40 / 2026092503** APK，原包名与证书保持；从手机完整回读安装包，SHA-256 与公开文件一致。vivo 安装页的应用名、版本和外部来源提示均按当前 UI 树核对，再完成该包的安装确认，没有更改系统安全设置。
+
+安装前、安装后和冷启动后的 `install_key.txt`、`farm_choice.json`、`region_choice.json`、`ui_state.json`、`language.cfg` 五个文件逐字节一致；`avatar/outfit_local.json`、`server.txt`、`voice_match_base_url.txt` 均原本不存在，之后仍不存在。当前服务端农场 **0 个耕作格、180 金币、4 个背包条目**，农场 ID、版本、地形、位置、搬迁状态以及排除时钟的完整 state 一致。背包数量来自本次真机基线，未恢复此前两条目的旧状态。
+
+本次冷启动 PID **6905** 的进程日志确认 `logged_in=true has_farm=true`，无脚本错误或崩溃，城市选择页截图已检查。保持 1080×2344、density 480 和自动亮度模式，未调整显示设置。runner 在检查结束后正常停止游戏进程。没有购买、开垦、鱼获、搬迁或其他资产操作，不代表本轮全玩法真机验收。
+
+[安装回读](../../output/pond-retirement-release-20260925/phone/installation.json) · [真机验证](../../output/pond-retirement-release-20260925/phone/verification.json) · [冷启动画面](../../output/pond-retirement-release-20260925/phone/cold-city.png)。不可变公开 `release.json` 中的 `physical_installation_verified: false` 保留首次发布时的事实，本节记录后续完成的安装与冷登录核验。
