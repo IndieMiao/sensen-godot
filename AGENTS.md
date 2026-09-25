@@ -17,7 +17,8 @@
   certificate 38771d94…, 2127 zip entries identical, only city_select/map_poc scripts
   changed. Installed on V2509A (readback, 5 identity files, cold login). DMIT + OSS
   verified; backend unchanged (pond-retirement-20260925/domain 28). Sent to Joey on
-  Slack (APK attachment) and Feishu (Drive link, view-only). No emulator pass.
+  Slack (APK attachment) and Feishu (Drive link, view-only). Emulator pass added
+  afterwards: skip, city override, missing-cache fallback and page sweep all passed.
   See docs/qa/farm-home-launch-2026-09-25.md.
 - Mine maximum default view on 2026-09-25: Journey 0.16.41 / 2026092504
   (source 2185e00) starts new mine floors/runs/instances at zoom 0.8, the widest
