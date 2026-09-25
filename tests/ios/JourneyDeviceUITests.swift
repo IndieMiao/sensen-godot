@@ -55,6 +55,35 @@ final class JourneyDeviceUITests: XCTestCase {
         capture("06-map-after-pinch")
     }
 
+    /// Players who already own a farm skip city selection: a cold launch must
+    /// reach the native map directly without any city tap. Opens the farm tab
+    /// and returns; it never plants, relocates, purchases, or claims rewards.
+    func testFarmOwnerColdLaunchLandsOnMap() {
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 20))
+        sleep(14)
+        capture("owner-01-cold-launch")
+        XCTAssertTrue(app.buttons["About this map"].exists,
+                      "A farm owner's cold launch did not reach the native map")
+
+        XCUIDevice.shared.press(.home)
+        XCTAssertTrue(app.wait(for: .runningBackground, timeout: 10))
+        app.activate()
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 10))
+        sleep(3)
+        capture("owner-02-foreground-restored")
+
+        // Bottom tab bar Farm entry, then the farm header back button.
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.945)).tap()
+        sleep(10)
+        capture("owner-03-farm")
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.12, dy: 0.09)).tap()
+        sleep(5)
+        XCTAssertEqual(app.state, .runningForeground)
+        capture("owner-04-back-to-map")
+    }
+
     /// Read-only diagnostic for the user's TestFlight invitation issue.
     /// This is separate from Journey gameplay acceptance.
     func testInspectTestFlightInbox() {
