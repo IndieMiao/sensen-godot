@@ -83,6 +83,8 @@ func _ready() -> void:
 	var holder := VBoxContainer.new()
 	holder.alignment = BoxContainer.ALIGNMENT_BEGIN
 	margin.add_child(holder)
+	# The focused field and the button right below it stay above the soft keyboard.
+	KeyboardAvoider.attach(margin, 64.0)
 	var panel := PanelContainer.new()
 	panel.name = "Card"
 	panel.add_theme_stylebox_override("panel", GameUi.panel_style(18))

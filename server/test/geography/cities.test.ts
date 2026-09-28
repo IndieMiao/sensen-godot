@@ -55,6 +55,9 @@ describe('CityCatalog', () => {
     expect(names[0]).toBe('Tokyo');
     expect(catalog.search('shang')[0].id).toBe('shanghai');
     expect(catalog.search('x')).toEqual([]);
+    expect(catalog.search("to'k")[0].name).toBe('Tokyo');
+    expect(catalog.search('xian').map(c => c.name)).toContain('Xi’an');
+    expect(catalog.search("xi'an")[0].name).toBe('Xi’an');
   });
 
   it('gives every city a map bounding box', () => {

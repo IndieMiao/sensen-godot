@@ -126,12 +126,14 @@ export class CityCatalog {
 
   /** 按名字前缀搜（离线兜底；正式搜索走客户端 Mapbox 再回 resolve）。 */
   search(query: string, limit = 10): City[] {
-    const q = query.trim().toLowerCase();
+    // Apostrophes are ignored on both sides: IME pinyin separators ("to'k") and names like Xi'an.
+    const fold = (v: string) => v.toLowerCase().replace(/['’]/g, '');
+    const q = fold(query.trim());
     if (q.length < 2) return [];
     const out: City[] = [];
     for (const c of this.byId.values()) {
       if (this.aliases.has(c.id)) continue;
-      if (c.name.toLowerCase().startsWith(q)) out.push(c);
+      if (fold(c.name).startsWith(q)) out.push(c);
     }
     return out.sort((a, b) => Number(b.curated) - Number(a.curated) || b.population - a.population).slice(0, limit);
   }

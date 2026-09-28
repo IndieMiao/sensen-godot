@@ -124,6 +124,8 @@ func _ready() -> void:
 	_search.placeholder_text = L10n.text("Search for any city")
 	_search.custom_minimum_size = Vector2(0, 48)
 	_search.clear_button_enabled = true
+	# City names are searched in English; this keeps Chinese IMEs out of pinyin composition (vivo 2026-09-28).
+	_search.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_URL
 	_search.text_changed.connect(_on_search_changed)
 	_city_column.add_child(_search)
 	_city_column.move_child(_search, 3)
@@ -163,6 +165,8 @@ func _ready() -> void:
 	_city_card_layer.resized.connect(_layout_city_card)
 	_city_column.minimum_size_changed.connect(_layout_city_card.call_deferred)
 	_layout_city_card.call_deferred()
+	# Keep the search box and its results above the soft keyboard.
+	KeyboardAvoider.attach($SafeArea, MAX_RESULTS * 54.0)
 	if Net and not Net.is_test_process():
 		_load_directory.call_deferred()
 	if Net:
@@ -255,11 +259,12 @@ func _on_search_changed(text: String) -> void:
 	if text.strip_edges().length() < 2:
 		show_results([])
 		_search_timer.stop()
+		status.text = ""
 		return
 	_search_timer.start()
 
 func _run_search() -> void:
-	var query := _search.text.strip_edges()
+	var query := search_query(_search.text)
 	if query.length() < 2: return
 	_search_serial += 1
 	var serial := _search_serial
@@ -273,6 +278,10 @@ func _run_search() -> void:
 	show_results(r.json.get("cities", []) if r.is_success() else [])
 	if r.is_success() and r.json.get("cities", []).is_empty():
 		status.text = L10n.text("No city found. Try another spelling.")
+
+## 输入法拼音分隔符（to'k）与多余空白不算查询内容；服务端同样忽略撇号。
+static func search_query(text: String) -> String:
+	return text.replace("'", "").replace("’", "").strip_edges()
 
 func show_results(views: Array) -> void:
 	for c in _results.get_children(): c.queue_free()
