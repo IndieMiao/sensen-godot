@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # 重建 iOS 工程：导出 Xcode 工程（project-only）并注入地图垫底层。
 # 注入物：G3Spike.mm（启动引导）+ MapUnderlay.swift（Mapbox 垫底 + UDP 桥）
+#        + AppleSignIn.swift（Sign in with Apple 桥 + entitlement，见 inject_apple_sign_in.py）
 #        + Mapbox SPM 依赖（mapbox-maps-ios 11.x）。
 # 前置：Godot 4.7.2 + iOS 导出模板；Xcode 已登录 Apple ID（免费个人团队即可，
 # 首次在 Xcode 打开工程选一次 Team 拿到 TEAM_ID，之后全程命令行）。
@@ -92,6 +93,8 @@ t = t.replace(
 open(p, 'w').write(t)
 print('pbxproj 注入完成（spike + swift + SPM）')
 PYEOF
+
+python3 tools/ios/inject_apple_sign_in.py --project build/ios/sensen.xcodeproj
 
 cat <<'TIP'
 构建装机（TEAM_ID：Xcode 选过一次 Team 后可从 pbxproj grep DEVELOPMENT_TEAM）：

@@ -199,6 +199,46 @@ export class PgStore implements Store {
       throw e;
     } finally { client.release(); }
   }
+  async userByIdentity(provider: string, providerUid: string) {
+    const r = await this.d.pool.query(
+      'SELECT u.* FROM user_identities i JOIN users u ON u.id = i.user_id WHERE i.provider = $1 AND i.provider_uid = $2', [provider, providerUid]);
+    return r.rowCount ? rowToUser(r.rows[0]) : null;
+  }
+  async linkIdentity(provider: string, providerUid: string, userId: string, now: number) {
+    const r = await this.d.pool.query(
+      `INSERT INTO user_identities (provider, provider_uid, user_id, sign_in_provider, created_at) VALUES ($1,$2,$3,$1,$4)
+         ON CONFLICT (provider, provider_uid) DO NOTHING`, [provider, providerUid, userId, now]);
+    if (r.rowCount) return true;
+    const owner = await this.d.pool.query('SELECT user_id FROM user_identities WHERE provider = $1 AND provider_uid = $2', [provider, providerUid]);
+    return owner.rows[0]?.user_id === userId;
+  }
+  async createIdentityUser(provider: string, providerUid: string, email: string | null, now: number) {
+    const client = await this.d.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const inserted = await client.query(
+        `INSERT INTO users (id, email, email_verified, password_hash, created_at, last_seen_at) VALUES ($1,$2,$3,NULL,$4,$4)
+           ON CONFLICT (email) DO NOTHING RETURNING *`, [randomUUID(), email, Boolean(email), now]);
+      if (!inserted.rowCount) { await client.query('ROLLBACK'); return { kind: 'email_taken' as const }; }
+      const user = rowToUser(inserted.rows[0]);
+      // The identity primary key decides concurrent first sign-ins; the loser rolls back its user row.
+      const identity = await client.query(
+        `INSERT INTO user_identities (provider, provider_uid, user_id, sign_in_provider, created_at) VALUES ($1,$2,$3,$1,$4)
+           ON CONFLICT (provider, provider_uid) DO NOTHING`, [provider, providerUid, user.id, now]);
+      if (!identity.rowCount) { await client.query('ROLLBACK'); return { kind: 'identity_taken' as const }; }
+      await client.query('COMMIT');
+      return { kind: 'created' as const, user };
+    } catch (e) {
+      await client.query('ROLLBACK');
+      if ((e as { code?: string }).code === '23505') return { kind: 'email_taken' as const };
+      throw e;
+    } finally { client.release(); }
+  }
+  async identitiesOf(userId: string) {
+    if (!/^[0-9a-f-]{36}$/i.test(userId)) return [];
+    const r = await this.d.pool.query('SELECT provider, provider_uid FROM user_identities WHERE user_id = $1', [userId]);
+    return r.rows.map(row => ({ provider: row.provider as string, provider_uid: row.provider_uid as string }));
+  }
   async userByEmail(email: string) {
     const r = await this.d.pool.query('SELECT * FROM users WHERE email = $1', [email]);
     return r.rowCount ? rowToUser(r.rows[0]) : null;

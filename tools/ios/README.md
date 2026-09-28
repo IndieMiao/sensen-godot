@@ -8,6 +8,8 @@
 | [flatten_app_icons.swift](flatten_app_icons.swift) | 去除导出 AppIcon 的 alpha 通道，保留已有图像内容 |
 | [create_device_ui_project.rb](create_device_ui_project.rb) | 生成独立 XCTest UI runner 工程；输入输出目录和团队 ID |
 | [MapUnderlay.swift](MapUnderlay.swift) | iOS 原生地图桥，含 listener 失败恢复及前台窗口处理 |
+| [AppleSignIn.swift](AppleSignIn.swift) | Sign in with Apple 原生桥（回环 UDP 46465），由 G3Spike.mm 拉起 |
+| [inject_apple_sign_in.py](inject_apple_sign_in.py) | 把 AppleSignIn.swift 编入导出工程并加 `com.apple.developer.applesignin` entitlement；须在 MapUnderlay 注入之后跑，可重复执行 |
 | [JourneyDeviceUITests.swift](../../tests/ios/JourneyDeviceUITests.swift) | 真机截图、基础地图手势和隔离地图恢复回归 |
 
 `setup_ios_g3.sh` 是旧地图 PoC 导出入口；当前应用身份及签名元数据应按上述准备工具和发布流程重新核对。

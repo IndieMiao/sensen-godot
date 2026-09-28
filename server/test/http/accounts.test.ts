@@ -15,6 +15,11 @@ import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/doma
 import { CENTER, fixtureGeography, geographicPoint } from '../geography/fixtures.js';
 import type { FarmLocation } from '../../src/http/farm_location.js';
 import type { Mailer } from '../../src/accounts/mailer.js';
+import { makeKeys, signToken } from '../fixtures/firebase_tokens.js';
+import { sha256Hex } from '../../src/accounts/apple_token.js';
+
+const APPLE_KEYS = makeKeys('apple-test');
+const APPLE_NONCE = 'raw-nonce-0123456789abcdef';
 
 const DSN = process.env.TEST_DATABASE_URL;
 const content = loadContent(DEFAULT_CONTENT_DIR);
@@ -37,6 +42,7 @@ const makers: [string, boolean, (now: () => number) => Store][] = [
 for (const [name, enabled, makeStore] of makers) {
   describe.skipIf(!enabled)(`${name}: accounts, guests and global cities`, () => {
     let app: FastifyInstance;
+    let store: Store;
     let clock = Date.UTC(2026, 8, 28, 2);
     let mail: { email: string; code: string; purpose: string }[] = [];
     const mailer: Mailer = { async sendCode(email, code, purpose) { mail.push({ email, code, purpose }); } };
@@ -46,9 +52,11 @@ for (const [name, enabled, makeStore] of makers) {
       if (pool) await truncateAll(pool);
       mail = [];
       clock = Date.UTC(2026, 8, 28, 2);
-      app = await buildApp({ store: makeStore(() => clock), content, contentVersion: CV, blueprintDir: path.join(ROOT, 'assets', 'blueprints'),
+      store = makeStore(() => clock);
+      app = await buildApp({ store, content, contentVersion: CV, blueprintDir: path.join(ROOT, 'assets', 'blueprints'),
         regionsFile: REGIONS, pepper: 'test-pepper', now: () => clock, mailer, ipLocator,
         qaEmailDomain: 'qa.sensen.test', qaEmailCode: '424242',
+        apple: { audiences: ['app.gensen.maps'], keys: APPLE_KEYS.keys },
         geographyProvider: async location => landAt(location) });
     });
     afterEach(async () => { await app.close(); });
@@ -304,6 +312,62 @@ for (const [name, enabled, makeStore] of makers) {
       expect(text).not.toContain('scrypt$');
       expect(text).not.toContain(body.token);
       expect(exported.json().farm.city_id).toMatch(/^gn-/);
+    });
+    const appleToken = (sub: string, over: Record<string, unknown> = {}) => {
+      const s = Math.floor(clock / 1000);
+      return signToken(APPLE_KEYS, { iss: 'https://appleid.apple.com', aud: 'app.gensen.maps', sub, iat: s, exp: s + 600,
+        nonce: sha256Hex(APPLE_NONCE), ...over });
+    };
+    const apple = (token: string, extra: Record<string, unknown> = {}) =>
+      app.inject({ method: 'POST', url: '/v1/auth/apple', payload: { identity_token: token, nonce: APPLE_NONCE, ...extra } });
+
+    it('signs in with Apple, creating a password-less account once', async () => {
+      const first = await apple(appleToken('apple.sub.1', { email: 'relay1@privaterelay.appleid.com', email_verified: 'true' }),
+        { given_name: 'Avery', family_name: 'Lee' });
+      expect(first.statusCode).toBe(201);
+      expect(first.json()).toMatchObject({ created: true, has_password: false, email: 'relay1@privaterelay.appleid.com',
+        email_verified: true, display_name: 'Avery', profile_complete: true });
+      // Apple sends the email only on the first authorization; later tokens carry just the sub.
+      const again = await apple(appleToken('apple.sub.1'));
+      expect(again.statusCode).toBe(200);
+      expect(again.json()).toMatchObject({ created: false, user_id: first.json().user_id, player_id: first.json().player_id });
+      const me = await app.inject({ method: 'GET', url: '/v1/users/me', headers: bearer(again.json().token) });
+      expect(me.json()).toMatchObject({ user_id: first.json().user_id, display_name: 'Avery' });
+    });
+
+    it('links Apple to a verified email account and refuses an unverified one', async () => {
+      await register('sam@example.com');
+      const blocked = await apple(appleToken('apple.sub.2', { email: 'sam@example.com', email_verified: true }));
+      expect(blocked.statusCode).toBe(409);
+      expect(blocked.json().code).toBe('EMAIL_IN_USE');
+      await app.inject({ method: 'POST', url: '/v1/auth/email/code', payload: { email: 'sam@example.com', purpose: 'reset' } });
+      const code = mail.find(m => m.purpose === 'reset')!.code;
+      const reset = await app.inject({ method: 'POST', url: '/v1/auth/email/reset', payload: { email: 'sam@example.com', code, password: 'another pass 1' } });
+      const linked = await apple(appleToken('apple.sub.2', { email: 'sam@example.com', email_verified: true }));
+      expect(linked.statusCode).toBe(200);
+      expect(linked.json()).toMatchObject({ user_id: reset.json().user_id, has_password: true, created: false });
+    });
+
+    it('rejects bad Apple tokens without creating anyone', async () => {
+      const wrongNonce = await app.inject({ method: 'POST', url: '/v1/auth/apple',
+        payload: { identity_token: appleToken('apple.sub.3'), nonce: 'another-nonce-0123456789' } });
+      expect(wrongNonce.statusCode).toBe(401);
+      expect(wrongNonce.json().code).toBe('APPLE_TOKEN_BAD_NONCE');
+      expect((await apple(appleToken('apple.sub.3', { aud: 'com.evil' }))).json().code).toBe('APPLE_TOKEN_BAD_AUDIENCE');
+      expect((await apple('not-a-token')).json().code).toBe('APPLE_TOKEN_MALFORMED');
+      expect((await apple(appleToken('apple.sub.3'))).json().created).toBe(true);
+    });
+
+    it('deletes an Apple account without a password and queues token revocation', async () => {
+      const body = (await apple(appleToken('apple.sub.4'))).json();
+      const gone = await app.inject({ method: 'DELETE', url: '/v1/users/me', headers: bearer(body.token) });
+      expect(gone.json()).toMatchObject({ ok: true, deleted: true });
+      const tomb = await store.deletion(body.user_id);
+      expect(tomb).toMatchObject({ provider_uid: 'apple:apple.sub.4', apple_revocation: 'pending', source: 'app' });
+      // A fresh Apple sign-in after deletion starts a brand-new account.
+      const back = (await apple(appleToken('apple.sub.4'))).json();
+      expect(back.created).toBe(true);
+      expect(back.user_id).not.toBe(body.user_id);
     });
   });
 }

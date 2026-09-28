@@ -192,3 +192,18 @@ R1（SGODOT-56）级联补农场域：farms、farm_snapshots、commands、farm_c
 - 注册无人机验证；邮箱验证不强制（可被抢注，靠找回密码夺回）。
 - 改邮箱（服务端与客户端都没做）；数据导出、"退出所有设备"（服务端有接口，客户端没有入口）。
 - 真机软键盘与输入法测试。
+
+## 9. 第三批：Sign in with Apple（2026-09-28）
+
+- **服务端** `POST /v1/auth/apple {identity_token, nonce, given_name?, family_name?}`：RS256 + Apple JWKS（`appleid.apple.com/auth/keys`）验签，
+  校验 iss、aud ∈ `APPLE_BUNDLE_IDS`（默认 `app.gensen.maps`）、exp、签发不超过 10 分钟、`nonce == sha256(原始 nonce)`。
+  找号顺序：Apple sub → Apple 验证过的邮箱对应的**已验证**邮箱账号（挂身份）→ 新建无密码账号。邮箱被未验证账号占着回 `EMAIL_IN_USE`（防抢注劫持）。
+  Apple 只在首次授权给名字，用作默认昵称。所有账号回包新增 `has_password`。
+- **删号**：Apple 账号无密码，应用内删号不要密码；墓碑 `provider_uid = apple:<sub>`、`apple_revocation = pending`。
+  真正调 Apple `/auth/revoke` 需要 Sign in with Apple 私钥（.p8）生成 client secret，**未做**，上架前补。
+- **iOS 原生**：`tools/ios/AppleSignIn.swift` 监听回环 UDP 46465，收 `APPLE|<nonce 哈希>` 弹系统授权，回 `APPLE_OK|token|名|姓|邮箱` 或 `APPLE_ERR|原因`。
+  `inject_apple_sign_in.py` 编入工程并加 entitlement；自动签名 + `-allowProvisioningUpdates` 会给 App ID 开能力，若团队权限不够需在开发者后台手动勾 Sign in with Apple。
+- **客户端**：iOS 上登录 / 注册页第二个按钮是黑色 "Sign in with Apple"；无密码账号隐藏"改密码"、删号不要密码、无邮箱时显示 "Signed in with Apple"。
+  取消授权不提示。按钮暂无 Apple 标志（Apple 人机指南要求自绘按钮带 logo），上架前换官方素材或原生 ASAuthorizationAppleIDButton。
+- **验证**：服务端 925 例全绿（含 PG）；客户端新增 8 例全绿，全量只剩 8 个既有基线失败；Swift 对 iOS SDK 类型检查通过；注入脚本对 0.16.42 发布工程副本重复执行结果一致。
+  **尚未真机验证**（需要 iPhone，且 Apple ID 登录的 Xcode 能为 XN4Z77ZX73 团队开此能力）。

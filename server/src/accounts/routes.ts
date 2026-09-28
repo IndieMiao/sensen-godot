@@ -16,6 +16,8 @@ import { CODE_MAX_ATTEMPTS, CODE_RESEND_MS, CODE_TTL_MS, codeHash, emailKey, isC
 import type { Mailer } from './mailer.js';
 import { ageOn, parseProfile } from './profile.js';
 import { DELETE_PAGE_HTML } from './delete_page.js';
+import { verifyAppleIdToken, type AppleVerifyOptions } from './apple_token.js';
+import { IdTokenError } from './firebase_token.js';
 
 export interface AccountRouteDeps {
   store: Store;
@@ -30,6 +32,8 @@ export interface AccountRouteDeps {
   /** 删号前清理该玩家的联机状态（离队、离房）。 */
   beforeDelete?: (playerId: string) => Promise<void>;
   log?: (line: string) => void;
+  /** Sign in with Apple；不配则 /v1/auth/apple 回 503。 */
+  apple?: Omit<AppleVerifyOptions, 'now'>;
 }
 
 export function userView(u: UserRow, player?: PlayerRow, now = Date.now()) {
@@ -39,6 +43,8 @@ export function userView(u: UserRow, player?: PlayerRow, now = Date.now()) {
     birth_date: u.birth_date ?? null, age: u.birth_date ? ageOn(u.birth_date, now) : null,
     // A nickname is the only required profile field; the client asks for it before the first farm.
     profile_complete: Boolean(u.display_name),
+    // Apple-only accounts have no password: the app hides password steps for them.
+    has_password: Boolean(u.password_hash),
     ...(player ? { player_id: player.id } : {}),
   };
 }
@@ -125,6 +131,52 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     return reply.send({ token: session.token, ...userView(user, session.player, deps.now()), server_time: deps.now() });
   });
 
+  /**
+   * Sign in with Apple。按 Apple sub 找号；没有就按 Apple 验证过的邮箱挂到已验证的邮箱账号上，
+   * 再没有就建一个无密码账号。邮箱被一个**未验证**的账号占着时不挂：那个账号可能是别人抢注的。
+   * Apple 只在首次授权时给名字，客户端顺带发来，用作默认昵称。
+   */
+  app.post('/v1/auth/apple', { config: { rateLimit: { max: 60, timeWindow: '1 hour' } } }, async (req, reply) => {
+    if (!deps.apple) return reply.code(503).send({ code: 'APPLE_UNAVAILABLE', server_time: deps.now() });
+    const body = req.body as { identity_token?: unknown; nonce?: unknown; given_name?: unknown; family_name?: unknown } | undefined;
+    let identity;
+    try { identity = await verifyAppleIdToken(body?.identity_token, body?.nonce, { ...deps.apple, now: deps.now }); }
+    catch (error) {
+      if (error instanceof IdTokenError) return reply.code(401).send({ code: 'APPLE_TOKEN_' + error.code, server_time: deps.now() });
+      log(`[apple] verify failed: ${(error as Error).message}`);
+      return reply.code(503).send({ code: 'APPLE_UNAVAILABLE', server_time: deps.now() });
+    }
+    const email = identity.emailVerified ? normalizeEmail(identity.email) : null;
+    let user = await deps.store.userByIdentity('apple', identity.sub);
+    let created = false;
+    if (!user && email) {
+      const existing = await deps.store.userByEmail(email);
+      if (existing) {
+        if (!existing.email_verified) return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
+        await deps.store.linkIdentity('apple', identity.sub, existing.id, deps.now());
+        user = await deps.store.userByIdentity('apple', identity.sub);
+      }
+    }
+    if (!user) {
+      const made = await deps.store.createIdentityUser('apple', identity.sub, email, deps.now());
+      if (made.kind === 'created') { user = made.user; created = true; }
+      else if (made.kind === 'identity_taken') user = await deps.store.userByIdentity('apple', identity.sub);
+      else return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
+      if (!user) return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
+    }
+    if (!user.display_name && typeof body?.given_name === 'string') {
+      const parsed = parseProfile({ display_name: body.given_name.trim() }, deps.now());
+      if (parsed.ok) {
+        await deps.store.updateUserProfile(user.id, { ...parsed.profile, gender: user.gender ?? null,
+          gender_custom: user.gender_custom ?? null, birth_date: user.birth_date ?? null });
+        user = { ...user, display_name: parsed.profile.display_name };
+      }
+    }
+    const session = await deps.store.authUser(user.id, deps.now());
+    return reply.code(created ? 201 : 200).send({ token: session.token, ...userView(user, session.player, deps.now()),
+      created, server_time: deps.now() });
+  });
+
   /** 发码：verify（已登录账号验证邮箱）或 reset（找回密码）。邮箱不存在也回 200。 */
   app.post('/v1/auth/email/code', { config: { rateLimit: { max: 60, timeWindow: '1 hour' } } }, async (req, reply) => {
     if (await limited(codeLimit, req, reply)) return;
@@ -174,9 +226,12 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
   const deleteUserEverywhere = async (user: UserRow, source: 'app' | 'web') => {
     const players = await deps.store.authUser(user.id, deps.now()).then(s => [s.player.id]).catch(() => [] as string[]);
     for (const id of players) { await deps.beforeDelete?.(id); await deps.closeSessions?.(id); }
+    // Apple asks apps to revoke the user's token on deletion; that needs a client secret we do not hold yet, so it is queued.
+    const apple = (await deps.store.identitiesOf(user.id)).find(i => i.provider === 'apple');
     return deps.store.deleteUser(user.id, {
-      user_id: user.id, provider_uid: user.email ? 'email:' + emailKey(user.email, deps.pepper) : 'none',
-      requested_at: deps.now(), source, apple_revocation: 'n/a',
+      user_id: user.id,
+      provider_uid: apple ? 'apple:' + apple.provider_uid : user.email ? 'email:' + emailKey(user.email, deps.pepper) : 'none',
+      requested_at: deps.now(), source, apple_revocation: apple ? 'pending' : 'n/a',
     });
   };
 

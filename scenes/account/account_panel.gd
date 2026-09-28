@@ -23,6 +23,8 @@ var busy := false
 ## 从"我的账号"进入的子页面，保存 / 返回后回到账号页；从登录流程进入的则直接关闭。
 var from_account := false
 var _reset_code_sent := false
+## 测试替身：func(nonce_hash) -> 原生回包；空则走 iOS 原生桥。
+var apple_transport: Callable = Callable()
 
 var _title: Label
 var _subtitle: Label
@@ -221,11 +223,11 @@ func set_mode(next: String) -> void:
 		"sign_in":
 			_show([_email, _password, _show_passwords])
 			_texts("Sign in", reason if not reason.is_empty() else "Sign in with your email to keep your farm on every device.")
-			_set_actions([["sign_in", "Sign in", "accent"], ["to_sign_up", "Create an account"], ["to_forgot", "Forgot password?"]])
+			_set_actions(_with_apple([["sign_in", "Sign in", "accent"], ["to_sign_up", "Create an account"], ["to_forgot", "Forgot password?"]]))
 		"sign_up":
 			_show([_email, _password, _confirm_password, _show_passwords])
 			_texts("Create account", reason if not reason.is_empty() else "Your farm is saved to this account.")
-			_set_actions([["sign_up", "Create account", "accent"], ["to_sign_in", "I already have an account"]])
+			_set_actions(_with_apple([["sign_up", "Create account", "accent"], ["to_sign_in", "I already have an account"]]))
 		"forgot":
 			if _reset_code_sent:
 				_show([_email, _code, _new_password, _confirm_password, _show_passwords])
@@ -253,27 +255,34 @@ func set_mode(next: String) -> void:
 		"account":
 			_show([])
 			_texts("My account", _account_summary(account))
-			var actions := [["done", "Done", "accent"], ["edit_profile", "Edit profile"], ["to_password", "Change password"]]
-			if not account.email_verified: actions.append(["start_verify", "Verify email"])
+			var actions := [["done", "Done", "accent"], ["edit_profile", "Edit profile"]]
+			# Apple-only accounts have no password to change; "Forgot password" can add one later.
+			if account.has_password: actions.append(["to_password", "Change password"])
+			if not account.email_verified and not account.email.is_empty(): actions.append(["start_verify", "Verify email"])
 			actions.append(["sign_out", "Sign out"])
 			actions.append(["delete", "Delete account", "danger_link"])
 			_set_actions(actions)
 		"delete":
-			_show([_password])
 			_password.text = ""
 			_password.placeholder_text = L10n.text("Password")
-			_texts("Delete account?", "This permanently deletes your account and your farm. Enter your password to confirm.")
+			if account.has_password:
+				_show([_password])
+				_texts("Delete account?", "This permanently deletes your account and your farm. Enter your password to confirm.")
+			else:
+				_show([])
+				_texts("Delete account?", "This permanently deletes your account and your farm. This can't be undone.")
 			_set_actions([["delete_now", "Delete permanently", "danger"], ["to_account", "Keep my account"]])
 
 func _account_summary(account: AccountSession) -> String:
 	var lines := []
 	if not account.display_name.is_empty(): lines.append(account.display_name)
-	lines.append(account.email)
-	var extra := [L10n.text("Verified" if account.email_verified else "Not verified yet")]
+	lines.append(account.email if not account.email.is_empty() else L10n.text("Signed in with Apple"))
+	var extra := []
+	if not account.email.is_empty(): extra.append(L10n.text("Verified" if account.email_verified else "Not verified yet"))
 	var g := AccountSession.gender_label(account.gender, account.gender_custom)
 	if not g.is_empty(): extra.append(L10n.text(g) if account.gender != "self_describe" else g)
 	if account.age >= 0: extra.append(L10n.format_text("Age %d", account.age))
-	lines.append(" · ".join(extra))
+	if not extra.is_empty(): lines.append(" · ".join(extra))
 	return "\n".join(lines)
 
 func _fill_profile(account: AccountSession) -> void:
@@ -305,6 +314,11 @@ func _texts(title: String, subtitle: String) -> void:
 	_title.text = L10n.text(title)
 	_subtitle.text = L10n.text(subtitle)
 
+## iOS 上登录 / 注册页都给 Apple 登录，紧跟主按钮（App Store 4.8：与其它登录方式同等显眼）。
+func _with_apple(list: Array) -> Array:
+	if AppleSignIn.available(): list.insert(1, ["apple", "Sign in with Apple", "apple"])
+	return list
+
 ## 每项 [动作 id, 文案, 样式]：accent 主按钮、danger 红色主按钮、danger_link 红字次按钮。
 func _set_actions(list: Array) -> void:
 	for c in _actions.get_children():
@@ -317,15 +331,22 @@ func _set_actions(list: Array) -> void:
 		b.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size.y = 48 if style in ["accent", "danger"] else 44
 		if style == "danger": _paint_danger(b)
+		if style == "apple":
+			b.custom_minimum_size.y = 48
+			_paint_solid(b, Color.BLACK)
 		if style == "danger_link": b.add_theme_color_override("font_color", GameUi.CORAL)
 		b.pressed.connect(_on_action.bind(str(spec[0])))
 		_actions.add_child(b)
 
 ## 删除确认的主按钮是珊瑚红，不能和"注册 / 登录"用同一种绿色。
 func _paint_danger(b: Button) -> void:
+	_paint_solid(b, GameUi.CORAL)
+
+## 实心色按钮、白字：删除用珊瑚红，Apple 登录按 Apple 规范用黑色。
+func _paint_solid(b: Button, fill: Color) -> void:
 	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
-		var style := GameUi.surface(GameUi.CORAL, 10, 14)
-		if state == "pressed": style.bg_color = GameUi.CORAL.darkened(0.12)
+		var style := GameUi.surface(fill, 10, 14)
+		if state == "pressed": style.bg_color = fill.lightened(0.15) if fill.v < 0.2 else fill.darkened(0.12)
 		b.add_theme_stylebox_override(state, style)
 	for color in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		b.add_theme_color_override(color, Color.WHITE)
@@ -356,6 +377,7 @@ func _on_action(id: String) -> void:
 	if busy: return
 	match id:
 		"sign_in": await _submit_login(false)
+		"apple": await _submit_apple()
 		"sign_up": await _submit_login(true)
 		"to_sign_up": set_mode("sign_up")
 		"to_sign_in":
@@ -441,6 +463,22 @@ func _submit_login(create: bool) -> void:
 	_confirm_password.text = ""
 	if create and not Net.account.email_verified: set_mode("verify")
 	else: _after_sign_in()
+
+func _submit_apple() -> void:
+	_set_busy(true)
+	_say("Signing in…", true)
+	var nonce := AppleSignIn.new_nonce()
+	var native := await AppleSignIn.authorize(nonce, apple_transport)
+	var result := native
+	if native.ok:
+		result = await AccountSession.apple_sign_in(Net.client, str(native.identity_token), nonce,
+			str(native.given_name), str(native.family_name))
+		if result.ok: result.ok = await Net.sign_in_with(result.body)
+	_set_busy(false)
+	if not result.ok:
+		_say(AccountSession.describe(str(result.code)))
+		return
+	_after_sign_in()
 
 func _send_reset_code() -> void:
 	var email := _email.text.strip_edges()
@@ -551,7 +589,7 @@ func _submit_password_change() -> void:
 	_say("Password changed.", true)
 
 func _submit_delete() -> void:
-	if _password.text.is_empty():
+	if Net.account.has_password and _password.text.is_empty():
 		_say("Enter your password.")
 		return
 	_set_busy(true)

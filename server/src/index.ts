@@ -12,6 +12,8 @@ import { voiceConfig } from './realtime/voice.js';
 import { CityCatalog } from './geography/cities.js';
 import { createMmdbIpLocator, type IpLocator } from './geography/ip_locator.js';
 import { mailerFromEnv } from './accounts/mailer.js';
+import { appleJwksFetcher } from './accounts/apple_token.js';
+import { CachedJwks } from './accounts/firebase_token.js';
 
 const need = (k: string): string => {
   const v = process.env[k];
@@ -67,6 +69,14 @@ for (const spec of PRESET_SPECS) {
   await store.ensureSystemFarm(presetHmac(spec.id ?? spec.layout), buildPresetFarm(spec, plot, content, tz, Date.now()));
 }
 
+/** APPLE_BUNDLE_IDS lists the iOS bundle ids allowed as token audience; empty turns Apple sign-in off. */
+function appleConfig() {
+  const audiences = (process.env.APPLE_BUNDLE_IDS ?? 'app.gensen.maps').split(',').map(v => v.trim()).filter(Boolean);
+  if (!audiences.length) return undefined;
+  const jwks = new CachedJwks(appleJwksFetcher(), () => Date.now());
+  return { audiences, keys: jwks.keys, refreshKeys: jwks.refresh };
+}
+
 const app = await buildApp({
   store, content, contentVersion: cv,
   blueprintDir: BLUEPRINT_DIR, regionsFile: path.join(CONTENT_DIR, 'regions.json'),
@@ -80,6 +90,7 @@ const app = await buildApp({
   cities, ipLocator,
   mailer: mailerFromEnv(process.env),
   qaEmailDomain: process.env.QA_EMAIL_DOMAIN, qaEmailCode: process.env.QA_EMAIL_CODE,
+  apple: appleConfig(),
   // Only a development server may let guests write; production keeps guests read-only.
   guestWrites: process.env.GUEST_WRITES === '1',
 });

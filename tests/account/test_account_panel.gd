@@ -154,3 +154,73 @@ func test_filled_fields_keep_a_caption() -> void:
 	assert_bool(caption.visible).is_true()
 	assert_str(caption.text).is_equal("Current password")
 	p.queue_free()
+
+const APPLE_ACCOUNT := "user://test_account_panel_apple.json"
+
+func _apple_net(responses: Array) -> FakeTransport:
+	var t := FakeTransport.new(responses)
+	Net.use_transport(t.callable())
+	Net.account_path = APPLE_ACCOUNT
+	return t
+
+func _restore_net() -> void:
+	AppleSignIn.force_available = false
+	Net.account.clear(APPLE_ACCOUNT)
+	Net.account_path = AccountSession.PATH
+
+func test_apple_button_follows_the_primary_action_only_on_ios() -> void:
+	var p := _panel()
+	assert_array(_actions(p)).not_contains(["apple"])
+	AppleSignIn.force_available = true
+	p.set_mode("sign_in")
+	assert_array(_actions(p)).contains_exactly(["sign_in", "apple", "to_sign_up", "to_forgot"])
+	p.set_mode("sign_up")
+	assert_str(_actions(p)[1]).is_equal("apple")
+	p.queue_free()
+	_restore_net()
+
+func test_apple_sign_in_sends_the_raw_nonce_and_adopts_a_password_less_account() -> void:
+	AppleSignIn.force_available = true
+	var t := _apple_net([{"status": 201, "json": {"token": "apple-token", "user_id": "u-apple", "player_id": "p-apple",
+		"email": null, "email_verified": false, "display_name": "Avery", "profile_complete": true, "has_password": false, "created": true}}])
+	var p := _panel()
+	var hashes := []
+	p.apple_transport = func(hash: String) -> String:
+		hashes.append(hash)
+		return "APPLE_OK|id.token.sig|Avery|Lee|"
+	await p._submit_apple()
+	var body: Dictionary = t.requests[0].body
+	assert_str(t.requests[0].url).ends_with("/auth/apple")
+	assert_str(body.identity_token).is_equal("id.token.sig")
+	assert_str(str(body.nonce).sha256_text()).is_equal(hashes[0])
+	assert_str(body.given_name).is_equal("Avery")
+	assert_str(Net.account.user_id).is_equal("u-apple")
+	assert_bool(Net.account.has_password).is_false()
+	assert_bool(p.is_queued_for_deletion()).is_true()
+	_restore_net()
+
+func test_cancelled_apple_sheet_is_silent_and_calls_no_server() -> void:
+	AppleSignIn.force_available = true
+	var t := _apple_net([])
+	var p := _panel()
+	p.apple_transport = func(_hash: String) -> String: return "APPLE_ERR|canceled"
+	await p._submit_apple()
+	assert_array(t.requests).is_empty()
+	assert_str(_status(p)).is_empty()
+	assert_bool(p.busy).is_false()
+	p.queue_free()
+	_restore_net()
+
+func test_password_less_account_hides_password_steps() -> void:
+	_sign_in_locally("Avery")
+	Net.account.email = ""
+	Net.account.has_password = false
+	var p := _panel("account")
+	assert_array(_actions(p)).not_contains(["to_password", "start_verify"])
+	assert_str(p._subtitle.text).contains("Signed in with Apple")
+	p.set_mode("delete")
+	assert_array(_visible_fields(p)).is_empty()
+	assert_str(p._subtitle.text).contains("can't be undone")
+	p.queue_free()
+	Net.account.has_password = true
+	Net.account.email = "ada@example.com"

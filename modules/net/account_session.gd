@@ -15,6 +15,8 @@ var user_id := ""
 var player_id := ""
 var email := ""
 var email_verified := false
+## Apple 首登建的号没有密码：界面不显示改密、删号不要密码。
+var has_password := true
 ## 账号资料（2026-09-28）：昵称必填；性别、生日选填。
 var display_name := ""
 var gender := ""
@@ -44,6 +46,7 @@ func _reset_fields() -> void:
 	player_id = ""
 	email = ""
 	email_verified = false
+	has_password = true
 	display_name = ""
 	gender = ""
 	gender_custom = ""
@@ -60,6 +63,7 @@ func load_saved(path := PATH) -> bool:
 	player_id = str(parsed.get("player_id", ""))
 	email = str(parsed.get("email", ""))
 	email_verified = bool(parsed.get("email_verified", false))
+	has_password = bool(parsed.get("has_password", true))
 	_adopt_profile(parsed)
 	return signed_in()
 
@@ -67,7 +71,7 @@ func save(path := PATH) -> bool:
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	if f == null: return false
 	f.store_string(JSON.stringify({"token": token, "user_id": user_id, "player_id": player_id,
-		"email": email, "email_verified": email_verified, "display_name": display_name, "gender": gender,
+		"email": email, "email_verified": email_verified, "has_password": has_password, "display_name": display_name, "gender": gender,
 		"gender_custom": gender_custom, "birth_date": birth_date, "age": age}))
 	f.close()
 	return true
@@ -84,6 +88,7 @@ func adopt(body: Dictionary, path := PATH) -> void:
 	player_id = str(body.get("player_id", player_id))
 	email = str(body.get("email", email)) if body.get("email") != null else email
 	email_verified = bool(body.get("email_verified", email_verified))
+	has_password = bool(body.get("has_password", has_password))
 	_adopt_profile(body)
 	save(path)
 
@@ -123,6 +128,10 @@ static func describe(code: String) -> String:
 		"SAME_PASSWORD": return "Choose a password different from your current one."
 		"PASSWORD_MISMATCH": return "The two passwords don't match."
 		"TRANSPORT": return "Can't reach the server. Check your connection."
+		"EMAIL_IN_USE": return "This email already has an account. Sign in with your email and password first."
+		"APPLE_CANCELED": return ""
+		"APPLE_UNAVAILABLE", "APPLE_NOT_HANDLED", "APPLE_TIMEOUT": return "Sign in with Apple isn't available right now."
+	if code.begins_with("APPLE_"): return "Sign in with Apple failed. Please try again."
 	return "Something went wrong. Please try again."
 
 ## 以下接口只发请求、回 {ok, code, body}；token 切换由 NetService 负责。
@@ -141,6 +150,11 @@ static func verify(client: ApiClient, code: String) -> Dictionary:
 static func reset(client: ApiClient, p_email: String, code: String, password: String) -> Dictionary:
 	return _result(await client.request("POST", "/auth/email/reset",
 		{"email": p_email.strip_edges(), "code": code.strip_edges(), "password": password}))
+
+## Apple 首次授权才给名字，顺带发上去作为默认昵称。
+static func apple_sign_in(client: ApiClient, identity_token: String, nonce: String, given_name := "", family_name := "") -> Dictionary:
+	return _result(await client.request("POST", "/auth/apple", {"identity_token": identity_token, "nonce": nonce,
+		"given_name": given_name, "family_name": family_name}))
 
 static func me(client: ApiClient) -> Dictionary:
 	return _result(await client.request("GET", "/users/me"))

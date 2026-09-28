@@ -16,6 +16,12 @@
         } else {
             NSLog(@"[G3Spike] MapUnderlay 类缺失（Swift 文件未编入？）");
         }
+        Class apple = NSClassFromString(@"AppleSignIn");
+        if (apple) {
+            [apple performSelector:@selector(setup)];
+        } else {
+            NSLog(@"[G3Spike] AppleSignIn 类缺失（Swift 文件未编入？）");
+        }
     });
 }
 @end

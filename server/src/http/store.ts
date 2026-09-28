@@ -71,6 +71,14 @@ export interface Store extends RealtimePersistence {
   /** 建邮箱账号（含 email 身份行）。邮箱已被占用返回 email_taken，不覆盖。 */
   createEmailUser(email: string, passwordHash: string, now: number): Promise<{ kind: 'created'; user: UserRow } | { kind: 'email_taken' }>;
   userByEmail(email: string): Promise<UserRow | null>;
+  /** 第三方身份（'apple' 等）对应的账号。 */
+  userByIdentity(provider: string, providerUid: string): Promise<UserRow | null>;
+  /** 给已有账号挂一条第三方身份；该身份已属于别人返回 false。 */
+  linkIdentity(provider: string, providerUid: string, userId: string, now: number): Promise<boolean>;
+  /** 只凭第三方身份建号（无密码）。email 由提供方验证过才传；邮箱或身份已被占用时不建。 */
+  createIdentityUser(provider: string, providerUid: string, email: string | null, now: number):
+    Promise<{ kind: 'created'; user: UserRow } | { kind: 'identity_taken' } | { kind: 'email_taken' }>;
+  identitiesOf(userId: string): Promise<{ provider: string; provider_uid: string }[]>;
   userById(userId: string): Promise<UserRow | null>;
   setUserPassword(userId: string, passwordHash: string): Promise<void>;
   markEmailVerified(userId: string): Promise<void>;

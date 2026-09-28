@@ -37,7 +37,7 @@ import { registerOnline } from '../realtime/gateway.js';
 import type { VoiceConfig, VoiceMedia } from '../realtime/voice.js';
 import { CityCatalog, cityView } from '../geography/cities.js';
 import type { IpLocator } from '../geography/ip_locator.js';
-import { registerAccounts } from '../accounts/routes.js';
+import { registerAccounts, type AccountRouteDeps } from '../accounts/routes.js';
 import { createLogMailer, type Mailer } from '../accounts/mailer.js';
 import type { PlayerRow } from './store.js';
 
@@ -79,6 +79,8 @@ export interface AppDeps {
   /** Addresses in this domain use qaEmailCode and receive no mail. */
   qaEmailDomain?: string;
   qaEmailCode?: string;
+  /** Sign in with Apple verification; absent means the endpoint answers 503. */
+  apple?: AccountRouteDeps['apple'];
 }
 
 interface Regions {
@@ -470,7 +472,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
 
   registerAccounts(app, {
     store: deps.store, pepper: deps.pepper, now: deps.now, mailer: deps.mailer ?? createLogMailer(),
-    qaEmailDomain: deps.qaEmailDomain, qaEmailCode: deps.qaEmailCode,
+    qaEmailDomain: deps.qaEmailDomain, qaEmailCode: deps.qaEmailCode, apple: deps.apple,
     closeSessions: async playerId => { online?.closePlayer(playerId); },
     beforeDelete: async playerId => { await online?.forgetPlayer(playerId); },
   }, auth);

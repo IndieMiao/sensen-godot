@@ -1785,5 +1785,11 @@
   "Pick month, day and year, or leave the birthday empty.": "请把年月日选全，或者不填生日",
   "Profile saved.": "资料已保存",
   "Password changed.": "密码已修改",
-  "Add a nickname to create your farm.": "填写昵称后即可创建农场"
+  "Add a nickname to create your farm.": "填写昵称后即可创建农场",
+  "Sign in with Apple": "通过 Apple 登录",
+  "Signed in with Apple": "已通过 Apple 登录",
+  "This permanently deletes your account and your farm. This can't be undone.": "将永久删除你的账号和农场，且无法恢复。",
+  "This email already has an account. Sign in with your email and password first.": "该邮箱已有账号，请先用邮箱和密码登录。",
+  "Sign in with Apple isn't available right now.": "暂时无法使用 Apple 登录。",
+  "Sign in with Apple failed. Please try again.": "Apple 登录失败，请重试。"
 }

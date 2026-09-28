@@ -105,6 +105,30 @@ export class MemoryStore implements Store {
   private users = new Map<string, UserRow>();
   private emailCodes = new Map<string, { hash: string; expires_at: number; sent_at: number; attempts: number }>();
   private deletions = new Map<string, DeletionRecord>();
+  private identities = new Map<string, { provider: string; provider_uid: string; user_id: string }>();
+
+  async userByIdentity(provider: string, providerUid: string) {
+    const row = this.identities.get(provider + '\0' + providerUid);
+    return row ? this.userById(row.user_id) : null;
+  }
+  async linkIdentity(provider: string, providerUid: string, userId: string, _now: number) {
+    const key = provider + '\0' + providerUid, prior = this.identities.get(key);
+    if (prior) return prior.user_id === userId;
+    if (!this.users.has(userId)) return false;
+    this.identities.set(key, { provider, provider_uid: providerUid, user_id: userId });
+    return true;
+  }
+  async createIdentityUser(provider: string, providerUid: string, email: string | null, now: number) {
+    if (this.identities.has(provider + '\0' + providerUid)) return { kind: 'identity_taken' as const };
+    if (email && [...this.users.values()].some(u => u.email === email)) return { kind: 'email_taken' as const };
+    const user: UserRow = { id: randomUUID(), email, email_verified: Boolean(email), password_hash: null, created_at: now, last_seen_at: now };
+    this.users.set(user.id, user);
+    this.identities.set(provider + '\0' + providerUid, { provider, provider_uid: providerUid, user_id: user.id });
+    return { kind: 'created' as const, user: structuredClone(user) };
+  }
+  async identitiesOf(userId: string) {
+    return [...this.identities.values()].filter(i => i.user_id === userId).map(({ provider, provider_uid }) => ({ provider, provider_uid }));
+  }
 
   async createEmailUser(email: string, passwordHash: string, now: number) {
     if ([...this.users.values()].some(u => u.email === email)) return { kind: 'email_taken' as const };
@@ -163,6 +187,7 @@ export class MemoryStore implements Store {
       this.players.delete(player.id);
     }
     for (const key of [...this.emailCodes.keys()]) if (key.endsWith(':' + user.email)) this.emailCodes.delete(key);
+    for (const [key, row] of [...this.identities]) if (row.user_id === userId) this.identities.delete(key);
     this.users.delete(userId);
     this.deletions.set(userId, structuredClone(tombstone));
     return true;
