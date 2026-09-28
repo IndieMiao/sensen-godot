@@ -116,6 +116,9 @@ export class MemoryStore implements Store {
   async userById(userId: string) { const u = this.users.get(userId); return u ? structuredClone(u) : null; }
   async setUserPassword(userId: string, passwordHash: string) { const u = this.users.get(userId); if (u) u.password_hash = passwordHash; }
   async markEmailVerified(userId: string) { const u = this.users.get(userId); if (u) u.email_verified = true; }
+  async updateUserProfile(userId: string, profile: { display_name: string | null; gender: string | null; gender_custom: string | null; birth_date: string | null }) {
+    const u = this.users.get(userId); if (u) Object.assign(u, profile);
+  }
   async authUser(userId: string, now: number) {
     const user = this.users.get(userId);
     if (!user) throw new Error('NO_ACCOUNT');

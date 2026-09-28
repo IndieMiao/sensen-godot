@@ -81,6 +81,7 @@ static func make_http_transport(host: Node) -> Callable:
 		match method:
 			"POST": verb = HTTPClient.METHOD_POST
 			"DELETE": verb = HTTPClient.METHOD_DELETE
+			"PUT": verb = HTTPClient.METHOD_PUT
 		var err := req.request(url, headers, verb, body)
 		if err != OK:
 			req.queue_free()

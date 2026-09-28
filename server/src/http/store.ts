@@ -22,6 +22,10 @@ export interface UserRow {
   password_hash: string | null;
   created_at: number;
   last_seen_at: number;
+  display_name?: string | null;
+  gender?: string | null;
+  gender_custom?: string | null;
+  birth_date?: string | null;
 }
 
 /** 删号墓碑：不带 FK、不留邮箱，只够证明"删过"和排 Apple revocation 队列。 */
@@ -70,6 +74,7 @@ export interface Store extends RealtimePersistence {
   userById(userId: string): Promise<UserRow | null>;
   setUserPassword(userId: string, passwordHash: string): Promise<void>;
   markEmailVerified(userId: string): Promise<void>;
+  updateUserProfile(userId: string, profile: { display_name: string | null; gender: string | null; gender_custom: string | null; birth_date: string | null }): Promise<void>;
   /** 找或建账号玩家并签发 token（同 authAnonymous 的上限与淘汰规则）。 */
   authUser(userId: string, now: number): Promise<{ player: PlayerRow; token: string }>;
   /** 账号玩家的全部 token 撤销（改密、删号后用）。 */

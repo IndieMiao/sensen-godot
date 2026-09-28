@@ -175,6 +175,9 @@ func _on_net_booted(_ok: bool) -> void:
 ## 新设备登录已有农场的账号：直接回到自己的农场，不必再选城。
 func _on_account_changed(signed_in: bool) -> void:
 	if not signed_in or not is_inside_tree() or not Net.session.has_farm(): return
+	for panel in find_children("*", "AccountPanel", true, false):
+		await (panel as AccountPanel).closed
+	if not is_inside_tree() or not Net.session.has_farm(): return
 	var choice := Net.session.farm_choice()
 	if FarmBlueprint.load_choice(choice) == null: return
 	await Net.ensure_city(Net.session.region_id)

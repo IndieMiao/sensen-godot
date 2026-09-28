@@ -15,16 +15,43 @@ var user_id := ""
 var player_id := ""
 var email := ""
 var email_verified := false
+## 账号资料（2026-09-28）：昵称必填；性别、生日选填。
+var display_name := ""
+var gender := ""
+var gender_custom := ""
+var birth_date := ""
+var age := -1
+
+## 北美常见的性别选项（全部选填）。值与服务端 profile.ts 的 GENDERS 一致。
+const GENDERS := [["woman", "Woman"], ["man", "Man"], ["nonbinary", "Non-binary"],
+	["self_describe", "Prefer to self-describe"], ["prefer_not_to_say", "Prefer not to say"]]
 
 func signed_in() -> bool:
 	return not token.is_empty() and not user_id.is_empty()
 
-func load_saved(path := PATH) -> bool:
+func profile_complete() -> bool:
+	return signed_in() and not display_name.is_empty()
+
+static func gender_label(value: String, custom := "") -> String:
+	if value == "self_describe" and not custom.is_empty(): return custom
+	for g in GENDERS:
+		if g[0] == value: return g[1]
+	return ""
+
+func _reset_fields() -> void:
 	token = ""
 	user_id = ""
 	player_id = ""
 	email = ""
 	email_verified = false
+	display_name = ""
+	gender = ""
+	gender_custom = ""
+	birth_date = ""
+	age = -1
+
+func load_saved(path := PATH) -> bool:
+	_reset_fields()
 	if not FileAccess.file_exists(path): return false
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not parsed is Dictionary: return false
@@ -33,22 +60,20 @@ func load_saved(path := PATH) -> bool:
 	player_id = str(parsed.get("player_id", ""))
 	email = str(parsed.get("email", ""))
 	email_verified = bool(parsed.get("email_verified", false))
+	_adopt_profile(parsed)
 	return signed_in()
 
 func save(path := PATH) -> bool:
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	if f == null: return false
 	f.store_string(JSON.stringify({"token": token, "user_id": user_id, "player_id": player_id,
-		"email": email, "email_verified": email_verified}))
+		"email": email, "email_verified": email_verified, "display_name": display_name, "gender": gender,
+		"gender_custom": gender_custom, "birth_date": birth_date, "age": age}))
 	f.close()
 	return true
 
 func clear(path := PATH) -> void:
-	token = ""
-	user_id = ""
-	player_id = ""
-	email = ""
-	email_verified = false
+	_reset_fields()
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
@@ -59,7 +84,15 @@ func adopt(body: Dictionary, path := PATH) -> void:
 	player_id = str(body.get("player_id", player_id))
 	email = str(body.get("email", email)) if body.get("email") != null else email
 	email_verified = bool(body.get("email_verified", email_verified))
+	_adopt_profile(body)
 	save(path)
+
+func _adopt_profile(body: Dictionary) -> void:
+	if body.has("display_name"): display_name = "" if body.display_name == null else str(body.display_name)
+	if body.has("gender"): gender = "" if body.gender == null else str(body.gender)
+	if body.has("gender_custom"): gender_custom = "" if body.gender_custom == null else str(body.gender_custom)
+	if body.has("birth_date"): birth_date = "" if body.birth_date == null else str(body.birth_date)
+	if body.has("age"): age = -1 if body.age == null else int(body.age)
 
 static func valid_email(value: String) -> bool:
 	var e := value.strip_edges()
@@ -83,6 +116,12 @@ static func describe(code: String) -> String:
 		"CODE_COOLDOWN": return "A code was just sent. Wait a minute before asking again."
 		"RATE_LIMITED": return "Too many attempts. Try again later."
 		"LOGIN_REQUIRED": return "Sign in to create your farm."
+		"INVALID_NAME": return "Nicknames are 2–24 characters and can't be an email address."
+		"INVALID_GENDER": return "Tell us how you describe your gender, or pick another option."
+		"INVALID_BIRTH_DATE": return "Check your birthday."
+		"UNDER_AGE": return "You need to be at least 13 to add a birthday."
+		"SAME_PASSWORD": return "Choose a password different from your current one."
+		"PASSWORD_MISMATCH": return "The two passwords don't match."
 		"TRANSPORT": return "Can't reach the server. Check your connection."
 	return "Something went wrong. Please try again."
 
@@ -105,6 +144,12 @@ static func reset(client: ApiClient, p_email: String, code: String, password: St
 
 static func me(client: ApiClient) -> Dictionary:
 	return _result(await client.request("GET", "/users/me"))
+
+static func update_profile(client: ApiClient, profile: Dictionary) -> Dictionary:
+	return _result(await client.request("PUT", "/users/me/profile", profile))
+
+static func change_password(client: ApiClient, current: String, next: String) -> Dictionary:
+	return _result(await client.request("POST", "/auth/email/password", {"current_password": current, "new_password": next}))
 
 static func delete_account(client: ApiClient, password: String) -> Dictionary:
 	return _result(await client.request("DELETE", "/users/me", {"password": password}))

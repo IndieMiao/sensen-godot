@@ -165,3 +165,8 @@ CREATE TABLE IF NOT EXISTS account_deletions (
   source            text NOT NULL,
   apple_revocation  text NOT NULL
 );
+-- 账号资料（2026-09-28）：昵称必填才算资料完整；性别与生日选填。生日只在满 13 岁时保存（COPPA）。
+ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name text;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS gender text;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS gender_custom text;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_date text;

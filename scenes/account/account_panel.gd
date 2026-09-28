@@ -1,36 +1,49 @@
 class_name AccountPanel
 extends CanvasLayer
-## 账号面板（SGODOT-135）：登录 / 注册 / 找回密码 / 验证邮箱 / 我的账号，一个模态层切五种状态。
+## 账号面板（SGODOT-135）：一个模态层里切换登录、注册、找回密码、验证邮箱、资料、改密码、
+## 我的账号、删号确认。
 ##
-## 游客点"建农场"时由登录墙弹出（决定 2）；也可从地图右上角账号按钮进入。关闭时发 closed，
-## signed_in 表示此刻是否已登录（注册后跳过验证也算已登录：验证不阻塞进入游戏）。
+## 游客点"建农场"时由登录墙弹出（决定 2）；也可从地图 / 选城页右上角账号按钮进入。关闭时发
+## closed，signed_in 表示此刻是否已登录（验证邮箱不阻塞进入游戏）。
 ##
 ## 面板贴顶而不是居中：手机软键盘从底部升起，贴顶的输入框不会被盖住。
-## 背景整屏不透明（与选城页同一张风景图）：同一时间只看得到这一个窗口，底下的界面既不透出也点不到。
+## 背景整屏不透明（与选城页同一张 3D 地图）：同一时间只看得到这一个窗口，底下的界面既不透出也点不到。
+##
+## 每个状态的按钮不同，所以按钮列表按状态重建：按钮节点名就是动作 id（测试与截图脚本按名字点）。
 
 signal closed(signed_in: bool)
 
-const MODES := ["sign_in", "sign_up", "forgot", "verify", "account"]
+const MODES := ["sign_in", "sign_up", "forgot", "verify", "profile", "password", "account", "delete"]
+const MONTHS := ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+const MIN_AGE := 13
 
 var mode := "sign_in"
 var reason := ""
 var busy := false
+## 从"我的账号"进入的子页面，保存 / 返回后回到账号页；从登录流程进入的则直接关闭。
+var from_account := false
 var _reset_code_sent := false
 
 var _title: Label
 var _subtitle: Label
 var _email: LineEdit
 var _password: LineEdit
+var _confirm_password: LineEdit
 var _code: LineEdit
 var _new_password: LineEdit
+var _nickname: LineEdit
+var _gender: OptionButton
+var _gender_custom: LineEdit
+var _birthday: HBoxContainer
+var _month: OptionButton
+var _day: OptionButton
+var _year: OptionButton
+var _show_passwords: CheckBox
 var _status: Label
-var _primary: Button
-var _secondary: Button
-var _tertiary: Button
-var _danger: Button
+var _actions: VBoxContainer
 var _close: Button
 var _fields: VBoxContainer
-var _confirm_delete := false
+var _field_list: Array[Control] = []
 
 static func open(host: Node, p_mode := "sign_in", p_reason := "") -> AccountPanel:
 	var panel := AccountPanel.new()
@@ -64,7 +77,8 @@ func _ready() -> void:
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 20)
 	margin.add_theme_constant_override("margin_right", 20)
-	margin.add_theme_constant_override("margin_top", 96)
+	margin.add_theme_constant_override("margin_top", 72)
+	margin.add_theme_constant_override("margin_bottom", 24)
 	scrim.add_child(margin)
 	var holder := VBoxContainer.new()
 	holder.alignment = BoxContainer.ALIGNMENT_BEGIN
@@ -80,8 +94,7 @@ func _ready() -> void:
 	panel.add_child(column)
 	var head := HBoxContainer.new()
 	column.add_child(head)
-	var symbol := GameUi.picture(GameUi.icon("user-round"), 28)
-	head.add_child(symbol)
+	head.add_child(GameUi.picture(GameUi.icon("user-round"), 28))
 	_title = GameUi.label("", 18)
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -97,103 +110,229 @@ func _ready() -> void:
 	_fields = VBoxContainer.new()
 	_fields.add_theme_constant_override("separation", 8)
 	column.add_child(_fields)
-	_email = _field("Email", false, LineEdit.KEYBOARD_TYPE_EMAIL_ADDRESS)
-	_email.name = "Email"
-	_password = _field("Password", true)
-	_password.name = "Password"
-	_code = _field("6-digit code", false, LineEdit.KEYBOARD_TYPE_NUMBER)
-	_code.name = "Code"
+	_nickname = _line("Nickname", "Nickname (2–24 characters)")
+	_nickname.max_length = 24
+	_email = _line("Email", "Email", false, LineEdit.KEYBOARD_TYPE_EMAIL_ADDRESS)
+	_password = _line("Password", "Password", true)
+	_code = _line("Code", "6-digit code", false, LineEdit.KEYBOARD_TYPE_NUMBER)
 	_code.max_length = 6
-	_new_password = _field("New password (8+ characters)", true)
-	_new_password.name = "NewPassword"
+	_new_password = _line("NewPassword", "New password (8+ characters)", true)
+	_confirm_password = _line("ConfirmPassword", "Confirm password", true)
+	_gender = _option("Gender", ["Gender (optional)"] + AccountSession.GENDERS.map(func(g): return g[1]))
+	_gender.item_selected.connect(func(_i): _gender_custom.visible = _selected_gender() == "self_describe")
+	_gender_custom = _line("GenderCustom", "How do you describe your gender?")
+	_gender_custom.max_length = 32
+	_birthday = HBoxContainer.new()
+	_birthday.name = "Birthday"
+	_birthday.add_theme_constant_override("separation", 6)
+	_fields.add_child(_birthday)
+	_field_list.append(_birthday)
+	var this_year: int = Time.get_date_dict_from_system().year
+	_month = _option("Month", ["Month"] + MONTHS, _birthday)
+	var days := ["Day"]
+	for d in range(1, 32): days.append(str(d))
+	_day = _option("Day", days, _birthday)
+	var years := ["Year"]
+	for y in range(this_year - MIN_AGE, this_year - 121, -1): years.append(str(y))
+	_year = _option("Year", years, _birthday)
+	for o in [_month, _day, _year]: o.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_show_passwords = CheckBox.new()
+	_show_passwords.name = "ShowPasswords"
+	_show_passwords.text = L10n.text("Show passwords")
+	_show_passwords.focus_mode = Control.FOCUS_NONE
+	# A plain checkbox, not the theme's filled toggle look.
+	for state in ["normal", "hover", "pressed", "hover_pressed", "focus", "disabled"]:
+		_show_passwords.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	_show_passwords.add_theme_color_override("font_color", GameUi.MUTED)
+	_show_passwords.add_theme_color_override("font_pressed_color", GameUi.MUTED)
+	_show_passwords.add_theme_color_override("font_hover_color", GameUi.INK)
+	_show_passwords.add_theme_font_size_override("font_size", 13)
+	_show_passwords.toggled.connect(func(on: bool):
+		for f in [_password, _confirm_password, _new_password]: f.secret = not on)
+	_fields.add_child(_show_passwords)
+	_field_list.append(_show_passwords)
 	_status = GameUi.label("", 13, GameUi.CORAL)
 	_status.name = "Status"
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_status.custom_minimum_size.x = 260
 	column.add_child(_status)
-	_primary = GameUi.button("", "", "", true)
-	_primary.name = "Primary"
-	_primary.custom_minimum_size.y = 48
-	_primary.pressed.connect(_on_primary)
-	column.add_child(_primary)
-	_secondary = GameUi.button("", "", "")
-	_secondary.name = "Secondary"
-	_secondary.pressed.connect(_on_secondary)
-	column.add_child(_secondary)
-	_tertiary = GameUi.button("", "", "")
-	_tertiary.name = "Tertiary"
-	_tertiary.pressed.connect(_on_tertiary)
-	column.add_child(_tertiary)
-	_danger = GameUi.button("trash-2", " ", "")
-	_danger.name = "Danger"
-	_danger.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_danger.add_theme_color_override("font_color", GameUi.CORAL)
-	_danger.pressed.connect(_on_danger)
-	column.add_child(_danger)
+	_actions = VBoxContainer.new()
+	_actions.name = "Actions"
+	_actions.add_theme_constant_override("separation", 10)
+	column.add_child(_actions)
 	if Net and Net.account.signed_in() and mode in ["sign_in", "sign_up"]: mode = "account"
 	if Net and Net.account.signed_in(): _email.text = Net.account.email
 	set_mode(mode)
 
-func _field(placeholder: String, secret: bool, keyboard := LineEdit.KEYBOARD_TYPE_DEFAULT) -> LineEdit:
+func _line(node_name: String, placeholder: String, secret := false, keyboard := LineEdit.KEYBOARD_TYPE_DEFAULT) -> LineEdit:
+	# Once a field has text its placeholder is gone, so a small caption above keeps it identifiable.
+	var caption := GameUi.label("", 11, GameUi.MUTED)
+	caption.name = node_name + "Caption"
+	caption.visible = false
+	_fields.add_child(caption)
 	var edit := LineEdit.new()
+	edit.name = node_name
 	edit.placeholder_text = L10n.text(placeholder)
 	edit.secret = secret
 	edit.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_PASSWORD if secret else keyboard
 	edit.custom_minimum_size = Vector2(260, 44)
-	edit.select_all_on_focus = false
-	edit.text_submitted.connect(func(_t): _on_primary())
+	edit.text_submitted.connect(func(_t): _submit_primary())
+	edit.text_changed.connect(func(_t): _sync_caption(edit))
+	edit.set_meta("caption", caption)
 	_fields.add_child(edit)
+	_field_list.append(edit)
 	return edit
 
+func _sync_caption(edit: LineEdit) -> void:
+	var caption: Label = edit.get_meta("caption")
+	caption.text = edit.placeholder_text
+	caption.visible = edit.visible and not edit.text.is_empty()
+
+func _option(node_name: String, labels: Array, parent: Control = null) -> OptionButton:
+	var o := OptionButton.new()
+	o.name = node_name
+	o.custom_minimum_size = Vector2(0, 44)
+	o.focus_mode = Control.FOCUS_NONE
+	o.fit_to_longest_item = false
+	for label in labels: o.add_item(L10n.text(str(label)))
+	GameUi.register_modal(o.get_popup())
+	if parent == null:
+		_fields.add_child(o)
+		_field_list.append(o)
+	else:
+		parent.add_child(o)
+	return o
+
+## 状态切换：显示哪些输入框、标题文案、按钮列表。
 func set_mode(next: String) -> void:
 	mode = next
-	_confirm_delete = false
-	_danger_primary(false)
 	_status.text = ""
 	_status.visible = false
 	_status.add_theme_color_override("font_color", GameUi.CORAL)
 	_email.editable = mode in ["sign_in", "sign_up", "forgot"]
-	var signed := Net != null and Net.account.signed_in()
+	_password.placeholder_text = L10n.text("Password (8+ characters)" if mode == "sign_up" else "Current password" if mode == "password" else "Password")
+	_new_password.placeholder_text = L10n.text("New password (8+ characters)")
+	_confirm_password.placeholder_text = L10n.text("Confirm new password" if mode in ["forgot", "password"] else "Confirm password")
+	var account := Net.account if Net else AccountSession.new()
+	for f in [_password, _new_password, _confirm_password]: _sync_caption(f)
 	match mode:
 		"sign_in":
-			_show_fields([_email, _password])
-			_set_texts("Sign in", reason if not reason.is_empty() else "Sign in with your email to keep your farm on every device.",
-				"Sign in", "Create an account", "Forgot password?")
+			_show([_email, _password, _show_passwords])
+			_texts("Sign in", reason if not reason.is_empty() else "Sign in with your email to keep your farm on every device.")
+			_set_actions([["sign_in", "Sign in", "accent"], ["to_sign_up", "Create an account"], ["to_forgot", "Forgot password?"]])
 		"sign_up":
-			_show_fields([_email, _password])
-			_password.placeholder_text = L10n.text("Password (8+ characters)")
-			_set_texts("Create account", reason if not reason.is_empty() else "Your farm is saved to this account.",
-				"Create account", "I already have an account", "")
+			_show([_email, _password, _confirm_password, _show_passwords])
+			_texts("Create account", reason if not reason.is_empty() else "Your farm is saved to this account.")
+			_set_actions([["sign_up", "Create account", "accent"], ["to_sign_in", "I already have an account"]])
 		"forgot":
-			_show_fields([_email, _code, _new_password] if _reset_code_sent else [_email])
-			_set_texts("Reset password", "We'll email you a 6-digit code." if not _reset_code_sent else "Enter the code from the email and choose a new password.",
-				"Reset password" if _reset_code_sent else "Send code", "Back to sign in", "Send a new code" if _reset_code_sent else "")
+			if _reset_code_sent:
+				_show([_email, _code, _new_password, _confirm_password, _show_passwords])
+				_texts("Reset password", "Enter the code from the email and choose a new password.")
+				_set_actions([["reset", "Reset password", "accent"], ["to_sign_in", "Back to sign in"], ["resend_reset", "Send a new code"]])
+			else:
+				_show([_email])
+				_texts("Reset password", "We'll email you a 6-digit code.")
+				_set_actions([["send_reset", "Send code", "accent"], ["to_sign_in", "Back to sign in"]])
 		"verify":
-			_show_fields([_code])
-			_set_texts("Verify email", L10n.format_text("We sent a 6-digit code to %s.", Net.account.email if signed else ""),
-				"Verify", "Send a new code", "Later")
+			_show([_code])
+			_texts("Verify email", L10n.format_text("We sent a 6-digit code to %s.", account.email))
+			_set_actions([["verify", "Verify", "accent"], ["resend_verify", "Send a new code"], ["later", "Later"]])
+		"profile":
+			_show([_nickname, _gender, _gender_custom, _birthday])
+			_fill_profile(account)
+			_texts("Your profile", "Pick a nickname. Gender and birthday are optional.")
+			var actions := [["save_profile", "Save", "accent"]]
+			if from_account: actions.append(["to_account", "Cancel"])
+			_set_actions(actions)
+		"password":
+			_show([_password, _new_password, _confirm_password, _show_passwords])
+			_texts("Change password", "You'll stay signed in here. Other devices will be signed out.")
+			_set_actions([["change_password", "Change password", "accent"], ["to_account", "Cancel"]])
 		"account":
-			_show_fields([])
-			var status := L10n.text("Verified") if signed and Net.account.email_verified else L10n.text("Not verified yet")
-			_set_texts("My account", (Net.account.email if signed else "") + "\n" + status,
-				"Done", "Verify email" if signed and not Net.account.email_verified else "", "Sign out")
-	_danger.visible = mode == "account"
-	_danger.text = L10n.text("Delete account")
-	_password.placeholder_text = L10n.text("Password (8+ characters)" if mode == "sign_up" else "Password")
+			_show([])
+			_texts("My account", _account_summary(account))
+			var actions := [["done", "Done", "accent"], ["edit_profile", "Edit profile"], ["to_password", "Change password"]]
+			if not account.email_verified: actions.append(["start_verify", "Verify email"])
+			actions.append(["sign_out", "Sign out"])
+			actions.append(["delete", "Delete account", "danger_link"])
+			_set_actions(actions)
+		"delete":
+			_show([_password])
+			_password.text = ""
+			_password.placeholder_text = L10n.text("Password")
+			_texts("Delete account?", "This permanently deletes your account and your farm. Enter your password to confirm.")
+			_set_actions([["delete_now", "Delete permanently", "danger"], ["to_account", "Keep my account"]])
 
-func _show_fields(visible_fields: Array) -> void:
-	for f in [_email, _password, _code, _new_password]:
+func _account_summary(account: AccountSession) -> String:
+	var lines := []
+	if not account.display_name.is_empty(): lines.append(account.display_name)
+	lines.append(account.email)
+	var extra := [L10n.text("Verified" if account.email_verified else "Not verified yet")]
+	var g := AccountSession.gender_label(account.gender, account.gender_custom)
+	if not g.is_empty(): extra.append(L10n.text(g) if account.gender != "self_describe" else g)
+	if account.age >= 0: extra.append(L10n.format_text("Age %d", account.age))
+	lines.append(" · ".join(extra))
+	return "\n".join(lines)
+
+func _fill_profile(account: AccountSession) -> void:
+	_nickname.text = account.display_name
+	var index := 0
+	for i in AccountSession.GENDERS.size():
+		if AccountSession.GENDERS[i][0] == account.gender: index = i + 1
+	_gender.select(index)
+	_gender_custom.text = account.gender_custom
+	_gender_custom.visible = account.gender == "self_describe"
+	_month.select(0)
+	_day.select(0)
+	_year.select(0)
+	var parts := account.birth_date.split("-")
+	if parts.size() == 3:
+		_month.select(int(parts[1]))
+		_day.select(int(parts[2]))
+		for i in _year.item_count:
+			if _year.get_item_text(i) == parts[0]: _year.select(i)
+
+func _show(visible_fields: Array) -> void:
+	for f in _field_list:
 		f.visible = f in visible_fields
+		if f is LineEdit: _sync_caption(f)
+	if _gender in visible_fields: _gender_custom.visible = _selected_gender() == "self_describe"
 	_fields.visible = not visible_fields.is_empty()
 
-func _set_texts(title: String, subtitle: String, primary: String, secondary: String, tertiary: String) -> void:
+func _texts(title: String, subtitle: String) -> void:
 	_title.text = L10n.text(title)
 	_subtitle.text = L10n.text(subtitle)
-	_primary.text = L10n.text(primary)
-	_secondary.text = L10n.text(secondary)
-	_secondary.visible = not secondary.is_empty()
-	_tertiary.text = L10n.text(tertiary)
-	_tertiary.visible = not tertiary.is_empty()
+
+## 每项 [动作 id, 文案, 样式]：accent 主按钮、danger 红色主按钮、danger_link 红字次按钮。
+func _set_actions(list: Array) -> void:
+	for c in _actions.get_children():
+		_actions.remove_child(c)
+		c.queue_free()
+	for spec in list:
+		var style: String = spec[2] if spec.size() > 2 else ""
+		var b := GameUi.button("trash-2" if style == "danger_link" else "", L10n.text(spec[1]), "", style == "accent")
+		b.name = spec[0]
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.custom_minimum_size.y = 48 if style in ["accent", "danger"] else 44
+		if style == "danger": _paint_danger(b)
+		if style == "danger_link": b.add_theme_color_override("font_color", GameUi.CORAL)
+		b.pressed.connect(_on_action.bind(str(spec[0])))
+		_actions.add_child(b)
+
+## 删除确认的主按钮是珊瑚红，不能和"注册 / 登录"用同一种绿色。
+func _paint_danger(b: Button) -> void:
+	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
+		var style := GameUi.surface(GameUi.CORAL, 10, 14)
+		if state == "pressed": style.bg_color = GameUi.CORAL.darkened(0.12)
+		b.add_theme_stylebox_override(state, style)
+	for color in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		b.add_theme_color_override(color, Color.WHITE)
+
+func action_button(id: String) -> Button:
+	return _actions.get_node_or_null(id) as Button
+
+func _submit_primary() -> void:
+	if _actions.get_child_count() > 0: _on_action(str(_actions.get_child(0).name))
 
 func _say(message: String, ok := false) -> void:
 	_status.text = L10n.text(message)
@@ -202,8 +341,8 @@ func _say(message: String, ok := false) -> void:
 
 func _set_busy(value: bool) -> void:
 	busy = value
-	for b in [_primary, _secondary, _tertiary, _danger, _close]:
-		b.disabled = value
+	_close.disabled = value
+	for b in _actions.get_children(): (b as Button).disabled = value
 
 func dismiss() -> void:
 	if busy: return
@@ -211,76 +350,66 @@ func dismiss() -> void:
 	closed.emit(signed)
 	queue_free()
 
-func _on_primary() -> void:
+func _on_action(id: String) -> void:
 	if busy: return
-	match mode:
+	match id:
 		"sign_in": await _submit_login(false)
 		"sign_up": await _submit_login(true)
-		"forgot":
-			if _reset_code_sent: await _submit_reset()
-			else: await _send_reset_code()
-		"verify": await _submit_verify()
-		"account":
-			if _confirm_delete: await _submit_delete()
-			else: dismiss()
-
-func _on_secondary() -> void:
-	if busy: return
-	match mode:
-		"sign_in": set_mode("sign_up")
-		"sign_up": set_mode("sign_in")
-		"forgot":
+		"to_sign_up": set_mode("sign_up")
+		"to_sign_in":
 			_reset_code_sent = false
 			set_mode("sign_in")
-		"verify": await _send_code(Net.account.email, "verify")
-		"account":
-			if _confirm_delete: set_mode("account")
-			else:
-				await _send_code(Net.account.email, "verify")
-				set_mode("verify")
-
-func _on_tertiary() -> void:
-	if busy: return
-	match mode:
-		"sign_in":
+		"to_forgot":
 			_reset_code_sent = false
 			set_mode("forgot")
-		"forgot": await _send_reset_code()
-		"verify": dismiss()
-		"account":
+		"send_reset", "resend_reset": await _send_reset_code()
+		"reset": await _submit_reset()
+		"verify": await _submit_verify()
+		"resend_verify": await _send_code(Net.account.email, "verify")
+		"later": _after_sign_in()
+		"save_profile": await _submit_profile()
+		"to_account":
+			from_account = false
+			set_mode("account")
+		"change_password": await _submit_password_change()
+		"done": dismiss()
+		"edit_profile":
+			from_account = true
+			set_mode("profile")
+		"to_password":
+			from_account = true
+			_password.text = ""
+			_new_password.text = ""
+			_confirm_password.text = ""
+			set_mode("password")
+		"start_verify":
+			await _send_code(Net.account.email, "verify")
+			set_mode("verify")
+		"sign_out":
 			_set_busy(true)
 			await Net.sign_out()
 			_set_busy(false)
 			dismiss()
+		"delete": set_mode("delete")
+		"delete_now": await _submit_delete()
 
-func _on_danger() -> void:
-	if busy or mode != "account": return
-	# Deletion asks twice and needs the password: it removes the farm for good.
-	_confirm_delete = true
-	_show_fields([_password])
-	_password.text = ""
-	_password.placeholder_text = L10n.text("Password")
-	_title.text = L10n.text("Delete account?")
-	_subtitle.text = L10n.text("This permanently deletes your account and your farm. Enter your password to confirm.")
-	_primary.text = L10n.text("Delete permanently")
-	_danger_primary(true)
-	_secondary.text = L10n.text("Keep my account")
-	_secondary.visible = true
-	_tertiary.visible = false
-	_danger.visible = false
+## 登录流程收尾：没昵称就先补资料，否则关闭。
+func _after_sign_in() -> void:
+	if Net.account.profile_complete(): dismiss()
+	else:
+		from_account = false
+		set_mode("profile")
 
-## 删除确认时主按钮变成珊瑚红，不能和"注册 / 登录"用同一种绿色。
-func _danger_primary(on: bool) -> void:
-	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
-		if on:
-			var style := GameUi.surface(GameUi.CORAL, 10, 14)
-			if state == "pressed": style.bg_color = GameUi.CORAL.darkened(0.12)
-			_primary.add_theme_stylebox_override(state, style)
-		else:
-			_primary.remove_theme_stylebox_override(state)
-	for color in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
-		if on: _primary.add_theme_color_override(color, Color.WHITE)
-		else: _primary.remove_theme_color_override(color)
+func _selected_gender() -> String:
+	var i := _gender.selected
+	return "" if i <= 0 else str(AccountSession.GENDERS[i - 1][0])
+
+## 生日三项要么全选要么全空；返回 "YYYY-MM-DD"、"" 或 null（不完整）。
+func _selected_birthday() -> Variant:
+	var picked := [_month.selected > 0, _day.selected > 0, _year.selected > 0]
+	if not picked.has(true): return ""
+	if picked.has(false): return null
+	return "%s-%02d-%02d" % [_year.get_item_text(_year.selected), _month.selected, _day.selected]
 
 func _submit_login(create: bool) -> void:
 	var email := _email.text.strip_edges()
@@ -289,6 +418,9 @@ func _submit_login(create: bool) -> void:
 		return
 	if create and not AccountSession.valid_password(_password.text):
 		_say("Use at least 8 characters for your password.")
+		return
+	if create and _password.text != _confirm_password.text:
+		_say(AccountSession.describe("PASSWORD_MISMATCH"))
 		return
 	if _password.text.is_empty():
 		_say("Enter your password.")
@@ -304,8 +436,9 @@ func _submit_login(create: bool) -> void:
 		_say(AccountSession.describe(str(result.code)))
 		return
 	_password.text = ""
+	_confirm_password.text = ""
 	if create and not Net.account.email_verified: set_mode("verify")
-	else: dismiss()
+	else: _after_sign_in()
 
 func _send_reset_code() -> void:
 	var email := _email.text.strip_edges()
@@ -330,6 +463,9 @@ func _submit_reset() -> void:
 	if not AccountSession.valid_password(_new_password.text):
 		_say("Use at least 8 characters for your password.")
 		return
+	if _new_password.text != _confirm_password.text:
+		_say(AccountSession.describe("PASSWORD_MISMATCH"))
+		return
 	_set_busy(true)
 	var result := await AccountSession.reset(Net.client, email, _code.text, _new_password.text)
 	if result.ok: result.ok = await Net.sign_in_with(result.body)
@@ -338,7 +474,8 @@ func _submit_reset() -> void:
 		_say(AccountSession.describe(str(result.code)))
 		return
 	_new_password.text = ""
-	dismiss()
+	_confirm_password.text = ""
+	_after_sign_in()
 
 func _send_code(email: String, purpose: String) -> void:
 	_set_busy(true)
@@ -358,7 +495,58 @@ func _submit_verify() -> void:
 		_say(AccountSession.describe(str(result.code)))
 		return
 	Net.account.adopt(result.body, Net.account_path)
-	dismiss()
+	_code.text = ""
+	_after_sign_in()
+
+func _submit_profile() -> void:
+	var name := _nickname.text.strip_edges()
+	if name.length() < 2:
+		_say(AccountSession.describe("INVALID_NAME"))
+		return
+	var gender := _selected_gender()
+	if gender == "self_describe" and _gender_custom.text.strip_edges().is_empty():
+		_say(AccountSession.describe("INVALID_GENDER"))
+		return
+	var birthday = _selected_birthday()
+	if birthday == null:
+		_say("Pick month, day and year, or leave the birthday empty.")
+		return
+	_set_busy(true)
+	var result := await AccountSession.update_profile(Net.client, {"display_name": name, "gender": gender,
+		"gender_custom": _gender_custom.text.strip_edges() if gender == "self_describe" else "", "birth_date": birthday})
+	_set_busy(false)
+	if not result.ok:
+		_say(AccountSession.describe(str(result.code)))
+		return
+	Net.account.adopt(result.body, Net.account_path)
+	if from_account:
+		from_account = false
+		set_mode("account")
+		_say("Profile saved.", true)
+	else:
+		dismiss()
+
+func _submit_password_change() -> void:
+	if _password.text.is_empty():
+		_say("Enter your password.")
+		return
+	if not AccountSession.valid_password(_new_password.text):
+		_say("Use at least 8 characters for your password.")
+		return
+	if _new_password.text != _confirm_password.text:
+		_say(AccountSession.describe("PASSWORD_MISMATCH"))
+		return
+	_set_busy(true)
+	var result := await AccountSession.change_password(Net.client, _password.text, _new_password.text)
+	if result.ok: result.ok = await Net.sign_in_with(result.body)
+	_set_busy(false)
+	if not result.ok:
+		_say(AccountSession.describe(str(result.code)))
+		return
+	for f in [_password, _new_password, _confirm_password]: f.text = ""
+	from_account = false
+	set_mode("account")
+	_say("Password changed.", true)
 
 func _submit_delete() -> void:
 	if _password.text.is_empty():

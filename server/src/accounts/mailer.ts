@@ -12,9 +12,10 @@ export interface Mailer {
   sendCode(email: string, code: string, purpose: CodePurpose): Promise<void>;
 }
 
-const SUBJECT: Record<CodePurpose, string> = { verify: 'Your Sensen verification code', reset: 'Reset your Sensen password' };
+const SUBJECT: Record<CodePurpose, string> = { verify: 'Your Sensen verification code', reset: 'Reset your Sensen password', delete: 'Confirm deleting your Sensen account' };
 const body = (code: string, purpose: CodePurpose) =>
-  `${purpose === 'verify' ? 'Use this code to verify your email' : 'Use this code to reset your password'}: ${code}\n\n`
+  `${purpose === 'verify' ? 'Use this code to verify your email' : purpose === 'reset' ? 'Use this code to reset your password'
+    : 'Use this code to permanently delete your account and farm'}: ${code}\n\n`
   + 'The code expires in 10 minutes. If you did not request it, you can ignore this email.';
 
 export function createLogMailer(log: (line: string) => void = console.log, showCodes = true): Mailer {

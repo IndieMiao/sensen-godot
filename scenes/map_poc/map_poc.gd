@@ -146,6 +146,8 @@ var _map_is_ready := false
 ## 受限模式（PRD §3.1）：由 FarmRegions 的城市选择触发；为真时地图只做「看见、选择、返回」。
 var street_mode := false
 var region: Dictionary = {}
+var _awaiting_account := false
+var _account_user_id := ""
 ## 平移边界（lat/lng）：position=(lat_min,lng_min)，size=(lat span,lng span)；零 size 不钳。
 var pan_bounds := Rect2()
 var candidate_overlay: CandidateOverlay = null
@@ -217,6 +219,16 @@ func _ready() -> void:
 	language.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	language.offset_left = -44
 	language.offset_bottom = 44
+	var account := GameUi.button("user-round", "", L10n.text("Account"))
+	account.name = "AccountButton"
+	$HUD/SafeArea/Root.add_child(account)
+	account.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	account.offset_left = -92
+	account.offset_right = -48
+	account.offset_bottom = 44
+	account.pressed.connect(_open_account)
+	if Net and not Net.account_changed.is_connected(_on_account_changed): Net.account_changed.connect(_on_account_changed)
+	if Net: _account_user_id = Net.account.user_id
 	side_toolbar.offset_top = 58
 	Localization.language_changed.connect(_refresh_language)
 	top_panel.add_theme_stylebox_override("panel", GameUi.panel_style(10))
@@ -1015,11 +1027,22 @@ func _cancel_placement() -> void:
 func _resolve_confirmed_farm(_id: String) -> Dictionary:
 	if await _connect_farm_service():
 		if not is_inside_tree(): return {}
+		# Guests browse only; creating a farm needs an account (2026-09-28 decision 2).
+		if not Net.account.profile_complete() and not await _require_account("Sign in to create your farm."):
+			location_status.text = L10n.text(AccountSession.describe("LOGIN_REQUIRED") if Net.is_guest() else "Add a nickname to create your farm.")
+			return {}
+		if not is_inside_tree(): return {}
 		var ok: bool = await Net.session.ensure_generated_farm(str(region.get("id", "")), _placement_location)
 		if not is_inside_tree(): return {}
 		if not ok:
+			if Net.session.last_error_code == "LOGIN_REQUIRED":
+				location_status.text = L10n.text(AccountSession.describe("LOGIN_REQUIRED"))
+				return {}
 			location_status.text = _generation_error(Net.session.last_error_code)
 			return {}
+		# The server decides the city from the pin; a border pick may land in the neighbouring city.
+		await Net.ensure_city(Net.session.region_id)
+		if not is_inside_tree(): return {}
 		var choice := Net.session.farm_choice()
 		if FarmBlueprint.load_choice(choice) == null:
 			location_status.text = _generation_error("INVALID_FARM_TERRAIN")
@@ -1785,6 +1808,38 @@ func _sync_farm_markers() -> void:
 			location_status.text = "Farm map"
 			_zoom_label.hide()
 	_update_pawns(_cam_distance())
+
+## 登录墙：弹账号面板并等它关闭。返回关闭时是否已登录。
+func _require_account(reason: String) -> bool:
+	if Net.account.profile_complete(): return true
+	_awaiting_account = true
+	# Guests sign up; signed-in players without a nickname finish their profile first.
+	var panel := AccountPanel.open(self, "profile" if not Net.is_guest() else "sign_up", L10n.text(reason))
+	await panel.closed
+	_awaiting_account = false
+	return Net.account.profile_complete()
+
+## 在地图上登录 / 登出 / 删号：按新身份重建地图（登录墙流程自己接着走，不重建）。
+func _on_account_changed(_signed_in: bool) -> void:
+	if _awaiting_account or _relocation_mode or not is_inside_tree(): return
+	if AppRouter.top_instance() != null: return
+	# A password change keeps the same account: nothing to rebuild.
+	if Net.account.user_id == _account_user_id: return
+	_account_user_id = Net.account.user_id
+	# Let the account panel finish (profile step) before the map rebuilds under it.
+	for panel in find_children("*", "AccountPanel", true, false):
+		await (panel as AccountPanel).closed
+	if not is_inside_tree(): return
+	if Net.session.has_farm() and FarmBlueprint.load_choice(Net.session.farm_choice()) != null:
+		FarmChoice.save_choice(Net.session.farm_choice())
+		FarmRegions.save_choice(Net.session.region_id)
+	else:
+		FarmChoice.clear()
+	AppRouter.go_to_map.call_deferred()
+
+func _open_account() -> void:
+	if GameUi.modal_is_open(self): return
+	AccountPanel.open(self, "account" if not Net.is_guest() else "sign_in")
 
 func _connect_farm_service() -> bool:
 	if not Net or not Net.session: return false

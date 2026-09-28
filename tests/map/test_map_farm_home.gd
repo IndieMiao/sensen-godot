@@ -40,6 +40,7 @@ func _login_fake(responses: Array) -> FakeTransport:
 	Net.client.token = "tok"     # 视作已登录
 	Net.account.token = "tok"  # 账号玩家（SGODOT-135）：游客建农场会先弹登录墙
 	Net.account.user_id = "test-user"
+	Net.account.display_name = "Tester"
 	return t
 
 func test_with_a_farm_the_map_shows_home_not_candidates() -> void:
@@ -169,6 +170,7 @@ func _login_with_farm(layout: String, extra_responses: Array = []) -> FakeTransp
 	Net.client.token = "tok"
 	Net.account.token = "tok"  # 账号玩家（SGODOT-135）：游客建农场会先弹登录墙
 	Net.account.user_id = "test-user"
+	Net.account.display_name = "Tester"
 	Net.session.farm_id = "f1"
 	Net.session.layout_patch_id = layout
 	Net.session.blueprint_revision = 2
@@ -265,6 +267,7 @@ func test_confirming_a_candidate_yields_to_the_servers_existing_farm() -> void:
 	Net.client.token = "tok"
 	Net.account.token = "tok"  # 账号玩家（SGODOT-135）：游客建农场会先弹登录墙
 	Net.account.user_id = "test-user"
+	Net.account.display_name = "Tester"
 	var m := _map()
 	await get_tree().process_frame
 	var choice: Dictionary = await m._resolve_confirmed_farm("sh_b")
@@ -333,6 +336,7 @@ func test_late_no_farm_response_replaces_cached_home_with_selection() -> void:
 	Net.client.token = "tok"
 	Net.account.token = "tok"  # 账号玩家（SGODOT-135）：游客建农场会先弹登录墙
 	Net.account.user_id = "test-user"
+	Net.account.display_name = "Tester"
 	Net.session.last_error_code = "NO_FARM"
 	m._on_net_booted(true)
 	assert_object(m.my_farm_btn).is_null()

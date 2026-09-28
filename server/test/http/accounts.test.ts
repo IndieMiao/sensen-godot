@@ -209,6 +209,92 @@ for (const [name, enabled, makeStore] of makers) {
       expect((await app.inject({ method: 'GET', url: '/v1/users/me', headers: bearer(fresh.token) })).json().has_farm).toBe(false);
     });
 
+    it('saves a profile with a nickname, optional gender and optional birthday', async () => {
+      const body = (await app.inject({ method: 'POST', url: '/v1/auth/email/register',
+        payload: { email: 'lea@example.com', password: 'correct horse', display_name: '  Lea  ' } })).json();
+      expect(body.display_name).toBe('Lea');
+      expect(body.profile_complete).toBe(true);
+      const put = (payload: object) => app.inject({ method: 'PUT', url: '/v1/users/me/profile', headers: bearer(body.token), payload });
+      const saved = await put({ display_name: 'Lea M', gender: 'nonbinary', birth_date: '2000-02-29' });
+      expect(saved.statusCode).toBe(200);
+      expect(saved.json()).toMatchObject({ display_name: 'Lea M', gender: 'nonbinary', birth_date: '2000-02-29', age: 26 });
+      const custom = await put({ display_name: 'Lea M', gender: 'self_describe', gender_custom: 'Genderfluid' });
+      expect(custom.json()).toMatchObject({ gender: 'self_describe', gender_custom: 'Genderfluid', birth_date: null, age: null });
+      for (const [payload, code] of [
+        [{ display_name: 'x' }, 'INVALID_NAME'],
+        [{ display_name: 'a@b.com' }, 'INVALID_NAME'],
+        [{ display_name: 'A​B' }, 'INVALID_NAME'],
+        [{ display_name: 'Lea', gender: 'female' }, 'INVALID_GENDER'],
+        [{ display_name: 'Lea', gender: 'self_describe' }, 'INVALID_GENDER'],
+        [{ display_name: 'Lea', birth_date: '2020-13-01' }, 'INVALID_BIRTH_DATE'],
+        [{ display_name: 'Lea', birth_date: '2015-01-01' }, 'UNDER_AGE'],
+      ] as const) expect((await put(payload)).json().code).toBe(code);
+      // A refused under-13 birthday is not stored.
+      const me = (await app.inject({ method: 'GET', url: '/v1/users/me', headers: bearer(body.token) })).json();
+      expect(me).toMatchObject({ display_name: 'Lea M', gender: 'self_describe', birth_date: null });
+      const guestToken = await guest();
+      expect((await app.inject({ method: 'PUT', url: '/v1/users/me/profile', headers: bearer(guestToken), payload: { display_name: 'Guest' } })).json().code).toBe('LOGIN_REQUIRED');
+    });
+
+    it('reports an incomplete profile until a nickname is set', async () => {
+      const body = (await register('max@example.com')).json();
+      expect(body.profile_complete).toBe(false);
+      expect(body.display_name).toBeNull();
+    });
+
+    it('changes the password while signed in and ends other sessions', async () => {
+      const first = (await register('ned@example.com')).json();
+      const other = (await login('ned@example.com', 'correct horse')).json();
+      const change = (payload: object) => app.inject({ method: 'POST', url: '/v1/auth/email/password', headers: bearer(first.token), payload });
+      expect((await change({ current_password: 'wrong one', new_password: 'another pass' })).json().code).toBe('INVALID_CREDENTIALS');
+      expect((await change({ current_password: 'correct horse', new_password: 'short' })).json().code).toBe('WEAK_PASSWORD');
+      expect((await change({ current_password: 'correct horse', new_password: 'correct horse' })).json().code).toBe('SAME_PASSWORD');
+      const changed = await change({ current_password: 'correct horse', new_password: 'another pass' });
+      expect(changed.statusCode).toBe(200);
+      expect((await app.inject({ method: 'GET', url: '/v1/users/me', headers: bearer(other.token) })).statusCode).toBe(401);
+      expect((await app.inject({ method: 'GET', url: '/v1/users/me', headers: bearer(changed.json().token) })).statusCode).toBe(200);
+      expect((await login('ned@example.com', 'another pass')).statusCode).toBe(200);
+    });
+
+    it('serves a self-contained deletion page', async () => {
+      const page = await app.inject({ method: 'GET', url: '/v1/account/delete' });
+      expect(page.statusCode).toBe(200);
+      expect(page.headers['content-type']).toContain('text/html');
+      expect(page.headers['content-security-policy']).toContain("connect-src 'self'");
+      expect(page.body).toContain('Delete your Sensen account');
+      // Only inline data: resources are allowed; nothing may be loaded from another host.
+      expect(page.body).not.toMatch(/<script[^>]+src=|<link[^>]+href="(?!data:)|https?:\/\//);
+    });
+
+    it('deletes an account from the web with the password', async () => {
+      const body = (await register('oli@example.com')).json();
+      await createFarm(body.token, TOKYO);
+      const del = (payload: object) => app.inject({ method: 'POST', url: '/v1/account/delete', payload });
+      expect((await del({ email: 'oli@example.com', password: 'nope nope' })).json().code).toBe('INVALID_CREDENTIALS');
+      expect((await del({ email: 'nobody@example.com', password: 'nope nope' })).json().code).toBe('INVALID_CREDENTIALS');
+      expect((await del({ email: 'oli@example.com' })).statusCode).toBe(400);
+      const gone = await del({ email: 'OLI@example.com', password: 'correct horse' });
+      expect(gone.json()).toMatchObject({ ok: true, deleted: true });
+      expect((await app.inject({ method: 'GET', url: '/v1/users/me', headers: bearer(body.token) })).statusCode).toBe(401);
+      expect((await login('oli@example.com', 'correct horse')).statusCode).toBe(401);
+    });
+
+    it('deletes an account from the web with an emailed code when the password is forgotten', async () => {
+      await register('pam@example.com');
+      mail = [];
+      const ghost = await app.inject({ method: 'POST', url: '/v1/account/delete/code', payload: { email: 'ghost@example.com' } });
+      expect(ghost.statusCode).toBe(200);
+      expect(mail).toEqual([]);
+      await app.inject({ method: 'POST', url: '/v1/account/delete/code', payload: { email: 'pam@example.com' } });
+      expect(mail).toEqual([expect.objectContaining({ email: 'pam@example.com', purpose: 'delete' })]);
+      const code = mail[0].code;
+      // A reset code cannot delete, and a delete code cannot reset.
+      expect((await app.inject({ method: 'POST', url: '/v1/auth/email/reset', payload: { email: 'pam@example.com', code, password: 'new password 1' } })).statusCode).toBe(422);
+      const gone = await app.inject({ method: 'POST', url: '/v1/account/delete', payload: { email: 'pam@example.com', code } });
+      expect(gone.json()).toMatchObject({ ok: true, deleted: true });
+      expect((await login('pam@example.com', 'correct horse')).statusCode).toBe(401);
+    });
+
     it('exports the account and farm without secrets', async () => {
       const body = (await register('kim@example.com')).json();
       await createFarm(body.token, TOKYO);

@@ -14,6 +14,8 @@ import { burnPasswordCheck, hashPassword, isValidPassword, verifyPassword } from
 import { CODE_MAX_ATTEMPTS, CODE_RESEND_MS, CODE_TTL_MS, codeHash, emailKey, isCodePurpose, isValidCode, newCode,
   normalizeEmail, type CodePurpose } from './email.js';
 import type { Mailer } from './mailer.js';
+import { ageOn, parseProfile } from './profile.js';
+import { DELETE_PAGE_HTML } from './delete_page.js';
 
 export interface AccountRouteDeps {
   store: Store;
@@ -30,9 +32,13 @@ export interface AccountRouteDeps {
   log?: (line: string) => void;
 }
 
-export function userView(u: UserRow, player?: PlayerRow) {
+export function userView(u: UserRow, player?: PlayerRow, now = Date.now()) {
   return {
     user_id: u.id, email: u.email, email_verified: u.email_verified, created_at: u.created_at,
+    display_name: u.display_name ?? null, gender: u.gender ?? null, gender_custom: u.gender_custom ?? null,
+    birth_date: u.birth_date ?? null, age: u.birth_date ? ageOn(u.birth_date, now) : null,
+    // A nickname is the only required profile field; the client asks for it before the first farm.
+    profile_complete: Boolean(u.display_name),
     ...(player ? { player_id: player.id } : {}),
   };
 }
@@ -95,9 +101,15 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     if (!isValidPassword(body?.password)) return reply.code(400).send({ code: 'WEAK_PASSWORD', server_time: deps.now() });
     const created = await deps.store.createEmailUser(email, await hashPassword(body.password), deps.now());
     if (created.kind === 'email_taken') return reply.code(409).send({ code: 'EMAIL_TAKEN', server_time: deps.now() });
+    // A nickname given at sign-up is saved right away; an invalid one is simply asked for again later.
+    const nickname = (req.body as { display_name?: unknown }).display_name;
+    if (nickname !== undefined) {
+      const parsed = parseProfile({ display_name: nickname }, deps.now());
+      if (parsed.ok) { await deps.store.updateUserProfile(created.user.id, parsed.profile); created.user.display_name = parsed.profile.display_name; }
+    }
     const session = await deps.store.authUser(created.user.id, deps.now());
     const sent = await sendCode(email, 'verify');
-    return reply.code(201).send({ token: session.token, ...userView(created.user, session.player), verification_sent: sent.ok, server_time: deps.now() });
+    return reply.code(201).send({ token: session.token, ...userView(created.user, session.player, deps.now()), verification_sent: sent.ok, server_time: deps.now() });
   });
 
   app.post('/v1/auth/email/login', { config: { rateLimit: { max: 120, timeWindow: '1 hour' } } }, async (req, reply) => {
@@ -110,7 +122,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     if (!user) { await burnPasswordCheck(body.password); return reply.code(401).send({ code: 'INVALID_CREDENTIALS', server_time: deps.now() }); }
     if (!await verifyPassword(body.password, user.password_hash)) return reply.code(401).send({ code: 'INVALID_CREDENTIALS', server_time: deps.now() });
     const session = await deps.store.authUser(user.id, deps.now());
-    return reply.send({ token: session.token, ...userView(user, session.player), server_time: deps.now() });
+    return reply.send({ token: session.token, ...userView(user, session.player, deps.now()), server_time: deps.now() });
   });
 
   /** 发码：verify（已登录账号验证邮箱）或 reset（找回密码）。邮箱不存在也回 200。 */
@@ -133,11 +145,11 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     if (!me) return;
     const code = (req.body as { code?: unknown } | undefined)?.code;
     if (!isValidCode(code)) return reply.code(400).send({ code: 'SCHEMA', server_time: deps.now() });
-    if (me.user.email_verified) return reply.send({ ...userView(me.user, me.player), server_time: deps.now() });
+    if (me.user.email_verified) return reply.send({ ...userView(me.user, me.player, deps.now()), server_time: deps.now() });
     const outcome = await consume(me.user.email ?? '', 'verify', code);
     if (outcome !== 'ok') return reply.code(422).send({ code: codeError(outcome), server_time: deps.now() });
     await deps.store.markEmailVerified(me.user.id);
-    return reply.send({ ...userView({ ...me.user, email_verified: true }, me.player), server_time: deps.now() });
+    return reply.send({ ...userView({ ...me.user, email_verified: true }, me.player, deps.now()), server_time: deps.now() });
   });
 
   /** 找回密码：码对了就改密、撤销该账号全部会话（含其它设备）并签发新会话。 */
@@ -155,14 +167,88 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     await deps.store.revokeUserTokens(user.id);
     const session = await deps.store.authUser(user.id, deps.now());
     await deps.closeSessions?.(session.player.id);
-    return reply.send({ token: session.token, ...userView({ ...user, email_verified: true }, session.player), server_time: deps.now() });
+    return reply.send({ token: session.token, ...userView({ ...user, email_verified: true }, session.player, deps.now()), server_time: deps.now() });
+  });
+
+  /** 应用内与站外删号共用：先清联机状态、断开会话，再级联删除并写墓碑。 */
+  const deleteUserEverywhere = async (user: UserRow, source: 'app' | 'web') => {
+    const players = await deps.store.authUser(user.id, deps.now()).then(s => [s.player.id]).catch(() => [] as string[]);
+    for (const id of players) { await deps.beforeDelete?.(id); await deps.closeSessions?.(id); }
+    return deps.store.deleteUser(user.id, {
+      user_id: user.id, provider_uid: user.email ? 'email:' + emailKey(user.email, deps.pepper) : 'none',
+      requested_at: deps.now(), source, apple_revocation: 'n/a',
+    });
+  };
+
+  /** 资料：昵称必填，性别与生日选填；生日不足 13 岁拒绝且不保存。 */
+  app.put('/v1/users/me/profile', { config: { rateLimit: { max: 60, timeWindow: '1 hour' } } }, async (req, reply) => {
+    const me = await account(req, reply);
+    if (!me) return;
+    const parsed = parseProfile(req.body, deps.now());
+    if (!parsed.ok) return reply.code(400).send({ code: parsed.code, server_time: deps.now() });
+    await deps.store.updateUserProfile(me.user.id, parsed.profile);
+    return reply.send({ ...userView({ ...me.user, ...parsed.profile }, me.player, deps.now()), server_time: deps.now() });
+  });
+
+  /** 登录状态下改密码：要当前密码；改完撤销该账号全部会话（含其它设备），本设备拿新 token。 */
+  app.post('/v1/auth/email/password', { config: { rateLimit: { max: 20, timeWindow: '1 hour' } } }, async (req, reply) => {
+    const me = await account(req, reply);
+    if (!me) return;
+    const body = req.body as { current_password?: unknown; new_password?: unknown } | undefined;
+    if (typeof body?.current_password !== 'string' || !await verifyPassword(body.current_password, me.user.password_hash))
+      return reply.code(401).send({ code: 'INVALID_CREDENTIALS', server_time: deps.now() });
+    if (!isValidPassword(body.new_password)) return reply.code(400).send({ code: 'WEAK_PASSWORD', server_time: deps.now() });
+    if (body.new_password === body.current_password) return reply.code(400).send({ code: 'SAME_PASSWORD', server_time: deps.now() });
+    await deps.store.setUserPassword(me.user.id, await hashPassword(body.new_password));
+    await deps.store.revokeUserTokens(me.user.id);
+    await deps.closeSessions?.(me.player.id);
+    const session = await deps.store.authUser(me.user.id, deps.now());
+    return reply.send({ token: session.token, ...userView(me.user, session.player, deps.now()), server_time: deps.now() });
+  });
+
+  // —— 站外删号（Google Play 要求可在应用外删除账号） ——
+  app.get('/v1/account/delete', async (_req, reply) => reply
+    .header('content-type', 'text/html; charset=utf-8')
+    .header('content-security-policy', "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'")
+    .header('cache-control', 'no-store')
+    .send(DELETE_PAGE_HTML));
+
+  app.post('/v1/account/delete/code', { config: { rateLimit: { max: 30, timeWindow: '1 hour' } } }, async (req, reply) => {
+    if (await limited(codeLimit, req, reply)) return;
+    const email = bodyEmail(req);
+    if (!email) return reply.code(400).send({ code: 'INVALID_EMAIL', server_time: deps.now() });
+    const user = await deps.store.userByEmail(email);
+    if (user) {
+      const sent = await sendCode(email, 'delete');
+      if (!sent.ok) return reply.code(429).send({ code: 'CODE_COOLDOWN', retry_after_s: Math.ceil(sent.retry_after_ms / 1000), server_time: deps.now() });
+    }
+    return reply.send({ ok: true, server_time: deps.now() });
+  });
+
+  /** 站外删号：邮箱 + 密码，或邮箱 + 删号验证码（忘了密码也能删）。失败一律不区分邮箱是否存在。 */
+  app.post('/v1/account/delete', { config: { rateLimit: { max: 30, timeWindow: '1 hour' } } }, async (req, reply) => {
+    if (await limited(loginLimit, req, reply)) return;
+    const body = req.body as { email?: unknown; password?: unknown; code?: unknown } | undefined;
+    const email = normalizeEmail(body?.email);
+    if (!email || (typeof body?.password !== 'string' && !isValidCode(body?.code)))
+      return reply.code(400).send({ code: 'SCHEMA', server_time: deps.now() });
+    const user = await deps.store.userByEmail(email);
+    if (typeof body.password === 'string') {
+      if (!user) { await burnPasswordCheck(body.password); return reply.code(401).send({ code: 'INVALID_CREDENTIALS', server_time: deps.now() }); }
+      if (!await verifyPassword(body.password, user.password_hash)) return reply.code(401).send({ code: 'INVALID_CREDENTIALS', server_time: deps.now() });
+    } else {
+      const outcome = user ? await consume(email, 'delete', body.code as string) : 'invalid';
+      if (!user || outcome !== 'ok') return reply.code(422).send({ code: codeError(outcome), server_time: deps.now() });
+    }
+    const deleted = await deleteUserEverywhere(user!, 'web');
+    return reply.send({ ok: true, deleted, server_time: deps.now() });
   });
 
   app.get('/v1/users/me', async (req, reply) => {
     const me = await account(req, reply);
     if (!me) return;
     const farm = await deps.store.farmByOwner(me.player.id);
-    return reply.send({ ...userView(me.user, me.player), has_farm: Boolean(farm), server_time: deps.now() });
+    return reply.send({ ...userView(me.user, me.player, deps.now()), has_farm: Boolean(farm), server_time: deps.now() });
   });
 
   /** 数据访问请求：账号 + 农场存档，一份 JSON 附件。不含 token 与密码哈希。 */
@@ -171,7 +257,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     if (!me) return;
     const farm = await deps.store.farmByOwner(me.player.id);
     reply.header('content-disposition', `attachment; filename="sensen-account-${me.user.id}.json"`);
-    return reply.send({ exported_at: deps.now(), account: userView(me.user, me.player),
+    return reply.send({ exported_at: deps.now(), account: userView(me.user, me.player, deps.now()),
       farm: farm ? { id: farm.id, city_id: farm.region_id, location: farm.location ?? null, visit_access: farm.visit_access,
         location_visible: farm.location_visible, version: farm.version, state: farm.state } : null });
   });
@@ -186,12 +272,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     const password = (req.body as { password?: unknown } | undefined)?.password;
     if (me.user.password_hash && (typeof password !== 'string' || !await verifyPassword(password, me.user.password_hash)))
       return reply.code(401).send({ code: 'INVALID_CREDENTIALS', server_time: deps.now() });
-    await deps.beforeDelete?.(me.player.id);
-    await deps.closeSessions?.(me.player.id);
-    const deleted = await deps.store.deleteUser(me.user.id, {
-      user_id: me.user.id, provider_uid: me.user.email ? 'email:' + emailKey(me.user.email, deps.pepper) : 'none',
-      requested_at: deps.now(), source: 'app', apple_revocation: 'n/a',
-    });
+    const deleted = await deleteUserEverywhere(me.user, 'app');
     return reply.send({ ok: true, deleted, server_time: deps.now() });
   });
 

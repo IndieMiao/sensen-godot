@@ -6,7 +6,7 @@
  */
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
 
-export type CodePurpose = 'verify' | 'reset';
+export type CodePurpose = 'verify' | 'reset' | 'delete';
 export const CODE_TTL_MS = 10 * 60_000;
 export const CODE_RESEND_MS = 60_000;
 export const CODE_MAX_ATTEMPTS = 5;
@@ -18,7 +18,7 @@ export function normalizeEmail(v: unknown): string | null {
   return email;
 }
 
-export const isCodePurpose = (v: unknown): v is CodePurpose => v === 'verify' || v === 'reset';
+export const isCodePurpose = (v: unknown): v is CodePurpose => v === 'verify' || v === 'reset' || v === 'delete';
 export const isValidCode = (v: unknown): v is string => typeof v === 'string' && /^\d{6}$/.test(v);
 export const newCode = (): string => String(randomInt(0, 1_000_000)).padStart(6, '0');
 

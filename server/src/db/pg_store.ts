@@ -53,6 +53,8 @@ const rowToFarm = (r: Record<string, unknown>): FarmRow => ({
 const rowToUser = (r: Record<string, unknown>): UserRow => ({
   id: r.id as string, email: (r.email ?? null) as string | null, email_verified: r.email_verified === true,
   password_hash: (r.password_hash ?? null) as string | null, created_at: Number(r.created_at), last_seen_at: Number(r.last_seen_at),
+  display_name: (r.display_name ?? null) as string | null, gender: (r.gender ?? null) as string | null,
+  gender_custom: (r.gender_custom ?? null) as string | null, birth_date: (r.birth_date ?? null) as string | null,
 });
 
 export class PgStore implements Store {
@@ -211,6 +213,10 @@ export class PgStore implements Store {
   }
   async markEmailVerified(userId: string) {
     await this.d.pool.query('UPDATE users SET email_verified = true WHERE id = $1', [userId]);
+  }
+  async updateUserProfile(userId: string, profile: { display_name: string | null; gender: string | null; gender_custom: string | null; birth_date: string | null }) {
+    await this.d.pool.query('UPDATE users SET display_name = $2, gender = $3, gender_custom = $4, birth_date = $5 WHERE id = $1',
+      [userId, profile.display_name, profile.gender, profile.gender_custom, profile.birth_date]);
   }
   async authUser(userId: string, now: number) {
     const client = await this.d.pool.connect();
