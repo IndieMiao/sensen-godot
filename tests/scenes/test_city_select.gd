@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## 选城页（SGODOT-137）：全球任意城市可选，不申请定位权限，默认城市由 IP 预填且需确认。
+## 选城页（SGODOT-137）：先登录；全球任意城市可选，不申请定位权限；默认城市（上次选的，否则 IP）预填，一键确认。
 
 const SCENE := "res://scenes/city_select/city_select.tscn"
 const TOKYO := {"id": "gn-1850147", "name": "Tokyo", "country": "Japan", "country_code": "JP", "timezone": "Asia/Tokyo",
@@ -27,16 +27,64 @@ func test_no_location_permission_entry_point() -> void:
 	assert_str(source).not_contains("start_location")
 	assert_str(source).not_contains("MapBridgeFactory")
 
-func test_suggestion_is_a_card_the_player_confirms() -> void:
+func test_network_city_is_prefilled_and_confirmed_with_one_tap() -> void:
 	var s := _scene()
 	var box: Control = s.find_child("Suggestion", true, false)
 	assert_bool(box.visible).is_false()
 	s.show_suggestion(TOKYO)
 	assert_bool(box.visible).is_true()
 	var button: Button = s.find_child("SuggestedCity", true, false)
-	assert_str(button.text).is_equal("Tokyo, Japan")
+	assert_str(button.text).is_equal("Continue with Tokyo, Japan")
+	assert_str((s.find_child("Search", true, false) as LineEdit).text).is_equal("Tokyo, Japan")
 	# Nothing is chosen until the button is pressed.
 	assert_str(FarmRegions.load_choice()).is_empty()
+
+func test_last_city_wins_over_the_network_guess() -> void:
+	FarmRegions.save_choice("los_angeles")
+	var s := _scene()
+	assert_str(s.suggested_source).is_equal("last")
+	assert_str((s.find_child("Search", true, false) as LineEdit).text).is_equal("Los Angeles")
+	s.show_suggestion(TOKYO)
+	assert_str(str(s.suggested.id)).is_equal("los_angeles")
+	assert_str((s.find_child("SuggestedCity", true, false) as Button).text).is_equal("Continue with Los Angeles")
+
+func test_editing_the_prefilled_city_hides_continue_until_cleared() -> void:
+	var s := _scene()
+	s.show_suggestion(TOKYO)
+	var search: LineEdit = s.find_child("Search", true, false)
+	var box: Control = s.find_child("Suggestion", true, false)
+	search.text = "Osa"
+	search.text_changed.emit("Osa")
+	assert_bool(box.visible).is_false()
+	search.text = ""
+	search.text_changed.emit("")
+	assert_bool(box.visible).is_true()
+	# A network answer arriving after the player typed does not overwrite the box.
+	search.text = "Osaka"
+	search.text_changed.emit("Osaka")
+	s.suggested = {}
+	s.suggested_source = ""
+	s.show_suggestion(TOKYO)
+	assert_str(search.text).is_equal("Osaka")
+
+func test_guests_get_a_sign_in_gate_that_cannot_be_closed() -> void:
+	Net.account.clear("user://test_city_gate.json")
+	var s := _scene()
+	var panel: AccountPanel = s.open_sign_in_gate()
+	assert_object(panel).is_not_null()
+	assert_bool(panel.gate).is_true()
+	assert_bool((panel.find_child("Close", true, false) as Button).visible).is_false()
+	panel.dismiss()
+	assert_bool(panel.is_queued_for_deletion()).is_false()
+	# Opening it again reuses the same gate.
+	assert_object(s.open_sign_in_gate()).is_same(panel)
+	# Once signed in, the gate lets go.
+	Net.account.token = "tok"
+	Net.account.user_id = "u1"
+	panel.dismiss()
+	assert_bool(panel.is_queued_for_deletion()).is_true()
+	assert_object(s.open_sign_in_gate()).is_null()
+	Net.account.clear("user://test_city_gate.json")
 
 func test_search_results_and_popular_list_render_server_cities() -> void:
 	var s := _scene()

@@ -22,6 +22,8 @@ var reason := ""
 var busy := false
 ## 从"我的账号"进入的子页面，保存 / 返回后回到账号页；从登录流程进入的则直接关闭。
 var from_account := false
+## 登录墙（2026-09-29 取消游客模式）：没有关闭按钮，登录成功前关不掉。
+var gate := false
 var _reset_code_sent := false
 ## 测试替身：func(nonce_hash) -> 原生回包；空则走 iOS 原生桥。
 var apple_transport: Callable = Callable()
@@ -367,8 +369,13 @@ func _set_busy(value: bool) -> void:
 	_close.disabled = value
 	for b in _actions.get_children(): (b as Button).disabled = value
 
+func set_gate(on: bool) -> void:
+	gate = on
+	if is_instance_valid(_close): _close.visible = not on
+
 func dismiss() -> void:
 	if busy: return
+	if gate and not (Net != null and Net.account.signed_in()): return
 	var signed := Net != null and Net.account.signed_in()
 	closed.emit(signed)
 	queue_free()

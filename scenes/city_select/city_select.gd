@@ -1,9 +1,9 @@
 extends Control
 ## 首次进入：自由选择全球任意城市（SGODOT-137）。
 ##
-## 2026-09-28 决定 3：先不申请定位权限。默认城市由服务端按请求 IP 粗定位预填成一张确认卡，
-## 用户点确认才落城（PRD §3.4：大致位置只推荐、不静默落入）。其余入口：按名字搜索、
-## 有玩家的城市推荐。离线时退回本地精品城市（上海、洛杉矶）。
+## 2026-09-29：取消游客模式，没登录先登录（本页开一个不能关的登录面板）；新玩家登录后才选城。
+## 默认城市自动填进搜索框：优先上一次选过的城市，其次服务端按 IP 粗定位（不申请定位权限）。
+## 玩家点"继续"确认，或改搜别的城市。离线时退回本地精品城市（上海、洛杉矶）。
 
 const SEARCH_DEBOUNCE_S := 0.35
 const MAX_RESULTS := 4
@@ -13,6 +13,8 @@ static var _boot_checked := false
 
 var regions: FarmRegions
 var suggested: Dictionary = {}
+## 预填来源："last" 上次选过的城市，"ip" 网络位置。
+var suggested_source := ""
 var _search_serial := 0
 var _search_timer: Timer
 var _city_card: Panel
@@ -52,7 +54,8 @@ func _ready() -> void:
 	if not _boot_checked and get_tree().current_scene == self:
 		_boot_checked = true
 		var own_region := owned_farm_region(FarmRegions.load_default(), FarmChoice.load())
-		if not own_region.is_empty():
+		# Only a signed-in device jumps straight to its farm; everyone else signs in here first.
+		if not own_region.is_empty() and has_saved_account():
 			FarmRegions.save_choice(own_region)
 			AppRouter.go_to_map.call_deferred()
 			return
@@ -101,7 +104,7 @@ func _ready() -> void:
 	symbol.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_city_column.add_child(symbol)
 	_city_column.move_child(symbol, 0)
-	# Default city from the network address: a suggestion the player confirms, never an automatic pick.
+	# The default city (last choice, else network location) is prefilled and confirmed with one tap.
 	_suggest_box = VBoxContainer.new()
 	_suggest_box.name = "Suggestion"
 	_suggest_box.add_theme_constant_override("separation", 6)
@@ -128,7 +131,9 @@ func _ready() -> void:
 	_search.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_URL
 	_search.text_changed.connect(_on_search_changed)
 	_city_column.add_child(_search)
-	_city_column.move_child(_search, 3)
+	_city_column.move_child(_search, 2)
+	# The prefilled city sits under the search box as a one-tap "Continue".
+	_city_column.move_child(_suggest_box, 3)
 	_results = VBoxContainer.new()
 	_results.name = "Results"
 	_results.add_theme_constant_override("separation", 6)
@@ -169,12 +174,31 @@ func _ready() -> void:
 	KeyboardAvoider.attach($SafeArea, MAX_RESULTS * 54.0)
 	if Net and not Net.is_test_process():
 		_load_directory.call_deferred()
+	prefill_remembered()
 	if Net:
 		Net.account_changed.connect(_on_account_changed)
 		Net.booted.connect(_on_net_booted)
+		# No guest mode: the sign-in gate opens as soon as we know nobody is signed in.
+		if not Net.is_test_process():
+			if Net.booted_once: _on_net_booted(Net.logged_in())
+			elif not has_saved_account(): open_sign_in_gate.call_deferred()
+
+static func has_saved_account() -> bool:
+	if Net and Net.account.signed_in(): return true
+	return AccountSession.new().load_saved(Net.account_path if Net else AccountSession.PATH)
 
 func _on_net_booted(_ok: bool) -> void:
-	_on_account_changed(not Net.is_guest())
+	if Net.is_guest(): open_sign_in_gate()
+	else: _on_account_changed(true)
+
+## 登录墙：盖住整页、不能关，登录成功才收起。
+func open_sign_in_gate() -> AccountPanel:
+	if not is_inside_tree() or (Net and not Net.is_guest()): return null
+	for existing in find_children("*", "AccountPanel", true, false):
+		if (existing as AccountPanel).gate: return existing
+	var panel := AccountPanel.open(self, "sign_in", L10n.text("Sign in or create an account to start."))
+	panel.set_gate(true)
+	return panel
 
 ## 新设备登录已有农场的账号：直接回到自己的农场，不必再选城。
 func _on_account_changed(signed_in: bool) -> void:
@@ -247,15 +271,40 @@ func _load_directory() -> void:
 	if hint.is_success() and hint.json.get("city") is Dictionary:
 		show_suggestion(hint.json.city)
 
-func show_suggestion(view: Dictionary) -> void:
+## IP 推荐只在没有"上次选过的城市"时生效，也不覆盖玩家已经在搜索框里改过的内容。
+func show_suggestion(view: Dictionary, source := "ip") -> void:
 	if str(view.get("id", "")).is_empty(): return
+	if source == "ip" and suggested_source == "last": return
+	var typed := _search.text.strip_edges()
+	if source == "ip" and not typed.is_empty() and (suggested.is_empty() or _search.text != city_label(suggested)): return
 	suggested = view
-	_suggest_label.text = L10n.text("You seem to be near")
-	_suggest_button.text = city_label(view)
+	suggested_source = source
+	_suggest_label.text = L10n.text("Your last city" if source == "last" else "Based on your network")
+	_suggest_button.text = L10n.format_text("Continue with %s", city_label(view))
+	# Setting text does not emit text_changed, so no search runs for the prefill.
+	_search.text = city_label(view)
+	show_results([])
 	_suggest_box.visible = true
+
+## 上次在本机选过的城市（精品城市或缓存过的全球城市）。
+func prefill_remembered() -> void:
+	var id := FarmRegions.load_choice()
+	if id.is_empty() or regions == null: return
+	var region := regions.region(id)
+	if region.is_empty(): region = FarmRegions.cached_region(id)
+	if region.is_empty(): return
+	var view := _region_view(region)
+	view.curated = not bool(region.get("global", false))
+	show_suggestion(view, "last")
 
 func _on_search_changed(text: String) -> void:
 	_search_serial += 1
+	# Editing the prefilled name means the player wants another city; clearing it brings the default back.
+	if not suggested.is_empty():
+		_suggest_box.visible = text.strip_edges().is_empty() or text == city_label(suggested)
+		if text == city_label(suggested):
+			show_results([])
+			return
 	if text.strip_edges().length() < 2:
 		show_results([])
 		_search_timer.stop()
@@ -306,4 +355,7 @@ func choose(id: String) -> void:
 
 func _open_account() -> void:
 	if GameUi.modal_is_open(self): return
-	AccountPanel.open(self, "account" if Net and not Net.is_guest() else "sign_in")
+	if Net and Net.is_guest():
+		open_sign_in_gate()
+		return
+	AccountPanel.open(self, "account")

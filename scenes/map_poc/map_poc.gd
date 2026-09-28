@@ -228,6 +228,7 @@ func _ready() -> void:
 	account.offset_bottom = 44
 	account.pressed.connect(_open_account)
 	if Net and not Net.account_changed.is_connected(_on_account_changed): Net.account_changed.connect(_on_account_changed)
+	if Net and not Net.booted.is_connected(_on_net_booted_guest): Net.booted.connect(_on_net_booted_guest)
 	if Net: _account_user_id = Net.account.user_id
 	side_toolbar.offset_top = 58
 	Localization.language_changed.connect(_refresh_language)
@@ -1823,6 +1824,10 @@ func _require_account(reason: String) -> bool:
 func _on_account_changed(_signed_in: bool) -> void:
 	if _awaiting_account or _relocation_mode or not is_inside_tree(): return
 	if AppRouter.top_instance() != null: return
+	# No guest mode (2026-09-29): signing out or deleting the account goes back to the sign-in gate.
+	if Net.is_guest():
+		_leave_for_sign_in()
+		return
 	# A password change keeps the same account: nothing to rebuild.
 	if Net.account.user_id == _account_user_id: return
 	_account_user_id = Net.account.user_id
@@ -1836,6 +1841,17 @@ func _on_account_changed(_signed_in: bool) -> void:
 	else:
 		FarmChoice.clear()
 	AppRouter.go_to_map.call_deferred()
+
+func _leave_for_sign_in() -> void:
+	for panel in find_children("*", "AccountPanel", true, false):
+		await (panel as AccountPanel).closed
+	if not is_inside_tree(): return
+	FarmChoice.clear()
+	AppRouter.go_to_city_select.call_deferred()
+
+## 启动时保存的账号 token 已失效：boot 回到游客，同样退回登录。
+func _on_net_booted_guest(_ok: bool) -> void:
+	if is_inside_tree() and Net.is_guest() and not Net.is_test_process(): _leave_for_sign_in()
 
 func _open_account() -> void:
 	if GameUi.modal_is_open(self): return

@@ -164,6 +164,27 @@ final class JourneyDeviceUITests: XCTestCase {
                       "Map did not recover after the transient listener failure")
     }
 
+    /// Account test build (app.gensen.maps.accounts): capture the screen and accept the
+    /// local-network prompt only when it names this test app. Never touches Sign in with Apple.
+    func testAccountsInspectAndAllowLocalNetwork() {
+        let accounts = XCUIApplication(bundleIdentifier: "app.gensen.maps.accounts")
+        accounts.activate()
+        XCTAssertTrue(accounts.wait(for: .runningForeground, timeout: 15))
+        sleep(3)
+        capture("accounts-launch", application: accounts)
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let alert = springboard.alerts.firstMatch
+        if alert.exists && alert.label.contains("Journey Acc") {
+            capture("accounts-alert", application: springboard)
+            for label in ["允许", "Allow"] where alert.buttons[label].exists {
+                alert.buttons[label].tap()
+                break
+            }
+        }
+        sleep(8)
+        capture("accounts-after-wait", application: accounts)
+    }
+
     private func allowQAFirstRunWiFiIfShown() {
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
         let wifiOnly = springboard.buttons["仅限无线局域网"]

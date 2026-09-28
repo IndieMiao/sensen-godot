@@ -1791,5 +1791,9 @@
   "This permanently deletes your account and your farm. This can't be undone.": "将永久删除你的账号和农场，且无法恢复。",
   "This email already has an account. Sign in with your email and password first.": "该邮箱已有账号，请先用邮箱和密码登录。",
   "Sign in with Apple isn't available right now.": "暂时无法使用 Apple 登录。",
-  "Sign in with Apple failed. Please try again.": "Apple 登录失败，请重试。"
+  "Sign in with Apple failed. Please try again.": "Apple 登录失败，请重试。",
+  "Sign in or create an account to start.": "登录或注册账号后开始",
+  "Your last city": "上次选择的城市",
+  "Based on your network": "根据你的网络位置",
+  "Continue with %s": "继续：%s"
 }
