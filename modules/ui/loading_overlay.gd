@@ -13,11 +13,11 @@ func _ready() -> void:
 	background.theme = GameUi.theme()
 	add_child(background)
 	var scenery := TextureRect.new()
-	scenery.texture = load("res://assets/ui/game/city-background.png")
+	# Same quiet 3D map as the city picker and account panel (2026-09-28).
+	scenery.texture = load("res://assets/ui/backgrounds/map-social.png")
 	scenery.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scenery.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	scenery.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	scenery.modulate.a = 0.38
 	scenery.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	background.add_child(scenery)
 	var center := CenterContainer.new()
