@@ -40,7 +40,7 @@ for (const storage of ['memory', 'postgres'] as const) {
     let ownerId: string;
     let farmId: string;
     const headers = () => ({ authorization: `Bearer ${token}` });
-    const build = () => buildApp({ store, content, contentVersion: cv, blueprintDir,
+    const build = () => buildApp({ guestWrites: true, store, content, contentVersion: cv, blueprintDir,
       regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: 'decorations-test', now: () => clock });
     const me = () => app.inject({ method: 'GET', url: '/v1/farms/me', headers: headers() });
     const save = (placements: unknown, id: string = randomUUID(), base = 0, auth: Record<string, string> = headers()) =>

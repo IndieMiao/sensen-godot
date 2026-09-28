@@ -3,6 +3,8 @@
  "regions": [
   {
    "id": "shanghai",
+   "geonames_id": "gn-1796236",
+   "country_code": "CN",
    "name": "Shanghai",
    "timezone": "Asia/Shanghai",
    "placement_bounds": [30.67, 120.86, 31.90, 122.20],
@@ -32,6 +34,8 @@
   },
   {
    "id": "los_angeles",
+   "geonames_id": "gn-5368361",
+   "country_code": "US",
    "name": "Los Angeles",
    "timezone": "America/Los_Angeles",
    "placement_bounds": [33.70, -118.67, 34.35, -118.15],

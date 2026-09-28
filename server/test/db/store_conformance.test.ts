@@ -62,7 +62,7 @@ for (const [name, enabled, makeStore] of makers) {
       qa = new Set();
       if (pool) await truncateAll(pool);
       currentStore = makeStore() as Store;
-      app = await buildApp({
+      app = await buildApp({ guestWrites: true,
         store: currentStore, content, contentVersion: CV,
         blueprintDir: BLUEPRINTS, regionsFile: REGIONS,
         pepper: 'test-pepper', now: () => clock, qaPlayerIds: qa,

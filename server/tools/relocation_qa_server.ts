@@ -46,7 +46,7 @@ await store.createFarm({ ownerId: auth.player.id, idempotencyKey: 'isolated-lega
   layoutPatchId: farm.layout_patch_id, blueprintRevision: 2, build: () => farm });
 writeFileSync(path.join(directory, 'account.json'), JSON.stringify({ key, farm_id: farm.id, player_id: auth.player.id }), { mode: 0o600 });
 writeFileSync(path.join(directory, 'before-farm.json'), JSON.stringify(farm, null, 2), { mode: 0o600 });
-const app = await buildApp({ store, content, contentVersion: cv, plot, now: Date.now, pepper,
+const app = await buildApp({ guestWrites: true, store, content, contentVersion: cv, plot, now: Date.now, pepper,
   blueprintDir: path.resolve(DEFAULT_CONTENT_DIR, '../../blueprints'), regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'),
   geographyProvider: async location => {
     if (Math.abs(location.lat - center.lat) > .0006 || Math.abs(location.lng - center.lng) > .0006)

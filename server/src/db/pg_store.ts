@@ -22,7 +22,7 @@ import { DOMAIN_VERSION, STATE_SCHEMA_VERSION } from '../domain/version.js';
 import { MAX_ACTIVE_TOKENS, TOKEN_IDLE_MS, newToken, tokenHash } from '../http/auth.js';
 import { currentOwnerFarmView, type FarmRow } from '../http/dto.js';
 import { canonicalJson, commandRecordResult, payloadHash } from '../http/hash.js';
-import type { ApplyOutcome, CommandRecord, PlayerRow, Store } from '../http/store.js';
+import type { ApplyOutcome, CommandRecord, ConsumeCodeOutcome, DeletionRecord, PlayerRow, Store, UserRow } from '../http/store.js';
 
 export interface PgStoreDeps {
   pool: pg.Pool;
@@ -48,6 +48,11 @@ const rowToFarm = (r: Record<string, unknown>): FarmRow => ({
   location_visible: r.location_visible as boolean,
   visit_access: r.visit_access as 'only_me' | 'anyone',
   state: r.state as FarmRow['state'],
+});
+
+const rowToUser = (r: Record<string, unknown>): UserRow => ({
+  id: r.id as string, email: (r.email ?? null) as string | null, email_verified: r.email_verified === true,
+  password_hash: (r.password_hash ?? null) as string | null, created_at: Number(r.created_at), last_seen_at: Number(r.last_seen_at),
 });
 
 export class PgStore implements Store {
@@ -163,13 +168,140 @@ export class PgStore implements Store {
            SELECT id FROM tokens WHERE player_id = $1 ORDER BY last_used_at DESC, id DESC LIMIT $2)`,
         [id, MAX_ACTIVE_TOKENS]);
       await client.query('COMMIT');
-      return { player: { id, install_key_hmac: hmac }, token };
+      return { player: { id, install_key_hmac: hmac, user_id: null }, token };
     } catch (e) {
       await client.query('ROLLBACK');
       throw e;
     } finally {
       client.release();
     }
+  }
+
+  // —— 账号（SGODOT-135） ——
+  async createEmailUser(email: string, passwordHash: string, now: number) {
+    const client = await this.d.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const inserted = await client.query(
+        `INSERT INTO users (id, email, email_verified, password_hash, created_at, last_seen_at) VALUES ($1,$2,false,$3,$4,$4)
+           ON CONFLICT (email) DO NOTHING RETURNING *`, [randomUUID(), email, passwordHash, now]);
+      if (!inserted.rowCount) { await client.query('ROLLBACK'); return { kind: 'email_taken' as const }; }
+      const user = rowToUser(inserted.rows[0]);
+      await client.query(`INSERT INTO user_identities (provider, provider_uid, user_id, sign_in_provider, created_at)
+        VALUES ('email', $1, $2, 'password', $3)`, [email, user.id, now]);
+      await client.query('COMMIT');
+      return { kind: 'created' as const, user };
+    } catch (e) {
+      await client.query('ROLLBACK');
+      if ((e as { code?: string }).code === '23505') return { kind: 'email_taken' as const };
+      throw e;
+    } finally { client.release(); }
+  }
+  async userByEmail(email: string) {
+    const r = await this.d.pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    return r.rowCount ? rowToUser(r.rows[0]) : null;
+  }
+  async userById(userId: string) {
+    if (!/^[0-9a-f-]{36}$/i.test(userId)) return null;
+    const r = await this.d.pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+    return r.rowCount ? rowToUser(r.rows[0]) : null;
+  }
+  async setUserPassword(userId: string, passwordHash: string) {
+    await this.d.pool.query('UPDATE users SET password_hash = $2 WHERE id = $1', [userId, passwordHash]);
+  }
+  async markEmailVerified(userId: string) {
+    await this.d.pool.query('UPDATE users SET email_verified = true WHERE id = $1', [userId]);
+  }
+  async authUser(userId: string, now: number) {
+    const client = await this.d.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const user = await client.query('UPDATE users SET last_seen_at = $2 WHERE id = $1 RETURNING id', [userId, now]);
+      if (!user.rowCount) throw new Error('NO_ACCOUNT');
+      // Upsert on user_id: concurrent first sign-ins from two devices land on the same account player.
+      const upsert = await client.query(
+        `INSERT INTO players (id, install_key_hmac, created_at, last_seen_at, user_id) VALUES ($1,$2,$3,$3,$4)
+           ON CONFLICT (user_id) DO UPDATE SET last_seen_at = EXCLUDED.last_seen_at RETURNING id, install_key_hmac`,
+        [randomUUID(), 'account:' + userId, now, userId]);
+      const id = upsert.rows[0].id as string;
+      const token = newToken();
+      await client.query('INSERT INTO tokens (id, player_id, token_hash, created_at, last_used_at) VALUES ($1,$2,$3,$4,$4)',
+        [randomUUID(), id, tokenHash(token), now]);
+      await client.query(
+        `DELETE FROM tokens WHERE player_id = $1 AND id NOT IN (
+           SELECT id FROM tokens WHERE player_id = $1 ORDER BY last_used_at DESC, id DESC LIMIT $2)`, [id, MAX_ACTIVE_TOKENS]);
+      await client.query('COMMIT');
+      return { player: { id, install_key_hmac: upsert.rows[0].install_key_hmac as string, user_id: userId }, token };
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally { client.release(); }
+  }
+  async revokeUserTokens(userId: string) {
+    await this.d.pool.query('DELETE FROM tokens WHERE player_id IN (SELECT id FROM players WHERE user_id = $1)', [userId]);
+  }
+  async saveEmailCode(email: string, purpose: string, hash: string, now: number, ttlMs: number, resendMs: number) {
+    // One statement: a concurrent resend either replaces an expired cooldown or sees the fresh row.
+    const r = await this.d.pool.query(
+      `INSERT INTO email_codes (email, purpose, code_hash, expires_at, sent_at, attempts) VALUES ($1,$2,$3,$4,$5,0)
+         ON CONFLICT (email, purpose) DO UPDATE SET code_hash = EXCLUDED.code_hash, expires_at = EXCLUDED.expires_at,
+           sent_at = EXCLUDED.sent_at, attempts = 0
+         WHERE email_codes.sent_at <= $5 - $6
+       RETURNING sent_at`, [email, purpose, hash, now + ttlMs, now, resendMs]);
+    if (r.rowCount) return { kind: 'saved' as const };
+    const prior = await this.d.pool.query('SELECT sent_at FROM email_codes WHERE email = $1 AND purpose = $2', [email, purpose]);
+    const sent = Number(prior.rows[0]?.sent_at ?? now);
+    return { kind: 'cooldown' as const, retry_after_ms: Math.max(0, resendMs - (now - sent)) };
+  }
+  async consumeEmailCode(email: string, purpose: string, hash: string, now: number, maxAttempts: number): Promise<ConsumeCodeOutcome> {
+    const client = await this.d.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const r = await client.query('SELECT * FROM email_codes WHERE email = $1 AND purpose = $2 FOR UPDATE', [email, purpose]);
+      const row = r.rows[0];
+      let outcome: ConsumeCodeOutcome;
+      if (!row) outcome = 'invalid';
+      else if (Number(row.expires_at) < now) outcome = 'expired';
+      else if (row.attempts >= maxAttempts) outcome = 'locked';
+      else if (row.code_hash !== hash) outcome = 'invalid';
+      else outcome = 'ok';
+      if (row && (outcome !== 'invalid' || row.attempts + 1 >= maxAttempts))
+        await client.query('DELETE FROM email_codes WHERE email = $1 AND purpose = $2', [email, purpose]);
+      else if (row) await client.query('UPDATE email_codes SET attempts = attempts + 1 WHERE email = $1 AND purpose = $2', [email, purpose]);
+      await client.query('COMMIT');
+      return outcome;
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally { client.release(); }
+  }
+  async deleteUser(userId: string, tombstone: DeletionRecord) {
+    const players = await this.d.pool.query('SELECT id FROM players WHERE user_id = $1', [userId]);
+    for (const row of players.rows) await this.realtimeDirectory(row.id as string, 'leave').catch(() => undefined);
+    const client = await this.d.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const user = await client.query('DELETE FROM users WHERE id = $1 RETURNING email', [userId]);
+      if (!user.rowCount) { await client.query('ROLLBACK'); return false; }
+      // players.user_id cascades; farms, tokens, commands, snapshots and online rows cascade from players.
+      if (user.rows[0].email) await client.query('DELETE FROM email_codes WHERE email = $1', [user.rows[0].email]);
+      await client.query(`INSERT INTO account_deletions (user_id, provider_uid, requested_at, source, apple_revocation)
+        VALUES ($1,$2,$3,$4,$5) ON CONFLICT (user_id) DO NOTHING`,
+        [tombstone.user_id, tombstone.provider_uid, tombstone.requested_at, tombstone.source, tombstone.apple_revocation]);
+      await client.query('COMMIT');
+      return true;
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally { client.release(); }
+  }
+  async deletion(userId: string) {
+    if (!/^[0-9a-f-]{36}$/i.test(userId)) return null;
+    const r = await this.d.pool.query('SELECT * FROM account_deletions WHERE user_id = $1', [userId]);
+    if (!r.rowCount) return null;
+    const row = r.rows[0];
+    return { user_id: row.user_id, provider_uid: row.provider_uid, requested_at: Number(row.requested_at),
+      source: row.source, apple_revocation: row.apple_revocation } as DeletionRecord;
   }
 
   async revokeToken(hash: string) {
@@ -188,7 +320,7 @@ export class PgStore implements Store {
 
   async playerByToken(hash: string, now: number): Promise<PlayerRow | null> {
     const r = await this.d.pool.query(
-      `SELECT t.player_id, t.last_used_at, p.install_key_hmac
+      `SELECT t.player_id, t.last_used_at, p.install_key_hmac, p.user_id
          FROM tokens t JOIN players p ON p.id = t.player_id WHERE t.token_hash = $1`, [hash]);
     if (!r.rowCount) return null;
     const row = r.rows[0];
@@ -197,7 +329,7 @@ export class PgStore implements Store {
       return null;
     }
     await this.d.pool.query('UPDATE tokens SET last_used_at = $2 WHERE token_hash = $1', [hash, now]);
-    return { id: row.player_id as string, install_key_hmac: row.install_key_hmac as string };
+    return { id: row.player_id as string, install_key_hmac: row.install_key_hmac as string, user_id: (row.user_id ?? null) as string | null };
   }
 
   async farmByOwner(ownerId: string): Promise<FarmRow | null> {
@@ -209,6 +341,11 @@ export class PgStore implements Store {
     if (!/^[0-9a-f-]{36}$/i.test(farmId)) return null; // 非 uuid 直接当不存在，别让 pg 抛类型错
     const r = await this.d.pool.query('SELECT * FROM farms WHERE id = $1', [farmId]);
     return r.rowCount ? rowToFarm(r.rows[0]) : null;
+  }
+
+  async cityFarmCounts() {
+    const r = await this.d.pool.query(`SELECT region_id, count(*)::int AS n FROM farms WHERE visit_access = 'anyone' GROUP BY region_id`);
+    return new Map(r.rows.map(row => [row.region_id as string, row.n as number]));
   }
 
   async nearby(regionId: string, excludeOwnerId: string, limit: number) {

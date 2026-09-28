@@ -25,7 +25,7 @@ await store.createFarm({ ownerId: auth.player.id, idempotencyKey: 'isolated-ui',
 writeFileSync(path.join(directory, 'qa-account.json'), JSON.stringify({ key, farm_id: farm.id, player_id: auth.player.id }), { mode: 0o600 });
 writeFileSync(path.join(directory, 'qa-before.json'), JSON.stringify(farm, null, 2), { mode: 0o600 });
 for (const spec of PRESET_SPECS.filter(s => s.region === 'los_angeles')) await store.ensureSystemFarm(presetHmac(spec.id ?? spec.layout), buildPresetFarm(spec, plot, content, 'America/Los_Angeles', Date.now()));
-const app = await buildApp({ store, content, contentVersion: cv, plot, now: Date.now, pepper,
+const app = await buildApp({ guestWrites: true, store, content, contentVersion: cv, plot, now: Date.now, pepper,
   blueprintDir: path.resolve(DEFAULT_CONTENT_DIR, '../../blueprints'), regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json') });
 await app.listen({ port: 3196, host: '127.0.0.1' });
 console.log(JSON.stringify({ ready: true, port: 3196, isolated: true, crops: Object.keys(farm.state.cells).length }));

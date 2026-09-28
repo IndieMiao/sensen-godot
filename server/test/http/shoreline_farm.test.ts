@@ -15,7 +15,7 @@ const osm=read('shore_osm_geography.json') as Geography,cover=read('shore_land_c
 let app:FastifyInstance;afterEach(async()=>{vi.useRealTimers();await app?.close();});
 async function setup(geo:GeographyProvider=async()=>osm,landCover:LandCoverProvider=async()=>cover,legacy=true){
  const calls={osm:0,cover:0};const store=new MemoryStore({content,contentVersion:cv,plot:plotFor(content),timezone:'America/Los_Angeles',now:Date.now});
- app=await buildApp({store,content,contentVersion:cv,blueprintDir:path.join(root,'assets/blueprints'),regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json'),pepper:'test',now:Date.now,realtimeEnabled:false,
+ app=await buildApp({ guestWrites: true,store,content,contentVersion:cv,blueprintDir:path.join(root,'assets/blueprints'),regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json'),pepper:'test',now:Date.now,realtimeEnabled:false,
   geographyProvider:async(...args)=>{calls.osm++;return geo(...args);},landCoverProvider:async(...args)=>{calls.cover++;return landCover(...args);}});
  const account=(await app.inject({method:'POST',url:'/v1/auth/anonymous',payload:{install_key:'99999999000000001111111122222222'}})).json(),headers={authorization:'Bearer '+account.token};
  const post=(url:string,payload:object)=>app.inject({method:'POST',url,headers,payload});

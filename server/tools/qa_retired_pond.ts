@@ -18,7 +18,7 @@ const content = loadContent(DEFAULT_CONTENT_DIR), cv = contentVersion(DEFAULT_CO
 const root = path.resolve(DEFAULT_CONTENT_DIR,'../../..');
 const terrain = retireFarmPond(JSON.parse(readFileSync(path.join(root,'tests/fixtures/generated_compact_farm_terrain.json'),'utf8')));
 const store = new MemoryStore({content,contentVersion:cv,plot,timezone:'Asia/Shanghai',now:Date.now});
-const app = await buildApp({store,content,contentVersion:cv,blueprintDir:path.join(root,'assets/blueprints'),
+const app = await buildApp({ guestWrites: true,store,content,contentVersion:cv,blueprintDir:path.join(root,'assets/blueprints'),
   regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json'),pepper:randomUUID(),now:Date.now});
 const accountFile = path.join(output,'account.json');
 const key: string = existsSync(accountFile) ? JSON.parse(readFileSync(accountFile,'utf8')).key : randomUUID().replaceAll('-','');

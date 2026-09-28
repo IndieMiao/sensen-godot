@@ -11,7 +11,7 @@ const plot = plotFor(content);
 const store = new MemoryStore({ content, contentVersion: cv, plot, timezone: 'Asia/Shanghai', now: Date.now });
 const evidence = path.resolve(DEFAULT_CONTENT_DIR, '../../../output/private-geographic-farm-2026-09-21/geo');
 const geography = JSON.parse(readFileSync(path.join(evidence, 'shanghai-peoples-park-source.json'), 'utf8')) as Geography;
-const app = await buildApp({ store, content, contentVersion: cv, plot, now: Date.now,
+const app = await buildApp({ guestWrites: true, store, content, contentVersion: cv, plot, now: Date.now,
   pepper: 'isolated-private-farm-qa-only', regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'),
   blueprintDir: path.resolve(DEFAULT_CONTENT_DIR, '../../blueprints'),
   geographyProvider: async location => {

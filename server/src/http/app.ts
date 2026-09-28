@@ -35,6 +35,11 @@ import type { Store } from './store.js';
 import { isFarmLocation, withinPlacementBounds, type FarmLocation, type PlacementBounds } from './farm_location.js';
 import { registerOnline } from '../realtime/gateway.js';
 import type { VoiceConfig, VoiceMedia } from '../realtime/voice.js';
+import { CityCatalog, cityView } from '../geography/cities.js';
+import type { IpLocator } from '../geography/ip_locator.js';
+import { registerAccounts } from '../accounts/routes.js';
+import { createLogMailer, type Mailer } from '../accounts/mailer.js';
+import type { PlayerRow } from './store.js';
 
 export interface AppDeps {
   store: Store;
@@ -60,6 +65,20 @@ export interface AppDeps {
   plot?: PlotLayout;
   geographyProvider?: GeographyProvider;
   landCoverProvider?: LandCoverProvider;
+  /** Global city directory; defaults to data/cities.tsv plus the curated regions file. */
+  cities?: CityCatalog;
+  /** Coarse IP geolocation for the city picker's default. Absent means no suggestion. */
+  ipLocator?: IpLocator;
+  /**
+   * Development and legacy QA only: let guest (install_key) tokens create farms and play.
+   * Production leaves it off — guests browse, accounts write (2026-09-28 decision 2).
+   */
+  guestWrites?: boolean;
+  /** Verification and reset codes; defaults to logging them. */
+  mailer?: Mailer;
+  /** Addresses in this domain use qaEmailCode and receive no mail. */
+  qaEmailDomain?: string;
+  qaEmailCode?: string;
 }
 
 interface Regions {
@@ -74,6 +93,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const app = Fastify({ logger: false, trustProxy: deps.trustedProxies?.length ? deps.trustedProxies : false });
   await app.register(rateLimit, { global: false });
   const regions = JSON.parse(readFileSync(deps.regionsFile, 'utf8')) as Regions;
+  const cities = deps.cities ?? CityCatalog.fromRegionsFile(deps.regionsFile);
   const seenBlueprints = new Set<string>();
   const geographyProvider = deps.geographyProvider ?? createOsmProvider();
   const landCoverProvider = deps.landCoverProvider ?? createLandCoverProvider();
@@ -82,7 +102,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     // A failed OSM request must remain a failed request; land cover supplements missing classifications only.
     const geography = await geographyProvider(location, extent);
     const build = (data: typeof geography) => retireFarmPond(generateFarmTerrain(location, data,
-      deps.content.farm_plot.layouts[deps.content.farm_plot.default_layout], farmStyleForRegion(regionId), generation));
+      deps.content.farm_plot.layouts[deps.content.farm_plot.default_layout], farmStyleForRegion(regionId, cities.get(regionId)?.country_code), generation));
     try { return build(geography); }
     catch (error) {
       if (generation < 2 || !(error instanceof GeographyError) || error.code !== 'GEOGRAPHY_INCOMPLETE') throw error;
@@ -108,18 +128,32 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return currentOwnerFarmView(farm, now, timezone, deps.content, deps.plot ?? plotFor(deps.content));
   };
 
-  const auth = async (req: FastifyRequest): Promise<{ id: string } | null> => {
+  const auth = async (req: FastifyRequest): Promise<PlayerRow | null> => {
     const raw = req.headers.authorization;
     if (!raw?.startsWith('Bearer ')) return null;
     return deps.store.playerByToken(tokenHash(raw.slice(7)), deps.now());
   };
+  const isGuest = (p: PlayerRow) => !p.user_id && !deps.guestWrites;
+  /** Writes need an account; a guest token is authenticated but read-only. */
+  const writer = async (req: FastifyRequest, reply: { code: (n: number) => { send: (b: object) => unknown } }): Promise<PlayerRow | null> => {
+    const p = await auth(req);
+    if (!p) { reply.code(401).send({ code: 'UNAUTHENTICATED' }); return null; }
+    if (isGuest(p)) { reply.code(401).send({ code: 'LOGIN_REQUIRED' }); return null; }
+    return p;
+  };
+  /** Realtime (farm rooms, parties, travel, voice) is for accounts only; guests are simply not authenticated there. */
+  const accountAuth = async (req: FastifyRequest): Promise<PlayerRow | null> => {
+    const p = await auth(req);
+    return p && !isGuest(p) ? p : null;
+  };
 
   const ponds = deps.pondCatalog ?? new PondCatalog();
-  const online = deps.realtimeEnabled !== false ? registerOnline(app, { ...deps, pondCatalog: ponds }, auth) : null;
+  const online = deps.realtimeEnabled !== false ? registerOnline(app, { ...deps, pondCatalog: ponds, cities }, accountAuth) : null;
   app.get('/v1/ponds', async (req, reply) => {
     const region = (req.query as { region_id?: unknown }).region_id;
-    if (typeof region !== 'string' || !regions.regions.some(r => r.id === region)) return reply.code(400).send({ code: 'SCHEMA' });
-    return { version: 1, catalog_revision: ponds.revision, available: Boolean(online), locations: ponds.list(region) };
+    const city = typeof region === 'string' ? cities.get(region) : null;
+    if (!city) return reply.code(400).send({ code: 'SCHEMA' });
+    return { version: 1, catalog_revision: ponds.revision, available: Boolean(online), locations: ponds.list(city.id) };
   });
 
   const installationLoginLimit = app.createRateLimit({ max: 10, timeWindow: '1 hour', keyGenerator: req => {
@@ -188,8 +222,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   }));
 
   app.post('/v1/farms', async (req, reply) => {
-    const p = await auth(req);
-    if (!p) return reply.code(401).send({ code: 'UNAUTHENTICATED' });
+    const p = await writer(req, reply);
+    if (!p) return;
     const generated = req.body as { generation_version?: unknown; idempotency_key?: unknown; region_id?: unknown; location?: unknown };
     if (generated?.generation_version !== undefined) {
       if ((generated.generation_version !== 1 && generated.generation_version !== 2 && generated.generation_version !== 3)
@@ -197,11 +231,11 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
         || generated.idempotency_key.length > 128 || typeof generated.region_id !== 'string')
         return reply.code(400).send({ code: 'SCHEMA' });
       if (!isFarmLocation(generated.location)) return reply.code(400).send({ code: 'INVALID_LOCATION' });
-      const region = regions.regions.find(r => r.id === generated.region_id);
-      if (!region) return reply.code(400).send({ code: 'SCHEMA' });
-      const location = generated.location;
+      const location = { lat: generated.location.lat, lng: generated.location.lng };
       const generation = FARM_GENERATIONS[generated.generation_version];
-      if (!withinPlacementBounds(location, region.placement_bounds, generation.geography_extent_m / 2))
+      // The server decides the city from the coordinates; the requested id only keeps border picks in the chosen city.
+      const region = cities.forPlacement(location, generated.region_id);
+      if (!region || (region.placement_bounds && !withinPlacementBounds(location, region.placement_bounds, generation.geography_extent_m / 2)))
         return reply.code(422).send({ code: 'LOCATION_OUTSIDE_REGION' });
       const hash = payloadHash({ idempotency_key: generated.idempotency_key, base_version: 0, type: 'create_farm',
         payload: { generation_version: generation.generation_version, region_id: region.id, location } });
@@ -262,9 +296,10 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   app.get('/v1/farms/me', async (req, reply) => {
     const p = await auth(req);
     if (!p) return reply.code(401).send({ code: 'UNAUTHENTICATED' });
-    const farm = await deps.store.farmByOwner(p.id);
+    // Guests own nothing: pre-account anonymous farms are not carried over (decision 4).
+    const farm = isGuest(p) ? null : await deps.store.farmByOwner(p.id);
     if (!farm) return reply.code(404).send({ code: 'NO_FARM' });
-    const tz = timezoneOf(regions, farm.region_id);
+    const tz = cities.timezone(farm.region_id);
     // 读路径同样先 clamp 成 max(采样, last) 再 derive，但**不写回**：时钟回拨时读取结果
     // 不会倒退（Codex 三审 O-I3）。
     // 读路径也要过 QA 变换，否则加速后的农场在 GET 里看到的是没加速的时间。
@@ -277,8 +312,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   app.post('/v1/farms/me/relocation/preview', {
     config: { rateLimit: { max: 30, timeWindow: '1 hour' } },
   }, async (req, reply) => {
-    const player = await auth(req);
-    if (!player) return reply.code(401).send({ code: 'UNAUTHENTICATED' });
+    const player = await writer(req, reply);
+    if (!player) return;
     const body = req.body as { region_id?: unknown; location?: unknown; generation_version?: unknown };
     if (!body || typeof body.region_id !== 'string') return reply.code(400).send({ code: 'SCHEMA' });
     const generationVersion = body.generation_version === undefined ? 1 : body.generation_version;
@@ -289,10 +324,11 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     if (!farm) return reply.code(404).send({ code: 'NO_FARM' });
     if (!relocationAvailable(farm)) return reply.code(409).send({ code: 'RELOCATION_UNAVAILABLE' });
     if (relocationBlocked(farm, deps.now(), deps.content)) return reply.code(409).send({ code: 'RELOCATION_BUSY' });
-    const region = regions.regions.find(r => r.id === body.region_id);
-    if (!region || region.id !== farm.region_id) return reply.code(422).send({ code: 'LOCATION_OUTSIDE_REGION' });
     const location = { lat: body.location.lat, lng: body.location.lng }, baseVersion = farm.version;
-    if (!withinPlacementBounds(location, region.placement_bounds, generation.geography_extent_m / 2))
+    // Relocation stays inside the farm's own city.
+    const region = cities.get(body.region_id)?.id === farm.region_id ? cities.forPlacement(location, farm.region_id) : null;
+    if (!region || region.id !== farm.region_id
+      || (region.placement_bounds && !withinPlacementBounds(location, region.placement_bounds, generation.geography_extent_m / 2)))
       return reply.code(422).send({ code: 'LOCATION_OUTSIDE_REGION' });
     try {
       const terrain = await terrainForLocation(location, region.id, generationVersion);
@@ -309,8 +345,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     }
   });
   app.post('/v1/farms/me/relocation/confirm', async (req, reply) => {
-    const player = await auth(req);
-    if (!player) return reply.code(401).send({ code: 'UNAUTHENTICATED' });
+    const player = await writer(req, reply);
+    if (!player) return;
     const input = req.body as RelocationConfirm;
     if (!input || typeof input.preview_id !== 'string' || !input.preview_id || input.preview_id.length > 128
       || typeof input.idempotency_key !== 'string' || !input.idempotency_key || input.idempotency_key.length > 128
@@ -322,7 +358,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       const result = online ? await online.withFarmRelocation(player.id, farm.id, commit) : await commit();
       if (result.kind === 'rejected') return reply.code(relocationStatus(result.code)).send({ code: result.code, server_time: deps.now() });
       const now = Math.max(qaNow(result.farm.state.qa, deps.now()), result.farm.state.clock.last_effective_now);
-      return reply.send(ownerView(result.farm, now, timezoneOf(regions, result.farm.region_id)));
+      return reply.send(ownerView(result.farm, now, cities.timezone(result.farm.region_id)));
     } catch (error) {
       if (error instanceof Error && error.message === 'RELOCATION_BUSY') return reply.code(409).send({ code: 'RELOCATION_BUSY' });
       throw error;
@@ -330,8 +366,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   });
 
   app.post('/v1/farms/me/commands', async (req, reply) => {
-    const p = await auth(req);
-    if (!p) return reply.code(401).send({ code: 'UNAUTHENTICATED' });
+    const p = await writer(req, reply);
+    if (!p) return;
     const env = req.body as CommandEnvelope;
     if (!env?.idempotency_key || typeof env.type !== 'string' || !Number.isInteger(env.base_version))
       return reply.code(400).send({ code: 'SCHEMA' });
@@ -364,7 +400,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
         if (out.record.outcome !== 'applied')
           return reply.send({ outcome: 'replayed', replayed_outcome: out.record.outcome,
             ...stored, server_time: deps.now() });
-        const tz = timezoneOf(regions, out.farm.region_id);
+        const tz = cities.timezone(out.farm.region_id);
         const now = Math.max(qaNow(out.farm.state.qa, deps.now()), out.farm.state.clock.last_effective_now);
         return reply.send({ outcome: 'replayed', replayed_outcome: 'applied',
           ...currentOwnerFarmView(out.farm, now, tz, deps.content, deps.plot ?? plotFor(deps.content)),
@@ -375,7 +411,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       case 'idempotency_mismatch':
         return reply.code(409).send({ code: 'IDEMPOTENCY_MISMATCH', server_time: deps.now() });
       case 'version_conflict': {
-        const tz = timezoneOf(regions, out.farm.region_id);
+        const tz = cities.timezone(out.farm.region_id);
         const now = Math.max(qaNow(out.farm.state.qa, deps.now()),
           out.farm.state.clock.last_effective_now);
         return reply.code(409).send({ code: 'VERSION_CONFLICT',
@@ -392,8 +428,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   app.get('/v1/nearby', async (req, reply) => {
     const p = await auth(req);
     if (!p) return reply.code(401).send({ code: 'UNAUTHENTICATED' });
-    const regionId = String((req.query as Record<string, unknown>).region_id ?? '');
-    if (!regions.regions.some(r => r.id === regionId)) return reply.code(400).send({ code: 'SCHEMA' });
+    const regionId = cities.get(String((req.query as Record<string, unknown>).region_id ?? ''))?.id ?? '';
+    if (!regionId) return reply.code(400).send({ code: 'SCHEMA' });
     const { count, farms } = await deps.store.nearby(regionId, p.id, NEARBY_LIMIT);
     return reply.send({
       region_id: regionId, count,
@@ -409,7 +445,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     // 不存在与不开放都是 404：区分它们就等于告诉访客「这座农场存在但拒绝你」。
     if (!farm || (farm.visit_access !== 'anyone' && !(online && farm.owner_id !== p.id && await online.travel.canVisitFarm(p.id, farm))))
       return reply.code(404).send({ code: 'NOT_FOUND' });
-    const tz = timezoneOf(regions, farm.region_id);
+    const tz = cities.timezone(farm.region_id);
     const real = deps.now();
     // 槽按真实墙钟切：快照节流是给访客看的节奏，与主人的 QA 时钟无关。
     const slot = snapshotSlot(real);
@@ -432,6 +468,50 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     });
   });
 
+  registerAccounts(app, {
+    store: deps.store, pepper: deps.pepper, now: deps.now, mailer: deps.mailer ?? createLogMailer(),
+    qaEmailDomain: deps.qaEmailDomain, qaEmailCode: deps.qaEmailCode,
+    closeSessions: async playerId => { online?.closePlayer(playerId); },
+    beforeDelete: async playerId => { await online?.forgetPlayer(playerId); },
+  }, auth);
+
+  // —— 全球城市（SGODOT-136 B0）：公开目录数据，不要求登录。 ——
+  app.get('/v1/cities', { config: { rateLimit: { max: 600, timeWindow: '1 minute' } } }, async (_req, reply) => {
+    const counts = await deps.store.cityFarmCounts();
+    const seen = new Set<string>();
+    const list = [];
+    for (const c of cities.curatedCities()) { seen.add(c.id); list.push(cityView(c, counts.get(c.id) ?? 0)); }
+    const popular = [...counts.entries()].filter(([id, n]) => n > 0 && !seen.has(id)).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    for (const [id, n] of popular.slice(0, 50)) { const c = cities.get(id); if (c) list.push(cityView(c, n)); }
+    return reply.send({ cities: list, server_time: deps.now() });
+  });
+  app.get('/v1/cities/search', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (req, reply) => {
+    const q = (req.query as { q?: unknown }).q;
+    if (typeof q !== 'string' || q.length > 64) return reply.code(400).send({ code: 'SCHEMA' });
+    return reply.send({ cities: cities.search(q).map(c => cityView(c)), server_time: deps.now() });
+  });
+  app.get('/v1/cities/suggest', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (req, reply) => {
+    let city = null;
+    try {
+      const point = deps.ipLocator ? await deps.ipLocator(req.ip) : null;
+      city = point ? cities.resolve(point) : null;
+    } catch { city = null; }
+    return reply.send({ city: city ? cityView(city) : null, source: city ? 'ip' : 'none', server_time: deps.now() });
+  });
+  app.post('/v1/cities/resolve', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (req, reply) => {
+    const body = req.body as { location?: unknown } | undefined;
+    if (!isFarmLocation(body?.location)) return reply.code(400).send({ code: 'INVALID_LOCATION' });
+    const city = cities.resolve(body.location);
+    if (!city) return reply.code(404).send({ code: 'NO_CITY', server_time: deps.now() });
+    return reply.send({ city: cityView(city), server_time: deps.now() });
+  });
+  app.get('/v1/cities/:city_id', async (req, reply) => {
+    const city = cities.get(String((req.params as Record<string, string>).city_id));
+    if (!city) return reply.code(404).send({ code: 'NOT_FOUND', server_time: deps.now() });
+    const count = (await deps.store.cityFarmCounts()).get(city.id) ?? 0;
+    return reply.send({ city: cityView(city, count), server_time: deps.now() });
+  });
+
   app.get('/v1/healthz', async (_req, reply) => reply.send({
     ok: true, db: true, git_sha: deps.gitSha ?? 'dev',
     content_version: deps.contentVersion, domain_version: DOMAIN_VERSION,
@@ -441,8 +521,6 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   return app;
 }
 
-const timezoneOf = (r: Regions, id: string): string =>
-  r.regions.find(x => x.id === id)?.timezone ?? 'UTC';
 
 export function loadBlueprint(dir: string, id: string, rev: number) {
   try {

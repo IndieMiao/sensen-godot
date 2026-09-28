@@ -21,10 +21,13 @@ const fail = (code: string): never => { throw new Error(code); };
 /** Discovery grants no authority. A signed destination is checked again at admission. */
 export class PartyTravel {
   private zones: Map<string, string>;
+  private zone: (id: string) => string;
   constructor(private deps: AppDeps, private presence: (player: string) => SpacePresence | null,
     private hasSeat: (key: string, player: string) => boolean) {
     const regions = JSON.parse(readFileSync(deps.regionsFile, 'utf8')).regions as { id: string; timezone: string }[];
     this.zones = new Map(regions.map(r => [r.id, r.timezone]));
+    // Global cities are resolved at runtime; curated regions stay in the static table above.
+    this.zone = (id: string) => this.zones.get(id) ?? deps.cities?.timezone(id) ?? 'UTC';
   }
 
   async sameParty(player: string, target: string) {
@@ -85,7 +88,7 @@ export class PartyTravel {
       const farm = await this.deps.store.farmById(destination.home);
       if (!farm) fail('NOT_FOUND');
       const now = Math.max(effectiveNow(farm!.state.qa, this.deps.now()), farm!.state.clock.last_effective_now);
-      const view = visitorSnapshot(farm!, derive(farm!.state, now, this.zones.get(farm!.region_id) ?? 'UTC', this.deps.content), farm!.version, now, undefined, avatarRef(farm!));
+      const view = visitorSnapshot(farm!, derive(farm!.state, now, this.zone(farm!.region_id), this.deps.content), farm!.version, now, undefined, avatarRef(farm!));
       snapshot = destination.kind === 'farm' ? view : {
         farm_id: view.farm_id, avatar_ref: view.avatar_ref, layout_patch_id: view.layout_patch_id,
         blueprint_revision: view.blueprint_revision, nursery: view.nursery, street_snapshot: view.street_snapshot,

@@ -12,7 +12,7 @@ const content=loadContent(DEFAULT_CONTENT_DIR),cv=contentVersion(DEFAULT_CONTENT
 let app:FastifyInstance;afterEach(async()=>{await app?.close();});
 async function setup(legacy=false){
  const extents:number[]=[];const store=new MemoryStore({content,contentVersion:cv,plot:plotFor(content),timezone:'Asia/Shanghai',now:Date.now});
- app=await buildApp({store,content,contentVersion:cv,blueprintDir:path.join(root,'assets/blueprints'),regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json'),pepper:'test',now:Date.now,realtimeEnabled:false,
+ app=await buildApp({ guestWrites: true,store,content,contentVersion:cv,blueprintDir:path.join(root,'assets/blueprints'),regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json'),pepper:'test',now:Date.now,realtimeEnabled:false,
   geographyProvider:async(_center,extent)=>{extents.push(extent);return extent===160?compactFixtureGeography():fixtureGeography();}});
  const auth=(await app.inject({method:'POST',url:'/v1/auth/anonymous',payload:{install_key:'11111111222222223333333344444444'}})).json();
  const headers={authorization:'Bearer '+auth.token};const post=(url:string,payload:object)=>app.inject({method:'POST',url,headers,payload});

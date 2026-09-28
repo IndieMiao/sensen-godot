@@ -17,7 +17,7 @@ await admin.end();url.pathname='/'+database;
 const pool=new pg.Pool({connectionString:url.toString(),max:3});await migrate(pool);
 const content=loadContent(DEFAULT_CONTENT_DIR),cv=contentVersion(DEFAULT_CONTENT_DIR),plot=plotFor(content);
 let now=Date.now();const store=new PgStore({pool,content,contentVersion:cv,plot,timezone:()=> 'Asia/Shanghai',now:()=>now});
-let app=await buildApp({store,content,contentVersion:cv,plot,now:()=>now,pepper:'isolated-free-loop-only',regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json'),blueprintDir:path.resolve(DEFAULT_CONTENT_DIR,'../../blueprints')});
+let app=await buildApp({ guestWrites: true,store,content,contentVersion:cv,plot,now:()=>now,pepper:'isolated-free-loop-only',regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json'),blueprintDir:path.resolve(DEFAULT_CONTENT_DIR,'../../blueprints')});
 let base=await app.listen({port:0,host:'127.0.0.1'});base+='/v1';
 let token='';const key=randomUUID().replaceAll('-','');let version=0;
 async function request(endpoint:string,body?:unknown,status=200){const r=await fetch(base+endpoint,{method:body===undefined?'GET':'POST',headers:{'content-type':'application/json',...(token?{authorization:'Bearer '+token}:{})},body:body===undefined?undefined:JSON.stringify(body)});const result:any=await r.json();assert.equal(r.status,status,JSON.stringify({endpoint,status:r.status,result}));return result;}
@@ -36,7 +36,7 @@ try {
  const harvest=await command('harvest_cells',{cell_ids});r=harvest.result;assert.equal(r.state.cells['28,35'].state,'tilled');assert.equal(r.state.inventory.produce.R,before+content.crops.crops.R.yield);
  const replay=await request('/farms/me/commands',harvest.envelope);assert.equal(replay.outcome,'replayed');assert.equal(replay.state.inventory.produce.R,r.state.inventory.produce.R);
  const saved=await request('/farms/me');await app.close();
- app=await buildApp({store:new PgStore({pool,content,contentVersion:cv,plot,timezone:()=> 'Asia/Shanghai',now:()=>now}),content,contentVersion:cv,plot,now:()=>now,pepper:'isolated-free-loop-only',regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json'),blueprintDir:path.resolve(DEFAULT_CONTENT_DIR,'../../blueprints')});
+ app=await buildApp({ guestWrites: true,store:new PgStore({pool,content,contentVersion:cv,plot,timezone:()=> 'Asia/Shanghai',now:()=>now}),content,contentVersion:cv,plot,now:()=>now,pepper:'isolated-free-loop-only',regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json'),blueprintDir:path.resolve(DEFAULT_CONTENT_DIR,'../../blueprints')});
  base=(await app.listen({port:0,host:'127.0.0.1'}))+'/v1';token=(await request('/auth/anonymous',{install_key:key})).token;
  const restored=await request('/farms/me');assert.deepEqual(restored.state,saved.state);assert.equal(restored.version,saved.version);
  const proof={passed:true,database,real_http:true,postgres:true,isolated_clock:true,checks:['buy seeds charges correct price','till free cell','sow consumes one seed','water starts server deadline','early harvest rejected','mature harvest creates produce','replay does not duplicate reward','restart and login retain exact state'],version};

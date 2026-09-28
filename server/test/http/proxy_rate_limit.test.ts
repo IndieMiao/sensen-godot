@@ -15,7 +15,7 @@ async function start(trustedProxies?: string[]) {
   const version = contentVersion(DEFAULT_CONTENT_DIR);
   const store = new MemoryStore({ content, contentVersion: version, timezone: 'Asia/Shanghai',
     plot: plotFor(content), now });
-  app = await buildApp({ store, content, contentVersion: version, blueprintDir,
+  app = await buildApp({ guestWrites: true, store, content, contentVersion: version, blueprintDir,
     regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: 'test-only', now, trustedProxies });
 }
 function attempt(remoteAddress: string, forwarded: string) {

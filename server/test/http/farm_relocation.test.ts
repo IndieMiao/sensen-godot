@@ -11,7 +11,7 @@ let app:FastifyInstance,now=Date.now();
 afterEach(async()=>{await app?.close();});
 async function setup(provider:GeographyProvider=async()=>fixtureGeography(),eligible=true) {
  const store=new MemoryStore({content,contentVersion:contentVersion(DEFAULT_CONTENT_DIR),plot:plotFor(content),timezone:'Asia/Shanghai',now:()=>now});
- app=await buildApp({store,content,contentVersion:contentVersion(DEFAULT_CONTENT_DIR),blueprintDir:path.join(root,'assets/blueprints'),regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json'),pepper:'test',now:()=>now,geographyProvider:provider,realtimeEnabled:false});
+ app=await buildApp({ guestWrites: true,store,content,contentVersion:contentVersion(DEFAULT_CONTENT_DIR),blueprintDir:path.join(root,'assets/blueprints'),regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json'),pepper:'test',now:()=>now,geographyProvider:provider,realtimeEnabled:false});
  const auth=(await app.inject({method:'POST',url:'/v1/auth/anonymous',payload:{install_key:'abcdef9876543210abcdef9876543210'}})).json();
  const headers={authorization:'Bearer '+auth.token};
  await app.inject({method:'POST',url:'/v1/farms',headers,payload:{idempotency_key:'old',region_id:'shanghai',layout_patch_id:'sh_a',blueprint_revision:2}});

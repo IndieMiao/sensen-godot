@@ -23,7 +23,7 @@ await store.createFarm({ownerId:auth.player.id,idempotencyKey:'pond-qa-create',p
 const dir=path.resolve(DEFAULT_CONTENT_DIR,'../../../output/system-ponds-2026-09-24/private');
 mkdirSync(dir,{recursive:true,mode:0o700});
 writeFileSync(path.join(dir,'qa-account.json'),JSON.stringify({key,farm_id:farm.id,player_id:auth.player.id}),{mode:0o600});
-const app=await buildApp({store,content,contentVersion:cv,plot,now:Date.now,pepper,blueprintDir:path.resolve(DEFAULT_CONTENT_DIR,'../../blueprints'),regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json')});
+const app=await buildApp({ guestWrites: true,store,content,contentVersion:cv,plot,now:Date.now,pepper,blueprintDir:path.resolve(DEFAULT_CONTENT_DIR,'../../blueprints'),regionsFile:path.join(DEFAULT_CONTENT_DIR,'regions.json')});
 await app.listen({port:3201,host:'127.0.0.1'});
 console.log(JSON.stringify({ready:true,port:3201,isolated:true,content:cv}));
 for(const signal of ['SIGINT','SIGTERM'] as const)process.on(signal,()=>{void app.close().then(()=>process.exit(0));});

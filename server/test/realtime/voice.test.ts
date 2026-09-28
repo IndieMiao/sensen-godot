@@ -145,7 +145,7 @@ describe('party voice grants and membership', () => {
   });
   it('HTTP requires auth and accepts no caller-supplied room, identity or grants', async () => {
     const f = await fixture();
-    app = await buildApp({ store: f.store, content, contentVersion: cv, blueprintDir,
+    app = await buildApp({ guestWrites: true, store: f.store, content, contentVersion: cv, blueprintDir,
       regionsFile: path.join(path.dirname(blueprintDir), 'farm/data/regions.json'), pepper: 'test', now: Date.now, voice: config, voiceMedia: f.media });
     const invoke = (payload: object, authenticated = true) => app!.inject({ method: 'POST', url: '/v1/online/voice/join',
       headers: authenticated ? { authorization: 'Bearer ' + f.accounts[0].token } : {}, payload });

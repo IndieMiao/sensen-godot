@@ -9,6 +9,9 @@ import { contentVersion, loadContent } from './domain/content.js';
 import type { Ctx } from './domain/reducer.js';
 import { PRESET_SPECS, buildPresetFarm, presetHmac } from './domain/presets.js';
 import { voiceConfig } from './realtime/voice.js';
+import { CityCatalog } from './geography/cities.js';
+import { createMmdbIpLocator, type IpLocator } from './geography/ip_locator.js';
+import { mailerFromEnv } from './accounts/mailer.js';
 
 const need = (k: string): string => {
   const v = process.env[k];
@@ -38,13 +41,19 @@ for (const r of regions.regions)
     shippedBlueprints.add(`${c.layout_patch_id}@${c.revision}`);
   }
 const plot = plotFor(content);
+const cities = CityCatalog.fromRegionsFile(path.join(CONTENT_DIR, 'regions.json'));
+let ipLocator: IpLocator | undefined;
+if (process.env.IP_CITY_DB) {
+  try { ipLocator = await createMmdbIpLocator(process.env.IP_CITY_DB); }
+  catch (error) { console.warn(`IP 城市库不可用，选城页不给默认城市：${(error as Error).message}`); }
+}
 
 const pool = new pg.Pool({ connectionString: need('DATABASE_URL'), max: 10 });
 await migrate(pool);
 
 const store = new PgStore({
   pool, content, contentVersion: cv,
-  timezone: id => regions.regions.find(r => r.id === id)?.timezone ?? 'UTC',
+  timezone: id => cities.timezone(id),
   plot,
   now: () => Date.now(),
 });
@@ -68,6 +77,11 @@ const app = await buildApp({
   qaPlayerIds: new Set((process.env.QA_PLAYER_IDS ?? '').split(',').filter(Boolean)),
   realtimeEnabled: process.env.REALTIME_ENABLED !== '0',
   voice: voiceConfig(process.env),
+  cities, ipLocator,
+  mailer: mailerFromEnv(process.env),
+  qaEmailDomain: process.env.QA_EMAIL_DOMAIN, qaEmailCode: process.env.QA_EMAIL_CODE,
+  // Only a development server may let guests write; production keeps guests read-only.
+  guestWrites: process.env.GUEST_WRITES === '1',
 });
 
 // Only one room writer may serve this database. HTTP-only replicas set REALTIME_ENABLED=0.
@@ -88,4 +102,4 @@ if (process.env.REALTIME_ENABLED !== '0') {
 
 const port = Number(process.env.PORT ?? 3000);
 await app.listen({ port, host: '0.0.0.0' });
-console.log(`farm-server listening on ${port} content=${cv}`);
+console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'}`);

@@ -23,8 +23,13 @@ export interface FarmGenerationDiagnostics { facility_rasterizations: number; fa
 /** Asset identifiers shared with modules/farm/farm_art.gd, not arbitrary asset paths. */
 export const FARM_STYLES = ['cottage', 'mushroom', 'thatch', 'dome', 'east_asian', 'barn', 'windmill'] as const;
 export type FarmStyle = (typeof FARM_STYLES)[number];
-export function farmStyleForRegion(regionId: string): FarmStyle {
-  return regionId === 'shanghai' ? 'east_asian' : regionId === 'los_angeles' ? 'barn' : 'cottage';
+const EAST_ASIAN = new Set(['CN', 'JP', 'KR', 'TW', 'HK', 'MO']);
+const BARN = new Set(['US', 'CA', 'AU', 'NZ']);
+/** Curated cities keep their hand-picked style; every other city follows its country. */
+export function farmStyleForRegion(regionId: string, countryCode = ''): FarmStyle {
+  if (regionId === 'shanghai') return 'east_asian';
+  if (regionId === 'los_angeles') return 'barn';
+  return EAST_ASIAN.has(countryCode) ? 'east_asian' : BARN.has(countryCode) ? 'barn' : 'cottage';
 }
 function validFarmStyle(value: unknown): value is FarmStyle {
   return typeof value === 'string' && (FARM_STYLES as readonly string[]).includes(value);

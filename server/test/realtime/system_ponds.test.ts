@@ -73,7 +73,7 @@ describe('published system ponds', () => {
     const store = backend === 'memory'
       ? new MemoryStore({ content, contentVersion: cv, plot: sets, timezone: 'Asia/Shanghai', now: () => now })
       : new PgStore({ pool: pool!, content, contentVersion: cv, plot: sets, timezone: () => 'Asia/Shanghai', now: () => now });
-    const app = await buildApp({ store, content, contentVersion: cv, blueprintDir,
+    const app = await buildApp({ guestWrites: true, store, content, contentVersion: cv, blueprintDir,
       regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: 'system-pond-test', now: () => now });
     const address = await app.listen({ port: 0, host: '127.0.0.1' });
     const accounts = await Promise.all([seed(store), seed(store)]);

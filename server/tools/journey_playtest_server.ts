@@ -34,7 +34,7 @@ for (const spec of PRESET_SPECS) {
   await store.ensureSystemFarm(presetHmac(spec.id ?? spec.layout),
     buildPresetFarm(spec, plot, content, timezone(spec.region), now()));
 }
-const app = await buildApp({ store, content, contentVersion: cv, blueprintDir, regionsFile,
+const app = await buildApp({ guestWrites: true, store, content, contentVersion: cv, blueprintDir, regionsFile,
   pepper: env.TOKEN_PEPPER, now, plot });
 // Device inspection is opt-in and confined to this loopback playtest service.
 if (process.env.JOURNEY_DEVICE_INSPECT === '1') {

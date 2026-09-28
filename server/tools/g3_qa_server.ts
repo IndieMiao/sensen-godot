@@ -31,7 +31,7 @@ for (const spec of PRESET_SPECS) {
     buildPresetFarm(spec, setsFor(spec.layout, spec.revision), content, zone(spec.region), now()));
 }
 const qaPlayerIds = new Set<string>();
-const app = await buildApp({ store, content, contentVersion: cv, blueprintDir,
+const app = await buildApp({ guestWrites: true, store, content, contentVersion: cv, blueprintDir,
   regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: env.TOKEN_PEPPER,
   now, plot: plotFor(content), qaPlayerIds });
 app.addHook('onSend', async (request, _reply, payload) => {

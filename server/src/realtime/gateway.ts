@@ -266,6 +266,8 @@ export class OnlineGateway {
       c.hash = tokenHash(b.token);
       const player = await this.deps.store.playerByToken(c.hash, this.deps.now());
       if (!player) throw new Error('UNAUTHENTICATED');
+      // Guests browse over HTTP only; shared spaces need an account (2026-09-28 decision 2).
+      if (!player.user_id && !this.deps.guestWrites) throw new Error('LOGIN_REQUIRED');
       if (c.ws.readyState !== WebSocket.OPEN) return;
       // One active spatial presence per account, across all device tokens and scene types.
       for (const old of this.connections) if (old !== c && old.player === player.id) {
@@ -402,6 +404,20 @@ export class OnlineGateway {
     this.loading.set(key, loading);
     try { return await loading; } finally { this.loading.delete(key); }
   }
+  /** Password reset or account deletion: every device session of this player ends now. */
+  closePlayer(player: string) {
+    for (const c of this.connections) if (c.player === player) {
+      if (c.member) c.room?.leave(c.member);
+      c.ws.close(4003, 'UNAUTHENTICATED');
+    }
+  }
+
+  /** Account deletion: drop voice grants and party membership before the rows cascade away. */
+  async forgetPlayer(player: string) {
+    await this.voice?.revoke(player).catch(() => undefined);
+    await this.deps.store.realtimeDirectory(player, 'leave').catch(() => undefined);
+  }
+
   async refresh(player: string) {
     const farm = await this.deps.store.farmByOwner(player);
     if (farm) for (const room of this.rooms.values()) room.reload(farm);

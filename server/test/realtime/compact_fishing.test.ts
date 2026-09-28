@@ -12,7 +12,7 @@ describe('retired farm ponds across host generations', () => {
   it.each([[2, 1], [1, 2]])('rejects farm fishing for a generation %i host and generation %i visitor without altering holdings', async (hostGeneration, visitorGeneration) => {
     let now = Date.now();
     const store = new MemoryStore({ content, contentVersion: cv, plot: sets, timezone: 'Asia/Shanghai', now: () => now });
-    const app = await buildApp({ store, content, contentVersion: cv, blueprintDir,
+    const app = await buildApp({ guestWrites: true, store, content, contentVersion: cv, blueprintDir,
       regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: 'mixed-pond-test', now: () => now,
       geographyProvider: async () => fixtureGeography([{ id: 'fixture/dry-land', kind: 'land', surface: 'soil', polygon: rectangle(-1, -1, 66, 66) }]) });
     const address = await app.listen({ host: '127.0.0.1', port: 0 }), clients: Client[] = [];

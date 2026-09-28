@@ -15,7 +15,7 @@ export async function truncateAll(pool: pg.Pool): Promise<void> {
   // teardown. A deadlocked TRUNCATE rolls back completely and is safe to retry.
   for (let attempt = 0; ; attempt++) {
     try {
-      await pool.query('TRUNCATE tokens, players, farms, farm_creations, commands, farm_snapshots CASCADE');
+      await pool.query('TRUNCATE tokens, players, farms, farm_creations, commands, farm_snapshots, users, user_identities, email_codes, account_deletions CASCADE');
       return;
     } catch (error) {
       if ((error as { code?: string }).code !== '40P01' || attempt >= 2) throw error;

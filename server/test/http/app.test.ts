@@ -31,7 +31,7 @@ beforeEach(async () => {
     now: () => clock, contentVersion: CV,
   });
   memoryStore = store;
-  app = await buildApp({
+  app = await buildApp({ guestWrites: true,
     store, content, contentVersion: CV, blueprintDir: BLUEPRINTS, regionsFile: REGIONS,
     pepper: 'test-pepper', now: () => clock, qaPlayerIds: qa,
   });

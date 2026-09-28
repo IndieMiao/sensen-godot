@@ -17,7 +17,7 @@ import { effectiveNow as qaNow } from '../domain/qa.js';
 import { DOMAIN_VERSION, STATE_SCHEMA_VERSION } from '../domain/version.js';
 import { currentOwnerFarmView, type FarmRow } from './dto.js';
 import { MAX_ACTIVE_TOKENS, TOKEN_IDLE_MS, newToken, tokenHash } from './auth.js';
-import type { ApplyOutcome, CommandRecord, PlayerRow, Store, TokenRow } from './store.js';
+import type { ApplyOutcome, CommandRecord, ConsumeCodeOutcome, DeletionRecord, PlayerRow, Store, TokenRow, UserRow } from './store.js';
 import { canonicalJson, commandRecordResult, payloadHash } from './hash.js';
 
 export interface MemoryStoreDeps {
@@ -82,20 +82,89 @@ export class MemoryStore implements Store {
   async authAnonymous(hmac: string) {
     let player = [...this.players.values()].find(p => p.install_key_hmac === hmac);
     if (!player) {
-      player = { id: randomUUID(), install_key_hmac: hmac };
+      player = { id: randomUUID(), install_key_hmac: hmac, user_id: null };
       this.players.set(player.id, player);
     }
+    return { player, token: this.issue(player.id) };
+  }
+
+  private issue(playerId: string): string {
     const token = newToken();
     this.tokens.push({
-      id: randomUUID(), player_id: player.id, token_hash: tokenHash(token), last_used_at: this.deps.now(),
+      id: randomUUID(), player_id: playerId, token_hash: tokenHash(token), last_used_at: this.deps.now(),
     });
     // 超出上限时淘汰最久未用的（Codex 三审 N-I5：不限量会让 token 表无限增长）。
-    const mine = this.tokens.filter(t => t.player_id === player!.id)
+    const mine = this.tokens.filter(t => t.player_id === playerId)
       .sort((a, b) => a.last_used_at - b.last_used_at);
     for (const t of mine.slice(0, Math.max(0, mine.length - MAX_ACTIVE_TOKENS)))
       this.tokens = this.tokens.filter(x => x.id !== t.id);
-    return { player, token };
+    return token;
   }
+
+  // —— 账号（SGODOT-135） ——
+  private users = new Map<string, UserRow>();
+  private emailCodes = new Map<string, { hash: string; expires_at: number; sent_at: number; attempts: number }>();
+  private deletions = new Map<string, DeletionRecord>();
+
+  async createEmailUser(email: string, passwordHash: string, now: number) {
+    if ([...this.users.values()].some(u => u.email === email)) return { kind: 'email_taken' as const };
+    const user: UserRow = { id: randomUUID(), email, email_verified: false, password_hash: passwordHash, created_at: now, last_seen_at: now };
+    this.users.set(user.id, user);
+    return { kind: 'created' as const, user: structuredClone(user) };
+  }
+  async userByEmail(email: string) { const u = [...this.users.values()].find(x => x.email === email); return u ? structuredClone(u) : null; }
+  async userById(userId: string) { const u = this.users.get(userId); return u ? structuredClone(u) : null; }
+  async setUserPassword(userId: string, passwordHash: string) { const u = this.users.get(userId); if (u) u.password_hash = passwordHash; }
+  async markEmailVerified(userId: string) { const u = this.users.get(userId); if (u) u.email_verified = true; }
+  async authUser(userId: string, now: number) {
+    const user = this.users.get(userId);
+    if (!user) throw new Error('NO_ACCOUNT');
+    user.last_seen_at = now;
+    let player = [...this.players.values()].find(p => p.user_id === userId);
+    if (!player) {
+      player = { id: randomUUID(), install_key_hmac: 'account:' + userId, user_id: userId };
+      this.players.set(player.id, player);
+    }
+    return { player: structuredClone(player), token: this.issue(player.id) };
+  }
+  async revokeUserTokens(userId: string) {
+    const ids = new Set([...this.players.values()].filter(p => p.user_id === userId).map(p => p.id));
+    this.tokens = this.tokens.filter(t => !ids.has(t.player_id));
+  }
+  async saveEmailCode(email: string, purpose: string, hash: string, now: number, ttlMs: number, resendMs: number) {
+    const key = purpose + ':' + email, prior = this.emailCodes.get(key);
+    if (prior && now - prior.sent_at < resendMs) return { kind: 'cooldown' as const, retry_after_ms: resendMs - (now - prior.sent_at) };
+    this.emailCodes.set(key, { hash, expires_at: now + ttlMs, sent_at: now, attempts: 0 });
+    return { kind: 'saved' as const };
+  }
+  async consumeEmailCode(email: string, purpose: string, hash: string, now: number, maxAttempts: number): Promise<ConsumeCodeOutcome> {
+    const key = purpose + ':' + email, row = this.emailCodes.get(key);
+    if (!row) return 'invalid';
+    if (row.expires_at < now) { this.emailCodes.delete(key); return 'expired'; }
+    if (row.attempts >= maxAttempts) { this.emailCodes.delete(key); return 'locked'; }
+    if (row.hash !== hash) { row.attempts++; if (row.attempts >= maxAttempts) this.emailCodes.delete(key); return 'invalid'; }
+    this.emailCodes.delete(key);
+    return 'ok';
+  }
+  async deleteUser(userId: string, tombstone: DeletionRecord) {
+    const user = this.users.get(userId);
+    if (!user) return false;
+    for (const player of [...this.players.values()].filter(p => p.user_id === userId)) {
+      if (this.realtimePlayers.has(player.id)) await this.realtimeDirectory(player.id, 'leave').catch(() => undefined);
+      this.realtimePlayers.delete(player.id);
+      for (const farm of [...this.farms.values()].filter(f => f.owner_id === player.id)) {
+        this.farms.delete(farm.id); this.commands.delete(farm.id); this.snapshots.delete(farm.id);
+      }
+      this.creations.delete(player.id);
+      this.tokens = this.tokens.filter(t => t.player_id !== player.id);
+      this.players.delete(player.id);
+    }
+    for (const key of [...this.emailCodes.keys()]) if (key.endsWith(':' + user.email)) this.emailCodes.delete(key);
+    this.users.delete(userId);
+    this.deletions.set(userId, structuredClone(tombstone));
+    return true;
+  }
+  async deletion(userId: string) { const d = this.deletions.get(userId); return d ? structuredClone(d) : null; }
 
   async revokeToken(hash: string) { this.tokens = this.tokens.filter(t => t.token_hash !== hash); }
   async revokeAllTokens(playerId: string) { this.tokens = this.tokens.filter(t => t.player_id !== playerId); }
@@ -168,6 +237,12 @@ export class MemoryStore implements Store {
       this.commands.set(farm.id, log);
       return { kind: 'applied', farm: structuredClone(farm) };
     } catch (error) { if (error instanceof RelocationError) return reject(error.code); throw error; }
+  }
+
+  async cityFarmCounts() {
+    const counts = new Map<string, number>();
+    for (const f of this.farms.values()) if (f.visit_access === 'anyone') counts.set(f.region_id, (counts.get(f.region_id) ?? 0) + 1);
+    return counts;
   }
 
   async nearby(regionId: string, excludeOwnerId: string, limit: number) {

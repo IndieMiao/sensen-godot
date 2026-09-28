@@ -10,7 +10,7 @@ const party = (await store.realtimeDirectory(accounts[0].player, 'create')).part
 for (const account of accounts.slice(1)) await store.realtimeDirectory(account.player, 'join', party.code);
 const config = voiceConfig({ ...process.env, VOICE_NAMESPACE: 'sensen-voice-dev-qa' });
 if (!config) throw new Error('Configure server/.env.voice.local first');
-const app = await buildApp({ store, content, contentVersion: cv, blueprintDir,
+const app = await buildApp({ guestWrites: true, store, content, contentVersion: cv, blueprintDir,
   regionsFile: path.join(path.dirname(blueprintDir), 'farm/data/regions.json'), pepper: 'voice-isolated-qa', now: Date.now, voice: config });
 const peers: { room: Room; source: AudioSource; running: boolean; frames: number; lease: string; index: number; heartbeat?: ReturnType<typeof setInterval> }[] = [];
 async function request(index: number, route: string, body: object) {

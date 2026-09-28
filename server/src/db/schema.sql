@@ -121,3 +121,47 @@ CREATE TABLE IF NOT EXISTS farm_snapshots (
   content_version    text NOT NULL,
   domain_version     text NOT NULL
 );
+
+-- 账号（SGODOT-135）。自有 uuid 是主键；邮箱账户自建（大陆可用），Apple / Google 经 Firebase
+-- 只作为 user_identities 里的一条身份。每个账号对应一个 players 行（user_id 非空），
+-- 农场、联机、队伍照旧按 player id 走；user_id 为空的 players 是游客，只读。
+CREATE TABLE IF NOT EXISTS users (
+  id              uuid PRIMARY KEY,
+  email           text UNIQUE,
+  email_verified  boolean NOT NULL DEFAULT false,
+  password_hash   text,
+  created_at      bigint NOT NULL,
+  last_seen_at    bigint NOT NULL
+);
+-- 同一个库可能已有 D2（feat/next-feature）建的旧 users 表：它没有密码列、邮箱也不唯一。
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash text;
+CREATE UNIQUE INDEX IF NOT EXISTS users_email_key ON users(email);
+-- (provider, provider_uid) 是并发首登的裁判：provider = 'email' | 'firebase'。
+CREATE TABLE IF NOT EXISTS user_identities (
+  provider          text NOT NULL,
+  provider_uid      text NOT NULL,
+  user_id           uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  sign_in_provider  text,
+  created_at        bigint NOT NULL,
+  PRIMARY KEY (provider, provider_uid)
+);
+CREATE INDEX IF NOT EXISTS user_identities_user_idx ON user_identities(user_id);
+ALTER TABLE players ADD COLUMN IF NOT EXISTS user_id uuid UNIQUE REFERENCES users(id) ON DELETE CASCADE;
+-- 验证码只存 HMAC；一个邮箱每种用途同时一个有效码。
+CREATE TABLE IF NOT EXISTS email_codes (
+  email       text NOT NULL,
+  purpose     text NOT NULL,
+  code_hash   text NOT NULL,
+  expires_at  bigint NOT NULL,
+  sent_at     bigint NOT NULL,
+  attempts    int NOT NULL DEFAULT 0,
+  PRIMARY KEY (email, purpose)
+);
+-- 删号墓碑：不带 FK、不留邮箱。
+CREATE TABLE IF NOT EXISTS account_deletions (
+  user_id           uuid PRIMARY KEY,
+  provider_uid      text NOT NULL,
+  requested_at      bigint NOT NULL,
+  source            text NOT NULL,
+  apple_revocation  text NOT NULL
+);

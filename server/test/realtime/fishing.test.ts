@@ -27,7 +27,7 @@ for (const backend of ['memory', 'postgres']) describe.skipIf(backend === 'postg
     const store = backend === 'memory'
       ? new MemoryStore({ content, contentVersion: cv, plot: sets, timezone: 'Asia/Shanghai', now: () => now })
       : new PgStore({ pool: pool!, content, contentVersion: cv, plot: sets, timezone: () => 'Asia/Shanghai', now: () => now });
-    const app = await buildApp({ store, content, contentVersion: cv, blueprintDir,
+    const app = await buildApp({ guestWrites: true, store, content, contentVersion: cv, blueprintDir,
       regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: 'fishing-test', now: () => now });
     const address = await app.listen({ port: 0, host: '127.0.0.1' });
     const account = await seed(store);

@@ -16,7 +16,7 @@ export const cv = contentVersion(DEFAULT_CONTENT_DIR);
 export const blueprintDir = path.resolve(DEFAULT_CONTENT_DIR, '../../blueprints');
 export const sets = plotFor(content);
 export const memory = () => new MemoryStore({ content, contentVersion: cv, plot: sets, timezone: 'Asia/Shanghai', now: Date.now });
-export const appFor = (store: Store) => buildApp({ store, content, contentVersion: cv, blueprintDir,
+export const appFor = (store: Store) => buildApp({ guestWrites: true, store, content, contentVersion: cv, blueprintDir,
   regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: 'isolated-online-test', now: Date.now });
 export async function seed(store: Store, location: { region?: string; layout?: string } = {}) {
   const auth = await store.authAnonymous(randomUUID());
