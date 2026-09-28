@@ -130,3 +130,30 @@ R1（SGODOT-56）级联补农场域：farms、farm_snapshots、commands、farm_c
 | 合计 | | ≈5.5–6（两人并行约 3.5 周） |
 
 顺序：B0 → C → B1 → B2；A 独立并行。B0 完成前不要动客户端选城页。
+
+## 7. 实施状态（2026-09-28 第一批，分支 feat/accounts-global-cities）
+
+### 7.1 已完成
+- **服务端账号（A）**：自建邮箱账户——scrypt 密码、HMAC 存储的 6 位验证码（10 分钟过期、60 秒冷却、错 5 次作废）、邮箱验证、找回密码（改密即撤销该账号全部会话）、数据导出、应用内删号（需再输密码，农场与联机状态级联删除，只留不含邮箱的墓碑）。接口：`/v1/auth/email/{register,login,code,verify,reset}`、`/v1/users/me`、`/v1/users/me/export`、`DELETE /v1/users/me`。Firebase 验签模块已从 feat/next-feature 移植，留给 C1 的 Apple/Google 登录。
+- **身份模型**：每个账号恰好一个"账号玩家"行（`players.user_id`），农场、联机、队伍照旧按 player id 走，改动面最小。游客（install_key）token 只读：建农场、命令、搬迁、联机都返回 `LOGIN_REQUIRED`；`/farms/me` 对游客返回 404，旧匿名农场不迁移（决定 4）。
+- **全球城市（B0）**：GeoNames cities15000 压成 `server/data/cities.tsv`（21209 座城市，卫星城并入所在都市），服务端按坐标解析城市与 IANA 时区；上海、洛杉矶保留精品 id 与边界。接口：`GET /v1/cities`、`/v1/cities/search`、`/v1/cities/suggest`（IP 粗定位）、`POST /v1/cities/resolve`、`GET /v1/cities/:id`。农场风格按国家选（东亚 / 北美澳新 / 其他）。
+- **客户端**：账号面板（登录、注册、找回密码、验证邮箱、我的账号 / 登出 / 删号），地图与选城页右上角账号入口；建农场前的登录墙；账号会话持久化、启动恢复、token 失效回游客、离线保留账号。选城页重做：IP 预填确认卡、按名字搜索、热门城市，去掉定位按钮（决定 3）。全球城市进入本地城市缓存，地图、选址框、城市切换对任意城市生效；非精品城市自动生成城市配置（概览视角、三位居民放在城市中心附近）。
+- **测试**：服务端 851 → 901 用例，内存与 PostgreSQL 两套存储同跑账号场景；客户端新增账号会话、账号面板、城市缓存、选城页、全球城市地图、游客登录墙用例；`tools/dev/account_e2e.tscn` 用真 HTTP 打本地服走完注册 → 东京建农场 → 多设备 → 登出 → 删号全链路（18 项全过）。
+
+### 7.2 与原方案的偏差
+- 城市目录放在内存（启动时读 tsv），没有建 `cities` 表：数据是静态的，农场数用 `farms` 按 `region_id` 聚合即可。
+- 搜索走服务端离线城市库，没有接 Mapbox Geocoding：大陆开发阶段可用、零额外成本，结果同样经服务端归属。
+- 跨城搬迁仍未开放，搬迁照旧限本城。
+
+### 7.3 上线前的部署步骤（未执行，需要时再做）
+1. 服务器下载 DB-IP City Lite（`dbip-city-lite-YYYY-MM.mmdb.gz`，约 60 MB），解压后挂进容器，设 `IP_CITY_DB`。
+2. 设 `TRUSTED_PROXIES` 为 Caddy 所在的 Docker 网段，否则服务端拿到的是代理内网 IP，IP 预填永远为空。
+3. 配 `SMTP_URL` / `MAIL_FROM`（阿里云邮件推送或 SES）；未配时验证码只打在服务端日志里。
+4. 生产不设 `GUEST_WRITES`；QA 邮箱域名与固定验证码按需配置。
+5. 迁移会给已有库补 `users.password_hash` 与邮箱唯一索引；若库里已有 D2 旧 users 表且存在重复邮箱，迁移会失败，需先清理。
+
+### 7.4 还没做
+- C1 原生 Apple / Google 登录插件（SGODOT-96）。
+- B1 后半：居民按玩家农场周边路网落位（现为城市中心固定偏移）、非精品城市的自动地标、公共池塘按城市生成。
+- B2：Overpass 结果缓存与备用源、五城实机验收。
+- 真机巡检（按惯例过一遍主要页面），以及线上部署。

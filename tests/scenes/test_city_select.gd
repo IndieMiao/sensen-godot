@@ -1,61 +1,66 @@
 extends GdUnitTestSuite
+## 选城页（SGODOT-137）：全球任意城市可选，不申请定位权限，默认城市由 IP 预填且需确认。
 
 const SCENE := "res://scenes/city_select/city_select.tscn"
-
-## 定位桥测试替身：不接入任何平台插件（Android/iOS 桥不进测试），只用来
-## 手动控制/触发 location_update，验证超时取消订阅、重新定位不重复 connect。
-class StubBridge extends MapBridge:
-	var start_calls := 0
-	func start_location() -> void:
-		start_calls += 1
+const TOKYO := {"id": "gn-1850147", "name": "Tokyo", "country": "Japan", "country_code": "JP", "timezone": "Asia/Tokyo",
+	"center": [35.6895, 139.69171], "radius_km": 45, "curated": false, "farm_count": 3,
+	"placement_bounds": [35.2853, 139.1953, 36.0937, 140.1881]}
 
 func after_test() -> void:
 	FarmRegions.clear_choice()
 
-func test_one_button_per_region() -> void:
+func _scene() -> Control:
 	var s := (load(SCENE) as PackedScene).instantiate()
 	add_child(auto_free(s))
-	assert_int(s.region_buttons().size()).is_equal(FarmRegions.load_default().ids().size())
-	assert_object(s.get_node("%UseCurrent")).is_not_null()
+	return s
 
-func test_pick_region_pure() -> void:
-	var regions := FarmRegions.load_default().regions
-	assert_str(s_pick(regions, 34.0, -118.2, true)).is_equal("los_angeles")
-	assert_str(s_pick(regions, 0.0, 0.0, false, "shanghai")).is_equal("shanghai")
-	assert_str(s_pick(regions, 0.0, 0.0, false)).is_equal("")
+func test_offline_list_shows_the_curated_cities() -> void:
+	var s := _scene()
+	await get_tree().process_frame
+	var ids: Array = s.region_buttons().map(func(b): return str(b.get_meta("city_id")))
+	assert_array(ids).contains_exactly(["shanghai", "los_angeles"])
 
-func s_pick(regions: Array, lat: float, lng: float, has_fix: bool, fallback := "") -> String:
+func test_no_location_permission_entry_point() -> void:
+	var s := _scene()
+	assert_object(s.get_node_or_null("%UseCurrent")).is_null()
+	var source := FileAccess.get_file_as_string("res://scenes/city_select/city_select.gd")
+	assert_str(source).not_contains("start_location")
+	assert_str(source).not_contains("MapBridgeFactory")
+
+func test_suggestion_is_a_card_the_player_confirms() -> void:
+	var s := _scene()
+	var box: Control = s.find_child("Suggestion", true, false)
+	assert_bool(box.visible).is_false()
+	s.show_suggestion(TOKYO)
+	assert_bool(box.visible).is_true()
+	var button: Button = s.find_child("SuggestedCity", true, false)
+	assert_str(button.text).is_equal("Tokyo, Japan")
+	# Nothing is chosen until the button is pressed.
+	assert_str(FarmRegions.load_choice()).is_empty()
+
+func test_search_results_and_popular_list_render_server_cities() -> void:
+	var s := _scene()
+	s.show_results([TOKYO, {"id": "gn-6058560", "name": "London", "country": "Canada", "admin": "Ontario"}])
+	await get_tree().process_frame
+	var labels: Array = s.result_buttons().map(func(b): return b.text)
+	assert_str(labels[0]).is_equal("Tokyo, Japan · 3 farms")
+	assert_str(labels[1]).is_equal("London, Ontario, Canada")
+	assert_bool(s.buttons.visible).is_false()
+	s.show_results([])
+	assert_bool(s.buttons.visible).is_true()
+	s._show_popular([TOKYO])
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_int(s.region_buttons().size()).is_equal(1)
+
+func test_city_labels_disambiguate_same_names() -> void:
 	var script := load("res://scenes/city_select/city_select.gd")
-	return script.pick_region(regions, lat, lng, has_fix, fallback)
+	assert_str(script.city_label({"name": "London", "country": "United Kingdom", "admin": "England"})).is_equal("London, United Kingdom")
+	assert_str(script.city_label({"name": "London", "country": "Canada", "admin": "Ontario"})).is_equal("London, Ontario, Canada")
+	assert_str(script.city_label({"name": "Shanghai", "curated": true})).is_equal("Shanghai")
 
 func test_main_scene_is_city_select() -> void:
 	assert_str(ProjectSettings.get_setting("application/run/main_scene")).is_equal(SCENE)
-
-func test_timeout_cancels_pending_subscription() -> void:
-	var s := (load(SCENE) as PackedScene).instantiate()
-	add_child(auto_free(s))
-	var stub := StubBridge.new()
-	s._bridge = stub
-	s.locate()
-	s._on_locate_timeout() # 直接触发超时回调，不等 3 秒真实计时器
-	assert_bool(stub.location_update.is_connected(s._on_location)).is_false()
-	stub.location_update.emit(34.0, -118.2, 5.0) # 迟到的定位：不应再被接住
-	assert_bool(s._located).is_false()
-
-func test_relocate_after_timeout_does_not_double_connect() -> void:
-	# 断言按状态转换分三步查：Godot 的 connect() 会静默拒绝重复连接（只打一条
-	# ERROR，返回值被 locate() 忽略），末态连接数在 bug 版和修复版都恰好是 1，
-	# 不能只看最后一步——中间「超时后必须归零」才是真正有判别力的一步。
-	var s := (load(SCENE) as PackedScene).instantiate()
-	add_child(auto_free(s))
-	var stub := StubBridge.new()
-	s._bridge = stub
-	s.locate()
-	assert_int(stub.location_update.get_connections().size()).is_equal(1)
-	s._on_locate_timeout()
-	assert_int(stub.location_update.get_connections().size()).is_equal(0)
-	s.locate() # 超时收回后重新点按「使用当前城市」：应该干净地重新订阅一次
-	assert_int(stub.location_update.get_connections().size()).is_equal(1)
 
 func test_owned_farm_region_skips_picker_only_with_usable_farm() -> void:
 	var script := load("res://scenes/city_select/city_select.gd")

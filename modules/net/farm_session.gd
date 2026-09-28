@@ -273,6 +273,36 @@ func _login_serialized() -> bool:
 	_authenticated_endpoint = client.base_url
 	return not client.token.is_empty()
 
+## 换用账号 token（SGODOT-135）。与匿名登录同一条串行队列：换身份前让在途请求落地，
+## 换了身份就清掉上一身份的农场与命令日志作用域——日志按账号划分，不按安装密钥。
+func adopt_account(account_token: String, account_player_id: String, account_user_id: String) -> void:
+	var ticket := _next_ticket
+	_next_ticket += 1
+	while _serving != ticket:
+		await Engine.get_main_loop().process_frame
+	last_command_events.clear()
+	var digest := ("account:" + account_user_id).sha256_text()
+	if player_id != account_player_id or _installation_digest != digest or _authenticated_endpoint != client.base_url:
+		_reset_authenticated_farm()
+	player_id = account_player_id
+	client.token = account_token
+	_installation_digest = digest
+	_authenticated_endpoint = client.base_url
+	_serving += 1
+
+## 登出 / 删号：丢掉当前身份与农场，调用方随后以游客身份重新登录。
+func forget_identity() -> void:
+	var ticket := _next_ticket
+	_next_ticket += 1
+	while _serving != ticket:
+		await Engine.get_main_loop().process_frame
+	_reset_authenticated_farm()
+	player_id = ""
+	client.token = ""
+	_installation_digest = ""
+	_authenticated_endpoint = ""
+	_serving += 1
+
 ## 已有农场就取回来，没有就建一个。
 func ensure_farm(region_id: String, layout_patch_id: String, revision: int, placement: Dictionary = {}) -> bool:
 	var ticket := _next_ticket

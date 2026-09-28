@@ -11,12 +11,32 @@ const SHOP_MAKI := ["grocery", "shop", "clothing-store", "convenience", "superma
 static var force_legacy := false
 
 static func has_city(region_id: String) -> bool:
-	return not force_legacy and not region_id.is_empty() and FileAccess.file_exists(CITY_DIR + region_id + ".json")
+	if force_legacy or region_id.is_empty(): return false
+	return FileAccess.file_exists(CITY_DIR + region_id + ".json") or not FarmRegions.cached_region(region_id).is_empty()
 
 static func city(region_id: String) -> Dictionary:
 	if not has_city(region_id): return {}
+	if not FileAccess.file_exists(CITY_DIR + region_id + ".json"): return generated_city(FarmRegions.cached_region(region_id))
 	var data = JSON.parse_string(FileAccess.get_file_as_string(CITY_DIR + region_id + ".json"))
 	return data if data is Dictionary else {}
+
+## 没有人工配置的全球城市（SGODOT-136）：概览视角按城市半径取，无人工地标，
+## 三位居民放在城市中心附近的固定偏移上，保证七日委托在任何城市都有人可找。
+## 按玩家农场周边路网落位是 B1 的后续工作。
+static func generated_city(region: Dictionary) -> Dictionary:
+	var center: Array = region.get("center", [])
+	if center.size() != 2: return {}
+	var lat := float(center[0])
+	var lng := float(center[1])
+	var radius := float(region.get("radius_km", 20))
+	var zoom := 11.0 if radius >= 45 else 11.5 if radius >= 30 else 12.0 if radius >= 20 else 12.5
+	var spots := {"nursery": [0.012, -0.010], "bistro": [-0.008, 0.012], "courtyard": [0.004, 0.018]}
+	var residents := []
+	for spec in [["nursery_keeper", "nursery", "nursery"], ["bistro_owner", "bistro", "bistro"], ["restorer", "courtyard", "restorer"]]:
+		var offset: Array = spots[spec[1]]
+		residents.append({"id": spec[0], "place": spec[1], "slot": spec[2], "lat": lat + offset[0], "lng": lng + offset[1] / maxf(0.2, cos(deg_to_rad(lat)))})
+	return {"format": 1, "generated": true, "overview": {"lat": lat, "lng": lng, "zoom": zoom, "bearing": 0.0},
+		"landmarks": [], "residents": residents}
 
 static func landmarks(region_id: String) -> Array:
 	var result: Array = city(region_id).get("landmarks", [])

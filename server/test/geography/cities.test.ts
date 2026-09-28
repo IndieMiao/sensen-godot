@@ -37,10 +37,10 @@ describe('CityCatalog', () => {
     expect(catalog.resolve({ lat: 0, lng: -140 })).toBeNull();
   });
 
-  it('keeps a chosen city near its border and falls back to resolving outside the tolerance', () => {
+  it('keeps a chosen city inside its placement box and resolves again outside it', () => {
     const tokyo = catalog.resolve({ lat: 35.6812, lng: 139.7671 })!;
     const near = { lat: 35.6812 + 0.3, lng: 139.7671 };
-    expect(distanceKm(near, { lat: tokyo.center[0], lng: tokyo.center[1] })).toBeLessThan(tokyo.radius_km * 1.25);
+    expect(distanceKm(near, { lat: tokyo.center[0], lng: tokyo.center[1] })).toBeLessThan(tokyo.radius_km);
     expect(catalog.forPlacement(near, tokyo.id)?.id).toBe(tokyo.id);
     expect(catalog.forPlacement({ lat: 34.6937, lng: 135.5023 }, tokyo.id)?.name).toBe('Osaka');
   });

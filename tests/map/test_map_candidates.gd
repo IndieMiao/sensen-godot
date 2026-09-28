@@ -59,6 +59,8 @@ func test_missing_farm_can_be_placed_and_enters_with_a_server_session() -> void:
 	var t := FakeTransport.new([])
 	Net.use_transport(t.callable())
 	Net.client.token = "tok"
+	Net.account.token = "tok"  # 账号玩家（SGODOT-135）：游客建农场会先弹登录墙
+	Net.account.user_id = "test-user"
 	Net.session.last_error_code = "NO_FARM"
 	var m := _map_with_region()
 	var id: String = m.select_panel.focused_id
@@ -84,6 +86,8 @@ func test_generation_failure_keeps_chosen_location_and_allows_reselection() -> v
 	var t := FakeTransport.new([])
 	Net.use_transport(t.callable())
 	Net.client.token = "tok"
+	Net.account.token = "tok"  # 账号玩家（SGODOT-135）：游客建农场会先弹登录墙
+	Net.account.user_id = "test-user"
 	Net.session.last_error_code = "NO_FARM"
 	var m := _map_with_region()
 	var location: Dictionary = m._placement_location.duplicate()

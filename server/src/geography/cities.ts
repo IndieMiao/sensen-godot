@@ -35,8 +35,6 @@ export interface CuratedRegion {
 
 /** 距离 / 城市半径超过这个倍数就不算任何城市（海上、极地、荒原）。 */
 export const MAX_RADIUS_RATIO = 4;
-/** 选中城市后在其半径 × 该系数内选址都算这座城，免得边界附近被吸到邻城。 */
-export const PLACEMENT_TOLERANCE = 1.25;
 
 export const DEFAULT_CITIES_FILE = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', 'data', 'cities.tsv');
 const CELL = 1;
@@ -116,15 +114,13 @@ export class CityCatalog {
   }
 
   /**
-   * 选址归属。玩家已经选了某座城时，在它半径的容差内都算这座城（边界附近不会被吸到邻城）；
-   * 超出容差就按坐标重新解析。精品城市严格按 placement_bounds。
+   * 选址归属。玩家已经选了某座城时，落在它的选址框内都算这座城（边界附近不会被吸到邻城）；
+   * 框外按坐标重新解析。
    */
   forPlacement(location: FarmLocation, requestedId?: string): City | null {
     const requested = requestedId ? this.get(requestedId) : null;
-    if (requested) {
-      if (requested.placement_bounds) { if (inBounds(requested.placement_bounds, location)) return requested; }
-      else if (distanceKm(location, point(requested)) <= requested.radius_km * PLACEMENT_TOLERANCE) return requested;
-    }
+    // Same box the client draws (cityView.placement_bounds), so a pick the map accepts is never moved to a neighbour.
+    if (requested && inBounds(cityBounds(requested), location)) return requested;
     return this.resolve(location);
   }
 
@@ -155,11 +151,16 @@ export function parseCities(text: string): City[] {
   return out;
 }
 
-/** 客户端看到的城市。bounds 给地图框定范围：精品城市用人工边界，其余用半径外接框。 */
-export function cityView(c: City, farmCount?: number) {
+/** 选址框：精品城市用人工边界，其余用半径外接框。客户端与服务端判定同一个框。 */
+export function cityBounds(c: City): PlacementBounds {
+  if (c.placement_bounds) return c.placement_bounds;
   const dLat = c.radius_km / 111.32, dLng = dLat / Math.max(0.1, Math.cos(c.center[0] * Math.PI / 180));
-  const bounds: PlacementBounds = c.placement_bounds
-    ?? [c.center[0] - dLat, c.center[1] - dLng, c.center[0] + dLat, c.center[1] + dLng];
+  return [c.center[0] - dLat, c.center[1] - dLng, c.center[0] + dLat, c.center[1] + dLng];
+}
+
+/** 客户端看到的城市。 */
+export function cityView(c: City, farmCount?: number) {
+  const bounds = cityBounds(c);
   return {
     id: c.id, name: c.name, country_code: c.country_code, country: c.country, admin: c.admin,
     center: c.center, timezone: c.timezone, radius_km: c.radius_km, curated: c.curated, placement_bounds: bounds,
