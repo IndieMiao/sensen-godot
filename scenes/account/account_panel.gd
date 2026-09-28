@@ -6,6 +6,7 @@ extends CanvasLayer
 ## signed_in 表示此刻是否已登录（注册后跳过验证也算已登录：验证不阻塞进入游戏）。
 ##
 ## 面板贴顶而不是居中：手机软键盘从底部升起，贴顶的输入框不会被盖住。
+## 背景整屏不透明（与选城页同一张风景图）：同一时间只看得到这一个窗口，底下的界面既不透出也点不到。
 
 signal closed(signed_in: bool)
 
@@ -43,15 +44,27 @@ func _ready() -> void:
 	GameUi.register_modal(self)
 	var scrim := ColorRect.new()
 	scrim.name = "Scrim"
-	scrim.color = Color(GameUi.INK, 0.32)
+	scrim.color = GameUi.PAPER
+	scrim.mouse_filter = Control.MOUSE_FILTER_STOP
 	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scrim.theme = GameUi.theme()
 	add_child(scrim)
+	var background_path := "res://assets/ui/game/city-background.png"
+	if not ResourceLoader.exists(background_path): background_path = "res://assets/ui/backgrounds/city-garden.png"
+	if ResourceLoader.exists(background_path):
+		var scenery := TextureRect.new()
+		scenery.name = "Scenery"
+		scenery.texture = load(background_path)
+		scenery.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		scenery.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		scenery.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		scenery.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		scrim.add_child(scenery)
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	margin.add_theme_constant_override("margin_left", 20)
 	margin.add_theme_constant_override("margin_right", 20)
-	margin.add_theme_constant_override("margin_top", 56)
+	margin.add_theme_constant_override("margin_top", 96)
 	scrim.add_child(margin)
 	var holder := VBoxContainer.new()
 	holder.alignment = BoxContainer.ALIGNMENT_BEGIN
@@ -135,6 +148,7 @@ func _field(placeholder: String, secret: bool, keyboard := LineEdit.KEYBOARD_TYP
 func set_mode(next: String) -> void:
 	mode = next
 	_confirm_delete = false
+	_danger_primary(false)
 	_status.text = ""
 	_status.visible = false
 	_status.add_theme_color_override("font_color", GameUi.CORAL)
@@ -161,7 +175,7 @@ func set_mode(next: String) -> void:
 		"account":
 			_show_fields([])
 			var status := L10n.text("Verified") if signed and Net.account.email_verified else L10n.text("Not verified yet")
-			_set_texts("My account", (Net.account.email if signed else "") + " · " + status,
+			_set_texts("My account", (Net.account.email if signed else "") + "\n" + status,
 				"Done", "Verify email" if signed and not Net.account.email_verified else "", "Sign out")
 	_danger.visible = mode == "account"
 	_danger.text = L10n.text("Delete account")
@@ -249,10 +263,24 @@ func _on_danger() -> void:
 	_title.text = L10n.text("Delete account?")
 	_subtitle.text = L10n.text("This permanently deletes your account and your farm. Enter your password to confirm.")
 	_primary.text = L10n.text("Delete permanently")
+	_danger_primary(true)
 	_secondary.text = L10n.text("Keep my account")
 	_secondary.visible = true
 	_tertiary.visible = false
 	_danger.visible = false
+
+## 删除确认时主按钮变成珊瑚红，不能和"注册 / 登录"用同一种绿色。
+func _danger_primary(on: bool) -> void:
+	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
+		if on:
+			var style := GameUi.surface(GameUi.CORAL, 10, 14)
+			if state == "pressed": style.bg_color = GameUi.CORAL.darkened(0.12)
+			_primary.add_theme_stylebox_override(state, style)
+		else:
+			_primary.remove_theme_stylebox_override(state)
+	for color in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		if on: _primary.add_theme_color_override(color, Color.WHITE)
+		else: _primary.remove_theme_color_override(color)
 
 func _submit_login(create: bool) -> void:
 	var email := _email.text.strip_edges()

@@ -36,9 +36,10 @@ static func owned_farm_region(p_regions: FarmRegions, choice: Dictionary) -> Str
 	if bp == null or bp.overlay.is_empty(): return ""
 	return bp.region_id if not p_regions.region(bp.region_id).is_empty() else ""
 
-## "Tokyo, Japan"：同名城市（伦敦 / 加拿大伦敦）靠国家与省份区分。
+## "Tokyo, Japan"：同名城市（伦敦 / 加拿大伦敦）靠国家与省份区分。精品城市（上海、洛杉矶）只写城市名。
 static func city_label(view: Dictionary) -> String:
 	var parts := [str(view.get("name", view.get("id", "")))]
+	if bool(view.get("curated", false)): return parts[0]
 	var admin := str(view.get("admin", ""))
 	var country := str(view.get("country", ""))
 	if not admin.is_empty() and admin != parts[0] and bool(view.get("curated", false)) == false and country in ["United States", "Canada", "Australia", "China", "India", "Brazil"]:
