@@ -79,7 +79,7 @@ func _ready() -> void:
 	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(backdrop)
 	move_child(backdrop, 0)
-	var background_path := "res://assets/ui/game/city-background.png"
+	var background_path := "res://assets/ui/backgrounds/map-social.png"
 	if not ResourceLoader.exists(background_path): background_path = "res://assets/ui/backgrounds/city-garden.png"
 	if ResourceLoader.exists(background_path):
 		var scenery := TextureRect.new()
