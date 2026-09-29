@@ -16,7 +16,7 @@
 
 - **Android 0.17.5**（versionCode 2026092901，`com.sensen.journeypreview`，原 Journey 证书 38771d94）：模拟器从 0.16.42 原位升级、冷启动进入登录墙。**未在真机安装**。
   - [美国下载](https://download-us.sensenjoy.cn:8443/farm/releases/accounts-20260929-cfec3ef142b6/sensen-journey-accounts-0.17.5.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/accounts-20260929-cfec3ef142b6/sensen-journey-accounts-0.17.5.apk)，SHA-256 `cfec3ef142b62efb4b1197fb64b8b2f7de6ba190c0f047a7da87587e7f42b271`，两站完整下载与 Range 校验通过。
-- **iOS 0.17.5 (1)**：`build/ios-release` 已导出 release 工程，含原生地图桥、Apple 登录桥与 entitlement，图标已去 alpha。**待 Mac 解锁后在 Xcode 里 Archive 并用 Organizer 上传 TestFlight**（CLI 无法为新能力建 profile）。
+- **iOS 0.17.5 (1)**：源码 `64ed735`（含 Apple 授权码回传）。Xcode GUI Archive → Organizer Custom → App Store Connect → Upload，关闭版本号托管、上传符号、非仅内部测试，自动签名得 Cloud Managed Apple Distribution + App Store profile（app.gensen.maps，含 `com.apple.developer.applesignin`）。10:16 上传完成，仅 MapboxCommon / MapboxCoreMaps 缺 dSYM 两条已知警告。**尚未在 TestFlight 真机安装验证**。
 
 ## 影响
 
@@ -24,4 +24,4 @@
 
 ## 仍待办
 
-- 删号时调 Apple revoke（等 .p8 私钥）；Apple 按钮换带 logo 的官方样式；真实发信；App Store Connect 隐私信息更新。
+- 删号撤销 Apple 授权：客户端 0.17.5 已回传授权码，服务端代码 `64ed735` 已写好并测试，**等 .p8（Key ID 8J47FB5YJN）配到服务器后再发一次服务端**；Apple 按钮换带 logo 的官方样式；真实发信；App Store Connect 隐私信息更新。
