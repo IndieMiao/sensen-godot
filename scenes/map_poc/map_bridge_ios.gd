@@ -15,6 +15,8 @@ var _pending_create := ""
 var _got_ready := false
 var _frames := 0
 var _locale := "zh_CN"
+## POIS 回包按 request_id 收集分包：{id: {"parts": n, "chunks": {index: features}}}。
+var _poi_parts: Dictionary = {}
 
 func _init() -> void:
 	_udp.connect_to_host("127.0.0.1", PORT)
@@ -49,10 +51,39 @@ func poll() -> void:
 		_send(_pending_create)
 	while _udp.get_available_packet_count() > 0:
 		var s := _udp.get_packet().get_string_from_utf8()
-		if s.begins_with("READY|"):
+		if s.begins_with("POIS|"):
+			_on_pois_packet(s)
+		elif s.begins_with("READY|"):
 			_ratio = maxf(float(s.get_slice("|", 1)), 1.0)
 			_got_ready = true
 			map_ready.emit()
+
+func request_pois(request_id: int) -> void:
+	_send("POIS|%d" % request_id)
+
+## 原生侧把一次查询拆成 POIS|id|part|parts|{json}；收齐后合并成一次 pois_received。
+func _on_pois_packet(s: String) -> void:
+	var head := s.split("|", true, 4)
+	if head.size() < 5: return
+	var id := int(head[1])
+	var index := int(head[2])
+	var parts := maxi(1, int(head[3]))
+	var body = JSON.parse_string(head[4])
+	if not body is Dictionary: return
+	# A newer request supersedes older partial answers.
+	for old in _poi_parts.keys():
+		if int(old) < id: _poi_parts.erase(old)
+	var entry: Dictionary = _poi_parts.get(id, {"parts": parts, "chunks": {}, "error": ""})
+	entry.chunks[index] = body.get("features", [])
+	if body.has("error"): entry.error = str(body.error)
+	_poi_parts[id] = entry
+	if entry.chunks.size() < int(entry.parts): return
+	_poi_parts.erase(id)
+	var features := []
+	for i in int(entry.parts): features.append_array(entry.chunks.get(i, []))
+	var result := {"features": features}
+	if not str(entry.error).is_empty(): result.error = entry.error
+	pois_received.emit(id, JSON.stringify(result))
 
 func _send(s: String) -> void:
 	_udp.put_packet(s.to_utf8_buffer())

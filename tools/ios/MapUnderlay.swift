@@ -3,7 +3,8 @@
 //      本机 UDP(46464) 接收 GDScript 指令（Mapbox v11 纯 Swift API，PoC 用回环桥，
 //      正式化时迁 GDExtension/插件）。
 // 协议（UTF-8 文本，'|' 分隔）：
-//   Godot → 本层：CREATE|token|lat|lng|zoom ／ CAM|lat|lng|zoom|bearing|pitch ／ VIS|0/1 ／ LANG|locale
+//   Godot → 本层：CREATE|token|lat|lng|zoom ／ CAM|lat|lng|zoom|bearing|pitch ／ VIS|0/1 ／ LANG|locale ／ POIS|request_id
+//   本层 → Godot：POIS|request_id|part|parts|{"features":[...]}（一次查询拆成多包，每包不超过约 7 KB；Godot 收齐再拼）
 //   本层 → Godot：READY|pixelRatio（样式加载完成后，答复 CREATE 的来源端口）
 import UIKit
 import Network
@@ -175,8 +176,99 @@ class MapUnderlay: NSObject {
                 mapLocale = locale
                 localizeMap()
             }
+        case "POIS" where p.count >= 2:
+            replyConn = conn
+            queryCityPois(requestId: p[1])
         default:
             NSLog("[MapUnderlay] unknown command: \(p.first ?? "")")
+        }
+    }
+
+    // MARK: - 城市 POI（与 Android GodotMapPlugin.queryCityPois 同字段、同上限）
+
+    private func sendPois(_ requestId: String, _ rows: [[String: Any]], error: String? = nil) {
+        // Loopback UDP datagrams are small; split rows into packets of at most ~7 KB each.
+        var parts: [Data] = []
+        var batch: [[String: Any]] = []
+        func encode(_ rows: [[String: Any]]) -> Data {
+            var body: [String: Any] = ["features": rows]
+            if let error { body["error"] = error }
+            return (try? JSONSerialization.data(withJSONObject: body)) ?? Data("{\"features\":[]}".utf8)
+        }
+        for row in rows {
+            if encode(batch + [row]).count > 7000, !batch.isEmpty {
+                parts.append(encode(batch))
+                batch = []
+            }
+            batch.append(row)
+        }
+        parts.append(encode(batch))
+        for (index, part) in parts.enumerated() {
+            var packet = Data("POIS|\(requestId)|\(index)|\(parts.count)|".utf8)
+            packet.append(part)
+            replyConn?.send(content: packet, completion: .contentProcessed { _ in })
+        }
+    }
+
+    private func queryCityPois(requestId: String) {
+        guard let map = mapView, styleLoaded else {
+            sendPois(requestId, [], error: "loading")
+            return
+        }
+        let english = mapLocale.identifier.hasPrefix("en")
+        let options = SourceQueryOptions(sourceLayerIds: ["poi_label"], filter: true)
+        _ = map.mapboxMap.querySourceFeatures(for: "composite", options: options) { [weak self, weak map] result in
+            DispatchQueue.main.async {
+                guard let self, let map else { return }
+                switch result {
+                case .failure(let error):
+                    NSLog("[MapUnderlay] POI query: \(error)")
+                    self.sendPois(requestId, [], error: "unavailable")
+                case .success(let queried):
+                    let center = map.mapboxMap.cameraState.center
+                    let bounds = map.bounds
+                    var points: [(CLLocationCoordinate2D, JSONObject, String?)] = []
+                    for item in queried {
+                        let feature = item.queriedFeature.feature
+                        guard case .point(let point)? = feature.geometry, let props = feature.properties else { continue }
+                        var id: String?
+                        switch feature.identifier {
+                        case .string(let v)?: id = v
+                        case .number(let v)?: id = String(Int64(v))
+                        default: id = nil
+                        }
+                        points.append((point.coordinates, props, id))
+                    }
+                    points.sort {
+                        abs($0.0.latitude - center.latitude) + abs($0.0.longitude - center.longitude)
+                            < abs($1.0.latitude - center.latitude) + abs($1.0.longitude - center.longitude)
+                    }
+                    func field(_ props: JSONObject, _ key: String) -> String {
+                        switch props[key] ?? nil {
+                        case .string(let v)?: return v
+                        case .number(let v)?: return String(v)
+                        default: return ""
+                        }
+                    }
+                    var rows: [[String: Any]] = []
+                    var seen = Set<String>()
+                    for (coordinate, props, fid) in points {
+                        let pixel = map.mapboxMap.point(for: coordinate)
+                        if pixel.x < 0 || pixel.y < 0 || pixel.x > bounds.width || pixel.y > bounds.height { continue }
+                        var name = field(props, english ? "name_en" : "name_zh-Hans")
+                        if name.isEmpty { name = field(props, "name") }
+                        if name.isEmpty { continue }
+                        let id = "tile:" + (fid ?? "\(name):\(coordinate.longitude):\(coordinate.latitude)")
+                        if !seen.insert(id).inserted { continue }
+                        rows.append(["id": id, "name": name, "lat": coordinate.latitude, "lng": coordinate.longitude,
+                                     "maki": field(props, "maki"), "class": field(props, "class"),
+                                     "category": field(props, english ? "category_en" : "category_zh-Hans"),
+                                     "rank": Double(field(props, "filterrank")) ?? 5.0])
+                        if rows.count >= 100 { break }
+                    }
+                    self.sendPois(requestId, rows)
+                }
+            }
         }
     }
 
