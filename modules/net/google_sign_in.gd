@@ -18,7 +18,8 @@ static func available() -> bool:
 	if not Engine.has_singleton(SINGLETON): return false
 	if _play_services < 0:
 		var plugin := Engine.get_singleton(SINGLETON)
-		_play_services = 1 if plugin.has_method("isAvailable") and bool(plugin.isAvailable()) else 0
+		# Android plugin singletons do not report their methods through has_method(); call it directly.
+		_play_services = 1 if bool(plugin.call("isAvailable")) else 0
 	return _play_services == 1
 
 static func web_client_id() -> String:
