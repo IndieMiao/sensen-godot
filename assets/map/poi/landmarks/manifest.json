@@ -1,54 +1,289 @@
 {
-  "format": 1,
-  "source": "Figma OMLTC3yw3u2WDjOZhLnhaR page Landmark_icons (299:2955), 1024px exports resized to 512px",
-  "note": "Landmark markers for cities beyond Los Angeles. LA's five live in assets/map/poi/ already. Coordinates are added per city map JSON when a city opens; none are invented here.",
-  "landmarks": {
-    "golden_gate_bridge": {"zh": "金门大桥", "en": "Golden Gate Bridge", "city": "San Francisco", "figma_node": "299:3067"},
-    "fishermans_wharf": {"zh": "渔人码头", "en": "Fisherman's Wharf", "city": "San Francisco", "figma_node": "299:3068"},
-    "alcatraz_island": {"zh": "恶魔岛", "en": "Alcatraz Island", "city": "San Francisco", "figma_node": "299:3069"},
-    "painted_ladies": {"zh": "彩绘女士", "en": "Painted Ladies", "city": "San Francisco", "figma_node": "299:3070"},
-    "balboa_park": {"zh": "巴尔博亚公园", "en": "Balboa Park", "city": "San Diego", "figma_node": "299:3071"},
-    "san_diego_zoo": {"zh": "圣地亚哥动物园", "en": "San Diego Zoo", "city": "San Diego", "figma_node": "299:3072"},
-    "multnomah_falls": {"zh": "马特诺玛瀑布", "en": "Multnomah Falls", "city": "Portland", "figma_node": "299:3073"},
-    "powells_books": {"zh": "鲍威尔书城", "en": "Powell's Books", "city": "Portland", "figma_node": "299:3074"},
-    "portland_japanese_garden": {"zh": "波特兰日本花园", "en": "Portland Japanese Garden", "city": "Portland", "figma_node": "299:3075"},
-    "portland_saturday_market": {"zh": "波特兰周六市集", "en": "Portland Saturday Market", "city": "Portland", "figma_node": "299:3076"},
-    "crater_lake": {"zh": "火山口湖国家公园", "en": "Crater Lake", "city": "Oregon", "figma_node": "299:3077"},
-    "space_needle": {"zh": "太空针塔", "en": "Space Needle", "city": "Seattle", "figma_node": "299:3078"},
-    "pike_place_market": {"zh": "派克市场", "en": "Pike Place Market", "city": "Seattle", "figma_node": "299:3079"},
-    "chihuly_garden_glass": {"zh": "奇胡利玻璃艺术园", "en": "Chihuly Garden and Glass", "city": "Seattle", "figma_node": "299:3080"},
-    "seattle_great_wheel": {"zh": "西雅图摩天轮", "en": "Seattle Great Wheel", "city": "Seattle", "figma_node": "299:3081"},
-    "gum_wall": {"zh": "口香糖墙", "en": "Gum Wall", "city": "Seattle", "figma_node": "299:3082"},
-    "hurricane_ridge": {"zh": "飓风岭", "en": "Hurricane Ridge", "city": "Washington", "figma_node": "299:3083"},
-    "hoh_rain_forest": {"zh": "霍河雨林", "en": "Hoh Rain Forest", "city": "Washington", "figma_node": "299:3084"},
-    "las_vegas_strip": {"zh": "拉斯维加斯大道", "en": "Las Vegas Strip", "city": "Las Vegas", "figma_node": "299:3085"},
-    "bellagio_fountains": {"zh": "百乐宫喷泉", "en": "Bellagio Fountains", "city": "Las Vegas", "figma_node": "299:3086"},
-    "grand_canyon": {"zh": "大峡谷", "en": "Grand Canyon", "city": "Arizona", "figma_node": "299:3087"},
-    "horseshoe_bend": {"zh": "马蹄湾", "en": "Horseshoe Bend", "city": "Arizona", "figma_node": "299:3088"},
-    "antelope_canyon": {"zh": "羚羊峡谷", "en": "Antelope Canyon", "city": "Arizona", "figma_node": "299:3089"},
-    "red_rocks_amphitheatre": {"zh": "红岩剧场", "en": "Red Rocks Amphitheatre", "city": "Denver", "figma_node": "299:3090"},
-    "rocky_mountain_np": {"zh": "落基山国家公园", "en": "Rocky Mountain National Park", "city": "Colorado", "figma_node": "299:3091"},
-    "arches_np": {"zh": "拱门国家公园", "en": "Arches National Park", "city": "Utah", "figma_node": "299:3092"},
-    "bryce_canyon_np": {"zh": "布莱斯峡谷国家公园", "en": "Bryce Canyon National Park", "city": "Utah", "figma_node": "299:3093"},
-    "cloud_gate": {"zh": "云门豆子", "en": "Cloud Gate", "city": "Chicago", "figma_node": "299:3094"},
-    "millennium_park": {"zh": "千禧公园", "en": "Millennium Park", "city": "Chicago", "figma_node": "299:3095"},
-    "willis_tower": {"zh": "威利斯大厦", "en": "Willis Tower", "city": "Chicago", "figma_node": "299:3096"},
-    "space_center_houston": {"zh": "休斯顿太空中心", "en": "Space Center Houston", "city": "Houston", "figma_node": "299:3097"},
-    "san_antonio_river_walk": {"zh": "圣安东尼奥河滨步道", "en": "San Antonio River Walk", "city": "San Antonio", "figma_node": "299:3098"},
-    "statue_of_liberty": {"zh": "自由女神像", "en": "Statue of Liberty", "city": "New York", "figma_node": "299:3099"},
-    "times_square": {"zh": "时代广场", "en": "Times Square", "city": "New York", "figma_node": "299:3100"},
-    "central_park": {"zh": "中央公园", "en": "Central Park", "city": "New York", "figma_node": "299:3101"},
-    "brooklyn_bridge": {"zh": "布鲁克林大桥", "en": "Brooklyn Bridge", "city": "New York", "figma_node": "299:3102"},
-    "empire_state_building": {"zh": "帝国大厦", "en": "Empire State Building", "city": "New York", "figma_node": "299:3103"},
-    "lincoln_memorial": {"zh": "林肯纪念堂", "en": "Lincoln Memorial", "city": "Washington D.C.", "figma_node": "299:3104"},
-    "washington_monument": {"zh": "华盛顿纪念碑", "en": "Washington Monument", "city": "Washington D.C.", "figma_node": "299:3105"},
-    "walt_disney_world": {"zh": "迪士尼世界", "en": "Walt Disney World", "city": "Orlando", "figma_node": "299:3106"},
-    "universal_studios_florida": {"zh": "奥兰多环球影城", "en": "Universal Studios Florida", "city": "Orlando", "figma_node": "299:3107"},
-    "wynwood_walls": {"zh": "温伍德涂鸦墙", "en": "Wynwood Walls", "city": "Miami", "figma_node": "299:3108"},
-    "south_beach": {"zh": "南海滩", "en": "South Beach", "city": "Miami", "figma_node": "299:3109"},
-    "freedom_trail": {"zh": "自由之路", "en": "Freedom Trail", "city": "Boston", "figma_node": "299:3110"},
-    "harvard_university": {"zh": "哈佛大学", "en": "Harvard University", "city": "Boston", "figma_node": "299:3111"},
-    "liberty_bell": {"zh": "自由钟", "en": "Liberty Bell", "city": "Philadelphia", "figma_node": "299:3112"},
-    "independence_hall": {"zh": "独立宫", "en": "Independence Hall", "city": "Philadelphia", "figma_node": "299:3113"}
+ "format": 1,
+ "source": "Figma OMLTC3yw3u2WDjOZhLnhaR page Landmark_icons (299:2955): each node's original transparent 1024px image (not the node render, which adds a grey card), resized to 512px on 2026-09-29",
+ "note": "Landmark markers for cities beyond Los Angeles. LA's five live in assets/map/poi/ already. Coordinates are added per city map JSON when a city opens; none are invented here.",
+ "landmarks": {
+  "golden_gate_bridge": {
+   "zh": "金门大桥",
+   "en": "Golden Gate Bridge",
+   "city": "San Francisco",
+   "figma_node": "299:3067"
+  },
+  "fishermans_wharf": {
+   "zh": "渔人码头",
+   "en": "Fisherman's Wharf",
+   "city": "San Francisco",
+   "figma_node": "299:3068"
+  },
+  "alcatraz_island": {
+   "zh": "恶魔岛",
+   "en": "Alcatraz Island",
+   "city": "San Francisco",
+   "figma_node": "299:3069"
+  },
+  "painted_ladies": {
+   "zh": "彩绘女士",
+   "en": "Painted Ladies",
+   "city": "San Francisco",
+   "figma_node": "299:3070"
+  },
+  "balboa_park": {
+   "zh": "巴尔博亚公园",
+   "en": "Balboa Park",
+   "city": "San Diego",
+   "figma_node": "299:3071"
+  },
+  "san_diego_zoo": {
+   "zh": "圣地亚哥动物园",
+   "en": "San Diego Zoo",
+   "city": "San Diego",
+   "figma_node": "299:3072"
+  },
+  "multnomah_falls": {
+   "zh": "马特诺玛瀑布",
+   "en": "Multnomah Falls",
+   "city": "Portland",
+   "figma_node": "299:3073"
+  },
+  "powells_books": {
+   "zh": "鲍威尔书城",
+   "en": "Powell's Books",
+   "city": "Portland",
+   "figma_node": "299:3074"
+  },
+  "portland_japanese_garden": {
+   "zh": "波特兰日本花园",
+   "en": "Portland Japanese Garden",
+   "city": "Portland",
+   "figma_node": "299:3075"
+  },
+  "portland_saturday_market": {
+   "zh": "波特兰周六市集",
+   "en": "Portland Saturday Market",
+   "city": "Portland",
+   "figma_node": "299:3076"
+  },
+  "crater_lake": {
+   "zh": "火山口湖国家公园",
+   "en": "Crater Lake",
+   "city": "Oregon",
+   "figma_node": "299:3077"
+  },
+  "space_needle": {
+   "zh": "太空针塔",
+   "en": "Space Needle",
+   "city": "Seattle",
+   "figma_node": "299:3078"
+  },
+  "pike_place_market": {
+   "zh": "派克市场",
+   "en": "Pike Place Market",
+   "city": "Seattle",
+   "figma_node": "299:3079"
+  },
+  "chihuly_garden_glass": {
+   "zh": "奇胡利玻璃艺术园",
+   "en": "Chihuly Garden and Glass",
+   "city": "Seattle",
+   "figma_node": "299:3080"
+  },
+  "seattle_great_wheel": {
+   "zh": "西雅图摩天轮",
+   "en": "Seattle Great Wheel",
+   "city": "Seattle",
+   "figma_node": "299:3081"
+  },
+  "gum_wall": {
+   "zh": "口香糖墙",
+   "en": "Gum Wall",
+   "city": "Seattle",
+   "figma_node": "299:3082"
+  },
+  "hurricane_ridge": {
+   "zh": "飓风岭",
+   "en": "Hurricane Ridge",
+   "city": "Washington",
+   "figma_node": "299:3083"
+  },
+  "hoh_rain_forest": {
+   "zh": "霍河雨林",
+   "en": "Hoh Rain Forest",
+   "city": "Washington",
+   "figma_node": "299:3084"
+  },
+  "las_vegas_strip": {
+   "zh": "拉斯维加斯大道",
+   "en": "Las Vegas Strip",
+   "city": "Las Vegas",
+   "figma_node": "299:3085"
+  },
+  "bellagio_fountains": {
+   "zh": "百乐宫喷泉",
+   "en": "Bellagio Fountains",
+   "city": "Las Vegas",
+   "figma_node": "299:3086"
+  },
+  "grand_canyon": {
+   "zh": "大峡谷",
+   "en": "Grand Canyon",
+   "city": "Arizona",
+   "figma_node": "299:3087"
+  },
+  "horseshoe_bend": {
+   "zh": "马蹄湾",
+   "en": "Horseshoe Bend",
+   "city": "Arizona",
+   "figma_node": "299:3088"
+  },
+  "antelope_canyon": {
+   "zh": "羚羊峡谷",
+   "en": "Antelope Canyon",
+   "city": "Arizona",
+   "figma_node": "299:3089"
+  },
+  "red_rocks_amphitheatre": {
+   "zh": "红岩剧场",
+   "en": "Red Rocks Amphitheatre",
+   "city": "Denver",
+   "figma_node": "299:3090"
+  },
+  "rocky_mountain_np": {
+   "zh": "落基山国家公园",
+   "en": "Rocky Mountain National Park",
+   "city": "Colorado",
+   "figma_node": "299:3091"
+  },
+  "arches_np": {
+   "zh": "拱门国家公园",
+   "en": "Arches National Park",
+   "city": "Utah",
+   "figma_node": "299:3092"
+  },
+  "bryce_canyon_np": {
+   "zh": "布莱斯峡谷国家公园",
+   "en": "Bryce Canyon National Park",
+   "city": "Utah",
+   "figma_node": "299:3093"
+  },
+  "cloud_gate": {
+   "zh": "云门豆子",
+   "en": "Cloud Gate",
+   "city": "Chicago",
+   "figma_node": "299:3094"
+  },
+  "millennium_park": {
+   "zh": "千禧公园",
+   "en": "Millennium Park",
+   "city": "Chicago",
+   "figma_node": "299:3095"
+  },
+  "willis_tower": {
+   "zh": "威利斯大厦",
+   "en": "Willis Tower",
+   "city": "Chicago",
+   "figma_node": "299:3096"
+  },
+  "space_center_houston": {
+   "zh": "休斯顿太空中心",
+   "en": "Space Center Houston",
+   "city": "Houston",
+   "figma_node": "299:3097"
+  },
+  "san_antonio_river_walk": {
+   "zh": "圣安东尼奥河滨步道",
+   "en": "San Antonio River Walk",
+   "city": "San Antonio",
+   "figma_node": "299:3098"
+  },
+  "statue_of_liberty": {
+   "zh": "自由女神像",
+   "en": "Statue of Liberty",
+   "city": "New York",
+   "figma_node": "299:3099"
+  },
+  "times_square": {
+   "zh": "时代广场",
+   "en": "Times Square",
+   "city": "New York",
+   "figma_node": "299:3100"
+  },
+  "central_park": {
+   "zh": "中央公园",
+   "en": "Central Park",
+   "city": "New York",
+   "figma_node": "299:3101"
+  },
+  "brooklyn_bridge": {
+   "zh": "布鲁克林大桥",
+   "en": "Brooklyn Bridge",
+   "city": "New York",
+   "figma_node": "299:3102"
+  },
+  "empire_state_building": {
+   "zh": "帝国大厦",
+   "en": "Empire State Building",
+   "city": "New York",
+   "figma_node": "299:3103"
+  },
+  "lincoln_memorial": {
+   "zh": "林肯纪念堂",
+   "en": "Lincoln Memorial",
+   "city": "Washington D.C.",
+   "figma_node": "299:3104"
+  },
+  "washington_monument": {
+   "zh": "华盛顿纪念碑",
+   "en": "Washington Monument",
+   "city": "Washington D.C.",
+   "figma_node": "299:3105"
+  },
+  "walt_disney_world": {
+   "zh": "迪士尼世界",
+   "en": "Walt Disney World",
+   "city": "Orlando",
+   "figma_node": "299:3106"
+  },
+  "universal_studios_florida": {
+   "zh": "奥兰多环球影城",
+   "en": "Universal Studios Florida",
+   "city": "Orlando",
+   "figma_node": "299:3107"
+  },
+  "wynwood_walls": {
+   "zh": "温伍德涂鸦墙",
+   "en": "Wynwood Walls",
+   "city": "Miami",
+   "figma_node": "299:3108"
+  },
+  "south_beach": {
+   "zh": "南海滩",
+   "en": "South Beach",
+   "city": "Miami",
+   "figma_node": "299:3109"
+  },
+  "freedom_trail": {
+   "zh": "自由之路",
+   "en": "Freedom Trail",
+   "city": "Boston",
+   "figma_node": "299:3110"
+  },
+  "harvard_university": {
+   "zh": "哈佛大学",
+   "en": "Harvard University",
+   "city": "Boston",
+   "figma_node": "299:3111"
+  },
+  "liberty_bell": {
+   "zh": "自由钟",
+   "en": "Liberty Bell",
+   "city": "Philadelphia",
+   "figma_node": "299:3112"
+  },
+  "independence_hall": {
+   "zh": "独立宫",
+   "en": "Independence Hall",
+   "city": "Philadelphia",
+   "figma_node": "299:3113"
   }
+ }
 }
