@@ -15,6 +15,8 @@ export const appleJwksFetcher = () => googleJwksFetcher(APPLE_JWKS_URL);
 
 export interface AppleIdentity {
   sub: string;
+  /** 签发给哪个 bundle id（换码和撤销时的 client_id）。 */
+  aud: string;
   email?: string;
   emailVerified: boolean;
   /** Hide My Email 中继地址（privaterelay.appleid.com）。 */
@@ -70,6 +72,7 @@ export async function verifyAppleIdToken(token: unknown, rawNonce: unknown, o: A
   if (typeof sub !== 'string' || sub.length === 0 || sub.length > 128) throw new IdTokenError('BAD_SUBJECT');
   return {
     sub,
+    aud: payload.aud,
     email: typeof payload.email === 'string' ? payload.email : undefined,
     emailVerified: truthy(payload.email_verified),
     privateEmail: truthy(payload.is_private_email),

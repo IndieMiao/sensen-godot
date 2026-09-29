@@ -479,7 +479,7 @@ func _submit_apple() -> void:
 	var result := native
 	if native.ok:
 		result = await AccountSession.apple_sign_in(Net.client, str(native.identity_token), nonce,
-			str(native.given_name), str(native.family_name))
+			str(native.given_name), str(native.family_name), str(native.get("authorization_code", "")))
 		if result.ok: result.ok = await Net.sign_in_with(result.body)
 	_set_busy(false)
 	if not result.ok:

@@ -1,7 +1,7 @@
 class_name AppleSignIn
 extends RefCounted
 ## Sign in with Apple（SGODOT-135）。iOS 原生桥 tools/ios/AppleSignIn.swift 监听回环 UDP 46465：
-## 发 "APPLE|<nonce 的 SHA-256>"，收 "APPLE_OK|token|名|姓|邮箱" 或 "APPLE_ERR|原因"。
+## 发 "APPLE|<nonce 的 SHA-256>"，收 "APPLE_OK|token|名|姓|邮箱|授权码" 或 "APPLE_ERR|原因"。
 ## 原始 nonce 留在这边，连同 identity token 一起发给服务端比对。
 
 const PORT := 46465
@@ -23,7 +23,8 @@ static func parse_reply(line: String) -> Dictionary:
 		return {"ok": true, "code": "", "identity_token": p[1],
 			"given_name": p[2].strip_edges() if p.size() > 2 else "",
 			"family_name": p[3].strip_edges() if p.size() > 3 else "",
-			"email": p[4].strip_edges() if p.size() > 4 else ""}
+			"email": p[4].strip_edges() if p.size() > 4 else "",
+			"authorization_code": p[5].strip_edges() if p.size() > 5 else ""}
 	if p.size() >= 2 and p[0] == "APPLE_ERR":
 		return {"ok": false, "code": "APPLE_" + p[1].to_upper()}
 	return {"ok": false, "code": "APPLE_UNKNOWN"}

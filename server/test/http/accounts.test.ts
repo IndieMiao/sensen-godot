@@ -45,18 +45,22 @@ for (const [name, enabled, makeStore] of makers) {
     let store: Store;
     let clock = Date.UTC(2026, 8, 28, 2);
     let mail: { email: string; code: string; purpose: string }[] = [];
+    let appleCalls: string[] = [];
     const mailer: Mailer = { async sendCode(email, code, purpose) { mail.push({ email, code, purpose }); } };
     const ipLocator = async (ip: string) => ip === '203.0.113.9' ? TOKYO : null;
 
     beforeEach(async () => {
       if (pool) await truncateAll(pool);
       mail = [];
+      appleCalls = [];
       clock = Date.UTC(2026, 8, 28, 2);
       store = makeStore(() => clock);
       app = await buildApp({ store, content, contentVersion: CV, blueprintDir: path.join(ROOT, 'assets', 'blueprints'),
         regionsFile: REGIONS, pepper: 'test-pepper', now: () => clock, mailer, ipLocator,
         qaEmailDomain: 'qa.sensen.test', qaEmailCode: '424242',
         apple: { audiences: ['app.gensen.maps'], keys: APPLE_KEYS.keys },
+        appleRevoker: { exchange: async code => { appleCalls.push('exchange:' + code); return code === 'good-code' ? 'refresh-1' : null; },
+          revoke: async token => { appleCalls.push('revoke:' + token); return true; } },
         geographyProvider: async location => landAt(location) });
     });
     afterEach(async () => { await app.close(); });
@@ -368,6 +372,18 @@ for (const [name, enabled, makeStore] of makers) {
       const back = (await apple(appleToken('apple.sub.4'))).json();
       expect(back.created).toBe(true);
       expect(back.user_id).not.toBe(body.user_id);
+    });
+    it('revokes the Apple authorization on deletion when sign-in provided a code', async () => {
+      const body = (await apple(appleToken('apple.sub.5'), { authorization_code: 'good-code' })).json();
+      expect(appleCalls).toEqual(['exchange:good-code']);
+      await app.inject({ method: 'DELETE', url: '/v1/users/me', headers: bearer(body.token) });
+      expect(appleCalls).toEqual(['exchange:good-code', 'revoke:refresh-1']);
+      expect((await store.deletion(body.user_id))?.apple_revocation).toBe('revoked');
+      // A code Apple rejects still signs in; deletion then stays pending.
+      const other = (await apple(appleToken('apple.sub.6'), { authorization_code: 'stale-code' })).json();
+      expect(other.token).toBeTruthy();
+      await app.inject({ method: 'DELETE', url: '/v1/users/me', headers: bearer(other.token) });
+      expect((await store.deletion(other.user_id))?.apple_revocation).toBe('pending');
     });
   });
 }

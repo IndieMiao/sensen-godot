@@ -34,7 +34,7 @@ export interface DeletionRecord {
   provider_uid: string;
   requested_at: number;
   source: 'app' | 'web';
-  apple_revocation: 'pending' | 'n/a';
+  apple_revocation: 'pending' | 'n/a' | 'revoked' | 'failed';
 }
 
 export type SaveCodeOutcome = { kind: 'saved' } | { kind: 'cooldown'; retry_after_ms: number };
@@ -78,7 +78,9 @@ export interface Store extends RealtimePersistence {
   /** 只凭第三方身份建号（无密码）。email 由提供方验证过才传；邮箱或身份已被占用时不建。 */
   createIdentityUser(provider: string, providerUid: string, email: string | null, now: number):
     Promise<{ kind: 'created'; user: UserRow } | { kind: 'identity_taken' } | { kind: 'email_taken' }>;
-  identitiesOf(userId: string): Promise<{ provider: string; provider_uid: string }[]>;
+  identitiesOf(userId: string): Promise<{ provider: string; provider_uid: string; refresh_token?: string | null; client_id?: string | null }[]>;
+  /** 记下第三方身份的 refresh token（Apple 删号撤销用）。 */
+  setIdentityToken(provider: string, providerUid: string, refreshToken: string, clientId: string): Promise<void>;
   userById(userId: string): Promise<UserRow | null>;
   setUserPassword(userId: string, passwordHash: string): Promise<void>;
   markEmailVerified(userId: string): Promise<void>;

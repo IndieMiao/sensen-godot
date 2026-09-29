@@ -152,9 +152,9 @@ static func reset(client: ApiClient, p_email: String, code: String, password: St
 		{"email": p_email.strip_edges(), "code": code.strip_edges(), "password": password}))
 
 ## Apple 首次授权才给名字，顺带发上去作为默认昵称。
-static func apple_sign_in(client: ApiClient, identity_token: String, nonce: String, given_name := "", family_name := "") -> Dictionary:
+static func apple_sign_in(client: ApiClient, identity_token: String, nonce: String, given_name := "", family_name := "", authorization_code := "") -> Dictionary:
 	return _result(await client.request("POST", "/auth/apple", {"identity_token": identity_token, "nonce": nonce,
-		"given_name": given_name, "family_name": family_name}))
+		"given_name": given_name, "family_name": family_name, "authorization_code": authorization_code}))
 
 static func me(client: ApiClient) -> Dictionary:
 	return _result(await client.request("GET", "/users/me"))

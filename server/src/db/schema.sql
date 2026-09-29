@@ -170,3 +170,6 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name text;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS gender text;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS gender_custom text;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_date text;
+-- Sign in with Apple：换码得到的 refresh token 与其 client_id，删号时用来撤销授权。
+ALTER TABLE user_identities ADD COLUMN IF NOT EXISTS refresh_token text;
+ALTER TABLE user_identities ADD COLUMN IF NOT EXISTS client_id text;

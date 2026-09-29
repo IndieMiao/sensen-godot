@@ -8,6 +8,7 @@ func test_parses_success_with_optional_name_and_email() -> void:
 	assert_str(r.given_name).is_equal("Avery")
 	assert_str(r.family_name).is_equal("Lee")
 	assert_str(r.email).is_equal("x@privaterelay.appleid.com")
+	assert_str(AppleSignIn.parse_reply("APPLE_OK|eyJ.a.b|A|B|e@x.io|c0de.1").authorization_code).is_equal("c0de.1")
 	var later := AppleSignIn.parse_reply("APPLE_OK|eyJ.a.b|||")
 	assert_bool(later.ok).is_true()
 	assert_str(later.given_name).is_empty()

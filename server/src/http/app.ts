@@ -81,6 +81,7 @@ export interface AppDeps {
   qaEmailCode?: string;
   /** Sign in with Apple verification; absent means the endpoint answers 503. */
   apple?: AccountRouteDeps['apple'];
+  appleRevoker?: AccountRouteDeps['appleRevoker'];
 }
 
 interface Regions {
@@ -472,7 +473,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
 
   registerAccounts(app, {
     store: deps.store, pepper: deps.pepper, now: deps.now, mailer: deps.mailer ?? createLogMailer(),
-    qaEmailDomain: deps.qaEmailDomain, qaEmailCode: deps.qaEmailCode, apple: deps.apple,
+    qaEmailDomain: deps.qaEmailDomain, qaEmailCode: deps.qaEmailCode, apple: deps.apple, appleRevoker: deps.appleRevoker,
     closeSessions: async playerId => { online?.closePlayer(playerId); },
     beforeDelete: async playerId => { await online?.forgetPlayer(playerId); },
   }, auth);

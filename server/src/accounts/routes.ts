@@ -17,6 +17,7 @@ import type { Mailer } from './mailer.js';
 import { ageOn, parseProfile } from './profile.js';
 import { DELETE_PAGE_HTML } from './delete_page.js';
 import { verifyAppleIdToken, type AppleVerifyOptions } from './apple_token.js';
+import type { AppleRevoker } from './apple_revoke.js';
 import { IdTokenError } from './firebase_token.js';
 
 export interface AccountRouteDeps {
@@ -34,6 +35,8 @@ export interface AccountRouteDeps {
   log?: (line: string) => void;
   /** Sign in with Apple；不配则 /v1/auth/apple 回 503。 */
   apple?: Omit<AppleVerifyOptions, 'now'>;
+  /** 配了 .p8 才有：登录时换 refresh token，删号时撤销。 */
+  appleRevoker?: AppleRevoker;
 }
 
 export function userView(u: UserRow, player?: PlayerRow, now = Date.now()) {
@@ -138,7 +141,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
    */
   app.post('/v1/auth/apple', { config: { rateLimit: { max: 60, timeWindow: '1 hour' } } }, async (req, reply) => {
     if (!deps.apple) return reply.code(503).send({ code: 'APPLE_UNAVAILABLE', server_time: deps.now() });
-    const body = req.body as { identity_token?: unknown; nonce?: unknown; given_name?: unknown; family_name?: unknown } | undefined;
+    const body = req.body as { identity_token?: unknown; nonce?: unknown; given_name?: unknown; family_name?: unknown; authorization_code?: unknown } | undefined;
     let identity;
     try { identity = await verifyAppleIdToken(body?.identity_token, body?.nonce, { ...deps.apple, now: deps.now }); }
     catch (error) {
@@ -171,6 +174,15 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
           gender_custom: user.gender_custom ?? null, birth_date: user.birth_date ?? null });
         user = { ...user, display_name: parsed.profile.display_name };
       }
+    }
+    // A fresh authorization code yields a refresh token for revocation on deletion; failures never block sign-in.
+    const code = body?.authorization_code;
+    if (deps.appleRevoker && typeof code === 'string' && code.length > 0 && code.length <= 512) {
+      try {
+        const refresh = await deps.appleRevoker.exchange(code, identity.aud);
+        if (refresh) await deps.store.setIdentityToken('apple', identity.sub, refresh, identity.aud);
+        else log('[apple] authorization code exchange returned no refresh token');
+      } catch (error) { log(`[apple] code exchange failed: ${(error as Error).message}`); }
     }
     const session = await deps.store.authUser(user.id, deps.now());
     return reply.code(created ? 201 : 200).send({ token: session.token, ...userView(user, session.player, deps.now()),
@@ -226,12 +238,17 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
   const deleteUserEverywhere = async (user: UserRow, source: 'app' | 'web') => {
     const players = await deps.store.authUser(user.id, deps.now()).then(s => [s.player.id]).catch(() => [] as string[]);
     for (const id of players) { await deps.beforeDelete?.(id); await deps.closeSessions?.(id); }
-    // Apple asks apps to revoke the user's token on deletion; that needs a client secret we do not hold yet, so it is queued.
+    // Apple asks apps to revoke the user's Apple authorization on deletion. Without a stored token it stays pending.
     const apple = (await deps.store.identitiesOf(user.id)).find(i => i.provider === 'apple');
+    let revocation: 'pending' | 'n/a' | 'revoked' | 'failed' = apple ? 'pending' : 'n/a';
+    if (apple?.refresh_token && apple.client_id && deps.appleRevoker) {
+      revocation = await deps.appleRevoker.revoke(apple.refresh_token, apple.client_id)
+        .then(ok => ok ? 'revoked' : 'failed', error => { log(`[apple] revoke failed: ${(error as Error).message}`); return 'failed'; });
+    }
     return deps.store.deleteUser(user.id, {
       user_id: user.id,
       provider_uid: apple ? 'apple:' + apple.provider_uid : user.email ? 'email:' + emailKey(user.email, deps.pepper) : 'none',
-      requested_at: deps.now(), source, apple_revocation: apple ? 'pending' : 'n/a',
+      requested_at: deps.now(), source, apple_revocation: revocation,
     });
   };
 

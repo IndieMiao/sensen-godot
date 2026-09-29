@@ -236,8 +236,13 @@ export class PgStore implements Store {
   }
   async identitiesOf(userId: string) {
     if (!/^[0-9a-f-]{36}$/i.test(userId)) return [];
-    const r = await this.d.pool.query('SELECT provider, provider_uid FROM user_identities WHERE user_id = $1', [userId]);
-    return r.rows.map(row => ({ provider: row.provider as string, provider_uid: row.provider_uid as string }));
+    const r = await this.d.pool.query('SELECT provider, provider_uid, refresh_token, client_id FROM user_identities WHERE user_id = $1', [userId]);
+    return r.rows.map(row => ({ provider: row.provider as string, provider_uid: row.provider_uid as string,
+      refresh_token: (row.refresh_token as string | null) ?? null, client_id: (row.client_id as string | null) ?? null }));
+  }
+  async setIdentityToken(provider: string, providerUid: string, refreshToken: string, clientId: string) {
+    await this.d.pool.query('UPDATE user_identities SET refresh_token = $3, client_id = $4 WHERE provider = $1 AND provider_uid = $2',
+      [provider, providerUid, refreshToken, clientId]);
   }
   async userByEmail(email: string) {
     const r = await this.d.pool.query('SELECT * FROM users WHERE email = $1', [email]);

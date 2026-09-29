@@ -13,6 +13,7 @@ import { CityCatalog } from './geography/cities.js';
 import { createMmdbIpLocator, type IpLocator } from './geography/ip_locator.js';
 import { mailerFromEnv } from './accounts/mailer.js';
 import { appleJwksFetcher } from './accounts/apple_token.js';
+import { appleRevokerFromEnv } from './accounts/apple_revoke.js';
 import { CachedJwks } from './accounts/firebase_token.js';
 
 const need = (k: string): string => {
@@ -91,6 +92,7 @@ const app = await buildApp({
   mailer: mailerFromEnv(process.env),
   qaEmailDomain: process.env.QA_EMAIL_DOMAIN, qaEmailCode: process.env.QA_EMAIL_CODE,
   apple: appleConfig(),
+  appleRevoker: appleRevokerFromEnv(process.env, () => Date.now()),
   // Only a development server may let guests write; production keeps guests read-only.
   guestWrites: process.env.GUEST_WRITES === '1',
 });

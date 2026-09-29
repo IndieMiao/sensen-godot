@@ -105,7 +105,7 @@ export class MemoryStore implements Store {
   private users = new Map<string, UserRow>();
   private emailCodes = new Map<string, { hash: string; expires_at: number; sent_at: number; attempts: number }>();
   private deletions = new Map<string, DeletionRecord>();
-  private identities = new Map<string, { provider: string; provider_uid: string; user_id: string }>();
+  private identities = new Map<string, { provider: string; provider_uid: string; user_id: string; refresh_token?: string | null; client_id?: string | null }>();
 
   async userByIdentity(provider: string, providerUid: string) {
     const row = this.identities.get(provider + '\0' + providerUid);
@@ -127,7 +127,12 @@ export class MemoryStore implements Store {
     return { kind: 'created' as const, user: structuredClone(user) };
   }
   async identitiesOf(userId: string) {
-    return [...this.identities.values()].filter(i => i.user_id === userId).map(({ provider, provider_uid }) => ({ provider, provider_uid }));
+    return [...this.identities.values()].filter(i => i.user_id === userId)
+      .map(({ provider, provider_uid, refresh_token, client_id }) => ({ provider, provider_uid, refresh_token: refresh_token ?? null, client_id: client_id ?? null }));
+  }
+  async setIdentityToken(provider: string, providerUid: string, refreshToken: string, clientId: string) {
+    const row = this.identities.get(provider + '\0' + providerUid);
+    if (row) { row.refresh_token = refreshToken; row.client_id = clientId; }
   }
 
   async createEmailUser(email: string, passwordHash: string, now: number) {
