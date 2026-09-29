@@ -20,8 +20,12 @@ uniform vec3 sun_direction = vec3(-0.391, 0.819, -0.419);
 uniform float flow_speed = 1.0;
 uniform float depth_absorption = 1.0;
 uniform float wave_strength : hint_range(0.0, 2.0) = 1.0;
+// Normal amplitude is independent of the film / sparkle height thresholds.
+uniform float normal_strength : hint_range(0.0, 1.0) = 0.30;
+uniform float caustic_depth_falloff : hint_range(0.5, 4.0) = 1.35;
 uniform float surface_roughness : hint_range(0.12, 0.45) = 0.31;
 uniform float film_cutoff : hint_range(0.25, 0.60) = 0.44;
+uniform float film_contrast : hint_range(0.0, 1.0) = 0.30;
 uniform float sparkle_cutoff : hint_range(0.65, 0.95) = 0.78;
 uniform float shimmer_strength : hint_range(0.0, 24.0) = 4.0;
 // Safe interior paths from each actual polygon, rather than a bounding ellipse.
@@ -67,10 +71,13 @@ void fragment() {
     float height = 0.5 + (field_a.r * 0.55 + field_b.r * 0.45 - 0.5) * wave_strength;
     vec2 gradient_a = (field_a.gb * 2.0 - 1.0) * 18.0 * 0.42;
     vec2 gradient_b = transpose(rotation) * ((field_b.gb * 2.0 - 1.0) * 18.0 * 0.49);
-    vec2 slope = (gradient_a * 0.55 + gradient_b * 0.45) * 0.055 * wave_strength;
+    vec2 slope = (gradient_a * 0.55 + gradient_b * 0.45) * 0.055 * wave_strength * normal_strength;
     slope *= smoothstep(0.02, 0.40, shore);
     float threshold_aa = max(fwidth(height) * 1.25, 0.004);
-    float film = clamp((height / film_cutoff) * (1.0 - smoothstep(film_cutoff - threshold_aa, film_cutoff + threshold_aa, height)), 0.0, 1.0);
+    // A soft film transition avoids flat reflection islands after lowering
+    // normal amplitude. Keep the bright-peak threshold independent.
+    float film_aa = max(threshold_aa, 0.045);
+    float film = clamp((height / film_cutoff) * (1.0 - smoothstep(film_cutoff - film_aa, film_cutoff + film_aa, height)), 0.0, 1.0);
     float peak = smoothstep(sparkle_cutoff - threshold_aa, sparkle_cutoff + 0.035 + threshold_aa, height);
     float soft_edge = smoothstep(sparkle_cutoff - 0.04 - threshold_aa, sparkle_cutoff + threshold_aa, height) * 0.16;
     water_sparkle = (peak + soft_edge) * smoothstep(0.10, 0.55, shore);
@@ -105,7 +112,7 @@ void fragment() {
     vec2 light_uv = p * 0.235 + warp * 0.065 + vec2(sin(p.y * 3.7 + t * 0.37), cos(p.x * 3.4 - t * 0.41)) * 0.015;
     float web = texture(caustics, light_uv).r;
     float pulse = 0.82 + 0.18 * sin(p.x * 1.2 - p.y * 0.7 + t * 0.8);
-    color += vec3(0.14, 0.38, 0.36) * web * pulse * exp(-depth * 2.1) * smoothstep(0.03, 0.20, shore);
+    color += vec3(0.14, 0.38, 0.36) * web * pulse * exp(-depth * caustic_depth_falloff) * smoothstep(0.03, 0.20, shore);
     float fish = 0.0;
     for (int i = 0; i < 3; i++) fish = max(fish, fish_shape(p + slope * 0.22, fish_paths[i], float(i + 1), t));
     color *= 1.0 - fish * 0.23 * smoothstep(0.35, 0.8, shore);
@@ -135,8 +142,8 @@ void fragment() {
     // The lower threshold shapes a soft reflected film; the upper threshold
     // creates isolated, irregular highlights in the light processor below.
     float normal_variance = dot(dFdx(normal_world), dFdx(normal_world)) + dot(dFdy(normal_world), dFdy(normal_world));
-    ROUGHNESS = clamp(mix(surface_roughness + 0.03, surface_roughness - 0.03, film) + normal_variance * 6.0, 0.12, 0.55);
-    SPECULAR = mix(0.30, 0.40, film);
+    ROUGHNESS = clamp(surface_roughness + (1.0 - 2.0 * film) * 0.03 * film_contrast + normal_variance * 6.0, 0.12, 0.55);
+    SPECULAR = 0.35 + (film - 0.5) * 0.10 * film_contrast;
     METALLIC = 0.0;
 }
 

@@ -1,5 +1,19 @@
 # Product Direction
 
+- Pond weak-normal comparison on 2026-09-30: user requested preserving the
+  layered-water version before reducing surface fragmentation and extending
+  caustics. The full baseline is committed as e89107a with local annotated tag
+  pond-water-layered-v1-20260930, created before the variant edits; not pushed.
+  The new variant separates normal amplitude (30%) from the retained sparkle
+  height/thresholds, reduces reflected-film contrast to 30%, softens its edge,
+  and changes caustic depth falloff from 2.1 to 1.35. Preserve the approved
+  palette, HDR reflections and high-peak motion. 12 pond checks and five matched
+  Metal/Vulkan views passed; Android motion and full QA APK readback verified.
+  Offline emulator only, no phone or production update. See
+  docs/qa/pond-water-soft-normal-2026-09-30.md for comparison and preservation.
+  The comparison and 12s video are sent/readback-verified in the same authorized
+  Gensen Feishu self review chat; no APK delivery.
+
 - Pond shimmer on 2026-09-30 now follows the actually retrieved 80.lv/Josh
   breakdown and Jasper's Mario Galaxy texture-threshold explanation. User
   rejected the analytic GGX bands. Two differently moving original scalar
