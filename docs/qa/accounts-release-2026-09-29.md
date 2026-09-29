@@ -63,3 +63,10 @@
 - 现象：Joey（TestFlight 与 Android 0.17.8）在旧金山一个地标都没有；用户在纽约点博物馆，卡片写「博物馆 · 上海」。两张截图的副标题都是「这里还没有农场」，说明当时激活的 region 不是所看的城市（还是自己农场所在城市 / 选城时选的城市），地标与卡片城市名以前只按激活 region 取。安装包里 `assets/map/landmarks.json` 与 47 张地标图都在，不是打包问题。
 - 修法：`CityMapView.refresh_content` 把地图中心 reach_km 内的设计地标并入 entries（本城地标照旧、按 id 去重，集合变化才重建列表）；详情卡城市名改按地点坐标——设计地标用素材表里的城市，落在已开通城市用该城名，否则用标题栏查到的瓦片地名，没地名只显示类别（玩家农场卡同规则，`_select_city_player` 传入坐标）。zh 目录补了 20 个地标城市/州名和 17 个地标类别。
 - 验证：`tests/map/test_city_map.gd` 新增两条（中心移到旧金山出现金门大桥等四处并回到洛杉矶消失；纽约 POI/旧金山地标/洛杉矶 POI 的卡片城市名），map + localization 目录 185 条，仅既有失败（test_map_fling×4、test_map_relocation×1、test_city_map_interactions 的 owner pins×1，基线同样失败）。**真机未验**，需随下个版本发 Joey。
+
+## 0.17.9 发给 Joey（2026-09-29 晚，安卓 + iOS）
+
+- 内容：上一节的两处修复（漫游城市显示地图中心附近地标；详情卡城市名按地点位置）。源码 `f1e6be6`。发布步骤已整理成 [发版手册](release-playbook-android-ios.md)。
+- **Android 0.17.9**（versionCode 2026092906，原 Journey 证书 38771d94）：与 0.17.8 按 CRC 对比只变 `classes6.dex`、`assets.sparsepck`、`zh_CN.json`、`city_map_view.gdc`、`map_poc.gdc`、`AndroidManifest.xml`。SHA-256 `434810ad059a9d12612530d6c11f4ef5abf928e4994614fc26859165c1e6497a`（181,952,733 字节）。下载站：[美国](https://download-us.sensenjoy.cn:8443/farm/releases/roaming-20260929-434810ad059a/sensen-journey-roaming-0.17.9.apk) · [OSS](https://oss.sensenjoy.cn/farm/releases/roaming-20260929-434810ad059a/sensen-journey-roaming-0.17.9.apk)，两站全量 + Range 校验通过。**未在模拟器或真机安装**（release.json 如实标记 false）。
+- **iOS 0.17.9 (1)**：`build/ios-release` 工程只换 pck（与 0.17.6 pck 相比多了 Google 登录模块、品牌图标、账号面板/登录重试与本次修复）+ `prepare_ios_signing.py` 设版本；CLI 归档（Apple Development，本地 profile）→ API 密钥 `KQ7J86X34J` 云签发上传，16:58 `Upload succeeded`，仅 Mapbox 两条 dSYM 警告。归档内 pck SHA-256 `6c59e1bb…ca3456` 与导出一致。**未真机验证**。
+- 已发 Joey：飞书（云盘文件 `BhxqbiAR5okf75xCfG5cAnVCnPe` 授权查看 + 消息 `om_x100b648393980cacb26943c38eb43f6`）；Slack DM 附 APK + 同样说明。
