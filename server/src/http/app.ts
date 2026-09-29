@@ -92,7 +92,7 @@ interface Regions {
 export const NEARBY_LIMIT = 20;
 
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
-  const app = Fastify({ logger: false, trustProxy: deps.trustedProxies?.length ? deps.trustedProxies : false });
+  const app = Fastify({ logger: process.env.HTTP_LOG === '1', trustProxy: deps.trustedProxies?.length ? deps.trustedProxies : false });
   await app.register(rateLimit, { global: false });
   const regions = JSON.parse(readFileSync(deps.regionsFile, 'utf8')) as Regions;
   const cities = deps.cities ?? CityCatalog.fromRegionsFile(deps.regionsFile);

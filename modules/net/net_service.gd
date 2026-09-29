@@ -69,6 +69,7 @@ func boot() -> bool:
 		return false
 	booting = true
 	var ok := false
+	ApiClient.debug_log("boot base=%s" % client.base_url)
 	if account.load_saved(account_path):
 		ok = await _resume_account()
 	if not ok:

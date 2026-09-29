@@ -67,6 +67,18 @@ func request(method: String, path: String, body: Variant = null) -> Response:
 	var r = await transport.call(method, base_url + path, headers, text)
 	return r if r is Response else Response.new(false, 0, {}, "bad transport result")
 
+const DEBUG_LOG := "user://net_debug.log"
+
+## 手机 debug 包的网络失败记到 user://net_debug.log，便于用 devicectl 拉回来看（iOS 上 print 取不到）。
+static func debug_log(line: String) -> void:
+	if not (OS.is_debug_build() and OS.has_feature("mobile")): return
+	var f := FileAccess.open(DEBUG_LOG, FileAccess.READ_WRITE if FileAccess.file_exists(DEBUG_LOG) else FileAccess.WRITE)
+	if f == null: return
+	if f.get_length() > 200_000: return
+	f.seek_end()
+	f.store_line("%s %s" % [Time.get_datetime_string_from_system(), line])
+	f.close()
+
 ## 真实传输：需要一个在场景树里的 Node 来挂 HTTPRequest。
 static func make_http_transport(host: Node) -> Callable:
 	return func(method: String, url: String, headers: PackedStringArray, body: String) -> Response:
@@ -85,11 +97,13 @@ static func make_http_transport(host: Node) -> Callable:
 		var err := req.request(url, headers, verb, body)
 		if err != OK:
 			req.queue_free()
+			debug_log("%s %s request() err=%d" % [method, url, err])
 			return Response.new(false, 0, {}, "request failed: %d" % err)
 		var result: Array = await req.request_completed
 		req.queue_free()
 		# result = [result_code, response_code, headers, body]
 		if int(result[0]) != HTTPRequest.RESULT_SUCCESS:
+			debug_log("%s %s transport result=%d" % [method, url, int(result[0])])
 			return Response.new(false, 0, {}, "transport error: %d" % int(result[0]))
 		var parsed = JSON.parse_string((result[3] as PackedByteArray).get_string_from_utf8())
 		return Response.new(true, int(result[1]), parsed if parsed is Dictionary else {}, "")
