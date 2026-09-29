@@ -39,10 +39,39 @@ static func generated_city(region: Dictionary) -> Dictionary:
 		"landmarks": [], "residents": residents}
 
 static func landmarks(region_id: String) -> Array:
-	var result: Array = city(region_id).get("landmarks", [])
+	var data := city(region_id)
+	var result: Array = data.get("landmarks", [])
+	var overview: Dictionary = data.get("overview", {})
+	if overview.has("lat") and overview.has("lng"):
+		var own := result.map(func(p): return str(p.get("id", "")))
+		for g in landmarks_near(float(overview.lat), float(overview.lng)):
+			if not own.has(str(g.id)): result.append(g)
 	for p in result:
 		p.kind = "landmark"
 	return result
+
+## 设计部门的全国地标图标（Figma Landmark_icons）：任何城市都显示其地图中心 reach_km 内的地标。
+## 城市景点 reach 40 km（纽约不带出费城的自由钟），国家公园等 150 km（弗拉格斯塔夫能看到大峡谷）。
+const GLOBAL_LANDMARKS := "res://assets/map/landmarks.json"
+static var _global_landmarks: Array = []
+
+static func global_landmarks() -> Array:
+	if _global_landmarks.is_empty() and FileAccess.file_exists(GLOBAL_LANDMARKS):
+		var data = JSON.parse_string(FileAccess.get_file_as_string(GLOBAL_LANDMARKS))
+		if data is Dictionary and data.get("landmarks") is Array: _global_landmarks = data.landmarks
+	return _global_landmarks
+
+static func landmarks_near(lat: float, lng: float) -> Array:
+	var out := []
+	for g in global_landmarks():
+		if distance_km(lat, lng, float(g.lat), float(g.lng)) <= float(g.get("reach_km", 40)):
+			out.append((g as Dictionary).duplicate(true))
+	return out
+
+static func distance_km(lat_a: float, lng_a: float, lat_b: float, lng_b: float) -> float:
+	var x := deg_to_rad(lng_b - lng_a) * cos(deg_to_rad((lat_a + lat_b) * 0.5))
+	var y := deg_to_rad(lat_b - lat_a)
+	return 6371.0 * sqrt(x * x + y * y)
 
 static func residents(region_id: String, state: Dictionary) -> Array:
 	if state.is_empty(): return []
