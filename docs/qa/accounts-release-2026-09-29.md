@@ -31,3 +31,7 @@
 - 源码 `c7755ba`。登录时客户端（iOS 0.17.5）带上 Apple 一次性授权码，服务端用 Sign in with Apple 私钥（Key ID `8J47FB5YJN`，Gensen 团队，主 App ID app.gensen.maps）签 ES256 client secret 换 refresh token，存在 `user_identities.refresh_token / client_id`；删号时调 Apple `/auth/revoke`，墓碑记 `revoked` / `failed`，没有 token 的旧账号记 `pending`。
 - 私钥在服务器 `/opt/farm/journey-preview/secrets/`（只读挂载 `/secrets`，文件属容器 farm 用户、400），环境 `APPLE_KEY_ID`、`APPLE_PRIVATE_KEY_FILE`。本机与服务器上用假授权码请求 Apple，均返回 `invalid_grant`（客户端认证通过）。
 - 演练：13 张表逐字节一致，只新增两列空值；HTTP 全流程通过。正式切换 **10:25:37–10:25:53 CST**，同样校验通过，线上确认撤销客户端已配置。
+
+## TestFlight 真机验证（0.17.5 (1)）
+
+用户用 TestFlight 装正式 Journey 0.17.5 (1)，Apple 登录 → 资料 → 选城 → 建农场 → 应用内删号。线上删号记录 10:47:55，来源 app，**apple_revocation = revoked**（Apple 撤销接口返回成功）。删号后线上无账号、无 Apple 身份、无账号玩家；服务日志无 Apple 换码或撤销错误。
