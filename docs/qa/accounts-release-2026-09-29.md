@@ -69,4 +69,5 @@
 - 内容：上一节的两处修复（漫游城市显示地图中心附近地标；详情卡城市名按地点位置）。源码 `f1e6be6`。发布步骤已整理成 [发版手册](release-playbook-android-ios.md)。
 - **Android 0.17.9**（versionCode 2026092906，原 Journey 证书 38771d94）：与 0.17.8 按 CRC 对比只变 `classes6.dex`、`assets.sparsepck`、`zh_CN.json`、`city_map_view.gdc`、`map_poc.gdc`、`AndroidManifest.xml`。SHA-256 `434810ad059a9d12612530d6c11f4ef5abf928e4994614fc26859165c1e6497a`（181,952,733 字节）。下载站：[美国](https://download-us.sensenjoy.cn:8443/farm/releases/roaming-20260929-434810ad059a/sensen-journey-roaming-0.17.9.apk) · [OSS](https://oss.sensenjoy.cn/farm/releases/roaming-20260929-434810ad059a/sensen-journey-roaming-0.17.9.apk)，两站全量 + Range 校验通过。**未在模拟器或真机安装**（release.json 如实标记 false）。
 - **iOS 0.17.9 (1)**：`build/ios-release` 工程只换 pck（与 0.17.6 pck 相比多了 Google 登录模块、品牌图标、账号面板/登录重试与本次修复）+ `prepare_ios_signing.py` 设版本；CLI 归档（Apple Development，本地 profile）→ API 密钥 `KQ7J86X34J` 云签发上传，16:58 `Upload succeeded`，仅 Mapbox 两条 dSYM 警告。归档内 pck SHA-256 `6c59e1bb…ca3456` 与导出一致。**未真机验证**。
-- 已发 Joey：飞书（云盘文件 `BhxqbiAR5okf75xCfG5cAnVCnPe` 授权查看 + 消息 `om_x100b648393980cacb26943c38eb43f6`）；Slack DM 附 APK + 同样说明。
+- TestFlight：App Store Connect 于 17:05 前显示 0.17.9 (1) `VALID`（`tools/ios/asc_builds.py` 回读），内部群组自动可装。
+- 已发 Joey：飞书（云盘文件 `BhxqbiAR5okf75xCfG5cAnVCnPe` 授权查看 + 消息 `om_x100b648393980cacb26943c38eb43f6`）；Slack DM `D0C1MHLA3GQ` 附 APK（文件 `F0C62B61R32`）+ 同样说明。
