@@ -147,3 +147,14 @@ TestFlight 安装中弹出“此 App 已经安装”属于确认阶段，不能�
 [完整黑屏事件与修复](ios-map-black-2026-09-25.md) · [首次打包/账号/邀请调查](ios-testflight-2026-09-24.md) · [上传结果](../../output/ios-map-black-20260925/testflight-upload-result.json) · [实际 IPA 验证](../../output/ios-map-black-20260925/app-store-package-validation.json) · [最终真机状态](../../output/ios-map-black-20260925/validation.json)
 
 本文件保存可复用结论和流程；`output/` 中的归档、私有备份、日志、图片和一次性驱动按本机产物保存，后续运行应生成自己的证据，不能把上次结果直接算作本次通过。
+
+## 2026-09-29 起：用 App Store Connect API 密钥免 GUI 上传
+
+锁屏或 CLI 报 `No Accounts` 时不再需要 Organizer：
+```
+xcodebuild -project sensen.xcodeproj -scheme sensen -configuration Release -destination 'generic/platform=iOS' -archivePath <archive> archive
+xcodebuild -exportArchive -archivePath <archive> -exportOptionsPlist ExportOptions-TestFlightUpload.plist -exportPath <out> \
+  -allowProvisioningUpdates -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_KQ7J86X34J.p8 \
+  -authenticationKeyID KQ7J86X34J -authenticationKeyIssuerID fdc8f15b-4cb7-4ddb-a8ac-899e1e35ce4c
+```
+0.17.6 (1) 按此上传成功。密钥权限为 App Manager，私钥只在本机该目录（600）。
