@@ -46,17 +46,21 @@ func _ready() -> void:
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color("e4f0ff")
 	environment.ambient_light_energy = 0.65
+	environment.sky = preload("res://assets/ponds/art/pond_daylight_sky.tres")
+	environment.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	world_env = WorldEnvironment.new()
 	world_env.environment = environment
 	add_child(world_env)
 	var sun := DirectionalLight3D.new()
+	sun.name = "PondSun"
 	sun.rotation_degrees = Vector3(-55, -137, 0)
 	sun.light_color = Color("fff3dc")
 	sun.light_energy = 1.15
+	sun.light_specular = 0.13
 	sun.shadow_enabled = true
-	sun.shadow_blur = 2.0
+	sun.shadow_blur = 3.0
 	sun.shadow_opacity = 0.82
-	sun.light_angular_distance = 1.5
+	sun.light_angular_distance = 1.0
 	sun.directional_shadow_max_distance = 65
 	add_child(sun)
 	cam = Camera3D.new()
@@ -67,7 +71,9 @@ func _ready() -> void:
 	add_child(cam)
 	cam.make_current()
 	add_child(PondScenery.build(entry))
-	add_child(FishingWater.build(str(entry.id), site_spec))
+	var water := FishingWater.build(str(entry.id), site_spec)
+	water.water_material.set_shader_parameter("sun_direction", sun.global_basis.z.normalized())
+	add_child(water)
 	var bp := SystemPonds.blueprint(entry)
 	mover = PlayerMover.new(bp, BlueprintGrid.new(bp))
 	player = Node3D.new()

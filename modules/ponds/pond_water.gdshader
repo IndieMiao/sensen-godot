@@ -4,84 +4,156 @@ render_mode cull_disabled;
 uniform sampler2D pond_shore : filter_linear, repeat_disable;
 uniform vec2 pond_extent = vec2(12.0, 16.0);
 uniform sampler2D pebble_bed : source_color, repeat_enable, filter_linear_mipmap;
+// Pond atlas: refracted mineral bed RGB, optical depth / 2.5 in alpha.
+uniform sampler2D basin_bed : source_color, filter_linear_mipmap, repeat_disable;
 uniform sampler2D surface_flow : repeat_enable, filter_linear_mipmap;
+uniform sampler2D ripple_field : repeat_enable, filter_linear_mipmap;
 uniform sampler2D caustics : repeat_enable, filter_linear_mipmap;
 uniform sampler2D bank_reflection : filter_linear, repeat_disable;
 uniform bool has_bank_reflection = false;
 uniform bool polygon_water = true;
 uniform vec4 interaction = vec4(0.0);
-uniform vec3 shallow_color : source_color = vec3(0.09, 0.80, 0.86);
-uniform vec3 deep_color : source_color = vec3(0.015, 0.46, 0.70);
+uniform vec3 shallow_color : source_color = vec3(0.22, 0.89, 0.88);
+uniform vec3 middle_color : source_color = vec3(0.125, 0.73, 0.835);
+uniform vec3 deep_color : source_color = vec3(0.045, 0.398, 0.60);
 uniform vec3 sun_direction = vec3(-0.391, 0.819, -0.419);
-uniform float flow_speed = 1.45;
+uniform float flow_speed = 1.0;
 uniform float depth_absorption = 1.0;
-uniform float sparkle_strength = 1.0;
+uniform float wave_strength : hint_range(0.0, 2.0) = 1.0;
+uniform float surface_roughness : hint_range(0.12, 0.45) = 0.31;
+uniform float film_cutoff : hint_range(0.25, 0.60) = 0.44;
+uniform float sparkle_cutoff : hint_range(0.65, 0.95) = 0.78;
+uniform float shimmer_strength : hint_range(0.0, 24.0) = 4.0;
+// Safe interior paths from each actual polygon, rather than a bounding ellipse.
+uniform vec4 fish_paths[3];
+uniform int lily_count = 0;
+uniform vec4 lily_pads[15];
 varying vec3 world;
+varying float water_sparkle;
 
 void vertex() { world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; }
 
+vec4 reflection_tap(vec2 uv) {
+    vec4 reflected = texture(bank_reflection, clamp(uv, vec2(0.002), vec2(0.998)));
+    return vec4(reflected.rgb * reflected.a, reflected.a);
+}
+
+float fish_shape(vec2 p, vec4 path, float seed, float t) {
+    float phase = t * (0.17 + seed * 0.018) + seed * 2.1;
+    vec2 center = path.xy + vec2(sin(phase), cos(phase * 0.83)) * path.zw;
+    vec2 forward = normalize(vec2(cos(phase) * path.z, -sin(phase * 0.83) * path.w * 0.83) + vec2(0.001));
+    vec2 delta = p - center;
+    vec2 q = vec2(dot(delta, forward), dot(delta, vec2(-forward.y, forward.x)));
+    q.y += sin(q.x * 17.0 - t * 3.2 + seed) * 0.012 * smoothstep(0.04, 0.24, -q.x);
+    float body = 1.0 - smoothstep(0.72, 1.2, length(q / vec2(0.17, 0.047)));
+    float tail = (1.0 - smoothstep(0.025, 0.042, abs(q.x + 0.18))) * (1.0 - smoothstep(0.022, 0.070, abs(q.y)));
+    return max(body, tail * 0.6);
+}
+
 void fragment() {
     vec2 p = world.xz;
-    float shore = texture(pond_shore, vec2(p.x, -p.y) / pond_extent).r * 2.0;
-    float broad = texture(surface_flow, p * 0.11).b;
-    // Authored bathymetry from the actual shoreline. No screen-depth dependency:
-    // the orthographic Mobile and desktop paths use the same optical thickness.
-    float shelf = smoothstep(0.0, 1.85, shore);
-    float far_bank = smoothstep(3.5, 12.0, -p.y);
-    float depth = 0.045 + shelf * (1.10 + far_bank * 1.00 + (broad - 0.5) * 0.28);
-    vec2 drift = TIME * flow_speed * vec2(0.018, -0.012);
-    vec2 waves_a = texture(surface_flow, p * 0.46 + drift).rg * 2.0 - 1.0;
-    vec2 waves_b = texture(surface_flow, p * 0.81 - drift.yx * 0.71).gr * 2.0 - 1.0;
-    vec2 slope = (waves_a + waves_b * 0.54) * 0.115;
+    vec2 pond_uv = vec2(p.x, -p.y) / pond_extent;
+    float shore = texture(pond_shore, pond_uv).r * 2.0;
+    float t = TIME * flow_speed;
+    // Long, low waves. Independent phases deform instead of sliding a map.
+    vec2 warp = vec2(sin(p.x * 1.4 + p.y * 0.8 + t * 0.62) + 0.45 * sin(p.y * 2.3 - t * 0.47),
+                     cos(p.y * 1.6 - p.x * 0.7 + t * 0.51) + 0.40 * cos(p.x * 2.5 + t * 0.39));
+    // Two differently moving copies create a changing scalar field, following
+    // the layered-texture/two-threshold technique in Josh's UE5 breakdown.
+    // Shapes grow, join and dissolve; there are no individually moving discs.
+    vec3 field_a = texture(ripple_field, p * 0.42 + t * vec2(0.025, -0.015)).rgb;
+    mat2 rotation = mat2(vec2(0.8, 0.6), vec2(-0.6, 0.8));
+    vec3 field_b = texture(ripple_field, rotation * p * 0.49 + vec2(0.37, 0.19) + t * vec2(-0.021, 0.027)).rgb;
+    float height = 0.5 + (field_a.r * 0.55 + field_b.r * 0.45 - 0.5) * wave_strength;
+    vec2 gradient_a = (field_a.gb * 2.0 - 1.0) * 18.0 * 0.42;
+    vec2 gradient_b = transpose(rotation) * ((field_b.gb * 2.0 - 1.0) * 18.0 * 0.49);
+    vec2 slope = (gradient_a * 0.55 + gradient_b * 0.45) * 0.055 * wave_strength;
+    slope *= smoothstep(0.02, 0.40, shore);
+    float threshold_aa = max(fwidth(height) * 1.25, 0.004);
+    float film = clamp((height / film_cutoff) * (1.0 - smoothstep(film_cutoff - threshold_aa, film_cutoff + threshold_aa, height)), 0.0, 1.0);
+    float peak = smoothstep(sparkle_cutoff - threshold_aa, sparkle_cutoff + 0.035 + threshold_aa, height);
+    float soft_edge = smoothstep(sparkle_cutoff - 0.04 - threshold_aa, sparkle_cutoff + threshold_aa, height) * 0.16;
+    water_sparkle = (peak + soft_edge) * smoothstep(0.10, 0.55, shore);
     vec2 to_float = p - interaction.xy;
     float distance_to_float = length(to_float);
-    float envelope = exp(-distance_to_float * 2.4) * smoothstep(0.025, 0.12, distance_to_float) * interaction.w;
-    float ring = distance_to_float * 27.0 - TIME * 5.0;
-    slope += normalize(to_float + vec2(0.0001)) * cos(ring) * envelope * 0.08;
+    float envelope = exp(-distance_to_float * 1.85) * smoothstep(0.04, 0.16, distance_to_float) * interaction.w;
+    float ring = distance_to_float * 29.0 - t * 4.2;
+    slope += normalize(to_float + vec2(0.0001)) * cos(ring) * envelope * 0.038;
     vec3 normal_world = normalize(vec3(-slope.x, 1.0, -slope.y));
     NORMAL = normalize(mat3(VIEW_MATRIX) * normal_world);
 
-    vec3 bed_sample = texture(pebble_bed, p * 0.15 + slope * (0.09 + shelf * 0.05)).rgb;
-    float mineral = dot(bed_sample, vec3(0.2126, 0.7152, 0.0722));
-    vec3 bed = vec3(0.40, 0.57, 0.45) * (0.28 + mineral * 4.2);
-    // Beer-Lambert absorption: red disappears first; deeper water loses bed
-    // contrast and gains blue in-scattering, as in depth fog.
-    vec3 transmission = exp(-depth * depth_absorption * vec3(2.45, 0.82, 0.48));
-    vec3 volume = mix(shallow_color, deep_color, smoothstep(0.12, 1.85, depth));
+    vec2 refracted = pond_uv + vec2(slope.x, -slope.y) * 0.010 * smoothstep(0.0, 0.4, shore);
+    vec4 bed_sample = texture(basin_bed, refracted);
+    float depth = bed_sample.a * 2.5;
+    vec3 transmission = exp(-depth * depth_absorption * vec3(4.0, 1.05, 0.68));
+    vec3 volume = mix(shallow_color, middle_color, smoothstep(0.0, 0.80, depth));
+    volume = mix(volume, deep_color, smoothstep(0.85, 2.25, depth));
+    // Sunlit neutral minerals transmit cyan/blue light. The old green-grey
+    // bed suppressed blue and flattened the shallow-to-deep luminance range.
+    vec3 bed = bed_sample.rgb * vec3(1.10, 1.65, 2.15);
     vec3 color = bed * transmission + volume * (1.0 - transmission);
-    color = mix(color, volume, 0.18 + shelf * 0.12);
+    // Bed-level shadows separate the floating fleshy pads from the clear water.
+    float pad_shadow = 0.0;
+    for (int i = 0; i < lily_count; i++) {
+        vec2 shadow_center = lily_pads[i].xy - sun_direction.xz * depth * 0.55;
+        vec2 delta = (p + slope * 0.15 - shadow_center) / lily_pads[i].z;
+        pad_shadow = max(pad_shadow, 1.0 - smoothstep(0.62, 1.40, dot(delta, delta)));
+    }
+    color *= 1.0 - pad_shadow * 0.20;
 
-    vec2 warp = vec2(texture(surface_flow, p * 0.09 + drift * 0.28).b,
-                     texture(surface_flow, p * 0.09 - drift * 0.21 + 0.3).b);
-    vec2 light_uv = p * 0.35 + warp * 0.13 + drift * 0.32;
-    float web_a = texture(caustics, light_uv).r;
-    float web_b = texture(caustics, light_uv * 1.17 - drift * 0.61).r;
-    float web = web_a * 0.72 + web_b * 0.28;
-    color += vec3(0.32, 0.64, 0.58) * web * exp(-depth * 1.3) * 0.68;
+    // Coherent cellular caustics expand, compress and curve with the waves.
+    vec2 light_uv = p * 0.235 + warp * 0.065 + vec2(sin(p.y * 3.7 + t * 0.37), cos(p.x * 3.4 - t * 0.41)) * 0.015;
+    float web = texture(caustics, light_uv).r;
+    float pulse = 0.82 + 0.18 * sin(p.x * 1.2 - p.y * 0.7 + t * 0.8);
+    color += vec3(0.14, 0.38, 0.36) * web * pulse * exp(-depth * 2.1) * smoothstep(0.03, 0.20, shore);
+    float fish = 0.0;
+    for (int i = 0; i < 3; i++) fish = max(fish, fish_shape(p + slope * 0.22, fish_paths[i], float(i + 1), t));
+    color *= 1.0 - fish * 0.23 * smoothstep(0.35, 0.8, shore);
 
     vec3 view_world = normalize(mat3(INV_VIEW_MATRIX) * VIEW);
     float fresnel = pow(1.0 - max(dot(normal_world, view_world), 0.0), 4.0);
-    color = mix(color, vec3(0.55, 0.77, 0.89), 0.025 + fresnel * 0.27);
     if (has_bank_reflection) {
-        vec2 uv = vec2(1.0 - SCREEN_UV.x, SCREEN_UV.y) + slope * vec2(0.025, 0.014);
-        vec4 reflection = texture(bank_reflection, clamp(uv, vec2(0.002), vec2(0.998)));
-        float bank = (1.0 - smoothstep(0.4, 1.8, shore)) * 0.10 + fresnel * 0.18;
-        color = mix(color, reflection.rgb, reflection.a * bank);
+        vec2 uv = vec2(1.0 - SCREEN_UV.x, SCREEN_UV.y) + slope * vec2(0.017, 0.011);
+        // Filter the small cached capture in premultiplied space, then restore
+        // colour. Its unfiltered bright stone silhouettes formed a stepped rim.
+        vec2 texel = 1.0 / vec2(textureSize(bank_reflection, 0));
+        vec4 reflection = reflection_tap(uv) * 0.40;
+        reflection += reflection_tap(uv + vec2(texel.x, 0.0)) * 0.15;
+        reflection += reflection_tap(uv - vec2(texel.x, 0.0)) * 0.15;
+        reflection += reflection_tap(uv + vec2(0.0, texel.y)) * 0.15;
+        reflection += reflection_tap(uv - vec2(0.0, texel.y)) * 0.15;
+        float bank = (1.0 - smoothstep(0.10, 0.85, shore)) * 0.03 + fresnel * 0.12;
+        color = mix(color, reflection.rgb / max(reflection.a, 0.001), reflection.a * bank);
     }
-    // Moving wave facets reflect a broad sun. Derivative filtering keeps fine
-    // glints from flickering into single-pixel noise on smaller Android screens.
-    vec2 fine_wave = texture(surface_flow, p * 0.18 + drift * 0.65).rg * 2.0 - 1.0;
-    vec3 facet = normalize(vec3(-(slope.x + fine_wave.x * 0.23), 1.0, -(slope.y + fine_wave.y * 0.23)));
-    vec3 half_sun = normalize(view_world + sun_direction);
-    float alignment = dot(facet, half_sun);
-    float aa = min(max(fwidth(alignment) * 0.35, 0.00012), 0.0012);
-    float glint = smoothstep(0.9965 - aa, 0.9996 + aa, alignment);
-    float halo = pow(max(alignment, 0.0), 160.0) * 0.10;
-    float glint_patch = smoothstep(0.46, 0.68, texture(surface_flow, p * 0.12 - drift * 0.3).b);
-    glint *= glint_patch * smoothstep(0.08, 0.38, shore) * sparkle_strength;
-    color += max(sin(ring), 0.0) * envelope * vec3(0.16, 0.29, 0.28);
-    ALBEDO = color;
-    EMISSION = vec3(1.0, 0.97, 0.82) * (glint * 2.8 + halo * glint_patch * sparkle_strength);
-    ROUGHNESS = 0.26;
-    SPECULAR = 0.35;
+    color += pow(max(sin(ring), 0.0), 5.0) * envelope * vec3(0.10, 0.22, 0.22);
+    float swell = sin(p.x * 3.1 + p.y * 1.3 + t * 0.65) * sin(p.y * 2.4 - t * 0.54);
+    color += vec3(0.0, 0.008, 0.011) * swell * smoothstep(0.2, 0.8, depth);
+    float far_bank = smoothstep(7.5, 11.7, -p.y + (p.x - 6.0) * 0.18);
+    color *= 1.0 - far_bank * (1.0 - smoothstep(0.08, 0.85, shore)) * 0.30;
+    ALBEDO = color * 0.88;
+    EMISSION = color * 0.12;
+    // The lower threshold shapes a soft reflected film; the upper threshold
+    // creates isolated, irregular highlights in the light processor below.
+    float normal_variance = dot(dFdx(normal_world), dFdx(normal_world)) + dot(dFdy(normal_world), dFdy(normal_world));
+    ROUGHNESS = clamp(mix(surface_roughness + 0.03, surface_roughness - 0.03, film) + normal_variance * 6.0, 0.12, 0.55);
+    SPECULAR = mix(0.30, 0.40, film);
+    METALLIC = 0.0;
+}
+
+void light() {
+    float nl = max(dot(NORMAL, LIGHT), 0.0);
+    float nv = max(dot(NORMAL, VIEW), 0.001);
+    vec3 half_vector = normalize(LIGHT + VIEW);
+    float lh = max(dot(LIGHT, half_vector), 0.0);
+    // Preserve the engine's Burley diffuse response for the existing water body.
+    float fd90 = 0.5 + 2.0 * ROUGHNESS * lh * lh;
+    float diffuse = (1.0 + (fd90 - 1.0) * pow(1.0 - nl, 5.0))
+                  * (1.0 + (fd90 - 1.0) * pow(1.0 - nv, 5.0));
+    DIFFUSE_LIGHT += LIGHT_COLOR * ATTENUATION * nl * diffuse / PI;
+    // Josh routes the stylized glints to emission. Here the same kind of mask
+    // is light- and view-gated, retaining the user's requirement that real
+    // light intensity, direction and shadowing affect the highlights.
+    float view_response = pow(max(dot(NORMAL, half_vector), 0.0), 24.0);
+    SPECULAR_LIGHT += LIGHT_COLOR * ATTENUATION * SPECULAR_AMOUNT * nl
+                    * view_response * water_sparkle * shimmer_strength;
 }

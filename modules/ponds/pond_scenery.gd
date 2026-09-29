@@ -20,7 +20,7 @@ static func build(entry: Dictionary) -> PondScenery:
 	for point in [Vector3(0.1, 0, -4), Vector3(-0.2, 0, -11), Vector3(2.2, 0, -16.1), Vector3(9.5, 0, -16.4), Vector3(12.2, 0, -12), Vector3(12.1, 0, -5.5)]:
 		var scale_value := scene._rng.randf_range(.85, 1.1)
 		trees.append(Transform3D(Basis(Vector3.UP, scene._rng.randf_range(0, TAU)).scaled(Vector3.ONE * scale_value), point))
-	scene.add_child(Art.batch("tree_1" if entry.template_id == "meander" else "tree_0", trees))
+	scene.add_child(preload("res://modules/ponds/pond_trees.gd").build(trees))
 	var layers := {"grass_clump": [], "daisy": [], "blue_flower": [], "bush": []}
 	var spec := SystemPonds.site(entry)
 	for i in 150:

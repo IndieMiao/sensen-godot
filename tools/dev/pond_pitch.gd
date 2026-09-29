@@ -9,6 +9,7 @@ var _output := "user://pond-art"
 var _capture := false
 var _shape := "gourd"
 var _shot := "hero"
+var _probe := ""
 var _materials: Array[ShaderMaterial] = []
 var _water_hash := ""
 var _ready_to_measure := false
@@ -36,6 +37,7 @@ func _ready() -> void:
 		if arg.begins_with("--out="): _output = arg.trim_prefix("--out=")
 		if arg.begins_with("--shape="): _shape = arg.trim_prefix("--shape=")
 		if arg.begins_with("--shot="): _shot = arg.trim_prefix("--shot=")
+		if arg.begins_with("--probe="): _probe = arg.trim_prefix("--probe=")
 		if arg.begins_with("--time="): _time = float(arg.trim_prefix("--time="))
 		if arg == "--capture": _capture = true
 		if arg == "--motion": _fixed = false
@@ -69,6 +71,7 @@ func _process(delta: float) -> void:
 			_loading = true
 			_shape = command.get("shape", _shape)
 			_shot = command.get("shot", _shot)
+			_probe = command.get("probe", "")
 			_time = command.get("time", 12.0)
 			_fixed = not command.get("motion", false)
 			_request_id = command.get("request_id", "command")
@@ -102,6 +105,15 @@ func _run() -> void:
 	scene.set_process_unhandled_input(false)
 	scene.canvas.hide()
 	scene.mover.stop()
+	var sun := scene.get_node("PondSun") as DirectionalLight3D
+	var water := scene.get_node(str(entry.id)) as FishingWater
+	if _probe == "sun-off": sun.light_specular = 0.0
+	if _probe == "env-off": scene.environment.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
+	if _probe == "flat": water.water_material.set_shader_parameter("wave_strength", 0.0)
+	if _probe == "env-rotate": scene.environment.sky_rotation.y = PI * .5
+	if _probe == "sun-rotate":
+		sun.rotation_degrees.y += 60.0
+		water.water_material.set_shader_parameter("sun_direction", sun.global_basis.z.normalized())
 	_water_hash = FileAccess.get_sha256(scene.get_node(str(entry.id)).water_material.shader.resource_path)
 	for node in scene.find_children("*", "GeometryInstance3D", true, false):
 		if node.material_override is ShaderMaterial:
@@ -132,6 +144,18 @@ func _run() -> void:
 	var report := {
 		"request_id": _request_id,
 		"shape": _shape, "shot": _shot, "shader_time": _time, "engine": Engine.get_version_info().string,
+		"probe": _probe, "sun_specular": sun.light_specular,
+		"wave_strength": _shader_uniform(water.water_material, &"wave_strength"),
+		"surface_roughness": _shader_uniform(water.water_material, &"surface_roughness"),
+		"film_cutoff": _shader_uniform(water.water_material, &"film_cutoff"),
+		"sparkle_cutoff": _shader_uniform(water.water_material, &"sparkle_cutoff"),
+		"shimmer_strength": _shader_uniform(water.water_material, &"shimmer_strength"),
+		"sun_direction": str(sun.global_basis.z.normalized()),
+		"sun_angular_distance": sun.light_angular_distance,
+		"environment_reflection_source": scene.environment.reflected_light_source,
+		"environment_rotation": str(scene.environment.sky_rotation),
+		"environment_energy": (scene.environment.sky.sky_material as PanoramaSkyMaterial).energy_multiplier,
+		"sky_radiance_size": 32 << scene.environment.sky.radiance_size,
 		"rendering_method": RenderingServer.get_current_rendering_method(),
 		"rendering_driver": RenderingServer.get_current_rendering_driver_name(),
 		"adapter": RenderingServer.get_video_adapter_name(), "os": OS.get_name(),
@@ -150,12 +174,25 @@ func _run() -> void:
 	_loading = false
 	if _capture: get_tree().quit()
 
+func _shader_uniform(material: ShaderMaterial, key: StringName) -> Variant:
+	var value: Variant = material.get_shader_parameter(key)
+	return value if value != null else RenderingServer.shader_get_parameter_default(material.shader.get_rid(), key)
+
 func frame_camera() -> void:
 	_view_center = Vector3(6, 0, -8)
 	_view_width = 14.6
 	if _shot == "detail":
 		_view_center = Vector3(6.5, 0, -5.8)
 		_view_width = 7.0
+	elif _shot == "reference":
+		_view_center = Vector3(6, 0, -8)
+		_view_width = 11.4
+	elif _shot == "bank":
+		_view_center = Vector3(6.5, 0, -11.1)
+		_view_width = 5.0
+	elif _shot == "tree":
+		_view_center = Vector3(.1, 1.1, -4)
+		_view_width = 4.2
 	elif _shot == "portrait":
 		_view_width = 11.2
 		scene.canvas.show()
@@ -164,7 +201,9 @@ func frame_camera() -> void:
 func _apply_camera() -> void:
 	var center := _view_center + _pan.offset
 	scene.cam.size = _view_width / _pan.zoom
-	scene.cam.position = center + Vector3(0.16, 1.10, 1.0).normalized() * 36
+	var direction := Vector3(0.16, 1.10, 1.0).normalized()
+	if _probe == "view-turn": direction = direction.rotated(Vector3.UP, deg_to_rad(30))
+	scene.cam.position = center + direction * 36
 	scene.cam.look_at(center)
 
 func _input(event: InputEvent) -> void:

@@ -1,14 +1,19 @@
 extends SceneTree
 ## Worktree-local, offline art viewer. Never shares Android build outputs or saves.
 func _initialize() -> void:
-	var directory := ProjectSettings.globalize_path("res://output/pond-pitch-2026-09-25/project")
+	# Captures and archived scripts are not source: do not let their class_name
+	# declarations replace runtime classes in the parent project's import cache.
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://output"))
+	if not FileAccess.file_exists("res://output/.gdignore"):
+		FileAccess.open("res://output/.gdignore", FileAccess.WRITE).close()
+	var directory := ProjectSettings.globalize_path("res://output/pond-reference-2026-09-29/project")
 	DirAccess.make_dir_recursive_absolute(directory)
 	var config := ConfigFile.new()
 	assert(config.load("res://project.godot") == OK)
 	config.set_value("application", "config/name", "Gensen Pond Art")
 	config.set_value("application", "config/features", PackedStringArray(["4.7", "Mobile"]))
 	config.set_value("application", "config/use_custom_user_dir", true)
-	config.set_value("application", "config/custom_user_dir_name", "sensen-pond-art-rapid-harbor")
+	config.set_value("application", "config/custom_user_dir_name", "sensen-pond-art-" + str(ProjectSettings.globalize_path("res://").hash()))
 	config.set_value("application", "run/main_scene", "res://tools/dev/pond_pitch.tscn")
 	config.set_value("sensen", "network/online_qa", true)
 	config.set_value("sensen", "network/base_url", "http://127.0.0.1:9/v1")
@@ -44,10 +49,10 @@ func _initialize() -> void:
 	preset.set_value("preset.0", "exclude_filter", "addons/gdUnit4/*,tests/*,docs/*,reports/*,build/*,output/*,server/*,native/*,assets/avatar/source/*.fbx")
 	# The scene uses core Godot rendering: no Gradle/Mapbox/voice build is needed.
 	preset.set_value("preset.0.options", "gradle_build/use_gradle_build", false)
-	preset.set_value("preset.0.options", "package/unique_name", "com.sensen.pondart.rapidharbor")
+	preset.set_value("preset.0.options", "package/unique_name", "com.sensen.pondart.calmcloud")
 	preset.set_value("preset.0.options", "package/name", "Gensen Pond Art")
-	preset.set_value("preset.0.options", "version/code", 2026092501)
-	preset.set_value("preset.0.options", "version/name", "0.16.37-pond-art")
+	preset.set_value("preset.0.options", "version/code", 2026092901)
+	preset.set_value("preset.0.options", "version/name", "pond-reference-2026-09-29")
 	assert(preset.save(directory.path_join("export_presets.cfg")) == OK)
 	print("POND_ART_PROJECT ", directory)
 	quit()

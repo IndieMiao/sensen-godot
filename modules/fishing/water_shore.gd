@@ -66,6 +66,7 @@ static func build(id: String, site_override: Dictionary = {}) -> WaterShore:
 func _finish(surface: SurfaceTool, label: String, material: Material, shadows: bool) -> void:
 	var node := MeshInstance3D.new()
 	node.name = label
+	if _pond and label == "BankStones": surface.generate_normals()
 	surface.index()
 	node.mesh = surface.commit()
 	node.material_override = material
@@ -107,7 +108,7 @@ func _bank_group(point: Vector3, outward: Vector3, index: int, lake: bool) -> vo
 func _rock(center: Vector3, radius: Vector3, yaw: float) -> void:
 	var seed_value := _rng.randf_range(0, TAU)
 	var tint := Color("d0cbb4").lerp(Color("829181"), _rng.randf()).srgb_to_linear()
-	if _pond: tint = Color("eee0c9").lerp(Color("cfc9bf"), _rng.randf_range(0.0, 0.6)).srgb_to_linear()
+	if _pond: tint = Color("cebdab").lerp(Color("b9b9ae"), _rng.randf_range(0.0, 0.6)).srgb_to_linear()
 	var basis := Basis(Vector3.UP, yaw)
 	var segments := 28 if _pond else 18
 	var rings := 16 if _pond else 10
@@ -122,6 +123,16 @@ func _rock(center: Vector3, radius: Vector3, yaw: float) -> void:
 				var lump := 1.0 + sin(a * 3.0 + seed_value) * sin(b) * 0.15 + cos(b * 4.0 + seed_value) * 0.095
 				if _pond: lump = 1.0 + sin(a * 3.0 + seed_value) * sin(b) * 0.065 + cos(b * 3.0 + seed_value) * 0.04
 				var vertex := normal * radius * lump
+				if _pond:
+					# Worn fieldstone: broad top and oblique mineral faces, with
+					# softened corners instead of a scaled sphere. Bounds remain
+					# within the established bank/nav/float clearance envelope.
+					var shaped := Vector3(signf(normal.x) * pow(absf(normal.x), .79), signf(normal.y) * pow(absf(normal.y), .74), signf(normal.z) * pow(absf(normal.z), .82))
+					var face := Vector3(.72, .54, .42).normalized()
+					var cut := shaped.dot(face)
+					if cut > .96: shaped -= face * (cut - .96) * .80
+					shaped.y = minf(shaped.y, .86 + shaped.x * .10 - shaped.z * .08)
+					vertex = shaped * radius * lump
 				vertex.y = maxf(-radius.y * 0.40, vertex.y)
 				points.append(center + basis * vertex + Vector3.UP * radius.y * 0.34)
 				normals.append(basis * ((normal / radius).normalized() if _pond else normal))

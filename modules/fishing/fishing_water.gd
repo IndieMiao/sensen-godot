@@ -74,7 +74,10 @@ static func build(site_id: String, site_override: Dictionary = {}) -> FishingWat
 		material.set_shader_parameter("polygon_water", true)
 		material.set_shader_parameter("pond_shore", load("res://assets/ponds/%s_shore.png" % str(spec.template_id)))
 		material.set_shader_parameter("pond_extent", Vector2(spec.extent[0], spec.extent[1]))
-		material.set_shader_parameter("basin", Vector4(6, -8, 6, 8))
+		material.set_shader_parameter("basin_bed", load("res://assets/ponds/art/%s_bed.png" % str(spec.template_id)))
+		material.set_shader_parameter("caustics", preload("res://assets/ponds/art/caustic_web.png"))
+		material.set_shader_parameter("ripple_field", preload("res://assets/ponds/art/pond_ripple_field.png"))
+		material.set_shader_parameter("fish_paths", _pond_fish_paths(spec))
 	elif spec.has("center"):
 		material.set_shader_parameter("basin", Vector4(spec.center[0], spec.center[1], spec.radii[0], spec.radii[1]))
 	else:
@@ -121,6 +124,27 @@ func _setup_reflections() -> void:
 	reflection.material = water_material
 	add_child(reflection)
 
+static func _pond_fish_paths(spec: Dictionary) -> PackedVector4Array:
+	var paths := PackedVector4Array()
+	var polygon := FishingModel._polygon(spec)
+	# A circular clearance bounds the full fish orbit, including its tail.
+	for z in range(4, 13):
+		for x in range(3, 10):
+			var point := Vector2(x, -z)
+			if not Geometry2D.is_point_in_polygon(point, polygon): continue
+			var clearance := point.distance_to(FishingModel._nearest_polygon(point, polygon))
+			if clearance < .95: continue
+			var separate := true
+			for path in paths:
+				if point.distance_to(Vector2(path.x, path.y)) < 1.8: separate = false
+			if not separate: continue
+			var radius := minf(.7, (clearance - .35) / sqrt(2.0))
+			paths.append(Vector4(point.x, point.y, radius, radius * .8))
+			if paths.size() == 3: return paths
+	while paths.size() < 3:
+		paths.append(paths[0] if not paths.is_empty() else Vector4(-100, -100, .1, .1))
+	return paths
+
 func _build_pond_lilies(spec: Dictionary) -> void:
 	var surface := SurfaceTool.new()
 	var flowers := SurfaceTool.new()
@@ -129,6 +153,7 @@ func _build_pond_lilies(spec: Dictionary) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(spec.decoration_seed)
 	var clusters: Array[Vector3] = []
+	var pad_shadows := PackedVector4Array()
 	for attempt in 240:
 		var point := Vector3(rng.randf_range(2, 10), 0.09, rng.randf_range(-12, -4))
 		if not FishingModel.contains(site_id, point, 0, spec): continue
@@ -144,19 +169,24 @@ func _build_pond_lilies(spec: Dictionary) -> void:
 			var offset := Vector3(cos(leaf * 2.4), 0, sin(leaf * 2.4)) * sqrt(float(leaf)) * .25
 			var at := point + offset + Vector3.UP * leaf * .003
 			if not FishingModel.contains(site_id, at, -.28, spec): continue
-			_lily_leaf(surface, at, rng.randf_range(.18,.29), rng.randf_range(0,TAU), Color("a4cb52").lerp(Color("c2d86b"), rng.randf()))
+			var radius := rng.randf_range(.18,.29)
+			_pond_lily_leaf(surface, at, radius, rng.randf_range(0,TAU), Color("8eae46").lerp(Color("a8bf5d"), rng.randf()))
+			pad_shadows.append(Vector4(at.x, at.z, radius, 0))
 		if clusters.size() % 2 == 1:
 			for ring in 2:
 				for petal in 8:
 					var angle := TAU * petal / 8.0 + ring * .35
 					var at := point + Vector3(cos(angle), 0, sin(angle)) * (.07 - ring * .025) + Vector3.UP * (.05 + ring * .05)
 					var basis := Basis(Vector3.UP,-angle) * Basis(Vector3.FORWARD,-.3 - ring * .3)
-					PlaceScenery._oval(flowers, Vector3(.12,.035,.055),at,Color("ffc6d7").lerp(Color("fff1e5"),ring*.65).srgb_to_linear(),basis)
+					PlaceScenery._oval(flowers, Vector3(.205,.082,.106),at,Color("ed93b3").lerp(Color("ffd8d8"),ring*.65).srgb_to_linear(),basis)
 			PlaceScenery._oval(flowers,Vector3(.048,.04,.048),point + Vector3.UP*.12,Color("ffdb75").srgb_to_linear())
 		if clusters.size() >= 3: break
 	if clusters.is_empty(): return
+	water_material.set_shader_parameter("lily_count", pad_shadows.size())
+	pad_shadows.resize(15)
+	water_material.set_shader_parameter("lily_pads", pad_shadows)
 	var material := ShaderMaterial.new()
-	material.shader = preload("res://modules/fishing/lily_leaf.gdshader")
+	material.shader = preload("res://modules/ponds/pond_lily.gdshader")
 	var leaves := MeshInstance3D.new()
 	leaves.name = "PondLilies"
 	surface.index()
@@ -221,6 +251,35 @@ func _build_lilies(spec: Dictionary) -> void:
 	blooms.material_override = material
 	blooms.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(blooms)
+
+static func _pond_lily_leaf(surface: SurfaceTool, center: Vector3, radius: float, yaw: float, color: Color) -> void:
+	# Closed fleshy pad: a quiet domed top, rounded lip and visible green sidewall.
+	# These centimetre-thick pads are confined to the system ponds.
+	var profile := [Vector2(0,.032), Vector2(.40,.035), Vector2(.84,.034), Vector2(.96,.029), Vector2(1,.017), Vector2(1,-.014), Vector2(.93,-.025), Vector2(0,-.025)]
+	for ring in profile.size() - 1:
+		for segment in 40:
+			var points: Array[Vector3] = []
+			var normals: Array[Vector3] = []
+			var uvs: Array[Vector2] = []
+			for corner in [Vector2(segment,ring), Vector2(segment+1,ring), Vector2(segment+1,ring+1), Vector2(segment,ring+1)]:
+				var angle: float = corner.x / 40.0 * TAU + yaw
+				var band: Vector2 = profile[int(corner.y)]
+				var roundness := 1.0 + sin(angle * 3.0 + yaw) * .016
+				var q := Vector2(cos(angle),sin(angle)) * band.x * roundness
+				points.append(center + Vector3(q.x * radius, band.y * radius / .24, q.y * radius))
+				var side := Vector3(cos(angle),0,sin(angle))
+				var normal := Vector3.UP
+				if ring >= 6: normal = Vector3.DOWN
+				elif ring >= 4: normal = side
+				elif ring == 3: normal = (Vector3.UP + side * .8).normalized()
+				else: normal = (Vector3.UP + side * band.x * .09).normalized()
+				normals.append(normal)
+				uvs.append(q * .5 + Vector2.ONE * .5)
+			for i in [0,2,1,0,3,2]:
+				surface.set_color(color.srgb_to_linear() * (0.82 if ring >= 4 else 1.0))
+				surface.set_normal(normals[i])
+				surface.set_uv(uvs[i])
+				surface.add_vertex(points[i])
 
 static func _lily_leaf(surface: SurfaceTool, center: Vector3, radius: float, yaw: float, color: Color) -> void:
 	for ring in 4:

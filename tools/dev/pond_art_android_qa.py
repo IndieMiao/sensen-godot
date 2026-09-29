@@ -15,7 +15,7 @@ import xml.etree.ElementTree as ET
 
 SERIAL = os.environ['JOURNEY_SERIAL']
 PACKAGE = os.environ['JOURNEY_PACKAGE']
-assert PACKAGE == 'com.sensen.pondart.rapidharbor', 'Use the isolated pond art app'
+assert PACKAGE in {'com.sensen.pondart.rapidharbor', 'com.sensen.pondart.calmcloud'}, 'Use the isolated pond art app'
 OUT = Path(sys.argv[1]).resolve()
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -80,12 +80,12 @@ original_size = adb('shell', 'wm', 'size').decode()
 try:
     wait_json('pond-art/gourd-hero.json', lambda r: not r['network_booted'])
     if '--record-only' not in sys.argv:
-        for shape, shot in [('gourd','hero'), ('gourd','detail'), ('crescent','hero'), ('meander','hero')]:
+        for shape, shot in [('gourd','hero'), ('gourd','reference'), ('gourd','detail'), ('gourd','bank'), ('gourd','tree'), ('crescent','hero'), ('meander','hero')]:
             capture(shape, shot)
         adb('shell', 'wm', 'size', '390x844')
         capture('gourd', 'portrait')
         adb('shell', 'wm', 'size', 'reset')
-    motion = capture('gourd', 'hero', True)
+    motion = capture('gourd', 'reference', True)
     dismiss_system_tips()
     performance = wait_json('pond-art/performance.json', lambda r: r['request_id'] == motion['request_id'])
     (OUT / 'performance.json').write_text(json.dumps(performance, indent=2))

@@ -1,5 +1,81 @@
 # Product Direction
 
+- Pond shimmer on 2026-09-30 now follows the actually retrieved 80.lv/Josh
+  breakdown and Jasper's Mario Galaxy texture-threshold explanation. User
+  rejected the analytic GGX bands. Two differently moving original scalar
+  fields now create irregular, changing highlights and a softer reflection
+  layer; normals derive from the same field. Keep HDR env reflection and the
+  approved water palette. Stylized glints run in light(), retaining real light,
+  shadow and view response; final shimmer_strength=4. 12 pond checks, Metal /
+  Vulkan capture parity, motion and complete QA APK readback passed. No release
+  or phone update. See docs/qa/pond-water-breakdown-2026-09-30.md.
+  Reference fetching succeeded through the already configured system proxy;
+  check scutil --proxy when direct public requests reset, without changing it.
+  Keep output/.gdignore: archived class_name scripts previously polluted the
+  parent's global class cache. Preview preparation/launcher now ensure it.
+  The latest before/after and 12s runtime video are sent/readback-verified in
+  the ongoing Gensen Feishu self review conversation; no APK was sent.
+
+- Pond reflections on 2026-09-29/30 supersede the drifting-white-patch method:
+  user rejected the patches as floating objects and requested env-map reflection
+  plus light-related shaped highlights. Removed the emissive glint generator;
+  pond water now uses Godot GGX specular, height-derived wave normals and an
+  authored HDR panorama through Sky/Radiance. Keep the approved depth palette
+  and bed; reflection naturally changes local colour. Actual sun-off, env-off,
+  flat-normal, environment/sun rotation and view-turn captures verify response.
+  12 pond checks passed; six Metal/Vulkan pairs, Android motion and full QA APK
+  readback passed. Pinterest shortlink remained unreachable; reference was the
+  user's two attached images. This is local visual review, not production or
+  phone/iOS release or user acceptance. See docs/qa/pond-reflection-2026-09-29.md.
+  The before/after image, lighting-control image and final 12s video are sent
+  and readback-verified in the ongoing Gensen Feishu self review conversation.
+
+- Pond highlight follow-up on 2026-09-29: the user accepted the current colour
+  layering and requested moderately more, larger highlights with visible flow.
+  Only the pond shader's glints changed: broad soft patches drift ~9cm/s, bend,
+  rotate and stretch slowly; four neighbouring cells avoid boundary popping.
+  Keep the approved water palette/depth/bed intact; five water-colour sample
+  medians remain exact. Three pond shapes, portrait, matched Metal/Vulkan and
+  Android motion/APK readback passed. This is local visual review, not a
+  production/phone/iOS release or user acceptance of the new glints. See
+  docs/qa/pond-highlights-2026-09-29.md and output/pond-highlights-2026-09-29.
+
+- Pond colour follow-up on 2026-09-29 supersedes the first calm-cloud water
+  palette. User rejected its flat cyan/green range. Match a bright foreground
+  shelf → cyan-blue middle → blue far basin, with darker far-bank water, not
+  an equally bright ring around every shore. Reworked optical depth, three
+  colour stops and bed illumination; filtered/reduced pale rock reflections.
+  Representative shallow/deep L* span is now 31.2 versus design 31.4 and prior
+  7.2; these selected patches are not registered geometry or a fidelity score.
+  Bed RGB/catalog/gameplay remain intact. Six final Metal/Vulkan views and
+  Android motion/readback passed; artifacts are in output/pond-colour-2026-09-29.
+  Nearest-shore colour is still slightly warm. Previous Feishu images/video
+  are the earlier revision; no new delivery/release/device update is implied.
+  See docs/design/pond-reference-2026-09-29/colour-correction.md and
+  docs/qa/pond-colour-2026-09-29.md.
+  On the user's subsequent delivery follow-up, the corrected three-column
+  colour comparison and final 12s MP4 were sent/readback-verified to the same
+  Gensen Feishu self DM (profile gensen). This is the corrected revision.
+
+- Pond reference refinement on 2026-09-29 is local in calm-cloud, based on
+  f1e6be6, without the user's discarded Fable 5.1 branch. Favor clear cyan/blue
+  water, broad continuous depth transitions, visible shallow stone beds,
+  deforming caustics, sparse soft glints and a few swimming fish. Pond-only
+  thick round lily pads/petals, mineral-faced matte bank stones, clustered
+  cloud crowns and flared wood roots now follow the supplied reference.
+  33 existing native checks passed; 7 matched Metal/Mobile vs Vulkan/Mobile
+  views differ by 0.0079–0.0520 RGB/255 (platform parity, not reference fidelity).
+  Offline QA uses com.sensen.pondart.calmcloud, emulator-5586 and ADB 5053;
+  exact APK readback, 12s motion review and 24 short 60 FPS samples passed.
+  Catalog/navigation/fishing/saves stay intact. This is not a public release,
+  phone/iOS acceptance or external delivery. Meadow pile, vegetation density
+  and indirect light still differ from the concept. See
+  docs/design/pond-reference-2026-09-29/README.md and
+  docs/qa/pond-reference-2026-09-29.md; open tools/dev/open_pond_art.command.
+  The user subsequently requested the comparisons and video in their Gensen
+  Feishu: both PNG comparisons and the 12s MP4 are sent/readback-verified in
+  the verified self DM using profile gensen. No future/other-recipient consent.
+
 - Android remote ADB preference on 2026-09-25: user requested a fixed remote
   debugging endpoint. Enabled TCP port 5555 on the freshly verified V2509A
   (10AFAF162200319); Tailscale 100.114.132.11:5555 connected and reconnected,
