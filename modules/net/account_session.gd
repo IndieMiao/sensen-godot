@@ -129,9 +129,12 @@ static func describe(code: String) -> String:
 		"PASSWORD_MISMATCH": return "The two passwords don't match."
 		"TRANSPORT": return "Can't reach the server. Check your connection."
 		"EMAIL_IN_USE": return "This email already has an account. Sign in with your email and password first."
-		"APPLE_CANCELED": return ""
+		"APPLE_CANCELED", "GOOGLE_CANCELED": return ""
+		"GOOGLE_NO_ACCOUNT": return "Add a Google account to this phone first."
+		"GOOGLE_UNAVAILABLE": return "Sign in with Google isn't available on this phone."
 		"APPLE_UNAVAILABLE", "APPLE_NOT_HANDLED", "APPLE_TIMEOUT": return "Sign in with Apple isn't available right now."
 	if code.begins_with("APPLE_"): return "Sign in with Apple failed. Please try again."
+	if code.begins_with("GOOGLE_"): return "Sign in with Google failed. Please try again."
 	return "Something went wrong. Please try again."
 
 ## 以下接口只发请求、回 {ok, code, body}；token 切换由 NetService 负责。
@@ -155,6 +158,9 @@ static func reset(client: ApiClient, p_email: String, code: String, password: St
 static func apple_sign_in(client: ApiClient, identity_token: String, nonce: String, given_name := "", family_name := "", authorization_code := "") -> Dictionary:
 	return _result(await client.request("POST", "/auth/apple", {"identity_token": identity_token, "nonce": nonce,
 		"given_name": given_name, "family_name": family_name, "authorization_code": authorization_code}))
+
+static func google_sign_in(client: ApiClient, id_token: String, nonce: String) -> Dictionary:
+	return _result(await client.request("POST", "/auth/google", {"id_token": id_token, "nonce": nonce}))
 
 static func me(client: ApiClient) -> Dictionary:
 	return _result(await client.request("GET", "/users/me"))

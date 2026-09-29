@@ -27,6 +27,8 @@ var gate := false
 var _reset_code_sent := false
 ## 测试替身：func(nonce_hash) -> 原生回包；空则走 iOS 原生桥。
 var apple_transport: Callable = Callable()
+## 测试替身：func(nonce_hash) -> 原生 JSON 回包；空则走 Android 原生插件。
+var google_transport: Callable = Callable()
 
 var _title: Label
 var _subtitle: Label
@@ -318,7 +320,12 @@ func _texts(title: String, subtitle: String) -> void:
 
 ## iOS 上登录 / 注册页都给 Apple 登录，紧跟主按钮（App Store 4.8：与其它登录方式同等显眼）。
 func _with_apple(list: Array) -> Array:
-	if AppleSignIn.available(): list.insert(1, ["apple", "Sign in with Apple", "apple"])
+	var at := 1
+	if AppleSignIn.available():
+		list.insert(at, ["apple", "Sign in with Apple", "apple"])
+		at += 1
+	# Android: Google account sign-in (Credential Manager); same prominence as the email option.
+	if GoogleSignIn.available(): list.insert(at, ["google", "Sign in with Google"])
 	return list
 
 ## 每项 [动作 id, 文案, 样式]：accent 主按钮、danger 红色主按钮、danger_link 红字次按钮。
@@ -385,6 +392,7 @@ func _on_action(id: String) -> void:
 	match id:
 		"sign_in": await _submit_login(false)
 		"apple": await _submit_apple()
+		"google": await _submit_google()
 		"sign_up": await _submit_login(true)
 		"to_sign_up": set_mode("sign_up")
 		"to_sign_in":
@@ -480,6 +488,21 @@ func _submit_apple() -> void:
 	if native.ok:
 		result = await AccountSession.apple_sign_in(Net.client, str(native.identity_token), nonce,
 			str(native.given_name), str(native.family_name), str(native.get("authorization_code", "")))
+		if result.ok: result.ok = await Net.sign_in_with(result.body)
+	_set_busy(false)
+	if not result.ok:
+		_say(AccountSession.describe(str(result.code)))
+		return
+	_after_sign_in()
+
+func _submit_google() -> void:
+	_set_busy(true)
+	_say("Signing in…", true)
+	var nonce := AppleSignIn.new_nonce()
+	var native := await GoogleSignIn.authorize(nonce, google_transport)
+	var result := native
+	if native.ok:
+		result = await AccountSession.google_sign_in(Net.client, str(native.id_token), nonce)
 		if result.ok: result.ok = await Net.sign_in_with(result.body)
 	_set_busy(false)
 	if not result.ok:

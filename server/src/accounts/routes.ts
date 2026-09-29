@@ -18,6 +18,7 @@ import { ageOn, parseProfile } from './profile.js';
 import { DELETE_PAGE_HTML } from './delete_page.js';
 import { verifyAppleIdToken, type AppleVerifyOptions } from './apple_token.js';
 import type { AppleRevoker } from './apple_revoke.js';
+import { verifyGoogleIdToken, type GoogleVerifyOptions } from './google_token.js';
 import { IdTokenError } from './firebase_token.js';
 
 export interface AccountRouteDeps {
@@ -37,6 +38,8 @@ export interface AccountRouteDeps {
   apple?: Omit<AppleVerifyOptions, 'now'>;
   /** 配了 .p8 才有：登录时换 refresh token，删号时撤销。 */
   appleRevoker?: AppleRevoker;
+  /** Sign in with Google；不配则 /v1/auth/google 回 503。 */
+  google?: Omit<GoogleVerifyOptions, 'now'>;
 }
 
 export function userView(u: UserRow, player?: PlayerRow, now = Date.now()) {
@@ -135,6 +138,60 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
   });
 
   /**
+   * 第三方身份登录的共用落号：先按 (provider, sub) 找号；没有就按提供方验证过的邮箱挂到**已验证**的邮箱账号上；
+   * 再没有就建无密码账号。邮箱被未验证账号占着返回 null（EMAIL_IN_USE，防抢注劫持）。
+   * 提供方给的名字只在账号还没有昵称时用作默认昵称。
+   */
+  const resolveIdentityUser = async (provider: string, sub: string, verifiedEmail: string | undefined, givenName: string | undefined):
+    Promise<{ user: UserRow; created: boolean } | null> => {
+    const email = verifiedEmail ? normalizeEmail(verifiedEmail) : null;
+    let user = await deps.store.userByIdentity(provider, sub);
+    let created = false;
+    if (!user && email) {
+      const existing = await deps.store.userByEmail(email);
+      if (existing) {
+        if (!existing.email_verified) return null;
+        await deps.store.linkIdentity(provider, sub, existing.id, deps.now());
+        user = await deps.store.userByIdentity(provider, sub);
+      }
+    }
+    if (!user) {
+      const made = await deps.store.createIdentityUser(provider, sub, email, deps.now());
+      if (made.kind === 'created') { user = made.user; created = true; }
+      else if (made.kind === 'identity_taken') user = await deps.store.userByIdentity(provider, sub);
+      else return null;
+      if (!user) return null;
+    }
+    if (!user.display_name && givenName) {
+      const parsed = parseProfile({ display_name: givenName.trim() }, deps.now());
+      if (parsed.ok) {
+        await deps.store.updateUserProfile(user.id, { ...parsed.profile, gender: user.gender ?? null,
+          gender_custom: user.gender_custom ?? null, birth_date: user.birth_date ?? null });
+        user = { ...user, display_name: parsed.profile.display_name };
+      }
+    }
+    return { user, created };
+  };
+
+  /** Sign in with Google（Android Credential Manager）。与 Apple 同一套落号规则；Google 不要求删号撤销。 */
+  app.post('/v1/auth/google', { config: { rateLimit: { max: 60, timeWindow: '1 hour' } } }, async (req, reply) => {
+    if (!deps.google) return reply.code(503).send({ code: 'GOOGLE_UNAVAILABLE', server_time: deps.now() });
+    const body = req.body as { id_token?: unknown; nonce?: unknown } | undefined;
+    let identity;
+    try { identity = await verifyGoogleIdToken(body?.id_token, body?.nonce, { ...deps.google, now: deps.now }); }
+    catch (error) {
+      if (error instanceof IdTokenError) return reply.code(401).send({ code: 'GOOGLE_TOKEN_' + error.code, server_time: deps.now() });
+      log(`[google] verify failed: ${(error as Error).message}`);
+      return reply.code(503).send({ code: 'GOOGLE_UNAVAILABLE', server_time: deps.now() });
+    }
+    const resolved = await resolveIdentityUser('google', identity.sub, identity.emailVerified ? identity.email : undefined, identity.givenName);
+    if (!resolved) return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
+    const session = await deps.store.authUser(resolved.user.id, deps.now());
+    return reply.code(resolved.created ? 201 : 200).send({ token: session.token, ...userView(resolved.user, session.player, deps.now()),
+      created: resolved.created, server_time: deps.now() });
+  });
+
+  /**
    * Sign in with Apple。按 Apple sub 找号；没有就按 Apple 验证过的邮箱挂到已验证的邮箱账号上，
    * 再没有就建一个无密码账号。邮箱被一个**未验证**的账号占着时不挂：那个账号可能是别人抢注的。
    * Apple 只在首次授权时给名字，客户端顺带发来，用作默认昵称。
@@ -149,32 +206,10 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
       log(`[apple] verify failed: ${(error as Error).message}`);
       return reply.code(503).send({ code: 'APPLE_UNAVAILABLE', server_time: deps.now() });
     }
-    const email = identity.emailVerified ? normalizeEmail(identity.email) : null;
-    let user = await deps.store.userByIdentity('apple', identity.sub);
-    let created = false;
-    if (!user && email) {
-      const existing = await deps.store.userByEmail(email);
-      if (existing) {
-        if (!existing.email_verified) return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
-        await deps.store.linkIdentity('apple', identity.sub, existing.id, deps.now());
-        user = await deps.store.userByIdentity('apple', identity.sub);
-      }
-    }
-    if (!user) {
-      const made = await deps.store.createIdentityUser('apple', identity.sub, email, deps.now());
-      if (made.kind === 'created') { user = made.user; created = true; }
-      else if (made.kind === 'identity_taken') user = await deps.store.userByIdentity('apple', identity.sub);
-      else return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
-      if (!user) return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
-    }
-    if (!user.display_name && typeof body?.given_name === 'string') {
-      const parsed = parseProfile({ display_name: body.given_name.trim() }, deps.now());
-      if (parsed.ok) {
-        await deps.store.updateUserProfile(user.id, { ...parsed.profile, gender: user.gender ?? null,
-          gender_custom: user.gender_custom ?? null, birth_date: user.birth_date ?? null });
-        user = { ...user, display_name: parsed.profile.display_name };
-      }
-    }
+    const resolved = await resolveIdentityUser('apple', identity.sub, identity.emailVerified ? identity.email : undefined,
+      typeof body?.given_name === 'string' ? body.given_name : undefined);
+    if (!resolved) return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
+    const { user, created } = resolved;
     // A fresh authorization code yields a refresh token for revocation on deletion; failures never block sign-in.
     const code = body?.authorization_code;
     if (deps.appleRevoker && typeof code === 'string' && code.length > 0 && code.length <= 512) {

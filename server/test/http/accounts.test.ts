@@ -19,6 +19,8 @@ import { makeKeys, signToken } from '../fixtures/firebase_tokens.js';
 import { sha256Hex } from '../../src/accounts/apple_token.js';
 
 const APPLE_KEYS = makeKeys('apple-test');
+const GOOGLE_KEYS = makeKeys('google-test');
+const GOOGLE_AUD = 'web-client.apps.googleusercontent.com';
 const APPLE_NONCE = 'raw-nonce-0123456789abcdef';
 
 const DSN = process.env.TEST_DATABASE_URL;
@@ -59,6 +61,7 @@ for (const [name, enabled, makeStore] of makers) {
         regionsFile: REGIONS, pepper: 'test-pepper', now: () => clock, mailer, ipLocator,
         qaEmailDomain: 'qa.sensen.test', qaEmailCode: '424242',
         apple: { audiences: ['app.gensen.maps'], keys: APPLE_KEYS.keys },
+        google: { audiences: [GOOGLE_AUD], keys: GOOGLE_KEYS.keys },
         appleRevoker: { exchange: async code => { appleCalls.push('exchange:' + code); return code === 'good-code' ? 'refresh-1' : null; },
           revoke: async token => { appleCalls.push('revoke:' + token); return true; } },
         geographyProvider: async location => landAt(location) });
@@ -384,6 +387,29 @@ for (const [name, enabled, makeStore] of makers) {
       expect(other.token).toBeTruthy();
       await app.inject({ method: 'DELETE', url: '/v1/users/me', headers: bearer(other.token) });
       expect((await store.deletion(other.user_id))?.apple_revocation).toBe('pending');
+    });
+    const googleToken = (sub: string, over: Record<string, unknown> = {}) => {
+      const s = Math.floor(clock / 1000);
+      return signToken(GOOGLE_KEYS, { iss: 'https://accounts.google.com', aud: GOOGLE_AUD, sub, iat: s, exp: s + 3600,
+        nonce: sha256Hex(APPLE_NONCE), email_verified: true, ...over });
+    };
+    const google = (token: string) => app.inject({ method: 'POST', url: '/v1/auth/google', payload: { id_token: token, nonce: APPLE_NONCE } });
+
+    it('signs in with Google, links to a verified email account and rejects bad tokens', async () => {
+      const first = await google(googleToken('g-1', { email: 'grace@gmail.com', given_name: 'Grace' }));
+      expect(first.statusCode).toBe(201);
+      expect(first.json()).toMatchObject({ created: true, has_password: false, email: 'grace@gmail.com', display_name: 'Grace' });
+      const again = await google(googleToken('g-1', { email: 'grace@gmail.com' }));
+      expect(again.json()).toMatchObject({ created: false, user_id: first.json().user_id });
+      // A verified email account gains the Google identity instead of a duplicate account.
+      await register('hal@example.com');
+      await app.inject({ method: 'POST', url: '/v1/auth/email/code', payload: { email: 'hal@example.com', purpose: 'reset' } });
+      const code = mail.find(m => m.email === 'hal@example.com' && m.purpose === 'reset')!.code;
+      const reset = await app.inject({ method: 'POST', url: '/v1/auth/email/reset', payload: { email: 'hal@example.com', code, password: 'another pass 2' } });
+      const linked = await google(googleToken('g-2', { email: 'hal@example.com' }));
+      expect(linked.json()).toMatchObject({ created: false, user_id: reset.json().user_id, has_password: true });
+      expect((await google(googleToken('g-3', { aud: 'other' }))).json().code).toBe('GOOGLE_TOKEN_BAD_AUDIENCE');
+      expect((await google('x.y.z')).json().code).toBe('GOOGLE_TOKEN_MALFORMED');
     });
   });
 }

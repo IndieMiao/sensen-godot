@@ -224,3 +224,44 @@ func test_password_less_account_hides_password_steps() -> void:
 	p.queue_free()
 	Net.account.has_password = true
 	Net.account.email = "ada@example.com"
+
+func test_google_button_follows_apple_or_the_primary_action() -> void:
+	GoogleSignIn.force_available = true
+	var p := _panel()
+	assert_array(_actions(p)).contains_exactly(["sign_in", "google", "to_sign_up", "to_forgot"])
+	AppleSignIn.force_available = true
+	p.set_mode("sign_in")
+	assert_array(_actions(p)).contains_exactly(["sign_in", "apple", "google", "to_sign_up", "to_forgot"])
+	p.queue_free()
+	GoogleSignIn.force_available = false
+	_restore_net()
+
+func test_google_sign_in_sends_the_raw_nonce_and_adopts_the_account() -> void:
+	GoogleSignIn.force_available = true
+	var t := _apple_net([{"status": 201, "json": {"token": "g-token", "user_id": "u-google", "player_id": "p-google",
+		"email": "ada@gmail.com", "email_verified": true, "display_name": "Ada", "profile_complete": true, "has_password": false, "created": true}}])
+	var p := _panel()
+	var hashes := []
+	p.google_transport = func(hash: String) -> String:
+		hashes.append(hash)
+		return '{"ok":true,"id_token":"g.id.token","given_name":"Ada"}'
+	await p._submit_google()
+	assert_str(t.requests[0].url).ends_with("/auth/google")
+	assert_str(t.requests[0].body.id_token).is_equal("g.id.token")
+	assert_str(str(t.requests[0].body.nonce).sha256_text()).is_equal(hashes[0])
+	assert_str(Net.account.user_id).is_equal("u-google")
+	assert_bool(p.is_queued_for_deletion()).is_true()
+	GoogleSignIn.force_available = false
+	_restore_net()
+
+func test_cancelled_google_picker_is_silent() -> void:
+	GoogleSignIn.force_available = true
+	var t := _apple_net([])
+	var p := _panel()
+	p.google_transport = func(_hash: String) -> String: return '{"ok":false,"code":"GOOGLE_CANCELED"}'
+	await p._submit_google()
+	assert_array(t.requests).is_empty()
+	assert_str(_status(p)).is_empty()
+	p.queue_free()
+	GoogleSignIn.force_available = false
+	_restore_net()

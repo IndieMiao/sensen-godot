@@ -1795,5 +1795,9 @@
   "Sign in or create an account to start.": "登录或注册账号后开始",
   "Your last city": "上次选择的城市",
   "Based on your network": "根据你的网络位置",
-  "Continue with %s": "继续：%s"
+  "Continue with %s": "继续：%s",
+  "Sign in with Google": "通过 Google 登录",
+  "Add a Google account to this phone first.": "请先在手机上添加 Google 账号。",
+  "Sign in with Google isn't available on this phone.": "这台手机暂不支持 Google 登录。",
+  "Sign in with Google failed. Please try again.": "Google 登录失败，请重试。"
 }

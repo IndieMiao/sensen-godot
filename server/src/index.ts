@@ -14,6 +14,7 @@ import { createMmdbIpLocator, type IpLocator } from './geography/ip_locator.js';
 import { mailerFromEnv } from './accounts/mailer.js';
 import { appleJwksFetcher } from './accounts/apple_token.js';
 import { appleRevokerFromEnv } from './accounts/apple_revoke.js';
+import { googleIdJwksFetcher } from './accounts/google_token.js';
 import { CachedJwks } from './accounts/firebase_token.js';
 
 const need = (k: string): string => {
@@ -78,6 +79,15 @@ function appleConfig() {
   return { audiences, keys: jwks.keys, refreshKeys: jwks.refresh };
 }
 
+/** GOOGLE_CLIENT_IDS lists the OAuth Web client ids Android asks tokens for; empty turns Google sign-in off. */
+function googleConfig() {
+  const audiences = (process.env.GOOGLE_CLIENT_IDS ?? '105022638066-s710gs2tsaikbkhbtvstdino7cq661go.apps.googleusercontent.com')
+    .split(',').map(v => v.trim()).filter(Boolean);
+  if (!audiences.length) return undefined;
+  const jwks = new CachedJwks(googleIdJwksFetcher(), () => Date.now());
+  return { audiences, keys: jwks.keys, refreshKeys: jwks.refresh };
+}
+
 const app = await buildApp({
   store, content, contentVersion: cv,
   blueprintDir: BLUEPRINT_DIR, regionsFile: path.join(CONTENT_DIR, 'regions.json'),
@@ -93,6 +103,7 @@ const app = await buildApp({
   qaEmailDomain: process.env.QA_EMAIL_DOMAIN, qaEmailCode: process.env.QA_EMAIL_CODE,
   apple: appleConfig(),
   appleRevoker: appleRevokerFromEnv(process.env, () => Date.now()),
+  google: googleConfig(),
   // Only a development server may let guests write; production keeps guests read-only.
   guestWrites: process.env.GUEST_WRITES === '1',
 });
