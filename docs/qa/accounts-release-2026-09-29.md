@@ -50,3 +50,10 @@
 - 服务端 `4081a03`：`POST /v1/auth/google` 用 Google JWKS 验签，校验 iss / aud / nonce；与 Apple 共用"按身份 → 按已验证邮箱挂号 → 新建无密码号"的逻辑。934 例全绿。发布 `accounts-google-20260929`，**14:08:52–14:09:09 CST** 切换，无表结构变化，13 张表逐字节一致。
 - Android 插件 `native/googleauth/android/GodotGoogleSignInPlugin.kt`（Credential Manager `GetSignInWithGoogleOption`），由 `tools/android/prepare_google_signin_plugin.py` 装进 android/build（依赖 credentials 1.3.0、googleid 1.1.1）；登录页在 Apple 之后、注册之前显示"Sign in with Google"。
 - Android 0.17.7（versionCode 2026092903）已构建：模拟器上按钮可见，点击后正常拉起 Google 系统登录页；但模拟器自带的 Google Play 服务崩溃，**未完成真实 Google 账号登录**，**未发布下载站**。需在有 Google 服务、能访问 Google 的真机或模拟器上验证。
+
+## Android 0.17.8 发给 Joey（2026-09-29）
+
+- 内容：Google 登录（仅有 Play 服务的手机显示）、Apple/Google 改为品牌图标按钮、登录请求 30 s 超时 + 网络失败重试一次（vivo 走 VPN 时 10 s 超时导致"无法连接服务器"）。versionCode 2026092905，SHA-256 `dda91ca37b235e0818786551264c5a7c8d024905c689a424ccac848a182de8fe`。
+- 下载站：[美国](https://download-us.sensenjoy.cn:8443/farm/releases/signin-20260929-dda91ca37b23/sensen-journey-signin-0.17.8.apk) · [OSS](https://oss.sensenjoy.cn/farm/releases/signin-20260929-dda91ca37b23/sensen-journey-signin-0.17.8.apk)，两站下载校验通过。
+- **更正**：该版公开 release.json 里 `emulator_validation: true` 不准确——0.17.8 没有在模拟器上跑，验证在 vivo 真机（原位升级、身份文件未变、登录页出现 Google 图标按钮）。Google 真实登录在修复后尚未完成验证。
+- 已发 Joey：Slack DM（附 APK 文件）与飞书（云盘文件，授予 Joey 查看权限，消息附云盘与下载站链接）。
