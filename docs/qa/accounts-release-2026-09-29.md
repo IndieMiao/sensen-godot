@@ -35,3 +35,11 @@
 ## TestFlight 真机验证（0.17.5 (1)）
 
 用户用 TestFlight 装正式 Journey 0.17.5 (1)，Apple 登录 → 资料 → 选城 → 建农场 → 应用内删号。线上删号记录 10:47:55，来源 app，**apple_revocation = revoked**（Apple 撤销接口返回成功）。删号后线上无账号、无 Apple 身份、无账号玩家；服务日志无 Apple 换码或撤销错误。
+
+## 全国地标 + iOS 普通地点（0.17.6，2026-09-29）
+
+- **iOS 普通地点**（`69f28df`）：MapUnderlay 新增 `POIS|id`，读 Mapbox `composite/poi_label`，屏内、按离中心排序、最多 100 个，字段与安卓一致；回环 UDP 按约 7 KB 分包，Godot 侧收齐再合并。此前 iOS 任何城市都没有普通地点（桥接从未实现）。
+- **47 个设计地标**（`df1218d`、`d2cecd0`）：素材为 Figma「Gensen (US)」Landmark_icons（node 299:2955）。坐标写在 `assets/map/landmarks.json`，与 OpenStreetMap 交叉核对。任何城市显示地图中心 reach_km 内的地标：城市景点 40 km，国家公园、瀑布、峡谷等 150 km。上海、洛杉矶原有地标不变。
+- **修复**：09-22 导出的 47 张图是节点渲染，带灰色底卡；已换成 Figma 原始透明图（1024 缩到 512）。
+- **Android 0.17.6**（versionCode 2026092902）：模拟器上旧金山看到彩绘女士、恶魔岛、渔人码头，图标透明。已发下载站：[美国](https://download-us.sensenjoy.cn:8443/farm/releases/landmarks-20260929-04b9a9f20249/sensen-journey-landmarks-0.17.6.apk) · [OSS](https://oss.sensenjoy.cn/farm/releases/landmarks-20260929-04b9a9f20249/sensen-journey-landmarks-0.17.6.apk)。未发 Joey、未真机。
+- **iOS 0.17.6 (1)**：`build/ios-release` 已导出并签名准备、图标去 alpha、包已解析；**Mac 锁屏，待解锁后 Archive + Organizer 上传**。iOS 普通地点尚未真机验证。
