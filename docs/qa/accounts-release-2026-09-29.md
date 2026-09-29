@@ -43,3 +43,10 @@
 - **修复**：09-22 导出的 47 张图是节点渲染，带灰色底卡；已换成 Figma 原始透明图（1024 缩到 512）。
 - **Android 0.17.6**（versionCode 2026092902）：模拟器上旧金山看到彩绘女士、恶魔岛、渔人码头，图标透明。已发下载站：[美国](https://download-us.sensenjoy.cn:8443/farm/releases/landmarks-20260929-04b9a9f20249/sensen-journey-landmarks-0.17.6.apk) · [OSS](https://oss.sensenjoy.cn/farm/releases/landmarks-20260929-04b9a9f20249/sensen-journey-landmarks-0.17.6.apk)。未发 Joey、未真机。
 - **iOS 0.17.6 (1)**：首次**全命令行、Mac 锁屏**完成：`xcodebuild archive` 后用 App Store Connect API 密钥（Key ID `KQ7J86X34J`，放在 `~/.appstoreconnect/private_keys/`）`-exportArchive` 自动签名并上传，13:21 上传成功，仅 Mapbox 两条已知 dSYM 警告。iOS 普通地点与地标**尚未真机验证**。
+
+## Sign in with Google（accounts-google-20260929 + Android 0.17.7，2026-09-29）
+
+- Google Cloud 项目 **gensen-preview**：OAuth Web 客户端 `105022638066-s710gs2tsaikbkhbtvstdino7cq661go`（服务端校验 aud），Android 客户端 `…p89ncjtm…`（包 `com.sensen.journeypreview` + 调试证书 SHA-1 `D0:BC:BF:…:5A:9C`）。两份 JSON 只存本机 `~/.config/journey/google/`（600）；Web 客户端密钥不需要、未上传。
+- 服务端 `4081a03`：`POST /v1/auth/google` 用 Google JWKS 验签，校验 iss / aud / nonce；与 Apple 共用"按身份 → 按已验证邮箱挂号 → 新建无密码号"的逻辑。934 例全绿。发布 `accounts-google-20260929`，**14:08:52–14:09:09 CST** 切换，无表结构变化，13 张表逐字节一致。
+- Android 插件 `native/googleauth/android/GodotGoogleSignInPlugin.kt`（Credential Manager `GetSignInWithGoogleOption`），由 `tools/android/prepare_google_signin_plugin.py` 装进 android/build（依赖 credentials 1.3.0、googleid 1.1.1）；登录页在 Apple 之后、注册之前显示"Sign in with Google"。
+- Android 0.17.7（versionCode 2026092903）已构建：模拟器上按钮可见，点击后正常拉起 Google 系统登录页；但模拟器自带的 Google Play 服务崩溃，**未完成真实 Google 账号登录**，**未发布下载站**。需在有 Google 服务、能访问 Google 的真机或模拟器上验证。
