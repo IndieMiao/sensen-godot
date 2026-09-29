@@ -57,3 +57,9 @@
 - 下载站：[美国](https://download-us.sensenjoy.cn:8443/farm/releases/signin-20260929-dda91ca37b23/sensen-journey-signin-0.17.8.apk) · [OSS](https://oss.sensenjoy.cn/farm/releases/signin-20260929-dda91ca37b23/sensen-journey-signin-0.17.8.apk)，两站下载校验通过。
 - **更正**：该版公开 release.json 里 `emulator_validation: true` 不准确——0.17.8 没有在模拟器上跑，验证在 vivo 真机（原位升级、身份文件未变、登录页出现 Google 图标按钮）。Google 真实登录在修复后尚未完成验证。
 - 已发 Joey：Slack DM（附 APK 文件）与飞书（云盘文件，授予 Joey 查看权限，消息附云盘与下载站链接）。
+
+## 漫游城市看不到地标 / POI 卡片城市名错乱（2026-09-29 晚，未发版）
+
+- 现象：Joey（TestFlight 与 Android 0.17.8）在旧金山一个地标都没有；用户在纽约点博物馆，卡片写「博物馆 · 上海」。两张截图的副标题都是「这里还没有农场」，说明当时激活的 region 不是所看的城市（还是自己农场所在城市 / 选城时选的城市），地标与卡片城市名以前只按激活 region 取。安装包里 `assets/map/landmarks.json` 与 47 张地标图都在，不是打包问题。
+- 修法：`CityMapView.refresh_content` 把地图中心 reach_km 内的设计地标并入 entries（本城地标照旧、按 id 去重，集合变化才重建列表）；详情卡城市名改按地点坐标——设计地标用素材表里的城市，落在已开通城市用该城名，否则用标题栏查到的瓦片地名，没地名只显示类别（玩家农场卡同规则，`_select_city_player` 传入坐标）。zh 目录补了 20 个地标城市/州名和 17 个地标类别。
+- 验证：`tests/map/test_city_map.gd` 新增两条（中心移到旧金山出现金门大桥等四处并回到洛杉矶消失；纽约 POI/旧金山地标/洛杉矶 POI 的卡片城市名），map + localization 目录 185 条，仅既有失败（test_map_fling×4、test_map_relocation×1、test_city_map_interactions 的 owner pins×1，基线同样失败）。**真机未验**，需随下个版本发 Joey。

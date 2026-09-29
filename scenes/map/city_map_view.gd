@@ -401,10 +401,14 @@ func clear_selection() -> void:
 func refresh_content() -> void:
 	if host == null: return
 	var state: Dictionary = Net.session.state if Net and Net.session else {}
-	var key := str(host.region.get("id", "")) + JSON.stringify(state.get("journey", {})) + JSON.stringify(state.get("residents", {})) + str(state.get("clock", {}).get("chapter_index", -1)) + str(Net.session.version if Net and Net.session else -1)
+	var region_id := str(host.region.get("id", ""))
+	var roaming := _roaming_landmarks()
+	var key := region_id + JSON.stringify(state.get("journey", {})) + JSON.stringify(state.get("residents", {})) + str(state.get("clock", {}).get("chapter_index", -1)) + str(Net.session.version if Net and Net.session else -1) + ",".join(roaming.map(func(g): return str(g.id)))
 	if key == _last_state: return
 	_last_state = key
-	entries = CityMapData.landmarks(str(host.region.get("id", ""))) + CityMapData.residents(str(host.region.get("id", "")), state)
+	var own := CityMapData.landmarks(region_id)
+	var own_ids := own.map(func(p): return str(p.get("id", "")))
+	entries = own + roaming.filter(func(g): return not own_ids.has(str(g.id))) + CityMapData.residents(region_id, state)
 	entries += pond_locations
 	for child in list_rows.get_children():
 		list_rows.remove_child(child)
@@ -424,6 +428,34 @@ func refresh_content() -> void:
 		for sty in ["normal", "hover", "focus"]: b.add_theme_stylebox_override(sty, StyleBoxEmpty.new())
 		list_rows.add_child(b)
 	if not selected.is_empty() and selected.kind == "resident" and not entries.any(func(p): return p.id == selected.id): clear_selection()
+
+## 漫游到别的城市也要看到地标：不论中心是否落在已开通城市，地图中心 reach_km 内的
+## 设计地标都上图、入列表。以前只按激活 region 取——在旧金山、纽约漫游时 region 还是
+## 自己农场所在的城市，整座城一个地标都没有（2026-09-29 Joey 真机反馈）。
+func _roaming_landmarks() -> Array:
+	var lat = host.get("center_lat")
+	var lng = host.get("center_lng")
+	if not (lat is float) or not (lng is float): return []
+	var out := CityMapData.landmarks_near(lat, lng)
+	for g in out: g.kind = "landmark"
+	return out
+
+## 详情卡的城市名：设计地标带自己的城市；其他条目按坐标落在哪座已开通城市取名；
+## 都不在（漫游到未开通城市）就用标题栏查到的瓦片地名；连地名都没有就只显示类别。
+## 以前一律取激活 region——在纽约点博物馆会写成“博物馆 · 上海”。
+func _place_city(entry: Dictionary) -> String:
+	if not str(entry.get("city", "")).is_empty(): return L10n.text(str(entry.city))
+	var region_id := str(host.region.get("id", ""))
+	var region_name := L10n.text(str(host.region.get("name", "")))
+	if not (entry.has("lat") and entry.has("lng")) or not host.has_method("city_id_at"): return region_name
+	var id: String = host.city_id_at(float(entry.lat), float(entry.lng))
+	if id == region_id: return region_name
+	for r in host.city_regions():
+		if str(r.get("id", "")) == id: return L10n.text(str(r.get("name", "")))
+	return str(places.get("settlement", ""))
+
+func _category_text(category: String, city: String) -> String:
+	return L10n.text(category) + (" · " + city if not city.is_empty() else "")
 
 func _name(entry: Dictionary) -> String:
 	if entry.get("kind") == "pond": return L10n.text(str(entry.name))
@@ -460,7 +492,7 @@ func select(entry: Dictionary) -> void:
 	_animate_focus(str(entry.get("id", "")), FOCUS_SCALE, 0.28)
 	_set_marker_front(str(entry.get("id", "")), true)
 	info_title.text = _name(entry)
-	info_category.text = L10n.text(str(entry.get("category", "Place"))) + " · " + L10n.text(str(host.region.get("name", "Los Angeles")))
+	info_category.text = _category_text(str(entry.get("category", "Place")), _place_city(entry))
 	info_address.text = str(entry.get("address", ""))
 	info_address.visible = not info_address.text.is_empty()
 	var landmark_scene := LandmarkScenes.path_for(str(host.region.get("id", "")), entry)
@@ -493,7 +525,7 @@ func select_player(entry: Dictionary, portrait: Texture2D) -> void:
 		_set_marker_front(str(selected.get("id", "")), false)
 	selected = entry
 	info_title.text = str(entry.get("name", ""))
-	info_category.text = L10n.text("Farm") + " · " + L10n.text(str(host.region.get("name", "Los Angeles")))
+	info_category.text = _category_text("Farm", _place_city(entry))
 	info_address.text = ""
 	info_address.visible = false
 	info_action.visible = true

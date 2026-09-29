@@ -146,3 +146,61 @@ func test_shanghai_uses_the_same_city_map_framework() -> void:
 	assert_float(m.center_lng).is_between(121.35, 121.6)
 	FarmChoice.clear()
 	FarmRegions.clear_choice()
+
+func _boot_la_map() -> Node:
+	FarmChoice.save("la_c", 2)
+	FarmRegions.save_choice("los_angeles")
+	Net.use_transport(FakeTransport.new([]).callable())
+	var m := load("res://scenes/map_poc/map_poc.tscn").instantiate() as Node
+	add_child(auto_free(m))
+	await get_tree().process_frame
+	return m
+
+## 2026-09-29 Joey 真机：在旧金山漫游一个地标都没有——地标只按激活 region（自己农场的城市）取。
+## 现在地图中心 reach_km 内的设计地标随中心一起出现，本城地标照旧保留、不重复。
+func test_landmarks_follow_the_map_center_beyond_the_active_city() -> void:
+	var m := await _boot_la_map()
+	var view: CityMapView = m.city_map
+	view._last_state = ""
+	view.refresh_content()
+	var ids := view.entries.map(func(e): return str(e.id))
+	assert_array(ids).contains(["hollywood_sign", "griffith_observatory"])
+	assert_array(ids).not_contains(["golden_gate_bridge"])
+	m.center_lat = 37.7749
+	m.center_lng = -122.4194
+	view.refresh_content()
+	ids = view.entries.map(func(e): return str(e.id))
+	assert_array(ids).contains(["hollywood_sign", "golden_gate_bridge", "alcatraz_island", "painted_ladies"])
+	assert_int(ids.count("golden_gate_bridge")).is_equal(1)
+	for e in view.entries:
+		if str(e.id) == "golden_gate_bridge": assert_str(str(e.kind)).is_equal("landmark")
+	m.center_lat = 34.0522
+	m.center_lng = -118.2437
+	view.refresh_content()
+	assert_array(view.entries.map(func(e): return str(e.id))).not_contains(["golden_gate_bridge"])
+	FarmChoice.clear()
+	FarmRegions.clear_choice()
+
+## 2026-09-29 用户真机：在纽约点博物馆，卡片写“博物馆 · 上海”——城市名一律取激活 region。
+## 现在按地点坐标：本城 → 城市名；设计地标 → 素材表里的城市；未开通城市 → 标题栏瓦片地名；没地名只留类别。
+func test_place_card_names_the_city_under_the_place() -> void:
+	var m := await _boot_la_map()
+	var view: CityMapView = m.city_map
+	view.places = {"settlement": "New York"}
+	view.select({"id": "poi:1", "kind": "poi", "name": "Fire Museum", "category": "Museum", "lat": 40.7128, "lng": -74.0060, "art": "museum"})
+	assert_str(view.info_category.text).is_equal("Museum · New York")
+	view.select({"id": "poi:2", "kind": "poi", "name": "Grand Central Market", "category": "Shop", "lat": 34.0508, "lng": -118.2489, "art": "shop"})
+	assert_str(view.info_category.text).is_equal("Shop · Los Angeles")
+	view.select({"id": "golden_gate_bridge", "kind": "landmark", "name": "Golden Gate Bridge", "category": "Bridge", "lat": 37.8199, "lng": -122.4783, "city": "San Francisco", "art": "landmarks/golden_gate_bridge"})
+	assert_str(view.info_category.text).is_equal("Bridge · San Francisco")
+	view.places = {}
+	view.select({"id": "poi:3", "kind": "poi", "name": "Fire Museum", "category": "Museum", "lat": 40.7128, "lng": -74.0060, "art": "museum"})
+	assert_str(view.info_category.text).is_equal("Museum")
+	view.select_player({"id": "player:f1", "farm_id": "f1", "kind": "player", "name": "Sam", "lat": 40.7, "lng": -74.0}, null)
+	assert_str(view.info_category.text).is_equal("Farm")
+	view.places = {"settlement": "New York"}
+	view.select_player({"id": "player:f1", "farm_id": "f1", "kind": "player", "name": "Sam", "lat": 40.7, "lng": -74.0}, null)
+	assert_str(view.info_category.text).is_equal("Farm · New York")
+	view.clear_selection()
+	FarmChoice.clear()
+	FarmRegions.clear_choice()

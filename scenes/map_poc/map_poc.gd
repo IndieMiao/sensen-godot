@@ -1958,8 +1958,8 @@ func _select_city_player(id: String) -> void:
 		"cfg": SeededOutfit.config_for(str(entry.avatar_ref)), "anim": "idle", "cohort": "farm:" + id})
 	# 与 POI 一致的底部详情卡：头像 + 名字 + “拜访农场”跳转按钮（反馈 round 9）。
 	var owner := str(entry.owner_name) if str(entry.avatar_ref).is_empty() else SeededOutfit.short_name(str(entry.avatar_ref))
-	city_map.select_player({"id": "player:" + id, "farm_id": id, "kind": "player", "name": owner},
-		farm_markers.portrait_texture(id))
+	city_map.select_player({"id": "player:" + id, "farm_id": id, "kind": "player", "name": owner,
+		"lat": point.x, "lng": point.y}, farm_markers.portrait_texture(id))
 	_camera_dirty = true
 
 ## 城市地图玩家卡上的“拜访农场”：拉快照进只读访客实例（空间跳转）。
@@ -2090,6 +2090,10 @@ static func city_at(regions: Array, lat: float, lng: float, current_id: String) 
 	for r in regions:
 		if _bounds_contain(r, lat, lng, 0.0): return str(r.get("id", ""))
 	return ""
+
+## 坐标落在哪座已开通城市（当前城市享有滞回外扩）；都不在返回 ""。详情卡据此写城市名。
+func city_id_at(lat: float, lng: float) -> String:
+	return city_at(city_regions(), lat, lng, str(region.get("id", "")))
 
 ## 屏幕中心当前是否落在（已激活的）城市里——标题据此决定显示城市名还是瓦片地名。
 func in_active_city() -> bool:
