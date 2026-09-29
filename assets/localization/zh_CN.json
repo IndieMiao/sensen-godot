@@ -1799,5 +1799,6 @@
   "Sign in with Google": "通过 Google 登录",
   "Add a Google account to this phone first.": "请先在手机上添加 Google 账号。",
   "Sign in with Google isn't available on this phone.": "这台手机暂不支持 Google 登录。",
-  "Sign in with Google failed. Please try again.": "Google 登录失败，请重试。"
+  "Sign in with Google failed. Please try again.": "Google 登录失败，请重试。",
+  "or": "或"
 }

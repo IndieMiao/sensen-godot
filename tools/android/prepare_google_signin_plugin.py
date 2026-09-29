@@ -12,7 +12,7 @@ shutil.copyfile(ROOT / 'native/googleauth/android/GodotGoogleSignInPlugin.kt', t
 gradle = build / 'build.gradle'
 g = gradle.read_text()
 deps = ['androidx.credentials:credentials:1.3.0', 'androidx.credentials:credentials-play-services-auth:1.3.0',
-        'com.google.android.libraries.identity.googleid:googleid:1.1.1']
+        'com.google.android.libraries.identity.googleid:googleid:1.1.1', 'com.google.android.gms:play-services-base:18.5.0']
 missing = [d for d in deps if d not in g]
 if missing:
     block = '    // Sign in with Google (Credential Manager), GodotGoogleSignInPlugin.\n' + ''.join(f'    implementation "{d}"\n' for d in missing)

@@ -27,6 +27,10 @@ func _visible_fields(p: AccountPanel) -> Array:
 func _actions(p: AccountPanel) -> Array:
 	return p.find_child("Actions", true, false).get_children().map(func(b): return str(b.name))
 
+func _providers(p: AccountPanel) -> Array:
+	var row := p.find_child("Actions", true, false).get_node_or_null("Providers/Row")
+	return [] if row == null else row.get_children().map(func(b): return str(b.name))
+
 func _status(p: AccountPanel) -> String:
 	return (p.find_child("Status", true, false) as Label).text
 
@@ -170,12 +174,20 @@ func _restore_net() -> void:
 
 func test_apple_button_follows_the_primary_action_only_on_ios() -> void:
 	var p := _panel()
-	assert_array(_actions(p)).not_contains(["apple"])
+	assert_array(_actions(p)).not_contains(["Providers"])
 	AppleSignIn.force_available = true
 	p.set_mode("sign_in")
-	assert_array(_actions(p)).contains_exactly(["sign_in", "apple", "to_sign_up", "to_forgot"])
+	assert_array(_actions(p)).contains_exactly(["sign_in", "Providers", "to_sign_up", "to_forgot"])
+	assert_array(_providers(p)).is_equal(["apple"])
+	# Logo-only button: no text, an accessible name, and the Apple logo.
+	var apple: Button = p.action_button("apple")
+	assert_str(apple.text).is_empty()
+	assert_str(apple.tooltip_text).is_equal("Sign in with Apple")
+	assert_object(apple.icon).is_not_null()
 	p.set_mode("sign_up")
-	assert_str(_actions(p)[1]).is_equal("apple")
+	assert_str(_actions(p)[1]).is_equal("Providers")
+	# Replaced rows are freed at the end of the frame.
+	await get_tree().process_frame
 	p.queue_free()
 	_restore_net()
 
@@ -228,10 +240,13 @@ func test_password_less_account_hides_password_steps() -> void:
 func test_google_button_follows_apple_or_the_primary_action() -> void:
 	GoogleSignIn.force_available = true
 	var p := _panel()
-	assert_array(_actions(p)).contains_exactly(["sign_in", "google", "to_sign_up", "to_forgot"])
+	assert_array(_actions(p)).contains_exactly(["sign_in", "Providers", "to_sign_up", "to_forgot"])
+	assert_array(_providers(p)).is_equal(["google"])
 	AppleSignIn.force_available = true
 	p.set_mode("sign_in")
-	assert_array(_actions(p)).contains_exactly(["sign_in", "apple", "google", "to_sign_up", "to_forgot"])
+	assert_array(_providers(p)).is_equal(["apple", "google"])
+	assert_str(p.action_button("google").text).is_empty()
+	await get_tree().process_frame
 	p.queue_free()
 	GoogleSignIn.force_available = false
 	_restore_net()

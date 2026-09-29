@@ -10,8 +10,16 @@ const DEFAULT_WEB_CLIENT := "105022638066-s710gs2tsaikbkhbtvstdino7cq661go.apps.
 ## 测试与桌面预览可强制显示按钮。
 static var force_available := false
 
+static var _play_services := -1
+
+## 插件在、且手机有可用的 Google Play 服务才显示按钮；结果缓存，避免每次重画都跨 JNI。
 static func available() -> bool:
-	return force_available or Engine.has_singleton(SINGLETON)
+	if force_available: return true
+	if not Engine.has_singleton(SINGLETON): return false
+	if _play_services < 0:
+		var plugin := Engine.get_singleton(SINGLETON)
+		_play_services = 1 if plugin.has_method("isAvailable") and bool(plugin.isAvailable()) else 0
+	return _play_services == 1
 
 static func web_client_id() -> String:
 	return str(ProjectSettings.get_setting("sensen/auth/google_web_client_id", DEFAULT_WEB_CLIENT))

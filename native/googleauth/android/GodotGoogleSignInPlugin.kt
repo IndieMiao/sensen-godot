@@ -15,6 +15,8 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.credentials.exceptions.NoCredentialException
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import org.godotengine.godot.Godot
@@ -37,6 +39,17 @@ class GodotGoogleSignInPlugin(godot: Godot) : GodotPlugin(godot) {
     }
 
     private fun fail(code: String) = emit(JSONObject().put("ok", false).put("code", code))
+
+    /** 只有装了可用的 Google Play 服务才显示 Google 登录（国行手机常见没有）。 */
+    @UsedByGodot
+    fun isAvailable(): Boolean {
+        val act = activity ?: return false
+        return try {
+            GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(act) == ConnectionResult.SUCCESS
+        } catch (e: Throwable) {
+            false
+        }
+    }
 
     @UsedByGodot
     fun signIn(webClientId: String, nonceHash: String) {

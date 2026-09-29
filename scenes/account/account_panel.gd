@@ -320,13 +320,54 @@ func _texts(title: String, subtitle: String) -> void:
 
 ## iOS 上登录 / 注册页都给 Apple 登录，紧跟主按钮（App Store 4.8：与其它登录方式同等显眼）。
 func _with_apple(list: Array) -> Array:
-	var at := 1
-	if AppleSignIn.available():
-		list.insert(at, ["apple", "Sign in with Apple", "apple"])
-		at += 1
-	# Android: Google account sign-in (Credential Manager); same prominence as the email option.
-	if GoogleSignIn.available(): list.insert(at, ["google", "Sign in with Google"])
+	var providers := []
+	if AppleSignIn.available(): providers.append(["apple", "Sign in with Apple"])
+	# Android with Google Play services only: Google account sign-in (Credential Manager).
+	if GoogleSignIn.available(): providers.append(["google", "Sign in with Google"])
+	# Logo-only buttons in one row right under the primary action (Apple and Google both allow logo buttons).
+	if not providers.is_empty(): list.insert(1, ["providers", providers, "providers"])
 	return list
+
+const BRAND_ICONS := {"apple": "res://assets/ui/icons/brand/apple.svg", "google": "res://assets/ui/icons/brand/google.svg"}
+
+## "或"分隔线 + 一排圆形品牌按钮；按钮节点名仍是动作 id。
+func _provider_row(providers: Array) -> Control:
+	var box := VBoxContainer.new()
+	box.name = "Providers"
+	box.add_theme_constant_override("separation", 8)
+	var divider := GameUi.label(L10n.text("or"), 12, GameUi.MUTED)
+	divider.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(divider)
+	var row := HBoxContainer.new()
+	row.name = "Row"
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 18)
+	box.add_child(row)
+	for spec in providers:
+		var id: String = spec[0]
+		var b := Button.new()
+		b.name = id
+		b.tooltip_text = L10n.text(spec[1])
+		b.custom_minimum_size = Vector2(56, 56)
+		b.focus_mode = Control.FOCUS_NONE
+		b.icon = load(BRAND_ICONS[id]) as Texture2D
+		b.expand_icon = true
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.add_theme_constant_override("icon_max_width", 26)
+		# The theme tints button icons; brand logos keep their own colours.
+		for key in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color", "icon_hover_pressed_color", "icon_disabled_color"]:
+			b.add_theme_color_override(key, Color.WHITE)
+		var fill := Color.BLACK if id == "apple" else Color.WHITE
+		for state in ["normal", "hover", "pressed", "focus", "disabled"]:
+			var style := GameUi.surface(fill, 0, 28)
+			if id == "google":
+				style.border_color = Color(0.85, 0.85, 0.85)
+				style.set_border_width_all(1)
+			if state == "pressed": style.bg_color = fill.lightened(0.18) if id == "apple" else fill.darkened(0.06)
+			b.add_theme_stylebox_override(state, style)
+		b.pressed.connect(_on_action.bind(id))
+		row.add_child(b)
+	return box
 
 ## 每项 [动作 id, 文案, 样式]：accent 主按钮、danger 红色主按钮、danger_link 红字次按钮。
 func _set_actions(list: Array) -> void:
@@ -335,14 +376,14 @@ func _set_actions(list: Array) -> void:
 		c.queue_free()
 	for spec in list:
 		var style: String = spec[2] if spec.size() > 2 else ""
+		if style == "providers":
+			_actions.add_child(_provider_row(spec[1]))
+			continue
 		var b := GameUi.button("trash-2" if style == "danger_link" else "", L10n.text(spec[1]), "", style == "accent")
 		b.name = spec[0]
 		b.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size.y = 48 if style in ["accent", "danger"] else 44
 		if style == "danger": _paint_danger(b)
-		if style == "apple":
-			b.custom_minimum_size.y = 48
-			_paint_solid(b, Color.BLACK)
 		if style == "danger_link": b.add_theme_color_override("font_color", GameUi.CORAL)
 		b.pressed.connect(_on_action.bind(str(spec[0])))
 		_actions.add_child(b)
@@ -361,7 +402,8 @@ func _paint_solid(b: Button, fill: Color) -> void:
 		b.add_theme_color_override(color, Color.WHITE)
 
 func action_button(id: String) -> Button:
-	return _actions.get_node_or_null(id) as Button
+	var b := _actions.get_node_or_null(id) as Button
+	return b if b else _actions.get_node_or_null("Providers/Row/" + id) as Button
 
 func _submit_primary() -> void:
 	if _actions.get_child_count() > 0: _on_action(str(_actions.get_child(0).name))
@@ -374,7 +416,7 @@ func _say(message: String, ok := false) -> void:
 func _set_busy(value: bool) -> void:
 	busy = value
 	_close.disabled = value
-	for b in _actions.get_children(): (b as Button).disabled = value
+	for b in _actions.find_children("*", "Button", true, false): (b as Button).disabled = value
 
 func set_gate(on: bool) -> void:
 	gate = on

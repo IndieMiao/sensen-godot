@@ -14,6 +14,10 @@ const TOKYO := {"id": "gn-1850147", "name": "Tokyo", "country": "Japan", "center
 func _ready() -> void:
 	var out := OS.get_environment("ACCOUNT_SHOTS") if OS.has_environment("ACCOUNT_SHOTS") else "/tmp/account_preview"
 	DirAccess.make_dir_recursive_absolute(out)
+	# ACCOUNT_PREVIEW_PROVIDERS=1 shows the Apple and Google logo buttons as on a phone that has both.
+	if OS.get_environment("ACCOUNT_PREVIEW_PROVIDERS") == "1":
+		AppleSignIn.force_available = true
+		GoogleSignIn.force_available = true
 	var city: Control = (load("res://scenes/city_select/city_select.tscn") as PackedScene).instantiate()
 	add_child(city)
 	await _frames(4)
