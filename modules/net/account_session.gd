@@ -156,11 +156,17 @@ static func reset(client: ApiClient, p_email: String, code: String, password: St
 
 ## Apple 首次授权才给名字，顺带发上去作为默认昵称。
 static func apple_sign_in(client: ApiClient, identity_token: String, nonce: String, given_name := "", family_name := "", authorization_code := "") -> Dictionary:
-	return _result(await client.request("POST", "/auth/apple", {"identity_token": identity_token, "nonce": nonce,
-		"given_name": given_name, "family_name": family_name, "authorization_code": authorization_code}))
+	return await _post_once_more(client, "/auth/apple", {"identity_token": identity_token, "nonce": nonce,
+		"given_name": given_name, "family_name": family_name, "authorization_code": authorization_code})
 
 static func google_sign_in(client: ApiClient, id_token: String, nonce: String) -> Dictionary:
-	return _result(await client.request("POST", "/auth/google", {"id_token": id_token, "nonce": nonce}))
+	return await _post_once_more(client, "/auth/google", {"id_token": id_token, "nonce": nonce})
+
+## 第三方登录的 token 有效期内可重发：网络失败（没到服务器）时再试一次，服务端错误不重试。
+static func _post_once_more(client: ApiClient, path: String, body: Dictionary) -> Dictionary:
+	var result := _result(await client.request("POST", path, body))
+	if str(result.code) == "TRANSPORT": result = _result(await client.request("POST", path, body))
+	return result
 
 static func me(client: ApiClient) -> Dictionary:
 	return _result(await client.request("GET", "/users/me"))

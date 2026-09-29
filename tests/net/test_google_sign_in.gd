@@ -26,3 +26,15 @@ func test_errors_have_player_facing_text() -> void:
 	assert_str(AccountSession.describe("GOOGLE_CANCELED")).is_empty()
 	assert_str(AccountSession.describe("GOOGLE_NO_ACCOUNT")).contains("Google account")
 	assert_str(AccountSession.describe("GOOGLE_TOKEN_BAD_AUDIENCE")).is_equal("Sign in with Google failed. Please try again.")
+
+func test_sign_in_retries_once_when_the_request_never_reached_the_server() -> void:
+	var t := FakeTransport.new([{"error": "timeout"}, {"status": 201, "json": {"token": "g", "user_id": "u"}}])
+	var client := ApiClient.new("https://example.test/v1", t.callable())
+	var r := await AccountSession.google_sign_in(client, "id", "n".repeat(32))
+	assert_bool(r.ok).is_true()
+	assert_int(t.requests.size()).is_equal(2)
+	# Server answers are not retried.
+	var t2 := FakeTransport.new([{"status": 401, "json": {"code": "GOOGLE_TOKEN_EXPIRED"}}, {"status": 201, "json": {}}])
+	var r2 := await AccountSession.google_sign_in(ApiClient.new("https://example.test/v1", t2.callable()), "id", "n".repeat(32))
+	assert_str(r2.code).is_equal("GOOGLE_TOKEN_EXPIRED")
+	assert_int(t2.requests.size()).is_equal(1)

@@ -9,6 +9,7 @@ extends RefCounted
 
 const DEFAULT_BASE := "https://farm.sensenjoy.cn/v1"
 const TIMEOUT_S := 10.0
+const AUTH_TIMEOUT_S := 30.0
 const INSTALL_KEY_PATH := "user://install_key.txt"
 
 ## 一次请求的结果。`ok` 只表示**传输层**成功；业务失败（4xx/5xx）时 ok 仍为 true，
@@ -84,6 +85,8 @@ static func make_http_transport(host: Node) -> Callable:
 	return func(method: String, url: String, headers: PackedStringArray, body: String) -> Response:
 		var req := HTTPRequest.new()
 		req.timeout = TIMEOUT_S
+		# Sign-in runs right after a system sheet closes and often over a slow VPN; give it longer (vivo 2026-09-29).
+		if "/auth/" in url: req.timeout = AUTH_TIMEOUT_S
 		if method == "POST" and url.ends_with("/relocation/preview"): req.timeout = 45.0
 		if method == "POST" and url.ends_with("/farms"):
 			var payload = JSON.parse_string(body)
