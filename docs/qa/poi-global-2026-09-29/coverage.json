@@ -1,0 +1,322 @@
+{
+ "san_francisco": {
+  "pois": 6469,
+  "all_pct": 54,
+  "rank3": 1036,
+  "rank3_pct": 71,
+  "top_missing": [
+   [
+    "marker",
+    212
+   ],
+   [
+    "college",
+    22
+   ],
+   [
+    "viewpoint",
+    10
+   ],
+   [
+    "bicycle",
+    8
+   ],
+   [
+    "attraction",
+    8
+   ],
+   [
+    "monument",
+    7
+   ],
+   [
+    "hospital",
+    4
+   ],
+   [
+    "laundry",
+    4
+   ]
+  ]
+ },
+ "new_york": {
+  "pois": 8271,
+  "all_pct": 62,
+  "rank3": 992,
+  "rank3_pct": 79,
+  "top_missing": [
+   [
+    "marker",
+    134
+   ],
+   [
+    "attraction",
+    25
+   ],
+   [
+    "college",
+    19
+   ],
+   [
+    "monument",
+    9
+   ],
+   [
+    "hospital",
+    5
+   ],
+   [
+    "bridge",
+    4
+   ],
+   [
+    "bicycle",
+    3
+   ],
+   [
+    "viewpoint",
+    3
+   ]
+  ]
+ },
+ "tokyo": {
+  "pois": 23104,
+  "all_pct": 6,
+  "rank3": 1751,
+  "rank3_pct": 71,
+  "top_missing": [
+   [
+    "marker",
+    389
+   ],
+   [
+    "place-of-worship",
+    28
+   ],
+   [
+    "post",
+    21
+   ],
+   [
+    "college",
+    19
+   ],
+   [
+    "hospital",
+    18
+   ],
+   [
+    "police",
+    7
+   ],
+   [
+    "religious-buddhist",
+    6
+   ],
+   [
+    "pharmacy",
+    6
+   ]
+  ]
+ },
+ "london": {
+  "pois": 10384,
+  "all_pct": 57,
+  "rank3": 1121,
+  "rank3_pct": 70,
+  "top_missing": [
+   [
+    "marker",
+    161
+   ],
+   [
+    "monument",
+    62
+   ],
+   [
+    "college",
+    34
+   ],
+   [
+    "attraction",
+    32
+   ],
+   [
+    "hospital",
+    22
+   ],
+   [
+    "castle",
+    8
+   ],
+   [
+    "bridge",
+    6
+   ],
+   [
+    "cinema",
+    4
+   ]
+  ]
+ },
+ "paris": {
+  "pois": 18808,
+  "all_pct": 62,
+  "rank3": 1260,
+  "rank3_pct": 84,
+  "top_missing": [
+   [
+    "college",
+    48
+   ],
+   [
+    "marker",
+    44
+   ],
+   [
+    "attraction",
+    42
+   ],
+   [
+    "bridge",
+    21
+   ],
+   [
+    "monument",
+    17
+   ],
+   [
+    "bicycle",
+    8
+   ],
+   [
+    "hospital",
+    5
+   ],
+   [
+    "castle",
+    4
+   ]
+  ]
+ },
+ "seattle": {
+  "pois": 4881,
+  "all_pct": 46,
+  "rank3": 906,
+  "rank3_pct": 64,
+  "top_missing": [
+   [
+    "marker",
+    279
+   ],
+   [
+    "attraction",
+    9
+   ],
+   [
+    "parking-garage",
+    7
+   ],
+   [
+    "college",
+    7
+   ],
+   [
+    "parking",
+    6
+   ],
+   [
+    "monument",
+    4
+   ],
+   [
+    "hospital",
+    4
+   ],
+   [
+    "stadium",
+    3
+   ]
+  ]
+ },
+ "chicago": {
+  "pois": 4417,
+  "all_pct": 51,
+  "rank3": 968,
+  "rank3_pct": 63,
+  "top_missing": [
+   [
+    "marker",
+    246
+   ],
+   [
+    "monument",
+    19
+   ],
+   [
+    "bridge",
+    18
+   ],
+   [
+    "college",
+    17
+   ],
+   [
+    "attraction",
+    12
+   ],
+   [
+    "parking",
+    11
+   ],
+   [
+    "bicycle",
+    11
+   ],
+   [
+    "parking-garage",
+    4
+   ]
+  ]
+ },
+ "sydney": {
+  "pois": 6256,
+  "all_pct": 54,
+  "rank3": 892,
+  "rank3_pct": 71,
+  "top_missing": [
+   [
+    "marker",
+    146
+   ],
+   [
+    "monument",
+    34
+   ],
+   [
+    "attraction",
+    19
+   ],
+   [
+    "viewpoint",
+    12
+   ],
+   [
+    "college",
+    9
+   ],
+   [
+    "hospital",
+    8
+   ],
+   [
+    "bridge",
+    7
+   ],
+   [
+    "toilet",
+    5
+   ]
+  ]
+ }
+}
