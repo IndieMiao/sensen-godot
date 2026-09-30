@@ -85,6 +85,14 @@ try:
         adb('shell', 'wm', 'size', '390x844')
         capture('gourd', 'portrait')
         adb('shell', 'wm', 'size', 'reset')
+        # Android's resize education can cover the surface without appearing
+        # in the active app's UI tree. Record from a fresh landscape activity
+        # after all size changes; keep this isolated package's files intact.
+        activity = adb('shell', 'cmd', 'package', 'resolve-activity', '--brief', PACKAGE).decode().strip().splitlines()[-1]
+        assert activity.startswith(PACKAGE + '/'), activity
+        adb('shell', 'am', 'force-stop', PACKAGE)
+        adb('shell', 'am', 'start', '-W', '-n', activity)
+        print('RECORDING_COLD_START', activity, flush=True)
     motion = capture('gourd', 'reference', True)
     dismiss_system_tips()
     performance = wait_json('pond-art/performance.json', lambda r: r['request_id'] == motion['request_id'])

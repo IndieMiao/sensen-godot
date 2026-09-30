@@ -24,10 +24,12 @@ uniform float wave_strength : hint_range(0.0, 2.0) = 1.0;
 uniform float normal_strength : hint_range(0.0, 1.0) = 0.30;
 uniform float caustic_depth_falloff : hint_range(0.5, 4.0) = 1.35;
 uniform float caustic_scale : hint_range(0.1, 0.5) = 0.22;
-uniform float caustic_distortion : hint_range(0.0, 0.25) = 0.09;
+uniform float caustic_distortion : hint_range(0.0, 0.25) = 0.13;
+uniform float caustic_pan_speed : hint_range(0.0, 2.0) = 0.25;
+uniform float caustic_motion_speed : hint_range(0.0, 2.0) = 1.0;
 uniform float caustic_softness : hint_range(0.0, 4.0) = 1.2;
-uniform float caustic_layer_blend : hint_range(0.0, 1.0) = 0.30;
-uniform float caustic_strength : hint_range(0.0, 2.0) = 1.0;
+uniform float caustic_layer_blend : hint_range(0.0, 1.0) = 1.0;
+uniform float caustic_strength : hint_range(0.0, 4.0) = 2.2;
 uniform float surface_roughness : hint_range(0.12, 0.45) = 0.31;
 uniform float film_cutoff : hint_range(0.25, 0.60) = 0.44;
 uniform float film_contrast : hint_range(0.0, 1.0) = 0.30;
@@ -112,14 +114,19 @@ void fragment() {
     color *= 1.0 - pad_shadow * 0.20;
 
     // Mobile adaptation of the supplied CausticsProjector: two monochrome
-    // samples in this water pass. Reuse the wave field and atlas depth;
-    // no scene-depth projection or repeated wave evaluation is needed.
-    // Alpha holds a broader wave band, so the light bends across whole cells
-    // without inheriting fine surface ripples. It costs no extra texture read.
-    vec2 caustic_warp = (vec2(field_a.a, field_b.a) - vec2(0.5)) * caustic_distortion * wave_strength;
-    vec2 light_uv_a = p * caustic_scale + caustic_warp + t * vec2(0.016, -0.009);
+    // samples in this water pass, using the existing atlas depth. Three broad
+    // waves provide bounded deformation without an external ocean function.
+    // Independently phased broad waves bend the light even with panning off.
+    // Unlike translating a smooth noise map, their combined shape changes.
+    float caustic_time = t * caustic_motion_speed;
+    float bend_a = sin(dot(p, vec2(1.30, 0.80)) + caustic_time * 0.90);
+    float bend_b = sin(dot(p, vec2(-0.70, 1.50)) - caustic_time * 1.25);
+    float bend_c = sin(dot(p, vec2(0.55, -1.05)) + caustic_time * 1.65 + 0.9);
+    vec2 caustic_warp = vec2(bend_a + bend_c * 0.35, bend_b - bend_c * 0.35)
+                       * caustic_distortion * wave_strength;
+    vec2 light_uv_a = p * caustic_scale + caustic_warp + t * caustic_pan_speed * vec2(0.016, -0.009);
     vec2 light_uv_b = rotation * p * (caustic_scale * 0.93) - caustic_warp * 0.75
-                   + vec2(0.37, 0.19) + t * vec2(-0.013, 0.011);
+                   + vec2(0.37, 0.19) + t * caustic_pan_speed * vec2(-0.013, 0.011);
     // Retain the screen-footprint LOD when zoomed out; an explicit LOD of 0
     // would shimmer in portrait views. Art softness never divides brightness.
     vec2 caustic_size = vec2(textureSize(caustics, 0));
@@ -131,9 +138,9 @@ void fragment() {
     float caustic_lod = max(0.5 * log2(max(footprint, 1.0)), caustic_softness + smoothstep(0.25, 1.8, depth) * 0.8);
     float web_a = textureLod(caustics, light_uv_a, caustic_lod).r;
     float web_b = textureLod(caustics, light_uv_b, caustic_lod).r;
-    // A continuous primary web keeps the strict min blend from breaking the
-    // light into isolated dots. Intersections still brighten and dissolve.
-    float web = mix(web_a, min(web_a, web_b) * 2.0, caustic_layer_blend);
+    // Broad soft light bands intersect, focus and disappear. Do not retain a
+    // dominant single-layer skeleton: that makes the motion read as panning.
+    float web = mix(web_a, min(web_a, web_b), caustic_layer_blend);
     color += vec3(0.14, 0.38, 0.36) * web * caustic_strength
            * exp(-depth * caustic_depth_falloff) * smoothstep(0.03, 0.20, shore);
     float fish = 0.0;

@@ -95,7 +95,9 @@ def bake_caustics():
             second = np.minimum(second,np.maximum(nearest,d))
             nearest = np.minimum(nearest,d)
     ridge = second-nearest
-    web = (1-smooth(.012,.105,ridge))*.62+(1-smooth(.005,.027,ridge))*.25
+    # Broad falloff around each focus band survives dual-layer intersection;
+    # the former thin edge network reduced min blending to isolated pinpoints.
+    web = np.exp(-(ridge/.25)**2)*.56 + np.exp(-(ridge/.075)**2)*.30
     Image.fromarray(np.uint8(np.clip(web,0,1)*255)).filter(ImageFilter.GaussianBlur(.75)).save(OUT/'caustic_web.png')
 
 if __name__ == '__main__':

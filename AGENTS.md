@@ -1,5 +1,22 @@
 # Product Direction
 
+- Caustic motion corrected on 2026-09-30 after the user said 2d3797d still
+  looked like panning. The original web GIF was retrieved and reviewed. The
+  70% primary skeleton / slow alpha warp is superseded by full intersection
+  of broader light bands, three independently phased broad waves, 25% panning
+  and strength 2.2. Preserve the 30% surface normal, palette and surface glints.
+  Two caustic texture reads remain; three sine evaluations are added, with no
+  extra projection pass. No-pan grayscale controls still morph; freezing both
+  panning and wave phase yields identical pixels in the checked water region.
+  12 pond checks, five Metal/Vulkan pairs and full APK readback passed. Final
+  emulator samples are 24 x 60 FPS / 32 draws, not physical GPU timing.
+  Android resize education was absent from the active UI tree; the QA runner
+  now cold-starts the isolated app after size changes before recording. Final
+  video is unobscured. The image and synchronized before/after + no-pan video
+  are sent/readback-verified in Gensen Feishu self review. No APK/phone/release.
+  See docs/design/pond-caustics-motion-2026-09-30.md and
+  docs/qa/pond-caustics-motion-2026-09-30.md. All prior tags/commits remain.
+
 - Mobile caustics integrated on 2026-09-30 after the user supplied the
   CausticsProjector HLSL. Two monochrome samples now share the existing water
   pass and atlas depth. A broad wave band is baked into ripple texture alpha;

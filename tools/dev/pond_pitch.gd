@@ -10,6 +10,10 @@ var _capture := false
 var _shape := "gourd"
 var _shot := "hero"
 var _probe := ""
+var _water_shader_path := ""
+var _caustic_texture_path := ""
+var _sequence_frames := 0
+var _sequence_step := 1.0 / 24.0
 var _materials: Array[ShaderMaterial] = []
 var _water_hash := ""
 var _ready_to_measure := false
@@ -38,9 +42,14 @@ func _ready() -> void:
 		if arg.begins_with("--shape="): _shape = arg.trim_prefix("--shape=")
 		if arg.begins_with("--shot="): _shot = arg.trim_prefix("--shot=")
 		if arg.begins_with("--probe="): _probe = arg.trim_prefix("--probe=")
+		if arg.begins_with("--water-shader-path="): _water_shader_path = arg.trim_prefix("--water-shader-path=")
+		if arg.begins_with("--caustic-texture-path="): _caustic_texture_path = arg.trim_prefix("--caustic-texture-path=")
+		if arg.begins_with("--sequence-frames="): _sequence_frames = clampi(int(arg.trim_prefix("--sequence-frames=")), 0, 600)
+		if arg.begins_with("--sequence-step="): _sequence_step = clampf(float(arg.trim_prefix("--sequence-step=")), 0.001, 1.0)
 		if arg.begins_with("--time="): _time = float(arg.trim_prefix("--time="))
 		if arg == "--capture": _capture = true
 		if arg == "--motion": _fixed = false
+	if _sequence_frames > 0: _fixed = true
 	_run.call_deferred()
 
 func _process(delta: float) -> void:
@@ -107,24 +116,45 @@ func _run() -> void:
 	scene.mover.stop()
 	var sun := scene.get_node("PondSun") as DirectionalLight3D
 	var water := scene.get_node(str(entry.id)) as FishingWater
+	if not _water_shader_path.is_empty():
+		var reference_shader := Shader.new()
+		reference_shader.code = FileAccess.get_file_as_string(_water_shader_path)
+		assert(not reference_shader.code.is_empty())
+		water.water_material.shader = reference_shader
+	if not _caustic_texture_path.is_empty():
+		var reference_image := Image.load_from_file(_caustic_texture_path)
+		assert(reference_image != null)
+		reference_image.generate_mipmaps()
+		water.water_material.set_shader_parameter("caustics", ImageTexture.create_from_image(reference_image))
 	if _probe == "sun-off": sun.light_specular = 0.0
 	if _probe == "env-off": scene.environment.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	if _probe == "flat": water.water_material.set_shader_parameter("wave_strength", 0.0)
 	if _probe == "caustics-off": water.water_material.set_shader_parameter("caustic_strength", 0.0)
 	if _probe == "caustics-no-warp": water.water_material.set_shader_parameter("caustic_distortion", 0.0)
+	if _probe == "caustics-no-pan": water.water_material.set_shader_parameter("caustic_pan_speed", 0.0)
+	if _probe.begins_with("caustics-only"):
+		scene.environment.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
+		water.water_material.set_shader_parameter("shimmer_strength", 0.0)
+		if _probe == "caustics-only-no-pan": water.water_material.set_shader_parameter("caustic_pan_speed", 0.0)
+		if _probe == "caustics-only-static":
+			water.water_material.set_shader_parameter("caustic_pan_speed", 0.0)
+			water.water_material.set_shader_parameter("caustic_motion_speed", 0.0)
 	if _probe == "caustics-primary": water.water_material.set_shader_parameter("caustic_layer_blend", 0.0)
 	if _probe == "caustics-soft": water.water_material.set_shader_parameter("caustic_softness", 3.0)
 	if _probe == "env-rotate": scene.environment.sky_rotation.y = PI * .5
 	if _probe == "sun-rotate":
 		sun.rotation_degrees.y += 60.0
 		water.water_material.set_shader_parameter("sun_direction", sun.global_basis.z.normalized())
-	_water_hash = FileAccess.get_sha256(scene.get_node(str(entry.id)).water_material.shader.resource_path)
+	_water_hash = FileAccess.get_sha256(_water_shader_path if not _water_shader_path.is_empty() else water.water_material.shader.resource_path)
 	for node in scene.find_children("*", "GeometryInstance3D", true, false):
 		if node.material_override is ShaderMaterial:
 			var material: ShaderMaterial = node.material_override
 			if material in _materials or not material.shader.code.contains("TIME"): continue
 			var controlled := Shader.new()
 			controlled.code = material.shader.code.replace("TIME", "art_time").replace("shader_type spatial;", "shader_type spatial;\nuniform float art_time = 12.0;")
+			if material == water.water_material and _probe.begins_with("caustics-only"):
+				controlled.code = controlled.code.replace("ALBEDO = color * 0.88;", "ALBEDO = vec3(0.0);").replace("EMISSION = color * 0.12;", "EMISSION = vec3(web);")
+				controlled.code = controlled.code.replace("float depth = bed_sample.a * 2.5;", "float depth = 0.4;")
 			material.shader = controlled
 			_materials.append(material)
 	var target := Vector3(6.7, 0, -6.9)
@@ -147,6 +177,7 @@ func _run() -> void:
 	assert(screenshot.save_png(_output.path_join(_shape + "-" + _shot + ".png")) == OK)
 	var report := {
 		"request_id": _request_id,
+		"sequence_frames": _sequence_frames, "sequence_step": _sequence_step,
 		"shape": _shape, "shot": _shot, "shader_time": _time, "engine": Engine.get_version_info().string,
 		"probe": _probe, "sun_specular": sun.light_specular,
 		"wave_strength": _shader_uniform(water.water_material, &"wave_strength"),
@@ -154,6 +185,8 @@ func _run() -> void:
 		"caustic_depth_falloff": _shader_uniform(water.water_material, &"caustic_depth_falloff"),
 		"caustic_scale": _shader_uniform(water.water_material, &"caustic_scale"),
 		"caustic_distortion": _shader_uniform(water.water_material, &"caustic_distortion"),
+		"caustic_pan_speed": _shader_uniform(water.water_material, &"caustic_pan_speed"),
+		"caustic_motion_speed": _shader_uniform(water.water_material, &"caustic_motion_speed"),
 		"caustic_softness": _shader_uniform(water.water_material, &"caustic_softness"),
 		"caustic_layer_blend": _shader_uniform(water.water_material, &"caustic_layer_blend"),
 		"caustic_strength": _shader_uniform(water.water_material, &"caustic_strength"),
@@ -186,7 +219,18 @@ func _run() -> void:
 	print("POND_ART_READY ", JSON.stringify(report))
 	_ready_to_measure = true
 	_loading = false
-	if _capture: get_tree().quit()
+	if _sequence_frames > 0:
+		_ready_to_measure = false
+		var start_time := _time
+		for frame in _sequence_frames:
+			_time = start_time + frame * _sequence_step
+			for material in _materials: material.set_shader_parameter("art_time", _time)
+			await get_tree().process_frame
+			await RenderingServer.frame_post_draw
+			assert(get_viewport().get_texture().get_image().save_png(_output.path_join("frame-%04d.png" % frame)) == OK)
+		print("POND_ART_SEQUENCE ", _sequence_frames, " frames, step ", _sequence_step)
+		get_tree().quit()
+	elif _capture: get_tree().quit()
 
 func _texture_image_hash(material: ShaderMaterial, key: StringName) -> String:
 	# Exported APKs contain imported textures, not the source PNG files.
