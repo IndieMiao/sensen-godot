@@ -297,6 +297,29 @@ final class JourneyDeviceUITests: XCTestCase {
         XCTAssertTrue(opened, "TestFlight has not confirmed installation with Open")
     }
 
+    /// Scripted walk for release checks: JOURNEY_STEPS (TEST_RUNNER_JOURNEY_STEPS via xcodebuild) is
+    /// ";"-separated shot:<name> | tap:<x>,<y> (normalized) | wait:<seconds>. Each tap is chosen
+    /// from the previous screenshot; the app must be in the foreground or the walk stops.
+    func testScriptedSteps() {
+        let steps = ProcessInfo.processInfo.environment["JOURNEY_STEPS"] ?? "shot:current"
+        app.activate()
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 15))
+        for step in steps.split(separator: ";") {
+            let parts = step.split(separator: ":", maxSplits: 1).map(String.init)
+            guard parts.count == 2 else { continue }
+            switch parts[0] {
+            case "shot": capture(parts[1])
+            case "wait": sleep(UInt32(parts[1]) ?? 1)
+            case "tap":
+                XCTAssertEqual(app.state, .runningForeground, "Journey left the foreground; refusing to tap")
+                let xy = parts[1].split(separator: ",").compactMap { Double($0) }
+                guard xy.count == 2 else { continue }
+                app.coordinate(withNormalizedOffset: CGVector(dx: xy[0], dy: xy[1])).tap()
+            default: continue
+            }
+        }
+    }
+
     private func capture(_ name: String, application: XCUIApplication? = nil) {
         let screenshot = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
         screenshot.name = name
