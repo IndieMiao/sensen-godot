@@ -66,7 +66,7 @@ def dismiss_system_tips():
         (OUT / f'system-ui-{attempt}.xml').write_text(xml)
         tree = ET.fromstring(xml)
         buttons = [n for n in tree.iter('node')
-                   if n.get('package') == 'com.android.systemui'
+                   if n.get('package', '').startswith('com.android.')
                    and n.get('text') == 'Got it' and n.get('clickable') == 'true']
         if not buttons:
             return
@@ -90,6 +90,9 @@ try:
     performance = wait_json('pond-art/performance.json', lambda r: r['request_id'] == motion['request_id'])
     (OUT / 'performance.json').write_text(json.dumps(performance, indent=2))
     print('PERFORMANCE', [s['fps'] for s in performance['samples']], flush=True)
+    # Rotation / size changes can trigger Android education after the first
+    # check. Inspect again immediately before recording, using fresh UI bounds.
+    dismiss_system_tips()
     video = '/sdcard/Download/gensen-pond-art.mp4'
     (OUT / 'before-record.png').write_bytes(adb('exec-out', 'screencap', '-p'))
     adb('shell', 'screenrecord', '--size', '1280x800', '--bit-rate', '8000000', '--time-limit', '12', video)

@@ -110,6 +110,10 @@ func _run() -> void:
 	if _probe == "sun-off": sun.light_specular = 0.0
 	if _probe == "env-off": scene.environment.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	if _probe == "flat": water.water_material.set_shader_parameter("wave_strength", 0.0)
+	if _probe == "caustics-off": water.water_material.set_shader_parameter("caustic_strength", 0.0)
+	if _probe == "caustics-no-warp": water.water_material.set_shader_parameter("caustic_distortion", 0.0)
+	if _probe == "caustics-primary": water.water_material.set_shader_parameter("caustic_layer_blend", 0.0)
+	if _probe == "caustics-soft": water.water_material.set_shader_parameter("caustic_softness", 3.0)
 	if _probe == "env-rotate": scene.environment.sky_rotation.y = PI * .5
 	if _probe == "sun-rotate":
 		sun.rotation_degrees.y += 60.0
@@ -148,6 +152,11 @@ func _run() -> void:
 		"wave_strength": _shader_uniform(water.water_material, &"wave_strength"),
 		"normal_strength": _shader_uniform(water.water_material, &"normal_strength"),
 		"caustic_depth_falloff": _shader_uniform(water.water_material, &"caustic_depth_falloff"),
+		"caustic_scale": _shader_uniform(water.water_material, &"caustic_scale"),
+		"caustic_distortion": _shader_uniform(water.water_material, &"caustic_distortion"),
+		"caustic_softness": _shader_uniform(water.water_material, &"caustic_softness"),
+		"caustic_layer_blend": _shader_uniform(water.water_material, &"caustic_layer_blend"),
+		"caustic_strength": _shader_uniform(water.water_material, &"caustic_strength"),
 		"surface_roughness": _shader_uniform(water.water_material, &"surface_roughness"),
 		"film_cutoff": _shader_uniform(water.water_material, &"film_cutoff"),
 		"film_contrast": _shader_uniform(water.water_material, &"film_contrast"),
@@ -169,6 +178,8 @@ func _run() -> void:
 		"shadow_size": ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/size"),
 		"shadow_filter": ProjectSettings.get_setting_with_override("rendering/lights_and_shadows/directional_shadow/soft_shadow_filter_quality"),
 		"catalog_sha256": SystemPonds.revision(),
+		"ripple_texture_image_sha256": _texture_image_hash(water.water_material, &"ripple_field"),
+		"caustic_texture_image_sha256": _texture_image_hash(water.water_material, &"caustics"),
 		"water_shader_sha256": _water_hash
 	}
 	FileAccess.open(_output.path_join(_shape + "-" + _shot + ".json"), FileAccess.WRITE).store_string(JSON.stringify(report, "\t"))
@@ -176,6 +187,14 @@ func _run() -> void:
 	_ready_to_measure = true
 	_loading = false
 	if _capture: get_tree().quit()
+
+func _texture_image_hash(material: ShaderMaterial, key: StringName) -> String:
+	# Exported APKs contain imported textures, not the source PNG files.
+	var texture := material.get_shader_parameter(key) as Texture2D
+	var hash_context := HashingContext.new()
+	hash_context.start(HashingContext.HASH_SHA256)
+	hash_context.update(texture.get_image().get_data())
+	return hash_context.finish().hex_encode()
 
 func _shader_uniform(material: ShaderMaterial, key: StringName) -> Variant:
 	var value: Variant = material.get_shader_parameter(key)

@@ -1,5 +1,22 @@
 # Product Direction
 
+- Mobile caustics integrated on 2026-09-30 after the user supplied the
+  CausticsProjector HLSL. Two monochrome samples now share the existing water
+  pass and atlas depth. A broad wave band is baked into ripple texture alpha;
+  RGB height/normals stay byte-identical, preserving the weak-normal palette
+  and shimmer. Two differently moving layers deform with that band; retain a
+  continuous primary web and 30% intersection blend. Screen-footprint/depth
+  Mip softness is independent of brightness. No RGB split, extra scene-depth
+  read, projection pass or repeated external wave function. 12 pond checks,
+  five matched Metal/Vulkan views and full QA APK/texture readback passed.
+  Final emulator samples are 24 x 60 FPS with the same 32 draw calls; no
+  physical GPU timing or phone/production release. The obscured first video
+  was discarded; QA now rechecks delayed Android tips before recording.
+  See docs/design/pond-caustics-mobile-2026-09-30.md and
+  docs/qa/pond-caustics-mobile-2026-09-30.md. Earlier tag and 7abcbc4 remain.
+  The comparison and unobscured final 12s video are sent/readback-verified in
+  the authorized Gensen Feishu self review chat; no APK delivery.
+
 - Pond weak-normal comparison on 2026-09-30: user requested preserving the
   layered-water version before reducing surface fragmentation and extending
   caustics. The full baseline is committed as e89107a with local annotated tag

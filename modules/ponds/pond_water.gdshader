@@ -23,6 +23,11 @@ uniform float wave_strength : hint_range(0.0, 2.0) = 1.0;
 // Normal amplitude is independent of the film / sparkle height thresholds.
 uniform float normal_strength : hint_range(0.0, 1.0) = 0.30;
 uniform float caustic_depth_falloff : hint_range(0.5, 4.0) = 1.35;
+uniform float caustic_scale : hint_range(0.1, 0.5) = 0.22;
+uniform float caustic_distortion : hint_range(0.0, 0.25) = 0.09;
+uniform float caustic_softness : hint_range(0.0, 4.0) = 1.2;
+uniform float caustic_layer_blend : hint_range(0.0, 1.0) = 0.30;
+uniform float caustic_strength : hint_range(0.0, 2.0) = 1.0;
 uniform float surface_roughness : hint_range(0.12, 0.45) = 0.31;
 uniform float film_cutoff : hint_range(0.25, 0.60) = 0.44;
 uniform float film_contrast : hint_range(0.0, 1.0) = 0.30;
@@ -59,19 +64,17 @@ void fragment() {
     vec2 pond_uv = vec2(p.x, -p.y) / pond_extent;
     float shore = texture(pond_shore, pond_uv).r * 2.0;
     float t = TIME * flow_speed;
-    // Long, low waves. Independent phases deform instead of sliding a map.
-    vec2 warp = vec2(sin(p.x * 1.4 + p.y * 0.8 + t * 0.62) + 0.45 * sin(p.y * 2.3 - t * 0.47),
-                     cos(p.y * 1.6 - p.x * 0.7 + t * 0.51) + 0.40 * cos(p.x * 2.5 + t * 0.39));
     // Two differently moving copies create a changing scalar field, following
     // the layered-texture/two-threshold technique in Josh's UE5 breakdown.
     // Shapes grow, join and dissolve; there are no individually moving discs.
-    vec3 field_a = texture(ripple_field, p * 0.42 + t * vec2(0.025, -0.015)).rgb;
+    vec4 field_a = texture(ripple_field, p * 0.42 + t * vec2(0.025, -0.015));
     mat2 rotation = mat2(vec2(0.8, 0.6), vec2(-0.6, 0.8));
-    vec3 field_b = texture(ripple_field, rotation * p * 0.49 + vec2(0.37, 0.19) + t * vec2(-0.021, 0.027)).rgb;
+    vec4 field_b = texture(ripple_field, rotation * p * 0.49 + vec2(0.37, 0.19) + t * vec2(-0.021, 0.027));
     float height = 0.5 + (field_a.r * 0.55 + field_b.r * 0.45 - 0.5) * wave_strength;
     vec2 gradient_a = (field_a.gb * 2.0 - 1.0) * 18.0 * 0.42;
     vec2 gradient_b = transpose(rotation) * ((field_b.gb * 2.0 - 1.0) * 18.0 * 0.49);
-    vec2 slope = (gradient_a * 0.55 + gradient_b * 0.45) * 0.055 * wave_strength * normal_strength;
+    vec2 surface_gradient = gradient_a * 0.55 + gradient_b * 0.45;
+    vec2 slope = surface_gradient * 0.055 * wave_strength * normal_strength;
     slope *= smoothstep(0.02, 0.40, shore);
     float threshold_aa = max(fwidth(height) * 1.25, 0.004);
     // A soft film transition avoids flat reflection islands after lowering
@@ -108,11 +111,31 @@ void fragment() {
     }
     color *= 1.0 - pad_shadow * 0.20;
 
-    // Coherent cellular caustics expand, compress and curve with the waves.
-    vec2 light_uv = p * 0.235 + warp * 0.065 + vec2(sin(p.y * 3.7 + t * 0.37), cos(p.x * 3.4 - t * 0.41)) * 0.015;
-    float web = texture(caustics, light_uv).r;
-    float pulse = 0.82 + 0.18 * sin(p.x * 1.2 - p.y * 0.7 + t * 0.8);
-    color += vec3(0.14, 0.38, 0.36) * web * pulse * exp(-depth * caustic_depth_falloff) * smoothstep(0.03, 0.20, shore);
+    // Mobile adaptation of the supplied CausticsProjector: two monochrome
+    // samples in this water pass. Reuse the wave field and atlas depth;
+    // no scene-depth projection or repeated wave evaluation is needed.
+    // Alpha holds a broader wave band, so the light bends across whole cells
+    // without inheriting fine surface ripples. It costs no extra texture read.
+    vec2 caustic_warp = (vec2(field_a.a, field_b.a) - vec2(0.5)) * caustic_distortion * wave_strength;
+    vec2 light_uv_a = p * caustic_scale + caustic_warp + t * vec2(0.016, -0.009);
+    vec2 light_uv_b = rotation * p * (caustic_scale * 0.93) - caustic_warp * 0.75
+                   + vec2(0.37, 0.19) + t * vec2(-0.013, 0.011);
+    // Retain the screen-footprint LOD when zoomed out; an explicit LOD of 0
+    // would shimmer in portrait views. Art softness never divides brightness.
+    vec2 caustic_size = vec2(textureSize(caustics, 0));
+    vec2 dx_a = dFdx(light_uv_a) * caustic_size;
+    vec2 dy_a = dFdy(light_uv_a) * caustic_size;
+    vec2 dx_b = dFdx(light_uv_b) * caustic_size;
+    vec2 dy_b = dFdy(light_uv_b) * caustic_size;
+    float footprint = max(max(dot(dx_a, dx_a), dot(dy_a, dy_a)), max(dot(dx_b, dx_b), dot(dy_b, dy_b)));
+    float caustic_lod = max(0.5 * log2(max(footprint, 1.0)), caustic_softness + smoothstep(0.25, 1.8, depth) * 0.8);
+    float web_a = textureLod(caustics, light_uv_a, caustic_lod).r;
+    float web_b = textureLod(caustics, light_uv_b, caustic_lod).r;
+    // A continuous primary web keeps the strict min blend from breaking the
+    // light into isolated dots. Intersections still brighten and dissolve.
+    float web = mix(web_a, min(web_a, web_b) * 2.0, caustic_layer_blend);
+    color += vec3(0.14, 0.38, 0.36) * web * caustic_strength
+           * exp(-depth * caustic_depth_falloff) * smoothstep(0.03, 0.20, shore);
     float fish = 0.0;
     for (int i = 0; i < 3; i++) fish = max(fish, fish_shape(p + slope * 0.22, fish_paths[i], float(i + 1), t));
     color *= 1.0 - fish * 0.23 * smoothstep(0.35, 0.8, shore);
