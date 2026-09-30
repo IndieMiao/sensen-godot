@@ -80,7 +80,7 @@ original_size = adb('shell', 'wm', 'size').decode()
 try:
     wait_json('pond-art/gourd-hero.json', lambda r: not r['network_booted'])
     if '--record-only' not in sys.argv:
-        for shape, shot in [('gourd','hero'), ('gourd','reference'), ('gourd','detail'), ('gourd','bank'), ('gourd','tree'), ('crescent','hero'), ('meander','hero')]:
+        for shape, shot in [('gourd','hero'), ('gourd','reference'), ('gourd','detail'), ('gourd','float'), ('gourd','bank'), ('gourd','tree'), ('crescent','hero'), ('meander','hero')]:
             capture(shape, shot)
         adb('shell', 'wm', 'size', '390x844')
         capture('gourd', 'portrait')
@@ -93,7 +93,8 @@ try:
         adb('shell', 'am', 'force-stop', PACKAGE)
         adb('shell', 'am', 'start', '-W', '-n', activity)
         print('RECORDING_COLD_START', activity, flush=True)
-    motion = capture('gourd', 'reference', True)
+    wide_video = '--wide-video' in sys.argv
+    motion = capture('gourd', 'hero' if wide_video else 'reference', True)
     dismiss_system_tips()
     performance = wait_json('pond-art/performance.json', lambda r: r['request_id'] == motion['request_id'])
     (OUT / 'performance.json').write_text(json.dumps(performance, indent=2))
@@ -103,7 +104,7 @@ try:
     dismiss_system_tips()
     video = '/sdcard/Download/gensen-pond-art.mp4'
     (OUT / 'before-record.png').write_bytes(adb('exec-out', 'screencap', '-p'))
-    adb('shell', 'screenrecord', '--size', '1280x800', '--bit-rate', '8000000', '--time-limit', '12', video)
+    adb('shell', 'screenrecord', '--size', '1280x800', '--bit-rate', '8000000', '--time-limit', '30' if wide_video else '12', video)
     adb('pull', video, str(OUT / 'water-motion-android.mp4'))
     (OUT / 'screencap.png').write_bytes(adb('exec-out', 'screencap', '-p'))
     adb('shell', 'rm', video)

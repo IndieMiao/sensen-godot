@@ -13,6 +13,7 @@ uniform sampler2D bank_reflection : filter_linear, repeat_disable;
 uniform bool has_bank_reflection = false;
 uniform bool polygon_water = true;
 uniform vec4 interaction = vec4(0.0);
+uniform float bobber_ripple_strength : hint_range(0.0, 4.0) = 2.0;
 uniform vec3 shallow_color : source_color = vec3(0.22, 0.89, 0.88);
 uniform vec3 middle_color : source_color = vec3(0.125, 0.73, 0.835);
 uniform vec3 deep_color : source_color = vec3(0.045, 0.398, 0.60);
@@ -88,9 +89,12 @@ void fragment() {
     water_sparkle = (peak + soft_edge) * smoothstep(0.10, 0.55, shore);
     vec2 to_float = p - interaction.xy;
     float distance_to_float = length(to_float);
-    float envelope = exp(-distance_to_float * 1.85) * smoothstep(0.04, 0.16, distance_to_float) * interaction.w;
-    float ring = distance_to_float * 29.0 - t * 4.2;
-    slope += normalize(to_float + vec2(0.0001)) * cos(ring) * envelope * 0.038;
+    // A few readable rings around the float, fading before they reach the bank.
+    float envelope = exp(-distance_to_float * 1.6) * smoothstep(0.05, 0.16, distance_to_float)
+                   * (1.0 - smoothstep(0.55, 0.95, distance_to_float)) * smoothstep(0.02, 0.20, shore)
+                   * interaction.w * bobber_ripple_strength;
+    float ring = distance_to_float * 22.0 - t * 4.2;
+    slope += normalize(to_float + vec2(0.0001)) * cos(ring) * envelope * 0.065;
     vec3 normal_world = normalize(vec3(-slope.x, 1.0, -slope.y));
     NORMAL = normalize(mat3(VIEW_MATRIX) * normal_world);
 
@@ -162,7 +166,14 @@ void fragment() {
         float bank = (1.0 - smoothstep(0.10, 0.85, shore)) * 0.03 + fresnel * 0.12;
         color = mix(color, reflection.rgb / max(reflection.a, 0.001), reflection.a * bank);
     }
-    color += pow(max(sin(ring), 0.0), 5.0) * envelope * vec3(0.10, 0.22, 0.22);
+    // Pair a pale crest with a soft trough so rings remain legible over bright
+    // shallows and moving caustics. Screen derivatives soften small-view edges.
+    float ripple_wave = sin(ring);
+    float ripple_aa = min(fwidth(ring) * 0.3, 0.20);
+    float ripple_crest = smoothstep(0.72 - ripple_aa, 1.0, ripple_wave);
+    float ripple_trough = smoothstep(0.60 - ripple_aa, 1.0, -ripple_wave);
+    color *= 1.0 - ripple_trough * envelope * 0.20;
+    color += ripple_crest * envelope * vec3(0.14, 0.28, 0.30);
     float swell = sin(p.x * 3.1 + p.y * 1.3 + t * 0.65) * sin(p.y * 2.4 - t * 0.54);
     color += vec3(0.0, 0.008, 0.011) * swell * smoothstep(0.2, 0.8, depth);
     float far_bank = smoothstep(7.5, 11.7, -p.y + (p.x - 6.0) * 0.18);

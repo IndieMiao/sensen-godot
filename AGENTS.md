@@ -1,5 +1,17 @@
 # Product Direction
 
+- Bobber ripples strengthened on 2026-09-30: user requested clearer fishing
+  float waves. Pond-only gain 2, wider ring spacing, brighter crests with soft
+  troughs and local normal movement now fade over 0.55–0.95m and near shore.
+  Keep FishingPresentation's waiting/playing/inactive strengths 0.3/0.7/0.
+  Native state controls, four Metal/Vulkan views and 12 pond checks passed.
+  Final wide-view samples are 24 x 60 FPS / 33 draws, matching the prior wide
+  view; no physical GPU measurement. Comparison and updated 30s full-pond
+  video are sent/readback-verified in Gensen Feishu self review. The user
+  requested a complete viewpoint; include a whole-pond view in water reviews.
+  No APK delivery, phone or production update. See
+  docs/qa/pond-bobber-ripples-2026-09-30.md.
+
 - Caustic motion corrected on 2026-09-30 after the user said 2d3797d still
   looked like panning. The original web GIF was retrieved and reviewed. The
   70% primary skeleton / slow alpha warp is superseded by full intersection

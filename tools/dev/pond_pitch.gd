@@ -129,6 +129,7 @@ func _run() -> void:
 	if _probe == "sun-off": sun.light_specular = 0.0
 	if _probe == "env-off": scene.environment.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	if _probe == "flat": water.water_material.set_shader_parameter("wave_strength", 0.0)
+	if _probe == "bobber-ripples-off": water.water_material.set_shader_parameter("bobber_ripple_strength", 0.0)
 	if _probe == "caustics-off": water.water_material.set_shader_parameter("caustic_strength", 0.0)
 	if _probe == "caustics-no-warp": water.water_material.set_shader_parameter("caustic_distortion", 0.0)
 	if _probe == "caustics-no-pan": water.water_material.set_shader_parameter("caustic_pan_speed", 0.0)
@@ -165,7 +166,9 @@ func _run() -> void:
 		if animation: animation.seek(0, true)
 		presentation = FishingPresentation.new()
 		scene.add_child(presentation)
-		presentation.configure_remote({"target":[plan.target.x,plan.target.z],"phase":"waiting"}, scene.player, scene._rig, scene.cam)
+		var float_phase := "playing" if _probe == "bobber-playing" else "idle" if _probe == "bobber-idle" else "waiting"
+		presentation.configure_remote({"target":[plan.target.x,plan.target.z],"phase":float_phase}, scene.player, scene._rig, scene.cam)
+		if _probe == "bobber-playing": presentation._splash_age = 1.0
 		presentation.set_process(false)
 		presentation._water = scene.get_node(str(entry.id))
 	frame_camera()
@@ -175,6 +178,7 @@ func _run() -> void:
 	await RenderingServer.frame_post_draw
 	var screenshot := get_viewport().get_texture().get_image()
 	assert(screenshot.save_png(_output.path_join(_shape + "-" + _shot + ".png")) == OK)
+	var float_interaction: Vector4 = _shader_uniform(water.water_material, &"interaction")
 	var report := {
 		"request_id": _request_id,
 		"sequence_frames": _sequence_frames, "sequence_step": _sequence_step,
@@ -182,6 +186,8 @@ func _run() -> void:
 		"probe": _probe, "sun_specular": sun.light_specular,
 		"wave_strength": _shader_uniform(water.water_material, &"wave_strength"),
 		"normal_strength": _shader_uniform(water.water_material, &"normal_strength"),
+		"bobber_ripple_strength": _shader_uniform(water.water_material, &"bobber_ripple_strength"),
+		"bobber_interaction": [float_interaction.x, float_interaction.y, float_interaction.z, float_interaction.w],
 		"caustic_depth_falloff": _shader_uniform(water.water_material, &"caustic_depth_falloff"),
 		"caustic_scale": _shader_uniform(water.water_material, &"caustic_scale"),
 		"caustic_distortion": _shader_uniform(water.water_material, &"caustic_distortion"),
@@ -250,6 +256,9 @@ func frame_camera() -> void:
 	if _shot == "detail":
 		_view_center = Vector3(6.5, 0, -5.8)
 		_view_width = 7.0
+	elif _shot == "float":
+		_view_center = Vector3(6.7, 0, -6.9)
+		_view_width = 3.2
 	elif _shot == "reference":
 		_view_center = Vector3(6, 0, -8)
 		_view_width = 11.4
