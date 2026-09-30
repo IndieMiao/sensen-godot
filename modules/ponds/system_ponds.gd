@@ -4,8 +4,14 @@ extends RefCounted
 const PATH := "res://assets/ponds/catalog.json"
 const SCENE := "res://scenes/pond/pond.tscn"
 const TITLES := {"crescent": "Crescent pond", "gourd": "Twin-bay pond", "meander": "Winding pond"}
+## Map directory cell size, shared with the server (POND_CELL_DEG).
+const CELL_DEG := 0.5
+const _RECORD_KEYS := ["id", "region_id", "name", "lat", "lng", "template_id", "decoration_seed", "layout_revision", "enabled"]
 static var _data: Dictionary = {}
 static var _revision := ""
+## Server-only ponds (added after the bundled catalog was frozen), learned from the cell directory
+## or a party-travel ticket. The bundled file only has to supply the matching template.
+static var _remote: Dictionary = {}
 
 static func data() -> Dictionary:
 	if _data.is_empty():
@@ -19,7 +25,56 @@ static func revision() -> String:
 static func location(id: String) -> Dictionary:
 	for entry in data().locations:
 		if entry.id == id and entry.enabled: return entry.duplicate(true)
-	return {}
+	return (_remote.get(id, {}) as Dictionary).duplicate(true)
+
+static func cell_of(lat: float, lng: float) -> Vector2i:
+	return Vector2i(floori(lng / CELL_DEG), floori(lat / CELL_DEG))
+
+static func cell_key(cell: Vector2i) -> String:
+	return "%d:%d" % [cell.y, cell.x]
+
+## Accept one server record: a bundled pond must match field for field; a server-only pond must
+## name a bundled template at the same layout revision. Returns {} when this build cannot host it.
+static func accept(raw: Variant) -> Dictionary:
+	if not raw is Dictionary: return {}
+	for key in _RECORD_KEYS:
+		if not raw.has(key): return {}
+	var id := str(raw.id)
+	if not raw.enabled or not (raw.lat is float or raw.lat is int) or not (raw.lng is float or raw.lng is int): return {}
+	for entry in data().locations:
+		if entry.id != id: continue
+		for key in _RECORD_KEYS:
+			if raw.get(key) != entry.get(key): return {}
+		return entry.duplicate(true)
+	var spec := template(str(raw.template_id))
+	if spec.is_empty() or int(raw.layout_revision) != int(spec.revision) or not RegEx.create_from_string("^pond_[a-z_]+_[0-9]{2}$").search(id): return {}
+	var entry := {"kind": "pond", "category": "Fishing pond"}
+	for key in _RECORD_KEYS: entry[key] = raw[key]
+	entry.lat = float(raw.lat)
+	entry.lng = float(raw.lng)
+	entry.decoration_seed = int(raw.decoration_seed)
+	entry.layout_revision = int(raw.layout_revision)
+	_remote[id] = entry
+	return entry.duplicate(true)
+
+## GET /v1/ponds/cells → {"y:x": [entry, ...]} for the requested cells; {} when the directory
+## is unavailable or was built for other templates (then the map shows no ponds rather than stale ones).
+static func validated_cells(payload: Dictionary, keys: Array) -> Dictionary:
+	if payload.get("version") != 2 or payload.get("catalog_revision") != revision() or not payload.get("available", false): return {}
+	if float(payload.get("cell_deg", 0)) != CELL_DEG or not payload.get("cells") is Dictionary: return {}
+	var result := {}
+	for key in keys:
+		var rows = payload.cells.get(key)
+		if not rows is Array: return {}
+		var seen := {}
+		var accepted := []
+		for raw in rows:
+			var entry := accept(raw)
+			if entry.is_empty() or seen.has(entry.id): continue
+			seen[entry.id] = true
+			accepted.append(entry)
+		result[key] = accepted
+	return result
 
 static func template(id: String) -> Dictionary:
 	return data().templates.get(id, {}).duplicate(true)
@@ -50,20 +105,3 @@ static func blueprint(entry: Dictionary) -> FarmBlueprint:
 	bp.masks = {"walkable": PackedStringArray(nav.rows)}
 	bp.anchors = {"spawn": Vector2i(floori(float(nav.spawn[0]) / bp.cell_m), floori(-float(nav.spawn[1]) / bp.cell_m))}
 	return bp
-
-static func validated_locations(payload: Dictionary, region: String) -> Array:
-	var result := []
-	if payload.get("version") != 1 or payload.get("catalog_revision") != revision() or not payload.get("available", false): return result
-	if not payload.get("locations") is Array: return result
-	var seen := {}
-	for raw in payload.locations:
-		if not raw is Dictionary: continue
-		var entry := location(str(raw.get("id", "")))
-		if entry.is_empty() or entry.region_id != region or seen.has(entry.id): continue
-		var valid := true
-		for key in ["lat", "lng", "template_id", "layout_revision", "decoration_seed", "enabled"]:
-			if raw.get(key) != entry.get(key): valid = false
-		if valid:
-			seen[entry.id] = true
-			result.append(entry)
-	return result

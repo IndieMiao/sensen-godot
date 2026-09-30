@@ -99,7 +99,9 @@ export class PartyTravel {
     return { travel_version: 1, kind: destination.kind, room: destination.key, floor: destination.floor,
       farm_id: destination.home, channel: destination.channel, layout_patch_id: destination.layout,
       blueprint_revision: destination.revision, expires_at: grant.expires, ticket,
-      ...(destination.kind === 'pond' ? { pond_id: destination.home, catalog_revision: destination.terrain } : {}),
+      // The record travels with the ticket: a follower may never have loaded that pond's map cell.
+      ...(destination.kind === 'pond' ? { pond_id: destination.home, catalog_revision: destination.terrain,
+        pond: this.deps.pondCatalog?.location(destination.home) } : {}),
       replaces_instance: destination.kind === 'mine' && Boolean(entry.instance && 'mine:' + entry.instance !== destination.key),
       ...(snapshot ? { snapshot } : {}) };
   }

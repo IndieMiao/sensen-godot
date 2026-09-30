@@ -18,16 +18,24 @@ export interface PondRoom {
   location: PondLocation; revision: string; template: PondTemplate; site: FishingSite; capacity: number;
 }
 export const DEFAULT_POND_CATALOG = fileURLToPath(new URL('../../../assets/ponds/catalog.json', import.meta.url));
+/** Server-only locations added after the bundled catalog was frozen (tools/ponds/add_pond_locations.py). */
+export const DEFAULT_POND_LOCATIONS = fileURLToPath(new URL('../../data/ponds/locations.json', import.meta.url));
+/** Map directory cells: clients fetch whole cells so a pan inside one cell reuses its cached answer. */
+export const POND_CELL_DEG = 0.5;
+export const pondCell = (lat: number, lng: number): [number, number] => [Math.floor(lat / POND_CELL_DEG), Math.floor(lng / POND_CELL_DEG)];
 
-/** A published, immutable catalog is persisted alongside the server content.
- * Its separate fingerprint fences scene admission without rewriting farm saves.
+/** The bundled catalog (templates + the first LA/Shanghai locations) is frozen: its sha256 is the
+ * revision every shipped client compares, so editing it would hide every pond on older builds.
+ * New locations live only on the server and reach clients through the cell directory; a client
+ * accepts one when it already bundles the template at the same layout revision.
  */
 export class PondCatalog {
   readonly revision: string;
   readonly capacity: number;
   private readonly locations = new Map<string, PondLocation>();
   private readonly templates: Record<string, PondTemplate>;
-  constructor(file = DEFAULT_POND_CATALOG) {
+  private readonly cells = new Map<string, PondLocation[]>();
+  constructor(file = DEFAULT_POND_CATALOG, extraFile: string | null = DEFAULT_POND_LOCATIONS) {
     const raw = readFileSync(file);
     const data = JSON.parse(raw.toString());
     if (data.version !== 1 || !Number.isInteger(data.room_capacity) || data.room_capacity < 1 || data.room_capacity > 300
@@ -46,14 +54,31 @@ export class PondCatalog {
         || !nav.rows.every(row => row.length === template.extent[0] / nav.cell && /^[01]+$/.test(row))
         || !walkable(nav, nav.spawn) || waterContains({ polygon: template.polygon } as FishingSite, nav.spawn)) throw new Error('POND_NAVIGATION_INVALID');
     }
-    for (const location of data.locations as PondLocation[]) {
+    const extra = extraFile ? JSON.parse(readFileSync(extraFile, 'utf8')) : { version: 1, locations: [] };
+    if (extra.version !== 1 || !Array.isArray(extra.locations)) throw new Error('POND_LOCATIONS_INVALID');
+    const all = [...data.locations, ...extra.locations] as PondLocation[];
+    if (all.length > 10000) throw new Error('POND_CATALOG_INVALID');
+    for (const location of all) {
       const template = this.templates[location.template_id];
       if (!/^pond_[a-z_]+_[0-9]{2}$/.test(location.id) || this.locations.has(location.id) || location.kind !== 'pond'
-        || !['los_angeles', 'shanghai'].includes(location.region_id) || !template || location.layout_revision !== template.revision
+        || typeof location.region_id !== 'string' || !/^[a-z0-9_-]{1,64}$/.test(location.region_id)
+        || typeof location.name !== 'string' || !location.name || !template || location.layout_revision !== template.revision
         || !Number.isFinite(location.lat) || Math.abs(location.lat) > 85 || !Number.isFinite(location.lng) || Math.abs(location.lng) > 180
         || !Number.isSafeInteger(location.decoration_seed) || location.decoration_seed < 0 || typeof location.enabled !== 'boolean') throw new Error('POND_LOCATION_INVALID');
       this.locations.set(location.id, location);
+      if (!location.enabled) continue;
+      const key = pondCell(location.lat, location.lng).join(':');
+      if (!this.cells.has(key)) this.cells.set(key, []);
+      this.cells.get(key)!.push(location);
     }
+  }
+  /** Enabled ponds whose coordinates fall in one directory cell. */
+  cell(y: number, x: number): PondLocation[] {
+    return structuredClone(this.cells.get(`${y}:${x}`) ?? []);
+  }
+  location(id: string): PondLocation | undefined {
+    const location = this.locations.get(id);
+    return location?.enabled ? structuredClone(location) : undefined;
   }
   list(region: string): PondLocation[] {
     return structuredClone([...this.locations.values()].filter(p => p.enabled && p.region_id === region));

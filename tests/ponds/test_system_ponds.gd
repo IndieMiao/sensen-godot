@@ -9,25 +9,64 @@ func _entries() -> Array:
 		entries.append(entry)
 	return entries
 
+func _cells_payload(cells: Dictionary) -> Dictionary:
+	return {"version": 2, "catalog_revision": SystemPonds.revision(), "available": true, "cell_deg": 0.5, "cells": cells}
+
+func _server_only(overrides := {}) -> Dictionary:
+	var row := {"id": "pond_san_francisco_01", "region_id": "gn-5391959", "name": "Willow Pond", "kind": "pond",
+		"category": "Fishing pond", "lat": 37.7695, "lng": -122.4863, "template_id": "gourd", "decoration_seed": 12345,
+		"layout_revision": 1, "generation_version": 1, "enabled": true}
+	row.merge(overrides, true)
+	return row
+
 func test_fixed_catalog_and_three_city_shapes() -> void:
+	# Frozen: shipped builds compare this hash; new cities live on the server (tools/ponds/add_pond_locations.py).
+	assert_str(SystemPonds.revision()).is_equal("2c6e2a2f5f6efa3742912257fa8a0b4844cbf89277e5867ac88157784770a187")
 	assert_int(SystemPonds.data().locations.size()).is_equal(12)
-	assert_int(SystemPonds.revision().length()).is_equal(64)
 	for region in ["shanghai", "los_angeles"]:
 		var entries: Array = SystemPonds.data().locations.filter(func(p): return p.region_id == region)
 		var seen := {}
 		for entry in entries: seen[entry.template_id] = true
 		assert_int(seen.size()).is_equal(3)
-		var payload := {"version": 1, "catalog_revision": SystemPonds.revision(), "available": true, "locations": entries}
-		assert_int(SystemPonds.validated_locations(payload, region).size()).is_equal(6)
-		payload.catalog_revision = "stale"
-		assert_array(SystemPonds.validated_locations(payload, region)).is_empty()
 
-func test_tampered_or_cross_city_entries_are_rejected() -> void:
+func test_cells_match_the_server_grid() -> void:
+	assert_str(SystemPonds.cell_key(SystemPonds.cell_of(37.7694, -122.4862))).is_equal("75:-245")
+	assert_str(SystemPonds.cell_key(SystemPonds.cell_of(31.2145, 121.5558))).is_equal("62:243")
+	assert_str(SystemPonds.cell_key(SystemPonds.cell_of(-0.2, -0.2))).is_equal("-1:-1")
+
+func test_cell_directory_accepts_bundled_and_server_only_ponds() -> void:
+	var bundled: Dictionary = SystemPonds.data().locations[0]
+	var sf := _server_only()
+	var cells := SystemPonds.validated_cells(_cells_payload({"1:1": [bundled, sf, sf], "2:2": []}), ["1:1", "2:2"])
+	assert_array(cells["1:1"].map(func(e): return e.id)).is_equal([bundled.id, sf.id])
+	assert_array(cells["2:2"]).is_empty()
+	var entered := SystemPonds.location(sf.id)
+	assert_str(str(entered.template_id)).is_equal("gourd")
+	assert_bool(SystemPonds.site(entered).is_empty()).is_false()
+	assert_object(SystemPonds.blueprint(entered)).is_not_null()
+	var stale := _cells_payload({"1:1": [sf]})
+	stale.catalog_revision = "stale"
+	assert_dict(SystemPonds.validated_cells(stale, ["1:1"])).is_empty()
+	var missing := SystemPonds.validated_cells(_cells_payload({}), ["1:1"])
+	assert_dict(missing).is_empty()
+
+func test_tampered_or_unhostable_records_are_rejected() -> void:
 	var row: Dictionary = SystemPonds.data().locations[0].duplicate(true)
 	row.lat += .01
-	var payload := {"version": 1, "catalog_revision": SystemPonds.revision(), "available": true, "locations": [row]}
-	assert_array(SystemPonds.validated_locations(payload, str(row.region_id))).is_empty()
-	assert_bool(SystemPonds.location("pond_unknown").is_empty()).is_true()
+	assert_dict(SystemPonds.accept(row)).is_empty()
+	assert_dict(SystemPonds.accept(_server_only({"id": "pond_nowhere_01", "template_id": "lagoon"}))).is_empty()
+	assert_dict(SystemPonds.accept(_server_only({"id": "pond_nowhere_02", "layout_revision": 2}))).is_empty()
+	assert_dict(SystemPonds.accept(_server_only({"id": "pond_nowhere_03", "enabled": false}))).is_empty()
+	assert_dict(SystemPonds.accept(_server_only({"id": "../pond"}))).is_empty()
+	for id in ["pond_nowhere_01", "pond_nowhere_02", "pond_nowhere_03", "../pond", "pond_unknown"]:
+		assert_bool(SystemPonds.location(id).is_empty()).is_true()
+
+func test_party_ticket_carries_a_server_only_pond() -> void:
+	var sf := _server_only({"id": "pond_san_francisco_04", "template_id": "crescent"})
+	var args := PartyTravel.scene_args({"kind": "pond", "ticket": "t", "farm_id": sf.id, "channel": 2,
+		"pond_id": sf.id, "catalog_revision": SystemPonds.revision(), "pond": sf}, null)
+	assert_str(str(args.get("pond_id", ""))).is_equal(sf.id)
+	assert_str(str(SystemPonds.location(sf.id).template_id)).is_equal("crescent")
 
 func test_all_shapes_have_reachable_shores_and_continuous_casts() -> void:
 	for entry in _entries():

@@ -7,7 +7,7 @@ import path from 'node:path';
 import { MemoryStore } from '../../src/http/memory_store.js';
 import { buildApp } from '../../src/http/app.js';
 import { DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
-import { PondCatalog } from '../../src/ponds/catalog.js';
+import { PondCatalog, pondCell } from '../../src/ponds/catalog.js';
 import { waterContains, nearestWater, defaultFishingTarget, validFishingCast, initialFishingSimulation, stepFishing } from '../../src/domain/fishing.js';
 import { walkable } from '../../src/realtime/model.js';
 import { onlineGateways } from '../../src/realtime/gateway.js';
@@ -142,5 +142,49 @@ describe('published system ponds', () => {
       const returned = await clients[0].join('pond', { travel_ticket: grant.ticket });
       expect(returned.room).toBe(joined.room);
     } finally { clients.forEach(c=>c.close());await app.close(); }
+  });
+});
+
+describe('server-only pond locations and the cell directory', () => {
+  it('adds San Francisco without touching the frozen bundled catalog revision', () => {
+    const catalog = new PondCatalog();
+    expect(catalog.revision).toBe('2c6e2a2f5f6efa3742912257fa8a0b4844cbf89277e5867ac88157784770a187');
+    const sf = catalog.list('gn-5391959');
+    expect(sf).toHaveLength(6);
+    expect(new Set(sf.map(p => p.template_id)).size).toBe(3);
+    for (const p of sf) {
+      expect(pondCell(p.lat, p.lng)).toEqual([75, -245]);
+      expect(catalog.room(p.id, catalog.revision, content).location.id).toBe(p.id);
+    }
+    expect(catalog.cell(75, -245).map(p => p.id).sort()).toEqual(sf.map(p => p.id).sort());
+    expect(catalog.list('los_angeles')).toHaveLength(6);
+    expect(new PondCatalog(undefined, null).list('gn-5391959')).toHaveLength(0);
+    expect(catalog.location('pond_san_francisco_01')?.name).toBe('Willow Pond');
+    expect(catalog.location('invented')).toBeUndefined();
+  });
+
+  it('serves whole cells, bounded and cacheable, next to the legacy region directory', async () => {
+    let now = Date.now();
+    const store = new MemoryStore({ content, contentVersion: cv, plot: sets, timezone: 'Asia/Shanghai', now: () => now });
+    const app = await buildApp({ guestWrites: true, store, content, contentVersion: cv, blueprintDir,
+      regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: 'pond-cells-test', now: () => now });
+    const address = await app.listen({ port: 0, host: '127.0.0.1' });
+    try {
+      const catalog = onlineGateways.get(app)!.ponds;
+      const la = catalog.list('los_angeles')[0], [ly, lx] = pondCell(la.lat, la.lng);
+      const r = await fetch(`${address}/v1/ponds/cells?cells=75:-245,${ly}:${lx},0:0`);
+      expect(r.status).toBe(200);
+      expect(r.headers.get('cache-control')).toContain('max-age=300');
+      const body = await r.json() as any;
+      expect(body).toMatchObject({ version: 2, catalog_revision: catalog.revision, available: true, cell_deg: 0.5 });
+      expect(body.cells['75:-245']).toHaveLength(6);
+      expect(body.cells[`${ly}:${lx}`].map((p: any) => p.id)).toContain(la.id);
+      expect(body.cells['0:0']).toEqual([]);
+      for (const bad of ['', 'x', '1:2:3', '999:0', Array.from({ length: 26 }, (_, i) => `0:${i}`).join(',')])
+        expect((await fetch(`${address}/v1/ponds/cells?cells=${bad}`)).status).toBe(400);
+      const legacy = await (await fetch(address + '/v1/ponds?region_id=los_angeles')).json() as any;
+      expect(legacy.catalog_revision).toBe(catalog.revision);
+      expect(legacy.locations).toHaveLength(6);
+    } finally { await app.close(); }
   });
 });

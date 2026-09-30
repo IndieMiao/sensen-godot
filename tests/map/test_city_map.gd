@@ -204,3 +204,26 @@ func test_place_card_names_the_city_under_the_place() -> void:
 	view.clear_selection()
 	FarmChoice.clear()
 	FarmRegions.clear_choice()
+
+## 水塘目录按地图中心所在的 0.5° 网格取（3×3），不再按激活城市：从洛杉矶漫游到旧金山能看到旧金山的水塘。
+func test_ponds_follow_the_map_center_by_cells() -> void:
+	var m := await _boot_la_map()
+	var view: CityMapView = m.city_map
+	var sf := SystemPonds.accept({"id": "pond_san_francisco_01", "region_id": "gn-5391959", "name": "Willow Pond",
+		"lat": 37.7695, "lng": -122.4863, "template_id": "gourd", "decoration_seed": 7, "layout_revision": 1, "enabled": true})
+	view._pond_cells["75:-245"] = {"at": Time.get_ticks_msec(), "entries": [sf]}
+	m.zoom = 12.0
+	m.center_lat = 37.7749
+	m.center_lng = -122.4194
+	view._refresh_pond_directory()
+	assert_array(view.entries.map(func(e): return str(e.id))).contains(["pond_san_francisco_01"])
+	m.zoom = 6.0
+	view._refresh_pond_directory()
+	assert_array(view.pond_locations).is_empty()
+	m.zoom = 12.0
+	m.center_lat = 34.0522
+	m.center_lng = -118.2437
+	view._refresh_pond_directory()
+	assert_array(view.entries.map(func(e): return str(e.id))).not_contains(["pond_san_francisco_01"])
+	FarmChoice.clear()
+	FarmRegions.clear_choice()

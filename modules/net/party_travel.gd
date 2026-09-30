@@ -13,6 +13,8 @@ static func scene_args(manifest: Dictionary, session: FarmSession) -> Dictionary
 		"farm_id": str(manifest.get("farm_id", "")), "channel": int(manifest.get("channel", 1))}}
 	if str(manifest.get("kind", "")) == "mine": return args
 	if str(manifest.get("kind", "")) == "pond":
+		# Server-only ponds ride along with the ticket; the follower may never have loaded that map cell.
+		if manifest.has("pond"): SystemPonds.accept(manifest.pond)
 		if manifest.get("catalog_revision") != SystemPonds.revision() or SystemPonds.location(str(manifest.get("pond_id", ""))).is_empty(): return {}
 		args.pond_id = manifest.pond_id
 		return args

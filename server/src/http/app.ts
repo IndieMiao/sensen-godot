@@ -1,5 +1,5 @@
 import { createOsmProvider } from '../geography/osm.js';
-import { PondCatalog } from '../ponds/catalog.js';
+import { PondCatalog, POND_CELL_DEG } from '../ponds/catalog.js';
 import { createLandCoverProvider } from '../geography/land_cover.js';
 import { relocateFarmState, relocationAvailable, relocationBlocked, RELOCATION_PREVIEW_TTL, RelocationError,
   type RelocationConfirm } from '../domain/farm_relocation.js';
@@ -158,6 +158,18 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const city = typeof region === 'string' ? cities.get(region) : null;
     if (!city) return reply.code(400).send({ code: 'SCHEMA' });
     return { version: 1, catalog_revision: ponds.revision, available: Boolean(online), locations: ponds.list(city.id) };
+  });
+  // Map directory by fixed cells ("y:x" = floor(lat / 0.5), floor(lng / 0.5)); the client asks only for
+  // cells it has not cached, so panning inside the same cells costs nothing.
+  app.get('/v1/ponds/cells', { config: { rateLimit: { max: 240, timeWindow: '1 minute' } } }, async (req, reply) => {
+    const raw = (req.query as { cells?: unknown }).cells;
+    const keys = typeof raw === 'string' && raw.length <= 400 ? [...new Set(raw.split(','))] : [];
+    const parsed = keys.map(k => /^(-?\d{1,3}):(-?\d{1,3})$/.exec(k)).filter(m => m !== null) as RegExpExecArray[];
+    if (!keys.length || keys.length > 25 || parsed.length !== keys.length
+      || parsed.some(m => Math.abs(Number(m[1])) > 180 || Math.abs(Number(m[2])) > 360)) return reply.code(400).send({ code: 'SCHEMA' });
+    reply.header('cache-control', 'public, max-age=300');
+    return { version: 2, catalog_revision: ponds.revision, available: Boolean(online), cell_deg: POND_CELL_DEG,
+      cells: Object.fromEntries(parsed.map(m => [m[0], ponds.cell(Number(m[1]), Number(m[2]))])) };
   });
 
   const installationLoginLimit = app.createRateLimit({ max: 10, timeWindow: '1 hour', keyGenerator: req => {

@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "locations": [
+    {
+      "id": "pond_san_francisco_01",
+      "region_id": "gn-5391959",
+      "name": "Willow Pond",
+      "kind": "pond",
+      "category": "Fishing pond",
+      "lat": 37.7694321,
+      "lng": -122.4862335,
+      "template_id": "gourd",
+      "decoration_seed": 1790896863,
+      "layout_revision": 1,
+      "generation_version": 1,
+      "enabled": true
+    },
+    {
+      "id": "pond_san_francisco_02",
+      "region_id": "gn-5391959",
+      "name": "Clover Pond",
+      "kind": "pond",
+      "category": "Fishing pond",
+      "lat": 37.7990517,
+      "lng": -122.4591334,
+      "template_id": "meander",
+      "decoration_seed": 2578601018,
+      "layout_revision": 1,
+      "generation_version": 1,
+      "enabled": true
+    },
+    {
+      "id": "pond_san_francisco_03",
+      "region_id": "gn-5391959",
+      "name": "Fern Pond",
+      "kind": "pond",
+      "category": "Fishing pond",
+      "lat": 37.7595154,
+      "lng": -122.4270801,
+      "template_id": "crescent",
+      "decoration_seed": 47338722,
+      "layout_revision": 1,
+      "generation_version": 1,
+      "enabled": true
+    },
+    {
+      "id": "pond_san_francisco_04",
+      "region_id": "gn-5391959",
+      "name": "Pebble Pond",
+      "kind": "pond",
+      "category": "Fishing pond",
+      "lat": 37.7186412,
+      "lng": -122.418993,
+      "template_id": "crescent",
+      "decoration_seed": 1556145448,
+      "layout_revision": 1,
+      "generation_version": 1,
+      "enabled": true
+    },
+    {
+      "id": "pond_san_francisco_05",
+      "region_id": "gn-5391959",
+      "name": "Reed Pond",
+      "kind": "pond",
+      "category": "Fishing pond",
+      "lat": 37.7359257,
+      "lng": -122.4770204,
+      "template_id": "meander",
+      "decoration_seed": 4081270712,
+      "layout_revision": 1,
+      "generation_version": 1,
+      "enabled": true
+    },
+    {
+      "id": "pond_san_francisco_06",
+      "region_id": "gn-5391959",
+      "name": "Blossom Pond",
+      "kind": "pond",
+      "category": "Fishing pond",
+      "lat": 37.7679364,
+      "lng": -122.440866,
+      "template_id": "gourd",
+      "decoration_seed": 405910200,
+      "layout_revision": 1,
+      "generation_version": 1,
+      "enabled": true
+    }
+  ]
+}

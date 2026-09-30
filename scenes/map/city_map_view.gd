@@ -7,10 +7,17 @@ signal landmark_requested(entry: Dictionary)
 signal pond_requested(entry: Dictionary)
 
 var pond_locations: Array = []
-var _pond_region := ""
-var _pond_request := 0
+## Pond directory by fixed 0.5° cells around the map centre (SystemPonds.CELL_DEG), not by active
+## city: roaming San Francisco from a Shanghai farm still shows the ponds there.
+var _pond_cells: Dictionary = {}      # "y:x" -> {"at": msec, "entries": Array}
+var _pond_view := ""                  # the 3×3 block currently shown
+var _pond_pending := false
 var _pond_retry_at := 0
 var _pond_error := false
+const POND_CELL_TTL_MS := 300000
+const POND_RETRY_MS := 30000
+## Below this zoom a 3×3 block is far smaller than the view; ponds are city-scale content anyway.
+const POND_MIN_ZOOM := 9.0
 ## 玩家详情卡上的“拜访农场”按钮：跳转到该玩家的空间（访客实例）。
 signal player_visit_requested(farm_id: String)
 ## 玩家详情卡被关闭（点 X、切筛选、开列表等）：宿主借此清掉 pin 选中与 3D 角色。
@@ -547,27 +554,54 @@ func _on_info_action() -> void:
 			if not LandmarkScenes.path_for(str(host.region.get("id", "")), selected).is_empty():
 				landmark_requested.emit(selected)
 
+func _pond_view_cells() -> Array:
+	var lat = host.get("center_lat")
+	var lng = host.get("center_lng")
+	var zoom = host.get("zoom")
+	if not (lat is float and lng is float) or (zoom is float and zoom < POND_MIN_ZOOM): return []
+	var centre := SystemPonds.cell_of(lat, lng)
+	var keys := []
+	for dy in [-1, 0, 1]:
+		for dx in [-1, 0, 1]: keys.append(SystemPonds.cell_key(centre + Vector2i(dx, dy)))
+	return keys
+
+func _show_pond_cells(keys: Array) -> void:
+	var shown := []
+	var seen := {}
+	for key in keys:
+		for entry in (_pond_cells.get(key, {}) as Dictionary).get("entries", []):
+			if seen.has(entry.id): continue
+			seen[entry.id] = true
+			shown.append(entry)
+	var ids := ",".join(shown.map(func(e): return str(e.id)))
+	if ids == ",".join(pond_locations.map(func(e): return str(e.id))): return
+	pond_locations = shown
+	_last_state = ""
+	if selected.get("kind") == "pond" and not seen.has(str(selected.get("id", ""))): clear_selection()
+	refresh_content()
+
 func _refresh_pond_directory() -> void:
-	var region_id := str(host.region.get("id", ""))
-	if region_id != _pond_region:
-		_pond_region = region_id
-		_pond_request += 1
-		pond_locations = []
-		_pond_retry_at = 0
-		_last_state = ""
-		if selected.get("kind") == "pond": clear_selection()
-	if Time.get_ticks_msec() < _pond_retry_at or Net.session == null or not Net.session.logged_in(): return
-	_pond_retry_at = Time.get_ticks_msec() + 30000
-	_pond_request += 1
-	var request := _pond_request
-	var response := await Net.session.client.request("GET", "/ponds?region_id=" + region_id.uri_encode())
-	if not is_inside_tree() or request != _pond_request or region_id != _pond_region: return
-	_pond_error = not response.is_success() or response.json.get("catalog_revision") != SystemPonds.revision() or not response.json.get("available", false)
-	if not _pond_error:
-		pond_locations = SystemPonds.validated_locations(response.json, region_id)
-		_pond_retry_at = Time.get_ticks_msec() + 300000
-		_last_state = ""
-		refresh_content()
+	var keys := _pond_view_cells()
+	var view := ",".join(keys)
+	if view != _pond_view:
+		_pond_view = view
+		_show_pond_cells(keys)
+	if keys.is_empty() or _pond_pending or Net.session == null or not Net.session.logged_in(): return
+	var now := Time.get_ticks_msec()
+	var missing := keys.filter(func(k): return not _pond_cells.has(k) or now - int(_pond_cells[k].at) > POND_CELL_TTL_MS)
+	if missing.is_empty() or now < _pond_retry_at: return
+	_pond_pending = true
+	var response := await Net.session.client.request("GET", "/ponds/cells?cells=" + ",".join(missing))
+	_pond_pending = false
+	if not is_inside_tree(): return
+	var cells := SystemPonds.validated_cells(response.json if response.is_success() and response.json is Dictionary else {}, missing)
+	_pond_error = cells.is_empty()
+	if _pond_error:
+		_pond_retry_at = Time.get_ticks_msec() + POND_RETRY_MS
+	else:
+		for key in cells: _pond_cells[key] = {"at": Time.get_ticks_msec(), "entries": cells[key]}
+		# The view may have moved while the request was in flight; show whatever is current.
+		_show_pond_cells(_pond_view_cells())
 	if filter == "pond": status.text = L10n.text("Ponds unavailable. Try again shortly.") if _pond_error else ""
 
 func attach_bridge(bridge: MapBridge) -> void:

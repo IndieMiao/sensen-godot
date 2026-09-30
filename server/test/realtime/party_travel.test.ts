@@ -130,3 +130,15 @@ describe('party travel across regions', () => {
     expect((await request(outsider, 'GET', '/v1/online/status')).json().roster).toEqual([]);
   });
 });
+
+describe('party travel to a pond', () => {
+  it('carries the pond record so a follower can enter a server-only pond it never loaded', async () => {
+    const { a, b, gateway, connect, request } = await harness();
+    const pond = gateway.ponds.location('pond_san_francisco_03')!;
+    const ca = await connect(a), cb = await connect(b);
+    const leader = await ca.join('pond', { pond_id: pond.id, catalog_revision: gateway.ponds.revision });
+    const prepared = (await request(b, 'POST', '/v1/online/travel', { mode: 'leader' })).json();
+    expect(prepared).toMatchObject({ kind: 'pond', pond_id: pond.id, catalog_revision: gateway.ponds.revision, pond });
+    expect((await cb.join('pond', { travel_ticket: prepared.ticket })).room).toBe(leader.room);
+  });
+});
