@@ -1,0 +1,83 @@
+{
+  "water_y": 0.055,
+  "catalog_sha256": "2c6e2a2f5f6efa3742912257fa8a0b4844cbf89277e5867ac88157784770a187",
+  "size": [
+    384,
+    512
+  ],
+  "distance_metres_per_unit": 1.0,
+  "entries": [
+    {
+      "decoration_seed": 748838515.0,
+      "id": "pond_los_angeles_01",
+      "rock_mesh_sha256": "d89dfff6d70909a9bd404e81e11395a79d063e5d975d35b6bddaf0e2c3f8a59e",
+      "template_id": "gourd"
+    },
+    {
+      "decoration_seed": 4133946343.0,
+      "id": "pond_los_angeles_02",
+      "rock_mesh_sha256": "c90906f573c575b4ef53551fec93cae81c5edb6b3cfdcb56c6c01c4da8ca1c52",
+      "template_id": "meander"
+    },
+    {
+      "decoration_seed": 1683460231.0,
+      "id": "pond_los_angeles_03",
+      "rock_mesh_sha256": "b3dc17189fee8ad9339882c4bea4819a3c17c2954c60745b3c4b3944dd282993",
+      "template_id": "crescent"
+    },
+    {
+      "decoration_seed": 879030845.0,
+      "id": "pond_los_angeles_04",
+      "rock_mesh_sha256": "7387dec28f21db793a9abc7ed165b25ef6fd147f155aeaf497d451b0ecb5c028",
+      "template_id": "crescent"
+    },
+    {
+      "decoration_seed": 1673317380.0,
+      "id": "pond_los_angeles_05",
+      "rock_mesh_sha256": "11cc11acf21d0213f34c7952f35df563a14c8dcb49210c6111377419a257de00",
+      "template_id": "meander"
+    },
+    {
+      "decoration_seed": 2514298000.0,
+      "id": "pond_los_angeles_06",
+      "rock_mesh_sha256": "2f25a759ae2a17fee6ddbe878fb215298830ac4685294227483bee9c0959842f",
+      "template_id": "gourd"
+    },
+    {
+      "decoration_seed": 2186371138.0,
+      "id": "pond_shanghai_01",
+      "rock_mesh_sha256": "bcf13150483a02ca30a487efb27c4a15cf74caa710536f820f16665bf8e40d52",
+      "template_id": "meander"
+    },
+    {
+      "decoration_seed": 1366097478.0,
+      "id": "pond_shanghai_02",
+      "rock_mesh_sha256": "e9ea7c62153d4e7b45995d7a59716c4889c290f2edfe529431b0a9e3193d673c",
+      "template_id": "crescent"
+    },
+    {
+      "decoration_seed": 3894810419.0,
+      "id": "pond_shanghai_03",
+      "rock_mesh_sha256": "b39f6fd1de081983f5df31f114937e5fc5871e760e72d649e07a7a147bff49ce",
+      "template_id": "gourd"
+    },
+    {
+      "decoration_seed": 2666945474.0,
+      "id": "pond_shanghai_04",
+      "rock_mesh_sha256": "608796c4c225f774ec81d7deec3396165289267155b001c3b67f0bddee9c21f0",
+      "template_id": "crescent"
+    },
+    {
+      "decoration_seed": 3803468098.0,
+      "id": "pond_shanghai_05",
+      "rock_mesh_sha256": "345c2ac6a320975e33fb7db8b5cd8d3e319b7cae1736d8220f40581310fd2fc2",
+      "template_id": "meander"
+    },
+    {
+      "decoration_seed": 978089231.0,
+      "id": "pond_shanghai_06",
+      "rock_mesh_sha256": "3eba103e77a0c9abb0f846387806a6d063615edae3a55d6bcba95bdb36dcfedd",
+      "template_id": "gourd"
+    }
+  ]
+}

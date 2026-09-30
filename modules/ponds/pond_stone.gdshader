@@ -15,9 +15,19 @@ void fragment() {
                  + texture(stone_detail, world.xz * 1.6).rgb * weights.y
                  + texture(stone_detail, world.xy * 1.6).rgb * weights.z;
     float detail = dot(mineral, vec3(0.3333));
+    // Fine mineral relief follows the real curved/cut surface in world space.
+    vec3 n = normalize(world_normal);
+    vec3 dx = dFdx(world);
+    vec3 dy = dFdy(world);
+    vec3 rx = cross(dy, n);
+    vec3 ry = cross(n, dx);
+    float determinant = dot(dx, rx);
+    vec3 gradient = (rx * dFdx(detail) + ry * dFdy(detail)) / max(abs(determinant), 0.000001) * sign(determinant);
+    NORMAL = normalize(mat3(VIEW_MATRIX) * normalize(n - gradient * 0.055));
     float wet = 1.0 - smoothstep(0.055, 0.15, world.y);
     // Vertex paint is linear on both backends. No renderer-specific exposure gain.
-    ALBEDO = COLOR.rgb * (0.72 + detail * 1.18) * mix(1.0, 0.74, wet);
-    ROUGHNESS = mix(0.88, 0.43, wet);
-    SPECULAR = 0.22;
+    float mottling = texture(surface_flow, world.xz * 1.9 + world.yy * 0.7).b;
+    ALBEDO = COLOR.rgb * (0.85 + detail * 0.40 + (mottling - 0.5) * 0.10) * mix(1.0, 0.76, wet);
+    ROUGHNESS = mix(0.94, 0.67, wet);
+    SPECULAR = 0.15;
 }

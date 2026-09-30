@@ -15,7 +15,7 @@ import xml.etree.ElementTree as ET
 
 SERIAL = os.environ['JOURNEY_SERIAL']
 PACKAGE = os.environ['JOURNEY_PACKAGE']
-assert PACKAGE == 'com.sensen.pondart.rapidharbor', 'Use the isolated pond art app'
+assert PACKAGE in {'com.sensen.pondart.rapidharbor', 'com.sensen.pondart.calmcloud'}, 'Use the isolated pond art app'
 OUT = Path(sys.argv[1]).resolve()
 OUT.mkdir(parents=True, exist_ok=True)
 
@@ -66,7 +66,7 @@ def dismiss_system_tips():
         (OUT / f'system-ui-{attempt}.xml').write_text(xml)
         tree = ET.fromstring(xml)
         buttons = [n for n in tree.iter('node')
-                   if n.get('package') == 'com.android.systemui'
+                   if n.get('package', '').startswith('com.android.')
                    and n.get('text') == 'Got it' and n.get('clickable') == 'true']
         if not buttons:
             return
@@ -80,19 +80,31 @@ original_size = adb('shell', 'wm', 'size').decode()
 try:
     wait_json('pond-art/gourd-hero.json', lambda r: not r['network_booted'])
     if '--record-only' not in sys.argv:
-        for shape, shot in [('gourd','hero'), ('gourd','detail'), ('crescent','hero'), ('meander','hero')]:
+        for shape, shot in [('gourd','hero'), ('gourd','reference'), ('gourd','detail'), ('gourd','float'), ('gourd','bank'), ('gourd','tree'), ('crescent','hero'), ('meander','hero')]:
             capture(shape, shot)
         adb('shell', 'wm', 'size', '390x844')
         capture('gourd', 'portrait')
         adb('shell', 'wm', 'size', 'reset')
-    motion = capture('gourd', 'hero', True)
+        # Android's resize education can cover the surface without appearing
+        # in the active app's UI tree. Record from a fresh landscape activity
+        # after all size changes; keep this isolated package's files intact.
+        activity = adb('shell', 'cmd', 'package', 'resolve-activity', '--brief', PACKAGE).decode().strip().splitlines()[-1]
+        assert activity.startswith(PACKAGE + '/'), activity
+        adb('shell', 'am', 'force-stop', PACKAGE)
+        adb('shell', 'am', 'start', '-W', '-n', activity)
+        print('RECORDING_COLD_START', activity, flush=True)
+    wide_video = '--wide-video' in sys.argv
+    motion = capture('gourd', 'hero' if wide_video else 'reference', True)
     dismiss_system_tips()
     performance = wait_json('pond-art/performance.json', lambda r: r['request_id'] == motion['request_id'])
     (OUT / 'performance.json').write_text(json.dumps(performance, indent=2))
     print('PERFORMANCE', [s['fps'] for s in performance['samples']], flush=True)
+    # Rotation / size changes can trigger Android education after the first
+    # check. Inspect again immediately before recording, using fresh UI bounds.
+    dismiss_system_tips()
     video = '/sdcard/Download/gensen-pond-art.mp4'
     (OUT / 'before-record.png').write_bytes(adb('exec-out', 'screencap', '-p'))
-    adb('shell', 'screenrecord', '--size', '1280x800', '--bit-rate', '8000000', '--time-limit', '12', video)
+    adb('shell', 'screenrecord', '--size', '1280x800', '--bit-rate', '8000000', '--time-limit', '30' if wide_video else '12', video)
     adb('pull', video, str(OUT / 'water-motion-android.mp4'))
     (OUT / 'screencap.png').write_bytes(adb('exec-out', 'screencap', '-p'))
     adb('shell', 'rm', video)
