@@ -149,3 +149,10 @@ func test_camera_gestures_stop_on_background_and_recenter_without_moving_player(
 	await await_millis(450)
 	assert_float(scene._focus.distance_to(start)).is_less(.01)
 	assert_vector(scene.mover.position).is_equal(start)
+
+func test_legacy_region_directory_is_the_fallback_for_older_servers() -> void:
+	var la: Array = SystemPonds.data().locations.filter(func(p): return p.region_id == "los_angeles")
+	var payload := {"version": 1, "catalog_revision": SystemPonds.revision(), "available": true, "locations": la + [_server_only()]}
+	assert_int(SystemPonds.validated_region(payload, "los_angeles").size()).is_equal(6)
+	payload.catalog_revision = "stale"
+	assert_array(SystemPonds.validated_region(payload, "los_angeles")).is_empty()

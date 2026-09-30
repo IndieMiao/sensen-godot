@@ -76,6 +76,16 @@ static func validated_cells(payload: Dictionary, keys: Array) -> Dictionary:
 		result[key] = accepted
 	return result
 
+## Legacy GET /v1/ponds?region_id= (servers without the cell directory): bundled ponds only.
+static func validated_region(payload: Dictionary, region: String) -> Array:
+	if payload.get("version") != 1 or payload.get("catalog_revision") != revision() or not payload.get("available", false): return []
+	if not payload.get("locations") is Array: return []
+	var result := []
+	for raw in payload.locations:
+		var entry := accept(raw)
+		if not entry.is_empty() and str(entry.region_id) == region and not result.any(func(e): return e.id == entry.id): result.append(entry)
+	return result
+
 static func template(id: String) -> Dictionary:
 	return data().templates.get(id, {}).duplicate(true)
 

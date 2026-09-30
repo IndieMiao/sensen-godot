@@ -592,9 +592,21 @@ func _refresh_pond_directory() -> void:
 	if missing.is_empty() or now < _pond_retry_at: return
 	_pond_pending = true
 	var response := await Net.session.client.request("GET", "/ponds/cells?cells=" + ",".join(missing))
+	var cells := {}
+	if response.status == 404:
+		# Server predates the cell directory: fall back to the active city's bundled ponds so an
+		# early client never shows fewer ponds than before. Filed under the cells they fall in.
+		var region := str(host.region.get("id", ""))
+		var legacy := await Net.session.client.request("GET", "/ponds?region_id=" + region.uri_encode())
+		if legacy.is_success() and legacy.json is Dictionary and legacy.json.get("catalog_revision") == SystemPonds.revision() and legacy.json.get("available", false):
+			for key in missing: cells[key] = []
+			for entry in SystemPonds.validated_region(legacy.json, region):
+				var key := SystemPonds.cell_key(SystemPonds.cell_of(float(entry.lat), float(entry.lng)))
+				if cells.has(key): cells[key].append(entry)
+	else:
+		cells = SystemPonds.validated_cells(response.json if response.is_success() and response.json is Dictionary else {}, missing)
 	_pond_pending = false
 	if not is_inside_tree(): return
-	var cells := SystemPonds.validated_cells(response.json if response.is_success() and response.json is Dictionary else {}, missing)
 	_pond_error = cells.is_empty()
 	if _pond_error:
 		_pond_retry_at = Time.get_ticks_msec() + POND_RETRY_MS
