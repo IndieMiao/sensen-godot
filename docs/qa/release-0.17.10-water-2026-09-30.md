@@ -8,7 +8,8 @@
 - SHA-256 `64bde5ec0a6e363f999dfdcf7227f68dccb76aba7946a8e4edda8103ac868c83`
 - 包名 `com.sensen.journeypreview`，versionCode `2026093001`，versionName `0.17.10`，证书 `38771d94…8515673`
 - 与 0.17.9 的 CRC 差异：鱼塘相关 `.gdc`/shader（fishing_water、water_shore、pond_scenery、pond_stone、pond_water、pond）、新增鱼塘贴图/泡沫/HDR 天空资源、`uid_cache.bin`、`classes6.dex`、`AndroidManifest.xml`；无其他变动
-- 未发布到下载站，未发 Joey
+- 未发布到下载站
+- 已发 Joey：Slack DM `D0C1MHLA3GQ` 附 APK（文件 `F0C6DUH1SU8`）；飞书云盘文件 `Fh5ubH3dToXCMhx8VE3cfvlPnwc`（授权 Joey 查看，回下载哈希一致）+ 消息 `om_x100b64f8672094a8b2e369b14f545aa`；两边都附 TestFlight 0.17.10 (1)
 
 ## iOS
 
