@@ -9,6 +9,14 @@ uniform sampler2D basin_bed : source_color, filter_linear_mipmap, repeat_disable
 uniform sampler2D surface_flow : repeat_enable, filter_linear_mipmap;
 uniform sampler2D ripple_field : repeat_enable, filter_linear_mipmap;
 uniform sampler2D caustics : repeat_enable, filter_linear_mipmap;
+uniform sampler2D foam_pattern : repeat_enable, filter_linear_mipmap;
+uniform sampler2D foam_contact : repeat_disable, filter_linear;
+uniform bool has_foam_contact = false;
+uniform float foam_strength : hint_range(0.0, 1.0) = 1.0;
+uniform float foam_width : hint_range(0.04, 0.4) = 0.14;
+uniform float contact_foam_opacity : hint_range(0.0, 1.0) = 0.60;
+uniform float surface_foam_opacity : hint_range(0.0, 1.0) = 0.16;
+uniform vec4 foam_color : source_color = vec4(0.94, 0.98, 0.94, 1.0);
 uniform sampler2D bank_reflection : filter_linear, repeat_disable;
 uniform bool has_bank_reflection = false;
 uniform bool polygon_water = true;
@@ -176,6 +184,27 @@ void fragment() {
     color += ripple_crest * envelope * vec3(0.14, 0.28, 0.30);
     float swell = sin(p.x * 3.1 + p.y * 1.3 + t * 0.65) * sin(p.y * 2.4 - t * 0.54);
     color += vec3(0.0, 0.008, 0.011) * swell * smoothstep(0.2, 0.8, depth);
+    // Ameye's foam method: moving/distorted UVs, a threshold tied to contact
+    // distance, then alpha compositing. The mask includes actual rock sections
+    // at water height and is baked offline, so no depth pass is required here.
+    float foam_distance = has_foam_contact ? texture(foam_contact, pond_uv).r : shore;
+    vec2 foam_uv = p * 0.72 + t * vec2(0.008, -0.005) + vec2(bend_a, bend_b) * 0.018;
+    vec3 foam_fields = texture(foam_pattern, foam_uv).rgb;
+    float foam_edge = clamp(foam_distance / (foam_width * (0.78 + foam_fields.b * 0.44)), 0.0, 1.0);
+    float foam_aa = max(fwidth(foam_fields.r - foam_edge * 0.90), 0.02);
+    float foam_cells = smoothstep(foam_edge * 0.90 - foam_aa, foam_edge * 0.90 + foam_aa, foam_fields.r + 0.02);
+    float contact_froth = foam_cells * (1.0 - smoothstep(0.35, 1.0, foam_edge))
+                       * smoothstep(0.28, 0.62, foam_fields.b) * contact_foam_opacity;
+    float surface_aa = max(fwidth(foam_fields.g), 0.02);
+    float surface_froth = smoothstep(0.79, 0.85, foam_fields.b)
+                       * smoothstep(0.80 - surface_aa, 0.90 + surface_aa, foam_fields.g)
+                       * smoothstep(foam_width, foam_width * 2.0, foam_distance)
+                       * (1.0 - smoothstep(0.50, 0.95, foam_distance)) * surface_foam_opacity;
+    // Let the active float disturb small free patches around it.
+    surface_froth *= 1.0 - (1.0 - smoothstep(0.15, 0.45, distance_to_float)) * clamp(interaction.w * 4.0, 0.0, 1.0);
+    float foam_alpha = clamp(max(contact_froth, surface_froth) * foam_strength * foam_color.a, 0.0, 1.0);
+    color = mix(color, foam_color.rgb, foam_alpha);
+    water_sparkle *= 1.0 - foam_alpha;
     float far_bank = smoothstep(7.5, 11.7, -p.y + (p.x - 6.0) * 0.18);
     color *= 1.0 - far_bank * (1.0 - smoothstep(0.08, 0.85, shore)) * 0.30;
     ALBEDO = color * 0.88;
@@ -185,6 +214,8 @@ void fragment() {
     float normal_variance = dot(dFdx(normal_world), dFdx(normal_world)) + dot(dFdy(normal_world), dFdy(normal_world));
     ROUGHNESS = clamp(surface_roughness + (1.0 - 2.0 * film) * 0.03 * film_contrast + normal_variance * 6.0, 0.12, 0.55);
     SPECULAR = 0.35 + (film - 0.5) * 0.10 * film_contrast;
+    ROUGHNESS = mix(ROUGHNESS, 0.70, foam_alpha);
+    SPECULAR = mix(SPECULAR, 0.12, foam_alpha);
     METALLIC = 0.0;
 }
 

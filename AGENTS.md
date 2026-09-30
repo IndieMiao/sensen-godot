@@ -1,5 +1,21 @@
 # Product Direction
 
+- Stylized foam added on 2026-09-30, referencing only Ameye's section 5 Foam
+  as requested. Contact froth follows offline distance maps derived from the
+  actual bank meshes at water Y=0.055 for all 12 fixed pond seeds. Sparse
+  surface fragments stay near contacts and avoid the active bobber. One packed
+  original texture supplies rounded breakup / filaments / density. Width .14m,
+  contact opacity .60, surface opacity .16; alpha blending and matte foam
+  coverage retain existing water, caustics and enhanced bobber ripples.
+  Two texture reads added, no projection pass. Foam-off matches the prior
+  image within 0.000622 RGB/255 mean error. 12 pond checks, 8 Metal/Vulkan
+  pairs, full APK readback and all 13 packaged foam textures passed. Final
+  wide-view samples: 24 x 60 FPS / 33 draws; no physical GPU timing. Rebuild
+  masks after bank/seed changes and synchronize water level in the exporter
+  when it changes. Comparison and 30s whole-pond video are sent/readback-
+  verified in Gensen Feishu self review. No APK/phone/production update. See
+  docs/design/pond-foam-2026-09-30.md and docs/qa/pond-foam-2026-09-30.md.
+
 - Bobber ripples strengthened on 2026-09-30: user requested clearer fishing
   float waves. Pond-only gain 2, wider ring spacing, brighter crests with soft
   troughs and local normal movement now fade over 0.55–0.95m and near shore.

@@ -77,6 +77,11 @@ static func build(site_id: String, site_override: Dictionary = {}) -> FishingWat
 		material.set_shader_parameter("basin_bed", load("res://assets/ponds/art/%s_bed.png" % str(spec.template_id)))
 		material.set_shader_parameter("caustics", preload("res://assets/ponds/art/caustic_web.png"))
 		material.set_shader_parameter("ripple_field", preload("res://assets/ponds/art/pond_ripple_field.png"))
+		material.set_shader_parameter("foam_pattern", preload("res://assets/ponds/art/foam/foam_pattern.png"))
+		var foam_contact_path := "res://assets/ponds/art/foam/%s.png" % site_id
+		if ResourceLoader.exists(foam_contact_path):
+			material.set_shader_parameter("foam_contact", load(foam_contact_path))
+			material.set_shader_parameter("has_foam_contact", true)
 		material.set_shader_parameter("fish_paths", _pond_fish_paths(spec))
 	elif spec.has("center"):
 		material.set_shader_parameter("basin", Vector4(spec.center[0], spec.center[1], spec.radii[0], spec.radii[1]))

@@ -130,6 +130,9 @@ func _run() -> void:
 	if _probe == "env-off": scene.environment.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	if _probe == "flat": water.water_material.set_shader_parameter("wave_strength", 0.0)
 	if _probe == "bobber-ripples-off": water.water_material.set_shader_parameter("bobber_ripple_strength", 0.0)
+	if _probe == "foam-off": water.water_material.set_shader_parameter("foam_strength", 0.0)
+	if _probe == "foam-contact-only": water.water_material.set_shader_parameter("surface_foam_opacity", 0.0)
+	if _probe == "foam-surface-only": water.water_material.set_shader_parameter("contact_foam_opacity", 0.0)
 	if _probe == "caustics-off": water.water_material.set_shader_parameter("caustic_strength", 0.0)
 	if _probe == "caustics-no-warp": water.water_material.set_shader_parameter("caustic_distortion", 0.0)
 	if _probe == "caustics-no-pan": water.water_material.set_shader_parameter("caustic_pan_speed", 0.0)
@@ -188,6 +191,11 @@ func _run() -> void:
 		"normal_strength": _shader_uniform(water.water_material, &"normal_strength"),
 		"bobber_ripple_strength": _shader_uniform(water.water_material, &"bobber_ripple_strength"),
 		"bobber_interaction": [float_interaction.x, float_interaction.y, float_interaction.z, float_interaction.w],
+		"foam_strength": _shader_uniform(water.water_material, &"foam_strength"),
+		"foam_width": _shader_uniform(water.water_material, &"foam_width"),
+		"contact_foam_opacity": _shader_uniform(water.water_material, &"contact_foam_opacity"),
+		"surface_foam_opacity": _shader_uniform(water.water_material, &"surface_foam_opacity"),
+		"has_foam_contact": _shader_uniform(water.water_material, &"has_foam_contact"),
 		"caustic_depth_falloff": _shader_uniform(water.water_material, &"caustic_depth_falloff"),
 		"caustic_scale": _shader_uniform(water.water_material, &"caustic_scale"),
 		"caustic_distortion": _shader_uniform(water.water_material, &"caustic_distortion"),
@@ -219,6 +227,8 @@ func _run() -> void:
 		"catalog_sha256": SystemPonds.revision(),
 		"ripple_texture_image_sha256": _texture_image_hash(water.water_material, &"ripple_field"),
 		"caustic_texture_image_sha256": _texture_image_hash(water.water_material, &"caustics"),
+		"foam_pattern_image_sha256": _texture_image_hash(water.water_material, &"foam_pattern"),
+		"foam_contact_image_sha256": _texture_image_hash(water.water_material, &"foam_contact"),
 		"water_shader_sha256": _water_hash
 	}
 	FileAccess.open(_output.path_join(_shape + "-" + _shot + ".json"), FileAccess.WRITE).store_string(JSON.stringify(report, "\t"))
@@ -241,6 +251,7 @@ func _run() -> void:
 func _texture_image_hash(material: ShaderMaterial, key: StringName) -> String:
 	# Exported APKs contain imported textures, not the source PNG files.
 	var texture := material.get_shader_parameter(key) as Texture2D
+	if texture == null: return ""
 	var hash_context := HashingContext.new()
 	hash_context.start(HashingContext.HASH_SHA256)
 	hash_context.update(texture.get_image().get_data())
