@@ -1,0 +1,1637 @@
+/* ============================================================================
+   UI anchor kit — 2026-10-03 style-anchor round (FARM-1 / FISH-1 / COOK-1)
+   Canvas: 1080 × 2400 CSS px (portrait 9:20). All sizes are literal px from
+   gameplay-plan-v2 §16.1.2 / §16.1.3 / §10.9. Pure CSS, no framework.
+   Layers (z): scene 0 · scene tags 2 · HUD 5 · quick bar 6 · guide 99
+   v2 (2026-10-03): camera scene mode (.scene-cam) + two-row HUD with avatar button.
+   v3 (2026-10-03): control layer — joystick · main-action FAB + switch · 6-slot quick bar
+      (no energy price) · action radial · bottom drawers (cook / bag). Icons: icons.svg.
+   ========================================================================== */
+
+/* ---------- palette & tokens ------------------------------------------- */
+:root {
+  --canvas-w: 1080px;
+  --canvas-h: 2400px;
+
+  /* cream cards (92 % opaque), separated by a 1 px deeper border — no shadows */
+  --card: rgba(251, 248, 241, 0.92);
+  --card-solid: #FBF8F1;
+  --card-edge: #E1DAC8;          /* 1 px deeper cream */
+  --card-edge-2: #CFC6B0;        /* for dashed ghost frames on light scenes */
+
+  /* primary (buttons / selection ring) */
+  --primary: #7FC66A;
+  --primary-deep: #5FA85A;
+  --primary-edge: #4F934B;
+  --primary-tint: rgba(127, 198, 106, 0.18);
+
+  /* energy tri-colour */
+  --energy-green: #6CBF73;
+  --energy-amber: #E3B341;
+  --energy-red: #E07A5F;
+  --track: rgba(47, 58, 51, 0.12);
+
+  /* coins */
+  --coin: #E3B341;
+  --coin-deep: #C9962A;
+  --coin-light: #F4D27A;
+
+  /* text */
+  --ink: #2F3A33;
+  --ink-2: #6E7B74;
+  --ink-on-primary: #FFFFFF;
+
+  /* rarity dots (fish & dishes only) */
+  --rar-common: #9DB89A;
+  --rar-fine: #6FA8DC;
+  --rar-rare: #A98BD6;
+  --rar-legendary: #E3B341;
+
+  /* disabled */
+  --disabled-bg: rgba(214, 213, 206, 0.92);
+  --disabled-edge: #C4C2BA;
+  --disabled-ink: #8A918C;
+
+  /* wood sign (Explore) */
+  --wood: #B98A5E;
+  --wood-deep: #9A6F47;
+  --wood-ink: #FFF6E6;
+
+  /* layout */
+  --m: 30px;                     /* side margin shared by HUD and quick bar */
+  --safe-top: 120px;
+  --safe-bottom: 100px;
+  --bar-bottom: 124px;           /* 100 safe + 24 */
+  --bar-h: 200px;                /* §10.9.1 bar height (40 px headroom for the 12 px lift) */
+  --slot: 160px;
+  --slot-r: 32px;
+  --slot-gap: 12px;
+  --btn-h: 112px;
+
+  /* scene fallback / fit-mode band colours — override per page in <body style> */
+  --scene-top: #DCE7D4;
+  --scene-bottom: #CFDCC6;
+  --scene-pos: 50% 50%;          /* object-position for cover mode */
+
+  font-family: "Nunito", "Avenir Next Rounded", "Arial Rounded MT Bold",
+    "Hiragino Maru Gothic ProN", "SF Pro Rounded", system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: var(--canvas-w);
+  height: var(--canvas-h);
+  overflow: hidden;
+  background: #EAE6DC;
+}
+
+.canvas {
+  position: relative;
+  width: var(--canvas-w);
+  height: var(--canvas-h);
+  overflow: hidden;
+  background: linear-gradient(to bottom, var(--scene-top), var(--scene-bottom));
+}
+
+/* ---------- scene layer ------------------------------------------------- */
+/* Default = cover: the image fills the whole 1080×2400 canvas, centre-cropped
+   (a 1024×1536 source loses 260 px on each side). Crop focus: --scene-pos.
+   body.scene-fit = fit: the image is letterboxed (object-fit: contain) at
+   --scene-fit-w wide (default 1080 → 1080×1620 for a 2:3 source), vertically
+   placed by --scene-fit-pos (50% = centred). The bands above/below come from
+   the layer gradient, whose end colours --scene-top / --scene-bottom are
+   sampled from the png's top / bottom rows. */
+.scene-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  /* flat bands (8%–50% top colour, 50%–92% bottom colour) so the png's edge rows
+     meet an identical colour wherever --scene-fit-pos places the image */
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--scene-top) 90%, white) 0%,
+    var(--scene-top) 8%,
+    var(--scene-top) 50%,
+    var(--scene-bottom) 50%,
+    var(--scene-bottom) 92%,
+    color-mix(in srgb, var(--scene-bottom) 94%, #2F3A33) 100%);
+}
+.scene {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--canvas-w);
+  height: var(--canvas-h);
+  object-fit: cover;
+  object-position: var(--scene-pos);
+  display: block;
+  color: transparent;            /* hide broken-image text if the png is missing */
+}
+.scene-fit .scene {
+  left: calc((var(--canvas-w) - var(--scene-fit-w, var(--canvas-w))) / 2);
+  width: var(--scene-fit-w, var(--canvas-w));
+  object-fit: contain;
+  object-position: 50% var(--scene-fit-pos, 50%);
+}
+/* fit mode: feather the png's top/bottom rows into the bands. Pages set
+   --scene-fit-top / --scene-fit-bottom (canvas y of the image edges) — for a
+   2:3 png at 1080 wide: top = pos × 780, bottom = top + 1620. */
+.scene-fit .scene-layer::before,
+.scene-fit .scene-layer::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: var(--scene-feather, 90px);
+  z-index: 1;
+  pointer-events: none;
+}
+.scene-fit .scene-layer::before {
+  top: calc(var(--scene-fit-top, 390px) - 2px);
+  background: linear-gradient(to bottom, var(--scene-top), transparent);
+}
+.scene-fit .scene-layer::after {
+  top: calc(var(--scene-fit-bottom, 2010px) - var(--scene-feather, 90px) + 2px);
+  background: linear-gradient(to top, var(--scene-bottom), transparent);
+}
+/* body.scene-cam = camera mode (v2, 2026-10-03): the png is scaled by the
+   unitless --cam-scale (source px → canvas px) and its top-left corner is put
+   at canvas (--cam-x, --cam-y), so canvas = source × scale + (cam-x, cam-y).
+   Anything outside 1080 × 2400 is clipped by .scene-layer; the band gradient
+   shows only where the png does not reach (above --cam-y). Pages give the
+   source size via --src-w / --src-h (default 1024 × 1536). */
+.scene-cam .scene {
+  left: var(--cam-x, 0px);
+  top: var(--cam-y, 0px);
+  width: calc(var(--src-w, 1024px) * var(--cam-scale, 1));
+  height: calc(var(--src-h, 1536px) * var(--cam-scale, 1));
+  object-fit: fill;
+  object-position: 0 0;
+}
+.scene-cam .scene-layer::before,
+.scene-cam .scene-layer::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: var(--scene-feather, 90px);
+  z-index: 1;
+  pointer-events: none;
+}
+.scene-cam .scene-layer::before {
+  top: calc(var(--cam-y, 0px) - 2px);
+  background: linear-gradient(to bottom, var(--scene-top), transparent);
+}
+.scene-cam .scene-layer::after {
+  top: calc(var(--cam-y, 0px) + var(--src-h, 1536px) * var(--cam-scale, 1) - var(--scene-feather, 90px) + 2px);
+  background: linear-gradient(to top, var(--scene-bottom), transparent);
+}
+/* soft legibility veil behind the quick bar; keeps the diorama visible */
+.bar-veil {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 460px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(251, 248, 241, 0) 0%,
+    rgba(251, 248, 241, 0.28) 55%, rgba(251, 248, 241, 0.42) 100%);
+}
+
+/* ---------- generic card / pill ----------------------------------------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  color: var(--ink);
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* icons: inline SVG via <use>, sized by class */
+.ic { display: inline-block; width: 1em; height: 1em; flex: 0 0 auto; }
+.ic-28 { width: 28px; height: 28px; }
+.ic-32 { width: 32px; height: 32px; }
+.ic-36 { width: 36px; height: 36px; }
+.ic-44 { width: 44px; height: 44px; }
+.ic-56 { width: 56px; height: 56px; }
+.ic-64 { width: 64px; height: 64px; }
+
+/* ---------- HUD (v2 · 2026-10-03) ---------------------------------------
+   Row 1  y 48…176 (128 tall): avatar button 112 · energy card (112 tall, bar 240 × 12)
+          · [flex gap] · coin capsule 72 tall · Inbox round button 96.
+   Row 2  y 192…256 (64 tall): Today chip (left, shrinks with ellipsis) · place chip (right).
+   Every tappable target ≥ 96 px. Cards: no shadow, 1 px deeper-cream edge. */
+.hud {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 280px;
+  z-index: 5;
+  pointer-events: none;
+}
+.hud > * { pointer-events: auto; }
+
+.hud-row1 {
+  position: absolute;
+  left: var(--m); right: var(--m); top: 48px;
+  height: 128px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hud-row1 .grow { flex: 1 1 auto; min-width: 0; }
+.hud-row2 {
+  position: absolute;
+  left: var(--m); right: var(--m); top: 192px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+/* avatar button 112 — dual skill ring (Farming green, right half · Fishing blue, left half)
+   around an 88 px face crop taken from scenes/farm.png (same crop on every page) */
+.avatar-btn {
+  position: relative;
+  flex: 0 0 auto;
+  width: 112px;
+  height: 112px;
+  border-radius: 56px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+}
+.avatar-btn .skill-ring {
+  position: absolute;
+  left: -1px; top: -1px;
+  width: 112px; height: 112px;
+}
+.avatar-face {
+  position: absolute;
+  left: 11px; top: 11px;
+  width: 88px; height: 88px;
+  border-radius: 44px;
+  border: 1px solid var(--card-edge);
+  background: #DCCFAF url("../scenes/farm.png") no-repeat;
+  background-size: var(--face-size, 805px) auto;
+  background-position: var(--face-pos, -206px -560px);
+}
+
+/* energy card — ⚡ + 40 px number, 240 × 12 tri-zone bar, regen line */
+.energy-card {
+  flex: 0 0 auto;
+  height: 112px;
+  padding: 10px 22px 0 18px;
+  border-radius: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.energy-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+}
+.energy-top .ic { width: 36px; height: 36px; }
+.energy-num {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 44px;
+  letter-spacing: 0.2px;
+}
+.energy-num .of { color: var(--ink-2); font-weight: 800; }
+.energy-track {
+  position: relative;
+  width: 240px;
+  height: 12px;
+  margin-top: 6px;
+  border-radius: 6px;
+  overflow: hidden;
+  /* three zones: red 0–10 %, amber 10–25 %, neutral 25–100 % */
+  background: linear-gradient(90deg,
+    rgba(224, 122, 95, 0.30) 0 10%,
+    rgba(227, 179, 65, 0.32) 10% 25%,
+    rgba(47, 58, 51, 0.12) 25% 100%);
+}
+.energy-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: var(--pct, 71%);
+  border-radius: 6px;
+  background: var(--energy-green);
+}
+.energy-card.is-amber .energy-fill { background: var(--energy-amber); }
+.energy-card.is-red .energy-fill { background: var(--energy-red); }
+.energy-card.is-bonus .energy-fill { background: linear-gradient(90deg, var(--energy-green), var(--coin-light)); }
+/* zone ticks at 10 % and 25 % */
+.energy-track::before,
+.energy-track::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: rgba(251, 248, 241, 0.9);
+}
+.energy-track::before { left: 10%; }
+.energy-track::after { left: 25%; }
+.energy-regen {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 26px;
+  color: var(--ink-2);
+}
+.energy-regen b { color: var(--ink); font-weight: 800; }
+
+/* coin capsule 72 tall */
+.coins {
+  flex: 0 0 auto;
+  height: 72px;
+  padding: 0 16px 0 28px;
+  border-radius: 36px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 32px;
+  font-weight: 800;
+}
+.coins .ic { width: 40px; height: 40px; }
+
+/* Inbox round button 96 with red count badge */
+.inbox-btn {
+  position: relative;
+  flex: 0 0 auto;
+  width: 96px;
+  height: 96px;
+  border-radius: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.inbox-btn .ic { width: 46px; height: 46px; }
+.badge {
+  position: absolute;
+  top: -2px; right: -2px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 9px;
+  border-radius: 18px;
+  background: var(--energy-red);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 36px;
+  text-align: center;
+  border: 2px solid var(--card-solid);
+}
+
+/* row 2 · Today chip (collapsed) — shrinks with an ellipsis so the place chip always fits */
+.today {
+  flex: 0 1 auto;
+  min-width: 0;
+  height: 64px;
+  padding: 0 22px 0 24px;
+  border-radius: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 28px;
+  font-weight: 700;
+}
+.today b { font-weight: 800; flex: 0 0 auto; }
+.today .today-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dot-sep { color: var(--ink-2); flex: 0 0 auto; }
+.today .chev { width: 24px; height: 24px; color: var(--ink-2); flex: 0 0 auto; }
+/* row 2 · place chip (v3: "City · Space", the Map entry) — "Shanghai · Homestead", "Shanghai · Willow Pond".
+   Left: small house = home city (abroad state would swap it for a passport stamp — not drawn this round).
+   Right: › chevron = opens the Map / city panel. The old standalone Map button is gone. */
+.place {
+  flex: 0 0 auto;
+  height: 64px;
+  padding: 0 14px 0 16px;
+  border-radius: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 28px;
+  font-weight: 800;
+}
+.place .ic { width: 34px; height: 34px; }
+.place .sub { color: var(--ink-2); font-weight: 700; }
+.place .sep { color: var(--ink-2); font-weight: 700; }
+.place .space { font-weight: 800; }
+.place .chev-r { width: 26px; height: 26px; color: var(--ink-2); margin-left: 2px; }
+
+/* under-HUD badges (e.g. Creel on the pond page) — y 272, chip-sized */
+.under-hud {
+  position: absolute;
+  left: var(--m);
+  top: 272px;
+  z-index: 5;
+  display: flex;
+  gap: 12px;
+}
+.creel {
+  height: 64px;
+  padding: 0 22px 0 18px;
+  border-radius: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 28px;
+  font-weight: 800;
+}
+.creel .ic { width: 34px; height: 34px; }
+.creel .free { color: var(--primary-deep); }
+
+/* ---------- Quick Bar --------------------------------------------------- */
+.quickbar {
+  position: absolute;
+  left: var(--m); right: var(--m);
+  bottom: var(--bar-bottom);
+  height: var(--bar-h);
+  z-index: 6;
+  display: flex;
+  align-items: flex-end;           /* slots sit on the bar's bottom edge (124 px from screen bottom) */
+  justify-content: space-between;
+  gap: var(--slot-gap);
+}
+.slots {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--slot-gap);
+}
+
+/* scene chip (left) and Bag (right) share the slot footprint */
+.chip, .bag {
+  width: var(--slot);
+  height: var(--slot);
+  border-radius: var(--slot-r);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 26px;
+  font-weight: 800;
+  position: relative;
+}
+.chip .ic, .bag .ic { width: 60px; height: 60px; }
+.chip-label { line-height: 28px; }
+.bag .cap-dot {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 16px; height: 16px;
+  border-radius: 8px;
+  background: var(--coin);
+  border: 2px solid var(--card-solid);
+}
+
+/* slot */
+.slot {
+  position: relative;
+  width: var(--slot);
+  height: var(--slot);
+  border-radius: var(--slot-r);
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  overflow: visible;
+}
+.slot-icon {
+  position: absolute;
+  left: 50%; top: 22px;
+  width: 84px; height: 84px;
+  transform: translateX(-50%);
+}
+.slot .count {
+  position: absolute;
+  right: 10px; top: 94px;
+  height: 30px;
+  padding: 0 9px;
+  border-radius: 15px;
+  background: rgba(47, 58, 51, 0.08);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 30px;
+}
+.slot .cost {
+  position: absolute;
+  left: 0; right: 0; bottom: 10px;
+  text-align: center;
+  font-size: 23px;
+  font-weight: 800;
+  line-height: 26px;
+  color: var(--ink-2);
+}
+.slot .cost.is-name { font-size: 21px; font-weight: 700; color: var(--ink-2); }   /* no price: item name */
+.slot .cost.is-free { color: var(--primary-deep); }
+.slot .cost.is-short { color: var(--energy-amber); }   /* not enough Energy for one use */
+.slot .cost.is-equipped { color: var(--primary-deep); }
+.slot .name {                     /* optional small name line under the icon */
+  position: absolute;
+  left: 0; right: 0; bottom: 38px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+/* rarity dot — 28 px, top-left (fish & dishes only) */
+.slot .dot {
+  position: absolute;
+  left: 12px; top: 12px;
+  width: 28px; height: 28px;
+  border-radius: 14px;
+  border: 2px solid var(--card-solid);
+}
+.dot-common { background: var(--rar-common); }
+.dot-fine { background: var(--rar-fine); }
+.dot-rare { background: var(--rar-rare); }
+.dot-legendary { background: var(--rar-legendary); }
+/* pin — top-left small pin for pinned slots */
+.slot .pin { position: absolute; left: 10px; top: 10px; width: 26px; height: 26px; color: var(--ink-2); }
+/* sub-badge — bottom-right mini item (e.g. bait hanging on the rod) */
+.slot .sub-badge {
+  position: absolute;
+  right: -10px; bottom: 36px;      /* lower-right, clear of the bottom text line */
+  width: 52px; height: 52px;
+  border-radius: 26px;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  display: flex; align-items: center; justify-content: center;
+}
+.slot .sub-badge .ic { width: 34px; height: 34px; }
+
+/* selected: lifts 12 px, bright primary ring; others dim 15 % */
+.slot.is-selected {
+  transform: translateY(-12px);
+  border: 3px solid var(--primary-deep);
+  background: var(--card-solid);
+}
+.quickbar.has-selection .slot:not(.is-selected) { filter: brightness(0.85); }
+.quickbar.has-selection .slot.is-ghost { filter: brightness(0.92); }
+
+/* ghost (empty) slot: light dashed frame, faint silhouette + hint, no "+" */
+.slot.is-ghost {
+  background: rgba(251, 248, 241, 0.42);
+  border: 3px dashed rgba(251, 248, 241, 0.95);
+}
+.slot.is-ghost .slot-icon {
+  top: 18px;
+  width: 60px; height: 60px;
+  opacity: 0.32;
+  filter: grayscale(1);
+}
+.slot.is-ghost .hint {
+  position: absolute;
+  left: 10px; right: 10px; bottom: 14px;
+  text-align: center;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 24px;
+  color: var(--ink-2);
+}
+
+/* locked / disabled: 60 % grey, reason text at the bottom */
+.slot.is-locked {
+  background: var(--disabled-bg);
+  border-color: var(--disabled-edge);
+}
+.slot.is-locked .slot-icon { filter: grayscale(1); opacity: 0.55; }
+.slot.is-locked .cost { color: var(--disabled-ink); }
+
+/* hint bubble above the chip (kitchen "Pick an ingredient") */
+.bar-hint {
+  position: absolute;
+  left: var(--m);
+  bottom: calc(var(--bar-bottom) + var(--slot) + 22px);
+  z-index: 6;
+  height: 56px;
+  padding: 0 22px;
+  border-radius: 28px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.bar-hint::after {
+  content: "";
+  position: absolute;
+  left: 64px; bottom: -11px;
+  width: 20px; height: 20px;
+  background: var(--card-solid);
+  border-right: 1px solid var(--card-edge);
+  border-bottom: 1px solid var(--card-edge);
+  transform: rotate(45deg);
+}
+
+/* ---------- buttons ----------------------------------------------------- */
+.btn {
+  height: var(--btn-h);
+  padding: 0 52px;
+  border-radius: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid var(--card-edge);
+  background: var(--card);
+  color: var(--ink);
+}
+.btn .ic { width: 44px; height: 44px; }
+.btn-primary {
+  background: linear-gradient(to bottom, var(--primary) 0%, var(--primary-deep) 100%);
+  border: 1px solid var(--primary-edge);
+  color: var(--ink-on-primary);
+}
+.btn-secondary {
+  background: var(--card);
+  border: 3px solid var(--primary-deep);
+  color: var(--ink);
+}
+.btn.is-disabled {
+  background: var(--disabled-bg);
+  border-color: var(--disabled-edge);
+  color: var(--disabled-ink);
+}
+.btn .sep { opacity: 0.7; font-weight: 700; }
+
+/* primary action above the bar (pond "Cast · 5 Energy"): centred, ≥ 560 wide */
+.action-main {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--bar-bottom) + var(--bar-h) + 24px);   /* 348 px */
+  transform: translateX(-50%);
+  min-width: 600px;
+  z-index: 6;
+}
+/* Map pill button, bottom-right above the bar */
+.action-map {
+  position: absolute;
+  right: var(--m);
+  bottom: calc(var(--bar-bottom) + var(--bar-h) + 24px);
+  z-index: 6;
+}
+
+/* ---------- scene tags (labels stuck on diorama objects) ---------------- */
+/* Position each with inline style="--x:…px; --y:…px" — anchored at its centre.
+   --dx (optional) slides the card sideways while the pointer stays on --x. */
+.tag {
+  position: absolute;
+  left: var(--x, 540px);
+  top: var(--y, 1200px);
+  transform: translate(calc(-50% + var(--dx, 0px)), -50%);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+  font-weight: 800;
+}
+.tag--anchor-bottom { transform: translate(calc(-50% + var(--dx, 0px)), -100%); }   /* --y = pointer tip, card above */
+.tag--anchor-top { transform: translate(calc(-50% + var(--dx, 0px)), 0); }         /* --y = pointer tip, card below */
+.tag-card {
+  height: 64px;
+  padding: 0 24px;
+  border-radius: 32px;
+  font-size: 28px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+}
+.tag-card .ic { width: 34px; height: 34px; }
+.tag-card.is-small { height: 52px; font-size: 24px; padding: 0 18px; }
+.tag-card .sub { color: var(--ink-2); font-weight: 700; }
+/* pointer under a card (or above it with tag--anchor-top) */
+.tag--pointer::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - var(--dx, 0px)); bottom: -10px;
+  width: 18px; height: 18px;
+  margin-left: -9px;
+  background: var(--card-solid);
+  border-right: 1px solid var(--card-edge);
+  border-bottom: 1px solid var(--card-edge);
+  transform: rotate(45deg);
+}
+/* leader: card floats --lead px above the tip, joined by a thin cream line */
+.tag--leader { transform: translate(calc(-50% + var(--dx, 0px)), calc(-100% - var(--lead, 60px))); }
+.tag--leader::before {
+  content: "";
+  position: absolute;
+  left: calc(50% - var(--dx, 0px)); top: 100%;
+  width: 4px; height: calc(var(--lead, 60px) + 2px);
+  margin-left: -2px;
+  background: rgba(251, 248, 241, 0.95);
+  border-radius: 2px;
+}
+.tag--anchor-top.tag--pointer::after {
+  bottom: auto; top: -10px;
+  border-right: none; border-bottom: none;
+  border-left: 1px solid var(--card-edge);
+  border-top: 1px solid var(--card-edge);
+}
+/* Ready badge (plots / stove / trap) — primary pill */
+.tag-ready {
+  height: 52px;
+  padding: 0 20px;
+  border-radius: 26px;
+  font-size: 24px;
+  background: linear-gradient(to bottom, var(--primary), var(--primary-deep));
+  border: 1px solid var(--primary-edge);
+  color: #fff;
+}
+.tag-ready.tag--pointer::after {
+  background: var(--primary-deep);
+  border-color: var(--primary-edge);
+}
+.tag-ready.is-glow { box-shadow: 0 0 0 6px rgba(127, 198, 106, 0.28), 0 0 28px 6px rgba(127, 198, 106, 0.55); }
+/* Sell badge — amber pill */
+.tag-sell {
+  height: 52px;
+  padding: 0 20px;
+  border-radius: 26px;
+  font-size: 24px;
+  background: linear-gradient(to bottom, var(--coin-light), var(--coin));
+  border: 1px solid var(--coin-deep);
+  color: var(--ink);
+}
+.tag-sell.tag--pointer::after { background: var(--coin); border-color: var(--coin-deep); }
+/* wooden sign (mine "Explore") */
+.tag-wood {
+  height: 64px;
+  padding: 0 28px;
+  border-radius: 18px;
+  font-size: 30px;
+  letter-spacing: 0.5px;
+  background: linear-gradient(to bottom, var(--wood), var(--wood-deep));
+  border: 1px solid var(--wood-deep);
+  color: var(--wood-ink);
+}
+.tag-wood::before {        /* post */
+  content: "";
+  position: absolute;
+  left: 50%; top: 100%;
+  width: 16px; height: 44px;
+  margin-left: -8px;
+  border-radius: 0 0 8px 8px;
+  background: var(--wood-deep);
+}
+/* hanging tag (Cookbook) — ring on top */
+.tag-hang::before {
+  content: "";
+  position: absolute;
+  left: 50%; top: -18px;
+  width: 20px; height: 20px;
+  margin-left: -10px;
+  border-radius: 10px;
+  border: 4px solid var(--card-edge-2);
+  background: transparent;
+}
+/* cast target ring (pond): glowing soft ellipse on the water, centred on --x/--y */
+.cast-ring {
+  position: absolute;
+  left: var(--x, 540px); top: var(--y, 1200px);
+  width: var(--w, 176px); height: var(--h, 84px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 5px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 0 0 6px rgba(127, 198, 106, 0.35), 0 0 26px 8px rgba(127, 198, 106, 0.5), inset 0 0 18px rgba(255, 255, 255, 0.45);
+  z-index: 1;
+  pointer-events: none;
+}
+/* tutorial tip (first-time hint) */
+.tag-tip {
+  height: 56px;
+  padding: 0 22px;
+  border-radius: 28px;
+  font-size: 24px;
+  font-weight: 700;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+}
+.tag-tip .ic { width: 28px; height: 28px; color: var(--primary-deep); }
+.tag-tip b { font-weight: 800; }
+
+/* stove status sign (kitchen) */
+.tag-stove {
+  height: 64px;
+  padding: 0 22px 0 18px;
+  border-radius: 32px;
+  font-size: 24px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+}
+.tag-stove .ic { width: 34px; height: 34px; }
+.tag-stove .st-empty { color: var(--ink-2); }
+.tag-stove .st-cooking { color: var(--energy-amber); }
+.tag-stove .st-ready { color: var(--primary-deep); }
+.tag-stove .sep { color: var(--ink-2); font-weight: 700; }
+.tag-stove.is-ready { border: 2px solid var(--primary-deep); }
+.tag-stove .ready-chip {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 20px;
+  background: linear-gradient(to bottom, var(--primary), var(--primary-deep));
+  color: #fff;
+  font-size: 22px;
+  line-height: 40px;
+  box-shadow: 0 0 0 5px rgba(127, 198, 106, 0.26), 0 0 22px 4px rgba(127, 198, 106, 0.5);
+}
+/* notice banner (kitchen "All stoves busy") — kept in kit, hidden on COOK-1 */
+.notice {
+  position: absolute;
+  left: 50%; top: 300px;
+  transform: translateX(-50%);
+  z-index: 5;
+  height: 64px;
+  padding: 0 28px;
+  border-radius: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 28px;
+  font-weight: 800;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+}
+.notice .sub { color: var(--ink-2); font-weight: 700; }
+
+[hidden] { display: none !important; }
+
+/* ---------- guide overlay (8 px grid + safe areas) ---------------------- */
+/* Shown with ?guide=1 (2-line inline script toggles html.show-guide) or #guide (pure CSS :target). */
+.guide {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 99;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(0, 140, 255, 0.10) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 140, 255, 0.10) 1px, transparent 1px),
+    linear-gradient(to right, rgba(0, 140, 255, 0.22) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 140, 255, 0.22) 1px, transparent 1px);
+  background-size: 8px 8px, 8px 8px, 80px 80px, 80px 80px;
+}
+.guide:target, .show-guide .guide { display: block; }
+.g-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 0;
+  border-top: 2px dashed rgba(224, 60, 60, 0.9);
+}
+.g-line.is-green { border-top-color: rgba(60, 170, 90, 0.95); }
+.g-line.is-blue { border-top-color: rgba(50, 110, 220, 0.9); }
+.g-line span {
+  position: absolute;
+  right: 12px; top: 4px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(224, 60, 60, 0.9);
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+.g-line.is-green span { background: rgba(60, 170, 90, 0.95); }
+.g-line.is-blue span { background: rgba(50, 110, 220, 0.9); }
+.g-vline {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 0;
+  border-left: 2px dashed rgba(50, 110, 220, 0.8);
+}
+.g-box {
+  position: absolute;
+  border: 2px dashed rgba(50, 110, 220, 0.9);
+  border-radius: 24px;
+  font-size: 20px;
+  font-weight: 800;
+  color: rgba(50, 110, 220, 0.95);
+  padding: 6px 12px;
+}
+
+
+/* ============================================================================
+   v3 control layer (2026-10-03) — operating model: joystick (move) · FAB (main
+   action of the current mode) · switch (mode radial) · 6-slot quick bar (5 + Bag)
+   · bottom drawers (cook, bag). Scene camera, HUD row 1 and scene tags unchanged.
+   ========================================================================== */
+
+/* ---------- floating joystick (farm page only; appears under the thumb) ----
+   outer 260 (cream 45 % + 1 px edge) · knob 120 (primary 70 %), knob offset
+   --kx/--ky from centre shows the push direction. Anchored at (--x, --y). */
+.joystick {
+  position: absolute;
+  left: calc(var(--x, 300px) - 130px);
+  top: calc(var(--y, 1560px) - 130px);
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: rgba(251, 248, 241, 0.45);
+  border: 1px solid rgba(251, 248, 241, 0.95);
+  z-index: 4;
+  pointer-events: none;
+}
+.joystick::before {                       /* faint centre mark */
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 14px; height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 7px;
+  background: rgba(47, 58, 51, 0.14);
+}
+.joystick .knob {
+  position: absolute;
+  left: calc(50% - 60px + var(--kx, 40px));
+  top: calc(50% - 60px + var(--ky, -40px));
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(127, 198, 106, 0.70);
+  border: 1px solid rgba(79, 147, 75, 0.85);
+}
+
+/* ---------- main action FAB (176 round, bottom-right where Map used to be) --
+   cream card + 4 px primary ring; big icon + label + price line.
+   bottom 348 = bar-bottom 124 + bar-h 200 + 24 → y 1876…2052, x 874…1050. */
+.fab {
+  position: absolute;
+  right: var(--m);
+  bottom: calc(var(--bar-bottom) + var(--bar-h) + 24px);
+  width: 176px; height: 176px;
+  border-radius: 50%;
+  background: var(--card-solid);
+  border: 4px solid var(--primary-deep);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+}
+.fab .ic { width: 68px; height: 68px; margin-top: -4px; }
+.fab .lbl { font-size: 30px; font-weight: 800; line-height: 34px; margin-top: 2px; }
+.fab .sub { font-size: 20px; font-weight: 700; line-height: 24px; color: var(--ink-2); }
+.fab .sub.is-free { color: var(--primary-deep); }
+.fab .sub.is-short { color: var(--energy-amber); }
+/* mode switch 96 round, 24 px above the FAB, centred on it (x 914…1010, y 1756…1852) */
+.switch {
+  position: absolute;
+  right: calc(var(--m) + 40px);
+  bottom: calc(var(--bar-bottom) + var(--bar-h) + 24px + 176px + 24px);
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: #E4E0D6;
+  border: 1px solid var(--card-edge-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+}
+.switch .ic { width: 50px; height: 50px; color: var(--ink-2); }
+.switch.is-on {                           /* pressed: radial open */
+  background: linear-gradient(to bottom, var(--primary), var(--primary-deep));
+  border-color: var(--primary-edge);
+}
+.switch.is-on .ic { color: #fff; }
+/* kitchen: no quick bar — Bag sits alone at the bar's right end */
+.bag-fixed {
+  position: absolute;
+  right: var(--m);
+  bottom: var(--bar-bottom);
+  z-index: 6;
+}
+
+/* ---------- quick bar v3: 5 slots + Bag = 6 × 160, 12 gaps → exactly 1020 ----
+   slot = icon (76, top) · name (22 px, ≤ 2 lines, bottom-left) · count ×N pill
+   (bottom-right). No energy price (it lives on the FAB). */
+.slot .slot-icon { top: 14px; width: 76px; height: 76px; }
+.slot .name {
+  position: absolute;
+  left: 12px; right: 12px; bottom: 12px;
+  text-align: left;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 24px;
+  max-height: 48px;
+  overflow: hidden;
+  color: var(--ink);
+}
+.slot.has-count .name,
+.slot.is-locked .name { right: 52px; }
+.slot .count {
+  top: auto; bottom: 8px; right: 8px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 16px;
+  line-height: 32px;
+  background: rgba(47, 58, 51, 0.08);
+}
+/* "Equipped" tag — small green label hanging over the slot's top-right edge */
+.slot .eq {
+  position: absolute;
+  top: -12px; right: 10px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 15px;
+  background: linear-gradient(to bottom, var(--primary), var(--primary-deep));
+  border: 1px solid var(--primary-edge);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 28px;
+}
+/* locked: 60 % grey + lock + level pill */
+.slot.is-locked { opacity: 0.78; }
+.slot.is-locked .name { color: var(--disabled-ink); }
+.slot .lock {
+  position: absolute;
+  right: 8px; bottom: 8px;
+  height: 32px;
+  padding: 0 10px 0 8px;
+  border-radius: 16px;
+  background: rgba(47, 58, 51, 0.10);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--disabled-ink);
+}
+.slot .lock .ic { width: 22px; height: 22px; color: var(--disabled-ink); }
+/* ghost v3: dashed frame + faint silhouette only, no text */
+.slot.is-ghost .slot-icon { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 64px; height: 64px; opacity: 0.28; }
+.slot.is-ghost .name, .slot.is-ghost .hint { display: none; }
+
+/* ---------- action radial (switch pressed) ------------------------------
+   4 × 128 round items fanned above the player, thin leaders from the player,
+   two-line capsule label under each item. Positions via --x/--y (centre). */
+.radial-lines { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.radial-lines line { stroke: rgba(251, 248, 241, 0.95); stroke-width: 4; stroke-linecap: round; }
+.radial-lines line.is-off { stroke: rgba(251, 248, 241, 0.55); stroke-dasharray: 10 12; }
+.radial-item {
+  position: absolute;
+  left: calc(var(--x) - 64px);
+  top: calc(var(--y) - 64px);
+  width: 128px; height: 128px;
+  border-radius: 50%;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+.radial-item .ic { width: 72px; height: 72px; }
+.radial-item.is-selected {
+  border: 4px solid var(--primary-deep);
+  outline: 6px solid rgba(127, 198, 106, 0.28);
+}
+.radial-item.is-off { background: var(--disabled-bg); border-color: var(--disabled-edge); }   /* 60 % grey: grey card, washed icon */
+.radial-item.is-off .ic { filter: grayscale(1); opacity: 0.6; }
+.radial-label {
+  position: absolute;
+  left: var(--x);
+  top: calc(var(--y) + 64px + 10px);
+  transform: translateX(-50%);
+  padding: 7px 18px 8px;
+  border-radius: 28px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  text-align: center;
+  white-space: nowrap;
+  z-index: 4;
+}
+.radial-label .n { display: block; font-size: 24px; font-weight: 800; line-height: 28px; }
+.radial-label .s { display: block; font-size: 20px; font-weight: 700; line-height: 24px; color: var(--ink-2); }
+.radial-label.is-selected { border: 2px solid var(--primary-deep); }
+.radial-label.is-off { background: var(--disabled-bg); border-color: var(--disabled-edge); }
+.radial-label.is-off .n, .radial-label.is-off .s { color: var(--disabled-ink); }
+/* player anchor dot (debug aid, hidden by default) */
+.radial-origin { position: absolute; left: calc(var(--x) - 8px); top: calc(var(--y) - 8px); width: 16px; height: 16px; border-radius: 8px; background: rgba(251,248,241,.9); z-index: 3; }
+/* while the radial is open the scene labels hide (they return when it closes) */
+.radial-open .tag { display: none; }
+
+/* ---------- bottom drawers (cook / bag) ----------------------------------
+   scene dimmed 30 % under the drawer; HUD (z 5) stays bright; drawer z 7. */
+.scene-dim {
+  position: absolute; inset: 0;
+  background: rgba(47, 58, 51, 0.30);
+  z-index: 3;
+  pointer-events: none;
+}
+.drawer {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: var(--drawer-h, 1440px);
+  padding: 0 var(--m);
+  border-radius: 48px 48px 0 0;
+  background: rgba(251, 248, 241, 0.92);
+  border-top: 1px solid var(--card-edge);
+  z-index: 7;
+  overflow: hidden;
+}
+.drawer-head {
+  height: 96px;
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.drawer-title { font-size: 34px; font-weight: 800; display: inline-flex; align-items: center; gap: 12px; }
+.drawer-title .sub { color: var(--ink-2); font-weight: 700; }
+.drawer-title .ic { width: 40px; height: 40px; }
+.close-btn {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.close-btn .ic { width: 40px; height: 40px; color: var(--ink); }
+.tabs { display: flex; gap: 12px; margin-top: 24px; }
+.tab {
+  height: 80px;
+  padding: 0 40px;
+  border-radius: 40px;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.tab.is-on {
+  background: linear-gradient(to bottom, var(--primary), var(--primary-deep));
+  border-color: var(--primary-edge);
+  color: #fff;
+}
+.tabs.is-split .tab { flex: 1 1 0; }
+.tabs.is-compact .tab { height: 64px; padding: 0 22px; border-radius: 32px; font-size: 24px; }
+.tab .n {
+  min-width: 34px; height: 34px;
+  padding: 0 9px;
+  border-radius: 17px;
+  background: var(--rar-fine);
+  color: #fff;
+  font-size: 20px;
+  line-height: 34px;
+  text-align: center;
+}
+.tab.is-on .n { background: rgba(255,255,255,.9); color: var(--primary-deep); }
+
+/* recipes list */
+.recipes { margin-top: 24px; }
+.recipe {
+  height: 140px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  border-bottom: 1px solid var(--card-edge);
+}
+.recipe .thumb {
+  position: relative;
+  flex: 0 0 auto;
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: #F1EADA;
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.recipe .thumb .ic { width: 62px; height: 62px; }
+.recipe .thumb .dot {
+  position: absolute;
+  left: -2px; top: -2px;
+  width: 28px; height: 28px;
+  border-radius: 14px;
+  border: 2px solid var(--card-solid);
+}
+.recipe .mid { flex: 1 1 auto; min-width: 0; }
+.recipe .nm { font-size: 30px; font-weight: 800; line-height: 36px; }
+.recipe .meta { margin-top: 4px; font-size: 24px; font-weight: 700; line-height: 30px; color: var(--ink-2); }
+.recipe .meta .rar-fine { color: var(--rar-fine); }
+.recipe .meta .rar-common { color: #7FA37B; }
+.recipe .right { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.btn-sm {
+  height: 96px;
+  min-width: 200px;
+  padding: 0 36px;
+  border-radius: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 28px;
+  font-weight: 800;
+  white-space: nowrap;
+  border: 1px solid var(--card-edge);
+  background: var(--card-solid);
+  color: var(--ink);
+}
+.btn-sm.btn-primary { background: linear-gradient(to bottom, var(--primary), var(--primary-deep)); border-color: var(--primary-edge); color: #fff; }
+.btn-sm.is-disabled { background: var(--disabled-bg); border-color: var(--disabled-edge); color: var(--disabled-ink); }
+.recipe .need { font-size: 22px; font-weight: 700; line-height: 26px; color: var(--ink-2); white-space: nowrap; }
+.recipe .need b { color: var(--ink); font-weight: 800; }
+.recipe .need .ok { color: var(--primary-deep); }
+.recipe .need .no { color: var(--energy-red); }
+.more-row {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ink-2);
+}
+.more-row .ic { width: 26px; height: 26px; color: var(--ink-2); }
+
+/* experiment */
+.exp-slots { display: flex; justify-content: center; gap: 56px; margin-top: 44px; }
+.exp-slot {
+  position: relative;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.exp-slot .ic { width: 68px; height: 68px; }
+.exp-slot .nm { font-size: 20px; font-weight: 800; line-height: 22px; text-align: center; padding: 0 12px; }
+.exp-slot.is-empty {
+  background: rgba(251, 248, 241, 0.5);
+  border: 3px dashed var(--card-edge-2);
+  color: var(--ink-2);
+  font-size: 26px;
+  font-weight: 800;
+}
+.exp-slot.is-empty .plus { font-size: 44px; line-height: 40px; color: var(--card-edge-2); }
+.pot {
+  position: relative;
+  width: 320px; height: 320px;
+  margin: 24px auto 0;
+  border-radius: 50%;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pot::before, .pot::after {              /* handles */
+  content: "";
+  position: absolute;
+  top: 118px;
+  width: 72px; height: 40px;
+  border-radius: 20px;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+}
+.pot::before { left: -62px; }
+.pot::after { right: -62px; }
+.pot .rim {                               /* inner rim ellipse */
+  position: absolute;
+  left: 34px; right: 34px; top: 96px;
+  height: 128px;
+  border-radius: 50%;
+  border: 1px solid var(--card-edge);
+  background: #F1EADA;
+}
+.pot .ic { position: relative; width: 112px; height: 112px; color: var(--card-edge-2); }
+.preview {
+  margin: 24px auto 0;
+  width: max-content;
+  height: 64px;
+  padding: 0 28px;
+  border-radius: 32px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 26px;
+  font-weight: 800;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+}
+.preview .q { color: var(--ink-2); }
+.preview .rar-fine { color: var(--rar-fine); }
+.preview .sub { color: var(--ink-2); font-weight: 700; }
+.sec-title { margin-top: 36px; font-size: 26px; font-weight: 800; color: var(--ink); }
+.ingr-row { display: flex; justify-content: space-between; margin-top: 16px; }
+.ingr {
+  position: relative;
+  width: 128px; height: 128px;
+  border-radius: 28px;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+}
+.ingr .ic { position: absolute; left: 50%; top: 10px; width: 58px; height: 58px; transform: translateX(-50%); }
+.ingr .nm { position: absolute; left: 8px; right: 8px; bottom: 10px; text-align: center; font-size: 18px; font-weight: 800; line-height: 20px; color: var(--ink); }
+.ingr .count { position: absolute; right: 6px; top: 6px; height: 26px; padding: 0 8px; border-radius: 13px; background: rgba(47,58,51,.08); font-size: 18px; font-weight: 800; line-height: 26px; }
+.ingr .dot { position: absolute; left: 8px; top: 8px; width: 22px; height: 22px; border-radius: 11px; border: 2px solid var(--card-solid); }
+.ingr.is-in { border: 3px solid var(--primary-deep); }
+.exp-foot {
+  position: absolute;
+  left: var(--m); right: var(--m);
+  bottom: calc(var(--safe-bottom) + 40px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.exp-foot .note { font-size: 22px; font-weight: 700; line-height: 28px; color: var(--ink-2); max-width: 360px; }
+.exp-foot .btn { width: 600px; }
+
+/* bag drawer */
+.drawer.is-bag { --drawer-h: 1600px; }
+.qb-inline {
+  margin-top: 36px;
+  height: 160px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.qb-inline .slots { display: flex; align-items: flex-end; gap: var(--slot-gap); }
+.close-slot {
+  width: var(--slot); height: var(--slot);
+  border-radius: var(--slot-r);
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.close-slot .ic { width: 44px; height: 44px; color: var(--ink); }
+.bag-title {
+  margin-top: 28px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.bag-title .h { font-size: 32px; font-weight: 800; white-space: nowrap; }
+.bag-title .h .of { color: var(--ink-2); }
+.cap-track { flex: 1 1 auto; height: 12px; border-radius: 6px; background: var(--track); position: relative; overflow: hidden; }
+.cap-fill { position: absolute; left: 0; top: 0; bottom: 0; width: var(--pct, 76%); border-radius: 6px; background: var(--primary); }
+.sort-chip {
+  height: 56px;
+  padding: 0 20px 0 16px;
+  border-radius: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  white-space: nowrap;
+}
+.sort-chip .ic { width: 28px; height: 28px; color: var(--ink-2); }
+.sort-chip .sub { color: var(--ink-2); font-weight: 700; }
+.detail {
+  margin-top: 24px;
+  height: 220px;
+  border-radius: 40px;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 28px 0 24px;
+}
+.detail .big {
+  position: relative;
+  flex: 0 0 auto;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: #F1EADA;
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.detail .big .ic { width: 80px; height: 80px; }
+.detail .big .dot { position: absolute; left: -2px; top: -2px; width: 28px; height: 28px; border-radius: 14px; border: 2px solid var(--card-solid); }
+.detail .mid { flex: 1 1 auto; min-width: 0; }
+.detail .nm { font-size: 32px; font-weight: 800; line-height: 38px; }
+.detail .meta { font-size: 24px; font-weight: 700; line-height: 30px; color: var(--ink-2); margin-top: 2px; }
+.detail .desc { font-size: 22px; font-weight: 700; line-height: 28px; color: var(--ink-2); margin-top: 6px; font-style: italic; }
+.detail .acts { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; }
+.detail .acts .btn-sm { min-width: 170px; padding: 0 28px; }
+.pin-btn {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink-2);
+}
+.pin-btn .ic { width: 34px; height: 34px; }
+.grid {
+  margin: 24px auto 0;
+  width: calc(5 * var(--slot) + 4 * 16px);
+  display: grid;
+  grid-template-columns: repeat(5, var(--slot));
+  gap: 16px;
+}
+.cell {
+  position: relative;
+  width: var(--slot); height: var(--slot);
+  border-radius: var(--slot-r);
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+}
+.cell .ic { position: absolute; left: 50%; top: 50%; width: 84px; height: 84px; transform: translate(-50%, -56%); }
+.cell .count { position: absolute; right: 8px; bottom: 8px; height: 32px; padding: 0 10px; border-radius: 16px; background: rgba(47,58,51,.08); font-size: 22px; font-weight: 800; line-height: 32px; }
+.cell .dot { position: absolute; left: 12px; top: 12px; width: 28px; height: 28px; border-radius: 14px; border: 2px solid var(--card-solid); }
+.cell.is-selected { border: 4px solid var(--primary-deep); outline: 6px solid rgba(127, 198, 106, 0.22); }
+.cell.is-empty { background: rgba(251, 248, 241, 0.35); border: 3px dashed var(--card-edge-2); }
+.btn-sm.btn-sec { border: 2px solid var(--primary-deep); }
+/* bag drawer rhythm: qb 832–992 · title 1016–1080 · tabs 1100–1164 · detail 1184–1404 · grid 1424–2288 (safe bottom 2300) */
+.drawer.is-bag .qb-inline { margin-top: 32px; }
+.drawer.is-bag .bag-title { margin-top: 24px; }
+.drawer.is-bag .tabs { margin-top: 20px; }
+.drawer.is-bag .detail { margin-top: 20px; }
+.drawer.is-bag .grid { margin-top: 20px; }
+/* while a drawer is open the scene tags hide too (leaders would bleed through the 92 % drawer) */
+.drawer-open .tag { display: none; }
+
+/* ============================================================================
+   v4 tools split (2026-10-03) — the quick bar holds only consumables of the
+   current action (it is a shortcut strip over the bag); tools and accessories
+   live in the "Tools & Gear" drawer (equip.html). Four starter tools are owned
+   by default; Outfit is a separate, later tab.
+   ========================================================================== */
+
+/* FAB gear badge — 56 round hanging on the FAB's top-left, shows the equipped
+   tool the action uses (pond: rod). Cream solid + 2 px primary ring + 32 icon. */
+.fab .gear-badge {
+  position: absolute;
+  left: -8px; top: -8px;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--card-solid);
+  border: 2px solid var(--primary-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fab .gear-badge .ic { width: 34px; height: 34px; margin: 0; }
+
+/* ---------- Tools & Gear drawer (equip.html) --------------------------------
+   1680 tall (70 %, y 720–2400). head 752–848 · tabs 872–952 · Equipped title
+   984 · 2 × 2 tool cards 480 × 200 (1032–1452) · Accessories title 1484 ·
+   2 cards 480 × 140 (1532–1672) · Owned title 1704 · 3 rows × 120 (1748–2108)
+   · footnote above safe bottom. */
+.drawer.is-equip { --drawer-h: 1680px; }
+.tab.is-off { background: var(--disabled-bg); border-color: var(--disabled-edge); color: var(--disabled-ink); }
+.tab .later {
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 15px;
+  background: rgba(47, 58, 51, 0.08);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 30px;
+  color: var(--disabled-ink);
+}
+.eq-sec {
+  margin-top: 32px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 32px;
+  color: var(--ink);
+}
+.eq-sec .sub { font-size: 22px; font-weight: 700; color: var(--ink-2); }
+.eq-grid {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  row-gap: 20px;
+}
+.eq-card {
+  position: relative;
+  width: 480px; height: 200px;
+  border-radius: 40px;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  padding: 26px 20px 20px 160px;
+}
+.eq-card .big {
+  position: absolute;
+  left: 20px; top: 40px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: #F1EADA;
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.eq-card .big .ic { width: 76px; height: 76px; }
+.eq-card .act { font-size: 20px; font-weight: 800; line-height: 24px; color: var(--ink-2); }
+.eq-card .act.is-farm { color: var(--primary-deep); }
+.eq-card .act.is-fish { color: var(--rar-fine); }
+.eq-card .act.is-mine { color: var(--wood-deep); }
+.eq-card .act.is-fight { color: var(--energy-red); }
+.eq-card .nm { font-size: 28px; font-weight: 800; line-height: 34px; margin-top: 2px; white-space: nowrap; }
+.eq-card .fx { font-size: 20px; font-weight: 700; line-height: 26px; color: var(--ink-2); margin-top: 2px; white-space: nowrap; }
+.btn-xs {
+  position: absolute;
+  right: 16px; bottom: 16px;
+  height: 52px;
+  padding: 0 22px;
+  border-radius: 26px;
+  border: 2px solid var(--primary-deep);
+  background: var(--card-solid);
+  color: var(--primary-deep);
+  font-size: 20px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+/* accessories: 480 × 140, 96 icon */
+.eq-card.is-acc { height: 140px; padding: 0 20px 0 136px; display: flex; flex-direction: column; justify-content: center; }
+.eq-card.is-acc .big { left: 20px; top: 22px; width: 96px; height: 96px; }
+.eq-card.is-acc .big .ic { width: 60px; height: 60px; }
+.eq-card.is-acc .btn-xs { bottom: auto; top: 50%; transform: translateY(-50%); }
+/* empty accessory slot: dashed frame, faint silhouette */
+.eq-card.is-empty { background: rgba(251, 248, 241, 0.5); border: 3px dashed var(--card-edge-2); }
+.eq-card.is-empty .big { background: transparent; border: 2px dashed var(--card-edge-2); }
+.eq-card.is-empty .big .ic { opacity: 0.3; filter: grayscale(1); }
+.eq-card.is-empty .nm { color: var(--ink-2); }
+/* owned list */
+.owned { margin-top: 12px; }
+.own-row {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid var(--card-edge);
+}
+.own-row:last-child { border-bottom: 0; }
+.own-row .thumb {
+  flex: 0 0 auto;
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: #F1EADA;
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.own-row .thumb .ic { width: 56px; height: 56px; }
+.own-row .mid { flex: 1 1 auto; min-width: 0; }
+.own-row .nm { font-size: 28px; font-weight: 800; line-height: 34px; }
+.own-row .meta { font-size: 22px; font-weight: 700; line-height: 28px; color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
+.own-row .meta .ok { color: var(--primary-deep); display: inline-flex; align-items: center; gap: 4px; }
+.own-row .meta .ok .ic { width: 22px; height: 22px; }
+.own-row .meta .no { color: var(--disabled-ink); }
+.own-row .btn-sm { height: 80px; min-width: 180px; padding: 0 30px; border-radius: 40px; font-size: 26px; }
+.own-row .btn-sm.is-disabled .ic { width: 24px; height: 24px; color: var(--disabled-ink); }
+.own-row.is-locked .thumb .ic { filter: grayscale(1); opacity: 0.55; }
+.own-row.is-locked .nm { color: var(--disabled-ink); }
+.eq-foot {
+  position: absolute;
+  left: var(--m); right: var(--m);
+  bottom: calc(var(--safe-bottom) + 24px);
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  color: var(--ink-2);
+}

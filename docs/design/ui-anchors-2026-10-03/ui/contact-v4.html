@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UI anchors · contact sheet (v4 tools split)</title>
+<style>
+  :root { --bg:#F6F1E6; --ink:#2B2A28; --ink-2:#6B675F; --edge:rgba(0,0,0,.08); }
+  html, body { margin:0; background:var(--bg); color:var(--ink);
+    font-family: "Nunito", "Avenir Next", "Helvetica Neue", Arial, sans-serif; }
+  .sheet { width:1880px; padding:40px; box-sizing:border-box; display:flex; flex-wrap:nowrap; gap:40px; align-items:flex-start; }
+  figure { margin:0; width:420px; }
+  figure img { display:block; width:420px; height:933px; border-radius:30px; box-shadow:0 2px 0 var(--edge), 0 14px 32px rgba(0,0,0,.10); }
+  figcaption { margin-top:18px; display:flex; align-items:center; gap:12px; white-space:nowrap; overflow:hidden; }
+  figcaption .no { flex:0 0 34px; width:34px; height:34px; border-radius:17px; background:var(--ink); color:#fff; font-size:20px; font-weight:800; line-height:34px; text-align:center; }
+  figcaption .id { font-size:26px; font-weight:800; letter-spacing:.5px; }
+  figcaption .name { font-size:20px; font-weight:700; color:var(--ink-2); min-width:0; overflow:hidden; text-overflow:ellipsis; }
+  figcaption .sep { color:var(--ink-2); font-weight:700; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <figure><img src="../out/v4/FARM-1.png" alt=""><figcaption><span class="no">1</span><span class="id">FARM-1</span><span class="sep">·</span><span class="name">Seeds &amp; feed · Sow ×1</span></figcaption></figure>
+  <figure><img src="../out/v4/FISH-1.png" alt=""><figcaption><span class="no">2</span><span class="id">FISH-1</span><span class="sep">·</span><span class="name">Bait only · rod on Cast</span></figcaption></figure>
+  <figure><img src="../out/v4/BAG-1.png" alt=""><figcaption><span class="no">3</span><span class="id">BAG-1</span><span class="sep">·</span><span class="name">Bag · no tool cells</span></figcaption></figure>
+  <figure><img src="../out/v4/EQUIP-1.png" alt=""><figcaption><span class="no">4</span><span class="id">EQUIP-1</span><span class="sep">·</span><span class="name">Tools &amp; Gear drawer</span></figcaption></figure>
+</div>
+</body>
+</html>

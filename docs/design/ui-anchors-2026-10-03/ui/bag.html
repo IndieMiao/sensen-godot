@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>BAG-1 · Bag Drawer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kit.css">
+</head>
+<!-- body class "scene-cam" = camera mode (v2): canvas = source × --cam-scale + (--cam-x, --cam-y).
+     --scene-top / --scene-bottom are the band colours sampled from the png's top/bottom rows (shown only above --cam-y).
+     v3 (2026-10-03): icons come from icons.svg; control layer = joystick · FAB + switch · 6-slot quick bar · drawers. -->
+<body class="scene-cam drawer-open" style="--scene-top:#B0CFC1; --scene-bottom:#F7DDAD; --src-w:1024px; --src-h:1536px; --cam-scale:1.22; --cam-x:-127px; --cam-y:356px;">
+<div class="canvas">
+
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../scenes/farm.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+
+  <!-- Scene tags — move with --x/--y (centre-anchored; tag--anchor-bottom puts the pointer tip on --y; --dx slides the card) -->
+  <!-- positions assume body.scene-cam with --cam-scale:1.22, --cam-x:-127px, --cam-y:356px (canvas = source×1.22 + (−127, 356)) -->
+  <div class="tag tag-card tag--pointer tag--anchor-bottom" style="--x:370px; --y:1015px; --dx:-40px"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-home"/></svg><span>Homestead Lv2</span></div>
+  <div class="tag tag-sell tag--pointer tag--anchor-bottom" style="--x:507px; --y:879px">Sell 12</div>
+  <div class="tag tag-ready tag--pointer tag--anchor-bottom" style="--x:390px; --y:1254px">Ready</div>
+  <div class="tag tag-ready tag--pointer tag--anchor-bottom" style="--x:893px; --y:1358px">Ready</div>
+  <div class="tag tag-ready tag--pointer tag--anchor-bottom" style="--x:714px; --y:1462px">Ready</div>
+  <div class="tag tag-wood" style="--x:983px; --y:893px; padding:0 22px">Explore</div>
+
+  <div class="scene-dim"></div>
+  <!-- bag drawer: rises to y 800 (1600 tall), top radius 48; row 1 is the quick bar itself (5 slots + ✕ in the Bag position)
+       v4: quick bar = consumables of the current action only (same 5 slots as farm.html); tools are in Tools & Gear, not here -->
+  <section class="drawer is-bag">
+    <div class="qb-inline">
+      <div class="slots">
+        <div class="slot has-count is-selected"><svg class="slot-icon" aria-hidden="true"><use href="icons.svg#i-radish-seeds"/></svg><span class="name">Radish Seeds</span><span class="count">×24</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="icons.svg#i-carrot-seeds"/></svg><span class="name">Carrot Seeds</span><span class="count">×10</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="icons.svg#i-compost"/></svg><span class="name">Compost</span><span class="count">×6</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="icons.svg#i-feed-bag"/></svg><span class="name">Orchard Feed</span><span class="count">×2</span></div>
+        <div class="slot is-ghost"><svg class="slot-icon" aria-hidden="true"><use href="icons.svg#i-radish-seeds"/></svg></div>
+      </div>
+      <div class="close-slot" title="Close"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-close"/></svg></div>
+    </div>
+    <div class="bag-title">
+      <div class="h">Bag 19<span class="of">/25</span></div>
+      <div class="cap-track"><div class="cap-fill" style="--pct:76%"></div></div>
+      <div class="sort-chip"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-sort"/></svg><span>Sort</span><span class="sub">· Recent</span></div>
+    </div>
+    <div class="tabs is-compact">
+      <div class="tab is-on">All</div><div class="tab">Seeds</div><div class="tab">Fish<span class="n">7</span></div><div class="tab">Produce</div><div class="tab">Dishes</div><div class="tab">Materials</div><div class="tab">Tackle</div>
+    </div>
+    <!-- detail card for the selected cell -->
+    <div class="detail">
+      <div class="big"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-dish-grilled"/></svg><span class="dot dot-common"></span></div>
+      <div class="mid"><div class="nm">Grilled Crucian</div><div class="meta">Common dish · +20 Energy</div><div class="desc">Simple grilled pond fish.<br>Tastes like home.</div></div>
+      <div class="acts"><div class="pin-btn" title="Pin to quick bar"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-pin"/></svg><span>Pin</span></div><div class="btn-sm btn-sec">Gift</div><div class="btn-sm btn-primary">Eat</div></div>
+    </div>
+    <!-- 5 × 5 grid, 160 cells, 16 gaps -->
+    <div class="grid">
+      <div class="cell is-selected"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="icons.svg#i-dish-grilled"/></svg><span class="count">×3</span></div>
+      <div class="cell"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="icons.svg#i-fish"/></svg><span class="count">×3</span></div>
+      <div class="cell"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="icons.svg#i-carp"/></svg><span class="count">×2</span></div>
+      <div class="cell"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="icons.svg#i-minnow"/></svg><span class="count">×2</span></div>
+      <div class="cell"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="icons.svg#i-dish-soup"/></svg><span class="count">×1</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-radish"/></svg><span class="count">×12</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-carrot"/></svg><span class="count">×4</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-apple"/></svg><span class="count">×2</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-radish-seeds"/></svg><span class="count">×24</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-carrot-seeds"/></svg><span class="count">×10</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-compost"/></svg><span class="count">×6</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-salt"/></svg><span class="count">×2</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-herb"/></svg><span class="count">×1</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-wood"/></svg><span class="count">×20</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-stone"/></svg><span class="count">×8</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-worm"/></svg><span class="count">×12</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-lure"/></svg><span class="count">×3</span></div>
+      <!-- v4: the two tool cells (Row Tool · Starter Rod) moved to Tools & Gear; Orchard Feed ×2 and Fish Trap ×1 take their place (still 19/25) -->
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-feed-bag"/></svg><span class="count">×2</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-trap"/></svg><span class="count">×1</span></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+    </div>
+  </section>
+
+  <!-- HUD v2 (unchanged in v3): row1 y48–176 = avatar 112 · energy card 112 (bar 240×12) · coins 72 · Inbox 96
+       row2 y192–256 = Today chip (left, shrinks) · place chip v3 (right): house = home city · "City · Space" · › opens the Map / city panel -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <!-- Farming (green) owns the right half: 12 → 6 o'clock · F4 ≈ 45 % -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <!-- Fishing (blue) owns the left half: 6 → 12 o'clock · F6 ≈ 60 % -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Radishes ready in 1h 12m</span><svg class="chev" aria-hidden="true"><use href="icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Homestead</span><svg class="chev-r" aria-hidden="true"><use href="icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+
+  <!-- Guide overlay: ?guide=1 or #guide -->
+  <div id="guide" class="guide">
+    <div class="g-line" style="top:120px"><span>safe top 120</span></div>
+    <div class="g-line" style="top:2300px"><span>safe bottom 100</span></div>
+    <div class="g-line is-green" style="top:2276px"><span>quick bar bottom · 124 from bottom</span></div>
+    <div class="g-line is-green" style="top:2116px"><span>slots top · 160 tall</span></div>
+    <div class="g-line is-blue" style="top:48px"><span>HUD row 1 · 48–176</span></div>
+    <div class="g-line is-blue" style="top:176px"></div>
+    <div class="g-line is-blue" style="top:192px"><span>HUD row 2 · 192–256</span></div>
+    <div class="g-line is-blue" style="top:256px"></div>
+    <div class="g-vline" style="left:30px"></div>
+    <div class="g-vline" style="left:1050px"></div>
+    <div class="g-vline" style="left:540px;border-left-style:dotted"></div>
+    <div class="g-box" style="right:30px;top:1876px;width:176px;height:176px;border-radius:88px">FAB 176</div>
+    <div class="g-box" style="right:70px;top:1756px;width:96px;height:96px;border-radius:48px"></div>
+  </div>
+  <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
+
+</div>
+</body>
+</html>
