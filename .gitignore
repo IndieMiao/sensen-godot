@@ -37,3 +37,6 @@ output/
 # Mixamo 骨架样例（three.js Xbot.glb），仅供本机跑重定向管线自测，不入库
 tmp/mixamo_fixture/
 __pycache__/
+
+# AI image API raw responses (base64 duplicates of the PNGs next to them)
+docs/design/**/*.response.json
