@@ -54,6 +54,8 @@ func _ready() -> void:
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.theme = GameUi.theme()
+	# App copy is English-only (user rule 2026-09-04): keep the Localization autoload from translating P0 labels.
+	root.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	add_child(root)
 	pad = _TouchPad.new()
 	pad.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -397,7 +399,7 @@ func _sheet(height: float, title: String, icon_id := "") -> VBoxContainer:
 
 ## Bag drawer: quick-bar row is the bar itself (P0: seeds shown), then capacity, then a 5-column grid.
 func open_bag() -> void:
-	var v := _sheet(380, "Bag %d/%d" % [_bag_slots().size(), int(view.get("bag", {}).get("capacity", 25))], "bag")
+	var v := _sheet(470, "Bag %d/%d" % [_bag_slots().size(), int(view.get("bag", {}).get("capacity", 25))], "bag")
 	var cap := _CapBar.new()
 	cap.custom_minimum_size = Vector2(0, 5)
 	cap.set_meta("pct", float(_bag_slots().size()) / maxf(1.0, float(view.get("bag", {}).get("capacity", 25))))
@@ -413,13 +415,15 @@ func open_bag() -> void:
 		var slots := _bag_slots()
 		if i < slots.size():
 			var s: Dictionary = slots[i]
-			cell.add_theme_stylebox_override("panel", _box(PAPER, 10, EDGE, 1, Vector4(4, 4, 4, 4)))
-			var box := Control.new()
-			var ic := _icon(str(s.id), 28)
-			ic.position = Vector2(11, 4)
+			cell.add_theme_stylebox_override("panel", _box(PAPER, 10, EDGE, 1, Vector4(4, 4, 4, 2)))
+			var box := VBoxContainer.new()
+			box.add_theme_constant_override("separation", 0)
+			box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			var ic := _icon(str(s.id), 30)
+			ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			box.add_child(ic)
 			var q := _label("×%d" % int(s.qty), 9, INK, true)
-			q.position = Vector2(26, 36)
+			q.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			box.add_child(q)
 			cell.add_child(box)
 			var id := str(s.id)
@@ -638,15 +642,17 @@ func show_level_up(ev: Dictionary) -> void:
 	card.add_child(ok)
 
 func _center_card(width: float) -> VBoxContainer:
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_CENTER)
 	panel.custom_minimum_size = Vector2(width, 0)
 	panel.add_theme_stylebox_override("panel", _box(CARD, 16, EDGE, 1, Vector4(14, 12, 14, 12)))
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 7)
 	panel.add_child(v)
-	_open_modal(panel, 0.3)
-	panel.position = Vector2(-width * 0.5, -120)
+	center.add_child(panel)
+	_open_modal(center, 0.3)
 	return v
 
 func _tile(icon_id: String, text: String, note: String, cb := Callable()) -> Control:

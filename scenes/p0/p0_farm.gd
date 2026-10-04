@@ -40,6 +40,10 @@ var _shot_t := 0.0
 var _shot_script: Array = []
 
 func _ready() -> void:
+	# The map app runs with a transparent window (native map underlay); the P0 farm is an opaque world.
+	get_viewport().transparent_bg = false
+	get_window().transparent = false
+	RenderingServer.set_default_clear_color(Color("b9dccf"))
 	_build_world()
 	session = P0Session.new()
 	add_child(session)
@@ -90,6 +94,13 @@ func _build_world() -> void:
 	sun.light_energy = 1.25
 	sun.shadow_enabled = true
 	add_child(sun)
+	# backdrop: a huge unlit pastel floor under the island so no transparent pixel can show through on Android
+	var floor := _box(Vector3(220, 0.1, 220), Vector3(0, -3.0, 0), Color("b9dccf"))
+	var fm := StandardMaterial3D.new()
+	fm.albedo_color = Color("b9dccf")
+	fm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	floor.material_override = fm
+	floor.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	# island: sand slab + grass top + a path to the stall
 	_box(Vector3(16, 0.8, 16), Vector3(0, -0.42, 0), Color("d9bb84"))
 	_box(Vector3(15.4, 0.04, 15.4), Vector3(0, 0.0, 0), Color("7fb84f"))
@@ -376,6 +387,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				ui.show_level_up(ev)
 		dy -= 16.0
 	if ui.has_modal() and events.size() > 0 and _is_stall_open():
+		ui.set_view(session.current())
 		ui.open_stall(_stall_bubble(events))
 
 func _is_stall_open() -> bool:
