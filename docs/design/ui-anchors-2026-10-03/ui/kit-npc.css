@@ -740,7 +740,7 @@
 .mini-card .h { font-size: 22px; font-weight: 800; color: var(--ink-2); text-transform: uppercase; letter-spacing: 1px; }
 .mini-card .btn { width: 100%; margin-top: 14px; font-size: 28px; padding: 0 20px; }
 
-/* ---------- four-up climate thumbnails (NPC-1-2) ---------------------------- */
+/* ---------- four-up climate thumbnails (NPC-1-2, page deleted 2026-10-04) ------ */
 .quad {
   position: absolute;
   left: var(--m); right: var(--m);
@@ -758,7 +758,7 @@
   background: linear-gradient(to bottom, #ADD5D0, #F7D9BB);
   border: 1px solid var(--card-edge);
 }
-/* outpost.png at 0.625 (640 wide): island src x 15…983 / y 169…1144 → cell x −62…543 (50 px cropped each side), y 76…685 */
+/* (deprecated 2026-10-04 with the outpost plaza; kept only so old pages do not break) */
 .quad .skin img { position: absolute; left: -71px; top: -30px; width: 640px; height: auto; display: block; }
 .quad .skin .sign {
   position: absolute;

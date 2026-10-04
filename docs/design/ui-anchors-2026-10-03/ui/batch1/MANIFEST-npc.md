@@ -99,3 +99,5 @@ ui/batch1/MANIFEST-npc.md
 |---|---|---|
 | NPC-6 / 6-2 | 点单卡顶部加 "Ama's Tea · Lotus Tea House" + ✕ 与掌柜栏 `.kpanel.is-tea`（Ama 近景 + 气泡 + 小字）；原柜台上方的 Tea Host 名牌去掉 | `.kpanel` 规则已做成全局（不只 `.drawer.is-counter`） |
 | NPC-7（新） | 驿站室内压暗；抽屉 `.drawer.is-counter.is-post`（1720 高）："Sigrid's Desk · Travel Post"，Tab Permits / Passport / Fares，掌柜栏藏青底；两张 `.pcard`（Travel Permit / Long-haul Ticket）：`.how` 配方行、`.pchip` 材料 / 条件芯片（✓ 绿框、灰不满足）、Craft / Buy；页脚 Coffee · Travel Biscuits · 盖章台 | **坑**：卡内类名不能叫 `.recipe` / `.chip`，会撞 kit.css 的配方行与 HUD 芯片样式 |
+
+- 2026-10-04 夜清理：删除作废的据点组广场底图 `scenes/outpost.png`（含 .log / .prompt.txt）与旧页面 `NPC-1.html` / `NPC-1-2.html` 及其渲染图（Figma 卡已分别换成 NPC-1a / NPC-1b）；`contact-batch1-C` 对应两格改指 NPC-1a / NPC-1b 并重出。
