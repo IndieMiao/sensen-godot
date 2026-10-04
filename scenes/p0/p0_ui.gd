@@ -57,6 +57,9 @@ var modal_kind := ""            # "stall", "bag", "kitchen", "card", ... — whi
 var _kitchen_tab := "cookbook"
 var _exp_slots: Array = []      # Experiment tab: ids placed in the pot
 var _card_queue: Array = []
+var _teach: PanelContainer
+var _teach_left := 0.0
+var _taught := {}
 var _tags := {}
 var _toast: Label
 var _toast_left := 0.0
@@ -94,6 +97,9 @@ func _process(dt: float) -> void:
 	if _toast_left > 0.0:
 		_toast_left -= dt
 		if _toast_left <= 0.0: _toast.hide()
+	if _teach_left > 0.0:
+		_teach_left -= dt
+		if _teach_left <= 0.0 and _teach: _teach.hide()
 
 func _build_hud() -> void:
 	_avatar = _AvatarRing.new()
@@ -939,6 +945,39 @@ func open_radial() -> void:
 		layer.add_child(b)
 	_open_modal(layer, 0.18)
 	modal_kind = "radial"
+
+# ---------------------------------------------------------------- one-line teaching cards (§14.3)
+const TIPS_PATH := "user://p0_tips.json"
+
+## A one-sentence card above the quick bar, once per account on this device; tap or 7 s to dismiss.
+## Never a hand animation, never moves the player (§14.3 "不画手指动画循环").
+func teach(key: String, text: String) -> void:
+	if _taught.is_empty() and FileAccess.file_exists(TIPS_PATH):
+		var saved = JSON.parse_string(FileAccess.get_file_as_string(TIPS_PATH))
+		if saved is Dictionary: _taught = saved
+	if _taught.has(key): return
+	_taught[key] = true
+	var f := FileAccess.open(TIPS_PATH, FileAccess.WRITE)
+	if f: f.store_string(JSON.stringify(_taught))
+	if _teach == null:
+		_teach = PanelContainer.new()
+		_teach.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+		_teach.offset_left = 10
+		_teach.offset_right = -84
+		_teach.offset_top = -41 - 53 - 14 - 64
+		_teach.offset_bottom = -41 - 53 - 12
+		_teach.add_theme_stylebox_override("panel", _box(Color("2f3a33"), 14, Color("2f3a33"), 0, Vector4(12, 8, 12, 8)))
+		var l := _label("", 11, PAPER, true)
+		l.name = "Text"
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		_teach.add_child(l)
+		_teach.gui_input.connect(func(e: InputEvent):
+			if P0Ui.is_tap(e) or (e is InputEventScreenTouch and e.pressed): _teach.hide())
+		root.add_child(_teach)
+	(_teach.get_node("Text") as Label).text = text
+	_teach.show()
+	_teach_left = 7.0
 
 # ---------------------------------------------------------------- M2: kitchen, catch and dish cards
 ## Stove panel (§7.2.7, COOK-2a/2b): Cookbook (known pages cook in one tap, missing ones say what is short)

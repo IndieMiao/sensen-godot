@@ -334,7 +334,20 @@ func _process(dt: float) -> void:
 	_update_tags(v)
 	_animate_bobber(dt)
 	_hold_repeat(dt)
+	_teaching(v)
 	ui.player_screen = cam.unproject_position(player.position + Vector3(0, 1.0, 0))
+
+## §14.3 one-line teaching cards, each the first time its moment comes (the card keeps its own memory).
+func _teaching(v: Dictionary) -> void:
+	if ui.has_modal() or _fishing != null or _cooking != null: return
+	var firsts: Array = v.get("firsts", [])
+	if _mode == "farm" and not firsts.any(func(f): return str(f).begins_with("harvest:")) and not v.get("plots", []).any(func(p): return str(p.state) in ["sown", "growing", "ready"]):
+		ui.teach("sow", "Pick a seed, walk up to a plot and press Sow. Hold to keep sowing.")
+	elif _mode == "fish":
+		ui.teach("cast", "Casting uses 5 Energy. If the fish gets away, most of it comes back.")
+		if P0Logic.bag_count(v, "bait_worm") > 0: ui.teach("bait", "Tap Worm Bait to put it on the hook · faster bites, more Fine fish.")
+	elif player.position.distance_to(STOVE) < 4.0 and not firsts.any(func(f): return str(f).begins_with("cook:")) and P0Logic.today_line(v).contains("fish"):
+		ui.teach("stove", "Tap the stove to grill your first fish.")
 
 ## Hold-to-repeat (§14.2 "Hold to keep sowing"): the same verb on each new plot in front, never a new verb.
 func _hold_repeat(dt: float) -> void:
@@ -679,6 +692,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if str(ev.status) == "accepted": ui.toast("Tracking · it shows in Today")
 				else: ui.toast("Request complete · +%d coins" % int(ev.coins))
 			"meal":
+				ui.teach("meal", "Energy comes back over time. A meal brings it back now.")
 				if int(ev.gain) <= 0:
 					ui.toast("Full belly · Meals reset in " + P0Logic.duration(float(v.get("meals", {}).get("resets_in", 0))) if int(ev.counted) <= 0 and int(ev.nominal) > 0 else "Same dish · no Energy today")
 				else:
