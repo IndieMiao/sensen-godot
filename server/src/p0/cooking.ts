@@ -1,8 +1,8 @@
 /** Cooking and eating (plan §7.2–7.6, §7.17): pots cost no energy; quality comes from heat taps judged on the server. */
 import { dishId, dishParts, fishById, ingredient, itemKind, recipeById, type CookTier, type P0Content, type Recipe } from './content.js';
 import { add, count, room, take } from './bag.js';
-import { gainEnergy, gainXp, type P0Event } from './progress.js';
-import { draw, scaledXp, skillLevel, xpPercent } from './rules.js';
+import { gainEnergy, gainXp, grantOnce, type P0Event } from './progress.js';
+import { draw, foodCap, scaledXp, skillLevel, xpPercent } from './rules.js';
 import type { Heat, P0State } from './state.js';
 import type { Refusal } from './fishing.js';
 
@@ -160,6 +160,11 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown }, no
   events.push({ kind: 'dish', dish: pot.dish, quality, qty: 1 + extra, first, mystery: pot.mystery, hits });
   if (pot.mystery) return null;
   if (!s.cookbook.includes(pot.dish)) s.cookbook.push(pot.dish);
+  if (first) {
+    grantOnce(c, s, now, `first_dish_${pot.rarity}`, c.rewards.first_dish[pot.rarity - 1] ?? 0, events);
+    const cooked = s.firsts.filter(f => f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`).length;
+    for (const [n, energy] of c.rewards.cookbook) if (cooked >= n) grantOnce(c, s, now, `cookbook_${n}`, energy, events);
+  }
   const tier = c.cooking.tiers[String(pot.rarity)];
   const before = s.day.cooked[pot.dish] ?? 0;
   s.day.cooked[pot.dish] = before + 1;
@@ -193,14 +198,15 @@ export function eatDish(c: P0Content, s: P0State, cmd: { item?: unknown }, now: 
   if (count(s.bag, id) < 1) return { code: 'not_enough', detail: { item: id, have: 0 } };
   if (s.energy.value >= max) return { code: 'energy_full' };
   const nominal = mealValue(c, s, id);
-  const counted = Math.max(0, Math.min(nominal, c.cooking.food_cap - s.day.meals));
+  const cap = foodCap(c, s, now);
+  const counted = Math.max(0, Math.min(nominal, cap - s.day.meals));
   take(s.bag, id, 1);
   events.push({ kind: 'item', id, delta: -1 });
   const { base } = dishParts(id);
   s.day.eaten[base] = (s.day.eaten[base] ?? 0) + 1;
   s.day.meals += counted;
   const gain = gainEnergy(c, s, now, counted, events, 'eat');
-  events.push({ kind: 'meal', dish: id, nominal, counted, gain, meals: s.day.meals, cap: c.cooking.food_cap });
+  events.push({ kind: 'meal', dish: id, nominal, counted, gain, meals: s.day.meals, cap });
   return null;
 }
 

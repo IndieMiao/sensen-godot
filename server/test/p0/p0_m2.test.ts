@@ -14,7 +14,7 @@ function step(s: P0State, cmd: P0Command, now = T0): { s: P0State; ev: P0Event[]
   if (!r.ok) throw new Error(`${cmd.type}: ${r.code} ${JSON.stringify(r.detail ?? {})}`);
   return { s: r.state, ev: r.events };
 }
-const fresh = () => freshState(c, 'player-test-02', T0, 7);
+const fresh = () => ({ ...freshState(c, 'player-test-02', T0, 7), created_at: T0 - 8 * 24 * H });
 const catchOf = (ev: P0Event[]) => ev.find(e => e.kind === 'catch') as Extract<P0Event, { kind: 'catch' }>;
 
 /** Cast and wait out the bite, then report the outcome. */
@@ -264,5 +264,46 @@ describe('P0 stall M2 goods', () => {
     s = step(s, { type: 'buy', item: 'bait_worm', qty: 30 }).s;
     expect(applyP0(c, s, { type: 'buy', item: 'bait_worm', qty: 1 }, T0)).toMatchObject({ ok: false, code: 'sold_out' });
     expect(recipeById(c, 'dish_grilled_crucian')?.known).toBe(true);
+  });
+});
+
+describe('P0 Newcomer Blessing (§3.4.6) and one-time rewards (§3.4.8)', () => {
+  const newcomer = () => freshState(c, 'player-test-03', T0, 7);
+  it('regenerates every 2:40 and allows 300 meals for the first 7 days, then back to 4:00 / 200', () => {
+    const s = newcomer();
+    s.energy = { value: 100, tick_ms: T0 };
+    const v = viewOf(c, s, T0 + 160_000);
+    expect(v.energy.value).toBe(101);
+    expect(v.meals.cap).toBe(300);
+    expect(v.blessing).not.toBeNull();
+    const later = viewOf(c, { ...s, energy: { value: 100, tick_ms: T0 + 8 * 24 * H } }, T0 + 8 * 24 * H);
+    expect(later.energy.regen_ms).toBe(240_000);
+    expect(later.meals.cap).toBe(200);
+    expect(later.blessing).toBeNull();
+  });
+  it('first Fine fish +20 Energy (may pass max by ≤ 50), once', () => {
+    let s = fresh();
+    s.fishing.bites = 10; s.skills.fishing = 70;
+    let got = 0;
+    for (let i = 0; i < 40 && !got; i++) {
+      s.energy = { value: 200, tick_ms: T0 + i * 60 * S };
+      const r = fishOnce(s, 'landed', T0 + i * 60 * S);
+      const reward = r.ev.find(e => e.kind === 'reward') as Extract<P0Event, { kind: 'reward' }> | undefined;
+      if (reward) { expect(reward).toMatchObject({ id: 'first_fish_2', energy: 20 }); got = r.s.energy.value; }
+      s = r.s;
+    }
+    expect(got).toBe(215); // 200 − 5 cast + 20 into the bonus zone
+    expect(s.rewards).toContain('first_fish_2');
+  });
+  it('first Rare dish +30 Energy; Common and Fine firsts give none', () => {
+    let s = fresh();
+    s.energy = { value: 150, tick_ms: T0 };
+    s.bag.push({ id: 'fish_perch', qty: 1 }, { id: 'crop_herb', qty: 1 }, { id: 'fish_crucian', qty: 1 });
+    s = step(s, { type: 'cook', items: ['fish_crucian'] }).s;
+    let r = step(s, { type: 'collect' }, T0 + 6 * S);
+    expect(r.ev.some(e => e.kind === 'reward')).toBe(false);
+    r = step(r.s, { type: 'cook', items: ['fish_perch', 'crop_herb'] }, T0 + 10 * S);
+    r = step(r.s, { type: 'collect' }, T0 + 41 * S);
+    expect(r.ev.find(e => e.kind === 'reward')).toMatchObject({ id: 'first_dish_3', energy: 30 });
   });
 });

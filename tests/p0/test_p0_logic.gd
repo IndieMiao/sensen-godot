@@ -49,6 +49,13 @@ func test_today_line_names_the_nearest_crop() -> void:
 	assert_str(P0Logic.today_line(v)).is_equal("Sow your first plot")
 	v.plots = [{"state": "growing", "crop": "crop_radish", "ready_in": 4320000}, {"state": "growing", "crop": "crop_carrot", "ready_in": 9000000}]
 	assert_str(P0Logic.today_line(v)).is_equal("Radishes ready in 1h 12m")
+	v.bag.slots.append({"id": "fish_crucian", "qty": 2})
+	assert_str(P0Logic.today_line(v)).is_equal("2 fish in your creel · the stove is free")
+	v["cooking"] = {"stove": {"dish": "dish_grilled_crucian", "ready_in": 3000}}
+	v.names["dish_grilled_crucian"] = "Grilled Crucian"
+	assert_str(P0Logic.today_line(v)).is_equal("Grilled Crucian · 0:03 left at the stove")
+	v.cooking.stove.ready_in = 0
+	assert_str(P0Logic.today_line(v)).is_equal("Grilled Crucian ready at the stove")
 	v.plots.append({"state": "ready", "crop": "crop_carrot"})
 	assert_str(P0Logic.today_line(v)).is_equal("Carrots ready to harvest")
 

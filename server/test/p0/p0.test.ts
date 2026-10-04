@@ -17,7 +17,8 @@ function run(s: P0State, cmd: P0Command, now = T0): P0State {
   if (!r.ok) throw new Error(`${cmd.type}: ${r.code} ${JSON.stringify(r.detail ?? {})}`);
   return r.state;
 }
-const fresh = () => freshState(c, 'player-test-01', T0, 42);
+// A veteran account (past the 7-day Newcomer Blessing) so base rates are under test; the blessing has its own tests.
+const fresh = () => ({ ...freshState(c, 'player-test-01', T0, 42), created_at: T0 - 8 * 24 * H });
 
 describe('P0 energy (§3.1.1)', () => {
   it('regenerates +1 per 4 minutes, caps at max, and holds the timer while full', () => {

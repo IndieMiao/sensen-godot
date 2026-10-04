@@ -3,7 +3,7 @@ import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES
 import { count, freeSlots } from './bag.js';
 import { cookSlots, ingredientsFor, mealValue, recipeRarity } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
-import { dayKey, maxEnergy, nextTickIn, settleEnergy, skillLevel, untilRollover } from './rules.js';
+import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
 
 export function viewOf(c: P0Content, input: P0State, now: number) {
@@ -18,7 +18,8 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
   const f = c.fishing;
   return {
     now, content_version: c.version, seq: s.seq,
-    energy: { value: s.energy.value, max: maxEnergy(c, s), next_in: nextTickIn(c, s, now), regen_ms: c.energy.regen_ms },
+    energy: { value: s.energy.value, max: maxEnergy(c, s), next_in: nextTickIn(c, s, now), regen_ms: regenMs(c, s, now) },
+    blessing: blessed(c, s, now) ? { left: s.created_at + c.blessing.days * 86_400_000 - now, regen_mult: c.blessing.regen_mult, food_bonus: c.blessing.food_bonus } : null,
     coins: s.coins,
     skills,
     plots: s.plots.map(p => ({
@@ -68,7 +69,7 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
       derive: c.cooking.derive,
       tiers: Object.fromEntries(Object.entries(c.cooking.tiers).map(([k, t]) => [k, { energy: t.energy, ms: t.ms, bonus: t.bonus }])),
     },
-    meals: { used: s.day.meals, cap: c.cooking.food_cap, resets_in: untilRollover(c, now), eaten: s.day.eaten },
+    meals: { used: s.day.meals, cap: foodCap(c, s, now), resets_in: untilRollover(c, now), eaten: s.day.eaten },
     items: Object.fromEntries(bagIds(c, s).map(id => [id, itemInfo(c, s, id)])),
     rarity_names: c.rarity_names,
     prices: Object.fromEntries(c.crops.map(crop => [crop.id, crop.price])),

@@ -1,7 +1,7 @@
 /** Fishing at the homestead pond (plan §6): cast pre-pays energy, the fish is drawn server-side, gates run level → rod → reel. */
 import { fishById, type Fish, type FishSite, type P0Content } from './content.js';
 import { add, count, freeSlots, room, take } from './bag.js';
-import { energyDetail, gainEnergy, gainXp, spendEnergy, type P0Event } from './progress.js';
+import { energyDetail, gainEnergy, gainXp, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { draw, maxEnergy, scaledXp, skillLevel, xpPercent } from './rules.js';
 import type { P0State } from './state.js';
 
@@ -89,6 +89,9 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
       events.push({ kind: 'first', what: key, xp });
       gainXp(c, s, now, 'fishing', xp, 100, events);
     }
+    grantOnce(c, s, now, `first_fish_${fish.rarity}`, c.rewards.first_fish[fish.rarity - 1] ?? 0, events);
+    const kinds = Object.keys(s.fishing.caught).length;
+    for (const [n, energy] of c.rewards.fishdex) if (kinds >= n) grantOnce(c, s, now, `fishdex_${n}`, energy, events);
     return null;
   }
   if (!['cancel', 'escaped', 'landed'].includes(outcome)) return { code: 'bad_outcome' };

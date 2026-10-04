@@ -16,7 +16,8 @@ export type P0Event =
       need_level?: number; protected_left?: number }
   | { kind: 'pot'; dish: string | null; rarity: number; ms: number }
   | { kind: 'dish'; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number }
-  | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number };
+  | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
+  | { kind: 'reward'; id: string; energy: number };
 
 export function energyDetail(c: P0Content, s: P0State, now: number, need: number) {
   return { need, have: s.energy.value, next_in: nextTickIn(c, s, now) };
@@ -62,4 +63,12 @@ export function gainXp(c: P0Content, s: P0State, now: number, skill: Skill, amou
     }
     events.push({ kind: 'level', skill, level, energy: granted, gifts });
   }
+}
+
+/** §3.4.8: a one-time energy reward, shown with the moment that earned it; may pass max by ≤ max_over. */
+export function grantOnce(c: P0Content, s: P0State, now: number, id: string, amount: number, events: P0Event[]): void {
+  if (amount <= 0 || s.rewards.includes(id)) return;
+  s.rewards.push(id);
+  const granted = gainEnergy(c, s, now, amount, events, 'reward', maxEnergy(c, s) + c.rewards.max_over);
+  events.push({ kind: 'reward', id, energy: granted });
 }

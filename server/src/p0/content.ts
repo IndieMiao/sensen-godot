@@ -48,6 +48,9 @@ export interface P0Content {
     baits: Record<string, { shift: number[]; wait: number }>;
   };
   goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number }>;
+  blessing: { days: number; regen_mult: number; food_bonus: number };
+  /** §3.4.8 one-time energy: by rarity (index = rarity − 1) and [count, energy] milestones; may pass max by ≤ max_over. */
+  rewards: { first_fish: number[]; first_dish: number[]; cookbook: [number, number][]; fishdex: [number, number][]; max_over: number };
   cooking: {
     slots: [number, number][];
     tiers: Record<string, CookTier>;

@@ -79,3 +79,13 @@ func test_ingredient_tags_read_as_words() -> void:
 	assert_str(P0Logic.ingredient_label(v, "W1")).is_equal("Any Common fish")
 	assert_str(P0Logic.ingredient_label(v, "S1")).is_equal("Any seasoning")
 	assert_str(P0Logic.ingredient_label(v, "fish_crucian")).is_equal("Pond Crucian")
+
+func test_reward_and_blessing_lines() -> void:
+	assert_str(P0Logic.reward_line("first_fish_2", 20)).is_equal("First Fine fish! +20 Energy")
+	assert_str(P0Logic.reward_line("first_dish_3", 30)).is_equal("First Rare dish! +30 Energy")
+	assert_str(P0Logic.reward_line("cookbook_8", 50)).is_equal("Home Cook · 8 recipes · +50 Energy")
+	var v := _view()
+	assert_str(P0Logic.blessing_line(v)).is_equal("")
+	v["blessing"] = {"left": 5 * 86400000 - 1000}
+	v.meals.cap = 300
+	assert_str(P0Logic.blessing_line(v)).is_equal("Newcomer Blessing · 5 days left · faster Energy, Meals 300")

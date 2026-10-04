@@ -729,6 +729,12 @@ func open_energy_card(need: int, verb: String) -> void:
 	tiles.add_child(_tile("rest", str(f.rest), "The bench is by the house"))
 	tiles.add_child(_tile("bag", "Open bag", "", func(): close_modal(); open_bag()))
 	card.add_child(tiles)
+	var bl := P0Logic.blessing_line(view)
+	if bl != "":
+		var bll := _label(bl, 9, GREEN_D, true)
+		bll.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		bll.custom_minimum_size = Vector2(260, 0)
+		card.add_child(bll)
 	var tiles2 := HBoxContainer.new()
 	tiles2.add_theme_constant_override("separation", 6)
 	tiles2.add_child(_tile("pot", P0Logic.meal_line(view).split(" · ")[0], "Eat a dish from your bag"))
@@ -1223,6 +1229,10 @@ func _style_button(b: Button, bg: Color, edge: Color, radius: int) -> void:
 	b.add_theme_stylebox_override("disabled", _box(DIS, radius, DIS, 1, Vector4(8, 4, 8, 4)))
 	b.add_theme_color_override("font_color", INK)
 	b.add_theme_color_override("font_disabled_color", INK2)
+	# Icons keep their own colours (the shared theme tints button icons dark).
+	for k in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color", "icon_hover_pressed_color"]:
+		b.add_theme_color_override(k, Color.WHITE)
+	b.add_theme_color_override("icon_disabled_color", Color(1, 1, 1, 0.45))
 
 func _pill_button(text: String, primary: bool) -> Button:
 	var b := Button.new()

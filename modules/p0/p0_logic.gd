@@ -101,6 +101,15 @@ static func today_line(view: Dictionary) -> String:
 				best_crop = str(p.get("crop", ""))
 		if st == "sown": any_sown = true
 	if ready != "": return "%s ready to harvest" % plural(item_name(view, ready))
+	var stove = view.get("cooking", {}).get("stove", null)
+	if stove is Dictionary:
+		var dish := item_name(view, str(stove.dish)) if stove.get("dish", null) != null else "Your dish"
+		if float(stove.get("ready_in", 0)) <= 0.0: return "%s ready at the stove" % dish
+		return "%s · %s left at the stove" % [dish, duration(float(stove.ready_in))]
+	var fish := 0
+	for st in view.get("bag", {}).get("slots", []):
+		if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
+	if fish > 0: return "%d fish in your creel · the stove is free" % fish
 	if best_crop != "": return "%s ready in %s" % [plural(item_name(view, best_crop)), duration(best_ms)]
 	if any_sown: return "Water what you sowed"
 	return "Sow your first plot"
@@ -292,3 +301,19 @@ static func unlock_line(view: Dictionary, skill: String, level: int) -> String:
 		"cooking":
 			if level == 4: return "A 3rd pot slot · three-family dishes"
 	return ""
+
+## §3.4.8 one-time rewards, said at the moment that earned them.
+static func reward_line(id: String, energy: int) -> String:
+	var rarity := ["", "Common", "Fine", "Rare", "Legendary"]
+	if id.begins_with("first_fish_"): return "First %s fish! +%d Energy" % [rarity[int(id.substr(11))], energy]
+	if id.begins_with("first_dish_"): return "First %s dish! +%d Energy" % [rarity[int(id.substr(11))], energy]
+	if id.begins_with("cookbook_"): return "Home Cook · %s recipes · +%d Energy" % [id.substr(9), energy]
+	if id.begins_with("fishdex_"): return "Fish-dex %s kinds · +%d Energy" % [id.substr(8), energy]
+	return "+%d Energy" % energy
+
+## "Newcomer Blessing · 5 days left" (§3.4.6), or "" once it has ended.
+static func blessing_line(view: Dictionary) -> String:
+	var b = view.get("blessing", null)
+	if not b is Dictionary: return ""
+	var days := ceili(float(b.get("left", 0)) / 86400000.0)
+	return "Newcomer Blessing · %d day%s left · faster Energy, Meals %d" % [days, "" if days == 1 else "s", int(view.get("meals", {}).get("cap", 300))]

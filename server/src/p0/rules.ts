@@ -6,13 +6,27 @@ export function maxEnergy(c: P0Content, _s: P0State): number {
   return c.energy.max_base; // Homestead Lv1 in M1; +10 per Homestead level later.
 }
 
+/** §3.4.6 Newcomer Blessing: the first 7 × 24 h after the account is created. */
+export function blessed(c: P0Content, s: P0State, now: number): boolean {
+  return now - s.created_at < c.blessing.days * 86_400_000;
+}
+
+/** Milliseconds per +1: 4:00, or 2:40 under the blessing (×1.5). */
+export function regenMs(c: P0Content, s: P0State, now: number): number {
+  return blessed(c, s, now) ? Math.round(c.energy.regen_ms / c.blessing.regen_mult) : c.energy.regen_ms;
+}
+
+export function foodCap(c: P0Content, s: P0State, now: number): number {
+  return c.cooking.food_cap + (blessed(c, s, now) ? c.blessing.food_bonus : 0);
+}
+
 /**
  * Bring the stored value up to `now`. Linear +1 per regen_ms; stops at max (or stays above it in the
  * bonus zone without regenerating). While full the timer is held at `now`, so the next +1 after a
  * spend is a full period away (§3.1.1 "满条后消费 1 点，下一个 +1 从消费时刻起算 4 分钟").
  */
 export function settleEnergy(c: P0Content, s: P0State, now: number): void {
-  const max = maxEnergy(c, s), period = c.energy.regen_ms;
+  const max = maxEnergy(c, s), period = regenMs(c, s, now);
   if (s.energy.value >= max) { s.energy.tick_ms = now; return; }
   const steps = Math.floor((now - s.energy.tick_ms) / period);
   if (steps <= 0) return;
@@ -23,7 +37,7 @@ export function settleEnergy(c: P0Content, s: P0State, now: number): void {
 /** Milliseconds until the next +1, or null while at / above max. Call after settleEnergy. */
 export function nextTickIn(c: P0Content, s: P0State, now: number): number | null {
   if (s.energy.value >= maxEnergy(c, s)) return null;
-  return Math.max(0, s.energy.tick_ms + c.energy.regen_ms - now);
+  return Math.max(0, s.energy.tick_ms + regenMs(c, s, now) - now);
 }
 
 export function levelFor(thresholds: number[], xp: number): number {

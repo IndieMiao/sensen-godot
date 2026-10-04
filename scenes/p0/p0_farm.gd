@@ -615,6 +615,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var bonus: bool = i > 0 and str(events[i - 1].get("kind", "")) == "first" and int(events[i - 1].xp) == int(ev.amount)
 				if int(ev.amount) > 0 and not bonus:
 					xp_lines.append("+%d %s XP" % [int(ev.amount), str(ev.skill).capitalize()] + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)))
+			"reward":
+				if int(ev.energy) > 0: xp_lines.append(P0Logic.reward_line(str(ev.id), int(ev.energy)))
 			"first":
 				var what := str(ev.what)
 				if what.begins_with("catch:"): xp_lines.append("First catch! +%d XP" % int(ev.xp))
