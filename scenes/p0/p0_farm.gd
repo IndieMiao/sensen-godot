@@ -76,6 +76,7 @@ func _ready() -> void:
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
 	ui.zoom.connect(func(f: float): cam.size = clampf(cam.size * f, 6.5, 17.0))
 	ui.recenter.connect(func(): _focus = player.position)
+	ui.show_spot.connect(_show_spot)
 	session.state_changed.connect(_on_state)
 	session.refused.connect(_on_refused)
 	session.connection_failed.connect(func(msg): ui.toast(msg + " · " + session.base_url, 4.0))
@@ -569,6 +570,28 @@ func _watch_pot(st: Dictionary) -> void:
 		ui.toast("The pot keeps cooking · tap the stove to collect"))
 	ui.root.add_child(_cooking)
 
+## Energy Card tiles only guide (§3.7.2): pan the camera to the spot and pulse a ring there; the player stays put.
+func _show_spot(where: String) -> void:
+	var at: Vector3 = {"stove": STOVE, "bench": BENCH}.get(where, player.position)
+	_focus = at
+	_idle_s = -2.5   # hold the view on the spot before easing back to the player
+	var ring := MeshInstance3D.new()
+	var tm := TorusMesh.new()
+	tm.inner_radius = 0.9
+	tm.outer_radius = 1.05
+	ring.mesh = tm
+	ring.position = at + Vector3(0, 0.08, 0)
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.albedo_color = Color("e3b341")
+	ring.material_override = m
+	add_child(ring)
+	var tw := create_tween()
+	tw.tween_property(ring, "scale", Vector3(1.25, 1, 1.25), 0.5).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(ring, "scale", Vector3.ONE, 0.5).set_trans(Tween.TRANS_SINE)
+	tw.set_loops(2)
+	tw.finished.connect(ring.queue_free)
+
 func _face_pond() -> void:
 	if _site == "river":
 		_facing = Vector3(0, 0, 1)
@@ -837,6 +860,8 @@ func _dev_shot(dt: float) -> void:
 				ui.open_bag(step[1] if step.size() > 1 else "")
 			"energy":
 				ui.open_energy_card(3, "Sow ×1")
+			"spot":
+				_show_spot(step[1])
 			"close":
 				ui.close_modal()
 			"goto":

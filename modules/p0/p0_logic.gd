@@ -124,23 +124,34 @@ static func plural(name: String) -> String:
 	if name.ends_with("y"): return name.substr(0, name.length() - 1) + "ies"
 	return name + "s"
 
-## Energy Card facts (§3.7.2): what, have, gap + when; tiles only guide.
+## Energy Card facts (§3.7.2 / §3.7.3): one card for short and zero; only facts, tiles only guide.
 static func energy_card(view: Dictionary, need: int, verb: String) -> Dictionary:
 	var e: Dictionary = view.get("energy", {})
 	var have := int(e.get("value", 0))
-	var gap := maxi(0, need - have)
+	var mx := int(e.get("max", 200))
 	var next_in = e.get("next_in", null)
-	var when := ""
-	if gap > 0 and next_in != null:
-		when = "+1 in %s" % duration(float(next_in))
+	var regen := float(e.get("regen_ms", 240000))
+	var tick := "" if next_in == null else " · +1 in %s" % duration(float(next_in))
+	var full_ms := 0.0 if next_in == null else float(next_in) + float(maxi(0, mx - have - 1)) * regen
+	var dishes := 0
+	var fish := 0
+	for st in view.get("bag", {}).get("slots", []):
+		var id := str(st.get("id", ""))
+		if id.begins_with("dish_"): dishes += int(st.get("qty", 0))
+		if id.begins_with("fish_") and item(view, id).get("cook", true): fish += int(st.get("qty", 0))
 	var rest: Dictionary = view.get("rest", {})
 	var rest_left := int(rest.get("limit", 1)) - int(rest.get("used", 0))
 	return {
-		"title": "%s · %d Energy needed" % [verb, need],
-		"have": "You have %d" % have,
-		"gap": ("Need %d more · %s" % [gap, when]) if when != "" else ("Need %d more" % gap),
-		"rest": "Rest · %d/1 today" % maxi(0, rest_left) if rest_left > 0 else "Rest · used today · resets in %s" % duration(float(rest.get("resets_in", 0))),
-		"rest_available": rest_left > 0,
+		"title": "Energy %d/%d%s" % [have, mx, tick],
+		"zero": have <= 0,
+		"subtitle": "Recover or do something free" if have <= 0 else "%s needs %d Energy · you have %d" % [verb, need, have],
+		"wait": "Wait · Full in %s" % duration(full_ms) if next_in != null else "Wait · Full now",
+		"tiles": [
+			{"icon": "eat", "label": "Eat", "fact": "%d dish%s in bag" % [dishes, "" if dishes == 1 else "es"] if dishes > 0 else "No dishes in bag", "guide": "Open bag", "go": "bag", "on": dishes > 0},
+			{"icon": "pot", "label": "Cook", "fact": "%d fish in creel" % fish if fish > 0 else "No fish to cook", "guide": "Show kitchen", "go": "stove", "on": fish > 0},
+			{"icon": "dish_fruit_tea", "label": "Tea", "fact": "Tea House opens later", "guide": "", "go": "", "on": false},
+			{"icon": "rest", "label": "Rest", "fact": "Available" if rest_left > 0 else "Rested today · %s" % duration(float(rest.get("resets_in", 0))), "guide": "Show bench", "go": "bench", "on": rest_left > 0},
+		],
 	}
 
 ## Locally advance a view by elapsed ms (energy ticks and crop timers) between server refreshes.

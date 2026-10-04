@@ -11,6 +11,7 @@ signal seed_selected(seed_id: String)
 signal command(cmd: Dictionary)
 signal dev_skip(minutes: int)
 signal zoom(factor: float)
+signal show_spot(where: String)
 signal recenter()
 
 const PAPER := Color("fbf8f1")
@@ -969,32 +970,56 @@ func _sell_row(id: String) -> Control:
 	h.add_child(all)
 	return h
 
-## Energy Card (§3.7.2): only facts; tiles guide; one button closes.
+## Energy Card (§3.7.2 / HUD-3): facts, a Wait line, RECOVER tiles that only guide, one button that closes.
 func open_energy_card(need: int, verb: String) -> void:
 	var f := P0Logic.energy_card(view, need, verb)
-	var card := _center_card(300)
-	card.add_child(_label(str(f.title), 12, INK, true))
-	card.add_child(_label(str(f.have), 11, INK))
-	card.add_child(_label(str(f.gap), 11, AMBER_D, true))
-	var tiles := HBoxContainer.new()
-	tiles.add_theme_constant_override("separation", 6)
-	tiles.add_child(_tile("rest", str(f.rest), "The bench is by the house"))
-	tiles.add_child(_tile("bag", "Open bag", "", func(): close_modal(); open_bag()))
-	card.add_child(tiles)
+	var card := _center_card(310)
+	modal_kind = "energy"
+	var head := HBoxContainer.new()
+	head.add_child(_icon("energy", 18))
+	head.add_child(_label(str(f.title), 14, Color("d0573f") if f.zero else AMBER_D, true))
+	card.add_child(head)
+	card.add_child(_label(str(f.subtitle), 11, INK, true))
+	var wait := HBoxContainer.new()
+	wait.add_child(_icon("clock", 13))
+	wait.add_child(_label(str(f.wait), 10, INK2, true))
+	card.add_child(wait)
 	var bl := P0Logic.blessing_line(view)
 	if bl != "":
-		var bll := _label(bl, 9, GREEN_D, true)
+		var bll := _label(bl, 8, GREEN_D, true)
 		bll.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		bll.custom_minimum_size = Vector2(260, 0)
+		bll.custom_minimum_size = Vector2(270, 0)
 		card.add_child(bll)
-	var tiles2 := HBoxContainer.new()
-	tiles2.add_theme_constant_override("separation", 6)
-	tiles2.add_child(_tile("pot", P0Logic.meal_line(view).split(" · ")[0], "Eat a dish from your bag"))
-	tiles2.add_child(_tile("stove", "Show kitchen", "The stove is beside the bench"))
-	card.add_child(tiles2)
+	card.add_child(_label("RECOVER", 8, INK2, true))
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 6)
+	for t in f.tiles:
+		var b := Button.new()
+		b.text = "%s · %s%s" % [t.label, t.fact, ("\n%s ›" % t.guide) if str(t.guide) != "" and t.on else ""]
+		b.icon = P0Logic.icon(str(t.icon))
+		b.expand_icon = false
+		b.add_theme_constant_override("icon_max_width", 18)
+		b.add_theme_font_size_override("font_size", 8)
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.custom_minimum_size = Vector2(140, 46)
+		_style_button(b, PAPER if t.on else Color(1, 1, 1, 0.4), EDGE, 14)
+		b.disabled = not t.on
+		var go := str(t.go)
+		b.pressed.connect(func():
+			close_modal()
+			if go == "bag": open_bag()
+			elif go != "": show_spot.emit(go))
+		grid.add_child(b)
+	card.add_child(grid)
 	var ok := _pill_button("Free to do now", true)
 	ok.pressed.connect(close_modal)
 	card.add_child(ok)
+	var note := _label("Closes this card · tiles only guide you, nothing is used automatically", 7, INK2)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.add_child(note)
 
 func open_rest_card() -> void:
 	var r: Dictionary = view.get("rest", {})

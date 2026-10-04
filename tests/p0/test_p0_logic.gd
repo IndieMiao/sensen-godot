@@ -36,8 +36,12 @@ func test_short_energy_turns_amber_and_opens_the_card() -> void:
 	assert_str(str(a.sub)).is_equal("Need 3 Energy")
 	assert_that(a.cmd).is_equal({"type": "energy_card"})
 	var card := P0Logic.energy_card(v, 3, "Sow ×1")
-	assert_str(str(card.gap)).is_equal("Need 1 more · +1 in 2:41")
-	assert_str(str(card.have)).is_equal("You have 2")
+	assert_str(str(card.title)).is_equal("Energy 2/200 · +1 in 2:41")
+	assert_str(str(card.subtitle)).is_equal("Sow ×1 needs 3 Energy · you have 2")
+	assert_str(str(card.wait)).is_equal("Wait · Full in 13h 10m")
+	assert_str(str(card.tiles[0].fact)).is_equal("No dishes in bag")
+	v.energy.value = 0
+	assert_str(str(P0Logic.energy_card(v, 3, "Sow ×1").subtitle)).is_equal("Recover or do something free")
 
 func test_quick_bar_keeps_order_then_fills_by_count() -> void:
 	var v := _view()
