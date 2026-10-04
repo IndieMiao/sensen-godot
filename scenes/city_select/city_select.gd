@@ -50,6 +50,11 @@ static func city_label(view: Dictionary) -> String:
 	return ", ".join(parts)
 
 func _ready() -> void:
+	# P0 prototype entry (2026-10-05): user://p0_boot or SENSEN_P0=1 opens the P0 farm instead of the current app flow.
+	if not _boot_checked and get_tree().current_scene == self and P0Session.boot_wanted():
+		_boot_checked = true
+		get_tree().change_scene_to_file.call_deferred("res://scenes/p0/p0_farm.tscn")
+		return
 	# 启动页才跳过：已有农场直接进地图并落在自己农场上；从地图主动回到选城页时照常显示。
 	if not _boot_checked and get_tree().current_scene == self:
 		_boot_checked = true
