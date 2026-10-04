@@ -92,3 +92,10 @@ ui/batch1/MANIFEST-npc.md
 | NPC-G1 / G1-2 / G1-3 / G1-4 | `NPC-G1*.html` | 房间轻压暗，掌柜头顶指尖卡亮成 "<名字> · Talking"（`.tag-tap.is-on`）；底部问候卡 `.greet`（560 高）：左 300 × 512 掌柜近景（场景 png 的 `background-image` 裁切，底部渐变名字），右 岗位 · 名牌 / "Keeps the …" / 一句带今日信息的问候 / 三个选项：主按钮 **Trade**（副文案 open the stall / order tea / see the rods / book a trip）、信息问句（What's fresh today? / Any news in town? / Where are they biting? / Fares today?）、灰字 Just passing by | 近景裁切参数在 `PORT` 表（页面内 `background-size:1500px 2250px` + position）；没有 Bag 与把手 |
 | NPC-2 / 2-2 / 3 / 3-2 | 同名 | 抽屉顶 270（`--drawer-h:2130`），标题 "Mei's Stall · Market Square" / "Finn's Tackle · Pudong"；掌柜一行换成**掌柜栏** `.kpanel`（116 近景 + 岗位 · 名牌 + 两行气泡 + 小字；配色 `.is-market` 蜜色 / `.is-tackle` 海蓝 / `.is-tea` 鼠尾草 / `.is-travel` 藏青）；背包网格减为 4 行（20 格，可滚） | 网格底边 ≈ 2257，回到安全区内 |
 | NPC-1a–1e | 同名 | 掌柜指尖卡一律改 "<名字> · Tap to talk"（图标 i-talk）；设施卡（Market Board / Bite Board / Stamp desk / Sit）不变 | 小木屋四张写 Tea / Tackle / Market / Post · Tap to talk |
+
+### 2026-10-04 夜：补齐三张
+
+| 编号 | 画面 | 备注 |
+|---|---|---|
+| NPC-6 / 6-2 | 点单卡顶部加 "Ama's Tea · Lotus Tea House" + ✕ 与掌柜栏 `.kpanel.is-tea`（Ama 近景 + 气泡 + 小字）；原柜台上方的 Tea Host 名牌去掉 | `.kpanel` 规则已做成全局（不只 `.drawer.is-counter`） |
+| NPC-7（新） | 驿站室内压暗；抽屉 `.drawer.is-counter.is-post`（1720 高）："Sigrid's Desk · Travel Post"，Tab Permits / Passport / Fares，掌柜栏藏青底；两张 `.pcard`（Travel Permit / Long-haul Ticket）：`.how` 配方行、`.pchip` 材料 / 条件芯片（✓ 绿框、灰不满足）、Craft / Buy；页脚 Coffee · Travel Biscuits · 盖章台 | **坑**：卡内类名不能叫 `.recipe` / `.chip`，会撞 kit.css 的配方行与 HUD 芯片样式 |

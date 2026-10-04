@@ -21,3 +21,5 @@
 通用：HUD 头像钮沿用 v4 的隐藏 tooltip `title="Profile · Passport"`（非可见文案）；所有可见英文无中文字符；旧口径词自检通过。
 
 - 2026-10-04 烹饪面板第五版：`kit-cook.css` 末尾 `v5 cook stage` 段（`.stage / .pot-ing / .pot-slots / .pot-cap / .drawer.is-cookbook / .ck / .cell.is-page / .pips / .cb`，全部 scoped，不动共享 kit.css）；三页 1080 × 2400 无中文、无 "Cook · Free"、无 "N more to discover"；Figma Section 03 现 11 张卡（COOK-2a-2 插在 COOK-2a 之后，COOK-2a / 2b 原位替换，COOK-2b-2 说明已标"待重切"）。
+
+- 2026-10-04 夜：`COOK-2b-2.html` 按第五版重切——三个 0.3 小帧 + 0.46 门禁帧都改成"锅在场景里（`.pot-ing`）、槽条与胶囊在锅下（`.pot-slots` / `.pot-cap`，新增 `.is-warn` 琥珀态与 `.is-pressed` 按下态）、抽屉是背包格"；小帧共用 body 的相机变量（1.85 / −511 / −499）与 `cook-stage` 轻压暗；⑤ 两件自然尺寸组件不变。

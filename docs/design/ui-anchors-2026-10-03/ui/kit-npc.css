@@ -928,3 +928,36 @@
 .drawer.is-counter .kpanel .who .role { color: var(--ink-2); font-weight: 700; }
 .drawer.is-counter .kpanel .bubble-say { margin-top: 2px; font-size: 23px; font-weight: 700; line-height: 30px; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .drawer.is-counter .kpanel .note { margin-top: 2px; font-size: 19px; font-weight: 700; line-height: 24px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* keeper header inside the tea order card and the travel-post drawer (2026-10-04) */
+.tea-card .tc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.kpanel { margin-top: 12px; height: 140px; border-radius: 32px; display: flex; align-items: center; gap: 18px; padding: 12px 18px 12px 12px; background: var(--kp-bg, #F7E9CF); }
+.kpanel.is-market { --kp-bg: #F7E9CF; } .kpanel.is-tackle { --kp-bg: #E3EEF6; } .kpanel.is-tea { --kp-bg: #E6EFE3; } .kpanel.is-travel { --kp-bg: #E6E8F2; }
+.kpanel .portrait { flex: 0 0 auto; width: 116px; height: 116px; border-radius: 28px; border: 1px solid var(--card-edge); background-color: #F1EADA; background-repeat: no-repeat; }
+.kpanel .mid { flex: 1 1 auto; min-width: 0; }
+.kpanel .who { font-size: 26px; font-weight: 800; line-height: 32px; white-space: nowrap; }
+.kpanel .who .role { color: var(--ink-2); font-weight: 700; }
+.kpanel .bubble-say { margin-top: 2px; font-size: 23px; font-weight: 700; line-height: 30px; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.kpanel .note { margin-top: 2px; font-size: 19px; font-weight: 700; line-height: 24px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tea-card .kpanel { margin: 0 0 18px; }
+.drawer.is-post { --drawer-h: 1720px; }
+.pcard { margin-top: 16px; border-radius: 36px; background: var(--card-solid); border: 1px solid var(--card-edge); padding: 20px 24px; }
+.pcard .top { display: flex; align-items: center; gap: 16px; }
+.pcard .big { flex: 0 0 auto; width: 88px; height: 88px; border-radius: 50%; background: #F1EADA; border: 1px solid var(--card-edge); display: flex; align-items: center; justify-content: center; }
+.pcard .big .ic { width: 52px; height: 52px; }
+.pcard .nm { font-size: 30px; font-weight: 800; line-height: 36px; }
+.pcard .sub { font-size: 22px; font-weight: 700; line-height: 28px; color: var(--ink-2); }
+.pcard .how { margin-top: 12px; font-size: 22px; font-weight: 700; line-height: 30px; color: var(--ink); }
+.pcard .how b { font-weight: 800; }
+.pcard .slots { margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap; }
+.pcard .pchip { height: 60px; padding: 0 16px 0 10px; border-radius: 30px; background: #F1EADA; border: 1px solid var(--card-edge); display: inline-flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; white-space: nowrap; }
+.pcard .pchip .ic { width: 34px; height: 34px; }
+.pcard .pchip .pt { font-size: 18px; font-weight: 700; color: var(--ink-2); }
+.pcard .pchip.is-ok { border: 2px solid var(--primary-deep); }
+.pcard .pchip.is-ok .ok { color: var(--primary-deep); }
+.pcard .pchip.is-off { background: var(--disabled-bg); border-color: var(--disabled-edge); color: var(--disabled-ink); }
+.pcard .pchip.is-off .ic { filter: grayscale(1); opacity: 0.6; }
+.pcard .acts { margin-top: 16px; display: flex; gap: 12px; }
+.pcard .acts .btn-sm { flex: 1 1 0; min-width: 0; height: 88px; border-radius: 44px; font-size: 26px; padding: 0 16px; }
+.pcard .acts .btn-sm.is-disabled { font-size: 22px; }
+.pcard .acts .btn-sm.btn-sec { border: 3px solid var(--primary-deep); }
+.post-foot { margin-top: 18px; font-size: 21px; font-weight: 700; line-height: 28px; color: var(--ink-2); text-align: center; }

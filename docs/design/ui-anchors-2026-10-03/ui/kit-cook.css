@@ -1053,3 +1053,8 @@
 .cell .pip .ic { position: static; width: 16px; height: 16px; transform: none; filter: grayscale(1); opacity: 0.8; }
 .cell .pip.is-clue { background: var(--card-solid); border: 2px solid var(--primary-deep); }
 .cell .pip.is-clue .ic { width: 18px; height: 18px; filter: none; opacity: 1; }
+/* v5 variants (COOK-2b-2) */
+.pot-cap.is-warn { color: var(--energy-amber); border: 2px solid var(--energy-amber); }
+.pot-slot.is-pressed .ring { border: 4px solid var(--primary-deep); outline: 6px solid rgba(127, 198, 106, 0.28); }
+.pot-slot.is-ghost .ring .plus { font-size: 44px; font-weight: 800; color: var(--card-edge-2); line-height: 1; }
+.cell.is-off .cap-s { background: rgba(47, 58, 51, 0.08); color: var(--disabled-ink); }
