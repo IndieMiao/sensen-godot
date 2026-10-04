@@ -1,5 +1,5 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
-import { cropById, cropBySeed, fishById, itemKind, type P0Content } from './content.js';
+import { cropById, cropBySeed, fishById, itemKind, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
 import { collectPot, eatDish, startPot } from './cooking.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
@@ -14,7 +14,8 @@ export type P0Command =
   | { type: 'sow'; plot: number; seed: string }
   | { type: 'water'; plot: number }
   | { type: 'harvest'; plot: number }
-  | { type: 'buy'; item: string; qty: number }
+  | { type: 'buy'; item: string; qty: number; shop?: 'stall' | 'tackle' }
+  | { type: 'equip'; item: string }
   | { type: 'sell'; item: string; qty: number }
   | { type: 'rest' }
   | FishCommand
@@ -95,7 +96,8 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     case 'buy': {
       const qty = Number(cmd.qty);
       if (!Number.isInteger(qty) || qty < 1 || qty > 99) return fail('bad_qty');
-      if (!c.stall.buy.includes(cmd.item)) return fail('bad_item');
+      const list = cmd.shop === 'tackle' ? c.tackle.buy : c.stall.buy;
+      if (!list.includes(cmd.item)) return fail('bad_item');
       const offer = stallOffer(c, cmd.item);
       const level = skillLevel(c, s, offer.skill);
       if (level < offer.gate) return fail('locked', { skill: offer.skill, level: offer.gate, xp_to_go: c.skills[offer.skill][offer.gate - 1] - s.skills[offer.skill] });
@@ -103,6 +105,16 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         return fail('sold_out', { left: Math.max(0, offer.daily - (s.day.bought[cmd.item] ?? 0)) });
       const cost = offer.price * qty;
       if (s.coins < cost) return fail('no_coins', { need: cost - s.coins });
+      if (itemKind(cmd.item) === 'rod') {
+        // Rods go to Tools & Gear, not the bag; a new rod is equipped right away (switch back any time).
+        if (qty !== 1) return fail('bad_qty');
+        if (s.gear.rods.includes(cmd.item)) return fail('owned');
+        s.coins -= cost;
+        s.gear.rods.push(cmd.item);
+        s.gear.rod = cmd.item;
+        events.push({ kind: 'coins', delta: -cost }, { kind: 'item', id: cmd.item, delta: 1 });
+        break;
+      }
       if (room(c, s.bag, cmd.item) < qty) return fail('bag_full', { room: room(c, s.bag, cmd.item) });
       s.coins -= cost;
       if (offer.daily) s.day.bought[cmd.item] = (s.day.bought[cmd.item] ?? 0) + qty;
@@ -130,6 +142,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       s.day.rest += 1;
       if (s.energy.value >= max) s.energy.tick_ms = now;
       events.push({ kind: 'energy', delta: gain, reason: 'rest' });
+      break;
+    }
+    case 'equip': {
+      if (!rodById(c, String(cmd.item)) || !s.gear.rods.includes(String(cmd.item))) return fail('not_owned');
+      s.gear.rod = String(cmd.item);
       break;
     }
     case 'accept': case 'deliver': {
@@ -171,6 +188,8 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
 export function stallOffer(c: P0Content, id: string): { price: number; skill: 'farming' | 'fishing' | 'cooking'; gate: number; daily: number } {
   const crop = cropBySeed(c, id);
   if (crop) return { price: crop.seed_price, skill: 'farming', gate: crop.gate, daily: 0 };
+  const rod = rodById(c, id);
+  if (rod) return { price: rod.price, skill: 'fishing', gate: rod.level, daily: 0 };
   const g = c.goods[id];
   return { price: g.price, skill: g.skill, gate: g.gate, daily: g.daily };
 }

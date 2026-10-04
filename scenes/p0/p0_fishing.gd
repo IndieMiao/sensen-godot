@@ -28,6 +28,7 @@ var _sub: Label
 var _btn: Button
 var _ring: Control
 var _done := false
+var _band_bonus := 0.0
 ## Dev playtests (P0_AUTO=1 / scripted shots): hook on the bite and keep the band on the fish.
 static var auto_play := false
 
@@ -37,6 +38,7 @@ func _init(owner_ui: P0Ui, cast_event: Dictionary, view: Dictionary) -> void:
 	breaks = cast_event.get("breaks", null) != null
 	_bite_ms = float(cast_event.get("bite_in", 2000))
 	_hook_ms = float(view.get("fishing", {}).get("cast", {}).get("hook_ms", 2200)) if view.get("fishing", {}).get("cast", null) is Dictionary else 2200.0
+	_band_bonus = float(view.get("fishing", {}).get("band_bonus", 0.0))
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var card := PanelContainer.new()
@@ -129,7 +131,9 @@ func _start_reel() -> void:
 	_title.add_theme_font_size_override("font_size", 13)
 	_title.add_theme_color_override("font_color", P0Ui.INK)
 	_sub.text = "Hold anywhere to lift the band · let go to drop"
-	_tier = FishingModel.data().tiers[str(rarity)]
+	_tier = (FishingModel.data().tiers[str(rarity)] as Dictionary).duplicate()
+	_tier["bar_size"] = float(_tier.bar_size) + _band_bonus   # Reed Rod +3 points (§6.5.2), capped at 45 %
+	_tier["bar_size"] = minf(0.45, float(_tier.bar_size))
 	_model = FishingModel.initial(randi())
 	_gauge = GAUGE.new()
 	_gauge.bar_size = float(_tier.bar_size)

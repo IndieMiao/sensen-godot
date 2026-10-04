@@ -324,3 +324,29 @@ describe('P0 stall board (§14.1.2 tutorial request)', () => {
     expect(applyP0(c, r.s, { type: 'deliver', request: 'req_pond_catch' }, T0)).toMatchObject({ ok: false, code: 'request_done' });
   });
 });
+
+describe('P0 Reed Rod and Tools & Gear (§6.4.1)', () => {
+  it('Old Kai sells the Reed Rod from Fishing Lv3; it equips, lands Rare fish the Starter Rod could not, and can be switched back', () => {
+    let s = fresh();
+    expect(applyP0(c, s, { type: 'buy', item: 'rod_reed', qty: 1, shop: 'tackle' }, T0)).toMatchObject({ ok: false, code: 'locked', detail: { skill: 'fishing', level: 3 } });
+    expect(applyP0(c, s, { type: 'buy', item: 'rod_reed', qty: 1 }, T0)).toMatchObject({ ok: false, code: 'bad_item' }); // not at Bao's
+    s.skills.fishing = 480; s.fishing.bites = 10; // Lv4: koi's level gate is open
+    s = step(s, { type: 'buy', item: 'rod_reed', qty: 1, shop: 'tackle' }).s;
+    expect(s.coins).toBe(100);
+    expect(s.gear).toEqual({ rods: ['rod_starter', 'rod_reed'], rod: 'rod_reed' });
+    expect(count(s.bag, 'rod_reed')).toBe(0);
+    expect(applyP0(c, s, { type: 'buy', item: 'rod_reed', qty: 1, shop: 'tackle' }, T0)).toMatchObject({ ok: false, code: 'owned' });
+    let koi = null as null | string;
+    for (let i = 0; i < 200 && !koi; i++) {
+      s.energy = { value: 200, tick_ms: T0 + i * 60 * S };
+      const r = fishOnce(s, 'landed', T0 + i * 60 * S);
+      if (catchOf(r.ev).fish === 'fish_koi') koi = catchOf(r.ev).result;
+      s = r.s;
+      s.bag = s.bag.filter(b => !b.id.startsWith('fish_'));
+    }
+    expect(koi).toBe('landed');
+    s = step(s, { type: 'equip', item: 'rod_starter' }).s;
+    expect(viewOf(c, s, T0).fishing.rod).toBe('Starter Rod');
+    expect(applyP0(c, s, { type: 'equip', item: 'rod_carbon' }, T0)).toMatchObject({ ok: false, code: 'not_owned' });
+  });
+});

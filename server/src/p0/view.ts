@@ -1,5 +1,5 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
-import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, SKILLS, type P0Content } from './content.js';
+import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SKILLS, type P0Content } from './content.js';
 import { count, freeSlots } from './bag.js';
 import { cookSlots, ingredientsFor, mealValue, recipeRarity } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
@@ -46,9 +46,11 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
     },
     fishing: {
       sites: Object.fromEntries(Object.entries(f.sites).map(([id, site]) => [id, { name: site.name, template: site.template }])),
-      rod: f.rod.name, rod_reach: f.rod.reach, cast_energy: f.cast_energy,
+      rod: (rodById(c, s.gear.rod) ?? f.rods[0]).name, rod_reach: (rodById(c, s.gear.rod) ?? f.rods[0]).reach,
+      hook_bonus_ms: (rodById(c, s.gear.rod) ?? f.rods[0]).hook_bonus_ms, band_bonus: (rodById(c, s.gear.rod) ?? f.rods[0]).band_bonus,
+      cast_energy: f.cast_energy,
       cast: s.cast ? { rarity: fishById(c, s.cast.fish)!.rarity, site: s.cast.site, bite_in: Math.max(0, s.cast.at + s.cast.bite_ms - now),
-        hook_ms: f.hook_window_ms, breaks: s.cast.breaks, bait: s.cast.bait } : null,
+        hook_ms: f.hook_window_ms + (rodById(c, s.gear.rod)?.hook_bonus_ms ?? 0), breaks: s.cast.breaks, bait: s.cast.bait } : null,
       protection_left: fishingLevel <= f.protect_max_level ? Math.max(0, f.protect_fails - s.day.fails) : null,
       caught: s.fishing.caught, seen: s.fishing.seen,
       dex: c.fish.map(fish => ({ id: fish.id, rarity: fish.rarity, level: fish.level, where: fish.where, caught: s.fishing.caught[fish.id] ?? 0,
@@ -74,13 +76,30 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
       derive: c.cooking.derive,
       tiers: Object.fromEntries(Object.entries(c.cooking.tiers).map(([k, t]) => [k, { energy: t.energy, ms: t.ms, bonus: t.bonus }])),
     },
+    gear: {
+      slots: { farming: c.tools.farming, fishing: s.gear.rod, mining: c.tools.mining, combat: c.tools.combat },
+      rods: c.fishing.rods.map(r => ({ ...r, owned: s.gear.rods.includes(r.id), equipped: s.gear.rod === r.id })),
+    },
+    tackle: {
+      keeper: c.tackle.keeper,
+      buy: c.tackle.buy.map(id => {
+        const offer = stallOffer(c, id);
+        const level = skillLevel(c, s, offer.skill);
+        return { id, name: itemName(c, id), price: offer.price, gate: offer.gate, skill: offer.skill, unlocked: level >= offer.gate,
+          xp_to_go: Math.max(0, c.skills[offer.skill][offer.gate - 1] - s.skills[offer.skill]),
+          owned: itemKind(id) === 'rod' ? s.gear.rods.includes(id) : false,
+          left: offer.daily ? Math.max(0, offer.daily - (s.day.bought[id] ?? 0)) : null,
+          reach: rodById(c, id)?.reach ?? null };
+      }),
+    },
     meals: { used: s.day.meals, cap: foodCap(c, s, now), resets_in: untilRollover(c, now), eaten: s.day.eaten },
     items: Object.fromEntries(bagIds(c, s).map(id => [id, itemInfo(c, s, id)])),
     rarity_names: c.rarity_names,
     prices: Object.fromEntries(c.crops.map(crop => [crop.id, crop.price])),
     names: Object.fromEntries([...c.crops.flatMap(crop => [[crop.id, crop.name], [crop.seed, crop.seed_name]]),
       ...c.fish.map(fish => [fish.id, fish.name]), ...c.cooking.recipes.map(r => [r.id, r.name]),
-      ...Object.entries(c.goods).map(([id, g]) => [id, g.name]), [c.cooking.mystery.id, c.cooking.mystery.name]]),
+      ...Object.entries(c.goods).map(([id, g]) => [id, g.name]), ...c.fishing.rods.map(r => [r.id, r.name]),
+      ...Object.entries(c.tools.names), [c.cooking.mystery.id, c.cooking.mystery.name]]),
     crops: c.crops.map(crop => ({ id: crop.id, seed: crop.seed, energy: crop.energy, grow_h: crop.grow_h, level: crop.level })),
     firsts: s.firsts,
   };

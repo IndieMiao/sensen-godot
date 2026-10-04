@@ -1,5 +1,5 @@
 {
-  "version": "p0-m2d-2026-10-05",
+  "version": "p0-m2e-2026-10-05",
   "_note": "P0 content (M1 homestead + M2 fish/cook/eat) (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit; M2: §6.1.2–6.1.3 fishing gates and protection, §6.2.2 fish, §6.3.1 pond weights, §6.4 rod/bait, §6.6.1 cast energy, §6.7.1 fishing XP, §7.2.3–7.2.5 cooking, §7.3 ingredient families, §7.4.1 rarity derivation, §7.6.2 cooking XP, §7.14 recipes, §7.17.1 eating). Shared by server/src/p0 and the Godot client (labels only). M2b: P0 fish list (§17.2.1) — Willow Pond (Pond template) and Willow Creek (River template) on the homestead; mackerel is Coast-only (shown in the Fish-dex, not catchable here). Recipes: the 14 pages that need only P0 fish and crops; rock-salt pages (#11, #16, #29, #37) wait for materials.",
   "energy": {
     "max_base": 200,
@@ -415,11 +415,6 @@
     ],
     "first_cast_xp": 5,
     "first_landed_xp": 5,
-    "rod": {
-      "id": "rod_starter",
-      "name": "Starter Rod",
-      "reach": 2
-    },
     "baits": {
       "bait_worm": {
         "shift": [
@@ -467,7 +462,27 @@
           "fish_trout"
         ]
       }
-    }
+    },
+    "rods": [
+      {
+        "id": "rod_starter",
+        "name": "Starter Rod",
+        "reach": 2,
+        "level": 1,
+        "price": 0,
+        "hook_bonus_ms": 0,
+        "band_bonus": 0
+      },
+      {
+        "id": "rod_reed",
+        "name": "Reed Rod",
+        "reach": 3,
+        "level": 3,
+        "price": 80,
+        "hook_bonus_ms": 400,
+        "band_bonus": 0.03
+      }
+    ]
   },
   "goods": {
     "bait_worm": {
@@ -754,6 +769,27 @@
       "qty": 2,
       "coins": 14,
       "where": "any pond"
+    }
+  },
+  "tackle": {
+    "keeper": {
+      "role": "Tackle Keeper",
+      "name": "Old Kai"
+    },
+    "buy": [
+      "rod_reed",
+      "bait_worm"
+    ]
+  },
+  "tools": {
+    "farming": "hoe_starter",
+    "fishing": "rod_starter",
+    "mining": "pick_starter",
+    "combat": "sword_wooden",
+    "names": {
+      "hoe_starter": "Starter Hoe",
+      "pick_starter": "Starter Pickaxe",
+      "sword_wooden": "Wooden Sword"
     }
   }
 }

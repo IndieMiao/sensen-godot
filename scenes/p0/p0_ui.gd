@@ -25,6 +25,8 @@ const AMBER_D := Color("b8831c")
 const BLUE := Color("6fa8dc")
 const TERRA := Color("f6e2d6")
 const DIS := Color("d6d5ce")
+const SEA := Color("cfe3ee")        # Old Kai's role colour (tackle · sea blue)
+const SEA_LIGHT := Color("e3eff5")
 
 var view: Dictionary = {}
 var root: Control
@@ -486,6 +488,12 @@ func _sheet(height: float, title: String, icon_id := "") -> VBoxContainer:
 func open_bag(focus := "") -> void:
 	var v := _sheet(500, "Bag %d/%d" % [_bag_slots().size(), int(view.get("bag", {}).get("capacity", 25))], "bag")
 	modal_kind = "bag"
+	var gear_btn := _pill_button("Tools & Gear ›", false)
+	gear_btn.custom_minimum_size = Vector2(0, 28)
+	gear_btn.add_theme_font_size_override("font_size", 9)
+	gear_btn.pressed.connect(open_gear)
+	v.get_child(0).add_child(gear_btn)
+	v.get_child(0).move_child(gear_btn, v.get_child(0).get_child_count() - 2)
 	var cap := _CapBar.new()
 	cap.custom_minimum_size = Vector2(0, 5)
 	cap.set_meta("pct", float(_bag_slots().size()) / maxf(1.0, float(view.get("bag", {}).get("capacity", 25))))
@@ -577,6 +585,155 @@ func _item_line(id: String) -> String:
 	return ""
 
 func _bag_slots() -> Array: return view.get("bag", {}).get("slots", [])
+
+## Old Kai's greeting (p(4)): same card, his own line and options; Trade opens the tackle counter.
+func open_kai_greeting() -> void:
+	var card := PanelContainer.new()
+	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	card.offset_top = -196
+	card.offset_left = 10
+	card.offset_right = -10
+	card.offset_bottom = -12
+	card.add_theme_stylebox_override("panel", _box(CARD, 16, EDGE, 1, Vector4(8, 8, 10, 8)))
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 10)
+	var face := PanelContainer.new()
+	face.custom_minimum_size = Vector2(100, 171)
+	face.add_theme_stylebox_override("panel", _box(SEA, 14, SEA, 0, Vector4(8, 8, 8, 8)))
+	var fi := _icon("rod_reed", 70)
+	fi.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	face.add_child(fi)
+	h.add_child(face)
+	var v := VBoxContainer.new()
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	v.add_theme_constant_override("separation", 4)
+	v.add_child(_label("Tackle Keeper · Old Kai", 13, INK, true))
+	v.add_child(_label("Rods and bait · Willow Creek", 8, INK2))
+	var line := _label("“%s”" % _kai_line(), 10, INK)
+	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	line.custom_minimum_size = Vector2(200, 0)
+	v.add_child(line)
+	var trade := _pill_button("Trade · see the rods", true)
+	trade.pressed.connect(open_tackle)
+	v.add_child(trade)
+	var ask := _pill_button("What's biting?", false)
+	ask.pressed.connect(func(): line.text = "“The pond keeps crucian, carp, perch and bass — koi too, if your rod can hold her. The creek adds mullet and trout.”")
+	v.add_child(ask)
+	var bye := _flat_button("Just passing by")
+	bye.pressed.connect(close_modal)
+	v.add_child(bye)
+	h.add_child(v)
+	card.add_child(h)
+	_open_modal(card, 0.22, true)
+	modal_kind = "greeting"
+
+func _kai_line() -> String:
+	var lv := int(view.get("skills", {}).get("fishing", {}).get("level", 1))
+	for g in view.get("gear", {}).get("rods", []):
+		if str(g.id) == "rod_reed" and g.get("owned", false): return "That Reed Rod suits you. Golden Koi won't snap it — at Fishing Lv4 she's yours."
+	if lv >= 3: return "Fishing Lv3 already? The Reed Rod holds Rare fish. 80 coins and she's yours."
+	return "A Starter Rod lands Common and Fine fish. The Reed Rod holds Rare ones — come back at Fishing Lv3."
+
+## Tackle counter (sea-blue keeper bar, §9.11): rods go to Tools & Gear, bait to the bag; nothing is sold here.
+func open_tackle(bubble := "") -> void:
+	var v := _sheet(420, "Old Kai's Tackle · Willow Creek", "rod")
+	modal_kind = "tackle"
+	var kp := PanelContainer.new()
+	kp.add_theme_stylebox_override("panel", _box(SEA_LIGHT, 12, SEA_LIGHT, 0, Vector4(8, 6, 8, 6)))
+	var kv := VBoxContainer.new()
+	kv.add_child(_label("Tackle Keeper · Old Kai", 9, INK, true))
+	var say := _label("“%s”" % (bubble if bubble != "" else "Pick a rod, I'll string it. Fish sell best at your own stall."), 9, INK)
+	say.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	say.custom_minimum_size = Vector2(280, 0)
+	kv.add_child(say)
+	kp.add_child(kv)
+	v.add_child(kp)
+	v.add_child(_label("Buy", 11, INK, true))
+	for row in view.get("tackle", {}).get("buy", []):
+		var id := str(row.id)
+		var h := HBoxContainer.new()
+		h.add_theme_constant_override("separation", 6)
+		h.custom_minimum_size = Vector2(0, 46)
+		var ic := _icon(id, 30)
+		if not row.get("unlocked", false): ic.modulate = Color(1, 1, 1, 0.45)
+		h.add_child(ic)
+		var mid := VBoxContainer.new()
+		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		mid.add_theme_constant_override("separation", 0)
+		mid.add_child(_label(str(row.name), 10, INK if row.get("unlocked", false) else INK2, true))
+		var sub := "%d coins · holds up to %s · Tools & Gear" % [int(row.price), P0Logic.rarity_name(view, int(row.reach))] if row.get("reach", null) != null else "%d coins · %d left today · Bag ×%d" % [int(row.price), int(row.get("left", 0)), P0Logic.bag_count(view, id)]
+		mid.add_child(_label(sub, 8, INK2))
+		h.add_child(mid)
+		if not row.get("unlocked", false):
+			var lk := _label("Fishing Lv%d · %d XP to go" % [int(row.gate), int(row.xp_to_go)], 8, INK2, true)
+			lk.add_theme_stylebox_override("normal", _box(DIS, 10, DIS, 0, Vector4(8, 4, 8, 4)))
+			h.add_child(lk)
+		elif row.get("owned", false):
+			var ow := _label("Owned", 9, GREEN_D, true)
+			h.add_child(ow)
+		else:
+			var q := 1
+			var b := _pill_button("Buy · %d" % int(row.price), true)
+			b.custom_minimum_size = Vector2(76, 30)
+			b.pressed.connect(func(): command.emit({"type": "buy", "item": id, "qty": q, "shop": "tackle"}))
+			h.add_child(b)
+		v.add_child(h)
+	var gear := _pill_button("Tools & Gear", false)
+	gear.pressed.connect(open_gear)
+	v.add_child(gear)
+
+## Tools & Gear (EQUIP-1 cut): four tool slots (starter tools by default), Ring / Charm empty; rods switch here.
+func open_gear() -> void:
+	var v := _sheet(440, "Tools & Gear", "hoe")
+	modal_kind = "gear"
+	var g: Dictionary = view.get("gear", {})
+	var slots: Dictionary = g.get("slots", {})
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 8)
+	for key in ["farming", "fishing", "mining", "combat"]:
+		var cell := PanelContainer.new()
+		cell.custom_minimum_size = Vector2(160, 64)
+		cell.add_theme_stylebox_override("panel", _box(PAPER, 12, EDGE, 1, Vector4(8, 6, 8, 6)))
+		var h := HBoxContainer.new()
+		h.add_theme_constant_override("separation", 8)
+		h.add_child(_icon(str(slots.get(key, "")), 36))
+		var t := VBoxContainer.new()
+		t.add_child(_label(key.capitalize(), 8, INK2, true))
+		t.add_child(_label(P0Logic.item_name(view, str(slots.get(key, ""))), 10, INK, true))
+		h.add_child(t)
+		cell.add_child(h)
+		grid.add_child(cell)
+	for key in ["Ring", "Charm"]:
+		var cell := _label("%s · coming later" % key, 9, INK2, true)
+		cell.custom_minimum_size = Vector2(160, 40)
+		cell.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		cell.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		cell.add_theme_stylebox_override("normal", _box(Color(1, 1, 1, 0.35), 12, Color("d9c7a6"), 1, Vector4(6, 4, 6, 4)))
+		grid.add_child(cell)
+	v.add_child(grid)
+	v.add_child(_label("Rods", 11, INK, true))
+	for r in g.get("rods", []):
+		var h := HBoxContainer.new()
+		h.add_theme_constant_override("separation", 6)
+		h.add_child(_icon(str(r.id), 28))
+		var mid := VBoxContainer.new()
+		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		mid.add_child(_label(str(r.name), 10, INK if r.get("owned", false) else INK2, true))
+		mid.add_child(_label("Holds up to %s%s" % [P0Logic.rarity_name(view, int(r.reach)), "" if int(r.hook_bonus_ms) == 0 else " · hook window +%.1f s · wider band" % (float(r.hook_bonus_ms) / 1000.0)], 8, INK2))
+		h.add_child(mid)
+		if r.get("equipped", false):
+			h.add_child(_label("Equipped", 9, GREEN_D, true))
+		elif r.get("owned", false):
+			var id := str(r.id)
+			var b := _pill_button("Equip", true)
+			b.custom_minimum_size = Vector2(64, 28)
+			b.pressed.connect(func(): command.emit({"type": "equip", "item": id}))
+			h.add_child(b)
+		else:
+			h.add_child(_label("Old Kai · Fishing Lv%d" % int(r.level), 8, INK2, true))
+		v.add_child(h)
 
 ## p(4): every NPC greets before trading — Bao's greeting card (§9.4.2), live info in the line.
 func open_greeting() -> void:

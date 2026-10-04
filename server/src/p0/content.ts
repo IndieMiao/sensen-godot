@@ -17,6 +17,7 @@ export interface Crop {
 }
 
 export interface Fish { id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[] }
+export interface Rod { id: string; name: string; reach: number; level: number; price: number; hook_bonus_ms: number; band_bonus: number }
 export interface FishSite { name: string; template: string; weights: number[]; fish: string[] }
 
 export interface CookTier {
@@ -43,12 +44,14 @@ export interface P0Content {
     cast_energy: number; refund_fail: number; protect_max_level: number; protect_fails: number;
     bite_min_ms: number; bite_spread_ms: number; hook_window_ms: number; stale_ms: number;
     catch_xp: number[]; first_xp: number[]; first_cast_xp: number; first_landed_xp: number;
-    rod: { id: string; name: string; reach: number };
+    rods: Rod[];
     sites: Record<string, FishSite>;
     baits: Record<string, { shift: number[]; wait: number }>;
   };
   goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number }>;
   blessing: { days: number; regen_mult: number; food_bonus: number };
+  tackle: { keeper: { role: string; name: string }; buy: string[] };
+  tools: { farming: string; fishing: string; mining: string; combat: string; names: Record<string, string> };
   /** §9 stall board (P0: the one-time tutorial request in slot 1; slot 2 refills after refill_h). */
   requests: { slots: number; refill_h: number; tutorial: { id: string; title: string; item: string; qty: number; coins: number; where: string } };
   /** §3.4.8 one-time energy: by rarity (index = rarity − 1) and [count, energy] milestones; may pass max by ≤ max_over. */
@@ -75,12 +78,13 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
 export function cropById(c: P0Content, id: string): Crop | undefined { return c.crops.find(crop => crop.id === id); }
 export function cropBySeed(c: P0Content, seed: string): Crop | undefined { return c.crops.find(crop => crop.seed === seed); }
 export function fishById(c: P0Content, id: string): Fish | undefined { return c.fish.find(f => f.id === id); }
+export function rodById(c: P0Content, id: string): Rod | undefined { return c.fishing.rods.find(r => r.id === id); }
 export function recipeById(c: P0Content, id: string): Recipe | undefined { return c.cooking.recipes.find(r => r.id === id); }
 
 /** Bag kind from the id prefix: seed_*, crop_*, fish_*, dish_*, bait_*, anything else is a material. */
 export function itemKind(id: string): string {
   const head = id.split('_')[0];
-  return ['seed', 'crop', 'fish', 'dish', 'bait'].includes(head) ? head : 'material';
+  return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod'].includes(head) ? head : 'material';
 }
 
 /** Dish stacks carry their quality in the id: dish_x (Plain), dish_x@good, dish_x@perfect (§7.2.5). */
@@ -107,6 +111,9 @@ export function itemName(c: P0Content, id: string): string {
   const fish = fishById(c, id);
   if (fish) return fish.name;
   if (c.goods[id]) return c.goods[id].name;
+  const rod = rodById(c, id);
+  if (rod) return rod.name;
+  if (c.tools.names[id]) return c.tools.names[id];
   if (itemKind(id) === 'dish') {
     const { base } = dishParts(id);
     if (base === c.cooking.mystery.id) return c.cooking.mystery.name;

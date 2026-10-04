@@ -1,5 +1,5 @@
 /** Fishing at the homestead pond (plan §6): cast pre-pays energy, the fish is drawn server-side, gates run level → rod → reel. */
-import { fishById, type Fish, type FishSite, type P0Content } from './content.js';
+import { fishById, rodById, type Fish, type FishSite, type P0Content } from './content.js';
 import { add, count, freeSlots, room, take } from './bag.js';
 import { energyDetail, gainEnergy, gainXp, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { draw, maxEnergy, scaledXp, skillLevel, xpPercent } from './rules.js';
@@ -59,7 +59,8 @@ export function castLine(c: P0Content, s: P0State, cmd: { bait?: string | null; 
   const level = skillLevel(c, s, 'fishing');
   const wait = bait ? f.baits[bait].wait : 1;
   const bite_ms = Math.round((f.bite_min_ms + draw(s) * f.bite_spread_ms) * wait);
-  const breaks = fish.level > level ? 'level' : fish.rarity > f.rod.reach ? 'rod' : null;
+  const rod = rodById(c, s.gear.rod) ?? f.rods[0];
+  const breaks = fish.level > level ? 'level' : fish.rarity > rod.reach ? 'rod' : null;
   s.cast = { fish: fish.id, site: siteId, at: now, bite_ms, bait, xp_pct: xpPercent(c, level, fish.level), breaks, ...(pin ? { pin } : {}) };
   events.push({ kind: 'cast', bite_in: bite_ms, rarity: fish.rarity, breaks, bait });
   if (!s.firsts.includes('cast')) {

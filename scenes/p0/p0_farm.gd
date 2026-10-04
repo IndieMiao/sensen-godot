@@ -16,6 +16,8 @@ const HOUSE := Vector3(-5.2, 0, -5.4)
 const POND := Vector3(4.6, 0, -5.0)
 const POND_R := Vector2(2.3, 1.6)
 const STOVE := Vector3(-5.8, 0, 1.2)
+const TACKLE := Vector3(-6.2, 0, 4.2)   # Old Kai's tackle stand at the west end of the creek
+const KAI := Vector3(-6.2, 0, 4.75)
 const CREEK_Z := 6.25          # Willow Creek runs east–west along the south edge (River template)
 const CREEK_HALF := 0.55
 const PITCH := 43.0
@@ -161,6 +163,7 @@ func _build_world() -> void:
 	_build_pond()
 	_build_creek()
 	_build_stove()
+	_build_tackle()
 	# plots
 	for id in 30:
 		var col := id % COLS
@@ -263,6 +266,24 @@ func _build_creek() -> void:
 	for k in 4:
 		_sphere(self, Vector3(-3.5 + k * 2.6, 0.08, CREEK_Z + 0.75), 0.16, Color("c9c2b0"))
 		_box(Vector3(0.05, 0.55, 0.05), Vector3(-2.6 + k * 2.6, 0.27, CREEK_Z - 0.75), Color("6f9e5a"))
+
+## Old Kai's tackle stand: a small counter with a blue awning, rods on a rack; Kai stands behind it.
+func _build_tackle() -> void:
+	_box(Vector3(1.6, 0.8, 0.6), TACKLE + Vector3(0, 0.4, 0), Color("a8c4d4"))
+	_box(Vector3(1.7, 0.07, 0.7), TACKLE + Vector3(0, 0.83, 0), Color("7d9fb4"))
+	for x in [-0.75, 0.75]: _box(Vector3(0.1, 1.9, 0.1), TACKLE + Vector3(x, 0.95, 0.45), Color("8a6544"))
+	_box(Vector3(1.8, 0.08, 1.0), TACKLE + Vector3(0, 1.92, 0.25), Color("6fa8dc"))
+	for i in 3: _box(Vector3(0.04, 1.3, 0.04), TACKLE + Vector3(-0.5 + i * 0.5, 1.35, -0.15), Color("c9a27a"))
+	_obstacles.append(Rect2(TACKLE.x - 0.9, TACKLE.z - 0.4, 1.8, 1.4))
+	var kai := Avatar.create_rig()
+	kai.assembler = AvatarAssemblerMerged.new()
+	var holder := Node3D.new()
+	holder.position = KAI
+	add_child(holder)
+	holder.add_child(kai)
+	kai.apply_config(Avatar.slot_table.default_config())
+	kai.config_applied.connect(func(_c): kai.play_motion("idle"))
+	kai.rotation.y = 0.0
 
 ## Outdoor kitchen (COOK-1, P0 has one stove): brick stove, pot, chimney and a side counter. Tap to cook.
 func _build_stove() -> void:
@@ -520,6 +541,8 @@ func _on_tap(screen: Vector2) -> void:
 		ui.open_rest_card()
 	elif cam.unproject_position(STOVE + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		_open_stove()
+	elif cam.unproject_position(KAI + Vector3(0, 1.0, 0)).distance_to(screen) < 60 or cam.unproject_position(TACKLE + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
+		ui.open_kai_greeting()
 
 ## The stove: empty → Cookbook / Experiment; cooking → back to the pot; ready → collect (no taps = Plain).
 func _open_stove() -> void:
@@ -636,6 +659,7 @@ func _update_tags(v: Dictionary) -> void:
 	var stove_text := "Stove · Tap to cook"
 	if st != null:
 		stove_text = "Stove · Ready · Tap to collect" if float(st.get("ready_in", 0)) <= 0.0 else "Stove · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))
+	ui.tag("kai", "Old Kai · Tap to talk", cam.unproject_position(KAI + Vector3(0, 2.3, 0)), player.position.distance_to(TACKLE) < 4.0 and not busy, true)
 	ui.tag("stove", stove_text, cam.unproject_position(STOVE + Vector3(0, 2.1, 0)), (player.position.distance_to(STOVE) < 4.0 or st != null) and not busy, st != null)
 
 # ---------------------------------------------------------------- server results
@@ -704,6 +728,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	if ui.modal_kind == "stall" and events.size() > 0:
 		ui.set_view(session.current())
 		ui.open_stall(_stall_bubble(events))
+	elif ui.modal_kind == "tackle" and events.size() > 0:
+		ui.open_tackle("Strung and ready — it's on your belt. Swap rods in Tools & Gear.")
+	elif ui.modal_kind == "gear" and events.size() == 0:
+		ui.open_gear()
 
 func _on_catch(ev: Dictionary, xp_lines: Array) -> void:
 	_show_tackle(false)
@@ -821,6 +849,12 @@ func _dev_shot(dt: float) -> void:
 				P0Cooking.auto_play = false
 			"dex":
 				ui.open_fishdex()
+			"kai":
+				ui.open_kai_greeting()
+			"tackle":
+				ui.open_tackle()
+			"gear":
+				ui.open_gear()
 			"skills":
 				ui.open_skills()
 			"radial":

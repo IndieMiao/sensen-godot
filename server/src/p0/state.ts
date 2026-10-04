@@ -52,6 +52,7 @@ export interface P0State {
   stove: Pot | null;
   cookbook: string[];            // known recipe pages
   requests: Request[];
+  gear: { rods: string[]; rod: string };   // Tools & Gear: owned rods and the equipped one (tools don't take bag slots)
   fires: number;                 // pots ever started (first fire is the tutorial ring)
   rng: number;
   seq: number;
@@ -76,6 +77,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     cast: null, stove: null,
     cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id),
     requests: [{ ...c.requests.tutorial, status: 'open' }],
+    gear: { rods: [c.tools.fishing], rod: c.tools.fishing },
     fires: 0,
     rng: seed, seq: 0,
   };
@@ -85,6 +87,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
 export function upgradeState(c: P0Content, raw: P0State): P0State {
   const s = raw as P0State & { v: number };
   s.requests ??= [{ ...c.requests.tutorial, status: 'open' }];
+  s.gear ??= { rods: [c.tools.fishing], rod: c.tools.fishing };
   if (s.v === 2) return s;
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
   s.fishing ??= { casts: 0, bites: 0, caught: {}, seen: [] };
