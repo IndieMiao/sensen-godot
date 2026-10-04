@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../kit.css">
 <link rel="stylesheet" href="../kit-home.css">
+<link rel="stylesheet" href="../kit-need.css">
 </head>
 <!-- batch 2 (homestead group, 2026-10-04) · HOME-1 Homestead panel, opened by tapping the farmhouse door plaque.
      Four things on one screen (plan §8.1.2 / §8.6.1): Needs (5 materials + coins + skills total) · You have (fractions + bars) ·
@@ -50,32 +51,32 @@
     <!-- Needs: icon + ring progress + "Name have/need" (user 2026-10-04 night: keep it terse, players aren't dumb).
          Shortage = amber ring; where to get it shows only when the tile is tapped; the gap is written on the button. -->
     <div class="hm-sec"><div class="t">Needs</div></div>
-    <div class="hm-tiles">
-      <div class="hm-tile is-short" style="--pct:62">
+    <div class="hm-tiles need-row">
+      <div class="need-tile is-short" style="--pct:62">
         <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-wood"/></svg></div></div>
         <div class="lbl">Timber <b>10<span class="of">/16</span></b></div>
       </div>
-      <div class="hm-tile" style="--pct:100">
+      <div class="need-tile" style="--pct:100">
         <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stone"/></svg></div></div>
         <div class="lbl">Stone <b>12<span class="of">/12</span></b></div>
       </div>
-      <div class="hm-tile" style="--pct:100">
+      <div class="need-tile" style="--pct:100">
         <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-reeds"/></svg></div></div>
         <div class="lbl">Reeds <b>10<span class="of">/10</span></b></div>
       </div>
-      <div class="hm-tile" style="--pct:100">
+      <div class="need-tile" style="--pct:100">
         <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-clay"/></svg></div></div>
         <div class="lbl">Clay <b>4<span class="of">/4</span></b></div>
       </div>
-      <div class="hm-tile" style="--pct:100">
+      <div class="need-tile" style="--pct:100">
         <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg></div></div>
         <div class="lbl">Rock Salt <b>5<span class="of">/4</span></b></div>
       </div>
-      <div class="hm-tile" style="--pct:100">
+      <div class="need-tile" style="--pct:100">
         <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div></div>
         <div class="lbl">Coins <b>830<span class="of">/400</span></b></div>
       </div>
-      <div class="hm-tile" style="--pct:100">
+      <div class="need-tile" style="--pct:100">
         <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-xp"/></svg></div></div>
         <div class="lbl">Skills <b>6<span class="of">/5</span></b></div>
       </div>

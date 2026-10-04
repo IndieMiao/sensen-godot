@@ -1,0 +1,30 @@
+/* ============================================================================
+   Need Tile — material progress (2026-10-04 night, user rule: every "have / need"
+   of materials, coins, skill totals and other counts uses this one component).
+   Icon inside a ring progress + one line "Name have/need". Numbers only:
+   source appears on tap, the gap goes on the action button.
+   Sizes: .is-l 156 (panels, 4 per row) · .is-m 112 (cards, 5 per row) · .is-s 72 (rows, 6+ per row).
+   States: default = complete (ring = have/need capped at 100 %, green) · .is-short (amber ring + amber number).
+   Shared across groups; linked by any page that shows material progress.
+   ========================================================================== */
+.need-row { display: grid; grid-template-columns: repeat(var(--cols, 4), 1fr); row-gap: 28px; }
+.need-tile { --ring: var(--primary); --ring-d: 156px; --ring-w: 12px; --ic: 76px; --lbl: 25px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.need-tile .ring { width: var(--ring-d); height: var(--ring-d); border-radius: 50%; padding: var(--ring-w);
+  background: conic-gradient(var(--ring) calc(var(--pct, 100) * 1%), var(--track) 0); }
+.need-tile .core { width: 100%; height: 100%; border-radius: 50%; background: #F4EEE1; display: flex; align-items: center; justify-content: center; }
+.need-tile .core .ic { width: var(--ic); height: var(--ic); }
+.need-tile .lbl { font-size: var(--lbl); font-weight: 800; line-height: 1.2; white-space: nowrap; color: var(--ink); }
+.need-tile .lbl b { font-weight: 800; }
+.need-tile .lbl .of { color: var(--ink-2); font-weight: 700; }
+.need-tile.is-short { --ring: var(--energy-amber); }
+.need-tile.is-short .core { background: #FBF1DA; }
+.need-tile.is-short .lbl b { color: #B8831C; }
+.need-tile.is-m { --ring-d: 112px; --ring-w: 9px; --ic: 54px; --lbl: 22px; gap: 10px; }
+.need-tile.is-s { --ring-d: 72px; --ring-w: 6px; --ic: 36px; --lbl: 19px; gap: 8px; }
+/* tap → source (guide only; Show moves the camera / opens the place, never acts) */
+.need-pop { display: inline-flex; align-items: center; gap: 14px; height: 72px; padding: 0 10px 0 24px; border-radius: 36px;
+  background: var(--card-solid); border: 1px solid var(--card-edge); font-size: 23px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.need-pop .show { height: 52px; padding: 0 16px 0 20px; border-radius: 26px; border: 2px solid var(--primary-deep);
+  display: inline-flex; align-items: center; gap: 2px; font-size: 21px; font-weight: 800; }
+.need-pop .show .ic { width: 24px; height: 24px; }

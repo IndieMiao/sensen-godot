@@ -1397,64 +1397,64 @@ td { font-variant-numeric: tabular-nums; }
 <td>o(7)</td>
 <td>驿站与背包同屏（2026-10-04 用户 Figma 定稿）</td>
 <td>驿站半屏抽屉 Buy / Sell / Stall Board 三 Tab，出售在 Sell Tab</td>
-<td>驿站抽屉上半 Buy / Stall Board 两 Tab、下半贴完整背包；出售只在背包详情卡 Pin / Sell / Sell All 上做，回收日额度条挂在背包标题下；正在买的种子在网格里高亮并标 In bag ×N</td>
-<td>买种子时必须看得见库存；少一个 Tab、少一套列表</td>
+<td>驿站抽屉上半 Buy / Stall Board 两 Tab、下半贴完整背包；出售只在背包详情卡 Pin / Sell / Sell All 上做，回收日额度条挂在背包标题下；正在买的种子在网格里高亮并标 In bag ×N（理由：买种子时必须看得见库存；少一个 Tab、少一套列表）</td>
+<td>第 16 章 FARM-6 行；第 9 章驿站、第 10 章背包详情卡动作表</td>
 </tr>
 <tr>
 <td>o(8)</td>
 <td>设施靠点击触发（2026-10-04 用户 Figma 定稿）</td>
 <td>靠近设施时主行动键变成 Cook / Shop / Rest · Free 等设施动词</td>
-<td>主行动键只做四种行动；灶台、长椅、柜台、居民、工作台等设施一律点击触发，靠近时设施上方浮出指尖卡（Tap to cook / Rest · +60 Energy · once a day / Tap to shop）；纯设施空间（厨房、柜台）隐藏主行动键与切换键</td>
-<td>一个键只做一类事，休息与烹饪的触发方式一致</td>
+<td>主行动键只做四种行动；灶台、长椅、柜台、居民、工作台等设施一律点击触发，靠近时设施上方浮出指尖卡（Tap to cook / Rest · +60 Energy · once a day / Tap to shop）；纯设施空间（厨房、柜台）隐藏主行动键与切换键（理由：一个键只做一类事，休息与烹饪的触发方式一致）</td>
+<td>第 10 章 10.2 主行动键状态表；第 7 章烹饪入口；第 14 章首会话；第 16 章 FARM-7 / COOK-1 / NPC-1 行与组件约定</td>
 </tr>
 <tr>
 <td>o(9)</td>
 <td>体力卡统一且只引导（2026-10-04 用户审图）</td>
 <td>不足卡写 "Eat +40" 等预测收益，按钮直接执行；归零卡是另一张卡</td>
-<td>不足与归零是同一张 Energy Card；只写系统确知的事实（3 dishes in bag / 1/3 today / Available）；瓦片只引导（Open bag / Show kitchen / Show on map / Show bench）从不替玩家执行；唯一按钮 Free to do now 关闭</td>
-<td>系统不可能预知玩家会吃哪道菜；替玩家花资源会失去信任；两种"不足"没必要两套 UI</td>
+<td>不足与归零是同一张 Energy Card；只写系统确知的事实（3 dishes in bag / 1/3 today / Available）；瓦片只引导（Open bag / Show kitchen / Show on map / Show bench）从不替玩家执行；唯一按钮 Free to do now 关闭（理由：系统不可能预知玩家会吃哪道菜；替玩家花资源会失去信任；两种"不足"没必要两套 UI）</td>
+<td>第 3 章 3.7.2 / 3.7.3；第 16 章 BAR-3 / HUD-3 行</td>
 </tr>
 <tr>
 <td>o(10)</td>
 <td>烹饪面板第五版：配方与图鉴合并、灶与锅做成 3D（2026-10-04 用户审图 + Figma 标注 "COOK-2b-修改"）</td>
 <td>Recipes 列表 + 独立全屏 Cookbook 书页；投料槽画在抽屉里、底部 "Cook · Free"；60% 抽屉塞下槽位 + 预览 + 食材横排</td>
-<td>灶台与锅是场景里的 3D 物件、相机推近：原料飞进锅里可见，锅下槽条（带 ✕）+ 预览胶囊；抽屉只放两 Tab——<strong>Cookbook</strong>（= Recipes + 图鉴：筛选条 / 详情卡含 Ingredients 材料列 / 5 列页格，参考《Spiritfarer》菜谱页改竖排、与背包同版式）与 <strong>Experiment</strong>（整段是背包格，点格入锅）；按钮只写 <code>Cook</code>，去掉 Free；COOK-5 并入 COOK-2a</td>
-<td>平面槽位限制了烹饪表现力；两份"菜的列表"让玩家分不清去哪里做菜；Free 像在暗示别的东西要收费</td>
+<td>灶台与锅是场景里的 3D 物件、相机推近：原料飞进锅里可见，锅下槽条（带 ✕）+ 预览胶囊；抽屉只放两 Tab——<strong>Cookbook</strong>（= Recipes + 图鉴：筛选条 / 详情卡含 Ingredients 材料列 / 5 列页格，参考《Spiritfarer》菜谱页改竖排、与背包同版式）与 <strong>Experiment</strong>（整段是背包格，点格入锅）；按钮只写 <code>Cook</code>，去掉 Free；COOK-5 并入 COOK-2a（理由：平面槽位限制了烹饪表现力；两份"菜的列表"让玩家分不清去哪里做菜；Free 像在暗示别的东西要收费）</td>
+<td>第 7 章 7.2.7、7.6.1；第 16 章 COOK-2a / 2a-2 / 2b / 5 行、§16.4、§16.5</td>
 </tr>
 <tr>
 <td>p(1)</td>
 <td><strong>第四轮（2026-10-04）</strong>：NPC 的 Market 不对——尽可能利用地图，除特殊情况外每个 NPC 单独分配到不同的地图定位点而不是统一放进一个 Market；每个功能 NPC 单独一个空间、空间全部室内、场景多用农场那种斜俯视；拍板：落点允许参考 POI 密度（不认领店铺）、角色住进功能房间、接受 pin 密度并做聚合、只有集市例外为室外</td>
 <td>据点组 Outpost Group：Market（含 Tea Counter）+ Tackle Shop + Travel Post 三栋围一个广场，每城 1–6 组；角色住广场</td>
-<td><strong>据点 Outpost = 每个功能岗位一处空间、一枚 pin</strong>：茶馆 Tea House / 渔具铺 Tackle Shop / 驿站 Travel Post 为两面墙切开的室内单间 diorama，<strong>集市广场 Market Square 是唯一的室外据点</strong>（委托板、特产货架、周末市集在此）；各岗位各走各的落点规则（渔具铺贴鱼塘、驿站贴市中心与交通密度、茶馆跟建成区密度、集市广场居中），落点可参考 POI 类别密度但不认领、不命名任何真实店铺；每城茶馆 1–6 / 渔具铺 1–6 / 集市广场 1–3 / 驿站 1–2 ≈ 5–17 处，城市级缩放同类聚合；S 档与荒野格 1 间四岗位同室的 Trading Post 小木屋；茶座定为独立茶馆（茶桌 = 派对房入口）；角色按职业住进据点（Pip 每间驿站都在），Granny Wu / Ivo / Lena 三位自带空间；"家组"改"家一套 Home Set"；额度键与账本不变</td>
-<td>平面广场限制了画面与竖屏可读性；一座城只有几枚一样的 Market pin 浪费了真实地图；每个岗位有自己的房间才有记忆点；评估见 research/round4-npc-rooms</td>
+<td><strong>据点 Outpost = 每个功能岗位一处空间、一枚 pin</strong>：茶馆 Tea House / 渔具铺 Tackle Shop / 驿站 Travel Post 为两面墙切开的室内单间 diorama，<strong>集市广场 Market Square 是唯一的室外据点</strong>（委托板、特产货架、周末市集在此）；各岗位各走各的落点规则（渔具铺贴鱼塘、驿站贴市中心与交通密度、茶馆跟建成区密度、集市广场居中），落点可参考 POI 类别密度但不认领、不命名任何真实店铺；每城茶馆 1–6 / 渔具铺 1–6 / 集市广场 1–3 / 驿站 1–2 ≈ 5–17 处，城市级缩放同类聚合；S 档与荒野格 1 间四岗位同室的 Trading Post 小木屋；茶座定为独立茶馆（茶桌 = 派对房入口）；角色按职业住进据点（Pip 每间驿站都在），Granny Wu / Ivo / Lena 三位自带空间；"家组"改"家一套 Home Set"；额度键与账本不变（理由：平面广场限制了画面与竖屏可读性；一座城只有几枚一样的 Market pin 浪费了真实地图；每个岗位有自己的房间才有记忆点；评估见 research/round4-npc-rooms）</td>
+<td>第 9 章 9.0 / 9.2 / 9.3.2 / 9.3.6 / 9.4 / 9.12；第 11 章 11.7–11.8；第 14 章第 3 天；第 16 章 NPC-1 / NPC-6 / MAP-1 / MAP-4；附录 A.9</td>
 </tr>
 <tr>
 <td>p(2)</td>
 <td>Sell 能否统一成类似 FARM-6（2026-10-04 用户审图）</td>
 <td>集市与渔具铺柜台抽屉三 Tab Buy / Sell / Board，Sell Tab 里列可回收行各带 Sell 按钮</td>
-<td>三处会收东西的柜台共用"柜台 + 背包同屏"抽屉：上半 Buy / Board + 掌柜一行 + ≤ 4 行商品，下半背包带该柜台的日额度条与 Sell here 筛选，卖 = 点格 → Sell / Sell All；Sell Tab 取消；不可卖写 Sell at home，满额写 Limit reached</td>
-<td>一套心智模型、买卖联动、UI 只做一个组件；代价是多堆连卖多一次点击与柜台区要限高 4 行</td>
+<td>三处会收东西的柜台共用"柜台 + 背包同屏"抽屉：上半 Buy / Board + 掌柜一行 + ≤ 4 行商品，下半背包带该柜台的日额度条与 Sell here 筛选，卖 = 点格 → Sell / Sell All；Sell Tab 取消；不可卖写 Sell at home，满额写 Limit reached（理由：一套心智模型、买卖联动、UI 只做一个组件；代价是多堆连卖多一次点击与柜台区要限高 4 行）</td>
+<td>第 9 章 9.11 开头；第 16 章 NPC-2 / NPC-2-2 / NPC-3 / NPC-3-2 行与 §16.4</td>
 </tr>
 <tr>
 <td>p(3)</td>
 <td>NPC 售卖界面要突出 NPC 形象，否则看起来太一样；点 NPC 不要直接弹商店，先 greeting 对话，再有选项打开交易 / 商店（取个名字）（2026-10-04 用户审图）</td>
 <td>点掌柜或柜台直接弹柜台抽屉；抽屉顶部只有一行小头像台词</td>
-<td>点掌柜 → <strong>问候卡</strong>（掌柜大幅近景 + 岗位 · 名牌 + 带今日信息的一句问候 + 三个选项：<strong>Trade</strong>（统一名字，副文案 open the stall / see the rods / order tea / book a trip）/ 信息问句 / Just passing by）→ Trade 才开柜台抽屉；抽屉顶部改为<strong>掌柜栏</strong>（头像近景 + 名牌 + 随操作变化的气泡 + 岗位配色），标题写 Mei's Stall · Market Square；各房间指尖卡改写 "&lt;名字&gt; · Tap to talk"</td>
-<td>形象与一句话让四处柜台各有记忆点；多一步问候把"买东西"变成"见一个人"，也给信息类台词（渔情 / 票价 / 库存）一个自然的出口</td>
+<td>点掌柜 → <strong>问候卡</strong>（掌柜大幅近景 + 岗位 · 名牌 + 带今日信息的一句问候 + 三个选项：<strong>Trade</strong>（统一名字，副文案 open the stall / see the rods / order tea / book a trip）/ 信息问句 / Just passing by）→ Trade 才开柜台抽屉；抽屉顶部改为<strong>掌柜栏</strong>（头像近景 + 名牌 + 随操作变化的气泡 + 岗位配色），标题写 Mei's Stall · Market Square；各房间指尖卡改写 "&lt;名字&gt; · Tap to talk"（理由：形象与一句话让四处柜台各有记忆点；多一步问候把"买东西"变成"见一个人"，也给信息类台词（渔情 / 票价 / 库存）一个自然的出口）</td>
+<td>第 9 章 9.4.2 掌柜交互表；第 10 章 10.2.2 设施点击规则、10.3.5、10.8；第 14 章 14.1.1；第 16 章 NPC-1 / NPC-G1 / NPC-2 / NPC-3 行、§16.1.3、§16.4、§16.5；附录 B.9 / B.10</td>
 </tr>
 <tr>
 <td>p(4)</td>
 <td>NPC 之后都先要打招呼（2026-10-04 夜用户拍板）</td>
 <td>问候卡只用于四处据点掌柜；农场驿站伙计无名字，点驿站直接弹抽屉（<code>Tap to shop</code>）</td>
-<td><strong>所有功能 NPC 先问候再 Trade，含农场驿站伙计</strong>：伙计按家城气候带取名（上海 = <code>Stallhand · Bao</code>），点驿站棚或伙计 → 相机推到驿站 → 问候卡（<code>Trade · buy &amp; sell</code> / <code>What's selling today?</code> / <code>Just passing by</code>）→ Trade 才开柜台 + 背包抽屉；抽屉顶部加掌柜栏（陶土色），标题 <code>Bao's Stall · Homestead</code>；<code>Tap to shop</code> 全文取消；角色 NPC 的对话条本身就是"先招呼再选项"，不另加问候卡</td>
-<td>一套交互、五处柜台都是"见一个人"；自家驿站每天多点一次的代价换来统一的心智与角色感</td>
+<td><strong>所有功能 NPC 先问候再 Trade，含农场驿站伙计</strong>：伙计按家城气候带取名（上海 = <code>Stallhand · Bao</code>），点驿站棚或伙计 → 相机推到驿站 → 问候卡（<code>Trade · buy &amp; sell</code> / <code>What's selling today?</code> / <code>Just passing by</code>）→ Trade 才开柜台 + 背包抽屉；抽屉顶部加掌柜栏（陶土色），标题 <code>Bao's Stall · Homestead</code>；<code>Tap to shop</code> 全文取消；角色 NPC 的对话条本身就是"先招呼再选项"，不另加问候卡（理由：一套交互、五处柜台都是"见一个人"；自家驿站每天多点一次的代价换来统一的心智与角色感）</td>
+<td>第 9 章 9.3.1 / 9.3.2 / 9.4.2 / 9.11；第 10 章 10.2.2 / 10.3.5 / 10.8；第 14 章；第 16 章 FARM-6 / NPC-G1 行、§16.4、§16.5；附录 B.9 / B.10</td>
 </tr>
 <tr>
 <td>p(5)</td>
 <td>关于材料和进度，信息能不能简洁一些，这个毕竟是一个多人游戏，玩家不是傻子（2026-10-04 夜用户审 HOME-1，附草图：icon 外套环状进度条，下面"名字 16/20"）</td>
 <td>农场等级面板每种材料一行：名字 · 已有 / 需要 · 进度条 · 来源一句；差的行写 Still missing N + 去哪拿 + 多久 + Show</td>
-<td><strong>材料进度格</strong>：图标外套环形进度，下面一行"名字 已有/需要"，4 列成组；齐了满绿环、差的琥珀环；来源不常驻，点格才弹；缺口只写在按钮上（Need 6 more Timber）；面板高度按内容收</td>
-<td>数字本身就是信息，重复的提示句是噪音；同一组件可复用到工作台蓝图与门禁物品配方</td>
+<td><strong>材料进度格</strong>：图标外套环形进度，下面一行"名字 已有/需要"，4 列成组；齐了满绿环、差的琥珀环；来源不常驻，点格才弹；缺口只写在按钮上（Need 6 more Timber）；面板高度按内容收 ；<strong>当晚追加</strong>（用户："更新到 figma 的设计规范里面，之后只要是材料的进度，全部都用这种形式"）：材料进度格定为全局组件，三档 L / M / S，写进 Figma Section 00 组件约定（NEED-TILE 规格表）；NPC-7 旅行证件配方由芯片改为 M 号格，FARM-5 蓝图卡同口径（理由：数字本身就是信息，重复的提示句是噪音；一个组件管所有"已有 / 需要"）</td>
+<td>第 8 章 8.1.2 / 8.6.1；第 16 章 16.1.3、HOME-1 / FARM-5 / NPC-7 行、§16.4</td>
 </tr>
 </tbody>
 </table></div>
@@ -30583,9 +30583,9 @@ td { font-variant-numeric: tabular-nums; }
 <td>永远不写 "Spend your Energy"；Show on map 只移动相机</td>
 </tr>
 <tr>
-<td>材料进度格 Need Tile</td>
-<td>圆形图标（156 px）外套 12 px 环形进度，下面一行「名字 已有/需要」（25 px 粗体，已有数字加粗）；一行 4 格；齐了满绿环，差的格琥珀环 + 琥珀数字；HOME-1、FARM-5 工作台蓝图、门禁物品配方共用</td>
-<td>只写数字，不常驻来源与"还差几个"的句子（2026-10-04 夜用户：信息要简洁）；来源点格才弹；缺口写在按钮上</td>
+<td>材料进度格 Need Tile（<strong>凡材料 / 数量进度一律用它</strong>）</td>
+<td>圆形图标外套环形进度，下面一行「名字 已有/需要」（已有数字加粗、/需要灰）；环 = 已有 ÷ 需要、满了封顶；三档：L 156 px · 环 12 · 字 25（面板，一行 4）/ M 112 · 环 9 · 字 22（卡片里的配方，一行 5）/ S 72 · 环 6 · 字 19（列表行、提示卡，一行 6+）；齐了满绿环，差的琥珀环 + 琥珀数字，多了照实写（5/4）；顺序 材料 → 金币 → 其他计数（技能和、印章）；用于 HOME-1、FARM-5 工作台蓝图、NPC-7 旅行证件配方及以后一切制作 / 升级 / 条件</td>
+<td>2026-10-04 夜用户："之后只要是材料的进度，全部都用这种形式"，已写进 Figma 组件约定（Section 00 · NEED-TILE）；只写数字，不常驻来源与提示句，不打勾、不用红；来源点格才弹（一句 + Show，只引导）；缺口写在按钮上；等级类门禁（Homestead Lv4）不是格，只写在按钮上；不再用横向进度条、芯片列表或 "you have N"</td>
 </tr>
 <tr>
 <td>右上常驻卡</td>
@@ -30957,7 +30957,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>设施</td>
 <td>种植 · 工作台</td>
 <td>洒水器放置预览：选中蓝图后田上出现 3 × 3 浅蓝覆盖范围跟随手指；温室 4 × 4 玻璃房（内有作物，玻璃用半透明软胶质感）；堆肥箱带投料槽</td>
-<td>工作台面板（半屏抽屉）：三张蓝图卡 "Sprinkler · Farming Lv6 · Waters 8 plots for you · Timber 8/8 · Stone 6/6 · Copper Ore 1/3"（材料不足项琥珀色）/ "Greenhouse · Farming Lv8 · Any seed grows inside" / "Compost Bin · 5 crops → 5 Compost"；锁定蓝图灰显 + 锁角标 + 四件事缩略</td>
+<td>工作台面板（半屏抽屉）：三张蓝图卡 "Sprinkler · Farming Lv6 · Waters 8 plots for you" + M 号材料进度格 "Timber 8/8" / "Stone 6/6" / "Copper Ore 1/3"（琥珀环）/ "Greenhouse · Farming Lv8 · Any seed grows inside" / "Compost Bin · 5 crops → 5 Compost"；锁定蓝图灰显 + 锁角标 + 四件事缩略</td>
 <td>上述文案；"Build" 按钮；"Coverage preview" 小标</td>
 <td>选中蓝图拖到田上放置；点设施看状态；堆肥箱点开投料（每日 ≤ 5 份）</td>
 <td>来自 FARM-1 点工作台；去 SKILL-2（锁定蓝图弹门禁卡）</td>
@@ -31489,7 +31489,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>Travel Post Desk</td>
 <td>驿站柜台</td>
 <td>旅行 · 门禁</td>
-<td>从 Sigrid 的问候卡选 Trade · book a trip 之后打开：驿站室内压暗，抽屉顶栏 "Sigrid's Desk · Travel Post" + ✕，Tab "Permits（选中）/ Passport / Fares"，掌柜栏（藏青底：Sigrid 近景 + "Post Clerk · Sigrid" + 气泡 "Shanghai to Tokyo: Trip 5 — 40 Energy, 200 coins and a Travel Permit. Where to?" + 小字 "Permits 2 a week · Long-haul Tickets 1 a week · resets Monday"）；Permits 页两张卡：<strong>Travel Permit</strong> · "For trips beyond 1,600 km · Trip 5 and up · you have 0" · "Craft: 2 regional specialties from 2 climates + 100 coins" · 材料芯片 "Smelt · Temperate ✓" / "Grass Carp · Subtropical ✓" / "100 coins · you have 230" · 按钮 "Craft · 100 coins" / "Buy · 250 coins (2/week)"；<strong>Long-haul Ticket</strong> · "For trips beyond 4,000 km · Trip 6–7 · you have 0" · "Craft: Travel Permit + Hardwood ×2 + Quartz ×2 + 150 coins" · 灰芯片 "Travel Permit · craft one first" / "Hardwood 0/2" / "Quartz 0/2" / "Homestead Lv4 needed" / "Stamps 6/8 · 2 more stamps" · 按钮灰 "Homestead Lv4 needed" / "Buy · 600 coins (1/week)"；页脚 "Also at this desk: Coffee · +30 Energy · 50 coins (2/3) · Travel Biscuits · 40 coins · Outpost stamp at the desk by the window"</td>
+<td>从 Sigrid 的问候卡选 Trade · book a trip 之后打开：驿站室内压暗，抽屉顶栏 "Sigrid's Desk · Travel Post" + ✕，Tab "Permits（选中）/ Passport / Fares"，掌柜栏（藏青底：Sigrid 近景 + "Post Clerk · Sigrid" + 气泡 "Shanghai to Tokyo: Trip 5 — 40 Energy, 200 coins and a Travel Permit. Where to?" + 小字 "Permits 2 a week · Long-haul Tickets 1 a week · resets Monday"）；Permits 页两张卡：<strong>Travel Permit</strong> · "For trips beyond 1,600 km · Trip 5 and up · you have 0" · "Craft: 2 regional specialties from 2 climates + 100 coins" · M 号材料进度格 "Smelt 1/1" / "Grass Carp 1/1" / "Coins 230/100"（全满绿环）· 按钮 "Craft · 100 coins" / "Buy · 250 coins (2/week)"；<strong>Long-haul Ticket</strong> · "For trips beyond 4,000 km · Trip 6–7 · you have 0" · "Craft: Travel Permit + Hardwood ×2 + Quartz ×2 + 150 coins" · M 号材料进度格 "Travel Permit 0/1" / "Hardwood 0/2" / "Quartz 0/2"（琥珀空环）/ "Coins 230/150"（满绿）/ "Stamps 6/8"（琥珀环），等级门禁不做格 · 按钮灰 "Homestead Lv4 needed" / "Buy · 600 coins (1/week)"；页脚 "Also at this desk: Coffee · +30 Energy · 50 coins (2/3) · Travel Biscuits · 40 coins · Outpost stamp at the desk by the window"</td>
 <td>Fares 页：费用预览板，列出 Nearby 10 城与收藏城 "Tokyo · Trip 5 · 40 Energy · 200 coins · Travel Permit · 10 min"；Passport 页一行 "Outposts · Shanghai 4/17"；盖章飘字 "Outpost Stamp collected"</td>
 <td>上述文案；"Craft" / "Buy" / "Stamps 6/8 · 2 more stamps" / "Homestead Lv4 needed" / "Outposts · Shanghai 4/17"</td>
 <td>点 Craft 即时制作（0 体力）；不满足时按钮写差什么；Buy 走周限购</td>
@@ -32238,8 +32238,8 @@ td { font-variant-numeric: tabular-nums; }
 </tr>
 <tr>
 <td>NPC-7</td>
-<td>驿站柜台抽屉：职员台词，Permits 页两张卡（许可与长途票的配方与购买），制作槽放两条带气候带标签的鱼</td>
-<td>Scene: half-screen travel post drawer with a clerk portrait, two large cards for Travel Permit and Long-haul Ticket showing craft recipes with ingredient icons and buy prices, a crafting slot holding two fish with small climate tags, Craft and Buy pills</td>
+<td>驿站柜台抽屉：职员台词，Permits 页两张卡（许可与长途票的配方与购买），配方材料用 M 号材料进度格（图标外套环形进度 + 名字 已有/需要）</td>
+<td>Scene: half-screen travel post drawer with a clerk portrait, two large cards for Travel Permit and Long-haul Ticket, each showing its recipe as a row of round icons wrapped in ring progress with a short name and have/need count under each (full green or partial amber), Craft and Buy pills</td>
 </tr>
 </tbody>
 </table></div>

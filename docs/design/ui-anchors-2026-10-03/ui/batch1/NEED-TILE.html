@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>NEED-TILE · Material progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-state.css">
+<link rel="stylesheet" href="../kit-need.css">
+<style>
+  .nt-card { background: var(--card-solid); border: 1px solid var(--card-edge); border-radius: 28px; padding: 28px 28px; }
+  .nt-anat { display: flex; align-items: center; gap: 40px; }
+  .nt-specs { flex: 1 1 auto; display: flex; flex-direction: column; gap: 14px; }
+  .nt-spec { display: flex; gap: 14px; align-items: baseline; font-size: 21px; font-weight: 700; color: var(--ink-2); line-height: 28px; }
+  .nt-spec b { flex: 0 0 120px; color: var(--ink); font-weight: 800; }
+  .nt-spec .zh { display: block; font-size: 16px; color: #9AA39D; line-height: 20px; }
+  .nt-states { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .nt-cap { margin-top: 12px; text-align: center; font-size: 18px; font-weight: 800; line-height: 22px; color: var(--ink); }
+  .nt-cap .s { display: block; font-weight: 700; color: var(--ink-2); }
+  .nt-cap .zh { display: block; font-size: 15px; font-weight: 700; color: #9AA39D; }
+  .nt-tap { display: flex; align-items: center; gap: 22px; }
+  .nt-tap .arrow { font-size: 36px; font-weight: 800; color: var(--ink-2); }
+  .nt-note { margin-top: 18px; font-size: 19px; font-weight: 700; line-height: 26px; color: var(--ink-2); }
+  .nt-note .zh { display: block; font-size: 16px; color: #9AA39D; line-height: 22px; }
+  .nt-btnrow { margin-top: 20px; display: flex; align-items: center; gap: 22px; }
+  .nt-btnrow .btn { height: 88px; font-size: 30px; padding: 0 40px; }
+  .nt-size { display: flex; align-items: center; gap: 28px; padding: 18px 0; border-bottom: 1px dashed var(--card-edge); }
+  .nt-size:last-child { border-bottom: 0; }
+  .nt-size .k { flex: 0 0 210px; font-size: 22px; font-weight: 800; line-height: 28px; }
+  .nt-size .k .s { display: block; font-size: 18px; font-weight: 700; color: var(--ink-2); }
+  .nt-size .k .zh { display: block; font-size: 15px; font-weight: 700; color: #9AA39D; }
+  .nt-size .tiles { display: flex; gap: 22px; align-items: flex-start; }
+  .nt-dont .lbl s { color: var(--energy-red); }
+  .nt-bad { display: flex; gap: 18px; flex-wrap: wrap; }
+  .nt-bad .x { position: relative; padding: 12px 18px; border-radius: 18px; border: 1px dashed #E0A08C; background: #FCEFEA; font-size: 18px; font-weight: 700; color: #8A5A4A; }
+  .nt-bad .x::before { content: "✕"; margin-right: 8px; color: var(--energy-red); font-weight: 800; }
+  .nt-uses { display: flex; flex-wrap: wrap; gap: 12px; }
+  .nt-uses span { height: 46px; padding: 0 18px; border-radius: 23px; background: var(--primary-tint); border: 1px solid var(--primary-deep); font-size: 19px; font-weight: 800; line-height: 44px; color: var(--ink); }
+</style>
+</head>
+<!-- NEED-TILE (2026-10-04 night): component spec sheet for material progress. User rule: every have/need of materials, coins,
+     skill totals and other counts uses this tile — icon inside a ring progress + one line "Name have/need"; numbers only.
+     Canvas 1080 x 2920 (spec sheet, not a screen). Component CSS ../kit-need.css (.need-tile), sheet chrome from ../kit-state.css. -->
+<body style="--canvas-h:2920px;">
+<div class="canvas is-sheet">
+<div class="st-page" style="gap:22px">
+
+  <header class="st-head">
+    <div class="st-title">Need Tile — Material Progress</div>
+    <div class="st-sub">Every "have / need" uses this one tile · numbers only<span class="zh">材料进度格：凡"已有 / 需要"一律用它</span></div>
+    <div class="st-meta">NEED-TILE · v1 · 2026-10-04</div>
+  </header>
+
+  <section class="st-sec">
+    <div class="st-sec-h"><span class="k">A</span><span class="t">Anatomy</span><span class="zh">结构</span><span class="r">size L · panels</span></div>
+    <div class="nt-card nt-anat" style="margin-top:16px">
+      <div class="need-tile is-short" style="--pct:62"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-wood"/></svg></div></div><div class="lbl">Timber <b>10</b><span class="of">/16</span></div></div>
+      <div class="nt-specs">
+        <div class="nt-spec"><b>Ring</b><span>156 px · stroke 12 · track ink 12 % · fill = have ÷ need, capped at full<span class="zh">环 = 已有 ÷ 需要，满了封顶</span></span></div>
+        <div class="nt-spec"><b>Core</b><span>132 px cream #F4EEE1 · icon 76 px · short: #FBF1DA<span class="zh">底色奶白；缺料时暖黄</span></span></div>
+        <div class="nt-spec"><b>Label</b><span>25 px Nunito 800 · Name + <b style="flex:none;color:var(--ink)">have</b> + /need in grey<span class="zh">一行："名字 已有/需要"，已有加粗</span></span></div>
+        <div class="nt-spec"><b>Colour</b><span>complete green #7FC66A · short amber #E3B341 (number #B8831C)<span class="zh">只有绿与琥珀两色，不用红</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="st-sec">
+    <div class="st-sec-h"><span class="k">B</span><span class="t">States</span><span class="zh">状态</span><span class="r">only two colours</span></div>
+    <div class="nt-card nt-states" style="margin-top:16px">
+      <div><div class="need-tile" style="--pct:100"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stone"/></svg></div></div><div class="lbl">Stone <b>12</b><span class="of">/12</span></div></div><div class="nt-cap">Complete<span class="s">full green ring</span><span class="zh">齐了</span></div></div>
+      <div><div class="need-tile is-short" style="--pct:62"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-wood"/></svg></div></div><div class="lbl">Timber <b>10</b><span class="of">/16</span></div></div><div class="nt-cap">Short<span class="s">amber ring + number</span><span class="zh">差一些</span></div></div>
+      <div><div class="need-tile is-short" style="--pct:0"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-quartz"/></svg></div></div><div class="lbl">Quartz <b>0</b><span class="of">/2</span></div></div><div class="nt-cap">None yet<span class="s">empty track</span><span class="zh">一个都没有</span></div></div>
+      <div><div class="need-tile" style="--pct:100"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg></div></div><div class="lbl">Rock Salt <b>5</b><span class="of">/4</span></div></div><div class="nt-cap">Surplus<span class="s">full ring, real count</span><span class="zh">多了照实写</span></div></div>
+    </div>
+  </section>
+
+  <section class="st-sec">
+    <div class="st-sec-h"><span class="k">C</span><span class="t">Tap for source · gap on the button</span><span class="zh">点格才给来源；缺口写在按钮上</span></div>
+    <div class="nt-card" style="margin-top:16px">
+      <div class="nt-tap">
+        <div class="need-tile is-m is-short" style="--pct:62"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-wood"/></svg></div></div><div class="lbl">Timber <b>10</b><span class="of">/16</span></div></div>
+        <div class="arrow">→</div>
+        <div class="need-pop"><span>Timber Grove · 6 per round · ready in 2h 14m</span><span class="show">Show<svg class="ic" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></span></div>
+      </div>
+      <div class="nt-note">The only sentence a tile ever gets — and only after a tap. Show moves the camera or opens the place; it never acts for the player.<span class="zh">来源一句只在点格后出现；Show 只移动相机 / 打开地点，不替玩家执行</span></div>
+      <div class="nt-btnrow"><div class="btn is-disabled">Need 6 more Timber</div><div class="nt-note" style="margin-top:0">One gap, on the action button.<span class="zh">还差多少只写在按钮上（Need 70 more coins / Homestead Lv4 needed）</span></div></div>
+    </div>
+  </section>
+
+  <section class="st-sec">
+    <div class="st-sec-h"><span class="k">D</span><span class="t">Sizes</span><span class="zh">三档尺寸</span><span class="r">same anatomy, scaled</span></div>
+    <div class="nt-card" style="margin-top:16px; padding-top:8px; padding-bottom:8px">
+      <div class="nt-size"><div class="k">L · 156<span class="s">panels · 4 per row</span><span class="zh">全屏 / 抽屉面板（HOME-1）</span></div>
+        <div class="tiles"><div class="need-tile is-short" style="--pct:62"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-wood"/></svg></div></div><div class="lbl">Timber <b>10</b><span class="of">/16</span></div></div><div class="need-tile" style="--pct:100"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div></div><div class="lbl">Coins <b>830</b><span class="of">/400</span></div></div></div></div>
+      <div class="nt-size"><div class="k">M · 112<span class="s">cards · 5 per row</span><span class="zh">卡片里的配方（工作台蓝图、旅行证件）</span></div>
+        <div class="tiles"><div class="need-tile is-m is-short" style="--pct:0"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-hardwood"/></svg></div></div><div class="lbl">Hardwood <b>0</b><span class="of">/2</span></div></div><div class="need-tile is-m" style="--pct:100"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stone"/></svg></div></div><div class="lbl">Stone <b>6</b><span class="of">/6</span></div></div><div class="need-tile is-m is-short" style="--pct:75"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-stamp"/></svg></div></div><div class="lbl">Stamps <b>6</b><span class="of">/8</span></div></div></div></div>
+      <div class="nt-size"><div class="k">S · 72<span class="s">list rows · 6+ per row</span><span class="zh">列表行内、提示卡里</span></div>
+        <div class="tiles"><div class="need-tile is-s" style="--pct:100"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-reeds"/></svg></div></div><div class="lbl">Reeds <b>10</b><span class="of">/10</span></div></div><div class="need-tile is-s" style="--pct:100"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-clay"/></svg></div></div><div class="lbl">Clay <b>4</b><span class="of">/4</span></div></div><div class="need-tile is-s is-short" style="--pct:33"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-quartz"/></svg></div></div><div class="lbl">Quartz <b>1</b><span class="of">/3</span></div></div></div></div>
+    </div>
+  </section>
+
+  <section class="st-sec">
+    <div class="st-sec-h"><span class="k">E</span><span class="t">Rules</span><span class="zh">规则</span><span class="r">multiplayer players read numbers</span></div>
+    <div class="st-rules" style="margin-top:16px">
+      <div class="st-rule is-wide"><span class="n">1</span><div><b>Every have / need uses this tile</b> — materials, coins, skill totals, stamps, any count. No bars, no chips, no "you have 230".<span class="zh">凡材料与数量进度一律用材料进度格，不用横条、芯片或"you have N"</span></div></div>
+      <div class="st-rule"><span class="n">2</span><div><b>Numbers only.</b> One line "Name have/need"; no sentences under tiles, no ✓.<span class="zh">只写数字；格下不写提示句，不打勾</span></div></div>
+      <div class="st-rule"><span class="n">3</span><div><b>Short = amber</b> ring + amber number. Never red.<span class="zh">差的变琥珀，不用红</span></div></div>
+      <div class="st-rule"><span class="n">4</span><div><b>Source on tap only</b> — one line + Show (guide, never act).<span class="zh">来源点格才弹，一句 + Show</span></div></div>
+      <div class="st-rule"><span class="n">5</span><div><b>Gap on the button</b>: Need 6 more Timber / Need 70 more coins.<span class="zh">缺口写在按钮上</span></div></div>
+      <div class="st-rule is-wide"><span class="n">6</span><div><b>Order</b>: materials by tier → Coins → other counts (Skills, Stamps). Non-count gates (Homestead Lv4) are not tiles — they go on the button.<span class="zh">顺序：材料 → 金币 → 其他计数；等级类门禁不是格，写在按钮上</span></div></div>
+    </div>
+    <div class="nt-card" style="margin-top:16px">
+      <div class="nt-bad"><span class="x">Still missing 6 · Timber Grove · 6 per round</span><span class="x">Hardwood 0/2 chip</span><span class="x">100 coins · you have 230</span><span class="x">linear progress bar per row</span><span class="x">red ring</span></div>
+    </div>
+  </section>
+
+  <section class="st-sec">
+    <div class="st-sec-h"><span class="k">F</span><span class="t">Used in</span><span class="zh">用在哪</span></div>
+    <div class="nt-uses" style="margin-top:16px"><span>HOME-1 · Homestead upgrade</span><span>FARM-5 · Workbench blueprints</span><span>NPC-7 · Travel Permit / Long-haul Ticket</span><span>any future craft / upgrade / requirement</span></div>
+  </section>
+
+  <div class="st-foot"><span>kit-need.css · .need-tile (.is-l default / .is-m / .is-s / .is-short)</span><span>2026-10-04</span></div>
+</div>
+</div>
+</body>
+</html>

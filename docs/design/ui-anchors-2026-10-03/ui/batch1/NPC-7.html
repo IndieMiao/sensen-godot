@@ -10,10 +10,13 @@
 <link rel="stylesheet" href="../kit.css">
 <link rel="stylesheet" href="../kit-npc.css">
 <link rel="stylesheet" href="../kit-farm.css">
+<link rel="stylesheet" href="../kit-need.css">
+<style>.nt-in-card { margin-top: 18px; } .nt-in-card .need-tile .lbl { font-size: 20px; }</style>
 </head>
 <!-- NPC-2 (group npc): Market counter drawer (60 %, y 960–2400) over the dimmed plaza. Keeper portrait + name tag + one line,
      "Shared stock · all Shanghai markets", item rows with coin price and stock, one locked row (Farming Lv7), one sold-out example row,
      a City Specialty shelf (group 1 only) with a cyan ◆ "New for you" Recipe Card, Buy at the bottom. -->
+<!-- 2026-10-04 night: craft materials switched from chips to need tiles (size M, ../kit-need.css) — user rule: every have/need uses the need tile; "Homestead Lv4 needed" is a level gate and stays on the button only. -->
 <body class="scene-cam drawer-open" style="--scene-top:#BEDDD2; --scene-bottom:#F7DCB5; --src-w:1024px; --src-h:1536px; --cam-scale:1.12; --cam-x:-30px; --cam-y:360px;">
 <div class="canvas">
   <!-- NPC-7 (2026-10-04): the Travel Post desk, opened from Sigrid's greeting card (Trade · book a trip). Keeper panel on top (navy tint),
@@ -33,13 +36,13 @@
     <div class="pcard">
       <div class="top"><div class="big"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-map"/></svg></div><div><div class="nm">Travel Permit</div><div class="sub">For trips beyond 1,600 km · Trip 5 and up · you have 0</div></div></div>
       <div class="how">Craft: <b>2 regional specialties from 2 climates</b> + 100 coins</div>
-      <div class="slots"><div class="pchip is-ok"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-minnow"/></svg><span>Smelt</span><span class="pt">Temperate ✓</span></div><div class="pchip is-ok"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carp"/></svg><span>Grass Carp</span><span class="pt">Subtropical ✓</span></div><div class="pchip is-ok"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>100 coins</span><span class="pt">you have 230</span></div></div>
+      <div class="need-row nt-in-card" style="--cols:5"><div class="need-tile is-m" style="--pct:100"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-minnow"/></svg></div></div><div class="lbl">Smelt <b>1</b><span class="of">/1</span></div></div><div class="need-tile is-m" style="--pct:100"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carp"/></svg></div></div><div class="lbl">Grass Carp <b>1</b><span class="of">/1</span></div></div><div class="need-tile is-m" style="--pct:100"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div></div><div class="lbl">Coins <b>230</b><span class="of">/100</span></div></div></div>
       <div class="acts"><div class="btn-sm btn-primary">Craft · 100 coins</div><div class="btn-sm btn-sec">Buy · 250 coins (2/week)</div></div>
     </div>
     <div class="pcard">
       <div class="top"><div class="big"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-travel"/></svg></div><div><div class="nm">Long-haul Ticket</div><div class="sub">For trips beyond 4,000 km · Trip 6–7 · you have 0</div></div></div>
       <div class="how">Craft: <b>Travel Permit + Hardwood ×2 + Quartz ×2</b> + 150 coins</div>
-      <div class="slots"><div class="pchip is-off"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-map"/></svg><span>Travel Permit</span><span class="pt">craft one first</span></div><div class="pchip is-off"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-wood"/></svg><span>Hardwood 0/2</span></div><div class="pchip is-off"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stone"/></svg><span>Quartz 0/2</span></div><div class="pchip is-off"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><span>Homestead Lv4 needed</span></div><div class="pchip is-off"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-stamp"/></svg><span>Stamps 6/8</span><span class="pt">2 more stamps</span></div></div>
+      <div class="need-row nt-in-card" style="--cols:5"><div class="need-tile is-m is-short" style="--pct:0"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-map"/></svg></div></div><div class="lbl">Travel Permit <b>0</b><span class="of">/1</span></div></div><div class="need-tile is-m is-short" style="--pct:0"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-hardwood"/></svg></div></div><div class="lbl">Hardwood <b>0</b><span class="of">/2</span></div></div><div class="need-tile is-m is-short" style="--pct:0"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-quartz"/></svg></div></div><div class="lbl">Quartz <b>0</b><span class="of">/2</span></div></div><div class="need-tile is-m" style="--pct:100"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div></div><div class="lbl">Coins <b>230</b><span class="of">/150</span></div></div><div class="need-tile is-m is-short" style="--pct:75"><div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-stamp"/></svg></div></div><div class="lbl">Stamps <b>6</b><span class="of">/8</span></div></div></div>
       <div class="acts"><div class="btn-sm is-disabled">Homestead Lv4 needed</div><div class="btn-sm btn-sec">Buy · 600 coins (1/week)</div></div>
     </div>
     <div class="post-foot">Also at this desk: Coffee · +30 Energy · 50 coins (2/3) · Travel Biscuits · 40 coins · Outpost stamp at the desk by the window</div>
