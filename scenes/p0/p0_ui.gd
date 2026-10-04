@@ -617,6 +617,10 @@ func open_greeting() -> void:
 
 func _bao_line() -> String:
 	var radish := int(view.get("prices", {}).get("crop_radish", 5))
+	for r in view.get("stall", {}).get("board", {}).get("requests", []):
+		var what := "%d %s" % [int(r.qty), P0Logic.item_name(view, str(r.item))]
+		if str(r.status) == "open": return "Morning! I could use %s from the pond — %d coins. It's on the Stall Board." % [what, int(r.coins)]
+		if str(r.status) == "accepted" and int(r.have) >= int(r.qty): return "Those %s look great — hand them over for %d coins." % [what, int(r.coins)]
 	var ready := 0
 	for p in view.get("plots", []): if str(p.get("state", "")) == "ready": ready += 1
 	if ready > 0: return "Morning! %d plots are ready out there. Radishes sell for %d each." % [ready, radish]
@@ -704,7 +708,8 @@ func open_stall(bubble := "", tab := "") -> void:
 
 ## Stall Board (FARM-6 tab): request cards with a need tile; Accept tracks it, Deliver pays coins (no XP).
 func _board(v: VBoxContainer, board: Dictionary) -> void:
-	var reqs: Array = board.get("requests", [])
+	# A delivered request leaves the board and frees its slot (§14.5 "完成打勾并补位").
+	var reqs: Array = board.get("requests", []).filter(func(r): return str(r.status) != "done")
 	for r in reqs:
 		var card := PanelContainer.new()
 		var done := str(r.status) == "done"
@@ -744,7 +749,7 @@ func _board(v: VBoxContainer, board: Dictionary) -> void:
 			h.add_child(b)
 		card.add_child(h)
 		v.add_child(card)
-	for i in maxi(0, int(board.get("slots", 2)) - reqs.filter(func(r): return str(r.status) != "done").size()):
+	for i in maxi(0, int(board.get("slots", 2)) - reqs.size()):
 		var empty := _label("New request in %s" % P0Logic.duration(float(board.get("refill_in", 0))), 10, INK2, true)
 		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		empty.custom_minimum_size = Vector2(0, 56)
