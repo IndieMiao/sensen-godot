@@ -70,6 +70,8 @@ func _ready() -> void:
 	ui.command.connect(func(cmd): session.send(cmd))
 	ui.seed_selected.connect(func(id): _seed = id)
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
+	ui.zoom.connect(func(f: float): cam.size = clampf(cam.size * f, 6.5, 17.0))
+	ui.recenter.connect(func(): _focus = player.position)
 	session.state_changed.connect(_on_state)
 	session.refused.connect(_on_refused)
 	session.connection_failed.connect(func(msg): ui.toast(msg + " · " + session.base_url, 4.0))
@@ -329,6 +331,7 @@ func _process(dt: float) -> void:
 		ui.set_action(P0Logic.main_action(v, _front, _seed))
 	_update_tags(v)
 	_animate_bobber(dt)
+	ui.player_screen = cam.unproject_position(player.position + Vector3(0, 1.0, 0))
 
 func _move(dt: float) -> void:
 	var v := _joy
@@ -773,6 +776,8 @@ func _dev_shot(dt: float) -> void:
 				P0Cooking.auto_play = false
 			"dex":
 				ui.open_fishdex()
+			"radial":
+				ui.open_radial()
 			"kitchen":
 				ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
 			"stove":

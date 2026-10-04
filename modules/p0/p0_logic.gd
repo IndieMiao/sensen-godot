@@ -109,7 +109,7 @@ static func today_line(view: Dictionary) -> String:
 	var fish := 0
 	for st in view.get("bag", {}).get("slots", []):
 		if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
-	if fish > 0: return "%d fish in your creel · the stove is free" % fish
+	if fish > 0: return "%d fish · the stove is free" % fish
 	if best_crop != "": return "%s ready in %s" % [plural(item_name(view, best_crop)), duration(best_ms)]
 	if any_sown: return "Water what you sowed"
 	return "Sow your first plot"

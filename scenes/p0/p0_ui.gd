@@ -10,6 +10,8 @@ signal action_pressed(cmd: Dictionary)
 signal seed_selected(seed_id: String)
 signal command(cmd: Dictionary)
 signal dev_skip(minutes: int)
+signal zoom(factor: float)
+signal recenter()
 
 const PAPER := Color("fbf8f1")
 const CARD := Color(0.984, 0.973, 0.945, 0.94)
@@ -46,6 +48,8 @@ var bar_mode := "farm"          # "farm" (seeds) or "fish" (bait) — the quick 
 var _place: Label
 var _creel: Label
 var _fab_badge: TextureRect
+var _switch: Button
+var player_screen := Vector2(180, 320)   # set by the farm each frame: the radial fans out from the character
 var _modal: Control
 var modal_kind := ""            # "stall", "bag", "kitchen", "card", ... — which drawer is open
 var _kitchen_tab := "cookbook"
@@ -206,15 +210,17 @@ func _build_fab() -> void:
 	_fab.add_child(badge)
 	root.add_child(_fab)
 	var sw := Button.new()
+	_switch = sw
 	sw.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	sw.position = Vector2(-10 - 46, -41 - 53 - 14 - 59 - 8 - 32)
 	sw.custom_minimum_size = Vector2(32, 32)
 	sw.size = Vector2(32, 32)
-	sw.icon = P0Logic.icon("switch")
+	sw.icon = P0Logic.icon("hoe")
 	sw.expand_icon = true
 	sw.add_theme_stylebox_override("normal", _box(Color(0.92, 0.92, 0.9, 0.9), 16, EDGE, 1, Vector4(6, 6, 6, 6)))
 	sw.add_theme_stylebox_override("pressed", _box(Color(0.85, 0.85, 0.82, 0.9), 16, EDGE, 1, Vector4(6, 6, 6, 6)))
-	sw.pressed.connect(func(): toast("Farming by the plots · Fishing at Willow Pond · the action follows where you stand"))
+	for k in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color"]: sw.add_theme_color_override(k, Color.WHITE)
+	sw.pressed.connect(open_radial)
 	root.add_child(sw)
 
 func _build_dev() -> void:
@@ -263,6 +269,7 @@ func set_mode(mode: String, place := "") -> void:
 	_bar_box.get_children().map(func(c): _bar_box.remove_child(c))
 	if mode != "fish": _place.text = "Shanghai · Homestead"
 	_fab_badge.texture = P0Logic.icon("rod" if mode == "fish" else "hoe")
+	_switch.icon = P0Logic.icon("rod" if mode == "fish" else "hoe")
 	_creel.visible = mode == "fish"
 	_refresh_bar()
 
@@ -815,6 +822,50 @@ func _tile(icon_id: String, text: String, note: String, cb := Callable()) -> Con
 	return b
 
 
+
+## §10.2.3: the switch key fans the four actions out from the character; what this spot can't do is
+## greyed with the reason. P0 preselects by where you stand (plots → Farming, water → Fishing).
+func open_radial() -> void:
+	if _modal != null:
+		close_modal()
+		return
+	var layer := Control.new()
+	layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var items := [
+		["farm", "hoe", "Farming", "No plots here"],
+		["fish", "rod", "Fishing", "No water nearby"],
+		["mine", "pickaxe", "Mining", "Enter the mine"],
+		["combat", "sword", "Combat", "Mine floors 3–5"],
+	]
+	var center := player_screen + Vector2(0, -30)
+	center.x = clampf(center.x, 110, root.size.x - 110)
+	center.y = clampf(center.y, 180, root.size.y - 260)
+	for i in items.size():
+		var it: Array = items[i]
+		var on: bool = it[0] == bar_mode
+		var ang := -PI * 0.5 + TAU * i / items.size() - PI * 0.25
+		var b := Button.new()
+		b.text = str(it[2]) if on else "%s\n%s" % [it[2], it[3]]
+		b.icon = P0Logic.icon(str(it[1]))
+		b.expand_icon = false
+		b.add_theme_constant_override("icon_max_width", 22)
+		b.add_theme_font_size_override("font_size", 9)
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.custom_minimum_size = Vector2(104, 44)
+		b.size = Vector2(104, 44)
+		_style_button(b, Color("e6f4df") if on else PAPER, GREEN_D if on else EDGE, 22)
+		if not on:
+			b.modulate = Color(1, 1, 1, 0.72)
+			var reason := "%s · %s" % [it[2], it[3]]
+			b.pressed.connect(func(): toast(reason))
+		else:
+			b.pressed.connect(close_modal)
+		b.position = center + Vector2(cos(ang), sin(ang)) * 92.0 - b.size * 0.5
+		layer.add_child(b)
+	_open_modal(layer, 0.18)
+	modal_kind = "radial"
+
 # ---------------------------------------------------------------- M2: kitchen, catch and dish cards
 ## Stove panel (§7.2.7, COOK-2a/2b): Cookbook (known pages cook in one tap, missing ones say what is short)
 ## and Experiment (free slots from the bag). Cooking costs no Energy.
@@ -1259,13 +1310,17 @@ func _flat_button(text: String) -> Button:
 
 # ---------------------------------------------------------------- small drawn widgets
 class _TouchPad extends Control:
-	## Scene area: a press-and-drag is the floating joystick (§10.1); a short tap picks a facility.
+	## Scene area: a press-and-drag is the floating joystick (§10.1); a short tap picks a facility;
+	## a double tap recenters; two fingers pinch-zoom (CTRL-1).
 	var ui: P0Ui
 	var _down := false
 	var _start := Vector2.ZERO
 	var _now := Vector2.ZERO
 	var _t := 0
 	var _id := -1
+	var _touches := {}
+	var _pinch := 0.0
+	var _last_tap := 0
 	const RADIUS := 43.0
 	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
 	func _gui_input(e: InputEvent) -> void:
@@ -1273,6 +1328,12 @@ class _TouchPad extends Control:
 		var released := false
 		var pos := Vector2.ZERO
 		if e is InputEventScreenTouch:
+			if e.pressed: _touches[e.index] = e.position
+			else: _touches.erase(e.index)
+			if _touches.size() >= 2:
+				_pinch = _spread()
+				_cancel_stick()
+				return
 			if e.pressed and _id < 0:
 				pressed = true
 				_id = e.index
@@ -1280,13 +1341,23 @@ class _TouchPad extends Control:
 				released = true
 				_id = -1
 			pos = e.position
-		elif e is InputEventScreenDrag and e.index == _id:
-			_move(e.position)
+		elif e is InputEventScreenDrag:
+			_touches[e.index] = e.position
+			if _touches.size() >= 2:
+				var d := _spread()
+				if _pinch > 0.0 and d > 0.0: ui.zoom.emit(_pinch / d)
+				_pinch = d
+				return
+			if e.index == _id: _move(e.position)
 			return
 		elif e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
+			if DisplayServer.is_touchscreen_available(): return   # touch already handled above
 			pressed = e.pressed
 			released = not e.pressed
 			pos = e.position
+		elif e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1)
+			return
 		elif e is InputEventMouseMotion and _down:
 			_move(e.position)
 			return
@@ -1300,7 +1371,21 @@ class _TouchPad extends Control:
 			_down = false
 			ui.joystick.emit(Vector2.ZERO)
 			if _now.distance_to(_start) < 12.0 and Time.get_ticks_msec() - _t < 350:
-				ui.tapped.emit(pos)
+				if Time.get_ticks_msec() - _last_tap < 320:
+					ui.recenter.emit()
+					_last_tap = 0
+				else:
+					_last_tap = Time.get_ticks_msec()
+					ui.tapped.emit(pos)
+			queue_redraw()
+	func _spread() -> float:
+		var pts: Array = _touches.values()
+		return (pts[0] as Vector2).distance_to(pts[1]) if pts.size() >= 2 else 0.0
+	func _cancel_stick() -> void:
+		if _down:
+			_down = false
+			_id = -1
+			ui.joystick.emit(Vector2.ZERO)
 			queue_redraw()
 	func _move(p: Vector2) -> void:
 		if not _down: return
