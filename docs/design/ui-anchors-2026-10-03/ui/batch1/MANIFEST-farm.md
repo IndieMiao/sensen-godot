@@ -34,3 +34,8 @@
 2. 田格覆盖层、飘字、角色位置都是在静态 png 上叠加的近似；真正的"边走边播 / 坐下"动作需要分镜或新底图。
 3. CTRL-1 为让角色进安全框把相机右移了 187 px，田右缘与 Explore 牌被裁。
 4. 规格图 2 中非并排的单图变体（HUD-3 Free 清单、HUD-4 灰字、FARM-2 体力不足、FARM-3 满包、FARM-6 的 Stall Board）本轮按共同规则未做；BAR-3 的 0 体力卡不再是单独变体——2026-10-04 起 BAR-3（不足）与 HUD-3（归零）是同一个 Energy Card 组件；FARM-6-2 已改为 v2 的"从背包出售"态（原 Sell Tab 页作废）。
+
+## 2026-10-04 夜 · v3：农场驿站也先打招呼（p(4)）
+
+- **FARM-6 / FARM-6-2 v3**：从伙计 Bao 的问候卡（NPC-G1-5）选 `Trade · buy & sell` 进入；底图换成新生成的驿站近景 `scenes/homestead-stall.png`（相机 1.1 / −32 / 307，同 NPC-G1），抽屉加 `.is-counter` 并链接 `../kit-npc.css`；顶栏 "Bao's Stall · Homestead"；Tab 下加陶土色掌柜栏 `.kpanel.is-stall`（近景裁切 `background-size:698px 1048px; background-position:-300px -321px`），FARM-6 气泡 "Radish seeds, 4 coins. Carrots open at Farming Lv2." + "Seeds never sell out here"，FARM-6-2 气泡 "Radishes? 5 each — I'll take all twelve." + "Your stall · only you can trade here"；为放下掌柜栏，背包网格只显示 4 行（第 5 行空格去掉，同 NPC-2）。
+- 底图生成：`scenes/homestead-stall.prompt.txt`，参考 farm.png + market-square-v2.png；Bao 头部约在源图 (520, 560)，帽顶 y≈480。

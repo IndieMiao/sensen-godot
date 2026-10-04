@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <!-- Homestead group icons (2026-10-04, batch 2) — same 64×64 flat pastel style as icons.svg -->
+  <symbol id="i-reeds" viewBox="0 0 64 64">
+    <path d="M22 58C20 42 18 28 14 12" stroke="#7FA65A" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M32 58C32 40 33 26 34 8" stroke="#8DB866" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M42 58C44 44 47 32 52 18" stroke="#7FA65A" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <rect x="11" y="8" width="7" height="16" rx="3.5" fill="#9A6F47"/>
+    <rect x="31" y="4" width="7" height="16" rx="3.5" fill="#B98A5E"/>
+    <rect x="49" y="14" width="7" height="14" rx="3.5" fill="#9A6F47"/>
+    <path d="M20 58c4-8 20-8 24 0z" fill="#A67C52"/>
+  </symbol>
+  <symbol id="i-clay" viewBox="0 0 64 64">
+    <ellipse cx="32" cy="50" rx="24" ry="8" fill="#B5694A"/>
+    <path d="M10 46c0-12 10-22 22-22s22 10 22 22c0 4-10 6-22 6s-22-2-22-6z" fill="#D9895F"/>
+    <path d="M18 38c3-6 8-9 14-9" stroke="#EBAA80" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <circle cx="40" cy="38" r="3" fill="#B5694A"/>
+  </symbol>
+  <symbol id="i-fence" viewBox="0 0 64 64">
+    <rect x="6" y="26" width="52" height="7" rx="3" fill="#B98A5E"/>
+    <rect x="6" y="42" width="52" height="7" rx="3" fill="#B98A5E"/>
+    <path d="M10 58V18l5-6 5 6v40z" fill="#E9C9A0"/>
+    <path d="M27 58V18l5-6 5 6v40z" fill="#E9C9A0"/>
+    <path d="M44 58V18l5-6 5 6v40z" fill="#E9C9A0"/>
+  </symbol>
+  <symbol id="i-house" viewBox="0 0 64 64">
+    <path d="M8 30 32 10l24 20z" fill="#E07A5F"/>
+    <rect x="13" y="28" width="38" height="28" rx="3" fill="#FBF0DC"/>
+    <rect x="27" y="38" width="10" height="18" rx="5" fill="#7FA65A"/>
+    <rect x="16" y="34" width="8" height="8" rx="2" fill="#A9CDEB"/>
+    <rect x="40" y="34" width="8" height="8" rx="2" fill="#A9CDEB"/>
+  </symbol>
+</svg>

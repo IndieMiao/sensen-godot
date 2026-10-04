@@ -101,3 +101,9 @@ ui/batch1/MANIFEST-npc.md
 | NPC-7（新） | 驿站室内压暗；抽屉 `.drawer.is-counter.is-post`（1720 高）："Sigrid's Desk · Travel Post"，Tab Permits / Passport / Fares，掌柜栏藏青底；两张 `.pcard`（Travel Permit / Long-haul Ticket）：`.how` 配方行、`.pchip` 材料 / 条件芯片（✓ 绿框、灰不满足）、Craft / Buy；页脚 Coffee · Travel Biscuits · 盖章台 | **坑**：卡内类名不能叫 `.recipe` / `.chip`，会撞 kit.css 的配方行与 HUD 芯片样式 |
 
 - 2026-10-04 夜清理：删除作废的据点组广场底图 `scenes/outpost.png`（含 .log / .prompt.txt）与旧页面 `NPC-1.html` / `NPC-1-2.html` 及其渲染图（Figma 卡已分别换成 NPC-1a / NPC-1b）；`contact-batch1-C` 对应两格改指 NPC-1a / NPC-1b 并重出。
+
+## 2026-10-04 夜 · NPC-G1-5 农场驿站伙计 Bao（p(4)：NPC 之后都先要打招呼）
+
+| 页 | 文件 | 画面 | 备注 |
+|---|---|---|---|
+| NPC-G1-5 | `NPC-G1-5.html` | 底图 `scenes/homestead-stall.png`（新生成的驿站棚近景：Bao 戴草帽站柜后挥手，柜上种子包 / 堆肥袋 / 蚯蚓罐 / 小秤，右侧 Stall Board，玩家背影），相机 1.1 / −32 / 307；牌子 "Homestead Stall"、指尖卡 "Bao · Talking"；问候卡 "Stallhand · Bao" / "Keeps your stall · Homestead" / “Morning! Radishes sell for 5 each today. Worm Bait's sold out — back in 9h 12m.” / Trade · buy & sell / What's selling today? / Just passing by | 近景裁切 `background-size:1434px 2150px; background-position:-602px -637px`；HUD 位置芯片 "Shanghai · Homestead" |

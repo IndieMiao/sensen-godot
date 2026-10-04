@@ -961,3 +961,6 @@
 .pcard .acts .btn-sm.is-disabled { font-size: 22px; }
 .pcard .acts .btn-sm.btn-sec { border: 3px solid var(--primary-deep); }
 .post-foot { margin-top: 18px; font-size: 21px; font-weight: 700; line-height: 28px; color: var(--ink-2); text-align: center; }
+
+/* 2026-10-04 night — every NPC greets first: the Homestead Stall gets a keeper bar too (stallhand Bao, terracotta) */
+.kpanel.is-stall, .drawer.is-counter .kpanel.is-stall { --kp-bg: #F6E2D6; }

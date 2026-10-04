@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>HOME-1 · Homestead Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-home.css">
+</head>
+<!-- batch 2 (homestead group, 2026-10-04) · HOME-1 Homestead panel, opened by tapping the farmhouse door plaque.
+     Four things on one screen (plan §8.1.2 / §8.6.1): Needs (5 materials + coins + skills total) · You have (fractions + bars) ·
+     Still missing (amber row with where / how long / Show) · What changes (5 visible results). Lv2 → Lv3 numbers from §8.2.1 / §8.3.1.
+     Farm camera 1.22 / -60 / -150 (farmhouse peeks above the drawer); drawer sized to its content (v2: y 560 → bottom); group CSS ../kit-home.css, icons ../icons-home.svg. -->
+<body class="scene-cam drawer-open" style="--scene-top:#B0CFC1; --scene-bottom:#F7DDAD; --src-w:1024px; --src-h:1536px; --cam-scale:1.22; --cam-x:-60px; --cam-y:-150px;">
+<div class="canvas ">
+
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/farm.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="tag tag-card tag--pointer tag--anchor-bottom" style="--x:370px; --y:1015px; --dx:-40px"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Homestead Lv2</span></div>
+
+  <div class="scene-dim"></div>
+  <section class="drawer is-home">
+    <div class="drawer-head">
+      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-house"/></svg>Homestead Lv2 → Lv3</div>
+      <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
+    </div>
+
+    <!-- now → next look -->
+    <div class="hm-hero">
+      <div class="hm-now" style="background-image:url('../../scenes/farm.png'); --bs:1024px 1536px; --bp:-105px -342px;">
+        <span class="cap">Now · Lv2</span>
+      </div>
+      <div class="hm-arrow"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+      <div class="hm-next">
+        <span class="cap">Lv3 look</span>
+        <div class="nm">Fence &amp; Mailbox</div>
+        <div class="sub">Pick A or B when you upgrade</div>
+        <div class="hm-looks">
+          <div class="hm-look"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-fence"/></svg><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-obj-mailbox"/></svg>Look A</div>
+          <div class="hm-look"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-fence"/></svg><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-obj-mailbox"/></svg>Look B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Needs: icon + ring progress + "Name have/need" (user 2026-10-04 night: keep it terse, players aren't dumb).
+         Shortage = amber ring; where to get it shows only when the tile is tapped; the gap is written on the button. -->
+    <div class="hm-sec"><div class="t">Needs</div></div>
+    <div class="hm-tiles">
+      <div class="hm-tile is-short" style="--pct:62">
+        <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-wood"/></svg></div></div>
+        <div class="lbl">Timber <b>10<span class="of">/16</span></b></div>
+      </div>
+      <div class="hm-tile" style="--pct:100">
+        <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stone"/></svg></div></div>
+        <div class="lbl">Stone <b>12<span class="of">/12</span></b></div>
+      </div>
+      <div class="hm-tile" style="--pct:100">
+        <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-reeds"/></svg></div></div>
+        <div class="lbl">Reeds <b>10<span class="of">/10</span></b></div>
+      </div>
+      <div class="hm-tile" style="--pct:100">
+        <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-home.svg#i-clay"/></svg></div></div>
+        <div class="lbl">Clay <b>4<span class="of">/4</span></b></div>
+      </div>
+      <div class="hm-tile" style="--pct:100">
+        <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg></div></div>
+        <div class="lbl">Rock Salt <b>5<span class="of">/4</span></b></div>
+      </div>
+      <div class="hm-tile" style="--pct:100">
+        <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div></div>
+        <div class="lbl">Coins <b>830<span class="of">/400</span></b></div>
+      </div>
+      <div class="hm-tile" style="--pct:100">
+        <div class="ring"><div class="core"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-xp"/></svg></div></div>
+        <div class="lbl">Skills <b>6<span class="of">/5</span></b></div>
+      </div>
+    </div>
+
+    <!-- What changes -->
+    <div class="hm-sec"><div class="t">What changes</div></div>
+    <div class="hm-changes">
+      <div class="hm-chg"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="nm">Max Energy <span class="up">220</span> · Meals <span class="up">220</span> a day</div><div class="sub">now 210</div></div>
+      <div class="hm-chg"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-field"/></svg><div class="nm">Plots <span class="up">280</span></div><div class="sub">now 240</div></div>
+      <div class="hm-chg"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-cabinet"/></svg><div class="nm">Warming Cabinet</div><div class="sub">keeps 6 dishes by the stove</div></div>
+      <div class="hm-chg"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><div class="nm">Bag Upgrade I for sale · 150 coins</div><div class="sub">Bag 25 → 30</div></div>
+      <div class="hm-chg"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-board"/></svg><div class="nm">Stall Board · 3rd slot</div><div class="sub">now 2</div></div>
+    </div>
+
+    <div class="btn is-disabled hm-cta">Need 6 more Timber</div>
+    <div class="hm-foot"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg> Upgrading is free of Energy · fills Energy to the new max</div>
+  </section>
+
+  <!-- HUD (same two rows as FARM-6; coins 830 to match the panel) -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <!-- Farming (green) owns the right half: 12 -> 6 o'clock -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <!-- Fishing (blue) owns the left half: 6 -> 12 o'clock -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card " style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>830</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card "><b>Today</b><span class="dot-sep">·</span><span class="today-text">Radishes ready in 1h 12m</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Homestead</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+
+  <!-- Guide overlay: ?guide=1 or #guide -->
+  <div id="guide" class="guide">
+    <div class="g-line" style="top:120px"><span>safe top 120</span></div>
+    <div class="g-line" style="top:2300px"><span>safe bottom 100</span></div>
+    <div class="g-line is-green" style="top:300px"><span>drawer top 300 · Homestead panel</span></div>
+    <div class="g-line is-blue" style="top:48px"><span>HUD row 1 · 48–176</span></div>
+    <div class="g-line is-blue" style="top:176px"></div>
+    <div class="g-line is-blue" style="top:192px"><span>HUD row 2 · 192–256</span></div>
+    <div class="g-line is-blue" style="top:256px"></div>
+    <div class="g-vline" style="left:30px"></div>
+    <div class="g-vline" style="left:1050px"></div>
+    <div class="g-vline" style="left:540px;border-left-style:dotted"></div>
+  </div>
+  <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
+
+</div>
+</body>
+</html>

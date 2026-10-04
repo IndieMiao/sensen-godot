@@ -9,17 +9,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../kit.css">
 <link rel="stylesheet" href="../kit-farm.css">
+<link rel="stylesheet" href="../kit-npc.css">
 </head>
 <!-- batch 1 (farm group, 2026-10-03) · FARM-6 v2 redone after the Figma change (2026-10-04): the stall panel and the bag share one
      drawer (y 300 → bottom) so stock is visible while buying. body.scene-cam: canvas = source x --cam-scale + (--cam-x, --cam-y);
      shared kit.css + icons.svg untouched, group additions in ../kit-farm.css (.drawer.is-stall-bag) and ../icons-farm.svg.
      Canvas 1080 x 2400, HUD two rows kept. -->
-<body class="scene-cam drawer-open" style="--scene-top:#B0CFC1; --scene-bottom:#F7DDAD; --src-w:1024px; --src-h:1536px; --cam-scale:1.22; --cam-x:-127px; --cam-y:356px;">
+<body class="scene-cam drawer-open" style="--scene-top:#B4D9D2; --scene-bottom:#FEDCAF; --src-w:1024px; --src-h:1536px; --cam-scale:1.1; --cam-x:-32px; --cam-y:307px;">
 <div class="canvas ">
 
   <!-- Scene layer: AI diorama only, no UI/text in the png -->
   <div class="scene-layer">
-    <img class="scene" src="../../scenes/farm.png" alt="">
+    <img class="scene" src="../../scenes/homestead-stall.png" alt="">
   </div>
   <div class="bar-veil"></div>
   <!-- Scene tags (farm camera 1.22 / -127 / 356) — hidden while the drawer is open -->
@@ -33,12 +34,16 @@
 
   <!-- Stall + Bag drawer: top 300, cream 92 %, radius 48. Upper half = stall (Buy / Stall Board — Sell moved into the bag below),
        thin divider, lower half = the bag (same components as ../bag.html; Sell / Sell All replace Eat / Gift in the stall context) -->
-  <section class="drawer is-stall-bag">
+  <section class="drawer is-stall-bag is-counter">
     <div class="drawer-head">
-      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-stall"/></svg><span>Homestead Stall</span><span class="sub">· Stallhand</span></div>
+      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-stall"/></svg><span>Bao's Stall</span><span class="sub">· Homestead</span></div>
       <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
     </div>
     <div class="tabs"><div class="tab is-on">Buy</div><div class="tab">Stall Board</div></div>
+    <div class="kpanel is-stall">
+      <div class="portrait" style="background-image:url('../../scenes/homestead-stall.png'); background-size:698px 1048px; background-position:-300px -321px;"></div>
+      <div class="mid"><div class="who">Stallhand <span class="role">· Bao</span></div><div class="bubble-say">“Radish seeds, 4 coins. Carrots open at Farming Lv2.”</div><div class="note">Seeds never sell out here</div></div>
+    </div>
     <div class="stall-rows">
       <div class="srow">
         <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish-seeds"/></svg></div>
@@ -99,11 +104,6 @@
       <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lure"/></svg><span class="count">×3</span></div>
       <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-feed-bag"/></svg><span class="count">×2</span></div>
       <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-trap"/></svg><span class="count">×1</span></div>
-      <div class="cell is-empty"></div>
-      <div class="cell is-empty"></div>
-      <div class="cell is-empty"></div>
-      <div class="cell is-empty"></div>
-      <div class="cell is-empty"></div>
       <div class="cell is-empty"></div>
     </div>
   </section>

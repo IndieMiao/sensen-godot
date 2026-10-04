@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>NPC-G1-5 · Keeper greeting · Bao (Homestead Stall)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-npc.css">
+<link rel="stylesheet" href="../kit-facility.css">
+</head>
+<!-- NPC-1c (round 4, 2026-10-04): Market Square — the ONLY outdoor outpost. Produce stall (Market Keeper), request board, specialty
+     shelf, bunting (weekend market), bakery stall (Nadia), nursery corner (Theo), two other players. Base = ../../scenes/market-square.png
+     (v2 render, vignette-free). Camera: canvas = source × 1.1 + (−32, 307). -->
+<body class="scene-cam greet-open" style="--scene-top:#B4D9D2; --scene-bottom:#FEDCAF; --src-w:1024px; --src-h:1536px; --cam-scale:1.1; --cam-x:-32px; --cam-y:307px;">
+<div class="canvas">
+  <!-- NPC-G1-5 (2026-10-04 night): every NPC greets first — the Homestead Stall's stallhand too. Tapping the stall shed or the
+       stallhand pushes the camera to the stall (scenes/homestead-stall.png, same diorama style as farm.png), then this card.
+       Trade · buy & sell opens FARM-6. Original NPC-G1 note follows.
+       NPC-G1 (2026-10-04): tapping a keeper never opens the shop directly. Step 1 = this greeting card: a scene-crop portrait of the
+       keeper, her name and post, one greeting line carrying live info, and three options — Trade (opens the counter + bag drawer),
+       an info question, and a polite exit. The talk card over her head is lit while the greeting is open. -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/homestead-stall.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+
+  <div class="tag tag-sign tag--anchor-bottom" style="--x:470px; --y:610px">Homestead Stall</div>
+  <!-- lit talk card above Bao's hat (src 520, 480) -->
+  <div class="tag tag-tap is-on tag--pointer tag--anchor-bottom" style="--x:540px; --y:820px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-talk"/></svg><span>Bao</span><span class="sep">·</span><span class="hint">Talking</span></div>
+
+  <!-- greeting card -->
+  <section class="greet">
+    <div class="portrait" style="background-image:url('../../scenes/homestead-stall.png'); background-size:1434px 2150px; background-position:-602px -637px;"><div class="nm">Bao</div></div>
+    <div class="mid">
+      <div class="who">Stallhand <span class="role">· Bao</span></div>
+      <div class="sub"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-stall"/></svg><span>Keeps your stall · Homestead</span></div>
+      <div class="say">“Morning! Radishes sell for 5 each today. Worm Bait's sold out — back in 9h 12m.”</div>
+      <div class="opts">
+        <div class="btn-sm btn-primary"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-shop"/></svg><span>Trade</span><span class="k">buy &amp; sell</span></div>
+        <div class="btn-sm btn-sec"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-talk"/></svg><span>What's selling today?</span></div>
+        <div class="btn-sm is-plain"><span>Just passing by</span></div>
+      </div>
+    </div>
+  </section>
+
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Radishes ready in 1h 12m</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Homestead</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+
+  <div id="guide" class="guide">
+    <div class="g-line" style="top:120px"><span>safe top 120</span></div>
+    <div class="g-line" style="top:2300px"><span>safe bottom 100</span></div>
+    <div class="g-line is-green" style="top:2276px"><span>bar bottom · 124 from bottom</span></div>
+    <div class="g-line is-blue" style="top:48px"><span>HUD row 1 · 48–176</span></div>
+    <div class="g-line is-blue" style="top:192px"><span>HUD row 2 · 192–256</span></div>
+    <div class="g-vline" style="left:30px"></div>
+    <div class="g-vline" style="left:1050px"></div>
+  </div>
+  <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
+
+</div>
+</body>
+</html>
