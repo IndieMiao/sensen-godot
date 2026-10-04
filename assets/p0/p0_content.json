@@ -1,0 +1,30 @@
+{
+  "version": "p0-m1-2026-10-05",
+  "_note": "P0 milestone 1 content (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit). Shared by server/src/p0 and the Godot client (labels only).",
+  "energy": { "max_base": 200, "regen_ms": 240000, "bonus_zone": 50, "rest_amount": 60 },
+  "day": { "utc_offset_hours": 8, "rollover_hour": 4 },
+  "start": { "coins": 180, "tilled_plots": 20, "wild_plots": 10, "bag": [["seed_radish", 20], ["seed_lettuce", 10]] },
+  "bag": { "capacity": 25, "stack": { "seed": 99, "crop": 50, "dish": 5, "fish": 10, "material": 99 } },
+  "skills": {
+    "farming": [0, 50, 150, 300, 500, 750, 1050, 1450, 2050, 2800],
+    "fishing": [0, 70, 220, 480, 850, 1300, 1850, 2400, 3100, 4000],
+    "cooking": [0, 30, 100, 220, 400, 650, 950, 1350, 1700, 2350]
+  },
+  "level_up_energy": { "first": 50, "later": 30 },
+  "level_gifts": { "farming:2": [["seed_carrot", 5]] },
+  "xp_multiplier": [[1, 100], [2, 75], [3, 50], [4, 25]],
+  "crops": [
+    { "id": "crop_radish",    "name": "Radish",    "seed": "seed_radish",    "seed_name": "Radish Seeds",    "tier": 1, "energy": 2, "level": 1, "gate": 1, "seed_price": 4,  "grow_h": 4,  "yield": 1, "price": 5,  "xp": 2, "first_xp": 10 },
+    { "id": "crop_lettuce",   "name": "Lettuce",   "seed": "seed_lettuce",   "seed_name": "Lettuce Seeds",   "tier": 1, "energy": 2, "level": 1, "gate": 1, "seed_price": 6,  "grow_h": 8,  "yield": 1, "price": 8,  "xp": 2, "first_xp": 10 },
+    { "id": "crop_herb",      "name": "Herb",      "seed": "seed_herb",      "seed_name": "Herb Seeds",      "tier": 1, "energy": 2, "level": 2, "gate": 2, "seed_price": 2,  "grow_h": 3,  "yield": 3, "price": 1,  "xp": 2, "first_xp": 10 },
+    { "id": "crop_carrot",    "name": "Carrot",    "seed": "seed_carrot",    "seed_name": "Carrot Seeds",    "tier": 2, "energy": 3, "level": 2, "gate": 2, "seed_price": 9,  "grow_h": 12, "yield": 1, "price": 12, "xp": 3, "first_xp": 15 },
+    { "id": "crop_potato",    "name": "Potato",    "seed": "seed_potato",    "seed_name": "Potato Seeds",    "tier": 2, "energy": 3, "level": 3, "gate": 3, "seed_price": 9,  "grow_h": 10, "yield": 2, "price": 6,  "xp": 3, "first_xp": 15 },
+    { "id": "crop_chamomile", "name": "Chamomile", "seed": "seed_chamomile", "seed_name": "Chamomile Seeds", "tier": 3, "energy": 4, "level": 3, "gate": 3, "seed_price": 12, "grow_h": 18, "yield": 1, "price": 16, "xp": 4, "first_xp": 20 },
+    { "id": "crop_chili",     "name": "Chili",     "seed": "seed_chili",     "seed_name": "Chili Seeds",     "tier": 1, "energy": 2, "level": 4, "gate": 4, "seed_price": 3,  "grow_h": 6,  "yield": 2, "price": 2,  "xp": 2, "first_xp": 10 },
+    { "id": "crop_tomato",    "name": "Tomato",    "seed": "seed_tomato",    "seed_name": "Tomato Seeds",    "tier": 3, "energy": 4, "level": 4, "gate": 4, "seed_price": 12, "grow_h": 14, "yield": 2, "price": 8,  "xp": 4, "first_xp": 20 }
+  ],
+  "stall": {
+    "keeper": { "role": "Stallhand", "name": "Bao" },
+    "buy": ["seed_radish", "seed_lettuce", "seed_herb", "seed_carrot", "seed_potato", "seed_chamomile", "seed_chili", "seed_tomato"]
+  }
+}
