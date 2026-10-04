@@ -7207,8 +7207,8 @@ td { font-variant-numeric: tabular-nums; }
 <td>每株每次 <strong>2 点体力</strong>，0 金币；体力不足时该株显示「+2 in m:ss」不让收；一次可对多株批量收，按株累计体力、不足整条拒绝；收获后立刻开始 48 小时再生计时</td>
 </tr>
 <tr>
-<td>确认</td>
-<td>手模式点树弹一次小确认「Pick apples · 2 Energy · [Pick] [Not now]」，勾选"Don't ask again"后不再弹；一年生与多年生混选时只计多年生株</td>
+<td>采摘</td>
+<td>站到树前按主行动键 <code>Pick · 2 Energy</code>，一次采一株；树不响应点击（10.2.2，与田格、水面、岩石一致），不弹确认卡；选中 Orchard Feed 时主行动键变 <code>Fertilize · Free</code></td>
 </tr>
 <tr>
 <td>占格阻挡</td>
@@ -30945,10 +30945,10 @@ td { font-variant-numeric: tabular-nums; }
 <td>Perennials</td>
 <td>多年生</td>
 <td>种植</td>
-<td>农场一角三株多年生：2 × 2 苹果树挂 6 颗果、2 × 2 柑橘幼树（倒计时牌 "First fruit in 31h"）、1 × 1 葡萄架；槽位计数牌 "Orchard 3/5"；玩家点苹果树弹小确认 "Pick apples · 2 Energy · [Pick] [Not now]"，下有勾选 "Don't ask again"</td>
-<td>果木肥施用：快捷栏选中 Orchard Feed，已采摘的树高亮，施后树冠冒小星、倒计时 "Regrow 48h → 24h"；旁边砍树确认 "Remove this tree? You get 2 Timber back; the sapling is lost."</td>
+<td>果园角：2 × 2 苹果树挂 6 颗果（头顶 "Ready"）、2 × 2 柑橘幼树（牌 "First fruit in 31h"）、1 × 1 葡萄架（"Regrow 22h"）、两块空树坑、计数牌 "Orchard 3/5"；玩家站在苹果树前（树根高亮），右下主行动键 "Pick · 2 Energy"（锄徽标），快捷栏为 Farming 候选（种子 / Compost / Orchard Feed）</td>
+<td>果木肥：快捷栏选中 Orchard Feed，主行动键变 "Fertilize · Free"，按下后树冠冒小星、倒计时 "Regrow 48h → 24h"；砍树在布置模式里做："Remove this tree? You get 2 Timber back; the sapling is lost."</td>
 <td>"Orchard 3/5" / "Pick apples · 2 Energy" / "First fruit in 31h" / "Regrow 24h" / "Picked 4 of 6 · bag full"</td>
-<td>手模式点树 = 采摘（2 体力 / 株，确认一次后可关闭提示）；选中果木肥点树 = 施肥 0 体力；长按树 = 砍除确认</td>
+<td>站到树前按主行动键 Pick = 采摘（2 体力 / 株）；树不响应点击（10.2.2，与田格、水面、岩石一致）；选中 Orchard Feed 时主行动键变 Fertilize · Free；砍除只在布置模式里做</td>
 <td>常驻 FARM-1</td>
 </tr>
 <tr>
@@ -30956,8 +30956,8 @@ td { font-variant-numeric: tabular-nums; }
 <td>Facilities</td>
 <td>设施</td>
 <td>种植 · 工作台</td>
-<td>洒水器放置预览：选中蓝图后田上出现 3 × 3 浅蓝覆盖范围跟随手指；温室 4 × 4 玻璃房（内有作物，玻璃用半透明软胶质感）；堆肥箱带投料槽</td>
-<td>工作台面板（半屏抽屉）：三张蓝图卡 "Sprinkler · Farming Lv6 · Waters 8 plots for you" + M 号材料进度格 "Timber 8/8" / "Stone 6/6" / "Copper Ore 1/3"（琥珀环）/ "Greenhouse · Farming Lv8 · Any seed grows inside" / "Compost Bin · 5 crops → 5 Compost"；锁定蓝图灰显 + 锁角标 + 四件事缩略</td>
+<td>点工作台打开半屏抽屉（相机框住工作台、温室、堆肥箱与洒水器田）：顶栏 "Workbench" + ✕，Tab "Facilities / Tools / Supplies"；三张蓝图卡：每卡图标 + 名称 + 等级胶囊 + 一行效果，右上按钮写缺口，下方一行 M 号材料进度格（从农场仓库扣）——Sprinkler "Farming Lv6 · Waters 8 plots for you" · "Timber 20/8 / Stone 12/6 / Copper Ore 1/3（琥珀）" · 按钮灰 "Need 2 more Copper Ore"；Compost Bin（锁 "Farming Lv7"，整卡半透明）"5 crops → 5 Compost a day" · 按钮灰 "Farming Lv7 needed"；Greenhouse（锁 "Farming Lv8"）"Any seed grows inside" · "Timber 20/20 / Stone 12/12 / Copper Ore 1/8 / Coins 230/300" · 按钮灰 "Farming Lv8 needed"</td>
+<td>洒水器放置预览：选中蓝图后田上出现 3 × 3 浅蓝覆盖范围跟随手指，小标 "Coverage preview"，底部 "Build"（本轮未出图：新底图的那块田已有洒水器）</td>
 <td>上述文案；"Build" 按钮；"Coverage preview" 小标</td>
 <td>选中蓝图拖到田上放置；点设施看状态；堆肥箱点开投料（每日 ≤ 5 份）</td>
 <td>来自 FARM-1 点工作台；去 SKILL-2（锁定蓝图弹门禁卡）</td>
@@ -31062,7 +31062,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>Fish-dex</td>
 <td>鱼图鉴</td>
 <td>图鉴</td>
-<td>全屏网格 20 格按稀有度分四段（Common / Fine / Rare / Legendary 段标），已钓到的全彩 + 数量 "×23"，未钓到的灰剪影 + "Fishing Lv 5" + 栖息模板小图标（Pond / River / Coast）+ 时段图标；地区鱼格右上 "Regional" 标签与已到访城市名；顶部 "Fish-dex 9/20"；底部一次性奖励条 "Catch 10 kinds · +30 Energy · 100 coins"</td>
+<td>全屏抽屉：顶栏 "Fish-dex" + ✕，Tab "Fish-dex / Cookbook / Crop-dex"；顶部一枚 M 号材料进度格 "Kinds 9/20" + 下一个一次性奖励 "Next at 10 kinds · +30 Energy · 100 coins"；四段稀有度（色点 + 段名 + "4/5"），每段 6 列：已钓到的全彩 + 数量 "×23"，未钓到的灰剪影 + 一行"在哪 / 何时"小图标（"Dusk · Coast" / "Night · River"）或等级门禁 "Fishing Lv7"（琥珀锁）；地区鱼左上标签写城市（Shanghai）或气候带（Temperate）；新点亮的格青色描边</td>
 <td>单格详情：Golden Koi 大图、"Rare · River · Dusk"、"Caught ×3 · Regional · Shanghai"、"XP: 50% · Reduced"（等级差徽标）</td>
 <td>上述文案</td>
 <td>点格看详情；左右滑切 Fish-dex / Cookbook / Crop-dex</td>
@@ -31208,8 +31208,8 @@ td { font-variant-numeric: tabular-nums; }
 <td>Bag Tabs</td>
 <td>分类视图</td>
 <td>背包</td>
-<td>三联并排缩略：Fish Tab（12 格鱼按稀有度色点，Legendary 金点格最上）/ Tackle Tab（顶部小字 "Not counted in Bag"；工具与渔具格：Starter Hoe "Equipped"、Starter Rod "Equipped"、Reed Rod、Starter Pickaxe "Equipped"、Wooden Sword "Equipped"、Fish Trap ×2；未装备格右下按钮 "Equip"）/ Materials Tab（背包里的 Copper Ore ×4 在前，仓库里的 Timber ×99 带房子角标在后，不在家时灰显 "At home"）</td>
-<td>Dishes Tab 单图：5 道菜各带色点与 "×5"，一格 Mystery Dish；点中一格后详情卡按钮行 "Eat · +40 Energy / Gift / Sell"</td>
+<td>两张单图（原"三联缩略"在 360 宽卡片上不可读）：BAG-2 Tackle Tab——标题下小字 "Tackle · Not counted in Bag"，详情卡 "Reed Rod · Bite window 2.6 s · lands up to Rare · Owned · not equipped" + "Info / Equip"；网格两行：Starter Hoe / Starter Rod / Starter Pickaxe / Wooden Sword 各带 "Equipped" 小标，Reed Rod 带 "Equip" 小按钮（选中），Fish Trap ×2 / Spinner Lure ×3 / Worm Bait ×12</td>
+<td>BAG-2-2 Materials Tab：背包里的 Copper Ore ×4、Rock Salt ×2 在前，农场仓库的 Timber ×99 / Stone ×64 / Reeds ×30 / Clay ×12 / Quartz ×3 带房子角标在后；点 Timber 弹 "Timber ×99 · Farm Storage · Take 10 / Take all"；不在家时仓库堆灰显 "At home"</td>
 <td>"Not counted in Bag" / "Equipped" / "Equip" / "At home" / "Take 10 / Take all" / Tab 角标 "Fish 23"</td>
 <td>点仓库堆弹 "Take 10 / Take all"；Tackle 格点 "Equip" 跳 EQUIP-1 并预选该槽</td>
 <td>常驻 BAG-1；去 EQUIP-1</td>
@@ -31321,7 +31321,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>Skills Panel</td>
 <td>技能面板</td>
 <td>技能</td>
-<td>全屏三张轨卡上下排：Farming Lv4 · 进度环 + "212 / 500 XP · 288 XP to go · about 2 days · Today +212 XP" · "Next: Lv5 · Corn, Cabbage, Sow Again"；Fishing Lv6 · "1,540 / 1,850 XP" 同构；<strong>Cooking Lv3 · "160 / 220 XP · 60 XP to go · about 1 day" · "Next: Lv4 · 3rd ingredient slot"</strong>，卡上三枚槽位点 ●●○；每卡下 10 行解锁列表：已解锁打勾 + 日期，未解锁锁角标 + 一行四件事缩略；"改变日常"类解锁用设施图标区分；底部首次类进度 "Crops first-harvested 6/20 · Fish first-caught 9/20 · Dishes first-cooked 5/48"</td>
+<td>全屏抽屉（农场压暗）：顶栏 "Skills" + ✕；三张轨卡上下排，左侧等级环（环 = 本级进度，中间 "Lv 4"），右侧名称、"412 / 500 XP · 88 to go"、"Next: Lv5 · Corn, Cabbage, Sow Again"；Farming 卡展开 Lv1–10 解锁列表（已解锁打勾 + 日期，下一级琥珀行写 "88 XP to go"，其余锁角标；改变日常的设施行带设施小图标）；Fishing Lv6 "1,540 / 1,850 XP · 310 to go" · "Next: Lv7 · Silver Sturgeon, Gift Clues"；Cooking Lv3 "160 / 220 XP · 60 to go" · "Next: Lv4 · 3rd ingredient slot"，名称旁三枚槽位点 ●●○；底部 "First times" 三枚 M 号材料进度格 "Crops 6/20 / Fish 9/20 / Dishes 5/48"（收集进度用绿环）（2026-10-05 出图；原稿 "Farming Lv4 · 212 / 500" 与 Lv4 = 300 的阈值矛盾，改为 412）</td>
 <td>等级差提示区：五枚 XP 徽标并排 "XP: Full · XP: 75% · XP: 50% · XP: 25% · XP: None · outleveled"（后两枚灰色），下方首次解释卡 "You've outleveled Pond Crucian. It still sells and cooks, but gives no XP. Fish Fine or better for full XP." + 按钮 "Where to fish"；飘字示例 "+7 XP · Reduced · 75%"；旁一帧 Cooking 卡的同页递减提示 "Same dish today · 2nd pot 50% XP · 3rd pot none"</td>
 <td>上述文案（阈值以技能章与烹饪章为准）；"Farming / Fishing / Cooking" / "Next: Lv4 · 3rd ingredient slot" / "XP: None · outleveled" / "Daily XP limit reached"（仅技能页一行）</td>
 <td>点解锁行弹 SKILL-2；点进度环无动作；头像环维持 Farming / Fishing 双色，Cooking 等级只在本页与烹饪面板顶栏显示</td>
@@ -31332,10 +31332,10 @@ td { font-variant-numeric: tabular-nums; }
 <td>Gate Card</td>
 <td>门禁卡（四件事同屏）</td>
 <td>技能 · 门禁</td>
-<td>驿站 Buy 列表里一行 Carrot Seeds 灰显 + 锁角标 + "Lv2"，上方浮卡："Carrot Seeds / Farming Lv2 · 18 XP to go / harvest 9 radishes / Unlocks Carrot, Herb / [Show my plots] [Got it]"</td>
+<td>在 Bao 的驿站抽屉（FARM-6）里选中锁定行：抽屉压暗，被选中的 Carrot Seeds 行浮起（琥珀描边 + "Farming Lv2 · 18 XP to go"），下方门禁卡（箭头朝上）："Carrot Seeds" + 锁胶囊 "Farming Lv2"；一枚 M 号材料进度格 "XP 32/50"；右侧 "Lv2 unlocks · Carrot · Herb · 5 Carrot Seeds gift"；两个按钮 "Show my plots"（只移动相机）/ "Got it"（关闭）；不写"怎么做"的句子（p(5)）</td>
 <td>渔具铺变体："Carbon Rod · 350 coins / Fishing Lv6 · 220 XP to go / about 12 casts at the river / Lands Legendary fish · wider hook window / [Got it]"</td>
 <td>上述文案；锁定物"可见不可买"</td>
-<td>选中锁定物即弹卡，不在点购买后报错；Show my plots 只移动相机</td>
+<td>选中锁定物即弹卡，不在点购买后报错；Show my plots 只移动相机；Got it 关闭</td>
 <td>来自 FARM-6 / NPC-2 / FARM-5 / SKILL-1；回原处</td>
 </tr>
 <tr>
@@ -31540,7 +31540,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>Collections Hub</td>
 <td>图鉴总览</td>
 <td>图鉴</td>
-<td>全屏四张入口卡："Fish-dex 9/20" / "Cookbook 12/48" / "Crop-dex 7/20" / "Passport · 6 stamps"，每卡一条进度与下一个一次性奖励 "Catch 10 kinds · +30 Energy · 100 coins"；卡上青 ◆ 表示有新点亮</td>
+<td>抽屉按内容高度：顶栏 "Collections" + ✕；2 × 2 四张卡，每卡一枚 L 号材料进度格（收集进度用绿环）+ 名称 + 一行下一个奖励：Fish-dex "Kinds 9/20 · Next at 10 · +30 Energy · 100 coins"（右上青 "◆ New"）/ Cookbook "Pages 12/48 · Next at 20 · Line Cook · 100 coins" / Crop-dex "Crops 7/20 · At 20 · gold frame" / Passport "Cities 4/10 · Next at 10 · Silver medal · +50 Energy"</td>
 <td>—</td>
 <td>上述文案</td>
 <td>点卡进入对应图鉴</td>
@@ -31664,8 +31664,8 @@ td { font-variant-numeric: tabular-nums; }
 <td>Energy Panel</td>
 <td>体力面板</td>
 <td>体力</td>
-<td>下拉小面板（从体力卡展开）六行："Max 200 · Homestead Lv1" / "Meals today 100/200 · resets in 7h 12m" / "Tea 1/3 · next 50 coins" / "Rest · available" / "Newcomer Blessing · Energy returns 1.5× faster · 5 days left" / "Catch protection 7 left today"</td>
-<td>新手祝福到期前一日的变体行 "Newcomer Blessing ends tomorrow"；Homestead 升级后 "Max 210 · Homestead Lv2"</td>
+<td>点体力卡从下方弹出小面板（指向体力卡的小三角）：第一行 "Max 200 · Homestead Lv1"；一行四枚 S 号材料进度格（今日用量，绿环）"Meals 100/300"（新手祝福期食物上限 300）/ "Tea 1/3" / "Rest 0/1" / "Refunds 3/10"（Fishing Lv1–3 失败退还次数）；底部暖黄条 "Newcomer Blessing · 5 days left" + 小字 "Energy returns 1.5× faster · Meals 300 a day"；背后农场常态（快捷栏、Sow ×1 主行动键）</td>
+<td>新手祝福到期前一日 "Newcomer Blessing ends tomorrow"；祝福结束后 Meals 分母回到 200；Homestead 升级后 "Max 210 · Homestead Lv2"</td>
 <td>上述文案</td>
 <td>点行无动作（纯信息）；点外关闭</td>
 <td>来自 HUD-1；回原处</td>
@@ -31978,8 +31978,8 @@ td { font-variant-numeric: tabular-nums; }
 </tr>
 <tr>
 <td>FARM-4</td>
-<td>果园角：2 × 2 苹果树挂果、柑橘幼树倒计时牌、葡萄架、Orchard 3/5 牌，采摘确认小卡</td>
-<td>Scene: orchard corner of the farm — a round 2×2 apple tree heavy with fruit, a young citrus tree with a small countdown sign, a 1×1 grape trellis, an Orchard 3/5 counter sign, a small confirmation card "Pick apples · 2 Energy" with two pill buttons and a Don't-ask-again checkbox</td>
+<td>果园角：2 × 2 苹果树挂果、柑橘幼树倒计时牌、葡萄架、Orchard 3/5 牌，主行动键 Pick · 2 Energy</td>
+<td>Scene: orchard corner of the farm — a round 2×2 apple tree heavy with fruit, a young citrus tree with a small countdown sign, a 1×1 grape trellis, an Orchard 3/5 counter sign, the player standing at the apple tree with a round main action button reading Pick · 2 Energy</td>
 </tr>
 <tr>
 <td>FARM-5</td>
@@ -32367,7 +32367,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>用户逐张审阅；主行动键与快捷栏在四个工作场景位置一致（FARM-1 / FISH-1 的 5 格快捷栏、176 px 主行动键、96 px 切换键叠起来位置、尺寸、圆角一致，MINE-1 出图后补叠；COOK-1 的主行动键同位、无快捷栏）；HUD 两行与 HUD-1 骨架重合；COOK-2a / 2b 顶栏显示 Cooking Lv、第 3 槽锁定态可见；所有文案无拼错</td>
 </tr>
 <tr>
-<td>批次 2 · 内容与成长</td>
+<td>批次 2 · 内容与成长（<strong>2026-10-05 已出完</strong>：12 张图 1 + BAG-2-2 / BAG-5-2 两张图 2；矿洞、农舍 Lv3、果园、设施四张新底图）</td>
 <td>验证图鉴、门禁、升级、矿洞的信息密度（据点与柜台已在批次 1 提前出完）</td>
 <td>FISH-6、SKILL-1、SKILL-2、HOME-1、HOME-2、BAG-2、BAG-5、MINE-1、FARM-4、FARM-5、PASS-3、HUD-2</td>
 <td>12 张</td>
