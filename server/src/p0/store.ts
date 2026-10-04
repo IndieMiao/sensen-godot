@@ -1,14 +1,14 @@
 /** In-memory P0 state store with an optional JSON file for local / emulator playtests. */
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import type { P0Content } from './content.js';
-import { freshState, type P0State } from './state.js';
+import { freshState, upgradeState, type P0State } from './state.js';
 
 export class P0Store {
   private players = new Map<string, P0State>();
   constructor(private c: P0Content, private file?: string) {
     if (file && existsSync(file)) {
       const saved = JSON.parse(readFileSync(file, 'utf8')) as Record<string, P0State>;
-      for (const [id, state] of Object.entries(saved)) this.players.set(id, state);
+      for (const [id, state] of Object.entries(saved)) this.players.set(id, upgradeState(c, state));
     }
   }
   get(player: string, now: number): P0State {
