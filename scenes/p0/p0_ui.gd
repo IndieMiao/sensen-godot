@@ -41,7 +41,16 @@ var _fab_state: Dictionary = {}
 var _bar_box: HBoxContainer
 var _bar_ids: Array = []
 var selected_seed := ""
+var selected_bait := ""
+var bar_mode := "farm"          # "farm" (seeds) or "fish" (bait) — the quick bar holds the current action's consumables
+var _place: Label
+var _creel: Label
+var _fab_badge: TextureRect
 var _modal: Control
+var modal_kind := ""            # "stall", "bag", "kitchen", "card", ... — which drawer is open
+var _kitchen_tab := "cookbook"
+var _exp_slots: Array = []      # Experiment tab: ids placed in the pot
+var _card_queue: Array = []
 var _tags := {}
 var _toast: Label
 var _toast_left := 0.0
@@ -136,13 +145,26 @@ func _build_hud() -> void:
 	var place := PanelContainer.new()
 	place.add_theme_stylebox_override("panel", _box(CARD, 11, EDGE, 1, Vector4(8, 4, 8, 4)))
 	place.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	place.position = Vector2(-128, 64)
+	place.grow_horizontal = Control.GROW_DIRECTION_BEGIN   # longer place names grow to the left
+	place.offset_left = -10
+	place.offset_right = -10
+	place.offset_top = 64
 	var ph := HBoxContainer.new()
 	ph.add_theme_constant_override("separation", 3)
 	ph.add_child(_icon("home", 11))
-	ph.add_child(_label("Shanghai · Homestead", 10, INK, true))
+	_place = _label("Shanghai · Homestead", 10, INK, true)
+	ph.add_child(_place)
 	place.add_child(ph)
 	root.add_child(place)
+	_creel = _label("", 9, INK, true)
+	_creel.add_theme_stylebox_override("normal", _box(CARD, 10, EDGE, 1, Vector4(8, 3, 8, 3)))
+	_creel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_creel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_creel.offset_left = -10
+	_creel.offset_right = -10
+	_creel.offset_top = 90
+	_creel.hide()
+	root.add_child(_creel)
 
 func _build_bar() -> void:
 	_bar_box = HBoxContainer.new()
@@ -176,7 +198,8 @@ func _build_fab() -> void:
 	badge.add_theme_stylebox_override("panel", _box(PAPER, 10, GREEN_D, 1, Vector4(2, 2, 2, 2)))
 	badge.position = Vector2(-4, -4)
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	badge.add_child(_icon("hoe", 13))
+	_fab_badge = _icon("hoe", 13)
+	badge.add_child(_fab_badge)
 	_fab.add_child(badge)
 	root.add_child(_fab)
 	var sw := Button.new()
@@ -188,13 +211,13 @@ func _build_fab() -> void:
 	sw.expand_icon = true
 	sw.add_theme_stylebox_override("normal", _box(Color(0.92, 0.92, 0.9, 0.9), 16, EDGE, 1, Vector4(6, 6, 6, 6)))
 	sw.add_theme_stylebox_override("pressed", _box(Color(0.85, 0.85, 0.82, 0.9), 16, EDGE, 1, Vector4(6, 6, 6, 6)))
-	sw.pressed.connect(func(): toast("Farming here · Fishing and Mining come with the pond and mine"))
+	sw.pressed.connect(func(): toast("Farming by the plots · Fishing at Willow Pond · the action follows where you stand"))
 	root.add_child(sw)
 
 func _build_dev() -> void:
 	var box := HBoxContainer.new()
 	box.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	box.position = Vector2(-96, 92)
+	box.position = Vector2(-96, 118)
 	box.add_theme_constant_override("separation", 4)
 	for m in [60, 240]:
 		var b := _pill_button("+%dh" % (m / 60), false)
@@ -227,12 +250,30 @@ func _skill_pct(s: Dictionary) -> float:
 	if s.is_empty() or s.get("next", null) == null: return 1.0
 	return clampf(float(int(s.xp) - int(s.floor)) / maxf(1.0, float(int(s.next) - int(s.floor))), 0.0, 1.0)
 
+## Pond vs. plots: place chip, creel badge, fab badge and quick-bar contents follow where the player stands.
+func set_mode(mode: String) -> void:
+	if mode == bar_mode: return
+	bar_mode = mode
+	_bar_ids = []
+	for c in _bar_box.get_children(): c.queue_free()
+	_bar_box.get_children().map(func(c): _bar_box.remove_child(c))
+	_place.text = "Shanghai · Willow Pond" if mode == "fish" else "Shanghai · Homestead"
+	_fab_badge.texture = P0Logic.icon("rod" if mode == "fish" else "hoe")
+	_creel.visible = mode == "fish"
+	_refresh_bar()
+
 func _refresh_bar() -> void:
-	var ids := P0Logic.quick_bar(view, _bar_ids)
-	if selected_seed != "" and not ids.has(selected_seed): selected_seed = ""
-	if selected_seed == "" and not ids.is_empty():
-		selected_seed = str(ids[0])
-		seed_selected.emit(selected_seed)
+	var ids := P0Logic.quick_bar(view, [] if _bar_ids.is_empty() else _bar_ids, bar_mode)
+	if bar_mode == "fish":
+		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
+		_creel.text = P0Logic.creel_line(view)
+		var amber := int(view.get("bag", {}).get("free", 1)) <= 1
+		_creel.add_theme_stylebox_override("normal", _box(Color("fbf1da") if amber else CARD, 10, AMBER if amber else EDGE, 1, Vector4(8, 3, 8, 3)))
+	else:
+		if selected_seed != "" and not ids.has(selected_seed): selected_seed = ""
+		if selected_seed == "" and not ids.is_empty():
+			selected_seed = str(ids[0])
+			seed_selected.emit(selected_seed)
 	if ids == _bar_ids and _bar_box.get_child_count() > 0:
 		_update_bar_counts()
 		return
@@ -259,13 +300,13 @@ func _update_bar_counts() -> void:
 		var slot := _bar_box.get_child(i)
 		var cnt := slot.find_child("Count", true, false) as Label
 		if cnt: cnt.text = "×%d" % P0Logic.bag_count(view, str(_bar_ids[i]))
-		slot.set_meta("selected", str(_bar_ids[i]) == selected_seed)
+		slot.set_meta("selected", str(_bar_ids[i]) == (selected_bait if bar_mode == "fish" else selected_seed))
 		slot.queue_redraw()
 
 func _slot(seed_id: String) -> Control:
 	var slot := _Slot.new()
 	slot.custom_minimum_size = Vector2(53, 53)
-	slot.set_meta("selected", seed_id != "" and seed_id == selected_seed)
+	slot.set_meta("selected", seed_id != "" and seed_id == (selected_bait if bar_mode == "fish" else selected_seed))
 	if seed_id == "":
 		slot.set_meta("ghost", true)
 		return slot
@@ -293,8 +334,13 @@ func _slot(seed_id: String) -> Control:
 	slot.add_child(col)
 	slot.gui_input.connect(func(e: InputEvent):
 		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
-			selected_seed = seed_id
-			seed_selected.emit(seed_id)
+			if bar_mode == "fish":
+				# Tapping bait only sets the current bait (0 Energy, nothing consumed); tap again to fish without bait.
+				selected_bait = "" if selected_bait == seed_id else seed_id
+				toast(("%s on the hook · used at the bite" % P0Logic.item_name(view, seed_id)) if selected_bait != "" else "No bait")
+			else:
+				selected_seed = seed_id
+				seed_selected.emit(seed_id)
 			_update_bar_counts())
 	return slot
 
@@ -350,13 +396,25 @@ func toast(text: String, seconds := 2.6) -> void:
 func has_modal() -> bool: return _modal != null
 
 func close_modal() -> void:
+	_drop_modal()
+	if not _card_queue.is_empty():
+		var next: Callable = _card_queue.pop_front()
+		next.call_deferred()
+
+## Result cards (catch, dish, level up) wait their turn instead of replacing each other.
+func queue_card(show: Callable) -> void:
+	if _modal == null and _card_queue.is_empty(): show.call()
+	else: _card_queue.append(show)
+
+func _drop_modal() -> void:
 	if _modal: _modal.queue_free()
 	_modal = null
+	modal_kind = ""
 	_fab.visible = true
 	_bar_box.visible = true
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
-	close_modal()
+	_drop_modal()
 	var veil := ColorRect.new()
 	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
 	veil.color = Color(0.184, 0.227, 0.2, dim)
@@ -397,51 +455,98 @@ func _sheet(height: float, title: String, icon_id := "") -> VBoxContainer:
 	_open_modal(panel, 0.3, true)
 	return v
 
-## Bag drawer: quick-bar row is the bar itself (P0: seeds shown), then capacity, then a 5-column grid.
-func open_bag() -> void:
-	var v := _sheet(470, "Bag %d/%d" % [_bag_slots().size(), int(view.get("bag", {}).get("capacity", 25))], "bag")
+## Bag drawer: capacity, a 5-column grid, and a detail row for the tapped item (dishes: Eat).
+func open_bag(focus := "") -> void:
+	var v := _sheet(500, "Bag %d/%d" % [_bag_slots().size(), int(view.get("bag", {}).get("capacity", 25))], "bag")
+	modal_kind = "bag"
 	var cap := _CapBar.new()
 	cap.custom_minimum_size = Vector2(0, 5)
 	cap.set_meta("pct", float(_bag_slots().size()) / maxf(1.0, float(view.get("bag", {}).get("capacity", 25))))
 	v.add_child(cap)
+	var detail := HBoxContainer.new()
+	detail.custom_minimum_size = Vector2(0, 54)
+	detail.add_theme_constant_override("separation", 8)
 	var grid := GridContainer.new()
 	grid.columns = 5
 	grid.add_theme_constant_override("h_separation", 5)
 	grid.add_theme_constant_override("v_separation", 5)
-	var detail := _label("Tap an item. Sell at Bao's Stall.", 9, INK2)
+	var slots := _bag_slots()
 	for i in int(view.get("bag", {}).get("capacity", 25)):
 		var cell := PanelContainer.new()
 		cell.custom_minimum_size = Vector2(58, 58)
-		var slots := _bag_slots()
 		if i < slots.size():
-			var s: Dictionary = slots[i]
-			cell.add_theme_stylebox_override("panel", _box(PAPER, 10, EDGE, 1, Vector4(4, 4, 4, 2)))
+			var st: Dictionary = slots[i]
+			var id := str(st.id)
+			var info := P0Logic.item(view, id)
+			var edge := P0Logic.rarity_color(int(info.get("rarity", 1))) if info.has("rarity") and not id.begins_with("crop_") else EDGE
+			cell.add_theme_stylebox_override("panel", _box(PAPER, 10, edge, 2 if edge != EDGE else 1, Vector4(4, 4, 4, 2)))
 			var box := VBoxContainer.new()
 			box.add_theme_constant_override("separation", 0)
 			box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			var ic := _icon(str(s.id), 30)
+			var ic := _icon(str(info.get("base", id)), 30)
 			ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			box.add_child(ic)
-			var q := _label("×%d" % int(s.qty), 9, INK, true)
+			var q := _label(("%s ×%d" % ["★".repeat(int(info.get("quality", 0))), int(st.qty)]).strip_edges(), 9, INK, true)
 			q.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			box.add_child(q)
 			cell.add_child(box)
-			var id := str(s.id)
 			cell.gui_input.connect(func(e: InputEvent):
 				if (e is InputEventMouseButton and e.pressed) or (e is InputEventScreenTouch and e.pressed):
-					detail.text = "%s ×%d · %s" % [P0Logic.item_name(view, id), P0Logic.bag_count(view, id), _item_line(id)])
+					_fill_detail(detail, id))
 		else:
 			cell.add_theme_stylebox_override("panel", _box(Color(1, 1, 1, 0.2), 10, Color("d9c7a6"), 1, Vector4(4, 4, 4, 4)))
 		grid.add_child(cell)
 	v.add_child(detail)
 	v.add_child(grid)
+	v.add_child(_label(P0Logic.meal_line(view), 9, INK2))
+	if focus != "" and P0Logic.bag_count(view, focus) > 0: _fill_detail(detail, focus)
+	else: detail.add_child(_label("Tap an item. Dishes can be eaten here.", 9, INK2))
+
+func _fill_detail(detail: HBoxContainer, id: String) -> void:
+	for c in detail.get_children(): c.queue_free()
+	var info := P0Logic.item(view, id)
+	detail.add_child(_icon(str(info.get("base", id)), 40))
+	var mid := VBoxContainer.new()
+	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mid.add_theme_constant_override("separation", 0)
+	var title := P0Logic.dish_label(view, id) if id.begins_with("dish_") else P0Logic.item_name(view, id)
+	mid.add_child(_label("%s ×%d" % [title, P0Logic.bag_count(view, id)], 11, INK, true))
+	var line := _label(_item_line(id), 8, INK2)
+	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	mid.add_child(line)
+	detail.add_child(mid)
+	if id.begins_with("dish_"):
+		var eb := P0Logic.eat_button(view, id)
+		var b := _pill_button(str(eb.text), true)
+		b.custom_minimum_size = Vector2(118, 34)
+		b.add_theme_font_size_override("font_size", 9)
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		b.disabled = not eb.get("enabled", false)
+		var confirm := str(eb.get("confirm", ""))
+		b.pressed.connect(func():
+			if confirm != "" and b.text != confirm:
+				b.text = confirm   # §7.17.1: say the real gain first, the second tap eats
+				return
+			close_modal()
+			command.emit({"type": "eat", "item": id}))
+		detail.add_child(b)
 
 func _item_line(id: String) -> String:
+	var info := P0Logic.item(view, id)
 	if id.begins_with("seed_"):
 		var c := P0Logic.crop_for_seed(view, id)
 		return "%d Energy per plot · ready in %dh" % [int(c.get("energy", 2)), int(c.get("grow_h", 4))]
-	if id.begins_with("crop_"):
-		return "Sells for %d at Bao's Stall" % int(view.get("prices", {}).get(id, 0))
+	if id.begins_with("crop_") or id.begins_with("fish_"):
+		var parts: Array = []
+		if id.begins_with("fish_"): parts.append(P0Logic.rarity_name(view, int(info.get("rarity", 1))))
+		parts.append("Sells for %d at Bao's Stall" % int(info.get("sell", 0)))
+		if not info.get("cook", false) and id.begins_with("fish_"): parts.append("Not for cooking")
+		return " · ".join(parts)
+	if id.begins_with("dish_"):
+		if str(info.get("base", "")) == "dish_mystery": return "Mystery Dish · +%d Energy" % int(info.get("full", 5))
+		return "%s · +%d Energy" % [P0Logic.rarity_name(view, int(info.get("rarity", 1))), int(info.get("full", 20))]
+	if id.begins_with("bait_"):
+		return "Used at the bite · more Fine fish, shorter wait"
 	return ""
 
 func _bag_slots() -> Array: return view.get("bag", {}).get("slots", [])
@@ -508,6 +613,7 @@ func _bao_art(region: Rect2) -> Texture2D:
 ## Stall drawer: keeper bar (terracotta) · Buy rows with level gates · Sell your produce (no Sell Tab; produce, no quota).
 func open_stall(bubble := "") -> void:
 	var v := _sheet(520, "Bao's Stall · Homestead", "stall")
+	modal_kind = "stall"
 	var kp := PanelContainer.new()
 	kp.add_theme_stylebox_override("panel", _box(TERRA, 12, TERRA, 0, Vector4(6, 6, 8, 6)))
 	var kh := HBoxContainer.new()
@@ -538,12 +644,12 @@ func open_stall(bubble := "") -> void:
 	for row in view.get("stall", {}).get("buy", []):
 		list.add_child(_buy_row(row))
 	var produce: Array = []
-	for s in _bag_slots():
-		var id := str(s.id)
-		if id.begins_with("crop_") and not produce.has(id): produce.append(id)
-	list.add_child(_label("Sell here · produce, no daily limit", 11, INK, true))
+	for st in _bag_slots():
+		var id := str(st.id)
+		if (id.begins_with("crop_") or id.begins_with("fish_")) and not produce.has(id): produce.append(id)
+	list.add_child(_label("Sell here · produce and fish, no daily limit", 11, INK, true))
 	if produce.is_empty():
-		list.add_child(_label("Nothing to sell yet — harvest first.", 9, INK2))
+		list.add_child(_label("Nothing to sell yet — harvest or fish first.", 9, INK2))
 	for id in produce: list.add_child(_sell_row(id))
 
 func _buy_row(row: Dictionary) -> Control:
@@ -558,10 +664,13 @@ func _buy_row(row: Dictionary) -> Control:
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mid.add_theme_constant_override("separation", 0)
 	mid.add_child(_label(str(row.name), 10, INK if row.get("unlocked", false) else INK2, true))
-	mid.add_child(_label("%d coins · %d Energy a plot · Bag ×%d" % [int(row.price), int(row.energy), P0Logic.bag_count(view, id)], 8, INK2))
+	if id.begins_with("seed_"):
+		mid.add_child(_label("%d coins · %d Energy a plot · Bag ×%d" % [int(row.price), int(row.energy), P0Logic.bag_count(view, id)], 8, INK2))
+	else:
+		mid.add_child(_label("%d coins · %d left today · Bag ×%d" % [int(row.price), int(row.get("left", 0)), P0Logic.bag_count(view, id)], 8, INK2))
 	h.add_child(mid)
 	if not row.get("unlocked", false):
-		var lk := _label("Farming Lv%d · %d XP to go" % [int(row.gate), int(row.xp_to_go)], 8, INK2, true)
+		var lk := _label("%s Lv%d · %d XP to go" % [str(row.get("skill", "farming")).capitalize(), int(row.gate), int(row.xp_to_go)], 8, INK2, true)
 		lk.add_theme_stylebox_override("normal", _box(DIS, 10, DIS, 0, Vector4(8, 4, 8, 4)))
 		h.add_child(lk)
 		return h
@@ -579,7 +688,7 @@ func _sell_row(id: String) -> Control:
 	h.custom_minimum_size = Vector2(0, 40)
 	h.add_child(_icon(id, 26))
 	var n := P0Logic.bag_count(view, id)
-	var price := int(view.get("prices", {}).get(id, 0))
+	var price := int(P0Logic.item(view, id).get("sell", view.get("prices", {}).get(id, 0)))
 	var mid := VBoxContainer.new()
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mid.add_child(_label("%s ×%d" % [P0Logic.item_name(view, id), n], 10, INK, true))
@@ -607,6 +716,11 @@ func open_energy_card(need: int, verb: String) -> void:
 	tiles.add_child(_tile("rest", str(f.rest), "The bench is by the house"))
 	tiles.add_child(_tile("bag", "Open bag", "", func(): close_modal(); open_bag()))
 	card.add_child(tiles)
+	var tiles2 := HBoxContainer.new()
+	tiles2.add_theme_constant_override("separation", 6)
+	tiles2.add_child(_tile("pot", P0Logic.meal_line(view).split(" · ")[0], "Eat a dish from your bag"))
+	tiles2.add_child(_tile("stove", "Show kitchen", "The stove is beside the bench"))
+	card.add_child(tiles2)
 	var ok := _pill_button("Free to do now", true)
 	ok.pressed.connect(close_modal)
 	card.add_child(ok)
@@ -670,6 +784,295 @@ func _tile(icon_id: String, text: String, note: String, cb := Callable()) -> Con
 		if cb.is_valid(): cb.call()
 		elif note != "": toast(note))
 	return b
+
+
+# ---------------------------------------------------------------- M2: kitchen, catch and dish cards
+## Stove panel (§7.2.7, COOK-2a/2b): Cookbook (known pages cook in one tap, missing ones say what is short)
+## and Experiment (free slots from the bag). Cooking costs no Energy.
+func open_kitchen(tab := "") -> void:
+	if tab != "": _kitchen_tab = tab
+	var ck: Dictionary = view.get("cooking", {})
+	var lvl := int(view.get("skills", {}).get("cooking", {}).get("level", 1))
+	var v := _sheet(540 if _kitchen_tab == "cookbook" else 440, "Stove · Empty · Cooking Lv%d" % lvl, "stove")
+	modal_kind = "kitchen"
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 6)
+	var pages: Array = ck.get("cookbook", [])
+	var known := pages.filter(func(p): return p.get("known", false)).size()
+	for t in [["cookbook", "Cookbook %d/%d" % [known, pages.size()]], ["experiment", "Experiment"]]:
+		var b := _pill_button(str(t[1]), t[0] == _kitchen_tab)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var key := str(t[0])
+		b.pressed.connect(func(): open_kitchen(key))
+		tabs.add_child(b)
+	v.add_child(tabs)
+	v.add_child(_label(P0Logic.meal_line(view), 8, INK2))
+	if _kitchen_tab == "cookbook": _cookbook(v, pages)
+	else: _experiment(v, int(ck.get("slots", 2)))
+
+func _cookbook(v: VBoxContainer, pages: Array) -> void:
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, 420)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 4)
+	scroll.add_child(list)
+	v.add_child(scroll)
+	var order := pages.duplicate()
+	order.sort_custom(func(a, b):
+		if bool(a.known) != bool(b.known): return bool(a.known)
+		if bool(a.get("can_cook", false)) != bool(b.get("can_cook", false)): return bool(a.get("can_cook", false))
+		return int(a.rarity) < int(b.rarity))
+	for page in order:
+		var h := HBoxContainer.new()
+		h.add_theme_constant_override("separation", 6)
+		h.custom_minimum_size = Vector2(0, 46)
+		var known := bool(page.get("known", false))
+		var ic := _icon(str(page.id) if known else "question", 30)
+		if not known: ic.modulate = Color(1, 1, 1, 0.35)
+		h.add_child(ic)
+		var mid := VBoxContainer.new()
+		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		mid.add_theme_constant_override("separation", 0)
+		var nm := HBoxContainer.new()
+		nm.add_theme_constant_override("separation", 4)
+		var dot := ColorRect.new()
+		dot.custom_minimum_size = Vector2(7, 7)
+		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		dot.color = P0Logic.rarity_color(int(page.rarity))
+		nm.add_child(dot)
+		nm.add_child(_label(str(page.name) if known else "Unknown dish", 10, INK if known else INK2, true))
+		mid.add_child(nm)
+		mid.add_child(_label(P0Logic.page_line(view, page), 8, INK2))
+		var parts: Array = []
+		for token in page.get("in", []):
+			parts.append(P0Logic.ingredient_label(view, str(token)) + ("" if not known or str(token).length() <= 2 else " · have %d" % P0Logic.bag_count(view, str(token))))
+		var ing := _label(" + ".join(parts) if known else ("1 ingredient" if int(page.get("slots", 1)) == 1 else "%d ingredients" % int(page.get("slots", 1))) + " · discover it in Experiment", 8, INK2)
+		ing.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		mid.add_child(ing)
+		h.add_child(mid)
+		if known:
+			var slots_ok := int(page.get("slots", 1)) <= int(view.get("cooking", {}).get("slots", 2))
+			var b := _pill_button("Cook" if page.get("can_cook", false) else ("Cooking Lv4" if not slots_ok else "Missing"), true)
+			b.custom_minimum_size = Vector2(70, 30)
+			b.disabled = not page.get("can_cook", false)
+			var pid := str(page.id)
+			b.pressed.connect(func(): close_modal(); command.emit({"type": "cook", "recipe": pid}))
+			h.add_child(b)
+		else:
+			var b := _pill_button("Try ›", false)
+			b.custom_minimum_size = Vector2(56, 30)
+			b.pressed.connect(func(): open_kitchen("experiment"))
+			h.add_child(b)
+		list.add_child(h)
+
+func _experiment(v: VBoxContainer, slots: int) -> void:
+	_exp_slots = _exp_slots.filter(func(id): return P0Logic.bag_count(view, str(id)) > 0)
+	while _exp_slots.size() > slots: _exp_slots.pop_back()
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	for i in 3:
+		var cell := PanelContainer.new()
+		cell.custom_minimum_size = Vector2(70, 70)
+		if i >= slots:
+			cell.add_theme_stylebox_override("panel", _box(DIS, 35, DIS, 0, Vector4(4, 4, 4, 4)))
+			var lk := _label("Cooking Lv4\n3rd slot", 8, INK2, true)
+			lk.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			lk.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			cell.add_child(lk)
+		elif i < _exp_slots.size():
+			cell.add_theme_stylebox_override("panel", _box(PAPER, 35, GREEN_D, 2, Vector4(4, 4, 4, 4)))
+			var box := VBoxContainer.new()
+			box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			box.alignment = BoxContainer.ALIGNMENT_CENTER
+			var ic := _icon(str(_exp_slots[i]), 30)
+			ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			box.add_child(ic)
+			var x := _label("✕ " + P0Logic.item_name(view, str(_exp_slots[i])), 7, INK, true)
+			x.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			x.clip_text = true
+			box.add_child(x)
+			cell.add_child(box)
+			var idx := i
+			cell.gui_input.connect(func(e: InputEvent):
+				if (e is InputEventMouseButton and e.pressed) or (e is InputEventScreenTouch and e.pressed):
+					_exp_slots.remove_at(idx)
+					open_kitchen("experiment"))
+		else:
+			cell.add_theme_stylebox_override("panel", _box(Color(1, 1, 1, 0.35), 35, Color("d9c7a6"), 1, Vector4(4, 4, 4, 4)))
+		row.add_child(cell)
+	v.add_child(row)
+	var preview := _label(_experiment_preview(), 10, INK, true)
+	preview.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	preview.add_theme_stylebox_override("normal", _box(PAPER, 12, EDGE, 1, Vector4(10, 4, 10, 4)))
+	v.add_child(preview)
+	v.add_child(_label("From your bag", 10, INK, true))
+	var grid := GridContainer.new()
+	grid.columns = 5
+	grid.add_theme_constant_override("h_separation", 5)
+	grid.add_theme_constant_override("v_separation", 5)
+	var shown := {}
+	for st in _bag_slots():
+		var id := str(st.id)
+		if shown.has(id) or not P0Logic.item(view, id).get("cook", false): continue
+		shown[id] = true
+		var left := P0Logic.bag_count(view, id) - _exp_slots.count(id)
+		var b := Button.new()
+		b.custom_minimum_size = Vector2(58, 58)
+		b.icon = P0Logic.icon(id)
+		b.expand_icon = false
+		b.add_theme_constant_override("icon_max_width", 26)
+		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.text = "×%d" % left
+		b.add_theme_font_size_override("font_size", 9)
+		_style_button(b, PAPER, EDGE, 10)
+		for k in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color", "icon_hover_pressed_color"]:
+			b.add_theme_color_override(k, Color.WHITE)
+		b.add_theme_color_override("icon_disabled_color", Color(1, 1, 1, 0.4))
+		b.disabled = left <= 0 or _exp_slots.size() >= slots
+		b.pressed.connect(func():
+			_exp_slots.append(id)
+			open_kitchen("experiment"))
+		grid.add_child(b)
+	if shown.is_empty(): v.add_child(_label("Fish or harvest something to cook.", 9, INK2))
+	v.add_child(grid)
+	var cook := _pill_button("Cook", true)
+	cook.custom_minimum_size = Vector2(0, 40)
+	cook.disabled = _exp_slots.is_empty()
+	cook.pressed.connect(func():
+		var items := _exp_slots.duplicate()
+		_exp_slots.clear()
+		close_modal()
+		command.emit({"type": "cook", "items": items}))
+	v.add_child(cook)
+
+## Preview capsule: "? · Fine · 15 s · Unknown dish" — rarity is derivable from what is in the pot (§7.4.1).
+func _experiment_preview() -> String:
+	if _exp_slots.is_empty(): return "Put 1–%d ingredients in the pot" % int(view.get("cooking", {}).get("slots", 2))
+	var fams := {}
+	var top := 1
+	var mains := 0
+	for id in _exp_slots:
+		var info := P0Logic.item(view, str(id))
+		fams[str(info.get("family", "F"))] = true
+		top = maxi(top, int(info.get("rarity", 1)))
+		if str(info.get("family", "")) != "S": mains += 1
+	if mains == 0: return "Needs a main ingredient"
+	var known := P0Logic.match_known(view, _exp_slots)
+	if not known.is_empty():
+		var kt: Dictionary = view.get("cooking", {}).get("tiers", {}).get(str(int(known.rarity)), {})
+		return "%s · %s · %d s · In your Cookbook" % [str(known.name), P0Logic.rarity_name(view, int(known.rarity)), int(kt.get("ms", 5000)) / 1000]
+	var derive: Array = view.get("cooking", {}).get("derive", [[1, 2, 3], [2, 3, 3], [3, 3, 4], [4, 4, 4]])
+	var r := int(derive[top - 1][mini(fams.size(), 3) - 1])
+	var t: Dictionary = view.get("cooking", {}).get("tiers", {}).get(str(r), {})
+	return "? · %s · %d s · Unknown dish" % [P0Logic.rarity_name(view, r), int(t.get("ms", 5000)) / 1000]
+
+## FISH-3: "Caught! Pond Crucian · Common", XP lines, Fish-dex count, first-catch line.
+func show_catch(fish_id: String, rarity: int, xp_lines: Array) -> void:
+	var card := _center_card(280)
+	modal_kind = "card"
+	var ic := _icon(fish_id, 64)
+	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	card.add_child(ic)
+	var t := _label("Caught! %s" % P0Logic.item_name(view, fish_id), 15, INK, true)
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.add_child(t)
+	var r := _label(P0Logic.rarity_name(view, rarity), 10, P0Logic.rarity_color(rarity).darkened(0.25), true)
+	r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.add_child(r)
+	for line in xp_lines:
+		var l := _label(str(line), 11, Color("1e9bb0"), true)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		card.add_child(l)
+	var dex: Array = view.get("fishing", {}).get("dex", [])
+	var got := dex.filter(func(d): return int(d.get("caught", 0)) > 0).size()
+	var d := _label("Fish-dex %d/%d · %s" % [got, dex.size(), P0Logic.creel_line(view)], 9, INK2)
+	d.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.add_child(d)
+	var ok := _pill_button("Keep fishing", true)
+	ok.pressed.connect(close_modal)
+	card.add_child(ok)
+
+## FISH-5: the gate card — what got away, what it needs, what it unlocks, energy back.
+func show_got_away(ev: Dictionary) -> void:
+	var card := _center_card(290)
+	modal_kind = "card"
+	var rarity := int(ev.get("rarity", 2))
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 10)
+	var sil := _icon("fish_glow", 56)
+	sil.modulate = P0Logic.rarity_color(rarity)
+	h.add_child(sil)
+	var v := VBoxContainer.new()
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	v.add_child(_label("%s fish got away" % P0Logic.rarity_name(view, rarity), 13, INK, true))
+	if ev.has("need_level"):
+		v.add_child(_label("Fishing Lv%d needed" % int(ev.need_level), 11, AMBER_D, true))
+	else:
+		v.add_child(_label("Too heavy for your rod · %s" % str(view.get("fishing", {}).get("rod", "Starter Rod")), 10, AMBER_D, true))
+	v.add_child(_label("Unlocks %s" % P0Logic.item_name(view, str(ev.get("fish", ""))), 10, INK))
+	v.add_child(_label("%d Energy back" % int(ev.get("refund", 3)), 10, GREEN_D, true))
+	if ev.has("protected_left"): v.add_child(_label("Catch protection %d left today" % int(ev.protected_left), 8, INK2))
+	h.add_child(v)
+	card.add_child(h)
+	var ok := _pill_button("Keep fishing", true)
+	ok.pressed.connect(close_modal)
+	card.add_child(ok)
+
+## COOK-4 / COOK-6: the dish slides out; Eat now or Keep (bag).
+func show_dish(ev: Dictionary, xp_lines: Array) -> void:
+	var card := _center_card(290)
+	modal_kind = "card"
+	var dish := str(ev.get("dish", ""))
+	var q := int(ev.get("quality", 0))
+	var id := dish if q == 0 else "%s@%s" % [dish, ["plain", "good", "perfect"][q]]
+	var info := P0Logic.item(view, id)
+	var ic := _icon(dish, 72)
+	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	card.add_child(ic)
+	var mystery := bool(ev.get("mystery", false))
+	var title := "Mystery Dish" if mystery else P0Logic.dish_label(view, id)
+	var t := _label(title, 15, INK, true)
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.add_child(t)
+	var sub := "Hmm… not a dish. Try another mix." if mystery else "%s%s · +%d Energy" % [["", "Good · ", "Perfect · "][q], P0Logic.rarity_name(view, int(info.get("rarity", 1))), int(info.get("full", 20))]
+	var s2 := _label(sub, 10, INK2, true)
+	s2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.add_child(s2)
+	if int(ev.get("qty", 1)) > 1:
+		var extra := _label("Perfect pot · a second portion", 9, AMBER_D, true)
+		extra.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		card.add_child(extra)
+	for line in xp_lines:
+		var l := _label(str(line), 11, Color("1e9bb0"), true)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		card.add_child(l)
+	var eb := P0Logic.eat_button(view, id)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	var eat := _pill_button(str(eb.text), true)
+	eat.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	eat.disabled = not eb.get("enabled", false)
+	eat.add_theme_font_size_override("font_size", 10)
+	var confirm := str(eb.get("confirm", ""))
+	eat.pressed.connect(func():
+		if confirm != "" and eat.text != confirm:
+			eat.text = confirm
+			return
+		close_modal()
+		command.emit({"type": "eat", "item": id}))
+	row.add_child(eat)
+	var keep := _pill_button("Keep", false)
+	keep.custom_minimum_size = Vector2(70, 32)
+	keep.pressed.connect(close_modal)
+	row.add_child(keep)
+	card.add_child(row)
+	var ml := _label(P0Logic.meal_line(view), 8, INK2)
+	ml.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.add_child(ml)
 
 # ---------------------------------------------------------------- helpers
 func _label(text: String, size: int, color: Color, bold := false) -> Label:

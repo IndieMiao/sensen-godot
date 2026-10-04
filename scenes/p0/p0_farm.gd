@@ -13,6 +13,9 @@ const STALL := Vector3(-0.4, 0, -5.2)
 const BAO := Vector3(-0.4, 0, -5.9)
 const BENCH := Vector3(-5.6, 0, -2.0)
 const HOUSE := Vector3(-5.2, 0, -5.4)
+const POND := Vector3(4.6, 0, -5.0)
+const POND_R := Vector2(2.3, 1.6)
+const STOVE := Vector3(-5.8, 0, 1.2)
 const PITCH := 43.0
 const YAW := 14.5
 const CROP_COLORS := {
@@ -38,6 +41,15 @@ var _seed := ""
 var _mats := {}
 var _shot_t := 0.0
 var _shot_script: Array = []
+var _mode := "farm"
+var _fishing: P0Fishing
+var _cooking: P0Cooking
+var _rod: MeshInstance3D
+var _bobber: MeshInstance3D
+var _line: MeshInstance3D
+var _bob_target := Vector3.ZERO
+var _bob_phase := ""
+var _water: MeshInstance3D
 
 func _ready() -> void:
 	# The map app runs with a transparent window (native map underlay); the P0 farm is an opaque world.
@@ -58,6 +70,9 @@ func _ready() -> void:
 	session.state_changed.connect(_on_state)
 	session.refused.connect(_on_refused)
 	session.connection_failed.connect(func(msg): ui.toast(msg + " · " + session.base_url, 4.0))
+	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
+		P0Fishing.auto_play = true
+		P0Cooking.auto_play = true
 
 # ---------------------------------------------------------------- world
 func _mat(color: Color, rough := 0.9) -> StandardMaterial3D:
@@ -136,6 +151,8 @@ func _build_world() -> void:
 	for i in 3: _box(Vector3(0.55, 0.45, 0.55), STALL + Vector3(-0.8 + i * 0.75, 0.22, -1.45), Color("f0c86a"))
 	_obstacles.append(Rect2(STALL.x - 1.4, STALL.z - 1.9, 2.8, 2.3))
 	_spawn_bao()
+	_build_pond()
+	_build_stove()
 	# plots
 	for id in 30:
 		var col := id % COLS
@@ -172,6 +189,76 @@ func _build_world() -> void:
 	add_child(cam)
 	_focus = player.position + Vector3(1.4, 0, 0.8)
 	_place_camera()
+
+## Willow Pond (FISH-1): soft-gel water with a sand rim, a willow and reeds. Water blocks walking.
+func _build_pond() -> void:
+	var rim := MeshInstance3D.new()
+	var rm := CylinderMesh.new()
+	rm.top_radius = 1.0
+	rm.bottom_radius = 1.0
+	rm.height = 0.05
+	rm.radial_segments = 48
+	rim.mesh = rm
+	rim.scale = Vector3(POND_R.x + 0.45, 1, POND_R.y + 0.45)
+	rim.position = POND + Vector3(0, 0.02, 0)
+	rim.material_override = _mat(Color("e8d4a8"))
+	add_child(rim)
+	_water = MeshInstance3D.new()
+	var wm := CylinderMesh.new()
+	wm.top_radius = 1.0
+	wm.bottom_radius = 1.0
+	wm.height = 0.06
+	wm.radial_segments = 48
+	_water.mesh = wm
+	_water.scale = Vector3(POND_R.x, 1, POND_R.y)
+	_water.position = POND + Vector3(0, 0.04, 0)
+	var water := StandardMaterial3D.new()
+	water.albedo_color = Color(0.45, 0.72, 0.86, 0.88)
+	water.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	water.roughness = 0.15
+	water.metallic_specular = 0.8
+	_water.material_override = water
+	add_child(_water)
+	for i in 3:
+		var ring := MeshInstance3D.new()
+		var tm := TorusMesh.new()
+		tm.inner_radius = 0.28 + i * 0.22
+		tm.outer_radius = 0.31 + i * 0.22
+		ring.mesh = tm
+		ring.position = POND + Vector3(-0.6, 0.08, 0.2)
+		ring.scale = Vector3(1, 0.2, 0.8)
+		ring.material_override = _mat(Color(0.86, 0.95, 1.0))
+		add_child(ring)
+	# willow: trunk + drooping green blobs
+	var willow := POND + Vector3(2.2, 0, -1.4)
+	_box(Vector3(0.35, 1.8, 0.35), willow + Vector3(0, 0.9, 0), Color("8a6544"))
+	for k in 6:
+		var a := TAU * k / 6.0
+		_sphere(self, willow + Vector3(cos(a) * 0.7, 1.9 - (k % 2) * 0.35, sin(a) * 0.6), 0.62, Color("8cc56e") if k % 2 == 0 else Color("7db35e"))
+	_sphere(self, willow + Vector3(0, 2.35, 0), 0.8, Color("95cc76"))
+	_obstacles.append(Rect2(willow.x - 0.4, willow.z - 0.4, 0.8, 0.8))
+	for k in 5:
+		var at := POND + Vector3(-POND_R.x - 0.1 + k * 0.12, 0, 0.9 + k * 0.1)
+		_box(Vector3(0.05, 0.6 + (k % 3) * 0.15, 0.05), at + Vector3(0, 0.3, 0), Color("6f9e5a"))
+
+## Outdoor kitchen (COOK-1, P0 has one stove): brick stove, pot, chimney and a side counter. Tap to cook.
+func _build_stove() -> void:
+	_box(Vector3(1.3, 0.8, 0.9), STOVE + Vector3(0, 0.4, 0), Color("c8775a"))
+	_box(Vector3(1.36, 0.08, 0.96), STOVE + Vector3(0, 0.84, 0), Color("6e5b52"))
+	_box(Vector3(0.3, 1.2, 0.3), STOVE + Vector3(0.45, 1.4, -0.28), Color("b4664c"))
+	var pot := MeshInstance3D.new()
+	var pm := CylinderMesh.new()
+	pm.top_radius = 0.3
+	pm.bottom_radius = 0.24
+	pm.height = 0.3
+	pot.mesh = pm
+	pot.position = STOVE + Vector3(-0.15, 1.03, 0.05)
+	pot.material_override = _mat(Color("4a5560"), 0.4)
+	add_child(pot)
+	_box(Vector3(0.12, 0.12, 0.12), STOVE + Vector3(-0.15, 0.6, 0.46), Color("f0a24a"))
+	_box(Vector3(1.0, 0.75, 0.8), STOVE + Vector3(1.25, 0.37, 0), Color("d9c39a"))
+	_box(Vector3(1.06, 0.06, 0.86), STOVE + Vector3(1.25, 0.77, 0), Color("b98a5e"))
+	_obstacles.append(Rect2(STOVE.x - 0.7, STOVE.z - 0.5, 2.5, 1.0))
 
 func _spawn_bao() -> void:
 	var bao := Avatar.create_rig()
@@ -210,9 +297,17 @@ func _process(dt: float) -> void:
 	if v.is_empty(): return
 	ui.set_view(v)
 	_sync_plots(v)
-	_pick_front(v)
-	ui.set_action(P0Logic.main_action(v, _front, _seed))
+	_mode = "fish" if _pond_d(player.position, 1.7) < 1.0 else "farm"
+	ui.set_mode(_mode)
+	if _mode == "fish":
+		_front = {}
+		_hi.visible = false
+		ui.set_action(P0Logic.fish_action(v, ui.selected_bait))
+	else:
+		_pick_front(v)
+		ui.set_action(P0Logic.main_action(v, _front, _seed))
 	_update_tags(v)
+	_animate_bobber(dt)
 
 func _move(dt: float) -> void:
 	var v := _joy
@@ -220,7 +315,7 @@ func _move(dt: float) -> void:
 	if Input.is_key_pressed(KEY_S): v.y += 1
 	if Input.is_key_pressed(KEY_A): v.x -= 1
 	if Input.is_key_pressed(KEY_D): v.x += 1
-	if v == Vector2.ZERO or ui.has_modal():
+	if v == Vector2.ZERO or ui.has_modal() or _fishing != null or _cooking != null:
 		_play("idle")
 		_idle_s += dt
 		return
@@ -243,8 +338,12 @@ func _move(dt: float) -> void:
 		player.look_at(player.position + _facing, Vector3.UP)
 	_play("run")
 
+func _pond_d(p: Vector3, pad := 0.0) -> float:
+	return Vector2((p.x - POND.x) / (POND_R.x + pad), (p.z - POND.z) / (POND_R.y + pad)).length()
+
 func _blocked(p: Vector3) -> bool:
 	if not ISLAND.grow(-0.4).has_point(Vector2(p.x, p.z)): return true
+	if _pond_d(p, 0.25) < 1.0: return true
 	for r in _obstacles:
 		if r.has_point(Vector2(p.x, p.z)): return true
 	return false
@@ -342,69 +441,238 @@ func _pick_front(v: Dictionary) -> void:
 # ---------------------------------------------------------------- input
 func _on_action(cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "energy_card":
-		var a := P0Logic.main_action(session.current(), _front, _seed)
-		ui.open_energy_card(int(a.get("need", 0)), str(a.get("verb", "Sow ×1")))
+		var a := P0Logic.fish_action(session.current(), ui.selected_bait) if _mode == "fish" else P0Logic.main_action(session.current(), _front, _seed)
+		ui.open_energy_card(int(a.get("need", 0)), "Cast" if _mode == "fish" else str(a.get("verb", "Sow ×1")))
 		return
 	if cmd.is_empty(): return
+	if str(cmd.type) == "cast":
+		if _fishing != null: return
+		_face_pond()
+		session.send(cmd)
+		return
 	_play(AnimPlaceholders.clip_for(str(cmd.type)) if str(cmd.type) in ["sow", "water", "harvest", "till"] else "idle")
 	session.send(cmd)
 
-## Facilities respond to taps only (§10.2.2): Bao (greeting first, p(4)) and the bench (Rest).
+## Facilities respond to taps only (§10.2.2): Bao (greeting first, p(4)), the bench (Rest), the stove (Cook).
 func _on_tap(screen: Vector2) -> void:
-	if ui.has_modal(): return
+	if ui.has_modal() or _fishing != null or _cooking != null: return
 	if cam.unproject_position(BAO + Vector3(0, 1.0, 0)).distance_to(screen) < 60 or cam.unproject_position(STALL + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		ui.open_greeting()
 	elif cam.unproject_position(BENCH + Vector3(0, 0.5, 0)).distance_to(screen) < 50:
 		ui.open_rest_card()
+	elif cam.unproject_position(STOVE + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
+		_open_stove()
+
+## The stove: empty → Cookbook / Experiment; cooking → back to the pot; ready → collect (no taps = Plain).
+func _open_stove() -> void:
+	var st = session.current().get("cooking", {}).get("stove", null)
+	if st == null:
+		ui.open_kitchen()
+	elif float(st.get("ready_in", 0)) <= 0.0:
+		session.send({"type": "collect", "taps": []})
+	else:
+		_watch_pot(st)
+
+func _watch_pot(st: Dictionary) -> void:
+	if _cooking != null: return
+	var v := session.current()
+	var dish = st.get("dish", null)
+	var heats: Array = st.get("heats", [])
+	var teach := not heats.is_empty() and float(heats[0].get("width", 0)) >= 0.5   # the first fire's wide arc (§7.2.4)
+	_cooking = P0Cooking.new(ui, st, P0Logic.item_name(v, str(dish)) if dish != null else "Unknown dish", teach)
+	_cooking.finished.connect(func(taps: Array):
+		_cooking = null
+		session.send({"type": "collect", "taps": taps}))
+	_cooking.left.connect(func():
+		_cooking = null
+		ui.toast("The pot keeps cooking · tap the stove to collect"))
+	ui.root.add_child(_cooking)
+
+func _face_pond() -> void:
+	var to := POND - player.position
+	to.y = 0
+	_facing = to.normalized()
+	player.look_at(player.position + _facing, Vector3.UP)
+	# bobber lands ~1 m inside the water along the facing direction
+	var p := player.position
+	for i in 80:
+		p += _facing * 0.1
+		if _pond_d(p, -0.7) < 1.0: break
+	_bob_target = Vector3(p.x, 0.12, p.z)
+
+func _start_fishing(ev: Dictionary) -> void:
+	_fishing = P0Fishing.new(ui, ev, session.current())
+	_fishing.reel.connect(func(outcome: String):
+		_fishing = null
+		session.send({"type": "reel", "outcome": outcome}))
+	_fishing.phase_changed.connect(func(ph: String): _bob_phase = ph)
+	ui.root.add_child(_fishing)
+	_show_tackle(true)
+
+func _show_tackle(on: bool) -> void:
+	if _rod == null:
+		_rod = MeshInstance3D.new()
+		var cm := CylinderMesh.new()
+		cm.top_radius = 0.015
+		cm.bottom_radius = 0.03
+		cm.height = 2.0
+		_rod.mesh = cm
+		_rod.material_override = _mat(Color("8a6544"))
+		add_child(_rod)
+		_bobber = MeshInstance3D.new()
+		var sm := SphereMesh.new()
+		sm.radius = 0.09
+		sm.height = 0.18
+		_bobber.mesh = sm
+		_bobber.material_override = _mat(Color("e8607a"))
+		add_child(_bobber)
+		_line = MeshInstance3D.new()
+		_line.mesh = ImmediateMesh.new()
+		var lm := StandardMaterial3D.new()
+		lm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		lm.albedo_color = Color(1, 1, 1, 0.9)
+		_line.material_override = lm
+		add_child(_line)
+	_rod.visible = on
+	_bobber.visible = on
+	_line.visible = on
+	if not on: _bob_phase = ""
+
+func _animate_bobber(_dt: float) -> void:
+	if _rod == null or not _rod.visible: return
+	var hand := player.position + _facing * 0.35 + Vector3(0, 1.0, 0)
+	var tip := hand + _facing * 1.3 + Vector3(0, 0.9, 0)
+	_rod.position = (hand + tip) * 0.5
+	_rod.look_at(tip, Vector3.UP if absf((tip - hand).normalized().dot(Vector3.UP)) < 0.99 else Vector3.FORWARD)
+	_rod.rotate_object_local(Vector3.RIGHT, PI * 0.5)
+	var t := Time.get_ticks_msec() / 1000.0
+	var dip := 0.0
+	match _bob_phase:
+		"wait": dip = sin(t * 3.0) * 0.02
+		"bite": dip = -0.08 + sin(t * 18.0) * 0.04
+		"reel": dip = sin(t * 9.0) * 0.05
+	_bobber.position = _bob_target + Vector3(0, dip, 0)
+	var im := _line.mesh as ImmediateMesh
+	im.clear_surfaces()
+	im.surface_begin(Mesh.PRIMITIVE_LINES)
+	im.surface_add_vertex(tip)
+	im.surface_add_vertex(_bobber.position)
+	im.surface_end()
 
 func _update_tags(v: Dictionary) -> void:
-	var near_bao := player.position.distance_to(STALL) < 4.5
+	var busy := _fishing != null or _cooking != null
+	var near_bao := player.position.distance_to(STALL) < 4.5 and not busy
 	ui.tag("bao", "Bao · Tap to talk", cam.unproject_position(BAO + Vector3(0, 2.3, 0)), near_bao, true)
 	var r: Dictionary = v.get("rest", {})
 	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
-	ui.tag("bench", "Rest · used today" if used else "Rest · +60 Energy · once a day", cam.unproject_position(BENCH + Vector3(0, 1.1, 0)), player.position.distance_to(BENCH) < 3.5)
+	ui.tag("bench", "Rest · used today" if used else "Rest · +60 Energy · once a day", cam.unproject_position(BENCH + Vector3(0, 1.1, 0)), player.position.distance_to(BENCH) < 3.5 and not busy)
+	var st = v.get("cooking", {}).get("stove", null)
+	var stove_text := "Stove · Tap to cook"
+	if st != null:
+		stove_text = "Stove · Ready · Tap to collect" if float(st.get("ready_in", 0)) <= 0.0 else "Stove · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))
+	ui.tag("stove", stove_text, cam.unproject_position(STOVE + Vector3(0, 2.1, 0)), (player.position.distance_to(STOVE) < 4.0 or st != null) and not busy, st != null)
 
 # ---------------------------------------------------------------- server results
 func _on_state(v: Dictionary, events: Array) -> void:
+	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
 	var at := cam.unproject_position(player.position + Vector3(0, 2.0, 0))
 	if not _front.is_empty() and _plots.has(int(_front.get("id", -1))):
 		at = cam.unproject_position((_plots[int(_front.id)].pos as Vector3) + Vector3(0, 0.6, 0))
 	var dy := 0.0
+	var xp_lines: Array = []
+	for i in events.size():
+		var ev: Dictionary = events[i]
+		match str(ev.get("kind", "")):
+			"xp":
+				# The server emits a first-time bonus as `first` immediately followed by its `xp`.
+				var bonus: bool = i > 0 and str(events[i - 1].get("kind", "")) == "first" and int(events[i - 1].xp) == int(ev.amount)
+				if int(ev.amount) > 0 and not bonus:
+					xp_lines.append("+%d %s XP" % [int(ev.amount), str(ev.skill).capitalize()] + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)))
+			"first":
+				var what := str(ev.what)
+				if what.begins_with("catch:"): xp_lines.append("First catch! +%d XP" % int(ev.xp))
+				elif what.begins_with("cook:"): xp_lines.append("New recipe! · First cooked · +%d Cooking XP" % int(ev.xp))
+				elif what == "landed": xp_lines.append("First fish landed · +%d XP" % int(ev.xp))
 	for ev in events:
 		match str(ev.get("kind", "")):
 			"energy":
 				var dlt := int(ev.delta)
-				ui.float_text(("%+d Energy" % dlt), at + Vector2(0, dy), Color("d9772f") if dlt < 0 else Color("4f934b"))
+				if str(ev.reason) != "cast":
+					ui.float_text(("%+d Energy" % dlt), at + Vector2(0, dy), Color("d9772f") if dlt < 0 else Color("4f934b"))
+				else:
+					ui.float_text("−%d Energy" % -dlt, at + Vector2(0, dy), Color("d9772f"))
 			"xp":
 				if int(ev.amount) > 0:
 					ui.float_text("+%d XP" % int(ev.amount) + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)), at + Vector2(0, dy), Color("1e9bb0"))
 			"item":
-				if int(ev.delta) > 0 and not str(ev.id).begins_with("seed_"):
-					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, str(ev.id))], at + Vector2(0, dy), Color("4f934b"))
+				var iid := str(ev.id)
+				if int(ev.delta) > 0 and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"):
+					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at + Vector2(0, dy), Color("4f934b"))
 			"coins":
 				ui.float_text("%+d coins" % int(ev.delta), at + Vector2(0, dy), Color("c9962a"))
+			"cast":
+				_start_fishing(ev)
+			"catch":
+				_on_catch(ev, xp_lines)
+			"pot":
+				var st = v.get("cooking", {}).get("stove", null)
+				if st is Dictionary: _watch_pot(st)
+			"dish":
+				var lines := xp_lines.duplicate()
+				ui.queue_card(func(): ui.show_dish(ev, lines))
+			"meal":
+				if int(ev.gain) <= 0:
+					ui.toast("Full belly · Meals reset in " + P0Logic.duration(float(v.get("meals", {}).get("resets_in", 0))) if int(ev.counted) <= 0 and int(ev.nominal) > 0 else "Same dish · no Energy today")
+				else:
+					ui.toast("+%d Energy · Meals today %d/%d" % [int(ev.gain), int(ev.meals), int(ev.cap)])
 			"level":
-				ui.show_level_up(ev)
+				var lv: Dictionary = ev
+				ui.queue_card(func(): ui.show_level_up(lv))
 		dy -= 16.0
-	if ui.has_modal() and events.size() > 0 and _is_stall_open():
+	if ui.modal_kind == "stall" and events.size() > 0:
 		ui.set_view(session.current())
 		ui.open_stall(_stall_bubble(events))
 
+func _on_catch(ev: Dictionary, xp_lines: Array) -> void:
+	_show_tackle(false)
+	match str(ev.result):
+		"landed":
+			var fid := str(ev.fish)
+			var r := int(ev.rarity)
+			var lines := xp_lines.duplicate()
+			ui.queue_card(func(): ui.show_catch(fid, r, lines))
+		"broke_free":
+			var gone: Dictionary = ev
+			ui.queue_card(func(): ui.show_got_away(gone))
+		"escaped":
+			var tail := ""
+			if ev.has("protected_left"): tail = " · protection %d left today" % int(ev.protected_left)
+			ui.toast("It got away · %d Energy back%s" % [int(ev.refund), tail], 3.0)
+		"cancelled":
+			ui.toast("Line in · Energy back")
+
 func _is_stall_open() -> bool:
-	return ui._modal != null and ui._modal.get_child_count() > 1 and ui._modal.get_child(1) is PanelContainer and (ui._modal.get_child(1) as PanelContainer).offset_top <= -500
+	return ui.modal_kind == "stall"
 
 func _stall_bubble(events: Array) -> String:
 	for ev in events:
 		if str(ev.get("kind", "")) == "coins" and int(ev.delta) > 0: return "Thanks! %d coins for those." % int(ev.delta)
-		if str(ev.get("kind", "")) == "item" and int(ev.delta) > 0: return "%d %s — happy sowing." % [int(ev.delta), P0Logic.item_name(session.view, str(ev.id))]
+		if str(ev.get("kind", "")) == "item" and int(ev.delta) > 0:
+			var id := str(ev.id)
+			return "%d %s — %s" % [int(ev.delta), P0Logic.item_name(session.view, id), "good luck at the pond." if id.begins_with("bait_") else "happy sowing."]
 	return ""
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
+		_show_tackle(false)
+		session.send({"type": "reel", "outcome": "escaped"})
+		ui.toast("Creel full · the fish slipped away")
+		return
 	match code:
 		"need_energy":
-			ui.open_energy_card(int(detail.get("need", 0)), "Sow ×1")
+			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else "Sow ×1")
 		"locked":
-			ui.toast("Farming Lv%d · %d XP to go" % [int(detail.get("level", 2)), int(detail.get("xp_to_go", 0))])
+			ui.toast("%s Lv%d · %d XP to go" % [str(detail.get("skill", "farming")).capitalize(), int(detail.get("level", 2)), int(detail.get("xp_to_go", 0))])
 		"no_coins":
 			ui.toast("Need %d more coins" % int(detail.get("need", 0)))
 		"bag_full":
@@ -412,9 +680,27 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"rest_used":
 			ui.toast("Rest used today")
 		"energy_full":
-			ui.toast("Energy full")
+			ui.toast("Energy full · eat later" if str(cmd.get("type", "")) == "eat" else "Energy full")
 		"not_ready":
 			ui.toast("Not ready yet")
+		"creel_full":
+			ui.toast("Creel full · 0 free slots · Sell or cook first")
+		"already_casting":
+			ui.toast("Your line is already in the water")
+		"no_bait":
+			ui.toast("No bait left")
+		"too_early", "no_cast":
+			_show_tackle(false)
+		"stove_busy":
+			ui.toast("The stove is busy · %s left" % P0Logic.duration(float(detail.get("ready_in", 0))))
+		"needs_main":
+			ui.toast("Needs a main ingredient")
+		"not_for_cooking":
+			ui.toast("Not for cooking")
+		"missing_ingredients", "not_enough":
+			ui.toast("Missing ingredients")
+		"sold_out":
+			ui.toast("Sold out today · %d left" % int(detail.get("left", 0)))
 		_:
 			ui.toast("Can't do that (%s)" % code)
 
@@ -425,7 +711,7 @@ func _dev_shot(dt: float) -> void:
 	if path == "": return
 	if _shot_t == 0.0: _shot_script = OS.get_environment("P0_SHOT_STEPS").split(",", false)
 	_shot_t += dt
-	if Time.get_ticks_msec() > 25000: get_tree().quit(2)
+	if Time.get_ticks_msec() > int(OS.get_environment("P0_SHOT_LIMIT_MS") if OS.get_environment("P0_SHOT_LIMIT_MS") != "" else "25000"): get_tree().quit(2)
 	if not _shot_script.is_empty() and _shot_t > 2.0:
 		var step := str(_shot_script[0]).split(":")
 		match step[0]:
@@ -443,11 +729,47 @@ func _dev_shot(dt: float) -> void:
 			"stall":
 				ui.open_stall()
 			"bag":
-				ui.open_bag()
+				ui.open_bag(step[1] if step.size() > 1 else "")
 			"energy":
 				ui.open_energy_card(3, "Sow ×1")
 			"close":
 				ui.close_modal()
+			"goto":
+				player.position = Vector3(float(step[1]), 0, float(step[2]))
+				_focus = player.position
+			"auto":
+				P0Fishing.auto_play = true
+				P0Cooking.auto_play = true
+			"manual":
+				P0Cooking.auto_play = false
+			"kitchen":
+				ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
+			"stove":
+				_open_stove()
+			"put":
+				ui._exp_slots.append(step[1])
+				ui.open_kitchen("experiment")
+			"cook":
+				session.send({"type": "cook", "recipe": step[1]})
+			"send":
+				# send:type=reel|outcome=landed (commas separate steps, so no JSON here)
+				var cmd := {}
+				for pair in ":".join(step.slice(1)).split("|"):
+					var kv := pair.split("=")
+					cmd[kv[0]] = int(kv[1]) if kv[1].is_valid_int() else kv[1]
+				session.send(cmd)
+			"wait":
+				if _shot_t < 2.0 + float(step[1]): return
+			"until":
+				# wait for a state: fishing / cooking / modal / idle
+				var ready := false
+				match step[1]:
+					"bite": ready = _fishing != null and _fishing.phase == "bite"
+					"reel": ready = _fishing != null and _fishing.phase == "reel"
+					"cooking": ready = _cooking != null
+					"modal": ready = ui.has_modal()
+					"idle": ready = _fishing == null and _cooking == null
+				if not ready and _shot_t < 40.0: return
 			"skip":
 				session.dev_skip(int(step[1]))
 		_shot_script.pop_front()

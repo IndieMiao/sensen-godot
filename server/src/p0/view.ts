@@ -63,6 +63,7 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
           can_cook: known && r.in.length <= cookSlots(c, s) && ingredientsFor(c, s, r) !== null,
           today: s.day.cooked[r.id] ?? 0 };
       }),
+      derive: c.cooking.derive,
       tiers: Object.fromEntries(Object.entries(c.cooking.tiers).map(([k, t]) => [k, { energy: t.energy, ms: t.ms, bonus: t.bonus }])),
     },
     meals: { used: s.day.meals, cap: c.cooking.food_cap, resets_in: untilRollover(c, now), eaten: s.day.eaten },

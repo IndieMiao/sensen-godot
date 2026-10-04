@@ -1,6 +1,6 @@
 class_name P0Session
 extends Node
-## P0 milestone-1 connection to the local P0 server (server/tools/p0_server.ts, /v1/p0/*).
+## P0 connection to the local P0 server (server/tools/p0_server.ts, /v1/p0/*).
 ## Server URL: user://p0_server.txt (one line) → else http://127.0.0.1:3110/v1 (Android: adb reverse tcp:3110 tcp:3110).
 ## Player id: user://p0_player.txt, created once. Between responses the view is projected locally (energy ticks, crop timers).
 
@@ -15,6 +15,7 @@ var base_url := DEFAULT_URL
 var player_id := ""
 var view: Dictionary = {}
 var busy := false
+var _queue: Array = []        # commands sent while a request was in flight (reel / collect must never be dropped)
 var _received_ms := 0
 var _refresh_left := REFRESH_S
 
@@ -44,7 +45,9 @@ func refresh() -> void:
 	_request(HTTPClient.METHOD_GET, "/p0/state", {}, {})
 
 func send(cmd: Dictionary) -> void:
-	if busy: return
+	if busy:
+		_queue.append(cmd)
+		return
 	_request(HTTPClient.METHOD_POST, "/p0/commands", cmd, cmd)
 
 func dev_skip(minutes: int) -> void:
@@ -66,6 +69,14 @@ func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> v
 func _on_done(result: int, code: int, _h: PackedStringArray, raw: PackedByteArray, http: HTTPRequest, cmd: Dictionary) -> void:
 	busy = false
 	http.queue_free()
+	if not _queue.is_empty():
+		var next: Dictionary = _queue.pop_front()
+		_request(HTTPClient.METHOD_POST, "/p0/commands", next, next)
+		_handle(result, code, raw, cmd)
+		return
+	_handle(result, code, raw, cmd)
+
+func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code >= 500 or code == 0:
 		connection_failed.emit("Can't reach the farm server")
 		return
