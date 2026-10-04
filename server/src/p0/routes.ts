@@ -46,6 +46,18 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     store.put(s);
     return reply.send({ ok: true, state: viewOf(c, s, clock(s.clock_ms)) });
   });
+  /** Playtests only: set the stored energy (eating, Energy Card and zero-energy states need a low bar). */
+  app.post('/v1/p0/dev/energy', async (req, reply) => {
+    const player = playerOf(req.headers);
+    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const value = Number((req.body as { value?: number } | undefined)?.value);
+    if (!Number.isInteger(value) || value < 0 || value > 1000) return reply.code(400).send({ ok: false, code: 'bad_value' });
+    const s = store.get(player, deps.now());
+    const now = clock(s.clock_ms);
+    s.energy = { value, tick_ms: now };
+    store.put(s);
+    return reply.send({ ok: true, state: viewOf(c, s, now) });
+  });
   app.post('/v1/p0/dev/reset', async (req, reply) => {
     const player = playerOf(req.headers);
     if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });

@@ -76,7 +76,7 @@ func _ready() -> void:
 	_toast = _label("", 11, INK, true)
 	_toast.add_theme_stylebox_override("normal", _box(Color(1, 1, 1, 0.96), 14, EDGE, 1, Vector4(12, 8, 12, 8)))
 	_toast.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_toast.position = Vector2(-150, 104)
+	_toast.position = Vector2(-150, 150)
 	_toast.custom_minimum_size = Vector2(300, 0)
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -596,6 +596,9 @@ func _bao_line() -> String:
 	var ready := 0
 	for p in view.get("plots", []): if str(p.get("state", "")) == "ready": ready += 1
 	if ready > 0: return "Morning! %d plots are ready out there. Radishes sell for %d each." % [ready, radish]
+	for st in _bag_slots():
+		if str(st.id).begins_with("fish_"):
+			return "Nice catch! Fish sell here at full price too — %s, %d each." % [P0Logic.item_name(view, str(st.id)), int(P0Logic.item(view, str(st.id)).get("sell", 0))]
 	return "Morning! Radishes sell for %d each today. Seeds never run out here." % radish
 
 func _bao_answer() -> String:
@@ -612,6 +615,10 @@ func _bao_art(region: Rect2) -> Texture2D:
 
 ## Stall drawer: keeper bar (terracotta) · Buy rows with level gates · Sell your produce (no Sell Tab; produce, no quota).
 func open_stall(bubble := "") -> void:
+	var keep_scroll := 0
+	if modal_kind == "stall" and _modal:
+		var old := _modal.find_child("StallScroll", true, false) as ScrollContainer
+		if old: keep_scroll = old.scroll_vertical   # a rebuild after Buy / Sell stays where the player was
 	var v := _sheet(520, "Bao's Stall · Homestead", "stall")
 	modal_kind = "stall"
 	var kp := PanelContainer.new()
@@ -633,6 +640,7 @@ func open_stall(bubble := "") -> void:
 	kp.add_child(kh)
 	v.add_child(kp)
 	var scroll := ScrollContainer.new()
+	scroll.name = "StallScroll"
 	scroll.custom_minimum_size = Vector2(0, 410)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var list := VBoxContainer.new()
@@ -640,6 +648,7 @@ func open_stall(bubble := "") -> void:
 	list.add_theme_constant_override("separation", 4)
 	scroll.add_child(list)
 	v.add_child(scroll)
+	if keep_scroll > 0: scroll.set_deferred("scroll_vertical", keep_scroll)
 	list.add_child(_label("Buy", 11, INK, true))
 	for row in view.get("stall", {}).get("buy", []):
 		list.add_child(_buy_row(row))
@@ -749,8 +758,14 @@ func show_level_up(ev: Dictionary) -> void:
 	var t := _label("%s Lv %d" % [str(ev.skill).capitalize(), int(ev.level)], 26, GREEN_D, true)
 	card.add_child(t)
 	if int(ev.get("energy", 0)) > 0: card.add_child(_label("+%d Energy" % int(ev.energy), 14, GREEN_D, true))
+	var unlock := P0Logic.unlock_line(view, str(ev.skill), int(ev.level))
+	if unlock != "": card.add_child(_label(unlock, 10, INK, true))
 	for g in ev.get("gifts", []):
-		card.add_child(_label("Level-up gift: %d %s" % [int(g[1]), P0Logic.item_name(view, str(g[0]))], 10, INK, true))
+		var gid := str(g[0])
+		if gid.begins_with("recipe:"):
+			card.add_child(_label("Recipe card: %s" % P0Logic.item_name(view, gid.substr(7)), 10, INK, true))
+		else:
+			card.add_child(_label("Level-up gift: %d %s" % [int(g[1]), P0Logic.item_name(view, gid)], 10, INK, true))
 	var ok := _pill_button("Got it", true)
 	ok.pressed.connect(close_modal)
 	card.add_child(ok)

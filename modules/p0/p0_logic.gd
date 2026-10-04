@@ -276,3 +276,19 @@ static func _token_matches(view: Dictionary, token: String, id: String) -> bool:
 		var info := item(view, id)
 		return str(info.get("family", "")) == token[0] and int(info.get("rarity", 0)) == int(token[1])
 	return token == id
+
+## What a new level opens, in one line (§4.5 / §6.7.2 / §7.2.3).
+static func unlock_line(view: Dictionary, skill: String, level: int) -> String:
+	var names: Array = []
+	match skill:
+		"fishing":
+			for f in view.get("fishing", {}).get("dex", []):
+				if int(f.get("level", 0)) == level: names.append(item_name(view, str(f.id)))
+			if not names.is_empty(): return "Now you can land " + ", ".join(names)
+		"farming":
+			for c in view.get("crops", []):
+				if int(c.get("level", 0)) == level: names.append(plural(item_name(view, str(c.id))))
+			if not names.is_empty(): return "New seeds at Bao's Stall: " + ", ".join(names)
+		"cooking":
+			if level == 4: return "A 3rd pot slot · three-family dishes"
+	return ""
