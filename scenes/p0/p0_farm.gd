@@ -52,6 +52,8 @@ var _line: MeshInstance3D
 var _bob_target := Vector3.ZERO
 var _bob_phase := ""
 var _water: MeshInstance3D
+var _hold_last := {}
+var _hold_t := 0.0
 var _site := "pond"
 
 func _ready() -> void:
@@ -331,7 +333,24 @@ func _process(dt: float) -> void:
 		ui.set_action(P0Logic.main_action(v, _front, _seed))
 	_update_tags(v)
 	_animate_bobber(dt)
+	_hold_repeat(dt)
 	ui.player_screen = cam.unproject_position(player.position + Vector3(0, 1.0, 0))
+
+## Hold-to-repeat (§14.2 "Hold to keep sowing"): the same verb on each new plot in front, never a new verb.
+func _hold_repeat(dt: float) -> void:
+	_hold_t -= dt
+	if not ui.fab_held or _mode != "farm" or ui.has_modal():
+		_hold_last = {}
+		return
+	var a: Dictionary = ui.fab_state()
+	var cmd: Dictionary = a.get("cmd", {})
+	if not a.get("enabled", false) or cmd.is_empty() or str(cmd.get("type", "")) == "energy_card": return
+	if ui.fab_verb == "": ui.fab_verb = str(a.get("verb", ""))   # pressed before reaching a plot: the first verb met sticks
+	if str(a.get("verb", "")) != ui.fab_verb: return
+	if cmd == _hold_last or _hold_t > 0.0 or session.busy: return
+	_hold_last = cmd
+	_hold_t = 0.18
+	_on_action(cmd)
 
 func _move(dt: float) -> void:
 	var v := _joy
@@ -476,6 +495,7 @@ func _on_action(cmd: Dictionary) -> void:
 		session.send(cmd)
 		return
 	_play(AnimPlaceholders.clip_for(str(cmd.type)) if str(cmd.type) in ["sow", "water", "harvest", "till"] else "idle")
+	_hold_last = cmd
 	session.send(cmd)
 
 ## Facilities respond to taps only (§10.2.2): Bao (greeting first, p(4)), the bench (Rest), the stove (Cook).
@@ -592,7 +612,10 @@ func _animate_bobber(_dt: float) -> void:
 func _update_tags(v: Dictionary) -> void:
 	var busy := _fishing != null or _cooking != null
 	var near_bao := player.position.distance_to(STALL) < 4.5 and not busy
-	ui.tag("bao", "Bao · Tap to talk", cam.unproject_position(BAO + Vector3(0, 2.3, 0)), near_bao, true)
+	var board_note := ""
+	for r in v.get("stall", {}).get("board", {}).get("requests", []):
+		if str(r.status) == "open" or (str(r.status) == "accepted" and int(r.have) >= int(r.qty)): board_note = " · !"
+	ui.tag("bao", "Bao · Tap to talk" + board_note, cam.unproject_position(BAO + Vector3(0, 2.3, 0)), near_bao or (board_note != "" and not busy), true)
 	var r: Dictionary = v.get("rest", {})
 	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
 	ui.tag("bench", "Rest · used today" if used else "Rest · +60 Energy · once a day", cam.unproject_position(BENCH + Vector3(0, 1.1, 0)), player.position.distance_to(BENCH) < 3.5 and not busy)
@@ -652,6 +675,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"dish":
 				var lines := xp_lines.duplicate()
 				ui.queue_card(func(): ui.show_dish(ev, lines))
+			"request":
+				if str(ev.status) == "accepted": ui.toast("Tracking · it shows in Today")
+				else: ui.toast("Request complete · +%d coins" % int(ev.coins))
 			"meal":
 				if int(ev.gain) <= 0:
 					ui.toast("Full belly · Meals reset in " + P0Logic.duration(float(v.get("meals", {}).get("resets_in", 0))) if int(ev.counted) <= 0 and int(ev.nominal) > 0 else "Same dish · no Energy today")
@@ -756,10 +782,15 @@ func _dev_shot(dt: float) -> void:
 				return
 			"act":
 				ui._fab_pressed()
+			"hold":
+				ui.fab_held = true
+				ui._fab_pressed()
+			"release":
+				ui.fab_held = false
 			"greet":
 				ui.open_greeting()
 			"stall":
-				ui.open_stall()
+				ui.open_stall("", step[1] if step.size() > 1 else "")
 			"bag":
 				ui.open_bag(step[1] if step.size() > 1 else "")
 			"energy":

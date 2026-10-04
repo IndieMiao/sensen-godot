@@ -31,6 +31,11 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
     rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, now), amount: c.energy.rest_amount },
     stall: {
       keeper: c.stall.keeper,
+      board: {
+        slots: c.requests.slots,
+        requests: s.requests.map(r => ({ ...r, have: count(s.bag, r.item) })),
+        refill_in: Math.max(0, s.created_at + c.requests.refill_h * 3_600_000 - now),
+      },
       buy: c.stall.buy.map(id => {
         const offer = stallOffer(c, id);
         const level = skillLevel(c, s, offer.skill);

@@ -40,6 +40,8 @@ var _fab_icon: TextureRect
 var _fab_verb: Label
 var _fab_sub: Label
 var _fab_state: Dictionary = {}
+var fab_held := false            # §14.2: hold the main action to keep sowing along a row
+var fab_verb := ""
 var _bar_box: HBoxContainer
 var _bar_ids: Array = []
 var selected_seed := ""
@@ -366,8 +368,13 @@ func set_action(a: Dictionary) -> void:
 	_fab.queue_redraw()
 
 func _fab_pressed() -> void:
+	fab_verb = ""
 	if not _fab_state.get("enabled", false) or _modal != null: return
+	fab_verb = str(_fab_state.get("verb", ""))
 	action_pressed.emit(_fab_state.get("cmd", {}))
+
+## While held, the farm repeats the action for each new plot with the same verb.
+func fab_state() -> Dictionary: return _fab_state
 
 # ---------------------------------------------------------------- world tags & floats
 func tag(id: String, text: String, screen: Vector2, show: bool, lit := false) -> void:
@@ -625,12 +632,15 @@ func _bao_art(region: Rect2) -> Texture2D:
 	return at
 
 ## Stall drawer: keeper bar (terracotta) · Buy rows with level gates · Sell your produce (no Sell Tab; produce, no quota).
-func open_stall(bubble := "") -> void:
+var stall_tab := "buy"
+
+func open_stall(bubble := "", tab := "") -> void:
+	if tab != "": stall_tab = tab
 	var keep_scroll := 0
 	if modal_kind == "stall" and _modal:
 		var old := _modal.find_child("StallScroll", true, false) as ScrollContainer
 		if old: keep_scroll = old.scroll_vertical   # a rebuild after Buy / Sell stays where the player was
-	var v := _sheet(520, "Bao's Stall · Homestead", "stall")
+	var v := _sheet(520 if stall_tab == "buy" else 360, "Bao's Stall · Homestead", "stall")
 	modal_kind = "stall"
 	var kp := PanelContainer.new()
 	kp.add_theme_stylebox_override("panel", _box(TERRA, 12, TERRA, 0, Vector4(6, 6, 8, 6)))
@@ -650,9 +660,23 @@ func open_stall(bubble := "") -> void:
 	kh.add_child(kv)
 	kp.add_child(kh)
 	v.add_child(kp)
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 6)
+	var board: Dictionary = view.get("stall", {}).get("board", {})
+	var open_reqs: Array = board.get("requests", []).filter(func(r): return str(r.status) != "done")
+	for t in [["buy", "Buy"], ["board", "Stall Board" + (" · %d" % open_reqs.size() if not open_reqs.is_empty() else "")]]:
+		var tb := _pill_button(str(t[1]), t[0] == stall_tab)
+		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var key := str(t[0])
+		tb.pressed.connect(func(): open_stall("", key))
+		tabs.add_child(tb)
+	v.add_child(tabs)
+	if stall_tab == "board":
+		_board(v, board)
+		return
 	var scroll := ScrollContainer.new()
 	scroll.name = "StallScroll"
-	scroll.custom_minimum_size = Vector2(0, 410)
+	scroll.custom_minimum_size = Vector2(0, 370)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var list := VBoxContainer.new()
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -671,6 +695,56 @@ func open_stall(bubble := "") -> void:
 	if produce.is_empty():
 		list.add_child(_label("Nothing to sell yet — harvest or fish first.", 9, INK2))
 	for id in produce: list.add_child(_sell_row(id))
+
+## Stall Board (FARM-6 tab): request cards with a need tile; Accept tracks it, Deliver pays coins (no XP).
+func _board(v: VBoxContainer, board: Dictionary) -> void:
+	var reqs: Array = board.get("requests", [])
+	for r in reqs:
+		var card := PanelContainer.new()
+		var done := str(r.status) == "done"
+		card.add_theme_stylebox_override("panel", _box(PAPER if not done else Color(1, 1, 1, 0.5), 14, AMBER if str(r.status) == "accepted" else EDGE, 2 if str(r.status) == "accepted" else 1, Vector4(10, 8, 10, 8)))
+		var h := HBoxContainer.new()
+		h.add_theme_constant_override("separation", 10)
+		var tile := _NeedTile.new()
+		tile.custom_minimum_size = Vector2(56, 56)
+		tile.set_meta("pct", minf(1.0, float(r.have) / maxf(1.0, float(r.qty))))
+		tile.set_meta("icon", P0Logic.icon(str(r.item)))
+		h.add_child(tile)
+		var mid := VBoxContainer.new()
+		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		mid.add_theme_constant_override("separation", 1)
+		mid.add_child(_label(str(r.title) + (" · done" if done else ""), 12, INK if not done else INK2, true))
+		var what := P0Logic.item_name(view, str(r.item))   # fish plurals stay as they are ("2 Pond Crucian")
+		if int(r.qty) > 1 and not str(r.item).begins_with("fish_"): what = P0Logic.plural(what)
+		var line := _label("%d %s · %s · %d coins · Deliver here" % [int(r.qty), what, str(r.get("where", "")), int(r.coins)], 8, INK2)
+		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		line.custom_minimum_size = Vector2(150, 0)
+		mid.add_child(line)
+		mid.add_child(_label("%s %d/%d" % [P0Logic.item_name(view, str(r.item)), mini(int(r.have), int(r.qty)), int(r.qty)], 10, INK, true))
+		h.add_child(mid)
+		if not done:
+			var id := str(r.id)
+			var b: Button
+			if str(r.status) == "open":
+				b = _pill_button("Accept", true)
+				b.pressed.connect(func(): command.emit({"type": "accept", "request": id}))
+			elif int(r.have) >= int(r.qty):
+				b = _pill_button("Deliver", true)
+				b.pressed.connect(func(): command.emit({"type": "deliver", "request": id}))
+			else:
+				b = _pill_button("Tracking", false)
+				b.disabled = true
+			b.custom_minimum_size = Vector2(78, 34)
+			h.add_child(b)
+		card.add_child(h)
+		v.add_child(card)
+	for i in maxi(0, int(board.get("slots", 2)) - reqs.filter(func(r): return str(r.status) != "done").size()):
+		var empty := _label("New request in %s" % P0Logic.duration(float(board.get("refill_in", 0))), 10, INK2, true)
+		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		empty.custom_minimum_size = Vector2(0, 56)
+		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		empty.add_theme_stylebox_override("normal", _box(Color(1, 1, 1, 0.3), 14, Color("d9c7a6"), 1, Vector4(8, 6, 8, 6)))
+		v.add_child(empty)
 
 func _buy_row(row: Dictionary) -> Control:
 	var id := str(row.id)
@@ -1406,8 +1480,17 @@ class _Fab extends Control:
 	var ui: P0Ui
 	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
 	func _gui_input(e: InputEvent) -> void:
-		if P0Ui.is_tap(e):
+		# The right thumb is often the second finger (the left one is on the joystick), and only the first
+		# touch is emulated as a mouse — so on touchscreens read touches, on desktop read the mouse.
+		var touch := DisplayServer.is_touchscreen_available()
+		var down: bool = (touch and e is InputEventScreenTouch and e.pressed) or (not touch and P0Ui.is_tap(e))
+		var up: bool = (touch and e is InputEventScreenTouch and not e.pressed) or (not touch and e is InputEventMouseButton and not e.pressed and e.button_index == MOUSE_BUTTON_LEFT)
+		if down:
+			ui.fab_held = true
 			ui._fab_pressed()
+			accept_event()
+		elif up:
+			ui.fab_held = false
 			accept_event()
 	func _draw() -> void:
 		var st: Dictionary = get_meta("state", {})

@@ -100,6 +100,10 @@ static func today_line(view: Dictionary) -> String:
 				best_ms = float(p.get("ready_in", INF))
 				best_crop = str(p.get("crop", ""))
 		if st == "sown": any_sown = true
+	for r in view.get("stall", {}).get("board", {}).get("requests", []):
+		if str(r.get("status", "")) != "accepted": continue
+		if int(r.have) >= int(r.qty): return "%s · Deliver to Bao" % str(r.title)
+		return "%s · %s %d/%d" % [str(r.title), item_name(view, str(r.item)), int(r.have), int(r.qty)]
 	if ready != "": return "%s ready to harvest" % plural(item_name(view, ready))
 	var stove = view.get("cooking", {}).get("stove", null)
 	if stove is Dictionary:

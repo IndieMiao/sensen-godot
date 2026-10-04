@@ -20,7 +20,9 @@ export type P0Command =
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string }
   | { type: 'collect'; taps?: number[] }
-  | { type: 'eat'; item: string };
+  | { type: 'eat'; item: string }
+  | { type: 'accept'; request: string }
+  | { type: 'deliver'; request: string };
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
@@ -128,6 +130,25 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       s.day.rest += 1;
       if (s.energy.value >= max) s.energy.tick_ms = now;
       events.push({ kind: 'energy', delta: gain, reason: 'rest' });
+      break;
+    }
+    case 'accept': case 'deliver': {
+      const req = s.requests.find(r => r.id === String(cmd.request));
+      if (!req) return fail('bad_request');
+      if (req.status === 'done') return fail('request_done');
+      if (cmd.type === 'accept') {
+        if (req.status === 'accepted') return fail('already_accepted');
+        req.status = 'accepted';
+        events.push({ kind: 'request', id: req.id, status: 'accepted', coins: 0 });
+        break;
+      }
+      const have = count(s.bag, req.item);
+      if (have < req.qty) return fail('not_enough', { item: req.item, need: req.qty, have });
+      take(s.bag, req.item, req.qty);
+      s.coins += req.coins;
+      req.status = 'done';
+      events.push({ kind: 'item', id: req.item, delta: -req.qty }, { kind: 'coins', delta: req.coins },
+        { kind: 'request', id: req.id, status: 'done', coins: req.coins });
       break;
     }
     case 'cast': case 'reel': case 'cook': case 'collect': case 'eat': {

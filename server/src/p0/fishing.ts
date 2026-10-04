@@ -12,14 +12,23 @@ export type FishCommand =
 
 const siteFish = (c: P0Content, site: FishSite): Fish[] => site.fish.map(id => fishById(c, id)!).filter(Boolean);
 
-/** §6.1.3 novice protection: bite 1 is a crucian, bites 2–3 are Common, bite 4 at Lv1 is a Fine fish that breaks free. */
+/**
+ * Teaching pins (§14.2.2, the director's reading of §6.1.3): bites 1–3 are Pond Crucian (two of them fill
+ * the Pond Catch request), bite 4 at Fishing Lv1 is a Fine fish that breaks free, and the first baited
+ * bite after Lv2 is a Fine fish that stays on. They only touch the first few bites; weights never change.
+ */
 export function pickFish(c: P0Content, s: P0State, bait: string | null, site: FishSite = c.fishing.sites.pond): Fish {
   const pond = siteFish(c, site);
   const bites = s.fishing.bites;
   const ofRarity = (r: number) => pond.filter(f => f.rarity === r);
-  if (bites === 0) return fishById(c, 'fish_crucian') ?? ofRarity(1)[0];
-  if (bites < 3) { const common = ofRarity(1); return common[Math.floor(draw(s) * common.length)]; }
-  if (bites === 3 && skillLevel(c, s, 'fishing') === 1 && ofRarity(2).length) return ofRarity(2)[0];
+  const crucian = pond.find(f => f.id === 'fish_crucian');
+  if (bites < 3 && crucian) return crucian;
+  const level = skillLevel(c, s, 'fishing');
+  if (bites === 3 && level === 1 && ofRarity(2).length) return ofRarity(2)[0];
+  if (bait && level >= 2 && !s.firsts.includes('baited_bite') && ofRarity(2).length) {
+    s.firsts.push('baited_bite');   // castLine records the pin on the cast so a line-in can hand it back
+    return pond.find(f => f.id === 'fish_perch') ?? ofRarity(2)[0];
+  }
   const shift = bait ? c.fishing.baits[bait]?.shift ?? [] : [];
   const weights = site.weights.map((w, i) => (ofRarity(i + 1).length ? Math.max(0, w + (shift[i] ?? 0)) : 0));
   let roll = draw(s) * weights.reduce((a, b) => a + b, 0);
@@ -44,12 +53,14 @@ export function castLine(c: P0Content, s: P0State, cmd: { bait?: string | null; 
   if (s.energy.value < f.cast_energy) return { code: 'need_energy', detail: energyDetail(c, s, now, f.cast_energy) };
   spendEnergy(c, s, now, f.cast_energy, events, 'cast');
   s.fishing.casts += 1;
+  const pinnedBefore = s.firsts.includes('baited_bite');
   const fish = pickFish(c, s, bait, site);
+  const pin = !pinnedBefore && s.firsts.includes('baited_bite') ? 'baited_bite' : undefined;
   const level = skillLevel(c, s, 'fishing');
   const wait = bait ? f.baits[bait].wait : 1;
   const bite_ms = Math.round((f.bite_min_ms + draw(s) * f.bite_spread_ms) * wait);
   const breaks = fish.level > level ? 'level' : fish.rarity > f.rod.reach ? 'rod' : null;
-  s.cast = { fish: fish.id, site: siteId, at: now, bite_ms, bait, xp_pct: xpPercent(c, level, fish.level), breaks };
+  s.cast = { fish: fish.id, site: siteId, at: now, bite_ms, bait, xp_pct: xpPercent(c, level, fish.level), breaks, ...(pin ? { pin } : {}) };
   events.push({ kind: 'cast', bite_in: bite_ms, rarity: fish.rarity, breaks, bait });
   if (!s.firsts.includes('cast')) {
     s.firsts.push('cast');
@@ -65,7 +76,8 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
   const bitten = now >= cast.at + cast.bite_ms;
   const outcome = String(cmd.outcome ?? '');
   if (outcome === 'cancel' && !bitten) {
-    // Line in before the bite: full refund, bait kept, not a failure (§6.6.1).
+    // Line in before the bite: full refund, bait kept, not a failure (§6.6.1); an unused teaching pin returns.
+    if (cast.pin) s.firsts = s.firsts.filter(f => f !== cast.pin);
     s.cast = null;
     gainEnergy(c, s, now, c.fishing.cast_energy, events, 'line_in', maxEnergy(c, s) + c.energy.bonus_zone);
     events.push({ kind: 'catch', fish: '', rarity: 0, result: 'cancelled', refund: c.fishing.cast_energy });

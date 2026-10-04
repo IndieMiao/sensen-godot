@@ -49,6 +49,8 @@ export interface P0Content {
   };
   goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number }>;
   blessing: { days: number; regen_mult: number; food_bonus: number };
+  /** §9 stall board (P0: the one-time tutorial request in slot 1; slot 2 refills after refill_h). */
+  requests: { slots: number; refill_h: number; tutorial: { id: string; title: string; item: string; qty: number; coins: number; where: string } };
   /** §3.4.8 one-time energy: by rarity (index = rarity − 1) and [count, energy] milestones; may pass max by ≤ max_over. */
   rewards: { first_fish: number[]; first_dish: number[]; cookbook: [number, number][]; fishdex: [number, number][]; max_over: number };
   cooking: {

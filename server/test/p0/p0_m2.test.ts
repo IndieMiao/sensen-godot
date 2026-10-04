@@ -43,11 +43,11 @@ describe('P0 fishing (§6.1–6.7)', () => {
     expect(r.s.fishing.bites).toBe(0);
     expect(r.s.cast).toBeNull();
   });
-  it('bites 2–3 are Common, bite 4 at Lv1 is a Fine fish that breaks free with the level needed', () => {
+  it('bites 1–3 are Pond Crucian, bite 4 at Lv1 is a Fine fish that breaks free with the level needed', () => {
     let s = fresh();
     for (let i = 0; i < 3; i++) {
       const r = fishOnce(s, 'landed', T0 + i * 60 * S);
-      expect(c.fish.find(f => f.id === catchOf(r.ev).fish)!.rarity).toBe(1);
+      expect(catchOf(r.ev).fish).toBe('fish_crucian');
       s = r.s;
     }
     s.skills.fishing = 10; // keep Lv1 for the teaching bite
@@ -118,6 +118,7 @@ describe('P0 fishing (§6.1–6.7)', () => {
     expect(s.cookbook).toContain('dish_herb_grilled_fish');
     const cast = step(s, { type: 'cast', bait: 'bait_worm' }, T0 + 60 * S);
     expect(cast.s.cast!.bite_ms).toBeLessThanOrEqual(2100);
+    expect(cast.s.cast!.fish).toBe('fish_perch'); // pin 3: the first baited bite after Lv2 is a Fine fish
     const done = step(cast.s, { type: 'reel', outcome: 'escaped' }, T0 + 70 * S);
     expect(count(done.s.bag, 'bait_worm')).toBe(2);
   });
@@ -305,5 +306,21 @@ describe('P0 Newcomer Blessing (§3.4.6) and one-time rewards (§3.4.8)', () => 
     r = step(r.s, { type: 'cook', items: ['fish_perch', 'crop_herb'] }, T0 + 10 * S);
     r = step(r.s, { type: 'collect' }, T0 + 41 * S);
     expect(r.ev.find(e => e.kind === 'reward')).toMatchObject({ id: 'first_dish_3', energy: 30 });
+  });
+});
+
+describe('P0 stall board (§14.1.2 tutorial request)', () => {
+  it('Pond Catch: accept, refuse short delivery, deliver 2 crucian for 14 coins once, no XP', () => {
+    let s = fresh();
+    expect(viewOf(c, s, T0).stall.board.requests[0]).toMatchObject({ id: 'req_pond_catch', status: 'open', qty: 2, coins: 14, have: 0 });
+    s = step(s, { type: 'accept', request: 'req_pond_catch' }).s;
+    expect(applyP0(c, s, { type: 'deliver', request: 'req_pond_catch' }, T0)).toMatchObject({ ok: false, code: 'not_enough', detail: { need: 2, have: 0 } });
+    s.bag.push({ id: 'fish_crucian', qty: 3 });
+    const xp = { ...s.skills };
+    const r = step(s, { type: 'deliver', request: 'req_pond_catch' });
+    expect(r.s.coins).toBe(194);
+    expect(count(r.s.bag, 'fish_crucian')).toBe(1);
+    expect(r.s.skills).toEqual(xp);
+    expect(applyP0(c, r.s, { type: 'deliver', request: 'req_pond_catch' }, T0)).toMatchObject({ ok: false, code: 'request_done' });
   });
 });

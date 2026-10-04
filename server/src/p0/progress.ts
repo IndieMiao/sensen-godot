@@ -17,7 +17,8 @@ export type P0Event =
   | { kind: 'pot'; dish: string | null; rarity: number; ms: number }
   | { kind: 'dish'; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number }
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
-  | { kind: 'reward'; id: string; energy: number };
+  | { kind: 'reward'; id: string; energy: number }
+  | { kind: 'request'; id: string; status: 'accepted' | 'done'; coins: number };
 
 export function energyDetail(c: P0Content, s: P0State, now: number, need: number) {
   return { need, have: s.energy.value, next_in: nextTickIn(c, s, now) };
