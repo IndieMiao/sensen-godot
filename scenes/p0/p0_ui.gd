@@ -166,7 +166,7 @@ func _build_hud() -> void:
 	_creel.hide()
 	_creel.mouse_filter = Control.MOUSE_FILTER_STOP
 	_creel.gui_input.connect(func(e: InputEvent):
-		if (e is InputEventMouseButton and e.pressed) or (e is InputEventScreenTouch and e.pressed): open_fishdex())
+		if P0Ui.is_tap(e): open_fishdex())
 	root.add_child(_creel)
 
 func _build_bar() -> void:
@@ -337,7 +337,7 @@ func _slot(seed_id: String) -> Control:
 	col.add_child(row)
 	slot.add_child(col)
 	slot.gui_input.connect(func(e: InputEvent):
-		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+		if P0Ui.is_tap(e):
 			if bar_mode == "fish":
 				# Tapping bait only sets the current bait (0 Energy, nothing consumed); tap again to fish without bait.
 				selected_bait = "" if selected_bait == seed_id else seed_id
@@ -423,7 +423,7 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
 	veil.color = Color(0.184, 0.227, 0.2, dim)
 	veil.gui_input.connect(func(e: InputEvent):
-		if (e is InputEventMouseButton and e.pressed) or (e is InputEventScreenTouch and e.pressed): close_modal())
+		if P0Ui.is_tap(e): close_modal())
 	var holder := Control.new()
 	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -495,7 +495,7 @@ func open_bag(focus := "") -> void:
 			box.add_child(q)
 			cell.add_child(box)
 			cell.gui_input.connect(func(e: InputEvent):
-				if (e is InputEventMouseButton and e.pressed) or (e is InputEventScreenTouch and e.pressed):
+				if P0Ui.is_tap(e):
 					_fill_detail(detail, id))
 		else:
 			cell.add_theme_stylebox_override("panel", _box(Color(1, 1, 1, 0.2), 10, Color("d9c7a6"), 1, Vector4(4, 4, 4, 4)))
@@ -920,7 +920,7 @@ func _experiment(v: VBoxContainer, slots: int) -> void:
 			cell.add_child(box)
 			var idx := i
 			cell.gui_input.connect(func(e: InputEvent):
-				if (e is InputEventMouseButton and e.pressed) or (e is InputEventScreenTouch and e.pressed):
+				if P0Ui.is_tap(e):
 					_exp_slots.remove_at(idx)
 					open_kitchen("experiment"))
 		else:
@@ -1171,6 +1171,11 @@ func show_dish(ev: Dictionary, xp_lines: Array) -> void:
 	card.add_child(ml)
 
 # ---------------------------------------------------------------- helpers
+## One press = one action. Touch is emulated as a left mouse button (project default), so reacting to
+## both InputEventScreenTouch and InputEventMouseButton would fire toggles and commands twice.
+static func is_tap(e: InputEvent) -> bool:
+	return e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT
+
 func _label(text: String, size: int, color: Color, bold := false) -> Label:
 	var l := Label.new()
 	l.text = text
@@ -1306,7 +1311,7 @@ class _Fab extends Control:
 	var ui: P0Ui
 	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
 	func _gui_input(e: InputEvent) -> void:
-		if (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT) or (e is InputEventScreenTouch and e.pressed):
+		if P0Ui.is_tap(e):
 			ui._fab_pressed()
 			accept_event()
 	func _draw() -> void:

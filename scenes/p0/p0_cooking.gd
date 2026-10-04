@@ -117,7 +117,7 @@ func _process(dt: float) -> void:
 		queue_free()
 
 func _gui_input(ev: InputEvent) -> void:
-	var pressed: bool = (ev is InputEventScreenTouch and ev.pressed) or (ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT)
+	var pressed: bool = P0Ui.is_tap(ev)
 	if not pressed or _done: return
 	accept_event()
 	var e := elapsed()
