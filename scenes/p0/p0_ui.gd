@@ -152,6 +152,9 @@ func _build_hud() -> void:
 	var today := PanelContainer.new()
 	today.add_theme_stylebox_override("panel", _box(CARD, 11, EDGE, 1, Vector4(8, 4, 8, 4)))
 	today.position = Vector2(10, 64)
+	today.mouse_filter = Control.MOUSE_FILTER_STOP
+	today.gui_input.connect(func(e: InputEvent):
+		if P0Ui.is_tap(e): open_today())
 	var th := HBoxContainer.new()
 	th.add_child(_label("Today ·", 10, INK, true))
 	_today = _label("Sow your first plot", 10, INK)
@@ -262,7 +265,7 @@ func set_view(v: Dictionary) -> void:
 	var nx = e.get("next_in", null)
 	_hud_regen.text = "Full" if nx == null else "+1 in " + P0Logic.duration(float(nx))
 	_hud_coins.text = str(int(v.get("coins", 0)))
-	_today.text = P0Logic.today_line(v)
+	_today.text = str(P0Logic.today_lines(v)[0])
 	var sk: Dictionary = v.get("skills", {})
 	_avatar.set_meta("farm", _skill_pct(sk.get("farming", {})))
 	_avatar.set_meta("fish", _skill_pct(sk.get("fishing", {})))
@@ -1135,6 +1138,24 @@ func open_radial() -> void:
 		layer.add_child(b)
 	_open_modal(layer, 0.18)
 	modal_kind = "radial"
+
+## Today panel (§14.5): the chip's three lines, facts only.
+func open_today() -> void:
+	var panel := PanelContainer.new()
+	panel.position = Vector2(10, 92)
+	panel.custom_minimum_size = Vector2(240, 0)
+	panel.add_theme_stylebox_override("panel", _box(CARD, 14, EDGE, 1, Vector4(12, 8, 12, 10)))
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 5)
+	v.add_child(_label("TODAY", 8, INK2, true))
+	for line in P0Logic.today_lines(view):
+		var l := _label("• " + str(line), 11, INK, true)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size = Vector2(220, 0)
+		v.add_child(l)
+	panel.add_child(v)
+	_open_modal(panel, 0.12)
+	modal_kind = "today"
 
 ## SKILL-1 (P0 cut): three track cards — level ring, XP and how far to go, what the next level opens —
 ## and the "First times" collection tiles. Opened from the avatar ring.

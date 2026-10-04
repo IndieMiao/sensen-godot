@@ -882,6 +882,8 @@ func _dev_shot(dt: float) -> void:
 				ui.open_gear()
 			"skills":
 				ui.open_skills()
+			"today":
+				ui.open_today()
 			"radial":
 				ui.open_radial()
 			"kitchen":

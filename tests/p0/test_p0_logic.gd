@@ -76,3 +76,9 @@ func test_projection_ticks_energy_and_ripens_crops() -> void:
 	assert_int(int(p.energy.value)).is_equal(200)
 	assert_that(p.energy.next_in).is_null()
 	assert_str(str(p.plots[0].state)).is_equal("ready")
+
+func test_today_panel_orders_now_then_countdown_then_skill() -> void:
+	var v := _view()
+	v["skills"] = {"farming": {"level": 1, "xp": 20, "next": 50}, "fishing": {"level": 1, "xp": 60, "next": 70}}
+	v.plots = [{"state": "growing", "crop": "crop_radish", "ready_in": 4320000}, {"state": "sown", "crop": "crop_carrot"}]
+	assert_that(P0Logic.today_lines(v)).is_equal(["Water 1 sown plot · Free", "Radishes ready in 1h 12m", "Fishing Lv2 in 10 XP"])

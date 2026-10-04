@@ -351,3 +351,48 @@ static func next_line(view: Dictionary, skill: String, level: int) -> String:
 		"cooking":
 			if level == 4: return "Next: Lv4 · 3rd ingredient slot"
 	return "Next: Lv%d · more XP from every new page" % level if skill == "cooking" else "Next: Lv%d" % level
+
+## Today panel (§14.5): up to 3 lines — doable now first, then the shortest countdown, then the skill
+## closest to its next level. Facts only; never "spend your Energy".
+static func today_lines(view: Dictionary) -> Array:
+	var now_lines: Array = []
+	var timed: Array = []    # [ms, text]
+	for r in view.get("stall", {}).get("board", {}).get("requests", []):
+		if str(r.get("status", "")) != "accepted": continue
+		if int(r.have) >= int(r.qty): now_lines.append("%s · Deliver to Bao" % str(r.title))
+		else: now_lines.append("%s · %s %d/%d" % [str(r.title), item_name(view, str(r.item)), int(r.have), int(r.qty)])
+	var ready := {}
+	var sown := 0
+	for p in view.get("plots", []):
+		var st := str(p.get("state", ""))
+		if st == "ready": ready[str(p.crop)] = int(ready.get(str(p.crop), 0)) + 1
+		elif st == "sown": sown += 1
+		elif st == "growing": timed.append([float(p.get("ready_in", 0)), "%s ready in %s" % [plural(item_name(view, str(p.crop))), duration(float(p.get("ready_in", 0)))]])
+	for c in ready: now_lines.append("Harvest %d %s" % [int(ready[c]), plural(item_name(view, str(c))) if int(ready[c]) > 1 else item_name(view, str(c))])
+	if sown > 0: now_lines.append("Water %d sown plot%s · Free" % [sown, "" if sown == 1 else "s"])
+	var stove = view.get("cooking", {}).get("stove", null)
+	if stove is Dictionary:
+		var dish := item_name(view, str(stove.dish)) if stove.get("dish", null) != null else "Your dish"
+		if float(stove.get("ready_in", 0)) <= 0.0: now_lines.append("%s ready at the stove" % dish)
+		else: timed.append([float(stove.ready_in), "%s · %s left at the stove" % [dish, duration(float(stove.ready_in))]])
+	else:
+		var fish := 0
+		for st in view.get("bag", {}).get("slots", []):
+			if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
+		if fish > 0: now_lines.append("%d fish · the stove is free" % fish)
+	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
+	var lines: Array = now_lines.duplicate()
+	for t in timed:
+		if lines.size() < 3 and not lines.has(t[1]): lines.append(t[1])
+	var best := ""
+	var best_gap := 1 << 30
+	for key in ["farming", "fishing", "cooking"]:
+		var sk: Dictionary = view.get("skills", {}).get(key, {})
+		if sk.get("next", null) == null: continue
+		var gap := int(sk.next) - int(sk.get("xp", 0))
+		if gap < best_gap:
+			best_gap = gap
+			best = "%s Lv%d in %d XP" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]
+	if lines.size() < 3 and best != "": lines.append(best)
+	if lines.is_empty(): lines.append("Sow your first plot")
+	return lines.slice(0, 3)
