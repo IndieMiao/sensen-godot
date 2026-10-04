@@ -357,7 +357,13 @@ static func next_line(view: Dictionary, skill: String, level: int) -> String:
 static func today_lines(view: Dictionary) -> Array:
 	var now_lines: Array = []
 	var timed: Array = []    # [ms, text]
+	var farmed := (view.get("firsts", []) as Array).any(func(f): return str(f).begins_with("harvest:")) \
+		or (view.get("plots", []) as Array).any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"])
+	if not farmed: now_lines.append("Sow your first plot")
 	for r in view.get("stall", {}).get("board", {}).get("requests", []):
+		if str(r.get("status", "")) == "open":
+			now_lines.append("%s · %d %s · Stall Board" % [str(r.title), int(r.qty), item_name(view, str(r.item))])
+			continue
 		if str(r.get("status", "")) != "accepted": continue
 		if int(r.have) >= int(r.qty): now_lines.append("%s · Deliver to Bao" % str(r.title))
 		else: now_lines.append("%s · %s %d/%d" % [str(r.title), item_name(view, str(r.item)), int(r.have), int(r.qty)])
