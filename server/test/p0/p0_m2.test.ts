@@ -75,6 +75,24 @@ describe('P0 fishing (§6.1–6.7)', () => {
     const s = step(fresh(), { type: 'cast' }).s;
     expect(applyP0(c, s, { type: 'reel', outcome: 'landed' }, T0 + 100)).toMatchObject({ ok: false, code: 'too_early' });
   });
+  it('Willow Creek (River template) draws mullet and trout; the pond never does; mackerel stays Coast-only', () => {
+    let s = fresh();
+    s.fishing.bites = 10; s.skills.fishing = 480;
+    const seen = { pond: new Set<string>(), river: new Set<string>() };
+    for (const site of ['pond', 'river'] as const) {
+      for (let i = 0; i < 120; i++) {
+        const r = applyP0(c, s, { type: 'cast', site }, T0 + i * 60 * S);
+        if (!r.ok) throw new Error(r.code);
+        seen[site].add(r.state.cast!.fish);
+        s = { ...r.state, cast: null };
+        s.energy.value = 200;
+      }
+    }
+    expect(seen.river.has('fish_trout') && seen.river.has('fish_mullet')).toBe(true);
+    expect(seen.pond.has('fish_trout') || seen.pond.has('fish_mullet')).toBe(false);
+    expect(seen.pond.has('fish_mackerel') || seen.river.has('fish_mackerel')).toBe(false);
+    expect(applyP0(c, fresh(), { type: 'cast', site: 'sea' }, T0)).toMatchObject({ ok: false, code: 'bad_site' });
+  });
   it('the Starter Rod cannot hold Rare fish even at a high level (rod gate after level gate)', () => {
     const s = fresh();
     s.fishing.bites = 50; s.skills.fishing = 1300; // Lv6
@@ -108,10 +126,10 @@ describe('P0 fishing (§6.1–6.7)', () => {
 describe('P0 recipes (§7.2.3 / §7.4.1)', () => {
   it('derives page rarity from ingredient rarity × families', () => {
     expect(c.cooking.recipes.map(r => [r.id, recipeRarity(c, r)])).toEqual([
-      ['dish_grilled_crucian', 1], ['dish_grilled_fish', 1], ['dish_carp_cakes', 1], ['dish_radish_salad', 1],
-      ['dish_veggie_plate', 1], ['dish_carrot_cake', 1], ['dish_herb_grilled_fish', 2], ['dish_fish_soup', 2],
-      ['dish_pan_fried_fish', 2], ['dish_fruit_tea', 2], ['dish_roast_veggies', 2], ['dish_charcoal_fish', 3],
-      ['dish_herb_baked_perch', 3], ['dish_bass_tomato_stew', 3], ['dish_catfish_stew', 3]]);
+      ['dish_grilled_crucian', 1], ['dish_herb_grilled_fish', 2], ['dish_grilled_fish', 1], ['dish_carp_cakes', 1],
+      ['dish_mullet_skewers', 1], ['dish_radish_salad', 1], ['dish_veggie_plate', 1], ['dish_carrot_cake', 1],
+      ['dish_fish_soup', 2], ['dish_pan_fried_fish', 2], ['dish_fruit_tea', 2], ['dish_roast_veggies', 2],
+      ['dish_herb_baked_perch', 3], ['dish_bass_tomato_stew', 3]]);
     expect(deriveRarity(c, [{ family: 'W', rarity: 1 }, { family: 'F', rarity: 1 }, { family: 'S', rarity: 1 }])).toBe(3);
   });
   it('specific pages beat tag pages, fewest wildcards win, otherwise a Mystery Dish', () => {

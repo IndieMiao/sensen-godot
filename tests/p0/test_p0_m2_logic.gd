@@ -27,7 +27,8 @@ func test_cast_states_follow_creel_energy_and_line() -> void:
 	var a := P0Logic.fish_action(v, "bait_worm")
 	assert_str(str(a.verb)).is_equal("Cast")
 	assert_str(str(a.sub)).is_equal("5 Energy")
-	assert_that(a.cmd).is_equal({"type": "cast", "bait": "bait_worm"})
+	assert_that(a.cmd).is_equal({"type": "cast", "bait": "bait_worm", "site": "pond"})
+	assert_str(str(P0Logic.fish_action(v, "", "river").cmd.site)).is_equal("river")
 	v.energy.value = 4
 	assert_that(P0Logic.fish_action(v, "").cmd).is_equal({"type": "energy_card"})
 	v.bag.free = 0

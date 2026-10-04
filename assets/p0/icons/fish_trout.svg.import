@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c0gjpcyn2wvmj"
-path="res://.godot/imported/fish_catfish.svg-66acef514515411b11094162ea99ad41.ctex"
+uid="uid://d3us7knko3pr8"
+path="res://.godot/imported/fish_trout.svg-94f131573be476a793db4a964d712880.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/p0/icons/fish_catfish.svg"
-dest_files=["res://.godot/imported/fish_catfish.svg-66acef514515411b11094162ea99ad41.ctex"]
+source_file="res://assets/p0/icons/fish_trout.svg"
+dest_files=["res://.godot/imported/fish_trout.svg-94f131573be476a793db4a964d712880.ctex"]
 
 [params]
 

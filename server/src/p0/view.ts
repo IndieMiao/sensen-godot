@@ -39,12 +39,14 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
       }),
     },
     fishing: {
-      pond: f.pond.name, rod: f.rod.name, cast_energy: f.cast_energy,
-      cast: s.cast ? { rarity: fishById(c, s.cast.fish)!.rarity, bite_in: Math.max(0, s.cast.at + s.cast.bite_ms - now),
+      sites: Object.fromEntries(Object.entries(f.sites).map(([id, site]) => [id, { name: site.name, template: site.template }])),
+      rod: f.rod.name, rod_reach: f.rod.reach, cast_energy: f.cast_energy,
+      cast: s.cast ? { rarity: fishById(c, s.cast.fish)!.rarity, site: s.cast.site, bite_in: Math.max(0, s.cast.at + s.cast.bite_ms - now),
         hook_ms: f.hook_window_ms, breaks: s.cast.breaks, bait: s.cast.bait } : null,
       protection_left: fishingLevel <= f.protect_max_level ? Math.max(0, f.protect_fails - s.day.fails) : null,
       caught: s.fishing.caught, seen: s.fishing.seen,
-      dex: c.fish.map(fish => ({ id: fish.id, rarity: fish.rarity, level: fish.level, caught: s.fishing.caught[fish.id] ?? 0 })),
+      dex: c.fish.map(fish => ({ id: fish.id, rarity: fish.rarity, level: fish.level, where: fish.where, caught: s.fishing.caught[fish.id] ?? 0,
+        seen: s.fishing.seen.includes(fish.id), cook: fish.cook !== false })),
       baits: Object.keys(f.baits).map(id => ({ id, have: count(s.bag, id) })),
     },
     cooking: {

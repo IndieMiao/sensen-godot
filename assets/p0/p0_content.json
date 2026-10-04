@@ -1,6 +1,6 @@
 {
-  "version": "p0-m2-2026-10-05",
-  "_note": "P0 content (M1 homestead + M2 fish/cook/eat) (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit; M2: §6.1.2–6.1.3 fishing gates and protection, §6.2.2 fish, §6.3.1 pond weights, §6.4 rod/bait, §6.6.1 cast energy, §6.7.1 fishing XP, §7.2.3–7.2.5 cooking, §7.3 ingredient families, §7.4.1 rarity derivation, §7.6.2 cooking XP, §7.14 recipes, §7.17.1 eating). Shared by server/src/p0 and the Godot client (labels only).",
+  "version": "p0-m2b-2026-10-05",
+  "_note": "P0 content (M1 homestead + M2 fish/cook/eat) (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit; M2: §6.1.2–6.1.3 fishing gates and protection, §6.2.2 fish, §6.3.1 pond weights, §6.4 rod/bait, §6.6.1 cast energy, §6.7.1 fishing XP, §7.2.3–7.2.5 cooking, §7.3 ingredient families, §7.4.1 rarity derivation, §7.6.2 cooking XP, §7.14 recipes, §7.17.1 eating). Shared by server/src/p0 and the Godot client (labels only). M2b: P0 fish list (§17.2.1) — Willow Pond (Pond template) and Willow Creek (River template) on the homestead; mackerel is Coast-only (shown in the Fish-dex, not catchable here). Recipes: the 14 pages that need only P0 fish and crops; rock-salt pages (#11, #16, #29, #37) wait for materials.",
   "energy": {
     "max_base": 200,
     "regen_ms": 240000,
@@ -310,28 +310,75 @@
       "name": "Pond Crucian",
       "rarity": 1,
       "level": 1,
-      "price": 3
+      "price": 3,
+      "where": [
+        "pond",
+        "river"
+      ]
     },
     {
       "id": "fish_carp",
       "name": "Common Carp",
       "rarity": 1,
       "level": 1,
-      "price": 4
+      "price": 4,
+      "where": [
+        "pond",
+        "river"
+      ]
+    },
+    {
+      "id": "fish_mullet",
+      "name": "Grey Mullet",
+      "rarity": 1,
+      "level": 1,
+      "price": 4,
+      "where": [
+        "coast",
+        "river"
+      ]
     },
     {
       "id": "fish_perch",
       "name": "River Perch",
       "rarity": 2,
       "level": 2,
-      "price": 7
+      "price": 7,
+      "where": [
+        "river",
+        "pond"
+      ]
     },
     {
       "id": "fish_bass",
       "name": "Largemouth Bass",
       "rarity": 2,
       "level": 2,
-      "price": 7
+      "price": 7,
+      "where": [
+        "pond",
+        "river"
+      ]
+    },
+    {
+      "id": "fish_trout",
+      "name": "Rainbow Trout",
+      "rarity": 2,
+      "level": 2,
+      "price": 8,
+      "where": [
+        "river"
+      ]
+    },
+    {
+      "id": "fish_mackerel",
+      "name": "Mackerel",
+      "rarity": 2,
+      "level": 2,
+      "price": 8,
+      "where": [
+        "coast"
+      ]
     },
     {
       "id": "fish_koi",
@@ -339,28 +386,10 @@
       "rarity": 3,
       "level": 4,
       "price": 13,
-      "cook": false
-    },
-    {
-      "id": "fish_catfish",
-      "name": "Catfish",
-      "rarity": 3,
-      "level": 4,
-      "price": 14
-    },
-    {
-      "id": "fish_sturgeon",
-      "name": "Silver Sturgeon",
-      "rarity": 4,
-      "level": 7,
-      "price": 28
-    },
-    {
-      "id": "fish_eel",
-      "name": "River Eel",
-      "rarity": 4,
-      "level": 9,
-      "price": 30
+      "cook": false,
+      "where": [
+        "pond"
+      ]
     }
   ],
   "fishing": {
@@ -391,25 +420,6 @@
       "name": "Starter Rod",
       "reach": 2
     },
-    "pond": {
-      "name": "Willow Pond",
-      "weights": [
-        60,
-        30,
-        9,
-        1
-      ],
-      "fish": [
-        "fish_crucian",
-        "fish_carp",
-        "fish_perch",
-        "fish_bass",
-        "fish_koi",
-        "fish_catfish",
-        "fish_sturgeon",
-        "fish_eel"
-      ]
-    },
     "baits": {
       "bait_worm": {
         "shift": [
@@ -419,6 +429,43 @@
           0
         ],
         "wait": 0.5
+      }
+    },
+    "sites": {
+      "pond": {
+        "name": "Willow Pond",
+        "template": "Pond",
+        "weights": [
+          60,
+          30,
+          9,
+          1
+        ],
+        "fish": [
+          "fish_crucian",
+          "fish_carp",
+          "fish_perch",
+          "fish_bass",
+          "fish_koi"
+        ]
+      },
+      "river": {
+        "name": "Willow Creek",
+        "template": "River",
+        "weights": [
+          35,
+          40,
+          20,
+          5
+        ],
+        "fish": [
+          "fish_crucian",
+          "fish_carp",
+          "fish_mullet",
+          "fish_perch",
+          "fish_bass",
+          "fish_trout"
+        ]
       }
     }
   },
@@ -560,6 +607,14 @@
         "known": true
       },
       {
+        "id": "dish_herb_grilled_fish",
+        "name": "Herb Grilled Fish",
+        "in": [
+          "W1",
+          "S1"
+        ]
+      },
+      {
         "id": "dish_grilled_fish",
         "name": "Grilled Fish",
         "in": [
@@ -572,6 +627,14 @@
         "in": [
           "fish_carp",
           "fish_carp"
+        ]
+      },
+      {
+        "id": "dish_mullet_skewers",
+        "name": "Mullet Skewers",
+        "in": [
+          "fish_mullet",
+          "fish_mullet"
         ]
       },
       {
@@ -596,14 +659,6 @@
         "in": [
           "crop_carrot",
           "crop_carrot"
-        ]
-      },
-      {
-        "id": "dish_herb_grilled_fish",
-        "name": "Herb Grilled Fish",
-        "in": [
-          "W1",
-          "S1"
         ]
       },
       {
@@ -636,13 +691,6 @@
         ]
       },
       {
-        "id": "dish_charcoal_fish",
-        "name": "Charcoal Fish",
-        "in": [
-          "W3"
-        ]
-      },
-      {
         "id": "dish_herb_baked_perch",
         "name": "Herb Baked Perch",
         "in": [
@@ -656,14 +704,6 @@
         "in": [
           "fish_bass",
           "crop_tomato"
-        ]
-      },
-      {
-        "id": "dish_catfish_stew",
-        "name": "Catfish Stew",
-        "in": [
-          "fish_catfish",
-          "crop_potato"
         ]
       }
     ]

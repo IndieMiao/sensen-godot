@@ -176,11 +176,11 @@ static func dish_label(view: Dictionary, id: String) -> String:
 	return str(info.get("name", item_name(view, id))) + ("" if q == 0 else " " + "★".repeat(q))
 
 ## Main action at the pond (§6.6.1): Cast pre-pays 5; creel full / short energy say why.
-static func fish_action(view: Dictionary, bait: String) -> Dictionary:
+static func fish_action(view: Dictionary, bait: String, site := "pond") -> Dictionary:
 	var f: Dictionary = view.get("fishing", {})
 	var cost := int(f.get("cast_energy", 5))
 	var a := {"icon": "rod", "verb": "Cast", "sub": "%d Energy" % cost, "enabled": true, "amber": false,
-		"cmd": {"type": "cast", "bait": bait if bait != "" else null}, "need": cost}
+		"cmd": {"type": "cast", "bait": bait if bait != "" else null, "site": site}, "need": cost}
 	if f.get("cast", null) != null:
 		return {"icon": "bobber", "verb": "Fishing…", "sub": "Line in the water", "enabled": false, "amber": false, "cmd": {}, "need": 0}
 	if int(view.get("bag", {}).get("free", 1)) < 1:

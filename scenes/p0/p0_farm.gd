@@ -16,6 +16,8 @@ const HOUSE := Vector3(-5.2, 0, -5.4)
 const POND := Vector3(4.6, 0, -5.0)
 const POND_R := Vector2(2.3, 1.6)
 const STOVE := Vector3(-5.8, 0, 1.2)
+const CREEK_Z := 6.25          # Willow Creek runs east–west along the south edge (River template)
+const CREEK_HALF := 0.55
 const PITCH := 43.0
 const YAW := 14.5
 const CROP_COLORS := {
@@ -50,6 +52,7 @@ var _line: MeshInstance3D
 var _bob_target := Vector3.ZERO
 var _bob_phase := ""
 var _water: MeshInstance3D
+var _site := "pond"
 
 func _ready() -> void:
 	# The map app runs with a transparent window (native map underlay); the P0 farm is an opaque world.
@@ -152,6 +155,7 @@ func _build_world() -> void:
 	_obstacles.append(Rect2(STALL.x - 1.4, STALL.z - 1.9, 2.8, 2.3))
 	_spawn_bao()
 	_build_pond()
+	_build_creek()
 	_build_stove()
 	# plots
 	for id in 30:
@@ -241,6 +245,21 @@ func _build_pond() -> void:
 		var at := POND + Vector3(-POND_R.x - 0.1 + k * 0.12, 0, 0.9 + k * 0.1)
 		_box(Vector3(0.05, 0.6 + (k % 3) * 0.15, 0.05), at + Vector3(0, 0.3, 0), Color("6f9e5a"))
 
+## Willow Creek: a shallow stream across the south edge with sandy banks and stepping stones.
+func _build_creek() -> void:
+	_box(Vector3(15.4, 0.05, CREEK_HALF * 2 + 0.7), Vector3(0, 0.02, CREEK_Z), Color("e8d4a8"))
+	var creek := _box(Vector3(15.6, 0.07, CREEK_HALF * 2), Vector3(0, 0.05, CREEK_Z), Color(0.45, 0.72, 0.86))
+	var water := StandardMaterial3D.new()
+	water.albedo_color = Color(0.5, 0.76, 0.88, 0.9)
+	water.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	water.roughness = 0.15
+	creek.material_override = water
+	for k in 7:
+		_box(Vector3(0.9, 0.02, 0.06), Vector3(-6.0 + k * 2.0 + (k % 2) * 0.4, 0.1, CREEK_Z - 0.2 + (k % 3) * 0.2), Color(0.88, 0.96, 1.0))
+	for k in 4:
+		_sphere(self, Vector3(-3.5 + k * 2.6, 0.08, CREEK_Z + 0.75), 0.16, Color("c9c2b0"))
+		_box(Vector3(0.05, 0.55, 0.05), Vector3(-2.6 + k * 2.6, 0.27, CREEK_Z - 0.75), Color("6f9e5a"))
+
 ## Outdoor kitchen (COOK-1, P0 has one stove): brick stove, pot, chimney and a side counter. Tap to cook.
 func _build_stove() -> void:
 	_box(Vector3(1.3, 0.8, 0.9), STOVE + Vector3(0, 0.4, 0), Color("c8775a"))
@@ -297,12 +316,14 @@ func _process(dt: float) -> void:
 	if v.is_empty(): return
 	ui.set_view(v)
 	_sync_plots(v)
-	_mode = "fish" if _pond_d(player.position, 1.7) < 1.0 else "farm"
-	ui.set_mode(_mode)
+	_site = "pond" if _pond_d(player.position, 1.7) < 1.0 else ("river" if player.position.z > CREEK_Z - CREEK_HALF - 1.3 else "")
+	_mode = "fish" if _site != "" else "farm"
+	var site_name := str(v.get("fishing", {}).get("sites", {}).get(_site, {}).get("name", "Willow Pond")) if _site != "" else ""
+	ui.set_mode(_mode, site_name)
 	if _mode == "fish":
 		_front = {}
 		_hi.visible = false
-		ui.set_action(P0Logic.fish_action(v, ui.selected_bait))
+		ui.set_action(P0Logic.fish_action(v, ui.selected_bait, _site))
 	else:
 		_pick_front(v)
 		ui.set_action(P0Logic.main_action(v, _front, _seed))
@@ -344,6 +365,7 @@ func _pond_d(p: Vector3, pad := 0.0) -> float:
 func _blocked(p: Vector3) -> bool:
 	if not ISLAND.grow(-0.4).has_point(Vector2(p.x, p.z)): return true
 	if _pond_d(p, 0.25) < 1.0: return true
+	if p.z > CREEK_Z - CREEK_HALF - 0.3: return true
 	for r in _obstacles:
 		if r.has_point(Vector2(p.x, p.z)): return true
 	return false
@@ -441,7 +463,7 @@ func _pick_front(v: Dictionary) -> void:
 # ---------------------------------------------------------------- input
 func _on_action(cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "energy_card":
-		var a := P0Logic.fish_action(session.current(), ui.selected_bait) if _mode == "fish" else P0Logic.main_action(session.current(), _front, _seed)
+		var a := P0Logic.fish_action(session.current(), ui.selected_bait, _site) if _mode == "fish" else P0Logic.main_action(session.current(), _front, _seed)
 		ui.open_energy_card(int(a.get("need", 0)), "Cast" if _mode == "fish" else str(a.get("verb", "Sow ×1")))
 		return
 	if cmd.is_empty(): return
@@ -489,6 +511,11 @@ func _watch_pot(st: Dictionary) -> void:
 	ui.root.add_child(_cooking)
 
 func _face_pond() -> void:
+	if _site == "river":
+		_facing = Vector3(0, 0, 1)
+		player.look_at(player.position + _facing, Vector3.UP)
+		_bob_target = Vector3(player.position.x, 0.12, CREEK_Z)
+		return
 	var to := POND - player.position
 	to.y = 0
 	_facing = to.normalized()
@@ -742,6 +769,8 @@ func _dev_shot(dt: float) -> void:
 				P0Cooking.auto_play = true
 			"manual":
 				P0Cooking.auto_play = false
+			"dex":
+				ui.open_fishdex()
 			"kitchen":
 				ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
 			"stove":

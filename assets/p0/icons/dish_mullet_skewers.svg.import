@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqjslu2lqb07d"
-path="res://.godot/imported/dish_charcoal_fish.svg-c88f30467fede13807cab1c42bff86f6.ctex"
+uid="uid://bputdnvvv5pil"
+path="res://.godot/imported/dish_mullet_skewers.svg-a84d45c7539bef386203926d855d8e8d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/p0/icons/dish_charcoal_fish.svg"
-dest_files=["res://.godot/imported/dish_charcoal_fish.svg-c88f30467fede13807cab1c42bff86f6.ctex"]
+source_file="res://assets/p0/icons/dish_mullet_skewers.svg"
+dest_files=["res://.godot/imported/dish_mullet_skewers.svg-a84d45c7539bef386203926d855d8e8d.ctex"]
 
 [params]
 

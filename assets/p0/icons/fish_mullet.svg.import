@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c1fc6b5h24yfa"
-path="res://.godot/imported/fish_sturgeon.svg-8200235f78acf009a0763c58c3f44057.ctex"
+uid="uid://dnnx7udlef30"
+path="res://.godot/imported/fish_mullet.svg-bc0aa59fc7513c9f4bbaaf709f76f026.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/p0/icons/fish_sturgeon.svg"
-dest_files=["res://.godot/imported/fish_sturgeon.svg-8200235f78acf009a0763c58c3f44057.ctex"]
+source_file="res://assets/p0/icons/fish_mullet.svg"
+dest_files=["res://.godot/imported/fish_mullet.svg-bc0aa59fc7513c9f4bbaaf709f76f026.ctex"]
 
 [params]
 

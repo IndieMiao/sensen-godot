@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cw63sd00a8eco"
-path="res://.godot/imported/fish_eel.svg-5673beb37e52c4b820879b368276bc4a.ctex"
+uid="uid://08nt33wi5bk4"
+path="res://.godot/imported/fish_mackerel.svg-12daa19f09a7b0c7492ee3afa1dc9bf4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/p0/icons/fish_eel.svg"
-dest_files=["res://.godot/imported/fish_eel.svg-5673beb37e52c4b820879b368276bc4a.ctex"]
+source_file="res://assets/p0/icons/fish_mackerel.svg"
+dest_files=["res://.godot/imported/fish_mackerel.svg-12daa19f09a7b0c7492ee3afa1dc9bf4.ctex"]
 
 [params]
 

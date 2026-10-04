@@ -16,7 +16,8 @@ export interface Crop {
   ingr: [Family, number];
 }
 
-export interface Fish { id: string; name: string; rarity: number; level: number; price: number; cook?: boolean }
+export interface Fish { id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[] }
+export interface FishSite { name: string; template: string; weights: number[]; fish: string[] }
 
 export interface CookTier {
   energy: number; ms: number; heats: number[]; gold: number; spin_ms: number;
@@ -43,7 +44,7 @@ export interface P0Content {
     bite_min_ms: number; bite_spread_ms: number; hook_window_ms: number; stale_ms: number;
     catch_xp: number[]; first_xp: number[]; first_cast_xp: number; first_landed_xp: number;
     rod: { id: string; name: string; reach: number };
-    pond: { name: string; weights: number[]; fish: string[] };
+    sites: Record<string, FishSite>;
     baits: Record<string, { shift: number[]; wait: number }>;
   };
   goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number }>;

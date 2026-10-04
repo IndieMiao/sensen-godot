@@ -10,7 +10,7 @@ export interface BagStack { id: string; qty: number }
 
 /** A line in the water: the fish is drawn when it is cast (§6.1.2), the client only sees its rarity. */
 export interface Cast {
-  fish: string; at: number; bite_ms: number; bait: string | null;
+  fish: string; site: string; at: number; bite_ms: number; bait: string | null;
   xp_pct: number;                       // level difference locked at the bite (§6.7.1)
   breaks: 'level' | 'rod' | null;       // gate failure decided up front, shown after the reel starts
 }
@@ -85,6 +85,7 @@ export function upgradeState(c: P0Content, raw: P0State): P0State {
   s.stove ??= null;
   s.cookbook ??= c.cooking.recipes.filter(r => r.known).map(r => r.id);
   s.fires ??= 0;
+  if (s.cast && !s.cast.site) s.cast.site = 'pond';
   s.v = 2;
   return s;
 }
