@@ -321,3 +321,22 @@ static func blessing_line(view: Dictionary) -> String:
 	if not b is Dictionary: return ""
 	var days := ceili(float(b.get("left", 0)) / 86400000.0)
 	return "Newcomer Blessing · %d day%s left · faster Energy, Meals %d" % [days, "" if days == 1 else "s", int(view.get("meals", {}).get("cap", 300))]
+
+## "Next: Lv3 · Potato, Chamomile seeds" — what the next level of a track opens (§4.5 / §6.7.2 / §7.2.3).
+static func next_line(view: Dictionary, skill: String, level: int) -> String:
+	if level > 10: return "Top level"
+	var parts: Array = []
+	match skill:
+		"farming":
+			for c in view.get("crops", []):
+				if int(c.get("level", 0)) == level: parts.append(item_name(view, str(c.id)))
+			if not parts.is_empty(): return "Next: Lv%d · %s seeds" % [level, ", ".join(parts)]
+		"fishing":
+			for f in view.get("fishing", {}).get("dex", []):
+				if int(f.get("level", 0)) == level: parts.append(item_name(view, str(f.id)))
+			if level == 2: parts.append("Worm Bait")
+			if level == 3: parts.append("Reed Rod")
+			if not parts.is_empty(): return "Next: Lv%d · %s" % [level, ", ".join(parts)]
+		"cooking":
+			if level == 4: return "Next: Lv4 · 3rd ingredient slot"
+	return "Next: Lv%d · more XP from every new page" % level if skill == "cooking" else "Next: Lv%d" % level

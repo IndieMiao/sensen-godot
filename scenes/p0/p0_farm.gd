@@ -821,6 +821,8 @@ func _dev_shot(dt: float) -> void:
 				P0Cooking.auto_play = false
 			"dex":
 				ui.open_fishdex()
+			"skills":
+				ui.open_skills()
 			"radial":
 				ui.open_radial()
 			"kitchen":

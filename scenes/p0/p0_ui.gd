@@ -105,6 +105,9 @@ func _build_hud() -> void:
 	_avatar = _AvatarRing.new()
 	_avatar.position = Vector2(10, 16)
 	_avatar.size = Vector2(37, 37)
+	_avatar.mouse_filter = Control.MOUSE_FILTER_STOP
+	_avatar.gui_input.connect(func(e: InputEvent):
+		if P0Ui.is_tap(e): open_skills())
 	root.add_child(_avatar)
 	var ecard := PanelContainer.new()
 	ecard.add_theme_stylebox_override("panel", _box(CARD, 12, EDGE, 1, Vector4(8, 5, 8, 5)))
@@ -951,6 +954,70 @@ func open_radial() -> void:
 	_open_modal(layer, 0.18)
 	modal_kind = "radial"
 
+## SKILL-1 (P0 cut): three track cards — level ring, XP and how far to go, what the next level opens —
+## and the "First times" collection tiles. Opened from the avatar ring.
+func open_skills() -> void:
+	var v := _sheet(520, "Skills", "xp")
+	modal_kind = "skills"
+	var sk: Dictionary = view.get("skills", {})
+	for key in ["farming", "fishing", "cooking"]:
+		var s: Dictionary = sk.get(key, {})
+		var card := PanelContainer.new()
+		card.add_theme_stylebox_override("panel", _box(PAPER, 14, EDGE, 1, Vector4(10, 8, 10, 8)))
+		var h := HBoxContainer.new()
+		h.add_theme_constant_override("separation", 10)
+		var ring := _NeedTile.new()
+		ring.custom_minimum_size = Vector2(58, 58)
+		ring.set_meta("pct", _skill_pct(s))
+		ring.set_meta("text", "Lv %d" % int(s.get("level", 1)))
+		h.add_child(ring)
+		var mid := VBoxContainer.new()
+		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		mid.add_theme_constant_override("separation", 1)
+		var name_row := HBoxContainer.new()
+		name_row.add_child(_label(key.capitalize(), 13, INK, true))
+		if key == "cooking":
+			var slots := int(view.get("cooking", {}).get("slots", 2))
+			name_row.add_child(_label("  " + "●".repeat(slots) + "○".repeat(maxi(0, 3 - slots)), 11, GREEN_D, true))
+		mid.add_child(name_row)
+		var nxt = s.get("next", null)
+		if nxt == null:
+			mid.add_child(_label("%d XP · top level" % int(s.get("xp", 0)), 9, INK2))
+		else:
+			mid.add_child(_label("%d / %d XP · %d to go" % [int(s.xp), int(nxt), int(nxt) - int(s.xp)], 9, INK2))
+		var nl := _label(P0Logic.next_line(view, key, int(s.get("level", 1)) + 1), 9, AMBER_D, true)
+		nl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		nl.custom_minimum_size = Vector2(200, 0)
+		mid.add_child(nl)
+		h.add_child(mid)
+		card.add_child(h)
+		v.add_child(card)
+	v.add_child(_label("First times", 11, INK, true))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	var firsts: Array = view.get("firsts", [])
+	var crops := firsts.filter(func(f): return str(f).begins_with("harvest:")).size()
+	var dex: Array = view.get("fishing", {}).get("dex", [])
+	var fish := dex.filter(func(d): return int(d.get("caught", 0)) > 0).size()
+	var pages: Array = view.get("cooking", {}).get("cookbook", [])
+	var dishes := pages.filter(func(p): return p.get("cooked", false)).size()
+	for t in [["crop_radish", "Crops", crops, (view.get("crops", []) as Array).size()], ["fish_crucian", "Fish", fish, dex.size()], ["dish_grilled_crucian", "Dishes", dishes, pages.size()]]:
+		var col := VBoxContainer.new()
+		col.add_theme_constant_override("separation", 2)
+		var tile := _NeedTile.new()
+		tile.custom_minimum_size = Vector2(60, 60)
+		tile.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		tile.set_meta("pct", float(t[2]) / maxf(1.0, float(t[3])))
+		tile.set_meta("icon", P0Logic.icon(str(t[0])))
+		col.add_child(tile)
+		var l := _label("%s %d/%d" % [t[1], int(t[2]), int(t[3])], 10, INK, true)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		col.add_child(l)
+		col.custom_minimum_size = Vector2(96, 0)
+		row.add_child(col)
+	v.add_child(row)
+
 # ---------------------------------------------------------------- one-line teaching cards (§14.3)
 const TIPS_PATH := "user://p0_tips.json"
 
@@ -1590,8 +1657,13 @@ class _NeedTile extends Control:
 		draw_circle(c, r, Color("fbf8f1"))
 		draw_arc(c, r, 0, TAU, 64, Color(0.18, 0.23, 0.2, 0.12), 4.0, true)
 		draw_arc(c, r, -PI * 0.5, -PI * 0.5 + TAU * clampf(float(get_meta("pct", 0.0)), 0.0, 1.0), 64, Color("7fc66a"), 4.0, true)
-		var tex: Texture2D = get_meta("icon", null)
+		var tex: Texture2D = get_meta("icon") if has_meta("icon") else null
 		if tex: draw_texture_rect(tex, Rect2(c - Vector2(r, r) * 0.62, Vector2(r, r) * 1.24), false)
+		var text := str(get_meta("text", ""))
+		if text != "":
+			var font := get_theme_default_font()
+			var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+			draw_string(font, c + Vector2(-w * 0.5, 5), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("2f3a33"))
 
 class _EnergyBar extends Control:
 	func _draw() -> void:
