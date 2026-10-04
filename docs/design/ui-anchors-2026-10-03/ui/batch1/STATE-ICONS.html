@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>STATE-ICONS · Status Icons — Farm &amp; Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-state.css">
+</head>
+<!-- STATE-ICONS (2026-10-04): review sheet — one badge language for farm objects (bench / stove / outpost / mailbox / mine / plot),
+     NPC heads and map-pin corners. Pure HTML/CSS/SVG on a cream ground, canvas 1080 x 3000 (taller than the 2400 phone canvas:
+     this is a spec sheet, not a screen). Shared kit.css + icons.svg untouched; badge CSS in ../kit-state.css, glyphs in ../icons-state.svg.
+     A badge spec · B semantic table (14 states, real renders) · C application examples · D rules. -->
+<body style="--canvas-h:3000px;">
+<div class="canvas is-sheet">
+<div class="st-page">
+
+  <!-- ===== head ===== -->
+  <header class="st-head">
+    <div class="st-title">Status Icons — Farm &amp; Map</div>
+    <div class="st-sub">One badge language for scene objects, NPC heads and map pins<span class="zh">农场 / 地图状态图标统一样式表</span></div>
+    <div class="st-meta">STATE-ICONS · v1 · 2026-10-04</div>
+  </header>
+
+  <!-- ===== A · badge spec ===== -->
+  <section class="st-sec">
+    <div class="st-sec-h"><span class="k">A</span><span class="t">Badge spec</span><span class="zh">基础徽标规格</span><span class="r">round · cream #FBF8F1 · 1 px deep edge #8A8070 · no shadow</span></div>
+    <div class="st-sizes">
+      <!-- 56 scene object -->
+      <div class="st-size" style="width:180px">
+        <div class="box"><div class="sb is-avail"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-zz"/></svg></div></div>
+        <div class="st-meas" style="width:56px"></div>
+        <div class="dim">56 · scene object</div>
+        <div class="use">bench · stove · outpost<br>mailbox · mine · plot</div>
+      </div>
+      <!-- 72 NPC head -->
+      <div class="st-size" style="width:160px">
+        <div class="box"><div class="sb sb-72 is-request"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-excl"/></svg></div></div>
+        <div class="st-meas" style="width:72px"></div>
+        <div class="dim">72 · NPC head</div>
+        <div class="use">24 px above the hair<br>! · ? · ♥ only</div>
+      </div>
+      <!-- 56 pin corner on a 96 disc -->
+      <div class="st-size" style="width:230px">
+        <div class="box"><div class="st-disc"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-group"/></svg><div class="sb is-request"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-excl"/></svg></div></div></div>
+        <div class="st-meas" style="width:96px"></div>
+        <div class="dim">56 · map-pin corner</div>
+        <div class="use">top-right of the 96 disc<br>offset −16 / −16 · rim kept</div>
+      </div>
+      <!-- 28 rarity dots -->
+      <div class="st-size" style="width:260px">
+        <div class="box" style="gap:12px"><span class="sb sb-28 is-common"></span><span class="sb sb-28 is-fine"></span><span class="sb sb-28 is-rare"></span><span class="sb sb-28 is-legendary"></span></div>
+        <div class="st-meas" style="width:28px; margin-right:120px"></div>
+        <div class="dim">28 · rarity dot</div>
+        <div class="use">Common · Fine · Rare · Legendary<br>fish &amp; dishes only · 2 px cream rim</div>
+      </div>
+      <!-- countdown anatomy -->
+      <div class="st-size" style="width:190px">
+        <div class="box"><div class="sb-stack">
+          <div class="sb is-count"><svg class="arc" viewBox="0 0 56 56" aria-hidden="true"><circle class="tr" cx="28" cy="28" r="25"/><circle class="fg" cx="28" cy="28" r="25" stroke-dasharray="94 157.08"/></svg><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-clock"/></svg></div>
+          <div class="sb-cap">1h 12m</div>
+        </div></div>
+        <div class="st-meas" style="width:56px"></div>
+        <div class="dim">badge + capsule</div>
+        <div class="use">capsule 28 · 6 px below<br>rim arc 4 px = remaining</div>
+      </div>
+    </div>
+    <div class="st-spec">
+      <div class="li"><span><b>Fill:</b> cream #FBF8F1 when neutral; solid colour only for Ready · Insufficient · Full · Error · New · Event · Gift · Request.</span></div>
+      <div class="li"><span><b>Edge:</b> 1 px, a deeper tone of the fill (cream #8A8070 · green #4F934B · amber #C9962A · grey #B9B5AA). No shadow or gradient.</span></div>
+      <div class="li"><span><b>Glyph:</b> monochrome · 32 px in a 56 badge, 42 px in a 72 · ink #2F3A33 on cream, white on colour, #8A918C on grey.</span></div>
+      <div class="li"><span><b>Rings &amp; arc:</b> state ring 4 px inset 2 (Available, "?") · Deliverable ring 5 px on the rim · progress arc 4 px #5FA85A, shrinks clockwise.</span></div>
+      <div class="li"><span><b>Grey</b> (#DEDBD2 / #8A918C) = wait · done · locked: can't act now, nothing is wrong. <b>Red</b> = hard block only.</span></div>
+      <div class="li"><span><b>Amber</b> serves coins (Sell) and soft blocks (Insufficient · Full); the glyph disambiguates. Badge floats 12 px above its object.</span></div>
+    </div>
+  </section>
+
+  <!-- ===== B · semantic table ===== -->
+  <section class="st-sec">
+    <div class="st-sec-h"><span class="k">B</span><span class="t">State semantics</span><span class="zh">状态语义表</span><span class="r">14 states · real renders at 56 px · one badge per object</span></div>
+    <div class="st-table">
+      <div class="st-row is-head"><span>#</span><span style="text-align:center">Badge</span><span>State</span><span>Colour</span><span>Glyph</span><span>When it appears</span><span>Example</span></div>
+
+      <!-- 1 Available -->
+      <div class="st-row">
+        <span class="no">1</span>
+        <div class="demo"><div class="pair">
+          <div class="sb is-avail"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-zz"/></svg></div>
+          <div class="sb is-avail"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-stove"/></svg></div>
+          <div class="sb is-avail"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-shopbag"/></svg></div>
+        </div></div>
+        <div class="nm">Available<span class="zh">可用</span></div>
+        <div class="col"><span class="sw" style="background:#6CBF73"></span><span>green ring<span class="hex">#6CBF73 · cream fill</span></span></div>
+        <div class="gl">ink glyph: zZ / flame / bag / pick</div>
+        <div class="when">Usable <b>right now</b> (free, or Energy you have). Idle bench / stove / stall / mine.</div>
+        <div class="ex">Rest<span class="q">Tap to cook · Shop</span></div>
+      </div>
+
+      <!-- 2 Ready -->
+      <div class="st-row">
+        <span class="no">2</span>
+        <div class="demo"><div class="pair">
+          <div class="sb is-ready"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></div>
+        </div></div>
+        <div class="nm">Ready<span class="zh">可收取</span></div>
+        <div class="col"><span class="sw" style="background:#6CBF73"></span><span>green fill<span class="hex">#6CBF73 · edge #4F934B</span></span></div>
+        <div class="gl">white ✓</div>
+        <div class="when"><b>Waiting to be collected</b>: grown plot, finished dish, trap with a catch. Tap = collect.</div>
+        <div class="ex">Ready<span class="q">plot · stove · fish trap</span></div>
+      </div>
+
+      <!-- 3 Countdown -->
+      <div class="st-row">
+        <span class="no">3</span>
+        <div class="demo"><div class="pair">
+          <div class="sb-stack"><div class="sb is-count"><svg class="arc" viewBox="0 0 56 56" aria-hidden="true"><circle class="tr" cx="28" cy="28" r="25"/><circle class="fg" cx="28" cy="28" r="25" stroke-dasharray="94 157.08"/></svg><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-clock"/></svg></div><div class="sb-cap">1h 12m</div></div>
+          <div class="sb-stack"><div class="sb is-count"><svg class="arc" viewBox="0 0 56 56" aria-hidden="true"><circle class="tr" cx="28" cy="28" r="25"/><circle class="fg" cx="28" cy="28" r="25" stroke-dasharray="28 157.08"/></svg><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-clock"/></svg></div><div class="sb-cap">0:22</div></div>
+        </div></div>
+        <div class="nm">Countdown<span class="zh">倒计时</span></div>
+        <div class="col"><span class="sw" style="background:#5FA85A"></span><span>primary arc<span class="hex">#5FA85A on cream</span></span></div>
+        <div class="gl">clock + rim arc (remaining)</div>
+        <div class="when">A process <b>you started</b> is running (crop, dish, trap). Arc = remaining; capsule ticks 1/s.</div>
+        <div class="ex">1h 12m<span class="q">0:22 (under 1 h)</span></div>
+      </div>
+
+      <!-- 4 Cooling -->
+      <div class="st-row">
+        <span class="no">4</span>
+        <div class="demo"><div class="sb-stack"><div class="sb is-cool"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-clock"/></svg></div><div class="sb-cap is-grey">back in 1h 12m</div></div></div>
+        <div class="nm">Cooling<span class="zh">冷却中 · not yet</span></div>
+        <div class="col"><span class="sw" style="background:#DEDBD2"></span><span>grey fill<span class="hex">#DEDBD2 · glyph #8A918C</span></span></div>
+        <div class="gl">grey clock, no arc</div>
+        <div class="when"><b>On cooldown</b> after use, or a daily thing not reset yet. Nothing to do but wait.</div>
+        <div class="ex">back in 1h 12m<span class="q">resets in 9h 12m</span></div>
+      </div>
+
+      <!-- 5 Used today / Done -->
+      <div class="st-row">
+        <span class="no">5</span>
+        <div class="demo"><div class="pair">
+          <div class="sb is-done"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></div>
+          <div class="sb-stack"><div class="sb is-done"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></div><div class="sb-cap is-grey">Tea 3/3</div></div>
+        </div></div>
+        <div class="nm">Used today<span class="zh">今日已用 · done</span></div>
+        <div class="col"><span class="sw" style="background:#DEDBD2"></span><span>grey fill<span class="hex">#DEDBD2 · glyph #8A918C</span></span></div>
+        <div class="gl">grey ✓ (+ quota)</div>
+        <div class="when"><b>Daily quota spent</b>; returns at the daily reset, not on a timer. Capsule = quota.</div>
+        <div class="ex">Rest used<span class="q">Tea 3/3 · Mine 2/2</span></div>
+      </div>
+
+      <!-- 6 Locked -->
+      <div class="st-row">
+        <span class="no">6</span>
+        <div class="demo"><div class="pair">
+          <div class="sb is-locked"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg></div>
+          <div class="sb-stack"><div class="sb is-locked"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg></div><div class="sb-cap is-grey">Farming Lv4</div></div>
+        </div></div>
+        <div class="nm">Locked<span class="zh">锁定</span></div>
+        <div class="col"><span class="sw" style="background:#DEDBD2"></span><span>grey fill<span class="hex">#DEDBD2 · glyph #8A918C</span></span></div>
+        <div class="gl">grey lock + gate capsule</div>
+        <div class="when">Gated by <b>skill level / progress</b>. Capsule names the gate; tap still opens the card.</div>
+        <div class="ex">Farming Lv4<span class="q">Cooking Lv4 · Floor 2</span></div>
+      </div>
+
+      <!-- 7 Insufficient -->
+      <div class="st-row">
+        <span class="no">7</span>
+        <div class="demo"><div class="sb-stack"><div class="sb is-short"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-bolt"/></svg></div><div class="sb-cap is-amber">Need 2 Energy</div></div></div>
+        <div class="nm">Insufficient<span class="zh">不足</span></div>
+        <div class="col"><span class="sw" style="background:#E3B341"></span><span>amber fill<span class="hex">#E3B341 · edge #C9962A</span></span></div>
+        <div class="gl">white ⚡ (or coin)</div>
+        <div class="when">Doable, but <b>you lack the price</b> (Energy, coins, item). Soft block; tap shows the fix.</div>
+        <div class="ex">Need 2 Energy<span class="q">Need 4 coins</span></div>
+      </div>
+
+      <!-- 8 Full -->
+      <div class="st-row">
+        <span class="no">8</span>
+        <div class="demo"><div class="pair">
+          <div class="sb-stack"><div class="sb is-full"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-creel"/></svg></div><div class="sb-cap is-amber">Creel full</div></div>
+          <div class="sb-stack"><div class="sb is-full"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-bag"/></svg></div><div class="sb-cap is-amber">Bag full</div></div>
+        </div></div>
+        <div class="nm">Full<span class="zh">已满</span></div>
+        <div class="col"><span class="sw" style="background:#E3B341"></span><span>amber fill<span class="hex">#E3B341 · edge #C9962A</span></span></div>
+        <div class="gl">white creel / bag</div>
+        <div class="when"><b>Container has no room</b> for the result. Collecting pauses until you sell / cook / drop.</div>
+        <div class="ex">Creel full<span class="q">Bag full</span></div>
+      </div>
+
+      <!-- 9 New -->
+      <div class="st-row">
+        <span class="no">9</span>
+        <div class="demo"><div class="sb is-new"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-diamond"/></svg></div></div>
+        <div class="nm">New<span class="zh">新内容</span></div>
+        <div class="col"><span class="sw" style="background:#4FB8C9"></span><span>cyan fill<span class="hex">#4FB8C9 · edge #3A98A8</span></span></div>
+        <div class="gl">white ◆</div>
+        <div class="when">Pin corner only: <b>never-visited</b> pond / outpost, new recipe source. Clears on first visit.</div>
+        <div class="ex">— (no text)<span class="q">pond pin · new outpost</span></div>
+      </div>
+
+      <!-- 10 Request -->
+      <div class="st-row">
+        <span class="no">10</span>
+        <div class="demo"><div class="pair">
+          <div class="sb is-request"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-excl"/></svg></div>
+          <div class="sb is-progress"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-question"/></svg></div>
+        </div></div>
+        <div class="nm">Request<span class="zh">可接委托</span></div>
+        <div class="col"><span class="sw" style="background:#E3B341"></span><span>gold fill<span class="hex">#E3B341 · edge #C9962A</span></span></div>
+        <div class="gl">white ! · cream ? = in progress</div>
+        <div class="when">NPC / outpost has a <b>request you can take</b>. Cream ? = already taken, ask about progress.</div>
+        <div class="ex">— (glyph only)<span class="q">NPC head · outpost pin</span></div>
+      </div>
+
+      <!-- 11 Deliverable -->
+      <div class="st-row">
+        <span class="no">11</span>
+        <div class="demo"><div class="sb is-deliver"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></div></div>
+        <div class="nm">Deliverable<span class="zh">可交付</span></div>
+        <div class="col"><span class="sw" style="background:#6CBF73"></span><span>green ring 5 px<span class="hex">#6CBF73 · cream fill</span></span></div>
+        <div class="gl">green ✓ in a green ring</div>
+        <div class="when">You <b>hold everything a request needs</b> — go hand it in. Outranks Request / New on a pin.</div>
+        <div class="ex">— (glyph only)<span class="q">outpost pin · NPC head</span></div>
+      </div>
+
+      <!-- 12 Event -->
+      <div class="st-row">
+        <span class="no">12</span>
+        <div class="demo"><div class="sb is-event"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-star"/></svg></div></div>
+        <div class="nm">Event<span class="zh">活动</span></div>
+        <div class="col"><span class="sw" style="background:#A98BD6"></span><span>purple fill<span class="hex">#A98BD6 · edge #8B6DBE</span></span></div>
+        <div class="gl">white ★</div>
+        <div class="when">A <b>time-limited event</b> is live there (market day, contest, festival). Lowest map priority.</div>
+        <div class="ex">— (glyph only)<span class="q">pin corner · city bubble</span></div>
+      </div>
+
+      <!-- 13 Gift -->
+      <div class="st-row">
+        <span class="no">13</span>
+        <div class="demo"><div class="sb sb-72 is-gift"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-heart"/></svg></div></div>
+        <div class="nm">Gift<span class="zh">可赠礼</span></div>
+        <div class="col"><span class="sw" style="background:#F2A08A"></span><span>soft red fill<span class="hex">#F2A08A · edge #E07A5F</span></span></div>
+        <div class="gl">white ♥ (72, NPC head only)</div>
+        <div class="when">You carry something this NPC <b>likes</b> and haven't gifted today. Hides after the gift.</div>
+        <div class="ex">— (glyph only)<span class="q">NPC head</span></div>
+      </div>
+
+      <!-- 14 Error / Blocked -->
+      <div class="st-row">
+        <span class="no">14</span>
+        <div class="demo"><div class="sb-stack"><div class="sb is-error"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-cross"/></svg></div><div class="sb-cap is-red">Not for cooking</div></div></div>
+        <div class="nm">Error / Blocked<span class="zh">错误 · 不可用</span></div>
+        <div class="col"><span class="sw" style="background:#E07A5F"></span><span>red fill<span class="hex">#E07A5F · edge #C9634A</span></span></div>
+        <div class="gl">white ✕</div>
+        <div class="when"><b>Hard block</b>: action impossible with the selected item / place. Flashes 1.5 s, then reverts.</div>
+        <div class="ex">Not for cooking<span class="q">Can't plant here</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== C · application examples ===== -->
+  <section class="st-sec">
+    <div class="st-sec-h"><span class="k">C</span><span class="t">In use</span><span class="zh">应用示例</span><span class="r">badge 12 px above the object · capsule 6 px below the badge · pin corner −16 / −16</span></div>
+    <div class="st-apps">
+
+      <!-- row 1: bench · stove · plot · mailbox -->
+      <div class="st-app-row">
+        <div class="st-group"><div class="gh">Bench<span class="zh">长椅三态</span></div>
+          <div class="st-tile"><div class="top"><div class="sb is-avail"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-zz"/></svg></div></div><div class="obj"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-rest"/></svg></div><div class="lb">Rest<span class="s">available · free</span></div></div>
+          <div class="st-tile"><div class="top"><div class="sb is-cool"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-clock"/></svg></div><div class="sb-cap is-grey">back in 1h 12m</div></div><div class="obj is-dim"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-rest"/></svg></div><div class="lb">Cooling<span class="s">after a rest</span></div></div>
+          <div class="st-tile"><div class="top"><div class="sb is-done"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></div></div><div class="obj is-dim"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-rest"/></svg></div><div class="lb">Used today<span class="s">back at reset</span></div></div>
+        </div>
+        <div class="st-group"><div class="gh">Stove<span class="zh">灶口三态</span></div>
+          <div class="st-tile"><div class="top"><div class="sb is-avail"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-stove"/></svg></div></div><div class="obj"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stove-off"/></svg></div><div class="lb">Empty<span class="s">Tap to cook</span></div></div>
+          <div class="st-tile"><div class="top"><div class="sb is-count"><svg class="arc" viewBox="0 0 56 56" aria-hidden="true"><circle class="tr" cx="28" cy="28" r="25"/><circle class="fg" cx="28" cy="28" r="25" stroke-dasharray="58 157.08"/></svg><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-clock"/></svg></div><div class="sb-cap">0:22</div></div><div class="obj"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-kitchen"/></svg></div><div class="lb">Cooking<span class="s">countdown arc</span></div></div>
+          <div class="st-tile"><div class="top"><div class="sb is-ready"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></div></div><div class="obj"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-stew"/></svg></div><div class="lb">Ready<span class="s">tap to plate</span></div></div>
+        </div>
+        <div class="st-group"><div class="gh">Plot<span class="zh">田格</span></div>
+          <div class="st-tile"><div class="top"><div class="sb is-ready"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></div></div><div class="obj"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg></div><div class="lb">Ready<span class="s">harvest</span></div></div>
+        </div>
+        <div class="st-group"><div class="gh">Mailbox<span class="zh">信箱</span></div>
+          <div class="st-tile"><div class="top"><div class="sb is-ready"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></div><div class="sb-cap is-green">×3</div></div><div class="obj"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-obj-mailbox"/></svg></div><div class="lb">3 letters<span class="s">Ready + count</span></div></div>
+        </div>
+      </div>
+
+      <!-- row 2: mine · outpost · map pins -->
+      <div class="st-app-row">
+        <div class="st-group"><div class="gh">Mine entrance<span class="zh">矿口</span></div>
+          <div class="st-tile"><div class="top"><div class="sb is-avail"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-pick"/></svg></div><div class="sb-cap is-green">Run 1/2</div></div><div class="obj"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-obj-mine"/></svg></div><div class="lb">Available<span class="s">1 run left today</span></div></div>
+          <div class="st-tile"><div class="top"><div class="sb is-done"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></div><div class="sb-cap is-grey">2/2</div></div><div class="obj is-dim"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-obj-mine"/></svg></div><div class="lb">Used today<span class="s">2 of 2 runs</span></div></div>
+          <div class="st-tile"><div class="top"><div class="sb is-locked"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg></div><div class="sb-cap is-grey">Floor 2</div></div><div class="obj is-dim"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-obj-mine"/></svg></div><div class="lb">Locked<span class="s">clear Floor 1 first</span></div></div>
+        </div>
+        <div class="st-group"><div class="gh">Outpost<span class="zh">驿站</span></div>
+          <div class="st-tile"><div class="top"><div class="sb is-sell"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-coin"/></svg></div><div class="sb-cap is-amber">Sell 12</div></div><div class="obj"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-stall"/></svg></div><div class="lb">Stall<span class="s">12 items to sell</span></div></div>
+        </div>
+        <div class="st-group"><div class="gh">Map pins<span class="zh">地图角标</span></div>
+          <div class="st-tile is-pin"><div class="top"><div class="st-disc"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-group"/></svg><div class="sb is-request"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-excl"/></svg></div></div></div><div class="lb">Outpost group<span class="s">request to take</span></div></div>
+          <div class="st-tile is-pin"><div class="top"><div class="st-disc is-pond"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-pond"/></svg><div class="sb is-new"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-diamond"/></svg></div></div></div><div class="lb">Pond<span class="s">new · unvisited</span></div></div>
+          <div class="st-tile is-pin"><div class="top"><div class="st-disc is-farm"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-crest"/></svg><div class="sb is-deliver"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></div></div></div><div class="lb">Farm<span class="s">deliverable</span></div></div>
+          <div class="st-tile is-pin"><div class="top"><div class="st-disc is-grey"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-city-grey"/></svg><div class="sb is-locked"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg></div></div></div><div class="lb">Grey city<span class="s">unexplored</span></div></div>
+        </div>
+      </div>
+
+      <!-- row 3: NPC heads · quick bar -->
+      <div class="st-app-row">
+        <div class="st-group"><div class="gh">NPC heads<span class="zh">NPC 头顶 · 72</span></div>
+          <div class="st-tile is-npc"><div class="top"><div class="sb sb-72 is-request"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-excl"/></svg></div></div><div class="st-face"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-face-granny"/></svg></div><div class="lb">Granny<span class="s">new request</span></div></div>
+          <div class="st-tile is-npc"><div class="top"><div class="sb sb-72 is-progress"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-question"/></svg></div></div><div class="st-face"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-face-finn"/></svg></div><div class="lb">Finn<span class="s">request in progress</span></div></div>
+          <div class="st-tile is-npc"><div class="top"><div class="sb sb-72 is-gift"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-heart"/></svg></div></div><div class="st-face"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-face-mei"/></svg></div><div class="lb">Mei<span class="s">gift she likes</span></div></div>
+        </div>
+        <div class="st-group"><div class="gh">Quick bar<span class="zh">快捷栏格</span></div>
+          <div class="st-tile is-slot">
+            <div class="slot is-locked"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-feed-bag"/></svg><div class="name">Fish Feed</div><div class="lock"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><span>Lv5</span></div></div>
+            <div class="lb">Locked slot<span class="s">grey + lock pill "Lv5"</span></div>
+          </div>
+          <div class="st-tile is-slot">
+            <div class="slot is-ghost"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-worm"/></svg></div>
+            <div class="lb">Ghost slot<span class="s">dashed · faint silhouette</span></div>
+          </div>
+        </div>
+        <div class="st-group"><div class="gh">Soft block<span class="zh">不足</span></div>
+          <div class="st-tile" style="width:150px"><div class="top"><div class="sb is-short"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-bolt"/></svg></div><div class="sb-cap is-amber">Need 2 Energy</div></div><div class="obj"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-field"/></svg></div><div class="lb">Water plot<span class="s">tap → card with the fix</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== D · rules ===== -->
+  <section class="st-sec">
+    <div class="st-sec-h"><span class="k">D</span><span class="t">Rules</span><span class="zh">规则条</span></div>
+    <div class="st-rules">
+      <div class="st-rule is-wide"><span class="n">1</span><div><b>≤ 5 map-pin badges on screen.</b> If more qualify, keep the top five by priority
+        <span class="chain">
+          <span class="sb is-deliver"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></span><span class="gt">&gt;</span>
+          <span class="sb is-request"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-excl"/></svg></span><span class="gt">&gt;</span>
+          <span class="sb is-new"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-diamond"/></svg></span><span class="gt">&gt;</span>
+          <span class="sb is-event"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-star"/></svg></span><span class="gt">&gt;</span>
+          <span class="sb is-locked"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg></span>
+        </span>
+        the rest show a plain disc.<span class="zh">同屏 ≤5 个地图角标，按 可交付 &gt; 可接委托 &gt; 新内容 &gt; 活动 &gt; 锁定 取前五</span></div></div>
+      <div class="st-rule"><span class="n">2</span><div><b>Durations, never clock times.</b> <span class="fmt"><span class="sb-cap">0:22</span></span> m:ss under an hour · <span class="fmt"><span class="sb-cap">1h 12m</span></span> h m from one hour · never <span class="fmt"><span class="sb-cap no">14:35</span></span><span class="zh">倒计时一律 "m:ss" 或 "h m"，不显示时刻；1 秒节拍</span></div></div>
+      <div class="st-rule"><span class="n">3</span><div><b>One badge per object</b> — the top state only: Ready &gt; Error &gt; Insufficient / Full &gt; Countdown &gt; Cooling &gt; Locked &gt; Done &gt; Available.<span class="zh">同一物件只显示一个状态徽标</span></div></div>
+      <div class="st-rule"><span class="n">4</span><div><b>Tap the badge = tap the object.</b> Badge and capsule are part of the object's hit area, never a tooltip.<span class="zh">点徽标 = 点物件</span></div></div>
+      <div class="st-rule"><span class="n">5</span><div><b>Not a substitute for the four-line card.</b> Insufficient / Locked still open the card on tap; the badge only says it early.<span class="zh">状态图标不替代四件事卡：不足 / 锁定点开仍弹卡</span></div></div>
+    </div>
+  </section>
+
+  <div class="st-foot"><span>kit.css + icons.svg untouched · this sheet: kit-state.css + icons-state.svg · canvas 1080 × 3000 · Nunito 700 / 800, tabular numerals in capsules</span></div>
+
+</div>
+</div>
+</body>
+</html>

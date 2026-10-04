@@ -1,0 +1,470 @@
+/* ============================================================================
+   kit-farm.css — batch 1 additions by the farm group (2026-10-03).
+   Loaded after ../kit.css by every ui/batch1/*.html page of this group.
+   kit.css and icons.svg are never edited here; new icons live in icons-farm.svg.
+   Scope: review annotations · skeleton frames · floating counters · FAB states
+   · centred modal card (four-line card / zero-energy exits) · Today panel
+   · level-up banner · collapsed quick-bar handle · scaled mini canvases
+   · plot overlay svg · stall drawer rows · teaching cards · misc.
+   ========================================================================== */
+
+/* ---------- neutral pastel ground (skeleton / sheet pages) ---------------- */
+.canvas.is-neutral { background: #EFEAE0; }
+.canvas.is-neutral::before {                   /* faint 80 px grid so the skeleton reads as a wireframe */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(47, 58, 51, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(47, 58, 51, 0.045) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+.sheet-title {                                 /* grey sheet heading (review only) */
+  position: absolute; left: var(--m); right: var(--m); top: var(--y, 300px);
+  font-size: 26px; font-weight: 800; line-height: 32px; color: #6E7B74;
+  letter-spacing: 0.4px;
+}
+.sheet-title .sub { font-weight: 700; color: #8A918C; }
+
+/* ---------- review annotations: thin grey lines + small grey labels ------- */
+.annot { position: absolute; inset: 0; z-index: 9; pointer-events: none; }
+.an-line  { position: absolute; height: 0; border-top: 1px solid rgba(110, 123, 116, 0.8); }
+.an-vline { position: absolute; width: 0; border-left: 1px solid rgba(110, 123, 116, 0.8); }
+.an-line.is-dashed, .an-vline.is-dashed { border-style: dashed; }
+.an-dot { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 4px; background: #6E7B74; }
+.an-label {
+  position: absolute; font-size: 20px; font-weight: 700; line-height: 24px;
+  color: #6E7B74; white-space: nowrap; letter-spacing: 0.2px;
+}
+.an-label.is-right { transform: translateX(-100%); text-align: right; }
+.an-label.is-center { transform: translateX(-50%); text-align: center; }
+.an-label.is-wrap { white-space: normal; width: var(--w, 360px); }
+.an-label.is-red { color: #C85A5A; }
+.an-tick { position: absolute; width: 12px; height: 0; border-top: 1px solid rgba(110, 123, 116, 0.8); margin-left: -6px; }
+
+/* ---------- dashed skeleton frames (HUD-1) --------------------------------- */
+.ghost {
+  position: absolute; border: 2px dashed #B9BDC4; border-radius: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 700; line-height: 26px; color: #8A918C; text-align: center;
+  background: rgba(251, 248, 241, 0.25);
+}
+.ghost.is-round { border-radius: 50%; }
+.ghost.is-solid { border: 1px solid var(--card-edge); background: var(--card); color: var(--ink); font-weight: 800; }
+.ghost .sub { display: block; font-size: 18px; color: #8A918C; font-weight: 700; }
+.zone-soft {                                   /* "joystick may appear here" soft shadow */
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(47, 58, 51, 0.12), rgba(47, 58, 51, 0) 70%);
+}
+
+/* ---------- floating counters over the scene -------------------------------
+   anchored at (--x, --y) centre; cream halo keeps them legible on the diorama */
+.float {
+  position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -50%);
+  z-index: 4; font-size: 30px; font-weight: 800; line-height: 34px; white-space: nowrap; padding: 0 6px;
+  text-shadow: 0 2px 0 rgba(251, 248, 241, 0.95), 0 -2px 0 rgba(251, 248, 241, 0.95),
+    2px 0 0 rgba(251, 248, 241, 0.95), -2px 0 0 rgba(251, 248, 241, 0.95), 0 0 12px rgba(251, 248, 241, 0.95);
+}
+.float.is-cost   { color: #D9772F; }           /* Energy spent */
+.float.is-gain   { color: #4F934B; }           /* item / Energy gained */
+.float.is-xp     { color: #1E9BB0; }           /* XP (cyan) */
+.float.is-big    { font-size: 42px; line-height: 46px; }
+.float.is-small  { font-size: 24px; line-height: 28px; }
+.float.is-sum {                                /* running total: small cream pill */
+  font-size: 26px; line-height: 30px; text-shadow: none;
+  background: rgba(251, 248, 241, 0.94); border: 1px solid var(--card-edge); border-radius: 24px; padding: 8px 20px;
+}
+.float.is-sum.is-cost { color: #D9772F; }
+.float .ic { width: 1em; height: 1em; vertical-align: -0.12em; }
+
+/* ---------- FAB states ------------------------------------------------------ */
+.fab.is-pressed { border-width: 7px; transform: translateY(6px) scale(0.97); background: #EEF6E9; }
+.fab.is-pressed .lbl { letter-spacing: -0.2px; }
+.fab.is-amber { border-color: #C9962A; background: #FFF4D6; }
+.fab.is-amber .sub { color: #B8831C; }
+.fab.is-amber .gear-badge { border-color: #C9962A; }
+.fab.is-amber.is-pressed { background: #FBE9B8; }
+.fab .sub.is-wrap { white-space: normal; text-align: center; font-size: 18px; line-height: 20px; padding: 0 12px; }
+.fab.is-off { background: var(--disabled-bg); border-color: var(--disabled-edge); }
+.fab.is-off .lbl, .fab.is-off .sub { color: var(--disabled-ink); }
+.fab.is-off .ic { filter: grayscale(1); opacity: 0.6; }
+
+/* ---------- energy card extras --------------------------------------------- */
+.energy-card.is-zero .energy-fill { width: 0; }
+.energy-card.is-red .energy-num, .energy-card.is-zero .energy-num { color: var(--energy-red); }
+.energy-card.is-amber .energy-num { color: #B8831C; }
+.bonus-tag { align-self: flex-end; margin: 0 0 6px 4px; font-size: 22px; font-weight: 800; color: #B8831C; }
+.energy-delta {
+  margin-left: 10px; height: 34px; padding: 0 12px; border-radius: 17px;
+  font-size: 22px; font-weight: 800; line-height: 34px; align-self: center;
+  background: rgba(108, 191, 115, 0.18); color: #4F934B;
+}
+.energy-delta.is-cost { background: rgba(224, 122, 95, 0.16); color: #D9772F; }
+
+/* ---------- scene dim variants --------------------------------------------- */
+.scene-dim.is-deep { background: rgba(47, 58, 51, 0.45); }
+
+/* ---------- centred modal card (four-line card · zero-energy exits) ---------
+   width --w (default 940), top --top (default centred). No shadow, 1 px edge. */
+.modal {
+  position: absolute; left: 50%; top: var(--top, 50%); transform: translate(-50%, var(--ty, -50%));
+  width: var(--w, 940px); z-index: 8;
+  background: var(--card-solid); border: 1px solid var(--card-edge); border-radius: 48px;
+  padding: 40px 44px 44px;
+}
+.modal .m-kicker { font-size: 24px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-2); }
+.modal .m-title { font-size: 40px; font-weight: 800; line-height: 48px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.modal .m-title .ic { width: 44px; height: 44px; }
+.modal .m-title .sub { color: var(--ink-2); font-weight: 700; }
+.modal .m-title.is-red { color: var(--energy-red); }
+.modal .m-line { font-size: 30px; font-weight: 700; line-height: 40px; color: var(--ink); margin-top: 10px; }
+.modal .m-line b { font-weight: 800; }
+.modal .m-line .sub { color: var(--ink-2); }
+.modal .m-line .ok { color: var(--primary-deep); }
+.modal .m-btns { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 28px; }
+.modal .m-btns .btn { padding: 0 36px; font-size: 32px; }
+.modal .m-btns .btn .ic { width: 40px; height: 40px; }
+.modal .m-btns.is-col { flex-direction: column; }
+.modal .m-btns.is-col .btn { width: 100%; }
+.modal .m-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0 0; }
+.modal .m-grid .btn-sm { width: 100%; height: 96px; font-size: 26px; border: 2px solid var(--primary-deep); }
+.modal .m-grid .btn-sm .ic { width: 34px; height: 34px; }
+.modal .m-note { margin-top: 18px; font-size: 24px; font-weight: 700; line-height: 30px; color: var(--ink-2); }
+.modal .m-side { display: flex; gap: 32px; align-items: center; }
+.modal .m-side .lines { flex: 1 1 auto; min-width: 0; }
+.btn.is-expanded { background: linear-gradient(to bottom, var(--primary-deep) 0%, var(--primary-edge) 100%); }
+.btn .chev { width: 32px; height: 32px; color: inherit; }
+
+/* ---------- zero-energy card v2 (HUD-3 · review redo 2026-10-04) ------------
+   Card 920 · r 40 · cream · 1 px edge · no shadow. The middle is information, not
+   buttons: "RECOVER" group label + collapse chevron + hairline · plain "Wait" line
+   (clock + grey text) · 2 × 2 info tiles (40 px icon disc · bold label · tabular
+   value pill; no border-ish, no arrows, not tappable). The only button is
+   "Free to do now": one primary pill at the bottom that closes the card. */
+.modal.is-zero { border-radius: 40px; padding: 40px 44px 40px; }
+.zc-group { margin-top: 30px; }
+.zc-head { display: flex; align-items: center; justify-content: space-between; height: 40px; }
+.zc-head .zc-label { font-size: 24px; font-weight: 800; line-height: 40px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--ink-2); }
+.zc-head .chev { width: 32px; height: 32px; color: var(--ink-2); transform: rotate(180deg); }   /* expanded → points up */
+.zc-rule { height: 0; border-top: 1px solid var(--card-edge); margin-top: 8px; }
+.zc-info {
+  display: flex; align-items: center; gap: 12px; margin-top: 16px;
+  font-size: 26px; font-weight: 700; line-height: 34px; color: var(--ink-2);
+}
+.zc-info .ic { width: 30px; height: 30px; color: var(--ink-2); }
+.zc-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+.zc-tile {
+  height: 100px; border-radius: 20px; background: #F3F1EA; border: 1px solid rgba(225, 218, 200, 0.55);
+  padding: 0 16px 0 18px; display: flex; align-items: center; gap: 14px; min-width: 0;
+}
+.zc-tile .zc-ic {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%;
+  background: #FFFFFF; border: 1px solid rgba(47, 58, 51, 0.14);
+  display: flex; align-items: center; justify-content: center;
+}
+.zc-tile .zc-ic .ic { width: 26px; height: 26px; }
+.zc-tile .zc-name { flex: 1 1 auto; min-width: 0; font-size: 28px; font-weight: 800; line-height: 34px; }
+.zc-tile .zc-val {
+  flex: 0 0 auto; height: 44px; padding: 0 16px; border-radius: 22px;
+  background: rgba(47, 58, 51, 0.07); color: var(--ink);
+  font-size: 23px; font-weight: 800; line-height: 44px; white-space: nowrap;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.2px;
+}
+.zc-foot { margin-top: 30px; display: flex; flex-direction: column; align-items: center; }
+.zc-foot .btn { width: 100%; font-size: 34px; }
+.zc-hint { margin-top: 12px; font-size: 22px; font-weight: 700; line-height: 26px; color: var(--ink-2); }
+
+/* inset small card (Row Hoe variant etc.) */
+.inset {
+  position: absolute; right: var(--m); top: var(--top, 290px);
+  width: var(--w, 460px); height: var(--h, 300px); z-index: 7;
+  background: var(--card); border: 1px solid var(--card-edge); border-radius: 40px;
+}
+.inset .cap { position: absolute; left: 24px; top: 18px; font-size: 20px; font-weight: 800; color: var(--ink-2); letter-spacing: 0.4px; }
+.inset .fab { left: 24px; top: 62px; right: auto; bottom: auto; transform: scale(0.72); transform-origin: 0 0; }
+.inset .lines { position: absolute; left: 170px; right: 24px; top: 70px; }
+.inset .lines .m-line { font-size: 24px; line-height: 32px; margin-top: 4px; font-weight: 700; }
+.inset .lines .m-line b { font-weight: 800; }
+.inset .mini-plots { position: absolute; left: 170px; top: 60px; width: 270px; height: 200px; }
+
+/* ---------- Today panel (HUD-4): under the Today chip at y 272 -------------- */
+/* long chip text ("Deliver 4 Fine fish · Shanghai Market"): 25 px so more of it survives beside the place chip (kit still ellipsizes) */
+.today.is-long { padding: 0 18px 0 20px; gap: 10px; }
+.today.is-long .today-text { font-size: 25px; letter-spacing: -0.2px; }
+.today.is-open { border: 2px solid var(--primary-deep); }
+.today.is-open .chev { transform: rotate(180deg); color: var(--primary-deep); }
+.today-panel {
+  position: absolute; left: var(--m); top: 272px; width: 1020px; z-index: 5;
+  background: var(--card); border: 1px solid var(--card-edge); border-radius: 40px; padding: 6px 20px;
+}
+.tp-row { height: 112px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--card-edge); }
+.tp-row:last-child { border-bottom: 0; }
+.tp-row .thumb {
+  flex: 0 0 auto; width: 72px; height: 72px; border-radius: 50%;
+  background: #F1EADA; border: 1px solid var(--card-edge); display: flex; align-items: center; justify-content: center;
+}
+.tp-row .thumb .ic { width: 46px; height: 46px; }
+.tp-row .t { flex: 1 1 auto; min-width: 0; font-size: 28px; font-weight: 800; line-height: 34px; }
+.tp-row .t .sub { color: var(--ink-2); font-weight: 700; }
+.tp-row .t .faint { color: var(--disabled-ink); font-weight: 700; font-size: 24px; }
+.tp-row .btn-sm { height: 84px; min-width: 0; padding: 0 26px; font-size: 24px; border: 2px solid var(--primary-deep); }
+.tp-row .btn-sm .ic { width: 30px; height: 30px; }
+.tp-row.is-done { opacity: 0.45; }
+.tp-row.is-done .t { text-decoration: line-through; }
+
+/* ---------- level-up banner (SKILL-3) -------------------------------------- */
+.banner {
+  position: absolute; left: 0; right: 0; top: var(--top, 680px); z-index: 8;
+  background: rgba(251, 248, 241, 0.96); border-top: 1px solid var(--card-edge); border-bottom: 1px solid var(--card-edge);
+  padding: 52px 60px 56px; text-align: center;
+}
+.banner .b-kicker { font-size: 26px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--primary-deep); }
+.banner.is-fish .b-kicker { color: #3F7DB8; }
+.banner.is-cook .b-kicker { color: #C9634A; }
+.banner .b-title { font-size: 108px; font-weight: 800; line-height: 116px; margin-top: 6px; letter-spacing: -1px; }
+.banner.is-fish .b-title { color: #3F7DB8; }
+.banner.is-cook .b-title { color: #C9634A; }
+.banner.is-farm .b-title { color: var(--primary-edge); }
+.banner .b-title.is-mid { font-size: 80px; line-height: 90px; }
+.banner .b-line { font-size: 34px; font-weight: 800; line-height: 44px; margin-top: 14px; }
+.banner .b-energy {
+  display: inline-flex; align-items: center; gap: 10px; margin-top: 16px;
+  font-size: 44px; font-weight: 800; line-height: 50px; color: #4F934B;
+}
+.banner .b-energy .ic { width: 44px; height: 44px; }
+.banner .b-tip { font-size: 26px; font-weight: 700; color: var(--ink-2); line-height: 34px; margin-top: 20px; }
+.banner .b-gift {
+  margin-top: 24px; display: inline-flex; align-items: center; gap: 14px; height: 72px; padding: 0 28px;
+  border-radius: 36px; background: #FFF4D6; border: 1px solid #E3B341; font-size: 28px; font-weight: 800;
+}
+.banner .b-gift .ic { width: 40px; height: 40px; }
+.banner .b-btn { margin-top: 24px; display: flex; justify-content: center; }
+.banner .b-btn .btn { min-width: 420px; }
+.banner .b-next { margin-top: 18px; font-size: 22px; font-weight: 700; color: var(--ink-2); }
+.banner .b-skip { position: absolute; right: 40px; top: 28px; font-size: 22px; font-weight: 700; color: var(--ink-2); }
+.slot.is-flash { border: 3px solid #E3B341; box-shadow: 0 0 0 8px rgba(227, 179, 65, 0.30), 0 0 36px 10px rgba(227, 179, 65, 0.70); }
+.mini-banner {                                 /* 1.5 s small banner (not full width) */
+  position: absolute; left: 50%; top: var(--top, 1180px); transform: translateX(-50%);
+  height: 96px; padding: 0 36px; border-radius: 48px; z-index: 8;
+  display: inline-flex; align-items: center; gap: 16px; white-space: nowrap;
+  background: rgba(251, 248, 241, 0.96); border: 2px solid #C9634A; font-size: 32px; font-weight: 800; color: #C9634A;
+}
+.mini-banner .sub { color: var(--ink); }
+.mini-banner .ic { width: 44px; height: 44px; }
+
+/* ---------- collapsed quick-bar handle (no action selected) ---------------- */
+.handle {
+  position: absolute; left: 50%; bottom: var(--bar-bottom); transform: translateX(-50%);
+  width: 280px; height: 96px; border-radius: 48px; z-index: 6;
+  background: var(--card); border: 1px solid var(--card-edge);
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.handle .ic { width: 56px; height: 56px; }
+.handle .grip { width: 96px; height: 10px; border-radius: 5px; background: #B9BDC4; }
+
+/* quick bar: ghost slot WITH a hint line (BAR-1 "Tap to pick a seed") */
+.slot.is-ghost.has-hint .slot-icon { top: 14px; left: 50%; transform: translateX(-50%); width: 56px; height: 56px; }
+.slot.is-ghost.has-hint .hint { display: block; bottom: 12px; font-size: 20px; line-height: 23px; }
+.slot.is-pressed { transform: translateY(2px) scale(0.96); border: 3px solid var(--card-edge-2); }
+/* pinned slot (.slot.is-pinned) and the long-press menu (.lp-menu / .lp-row / .lp-note)
+   now live in shared kit.css (2026-10-04 pin-state v2) */
+.bag .new-dot { position: absolute; top: 12px; right: 12px; width: 22px; height: 22px; border-radius: 11px; background: var(--energy-red); border: 2px solid var(--card-solid); box-shadow: 0 0 0 6px rgba(224, 122, 95, 0.25); }
+
+/* ---------- scaled mini canvases (side-by-side sheets) ---------------------
+   .mini is sized to 1080 × 2400 × --s and clips a full .canvas scaled by --s. */
+.mini {
+  position: absolute; left: var(--x); top: var(--y);
+  width: calc(1080px * var(--s)); height: calc(2400px * var(--s));
+  overflow: hidden; border-radius: 24px; border: 1px solid var(--card-edge); background: #EAE6DC;
+}
+.mini > .canvas { transform: scale(var(--s)); transform-origin: 0 0; }
+.mini-cap {
+  position: absolute; left: var(--x); top: var(--y); width: calc(1080px * var(--s));
+  text-align: center; font-size: 24px; font-weight: 800; line-height: 30px; color: var(--ink);
+}
+.mini-cap .sub { display: block; font-size: 21px; font-weight: 700; color: var(--ink-2); margin-top: 2px; }
+
+/* ---------- safe frame + camera arrow (CTRL-1, review only) ---------------- */
+.safe-frame {
+  position: absolute; left: 30%; top: 27.5%; width: 40%; height: 45%;
+  border: 3px dashed rgba(200, 90, 90, 0.9); border-radius: 28px; z-index: 8; pointer-events: none;
+}
+.safe-frame .lbl {
+  position: absolute; left: 50%; top: -46px; transform: translateX(-50%);
+  font-size: 22px; font-weight: 800; color: #C85A5A; white-space: nowrap;
+}
+.cam-arrow { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
+.cam-arrow path, .cam-arrow line { stroke: #C85A5A; stroke-width: 5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.cam-arrow .head { fill: #C85A5A; stroke: none; }
+.cam-arrow .soft { stroke: rgba(200, 90, 90, 0.5); stroke-dasharray: 10 12; }
+.dust { position: absolute; left: var(--x); top: var(--y); width: var(--d, 26px); height: var(--d, 26px); margin: -13px 0 0 -13px; border-radius: 50%; background: rgba(251, 248, 241, 0.75); z-index: 2; }
+
+/* ---------- plot overlay svg (farm) ----------------------------------------- */
+.plots { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.plots .p-hi   { fill: rgba(190, 240, 165, 0.60); stroke: rgba(240, 255, 230, 0.98); stroke-width: 7; stroke-linejoin: round; }
+.plots .p-soft { fill: rgba(255, 255, 255, 0.16); stroke: rgba(255, 255, 255, 0.70); stroke-width: 3; stroke-linejoin: round; }
+.plots .p-ready { fill: rgba(227, 179, 65, 0.22); stroke: rgba(255, 240, 190, 0.95); stroke-width: 5; stroke-linejoin: round; }
+.plots .p-soil { fill: #C9A06A; stroke: #B48A58; stroke-width: 3; stroke-linejoin: round; }
+.plots .p-sown { fill: rgba(166, 124, 82, 0.55); stroke: rgba(255, 255, 255, 0.5); stroke-width: 3; stroke-linejoin: round; }
+.plots .arc { fill: none; stroke: rgba(251, 248, 241, 0.95); stroke-width: 5; stroke-dasharray: 12 14; stroke-linecap: round; }
+.sprout { position: absolute; left: var(--x); top: var(--y); width: var(--d, 56px); height: var(--d, 56px); transform: translate(-50%, -60%); z-index: 3; }
+.pop { position: absolute; left: var(--x); top: var(--y); width: var(--d, 64px); height: var(--d, 64px); transform: translate(-50%, -50%); z-index: 4; }
+.glow-ring {                                   /* soft glow under a Ready tag's plot */
+  position: absolute; left: var(--x); top: var(--y); width: var(--w, 120px); height: var(--h, 60px);
+  transform: translate(-50%, -50%); border-radius: 50%; z-index: 2;
+  box-shadow: 0 0 0 4px rgba(127, 198, 106, 0.25), 0 0 28px 10px rgba(127, 198, 106, 0.55);
+}
+
+/* ---------- Homestead Stall drawer (FARM-6) ---------------------------------- */
+.drawer.is-stall { --drawer-h: 1300px; }
+.stall-rows { margin-top: 20px; }
+.srow { height: 136px; display: flex; align-items: center; gap: 22px; border-bottom: 1px solid var(--card-edge); }
+.srow .thumb {
+  position: relative; flex: 0 0 auto; width: 96px; height: 96px; border-radius: 50%;
+  background: #F1EADA; border: 1px solid var(--card-edge); display: flex; align-items: center; justify-content: center;
+}
+.srow .thumb .ic { width: 62px; height: 62px; }
+.srow .mid { flex: 1 1 auto; min-width: 0; }
+.srow .nm { font-size: 30px; font-weight: 800; line-height: 36px; white-space: nowrap; }
+.srow .meta { margin-top: 4px; font-size: 24px; font-weight: 700; line-height: 30px; color: var(--ink-2); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.srow .btn-sm.is-disabled .ic { width: 26px; height: 26px; color: var(--disabled-ink); }
+.srow .meta .ic { width: 28px; height: 28px; }
+.srow .meta .lock { display: inline-flex; align-items: center; gap: 6px; color: var(--disabled-ink); }
+.srow .meta .lock .ic { width: 24px; height: 24px; color: var(--disabled-ink); }
+.srow .right { flex: 0 0 auto; display: flex; align-items: center; gap: 14px; }
+.stepper { display: inline-flex; align-items: center; height: 80px; border-radius: 40px; border: 1px solid var(--card-edge); background: var(--card-solid); overflow: hidden; }
+.stepper .k { width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 800; color: var(--primary-deep); }
+.stepper .v { width: 64px; text-align: center; font-size: 28px; font-weight: 800; }
+.srow .btn-sm { height: 80px; min-width: 150px; padding: 0 30px; border-radius: 40px; font-size: 26px; }
+.srow .btn-sm.is-disabled { min-width: 0; font-size: 22px; }
+.srow.is-locked .thumb .ic { filter: grayscale(1); opacity: 0.55; }
+.srow.is-locked .nm { color: var(--disabled-ink); }
+.srow.is-locked .stepper { opacity: 0.5; }
+.stall-foot {
+  margin-top: 20px; height: 96px; border-radius: 32px; padding: 0 28px;
+  background: #F1EADA; border: 1px solid var(--card-edge);
+  display: flex; align-items: center; gap: 16px; font-size: 26px; font-weight: 800; white-space: nowrap;
+}
+.stall-foot .ic { width: 40px; height: 40px; }
+.stall-foot .sub { color: var(--ink-2); font-weight: 700; }
+.quota { margin-top: 20px; display: flex; align-items: center; gap: 20px; font-size: 26px; font-weight: 800; }
+.quota .cap-track { height: 14px; }
+.quota .cap-fill { background: var(--energy-amber); }
+.quota .sub { font-size: 22px; font-weight: 700; color: var(--ink-2); white-space: nowrap; }
+
+/* ---------- wooden sign cards (FARM-7 states) ------------------------------- */
+.wood-card {
+  position: absolute; left: var(--x); top: var(--y); width: var(--w, 320px);
+  padding: 24px 24px 26px; border-radius: 22px; text-align: center;
+  background: linear-gradient(to bottom, var(--wood), var(--wood-deep)); border: 1px solid var(--wood-deep);
+  color: var(--wood-ink); font-size: 30px; font-weight: 800; line-height: 38px; letter-spacing: 0.4px;
+}
+.wood-card::after {
+  content: ""; position: absolute; left: 50%; top: 100%; width: 18px; height: 60px; margin-left: -9px;
+  border-radius: 0 0 9px 9px; background: var(--wood-deep);
+}
+.wood-card .sub { display: block; font-size: 24px; font-weight: 700; line-height: 30px; opacity: 0.9; margin-top: 4px; }
+.wood-card.is-off { filter: saturate(0.4) brightness(0.92); }
+.wood-card.is-off::before { content: ""; position: absolute; inset: 0; border-radius: 22px; background: rgba(214, 213, 206, 0.35); }
+.wood-card > * { position: relative; }
+
+/* ---------- teaching cards (TUT-2) ------------------------------------------ */
+.teach {
+  position: absolute; left: var(--x); top: var(--y); width: 480px; height: 420px;
+  border-radius: 40px; background: var(--card-solid); border: 1px solid var(--card-edge);
+  padding: 32px 32px 28px; display: flex; flex-direction: column;
+}
+.teach .thumb {
+  width: 88px; height: 88px; border-radius: 50%; background: #F1EADA; border: 1px solid var(--card-edge);
+  display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
+}
+.teach .thumb .ic { width: 56px; height: 56px; }
+.teach .t { flex: 1 1 auto; margin-top: 20px; font-size: 30px; font-weight: 800; line-height: 40px; }
+.teach .t b { color: var(--primary-deep); }
+.teach .btn { height: 96px; padding: 0 40px; font-size: 32px; align-self: flex-start; }
+.teach-cap { position: absolute; left: var(--x); top: var(--y); width: 480px; font-size: 21px; font-weight: 700; color: var(--ink-2); line-height: 26px; }
+.teach-cap b { color: var(--ink); font-weight: 800; }
+
+/* fish-dex silhouette lighting up (TUT-2-2) */
+.sil-wrap { position: relative; flex: 0 0 auto; width: 220px; height: 220px; border-radius: 50%; background: #EEE7F7; border: 1px solid var(--card-edge); display: flex; align-items: center; justify-content: center; }
+.sil-wrap .ic { width: 150px; height: 150px; color: #8A918C; }
+.sil-wrap.is-lit { box-shadow: 0 0 0 8px rgba(169, 139, 214, 0.25), 0 0 40px 10px rgba(169, 139, 214, 0.55); }
+.sil-wrap .dot { position: absolute; left: 10px; top: 10px; width: 28px; height: 28px; border-radius: 14px; border: 2px solid var(--card-solid); }
+.dex-row { display: flex; gap: 14px; margin-top: 20px; align-items: center; }
+.dex-row .d { width: 72px; height: 72px; border-radius: 50%; background: #F1EADA; border: 1px solid var(--card-edge); display: flex; align-items: center; justify-content: center; }
+.dex-row .d .ic { width: 46px; height: 46px; color: #B9BDC4; }
+.dex-row .d.is-caught .ic { color: #6FA8DC; }
+.dex-row .d.is-lit { border: 3px solid var(--rar-fine); box-shadow: 0 0 0 6px rgba(111, 168, 220, 0.25), 0 0 24px 6px rgba(111, 168, 220, 0.55); }
+.dex-row .d.is-lit .ic { color: #8A918C; }
+.dex-row .lbl { font-size: 24px; font-weight: 800; color: var(--ink-2); margin-left: 8px; }
+
+/* experiment slots inline (SKILL-3-2 cooking frame) */
+.exp-inline { position: absolute; left: 50%; top: var(--top, 1560px); transform: translateX(-50%); display: flex; gap: 48px; z-index: 8; }
+.exp-inline .exp-slot.is-flash { border: 3px solid #E3B341; box-shadow: 0 0 0 8px rgba(227, 179, 65, 0.30), 0 0 36px 10px rgba(227, 179, 65, 0.70); }
+.exp-inline .exp-slot .nm.is-small { font-size: 18px; }
+.drop-card { position: absolute; left: var(--x); top: var(--y); width: 150px; height: 110px; border-radius: 20px; z-index: 8; background: #6FA8DC; border: 2px solid #FBF8F1; transform: translate(-50%, -50%) rotate(-8deg); display: flex; align-items: center; justify-content: center; }
+.drop-card .ic { width: 80px; height: 80px; }
+
+/* generic positioned block */
+.at { position: absolute; left: var(--x); top: var(--y); }
+.at.is-center { transform: translate(-50%, -50%); }
+.at.is-z8 { z-index: 8; }
+.chip-note {
+  position: absolute; left: var(--x); top: var(--y); transform: translateX(-50%);
+  height: 56px; padding: 0 22px; border-radius: 28px; display: inline-flex; align-items: center; gap: 10px;
+  font-size: 24px; font-weight: 800; background: var(--card); border: 1px solid var(--card-edge); white-space: nowrap; z-index: 7;
+}
+.chip-note .sub { color: var(--ink-2); font-weight: 700; }
+
+/* ---------- Homestead Stall + Bag in one drawer (FARM-6 v2 · Figma redo 2026-10-04) ----
+   One drawer from y 300 to the bottom (h 2100) so the stall rows and the bag are on screen
+   together (buy seeds while seeing stock). Rhythm (y): head 324–420 · tabs Buy / Stall Board
+   436–516 · 4 stall rows 528–976 · divider 992 · Bag title 1009–1073 · [6-2 only: buyback
+   quota 1083–1127] · bag tabs +14 (64) · detail +14 (200) · grid +16 (5 × 160 + 4 × 16 = 864)
+   → grid bottom 2245 (FARM-6) / 2299 (FARM-6-2, safe bottom 2300). .quota itself is shared
+   with NPC-3, so every override here is scoped to .drawer.is-stall-bag. */
+.drawer.is-stall-bag { --drawer-h: 2100px; }
+.drawer.is-stall-bag .drawer-head { margin-top: 24px; }
+.drawer.is-stall-bag .tabs { margin-top: 16px; }
+.drawer.is-stall-bag .stall-rows { margin-top: 12px; }
+.drawer.is-stall-bag .srow { height: 112px; gap: 20px; }
+.drawer.is-stall-bag .srow:last-child { border-bottom: 0; }
+.drawer.is-stall-bag .srow .thumb { width: 80px; height: 80px; }
+.drawer.is-stall-bag .srow .thumb .ic { width: 52px; height: 52px; }
+.drawer.is-stall-bag .srow .nm { font-size: 28px; line-height: 34px; }
+.drawer.is-stall-bag .srow .meta { margin-top: 2px; font-size: 22px; line-height: 28px; }
+.drawer.is-stall-bag .srow .meta .ic { width: 26px; height: 26px; }
+.drawer.is-stall-bag .stepper { height: 72px; border-radius: 36px; }
+.drawer.is-stall-bag .stepper .k { width: 72px; height: 72px; font-size: 32px; }
+.drawer.is-stall-bag .stepper .v { width: 56px; font-size: 26px; }
+.drawer.is-stall-bag .srow .btn-sm { height: 72px; min-width: 140px; padding: 0 28px; border-radius: 36px; font-size: 24px; }
+.drawer.is-stall-bag .srow .btn-sm.is-disabled { min-width: 0; font-size: 21px; padding: 0 24px; gap: 8px; }
+.drawer.is-stall-bag .srow .btn-sm.is-disabled .ic { width: 24px; height: 24px; }
+.srow .bagct {                                 /* "Bag ×24": current stock of the item being bought */
+  display: inline-flex; align-items: center; gap: 6px; margin-right: 6px;
+  font-size: 22px; font-weight: 800; color: var(--primary-deep); white-space: nowrap;
+}
+.srow .bagct .ic { width: 26px; height: 26px; }
+.split { height: 0; border-top: 1px solid var(--card-edge-2); margin: 16px 0 0; }   /* thin divider stall ↔ bag */
+.drawer.is-stall-bag .bag-title { margin-top: 16px; height: 64px; }
+.drawer.is-stall-bag .quota { margin-top: 10px; height: 44px; gap: 16px; font-size: 24px; color: #B8831C; white-space: nowrap; }
+.drawer.is-stall-bag .quota .cap-track { height: 12px; }
+.drawer.is-stall-bag .quota .sub { font-size: 21px; }
+.drawer.is-stall-bag .tabs.is-compact { margin-top: 14px; }
+.drawer.is-stall-bag .detail { margin-top: 14px; height: 200px; }
+.drawer.is-stall-bag .detail .big { width: 112px; height: 112px; }
+.drawer.is-stall-bag .detail .big .ic { width: 74px; height: 74px; }
+.drawer.is-stall-bag .detail .nm { font-size: 30px; line-height: 36px; }
+.drawer.is-stall-bag .detail .nm .of { color: var(--ink-2); }
+.drawer.is-stall-bag .detail .desc.is-price { font-style: normal; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+.drawer.is-stall-bag .detail .desc.is-price .ic { width: 26px; height: 26px; }
+.drawer.is-stall-bag .detail .desc.is-price b { color: var(--coin-deep); font-weight: 800; }
+.drawer.is-stall-bag .detail .acts { gap: 12px; }
+.drawer.is-stall-bag .detail .acts .btn-sm { height: 80px; min-width: 140px; padding: 0 28px; border-radius: 40px; font-size: 26px; }
+.drawer.is-stall-bag .pin-btn { width: 80px; height: 80px; font-size: 16px; }
+.drawer.is-stall-bag .pin-btn .ic { width: 30px; height: 30px; }
+.drawer.is-stall-bag .grid { margin-top: 16px; }
+.cell.is-linked { border: 2px solid var(--primary-deep); }   /* the cell linked to the stall row being bought */
+.cell .inbag {
+  position: absolute; left: 50%; top: -14px; transform: translateX(-50%); z-index: 1;
+  height: 28px; padding: 0 10px; border-radius: 14px; background: var(--primary-deep); color: #fff;
+  font-size: 17px; font-weight: 800; line-height: 28px; white-space: nowrap;
+}

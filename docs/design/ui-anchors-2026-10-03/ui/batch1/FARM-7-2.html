@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>FARM-7-2 · Rest popup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-farm.css">
+<link rel="stylesheet" href="../kit-facility.css">
+</head>
+<!-- batch 1 (farm group, 2026-10-03) · facility-tap revision 2026-10-04: the frame right after tapping the bench on FARM-7.
+     Scene dimmed 30 % (.scene-dim), the bench status dot stays visible, a centred popup (920 wide · r 40 · cream · 1 px edge ·
+     no shadow) carries the state and the action; the main action key stays Sow ×1 · 2 Energy. The two other popup states
+     (cooling down · rested today) are shown small at the bottom of the same sheet, review only. Camera as FARM-7. -->
+<body class="scene-cam" style="--scene-top:#B0CFC1; --scene-bottom:#F7DDAD; --src-w:1024px; --src-h:1536px; --cam-scale:1.22; --cam-x:-127px; --cam-y:356px;">
+<div class="canvas ">
+
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/farm.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <!-- Scene tags (farm camera 1.22 / -127 / 356) — under the dim -->
+  <div class="tag tag-card tag--pointer tag--anchor-bottom" style="--x:370px; --y:1015px; --dx:0px"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Homestead Lv2</span></div>
+  <div class="tag tag-sell tag--pointer tag--anchor-bottom" style="--x:507px; --y:879px">Sell 12</div>
+  <!-- 30 % dim while the popup is open (kit.css .scene-dim, z 3) -->
+  <div class="scene-dim"></div>
+  <!-- bench status dot stays above the dim (z 4) -->
+  <div class="fac-dot is-ok" title="Rest · available"><svg class="ic" aria-hidden="true"><use href="../icons-facility.svg#i-zz"/></svg></div>
+  <style>.fac-dot { --x: 210px; --y: 1048px; }</style>
+  <div class="switch " title="Switch action"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-switch"/></svg></div>
+  <!-- main action FAB 176: current action only — never a facility verb -->
+  <div class="fab " title="Sow ×1"><div class="gear-badge" title="Tools &amp; Gear"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-hoe"/></svg></div><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-sow"/></svg><span class="lbl">Sow ×1</span><span class="sub ">2 Energy</span></div>
+  <!-- HUD v2 -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card " style="--pct:60%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">120<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card "><b>Today</b><span class="dot-sep">·</span><span class="today-text">Radishes ready in 1h 12m</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Homestead</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  <!-- Quick Bar v4 -->
+  <nav class="quickbar has-selection">
+    <div class="slots">
+        <div class="slot has-count is-selected"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-radish-seeds"/></svg><span class="name">Radish Seeds</span><span class="count">×24</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-carrot-seeds"/></svg><span class="name">Carrot Seeds</span><span class="count">×10</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-compost"/></svg><span class="name">Compost</span><span class="count">×6</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-feed-bag"/></svg><span class="name">Orchard Feed</span><span class="count">×2</span></div>
+        <div class="slot is-ghost"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-radish-seeds"/></svg></div>
+    </div>
+    <div class="bag card"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div>
+  </nav>
+
+  <!-- the popup: centred floating card (sits a little below canvas centre so the bench dot stays uncovered) -->
+  <div class="modal fac-pop" style="--w:920px; --top:1350px">
+    <div class="m-title"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-rest"/></svg><span>Rest on the bench</span></div>
+    <div class="m-line"><b>+60 Energy</b> <span class="sub">· once a day</span></div>
+    <div class="m-line"><span class="ok">Available now</span></div>
+    <div class="m-line"><span class="sub">Next rest: tomorrow 4:00 after a rest</span></div>
+    <div class="m-btns">
+      <div class="btn btn-primary"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><span>Rest · +60 Energy</span></div>
+      <div class="btn btn-secondary"><span>Not now</span></div>
+    </div>
+  </div>
+
+  <!-- the other two popup states, small (review only) -->
+  <div class="fac-mini" style="--x:30px; --y:1610px; --s:0.4565">
+    <div class="modal fac-pop">
+      <div class="m-title"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-rest"/></svg><span>Rest on the bench</span></div>
+      <div class="m-line"><b>+60 Energy</b> <span class="sub">· once a day</span></div>
+      <div class="m-line"><span class="wait">Rest · back after 2h away</span></div>
+      <div class="m-line"><span class="sub">1h 12m to go</span></div>
+      <div class="m-btns">
+        <div class="btn btn-primary is-disabled"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-clock"/></svg><span>Not yet</span></div>
+        <div class="btn btn-secondary"><span>Not now</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="fac-mini-cap" style="--x:30px; --y:1816px; --w:420px">Cooling down <span class="sub">needs ≥ 2 h away from home · review only</span></div>
+  <div class="fac-mini" style="--x:480px; --y:1610px; --s:0.4565">
+    <div class="modal fac-pop">
+      <div class="m-title"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-rest"/></svg><span>Rest on the bench</span></div>
+      <div class="m-line"><b>+60 Energy</b> <span class="sub">· once a day</span></div>
+      <div class="m-line"><span class="off">Rested today</span></div>
+      <div class="m-line"><span class="sub">Back tomorrow 4:00</span></div>
+      <div class="m-btns">
+        <div class="btn btn-primary is-disabled"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg><span>Rest · +60 Energy</span></div>
+        <div class="btn btn-secondary"><span>Not now</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="fac-mini-cap" style="--x:480px; --y:1816px; --w:420px">Rested today <span class="sub">resets at day change · review only</span></div>
+
+  <div class="an-label" style="position:absolute; left:30px; top:2040px; z-index:9">After tapping the bench · the main action key stays Sow ×1 · 2 Energy</div>
+
+  <!-- Guide overlay: ?guide=1 or #guide -->
+  <div id="guide" class="guide">
+    <div class="g-line" style="top:120px"><span>safe top 120</span></div>
+    <div class="g-line" style="top:2300px"><span>safe bottom 100</span></div>
+    <div class="g-line is-green" style="top:2276px"><span>quick bar bottom · 124 from bottom</span></div>
+    <div class="g-line is-green" style="top:2116px"><span>slots top · 160 tall</span></div>
+    <div class="g-line is-blue" style="top:48px"><span>HUD row 1 · 48–176</span></div>
+    <div class="g-line is-blue" style="top:176px"></div>
+    <div class="g-line is-blue" style="top:192px"><span>HUD row 2 · 192–256</span></div>
+    <div class="g-line is-blue" style="top:256px"></div>
+    <div class="g-vline" style="left:30px"></div>
+    <div class="g-vline" style="left:1050px"></div>
+    <div class="g-vline" style="left:540px;border-left-style:dotted"></div>
+    <div class="g-box" style="right:30px;top:1876px;width:176px;height:176px;border-radius:88px">FAB 176</div>
+    <div class="g-box" style="right:70px;top:1756px;width:96px;height:96px;border-radius:48px"></div>
+  </div>
+  <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
+
+</div>
+</body>
+</html>

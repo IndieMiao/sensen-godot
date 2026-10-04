@@ -8,10 +8,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="kit.css">
+<link rel="stylesheet" href="kit-facility.css">
 </head>
 <!-- body class "scene-cam" = camera mode (v2): canvas = source × --cam-scale + (--cam-x, --cam-y).
      --scene-top / --scene-bottom are the band colours sampled from the png's top/bottom rows (shown only above --cam-y).
-     v3 (2026-10-03): icons come from icons.svg; control layer = joystick · FAB + switch · 6-slot quick bar · drawers. -->
+     v3 (2026-10-03): icons come from icons.svg; control layer = joystick · FAB + switch · 6-slot quick bar · drawers.
+     facility-tap revision (2026-10-04): the kitchen has no action, so no main action key and no switch — only the Bag.
+     Cooking starts by tapping a stove: the empty stove you are at carries a fingertip card "Stove 1/3 · Empty · Tap to cook"
+     (2 px primary stroke, kit-facility.css). -->
 <body class="scene-cam" style="--scene-top:#B2D6D0; --scene-bottom:#F4D9B7; --src-w:1024px; --src-h:1536px; --cam-scale:1.39; --cam-x:-229px; --cam-y:280px;">
 <div class="canvas">
 
@@ -23,7 +27,8 @@
 
   <!-- Stove status signs — one per stove, move with --x/--y -->
   <!-- positions assume body.scene-cam with --cam-scale:1.39, --cam-x:-229px, --cam-y:280px (canvas = source×1.39 + (−229, 280)) -->
-  <div class="tag tag-stove tag--pointer tag--anchor-top" style="--x:367px; --y:1274px; --dx:0px"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-stove-off"/></svg><span>Stove 1/3</span><span class="sep">·</span><span class="st-empty">Empty</span></div>
+  <!-- the empty stove you are at: fingertip card above the stove hole (tip on the hole's top edge), card slid left to clear stove 2's leader -->
+  <div class="tag tag-tap tag--pointer tag--anchor-bottom" style="--x:366px; --y:1050px; --dx:-90px"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-stove-off"/></svg><span>Stove 1/3</span><span class="sep">·</span><span class="st-empty">Empty</span><span class="sep">·</span><span class="hint">Tap to cook</span></div>
   <div class="tag tag-stove tag--pointer tag--leader" style="--x:533px; --y:1055px; --lead:290px; --dx:0px"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-steam"/></svg><span>Stove 2/3</span><span class="sep">·</span><span class="st-cooking">Cooking 0:22</span></div>
   <div class="tag tag-stove tag--pointer tag--leader is-ready" style="--x:746px; --y:1118px; --lead:264px; --dx:60px"><svg class="ic st-ready" aria-hidden="true"><use href="icons.svg#i-check"/></svg><span>Stove</span><span class="sep">·</span><span class="st-ready">Ready</span><span class="sep">·</span><span>Grilled Crucian</span></div>
   <!-- glowing Ready corner badge on the plated dish -->
@@ -32,9 +37,7 @@
   <div class="tag tag-card tag--pointer tag--anchor-top" style="--x:981px; --y:1326px; --dx:-128px"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-cabinet"/></svg><span>Warming Cabinet</span><span class="sub">4/6</span></div>
   <div class="tag tag-card tag--pointer tag--anchor-bottom" style="--x:328px; --y:805px; --dx:-27px"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-cookbook"/></svg><span>Cookbook</span></div>
 
-  <!-- mode switch 96 (⇄) + main action FAB 176: bottom-right, where the Map button used to be -->
-  <div class="switch" title="Switch action"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-switch"/></svg></div>
-  <div class="fab" title="Cook"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-pot"/></svg><span class="lbl">Cook</span><span class="sub is-free">Free</span></div>
+  <!-- no main action key and no switch in the kitchen (no action here): facilities are tapped on the scene -->
 
   <!-- HUD v2 (unchanged in v3): row1 y48–176 = avatar 112 · energy card 112 (bar 240×12) · coins 72 · Inbox 96
        row2 y192–256 = Today chip (left, shrinks) · place chip v3 (right): house = home city · "City · Space" · › opens the Map / city panel -->
@@ -67,7 +70,7 @@
     </div>
   </header>
 
-  <!-- kitchen has no quick bar: only the FAB (Cook) and a lone Bag at the bar's right end -->
+  <!-- kitchen has no quick bar: only a lone Bag at the bar's right end -->
   <div class="bag-fixed"><div class="bag card"><svg class="ic" aria-hidden="true"><use href="icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div></div>
 
   <!-- Guide overlay: ?guide=1 or #guide -->
@@ -83,8 +86,6 @@
     <div class="g-vline" style="left:30px"></div>
     <div class="g-vline" style="left:1050px"></div>
     <div class="g-vline" style="left:540px;border-left-style:dotted"></div>
-    <div class="g-box" style="right:30px;top:1876px;width:176px;height:176px;border-radius:88px">FAB 176</div>
-    <div class="g-box" style="right:70px;top:1756px;width:96px;height:96px;border-radius:48px"></div>
   </div>
   <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
 

@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <!-- Batch 1 "cook" group icon sheet (2026-10-03). Referenced via <use href="../icons-cook.svg#i-…">. Same 64×64 clay style as icons.svg. -->
+  <defs>
+    <!-- fishing: bobber (red top, cream bottom) -->
+    <symbol id="i-bobber" viewBox="0 0 64 64">
+      <rect x="30" y="2" width="4" height="14" rx="2" fill="#2F3A33"/>
+      <path fill="#E07A5F" d="M12 32a20 20 0 0 1 40 0z"/>
+      <path fill="#FBF8F1" d="M12 32a20 20 0 0 0 40 0z"/>
+      <rect x="10" y="30" width="44" height="4" rx="2" fill="#C9634A"/>
+      <rect x="30" y="50" width="4" height="12" rx="2" fill="#2F3A33"/>
+    </symbol>
+    <!-- fish silhouette (currentColor): reel-bar shadow, dex silhouettes -->
+    <symbol id="i-fish-sil" viewBox="0 0 64 64">
+      <path fill="currentColor" d="M50 32 62 20v24z"/>
+      <ellipse cx="30" cy="32" rx="22" ry="13" fill="currentColor"/>
+      <path fill="currentColor" d="M22 20c5-7 13-7 18 0z"/>
+      <path fill="currentColor" d="M24 44c4 5 10 5 14 0z"/>
+    </symbol>
+    <!-- hook (currentColor) for the Hook button -->
+    <symbol id="i-hook" viewBox="0 0 64 64">
+      <path fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" d="M36 8v28a12 12 0 0 1-24 0v-6"/>
+      <circle cx="36" cy="8" r="5.5" fill="currentColor"/>
+      <path fill="currentColor" d="M6 32l6-11 6 11z"/>
+    </symbol>
+    <!-- Golden Koi (Rare) -->
+    <symbol id="i-koi" viewBox="0 0 64 64">
+      <path fill="#E3B341" d="M48 32 62 18v28z"/>
+      <ellipse cx="29" cy="32" rx="23" ry="13" fill="#F4D27A"/>
+      <path fill="#E8A14A" d="M18 24c6-3 12-2 16 3-6 3-12 2-16-3zM30 36c6-2 11 0 14 4-6 2-11 1-14-4z"/>
+      <path fill="#F2A08A" d="M22 40c4-2 8-1 10 2-4 2-8 1-10-2z"/>
+      <path fill="#E3B341" d="M22 19c5-7 13-7 18 0-6 1-12 1-18 0z"/>
+      <circle cx="14" cy="29" r="4" fill="#FBF8F1"/><circle cx="13" cy="29" r="2" fill="#2F3A33"/>
+    </symbol>
+    <!-- Mystery Dish: lumpy grey-brown blob with a question mark -->
+    <symbol id="i-blob" viewBox="0 0 64 64">
+      <path fill="#8C7A66" d="M14 44c-6-8-2-20 8-22 4-10 18-12 24-4 10-2 16 8 12 16 4 8-4 16-12 14-6 6-18 6-24 0-6 2-10-2-8-4z"/>
+      <path fill="#A08C76" d="M20 36c0-8 8-12 14-10 6-2 12 4 10 10 2 6-6 10-12 8-6 2-12-2-12-8z"/>
+      <circle cx="24" cy="42" r="2.5" fill="#6B5B4A"/><circle cx="42" cy="30" r="2" fill="#6B5B4A"/>
+      <path fill="#FBF8F1" d="M27 25a6.5 6.5 0 0 1 12.5 2.5c0 3.5-3.5 4.5-4.5 6.5v1.5h-5v-2.5c0-3.5 4.5-4.5 4.5-6.5a1.75 1.75 0 0 0-3.5 0z"/>
+      <circle cx="32.5" cy="40.5" r="2.6" fill="#FBF8F1"/>
+    </symbol>
+    <!-- Potato (3-slot dish ingredient) -->
+    <symbol id="i-potato" viewBox="0 0 64 64">
+      <path fill="#C9A06A" d="M12 36c-4-12 8-24 22-22 12 2 20 10 18 22-2 10-12 16-22 14S14 44 12 36z"/>
+      <path fill="#DDB884" d="M20 30c0-6 8-10 14-8 6 2 10 8 8 14-4 2-8 0-12 0s-10-2-10-6z"/>
+      <circle cx="22" cy="40" r="2.5" fill="#9A7149"/><circle cx="40" cy="42" r="2.5" fill="#9A7149"/><circle cx="36" cy="26" r="2" fill="#9A7149"/>
+    </symbol>
+    <!-- Pumpkin Seeds pouch (quick-bar slot before the drop) -->
+    <symbol id="i-pumpkin-seeds" viewBox="0 0 64 64">
+      <path fill="#E8A14A" d="M16 22h32l-4 30a6 6 0 0 1-6 6H26a6 6 0 0 1-6-6z"/>
+      <rect x="14" y="14" width="36" height="10" rx="5" fill="#C9884A"/>
+      <ellipse cx="26" cy="40" rx="5" ry="8" fill="#FBF8F1" transform="rotate(-20 26 40)"/>
+      <ellipse cx="38" cy="42" rx="5" ry="8" fill="#FBF8F1" transform="rotate(20 38 42)"/>
+    </symbol>
+    <!-- star (currentColor) for quality badges -->
+    <symbol id="i-star" viewBox="0 0 64 64">
+      <path fill="currentColor" d="M32 4l8.2 17.6 19.3 2.3-14.2 13.2 3.8 19.1L32 46.6 14.9 56.2l3.8-19.1L4.5 23.9l19.3-2.3z"/>
+    </symbol>
+    <!-- v5 cookbook dishes (2026-10-04): simple clay-style plates for the merged Cookbook grid -->
+    <symbol id="i-dish-salad" viewBox="0 0 64 64">
+      <path fill="#E9EAE6" d="M8 30h48c0 14-8 24-24 24S8 44 8 30z"/>
+      <ellipse cx="32" cy="30" rx="24" ry="7" fill="#9DB89A"/>
+      <circle cx="22" cy="28" r="5" fill="#7FC66A"/><circle cx="36" cy="27" r="5.5" fill="#7FC66A"/><circle cx="46" cy="30" r="4" fill="#7FC66A"/>
+      <circle cx="30" cy="31" r="3.2" fill="#F2B1A6"/><circle cx="42" cy="26" r="2.6" fill="#F2B1A6"/>
+    </symbol>
+    <symbol id="i-dish-plate" viewBox="0 0 64 64">
+      <ellipse cx="32" cy="40" rx="28" ry="14" fill="#E9EAE6"/>
+      <ellipse cx="32" cy="38" rx="22" ry="10" fill="#FBF8F1"/>
+      <circle cx="22" cy="37" r="6" fill="#E8893A"/><circle cx="34" cy="35" r="6.5" fill="#7FC66A"/><circle cx="44" cy="38" r="5" fill="#F2B1A6"/>
+    </symbol>
+    <symbol id="i-dish-cakes" viewBox="0 0 64 64">
+      <ellipse cx="32" cy="42" rx="28" ry="13" fill="#E9EAE6"/>
+      <ellipse cx="32" cy="40" rx="22" ry="9" fill="#FBF8F1"/>
+      <rect x="14" y="26" width="18" height="14" rx="7" fill="#D9A066"/><rect x="32" y="28" width="18" height="14" rx="7" fill="#C9884A"/>
+      <circle cx="23" cy="31" r="1.6" fill="#A8761A"/><circle cx="41" cy="33" r="1.6" fill="#A8761A"/>
+    </symbol>
+    <symbol id="i-dish-skewer" viewBox="0 0 64 64">
+      <ellipse cx="32" cy="42" rx="28" ry="13" fill="#E9EAE6"/>
+      <ellipse cx="32" cy="40" rx="22" ry="9" fill="#FBF8F1"/>
+      <rect x="6" y="33" width="52" height="4" rx="2" fill="#A8761A"/>
+      <rect x="16" y="26" width="12" height="16" rx="5" fill="#C9884A"/><rect x="30" y="25" width="12" height="16" rx="5" fill="#D9A066"/><rect x="44" y="27" width="10" height="14" rx="5" fill="#C9884A"/>
+    </symbol>
+    <symbol id="i-dish-cake" viewBox="0 0 64 64">
+      <ellipse cx="32" cy="46" rx="26" ry="10" fill="#E9EAE6"/>
+      <path fill="#F2C9A0" d="M14 42 32 16l18 26z"/>
+      <path fill="#E8893A" d="M14 42h36l-2 6H16z"/>
+      <path fill="#FBF8F1" d="M26 32h12l3 5H23z" opacity=".8"/>
+      <circle cx="32" cy="18" r="3.5" fill="#EF8E97"/>
+    </symbol>
+    <symbol id="i-dish-biscuit" viewBox="0 0 64 64">
+      <ellipse cx="32" cy="44" rx="28" ry="12" fill="#E9EAE6"/>
+      <circle cx="24" cy="32" r="13" fill="#D9A066"/><circle cx="42" cy="36" r="12" fill="#E3B57A"/>
+      <circle cx="20" cy="29" r="1.8" fill="#A8761A"/><circle cx="28" cy="35" r="1.8" fill="#A8761A"/><circle cx="40" cy="33" r="1.8" fill="#A8761A"/><circle cx="45" cy="40" r="1.8" fill="#A8761A"/>
+    </symbol>
+    <symbol id="i-dish-bowl" viewBox="0 0 64 64">
+      <path fill="#E9EAE6" d="M8 32h48c0 14-8 22-24 22S8 46 8 32z"/>
+      <ellipse cx="32" cy="32" rx="24" ry="7" fill="#D6D7D2"/>
+      <ellipse cx="32" cy="29" rx="16" ry="9" fill="#FBF8F1"/>
+      <path fill="#C9884A" d="M22 26c4-4 16-4 20 0-3 3-17 3-20 0z"/>
+    </symbol>
+    <symbol id="i-dish-pie" viewBox="0 0 64 64">
+      <ellipse cx="32" cy="44" rx="28" ry="12" fill="#E9EAE6"/>
+      <ellipse cx="32" cy="34" rx="22" ry="14" fill="#D9A066"/>
+      <ellipse cx="32" cy="32" rx="17" ry="10" fill="#E8893A"/>
+      <path stroke="#F2C9A0" stroke-width="2.5" fill="none" d="M20 28l16 12M26 25l14 12M18 34l12 9M32 24l10 8M22 36l6 5"/>
+    </symbol>
+  </defs>
+</svg>

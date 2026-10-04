@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>HUD-1 · HUD Layout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-farm.css">
+</head>
+<!-- batch 1 (farm group, 2026-10-03). body.scene-cam: canvas = source x --cam-scale + (--cam-x, --cam-y); shared kit.css + icons.svg untouched,
+     group additions in ../kit-farm.css and ../icons-farm.svg. Canvas 1080 x 2400, HUD two rows, FAB 176, switch 96, quick bar 5 + Bag (v4). -->
+<body class="" style="">
+<div class="canvas is-neutral">
+
+  <!-- HUD v2: row1 y48-176 = avatar 112 · energy card 112 (bar 240x12) · coins 72 · Inbox 96; row2 y192-256 = Today chip · place chip "City · Space" (the Map entry) -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <!-- Farming (green) owns the right half: 12 -> 6 o'clock -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <!-- Fishing (blue) owns the left half: 6 -> 12 o'clock -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card " style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card is-long"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish · Shanghai Market</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Homestead</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  <!-- slots under row 2: Creel badge (pond pages) left · boarding pass (while travelling) under the place chip -->
+  <div class="ghost" style="left:30px; top:272px; width:292px; height:64px; border-radius:32px">Creel 7 · 6 free</div>
+  <div class="ghost" style="left:740px; top:272px; width:310px; height:80px">In transit · Tokyo · 7:42</div>
+  <div class="zone-soft" style="left:70px; top:1420px; width:460px; height:460px"></div>
+  <div class="ghost" style="left:30px; top:2116px; width:160px; height:160px">160</div>
+  <div class="ghost" style="left:202px; top:2116px; width:160px; height:160px">160</div>
+  <div class="ghost" style="left:374px; top:2116px; width:160px; height:160px">160</div>
+  <div class="ghost" style="left:546px; top:2116px; width:160px; height:160px">160</div>
+  <div class="ghost" style="left:718px; top:2116px; width:160px; height:160px">160</div>
+  <div class="ghost" style="left:890px; top:2116px; width:160px; height:160px">Bag</div>
+  <div class="ghost is-round" style="left:874px; top:1876px; width:176px; height:176px">176<span class="sub">action</span></div>
+  <div class="ghost is-round" style="left:914px; top:1756px; width:96px; height:96px">96</div>
+  <!-- review annotations: thin grey lines + labels (never in the app) -->
+  <div class="annot">
+    <div class="an-label " style="left:470px; top:54px;">energy 282 × 112 · bar 240 × 12</div>
+    <div class="an-label " style="left:470px; top:80px;">number always shown · 1 s tick</div>
+    <div class="an-label " style="left:470px; top:106px;">avatar 112 · dual skill ring</div>
+    <div class="an-label " style="left:470px; top:152px;">≥ 25 % green · &lt; 25 % amber · &lt; 10 % red</div>
+    <div class="an-vline " style="left:460px; top:48px; height:128px;"></div>
+    <div class="an-label is-right" style="left:1050px; top:16px;">coins 72 · Inbox 96 + badge</div>
+    <div class="an-label " style="left:30px; top:346px;">Creel badge slot · pond pages only · y 272</div>
+    <div class="an-label is-right" style="left:1050px; top:372px;">boarding-pass slot · only while travelling · Day Pass merges into the chip</div>
+    <div class="an-label " style="left:30px; top:398px;">Today chip ▾ · opens ≤ 3 rows under it (HUD-4)</div>
+    <div class="an-label is-right" style="left:1050px; top:424px;">City · Space › = the only Map entry · house = home city</div>
+    <div class="an-line is-dashed" style="left:30px; top:460px; width:1020px;"></div>
+    <div class="an-label " style="left:30px; top:468px;">scene area · joystick appears under the thumb anywhere here (outer 260 · knob 120) · no resident joystick</div>
+    <div class="an-label is-center" style="left:300px; top:1660px;">joystick zone (soft hint)</div>
+    <div class="an-vline " style="left:30px; top:1200px; height:300px;"></div>
+    <div class="an-label " style="left:40px; top:1480px;">side margin 30</div>
+    <div class="an-vline " style="left:1050px; top:1200px; height:300px;"></div>
+    <div class="an-label is-right" style="left:1040px; top:1480px;">side margin 30</div>
+    <div class="an-label is-right" style="left:860px; top:1796px;">switch 96 · opens the action radial</div>
+    <div class="an-label is-right" style="left:860px; top:1930px;">main action 176 · icon + verb + Energy price</div>
+    <div class="an-label is-right" style="left:860px; top:1960px;">tool badge 56 on its top-left · amber when short of Energy</div>
+    <div class="an-line " style="left:30px; top:2092px; width:1020px;"></div>
+    <div class="an-label " style="left:30px; top:2060px; font-size:18px;">quick bar · 5 consumable slots of the current action + Bag · 160 r 32 · gaps 12 · ghost slot = dashed, no plus sign</div>
+    <div class="an-line " style="left:30px; top:2276px; width:1020px;"></div>
+    <div class="an-label " style="left:30px; top:2284px;">bar bottom · 124 from the screen bottom</div>
+    <div class="an-label is-right" style="left:1050px; top:2284px;">safe bottom 100</div>
+  </div>
+
+  <!-- Guide overlay: ?guide=1 or #guide -->
+  <div id="guide" class="guide">
+    <div class="g-line" style="top:120px"><span>safe top 120</span></div>
+    <div class="g-line" style="top:2300px"><span>safe bottom 100</span></div>
+    <div class="g-line is-green" style="top:2276px"><span>quick bar bottom · 124 from bottom</span></div>
+    <div class="g-line is-green" style="top:2116px"><span>slots top · 160 tall</span></div>
+    <div class="g-line is-blue" style="top:48px"><span>HUD row 1 · 48–176</span></div>
+    <div class="g-line is-blue" style="top:176px"></div>
+    <div class="g-line is-blue" style="top:192px"><span>HUD row 2 · 192–256</span></div>
+    <div class="g-line is-blue" style="top:256px"></div>
+    <div class="g-vline" style="left:30px"></div>
+    <div class="g-vline" style="left:1050px"></div>
+    <div class="g-vline" style="left:540px;border-left-style:dotted"></div>
+    <div class="g-box" style="right:30px;top:1876px;width:176px;height:176px;border-radius:88px">FAB 176</div>
+    <div class="g-box" style="right:70px;top:1756px;width:96px;height:96px;border-radius:48px"></div>
+  </div>
+  <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
+
+</div>
+</body>
+</html>

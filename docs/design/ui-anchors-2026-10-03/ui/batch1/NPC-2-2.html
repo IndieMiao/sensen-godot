@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>NPC-2-2 · Tackle Shop counter + bag</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-npc.css">
+<link rel="stylesheet" href="../kit-farm.css">
+</head>
+<!-- NPC-2 (group npc): Market counter drawer (60 %, y 960–2400) over the dimmed plaza. Keeper portrait + name tag + one line,
+     "Shared stock · all Shanghai markets", item rows with coin price and stock, one locked row (Farming Lv7), one sold-out example row,
+     a City Specialty shelf (group 1 only) with a cyan ◆ "New for you" Recipe Card, Buy at the bottom. -->
+<body class="scene-cam drawer-open" style="--scene-top:#BEDDD2; --scene-bottom:#F7DCB5; --src-w:1024px; --src-h:1536px; --cam-scale:1.12; --cam-x:-30px; --cam-y:360px;">
+<div class="canvas">
+  <!-- NPC-2-2 (2026-10-04 unified): Tackle Shop counter in the FARM-6 layout; bag opens on Sell here = fish, fish buyback quota -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/tackle-shop.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+
+  <!-- Counter + Bag drawer (unified with FARM-6, 2026-10-04): upper half = the counter (Buy / Board, keeper line, ≤ 4 rows),
+       lower half = the bag (quota bar when this counter buys, Sell here filter, detail card Pin / Sell / Sell All, 5 × 5 grid). No Sell tab. -->
+  <section class="drawer is-stall-bag is-counter">
+    <div class="drawer-head">
+      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-tackle"/></svg><span>Finn's Tackle</span><span class="sub">· Pudong</span></div>
+      <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
+    </div>
+    <div class="tabs"><div class="tab is-on">Buy</div><div class="tab">Bite Board</div></div>
+    <div class="kpanel is-tackle">
+      <div class="portrait" style="background-image:url('../../scenes/tackle-shop.png'); background-size:1229px 1843px; background-position:-333px -549px;"></div>
+      <div class="mid"><div class="who">Tackle Keeper <span class="role">· Finn</span></div><div class="bubble-say">“Reed rods are in. Fishing Lv3 and Fine fish stop slipping the hook.”</div><div class="note">Shared stock · all Shanghai tackle shops</div></div>
+    </div>
+    <div class="stall-rows">
+      <div class="srow">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-rod"/></svg></div>
+        <div class="mid"><div class="nm">Reed Rod</div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>80 coins</span><span>· Fishing Lv3 ✓ · Lands Fine fish</span></div></div>
+        <div class="right"><div class="stepper"><div class="k">−</div><div class="v">1</div><div class="k">+</div></div><div class="price-tag">80 <svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div><div class="btn-sm btn-primary">Buy</div></div>
+      </div>
+      <div class="srow is-locked">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-rod-carbon"/></svg></div>
+        <div class="mid"><div class="nm">Carbon Rod</div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>350 coins</span><span>· Lands Rare fish</span></div></div>
+        <div class="right"><div class="btn-sm is-disabled"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><span>Fishing Lv6 · 2 levels to go</span></div></div>
+      </div>
+      <div class="srow">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lure"/></svg></div>
+        <div class="mid"><div class="nm">Spinner Lure</div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>6 coins</span><span>· Stock 10/10 · Faster bites · 3 casts each</span></div></div>
+        <div class="right"><div class="bagct"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span>Bag ×3</span></div><div class="stepper"><div class="k">−</div><div class="v">0</div><div class="k">+</div></div><div class="price-tag">6 <svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div><div class="btn-sm btn-primary">Buy</div></div>
+      </div>
+      <div class="srow is-locked">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-trap"/></svg></div>
+        <div class="mid"><div class="nm">Fish Trap</div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>120 coins</span><span>· Catches while you are away</span></div></div>
+        <div class="right"><div class="btn-sm is-disabled"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><span>Fishing Lv5 · 1 level to go</span></div></div>
+      </div>
+    </div>
+    <div class="split"></div>
+
+    <div class="bag-title">
+      <div class="h">Bag 19<span class="of">/25</span></div>
+      <div class="cap-track"><div class="cap-fill" style="--pct:76%"></div></div>
+      <div class="sort-chip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-sort"/></svg><span>Sort</span><span class="sub">· Recent</span></div>
+    </div>
+    <div class="quota"><span>Fish buyback today 30/80</span><div class="cap-track"><div class="cap-fill" style="--pct:38%"></div></div><span class="sub">all tackle shops · resets in 9h 12m</span></div>
+    <div class="tabs is-compact"><div class="tab is-on is-here">Sell here<span class="n">4</span></div><div class="tab">All</div><div class="tab">Seeds</div><div class="tab">Fish</div><div class="tab">Produce</div><div class="tab">Dishes</div><div class="tab">Materials</div></div>
+    <div class="detail">
+      <div class="big"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span class="dot dot-common"></span></div>
+      <div class="mid"><div class="nm">Pond Crucian <span class="of">×3</span></div><div class="meta">Common fish · Caught at Willow Pond</div><div class="desc is-price"><span>2 each · Sell All =</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><b>6 coins</b></div></div>
+      <div class="acts"><div class="pin-btn" title="Pin to quick bar"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-pin"/></svg><span>Pin</span></div><div class="btn-sm btn-sec">Sell</div><div class="btn-sm btn-primary">Sell All</div></div>
+    </div>
+    <div class="grid">
+      <div class="cell is-selected"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span class="count">×3</span></div>
+      <div class="cell"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carp"/></svg><span class="count">×2</span></div>
+      <div class="cell"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-minnow"/></svg><span class="count">×2</span></div>
+      <div class="cell"><span class="dot dot-rare"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-koi"/></svg><span class="count">×1</span></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+    </div>
+  </section>
+
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish · Shanghai Market</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Pudong Tackle Shop</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+
+</div>
+</body>
+</html>

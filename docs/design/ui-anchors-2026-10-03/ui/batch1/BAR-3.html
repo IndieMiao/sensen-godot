@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>BAR-3 · Energy Card (low)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-farm.css">
+<link rel="stylesheet" href="../kit-energycard.css">
+</head>
+<!-- batch 1 (farm group, 2026-10-03) · v3 (review 2026-10-04): the Energy Card, LOW state. Same component as HUD-3 (zero state),
+     styles in ../kit-energycard.css. The card states facts only (counts / states, never a predicted gain), never acts for the
+     player (tiles are guidance: Eat → bag Dishes, Cook → camera to the kitchen door, Tea → nearest tea seat on the map,
+     Rest → camera to the bench; see BAR-3-2), and its only button "Free to do now" just closes it.
+     body.scene-cam: canvas = source x --cam-scale + (--cam-x, --cam-y); shared kit.css + icons.svg untouched. -->
+<body class="scene-cam" style="--scene-top:#B0CFC1; --scene-bottom:#F7DDAD; --src-w:1024px; --src-h:1536px; --cam-scale:1.22; --cam-x:-127px; --cam-y:356px;">
+<div class="canvas ">
+
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/farm.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <!-- Scene tags (farm camera 1.22 / -127 / 356) -->
+  <div class="tag tag-card tag--pointer tag--anchor-bottom" style="--x:370px; --y:1015px; --dx:-40px"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Homestead Lv2</span></div>
+  <div class="tag tag-sell tag--pointer tag--anchor-bottom" style="--x:507px; --y:879px">Sell 12</div>
+  <svg class="plots" viewBox="0 0 1080 2400" aria-hidden="true">
+    <polygon class="p-hi" points="460,1312 404,1340 348,1312 404,1284"/>
+  </svg>
+  <div class="scene-dim is-deep"></div>
+  <div class="switch " title="Switch action"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-switch"/></svg></div>
+  <!-- main action FAB 176 (bottom-right): amber = not enough Energy for one use (tool badge 56 top-left · icon · verb · price) -->
+  <div class="fab is-amber" title="Sow ×1"><div class="gear-badge" title="Tools &amp; Gear"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-hoe"/></svg></div><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-sow"/></svg><span class="lbl">Sow ×1</span><span class="sub ">Need 2 Energy</span></div>
+  <!-- HUD v2: row1 y48-176 = avatar 112 · energy card 112 (bar 240x12) · coins 72 · Inbox 96; row2 y192-256 = Today chip · place chip "City · Space" (the Map entry) -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <!-- Farming (green) owns the right half: 12 -> 6 o'clock -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <!-- Fishing (blue) owns the left half: 6 -> 12 o'clock -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <!-- 1/200: amber (low, not zero) -->
+      <div class="energy-card card is-amber" style="--pct:0.5%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">1<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card "><b>Today</b><span class="dot-sep">·</span><span class="today-text">Radishes ready in 1h 12m</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Homestead</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  <!-- Quick Bar v4: 5 consumable slots + Bag = 6 x 160 (r 32), 12 gaps -> 1020; bottom edge 124 above the screen bottom. No energy price (it lives on the FAB). -->
+  <nav class="quickbar has-selection">
+    <div class="slots">
+        <div class="slot has-count is-selected"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-radish-seeds"/></svg><span class="name">Radish Seeds</span><span class="count">×24</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-carrot-seeds"/></svg><span class="name">Carrot Seeds</span><span class="count">×10</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-compost"/></svg><span class="name">Compost</span><span class="count">×6</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-feed-bag"/></svg><span class="name">Orchard Feed</span><span class="count">×2</span></div>
+        <div class="slot is-ghost"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-radish-seeds"/></svg></div>
+    </div>
+    <div class="bag card"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div>
+  </nav>
+
+  <!-- ===== Energy Card · LOW state (the same component as HUD-3; only the headline and the subtitle differ) =====
+       headline: ⚡ amber 1/200 · regen · subtitle: the need-vs-have fact · "Wait" info row · RECOVER group · 2 x 2 guidance
+       tiles (fact = count / state only; right end = where the tap takes you) · one button that closes the card. -->
+  <div class="ec" style="--w:920px; --top:1180px">
+    <div class="ec-title is-amber"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><span class="ec-num">1<span class="of">/200</span></span><span class="ec-regen">· +1 in <b>2:41</b></span></div>
+    <div class="ec-line">Sow 1 plot needs <b>2 Energy</b> <span class="sub">·</span> you have <b>1</b></div>
+    <div class="ec-info"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-clock"/></svg><span>Wait · Full in 13h 15m</span></div>
+    <div class="ec-group">
+      <div class="ec-head"><span class="ec-label">Recover</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="ec-rule"></div>
+      <div class="ec-tiles">
+        <div class="ec-tile" title="Opens the bag on the Dishes tab"><div class="ec-ic"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-eat"/></svg></div><div class="ec-txt"><span class="ec-name">Eat</span><span class="ec-fact">3 dishes in bag</span></div><span class="ec-go">Open bag <i>›</i></span></div>
+        <div class="ec-tile" title="Camera to the farmhouse kitchen door"><div class="ec-ic"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-pot"/></svg></div><div class="ec-txt"><span class="ec-name">Cook</span><span class="ec-fact">4 fish in creel</span></div><span class="ec-go">Show kitchen <i>›</i></span></div>
+        <div class="ec-tile" title="Nearest tea seat on the map"><div class="ec-ic"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-tea"/></svg></div><div class="ec-txt"><span class="ec-name">Tea</span><span class="ec-fact">1/3 today · 40 coins</span></div><span class="ec-go">Show on map <i>›</i></span></div>
+        <div class="ec-tile" title="Camera to the bench (BAR-3-2)"><div class="ec-ic"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-rest"/></svg></div><div class="ec-txt"><span class="ec-name">Rest</span><span class="ec-fact">Available</span></div><span class="ec-go">Show bench <i>›</i></span></div>
+      </div>
+    </div>
+    <div class="ec-foot">
+      <div class="btn btn-primary"><span>Free to do now</span></div>
+      <div class="ec-hint">Closes this card · tiles only guide you, nothing is used automatically</div>
+    </div>
+  </div>
+
+  <!-- Guide overlay: ?guide=1 or #guide -->
+  <div id="guide" class="guide">
+    <div class="g-line" style="top:120px"><span>safe top 120</span></div>
+    <div class="g-line" style="top:2300px"><span>safe bottom 100</span></div>
+    <div class="g-line is-green" style="top:2276px"><span>quick bar bottom · 124 from bottom</span></div>
+    <div class="g-line is-green" style="top:2116px"><span>slots top · 160 tall</span></div>
+    <div class="g-line is-blue" style="top:48px"><span>HUD row 1 · 48–176</span></div>
+    <div class="g-line is-blue" style="top:176px"></div>
+    <div class="g-line is-blue" style="top:192px"><span>HUD row 2 · 192–256</span></div>
+    <div class="g-line is-blue" style="top:256px"></div>
+    <div class="g-vline" style="left:30px"></div>
+    <div class="g-vline" style="left:1050px"></div>
+    <div class="g-vline" style="left:540px;border-left-style:dotted"></div>
+    <div class="g-box" style="right:30px;top:1876px;width:176px;height:176px;border-radius:88px">FAB 176</div>
+    <div class="g-box" style="right:70px;top:1756px;width:96px;height:96px;border-radius:48px"></div>
+  </div>
+  <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
+
+</div>
+</body>
+</html>

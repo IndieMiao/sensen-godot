@@ -1,0 +1,124 @@
+/* ============================================================================
+   kit-energycard.css — the Energy Card (2026-10-04, review round 3).
+   ONE popup component for every "not enough Energy" moment: Energy left but
+   short of the action's price (BAR-3) and Energy at zero (HUD-3) are the same
+   card; only the headline number/colour and the one-line subtitle differ.
+
+   Rules the card obeys (user review 2026-10-04):
+   · it only states facts the system knows for certain — counts and states
+     ("3 dishes in bag", "1/3 today · 40 coins", "Available") — never a
+     predicted gain ("Eat +40" is gone);
+   · it never acts for the player: every tile is guidance only — tapping it
+     closes the card and takes you to the thing (Eat → bag Dishes tab,
+     Cook → camera to the farmhouse kitchen door, Tea → nearest tea seat on
+     the map, Rest → camera to the bench); nothing is consumed automatically;
+   · the only button is "Free to do now", which just closes the card.
+
+   Self-contained (does not use kit-farm's .modal / .zc-*): card 920 · r 40 ·
+   cream · 1 px edge · no shadow. Loaded after kit.css (+ group kit) by
+   BAR-3 / BAR-3-2 / HUD-3. kit.css, kit-farm.css and icons.svg untouched.
+   ========================================================================== */
+
+/* ---------- the card ------------------------------------------------------ */
+.ec {
+  position: absolute; left: 50%; top: var(--top, 50%); transform: translate(-50%, -50%);
+  width: var(--w, 920px); z-index: 8;
+  background: var(--card-solid); border: 1px solid var(--card-edge); border-radius: 40px;
+  padding: 40px 44px 40px;
+}
+
+/* headline: ⚡ + Energy number (red when zero, amber when low) + "· +1 in m:ss" */
+.ec-title { display: flex; align-items: center; gap: 12px; font-size: 40px; font-weight: 800; line-height: 48px; white-space: nowrap; }
+.ec-title .ic { width: 44px; height: 44px; flex: 0 0 auto; }
+.ec-title .ec-num { font-variant-numeric: tabular-nums; }
+.ec-title .ec-num .of { color: var(--ink-2); }
+.ec-title.is-red .ec-num { color: var(--energy-red); }
+.ec-title.is-amber .ec-num { color: #B8831C; }
+.ec-title .ec-regen { color: var(--ink-2); font-weight: 700; }
+.ec-title .ec-regen b { color: var(--ink); font-weight: 800; }
+
+/* subtitle: the fact line (what it needs vs. what you have · or the zero-state line) */
+.ec-line { margin-top: 10px; font-size: 30px; font-weight: 700; line-height: 40px; color: var(--ink); }
+.ec-line b { font-weight: 800; }
+.ec-line .sub { color: var(--ink-2); }
+
+/* plain information row: clock + "Wait · Full in 13h 20m" (no frame, no fill) */
+.ec-info {
+  display: flex; align-items: center; gap: 12px; margin-top: 16px;
+  font-size: 26px; font-weight: 700; line-height: 34px; color: var(--ink-2);
+}
+.ec-info .ic { width: 30px; height: 30px; flex: 0 0 auto; }
+
+/* group label "RECOVER" + collapse chevron + hairline */
+.ec-group { margin-top: 30px; }
+.ec-head { display: flex; align-items: center; justify-content: space-between; height: 40px; }
+.ec-head .ec-label { font-size: 24px; font-weight: 800; line-height: 40px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--ink-2); }
+.ec-head .chev { width: 32px; height: 32px; color: var(--ink-2); transform: rotate(180deg); }   /* expanded → points up */
+.ec-rule { height: 0; border-top: 1px solid var(--card-edge); margin-top: 8px; }
+
+/* 2 × 2 guidance tiles: light fill, r 20, no button feel. Left: 40 px icon disc ·
+   bold name over a grey fact (counts / states only). Right end: 16 px grey
+   "where this takes you" + › — the "tap me and I'll take you there" cue. */
+.ec-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+.ec-tile {
+  height: 112px; border-radius: 20px; background: #F3F1EA; border: 1px solid rgba(225, 218, 200, 0.55);
+  padding: 0 14px 0 16px; display: flex; align-items: center; gap: 10px; min-width: 0;
+}
+.ec-tile .ec-ic {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%;
+  background: #FFFFFF; border: 1px solid rgba(47, 58, 51, 0.14);
+  display: flex; align-items: center; justify-content: center;
+}
+.ec-tile .ec-ic .ic { width: 26px; height: 26px; }
+.ec-tile .ec-txt { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.ec-tile .ec-name { font-size: 28px; font-weight: 800; line-height: 34px; color: var(--ink); white-space: nowrap; }
+.ec-tile .ec-fact {
+  font-size: 22px; font-weight: 700; line-height: 28px; color: var(--ink-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+.ec-tile .ec-go {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 2px;
+  font-size: 16px; font-weight: 700; line-height: 20px; color: #8A918C; white-space: nowrap; letter-spacing: 0.2px;
+}
+.ec-tile .ec-go i { font-style: normal; font-size: 22px; line-height: 20px; font-weight: 800; }
+
+/* foot: the one button (closes the card) + what the card does / does not do */
+.ec-foot { margin-top: 30px; display: flex; flex-direction: column; align-items: center; }
+.ec-foot .btn { width: 100%; font-size: 34px; }
+.ec-hint {
+  margin-top: 12px; max-width: 760px; text-align: center;
+  font-size: 22px; font-weight: 700; line-height: 28px; color: var(--ink-2);
+}
+
+/* ---------- after tapping a tile: guidance result (BAR-3-2) ----------------
+   The card is gone; the camera has moved. A tip capsule under the HUD names
+   the thing it brought you to (facility rule copy, not a prediction), and the
+   facility status dot is lit: 1.3 × with a primary halo. */
+.ec-tip {
+  position: absolute; left: 50%; top: var(--top, 300px); transform: translateX(-50%);
+  height: 72px; padding: 0 28px; border-radius: 36px;
+  display: inline-flex; align-items: center; gap: 12px; white-space: nowrap;
+  font-size: 26px; font-weight: 800; line-height: 1; color: var(--ink);
+  background: var(--card-solid); border: 1px solid var(--card-edge);
+  z-index: 7;
+}
+.ec-tip .ic { width: 34px; height: 34px; flex: 0 0 auto; }
+.ec-tip .sub { color: var(--ink-2); font-weight: 700; }
+.ec-tip .gain { color: var(--primary-edge); }
+
+.fac-dot.is-lit {
+  transform: translate(-50%, -50%) scale(1.3);
+  border-color: var(--primary-deep);
+  box-shadow: 0 0 0 8px rgba(127, 198, 106, 0.32), 0 0 0 20px rgba(127, 198, 106, 0.14);
+}
+
+/* bottom note (review copy): the zoomed camera puts grass under FARM-7's bare
+   caption slot, so the same 20 px grey line sits on a small cream capsule */
+.ec-note {
+  position: absolute; left: var(--m); top: 2028px; z-index: 9;
+  height: 48px; padding: 0 18px; border-radius: 24px;
+  display: inline-flex; align-items: center; white-space: nowrap;
+  font-size: 20px; font-weight: 700; line-height: 1; letter-spacing: 0.2px; color: var(--ink-2);
+  background: var(--card); border: 1px solid var(--card-edge);
+}

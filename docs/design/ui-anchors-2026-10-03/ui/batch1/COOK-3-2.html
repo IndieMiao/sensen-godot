@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>COOK-3-2 · Heat states</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-cook.css">
+</head>
+<!-- body class "scene-cam" = camera mode (v2): canvas = source × --cam-scale + (--cam-x, --cam-y).
+     Batch 1 (2026-10-03, cook group): shared kit.css/icons.svg untouched; additions live in kit-cook.css / icons-cook.svg. -->
+<body class="scene-cam" style="--scene-top:#B2D6D0; --scene-bottom:#F4D9B7; --src-w:1024px; --src-h:1536px; --cam-scale:1.39; --cam-x:-229px; --cam-y:280px;">
+<div class="canvas">
+
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/kitchen.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+  <div class="state-card" style="--x:30px; --y:200px"><div class="heat"><svg viewBox="0 0 200 200" aria-hidden="true"><circle class="ring-track" cx="100" cy="100" r="80"/><line class="tick" x1="100" y1="12" x2="100" y2="26"/><path class="ring-gold" d="M116.6 21.8A80 80 0 0 1 170.6 62.4"/><line class="needle" x1="100" y1="100" x2="165.8" y2="123.9"/><circle class="hub" cx="100" cy="100" r="10"/></svg></div><div class="t is-miss">Missed · still cooking</div><div class="q">Plain</div></div>
+  <div class="state-card" style="--x:382px; --y:200px"><div class="heat"><svg viewBox="0 0 200 200" aria-hidden="true"><circle class="ring-track" cx="100" cy="100" r="80"/><line class="tick" x1="100" y1="12" x2="100" y2="26"/><path class="ring-gold" d="M116.6 21.8A80 80 0 0 1 170.6 62.4"/><line class="needle" x1="100" y1="100" x2="123.9" y2="34.2"/><circle class="hub" cx="100" cy="100" r="10"/></svg></div><div class="t is-nice">Nice heat! ★</div><div class="q">Good ★</div></div>
+  <div class="state-card" style="--x:734px; --y:200px"><div class="heat"><svg viewBox="0 0 200 200" aria-hidden="true"><circle class="ring-track" cx="100" cy="100" r="80"/><line class="tick" x1="100" y1="12" x2="100" y2="26"/><path class="ring-gold" d="M116.6 21.8A80 80 0 0 1 170.6 62.4"/><line class="needle" x1="100" y1="100" x2="138.4" y2="42.5"/><circle class="hub" cx="100" cy="100" r="10"/><text x="100" y="150" text-anchor="middle" font-size="34" font-weight="800" fill="#C9962A">★★</text></svg></div><div class="t is-perfect">Perfect! ★★ · Extra portion</div><div class="q">Perfect ★★</div></div>
+  <div class="frame-wrap" style="--s:0.46; left:291px; top:720px;"><div class="frame">
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/kitchen.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <!-- two stoves cooking at once: both heat rings are up; stove 3's card enlarges and vibrates 1 s before its needle starts
+       (stove 1 / cabinet tags omitted here so the two stove cards stay readable at 0.46) -->
+  <div class="heat" style="--x:548px; --y:770px; --d:300px"><svg viewBox="0 0 200 200" aria-hidden="true"><circle class="ring-track" cx="100" cy="100" r="80"/><line class="tick" x1="100" y1="12" x2="100" y2="26"/><path class="ring-gold" d="M116.6 21.8A80 80 0 0 1 170.6 62.4"/><line class="needle" x1="100" y1="100" x2="123.9" y2="34.2"/><circle class="hub" cx="100" cy="100" r="10"/></svg></div>
+  <div class="heat" style="--x:800px; --y:830px; --d:300px"><svg viewBox="0 0 200 200" aria-hidden="true"><circle class="ring-track" cx="100" cy="100" r="80"/><line class="tick" x1="100" y1="12" x2="100" y2="26"/><path class="ring-gold" d="M116.6 21.8A80 80 0 0 1 170.6 62.4"/><line class="needle" x1="100" y1="100" x2="165.8" y2="123.9"/><circle class="hub" cx="100" cy="100" r="10"/></svg></div>
+  <div class="float is-gold" style="--x:400px; --y:600px; --fs:44px; --rot:-8deg">Nice heat! ★</div>
+  <div class="tag tag-stove tag--pointer tag--anchor-top" style="--x:549px; --y:1239px; --dx:-150px"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-steam"/></svg><span>Stove 2/3</span><span class="sep">·</span><span class="st-cooking">Cooking 0:09</span></div>
+  <div class="tag tag-stove tag--pointer tag--anchor-top is-next" style="--x:772px; --y:1301px; --dx:60px"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-steam"/></svg><span>Stove 3/3</span><span class="sep">·</span><span class="st-cooking">Cooking 0:14</span></div>
+  <div class="prog is-timer" style="--x:548px; --y:1130px; --d:140px; --dash:302; --fs:33px"><svg viewBox="0 0 300 300"><circle class="track" cx="150" cy="150" r="120"/><circle class="fill" cx="150" cy="150" r="120"/></svg><div class="pct">0:09</div></div>
+  <div class="prog is-timer" style="--x:800px; --y:1180px; --d:140px; --dash:180; --fs:33px"><svg viewBox="0 0 300 300"><circle class="track" cx="150" cy="150" r="120"/><circle class="fill" cx="150" cy="150" r="120"/></svg><div class="pct">0:14</div></div>
+  <div class="switch" title="Switch action"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-switch"/></svg></div>
+  <div class="fab" title="Cook"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-pot"/></svg><span class="lbl">Cook</span><span class="sub is-free">Free</span></div>
+  <!-- kitchen has no quick bar: only the FAB (Cook) and a lone Bag at the bar's right end -->
+  <div class="bag-fixed"><div class="bag card"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div></div>
+  <!-- HUD v2: row1 y48–176 = avatar 112 · energy card 112 (bar 240×12) · coins 72 · Inbox 96
+       row2 y192–256 = Today chip (left, shrinks) · place chip (right): house = home city · "City · Space" · › opens the Map -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Kitchen</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  </div></div>
+  <div class="frame-cap" style="left:540px; top:1852px"><span class="n">4</span><span>Two stoves · next card enlarges and vibrates</span></div>
+
+</div>
+</body>
+</html>

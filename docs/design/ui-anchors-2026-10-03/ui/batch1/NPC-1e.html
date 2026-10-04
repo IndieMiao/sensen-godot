@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>NPC-1e · Trading Post cabin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-npc.css">
+<link rel="stylesheet" href="../kit-facility.css">
+</head>
+<!-- NPC-1e (round 4, 2026-10-04): Trading Post cabin — the single outpost of small towns and wilderness cells: four small counters
+     (tea · tackle · produce · travel/stamp) each with its keeper, a stove, one tea table on a reindeer rug, Granny Wu by the fire,
+     Pip at the door. Base = ../../scenes/trading-post.png (cool-climate skin). Camera: canvas = source × 1.12 + (−30, 360). -->
+<body class="scene-cam" style="--scene-top:#C2DCDA; --scene-bottom:#F7DCB5; --src-w:1024px; --src-h:1536px; --cam-scale:1.12; --cam-x:-30px; --cam-y:360px;">
+<div class="canvas">
+
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/trading-post.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+
+  <div class="under-hud is-center"><div class="notice-chip"><span class="ok">Free</span><span class="sub">·</span><span>Home Set</span></div></div>
+
+  <!-- scene tags (canvas = source × 1.12 + (−30, 360)) -->
+  <div class="tag tag-sign tag--anchor-bottom" style="--x:650px; --y:690px">Tundra Trading Post</div>
+  <!-- four counters, four fingertip cards (each keeper keeps the same rules as its stand-alone room) -->
+  <div class="tag tag-tap tag--pointer tag--anchor-top" style="--x:194px; --y:1211px; --dx:70px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-tea"/></svg><span>Tea</span><span class="sep">·</span><span class="hint">Tap to talk</span></div>
+  <div class="tag tag-tap tag--pointer tag--anchor-top" style="--x:407px; --y:1077px; --dx:-20px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-tackle"/></svg><span>Tackle</span><span class="sep">·</span><span class="hint">Tap to talk</span></div>
+  <div class="tag tag-tap tag--pointer tag--anchor-top" style="--x:844px; --y:1166px; --dx:-20px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-market"/></svg><span>Market</span><span class="sep">·</span><span class="hint">Tap to talk</span></div>
+  <div class="tag tag-tap tag--pointer tag--anchor-top" style="--x:978px; --y:1250px; --dx:-130px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-travel"/></svg><span>Post</span><span class="sep">·</span><span class="hint">Tap to talk</span></div>
+  <!-- Granny Wu (campfire elder, the cabin is her home): pink ♥ = not gifted today and you carry a dish she likes -->
+  <div class="bubble is-gift" style="--x:690px; --y:915px">♥</div>
+  <div class="tag tag-name tag--anchor-bottom" style="--x:631px; --y:940px; --dx:-115px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-face-granny"/></svg><span>Granny Wu</span></div>
+  <!-- Pip at the door -->
+  <div class="bubble is-new" style="--x:396px; --y:1335px">!</div>
+  <div class="tag tag-name tag--pointer tag--anchor-top" style="--x:396px; --y:1491px; --dx:-60px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-face-pip"/></svg><span>Pip</span></div>
+  <!-- the gate at the open front = the door back to the map -->
+  <div class="tag tag-card tag--pointer tag--anchor-top" style="--x:597px; --y:1480px; --dx:40px"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-map"/></svg><span>Door</span><span class="sub">· Back to map</span></div>
+
+  <!-- bottom: collapsed quick-bar handle · Bag only (no main action key, no switch in an outpost) -->
+  <div class="bar-handle" title="Quick bar"><div class="grip"></div></div>
+  <div class="bag card bag-fixed"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div>
+
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish · Shanghai Market Square</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Tromsø</span><span class="sep">·</span><span class="space">Trading Post</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+
+  <div id="guide" class="guide">
+    <div class="g-line" style="top:120px"><span>safe top 120</span></div>
+    <div class="g-line" style="top:2300px"><span>safe bottom 100</span></div>
+    <div class="g-line is-green" style="top:2276px"><span>bar bottom · 124 from bottom</span></div>
+    <div class="g-line is-blue" style="top:48px"><span>HUD row 1 · 48–176</span></div>
+    <div class="g-line is-blue" style="top:192px"><span>HUD row 2 · 192–256</span></div>
+    <div class="g-vline" style="left:30px"></div>
+    <div class="g-vline" style="left:1050px"></div>
+  </div>
+  <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
+
+</div>
+</body>
+</html>

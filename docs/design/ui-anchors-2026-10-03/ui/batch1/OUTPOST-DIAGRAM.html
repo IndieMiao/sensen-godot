@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>OUTPOST-DIAGRAM · Outposts by keeper, Ponds &amp; POI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-npc.css">
+</head>
+<!-- OUTPOST-DIAGRAM v2 (2026-10-04, per-keeper outposts): review diagram, pure HTML/SVG, pastel. Top: a tier-6 city with
+     tea houses (6), tackle shops on pond banks (4), market squares (3), travel posts (2), player farms and unmarked POI dots;
+     a tier-1 town with a single trading-post cabin; a tier-3 city. Bottom: legend, tier → counts table, the guarantee. -->
+<body>
+<div class="canvas">
+  <div class="dg-page">
+    <div class="dg-title">Outposts by keeper, Ponds &amp; POI</div>
+    <div class="dg-sub">One keeper = one room = one pin. Indoor rooms everywhere except the open-air Market Square.</div>
+
+    <div class="dg-fig">
+      <svg viewBox="0 0 960 1000" aria-hidden="true">
+        <defs>
+          <clipPath id="cityClip"><circle cx="380" cy="540" r="358"/></clipPath>
+          <clipPath id="townClip"><circle cx="820" cy="250" r="118"/></clipPath>
+          <clipPath id="midClip"><circle cx="810" cy="740" r="133"/></clipPath>
+        </defs>
+
+        <!-- ===== big city (tier 6) ===== -->
+        <circle cx="380" cy="540" r="360" fill="#F3EEDF" stroke="#E1DAC8" stroke-width="2"/>
+        <g clip-path="url(#cityClip)">
+          <path d="M20 700 C 120 640, 200 760, 330 720 S 560 820, 740 760 L 740 900 L 20 900 Z" fill="#C8F3FF"/>
+          <path d="M20 700 C 120 640, 200 760, 330 720 S 560 820, 740 760" fill="none" stroke="#9EDBEF" stroke-width="6"/>
+          <circle cx="250" cy="330" r="70" fill="#DDF4C8"/>
+          <circle cx="560" cy="420" r="52" fill="#DDF4C8"/>
+          <circle cx="150" cy="560" r="44" fill="#DDF4C8"/>
+          <g stroke="#E8E1D0" stroke-width="4">
+            <line x1="20" y1="300" x2="740" y2="300"/><line x1="20" y1="390" x2="740" y2="390"/><line x1="20" y1="480" x2="740" y2="480"/>
+            <line x1="20" y1="570" x2="740" y2="570"/><line x1="20" y1="660" x2="740" y2="660"/>
+            <line x1="200" y1="180" x2="200" y2="900"/><line x1="290" y1="180" x2="290" y2="900"/><line x1="380" y1="180" x2="380" y2="900"/>
+            <line x1="470" y1="180" x2="470" y2="900"/><line x1="560" y1="180" x2="560" y2="900"/><line x1="650" y1="180" x2="650" y2="900"/>
+          </g>
+          <!-- denser built-up core (tea houses follow density) -->
+          <circle cx="400" cy="420" r="150" fill="#EBE3CF" opacity=".55"/>
+        </g>
+        <!-- POI dots: grey, no badge, no label (only their density nudges placement) -->
+        <g fill="#C9CCD1" stroke="#fff" stroke-width="3">
+          <circle cx="330" cy="350" r="9"/><circle cx="420" cy="320" r="9"/><circle cx="500" cy="500" r="9"/><circle cx="300" cy="470" r="9"/>
+          <circle cx="620" cy="560" r="9"/><circle cx="240" cy="620" r="9"/><circle cx="560" cy="300" r="9"/><circle cx="450" cy="600" r="9"/>
+          <circle cx="160" cy="470" r="9"/><circle cx="660" cy="430" r="9"/><circle cx="380" cy="770" r="9"/><circle cx="520" cy="730" r="9"/>
+          <circle cx="110" cy="640" r="9"/><circle cx="600" cy="660" r="9"/><circle cx="360" cy="430" r="9"/><circle cx="440" cy="470" r="9"/>
+        </g>
+        <!-- 3 ponds -->
+        <use href="../icons-npc.svg#i-pond" x="343" y="653" width="64" height="64"/><use href="../icons-npc.svg#i-pond" x="173" y="318" width="64" height="64"/><use href="../icons-npc.svg#i-pond" x="578" y="728" width="64" height="64"/>
+        <!-- 4 tackle shops: each on a pond bank -->
+        <use href="../icons-npc.svg#i-tackle" x="402" y="622" width="56" height="56"/><use href="../icons-npc.svg#i-tackle" x="234" y="344" width="56" height="56"/><use href="../icons-npc.svg#i-tackle" x="532" y="717" width="56" height="56"/><use href="../icons-npc.svg#i-tackle" x="294" y="707" width="56" height="56"/>
+        <!-- 6 tea houses: spread over the built-up area, ≥ 3 km apart -->
+        <use href="../icons-npc.svg#i-tea" x="322" y="372" width="56" height="56"/><use href="../icons-npc.svg#i-tea" x="452" y="322" width="56" height="56"/><use href="../icons-npc.svg#i-tea" x="212" y="492" width="56" height="56"/><use href="../icons-npc.svg#i-tea" x="532" y="472" width="56" height="56"/><use href="../icons-npc.svg#i-tea" x="172" y="712" width="56" height="56"/><use href="../icons-npc.svg#i-tea" x="452" y="772" width="56" height="56"/>
+        <!-- 3 market squares: #1 near the centre and the beginner pond -->
+        <use href="../icons-npc.svg#i-market" x="378" y="508" width="64" height="64"/><use href="../icons-npc.svg#i-market" x="138" y="388" width="64" height="64"/><use href="../icons-npc.svg#i-market" x="588" y="588" width="64" height="64"/>
+        <!-- 2 travel posts: #1 at the centre / transit density, #2 far side -->
+        <use href="../icons-npc.svg#i-travel" x="408" y="418" width="64" height="64"/><use href="../icons-npc.svg#i-travel" x="138" y="608" width="64" height="64"/>
+        <!-- 3 player farms -->
+        <use href="../icons-npc.svg#i-crest" x="580" y="470" width="52" height="52"/><use href="../icons-npc.svg#i-crest" x="94" y="474" width="52" height="52"/><use href="../icons-npc.svg#i-crest" x="470" y="674" width="52" height="52"/>
+        <!-- labels -->
+        <text x="380" y="215" text-anchor="middle" font-size="28" font-weight="800" fill="#2F3A33">Shanghai · tier 6 · 15 outposts</text>
+        <text x="380" y="245" text-anchor="middle" font-size="19" font-weight="700" fill="#6E7B74">6 tea houses · 4 tackle shops · 3 market squares · 2 travel posts</text><text x="380" y="270" text-anchor="middle" font-size="18" font-weight="700" fill="#6E7B74">POI dots stay unmarked · their density only nudges a pin</text>
+
+        <!-- ===== small town (tier 1) ===== -->
+        <circle cx="820" cy="250" r="120" fill="#F3EEDF" stroke="#E1DAC8" stroke-width="2"/>
+        <g clip-path="url(#townClip)">
+          <circle cx="860" cy="300" r="40" fill="#DDF4C8"/>
+          <g stroke="#E8E1D0" stroke-width="4"><line x1="700" y1="250" x2="940" y2="250"/><line x1="820" y1="130" x2="820" y2="370"/></g>
+        </g>
+        <g fill="#C9CCD1" stroke="#fff" stroke-width="3"><circle cx="770" cy="215" r="8"/><circle cx="875" cy="225" r="8"/></g>
+        <use href="../icons-npc.svg#i-group" x="794" y="230" width="64" height="64"/><use href="../icons-npc.svg#i-pond" x="752" y="266" width="48" height="48"/>
+        <text x="820" y="110" text-anchor="middle" font-size="22" font-weight="800" fill="#2F3A33">Small town · tier 1</text>
+        <text x="820" y="395" text-anchor="middle" font-size="18" font-weight="700" fill="#6E7B74">1 cabin · all 4 keepers · 1 pond</text>
+
+        <!-- ===== mid city (tier 3) ===== -->
+        <circle cx="810" cy="740" r="135" fill="#F3EEDF" stroke="#E1DAC8" stroke-width="2"/>
+        <g clip-path="url(#midClip)">
+          <path d="M675 800 C 740 770, 800 830, 945 790 L 945 880 L 675 880 Z" fill="#C8F3FF"/>
+          <circle cx="760" cy="690" r="34" fill="#DDF4C8"/>
+          <g stroke="#E8E1D0" stroke-width="4"><line x1="675" y1="700" x2="945" y2="700"/><line x1="675" y1="760" x2="945" y2="760"/><line x1="760" y1="605" x2="760" y2="875"/><line x1="860" y1="605" x2="860" y2="875"/></g>
+        </g>
+        <g fill="#C9CCD1" stroke="#fff" stroke-width="3"><circle cx="730" cy="760" r="8"/><circle cx="880" cy="690" r="8"/><circle cx="700" cy="690" r="8"/></g>
+        <use href="../icons-npc.svg#i-pond" x="850" y="800" width="48" height="48"/><use href="../icons-npc.svg#i-tackle" x="814" y="784" width="44" height="44"/>
+        <use href="../icons-npc.svg#i-tea" x="738" y="628" width="44" height="44"/><use href="../icons-npc.svg#i-tea" x="848" y="668" width="44" height="44"/><use href="../icons-npc.svg#i-tea" x="713" y="778" width="44" height="44"/>
+        <use href="../icons-npc.svg#i-market" x="786" y="706" width="48" height="48"/><use href="../icons-npc.svg#i-market" x="676" y="716" width="48" height="48"/>
+        <use href="../icons-npc.svg#i-travel" x="826" y="616" width="48" height="48"/><use href="../icons-npc.svg#i-travel" x="736" y="826" width="48" height="48"/>
+        <use href="../icons-npc.svg#i-crest" x="702" y="670" width="40" height="40"/>
+        <text x="810" y="585" text-anchor="middle" font-size="22" font-weight="800" fill="#2F3A33">San Francisco · tier 3</text>
+        <text x="810" y="905" text-anchor="middle" font-size="18" font-weight="700" fill="#6E7B74">3 tea · 1 tackle · 2 market · 2 travel</text>
+
+        <!-- footer note inside the figure -->
+        <text x="480" y="962" text-anchor="middle" font-size="18" font-weight="700" fill="#6E7B74">Tackle shops on pond banks · tea houses follow built-up density · travel posts at the centre</text><text x="480" y="986" text-anchor="middle" font-size="18" font-weight="700" fill="#6E7B74">All pins placed once by the server · never moved</text>
+      </svg>
+    </div>
+
+    <div class="dg-legend">
+      <div class="li"><div class="sw"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-tea"/></svg></div><div><b>Tea House</b> · indoor room · hot tea, tea table = party room · count = city tier (1–6)</div></div>
+      <div class="li"><div class="sw"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-tackle"/></svg></div><div><b>Tackle Shop</b> · indoor room on a pond bank · rods, bait, fish buyback, bite board</div></div>
+      <div class="li"><div class="sw"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-market"/></svg></div><div><b>Market Square</b> · the only outdoor outpost · regional seeds, request board, specialty shelf, weekend market</div></div>
+      <div class="li"><div class="sw"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-travel"/></svg></div><div><b>Travel Post</b> · indoor room · permits, tickets, stamp desk, coffee · 1–2 per city</div></div>
+      <div class="li"><div class="sw"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-group"/></svg></div><div><b>Trading Post cabin</b> · small towns &amp; wilderness · all four keepers in one indoor room</div></div>
+      <div class="li"><div class="sw"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-pond"/></svg></div><div><b>Pond</b> · one per 0.5° grid cell · beginner pond guaranteed</div></div>
+      <div class="li"><div class="sw"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-crest"/></svg></div><div><b>Farm</b> · private instance per player · pinned with the family crest</div></div>
+      <div class="li"><div class="sw is-poi"></div><div><b>POI</b> · visual layer only · its density may nudge a pin, never named or claimed</div></div>
+    </div>
+
+    <div class="dg-sec">City tier → outposts</div>
+    <div class="dg-table is-wide">
+      <div class="tr is-head"><span>City population</span><span>Tea · Tackle · Market · Travel</span><span>Examples</span></div>
+      <div class="tr"><span>&lt; 0.5 M</span><span class="n"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-group"/></svg>1 cabin</span><span class="ex">Small town · wilderness</span></div>
+      <div class="tr"><span>0.5 – 1.5 M</span><span class="n">2 · ≤2 · 1 · 1</span><span class="ex">Denver</span></div>
+      <div class="tr"><span>1.5 – 3 M</span><span class="n">3 · ≤3 · 2 · 2</span><span class="ex">San Francisco</span></div>
+      <div class="tr"><span>3 – 8 M</span><span class="n">4 · ≤4 · 2 · 2</span><span class="ex">Berlin</span></div>
+      <div class="tr"><span>8 – 15 M</span><span class="n">5 · ≤5 · 3 · 2</span><span class="ex">London</span></div>
+      <div class="tr"><span>&gt; 15 M</span><span class="n">6 · ≤6 · 3 · 2</span><span class="ex">Shanghai</span></div>
+    </div>
+    <div class="dg-rule"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg><span>Every city guarantees all four keepers + ≥1 beginner pond; your Home Set = the nearest of each</span></div>
+    <div class="dg-foot">Tackle shops ≤ 300 m from a pond · tea houses ≥ 3 km apart · market square #1 within 800 m of the beginner pond · all pins placed once by the server and never moved. City zoom clusters same-type pins ("Tea House ×6").</div>
+  </div>
+</div>
+</body>
+</html>

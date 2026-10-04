@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>FISH-5-2 · Got Away variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-cook.css">
+</head>
+<!-- body class "scene-cam" = camera mode (v2): canvas = source × --cam-scale + (--cam-x, --cam-y).
+     Batch 1 (2026-10-03, cook group): shared kit.css/icons.svg untouched; additions live in kit-cook.css / icons-cook.svg. -->
+<body class="scene-cam" style="--scene-top:#C2DADC; --scene-bottom:#D0D1E4; --src-w:1024px; --src-h:1536px; --cam-scale:1.45; --cam-x:-207px; --cam-y:246px;">
+<div class="canvas">
+
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/pond.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+  <div class="frame-wrap" style="--s:0.3; left:30px; top:800px;"><div class="frame">
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/pond.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <!-- Creel badge under the HUD (y 272) -->
+  <div class="under-hud"><div class="creel card pill"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-creel"/></svg><span>Creel 7</span><span class="dot-sep">·</span><span class="free">6 free</span></div></div>
+  <!-- the fish broke free: only fading ripples remain at the cast point -->
+  <div class="ripple" style="--x:453px; --y:1212px; --w:420px; --h:180px; --a:.3"></div>
+  <div class="ripple" style="--x:453px; --y:1212px; --w:300px; --h:128px; --a:.5"></div>
+  <div class="ripple" style="--x:453px; --y:1212px; --w:180px; --h:78px; --a:.75"></div>
+  <div class="modal four-card" style="--y:1240px; --w:980px">
+    <div class="four">
+      <div class="sil">
+        <svg class="big " aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg>
+        <div class="dex-mini">
+          <div class="t is-common"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div><div class="t is-common"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div><div class="t is-caught"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div>
+          <div class="t"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div><div class="t is-lit"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div><div class="t"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div>
+          <div class="cap">Fish-dex</div>
+        </div>
+      </div>
+      <div class="lines">
+        <div class="ttl">Too heavy for your rod</div>
+        <div class="ln">Reed Rod · Fishing Lv3 · 80 coins</div>
+        <div class="ln">Lands Rare fish</div>
+        <div class="ln is-ok">3 Energy back</div>
+      </div>
+    </div>
+    <div class="acts"><div class="btn-sm btn-sec">Tackle Shop</div><div class="btn-sm btn-primary">Keep fishing</div></div>
+  </div>
+  <div class="switch" title="Switch action"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-switch"/></svg></div>
+  <div class="fab" title="Cast"><div class="gear-badge" title="Starter Rod · Tools & Gear"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-rod"/></svg></div><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-rod"/></svg><span class="lbl">Cast</span><span class="sub">5 Energy</span></div>
+  <!-- Quick Bar v4: Fishing consumables only (bait · lure · trap); the rod lives in Tools & Gear (FAB badge) -->
+  <nav class="quickbar has-selection">
+    <div class="slots">
+        <div class="slot has-count is-selected"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-worm"/></svg><span class="name">Worm Bait</span><span class="count">×12</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-lure"/></svg><span class="name">Spinner Lure</span><span class="count">×3</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-trap"/></svg><span class="name">Fish Trap</span><span class="count">×1</span></div>
+        <div class="slot is-ghost"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-worm"/></svg></div>
+        <div class="slot is-ghost"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-lure"/></svg></div>
+    </div>
+    <div class="bag card"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div>
+  </nav>
+  <!-- HUD v2: row1 y48–176 = avatar 112 · energy card 112 (bar 240×12) · coins 72 · Inbox 96
+       row2 y192–256 = Today chip (left, shrinks) · place chip (right): house = home city · "City · Space" · › opens the Map -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Willow Pond</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  </div></div>
+  <div class="frame-cap" style="left:192px; top:1548px"><span class="n">1</span><span>Rod too light</span></div>
+  <div class="frame-wrap" style="--s:0.3; left:378px; top:800px;"><div class="frame">
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/pond.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <!-- Creel badge under the HUD (y 272) -->
+  <div class="under-hud"><div class="creel card pill"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-creel"/></svg><span>Creel 7</span><span class="dot-sep">·</span><span class="free">6 free</span></div></div>
+  <!-- the fish broke free: only fading ripples remain at the cast point -->
+  <div class="ripple" style="--x:453px; --y:1212px; --w:420px; --h:180px; --a:.3"></div>
+  <div class="ripple" style="--x:453px; --y:1212px; --w:300px; --h:128px; --a:.5"></div>
+  <div class="ripple" style="--x:453px; --y:1212px; --w:180px; --h:78px; --a:.75"></div>
+  <div class="float is-energy" style="--x:540px; --y:1060px; --fs:40px">It got away · Energy refunded (7 left today)</div>
+  <div class="switch" title="Switch action"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-switch"/></svg></div>
+  <div class="fab" title="Cast"><div class="gear-badge" title="Starter Rod · Tools & Gear"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-rod"/></svg></div><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-rod"/></svg><span class="lbl">Cast</span><span class="sub">5 Energy</span></div>
+  <!-- Quick Bar v4: Fishing consumables only (bait · lure · trap); the rod lives in Tools & Gear (FAB badge) -->
+  <nav class="quickbar has-selection">
+    <div class="slots">
+        <div class="slot has-count is-selected"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-worm"/></svg><span class="name">Worm Bait</span><span class="count">×12</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-lure"/></svg><span class="name">Spinner Lure</span><span class="count">×3</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-trap"/></svg><span class="name">Fish Trap</span><span class="count">×1</span></div>
+        <div class="slot is-ghost"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-worm"/></svg></div>
+        <div class="slot is-ghost"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-lure"/></svg></div>
+    </div>
+    <div class="bag card"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div>
+  </nav>
+  <!-- HUD v2: row1 y48–176 = avatar 112 · energy card 112 (bar 240×12) · coins 72 · Inbox 96
+       row2 y192–256 = Today chip (left, shrinks) · place chip (right): house = home city · "City · Space" · › opens the Map -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Willow Pond</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  </div></div>
+  <div class="frame-cap" style="left:540px; top:1548px"><span class="n">2</span><span>Protected · refund</span></div>
+  <div class="frame-wrap" style="--s:0.3; left:726px; top:800px;"><div class="frame">
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/pond.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <!-- Creel badge under the HUD (y 272) -->
+  <div class="under-hud"><div class="creel card pill"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-creel"/></svg><span>Creel 7</span><span class="dot-sep">·</span><span class="free">6 free</span></div></div>
+  <!-- the fish broke free: only fading ripples remain at the cast point -->
+  <div class="ripple" style="--x:453px; --y:1212px; --w:420px; --h:180px; --a:.3"></div>
+  <div class="ripple" style="--x:453px; --y:1212px; --w:300px; --h:128px; --a:.5"></div>
+  <div class="ripple" style="--x:453px; --y:1212px; --w:180px; --h:78px; --a:.75"></div>
+  <div class="modal four-card" style="--y:1240px; --w:980px">
+    <div class="four">
+      <div class="sil">
+        <svg class="big is-fine" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg>
+        <div class="dex-mini">
+          <div class="t is-common"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div><div class="t is-common"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div><div class="t is-caught"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div>
+          <div class="t"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div><div class="t is-lit is-fine-lit"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div><div class="t"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></div>
+          <div class="cap">Fish-dex</div>
+        </div>
+      </div>
+      <div class="lines">
+        <div class="ttl">Too strong</div>
+        <div class="ln">Fishing Lv 2 · 3 XP to go</div>
+        <div class="ln">Unlocks Fine fish (Perch, Bass)</div>
+        <div class="ln is-ok">3 Energy back</div>
+      </div>
+    </div>
+    <div class="acts"><div class="btn-sm btn-sec">Fish-dex</div><div class="btn-sm btn-primary">Keep fishing</div></div>
+  </div>
+  <div class="switch" title="Switch action"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-switch"/></svg></div>
+  <div class="fab" title="Cast"><div class="gear-badge" title="Starter Rod · Tools & Gear"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-rod"/></svg></div><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-rod"/></svg><span class="lbl">Cast</span><span class="sub">5 Energy</span></div>
+  <!-- Quick Bar v4: Fishing consumables only (bait · lure · trap); the rod lives in Tools & Gear (FAB badge) -->
+  <nav class="quickbar has-selection">
+    <div class="slots">
+        <div class="slot has-count is-selected"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-worm"/></svg><span class="name">Worm Bait</span><span class="count">×12</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-lure"/></svg><span class="name">Spinner Lure</span><span class="count">×3</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-trap"/></svg><span class="name">Fish Trap</span><span class="count">×1</span></div>
+        <div class="slot is-ghost"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-worm"/></svg></div>
+        <div class="slot is-ghost"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-lure"/></svg></div>
+    </div>
+    <div class="bag card"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div>
+  </nav>
+  <!-- HUD v2: row1 y48–176 = avatar 112 · energy card 112 (bar 240×12) · coins 72 · Inbox 96
+       row2 y192–256 = Today chip (left, shrinks) · place chip (right): house = home city · "City · Space" · › opens the Map -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Willow Pond</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  </div></div>
+  <div class="frame-cap" style="left:888px; top:1548px"><span class="n">3</span><span>First lock · Lv 2</span></div>
+
+</div>
+</body>
+</html>

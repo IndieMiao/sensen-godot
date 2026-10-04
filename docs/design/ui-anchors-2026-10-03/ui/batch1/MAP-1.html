@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>MAP-1 · Map Browse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-npc.css">
+</head>
+<!-- MAP-1 (group npc, 2026-10-03): city-level map browse centred on the home city.
+     Base = ../../scenes/map-tile.png (1080×2400 cover crop of social-background variant-a, a pastel 3D city map; see scenes/map-tile.SOURCE.txt).
+     Default cover scene mode (1:1). Layers: map 0 · POI lights 1 · fog 2 (hole over the home city) · pins / bubbles / friends 3 · HUD 5 · bottom controls 6.
+     Bottom: quick bar collapsed to a handle, Bag only; no FAB, no switch, no Map button; "Nearby Cities" in the FAB's corner. -->
+<body style="--scene-top:#CFE6DC; --scene-bottom:#9EDBEF;">
+<div class="canvas">
+
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/map-tile.png" alt="">
+  </div>
+
+  <!-- real-world POI: lit discs only — no badge, no label (tap = read-only name card) -->
+  <div class="poi is-cafe" style="--x:640px; --y:1010px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-poi-cafe"/></svg></div>
+  <div class="poi is-shop" style="--x:470px; --y:1160px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-poi-shop"/></svg></div>
+  <div class="poi is-park" style="--x:880px; --y:1330px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-poi-park"/></svg></div>
+  <div class="poi is-museum" style="--x:380px; --y:1420px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-poi-museum"/></svg></div>
+  <div class="poi is-cafe" style="--x:700px; --y:1740px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-poi-cafe"/></svg></div>
+  <div class="poi is-shop" style="--x:230px; --y:1300px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-poi-shop"/></svg></div>
+  <div class="poi is-park" style="--x:560px; --y:860px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-poi-park"/></svg></div>
+
+  <!-- fog: #B9BDC4 60 % with a feathered hole over the home city (neighbouring cities stay under it) -->
+  <div class="fog" style="--fx:540px; --fy:1180px; --frx:520px; --fry:640px"></div>
+
+  <!-- home city bubble (name + online count) -->
+  <div class="city is-home" style="--x:540px; --y:620px"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="on">14 online</span></div>
+
+  <!-- neighbouring cities under the fog: grey silhouettes, "Unexplored" -->
+  <div class="city is-grey" style="--x:250px; --y:470px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-city-grey"/></svg><span>Suzhou</span><span class="sep">·</span><span class="sub">Unexplored</span></div>
+  <div class="city is-grey" style="--x:860px; --y:430px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-city-grey"/></svg><span>Nantong</span><span class="sep">·</span><span class="sub">Unexplored</span></div>
+  <div class="city is-grey" style="--x:230px; --y:1880px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-city-grey"/></svg><span>Hangzhou</span><span class="sep">·</span><span class="sub">Unexplored</span></div>
+  <div class="city is-grey" style="--x:520px; --y:2020px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-city-grey"/></svg><span>Jiaxing</span><span class="sep">·</span><span class="sub">Unexplored</span></div>
+
+  <!-- outpost pins (v2 2026-10-04: one keeper = one pin, typed icons; online count under the name); marker badges: gold ! = request to take, green ✓ = deliverable -->
+  <div class="pin is-outpost" style="--x:790px; --y:1060px">
+    <div class="disc"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-market"/></svg><span class="mk is-request">!</span></div>
+    <div class="lbl"><span class="n">Shanghai Market Square <span class="sep">·</span> <span class="on">3 online</span></span></div>
+  </div>
+  <div class="pin is-outpost" style="--x:270px; --y:1345px">
+    <div class="disc"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-tackle"/></svg><span class="mk is-deliver"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></span></div>
+    <div class="lbl"><span class="n">Hongkou Tackle Shop <span class="sep">·</span> <span class="on">5 online</span></span></div>
+  </div>
+  <div class="pin is-outpost" style="--x:300px; --y:1600px">
+    <div class="disc"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-tea"/></svg></div>
+    <div class="lbl"><span class="n">Lotus Tea House <span class="sep">·</span> <span class="on">4 online</span></span></div>
+  </div>
+  <div class="pin is-outpost" style="--x:360px; --y:790px">
+    <div class="disc"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-travel"/></svg></div>
+    <div class="lbl"><span class="n">Shanghai Travel Post <span class="sep">·</span> <span class="on">2 online</span></span></div>
+  </div>
+  <!-- city-zoom cluster of same-type pins (expands to a list when tapped) -->
+  <div class="pin is-outpost is-cluster" style="--x:760px; --y:1760px">
+    <div class="disc"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-tea"/></svg><span class="mk is-count">×5</span></div>
+    <div class="lbl"><span class="n">Tea House ×5 <span class="sep">·</span> <span class="on">12 online</span></span><span class="s">Tap to list</span></div>
+  </div>
+  <div class="pin is-pond" style="--x:800px; --y:1500px">
+    <div class="disc"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-pond"/></svg><span class="mk is-new">◆</span></div>
+    <div class="lbl"><span class="n">Willow Pond</span><span class="s">Beginner pond · 1.2 km</span></div>
+  </div>
+  <div class="pin is-pond" style="--x:190px; --y:1090px">
+    <div class="disc"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-pond"/></svg></div>
+    <div class="lbl"><span class="n">Reed Pond</span><span class="s">Beginner pond · 3.4 km</span></div>
+  </div>
+
+  <!-- farm crest pin (your homestead) + "you" dot -->
+  <div class="pin is-farm" style="--x:540px; --y:1310px">
+    <div class="disc"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-crest"/></svg></div>
+    <div class="lbl"><span class="n">Homestead</span><span class="s">Your farm</span></div>
+  </div>
+  <div class="you" style="--x:596px; --y:1262px"></div>
+
+  <!-- two friends on the map -->
+  <div class="friend" style="--x:680px; --y:880px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-face-friend"/></svg><span class="nm">Mira</span></div>
+  <div class="friend" style="--x:420px; --y:1760px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-face-player"/></svg><span class="nm">Kai</span></div>
+
+  <!-- bottom: collapsed quick-bar handle · Bag · Nearby Cities (no FAB, no switch, no Map button) -->
+  <div class="bar-handle" title="Quick bar"><div class="grip"></div></div>
+  <div class="bag card bag-fixed"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div>
+  <div class="nearby-btn" title="Nearby Cities"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-cities"/></svg><span>Nearby Cities</span></div>
+
+  <!-- HUD v2: row1 avatar · energy · coins · Inbox; row2 Today chip · place chip (tap = back to the scene you are in) -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish · Shanghai Market Square</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Back to Homestead"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Homestead</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+
+  <div id="guide" class="guide">
+    <div class="g-line" style="top:120px"><span>safe top 120</span></div>
+    <div class="g-line" style="top:2300px"><span>safe bottom 100</span></div>
+    <div class="g-line is-green" style="top:2276px"><span>bar bottom · 124 from bottom</span></div>
+    <div class="g-line is-blue" style="top:48px"><span>HUD row 1 · 48–176</span></div>
+    <div class="g-line is-blue" style="top:192px"><span>HUD row 2 · 192–256</span></div>
+    <div class="g-vline" style="left:30px"></div>
+    <div class="g-vline" style="left:1050px"></div>
+  </div>
+  <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
+
+</div>
+</body>
+</html>

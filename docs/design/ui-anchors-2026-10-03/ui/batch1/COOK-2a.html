@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>COOK-2a · Cookbook · Grilled Crucian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-cook.css">
+</head>
+<!-- v5 cook stage (2026-10-04, user Figma mark-up "COOK-2b-修改"): the camera frames the stove; the pot is a 3D object in the
+     scene and ingredients drop into it in 3D; the drawer (60 %) only carries the two tabs + the bag / the Cookbook grid.
+     canvas = source × 1.85 + (−511, −499) → the diorama's pot centre (source 568, 583) lands at canvas (540, 580). -->
+<body class="scene-cam drawer-open cook-stage" style="--scene-top:#B2D6D0; --scene-bottom:#F4D9B7; --src-w:1024px; --src-h:1536px; --cam-scale:1.85; --cam-x:-511px; --cam-y:-499px;">
+<div class="canvas">
+
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/kitchen.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+  <!-- Stage: the selected Cookbook page previews on the 3D pot — its ingredient hovers ghosted over the pot,
+       the slot strip shows what the recipe will take from the bag, the capsule states facts only -->
+  <div class="stage">
+    <div class="pot-ing is-ghost" style="--x:540px; --y:552px; --d:84px; --rot:-10deg"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg></div>
+    <div class="pot-slots" style="--y:730px">
+      <div class="pot-slot is-ghost"><div class="ring"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span class="dot dot-common"></span></div><div class="nm ok">Pond Crucian · have 3</div></div>
+    </div>
+    <div class="pot-cap" style="--y:880px"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-grilled"/></svg><span>Grilled Crucian</span><span class="sep">·</span><span class="rar-common">Common</span><span class="sep">·</span><span>5 s</span><span class="sep">·</span><span class="ok">Ready to cook</span></div>
+  </div>
+
+  <!-- Cookbook tab (Recipes + Cookbook merged, 2026-10-04): filter row · detail card (icon · name / facts / desc · Ingredients) · page grid -->
+  <section class="drawer is-cookbook">
+    <div class="drawer-head">
+      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stove-off"/></svg><span>Stove 1/3</span><span class="sub">· Empty</span><span class="sub">· Cooking Lv2</span></div>
+      <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
+    </div>
+    <div class="tabs is-split"><div class="tab is-on">Cookbook<span class="n">4/48</span></div><div class="tab">Experiment</div></div>
+    <div class="tabs is-compact"><div class="tab is-on">All<span class="n">48</span></div><div class="tab">Can cook<span class="n">5</span></div><div class="tab">Common</div><div class="tab">Fine</div><div class="tab">Rare</div><div class="tab">Legendary</div></div>
+    <div class="ck">
+      <div class="ck-top">
+        <div class="big"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-grilled"/></svg><span class="dot dot-common"></span><span class="cb is-cook"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></span></div>
+        <div class="mid">
+          <div class="nm">Grilled Crucian · <span class="rar-common">Common</span></div>
+          <div class="meta"><b>+20 Energy</b> · 5 s · Grilled · Cooked ×3 · Best ★ Good</div>
+          <div class="desc">Straight from the pond onto the grill. The first dish most cooks remember.</div>
+        </div>
+        <div class="ings">
+          <div class="lbl">Ingredients</div>
+          <div class="row">
+            <div class="ing"><div class="ring"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span class="dot dot-common"></span></div><div class="t">Pond Crucian</div><div class="t ok">×1 · have 3</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="ck-bot">
+        <div class="xp-tag">+4 XP · 2nd today <span class="half">½</span></div>
+        <div class="uses">Eat · Gift · Request · Trail</div>
+        <div class="grow"></div>
+        <div class="btn-sm btn-primary">Cook</div>
+      </div>
+    </div>
+    <!-- page grid: 5 × 160, 16 gap; "Can cook" pages first, then by rarity; row 5 peeks under the fade = scroll -->
+    <div class="grid">
+      <div class="cell is-page is-selected"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-grilled"/></svg><span class="cb is-cook"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></span></div>
+      <div class="cell is-page"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-grilled"/></svg><span class="cb is-cook"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></span></div>
+      <div class="cell is-page"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-salad"/></svg><span class="cb is-cook"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></span></div>
+      <div class="cell is-page"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-plate"/></svg><span class="cb is-cook"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></span></div>
+      <div class="cell is-page is-tasted has-cap"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-soup"/></svg><span class="cb is-cook"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg></span><span class="cap-s">Tasted</span></div>
+      <div class="cell is-page is-tasted has-cap"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-herb"/></svg><span class="cap-s">Tasted</span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-cakes"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-skewer"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-cake"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-stew"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span></span></div>
+      <div class="cell is-page is-hidden has-cap"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-biscuit"/></svg><span class="cap-s">Shop</span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-bowl"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span><span class="pip is-clue"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-pie"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-apple"/></svg></span></span></div>
+      <div class="cell is-page is-hidden is-might"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-plate"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-grilled"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-stew"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-cakes"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-salad"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-apple"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-bowl"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-apple"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-skewer"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-rare"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-stew"/></svg><span class="cb is-lock"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg></span><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-rare"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-pie"/></svg><span class="cb is-lock"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg></span><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-apple"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-rare"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-soup"/></svg><span class="cb is-lock"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg></span><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-rare"></span><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-dish-plate"/></svg><span class="cb is-lock"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg></span><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-state.svg#i-st-sprout"/></svg></span><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg></span></span></div>
+      <div class="cell is-page is-hidden"><span class="dot dot-rare"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-grilled"/></svg><span class="pips"><span class="pip"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-fish-sil"/></svg></span></span></div>
+    </div>
+  </section>
+
+  <!-- HUD v2 (unchanged in v3): row1 y48–176 = avatar 112 · energy card 112 (bar 240×12) · coins 72 · Inbox 96
+       row2 y192–256 = Today chip (left, shrinks) · place chip v3 (right): house = home city · "City · Space" · › opens the Map / city panel -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <!-- Farming (green) owns the right half: 12 → 6 o'clock · F4 ≈ 45 % -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <!-- Fishing (blue) owns the left half: 6 → 12 o'clock · F6 ≈ 60 % -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Kitchen</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+
+  <!-- Guide overlay: ?guide=1 or #guide -->
+  <div id="guide" class="guide">
+    <div class="g-line" style="top:120px"><span>safe top 120</span></div>
+    <div class="g-line" style="top:2300px"><span>safe bottom 100</span></div>
+    <div class="g-line is-green" style="top:2276px"><span>quick bar bottom · 124 from bottom</span></div>
+    <div class="g-line is-green" style="top:2116px"><span>slots top · 160 tall</span></div>
+    <div class="g-line is-blue" style="top:48px"><span>HUD row 1 · 48–176</span></div>
+    <div class="g-line is-blue" style="top:176px"></div>
+    <div class="g-line is-blue" style="top:192px"><span>HUD row 2 · 192–256</span></div>
+    <div class="g-line is-blue" style="top:256px"></div>
+    <div class="g-vline" style="left:30px"></div>
+    <div class="g-vline" style="left:1050px"></div>
+    <div class="g-vline" style="left:540px;border-left-style:dotted"></div>
+    <div class="g-box" style="right:30px;top:1876px;width:176px;height:176px;border-radius:88px">FAB 176</div>
+    <div class="g-box" style="right:70px;top:1756px;width:96px;height:96px;border-radius:48px"></div>
+  </div>
+  <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
+
+</div>
+</body>
+</html>

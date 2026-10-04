@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>BAR-3-2 · Rest guidance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-farm.css">
+<link rel="stylesheet" href="../kit-facility.css">
+<link rel="stylesheet" href="../kit-energycard.css">
+</head>
+<!-- batch 1 (farm group, 2026-10-03) · v3 (review 2026-10-04): the frame right after tapping the Rest tile on the Energy Card (BAR-3).
+     The card is gone and nothing was used: the camera zooms 1.8 x onto the bench by the farmhouse door (farm camera 1.22 / -127 / 356
+     → 2.196 / -67 / -204, bench centred at canvas 540 x 1180), the bench status dot (green zZ = available) is lit 1.3 x with a primary
+     halo, and a tip capsule under the HUD names the facility rule. The main action key stays amber "Sow ×1 · Need 2 Energy",
+     the HUD stays 1/200 amber. Guidance only — resting is still the player's tap on the bench (FARM-7 → FARM-7-2).
+     body.scene-cam: canvas = source x --cam-scale + (--cam-x, --cam-y); shared kit.css + icons.svg untouched. -->
+<body class="scene-cam" style="--scene-top:#B0CFC1; --scene-bottom:#F7DDAD; --src-w:1024px; --src-h:1536px; --cam-scale:2.196; --cam-x:-67px; --cam-y:-204px;">
+<div class="canvas ">
+
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/farm.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <!-- Scene tags re-projected for the zoomed camera (source 407 x 540 → canvas 828 x 982) -->
+  <div class="tag tag-card tag--pointer tag--anchor-bottom" style="--x:828px; --y:982px; --dx:0px"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Homestead Lv2</span></div>
+  <!-- bench status dot: source 276 x 567 → canvas 540 x 1042 · available (green zZ) · lit = 1.3 x + primary halo -->
+  <div class="fac-dot is-ok is-lit" title="Rest · available"><svg class="ic" aria-hidden="true"><use href="../icons-facility.svg#i-zz"/></svg></div>
+  <style>.fac-dot { --x: 540px; --y: 1042px; }</style>
+  <!-- tip capsule under the HUD: the facility rule (what the bench does), not a prediction about this player -->
+  <div class="ec-tip" style="--top:300px"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-rest"/></svg><span>Rest on the bench</span><span class="sub">·</span><span class="gain">+60 Energy</span><span class="sub">·</span><span class="sub">once a day</span></div>
+  <div class="switch " title="Switch action"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-switch"/></svg></div>
+  <!-- main action FAB 176 (bottom-right): still the current action, still amber (not enough Energy for one use) -->
+  <div class="fab is-amber" title="Sow ×1"><div class="gear-badge" title="Tools &amp; Gear"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-hoe"/></svg></div><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-sow"/></svg><span class="lbl">Sow ×1</span><span class="sub ">Need 2 Energy</span></div>
+  <!-- HUD v2: row1 y48-176 = avatar 112 · energy card 112 (bar 240x12) · coins 72 · Inbox 96; row2 y192-256 = Today chip · place chip "City · Space" (the Map entry) -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <!-- Farming (green) owns the right half: 12 -> 6 o'clock -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <!-- Fishing (blue) owns the left half: 6 -> 12 o'clock -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <!-- 1/200: amber (low, not zero) -->
+      <div class="energy-card card is-amber" style="--pct:0.5%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">1<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:39</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card "><b>Today</b><span class="dot-sep">·</span><span class="today-text">Radishes ready in 1h 12m</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Homestead</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  <!-- Quick Bar v4: 5 consumable slots + Bag = 6 x 160 (r 32), 12 gaps -> 1020; bottom edge 124 above the screen bottom. No energy price (it lives on the FAB). -->
+  <nav class="quickbar has-selection">
+    <div class="slots">
+        <div class="slot has-count is-selected"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-radish-seeds"/></svg><span class="name">Radish Seeds</span><span class="count">×24</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-carrot-seeds"/></svg><span class="name">Carrot Seeds</span><span class="count">×10</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-compost"/></svg><span class="name">Compost</span><span class="count">×6</span></div>
+        <div class="slot has-count"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-feed-bag"/></svg><span class="name">Orchard Feed</span><span class="count">×2</span></div>
+        <div class="slot is-ghost"><svg class="slot-icon" aria-hidden="true"><use href="../icons.svg#i-radish-seeds"/></svg></div>
+    </div>
+    <div class="bag card"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div>
+  </nav>
+
+  <!-- bottom note (review copy, FARM-7's slot; on a cream capsule because the zoomed png puts grass under it) -->
+  <div class="ec-note">Guidance only · the card never acts for you</div>
+
+  <!-- Guide overlay: ?guide=1 or #guide -->
+  <div id="guide" class="guide">
+    <div class="g-line" style="top:120px"><span>safe top 120</span></div>
+    <div class="g-line" style="top:2300px"><span>safe bottom 100</span></div>
+    <div class="g-line is-green" style="top:2276px"><span>quick bar bottom · 124 from bottom</span></div>
+    <div class="g-line is-green" style="top:2116px"><span>slots top · 160 tall</span></div>
+    <div class="g-line is-blue" style="top:48px"><span>HUD row 1 · 48–176</span></div>
+    <div class="g-line is-blue" style="top:176px"></div>
+    <div class="g-line is-blue" style="top:192px"><span>HUD row 2 · 192–256</span></div>
+    <div class="g-line is-blue" style="top:256px"></div>
+    <div class="g-vline" style="left:30px"></div>
+    <div class="g-vline" style="left:1050px"></div>
+    <div class="g-vline" style="left:540px;border-left-style:dotted"></div>
+    <div class="g-box" style="right:30px;top:1876px;width:176px;height:176px;border-radius:88px">FAB 176</div>
+    <div class="g-box" style="right:70px;top:1756px;width:96px;height:96px;border-radius:48px"></div>
+  </div>
+  <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
+
+</div>
+</body>
+</html>

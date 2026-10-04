@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>FARM-6-2 · Homestead Stall + Bag · selling from the bag</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-farm.css">
+</head>
+<!-- batch 1 (farm group, 2026-10-03) · FARM-6-2 v2 (2026-10-04): the old "Sell Tab" page is retired — selling now happens from the bag
+     half of the same Stall + Bag drawer. Same layout as FARM-6; bag tab Produce, Radish ×12 selected, buyback quota bar under the
+     Bag title, stall rows stay in their Buy-tab resting state. body.scene-cam: canvas = source x --cam-scale + (--cam-x, --cam-y);
+     shared kit.css + icons.svg untouched, group additions in ../kit-farm.css (.drawer.is-stall-bag) and ../icons-farm.svg. -->
+<body class="scene-cam drawer-open" style="--scene-top:#B0CFC1; --scene-bottom:#F7DDAD; --src-w:1024px; --src-h:1536px; --cam-scale:1.22; --cam-x:-127px; --cam-y:356px;">
+<div class="canvas ">
+
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/farm.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <!-- Scene tags (farm camera 1.22 / -127 / 356) — hidden while the drawer is open -->
+  <div class="tag tag-card tag--pointer tag--anchor-bottom" style="--x:370px; --y:1015px; --dx:-40px"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Homestead Lv2</span></div>
+  <div class="tag tag-sell tag--pointer tag--anchor-bottom" style="--x:507px; --y:879px">Sell 12</div>
+  <div class="tag tag-ready tag--pointer tag--anchor-bottom" style="--x:390px; --y:1254px">Ready</div>
+  <div class="tag tag-ready tag--pointer tag--anchor-bottom" style="--x:893px; --y:1358px">Ready</div>
+  <div class="tag tag-ready tag--pointer tag--anchor-bottom" style="--x:714px; --y:1462px">Ready</div>
+  <div class="tag tag-wood" style="--x:983px; --y:893px; padding:0 22px">Explore</div>
+  <div class="scene-dim"></div>
+
+  <!-- Stall + Bag drawer: top 300, cream 92 %, radius 48. Upper half = stall in its Buy-tab resting state; lower half = the bag in
+       "sell from the bag" state (Produce tab · Radish ×12 · Pin / Sell / Sell All · buyback quota) -->
+  <section class="drawer is-stall-bag">
+    <div class="drawer-head">
+      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-stall"/></svg><span>Homestead Stall</span><span class="sub">· Stallhand</span></div>
+      <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
+    </div>
+    <div class="tabs"><div class="tab is-on">Buy</div><div class="tab">Stall Board</div></div>
+    <div class="stall-rows">
+      <div class="srow">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish-seeds"/></svg></div>
+        <div class="mid"><div class="nm">Radish Seeds</div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>4 coins</span></div></div>
+        <div class="right"><div class="bagct"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span>Bag ×24</span></div><div class="stepper"><div class="k">−</div><div class="v">2</div><div class="k">+</div></div><div class="btn-sm btn-primary">Buy</div></div>
+      </div>
+      <div class="srow is-locked">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carrot-seeds"/></svg></div>
+        <div class="mid"><div class="nm">Carrot Seeds</div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>9 coins</span></div></div>
+        <div class="right"><div class="btn-sm is-disabled"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><span>Farming Lv2 · 18 XP to go</span></div></div>
+      </div>
+      <div class="srow">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-worm"/></svg></div>
+        <div class="mid"><div class="nm">Worm Bait</div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>2 coins</span></div></div>
+        <div class="right"><div class="btn-sm is-disabled">Sold out today · resets in 9h 12m</div></div>
+      </div>
+      <div class="srow">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-compost"/></svg></div>
+        <div class="mid"><div class="nm">Compost</div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>2 coins</span></div></div>
+        <div class="right"><div class="stepper"><div class="k">−</div><div class="v">0</div><div class="k">+</div></div><div class="btn-sm btn-primary">Buy</div></div>
+      </div>
+    </div>
+    <div class="split"></div>
+
+    <!-- Bag (same components as ../bag.html) · selling state -->
+    <div class="bag-title">
+      <div class="h">Bag 19<span class="of">/25</span></div>
+      <div class="cap-track"><div class="cap-fill" style="--pct:76%"></div></div>
+      <div class="sort-chip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-sort"/></svg><span>Sort</span><span class="sub">· Recent</span></div>
+    </div>
+    <!-- daily buyback quota of the stall (amber) -->
+    <div class="quota"><span>Buyback today 64/80</span><div class="cap-track"><div class="cap-fill" style="--pct:80%"></div></div><span class="sub">resets in 9h 12m</span></div>
+    <div class="tabs is-compact">
+      <div class="tab">All</div><div class="tab">Seeds</div><div class="tab">Fish<span class="n">7</span></div><div class="tab is-on">Produce</div><div class="tab">Dishes</div><div class="tab">Materials</div><div class="tab">Tackle</div>
+    </div>
+    <!-- detail card for the selected cell: Radish ×12, unit price and the Sell All total -->
+    <div class="detail">
+      <div class="big"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg></div>
+      <div class="mid"><div class="nm">Radish <span class="of">×12</span></div><div class="meta">Common crop</div><div class="desc is-price"><span>5 each · Sell All =</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><b>60 coins</b></div></div>
+      <div class="acts"><div class="pin-btn" title="Pin to quick bar"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-pin"/></svg><span>Pin</span></div><div class="btn-sm btn-sec">Sell</div><div class="btn-sm btn-primary">Sell All</div></div>
+    </div>
+    <!-- Produce tab: 5 × 5 grid shows only produce (Radish · Carrot · Apple), the rest are empty cells (same convention as BAG-3 Fish tab) -->
+    <div class="grid">
+      <div class="cell is-selected"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg><span class="count">×12</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carrot"/></svg><span class="count">×4</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-apple"/></svg><span class="count">×2</span></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+      <div class="cell is-empty"></div>
+    </div>
+  </section>
+
+  <!-- HUD v2: row1 y48-176 = avatar 112 · energy card 112 (bar 240x12) · coins 72 · Inbox 96; row2 y192-256 = Today chip · place chip "City · Space" (the Map entry) -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <!-- Farming (green) owns the right half: 12 -> 6 o'clock -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <!-- Fishing (blue) owns the left half: 6 -> 12 o'clock -->
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card " style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card "><b>Today</b><span class="dot-sep">·</span><span class="today-text">Radishes ready in 1h 12m</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Homestead</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+
+  <!-- Guide overlay: ?guide=1 or #guide -->
+  <div id="guide" class="guide">
+    <div class="g-line" style="top:120px"><span>safe top 120</span></div>
+    <div class="g-line" style="top:2300px"><span>safe bottom 100</span></div>
+    <div class="g-line is-green" style="top:300px"><span>drawer top 300</span></div>
+    <div class="g-line is-blue" style="top:48px"><span>HUD row 1 · 48–176</span></div>
+    <div class="g-line is-blue" style="top:176px"></div>
+    <div class="g-line is-blue" style="top:192px"><span>HUD row 2 · 192–256</span></div>
+    <div class="g-line is-blue" style="top:256px"></div>
+    <div class="g-vline" style="left:30px"></div>
+    <div class="g-vline" style="left:1050px"></div>
+    <div class="g-vline" style="left:540px;border-left-style:dotted"></div>
+  </div>
+  <script>if(/[?&]guide=1(?:&|$)/.test(location.search))document.documentElement.classList.add('show-guide')</script>
+
+</div>
+</body>
+</html>

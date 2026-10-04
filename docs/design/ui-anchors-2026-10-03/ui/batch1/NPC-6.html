@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>NPC-6 · Tea House Counter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-npc.css">
+</head>
+<!-- NPC-6 (group npc): close-up of the tea window at the right end of the Market counter (no separate tea house).
+     Same outpost.png, camera zoomed: canvas = source × 2.4 + (−425, −272), the window (src 402, 530) lands at canvas (540, 1000).
+     Tea Host · Ama hands a cup across; card "Hot Tea · +30 Energy · 40 coins (1/3)"; buttons Hot Tea / Coffee; inset: carrying the cup to the tea table, HUD +30. -->
+<body class="scene-cam" style="--scene-top:#BEDDD2; --scene-bottom:#F7DCB5; --src-w:1024px; --src-h:1536px; --cam-scale:2.0; --cam-x:-220px; --cam-y:-440px;">
+<div class="canvas">
+
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/tea-house.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+
+  <!-- Tea Counter sign on the window awning (src 402, 470) and the host's name tag on her head (src 402, 505) -->
+  <div class="tag tag-name tag--pointer tag--anchor-bottom" style="--x:490px; --y:462px; --dx:-130px"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-face-ama"/></svg><span>Tea Host</span><span class="role">· Ama</span></div>
+  <!-- the cup she holds out (src 435, 571) -->
+  <div class="cast-ring" style="--x:580px; --y:690px; --w:120px; --h:120px"></div>
+
+  <!-- inset (top-right): the player carries the cup to the plaza tea table and sits — ~2 s animation, not a second interaction -->
+  <div class="inset" style="--x:690px; --y:300px; --w:360px; --h:300px">
+    <img src="../../scenes/tea-house.png" alt="" style="left:-350px; top:-640px; width:1024px; height:1536px">
+    <div class="float" style="--x:180px; --y:70px">+30 Energy</div>
+    <div class="cap">Sip at a tea table · 2 s</div>
+  </div>
+
+  <section class="tea-card">
+    <div class="row1">
+      <div class="cup"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-tea"/></svg></div>
+      <div class="mid">
+        <div class="t">Hot Tea · <span class="e">+30 Energy</span> · <span class="c">40 coins</span> <span class="k">(1/3)</span></div>
+        <div class="s">Next cups today 50 coins · 60 coins · Counts across all tea houses</div>
+      </div>
+    </div>
+    <div class="acts">
+      <div class="btn btn-primary"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-tea"/></svg>Hot Tea · +30 Energy</div>
+      <div class="btn btn-secondary"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-coffee"/></svg>Coffee · +30 Energy</div>
+    </div>
+    <div class="note">Buy and drink in one tap · 0 Energy · sit at a tea table to open the party room</div>
+  </section>
+
+  <div class="bar-handle" title="Quick bar"><div class="grip"></div></div>
+  <div class="bag card bag-fixed"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div>
+
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish · Shanghai Market</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Lotus Tea House</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+
+</div>
+</body>
+</html>

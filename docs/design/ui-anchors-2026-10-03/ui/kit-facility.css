@@ -1,0 +1,74 @@
+/* ============================================================================
+   kit-facility.css — facility-tap language (2026-10-04).
+   Facilities (rest bench · stove · market counter) are triggered only by
+   tapping them on the scene; the main action key never shows a facility verb
+   (it only ever reads Farming / Fishing / Mining / Combat). Loaded after
+   kit.css (and the group kit) by FARM-7 / FARM-7-2 / kitchen (COOK-1) / NPC-1.
+   kit.css and icons.svg stay untouched; new icons live in icons-facility.svg.
+   ========================================================================== */
+
+/* ---------- facility status dot (above the facility, always visible) --------
+   56 round, cream, 1 px edge, 34 px glyph. is-ok = green zZ (rest available),
+   is-wait = clock (cooling down), is-done = grey check (used today). Sits at
+   z 4 so it stays readable above .scene-dim (z 3) when a popup is open. */
+.fac-dot {
+  position: absolute; left: var(--x); top: var(--y);
+  width: 56px; height: 56px; transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--card-solid); border: 1px solid var(--card-edge);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 4;
+}
+.fac-dot .ic { width: 34px; height: 34px; }
+.fac-dot.is-ok .ic { color: var(--primary-edge); }
+.fac-dot.is-wait .ic { color: var(--energy-amber); }
+.fac-dot.is-done { background: var(--disabled-bg); border-color: var(--disabled-edge); }
+.fac-dot.is-done .ic { color: var(--disabled-ink); }
+
+/* ---------- fingertip card: "<facility> · Tap to …" --------------------------
+   cream card with a 2 px primary stroke (the tappable-facility cue), pointer
+   on the facility. Use with .tag .tag--pointer .tag--anchor-bottom. */
+.tag-tap {
+  height: 64px;
+  padding: 0 24px;
+  border-radius: 32px;
+  gap: 10px;
+  font-size: 26px;
+  background: var(--card-solid);
+  border: 2px solid var(--primary-deep);
+}
+.tag-tap .ic { width: 34px; height: 34px; }
+.tag-tap .sep { color: var(--ink-2); font-weight: 700; }
+.tag-tap .st-empty { color: var(--ink-2); }
+.tag-tap .hint { color: var(--primary-deep); }
+.tag-tap.tag--pointer::after {
+  bottom: -11px;
+  border-right: 2px solid var(--primary-deep);
+  border-bottom: 2px solid var(--primary-deep);
+}
+
+/* ---------- facility popup (after tapping the bench) ------------------------
+   centred floating card 920 wide, radius 40, cream, 1 px edge, no shadow.
+   Builds on kit-farm's .modal (title / lines / buttons). */
+.modal.fac-pop { border-radius: 40px; padding: 40px 44px 44px; }
+.modal.fac-pop .m-line { margin-top: 8px; }
+.modal.fac-pop .m-line:first-of-type { margin-top: 18px; }
+.modal.fac-pop .m-line .wait { color: var(--energy-amber); }
+.modal.fac-pop .m-line .off { color: var(--disabled-ink); }
+.modal.fac-pop .m-btns { margin-top: 30px; }
+
+/* the other popup states, shown small on the same sheet (review only):
+   a 920-wide card scaled by --s at (--x, --y) */
+.fac-mini {
+  position: absolute; left: var(--x); top: var(--y);
+  width: 920px; transform: scale(var(--s, 0.4565)); transform-origin: 0 0;
+  z-index: 8;
+}
+.fac-mini .modal { position: relative; left: auto; top: auto; transform: none; width: 920px; }
+.fac-mini-cap {
+  position: absolute; left: var(--x); top: var(--y);
+  width: var(--w, 420px);
+  font-size: 22px; font-weight: 800; line-height: 28px; color: var(--ink);
+  z-index: 8;
+}
+.fac-mini-cap .sub { display: block; font-size: 20px; font-weight: 700; color: var(--ink-2); }

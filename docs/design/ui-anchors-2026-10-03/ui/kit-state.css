@@ -1,0 +1,260 @@
+/* ============================================================================
+   kit-state.css — unified status badges for farm objects, NPC heads and map pins
+   (STATE-ICONS sheet, 2026-10-04). Loaded after ../kit.css. kit.css / icons.svg
+   are never edited here; glyphs live in icons-state.svg (monochrome, currentColor).
+
+   Badge (.sb): round, cream #FBF8F1, 1 px deep edge, no shadow.
+     sizes   .sb (56 · scene objects & pin corners) · .sb-72 (NPC heads) · .sb-28 (rarity dot)
+     states  .is-avail · .is-ready · .is-count · .is-cool · .is-done · .is-locked
+             .is-short · .is-full · .is-new · .is-request · .is-deliver · .is-event
+             .is-gift · .is-error
+     capsule .sb-cap under the badge ("1h 12m" · "back in 1h 12m" · "Farming Lv4" · "Need 2 Energy")
+   Sheet layout classes (.st-*) are review-only.
+   ========================================================================== */
+
+:root {
+  --sb-fill: #FBF8F1;
+  --sb-edge: #8A8070;            /* 1 px deep (warm taupe) edge — darker than the card edge so a 56 px disc reads on a diorama */
+  --sb-ink: #2F3A33;
+  --st-green: #6CBF73;
+  --st-green-deep: #4F934B;
+  --st-amber: #E3B341;
+  --st-amber-deep: #C9962A;
+  --st-red: #E07A5F;
+  --st-red-deep: #C9634A;
+  --st-pink: #F2A08A;           /* soft red for Gift */
+  --st-cyan: #4FB8C9;
+  --st-cyan-deep: #3A98A8;
+  --st-purple: #A98BD6;
+  --st-purple-deep: #8B6DBE;
+  --st-grey: #DEDBD2;           /* grey fill: cooling / done / locked */
+  --st-grey-edge: #B9B5AA;
+  --st-grey-ink: #8A918C;
+}
+
+/* ---------- badge core -------------------------------------------------- */
+.sb {
+  position: relative;
+  flex: 0 0 auto;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--sb-fill);
+  border: 1px solid var(--sb-edge);
+  color: var(--sb-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+}
+.sb .ic { width: 32px; height: 32px; position: relative; }
+.sb-72 { width: 72px; height: 72px; }
+.sb-72 .ic { width: 42px; height: 42px; }
+.sb-28 { width: 28px; height: 28px; border: 2px solid var(--sb-fill); }          /* rarity dot: colour fill, cream 2 px rim */
+.sb-28.is-common { background: var(--rar-common); }
+.sb-28.is-fine { background: var(--rar-fine); }
+.sb-28.is-rare { background: var(--rar-rare); }
+.sb-28.is-legendary { background: var(--rar-legendary); }
+
+/* 1 Available — cream + 4 px green ring (inset 2) + function glyph in ink */
+.sb.is-avail::before {
+  content: ""; position: absolute; inset: 2px; border-radius: 50%;
+  border: 4px solid var(--st-green);
+}
+/* 2 Ready — green fill + white check */
+.sb.is-ready { background: var(--st-green); border-color: var(--st-green-deep); color: #fff; }
+/* 3 Countdown — cream + progress arc on the rim (remaining ratio) + clock */
+.sb.is-count .arc { position: absolute; left: -1px; top: -1px; width: 56px; height: 56px; transform: rotate(-90deg); }
+.sb.is-count .arc .tr { fill: none; stroke: rgba(47, 58, 51, 0.10); stroke-width: 4; }
+.sb.is-count .arc .fg { fill: none; stroke: var(--primary-deep); stroke-width: 4; stroke-linecap: round; }   /* dasharray = 157.08 × remaining */
+.sb-72.is-count .arc { width: 72px; height: 72px; }
+/* 4 Cooling · 5 Done · 6 Locked — grey fill + grey glyph */
+.sb.is-cool, .sb.is-done, .sb.is-locked {
+  background: var(--st-grey); border-color: var(--st-grey-edge); color: var(--st-grey-ink);
+}
+/* 7 Insufficient · 8 Full — amber fill + white glyph */
+.sb.is-short, .sb.is-full { background: var(--st-amber); border-color: var(--st-amber-deep); color: #fff; }
+/* 9 New — cyan ◆ */
+.sb.is-new { background: var(--st-cyan); border-color: var(--st-cyan-deep); color: #fff; }
+.sb.is-new .ic { width: 26px; height: 26px; }
+/* 10 Request — gold ! ; "?" variant = request in progress (cream + gold ring + gold ?) */
+.sb.is-request { background: var(--st-amber); border-color: var(--st-amber-deep); color: #fff; }
+.sb.is-progress { color: var(--st-amber-deep); }
+.sb.is-progress::before { content: ""; position: absolute; inset: 2px; border-radius: 50%; border: 4px solid var(--st-amber); }
+/* 11 Deliverable — cream + 5 px green ring + green check */
+.sb.is-deliver { border: 5px solid var(--st-green); color: var(--primary-deep); }
+.sb.is-deliver .ic { width: 30px; height: 30px; }
+/* 12 Event — purple ★ */
+.sb.is-event { background: var(--st-purple); border-color: var(--st-purple-deep); color: #fff; }
+/* 13 Gift — soft red ♥ */
+.sb.is-gift { background: var(--st-pink); border-color: var(--st-red); color: #fff; }
+/* 14 Error / Blocked — red ✕ */
+.sb.is-error { background: var(--st-red); border-color: var(--st-red-deep); color: #fff; }
+.sb.is-error .ic { width: 26px; height: 26px; }
+/* Sell corner — gold coin (same gold family as Request; the glyph disambiguates) */
+.sb.is-sell { background: var(--st-amber); border-color: var(--st-amber-deep); color: #FBF8F1; }
+
+/* capsule under the badge */
+.sb-cap {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 28px; padding: 0 10px;
+  border-radius: 14px;
+  background: var(--sb-fill);
+  border: 1px solid var(--sb-edge);
+  font-size: 18px; font-weight: 800; line-height: 26px;
+  color: var(--sb-ink);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.sb-cap.is-grey { color: var(--st-grey-ink); border-color: var(--st-grey-edge); }
+.sb-cap.is-amber { color: var(--st-amber-deep); border-color: var(--st-amber-deep); }
+.sb-cap.is-green { color: var(--primary-deep); border-color: var(--st-green-deep); }
+.sb-cap.is-red { color: var(--st-red-deep); border-color: var(--st-red); }
+/* stack: badge over capsule, centred */
+.sb-stack { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; }
+
+/* ---------- sheet page (review only) ------------------------------------ */
+.canvas.is-sheet { background: #F6F2E8; }
+.st-page { position: relative; padding: 32px var(--m) 14px; display: flex; flex-direction: column; gap: 16px; }
+.st-head { position: relative; }
+.st-title { font-size: 42px; font-weight: 800; line-height: 50px; letter-spacing: -0.3px; }
+.st-sub { margin-top: 2px; font-size: 21px; font-weight: 700; line-height: 26px; color: var(--ink-2); }
+.st-sub .zh { font-size: 19px; color: #9AA39D; margin-left: 10px; }
+.st-meta {
+  position: absolute; right: 0; top: 4px;
+  height: 42px; padding: 0 18px; border-radius: 21px;
+  background: var(--card-solid); border: 1px solid var(--card-edge);
+  font-size: 19px; font-weight: 800; line-height: 40px; color: var(--ink-2);
+}
+
+.st-sec { position: relative; }
+.st-sec-h { display: flex; align-items: baseline; gap: 14px; height: 40px; border-bottom: 1px solid #D9D2C2; }
+.st-sec-h .k {
+  flex: 0 0 auto; width: 36px; height: 36px; border-radius: 10px;
+  background: var(--ink); color: #FBF8F1;
+  font-size: 22px; font-weight: 800; line-height: 36px; text-align: center;
+  align-self: center;
+}
+.st-sec-h .t { font-size: 28px; font-weight: 800; line-height: 32px; }
+.st-sec-h .zh { font-size: 20px; font-weight: 700; color: #9AA39D; }
+.st-sec-h .r { margin-left: auto; font-size: 18px; font-weight: 700; color: var(--ink-2); }
+
+/* A · sizes row: five columns, each badge sample over a measurement bracket + two caption lines */
+.st-sizes { display: flex; align-items: flex-end; margin-top: 22px; }
+.st-size { position: relative; flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.st-size .box { height: 100px; display: flex; align-items: flex-end; justify-content: center; }
+.st-size .dim { font-size: 19px; font-weight: 800; line-height: 22px; color: var(--ink); white-space: nowrap; }
+.st-size .use { font-size: 15px; font-weight: 700; line-height: 19px; color: var(--ink-2); text-align: center; white-space: nowrap; }
+.st-meas { position: relative; height: 10px; border-left: 1px solid var(--ink-2); border-right: 1px solid var(--ink-2); }
+.st-meas::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--ink-2); }
+/* pin disc sample (kit .pin .disc look, no pointer) */
+.st-disc {
+  position: relative; width: 96px; height: 96px; border-radius: 50%;
+  background: var(--card-solid); border: 3px solid var(--primary-deep);
+  display: flex; align-items: center; justify-content: center;
+}
+.st-disc .ic { width: 60px; height: 60px; }
+.st-disc.is-pond { border-color: var(--rar-fine); }
+.st-disc.is-farm { background: #EEF7E6; }
+.st-disc.is-grey { border-color: #B9BDC4; background: #EDEBE4; }
+.st-disc .sb { position: absolute; right: -16px; top: -16px; z-index: 1; }
+.st-disc .sb.is-deliver { right: -18px; top: -18px; }
+/* NPC head sample */
+.st-face {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--card-solid); border: 1px solid var(--card-edge);
+  display: flex; align-items: center; justify-content: center;
+}
+.st-face .ic { width: 60px; height: 60px; }
+/* spec bullets (A) */
+.st-spec { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 28px; }
+.st-spec .li { display: flex; gap: 8px; font-size: 15px; font-weight: 700; line-height: 20px; color: var(--ink-2); }
+.st-spec .li b { color: var(--ink); font-weight: 800; }
+.st-spec .li::before { content: "·"; color: var(--ink-2); flex: 0 0 auto; }
+
+/* B · semantic table */
+.st-table { margin-top: 12px; border-radius: 28px; background: var(--card-solid); border: 1px solid var(--card-edge); overflow: hidden; }
+.st-row {
+  display: grid;
+  grid-template-columns: 34px 190px 170px 136px 110px 250px 110px;
+  align-items: center;
+  min-height: 72px;
+  padding: 1px 0 1px 10px;
+  border-bottom: 1px solid var(--card-edge);
+}
+.st-row:last-child { border-bottom: 0; }
+.st-row.is-head { min-height: 36px; padding: 0 0 0 10px; background: #EFE9DA; font-size: 16px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-2); }
+.st-row .no { font-size: 19px; font-weight: 800; color: var(--ink-2); }
+.st-row .demo { display: flex; align-items: center; justify-content: center; padding-right: 8px; }
+.st-row .demo .sb-stack { gap: 2px; }
+.st-row .demo .pair { display: flex; align-items: center; gap: 10px; }
+.st-row .nm { font-size: 21px; font-weight: 800; line-height: 25px; padding-right: 8px; }
+.st-row .nm .zh { display: block; font-size: 16px; font-weight: 700; line-height: 20px; color: #9AA39D; }
+.st-row .col { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; line-height: 20px; color: var(--ink-2); padding-right: 8px; }
+.st-row .col .sw { flex: 0 0 auto; width: 24px; height: 24px; border-radius: 7px; border: 1px solid rgba(47, 58, 51, 0.18); }
+.st-row .col .hex { display: block; font-size: 14px; line-height: 17px; color: #9AA39D; font-variant-numeric: tabular-nums; }
+.st-row .gl { font-size: 16px; font-weight: 700; line-height: 20px; color: var(--ink); padding-right: 10px; }
+.st-row .when { font-size: 16px; font-weight: 700; line-height: 20px; color: var(--ink-2); padding-right: 12px; }
+.st-row .when b { color: var(--ink); font-weight: 800; }
+.st-row .ex { font-size: 15px; font-weight: 800; line-height: 19px; color: var(--ink); padding-right: 8px; }
+.st-row .ex .q { display: block; color: var(--ink-2); font-weight: 700; }
+
+/* C · application examples: groups of tiles; group name sits on the group's top border */
+.st-apps { margin-top: 22px; display: flex; flex-direction: column; gap: 14px; }
+.st-app-row { display: flex; align-items: flex-end; }
+.st-group {
+  position: relative; display: flex; align-items: flex-end; gap: 4px;
+  padding: 16px 8px 8px; border-radius: 22px;
+  background: var(--card-solid); border: 1px solid var(--card-edge);
+  margin-right: 10px;
+}
+.st-group:last-child { margin-right: 0; }
+.st-group .gh {
+  position: absolute; left: 12px; top: -13px;
+  height: 26px; padding: 0 10px; border-radius: 13px;
+  background: #EFE9DA; border: 1px solid var(--card-edge);
+  font-size: 15px; font-weight: 800; line-height: 24px; color: var(--ink); white-space: nowrap;
+}
+.st-group .gh .zh { font-weight: 700; color: #9AA39D; margin-left: 5px; }
+.st-tile { width: 112px; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.st-tile .top { height: 88px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
+.st-tile .obj { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+.st-tile .obj .ic { width: 60px; height: 60px; }
+.st-tile .obj.is-dim .ic { filter: grayscale(1); opacity: 0.6; }
+.st-tile .lb { font-size: 16px; font-weight: 800; line-height: 19px; color: var(--ink); text-align: center; white-space: nowrap; }
+.st-tile .lb .s { display: block; font-size: 14px; font-weight: 700; line-height: 17px; color: var(--ink-2); }
+.st-tile.is-pin { width: 108px; }
+.st-tile.is-pin .top { height: 108px; justify-content: center; padding-top: 8px; }
+.st-tile.is-pin .obj { display: none; }
+.st-tile.is-npc { width: 128px; }
+.st-tile.is-npc .top { height: 76px; }
+.st-tile.is-slot { width: 170px; }
+.st-tile.is-slot .top { display: none; }
+.st-tile.is-slot .slot { margin-bottom: 4px; }
+.st-tile .slot.is-locked .lock .ic { color: var(--st-grey-ink); }
+
+/* D · rules */
+.st-rules { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+.st-rule {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 12px 10px 12px; border-radius: 20px;
+  background: var(--card-solid); border: 1px solid var(--card-edge);
+  font-size: 15px; font-weight: 700; line-height: 20px; color: var(--ink-2);
+}
+.st-rule .n {
+  flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--primary-tint); border: 1px solid var(--primary-deep);
+  color: var(--primary-deep); font-size: 16px; font-weight: 800; line-height: 26px; text-align: center;
+}
+.st-rule b { color: var(--ink); font-weight: 800; }
+.st-rule .zh { display: block; font-size: 14px; line-height: 18px; color: #9AA39D; margin-top: 3px; }
+.st-rule .chain { display: inline-flex; align-items: center; gap: 5px; vertical-align: middle; margin: 0 4px; }
+.st-rule .chain .sb { width: 30px; height: 30px; }
+.st-rule .chain .sb .ic { width: 17px; height: 17px; }
+.st-rule .chain .sb.is-deliver { border-width: 3px; }
+.st-rule .chain .gt { font-size: 17px; font-weight: 800; color: var(--ink-2); }
+.st-rule.is-wide { grid-column: 1 / -1; }
+.st-rule .fmt { display: inline-flex; align-items: center; gap: 5px; margin: 0 3px; vertical-align: middle; }
+.st-rule .fmt .sb-cap { height: 20px; font-size: 13px; line-height: 18px; padding: 0 7px; }
+.st-rule .fmt .no { text-decoration: line-through; color: var(--st-red-deep); border-color: var(--st-red); }
+
+.st-foot { font-size: 15px; font-weight: 700; line-height: 20px; color: #9AA39D; display: flex; justify-content: space-between; }

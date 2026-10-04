@@ -1,0 +1,930 @@
+/* ============================================================================
+   kit-npc.css — group "npc" additions (2026-10-03, batch 1: MAP-1 · NPC-1…6 ·
+   OUTPOST-DIAGRAM). Loaded after ../kit.css; never edits kit.css rules, only
+   adds. Same tokens (cards 92 % cream, 1 px edge, no shadows, tabular nums).
+   ========================================================================== */
+
+/* ---------- bottom controls when no action is selected ---------------------
+   Quick bar collapsed to a centred handle (tap area 320 × 96, visual pill 240 ×
+   56 with a grip line); Bag stays at the bar's right end; FAB / switch hidden. */
+.bar-handle {
+  position: absolute;
+  left: 50%;
+  bottom: var(--bar-bottom);
+  width: 320px; height: 96px;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.bar-handle .grip {
+  width: 240px; height: 56px;
+  border-radius: 28px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bar-handle .grip::before {
+  content: "";
+  width: 72px; height: 8px;
+  border-radius: 4px;
+  background: var(--card-edge-2);
+}
+/* FAB sub-line "Free" in primary green (kit has .is-free on .fab .sub) */
+.fab .lbl.is-two { font-size: 26px; line-height: 30px; text-align: center; }
+
+/* under-HUD notice line (outpost: "Free · Home Outpost") — centred, y 272 */
+.under-hud.is-center { left: 50%; transform: translateX(-50%); }
+.notice-chip {
+  height: 56px;
+  padding: 0 22px;
+  border-radius: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+}
+.notice-chip .ok { color: var(--primary-deep); }
+.notice-chip .sub { color: var(--ink-2); font-weight: 700; }
+
+/* ---------- scene labels for the outpost page ------------------------------ */
+/* plaza sign: wooden board with the group name (art text), hangs on the png's blank sign */
+.tag-sign {
+  height: 76px;
+  padding: 0 34px;
+  border-radius: 20px;
+  font-size: 34px;
+  letter-spacing: 0.5px;
+  background: linear-gradient(to bottom, var(--wood), var(--wood-deep));
+  border: 1px solid var(--wood-deep);
+  color: var(--wood-ink, #FBF8F1);
+}
+.tag-sign.is-small { height: 56px; padding: 0 22px; font-size: 26px; border-radius: 14px; }
+.tag-sign::before, .tag-sign::after {          /* two little nails */
+  content: "";
+  position: absolute;
+  top: 12px;
+  width: 10px; height: 10px;
+  border-radius: 5px;
+  background: rgba(47, 58, 51, 0.35);
+}
+.tag-sign::before { left: 14px; }
+.tag-sign::after { right: 14px; }
+/* NPC name tag: small cream card with a portrait */
+.tag-name {
+  height: 60px;
+  padding: 0 20px 0 8px;
+  border-radius: 30px;
+  font-size: 24px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+}
+.tag-name .ic { width: 44px; height: 44px; }
+.tag-name .role { color: var(--ink-2); font-weight: 700; }
+/* NPC head bubble 72: yellow ! / yellow ? / pale-red ♥ */
+.bubble {
+  position: absolute;
+  left: var(--x, 540px); top: var(--y, 1200px);
+  width: 72px; height: 72px;
+  transform: translate(-50%, -100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 46px;
+  font-weight: 800;
+  line-height: 1;
+  z-index: 2;
+  border: 3px solid var(--card-solid);
+}
+.bubble.is-new { background: var(--coin); color: #fff; }
+.bubble.is-wait { background: var(--coin); color: #fff; }
+.bubble.is-gift { background: #F0A6A0; color: #fff; font-size: 40px; }
+.bubble::after {                                 /* little tail */
+  content: "";
+  position: absolute;
+  left: 50%; bottom: -12px;
+  width: 16px; height: 16px;
+  margin-left: -8px;
+  transform: rotate(45deg);
+  background: inherit;
+  border-right: 3px solid var(--card-solid);
+  border-bottom: 3px solid var(--card-solid);
+}
+
+/* ---------- MAP-1 layers -------------------------------------------------- */
+/* fog: #B9BDC4 60 % everywhere except an elliptical hole over the home city, 48 px feathered edge.
+   --fx/--fy centre, --frx/--fry radii. Everything that must read over the fog uses z ≥ 3. */
+.fog {
+  position: absolute; inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: rgba(185, 189, 196, 0.60);
+  -webkit-mask-image: radial-gradient(ellipse var(--frx, 520px) var(--fry, 640px) at var(--fx, 540px) var(--fy, 1180px),
+    transparent 0, transparent calc(100% - 48px), #000 100%);
+  mask-image: radial-gradient(ellipse var(--frx, 520px) var(--fry, 640px) at var(--fx, 540px) var(--fy, 1180px),
+    transparent 0, transparent calc(100% - 48px), #000 100%);
+}
+/* map pin: 96 round disc + label pill under it; anchored at the disc centre (--x/--y) */
+.pin {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.pin .disc {
+  position: relative;
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pin .disc .ic { width: 62px; height: 62px; }
+.pin .disc::after {                              /* pointer under the disc */
+  content: "";
+  position: absolute;
+  left: 50%; bottom: -9px;
+  width: 18px; height: 18px;
+  margin-left: -9px;
+  background: var(--card-solid);
+  border-right: 1px solid var(--card-edge);
+  border-bottom: 1px solid var(--card-edge);
+  transform: rotate(45deg);
+}
+.pin.is-outpost .disc { border: 3px solid var(--primary-deep); }
+.pin.is-pond .disc { border: 3px solid var(--rar-fine); }
+.pin.is-farm .disc { border: 3px solid var(--primary-deep); background: #EEF7E6; }
+.pin .lbl {
+  margin-top: 8px;
+  padding: 6px 18px 7px;
+  border-radius: 24px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  text-align: center;
+  white-space: nowrap;
+}
+.pin .lbl .n { display: block; font-size: 24px; font-weight: 800; line-height: 28px; }
+.pin .lbl .s { display: block; font-size: 20px; font-weight: 700; line-height: 24px; color: var(--ink-2); }
+.pin .lbl .on { color: var(--primary-deep); font-weight: 800; }
+/* 56 px marker badge on the disc's top-right: green ✓ ring / gold ! / cyan ◆ / purple ★ / grey lock */
+.mk {
+  position: absolute;
+  right: -16px; top: -16px;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  border: 3px solid var(--card-solid);
+  z-index: 1;
+}
+.mk.is-deliver { background: var(--card-solid); color: var(--primary-deep); border: 5px solid var(--primary-deep); font-size: 28px; }
+.mk.is-deliver .ic { width: 30px; height: 30px; }
+.mk.is-request { background: var(--coin); }
+.mk.is-new { background: #5EC8C2; font-size: 26px; }
+.mk.is-event { background: var(--rar-rare); font-size: 28px; }
+.mk.is-locked { background: #AEB3B9; }
+.mk.is-locked .ic { width: 28px; height: 28px; color: #fff; }
+/* city bubble: name + online count; grey variant for unexplored cities (sits above the fog) */
+.city {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  height: 72px;
+  padding: 0 24px 0 14px;
+  border-radius: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 28px;
+  font-weight: 800;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  white-space: nowrap;
+}
+.city .ic { width: 44px; height: 44px; }
+.city .on { color: var(--primary-deep); }
+.city .sep { color: var(--ink-2); font-weight: 700; }
+.city.is-home { border: 3px solid var(--primary-deep); }
+.city.is-grey { background: rgba(236, 237, 239, 0.94); border-color: #C9CCD1; color: #6E7B74; }
+.city.is-grey .sub { color: #8A918C; font-weight: 700; }
+.city .cnt {                                      /* folded-count corner badge */
+  position: absolute;
+  right: -10px; top: -14px;
+  min-width: 36px; height: 36px;
+  padding: 0 9px;
+  border-radius: 18px;
+  background: var(--energy-red);
+  color: #fff;
+  font-size: 22px;
+  line-height: 36px;
+  text-align: center;
+  border: 2px solid var(--card-solid);
+}
+/* friend avatar bubble 88 (above fog) */
+.friend {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: var(--card-solid);
+  border: 3px solid var(--rar-fine);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.friend .ic { width: 70px; height: 70px; }
+.friend .nm {
+  position: absolute;
+  left: 50%; top: 100%;
+  transform: translateX(-50%);
+  margin-top: 6px;
+  padding: 2px 12px 3px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  white-space: nowrap;
+}
+/* real-world POI: small lit disc (56), no badge, no label */
+.poi {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.35), 0 0 18px 4px rgba(255, 235, 180, 0.65);
+}
+.poi .ic { width: 34px; height: 34px; }
+.poi.is-cafe { background: #E8893A; }
+.poi.is-shop { background: #6FA8DC; }
+.poi.is-park { background: #7FC66A; }
+.poi.is-museum { background: #A98BD6; }
+/* Nearby Cities pill — bottom-right above the bar (the FAB slot is empty on the map) */
+.nearby-btn {
+  position: absolute;
+  right: var(--m);
+  bottom: calc(var(--bar-bottom) + var(--bar-h) + 24px);
+  z-index: 6;
+  height: 96px;
+  padding: 0 32px 0 22px;
+  border-radius: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 30px;
+  font-weight: 800;
+  background: var(--card-solid);
+  border: 3px solid var(--primary-deep);
+  color: var(--ink);
+}
+.nearby-btn .ic { width: 48px; height: 48px; }
+/* player dot on the map (where "you" are: at the homestead) */
+.you {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--rar-fine);
+  border: 4px solid #fff;
+  box-shadow: 0 0 0 10px rgba(111, 168, 220, 0.25);
+}
+
+/* ---------- dialogue bar (NPC-5) --------------------------------------------
+   sits over the quick-bar zone: x 30…1050, bottom 124, 300 tall; Bag hides. */
+.dlg {
+  position: absolute;
+  left: var(--m); right: var(--m);
+  bottom: var(--bar-bottom);
+  height: 300px;
+  border-radius: 40px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  z-index: 6;
+  display: flex;
+  align-items: stretch;
+  gap: 22px;
+  padding: 22px 24px 22px 22px;
+}
+.dlg .portrait {
+  flex: 0 0 auto;
+  width: 200px; height: 256px;
+  border-radius: 32px;
+  background: #F1EADA;
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+.dlg .portrait .ic { width: 190px; height: 190px; margin-bottom: -10px; }
+.dlg .mid { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.dlg .who { display: flex; align-items: center; gap: 14px; height: 40px; }
+.dlg .nm { font-size: 30px; font-weight: 800; white-space: nowrap; }
+.dlg .role { font-size: 24px; font-weight: 700; color: var(--ink-2); white-space: nowrap; }
+.dlg .stage { display: flex; align-items: center; gap: 12px; margin-top: 8px; height: 32px; }
+.dlg .stage .tag-stage {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  background: var(--primary-tint);
+  border: 1px solid var(--primary-deep);
+  color: var(--primary-deep);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 30px;
+}
+.dlg .stage .track { width: 220px; height: 10px; border-radius: 5px; background: var(--track); position: relative; overflow: hidden; }
+.dlg .stage .track i { position: absolute; left: 0; top: 0; bottom: 0; width: var(--pct, 40%); border-radius: 5px; background: var(--primary); }
+.dlg .stage .next { font-size: 20px; font-weight: 700; color: var(--ink-2); white-space: nowrap; }
+.dlg .say {
+  margin-top: 14px;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 38px;
+  color: var(--ink);
+}
+.dlg .acts { margin-top: auto; display: flex; gap: 12px; }
+.dlg .acts .btn-sm { min-width: 180px; }
+.dlg .acts .btn-sm.is-disabled { font-size: 22px; min-width: 0; padding: 0 20px; }
+/* gift moment card (centre of the scene) */
+.gift-card {
+  position: absolute;
+  left: 50%; top: var(--y, 1180px);
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  width: 900px;
+  padding: 28px 32px 30px;
+  border-radius: 40px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.gift-card .hand { display: flex; align-items: center; gap: 24px; }
+.gift-card .ic-big { width: 120px; height: 120px; flex: 0 0 auto; }
+.gift-card .mid { text-align: center; }
+.gift-card .arrow { flex: 0 0 auto; width: 120px; height: 8px; border-radius: 4px; background: var(--card-edge-2); position: relative; }
+.gift-card .arrow::after { content: ""; position: absolute; right: -4px; top: -10px; width: 0; height: 0; border-left: 20px solid var(--card-edge-2); border-top: 14px solid transparent; border-bottom: 14px solid transparent; }
+.gift-card .mid { flex: 1 1 auto; min-width: 0; }
+.gift-card .t { font-size: 30px; font-weight: 800; line-height: 38px; }
+.gift-card .e { font-size: 34px; font-weight: 800; line-height: 40px; color: var(--primary-deep); }
+/* floating text */
+.float {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--primary-deep);
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(251, 248, 241, 0.95), 0 0 2px rgba(251, 248, 241, 1);
+}
+.float.is-cyan { color: #3FB3AD; }
+.float.is-small { font-size: 26px; }
+
+/* ---------- shop / buyback drawer (NPC-2 · NPC-3) ----------------------------
+   60 % drawer (1440) over the dimmed plaza. head → keeper strip → tabs → rows → footer. */
+.drawer.is-shop { --drawer-h: 1440px; }
+.keeper {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.keeper .face {
+  flex: 0 0 auto;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: #F1EADA;
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.keeper .face .ic { width: 104px; height: 104px; margin-top: 10px; }
+.keeper .mid { flex: 1 1 auto; min-width: 0; }
+.keeper .tag-name { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 16px; font-size: 22px; }
+.keeper .say { margin-top: 8px; font-size: 26px; font-weight: 700; line-height: 32px; color: var(--ink); }
+.keeper .side {
+  flex: 0 0 auto;
+  width: 300px;
+  padding: 14px 18px;
+  border-radius: 24px;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+}
+.keeper .side .h { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.keeper .side .h .ic { width: 28px; height: 28px; }
+.keeper .side .p { font-size: 22px; font-weight: 700; line-height: 28px; color: var(--ink-2); margin-top: 4px; }
+.shop-note { margin-top: 14px; font-size: 22px; font-weight: 700; color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
+.shop-note .ic { width: 24px; height: 24px; }
+.shop-sec { margin-top: 18px; font-size: 24px; font-weight: 800; color: var(--ink); display: flex; align-items: center; gap: 10px; }
+.shop-sec .sub { font-size: 20px; font-weight: 700; color: var(--ink-2); }
+/* item row 128 tall */
+.shop-row {
+  height: 128px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid var(--card-edge);
+}
+.shop-row .thumb {
+  position: relative;
+  flex: 0 0 auto;
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: #F1EADA;
+  border: 1px solid var(--card-edge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.shop-row .thumb .ic { width: 58px; height: 58px; }
+.shop-row .mid { flex: 1 1 auto; min-width: 0; }
+.shop-row .nm { font-size: 28px; font-weight: 800; line-height: 34px; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.shop-row .meta { margin-top: 2px; font-size: 22px; font-weight: 700; line-height: 28px; color: var(--ink-2); white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+.shop-row .meta .ok { color: var(--primary-deep); display: inline-flex; align-items: center; gap: 4px; }
+.shop-row .meta .ok .ic { width: 22px; height: 22px; }
+.shop-row .meta .amber { color: var(--energy-amber); }
+.shop-row .price {
+  flex: 0 0 auto;
+  height: 56px;
+  padding: 0 16px 0 18px;
+  border-radius: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 26px;
+  font-weight: 800;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  white-space: nowrap;
+}
+.shop-row .price .ic { width: 30px; height: 30px; }
+/* quantity stepper on the selected row: − n + (each target 80) */
+.qty {
+  flex: 0 0 auto;
+  height: 80px;
+  border-radius: 40px;
+  background: var(--card-solid);
+  border: 2px solid var(--primary-deep);
+  display: inline-flex;
+  align-items: center;
+}
+.qty .b { width: 80px; height: 76px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 800; color: var(--primary-deep); }
+.qty .n { min-width: 56px; text-align: center; font-size: 30px; font-weight: 800; }
+.shop-row.is-selected { background: rgba(127, 198, 106, 0.10); border-radius: 24px; padding: 0 12px; margin: 0 -12px; }
+/* locked / sold-out rows: 60 % grey, reason inline */
+.shop-row.is-locked .thumb .ic, .shop-row.is-out .thumb .ic { filter: grayscale(1); opacity: 0.55; }
+.shop-row.is-locked .nm, .shop-row.is-out .nm { color: var(--disabled-ink); }
+.shop-row.is-locked .price, .shop-row.is-out .price { background: var(--disabled-bg); border-color: var(--disabled-edge); color: var(--disabled-ink); }
+.lock-pill {
+  height: 36px;
+  padding: 0 12px 0 8px;
+  border-radius: 18px;
+  background: rgba(47, 58, 51, 0.10);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--disabled-ink);
+  white-space: nowrap;
+}
+.lock-pill .ic { width: 22px; height: 22px; color: var(--disabled-ink); }
+.new-pill {
+  height: 36px;
+  padding: 0 12px 0 10px;
+  border-radius: 18px;
+  background: rgba(94, 200, 194, 0.16);
+  border: 1px solid #5EC8C2;
+  color: #2E8F8A;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 20px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.stock { font-size: 22px; font-weight: 800; color: var(--ink); }
+/* drawer footer: full-width primary button + note on the left */
+.drawer-foot {
+  position: absolute;
+  left: var(--m); right: var(--m);
+  bottom: calc(var(--safe-bottom) + 24px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.drawer-foot .note { font-size: 22px; font-weight: 700; line-height: 28px; color: var(--ink-2); }
+.drawer-foot .note b { color: var(--ink); font-weight: 800; }
+.drawer-foot .btn { min-width: 420px; }
+.drawer-foot .btn.is-disabled { font-size: 28px; padding: 0 36px; }
+.drawer-foot .btn.is-wide { width: 100%; }
+/* buyback quota bar */
+.quota {
+  margin-top: 20px;
+  padding: 16px 22px 14px;
+  border-radius: 28px;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+}
+.quota .row { display: flex; align-items: center; justify-content: space-between; font-size: 26px; font-weight: 800; }
+.quota .row .v.is-amber { color: var(--energy-amber); }
+.quota .row .v.is-red { color: var(--energy-red); }
+.quota .track { margin-top: 10px; height: 14px; border-radius: 7px; background: var(--track); position: relative; overflow: hidden; }
+.quota .track i { position: absolute; left: 0; top: 0; bottom: 0; width: var(--pct, 80%); border-radius: 7px; background: var(--energy-amber); }
+.quota.is-full .track i { background: var(--energy-red); }
+.quota .sub { margin-top: 8px; font-size: 20px; font-weight: 700; color: var(--ink-2); }
+.shop-row .total { font-size: 22px; font-weight: 800; color: var(--ink); white-space: nowrap; }
+.shop-row.is-home .nm { color: var(--disabled-ink); }
+.shop-row.is-home .thumb .ic { filter: grayscale(1); opacity: 0.55; }
+.btn-sm.is-disabled.is-reason { font-size: 22px; min-width: 0; padding: 0 22px; }
+
+/* ---------- request board (NPC-4) ----------------------------------------- */
+.board {
+  position: absolute;
+  left: var(--m); right: var(--m);
+  top: var(--y, 420px);
+  height: var(--h, 1560px);
+  z-index: 6;
+  border-radius: 40px;
+  background: linear-gradient(to bottom, #C9A27A, #B98A5E);
+  border: 1px solid var(--wood-deep);
+  padding: 28px 28px 24px;
+}
+.board::before {                                 /* inner cork panel */
+  content: "";
+  position: absolute;
+  inset: 20px;
+  border-radius: 28px;
+  background: #DDBE95;
+  border: 1px solid var(--wood-deep);
+}
+.board .board-head {
+  position: relative;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 30px;
+  font-weight: 800;
+  color: #FBF8F1;
+  padding: 0 14px;
+  text-shadow: 0 1px 0 rgba(47, 58, 51, 0.25);
+}
+.board .board-head .ic { width: 36px; height: 36px; }
+.board .board-head .left { display: inline-flex; align-items: center; gap: 12px; }
+.board .close-btn { width: 72px; height: 72px; }
+.board .close-btn .ic { width: 32px; height: 32px; }
+.board .cards { position: relative; margin-top: 18px; display: flex; flex-direction: column; gap: 20px; }
+.req {
+  position: relative;
+  border-radius: 28px;
+  background: var(--card-solid);
+  border: 1px solid var(--card-edge);
+  padding: 26px 28px 24px;
+}
+.req::before {                                   /* pin */
+  content: "";
+  position: absolute;
+  left: 50%; top: -12px;
+  width: 24px; height: 24px;
+  margin-left: -12px;
+  border-radius: 12px;
+  background: var(--energy-red);
+  border: 3px solid var(--card-solid);
+}
+.req .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.req .nm { font-size: 30px; font-weight: 800; line-height: 36px; white-space: nowrap; }
+.req .nm .src { color: var(--ink-2); font-weight: 700; }
+.req .st {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 22px;
+  font-weight: 800;
+  background: rgba(47, 58, 51, 0.08);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.req .st.is-tracked { background: var(--primary-tint); color: var(--primary-deep); border: 1px solid var(--primary-deep); }
+.req .st.is-ready { background: linear-gradient(to bottom, var(--primary), var(--primary-deep)); color: #fff; border: 1px solid var(--primary-edge); }
+.req .st .ic { width: 22px; height: 22px; }
+.req .line { margin-top: 10px; font-size: 26px; font-weight: 700; line-height: 32px; color: var(--ink); display: flex; align-items: center; gap: 10px; }
+.req .line .ic { width: 30px; height: 30px; }
+.req .line .sub { color: var(--ink-2); }
+.req .line .reward { color: var(--coin-deep); font-weight: 800; }
+.req .line .stamp { color: var(--rar-rare); font-weight: 800; }
+.req .line .have { color: var(--primary-deep); font-weight: 800; }
+.req .acts { margin-top: 16px; display: flex; gap: 12px; }
+.req .acts .btn-sm { height: 88px; min-width: 190px; }
+.req.is-ready { border: 3px solid var(--primary-deep); }
+.req.is-coop .nm .src { color: #2E8F8A; }
+.req.is-solo { background: rgba(251, 248, 241, 0.7); }
+.req.is-solo .nm { color: var(--disabled-ink); }
+.board .corner {
+  position: relative;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #5A3F2A;
+  padding: 0 14px;
+}
+.board .corner .sub { font-weight: 700; color: #7A5A3E; }
+.req .joined { display: flex; align-items: center; gap: 6px; margin-top: 12px; }
+.req .joined .av { width: 56px; height: 56px; border-radius: 50%; background: #F1EADA; border: 2px solid var(--card-solid); display: flex; align-items: center; justify-content: center; margin-left: -10px; }
+.req .joined .av:first-child { margin-left: 0; }
+.req .joined .av .ic { width: 46px; height: 46px; }
+.req .joined .av.is-empty { border: 2px dashed var(--card-edge-2); background: transparent; }
+.req .joined .t { margin-left: 10px; font-size: 24px; font-weight: 800; }
+
+/* ---------- tea counter (NPC-6) --------------------------------------------- */
+.tea-card {
+  position: absolute;
+  left: var(--m); right: var(--m);
+  bottom: calc(var(--bar-bottom) + var(--slot) + 28px);
+  z-index: 6;
+  border-radius: 40px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  padding: 24px 28px 26px;
+}
+.tea-card .row1 { display: flex; align-items: center; gap: 20px; }
+.tea-card .cup { flex: 0 0 auto; width: 112px; height: 112px; border-radius: 50%; background: #F1EADA; border: 1px solid var(--card-edge); display: flex; align-items: center; justify-content: center; }
+.tea-card .cup .ic { width: 72px; height: 72px; }
+.tea-card .mid { flex: 1 1 auto; min-width: 0; }
+.tea-card .t { font-size: 32px; font-weight: 800; line-height: 38px; white-space: nowrap; }
+.tea-card .t .e { color: var(--primary-deep); }
+.tea-card .t .c { color: var(--coin-deep); }
+.tea-card .t .k { color: var(--ink-2); font-weight: 700; }
+.tea-card .s { margin-top: 4px; font-size: 22px; font-weight: 700; line-height: 28px; color: var(--ink-2); }
+.tea-card .acts { margin-top: 20px; display: flex; gap: 12px; }
+.tea-card .acts .btn { flex: 1 1 0; padding: 0 20px; font-size: 32px; }
+.tea-card .acts .btn .ic { width: 40px; height: 40px; }
+.tea-card .acts .btn.is-disabled { font-size: 28px; }
+.tea-card .note { margin-top: 14px; font-size: 22px; font-weight: 700; color: var(--ink-2); text-align: center; }
+/* small inset frame (corner): tea table moment */
+.inset {
+  position: absolute;
+  left: var(--x, 30px); top: var(--y, 300px);
+  width: var(--w, 360px); height: var(--h, 300px);
+  z-index: 5;
+  border-radius: 28px;
+  overflow: hidden;
+  border: 3px solid var(--card-solid);
+  background: #DCE7D4;
+}
+.inset img { position: absolute; display: block; }
+.inset .cap {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 8px 14px 10px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  background: rgba(251, 248, 241, 0.88);
+}
+/* generic small state card used for side-by-side variant frames */
+.mini-card {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  width: var(--w, 480px);
+  z-index: 6;
+  border-radius: 32px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  padding: 20px 22px 22px;
+}
+.mini-card .h { font-size: 22px; font-weight: 800; color: var(--ink-2); text-transform: uppercase; letter-spacing: 1px; }
+.mini-card .btn { width: 100%; margin-top: 14px; font-size: 28px; padding: 0 20px; }
+
+/* ---------- four-up climate thumbnails (NPC-1-2) ---------------------------- */
+.quad {
+  position: absolute;
+  left: var(--m); right: var(--m);
+  top: 300px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  z-index: 4;
+}
+.quad .skin {
+  position: relative;
+  height: 760px;
+  border-radius: 36px;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #ADD5D0, #F7D9BB);
+  border: 1px solid var(--card-edge);
+}
+/* outpost.png at 0.625 (640 wide): island src x 15…983 / y 169…1144 → cell x −62…543 (50 px cropped each side), y 76…685 */
+.quad .skin img { position: absolute; left: -71px; top: -30px; width: 640px; height: auto; display: block; }
+.quad .skin .sign {
+  position: absolute;
+  left: 50%; bottom: 28px;
+  transform: translateX(-50%);
+  height: 64px;
+  padding: 0 26px;
+  border-radius: 16px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(to bottom, var(--wood), var(--wood-deep));
+  border: 1px solid var(--wood-deep);
+  color: #FBF8F1;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.quad .skin .sign::before {               /* post */
+  content: "";
+  position: absolute;
+  left: 50%; top: -24px;
+  width: 12px; height: 24px;
+  margin-left: -6px;
+  background: var(--wood-deep);
+}
+.quad .skin .keeper-dot {
+  position: absolute;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+}
+.quad .skin.is-tropical img { filter: hue-rotate(-18deg) saturate(1.25) brightness(1.04); }
+.quad .skin.is-temperate img { filter: none; }
+.quad .skin.is-cool img { filter: hue-rotate(28deg) saturate(0.55) brightness(1.08) contrast(0.96); }
+.quad .skin.is-arid img { filter: sepia(0.55) saturate(1.15) hue-rotate(-12deg) brightness(1.03); }
+.quad .skin .tint { position: absolute; inset: 0; pointer-events: none; }
+.quad .skin.is-tropical .tint { background: linear-gradient(to bottom, rgba(255, 170, 120, 0.10), rgba(90, 200, 190, 0.14)); }
+.quad .skin.is-cool .tint { background: linear-gradient(to bottom, rgba(220, 235, 255, 0.28), rgba(255, 255, 255, 0.22)); }
+.quad .skin.is-arid .tint { background: linear-gradient(to bottom, rgba(255, 210, 140, 0.14), rgba(230, 170, 90, 0.18)); }
+.quad .skin .cap {
+  position: absolute;
+  left: 20px; top: 20px;
+  height: 52px;
+  padding: 0 18px;
+  border-radius: 26px;
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  font-size: 24px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.quad .skin .cap .sub { color: var(--ink-2); font-weight: 700; }
+.quad .skin .tag { z-index: 2; }
+.page-title {
+  position: absolute;
+  left: var(--m); right: var(--m);
+  top: 200px;
+  z-index: 4;
+  font-size: 34px;
+  font-weight: 800;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.page-title .sub { font-size: 24px; font-weight: 700; color: var(--ink-2); }
+
+/* ---------- OUTPOST-DIAGRAM (pure HTML/SVG page) -------------------------- */
+.dg-page {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, #EEF3EA, #F6F1E6);
+  padding: 72px 60px 80px;
+}
+.dg-title { font-size: 56px; font-weight: 800; line-height: 64px; }
+.dg-sub { margin-top: 8px; font-size: 26px; font-weight: 700; color: var(--ink-2); }
+.dg-fig { margin-top: 28px; width: 960px; height: 1000px; border-radius: 40px; background: var(--card-solid); border: 1px solid var(--card-edge); overflow: hidden; position: relative; }
+.dg-fig svg { display: block; width: 960px; height: 1000px; font-family: inherit; }
+.dg-legend { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+.dg-legend .li { display: flex; align-items: center; gap: 14px; font-size: 22px; font-weight: 700; color: var(--ink); line-height: 28px; }
+.dg-legend .li .sw { flex: 0 0 auto; width: 56px; height: 56px; border-radius: 50%; background: var(--card-solid); border: 1px solid var(--card-edge); display: flex; align-items: center; justify-content: center; }
+.dg-legend .li .sw .ic { width: 38px; height: 38px; }
+.dg-legend .li b { font-weight: 800; }
+.dg-legend .li .sw.is-poi { background: #E8893A; border: 3px solid #fff; width: 40px; height: 40px; margin: 0 8px; }
+.dg-sec { margin-top: 30px; font-size: 30px; font-weight: 800; }
+.dg-table { margin-top: 14px; width: 960px; border-radius: 32px; overflow: hidden; border: 1px solid var(--card-edge); background: var(--card-solid); }
+.dg-table .tr { display: grid; grid-template-columns: 300px 220px 1fr; align-items: center; height: 76px; padding: 0 26px; border-bottom: 1px solid var(--card-edge); font-size: 24px; font-weight: 700; }
+.dg-table .tr:last-child { border-bottom: 0; }
+.dg-table .tr.is-head { background: #EFE9DA; font-weight: 800; color: var(--ink-2); font-size: 22px; height: 60px; text-transform: uppercase; letter-spacing: 1px; }
+.dg-table .tr .n { font-weight: 800; display: inline-flex; align-items: center; gap: 8px; }
+.dg-table .tr .n .ic { width: 30px; height: 30px; }
+.dg-table .tr .ex { color: var(--ink-2); }
+.dg-rule { margin-top: 18px; display: flex; align-items: center; gap: 14px; height: 72px; padding: 0 24px; border-radius: 36px; background: var(--primary-tint); border: 1px solid var(--primary-deep); font-size: 24px; font-weight: 800; color: var(--primary-deep); }
+.dg-rule .ic { width: 32px; height: 32px; }
+.dg-foot { margin-top: 16px; font-size: 20px; font-weight: 700; color: var(--ink-2); line-height: 26px; }
+/* v2 diagram (2026-10-04): wider middle column for per-keeper counts */
+.dg-table.is-wide .tr { grid-template-columns: 220px 330px 1fr; }
+.dg-legend .li { font-size: 20px; line-height: 24px; }
+/* v2 map pins (2026-10-04): same-type cluster count badge */
+.pin .disc .mk.is-count { background: var(--ink); color: #fff; font-size: 20px; }
+.pin.is-cluster .disc { border-style: double; border-width: 5px; }
+/* ===== unified counter + bag drawer (2026-10-04): Market Square / Tackle Shop share FARM-6's layout ===== */
+.drawer.is-counter .kline { margin-top: 10px; height: 56px; display: flex; align-items: center; gap: 14px; }
+.drawer.is-counter .kline .face { flex: 0 0 auto; width: 52px; height: 52px; border-radius: 50%; background: #F1EADA; border: 1px solid var(--card-edge); display: flex; align-items: center; justify-content: center; }
+.drawer.is-counter .kline .face .ic { width: 38px; height: 38px; }
+.drawer.is-counter .kline .who { font-size: 22px; font-weight: 800; white-space: nowrap; }
+.drawer.is-counter .kline .who .role { color: var(--ink-2); font-weight: 700; }
+.drawer.is-counter .kline .say { flex: 1 1 auto; min-width: 0; font-size: 21px; font-weight: 700; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.drawer.is-counter .stall-rows { margin-top: 6px; }
+.drawer.is-counter .srow .nm .lock-pill, .drawer.is-counter .srow .nm .new-pill { margin-left: 10px; vertical-align: middle; }
+.drawer.is-counter .quota { margin-top: 14px; }
+.drawer.is-counter .quota.is-full { color: var(--energy-red); }
+.drawer.is-counter .quota.is-full .cap-fill { background: var(--energy-red); }
+.drawer.is-counter .tabs.is-compact .tab { padding: 0 18px; }
+.drawer.is-counter .tabs.is-compact .tab.is-here { border: 2px solid var(--primary-deep); color: var(--primary-deep); }
+.drawer.is-counter .tabs.is-compact .tab.is-here.is-on { color: #fff; }
+.drawer.is-counter .detail .acts .btn-sm.is-disabled { font-size: 20px; padding: 0 18px; min-width: 0; }
+.drawer.is-counter .detail .desc.is-off { color: var(--disabled-ink); font-style: normal; }
+.cell .cap-s { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); height: 26px; padding: 0 10px; border-radius: 13px; background: var(--primary-tint); font-size: 17px; font-weight: 800; line-height: 26px; color: var(--primary-deep); white-space: nowrap; }
+.cell.has-cap > .ic { transform: translate(-50%, -66%); }
+.cell.has-cap .count { bottom: 40px; }
+.drawer.is-counter .srow .price-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 24px; font-weight: 800; white-space: nowrap; }
+.drawer.is-counter .srow .price-tag .ic { width: 26px; height: 26px; }
+.drawer.is-counter .srow .meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* ===== keeper greeting card (2026-10-04): tapping a keeper opens this first; "Trade" opens the counter drawer ===== */
+.greet-open .scene-dim { background: rgba(47, 58, 51, 0.16); }
+.greet {
+  position: absolute; left: var(--m); right: var(--m); bottom: 60px; height: 560px;
+  border-radius: 44px; background: var(--card); border: 1px solid var(--card-edge);
+  z-index: 6; display: flex; gap: 24px; padding: 24px;
+}
+.greet .portrait {
+  position: relative; flex: 0 0 auto; width: 300px; height: 100%;
+  border-radius: 36px; border: 1px solid var(--card-edge); overflow: hidden;
+  background-color: #F1EADA; background-repeat: no-repeat; background-size: 1024px 1536px;
+}
+.greet .portrait .nm {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 72px;
+  background: linear-gradient(to top, rgba(47, 58, 51, 0.6), rgba(47, 58, 51, 0));
+  color: #fff; font-size: 24px; font-weight: 800; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px;
+}
+.greet .mid { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.greet .who { font-size: 32px; font-weight: 800; line-height: 38px; white-space: nowrap; }
+.greet .who .role { color: var(--ink-2); font-weight: 700; }
+.greet .sub { margin-top: 4px; font-size: 21px; font-weight: 700; color: var(--ink-2); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.greet .sub .ic { width: 24px; height: 24px; }
+.greet .say { margin-top: 14px; font-size: 27px; font-weight: 700; line-height: 36px; color: var(--ink); }
+.greet .opts { margin-top: auto; display: flex; flex-direction: column; gap: 12px; }
+.greet .opts .btn-sm { height: 80px; width: 100%; justify-content: flex-start; padding: 0 26px; font-size: 27px; gap: 14px; border-radius: 40px; }
+.greet .opts .btn-sm .ic { width: 32px; height: 32px; }
+.greet .opts .btn-sm .k { margin-left: auto; font-size: 21px; font-weight: 700; color: var(--ink-2); }
+.greet .opts .btn-sm.btn-primary .k { color: rgba(255, 255, 255, 0.85); }
+.greet .opts .btn-sm.is-plain { background: transparent; border-color: transparent; color: var(--ink-2); height: 64px; }
+.tag-tap.is-on { background: linear-gradient(to bottom, var(--primary), var(--primary-deep)); border-color: var(--primary-edge); color: #fff; }
+.tag-tap.is-on .hint, .tag-tap.is-on .sep { color: #fff; }
+/* keeper panel at the top of every counter drawer (2026-10-04): portrait crop + name + live bubble, tinted per post */
+.drawer.is-stall-bag.is-counter { --drawer-h: 2130px; }
+.drawer.is-counter .kpanel { margin-top: 12px; height: 140px; border-radius: 32px; display: flex; align-items: center; gap: 18px; padding: 12px 18px 12px 12px; background: var(--kp-bg, #F7E9CF); }
+.drawer.is-counter .kpanel.is-market { --kp-bg: #F7E9CF; }
+.drawer.is-counter .kpanel.is-tackle { --kp-bg: #E3EEF6; }
+.drawer.is-counter .kpanel.is-tea { --kp-bg: #E6EFE3; }
+.drawer.is-counter .kpanel.is-travel { --kp-bg: #E6E8F2; }
+.drawer.is-counter .kpanel .portrait { flex: 0 0 auto; width: 116px; height: 116px; border-radius: 28px; border: 1px solid var(--card-edge); background-color: #F1EADA; background-repeat: no-repeat; }
+.drawer.is-counter .kpanel .mid { flex: 1 1 auto; min-width: 0; }
+.drawer.is-counter .kpanel .who { font-size: 26px; font-weight: 800; line-height: 32px; white-space: nowrap; }
+.drawer.is-counter .kpanel .who .role { color: var(--ink-2); font-weight: 700; }
+.drawer.is-counter .kpanel .bubble-say { margin-top: 2px; font-size: 23px; font-weight: 700; line-height: 30px; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.drawer.is-counter .kpanel .note { margin-top: 2px; font-size: 19px; font-weight: 700; line-height: 24px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

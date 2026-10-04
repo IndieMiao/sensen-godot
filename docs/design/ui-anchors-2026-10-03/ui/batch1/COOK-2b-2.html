@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>COOK-2b-2 · Experiment variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-cook.css">
+</head>
+<!-- body class "scene-cam" = camera mode (v2): canvas = source × --cam-scale + (--cam-x, --cam-y).
+     Batch 1 (2026-10-03, cook group): shared kit.css/icons.svg untouched; additions live in kit-cook.css / icons-cook.svg. -->
+<body class="scene-cam" style="--scene-top:#B2D6D0; --scene-bottom:#F4D9B7; --src-w:1024px; --src-h:1536px; --cam-scale:1.39; --cam-x:-229px; --cam-y:280px;">
+<div class="canvas">
+
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/kitchen.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+  <!-- row 1: three panels side by side (scale 0.30): ① Lv4 three slots · ② family labels · ③ disabled state -->
+  <div class="frame-wrap" style="--s:0.3; left:30px; top:100px;"><div class="frame">
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/kitchen.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+  <section class="drawer " style="--drawer-h:1440px">
+    <div class="drawer-head">
+      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stove-off"/></svg><span>Stove 1/3</span><span class="sub">· Empty</span><span class="sub">· Cooking Lv4</span></div>
+      <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
+    </div>
+    <div class="tabs is-split"><div class="tab">Recipes</div><div class="tab is-on">Experiment</div></div>
+    <div class="exp-slots"><div class="exp-slot"><span class="dot dot-fine" style="position:absolute;left:8px;top:8px;width:24px;height:24px;border-radius:12px;border:2px solid #FBF8F1"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carp"/></svg><span class="nm">Grass Carp</span></div><div class="exp-slot"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-potato"/></svg><span class="nm">Potato</span></div><div class="exp-slot"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg><span class="nm">Rock Salt</span></div></div>
+    <div class="pot"><div class="rim"></div><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-question"/></svg></div>
+    <div class="preview"><span class="q">?</span><span class="sub">·</span><span class="rar-rare">Rare</span><span class="sub">·</span><span>30 s</span><span class="sub">·</span><span class="sub">Unknown dish</span></div>
+    <div class="sec-title">From your bag</div>
+    <div class="ingr-row"><div class="ingr is-in"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carp"/></svg><span class="count">×2</span><span class="nm">Grass Carp</span></div><div class="ingr is-in"><svg class="ic" aria-hidden="true"><use href="../icons-cook.svg#i-potato"/></svg><span class="count">×5</span><span class="nm">Potato</span></div><div class="ingr is-in"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg><span class="count">×2</span><span class="nm">Rock Salt</span></div><div class="ingr"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span class="count">×3</span><span class="nm">Pond Crucian</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg><span class="count">×12</span><span class="nm">Radish</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-herb"/></svg><span class="count">×1</span><span class="nm">Wild Herb</span></div></div>
+    <div class="exp-foot"><div class="note">Mystery dishes still<br>restore 5 Energy</div><div class="btn btn-primary"><span>Cook</span><span class="sep">·</span><span>Free</span></div></div>
+  </section>
+  <!-- HUD v2: row1 y48–176 = avatar 112 · energy card 112 (bar 240×12) · coins 72 · Inbox 96
+       row2 y192–256 = Today chip (left, shrinks) · place chip (right): house = home city · "City · Space" · › opens the Map -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Kitchen</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  </div></div>
+  <div class="frame-cap" style="left:192px; top:848px"><span class="n">1</span><span>Lv4 · 3 slots</span></div>
+  <div class="frame-wrap" style="--s:0.3; left:378px; top:100px;"><div class="frame">
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/kitchen.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+  <section class="drawer has-lock-lbl has-fam" style="--drawer-h:1440px">
+    <div class="drawer-head">
+      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stove-off"/></svg><span>Stove 1/3</span><span class="sub">· Empty</span><span class="sub">· Cooking Lv2</span></div>
+      <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
+    </div>
+    <div class="tabs is-split"><div class="tab">Recipes</div><div class="tab is-on">Experiment</div></div>
+    <div class="exp-slots"><div class="exp-slot"><div class="fam-lbl is-ok"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-check"/></svg><span>Any Common fish</span></div><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span class="nm">Pond Crucian</span></div><div class="exp-slot is-empty"><div class="fam-lbl"><span>Any seasoning</span></div><span class="plus">+</span><span>Add ingredient</span></div><div class="exp-slot is-locked"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><div class="lock-lbl"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><span>Cooking Lv4 · 3rd slot</span></div></div></div>
+    <div class="pot"><div class="rim"></div><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-question"/></svg></div>
+    <div class="preview"><span class="q">?</span><span class="sub">·</span><span class="rar-common">Common</span><span class="sub">·</span><span>5 s</span><span class="sub">·</span><span class="sub">Unknown dish</span></div>
+    <div class="sec-title">From your bag</div>
+    <div class="ingr-row"><div class="ingr is-in"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span class="count">×3</span><span class="nm">Pond Crucian</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg><span class="count">×12</span><span class="nm">Radish</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg><span class="count">×2</span><span class="nm">Rock Salt</span></div><div class="ingr is-in"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-herb"/></svg><span class="count">×1</span><span class="nm">Wild Herb</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-apple"/></svg><span class="count">×2</span><span class="nm">Apple</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carrot"/></svg><span class="count">×4</span><span class="nm">Carrot</span></div></div>
+    <div class="exp-foot"><div class="note">Mystery dishes still<br>restore 5 Energy</div><div class="btn btn-primary"><span>Cook</span><span class="sep">·</span><span>Free</span></div></div>
+  </section>
+  <!-- HUD v2: row1 y48–176 = avatar 112 · energy card 112 (bar 240×12) · coins 72 · Inbox 96
+       row2 y192–256 = Today chip (left, shrinks) · place chip (right): house = home city · "City · Space" · › opens the Map -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Kitchen</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  </div></div>
+  <div class="frame-cap" style="left:540px; top:848px"><span class="n">2</span><span>Family hints</span></div>
+  <div class="frame-wrap" style="--s:0.3; left:726px; top:100px;"><div class="frame">
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/kitchen.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+  <section class="drawer has-lock-lbl" style="--drawer-h:1440px">
+    <div class="drawer-head">
+      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stove-off"/></svg><span>Stove 1/3</span><span class="sub">· Empty</span><span class="sub">· Cooking Lv2</span></div>
+      <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
+    </div>
+    <div class="tabs is-split"><div class="tab">Recipes</div><div class="tab is-on">Experiment</div></div>
+    <div class="exp-slots"><div class="exp-slot"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg><span class="nm">Rock Salt</span></div><div class="exp-slot is-empty"><span class="plus">+</span><span>Add ingredient</span></div><div class="exp-slot is-locked"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><div class="lock-lbl"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><span>Cooking Lv4 · 3rd slot</span></div></div></div>
+    <div class="pot"><div class="rim"></div><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-question"/></svg></div>
+    <div class="preview is-warn"><span>Needs a main ingredient</span></div>
+    <div class="sec-title">From your bag</div>
+    <div class="ingr-row"><div class="ingr is-in"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg><span class="count">×2</span><span class="nm">Rock Salt</span></div><div class="ingr"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span class="count">×3</span><span class="nm">Pond Crucian</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg><span class="count">×12</span><span class="nm">Radish</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-herb"/></svg><span class="count">×1</span><span class="nm">Wild Herb</span></div><div class="ingr is-off"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-worm"/></svg><span class="count">×12</span><span class="nm">Worm Bait</span><div class="off-lbl">Not for cooking</div></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carrot"/></svg><span class="count">×4</span><span class="nm">Carrot</span></div></div>
+    <div class="exp-foot"><div class="note">Mystery dishes still<br>restore 5 Energy</div><div class="btn is-disabled"><span>Cook</span><span class="sep">·</span><span>Needs a main ingredient</span></div></div>
+  </section>
+  <!-- HUD v2: row1 y48–176 = avatar 112 · energy card 112 (bar 240×12) · coins 72 · Inbox 96
+       row2 y192–256 = Today chip (left, shrinks) · place chip (right): house = home city · "City · Space" · › opens the Map -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Kitchen</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  </div></div>
+  <div class="frame-cap" style="left:888px; top:848px"><span class="n">3</span><span>Needs a main</span></div>
+  <!-- row 2: gate card for the locked 3rd slot (scale 0.46) + two natural-scale widgets -->
+  <div class="frame-wrap" style="--s:0.46; left:30px; top:940px;"><div class="frame">
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/kitchen.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+  <section class="drawer has-lock-lbl" style="--drawer-h:1440px">
+    <div class="drawer-head">
+      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stove-off"/></svg><span>Stove 1/3</span><span class="sub">· Empty</span><span class="sub">· Cooking Lv2</span></div>
+      <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
+    </div>
+    <div class="tabs is-split"><div class="tab">Recipes</div><div class="tab is-on">Experiment</div></div>
+    <div class="exp-slots"><div class="exp-slot"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span class="nm">Pond Crucian</span></div><div class="exp-slot"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-herb"/></svg><span class="nm">Wild Herb</span></div><div class="exp-slot is-locked is-pressed"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><div class="lock-lbl"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><span>Cooking Lv4 · 3rd slot</span></div></div></div>
+    <div class="pot"><div class="rim"></div><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-question"/></svg></div>
+    <div class="preview"><span class="q">?</span><span class="sub">·</span><span class="rar-fine">Fine</span><span class="sub">·</span><span>15 s</span><span class="sub">·</span><span class="sub">Unknown dish</span></div>
+    <div class="sec-title">From your bag</div>
+    <div class="ingr-row"><div class="ingr is-in"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span class="count">×3</span><span class="nm">Pond Crucian</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg><span class="count">×12</span><span class="nm">Radish</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg><span class="count">×2</span><span class="nm">Rock Salt</span></div><div class="ingr is-in"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-herb"/></svg><span class="count">×1</span><span class="nm">Wild Herb</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-apple"/></svg><span class="count">×2</span><span class="nm">Apple</span></div><div class="ingr"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carrot"/></svg><span class="count">×4</span><span class="nm">Carrot</span></div></div>
+    <div class="exp-foot"><div class="note">Mystery dishes still<br>restore 5 Energy</div><div class="btn btn-primary"><span>Cook</span><span class="sep">·</span><span>Free</span></div></div>
+  </section>
+  <div class="scene-dim is-top"></div>
+  <div class="modal is-center is-top" style="--w:900px">
+    <div class="ttl">3rd ingredient slot</div>
+    <div class="ln">Cooking Lv4 · 120 XP to go · about 2 days</div>
+    <div class="ln">Cook new or Fine dishes for full XP</div>
+    <div class="ln is-ok">Unlocks 3-ingredient dishes</div>
+    <div class="acts"><div class="btn-sm btn-primary">Got it</div></div>
+  </div>
+  <!-- HUD v2: row1 y48–176 = avatar 112 · energy card 112 (bar 240×12) · coins 72 · Inbox 96
+       row2 y192–256 = Today chip (left, shrinks) · place chip (right): house = home city · "City · Space" · › opens the Map -->
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Kitchen</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+  </div></div>
+  <div class="frame-cap" style="left:278px; top:2072px"><span class="n">4</span><span>Locked slot · gate card</span></div>
+  <div class="comp" style="left:560px; top:940px; width:490px">
+    <div class="exp-slots"><div class="exp-slot"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg><span class="nm">Radish</span></div><div class="exp-slot"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg><span class="nm">Radish</span></div></div>
+    <div class="preview is-tried"><span class="q">?</span><span class="sub">·</span><span>Tried before · still a Mystery Dish</span></div>
+  </div>
+  <div class="comp" style="left:560px; top:1330px; width:490px">
+    <div class="modal">
+      <div class="ttl"><span class="dot dot-rare"></span><span>Cook with Silver Sturgeon?</span></div>
+      <div class="acts"><div class="btn-sm btn-sec">Not now</div><div class="btn-sm btn-primary">Cook</div></div>
+    </div>
+  </div>
+  <div class="frame-cap" style="left:805px; top:2072px"><span class="n">5</span><span>Tried combo · Rare confirm</span></div>
+
+</div>
+</body>
+</html>

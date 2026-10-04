@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>NPC-2 · Market Square counter + bag</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-npc.css">
+<link rel="stylesheet" href="../kit-farm.css">
+</head>
+<!-- NPC-2 (group npc): Market counter drawer (60 %, y 960–2400) over the dimmed plaza. Keeper portrait + name tag + one line,
+     "Shared stock · all Shanghai markets", item rows with coin price and stock, one locked row (Farming Lv7), one sold-out example row,
+     a City Specialty shelf (group 1 only) with a cyan ◆ "New for you" Recipe Card, Buy at the bottom. -->
+<body class="scene-cam drawer-open" style="--scene-top:#EDE6D3; --scene-bottom:#CFEAE9; --src-w:1024px; --src-h:1536px; --cam-scale:1.1; --cam-x:-32px; --cam-y:307px;">
+<div class="canvas">
+  <!-- NPC-2 (2026-10-04 unified): Market Square counter in the FARM-6 layout; bag on All, a non-regional dish selected → Sell at home -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/market-square-v2.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+
+  <!-- Counter + Bag drawer (unified with FARM-6, 2026-10-04): upper half = the counter (Buy / Board, keeper line, ≤ 4 rows),
+       lower half = the bag (quota bar when this counter buys, Sell here filter, detail card Pin / Sell / Sell All, 5 × 5 grid). No Sell tab. -->
+  <section class="drawer is-stall-bag is-counter">
+    <div class="drawer-head">
+      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-market"/></svg><span>Mei's Stall</span><span class="sub">· Market Square</span></div>
+      <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
+    </div>
+    <div class="tabs"><div class="tab is-on">Buy</div><div class="tab">Market Board</div></div>
+    <div class="kpanel is-market">
+      <div class="portrait" style="background-image:url('../../scenes/market-square-v2.png'); background-size:1229px 1843px; background-position:-285px -627px;"></div>
+      <div class="mid"><div class="who">Market Keeper <span class="role">· Mei</span></div><div class="bubble-say">“Sweet potato seeds, fresh in. Farming Lv5 to plant.”</div><div class="note">Shared stock · all Shanghai markets</div></div>
+    </div>
+    <div class="stall-rows">
+      <div class="srow">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-sweet-potato"/></svg></div>
+        <div class="mid"><div class="nm">Sweet Potato Seeds</div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>15 coins</span><span>· Stock 8/10 · Farming Lv5 to plant</span></div></div>
+        <div class="right"><div class="bagct"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span>Bag ×0</span></div><div class="stepper"><div class="k">−</div><div class="v">1</div><div class="k">+</div></div><div class="price-tag">15 <svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div><div class="btn-sm btn-primary">Buy</div></div>
+      </div>
+      <div class="srow is-locked">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-sapling"/></svg></div>
+        <div class="mid"><div class="nm">Apple Sapling</div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>40 coins</span><span>· Grows 2×2</span></div></div>
+        <div class="right"><div class="btn-sm is-disabled"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lock"/></svg><span>Farming Lv7 · 3 levels to go</span></div></div>
+      </div>
+      <div class="srow">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-feed-bag"/></svg></div>
+        <div class="mid"><div class="nm">Orchard Feed</div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>6 coins</span><span>· Stock 10/10 · Feeds one tree for a day</span></div></div>
+        <div class="right"><div class="stepper"><div class="k">−</div><div class="v">0</div><div class="k">+</div></div><div class="price-tag">6 <svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div><div class="btn-sm btn-primary">Buy</div></div>
+      </div>
+      <div class="srow">
+        <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-recipe-card"/></svg></div>
+        <div class="mid"><div class="nm">Recipe Card<span class="new-pill">◆ New for you</span></div><div class="meta"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span>200 coins</span><span>· City Specialty · Fisher's Stew · Stock 1/1</span></div></div>
+        <div class="right"><div class="stepper"><div class="k">−</div><div class="v">1</div><div class="k">+</div></div><div class="price-tag">200 <svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div><div class="btn-sm btn-primary">Buy</div></div>
+      </div>
+    </div>
+    <div class="split"></div>
+
+    <div class="bag-title">
+      <div class="h">Bag 19<span class="of">/25</span></div>
+      <div class="cap-track"><div class="cap-fill" style="--pct:76%"></div></div>
+      <div class="sort-chip"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-sort"/></svg><span>Sort</span><span class="sub">· Recent</span></div>
+    </div>
+    <div class="tabs is-compact"><div class="tab is-here">Sell here<span class="n">3</span></div><div class="tab is-on">All</div><div class="tab">Seeds</div><div class="tab">Fish</div><div class="tab">Produce</div><div class="tab">Dishes</div><div class="tab">Materials</div></div>
+    <div class="detail">
+      <div class="big"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-grilled"/></svg><span class="dot dot-common"></span></div>
+      <div class="mid"><div class="nm">Grilled Crucian <span class="of">×3</span></div><div class="meta">Common dish · +20 Energy</div><div class="desc is-off">Not from this region · sells at the Homestead Stall</div></div>
+      <div class="acts"><div class="pin-btn" title="Pin to quick bar"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-pin"/></svg><span>Pin</span></div><div class="btn-sm is-disabled">Sell at home</div><div class="btn-sm is-disabled">Sell All · at home</div></div>
+    </div>
+    <div class="grid">
+      <div class="cell is-selected"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-grilled"/></svg><span class="count">×3</span></div>
+      <div class="cell has-cap"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-sweet-potato"/></svg><span class="count">×12</span><span class="cap-s">Sell here</span></div>
+      <div class="cell has-cap"><span class="dot dot-rare"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-stew"/></svg><span class="count">×2</span><span class="cap-s">Sell here</span></div>
+      <div class="cell has-cap"><span class="dot dot-fine"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carp"/></svg><span class="count">×3</span><span class="cap-s">Sell here</span></div>
+      <div class="cell"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span class="count">×3</span></div>
+      <div class="cell"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-minnow"/></svg><span class="count">×2</span></div>
+      <div class="cell"><span class="dot dot-common"></span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-dish-soup"/></svg><span class="count">×1</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg><span class="count">×24</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carrot"/></svg><span class="count">×4</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-apple"/></svg><span class="count">×2</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish-seeds"/></svg><span class="count">×24</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-carrot-seeds"/></svg><span class="count">×10</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-compost"/></svg><span class="count">×6</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-salt"/></svg><span class="count">×2</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-herb"/></svg><span class="count">×1</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-wood"/></svg><span class="count">×20</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-stone"/></svg><span class="count">×8</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-worm"/></svg><span class="count">×12</span></div>
+      <div class="cell"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-lure"/></svg><span class="count">×3</span></div>
+      <div class="cell is-empty"></div>
+    </div>
+  </section>
+
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish · Shanghai Market</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Market Square</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+
+</div>
+</body>
+</html>

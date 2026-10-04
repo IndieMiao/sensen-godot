@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <!-- Status-icon sheet (2026-10-04) — glyphs used inside the unified state badges (STATE-ICONS.html).
+       Referenced from ui/batch1 pages via <use href="../icons-state.svg#i-st-…">. Shared icons.svg is untouched.
+       Every i-st-* glyph is monochrome (currentColor) so it takes the badge's ink/white colour; the few i-obj-*
+       symbols at the bottom are small colour objects for the application examples only. Same 64 grid. -->
+  <defs>
+
+    <!-- ===== monochrome state glyphs (currentColor) ===== -->
+
+    <!-- zZ · rest / bench available -->
+    <symbol id="i-st-zz" viewBox="0 0 64 64">
+      <path fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" d="M10 28h20L10 48h20"/>
+      <path fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" d="M36 12h16L36 28h16"/>
+    </symbol>
+    <!-- flame over a hob bar · stove available -->
+    <symbol id="i-st-stove" viewBox="0 0 64 64">
+      <path fill="currentColor" d="M33 4c3 10 13 16 13 28a14 14 0 0 1-28 0c0-7 4-11 7-15 1 5 3 8 6 9-1-8 0-14 2-22z"/>
+      <path fill="rgba(251,248,241,.55)" d="M32 30c3 4 6 7 6 11a6 6 0 0 1-12 0c0-3 1-5 3-7 0 3 1 4 3 5-1-3-1-6 0-9z"/>
+      <rect x="12" y="52" width="40" height="7" rx="3.5" fill="currentColor"/>
+    </symbol>
+    <!-- shopping bag · stall available -->
+    <symbol id="i-st-shopbag" viewBox="0 0 64 64">
+      <path fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" d="M22 24v-6a10 10 0 0 1 20 0v6"/>
+      <path fill="currentColor" d="M10 22h44l-3 30a7 7 0 0 1-7 7H20a7 7 0 0 1-7-7z"/>
+      <rect x="18" y="40" width="28" height="5" rx="2.5" fill="rgba(251,248,241,.55)"/>
+    </symbol>
+    <!-- clock · countdown / cooling -->
+    <symbol id="i-st-clock" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="23" fill="none" stroke="currentColor" stroke-width="6"/>
+      <rect x="29.5" y="17" width="5" height="18" rx="2.5" fill="currentColor"/>
+      <rect x="29.5" y="30" width="15" height="5" rx="2.5" fill="currentColor"/>
+    </symbol>
+    <!-- lightning · insufficient energy -->
+    <symbol id="i-st-bolt" viewBox="0 0 64 64">
+      <path fill="currentColor" d="M36 4 14 36h14l-4 24 26-34H36z"/>
+    </symbol>
+    <!-- creel · "Creel full" -->
+    <symbol id="i-st-creel" viewBox="0 0 64 64">
+      <path fill="currentColor" d="M22 12a10 10 0 0 1 20 0l-5 2a5 5 0 0 0-10 0z"/>
+      <path fill="currentColor" d="M8 20h48l-5 30a6 6 0 0 1-6 6H19a6 6 0 0 1-6-6z"/>
+      <rect x="11" y="30" width="42" height="4" fill="rgba(47,58,51,.22)"/>
+      <rect x="13" y="42" width="38" height="4" fill="rgba(47,58,51,.22)"/>
+    </symbol>
+    <!-- bag · "Bag full" -->
+    <symbol id="i-st-bag" viewBox="0 0 64 64">
+      <rect x="8" y="22" width="48" height="36" rx="11" fill="currentColor"/>
+      <rect x="22" y="8" width="20" height="14" rx="7" fill="currentColor"/>
+      <rect x="26" y="11" width="12" height="9" rx="4.5" fill="rgba(47,58,51,.22)"/>
+      <rect x="25" y="36" width="14" height="9" rx="4.5" fill="rgba(251,248,241,.6)"/>
+    </symbol>
+    <!-- diamond · new content -->
+    <symbol id="i-st-diamond" viewBox="0 0 64 64">
+      <rect x="17" y="17" width="30" height="30" rx="5" fill="currentColor" transform="rotate(45 32 32)"/>
+    </symbol>
+    <!-- exclamation · request to take -->
+    <symbol id="i-st-excl" viewBox="0 0 64 64">
+      <rect x="26.5" y="8" width="11" height="30" rx="5.5" fill="currentColor"/>
+      <circle cx="32" cy="50" r="6.5" fill="currentColor"/>
+    </symbol>
+    <!-- star · event -->
+    <symbol id="i-st-star" viewBox="0 0 64 64">
+      <path fill="currentColor" d="M32 5l8.2 17.6L59 25l-14 13.2L48.6 57 32 47.4 15.4 57 19 38.2 5 25l18.8-2.4z"/>
+    </symbol>
+    <!-- heart · gift -->
+    <symbol id="i-st-heart" viewBox="0 0 64 64">
+      <path fill="currentColor" d="M32 57S5 40 5 22a13 13 0 0 1 27-5 13 13 0 0 1 27 5c0 18-27 35-27 35z"/>
+    </symbol>
+    <!-- cross · error / blocked -->
+    <symbol id="i-st-cross" viewBox="0 0 64 64">
+      <rect x="27" y="8" width="10" height="48" rx="5" fill="currentColor" transform="rotate(45 32 32)"/>
+      <rect x="27" y="8" width="10" height="48" rx="5" fill="currentColor" transform="rotate(-45 32 32)"/>
+    </symbol>
+    <!-- pickaxe · mine run available -->
+    <symbol id="i-st-pick" viewBox="0 0 64 64">
+      <rect x="29" y="18" width="7" height="42" rx="3.5" fill="currentColor" transform="rotate(-40 32 40)"/>
+      <path fill="currentColor" d="M8 24c10-10 22-14 36-12 2 0 3 2 2 4-8 2-14 5-20 10-4 4-8 10-10 18-1 2-3 2-4 1C8 38 6 31 8 24z"/>
+    </symbol>
+    <!-- coin · sell -->
+    <symbol id="i-st-coin" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="25" fill="currentColor"/>
+      <circle cx="32" cy="32" r="16" fill="none" stroke="rgba(47,58,51,.22)" stroke-width="5"/>
+    </symbol>
+    <!-- fish · fish trap (available) -->
+    <symbol id="i-st-fish" viewBox="0 0 64 64">
+      <path fill="currentColor" d="M48 32 60 20v24z"/>
+      <ellipse cx="28" cy="32" rx="22" ry="13" fill="currentColor"/>
+      <circle cx="18" cy="29" r="3" fill="#FBF8F1"/>
+    </symbol>
+    <!-- sprout · plot (growing, used in C) -->
+    <symbol id="i-st-sprout" viewBox="0 0 64 64">
+      <rect x="30" y="28" width="4" height="26" rx="2" fill="currentColor"/>
+      <path fill="currentColor" d="M32 38c-2-10-8-15-18-15 1 10 7 15 18 15zM32 32c2-10 8-15 18-15-1 10-7 15-18 15z"/>
+      <rect x="14" y="52" width="36" height="6" rx="3" fill="currentColor" opacity=".55"/>
+    </symbol>
+
+    <!-- ===== small colour objects for the application examples (C) ===== -->
+
+    <!-- mine entrance: timber-framed dark arch in a hillside -->
+    <symbol id="i-obj-mine" viewBox="0 0 64 64">
+      <path fill="#B7C9A4" d="M2 58C6 30 20 14 32 14s26 16 30 44z"/>
+      <path fill="#9A6F47" d="M14 58V36a18 18 0 0 1 36 0v22h-6V36a12 12 0 0 0-24 0v22z"/>
+      <path fill="#4A5048" d="M20 58V36a12 12 0 0 1 24 0v22z"/>
+      <rect x="12" y="30" width="40" height="6" rx="3" fill="#B98A5E"/>
+      <rect x="22" y="40" width="20" height="4" rx="2" fill="#B98A5E" opacity=".6"/>
+    </symbol>
+    <!-- mailbox (Inbox object) -->
+    <symbol id="i-obj-mailbox" viewBox="0 0 64 64">
+      <rect x="29" y="34" width="6" height="26" rx="3" fill="#9A6F47"/>
+      <path fill="#6FA8DC" d="M12 18a10 10 0 0 1 10-10h20a10 10 0 0 1 10 10v18H12z"/>
+      <path fill="#5B8FC2" d="M12 18a10 10 0 0 1 10-10h4v28H12z"/>
+      <rect x="30" y="16" width="16" height="5" rx="2.5" fill="#FBF8F1"/>
+      <rect x="46" y="2" width="4" height="14" rx="2" fill="#E07A5F"/>
+      <rect x="46" y="2" width="10" height="7" rx="2" fill="#E07A5F"/>
+    </symbol>
+    <!-- grey city disc glyph used for the locked pin -->
+    <symbol id="i-obj-citygrey" viewBox="0 0 64 64">
+      <rect x="6" y="34" width="12" height="22" rx="2" fill="#AEB3B9"/>
+      <rect x="20" y="22" width="12" height="34" rx="2" fill="#9FA5AC"/>
+      <rect x="34" y="28" width="10" height="28" rx="2" fill="#AEB3B9"/>
+      <rect x="46" y="38" width="12" height="18" rx="2" fill="#9FA5AC"/>
+      <path fill="#9FA5AC" d="M20 22 26 14l6 8z"/>
+    </symbol>
+  </defs>
+</svg>

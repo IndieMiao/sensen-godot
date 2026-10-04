@@ -36,6 +36,11 @@
   --coin-deep: #C9962A;
   --coin-light: #F4D27A;
 
+  /* pinned quick-bar slot (2026-10-04): amber badge + 6 px top strip + warm cream body */
+  --pin: #E3B341;
+  --pin-edge: #A8761A;           /* 1 px dark stroke around the badge */
+  --pin-bg: #FBF4E6;
+
   /* text */
   --ink: #2F3A33;
   --ink-2: #6E7B74;
@@ -556,8 +561,8 @@ html, body {
 .dot-fine { background: var(--rar-fine); }
 .dot-rare { background: var(--rar-rare); }
 .dot-legendary { background: var(--rar-legendary); }
-/* pin — top-left small pin for pinned slots */
-.slot .pin { position: absolute; left: 10px; top: 10px; width: 26px; height: 26px; color: var(--ink-2); }
+/* pinned slot → `.slot.is-pinned` below (after the selected state); the old 26 px
+   top-left `.slot .pin` glyph is retired (2026-10-04) */
 /* sub-badge — bottom-right mini item (e.g. bait hanging on the rod) */
 .slot .sub-badge {
   position: absolute;
@@ -578,6 +583,34 @@ html, body {
 }
 .quickbar.has-selection .slot:not(.is-selected) { filter: brightness(0.85); }
 .quickbar.has-selection .slot.is-ghost { filter: brightness(0.92); }
+
+/* pinned (2026-10-04): the slot keeps its place when the bar refills.
+   · 36 px solid amber badge (white push-pin, 1 px dark stroke) centred on the top
+     edge, half of it outside the slot;
+   · 6 px amber strip along the top, following the corner radius (painted inside
+     the border via background-clip: padding-box), body warm cream #FBF4E6;
+   · stacks with .is-selected: green 3 px ring outside, amber strip inside, the
+     12 px lift still applies. No text — the badge is the whole signal. */
+.slot.is-pinned,
+.slot.is-pinned.is-selected {
+  background: linear-gradient(to bottom, var(--pin) 0, var(--pin) 6px, var(--pin-bg) 6px, var(--pin-bg) 100%);
+  background-clip: padding-box;
+}
+.slot.is-pinned::after,
+.pin-badge {
+  content: "";
+  position: absolute;
+  left: 50%; top: -19px;                 /* 1 px frame: badge centre sits on the outer top edge */
+  width: 36px; height: 36px;
+  margin-left: -18px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--pin) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M7 1.5h10a1.5 1.5 0 0 1 0 3h-1v4.5c0 1.7 1.3 3 3 3v2h-6v6.5L12 23l-1-2.5V14H5v-2c1.7 0 3-1.3 3-3V4.5H7a1.5 1.5 0 0 1 0-3z'/%3E%3C/svg%3E") center / 26px 26px no-repeat;
+  border: 1px solid var(--pin-edge);
+  z-index: 2;
+}
+.slot.is-pinned.is-selected::after { top: -21px; }     /* 3 px ring: keep the badge centred on the outer edge */
+.pin-badge { position: relative; left: auto; top: auto; margin-left: 0; display: inline-block; flex: 0 0 auto; }
 
 /* ghost (empty) slot: light dashed frame, faint silhouette + hint, no "+" */
 .slot.is-ghost {
@@ -607,6 +640,29 @@ html, body {
 }
 .slot.is-locked .slot-icon { filter: grayscale(1); opacity: 0.55; }
 .slot.is-locked .cost { color: var(--disabled-ink); }
+
+/* long-press menu over a quick-bar slot (Pin / Unpin) — shared by farm & cook
+   groups (moved here from kit-farm.css, 2026-10-04). Card 250 wide, tip at
+   --x/--y pointing down at the slot (keep the tip ≥ 14 px above the pinned
+   badge); rows 64 high. The Unpin row leads with the same 36 px amber badge the
+   pinned slot wears; .has-note widens the card to 320 for a footer hint line. */
+.lp-menu {
+  position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -100%);
+  width: 250px; padding: 10px; border-radius: 28px; z-index: 9;
+  background: var(--card-solid); border: 1px solid var(--card-edge);
+}
+.lp-menu.has-note { width: 320px; }
+.lp-menu::after {
+  content: ""; position: absolute; left: 50%; bottom: -10px; width: 18px; height: 18px; margin-left: -9px;
+  background: var(--card-solid); border-right: 1px solid var(--card-edge); border-bottom: 1px solid var(--card-edge); transform: rotate(45deg);
+}
+.lp-row { height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 18px; border-radius: 20px; font-size: 26px; font-weight: 800; }
+.lp-row .ic { width: 30px; height: 30px; }
+.lp-row .pin-badge { margin: 0 -3px; }                 /* 36 badge in the 30 icon column: text stays aligned */
+.lp-row.is-on { background: var(--primary-tint); color: var(--primary-edge); }
+.lp-row.is-off { color: var(--disabled-ink); }
+.lp-row.is-off .ic, .lp-row.is-off .pin-badge { filter: grayscale(1); opacity: 0.5; }
+.lp-note { padding: 8px 18px 6px; font-size: 18px; font-weight: 700; line-height: 22px; color: var(--ink-2); }
 
 /* hint bubble above the chip (kitchen "Pick an ingredient") */
 .bar-hint {

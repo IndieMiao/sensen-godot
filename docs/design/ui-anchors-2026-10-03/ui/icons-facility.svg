@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <!-- icons-facility.svg (2026-10-04): facility status glyphs. Shared icons.svg untouched. -->
+  <!-- zZ — rest available (currentColor) -->
+  <symbol id="i-zz" viewBox="0 0 64 64">
+    <path fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" d="M12 28h22L12 50h22"/>
+    <path fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" d="M40 12h14L40 28h14"/>
+  </symbol>
+</svg>

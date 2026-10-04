@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>NPC-4-2 · Together Request</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-npc.css">
+</head>
+<!-- NPC-4 figure 2 (group npc): the co-op card on the same board — "Harvest Together · Together · 2–6 players / 3 joined · 7:12 to start /
+     Everyone gets the full reward / Join", and beside it the fallback "Not enough players · solo request". -->
+<body class="scene-cam drawer-open" style="--scene-top:#EDE6D3; --scene-bottom:#CFEAE9; --src-w:1024px; --src-h:1536px; --cam-scale:1.1; --cam-x:-32px; --cam-y:307px;">
+<div class="canvas">
+
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/market-square-v2.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+
+  <section class="board" style="--y:380px; --h:1250px">
+    <div class="board-head">
+      <div class="left"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-board"/></svg><span>Market Board</span><span style="font-weight:700;opacity:.85">· Together</span></div>
+      <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
+    </div>
+    <div class="cards">
+
+      <div class="req is-coop">
+        <div class="top"><div class="nm">Harvest Together <span class="src">· Together</span></div><div class="st is-tracked">2–6 players</div></div>
+        <div class="line"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-handshake"/></svg><span>3 joined</span><span class="sub">·</span><span>7:12 to start</span></div>
+        <div class="joined">
+          <div class="av"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-face-friend"/></svg></div>
+          <div class="av"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-face-player"/></svg></div>
+          <div class="av"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-face-finn"/></svg></div>
+          <div class="av is-empty"></div><div class="av is-empty"></div><div class="av is-empty"></div>
+          <span class="t">3 of 6</span>
+        </div>
+        <div class="line"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish"/></svg><span>Harvest 30 plots together · any crop</span></div>
+        <div class="line"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span class="reward">30 coins</span><span class="sub">·</span><span class="stamp">+1 city stamp</span><span class="sub">·</span><span class="have">Everyone gets the full reward</span></div>
+        <div class="acts"><div class="btn-sm btn-primary" style="min-width:320px">Join</div><div class="btn-sm btn-sec">Show on map</div></div>
+      </div>
+
+      <div class="req is-solo">
+        <div class="top"><div class="nm">Harvest Together <span class="src">· Together</span></div><div class="st">Not enough players · solo request</div></div>
+        <div class="line"><svg class="ic" aria-hidden="true"><use href="../icons-npc.svg#i-handshake"/></svg><span>1 joined by the start</span><span class="sub">·</span><span>runs as a solo request for you</span></div>
+        <div class="line"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span class="reward">30 coins</span><span class="sub">·</span><span class="stamp">+1 city stamp</span><span class="sub">·</span><span>same reward</span></div>
+        <div class="acts"><div class="btn-sm btn-primary">Track</div><div class="btn-sm btn-sec">Show on map</div></div>
+      </div>
+
+      <div class="req">
+        <div class="top"><div class="nm">Dusk Haul <span class="src">· Market Board</span></div><div class="st">Open</div></div>
+        <div class="line"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-fish"/></svg><span>4 Fine fish · any kind</span><span class="sub">·</span><span class="have">you have 1</span></div>
+        <div class="line"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg><span class="reward">24 coins</span><span class="sub">·</span><span class="stamp">+1 city stamp</span></div>
+        <div class="acts"><div class="btn-sm btn-primary">Track</div><div class="btn-sm btn-sec">Show on map</div></div>
+      </div>
+
+    </div>
+    <div class="corner">
+      <span>Requests today 4 of 6 · Next request in 3h 58m</span>
+      <span class="sub">Same board at all 3 market squares · Together requests start on the clock, joined or not</span>
+    </div>
+  </section>
+
+  <div class="bar-handle" title="Quick bar"><div class="grip"></div></div>
+  <div class="bag card bag-fixed"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bag"/></svg><span class="chip-label">Bag</span><span class="cap-dot"></span></div>
+
+  <header class="hud">
+    <div class="hud-row1">
+      <div class="avatar-btn" title="Profile · Passport">
+        <svg class="skill-ring" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(47,58,51,.08)" stroke-width="8"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(127,198,106,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#7FC66A" stroke-width="8" stroke-linecap="round" stroke-dasharray="73 326.7" transform="rotate(-90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="rgba(111,168,220,.28)" stroke-width="8" stroke-dasharray="163.4 326.7" transform="rotate(90 56 56)"/>
+          <circle cx="56" cy="56" r="52" fill="none" stroke="#6FA8DC" stroke-width="8" stroke-linecap="round" stroke-dasharray="98 326.7" transform="rotate(90 56 56)"/>
+        </svg>
+        <div class="avatar-face"></div>
+      </div>
+      <div class="energy-card card" style="--pct:71%">
+        <div class="energy-top"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-energy"/></svg><div class="energy-num">142<span class="of">/200</span></div></div>
+        <div class="energy-track"><div class="energy-fill"></div></div>
+        <div class="energy-regen">+1 in <b>2:41</b></div>
+      </div>
+      <div class="grow"></div>
+      <div class="coins card"><span>230</span><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-coin"/></svg></div>
+      <div class="inbox-btn card" title="Inbox"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-bell"/></svg><span class="badge">3</span></div>
+    </div>
+    <div class="hud-row2">
+      <div class="today card"><b>Today</b><span class="dot-sep">·</span><span class="today-text">Deliver 4 Fine fish · Shanghai Market</span><svg class="chev" aria-hidden="true"><use href="../icons.svg#i-chevron"/></svg></div>
+      <div class="place card" title="Map · Cities"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-home"/></svg><span>Shanghai</span><span class="sep">·</span><span class="space">Market Square</span><svg class="chev-r" aria-hidden="true"><use href="../icons.svg#i-chev-r"/></svg></div>
+    </div>
+  </header>
+
+</div>
+</body>
+</html>

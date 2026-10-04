@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, initial-scale=1">
+<title>COOK-7-2 · Eat states</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../kit.css">
+<link rel="stylesheet" href="../kit-cook.css">
+</head>
+<!-- body class "scene-cam" = camera mode (v2): canvas = source × --cam-scale + (--cam-x, --cam-y).
+     Batch 1 (2026-10-03, cook group): shared kit.css/icons.svg untouched; additions live in kit-cook.css / icons-cook.svg. -->
+<body class="scene-cam" style="--scene-top:#B2D6D0; --scene-bottom:#F4D9B7; --src-w:1024px; --src-h:1536px; --cam-scale:1.39; --cam-x:-229px; --cam-y:280px;">
+<div class="canvas">
+
+  <!-- Scene layer: AI diorama only, no UI/text in the png -->
+  <div class="scene-layer">
+    <img class="scene" src="../../scenes/kitchen.png" alt="">
+  </div>
+  <div class="bar-veil"></div>
+  <div class="scene-dim"></div>
+  <div class="state-card is-wide" style="--x:30px; --y:760px"><div class="big"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-eat"/></svg></div><div><div class="t is-half">Same dish again · +20 (half)</div></div></div>
+  <div class="state-card is-wide" style="--x:560px; --y:760px"><div class="big"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-eat"/></svg></div><div><div class="t is-none">Same dish · no Energy today</div></div></div>
+  <div class="state-card is-wide" style="--x:30px; --y:1060px"><div class="big"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-eat"/></svg></div><div><div class="t is-full">Full belly · Meals reset in 9h 12m</div></div></div>
+  <div class="state-card is-wide" style="--x:560px; --y:1060px"><div class="big"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-eat"/></svg></div><div><div class="t ">Only +12 of 40 · Eat anyway?</div><div class="mini-acts"><div class="btn-sm btn-sec">Keep</div><div class="btn-sm btn-primary">Eat anyway</div></div></div></div>
+  <div class="btn-sm is-disabled is-wide" style="top:1400px">Eat · Energy full</div>
+
+</div>
+</body>
+</html>

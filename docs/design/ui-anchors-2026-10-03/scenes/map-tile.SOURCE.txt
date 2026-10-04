@@ -1,0 +1,4 @@
+map-tile.png — MAP-1 base (2026-10-03, group npc)
+Source: ../../social-background-2026-09-28/variant-a.png (1024×1536, Sensenjoy gpt-image-2, already adopted in-app as assets/ui/backgrounds/map-social.png).
+Why: no real map screenshot in the repo is city-level + pastel + UI-free (farm-ui-2026-09-05/*.png and ref-gensen-map.png are street-level Mapbox captures with UI overlays), so the existing pastel 3D city-map background was reused instead of generating a new image.
+Crop: ffmpeg scale=1600:2400 (lanczos) then crop=1080:2400 centred (260 px off each side) → a 1080×2400 cover; used 1:1 by ui/batch1/MAP-1.html (default cover scene mode).
