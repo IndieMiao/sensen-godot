@@ -31,6 +31,7 @@ var _mine := Vector3.ZERO
 var _focus := Vector3.ZERO
 var _idle_s := 0.0
 var _zoom := 1.0
+var _dev_yaw := -1.0
 var _hold_until := 0.0
 var _front: Dictionary = {}
 var _front_cell := Vector2i(-1, -1)
@@ -178,6 +179,12 @@ func _place_camera() -> void:
 	cam.keep_aspect = Camera3D.KEEP_WIDTH   # the old farm frames by width (portrait phones)
 	cam.size = FarmCamera.close_view_size(vp) * 1.12 / _zoom
 	FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
+	if _dev_yaw >= 0.0:   # P0_SHOT yaw comparison only (style doc asks 35–45°, the old farm uses 14.5°)
+		var c := _focus + Vector3.UP * 0.7
+		var pitch := deg_to_rad(FarmCamera.PITCH_DEG)
+		var yaw := deg_to_rad(_dev_yaw)
+		cam.position = c + Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch)) * FarmCamera.DISTANCE
+		cam.look_at(c, Vector3.UP)
 	FarmCamera.fit_ground_depth(cam)
 
 func _follow(dt: float) -> void:
@@ -357,6 +364,7 @@ func _watch_pot(st: Dictionary) -> void:
 # ---------------------------------------------------------------- dev steps for P0_SHOT
 func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
+		"yaw": _dev_yaw = float(step[1])
 		"goto":
 			actor.teleport(Vector3(float(step[1]), 0, float(step[2])))
 			_focus = actor.position
