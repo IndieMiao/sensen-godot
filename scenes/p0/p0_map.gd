@@ -48,6 +48,13 @@ func _on_city_pond_requested(entry: Dictionary) -> void:
 	_reset_gesture()
 	AppRouter.open_instance(P0_POND, {"pond_id": pond.id})
 
+## Touch screens have no hover; the farm marker's "Select My Farm" tooltip only shows up under the
+## emulator's resting pointer.
+func _enter_farm_home(r: Dictionary) -> void:
+	super._enter_farm_home(r)
+	if farm_markers:
+		for c in farm_markers.find_children("*", "Control", true, false): (c as Control).tooltip_text = ""
+
 func _install_city_map() -> void:
 	super._install_city_map()
 	if city_map and not city_map.bundled_ponds:
