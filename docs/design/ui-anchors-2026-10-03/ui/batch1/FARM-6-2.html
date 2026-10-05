@@ -15,12 +15,13 @@
      half of the same Stall + Bag drawer. Same layout as FARM-6; bag tab Produce, Radish ×12 selected, buyback quota bar under the
      Bag title, stall rows stay in their Buy-tab resting state. body.scene-cam: canvas = source x --cam-scale + (--cam-x, --cam-y);
      shared kit.css + icons.svg untouched, group additions in ../kit-farm.css (.drawer.is-stall-bag) and ../icons-farm.svg. -->
+<!-- 2026-10-05 pm revision: stall without a stallhand (user decision 1:A) — no keeper panel, tapping the shed opens this drawer directly. -->
 <body class="scene-cam drawer-open" style="--scene-top:#B4D9D2; --scene-bottom:#FEDCAF; --src-w:1024px; --src-h:1536px; --cam-scale:1.1; --cam-x:-32px; --cam-y:307px;">
 <div class="canvas ">
 
   <!-- Scene layer: AI diorama only, no UI/text in the png -->
   <div class="scene-layer">
-    <img class="scene" src="../../scenes/homestead-stall.png" alt="">
+    <img class="scene" src="../../scenes/homestead-stall-v2.png" alt="">
   </div>
   <div class="bar-veil"></div>
   <!-- Scene tags (farm camera 1.22 / -127 / 356) — hidden while the drawer is open -->
@@ -36,14 +37,10 @@
        "sell from the bag" state (Produce tab · Radish ×12 · Pin / Sell / Sell All · buyback quota) -->
   <section class="drawer is-stall-bag is-counter">
     <div class="drawer-head">
-      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-stall"/></svg><span>Bao's Stall</span><span class="sub">· Homestead</span></div>
+      <div class="drawer-title"><svg class="ic" aria-hidden="true"><use href="../icons-farm.svg#i-stall"/></svg><span>Homestead Stall</span></div>
       <div class="close-btn" title="Close"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-close"/></svg></div>
     </div>
     <div class="tabs"><div class="tab is-on">Buy</div><div class="tab">Stall Board</div></div>
-    <div class="kpanel is-stall">
-      <div class="portrait" style="background-image:url('../../scenes/homestead-stall.png'); background-size:698px 1048px; background-position:-300px -321px;"></div>
-      <div class="mid"><div class="who">Stallhand <span class="role">· Bao</span></div><div class="bubble-say">“Radishes? 5 each — I'll take all twelve.”</div><div class="note">Your stall · only you can trade here</div></div>
-    </div>
     <div class="stall-rows">
       <div class="srow">
         <div class="thumb"><svg class="ic" aria-hidden="true"><use href="../icons.svg#i-radish-seeds"/></svg></div>
