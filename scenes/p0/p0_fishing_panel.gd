@@ -23,6 +23,12 @@ func _ready() -> void:
 	super._ready()
 	layer = 30
 	_title.visible = false   # the P0 place chip already names the pond; the close X takes the bell's corner
+	# The old input shield covers the HUD below; let a tap on the place chip still mean "back to the map"
+	# (the first tap reels in and closes, like the system back key, the next one leaves).
+	var shield: Control = get_node("FishingInputShield")
+	shield.gui_input.connect(func(e: InputEvent):
+		if rt and P0Ui.is_tap(e) and rt.ui._place_chip.get_global_rect().has_point((e as InputEventMouseButton).global_position):
+			rt.leave_world())
 
 func last_result() -> Dictionary:
 	return _last
