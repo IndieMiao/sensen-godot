@@ -9,10 +9,10 @@ const P0_POND := "res://scenes/p0/p0_pond.tscn"
 const P0_REGION := "shanghai"
 ## The homestead's map footprint: the Hengshan Road layout, between Pebble Pond and Reed Pond.
 const P0_FARM_CHOICE := {"layout_patch_id": "sh_a", "revision": 2}
-## Old Kai's shop: a fixed place a short walk from Reed Pond (the winding pond nearest home).
+## Old Kai's shop: a fixed place on the way from home to Reed Pond (the winding pond nearest home).
 ## Entering opens his greeting card for now; the interior room follows once its design is approved.
 const TACKLE_SHOP := {"id": "p0_tackle_shop", "kind": "place", "name": "Old Kai's Tackle",
-	"category": "Tackle shop · Rods and bait", "lat": 31.2083, "lng": 121.4371,
+	"category": "Tackle shop · Rods and bait", "lat": 31.2097, "lng": 121.4408,
 	"art_path": "res://assets/p0/art/map/tackle_shop.webp", "action": "Enter shop",
 	"action_icon": "store", "filter": "pond"}
 

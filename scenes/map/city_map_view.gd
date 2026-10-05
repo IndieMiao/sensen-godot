@@ -990,7 +990,7 @@ func _animate_focus(id: String, to: float, duration: float) -> void:
 		_apply_marker_scale(marker), float(marker.get("focus", 1.0)), to, duration)
 
 func _pack_key(c: Dictionary) -> Array:
-	var kind_order := {"landmark": 0, "resident": 1, "pond": 2, "place": 2, "poi": 3}
+	var kind_order := {"landmark": 0, "resident": 1, "pond": 2, "place": 2.5, "poi": 3}
 	return [0 if selected.get("id", null) == c.entry.get("id") else 1,
 		kind_order.get(c.entry.kind, 3),
 		0 if _shown_last.has(c.id) else 1,
