@@ -2,12 +2,15 @@
 # P0 prototype on an Android emulator/device, isolated from the Journey app:
 #   tools/p0/android_p0.sh [SERIAL]        (default emulator-5570; build + install + launch)
 #   SKIP_BUILD=1 tools/p0/android_p0.sh    (reinstall the last APK)
+#   ADB_PORT=5039 tools/p0/android_p0.sh 10AFAF162200319   (the vivo phone sits on the 5039 adb server;
+#                                          5037 gets restarted by other sessions)
 # Exports preset "Android" with package com.sensen.p0proto (export_presets.cfg is restored afterwards),
 # reverses tcp:3110 to the local P0 server (cd server && node --import tsx tools/p0_server.ts),
 # drops the user://p0_boot marker so the app opens the P0 farm, then launches it.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 SERIAL="${1:-${SERIAL:-emulator-5570}}"
+adb() { command adb ${ADB_PORT:+-P "$ADB_PORT"} "$@"; }
 PKG=com.sensen.p0proto
 APK=build/p0-debug.apk
 if [[ "${SKIP_BUILD:-0}" != 1 ]]; then
