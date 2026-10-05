@@ -8,6 +8,7 @@ const Art = preload("res://modules/farm/farm_art.gd")
 const FarmScenery = preload("res://modules/farm/farm_scenery.gd")
 
 var field_rect := Rect2()   # world xz rect covering every bed, for scatter exclusion
+var rock_points: Array = []  # scattered rocks; the farm makes their cells solid
 
 func build(bp: FarmBlueprint, style: String) -> void:
 	name = "GardenScenery"
@@ -76,6 +77,7 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		elif i % 9 == 0: asset = "pink_flower"
 		elif i % 13 == 0: asset = "blue_flower"
 		layers[asset].append(_xf(point, rng.randf_range(0, TAU), rng.randf_range(0.55, 1.05)))
+	for xf in layers.rock: rock_points.append((xf as Transform3D).origin)
 	for asset in layers: add_child(Art.batch(asset, layers[asset], asset == "rock"))
 	var flowers: Array = []
 	for i in 12:

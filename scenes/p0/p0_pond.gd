@@ -22,7 +22,7 @@ var actor: P0Actor
 var panel: P0FishingPanel
 var view: FishingPresentation
 var _focus := Vector3(6, 0, -6)
-var _idle_s := 0.0
+var _cam_follow := P0Follow.new()
 var _zoom := 1.0
 var _plan: Dictionary = {}
 # Camera blend from the fishing close-up back to the pond framing when the panel closes.
@@ -124,7 +124,6 @@ func p0_tap(screen: Vector2) -> void:
 func p0_frame(v: Dictionary, dt: float) -> void:
 	if panel.visible: return   # the fishing presentation owns rig and camera
 	actor.step(dt)
-	_idle_s = (_idle_s + dt) if not actor.mover.is_moving() else 0.0
 	# Walking to the cast origin finished: open the panel and cast.
 	if not _plan.is_empty() and not actor.mover.is_moving():
 		var plan := _plan
@@ -222,18 +221,11 @@ func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 	rt._on_catch(ev, rt.last_xp_lines, at)
 
 # ---------------------------------------------------------------- camera (old pond framing + safe box)
-func _follow(dt: float) -> void:
-	var vp := get_viewport().get_visible_rect().size
-	var zone := FarmCamera.symmetric_area(vp, Rect2(0, 110, vp.x, vp.y - 290))
-	var shift := FarmCamera.follow_shift(cam, actor.position, zone)
-	# Safe-box camera (operation model 2026-10-03): still while the player stays inside the box,
-	# held after Show-spot, and eased back when a hold or a teleport left the player outside it.
-	if _idle_s >= 0.0 and shift != Vector3.ZERO:
-		var step := Vector3(shift.x, 0, shift.z)
-		_focus += step if step.length() < 0.4 else step * clampf(dt * 6.0, 0, 1)
+func _follow(_dt: float) -> void:
+	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), _dt)
 	_update_camera()
 
-## At rest the camera leans toward the nearest water so the pond stays in the frame.
+## The opening shot leans toward the nearest water so the pond is in the frame (held until the first step).
 func _rest_focus() -> Vector3:
 	var shore := FishingModel.nearest_water(str(entry.id), actor.position, site_spec)
 	var lean := Vector3(shore.x - actor.position.x, 0, shore.z - actor.position.z).limit_length(2.6) * 0.5
@@ -245,7 +237,9 @@ func _update_camera() -> void:
 	cam.look_at(_focus, Vector3.UP)
 
 func p0_zoom(f: float) -> void: _zoom = clampf(_zoom / f, 0.5, 1.4)
-func p0_recenter() -> void: _focus = _rest_focus()
+func p0_recenter() -> void:
+	_focus = actor.position
+	_cam_follow.held = false
 
 func p0_anchor() -> Vector2:
 	return cam.unproject_position(actor.position + Vector3(0, 2.0, 0))

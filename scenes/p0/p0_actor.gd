@@ -13,6 +13,8 @@ var _clip := ""
 var _labour_left := 0.0
 var _joy := Vector2.ZERO
 var cam: Camera3D
+## Optional ground height under a point (the farm's raised beds); the rig steps up onto it.
+var ground_height: Callable
 
 func setup(bp: FarmBlueprint, grid: BlueprintGrid, camera: Camera3D, spawn := Vector3.INF) -> void:
 	cam = camera
@@ -55,7 +57,8 @@ func step(dt: float) -> void:
 		var dir := right.normalized() * _joy.x - fwd.normalized() * _joy.y
 		mover.set_joystick(Vector2(dir.x, dir.z).limit_length(1.0))
 		mover.step(dt)
-	position = mover.position
+	var y := float(ground_height.call(mover.position)) if ground_height.is_valid() else 0.0
+	position = Vector3(mover.position.x, lerpf(position.y, y, clampf(dt * 14.0, 0, 1)), mover.position.z)
 	if mover.is_moving():
 		look_at(position + mover.facing, Vector3.UP)
 		state = "move"

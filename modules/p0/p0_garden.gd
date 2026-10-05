@@ -72,12 +72,28 @@ static func blueprint() -> FarmBlueprint:
 			var c := Vector2i(x, y)
 			var plot := id_of(c) >= 0
 			cultivable += "1" if plot else "0"
-			walkable += "1" if WALK_RECT.has_point(c) and not plot and not _in_footprint(c) else "0"
+			# Beds are walkable (crops don't block); facilities, the yard edge (trees) and rocks do.
+			walkable += "1" if WALK_RECT.has_point(c) and not _in_footprint(c) else "0"
 		bp.masks.visual.append("1".repeat(GRID.x))
 		bp.masks.walkable.append(walkable)
 		bp.masks.buildable.append("1".repeat(GRID.x))
 		bp.masks.cultivable.append(cultivable)
 	return bp
+
+## Mark scenery rocks solid: each rock blocks the cell it stands in (trees already stand outside the yard).
+static func block_points(bp: FarmBlueprint, points: Array) -> void:
+	for p in points:
+		var c := bp.world_to_cell(p)
+		if c.y < 0 or c.y >= bp.masks.walkable.size() or c.x < 0 or c.x >= GRID.x: continue
+		var row: String = bp.masks.walkable[c.y]
+		bp.masks.walkable[c.y] = row.substr(0, c.x) + "0" + row.substr(c.x + 1)
+
+## True when a world point stands on a bed (the player steps up onto it).
+static func on_bed(bp: FarmBlueprint, p: Vector3) -> bool:
+	var c := bp.world_to_cell(p)
+	if id_of(c) < 0: return false
+	var centre := bp.cell_to_world(c)
+	return absf(p.x - centre.x) < 0.47 and absf(p.z - centre.z) < 0.47   # plot.glb is 0.94 m across
 
 static func _in_footprint(c: Vector2i) -> bool:
 	for key in FOOTPRINTS:

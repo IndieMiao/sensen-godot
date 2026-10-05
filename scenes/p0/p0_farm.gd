@@ -29,7 +29,7 @@ var _house := Vector3.ZERO
 var _bao := Vector3.ZERO
 var _mine := Vector3.ZERO
 var _focus := Vector3.ZERO
-var _idle_s := 0.0
+var _cam_follow := P0Follow.new()
 var _zoom := 1.0
 var _dev_yaw := -1.0
 var _hold_until := 0.0
@@ -94,6 +94,8 @@ func _build_world() -> void:
 	var scenery := GardenScenery.new()
 	add_child(scenery)
 	scenery.build(bp, STYLE)
+	P0Garden.block_points(bp, scenery.rock_points)   # rocks collide; crops and bushes don't
+	grid = BlueprintGrid.new(bp)
 	# One thick soil bed per plot (plot.glb), tinted per state (watered beds read darker).
 	var xfs: Array = []
 	var tints := PackedColorArray()
@@ -114,9 +116,10 @@ func _build_world() -> void:
 	actor = P0Actor.new()
 	add_child(actor)
 	actor.setup(bp, grid, cam)
+	actor.ground_height = func(p: Vector3) -> float: return P0Garden.BED_H if P0Garden.on_bed(bp, p) else 0.0
 	# Opening shot like the polished farm: cottage on top, beds below, the player at the front edge.
 	_focus = actor.position.lerp(_house, 0.42)
-	_idle_s = -1.5
+	_cam_follow.hold()   # the opening shot stays until the player first moves
 	_place_camera()
 
 func _spawn_bao() -> void:
@@ -189,23 +192,18 @@ func _place_camera() -> void:
 	FarmCamera.fit_ground_depth(cam)
 
 func _follow(dt: float) -> void:
-	var vp := get_viewport().get_visible_rect().size
-	var zone := FarmCamera.symmetric_area(vp, Rect2(0, 110, vp.x, vp.y - 290))
-	var shift := FarmCamera.follow_shift(cam, actor.position, zone)
-	# Safe-box camera (operation model 2026-10-03): still while the player stays inside the box,
-	# held after Show-spot, and eased back when a hold or a teleport left the player outside it.
-	if _idle_s >= 0.0 and shift != Vector3.ZERO:
-		var step := Vector3(shift.x, 0, shift.z)
-		_focus += step if step.length() < 0.4 else step * clampf(dt * 6.0, 0, 1)
+	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
 	_place_camera()
 
 func p0_zoom(f: float) -> void: _zoom = clampf(_zoom / f, 0.8, 1.4)
-func p0_recenter() -> void: _focus = actor.position
+func p0_recenter() -> void:
+	_focus = actor.position
+	_cam_follow.held = false
 
 func p0_show_spot(where: String) -> void:
 	var at := _house if where in ["stove", "bench", "home"] else actor.position
 	_focus = at
-	_idle_s = -2.5
+	_cam_follow.hold()
 	var ring := MeshInstance3D.new()
 	var tm := TorusMesh.new()
 	tm.inner_radius = 0.95
@@ -228,7 +226,6 @@ func p0_joystick(v: Vector2) -> void:
 
 func p0_frame(v: Dictionary, dt: float) -> void:
 	actor.step(dt)
-	_idle_s = (_idle_s + dt) if not actor.mover.is_moving() else 0.0
 	_follow(dt)
 	_sync_plots(v, dt)
 	_pick_front(v)
@@ -262,9 +259,11 @@ func _pick_front(v: Dictionary) -> void:
 		var dist := to.length()
 		if dist > 1.05: continue
 		var ahead := to.normalized().dot(Vector2(f.x, f.z)) if dist > 0.01 else 1.0
-		# Ahead first; a bed right beside the walkway also counts, so walking a row while holding works.
-		if ahead < 0.2 and not (dist < 0.8 and ahead > -0.25): continue
-		var score := ahead * 0.6 - dist * 0.8
+		# Standing on a bed works that bed; otherwise ahead first, and a bed right beside the walkway
+		# also counts, so walking a row while holding works.
+		var underfoot := dist < 0.42
+		if not underfoot and ahead < 0.2 and not (dist < 0.8 and ahead > -0.25): continue
+		var score := 10.0 if underfoot else ahead * 0.6 - dist * 0.8
 		if score > best_score:
 			best_score = score
 			best = id

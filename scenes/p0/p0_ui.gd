@@ -581,11 +581,22 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 		_fab_pills.visible = false
 		_bar_box.visible = false
 
+## Bottom system inset (gesture bar, rounded corners) in UI units; 0 on desktop.
+func safe_bottom() -> float:
+	if not (OS.has_feature("android") or OS.has_feature("ios")): return 0.0
+	return UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(),
+		get_viewport().get_visible_rect().size, 0.0).w
+
+## Bottom edge for cards that sit low (NPC greetings): on the quick bar's baseline (41 from the bottom,
+## FISH-1 / NPC-G1), or clear of a taller gesture bar — never against the screen edge.
+func bottom_pad() -> float:
+	return maxf(41.0, safe_bottom() + 16.0)
+
 func _sheet(height: float, title: String, icon_id := "") -> VBoxContainer:
 	var panel := PanelContainer.new()
 	panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	panel.offset_top = -height
-	panel.add_theme_stylebox_override("panel", _box(CARD, 16, EDGE, 1, Vector4(10, 8, 10, 12), true))
+	panel.add_theme_stylebox_override("panel", _box(CARD, 16, EDGE, 1, Vector4(10, 8, 10, 12 + safe_bottom()), true))
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 6)
@@ -711,10 +722,11 @@ func _bag_slots() -> Array: return view.get("bag", {}).get("slots", [])
 func open_kai_greeting() -> void:
 	var card := PanelContainer.new()
 	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	card.offset_top = -196
+	card.offset_bottom = -bottom_pad()
+	card.offset_top = card.offset_bottom - 184
+	card.grow_vertical = Control.GROW_DIRECTION_BEGIN   # taller content grows up, never past the bottom pad
 	card.offset_left = 10
 	card.offset_right = -10
-	card.offset_bottom = -12
 	card.add_theme_stylebox_override("panel", _box(CARD, 16, EDGE, 1, Vector4(8, 8, 10, 8)))
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 10)
@@ -859,10 +871,11 @@ func open_gear() -> void:
 func open_greeting() -> void:
 	var card := PanelContainer.new()
 	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	card.offset_top = -196
+	card.offset_bottom = -bottom_pad()
+	card.offset_top = card.offset_bottom - 184
+	card.grow_vertical = Control.GROW_DIRECTION_BEGIN   # taller content grows up, never past the bottom pad
 	card.offset_left = 10
 	card.offset_right = -10
-	card.offset_bottom = -12
 	card.add_theme_stylebox_override("panel", _box(CARD, 16, EDGE, 1, Vector4(8, 8, 10, 8)))
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 10)

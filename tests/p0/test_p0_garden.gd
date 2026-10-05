@@ -12,19 +12,24 @@ func test_plot_ids_and_cells_are_a_bijection_on_spaced_beds() -> void:
 		assert_int(P0Garden.id_of(c + Vector2i(0, 1))).is_equal(-1)
 	assert_int(seen.size()).is_equal(30)
 
-func test_blueprint_beds_are_solid_and_reachable_from_spawn() -> void:
+func test_beds_can_be_walked_on_but_facilities_and_rocks_block() -> void:
+	# 2026-10-05 device review: crops don't collide; trees (yard edge), rocks and facilities do.
 	var bp := P0Garden.blueprint()
 	var grid := BlueprintGrid.new(bp)
 	var spawn := bp.anchor("spawn")
 	assert_bool(bp.is_walkable(spawn)).is_true()
 	for id in P0Garden.plot_count():
 		var c := P0Garden.cell_of(id)
-		assert_bool(bp.is_walkable(c)).is_false()
+		assert_bool(bp.is_walkable(c)).is_true()
 		assert_bool(bp.mask_has("cultivable", c)).is_true()
-		# the walkway cell below each bed can be reached on foot
-		assert_bool(grid.path(spawn, c - Vector2i(0, 1)).is_empty()).is_false()
-	for key in ["house", "storage", "bao", "well"]:
+		assert_bool(grid.path(spawn, c).is_empty()).is_false()
+		assert_bool(P0Garden.on_bed(bp, bp.cell_to_world(c))).is_true()
+		assert_bool(P0Garden.on_bed(bp, bp.cell_to_world(c + Vector2i(1, 0)))).is_false()
+	for key in ["house", "storage", "bao", "well", "mine"]:
 		assert_bool(bp.is_walkable(bp.anchor(key))).is_false()
+	var rock := bp.cell_to_world(Vector2i(18, 5))
+	P0Garden.block_points(bp, [rock])
+	assert_bool(bp.is_walkable(Vector2i(18, 5))).is_false()
 
 func test_view_maps_to_old_cell_states() -> void:
 	var view := {"crops": [{"id": "crop_radish", "grow_h": 4}], "plots": [
