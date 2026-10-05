@@ -135,6 +135,11 @@ func _fit() -> void:
 	_gauge.size = Vector2(64, clampf(area.y * 0.28, 142, 210))
 	_place_gauge()
 
+## The last settled cast for the presentation's landing arc ({outcome, fish_id, [tier]}).
+## Subclasses with another backend (P0) override this instead of exposing a FarmSession.
+func last_result() -> Dictionary:
+	return session.state.get("fishing", {}).get("last", {}) if session else {}
+
 func anchor_gauge(screen_point: Vector2) -> void:
 	_world_anchor = screen_point
 	_place_gauge()

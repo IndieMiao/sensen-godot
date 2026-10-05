@@ -17,6 +17,8 @@ var ui: P0Ui
 var world: Node
 var _shot_t := 0.0
 var _shot_script: Array = []
+## XP / reward lines of the last state change, for worlds that show results themselves (the fishing panel).
+var last_xp_lines: Array = []
 
 static func ensure() -> P0Runtime:
 	if is_instance_valid(_instance): return _instance
@@ -26,6 +28,8 @@ static func ensure() -> P0Runtime:
 	return _instance
 
 func _init() -> void:
+	# App copy is English-only (user rule 2026-09-04); reused old panels translate through L10n, so pin the locale.
+	TranslationServer.set_locale("en")
 	session = P0Session.new()
 	add_child(session)
 	ui = P0Ui.new()
@@ -39,6 +43,7 @@ func _init() -> void:
 	ui.recenter.connect(func(): _call("p0_recenter", []))
 	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
 	ui.home_choice.connect(func(choice: String): _call("p0_home", [choice]))
+	ui.place_pressed.connect(leave_world)
 	session.state_changed.connect(_on_state)
 	session.refused.connect(_on_refused)
 	session.connection_failed.connect(func(msg): ui.toast(msg + " · " + session.base_url, 4.0))
@@ -56,6 +61,11 @@ func detach(w: Node) -> void:
 		world = null
 		ui.close_modal()
 		ui.set_surface("map")
+
+## Back to the map: the active world is an AppRouter instance above it (back locks still apply,
+## e.g. a line in the water is reeled in first).
+func leave_world() -> void:
+	if is_instance_valid(world) and AppRouter.top_instance() == world: AppRouter.handle_back()
 
 func _call(method: String, args: Array):
 	if is_instance_valid(world) and world.has_method(method): return world.callv(method, args)
@@ -100,6 +110,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if what.begins_with("catch:"): xp_lines.append("First catch! +%d XP" % int(ev.xp))
 				elif what.begins_with("cook:"): xp_lines.append("New recipe! · First cooked · +%d Cooking XP" % int(ev.xp))
 				elif what == "landed": xp_lines.append("First fish landed · +%d XP" % int(ev.xp))
+	last_xp_lines = xp_lines
 	for ev in events:
 		match str(ev.get("kind", "")):
 			"energy":
@@ -115,8 +126,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"coins":
 				ui.float_text("%+d coins" % int(ev.delta), at + Vector2(0, dy), Color("c9962a"))
 			"catch":
-				_on_catch(ev, xp_lines)
-				_call("p0_event", [ev, v])
+				# A world that shows the catch itself (the open fishing panel) returns true.
+				if not bool(_call("p0_event", [ev, v])): _on_catch(ev, xp_lines)
 			"cast", "pot":
 				_call("p0_event", [ev, v])
 			"dish":
@@ -170,6 +181,7 @@ func _stall_bubble(events: Array) -> String:
 	return ""
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})
@@ -270,6 +282,7 @@ func _dev_shot(dt: float) -> void:
 				var ready := ui.has_modal() if step[1] == "modal" else bool(_call("p0_until", [step[1]]))
 				if not ready and _shot_t < 40.0: return
 			"skip": session.dev_skip(int(step[1]))
+			"back": leave_world()
 			_:
 				if not bool(_call("p0_dev", [step])): push_warning("P0_SHOT: unknown step " + step[0])
 		_shot_script.pop_front()

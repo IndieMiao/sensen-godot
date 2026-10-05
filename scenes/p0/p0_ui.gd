@@ -14,6 +14,7 @@ signal zoom(factor: float)
 signal show_spot(where: String)
 signal home_choice(choice: String)
 signal recenter()
+signal place_pressed()
 
 const PAPER := Color("fbf8f1")
 const CARD := Color(0.984, 0.973, 0.945, 0.94)
@@ -185,9 +186,12 @@ func _build_hud() -> void:
 	place.offset_left = -10
 	place.offset_right = -10
 	place.offset_top = 64
+	place.mouse_filter = Control.MOUSE_FILTER_STOP
+	place.gui_input.connect(func(e: InputEvent):
+		if P0Ui.is_tap(e): place_pressed.emit())   # the place chip is the way back to the map
 	var ph := HBoxContainer.new()
 	ph.add_theme_constant_override("separation", 3)
-	ph.add_child(_icon("home", 11))
+	ph.add_child(_icon("showmap", 11))
 	_place = _label("Shanghai · Homestead", 10, INK, true)
 	ph.add_child(_place)
 	place.add_child(ph)
@@ -311,6 +315,7 @@ func set_surface(name: String) -> void:
 	var action := name in ["farm", "pond"]
 	var world := name != "map"
 	for n in [_avatar, _ecard, _right, _today_chip, _place_chip]: n.visible = world
+	_right.visible = world and name != "busy"   # a busy world's own close button sits in that corner
 	pad.visible = world
 	_fab.visible = action and _modal == null
 	_switch.visible = action

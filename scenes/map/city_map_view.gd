@@ -14,6 +14,8 @@ var _pond_view := ""                  # the 3×3 block currently shown
 var _pond_pending := false
 var _pond_retry_at := 0
 var _pond_error := false
+## P0: pins come from the bundled catalog only (preload_ponds), no directory requests.
+var bundled_ponds := false
 const POND_CELL_TTL_MS := 300000
 const POND_RETRY_MS := 30000
 ## Below this zoom a 3×3 block is far smaller than the view; ponds are city-scale content anyway.
@@ -586,7 +588,7 @@ func _refresh_pond_directory() -> void:
 	if view != _pond_view:
 		_pond_view = view
 		_show_pond_cells(keys)
-	if keys.is_empty() or _pond_pending or Net.session == null or not Net.session.logged_in(): return
+	if bundled_ponds or keys.is_empty() or _pond_pending or Net.session == null or not Net.session.logged_in(): return
 	var now := Time.get_ticks_msec()
 	var missing := keys.filter(func(k): return not _pond_cells.has(k) or now - int(_pond_cells[k].at) > POND_CELL_TTL_MS)
 	if missing.is_empty() or now < _pond_retry_at: return
@@ -615,6 +617,17 @@ func _refresh_pond_directory() -> void:
 		# The view may have moved while the request was in flight; show whatever is current.
 		_show_pond_cells(_pond_view_cells())
 	if filter == "pond": status.text = L10n.text("Ponds unavailable. Try again shortly.") if _pond_error else ""
+
+## File bundled catalog entries under their directory cells and stop asking the server (P0 map).
+func preload_ponds(locations: Array) -> void:
+	bundled_ponds = true
+	for entry in locations:
+		if not entry.get("enabled", true): continue
+		var key := SystemPonds.cell_key(SystemPonds.cell_of(float(entry.lat), float(entry.lng)))
+		if not _pond_cells.has(key): _pond_cells[key] = {"at": 0, "entries": []}
+		(_pond_cells[key].entries as Array).append(entry.duplicate(true))
+	_pond_view = ""
+	_refresh_pond_directory()
 
 func attach_bridge(bridge: MapBridge) -> void:
 	if bridge == _attached_bridge: return

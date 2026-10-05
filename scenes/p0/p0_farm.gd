@@ -41,6 +41,8 @@ var _cooking: P0Cooking
 func _ready() -> void:
 	bp = P0Garden.blueprint()
 	grid = BlueprintGrid.new(bp)
+	get_viewport().transparent_bg = false   # pushed above the map, whose tiles show through a transparent root
+	cam.make_current()
 	_build_world()
 	rt = P0Runtime.ensure()
 	rt.attach(self)
@@ -56,6 +58,7 @@ func suspend() -> void:
 	visible = false
 
 func resume() -> void:
+	get_viewport().transparent_bg = false
 	visible = true
 	set_process(true)
 	cam.make_current()
@@ -181,10 +184,11 @@ func _follow(dt: float) -> void:
 	var vp := get_viewport().get_visible_rect().size
 	var zone := FarmCamera.symmetric_area(vp, Rect2(0, 110, vp.x, vp.y - 290))
 	var shift := FarmCamera.follow_shift(cam, actor.position, zone)
-	if shift != Vector3.ZERO:
-		_focus += Vector3(shift.x, 0, shift.z)
-	elif _idle_s > 0.6:
-		_focus = _focus.lerp(actor.position, clampf(dt * 2.0, 0, 1))
+	# Safe-box camera (operation model 2026-10-03): still while the player stays inside the box,
+	# held after Show-spot, and eased back when a hold or a teleport left the player outside it.
+	if _idle_s >= 0.0 and shift != Vector3.ZERO:
+		var step := Vector3(shift.x, 0, shift.z)
+		_focus += step if step.length() < 0.4 else step * clampf(dt * 6.0, 0, 1)
 	_place_camera()
 
 func p0_zoom(f: float) -> void: _zoom = clampf(_zoom / f, 0.8, 1.4)
