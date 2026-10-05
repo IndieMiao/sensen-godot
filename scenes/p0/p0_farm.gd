@@ -40,6 +40,7 @@ var _sync_t := 0.0
 var _cooking: P0Cooking
 
 func _ready() -> void:
+	P0Runtime.mark("%s _ready start" % name)
 	bp = P0Garden.blueprint()
 	grid = BlueprintGrid.new(bp)
 	get_viewport().transparent_bg = false   # pushed above the map, whose tiles show through a transparent root

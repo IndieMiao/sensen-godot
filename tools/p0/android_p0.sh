@@ -28,6 +28,10 @@ PY
   trap - EXIT
 fi
 adb start-server > /dev/null 2>&1 || true
+if adb -s "$SERIAL" shell dumpsys SurfaceFlinger 2>/dev/null | grep -m1 "GLES:" | grep -qi "swiftshader"; then
+  echo "WARNING: $SERIAL renders in software (SwiftShader). Restart it with tools/p0/start_emulator.sh (-gpu host):" >&2
+  echo "         slow space loads and a white, untextured avatar are emulator artefacts in this mode." >&2
+fi
 adb -s "$SERIAL" install -r "$APK"
 adb -s "$SERIAL" reverse tcp:3110 tcp:3110
 adb -s "$SERIAL" shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 > /dev/null 2>&1 || true

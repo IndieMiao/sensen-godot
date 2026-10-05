@@ -12,6 +12,7 @@ const P0_FARM_CHOICE := {"layout_patch_id": "sh_a", "revision": 2}
 ## Old Kai's shop: a fixed place about a kilometre north of Reed Pond (the winding pond nearest home),
 ## far enough apart that both pins survive the declutter at district zoom.
 ## Entering opens his greeting card for now; the interior room follows once its design is approved.
+const NEAREST_POND := "pond_shanghai_05"   # Reed Pond, the closest to home
 const TACKLE_SHOP := {"id": "p0_tackle_shop", "kind": "place", "name": "Old Kai's Tackle",
 	"category": "Tackle shop · Rods and bait", "lat": 31.2168, "lng": 121.4398,
 	"art_path": "res://assets/p0/art/map/tackle_shop.webp", "action": "Enter shop",
@@ -40,6 +41,7 @@ func _open_my_farm() -> void:
 	if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
 	_clear_farm_selection()
 	_reset_gesture()
+	P0Runtime.nav_started()
 	AppRouter.open_instance(P0_FARM, {})
 
 func _on_city_pond_requested(entry: Dictionary) -> void:
@@ -47,6 +49,7 @@ func _on_city_pond_requested(entry: Dictionary) -> void:
 	var pond := SystemPonds.location(str(entry.get("id", "")))
 	if pond.is_empty(): return
 	_reset_gesture()
+	P0Runtime.nav_started()
 	AppRouter.open_instance(P0_POND, {"pond_id": pond.id})
 
 ## Touch screens have no hover; the farm marker's "Select My Farm" tooltip only shows up under the
@@ -62,6 +65,13 @@ func _install_city_map() -> void:
 		city_map.preload_ponds(SystemPonds.data().locations.filter(func(e): return str(e.region_id) == P0_REGION))
 		city_map.set_places([TACKLE_SHOP])
 		city_map.place_requested.connect(_on_place_requested)
+		# A pond's bank is generated off the main thread while its info card is read, so Enter is quick.
+		city_map.entry_selected.connect(func(e: Dictionary): if str(e.get("kind", "")) == "pond": _prewarm_pond(str(e.id)))
+		get_tree().create_timer(2.0).timeout.connect(_prewarm_pond.bind(NEAREST_POND))
+
+func _prewarm_pond(id: String) -> void:
+	var pond := SystemPonds.location(id)
+	if not pond.is_empty(): WaterShore.prewarm(id, SystemPonds.site(pond))
 
 func _on_place_requested(entry: Dictionary) -> void:
 	if str(entry.get("id", "")) != TACKLE_SHOP.id: return

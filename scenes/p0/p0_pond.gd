@@ -33,6 +33,7 @@ func setup(args: Dictionary) -> void:
 	entry = SystemPonds.location(str(args.get("pond_id", "")))
 
 func _ready() -> void:
+	P0Runtime.mark("%s _ready start" % name)
 	if entry.is_empty():
 		push_error("P0 pond: unknown pond id")
 		return

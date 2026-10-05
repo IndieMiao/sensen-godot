@@ -20,6 +20,13 @@ var _shot_script: Array = []
 ## XP / reward lines of the last state change, for worlds that show results themselves (the fishing panel).
 var last_xp_lines: Array = []
 
+## Load timing (logcat tag godot, "P0_TIMING"): navigation start → world _ready → first drawn frame.
+static var _nav_ms := 0
+static func nav_started() -> void:
+	_nav_ms = Time.get_ticks_msec()
+static func mark(tag: String) -> void:
+	print("P0_TIMING %s +%d ms" % [tag, Time.get_ticks_msec() - _nav_ms])
+
 static func ensure() -> P0Runtime:
 	if is_instance_valid(_instance): return _instance
 	_instance = P0Runtime.new()
@@ -54,7 +61,15 @@ func _init() -> void:
 ## The active world takes over input and the HUD surface; the previous one is simply forgotten.
 func attach(w: Node) -> void:
 	world = w
+	mark("attach " + str(w.name))
+	_first_frame.call_deferred(str(w.name))
 	ui.set_surface(str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm")
+
+func _first_frame(tag: String) -> void:
+	await RenderingServer.frame_post_draw
+	mark("first frame " + tag)
+	await RenderingServer.frame_post_draw
+	mark("second frame " + tag)
 
 func detach(w: Node) -> void:
 	if world == w:

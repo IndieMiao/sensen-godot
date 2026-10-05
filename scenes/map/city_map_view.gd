@@ -5,6 +5,8 @@ signal focus_requested(entry: Dictionary)
 signal resident_requested(entry: Dictionary)
 signal landmark_requested(entry: Dictionary)
 signal pond_requested(entry: Dictionary)
+## A marker was selected (its info card opens); hosts can start loading what Enter will need.
+signal entry_selected(entry: Dictionary)
 ## A host-defined place pin (kind "place": own art_path, category, action label) was entered.
 signal place_requested(entry: Dictionary)
 
@@ -503,6 +505,7 @@ func select(entry: Dictionary) -> void:
 		_animate_focus(str(selected.get("id", "")), 1.0, 0.14)
 		_set_marker_front(str(selected.get("id", "")), false)
 	selected = entry
+	entry_selected.emit(entry)
 	_animate_focus(str(entry.get("id", "")), FOCUS_SCALE, 0.28)
 	_set_marker_front(str(entry.get("id", "")), true)
 	info_title.text = _name(entry)
