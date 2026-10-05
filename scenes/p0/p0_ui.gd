@@ -51,6 +51,8 @@ var _bar_box: HBoxContainer
 var _bar_ids: Array = []
 var selected_seed := ""
 var selected_bait := ""
+## Where Old Kai keeps shop (a fixed map place since ponds moved to the map).
+var tackle_place := "Reed Pond"
 var bar_mode := "farm"          # "farm" (seeds) or "fish" (bait) — the quick bar holds the current action's consumables
 var _place: Label
 var surface := "farm"
@@ -507,6 +509,13 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	holder.add_child(veil)
 	holder.add_child(content)
+	if surface == "map" and content is PanelContainer:
+		# Over the map, translucent paper lets the map's own buttons ghost through the card.
+		var sb := (content as PanelContainer).get_theme_stylebox("panel")
+		if sb is StyleBoxFlat:
+			sb = sb.duplicate()
+			(sb as StyleBoxFlat).bg_color.a = 1.0
+			content.add_theme_stylebox_override("panel", sb)
 	root.add_child(holder)
 	_modal = holder
 	if hide_controls:
@@ -650,18 +659,17 @@ func open_kai_greeting() -> void:
 	card.add_theme_stylebox_override("panel", _box(CARD, 16, EDGE, 1, Vector4(8, 8, 10, 8)))
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 10)
-	var face := PanelContainer.new()
+	var face := TextureRect.new()   # Old Kai mending a net in his shop (NPC-1b look)
+	face.texture = load("res://assets/p0/art/kai-portrait.jpg")
 	face.custom_minimum_size = Vector2(100, 171)
-	face.add_theme_stylebox_override("panel", _box(SEA, 14, SEA, 0, Vector4(8, 8, 8, 8)))
-	var fi := _icon("rod_reed", 70)
-	fi.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	face.add_child(fi)
+	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	h.add_child(face)
 	var v := VBoxContainer.new()
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	v.add_theme_constant_override("separation", 4)
 	v.add_child(_label("Tackle Keeper · Old Kai", 13, INK, true))
-	v.add_child(_label("Rods and bait · Willow Creek", 8, INK2))
+	v.add_child(_label("Rods and bait · " + tackle_place, 8, INK2))
 	var line := _label("“%s”" % _kai_line(), 10, INK)
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	line.custom_minimum_size = Vector2(200, 0)
@@ -670,7 +678,7 @@ func open_kai_greeting() -> void:
 	trade.pressed.connect(open_tackle)
 	v.add_child(trade)
 	var ask := _pill_button("What's biting?", false)
-	ask.pressed.connect(func(): line.text = "“The pond keeps crucian, carp, perch and bass — koi too, if your rod can hold her. The creek adds mullet and trout.”")
+	ask.pressed.connect(func(): line.text = "“Round ponds keep crucian, carp, perch and bass — koi too, if your rod can hold her. The winding ones add mullet and trout.”")
 	v.add_child(ask)
 	var bye := _flat_button("Just passing by")
 	bye.pressed.connect(close_modal)
@@ -689,7 +697,7 @@ func _kai_line() -> String:
 
 ## Tackle counter (sea-blue keeper bar, §9.11): rods go to Tools & Gear, bait to the bag; nothing is sold here.
 func open_tackle(bubble := "") -> void:
-	var v := _sheet(420, "Old Kai's Tackle · Willow Creek", "rod")
+	var v := _sheet(420, "Old Kai's Tackle · " + tackle_place, "rod")
 	modal_kind = "tackle"
 	var kp := PanelContainer.new()
 	kp.add_theme_stylebox_override("panel", _box(SEA_LIGHT, 12, SEA_LIGHT, 0, Vector4(8, 6, 8, 6)))

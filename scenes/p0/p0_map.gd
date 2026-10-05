@@ -9,6 +9,12 @@ const P0_POND := "res://scenes/p0/p0_pond.tscn"
 const P0_REGION := "shanghai"
 ## The homestead's map footprint: the Hengshan Road layout, between Pebble Pond and Reed Pond.
 const P0_FARM_CHOICE := {"layout_patch_id": "sh_a", "revision": 2}
+## Old Kai's shop: a fixed place a short walk from Reed Pond (the winding pond nearest home).
+## Entering opens his greeting card for now; the interior room follows once its design is approved.
+const TACKLE_SHOP := {"id": "p0_tackle_shop", "kind": "place", "name": "Old Kai's Tackle",
+	"category": "Tackle shop · Rods and bait", "lat": 31.2083, "lng": 121.4371,
+	"art_path": "res://assets/p0/art/map/tackle_shop.webp", "action": "Enter shop",
+	"action_icon": "store", "filter": "pond"}
 
 var rt: P0Runtime
 
@@ -46,6 +52,13 @@ func _install_city_map() -> void:
 	super._install_city_map()
 	if city_map and not city_map.bundled_ponds:
 		city_map.preload_ponds(SystemPonds.data().locations.filter(func(e): return str(e.region_id) == P0_REGION))
+		city_map.set_places([TACKLE_SHOP])
+		city_map.place_requested.connect(_on_place_requested)
+
+func _on_place_requested(entry: Dictionary) -> void:
+	if str(entry.get("id", "")) != TACKLE_SHOP.id: return
+	city_map.dismiss_overlays()
+	rt.ui.open_kai_greeting()
 
 ## The city view's bottom bar: Farm opens the homestead; outfit and city switching are not in P0.
 func _city_action(action: String) -> void:
@@ -80,6 +93,10 @@ func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"farm": _open_my_farm()
 		"pond": _on_city_pond_requested({"id": step[1]})
+		"shop":
+			if city_map: city_map.select(TACKLE_SHOP)
+		"enter":
+			if city_map: city_map._on_info_action()
 		"zoom":
 			_set_zoom(float(step[1]))
 			_camera_dirty = true

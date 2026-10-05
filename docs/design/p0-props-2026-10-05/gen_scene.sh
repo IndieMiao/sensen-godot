@@ -6,7 +6,7 @@ set -uo pipefail
 NAME="$1"; PROMPT_FILE="$2"; shift 2
 OUT="${NAME}.png"; LOG="${NAME}.log"
 : > "$LOG"
-for SIZE in 1024x1536 1024x1792 auto; do
+for SIZE in ${SIZES:-1024x1536 1024x1792 auto}; do
   for ATTEMPT in 1 2 3; do
     RESP="${NAME}.${SIZE}.a${ATTEMPT}.response.json"
     echo "$(date '+%H:%M:%S') try size=${SIZE} attempt=${ATTEMPT}" | tee -a "$LOG"

@@ -1,0 +1,5 @@
+A single map POI icon in exactly the same style as the three reference icons: a glossy, soft, toy-like 3D clay render with rounded chunky shapes, smooth subsurface plastic sheen, gentle top-left studio light, soft contact shadow only inside the object, saturated but friendly colours, no outlines, no text, no background scene.
+
+Subject: a small fishing-tackle shop sign object for "Old Kai's Tackle" — a little wooden bait bucket (warm honey wood with a dark band) with two short bamboo fishing rods leaning out of it, a red-and-white round fishing float (bobber) hanging from one rod's line in front, and a tiny teal fish tag tied to the bucket handle. Compact, readable at 40 px, centred, three-quarter front view, filling about 80% of the square frame.
+
+Pure white background, isolated object, nothing else in the frame.
