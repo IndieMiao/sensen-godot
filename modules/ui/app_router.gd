@@ -10,6 +10,7 @@ const ONLINE_MINE := "res://scenes/mine/online_mine.tscn"
 const PLACE := "res://scenes/place/place.tscn"
 const STREET := "res://scenes/map/journey_street.tscn"
 const CITY_SELECT := "res://scenes/city_select/city_select.tscn"
+const P0_MAP := "res://scenes/p0/p0_map.tscn"   # P0 prototype map (feat/p0-core)
 
 const BACK_IGNORE := 0
 const BACK_TO_MAP := 1
@@ -404,7 +405,7 @@ static func back_action_for_scene(scene_path: String, back_locked := false) -> i
 	match scene_path:
 		DRESS, STRESS, FARM, PLACE, MINE, LandmarkScenes.GRIFFITH:
 			return BACK_TO_MAP
-		MAP, CITY_SELECT:
+		MAP, CITY_SELECT, P0_MAP:
 			return BACK_LEAVE_APP
 		_:
 			return BACK_IGNORE

@@ -10,7 +10,7 @@ extends Node3D
 
 const PlantMesh = preload("res://modules/farm/crop_plant_mesh.gd")
 
-const CROPS := ["R", "L", "C", "H", "T"]
+const CROPS := ["R", "L", "C", "H", "T", "B", "P", "I", "M"]
 const STAGES := 4
 ## 与种子袋和作物 PNG 一致的根茎色，叶片保留自己的绿色。
 const CROP_COLOR := {
@@ -19,7 +19,13 @@ const CROP_COLOR := {
 	"C": Color(0.93, 0.60, 0.24),   # 胡萝卜
 	"H": Color(0.95, 0.90, 0.52),   # 洋甘菊
 	"T": Color(0.36, 0.52, 0.28),   # 果树：木本，阻挡通行
+	"B": Color(0.55, 0.80, 0.38),   # 香草（P0）
+	"P": Color(0.80, 0.64, 0.42),   # 土豆：块茎色（P0）
+	"I": Color(0.88, 0.25, 0.20),   # 辣椒：果色（P0）
+	"M": Color(0.90, 0.30, 0.22),   # 番茄：果色（P0）
 }
+## 带成熟细节层（根 / 花 / 果）的作物，及细节出现的阶段。
+const DETAIL_STAGE := {"R": 2, "C": 2, "H": 3, "P": 2, "I": 2, "M": 2}
 const WEED_COLOR := Color(0.46, 0.58, 0.30)
 ## 翻土层包含五条立体垄沟，与只清理过的平地分开。
 const SOIL_COLOR := Color(0.55, 0.38, 0.23)
@@ -44,6 +50,10 @@ var bp: FarmBlueprint
 var world_scale := 1.0
 ## 作物从地面往上长。田畦盒子随自由格子种田退役，这里通常是 0。
 var ground_y := 0.0
+## 独立土畦（P0 固定田位）没有地面 shader 画田况：荒地画杂草层，翻过的地画翻土板。
+var ground_layers := false
+## Plants are sized in cell units; a bed wider than its cell (P0 fixed beds: 0.94 m on 0.65 m cells) scales them up.
+var plant_scale := 1.0
 var _mm: Dictionary = {}       ## crop_id / "weed" / "soil" → MultiMeshInstance3D
 var _detail_mm: Dictionary = {} # Roots and flowers appear only in their visible growth stage.
 
@@ -56,7 +66,7 @@ func _ready() -> void:
 		_mm[crop] = _make_layer(PlantMesh.build(crop, CROP_COLOR[crop]))
 	_mm["weed"] = _make_layer(PlantMesh.build("weed", WEED_COLOR))
 	_mm["soil"] = _make_layer(PlantMesh.build("soil", SOIL_COLOR))
-	for crop in ["R", "C", "H"]:
+	for crop in DETAIL_STAGE:
 		_detail_mm[crop] = _make_layer(PlantMesh.build(crop + "_detail", CROP_COLOR[crop]))
 
 func _make_layer(mesh: Mesh) -> MultiMeshInstance3D:
@@ -127,6 +137,8 @@ func sync(cells: Dictionary, now_ms: int) -> void:
 	for id in cells:
 		var slot: Dictionary = cells[id]
 		var layer := layer_of(slot)
+		if layer == "" and ground_layers:
+			layer = {"wild": "weed", "tilled": "soil"}.get(str(slot.get("state", "")), "")
 		if layer == "" or not buckets.has(layer):
 			continue
 		var cell := _parse_cell(str(id))
@@ -138,7 +150,7 @@ func _sync_buckets(buckets: Dictionary) -> void:
 	for layer in buckets:
 		_fill(_mm[layer], buckets[layer], layer)
 		if _detail_mm.has(layer):
-			var detail_stage := 3 if layer == "H" else 2
+			var detail_stage: int = DETAIL_STAGE[layer]
 			var detailed: Array = buckets[layer].filter(func(item): return int(item.stage) >= detail_stage)
 			_fill(_detail_mm[layer], detailed, layer)
 
@@ -152,7 +164,7 @@ func _fill(mmi: MultiMeshInstance3D, items: Array, layer: String) -> void:
 	var n := 0
 	for item in items:
 		var base: Vector3 = bp.cell_to_world(item.cell, world_scale)
-		var unit := bp.cell_m * world_scale
+		var unit := bp.cell_m * world_scale * plant_scale
 		var size: Vector3
 		match layer:
 			"weed": size = WEED_SIZE * unit

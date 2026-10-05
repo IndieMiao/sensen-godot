@@ -188,7 +188,7 @@ func step(dt: float) -> void:
 	var current_phase := str(remote_state.get("phase", "waiting")) if remote else panel.phase
 	var held := bool(remote_state.get("held", false)) if remote else panel.held
 	var model: Dictionary = remote_state if remote else panel.model
-	var result: Dictionary = remote_state if remote else panel.session.state.get("fishing", {}).get("last", {})
+	var result: Dictionary = remote_state if remote else panel.last_result()
 	if _phase != current_phase:
 		_phase = current_phase
 		_phase_age = float(remote_state.get("age", 0)) if remote else 0
@@ -246,7 +246,7 @@ func step(dt: float) -> void:
 		_catch.global_position = bobber_position - Vector3.UP * 0.15
 		_catch.rotation = Vector3(0, _clock * 3.0, sin(_clock * 17) * 0.3)
 		var id := str(result.get("fish_id", ""))
-		var tier := int(FishingModel.fish(id).get("tier", 1))
+		var tier := int(result.get("tier", FishingModel.fish(id).get("tier", 1)))
 		_catch_material.albedo_color = [Color("a7c1a5"), Color("71aaba"), Color("e4ba63"), Color("bcb8df")][clampi(tier - 1, 0, 3)]
 	_catch.visible = landed and _phase_age < 1.25
 	_bobber.visible = active_float and not _catch.visible

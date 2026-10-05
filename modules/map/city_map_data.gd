@@ -163,6 +163,7 @@ static func icon_key(poi: Dictionary) -> String:
 
 ## 地标用建筑贴图；普通 POI 用 maki 图标，同名永远同一张；无图标返回通用图钉（只用于卡片兜底）。
 static func art_texture(poi: Dictionary) -> Texture2D:
+	if poi.has("art_path") and ResourceLoader.exists(str(poi.art_path)): return load(str(poi.art_path))
 	if poi.get("kind") == "pond": return SystemPonds.texture(str(poi.template_id))
 	if str(poi.get("kind", "")) != "poi": return texture(art_key(poi))
 	var key := icon_key(poi)

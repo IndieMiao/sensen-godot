@@ -5,8 +5,15 @@ signal focus_requested(entry: Dictionary)
 signal resident_requested(entry: Dictionary)
 signal landmark_requested(entry: Dictionary)
 signal pond_requested(entry: Dictionary)
+## A marker was selected (its info card opens); hosts can start loading what Enter will need.
+signal entry_selected(entry: Dictionary)
+## A host-defined place pin (kind "place": own art_path, category, action label) was entered.
+signal place_requested(entry: Dictionary)
 
 var pond_locations: Array = []
+## Host-defined place pins: {id, kind: "place", name, category, lat, lng, art_path, action,
+## action_icon, filter} — e.g. the P0 tackle shop. They lay out like pond pins.
+var extra_places: Array = []
 ## Pond directory by fixed 0.5° cells around the map centre (SystemPonds.CELL_DEG), not by active
 ## city: roaming San Francisco from a Shanghai farm still shows the ponds there.
 var _pond_cells: Dictionary = {}      # "y:x" -> {"at": msec, "entries": Array}
@@ -14,6 +21,8 @@ var _pond_view := ""                  # the 3×3 block currently shown
 var _pond_pending := false
 var _pond_retry_at := 0
 var _pond_error := false
+## P0: pins come from the bundled catalog only (preload_ponds), no directory requests.
+var bundled_ponds := false
 const POND_CELL_TTL_MS := 300000
 const POND_RETRY_MS := 30000
 ## Below this zoom a 3×3 block is far smaller than the view; ponds are city-scale content anyway.
@@ -416,14 +425,14 @@ func refresh_content() -> void:
 	var own := CityMapData.landmarks(region_id)
 	var own_ids := own.map(func(p): return str(p.get("id", "")))
 	entries = own + roaming.filter(func(g): return not own_ids.has(str(g.id))) + CityMapData.residents(region_id, state)
-	entries += pond_locations
+	entries += pond_locations + extra_places
 	for child in list_rows.get_children():
 		list_rows.remove_child(child)
 		child.queue_free()
 	for entry in entries:
 		if not _entry_visible(entry): continue
 		var b := flat_button("map-pin" if entry.kind == "landmark" else "user-round", _name(entry), "MapPlace_" + str(entry.id))
-		if entry.kind in ["landmark", "pond"]:
+		if entry.kind in ["landmark", "pond", "place"]:
 			b.icon = CityMapData.art_texture(entry)
 			b.add_theme_constant_override("icon_max_width", 28)
 			for state_name in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
@@ -496,6 +505,7 @@ func select(entry: Dictionary) -> void:
 		_animate_focus(str(selected.get("id", "")), 1.0, 0.14)
 		_set_marker_front(str(selected.get("id", "")), false)
 	selected = entry
+	entry_selected.emit(entry)
 	_animate_focus(str(entry.get("id", "")), FOCUS_SCALE, 0.28)
 	_set_marker_front(str(entry.get("id", "")), true)
 	info_title.text = _name(entry)
@@ -503,7 +513,7 @@ func select(entry: Dictionary) -> void:
 	info_address.text = str(entry.get("address", ""))
 	info_address.visible = not info_address.text.is_empty()
 	var landmark_scene := LandmarkScenes.path_for(str(host.region.get("id", "")), entry)
-	info_action.visible = entry.kind in ["resident", "pond"] or not landmark_scene.is_empty()
+	info_action.visible = entry.kind in ["resident", "pond", "place"] or not landmark_scene.is_empty()
 	if entry.kind == "resident":
 		info_category.text = L10n.text("Resident") + " · " + L10n.text(str(entry.get("status", "Talk")))
 		info_action.text = L10n.text("Visit resident")
@@ -512,6 +522,10 @@ func select(entry: Dictionary) -> void:
 		info_category.text = L10n.text(str(SystemPonds.TITLES.get(entry.template_id, "Fishing pond")))
 		info_action.text = L10n.text("Enter pond")
 		info_action.icon = GameUi.icon("fish")
+	elif entry.kind == "place":
+		info_category.text = L10n.text(str(entry.get("category", "Place")))
+		info_action.text = L10n.text(str(entry.get("action", "Enter")))
+		info_action.icon = GameUi.icon(str(entry.get("action_icon", "footprints")))
 	elif not landmark_scene.is_empty():
 		info_action.text = L10n.text("Enter scene")
 		info_action.icon = GameUi.icon("footprints")
@@ -550,6 +564,7 @@ func _on_info_action() -> void:
 		"player": player_visit_requested.emit(str(selected.get("farm_id", "")))
 		"resident": resident_requested.emit(selected)
 		"pond": pond_requested.emit(selected)
+		"place": place_requested.emit(selected)
 		"landmark":
 			if not LandmarkScenes.path_for(str(host.region.get("id", "")), selected).is_empty():
 				landmark_requested.emit(selected)
@@ -586,7 +601,7 @@ func _refresh_pond_directory() -> void:
 	if view != _pond_view:
 		_pond_view = view
 		_show_pond_cells(keys)
-	if keys.is_empty() or _pond_pending or Net.session == null or not Net.session.logged_in(): return
+	if bundled_ponds or keys.is_empty() or _pond_pending or Net.session == null or not Net.session.logged_in(): return
 	var now := Time.get_ticks_msec()
 	var missing := keys.filter(func(k): return not _pond_cells.has(k) or now - int(_pond_cells[k].at) > POND_CELL_TTL_MS)
 	if missing.is_empty() or now < _pond_retry_at: return
@@ -615,6 +630,22 @@ func _refresh_pond_directory() -> void:
 		# The view may have moved while the request was in flight; show whatever is current.
 		_show_pond_cells(_pond_view_cells())
 	if filter == "pond": status.text = L10n.text("Ponds unavailable. Try again shortly.") if _pond_error else ""
+
+## File bundled catalog entries under their directory cells and stop asking the server (P0 map).
+func preload_ponds(locations: Array) -> void:
+	bundled_ponds = true
+	for entry in locations:
+		if not entry.get("enabled", true): continue
+		var key := SystemPonds.cell_key(SystemPonds.cell_of(float(entry.lat), float(entry.lng)))
+		if not _pond_cells.has(key): _pond_cells[key] = {"at": 0, "entries": []}
+		(_pond_cells[key].entries as Array).append(entry.duplicate(true))
+	_pond_view = ""
+	_refresh_pond_directory()
+
+func set_places(places: Array) -> void:
+	extra_places = places.duplicate(true)
+	_last_state = ""
+	refresh_content()
 
 func attach_bridge(bridge: MapBridge) -> void:
 	if bridge == _attached_bridge: return
@@ -698,7 +729,7 @@ func _merge_pois(incoming: Array) -> void:
 	live_pois = known.values()
 
 func _entry_visible(entry: Dictionary) -> bool:
-	if filter == "pond": return entry.kind == "pond"
+	if filter == "pond": return entry.kind == "pond" or str(entry.get("filter", "")) == "pond"
 	if filter == "landmark": return entry.kind == "landmark"
 	if filter == "resident": return entry.kind == "resident"
 	if filter == "food": return entry.kind == "poi" and CityMapData.art_key(entry) in ["restaurant", "chinese_restaurant", "cafe", "bakery"]
@@ -764,7 +795,7 @@ func _update_markers() -> void:
 	# Cull only outside the screen plus the artwork's extent. UI panels cover
 	# geography; they never move or hide its anchors to make room for themselves.
 	var area := Rect2(-global_position, get_viewport_rect().size).grow(120)
-	var all := entries.filter(func(e):return e.kind in ["landmark", "resident", "pond"]) + live_pois
+	var all := entries.filter(func(e):return e.kind in ["landmark", "resident", "pond", "place"]) + live_pois
 	var keep := {}
 	var candidates: Array = []
 	# 国家/省级视野只剩城市气泡与自己的头像：细节标记全部让出（带消失动画）。
@@ -962,7 +993,7 @@ func _animate_focus(id: String, to: float, duration: float) -> void:
 		_apply_marker_scale(marker), float(marker.get("focus", 1.0)), to, duration)
 
 func _pack_key(c: Dictionary) -> Array:
-	var kind_order := {"landmark": 0, "resident": 1, "pond": 2, "poi": 3}
+	var kind_order := {"landmark": 0, "resident": 1, "pond": 2, "place": 2.5, "poi": 3}
 	return [0 if selected.get("id", null) == c.entry.get("id") else 1,
 		kind_order.get(c.entry.kind, 3),
 		0 if _shown_last.has(c.id) else 1,

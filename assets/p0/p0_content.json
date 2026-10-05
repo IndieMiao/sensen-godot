@@ -1,0 +1,795 @@
+{
+  "version": "p0-m2e-2026-10-05",
+  "_note": "P0 content (M1 homestead + M2 fish/cook/eat) (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit; M2: §6.1.2–6.1.3 fishing gates and protection, §6.2.2 fish, §6.3.1 pond weights, §6.4 rod/bait, §6.6.1 cast energy, §6.7.1 fishing XP, §7.2.3–7.2.5 cooking, §7.3 ingredient families, §7.4.1 rarity derivation, §7.6.2 cooking XP, §7.14 recipes, §7.17.1 eating). Shared by server/src/p0 and the Godot client (labels only). M2b: P0 fish list (§17.2.1) — Willow Pond (Pond template) and Willow Creek (River template) on the homestead; mackerel is Coast-only (shown in the Fish-dex, not catchable here). Recipes: the 14 pages that need only P0 fish and crops; rock-salt pages (#11, #16, #29, #37) wait for materials.",
+  "energy": {
+    "max_base": 200,
+    "regen_ms": 240000,
+    "bonus_zone": 50,
+    "rest_amount": 60
+  },
+  "day": {
+    "utc_offset_hours": 8,
+    "rollover_hour": 4
+  },
+  "start": {
+    "coins": 180,
+    "tilled_plots": 20,
+    "wild_plots": 10,
+    "bag": [
+      [
+        "seed_radish",
+        20
+      ],
+      [
+        "seed_lettuce",
+        10
+      ]
+    ]
+  },
+  "bag": {
+    "capacity": 25,
+    "stack": {
+      "seed": 99,
+      "crop": 50,
+      "dish": 5,
+      "fish": 10,
+      "material": 99,
+      "bait": 99
+    }
+  },
+  "skills": {
+    "farming": [
+      0,
+      50,
+      150,
+      300,
+      500,
+      750,
+      1050,
+      1450,
+      2050,
+      2800
+    ],
+    "fishing": [
+      0,
+      70,
+      220,
+      480,
+      850,
+      1300,
+      1850,
+      2400,
+      3100,
+      4000
+    ],
+    "cooking": [
+      0,
+      30,
+      100,
+      220,
+      400,
+      650,
+      950,
+      1350,
+      1700,
+      2350
+    ]
+  },
+  "level_up_energy": {
+    "first": 50,
+    "later": 30
+  },
+  "level_gifts": {
+    "farming:2": [
+      [
+        "seed_carrot",
+        5
+      ]
+    ],
+    "fishing:2": [
+      [
+        "bait_worm",
+        3
+      ],
+      [
+        "crop_herb",
+        3
+      ],
+      [
+        "recipe:dish_herb_grilled_fish",
+        1
+      ]
+    ]
+  },
+  "xp_multiplier": [
+    [
+      1,
+      100
+    ],
+    [
+      2,
+      75
+    ],
+    [
+      3,
+      50
+    ],
+    [
+      4,
+      25
+    ]
+  ],
+  "crops": [
+    {
+      "id": "crop_radish",
+      "name": "Radish",
+      "seed": "seed_radish",
+      "seed_name": "Radish Seeds",
+      "tier": 1,
+      "energy": 2,
+      "level": 1,
+      "gate": 1,
+      "seed_price": 4,
+      "grow_h": 4,
+      "yield": 1,
+      "price": 5,
+      "xp": 2,
+      "first_xp": 10,
+      "ingr": [
+        "F",
+        1
+      ]
+    },
+    {
+      "id": "crop_lettuce",
+      "name": "Lettuce",
+      "seed": "seed_lettuce",
+      "seed_name": "Lettuce Seeds",
+      "tier": 1,
+      "energy": 2,
+      "level": 1,
+      "gate": 1,
+      "seed_price": 6,
+      "grow_h": 8,
+      "yield": 1,
+      "price": 8,
+      "xp": 2,
+      "first_xp": 10,
+      "ingr": [
+        "F",
+        1
+      ]
+    },
+    {
+      "id": "crop_herb",
+      "name": "Herb",
+      "seed": "seed_herb",
+      "seed_name": "Herb Seeds",
+      "tier": 1,
+      "energy": 2,
+      "level": 2,
+      "gate": 2,
+      "seed_price": 2,
+      "grow_h": 3,
+      "yield": 3,
+      "price": 1,
+      "xp": 2,
+      "first_xp": 10,
+      "ingr": [
+        "S",
+        1
+      ]
+    },
+    {
+      "id": "crop_carrot",
+      "name": "Carrot",
+      "seed": "seed_carrot",
+      "seed_name": "Carrot Seeds",
+      "tier": 2,
+      "energy": 3,
+      "level": 2,
+      "gate": 2,
+      "seed_price": 9,
+      "grow_h": 12,
+      "yield": 1,
+      "price": 12,
+      "xp": 3,
+      "first_xp": 15,
+      "ingr": [
+        "F",
+        1
+      ]
+    },
+    {
+      "id": "crop_potato",
+      "name": "Potato",
+      "seed": "seed_potato",
+      "seed_name": "Potato Seeds",
+      "tier": 2,
+      "energy": 3,
+      "level": 3,
+      "gate": 3,
+      "seed_price": 9,
+      "grow_h": 10,
+      "yield": 2,
+      "price": 6,
+      "xp": 3,
+      "first_xp": 15,
+      "ingr": [
+        "F",
+        1
+      ]
+    },
+    {
+      "id": "crop_chamomile",
+      "name": "Chamomile",
+      "seed": "seed_chamomile",
+      "seed_name": "Chamomile Seeds",
+      "tier": 3,
+      "energy": 4,
+      "level": 3,
+      "gate": 3,
+      "seed_price": 12,
+      "grow_h": 18,
+      "yield": 1,
+      "price": 16,
+      "xp": 4,
+      "first_xp": 20,
+      "ingr": [
+        "O",
+        2
+      ]
+    },
+    {
+      "id": "crop_chili",
+      "name": "Chili",
+      "seed": "seed_chili",
+      "seed_name": "Chili Seeds",
+      "tier": 1,
+      "energy": 2,
+      "level": 4,
+      "gate": 4,
+      "seed_price": 3,
+      "grow_h": 6,
+      "yield": 2,
+      "price": 2,
+      "xp": 2,
+      "first_xp": 10,
+      "ingr": [
+        "S",
+        1
+      ]
+    },
+    {
+      "id": "crop_tomato",
+      "name": "Tomato",
+      "seed": "seed_tomato",
+      "seed_name": "Tomato Seeds",
+      "tier": 3,
+      "energy": 4,
+      "level": 4,
+      "gate": 4,
+      "seed_price": 12,
+      "grow_h": 14,
+      "yield": 2,
+      "price": 8,
+      "xp": 4,
+      "first_xp": 20,
+      "ingr": [
+        "F",
+        2
+      ]
+    }
+  ],
+  "stall": {
+    "keeper": {
+      "role": "Stallhand",
+      "name": "Bao"
+    },
+    "buy": [
+      "seed_radish",
+      "seed_lettuce",
+      "seed_herb",
+      "seed_carrot",
+      "seed_potato",
+      "seed_chamomile",
+      "seed_chili",
+      "seed_tomato",
+      "bait_worm"
+    ]
+  },
+  "rarity_names": [
+    "Common",
+    "Fine",
+    "Rare",
+    "Legendary"
+  ],
+  "fish": [
+    {
+      "id": "fish_crucian",
+      "name": "Pond Crucian",
+      "rarity": 1,
+      "level": 1,
+      "price": 3,
+      "where": [
+        "pond",
+        "river"
+      ]
+    },
+    {
+      "id": "fish_carp",
+      "name": "Common Carp",
+      "rarity": 1,
+      "level": 1,
+      "price": 4,
+      "where": [
+        "pond",
+        "river"
+      ]
+    },
+    {
+      "id": "fish_mullet",
+      "name": "Grey Mullet",
+      "rarity": 1,
+      "level": 1,
+      "price": 4,
+      "where": [
+        "coast",
+        "river"
+      ]
+    },
+    {
+      "id": "fish_perch",
+      "name": "River Perch",
+      "rarity": 2,
+      "level": 2,
+      "price": 7,
+      "where": [
+        "river",
+        "pond"
+      ]
+    },
+    {
+      "id": "fish_bass",
+      "name": "Largemouth Bass",
+      "rarity": 2,
+      "level": 2,
+      "price": 7,
+      "where": [
+        "pond",
+        "river"
+      ]
+    },
+    {
+      "id": "fish_trout",
+      "name": "Rainbow Trout",
+      "rarity": 2,
+      "level": 2,
+      "price": 8,
+      "where": [
+        "river"
+      ]
+    },
+    {
+      "id": "fish_mackerel",
+      "name": "Mackerel",
+      "rarity": 2,
+      "level": 2,
+      "price": 8,
+      "where": [
+        "coast"
+      ]
+    },
+    {
+      "id": "fish_koi",
+      "name": "Golden Koi",
+      "rarity": 3,
+      "level": 4,
+      "price": 13,
+      "cook": false,
+      "where": [
+        "pond"
+      ]
+    }
+  ],
+  "fishing": {
+    "cast_energy": 5,
+    "refund_fail": 3,
+    "protect_max_level": 3,
+    "protect_fails": 10,
+    "bite_min_ms": 1800,
+    "bite_spread_ms": 2400,
+    "hook_window_ms": 2200,
+    "stale_ms": 90000,
+    "catch_xp": [
+      5,
+      10,
+      20,
+      40
+    ],
+    "first_xp": [
+      15,
+      30,
+      60,
+      120
+    ],
+    "first_cast_xp": 5,
+    "first_landed_xp": 5,
+    "baits": {
+      "bait_worm": {
+        "shift": [
+          -10,
+          10,
+          0,
+          0
+        ],
+        "wait": 0.5
+      }
+    },
+    "sites": {
+      "pond": {
+        "name": "Willow Pond",
+        "template": "Pond",
+        "weights": [
+          60,
+          30,
+          9,
+          1
+        ],
+        "fish": [
+          "fish_crucian",
+          "fish_carp",
+          "fish_perch",
+          "fish_bass",
+          "fish_koi"
+        ]
+      },
+      "river": {
+        "name": "Willow Creek",
+        "template": "River",
+        "weights": [
+          35,
+          40,
+          20,
+          5
+        ],
+        "fish": [
+          "fish_crucian",
+          "fish_carp",
+          "fish_mullet",
+          "fish_perch",
+          "fish_bass",
+          "fish_trout"
+        ]
+      }
+    },
+    "rods": [
+      {
+        "id": "rod_starter",
+        "name": "Starter Rod",
+        "reach": 2,
+        "level": 1,
+        "price": 0,
+        "hook_bonus_ms": 0,
+        "band_bonus": 0
+      },
+      {
+        "id": "rod_reed",
+        "name": "Reed Rod",
+        "reach": 3,
+        "level": 3,
+        "price": 80,
+        "hook_bonus_ms": 400,
+        "band_bonus": 0.03
+      }
+    ]
+  },
+  "goods": {
+    "bait_worm": {
+      "name": "Worm Bait",
+      "price": 2,
+      "skill": "fishing",
+      "gate": 2,
+      "daily": 30
+    }
+  },
+  "cooking": {
+    "slots": [
+      [
+        1,
+        2
+      ],
+      [
+        4,
+        3
+      ]
+    ],
+    "tiers": {
+      "1": {
+        "energy": 20,
+        "ms": 5000,
+        "heats": [
+          2500
+        ],
+        "gold": 0.35,
+        "spin_ms": 1600,
+        "first_xp": 10,
+        "xp": 4,
+        "level": 1,
+        "bonus": [
+          0,
+          5
+        ]
+      },
+      "2": {
+        "energy": 40,
+        "ms": 15000,
+        "heats": [
+          9000
+        ],
+        "gold": 0.3,
+        "spin_ms": 1600,
+        "first_xp": 20,
+        "xp": 8,
+        "level": 2,
+        "bonus": [
+          0,
+          5
+        ]
+      },
+      "3": {
+        "energy": 70,
+        "ms": 30000,
+        "heats": [
+          10000,
+          22000
+        ],
+        "gold": 0.25,
+        "spin_ms": 1400,
+        "first_xp": 40,
+        "xp": 16,
+        "level": 4,
+        "bonus": [
+          0,
+          10,
+          20
+        ]
+      },
+      "4": {
+        "energy": 70,
+        "ms": 60000,
+        "heats": [
+          20000,
+          45000
+        ],
+        "gold": 0.2,
+        "spin_ms": 1200,
+        "first_xp": 80,
+        "xp": 32,
+        "level": 6,
+        "bonus": [
+          0,
+          10,
+          20
+        ]
+      }
+    },
+    "first_fire": {
+      "gold": 0.5,
+      "spin_ms": 2000
+    },
+    "tolerance_ms": 150,
+    "quality_xp": [
+      1,
+      1.25,
+      1.5
+    ],
+    "derive": [
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        2,
+        3,
+        3
+      ],
+      [
+        3,
+        3,
+        4
+      ],
+      [
+        4,
+        4,
+        4
+      ]
+    ],
+    "mystery": {
+      "id": "dish_mystery",
+      "name": "Mystery Dish",
+      "energy": 5
+    },
+    "food_cap": 200,
+    "recipes": [
+      {
+        "id": "dish_grilled_crucian",
+        "name": "Grilled Crucian",
+        "in": [
+          "fish_crucian"
+        ],
+        "known": true
+      },
+      {
+        "id": "dish_herb_grilled_fish",
+        "name": "Herb Grilled Fish",
+        "in": [
+          "W1",
+          "S1"
+        ]
+      },
+      {
+        "id": "dish_grilled_fish",
+        "name": "Grilled Fish",
+        "in": [
+          "W1"
+        ]
+      },
+      {
+        "id": "dish_carp_cakes",
+        "name": "Carp Fish Cakes",
+        "in": [
+          "fish_carp",
+          "fish_carp"
+        ]
+      },
+      {
+        "id": "dish_mullet_skewers",
+        "name": "Mullet Skewers",
+        "in": [
+          "fish_mullet",
+          "fish_mullet"
+        ]
+      },
+      {
+        "id": "dish_radish_salad",
+        "name": "Radish Salad",
+        "in": [
+          "crop_radish",
+          "crop_lettuce"
+        ],
+        "known": true
+      },
+      {
+        "id": "dish_veggie_plate",
+        "name": "Veggie Plate",
+        "in": [
+          "F1"
+        ]
+      },
+      {
+        "id": "dish_carrot_cake",
+        "name": "Carrot Cake",
+        "in": [
+          "crop_carrot",
+          "crop_carrot"
+        ]
+      },
+      {
+        "id": "dish_fish_soup",
+        "name": "Fresh Fish Soup",
+        "in": [
+          "W1",
+          "F1"
+        ]
+      },
+      {
+        "id": "dish_pan_fried_fish",
+        "name": "Pan-Fried Fish",
+        "in": [
+          "W2"
+        ]
+      },
+      {
+        "id": "dish_fruit_tea",
+        "name": "Fruit Tea",
+        "in": [
+          "O2"
+        ]
+      },
+      {
+        "id": "dish_roast_veggies",
+        "name": "Roast Veggies",
+        "in": [
+          "F2"
+        ]
+      },
+      {
+        "id": "dish_herb_baked_perch",
+        "name": "Herb Baked Perch",
+        "in": [
+          "fish_perch",
+          "crop_herb"
+        ]
+      },
+      {
+        "id": "dish_bass_tomato_stew",
+        "name": "Bass Tomato Stew",
+        "in": [
+          "fish_bass",
+          "crop_tomato"
+        ]
+      }
+    ]
+  },
+  "blessing": {
+    "days": 7,
+    "regen_mult": 1.5,
+    "food_bonus": 100
+  },
+  "rewards": {
+    "first_fish": [
+      0,
+      20,
+      30,
+      50
+    ],
+    "first_dish": [
+      0,
+      0,
+      30,
+      50
+    ],
+    "cookbook": [
+      [
+        8,
+        50
+      ]
+    ],
+    "fishdex": [
+      [
+        10,
+        30
+      ],
+      [
+        20,
+        50
+      ]
+    ],
+    "max_over": 50
+  },
+  "requests": {
+    "slots": 2,
+    "refill_h": 72,
+    "tutorial": {
+      "id": "req_pond_catch",
+      "title": "Pond Catch",
+      "item": "fish_crucian",
+      "qty": 2,
+      "coins": 14,
+      "where": "any pond"
+    }
+  },
+  "tackle": {
+    "keeper": {
+      "role": "Tackle Keeper",
+      "name": "Old Kai"
+    },
+    "buy": [
+      "rod_reed",
+      "bait_worm"
+    ]
+  },
+  "tools": {
+    "farming": "hoe_starter",
+    "fishing": "rod_starter",
+    "mining": "pick_starter",
+    "combat": "sword_wooden",
+    "names": {
+      "hoe_starter": "Starter Hoe",
+      "pick_starter": "Starter Pickaxe",
+      "sword_wooden": "Wooden Sword"
+    }
+  }
+}

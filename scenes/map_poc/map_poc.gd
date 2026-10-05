@@ -241,7 +241,7 @@ func _ready() -> void:
 	_rng.seed = 20260829 # 固定种子：装机验证时角色分布可复现
 	get_viewport().transparent_bg = true
 	$Sun.rotation_degrees = Vector3(-55, 30, 0)
-	var choice := FarmRegions.load_choice()
+	var choice := _initial_region_id()
 	var regions := FarmRegions.load_default()
 	if regions != null and not choice.is_empty() and not regions.region(choice).is_empty():
 		enter_street_mode(regions.region(choice))
@@ -305,6 +305,10 @@ func _ready() -> void:
 		_resolve_home(float(region.center[0]), float(region.center[1]), false)
 		_build_region_ui(region)
 	_camera_dirty = true
+
+## Which city the map opens in (the saved pick). Subclasses (P0) pin their own.
+func _initial_region_id() -> String:
+	return FarmRegions.load_choice()
 
 ## 平台桥工厂（避免 MapBridge 基类反向引用子类的脚本环）；城市选择页共用同一工厂。
 func _make_bridge() -> MapBridge:

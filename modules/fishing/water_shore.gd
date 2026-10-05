@@ -10,7 +10,121 @@ var _plants := SurfaceTool.new()
 var _flowers := SurfaceTool.new()
 var _pond := false
 
+## Pond banks are seeded and deterministic, but generating them vertex by vertex costs ~0.8 s on a
+## desktop M4 and several seconds on phones. The committed arrays are kept per pond (and can be
+## made ahead on a worker thread with prewarm) so entering a pond only builds the meshes.
+const CACHE_LIMIT := 8
+static var _cache: Dictionary = {}     # key -> {"rocks": Array, "plants": Array, "flowers": Array}
+static var _order: Array = []
+static var _pending: Dictionary = {}   # key -> WorkerThreadPool task id
+static var _lock := Mutex.new()
+
+## Unit sphere / cylinder arrays, read once on the main thread. PrimitiveMesh arrays come back
+## through the RenderingServer, which a worker thread can't reach while the main thread waits on it.
+static var _unit: Dictionary = {}
+
+static func _prepare_units() -> void:
+	if not _unit.is_empty(): return
+	var sphere := SphereMesh.new()
+	sphere.radius = 0.5
+	sphere.height = 1.0
+	sphere.radial_segments = 10
+	sphere.rings = 4
+	_unit["sphere"] = sphere.surface_get_arrays(0)
+	for segments in [4, 5]:
+		var cylinder := CylinderMesh.new()
+		cylinder.top_radius = 1.0
+		cylinder.bottom_radius = 1.0
+		cylinder.height = 1.0
+		cylinder.radial_segments = segments
+		cylinder.rings = 1
+		_unit["cylinder%d" % segments] = cylinder.surface_get_arrays(0)
+
+## Same output as PlaceScenery._oval / _cylinder (a radius-r, height-h cylinder is the unit one
+## scaled by (r, h, r); its normals survive the inverse-transpose unchanged).
+static func _oval(s: SurfaceTool, size: Vector3, center: Vector3, color: Color, basis := Basis.IDENTITY) -> void:
+	_put(s, _unit.sphere, Transform3D(basis * Basis.from_scale(size), center), color)
+
+static func _cylinder(s: SurfaceTool, radius: float, height: float, center: Vector3, color: Color, segments: int) -> void:
+	_put(s, _unit["cylinder%d" % segments], Transform3D(Basis.from_scale(Vector3(radius, height, radius)), center), color)
+
+static func _put(s: SurfaceTool, arrays: Array, transform: Transform3D, color: Color) -> void:
+	var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+	var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+	var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
+	var normal_basis := transform.basis.inverse().transposed()
+	for index in indices:
+		s.set_color(color)
+		s.set_normal((normal_basis * normals[index]).normalized())
+		s.add_vertex(transform * vertices[index])
+
+static func _cacheable(spec: Dictionary) -> bool:
+	return spec.has("polygon") and spec.get("space", "") != "street"
+
+static func _cache_key(id: String, spec: Dictionary) -> String:
+	return "%s:%d:%d" % [id, int(spec.get("decoration_seed", 0)), FishingModel._polygon(spec).size()]
+
+## Start generating a pond's bank on a worker thread (e.g. when its map pin is selected).
+static func prewarm(id: String, site_override: Dictionary = {}) -> void:
+	_reap()
+	_prepare_units()
+	var spec := FishingModel.site(id, site_override)
+	if not _cacheable(spec): return
+	var key := _cache_key(id, spec)
+	_lock.lock()
+	var known := _cache.has(key) or _pending.has(key)
+	_lock.unlock()
+	if known: return
+	_pending[key] = WorkerThreadPool.add_task(func(): _store(key, _generate(id, spec)), false, "WaterShore " + id)
+
+## Every WorkerThreadPool task must be waited on once; collect the finished ones.
+static func _reap() -> void:
+	for key in _pending.keys():
+		if WorkerThreadPool.is_task_completed(_pending[key]):
+			WorkerThreadPool.wait_for_task_completion(_pending[key])
+			_pending.erase(key)
+
+static func _store(key: String, arrays: Dictionary) -> void:
+	_lock.lock()
+	_cache[key] = arrays
+	_order.erase(key)
+	_order.append(key)
+	while _order.size() > CACHE_LIMIT: _cache.erase(_order.pop_front())
+	_lock.unlock()
+
+static func _pond_arrays(id: String, spec: Dictionary) -> Dictionary:
+	var key := _cache_key(id, spec)
+	if _pending.has(key):
+		WorkerThreadPool.wait_for_task_completion(_pending[key])
+		_pending.erase(key)
+	_lock.lock()
+	var hit: Dictionary = _cache.get(key, {})
+	_lock.unlock()
+	if hit.is_empty():
+		hit = _generate(id, spec)
+		_store(key, hit)
+	return hit
+
+## Thread-safe: builds the bank on a detached instance and returns committed, indexed arrays.
+static func _generate(id: String, spec: Dictionary) -> Dictionary:
+	var shore := WaterShore.new()
+	shore._rng.seed = int(spec.decoration_seed) if spec.has("decoration_seed") else 190924 + id.hash()
+	shore._rocks.begin(Mesh.PRIMITIVE_TRIANGLES)
+	shore._plants.begin(Mesh.PRIMITIVE_TRIANGLES)
+	shore._flowers.begin(Mesh.PRIMITIVE_TRIANGLES)
+	shore._pond = true
+	shore._pond_bank(FishingModel._polygon(spec))
+	shore._rocks.generate_normals()
+	var out := {}
+	for pair in [["rocks", shore._rocks], ["plants", shore._plants], ["flowers", shore._flowers]]:
+		var st: SurfaceTool = pair[1]
+		st.index()
+		out[pair[0]] = st.commit_to_arrays()
+	shore.free()
+	return out
+
 static func build(id: String, site_override: Dictionary = {}) -> WaterShore:
+	_prepare_units()
 	var shore := WaterShore.new()
 	shore.name = "NaturalWaterBank"
 	shore._rng.seed = 190924 + id.hash()
@@ -19,6 +133,10 @@ static func build(id: String, site_override: Dictionary = {}) -> WaterShore:
 	shore._flowers.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var spec := FishingModel.site(id, site_override)
 	if spec.has("decoration_seed"): shore._rng.seed = int(spec.decoration_seed)
+	if _cacheable(spec):
+		shore._pond = true
+		shore._add_banks(_pond_arrays(id, spec))
+		return shore
 	if spec.space == "street": shore._street_ground(spec)
 	if spec.has("polygon"):
 		shore._pond = true
@@ -47,28 +165,42 @@ static func build(id: String, site_override: Dictionary = {}) -> WaterShore:
 					var point := start.lerp(end, (float(step) + 0.5) / count)
 					shore._bank_group(point + normal * sign_value * float(spec.width) * 0.47, normal * sign_value, index, false)
 					index += 1
+	var materials := shore._materials()
+	if shore._pond: shore._rocks.generate_normals()
+	shore._finish(shore._rocks, "BankStones", materials.rocks, true)
+	shore._finish(shore._plants, "BankReedsAndGrass", materials.plants, true)
+	shore._finish(shore._flowers, "BankFlowers", materials.flowers, false)
+	return shore
+
+func _materials() -> Dictionary:
 	var rock_material := ShaderMaterial.new()
 	rock_material.shader = preload("res://modules/fishing/shore_rock.gdshader")
-	if shore._pond: rock_material.shader = preload("res://modules/ponds/pond_stone.gdshader")
+	if _pond: rock_material.shader = preload("res://modules/ponds/pond_stone.gdshader")
 	rock_material.set_shader_parameter("stone_detail", preload("res://assets/farm/art/water/shore_stone.png"))
 	rock_material.set_shader_parameter("surface_flow", preload("res://assets/farm/art/water/surface_flow.png"))
-	shore._finish(shore._rocks, "BankStones", rock_material, true)
 	var plants := ShaderMaterial.new()
 	plants.shader = preload("res://modules/fishing/bank_plants.gdshader")
-	shore._finish(shore._plants, "BankReedsAndGrass", plants, true)
 	var flower_material := StandardMaterial3D.new()
 	flower_material.vertex_color_use_as_albedo = true
 	flower_material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	flower_material.roughness = 0.85
-	shore._finish(shore._flowers, "BankFlowers", flower_material, false)
-	return shore
+	return {"rocks": rock_material, "plants": plants, "flowers": flower_material}
+
+func _add_banks(arrays: Dictionary) -> void:
+	var materials := _materials()
+	for spec in [["rocks", "BankStones", true], ["plants", "BankReedsAndGrass", true], ["flowers", "BankFlowers", false]]:
+		var mesh := ArrayMesh.new()
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays[spec[0]])
+		_add_bank_node(spec[1], mesh, materials[spec[0]], spec[2])
 
 func _finish(surface: SurfaceTool, label: String, material: Material, shadows: bool) -> void:
+	surface.index()
+	_add_bank_node(label, surface.commit(), material, shadows)
+
+func _add_bank_node(label: String, mesh: Mesh, material: Material, shadows: bool) -> void:
 	var node := MeshInstance3D.new()
 	node.name = label
-	if _pond and label == "BankStones": surface.generate_normals()
-	surface.index()
-	node.mesh = surface.commit()
+	node.mesh = mesh
 	node.material_override = material
 	if not shadows: node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(node)
@@ -98,8 +230,8 @@ func _bank_group(point: Vector3, outward: Vector3, index: int, lake: bool) -> vo
 		for stem in (3 if lake else 2):
 			var base := origin + tangent * _rng.randf_range(-0.15, 0.15)
 			var height := _rng.randf_range(0.52, 0.86)
-			PlaceScenery._cylinder(_plants, 0.009, height, base + Vector3.UP * height * 0.5, Color("7d873d").srgb_to_linear(), Vector3.ONE, 5)
-			PlaceScenery._oval(_plants, Vector3(0.032, 0.11, 0.032), base + Vector3.UP * height, Color("a6814b").srgb_to_linear())
+			_cylinder(_plants, 0.009, height, base + Vector3.UP * height * 0.5, Color("7d873d").srgb_to_linear(), 5)
+			_oval(_plants, Vector3(0.032, 0.11, 0.032), base + Vector3.UP * height, Color("a6814b").srgb_to_linear())
 	if index % 4 == 2:
 		for flower in 3:
 			var base := origin + tangent * _rng.randf_range(-0.2, 0.2)
@@ -198,7 +330,7 @@ func _flowering_cushion(center: Vector3, tangent: Vector3) -> void:
 		var basis := Basis(Vector3.UP,-angle) * Basis(Vector3.FORWARD, _rng.randf_range(-.65,.35))
 		var tint := Color("709b39").lerp(Color("cadb72"),_rng.randf()).srgb_to_linear()
 		_plants.set_uv(Vector2(.5,.7))
-		PlaceScenery._oval(_plants,Vector3(.24,.055,.12),point,tint,basis)
+		_oval(_plants,Vector3(.24,.055,.12),point,tint,basis)
 	for flower in 9:
 		var point := center + tangent * _rng.randf_range(-.29,.29) + Vector3(_rng.randf_range(-.1,.1),0,_rng.randf_range(-.15,.15))
 		_daisy(point,_rng.randf_range(.29,.44))
@@ -218,13 +350,13 @@ func _blade(base: Vector3, yaw: float, height: float, reed: bool) -> void:
 		_quad(_plants, [start - left, start + left, end + right, end - right], color.srgb_to_linear(), t0, t1)
 
 func _daisy(base: Vector3, height: float) -> void:
-	PlaceScenery._cylinder(_flowers, 0.005, height, base + Vector3.UP * height * 0.5, Color("647a34").srgb_to_linear(), Vector3.ONE, 4)
+	_cylinder(_flowers, 0.005, height, base + Vector3.UP * height * 0.5, Color("647a34").srgb_to_linear(), 4)
 	var center := base + Vector3.UP * height
 	for petal in 6:
 		var a := float(petal) / 6.0 * TAU
 		var size := 1.65 if _pond else 1.0
-		PlaceScenery._oval(_flowers, Vector3(0.035, 0.009, 0.014) * size, center + Vector3(cos(a), 0, sin(a)) * 0.028 * size, Color("fff4ce").srgb_to_linear(), Basis(Vector3.UP, -a))
-	PlaceScenery._oval(_flowers, Vector3(0.016, 0.013, 0.016), center + Vector3.UP * 0.008, Color("dbb64a").srgb_to_linear())
+		_oval(_flowers, Vector3(0.035, 0.009, 0.014) * size, center + Vector3(cos(a), 0, sin(a)) * 0.028 * size, Color("fff4ce").srgb_to_linear(), Basis(Vector3.UP, -a))
+	_oval(_flowers, Vector3(0.016, 0.013, 0.016), center + Vector3.UP * 0.008, Color("dbb64a").srgb_to_linear())
 
 static func _quad(surface: SurfaceTool, points: Array, color: Color, v0 := 0.0, v1 := 1.0) -> void:
 	var normal: Vector3 = (points[2] - points[0]).cross(points[1] - points[0]).normalized()

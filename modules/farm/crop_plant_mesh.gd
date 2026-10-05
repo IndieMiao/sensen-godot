@@ -17,6 +17,13 @@ static func build(kind: String, body_color: Color) -> ArrayMesh:
 		"H": _chamomile(surface)
 		"H_detail": _chamomile_flowers(surface)
 		"T": _tree(surface, body_color)
+		"B": _herb(surface)
+		"P": _potato(surface)
+		"P_detail": _potato_tubers(surface, body_color)
+		"I": _chili(surface)
+		"I_detail": _chili_peppers(surface, body_color)
+		"M": _tomato(surface)
+		"M_detail": _tomato_fruit(surface, body_color)
 		"weed": _weeds(surface, body_color)
 		"soil": _soil(surface, body_color)
 	surface.index()
@@ -83,6 +90,90 @@ static func _chamomile_flowers(surface: SurfaceTool) -> void:
 			_oval(surface, Vector3(0.10, 0.065, 0.21), head + radial * 0.115,
 				Color(1.0, 0.98, 0.89), Basis(Vector3.UP, angle), 6, 2)
 		_oval(surface, Vector3(0.15, 0.10, 0.15), head + Vector3(0, 0.028, 0), Color(1.0, 0.75, 0.12), Basis.IDENTITY, 6, 2)
+
+## Herb: a low, bushy clump of paired soft leaves (basil-like), lighter than lettuce.
+static func _herb(surface: SurfaceTool) -> void:
+	var herb_light := Color(0.62, 0.84, 0.38)
+	for i in 4:
+		var angle := TAU * float(i) / 4.0 + 0.4
+		var radial := Vector3(sin(angle), 0, cos(angle))
+		var tip := radial * 0.16 + Vector3(0, 0.22 + float(i % 2) * 0.12, 0)
+		_stem(surface, Vector3(0, -0.49, 0), tip, 0.022)
+		for j in 3:
+			var at := tip * (0.45 + float(j) * 0.27)
+			for side in [-1.0, 1.0]:
+				var leaf_angle: float = angle + side * 1.2
+				var basis := Basis(Vector3.UP, leaf_angle) * Basis(Vector3.RIGHT, 0.95)
+				_oval(surface, Vector3(0.17, 0.08, 0.24) * (1.0 - float(j) * 0.18), at + Vector3(sin(leaf_angle), 0, cos(leaf_angle)) * 0.08,
+					herb_light if (i + j) % 2 == 0 else LEAF_LIGHT, basis, 8, 3)
+	_oval(surface, Vector3(0.30, 0.16, 0.30), Vector3(0, -0.36, 0), LEAF)
+
+## Potato: a broad, dark leafy mound with a few upright leaflets.
+static func _potato(surface: SurfaceTool) -> void:
+	var dark := LEAF.darkened(0.12)
+	_oval(surface, Vector3(0.78, 0.44, 0.78), Vector3(0, -0.26, 0), dark)
+	for i in 7:
+		var angle := TAU * float(i) / 7.0
+		var radial := Vector3(sin(angle), 0, cos(angle))
+		var basis := Basis(Vector3.UP, angle) * Basis(Vector3.RIGHT, 0.75)
+		_oval(surface, Vector3(0.30, 0.42, 0.14), radial * 0.27 + Vector3(0, -0.02, 0),
+			LEAF if i % 2 == 0 else dark, basis)
+	for i in 3:
+		var angle := TAU * float(i) / 3.0 + 0.5
+		_oval(surface, Vector3(0.20, 0.30, 0.12), Vector3(sin(angle), 0, cos(angle)) * 0.10 + Vector3(0, 0.22, 0),
+			LEAF_LIGHT, Basis(Vector3.UP, angle) * Basis(Vector3.RIGHT, 0.35))
+
+## Ripe potato: small white-violet flowers on top and tubers peeking out at the base.
+static func _potato_tubers(surface: SurfaceTool, body_color: Color) -> void:
+	for i in 3:
+		var angle := TAU * float(i) / 3.0 + 1.0
+		var radial := Vector3(sin(angle), 0, cos(angle))
+		_oval(surface, Vector3(0.22, 0.16, 0.18), radial * 0.36 + Vector3(0, -0.44, 0), body_color, Basis(Vector3.UP, angle), 8, 3)
+	for i in 4:
+		var angle := TAU * float(i) / 4.0 + 0.2
+		var head := Vector3(sin(angle), 0, cos(angle)) * 0.14 + Vector3(0, 0.36, 0)
+		_oval(surface, Vector3(0.12, 0.06, 0.12), head, Color(0.93, 0.89, 0.98), Basis.IDENTITY, 6, 2)
+		_oval(surface, Vector3(0.05, 0.05, 0.05), head + Vector3(0, 0.03, 0), Color(1.0, 0.82, 0.25), Basis.IDENTITY, 5, 2)
+
+## Chili: a small branching bush with narrow leaves.
+static func _chili(surface: SurfaceTool) -> void:
+	_stem(surface, Vector3(0, -0.49, 0), Vector3(0, 0.05, 0), 0.03)
+	for i in 4:
+		var angle := TAU * float(i) / 4.0 + 0.8
+		var radial := Vector3(sin(angle), 0, cos(angle))
+		var tip := radial * 0.26 + Vector3(0, 0.30 + float(i % 2) * 0.10, 0)
+		_stem(surface, Vector3(0, 0.0, 0), tip, 0.018)
+		for j in 2:
+			var basis := Basis(Vector3.UP, angle + 0.6 * float(j * 2 - 1)) * Basis(Vector3.RIGHT, 0.9)
+			_oval(surface, Vector3(0.10, 0.07, 0.26), tip * (0.6 + float(j) * 0.35), LEAF if j == 0 else LEAF_LIGHT, basis, 8, 3)
+
+## Ripe chili: glossy-looking (still matte) red cones hanging under the branches.
+static func _chili_peppers(surface: SurfaceTool, body_color: Color) -> void:
+	for i in 5:
+		var angle := TAU * float(i) / 5.0 + 0.3
+		var radial := Vector3(sin(angle), 0, cos(angle))
+		var top := radial * 0.22 + Vector3(0, 0.18 + float(i % 2) * 0.08, 0)
+		_cone(surface, top - Vector3(0, 0.22, 0), top, 0.01, 0.055, body_color if i % 3 else body_color.lightened(0.12))
+		_oval(surface, Vector3(0.05, 0.04, 0.05), top + Vector3(0, 0.02, 0), STEM, Basis.IDENTITY, 5, 2)
+
+## Tomato: a leafy plant tied to a short wooden stake.
+static func _tomato(surface: SurfaceTool) -> void:
+	_box(surface, Vector3(0.06, 1.0, 0.06), Vector3(0.05, 0.0, -0.08), Color(0.62, 0.45, 0.28))
+	_stem(surface, Vector3(0, -0.49, 0), Vector3(0.02, 0.42, -0.04), 0.03)
+	for i in 6:
+		var angle := TAU * float(i) / 6.0
+		var radial := Vector3(sin(angle), 0, cos(angle))
+		var height := -0.25 + float(i) * 0.11
+		var basis := Basis(Vector3.UP, angle) * Basis(Vector3.RIGHT, 0.85)
+		_oval(surface, Vector3(0.28, 0.10, 0.34), radial * 0.18 + Vector3(0, height, 0), LEAF if i % 2 == 0 else LEAF_LIGHT, basis, 8, 3)
+
+## Ripe tomato: a cluster of round red fruit with little green caps.
+static func _tomato_fruit(surface: SurfaceTool, body_color: Color) -> void:
+	var fruit := [Vector3(0.16, -0.05, 0.10), Vector3(-0.14, 0.08, 0.12), Vector3(0.10, 0.20, -0.14), Vector3(-0.08, -0.12, -0.12)]
+	for i in fruit.size():
+		var at: Vector3 = fruit[i]
+		_oval(surface, Vector3(0.17, 0.15, 0.17), at, body_color if i % 2 == 0 else body_color.lightened(0.1), Basis.IDENTITY, 8, 4)
+		_oval(surface, Vector3(0.07, 0.03, 0.07), at + Vector3(0, 0.08, 0), STEM, Basis.IDENTITY, 5, 2)
 
 static func _weeds(surface: SurfaceTool, body_color: Color) -> void:
 	for i in 7:
