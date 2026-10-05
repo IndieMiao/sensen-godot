@@ -27,6 +27,15 @@ func _ready() -> void:
 func last_result() -> Dictionary:
 	return _last
 
+## The old layout puts the close X at the panel's safe-area top; dock it in the P0 HUD's coins/bell
+## corner instead (hidden while fishing), so it never lands on the place chip on notched screens.
+func _fit() -> void:
+	super._fit()
+	if rt == null or rt.ui._right == null: return
+	var corner: Control = rt.ui._right
+	var r := corner.get_global_rect()
+	_close_button.global_position = Vector2(r.end.x - _close_button.size.x, r.position.y + (r.size.y - _close_button.size.y) * 0.5)
+
 ## Open at the shore and cast right away (the world's main action was the Cast press).
 func open_p0(runtime: P0Runtime, water_id: String, spec: Dictionary, target: Vector3, site: String, title: String) -> void:
 	rt = runtime
@@ -41,6 +50,7 @@ func open_p0(runtime: P0Runtime, water_id: String, spec: Dictionary, target: Vec
 	_gauge.model = {}
 	_title.text = title
 	show()
+	_fit.call_deferred()
 	opened.emit(water_id)
 	_p0_cast()
 
