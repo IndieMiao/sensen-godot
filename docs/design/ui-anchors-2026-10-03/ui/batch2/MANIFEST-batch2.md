@@ -18,3 +18,19 @@
 | FARM-5 | **farm-facilities.png**（新）1.0 / 28 / 75 | 工作台抽屉三张蓝图卡（M 号格 + 缺口写在按钮上）；放置预览未出（新底图那块田已有洒水器） |
 
 收集类进度（图鉴、First times）与今日用量（HUD-2）用绿环部分填充；琥珀只用于"需要但不够"。
+
+## 10-05 下午修订（用户审 Figma Section 06，改动清单 p(6)–p(9)）
+
+生成：`python3 _gen_rev.py [farm6 skill2 profile1 profile2 bag2 soc4 bag5b]`（**在 `_gen.py` 之后跑**——`_gen.py` 的 bag2 / bag5 / pass3 是旧稿）；样式 `../kit-profile.css`（前缀 `.pf-` / `.gr-` / `.ib-`）；图标 `../icons-profile.svg`（cog / hanger / parcel / copy / people / medal / pencil / flag / plaque）。
+
+| 页 | 底图 | 要点 |
+|---|---|---|
+| FARM-6 / FARM-6-2（batch1） | **homestead-stall-v2.png**（新，无人值守：诚实箱 + 小铃） | p(6)：去掉掌柜栏，标题 `Homestead Stall`；`_gen_rev.farm6()` 原地改 batch1 页 |
+| SKILL-2 | 同上 | 由新 FARM-6 派生；浮起行 top 600 / 门禁卡 748（环境变量 LIFT 可调） |
+| PROFILE-1 | **profile-avatar.png**（新）1.05 / 2 / 79 | p(7)：全屏个人页，图上部角色立绘、880 起奶油底板 |
+| PROFILE-2 | **profile-avatar-mia.png**（新） | 他人页：Visit farm / Send a gift / Following + 密友进度一行 |
+| BAG-2 | farm.png 压暗 | p(8)：背包抽屉 `Bag | Gear`，六槽 + 当前槽列表；无 Outfit |
+| BAG-5-2 | farm.png | p(9)：满包奖励直接进包裹——铃铛下飘条 + 信箱 `Parcel` 小牌；Keep which? 删除 |
+| SOC-4 | farm.png 压暗 | p(9)：收件箱 To do / Parcels / Updates，Parcels 页 |
+
+作废：PASS-3（并入 PROFILE-1）、EQUIP-1（并入 BAG-2）、NPC-G1-5（驿站无人值守）——页面与截图已删，Figma 卡已删 / 改名。
