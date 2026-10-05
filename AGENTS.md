@@ -1,5 +1,16 @@
 # Product Direction
 
+- Current design baseline adopted on 2026-10-05: read
+  `docs/product/gameplay-plan-v2-2026-10-02.md` for all gameplay rules, numbers,
+  interactions and P0/P1/P2/P3 scope, including its latest review amendments.
+  Figma Prototype: https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955 .
+  Use `docs/README.md` and `docs/design/README.md` to find current documents.
+  Older entries below are dated implementation/release evidence, not competing
+  design authority. Obsolete design files removed from the working tree can be
+  recovered from the commit and inventory in `docs/design-cleanup-2026-10-05.md`.
+  Keep technical constraints and current data-preservation rules when relevant;
+  design cleanup does not itself authorize a release, migration or save reset.
+
 - Stylized foam added on 2026-09-30, referencing only Ameye's section 5 Foam
   as requested. Contact froth follows offline distance maps derived from the
   actual bank meshes at water Y=0.055 for all 12 fixed pond seeds. Sparse
@@ -1023,21 +1034,18 @@
   before resuming the regional-growth sequence. Keep protocol/save identifiers
   stable; localization is not a change to gameplay rules or release status.
 - The user's 2026-09-07 priority is to make this a more enjoyable map-based game.
-- For gameplay changes, read `docs/product/fun-first-rework-2026-09-07.md` first.
-- Its direction supersedes conflicting time gates, scope freezes, UI conventions,
-  balance targets, and priorities in older product documents, plans, and memos.
+- The 2026-09-07 fun-first direction is historical. For gameplay changes,
+  read `docs/product/gameplay-plan-v2-2026-10-02.md`; it supersedes the earlier
+  gameplay plans, balance targets and UI conventions.
 - Distinguish implemented behavior, proposed design, and verified player outcomes.
   The new direction is a design baseline; it does not mean the rework is shipped.
 - Preserve existing work and save integrity. Update affected contracts and tests
   when implementing new rules instead of treating historical assertions as
   immutable product requirements.
-- The user adopted the next-stage action blueprint on 2026-09-10. Read
-  `docs/product/next-stage-action-blueprint-2026-09-10.md` for current sequencing
-  and `docs/product/regional-growth-gdd-2026-09-10.md` for the design draft.
-  Compact growth/resource/validation design precedes a two-region prototype;
-  60-90 minute natural-session validation follows evidence of repeated choices.
-  Do not resume an open-ended content/polish loop merely to fill that duration.
-  Draft rules and numbers are not implemented or player-validated outcomes.
+- The 2026-09-10 action blueprint and regional-growth draft are superseded.
+  Current sequencing and exit criteria are in gameplay-plan-v2 chapter 17.
+  Keep implemented behavior, proposed design and verified player outcomes distinct;
+  draft rules and numbers are not implemented or player-validated outcomes.
 
 # Android QA Sessions
 

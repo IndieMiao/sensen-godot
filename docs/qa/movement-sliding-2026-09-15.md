@@ -58,5 +58,5 @@ Journey 正式包冷启动连上线上农场，采样无 GDScript/解析错误�
 [APK 云盘文件](https://a91obh1e4d.feishu.cn/file/XYGwbKD6aoKzDpxcEHHcWD1RnCh)。
 云盘文件大小 `133936175` 字节，与 Journey APK 一致。
 
-多人架构问题的说明与建议见[多人下矿笔记](../product/multiplayer-mine-notes-2026-09-15.md)，
+多人架构问题的说明与建议见[多人下矿笔记](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/multiplayer-mine-notes-2026-09-15.md)，
 该文是建议，未实现共享房间或多人战斗。

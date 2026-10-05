@@ -22,7 +22,7 @@
 离矿等待队列结算，未确认期间不能提交采矿、换层、装备或食用命令。
 
 本轮保留 R2 障碍边缘滑动。服务端领域版本仍为 `19`，内容为 `357a6d361d4c7ab6`，无服务端部署或存档迁移。
-仍是单人战斗；[多人架构说明](../product/multiplayer-mine-notes-2026-09-15.md)已按 R3 更新。
+仍是单人战斗；[多人架构说明](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/multiplayer-mine-notes-2026-09-15.md)已按 R3 更新。
 
 ## 验证
 

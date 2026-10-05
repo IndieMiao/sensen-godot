@@ -1,5 +1,7 @@
 # Implementation Assets
 
+> **资料范围（2026-10-05 清理）**：此页保留美术来源、技术或原日期的验证过程；旧界面/布局不是当前验收稿。当前规则和有效稿入口见 [设计索引](../README.md)。已移除的旧图按清理记录中的固定 Git 版本查阅。
+
 ## Existing Libraries Reviewed
 
 - Existing project Lucide icons: retained for actions, weather, navigation, goals and modal controls. The consistent line weight matches the approved UI boards.

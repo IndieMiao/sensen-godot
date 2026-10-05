@@ -1,5 +1,7 @@
 # 洛杉矶地图 第 9 轮反馈（2026-09-23）
 
+> **资料范围（2026-10-05 清理）**：此页保留美术来源、技术或原日期的验证过程；旧界面/布局不是当前验收稿。当前规则和有效稿入口见 [设计索引](../README.md)。已移除的旧图按清理记录中的固定 Git 版本查阅。
+
 生图渠道：Sensenjoy Image API `https://sub.sensenjoy.cn/v1`，模型 `gpt-image-2`，`/images/edits` 多参考图调用（`mockups/call_image_api.sh`）。密钥只从环境变量 `SENSENJOY_API_KEY` 读取，不落盘。
 
 ## 设计稿

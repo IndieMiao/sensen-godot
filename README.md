@@ -1,62 +1,18 @@
-# SensenAvatar
+# Sensen Godot / Gensen
 
-**2026-09-22 最新线上版：Journey Preview 0.16.12。** 农场左下角恢复明确的“行走 / 种地”切换文字，保持52px按钮和紧凑HUD。保留上一版高清UI、离屏方向头像、鱼塘对齐及原账号、地形和资产。
-[美国 DMIT 下载 Journey 更新 APK](https://download-us.sensenjoy.cn:8443/farm/releases/farm-mode-20260922-e6913c40e35e/sensen-journey-farm-mode-0.16.12.apk) · [OSS 备用](https://oss.sensenjoy.cn/farm/releases/farm-mode-20260922-e6913c40e35e/sensen-journey-farm-mode-0.16.12.apk) · [验证与发布记录](docs/qa/farm-mode-2026-09-22.md)。模拟器买种、翻土、播种、浇水和模式切换通过；最终无观察器包已安装到 V2509A，原身份与存档保留、双端下载校验均通过。
+当前玩法、数值、交互与分期以 [玩法方案 v2](docs/product/gameplay-plan-v2-2026-10-02.md) 为唯一基准，包含 2026-10-05 最新审图修订。
+原型设计：[Figma · Prototype](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955)。
 
-以下为历史功能迭代说明。
+- [文档入口与保留范围](docs/README.md)
+- [当前设计稿索引](docs/design/README.md)
+- [P0 进度与 Plane 卡片](docs/qa/p0-progress-audit-2026-10-05.md)：核心闭环已有实现，未完成 P0 出口验收。
+- [服务端技术文档](server/README.md)、[Android 工具](tools/android/README.md)、[iOS 工具](tools/ios/README.md)
 
-已加入街区、农场多人空间及组队矿井副本，单实例上限 300 人；共享矿物、怪物和清层进度，
-角色位置、动作、血量实时同步。矿井按队伍与队长当前所在实例决定重新入场后的绑定，
-组队时不会立即传送；保留旧个人矿井存档。见[产品规则](docs/product/multiplayer-spaces-2026-09-16.md)、
-[架构与协议](docs/architecture/online-spaces.md)和[验证记录](docs/qa/multiplayer-spaces-2026-09-16.md)。
-0.10.2 已上线，同步其他玩家实际保存的衣服、发型、鞋子与配饰，覆盖换装、重连和后来加入。
-见[装扮同步验证与发布](docs/qa/appearance-sync-2026-09-16.md)。保留 0.10.1 的跨区汇合和队伍农场授权，
-见[汇合规则](docs/product/party-cross-region-travel-2026-09-16.md)。
-[0.10.2 历史 Journey APK](https://oss.sensenjoy.cn/farm/releases/appearance-20260916-ed867c8e4d68/sensen-appearance-online-2026-09-16.apk)
-可覆盖旧版，保留原账号与存档；双方均需更新。下方 R5 链接保留为历史版本。
+P0 客户端位于 `scenes/p0/`、`modules/p0/`，独立规则位于 `server/src/p0/`，内容表位于 `assets/p0/`。历史 Journey 实现和发布记录保留用于维护，不是 v2 已实现或已上线的证明。版本、设备与发布状态按对应日期的 QA 记录核验，不将旧版本标为“最新”。
 
-`farm-dev` 已加入矿井即时战斗：第三层 1 只史莱姆、第四层 3 只、第五层 1 只精英，
-配套生命、移速、防御、独立武器位、铜剑与探矿靴制作、料理回血和倒下救援。
-Godot 独立试玩：`node tools/dev/run_journey.mjs --journey-combat`，或运行
-[`open_combat.command`](tools/dev/open_combat.command)。需要下述 Godot、Node 和测试数据库依赖。
-规则见[矿井战斗](docs/product/mine-combat-2026-09-15.md)，证据与限制见[验证记录](docs/qa/mine-combat-2026-09-15.md)。
-模拟器独立包 `com.sensen.journeycombatqa`；保留此前应用与存档。
-2026-09-15 已按用户要求[更新线上服务并通过飞书交付](docs/qa/combat-public-release-2026-09-15.md)，
-[Journey 战斗 R5 APK](https://oss.sensenjoy.cn/farm/releases/combat-20260915-r5-cb01c70e296a/sensen-combat-online-2026-09-15-r5.apk)可覆盖原 Journey Preview。
-R5 已上线：地图缩略图缩小并保持在角色右侧；第三、四层可清怪或清矿下楼，第五层只保留强化精英，击杀获得随机种子或矿石。见[验证与发布记录](docs/qa/mine-routes-2026-09-16.md)。
-保留 R4 仅在挥砍时显示宝剑的规则，见[验证记录](docs/qa/weapon-visibility-2026-09-15.md)。
-保留 R3 的死亡返回和命中延迟修复，见[验证记录](docs/qa/combat-latency-rescue-2026-09-15.md)。
-保留 R2 的摇杆障碍边缘滑动，见[移动验证](docs/qa/movement-sliding-2026-09-15.md)。
+## Avatar 模块技术参考
 
-`farm-dev` 已加入 SGODOT-114 邻里委托：三人需求比较、独立接取与单一追踪、放弃/换单、矿物/手作/料理交付及最近回应记录。
-Godot 独立试玩：`node tools/dev/run_journey.mjs --journey-requests`，或运行
-[`open_requests.command`](tools/dev/open_requests.command)。规则见[邻里委托](docs/product/npc-requests-2026-09-14.md)，Godot、模拟器与真机安装检查见[验证记录](docs/qa/npc-requests-2026-09-14.md)。114 R2 已单独安装真机，农场矿坑入口直接点击 3D 模型；原 113 应用及存档保留，尚未发布线上版本。
-
-`farm-dev` 已加入 SGODOT-113 人物属性、工具/配件装备、三件装备制作与按次数生效的料理加成。
-Godot 独立试玩：`node tools/dev/run_journey.mjs --journey-character`，或运行
-[`open_character.command`](tools/dev/open_character.command)。使用独立人物试玩存档和数据库。
-规则见[人物属性与装备](docs/product/character-equipment-2026-09-14.md)，Godot、模拟器及真机证据见[验证记录](docs/qa/character-equipment-2026-09-14.md)。113 已安装真机并完成核心流程测试，尚未发布线上版本。
-
-`farm-dev` 已加入 SGODOT-112 物品与背包：24 格、物品属性、堆叠拆合、整理筛选、工具装备、满包回退与旧档暂存。
-Godot 独立试玩：`node tools/dev/run_journey.mjs --journey-inventory`，或运行
-[`open_inventory.command`](tools/dev/open_inventory.command)。沿用下述开发依赖，使用独立背包存档和数据库。
-规则见[物品与背包](docs/product/inventory-2026-09-14.md)，Godot、模拟器及后续真机安装检查见[验证记录](docs/qa/inventory-2026-09-14.md)。尚未发布线上版本。
-
-`farm-dev` 已接入五层新手矿坑：农场入口、逐层开采、通关后的 1/5 层电梯，以及铜箍木箱和岩盐蔬菜汤。
-本地独立试玩：`node tools/dev/run_journey.mjs --journey-mining`，或运行
-[`open_mine.command`](tools/dev/open_mine.command)。需要 Godot、Node、已安装的服务端依赖及
-`server/.env` 中可用的测试数据库配置。使用独立矿坑试玩身份与数据库，关闭窗口后停止本地服务。
-规则与验证见[新手矿坑设计](docs/product/starter-mine-2026-09-14.md)和[验证记录](docs/qa/starter-mine-2026-09-14.md)。独立 Android 本地测试包已通过 vivo 真机矿坑验证；尚未部署线上或更新正式 APK。
-
-当前产品首要目标是做成更好玩的基于地图的游戏。下一轮玩法方向、首日节奏、3D 交互与验收以
-[`以好玩为先的改造方案`](docs/product/fun-first-rework-2026-09-07.md) 为准，优先于历史策划中的冲突约束。
-首个旅程切片已接入分钟级种植、采集制作、料理、庭院布置和地图地点交互；G3 存档保留兼容路径。
-实现范围、验证证据与待试玩问题见 [旅程切片记录](docs/qa/journey-slice-2026-09-07.md)。
-资源路线、持续设施和场景操作见 [第二轮记录](docs/qa/journey-expansion-2026-09-07.md)。手工作品修复地点、每轮补给选择和持久目标追踪见 [场景发现记录](docs/qa/journey-discoveries-2026-09-08.md)。本轮接入实物陈列操作、可行走侧径、来访居民交互与紧凑工作台，最新验证见 [场景操作记录](docs/qa/journey-spatial-2026-09-08.md)。
-
-本地试玩：`node tools/dev/run_journey.mjs`。需要 Godot、Node、已安装的服务端依赖，以及
-`server/.env` 中可访问的测试数据库配置。启动器创建独立的旅程试玩数据库与客户端存档，使用自然时间。
-下文保留 Avatar 模块的开发说明。
+v2 保留 Avatar 换装、钓鱼小游戏和地图交互。下文是沿用的 Avatar 管线、独立场景与测试说明，不定义 P0 玩法范围。
 
 Godot 4.7（Mobile 渲染管线）实现的角色换装（avatar）模块一期：从 Unity 项目迁移部件资产，
 在 Godot 侧完成装配、换装、存档与轻量压测。目标是把 Unity 侧已经生产的角色/部件资产
@@ -92,7 +48,7 @@ assets/avatar/
   source/                     从 Unity 工程搬运的原始 FBX/PNG（转换管线中间产物）
 
 scenes/
-  dressing_room/              换装场景（项目 main scene）
+  dressing_room/              独立换装场景（当前项目启动由 city_select 负责）
   stress_test/                批量角色压测场景（数量滑条 + direct/merged 切换 + HUD）
 
 tools/
@@ -103,7 +59,7 @@ tools/
 tests/                        gdUnit4 测试，目录结构与 modules/ 对齐，外加 pipeline/ integration/
 addons/gdUnit4/               测试框架（第三方插件）
 docs/mobile_export.md         移动端导出与真机验收指引
-docs/superpowers/             设计过程文档（spec / plan，历史记录，非运行时依赖）
+docs/superpowers/             保留的 Avatar / 地图 / 移动端技术资料及历史交接
 ```
 
 ## 跑测试
@@ -173,8 +129,8 @@ cubemap 反射、菲涅尔、alpha 等我们不消费的通道，搬过来会渲
 
 ## 两个场景怎么开
 
-- **换装场景** `res://scenes/dressing_room/dressing_room.tscn` —— 项目 main scene，直接
-  `godot --path .` 或编辑器里 F5 即可。右侧面板按槽位分类，点部件缩略图切换（异步加载，
+- **换装场景** `res://scenes/dressing_room/dressing_room.tscn` —— 独立换装入口，显式运行
+  `godot --path . res://scenes/dressing_room/dressing_room.tscn`。右侧面板按槽位分类，点部件缩略图切换（异步加载，
   切换过程原地不闪烁），底部“保存/重置”对应 `Avatar.save_outfit` / 默认配置。拖拽左键
   旋转视角。
 - **压测场景** `res://scenes/stress_test/stress_test.tscn` —— 需要显式指定打开：

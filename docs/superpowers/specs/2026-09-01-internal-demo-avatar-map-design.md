@@ -1,5 +1,7 @@
 # 内部 Demo（2026-09-04 周五）范围设计：avatar + 地图端到端
 
+> **资料范围（2026-10-05 清理）**：保留原日期的技术选型、Avatar/地图参考或交接事实。旧玩法、UI、上架目标、版本与排期不是当前任务；当前规则与分期以 [玩法方案 v2](../../product/gameplay-plan-v2-2026-10-02.md) 为准。
+
 日期：2026-09-01（周二）
 状态：已与决策者逐节确认，待实施
 上游背景：[3D 地图方案A](2026-08-25-3dmap-mapbox-research.md)、[avatar 一期](2026-08-21-avatar-godot-design.md)、[海外版重构调研](2026-08-30-overseas-refactor-research.md)

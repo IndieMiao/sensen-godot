@@ -1,6 +1,6 @@
 # 街区目标、居民交谈与交付回应
 
-日期：2026-09-09。当前方向：[以好玩为先](../product/fun-first-rework-2026-09-07.md)。
+日期：2026-09-09。当前方向：[以好玩为先](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/fun-first-rework-2026-09-07.md)。
 
 本轮完成街区居民交互缺口及一处交付后作业阻塞的修复。60–90 分钟主动内容、自然新玩家的继续意愿仍未验收。
 

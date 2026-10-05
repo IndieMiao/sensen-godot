@@ -4,7 +4,7 @@
 - 用户授权：采纳四步行动蓝图，清理/Done/关闭与其冲突的 Plane 任务，并展开紧凑设计 GDD。
 - 项目：Sensen Godot，`SGODOT`，`47d11337-c390-4b42-8b05-ef60fa2633f7`。
 - 范围：本仓库 `feat/farm-ui-playability` 的农场玩法、旧 G0–G4 阶段与相应支持事项。
-- 文档：[行动蓝图](../product/next-stage-action-blueprint-2026-09-10.md)、[GDD v0.1](../product/regional-growth-gdd-2026-09-10.md)。
+- 文档：[行动蓝图](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/next-stage-action-blueprint-2026-09-10.md)、[GDD v0.1](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/regional-growth-gdd-2026-09-10.md)。
 - 操作：状态、描述、必要的标题/优先级/父任务与模块归属更新；没有删除任务。
 
 ## 1. 当前执行入口

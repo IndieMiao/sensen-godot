@@ -3,7 +3,7 @@
 - 日期：2026-09-08。
 - 状态：本轮实现及专项验收完成；60–90 分钟自然玩家主动体验仍未验收。
 - 环境：Godot 4.7.2 原生 Mobile / Compatibility；Android 模拟器 `127.0.0.1:5561`，独立 ADB `5038`。未操作真机。
-- 方向：[以好玩为先](../product/fun-first-rework-2026-09-07.md)。
+- 方向：[以好玩为先](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/fun-first-rework-2026-09-07.md)。
 
 ## 本轮实现
 

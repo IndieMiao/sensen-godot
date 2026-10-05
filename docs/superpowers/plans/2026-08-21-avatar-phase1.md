@@ -1,5 +1,7 @@
 # Avatar 模块 Godot 一期实施计划
 
+> **资料范围（2026-10-05 清理）**：保留的 Avatar、地图、移动端技术或历史交接资料。任务勾选、版本、设备结果仅对应原日期，不要求重做已完成事项；当前玩法与UI采用 [玩法方案 v2](../../product/gameplay-plan-v2-2026-10-02.md)，旧示例不覆盖新规则。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 在本仓库落地 avatar 部件 加载/切换/保存 的 Godot 基础框架：数据层、异步加载、双装配策略（直挂/合并）、换装场景、压测场景，以及从 Unity 工程迁移样例资产的自动化转换工具。

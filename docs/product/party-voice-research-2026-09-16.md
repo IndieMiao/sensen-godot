@@ -1,5 +1,7 @@
 # 组队语音调研与实现建议
 
+> **资料范围（2026-10-05 清理）**：当前玩法、数值、操作与分期统一以 [玩法方案 v2](gameplay-plan-v2-2026-10-02.md) 为准。保留 LiveKit 技术选型/部署证据，已经有历史边界；补充不定义 P0 玩法范围，旧组队人数/阶段以 v2 为准。
+
 > **已采纳的最新决定（2026-09-16）：**用户要求直接部署到现有阿里云服务器，替代下文调研阶段的 LiveKit Cloud 建议。香港 ECS 上开发/生产 LiveKit 已分别部署，域名为 `voice-dev.sensenjoy.cn` / `voice.sensenjoy.cn`，独立密钥、容器、命名空间；无新增实例或 Cloud 订阅。软件免费，现有公网流量按阿里云计费。SGODOT-126 为 **In Progress**。
 >
 > Android 原生接入和队伍 UI 已实现并通过模拟器 2/4/8 人联调；默认静音、主动开麦、收听开关、跨场景保留、后台退出、离队撤权。双向音频及强制 TURN 中继有测试证据。iOS 官方 Swift 桥接已通过 macOS / iOS Simulator 编译，Godot iOS 适配及真机跨平台验收仍待完成。部署与配置见 `server/deploy/voice/README.md`，实际发布状态见 `docs/qa/party-voice-2026-09-16.md`。

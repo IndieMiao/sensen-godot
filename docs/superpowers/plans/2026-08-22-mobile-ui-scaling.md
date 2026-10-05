@@ -1,5 +1,7 @@
 # 移动端 UI 缩放、安全区与换装取景 Implementation Plan
 
+> **资料范围（2026-10-05 清理）**：保留的 Avatar、地图、移动端技术或历史交接资料。任务勾选、版本、设备结果仅对应原日期，不要求重做已完成事项；当前玩法与UI采用 [玩法方案 v2](../../product/gameplay-plan-v2-2026-10-02.md)，旧示例不覆盖新规则。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 修复 Android 真机上 UI 过小、控件贴边点不到的问题，并把换装房间改为底部抽屉布局 + 相机按角色包围盒自适应取景。

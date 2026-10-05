@@ -1,8 +1,0 @@
-Use case: text-localization / ui-mockup.
-Image 1 is the generated SENSEN / EVERYDAY FLOWS board. Preserve all three complete viewports, game world, avatar, layout, icons, typography, background, colors and modal behavior diagram. Only correct the sale and seed purchase numbers in the LEFT Roadside stall view to match the game's actual economy.
-Harvested Radish: 6 owned, 8 each, row total 48. This row is already correct; preserve it.
-Harvested Lettuce: 3 owned, 12 each, row total 36. Replace the incorrect 8 each and 24.
-Sell all: total 84, because 48 + 36 = 84. Replace the incorrect 72.
-Seeds Radish: 0 owned, 4 each, Buy 3 · 12. This is already correct; preserve it.
-Seeds Lettuce: 3 owned, 6 each, Buy 3 · 18. Replace the incorrect 4 each and Buy 3 · 12.
-All text must remain sharp and entirely inside its existing row or button. Change only these numeric values. Do not alter the goals checklist, visitor controls, farm plots or other labels. Return the corrected design board bitmap.

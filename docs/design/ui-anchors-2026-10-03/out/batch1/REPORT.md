@@ -1,5 +1,7 @@
 # 批次 1 截图巡检报告（2026-10-03）
 
+> **资料范围（2026-10-05 清理）**：此页保留美术来源、技术或原日期的验证过程；旧界面/布局不是当前验收稿。当前规则和有效稿入口见 [设计索引](../../../README.md)。已移除的旧图按清理记录中的固定 Git 版本查阅。
+
 - 来源：`ui/batch1/*.html` 51 页（farm 组 20 · cook 组 17 · npc 组 14），经 `python3 -m http.server 8795` 本地服打开（file:// 下外链 `<use>` 图标不渲染）。
 - 工具：Playwright（Chromium）视口 1080 × 2400，逐页 `goto` → 等 networkidle + `document.fonts.ready` → 截 1080 × 2400 画布；原图落 `.playwright-mcp/batch1/`，再 cp 到本目录。
 - 产出：本目录 55 张 PNG = 51 张单页 + 4 张对比图（`contact-A/B/C/D.png`，1912 宽，每行 5 张、每张缩到 360 宽、带编号标题）；对比图源文件 `ui/contact-batch1-A..D.html`。

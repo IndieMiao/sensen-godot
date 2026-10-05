@@ -1,5 +1,7 @@
 # 2026-09-21 视觉对照证据
 
+> **资料范围（2026-10-05 清理）**：此页保留美术来源、技术或原日期的验证过程；旧界面/布局不是当前验收稿。当前规则和有效稿入口见 [设计索引](../../README.md)。已移除的旧图按清理记录中的固定 Git 版本查阅。
+
 最新结论见仓库根目录 [design-qa.md](../../../../design-qa.md)。本目录保留源稿与实际 Godot / Android 的同宽并排图；原始截图没有重绘背景或替换物品。
 
 - 完整并排：farm-comparison-final.png、bag-comparison-final.png，以及 secondary-{stall,request,kitchen,party}-comparison.png。

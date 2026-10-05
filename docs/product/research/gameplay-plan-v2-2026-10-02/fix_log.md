@@ -1,5 +1,7 @@
 # v2 校验修正处理记录（fix_log，2026-10-02）
 
+> **资料范围（2026-10-05 清理）**：当前玩法、数值、操作与分期统一以 [玩法方案 v2](../../gameplay-plan-v2-2026-10-02.md) 为准。保留为有日期的数值/审读历史证据，非当前实施规则或P0已验收证明；早期两轨/参数结果被第三轮及v2第15章替代。
+
 > 对象：verify_simulation（10 条）+ verify_consistency（30 条）共 40 条问题。原则：critical / major 全部修，minor 全部修；自包含违规行全部改写。数值改动同步到 `sim/sim_v2.py` 的 `base_config()` 并重跑（120 天 × 12 组随机种子），结果写入 `sections/15_simulation_results.md`。备份：各章修改前的副本在 `/tmp/gensen_design/v2/*.bak.md`，模拟器修改前为 `sim/sim_v2_pre_fix.py.bak`。
 
 ## 0. 结果摘要

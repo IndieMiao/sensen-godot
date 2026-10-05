@@ -1,5 +1,7 @@
 # 移动端导出与真机验收
 
+> 本页保留 Avatar 一期导出技术参考。当前 Android / iOS 发布与设备流程分别见 [Android 工具](../tools/android/README.md)、[iOS 工具](../tools/ios/README.md) 与 [发布流程](qa/release-playbook-android-ios.md)。下文 debug 签名、占位配置和旧版本示例不作为当前生产发布指令；玩法范围以 [v2](product/gameplay-plan-v2-2026-10-02.md) 为准。
+
 一期只走查“能装、能跑、帧率数据能读出来”，不追求商店上架签名/发行流程。下面按
 安装模板 → 配置 preset → 真机验收步骤，三步走。
 

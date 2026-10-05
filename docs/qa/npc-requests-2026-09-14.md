@@ -2,7 +2,7 @@
 
 日期：2026-09-14。分支：`farm-dev`。领域版本 `18`，存档结构版本 `1`。
 服务端与客户端专项、原生布局及模拟器操作检查已完成；记录至模拟器农场版本 `32`。
-未发布，未修改 Plane 状态，未完成自然玩家观察。规则见[NPC 与邻里委托](../product/npc-requests-2026-09-14.md)。
+未发布，未修改 Plane 状态，未完成自然玩家观察。规则见[NPC 与邻里委托](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/npc-requests-2026-09-14.md)。
 
 ## 已实现范围
 

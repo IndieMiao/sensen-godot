@@ -1,7 +1,0 @@
-Image 1 is the edit target. Keep the entire design board unchanged except for two precisely located corrections.
-
-CORRECTION A: In the RIGHT phone viewport there are currently only eight soil squares because the standing avatar occupies the CENTER square of the MIDDLE row. There must be NINE soil squares in a full 3-by-3 grid. Add the missing growing soil square at image coordinates approximately x=782, y=620 (native input is 1448 x 1086). It must be identical in size, shape, perspective and little plants to the square immediately to its left at x=672, y=620. Move the standing avatar into the narrow open margin to the LEFT of this grid, around x=590, y=625, reducing its size if needed to fit that margin. The avatar must stand on grass OUTSIDE all nine soil squares. Do not remove any other square. Both phone viewports must show all nine plots.
-
-CORRECTION B: In the ACTION ICONS row on the far right, replace ONLY the first interior symbol with a familiar open SCISSORS glyph, and replace ONLY the second interior symbol with a familiar diagonal SHOVEL glyph. Keep the existing circular borders, their sizes and colors. Keep the following five symbols unchanged: sprout, droplet, rain cloud, wind, wheat. Scissors should have two round finger holes and crossed blades, and the shovel should have a handle, shaft and flat digging head. Do not use plants or hand gestures for those two icons.
-
-Nothing else may change. Keep all text, controls, artwork, columns, plot-state legends, bottom docks, colors and framing. Return the corrected bitmap only.

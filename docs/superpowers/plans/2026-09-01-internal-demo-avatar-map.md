@@ -1,5 +1,7 @@
 # 2026-09-04 内部 Demo 实施计划：avatar + 地图端到端
 
+> **资料范围（2026-10-05 清理）**：保留原日期的技术选型、Avatar/地图参考或交接事实。旧玩法、UI、上架目标、版本与排期不是当前任务；当前规则与分期以 [玩法方案 v2](../../product/gameplay-plan-v2-2026-10-02.md) 为准。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 让决策者在一台 Android 真机上点完「打开 → 落在真实位置 → 周围有路人角色和留言气泡 → 拖拽有惯性、双击平滑放大 → 进换装房换一身 → 回地图角色已更新」这条链。

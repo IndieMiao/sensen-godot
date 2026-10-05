@@ -2,7 +2,7 @@
 
 - 日期：2026-09-07。
 - 目的：查明首日断档、菜单集中和地图/3D 价值不足的机制原因。
-- 结论入口：[以好玩为先的产品改造](../product/fun-first-rework-2026-09-07.md)。
+- 结论入口：[以好玩为先的产品改造](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/fun-first-rework-2026-09-07.md)。
 
 ## 证据范围
 

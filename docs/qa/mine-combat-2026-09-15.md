@@ -1,7 +1,7 @@
 # 矿井即时战斗验证
 
 日期：2026-09-15。分支 `farm-dev`，领域版本 `19`，存档结构版本 `1`。
-规则见[矿井战斗](../product/mine-combat-2026-09-15.md)。本文记录最初完成的 Godot 与 Android 模拟器工程验证。
+规则见[矿井战斗](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/mine-combat-2026-09-15.md)。本文记录最初完成的 Godot 与 Android 模拟器工程验证。
 用户随后授权上线并通过飞书交付，已完成，见[线上发布记录](combat-public-release-2026-09-15.md)。未操作真机，未完成自然玩家平衡验证。
 
 ## 可体验版本

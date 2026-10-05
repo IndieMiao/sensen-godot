@@ -22,7 +22,7 @@ ol,ul{padding-left:22px}li{margin:8px 0}kbd,code{font:13px/1.6 ui-monospace,SFMo
 <body><main>
 <h1>街角四季 · 操作指南</h1>
 <p class="meta">2026-09-06 · 分支 <code>feat/farm-ui-playability</code> · <a href="../../build/sensen-g3-physical-final.apk">Android 调试安装包</a><br>UI 按认可设计稿实装，界面为英文。G3 已完成 vivo <code>10AFAF162200319</code> 真机功能验证：870 次触控连续完成七章，并验证强退恢复与两种实存合照。原账号配置和装扮已恢复，最新普通包留在手机上；证据、性能与人工演示的剩余验收项见<a href="g3-physical-2026-09-05.md">本轮真机记录</a>。此前 UI 设计对照见<a href="../../design-qa.md">设计验收记录</a>。</p>
-<nav aria-label="章节"><a href="#map">地图与拜访</a><a href="#farm">种田与移动</a><a href="#hints">地块提示</a><a href="#panels">摊位与目标</a><a href="#dressing">城市与换装</a><a href="#qa">验证与限制</a><a href="../design/farm-ui-2026-09-05/index.html">AI 设计稿</a></nav>
+<nav aria-label="章节"><a href="#map">地图与拜访</a><a href="#farm">种田与移动</a><a href="#hints">地块提示</a><a href="#panels">摊位与目标</a><a href="#dressing">城市与换装</a><a href="#qa">验证与限制</a><a href="https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/design/farm-ui-2026-09-05/index.html">AI 设计稿</a></nav>
 <div class="intro"><p><b>点一块田，人物先走过去，再完成这块田的下一步。</b><br>初始农场为三行九格，扩建后增加第四行；镜头会为全部田块和底部选种栏留出空间。底部主按钮批量处理同一步骤；点空地可移动，落点圆环与路径圆点显示目的地。单摇杆已移除。</p></div>
 <p class="meta"><a href="../design/farm-ui-2026-09-05/qa/primary-comparison.png">地图、农场、摊位设计稿与真机对照</a> · 设计板是 AI 图像，以下实际游戏画面来自此前 UI 验收阶段。</p>
 
@@ -133,6 +133,6 @@ ol,ul{padding-left:22px}li{margin:8px 0}kbd,code{font:13px/1.6 ui-monospace,SFMo
 <p>此前 UI 阶段的 APK 安装到 vivo 后，已验证选址、清理、翻土、成熟、收获、取消、移动、卖菜、买种子、目标、访客、导演及换装界面。卖出萝卜后金币 180→228，买三颗种子后 228→216。农场和换装不再透出底层地图。当时最终包保存金发后地图即时更新，试穿银发后按返回取消，地图和存档仍保留已保存的金发。</p>
 <p>此前 UI 验证曾恢复并进入<a href="../design/farm-ui-2026-09-05/qa/vivo/farm-original-restored-final.png">原 Yuyuan Road 农场：128 金币、旧目标 7/7、九格生长作物</a>。本次 G3 测试结束后也已独立完成原配置和装扮的字节校验、默认地图入口检查、临时服务连接与测试文件清理；手机保留最新普通 APK。完整校验和发布边界见<a href="g3-physical-2026-09-05.md">G3 真机记录</a>。</p>
 <p>导演面板通过长按农场路名 3 秒打开。时间倍率、跳日和天气按钮会修改服务端 QA 农场状态，仅供测试使用。</p>
-<div class="limit"><p>小屋、井和木箱已换成原创低模环境，并在此前 UI 阶段的真机画面中显示。当时记录的井边裁切、旧出口标记等观感差异保留为历史证据；本轮修正及复测见 G3 真机记录。公共农场使用快照，没有实时多人位置同步。自由选址配套后端尚未发布到公网。四张<a href="../design/farm-ui-2026-09-05/index.html">认可设计稿</a>已用于当前布局、图标与 PNG 素材实装；具体差异与验证结果见设计验收记录。</p></div>
+<div class="limit"><p>小屋、井和木箱已换成原创低模环境，并在此前 UI 阶段的真机画面中显示。当时记录的井边裁切、旧出口标记等观感差异保留为历史证据；本轮修正及复测见 G3 真机记录。公共农场使用快照，没有实时多人位置同步。自由选址配套后端尚未发布到公网。四张<a href="https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/design/farm-ui-2026-09-05/index.html">认可设计稿</a>已用于当前布局、图标与 PNG 素材实装；具体差异与验证结果见设计验收记录。</p></div>
 <footer class="meta">源码：<code>docs/qa/farm-controls-guide.html</code> · 游戏行为或布局更新时同步维护。</footer>
 </main></body></html>

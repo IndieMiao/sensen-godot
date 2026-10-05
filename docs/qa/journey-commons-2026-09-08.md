@@ -3,7 +3,7 @@
 - 日期：2026-09-08。
 - 范围：重复委托的持久建设反馈、街道居民互动及本地验证。
 - 环境：Godot 4.7.2 Mobile / Compatibility，Android 模拟器 `127.0.0.1:5561`、独立 ADB `5038`。未操作真机。
-- 产品方向：[以好玩为先](../product/fun-first-rework-2026-09-07.md)。60–90 分钟自然新玩家主动体验仍未验收。
+- 产品方向：[以好玩为先](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/fun-first-rework-2026-09-07.md)。60–90 分钟自然新玩家主动体验仍未验收。
 
 ## 实现
 

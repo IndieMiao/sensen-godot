@@ -3,7 +3,7 @@
 日期：2026-09-14。分支：`farm-dev`。领域版本 `17`，存档结构版本 `1`。
 本文记录至模拟器农场版本 `28`，区分已实现规则、自动检查与开发者操作。
 满包模拟器流程、重启恢复及最终截图已完成；未发布，未修改 Plane 状态，未完成自然玩家观察。
-规则见[人物属性与装备](../product/character-equipment-2026-09-14.md)。
+规则见[人物属性与装备](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/character-equipment-2026-09-14.md)。
 
 ## 已实现范围
 

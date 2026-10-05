@@ -1,25 +1,42 @@
-# MANIFEST · cook 组（批次 1 · 2026-10-03）
+# 批次 1 · 钓鱼、烹饪与背包操作设计
 
-共享文件（不改 kit.css / icons.svg）：`ui/kit-cook.css`、`ui/icons-cook.svg`（bobber / fish-sil / hook / koi / blob / potato / pumpkin-seeds / star）。页面由 `/tmp/gensen_design/v2/build_cook.py` 生成（HUD / 快捷栏 / guide 片段逐字节一致；COOK-2a/2b 是对 v4 源文件的字符串补丁）。
-截图须走 http（`python3 -m http.server`），`file://` 下 Chromium 拦截跨文件 `<use href>`，图标不显示（v4 锚点页同样如此）。
+更新：2026-10-05。规则以[玩法方案 v2](../../../../product/gameplay-plan-v2-2026-10-02.md)第 4、6、7、10、16 章为准；视觉对照使用 [Figma 原型](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955)。[返回设计索引](../../REPORT.md)。
 
-| 编号 | 文件 | 底图 | 图 1 | 图 2 | 未做到 / 口径说明 |
-|---|---|---|---|---|---|
-| FISH-2 | FISH-2.html | pond（画布底图压暗 + 三帧 0.30 并排） | ① 浮标下沉 + "Bite!" + "Hook" 圆钮带缩圈（虚线外圈 → 实线收缩）② 竖向收线条（绿带 + 鱼影）+ 进度环 "64%" + 小标 "Keep the fish in the green" ③ 鱼跃出 + 进度环 "100%" | — | 小游戏帧内隐藏快捷栏 / 主行动键（由 Hook 接管）；缩圈秒数不写字 |
-| FISH-3 | FISH-3.html | pond | 鱼跃定格 + 青色 "+5 XP" 飘字 + 卡 "Caught! Pond Crucian · Common"（Common 点）/ "Fish-dex 3/20" / 闪光行 "First catch! +60 XP" / 按钮 "Keep fishing"；Creel 8 · 6 free | 未做（地区鱼变体不是并排） | 行里没有 Keep · Sell 按钮，未画；底图 png 里仍有浮标与钓线（底图不可改） |
-| FISH-4 | FISH-4.html | pond | 鱼篓角标琥珀 "Creel 12 · 0 free"（0 free 红字）；主行动键置灰 + 鱼竿徽标红点 + 文案 "Creel full · 0 free slots · Sell or cook first"；键上方两枚次按钮 "Open Bag" / "Go home · Free" | 未做（背包 Fish Tab 不是并排） | 按行用 Creel 12（任务稿写 25）；键面文案 176 圆内只能排 3 行 18 px（行写"缩两行"，一行 "Creel full · 0 free slots" 放不下） |
-| FISH-5 | FISH-5.html | pond | 水面余波 + 绿色飘字 "3 Energy back" + 四件事卡 "Rare fish got away / Fishing Lv4 needed · about 30 casts / Unlocks Golden Koi, Catfish / 3 Energy back"，左侧紫色 Golden Koi 剪影 + 迷你图鉴一格点亮灰剪影；按钮 "Fish-dex" / "Keep fishing" | FISH-5-2.html：三帧 0.30 并排 ① 鱼竿不够 "Too heavy for your rod / Reed Rod · Fishing Lv3 · 80 coins / Lands Rare fish / 3 Energy back" + "Tackle Shop" / "Keep fishing" ② 保护期飘字 "It got away · Energy refunded (7 left today)" ③ 首会话首次锁（TUT-2 图 2 同卡）"Too strong / Fishing Lv 2 · 3 XP to go / Unlocks Fine fish (Perch, Bass) / 3 Energy back" | 任务稿给的 "Too strong · Fishing Lv 2 …" 是 TUT-2 变体，图 1 按 FISH-5 行画，Too strong 放到图 2 ③；图 2 超出"只做并排"规则，可删；"Got away · Lv4" 第二次飘字未画 |
-| COOK-2a | COOK-2a.html | kitchen（v5：相机推到灶台，`--cam-scale:1.85 --cam-x:-511 --cam-y:-499`，锅心落在 (540, 580)） | **第五版（2026-10-04，Recipes 与图鉴合并、锅做成 3D）**：舞台 = 场景本身——锅上悬浮选中页原料虚影（`.pot-ing.is-ghost`），锅下槽条 "Pond Crucian · have 3"（`.pot-slots`），胶囊 "Grilled Crucian · Common · 5 s · Ready to cook"（`.pot-cap`）；抽屉 60%（`.drawer.is-cookbook`）：顶栏 "Stove 1/3 · Empty · Cooking Lv2" + ✕，Tab "Cookbook 4/48"（选中）/ "Experiment"，筛选条 All 48 / Can cook 5 / Common / Fine / Rare / Legendary，详情卡 `.ck`（菜图 + 绿勾 / 名字 · 稀有度 / "+20 Energy · 5 s · Grilled · Cooked ×3 · Best ★ Good" / 一句描述 / 右侧 INGREDIENTS 列 "Pond Crucian ×1 · have 3" / 卡底 "+4 XP · 2nd today ½" + "Eat · Gift · Request · Trail" + Cook），5 列页格 `.cell.is-page`（可做绿勾 `.cb.is-cook`、Tasted 半彩 + 角签、灰剪影 `.is-hidden` + 原料族小点 `.pips`、线索点 `.pip.is-clue`、Lv4 锁 `.cb.is-lock`、Shop 角签、微光 `.is-might`），第 5 行在 `::after` 渐隐下露出一截 | `COOK-2a-2.html`（2026-10-04 重出）：All 筛选、第一周末存档（顶栏 Cooking Lv3、Tab Cookbook 9/48、Can cook 7），五种页态同屏——行 1–2 可做页绿勾按稀有度高 → 低（Herb Grilled Fish / Fresh Fish Soup / Grilled Crucian 带金签 "Mastered" / Grilled Fish / Radish Salad / Veggie Plate / Carp Fish Cakes），Fisher's Bowl 青 ◆ 新点亮、Carrot Cake 已发现缺料无角标、Mullet Skewers 半彩 "Tasted"；行 3 起：有线索的 Rare 炖锅（选中，土豆点亮 + Lv4 锁）、Fine 汤（萝卜点亮）、"Shop" 页、灰剪影 + 原料族小点、微光页，第 5 行露出 Rare 锁页；舞台与详情卡同前一版（族剪影 + 土豆、"Unknown dish · Rare" 卡、"Try in Experiment ›"）；排序规则随之写进文档 §7.2.7：可做 → 已发现缺料 → Tasted → 有线索 → 未知 | 底图只有灶 2 有锅，画面按灶 2 的锅取景（顶栏仍写 Stove 1/3，真机里锅出现在所点的灶上）；8 个新菜图标 `i-dish-salad/plate/cakes/skewer/cake/biscuit/bowl/pie` 加在 `icons-cook.svg`；状态口径：Cookbook 4/48 = Discovered 4（烤鲫鱼 ×3、烤鱼、萝卜沙拉、时蔬拼盘）+ Tasted 2（香草烤鱼缺野香草、鲜鱼汤可做）；"Can cook 5" 含 Tasted 的鲜鱼汤；描述句自拟；里程碑称号条、Kitchen Mishaps 入口、Cook All 未画；**截图必须经本机 http 服务（`python3 -m http.server 8765`），file:// 下 Chrome 不加载跨文件的 svg sprite，HUD 图标会全部消失** |
-| COOK-2b | COOK-2b.html | kitchen（同 COOK-2a 取景） | **第五版（按用户 Figma 标注 "COOK-2b-修改"）**：Pond Crucian 与 Wild Herb 的图标直接画在 3D 锅里（`.pot-ing`，带投影与轻微旋转），锅下槽条两枚圆标各带 ✕（`.pot-slot .x`）+ 第 3 枚灰锁 "Cooking Lv4 · 3rd slot"，胶囊 "? · Fine · 15 s · Unknown dish"；抽屉只剩背包（`.drawer.is-cook`）：顶栏同上，Tab "Experiment" 选中，"From your bag · 2 of 2 slots used" + "Sort · Fish first"，筛选 All / Fish 4 / Produce 4 / Fruit 1 / Seasoning 2，5 × 4 格：Pond Crucian ×2 与 Wild Herb 绿框 + 勾（`.cell.is-pot` + `.cb.is-pot`，香草用完写 "In the pot"），Golden Koi 灰显 "Not for cooking"，10 空格虚线；底部 "Mystery dishes still restore 5 Energy" + 大按钮 **"Cook"**（Free 已按用户红叉去掉） | `COOK-2b-2.html` **未重切**（仍是 v4 布局：槽位在抽屉里）——四个状态（Lv4 三槽 / 原料族标签 / 门禁卡 / 稀有原料二次确认）口径仍有效，下一轮按 v5 把槽位改画到锅下 | 用户标注的绿箭头（槽位 → 锅）在本版实现为"原料实物进锅 + 锅下槽条"，没有再画箭头；用户标注件已从 Figma 删除 |
-| COOK-3 | COOK-3.html | kitchen | 灶 2 锅上方火候环（针正入金区）+ 环下教学 "Tap when the needle hits gold!" + 锅上点按指示 + 飘字 "Nice heat! ★" + 锅下倒计时环 "0:09"；Stove 1/3 · Empty 与 Warming Cabinet 标签保留 | COOK-3-2.html：三态小卡并排 "Missed · still cooking" / "Nice heat! ★" / "Perfect! ★★ · Extra portion"（各带针位 + 品质 Plain / Good ★ / Perfect ★★）；下方 0.46 帧：两口灶火候环同时出现，Stove 3/3 灶卡放大 + 虚线振动 | 底图锅在灶 2，环按灶 2 画（顶栏口径 Stove 1/3 不受影响）；教学句与命中飘字同帧；灶 3 Ready 标 / Cookbook 标在本页省略避免压环 |
-| COOK-4 | COOK-4.html | kitchen（压暗） | 锅盖掀起 + 蒸汽 + 盘子居中带绿色微光；卡 "Herb Grilled Fish" + Fine 蓝点 + "★ Good" 角标 / "Fine · +45 Energy" / 翻页条 "New recipe! · First cooked! +20 Cooking XP · Cookbook 2/48" / 按钮 "Eat · +45 Energy" / "Keep" / 灰 "Gift later from your bag" | 未做（满包 / 满体力不是并排） | 厨房无居民 → 第三钮用灰字 "Gift later from your bag"，"Gift to Mira" 未出现；按行 +45（任务稿写 +20）；"Bag full · dish left on the stove" 未画，"Energy full" 见 COOK-7-2 |
-| COOK-6 | COOK-6.html | kitchen（压暗） | 灰烟 + 盘子倾斜 + "?" 灰褐团；卡 "Mystery Dish · +5 Energy" / "Hmm… not a dish. A clue was added to your Cookbook" + 右侧迷你图鉴页（一槽点亮 Radish）；按钮 "Eat · +5 Energy" / "Keep" | 未做（Kitchen Mishaps 页不是并排） | "Kitchen Mishaps 12" / "Brave Palate" / "Thanks, but no" 未画 |
-| COOK-7 | COOK-7.html | kitchen | CSS 替身 Avatar 举盘 + 绿色飘字 "+40 Energy"；HUD 142/200 旁加 "+40" 小标示意滚动；条 "Meals today 60/200 · resets in 7h 12m"；小标 "Newcomer Blessing · ×1.5" | COOK-7-2.html：四态小卡 2×2 "Same dish again · +20 (half)" / "Same dish · no Energy today" / "Full belly · Meals reset in 9h 12m" / "Only +12 of 40 · Eat anyway?"（Keep / Eat anyway）+ 下方置灰 "Eat · Energy full" | 底图无角色，Avatar 为 CSS 替身；数字滚动只能用 "+40" 小标示意；第四卡按钮文案属假设 |
-| BAG-3 | BAG-3.html | farm（bag.html 结构） | Fish Tab 选中；Tab 与网格之间浮出 6 行卡：金锦鲤大图 + 紫点 "Golden Koi · Rare" / "3 / 10 · Caught at Willow Pond" / "Sells for 10 · Not for cooking · Fish-dex 9/20" / "XP: 50% · Reduced" / 一句描述 / "Gift" · "Sell"；网格第 2 行 Golden Koi ×3 选中 | 未做（种子 / 工具变体不是并排） | 卡浮在网格第 1 行之上（6 行塞不进原 220 px 行内位）；Bag 改 20/25、Fish 10（多了锦鲤堆）；描述句自拟；Pin / Store / Equip 按钮未出现 |
-| BAG-4 | BAG-4.html | farm（bag.html 结构，无详情卡） | 手指把 Compost ×6 从网格第 3 行拖向快捷栏第 3 格（Pumpkin Seeds ×4）：目标格放大描亮、原格半透明、虚线轨迹、拖拽影子在网格与栏之间 | BAG-4-2.html：两帧 0.46 并排 ① 长按钉住（2026-10-04 改钉住态 v2）：格上方长按小卡 "Pin（高亮）/ Unpin（置灰，前置图钉徽标）"，Compost 格进入钉住态 = 顶边中央 36 px 琥珀实心图钉徽标（白图钉 + 1 px 深描边，一半压出格外）+ 格顶 6 px 琥珀色条 + 底色 #FBF4E6，外加琥珀虚线轻震 ② 再长按取消：提示 "Unpin"，该格回普通态——无候选则变幽灵格 "Tap to pick a seed"（带轻震） | 第 3 格落前占位改为 Pumpkin Seeds（原 bag.html 第 3 格就是 Compost，拖入无意义）；落入后出图钉的下一帧未画；取消后"自动填充有候选"的情形未画；旧的左上小红图钉 `.pin.is-new` 已退役；长按小卡放在抽屉外（抽屉 overflow 会裁掉），卡尖 ≈ y 800 紧贴抽屉顶边、离徽标 13 px |
+## 页面索引
 
-通用：HUD 头像钮沿用 v4 的隐藏 tooltip `title="Profile · Passport"`（非可见文案）；所有可见英文无中文字符；旧口径词自检通过。
+| 编号 | 当前设计源 | 内容与适用范围 |
+|---|---|---|
+| FISH-2 | [咬钩与收线](FISH-2.html) | 下沉、Hook 窗口、绿带鱼影、收线进度；小游戏期间由 Hook 接管操作区 |
+| FISH-3 | [鱼获结果](FISH-3.html) | 鱼种、稀有度、首次收集、XP 与继续钓鱼 |
+| FISH-4 | [鱼篓满](FISH-4.html) | 主动抛竿容量门禁、打开背包或回家引导 |
+| FISH-5 / FISH-5-2 | [技能门禁](FISH-5.html) · [鱼竿与保护期变体](FISH-5-2.html) | 挣脱原因、解锁目标与退还；具体 XP、次数、退款按玩法方案 |
+| COOK-2a / COOK-2a-2 | [Cookbook](COOK-2a.html) · [图鉴状态](COOK-2a-2.html) | 菜谱、已品尝、线索、未知、可做与等级锁，详情与材料需求同屏 |
+| COOK-2b / COOK-2b-2 | [Experiment](COOK-2b.html) · [投料与门禁状态](COOK-2b-2.html) | 原料进入场景中的锅，锅下槽条、第三槽解锁、族标签、稀有原料确认 |
+| COOK-3 / COOK-3-2 | [火候小游戏](COOK-3.html) · [火候结果与多灶](COOK-3-2.html) | 针入金区、Missed / Nice heat / Perfect、品质与额外份数提示 |
+| COOK-4 | [完成料理](COOK-4.html) | 料理、稀有度、品质、首次制作、Eat / Keep |
+| COOK-6 | [Mystery Dish](COOK-6.html) | 失败料理保留回能用途，并给 Cookbook 增加线索 |
+| COOK-7 / COOK-7-2 | [进食](COOK-7.html) · [重复、额度与溢出](COOK-7-2.html) | 恢复体力、今日食物额度、同菜衰减、满体力与部分收益确认 |
+| BAG-3 | [物品详情](BAG-3.html) | 鱼的来源、稀有度、用途、价格与可执行动作；材料与装备变体见批次 2 |
+| BAG-4 / BAG-4-2 | [拖入快捷栏](BAG-4.html) · [钉住与取消](BAG-4-2.html) | 背包消耗品拖入当前行动快捷栏，长按 Pin / Unpin |
 
-- 2026-10-04 烹饪面板第五版：`kit-cook.css` 末尾 `v5 cook stage` 段（`.stage / .pot-ing / .pot-slots / .pot-cap / .drawer.is-cookbook / .ck / .cell.is-page / .pips / .cb`，全部 scoped，不动共享 kit.css）；三页 1080 × 2400 无中文、无 "Cook · Free"、无 "N more to discover"；Figma Section 03 现 11 张卡（COOK-2a-2 插在 COOK-2a 之后，COOK-2a / 2b 原位替换，COOK-2b-2 说明已标"待重切"）。
+厨房总览为 [COOK-1](../kitchen.html)；基础物品网格为 [BAG-1](../bag.html)。完整背包入口是 Bag / Gear，装备与包裹分别见 [BAG-2](../batch2/BAG-2.html) 和 [SOC-4](../batch2/SOC-4.html)。
 
-- 2026-10-04 夜：`COOK-2b-2.html` 按第五版重切——三个 0.3 小帧 + 0.46 门禁帧都改成"锅在场景里（`.pot-ing`）、槽条与胶囊在锅下（`.pot-slots` / `.pot-cap`，新增 `.is-warn` 琥珀态与 `.is-pressed` 按下态）、抽屉是背包格"；小帧共用 body 的相机变量（1.85 / −511 / −499）与 `cook-stage` 轻压暗；⑤ 两件自然尺寸组件不变。
+## 当前烹饪约定
+
+点击灶台后相机推近，锅留在 3D 场景里。锅内显示选中原料，锅下显示槽条与菜品预览胶囊；下方抽屉切换 Cookbook / Experiment。Cookbook 集合菜谱查阅、发现进度与制作入口，Experiment 的抽屉显示背包原料。投料初始为 2 槽，Cooking Lv4 开第 3 槽。
+
+Cookbook 以可做、已发现但缺料、Tasted、有线索、未知区分展示；可做排序与稀有度顺序按玩法方案第 7.2.7 节。`Can cook` 可包含已品尝且材料足够的料理；已发现计数不能直接把 Tasted 一并相加。当前分镜同时保留菜谱详情、材料需求、线索原料族和等级条件。
+
+Experiment 允许从锅下槽条取回原料；投入物与背包数量联动。第三槽锁定态可见，页面底部按钮为 `Cook`。稀有鱼的不可烹饪状态与高价值材料确认依据玩法方案，不能仅根据图标是否可拖动判定规则。
+
+`COOK-2b-2` 已采用与主页面一致的场景锅、锅下槽条与原料背包结构。锅位受静态底图约束；真实实现应在玩家实际点击的灶上展示对应锅与状态。
+
+## 依赖与预览
+
+本组共享 `../kit.css`、`../icons.svg`，使用 `../kit-cook.css`、`../icons-cook.svg`；快捷栏钉住与部分分镜还复用农场样式。烹饪舞台样式为 `.stage / .pot-ing / .pot-slots / .pot-cap`，图鉴样式为 `.drawer.is-cookbook / .ck / .cell.is-page`。
+
+COOK-2a/2b 的静态取景参数为 `1.85 / −511 / −499`，锅心约在画布 `(540, 580)`。画布为 1080 × 2400。须经 HTTP 加载外链 SVG sprite，方法见[总索引](../../REPORT.md)。
+
+## 保留限制
+
+钓鱼浮标、厨房锅与人物局部仍是静态底图或 CSS 示意，不能证明动画和实际操作。Kitchen Mishaps、部分满包结果、全部菜谱里程碑等未完整展开。被动奖励满包后进入 Inbox 的规则见 [BAG-5-2](../batch2/BAG-5-2.html)；不能把鱼篓满或主动收取容量门禁视为同一状态。所有样例奖励、XP、回能与价格以玩法方案正文为准。

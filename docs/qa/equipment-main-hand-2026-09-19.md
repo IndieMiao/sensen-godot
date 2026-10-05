@@ -1,6 +1,6 @@
 # SGODOT-130 六槽装备与主手效率验证
 
-2026-09-19。规则见 [产品契约](../product/equipment-main-hand-2026-09-19.md)。本轮为 **Journey 0.16.2 / 2026091903**，仅交付 `com.sensen.journeypreview`；服务端 `equipment-20260919`，domain 25，content `50c2dbdde04c9678`。
+2026-09-19。规则见 [产品契约](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/equipment-main-hand-2026-09-19.md)。本轮为 **Journey 0.16.2 / 2026091903**，仅交付 `com.sensen.journeypreview`；服务端 `equipment-20260919`，domain 25，content `50c2dbdde04c9678`。
 
 ## 功能与保存
 

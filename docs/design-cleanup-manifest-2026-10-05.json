@@ -1,0 +1,1239 @@
+{
+  "baseline": "25b7a8a6e0574f9b0c4c97f480238e98d5d9985c",
+  "authority": "docs/product/gameplay-plan-v2-2026-10-02.md",
+  "files": [
+    {
+      "path": "docs/product/prd-brief-2026-09-10.md",
+      "reason": "以生产交换/社区共建和分钟级生产为阶段主线，已被体力—种钓—料理闭环及 P0/P1/P2 排期整体取代",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 0、2、17 章",
+      "tracked": true,
+      "bytes": 7729,
+      "sha256": "c9d2dbb7f25f5e4db2f4c5636e2016e3f3cccbdcff8bc96c5a6e38a7ce44115b",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/partner-gdd-2026-09-07.md",
+      "reason": "文内已自称早期切片记录；七日章节、四作物两料理、九格起步、成长二选一均不再是当前规则",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 5、7、8、14、17 章",
+      "tracked": true,
+      "bytes": 20809,
+      "sha256": "9e5cde6c2a4f7961c7b1dd5926e63faf3234fd34b55ff067602e806b782d35fd",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/inventory-2026-09-14.md",
+      "reason": "24 格、种子/作物/材料每堆 99、料理 20、无限期限暂存可直接做材料、工具占格均与 v2 的 25 格、分类堆叠/仓库/24h 包裹/Gear 不符",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 10 章",
+      "tracked": true,
+      "bytes": 3569,
+      "sha256": "a85bd460c4e03cc760fbadeced8171e8ba849b332a86c61b8d14a81154beddc2",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/npc-requests-2026-09-14.md",
+      "reason": "旧三居民、先共餐解锁、街边成果奖励及铜矿/木箱委托链已被 Keeper/Resident、Pip/Granny Wu、8 条 P0 委托和账号日额度取代",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 9、14、17 章",
+      "tracked": true,
+      "bytes": 4348,
+      "sha256": "df49e6fa4539ad2163bc8e909edc9319b3e6455c65d7487b2a1b1c5601be6f45",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/regional-growth-gdd-2026-09-10.md",
+      "reason": "双地域异步交换、育种棚与个人支路投资是旧阶段草案；当前 P0 不做交易，当前地域与旅行设计已完整重写",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 5、8、11、12、17 章",
+      "tracked": true,
+      "bytes": 36393,
+      "sha256": "fd9c8f17565a7bdb317f1818a09465546d6b528565be51411c3b3f29c70f6415",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/mine-combat-2026-09-15.md",
+      "reason": "无体力/无日切、300 HP 精英、旧短剑/铜剑伤害、食物回血次数效果、旧五层电梯与战利品规则不再适用；实现历史由 QA 保存",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 3、10、13 章",
+      "tracked": true,
+      "bytes": 8426,
+      "sha256": "a66cf385721f05a6b85a3f42df327b99e7ed2d32d866d83bc135131d976b2a5e",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/investor-build-2026-09-13.md",
+      "reason": "一次性投资人演示构建清单；4→6→9 田格、街区和双包历史均被新原型替代，发布事实在 QA 有完整记录",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 14、17 章；docs/qa/investor-android-2026-09-13.md",
+      "tracked": true,
+      "bytes": 6213,
+      "sha256": "bbc68990b4ea13c63c4fa3041467c4f2c7a886bca8196fe5c7b76f58e7a49929",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/equipment-main-hand-2026-09-19.md",
+      "reason": "主手统一工具与武器、双戒指/项链/手套六槽及旧伤害效率表，与 v2 独立 Hoe/Rod/Pickaxe/Weapon/Ring/Charm 的 Gear 页不符",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 10.5、13 章",
+      "tracked": true,
+      "bytes": 3175,
+      "sha256": "c27e568de4eaf1f3e5bd013080e2bbec38bbe69a5c2decdab70374eba9258c59",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/game-ui-2026-09-21.md",
+      "reason": "取消安全框的自由相机、右侧固定头像、旧顶底栏、独立人物六槽页已被 v2 操作/HUD/Profile/Bag-Gear 重做",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 10、16 章",
+      "tracked": true,
+      "bytes": 3297,
+      "sha256": "1f4de82d7e121f9f783e76c66c043aa3e959f9cd6dc2b3a80b76fb6a2c67415b",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/character-equipment-2026-09-14.md",
+      "reason": "双槽旧装备和按次数的料理生产加成，且明确不加体力；与三轨/食物回复 Energy/Gear/料理 Buff P3 冲突",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 3、7、10、13、17 章",
+      "tracked": true,
+      "bytes": 4252,
+      "sha256": "32cee125e6107f61c05c299d1da273d19eb3c69dbe27ce0b97d878c1b8ffc9d9",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/mine-camera-2026-09-24.md",
+      "reason": "近景自由平移、角色走动不跟随、离屏头像回中是旧操作合同；v2 统一摇杆与安全框跟随、双击回中",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 10.1、16.0.1 章；历史 QA 保留",
+      "tracked": true,
+      "bytes": 2445,
+      "sha256": "cad2cf8c4882fb6a3f0f2e3b0496c710204d0f3eae78a2be697a405bbd1a462f",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/mine-max-view-2026-09-25.md",
+      "reason": "旧 0.8–1.4 相机缩放与自由平移规格，不能继续约束 v2 统一安全框/场景初始构图",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 10.1、16.0.1 章；docs/qa/mine-max-view-2026-09-25.md",
+      "tracked": true,
+      "bytes": 1153,
+      "sha256": "5e6b03992635908cb9df30f36c5e2c17428e57bb7fb837ebc42204e02abe6cbb",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/fun-first-rework-2026-09-07.md",
+      "reason": "旧当前方向声明、60–90 分钟首会话、分钟级作物、旅程工程和旧阶段顺序已被 v2 30 分钟导演脚本/P0 纵切覆盖",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 0、14、17 章",
+      "tracked": true,
+      "bytes": 48911,
+      "sha256": "debb6f58749430fa216c793475b1ac121d71e5c074ffa488046bd5f261648ef1",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/map-farm-game-design.md",
+      "reason": "已明确历史探索稿；物流订单、7 日 Alpha Gate 与地图供给主循环不适用于现原型",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 0–18 章；位置隐私技术约束应保留于专门账号/地图文件",
+      "tracked": true,
+      "bytes": 222890,
+      "sha256": "9e374f41c1dae6a460b7157995dccc5effe91b82ab5a9a0164a9b591756ec0d0",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/map-farm-life-sim-direction.md",
+      "reason": "已明确 Superseded；单城三蓝图、七章活跃日、四作物两料理、无实时多人、旧数值表均过时",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 0–18 章",
+      "tracked": true,
+      "bytes": 58001,
+      "sha256": "54195e59c27f1c9dada21011b13188aa17836434f87f5981eb25c2aec4188454",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/starter-mine-2026-09-14.md",
+      "reason": "五层各六岩、仅 1/5 层永久电梯、无体力无日刷新、旧岩盐料理/木箱用途与 v2 P0 1/2 层、层费2、日2局、每层电梯/材料用途不符",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 13、17 章",
+      "tracked": true,
+      "bytes": 4251,
+      "sha256": "5d48f3b8992a171bc04c5095431eed0305bacd08cffea6ad40d2f87ecc28a63a",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/next-stage-action-blueprint-2026-09-10.md",
+      "reason": "本地化优先→双地域交换样板→60–90min 的旧执行排期；当前由 v2 P0 纵切出口定义推进",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 17 章",
+      "tracked": true,
+      "bytes": 7233,
+      "sha256": "502d6eb9f15cdbc8bcc67c6284ab21cb221916a6ba4037ab6cc09409026de6d1",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/core-loop-redesign-2026-10-02.md",
+      "reason": "v1 的 +1/15 分钟回复、食物日上限40、29页菜、两轨/工具架、旧迁移与 P0 地基内容均已被同日 v2 及后续审图重写",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第 3–18 章",
+      "tracked": true,
+      "bytes": 696591,
+      "sha256": "6b919732bc3a8b51a630580ce2390e78944334da9eff5d1ed0dfb5fdc8d7c270",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/multiplayer-mine-notes-2026-09-15.md",
+      "reason": "文内仍称不支持共享矿井、客户端模拟并建议新建房间；9月16日多人空间已实装且 v2 定义当前玩法，该旧建议不能作现架构入口",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md multiplayer-spaces-2026-09-16.md（只作为历史技术契约）；v2 第13章",
+      "tracked": true,
+      "bytes": 4008,
+      "sha256": "7346db086b09bfa60b1ed49e87710da20658a7b240a7aade4571af98a7203b1a",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/core-loop-2026-10-02/fix_log.md",
+      "reason": "v1 已淘汰数值与方案的推演/校验/输出；如首会话 Fishing Lv2=40、每竿约2体力均不是现 v2。保留同目录.py代码，历史证据可由 Git追溯。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第15章与 research/gameplay-plan-v2-2026-10-02/",
+      "tracked": true,
+      "bytes": 14134,
+      "sha256": "ee13dcf7e15eebf46e2c6ee699cfa546f213bb4176c1826a0bb65c87771eb4d9",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/core-loop-2026-10-02/verify_consistency.md",
+      "reason": "v1 已淘汰数值与方案的推演/校验/输出；如首会话 Fishing Lv2=40、每竿约2体力均不是现 v2。保留同目录.py代码，历史证据可由 Git追溯。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第15章与 research/gameplay-plan-v2-2026-10-02/",
+      "tracked": true,
+      "bytes": 34451,
+      "sha256": "feb62e853f04c5bda34ebe35ebcf3719f0463f8755ff950dd14765d96ad424d6",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/core-loop-2026-10-02/verify_feasibility.md",
+      "reason": "v1 已淘汰数值与方案的推演/校验/输出；如首会话 Fishing Lv2=40、每竿约2体力均不是现 v2。保留同目录.py代码，历史证据可由 Git追溯。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第15章与 research/gameplay-plan-v2-2026-10-02/",
+      "tracked": true,
+      "bytes": 13474,
+      "sha256": "eecb97e6cfd6348557e09812c0a915cd353aaead818c1e8110426f8769434df2",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/core-loop-2026-10-02/verify_simulation.md",
+      "reason": "v1 已淘汰数值与方案的推演/校验/输出；如首会话 Fishing Lv2=40、每竿约2体力均不是现 v2。保留同目录.py代码，历史证据可由 Git追溯。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第15章与 research/gameplay-plan-v2-2026-10-02/",
+      "tracked": true,
+      "bytes": 34271,
+      "sha256": "e04f61a9dc705e6e9e0e1148c99ba00034d1b7c223165cd2282d59bcb5bbda2e",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/gameplay-plan-v2-2026-10-02/round2-interaction/interaction_model.md",
+      "reason": "已合并入当前v2或被后续审图取代的中间设计/互斥备选稿；旧据点组/厨房等级等不再作为实施入口。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第4/7/9/10/13/16章及1.5改动清单",
+      "tracked": true,
+      "bytes": 7075,
+      "sha256": "cda36958729a92e5ac56f8e06763b8072204f44728edc7c545645df2ccbafe62",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/gameplay-plan-v2-2026-10-02/round3-cooking-mine-npc/decisions_r3.md",
+      "reason": "已合并入当前v2或被后续审图取代的中间设计/互斥备选稿；旧据点组/厨房等级等不再作为实施入口。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第4/7/9/10/13/16章及1.5改动清单",
+      "tracked": true,
+      "bytes": 5606,
+      "sha256": "d59217e40671917b321786578545bc830eb5fc27e26f2c4ed2989a9ddf40204f",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/gameplay-plan-v2-2026-10-02/round3-cooking-mine-npc/eval/A_proficiency.md",
+      "reason": "已合并入当前v2或被后续审图取代的中间设计/互斥备选稿；旧据点组/厨房等级等不再作为实施入口。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第4/7/9/10/13/16章及1.5改动清单",
+      "tracked": true,
+      "bytes": 46341,
+      "sha256": "3893c3b8ea351e551e22ea3b98639dfe9bd669332384038596bb8ac571407b25",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/gameplay-plan-v2-2026-10-02/round3-cooking-mine-npc/eval/B_kitchen_upgrade.md",
+      "reason": "已合并入当前v2或被后续审图取代的中间设计/互斥备选稿；旧据点组/厨房等级等不再作为实施入口。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第4/7/9/10/13/16章及1.5改动清单",
+      "tracked": true,
+      "bytes": 46901,
+      "sha256": "6446ac6edd5df3336e2e3ff870e86df5189ef7ff788e632657ac94d91d23cc13",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/gameplay-plan-v2-2026-10-02/round3-cooking-mine-npc/eval/C_homestead.md",
+      "reason": "已合并入当前v2或被后续审图取代的中间设计/互斥备选稿；旧据点组/厨房等级等不再作为实施入口。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第4/7/9/10/13/16章及1.5改动清单",
+      "tracked": true,
+      "bytes": 37242,
+      "sha256": "db690f0bb088cf560ba2998cb2a710830ac5b8c4210267d3381e9a144372d493",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/gameplay-plan-v2-2026-10-02/round3-cooking-mine-npc/eval/mine_floors.md",
+      "reason": "已合并入当前v2或被后续审图取代的中间设计/互斥备选稿；旧据点组/厨房等级等不再作为实施入口。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第4/7/9/10/13/16章及1.5改动清单",
+      "tracked": true,
+      "bytes": 33367,
+      "sha256": "b9f854bf7240e5dbfe2ca173a62f30d2d445c1eb6375187543b8397533dcac2a",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/gameplay-plan-v2-2026-10-02/round3-cooking-mine-npc/eval/npc_poi_rules.md",
+      "reason": "已合并入当前v2或被后续审图取代的中间设计/互斥备选稿；旧据点组/厨房等级等不再作为实施入口。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第4/7/9/10/13/16章及1.5改动清单",
+      "tracked": true,
+      "bytes": 34395,
+      "sha256": "e7c2c614f3aa1eda34d2c5d13571f15ce67547611359d39f93d963d804cd5201",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/gameplay-plan-v2-2026-10-02/round3-cooking-mine-npc/eval/redteam.md",
+      "reason": "已合并入当前v2或被后续审图取代的中间设计/互斥备选稿；旧据点组/厨房等级等不再作为实施入口。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第4/7/9/10/13/16章及1.5改动清单",
+      "tracked": true,
+      "bytes": 33709,
+      "sha256": "12f12d365132e028f89c5e655f042f91bb12e60061473fc5c211c3051f1f3527",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/gameplay-plan-v2-2026-10-02/round3-cooking-mine-npc/eval/verdict.md",
+      "reason": "已合并入当前v2或被后续审图取代的中间设计/互斥备选稿；旧据点组/厨房等级等不再作为实施入口。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第4/7/9/10/13/16章及1.5改动清单",
+      "tracked": true,
+      "bytes": 47118,
+      "sha256": "bc4e17578d90624913e4ad877d2fe802377742fb26176a2c6ad9e3f1732546b9",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/research/gameplay-plan-v2-2026-10-02/round4-npc-rooms/eval-npc-rooms-2026-10-04.md",
+      "reason": "已合并入当前v2或被后续审图取代的中间设计/互斥备选稿；旧据点组/厨房等级等不再作为实施入口。",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md 第4/7/9/10/13/16章及1.5改动清单",
+      "tracked": true,
+      "bytes": 16746,
+      "sha256": "f1eeab2102e4103cf63bc7b9f4da89b04ed8ef8484cfce99e36351d0542a5ab3",
+      "action": "delete"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-03-map-farm-mvp-implementation.md",
+      "reason": "旧 G0–G4 / 街角四季七日章节 MVP 路线已由 v2 P0/P1/P2 取代，旧固定地图与账本结论会直接误导实现。",
+      "evidence": "L26–30 的 D6 钱包/XP/关系账本、L50 固定地图 zoom/pitch，冲突 v2 §0.3、§3–16、§17。",
+      "tracked": true,
+      "bytes": 29559,
+      "sha256": "c01185222b097724215dc0b15dd4c6c97ac6509175fe367cf2791f7bbdf38ac4",
+      "action": "delete"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-03-g0a-blueprint-pipeline.md",
+      "reason": "旧三候选离线街区农场灰盒方案；64m、3畦9格与已更新自由选址/农场模型不再是当前设计依据。",
+      "evidence": "L5–15：每城三候选+安全蓝图、64m、初始9格、固定单格动作。",
+      "tracked": true,
+      "bytes": 74709,
+      "sha256": "fa7685544b67234d48586357338c1b3d3fd9596ab7a94ee8ae6666eda09562db",
+      "action": "delete"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-03-g0b-map-select-farm-greybox.md",
+      "reason": "旧受限地图三候选入场和旧农事灰盒任务单；v2明确保留无缝地图并重写操作层。",
+      "evidence": "L5–18：固定 zoom/pitch/north-up，禁缩放旋转、中文新UI；与 v2 §0.3/§10/§16 冲突。",
+      "tracked": true,
+      "bytes": 101235,
+      "sha256": "ccd650b2a0cd0c5a2a94172c32f25a2cd7b37595677d5c60f06121f388cfdbfd",
+      "action": "delete"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-04-g1a-farm-server.md",
+      "reason": "服务端实施单把旧作物时长、每日XP封顶、不可改账本断言指定为当前规则，已被体力与三轨成长取代。",
+      "evidence": "L79 作物4/8/12/18h；L122 收获每日封顶9；L137 旧七日账本不可改。",
+      "tracked": true,
+      "bytes": 16512,
+      "sha256": "e5990310f2a05113b84a8520fd22119f4a250f33f51534ed947987fde0b599ff",
+      "action": "delete"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-04-g1b-farm-client.md",
+      "reason": "旧12格/4作物、种子栏+五动作工具条、HUD只显金币的客户端任务单，被v2操作和内容范围取代。",
+      "evidence": "L126 12格，L177–178 顶部只长期显示金币、五种动作工具条；v2 §10与§17.2明确新HUD及行动径向。",
+      "tracked": true,
+      "bytes": 11841,
+      "sha256": "2ee273c271d2f383133af2af9e175e30a8bafaa06ee15f072d91da4297d3c15b",
+      "action": "delete"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-04-g2-visit-skeleton.md",
+      "reason": "依赖旧D4章节和Nearby Farmers横卡、只读Wave/Stamp拜访的任务单，当前地图表达已更新且v2社交归P2。",
+      "evidence": "L3–5 上游旧PRD、D4；L51–60 Nearby Farmers面板与Wave/Stamp；v2 §12、§17。",
+      "tracked": true,
+      "bytes": 7246,
+      "sha256": "805b7550faffd418d950c760b199f949eeac44962a2c3c8d5bdaffe209abb81d",
+      "action": "delete"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-09-04-g1a-farm-server-design.md",
+      "reason": "将旧章节经济、料理上摊、XP封顶及三居民账本定义为服务端权威的混合设计已被v2替代。可靠性/持久化现状另有server/README与docs/architecture。",
+      "evidence": "L3–11 明确上游旧PRD；L25起料理销售旧规则；v2 §0.3规定§3–16唯一规则数值来源。",
+      "tracked": true,
+      "bytes": 32664,
+      "sha256": "8ac46ffc62a6d884c74ae7690c2d12054db1bd6d9be16ad5dbe27f64f58c0d00",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/COOK-1.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 1628038,
+      "sha256": "08f2b394c812175bf2074c80d7bcba179e77bb4afd35fb6ff979b1ccd2749059",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/COOK-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 960,
+      "sha256": "1ae9b08800a948c17c21732e7d47ab728be6cb86f1948339ba3df08f721931b0",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/FARM-1.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 1827982,
+      "sha256": "53cccb1b691d6091efaac203d2bb4b8bb7f39ac9c757c5838c8a8f8ea3603fc7",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/FARM-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 959,
+      "sha256": "a7e38aec08d692edb2c1e1b4f050237336ab64d770b7fabae7431167080b35d3",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/FISH-1.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 1894633,
+      "sha256": "b7f41014ef713af42cd52f4f107f390d1232a52722efe86ecd7eef3473101ce6",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/FISH-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 959,
+      "sha256": "0b3ff53258070b5ce1018ae77168ffac1c364fb9002f9bc3753e36d10099d024",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/contact-sheet.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 1659763,
+      "sha256": "86b109313e7252b70fa349dcebb7006a3b427b7516e60535bf0381a34b90461e",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/contact-sheet.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 981,
+      "sha256": "8d02e1043a13c4392d6722ab820d7971d88fb4f6fa5d94c6e6a1547ec0085cd9",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v2/COOK-1.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 1870438,
+      "sha256": "849ec155ba214a9b3dfb19afc2c3aeb6e5b38d25619b0a8f683b1dc11612f890",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v2/COOK-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 963,
+      "sha256": "2d3a13e49b2a8a336f75e2554421c61d6ba3fcd086eef26f33683aa0d89649f5",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v2/FARM-1.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 2024648,
+      "sha256": "0d860203be385c350dfe4a8d207d95f15f4af8f655cdaa81e7ea5f7b337096f2",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v2/FARM-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 963,
+      "sha256": "23a57738091963c8486e5a9a38c555cc9ff59c74557d4a5f0682838e9ec5436f",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v2/FISH-1.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 2229624,
+      "sha256": "42014fc54118a826d0840713f7104b6c28208308772904232a4bd91c470ebcbb",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v2/FISH-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 962,
+      "sha256": "3a9960960a51fc4939ea5d9d116355fba5261c3331a814f98ab667777e31f10d",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v2/contact-sheet.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 1970161,
+      "sha256": "7fc97f333a72172318b66fb350fe12ea48147e4d5ea1cc8bf853bf6f43c0d6e8",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v2/contact-sheet.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 984,
+      "sha256": "0842b62578b89c0d54f13b38bd5817aed33386dbd76e78c6e9a5c996cb1666fc",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/ACTION-RADIAL.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 2011552,
+      "sha256": "f649642ebece958712ee3f77c8dcf9df3729d4c4412805321bfab551e587b68a",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/ACTION-RADIAL.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 984,
+      "sha256": "bfee0a36a694a7f8bd5e7ddc6878a28f0875efc00ce389d68d79da11c9153ea8",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/BAG-1.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 694485,
+      "sha256": "1e2c1ce136a60273f093632decc81343d0ae11a0a886495d9e2c15d54ac88362",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/BAG-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 959,
+      "sha256": "963205504bfc389c8333099571c948492115358c1880554be64a32b4396dda58",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/COOK-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 963,
+      "sha256": "e4461d43dccc449c5eff5fbbb28b4c4d8e271d4a1f094295b2fa1e7508146a01",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/COOK-2a-recipes.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 929943,
+      "sha256": "e6f7a708a24a3065247ba0ed39e6ab4d82b2b23feadce5d4764759b23b74fd39",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/COOK-2a-recipes.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 990,
+      "sha256": "35c4ff1cf0d45963a8f897fde26fc1ffcef64eab489f697e63b0b45d176adf25",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/COOK-2b-experiment.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 893725,
+      "sha256": "3137f93d84b5ad8859304ac597fc4c0005d294f8b7c42f2ecced6a83b92b06a5",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/COOK-2b-experiment.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 998,
+      "sha256": "e0049e4fc41b230a4fe223c3afa2c21ee14f59c355e7775e3932f54cc3132b2d",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/FARM-1.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 2023760,
+      "sha256": "de88ca786b558483ced4c10cf5a19fee1ac402a40bf43c79cfc6320c5db3e9c7",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/FARM-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 963,
+      "sha256": "84d3a5f8a34ab2af759e401517731399837ad6363d50f0632e948aaf17702984",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/FISH-1.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 2249927,
+      "sha256": "6ce68beafa2078a1133735ecef4b8dfccca48927fa02a3fc58a58147510823c4",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/FISH-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 962,
+      "sha256": "da8653e3324969bf07355b11a185c8eda499bf07770d6178cd5b1a8d7a3cbca0",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/contact-sheet.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 1890176,
+      "sha256": "d4f96a1469f224f2e2f3dc9f7ba1977b1b330158d6736fa044a62be952a8ace0",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/contact-sheet.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 984,
+      "sha256": "301ce4c15ee00b5e1887a7872b0507e4815a84158fd588f8ed7eb9d801de451a",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v4/BAG-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 959,
+      "sha256": "4da8f7487b29531932ee77eeb497fa1b029bc576e9e8119a06ab811b64c51554",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v4/EQUIP-1.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 714909,
+      "sha256": "53eb845c7cec406dd2cc5a81da124f4f70427373b1c9c06ae34f84ca33c1251e",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v4/EQUIP-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 966,
+      "sha256": "5a9a9a934b770faa2654f8ac3dc538d4df4aeedcca02d50329e9464258ff0477",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v4/FARM-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 962,
+      "sha256": "8a10286a3143cc87cf9c085d118eb1f60a4654a3dd9da3cfceb56a0565f99d00",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v4/FISH-1.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 963,
+      "sha256": "5270165b657bab7816757d37acc4175a52664ee66149176914df2a768a8ea3ec",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v4/contact-sheet.png",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": true,
+      "bytes": 1243818,
+      "sha256": "6de00168975ed49ac3f8c51d82d645065f12378ec1972e114c9703b31e80056e",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v4/contact-sheet.png.import",
+      "reason": "Initial/v2/v3/v4 snapshot copies predate latest control/cooking/bag revisions. v3 Recipes list and pot-in-panel, v4 standalone Tools & Gear are explicitly superseded. Live root HTML anchors and batch1/batch2 source pages remain.",
+      "replacement": "ui/farm.html; ui/pond.html; ui/kitchen.html; ui/batch1/BAR-2.html; ui/batch1/COOK-2a.html; ui/batch1/COOK-2b.html; ui/batch2/BAG-2.html",
+      "tracked": false,
+      "bytes": 984,
+      "sha256": "5da183c66727e28aac5f8e01fa5cbb513896e70c43b67f9193ea641e95ee19bd",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/batch1/contact-D.png",
+      "reason": "Old galleries and standalone prototype pages have current replacements. bag.html still calls tools separate and Tackle tab; cook pages use old Recipes and 2D pot. action-radial has old Mine entrance copy and tool consumables.",
+      "replacement": "Latest batch1/BAR-2 (radial), batch1/BAG-3/BAG-4 (bag), batch2/BAG-2 (Gear), batch1/COOK-2a/COOK-2b. Root farm/pond/kitchen remain.",
+      "tracked": true,
+      "bytes": 1871134,
+      "sha256": "d731a9983b43787e50bbd154f682abb5c2b973e3407db3758d909ead033dfcc4",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/batch1/contact-D.png.import",
+      "reason": "Old galleries and standalone prototype pages have current replacements. bag.html still calls tools separate and Tackle tab; cook pages use old Recipes and 2D pot. action-radial has old Mine entrance copy and tool consumables.",
+      "replacement": "Latest batch1/BAR-2 (radial), batch1/BAG-3/BAG-4 (bag), batch2/BAG-2 (Gear), batch1/COOK-2a/COOK-2b. Root farm/pond/kitchen remain.",
+      "tracked": false,
+      "bytes": 976,
+      "sha256": "e6100a0b0883a34479289fb93294c35bb1320e80c43491d9bfaf6944425fb4f0",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/action-radial.html",
+      "reason": "Old galleries and standalone prototype pages have current replacements. bag.html still calls tools separate and Tackle tab; cook pages use old Recipes and 2D pot. action-radial has old Mine entrance copy and tool consumables.",
+      "replacement": "Latest batch1/BAR-2 (radial), batch1/BAG-3/BAG-4 (bag), batch2/BAG-2 (Gear), batch1/COOK-2a/COOK-2b. Root farm/pond/kitchen remain.",
+      "tracked": true,
+      "bytes": 9522,
+      "sha256": "1e96d604d48207f68a96e086f9bb2a0a49049cae4b6a97595a966ef8d4e8cf0c",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/contact-batch1-D.html",
+      "reason": "Old galleries and standalone prototype pages have current replacements. bag.html still calls tools separate and Tackle tab; cook pages use old Recipes and 2D pot. action-radial has old Mine entrance copy and tool consumables.",
+      "replacement": "Latest batch1/BAR-2 (radial), batch1/BAG-3/BAG-4 (bag), batch2/BAG-2 (Gear), batch1/COOK-2a/COOK-2b. Root farm/pond/kitchen remain.",
+      "tracked": true,
+      "bytes": 2154,
+      "sha256": "476d41a47134977af13e98274a046e3cf3fad30a6ea686a1563735c5554bbfc8",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/contact-v2.html",
+      "reason": "Old galleries and standalone prototype pages have current replacements. bag.html still calls tools separate and Tackle tab; cook pages use old Recipes and 2D pot. action-radial has old Mine entrance copy and tool consumables.",
+      "replacement": "Latest batch1/BAR-2 (radial), batch1/BAG-3/BAG-4 (bag), batch2/BAG-2 (Gear), batch1/COOK-2a/COOK-2b. Root farm/pond/kitchen remain.",
+      "tracked": true,
+      "bytes": 1563,
+      "sha256": "5f3273b99b7168d008c228c9725f7cd535239474f85fe5c067a189d9162607e4",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/contact-v3.html",
+      "reason": "Old galleries and standalone prototype pages have current replacements. bag.html still calls tools separate and Tackle tab; cook pages use old Recipes and 2D pot. action-radial has old Mine entrance copy and tool consumables.",
+      "replacement": "Latest batch1/BAR-2 (radial), batch1/BAG-3/BAG-4 (bag), batch2/BAG-2 (Gear), batch1/COOK-2a/COOK-2b. Root farm/pond/kitchen remain.",
+      "tracked": true,
+      "bytes": 2357,
+      "sha256": "9749ee3bbab90d39db6e25440a0f4bd7a2c295dfbbfce2600bdb49762be8320d",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/contact-v4.html",
+      "reason": "Old galleries and standalone prototype pages have current replacements. bag.html still calls tools separate and Tackle tab; cook pages use old Recipes and 2D pot. action-radial has old Mine entrance copy and tool consumables.",
+      "replacement": "Latest batch1/BAR-2 (radial), batch1/BAG-3/BAG-4 (bag), batch2/BAG-2 (Gear), batch1/COOK-2a/COOK-2b. Root farm/pond/kitchen remain.",
+      "tracked": true,
+      "bytes": 2159,
+      "sha256": "30b8b2e6a1a7b2272dd508d3495fbf72c946652922531305327ea85b3dbc8292",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/contact.html",
+      "reason": "Old galleries and standalone prototype pages have current replacements. bag.html still calls tools separate and Tackle tab; cook pages use old Recipes and 2D pot. action-radial has old Mine entrance copy and tool consumables.",
+      "replacement": "Latest batch1/BAR-2 (radial), batch1/BAG-3/BAG-4 (bag), batch2/BAG-2 (Gear), batch1/COOK-2a/COOK-2b. Root farm/pond/kitchen remain.",
+      "tracked": true,
+      "bytes": 1549,
+      "sha256": "71410510c38f676b3659b37dadf37d30e5c718b3c7353bcff4c0559aa0468aaa",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/cook-experiment.html",
+      "reason": "Old galleries and standalone prototype pages have current replacements. bag.html still calls tools separate and Tackle tab; cook pages use old Recipes and 2D pot. action-radial has old Mine entrance copy and tool consumables.",
+      "replacement": "Latest batch1/BAR-2 (radial), batch1/BAG-3/BAG-4 (bag), batch2/BAG-2 (Gear), batch1/COOK-2a/COOK-2b. Root farm/pond/kitchen remain.",
+      "tracked": true,
+      "bytes": 9620,
+      "sha256": "727a3da2005d7f08ed4cde472d7fb6b99b9eb5fb4f967bc771e4211b2d22ac91",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/cook-recipes.html",
+      "reason": "Old galleries and standalone prototype pages have current replacements. bag.html still calls tools separate and Tackle tab; cook pages use old Recipes and 2D pot. action-radial has old Mine entrance copy and tool consumables.",
+      "replacement": "Latest batch1/BAR-2 (radial), batch1/BAG-3/BAG-4 (bag), batch2/BAG-2 (Gear), batch1/COOK-2a/COOK-2b. Root farm/pond/kitchen remain.",
+      "tracked": true,
+      "bytes": 9587,
+      "sha256": "0425eebca74e25be10f6c0b11bb1c0160201846542a3f7a794f92c02374f076c",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/equip.html",
+      "reason": "Old galleries and standalone prototype pages have current replacements. bag.html still calls tools separate and Tackle tab; cook pages use old Recipes and 2D pot. action-radial has old Mine entrance copy and tool consumables.",
+      "replacement": "Latest batch1/BAR-2 (radial), batch1/BAG-3/BAG-4 (bag), batch2/BAG-2 (Gear), batch1/COOK-2a/COOK-2b. Root farm/pond/kitchen remain.",
+      "tracked": true,
+      "bytes": 9615,
+      "sha256": "1b08c1097a1856a8d5d3a0c9eb76eda14381bf157141a2db52fd54d68ef9c7fe",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/kitchen-v1.log",
+      "reason": "Explicitly rejected kitchen with three fires and duplicate books",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/kitchen.png / kitchen-v2.png",
+      "tracked": true,
+      "bytes": 290,
+      "sha256": "8417a734c26221197a99f5e2a222c3940761aed102bf13f199f99bb1d18e7b75",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/kitchen-v1.png",
+      "reason": "Explicitly rejected kitchen with three fires and duplicate books",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/kitchen.png / kitchen-v2.png",
+      "tracked": true,
+      "bytes": 1635994,
+      "sha256": "bb1a021efd8ab29d95fdcf82767aabbeed886c95cf9758353f0a92a1736e3987",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/kitchen-v1.png.import",
+      "reason": "Explicitly rejected kitchen with three fires and duplicate books",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/kitchen.png / kitchen-v2.png",
+      "tracked": false,
+      "bytes": 975,
+      "sha256": "aa3f33d325a02b5f57ed474d5448293e967edf87b26e24b7c236594e6efb8811",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/kitchen-v1.prompt.txt",
+      "reason": "Explicitly rejected kitchen with three fires and duplicate books",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/kitchen.png / kitchen-v2.png",
+      "tracked": true,
+      "bytes": 2137,
+      "sha256": "88209252db846f7026b3dac84920d304bff752b4cef28631f42d65f2db2413b2",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/kitchen-v1.response.json",
+      "reason": "Explicitly rejected kitchen with three fires and duplicate books",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/kitchen.png / kitchen-v2.png",
+      "tracked": false,
+      "bytes": 2181877,
+      "sha256": "9b1433fcc8e3a2f6c9560a88761317f63cd4730db9aee4cb0a182d02c92ff1b0",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/homestead-stall.log",
+      "reason": "Old manned Bao stall replaced by unattended honest box under v2 p(6)",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/homestead-stall-v2.png",
+      "tracked": true,
+      "bytes": 298,
+      "sha256": "99ec856fc6a2ff8e8722e1add198af0229d7dcd1209e62b0fda24a49108ae0fb",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/homestead-stall.png",
+      "reason": "Old manned Bao stall replaced by unattended honest box under v2 p(6)",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/homestead-stall-v2.png",
+      "tracked": true,
+      "bytes": 1872539,
+      "sha256": "4ea8e4dae6ba71648f2710eaba7710d4337ccf3b0f5d782b5595a162a3263831",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/homestead-stall.png.import",
+      "reason": "Old manned Bao stall replaced by unattended honest box under v2 p(6)",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/homestead-stall-v2.png",
+      "tracked": false,
+      "bytes": 990,
+      "sha256": "0d6cf12b1f02fa8395b25cefc74a37f5d2b9e232285da1d644f537d29faf1ef0",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/homestead-stall.prompt.txt",
+      "reason": "Old manned Bao stall replaced by unattended honest box under v2 p(6)",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/homestead-stall-v2.png",
+      "tracked": true,
+      "bytes": 2895,
+      "sha256": "cbad2dd1b051f1223ded3ec61f78c410ea802f49be03f9c218153507170f076e",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/homestead-stall.response.json",
+      "reason": "Old manned Bao stall replaced by unattended honest box under v2 p(6)",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/homestead-stall-v2.png",
+      "tracked": false,
+      "bytes": 2497269,
+      "sha256": "f3595a848542c665a50086a59ce147b6592798f23ddcbf07ff7dd7cc23d35536",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/market-square.log",
+      "reason": "Dark-vignette first pass replaced by corrected v2 in all current HTML",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/market-square-v2.png",
+      "tracked": true,
+      "bytes": 298,
+      "sha256": "513aee45c4021b0704237a60db02ad0590c6c19488753fb0514cc040dad5724c",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/market-square.png",
+      "reason": "Dark-vignette first pass replaced by corrected v2 in all current HTML",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/market-square-v2.png",
+      "tracked": true,
+      "bytes": 2152399,
+      "sha256": "c5f556a58de331ce69f9b7068bd526198cf53f1bb731de54483677f864bc09ab",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/market-square.png.import",
+      "reason": "Dark-vignette first pass replaced by corrected v2 in all current HTML",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/market-square-v2.png",
+      "tracked": false,
+      "bytes": 984,
+      "sha256": "5ebf7d96ecbc7119961275a6a8cac3d8dc03ab607f161d15fa1ff1418a077703",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/market-square.prompt.txt",
+      "reason": "Dark-vignette first pass replaced by corrected v2 in all current HTML",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/market-square-v2.png",
+      "tracked": true,
+      "bytes": 2465,
+      "sha256": "55a449b1fa85e502394afabbe4b9f6329f769623a3038657a3da911fb5612ebe",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/market-square.response.json",
+      "reason": "Dark-vignette first pass replaced by corrected v2 in all current HTML",
+      "replacement": "docs/design/ui-anchors-2026-10-03/scenes/market-square-v2.png",
+      "tracked": false,
+      "bytes": 2870427,
+      "sha256": "adf58a1b2b9a685f7e3e1c4afa85eb7e20ca9068ea9ecd7a859fbbf6ebc38bb7",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/generated/farm-design.png",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 1508064,
+      "sha256": "e05ad25fa345776bb8f19d542797cca18d59b404177338fdfc35f3fd0007e744",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/generated/map-design.png",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 1690039,
+      "sha256": "fdf6fe74b70683f2d8b29614f86a5e77a9de03cfab57b628e2b52bc35fbfe058",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/generated/panels-design.png",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 1392929,
+      "sha256": "a72c95e96228b6aab90e7c33282dece808c63a17a0e8db4e85159cf66069a632",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/generated/secondary-design.png",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 1634637,
+      "sha256": "ce75da036fe51b3b9011aed0876c2789537c2a771d228a9475eb909ac53c3a40",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/image-prompts.md",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 4961,
+      "sha256": "4d0e56f6f8c3baf08c12ec96720d081fc31faeafd5fa34848ac411852a79c93a",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/index.html",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 6997,
+      "sha256": "7bc30578fcaa74fe47ea1359d736ca7a7c0be7bce8995fb0d6009cb67eb7a6d0",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/prompts/01-map.txt",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 3392,
+      "sha256": "e41e497557a0f5ca1d7c68355f1c9ae35c0fa0f02d39c359d92f040a9fb034f8",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/prompts/02-farm-final.txt",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 1559,
+      "sha256": "45ca6aca08f775f8fadde85600b933fd6d464646656436c5cde2ff82ec2322a7",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/prompts/02-farm-refinement.txt",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 1865,
+      "sha256": "497ab3ffda2e107cef1b5a79287e7b8b495e108717c8e6df86947ddaf37d7c2c",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/prompts/02-farm.txt",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 3727,
+      "sha256": "530eed483dbd62fc3494eebe29aefcee92ad74827db6b5b59f36e7da8735dcd9",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/prompts/03-panels-refinement.txt",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 997,
+      "sha256": "62bf84bc092c9c02f45926a79bdb02f0d0b3743d5b2eb1e4fa519bca6a809f5b",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/prompts/03-panels.txt",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 3442,
+      "sha256": "6f9c800794280ede5935d3cced656aa7004b2a2600dafbbaed8f9c8d3ac2e1b4",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/prompts/04-secondary-refinement.txt",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 1179,
+      "sha256": "5ff5dada07872d6395a66e10514b9bb4353e720045a28ff6dd694a2d0c0ea0cc",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/farm-ui-2026-09-05/prompts/04-secondary.txt",
+      "reason": "2026-09-05 tap-ground/context dock, nine-plot concepts and old prices superseded by v2 joystick/action ring/bag design.",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md §10/§16; docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 3423,
+      "sha256": "420810584e81951b4652b1f3bf416801c76141f64e6927d84bf8519941aa2aae",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/game-ui-2026-09-21/generated/bag-design.png",
+      "reason": "Blue-purple bordered farm/bag/system concept boards superseded by latest v2 UI.",
+      "replacement": "docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 1306058,
+      "sha256": "e03755fb6e8b7741fc8318550d027c9d77a6b8f32893068021fe7a78ec9862ba",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/game-ui-2026-09-21/generated/bag-design.png.import",
+      "reason": "Blue-purple bordered farm/bag/system concept boards superseded by latest v2 UI.",
+      "replacement": "docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 975,
+      "sha256": "5f5e28433e47098200639edd591675d3bf592a43918d219af2c122ddaaf0ab8b",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/game-ui-2026-09-21/generated/farm-design.png",
+      "reason": "Blue-purple bordered farm/bag/system concept boards superseded by latest v2 UI.",
+      "replacement": "docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 1459796,
+      "sha256": "18d52a2412e510c495835b90451832d5135a198e664a6a2a8b68834b69904377",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/game-ui-2026-09-21/generated/farm-design.png.import",
+      "reason": "Blue-purple bordered farm/bag/system concept boards superseded by latest v2 UI.",
+      "replacement": "docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 978,
+      "sha256": "8d621b28254177e46d04018c2ba6451c73a457da2f903d07b2fe009e12c7156f",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/game-ui-2026-09-21/generated/secondary-design.png",
+      "reason": "Blue-purple bordered farm/bag/system concept boards superseded by latest v2 UI.",
+      "replacement": "docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 1609944,
+      "sha256": "795d3e224c6b304b2a15fed79ff403506e1e01da858104f554f9c9699e062d4f",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/game-ui-2026-09-21/generated/secondary-design.png.import",
+      "reason": "Blue-purple bordered farm/bag/system concept boards superseded by latest v2 UI.",
+      "replacement": "docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 993,
+      "sha256": "24abd5960f6442a52c392adc528303fd2efaf00ae276ca710275671fa724d485",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/game-ui-2026-09-21/prompts/bag.txt",
+      "reason": "Blue-purple bordered farm/bag/system concept boards superseded by latest v2 UI.",
+      "replacement": "docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 2028,
+      "sha256": "042ec87ca0f75b3111b6a58c1cd757535db7ac8c391a942b9f97e475ef94ef53",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/game-ui-2026-09-21/prompts/farm.txt",
+      "reason": "Blue-purple bordered farm/bag/system concept boards superseded by latest v2 UI.",
+      "replacement": "docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 2098,
+      "sha256": "f20510d8e1a5375f60dd1a248f3a10fdda83316e710ff5ffaeaea2213194d16d",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/game-ui-2026-09-21/prompts/system.txt",
+      "reason": "Blue-purple bordered farm/bag/system concept boards superseded by latest v2 UI.",
+      "replacement": "docs/design/ui-anchors-2026-10-03/",
+      "tracked": true,
+      "bytes": 2144,
+      "sha256": "3f41779b3d2fe140a62b1e09813aad0c71f1907b3c9df3eea1da2d8ae7d12252",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/maki-icons-2026-09-23/sheet.png.import",
+      "reason": "Orphan Godot import descriptor; original design image already deleted",
+      "replacement": null,
+      "tracked": true,
+      "bytes": 953,
+      "sha256": "d203a32dd30f7d592d263b6d5a63c2c3f35c9191f4c49cefe13f8bc99217bdec",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-G1-5.png.import",
+      "reason": "Orphan Godot import descriptor; original design image already deleted",
+      "replacement": null,
+      "tracked": false,
+      "bytes": 973,
+      "sha256": "0fb3c27ce33a6ced219f056b7866279b8004792107d44f2516f392335bd7e8b3",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/batch2/PASS-3.png.import",
+      "reason": "Orphan Godot import descriptor; original design image already deleted",
+      "replacement": null,
+      "tracked": false,
+      "bytes": 967,
+      "sha256": "7632280dd3d36c0f3dd64bb1fc618fdcdaa7d1a565b08c9c637c153be5359a1d",
+      "action": "delete"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-03-map-farm-mvp-implementation.html",
+      "reason": "同名旧MVP计划的阅读导出，一并由v2取代",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "tracked": true,
+      "bytes": 46270,
+      "sha256": "04715f53f014d5c52bd432d9c4873dded4544647bbd2137672e360a5892b7ae3",
+      "action": "delete"
+    },
+    {
+      "path": "docs/partner_demo_runbook.md",
+      "reason": "旧9月1日一次性演示手册，当前主线已更换；历史验收记录另存",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "tracked": true,
+      "bytes": 9207,
+      "sha256": "e97829a7bbb2768acce0e817789183d2d13f3804547c1491f53cce724711da12",
+      "action": "delete"
+    },
+    {
+      "path": "docs/product/map-fishing-ponds-proposal-2026-09-24.md",
+      "reason": "系统塘旧提案已由v2与实现取代；真实水域技术调研附录提取保留于docs/reference/mapbox-water-research-2026-09-24.md",
+      "replacement": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "tracked": true,
+      "bytes": 15549,
+      "sha256": "f18309363cbfdc1d0bc48c43201f16f9abeae8beb7f25d7d64cd8ccc6a286a32",
+      "action": "delete"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v4/FARM-1.png",
+      "replacement": "docs/design/ui-anchors-2026-10-03/out/current/FARM-1.png",
+      "reason": "当前Figma仍使用的最新基础锚定图，移出旧版本目录，内容不变",
+      "tracked": true,
+      "bytes": 2025964,
+      "sha256": "3617bdcedf06f85abff2f557c9d4a8d06d88ff5bff51cdcdd69dfd1247f4c59e",
+      "action": "move"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v4/FISH-1.png",
+      "replacement": "docs/design/ui-anchors-2026-10-03/out/current/FISH-1.png",
+      "reason": "当前Figma仍使用的最新基础锚定图，移出旧版本目录，内容不变",
+      "tracked": true,
+      "bytes": 2249308,
+      "sha256": "e7eccafd38b84ba0c2ebed27ccd7236c533145bde6f963370179739af640d9b2",
+      "action": "move"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v4/BAG-1.png",
+      "replacement": "docs/design/ui-anchors-2026-10-03/out/current/BAG-1.png",
+      "reason": "当前Figma仍使用的最新基础锚定图，移出旧版本目录，内容不变",
+      "tracked": true,
+      "bytes": 698244,
+      "sha256": "0ff57091ad71bb44faf79c7f7d3f81c0eb097f9b4109384cc6d8a2696ccb7f37",
+      "action": "move"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/out/v3/COOK-1.png",
+      "replacement": "docs/design/ui-anchors-2026-10-03/out/current/COOK-1.png",
+      "reason": "当前Figma仍使用的最新基础锚定图，移出旧版本目录，内容不变",
+      "tracked": true,
+      "bytes": 1891705,
+      "sha256": "622e3315ca9340e9e73edadc911324a5a1365b1d9203970802b42cc28adfb6da",
+      "action": "move"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # 人物触摸意图与施工目标接续
 
-日期：2026-09-09。方向：[以好玩为先](../product/fun-first-rework-2026-09-07.md)。
+日期：2026-09-09。方向：[以好玩为先](https://github.com/IndieMiao/sensen-godot/blob/25b7a8a6e0574f9b0c4c97f480238e98d5d9985c/docs/product/fun-first-rework-2026-09-07.md)。
 
 本轮修复人物触摸命中、施工后的目标接续，以及地点缺种目标进入农场后的断点。使用模拟器和 Godot 验证；60–90 分钟主动内容与自然新玩家的继续意愿仍未验收。
 
