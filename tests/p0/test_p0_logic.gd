@@ -66,7 +66,7 @@ func test_today_line_names_the_nearest_crop() -> void:
 	v.names["fish_crucian"] = "Pond Crucian"
 	assert_str(P0Logic.today_line(v)).is_equal("Pond Catch · Pond Crucian 1/2")
 	v.stall.board.requests[0].have = 2
-	assert_str(P0Logic.today_line(v)).is_equal("Pond Catch · Deliver to Bao")
+	assert_str(P0Logic.today_line(v)).is_equal("Pond Catch · Deliver at the Stall")
 
 func test_projection_ticks_energy_and_ripens_crops() -> void:
 	var v := _view()

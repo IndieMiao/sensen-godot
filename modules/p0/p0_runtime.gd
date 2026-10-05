@@ -185,9 +185,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		dy -= 16.0
 	if ui.modal_kind == "stall" and events.size() > 0:
 		ui.set_view(session.current())
-		ui.open_stall(_stall_bubble(events))
+		ui.open_stall()   # refresh after Buy / Sell / Deliver; floats say what changed
 	elif ui.modal_kind == "tackle" and events.size() > 0:
-		ui.open_tackle("Strung and ready — it's on your belt. Swap rods in Tools & Gear.")
+		ui.open_tackle("Strung and ready — it's on your belt. Swap rods in Bag › Gear.")
 	elif ui.modal_kind == "gear" and events.size() == 0:
 		ui.open_gear()
 
@@ -220,14 +220,6 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
 				else "It got away · %d Energy back" % refund, where, P0Ui.GREEN_D)
 		"cancelled":
 			ui.toast("Line in · Energy back")
-
-func _stall_bubble(events: Array) -> String:
-	for ev in events:
-		if str(ev.get("kind", "")) == "coins" and int(ev.delta) > 0: return "Thanks! %d coins for those." % int(ev.delta)
-		if str(ev.get("kind", "")) == "item" and int(ev.delta) > 0:
-			var id := str(ev.id)
-			return "%d %s — %s" % [int(ev.delta), P0Logic.item_name(session.view, id), "good luck at the pond." if id.begins_with("bait_") else "happy sowing."]
-	return ""
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
@@ -297,8 +289,7 @@ func _dev_shot(dt: float) -> void:
 				ui.fab_held = true
 				ui._fab_pressed()
 			"release": ui.fab_held = false
-			"greet": ui.open_greeting()
-			"stall": ui.open_stall("", step[1] if step.size() > 1 else "")
+			"stall": ui.open_stall(step[1] if step.size() > 1 else "")
 			"bag": ui.open_bag(step[1] if step.size() > 1 else "")
 			"energy": ui.open_energy_card(3, "Sow ×1")
 			"close": ui.close_modal()

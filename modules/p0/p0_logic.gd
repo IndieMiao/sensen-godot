@@ -142,7 +142,7 @@ static func today_line(view: Dictionary) -> String:
 		if st == "sown": any_sown = true
 	for r in view.get("stall", {}).get("board", {}).get("requests", []):
 		if str(r.get("status", "")) != "accepted": continue
-		if int(r.have) >= int(r.qty): return "%s · Deliver to Bao" % str(r.title)
+		if int(r.have) >= int(r.qty): return "%s · Deliver at the Stall" % str(r.title)
 		return "%s · %s %d/%d" % [str(r.title), item_name(view, str(r.item)), int(r.have), int(r.qty)]
 	if ready != "": return "%s ready to harvest" % plural(item_name(view, ready))
 	var stove = view.get("cooking", {}).get("stove", null)
@@ -357,7 +357,7 @@ static func unlock_line(view: Dictionary, skill: String, level: int) -> String:
 		"farming":
 			for c in view.get("crops", []):
 				if int(c.get("level", 0)) == level: names.append(plural(item_name(view, str(c.id))))
-			if not names.is_empty(): return "New seeds at Bao's Stall: " + ", ".join(names)
+			if not names.is_empty(): return "New seeds at the Homestead Stall: " + ", ".join(names)
 		"cooking":
 			if level == 4: return "A 3rd pot slot · three-family dishes"
 	return ""
@@ -410,7 +410,7 @@ static func today_lines(view: Dictionary) -> Array:
 			now_lines.append("%s · %d %s · Stall Board" % [str(r.title), int(r.qty), item_name(view, str(r.item))])
 			continue
 		if str(r.get("status", "")) != "accepted": continue
-		if int(r.have) >= int(r.qty): now_lines.append("%s · Deliver to Bao" % str(r.title))
+		if int(r.have) >= int(r.qty): now_lines.append("%s · Deliver at the Stall" % str(r.title))
 		else: now_lines.append("%s · %s %d/%d" % [str(r.title), item_name(view, str(r.item)), int(r.have), int(r.qty)])
 	var ready := {}
 	var sown := 0

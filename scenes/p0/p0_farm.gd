@@ -21,12 +21,11 @@ var rt: P0Runtime
 var bp: FarmBlueprint
 var grid: BlueprintGrid
 var actor: P0Actor
-var bao: Node3D
 var crops: CropField
 var beds: MultiMeshInstance3D
 var _hi: MeshInstance3D
 var _house := Vector3.ZERO
-var _bao := Vector3.ZERO
+var _stall := Vector3.ZERO   # the Homestead Stall (unattended, p(6)); the seed box stands in until its model
 var _mine := Vector3.ZERO
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
@@ -112,7 +111,7 @@ func _build_world() -> void:
 	add_child(crops)
 	_hi = _bed_highlight()
 	add_child(_hi)
-	_spawn_bao()
+	_stall = bp.cell_to_world(bp.anchor("storage"))
 	actor = P0Actor.new()
 	add_child(actor)
 	actor.setup(bp, grid, cam)
@@ -121,23 +120,6 @@ func _build_world() -> void:
 	_focus = actor.position.lerp(_house, 0.42)
 	_cam_follow.hold()   # the opening shot stays until the player first moves
 	_place_camera()
-
-func _spawn_bao() -> void:
-	_bao = bp.cell_to_world(bp.anchor("bao"))
-	bao = Node3D.new()
-	bao.name = "Bao"
-	bao.position = _bao
-	add_child(bao)
-	var rig := Avatar.create_rig()
-	rig.assembler = AvatarAssemblerMerged.new()
-	for child in rig.get_children():
-		if child is RigActivity:
-			child.reduced_distance = 50
-			child.sleep_distance = 80
-	bao.add_child(rig)
-	rig.rotation.y = -0.35   # faces the field, half toward the camera
-	rig.config_applied.connect(func(_c): rig.play_motion("idle"))
-	rig.apply_config(Avatar.slot_table.default_config())
 
 ## A soft mint rounded-square outline on top of the bed in front of the player.
 func _bed_highlight() -> MeshInstance3D:
@@ -300,24 +282,24 @@ func _hold_repeat() -> void:
 	if str(a.get("verb", "")) != rt.ui.fab_verb: return
 	p0_action(cmd)
 
-## Facilities respond to taps only (§10.2.2): Bao (greeting first), the farmhouse (Kitchen / Rest), the mine.
+## Facilities respond to taps only (§10.2.2): the stall opens its drawer directly (unattended, p(6)),
+## the farmhouse (Kitchen / Rest), the mine.
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal() or _cooking != null: return
-	if cam.unproject_position(_bao + Vector3(0, 1.0, 0)).distance_to(screen) < 60 \
-			or cam.unproject_position(bp.cell_to_world(bp.anchor("storage")) + Vector3(0, 0.4, 0)).distance_to(screen) < 50:
-		actor.face(_bao)
-		rt.ui.open_greeting()
+	if cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
+		actor.face(_stall)
+		rt.ui.open_stall()
 	elif cam.unproject_position(_house + Vector3(0, 1.0, 0.6)).distance_to(screen) < 80:
 		rt.ui.open_home_card()
 	elif cam.unproject_position(_mine + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		rt.ui.toast("The mine opens soon")
 
 func _tags(v: Dictionary) -> void:
-	var near_bao := actor.position.distance_to(_bao) < 3.2
+	var near_stall := actor.position.distance_to(_stall) < 3.2
 	var note := ""
 	for r in v.get("stall", {}).get("board", {}).get("requests", []):
 		if str(r.status) == "open" or (str(r.status) == "accepted" and int(r.have) >= int(r.qty)): note = " · !"
-	rt.ui.tag("bao", "Bao · Tap to talk" + note, cam.unproject_position(_bao + Vector3(0, 2.15, 0)), near_bao or note != "", true)
+	rt.ui.tag("stall", "Homestead Stall · Tap to shop" + note, cam.unproject_position(_stall + Vector3(0, 1.05, 0)), near_stall or note != "", true)
 	var st = v.get("cooking", {}).get("stove", null)
 	var home := "Home · Kitchen · Rest"
 	if st != null: home = "Home · Dish ready" if float(st.get("ready_in", 0)) <= 0.0 else "Home · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))

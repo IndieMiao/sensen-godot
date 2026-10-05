@@ -64,7 +64,7 @@ func build(bp: FarmBlueprint, style: String) -> void:
 	var keep_clear := [Rect2(field_rect.position - Vector2(0.45, 0.45), field_rect.size + Vector2(0.9, 0.9)),
 		Rect2(Vector2(house.x - 0.6, field_rect.position.y - 1.8), Vector2(1.2, 1.9)),
 		Rect2(Vector2(spawn.x - 0.7, spawn.z - 1.4), Vector2(1.4, 2.2))]
-	var spots := [house, bp.cell_to_world(bp.anchor("storage")), bp.cell_to_world(bp.anchor("bao")),
+	var spots := [house, bp.cell_to_world(bp.anchor("storage")),
 		bp.cell_to_world(bp.anchor("well")), bp.cell_to_world(bp.anchor("mine"))]
 	for i in 420:
 		var point := Vector3(rng.randf_range(-3.0, 16.0), 0.01, rng.randf_range(-16.0, -11.5) if i < 220 else rng.randf_range(-11.5, 2.5))
