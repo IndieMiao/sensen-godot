@@ -18,6 +18,7 @@ var _breaks := false
 var _play_ms := 0.0
 var _last: Dictionary = {}
 var _reported := false
+var _reel_retries := 0
 
 func _ready() -> void:
 	super._ready()
@@ -166,6 +167,7 @@ func _process(dt: float) -> void:
 func _report(outcome: String) -> void:
 	if _reported: return
 	_reported = true
+	_reel_retries = 0
 	held = false
 	busy = true
 	rt.session.send({"type": "reel", "outcome": outcome})
@@ -199,6 +201,25 @@ func on_catch(ev: Dictionary, lines: Array) -> void:
 			_last = {"outcome": "cancelled"}
 			_show_notice("Line in · Energy back")
 	_refresh_button()
+
+## A command never reached the server. A lost cast changes nothing server-side: back to Cast. A lost
+## reel report would leave the line open there, so it is resent a few times before giving up.
+func on_send_failed(cmd: Dictionary) -> void:
+	match str(cmd.get("type", "")):
+		"cast":
+			busy = false
+			phase = "ready"
+			_show_notice("Couldn't reach the server · tap Cast to try again", "Not cast", "failed")
+			_refresh_button()
+		"reel":
+			if _reel_retries < 3:
+				_reel_retries += 1
+				get_tree().create_timer(1.5).timeout.connect(func(): if visible and rt: rt.session.send(cmd))
+			else:
+				busy = false
+				phase = "result"
+				_show_notice("Couldn't reach the server · the line will clear in a moment", "Connection lost", "failed")
+				_refresh_button()
 
 ## Something went wrong mid-cast (e.g. too early, line gone): settle back to ready.
 func on_abort() -> void:

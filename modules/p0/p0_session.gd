@@ -6,7 +6,8 @@ extends Node
 
 signal state_changed(view: Dictionary, events: Array)
 signal refused(code: String, detail: Dictionary, cmd: Dictionary)
-signal connection_failed(message: String)
+## cmd is the command that never reached the server ({} for state refreshes and dev calls).
+signal connection_failed(message: String, cmd: Dictionary)
 
 const DEFAULT_URL := "http://127.0.0.1:3110/v1"
 const REFRESH_S := 30.0
@@ -64,7 +65,7 @@ func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> v
 	if err != OK:
 		busy = false
 		http.queue_free()
-		connection_failed.emit("Can't reach the farm server")
+		connection_failed.emit("Can't reach the farm server", cmd)
 
 func _on_done(result: int, code: int, _h: PackedStringArray, raw: PackedByteArray, http: HTTPRequest, cmd: Dictionary) -> void:
 	busy = false
@@ -78,11 +79,11 @@ func _on_done(result: int, code: int, _h: PackedStringArray, raw: PackedByteArra
 
 func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code >= 500 or code == 0:
-		connection_failed.emit("Can't reach the farm server")
+		connection_failed.emit("Can't reach the farm server", cmd)
 		return
 	var data = JSON.parse_string(raw.get_string_from_utf8())
 	if typeof(data) != TYPE_DICTIONARY:
-		connection_failed.emit("Unexpected server reply")
+		connection_failed.emit("Unexpected server reply", cmd)
 		return
 	if data.has("state"):
 		view = data.state

@@ -191,6 +191,8 @@ func p0_event(ev: Dictionary, _v: Dictionary) -> bool:
 				return true
 		"fish_abort":
 			if panel.visible: panel.on_abort()
+		"send_failed":
+			if panel.visible: panel.on_send_failed(ev.cmd)
 	return false
 
 # ---------------------------------------------------------------- camera (old pond framing + safe box)

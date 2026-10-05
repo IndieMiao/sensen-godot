@@ -53,7 +53,10 @@ func _init() -> void:
 	ui.place_pressed.connect(leave_world)
 	session.state_changed.connect(_on_state)
 	session.refused.connect(_on_refused)
-	session.connection_failed.connect(func(msg): ui.toast(msg + " · " + session.base_url, 4.0))
+	session.connection_failed.connect(func(msg: String, cmd: Dictionary):
+		ui.toast(msg + " · " + session.base_url, 4.0)
+		# The world may be waiting on that command (a cast in flight): let it recover.
+		if not cmd.is_empty(): _call("p0_event", [{"kind": "send_failed", "cmd": cmd}, session.current()]))
 	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
 		P0Fishing.auto_play = true
 		P0Cooking.auto_play = true
