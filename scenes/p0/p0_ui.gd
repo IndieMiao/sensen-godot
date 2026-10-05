@@ -15,6 +15,8 @@ signal show_spot(where: String)
 signal home_choice(choice: String)
 signal recenter()
 signal place_pressed()
+signal home_requested()        # FISH-4 "Go home · Free"
+signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
 
 const PAPER := Color("fbf8f1")
 const CARD := Color(0.984, 0.973, 0.945, 0.94)
@@ -30,6 +32,10 @@ const TERRA := Color("f6e2d6")
 const DIS := Color("d6d5ce")
 const SEA := Color("cfe3ee")        # Old Kai's role colour (tackle · sea blue)
 const SEA_LIGHT := Color("e3eff5")
+const GOLD := Color("e9c35e")        # kit-cook --gold-light → --gold
+const GOLD_D := Color("c9962a")
+const RED := Color("e07a5f")         # --energy-red
+const XP := Color("1f8c88")          # --xp-deep (floating XP)
 
 var view: Dictionary = {}
 var root: Control
@@ -62,7 +68,11 @@ var _right: Control
 var _today_chip: Control
 var _place_chip: Control
 var _dev_box: Control
-var _creel: Label
+var _creel: PanelContainer
+var _creel_count: Label
+var _creel_free: Label
+var _fab_dot: Control
+var _fab_pills: HBoxContainer
 var _fab_badge: TextureRect
 var _switch: Button
 var player_screen := Vector2(180, 320)   # set by the farm each frame: the radial fans out from the character
@@ -199,13 +209,18 @@ func _build_hud() -> void:
 	place.add_child(ph)
 	root.add_child(place)
 	_place_chip = place
-	_creel = _label("", 9, INK, true)
-	_creel.add_theme_stylebox_override("normal", _box(CARD, 10, EDGE, 1, Vector4(8, 3, 8, 3)))
-	_creel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_creel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_creel.offset_left = -10
-	_creel.offset_right = -10
-	_creel.offset_top = 90
+	_creel = PanelContainer.new()
+	_creel.add_theme_stylebox_override("panel", _box(CARD, 11, EDGE, 1, Vector4(6, 3, 8, 3)))
+	_creel.position = Vector2(10, 91)
+	var crh := HBoxContainer.new()
+	crh.add_theme_constant_override("separation", 4)
+	crh.add_child(_icon("creel", 11))
+	_creel_count = _label("Creel 0", 9, INK, true)
+	crh.add_child(_creel_count)
+	crh.add_child(_label("·", 9, INK2, true))
+	_creel_free = _label("0 free", 9, GREEN_D, true)
+	crh.add_child(_creel_free)
+	_creel.add_child(crh)
 	_creel.hide()
 	_creel.mouse_filter = Control.MOUSE_FILTER_STOP
 	_creel.gui_input.connect(func(e: InputEvent):
@@ -247,7 +262,34 @@ func _build_fab() -> void:
 	_fab_badge = _icon("hoe", 13)
 	badge.add_child(_fab_badge)
 	_fab.add_child(badge)
+	_fab_dot = _Dot.new()
+	_fab_dot.position = Vector2(12, -6)
+	_fab_dot.size = Vector2(7, 7)
+	_fab_dot.hide()
+	_fab.add_child(_fab_dot)
 	root.add_child(_fab)
+	# FISH-4: two pills above the switch while the creel is full.
+	_fab_pills = HBoxContainer.new()
+	_fab_pills.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	_fab_pills.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_fab_pills.add_theme_constant_override("separation", 5)
+	var open_bag_pill := _pill_button("Open Bag", false)
+	open_bag_pill.pressed.connect(func(): open_bag())
+	var home_pill := _pill_button("Go home · Free", false)
+	_style_button(home_pill, PAPER, EDGE, 16)
+	home_pill.pressed.connect(func(): home_requested.emit())
+	for b in [open_bag_pill, home_pill]:
+		b.add_theme_font_size_override("font_size", 10)
+		b.custom_minimum_size = Vector2(0, 32)
+		_fab_pills.add_child(b)
+	# Right-aligned to the screen margin, 8 px above the switch; grows left to fit both pills.
+	var pills_bottom := -41.0 - 53 - 14 - 59 - 8 - 32 - 8
+	_fab_pills.offset_right = -10
+	_fab_pills.offset_left = -11
+	_fab_pills.offset_bottom = pills_bottom
+	_fab_pills.offset_top = pills_bottom - 32
+	_fab_pills.hide()
+	root.add_child(_fab_pills)
 	var sw := Button.new()
 	_switch = sw
 	sw.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -320,6 +362,7 @@ func set_surface(name: String) -> void:
 	_right.visible = world and name != "busy"   # a busy world's own close button sits in that corner
 	pad.visible = world
 	_fab.visible = action and _modal == null
+	_fab_pills.visible = _fab.visible and bool(_fab_state.get("creel_full", false))
 	_switch.visible = action
 	_bar_box.visible = action and _modal == null
 	_creel.visible = action and bar_mode == "fish"
@@ -345,9 +388,12 @@ func _refresh_bar() -> void:
 	var ids := P0Logic.quick_bar(view, [] if _bar_ids.is_empty() else _bar_ids, bar_mode)
 	if bar_mode == "fish":
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
-		_creel.text = P0Logic.creel_line(view)
-		var amber := int(view.get("bag", {}).get("free", 1)) <= 1
-		_creel.add_theme_stylebox_override("normal", _box(Color("fbf1da") if amber else CARD, 10, AMBER if amber else EDGE, 1, Vector4(8, 3, 8, 3)))
+		var free := int(view.get("bag", {}).get("free", 0))
+		_creel_count.text = P0Logic.creel_line(view).get_slice(" · ", 0)
+		_creel_free.text = "%d free" % free
+		var full := free < 1
+		_creel_free.add_theme_color_override("font_color", RED if full else GREEN_D)
+		_creel.add_theme_stylebox_override("panel", _box(GOLD if full else CARD, 11, GOLD_D if full else EDGE, 1, Vector4(6, 3, 8, 3)))
 	else:
 		if selected_seed != "" and not ids.has(selected_seed): selected_seed = ""
 		if selected_seed == "" and not ids.is_empty():
@@ -429,6 +475,17 @@ func set_action(a: Dictionary) -> void:
 	_fab_icon.texture = P0Logic.icon(str(a.get("icon", "sow")))
 	_fab_verb.text = str(a.get("verb", ""))
 	_fab_sub.text = str(a.get("sub", ""))
+	var full := bool(a.get("creel_full", false))
+	# FISH-4: the greyed key carries the whole reason in three small lines under a smaller icon.
+	_fab_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if full else TextServer.AUTOWRAP_OFF
+	_fab_sub.custom_minimum_size.x = 51.0 if full else 0.0
+	_fab_sub.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if full else Control.SIZE_FILL
+	_fab_sub.add_theme_font_size_override("font_size", 6 if full else 7)
+	_fab_verb.add_theme_font_size_override("font_size", 9 if full else 10)
+	_fab_icon.custom_minimum_size = Vector2(14, 14) if full else Vector2(20, 20)
+	_fab_icon.modulate = Color(1, 1, 1, 0.55) if full else Color.WHITE
+	_fab_dot.visible = full
+	_fab_pills.visible = full and _fab.visible
 	_fab_verb.add_theme_color_override("font_color", AMBER_D if a.get("amber", false) else (INK if a.get("enabled", false) else INK2))
 	_fab.set_meta("state", a)
 	_fab.queue_redraw()
@@ -496,6 +553,7 @@ func _drop_modal() -> void:
 	modal_kind = ""
 	_fab.visible = surface in ["farm", "pond"]
 	_bar_box.visible = surface in ["farm", "pond"]
+	_fab_pills.visible = _fab.visible and bool(_fab_state.get("creel_full", false))
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	_drop_modal()
@@ -520,6 +578,7 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	_modal = holder
 	if hide_controls:
 		_fab.visible = false
+		_fab_pills.visible = false
 		_bar_box.visible = false
 
 func _sheet(height: float, title: String, icon_id := "") -> VBoxContainer:
@@ -1310,13 +1369,10 @@ const TIPS_PATH := "user://p0_tips.json"
 ## A one-sentence card above the quick bar, once per account on this device; tap or 7 s to dismiss.
 ## Never a hand animation, never moves the player (§14.3 "不画手指动画循环").
 func teach(key: String, text: String) -> void:
-	if _taught.is_empty() and FileAccess.file_exists(TIPS_PATH):
-		var saved = JSON.parse_string(FileAccess.get_file_as_string(TIPS_PATH))
-		if saved is Dictionary: _taught = saved
+	_load_tips()
 	if _taught.has(key): return
 	_taught[key] = true
-	var f := FileAccess.open(TIPS_PATH, FileAccess.WRITE)
-	if f: f.store_string(JSON.stringify(_taught))
+	_save_tips()
 	if _teach == null:
 		_teach = PanelContainer.new()
 		_teach.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
@@ -1522,52 +1578,189 @@ func _experiment_preview() -> String:
 	return "? · %s · %d s · Unknown dish" % [P0Logic.rarity_name(view, r), int(t.get("ms", 5000)) / 1000]
 
 ## FISH-3: "Caught! Pond Crucian · Common", XP lines, Fish-dex count, first-catch line.
-func show_catch(fish_id: String, rarity: int, xp_lines: Array) -> void:
-	var card := _center_card(280)
+func show_catch(fish_id: String, rarity: int, first_xp: int) -> void:
+	# FISH-3: small cream card under the leaping fish; the scene stays bright (the +XP float is in it).
+	var v := _scene_card(0.815, 0.54, 2.5)
 	modal_kind = "card"
-	var ic := _icon(fish_id, 64)
-	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	card.add_child(ic)
-	var t := _label("Caught! %s" % P0Logic.item_name(view, fish_id), 15, INK, true)
-	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	card.add_child(t)
-	var r := _label(P0Logic.rarity_name(view, rarity), 10, P0Logic.rarity_color(rarity).darkened(0.25), true)
-	r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	card.add_child(r)
-	for line in xp_lines:
-		var l := _label(str(line), 11, Color("1e9bb0"), true)
-		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		card.add_child(l)
+	var title := HBoxContainer.new()
+	title.add_theme_constant_override("separation", 4)
+	var dot := _RarityDot.new()
+	dot.color = P0Logic.rarity_color(rarity)
+	dot.custom_minimum_size = Vector2(10, 10)
+	dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	title.add_child(dot)
+	title.add_child(_label("Caught! %s" % P0Logic.item_name(view, fish_id), 13, INK, true))
+	title.add_child(_label("·", 13, INK2, true))
+	title.add_child(_label(P0Logic.rarity_name(view, rarity), 13, P0Logic.rarity_text_color(rarity), true))
+	v.add_child(title)
 	var dex: Array = view.get("fishing", {}).get("dex", [])
 	var got := dex.filter(func(d): return int(d.get("caught", 0)) > 0).size()
-	var d := _label("Fish-dex %d/%d · %s" % [got, dex.size(), P0Logic.creel_line(view)], 9, INK2)
-	d.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	card.add_child(d)
-	card.add_child(_card_buttons())
+	v.add_child(_label("Fish-dex %d/%d" % [got, dex.size()], 9, INK2, true))
+	if first_xp > 0:
+		# First catch of a species: a gold chip that shines for under three seconds.
+		var chip := PanelContainer.new()
+		var sb := _box(GOLD, 11, GOLD_D, 1, Vector4(8, 3, 9, 3))
+		sb.shadow_color = Color(0.89, 0.70, 0.25, 0.45)
+		sb.shadow_size = 8
+		chip.add_theme_stylebox_override("panel", sb)
+		chip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		var ch := HBoxContainer.new()
+		ch.add_theme_constant_override("separation", 4)
+		ch.add_child(_icon("star", 11))
+		ch.add_child(_label("First catch! +%d XP" % first_xp, 9, INK, true))
+		chip.add_child(ch)
+		v.add_child(chip)
+		var tw := chip.create_tween().set_loops(3)
+		tw.tween_property(sb, "shadow_size", 2, 0.5)
+		tw.tween_property(sb, "shadow_size", 8, 0.5)
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(0, 5)
+	v.add_child(gap)
+	var keep := _pill_button("Keep fishing", true)
+	keep.custom_minimum_size = Vector2(0, 37)
+	keep.pressed.connect(close_modal)
+	v.add_child(keep)
 
-## FISH-5: the gate card — what got away, what it needs, what it unlocks, energy back.
+## FISH-5 / 5-2: four-line card — the fish that got away (glowing silhouette lighting up in a mini
+## Fish-dex), what it needs, what that unlocks, Energy back. Level gate, rod gate, first lock.
 func show_got_away(ev: Dictionary) -> void:
-	var card := _center_card(290)
+	var v := _scene_card(0.907, 0.46, 3.0)
 	modal_kind = "card"
 	var rarity := int(ev.get("rarity", 2))
+	var fish := str(ev.get("fish", ""))
 	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 10)
-	var sil := _icon("fish_glow", 56)
-	sil.modulate = P0Logic.rarity_color(rarity)
-	h.add_child(sil)
-	var v := VBoxContainer.new()
-	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	v.add_child(_label("%s fish got away" % P0Logic.rarity_name(view, rarity), 13, INK, true))
-	if ev.has("need_level"):
-		v.add_child(_label("Fishing Lv%d needed" % int(ev.need_level), 11, AMBER_D, true))
+	h.add_theme_constant_override("separation", 12)
+	var left := VBoxContainer.new()
+	left.custom_minimum_size = Vector2(73, 0)
+	left.add_theme_constant_override("separation", 5)
+	left.alignment = BoxContainer.ALIGNMENT_CENTER
+	var sil := _Glow.new()
+	sil.texture = P0Logic.icon("fish_glow")
+	sil.color = P0Logic.rarity_color(rarity)
+	sil.custom_minimum_size = Vector2(60, 60)
+	sil.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	left.add_child(sil)
+	left.add_child(_dex_mini(fish))
+	h.add_child(left)
+	var lines := VBoxContainer.new()
+	lines.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lines.add_theme_constant_override("separation", 1)
+	var rod_gate := not ev.has("need_level")
+	var title := ""
+	var body: Array = []
+	if rod_gate:
+		title = "Too heavy for your rod"
+		var rod := P0Logic.rod_for(view, rarity)
+		if not rod.is_empty(): body.append("%s · Fishing Lv%d · %d coins" % [str(rod.name), int(rod.level), int(rod.price)])
+		body.append("Lands %s fish" % P0Logic.rarity_name(view, rarity))
 	else:
-		v.add_child(_label("Too heavy for your rod · %s" % str(view.get("fishing", {}).get("rod", "Starter Rod")), 10, AMBER_D, true))
-	v.add_child(_label("Unlocks %s" % P0Logic.item_name(view, str(ev.get("fish", ""))), 10, INK))
-	v.add_child(_label("%d Energy back" % int(ev.get("refund", 3)), 10, GREEN_D, true))
-	if ev.has("protected_left"): v.add_child(_label("Catch protection %d left today" % int(ev.protected_left), 8, INK2))
-	h.add_child(v)
-	card.add_child(h)
-	card.add_child(_card_buttons())
+		var need := int(ev.need_level)
+		var opens := P0Logic.fish_at_level(view, need)
+		var first_lock := first_time("first_lock")
+		title = "Too strong" if first_lock else "%s fish got away" % P0Logic.rarity_name(view, rarity)
+		body.append(P0Logic.level_gate_line(view, need))
+		if not opens.is_empty():
+			var names := ", ".join(opens.slice(0, 2))
+			body.append(("Unlocks %s fish (%s)" % [P0Logic.rarity_name(view, rarity), names]) if first_lock else "Unlocks %s" % names)
+	var t := _label(title, 13, INK, true)
+	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	lines.add_child(t)
+	for line in body:
+		var l := _label(str(line), 9, INK, true)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		lines.add_child(l)
+	lines.add_child(_label("%d Energy back" % int(ev.get("refund", 3)), 9, GREEN_D, true))
+	h.add_child(lines)
+	v.add_child(h)
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(0, 5)
+	v.add_child(gap)
+	var acts := HBoxContainer.new()
+	acts.add_theme_constant_override("separation", 5)
+	var side := _pill_button("Tackle Shop" if rod_gate else "Fish-dex", false)
+	side.pressed.connect(func():
+		_drop_modal()
+		if rod_gate: tackle_requested.emit()
+		else: open_fishdex())
+	var keep := _pill_button("Keep fishing", true)
+	for b in [side, keep]:
+		b.custom_minimum_size = Vector2(0, 37)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		acts.add_child(b)
+	keep.pressed.connect(close_modal)
+	v.add_child(acts)
+
+## Six Fish-dex tiles around a fish (3 × 2, "Fish-dex" under them): caught ones in their rarity
+## colour, the one that just got away lit, the rest blank.
+func _dex_mini(fish: String) -> Control:
+	var dex: Array = view.get("fishing", {}).get("dex", []).filter(func(d):
+		var w = d.get("where", [])
+		return not (w is Array) or w.has("pond") or w.has("river"))
+	var at := maxi(0, dex.find_custom(func(d): return str(d.id) == fish))
+	var from := clampi(at - 2, 0, maxi(0, dex.size() - 6))
+	var box := PanelContainer.new()
+	box.add_theme_stylebox_override("panel", _box(Color("f1eada"), 7, EDGE, 1, Vector4(3, 3, 3, 2)))
+	box.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 2)
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 3)
+	grid.add_theme_constant_override("v_separation", 3)
+	for d in dex.slice(from, from + 6):
+		var tile := _DexTile.new()
+		tile.texture = P0Logic.icon("fish_glow")
+		tile.custom_minimum_size = Vector2(19, 19)
+		if str(d.id) == fish:
+			tile.state = "lit"
+			tile.glow = P0Logic.rarity_color(int(d.rarity))
+		elif int(d.get("caught", 0)) > 0:
+			tile.state = "caught"
+			tile.glow = P0Logic.rarity_color(int(d.rarity))
+		grid.add_child(tile)
+	col.add_child(grid)
+	var cap := _label("Fish-dex", 7, INK2, true)
+	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	col.add_child(cap)
+	box.add_child(col)
+	return box
+
+## A result card placed like the design's .modal (centred, top at a share of the screen, width a share
+## of it) over an undimmed scene. Tapping outside or the button closes it; it also closes after auto_s.
+func _scene_card(width_frac: float, top_frac: float, auto_s: float) -> VBoxContainer:
+	var vp := root.size
+	var w := roundf(vp.x * width_frac)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(w, 0)
+	panel.position = Vector2(roundf((vp.x - w) * 0.5), roundf(vp.y * top_frac))
+	panel.add_theme_stylebox_override("panel", _box(PAPER, 13, EDGE, 1, Vector4(13, 12, 13, 12)))
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 4)
+	panel.add_child(v)
+	_open_modal(panel, 0.0)
+	var holder_id := _modal.get_instance_id()
+	if auto_s > 0.0:
+		get_tree().create_timer(auto_s).timeout.connect(func():
+			if is_instance_valid(_modal) and _modal.get_instance_id() == holder_id: close_modal())
+	return v
+
+## True the first time a key comes up on this device (kept with the teaching tips).
+func first_time(key: String) -> bool:
+	_load_tips()
+	if _taught.has(key): return false
+	_taught[key] = true
+	_save_tips()
+	return true
+
+func _load_tips() -> void:
+	if _taught.is_empty() and FileAccess.file_exists(TIPS_PATH):
+		var saved = JSON.parse_string(FileAccess.get_file_as_string(TIPS_PATH))
+		if saved is Dictionary: _taught = saved
+
+func _save_tips() -> void:
+	var f := FileAccess.open(TIPS_PATH, FileAccess.WRITE)
+	if f: f.store_string(JSON.stringify(_taught))
 
 func _card_buttons() -> HBoxContainer:
 	var row := HBoxContainer.new()
@@ -1872,6 +2065,46 @@ class _TouchPad extends Control:
 		var k := _start + ((_now - _start).limit_length(RADIUS))
 		draw_circle(k, RADIUS * 0.45, Color(0.98, 0.97, 0.94, 0.95))
 		draw_circle(k, RADIUS * 0.3, Color(0.5, 0.78, 0.42))
+
+class _RarityDot extends Control:   # FISH-3 title dot: rarity colour in a cream ring
+	var color := Color.WHITE
+	func _draw() -> void:
+		draw_circle(size * 0.5, size.x * 0.5, P0Ui.PAPER)
+		draw_circle(size * 0.5, size.x * 0.5 - 1.0, color)
+
+class _Glow extends Control:   # FISH-5 silhouette with a soft rarity glow (kit-cook .four .sil .big)
+	var texture: Texture2D
+	var color := Color.WHITE
+	func _draw() -> void:
+		if texture == null: return
+		var r := Rect2(Vector2.ZERO, size)
+		for i in 3:
+			var g := 2.5 + i * 2.5
+			draw_texture_rect(texture, r.grow(g), false, Color(color, 0.16))
+		draw_texture_rect(texture, r, false, color)
+
+class _DexTile extends Control:   # FISH-5 mini Fish-dex tile: blank / caught (rarity colour) / lit (grey + glow ring)
+	var texture: Texture2D
+	var state := ""
+	var glow := Color.WHITE
+	func _draw() -> void:
+		var r := Rect2(Vector2.ZERO, size)
+		if state == "lit":
+			draw_rect(r.grow(2.0), Color(glow, 0.35), true)
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = P0Ui.PAPER
+		sb.border_color = Color(glow, 0.8) if state == "lit" else P0Ui.EDGE
+		sb.set_border_width_all(1)
+		sb.set_corner_radius_all(3)
+		draw_style_box(sb, r)
+		if texture:
+			var tint := glow if state == "caught" else Color("8a918c") if state == "lit" else Color("cfc6b0")
+			draw_texture_rect(texture, r.grow(-size.x * 0.15), false, tint)
+
+class _Dot extends Control:   # the red dot on the FAB's gear badge (FISH-4: creel full)
+	func _draw() -> void:
+		draw_circle(size * 0.5, size.x * 0.5 + 1.0, P0Ui.PAPER)
+		draw_circle(size * 0.5, size.x * 0.5, P0Ui.RED)
 
 class _Fab extends Control:
 	var ui: P0Ui

@@ -4,6 +4,7 @@ import type { P0Content } from './content.js';
 import { applyP0, type P0Command } from './reducer.js';
 import type { P0Store } from './store.js';
 import { viewOf } from './view.js';
+import { add } from './bag.js';
 
 export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean }
 
@@ -57,6 +58,17 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     s.energy = { value, tick_ms: now };
     store.put(s);
     return reply.send({ ok: true, state: viewOf(c, s, now) });
+  });
+  /** Playtests only: fill every free bag slot with one item (the creel-full state, FISH-4). */
+  app.post('/v1/p0/dev/fill', async (req, reply) => {
+    const player = playerOf(req.headers);
+    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const id = String((req.body as { id?: string } | undefined)?.id ?? 'fish_crucian');
+    if (!c.fish.some(f => f.id === id)) return reply.code(400).send({ ok: false, code: 'bad_item' });
+    const s = store.get(player, deps.now());
+    add(c, s.bag, id, 1_000_000);
+    store.put(s);
+    return reply.send({ ok: true, state: viewOf(c, s, clock(s.clock_ms)) });
   });
   app.post('/v1/p0/dev/reset', async (req, reply) => {
     const player = playerOf(req.headers);

@@ -19,6 +19,10 @@ var _shot_t := 0.0
 var _shot_script: Array = []
 ## XP / reward lines of the last state change, for worlds that show results themselves (the fishing panel).
 var last_xp_lines: Array = []
+## First-catch bonus of the last state change (FISH-3 gold chip); 0 when the species was caught before.
+var last_first_catch_xp := 0
+## What to do once the map is back on top (FISH-4 Go home, FISH-5 Tackle Shop): "farm" / "tackle".
+var after_leave := ""
 
 ## Load timing (logcat tag godot, "P0_TIMING"): navigation start → world _ready → first drawn frame.
 static var _nav_ms := 0
@@ -51,6 +55,8 @@ func _init() -> void:
 	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
 	ui.home_choice.connect(func(choice: String): _call("p0_home", [choice]))
 	ui.place_pressed.connect(leave_world)
+	ui.home_requested.connect(func(): _leave_then("farm"))
+	ui.tackle_requested.connect(func(): _leave_then("tackle"))
 	session.state_changed.connect(_on_state)
 	session.refused.connect(_on_refused)
 	session.connection_failed.connect(func(msg: String, cmd: Dictionary):
@@ -85,6 +91,11 @@ func detach(w: Node) -> void:
 func leave_world() -> void:
 	if is_instance_valid(world) and AppRouter.top_instance() == world: AppRouter.handle_back()
 
+## Back to the map, then on to the homestead or Old Kai's pin (the map reads after_leave on resume).
+func _leave_then(next: String) -> void:
+	after_leave = next
+	leave_world()
+
 func _call(method: String, args: Array):
 	if is_instance_valid(world) and world.has_method(method): return world.callv(method, args)
 	return null
@@ -113,6 +124,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var at := anchor()
 	var dy := 0.0
 	var xp_lines: Array = []
+	last_first_catch_xp = 0
+	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
 	for i in events.size():
 		var ev: Dictionary = events[i]
 		match str(ev.get("kind", "")):
@@ -125,7 +138,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if int(ev.energy) > 0: xp_lines.append(P0Logic.reward_line(str(ev.id), int(ev.energy)))
 			"first":
 				var what := str(ev.what)
-				if what.begins_with("catch:"): xp_lines.append("First catch! +%d XP" % int(ev.xp))
+				if what.begins_with("catch:"):
+					xp_lines.append("First catch! +%d XP" % int(ev.xp))
+					last_first_catch_xp = int(ev.xp)
 				elif what.begins_with("cook:"): xp_lines.append("New recipe! · First cooked · +%d Cooking XP" % int(ev.xp))
 				elif what == "landed": xp_lines.append("First fish landed · +%d XP" % int(ev.xp))
 	last_xp_lines = xp_lines
@@ -133,6 +148,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		match str(ev.get("kind", "")):
 			"energy":
 				var dlt := int(ev.delta)
+				# A catch's refund is said by its own float or card ("3 Energy back"), not twice.
+				if settles_catch and str(ev.get("reason", "")) in ["refund", "line_in"]: continue
 				ui.float_text(("%+d Energy" % dlt).replace("-", "−"), at + Vector2(0, dy), Color("d9772f") if dlt < 0 else Color("4f934b"))
 			"xp":
 				if int(ev.amount) > 0:
@@ -173,20 +190,33 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	elif ui.modal_kind == "gear" and events.size() == 0:
 		ui.open_gear()
 
-func _on_catch(ev: Dictionary, xp_lines: Array) -> void:
+## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
+## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
+## a plain escape is a float ("It got away · 3 Energy back", or the protection wording). `at` is where
+## floats rise (the cast point when the pond knows it).
+func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
+	var where := at if at.is_finite() else anchor()
+	var v := session.current()
 	match str(ev.result):
 		"landed":
 			var fid := str(ev.fish)
 			var r := int(ev.rarity)
-			var lines := xp_lines.duplicate()
-			ui.queue_card(func(): ui.show_catch(fid, r, lines))
+			if last_first_catch_xp > 0:
+				var first := last_first_catch_xp
+				ui.queue_card(func(): ui.show_catch(fid, r, first))
+			else:
+				ui.float_text("%s · %s" % [P0Logic.item_name(v, fid), P0Logic.rarity_name(v, r)], where + Vector2(0, -22), P0Logic.rarity_text_color(r))
 		"broke_free":
 			var gone: Dictionary = ev
-			ui.queue_card(func(): ui.show_got_away(gone))
+			if ui.first_time("gotaway:" + str(ev.fish)):
+				ui.queue_card(func(): ui.show_got_away(gone))
+			else:
+				ui.float_text(("Got away · Lv%d" % int(ev.need_level)) if ev.has("need_level") else "Got away · rod too light", where, P0Ui.INK2)
 		"escaped":
-			var tail := ""
-			if ev.has("protected_left"): tail = " · protection %d left today" % int(ev.protected_left)
-			ui.toast("It got away · %d Energy back%s" % [int(ev.refund), tail], 3.0)
+			var refund := int(ev.refund)
+			var protected: bool = ev.has("protected_left") and refund >= int(v.get("fishing", {}).get("cast_energy", 5))
+			ui.float_text(("It got away · Energy refunded (%d left today)" % int(ev.protected_left)) if protected
+				else "It got away · %d Energy back" % refund, where, P0Ui.GREEN_D)
 		"cancelled":
 			ui.toast("Line in · Energy back")
 
@@ -301,6 +331,8 @@ func _dev_shot(dt: float) -> void:
 				if not ready and _shot_t < 40.0: return
 			"skip": session.dev_skip(int(step[1]))
 			"back": leave_world()
+			"gohome": ui.home_requested.emit()
+			"tackleshop": ui.tackle_requested.emit()
 			_:
 				if not bool(_call("p0_dev", [step])): push_warning("P0_SHOT: unknown step " + step[0])
 		_shot_script.pop_front()

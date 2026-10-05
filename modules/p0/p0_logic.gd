@@ -4,9 +4,49 @@ extends RefCounted
 ## §10.3.3 quick bar fill, §3.7 countdown format, §9.5.3 Today line; M2: §6.6.1 Cast states,
 ## §7.2.4 heat ring, §7.17.1 eating). Pure and static: tested headless.
 
-const RARITY_COLORS := [Color("9db89a"), Color("5fa85a"), Color("6fa8dc"), Color("e3b341")]
+## Design kit rarity colours (kit.css --rar-*): Common sage · Fine blue · Rare violet · Legendary gold.
+const RARITY_COLORS := [Color("9db89a"), Color("6fa8dc"), Color("a98bd6"), Color("e3b341")]
+## Text on cream needs a deeper sage for Common (kit-cook.css .rar-common).
+const RARITY_TEXT := [Color("7fa37b"), Color("6fa8dc"), Color("a98bd6"), Color("c9962a")]
 
 const ICON_DIR := "res://assets/p0/icons/%s.svg"
+
+static var _content: Dictionary = {}
+
+## The bundled content table (shared with the server) for display-only lookups the view doesn't carry.
+static func content() -> Dictionary:
+	if _content.is_empty():
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/p0_content.json"))
+		if parsed is Dictionary: _content = parsed
+	return _content
+
+## FISH-5 line 1 for a level gate: "Fishing Lv2 · 3 XP to go" one level up, else "Fishing Lv4 needed · about 30 casts"
+## (Common catches at today's level; the estimate ignores first-catch bonuses).
+static func level_gate_line(view: Dictionary, need_level: int) -> String:
+	var sk: Dictionary = view.get("skills", {}).get("fishing", {})
+	var level := int(sk.get("level", 1))
+	var xp := int(sk.get("xp", 0))
+	var th: Array = content().get("skills", {}).get("fishing", [])
+	var need_xp := int(th[need_level - 1]) if need_level - 1 < th.size() else int(sk.get("next", xp))
+	var to_go := maxi(0, need_xp - xp)
+	if need_level <= level + 1: return "Fishing Lv%d · %d XP to go" % [need_level, to_go]
+	var per_cast := int(content().get("fishing", {}).get("catch_xp", [5])[0])
+	return "Fishing Lv%d needed · about %d casts" % [need_level, ceili(float(to_go) / maxf(1.0, per_cast))]
+
+## Fish that open at a Fishing level, by name ("Golden Koi, Catfish").
+static func fish_at_level(view: Dictionary, level: int) -> Array:
+	var out := []
+	for d in view.get("fishing", {}).get("dex", []):
+		var where = d.get("where", [])
+		var inland: bool = not (where is Array) or where.has("pond") or where.has("river")
+		if int(d.get("level", 1)) == level and inland: out.append(item_name(view, str(d.id)))
+	return out
+
+## The cheapest rod that holds a rarity, for the "Too heavy for your rod" card.
+static func rod_for(view: Dictionary, rarity: int) -> Dictionary:
+	for r in view.get("gear", {}).get("rods", []):
+		if int(r.get("reach", 0)) >= rarity and not r.get("owned", false): return r
+	return {}
 
 static func icon(id: String) -> Texture2D:
 	var path := ICON_DIR % id
@@ -193,6 +233,9 @@ static func rarity_name(view: Dictionary, rarity: int) -> String:
 static func rarity_color(rarity: int) -> Color:
 	return RARITY_COLORS[clampi(rarity - 1, 0, 3)]
 
+static func rarity_text_color(rarity: int) -> Color:
+	return RARITY_TEXT[clampi(rarity - 1, 0, 3)]
+
 ## Dish label with its quality star: "Grilled Crucian ★" (Good) / "★★" (Perfect).
 static func dish_label(view: Dictionary, id: String) -> String:
 	var info := item(view, id)
@@ -208,7 +251,9 @@ static func fish_action(view: Dictionary, bait: String, site := "pond") -> Dicti
 	if f.get("cast", null) != null:
 		return {"icon": "bobber", "verb": "Fishing…", "sub": "Line in the water", "enabled": false, "amber": false, "cmd": {}, "need": 0}
 	if int(view.get("bag", {}).get("free", 1)) < 1:
-		return {"icon": "creel", "verb": "Creel full", "sub": "Sell or cook first", "enabled": false, "amber": true, "cmd": {}, "need": 0}
+		# FISH-4: the key is greyed and says why; Open Bag / Go home pills float above the switch.
+		return {"icon": "rod", "verb": "Creel full", "sub": "0 free slots · Sell or cook first", "enabled": false, "amber": false,
+			"cmd": {}, "need": 0, "creel_full": true}
 	if int(view.get("energy", {}).get("value", 0)) < cost:
 		a.sub = "Need %d Energy" % cost
 		a.amber = true

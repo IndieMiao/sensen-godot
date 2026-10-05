@@ -103,6 +103,20 @@ func _open_account() -> void: pass
 func resume() -> void:
 	super.resume()
 	rt.attach(self)
+	var next := rt.after_leave
+	rt.after_leave = ""
+	match next:
+		"farm": _open_my_farm.call_deferred()      # FISH-4 Go home · Free
+		"tackle": _show_tackle_shop.call_deferred()  # FISH-5 Tackle Shop: the camera goes to Old Kai's pin
+
+func _show_tackle_shop() -> void:
+	if city_map == null: return
+	_reset_gesture()
+	_city_bounds()   # city-wide pan bounds, else the homestead's 450 m box pulls the camera back
+	fly_to(float(TACKLE_SHOP.lat), float(TACKLE_SHOP.lng))
+	_set_zoom(15.5)
+	_camera_dirty = true
+	city_map.select(TACKLE_SHOP)
 
 func p0_surface() -> String: return "map"
 

@@ -55,6 +55,7 @@ func open_p0(runtime: P0Runtime, water_id: String, spec: Dictionary, target: Vec
 	model = {}
 	_last = {}
 	_gauge.model = {}
+	for n in [_message_card, _primary, _guide, _gauge]: n.visible = true
 	_title.text = title
 	show()
 	_fit.call_deferred()
@@ -172,35 +173,20 @@ func _report(outcome: String) -> void:
 	busy = true
 	rt.session.send({"type": "reel", "outcome": outcome})
 
-## The server's verdict (P0 `catch` event) with the XP / reward lines the runtime collected.
-func on_catch(ev: Dictionary, lines: Array) -> void:
+## The server's verdict (P0 `catch` event). Results are the pond HUD's cards (FISH-3 / FISH-5), not this
+## panel's: hide the old notice and thumb button, hold the result phase so FishingPresentation plays
+## the landing arc (or leaves the ripples), and return how long the pond should wait before closing.
+func on_catch(ev: Dictionary) -> float:
 	busy = false
-	var v := rt.session.current()
-	var extra := "" if lines.is_empty() else "\n" + "\n".join(lines)
+	phase = "result"
+	var landed := str(ev.get("result", "")) == "landed"
+	model["outcome"] = "caught" if landed else "escaped"
+	_last = {"outcome": "caught", "fish_id": str(ev.fish), "tier": int(ev.rarity)} if landed else {"outcome": "escaped"}
+	for n in [_message_card, _primary, _guide, _gauge]: n.visible = false
 	match str(ev.get("result", "")):
-		"landed":
-			phase = "result"
-			model["outcome"] = "caught"
-			_last = {"outcome": "caught", "fish_id": str(ev.fish), "tier": int(ev.rarity)}
-			_show_notice("%s · %s%s\n%s" % [P0Logic.item_name(v, str(ev.fish)), P0Logic.rarity_name(v, int(ev.rarity)), extra, P0Logic.creel_line(v)], "Fish caught!", "caught")
-		"broke_free":
-			phase = "result"
-			model["outcome"] = "escaped"
-			_last = {"outcome": "escaped"}
-			var why := ("Fishing Lv%d needed" % int(ev.need_level)) if ev.has("need_level") else "Too heavy for your %s" % str(v.get("fishing", {}).get("rod", "rod"))
-			_show_notice("%s · unlocks %s\n%d Energy back" % [why, P0Logic.item_name(v, str(ev.fish)), int(ev.refund)],
-				"%s fish got away" % P0Logic.rarity_name(v, int(ev.rarity)), "failed")
-		"escaped":
-			phase = "result"
-			model["outcome"] = "escaped"
-			_last = {"outcome": "escaped"}
-			var tail := ("\nCatch protection %d left today" % int(ev.protected_left)) if ev.has("protected_left") else ""
-			_show_notice("%d Energy back%s" % [int(ev.refund), tail], "Fish escaped", "failed")
-		"cancelled":
-			phase = "result"
-			_last = {"outcome": "cancelled"}
-			_show_notice("Line in · Energy back")
-	_refresh_button()
+		"landed": return 1.3     # FishingPresentation lifts the fish over 1.25 s
+		"cancelled": return 0.15
+	return 0.7                   # the float sinks and the ripples fade
 
 ## A command never reached the server. A lost cast changes nothing server-side: back to Cast. A lost
 ## reel report would leave the line open there, so it is resent a few times before giving up.

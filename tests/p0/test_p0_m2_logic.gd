@@ -89,3 +89,37 @@ func test_reward_and_blessing_lines() -> void:
 	v["blessing"] = {"left": 5 * 86400000 - 1000}
 	v.meals.cap = 300
 	assert_str(P0Logic.blessing_line(v)).is_equal("Newcomer Blessing · 5 days left · faster Energy, Meals 300")
+
+func test_creel_full_key_carries_the_fish4_reason_and_pills() -> void:
+	var v := _view()
+	v.bag.free = 0
+	var a := P0Logic.fish_action(v, "")
+	assert_bool(bool(a.enabled)).is_false()
+	assert_str(str(a.sub)).is_equal("0 free slots · Sell or cook first")
+	assert_bool(bool(a.get("creel_full", false))).is_true()
+	assert_bool(P0Logic.fish_action(_view(), "").has("creel_full")).is_false()
+
+func test_got_away_lines_for_level_and_rod_gates() -> void:
+	# Thresholds come from the bundled content (Fishing: 0, 70, 220, 480 …); Common catches give 5 XP.
+	var v := _view()
+	v["skills"] = {"fishing": {"level": 1, "xp": 40, "floor": 0, "next": 70}}
+	assert_str(P0Logic.level_gate_line(v, 2)).is_equal("Fishing Lv2 · 30 XP to go")
+	assert_str(P0Logic.level_gate_line(v, 4)).is_equal("Fishing Lv4 needed · about 88 casts")
+	v.fishing["dex"] = [
+		{"id": "fish_perch", "rarity": 2, "level": 2, "where": ["river", "pond"]},
+		{"id": "fish_bass", "rarity": 2, "level": 2, "where": ["pond", "river"]},
+		{"id": "fish_mackerel", "rarity": 2, "level": 2, "where": ["coast"]},
+		{"id": "fish_koi", "rarity": 3, "level": 4, "where": ["pond"]},
+	]
+	v.names["fish_perch"] = "River Perch"
+	v.names["fish_bass"] = "Largemouth Bass"
+	assert_that(P0Logic.fish_at_level(v, 2)).is_equal(["River Perch", "Largemouth Bass"])   # coast-only fish excluded
+	v["gear"] = {"rods": [{"id": "rod_starter", "name": "Starter Rod", "reach": 2, "level": 1, "price": 0, "owned": true},
+		{"id": "rod_reed", "name": "Reed Rod", "reach": 3, "level": 3, "price": 80, "owned": false}]}
+	assert_str(str(P0Logic.rod_for(v, 3).name)).is_equal("Reed Rod")
+	assert_bool(P0Logic.rod_for(v, 4).is_empty()).is_true()
+
+func test_rarity_colours_follow_the_design_kit() -> void:
+	assert_str(P0Logic.rarity_color(2).to_html(false)).is_equal("6fa8dc")   # Fine blue
+	assert_str(P0Logic.rarity_color(3).to_html(false)).is_equal("a98bd6")   # Rare violet
+	assert_str(P0Logic.rarity_text_color(1).to_html(false)).is_equal("7fa37b")

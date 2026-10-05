@@ -25,6 +25,10 @@ var _focus := Vector3(6, 0, -6)
 var _idle_s := 0.0
 var _zoom := 1.0
 var _plan: Dictionary = {}
+# Camera blend from the fishing close-up back to the pond framing when the panel closes.
+var _blend_from := Transform3D.IDENTITY
+var _blend_size := 7.5
+var _blend_t := 1.0
 
 static func site_for(template_id: String) -> String:
 	return str(SITE_FOR_TEMPLATE.get(template_id, "pond"))
@@ -127,6 +131,11 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		_plan = {}
 		if actor.position.distance_to(plan.origin) < 0.35: _open_panel(plan)
 	_follow(dt)
+	if _blend_t < 1.0:
+		_blend_t = minf(1.0, _blend_t + dt / 0.45)
+		var k := ease(_blend_t, -2.0)
+		cam.global_transform = _blend_from.interpolate_with(cam.global_transform, k)
+		cam.size = lerpf(_blend_size, cam.size, k)
 	rt.ui.set_action(_action_state(v))
 	if not rt.ui.has_modal():
 		rt.ui.teach("cast", "Casting uses 5 Energy. If the fish gets away, most of it comes back.")
@@ -173,7 +182,13 @@ func _begin_fishing(_id: String) -> void:
 	view.configure(panel, actor, actor.rig, cam, [])
 
 func _end_fishing() -> void:
-	if is_instance_valid(view): view.finish()
+	if is_instance_valid(view):
+		var close_up := cam.global_transform
+		var close_size := cam.size
+		view.finish()   # puts the pond camera back at once …
+		_blend_from = close_up   # … so ease out of the close-up instead of cutting
+		_blend_size = close_size
+		_blend_t = 0.0
 	view = null
 	if actor: actor.lock(false)
 	if rt and rt.world == self: rt.ui.set_surface("pond")
@@ -187,13 +202,24 @@ func p0_event(ev: Dictionary, _v: Dictionary) -> bool:
 			if panel.visible: panel.on_refused()
 		"catch":
 			if panel.visible:
-				panel.on_catch(ev, rt.last_xp_lines)
+				_settle(ev, panel.on_catch(ev), rt.last_first_catch_xp)
 				return true
 		"fish_abort":
 			if panel.visible: panel.on_abort()
 		"send_failed":
 			if panel.visible: panel.on_send_failed(ev.cmd)
 	return false
+
+## After the landing arc (or the ripples), close the panel, ease the camera back to the pond and let the
+## runtime show the result card or float at the cast point (FISH-3 / FISH-5).
+func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
+	await get_tree().create_timer(delay).timeout
+	if not is_inside_tree(): return
+	var land := panel.landing
+	if panel.visible: panel.close()
+	var at := cam.unproject_position(land) if not cam.is_position_behind(land) else Vector2.INF
+	rt.last_first_catch_xp = first_xp
+	rt._on_catch(ev, rt.last_xp_lines, at)
 
 # ---------------------------------------------------------------- camera (old pond framing + safe box)
 func _follow(dt: float) -> void:
