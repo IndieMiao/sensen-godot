@@ -1,0 +1,282 @@
+class_name P0Runtime
+extends Node
+## Lives under the root for the whole P0 session: one P0Session and one P0Ui shared by every P0 world
+## (homestead farm, map ponds, interior rooms). Worlds only draw, move and pick targets; the runtime
+## routes UI input to the active world and turns server events into floats, cards and toasts, so the
+## new UI flow is identical everywhere.
+##
+## A world implements (all optional): p0_surface() -> String, p0_frame(view, dt), p0_joystick(v),
+## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f),
+## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
+## p0_until(name) -> bool.
+
+static var _instance: P0Runtime
+
+var session: P0Session
+var ui: P0Ui
+var world: Node
+var _shot_t := 0.0
+var _shot_script: Array = []
+
+static func ensure() -> P0Runtime:
+	if is_instance_valid(_instance): return _instance
+	_instance = P0Runtime.new()
+	_instance.name = "P0Runtime"
+	(Engine.get_main_loop() as SceneTree).root.add_child.call_deferred(_instance)
+	return _instance
+
+func _init() -> void:
+	session = P0Session.new()
+	add_child(session)
+	ui = P0Ui.new()
+	add_child(ui)
+	ui.joystick.connect(func(v): _call("p0_joystick", [v]))
+	ui.tapped.connect(func(p): _call("p0_tap", [p]))
+	ui.action_pressed.connect(_on_action)
+	ui.command.connect(func(cmd): session.send(cmd))
+	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
+	ui.zoom.connect(func(f: float): _call("p0_zoom", [f]))
+	ui.recenter.connect(func(): _call("p0_recenter", []))
+	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
+	ui.home_choice.connect(func(choice: String): _call("p0_home", [choice]))
+	session.state_changed.connect(_on_state)
+	session.refused.connect(_on_refused)
+	session.connection_failed.connect(func(msg): ui.toast(msg + " · " + session.base_url, 4.0))
+	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
+		P0Fishing.auto_play = true
+		P0Cooking.auto_play = true
+
+## The active world takes over input and the HUD surface; the previous one is simply forgotten.
+func attach(w: Node) -> void:
+	world = w
+	ui.set_surface(str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm")
+
+func detach(w: Node) -> void:
+	if world == w:
+		world = null
+		ui.close_modal()
+		ui.set_surface("map")
+
+func _call(method: String, args: Array):
+	if is_instance_valid(world) and world.has_method(method): return world.callv(method, args)
+	return null
+
+func _process(dt: float) -> void:
+	_dev_shot(dt)
+	var v := session.current()
+	if v.is_empty(): return
+	ui.set_view(v)
+	_call("p0_frame", [v, dt])
+
+func _on_action(cmd: Dictionary) -> void:
+	if str(cmd.get("type", "")) == "energy_card":
+		var verb = _call("p0_energy_verb", [])
+		ui.open_energy_card(int(ui.fab_state().get("need", 0)), str(verb) if verb != null else str(ui.fab_state().get("verb", "")))
+		return
+	if not cmd.is_empty(): _call("p0_action", [cmd])
+
+func anchor() -> Vector2:
+	var at = _call("p0_anchor", [])
+	return at if at is Vector2 else get_viewport().get_visible_rect().size * Vector2(0.5, 0.42)
+
+# ---------------------------------------------------------------- server results
+func _on_state(v: Dictionary, events: Array) -> void:
+	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
+	var at := anchor()
+	var dy := 0.0
+	var xp_lines: Array = []
+	for i in events.size():
+		var ev: Dictionary = events[i]
+		match str(ev.get("kind", "")):
+			"xp":
+				# The server emits a first-time bonus as `first` immediately followed by its `xp`.
+				var bonus: bool = i > 0 and str(events[i - 1].get("kind", "")) == "first" and int(events[i - 1].xp) == int(ev.amount)
+				if int(ev.amount) > 0 and not bonus:
+					xp_lines.append("+%d %s XP" % [int(ev.amount), str(ev.skill).capitalize()] + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)))
+			"reward":
+				if int(ev.energy) > 0: xp_lines.append(P0Logic.reward_line(str(ev.id), int(ev.energy)))
+			"first":
+				var what := str(ev.what)
+				if what.begins_with("catch:"): xp_lines.append("First catch! +%d XP" % int(ev.xp))
+				elif what.begins_with("cook:"): xp_lines.append("New recipe! · First cooked · +%d Cooking XP" % int(ev.xp))
+				elif what == "landed": xp_lines.append("First fish landed · +%d XP" % int(ev.xp))
+	for ev in events:
+		match str(ev.get("kind", "")):
+			"energy":
+				var dlt := int(ev.delta)
+				ui.float_text(("%+d Energy" % dlt).replace("-", "−"), at + Vector2(0, dy), Color("d9772f") if dlt < 0 else Color("4f934b"))
+			"xp":
+				if int(ev.amount) > 0:
+					ui.float_text("+%d XP" % int(ev.amount) + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)), at + Vector2(0, dy), Color("1e9bb0"))
+			"item":
+				var iid := str(ev.id)
+				if int(ev.delta) > 0 and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"):
+					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at + Vector2(0, dy), Color("4f934b"))
+			"coins":
+				ui.float_text("%+d coins" % int(ev.delta), at + Vector2(0, dy), Color("c9962a"))
+			"catch":
+				_on_catch(ev, xp_lines)
+				_call("p0_event", [ev, v])
+			"cast", "pot":
+				_call("p0_event", [ev, v])
+			"dish":
+				var lines := xp_lines.duplicate()
+				_call("p0_event", [ev, v])
+				ui.queue_card(func(): ui.show_dish(ev, lines))
+			"request":
+				if str(ev.status) == "accepted": ui.toast("Tracking · it shows in Today")
+				else: ui.toast("Request complete · +%d coins" % int(ev.coins))
+			"meal":
+				ui.teach("meal", "Energy comes back over time. A meal brings it back now.")
+				if int(ev.gain) <= 0:
+					ui.toast("Full belly · Meals reset in " + P0Logic.duration(float(v.get("meals", {}).get("resets_in", 0))) if int(ev.counted) <= 0 and int(ev.nominal) > 0 else "Same dish · no Energy today")
+				else:
+					ui.toast("+%d Energy · Meals today %d/%d" % [int(ev.gain), int(ev.meals), int(ev.cap)])
+			"level":
+				var lv: Dictionary = ev
+				ui.queue_card(func(): ui.show_level_up(lv))
+		dy -= 16.0
+	if ui.modal_kind == "stall" and events.size() > 0:
+		ui.set_view(session.current())
+		ui.open_stall(_stall_bubble(events))
+	elif ui.modal_kind == "tackle" and events.size() > 0:
+		ui.open_tackle("Strung and ready — it's on your belt. Swap rods in Tools & Gear.")
+	elif ui.modal_kind == "gear" and events.size() == 0:
+		ui.open_gear()
+
+func _on_catch(ev: Dictionary, xp_lines: Array) -> void:
+	match str(ev.result):
+		"landed":
+			var fid := str(ev.fish)
+			var r := int(ev.rarity)
+			var lines := xp_lines.duplicate()
+			ui.queue_card(func(): ui.show_catch(fid, r, lines))
+		"broke_free":
+			var gone: Dictionary = ev
+			ui.queue_card(func(): ui.show_got_away(gone))
+		"escaped":
+			var tail := ""
+			if ev.has("protected_left"): tail = " · protection %d left today" % int(ev.protected_left)
+			ui.toast("It got away · %d Energy back%s" % [int(ev.refund), tail], 3.0)
+		"cancelled":
+			ui.toast("Line in · Energy back")
+
+func _stall_bubble(events: Array) -> String:
+	for ev in events:
+		if str(ev.get("kind", "")) == "coins" and int(ev.delta) > 0: return "Thanks! %d coins for those." % int(ev.delta)
+		if str(ev.get("kind", "")) == "item" and int(ev.delta) > 0:
+			var id := str(ev.id)
+			return "%d %s — %s" % [int(ev.delta), P0Logic.item_name(session.view, id), "good luck at the pond." if id.begins_with("bait_") else "happy sowing."]
+	return ""
+
+func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
+		_call("p0_event", [{"kind": "fish_abort"}, session.view])
+		session.send({"type": "reel", "outcome": "escaped"})
+		ui.toast("Creel full · the fish slipped away")
+		return
+	match code:
+		"need_energy":
+			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else "Sow ×1")
+		"locked":
+			ui.toast("%s Lv%d · %d XP to go" % [str(detail.get("skill", "farming")).capitalize(), int(detail.get("level", 2)), int(detail.get("xp_to_go", 0))])
+		"no_coins":
+			ui.toast("Need %d more coins" % int(detail.get("need", 0)))
+		"bag_full":
+			ui.toast("Bag full · free a slot first")
+		"rest_used":
+			ui.toast("Rest used today")
+		"energy_full":
+			ui.toast("Energy full · eat later" if str(cmd.get("type", "")) == "eat" else "Energy full")
+		"not_ready":
+			ui.toast("Not ready yet")
+		"creel_full":
+			ui.toast("Creel full · 0 free slots · Sell or cook first")
+		"already_casting":
+			ui.toast("Your line is already in the water")
+		"no_bait":
+			ui.toast("No bait left")
+		"too_early", "no_cast":
+			_call("p0_event", [{"kind": "fish_abort"}, session.view])
+		"stove_busy":
+			ui.toast("The stove is busy · %s left" % P0Logic.duration(float(detail.get("ready_in", 0))))
+		"needs_main":
+			ui.toast("Needs a main ingredient")
+		"not_for_cooking":
+			ui.toast("Not for cooking")
+		"missing_ingredients", "not_enough":
+			ui.toast("Missing ingredients")
+		"sold_out":
+			ui.toast("Sold out today · %d left" % int(detail.get("left", 0)))
+		"wrong_state", "bad_plot":
+			pass   # the plot changed under a held repeat; the next frame shows its new state
+		_:
+			ui.toast("Can't do that (%s)" % code)
+
+# ---------------------------------------------------------------- dev: scripted desktop screenshots
+## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.
+## Generic UI steps live here; world steps (goto, stove, until:bite …) go to world.p0_dev / p0_until.
+func _dev_shot(dt: float) -> void:
+	var path := OS.get_environment("P0_SHOT")
+	if path == "": return
+	if _shot_t == 0.0: _shot_script = OS.get_environment("P0_SHOT_STEPS").split(",", false)
+	_shot_t += dt
+	var limit := OS.get_environment("P0_SHOT_LIMIT_MS")
+	if Time.get_ticks_msec() > int(limit if limit != "" else "30000"): get_tree().quit(2)
+	if world == null and _shot_t < 6.0: return
+	if not _shot_script.is_empty() and _shot_t > 2.0:
+		var step := str(_shot_script[0]).split(":")
+		match step[0]:
+			"walk":
+				_call("p0_joystick", [Vector2(float(step[1]), float(step[2]))])
+				if _shot_t < 2.0 + float(step[3] if step.size() > 3 else "1.0"): return
+				_call("p0_joystick", [Vector2.ZERO])
+			"act": ui._fab_pressed()
+			"hold":
+				ui.fab_held = true
+				ui._fab_pressed()
+			"release": ui.fab_held = false
+			"greet": ui.open_greeting()
+			"stall": ui.open_stall("", step[1] if step.size() > 1 else "")
+			"bag": ui.open_bag(step[1] if step.size() > 1 else "")
+			"energy": ui.open_energy_card(3, "Sow ×1")
+			"close": ui.close_modal()
+			"auto":
+				P0Fishing.auto_play = true
+				P0Cooking.auto_play = true
+			"manual": P0Cooking.auto_play = false
+			"dex": ui.open_fishdex()
+			"kai": ui.open_kai_greeting()
+			"tackle": ui.open_tackle()
+			"gear": ui.open_gear()
+			"skills": ui.open_skills()
+			"today": ui.open_today()
+			"radial": ui.open_radial()
+			"kitchen": ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
+			"put":
+				ui._exp_slots.append(step[1])
+				ui.open_kitchen("experiment")
+			"cook": session.send({"type": "cook", "recipe": step[1]})
+			"send":
+				# send:type=reel|outcome=landed (commas separate steps, so no JSON here)
+				var cmd := {}
+				for pair in ":".join(step.slice(1)).split("|"):
+					var kv := pair.split("=")
+					cmd[kv[0]] = int(kv[1]) if kv[1].is_valid_int() else kv[1]
+				session.send(cmd)
+			"wait":
+				if _shot_t < 2.0 + float(step[1]): return
+			"until":
+				var ready := ui.has_modal() if step[1] == "modal" else bool(_call("p0_until", [step[1]]))
+				if not ready and _shot_t < 40.0: return
+			"skip": session.dev_skip(int(step[1]))
+			_:
+				if not bool(_call("p0_dev", [step])): push_warning("P0_SHOT: unknown step " + step[0])
+		_shot_script.pop_front()
+		_shot_t = 1.2
+		return
+	if _shot_script.is_empty() and _shot_t > 1.6:
+		var img := get_viewport().get_texture().get_image()
+		img.save_png(path)
+		print("P0_SHOT saved ", path)
+		get_tree().quit()

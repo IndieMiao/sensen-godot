@@ -12,6 +12,7 @@ signal command(cmd: Dictionary)
 signal dev_skip(minutes: int)
 signal zoom(factor: float)
 signal show_spot(where: String)
+signal home_choice(choice: String)
 signal recenter()
 
 const PAPER := Color("fbf8f1")
@@ -51,6 +52,13 @@ var selected_seed := ""
 var selected_bait := ""
 var bar_mode := "farm"          # "farm" (seeds) or "fish" (bait) — the quick bar holds the current action's consumables
 var _place: Label
+var surface := "farm"
+var _pending := {}   # surface / place / mode set before the HUD exists (the runtime attaches early)
+var _ecard: Control
+var _right: Control
+var _today_chip: Control
+var _place_chip: Control
+var _dev_box: Control
 var _creel: Label
 var _fab_badge: TextureRect
 var _switch: Button
@@ -95,6 +103,10 @@ func _ready() -> void:
 	_toast.hide()
 	root.add_child(_toast)
 	if OS.is_debug_build(): _build_dev()
+	if _pending.has("mode"): set_mode(_pending.mode)
+	if _pending.has("place"): set_place(_pending.place)
+	set_surface(_pending.get("surface", surface))
+	_pending.clear()
 
 func _process(dt: float) -> void:
 	if _toast_left > 0.0:
@@ -131,6 +143,7 @@ func _build_hud() -> void:
 	ev.add_child(_hud_regen)
 	ecard.add_child(ev)
 	root.add_child(ecard)
+	_ecard = ecard
 	var right := HBoxContainer.new()
 	right.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	right.position = Vector2(-128, 22)
@@ -148,6 +161,7 @@ func _build_hud() -> void:
 	bell.add_child(_icon("bell", 18))
 	right.add_child(bell)
 	root.add_child(right)
+	_right = right
 	# row 2: Today chip (left) · place chip "City · Space" (right)
 	var today := PanelContainer.new()
 	today.add_theme_stylebox_override("panel", _box(CARD, 11, EDGE, 1, Vector4(8, 4, 8, 4)))
@@ -163,6 +177,7 @@ func _build_hud() -> void:
 	th.add_child(_today)
 	today.add_child(th)
 	root.add_child(today)
+	_today_chip = today
 	var place := PanelContainer.new()
 	place.add_theme_stylebox_override("panel", _box(CARD, 11, EDGE, 1, Vector4(8, 4, 8, 4)))
 	place.set_anchors_preset(Control.PRESET_TOP_RIGHT)
@@ -177,6 +192,7 @@ func _build_hud() -> void:
 	ph.add_child(_place)
 	place.add_child(ph)
 	root.add_child(place)
+	_place_chip = place
 	_creel = _label("", 9, INK, true)
 	_creel.add_theme_stylebox_override("normal", _box(CARD, 10, EDGE, 1, Vector4(8, 3, 8, 3)))
 	_creel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
@@ -252,6 +268,7 @@ func _build_dev() -> void:
 		b.pressed.connect(func(): dev_skip.emit(m))
 		box.add_child(b)
 	root.add_child(box)
+	_dev_box = box
 
 # ---------------------------------------------------------------- refresh
 func set_view(v: Dictionary) -> void:
@@ -277,14 +294,41 @@ func _skill_pct(s: Dictionary) -> float:
 	return clampf(float(int(s.xp) - int(s.floor)) / maxf(1.0, float(int(s.next) - int(s.floor))), 0.0, 1.0)
 
 ## Pond vs. plots: place chip, creel badge, fab badge and quick-bar contents follow where the player stands.
+## Full place chip text: "City · Space" (Shanghai · Homestead / Shanghai · Willow Pond / … · Kitchen).
+func set_place(text: String) -> void:
+	if not is_node_ready():
+		_pending["place"] = text
+		return
+	if _place.text != text: _place.text = text
+
+## Which world the HUD sits on (§10.2.4): action spaces show everything; rooms are facility spaces
+## (no quick bar, main action or switch key); the map shows only toasts and cards.
+func set_surface(name: String) -> void:
+	surface = name
+	if not is_node_ready():
+		_pending["surface"] = name
+		return
+	var action := name in ["farm", "pond"]
+	var world := name != "map"
+	for n in [_avatar, _ecard, _right, _today_chip, _place_chip]: n.visible = world
+	pad.visible = world
+	_fab.visible = action and _modal == null
+	_switch.visible = action
+	_bar_box.visible = action and _modal == null
+	_creel.visible = action and bar_mode == "fish"
+	if _dev_box: _dev_box.visible = world
+	for t in _tags.values(): (t as Control).visible = false
+
 func set_mode(mode: String, place := "") -> void:
-	if place != "" and _place.text != "Shanghai · " + place: _place.text = "Shanghai · " + place
+	if place != "": set_place(place)
+	if not is_node_ready():
+		_pending["mode"] = mode
+		return
 	if mode == bar_mode: return
 	bar_mode = mode
 	_bar_ids = []
 	for c in _bar_box.get_children(): c.queue_free()
 	_bar_box.get_children().map(func(c): _bar_box.remove_child(c))
-	if mode != "fish": _place.text = "Shanghai · Homestead"
 	_fab_badge.texture = P0Logic.icon("rod" if mode == "fish" else "hoe")
 	_switch.icon = P0Logic.icon("rod" if mode == "fish" else "hoe")
 	_creel.visible = mode == "fish"
@@ -443,8 +487,8 @@ func _drop_modal() -> void:
 	if _modal: _modal.queue_free()
 	_modal = null
 	modal_kind = ""
-	_fab.visible = true
-	_bar_box.visible = true
+	_fab.visible = surface in ["farm", "pond"]
+	_bar_box.visible = surface in ["farm", "pond"]
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	_drop_modal()
@@ -1024,13 +1068,39 @@ func open_energy_card(need: int, verb: String) -> void:
 	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_child(note)
 
+## The farmhouse (§3.4.3 "回家休息 Rest"; COOK-1 kitchen inside): one card, two doors.
+func open_home_card() -> void:
+	var r: Dictionary = view.get("rest", {})
+	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
+	var e: Dictionary = view.get("energy", {})
+	var full := int(e.get("value", 0)) >= int(e.get("max", 200))
+	var card := _center_card(280)
+	modal_kind = "home"
+	card.add_child(_label("Home · Farmhouse", 13, INK, true))
+	var st = view.get("cooking", {}).get("stove", null)
+	var kitchen_line := "Kitchen · Cook"
+	if st != null: kitchen_line = "Kitchen · Dish ready" if float(st.get("ready_in", 0)) <= 0.0 else "Kitchen · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))
+	var k := _pill_button(kitchen_line, true)
+	k.pressed.connect(func(): close_modal(); home_choice.emit("kitchen"))
+	card.add_child(k)
+	var rest_text := "Rest · +%d Energy · once a day" % int(r.get("amount", 60))
+	if used: rest_text = "Rested today · resets in " + P0Logic.duration(float(r.get("resets_in", 0)))
+	elif full: rest_text = "Rest · Energy full"
+	var b := _pill_button(rest_text, false)
+	b.disabled = used or full
+	b.pressed.connect(func(): close_modal(); command.emit({"type": "rest"}))
+	card.add_child(b)
+	var bye := _flat_button("Not now")
+	bye.pressed.connect(close_modal)
+	card.add_child(bye)
+
 func open_rest_card() -> void:
 	var r: Dictionary = view.get("rest", {})
 	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
 	var e: Dictionary = view.get("energy", {})
 	var full := int(e.get("value", 0)) >= int(e.get("max", 200))
 	var card := _center_card(260)
-	card.add_child(_label("Bench · Rest", 12, INK, true))
+	card.add_child(_label("Home · Rest", 12, INK, true))
 	card.add_child(_label("+%d Energy · once a day" % int(r.get("amount", 60)), 11, INK))
 	var b := _pill_button("Rest", true)
 	if used:

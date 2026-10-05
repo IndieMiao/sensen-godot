@@ -40,7 +40,7 @@ func test_sync_buckets_cells_per_crop() -> void:
 		"1,3": _slot("growing", "L", 0, 400), "2,3": _slot("growing", "C", 0, 400),
 		"3,3": _slot("growing", "H", 0, 400),
 	}, 200)
-	assert_that(f.cell_counts()).is_equal({"R": 2, "L": 1, "C": 1, "H": 1, "T": 0, "weed": 0, "soil": 0})
+	assert_that(f.cell_counts()).is_equal({"R": 2, "L": 1, "C": 1, "H": 1, "T": 0, "B": 0, "P": 0, "I": 0, "M": 0, "weed": 0, "soil": 0})
 	assert_int(f.counts()["R"]).is_equal(2 * CropField.PER_CELL)
 
 func test_sync_is_idempotent_and_shrinks() -> void:
@@ -105,7 +105,7 @@ func test_instance_colors_are_declared_srgb() -> void:
 
 func test_plants_and_furrows_are_nonempty_colored_meshes_in_fixed_shared_layers() -> void:
 	var f := _field()
-	assert_int(f.get_child_count()).is_equal(10)
+	assert_int(f.get_child_count()).is_equal(CropField.CROPS.size() + 2 + CropField.DETAIL_STAGE.size())
 	for layer in f._mm:
 		var mesh: Mesh = f._mm[layer].multimesh.mesh
 		assert_int(mesh.get_surface_count()).is_equal(1)
