@@ -1,0 +1,633 @@
+{
+  "units": "metres",
+  "coordinates": "Godot Y up, front +Z; pivots local floor or mounting point",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2958"
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "file": "floor.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.09,
+            0
+          ],
+          "size": [
+            6.1,
+            0.22,
+            5.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0.06,
+        -2.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.5,
+            0
+          ],
+          "size": [
+            6,
+            3,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "left_door_wall",
+      "file": "left_door_wall.glb",
+      "position": [
+        -3,
+        0.06,
+        0.15
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            -2.175,
+            1.5,
+            0
+          ],
+          "size": [
+            1.0500000000000003,
+            3,
+            0.23
+          ]
+        },
+        {
+          "at": [
+            1.375,
+            1.5,
+            0
+          ],
+          "size": [
+            3.05,
+            3,
+            0.23
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front_wall_left",
+      "file": "front_wall_left.glb",
+      "position": [
+        -1.99,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.95,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front_wall_right",
+      "file": "front_wall_right.glb",
+      "position": [
+        2.17,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.65,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "side_low_wall",
+      "file": "side_low_wall.glb",
+      "position": [
+        3,
+        0.06,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            5.28,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "corner_pier",
+      "file": "corner_pier.glb",
+      "position": [
+        3,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.43,
+            0
+          ],
+          "size": [
+            0.4,
+            0.86,
+            0.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entry_step",
+      "file": "entry_step.glb",
+      "position": [
+        0.15,
+        -0.16,
+        2.82
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.025,
+            0.05
+          ],
+          "size": [
+            2.06,
+            0.17,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entrance_frame",
+      "file": "entrance_frame.glb",
+      "position": [
+        -2.9,
+        0.07,
+        1.05
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "entrance_glass",
+      "file": "entrance_glass.glb",
+      "position": [
+        -2.9,
+        0.07,
+        1.05
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "entrance_awning",
+      "file": "entrance_awning.glb",
+      "position": [
+        -2.85,
+        2.55,
+        1.05
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "convenience_sign",
+      "file": "convenience_sign.glb",
+      "position": [
+        -2.8,
+        2.82,
+        1.05
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "drink_cabinet",
+      "file": "drink_cabinet.glb",
+      "position": [
+        -2.68,
+        0.065,
+        -0.55
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.12,
+            0
+          ],
+          "size": [
+            0.7,
+            2.24,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chiller_glass",
+      "file": "chiller_glass.glb",
+      "position": [
+        -2.68,
+        0.065,
+        -0.55
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "drinks_header",
+      "file": "drinks_header.glb",
+      "position": [
+        -2.39,
+        2.6,
+        -1.28
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "snacks_wall_rack",
+      "file": "snacks_wall_rack.glb",
+      "position": [
+        -1.06,
+        0.75,
+        -2.45
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.78,
+            0
+          ],
+          "size": [
+            2.28,
+            1.56,
+            0.49
+          ]
+        }
+      ]
+    },
+    {
+      "name": "essentials_wall_rack",
+      "file": "essentials_wall_rack.glb",
+      "position": [
+        1.4,
+        0.75,
+        -2.45
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.78,
+            0
+          ],
+          "size": [
+            2.28,
+            1.56,
+            0.49
+          ]
+        }
+      ]
+    },
+    {
+      "name": "checkout",
+      "file": "checkout.glb",
+      "position": [
+        -0.37,
+        0.06,
+        -1.42
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.53,
+            0
+          ],
+          "size": [
+            2.45,
+            1.06,
+            0.72
+          ]
+        }
+      ]
+    },
+    {
+      "name": "produce_aisle",
+      "file": "produce_aisle.glb",
+      "position": [
+        -1.18,
+        0.07,
+        0.48
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.6,
+            0
+          ],
+          "size": [
+            1.92,
+            1.2,
+            0.63
+          ]
+        }
+      ]
+    },
+    {
+      "name": "essentials_aisle",
+      "file": "essentials_aisle.glb",
+      "position": [
+        1.05,
+        0.07,
+        1.35
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.6,
+            0
+          ],
+          "size": [
+            1.92,
+            1.2,
+            0.63
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ice_cream_freezer",
+      "file": "ice_cream_freezer.glb",
+      "position": [
+        2.03,
+        0.07,
+        -1.16
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.49,
+            0
+          ],
+          "size": [
+            1.43,
+            0.98,
+            0.81
+          ]
+        }
+      ]
+    },
+    {
+      "name": "freezer_glass",
+      "file": "freezer_glass.glb",
+      "position": [
+        2.03,
+        0.07,
+        -1.16
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "basket_stack",
+      "file": "basket_stack.glb",
+      "position": [
+        2.57,
+        0.07,
+        -0.18
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.43,
+            0
+          ],
+          "size": [
+            0.53,
+            0.86,
+            0.53
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entrance_plant",
+      "file": "entrance_plant.glb",
+      "position": [
+        -2.25,
+        0.07,
+        0.01
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "trailing_plant",
+      "file": "trailing_plant.glb",
+      "position": [
+        2.56,
+        2.56,
+        -2.23
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "front_flowers",
+      "file": "front_flowers.glb",
+      "position": [
+        -2.14,
+        0.79,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "side_leaves",
+      "file": "side_leaves.glb",
+      "position": [
+        3,
+        0.79,
+        1.28
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "entrance_sconce",
+      "file": "entrance_sconce.glb",
+      "position": [
+        -2.8,
+        1.93,
+        2.06
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "corner_pier_0",
+      "asset": "corner_pier",
+      "position": [
+        -3,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "corner_pier_1",
+      "asset": "corner_pier",
+      "position": [
+        -0.97,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "corner_pier_2",
+      "asset": "corner_pier",
+      "position": [
+        1.28,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "drink_cabinet_1",
+      "asset": "drink_cabinet",
+      "position": [
+        -2.68,
+        0.065,
+        -1.27
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "drink_cabinet_2",
+      "asset": "drink_cabinet",
+      "position": [
+        -2.68,
+        0.065,
+        -1.99
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "chiller_glass_1",
+      "asset": "chiller_glass",
+      "position": [
+        -2.68,
+        0.065,
+        -1.27
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "chiller_glass_2",
+      "asset": "chiller_glass",
+      "position": [
+        -2.68,
+        0.065,
+        -1.99
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "front_flowers_right",
+      "asset": "front_flowers",
+      "position": [
+        2.16,
+        0.79,
+        2.68
+      ],
+      "yaw_degrees": 0
+    }
+  ],
+  "camera": {
+    "position": [
+      10,
+      9.2,
+      12
+    ],
+    "target": [
+      0,
+      1.12,
+      0.04
+    ],
+    "size": 9.5
+  }
+}

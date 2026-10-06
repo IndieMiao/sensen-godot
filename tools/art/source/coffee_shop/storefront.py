@@ -119,7 +119,7 @@ def menu(name,at,title,lines,width=1.5,height=1.12,bg='porcelain',ink='iron'):
     begin(name,at=at)
     cube('Rounded menu frame',(0,0,0),(width+.08,height+.08,.09),'oak_light',.085)
     cube('Menu face',(0,0,.053),(width,height,.029),bg,.065)
-    k.text_label(title,(-width*.42,height*.34,.072),min(.16,width/(len(title)*.61)),ink,'LEFT')
+    k.text_label(title,(-width*.42,height*.34 if lines else -.055,.072),min(.16,width/(len(title)*.61)),ink,'LEFT')
     step=min(.155,height*.60/max(len(lines),1))
     for j,line in enumerate(lines):k.text_label(line,(-width*.42,height*.15-j*step,.073),min(.105,(width*.85)/(max(len(line),1)*.57)),ink,'LEFT')
 
