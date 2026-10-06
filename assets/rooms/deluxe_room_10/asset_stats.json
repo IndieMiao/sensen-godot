@@ -1,0 +1,369 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "vertices": 8384,
+      "triangles": 16172,
+      "surfaces": 1,
+      "bytes": 557940
+    },
+    {
+      "name": "window_wall",
+      "vertices": 986,
+      "triangles": 1928,
+      "surfaces": 1,
+      "bytes": 72152
+    },
+    {
+      "name": "back_wall",
+      "vertices": 794,
+      "triangles": 1552,
+      "surfaces": 1,
+      "bytes": 60832
+    },
+    {
+      "name": "arched_window",
+      "vertices": 656,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 41192
+    },
+    {
+      "name": "window_garden",
+      "vertices": 4,
+      "triangles": 2,
+      "surfaces": 1,
+      "bytes": 1492
+    },
+    {
+      "name": "green_door",
+      "vertices": 1740,
+      "triangles": 3432,
+      "surfaces": 1,
+      "bytes": 122060
+    },
+    {
+      "name": "entry_mat",
+      "vertices": 280,
+      "triangles": 540,
+      "surfaces": 1,
+      "bytes": 19972
+    },
+    {
+      "name": "sink_cabinet",
+      "vertices": 1736,
+      "triangles": 3356,
+      "surfaces": 1,
+      "bytes": 119488
+    },
+    {
+      "name": "sink_left_cabinet",
+      "vertices": 452,
+      "triangles": 876,
+      "surfaces": 1,
+      "bytes": 30304
+    },
+    {
+      "name": "kitchen_drawers",
+      "vertices": 452,
+      "triangles": 876,
+      "surfaces": 1,
+      "bytes": 30300
+    },
+    {
+      "name": "range_cooker",
+      "vertices": 1474,
+      "triangles": 2856,
+      "surfaces": 1,
+      "bytes": 102680
+    },
+    {
+      "name": "kitchen_end_cabinet",
+      "vertices": 452,
+      "triangles": 876,
+      "surfaces": 1,
+      "bytes": 30308
+    },
+    {
+      "name": "wall_shelf",
+      "vertices": 504,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 36680
+    },
+    {
+      "name": "shelf_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 119584
+    },
+    {
+      "name": "utensil_crock",
+      "vertices": 300,
+      "triangles": 572,
+      "surfaces": 1,
+      "bytes": 23864
+    },
+    {
+      "name": "range_hood",
+      "vertices": 120,
+      "triangles": 228,
+      "surfaces": 1,
+      "bytes": 9644
+    },
+    {
+      "name": "bookshelf",
+      "vertices": 5176,
+      "triangles": 9844,
+      "surfaces": 1,
+      "bytes": 360352
+    },
+    {
+      "name": "loft_structure",
+      "vertices": 1960,
+      "triangles": 3780,
+      "surfaces": 1,
+      "bytes": 131588
+    },
+    {
+      "name": "loft_stairs",
+      "vertices": 1768,
+      "triangles": 3400,
+      "surfaces": 1,
+      "bytes": 119800
+    },
+    {
+      "name": "loft_bed",
+      "vertices": 2960,
+      "triangles": 5720,
+      "surfaces": 1,
+      "bytes": 196468
+    },
+    {
+      "name": "bedside_table",
+      "vertices": 422,
+      "triangles": 816,
+      "surfaces": 1,
+      "bytes": 28848
+    },
+    {
+      "name": "bedside_lamp",
+      "vertices": 248,
+      "triangles": 484,
+      "surfaces": 1,
+      "bytes": 20136
+    },
+    {
+      "name": "loft_curtain_left",
+      "vertices": 394,
+      "triangles": 780,
+      "surfaces": 1,
+      "bytes": 29112
+    },
+    {
+      "name": "loft_curtain_right",
+      "vertices": 394,
+      "triangles": 780,
+      "surfaces": 1,
+      "bytes": 29112
+    },
+    {
+      "name": "bedroom_botanical",
+      "vertices": 544,
+      "triangles": 1040,
+      "surfaces": 1,
+      "bytes": 42360
+    },
+    {
+      "name": "loft_greenery",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 119304
+    },
+    {
+      "name": "hearth",
+      "vertices": 1052,
+      "triangles": 2080,
+      "surfaces": 1,
+      "bytes": 74760
+    },
+    {
+      "name": "fire",
+      "vertices": 180,
+      "triangles": 348,
+      "surfaces": 1,
+      "bytes": 13416
+    },
+    {
+      "name": "mantel",
+      "vertices": 152,
+      "triangles": 296,
+      "surfaces": 1,
+      "bytes": 11072
+    },
+    {
+      "name": "mantel_picture",
+      "vertices": 544,
+      "triangles": 1040,
+      "surfaces": 1,
+      "bytes": 42832
+    },
+    {
+      "name": "mantel_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 119300
+    },
+    {
+      "name": "underloft_bookcase",
+      "vertices": 5176,
+      "triangles": 9844,
+      "surfaces": 1,
+      "bytes": 360372
+    },
+    {
+      "name": "island",
+      "vertices": 452,
+      "triangles": 876,
+      "surfaces": 1,
+      "bytes": 30284
+    },
+    {
+      "name": "island_flowers",
+      "vertices": 3814,
+      "triangles": 7260,
+      "surfaces": 1,
+      "bytes": 259784
+    },
+    {
+      "name": "bar_stool",
+      "vertices": 96,
+      "triangles": 176,
+      "surfaces": 1,
+      "bytes": 9596
+    },
+    {
+      "name": "living_rug",
+      "vertices": 600,
+      "triangles": 1020,
+      "surfaces": 1,
+      "bytes": 48460
+    },
+    {
+      "name": "sofa",
+      "vertices": 1488,
+      "triangles": 2852,
+      "surfaces": 1,
+      "bytes": 102160
+    },
+    {
+      "name": "coffee_table",
+      "vertices": 728,
+      "triangles": 1404,
+      "surfaces": 1,
+      "bytes": 49744
+    },
+    {
+      "name": "coffee_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 119300
+    },
+    {
+      "name": "coffee_mug",
+      "vertices": 242,
+      "triangles": 468,
+      "surfaces": 1,
+      "bytes": 20952
+    },
+    {
+      "name": "tv_console",
+      "vertices": 280,
+      "triangles": 540,
+      "surfaces": 1,
+      "bytes": 19972
+    },
+    {
+      "name": "television",
+      "vertices": 144,
+      "triangles": 272,
+      "surfaces": 1,
+      "bytes": 11708
+    },
+    {
+      "name": "dining_rug",
+      "vertices": 552,
+      "triangles": 948,
+      "surfaces": 1,
+      "bytes": 44164
+    },
+    {
+      "name": "dining_table",
+      "vertices": 728,
+      "triangles": 1404,
+      "surfaces": 1,
+      "bytes": 49740
+    },
+    {
+      "name": "checked_runner",
+      "vertices": 196,
+      "triangles": 388,
+      "surfaces": 1,
+      "bytes": 13884
+    },
+    {
+      "name": "daisy_jug",
+      "vertices": 3814,
+      "triangles": 7260,
+      "surfaces": 1,
+      "bytes": 259772
+    },
+    {
+      "name": "chair",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 45988
+    },
+    {
+      "name": "floor_plant",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 45876
+    },
+    {
+      "name": "entry_plant",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 45876
+    },
+    {
+      "name": "living_lamp",
+      "vertices": 248,
+      "triangles": 484,
+      "surfaces": 1,
+      "bytes": 20136
+    }
+  ],
+  "unique_triangles": 116062,
+  "scene_triangles": 120302,
+  "static_draw_surfaces": 55,
+  "glb_bytes": 4274720,
+  "atlas_bytes": 2729278,
+  "placed_instances": 55,
+  "materials": 3
+}
