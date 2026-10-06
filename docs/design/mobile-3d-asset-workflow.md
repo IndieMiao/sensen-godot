@@ -2,6 +2,8 @@
 
 Use this guide when creating or refining rooms, props and small environments in Blender for this Godot project. It captures the practices and failures from the **Basic Room**, whose asset quality the user accepted on 2026-10-06. Follow the current user brief and gameplay baseline first; this guide describes production methods, not new gameplay rules or permission to release a build.
 
+On a fresh or unverified host, complete the [art environment setup](art-environment-setup.md) first. It covers installation, Figma access, remote-browser OAuth, Lark CLI provisioning/authorization and the readiness checks assumed here. Reuse working setup rather than reauthorizing every task.
+
 The working example is the [Basic Room implementation](basic-room-2026-10-06/README.md). Its [reference/runtime comparison](basic-room-2026-10-06/comparison.png), [orthographic views](basic-room-2026-10-06/orthographic-sheet.png) and [verification summary](basic-room-2026-10-06/verification-summary.json) are committed so another agent can inspect them without access to the original workstation's `output/` directory. Detailed results and limitations are in the [QA report](../qa/basic-room-2026-10-06.md).
 
 ## 1. Establish the reference and the working environment

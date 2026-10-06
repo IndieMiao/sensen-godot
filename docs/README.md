@@ -21,7 +21,7 @@
 
 开发与发布工具见 [服务端](../server/README.md)、[Android](../tools/android/README.md)、[iOS](../tools/ios/README.md)。这些技术资料不能覆盖 v2 的玩法与分期，也不能把历史安装结果解释为当前设备状态。
 
-For new Blender/Godot art work, read the English [Mobile 3D asset workflow](design/mobile-3d-asset-workflow.md), with the accepted Basic Room as a reproducible example.
+For a fresh art environment, start with the English [Art environment setup](design/art-environment-setup.md), then follow the [Mobile 3D asset workflow](design/mobile-3d-asset-workflow.md). The accepted Basic Room is the reproducible example.
 
 ## 清理与历史追溯
 
