@@ -64,12 +64,14 @@ def reuse(name, at, yaw=0, source='basic_room', original=None):
     return KITS[name]
 
 
-def instance(asset, name, at, yaw=0):
+def instance(asset, name, at, yaw=0, scale=1.0):
     root=bpy.data.objects.new(name,None);bpy.context.scene.collection.objects.link(root)
     root.location=v(at);root.rotation_euler.z=math.radians(yaw);root['linked_asset']=asset
+    root.scale=(scale,scale,scale)
     for src in KITS[asset]['objects']:
         o=src.copy();o.data=src.data;bpy.context.scene.collection.objects.link(o);o.parent=root
     INSTANCES.append({'name':name,'asset':asset,'position':list(at),'yaw_degrees':yaw})
+    if scale!=1.0:INSTANCES[-1]['scale']=[scale,scale,scale]
 
 
 def shell(width=8, depth=6.4, height=3.65, window_z=.05, door_x=3.15, stone_floor=False,

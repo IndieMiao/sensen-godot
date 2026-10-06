@@ -8,6 +8,8 @@ text=(ROOT/'scenes/standard_room_5/standard_room_5_art.gd').read_text().replace(
 text=text.replace('asset.name == "window_garden"','str(asset.name).ends_with("garden")')
 text=text.replace('asset.name == "fire"','asset.name == "fire" or str(asset.name).ends_with("_glow")')
 text=text.replace('var fire: Node3D','var fire: Node3D\nvar variant_materials: Dictionary = {}')
+text=text.replace('container.position = _vec(placement.position)',
+                  'container.position = _vec(placement.position)\n\tcontainer.scale = _vec(placement.get("scale", [1.0,1.0,1.0]))')
 text=text.replace('\t_set_material(model, applied)', '''\tif asset.name == "display_glass":
 \t\tapplied = material.duplicate()
 \t\tapplied.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

@@ -32,14 +32,14 @@ func capture() -> void:
 	environment.background_mode = Environment.BG_COLOR
 	environment.background_color = Color("e8e4c8")
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color("fff0dc")
+	environment.ambient_light_color = Color(lighting.get("ambient_color", "fff0dc"))
 	environment.ambient_light_energy = float(lighting.get("ambient", .70))
 	environment.tonemap_mode = Environment.TONE_MAPPER_ACES
 	var env := WorldEnvironment.new()
 	env.environment = environment
 	world.add_child(env)
 	var sun := DirectionalLight3D.new()
-	sun.light_color = Color("ffe6c2")
+	sun.light_color = Color(lighting.get("sun_color", "ffe6c2"))
 	sun.light_energy = float(lighting.get("sun", 1.05))
 	sun.shadow_enabled = true
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL

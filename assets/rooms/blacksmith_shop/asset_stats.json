@@ -1,0 +1,250 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "vertices": 4912,
+      "triangles": 9476,
+      "surfaces": 1,
+      "bytes": 327264
+    },
+    {
+      "name": "window_wall",
+      "vertices": 832,
+      "triangles": 1616,
+      "surfaces": 1,
+      "bytes": 54980
+    },
+    {
+      "name": "back_wall",
+      "vertices": 584,
+      "triangles": 1132,
+      "surfaces": 1,
+      "bytes": 39332
+    },
+    {
+      "name": "brick_forge",
+      "vertices": 2178,
+      "triangles": 4196,
+      "surfaces": 1,
+      "bytes": 155360
+    },
+    {
+      "name": "forge_hood",
+      "vertices": 1080,
+      "triangles": 2092,
+      "surfaces": 1,
+      "bytes": 72300
+    },
+    {
+      "name": "smoke",
+      "vertices": 1022,
+      "triangles": 2016,
+      "surfaces": 1,
+      "bytes": 59612
+    },
+    {
+      "name": "fire",
+      "vertices": 180,
+      "triangles": 348,
+      "surfaces": 1,
+      "bytes": 13416
+    },
+    {
+      "name": "forge_coals",
+      "vertices": 1176,
+      "triangles": 2240,
+      "surfaces": 1,
+      "bytes": 77548
+    },
+    {
+      "name": "forge_sign",
+      "vertices": 4180,
+      "triangles": 7216,
+      "surfaces": 1,
+      "bytes": 614224
+    },
+    {
+      "name": "hammer_wall",
+      "vertices": 568,
+      "triangles": 1084,
+      "surfaces": 1,
+      "bytes": 40636
+    },
+    {
+      "name": "tongs_wall",
+      "vertices": 784,
+      "triangles": 1516,
+      "surfaces": 1,
+      "bytes": 61680
+    },
+    {
+      "name": "left_tool_shelves",
+      "vertices": 336,
+      "triangles": 648,
+      "surfaces": 1,
+      "bytes": 23708
+    },
+    {
+      "name": "display_swords",
+      "vertices": 546,
+      "triangles": 1032,
+      "surfaces": 1,
+      "bytes": 39416
+    },
+    {
+      "name": "horseshoe_stock",
+      "vertices": 1356,
+      "triangles": 2628,
+      "surfaces": 1,
+      "bytes": 104328
+    },
+    {
+      "name": "tool_shelf_mugs",
+      "vertices": 484,
+      "triangles": 936,
+      "surfaces": 1,
+      "bytes": 40064
+    },
+    {
+      "name": "shelf_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 118336
+    },
+    {
+      "name": "quench_barrel",
+      "vertices": 2848,
+      "triangles": 5528,
+      "surfaces": 1,
+      "bytes": 360880
+    },
+    {
+      "name": "coal_bucket",
+      "vertices": 3832,
+      "triangles": 7400,
+      "surfaces": 1,
+      "bytes": 424912
+    },
+    {
+      "name": "anvil_workbench",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 46028
+    },
+    {
+      "name": "main_anvil",
+      "vertices": 464,
+      "triangles": 912,
+      "surfaces": 1,
+      "bytes": 51892
+    },
+    {
+      "name": "heated_bar_glow",
+      "vertices": 56,
+      "triangles": 108,
+      "surfaces": 1,
+      "bytes": 5096
+    },
+    {
+      "name": "bench_hammer",
+      "vertices": 128,
+      "triangles": 244,
+      "surfaces": 1,
+      "bytes": 10244
+    },
+    {
+      "name": "leather_apron",
+      "vertices": 108,
+      "triangles": 212,
+      "surfaces": 1,
+      "bytes": 8600
+    },
+    {
+      "name": "metal_ingot_crate",
+      "vertices": 1120,
+      "triangles": 2160,
+      "surfaces": 1,
+      "bytes": 75776
+    },
+    {
+      "name": "back_tool_bench",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 46032
+    },
+    {
+      "name": "punch_set",
+      "vertices": 264,
+      "triangles": 480,
+      "surfaces": 1,
+      "bytes": 24224
+    },
+    {
+      "name": "stump",
+      "vertices": 1325,
+      "triangles": 2622,
+      "surfaces": 1,
+      "bytes": 99540
+    },
+    {
+      "name": "tool_bucket",
+      "vertices": 3148,
+      "triangles": 6108,
+      "surfaces": 1,
+      "bytes": 382920
+    },
+    {
+      "name": "forge_stool",
+      "vertices": 96,
+      "triangles": 176,
+      "surfaces": 1,
+      "bytes": 9596
+    },
+    {
+      "name": "forge_mat",
+      "vertices": 360,
+      "triangles": 660,
+      "surfaces": 1,
+      "bytes": 28376
+    },
+    {
+      "name": "forge_lantern",
+      "vertices": 200,
+      "triangles": 368,
+      "surfaces": 1,
+      "bytes": 17032
+    },
+    {
+      "name": "right_wall_shelf",
+      "vertices": 410,
+      "triangles": 792,
+      "surfaces": 1,
+      "bytes": 31816
+    },
+    {
+      "name": "right_shelf_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 118412
+    }
+  ],
+  "unique_triangles": 74274,
+  "scene_triangles": 75186,
+  "static_draw_surfaces": 34,
+  "glb_bytes": 3583580,
+  "atlas_bytes": 2543312,
+  "placed_instances": 34,
+  "materials": 2
+}
