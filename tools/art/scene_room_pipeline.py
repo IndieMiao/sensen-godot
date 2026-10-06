@@ -330,6 +330,6 @@ def bake_and_export():
     stats["glb_bytes"]=sum(a["bytes"] for a in stats["assets"])
     stats["atlas_bytes"]=(OUT/"room_albedo_ao.png").stat().st_size
     stats["placed_instances"]=len(names)+len(INSTANCES)
-    stats["materials"]=3 if "fire" in names else 2 if "window_garden" in names else 1
+    stats["materials"]=1+int(any(n.endswith("garden") for n in names))+int("fire" in names)+int("display_glass" in names)
     (OUT/"asset_stats.json").write_text(json.dumps(stats,indent=2)+"\n")
     print("EXPORT_READY",json.dumps({k:stats[k] for k in ["unique_triangles","scene_triangles","static_draw_surfaces"]}),flush=True)

@@ -1,0 +1,645 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2964"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "file": "room_shell.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.09,
+            0
+          ],
+          "size": [
+            7.5,
+            0.34,
+            6.7
+          ]
+        },
+        {
+          "at": [
+            -3.6,
+            1.825,
+            0
+          ],
+          "size": [
+            0.22,
+            3.65,
+            6.6000000000000005
+          ]
+        },
+        {
+          "at": [
+            0,
+            1.825,
+            -3.2
+          ],
+          "size": [
+            7.4,
+            3.65,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "window_wall",
+      "file": "window_wall.glb",
+      "position": [
+        -3.6,
+        0,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0,
+        -3.2
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "back_window_left",
+      "file": "back_window_left.glb",
+      "position": [
+        -0.9,
+        0,
+        -3.095
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "back_window_left_garden",
+      "file": "back_window_left_garden.glb",
+      "position": [
+        -0.9,
+        0,
+        -3.095
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "back_window_right",
+      "file": "back_window_right.glb",
+      "position": [
+        2.36,
+        0,
+        -3.095
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "back_window_right_garden",
+      "file": "back_window_right_garden.glb",
+      "position": [
+        2.36,
+        0,
+        -3.095
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "brick_oven",
+      "file": "brick_oven.glb",
+      "position": [
+        -2.23,
+        0.082,
+        -2.22
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.45,
+            0
+          ],
+          "size": [
+            1.72,
+            2.9,
+            1.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "fire",
+      "file": "fire.glb",
+      "position": [
+        -2.23,
+        1.18,
+        -1.84
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "baking_loaves",
+      "file": "baking_loaves.glb",
+      "position": [
+        -2.23,
+        1.18,
+        -1.82
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "oven_peel",
+      "file": "oven_peel.glb",
+      "position": [
+        -3.02,
+        0.082,
+        -1.42
+      ],
+      "yaw_degrees": 12,
+      "colliders": []
+    },
+    {
+      "name": "pastry_display",
+      "file": "pastry_display.glb",
+      "position": [
+        1.79,
+        0.082,
+        0.71
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.34,
+            0
+          ],
+          "size": [
+            2.2,
+            0.68,
+            0.99
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pastry_trays",
+      "file": "pastry_trays.glb",
+      "position": [
+        1.79,
+        0.87,
+        0.71
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "display_frame",
+      "file": "display_frame.glb",
+      "position": [
+        1.79,
+        0.8,
+        0.71
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "display_glass",
+      "file": "display_glass.glb",
+      "position": [
+        1.79,
+        0.8,
+        0.71
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "checkout_counter",
+      "file": "checkout_counter.glb",
+      "position": [
+        3.0,
+        0.082,
+        -0.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.51,
+            0
+          ],
+          "size": [
+            0.87,
+            1.02,
+            0.85
+          ]
+        }
+      ]
+    },
+    {
+      "name": "register",
+      "file": "register.glb",
+      "position": [
+        3.0,
+        1.25,
+        -0.65
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bakery_sign",
+      "file": "bakery_sign.glb",
+      "position": [
+        0.61,
+        2.94,
+        -3.04
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bread_motto",
+      "file": "bread_motto.glb",
+      "position": [
+        3.2,
+        2.44,
+        -3.035
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "sink_cabinet",
+      "file": "sink_cabinet.glb",
+      "position": [
+        -0.66,
+        0.082,
+        -2.73
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.6,
+            0
+          ],
+          "size": [
+            1.8,
+            1.2,
+            0.86
+          ]
+        }
+      ]
+    },
+    {
+      "name": "utensil_crock",
+      "file": "utensil_crock.glb",
+      "position": [
+        -1.3,
+        1.26,
+        -2.71
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "back_counter",
+      "file": "back_counter.glb",
+      "position": [
+        0.81,
+        0.082,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.54,
+            0
+          ],
+          "size": [
+            1.03,
+            1.08,
+            0.77
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pantry",
+      "file": "pantry.glb",
+      "position": [
+        0.75,
+        1.18,
+        -2.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "pantry_jars",
+      "file": "pantry_jars.glb",
+      "position": [
+        0.75,
+        1.27,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "baguette_basket",
+      "file": "baguette_basket.glb",
+      "position": [
+        0.3,
+        2.51,
+        -2.74
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "pantry_plant",
+      "file": "pantry_plant.glb",
+      "position": [
+        1.19,
+        2.51,
+        -2.74
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "jar_wall_shelves",
+      "file": "jar_wall_shelves.glb",
+      "position": [
+        -3.35,
+        0.68,
+        1.16
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "jar_collection",
+      "file": "jar_collection.glb",
+      "position": [
+        -3.18,
+        0.79,
+        1.49
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "bakery_rack",
+      "file": "bakery_rack.glb",
+      "position": [
+        -2.93,
+        0.08,
+        -0.11
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.92,
+            0
+          ],
+          "size": [
+            0.68,
+            1.84,
+            0.61
+          ]
+        }
+      ]
+    },
+    {
+      "name": "baking_workbench",
+      "file": "baking_workbench.glb",
+      "position": [
+        -0.66,
+        0.082,
+        0.03
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.48,
+            0
+          ],
+          "size": [
+            1.91,
+            0.96,
+            0.98
+          ]
+        }
+      ]
+    },
+    {
+      "name": "workbench_baking_props",
+      "file": "workbench_baking_props.glb",
+      "position": [
+        -0.66,
+        1.2,
+        0.03
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "flour_storage",
+      "file": "flour_storage.glb",
+      "position": [
+        -0.66,
+        0.37,
+        0.05
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cafe_table",
+      "file": "cafe_table.glb",
+      "position": [
+        -1.65,
+        0.082,
+        2.13
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.415,
+            0
+          ],
+          "size": [
+            1.3,
+            0.83,
+            1.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chair",
+      "file": "chair.glb",
+      "position": [
+        -2.44,
+        0.082,
+        2.13
+      ],
+      "yaw_degrees": -90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.66,
+            0
+          ],
+          "size": [
+            0.63,
+            1.32,
+            0.63
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cafe_rope_rug",
+      "file": "cafe_rope_rug.glb",
+      "position": [
+        -1.65,
+        0.093,
+        2.13
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cafe_flowers",
+      "file": "cafe_flowers.glb",
+      "position": [
+        -1.66,
+        1.04,
+        2.12
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cafe_cup",
+      "file": "cafe_cup.glb",
+      "position": [
+        -1.3,
+        1.02,
+        2.3
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "floor_plant",
+      "file": "floor_plant.glb",
+      "position": [
+        -3.12,
+        0.083,
+        2.62
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "display_plant",
+      "file": "display_plant.glb",
+      "position": [
+        2.97,
+        0.083,
+        1.74
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "left_wall_light",
+      "file": "left_wall_light.glb",
+      "position": [
+        -3.4,
+        2.63,
+        1.94
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "right_wall_light",
+      "file": "right_wall_light.glb",
+      "position": [
+        2.37,
+        2.93,
+        -2.92
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "chair_opposite",
+      "asset": "chair",
+      "position": [
+        -0.85,
+        0.082,
+        2.13
+      ],
+      "yaw_degrees": 90
+    }
+  ],
+  "camera": {
+    "position": [
+      10.5,
+      9.4,
+      12
+    ],
+    "target": [
+      0,
+      1.6,
+      0
+    ],
+    "size": 11.9
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ]
+}

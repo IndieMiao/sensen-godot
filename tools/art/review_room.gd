@@ -2,6 +2,7 @@ extends SceneTree
 ## Art-only import/render inspection. No player, network, UI or saved data.
 var slug: String
 var output_dir: String
+var material_ids: Array[int] = []
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
@@ -74,6 +75,7 @@ func capture() -> void:
 		"adapter":RenderingServer.get_video_adapter_name(),"resolution":[1440,1080],
 		"mesh_instances":0,"surfaces":0,"triangles":0,"colliders":0,"finite_aabbs":true}
 	inspect(room,stats)
+	stats["material_count"] = material_ids.size()
 	assert(stats.mesh_instances == layout.assets.size() + layout.instances.size())
 	assert(stats.finite_aabbs)
 	var file := FileAccess.open(output_dir + "/godot-validation.json",FileAccess.WRITE)
@@ -86,6 +88,8 @@ func inspect(node: Node, stats: Dictionary) -> void:
 		stats.mesh_instances += 1
 		assert(node.material_override != null)
 		assert(node.material_override.albedo_texture != null)
+		var material_id: int = node.material_override.get_instance_id()
+		if not material_ids.has(material_id): material_ids.append(material_id)
 		var box: AABB = node.get_aabb()
 		stats.finite_aabbs = stats.finite_aabbs and box.position.is_finite() and box.size.is_finite() and box.size.length()>0
 		for i in node.mesh.get_surface_count():

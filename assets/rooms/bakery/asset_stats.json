@@ -1,0 +1,306 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "vertices": 5696,
+      "triangles": 10988,
+      "surfaces": 1,
+      "bytes": 379344
+    },
+    {
+      "name": "window_wall",
+      "vertices": 832,
+      "triangles": 1616,
+      "surfaces": 1,
+      "bytes": 54980
+    },
+    {
+      "name": "back_wall",
+      "vertices": 892,
+      "triangles": 1756,
+      "surfaces": 1,
+      "bytes": 72584
+    },
+    {
+      "name": "back_window_left",
+      "vertices": 600,
+      "triangles": 1188,
+      "surfaces": 1,
+      "bytes": 36804
+    },
+    {
+      "name": "back_window_left_garden",
+      "vertices": 4,
+      "triangles": 2,
+      "surfaces": 1,
+      "bytes": 1512
+    },
+    {
+      "name": "back_window_right",
+      "vertices": 600,
+      "triangles": 1188,
+      "surfaces": 1,
+      "bytes": 36804
+    },
+    {
+      "name": "back_window_right_garden",
+      "vertices": 4,
+      "triangles": 2,
+      "surfaces": 1,
+      "bytes": 1516
+    },
+    {
+      "name": "brick_oven",
+      "vertices": 3872,
+      "triangles": 7368,
+      "surfaces": 1,
+      "bytes": 285264
+    },
+    {
+      "name": "fire",
+      "vertices": 180,
+      "triangles": 348,
+      "surfaces": 1,
+      "bytes": 13416
+    },
+    {
+      "name": "baking_loaves",
+      "vertices": 436,
+      "triangles": 840,
+      "surfaces": 1,
+      "bytes": 28632
+    },
+    {
+      "name": "oven_peel",
+      "vertices": 112,
+      "triangles": 216,
+      "surfaces": 1,
+      "bytes": 8808
+    },
+    {
+      "name": "pastry_display",
+      "vertices": 784,
+      "triangles": 1512,
+      "surfaces": 1,
+      "bytes": 53472
+    },
+    {
+      "name": "pastry_trays",
+      "vertices": 8898,
+      "triangles": 17364,
+      "surfaces": 1,
+      "bytes": 550944
+    },
+    {
+      "name": "display_frame",
+      "vertices": 140,
+      "triangles": 264,
+      "surfaces": 1,
+      "bytes": 12500
+    },
+    {
+      "name": "display_glass",
+      "vertices": 10,
+      "triangles": 8,
+      "surfaces": 1,
+      "bytes": 1792
+    },
+    {
+      "name": "checkout_counter",
+      "vertices": 448,
+      "triangles": 864,
+      "surfaces": 1,
+      "bytes": 31148
+    },
+    {
+      "name": "register",
+      "vertices": 952,
+      "triangles": 1836,
+      "surfaces": 1,
+      "bytes": 64620
+    },
+    {
+      "name": "bakery_sign",
+      "vertices": 1712,
+      "triangles": 2968,
+      "surfaces": 1,
+      "bytes": 238104
+    },
+    {
+      "name": "bread_motto",
+      "vertices": 8432,
+      "triangles": 14468,
+      "surfaces": 1,
+      "bytes": 1344168
+    },
+    {
+      "name": "sink_cabinet",
+      "vertices": 1736,
+      "triangles": 3356,
+      "surfaces": 1,
+      "bytes": 119292
+    },
+    {
+      "name": "utensil_crock",
+      "vertices": 300,
+      "triangles": 572,
+      "surfaces": 1,
+      "bytes": 23420
+    },
+    {
+      "name": "back_counter",
+      "vertices": 452,
+      "triangles": 876,
+      "surfaces": 1,
+      "bytes": 30292
+    },
+    {
+      "name": "pantry",
+      "vertices": 336,
+      "triangles": 648,
+      "surfaces": 1,
+      "bytes": 23684
+    },
+    {
+      "name": "pantry_jars",
+      "vertices": 1056,
+      "triangles": 2040,
+      "surfaces": 1,
+      "bytes": 76200
+    },
+    {
+      "name": "baguette_basket",
+      "vertices": 1752,
+      "triangles": 3256,
+      "surfaces": 1,
+      "bytes": 130320
+    },
+    {
+      "name": "pantry_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 118116
+    },
+    {
+      "name": "jar_wall_shelves",
+      "vertices": 392,
+      "triangles": 756,
+      "surfaces": 1,
+      "bytes": 27428
+    },
+    {
+      "name": "jar_collection",
+      "vertices": 2112,
+      "triangles": 4080,
+      "surfaces": 1,
+      "bytes": 151040
+    },
+    {
+      "name": "bakery_rack",
+      "vertices": 2524,
+      "triangles": 4852,
+      "surfaces": 1,
+      "bytes": 162020
+    },
+    {
+      "name": "baking_workbench",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 46032
+    },
+    {
+      "name": "workbench_baking_props",
+      "vertices": 602,
+      "triangles": 1172,
+      "surfaces": 1,
+      "bytes": 42292
+    },
+    {
+      "name": "flour_storage",
+      "vertices": 2122,
+      "triangles": 3660,
+      "surfaces": 1,
+      "bytes": 280888
+    },
+    {
+      "name": "cafe_table",
+      "vertices": 288,
+      "triangles": 556,
+      "surfaces": 1,
+      "bytes": 23396
+    },
+    {
+      "name": "chair",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 46012
+    },
+    {
+      "name": "cafe_rope_rug",
+      "vertices": 6608,
+      "triangles": 13148,
+      "surfaces": 1,
+      "bytes": 559296
+    },
+    {
+      "name": "cafe_flowers",
+      "vertices": 3814,
+      "triangles": 7260,
+      "surfaces": 1,
+      "bytes": 260484
+    },
+    {
+      "name": "cafe_cup",
+      "vertices": 242,
+      "triangles": 468,
+      "surfaces": 1,
+      "bytes": 20628
+    },
+    {
+      "name": "floor_plant",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 45588
+    },
+    {
+      "name": "display_plant",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 45592
+    },
+    {
+      "name": "left_wall_light",
+      "vertices": 200,
+      "triangles": 368,
+      "surfaces": 1,
+      "bytes": 17032
+    },
+    {
+      "name": "right_wall_light",
+      "vertices": 200,
+      "triangles": 368,
+      "surfaces": 1,
+      "bytes": 17036
+    }
+  ],
+  "unique_triangles": 119848,
+  "scene_triangles": 121144,
+  "static_draw_surfaces": 42,
+  "glb_bytes": 5482500,
+  "atlas_bytes": 2776542,
+  "placed_instances": 42,
+  "materials": 4
+}

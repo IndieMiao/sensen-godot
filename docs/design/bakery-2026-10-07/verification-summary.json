@@ -1,0 +1,370 @@
+{
+  "status": "art review candidate; user acceptance pending",
+  "asset_stats": {
+    "atlas": {
+      "size": [
+        2048,
+        2048
+      ],
+      "file": "room_albedo_ao.png",
+      "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+    },
+    "assets": [
+      {
+        "name": "room_shell",
+        "vertices": 5696,
+        "triangles": 10988,
+        "surfaces": 1,
+        "bytes": 379344
+      },
+      {
+        "name": "window_wall",
+        "vertices": 832,
+        "triangles": 1616,
+        "surfaces": 1,
+        "bytes": 54980
+      },
+      {
+        "name": "back_wall",
+        "vertices": 892,
+        "triangles": 1756,
+        "surfaces": 1,
+        "bytes": 72584
+      },
+      {
+        "name": "back_window_left",
+        "vertices": 600,
+        "triangles": 1188,
+        "surfaces": 1,
+        "bytes": 36804
+      },
+      {
+        "name": "back_window_left_garden",
+        "vertices": 4,
+        "triangles": 2,
+        "surfaces": 1,
+        "bytes": 1512
+      },
+      {
+        "name": "back_window_right",
+        "vertices": 600,
+        "triangles": 1188,
+        "surfaces": 1,
+        "bytes": 36804
+      },
+      {
+        "name": "back_window_right_garden",
+        "vertices": 4,
+        "triangles": 2,
+        "surfaces": 1,
+        "bytes": 1516
+      },
+      {
+        "name": "brick_oven",
+        "vertices": 3872,
+        "triangles": 7368,
+        "surfaces": 1,
+        "bytes": 285264
+      },
+      {
+        "name": "fire",
+        "vertices": 180,
+        "triangles": 348,
+        "surfaces": 1,
+        "bytes": 13416
+      },
+      {
+        "name": "baking_loaves",
+        "vertices": 436,
+        "triangles": 840,
+        "surfaces": 1,
+        "bytes": 28632
+      },
+      {
+        "name": "oven_peel",
+        "vertices": 112,
+        "triangles": 216,
+        "surfaces": 1,
+        "bytes": 8808
+      },
+      {
+        "name": "pastry_display",
+        "vertices": 784,
+        "triangles": 1512,
+        "surfaces": 1,
+        "bytes": 53472
+      },
+      {
+        "name": "pastry_trays",
+        "vertices": 8898,
+        "triangles": 17364,
+        "surfaces": 1,
+        "bytes": 550944
+      },
+      {
+        "name": "display_frame",
+        "vertices": 140,
+        "triangles": 264,
+        "surfaces": 1,
+        "bytes": 12500
+      },
+      {
+        "name": "display_glass",
+        "vertices": 10,
+        "triangles": 8,
+        "surfaces": 1,
+        "bytes": 1792
+      },
+      {
+        "name": "checkout_counter",
+        "vertices": 448,
+        "triangles": 864,
+        "surfaces": 1,
+        "bytes": 31148
+      },
+      {
+        "name": "register",
+        "vertices": 952,
+        "triangles": 1836,
+        "surfaces": 1,
+        "bytes": 64620
+      },
+      {
+        "name": "bakery_sign",
+        "vertices": 1712,
+        "triangles": 2968,
+        "surfaces": 1,
+        "bytes": 238104
+      },
+      {
+        "name": "bread_motto",
+        "vertices": 8432,
+        "triangles": 14468,
+        "surfaces": 1,
+        "bytes": 1344168
+      },
+      {
+        "name": "sink_cabinet",
+        "vertices": 1736,
+        "triangles": 3356,
+        "surfaces": 1,
+        "bytes": 119292
+      },
+      {
+        "name": "utensil_crock",
+        "vertices": 300,
+        "triangles": 572,
+        "surfaces": 1,
+        "bytes": 23420
+      },
+      {
+        "name": "back_counter",
+        "vertices": 452,
+        "triangles": 876,
+        "surfaces": 1,
+        "bytes": 30292
+      },
+      {
+        "name": "pantry",
+        "vertices": 336,
+        "triangles": 648,
+        "surfaces": 1,
+        "bytes": 23684
+      },
+      {
+        "name": "pantry_jars",
+        "vertices": 1056,
+        "triangles": 2040,
+        "surfaces": 1,
+        "bytes": 76200
+      },
+      {
+        "name": "baguette_basket",
+        "vertices": 1752,
+        "triangles": 3256,
+        "surfaces": 1,
+        "bytes": 130320
+      },
+      {
+        "name": "pantry_plant",
+        "vertices": 1514,
+        "triangles": 2868,
+        "surfaces": 1,
+        "bytes": 118116
+      },
+      {
+        "name": "jar_wall_shelves",
+        "vertices": 392,
+        "triangles": 756,
+        "surfaces": 1,
+        "bytes": 27428
+      },
+      {
+        "name": "jar_collection",
+        "vertices": 2112,
+        "triangles": 4080,
+        "surfaces": 1,
+        "bytes": 151040
+      },
+      {
+        "name": "bakery_rack",
+        "vertices": 2524,
+        "triangles": 4852,
+        "surfaces": 1,
+        "bytes": 162020
+      },
+      {
+        "name": "baking_workbench",
+        "vertices": 672,
+        "triangles": 1296,
+        "surfaces": 1,
+        "bytes": 46032
+      },
+      {
+        "name": "workbench_baking_props",
+        "vertices": 602,
+        "triangles": 1172,
+        "surfaces": 1,
+        "bytes": 42292
+      },
+      {
+        "name": "flour_storage",
+        "vertices": 2122,
+        "triangles": 3660,
+        "surfaces": 1,
+        "bytes": 280888
+      },
+      {
+        "name": "cafe_table",
+        "vertices": 288,
+        "triangles": 556,
+        "surfaces": 1,
+        "bytes": 23396
+      },
+      {
+        "name": "chair",
+        "vertices": 672,
+        "triangles": 1296,
+        "surfaces": 1,
+        "bytes": 46012
+      },
+      {
+        "name": "cafe_rope_rug",
+        "vertices": 6608,
+        "triangles": 13148,
+        "surfaces": 1,
+        "bytes": 559296
+      },
+      {
+        "name": "cafe_flowers",
+        "vertices": 3814,
+        "triangles": 7260,
+        "surfaces": 1,
+        "bytes": 260484
+      },
+      {
+        "name": "cafe_cup",
+        "vertices": 242,
+        "triangles": 468,
+        "surfaces": 1,
+        "bytes": 20628
+      },
+      {
+        "name": "floor_plant",
+        "vertices": 571,
+        "triangles": 1078,
+        "surfaces": 1,
+        "bytes": 45588
+      },
+      {
+        "name": "display_plant",
+        "vertices": 571,
+        "triangles": 1078,
+        "surfaces": 1,
+        "bytes": 45592
+      },
+      {
+        "name": "left_wall_light",
+        "vertices": 200,
+        "triangles": 368,
+        "surfaces": 1,
+        "bytes": 17032
+      },
+      {
+        "name": "right_wall_light",
+        "vertices": 200,
+        "triangles": 368,
+        "surfaces": 1,
+        "bytes": 17036
+      }
+    ],
+    "unique_triangles": 119848,
+    "scene_triangles": 121144,
+    "static_draw_surfaces": 42,
+    "glb_bytes": 5482500,
+    "atlas_bytes": 2776542,
+    "placed_instances": 42,
+    "materials": 4
+  },
+  "godot": {
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "colliders": 14,
+    "finite_aabbs": true,
+    "material_count": 5,
+    "mesh_instances": 42,
+    "renderer": "mobile",
+    "resolution": [
+      1440,
+      1080
+    ],
+    "scene": "bakery",
+    "surfaces": 42,
+    "triangles": 121144
+  },
+  "hashes": {
+    "assets/rooms/bakery/baking_loaves.glb": "9f97ac02c828f532250fe6d93ef6f029671824d18822ee2c5ec07741b546ce74",
+    "assets/rooms/bakery/back_counter.glb": "4db455d9a2cbc495acbbdcc7edb1a61f7116ab3ed9f7ca9db32b800406e0dbf2",
+    "assets/rooms/bakery/bread_motto.glb": "d958230b19bee4ad820ab369610884f4d06ed68511bd78e63eebd8847571e63f",
+    "assets/rooms/bakery/baguette_basket.glb": "9af876de703cea5f2880ec003fd2f64c414baffcec4cadddd60850e556cb5d98",
+    "assets/rooms/bakery/baking_workbench.glb": "864d7ed2af79c93b2de6e4f9a78873ffeae46ef89aceb55f60f457d1ebfab4e9",
+    "assets/rooms/bakery/display_plant.glb": "4bfa718d559b2dd1e6395d6721e9789f95f9b52b0105fbe11cd8b640fbd4bd84",
+    "assets/rooms/bakery/back_window_right.glb": "40fe02749e603c9a658223369ed0f3103dffc194a530f1244698d1bb691186e0",
+    "assets/rooms/bakery/cafe_table.glb": "3620b5febd21b9b34c9cad2d214d6a8f12d90b5f085bdff8552c9aa7b0e964b4",
+    "assets/rooms/bakery/back_wall.glb": "a68d0238ff690f4dd72a50c0dc653d6eed7d5eb8d9c01ae11c429b6c451c9ee1",
+    "assets/rooms/bakery/right_wall_light.glb": "f93c505268ba89622e1026788f64081890b1084f7a2e5c6f48a74e53743c5a84",
+    "assets/rooms/bakery/back_window_left.glb": "0947aabb77818c2dbf831e5f49b0de79673cc6332c3e26a11f6e077039d21476",
+    "assets/rooms/bakery/floor_plant.glb": "55ebc2cf91558780075b8c365f3ec1879d28255243928e108eda99b9cd63832c",
+    "assets/rooms/bakery/chair.glb": "7a207645da66ab420745a9a8e137f7852ebbd037646d0b6f0b251d2afb55091f",
+    "assets/rooms/bakery/room_shell.glb": "c8cca2511b085b38ef0483c7d853715e719909f2424935b258c8e4d54b2f3f6e",
+    "assets/rooms/bakery/left_wall_light.glb": "8295230492b0c07c65318c49e4faf4a68fdadae6373687c3648b955848344d42",
+    "assets/rooms/bakery/bakery_sign.glb": "c7d8427346a9b51fde90f6f3cfd746b4ec88d8bc1d35e7e581a7e93ec3164994",
+    "assets/rooms/bakery/display_frame.glb": "091ff722c353ee3bb442c5025ac7dbeb6e9cf35418ad2e5afde067ded56adcea",
+    "assets/rooms/bakery/pantry_jars.glb": "93a8f43a089fb9420a77ad026090fa501d92ad9557d5d846ddd838c147d527b1",
+    "assets/rooms/bakery/checkout_counter.glb": "a3a1e7d4af9f8b2c52deeb215b22067d1f2c3e537a827c237253e030c4817a56",
+    "assets/rooms/bakery/fire.glb": "bbc92778672be2ee2b090fffc694890364a00eae84d8064fe3a0a4490b9c91e5",
+    "assets/rooms/bakery/jar_collection.glb": "d39a5c72decfe137023158056aeb977ffe91fc75498f6c3549fcb24d67bc9516",
+    "assets/rooms/bakery/back_window_left_garden.glb": "6828b1e37ba755a206c51cafc50c6149a99ca4ff657a2318c3fc748964438b45",
+    "assets/rooms/bakery/bakery_rack.glb": "ff391c3c4973a7bf5fb60b110be6008aea98a05839787034f8c70d946f0830f4",
+    "assets/rooms/bakery/pantry.glb": "289e9964424d13010bc18ea302c737fdd7f6993d8582ee2b0e5e97d5389c07ec",
+    "assets/rooms/bakery/pastry_display.glb": "166a54d1a4c6ccf638e659e0c73c5f1ad61f5c91eb4c8edc14fb6fcf479e51f0",
+    "assets/rooms/bakery/cafe_cup.glb": "820ae4806d0089622b8ebe6b532e4d43636f349e2fd5c51851e509d3523dd760",
+    "assets/rooms/bakery/cafe_flowers.glb": "ffa163cd66839ccc732278e755a760915267ccd4874ebb269e8c9ba62fa310e6",
+    "assets/rooms/bakery/pastry_trays.glb": "6c01b96f48ebdaf367d1d944108e6df07760c003a5c7c5a485c994e5f518f260",
+    "assets/rooms/bakery/cafe_rope_rug.glb": "c157f2dbb91135527f595117622b0b48ead8055c9551e1fe5ae08b891b95e2ea",
+    "assets/rooms/bakery/display_glass.glb": "9d496e56bc9c416900aeb3e7a7448bec8530685169757b8d319975fbcedc6027",
+    "assets/rooms/bakery/oven_peel.glb": "a0027b7d015a29bcee055220a82cf44ea3d5d454614d86f96d1a13e31febafd5",
+    "assets/rooms/bakery/brick_oven.glb": "701e407555e4507fce6e839e525036855d7753a20e41e00482c56d294740f4c8",
+    "assets/rooms/bakery/workbench_baking_props.glb": "427a898be0984bacc63c42496281de1e0901578a06c14b082a16677d5336e937",
+    "assets/rooms/bakery/jar_wall_shelves.glb": "b8c80a35eb0437eed74937c3515eacf4b60483a6b37e715125a0681ad5a52077",
+    "assets/rooms/bakery/utensil_crock.glb": "c00cf11f5c74b16c0a50df38c0902897a7d883d16222e88bbd8b0733126c3581",
+    "assets/rooms/bakery/flour_storage.glb": "671f6b618bd03b5b03385ea19011a72c1239a1cb54b517636c64265711d90944",
+    "assets/rooms/bakery/sink_cabinet.glb": "81c41d216ef1e2edfef87e60c707612e37a5396ce16be45af21e4e34418d99a8",
+    "assets/rooms/bakery/back_window_right_garden.glb": "6f3a6d7f68778bb4a50af9b3e6a231f6309c8ca93010c411341e4f0a9b63a8ac",
+    "assets/rooms/bakery/window_wall.glb": "999819233aa21838fe8d85251c9e459f276862f7900838c2306f6e4c36c28a5e",
+    "assets/rooms/bakery/register.glb": "5dc85c1e3777f01b1ee5cf79e531bfa165079bc6cda502998428dd0818fc5015",
+    "assets/rooms/bakery/pantry_plant.glb": "79f4a64666bc4e2636b122dcb5c22cc068eabe8a343f3602c89ccbd4957d466a",
+    "assets/rooms/bakery/room_albedo_ao.png": "f1eebb8b95918c8b4bbb239d33389550f280d258d6be92a73311f7b59ad392d6",
+    "tools/art/source/bakery/bakery.blend": "c7daf4b4ac49cf99565205b528a9f96e7236ed6862d4d71de5058b8370ea5367"
+  },
+  "scope": "Art assets only; no gameplay, Android benchmark, physical-device performance or release claim."
+}
