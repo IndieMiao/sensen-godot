@@ -72,7 +72,8 @@ def instance(asset, name, at, yaw=0):
     INSTANCES.append({'name':name,'asset':asset,'position':list(at),'yaw_degrees':yaw})
 
 
-def shell(width=8, depth=6.4, height=3.65, window_z=.05, door_x=3.15, stone_floor=False):
+def shell(width=8, depth=6.4, height=3.65, window_z=.05, door_x=3.15, stone_floor=False,
+          open_left=True, open_back=True):
     x=width/2;z=depth/2
     begin('room_shell',at=(0,0,0),collision=[{'at':[0,-.09,0],'size':[width+.3,.34,depth+.3]},
           {'at':[-x,height/2,0],'size':[.22,height,depth+.2]},
@@ -93,9 +94,10 @@ def shell(width=8, depth=6.4, height=3.65, window_z=.05, door_x=3.15, stone_floo
     for name,at,yaw,length,cutx,opening in [('window_wall',(-x,0,0),90,depth,-window_z,'window'),('back_wall',(0,0,-z),0,width,door_x,'door')]:
         begin(name,at,yaw)
         wall=cube('Cream plaster infill',(0,height/2,0),(length,height,.18),'plaster',.04,'plaster')
-        if opening=='window':cut=arch_solid('Window opening',1.78,1.32,2.38,.62,.7,0,'plaster')
-        else:cut=arch_solid('Door opening',1.04,.07,1.89,.50,.7,0,'plaster')
-        cut.location.x=cutx;boolean_cut(wall,cut)
+        if (opening=='window' and open_left) or (opening=='door' and open_back):
+            if opening=='window':cut=arch_solid('Window opening',1.78,1.32,2.38,.62,.7,0,'plaster')
+            else:cut=arch_solid('Door opening',1.04,.07,1.89,.50,.7,0,'plaster')
+            cut.location.x=cutx;boolean_cut(wall,cut)
         for xx in ((-length/2+.08,length/2-.08) if opening=="window" else (length/2-.08,)):
             cube('Upright oak timber',(xx,height/2,.06),(.26,height+.15,.30),'oak',.07,'wood','Y')
             cube('Timber joint cap',(xx,height-.05,.06),(.43,.39,.43),'oak_end',.10,'wood')
@@ -106,10 +108,12 @@ def shell(width=8, depth=6.4, height=3.65, window_z=.05, door_x=3.15, stone_floo
         else:
             edge=-length/2+.2;end=cutx-.62
             cube('Door left skirting',((edge+end)/2,.18,.11),(end-edge,.19,.14),'oak',.025,'wood')
-    reuse('arched_window',(-x+.10,0,window_z),90)
-    reuse('window_garden',(-x-.16,0,window_z),90)
-    reuse('green_door',(door_x,.05,-z+.115))
-    reuse('entry_mat',(door_x,.092,-z+.72))
+    if open_left:
+        reuse('arched_window',(-x+.10,0,window_z),90)
+        reuse('window_garden',(-x-.16,0,window_z),90)
+    if open_back:
+        reuse('green_door',(door_x,.05,-z+.115))
+        reuse('entry_mat',(door_x,.092,-z+.72))
 
 
 def stool(name,at,yaw=0, height=.59,radius=.29):
