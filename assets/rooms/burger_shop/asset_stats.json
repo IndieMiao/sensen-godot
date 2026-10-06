@@ -1,0 +1,173 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
+    "bytes": 2910271
+  },
+  "assets": [
+    {
+      "name": "checker_floor",
+      "vertices": 7488,
+      "triangles": 14444,
+      "surfaces": 1,
+      "bytes": 431352
+    },
+    {
+      "name": "left_wall",
+      "vertices": 1792,
+      "triangles": 3456,
+      "surfaces": 1,
+      "bytes": 100192
+    },
+    {
+      "name": "pickup_wall",
+      "vertices": 1400,
+      "triangles": 2700,
+      "surfaces": 1,
+      "bytes": 82860
+    },
+    {
+      "name": "pickup_window",
+      "vertices": 224,
+      "triangles": 432,
+      "surfaces": 1,
+      "bytes": 16764
+    },
+    {
+      "name": "pickup_canopy",
+      "vertices": 1044,
+      "triangles": 2008,
+      "surfaces": 1,
+      "bytes": 57976
+    },
+    {
+      "name": "pickup_sign",
+      "vertices": 800,
+      "triangles": 876,
+      "surfaces": 1,
+      "bytes": 46056
+    },
+    {
+      "name": "pickup_paper_bags",
+      "vertices": 1648,
+      "triangles": 3216,
+      "surfaces": 1,
+      "bytes": 77504
+    },
+    {
+      "name": "drinks_fridge",
+      "vertices": 5144,
+      "triangles": 7932,
+      "surfaces": 1,
+      "bytes": 287444
+    },
+    {
+      "name": "drinks_glass",
+      "vertices": 8,
+      "triangles": 12,
+      "surfaces": 1,
+      "bytes": 2192
+    },
+    {
+      "name": "grill_station",
+      "vertices": 2108,
+      "triangles": 4036,
+      "surfaces": 1,
+      "bytes": 116080
+    },
+    {
+      "name": "fryer_station",
+      "vertices": 2620,
+      "triangles": 4972,
+      "surfaces": 1,
+      "bytes": 129096
+    },
+    {
+      "name": "prep_station",
+      "vertices": 1504,
+      "triangles": 2852,
+      "surfaces": 1,
+      "bytes": 75564
+    },
+    {
+      "name": "burger_warming_shelf",
+      "vertices": 4288,
+      "triangles": 8140,
+      "surfaces": 1,
+      "bytes": 200516
+    },
+    {
+      "name": "menu_board",
+      "vertices": 18100,
+      "triangles": 18272,
+      "surfaces": 1,
+      "bytes": 985296
+    },
+    {
+      "name": "red_order_counter",
+      "vertices": 5624,
+      "triangles": 10824,
+      "surfaces": 1,
+      "bytes": 278048
+    },
+    {
+      "name": "customer_bar",
+      "vertices": 568,
+      "triangles": 1104,
+      "surfaces": 1,
+      "bytes": 35136
+    },
+    {
+      "name": "red_diner_stool",
+      "vertices": 382,
+      "triangles": 752,
+      "surfaces": 1,
+      "bytes": 24756
+    },
+    {
+      "name": "wood_planter_barrier",
+      "vertices": 3528,
+      "triangles": 6744,
+      "surfaces": 1,
+      "bytes": 174220
+    },
+    {
+      "name": "good_burgers_poster",
+      "vertices": 2200,
+      "triangles": 2264,
+      "surfaces": 1,
+      "bytes": 122664
+    },
+    {
+      "name": "fresh_buns_poster",
+      "vertices": 1696,
+      "triangles": 1752,
+      "surfaces": 1,
+      "bytes": 95108
+    },
+    {
+      "name": "corner_plant",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 35508
+    },
+    {
+      "name": "wall_lamp",
+      "vertices": 210,
+      "triangles": 404,
+      "surfaces": 1,
+      "bytes": 11412
+    }
+  ],
+  "unique_triangles": 98270,
+  "scene_triangles": 100582,
+  "static_draw_surfaces": 26,
+  "unique_assets": 22,
+  "placed_instances": 26,
+  "glb_bytes": 3385744
+}
