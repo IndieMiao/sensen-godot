@@ -1,0 +1,320 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
+    "bytes": 3121515
+  },
+  "assets": [
+    {
+      "name": "boutique_floor",
+      "vertices": 7488,
+      "triangles": 14444,
+      "surfaces": 1,
+      "bytes": 431356
+    },
+    {
+      "name": "boutique_left_wall",
+      "vertices": 1162,
+      "triangles": 2252,
+      "surfaces": 1,
+      "bytes": 83484
+    },
+    {
+      "name": "boutique_back_wall",
+      "vertices": 1162,
+      "triangles": 2252,
+      "surfaces": 1,
+      "bytes": 83708
+    },
+    {
+      "name": "entrance_frame",
+      "vertices": 552,
+      "triangles": 1092,
+      "surfaces": 1,
+      "bytes": 31484
+    },
+    {
+      "name": "entrance_glass",
+      "vertices": 46,
+      "triangles": 88,
+      "surfaces": 1,
+      "bytes": 6292
+    },
+    {
+      "name": "street_left_rack",
+      "vertices": 332,
+      "triangles": 632,
+      "surfaces": 1,
+      "bytes": 21944
+    },
+    {
+      "name": "street_right_rack",
+      "vertices": 332,
+      "triangles": 632,
+      "surfaces": 1,
+      "bytes": 21944
+    },
+    {
+      "name": "street_top_gray",
+      "vertices": 890,
+      "triangles": 1724,
+      "surfaces": 1,
+      "bytes": 45652
+    },
+    {
+      "name": "street_top_black",
+      "vertices": 890,
+      "triangles": 1724,
+      "surfaces": 1,
+      "bytes": 45652
+    },
+    {
+      "name": "street_top_ivory",
+      "vertices": 890,
+      "triangles": 1724,
+      "surfaces": 1,
+      "bytes": 45656
+    },
+    {
+      "name": "street_top_blue",
+      "vertices": 1216,
+      "triangles": 2232,
+      "surfaces": 1,
+      "bytes": 63104
+    },
+    {
+      "name": "street_top_purple",
+      "vertices": 890,
+      "triangles": 1724,
+      "surfaces": 1,
+      "bytes": 45656
+    },
+    {
+      "name": "street_top_varsity",
+      "vertices": 1216,
+      "triangles": 2232,
+      "surfaces": 1,
+      "bytes": 63108
+    },
+    {
+      "name": "cargo_trousers_olive",
+      "vertices": 431,
+      "triangles": 822,
+      "surfaces": 1,
+      "bytes": 24980
+    },
+    {
+      "name": "cargo_trousers_black",
+      "vertices": 431,
+      "triangles": 822,
+      "surfaces": 1,
+      "bytes": 24980
+    },
+    {
+      "name": "cargo_trousers_sand",
+      "vertices": 431,
+      "triangles": 822,
+      "surfaces": 1,
+      "bytes": 24980
+    },
+    {
+      "name": "dark_changing_arch",
+      "vertices": 432,
+      "triangles": 864,
+      "surfaces": 1,
+      "bytes": 29100
+    },
+    {
+      "name": "black_changing_curtain",
+      "vertices": 332,
+      "triangles": 648,
+      "surfaces": 1,
+      "bytes": 30692
+    },
+    {
+      "name": "standing_mirror",
+      "vertices": 646,
+      "triangles": 1270,
+      "surfaces": 1,
+      "bytes": 36972
+    },
+    {
+      "name": "brand_wall_panel",
+      "vertices": 84,
+      "triangles": 156,
+      "surfaces": 1,
+      "bytes": 8584
+    },
+    {
+      "name": "block_theory_brand",
+      "vertices": 1598,
+      "triangles": 2382,
+      "surfaces": 1,
+      "bytes": 157836
+    },
+    {
+      "name": "entry_graffiti",
+      "vertices": 20,
+      "triangles": 36,
+      "surfaces": 1,
+      "bytes": 3060
+    },
+    {
+      "name": "black_checkout",
+      "vertices": 1492,
+      "triangles": 2856,
+      "surfaces": 1,
+      "bytes": 84952
+    },
+    {
+      "name": "checkout_plant",
+      "vertices": 487,
+      "triangles": 910,
+      "surfaces": 1,
+      "bytes": 24196
+    },
+    {
+      "name": "display_rug",
+      "vertices": 280,
+      "triangles": 540,
+      "surfaces": 1,
+      "bytes": 17924
+    },
+    {
+      "name": "central_display_table",
+      "vertices": 560,
+      "triangles": 1080,
+      "surfaces": 1,
+      "bytes": 37572
+    },
+    {
+      "name": "graphic_fold_black",
+      "vertices": 226,
+      "triangles": 388,
+      "surfaces": 1,
+      "bytes": 12740
+    },
+    {
+      "name": "graphic_fold_ivory",
+      "vertices": 226,
+      "triangles": 388,
+      "surfaces": 1,
+      "bytes": 12740
+    },
+    {
+      "name": "graphic_fold_blue",
+      "vertices": 226,
+      "triangles": 388,
+      "surfaces": 1,
+      "bytes": 12736
+    },
+    {
+      "name": "black_cap",
+      "vertices": 1338,
+      "triangles": 2616,
+      "surfaces": 1,
+      "bytes": 59872
+    },
+    {
+      "name": "blue_sneaker_pair",
+      "vertices": 944,
+      "triangles": 1816,
+      "surfaces": 1,
+      "bytes": 45036
+    },
+    {
+      "name": "folded_black_trousers",
+      "vertices": 198,
+      "triangles": 356,
+      "surfaces": 1,
+      "bytes": 11916
+    },
+    {
+      "name": "display_storage_crate",
+      "vertices": 1512,
+      "triangles": 2916,
+      "surfaces": 1,
+      "bytes": 76736
+    },
+    {
+      "name": "black_tufted_bench",
+      "vertices": 1064,
+      "triangles": 2052,
+      "surfaces": 1,
+      "bytes": 74124
+    },
+    {
+      "name": "good_fit_poster",
+      "vertices": 2910,
+      "triangles": 4378,
+      "surfaces": 1,
+      "bytes": 279760
+    },
+    {
+      "name": "wear_ideas_poster",
+      "vertices": 1888,
+      "triangles": 3148,
+      "surfaces": 1,
+      "bytes": 147328
+    },
+    {
+      "name": "monochrome_poster",
+      "vertices": 292,
+      "triangles": 536,
+      "surfaces": 1,
+      "bytes": 16440
+    },
+    {
+      "name": "black_pendant",
+      "vertices": 272,
+      "triangles": 532,
+      "surfaces": 1,
+      "bytes": 17328
+    },
+    {
+      "name": "street_wall_sconce",
+      "vertices": 152,
+      "triangles": 292,
+      "surfaces": 1,
+      "bytes": 12352
+    },
+    {
+      "name": "front_square_plant",
+      "vertices": 487,
+      "triangles": 910,
+      "surfaces": 1,
+      "bytes": 32544
+    },
+    {
+      "name": "entrance_square_plant",
+      "vertices": 487,
+      "triangles": 910,
+      "surfaces": 1,
+      "bytes": 30820
+    },
+    {
+      "name": "left_trailing_plant",
+      "vertices": 1430,
+      "triangles": 2700,
+      "surfaces": 1,
+      "bytes": 65148
+    },
+    {
+      "name": "entry_mat",
+      "vertices": 62,
+      "triangles": 112,
+      "surfaces": 1,
+      "bytes": 5812
+    }
+  ],
+  "unique_triangles": 70398,
+  "scene_triangles": 90716,
+  "static_draw_surfaces": 64,
+  "unique_assets": 43,
+  "placed_instances": 64,
+  "glb_bytes": 2408300
+}

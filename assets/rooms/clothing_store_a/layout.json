@@ -1,0 +1,837 @@
+{
+  "units": "metres",
+  "coordinates": "Godot Y up, front +Z; pivots local floor or mounting point",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2959"
+  },
+  "assets": [
+    {
+      "name": "boutique_floor",
+      "file": "boutique_floor.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.105,
+            0
+          ],
+          "size": [
+            6.1,
+            0.27,
+            5.68
+          ]
+        }
+      ]
+    },
+    {
+      "name": "boutique_left_wall",
+      "file": "boutique_left_wall.glb",
+      "position": [
+        -3,
+        0.06,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            -2.64,
+            1.5,
+            0
+          ],
+          "size": [
+            0.27,
+            3,
+            0.2
+          ]
+        },
+        {
+          "at": [
+            0.8,
+            1.5,
+            0
+          ],
+          "size": [
+            3.99,
+            3,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "boutique_back_wall",
+      "file": "boutique_back_wall.glb",
+      "position": [
+        0,
+        0.06,
+        -2.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.57,
+            0
+          ],
+          "size": [
+            6,
+            3.14,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entrance_frame",
+      "file": "entrance_frame.glb",
+      "position": [
+        -2.87,
+        0.06,
+        1.96
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "entrance_glass",
+      "file": "entrance_glass.glb",
+      "position": [
+        -2.87,
+        0.06,
+        1.96
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "street_left_rack",
+      "file": "street_left_rack.glb",
+      "position": [
+        -2.65,
+        0.07,
+        -0.66
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.28,
+            0
+          ],
+          "size": [
+            2.27,
+            2.56,
+            0.55
+          ]
+        }
+      ]
+    },
+    {
+      "name": "street_right_rack",
+      "file": "street_right_rack.glb",
+      "position": [
+        2.03,
+        0.07,
+        -2.38
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.28,
+            0
+          ],
+          "size": [
+            1.87,
+            2.56,
+            0.55
+          ]
+        }
+      ]
+    },
+    {
+      "name": "street_top_gray",
+      "file": "street_top_gray.glb",
+      "position": [
+        -2.51,
+        2.23,
+        0.23
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "street_top_black",
+      "file": "street_top_black.glb",
+      "position": [
+        -2.51,
+        2.23,
+        -0.33999999999999997
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "street_top_ivory",
+      "file": "street_top_ivory.glb",
+      "position": [
+        -2.51,
+        2.23,
+        -0.9099999999999999
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "street_top_blue",
+      "file": "street_top_blue.glb",
+      "position": [
+        -2.51,
+        2.23,
+        -1.48
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "street_top_purple",
+      "file": "street_top_purple.glb",
+      "position": [
+        2.24,
+        2.23,
+        -2.23
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "street_top_varsity",
+      "file": "street_top_varsity.glb",
+      "position": [
+        2.68,
+        2.23,
+        -2.23
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cargo_trousers_olive",
+      "file": "cargo_trousers_olive.glb",
+      "position": [
+        -2.49,
+        0.235,
+        0.12
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "cargo_trousers_black",
+      "file": "cargo_trousers_black.glb",
+      "position": [
+        -2.49,
+        0.235,
+        -0.6
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "cargo_trousers_sand",
+      "file": "cargo_trousers_sand.glb",
+      "position": [
+        -2.49,
+        0.235,
+        -1.3199999999999998
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "dark_changing_arch",
+      "file": "dark_changing_arch.glb",
+      "position": [
+        -1.62,
+        0.06,
+        -2.56
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "black_changing_curtain",
+      "file": "black_changing_curtain.glb",
+      "position": [
+        -1.62,
+        0.06,
+        -2.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "standing_mirror",
+      "file": "standing_mirror.glb",
+      "position": [
+        -1.77,
+        0.07,
+        -1.68
+      ],
+      "yaw_degrees": 15,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.06,
+            0
+          ],
+          "size": [
+            0.77,
+            2.12,
+            0.25
+          ]
+        }
+      ]
+    },
+    {
+      "name": "brand_wall_panel",
+      "file": "brand_wall_panel.glb",
+      "position": [
+        0.18,
+        0.06,
+        -2.57
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "block_theory_brand",
+      "file": "block_theory_brand.glb",
+      "position": [
+        0.13,
+        2.1,
+        -2.48
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "entry_graffiti",
+      "file": "entry_graffiti.glb",
+      "position": [
+        -2.85,
+        2.76,
+        1.96
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "black_checkout",
+      "file": "black_checkout.glb",
+      "position": [
+        0.01,
+        0.07,
+        -2.05
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.55,
+            0
+          ],
+          "size": [
+            2.4,
+            1.1,
+            0.64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "checkout_plant",
+      "file": "checkout_plant.glb",
+      "position": [
+        0.92,
+        1.2,
+        -2.02
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "display_rug",
+      "file": "display_rug.glb",
+      "position": [
+        -0.21,
+        0.074,
+        0.46
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "central_display_table",
+      "file": "central_display_table.glb",
+      "position": [
+        -0.21,
+        0.087,
+        0.44
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.44,
+            0
+          ],
+          "size": [
+            2.92,
+            0.88,
+            1.34
+          ]
+        }
+      ]
+    },
+    {
+      "name": "graphic_fold_black",
+      "file": "graphic_fold_black.glb",
+      "position": [
+        -1.08,
+        1.0,
+        0.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "graphic_fold_ivory",
+      "file": "graphic_fold_ivory.glb",
+      "position": [
+        -0.42000000000000004,
+        1.0,
+        0.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "graphic_fold_blue",
+      "file": "graphic_fold_blue.glb",
+      "position": [
+        0.24,
+        1.0,
+        0.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "black_cap",
+      "file": "black_cap.glb",
+      "position": [
+        0.09,
+        1.0,
+        0.08
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "blue_sneaker_pair",
+      "file": "blue_sneaker_pair.glb",
+      "position": [
+        0.86,
+        1.0,
+        0.46
+      ],
+      "yaw_degrees": -12,
+      "colliders": []
+    },
+    {
+      "name": "folded_black_trousers",
+      "file": "folded_black_trousers.glb",
+      "position": [
+        -0.84,
+        1.0,
+        0.03
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "display_storage_crate",
+      "file": "display_storage_crate.glb",
+      "position": [
+        0.8,
+        0.32,
+        -0.03
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "black_tufted_bench",
+      "file": "black_tufted_bench.glb",
+      "position": [
+        -0.82,
+        0.07,
+        2.13
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.25,
+            0
+          ],
+          "size": [
+            2.29,
+            0.5,
+            0.55
+          ]
+        }
+      ]
+    },
+    {
+      "name": "good_fit_poster",
+      "file": "good_fit_poster.glb",
+      "position": [
+        -2.83,
+        2.77,
+        -1.27
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "wear_ideas_poster",
+      "file": "wear_ideas_poster.glb",
+      "position": [
+        2.17,
+        2.82,
+        -2.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "monochrome_poster",
+      "file": "monochrome_poster.glb",
+      "position": [
+        -2.83,
+        2.77,
+        -0.3
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "black_pendant",
+      "file": "black_pendant.glb",
+      "position": [
+        -1.99,
+        2.87,
+        -1.84
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "street_wall_sconce",
+      "file": "street_wall_sconce.glb",
+      "position": [
+        -0.92,
+        2.0,
+        -2.56
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "front_square_plant",
+      "file": "front_square_plant.glb",
+      "position": [
+        2.49,
+        0.07,
+        2.13
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "entrance_square_plant",
+      "file": "entrance_square_plant.glb",
+      "position": [
+        -2.62,
+        0.07,
+        2.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "left_trailing_plant",
+      "file": "left_trailing_plant.glb",
+      "position": [
+        -2.59,
+        2.48,
+        0.14
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "entry_mat",
+      "file": "entry_mat.glb",
+      "position": [
+        -2.41,
+        0.078,
+        1.96
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "right_black_hoodie",
+      "asset": "street_top_black",
+      "position": [
+        1.39,
+        2.23,
+        -2.23
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_ivory_hoodie",
+      "asset": "street_top_ivory",
+      "position": [
+        1.81,
+        2.23,
+        -2.23
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_cargo_olive",
+      "asset": "cargo_trousers_olive",
+      "position": [
+        1.4,
+        0.235,
+        -2.21
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_cargo_black",
+      "asset": "cargo_trousers_black",
+      "position": [
+        1.98,
+        0.235,
+        -2.21
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_cargo_sand",
+      "asset": "cargo_trousers_sand",
+      "position": [
+        2.5599999999999996,
+        0.235,
+        -2.21
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "lower_fold_black",
+      "asset": "graphic_fold_black",
+      "position": [
+        -1.08,
+        0.319,
+        0.71
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "lower_fold_stack_black",
+      "asset": "graphic_fold_black",
+      "position": [
+        -1.08,
+        0.429,
+        0.71
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "lower_fold_ivory",
+      "asset": "graphic_fold_ivory",
+      "position": [
+        -0.54,
+        0.319,
+        0.71
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "lower_fold_stack_ivory",
+      "asset": "graphic_fold_ivory",
+      "position": [
+        -0.54,
+        0.429,
+        0.71
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "lower_fold_blue",
+      "asset": "graphic_fold_blue",
+      "position": [
+        0.0,
+        0.319,
+        0.71
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "lower_fold_stack_blue",
+      "asset": "graphic_fold_blue",
+      "position": [
+        0.0,
+        0.429,
+        0.71
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "left_rack_cap",
+      "asset": "black_cap",
+      "position": [
+        -2.55,
+        2.475,
+        -0.83
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "right_rack_cap",
+      "asset": "black_cap",
+      "position": [
+        1.65,
+        2.475,
+        -2.35
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "lower_sneaker_pair",
+      "asset": "blue_sneaker_pair",
+      "position": [
+        0.81,
+        0.319,
+        0.68
+      ],
+      "yaw_degrees": -8
+    },
+    {
+      "name": "rack_folded_knit",
+      "asset": "graphic_fold_ivory",
+      "position": [
+        2.4,
+        2.475,
+        -2.33
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "black_pendant_middle",
+      "asset": "black_pendant",
+      "position": [
+        -1.04,
+        2.71,
+        -1.2
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "black_pendant_back",
+      "asset": "black_pendant",
+      "position": [
+        -0.44,
+        2.92,
+        -2.04
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "sconce_door",
+      "asset": "street_wall_sconce",
+      "position": [
+        -2.84,
+        1.69,
+        2.74
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "sconce_arch",
+      "asset": "street_wall_sconce",
+      "position": [
+        -2.35,
+        2.05,
+        -2.56
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "sconce_right",
+      "asset": "street_wall_sconce",
+      "position": [
+        2.89,
+        1.89,
+        -2.56
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_trailing_plant",
+      "asset": "left_trailing_plant",
+      "position": [
+        2.74,
+        2.48,
+        -2.29
+      ],
+      "yaw_degrees": 0
+    }
+  ],
+  "camera": {
+    "position": [
+      10,
+      9.2,
+      12
+    ],
+    "target": [
+      0,
+      1.28,
+      0.05
+    ],
+    "size": 9.6
+  }
+}
