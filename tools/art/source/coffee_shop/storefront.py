@@ -1,7 +1,32 @@
 """Reusable store fixtures for the bright-shop series, in the Coffee Shop kit namespace."""
 import math, random
+import json
+import bpy
 import kit as k
 from kit import begin,cube,cylinder,tube,ellipsoid,lathe,leaf
+
+def reuse_coffee(asset,at,yaw=0):
+    """Append editable objects, then rebake into this shop's atlas; never edit the source kit."""
+    path=k.ROOT/'tools/art/source/coffee_shop/coffee_shop.blend'
+    with bpy.data.libraries.load(str(path),link=False) as (src,dst):
+        dst.collections=['KIT_'+asset]
+    collection=dst.collections[0];bpy.context.scene.collection.children.link(collection)
+    root=next(o for o in collection.objects if o.type=='EMPTY')
+    root.name=asset;collection.name='KIT_'+asset
+    root.location=k.v(at);root.rotation_euler.z=math.radians(yaw)
+    original=next(a for a in json.loads((k.ROOT/'assets/rooms/coffee_shop/layout.json').read_text())['assets'] if a['name']==asset)
+    k.KITS[asset]={'collection':collection,'root':root,'objects':[o for o in collection.objects if o.type=='MESH'],'at':list(at),'yaw':yaw,'collision':original['colliders']}
+
+def flower_border(length=1.0):
+    cube('Planter trough',(0,.08,0),(length,.16,.35),'plaster',.045)
+    cube('Planter soil',(0,.167,0),(length-.08,.015,.26),'soil',.01)
+    n=max(3,round(length/.23))
+    for j in range(n):
+        x=-length*.41+j*(length*.82)/(n-1)
+        for i in range(7):
+            a=i*2.399
+            leaf('Bushy planter leaf',(x,.18,0),(x+math.cos(a)*.20,.27+(i%3)*.045,math.sin(a)*.20),.14,random.choice(['leaf','leaf_light']))
+        if j%2==0:k.flower((x,.40,.04),1.20)
 
 def shell(wall='EAD4BA',accent='C5B6CF',floor='EBD7B7',wood=False):
     begin('floor',collision=[{'at':[0,-.09,0],'size':[6.1,.22,5.6]}])

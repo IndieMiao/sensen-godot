@@ -1,0 +1,743 @@
+{
+  "units": "metres",
+  "coordinates": "Godot Y up, front +Z; pivots local floor or mounting point",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2955"
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "file": "floor.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.09,
+            0
+          ],
+          "size": [
+            6.1,
+            0.22,
+            5.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0.06,
+        -2.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.5,
+            0
+          ],
+          "size": [
+            6,
+            3,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "left_door_wall",
+      "file": "left_door_wall.glb",
+      "position": [
+        -3,
+        0.06,
+        0.15
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            -1.91,
+            1.5,
+            0
+          ],
+          "size": [
+            1.02,
+            3,
+            0.23
+          ]
+        },
+        {
+          "at": [
+            1.65,
+            1.5,
+            0
+          ],
+          "size": [
+            2.22,
+            3,
+            0.23
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front_wall_left",
+      "file": "front_wall_left.glb",
+      "position": [
+        -1.99,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.95,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front_wall_right",
+      "file": "front_wall_right.glb",
+      "position": [
+        2.17,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.65,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "side_low_wall",
+      "file": "side_low_wall.glb",
+      "position": [
+        3,
+        0.06,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            5.28,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "corner_pier",
+      "file": "corner_pier.glb",
+      "position": [
+        3,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.43,
+            0
+          ],
+          "size": [
+            0.4,
+            0.86,
+            0.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entry_step",
+      "file": "entry_step.glb",
+      "position": [
+        0.15,
+        -0.16,
+        2.82
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.025,
+            0.05
+          ],
+          "size": [
+            2.06,
+            0.17,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "grass_base",
+      "file": "grass_base.glb",
+      "position": [
+        0,
+        -0.3,
+        0.42
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "back_crenellations",
+      "file": "back_crenellations.glb",
+      "position": [
+        0,
+        3.11,
+        -2.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "left_crenellations",
+      "file": "left_crenellations.glb",
+      "position": [
+        -3,
+        3.11,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "back_cabinet",
+      "file": "back_cabinet.glb",
+      "position": [
+        0.08,
+        0.06,
+        -2.15
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.54,
+            0
+          ],
+          "size": [
+            3.15,
+            1.08,
+            0.72
+          ]
+        }
+      ]
+    },
+    {
+      "name": "serving_counter",
+      "file": "serving_counter.glb",
+      "position": [
+        0.08,
+        0.06,
+        -0.98
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.49,
+            0
+          ],
+          "size": [
+            3.25,
+            0.98,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "counter_return",
+      "file": "counter_return.glb",
+      "position": [
+        1.65,
+        0.06,
+        -1.56
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.54,
+            0
+          ],
+          "size": [
+            1.38,
+            1.08,
+            0.53
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sink",
+      "file": "sink.glb",
+      "position": [
+        1.12,
+        1.26,
+        -2.11
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "espresso_machine",
+      "file": "espresso_machine.glb",
+      "position": [
+        0.04,
+        1.26,
+        -2.13
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "coffee_grinder",
+      "file": "coffee_grinder.glb",
+      "position": [
+        0.61,
+        1.26,
+        -2.2
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "pastry_case",
+      "file": "pastry_case.glb",
+      "position": [
+        -1.01,
+        1.26,
+        -2.11
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "display_glass",
+      "file": "display_glass.glb",
+      "position": [
+        -1.01,
+        1.26,
+        -2.11
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "supply_shelf",
+      "file": "supply_shelf.glb",
+      "position": [
+        -0.31,
+        2.04,
+        -2.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cookie_jars",
+      "file": "cookie_jars.glb",
+      "position": [
+        0.8,
+        1.26,
+        -2.15
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "service_tray",
+      "file": "service_tray.glb",
+      "position": [
+        -0.92,
+        1.26,
+        -0.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "counter_chalkboard",
+      "file": "counter_chalkboard.glb",
+      "position": [
+        0.8,
+        1.45,
+        -0.93
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "orange_tree",
+      "file": "orange_tree.glb",
+      "position": [
+        -2.25,
+        0.06,
+        -1.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.37,
+            0
+          ],
+          "size": [
+            0.71,
+            0.74,
+            0.71
+          ]
+        }
+      ]
+    },
+    {
+      "name": "flower_border",
+      "file": "flower_border.glb",
+      "position": [
+        -2.12,
+        0.78,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "chair",
+      "file": "chair.glb",
+      "position": [
+        -2.24,
+        0.06,
+        0.65
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.49,
+            0
+          ],
+          "size": [
+            0.67,
+            0.98,
+            0.64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "round_table",
+      "file": "round_table.glb",
+      "position": [
+        -1.45,
+        0.06,
+        0.65
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.43,
+            0
+          ],
+          "size": [
+            1.1,
+            0.86,
+            1.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "blue_vase_flowers",
+      "file": "blue_vase_flowers.glb",
+      "position": [
+        -1.45,
+        0.91,
+        0.65
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "table_cup",
+      "file": "table_cup.glb",
+      "position": [
+        1.76,
+        0.91,
+        1.38
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "sleeping_cat",
+      "file": "sleeping_cat.glb",
+      "position": [
+        0.12,
+        0.035,
+        2.7
+      ],
+      "yaw_degrees": -25,
+      "colliders": []
+    },
+    {
+      "name": "counter_cat",
+      "file": "counter_cat.glb",
+      "position": [
+        1.32,
+        1.225,
+        -0.9
+      ],
+      "yaw_degrees": -45,
+      "colliders": []
+    },
+    {
+      "name": "walking_cat",
+      "file": "walking_cat.glb",
+      "position": [
+        -0.23,
+        0.06,
+        0.67
+      ],
+      "yaw_degrees": -35,
+      "colliders": []
+    },
+    {
+      "name": "garden_stepping_stones",
+      "file": "garden_stepping_stones.glb",
+      "position": [
+        0.1,
+        -0.13,
+        3.24
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "street_signboard",
+      "file": "street_signboard.glb",
+      "position": [
+        -1.56,
+        0.02,
+        3.13
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "corner_pier_0",
+      "asset": "corner_pier",
+      "position": [
+        -3,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "corner_pier_1",
+      "asset": "corner_pier",
+      "position": [
+        -0.97,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "corner_pier_2",
+      "asset": "corner_pier",
+      "position": [
+        1.28,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "service_tray_2",
+      "asset": "service_tray",
+      "position": [
+        0.05,
+        1.26,
+        -0.94
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "orange_tree_2",
+      "asset": "orange_tree",
+      "position": [
+        2.37,
+        0.06,
+        -1.72
+      ],
+      "yaw_degrees": 70
+    },
+    {
+      "name": "flower_border_front_right",
+      "asset": "flower_border",
+      "position": [
+        2.16,
+        0.78,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "flower_border_right_0",
+      "asset": "flower_border",
+      "position": [
+        3,
+        0.78,
+        -1.65
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "flower_border_right_1",
+      "asset": "flower_border",
+      "position": [
+        3,
+        0.78,
+        0
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "flower_border_right_2",
+      "asset": "flower_border",
+      "position": [
+        3,
+        0.78,
+        1.65
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "chair_2",
+      "asset": "chair",
+      "position": [
+        -0.66,
+        0.06,
+        0.65
+      ],
+      "yaw_degrees": -90
+    },
+    {
+      "name": "chair_3",
+      "asset": "chair",
+      "position": [
+        0.66,
+        0.06,
+        1.24
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "chair_4",
+      "asset": "chair",
+      "position": [
+        2.24,
+        0.06,
+        1.24
+      ],
+      "yaw_degrees": -90
+    },
+    {
+      "name": "round_table_2",
+      "asset": "round_table",
+      "position": [
+        1.45,
+        0.06,
+        1.24
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "blue_vase_flowers_2",
+      "asset": "blue_vase_flowers",
+      "position": [
+        1.45,
+        0.91,
+        1.24
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "walking_cat_2",
+      "asset": "walking_cat",
+      "position": [
+        1.0,
+        0.06,
+        2.15
+      ],
+      "yaw_degrees": 150
+    }
+  ],
+  "camera": {
+    "position": [
+      10,
+      10,
+      12
+    ],
+    "target": [
+      0,
+      1.0,
+      0.45
+    ],
+    "size": 12.0
+  }
+}

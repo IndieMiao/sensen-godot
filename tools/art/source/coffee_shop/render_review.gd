@@ -66,9 +66,9 @@ func _render() -> void:
 	camera.current = true
 	var views := [
 		["godot-whole",_vec(layout.camera.position),_vec(layout.camera.target),float(layout.camera.size)],
-		["model-front",Vector3(0,1.5,20),Vector3(0,1.5,0),8.0],
-		["model-side",Vector3(20,1.5,0),Vector3(0,1.5,0),8.0],
-		["model-top",Vector3(.001,20,0),Vector3.ZERO,8.0],
+		["model-front",Vector3(0,1.5,20),Vector3(0,1.5,0),9.8 if slug == "coffee_shop_0" else 8.0],
+		["model-side",Vector3(20,1.5,0),Vector3(0,1.5,0),9.8 if slug == "coffee_shop_0" else 8.0],
+		["model-top",Vector3(.001,20,0),Vector3.ZERO,9.8 if slug == "coffee_shop_0" else 8.0],
 		["godot-detail",Vector3(7,6,9),Vector3(0,1.25,-1.1),5.7]
 	]
 	for view in views:
