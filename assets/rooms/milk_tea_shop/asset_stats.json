@@ -1,0 +1,257 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
+    "bytes": 3322251
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "vertices": 9952,
+      "triangles": 19196,
+      "surfaces": 1,
+      "bytes": 471116
+    },
+    {
+      "name": "back_wall",
+      "vertices": 4592,
+      "triangles": 8856,
+      "surfaces": 1,
+      "bytes": 286456
+    },
+    {
+      "name": "left_door_wall",
+      "vertices": 4184,
+      "triangles": 8100,
+      "surfaces": 1,
+      "bytes": 224072
+    },
+    {
+      "name": "front_wall_left",
+      "vertices": 616,
+      "triangles": 1188,
+      "surfaces": 1,
+      "bytes": 42772
+    },
+    {
+      "name": "front_wall_right",
+      "vertices": 504,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 35364
+    },
+    {
+      "name": "side_low_wall",
+      "vertices": 1288,
+      "triangles": 2484,
+      "surfaces": 1,
+      "bytes": 87440
+    },
+    {
+      "name": "corner_pier",
+      "vertices": 168,
+      "triangles": 324,
+      "surfaces": 1,
+      "bytes": 14964
+    },
+    {
+      "name": "entry_step",
+      "vertices": 112,
+      "triangles": 216,
+      "surfaces": 1,
+      "bytes": 9064
+    },
+    {
+      "name": "drinks_fridge",
+      "vertices": 5640,
+      "triangles": 8196,
+      "surfaces": 1,
+      "bytes": 292996
+    },
+    {
+      "name": "service_counter",
+      "vertices": 1592,
+      "triangles": 3076,
+      "surfaces": 1,
+      "bytes": 84084
+    },
+    {
+      "name": "main_menu",
+      "vertices": 7300,
+      "triangles": 7168,
+      "surfaces": 1,
+      "bytes": 398984
+    },
+    {
+      "name": "toppings_menu",
+      "vertices": 6456,
+      "triangles": 6436,
+      "surfaces": 1,
+      "bytes": 352996
+    },
+    {
+      "name": "freshly_made",
+      "vertices": 784,
+      "triangles": 856,
+      "surfaces": 1,
+      "bytes": 45812
+    },
+    {
+      "name": "wall_tea_symbol",
+      "vertices": 530,
+      "triangles": 988,
+      "surfaces": 1,
+      "bytes": 27088
+    },
+    {
+      "name": "syrup_shelf",
+      "vertices": 1004,
+      "triangles": 1908,
+      "surfaces": 1,
+      "bytes": 50076
+    },
+    {
+      "name": "tea_urns",
+      "vertices": 752,
+      "triangles": 1440,
+      "surfaces": 1,
+      "bytes": 49948
+    },
+    {
+      "name": "cup_sealer",
+      "vertices": 866,
+      "triangles": 1628,
+      "surfaces": 1,
+      "bytes": 50360
+    },
+    {
+      "name": "ingredient_jars",
+      "vertices": 1592,
+      "triangles": 2956,
+      "surfaces": 1,
+      "bytes": 81336
+    },
+    {
+      "name": "shakers",
+      "vertices": 312,
+      "triangles": 600,
+      "surfaces": 1,
+      "bytes": 16468
+    },
+    {
+      "name": "topping_case",
+      "vertices": 3508,
+      "triangles": 6552,
+      "surfaces": 1,
+      "bytes": 162300
+    },
+    {
+      "name": "topping_glass",
+      "vertices": 4,
+      "triangles": 2,
+      "surfaces": 1,
+      "bytes": 1488
+    },
+    {
+      "name": "checkout_register",
+      "vertices": 184,
+      "triangles": 352,
+      "surfaces": 1,
+      "bytes": 10132
+    },
+    {
+      "name": "pickup_counter",
+      "vertices": 2178,
+      "triangles": 3692,
+      "surfaces": 1,
+      "bytes": 111992
+    },
+    {
+      "name": "straw_box",
+      "vertices": 236,
+      "triangles": 408,
+      "surfaces": 1,
+      "bytes": 12120
+    },
+    {
+      "name": "cup_stacks",
+      "vertices": 240,
+      "triangles": 456,
+      "surfaces": 1,
+      "bytes": 19468
+    },
+    {
+      "name": "cafe_table",
+      "vertices": 3304,
+      "triangles": 6380,
+      "surfaces": 1,
+      "bytes": 151256
+    },
+    {
+      "name": "chair",
+      "vertices": 418,
+      "triangles": 800,
+      "surfaces": 1,
+      "bytes": 26580
+    },
+    {
+      "name": "table_flower_vase",
+      "vertices": 2480,
+      "triangles": 4596,
+      "surfaces": 1,
+      "bytes": 108952
+    },
+    {
+      "name": "pastel_bench",
+      "vertices": 504,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 35148
+    },
+    {
+      "name": "corner_plant",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 30512
+    },
+    {
+      "name": "trailing_wall_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 69356
+    },
+    {
+      "name": "flower_wall_ivy",
+      "vertices": 5624,
+      "triangles": 10624,
+      "surfaces": 1,
+      "bytes": 245104
+    },
+    {
+      "name": "street_signboard",
+      "vertices": 1208,
+      "triangles": 1380,
+      "surfaces": 1,
+      "bytes": 70952
+    },
+    {
+      "name": "good_tea_wall_sign",
+      "vertices": 1548,
+      "triangles": 1616,
+      "surfaces": 1,
+      "bytes": 85908
+    }
+  ],
+  "unique_triangles": 118364,
+  "scene_triangles": 150800,
+  "static_draw_surfaces": 45,
+  "unique_assets": 34,
+  "placed_instances": 45,
+  "glb_bytes": 3762664
+}

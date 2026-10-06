@@ -1,0 +1,12 @@
+{
+  "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+  "draw_calls": 42.0,
+  "instances": 45,
+  "renderer": "mobile",
+  "resolution": [
+    1400,
+    1400
+  ],
+  "scope": "offline art render; no mobile/gameplay/performance acceptance",
+  "slug": "milk_tea_shop"
+}

@@ -1,0 +1,703 @@
+{
+  "units": "metres",
+  "coordinates": "Godot Y up, front +Z; pivots local floor or mounting point",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2962"
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "file": "floor.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.09,
+            0
+          ],
+          "size": [
+            6.1,
+            0.22,
+            5.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0.06,
+        -2.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.5,
+            0
+          ],
+          "size": [
+            6,
+            3,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "left_door_wall",
+      "file": "left_door_wall.glb",
+      "position": [
+        -3,
+        0.06,
+        0.15
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            -1.91,
+            1.5,
+            0
+          ],
+          "size": [
+            1.02,
+            3,
+            0.23
+          ]
+        },
+        {
+          "at": [
+            1.65,
+            1.5,
+            0
+          ],
+          "size": [
+            2.22,
+            3,
+            0.23
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front_wall_left",
+      "file": "front_wall_left.glb",
+      "position": [
+        -1.99,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.95,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front_wall_right",
+      "file": "front_wall_right.glb",
+      "position": [
+        2.17,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.65,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "side_low_wall",
+      "file": "side_low_wall.glb",
+      "position": [
+        3,
+        0.06,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            5.28,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "corner_pier",
+      "file": "corner_pier.glb",
+      "position": [
+        3,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.43,
+            0
+          ],
+          "size": [
+            0.4,
+            0.86,
+            0.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entry_step",
+      "file": "entry_step.glb",
+      "position": [
+        0.15,
+        -0.16,
+        2.82
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.025,
+            0.05
+          ],
+          "size": [
+            2.06,
+            0.17,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "drinks_fridge",
+      "file": "drinks_fridge.glb",
+      "position": [
+        -2.3,
+        0.06,
+        -1.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.15,
+            0
+          ],
+          "size": [
+            1.1,
+            2.3,
+            0.67
+          ]
+        }
+      ]
+    },
+    {
+      "name": "service_counter",
+      "file": "service_counter.glb",
+      "position": [
+        0.35,
+        0.06,
+        -1.62
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.57,
+            0
+          ],
+          "size": [
+            3.85,
+            1.14,
+            0.86
+          ]
+        }
+      ]
+    },
+    {
+      "name": "main_menu",
+      "file": "main_menu.glb",
+      "position": [
+        -1.08,
+        2.42,
+        -2.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "toppings_menu",
+      "file": "toppings_menu.glb",
+      "position": [
+        0.65,
+        2.42,
+        -2.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "freshly_made",
+      "file": "freshly_made.glb",
+      "position": [
+        2.02,
+        2.38,
+        -2.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "wall_tea_symbol",
+      "file": "wall_tea_symbol.glb",
+      "position": [
+        2.0,
+        2.17,
+        -2.44
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "syrup_shelf",
+      "file": "syrup_shelf.glb",
+      "position": [
+        -1.18,
+        1.49,
+        -2.4
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tea_urns",
+      "file": "tea_urns.glb",
+      "position": [
+        0.16,
+        1.26,
+        -2.09
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cup_sealer",
+      "file": "cup_sealer.glb",
+      "position": [
+        1.42,
+        1.26,
+        -2.0
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "ingredient_jars",
+      "file": "ingredient_jars.glb",
+      "position": [
+        2.12,
+        1.41,
+        -2.28
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "shakers",
+      "file": "shakers.glb",
+      "position": [
+        -0.38,
+        1.26,
+        -1.93
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "topping_case",
+      "file": "topping_case.glb",
+      "position": [
+        -0.96,
+        1.26,
+        -1.38
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "topping_glass",
+      "file": "topping_glass.glb",
+      "position": [
+        -0.96,
+        1.26,
+        -1.38
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "checkout_register",
+      "file": "checkout_register.glb",
+      "position": [
+        0.49,
+        1.26,
+        -1.26
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "pickup_counter",
+      "file": "pickup_counter.glb",
+      "position": [
+        2.23,
+        1.25,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "straw_box",
+      "file": "straw_box.glb",
+      "position": [
+        2.54,
+        1.26,
+        -1.95
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cup_stacks",
+      "file": "cup_stacks.glb",
+      "position": [
+        0.97,
+        1.26,
+        -1.9
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cafe_table",
+      "file": "cafe_table.glb",
+      "position": [
+        -1.45,
+        0.06,
+        0.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.44,
+            0
+          ],
+          "size": [
+            1.1,
+            0.88,
+            1.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chair",
+      "file": "chair.glb",
+      "position": [
+        -2.22,
+        0.06,
+        0.63
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.48,
+            0
+          ],
+          "size": [
+            0.59,
+            0.96,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "table_flower_vase",
+      "file": "table_flower_vase.glb",
+      "position": [
+        -1.45,
+        0.93,
+        0.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "pastel_bench",
+      "file": "pastel_bench.glb",
+      "position": [
+        -1.8,
+        0.07,
+        2.36
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.35,
+            0
+          ],
+          "size": [
+            1.68,
+            0.7,
+            0.52
+          ]
+        }
+      ]
+    },
+    {
+      "name": "corner_plant",
+      "file": "corner_plant.glb",
+      "position": [
+        -2.56,
+        0.07,
+        -0.35
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.28,
+            0
+          ],
+          "size": [
+            0.52,
+            0.56,
+            0.52
+          ]
+        }
+      ]
+    },
+    {
+      "name": "trailing_wall_plant",
+      "file": "trailing_wall_plant.glb",
+      "position": [
+        -2.66,
+        2.72,
+        -2.39
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "flower_wall_ivy",
+      "file": "flower_wall_ivy.glb",
+      "position": [
+        2.32,
+        0.85,
+        2.67
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "street_signboard",
+      "file": "street_signboard.glb",
+      "position": [
+        -1.55,
+        0.02,
+        3.13
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "good_tea_wall_sign",
+      "file": "good_tea_wall_sign.glb",
+      "position": [
+        -2.84,
+        1.14,
+        1.49
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "corner_pier_0",
+      "asset": "corner_pier",
+      "position": [
+        -3,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "corner_pier_1",
+      "asset": "corner_pier",
+      "position": [
+        -0.97,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "corner_pier_2",
+      "asset": "corner_pier",
+      "position": [
+        1.28,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "cafe_table_2",
+      "asset": "cafe_table",
+      "position": [
+        1.45,
+        0.06,
+        1.18
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chair_2",
+      "asset": "chair",
+      "position": [
+        -0.68,
+        0.06,
+        0.63
+      ],
+      "yaw_degrees": -90
+    },
+    {
+      "name": "chair_3",
+      "asset": "chair",
+      "position": [
+        0.68,
+        0.06,
+        1.18
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "chair_4",
+      "asset": "chair",
+      "position": [
+        2.22,
+        0.06,
+        1.18
+      ],
+      "yaw_degrees": -90
+    },
+    {
+      "name": "table_flower_vase_2",
+      "asset": "table_flower_vase",
+      "position": [
+        1.45,
+        0.93,
+        1.18
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "counter_flower_vase",
+      "asset": "table_flower_vase",
+      "position": [
+        0.03,
+        1.26,
+        -1.46
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "trailing_wall_plant_2",
+      "asset": "trailing_wall_plant",
+      "position": [
+        2.62,
+        2.72,
+        -2.44
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "flower_wall_ivy_2",
+      "asset": "flower_wall_ivy",
+      "position": [
+        -2.15,
+        0.85,
+        2.68
+      ],
+      "yaw_degrees": 0
+    }
+  ],
+  "camera": {
+    "position": [
+      10,
+      9.2,
+      12
+    ],
+    "target": [
+      0,
+      1.1,
+      0.15
+    ],
+    "size": 9.4
+  }
+}
