@@ -1,0 +1,243 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
+    "bytes": 3711561
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "vertices": 3624,
+      "triangles": 6992,
+      "surfaces": 1,
+      "bytes": 242184
+    },
+    {
+      "name": "entry_steps",
+      "vertices": 112,
+      "triangles": 216,
+      "surfaces": 1,
+      "bytes": 9832
+    },
+    {
+      "name": "low_wall_long",
+      "vertices": 1680,
+      "triangles": 3240,
+      "surfaces": 1,
+      "bytes": 85572
+    },
+    {
+      "name": "low_wall_front_left",
+      "vertices": 728,
+      "triangles": 1404,
+      "surfaces": 1,
+      "bytes": 39720
+    },
+    {
+      "name": "low_wall_front_right",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 37028
+    },
+    {
+      "name": "low_pillar",
+      "vertices": 112,
+      "triangles": 216,
+      "surfaces": 1,
+      "bytes": 9316
+    },
+    {
+      "name": "tall_pillar",
+      "vertices": 448,
+      "triangles": 864,
+      "surfaces": 1,
+      "bytes": 28060
+    },
+    {
+      "name": "ivy_arch_door",
+      "vertices": 4958,
+      "triangles": 9468,
+      "surfaces": 1,
+      "bytes": 234388
+    },
+    {
+      "name": "left_window",
+      "vertices": 1512,
+      "triangles": 2892,
+      "surfaces": 1,
+      "bytes": 76332
+    },
+    {
+      "name": "back_counter_wall",
+      "vertices": 2836,
+      "triangles": 5436,
+      "surfaces": 1,
+      "bytes": 148956
+    },
+    {
+      "name": "right_arch_window",
+      "vertices": 5024,
+      "triangles": 9556,
+      "surfaces": 1,
+      "bytes": 234092
+    },
+    {
+      "name": "counter",
+      "vertices": 1424,
+      "triangles": 2752,
+      "surfaces": 1,
+      "bytes": 75996
+    },
+    {
+      "name": "espresso_machine",
+      "vertices": 1586,
+      "triangles": 3048,
+      "surfaces": 1,
+      "bytes": 79392
+    },
+    {
+      "name": "coffee_grinder",
+      "vertices": 726,
+      "triangles": 1360,
+      "surfaces": 1,
+      "bytes": 36848
+    },
+    {
+      "name": "pastry_case",
+      "vertices": 1764,
+      "triangles": 3388,
+      "surfaces": 1,
+      "bytes": 87480
+    },
+    {
+      "name": "display_glass",
+      "vertices": 12,
+      "triangles": 6,
+      "surfaces": 1,
+      "bytes": 1780
+    },
+    {
+      "name": "cups_and_saucers",
+      "vertices": 565,
+      "triangles": 1098,
+      "surfaces": 1,
+      "bytes": 34500
+    },
+    {
+      "name": "counter_daisies",
+      "vertices": 2480,
+      "triangles": 4596,
+      "surfaces": 1,
+      "bytes": 111124
+    },
+    {
+      "name": "small_planter",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 28400
+    },
+    {
+      "name": "pendant",
+      "vertices": 204,
+      "triangles": 396,
+      "surfaces": 1,
+      "bytes": 13320
+    },
+    {
+      "name": "botanical_picture",
+      "vertices": 332,
+      "triangles": 632,
+      "surfaces": 1,
+      "bytes": 17336
+    },
+    {
+      "name": "table",
+      "vertices": 288,
+      "triangles": 556,
+      "surfaces": 1,
+      "bytes": 19908
+    },
+    {
+      "name": "chair",
+      "vertices": 2097,
+      "triangles": 4018,
+      "surfaces": 1,
+      "bytes": 98980
+    },
+    {
+      "name": "jute_rug",
+      "vertices": 6628,
+      "triangles": 13172,
+      "surfaces": 1,
+      "bytes": 296604
+    },
+    {
+      "name": "table_bouquet",
+      "vertices": 2480,
+      "triangles": 4596,
+      "surfaces": 1,
+      "bytes": 108948
+    },
+    {
+      "name": "table_coffee",
+      "vertices": 421,
+      "triangles": 822,
+      "surfaces": 1,
+      "bytes": 23624
+    },
+    {
+      "name": "floor_planter",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 35700
+    },
+    {
+      "name": "medium_planter",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 29940
+    },
+    {
+      "name": "low_trailing_planter",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 29952
+    },
+    {
+      "name": "front_ivy",
+      "vertices": 7176,
+      "triangles": 13536,
+      "surfaces": 1,
+      "bytes": 312228
+    },
+    {
+      "name": "back_trailing_ivy",
+      "vertices": 4724,
+      "triangles": 8912,
+      "surfaces": 1,
+      "bytes": 206036
+    },
+    {
+      "name": "hanging_cafe_sign",
+      "vertices": 1462,
+      "triangles": 1808,
+      "surfaces": 1,
+      "bytes": 79984
+    }
+  ],
+  "unique_triangles": 110588,
+  "scene_triangles": 166484,
+  "static_draw_surfaces": 52,
+  "unique_assets": 32,
+  "placed_instances": 52,
+  "glb_bytes": 2873560
+}
