@@ -1,0 +1,264 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "vertices": 4912,
+      "triangles": 9476,
+      "surfaces": 1,
+      "bytes": 338468
+    },
+    {
+      "name": "window_wall",
+      "vertices": 888,
+      "triangles": 1728,
+      "surfaces": 1,
+      "bytes": 61380
+    },
+    {
+      "name": "back_wall",
+      "vertices": 584,
+      "triangles": 1132,
+      "surfaces": 1,
+      "bytes": 40680
+    },
+    {
+      "name": "postal_blue_door",
+      "vertices": 758,
+      "triangles": 1460,
+      "surfaces": 1,
+      "bytes": 54696
+    },
+    {
+      "name": "sorting_cabinet",
+      "vertices": 952,
+      "triangles": 1836,
+      "surfaces": 1,
+      "bytes": 66808
+    },
+    {
+      "name": "mail_stack",
+      "vertices": 336,
+      "triangles": 648,
+      "surfaces": 1,
+      "bytes": 24468
+    },
+    {
+      "name": "red_post_box",
+      "vertices": 1102,
+      "triangles": 2172,
+      "surfaces": 1,
+      "bytes": 74292
+    },
+    {
+      "name": "world_map",
+      "vertices": 350,
+      "triangles": 656,
+      "surfaces": 1,
+      "bytes": 28028
+    },
+    {
+      "name": "wall_clock",
+      "vertices": 328,
+      "triangles": 592,
+      "surfaces": 1,
+      "bytes": 30656
+    },
+    {
+      "name": "post_office_sign",
+      "vertices": 2580,
+      "triangles": 4436,
+      "surfaces": 1,
+      "bytes": 390260
+    },
+    {
+      "name": "postal_counter",
+      "vertices": 1120,
+      "triangles": 2160,
+      "surfaces": 1,
+      "bytes": 78352
+    },
+    {
+      "name": "counter_computer",
+      "vertices": 952,
+      "triangles": 1836,
+      "surfaces": 1,
+      "bytes": 66812
+    },
+    {
+      "name": "counter_bell",
+      "vertices": 144,
+      "triangles": 280,
+      "surfaces": 1,
+      "bytes": 11004
+    },
+    {
+      "name": "counter_stamps",
+      "vertices": 248,
+      "triangles": 468,
+      "surfaces": 1,
+      "bytes": 21604
+    },
+    {
+      "name": "counter_mail_tray",
+      "vertices": 3547,
+      "triangles": 6826,
+      "surfaces": 1,
+      "bytes": 247456
+    },
+    {
+      "name": "parcel_shelves",
+      "vertices": 392,
+      "triangles": 756,
+      "surfaces": 1,
+      "bytes": 28320
+    },
+    {
+      "name": "brown_parcel",
+      "vertices": 504,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 36016
+    },
+    {
+      "name": "blue_parcel",
+      "vertices": 504,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 36016
+    },
+    {
+      "name": "mail_sacks",
+      "vertices": 1658,
+      "triangles": 3220,
+      "surfaces": 1,
+      "bytes": 109920
+    },
+    {
+      "name": "packing_table",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 47564
+    },
+    {
+      "name": "packing_mat",
+      "vertices": 56,
+      "triangles": 108,
+      "surfaces": 1,
+      "bytes": 5216
+    },
+    {
+      "name": "packing_parcel",
+      "vertices": 504,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 36020
+    },
+    {
+      "name": "postal_scale",
+      "vertices": 200,
+      "triangles": 384,
+      "surfaces": 1,
+      "bytes": 15652
+    },
+    {
+      "name": "packing_supplies",
+      "vertices": 1020,
+      "triangles": 1976,
+      "surfaces": 1,
+      "bytes": 86516
+    },
+    {
+      "name": "desk_airmail",
+      "vertices": 280,
+      "triangles": 540,
+      "surfaces": 1,
+      "bytes": 20620
+    },
+    {
+      "name": "underdesk_boxes",
+      "vertices": 4368,
+      "triangles": 8424,
+      "surfaces": 1,
+      "bytes": 301520
+    },
+    {
+      "name": "packing_stool",
+      "vertices": 96,
+      "triangles": 176,
+      "surfaces": 1,
+      "bytes": 9860
+    },
+    {
+      "name": "entry_rug",
+      "vertices": 408,
+      "triangles": 732,
+      "surfaces": 1,
+      "bytes": 34032
+    },
+    {
+      "name": "packing_rug",
+      "vertices": 344,
+      "triangles": 636,
+      "surfaces": 1,
+      "bytes": 27340
+    },
+    {
+      "name": "floor_plant",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 47220
+    },
+    {
+      "name": "counter_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 122120
+    },
+    {
+      "name": "cabinet_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 122116
+    },
+    {
+      "name": "parcel_shelf_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 122128
+    },
+    {
+      "name": "door_notice",
+      "vertices": 544,
+      "triangles": 1040,
+      "surfaces": 1,
+      "bytes": 43432
+    },
+    {
+      "name": "door_light",
+      "vertices": 200,
+      "triangles": 368,
+      "surfaces": 1,
+      "bytes": 17984
+    }
+  ],
+  "unique_triangles": 67960,
+  "scene_triangles": 78004,
+  "static_draw_surfaces": 49,
+  "glb_bytes": 2804576,
+  "atlas_bytes": 2576486,
+  "placed_instances": 49,
+  "materials": 1
+}
