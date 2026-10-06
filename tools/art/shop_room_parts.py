@@ -34,7 +34,7 @@ def crate(at=(0,0,0),width=.65,height=.45,depth=.48,color='oak'):
         for dx in (-width/2,width/2):cube('Crate side slat',(x+dx,yy,z),(.045,.09,depth),color,.011,'wood','Z')
 
 
-def barrel(at=(0,0,0),radius=.34,height=.80,water=False):
+def tool_bin(at=(0,0,0),radius=.34,height=.80,water=False):
     x,y,z=at
     for i in range(16):
         a=2*math.pi*i/16
@@ -47,6 +47,43 @@ def barrel(at=(0,0,0),radius=.34,height=.80,water=False):
             a=i*math.pi/6;ellipsoid('Hoop rivet',(x+math.cos(a)*(r+.039),y+yy+.04,z+math.sin(a)*(r+.039)),(.035,.035,.035),'iron',8,6)
     cylinder('Barrel inside',(x,y+height*.25,z),radius*.8,.08,'oak_dark',vertices=24)
     if water:cylinder('Quenching water',(x,y+height*.82,z),radius*.81,.025,'446978',vertices=32)
+
+
+def barrel(at=(0,0,0),radius=.34,height=.80,water=False,lid=True):
+    x,y,z=at;profile=[(0,.88),(.12,.97),(.5,1.04),(.88,.97),(1,.88)]
+    for i in range(16):
+        angles=[2*math.pi*i/16+.009,2*math.pi*(i+1)/16-.009]
+        verts=[]
+        for inner in (False,True):
+            for h,r in profile:
+                for a in angles:
+                    rr=radius*r-(.042 if inner else 0)
+                    verts.append((x+math.cos(a)*rr,y+h*height,z+math.sin(a)*rr))
+        n=len(profile)*2;faces=[]
+        for j in range(len(profile)-1):
+            k=j*2;faces += [(k,k+1,k+3,k+2),(n+k+2,n+k+3,n+k+1,n+k),
+                            (k,k+2,n+k+2,n+k),(k+1,n+k+1,n+k+3,k+3)]
+        faces += [(0,n,n+1,1),(n-2,n-1,2*n-1,2*n-2)]
+        o=mesh('Curved coopered oak stave',verts,faces,'oak_light' if i%4==0 else 'oak','wood')
+        mod=o.modifiers.new('Soft stave edge','BEVEL');mod.width=.008;mod.segments=2
+        mod=o.modifiers.new('Stave corner normals','WEIGHTED_NORMAL');mod.keep_sharp=True
+    for yy in (height*.12,height*.85):
+        r=radius*.98;verts=[];faces=[];segments=32
+        for dy,rr in [(0,r+.024),(.07,r+.024),(.07,r+.006),(0,r+.006)]:
+            for i in range(segments):
+                a=i*2*math.pi/segments;verts.append((x+rr*math.cos(a),y+yy+dy,z+rr*math.sin(a)))
+        for j in range(4):
+            for i in range(segments):faces.append((j*segments+i,j*segments+(i+1)%segments,((j+1)%4)*segments+(i+1)%segments,((j+1)%4)*segments+i))
+        mesh('Continuous iron barrel hoop',verts,faces,'iron_edge',smooth=True)
+        for i in range(12):
+            a=i*math.pi/6;ellipsoid('Hoop rivet',(x+math.cos(a)*(r+.032),y+yy+.035,z+math.sin(a)*(r+.032)),(.028,.028,.028),'iron',8,6)
+    cylinder('Barrel interior floor',(x,y+height*.12,z),radius*.82,.05,'oak_dark',vertices=24)
+    if lid and not water:
+        cylinder('Round wooden barrel lid',(x,y+height*.965,z),radius*.84,.05,'oak_light',vertices=32)
+        for dx in (-.45,0,.45):
+            span=radius*.80*math.sqrt(1-dx*dx)
+            tube('Lid board seam',[(x+radius*dx,y+height*.994,z-span),(x+radius*dx,y+height*.994,z+span)],.006,'oak_edge',4)
+    if water:cylinder('Quenching water',(x,y+height*.82,z),radius*.80,.018,'446978',vertices=32)
 
 
 def pot(at=(0,0,0),radius=.17,height=.30,color='terra'):

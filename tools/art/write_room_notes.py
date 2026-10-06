@@ -52,6 +52,7 @@ Actual Godot **Mobile / Vulkan**, {validation['adapter']}, 1440×1080. {validati
 | Unique GLBs / placed instances | {len(stats['assets'])} / {stats['placed_instances']} |
 | Unique / placed triangles | {stats['unique_triangles']:,} / {stats['scene_triangles']:,} |
 | Static surfaces | {stats['static_draw_surfaces']} |
+| Runtime materials | {validation.get('material_count', stats['materials'])} |
 | GLB bytes combined | {stats['glb_bytes']:,} |
 | Atlas source PNG bytes | {stats['atlas_bytes']:,} |
 | Shared atlas | 2048 × 2048 |

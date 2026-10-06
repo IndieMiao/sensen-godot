@@ -27,19 +27,20 @@ func capture() -> void:
 	var room := kit.instantiate()
 	world.add_child(room)
 	var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/rooms/%s/layout.json" % slug))
+	var lighting: Dictionary = layout.get("review_lighting", {})
 	var environment := Environment.new()
 	environment.background_mode = Environment.BG_COLOR
 	environment.background_color = Color("e8e4c8")
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color("fff0dc")
-	environment.ambient_light_energy = .70
+	environment.ambient_light_energy = float(lighting.get("ambient", .70))
 	environment.tonemap_mode = Environment.TONE_MAPPER_ACES
 	var env := WorldEnvironment.new()
 	env.environment = environment
 	world.add_child(env)
 	var sun := DirectionalLight3D.new()
 	sun.light_color = Color("ffe6c2")
-	sun.light_energy = 1.05
+	sun.light_energy = float(lighting.get("sun", 1.05))
 	sun.shadow_enabled = true
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
 	sun.directional_shadow_max_distance = 35
@@ -49,6 +50,14 @@ func capture() -> void:
 	world.add_child(sun)
 	sun.position = Vector3(-6,7,1.5)
 	sun.look_at(Vector3.ZERO)
+	for lamp in lighting.get("points", []):
+		var light := OmniLight3D.new()
+		world.add_child(light)
+		light.position = vec(lamp.position)
+		light.light_color = Color(lamp.get("color", "ffb85e"))
+		light.light_energy = float(lamp.get("energy", 1.0))
+		light.omni_range = float(lamp.get("range", 2.4))
+		light.shadow_enabled = false
 	var ground := MeshInstance3D.new()
 	var plane := PlaneMesh.new()
 	plane.size = Vector2(200,200)

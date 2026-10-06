@@ -68,7 +68,7 @@ def build():
     for x in (-.18,.12):
         cube('Seed sack',(x,.23,0),(.28,.45,.34),'linen',.08,'cloth')
         leaf('Sack seed emblem',(x,.15,.18),(x+.07,.32,.18),.09,'sage')
-    begin('tool_barrel',(-2.07,.082,.92),collision=[{'at':[0,.45,0],'size':[.68,.9,.68]}]);barrel()
+    begin('tool_barrel',(-2.07,.082,.92),collision=[{'at':[0,.45,0],'size':[.68,.9,.68]}]);tool_bin()
     garden_tool('shovel',(-.10,.46,0),1.05);garden_tool('rake',(.12,.52,0),1.05)
     begin('entry_crate',(1.59,.082,-2.12));crate(width=.65,height=.46,depth=.59)
     for x in (-.15,.14):lathe('Twine spool',(x,.06,0),[(0,.14),(.22,.14),(.23,.12),(.23,.035),(.03,.035)],'terra_light',20)

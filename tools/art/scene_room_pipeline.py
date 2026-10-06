@@ -192,13 +192,14 @@ def lettering(text,at,width,color='linen'):
     b.finish(o,'Sign '+text,color)
 
 
-def finalize(camera=None):
+def finalize(camera=None, lighting=None):
     global CAMERA
     CAMERA=camera or {'position':[11,9.7,13],'target':[0,1.35,0],'size':12.4}
     layout={'units':'metres','axes':'Godot Y-up, front +Z; Blender (x,-z,y)',
             'reference':{'file_key':'OMLTC3yw3u2WDjOZhLnhaR','node_id':NODE},
             'assets':[{'name':k,'file':k+'.glb','position':d['at'],'yaw_degrees':d['yaw'],'colliders':d['collision']} for k,d in KITS.items()],
             'instances':INSTANCES,'camera':CAMERA,'sun_direction':[-6,7,1.5]}
+    if lighting:layout['review_lighting']=lighting
     (OUT/'layout.json').write_text(json.dumps(layout,indent=2)+'\n')
     b.setup_render();scene=bpy.context.scene
     scene.camera.location=v(CAMERA['position']);scene.camera.rotation_euler=(v(CAMERA['target'])-scene.camera.location).to_track_quat('-Z','Y').to_euler();scene.camera.data.ortho_scale=CAMERA['size']
@@ -330,6 +331,6 @@ def bake_and_export():
     stats["glb_bytes"]=sum(a["bytes"] for a in stats["assets"])
     stats["atlas_bytes"]=(OUT/"room_albedo_ao.png").stat().st_size
     stats["placed_instances"]=len(names)+len(INSTANCES)
-    stats["materials"]=1+int(any(n.endswith("garden") for n in names))+int("fire" in names)+int("display_glass" in names)
+    stats["materials"]=1+int(any(n.endswith("garden") for n in names))+int("fire" in names or any(n.endswith("_glow") for n in names))+int("display_glass" in names)
     (OUT/"asset_stats.json").write_text(json.dumps(stats,indent=2)+"\n")
     print("EXPORT_READY",json.dumps({k:stats[k] for k in ["unique_triangles","scene_triangles","static_draw_surfaces"]}),flush=True)
