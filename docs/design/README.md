@@ -4,6 +4,7 @@
 
 ## 当前 UI 与 P0 美术
 
+- [刘备 · 八个店面场景审阅稿（2026-10-07）](shop-series-2026-10-07/README.md)：SGODOT-179～186，Godot 实际整景总览、逐场景原图对照、Blender/GLB 记录与交付核验；全部待用户美术验收，Plane 保持 In Progress。
 - [Art environment setup](art-environment-setup.md): start here on a fresh host; toolchain, Git access, Figma MCP, Windows/remote OAuth callbacks, Lark CLI application/user authorization and readiness checks.
 - [Mobile 3D asset workflow](mobile-3d-asset-workflow.md): English production guide for agents, based on the accepted Basic Room; reference analysis, reusable modeling, atlases, mobile budgets, Godot/Android checks and verified delivery.
 - [Basic Room (2026-10-06)](basic-room-2026-10-06/README.md): user-accepted Blender assets, reusable Godot room, offline movement benchmark and Android checks; includes committed review images and an evidence summary. Not a production release.
