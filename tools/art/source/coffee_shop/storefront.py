@@ -28,7 +28,39 @@ def flower_border(length=1.0):
             leaf('Bushy planter leaf',(x,.18,0),(x+math.cos(a)*.20,.27+(i%3)*.045,math.sin(a)*.20),.14,random.choice(['leaf','leaf_light']))
         if j%2==0:k.flower((x,.40,.04),1.20)
 
-def shell(wall='EAD4BA',accent='C5B6CF',floor='EBD7B7',wood=False):
+def awning(width=3.5,depth=.82,colors=('porcelain','D7BE8B')):
+    n=round(width/.22)
+    for j in range(n):
+        x=-width/2+(j+.5)*width/n;c=colors[j%2]
+        roof=cube('Striped canvas canopy',(x,-.10,depth/2),(width/n+.004,.037,depth),c,.006,'cloth')
+        roof.rotation_euler.x=math.radians(15)
+        cube('Scalloped canvas valance',(x,-.28,depth-.01),(width/n+.008,.25,.07),c,.09,'cloth')
+    for x in (-width*.47,width*.47):
+        tube('Awning triangular support',[(x,-.39,0),(x,-.24,depth),(x,.08,0)],.024,'oak_edge',6)
+
+def crate(width=.83,depth=.64,height=.29):
+    cube('Crate base',(0,.024,0),(width,.048,depth),'oak_light',.01,'wood')
+    for z in (-depth/2,depth/2):
+        for row in range(3):cube('Crate long slat',(0,.072+row*height/3,z),(width,.075,.032),'oak_light',.010,'wood')
+    for x in (-width/2,width/2):
+        for row in range(3):cube('Crate end slat',(x,.072+row*height/3,0),(.033,.075,depth),'oak',.01,'wood','Z')
+        for z in (-depth/2,depth/2):cube('Crate corner brace',(x,.18,z),(.065,height+.03,.065),'oak_edge',.01,'wood','Y')
+
+def fruit(kind,at,s=1):
+    x,y,z=at
+    color={'orange':'E8AA37','lemon':'EBD35B','fig':'795B92','peach':'DBA06F','apple':'C97758','grape':'786394'}[kind]
+    if kind=='grape':
+        for j in range(13):
+            a=j*2.399;r=.07*s*(1-(j%3)*.13)
+            ellipsoid('Grape',(x+math.cos(a)*r,y+.04*s+(j%3)*.055*s,z+math.sin(a)*r),(.072*s,.075*s,.072*s),color,8,5)
+    elif kind=='fig':lathe('Fig',at,[(0,.044*s),(.025*s,.076*s),(.065*s,.095*s),(.11*s,.084*s),(.155*s,.045*s),(.19*s,.018*s),(.21*s,.014*s)],color,12)
+    else:
+        ellipsoid(kind.title(),(x,y+.088*s,z),(.17*s,.17*s if kind!='lemon' else .21*s,.17*s),color,12,8)
+        if kind=='peach':tube('Peach groove',[(x,y+.17*s,z-.02*s),(x,y+.12*s,z+.088*s),(x,y+.065*s,z+.085*s)],.003*s,'C18461',4)
+    tube('Fruit stem',[(x,y+.17*s,z),(x+.005*s,y+.22*s,z)],.007*s,'oak_dark',5)
+    if random.random()<.25:leaf('Fresh fruit leaf',(x,y+.19*s,z),(x+.10*s,y+.24*s,z),.065*s,'leaf')
+
+def shell(wall='EAD4BA',accent='C5B6CF',floor='EBD7B7',wood=False,door_center=-.90,rectangular=False):
     begin('floor',collision=[{'at':[0,-.09,0],'size':[6.1,.22,5.6]}])
     cube('Diorama foundation',(0,-.12,0),(6.18,.27,5.68),wall,.12)
     if wood:
@@ -45,17 +77,23 @@ def shell(wall='EAD4BA',accent='C5B6CF',floor='EBD7B7',wood=False):
         for x in range(10):
             cube('Soft brick block',(-2.71+x*.60, .18+y*.364,.101),(.585,.347,.09),wall,.031)
     cube('Cream coping',(0,3.0,0),(6.20,.16,.29),'porcelain',.045)
-    begin('left_door_wall',at=(-3,.06,.15),yaw=90,collision=[{'at':[-1.91,1.50,0],'size':[1.02,3,.23]},{'at':[1.65,1.50,0],'size':[2.22,3,.23]}])
+    edges=((-2.70,door_center-.75),(door_center+.75,2.90))
+    begin('left_door_wall',at=(-3,.06,.15),yaw=90,collision=[{'at':[(a+b)/2,1.50,0],'size':[b-a,3,.23]} for a,b in edges])
     # Arch opening occupies local x=-.90; all wall blocks stay outside it.
-    for left,right in ((-2.70,-1.65),(-.13,2.90)):
+    for left,right in edges:
         cube('Door flanking masonry',((left+right)/2,1.48,0),(right-left,2.96,.20),wall,.035)
         n=max(1,round((right-left)/.53))
         for row in range(8):
             for j in range(n):cube('Left wall brick',(left+(j+.5)*(right-left)/n,.18+row*.364,.12),((right-left)/n-.015,.347,.055),wall,.028)
     # Centered in temporary local coordinates, then offset entire arch mesh objects.
     start=len(k.CURRENT['objects'])
-    k.arch_trim('Open pastel doorway',1.44,0,1.96,.67,.15,.28,.025,accent)
-    for obj in k.CURRENT['objects'][start:]:obj.location.x-=.90
+    if rectangular:
+        for x in (-.72,.72):cube('Rectangular door jamb',(x,1.22,.05),(.10,2.44,.28),accent,.024)
+        cube('Door lintel',(0,2.43,.05),(1.54,.12,.28),accent,.024)
+        cube('Masonry above rectangular entrance',(0,2.73,0),(1.52,.50,.20),wall,.02)
+    else:
+        k.arch_trim('Open pastel doorway',1.44,0,1.96,.67,.15,.28,.025,accent)
+    for obj in k.CURRENT['objects'][start:]:obj.location.x+=door_center
     cube('Left wall top lintel',(.10,2.96,0),(5.75,.19,.29),'porcelain',.045)
     begin('front_wall_left',at=(-1.99,.06,2.68),collision=[{'at':[0,.32,0],'size':[1.95,.64,.30]}])
     for i in range(5):

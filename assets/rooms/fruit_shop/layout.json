@@ -1,0 +1,594 @@
+{
+  "units": "metres",
+  "coordinates": "Godot Y up, front +Z; pivots local floor or mounting point",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2957"
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "file": "floor.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.09,
+            0
+          ],
+          "size": [
+            6.1,
+            0.22,
+            5.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0.06,
+        -2.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.5,
+            0
+          ],
+          "size": [
+            6,
+            3,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "left_door_wall",
+      "file": "left_door_wall.glb",
+      "position": [
+        -3,
+        0.06,
+        0.15
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            -1.5250000000000001,
+            1.5,
+            0
+          ],
+          "size": [
+            2.35,
+            3,
+            0.23
+          ]
+        },
+        {
+          "at": [
+            2.025,
+            1.5,
+            0
+          ],
+          "size": [
+            1.75,
+            3,
+            0.23
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front_wall_left",
+      "file": "front_wall_left.glb",
+      "position": [
+        -1.99,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.95,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front_wall_right",
+      "file": "front_wall_right.glb",
+      "position": [
+        2.17,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.65,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "side_low_wall",
+      "file": "side_low_wall.glb",
+      "position": [
+        3,
+        0.06,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            5.28,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "corner_pier",
+      "file": "corner_pier.glb",
+      "position": [
+        3,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.43,
+            0
+          ],
+          "size": [
+            0.4,
+            0.86,
+            0.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entry_step",
+      "file": "entry_step.glb",
+      "position": [
+        0.15,
+        -0.16,
+        2.82
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.025,
+            0.05
+          ],
+          "size": [
+            2.06,
+            0.17,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wood_display_hutch",
+      "file": "wood_display_hutch.glb",
+      "position": [
+        0.34,
+        0.06,
+        -2.42
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.25,
+            0
+          ],
+          "size": [
+            3.85,
+            2.5,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "striped_awning",
+      "file": "striped_awning.glb",
+      "position": [
+        0.34,
+        2.91,
+        -2.42
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "blue_shutter",
+      "file": "blue_shutter.glb",
+      "position": [
+        -1.82,
+        1.7,
+        -2.11
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "produce_display_table",
+      "file": "produce_display_table.glb",
+      "position": [
+        0.18,
+        0.06,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.49,
+            0
+          ],
+          "size": [
+            4.8,
+            0.98,
+            0.83
+          ]
+        }
+      ]
+    },
+    {
+      "name": "crate_orange",
+      "file": "crate_orange.glb",
+      "position": [
+        -1.73,
+        1.08,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "crate_lemon",
+      "file": "crate_lemon.glb",
+      "position": [
+        -0.78,
+        1.08,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "crate_fig",
+      "file": "crate_fig.glb",
+      "position": [
+        0.16999999999999993,
+        1.08,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "crate_peach",
+      "file": "crate_peach.glb",
+      "position": [
+        1.1199999999999997,
+        1.08,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "crate_grape",
+      "file": "crate_grape.glb",
+      "position": [
+        2.07,
+        1.08,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "analog_scale",
+      "file": "analog_scale.glb",
+      "position": [
+        1.84,
+        1.37,
+        -2.0
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "striped_table_towel",
+      "file": "striped_table_towel.glb",
+      "position": [
+        -1.36,
+        1.15,
+        -1.12
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "olive_planter",
+      "file": "olive_planter.glb",
+      "position": [
+        -2.41,
+        0.07,
+        1.13
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.39,
+            0
+          ],
+          "size": [
+            0.61,
+            0.78,
+            0.61
+          ]
+        }
+      ]
+    },
+    {
+      "name": "flower_border",
+      "file": "flower_border.glb",
+      "position": [
+        -2.1,
+        0.79,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "doorway_vine",
+      "file": "doorway_vine.glb",
+      "position": [
+        -2.78,
+        2.95,
+        -1.4
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "orchard_market_sign",
+      "file": "orchard_market_sign.glb",
+      "position": [
+        -2.82,
+        1.57,
+        1.75
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "hanging_herbs",
+      "file": "hanging_herbs.glb",
+      "position": [
+        2.71,
+        2.23,
+        -2.57
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "corner_pier_0",
+      "asset": "corner_pier",
+      "position": [
+        -3,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "corner_pier_1",
+      "asset": "corner_pier",
+      "position": [
+        -0.97,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "corner_pier_2",
+      "asset": "corner_pier",
+      "position": [
+        1.28,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "blue_shutter_2",
+      "asset": "blue_shutter",
+      "position": [
+        0.79,
+        1.7,
+        -2.11
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "blue_shutter_3",
+      "asset": "blue_shutter",
+      "position": [
+        2.54,
+        1.7,
+        -2.11
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "floor_orange_crate",
+      "asset": "crate_orange",
+      "position": [
+        -1.36,
+        0.064,
+        1.1
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "floor_fig_crate",
+      "asset": "crate_fig",
+      "position": [
+        1.35,
+        0.064,
+        1.54
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "shelf_orange_crate",
+      "asset": "crate_orange",
+      "position": [
+        -0.32,
+        1.94,
+        -2.17
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "shelf_lemon_crate",
+      "asset": "crate_lemon",
+      "position": [
+        -0.32,
+        1.37,
+        -2.17
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "striped_table_towel_2",
+      "asset": "striped_table_towel",
+      "position": [
+        1.99,
+        1.15,
+        -1.12
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "olive_planter_2",
+      "asset": "olive_planter",
+      "position": [
+        2.52,
+        0.07,
+        -1.92
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "flower_border_2",
+      "asset": "flower_border",
+      "position": [
+        2.16,
+        0.79,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "flower_border_side_0",
+      "asset": "flower_border",
+      "position": [
+        3,
+        0.79,
+        -0.95
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "flower_border_side_1",
+      "asset": "flower_border",
+      "position": [
+        3,
+        0.79,
+        0.72
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "flower_border_side_2",
+      "asset": "flower_border",
+      "position": [
+        3,
+        0.79,
+        2.25
+      ],
+      "yaw_degrees": 90
+    }
+  ],
+  "camera": {
+    "position": [
+      10,
+      9.2,
+      12
+    ],
+    "target": [
+      0,
+      1.1,
+      0.05
+    ],
+    "size": 9.5
+  }
+}

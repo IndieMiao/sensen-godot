@@ -1,0 +1,187 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
+    "bytes": 3734136
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "vertices": 3792,
+      "triangles": 7316,
+      "surfaces": 1,
+      "bytes": 253396
+    },
+    {
+      "name": "back_wall",
+      "vertices": 4592,
+      "triangles": 8856,
+      "surfaces": 1,
+      "bytes": 286456
+    },
+    {
+      "name": "left_door_wall",
+      "vertices": 3736,
+      "triangles": 7236,
+      "surfaces": 1,
+      "bytes": 233736
+    },
+    {
+      "name": "front_wall_left",
+      "vertices": 616,
+      "triangles": 1188,
+      "surfaces": 1,
+      "bytes": 41492
+    },
+    {
+      "name": "front_wall_right",
+      "vertices": 504,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 35364
+    },
+    {
+      "name": "side_low_wall",
+      "vertices": 1288,
+      "triangles": 2484,
+      "surfaces": 1,
+      "bytes": 87440
+    },
+    {
+      "name": "corner_pier",
+      "vertices": 168,
+      "triangles": 324,
+      "surfaces": 1,
+      "bytes": 14836
+    },
+    {
+      "name": "entry_step",
+      "vertices": 112,
+      "triangles": 216,
+      "surfaces": 1,
+      "bytes": 9064
+    },
+    {
+      "name": "wood_display_hutch",
+      "vertices": 1512,
+      "triangles": 2916,
+      "surfaces": 1,
+      "bytes": 96072
+    },
+    {
+      "name": "striped_awning",
+      "vertices": 2164,
+      "triangles": 4168,
+      "surfaces": 1,
+      "bytes": 112156
+    },
+    {
+      "name": "blue_shutter",
+      "vertices": 896,
+      "triangles": 1728,
+      "surfaces": 1,
+      "bytes": 49252
+    },
+    {
+      "name": "produce_display_table",
+      "vertices": 504,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 33340
+    },
+    {
+      "name": "crate_orange",
+      "vertices": 1942,
+      "triangles": 3732,
+      "surfaces": 1,
+      "bytes": 93328
+    },
+    {
+      "name": "crate_lemon",
+      "vertices": 1984,
+      "triangles": 3812,
+      "surfaces": 1,
+      "bytes": 95152
+    },
+    {
+      "name": "crate_fig",
+      "vertices": 1882,
+      "triangles": 3616,
+      "surfaces": 1,
+      "bytes": 90708
+    },
+    {
+      "name": "crate_peach",
+      "vertices": 1966,
+      "triangles": 3752,
+      "surfaces": 1,
+      "bytes": 94216
+    },
+    {
+      "name": "crate_grape",
+      "vertices": 5062,
+      "triangles": 9548,
+      "surfaces": 1,
+      "bytes": 228064
+    },
+    {
+      "name": "analog_scale",
+      "vertices": 484,
+      "triangles": 900,
+      "surfaces": 1,
+      "bytes": 28644
+    },
+    {
+      "name": "striped_table_towel",
+      "vertices": 560,
+      "triangles": 1080,
+      "surfaces": 1,
+      "bytes": 27328
+    },
+    {
+      "name": "olive_planter",
+      "vertices": 8020,
+      "triangles": 15240,
+      "surfaces": 1,
+      "bytes": 359820
+    },
+    {
+      "name": "flower_border",
+      "vertices": 3002,
+      "triangles": 5672,
+      "surfaces": 1,
+      "bytes": 133000
+    },
+    {
+      "name": "doorway_vine",
+      "vertices": 7356,
+      "triangles": 13888,
+      "surfaces": 1,
+      "bytes": 320104
+    },
+    {
+      "name": "orchard_market_sign",
+      "vertices": 1076,
+      "triangles": 1156,
+      "surfaces": 1,
+      "bytes": 61644
+    },
+    {
+      "name": "hanging_herbs",
+      "vertices": 1496,
+      "triangles": 2816,
+      "surfaces": 1,
+      "bytes": 66156
+    }
+  ],
+  "unique_triangles": 103588,
+  "scene_triangles": 161916,
+  "static_draw_surfaces": 39,
+  "unique_assets": 24,
+  "placed_instances": 39,
+  "glb_bytes": 2850768
+}
