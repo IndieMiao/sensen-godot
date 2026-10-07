@@ -134,7 +134,7 @@ func _build_hud() -> void:
 	_avatar.size = Vector2(37, 37)
 	_avatar.mouse_filter = Control.MOUSE_FILTER_STOP
 	_avatar.gui_input.connect(func(e: InputEvent):
-		if P0Ui.is_tap(e): open_skills())
+		if P0Ui.is_tap(e): open_profile())   # LOCK-06: the avatar opens Profile
 	root.add_child(_avatar)
 	var ecard := PanelContainer.new()
 	ecard.add_theme_stylebox_override("panel", _box(CARD, 12, EDGE, 1, Vector4(8, 5, 8, 5)))
@@ -321,6 +321,7 @@ func _build_dev() -> void:
 func set_view(v: Dictionary) -> void:
 	view = v
 	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear"]: _bag.refresh(v)
+	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	var e: Dictionary = v.get("energy", {})
 	var val := int(e.get("value", 0))
 	var mx := int(e.get("max", 200))
@@ -643,7 +644,7 @@ func open_bag(focus := "", side := "") -> void:
 	modal_kind = "bag" if bag_side == "bag" else "gear"
 
 ## A button on the bag card or a Gear row. The drawer only reports; commands go to the server from here.
-func _bag_action(action: StringName, id: String, _payload: Dictionary) -> void:
+func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 	match action:
 		&"eat":
 			var confirm := str(P0Logic.eat_button(view, id).get("confirm", ""))
@@ -656,6 +657,10 @@ func _bag_action(action: StringName, id: String, _payload: Dictionary) -> void:
 			command.emit({"type": "eat", "item": id})
 		&"equip":
 			command.emit({"type": "equip", "item": id})
+		&"lock", &"unlock":   # the title-area lock icon (F-07); Sell All skips locked items (SGODOT-228)
+			command.emit({"type": String(action), "item": id})
+		&"store":             # farm storage (SGODOT-228 store / take_out); the card shows Store only at home
+			command.emit({"type": "store", "item": id, "qty": payload.get("qty", "all")})
 		&"pin", &"unpin":
 			pass   # TODO(SGODOT-225 after #12): pin through the quick bar's pin record (P0Ui.bind_quick_bar)
 		_:
@@ -1123,6 +1128,35 @@ func open_today() -> void:
 	panel.add_child(v)
 	_open_modal(panel, 0.12)
 	modal_kind = "today"
+
+## Own profile (SGODOT-225; PROFILE-1-P0, LOCK-22), opened from the HUD avatar. A skill ring opens the skill
+## details; Edit look opens the dressing room above the current world and comes back here.
+var _profile: P0ProfilePage
+
+func open_profile() -> void:
+	var top := 0.0   # TODO(SGODOT-225 rebase on #11): use safe_top()
+	if OS.has_feature("android") or OS.has_feature("ios"):
+		top = UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(),
+			get_viewport().get_visible_rect().size, 0.0).y
+	var page := P0ProfilePage.new(view, top)
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(close_modal)
+	page.skill_pressed.connect(func(_skill: String): open_skills())
+	page.edit_look_pressed.connect(edit_look)
+	_open_modal(page, 0.0, true)
+	_profile = page
+	modal_kind = "profile"
+
+## The existing dressing room (Avatar outfit; the P0 actor follows the saved outfit). The P0 layer hides while
+## it is on top and the profile comes back when it closes (Back or Done).
+func edit_look() -> void:
+	close_modal()
+	var room := AppRouter.push_instance(AppRouter.DRESS)
+	if room == null: return
+	visible = false
+	room.tree_exited.connect(func():
+		visible = true
+		open_profile(), CONNECT_ONE_SHOT)
 
 ## SKILL-1 (P0 cut): three track cards — level ring, XP and how far to go, what the next level opens —
 ## and the "First times" collection tiles. Opened from the avatar ring.
