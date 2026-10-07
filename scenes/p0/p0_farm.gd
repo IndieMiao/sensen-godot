@@ -110,13 +110,13 @@ func _build_world() -> void:
 	_sign = P0Garden.sign_point(bp)
 	props.add_child(FarmArt.instance("sign", _sign, 0.8))
 	P0Garden.block_points(bp, [_sign])
-	# The Upgrade Plaque: art placeholder (a smaller sign.glb) until its model lands; solid even before it shows.
+	# The Upgrade Plaque: art placeholder (a smaller sign.glb) until its model lands. Not solid: it appears only after
+	# the first upgrade, and an invisible block before then would stop the player for no visible reason.
 	_plaque = P0Garden.plaque_point(bp)
 	_plaque_node = FarmArt.instance("sign", _plaque, 0.6)
 	_plaque_node.rotation.y = 0.35
 	_plaque_node.visible = false
 	props.add_child(_plaque_node)
-	P0Garden.block_points(bp, [_plaque])
 	grid = BlueprintGrid.new(bp)
 	# One thick soil bed per plot (plot.glb), tinted per state (watered beds read darker).
 	var xfs: Array = []
