@@ -6,6 +6,7 @@ import json
 import os
 import subprocess
 import time
+import math
 
 ROOT=Path(__file__).resolve().parents[3]
 parser=argparse.ArgumentParser()
@@ -52,9 +53,21 @@ try:
     route=json.loads((out/'record-result.json').read_text());assert route['passed']
     probe=subprocess.run(['ffprobe','-v','error','-show_entries','format=duration:stream=codec_name,width,height','-of','json',str(out/'walkthrough.mp4')],capture_output=True,text=True,check=True)
     video=json.loads(probe.stdout);assert 14.8<=float(video['format']['duration'])<=15.2
+    frame_checks=[]
     for i,t in enumerate((.5,7.5,14.0)):
         subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y','-ss',str(t),'-i',str(out/'walkthrough.mp4'),'-frames:v','1',str(out/f'video-{i}.png')],check=True)
+        decoded=subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-ss',str(t),'-i',str(out/'walkthrough.mp4'),
+            '-frames:v','1','-vf','scale=64:48','-pix_fmt','gray','-f','rawvideo','pipe:1'],capture_output=True,check=True).stdout
+        assert len(decoded)==64*48
+        mean=sum(decoded)/len(decoded)
+        std=math.sqrt(sum((x-mean)**2 for x in decoded)/len(decoded))
+        visible=mean>8 and std>8
+        frame_checks.append({'time_seconds':t,'luma_mean':mean,'luma_std':std,'nonblack_nonuniform':visible})
+    video['frame_checks']=frame_checks
+    video['image_content_valid']=all(x['nonblack_nonuniform'] for x in frame_checks)
     (out/'video-metadata.json').write_text(json.dumps(video,indent=2)+'\n')
+    if not video['image_content_valid']:
+        raise RuntimeError('Recording contains black/blank sample frames; encoding/route success is insufficient. Inspect video-*.png; do not deliver this clip.')
     print('REAL_TIME_ROUTE_VIDEO_VERIFIED',args.slug,flush=True)
 finally:
     if recorder and recorder.poll() is None:recorder.terminate();recorder.wait(timeout=5)

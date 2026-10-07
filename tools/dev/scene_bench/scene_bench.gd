@@ -39,6 +39,7 @@ func _ready() -> void:
 		bench=JSON.parse_string(FileAccess.get_file_as_string("res://tools/dev/scene_bench/fixtures/basic_room.json"))
 	art=load("res://scenes/%s/%s_art.tscn"%[slug,slug]).instantiate()
 	add_child(art)
+	if art.has_method("set_bench_door_open"): art.set_bench_door_open(true)
 	setup_world()
 	setup_player()
 	var layer:=CanvasLayer.new();add_child(layer)
@@ -77,6 +78,15 @@ func setup_world()->void:
 	ground.mesh=plane;ground.position.y=-.43
 	var mat:=StandardMaterial3D.new();mat.albedo_color=Color(lighting.get("background","e9e7d4"));mat.roughness=1
 	ground.material_override=mat;add_child(ground)
+	if lighting.get("background_gradient",false):
+		var backdrop:=ShaderMaterial.new();var shader:=Shader.new()
+		shader.code="""shader_type spatial; render_mode unshaded;
+varying vec3 world_pos;
+void vertex(){world_pos=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;}
+void fragment(){float t=smoothstep(-4.0,6.0,dot(world_pos.xz,vec2(.66,.75)));
+ALBEDO=mix(vec3(.64,.81,.74),vec3(.98,.92,.71),t);}
+"""
+		backdrop.shader=shader;ground.material_override=backdrop
 	camera=Camera3D.new();camera.name="ReferenceCamera";camera.projection=Camera3D.PROJECTION_ORTHOGONAL
 	camera.keep_aspect=Camera3D.KEEP_HEIGHT;camera.size=float(layout.camera.size)*.75
 	camera.near=.1;camera.far=70;add_child(camera)
