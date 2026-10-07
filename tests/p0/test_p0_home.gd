@@ -44,10 +44,13 @@ func test_the_button_carries_the_first_gap_in_tile_order() -> void:
 func test_lv1_to_lv2_lists_the_spice_rack_and_no_look_line() -> void:
 	var v := _view(1)
 	v.homestead.next.level = 2
-	v.homestead.next.unlocks = ["spice_rack"]
+	v.homestead.next.unlocks = ["spice_rack", "clay_bank"]
 	var p := P0Logic.home_panel(v)
 	assert_str(str(p.look)).is_equal("")
 	assert_str(str(p.changes[1].text)).is_equal("Spice Rack")
+	assert_str("%s · %s" % [p.changes[2].text, p.changes[2].note]).is_equal("Clay Bank · Clay next to the Reed Bank")   # q(45)
+	var m := P0Logic.home_moment(v, {"level": 2, "unlocks": ["spice_rack", "clay_bank"]})
+	assert_str(str(m.detail)).is_equal("Spice Rack · seasonings off your bag\nClay Bank opened")
 
 func test_p0_stops_at_lv3() -> void:
 	var v := _view(3)

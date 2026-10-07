@@ -675,6 +675,7 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	for u in unlocks:
 		match str(u):
 			"spice_rack": out.changes.append({"icon": "kitchen", "text": "Spice Rack", "note": "seasonings off your bag"})
+			"clay_bank": out.changes.append({"icon": "clay", "text": "Clay Bank", "note": "Clay next to the Reed Bank"})
 			"warming_cabinet": out.changes.append({"icon": "kitchen", "text": "Warming Cabinet", "note": "keeps 6 dishes by the stove"})
 			"bag_upgrade_1":
 				out.changes.append({"icon": "bag", "text": "Bag Upgrade I for sale · 150 coins",
@@ -714,6 +715,7 @@ static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 	for u in ev.get("unlocks", []):
 		match str(u):
 			"spice_rack": lines.append("Spice Rack · seasonings off your bag")
+			"clay_bank": lines.append("Clay Bank opened")   # gathering spot (SGODOT-231, q(45))
 			"warming_cabinet": lines.append("Warming Cabinet")
 			"bag_upgrade_1": lines.append("Bag Upgrade I for sale · 150 coins")
 	return {"level": str(level), "title": "Homestead Lv %d" % level, "subtitle": "Max Energy %d · Energy full" % max_e,
