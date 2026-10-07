@@ -6,6 +6,7 @@ const KIT := "res://assets/rooms/standard_room_5/"
 var layout: Dictionary
 var assets: Dictionary = {}
 var fire: Node3D
+var variant_materials: Dictionary = {}
 
 func _ready() -> void:
 	layout = JSON.parse_string(FileAccess.get_file_as_string(KIT + "layout.json"))
@@ -27,11 +28,28 @@ func _setup_room() -> void:
 		_add_asset(asset, asset, material)
 	for instance in layout.instances:
 		_add_asset(assets[instance.asset], instance, material)
+	var plant_material := load("res://assets/rooms/_shared/plants/material.tres") as StandardMaterial3D
+	for plant in layout.get("shared_plants", []):
+		var container := Node3D.new()
+		container.name = plant.name
+		container.position = _vec(plant.position)
+		container.rotation_degrees = _vec(plant.rotation_degrees)
+		container.scale = _vec(plant.scale)
+		add_child(container)
+		var model := (load("res://assets/rooms/_shared/plants/" + str(plant.file)) as PackedScene).instantiate()
+		container.add_child(model)
+		_set_material(model, plant_material)
+		for c in plant.get("colliders", []):
+			var body := StaticBody3D.new(); body.position = _vec(c.at)
+			var shape := BoxShape3D.new(); shape.size = _vec(c.size)
+			var collision := CollisionShape3D.new(); collision.shape = shape
+			body.add_child(collision); container.add_child(body)
 
 func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMaterial3D) -> void:
 	var container := Node3D.new()
 	container.name = placement.name
 	container.position = _vec(placement.position)
+	container.scale = _vec(placement.get("scale", [1.0, 1.0, 1.0]))
 	container.rotation.y = deg_to_rad(float(placement.yaw_degrees))
 	add_child(container)
 	var scene := load(KIT + asset.file) as PackedScene
@@ -41,8 +59,9 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 	var model := scene.instantiate() as Node3D
 	container.add_child(model)
 	var applied := material
-	if asset.name == "window_garden":
+	if str(asset.name).ends_with("garden"):
 		applied = material.duplicate()
+		applied.albedo_texture = load(KIT + "window_landscape.png")
 		applied.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		applied.cull_mode = BaseMaterial3D.CULL_DISABLED
 	if asset.name == "fire":
@@ -51,29 +70,24 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 		applied.emission = Color("ffb041")
 		applied.emission_energy_multiplier = 1.3
 		fire = container
+	var variant := "garden" if str(asset.name).ends_with("garden") else "fire" if asset.name == "fire" else "plain"
+	if variant_materials.has(variant): applied = variant_materials[variant]
+	else: variant_materials[variant] = applied
 	_set_material(model, applied)
-	if asset.name == "window_garden": _disable_shadows(model)
+	if str(asset.name).ends_with("garden"): _disable_shadows(model)
 	for c in asset.colliders:
 		var body := StaticBody3D.new()
 		body.position = _vec(c.at)
-		# The authored floorboard top is 8cm above the assembly pivot.
-		if asset.name == "room_shell": pass
 		var shape := BoxShape3D.new()
 		shape.size = _vec(c.size)
 		var collision := CollisionShape3D.new()
 		collision.shape = shape
 		body.add_child(collision)
 		container.add_child(body)
-	if asset.name == "floor_plant":
-		var body := StaticBody3D.new()
-		var collision := CollisionShape3D.new()
-		var shape := CylinderShape3D.new()
-		shape.height = .45
-		shape.radius = .22
-		collision.shape = shape
-		collision.position.y = .225
-		body.add_child(collision)
-		container.add_child(body)
+
+func set_bench_door_open(open: bool) -> void:
+	var door := get_node_or_null("green_door") as Node3D
+	if door: door.rotation.y = deg_to_rad(float(layout.door.open_yaw_degrees)) if open else 0.0
 
 func _set_material(node: Node, mat: Material) -> void:
 	if node is MeshInstance3D:

@@ -1,12 +1,14 @@
 # 赵云 · 暖木室内系场景评审包（2026-10-07）
 
-按 Plane 父卡 SGODOT-171 的顺序完成了赵云负责的七个场景评审版。每张卡在实际开工时改为 **In Progress**；当前全部保持此状态，等待用户确认美术效果。用户在本轮明确要求依次制作、每完成一个用 Lark CLI 发消息，并留待早上 review，因此没有在第一张后中断。
+按 Plane 父卡 SGODOT-171 的顺序完成了赵云负责的七个场景评审版。每张卡在实际开工时改为 **In Progress**。当前 SGODOT-172 已完成第 1 轮样板返工并转 **Review**；173–178 仍是原审阅稿，待样板确认后按新 review 推进。用户在本轮明确要求依次制作、每完成一个用 Lark CLI 发消息，并留待早上 review，因此没有在第一张后中断。
 
-![七个场景的 Godot 实际渲染](overview.jpg)
+最新入口：[172 样板 R1：三栏叠图、角色走位与逐项清单](../standard_room_5-review1-2026-10-07/README.md)。下图保留为首轮七场景总览。
+
+![首轮七个场景的 Godot 实际渲染](overview.jpg)
 
 | Plane | 完整参考、对照图和交付文档 | GLB / 摆放实例 | 场景三角面 |
 |---|---|---:|---:|
-| [SGODOT-172](https://plane.sensenjoy.cn/zili/browse/SGODOT-172) | [Standard Room-5](../standard_room_5-2026-10-07/README.md) | 39 / 41 | 93,726 |
+| [SGODOT-172](https://plane.sensenjoy.cn/zili/browse/SGODOT-172) | [Standard Room-5](../standard_room_5-2026-10-07/README.md) | 41 本地 + 3 共享 / 49 | 191,256 |
 | [SGODOT-173](https://plane.sensenjoy.cn/zili/browse/SGODOT-173) | [Deluxe Room-10](../deluxe_room_10-2026-10-07/README.md) | 50 / 55 | 120,302 |
 | [SGODOT-174](https://plane.sensenjoy.cn/zili/browse/SGODOT-174) | [Farm Tools Store](../farm_tools_store-2026-10-07/README.md) | 36 / 41 | 85,144 |
 | [SGODOT-175](https://plane.sensenjoy.cn/zili/browse/SGODOT-175) | [Bakery](../bakery-2026-10-07/README.md) | 41 / 42 | 121,144 |
@@ -28,6 +30,6 @@ Basic Room 已验收资产和源脚本保持不变。新模型保留命名部件
 
 这是美术评审候选，并不表示用户已接受还原效果。尺寸、背面和结构深度由单张透视图推断；植物、织物、装饰密度、材质磨损、间接光和部分小道具有简化，具体差异逐场景记录。请优先核对整体构图、比例、家具布局与风格，再审细节。
 
-本期只做场景美术。没有新增角色移动 benchmark、玩法/地图接入、Android 验收、发包或生产更新，也没有把桌面渲染结果当作手机性能结论。所有源码与小体量评审素材已分场景提交在 `wp-3d-scene`；[远端同名分支](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene)用于其他 agent 评审，尚未合入主开发分支。远端同时包含[刘备的八个店面场景](../shop-series-2026-10-07/README.md)。
+首轮范围是场景美术；第 1 轮 review 新增共享桌面角色移动、尺度和碰撞 harness，目前 172 样板已覆盖。未新增玩法/地图接入、Android 验收、发包或生产更新，也没有把桌面渲染结果当作手机性能结论。所有源码与小体量评审素材已分场景提交在 `wp-3d-scene`；[远端同名分支](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene)用于其他 agent 评审，尚未合入主开发分支。远端同时包含[刘备的八个店面场景](../shop-series-2026-10-07/README.md)。
 
 评审差异从基线 `2d18868` 开始：`git diff 2d18868..origin/wp-3d-scene`。先看本页总览与各场景对照图，再按各场景 README 重建或运行 Godot 检查；新环境按 [环境准备指南](../art-environment-setup.md)配置工具。

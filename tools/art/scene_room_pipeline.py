@@ -24,6 +24,8 @@ INSTANCES = []
 OUT = SOURCE = QA = None
 SLUG = NODE = ""
 CAMERA = {}
+BAKE_SETTINGS = {}
+MANIFEST_EXTRA = {}
 
 
 def start(slug, node):
@@ -37,6 +39,7 @@ def start(slug, node):
     bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
     for c in list(bpy.data.collections): bpy.data.collections.remove(c)
     KITS.clear(); INSTANCES.clear(); b.MATS.clear()
+    BAKE_SETTINGS.clear(); MANIFEST_EXTRA.clear()
     bpy.context.preferences.filepaths.save_version = 0
     random.seed(71007)
 
@@ -202,6 +205,7 @@ def finalize(camera=None, lighting=None):
             'assets':[{'name':k,'file':k+'.glb','position':d['at'],'yaw_degrees':d['yaw'],'colliders':d['collision']} for k,d in KITS.items()],
             'instances':INSTANCES,'camera':CAMERA,'sun_direction':[-6,7,1.5]}
     if lighting:layout['review_lighting']=lighting
+    layout.update(MANIFEST_EXTRA)
     (OUT/'layout.json').write_text(json.dumps(layout,indent=2)+'\n')
     b.setup_render();scene=bpy.context.scene
     scene.camera.location=v(CAMERA['position']);scene.camera.rotation_euler=(v(CAMERA['target'])-scene.camera.location).to_track_quat('-Z','Y').to_euler();scene.camera.data.ortho_scale=CAMERA['size']
@@ -263,9 +267,11 @@ def bake_and_export():
         nt=mat.node_tree;p=nt.nodes.get("Principled BSDF");out=nt.nodes.get("Material Output")
         image=nt.nodes.new("ShaderNodeTexImage");image.image=tex;nt.nodes.active=image
         emission=nt.nodes.new("ShaderNodeEmission")
-        ao=nt.nodes.new("ShaderNodeAmbientOcclusion");ao.samples=16;ao.inputs["Distance"].default_value=.68
+        ao=nt.nodes.new("ShaderNodeAmbientOcclusion");ao.samples=24;ao.inputs["Distance"].default_value=BAKE_SETTINGS.get('ao_distance',.68)
         # Keep occluded surfaces legible; this is contact AO, not baked sun/shadows.
-        mix=nt.nodes.new("ShaderNodeMixRGB");mix.blend_type="MIX";mix.inputs[0].default_value=.58
+        mix=nt.nodes.new("ShaderNodeMixRGB");mix.blend_type="MIX";mix.inputs[0].default_value=BAKE_SETTINGS.get('ao_strength',.58)
+        if mat.name.startswith(('floor_', 'floor_light_', 'floor_shade_')):
+            mix.inputs[0].default_value=BAKE_SETTINGS.get('floor_ao_strength',mix.inputs[0].default_value)
         mix.inputs[1].default_value=(1,1,1,1);nt.links.new(ao.outputs["Color"],mix.inputs[2])
         multiply=nt.nodes.new("ShaderNodeMixRGB");multiply.blend_type="MULTIPLY";multiply.inputs[0].default_value=1
         base=p.inputs["Base Color"]

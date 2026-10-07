@@ -1,0 +1,16 @@
+{
+  "scene": "standard_room_5",
+  "plane_card": "SGODOT-172",
+  "state": "Review",
+  "art_commit": "acc26d6",
+  "harness_commits": [
+    "39f50fb",
+    "341bd2e",
+    "10dd467"
+  ],
+  "plane_attachments_download_verified": 16,
+  "lark_messages_readback_verified": 5,
+  "lark_media_download_verified": 4,
+  "video_sha256": "8d8c08caef74d54f4f32b58198bbcb8931ba64d905bce252688e87335690a901",
+  "scope": "R1 sample only; remaining Zhao Yun cards await sample approval per SGODOT-171"
+}

@@ -154,10 +154,28 @@ func capture(name:String)->void:
 func show_colliders()->void:
 	collision_overlay=Node3D.new();add_child(collision_overlay)
 	_draw_colliders(art)
+	_draw_colliders(player)
 
 func _draw_colliders(node:Node)->void:
 	if node is CollisionShape3D and not node.disabled:
-		var mesh:=MeshInstance3D.new();mesh.mesh=node.shape.get_debug_mesh()
+		var source:ArrayMesh=node.shape.get_debug_mesh()
+		var wire:=ImmediateMesh.new();wire.surface_begin(Mesh.PRIMITIVE_LINES)
+		for surface in source.get_surface_count():
+			var arrays:Array=source.surface_get_arrays(surface)
+			var vertices:PackedVector3Array=arrays[Mesh.ARRAY_VERTEX]
+			var indices:=PackedInt32Array()
+			if arrays[Mesh.ARRAY_INDEX]!=null:indices=arrays[Mesh.ARRAY_INDEX]
+			if indices.is_empty():
+				for i in vertices.size():indices.append(i)
+			if source.surface_get_primitive_type(surface)==Mesh.PRIMITIVE_LINES:
+				for index in indices:wire.surface_add_vertex(vertices[index])
+			else:
+				for triangle in range(0,indices.size(),3):
+					for edge in range(3):
+						wire.surface_add_vertex(vertices[indices[triangle+edge]])
+						wire.surface_add_vertex(vertices[indices[triangle+(edge+1)%3]])
+		wire.surface_end()
+		var mesh:=MeshInstance3D.new();mesh.mesh=wire
 		var mat:=StandardMaterial3D.new();mat.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED
 		mat.albedo_color=Color(.08,.82,1.0);mat.no_depth_test=true;mesh.material_override=mat
 		collision_overlay.add_child(mesh);mesh.global_transform=node.global_transform

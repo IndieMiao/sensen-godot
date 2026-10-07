@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Timber",
+    "reference_pixel": [
+      2238,
+      705
+    ],
+    "median_hex": "#CAAA7D",
+    "sample_size": 13
+  },
+  {
+    "name": "Floor",
+    "reference_pixel": [
+      2163,
+      1902
+    ],
+    "median_hex": "#FECF73",
+    "sample_size": 13
+  },
+  {
+    "name": "Plaster",
+    "reference_pixel": [
+      1331,
+      615
+    ],
+    "median_hex": "#FFEABC",
+    "sample_size": 13
+  },
+  {
+    "name": "Sage cabinet",
+    "reference_pixel": [
+      2124,
+      1288
+    ],
+    "median_hex": "#847540",
+    "sample_size": 13
+  },
+  {
+    "name": "Cream linen",
+    "reference_pixel": [
+      1064,
+      1387
+    ],
+    "median_hex": "#FEF0CE",
+    "sample_size": 13
+  },
+  {
+    "name": "Terracotta",
+    "reference_pixel": [
+      2805,
+      1631
+    ],
+    "median_hex": "#DE8643",
+    "sample_size": 13
+  },
+  {
+    "name": "Iron pipe",
+    "reference_pixel": [
+      1790,
+      602
+    ],
+    "median_hex": "#6E503B",
+    "sample_size": 13
+  },
+  {
+    "name": "Foliage",
+    "reference_pixel": [
+      576,
+      1339
+    ],
+    "median_hex": "#6B892F",
+    "sample_size": 13
+  }
+]

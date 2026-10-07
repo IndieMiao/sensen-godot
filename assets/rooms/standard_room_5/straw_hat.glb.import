@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cb841wag2wu8o"
-path="res://.godot/imported/floor_plant.glb-6f70a6de8b256022a829ef1577b6004e.scn"
+uid="uid://bfjo63f3c3ltq"
+path="res://.godot/imported/straw_hat.glb-e384085d70964b593bc48b35fcbd09e4.scn"
 
 [deps]
 
-source_file="res://assets/rooms/standard_room_5/floor_plant.glb"
-dest_files=["res://.godot/imported/floor_plant.glb-6f70a6de8b256022a829ef1577b6004e.scn"]
+source_file="res://assets/rooms/standard_room_5/straw_hat.glb"
+dest_files=["res://.godot/imported/straw_hat.glb-e384085d70964b593bc48b35fcbd09e4.scn"]
 
 [params]
 
