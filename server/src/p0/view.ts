@@ -265,7 +265,9 @@ function legacyBoard(c: P0Content, s: P0State, now: number) {
     slots: slots.length,
     requests: slots.filter(sl => sl.req).map(sl => {
       const r = requestView(c, s, sl.req!, now);
-      return { id: r.id, title: r.title, item: r.icon ?? '', qty: r.qty, coins: r.coins, where: r.items.length ? 'any pond' : 'any kind', status: r.status, have: r.have };
+      const any = r.rarity ? `any ${c.rarity_names[r.rarity - 1]} ${r.kind}` : `any ${r.kind}`;
+      const where = r.items.length ? (r.kind === 'fish' ? 'any pond' : 'from your farm') : any;
+      return { id: r.id, title: r.title, item: r.icon ?? '', qty: r.qty, coins: r.coins, where, status: r.status, have: r.have };
     }),
     refill_in: empty.length ? Math.max(0, Math.min(...empty) - now) : 0,
   };

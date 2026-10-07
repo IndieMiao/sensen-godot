@@ -165,6 +165,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
       market: [],
     };
   }
+  s.req_done ??= [];
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
   s.v = 3;
   return s;
