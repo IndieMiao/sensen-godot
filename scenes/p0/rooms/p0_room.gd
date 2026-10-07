@@ -26,6 +26,10 @@ const REACH_M := 0.35             # close enough to a stand_ point to use the fa
 const FOCUS_S := 0.4              # push-in ease
 const HUD_BOTTOM := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H   # below the safe-area top
 const ZOOM_RANGE := Vector2(0.8, 1.6)
+const FRAME_W := 0.84             # opening shot: player + facilities within 84 % of the width …
+const FRAME_H := 0.60             # … and the middle 60 % of the height (§10.1)
+const MIN_VIEW_K := 0.8           # … but never closer than 80 % of the room's accepted view
+const BADGE_SCRIPT := "res://scenes/ui_kit/ui_status_badge.gd"   # UiStatusBadge (SGODOT-221)
 
 var art_scene: PackedScene
 var layout_path := BASIC_ROOM_LAYOUT
@@ -49,6 +53,7 @@ var layout: Dictionary = {}
 var art: Node3D
 var room: Node3D          ## layout space: art and anchors live here, placed at the blueprint offset
 var floor_y := 0.0
+var floor_rect := Rect2()  ## walkable floor footprint in layout space (x, z)
 var environment: Environment
 var world_env: WorldEnvironment
 
@@ -85,6 +90,7 @@ func _ready() -> void:
 	bp = nav.bp
 	grid = BlueprintGrid.new(bp)
 	floor_y = float(nav.floor_y)
+	floor_rect = nav.bounds
 	room.position = nav.offset
 	_build_lights()
 	_build_anchors()
@@ -96,9 +102,7 @@ func _ready() -> void:
 	actor.setup(bp, grid, cam, Vector3(at.x, floor_y, at.z))
 	actor.ground_height = func(_p: Vector3) -> float: return floor_y
 	if spawn: actor.face(actor.position + yaw_dir(float(_data.spawn.get("yaw_degrees", 180))))
-	_focus = _room_center()
-	_follow.hold()
-	_update_camera()
+	frame_all()
 	_room_ready()
 	if use_runtime:
 		rt = P0Runtime.ensure()
@@ -122,8 +126,9 @@ func _tappable() -> PackedStringArray:
 ## Called once the player stands at the facility (after facility_tapped).
 func _on_facility(_name: String) -> void: pass
 
-## Finger card and status badge over a tappable anchor: {text, badge (UiStatusBadge.State), caption, icon}.
-## Empty = nothing; the door's card comes from exit_text.
+## Finger card and status badge over a tappable anchor: {text, badge, caption, icon}; badge is a STATE-ICONS
+## key ("available", "countdown", "ready", … = UiStatusBadge.State in lower case). Empty = nothing; the
+## door's card comes from exit_text.
 func _marker(name: String, _view: Dictionary) -> Dictionary:
 	return {text = exit_text} if name == "exit" else {}
 
@@ -235,8 +240,33 @@ func _build_camera() -> void:
 	add_child(cam)
 	cam.make_current()
 
-func _room_center() -> Vector3:
-	return Vector3(bp.grid.x * bp.cell_m * 0.5, floor_y, -bp.grid.y * bp.cell_m * 0.5)
+## Opening shot (§10.1): the player, every tappable anchor and the room's floor (a cut-away diorama reads
+## wrong cropped) in the middle of the screen; held until the player first moves. Re-run when a room changes
+## what can be tapped.
+func frame_all() -> void:
+	var pts: Array[Vector3] = [actor.position, actor.position + Vector3(0, 1.75, 0)]
+	for n in _tappable(): pts.append(anchor(n).global_position)
+	for c in [floor_rect.position, floor_rect.end, Vector2(floor_rect.position.x, floor_rect.end.y), Vector2(floor_rect.end.x, floor_rect.position.y)]:
+		pts.append(room.position + Vector3(c.x, floor_y, c.y))
+	var forward := -_cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var lo := Vector2(INF, INF)
+	var hi := Vector2(-INF, -INF)
+	for p in pts:
+		var q := Vector2(p.dot(right), p.dot(up))
+		lo = lo.min(q)
+		hi = hi.max(q)
+	var view := _view()
+	var tall := view.y / maxf(view.x, 1.0)
+	var base := float(layout.get("camera", {}).get("size", _cam_size))
+	_cam_size = clampf(maxf((hi.x - lo.x) / FRAME_W, (hi.y - lo.y) / (FRAME_H * tall)), base * MIN_VIEW_K, base)
+	var mid := (lo + hi) * 0.5
+	# The screen centre on the floor plane: move along the view axis until y = floor.
+	var t := (floor_y - up.y * mid.y) / forward.y
+	_focus = right * mid.x + up * mid.y + forward * t
+	_follow.hold()
+	_update_camera()
 
 func _view() -> Vector2:
 	return get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(360, 800)
@@ -364,11 +394,13 @@ func p0_tap(screen: Vector2) -> void:
 	if n != "": walk_to(n)
 
 func p0_frame(v: Dictionary, dt: float) -> void:
+	if _leaving: return
 	actor.step(dt)
 	if not _walk.is_empty() and not actor.mover.is_moving():
 		if _flat_distance(actor.position, _walk.point) <= REACH_M: _arrive()
 		else: _walk = {}
 	_door_check()
+	if _leaving or not is_inside_tree(): return   # the door popped this room mid-frame
 	_focus = _follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
 	_update_camera()
 	if rt: _markers(v)
@@ -394,8 +426,9 @@ func _markers(v: Dictionary) -> void:
 		var badge_at := anchor("badge_" + P0RoomAnchors.object_of(n))
 		var screen := cam.unproject_position(badge_at.global_position if badge_at else at)
 		var lift := 0.0
-		if m.has("badge") and rt.ui.has_method("badge"):
-			rt.ui.call("badge", id, m.badge, screen, true, str(m.get("caption", "")), m.get("icon", null))
+		var state := badge_state(str(m.get("badge", "")))
+		if state >= 0 and rt.ui.has_method("badge"):
+			rt.ui.call("badge", id, state, screen, true, str(m.get("caption", "")), m.get("icon", null))
 			if rt.ui.has_method("badge_height"): lift = float(rt.ui.call("badge_height", id))
 		if m.has("text"):
 			var near := _flat_distance(actor.position, anchor(n).global_position) < CARD_NEAR_M
@@ -405,6 +438,12 @@ func _markers(v: Dictionary) -> void:
 		rt.ui.tag(id, "", Vector2.ZERO, false)
 		if rt.ui.has_method("badge"): rt.ui.call("badge", id, 0, Vector2.ZERO, false)
 	_shown = now
+
+## UiStatusBadge.State for a STATE-ICONS key, or -1 (unknown key, or the badge component is not in this build).
+static func badge_state(key: String) -> int:
+	if key == "" or not ResourceLoader.exists(BADGE_SCRIPT): return -1
+	var states: Dictionary = (load(BADGE_SCRIPT) as Script).get_script_constant_map().get("State", {})
+	return int(states.get(key.to_upper(), -1))
 
 func p0_anchor() -> Vector2:
 	return cam.unproject_position(actor.position + Vector3(0, 2.0, 0))
