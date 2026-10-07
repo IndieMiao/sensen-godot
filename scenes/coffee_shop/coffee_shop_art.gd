@@ -5,12 +5,15 @@ extends Node3D
 var _assembled := false
 var module_count := 0
 var material_overrides: Dictionary = {}
+var merged_sources: Dictionary = {}
 
 func _ready() -> void:
 	if _assembled: return
 	_assembled = true
 	var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(kit_path + "/layout.json"))
 	material_overrides = layout.get("material_overrides", {})
+	for batch: Dictionary in layout.get("render_batches", []):
+		for source_name: String in batch.sources: merged_sources[source_name] = true
 	var material := StandardMaterial3D.new()
 	material.resource_name = "SharedShopAtlas"
 	material.albedo_texture = load(kit_path + "/room_albedo_ao.png")
@@ -28,6 +31,22 @@ func _ready() -> void:
 		_add_shared_plants(layout.shared_plants)
 	for box: Dictionary in layout.get("boundaries", []):
 		_add_box(self, box)
+	for batch: Dictionary in layout.get("render_batches", []):
+		var model := (load(batch.file) as PackedScene).instantiate()
+		model.name = batch.name
+		add_child(model)
+		var applied := material.duplicate() as StandardMaterial3D
+		if batch.material == "plants":
+			applied.albedo_texture = load("res://assets/rooms/_shared/plants/room_albedo_ao.png")
+			applied.cull_mode = BaseMaterial3D.CULL_DISABLED
+			applied.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+			applied.alpha_scissor_threshold = .45
+		if batch.material == "glass":
+			applied.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			applied.albedo_color.a = .08
+			applied.cull_mode = BaseMaterial3D.CULL_DISABLED
+		_set_material(model, applied, batch.material == "glass")
+		if not batch.cast_shadow: _disable_shadows(model)
 
 func _vec(a: Array) -> Vector3:
 	return Vector3(float(a[0]), float(a[1]), float(a[2]))
@@ -38,6 +57,9 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 	pivot.position = _vec(placement.position)
 	pivot.rotation.y = deg_to_rad(float(placement.yaw_degrees))
 	add_child(pivot)
+	if merged_sources.has(placement.name):
+		for box: Dictionary in asset.colliders: _add_box(pivot, box)
+		return
 	var packed := load(kit_path + "/" + asset.file) as PackedScene
 	if packed == null:
 		push_error("Missing shop module: " + asset.file)
@@ -99,6 +121,9 @@ func _add_shared_plants(placements: Array) -> void:
 	plant_material.roughness = .86
 	plant_material.metallic_specular = .22
 	plant_material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	plant_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	plant_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	plant_material.alpha_scissor_threshold = .45
 	for placement: Dictionary in placements:
 		var pivot := Node3D.new()
 		pivot.name = placement.name
@@ -106,6 +131,10 @@ func _add_shared_plants(placements: Array) -> void:
 		pivot.rotation_degrees = _vec(placement.rotation_degrees)
 		pivot.scale = _vec(placement.scale)
 		add_child(pivot)
+		if merged_sources.has(placement.name):
+			for box: Dictionary in placement.colliders: _add_box(pivot, box)
+			module_count += 1
+			continue
 		var model := (load(placement.file) as PackedScene).instantiate()
 		pivot.add_child(model)
 		_set_material(model, plant_material, false)

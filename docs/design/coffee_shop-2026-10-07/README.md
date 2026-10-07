@@ -1,85 +1,78 @@
-# Coffee Shop · SGODOT-179 · 第 1 轮修改样板
+# Coffee Shop · SGODOT-179 · R2 Review
 
-刘备，2026-10-07。按不知火舞在 SGODOT-171 / 179 的评审修改。本卡保持 **In Progress，待用户确认样板**；180–186 本轮尚未改动。共享角色 harness 消费赵云提交 `39f50fb`，核心文件未修改；共享植物库独立提交 `26aed6f`。
+刘备，2026-10-07。按 179 复审 `6534b296` 和尺度补充 `31308f60` 修改，完成后进入 **Review**。用户已决定维持 Basic Room 基线，并保留 179 所有现有尺寸：本轮没有缩短墙柱、改变台面/座面/桌面高度或角色比例。180–186 尚未套用本样板，植物和光照须等待 179 R2 通过。
 
-![Figma / Godot / 50% overlay](comparison.png)
+![Reference / actual Godot / 50% overlay](comparison.png)
 
-## 参考、机位与色板
+## 参考与尺度
 
-Figma 文件 `OMLTC3yw3u2WDjOZhLnhaR`，[node 545:2956](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=545-2956)。保留原图 SHA-256 `bac78a88a5cb5fdc3aa2d2e7a026c31ec402bc84b5a978c84413c2951d44ce7a`，本轮重新目视对照；不是重新抓取的云端修订。
+Figma 文件 `OMLTC3yw3u2WDjOZhLnhaR`，[node 545:2956](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=545-2956)。保留原图 SHA-256 `bac78a88a5cb5fdc3aa2d2e7a026c31ec402bc84b5a978c84413c2951d44ce7a`。本轮重新目视检查完整原图，没有声称重新获取云端修订。
 
-美术相机 yaw 45°、pitch 约 28°、正交 size 9.3，目标 `[0,1.18,0]`。三栏用完整原图和完整实景等尺寸 letterbox；第三栏直接 50% 混合，没有形变或逐物件挪图。此叠图会如实暴露屋高、招牌位置和家具间距的剩余差异，不是像素还原度分数。角色测试使用相同 yaw/pitch，在 4:3 视口拓宽至 size 10.2 并上移视点 0.08m，防止屋顶裁切。
+实际源模型复测：地板顶 0.0495m、柜台 1.2005m、椅面 0.71045m、桌面 1.0175m、侧拱净高 2.69m，与 R1 一致。Basic Room 同类物件偏差仍为 +4.16% / +3.72% / −10.35%；侧拱 +15.45% 的温室高拱例外已由用户保留。见 [source-scale.json](source-scale.json)。
 
-下表是原图 9×9 像素区域的中位色（含原图光照），材质 albedo 另据实际灯光调整，不能直接把采样值当无光照反射率。采样坐标和方法见 [reference-palette.json](reference-palette.json)。
+## R2 逐项回应
 
-| 色类 | 原图采样 | 像素坐标 |
-|---|---|---|
-| limestone | `#F5C485` | [1229, 674] |
-| sage_board | `#C3B693` | [1008, 520] |
-| honey_oak | `#ECB477` | [606, 1020] |
-| upholstery | `#E1B38B` | [705, 846] |
-| leaf_lit | `#78803B` | [664, 540] |
-| leaf_shadow | `#738141` | [623, 503] |
-| graphite_pedestal | `#605754` | [597, 949] |
-| ivory_lamp | `#FEFAEB` | [821, 387] |
-
-## 评审清单逐项回应
-
-| 要求 | 本轮结果 |
+| 复审项 | 实现与验证 |
 |---|---|
-| 共享植物库 P0 | 已做。龟背竹 11 片裂叶、白掌 4 朵白花、绿萝、0.65/1/1.4m 白花藤、矮灌木；另有橄榄树和果树。叶片为封闭弯曲体，叶脉烘进独立图集，局部轴心、可编辑源文件与实际预览齐全。见 [植物库](../../../assets/rooms/_shared/plants/README.md)。 |
-| 花藤 P0 | 已做。沿主拱整圈、右窗拱与柱、窗顶和前沿布置分段件，增加花量；短中长段、旋转和偏移打破相同直条重复。仍能看出重复叶形，后续可按样板反馈继续雕形。 |
-| 椅子和桌脚 P0 | 已做。白色连续软包圆背和布面坐垫、木腿；深灰细柱与圆盘底。桌/椅高度按 Basic Room 校准。 |
-| 温室窗 P0 | 已做。真实独立透明玻璃、细窗棂、窗外独立植物和退后的淡色背景，不再在不透明玻璃上贴叶片。没有昂贵折射/SSR。 |
-| 柜台 P1 | 已做。保留浅木竖板和浅色台面，三层可颂/玛芬/蛋挞带烤色，银色咖啡机、黑手柄、磨豆机、杯碟、小盆栽；补墙架、四种杯色/尺寸和植物画。 |
-| 吊灯 P1 | 已做。两盏加大的米白灯罩移到柜台前上方，各配不投影的局部暖灯。 |
-| 植物角 P1 | 已做。左后龟背竹、白掌与小盆；右侧大叶盆栽和高盆栽。共享绿萝使用编织盆；大盆暂为有筋纹的陶盆，尚未把右侧大盆做成参考的完整藤编纹理。 |
-| 招牌 P1 | 已做。外挑铁杆、椭圆木牌、GREENHOUSE CAFE 字样。相对原图外挑距离仍较大，叠图可见。 |
-| 前沿 P1 | 已做。台阶与前沿连接，柱头花丛与向外垂藤；碰撞使用连续凸坡道，台阶外侧有受控落脚区及边界。 |
-| 桌面 P1 | 已做。雏菊花瓶、杯碟与咖啡纹样。 |
-| 窗梁/后墙/倒角 P2 | 已做。保留可见斜撑；后墙四种鼠尾草板色；强化柱帽、台面、厚底座圆角。 |
-| 光照/材质共性 | 已做。冷色环境、暖主光、两盏局部灯、较强接触 AO；错缝木板、细拼缝和近窗暖色衰减。地板可见实时窗框投影，叶脉/木纹/布面噪声烘焙。仍比参考的绘画式漫反射和圆润细节更简化。 |
-| 机位/对照 | 已做。全参考、整景、50% 叠图、两张细节和正交图；保留可见差异，未宣称美术验收。 |
+| 暖色调 P0 | 柱/底座为奶油石灰色，地板为蜂蜜橡木色；暖金色主光 1.55，环境色从 ADC9D8 改为 C0ADA9、能量 0.58；主光方向照亮参考中对应的外侧柱面。两盏局部暖灯能量 1.2、范围 1.45m。最终图对声明的柱/地板/矮墙亮面取样，色相差均 ≤10°。这不等于全图亮度/饱和度一致。 |
+| 小叶和颜色 P0 | 藤蔓/绿萝叶长宽为 R1 的约 60%，黄绿六色中仅 1 色为最深档。叶片为开放弯曲薄片，普通叶 6 面、龟背竹 8 面。图集正确编码 sRGB，消除线性值直接写入产生的发暗偏饱和。 |
+| 白色矩形 P0 | 椅背等大曲面不再逐面切换到常量色块；安全色块以完整微小源物件为单位选择。植物改为明确的 128px UV 细节格、12px 内边距，不依赖旧的细碎自动拆岛。整景/两张近景和独立植物目录均已目视检查。 |
+| 龟背竹/白掌 P0 | 龟背竹 11 片叶、8 面弯曲片，alpha scissor 轮廓给出多处深裂口和内部孔洞，深度写入保留；这不是高面数封闭体。白掌 4 个佛焰苞约缩半。 |
+| 橄榄/花盆 P0 | 橄榄树冠 352 片银绿小叶；新增陶土盆与藤编盆独立模块，新增藤编盆龟背竹。陶土卷边开口已检查，藤编纹理烘于连续柱面 UV。 |
+| 窗外与浮叶 P0 | 替换原来从单点放射的花灌木背景，改为三层低模树冠，远层更浅偏青；关闭背景投影。拱顶藤段改按切线旋转并贴拱铺设，清除越过墙顶的旧背景枝叶。 |
+| 预算 P0 | 见下表。按实际摆放统计，植物还包含桌花、柜台小盆和窗外背景，没有只算共享库。4 组墙/前沿藤蔓及台面、桌面、玻璃分组在导出时合并，保留原模块和编辑数据。小叶、花朵、窗外背景不投影，主要大盆栽保留投影。 |
+| 椅子 P1 | 移除外露木色圆环和靠背木支撑凸点，4 条原木腿直连隐蔽座框；饱满连续软包圆背、原厚坐垫和包边线。原座高保留。 |
+| 咖啡机 P1 | 奶油复古外壳、独立冲煮区、浅铬色冲煮头/托盘、黑手柄、单压力表与小矩形按键；顶部杯子大小和前后位置不一。受一个模块/图集策略限制，金属与搪瓷共享折中粗糙度，尚非独立镀铬材质。 |
+| 糕点 P1 | 每层 5 件，3 种可颂/玛芬/蛋挞混排，固定随机大小、位置和朝向。可颂改弯曲五段体，保留浅深烤色。 |
+| 建筑/机位 P1 | 最新拍板覆盖旧的“墙柱降低 10–15%”要求，所有尺寸保留。相机提高到约 32°俯角、正交 9.6 并微调目标，完整取景保留招牌与底座。叠图仍暴露建筑/桌子/柜台布局偏差；**没有宣称所有地标已达到一柱宽以内**。这是本轮仍待美术复审的构图项。 |
+| 台阶 P2 | 原碰撞坡道和落脚区保留；视觉为两级独立倒角踏步，侧面加短挡墙，消除只有一块外伸平板的观感。 |
+| 吊灯 P2 | 灯罩 64 段，暖色内衬，原两盏不投影局部灯增强，柜台附近产生暖色照明；没有增加实时投影灯。 |
 
-## 角色、碰撞与尺度
+## 色相检查
 
-共享 harness 的同一默认 Avatar、胶囊 r=0.21 / h=1.25 / SPEED=3.75。真实 Godot Mobile/Vulkan 运行 **39/39 项通过**：出生点、十段连续路线、家具/盆栽/矮墙/开放边界探针、三个实测通道、入口出入、斜向滑墙、输入释放、idle/run 和前后台失焦停止。
+[标注取色位置](colour-patch-comparison.jpg) / [完整数值](colour-verification.json)。对参考和实景的同一实体表面取 9×9 像素中位 RGB，以 HSV 的最短环向色相距离判断。相机/布局未像素配准，因此不机械使用相同屏幕坐标。位置事先明确标注，不以阴影面替代所述亮面。
 
-第一次真实测试发现旧斜箱与地板有断差，现用凸多边形连续坡道；地板碰撞顶面对齐美术 0.0495m。两内侧椅子移开，额外 0.70m 宽胶囊扫掠通过。实测两桌横切 1.19m、桌柜间 1.30m、入口 1.32m；这些是在 JSON 指定切面测量，完整路线由角色实际走过。
+| 对应表面 | 参考中位色 | 实景中位色 | 色相差 |
+|---|---|---|---|
+| Front-right corner pier; outward lit face | #FEE5C4 | #FFE7B3 | 6.915° |
+| Unobstructed front floor between the left table and entrance | #FCCA91 | #FFDC90 | 9.118° |
+| Right low-wall sage boarding; outward lit face | #D5CBA1 | #C4BF8C | 6.181° |
 
-H≈1.7455m。Blender 实际几何高度：柜台 1.2005m（基线 +4.16%）、椅面 0.71045m（+3.72%）、桌面 1.0175m（−10.35%）。侧面温室拱净高 2.69m，比 Basic Room 门 2.33m 高 15.45%；保留温室高拱与窗框的对齐，是明确记录的建筑例外。角色入口是前沿缺口，侧拱外沿仍受边界约束。
+更正 R1：`reference-palette.json` 的 `limestone` 坐标 (1229,674) 实际落在木窗框，`honey_oak` (606,1020) 也靠近地毯边缘。此文件保留原始记录，不能继续当正确部位的验收依据。R2 的新坐标/图例和 `colour-verification.json` 替代之前的部位判断。明度、饱和度仍有差异，3 个样本通过不表示全图完全一致。
 
-证据：[逐项结果](bench-result.json)、[尺度](bench-scale-measurements.json)、[源模型测量](source-scale.json)、[录制路线](bench-record-result.json)、[视频元数据](bench-video-metadata.json)。截图：出生点、柜台前、门口和碰撞体均附本卡。共享框架默认实心调试材质会遮住本场景内部，咖啡店的独立 capture_collisions.gd 改用同一批实时物理形状的线框截图，未改动框架核心。
+## 成本与运行检查
 
-首次默认 VSync 检查出现长帧间隔；隔离项目关闭 VSync、限制 60 FPS 后重跑通过。此环境处理仅在本场景 adapter，不改核心或生产设置。X11 录制虽然编码成功但画面全黑，已作废。最终视频来自真实 Godot 视口，保存实际单调时钟时间戳后按原时间间隔编码成 15 秒视频；无加速。抽查 0/1.5/3/4.5/6/7.5/10/14.5 秒共 8 帧，均无黑屏；约 6.8 秒完成整条路线，后半段保留 idle 观察。它是桌面走位证据，不是手机性能测量。
+| 指标 | R1 | R2 | 新上限 |
+|---|---:|---:|---:|
+| 总摆放三角面 | 522,310 | 131,172 | 200,000 |
+| 共享植物摆放三角面 | 441,576 | 43,972 | 包含于植物合计 |
+| 全部植物含桌花/柜台植物/窗外背景 | 456,466 | 62,738 | 100,000 |
+| 静态 surface | 97 | 49 | 60 |
+| flower_shrub 单模块 | 14,992 | 2,214 | 4,000 |
+| 单片叶三角面 | 封闭高密度体 | ≤8 | 8 |
 
-![Character scale and spawn](bench-spawn.png)
+独立植物库共 12 模块、17,286 面；房间模块 87,200 面中有 18,766 面归入植物统计，**植物合计不能再加到总面数上**。实际 Godot 遍历得到 49 个静态 surface，与导出清单一致。整景美术截图为 51 个 draw calls（含背景等）；这不是包含角色及全部阴影 pass 的手机帧预算。两张 2048² 图集，植物图集带 alpha scissor，不能据三角面减少就宣称手机性能已验收。
 
-## 源文件、重建与预算
+共享 `scene_bench` 已同步赵云 `341bd2e`，刘备未修改其核心。Godot 4.7.2 Mobile/Vulkan，AMD Custom GPU 0405 / RADV VANGOGH，真实渲染 **39/39 通过**。连续 10 个航点、入口进出、家具/墙/边界阻挡、滑墙、输入释放、idle/run 和焦点停止均通过。实测两桌切面 1.19m、桌柜间 1.30m、入口 1.32m。
 
-米制、Godot Y-up、前方 +Z，模块为地面/安装点局部轴心。Blender 和生成脚本保持一致；source 中含共享植物实例。手动更改大型布局后必须重烘房间接触 AO。
+[逐项结果](bench-result.json) / [尺度](bench-scale-measurements.json) / [录制路线](bench-record-result.json) / [视频元数据](bench-video-metadata.json) / [视频时间点](bench-video-timeline.jpg)。15 秒视频由真实视口、原始单调时钟时间戳编码，无加速；开头、中间、结束等 8 帧检查无黑屏，完整角色可见。路线约 7 秒走完，后半段保留 idle 观察。线框图绘制实际物理形状，未改碰撞来美化截图。桌面输入检查不代表真实 Android 触控或实体手机性能验收。
+
+![Actual character at spawn](bench-spawn.png)
+
+## 重建与评审
 
 ```sh
 blender --background --factory-startup --python "$PWD/assets/rooms/_shared/plants/source/build_plants.py"
 blender --background --factory-startup --python "$PWD/tools/art/build_coffee_shop.py"
-python3 tools/art/source/coffee_shop/render_r1.py
-# Pillow 环境中生成三栏图、正交图及预算证据
-python3 tools/art/source/coffee_shop/package_r1.py
+python3 tools/art/source/coffee_shop/render_r1.py r2
+# 需要 Pillow/NumPy 的 Python 环境
+python3 tools/art/source/coffee_shop/package_r2.py
+python3 tools/art/source/coffee_shop/check_colour_r2.py
 python3 tools/art/source/coffee_shop/run_bench.py --record
 ```
 
-Editable：`tools/art/source/coffee_shop/coffee_shop.blend`。美术场景：`scenes/coffee_shop/coffee_shop_art.tscn`。正式模型、放置、简易碰撞、bench 数据：`assets/rooms/coffee_shop/`。共享 harness 位于 `tools/dev/scene_bench/`，调用方式没有修改其核心。
+可编辑源文件与确定性生成器保持一致。`batch_r2.py` 消费原 GLB 的 UV/法线和摆放数据，生成 `assets/rooms/coffee_shop/batches/`，不复制图集；原模块仍可复用。局部轴心、Y-up 米制、实例、家具位置及现有碰撞契约保留。大布局变化仍须重烘房间 AO。
 
-| 指标 | 当前值 |
-|---|---:|
-| 房间独立 / 摆放三角面 | 60,678 / 80,734 |
-| 已使用植物独立 / 摆放三角面 | 85,372 / 441,576 |
-| 合计摆放三角面 | 522,310 |
-| 静态 surface | 97 |
-| 共享图集 | 2 × 2048²，mipmap / VRAM compression |
+![R1 / R2; cameras differ as labeled](revision-before-after.jpg)
 
-32 个本场景 GLB + 9 个植物库 GLB 均通过单 mesh/surface、无重复内嵌图集检查。实际摆放 97 个实例。高密度植物使摆放几何成本高于初稿；这是本轮质量样板预算，尚未做实体手机验收，不把桌面 60 FPS 当作移动端性能结论。完整数值见 [revision-verification.json](revision-verification.json)。
-
-![R1 compared with previous draft; framing differs](revision-before-after.jpg)
-
-交付：SGODOT-179 新增 11 个 R1 附件（9 张图、15 秒视频、逐项结果），5 个已有附件保留；11 个文件下载 SHA-256 全部匹配。用户飞书通过 Lark CLI 发送 6 条消息，4 张图及视频下载 SHA-256 全部匹配。见 [交付验证](delivery-verification.json) 与 [视频时序抽帧](bench-video-timeline.jpg)。原始回执和大视频保存在忽略的 output 目录，不提交私人聊天 ID。Basic Room、赵云场景、生产存档与发布配置没有修改。
+179 已改为 **Review**。Plane 新增 15 个 `SGODOT-179_R2_*` 附件，16 个已有附件保留；15 个文件下载 SHA-256 全部匹配。Lark CLI 在已授权的用户自审会话发送 9 条消息，7 张图片及视频下载 SHA-256 全部匹配。见 [交付验证](delivery-verification.json)，私人聊天回执与大视频保存在忽略的 output 目录。Basic Room、赵云场景、用户存档、发布配置与已有 `.codex/config.toml` 修改不在本次提交范围。

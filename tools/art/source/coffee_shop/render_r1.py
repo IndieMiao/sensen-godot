@@ -8,7 +8,9 @@ import os, shutil, subprocess, sys
 ROOT=Path(__file__).resolve().parents[4]
 slug='coffee_shop'
 assert slug.replace('_','').isalnum()
-out=ROOT/'output'/slug/'r1'
+revision=sys.argv[1] if len(sys.argv)>1 else 'r1'
+assert revision in ('r1','r2')
+out=ROOT/'output'/slug/revision
 stage=out/'godot-project'
 out.mkdir(parents=True,exist_ok=True)
 (ROOT/'output/.gdignore').touch()

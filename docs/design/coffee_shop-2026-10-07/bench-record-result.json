@@ -27,7 +27,7 @@
 				"name": "entry_step",
 				"reached": true,
 				"remaining_m": 0.148080661892891,
-				"seconds": 0.016,
+				"seconds": 0.014,
 				"target": [
 					0.150000005960464,
 					-0.180000007152557,
@@ -53,7 +53,7 @@
 				"name": "entry_inside",
 				"reached": true,
 				"remaining_m": 0.0741135478019714,
-				"seconds": 0.338,
+				"seconds": 0.361,
 				"target": [
 					0.150000005960464,
 					0.0700000002980232,
@@ -79,7 +79,7 @@
 				"name": "between_tables",
 				"reached": true,
 				"remaining_m": 0.0701723992824554,
-				"seconds": 0.468,
+				"seconds": 0.466,
 				"target": [
 					0.0500000007450581,
 					0.0700000002980232,
@@ -105,7 +105,7 @@
 				"name": "counter_front",
 				"reached": true,
 				"remaining_m": 0.0734351724386215,
-				"seconds": 0.382,
+				"seconds": 0.383,
 				"target": [
 					0.0500000007450581,
 					0.0700000002980232,
@@ -131,7 +131,7 @@
 				"name": "plant_corner_left",
 				"reached": true,
 				"remaining_m": 0.0702724382281303,
-				"seconds": 0.569,
+				"seconds": 0.554,
 				"target": [
 					-2.0,
 					0.0700000002980232,
@@ -157,7 +157,7 @@
 				"name": "center_return",
 				"reached": true,
 				"remaining_m": 0.0651928186416626,
-				"seconds": 0.561,
+				"seconds": 0.538,
 				"target": [
 					0.0500000007450581,
 					0.0700000002980232,
@@ -209,7 +209,7 @@
 				"name": "center_return_right",
 				"reached": true,
 				"remaining_m": 0.0738705992698669,
-				"seconds": 0.566,
+				"seconds": 0.579,
 				"target": [
 					0.0500000007450581,
 					0.0700000002980232,
@@ -235,7 +235,7 @@
 				"name": "between_tables_return",
 				"reached": true,
 				"remaining_m": 0.0706017315387726,
-				"seconds": 0.379,
+				"seconds": 0.366,
 				"target": [
 					0.0500000007450581,
 					0.0700000002980232,
@@ -261,7 +261,7 @@
 				"name": "door_return",
 				"reached": true,
 				"remaining_m": 0.0678353607654572,
-				"seconds": 0.467,
+				"seconds": 0.466,
 				"target": [
 					0.150000005960464,
 					0.0700000002980232,
@@ -272,13 +272,13 @@
 			"passed": true
 		},
 		{
-			"details": 6.769,
+			"details": 6.734,
 			"name": "Full route fits unaccelerated 15s clip",
 			"passed": true
 		}
 	],
 	"passed": true,
-	"pid": 1040092,
+	"pid": 1049594,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -296,7 +296,7 @@
 			"name": "entry_step",
 			"reached": true,
 			"remaining_m": 0.148080661892891,
-			"seconds": 0.016,
+			"seconds": 0.014,
 			"target": [
 				0.150000005960464,
 				-0.180000007152557,
@@ -318,7 +318,7 @@
 			"name": "entry_inside",
 			"reached": true,
 			"remaining_m": 0.0741135478019714,
-			"seconds": 0.338,
+			"seconds": 0.361,
 			"target": [
 				0.150000005960464,
 				0.0700000002980232,
@@ -340,7 +340,7 @@
 			"name": "between_tables",
 			"reached": true,
 			"remaining_m": 0.0701723992824554,
-			"seconds": 0.468,
+			"seconds": 0.466,
 			"target": [
 				0.0500000007450581,
 				0.0700000002980232,
@@ -362,7 +362,7 @@
 			"name": "counter_front",
 			"reached": true,
 			"remaining_m": 0.0734351724386215,
-			"seconds": 0.382,
+			"seconds": 0.383,
 			"target": [
 				0.0500000007450581,
 				0.0700000002980232,
@@ -384,7 +384,7 @@
 			"name": "plant_corner_left",
 			"reached": true,
 			"remaining_m": 0.0702724382281303,
-			"seconds": 0.569,
+			"seconds": 0.554,
 			"target": [
 				-2.0,
 				0.0700000002980232,
@@ -406,7 +406,7 @@
 			"name": "center_return",
 			"reached": true,
 			"remaining_m": 0.0651928186416626,
-			"seconds": 0.561,
+			"seconds": 0.538,
 			"target": [
 				0.0500000007450581,
 				0.0700000002980232,
@@ -450,7 +450,7 @@
 			"name": "center_return_right",
 			"reached": true,
 			"remaining_m": 0.0738705992698669,
-			"seconds": 0.566,
+			"seconds": 0.579,
 			"target": [
 				0.0500000007450581,
 				0.0700000002980232,
@@ -472,7 +472,7 @@
 			"name": "between_tables_return",
 			"reached": true,
 			"remaining_m": 0.0706017315387726,
-			"seconds": 0.379,
+			"seconds": 0.366,
 			"target": [
 				0.0500000007450581,
 				0.0700000002980232,
@@ -494,7 +494,7 @@
 			"name": "door_return",
 			"reached": true,
 			"remaining_m": 0.0678353607654572,
-			"seconds": 0.467,
+			"seconds": 0.466,
 			"target": [
 				0.150000005960464,
 				0.0700000002980232,

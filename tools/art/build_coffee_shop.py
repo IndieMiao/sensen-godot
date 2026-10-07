@@ -70,20 +70,7 @@ def geometry():
     cube('Window upper coping',(0,3.,0),(1.51,.16,.28),'plaster_light',.045)
     k.vine([(x,y,.20) for x,y in k.arch_path(1.52,.56,2.14,.73,24)])
     begin('counter',at=(-.20,.06,-1.80),collision=[{'at':[0,.58,0],'size':[3.40,1.16,.98]}]);k.counter()
-    begin('espresso_machine',at=(.45,1.26,-1.76))
-    cube('Silver espresso body',(0,.34,0),(.68,.43,.40),'B9C3BE',.055,'metal')
-    cube('Espresso warming tray',(0,.57,0),(.70,.045,.43),'C7CEC5',.025,'metal')
-    cube('Drip tray',(0,.065,.055),(.70,.07,.59),'porcelain',.045)
-    cube('Dark drip grille',(0,.108,.14),(.58,.018,.31),'iron_edge',.012)
-    for j in range(9):cube('Drip grille slat',(-.25+j*.062,.12,.14),(.012,.006,.27),'plaster',.001)
-    for x in (-.22,0,.22):
-        o=cylinder('Espresso dial',(x,.39,.217),.040,.028,'iron',vertices=16);o.rotation_euler.x=math.pi/2
-        o=cylinder('Dial center',(x,.39,.234),.024,.007,'brass',vertices=16);o.rotation_euler.x=math.pi/2
-    for x in (-.18,.18):
-        cylinder('Group head',(x,.25,.15),.062,.045,'iron_edge',vertices=16)
-        tube('Portafilter handle',[(x,.24,.17),(x,.23,.40)],.020,'iron',8)
-        tube('Steam wand',[(x*1.8,.27,.13),(x*1.9,.18,.18),(x*1.9,.14,.26)],.01,'iron_edge',6)
-    for x in (-.20,0,.20):k.cup((x,.595,0),.72,coffee=False)
+    r.espresso_machine()
     begin('coffee_grinder',at=(1.05,1.26,-1.86))
     cube('Grinder base',(0,.045,0),(.31,.09,.31),'iron',.03)
     cube('Grinder motor',(0,.22,-.035),(.22,.35,.22),'iron_edge',.035)
@@ -99,7 +86,8 @@ def geometry():
     begin('pendant',at=(-1.20,3.12,-1.32))
     tube('Pendant cable',[(0,0,0),(0,-.62,0)],.008,'iron',6)
     cylinder('Brass lampholder',(0,-.61,0),.055,.12,'brass',vertices=16)
-    lathe('Cream bell shade',(0,-.88,0),[(0,.29),(.03,.31),(.10,.28),(.25,.145),(.29,.058)],'porcelain',32)
+    lathe('Cream bell shade',(0,-.88,0),[(0,.29),(.03,.31),(.10,.28),(.25,.145),(.29,.058)],'porcelain',64)
+    cylinder('Warm lamp lining',(0,-.857,0),.268,.012,'FFE6AB',vertices=48)
     k.instance('pendant','pendant_2',(.30,3.12,-1.32))
     begin('botanical_picture',at=(.93,1.54,-2.56))
     cube('Picture oak frame',(0,.29,0),(.54,.72,.055),'oak_light',.02)
@@ -133,4 +121,7 @@ if __name__=='__main__':
     args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
     if '--bake-only' in args:k.load()
     else:geometry()
-    if '--geometry-only' not in args:k.bake_and_export(ao_strength=.68,ao_distance=.55)
+    if '--geometry-only' not in args:k.bake_and_export(ao_strength=.55,ao_distance=.42,coherent_swatches=True)
+    if '--geometry-only' not in args:
+        from batch_r2 import build_batches
+        build_batches()

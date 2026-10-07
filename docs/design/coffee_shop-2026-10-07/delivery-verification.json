@@ -1,76 +1,101 @@
 {
   "card": "SGODOT-179",
-  "revision": "R1 sample",
+  "revision": "R2",
   "plane": {
-    "attachment_count": 11,
-    "existing_attachments_preserved": 5,
+    "state": "Review",
+    "attachment_count": 15,
+    "existing_attachments_preserved": 16,
     "download_sha256_verified": true,
     "attachments": [
       {
-        "name": "SGODOT-179_R1_01-reference-comparison.png",
+        "name": "SGODOT-179_R2_01-reference-comparison.png",
         "source": "docs/design/coffee_shop-2026-10-07/comparison.png",
-        "bytes": 2955065,
-        "sha256": "5d51f4b8919d4241f19b720d9617f987380dc0679a6b40f010412553a6fb6231"
+        "bytes": 2862044,
+        "sha256": "d7d58f0add94899aa914701bc6ee790296ad35b63b4312667794a4eade668c06"
       },
       {
-        "name": "SGODOT-179_R1_02-whole.png",
+        "name": "SGODOT-179_R2_02-whole.png",
         "source": "docs/design/coffee_shop-2026-10-07/godot-whole.png",
-        "bytes": 1452984,
-        "sha256": "1798b3adcae82f4fb233485812aeb22214adc343551ccfa8820598f5e8685543"
+        "bytes": 1324046,
+        "sha256": "624a09d76b88d0627f6cf3c5529e6239be60cb093c94ca8debb87d419d883339"
       },
       {
-        "name": "SGODOT-179_R1_03-counter-detail.png",
+        "name": "SGODOT-179_R2_03-counter-detail.png",
         "source": "docs/design/coffee_shop-2026-10-07/godot-detail.png",
-        "bytes": 1942580,
-        "sha256": "e58fabc58ac88098173f85ae38c7a57c654fd2ee720f694eaecdd63efe7ba6af"
+        "bytes": 1738638,
+        "sha256": "d7a5c173eb618e7bb6c71fcdd885f8cbb4ffedf6c4a554e8b6f7e37c9ff3f853"
       },
       {
-        "name": "SGODOT-179_R1_04-plants-detail.png",
+        "name": "SGODOT-179_R2_04-plants-detail.png",
         "source": "docs/design/coffee_shop-2026-10-07/godot-detail-plants.png",
-        "bytes": 1767260,
-        "sha256": "b0e71584636f2dd826c3d2486c8d2ff0263fa64ca8cf2b704acd6b55316d86fc"
+        "bytes": 1633272,
+        "sha256": "e6fa851a1bbd1db0cc787d0590838f3166e20bbb6a5a784077d4b122e92f35ff"
       },
       {
-        "name": "SGODOT-179_R1_05-orthographic.png",
+        "name": "SGODOT-179_R2_05-orthographic.png",
         "source": "docs/design/coffee_shop-2026-10-07/orthographic.png",
-        "bytes": 977205,
-        "sha256": "5372d874ff8152d95038d753d38cd39b76cd6b8157ec3c960e91d100c501682d"
+        "bytes": 784892,
+        "sha256": "f762353c8115c4f534ee02e4c7612a96354e6279371ddc17751e118758423135"
       },
       {
-        "name": "SGODOT-179_R1_06-bench-spawn.png",
+        "name": "SGODOT-179_R2_06-bench-spawn.png",
         "source": "output/scene-bench/coffee_shop/evidence/spawn.png",
-        "bytes": 983616,
-        "sha256": "92c83a28a51543810a7870c41402d3b28bf692d07e5b99c0d25d7511de55b92e"
+        "bytes": 1028199,
+        "sha256": "0d45315d477f4c95ce2724efa5dc7a81096b22a14bf51dc8eaa78022371d081d"
       },
       {
-        "name": "SGODOT-179_R1_07-bench-counter.png",
+        "name": "SGODOT-179_R2_07-bench-counter.png",
         "source": "output/scene-bench/coffee_shop/evidence/main.png",
-        "bytes": 983651,
-        "sha256": "4713f03aa25fface63f001b51972e436fbeb3833651998416a89568432a3752f"
+        "bytes": 1029235,
+        "sha256": "cd684a0c84f636d24245eae4112d1d2c7443e11d087591ebd8de3938bd483ad7"
       },
       {
-        "name": "SGODOT-179_R1_08-bench-entrance.png",
+        "name": "SGODOT-179_R2_08-bench-entrance.png",
         "source": "output/scene-bench/coffee_shop/evidence/door.png",
-        "bytes": 983540,
-        "sha256": "2dfb29771d1810de3b4624ecc8bca4a7f4bbdbfa6bd6a64e3a632aad242594f6"
+        "bytes": 1027650,
+        "sha256": "a0878ef00b4930cfb396a0fc90471429702b23899726950d899ea1b35234cd28"
       },
       {
-        "name": "SGODOT-179_R1_09-collisions.png",
+        "name": "SGODOT-179_R2_09-collisions.png",
         "source": "output/scene-bench/coffee_shop/evidence/collisions.png",
-        "bytes": 1044195,
-        "sha256": "d61e3562ce45f705aa34b76a4abe64064347fbcb411f8f88c27248e433a94d8e"
+        "bytes": 1100095,
+        "sha256": "3d8b1a63e07af7e1671ab55976764e2692bf51f9f1abb1d4d8ef53b173ff6ea6"
       },
       {
-        "name": "SGODOT-179_R1_10-walkthrough.mp4",
+        "name": "SGODOT-179_R2_10-walkthrough.mp4",
         "source": "output/scene-bench/coffee_shop/evidence/walkthrough.mp4",
-        "bytes": 540463,
-        "sha256": "76fbed7fd93813e31d87b1025419f1f9766463d8e37b164d30ef2e6e56c89e0b"
+        "bytes": 586482,
+        "sha256": "6fa7facce6d077a72ab214b548293064ed255d6374f2417d09b5c6e9725c4b48"
       },
       {
-        "name": "SGODOT-179_R1_11-bench-result.json",
+        "name": "SGODOT-179_R2_11-bench-result.json",
         "source": "output/scene-bench/coffee_shop/evidence/result.json",
-        "bytes": 19191,
-        "sha256": "2118decdfa2035badc0885cabb1452def6c3342fe6e44072b8e47bb55ab89f75"
+        "bytes": 19201,
+        "sha256": "7f931f4bd9193854f42ccf2dcc05ee93ca876d4b1e51c1687f50ca1ecef5e967"
+      },
+      {
+        "name": "SGODOT-179_R2_12-before-after.jpg",
+        "source": "docs/design/coffee_shop-2026-10-07/revision-before-after.jpg",
+        "bytes": 420128,
+        "sha256": "7add82c07a1d385782b1c359c5179c31c167ca988ccbecb83b0a3a41e887b775"
+      },
+      {
+        "name": "SGODOT-179_R2_13-colour-patches.jpg",
+        "source": "docs/design/coffee_shop-2026-10-07/colour-patch-comparison.jpg",
+        "bytes": 505102,
+        "sha256": "2c7fe838564b380bd64936d12faa59783e11390837f0f2f04d7782c8c9cfe928"
+      },
+      {
+        "name": "SGODOT-179_R2_14-plant-catalogue.jpg",
+        "source": "assets/rooms/_shared/plants/catalogue.jpg",
+        "bytes": 268637,
+        "sha256": "3dcc35c639ef98d3118ed7d8fe533b85ab79c4ed89ab3da33d2a77489dd4a7eb"
+      },
+      {
+        "name": "SGODOT-179_R2_15-budget-verification.json",
+        "source": "docs/design/coffee_shop-2026-10-07/revision-verification.json",
+        "bytes": 9266,
+        "sha256": "012ddf50cb36880a88041a0dceaaff0d83b841cedcd89edd24903db66eac9c85"
       }
     ]
   },
@@ -78,32 +103,47 @@
     "cli_profile": "gensen",
     "identity": "user",
     "recipient": "same authorized user self-review conversation",
-    "message_count": 6,
+    "message_count": 9,
     "media_download_sha256_verified": true,
     "media": [
       {
         "name": "comparison",
-        "sha256": "5d51f4b8919d4241f19b720d9617f987380dc0679a6b40f010412553a6fb6231",
+        "sha256": "d7d58f0add94899aa914701bc6ee790296ad35b63b4312667794a4eade668c06",
         "byte_identical": true
       },
       {
         "name": "whole",
-        "sha256": "1798b3adcae82f4fb233485812aeb22214adc343551ccfa8820598f5e8685543",
+        "sha256": "624a09d76b88d0627f6cf3c5529e6239be60cb093c94ca8debb87d419d883339",
         "byte_identical": true
       },
       {
         "name": "details",
-        "sha256": "f30bf6f14ccf7bab2c866acc3c41480cf51a8dbff25ab2dc16cc9e13912bbfaf",
+        "sha256": "d6fbff9d8ca0582b3ffd32accf0a7c2894083b230ebd1d4677c28ddda113bdc4",
         "byte_identical": true
       },
       {
         "name": "character",
-        "sha256": "93c6d748161578555f6212028ef7239a8249fbe7ea27ba388f52565a714a6fa2",
+        "sha256": "e720da107e77a966073df2265771018ff4bb7234839b87751ba3018ca97c36b0",
+        "byte_identical": true
+      },
+      {
+        "name": "before-after",
+        "sha256": "7add82c07a1d385782b1c359c5179c31c167ca988ccbecb83b0a3a41e887b775",
+        "byte_identical": true
+      },
+      {
+        "name": "colour",
+        "sha256": "2c7fe838564b380bd64936d12faa59783e11390837f0f2f04d7782c8c9cfe928",
+        "byte_identical": true
+      },
+      {
+        "name": "plants",
+        "sha256": "3dcc35c639ef98d3118ed7d8fe533b85ab79c4ed89ab3da33d2a77489dd4a7eb",
         "byte_identical": true
       },
       {
         "name": "video",
-        "sha256": "76fbed7fd93813e31d87b1025419f1f9766463d8e37b164d30ef2e6e56c89e0b",
+        "sha256": "6fa7facce6d077a72ab214b548293064ed255d6374f2417d09b5c6e9725c4b48",
         "byte_identical": true
       }
     ]
@@ -111,11 +151,10 @@
   "video": {
     "black_frames": 0,
     "sample_count": 8,
-    "motion_max_mean_pixel_delta": 1.8289409722222223,
+    "motion_max_mean_pixel_delta": 1.8352199074074074,
     "duration_seconds": 15,
     "accelerated": false,
-    "sha256": "76fbed7fd93813e31d87b1025419f1f9766463d8e37b164d30ef2e6e56c89e0b"
+    "sha256": "6fa7facce6d077a72ab214b548293064ed255d6374f2417d09b5c6e9725c4b48"
   },
-  "state": "In Progress; user sample review pending",
-  "scope": "Desktop art and movement evidence. No physical phone or release acceptance."
+  "scope": "Art revision and rendered desktop benchmark; user/art-director acceptance pending; no physical-phone claim"
 }

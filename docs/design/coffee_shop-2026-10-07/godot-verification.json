@@ -1,7 +1,7 @@
 {
   "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-  "draw_calls": 66.0,
-  "instances": 97,
+  "draw_calls": 37.0,
+  "instances": 89,
   "renderer": "mobile",
   "resolution": [
     1400,
@@ -9,35 +9,36 @@
   ],
   "scope": "offline art render; no mobile/gameplay/performance acceptance",
   "slug": "coffee_shop",
+  "static_surfaces": 49,
   "views": [
     {
-      "draw_calls": 99.0,
-      "rendered_objects": 99.0,
+      "draw_calls": 51.0,
+      "rendered_objects": 51.0,
       "view": "godot-whole"
     },
     {
-      "draw_calls": 99.0,
-      "rendered_objects": 99.0,
+      "draw_calls": 51.0,
+      "rendered_objects": 51.0,
       "view": "model-front"
     },
     {
-      "draw_calls": 99.0,
-      "rendered_objects": 99.0,
+      "draw_calls": 51.0,
+      "rendered_objects": 51.0,
       "view": "model-side"
     },
     {
-      "draw_calls": 99.0,
-      "rendered_objects": 99.0,
+      "draw_calls": 51.0,
+      "rendered_objects": 51.0,
       "view": "model-top"
     },
     {
-      "draw_calls": 63.0,
-      "rendered_objects": 63.0,
+      "draw_calls": 38.0,
+      "rendered_objects": 38.0,
       "view": "godot-detail"
     },
     {
-      "draw_calls": 66.0,
-      "rendered_objects": 66.0,
+      "draw_calls": 37.0,
+      "rendered_objects": 37.0,
       "view": "godot-detail-plants"
     }
   ]

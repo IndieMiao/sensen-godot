@@ -1,0 +1,123 @@
+{
+  "revision": "R2",
+  "method": "9x9 RGB median; HSV circular hue distance; corresponding authored surface positions, not same screen pixel",
+  "correction": "R1 limestone sample (1229,674) was a wooden window mullion, not limestone. R1 honey_oak (606,1020) overlapped the rug edge. R2 labels and fresh physical-surface coordinates supersede those claims.",
+  "checks": [
+    {
+      "name": "front_right_pillar_lit",
+      "surface": "Front-right corner pier; outward lit face",
+      "reference_pixel": [
+        831,
+        1333
+      ],
+      "runtime_pixel": [
+        775,
+        1128
+      ],
+      "patch_size": 9,
+      "reference": {
+        "rgb": [
+          254,
+          229,
+          196
+        ],
+        "hex": "#FEE5C4",
+        "hue_degrees": 34.138,
+        "saturation": 0.2283,
+        "value": 0.9961
+      },
+      "runtime": {
+        "rgb": [
+          255,
+          231,
+          179
+        ],
+        "hex": "#FFE7B3",
+        "hue_degrees": 41.053,
+        "saturation": 0.298,
+        "value": 1.0
+      },
+      "hue_delta_degrees": 6.915,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "front_floor_lit",
+      "surface": "Unobstructed front floor between the left table and entrance",
+      "reference_pixel": [
+        606,
+        1050
+      ],
+      "runtime_pixel": [
+        493,
+        911
+      ],
+      "patch_size": 9,
+      "reference": {
+        "rgb": [
+          252,
+          202,
+          145
+        ],
+        "hex": "#FCCA91",
+        "hue_degrees": 31.963,
+        "saturation": 0.4246,
+        "value": 0.9882
+      },
+      "runtime": {
+        "rgb": [
+          255,
+          220,
+          144
+        ],
+        "hex": "#FFDC90",
+        "hue_degrees": 41.081,
+        "saturation": 0.4353,
+        "value": 1.0
+      },
+      "hue_delta_degrees": 9.118,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "right_low_wall_lit",
+      "surface": "Right low-wall sage boarding; outward lit face",
+      "reference_pixel": [
+        1160,
+        1150
+      ],
+      "runtime_pixel": [
+        1045,
+        982
+      ],
+      "patch_size": 9,
+      "reference": {
+        "rgb": [
+          213,
+          203,
+          161
+        ],
+        "hex": "#D5CBA1",
+        "hue_degrees": 48.462,
+        "saturation": 0.2441,
+        "value": 0.8353
+      },
+      "runtime": {
+        "rgb": [
+          196,
+          191,
+          140
+        ],
+        "hex": "#C4BF8C",
+        "hue_degrees": 54.643,
+        "saturation": 0.2857,
+        "value": 0.7686
+      },
+      "hue_delta_degrees": 6.181,
+      "limit_degrees": 10,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Only these declared representative lit patches are measured. This does not establish full-image colour or reference fidelity; brightness/saturation are recorded separately."
+}

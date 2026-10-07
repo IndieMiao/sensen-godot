@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3815689
+    "bytes": 3678673
   },
   "assets": [
     {
@@ -14,105 +14,105 @@
       "vertices": 4968,
       "triangles": 9584,
       "surfaces": 1,
-      "bytes": 328392
+      "bytes": 330952
     },
     {
       "name": "entry_steps",
-      "vertices": 112,
-      "triangles": 216,
+      "vertices": 224,
+      "triangles": 432,
       "surfaces": 1,
-      "bytes": 9836
+      "bytes": 16252
     },
     {
       "name": "low_wall_long",
       "vertices": 1680,
       "triangles": 3240,
       "surfaces": 1,
-      "bytes": 93764
+      "bytes": 112964
     },
     {
       "name": "low_wall_front_left",
       "vertices": 728,
       "triangles": 1404,
       "surfaces": 1,
-      "bytes": 43564
+      "bytes": 49708
     },
     {
       "name": "low_wall_front_right",
       "vertices": 672,
       "triangles": 1296,
       "surfaces": 1,
-      "bytes": 40612
+      "bytes": 45992
     },
     {
       "name": "low_pillar",
       "vertices": 112,
       "triangles": 216,
       "surfaces": 1,
-      "bytes": 10340
+      "bytes": 8804
     },
     {
       "name": "tall_pillar",
       "vertices": 448,
       "triangles": 864,
       "surfaces": 1,
-      "bytes": 38816
+      "bytes": 31132
     },
     {
       "name": "ivy_arch_door",
       "vertices": 920,
       "triangles": 1836,
       "surfaces": 1,
-      "bytes": 58608
+      "bytes": 53936
     },
     {
       "name": "left_window",
       "vertices": 448,
       "triangles": 864,
       "surfaces": 1,
-      "bytes": 29852
+      "bytes": 31132
     },
     {
       "name": "back_counter_wall",
       "vertices": 1772,
       "triangles": 3408,
       "surfaces": 1,
-      "bytes": 113748
+      "bytes": 120148
     },
     {
       "name": "right_arch_window",
       "vertices": 712,
       "triangles": 1404,
       "surfaces": 1,
-      "bytes": 44760
+      "bytes": 44440
     },
     {
       "name": "counter",
       "vertices": 1424,
       "triangles": 2752,
       "surfaces": 1,
-      "bytes": 92124
+      "bytes": 95196
     },
     {
       "name": "espresso_machine",
-      "vertices": 1586,
-      "triangles": 3048,
+      "vertices": 1670,
+      "triangles": 3220,
       "surfaces": 1,
-      "bytes": 84768
+      "bytes": 120968
     },
     {
       "name": "coffee_grinder",
       "vertices": 726,
       "triangles": 1360,
       "surfaces": 1,
-      "bytes": 40176
+      "bytes": 38640
     },
     {
       "name": "pastry_case",
-      "vertices": 3239,
-      "triangles": 6130,
+      "vertices": 2988,
+      "triangles": 5660,
       "surfaces": 1,
-      "bytes": 164832
+      "bytes": 193628
     },
     {
       "name": "display_glass",
@@ -126,77 +126,77 @@
       "vertices": 565,
       "triangles": 1098,
       "surfaces": 1,
-      "bytes": 35528
+      "bytes": 45676
     },
     {
       "name": "counter_daisies",
       "vertices": 2480,
       "triangles": 4596,
       "surfaces": 1,
-      "bytes": 111508
+      "bytes": 129716
     },
     {
       "name": "small_planter",
       "vertices": 571,
       "triangles": 1078,
       "surfaces": 1,
-      "bytes": 29424
+      "bytes": 46072
     },
     {
       "name": "pendant",
-      "vertices": 204,
-      "triangles": 396,
+      "vertices": 460,
+      "triangles": 904,
       "surfaces": 1,
-      "bytes": 16776
+      "bytes": 31472
     },
     {
       "name": "botanical_picture",
       "vertices": 332,
       "triangles": 632,
       "surfaces": 1,
-      "bytes": 18488
+      "bytes": 25820
     },
     {
       "name": "table",
       "vertices": 312,
       "triangles": 604,
       "surfaces": 1,
-      "bytes": 23652
+      "bytes": 25060
     },
     {
       "name": "chair",
-      "vertices": 1210,
-      "triangles": 2376,
+      "vertices": 1415,
+      "triangles": 2790,
       "surfaces": 1,
-      "bytes": 63496
+      "bytes": 90684
     },
     {
       "name": "jute_rug",
       "vertices": 1103,
       "triangles": 2190,
       "surfaces": 1,
-      "bytes": 53908
+      "bytes": 82196
     },
     {
       "name": "table_bouquet",
       "vertices": 2480,
       "triangles": 4596,
       "surfaces": 1,
-      "bytes": 108948
+      "bytes": 126676
     },
     {
       "name": "table_coffee",
       "vertices": 421,
       "triangles": 822,
       "surfaces": 1,
-      "bytes": 24328
+      "bytes": 34028
     },
     {
       "name": "hanging_cafe_sign",
       "vertices": 2038,
       "triangles": 2960,
       "surfaces": 1,
-      "bytes": 110352
+      "bytes": 117744
     },
     {
       "name": "window_glass_left",
@@ -221,23 +221,169 @@
     },
     {
       "name": "window_garden_backdrop",
-      "vertices": 16,
-      "triangles": 24,
+      "vertices": 2028,
+      "triangles": 3900,
       "surfaces": 1,
-      "bytes": 3044
+      "bytes": 129828
     },
     {
       "name": "wall_shelf",
       "vertices": 804,
       "triangles": 1564,
       "surfaces": 1,
-      "bytes": 42372
+      "bytes": 62216
     }
   ],
-  "unique_triangles": 60678,
-  "scene_triangles": 80734,
+  "unique_triangles": 65394,
+  "scene_triangles": 87200,
   "static_draw_surfaces": 48,
   "unique_assets": 32,
   "placed_instances": 48,
-  "glb_bytes": 1848680
+  "glb_bytes": 2253744,
+  "revision": "R2",
+  "scene_budget": {
+    "before": {
+      "room_triangles": 80734,
+      "plant_triangles": 456466,
+      "total_triangles": 522310,
+      "static_surfaces": 97,
+      "shared_plant_triangles": 441576
+    },
+    "after": {
+      "room_triangles": 87200,
+      "shared_plant_triangles": 43972,
+      "room_botanical_triangles": 18766,
+      "plant_triangles": 62738,
+      "total_triangles": 131172,
+      "static_surfaces": 49
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "plant_leaf_triangle_max": 8,
+    "render_batches": [
+      {
+        "name": "ivy_left_arch",
+        "file": "res://assets/rooms/coffee_shop/batches/r2_ivy_left_arch.glb",
+        "material": "plants",
+        "sources": [
+          "ArchCrown00",
+          "ArchCrown01",
+          "ArchCrown02",
+          "ArchCrown03",
+          "ArchCrown04",
+          "ArchCrown05",
+          "ArchCrown06",
+          "ArchCrown07",
+          "ArchSide_front0",
+          "ArchSide_front1",
+          "ArchSide_front2",
+          "ArchSide_back0",
+          "ArchSide_back1",
+          "ArchSide_back2"
+        ],
+        "triangles": 10760,
+        "cast_shadow": false
+      },
+      {
+        "name": "ivy_back_transom",
+        "file": "res://assets/rooms/coffee_shop/batches/r2_ivy_back_transom.glb",
+        "material": "plants",
+        "sources": [
+          "TransomTrailing00",
+          "TransomTrailing01",
+          "TransomTrailing02",
+          "TransomTrailing03"
+        ],
+        "triangles": 4920,
+        "cast_shadow": false
+      },
+      {
+        "name": "ivy_right_arch",
+        "file": "res://assets/rooms/coffee_shop/batches/r2_ivy_right_arch.glb",
+        "material": "plants",
+        "sources": [
+          "WindowArchCrown00",
+          "WindowArchCrown01",
+          "WindowArchCrown02",
+          "WindowArchCrown03",
+          "WindowArchCrown04",
+          "WindowArchCrown05",
+          "RightPillarVine00",
+          "RightPillarVine01",
+          "RightPillarVine02"
+        ],
+        "triangles": 7240,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_flowers",
+        "file": "res://assets/rooms/coffee_shop/batches/r2_front_flowers.glb",
+        "material": "plants",
+        "sources": [
+          "FrontFlowerCluster00",
+          "FrontFlowerDrape00",
+          "FrontFlowerCluster01",
+          "FrontFlowerDrape01",
+          "FrontFlowerCluster02",
+          "FrontFlowerDrape02",
+          "LeftPierFlowers",
+          "LeftPierDrape"
+        ],
+        "triangles": 12124,
+        "cast_shadow": false
+      },
+      {
+        "name": "counter_dressing",
+        "file": "res://assets/rooms/coffee_shop/batches/r2_counter_dressing.glb",
+        "material": "room",
+        "sources": [
+          "coffee_grinder",
+          "cups_and_saucers",
+          "botanical_picture",
+          "wall_shelf"
+        ],
+        "triangles": 4654,
+        "cast_shadow": true
+      },
+      {
+        "name": "counter_botanical",
+        "file": "res://assets/rooms/coffee_shop/batches/r2_counter_botanical.glb",
+        "material": "room",
+        "sources": [
+          "counter_daisies",
+          "small_planter"
+        ],
+        "triangles": 5674,
+        "cast_shadow": false
+      },
+      {
+        "name": "table_settings",
+        "file": "res://assets/rooms/coffee_shop/batches/r2_table_settings.glb",
+        "material": "room",
+        "sources": [
+          "table_bouquet",
+          "table_coffee",
+          "table_bouquet_2",
+          "table_coffee_2"
+        ],
+        "triangles": 10836,
+        "cast_shadow": false
+      },
+      {
+        "name": "window_glazing",
+        "file": "res://assets/rooms/coffee_shop/batches/r2_window_glazing.glb",
+        "material": "glass",
+        "sources": [
+          "window_glass_left",
+          "window_glass_back",
+          "window_glass_arch"
+        ],
+        "triangles": 112,
+        "cast_shadow": false
+      }
+    ]
+  }
 }

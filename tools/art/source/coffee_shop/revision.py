@@ -1,10 +1,10 @@
-"""SGODOT-179 R1 art and placement edits; other shop generators retain their defaults."""
+"""SGODOT-179 R2 art and placement edits; other shop generators retain their defaults."""
 import math, random, json
 from pathlib import Path
 import kit as k
 from kit import cube,cylinder,ellipsoid,tube,lathe,mesh,begin
 
-PALETTE={'oak':'C79B6F','oak_light':'D8B78D','oak_edge':'B89571','plaster':'E6DFCB','plaster_light':'F4ECD9','sage':'98A58E','linen_green':'DEDCC6','linen':'F0EBDD','leaf':'678347','leaf_light':'8EA15C','leaf_dark':'3E623D','terra':'C6B797','terra_light':'D6C8A9','jar_green':'AFBEA2','porcelain':'F4EFDF','iron':'596366','iron_edge':'8F9997'}
+PALETTE={'oak':'C79B6F','oak_light':'E0B17A','oak_edge':'B89571','plaster':'F0D0A0','plaster_light':'F7DFBA','sage':'98A58E','linen_green':'DEDCC6','linen':'F4E7CD','leaf':'678347','leaf_light':'8EA15C','leaf_dark':'3E623D','terra':'C6B797','terra_light':'D6C8A9','jar_green':'AFBEA2','porcelain':'F4EFDF','iron':'596366','iron_edge':'8F9997'}
 PLANTS=[]
 
 def put(name,asset,at,yaw=0,scale=1,roll=0,collision=None):
@@ -13,7 +13,7 @@ def put(name,asset,at,yaw=0,scale=1,roll=0,collision=None):
 def upholstered_chair():
     for x in (-.235,.235):
         for z in (-.22,.22):tube('Splayed solid oak leg',[(x*1.17,.015,z*1.15),(x,.51,z)],.032,'oak',8,'wood')
-    cylinder('Round oak seat rim',(0,.48,0),.30,.065,'oak',vertices=32)
+    cube('Hidden oak seat frame',(0,.49,0),(.43,.045,.40),'oak',.012,'wood')
     ellipsoid('Ivory upholstered seat',(0,.545,0),(.62,.14,.59),'linen',32,12,'cloth')
     # Horseshoe cushion: solid rounded fabric back, with continuous piping.
     path=[(.30*math.cos(i*math.pi/28),.80,-.285*math.sin(i*math.pi/28)) for i in range(29)]
@@ -28,7 +28,7 @@ def upholstered_chair():
     fs += [tuple(reversed(range(12))),tuple(28*12+j for j in range(12))]
     mesh('White padded wraparound back',vs,fs,'linen','cloth',True)
     for y in (.62,.985):tube('Cotton edge piping',[(p[0],y,p[2]) for p in path],.008,'E5DFCE',6)
-    for x in (-.27,.27):tube('Back oak support',[(x,.44,-.04),(x,.79,-.13)],.026,'oak',8,'wood')
+    tube('Upholstery seat piping',[(.298*math.cos(i*math.tau/48),.566,.283*math.sin(i*math.tau/48)) for i in range(49)],.006,'E6D8B8',5)
 
 def slim_table():
     lathe('Graphite disc and slim pedestal',(0,0,0),[(0,.245),(.025,.26),(.047,.23),(.066,.055),(.72,.035),(.76,.12)],'596266',32,'metal')
@@ -40,30 +40,61 @@ def soft_rug():
     cylinder('Woven flat jute rug',(0,.007,0),.88,.012,'D0BE9C',vertices=64,kind='cloth')
     for r in (.80,.84,.875):tube('Bound jute edging',[(r*math.cos(i*math.tau/64),.016,r*math.sin(i*math.tau/64)) for i in range(65)],.004,'BCA989',5)
 
+def espresso_machine():
+    begin('espresso_machine',at=(.45,1.26,-1.76))
+    cube('Retro cream enamel housing',(0,.35,-.025),(.68,.44,.36),'E9D7B6',.08)
+    cube('Chrome base and drip tray',(0,.065,.055),(.70,.07,.59),'C5C7BC',.035,'metal')
+    cube('Recessed dark brew bay',(0,.29,.172),(.47,.26,.025),'77746A',.018)
+    cube('Chrome brew fascia',(0,.42,.18),(.57,.07,.060),'C9CBC0',.018,'metal')
+    cube('Dark drip grille',(0,.108,.14),(.58,.018,.31),'5A5952',.012)
+    for j in range(8):cube('Chrome grille slat',(-.24+j*.069,.12,.14),(.012,.006,.27),'C9CBC0',.001)
+    for x in (-.16,.16):
+        cylinder('Chrome brew group',(x,.315,.23),.065,.09,'C9CBC0',vertices=20,kind='metal')
+        tube('Black portafilter grip',[(x,.278,.25),(x-.026,.265,.44)],.021,'494B45',8)
+    tube('Curved steam wand',[(.31,.36,.12),(.35,.21,.16),(.34,.15,.30)],.012,'CDD0C5',8,'metal')
+    dial=cylinder('Single pressure gauge',(-.20,.48,.171),.055,.021,'7D8077',vertices=24);dial.rotation_euler.x=math.pi/2
+    dial=cylinder('Ivory pressure gauge face',(-.20,.48,.185),.043,.007,'F4ECD6',vertices=24);dial.rotation_euler.x=math.pi/2
+    tube('Gauge needle',[(-.2,.48,.193),(-.222,.505,.193)],.003,'5E6354',4)
+    for i,x in enumerate((.08,.19)):cube('Small rectangular brew key',(x,.48,.18),(.047,.065,.025),'858B7F',.006)
+    cube('Chrome warming tray',(0,.578,-.025),(.66,.027,.35),'C9CDC1',.018,'metal')
+    for i,(x,z,scale) in enumerate(((-.19,-.04,.66),(.10,.015,.73),(.25,-.09,.60))):
+        before=len(k.CURRENT['objects']);k.cup((x,.598,z),scale,coffee=False)
+        for o in k.CURRENT['objects'][before:]:o.rotation_euler.z+=math.radians((-7,5,11)[i])
+
+def pastry_piece(kind,x,y,z,scale,angle):
+    before=len(k.CURRENT['objects'])
+    if kind=='croissant':
+        for j in range(5):
+            xx=(j-2)*.034;zz=abs(j-2)*.027
+            ellipsoid('Curved croissant folded lobe',(xx,.056,zz),(.081,.11-.018*abs(j-2),.115),'C78E43' if j%2 else 'DAAA61',10,6)
+    elif kind=='muffin':
+        cylinder('Muffin fluted paper',(0,.042,0),.063,.078,'D6B78E',top=.080,vertices=12)
+        ellipsoid('Irregular muffin crown',(0,.104,0),(.176,.10,.168),'B88342',12,6)
+        for j in range(3):ellipsoid('Muffin crust chip',(.046*math.cos(j*2.3),.147,.043*math.sin(j*2.3)),(.025,.012,.022),'DFAD62',8,4)
+    else:
+        cylinder('Fluted tart shell',(0,.031,0),.084,.059,'C88D48',top=.094,vertices=14)
+        cylinder('Golden custard centre',(0,.067,0),.074,.018,'F1CE78',vertices=16)
+        for j in range(2):ellipsoid('Custard toasted spot',(.027*math.cos(j*3),.078,.029*math.sin(j*3)),(.026,.008,.021),'AD7035',8,4)
+    c,s=math.cos(angle),math.sin(angle)
+    for o in k.CURRENT['objects'][before:]:
+        px,py,pz=o.location.x,-o.location.y,o.location.z
+        o.location=k.v((x+scale*(c*px-s*py),y+scale*pz,z+scale*(s*px+c*py)))
+        o.scale*=scale;o.rotation_euler.z-=angle
+
 def pastry_case():
     begin('pastry_case',at=(-.92,1.26,-1.80))
     cube('Display oak base',(0,.025,0),(1.16,.05,.68),'oak_light',.025,'wood')
+    rng=random.Random(17902)
     for tier,y in enumerate((.10,.34,.58)):
         cube('White patisserie tray',(0,y,0),(1.09,.022,.59),'porcelain',.01)
-        for i in range(3):
-            x=-.35+i*.34+(tier%2)*.025;z=.01+math.sin(i*2.7+tier)*.06
-            if tier==2:
-                for j in range(7):
-                    xx=x+(j-3)*.033;zz=z+abs(j-3)*.02;h=.09-.008*abs(j-3)
-                    ellipsoid('Baked croissant folded lobe',(xx,y+.055,zz),(.072,h,.13),'C58544' if j%2 else 'DEAA63',12,6)
-                    tube('Croissant toasted ridge',[(xx-.008,y+.088,zz-.046),(xx-.011,y+.105,zz),(xx-.008,y+.088,zz+.046)],.004,'EDC887',5)
-            elif tier==1:
-                cylinder('Pleated muffin paper',(x,y+.05,z),.068,.08,'D4B58A',top=.085,vertices=16)
-                ellipsoid('Golden muffin crown',(x,y+.105,z),(.19,.10,.18),'BB803E',16,8)
-                for j in range(5):ellipsoid('Muffin crust fleck',(x+math.cos(j*2.4)*.06,y+.14,z+math.sin(j*2.4)*.055),(.02,.013,.019),'E0B16D',8,4)
-            else:
-                cylinder('Fluted tart shell',(x,y+.035,z),.094,.065,'C48B45',top=.103,vertices=18)
-                cylinder('Egg custard',(x,y+.071,z),.080,.016,'F0CC69',vertices=24)
-                for j in range(3):ellipsoid('Custard caramel fleck',(x+.04*math.cos(j*2),y+.081,z+.04*math.sin(j*2)),(.034,.008,.024),'BB803C',8,4)
+        for i in range(5):
+            x=-.37+(i%3)*.34+(0.055 if i>=3 else 0);z=-.13 if i<3 else .15
+            kind=('croissant','tart','muffin')[(i+tier)%3]
+            pastry_piece(kind,x+rng.uniform(-.018,.018),y+.014,z+rng.uniform(-.012,.012),rng.uniform(.82,1.03),rng.uniform(-.30,.30))
     for x in (-.565,.565):tube('Polished display side frame',[(x,.04,.32),(x,.66,.32),(x,.83,-.25),(x,.04,-.31)],.012,'B5B9AF',6,'metal')
     for z,y in ((.32,.66),(-.25,.83),(-.31,.05)):tube('Display crossbar',[(-.565,y,z),(.565,y,z)],.012,'B5B9AF',6,'metal')
     begin('display_glass',at=(-.92,1.26,-1.80))
-    mesh('Clear curved display front',[(-.55,.08,.319),(.55,.08,.319),(.55,.657,.319),(-.55,.657,.319)],[(0,1,2,3)],'CADFD9')
+    mesh('Clear display front',[(-.55,.08,.319),(.55,.08,.319),(.55,.657,.319),(-.55,.657,.319)],[(0,1,2,3)],'CADFD9')
     mesh('Clear sloped display top',[(-.55,.663,.317),(.55,.663,.317),(.55,.827,-.25),(-.55,.827,-.25)],[(0,1,2,3)],'CADFD9')
     for x in (-.553,.553):mesh('Clear display side',[(x,.06,.31),(x,.66,.31),(x,.82,-.25),(x,.06,-.30)],[(0,1,2,3)],'CADFD9')
 
@@ -78,8 +109,10 @@ def replace(name,fn):
 def architecture():
     replace('entry_steps',lambda:None)
     r=k.KITS['entry_steps'];r['root'].location=k.v((.15,0,2.82));r['at']=[.15,0,2.82]
-    cube('Joined lower entrance tread',(0,-.235,.38),(1.78,.15,.88),'plaster',.055)
+    cube('Joined lower entrance tread',(0,-.235,.38),(1.78,.15,.78),'plaster',.055)
     cube('Joined upper entrance tread',(0,-.095,.01),(1.74,.13,.50),'plaster_light',.055)
+    for x in (-.87,.87):
+        cube('Entrance stair side cheek',(x,-.12,.28),(.14,.30,.72),'plaster',.035)
     r['collision']=[{'at':[0,0,0],'points':[[x,y,z] for x in (-.85,.85) for y,z in ((-.34,-.22),(.05,-.22),(.05,.21),(-.31,.88),(-.34,.88))]}]
     k.KITS['floor']['collision']=[{'at':[0,-.080,0],'size':[6.20,.259,5.70]}]
     # Back and left windows: architecture has real open panels, glazing is separate.
@@ -99,11 +132,11 @@ def architecture():
         z=-2.70+j*.282;start=-3.09
         cuts=[-3.09]+sorted(x for x in [-2.30+(j%3)*.54+i*1.66 for i in range(4)] if -3.05<x<3.05)+[3.09]
         for a,b in zip(cuts,cuts[1:]):
-            tone=['D5B58D','DABB96','D3B28A','DCC09B'][rng.randrange(4)]
+            tone=['DFAD73','E4B780','DDA971','E7BD88'][rng.randrange(4)]
             cube('Staggered oak board',((a+b)/2,.017,z),(b-a-.003,.065,.277),tone,.008,'wood')
     # Window-facing floor tint is authored into broad albedo, not baked shadows.
     for m in k.MATS.values():
-        if not any(m.name.startswith(t) for t in ('D5B58D','DABB96','D3B28A','DCC09B')):continue
+        if not any(m.name.startswith(t) for t in ('DFAD73','E4B780','DDA971','E7BD88')):continue
         nt=m.node_tree;p=nt.nodes.get('Principled BSDF');base=p.inputs['Base Color'].links[0].from_socket
         geo=nt.nodes.new('ShaderNodeNewGeometry');sep=nt.nodes.new('ShaderNodeSeparateXYZ');nt.links.new(geo.outputs['Position'],sep.inputs[0])
         mapping=nt.nodes.new('ShaderNodeMapRange');mapping.inputs['From Min'].default_value=-3;mapping.inputs['From Max'].default_value=3;mapping.inputs['To Min'].default_value=.17;mapping.inputs['To Max'].default_value=.0
@@ -124,10 +157,15 @@ def architecture():
     # Quiet sage boarding with four variants.
     rec=k.KITS['back_counter_wall'];k.CURRENT=rec
     for i,o in enumerate(rec['objects']):
-        if 'Vertical painted' in o.name:o.data.materials.clear();o.data.materials.append(k.material(['98A58E','A5AE98','94A38D','9DAC95'][i%4],'wood','Y'))
+        if 'Vertical painted' in o.name:o.data.materials.clear();o.data.materials.append(k.material(['A5AC88','B0B494','A0A783','ABB18E'][i%4],'wood','Y'))
     begin('window_garden_backdrop')
-    cube('Pale garden depth behind back glazing',(-.1,1.5,-3.15),(5.40,1.90,.02),'C6D7B5',0)
-    cube('Pale garden depth behind left glazing',(-3.24,1.5,-1.88),(.02,2.15,1.45),'CBDFC0',0)
+    for layer,(z,tone) in enumerate(((-3.35,'C8D7BF'),(-3.25,'AEC6A2'),(-3.13,'90AA77'))):
+        for j in range(9):
+            x=-2.9+j*.72+(layer%2)*.23
+            ellipsoid('Layered distant canopy', (x,2.03+.18*math.sin(j*1.8+layer),z),(.95,.95+.20*math.cos(j),.12),tone,10,6)
+    for layer,(x,tone) in enumerate(((-3.5,'CADBC7'),(-3.39,'B2CBA9'),(-3.27,'94B181'))):
+        for j in range(4):
+            ellipsoid('Layered side canopy',(x,1.25+(j%2)*.56,-2.60+j*.43),(.12,1.18,.76),tone,10,6)
     # Wall shelf / intentionally varied crockery sizes and rotations.
     begin('wall_shelf',at=(-.75,1.68,-2.45))
     cube('Oak wall shelf',(0,0,0),(1.58,.065,.29),'oak_light',.025,'wood')
@@ -140,33 +178,29 @@ def foliage():
     put('LargeMonsteraLeft','monstera',(-2.47,.065,-1.51),-15,1.05,collision=[{'at':[0,.30,0],'size':[.60,.60,.60]}])
     put('WhitePeaceLily','peace_lily',(-2.58,.065,-.68),22,.95,collision=[{'at':[0,.21,0],'size':[.46,.42,.46]}])
     put('SmallCornerPlant','pothos',(-2.88,.065,1.98),35,.9)
-    put('MonsteraWovenCorner','monstera',(2.55,.065,-1.70),-28,.94,collision=[{'at':[0,.3,0],'size':[.60,.60,.60]}])
+    put('MonsteraWovenCorner','monstera_woven',(2.55,.065,-1.70),-28,.94,collision=[{'at':[0,.3,0],'size':[.60,.60,.60]}])
     put('TallOliveCorner','olive_tree',(1.97,.065,-2.26),45,.66,collision=[{'at':[0,.22,0],'size':[.40,.44,.40]}])
     put('SmallWhiteLilyRight','peace_lily',(2.14,.065,-1.76),-20,.52)
     # Dense contour-following segments: the source vine points down local Y.
     for i,a in enumerate([math.pi-j*math.pi/7 for j in range(8)]):
-        at=(-2.80,2.00+.99*math.sin(a),.65-.99*math.cos(a))
-        put('ArchCrown%02d'%i,'ivy_short',at,90,.75,math.degrees(math.pi-a))
+        at=(-2.80,1.96+.93*math.sin(a),.65-.93*math.cos(a))
+        put('ArchCrown%02d'%i,'ivy_short',at,90,.75,math.degrees(a))
     for side,z in [('front',1.65),('back',-.35)]:
-        for i,y in enumerate((2.07,1.55,.97)):
+        for i,y in enumerate((2.02,1.50,.94)):
             put('ArchSide_'+side+str(i),['ivy_short','ivy_medium'][i%2],(-2.80,y,z),90,.78,(-7 if i%2 else 8))
     for i,x in enumerate((-2.71,-1.55,-.30,1.20)):
-        put('TransomTrailing%02d'%i,['ivy_long','ivy_medium','ivy_short'][i%3],(x,3.01,-2.52),0,.76+(i%2)*.12,(-6+i*4))
+        put('TransomTrailing%02d'%i,['ivy_long','ivy_medium','ivy_short'][i%3],(x,2.93,-2.59),0,.76+(i%2)*.12,(-6+i*4))
     for i,a in enumerate([math.pi-j*math.pi/5 for j in range(6)]):
-        put('WindowArchCrown%02d'%i,'ivy_short',(2.24+.75*math.cos(a),2.14+.76*math.sin(a),-2.48),0,.75,math.degrees(math.pi-a))
+        put('WindowArchCrown%02d'%i,'ivy_short',(2.24+.75*math.cos(a),2.14+.76*math.sin(a),-2.48),0,.75,math.degrees(a))
     for i,y in enumerate((2.14,1.57,1.0)):
-        put('RightPillarVine%02d'%i,['ivy_medium','ivy_short'][i%2],(2.98,y,-2.48),0,.90,4)
+        put('RightPillarVine%02d'%i,['ivy_medium','ivy_short'][i%2],(2.94,y,-2.57),0,.90,4)
     for i,x in enumerate((1.25,1.65,2.08)):
         put('FrontFlowerCluster%02d'%i,'flower_shrub',(x,.82,2.66),i*37,.86)
         put('FrontFlowerDrape%02d'%i,'ivy_short',(x,.94,2.91),0,.83,i*8-8)
     put('LeftPierFlowers','flower_shrub',(-2.93,.9,2.58),40,.90)
     put('LeftPierDrape','ivy_medium',(-3.03,1.16,2.53),-90,.72,-8)
-    # Actual geometry behind transparent windows, not leaf decals on the panes.
-    for i,x in enumerate((-2.28,-1.40,-.35,.68,2.30)):
-        put('GardenBeyondBack%02d'%i,'flower_shrub',(x,2.05,-3.11),i*33,1.38)
-    for i,z in enumerate((-2.22,-1.43)):
-        put('GardenBeyondLeft%02d'%i,'olive_tree',(-3.48,-.25,z),30+i*57,1.42)
-    put('WindowGardenLow','flower_shrub',(2.22,.35,-3.13),55,1.6)
+    # Far-to-near low-poly canopy masses are authored in the backdrop module.
+
 
 def append_source_plants():
     source=k.ROOT/'assets/rooms/_shared/plants/source/plants.blend'
@@ -200,10 +234,10 @@ def finish():
         for o in list(root.children):k.bpy.data.objects.remove(o,do_unlink=True)
         for source in k.KITS[inst['asset']]['objects']:
             o=source.copy();o.data=source.data;k.bpy.context.scene.collection.objects.link(o);o.parent=root
-    k.save('545:2956',{'position':[11,9.47,11],'target':[0,1.18,0],'size':9.3})
+    k.save('545:2956',{'position':[10.85,11.0,11.15],'target':[-.15,1.27,.15],'size':9.6})
     path=k.OUT/'layout.json';d=json.loads(path.read_text());d['shared_plants']=PLANTS
-    d['material_overrides']={'window_garden_backdrop':{'unshaded':True},'espresso_machine':{'roughness':.34,'metallic':.55},'table':{'roughness':.54},'window_glass_left':{'alpha':.08},'window_glass_back':{'alpha':.08},'window_glass_arch':{'alpha':.08}}
-    d['lighting']={'background':'D3E7D8','ambient':'ADC9D8','ambient_energy':.70,'sun_color':'FFF0D4','sun_energy':1.15,'sun_position':[-6,9,4],'sun_target':[0,0,.8],'angular_distance':4.5,'lamps':[{'position':[-1.20,2.25,-1.32],'color':'FFE0A3','energy':.52,'range':1.7},{'position':[.30,2.25,-1.32],'color':'FFE0A3','energy':.52,'range':1.7}]}
+    d['material_overrides']={'window_garden_backdrop':{'unshaded':True},'espresso_machine':{'roughness':.40,'metallic':.12},'table':{'roughness':.54},'window_glass_left':{'alpha':.08},'window_glass_back':{'alpha':.08},'window_glass_arch':{'alpha':.08}}
+    d['lighting']={'background':'D3E7D8','ambient':'C0ADA9','ambient_energy':.58,'sun_color':'FFE0AE','sun_energy':1.55,'sun_position':[6,9,-4],'sun_target':[0,0,.8],'angular_distance':4.5,'lamps':[{'position':[-1.20,2.25,-1.32],'color':'FFE0A3','energy':1.2,'range':1.45},{'position':[.30,2.25,-1.32],'color':'FFE0A3','energy':1.2,'range':1.45}]}
     d['spawn']=[.15,-.12,3.25]
     d['boundaries']=[{'name':'left_open_arch_boundary','at':[-3.11,1.20,0],'size':[.10,2.7,5.8]},{'name':'entry_landing_floor','at':[.15,-.36,3.34],'size':[1.74,.10,.90]},{'name':'landing_front_edge','at':[.15,.45,3.79],'size':[1.90,1.7,.08]},{'name':'landing_left_edge','at':[-.76,.4,3.25],'size':[.08,1.7,1.15]},{'name':'landing_right_edge','at':[1.06,.4,3.25],'size':[.08,1.7,1.15]}]
     d['bench']={'route':[{'name':'entry_step','position':[.15,-.18,3.2]},{'name':'entry_inside','position':[.15,.07,2.20]},{'name':'between_tables','position':[.05,.07,.60]},{'name':'counter_front','position':[.05,.07,-.70]},{'name':'plant_corner_left','position':[-2.0,.07,-.70]},{'name':'center_return','position':[.05,.07,-.70]},{'name':'plant_corner_right','position':[2.2,.07,-.70]},{'name':'center_return_right','position':[.05,.07,-.70]},{'name':'between_tables_return','position':[.05,.07,.60]},{'name':'door_return','position':[.15,.07,2.20]}],

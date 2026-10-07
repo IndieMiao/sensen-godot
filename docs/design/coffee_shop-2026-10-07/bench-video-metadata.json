@@ -15,7 +15,7 @@
   "accelerated": false,
   "captured_frames": 228,
   "capture_intervals_seconds": {
-    "mean": 0.06611540969162996,
-    "max": 0.06765199999999894
+    "mean": 0.06609977533039647,
+    "max": 0.0745199999999997
   }
 }

@@ -8,6 +8,12 @@ var output_dir: String
 var errors: Array[String] = []
 var view_stats: Array = []
 
+func surface_count(node: Node) -> int:
+	var count := 0
+	if node is MeshInstance3D and node.mesh: count += node.mesh.get_surface_count()
+	for child in node.get_children(): count += surface_count(child)
+	return count
+
 func _initialize() -> void:
 	call_deferred("_render")
 
@@ -103,7 +109,7 @@ void fragment() {
 		assert(image.save_png(output_dir + "/" + view[0] + ".png") == OK)
 		view_stats.append({"view":view[0],"draw_calls":Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),"rendered_objects":Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME)})
 		print("SHOP_CAPTURE ",view[0])
-	var result := {"slug":slug,"renderer":RenderingServer.get_current_rendering_method(),"device":RenderingServer.get_video_adapter_name(),"instances":room.module_count,"resolution":[1400,1400],"draw_calls":Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),"views":view_stats,"scope":"offline art render; no mobile/gameplay/performance acceptance"}
+	var result := {"slug":slug,"renderer":RenderingServer.get_current_rendering_method(),"device":RenderingServer.get_video_adapter_name(),"instances":room.module_count,"static_surfaces":surface_count(room),"resolution":[1400,1400],"draw_calls":Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),"views":view_stats,"scope":"offline art render; no mobile/gameplay/performance acceptance"}
 	var file := FileAccess.open(output_dir + "/godot-verification.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify(result,"  ")+"\n")
 	print("SHOP_REVIEW_PASS ",JSON.stringify(result))

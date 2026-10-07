@@ -250,13 +250,14 @@ def plant(at=(0,0,0), scale=1, trailing=False):
                 leaf("Vine leaf",p,(p[0]+side*.12*s,p[1]-.045*s,p[2]+.02*s),.095*s,"leaf" if i%2 else "leaf_light")
 
 
-def bake_and_export(ao_strength=.40, ao_distance=.38):
+def bake_and_export(ao_strength=.40, ao_distance=.38, coherent_swatches=False):
     scene=bpy.context.scene;scene.render.engine="CYCLES";scene.cycles.samples=8
     scene.cycles.bake_type="EMIT";scene.render.bake.margin=8;scene.render.bake.use_clear=True
     bpy.context.view_layer.update();deps=bpy.context.evaluated_depsgraph_get()
     all_source=list(scene.objects)
     work=bpy.data.collections.new("TEMP_EXPORT");scene.collection.children.link(work)
     copies=[];names=list(KITS)
+    source_id=0
     for ki,name in enumerate(names):
         for source in KITS[name]["objects"]:
             ev=source.evaluated_get(deps)
@@ -264,6 +265,9 @@ def bake_and_export(ao_strength=.40, ao_distance=.38):
             d.transform(source.matrix_world)
             attr=d.attributes.new("kit_id","INT","FACE")
             for item in attr.data:item.value=ki
+            attr=d.attributes.new("source_id","INT","FACE")
+            for item in attr.data:item.value=source_id
+            source_id+=1
             o=bpy.data.objects.new("Baked_"+source.name,d);work.objects.link(o);copies.append(o)
     for o in all_source:o.hide_render=True;o.hide_set(True)
     bpy.ops.object.select_all(action="DESELECT")
@@ -289,7 +293,7 @@ def bake_and_export(ao_strength=.40, ao_distance=.38):
         emission=nt.nodes.new("ShaderNodeEmission")
         ao=nt.nodes.new("ShaderNodeAmbientOcclusion");ao.samples=16 if ao_strength>.4 else 8;ao.inputs["Distance"].default_value=ao_distance
         # Keep occluded surfaces legible; this is contact AO, not baked sun/shadows.
-        mix=nt.nodes.new("ShaderNodeMixRGB");mix.blend_type="MIX";mix.inputs[0].default_value=ao_strength
+        mix=nt.nodes.new("ShaderNodeMixRGB");mix.blend_type="MIX";mix.inputs[0].default_value=.23 if coherent_swatches and mat.name.startswith(("plaster_","plaster_light_")) else ao_strength
         mix.inputs[1].default_value=(1,1,1,1);nt.links.new(ao.outputs["Color"],mix.inputs[2])
         multiply=nt.nodes.new("ShaderNodeMixRGB");multiply.blend_type="MULTIPLY";multiply.inputs[0].default_value=1
         base=p.inputs["Base Color"]
@@ -311,14 +315,26 @@ def bake_and_export(ao_strength=.40, ao_distance=.38):
     for mi,mat in enumerate(joined.data.materials):
         col,row=mi%32,mi//32
         assert row<4,'Palette strip capacity exceeded'
-        pixels[row*64:(row+1)*64,col*64:(col+1)*64]=mat.diffuse_color[:]
+        color=mat.diffuse_color[:]
+        if coherent_swatches:
+            color=tuple(c*12.92 if c<=.0031308 else 1.055*c**(1/2.4)-.055 for c in color[:3])+(color[3],)
+        pixels[row*64:(row+1)*64,col*64:(col+1)*64]=color
     # Preserve baked broad surfaces; reuse padded constant swatches for details
     # whose projected UV area cannot retain a stable bake at this resolution.
     uv=joined.data.uv_layers.active.data
+    small_sources=set()
+    if coherent_swatches:
+        areas={}
+        ids=joined.data.attributes['source_id'].data
+        for f in joined.data.polygons:
+            key=ids[f.index].value
+            areas[key]=areas.get(key,0)+f.area
+        small_sources={key for key,area in areas.items() if area<.006}
     for face in joined.data.polygons:
         pts=[uv[i].uv.copy() for i in face.loop_indices]
         area=abs(sum(p.x*q.y-q.x*p.y for p,q in zip(pts,pts[1:]+pts[:1])))*.5*2048**2
-        if area<12 or face.area<.0007:
+        use_swatch=joined.data.attributes['source_id'].data[face.index].value in small_sources if coherent_swatches else area<12 or face.area<.0007
+        if use_swatch:
             mi=face.material_index
             for li in face.loop_indices:uv[li].uv=((mi%32+.5)/32,(mi//32+.5)/32)
     tex.pixels.foreach_set(pixels.ravel());tex.update()

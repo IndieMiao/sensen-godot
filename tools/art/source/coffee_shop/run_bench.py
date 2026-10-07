@@ -15,7 +15,7 @@ layout['camera']['position'][1]+=.08
 layout['camera']['target'][1]+=.08
 layout_file.write_text(json.dumps(layout,indent=2)+'\n')
 p=project/'project.godot';s=p.read_text().replace('[display]\n','[display]\nwindow/vsync/vsync_mode=0\n').replace('[application]\n','[application]\nrun/max_fps=60\n');p.write_text(s)
-with (ROOT/'output/coffee_shop/r1/bench-import.log').open('w') as log:
+with (ROOT/'output/coffee_shop'/layout.get('revision','R1').lower()/'bench-import.log').open('w') as log:
     subprocess.run(['godot','--headless','--editor','--path',str(project),'--import','--quit'],stdout=log,stderr=subprocess.STDOUT,check=True)
 subprocess.run([sys.executable,str(ROOT/'tools/dev/scene_bench/run.py'),'coffee_shop',*[a for a in sys.argv[1:] if a!='--record']],cwd=ROOT,check=True)
 
