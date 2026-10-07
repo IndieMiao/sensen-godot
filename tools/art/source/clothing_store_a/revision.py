@@ -107,6 +107,8 @@ def revise():
  begin('entrance_tree_view',at=(-3.18,.06,1.96),yaw=90)
  k.arch_solid('Cool outdoor sky',1.34,.025,2.13,.34,.012,0,'92BFCE')
  for j in range(10):ellipsoid('Outdoor tree silhouette',(-.65+j*.145,.66+(j%3)*.22,.018),(.43,.57,.024),['728E75','94AD8D','A4BCA0'][j%3],8,4)
+ import revision2
+ revision2.revise()
  r.sync_instances()
 
 def manifest():
@@ -119,4 +121,7 @@ def manifest():
  d['boundaries']=[{'name':'front_edge','at':[0,.6,2.94],'size':[6.2,1.8,.12]}, {'name':'right_edge','at':[3.06,.6,0],'size':[.12,1.8,5.9]}, {'name':'left_door_limit','at':[-3.12,1.4,1.96],'size':[.10,2.8,1.4]}]
  d['camera']={'position':[10,10,12],'target':[0,1.28,.08],'size':10.4}
  from street_bench import bench
- bench(d);p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)
+ bench(d)
+ import revision2
+ revision2.manifest(d)
+ p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)

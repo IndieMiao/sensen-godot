@@ -63,7 +63,7 @@
 				"name": "front_left",
 				"reached": true,
 				"remaining_m": 0.0921372771263123,
-				"seconds": 0.003,
+				"seconds": 0.004,
 				"target": [
 					-2.01999998092651,
 					0.0649999976158142,
@@ -89,7 +89,7 @@
 				"name": "left_edge",
 				"reached": true,
 				"remaining_m": 0.0911158472299576,
-				"seconds": 0.396,
+				"seconds": 0.397,
 				"target": [
 					-2.01999998092651,
 					0.0649999976158142,
@@ -143,7 +143,7 @@
 				"name": "mirror",
 				"reached": true,
 				"remaining_m": 0.0791078731417656,
-				"seconds": 0.066,
+				"seconds": 0.067,
 				"target": [
 					-1.35000002384186,
 					0.0649999976158142,
@@ -169,7 +169,7 @@
 				"name": "checkout",
 				"reached": true,
 				"remaining_m": 0.0787470787763596,
-				"seconds": 0.416,
+				"seconds": 0.417,
 				"target": [
 					0.200000002980232,
 					0.0649999976158142,
@@ -328,7 +328,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.651243329048157,
-				"seconds": 0.866,
+				"seconds": 0.883,
 				"target": [
 					-2.79999995231628,
 					0.0649999976158142,
@@ -356,7 +356,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.60481584072113,
-				"seconds": 0.882,
+				"seconds": 0.883,
 				"target": [
 					0.0,
 					0.0649999976158142,
@@ -384,7 +384,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.685035467147827,
-				"seconds": 0.882,
+				"seconds": 0.883,
 				"target": [
 					-1.35000002384186,
 					0.0649999976158142,
@@ -453,7 +453,7 @@
 				],
 				"reached": true,
 				"remaining_m": 0.0686176344752312,
-				"seconds": 0.567,
+				"seconds": 0.566,
 				"target": [
 					1.82000005245209,
 					0.0649999976158142,
@@ -513,7 +513,7 @@
 					],
 					"reached": true,
 					"remaining_m": 0.0698150619864464,
-					"seconds": 0.117,
+					"seconds": 0.116,
 					"target": [
 						-2.40000009536743,
 						0.0649999976158142,
@@ -560,8 +560,8 @@
 		{
 			"details": [
 				"run",
-				0.149971666666667,
-				0.316638333333333
+				0.15,
+				0.316666666666667
 			],
 			"name": "Run animation advances in rendered viewport",
 			"passed": true
@@ -582,16 +582,16 @@
 			"passed": true
 		},
 		{
-			"details": 1.74549429118633,
+			"details": 1.74549420177937,
 			"name": "Fixture head-top height measurable",
 			"passed": true
 		},
 		{
 			"details": {
-				"baseline_ratio": 1.33486543712292,
+				"baseline_ratio": 1.33486550549683,
 				"difference": 0.055793991416309,
 				"height": 2.46,
-				"ratio_to_H": 1.40934290786368,
+				"ratio_to_H": 1.40934298005245,
 				"reason": ""
 			},
 			"name": "Scale ±15%: door",
@@ -599,10 +599,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.660271423297924,
+				"baseline_ratio": 0.660271457118068,
 				"difference": 0.0429501084598698,
 				"height": 1.202,
-				"ratio_to_H": 0.688630152541522,
+				"ratio_to_H": 0.688630187814245,
 				"reason": ""
 			},
 			"name": "Scale ±15%: counter",
@@ -610,10 +610,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.392438980441716,
+				"baseline_ratio": 0.39243900054306,
 				"difference": 0.00437956204379564,
 				"height": 0.682,
-				"ratio_to_H": 0.390720269578468,
+				"ratio_to_H": 0.390720289591776,
 				"reason": ""
 			},
 			"name": "Scale ±15%: chair",
@@ -621,10 +621,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.650245609928975,
+				"baseline_ratio": 0.650245643235581,
 				"difference": 0.107885462555066,
 				"height": 1.01255,
-				"ratio_to_H": 0.580093561527386,
+				"ratio_to_H": 0.580093591240694,
 				"reason": ""
 			},
 			"name": "Scale ±15%: table",
@@ -632,7 +632,7 @@
 		}
 	],
 	"passed": true,
-	"pid": 1080411,
+	"pid": 1116558,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -672,7 +672,7 @@
 			"name": "front_left",
 			"reached": true,
 			"remaining_m": 0.0921372771263123,
-			"seconds": 0.003,
+			"seconds": 0.004,
 			"target": [
 				-2.01999998092651,
 				0.0649999976158142,
@@ -694,7 +694,7 @@
 			"name": "left_edge",
 			"reached": true,
 			"remaining_m": 0.0911158472299576,
-			"seconds": 0.396,
+			"seconds": 0.397,
 			"target": [
 				-2.01999998092651,
 				0.0649999976158142,
@@ -740,7 +740,7 @@
 			"name": "mirror",
 			"reached": true,
 			"remaining_m": 0.0791078731417656,
-			"seconds": 0.066,
+			"seconds": 0.067,
 			"target": [
 				-1.35000002384186,
 				0.0649999976158142,
@@ -762,7 +762,7 @@
 			"name": "checkout",
 			"reached": true,
 			"remaining_m": 0.0787470787763596,
-			"seconds": 0.416,
+			"seconds": 0.417,
 			"target": [
 				0.200000002980232,
 				0.0649999976158142,

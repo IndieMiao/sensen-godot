@@ -16,10 +16,10 @@ can=Image.new('RGB',(2800,1455),'#eee7df');can.paste(ref,(0,55));can.paste(run,(
 dr.text((20,15),'Reference plinth edge intersections',font=font,fill='#443b37');dr.text((1420,15),'Rigid fit / residuals '+', '.join(f'{n:.1f}' for n in fit['residual_px'])+' px; no model scaling',font=font,fill='#443b37');can.save(doc/'camera-registration.png')
 p=doc/'signage-crops.json'
 if p.exists():
- boxes=json.loads(p.read_text());whole=Image.open(doc/'godot-whole.png').convert('RGB');w=max(480,max((r['box'][2]-r['box'][0])*3+50 for r in boxes));h=max(600,max((r['box'][3]-r['box'][1])*3+300 for r in boxes))
+ boxes=json.loads(p.read_text());whole=Image.open(doc/'godot-whole.png').convert('RGB');w=max(480,max((r['box'][2]-r['box'][0])*3+50 for r in boxes));big_top=max(220,max(r['box'][3]-r['box'][1] for r in boxes)+95);h=max(600,max((r['box'][3]-r['box'][1])*3+big_top+60 for r in boxes))
  can=Image.new('RGB',(w*len(boxes),h),'#eee7df');dr=ImageDraw.Draw(can)
  for i,rec in enumerate(boxes):
-  crop=whole.crop(rec['box']);can.paste(crop,(i*w+25,65));can.paste(crop.resize((crop.width*3,crop.height*3),Image.Resampling.NEAREST),(i*w+25,220));dr.text((i*w+12,15),rec['label'],font=font,fill='#443b37')
+  crop=whole.crop(rec['box']);can.paste(crop,(i*w+25,65));can.paste(crop.resize((crop.width*3,crop.height*3),Image.Resampling.NEAREST),(i*w+25,big_top));dr.text((i*w+12,15),rec['label'],font=font,fill='#443b37')
  dr.text((20,h-35),'Whole-view pixels above; 3x nearest-neighbour below (inspection only)',font=font,fill='#443b37');can.save(doc/'signage-check.png')
 p=doc/'detail-views.json'
 if p.exists():

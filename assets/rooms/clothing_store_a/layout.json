@@ -557,9 +557,9 @@
       "name": "entry_mat",
       "file": "entry_mat.glb",
       "position": [
-        -2.41,
-        0.078,
-        1.96
+        -2.46,
+        0.079,
+        1.5
       ],
       "yaw_degrees": 90,
       "colliders": []
@@ -728,6 +728,17 @@
       ],
       "yaw_degrees": 90,
       "colliders": []
+    },
+    {
+      "name": "graphic_fold_graffiti",
+      "file": "graphic_fold_graffiti.glb",
+      "position": [
+        -1.08,
+        0.446,
+        0.42999999999999994
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
     }
   ],
   "instances": [
@@ -772,16 +783,6 @@
       "yaw_degrees": 0
     },
     {
-      "name": "lower_fold_stack_black",
-      "asset": "graphic_fold_black",
-      "position": [
-        -1.08,
-        0.446,
-        0.42999999999999994
-      ],
-      "yaw_degrees": 0
-    },
-    {
       "name": "lower_fold_ivory",
       "asset": "graphic_fold_ivory",
       "position": [
@@ -803,7 +804,7 @@
     },
     {
       "name": "lower_fold_blue",
-      "asset": "graphic_fold_blue",
+      "asset": "graphic_fold_graffiti",
       "position": [
         0.0,
         0.336,
@@ -853,7 +854,7 @@
     },
     {
       "name": "rack_folded_knit",
-      "asset": "graphic_fold_ivory",
+      "asset": "graphic_fold_black",
       "position": [
         2.4,
         2.475,
@@ -964,18 +965,18 @@
   ],
   "camera": {
     "position": [
-      10,
-      10,
-      12
+      10.53141605776869,
+      14.428448626118273,
+      10.681335164500245
     ],
     "target": [
-      0,
-      1.28,
-      0.08
+      -0.028804809070830176,
+      1.2459873624195033,
+      0.028554530150961845
     ],
-    "size": 10.4
+    "size": 8.869720440671166
   },
-  "revision": "R1",
+  "revision": "R2",
   "botanical_assets": [
     "entrance_tree_view"
   ],
@@ -1178,8 +1179,8 @@
     }
   },
   "lighting": {
-    "background": "9A929B",
-    "ambient": "B4BAC9",
+    "background": "#AD9D95",
+    "ambient": "B9BAC9",
     "ambient_energy": 0.55,
     "sun_color": "EDF1FF",
     "sun_energy": 0.78,
@@ -1244,12 +1245,22 @@
         "color": "FFDFC0",
         "energy": 0.52,
         "range": 1.5
+      },
+      {
+        "position": [
+          -2.65,
+          0.75,
+          1.4
+        ],
+        "color": "88BFFF",
+        "energy": 1.5,
+        "range": 2.2
       }
     ]
   },
   "review_lighting": {
-    "background": "9A929B",
-    "ambient_color": "B4BAC9",
+    "background": "#AD9D95",
+    "ambient_color": "B9BAC9",
     "ambient": 0.55,
     "sun_color": "EDF1FF",
     "sun": 0.78,
@@ -1313,6 +1324,16 @@
         "color": "FFDFC0",
         "energy": 0.52,
         "range": 1.5
+      },
+      {
+        "position": [
+          -2.65,
+          0.75,
+          1.4
+        ],
+        "color": "88BFFF",
+        "energy": 1.5,
+        "range": 2.2
       }
     ]
   },
@@ -1643,6 +1664,194 @@
       }
     }
   },
+  "pendant_pools": [
+    {
+      "name": "LeftFloorPool",
+      "position": [
+        -1.99,
+        2.82,
+        -1.84
+      ],
+      "target": [
+        -2.05,
+        0.06,
+        0.4
+      ],
+      "energy": 9.0,
+      "angle": 15.0
+    },
+    {
+      "name": "DisplayTablePool",
+      "position": [
+        -1.04,
+        2.66,
+        -1.2
+      ],
+      "target": [
+        -0.42,
+        1.04,
+        0.14
+      ],
+      "energy": 6.0,
+      "angle": 18.0
+    },
+    {
+      "name": "RearAislePool",
+      "position": [
+        -0.44,
+        2.87,
+        -2.04
+      ],
+      "target": [
+        1.35,
+        0.06,
+        -1.07
+      ],
+      "energy": 9.0,
+      "angle": 15.0
+    }
+  ],
+  "review_camera_fit": {
+    "method": "orthographic fit to plinth edge intersections; no model scaling or image warp",
+    "reference_size": [
+      1544,
+      1544
+    ],
+    "reference_corners_left_front_right": [
+      [
+        40,
+        946
+      ],
+      [
+        818,
+        1452
+      ],
+      [
+        1507,
+        991
+      ]
+    ],
+    "inferred_back": [
+      729,
+      485
+    ],
+    "footprint_m": [
+      6.16,
+      5.76
+    ],
+    "plinth_y": -0.255,
+    "render_size": [
+      1400,
+      1400
+    ],
+    "fitted_corners": [
+      [
+        41.1152743281325,
+        865.1401680007227
+      ],
+      [
+        731.62617828981,
+        1317.008448278788
+      ],
+      [
+        1371.6885991955287,
+        890.7788448603862
+      ]
+    ],
+    "observed_letterboxed_corners": [
+      [
+        36.26943005181347,
+        857.7720207253886
+      ],
+      [
+        741.7098445595855,
+        1316.580310880829
+      ],
+      [
+        1366.4507772020725,
+        898.5751295336787
+      ]
+    ],
+    "residual_px": [
+      8.818832180132862,
+      10.092751214200124,
+      9.392381697000436
+    ],
+    "pitch_degrees": 41.309999999999995,
+    "yaw_degrees": 44.74999999999998,
+    "camera": {
+      "position": [
+        10.53141605776869,
+        14.428448626118273,
+        10.681335164500245
+      ],
+      "target": [
+        -0.028804809070830176,
+        1.2459873624195033,
+        0.028554530150961845
+      ],
+      "size": 8.869720440671166
+    },
+    "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
+  },
+  "review_views": [
+    {
+      "name": "cargo-detail",
+      "position": [
+        4,
+        2.2,
+        1.9
+      ],
+      "target": [
+        2.01,
+        0.9,
+        -2.2
+      ],
+      "size": 2.45
+    },
+    {
+      "name": "print-detail",
+      "position": [
+        2.0,
+        3.7,
+        3.6
+      ],
+      "target": [
+        -0.2,
+        1.12,
+        0.21
+      ],
+      "size": 2.9
+    },
+    {
+      "name": "brand-detail",
+      "position": [
+        2.5,
+        2.6,
+        2.0
+      ],
+      "target": [
+        0.13,
+        2.26,
+        -2.46
+      ],
+      "size": 2.9
+    },
+    {
+      "name": "light-pools-detail",
+      "position": [
+        5,
+        6.5,
+        7
+      ],
+      "target": [
+        -0.3,
+        0.4,
+        -0.35
+      ],
+      "size": 6.8
+    }
+  ],
   "render_batches": [
     {
       "name": "front_dressing",
@@ -1669,8 +1878,8 @@
         "front_black_pot",
         "entry_black_pot",
         "left_shelf_black_pot",
+        "graphic_fold_graffiti",
         "lower_fold_black",
-        "lower_fold_stack_black",
         "lower_fold_ivory",
         "lower_fold_stack_ivory",
         "lower_fold_blue",
@@ -1679,7 +1888,7 @@
         "lower_sneaker_pair",
         "sconce_door"
       ],
-      "triangles": 26488,
+      "triangles": 35208,
       "cast_shadow": true
     },
     {
@@ -1727,7 +1936,7 @@
         "sconce_arch",
         "sconce_right"
       ],
-      "triangles": 30012,
+      "triangles": 122314,
       "cast_shadow": true
     },
     {
@@ -1764,5 +1973,10 @@
       "triangles": 2958,
       "cast_shadow": false
     }
+  ],
+  "bench_albedo_multiplier": [
+    1.0,
+    0.95,
+    1.0
   ]
 }

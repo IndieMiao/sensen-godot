@@ -1,6 +1,6 @@
 {
   "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-  "draw_calls": 20.0,
+  "draw_calls": 24.0,
   "instances": 84,
   "renderer": "mobile",
   "resolution": [
@@ -12,8 +12,8 @@
   "static_surfaces": 24,
   "views": [
     {
-      "draw_calls": 26.0,
-      "rendered_objects": 26.0,
+      "draw_calls": 29.0,
+      "rendered_objects": 29.0,
       "view": "godot-whole"
     },
     {
@@ -40,6 +40,26 @@
       "draw_calls": 20.0,
       "rendered_objects": 20.0,
       "view": "godot-detail-plants"
+    },
+    {
+      "draw_calls": 11.0,
+      "rendered_objects": 11.0,
+      "view": "cargo-detail"
+    },
+    {
+      "draw_calls": 14.0,
+      "rendered_objects": 14.0,
+      "view": "print-detail"
+    },
+    {
+      "draw_calls": 13.0,
+      "rendered_objects": 13.0,
+      "view": "brand-detail"
+    },
+    {
+      "draw_calls": 24.0,
+      "rendered_objects": 24.0,
+      "view": "light-pools-detail"
     }
   ]
 }

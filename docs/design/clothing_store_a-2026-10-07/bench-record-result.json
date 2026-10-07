@@ -27,7 +27,7 @@
 				"name": "entry",
 				"reached": true,
 				"remaining_m": 0.0360554791986942,
-				"seconds": 0.016,
+				"seconds": 0.015,
 				"target": [
 					-2.40000009536743,
 					0.0649999976158142,
@@ -53,7 +53,7 @@
 				"name": "front_left",
 				"reached": true,
 				"remaining_m": 0.0921372771263123,
-				"seconds": 0.117,
+				"seconds": 0.105,
 				"target": [
 					-2.01999998092651,
 					0.0649999976158142,
@@ -79,7 +79,7 @@
 				"name": "left_edge",
 				"reached": true,
 				"remaining_m": 0.0911158472299576,
-				"seconds": 0.439,
+				"seconds": 0.449,
 				"target": [
 					-2.01999998092651,
 					0.0649999976158142,
@@ -107,7 +107,7 @@
 				"name": "fitting_room",
 				"reached": true,
 				"remaining_m": 0.0971162542700768,
-				"seconds": 0.4,
+				"seconds": 0.399,
 				"target": [
 					-1.35000002384186,
 					0.0649999976158142,
@@ -133,7 +133,7 @@
 				"name": "mirror",
 				"reached": true,
 				"remaining_m": 0.0791078731417656,
-				"seconds": 0.072,
+				"seconds": 0.094,
 				"target": [
 					-1.35000002384186,
 					0.0649999976158142,
@@ -159,7 +159,7 @@
 				"name": "checkout",
 				"reached": true,
 				"remaining_m": 0.0787470787763596,
-				"seconds": 0.435,
+				"seconds": 0.426,
 				"target": [
 					0.200000002980232,
 					0.0649999976158142,
@@ -185,7 +185,7 @@
 				"name": "back_right",
 				"reached": true,
 				"remaining_m": 0.0833353027701378,
-				"seconds": 0.466,
+				"seconds": 0.467,
 				"target": [
 					1.82000005245209,
 					0.0649999976158142,
@@ -211,7 +211,7 @@
 				"name": "right_edge",
 				"reached": true,
 				"remaining_m": 0.0941630378365517,
-				"seconds": 0.394,
+				"seconds": 0.37,
 				"target": [
 					1.82000005245209,
 					0.0649999976158142,
@@ -274,13 +274,13 @@
 			"passed": true
 		},
 		{
-			"details": 6.18,
+			"details": 6.102,
 			"name": "Full route fits unaccelerated 15s clip",
 			"passed": true
 		}
 	],
 	"passed": true,
-	"pid": 1080481,
+	"pid": 1116648,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -298,7 +298,7 @@
 			"name": "entry",
 			"reached": true,
 			"remaining_m": 0.0360554791986942,
-			"seconds": 0.016,
+			"seconds": 0.015,
 			"target": [
 				-2.40000009536743,
 				0.0649999976158142,
@@ -320,7 +320,7 @@
 			"name": "front_left",
 			"reached": true,
 			"remaining_m": 0.0921372771263123,
-			"seconds": 0.117,
+			"seconds": 0.105,
 			"target": [
 				-2.01999998092651,
 				0.0649999976158142,
@@ -342,7 +342,7 @@
 			"name": "left_edge",
 			"reached": true,
 			"remaining_m": 0.0911158472299576,
-			"seconds": 0.439,
+			"seconds": 0.449,
 			"target": [
 				-2.01999998092651,
 				0.0649999976158142,
@@ -366,7 +366,7 @@
 			"name": "fitting_room",
 			"reached": true,
 			"remaining_m": 0.0971162542700768,
-			"seconds": 0.4,
+			"seconds": 0.399,
 			"target": [
 				-1.35000002384186,
 				0.0649999976158142,
@@ -388,7 +388,7 @@
 			"name": "mirror",
 			"reached": true,
 			"remaining_m": 0.0791078731417656,
-			"seconds": 0.072,
+			"seconds": 0.094,
 			"target": [
 				-1.35000002384186,
 				0.0649999976158142,
@@ -410,7 +410,7 @@
 			"name": "checkout",
 			"reached": true,
 			"remaining_m": 0.0787470787763596,
-			"seconds": 0.435,
+			"seconds": 0.426,
 			"target": [
 				0.200000002980232,
 				0.0649999976158142,
@@ -432,7 +432,7 @@
 			"name": "back_right",
 			"reached": true,
 			"remaining_m": 0.0833353027701378,
-			"seconds": 0.466,
+			"seconds": 0.467,
 			"target": [
 				1.82000005245209,
 				0.0649999976158142,
@@ -454,7 +454,7 @@
 			"name": "right_edge",
 			"reached": true,
 			"remaining_m": 0.0941630378365517,
-			"seconds": 0.394,
+			"seconds": 0.37,
 			"target": [
 				1.82000005245209,
 				0.0649999976158142,

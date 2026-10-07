@@ -1,9 +1,9 @@
 {
-  "revision": "r1",
+  "revision": "r2",
   "reference_sha256": "696c1ba820110951c0a21d8b1f571d12806773fd5f3dc70252f0e8da432a085a",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "draw_calls": 20.0,
+    "draw_calls": 24.0,
     "instances": 84,
     "renderer": "mobile",
     "resolution": [
@@ -15,8 +15,8 @@
     "static_surfaces": 24,
     "views": [
       {
-        "draw_calls": 26.0,
-        "rendered_objects": 26.0,
+        "draw_calls": 29.0,
+        "rendered_objects": 29.0,
         "view": "godot-whole"
       },
       {
@@ -43,16 +43,36 @@
         "draw_calls": 20.0,
         "rendered_objects": 20.0,
         "view": "godot-detail-plants"
+      },
+      {
+        "draw_calls": 11.0,
+        "rendered_objects": 11.0,
+        "view": "cargo-detail"
+      },
+      {
+        "draw_calls": 14.0,
+        "rendered_objects": 14.0,
+        "view": "print-detail"
+      },
+      {
+        "draw_calls": 13.0,
+        "rendered_objects": 13.0,
+        "view": "brand-detail"
+      },
+      {
+        "draw_calls": 24.0,
+        "rendered_objects": 24.0,
+        "view": "light-pools-detail"
       }
     ]
   },
   "budget": {
     "after": {
-      "room_triangles": 74154,
+      "room_triangles": 175176,
       "shared_plant_triangles": 8718,
       "room_botanical_triangles": 568,
       "plant_triangles": 9286,
-      "total_triangles": 82872,
+      "total_triangles": 183894,
       "static_surfaces": 24
     },
     "limits": {
@@ -86,8 +106,8 @@
           "front_black_pot",
           "entry_black_pot",
           "left_shelf_black_pot",
+          "graphic_fold_graffiti",
           "lower_fold_black",
-          "lower_fold_stack_black",
           "lower_fold_ivory",
           "lower_fold_stack_ivory",
           "lower_fold_blue",
@@ -96,7 +116,7 @@
           "lower_sneaker_pair",
           "sconce_door"
         ],
-        "triangles": 26488,
+        "triangles": 35208,
         "cast_shadow": true
       },
       {
@@ -144,7 +164,7 @@
           "sconce_arch",
           "sconce_right"
         ],
-        "triangles": 30012,
+        "triangles": 122314,
         "cast_shadow": true
       },
       {
@@ -227,6 +247,7 @@
       "assets/rooms/clothing_store_a/good_fit_poster.glb",
       "assets/rooms/clothing_store_a/graphic_fold_black.glb",
       "assets/rooms/clothing_store_a/graphic_fold_blue.glb",
+      "assets/rooms/clothing_store_a/graphic_fold_graffiti.glb",
       "assets/rooms/clothing_store_a/graphic_fold_ivory.glb",
       "assets/rooms/clothing_store_a/left_shelf_black_pot.glb",
       "assets/rooms/clothing_store_a/mirror_led.glb",

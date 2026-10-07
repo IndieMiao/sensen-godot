@@ -5,17 +5,19 @@ import bpy
 sys.path.insert(0,str(Path(__file__).resolve().parent/'source/coffee_shop'))
 import kit as k
 import boutique as b
+from liubei_r2 import enable_lettering
+enable_lettering()
 from kit import begin,cube,cylinder,tube,ellipsoid,lathe,leaf
 
 BLACK='383A3D';BLUE='3458AD';WHITE='DAD9CC'
 
 def lettering(body,at,size,color):
-    curve=bpy.data.curves.new('Raised brand type '+body,'FONT');curve.body=body;curve.align_x='CENTER'
-    curve.size=size;curve.offset=.003*size/.49;curve.extrude=.018*size/.49;curve.bevel_depth=.001;curve.bevel_resolution=1;curve.resolution_u=3
+    curve=bpy.data.curves.new('Raised brand type '+body,'FONT');curve.body=body;curve.align_x='CENTER';curve.font=bpy.data.fonts.get('Nunito-Black.ttf') or bpy.data.fonts.load(str(Path(__file__).resolve().parent/'source/coffee_shop/fonts/Nunito-Black.ttf'))
+    curve.size=size;curve.offset=.003*size/.49;curve.extrude=.018*size/.49;curve.bevel_depth=.001;curve.bevel_resolution=1;curve.resolution_u=10
     o=bpy.data.objects.new('Raised brand type '+body,curve);bpy.context.scene.collection.objects.link(o)
     o.location=k.v(at);o.rotation_euler.x=math.pi/2
     bpy.ops.object.select_all(action='DESELECT');o.select_set(True);bpy.context.view_layer.objects.active=o;bpy.ops.object.convert(target='MESH')
-    k.finish(bpy.context.object,'Raised lettering '+body,color)
+    k.finish(bpy.context.object,'Raised lettering '+body,color)['atlas_constant_colour']=True
 
 def globe(at,r=.10):
     x,y,z=at;b.ring('Globe emblem rim',at,r,r,'porcelain',.006)

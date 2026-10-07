@@ -1,0 +1,65 @@
+{
+  "method": "identical camera/renderer; all-on/all-off and each single actual SpotLight3D. Marked 49x49 target patches; diagnostic delta sheet is explicitly labelled.",
+  "checks": [
+    {
+      "lamp": "LeftFloorPool",
+      "target_world": [
+        -2.05,
+        0.06,
+        0.4
+      ],
+      "projected_target_pixel": [
+        432,
+        720
+      ],
+      "target_patch_mean_rgb_gain": 46.967,
+      "target_patch_peak_gain": 127.0,
+      "pixels_delta_over_5": 46068,
+      "passed": true,
+      "casts_shadow": false
+    },
+    {
+      "lamp": "DisplayTablePool",
+      "target_world": [
+        -0.42,
+        1.04,
+        0.14
+      ],
+      "projected_target_pixel": [
+        644,
+        704
+      ],
+      "target_patch_mean_rgb_gain": 60.45,
+      "target_patch_peak_gain": 111.0,
+      "pixels_delta_over_5": 85255,
+      "passed": true,
+      "casts_shadow": false
+    },
+    {
+      "lamp": "RearAislePool",
+      "target_world": [
+        1.35,
+        0.06,
+        -1.07
+      ],
+      "projected_target_pixel": [
+        977,
+        860
+      ],
+      "target_patch_mean_rgb_gain": 60.225,
+      "target_patch_peak_gain": 83.0,
+      "pixels_delta_over_5": 54386,
+      "passed": true,
+      "casts_shadow": false
+    }
+  ],
+  "passed": true,
+  "source_files": {
+    "RearAislePool.png": "2bd6fa3398df8759d32eceea9c1f255dcb8b0966b64f42840ff7143fb212981a",
+    "DisplayTablePool.png": "e45cdf4803d5d0c17218bf7f5b20932870dc3977b014d440347386cbf00bf3d1",
+    "pools-off.png": "e020f3a1fa85c21561f4ace97d9d502131c1a3ab9ca7c73b57d055df624e859e",
+    "LeftFloorPool.png": "fc5260bba13bbc5afb0db560b0323ff5274a7e94d2d56709ebfc0dd977ae7de6",
+    "pools-all.png": "feb2e28ab5d0bf3be9543f6375bea698167e9b374fb4fc76b8d5f6b562209a8a"
+  },
+  "whole_capture_rgb_mean_abs_difference": 0.0
+}
