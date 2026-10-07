@@ -47,7 +47,7 @@ export function castLine(c: P0Content, s: P0State, cmd: { bait?: string | null; 
     if (now - s.cast.at < f.stale_ms) return { code: 'already_casting' };
     settleFailure(c, s, now, events, 'escaped'); // a line left in the water past the grace counts as got away
   }
-  if (freeSlots(c, s.bag) < 1) return { code: 'creel_full', detail: { free: 0 } };
+  if (freeSlots(s) < 1) return { code: 'creel_full', detail: { free: 0 } };
   const bait = cmd.bait ? String(cmd.bait) : null;
   if (bait && (!f.baits[bait] || count(s.bag, bait) < 1)) return { code: 'no_bait', detail: { bait } };
   if (s.energy.value < f.cast_energy) return { code: 'need_energy', detail: energyDetail(c, s, now, f.cast_energy) };
@@ -87,11 +87,11 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
   if (outcome === 'landed' && !bitten) return { code: 'too_early', detail: { bite_in: cast.at + cast.bite_ms - now } };
   if (outcome === 'landed' && !cast.breaks) {
     const fish = fishById(c, cast.fish)!;
-    if (room(c, s.bag, fish.id) < 1) return { code: 'bag_full' };
+    if (room(c, s, fish.id) < 1) return { code: 'bag_full' };
     s.cast = null;
     s.fishing.bites += 1;
     useBait(s, cast.bait, events);
-    add(c, s.bag, fish.id, 1);
+    add(c, s, fish.id, 1);
     s.fishing.caught[fish.id] = (s.fishing.caught[fish.id] ?? 0) + 1;
     events.push({ kind: 'item', id: fish.id, delta: 1 });
     events.push({ kind: 'catch', fish: fish.id, rarity: fish.rarity, result: 'landed', refund: 0 });

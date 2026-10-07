@@ -18,7 +18,12 @@ export type P0Event =
   | { kind: 'dish'; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number }
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }
-  | { kind: 'request'; id: string; status: 'accepted' | 'done'; coins: number };
+  | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
+  | { kind: 'homestead'; level: number; energy: number; unlocks: string[] }
+  | { kind: 'drink'; item: string; gain: number; price: number; left: number }
+  | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string }
+  | { kind: 'gift_meal'; resident: string; dish: string; given: boolean }
+  | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null };
 
 export function energyDetail(c: P0Content, s: P0State, now: number, need: number) {
   return { need, have: s.energy.value, next_in: nextTickIn(c, s, now) };
@@ -59,8 +64,8 @@ export function gainXp(c: P0Content, s: P0State, now: number, skill: Skill, amou
     const gifts = c.level_gifts[`${skill}:${level}`] ?? [];
     for (const [id, qty] of gifts) {
       if (id.startsWith('recipe:')) { const page = id.slice(7); if (!s.cookbook.includes(page)) s.cookbook.push(page); continue; }
-      const put = Math.min(qty, room(c, s.bag, id));
-      if (put > 0) add(c, s.bag, id, put);
+      const put = Math.min(qty, room(c, s, id));
+      if (put > 0) add(c, s, id, put);
     }
     events.push({ kind: 'level', skill, level, energy: granted, gifts });
   }

@@ -1105,6 +1105,33 @@
   `tools/android/README.md`. Keep an entire multi-step scenario in one session.
   The runner force-stops the target before launch and on exit or interruption.
 - Use `--clean-all` when old Sensen test processes must be stopped. Preserve
-  installed applications and saves, and keep the Android emulator running.
+  installed applications and saves.
+- Resource rule adopted on 2026-10-07 at the user's request, superseding the
+  earlier "keep the Android emulator running": after each test round (unit
+  tests, emulator walkthrough, screenshots), shut down the Android emulators
+  and test Godot instances you started, plus any local test servers or
+  database containers, unless you still need them for an immediate next run or
+  a user hand test; say so when you keep one, and close it afterwards. Stop
+  only processes you started, never another session's emulator or Godot or the
+  user's own editor. Shutting down an emulator must not wipe its data
+  (no wipe-data). Confirm with `ps` that nothing you started is left running.
+- Process-kill rule adopted on 2026-10-08 after an incident: never stop
+  processes by pattern. Do not use `pkill`, `killall`, `pgrep ... | xargs kill`
+  or any other name/pattern-based kill. At 00:41:44 a session ran
+  `pkill -f "tools/p0_server.ts" -U $(id -u) --` to stop its own server on
+  port 3120; macOS BSD pkill treated `-U`, `501` and `--` after the first
+  pattern as extra patterns, so the user filter did not apply and `--` matched
+  every Claude session (`--permission-mode`, `--settings`). SIGTERM ended all
+  other agent sessions and their dev servers, adb servers and reverses
+  (evidence: that session's transcript line 992 and ~/.claude/daemon.log).
+  Instead:
+  - When you start a server, emulator or other long-running process, record its
+    PID (for example in your own output directory) and stop it with
+    `kill <that PID>`.
+  - Otherwise resolve your own port first, `lsof -tiTCP:<your port>
+    -sTCP:LISTEN`, check the result is your process, then `kill <PID>`.
+  - Stop emulators with `adb -s <your serial> emu kill`.
+  - `pgrep -lf` may be used only to look; never pipe its output into kill.
+  - If you cannot tell whether a process is yours, leave it and ask.
 - Background CPU diagnosis starts with measurements before application changes.
   Do not infer a runtime defect solely from the number of installed packages.
