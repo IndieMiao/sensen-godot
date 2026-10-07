@@ -119,8 +119,19 @@ func test_hud_rows_read_today_and_the_actual_place() -> void:
 	assert_array(texts).contains(["Today · All caught up", "Shanghai · ", "Farmhouse"])
 	hud.apply({today = "Radishes ready in 1h 12m", place = {city = "Tokyo", space = "Arrived", kind = UiHud.PlaceKind.FOREIGN, day_pass = "23h"}})
 	await _settle()
-	assert_array(_labels(hud)).contains(["Today · Radishes ready in 1h 12m", "Tokyo · ", "Arrived", " · Day Pass 23h"])
+	assert_array(_labels(hud)).contains(["Today · Radishes ready in 1h 12m", "Tokyo · ", " · Day Pass 23h"])
 	assert_str(UiHud.place_text(hud.data.place)).is_equal("Tokyo · Arrived · Day Pass 23h")
+	# the space is truncated first and always shows its "…" (Godot alone only adds it once 6 letters fit)
+	var space: Label = hud._place_space
+	assert_str(space.text).ends_with("…")
+	assert_bool("Arrived".begins_with(space.text.trim_suffix("…"))).is_true()
+	assert_int(space.text.length()).is_greater(1)
+	var fs := space.get_theme_font_size(&"font_size")
+	assert_float(space.get_theme_font(&"font").get_string_size(space.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x).is_less_equal(space.size.x)
+	assert_float(hud._place_suffix.get_global_rect().end.x).is_less_equal(hud.place_chip_rect().end.x)
+	hud.apply({place = {city = "Shanghai", space = "Farmhouse", kind = UiHud.PlaceKind.HOME, day_pass = ""}})
+	await _settle()
+	assert_str(space.text).is_equal("Farmhouse")   # room again: the whole space comes back
 	assert_str(UiHud.place_text({city = "Shanghai", space = "Homestead"})).is_equal("Shanghai · Homestead")
 
 func test_hud_badge_buff_and_balances() -> void:

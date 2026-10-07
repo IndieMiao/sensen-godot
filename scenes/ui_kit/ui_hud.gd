@@ -81,6 +81,7 @@ var _place_icon: TextureRect
 var _place_city: Label
 var _place_space: Label
 var _place_suffix: Label
+var _place_names: HBoxContainer
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -273,10 +274,11 @@ func _build_row2() -> void:
 	names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_place_city = UiKit.label("", UiTokens.STYLE_C10_B)
 	_place_space = UiKit.label("", UiTokens.STYLE_C10_B)
-	_place_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_place_space.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_place_space.clip_text = true
 	_place_suffix = UiKit.label("", UiTokens.STYLE_C10_B)
 	for l in [_place_city, _place_space, _place_suffix]: names.add_child(l)
+	_place_names = names
+	names.resized.connect(_fit_space)
 	ph.add_child(names)
 	ph.add_child(UiKit.label("›", UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY))
 	row.add_child(_place_chip)
@@ -343,6 +345,23 @@ func _refresh() -> void:
 	_place_city.text = city + (" · " if city != "" and space != "" else "")
 	_place_space.text = space
 	_place_suffix.text = " · Day Pass " + str(place.day_pass) if str(place.get("day_pass", "")) != "" else ""
+	_fit_space()
+
+## Truncates the space first (`Tokyo · Arr… · Day Pass 23h`). Done by hand: Godot's TRIM_ELLIPSIS only adds
+## "…" once 6 letters still fit, so a squeezed space read `Arr` with no ellipsis.
+func _fit_space() -> void:
+	var full := str((data.place as Dictionary).get("space", ""))
+	var font := _place_space.get_theme_font(&"font")
+	var fs := _place_space.get_theme_font_size(&"font_size")
+	var room := _place_names.size.x - _place_city.get_minimum_size().x - _place_suffix.get_minimum_size().x
+	var shown := full
+	if full != "" and font.get_string_size(full, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room:
+		var n := full.length() - 1
+		while n > 1 and font.get_string_size(full.left(n) + "…", HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room: n -= 1
+		shown = full.left(n).strip_edges(false, true) + "…"
+	_place_space.text = shown
+	# a fixed width (never more than the room) so the names row cannot push the chip wider
+	_place_space.custom_minimum_size.x = ceilf(font.get_string_size(shown, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x)
 
 # ------------------------------------------------------------------ parts
 
