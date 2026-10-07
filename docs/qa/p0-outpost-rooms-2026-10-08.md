@@ -106,8 +106,9 @@ facing the room; standing behind a counter waits for the final scenes:
 - Keeper and door finger cards overlap near the spawn (placeholder anchors near the door); marker
   avoidance comes with SGODOT-221's tag layer.
 - Seated pose not yet accepted by the art director; sitting while drinking is not done (see SGODOT-227).
-- NPC outfits wait for the art director's acceptance; dedicated parts come with SGODOT-229. Pip's bag is the
-  closest cross-body part, not a mail satchel.
+- NPC outfits are accepted as the P0 placeholder (art director, 2026-10-08). Shared hairstyles (Ama / Mei on
+  41, Finn / Sigrid on 43), Old Kai not reading old enough and Pip's bag not being a mail satchel wait for the
+  dedicated parts in SGODOT-229; `npc_keeper` moves behind the counter when the final scenes land.
 - `drink_stand` is in the library but not played in P0 (no cup prop yet; art director, SGODOT-227).
 - Not covered here: physical phone (ask the user first), real network latency, more than one client
   device.
