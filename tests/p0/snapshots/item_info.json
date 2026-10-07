@@ -1,0 +1,326 @@
+{
+  "bait_worm/bag": {
+    "badge": "",
+    "buttons": [
+      "secondary:Pin"
+    ],
+    "facts": [
+      "Faster bites"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": true
+    },
+    "price": {},
+    "quota": {}
+  },
+  "bait_worm/counter_buy": {
+    "badge": "",
+    "buttons": [
+      "secondary:Buy"
+    ],
+    "facts": [
+      "Faster bites",
+      "Stock 7/30 · Bag ×5"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {
+      "each": 2,
+      "line": "",
+      "text": "2 coins",
+      "total": 2
+    },
+    "quota": {}
+  },
+  "crop_radish/bag": {
+    "badge": "",
+    "buttons": [],
+    "facts": [
+      "12 · Harvested at home",
+      "Sells for 5"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": true
+    },
+    "price": {},
+    "quota": {}
+  },
+  "crop_radish/counter_sell": {
+    "badge": "",
+    "buttons": [
+      "secondary:Sell",
+      "primary:Sell All · 60 coins"
+    ],
+    "facts": [
+      "12",
+      "5 each"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {
+      "have": 0,
+      "note": "",
+      "text": "Crops & fish · no daily limit",
+      "total": 0
+    }
+  },
+  "crop_radish/gift": {
+    "badge": "",
+    "buttons": [],
+    "facts": [],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "dish_grilled_crucian/bag": {
+    "badge": "",
+    "buttons": [
+      "primary:Eat · +45 Energy",
+      "nav:Gift ›"
+    ],
+    "facts": [
+      "Common ★",
+      "+45 Energy"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": true
+    },
+    "price": {},
+    "quota": {}
+  },
+  "dish_grilled_crucian/counter_sell": {
+    "badge": "",
+    "buttons": [
+      "unavailable:Sell at home"
+    ],
+    "facts": [
+      "Common ★",
+      "1"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {
+      "have": 0,
+      "note": "",
+      "text": "Crops & fish · no daily limit",
+      "total": 0
+    }
+  },
+  "dish_grilled_crucian/gift": {
+    "badge": "",
+    "buttons": [],
+    "facts": [
+      "Common ★"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "fish_crucian/bag": {
+    "badge": "",
+    "buttons": [
+      "unavailable:Gift · Mutual friends only"
+    ],
+    "facts": [
+      "Common",
+      "3",
+      "Sells for 6 · Fish-dex 1/2"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": true
+    },
+    "price": {},
+    "quota": {}
+  },
+  "fish_crucian/counter_sell": {
+    "badge": "",
+    "buttons": [
+      "secondary:Sell",
+      "primary:Sell All · 18 coins"
+    ],
+    "facts": [
+      "Common",
+      "3",
+      "6 each"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {
+      "have": 0,
+      "note": "",
+      "text": "Crops & fish · no daily limit",
+      "total": 0
+    }
+  },
+  "fish_crucian/gift": {
+    "badge": "",
+    "buttons": [],
+    "facts": [
+      "Common"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "rod_reed/counter_buy": {
+    "badge": "",
+    "buttons": [
+      "unavailable:Fishing Lv3 needed"
+    ],
+    "facts": [
+      "Lands up to Rare fish · Bite window +0.4 s"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {
+      "each": 80,
+      "line": "",
+      "text": "80 coins",
+      "total": 80
+    },
+    "quota": {}
+  },
+  "rod_reed/gear": {
+    "badge": "",
+    "buttons": [],
+    "facts": [
+      "Lands up to Rare fish · Bite window +0.4 s",
+      "Fishing Lv3 · Tackle Shop"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "rod_starter/counter_buy": {
+    "badge": "",
+    "buttons": [
+      "unavailable:Owned"
+    ],
+    "facts": [
+      "Lands up to Fine fish",
+      "In Gear"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "rod_starter/gear": {
+    "badge": "",
+    "buttons": [
+      "unavailable:✓ Equipped"
+    ],
+    "facts": [
+      "Lands up to Fine fish"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "seed_radish/bag": {
+    "badge": "",
+    "buttons": [
+      "secondary:Pin",
+      "secondary:Store"
+    ],
+    "facts": [
+      "2 Energy per plot · Ready in 4h 0m"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": true
+    },
+    "price": {},
+    "quota": {}
+  },
+  "seed_radish/counter_buy": {
+    "badge": "",
+    "buttons": [
+      "secondary:Buy"
+    ],
+    "facts": [
+      "Bag ×20"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {
+      "each": 4,
+      "line": "",
+      "text": "4 coins",
+      "total": 4
+    },
+    "quota": {}
+  },
+  "timber/bag": {
+    "badge": "",
+    "buttons": [
+      "secondary:Store"
+    ],
+    "facts": [
+      "12",
+      "Sells for 2 at home"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": true
+    },
+    "price": {},
+    "quota": {}
+  },
+  "timber/counter_sell": {
+    "badge": "",
+    "buttons": [
+      "unavailable:Sell at home"
+    ],
+    "facts": [
+      "12"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {
+      "have": 0,
+      "note": "",
+      "text": "Crops & fish · no daily limit",
+      "total": 0
+    }
+  }
+}
