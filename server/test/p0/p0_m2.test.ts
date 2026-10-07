@@ -114,7 +114,7 @@ describe('P0 fishing (§6.1–6.7)', () => {
     s.fishing.bites = 5;
     s = fishOnce(s, 'landed').s;
     expect(count(s.bag, 'bait_worm')).toBe(3);
-    expect(count(s.bag, 'crop_herb')).toBe(3);
+    expect(count(s.bag, 'wild_herb')).toBe(3);   // q(40): the gift is Wild Herb, a seasoning material
     expect(s.cookbook).toContain('dish_herb_grilled_fish');
     const cast = step(s, { type: 'cast', bait: 'bait_worm' }, T0 + 60 * S);
     expect(cast.s.cast!.bite_ms).toBeLessThanOrEqual(2100);

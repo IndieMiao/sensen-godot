@@ -180,3 +180,16 @@ describe('farm storage hand-over (§10.4.8)', () => {
     expect(refuse(s, { type: 'store', item: 'fish_crucian', qty: 1 })).toMatchObject({ ok: false, code: 'not_storable' });
   });
 });
+
+describe('Wild Herb (q(40))', () => {
+  it('is a material that cooks as a seasoning: Pond Crucian + Wild Herb is Herb Grilled Fish; it can be stored', () => {
+    let s = fresh();
+    s.cookbook.push('dish_herb_grilled_fish');
+    s.bag.push({ id: 'fish_crucian', qty: 1 }, { id: 'wild_herb', qty: 2 });
+    const r = step(s, { type: 'cook', items: ['fish_crucian', 'wild_herb'] });
+    expect(r.s.stove).toMatchObject({ dish: 'dish_herb_grilled_fish', mystery: false });
+    s = step(r.s, { type: 'store', item: 'wild_herb', qty: 'all' }).s;
+    expect(s.storage.wild_herb).toBe(1);
+    expect(viewOf(c, s, T0).names.wild_herb).toBe('Wild Herb');
+  });
+});

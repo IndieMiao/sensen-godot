@@ -69,7 +69,7 @@ export interface P0Content {
     farming: string; fishing: string; mining: string; combat: string; names: Record<string, string>;
     row_hoe: { id: string; price: number; skill: Skill; gate: number; sow: number };
   };
-  materials: Record<string, { name: string; price: number | null }>;
+  materials: Record<string, { name: string; price: number | null; ingr?: [Family, number] }>;   // ingr: seasonings (§7.3.1)
   wallet_floor: number;                       // §8.1.1 / q(32): every coin spend except seeds keeps this much
   homestead: {
     max_level: number;
@@ -146,6 +146,8 @@ export function ingredient(c: P0Content, id: string): { family: Family; rarity: 
   if (crop) return { family: crop.ingr[0], rarity: crop.ingr[1] };
   const fish = fishById(c, id);
   if (fish && fish.cook !== false) return { family: 'W', rarity: fish.rarity };
+  const ingr = c.materials[id]?.ingr;   // Wild Herb and Rock Salt are seasonings (q(40))
+  if (ingr) return { family: ingr[0], rarity: ingr[1] };
   return null;
 }
 

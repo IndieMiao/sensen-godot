@@ -122,7 +122,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     names: Object.fromEntries([...c.crops.flatMap(crop => [[crop.id, crop.name], [crop.seed, crop.seed_name]]),
       ...c.fish.map(fish => [fish.id, fish.name]), ...c.cooking.recipes.map(r => [r.id, r.name]),
       ...Object.entries(c.goods).map(([id, g]) => [id, g.name]), ...c.fishing.rods.map(r => [r.id, r.name]),
-      ...Object.entries(c.tools.names), [c.cooking.mystery.id, c.cooking.mystery.name]]),
+      ...Object.entries(c.tools.names), [c.cooking.mystery.id, c.cooking.mystery.name],
+      ...Object.entries(c.materials).map(([id, m]) => [id, m.name]), ...Object.entries(c.drinks.items).map(([id, d]) => [id, d.name]),
+      ...Object.entries(c.specialty).map(([id, sp]) => [id, sp.name]), ...c.bag_upgrades.map(u => [u.id, u.name])]),
     crops: c.crops.map(crop => ({ id: crop.id, seed: crop.seed, energy: crop.energy, grow_h: crop.grow_h, level: crop.level })),
     firsts: s.firsts,
   };
