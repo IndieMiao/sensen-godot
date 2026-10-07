@@ -1,0 +1,18 @@
+{
+  "expected_failure": "Free-floor movement cannot establish wall contact",
+  "failed_check": {
+    "details": {
+      "collisions": [],
+      "delta": [
+        -0.159344673156738,
+        -7.27176666259766e-05,
+        0.796721816062927
+      ],
+      "wall_torso_ray": {}
+    },
+    "name": "Diagonal collision preserves wall sliding",
+    "passed": false
+  },
+  "other_checks_passed": 33,
+  "negative_control_passed": true
+}

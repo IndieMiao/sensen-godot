@@ -156,4 +156,6 @@ def build():
     finalize({'position':[10,8.9,11.3],'target':[0,1.5,0],'size':11.3});complete()
 
 
-if __name__=='__main__':build()
+if __name__=='__main__':
+    import runpy
+    runpy.run_path(str(Path(__file__).resolve().parent/'source/post_office/revision.py'),run_name='__main__')

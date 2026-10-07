@@ -1,0 +1,72 @@
+{
+  "patches": [
+    {
+      "name": "left_plaster",
+      "surface": "Clear left plaster above the brass wall lamp",
+      "reference": [
+        405,
+        290
+      ],
+      "runtime": [
+        406,
+        390
+      ],
+      "runtime_world": [
+        -3.19,
+        3.2,
+        1.3
+      ]
+    },
+    {
+      "name": "back_plaster",
+      "surface": "Clear back plaster above-right of decorative map",
+      "reference": [
+        971,
+        280
+      ],
+      "runtime": [
+        1061,
+        442
+      ],
+      "runtime_world": [
+        1.95,
+        3.1,
+        -2.89
+      ]
+    },
+    {
+      "name": "mahogany_post",
+      "surface": "Front left post interior flat face",
+      "reference": [
+        288,
+        458
+      ],
+      "runtime": [
+        296,
+        580
+      ],
+      "runtime_world": [
+        -3.11,
+        1.7,
+        2.92
+      ]
+    },
+    {
+      "name": "floor",
+      "surface": "Clear floor on the right of packing table",
+      "reference": [
+        1000,
+        824
+      ],
+      "runtime": [
+        812,
+        864
+      ],
+      "runtime_world": [
+        2.4,
+        0.083,
+        1.05
+      ]
+    }
+  ]
+}

@@ -19,12 +19,12 @@
         {
           "at": [
             0,
-            -0.09,
+            -0.07,
             0
           ],
           "size": [
-            6.8999999999999995,
-            0.34,
+            6.9,
+            0.3,
             6.3
           ]
         },
@@ -32,27 +32,125 @@
           "at": [
             -3.3,
             1.85,
-            0
+            -1.155
           ],
           "size": [
             0.22,
             3.7,
-            6.2
+            3.69
+          ]
+        },
+        {
+          "at": [
+            -3.3,
+            1.85,
+            2.445
+          ],
+          "size": [
+            0.22,
+            3.7,
+            1.11
+          ]
+        },
+        {
+          "at": [
+            -3.3,
+            3.08,
+            1.29
+          ],
+          "size": [
+            0.22,
+            1.24,
+            1.2
           ]
         },
         {
           "at": [
             0,
             1.85,
-            -3.0
+            -3
           ],
           "size": [
             6.8,
             3.7,
             0.22
           ]
+        },
+        {
+          "at": [
+            3.4,
+            0.75,
+            0
+          ],
+          "size": [
+            0.1,
+            1.5,
+            6.3
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.75,
+            3.1
+          ],
+          "size": [
+            6.9,
+            1.5,
+            0.1
+          ]
+        },
+        {
+          "at": [
+            -3.68,
+            -0.07,
+            1.29
+          ],
+          "size": [
+            0.94,
+            0.3,
+            1.2
+          ]
+        },
+        {
+          "at": [
+            -3.72,
+            0.7,
+            0.66
+          ],
+          "size": [
+            0.95,
+            1.4,
+            0.08
+          ]
+        },
+        {
+          "at": [
+            -3.72,
+            0.7,
+            1.92
+          ],
+          "size": [
+            0.95,
+            1.4,
+            0.08
+          ]
+        },
+        {
+          "at": [
+            -4.17,
+            0.7,
+            1.29
+          ],
+          "size": [
+            0.08,
+            1.4,
+            1.3
+          ]
         }
-      ]
+      ],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "window_wall",
@@ -63,7 +161,9 @@
         0
       ],
       "yaw_degrees": 90,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "back_wall",
@@ -74,7 +174,9 @@
         -3.0
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "postal_blue_door",
@@ -82,10 +184,12 @@
       "position": [
         -3.19,
         0.075,
-        1.29
+        1.82
       ],
       "yaw_degrees": 90,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "sorting_cabinet",
@@ -109,26 +213,17 @@
             0.48
           ]
         }
-      ]
-    },
-    {
-      "name": "mail_stack",
-      "file": "mail_stack.glb",
-      "position": [
-        -1.46,
-        1.075,
-        -2.5
       ],
-      "yaw_degrees": 0,
-      "colliders": []
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "red_post_box",
       "file": "red_post_box.glb",
       "position": [
-        2.75,
+        2.98,
         0.082,
-        -1.37
+        0
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -144,7 +239,9 @@
             0.74
           ]
         }
-      ]
+      ],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "world_map",
@@ -155,7 +252,9 @@
         -2.85
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "wall_clock",
@@ -166,18 +265,9 @@
         -2.86
       ],
       "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "post_office_sign",
-      "file": "post_office_sign.glb",
-      "position": [
-        -3.14,
-        2.96,
-        -1.65
-      ],
-      "yaw_degrees": 90,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "postal_counter",
@@ -201,51 +291,9 @@
             0.78
           ]
         }
-      ]
-    },
-    {
-      "name": "counter_computer",
-      "file": "counter_computer.glb",
-      "position": [
-        -1.49,
-        1.4,
-        -0.52
       ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "counter_bell",
-      "file": "counter_bell.glb",
-      "position": [
-        -0.65,
-        1.4,
-        -0.42
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "counter_stamps",
-      "file": "counter_stamps.glb",
-      "position": [
-        0.07,
-        1.42,
-        -0.45
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "counter_mail_tray",
-      "file": "counter_mail_tray.glb",
-      "position": [
-        0.74,
-        1.43,
-        -0.49
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "parcel_shelves",
@@ -256,40 +304,22 @@
         -2.58
       ],
       "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "brown_parcel",
-      "file": "brown_parcel.glb",
-      "position": [
-        1.86,
-        1.1,
-        -2.51
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.12,
+            0
+          ],
+          "size": [
+            1.28,
+            2.38,
+            0.67
+          ]
+        }
       ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "blue_parcel",
-      "file": "blue_parcel.glb",
-      "position": [
-        2.28,
-        1.1,
-        -2.51
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "mail_sacks",
-      "file": "mail_sacks.glb",
-      "position": [
-        2.09,
-        0.34,
-        -2.52
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "packing_table",
@@ -313,81 +343,17 @@
             1.28
           ]
         }
-      ]
-    },
-    {
-      "name": "packing_mat",
-      "file": "packing_mat.glb",
-      "position": [
-        0.31,
-        1.113,
-        1.64
       ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "packing_parcel",
-      "file": "packing_parcel.glb",
-      "position": [
-        -0.27,
-        1.14,
-        1.48
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "postal_scale",
-      "file": "postal_scale.glb",
-      "position": [
-        1.12,
-        1.15,
-        1.65
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "packing_supplies",
-      "file": "packing_supplies.glb",
-      "position": [
-        0.36,
-        1.14,
-        1.69
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "desk_airmail",
-      "file": "desk_airmail.glb",
-      "position": [
-        0.65,
-        1.165,
-        1.98
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "underdesk_boxes",
-      "file": "underdesk_boxes.glb",
-      "position": [
-        0.32,
-        0.34,
-        1.65
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "packing_stool",
       "file": "packing_stool.glb",
       "position": [
-        -1.71,
+        -2.12,
         0.082,
-        2.19
+        2.31
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -403,255 +369,788 @@
             0.58
           ]
         }
-      ]
-    },
-    {
-      "name": "entry_rug",
-      "file": "entry_rug.glb",
-      "position": [
-        -2.71,
-        0.094,
-        1.32
       ],
-      "yaw_degrees": 0,
-      "colliders": []
+      "material": "plain",
+      "cast_shadow": true
     },
     {
-      "name": "packing_rug",
-      "file": "packing_rug.glb",
+      "name": "postal_door_frame",
+      "file": "postal_door_frame.glb",
       "position": [
-        0.34,
-        0.094,
-        2.69
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "floor_plant",
-      "file": "floor_plant.glb",
-      "position": [
-        -2.86,
-        0.083,
-        2.43
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "counter_plant",
-      "file": "counter_plant.glb",
-      "position": [
-        -2.13,
-        1.44,
-        -0.68
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "cabinet_plant",
-      "file": "cabinet_plant.glb",
-      "position": [
-        -1.32,
-        2.42,
-        -2.61
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "parcel_shelf_plant",
-      "file": "parcel_shelf_plant.glb",
-      "position": [
-        2.38,
-        2.64,
-        -2.6
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "door_notice",
-      "file": "door_notice.glb",
-      "position": [
-        -3.16,
-        1.76,
-        0.19
+        -3.19,
+        0.075,
+        1.29
       ],
       "yaw_degrees": 90,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
-      "name": "door_light",
-      "file": "door_light.glb",
+      "name": "postal_door_glass",
+      "file": "postal_door_glass.glb",
       "position": [
-        -3.05,
-        2.94,
-        1.28
+        -3.19,
+        0.075,
+        1.82
       ],
       "yaw_degrees": 90,
-      "colliders": []
+      "colliders": [],
+      "material": "window_glass",
+      "cast_shadow": true
+    },
+    {
+      "name": "counter_computer",
+      "file": "counter_computer.glb",
+      "position": [
+        -1.49,
+        1.397,
+        -0.52
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "post_office_sign",
+      "file": "post_office_sign.glb",
+      "position": [
+        -3.14,
+        2.78,
+        -1.64
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "sorted_letters",
+      "file": "sorted_letters.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "parcel_shelf_stock",
+      "file": "parcel_shelf_stock.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "mail_sacks",
+      "file": "mail_sacks.glb",
+      "position": [
+        2.1,
+        0.082,
+        -2.12
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.54,
+            0
+          ],
+          "size": [
+            1.0,
+            1.08,
+            0.54
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "counter_bell",
+      "file": "counter_bell.glb",
+      "position": [
+        -0.65,
+        1.397,
+        -0.42
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "metal",
+      "cast_shadow": true
+    },
+    {
+      "name": "magazine_rack",
+      "file": "magazine_rack.glb",
+      "position": [
+        -2.82,
+        0.082,
+        0.05
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.46,
+            0
+          ],
+          "size": [
+            0.65,
+            0.92,
+            0.4
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "door_lamp_glow",
+      "file": "door_lamp_glow.glb",
+      "position": [
+        -3.12,
+        2.79,
+        1.36
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "glow",
+      "cast_shadow": true
+    },
+    {
+      "name": "blue_entry_mat",
+      "file": "blue_entry_mat.glb",
+      "position": [
+        -2.83,
+        0.092,
+        1.29
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "corner_letter_crate",
+      "file": "corner_letter_crate.glb",
+      "position": [
+        2.68,
+        0.082,
+        2.45
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.26,
+            0
+          ],
+          "size": [
+            0.65,
+            0.52,
+            0.5
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "front_floor_runner",
+      "file": "front_floor_runner.glb",
+      "position": [
+        0.26,
+        0.094,
+        2.74
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "counter_dressing",
+      "file": "counter_dressing.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "wall_dressing",
+      "file": "wall_dressing.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "packing_dressing",
+      "file": "packing_dressing.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     }
   ],
-  "instances": [
-    {
-      "name": "mail_stack_0_1",
-      "asset": "mail_stack",
-      "position": [
-        -0.96,
-        1.075,
-        -2.5
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "mail_stack_0_2",
-      "asset": "mail_stack",
-      "position": [
-        -0.45999999999999996,
-        1.075,
-        -2.5
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "mail_stack_0_3",
-      "asset": "mail_stack",
-      "position": [
-        0.040000000000000036,
-        1.075,
-        -2.5
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "mail_stack_1_0",
-      "asset": "mail_stack",
-      "position": [
-        -1.46,
-        1.4649999999999999,
-        -2.5
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "mail_stack_1_1",
-      "asset": "mail_stack",
-      "position": [
-        -0.96,
-        1.4649999999999999,
-        -2.5
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "mail_stack_1_2",
-      "asset": "mail_stack",
-      "position": [
-        -0.45999999999999996,
-        1.4649999999999999,
-        -2.5
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "mail_stack_1_3",
-      "asset": "mail_stack",
-      "position": [
-        0.040000000000000036,
-        1.4649999999999999,
-        -2.5
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "mail_stack_2_0",
-      "asset": "mail_stack",
-      "position": [
-        -1.46,
-        1.855,
-        -2.5
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "mail_stack_2_1",
-      "asset": "mail_stack",
-      "position": [
-        -0.96,
-        1.855,
-        -2.5
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "mail_stack_2_2",
-      "asset": "mail_stack",
-      "position": [
-        -0.45999999999999996,
-        1.855,
-        -2.5
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "mail_stack_2_3",
-      "asset": "mail_stack",
-      "position": [
-        0.040000000000000036,
-        1.855,
-        -2.5
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "parcel_above",
-      "asset": "brown_parcel",
-      "position": [
-        2.28,
-        1.86,
-        -2.51
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "parcel_top",
-      "asset": "brown_parcel",
-      "position": [
-        1.82,
-        2.62,
-        -2.51
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "blue_parcel_cabinet_top",
-      "asset": "blue_parcel",
-      "position": [
-        -0.32,
-        2.41,
-        -2.64
-      ],
-      "yaw_degrees": 0
-    }
-  ],
+  "instances": [],
   "camera": {
     "position": [
-      10,
-      8.9,
-      11.3
+      10.73654100751163,
+      13.191920594830878,
+      10.475050701262555
     ],
     "target": [
       0,
-      1.5,
+      2.3285169667382886,
       0
     ],
-    "size": 11.3
+    "size": 14.474629114063505
   },
   "sun_direction": [
     -6,
     7,
     1.5
-  ]
+  ],
+  "review_lighting": {
+    "ambient": 0.53,
+    "ambient_color": "FFE8D0",
+    "sun": 1.12,
+    "sun_color": "FFE9C7",
+    "sun_position": [
+      -6,
+      7,
+      2
+    ],
+    "sun_target": [
+      0,
+      0,
+      0
+    ],
+    "shadow_bias": 0.065,
+    "shadow_normal_bias": 0.7,
+    "shadow_distance": 25,
+    "background": "D6E5E1",
+    "background_gradient": true,
+    "points": [
+      {
+        "position": [
+          -2.72,
+          2.78,
+          1.36
+        ],
+        "energy": 0.72,
+        "color": "FFE1A2",
+        "range": 2.5
+      }
+    ]
+  },
+  "door": {
+    "module": "postal_blue_door",
+    "companions": [
+      "postal_door_glass"
+    ],
+    "closed_yaw_degrees": 90,
+    "open_yaw_degrees": 0
+  },
+  "shared_plants": [
+    {
+      "name": "door_floor_greenery",
+      "file": "peace_lily.glb",
+      "position": [
+        -2.95,
+        0.083,
+        2.59
+      ],
+      "rotation_degrees": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        0.94,
+        0.94,
+        0.94
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.2,
+            0
+          ],
+          "size": [
+            0.45,
+            0.4,
+            0.45
+          ]
+        }
+      ]
+    },
+    {
+      "name": "counter_trailing",
+      "file": "pothos.glb",
+      "position": [
+        -2.13,
+        1.4,
+        -0.62
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "colliders": []
+    },
+    {
+      "name": "cabinet_greenery",
+      "file": "peace_lily.glb",
+      "position": [
+        0.12,
+        2.405,
+        -2.65
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.54,
+        0.54,
+        0.54
+      ],
+      "colliders": []
+    },
+    {
+      "name": "shelf_trailing",
+      "file": "pothos.glb",
+      "position": [
+        2.43,
+        2.64,
+        -2.53
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.37,
+        1.37,
+        1.37
+      ],
+      "colliders": []
+    },
+    {
+      "name": "corner_floor_greenery",
+      "file": "peace_lily.glb",
+      "position": [
+        3.05,
+        0.083,
+        1.91
+      ],
+      "rotation_degrees": [
+        0,
+        40,
+        0
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.2,
+            0
+          ],
+          "size": [
+            0.45,
+            0.4,
+            0.45
+          ]
+        }
+      ]
+    },
+    {
+      "name": "door_hanging_pothos",
+      "file": "pothos.glb",
+      "position": [
+        -3.0,
+        2.65,
+        0.37
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "colliders": []
+    }
+  ],
+  "review_views": [
+    {
+      "name": "detail-counter",
+      "position": [
+        6,
+        4.5,
+        6
+      ],
+      "target": [
+        -0.55,
+        1.6,
+        -1.45
+      ],
+      "size": 5.4
+    },
+    {
+      "name": "detail-mail",
+      "position": [
+        6,
+        4.2,
+        6
+      ],
+      "target": [
+        1.35,
+        1.24,
+        0.75
+      ],
+      "size": 5.0
+    },
+    {
+      "name": "detail-door",
+      "position": [
+        4,
+        3.3,
+        6
+      ],
+      "target": [
+        -2.7,
+        1.5,
+        0.95
+      ],
+      "size": 4.3
+    }
+  ],
+  "spawn": [
+    -2.5,
+    0.09,
+    1.29
+  ],
+  "bench": {
+    "floor_y": 0.08,
+    "route": [
+      {
+        "name": "blue door",
+        "position": [
+          -2.25,
+          0.08,
+          1.24
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "counter front",
+        "position": [
+          -0.85,
+          0.08,
+          0.42
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "packing west",
+        "position": [
+          -1.4,
+          0.08,
+          0.68
+        ]
+      },
+      {
+        "name": "table southwest",
+        "position": [
+          -1.38,
+          0.08,
+          2.62
+        ]
+      },
+      {
+        "name": "table front",
+        "position": [
+          0.3,
+          0.08,
+          2.7
+        ]
+      },
+      {
+        "name": "table southeast",
+        "position": [
+          2.05,
+          0.08,
+          2.65
+        ]
+      },
+      {
+        "name": "mailbox approach",
+        "position": [
+          2.02,
+          0.08,
+          0.35
+        ]
+      },
+      {
+        "name": "red mailbox",
+        "position": [
+          2.35,
+          0.08,
+          -0.6
+        ]
+      },
+      {
+        "name": "parcel shelf",
+        "position": [
+          1.54,
+          0.08,
+          -1.34
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "counter",
+        "from": [
+          -0.85,
+          0.09,
+          0.47
+        ],
+        "to": [
+          -0.85,
+          0.09,
+          -0.54
+        ],
+        "target": "postal_counter"
+      },
+      {
+        "name": "packing table",
+        "from": [
+          2.05,
+          0.09,
+          1.6
+        ],
+        "to": [
+          0.31,
+          0.09,
+          1.64
+        ],
+        "target": "packing_table"
+      },
+      {
+        "name": "red mailbox",
+        "from": [
+          2.55,
+          0.09,
+          1.0
+        ],
+        "to": [
+          2.98,
+          0.09,
+          0
+        ],
+        "target": "red_post_box"
+      },
+      {
+        "name": "mailbags",
+        "from": [
+          2.07,
+          0.09,
+          -1.38
+        ],
+        "to": [
+          2.07,
+          0.09,
+          -2.12
+        ],
+        "target": "mail_sacks"
+      },
+      {
+        "name": "parcel shelf",
+        "from": [
+          1.35,
+          0.09,
+          -2.1
+        ],
+        "to": [
+          2.09,
+          0.09,
+          -2.58
+        ],
+        "target": "parcel_shelves"
+      },
+      {
+        "name": "west wall",
+        "from": [
+          -2.83,
+          0.09,
+          -1.5
+        ],
+        "to": [
+          -3.9,
+          0.09,
+          -1.5
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "east edge",
+        "from": [
+          2.8,
+          0.09,
+          0.6
+        ],
+        "to": [
+          3.9,
+          0.09,
+          0.6
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "front edge",
+        "from": [
+          1.6,
+          0.09,
+          2.67
+        ],
+        "to": [
+          1.6,
+          0.09,
+          3.7
+        ],
+        "target": "room_shell"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "packing counter aisle",
+        "from": [
+          -1.38,
+          0.09,
+          0.4
+        ],
+        "to": [
+          1.67,
+          0.09,
+          0.4
+        ],
+        "measure": [
+          [
+            0.31,
+            0.7,
+            -0.15
+          ],
+          [
+            0.31,
+            0.7,
+            1.0
+          ]
+        ],
+        "minimum": 0.8,
+        "width": 1.15
+      }
+    ],
+    "entrance": {
+      "inside": [
+        -2.5,
+        0.09,
+        1.29
+      ],
+      "outside": [
+        -3.75,
+        0.09,
+        1.29
+      ]
+    },
+    "slide": {
+      "from": [
+        -2.83,
+        0.09,
+        -1.85
+      ],
+      "direction": [
+        -1,
+        0,
+        0.6
+      ],
+      "tangent": [
+        0,
+        0,
+        1
+      ],
+      "seconds": 0.55
+    },
+    "input_start": [
+      -1.7,
+      0.09,
+      0.9
+    ],
+    "scale": {
+      "door": {
+        "height": 2.3,
+        "source": "Blue postal door panel clear leaf height"
+      },
+      "counter": {
+        "height": 1.31,
+        "source": "Blue counter oak top,+13.67% fromBasicRoom"
+      },
+      "chair": {
+        "height": 0.59,
+        "source": "Small packing stool seat,+13.87% belowBasicRoom seat"
+      },
+      "table": {
+        "height": 1.015,
+        "source": "Green packing worktable top"
+      }
+    }
+  }
 }

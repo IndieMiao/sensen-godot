@@ -1,0 +1,159 @@
+{
+  "method": "11x11 RGB median; circular HSV hue distance; fixed declared corresponding lit faces",
+  "checks": [
+    {
+      "name": "left_plaster",
+      "surface": "Clear left plaster above the brass wall lamp",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          405,
+          290
+        ],
+        "rgb": [
+          218,
+          170,
+          132
+        ],
+        "hex": "#DAAA84",
+        "hue_degrees": 26.512,
+        "saturation": 0.3945,
+        "value": 0.8549
+      },
+      "runtime": {
+        "pixel": [
+          406,
+          390
+        ],
+        "rgb": [
+          255,
+          226,
+          187
+        ],
+        "hex": "#FFE2BB",
+        "hue_degrees": 34.412,
+        "saturation": 0.2667,
+        "value": 1.0
+      },
+      "hue_delta_degrees": 7.9,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "back_plaster",
+      "surface": "Clear back plaster above-right of decorative map",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          971,
+          280
+        ],
+        "rgb": [
+          252,
+          229,
+          199
+        ],
+        "hex": "#FCE5C7",
+        "hue_degrees": 33.962,
+        "saturation": 0.2103,
+        "value": 0.9882
+      },
+      "runtime": {
+        "pixel": [
+          1061,
+          442
+        ],
+        "rgb": [
+          202,
+          162,
+          117
+        ],
+        "hex": "#CAA275",
+        "hue_degrees": 31.765,
+        "saturation": 0.4208,
+        "value": 0.7922
+      },
+      "hue_delta_degrees": 2.198,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "mahogany_post",
+      "surface": "Front left post interior flat face",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          288,
+          458
+        ],
+        "rgb": [
+          116,
+          48,
+          15
+        ],
+        "hex": "#74300F",
+        "hue_degrees": 19.604,
+        "saturation": 0.8707,
+        "value": 0.4549
+      },
+      "runtime": {
+        "pixel": [
+          296,
+          580
+        ],
+        "rgb": [
+          139,
+          45,
+          18
+        ],
+        "hex": "#8B2D12",
+        "hue_degrees": 13.388,
+        "saturation": 0.8705,
+        "value": 0.5451
+      },
+      "hue_delta_degrees": 6.216,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "floor",
+      "surface": "Clear floor on the right of packing table",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          1000,
+          824
+        ],
+        "rgb": [
+          193,
+          101,
+          60
+        ],
+        "hex": "#C1653C",
+        "hue_degrees": 18.496,
+        "saturation": 0.6891,
+        "value": 0.7569
+      },
+      "runtime": {
+        "pixel": [
+          812,
+          864
+        ],
+        "rgb": [
+          232,
+          148,
+          80
+        ],
+        "hex": "#E89450",
+        "hue_degrees": 26.842,
+        "saturation": 0.6552,
+        "value": 0.9098
+      },
+      "hue_delta_degrees": 8.346,
+      "limit_degrees": 10,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Representative patches only. Full image retains independent brightness/saturation/composition differences."
+}

@@ -1,55 +1,36 @@
-# Post Office · art review candidate
+# SGODOT-176 · Post Office review revision
 
-Plane [SGODOT-176](https://plane.sensenjoy.cn/zili/browse/SGODOT-176), owner Zhao Yun / 赵云. **In Progress, awaiting user review.** Produced 2026-10-07 under the user's request to proceed sequentially overnight and send each scene through Lark CLI.
+赵云 · Review candidate. Reference Figma `OMLTC3yw3u2WDjOZhLnhaR`, SceneDesign node `545:2967`. The current P0 plan may use this art as a waystation placeholder; this delivery adds no postal or waystation gameplay.
 
-Reference: Figma file `OMLTC3yw3u2WDjOZhLnhaR`, node [545:2967](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=545-2967). The [original export](reference.png) was downloaded and visually inspected before modeling.
+![Reference / actual Godot / direct 50% overlay](comparison.png)
 
-![Figma and actual Godot render](comparison.png)
+[Whole scene](godot.png) · [Counter and sorting](detail-counter.png) · [Letters, parcels and packing](detail-mail.png) · [Blue entrance](detail-door.png) · [Actual model orthographics](orthographic-sheet.png).
 
-The post office uses copper-brown timber, a blue panelled entrance and service counter, red pillar box with a cut-out slot, sorting cabinet with twelve repeated letter stacks, parcel shelving and canvas mailbags. The packing table holds a carton, twine, a scale and stationery. A wall clock, decorative world map and POST OFFICE sign retain the reference identity. Crates, packing tools and plants remain individually named in the editable source.
+| Review item | Implemented response |
+|---|---|
+| Mahogany and apricot | Deeper red-brown timber palette, warm apricot plaster, 30 rows of narrow staggered floorboards with visible ends and restrained tonal variation. Accepted furniture scale remains unchanged. |
+| Counter | Thin desktop monitor, upright support/foot and a separate keyboard replace the register. Brass service bell, document stand, three red/black stamps and a letter tray remain readable against deep blue vertical panels. |
+| Sign | Wall-mounted red arch plaque with white envelope emblem and **Nunito Black rounded bold lettering**, fitted with 4mm physical extrusion and an offset from the plaque. No hanging hooks. |
+| Sorting and parcels | Every cubby contains offset individual folded envelopes, using four linked source prototypes with differing paper/stamp/airmail treatments. Four parcel prototypes vary size, colour, knots, postage marks and label motifs. Shelf and cabinet-top stock is assembled from those prototypes. Bottom drawers have brass pulls. |
+| Entry | Six lit frosted panes, brass handle and slot on the blue door. Leaf and glass share a real hinge/opening contract for benchmark exit/reentry. Two clipped notices, a stocked magazine rack, a brass wall light and blue woven mat complete the entry. |
+| Mailbags and mailbox | Two tied linen sacks with red/blue stripes and envelope marks have floor colliders; the mailbox moves clear of their main-view silhouette. Red pillar box retains its true dark letter slot, white envelope emblem and broad rounded black foot. |
+| Packing zone | Green work surface, two package sizes, scale, pencils, twine, mug and individual letter stack. Blue/red/tan storage boxes have exposed coloured fronts and address labels. Right-front crate holds letters and a plant; the left-front stool retains the baseline seat-height range. |
+| Plants | Current shared deeper-green library on cabinet/shelf/counter/door and floor placements, with supplied alpha-scissor material and no small-leaf shadows. Cabinet plant sits on the crown, not outside its footprint. |
 
-## Deliverables
+Source prototypes remain editable in named `PROTOTYPE_envelope_*` / `PROTOTYPE_parcel_*` collections. Linked source meshes are placed with varied offsets/rotations, then grouped by counter/sorting/packing zones for export; each large furniture module retains its own local pivot. Source atlas images are external to GLBs.
 
-- [Editable Blender model](../../../tools/art/source/post_office/post_office.blend), with named objects and module collections.
-- [Deterministic scene generator](../../../tools/art/build_post_office.py), using the [room pipeline](../../../tools/art/scene_room_pipeline.py).
-- [GLB placement and collision manifest](../../../assets/rooms/post_office/layout.json), individual local pivots and a shared external base-color/contact-AO atlas.
-- [Reusable Godot art scene](../../../scenes/post_office/post_office_art.tscn), without gameplay/account/network dependencies.
-- [Whole-scene runtime image](godot.png), [model orthographic views](orthographic-sheet.png), [budget and verification hashes](verification-summary.json).
+[Camera fit](../../../tools/art/source/post_office/camera-review.json) uses three declared plinth-edge intersections and infers the hidden fourth. The direct overlay retains the single-view concept's upper-wall/proportion residuals. It is not a claim of pixel-perfect geometry. [Fixed surface samples](colour-samples.png) include both plaster walls, the mahogany post and clear horizontal floor; [RGB/HSV results](colour-verification.json) list saturation/value independently. A source raycast verifies those runtime samples hit the intended faces. The initial lamp-side left-wall hue missed at 14.358°; its material was corrected at the same position. Final hue differences: **7.900° / 2.198° / 6.216° / 8.346°**, all ≤10°. [Source face-ray audit](colour-source-face-audit.json).
 
-## Reconstruction and contract
+**172,218 / 200,000 placed triangles**, **8,982 / 100,000 botanical triangles**, **34 / 60 static surfaces**. **34/34 actual rendered checks and the 15-second real-time route video pass.**
 
-```sh
-blender --background --factory-startup --python "$PWD/tools/art/build_post_office.py" -- --views
-python3 tools/art/prepare_room_review.py post_office
-godot --headless --editor --path output/post_office-2026-10-07/godot-project --import --quit
-godot --path output/post_office-2026-10-07/godot-project \
-  --script res://tools/art/review_room.gd -- post_office \
-  "$PWD/output/post_office-2026-10-07"
-```
+The source heights are **door 2.30m, counter 1.31m, stool .59m, packing table 1.015m**, all within the agreed ±15% category tolerance. The nine-waypoint rendered route starts at the blue door, visits the counter, loops around the packing table and reaches the mailbox/shelf. Authored blockers cover counter, table, box, sacks, rack, walls and open edges. The counter-to-table passage measures **1.15m**, exceeding .80m. Exit/reentry uses the actual west-wall gap and supported exterior pad.
 
-Use the actual host display for rendering. Blender 5.2.0 LTS and Godot 4.7.2 were used here. `--geometry-only` skips bake/export. Rebuilding replaces this scene's `.blend`; preserve manual edits deliberately. Source assets from Basic Room remain read-only.
+[Behavior results](bench-result.json) · [Live scale](bench-scale-measurements.json) · [Evaluated Blender source](source-scale.json) · [Actual collider view](bench-collisions.png) · [15-second real-time video samples](video-frames.png) · [Budget, normals, UVs and hashes](verification-summary.json).
 
-Coordinates are metres, Godot Y-up/front +Z and Blender `(x,-z,y)`. Modules export about their own floor/mounting pivot; placement is in the manifest. The baked atlas contains procedural surface detail and softened contact AO, with live runtime sunlight. Rebake after major rearrangement. Raw GLBs must bind this atlas. Triangulation occurs before UV bake/export to keep surface interpolation consistent, and empty atlas gutters are extended before mip generation.
+Wall-slide evidence requires >.45m tangential displacement and live contact. Jolt can constrain a capsule through recovery without retaining a slide-contact entry; in that case the harness additionally records a short torso ray into the declared wall-normal direction. The [free-floor negative control](wall-slide-negative-control.json) fails only the wall-slide check, while its other 33 checks pass. No controller speed/capsule/floor-snap parameter changes are involved.
 
-## Validation and budget
+Rebuild `tools/art/build_post_office.py` (delegates to scene-local `revision.py`), then `measure_room_source.py -- post_office` in Blender. Stage/import/render with the shared room review tools and run the isolated `scene_bench`; package with `check_room_colour.py post_office 176` and `package_room_review.py post_office 176`.
 
-Actual Godot **Mobile / Vulkan**, AMD Custom GPU 0405 (RADV VANGOGH), 1440×1080. 49 meshes have atlas materials and finite nonempty bounds; 9 simple collision shapes are present. The imported triangle count matches the export manifest.
+Godot 4.7.2 Mobile/Vulkan, AMD Custom GPU 0405 / RADV VANGOGH. Desktop scale/appearance/behavior review only, with no production/save changes or phone-performance acceptance. Basic Room, accepted 172, and Liu Bei-owned 177/178 remain unchanged by this revision.
 
-| Metric | Measured |
-|---|---:|
-| Unique GLBs / placed instances | 35 / 49 |
-| Unique / placed triangles | 67,960 / 78,004 |
-| Static surfaces | 49 |
-| GLB bytes combined | 2,804,576 |
-| Atlas source PNG bytes | 2,576,486 |
-| Shared atlas | 2048 × 2048 |
-
-Texture imports enable mipmaps and VRAM compression. Fine geometry keeps uncompressed vertices and disables automatic mesh LODs. Static surface counts exclude renderer shadow passes; PNG bytes are not GPU memory. No physical-phone performance measurement is claimed.
-
-## Inferences and differences
-
-The 6.6 × 6.0m floor and hidden geometry are inferred. The paper labels use generic strokes, not real addresses. The world map is an original simplified decorative silhouette, not geographic navigation data. The card beside the door uses a botanical placeholder and the register uses the shared shop design. The parcel pile is less dense and material wear is simplified. The English POST OFFICE wording is preserved.
-
-The door aperture and letter-box slot are real cutouts. Room containment and large furnishings use simple boxes; paper, labels, hands and parcels are decorative. No route transition, postal interaction or character traversal is implemented.
-
-This is an art-only candidate awaiting review. No gameplay/map integration, avatar benchmark, Android QA, production build, migration or release is included.
+**邮筒已改动**：本轮图集重烘焙/重新打包，`red_post_box.glb` 的 UV 区域和 GLB 字节已改变；本地包围盒/尺寸和轴心契约保持一致，房内摆放位置已调整。[变更校验](mailbox-change-notice.json)。SGODOT-204 的农舍信箱占位由奕星决定是否同步，未自行修改 farm-dev 的副本。

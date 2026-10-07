@@ -6,6 +6,7 @@ const KIT := "res://assets/rooms/post_office/"
 var layout: Dictionary
 var assets: Dictionary = {}
 var fire: Node3D
+var variant_materials: Dictionary = {}
 
 func _ready() -> void:
 	layout = JSON.parse_string(FileAccess.get_file_as_string(KIT + "layout.json"))
@@ -27,11 +28,39 @@ func _setup_room() -> void:
 		_add_asset(asset, asset, material)
 	for instance in layout.instances:
 		_add_asset(assets[instance.asset], instance, material)
+	for point in layout.get("attachment_points", []):
+		var marker := Marker3D.new()
+		marker.name = str(point.name)
+		marker.position = _vec(point.position)
+		marker.rotation_degrees = _vec(point.get("rotation_degrees", [0,0,0]))
+		marker.set_meta("purpose", str(point.get("purpose", "")))
+		if point.has("size"): marker.set_meta("slot_size", _vec(point.size))
+		add_child(marker)
+	var plant_material := load("res://assets/rooms/_shared/plants/material.tres") as StandardMaterial3D
+	for plant in layout.get("shared_plants", []):
+		var container := Node3D.new()
+		container.name = plant.name
+		container.position = _vec(plant.position)
+		container.rotation_degrees = _vec(plant.rotation_degrees)
+		container.scale = _vec(plant.scale)
+		add_child(container)
+		var model := (load("res://assets/rooms/_shared/plants/" + str(plant.file)) as PackedScene).instantiate()
+		container.add_child(model)
+		_set_material(model, plant_material)
+		# R2 library uses small leaves and alpha-scissor cutouts. Keep their
+		# shadows disabled per the shared budget standard (pots included).
+		_disable_shadows(model)
+		for c in plant.get("colliders", []):
+			var body := StaticBody3D.new(); body.position = _vec(c.at)
+			var shape := BoxShape3D.new(); shape.size = _vec(c.size)
+			var collision := CollisionShape3D.new(); collision.shape = shape
+			body.add_child(collision); container.add_child(body)
 
 func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMaterial3D) -> void:
 	var container := Node3D.new()
 	container.name = placement.name
 	container.position = _vec(placement.position)
+	container.scale = _vec(placement.get("scale", [1.0, 1.0, 1.0]))
 	container.rotation.y = deg_to_rad(float(placement.yaw_degrees))
 	add_child(container)
 	var scene := load(KIT + asset.file) as PackedScene
@@ -41,46 +70,73 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 	var model := scene.instantiate() as Node3D
 	container.add_child(model)
 	var applied := material
-	if str(asset.name).ends_with("garden"):
+	var mode := str(asset.get("material", "plain"))
+	if mode == "garden":
 		applied = material.duplicate()
+		if FileAccess.file_exists(KIT + "window_landscape.png"): applied.albedo_texture = load(KIT + "window_landscape.png")
 		applied.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		applied.cull_mode = BaseMaterial3D.CULL_DISABLED
-	if asset.name == "fire":
+	elif mode == "fire" or mode == "glow":
 		applied = material.duplicate()
+		if mode == "fire" and FileAccess.file_exists(KIT + "fire_gradient.png"): applied.albedo_texture = load(KIT + "fire_gradient.png")
+		applied.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		applied.emission_enabled = true
-		applied.emission = Color("ffb041")
-		applied.emission_energy_multiplier = 1.3
-		fire = container
-	if asset.name == "display_glass":
+		applied.emission = Color("ff963b")
+		applied.emission_energy_multiplier = .3
+	elif mode == "glass":
 		applied = material.duplicate()
 		applied.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		applied.albedo_color = Color(0.90, 0.97, 1.0, 0.12)
-		applied.roughness = 0.14
+		applied.albedo_color = Color(.98,.99,1,.045)
+		applied.roughness = .15
 		applied.cull_mode = BaseMaterial3D.CULL_DISABLED
-		_disable_shadows(model)
+	elif mode == "window_glass":
+		applied = material.duplicate()
+		applied.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		applied.emission_enabled = true
+		applied.emission = Color("dce9dc")
+		applied.emission_texture = applied.albedo_texture
+		applied.emission_energy_multiplier = .06
+	elif mode == "metal":
+		applied = material.duplicate()
+		applied.roughness = .43
+		applied.metallic_specular = .52
+	elif mode == "matte":
+		applied = material.duplicate()
+		applied.roughness = 1.0
+		applied.metallic_specular = .06
+	if variant_materials.has(mode): applied = variant_materials[mode]
+	else: variant_materials[mode] = applied
 	_set_material(model, applied)
-	if str(asset.name).ends_with("garden"): _disable_shadows(model)
-	for c in asset.colliders:
-		var body := StaticBody3D.new()
-		body.position = _vec(c.at)
-		# The authored floorboard top is 8cm above the assembly pivot.
-		if asset.name == "room_shell": pass
-		var shape := BoxShape3D.new()
-		shape.size = _vec(c.size)
-		var collision := CollisionShape3D.new()
-		collision.shape = shape
-		body.add_child(collision)
-		container.add_child(body)
-	if asset.name == "floor_plant":
-		var body := StaticBody3D.new()
-		var collision := CollisionShape3D.new()
-		var shape := CylinderShape3D.new()
-		shape.height = .45
-		shape.radius = .22
-		collision.shape = shape
-		collision.position.y = .225
-		body.add_child(collision)
-		container.add_child(body)
+	if not asset.get("cast_shadow", true) or mode in ["garden","fire","glow","glass","window_glass"]: _disable_shadows(model)
+	for c in asset.colliders: _add_collider(container,c)
+
+func _add_collider(container: Node3D, c: Dictionary) -> void:
+	var body := StaticBody3D.new()
+	body.position = _vec(c.get("at", [0,0,0]))
+	body.rotation_degrees = _vec(c.get("rotation", [0,0,0]))
+	var shape: Shape3D
+	if c.has("points"):
+		var convex := ConvexPolygonShape3D.new()
+		var points := PackedVector3Array()
+		for p in c.points: points.append(_vec(p))
+		convex.points = points
+		shape = convex
+	else:
+		var box := BoxShape3D.new()
+		box.size = _vec(c.size)
+		shape = box
+	var collision := CollisionShape3D.new()
+	collision.shape = shape
+	body.add_child(collision)
+	container.add_child(body)
+
+func set_bench_door_open(open: bool) -> void:
+	if not layout.has("door"): return
+	var names: Array = [layout.door.module]
+	names.append_array(layout.door.get("companions", []))
+	for name in names:
+		var door := get_node_or_null(str(name)) as Node3D
+		if door: door.rotation.y = deg_to_rad(float(layout.door.open_yaw_degrees)) if open else deg_to_rad(float(layout.door.get("closed_yaw_degrees", 0.0)))
 
 func _set_material(node: Node, mat: Material) -> void:
 	if node is MeshInstance3D:

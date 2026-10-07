@@ -1,0 +1,853 @@
+{
+  "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+  "checks": [
+    {
+      "details": null,
+      "name": "Default Avatar fixture assembles",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Bench route/probe schema",
+      "passed": true
+    },
+    {
+      "details": 0.0900000035762787,
+      "name": "Spawn stands on authored floor",
+      "passed": true
+    },
+    {
+      "details": "(-2.5, 0.09, 1.29)",
+      "name": "Spawn capsule clear",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.32765078544617,
+          0.0899347364902496,
+          1.25553023815155
+        ],
+        "from": [
+          -2.5,
+          0.0900000035762787,
+          1.28999996185303
+        ],
+        "name": "blue door",
+        "reached": true,
+        "remaining_m": 0.079809345304966,
+        "seconds": 0.003,
+        "target": [
+          -2.25,
+          0.0799999982118607,
+          1.24000000953674
+        ]
+      },
+      "name": "Route: blue door",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -0.921619832515717,
+          0.0899355337023735,
+          0.460496962070465
+        ],
+        "from": [
+          -2.32765078544617,
+          0.0899347364902496,
+          1.25553023815155
+        ],
+        "name": "counter front",
+        "reached": true,
+        "remaining_m": 0.0828741043806076,
+        "seconds": 0.347,
+        "target": [
+          -0.850000023841858,
+          0.0799999982118607,
+          0.419999986886978
+        ]
+      },
+      "name": "Route: counter front",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.31618237495422,
+          0.0899377390742302,
+          0.64154052734375
+        ],
+        "from": [
+          -0.921619832515717,
+          0.0899355337023735,
+          0.460496962070465
+        ],
+        "name": "packing west",
+        "reached": true,
+        "remaining_m": 0.0927538722753525,
+        "seconds": 0.005,
+        "target": [
+          -1.39999997615814,
+          0.0799999982118607,
+          0.680000007152557
+        ]
+      },
+      "name": "Route: packing west",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.37663125991821,
+          0.0899270102381706,
+          2.51556587219238
+        ],
+        "from": [
+          -1.31618237495422,
+          0.0899377390742302,
+          0.64154052734375
+        ],
+        "name": "table southwest",
+        "reached": true,
+        "remaining_m": 0.104958839714527,
+        "seconds": 0.532,
+        "target": [
+          -1.37999999523163,
+          0.0799999982118607,
+          2.61999988555908
+        ]
+      },
+      "name": "Route: table southwest",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.224742442369461,
+          0.0899334922432899,
+          2.69172167778015
+        ],
+        "from": [
+          -1.37663125991821,
+          0.0899270102381706,
+          2.51556587219238
+        ],
+        "name": "table front",
+        "reached": true,
+        "remaining_m": 0.0763603746891022,
+        "seconds": 0.45,
+        "target": [
+          0.300000011920929,
+          0.0799999982118607,
+          2.70000004768372
+        ]
+      },
+      "name": "Route: table front",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.96578538417816,
+          0.0899357050657272,
+          2.65192532539368
+        ],
+        "from": [
+          0.224742442369461,
+          0.0899334922432899,
+          2.69172167778015
+        ],
+        "name": "table southeast",
+        "reached": true,
+        "remaining_m": 0.0848205089569092,
+        "seconds": 0.483,
+        "target": [
+          2.04999995231628,
+          0.0799999982118607,
+          2.65000009536743
+        ]
+      },
+      "name": "Route: table southeast",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          2.01834893226624,
+          0.0899320915341377,
+          0.420097053050995
+        ],
+        "from": [
+          1.96578538417816,
+          0.0899357050657272,
+          2.65192532539368
+        ],
+        "name": "mailbox approach",
+        "reached": true,
+        "remaining_m": 0.0708164572715759,
+        "seconds": 0.617,
+        "target": [
+          2.01999998092651,
+          0.0799999982118607,
+          0.349999994039536
+        ]
+      },
+      "name": "Route: mailbox approach",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          2.32453536987305,
+          0.0899355486035347,
+          -0.521675109863281
+        ],
+        "from": [
+          2.01834893226624,
+          0.0899320915341377,
+          0.420097053050995
+        ],
+        "name": "red mailbox",
+        "reached": true,
+        "remaining_m": 0.0829575210809708,
+        "seconds": 0.283,
+        "target": [
+          2.34999990463257,
+          0.0799999982118607,
+          -0.600000023841858
+        ]
+      },
+      "name": "Route: red mailbox",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.596360206604,
+          0.0898880958557129,
+          -1.28121221065521
+        ],
+        "from": [
+          2.32453536987305,
+          0.0899355486035347,
+          -0.521675109863281
+        ],
+        "name": "parcel shelf",
+        "reached": true,
+        "remaining_m": 0.0820381641387939,
+        "seconds": 0.3,
+        "target": [
+          1.53999996185303,
+          0.0799999982118607,
+          -1.3400000333786
+        ]
+      },
+      "name": "Route: parcel shelf",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/PostOfficeArt/postal_counter/@StaticBody3D@29"
+        ],
+        "final": [
+          -0.850000023841858,
+          0.0760435312986374,
+          0.0747762024402618
+        ],
+        "from": [
+          -0.850000023841858,
+          0.0900000035762787,
+          0.469999998807907
+        ],
+        "reached": false,
+        "remaining_m": 0.614934623241425,
+        "seconds": 0.867,
+        "target": [
+          -0.850000023841858,
+          0.0900000035762787,
+          -0.540000021457672
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/PostOfficeArt/postal_counter/@StaticBody3D@29"
+      },
+      "name": "Blocked: counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/PostOfficeArt/packing_table/@StaticBody3D@33"
+        ],
+        "final": [
+          1.86254954338074,
+          0.0801731795072556,
+          1.60430908203125
+        ],
+        "from": [
+          2.04999995231628,
+          0.0900000035762787,
+          1.60000002384186
+        ],
+        "reached": false,
+        "remaining_m": 1.55299091339111,
+        "seconds": 0.867,
+        "target": [
+          0.310000002384186,
+          0.0900000035762787,
+          1.63999998569489
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/PostOfficeArt/packing_table/@StaticBody3D@33"
+      },
+      "name": "Blocked: packing table",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/PostOfficeArt/red_post_box/@StaticBody3D@27"
+        ],
+        "final": [
+          2.82681274414062,
+          0.0723652690649033,
+          0.59808212518692
+        ],
+        "from": [
+          2.54999995231628,
+          0.0900000035762787,
+          1.0
+        ],
+        "reached": false,
+        "remaining_m": 0.617640316486359,
+        "seconds": 0.866,
+        "target": [
+          2.98000001907349,
+          0.0900000035762787,
+          0.0
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/PostOfficeArt/red_post_box/@StaticBody3D@27"
+      },
+      "name": "Blocked: red mailbox",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/PostOfficeArt/mail_sacks/@StaticBody3D@37"
+        ],
+        "final": [
+          2.0699999332428,
+          0.0899336859583855,
+          -1.62999999523163
+        ],
+        "from": [
+          2.0699999332428,
+          0.0900000035762787,
+          -1.37999999523163
+        ],
+        "reached": false,
+        "remaining_m": 0.489999890327454,
+        "seconds": 0.867,
+        "target": [
+          2.0699999332428,
+          0.0900000035762787,
+          -2.11999988555908
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/PostOfficeArt/mail_sacks/@StaticBody3D@37"
+      },
+      "name": "Blocked: mailbags",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/PostOfficeArt/parcel_shelves/@StaticBody3D@31",
+          "/root/SceneBenchmark/PostOfficeArt/mail_sacks/@StaticBody3D@37"
+        ],
+        "final": [
+          1.37053322792053,
+          0.0901938378810883,
+          -2.036372423172
+        ],
+        "from": [
+          1.32473540306091,
+          0.0801508501172066,
+          -2.06336617469788
+        ],
+        "reached": false,
+        "remaining_m": 0.901755630970001,
+        "seconds": 0.883,
+        "target": [
+          2.08999991416931,
+          0.0900000035762787,
+          -2.57999992370605
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/PostOfficeArt/parcel_shelves/@StaticBody3D@31"
+      },
+      "name": "Blocked: parcel shelf",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.95499992370605,
+          0.0723652616143227,
+          -1.5
+        ],
+        "from": [
+          -2.82999992370605,
+          0.0900000035762787,
+          -1.5
+        ],
+        "reached": false,
+        "remaining_m": 0.945164680480957,
+        "seconds": 0.866,
+        "target": [
+          -3.90000009536743,
+          0.0900000035762787,
+          -1.5
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/PostOfficeArt/room_shell/@StaticBody3D@5"
+      },
+      "name": "Blocked: west wall",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          3.11249995231628,
+          0.0800789371132851,
+          0.600000023841858
+        ],
+        "from": [
+          2.79999995231628,
+          0.0900000035762787,
+          0.600000023841858
+        ],
+        "reached": false,
+        "remaining_m": 0.787562608718872,
+        "seconds": 0.866,
+        "target": [
+          3.90000009536743,
+          0.0900000035762787,
+          0.600000023841858
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/PostOfficeArt/room_shell/@StaticBody3D@13"
+      },
+      "name": "Blocked: east edge",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.60000002384186,
+          0.0723652690649033,
+          2.81521987915039
+        ],
+        "from": [
+          1.60000002384186,
+          0.0900000035762787,
+          2.67000007629395
+        ],
+        "reached": false,
+        "remaining_m": 0.884955883026123,
+        "seconds": 0.867,
+        "target": [
+          1.60000002384186,
+          0.0900000035762787,
+          3.70000004768372
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/PostOfficeArt/room_shell/@StaticBody3D@15"
+      },
+      "name": "Blocked: front edge",
+      "passed": true
+    },
+    {
+      "details": {
+        "authored_width": 1.15,
+        "measured_m": 1.15000003576279,
+        "minimum_m": 0.8
+      },
+      "name": "Gap width: packing counter aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.60144627094269,
+          0.0899315699934959,
+          0.400000005960464
+        ],
+        "from": [
+          -1.37999999523163,
+          0.0900000035762787,
+          0.400000005960464
+        ],
+        "reached": true,
+        "remaining_m": 0.0685537233948708,
+        "seconds": 0.833,
+        "target": [
+          1.66999995708466,
+          0.0900000035762787,
+          0.400000005960464
+        ]
+      },
+      "name": "Traverse: packing counter aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "entry": {
+          "collisions": [],
+          "final": [
+            -2.56748127937317,
+            0.0899312198162079,
+            1.28999996185303
+          ],
+          "from": [
+            -3.67358899116516,
+            0.0899336710572243,
+            1.28999996185303
+          ],
+          "reached": true,
+          "remaining_m": 0.0674813166260719,
+          "seconds": 0.317,
+          "target": [
+            -2.5,
+            0.0900000035762787,
+            1.28999996185303
+          ]
+        },
+        "exit": {
+          "collisions": [],
+          "final": [
+            -3.67358899116516,
+            0.0899336710572243,
+            1.28999996185303
+          ],
+          "from": [
+            -2.5,
+            0.0900000035762787,
+            1.28999996185303
+          ],
+          "reached": true,
+          "remaining_m": 0.0764110386371613,
+          "seconds": 0.35,
+          "target": [
+            -3.75,
+            0.0900000035762787,
+            1.28999996185303
+          ]
+        }
+      },
+      "name": "Entrance gap allows exit and reentry",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "delta": [
+          -0.124524593353271,
+          -0.000201962888240814,
+          1.09330368041992
+        ],
+        "wall_torso_ray": {
+          "collider": "/root/SceneBenchmark/PostOfficeArt/room_shell/@StaticBody3D@5",
+          "distance_m": 0.235475540161133
+        }
+      },
+      "name": "Diagonal collision preserves wall sliding",
+      "passed": true
+    },
+    {
+      "details": [
+        "run",
+        0.15,
+        0.316666666666667
+      ],
+      "name": "Run animation advances in rendered viewport",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Input release stops horizontal motion",
+      "passed": true
+    },
+    {
+      "details": "idle",
+      "name": "Release returns to idle",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Focus loss cancels movement",
+      "passed": true
+    },
+    {
+      "details": 1.74549426138401,
+      "name": "Fixture head-top height measurable",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 1.33486545991422,
+        "difference": 0.0128755364806868,
+        "height": 2.3,
+        "ratio_to_H": 1.31767835098829,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: door",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.660271434571305,
+        "difference": 0.136659436008677,
+        "height": 1.31,
+        "ratio_to_H": 0.750503756432459,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.392438987142164,
+        "difference": 0.138686131386861,
+        "height": 0.59,
+        "ratio_to_H": 0.338013142210039,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: chair",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.650245621031176,
+        "difference": 0.105726872246696,
+        "height": 1.015,
+        "ratio_to_H": 0.581497185327439,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: table",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "renderer": "mobile",
+  "route": [
+    {
+      "collisions": [],
+      "final": [
+        -2.32765078544617,
+        0.0899347364902496,
+        1.25553023815155
+      ],
+      "from": [
+        -2.5,
+        0.0900000035762787,
+        1.28999996185303
+      ],
+      "name": "blue door",
+      "reached": true,
+      "remaining_m": 0.079809345304966,
+      "seconds": 0.003,
+      "target": [
+        -2.25,
+        0.0799999982118607,
+        1.24000000953674
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -0.921619832515717,
+        0.0899355337023735,
+        0.460496962070465
+      ],
+      "from": [
+        -2.32765078544617,
+        0.0899347364902496,
+        1.25553023815155
+      ],
+      "name": "counter front",
+      "reached": true,
+      "remaining_m": 0.0828741043806076,
+      "seconds": 0.347,
+      "target": [
+        -0.850000023841858,
+        0.0799999982118607,
+        0.419999986886978
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -1.31618237495422,
+        0.0899377390742302,
+        0.64154052734375
+      ],
+      "from": [
+        -0.921619832515717,
+        0.0899355337023735,
+        0.460496962070465
+      ],
+      "name": "packing west",
+      "reached": true,
+      "remaining_m": 0.0927538722753525,
+      "seconds": 0.005,
+      "target": [
+        -1.39999997615814,
+        0.0799999982118607,
+        0.680000007152557
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -1.37663125991821,
+        0.0899270102381706,
+        2.51556587219238
+      ],
+      "from": [
+        -1.31618237495422,
+        0.0899377390742302,
+        0.64154052734375
+      ],
+      "name": "table southwest",
+      "reached": true,
+      "remaining_m": 0.104958839714527,
+      "seconds": 0.532,
+      "target": [
+        -1.37999999523163,
+        0.0799999982118607,
+        2.61999988555908
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        0.224742442369461,
+        0.0899334922432899,
+        2.69172167778015
+      ],
+      "from": [
+        -1.37663125991821,
+        0.0899270102381706,
+        2.51556587219238
+      ],
+      "name": "table front",
+      "reached": true,
+      "remaining_m": 0.0763603746891022,
+      "seconds": 0.45,
+      "target": [
+        0.300000011920929,
+        0.0799999982118607,
+        2.70000004768372
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        1.96578538417816,
+        0.0899357050657272,
+        2.65192532539368
+      ],
+      "from": [
+        0.224742442369461,
+        0.0899334922432899,
+        2.69172167778015
+      ],
+      "name": "table southeast",
+      "reached": true,
+      "remaining_m": 0.0848205089569092,
+      "seconds": 0.483,
+      "target": [
+        2.04999995231628,
+        0.0799999982118607,
+        2.65000009536743
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        2.01834893226624,
+        0.0899320915341377,
+        0.420097053050995
+      ],
+      "from": [
+        1.96578538417816,
+        0.0899357050657272,
+        2.65192532539368
+      ],
+      "name": "mailbox approach",
+      "reached": true,
+      "remaining_m": 0.0708164572715759,
+      "seconds": 0.617,
+      "target": [
+        2.01999998092651,
+        0.0799999982118607,
+        0.349999994039536
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        2.32453536987305,
+        0.0899355486035347,
+        -0.521675109863281
+      ],
+      "from": [
+        2.01834893226624,
+        0.0899320915341377,
+        0.420097053050995
+      ],
+      "name": "red mailbox",
+      "reached": true,
+      "remaining_m": 0.0829575210809708,
+      "seconds": 0.283,
+      "target": [
+        2.34999990463257,
+        0.0799999982118607,
+        -0.600000023841858
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        1.596360206604,
+        0.0898880958557129,
+        -1.28121221065521
+      ],
+      "from": [
+        2.32453536987305,
+        0.0899355486035347,
+        -0.521675109863281
+      ],
+      "name": "parcel shelf",
+      "reached": true,
+      "remaining_m": 0.0820381641387939,
+      "seconds": 0.3,
+      "target": [
+        1.53999996185303,
+        0.0799999982118607,
+        -1.3400000333786
+      ]
+    }
+  ],
+  "scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+  "slug": "post_office"
+}

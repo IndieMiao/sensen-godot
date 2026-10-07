@@ -1,0 +1,19 @@
+{
+  "door": {
+    "kit": "postal_blue_door",
+    "name": "Blue door panel",
+    "clear_height": true
+  },
+  "counter": {
+    "kit": "postal_counter",
+    "name": "Counter thick oak top"
+  },
+  "chair": {
+    "kit": "packing_stool",
+    "name": "Round stool seat"
+  },
+  "table": {
+    "kit": "packing_table",
+    "name": "Workbench top plank"
+  }
+}

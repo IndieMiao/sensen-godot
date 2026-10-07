@@ -10,255 +10,231 @@
   "assets": [
     {
       "name": "room_shell",
-      "vertices": 4912,
-      "triangles": 9476,
+      "vertices": 8776,
+      "triangles": 16928,
       "surfaces": 1,
-      "bytes": 338468
+      "bytes": 583856
     },
     {
       "name": "window_wall",
       "vertices": 888,
       "triangles": 1728,
       "surfaces": 1,
-      "bytes": 61380
+      "bytes": 59460
     },
     {
       "name": "back_wall",
       "vertices": 584,
       "triangles": 1132,
       "surfaces": 1,
-      "bytes": 40680
+      "bytes": 39204
     },
     {
       "name": "postal_blue_door",
-      "vertices": 758,
-      "triangles": 1460,
+      "vertices": 254,
+      "triangles": 488,
       "surfaces": 1,
-      "bytes": 54696
+      "bytes": 19228
     },
     {
       "name": "sorting_cabinet",
-      "vertices": 952,
-      "triangles": 1836,
+      "vertices": 1016,
+      "triangles": 1956,
       "surfaces": 1,
-      "bytes": 66808
-    },
-    {
-      "name": "mail_stack",
-      "vertices": 336,
-      "triangles": 648,
-      "surfaces": 1,
-      "bytes": 24468
+      "bytes": 70984
     },
     {
       "name": "red_post_box",
       "vertices": 1102,
       "triangles": 2172,
       "surfaces": 1,
-      "bytes": 74292
+      "bytes": 72980
     },
     {
       "name": "world_map",
       "vertices": 350,
       "triangles": 656,
       "surfaces": 1,
-      "bytes": 28028
+      "bytes": 27388
     },
     {
       "name": "wall_clock",
       "vertices": 328,
       "triangles": 592,
       "surfaces": 1,
-      "bytes": 30656
-    },
-    {
-      "name": "post_office_sign",
-      "vertices": 2580,
-      "triangles": 4436,
-      "surfaces": 1,
-      "bytes": 390260
+      "bytes": 30016
     },
     {
       "name": "postal_counter",
       "vertices": 1120,
       "triangles": 2160,
       "surfaces": 1,
-      "bytes": 78352
-    },
-    {
-      "name": "counter_computer",
-      "vertices": 952,
-      "triangles": 1836,
-      "surfaces": 1,
-      "bytes": 66812
-    },
-    {
-      "name": "counter_bell",
-      "vertices": 144,
-      "triangles": 280,
-      "surfaces": 1,
-      "bytes": 11004
-    },
-    {
-      "name": "counter_stamps",
-      "vertices": 248,
-      "triangles": 468,
-      "surfaces": 1,
-      "bytes": 21604
-    },
-    {
-      "name": "counter_mail_tray",
-      "vertices": 3547,
-      "triangles": 6826,
-      "surfaces": 1,
-      "bytes": 247456
+      "bytes": 75792
     },
     {
       "name": "parcel_shelves",
       "vertices": 392,
       "triangles": 756,
       "surfaces": 1,
-      "bytes": 28320
-    },
-    {
-      "name": "brown_parcel",
-      "vertices": 504,
-      "triangles": 972,
-      "surfaces": 1,
-      "bytes": 36016
-    },
-    {
-      "name": "blue_parcel",
-      "vertices": 504,
-      "triangles": 972,
-      "surfaces": 1,
-      "bytes": 36016
-    },
-    {
-      "name": "mail_sacks",
-      "vertices": 1658,
-      "triangles": 3220,
-      "surfaces": 1,
-      "bytes": 109920
+      "bytes": 27424
     },
     {
       "name": "packing_table",
       "vertices": 672,
       "triangles": 1296,
       "surfaces": 1,
-      "bytes": 47564
-    },
-    {
-      "name": "packing_mat",
-      "vertices": 56,
-      "triangles": 108,
-      "surfaces": 1,
-      "bytes": 5216
-    },
-    {
-      "name": "packing_parcel",
-      "vertices": 504,
-      "triangles": 972,
-      "surfaces": 1,
-      "bytes": 36020
-    },
-    {
-      "name": "postal_scale",
-      "vertices": 200,
-      "triangles": 384,
-      "surfaces": 1,
-      "bytes": 15652
-    },
-    {
-      "name": "packing_supplies",
-      "vertices": 1020,
-      "triangles": 1976,
-      "surfaces": 1,
-      "bytes": 86516
-    },
-    {
-      "name": "desk_airmail",
-      "vertices": 280,
-      "triangles": 540,
-      "surfaces": 1,
-      "bytes": 20620
-    },
-    {
-      "name": "underdesk_boxes",
-      "vertices": 4368,
-      "triangles": 8424,
-      "surfaces": 1,
-      "bytes": 301520
+      "bytes": 46028
     },
     {
       "name": "packing_stool",
       "vertices": 96,
       "triangles": 176,
       "surfaces": 1,
-      "bytes": 9860
+      "bytes": 9604
     },
     {
-      "name": "entry_rug",
-      "vertices": 408,
-      "triangles": 732,
+      "name": "postal_door_frame",
+      "vertices": 168,
+      "triangles": 324,
       "surfaces": 1,
-      "bytes": 34032
+      "bytes": 12548
     },
     {
-      "name": "packing_rug",
-      "vertices": 344,
-      "triangles": 636,
+      "name": "postal_door_glass",
+      "vertices": 336,
+      "triangles": 648,
       "surfaces": 1,
-      "bytes": 27340
+      "bytes": 23704
     },
     {
-      "name": "floor_plant",
-      "vertices": 571,
-      "triangles": 1078,
+      "name": "counter_computer",
+      "vertices": 1960,
+      "triangles": 3780,
       "surfaces": 1,
-      "bytes": 47220
+      "bytes": 131576
     },
     {
-      "name": "counter_plant",
-      "vertices": 1514,
-      "triangles": 2868,
+      "name": "post_office_sign",
+      "vertices": 5386,
+      "triangles": 8236,
       "surfaces": 1,
-      "bytes": 122120
+      "bytes": 690564
     },
     {
-      "name": "cabinet_plant",
-      "vertices": 1514,
-      "triangles": 2868,
+      "name": "sorted_letters",
+      "vertices": 31140,
+      "triangles": 59880,
       "surfaces": 1,
-      "bytes": 122116
+      "bytes": 2093356
     },
     {
-      "name": "parcel_shelf_plant",
-      "vertices": 1514,
-      "triangles": 2868,
+      "name": "parcel_shelf_stock",
+      "vertices": 5068,
+      "triangles": 9724,
       "surfaces": 1,
-      "bytes": 122128
+      "bytes": 356960
     },
     {
-      "name": "door_notice",
-      "vertices": 544,
-      "triangles": 1040,
+      "name": "mail_sacks",
+      "vertices": 2578,
+      "triangles": 4980,
       "surfaces": 1,
-      "bytes": 43432
+      "bytes": 171172
     },
     {
-      "name": "door_light",
-      "vertices": 200,
-      "triangles": 368,
+      "name": "counter_bell",
+      "vertices": 328,
+      "triangles": 644,
       "surfaces": 1,
-      "bytes": 17984
+      "bytes": 21612
+    },
+    {
+      "name": "magazine_rack",
+      "vertices": 5119,
+      "triangles": 9846,
+      "surfaces": 1,
+      "bytes": 344540
+    },
+    {
+      "name": "door_lamp_glow",
+      "vertices": 222,
+      "triangles": 440,
+      "surfaces": 1,
+      "bytes": 13108
+    },
+    {
+      "name": "blue_entry_mat",
+      "vertices": 168,
+      "triangles": 324,
+      "surfaces": 1,
+      "bytes": 12540
+    },
+    {
+      "name": "corner_letter_crate",
+      "vertices": 4066,
+      "triangles": 7824,
+      "surfaces": 1,
+      "bytes": 273544
+    },
+    {
+      "name": "front_floor_runner",
+      "vertices": 168,
+      "triangles": 324,
+      "surfaces": 1,
+      "bytes": 12548
+    },
+    {
+      "name": "counter_dressing",
+      "vertices": 4146,
+      "triangles": 7968,
+      "surfaces": 1,
+      "bytes": 282100
+    },
+    {
+      "name": "wall_dressing",
+      "vertices": 1392,
+      "triangles": 2684,
+      "surfaces": 1,
+      "bytes": 95596
+    },
+    {
+      "name": "packing_dressing",
+      "vertices": 8069,
+      "triangles": 15570,
+      "surfaces": 1,
+      "bytes": 560456
     }
   ],
-  "unique_triangles": 67960,
-  "scene_triangles": 78004,
-  "static_draw_surfaces": 49,
-  "glb_bytes": 2804576,
-  "atlas_bytes": 2576486,
-  "placed_instances": 49,
-  "materials": 1
+  "unique_triangles": 163236,
+  "scene_triangles": 172218,
+  "static_draw_surfaces": 34,
+  "glb_bytes": 6157888,
+  "atlas_bytes": 2155957,
+  "placed_instances": 34,
+  "materials": 2,
+  "local_scene_triangles": 163236,
+  "shared_scene_triangles": 8982,
+  "shared_assets": [
+    {
+      "name": "peace_lily",
+      "vertices": 620,
+      "triangles": 946,
+      "surfaces": 1,
+      "bytes": 26780
+    },
+    {
+      "name": "pothos",
+      "vertices": 1670,
+      "triangles": 2048,
+      "surfaces": 1,
+      "bytes": 67012
+    }
+  ],
+  "plant_budget_triangles": 8982,
+  "budget_limits": {
+    "placed_triangles": 200000,
+    "plant_triangles": 100000,
+    "static_surfaces": 60
+  },
+  "budget_passed": true
 }

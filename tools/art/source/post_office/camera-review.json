@@ -1,0 +1,32 @@
+{
+  "method": "Three visible plinth-edge intersections,1544square reference contained without warp;edge slopes and mean scale,hidden fourth inferred.",
+  "anchors": {
+    "left": [
+      256.2435233160622,
+      735.1554404145078
+    ],
+    "front": [
+      722.7979274611399,
+      1015.6476683937824
+    ],
+    "right": [
+      1197.0466321243525,
+      744.2487046632125
+    ]
+  },
+  "pitch_degrees": 35.913067280929084,
+  "yaw_degrees": 45.706289855175946,
+  "camera": {
+    "position": [
+      10.73654100751163,
+      13.191920594830878,
+      10.475050701262555
+    ],
+    "target": [
+      0,
+      2.3285169667382886,
+      0
+    ],
+    "size": 14.474629114063505
+  }
+}

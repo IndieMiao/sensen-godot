@@ -1,0 +1,46 @@
+{
+  "method": "Orthographic rays from exact runtime camera/pixels against evaluated Blender source",
+  "faces": [
+    {
+      "name": "left_plaster",
+      "hit_object": "Cream plaster infill",
+      "material": "F2C6B2_plaster_X",
+      "location": [
+        -3.2099997997283936,
+        3.1724352836608887,
+        1.2778043746948242
+      ]
+    },
+    {
+      "name": "back_plaster",
+      "hit_object": "Cream plaster infill.001",
+      "material": "plaster_plaster_X.001",
+      "location": [
+        1.9256954193115234,
+        3.071298122406006,
+        -2.9099998474121094
+      ]
+    },
+    {
+      "name": "mahogany_post",
+      "hit_object": "Upright oak timber",
+      "material": "oak_wood_Y.001",
+      "location": [
+        -3.089999198913574,
+        1.7170253992080688,
+        2.9396543502807617
+      ]
+    },
+    {
+      "name": "floor",
+      "hit_object": "Narrow mahogany floorboard.103",
+      "material": "floor_shade_wood_X.001",
+      "location": [
+        2.4002389907836914,
+        0.08250026404857635,
+        1.0497890710830688
+      ]
+    }
+  ],
+  "limits": "Verifies source surface identities only, not the runtime lit RGB."
+}
