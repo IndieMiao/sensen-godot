@@ -115,7 +115,7 @@
 				"name": "pickup",
 				"reached": true,
 				"remaining_m": 0.101233571767807,
-				"seconds": 0.417,
+				"seconds": 0.418,
 				"target": [
 					2.09999990463257,
 					0.0599999986588955,
@@ -141,7 +141,7 @@
 				"name": "return_counter",
 				"reached": true,
 				"remaining_m": 0.0754704996943474,
-				"seconds": 0.534,
+				"seconds": 0.533,
 				"target": [
 					0.0,
 					0.0599999986588955,
@@ -167,7 +167,7 @@
 				"name": "bench_approach",
 				"reached": true,
 				"remaining_m": 0.0874886438250542,
-				"seconds": 0.616,
+				"seconds": 0.617,
 				"target": [
 					0.0,
 					0.0599999986588955,
@@ -193,7 +193,7 @@
 				"name": "bench_front",
 				"reached": true,
 				"remaining_m": 0.0802352130413055,
-				"seconds": 0.408,
+				"seconds": 0.4,
 				"target": [
 					-1.5,
 					0.0599999986588955,
@@ -219,7 +219,7 @@
 				"name": "center_return",
 				"reached": true,
 				"remaining_m": 0.0655326917767525,
-				"seconds": 0.376,
+				"seconds": 0.383,
 				"target": [
 					0.0,
 					0.0599999986588955,
@@ -257,7 +257,9 @@
 		},
 		{
 			"details": {
-				"collisions": [],
+				"collisions": [
+					"/root/SceneBenchmark/MilkTeaShopArt/service_counter/Collider"
+				],
 				"final": [
 					-1.94350636005402,
 					0.0599344223737717,
@@ -288,7 +290,7 @@
 				],
 				"final": [
 					0.0,
-					0.0430923849344254,
+					0.0501731783151627,
 					-0.962499856948853
 				],
 				"from": [
@@ -297,8 +299,8 @@
 					-0.649999976158142
 				],
 				"reached": false,
-				"remaining_m": 0.837670743465424,
-				"seconds": 0.883,
+				"remaining_m": 0.837557733058929,
+				"seconds": 0.867,
 				"target": [
 					0.0,
 					0.0599999986588955,
@@ -326,7 +328,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.623744010925293,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					-2.01999998092651,
 					0.0599999986588955,
@@ -339,7 +341,9 @@
 		},
 		{
 			"details": {
-				"collisions": [],
+				"collisions": [
+					"/root/SceneBenchmark/MilkTeaShopArt/pastel_bench/Collider"
+				],
 				"final": [
 					-1.79999995231628,
 					0.0500789284706116,
@@ -352,7 +356,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.654609560966492,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					-1.79999995231628,
 					0.0599999986588955,
@@ -380,7 +384,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.749176144599915,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					-1.45000004768372,
 					0.0599999986588955,
@@ -435,7 +439,7 @@
 				],
 				"reached": false,
 				"remaining_m": 1.00369620323181,
-				"seconds": 0.882,
+				"seconds": 0.875,
 				"target": [
 					2.20000004768372,
 					0.0599999986588955,
@@ -452,7 +456,7 @@
 				],
 				"final": [
 					-2.8511917591095,
-					0.0423652678728104,
+					0.0500789284706116,
 					1.29999995231628
 				],
 				"from": [
@@ -461,8 +465,8 @@
 					1.29999995231628
 				],
 				"reached": false,
-				"remaining_m": 0.6490478515625,
-				"seconds": 0.867,
+				"remaining_m": 0.648884117603302,
+				"seconds": 0.882,
 				"target": [
 					-3.5,
 					0.0599999986588955,
@@ -490,7 +494,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.741145074367523,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					0.150000005960464,
 					-0.180000007152557,
@@ -525,7 +529,7 @@
 				],
 				"reached": true,
 				"remaining_m": 0.0837888345122337,
-				"seconds": 0.599,
+				"seconds": 0.6,
 				"target": [
 					0.0,
 					0.0599999986588955,
@@ -559,7 +563,7 @@
 				],
 				"reached": true,
 				"remaining_m": 0.0837892517447472,
-				"seconds": 0.865,
+				"seconds": 0.866,
 				"target": [
 					1.79999995231628,
 					0.0599999986588955,
@@ -582,9 +586,9 @@
 			"details": {
 				"collisions": [],
 				"final": [
-					0.15000008046627,
-					0.047677855938673,
-					3.10516571998596
+					0.150000050663948,
+					0.0211785081773996,
+					3.15172433853149
 				],
 				"from": [
 					0.150000005960464,
@@ -592,8 +596,8 @@
 					2.09999990463257
 				],
 				"reached": true,
-				"remaining_m": 0.25065404176712,
-				"seconds": 0.299,
+				"remaining_m": 0.209448933601379,
+				"seconds": 0.316,
 				"target": [
 					0.150000005960464,
 					-0.180000007152557,
@@ -666,8 +670,8 @@
 		{
 			"details": [
 				"run",
-				0.15,
-				0.317692777777778
+				0.150321111111111,
+				0.316987777777778
 			],
 			"name": "Run animation advances in rendered viewport",
 			"passed": true
@@ -688,16 +692,16 @@
 			"passed": true
 		},
 		{
-			"details": 1.74549420922995,
+			"details": 1.74549420177937,
 			"name": "Fixture head-top height measurable",
 			"passed": true
 		},
 		{
 			"details": {
-				"baseline_ratio": 1.334865499799,
+				"baseline_ratio": 1.33486550549683,
 				"difference": 0.128755364806867,
 				"height": 2.63,
-				"ratio_to_H": 1.50673659419373,
+				"ratio_to_H": 1.50673660062518,
 				"reason": ""
 			},
 			"name": "Scale ±15%: door",
@@ -705,10 +709,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.660271454299722,
+				"baseline_ratio": 0.660271457118068,
 				"difference": 0.0416485900216919,
 				"height": 1.2005,
-				"ratio_to_H": 0.687770829402877,
+				"ratio_to_H": 0.687770832338603,
 				"reason": ""
 			},
 			"name": "Scale ±15%: counter",
@@ -716,10 +720,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.392438998867948,
+				"baseline_ratio": 0.39243900054306,
 				"difference": 0.0126277372262773,
 				"height": 0.69365,
-				"ratio_to_H": 0.397394615422995,
+				"ratio_to_H": 0.39739461711926,
 				"reason": ""
 			},
 			"name": "Scale ±15%: chair",
@@ -727,10 +731,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.65024564046003,
+				"baseline_ratio": 0.650245643235581,
 				"difference": 0.0766519823788546,
 				"height": 1.048,
-				"ratio_to_H": 0.600403023085561,
+				"ratio_to_H": 0.60040302564836,
 				"reason": ""
 			},
 			"name": "Scale ±15%: table",
@@ -738,7 +742,7 @@
 		}
 	],
 	"passed": true,
-	"pid": 1058482,
+	"pid": 1090052,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -822,7 +826,7 @@
 			"name": "pickup",
 			"reached": true,
 			"remaining_m": 0.101233571767807,
-			"seconds": 0.417,
+			"seconds": 0.418,
 			"target": [
 				2.09999990463257,
 				0.0599999986588955,
@@ -844,7 +848,7 @@
 			"name": "return_counter",
 			"reached": true,
 			"remaining_m": 0.0754704996943474,
-			"seconds": 0.534,
+			"seconds": 0.533,
 			"target": [
 				0.0,
 				0.0599999986588955,
@@ -866,7 +870,7 @@
 			"name": "bench_approach",
 			"reached": true,
 			"remaining_m": 0.0874886438250542,
-			"seconds": 0.616,
+			"seconds": 0.617,
 			"target": [
 				0.0,
 				0.0599999986588955,
@@ -888,7 +892,7 @@
 			"name": "bench_front",
 			"reached": true,
 			"remaining_m": 0.0802352130413055,
-			"seconds": 0.408,
+			"seconds": 0.4,
 			"target": [
 				-1.5,
 				0.0599999986588955,
@@ -910,7 +914,7 @@
 			"name": "center_return",
 			"reached": true,
 			"remaining_m": 0.0655326917767525,
-			"seconds": 0.376,
+			"seconds": 0.383,
 			"target": [
 				0.0,
 				0.0599999986588955,
@@ -940,7 +944,9 @@
 			]
 		},
 		{
-			"collisions": [],
+			"collisions": [
+				"/root/SceneBenchmark/MilkTeaShopArt/service_counter/Collider"
+			],
 			"final": [
 				-1.94350636005402,
 				0.0599344223737717,

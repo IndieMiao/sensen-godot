@@ -1,45 +1,38 @@
-# SGODOT-180 · Milk Tea Shop · 刘备 R1 修订
+# SGODOT-180 · Milk Tea Shop · 刘备 R2
 
-依据原始 Figma `OMLTC3yw3u2WDjOZhLnhaR / 545:2962` 的 1544×1544 reference.png，以及不知火舞两轮评论。179 R2 放行后接入共享植物 R2.1。状态目标为 Review，由美术总监确认效果；不把技术检查视为视觉验收。
+按不知火舞本轮评论及父卡 171 修订。原始参考 Figma `545:2962`，1544×1544；Basic Room 尺度不变，等待视觉复审。
 
-| Review 项 | 本轮处理 |
+| 复审项 | R2 处理 |
 |---|---|
-| 粉桃 / 薰衣草 / 薄荷色板 | 重做粉白错缝长砖、粉米方砖与四角薰衣草菱形；紫粉柱和压顶、薄荷门拱与冷柜；独立暖粉日光配桃色背景。 |
-| 卡座 | 方鼓软包薰衣草长凳，粉/薄荷靠枕。前沿局部矮墙降低，让接受尺度的座面可见，不用抬高座面来掩盖遮挡。 |
-| 桌椅 | 原木框椅配粉坐垫；白色圆桌、木柱脚。桌椅高度按不变的 Basic Room 基线校准。 |
-| 菜单与左墙 | 原菜单英文，加入杯子/珍珠插画并腾出文字栏；薄荷 FRESHLY MADE；圆形奶茶标牌与暖光壁灯、GOOD TEA BRIGHTER DAYS。 |
-| 冷柜 | 薄荷外壳、4 层彩瓶、透明门，顶部两只纸箱与垂吊植物。 |
-| 吧台 | 6 个不同色配料格，透明茶桶罩/内层茶液，糖浆瓶高度轻微变化；薰衣草封口机、收银、花瓶、3 杯取餐架、吸管和糖果罐。 |
-| 植物 | 大龟背竹、两端绿萝、7 簇半球白花与垂藤，保留场景需要的覆盖。 |
-| 入口 | A 字牌、紫色地垫、两级视觉台阶与连续坡道碰撞。 |
+| 招牌缺笔画 P0 | 本场景显式启用附许可证的 Nunito Black 粗圆体，挤出 4mm、离板 5mm；加大 PICK UP 与 A 字牌。文字所有面显式使用图集留边固定色块，避免 K / I 的小 UV 岛串到底板色。全景逐字检查 MILK TEA / GOOD / MOOD、PICK UP、COLD DRINKS，细竖画现在可见。`signage-check.png` 上行是全景原像素，下行仅作 3 倍最近邻检查。小菜单文字保留，但不声称缩略图能读所有价格。 |
+| 卡座被挡 | 前方墙段再次降低，花丛移到端部并缩到相邻花箱尺度。移除挡住座面的连续靠背；不抬高座面，薰衣草分格软垫与粉/薄荷靠枕完整露出。 |
+| 冷灰墙砖、过黄木色 | 粉米色错缝砖分四档颜色，底层砂浆改相近粉米色；吧台面板与取餐柜为去黄、低饱和的粉米浅木。 |
+| 地砖菱形 | 薰衣草方片由 0.115m 扩到 0.1495m，旋转 45°，保留 0.5m 地砖尺寸。 |
+| 冷饮瓶在柜门外 | 重建空腔薄荷冷柜与背板、两侧、四层内架；彩瓶位于玻璃以内，增加低能量冷白柜内灯，玻璃及把手位于最前。 |
+| 叶色 | 使用共享深绿修正 1ec21f9e。植物密度不因预算削减；龟背竹暗部不再泛黄发白。 |
+| 相机对齐 | 三个可见地台边线交点，第四角按平行四边形推定；固定 6.18×5.68m 地台，最小二乘拟合正交相机，不缩放模型、不变形图片。相机与角点数据见 `camera-registration.json/png`。 |
 
-| 预算 | 修订前 | 当前 | 限制 |
-|---|---:|---:|---:|
-| 总摆放三角面 | 150,800 | 154,222 | 200,000 |
-| 植物（含桌花） | 未单独统计 | 40,452 | 100,000 |
-| 静态 surface | 45 | 27 | 60 |
+| 当前预算 | 数量 | 限制 |
+|---|---:|---:|
+| 总摆放三角面 | 176,858 | 200,000 |
+| 全部植物，含桌花 | 40,452 | 100,000 |
+| 静态 surfaces | 27 | 60 |
 
-本场景原件 34 个，含实例共 43 个；共享植物 17 个摆放。按前后装饰、玻璃、花草合并，运行时商品与藤段不产生独立节点；原件 GLB 和命名源对象保留。两张共享 2048 图集（房间 / 全系列植物），mipmap + VRAM 压缩，不向每个 GLB 内嵌纹理。小花、藤蔓和桌花不投影，大盆栽保留投影。`asset_stats.json` / `revision-verification.json` 包含分组与文件大小，实际 Godot 静态 surface 数与预算一致。
+34 个独立可复用原件，43 个房间摆放和 17 个共享植物摆放。装饰、玻璃、花草按组合并；原件 GLB 与命名源对象保留，两张 2048 图集，不嵌入每个 GLB。修复合并器在累计顶点数超过 65,535 时的索引溢出：加偏移前转 uint32，完整实际场景导出和 Godot 载入验证通过。第一版字体曲线过细分曾超预算，现以 2 段曲线保留粗轮廓并控制面数。小花和藤叶不投影；大盆栽保持原投影规则。
 
-对应物理部位 9×9 像素中位数：粉白墙砖色相差 **2.73°**，薰衣草柱 **0.74°**，粉色地砖 **9.16°**。位置见 `colour-samples.json` 与 `colour-patch-comparison.jpg`；只测声明部位，饱和度/亮度另保留，当前墙面仍比原图浅，不能用色相通过宣称全图一致。
+9×9 对应表面取色：墙砖 3.913°、入口薰衣草柱 2.449°、前沿粉瓷地砖 3.429°，均≤10°。新机位重新定位同一物理部位；原参考采样不变。墙面饱和度仍低于参考，完整 RGB/HSV 与位置见取色报告，不以三个样本代替全图视觉验收。
 
-Basic Room 不变，角色 H≈1.7455m：台面 1.2005m、椅面 0.69365m、桌面 1.048m、侧拱净高 2.63m，同类偏差均在 ±15%。源尺寸计算见 `layout.json > bench.scale`；真实测量报告见 `bench-scale-measurements.json`。
+相机拟合的可见角点残差为 35.5 / 33.4 / 35.3px（1400 全景，最大约 2.5%）。设计图地台边长与现有固定地台比例不同，不能在保持比例的同时用单个正交机位完全重合；报告保留此限制。叠图是完整参考和完整实景的 50% 直接混合，没有图像变形。墙高、柜台和桌子的构图仍与插画有差异。
 
-实际 Godot Mobile/Vulkan **39/39 PASS**：入口→桌间→取餐→卡座→冷柜；家具/边界阻挡、入口往返、贴墙滑行、按键/摇杆、idle/run、放手停止。椅间净宽 0.76m、桌与柜台 1.27m、入口 1.85m，物理射线实测。首次缺少依赖脚本的空碰撞失败没有用于交付；刘备自己的适配器已复制装配器依赖，未修改共享 harness 核心。坡道平台延伸到地板边缘外，修复返回入口被地板侧面阻挡的问题。
-
-15 秒原速实际视口录像，按墙钟采集，不加速；8 个时间点解码确认非黑、完整角色与运动。这是桌面美术/行为证据，未做 Android 或物理手机性能验收。
-
-重建（仓库根目录）：
+角色 H≈1.7455m；侧拱净高 2.63m、台面 1.2005m、椅面 0.69365m、桌面 1.048m，均保持已有 ±15% 基线检查。Godot Mobile / Vulkan 最终 **39/39 PASS**：入口、桌间、取餐、卡座、冷柜路线，碰撞、净宽、贴墙滑行、摇杆/按键、动画与松手停止。未修改共享 benchmark 核心。15 秒实际视口原速录像，8 个时间点检查完整角色、非黑画面与运动；这是桌面证据，不是物理手机性能结论。
 
 ```sh
-blender --background --factory-startup --python "$PWD/tools/art/build_milk_tea_shop.py"
-python tools/art/source/coffee_shop/render_r1.py r1 milk_tea_shop
+blender -b -t 8 --python tools/art/build_milk_tea_shop.py
+python tools/art/source/coffee_shop/render_r1.py r2 milk_tea_shop
 python tools/art/source/coffee_shop/run_bench.py milk_tea_shop --record
-output/art-tools/bin/python tools/art/source/coffee_shop/package_series.py milk_tea_shop r1
-output/art-tools/bin/python tools/art/source/coffee_shop/check_series_colour.py milk_tea_shop r1
-output/art-tools/bin/python tools/art/source/coffee_shop/prepare_series_media.py milk_tea_shop r1
+output/art-tools/bin/python tools/art/source/coffee_shop/package_series.py milk_tea_shop r2
+output/art-tools/bin/python tools/art/source/coffee_shop/check_series_colour.py milk_tea_shop r2
+output/art-tools/bin/python tools/art/source/coffee_shop/prepare_series_media.py milk_tea_shop r2
 ```
 
-可编辑源 `tools/art/source/milk_tea_shop/milk_tea_shop.blend`，修订脚本同目录 `revision.py` / `milk_bench.py`，米制 Y-up、各物件保持地面或安装轴心；源中有共享植物实例，运行时独立引用共享图集。生成会覆盖源，手工修改须回填脚本。基础制作脚本保留旧道具，再由修订脚本替换，不改其他人的场景。
-
-待视觉复审的简化：软椅木背比设计图更方；取餐架较窄、糖浆瓶仍较规则；墙和桌面的饱和度较淡；花簇使用共享形态，没有逐叶复刻插画。玻璃用透明材质与内层模型，无昂贵折射。三栏图为完整参考 / 完整运行时 / 50% 直接叠图，未变形配准，布局仍有差异。
+可编辑源 `tools/art/source/milk_tea_shop/milk_tea_shop.blend`；修订脚本 `revision.py`，本系列显式启用的字体与相机工具为 `coffee_shop/liubei_r2.py`，不会修改赵云生成器。米制 Y-up、原局部轴心。生成会覆盖源，手工修改须回填生成器。

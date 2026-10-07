@@ -1,5 +1,38 @@
 [
- {"name":"pink-white brick","surface":"Left interior wall brick between logo and GOOD TEA sign","reference_pixel":[200,670],"runtime_pixel":[151,571]},
- {"name":"lavender pier","surface":"Front-right entrance corner pier, outward front face","reference_pixel":[906,1344],"runtime_pixel":[728,1130]},
- {"name":"pink porcelain floor","surface":"Open front floor between the left seating and entrance","reference_pixel":[669,1046],"runtime_pixel":[498,926]}
+  {
+    "name": "pink-white brick",
+    "surface": "Left interior wall brick between logo and GOOD TEA sign",
+    "reference_pixel": [
+      200,
+      670
+    ],
+    "runtime_pixel": [
+      149,
+      661
+    ]
+  },
+  {
+    "name": "lavender pier",
+    "surface": "Front-right entrance corner pier, outward front face",
+    "reference_pixel": [
+      906,
+      1344
+    ],
+    "runtime_pixel": [
+      778,
+      1202
+    ]
+  },
+  {
+    "name": "pink porcelain floor",
+    "surface": "Open front floor between the left seating and entrance",
+    "reference_pixel": [
+      669,
+      1046
+    ],
+    "runtime_pixel": [
+      495,
+      989
+    ]
+  }
 ]

@@ -37,7 +37,7 @@ def merged(path,placements):
         x,y,z=np.radians(item.get('rotation_degrees',[0,item.get('yaw_degrees',0),0]));cx,sx,cy,sy,cz,sz=math.cos(x),math.sin(x),math.cos(y),math.sin(y),math.cos(z),math.sin(z)
         rot=np.array([[cy,0,sy],[0,1,0],[-sy,0,cy]])@np.array([[1,0,0],[0,cx,-sx],[0,sx,cx]])@np.array([[cz,-sz,0],[sz,cz,0],[0,0,1]])
         scale=np.array(item.get('scale',[1,1,1]));p=(p*scale)@rot.T+item['position'];n=(n/scale)@rot.T;n/=np.linalg.norm(n,axis=1)[:,None]
-        positions.append(p);normals.append(n);uvs.append(uv);indices.append(idx+offset);offset+=len(p)
+        positions.append(p);normals.append(n);uvs.append(uv);indices.append(idx.astype(np.uint32)+offset);offset+=len(p)
     write_glb(path,np.concatenate(positions),np.concatenate(normals),np.concatenate(uvs),np.concatenate(indices))
     return sum(len(x) for x in indices)//3
 

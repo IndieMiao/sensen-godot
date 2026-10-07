@@ -87,6 +87,7 @@ def revise():
     r.recolor('entry_step','C49BCF',lambda o:'mat' in o.name.lower())
     k.CURRENT=k.KITS['entry_step'];cube('Lower rounded entry tread',(0,-.065,.33),(2.06,.13,.65),'F2D9D6',.045)
     polish()
+    revise_r2()
     r.sync_instances()
 
 def polish():
@@ -106,18 +107,62 @@ def polish():
     r.recolor('floor','EDC7B8',lambda o:'large square tile' in o.name)
 
 def manifest():
-    p=k.OUT/'layout.json';d=json.loads(p.read_text());d['revision']='R1'
+    p=k.OUT/'layout.json';d=json.loads(p.read_text());d['revision']='R2'
     plants=[r.plant('MonsteraCorner','monstera',(-2.54,.06,-.54),1.0,20,colliders=[{'at':[0,.28,0],'size':[.57,.56,.57]}])]
     for i,x in enumerate((-2.60,2.64)):
         plants.append(r.plant('WallPothos'+str(i),'pothos',(x,2.70,-2.39),1.15))
-    for i,(x,z) in enumerate(((-2.57,2.61),(-1.01,2.65),(1.40,2.63),(2.07,2.64),(2.72,2.62),(2.92,1.92),(2.93,1.21))):
-        plants.append(r.plant('FlowerBox'+str(i),'flower_shrub',(x,.80,z),.84,yaw=i*29))
-        plants.append(r.plant('FlowerDrape'+str(i),'ivy_short',(x,.95,z+.16),.75,roll=i%3*7))
+    for i,(x,z) in enumerate(((-2.77,1.93),(-.82,2.73),(1.40,2.63),(2.07,2.64),(2.72,2.62),(2.92,1.92),(2.93,1.21))):
+        plants.append(r.plant('FlowerBox'+str(i),'flower_shrub',(x,.80,z),.62 if i<2 else .84,yaw=i*29))
+        plants.append(r.plant('FlowerDrape'+str(i),'ivy_short',(x,.95,z+.16),.56 if i<2 else .75,roll=i%3*7))
     d['shared_plants']=plants
-    d['material_overrides']={'floor':{'roughness':.46},'urn_glass':{'alpha':.12},'fridge_glass':{'alpha':.07}}
-    r.front_entry(d);r.lighting(d,'E3AF96',ambient='C8BFB6',sun='FFE4C3',energy=1.20,lamps=[{'position':[-2.46,2.30,1.27],'color':'FFE1AB','energy':.65,'range':1.6}])
+    d['material_overrides']={'floor':{'roughness':.46},'urn_glass':{'alpha':.12},'fridge_glass':{'alpha':.09}}
+    r.front_entry(d);r.lighting(d,'E3AF96',ambient='C8BFB6',sun='FFE4C3',energy=1.20,lamps=[{'position':[-2.30,1.45,-1.69],'color':'E7F5F1','energy':.40,'range':1.05},{'position':[-2.46,2.30,1.27],'color':'FFE1AB','energy':.65,'range':1.6}])
     d['lighting']['sun_position']=[6,9,4];d['review_lighting']['sun_position']=[6,9,4]
     d['camera']={'position':[10.8,10.6,11.4],'target':[0,1.24,.05],'size':9.4}
+    from liubei_r2 import fit_camera
+    fit_camera(d,(1544,1544),[(88,1016),(926,1409),(1484,1057)])
     from milk_bench import bench
     bench(d)
     p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)
+
+
+def revise_r2():
+    # Reveal the accepted-height upholstery by removing foreground occluders.
+    r.vertical('front_wall_left',.58)
+    k.CURRENT=k.KITS['pastel_bench']
+    # Clay-pink grout nearly matches the varied warm masonry.
+    rng=random.Random(1802)
+    for name in ('back_wall','left_door_wall'):
+        r.recolor(name,'E7C7BD',lambda o:'backing' in o.name.lower() or 'flanking' in o.name.lower())
+        for o in k.KITS[name]['objects']:
+            if 'brick' in o.name.lower():
+                o.data.materials.clear();o.data.materials.append(k.material(rng.choice(['E6C6BB','EBCBC1','E9CBC3','E8C6BC'])))
+    for name in ('service_counter','pickup_counter'):
+        r.recolor(name,'C7A58F',lambda o:any(t in o.name.lower() for t in ('board','front','cabinet','door','panel','plinth','rail','side')),kind='wood')
+    for o in k.KITS['floor']['objects']:
+        if 'diamond' in o.name.lower():o.scale.x*=1.30;o.scale.y*=1.30
+    # Build a hollow cabinet: the old solid box filled the glass volume.
+    r.clear('drinks_fridge')
+    cube('Mint cabinet rear',(0,1.16,-.25),(1.13,2.32,.10),'A3C4B4',.035)
+    for x in (-.52,.52):cube('Mint cabinet side',(x,1.16,.045),(.095,2.32,.60),'A3C4B4',.028)
+    for y in (.10,2.23):cube('Mint cabinet cap',(0,y,.045),(1.05,.20,.60),'A3C4B4',.025)
+    cube('Cream refrigerator liner',(0,1.16,-.185),(.93,1.94,.02),'CFDBD5',.005)
+    for row in range(4):
+        y=.29+row*.45
+        cube('Interior chilled shelf',(0,y,.02),(.94,.034,.47),'E6ECE1',.008)
+        for j in range(4):s.bottle((-.33+j*.22,y+.025,.055),['DFABA1','B4C4A1','E2C27F','D8BDD2'][(j+row)%4],.29)
+    for x in (-.48,.48):cube('Mint glass door frame',(x,1.16,.36),(.045,1.96,.04),'91AF9F',.01)
+    cube('Vertical brass door handle',(.43,1.17,.404),(.028,.45,.047),'A57F55',.01)
+    k.text_label('COLD DRINKS',(0,2.19,.363),.145,'38594F')
+    for x,y in ((-.25,2.38),(.20,2.42)):
+        cube('Tea supply carton',(x,y,0),(.33,.22,.29),'C99964',.015,'wood')
+        cube('Carton paper seal',(x,y+.116,0),(.055,.007,.29),'EED5AE',.001)
+    for o in k.KITS['fridge_glass']['objects']:o.location.y=-.366
+    # More generous A-board text; every I/L stroke uses the opt-in black face.
+    r.clear('street_signboard')
+    cube('A board face',(0,.53,.04),(.79,.94,.07),'665448',.025)
+    for x in (-.43,.43):
+        tube('A board front rail',[(x,0,.19),(x,1.07,0)],.035,'C7A58F',8,'wood')
+        tube('A board rear rail',[(x,0,-.34),(x,1.07,0)],.03,'C7A58F',8,'wood')
+    for y in (.08,1.02):cube('Board wood crossrail',(0,y,.077),(.88,.055,.065),'C7A58F',.015)
+    for j,line in enumerate(('MILK TEA','GOOD','MOOD')):k.text_label(line,(0,.81-j*.25,.085),.157,'FFF0D9')

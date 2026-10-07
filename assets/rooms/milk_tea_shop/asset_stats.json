@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3048516
+    "bytes": 3022374
   },
   "assets": [
     {
@@ -14,91 +14,91 @@
       "vertices": 13704,
       "triangles": 26432,
       "surfaces": 1,
-      "bytes": 918276
+      "bytes": 915556
     },
     {
       "name": "back_wall",
       "vertices": 4368,
       "triangles": 8424,
       "surfaces": 1,
-      "bytes": 291544
+      "bytes": 294040
     },
     {
       "name": "left_door_wall",
       "vertices": 3848,
       "triangles": 7452,
       "surfaces": 1,
-      "bytes": 252376
+      "bytes": 255128
     },
     {
       "name": "front_wall_left",
       "vertices": 616,
       "triangles": 1188,
       "surfaces": 1,
-      "bytes": 42272
+      "bytes": 44032
     },
     {
       "name": "front_wall_right",
       "vertices": 504,
       "triangles": 972,
       "surfaces": 1,
-      "bytes": 34852
+      "bytes": 35140
     },
     {
       "name": "side_low_wall",
       "vertices": 1288,
       "triangles": 2484,
       "surfaces": 1,
-      "bytes": 86928
+      "bytes": 87664
     },
     {
       "name": "corner_pier",
       "vertices": 168,
       "triangles": 324,
       "surfaces": 1,
-      "bytes": 12532
+      "bytes": 12628
     },
     {
       "name": "entry_step",
       "vertices": 168,
       "triangles": 324,
       "surfaces": 1,
-      "bytes": 12528
+      "bytes": 12624
     },
     {
       "name": "drinks_fridge",
-      "vertices": 5864,
-      "triangles": 8628,
+      "vertices": 5020,
+      "triangles": 7948,
       "surfaces": 1,
-      "bytes": 364456
+      "bytes": 325368
     },
     {
       "name": "service_counter",
       "vertices": 1592,
       "triangles": 3076,
       "surfaces": 1,
-      "bytes": 106164
+      "bytes": 107092
     },
     {
       "name": "main_menu",
-      "vertices": 7436,
-      "triangles": 7412,
+      "vertices": 16914,
+      "triangles": 17318,
       "surfaces": 1,
-      "bytes": 405408
+      "bytes": 954384
     },
     {
       "name": "toppings_menu",
-      "vertices": 6592,
-      "triangles": 6680,
+      "vertices": 13950,
+      "triangles": 14360,
       "surfaces": 1,
-      "bytes": 359420
+      "bytes": 786080
     },
     {
       "name": "freshly_made",
-      "vertices": 784,
-      "triangles": 856,
+      "vertices": 2074,
+      "triangles": 2194,
       "surfaces": 1,
-      "bytes": 44916
+      "bytes": 116308
     },
     {
       "name": "wall_tea_symbol",
@@ -112,42 +112,42 @@
       "vertices": 1004,
       "triangles": 1908,
       "surfaces": 1,
-      "bytes": 74652
+      "bytes": 75260
     },
     {
       "name": "tea_urns",
       "vertices": 752,
       "triangles": 1440,
       "surfaces": 1,
-      "bytes": 59164
+      "bytes": 59292
     },
     {
       "name": "cup_sealer",
       "vertices": 866,
       "triangles": 1628,
       "surfaces": 1,
-      "bytes": 55128
+      "bytes": 55288
     },
     {
       "name": "ingredient_jars",
       "vertices": 1592,
       "triangles": 2956,
       "surfaces": 1,
-      "bytes": 82616
+      "bytes": 82648
     },
     {
       "name": "shakers",
       "vertices": 312,
       "triangles": 600,
       "surfaces": 1,
-      "bytes": 23000
+      "bytes": 23384
     },
     {
       "name": "topping_case",
       "vertices": 1604,
       "triangles": 2908,
       "surfaces": 1,
-      "bytes": 88700
+      "bytes": 89052
     },
     {
       "name": "topping_glass",
@@ -161,21 +161,21 @@
       "vertices": 184,
       "triangles": 352,
       "surfaces": 1,
-      "bytes": 13976
+      "bytes": 14072
     },
     {
       "name": "pickup_counter",
-      "vertices": 2178,
-      "triangles": 3692,
+      "vertices": 2712,
+      "triangles": 4230,
       "surfaces": 1,
-      "bytes": 116472
+      "bytes": 145396
     },
     {
       "name": "straw_box",
       "vertices": 236,
       "triangles": 408,
       "surfaces": 1,
-      "bytes": 22232
+      "bytes": 22264
     },
     {
       "name": "cup_stacks",
@@ -196,35 +196,35 @@
       "vertices": 418,
       "triangles": 800,
       "surfaces": 1,
-      "bytes": 29748
+      "bytes": 29812
     },
     {
       "name": "table_flower_vase",
       "vertices": 2480,
       "triangles": 4596,
       "surfaces": 1,
-      "bytes": 125912
+      "bytes": 125976
     },
     {
       "name": "pastel_bench",
       "vertices": 616,
       "triangles": 1188,
       "surfaces": 1,
-      "bytes": 42300
+      "bytes": 42652
     },
     {
       "name": "street_signboard",
-      "vertices": 1208,
-      "triangles": 1380,
+      "vertices": 2816,
+      "triangles": 3038,
       "surfaces": 1,
-      "bytes": 70952
+      "bytes": 160260
     },
     {
       "name": "good_tea_wall_sign",
-      "vertices": 1548,
-      "triangles": 1616,
+      "vertices": 3668,
+      "triangles": 3812,
       "surfaces": 1,
-      "bytes": 86356
+      "bytes": 206832
     },
     {
       "name": "fridge_glass",
@@ -245,22 +245,22 @@
       "vertices": 438,
       "triangles": 824,
       "surfaces": 1,
-      "bytes": 31024
+      "bytes": 31120
     }
   ],
-  "unique_triangles": 108614,
-  "scene_triangles": 127558,
+  "unique_triangles": 131250,
+  "scene_triangles": 150194,
   "static_draw_surfaces": 43,
   "unique_assets": 34,
   "placed_instances": 43,
-  "glb_bytes": 4070804,
+  "glb_bytes": 5326252,
   "scene_budget": {
     "after": {
-      "room_triangles": 127558,
+      "room_triangles": 150194,
       "shared_plant_triangles": 26664,
       "room_botanical_triangles": 13788,
       "plant_triangles": 40452,
-      "total_triangles": 154222,
+      "total_triangles": 176858,
       "static_surfaces": 27
     },
     "limits": {
@@ -289,7 +289,7 @@
           "straw_box",
           "cup_stacks"
         ],
-        "triangles": 32284,
+        "triangles": 51746,
         "cast_shadow": true
       },
       {
@@ -325,7 +325,7 @@
           "good_tea_wall_sign",
           "left_tea_logo"
         ],
-        "triangles": 3820,
+        "triangles": 7674,
         "cast_shadow": true
       },
       {

@@ -7,6 +7,8 @@ import storefront as s
 from kit import begin,cube,cylinder,ellipsoid,tube,lathe
 
 def geometry():
+    from liubei_r2 import enable_lettering
+    enable_lettering()
     k.PALETTE.update({'oak':'BD8B50','oak_light':'D9AD72','porcelain':'F4E8D7','sage':'98B19A','leaf':'587C3E','leaf_light':'86A25A','terra':'DAC397'})
     s.shell()
     s.fridge()
@@ -70,8 +72,8 @@ def geometry():
     begin('pickup_counter',at=(2.23,1.25,-1.27))
     cube('Pickup cabinet',(0,.25,0),(.76,.51,.43),'oak_light',.058,'wood')
     cube('Pickup shelf',(0,.03,.33),(.76,.07,.34),'porcelain',.025)
-    cube('Pickup sign',(0,.47,.245),(.57,.17,.04),'iron_edge',.017)
-    k.text_label('PICK UP',(0,.425,.27),.092,'porcelain')
+    cube('Pickup sign',(0,.47,.245),(.76,.22,.04),'iron_edge',.017)
+    k.text_label('PICK UP',(0,.425,.27),.15,'porcelain')
     for i,c in enumerate(['D8B78C','B4C6A1','D8A1A5']):s.tea_cup((-.24+i*.24,.071,.32),.75,c)
     begin('straw_box',at=(2.54,1.26,-1.95))
     cube('Straw caddy',(0,.105,0),(.27,.21,.20),'oak_light',.028)

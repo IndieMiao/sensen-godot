@@ -103,12 +103,12 @@
         {
           "at": [
             0,
-            0.2016,
+            0.11692799999999999,
             0
           ],
           "size": [
             1.95,
-            0.4032,
+            0.23385599999999998,
             0.3
           ]
         }
@@ -703,18 +703,18 @@
   ],
   "camera": {
     "position": [
-      10.8,
-      10.6,
-      11.4
+      9.584336230459046,
+      11.100291206639248,
+      11.540278693513208
     ],
     "target": [
-      0,
-      1.24,
-      0.05
+      -0.14742709557136838,
+      1.7272509279993205,
+      0.12569229863540604
     ],
-    "size": 9.4
+    "size": 9.247567529782838
   },
-  "revision": "R1",
+  "revision": "R2",
   "shared_plants": [
     {
       "name": "MonsteraCorner",
@@ -797,9 +797,9 @@
       "asset": "flower_shrub",
       "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
       "position": [
-        -2.57,
+        -2.77,
         0.8,
-        2.61
+        1.93
       ],
       "rotation_degrees": [
         0,
@@ -807,9 +807,9 @@
         0
       ],
       "scale": [
-        0.84,
-        0.84,
-        0.84
+        0.62,
+        0.62,
+        0.62
       ],
       "colliders": []
     },
@@ -818,9 +818,9 @@
       "asset": "ivy_short",
       "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
       "position": [
-        -2.57,
+        -2.77,
         0.95,
-        2.77
+        2.09
       ],
       "rotation_degrees": [
         0,
@@ -828,9 +828,9 @@
         0
       ],
       "scale": [
-        0.75,
-        0.75,
-        0.75
+        0.56,
+        0.56,
+        0.56
       ],
       "colliders": []
     },
@@ -839,9 +839,9 @@
       "asset": "flower_shrub",
       "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
       "position": [
-        -1.01,
+        -0.82,
         0.8,
-        2.65
+        2.73
       ],
       "rotation_degrees": [
         0,
@@ -849,9 +849,9 @@
         0
       ],
       "scale": [
-        0.84,
-        0.84,
-        0.84
+        0.62,
+        0.62,
+        0.62
       ],
       "colliders": []
     },
@@ -860,9 +860,9 @@
       "asset": "ivy_short",
       "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
       "position": [
-        -1.01,
+        -0.82,
         0.95,
-        2.81
+        2.89
       ],
       "rotation_degrees": [
         0,
@@ -870,9 +870,9 @@
         7
       ],
       "scale": [
-        0.75,
-        0.75,
-        0.75
+        0.56,
+        0.56,
+        0.56
       ],
       "colliders": []
     },
@@ -1095,7 +1095,7 @@
       "alpha": 0.12
     },
     "fridge_glass": {
-      "alpha": 0.07
+      "alpha": 0.09
     }
   },
   "boundaries": [
@@ -1185,6 +1185,16 @@
     "lamps": [
       {
         "position": [
+          -2.3,
+          1.45,
+          -1.69
+        ],
+        "color": "E7F5F1",
+        "energy": 0.4,
+        "range": 1.05
+      },
+      {
+        "position": [
           -2.46,
           2.3,
           1.27
@@ -1214,6 +1224,16 @@
     "points": [
       {
         "position": [
+          -2.3,
+          1.45,
+          -1.69
+        ],
+        "color": "E7F5F1",
+        "energy": 0.4,
+        "range": 1.05
+      },
+      {
+        "position": [
           -2.46,
           2.3,
           1.27
@@ -1223,6 +1243,89 @@
         "range": 1.6
       }
     ]
+  },
+  "review_camera_fit": {
+    "method": "orthographic fit to plinth edge intersections; no model scaling or image warp",
+    "reference_size": [
+      1544,
+      1544
+    ],
+    "reference_corners_left_front_right": [
+      [
+        88,
+        1016
+      ],
+      [
+        926,
+        1409
+      ],
+      [
+        1484,
+        1057
+      ]
+    ],
+    "inferred_back": [
+      646,
+      664
+    ],
+    "footprint_m": [
+      6.18,
+      5.68
+    ],
+    "plinth_y": -0.15,
+    "render_size": [
+      1400,
+      1400
+    ],
+    "fitted_corners": [
+      [
+        94.40251988576517,
+        953.5632754010921
+      ],
+      [
+        806.3663321381455,
+        1275.2247040619875
+      ],
+      [
+        1364.2570547118407,
+        928.4659065472831
+      ]
+    ],
+    "observed_letterboxed_corners": [
+      [
+        79.79274611398964,
+        921.2435233160621
+      ],
+      [
+        839.6373056994819,
+        1277.5906735751296
+      ],
+      [
+        1345.5958549222798,
+        958.419689119171
+      ]
+    ],
+    "residual_px": [
+      35.468462956551456,
+      33.35499203202219,
+      35.29120949967349
+    ],
+    "pitch_degrees": 32.00000000000004,
+    "yaw_degrees": 40.44999999999999,
+    "camera": {
+      "position": [
+        9.584336230459046,
+        11.100291206639248,
+        11.540278693513208
+      ],
+      "target": [
+        -0.14742709557136838,
+        1.7272509279993205,
+        0.12569229863540604
+      ],
+      "size": 9.247567529782838
+    },
+    "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
   },
   "spawn": [
     0.15,
@@ -1587,7 +1690,7 @@
         "straw_box",
         "cup_stacks"
       ],
-      "triangles": 32284,
+      "triangles": 51746,
       "cast_shadow": true
     },
     {
@@ -1623,7 +1726,7 @@
         "good_tea_wall_sign",
         "left_tea_logo"
       ],
-      "triangles": 3820,
+      "triangles": 7674,
       "cast_shadow": true
     },
     {

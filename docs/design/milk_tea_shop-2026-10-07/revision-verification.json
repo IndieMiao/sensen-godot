@@ -1,5 +1,5 @@
 {
-  "revision": "r1",
+  "revision": "r2",
   "reference_sha256": "71139bac1104cc37c5e3a3305ae7caa152f126933e609869824ae1c701c14b36",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
@@ -48,11 +48,11 @@
   },
   "budget": {
     "after": {
-      "room_triangles": 127558,
+      "room_triangles": 150194,
       "shared_plant_triangles": 26664,
       "room_botanical_triangles": 13788,
       "plant_triangles": 40452,
-      "total_triangles": 154222,
+      "total_triangles": 176858,
       "static_surfaces": 27
     },
     "limits": {
@@ -81,7 +81,7 @@
           "straw_box",
           "cup_stacks"
         ],
-        "triangles": 32284,
+        "triangles": 51746,
         "cast_shadow": true
       },
       {
@@ -117,7 +117,7 @@
           "good_tea_wall_sign",
           "left_tea_logo"
         ],
-        "triangles": 3820,
+        "triangles": 7674,
         "cast_shadow": true
       },
       {

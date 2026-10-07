@@ -258,6 +258,7 @@ def bake_and_export(ao_strength=.40, ao_distance=.38, coherent_swatches=False):
     work=bpy.data.collections.new("TEMP_EXPORT");scene.collection.children.link(work)
     copies=[];names=list(KITS)
     source_id=0
+    constant_sources=set()
     for ki,name in enumerate(names):
         for source in KITS[name]["objects"]:
             ev=source.evaluated_get(deps)
@@ -267,6 +268,7 @@ def bake_and_export(ao_strength=.40, ao_distance=.38, coherent_swatches=False):
             for item in attr.data:item.value=ki
             attr=d.attributes.new("source_id","INT","FACE")
             for item in attr.data:item.value=source_id
+            if source.get('atlas_constant_colour',False):constant_sources.add(source_id)
             source_id+=1
             o=bpy.data.objects.new("Baked_"+source.name,d);work.objects.link(o);copies.append(o)
     for o in all_source:o.hide_render=True;o.hide_set(True)
@@ -329,7 +331,7 @@ def bake_and_export(ao_strength=.40, ao_distance=.38, coherent_swatches=False):
         for f in joined.data.polygons:
             key=ids[f.index].value
             areas[key]=areas.get(key,0)+f.area
-        small_sources={key for key,area in areas.items() if area<.006}
+        small_sources={key for key,area in areas.items() if area<.006}|constant_sources
     for face in joined.data.polygons:
         pts=[uv[i].uv.copy() for i in face.loop_indices]
         area=abs(sum(p.x*q.y-q.x*p.y for p,q in zip(pts,pts[1:]+pts[:1])))*.5*2048**2

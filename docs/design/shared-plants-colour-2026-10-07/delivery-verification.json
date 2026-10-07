@@ -1,0 +1,26 @@
+[
+  {
+    "card": "179",
+    "name": "SGODOT-179_shared-leaf-colour_godot-whole.png",
+    "sha256": "2e5ad3b0c333a2a6f82fda64dc2f3fa437db02d00311b299b4059cace378ece1",
+    "download_matches": true
+  },
+  {
+    "card": "179",
+    "name": "SGODOT-179_shared-leaf-colour_comparison.jpg",
+    "sha256": "0d36d3ad7d62a5201a473ef6a66312b61712dc609a2c4bdab509b2e8caf8444c",
+    "download_matches": true
+  },
+  {
+    "card": "171",
+    "name": "SGODOT-171_shared-leaf-colour_godot-whole.png",
+    "sha256": "2e5ad3b0c333a2a6f82fda64dc2f3fa437db02d00311b299b4059cace378ece1",
+    "download_matches": true
+  },
+  {
+    "card": "171",
+    "name": "SGODOT-171_shared-leaf-colour_comparison.jpg",
+    "sha256": "0d36d3ad7d62a5201a473ef6a66312b61712dc609a2c4bdab509b2e8caf8444c",
+    "download_matches": true
+  }
+]
