@@ -66,7 +66,7 @@ func test_toast_sits_above_the_quick_bar_left_of_the_action_key() -> void:
 	var bar_top := 800.0 - UiTokens.SIZE_QUICK_BAR_BOTTOM - UiTokens.SIZE_QUICK_BAR_H   # 708, Figma demo 1182:82261
 	assert_float(_bottom()).is_equal_approx(bar_top - UiTokens.SPACE_OVERLAY_BODY, 0.5)
 	assert_float(toasts._panel.position.x).is_equal(float(UiTokens.SPACE_PAGE))
-	assert_float(toasts._panel.size.x).is_equal(ToastLayer.WIDTH)
+	assert_float(toasts._panel.size.x).is_equal(float(ToastLayer.WIDTH))
 	# The main action key starts at x 249 in the same demo; the toast must end before it.
 	assert_float(toasts._panel.position.x + toasts._panel.size.x).is_less(249.0)
 

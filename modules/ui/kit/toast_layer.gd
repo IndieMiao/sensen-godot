@@ -16,9 +16,8 @@ enum Severity { SUCCESS, INFO, REFUSED, ERROR }
 
 const MAX_QUEUE := 3
 const MERGE_MS := 1000
-## Toast · R1 width (Figma 1178:82265, WP2 staging; both placement demos 1182:82260 use 232). Becomes
-## SIZE_TOAST_W when the R1 main replaces the old Toast main in the token export.
-const WIDTH := 232.0
+## Toast · R1 width (Figma 1178:82265, WP2 accepted; both placement demos 1182:82260 use it).
+const WIDTH := UiTokens.SIZE_TOAST_W
 
 var _anchor: WeakRef
 

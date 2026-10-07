@@ -120,7 +120,8 @@ const opacity = {
   kitchenEmpty: Math.round(child(kitchenEmpty, 'Cell surface').opacity * 100) / 100,
 };
 const info = await node('932:71686');
-const toast = await node('483:302');
+// Toast R1 (1178:82265, WP2 accepted 2026-10-07, SGODOT-202) replaced the old Toast main 483:302.
+const toast = await variant('1178:82265', 'Tone=Info');
 const badge = await variant('517:11951', 'State=Available');
 const close = await node('483:336');
 const size = {
@@ -146,7 +147,10 @@ const size = {
   itemRowIcon: (await node('483:228')).children.find(c => c.type === 'INSTANCE').width,
   stateBadgeH: (await node('483:324')).height,
   statusBadge: badge.width, statusBadgeIcon: badge.children[0].width,
-  toastW: toast.width, toastMinH: toast.height, toastPad: toast.paddingTop,
+  toastW: toast.width, toastIcon: child(toast, 'Tone icon').width,
+  toastPadTop: toast.paddingTop, toastPadRight: toast.paddingRight, toastPadBottom: toast.paddingBottom, toastPadLeft: toast.paddingLeft,
+  // One-line toasts on page 14 are 232 × 40: padding + tone icon + the 1 px stroke top and bottom.
+  toastMinH: toast.paddingTop + toast.paddingBottom + child(toast, 'Tone icon').height + 2 * toast.strokeWeight,
   sheetPad: info.paddingTop, sheetGap: info.itemSpacing, sheetBodyMaxH: 440,
   energyRefW: energyRef.width, energyRefH: energyRef.height,
   pinBadge: child(quickDefault, 'Pinned icon surface').width, pinIcon: child(quickDefault, 'Pin glyph').width,
@@ -197,6 +201,15 @@ const todayDone = await variant('1145:81714', 'State=Done');
 const quickEnd = await node('907:72112');
 // Collapsed quick bar (LOCK-04 "未选行动时收起成把手"): page-14 frames, not a main yet.
 const handleTouch = await node('676:63515'), handle = await node('676:63516'), grip = await node('676:63517');
+// EmptyState 1234:87237 (WP6 main, Kind=Panel / Row).
+const emptyPanel = await variant('1234:87237', 'Kind=Panel'), emptyRow = await variant('1234:87237', 'Kind=Row');
+// StatusBadge 1132:79554 state table: fill and ring colour per state (World size; NPC uses the same colours).
+for (const v of (await node('1132:79554')).children.filter(c => c.name.startsWith('Size=World'))) {
+  const key = v.name.replace('Size=World, State=', '').replace(/ (\w)/g, (_, c) => c.toUpperCase()).replace(/^\w/, c => c.toLowerCase());
+  const b = child(v, 'Badge');
+  color['status/' + key] = hex(firstFill(b).color);
+  color['status/' + key + 'Ring'] = hex(b.strokes.find(p => p.visible !== false).color);
+}
 const shadow = {
   card: shadowOf(energyCard), float: shadowOf(tapCard), petal: shadowOf(child(petalSel, 'Petal')),
   menu: shadowOf(pinMenu), key: shadowOf(switchKey),
@@ -231,6 +244,7 @@ Object.assign(opacity, {
   // Shared by the radial petal icon (1122:79385) and the EnergyTile unavailable icon disc (1093:77292).
   unavailableIcon: Math.round(child(child(petalOff, 'Petal'), 'Icon').opacity * 100) / 100,
   todayDone: Math.round(todayDone.opacity * 100) / 100,
+  emptyIcon: Math.round(child(emptyPanel, 'Icon').opacity * 100) / 100,
 });
 Object.assign(size, {
   sceneAction: saDefault.width, switchKey: switchKey.width, switchIcon: switchKey.children[0].width,
@@ -262,6 +276,7 @@ Object.assign(size, {
   capacityDot: child(quickEnd, 'Capacity warning').width,
   quickHandleTouchW: handleTouch.width, quickHandleTouchH: handleTouch.height,
   quickHandleW: handle.width, quickHandleH: handle.height, quickHandleGripW: grip.width, quickHandleGripH: grip.height,
+  emptyDisc: child(emptyPanel, 'Icon disc').width, emptyIcon: child(emptyPanel, 'Icon').width, emptyRowIcon: child(emptyRow, 'Icon').width,
 });
 for (const k of Object.keys(size)) size[k] = r1(size[k]);
 const weightOf = { Regular: 'regular', Bold: 'bold', ExtraBold: 'extrabold' };
@@ -280,11 +295,11 @@ const tokens = {
     schema: 2, version: '2.1-draft', status: 'draft',
     source: 'Figma OMLTC3yw3u2WDjOZhLnhaR page 481:53 (read-only export, tools/ui/export_tokens_figma.js)',
     unit: '360-wide logical px = Godot UI unit',
-    accepted: 'WP1a mains (HUD, NeedTile, Energy, Today, ActionKey, SceneAction, RadialPetal, TapCard, StatusBadge, PinMenu, QuickSlot, CommandButton, joystick) accepted 2026-10-07, SGODOT-200',
+    accepted: 'WP1a mains (HUD, NeedTile, Energy, Today, ActionKey, SceneAction, RadialPetal, TapCard, StatusBadge, PinMenu, QuickSlot, CommandButton, joystick) accepted 2026-10-07, SGODOT-200; WP2 Toast R1 accepted 2026-10-07, SGODOT-202; WP6 EmptyState accepted 2026-10-07, SGODOT-206',
     pending: {
       wp1b: 'container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)',
       segmentTab: 'selected style must not use command green (LOCK-13), WP1b',
-      toast: 'Toast R1 (1178:82265) replaces the old Toast main 483:302 in the WP2 migration; toastW is still the old 328',
+      toast: 'sizes read Toast R1 (1178:82265); its tone look (light fills, tone icon, optional action) is not generated yet: ToastPanel and ToastLayer still draw the old dark panel',
     },
   },
   font: { file: 'res://assets/ui/fonts/Nunito.ttf', naturalLineHeight: CONST.naturalLineHeight,
