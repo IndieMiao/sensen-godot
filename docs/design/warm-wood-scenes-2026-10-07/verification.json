@@ -2,19 +2,22 @@
   {
     "scene": "standard_room_5",
     "plane": "SGODOT-172",
-    "state": "In Progress",
+    "state": "Review",
     "user_acceptance": "pending",
     "godot_render_verified": true,
     "export_runtime_triangles_match": true,
     "asset_hashes_verified": true,
     "no_embedded_atlas": true,
-    "unique_glbs": 39,
-    "instances": 41,
-    "placed_triangles": 93726,
+    "unique_glbs": 41,
+    "instances": 49,
+    "placed_triangles": 191256,
     "lark_message_count": 4,
     "lark_images_sha256_verified": true,
     "plane_review_images": 3,
-    "plane_comment_readback_verified": true
+    "plane_comment_readback_verified": true,
+    "revision": "R1 sample",
+    "shared_library_modules": 3,
+    "revision_evidence": "../standard_room_5-review1-2026-10-07/verification-summary.json"
   },
   {
     "scene": "deluxe_room_10",

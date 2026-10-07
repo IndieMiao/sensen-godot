@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c38obq6dnhlsu"
-path="res://.godot/imported/door_hook_board.glb-b8b72f6d2105d41ee34119b4f680af41.scn"
+uid="uid://ncalchu7ub6t"
+path="res://.godot/imported/door_frame.glb-0d96c1cc1cc9c7079688bf5a5fcdc4d3.scn"
 
 [deps]
 
-source_file="res://assets/rooms/standard_room_5/door_hook_board.glb"
-dest_files=["res://.godot/imported/door_hook_board.glb-b8b72f6d2105d41ee34119b4f680af41.scn"]
+source_file="res://assets/rooms/standard_room_5/door_frame.glb"
+dest_files=["res://.godot/imported/door_frame.glb-0d96c1cc1cc9c7079688bf5a5fcdc4d3.scn"]
 
 [params]
 

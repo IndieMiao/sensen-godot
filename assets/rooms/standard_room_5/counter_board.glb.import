@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dbeflb67srvpm"
-path="res://.godot/imported/entry_plant.glb-7daf50fc6af092585055932332081064.scn"
+uid="uid://bw82qyq0e8y08"
+path="res://.godot/imported/counter_board.glb-69bc9e40bf901a9d9525cc0206052da3.scn"
 
 [deps]
 
-source_file="res://assets/rooms/standard_room_5/entry_plant.glb"
-dest_files=["res://.godot/imported/entry_plant.glb-7daf50fc6af092585055932332081064.scn"]
+source_file="res://assets/rooms/standard_room_5/counter_board.glb"
+dest_files=["res://.godot/imported/counter_board.glb-69bc9e40bf901a9d9525cc0206052da3.scn"]
 
 [params]
 

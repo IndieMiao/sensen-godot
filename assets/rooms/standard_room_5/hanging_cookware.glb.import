@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cqhepchpn13qd"
-path="res://.godot/imported/window_plant.glb-86a14815b0930432d9e228dc762574aa.scn"
+uid="uid://cjm7c7eflanxq"
+path="res://.godot/imported/hanging_cookware.glb-98ac18f33acebd6dd0607a9749ad1c00.scn"
 
 [deps]
 
-source_file="res://assets/rooms/standard_room_5/window_plant.glb"
-dest_files=["res://.godot/imported/window_plant.glb-86a14815b0930432d9e228dc762574aa.scn"]
+source_file="res://assets/rooms/standard_room_5/hanging_cookware.glb"
+dest_files=["res://.godot/imported/hanging_cookware.glb-98ac18f33acebd6dd0607a9749ad1c00.scn"]
 
 [params]
 

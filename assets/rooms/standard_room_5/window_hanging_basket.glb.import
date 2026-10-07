@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://ctypqmoxp040t"
-path="res://.godot/imported/bookcase_plant.glb-efe6bc5e5e8bd549c7f9b4a3575f64f9.scn"
+uid="uid://gwg6xw4ftky8"
+path="res://.godot/imported/window_hanging_basket.glb-3f46fca000bc4aece82b35d23c541d3b.scn"
 
 [deps]
 
-source_file="res://assets/rooms/standard_room_5/bookcase_plant.glb"
-dest_files=["res://.godot/imported/bookcase_plant.glb-efe6bc5e5e8bd549c7f9b4a3575f64f9.scn"]
+source_file="res://assets/rooms/standard_room_5/window_hanging_basket.glb"
+dest_files=["res://.godot/imported/window_hanging_basket.glb-3f46fca000bc4aece82b35d23c541d3b.scn"]
 
 [params]
 

@@ -1,0 +1,59 @@
+{
+  "door": {
+    "source_objects": [
+      "Sage arched door"
+    ],
+    "world_min_y": 0.05000000074505806,
+    "world_max_y": 2.379999876022339,
+    "height_above_floor": 2.297999876022339,
+    "clear_height": 2.329999875277281
+  },
+  "counter": {
+    "source_objects": [
+      "Oak countertop"
+    ],
+    "world_min_y": 1.0795000791549683,
+    "world_max_y": 1.2345000505447388,
+    "height_above_floor": 1.1525000505447387,
+    "clear_height": null
+  },
+  "chair": {
+    "source_objects": [
+      "Sage chair seat pad.001",
+      "Sage chair seat pad"
+    ],
+    "world_min_y": 0.7409999966621399,
+    "world_max_y": 0.8610000014305115,
+    "height_above_floor": 0.7790000014305115,
+    "clear_height": null
+  },
+  "table": {
+    "source_objects": [
+      "Individual tabletop board",
+      "Individual tabletop board.001",
+      "Individual tabletop board.002",
+      "Individual tabletop board.003",
+      "Individual tabletop board.004"
+    ],
+    "world_min_y": 1.066999912261963,
+    "world_max_y": 1.2170000076293945,
+    "height_above_floor": 1.1350000076293945,
+    "clear_height": null
+  },
+  "range": {
+    "source_objects": [
+      "Burner grate",
+      "Burner grate.001",
+      "Burner grate.002",
+      "Burner grate.003",
+      "Burner grate.004",
+      "Burner grate.005",
+      "Burner grate.006",
+      "Burner grate.007"
+    ],
+    "world_min_y": 1.439000129699707,
+    "world_max_y": 1.4570000171661377,
+    "height_above_floor": 1.3750000171661376,
+    "clear_height": null
+  }
+}

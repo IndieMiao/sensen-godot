@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cxedk437aqr01"
-path="res://.godot/imported/shelf_plant.glb-42390d8b4579ca3d2b995235aa972180.scn"
+uid="uid://btbg5uyr1c17h"
+path="res://.godot/imported/door_garden_fork.glb-8bc43da677178dc0e15fcbf0c7d47af6.scn"
 
 [deps]
 
-source_file="res://assets/rooms/standard_room_5/shelf_plant.glb"
-dest_files=["res://.godot/imported/shelf_plant.glb-42390d8b4579ca3d2b995235aa972180.scn"]
+source_file="res://assets/rooms/standard_room_5/door_garden_fork.glb"
+dest_files=["res://.godot/imported/door_garden_fork.glb-8bc43da677178dc0e15fcbf0c7d47af6.scn"]
 
 [params]
 

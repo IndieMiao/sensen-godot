@@ -124,4 +124,7 @@ def build():
     finalize();complete()
 
 
-if __name__=='__main__':build()
+if __name__=='__main__':
+    sys.path.insert(0,str(Path(__file__).resolve().parent/'source/standard_room_5'))
+    from revision1 import build as build_review
+    build_review()

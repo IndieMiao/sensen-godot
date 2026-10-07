@@ -10,6 +10,10 @@ out=ROOT/'output'/(slug+'-2026-10-07')
 project=out/'godot-project'
 for folder in ['assets/rooms/'+slug,'scenes/'+slug]:
     shutil.copytree(ROOT/folder,project/folder,dirs_exist_ok=True)
+layout=json.loads((ROOT/'assets/rooms'/slug/'layout.json').read_text())
+if layout.get('shared_plants'):
+    shutil.copytree(ROOT/'assets/rooms/_shared/plants',project/'assets/rooms/_shared/plants',dirs_exist_ok=True,
+                    ignore=shutil.ignore_patterns('source'))
 (project/'tools/art').mkdir(parents=True,exist_ok=True)
 shutil.copy2(ROOT/'tools/art/review_room.gd',project/'tools/art/review_room.gd')
 (project/'project.godot').write_text('''config_version=5

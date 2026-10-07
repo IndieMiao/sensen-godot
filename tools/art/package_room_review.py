@@ -27,7 +27,12 @@ sheet([(n.capitalize()+' / Blender model',out/(n+'.png')) for n in ('front','sid
 stats=json.loads((ROOT/'assets/rooms'/slug/'asset_stats.json').read_text())
 validation=json.loads((out/'godot-validation.json').read_text())
 assert stats['scene_triangles']==validation['triangles']
-files=list((ROOT/'assets/rooms'/slug).glob('*.glb'))+[ROOT/'assets/rooms'/slug/'room_albedo_ao.png',ROOT/'tools/art/source'/slug/(slug+'.blend')]
+files=list((ROOT/'assets/rooms'/slug).glob('*.glb'))+list((ROOT/'assets/rooms'/slug).glob('*.png'))+[ROOT/'tools/art/source'/slug/(slug+'.blend')]
+layout=json.loads((ROOT/'assets/rooms'/slug/'layout.json').read_text())
+if layout.get('shared_plants'):
+    shared=ROOT/'assets/rooms/_shared/plants'
+    files += [shared/name for name in sorted({a['file'] for a in layout['shared_plants']})]
+    files += [shared/'room_albedo_ao.png',shared/'material.tres']
 summary={'status':'art review candidate; user acceptance pending','asset_stats':stats,'godot':validation,
          'hashes':{str(f.relative_to(ROOT)):hashlib.sha256(f.read_bytes()).hexdigest() for f in files},
          'scope':'Art assets only; no gameplay, Android benchmark, physical-device performance or release claim.'}
