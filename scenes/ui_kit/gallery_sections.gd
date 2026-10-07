@@ -27,6 +27,8 @@ static func all() -> Array[Dictionary]:
 		{id = "segment_tab", title = "UiSegmentTab", figma = "Tab 483:322 · Compact/Kitchen/Mode 655:58504 · LOCK-13 / 20", build = _segment_tabs},
 		{id = "badge", title = "UiBadge", figma = "StateBadge 483:324", build = _badges},
 		{id = "empty_state", title = "UiEmptyState", figma = "Main pending: WP6 SGODOT-206 · provisional look per WP7-B F-08 §5", build = _empty_states},
+		# SGODOT-224 panels
+		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
 	]
 	return out
 
@@ -355,3 +357,30 @@ static func _empty_states() -> Control:
 	v.add_child(UiEmptyState.new("No fish yet", _tex("fish_unknown"), "Show on map"))
 	v.add_child(UiEmptyState.new("Nothing to sell here", _tex("stall")))
 	return v
+
+## Specs as P0ItemInfo returns them for the F-07 states the card has to draw.
+static func _info_sheets() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var specs := [
+		["bag · dish", {title = "Grilled Crucian", icon = _tex("dish_grilled_crucian"), quantity = 3, info = true, rarity_text = "Common", quality = 1,
+			facts = ["+20 Energy"], buttons = [{id = &"gift", label = "Gift ›", kind = &"nav"}, {id = &"eat", label = "Eat · +20 Energy", kind = &"primary"}],
+			lock = {shown = true, locked = false}}],
+		["counter sell · quota short", {title = "Radish", icon = _tex("crop_radish"), quantity = 12, info = true, rarity_text = "Common",
+			facts = ["12 · Harvested at home", "4 each"], buttons = [{id = &"sell", label = "Sell", kind = &"secondary"},
+			{id = &"sell_all", label = "Sell 5 · 20 coins", kind = &"primary"}], lock = {shown = true, locked = false}}],
+		["locked stack", {title = "Radish", icon = _tex("crop_radish"), quantity = 12, info = true, badge = &"locked",
+			facts = ["5 each"], buttons = [{id = &"locked", label = "Locked", kind = &"unavailable"}, {id = &"unlock", label = "Unlock", kind = &"secondary"}],
+			lock = {shown = true, locked = true}}],
+		["bag · seed away from home", {title = "Radish Seeds", icon = _tex("seed_radish"), quantity = 20, info = true, badge = &"pinned",
+			facts = ["2 Energy per plot · Ready in 4h 0m"], buttons = [{id = &"pin", label = "Unpin", kind = &"secondary"},
+			{id = &"store", label = "At home only", kind = &"unavailable"}], lock = {shown = true, locked = false}}],
+	]
+	for pair in specs:
+		var sheet := UiInfoSheet.new()
+		var spec: Dictionary = pair[1]
+		sheet.rules = func(id, ctx, o): return spec
+		sheet.custom_minimum_size.x = 328   # the gallery column (the main is 336 inside the 360 drawer)
+		sheet.open("sample", &"bag")
+		v.add_child(_captioned(sheet, pair[0]))
+	return v
+

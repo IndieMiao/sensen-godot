@@ -233,7 +233,6 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 	var quota := _quota_of(view, kind, opts)
 	var sellable := count
 	if not quota.is_empty(): sellable = mini(count, maxi(0, int(quota.get("cap", 0)) - int(quota.get("used", 0))))
-	var rarity := int(it.get("rarity", 0))
 	var rod := _rod(view, item_id)
 	var t := {
 		count = str(count) if count > 0 else "",
@@ -247,7 +246,6 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		use = "",
 		region_line = "",
 		pin_verb = "Unpin" if opts.get("pinned", false) else "Pin",
-		rarity_line = (P0Logic.rarity_name(view, rarity) + " ★".repeat(int(it.get("quality", 0)))) if rarity > 0 else "",
 		dex = _dex(view),
 		meal = str(int(it.get("meal", 0))) if kind == "dish" else "",
 		eat_label = str(P0Logic.eat_button(view, item_id).get("text", "")) if kind == "dish" else "",

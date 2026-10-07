@@ -88,7 +88,6 @@
       "primary:Eat · +45 Energy"
     ],
     "facts": [
-      "Common ★",
       "+45 Energy"
     ],
     "lock": {
@@ -104,7 +103,6 @@
       "unavailable:Sell at home"
     ],
     "facts": [
-      "Common ★",
       "1"
     ],
     "lock": {
@@ -122,9 +120,7 @@
   "dish_grilled_crucian/gift": {
     "badge": "",
     "buttons": [],
-    "facts": [
-      "Common ★"
-    ],
+    "facts": [],
     "lock": {
       "locked": false,
       "shown": false
@@ -136,7 +132,6 @@
     "badge": "",
     "buttons": [],
     "facts": [
-      "Common",
       "3",
       "Sells for 6 · Fish-dex 1/2"
     ],
@@ -154,7 +149,6 @@
       "primary:Sell All · 18 coins"
     ],
     "facts": [
-      "Common",
       "3",
       "6 each"
     ],
@@ -173,9 +167,7 @@
   "fish_crucian/gift": {
     "badge": "",
     "buttons": [],
-    "facts": [
-      "Common"
-    ],
+    "facts": [],
     "lock": {
       "locked": false,
       "shown": false

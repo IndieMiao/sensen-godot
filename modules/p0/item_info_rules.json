@@ -10,7 +10,8 @@
     "  entry at all (no grey text: seeds and bait are never sold).",
     "promote: the button id that becomes primary when its own `when` holds, demoting the default primary (Deliver over Eat).",
     "lock: the title-area lock icon is shown; price: the buy row has a price column; quota: the sell area shows the quota line.",
-    "Capability flags (can_store, can_lock, can_gift) gate actions the P0 server can't do yet: no button and no grey text until the view carries the feature (storage, locked on bag stacks, residents / social)."
+    "Capability flags (can_store, can_lock, can_gift) gate actions the P0 server can't do yet: no button and no grey text until the view carries the feature (storage, locked on bag stacks, residents / social).",
+    "Rarity and dish stars sit on the card's state line (spec.rarity_text, spec.quality), not in facts."
   ],
   "seed/bag": {
     "facts": [
@@ -138,7 +139,6 @@
   },
   "fish/bag": {
     "facts": [
-      "{rarity_line}",
       "{count} · {source}",
       "Sells for {sell} · Fish-dex {dex}",
       "{xp_hint}"
@@ -161,7 +161,6 @@
   },
   "fish/counter_sell": {
     "facts": [
-      "{rarity_line}",
       "{count} · {region_line}",
       "{sell_here} each"
     ],
@@ -212,9 +211,7 @@
     ]
   },
   "fish/gift": {
-    "facts": [
-      "{rarity_line}"
-    ],
+    "facts": [],
     "buttons": [
       {
         "id": "deliver",
@@ -238,7 +235,6 @@
   },
   "dish/bag": {
     "facts": [
-      "{rarity_line}",
       "+{meal} Energy",
       "{gifted_line}",
       "{expires_line}"
@@ -273,7 +269,6 @@
   },
   "dish/counter_sell": {
     "facts": [
-      "{rarity_line}",
       "{count}",
       "{sell_here} each"
     ],
@@ -325,7 +320,6 @@
   },
   "dish/gift": {
     "facts": [
-      "{rarity_line}",
       "{affinity_line}"
     ],
     "buttons": [

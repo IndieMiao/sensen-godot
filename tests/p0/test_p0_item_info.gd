@@ -128,7 +128,8 @@ func test_locked_stack_shows_locked_and_unlock_only() -> void:
 func test_fish_gift_is_grey_without_mutual_friends() -> void:
 	var s := P0ItemInfo.spec(_full(), "fish_crucian", &"bag")
 	assert_array(_labels(s)).is_equal(["unavailable:Gift · Mutual friends only"])
-	assert_array(s.facts).is_equal(["Common", "3", "Sells for 6 · Fish-dex 1/2"])
+	assert_array(s.facts).is_equal(["3", "Sells for 6 · Fish-dex 1/2"])
+	assert_str(s.rarity_text).is_equal("Common")   # rarity sits on the state line, not in facts
 	var v := _full()
 	v["social"] = {"mutual": 2}
 	assert_array(_labels(P0ItemInfo.spec(v, "fish_crucian", &"bag"))).is_equal(["nav:Gift ›"])
@@ -136,7 +137,9 @@ func test_fish_gift_is_grey_without_mutual_friends() -> void:
 func test_dish_eats_and_deliver_takes_the_primary_slot() -> void:
 	var s := P0ItemInfo.spec(_full(), "dish_grilled_crucian", &"bag")
 	assert_array(_labels(s)).is_equal(["primary:Eat · +45 Energy", "nav:Gift ›"])
-	assert_str(s.facts[0]).is_equal("Common ★")
+	assert_str(s.rarity_text).is_equal("Common")
+	assert_int(s.quality).is_equal(1)
+	assert_array(s.facts).is_equal(["+45 Energy"])
 	var v := _full()
 	v.energy.value = 200
 	assert_array(_labels(P0ItemInfo.spec(v, "dish_grilled_crucian", &"bag"))).is_equal(["unavailable:Energy full", "nav:Gift ›"])
