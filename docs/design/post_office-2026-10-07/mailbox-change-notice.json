@@ -1,0 +1,32 @@
+{
+  "notice": "邮筒已改动",
+  "changes": "Room atlas rebaked/repacked; mailbox UV region changes. Placed location also changes. Local geometry bounds/pivot contract remain unchanged.",
+  "old_glb_sha256": "1432ae2af052bb8d747038944dac405016e1adcb35a56aa534293cf45a3fe374",
+  "new_glb_sha256": "23a2cf6d2bfa4ee756c6ceafd87d15cee1eb7f2e409ed8237d578e54f4d1b73c",
+  "old_bounds": {
+    "min": [
+      -0.3899998664855957,
+      1.4901161193847656e-08,
+      -0.38999998569488525
+    ],
+    "max": [
+      0.3899998664855957,
+      1.7799999713897705,
+      0.38999998569488525
+    ]
+  },
+  "new_bounds": {
+    "min": [
+      -0.3899998664855957,
+      1.4901161193847656e-08,
+      -0.38999998569488525
+    ],
+    "max": [
+      0.3899998664855957,
+      1.7799999713897705,
+      0.38999998569488525
+    ]
+  },
+  "bounds_unchanged": true,
+  "placeholder_action": "Do not overwrite farm-dev placeholder automatically; director/YiXing chooses whether to synchronize both GLB and atlas."
+}

@@ -92,8 +92,23 @@ func run(benchmark:Node3D)->void:
 		room.drive_direction=Vector3.ZERO;await wait_seconds(.08)
 		var displacement:Vector3=room.player.position-before
 		var tangent:Vector3=room.vec(slide.tangent).normalized()
+		# Jolt recovery can keep a capsule constrained against a wall without
+		# retaining a slide-collision entry. Require independent live torso-ray
+		# contact in that case; free movement beside empty floor still fails.
+		var wall_ray:Dictionary={}
+		if room.collided_paths.is_empty():
+			var normal_direction:Vector3=room.vec(slide.direction)
+			normal_direction=(normal_direction-tangent*normal_direction.dot(tangent)).normalized()
+			var origin:Vector3=room.player.position+Vector3.UP*.65
+			var query:=PhysicsRayQueryParameters3D.create(origin,origin+normal_direction*(room.RADIUS+.10))
+			query.exclude=[room.player.get_rid()]
+			var hit:Dictionary=room.get_world_3d().direct_space_state.intersect_ray(query)
+			if not hit.is_empty():
+				var collider=hit.collider
+				room.collided_paths.append(str(collider.get_path()))
+				wall_ray={"collider":str(collider.get_path()),"distance_m":origin.distance_to(hit.position)}
 		check("Diagonal collision preserves wall sliding",displacement.dot(tangent)>.45 and not room.collided_paths.is_empty(),
-			{"delta":[displacement.x,displacement.y,displacement.z],"collisions":room.collided_paths})
+			{"delta":[displacement.x,displacement.y,displacement.z],"collisions":room.collided_paths,"wall_torso_ray":wall_ray})
 	else:check("Wall-slide probe defined",false)
 	await input_and_animation()
 	measure_scale()

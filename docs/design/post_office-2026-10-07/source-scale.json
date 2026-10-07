@@ -1,0 +1,46 @@
+{
+  "door": {
+    "source_objects": [
+      "Blue door panel"
+    ],
+    "world_min_y": 0.07500004768371582,
+    "world_max_y": 2.375,
+    "measured_height": 2.299999952316284,
+    "declared_height": 2.3,
+    "passed": true
+  },
+  "counter": {
+    "source_objects": [
+      "Counter thick oak top"
+    ],
+    "world_min_y": 1.2419999837875366,
+    "world_max_y": 1.3920000791549683,
+    "measured_height": 1.3100000791549682,
+    "declared_height": 1.31,
+    "passed": true
+  },
+  "chair": {
+    "source_objects": [
+      "Round stool seat"
+    ],
+    "world_min_y": 0.5519999861717224,
+    "world_max_y": 0.671999990940094,
+    "measured_height": 0.589999990940094,
+    "declared_height": 0.59,
+    "passed": true
+  },
+  "table": {
+    "source_objects": [
+      "Workbench top plank",
+      "Workbench top plank.001",
+      "Workbench top plank.002",
+      "Workbench top plank.003",
+      "Workbench top plank.004"
+    ],
+    "world_min_y": 0.9469999670982361,
+    "world_max_y": 1.097000002861023,
+    "measured_height": 1.0150000028610229,
+    "declared_height": 1.015,
+    "passed": true
+  }
+}

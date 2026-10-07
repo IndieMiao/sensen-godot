@@ -1,5 +1,25 @@
 {
-  "status": "art review candidate; user acceptance pending",
+  "state": "Review",
+  "user_acceptance": "pending",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2967"
+  },
+  "renderer": {
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "colliders": 22,
+    "finite_aabbs": true,
+    "material_count": 5,
+    "mesh_instances": 34,
+    "renderer": "mobile",
+    "resolution": [
+      1440,
+      1080
+    ],
+    "scene": "post_office",
+    "surfaces": 34,
+    "triangles": 172218
+  },
   "asset_stats": {
     "atlas": {
       "size": [
@@ -12,311 +32,313 @@
     "assets": [
       {
         "name": "room_shell",
-        "vertices": 4912,
-        "triangles": 9476,
+        "vertices": 8776,
+        "triangles": 16928,
         "surfaces": 1,
-        "bytes": 338468
+        "bytes": 583856
       },
       {
         "name": "window_wall",
         "vertices": 888,
         "triangles": 1728,
         "surfaces": 1,
-        "bytes": 61380
+        "bytes": 59460
       },
       {
         "name": "back_wall",
         "vertices": 584,
         "triangles": 1132,
         "surfaces": 1,
-        "bytes": 40680
+        "bytes": 39204
       },
       {
         "name": "postal_blue_door",
-        "vertices": 758,
-        "triangles": 1460,
+        "vertices": 254,
+        "triangles": 488,
         "surfaces": 1,
-        "bytes": 54696
+        "bytes": 19228
       },
       {
         "name": "sorting_cabinet",
-        "vertices": 952,
-        "triangles": 1836,
+        "vertices": 1016,
+        "triangles": 1956,
         "surfaces": 1,
-        "bytes": 66808
-      },
-      {
-        "name": "mail_stack",
-        "vertices": 336,
-        "triangles": 648,
-        "surfaces": 1,
-        "bytes": 24468
+        "bytes": 70984
       },
       {
         "name": "red_post_box",
         "vertices": 1102,
         "triangles": 2172,
         "surfaces": 1,
-        "bytes": 74292
+        "bytes": 72980
       },
       {
         "name": "world_map",
         "vertices": 350,
         "triangles": 656,
         "surfaces": 1,
-        "bytes": 28028
+        "bytes": 27388
       },
       {
         "name": "wall_clock",
         "vertices": 328,
         "triangles": 592,
         "surfaces": 1,
-        "bytes": 30656
-      },
-      {
-        "name": "post_office_sign",
-        "vertices": 2580,
-        "triangles": 4436,
-        "surfaces": 1,
-        "bytes": 390260
+        "bytes": 30016
       },
       {
         "name": "postal_counter",
         "vertices": 1120,
         "triangles": 2160,
         "surfaces": 1,
-        "bytes": 78352
-      },
-      {
-        "name": "counter_computer",
-        "vertices": 952,
-        "triangles": 1836,
-        "surfaces": 1,
-        "bytes": 66812
-      },
-      {
-        "name": "counter_bell",
-        "vertices": 144,
-        "triangles": 280,
-        "surfaces": 1,
-        "bytes": 11004
-      },
-      {
-        "name": "counter_stamps",
-        "vertices": 248,
-        "triangles": 468,
-        "surfaces": 1,
-        "bytes": 21604
-      },
-      {
-        "name": "counter_mail_tray",
-        "vertices": 3547,
-        "triangles": 6826,
-        "surfaces": 1,
-        "bytes": 247456
+        "bytes": 75792
       },
       {
         "name": "parcel_shelves",
         "vertices": 392,
         "triangles": 756,
         "surfaces": 1,
-        "bytes": 28320
-      },
-      {
-        "name": "brown_parcel",
-        "vertices": 504,
-        "triangles": 972,
-        "surfaces": 1,
-        "bytes": 36016
-      },
-      {
-        "name": "blue_parcel",
-        "vertices": 504,
-        "triangles": 972,
-        "surfaces": 1,
-        "bytes": 36016
-      },
-      {
-        "name": "mail_sacks",
-        "vertices": 1658,
-        "triangles": 3220,
-        "surfaces": 1,
-        "bytes": 109920
+        "bytes": 27424
       },
       {
         "name": "packing_table",
         "vertices": 672,
         "triangles": 1296,
         "surfaces": 1,
-        "bytes": 47564
-      },
-      {
-        "name": "packing_mat",
-        "vertices": 56,
-        "triangles": 108,
-        "surfaces": 1,
-        "bytes": 5216
-      },
-      {
-        "name": "packing_parcel",
-        "vertices": 504,
-        "triangles": 972,
-        "surfaces": 1,
-        "bytes": 36020
-      },
-      {
-        "name": "postal_scale",
-        "vertices": 200,
-        "triangles": 384,
-        "surfaces": 1,
-        "bytes": 15652
-      },
-      {
-        "name": "packing_supplies",
-        "vertices": 1020,
-        "triangles": 1976,
-        "surfaces": 1,
-        "bytes": 86516
-      },
-      {
-        "name": "desk_airmail",
-        "vertices": 280,
-        "triangles": 540,
-        "surfaces": 1,
-        "bytes": 20620
-      },
-      {
-        "name": "underdesk_boxes",
-        "vertices": 4368,
-        "triangles": 8424,
-        "surfaces": 1,
-        "bytes": 301520
+        "bytes": 46028
       },
       {
         "name": "packing_stool",
         "vertices": 96,
         "triangles": 176,
         "surfaces": 1,
-        "bytes": 9860
+        "bytes": 9604
       },
       {
-        "name": "entry_rug",
-        "vertices": 408,
-        "triangles": 732,
+        "name": "postal_door_frame",
+        "vertices": 168,
+        "triangles": 324,
         "surfaces": 1,
-        "bytes": 34032
+        "bytes": 12548
       },
       {
-        "name": "packing_rug",
-        "vertices": 344,
-        "triangles": 636,
+        "name": "postal_door_glass",
+        "vertices": 336,
+        "triangles": 648,
         "surfaces": 1,
-        "bytes": 27340
+        "bytes": 23704
       },
       {
-        "name": "floor_plant",
-        "vertices": 571,
-        "triangles": 1078,
+        "name": "counter_computer",
+        "vertices": 1960,
+        "triangles": 3780,
         "surfaces": 1,
-        "bytes": 47220
+        "bytes": 131576
       },
       {
-        "name": "counter_plant",
-        "vertices": 1514,
-        "triangles": 2868,
+        "name": "post_office_sign",
+        "vertices": 5386,
+        "triangles": 8236,
         "surfaces": 1,
-        "bytes": 122120
+        "bytes": 690564
       },
       {
-        "name": "cabinet_plant",
-        "vertices": 1514,
-        "triangles": 2868,
+        "name": "sorted_letters",
+        "vertices": 31140,
+        "triangles": 59880,
         "surfaces": 1,
-        "bytes": 122116
+        "bytes": 2093356
       },
       {
-        "name": "parcel_shelf_plant",
-        "vertices": 1514,
-        "triangles": 2868,
+        "name": "parcel_shelf_stock",
+        "vertices": 5068,
+        "triangles": 9724,
         "surfaces": 1,
-        "bytes": 122128
+        "bytes": 356960
       },
       {
-        "name": "door_notice",
-        "vertices": 544,
-        "triangles": 1040,
+        "name": "mail_sacks",
+        "vertices": 2578,
+        "triangles": 4980,
         "surfaces": 1,
-        "bytes": 43432
+        "bytes": 171172
       },
       {
-        "name": "door_light",
-        "vertices": 200,
-        "triangles": 368,
+        "name": "counter_bell",
+        "vertices": 328,
+        "triangles": 644,
         "surfaces": 1,
-        "bytes": 17984
+        "bytes": 21612
+      },
+      {
+        "name": "magazine_rack",
+        "vertices": 5119,
+        "triangles": 9846,
+        "surfaces": 1,
+        "bytes": 344540
+      },
+      {
+        "name": "door_lamp_glow",
+        "vertices": 222,
+        "triangles": 440,
+        "surfaces": 1,
+        "bytes": 13108
+      },
+      {
+        "name": "blue_entry_mat",
+        "vertices": 168,
+        "triangles": 324,
+        "surfaces": 1,
+        "bytes": 12540
+      },
+      {
+        "name": "corner_letter_crate",
+        "vertices": 4066,
+        "triangles": 7824,
+        "surfaces": 1,
+        "bytes": 273544
+      },
+      {
+        "name": "front_floor_runner",
+        "vertices": 168,
+        "triangles": 324,
+        "surfaces": 1,
+        "bytes": 12548
+      },
+      {
+        "name": "counter_dressing",
+        "vertices": 4146,
+        "triangles": 7968,
+        "surfaces": 1,
+        "bytes": 282100
+      },
+      {
+        "name": "wall_dressing",
+        "vertices": 1392,
+        "triangles": 2684,
+        "surfaces": 1,
+        "bytes": 95596
+      },
+      {
+        "name": "packing_dressing",
+        "vertices": 8069,
+        "triangles": 15570,
+        "surfaces": 1,
+        "bytes": 560456
       }
     ],
-    "unique_triangles": 67960,
-    "scene_triangles": 78004,
-    "static_draw_surfaces": 49,
-    "glb_bytes": 2804576,
-    "atlas_bytes": 2576486,
-    "placed_instances": 49,
-    "materials": 1
-  },
-  "godot": {
-    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "colliders": 9,
-    "finite_aabbs": true,
-    "material_count": 1,
-    "mesh_instances": 49,
-    "renderer": "mobile",
-    "resolution": [
-      1440,
-      1080
+    "unique_triangles": 163236,
+    "scene_triangles": 172218,
+    "static_draw_surfaces": 34,
+    "glb_bytes": 6157888,
+    "atlas_bytes": 2155957,
+    "placed_instances": 34,
+    "materials": 2,
+    "local_scene_triangles": 163236,
+    "shared_scene_triangles": 8982,
+    "shared_assets": [
+      {
+        "name": "peace_lily",
+        "vertices": 620,
+        "triangles": 946,
+        "surfaces": 1,
+        "bytes": 26780
+      },
+      {
+        "name": "pothos",
+        "vertices": 1670,
+        "triangles": 2048,
+        "surfaces": 1,
+        "bytes": 67012
+      }
     ],
-    "scene": "post_office",
-    "surfaces": 49,
-    "triangles": 78004
+    "plant_budget_triangles": 8982,
+    "budget_limits": {
+      "placed_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "budget_passed": true
+  },
+  "camera_fit": {
+    "method": "Three visible plinth-edge intersections,1544square reference contained without warp;edge slopes and mean scale,hidden fourth inferred.",
+    "anchors": {
+      "left": [
+        256.2435233160622,
+        735.1554404145078
+      ],
+      "front": [
+        722.7979274611399,
+        1015.6476683937824
+      ],
+      "right": [
+        1197.0466321243525,
+        744.2487046632125
+      ]
+    },
+    "pitch_degrees": 35.913067280929084,
+    "yaw_degrees": 45.706289855175946,
+    "camera": {
+      "position": [
+        10.73654100751163,
+        13.191920594830878,
+        10.475050701262555
+      ],
+      "target": [
+        0,
+        2.3285169667382886,
+        0
+      ],
+      "size": 14.474629114063505
+    }
+  },
+  "checks": {
+    "character_checks": 34,
+    "character_passed": true,
+    "route_video_passed": true,
+    "colour_passed": true,
+    "normals_uv_external_images": true
+  },
+  "video": {
+    "duration_seconds": 15.0,
+    "sha256": "58339609577d104edf3114a69a3edecb3079e0a3d9b69a5675339f52419b5d85"
   },
   "hashes": {
-    "assets/rooms/post_office/packing_stool.glb": "00c7cadd5a475089f76ecd442f3fde6f941b29b1318ae630fc8f7afc0580f6b7",
-    "assets/rooms/post_office/packing_table.glb": "f7861fb0dff0532b45004599a5fe7fbd5aef4005c05e99e894776c98bacfcb7c",
-    "assets/rooms/post_office/sorting_cabinet.glb": "7b55c8e141c1c196e0b3d5f7392e3c63ac623897ad995c4b61f336e7209b58a3",
-    "assets/rooms/post_office/counter_stamps.glb": "47fbddd2a51c7b7ccefbf5e73b7556f8ee61244d7658beffc94d9a45b816c5cd",
-    "assets/rooms/post_office/packing_mat.glb": "3eed2a897938476722602c6d6da29dd47e616e453abda27ccf42de594f68f612",
-    "assets/rooms/post_office/packing_parcel.glb": "250e33c43f43853182f83eaab0bd1a6b555fd4193b5e6779a932b54a4d673537",
-    "assets/rooms/post_office/post_office_sign.glb": "b770076e0e8ed8f06817c4b2b78522e83ce85c76eda86b5bc2fa477bb4d33717",
-    "assets/rooms/post_office/postal_scale.glb": "c4328a90730b8b265405d5a2694a841a1df4293da62757e903d8994e059779a0",
-    "assets/rooms/post_office/packing_supplies.glb": "e1ec133e72d60aa018ff1561f1aa29378b1520f71b11a8c87a825cd641a197a9",
-    "assets/rooms/post_office/back_wall.glb": "da5fd686f9029192de7813d927779dc94004669761c6cf995cf6e76125a4b368",
-    "assets/rooms/post_office/floor_plant.glb": "47779dbf5b35102c7f082ce44feb21f459bad1e7e2a086c0307ffb6bb87fed54",
-    "assets/rooms/post_office/parcel_shelves.glb": "641ea9d9ddcb0b8fcc5da0a185d46427aa9d503c166d8228307ae0b272e3c824",
-    "assets/rooms/post_office/underdesk_boxes.glb": "2779ad15627d2cc96ac8a19b972cf5b3c94b7370f5c14043dacd1fe94b08fb2c",
-    "assets/rooms/post_office/mail_stack.glb": "62ee7853b4ac969ca4abd46c46a5093680f2ca47944156e1281bdbcb47ad9f2b",
-    "assets/rooms/post_office/room_shell.glb": "bb0204f535f65e23e4dbb79d3b6a3c68402f062a40ff59126fb0d1ac2d96e29d",
-    "assets/rooms/post_office/door_notice.glb": "8dc5ec12d7cde41c2ba794b667344e1afbeb535c3418b0810495a0f51ba092e0",
-    "assets/rooms/post_office/counter_bell.glb": "a84c2066bf8b26f7bc0b2d0ef5719bc2b9ec7f97f433190b0b460263aa078c73",
-    "assets/rooms/post_office/mail_sacks.glb": "f572d751ca8b2a55743a5e0d98629b2a6cf91b8bfe70eb7cbd2293bae6e5cfb9",
-    "assets/rooms/post_office/red_post_box.glb": "1432ae2af052bb8d747038944dac405016e1adcb35a56aa534293cf45a3fe374",
-    "assets/rooms/post_office/entry_rug.glb": "c95cd4b53322fe7ac3990645bab7a355d974e32ad49d65cf25656879a3ebcdbf",
-    "assets/rooms/post_office/parcel_shelf_plant.glb": "483f987b6d587370dac855518cc0f13ae02405297423aa130b37e6aa41755795",
-    "assets/rooms/post_office/counter_computer.glb": "aada087608093dc312c974f363d1e920d48e123a54fb4f51c23e62e4712522e8",
-    "assets/rooms/post_office/counter_plant.glb": "b8926ae25c002b7799df3f95f25ba61a5904eb650adc2f9a4d14fb4a0ec3eadc",
-    "assets/rooms/post_office/brown_parcel.glb": "b84318f1cfc6445c4d163757a68cd6d401b20f63d5b949022303b46475d45bd5",
-    "assets/rooms/post_office/desk_airmail.glb": "ffed848b7bf70a3010dd782f092bdc5b1e5e304bbe11f51590c334869adf83b2",
-    "assets/rooms/post_office/postal_blue_door.glb": "60f6a0fed1d95f134eb18c49280f172aee8edc2d8f4f7902195d32adef55e92f",
-    "assets/rooms/post_office/cabinet_plant.glb": "f7ac26182d3a481919bff8729c9c25df9f39b3cfeb4b6ff978f93ab7877c5afe",
-    "assets/rooms/post_office/packing_rug.glb": "07c70ee87822f29e99bc052170b1cf3af1bf7e10c3568e3a31e8a1d307cc385c",
-    "assets/rooms/post_office/wall_clock.glb": "3d5da4b1c727abc04a763f8d4a6275b278e4f4ef2309d5f1dac8ff8010c950de",
-    "assets/rooms/post_office/postal_counter.glb": "6f76c85f443aaa965fa6250c2144f7170147b90bc975e6028eda9a86e0444241",
-    "assets/rooms/post_office/world_map.glb": "24435483048e4fb034f52540569704b04bb860b30c219128d2429ad415c5ad50",
-    "assets/rooms/post_office/door_light.glb": "091ae13cf5362701f9bfda8a1224c1cf1f222b7e7321a5906209477808a98416",
-    "assets/rooms/post_office/counter_mail_tray.glb": "b48c98db12cdc7eb7eb0fb6b567dc4322e0bc59530d2ddea3e100953a8e87c45",
-    "assets/rooms/post_office/window_wall.glb": "cd7dc936bf17b37911ee70cf69d00d079bffea3b7951376b60ff0bb13162a435",
-    "assets/rooms/post_office/blue_parcel.glb": "5ffb59ee51986ff8f5b3f605ac46f031e739d283055f7dccec0185b95d3f8c45",
-    "assets/rooms/post_office/room_albedo_ao.png": "3f0ef2f6b4b101324818647b4447960f1d50382492a95d65e637ecc9b6599864",
-    "tools/art/source/post_office/post_office.blend": "6640a116a0a84ca670000a48b15a2c120790882c5f06896b50a67e76301628c8"
+    "assets/rooms/post_office/room_shell.glb": "7ddf63c77d1968ddb552c515c1fd5c19c295458af7de139aab352c6c5c4b7149",
+    "assets/rooms/post_office/window_wall.glb": "c35c3761d2267922dd8bff3e09e89b671f58726f8eaa153e044f3bb522ef1fd0",
+    "assets/rooms/post_office/back_wall.glb": "f70680f864537e3a30f8fed056ba963781bbc05be31bdee834c5ca6a04eba3ef",
+    "assets/rooms/post_office/postal_blue_door.glb": "edef9197d2f9597363a075674146b40bc94c287f057b5729d8a8b41fcdf8bdf2",
+    "assets/rooms/post_office/sorting_cabinet.glb": "e469c7c1f13834cdb18c12c7d4fb0f97d9d15ccfb232533f509df45221b1b1c5",
+    "assets/rooms/post_office/red_post_box.glb": "23a2cf6d2bfa4ee756c6ceafd87d15cee1eb7f2e409ed8237d578e54f4d1b73c",
+    "assets/rooms/post_office/world_map.glb": "d69fed52c53acff5e8800b15bd17e80e6401f394ee563bf685b3c495693025a5",
+    "assets/rooms/post_office/wall_clock.glb": "9104951fd03bd18502665463f1a093f977368e039f5236273242db663fcab7dd",
+    "assets/rooms/post_office/postal_counter.glb": "187ea9c7f1d58fd3cf48310919371a65b18ab6a8e8e84e875e973dffee9b8f60",
+    "assets/rooms/post_office/parcel_shelves.glb": "9401605487eaa692f090b022bec968b8af4f547e13d28c69d34021df0e143100",
+    "assets/rooms/post_office/packing_table.glb": "6cd01c14257e7f67dedcf1076c7f7287c33931561bfe25e7980e8f2012cb57f3",
+    "assets/rooms/post_office/packing_stool.glb": "ce0ce5aee253ad43a2146e19b45635385bef713114417e4dca469881ec3978d8",
+    "assets/rooms/post_office/postal_door_frame.glb": "9855bf5b9c551052e5ce7840719117175bfc26ca84b8c1819d1d3545b80245ed",
+    "assets/rooms/post_office/postal_door_glass.glb": "741a02506d661f39b069b348bcebfbc33bcaa3e882630f42d45681377722f642",
+    "assets/rooms/post_office/counter_computer.glb": "8deaa80a156f3cc67fec5d9fb0bc4766d39694fb238ecb6bc49bdad545467547",
+    "assets/rooms/post_office/post_office_sign.glb": "d1e2a1944761fc589988fa44f4ba44f1b2966a06c84799821cfc3a173e89bcfc",
+    "assets/rooms/post_office/sorted_letters.glb": "0b8ebff6bed6928c03d865acad04751af15d8d59689a42b04c99c328f43f7e1c",
+    "assets/rooms/post_office/parcel_shelf_stock.glb": "4d06953ecae1d751241170355585b13f74c5126440fca4b9726392c62f1e86c7",
+    "assets/rooms/post_office/mail_sacks.glb": "5bdf686f73b5fe15626992a59fbbd04f8268d923502255025b0226941cb3f435",
+    "assets/rooms/post_office/counter_bell.glb": "7aadef05000b7c1ccdf899ea2c31851a05c9d12b775e8fbc6878df1b43006307",
+    "assets/rooms/post_office/magazine_rack.glb": "96fac20342e9c8bfc722da2dccfa4bfbc4f9c9c07c7ac7aa1c241da2b7a48f27",
+    "assets/rooms/post_office/door_lamp_glow.glb": "1d627b25e2a839335b63610992958050cb20bcc0ebadad01212afe43be7fdb1c",
+    "assets/rooms/post_office/blue_entry_mat.glb": "abcfd0cea4ccdc5262926dd42fed46ce20be23070533ce74b32f7dc673035b32",
+    "assets/rooms/post_office/corner_letter_crate.glb": "86e5aa5a81ed5d31899d7adfa1381d5deb9e735af56dc01bed38e02f2604dd46",
+    "assets/rooms/post_office/front_floor_runner.glb": "46bcca591ae908ed2f4b1fa95507f0d4be13e5d48fc60e3ef528f326971c2f65",
+    "assets/rooms/post_office/counter_dressing.glb": "cd4834e92def454fa678adcedf7c6376ee4b834b7103586974f6e50695569956",
+    "assets/rooms/post_office/wall_dressing.glb": "5ab2d546a1e6513f2a852448b104a9cf70adf679e8bbf2adc819e5c7de751aad",
+    "assets/rooms/post_office/packing_dressing.glb": "e2a65ae92014f9b0ae0ac7efd700abe4a896cd5ed9388684f8833beecd94bd2c",
+    "assets/rooms/_shared/plants/peace_lily.glb": "c08e656b11a7dfcf41d2831a73d1ae547001247ff2eab45a4bee0ed494016d21",
+    "assets/rooms/_shared/plants/pothos.glb": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
+    "assets/rooms/post_office/room_albedo_ao.png": "dbae34e9aaeb7553c7264ef841e939ba43b6d462ad60eb18ba1e2132021ffbd9",
+    "assets/rooms/_shared/plants/room_albedo_ao.png": "713c9f88ad08d91fccb6f2b0f1969162cbb6381367e632919ec8159ccf810b4a",
+    "assets/rooms/_shared/plants/material.tres": "f75e3970edd6f8caeaa485218465d51f718b0caee941923ee5825da94adf791b",
+    "tools/art/source/post_office/post_office.blend": "15725e7256a0188bc9b132f2086e7c4fd544bf186ed8afbb43b8c52cb8d965c1",
+    "assets/rooms/post_office/layout.json": "03187342c8a64f1e875d9a421379afeca8e35cc24a2d35197655b0ca0196b829"
   },
-  "scope": "Art assets only; no gameplay, Android benchmark, physical-device performance or release claim."
+  "scope": "Zhao Yun scene art revision; actual desktop rendered benchmark. No production update or physical-phone GPU claim."
 }
