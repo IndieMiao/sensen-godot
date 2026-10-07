@@ -227,7 +227,35 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 	var subtitle := "Recover or do something free" if have <= 0 else "%s needs %d Energy · you have %d" % [verb, need, have]
 	var cook := {"icon": "pot", "label": "Cook", "fact": "%d fish in creel" % fish if fish > 0 else "No fish to cook", "guide": "Show kitchen", "go": "stove", "on": fish > 0}
 	# TODO(SGODOT-224, bench): LOCK-09 guides Rest with "Show bench"; P0 has no bench, rest is at the farmhouse (197 60c82ad2).
-	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available" if rest_left > 0 else "Rested today · %s" % duration(float(rest.get("resets_in", 0))), "guide": "Show home", "go": "home", "on": rest_left > 0}
+	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show home", "go": "home", "on": true}
+	if rest_left <= 0:
+		rest_tile.fact = "Rested today · %s" % duration(float(rest.get("resets_in", 0)))
+		rest_tile.on = false
+	elif rest.has("away_ready_in"):   # q(41): Rest opens after 2 h away from the farm (SGODOT-228)
+		var away = rest.get("away_ready_in")
+		if away == null:
+			rest_tile.fact = "Leave the farm for %dh" % int(rest.get("away_h", 2))
+			rest_tile.on = false
+		elif float(away) > 0.0:
+			rest_tile.fact = "Back after %dh away · %s to go" % [int(rest.get("away_h", 2)), duration(float(away))]
+			rest_tile.on = false
+	var tea := {"icon": "dish_fruit_tea", "label": "Tea", "fact": "Tea House opens later", "guide": "", "go": "", "on": false}
+	var drinks: Dictionary = view.get("drinks", {})
+	if not drinks.is_empty():   # §3.4.4: three cups a day, shared by tea and coffee (SGODOT-228 view.drinks)
+		tea.guide = "Show on map"
+		tea.go = "outpost:tea"
+		tea.on = true
+		if int(drinks.get("left", 0)) <= 0:
+			tea.fact = "%d/%d today · %s" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3)), duration(float(drinks.get("resets_in", 0)))]
+			tea.on = false
+		elif bool(drinks.get("full", false)):
+			tea.fact = "Energy full"
+			tea.on = false
+		elif drinks.get("need", null) != null and int(drinks.need) > 0:
+			tea.fact = "Need %d more coins" % int(drinks.need)
+			tea.on = false
+		else:
+			tea.fact = "%d/%d today · %d coins" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3)), int(drinks.get("price", 0))]
 	if not at_home:
 		for t in [cook, rest_tile]:
 			t.fact = "At home"
@@ -241,7 +269,7 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 		"tiles": [
 			{"icon": "dish_grilled_fish", "label": "Eat", "fact": "%d dish%s in bag" % [dishes, "" if dishes == 1 else "es"] if dishes > 0 else "No dishes in bag", "guide": "Open bag", "go": "bag", "on": dishes > 0},
 			cook,
-			{"icon": "dish_fruit_tea", "label": "Tea", "fact": "Tea House opens later", "guide": "", "go": "", "on": false},
+			tea,
 			rest_tile,
 		],
 	}

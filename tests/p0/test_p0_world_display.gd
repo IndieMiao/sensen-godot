@@ -191,3 +191,28 @@ func test_gift_drawer_shows_dishes_and_sends_gift() -> void:
 	assert_that(d.grid.shown_items().map(func(it): return it.id)).is_equal(["dish_grilled_crucian"])
 	d.action_requested.emit(&"gift", "dish_grilled_crucian", {})
 	assert_that(sent.back()).is_equal({"type": "gift", "resident": "res_pip", "item": "dish_grilled_crucian"})
+
+func test_energy_card_tea_and_rest_read_the_drinks_and_away_facts() -> void:
+	var v := _view()
+	v.energy = {"value": 1, "max": 200, "next_in": 161000, "regen_ms": 240000}
+	v["drinks"] = {"used": 1, "limit": 3, "left": 2, "price": 50, "need": null, "full": false, "resets_in": 3600000}
+	v.rest = {"used": 0, "limit": 1, "resets_in": 3600000, "away_h": 2, "away_ready_in": 4320000}
+	var tiles := {}
+	for t in P0Logic.energy_card(v, 2, "Sow ×1").tiles: tiles[t.label] = t
+	assert_str(str(tiles["Tea"].fact)).is_equal("1/3 today · 50 coins")
+	assert_bool(bool(tiles["Tea"].on)).is_true()
+	assert_str(str(tiles["Tea"].go)).is_equal("outpost:tea")
+	assert_str(str(tiles["Rest"].fact)).is_equal("Back after 2h away · 1h 12m to go")
+	assert_bool(bool(tiles["Rest"].on)).is_false()
+	v.drinks.need = 15
+	v.rest.away_ready_in = null
+	tiles = {}
+	for t in P0Logic.energy_card(v, 2, "Sow ×1").tiles: tiles[t.label] = t
+	assert_str(str(tiles["Tea"].fact)).is_equal("Need 15 more coins")
+	assert_bool(bool(tiles["Tea"].on)).is_false()
+	assert_str(str(tiles["Rest"].fact)).is_equal("Leave the farm for 2h")
+	v.rest.away_ready_in = 0
+	tiles = {}
+	for t in P0Logic.energy_card(v, 2, "Sow ×1").tiles: tiles[t.label] = t
+	assert_str(str(tiles["Rest"].fact)).is_equal("Available")
+	assert_bool(bool(tiles["Rest"].on)).is_true()

@@ -889,7 +889,8 @@ func open_energy_card(need: int, verb: String) -> void:
 	card.tile_pressed.connect(func(go: String):
 		close_modal()
 		if go == "bag": open_bag()
-		else: show_spot.emit(go))
+		elif show_label(go, surface, spot_reachable()) == "Show": show_spot.emit(go)
+		else: show_on_map.emit(map_target(go)))   # Tea's outpost, or home from the pond
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
