@@ -1,0 +1,32 @@
+{
+  "method": "Three visible plinth-edge intersections, full square reference contained in 1440x1080 without warping. Edge slopes fit pitch/yaw; mean scale fits physical 7.6x6.8m plinth.",
+  "anchors": {
+    "left": [
+      186.41160949868075,
+      696.7282321899737
+    ],
+    "front": [
+      754.1952506596307,
+      890.5013192612138
+    ],
+    "right": [
+      1243.6147757255937,
+      674.6437994722955
+    ]
+  },
+  "pitch_degrees": 22.828250829178174,
+  "yaw_degrees": 41.336633222811344,
+  "camera": {
+    "position": [
+      9.907228035606705,
+      7.680569194057143,
+      11.2626299171414
+    ],
+    "target": [
+      0,
+      1.366445034283947,
+      0
+    ],
+    "size": 13.814897831889498
+  }
+}

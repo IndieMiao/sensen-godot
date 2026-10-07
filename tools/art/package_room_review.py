@@ -1,9 +1,9 @@
 """Package actual scene-review evidence and enforce the batch's declared budgets."""
 from pathlib import Path
-import sys,json,hashlib,struct,shutil
+import sys,json,hashlib,struct,shutil,os
 from PIL import Image,ImageDraw,ImageFont,ImageOps
 ROOT=Path(__file__).resolve().parents[2];slug=sys.argv[1];card=sys.argv[2]
-DOC=ROOT/'docs/design'/(slug+'-2026-10-07');OUT=ROOT/'output'/('zhaoyun-'+card+'-review-2026-10-07');BENCH=OUT/'bench';KIT=ROOT/'assets/rooms'/slug
+DOC=ROOT/'docs/design'/(slug+'-2026-10-07');OUT=Path(os.environ.get('SCENE_REVIEW_OUTPUT',ROOT/'output'/('zhaoyun-'+card+'-review-2026-10-07')));BENCH=OUT/'bench';KIT=ROOT/'assets/rooms'/slug
 font=ImageFont.truetype('/usr/share/fonts/TTF/DejaVuSans.ttf',22)
 def sheet(items,name,width=960,height=720):
  canvas=Image.new('RGB',(width*len(items),height+58),'#f5f0df');d=ImageDraw.Draw(canvas)

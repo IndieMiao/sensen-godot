@@ -1,55 +1,31 @@
-# Bakery · art review candidate
+# SGODOT-175 · Bakery review revision
 
-Plane [SGODOT-175](https://plane.sensenjoy.cn/zili/browse/SGODOT-175), owner Zhao Yun / 赵云. **In Progress, awaiting user review.** Produced 2026-10-07 under the user's request to proceed sequentially overnight and send each scene through Lark CLI.
+赵云 · Review candidate after the SGODOT-172 R2 release. Reference: Figma `OMLTC3yw3u2WDjOZhLnhaR`, SceneDesign, node `545:2964`.
 
-Reference: Figma file `OMLTC3yw3u2WDjOZhLnhaR`, node [545:2964](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=545-2964). The [original export](reference.png) was downloaded and visually inspected before modeling.
+![Reference / revised Godot / direct 50% overlay](comparison.png)
 
-![Figma and actual Godot render](comparison.png)
+[Whole room](godot.png) · [Oven and workbench](detail-oven.png) · [Stocked curved display](detail-pastries.png) · [Model orthographics](orthographic-sheet.png).
 
-A warm bakery with a genuine cut-out domed masonry oven and open chimney, brick arch, recessed wood store and visible flame; tray rack and ingredient jars; sink and wall windows; kneading bench with dough, rolling pin and flour sack; curved transparent pastry case with three shelves; separate register counter; and a small round café table. BAKERY, FLOUR and Good Bread / Brighter Days preserve the source English wording.
+| Review requirement | Change |
+|---|---|
+| Structure and palette | Removed the Basic Room corner posts, post caps and beam brackets. Continuous apricot plaster walls meet at a bare plaster corner; red-brown top trim and 31 rows of narrower staggered reddish planks replace the former warm timber frame. |
+| Oven | Wider cream/apricot domed masonry oven, real arched mouth and lower wood-storage cavity, brick mouth voussoirs, brick chimney with mortar, hearth ledge, visible stored logs and peel. Orange gradient flames and a short-range warm OmniLight light the baking loaves and preparation area. |
+| Pastry display | Curved glass and metal outline enclose 25 pastries using five editable linked prototypes: cream strawberry cake, chocolate berry cake, fruit tart, croissant and scored loaf. Heights, yaw and offsets vary. Named prototypes remain in Blender's PROTOTYPE collections; display placements batch into one local-pivot runtime zone. Glass opacity is .045, retaining visibility of the food. |
+| Bread rack and jars | Five metal rack levels with bread and staggered baguettes/croissants; adjacent shelf has 24 jars/bottles of varied heights and colours. Back pantry adds six jars plus baskets of upright baguettes. |
+| Working props | Dough, rolling pin, utensils, mixing bowl, an actual dial scale, metric folded checked towel, FLOUR sack and wicker storage under the workbench. |
+| Sign and lights | Nunito Black rounded-bold 4mm-extruded BAKERY lettering on a curved cream wall-mounted plaque with red wood border and wheat motif; two black curved wall lights, green enamel pendant on a long cord and orange oven light. Blackboard reads Good / Bread / Brighter / Days. |
+| Cafe and plants | Two bentwood chairs with curved backs and green pads, round cafe table/cup/daisies and a braided round rug. Two shared olive trees by the left seating, large right-front peace lily, shared window/pantry pothos. Shared library is consumed without edits. |
 
-## Deliverables
+The camera fits three declared plinth corners; the rear corner is inferred. Whole-reference containment and direct 50% overlay use no image warping. The concept's single stylized view leaves residual upper-wall and furniture-position differences for review; [camera data](../../../tools/art/source/bakery/camera-review.json) records the fit.
 
-- [Editable Blender model](../../../tools/art/source/bakery/bakery.blend), with named objects and module collections.
-- [Deterministic scene generator](../../../tools/art/build_bakery.py), using the [room pipeline](../../../tools/art/scene_room_pipeline.py).
-- [GLB placement and collision manifest](../../../assets/rooms/bakery/layout.json), individual local pivots and a shared external base-color/contact-AO atlas.
-- [Reusable Godot art scene](../../../scenes/bakery/bakery_art.tscn), without gameplay/account/network dependencies.
-- [Whole-scene runtime image](godot.png), [model orthographic views](orthographic-sheet.png), [budget and verification hashes](verification-summary.json).
+[Marked fixed samples](colour-samples.png) and [RGB/HSV measurements](colour-verification.json) cover left/right plaster, red-brown trim and horizontal floor. Before tuning, a misplaced reference sample on a timber pantry ledge was reclassified to the actual plaster beside the left lamp; this correction is documented in `colour-patches.json`. The resulting fixed plaster sample initially measured 10.043° after the final lighting revision, so its material was warmed toward peach at the same sample point. Final fixed samples: **7.316° / 8.261° / 3.323° / 3.552°**, all ≤10°.
 
-## Reconstruction and contract
+**173,399 total triangles / 31,154 botanical triangles / 40 static surfaces**. [Budget/UV/normals/hash verification](verification-summary.json) enforces ≤200,000 total triangles, ≤100,000 botanical triangles and ≤60 static surfaces. Botanical budget conservatively includes the complete flower-containing cafe/wall module. Source geometry remains named/editable, with explicit local pivots and no atlas embedded in the delivered GLBs.
 
-```sh
-blender --background --factory-startup --python "$PWD/tools/art/build_bakery.py" -- --views
-python3 tools/art/prepare_room_review.py bakery
-godot --headless --editor --path output/bakery-2026-10-07/godot-project --import --quit
-godot --path output/bakery-2026-10-07/godot-project \
-  --script res://tools/art/review_room.gd -- bakery \
-  "$PWD/output/bakery-2026-10-07"
-```
+**34/34 rendered character checks and the 15-second real-time route video pass.** The art scene owns a controlled front entrance and supporting exterior pad, remaining perimeter boundaries and furniture blockers. Actual character traversal goes from the front to pastry display/cashier, around the workbench and to the cafe. The narrowest authored workbench/display overlap has **1.08095m** clear width, above .80m. [Rendered checks](bench-result.json), [live scales](bench-scale-measurements.json), [source dimensions](source-scale.json), [cloth UV ratios](cloth-uv-verification.json), [collision view](bench-collisions.png) and [15-second real-time video frames](video-frames.png) are supplied.
 
-Use the actual host display for rendering. Blender 5.2.0 LTS and Godot 4.7.2 were used here. `--geometry-only` skips bake/export. Rebuilding replaces this scene's `.blend`; preserve manual edits deliberately. Source assets from Basic Room remain read-only.
+Door scale is explicitly inapplicable to this open-front shop. Checkout top 1.15m, cafe seat .73m, cafe tabletop 1.0024m all remain within ±15% of the accepted Basic Room category; preparation workbench is 1.035m. Capsule .21m radius/1.25m height and 3.75m/s speed remain unchanged.
 
-Coordinates are metres, Godot Y-up/front +Z and Blender `(x,-z,y)`. Modules export about their own floor/mounting pivot; placement is in the manifest. The baked atlas contains procedural surface detail and softened contact AO, with live runtime sunlight. Rebake after major rearrangement. Raw GLBs must bind this atlas. Triangulation occurs before UV bake/export to keep surface interpolation consistent, and empty atlas gutters are extended before mip generation.
+Rebuild `tools/art/build_bakery.py`, which delegates to `source/bakery/revision.py`; use Blender's `measure_room_source.py -- bakery`, then the isolated Godot review and scene_bench workflow. Final checks/package: `check_room_colour.py bakery 175` and `package_room_review.py bakery 175` (Pillow/NumPy required).
 
-## Validation and budget
-
-Actual Godot **Mobile / Vulkan**, AMD Custom GPU 0405 (RADV VANGOGH), 1440×1080. 42 meshes have atlas materials and finite nonempty bounds; 14 simple collision shapes are present. The imported triangle count matches the export manifest.
-
-| Metric | Measured |
-|---|---:|
-| Unique GLBs / placed instances | 41 / 42 |
-| Unique / placed triangles | 119,848 / 121,144 |
-| Static surfaces | 42 |
-| GLB bytes combined | 5,482,500 |
-| Atlas source PNG bytes | 2,776,542 |
-| Shared atlas | 2048 × 2048 |
-
-Texture imports enable mipmaps and VRAM compression. Fine geometry keeps uncompressed vertices and disables automatic mesh LODs. Static surface counts exclude renderer shadow passes; PNG bytes are not GPU memory. No physical-phone performance measurement is claimed.
-
-## Inferences and differences
-
-The 7.2 × 6.4m floor, hidden construction and all dimensions are inferred. Brickwork and bread scoring are simplified; croissants and cakes use readable stylized forms instead of the exact pastry assortment. The shelving is less crowded, curtain/lighting embellishments are reduced, and the menu font differs. The source does not define an entrance, so the open presentation side is retained rather than inventing a visible door. Godot uses one deliberate transparent glazing material; the original image has more complex reflections and warm bounce light.
-
-The oven has a real arched cavity and a shallow dark lining positioned for the review angle. Counters, rack and furniture have simple collision boxes; decorative pastry, glass and tools do not introduce gameplay collision.
-
-This is an art-only candidate awaiting review. No gameplay/map integration, avatar benchmark, Android QA, production build, migration or release is included.
+Godot 4.7.2 Mobile/Vulkan on AMD Custom GPU 0405 / RADV VANGOGH. Desktop behavior and appearance review only; no production/gameplay/save changes or physical-phone performance acceptance. Basic Room and Liu Bei assets remain read-only.

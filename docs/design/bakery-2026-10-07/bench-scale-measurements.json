@@ -1,0 +1,33 @@
+{
+  "avatar_top_H": 1.74549426138401,
+  "capsule_height": 1.25,
+  "capsule_radius": 0.21,
+  "measurements": {
+    "chair": {
+      "baseline_ratio": 0.392438987142164,
+      "difference": 0.0656934306569341,
+      "height": 0.73,
+      "ratio_to_H": 0.418219650531065,
+      "reason": ""
+    },
+    "counter": {
+      "baseline_ratio": 0.660271434571305,
+      "difference": 0.00216919739696331,
+      "height": 1.15,
+      "ratio_to_H": 0.658839175494143,
+      "reason": ""
+    },
+    "door": {
+      "applicable": false,
+      "reason": "Open-front bakery has a controlled floor entrance, no doorway"
+    },
+    "table": {
+      "baseline_ratio": 0.650245621031176,
+      "difference": 0.116828193832599,
+      "height": 1.0024,
+      "ratio_to_H": 0.574278599578547,
+      "reason": ""
+    }
+  },
+  "speed": 3.75
+}

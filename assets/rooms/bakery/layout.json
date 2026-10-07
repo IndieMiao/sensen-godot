@@ -19,12 +19,12 @@
         {
           "at": [
             0,
-            -0.09,
+            -0.07,
             0
           ],
           "size": [
             7.5,
-            0.34,
+            0.3,
             6.7
           ]
         },
@@ -37,7 +37,7 @@
           "size": [
             0.22,
             3.65,
-            6.6000000000000005
+            6.7
           ]
         },
         {
@@ -47,12 +47,98 @@
             -3.2
           ],
           "size": [
-            7.4,
+            7.5,
             3.65,
             0.22
           ]
+        },
+        {
+          "at": [
+            3.7,
+            0.75,
+            0
+          ],
+          "size": [
+            0.1,
+            1.5,
+            6.7
+          ]
+        },
+        {
+          "at": [
+            -1.77,
+            0.75,
+            3.3000000000000003
+          ],
+          "size": [
+            3.66,
+            1.5,
+            0.1
+          ]
+        },
+        {
+          "at": [
+            2.42,
+            0.75,
+            3.3000000000000003
+          ],
+          "size": [
+            2.3600000000000003,
+            1.5,
+            0.1
+          ]
+        },
+        {
+          "at": [
+            0.65,
+            -0.07,
+            3.62
+          ],
+          "size": [
+            1.26,
+            0.3,
+            0.9
+          ]
+        },
+        {
+          "at": [
+            0.020000000000000052,
+            0.7,
+            3.64
+          ],
+          "size": [
+            0.08,
+            1.4,
+            0.9
+          ]
+        },
+        {
+          "at": [
+            1.28,
+            0.7,
+            3.64
+          ],
+          "size": [
+            0.08,
+            1.4,
+            0.9
+          ]
+        },
+        {
+          "at": [
+            0.65,
+            0.7,
+            4.08
+          ],
+          "size": [
+            1.38,
+            1.4,
+            0.08
+          ]
         }
-      ]
+      ],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "window_wall",
@@ -63,7 +149,9 @@
         0
       ],
       "yaw_degrees": 90,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "back_wall",
@@ -74,7 +162,9 @@
         -3.2
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "back_window_left",
@@ -85,7 +175,9 @@
         -3.095
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "back_window_left_garden",
@@ -96,7 +188,9 @@
         -3.095
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "garden",
+      "cast_shadow": true
     },
     {
       "name": "back_window_right",
@@ -107,7 +201,9 @@
         -3.095
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "back_window_right_garden",
@@ -118,53 +214,48 @@
         -3.095
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "garden",
+      "cast_shadow": true
     },
     {
       "name": "brick_oven",
       "file": "brick_oven.glb",
       "position": [
-        -2.23,
+        -2.28,
         0.082,
-        -2.22
+        -2.2
       ],
       "yaw_degrees": 0,
       "colliders": [
         {
           "at": [
-            0,
-            1.45,
-            0
+            0.0,
+            1.3195,
+            0.0
           ],
           "size": [
-            1.72,
-            2.9,
-            1.5
+            1.9264000000000001,
+            2.639,
+            1.62
           ]
         }
-      ]
-    },
-    {
-      "name": "fire",
-      "file": "fire.glb",
-      "position": [
-        -2.23,
-        1.18,
-        -1.84
       ],
-      "yaw_degrees": 0,
-      "colliders": []
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "baking_loaves",
       "file": "baking_loaves.glb",
       "position": [
-        -2.23,
-        1.18,
+        -2.28,
+        1.1,
         -1.82
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "oven_peel",
@@ -175,64 +266,61 @@
         -1.42
       ],
       "yaw_degrees": 12,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "pastry_display",
       "file": "pastry_display.glb",
       "position": [
-        1.79,
+        2.06,
         0.082,
-        0.71
+        0.8099999999999999
       ],
       "yaw_degrees": 0,
       "colliders": [
         {
           "at": [
             0,
-            0.34,
+            0.95,
             0
           ],
           "size": [
             2.2,
-            0.68,
-            0.99
+            1.9,
+            1.16
           ]
         }
-      ]
-    },
-    {
-      "name": "pastry_trays",
-      "file": "pastry_trays.glb",
-      "position": [
-        1.79,
-        0.87,
-        0.71
       ],
-      "yaw_degrees": 0,
-      "colliders": []
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "display_frame",
       "file": "display_frame.glb",
       "position": [
-        1.79,
+        2.06,
         0.8,
-        0.71
+        0.8099999999999999
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "display_glass",
       "file": "display_glass.glb",
       "position": [
-        1.79,
+        2.06,
         0.8,
-        0.71
+        0.8099999999999999
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "glass",
+      "cast_shadow": true
     },
     {
       "name": "checkout_counter",
@@ -240,7 +328,7 @@
       "position": [
         3.0,
         0.082,
-        -0.63
+        -0.74
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -256,29 +344,9 @@
             0.85
           ]
         }
-      ]
-    },
-    {
-      "name": "register",
-      "file": "register.glb",
-      "position": [
-        3.0,
-        1.25,
-        -0.65
       ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "bakery_sign",
-      "file": "bakery_sign.glb",
-      "position": [
-        0.61,
-        2.94,
-        -3.04
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "bread_motto",
@@ -289,7 +357,9 @@
         -3.035
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "sink_cabinet",
@@ -313,18 +383,9 @@
             0.86
           ]
         }
-      ]
-    },
-    {
-      "name": "utensil_crock",
-      "file": "utensil_crock.glb",
-      "position": [
-        -1.3,
-        1.26,
-        -2.71
       ],
-      "yaw_degrees": 0,
-      "colliders": []
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "back_counter",
@@ -348,7 +409,9 @@
             0.77
           ]
         }
-      ]
+      ],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "pantry",
@@ -359,40 +422,9 @@
         -2.77
       ],
       "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "pantry_jars",
-      "file": "pantry_jars.glb",
-      "position": [
-        0.75,
-        1.27,
-        -2.72
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "baguette_basket",
-      "file": "baguette_basket.glb",
-      "position": [
-        0.3,
-        2.51,
-        -2.74
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "pantry_plant",
-      "file": "pantry_plant.glb",
-      "position": [
-        1.19,
-        2.51,
-        -2.74
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "jar_wall_shelves",
@@ -403,88 +435,61 @@
         1.16
       ],
       "yaw_degrees": 90,
-      "colliders": []
-    },
-    {
-      "name": "jar_collection",
-      "file": "jar_collection.glb",
-      "position": [
-        -3.18,
-        0.79,
-        1.49
-      ],
-      "yaw_degrees": 90,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "bakery_rack",
       "file": "bakery_rack.glb",
       "position": [
-        -2.93,
-        0.08,
-        -0.11
+        -2.94,
+        0.082,
+        -0.29
       ],
       "yaw_degrees": 0,
       "colliders": [
         {
           "at": [
-            0,
+            0.0,
             0.92,
-            0
+            0.0
           ],
           "size": [
-            0.68,
+            0.7276000000000001,
             1.84,
-            0.61
+            0.671
           ]
         }
-      ]
+      ],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "baking_workbench",
       "file": "baking_workbench.glb",
       "position": [
-        -0.66,
+        -0.99,
         0.082,
-        0.03
+        -0.22
       ],
       "yaw_degrees": 0,
       "colliders": [
         {
           "at": [
-            0,
+            0.0,
             0.48,
             0
           ],
           "size": [
-            1.91,
+            1.7381,
             0.96,
             0.98
           ]
         }
-      ]
-    },
-    {
-      "name": "workbench_baking_props",
-      "file": "workbench_baking_props.glb",
-      "position": [
-        -0.66,
-        1.2,
-        0.03
       ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "flour_storage",
-      "file": "flour_storage.glb",
-      "position": [
-        -0.66,
-        0.37,
-        0.05
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "cafe_table",
@@ -499,40 +504,18 @@
         {
           "at": [
             0,
-            0.415,
+            0.46480000000000005,
             0
           ],
           "size": [
             1.3,
-            0.83,
+            0.9296000000000001,
             1.3
           ]
         }
-      ]
-    },
-    {
-      "name": "chair",
-      "file": "chair.glb",
-      "position": [
-        -2.44,
-        0.082,
-        2.13
       ],
-      "yaw_degrees": -90,
-      "colliders": [
-        {
-          "at": [
-            0,
-            0.66,
-            0
-          ],
-          "size": [
-            0.63,
-            1.32,
-            0.63
-          ]
-        }
-      ]
+      "material": "plain",
+      "cast_shadow": true
     },
     {
       "name": "cafe_rope_rug",
@@ -543,103 +526,716 @@
         2.13
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
-      "name": "cafe_flowers",
-      "file": "cafe_flowers.glb",
+      "name": "fire",
+      "file": "fire.glb",
       "position": [
-        -1.66,
-        1.04,
-        2.12
+        -2.28,
+        1.09,
+        -1.79
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "fire",
+      "cast_shadow": true
     },
     {
-      "name": "cafe_cup",
-      "file": "cafe_cup.glb",
+      "name": "display_shelves",
+      "file": "display_shelves.glb",
       "position": [
-        -1.3,
+        2.06,
+        0.92,
+        0.81
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "bakery_sign",
+      "file": "bakery_sign.glb",
+      "position": [
         1.02,
-        2.3
+        3.14,
+        -3.045
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
-      "name": "floor_plant",
-      "file": "floor_plant.glb",
+      "name": "cafe_chair",
+      "file": "cafe_chair.glb",
       "position": [
-        -3.12,
-        0.083,
-        2.62
+        -2.4,
+        0.082,
+        2.22
+      ],
+      "yaw_degrees": -90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.64,
+            0
+          ],
+          "size": [
+            0.59,
+            1.28,
+            0.6
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "back_counter_dressing",
+      "file": "back_counter_dressing.glb",
+      "position": [
+        0,
+        0,
+        0
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
-      "name": "display_plant",
-      "file": "display_plant.glb",
+      "name": "prep_dressing",
+      "file": "prep_dressing.glb",
       "position": [
-        2.97,
-        0.083,
-        1.74
+        0,
+        0,
+        0
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     },
     {
-      "name": "left_wall_light",
-      "file": "left_wall_light.glb",
+      "name": "wall_and_cafe_dressing",
+      "file": "wall_and_cafe_dressing.glb",
       "position": [
-        -3.4,
-        2.63,
-        1.94
-      ],
-      "yaw_degrees": 90,
-      "colliders": []
-    },
-    {
-      "name": "right_wall_light",
-      "file": "right_wall_light.glb",
-      "position": [
-        2.37,
-        2.93,
-        -2.92
+        0,
+        0,
+        0
       ],
       "yaw_degrees": 0,
-      "colliders": []
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": false
+    },
+    {
+      "name": "wall_lamps",
+      "file": "wall_lamps.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "warm_lamps_glow",
+      "file": "warm_lamps_glow.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "glow",
+      "cast_shadow": true
+    },
+    {
+      "name": "stocked_pastries",
+      "file": "stocked_pastries.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
     }
   ],
   "instances": [
     {
-      "name": "chair_opposite",
-      "asset": "chair",
+      "name": "cafe_chair_opposite",
+      "asset": "cafe_chair",
       "position": [
-        -0.85,
+        -0.84,
         0.082,
-        2.13
+        2.22
       ],
       "yaw_degrees": 90
     }
   ],
   "camera": {
     "position": [
-      10.5,
-      9.4,
-      12
+      9.907228035606705,
+      7.680569194057143,
+      11.2626299171414
     ],
     "target": [
       0,
-      1.6,
+      1.366445034283947,
       0
     ],
-    "size": 11.9
+    "size": 13.814897831889498
   },
   "sun_direction": [
     -6,
     7,
     1.5
-  ]
+  ],
+  "review_lighting": {
+    "ambient": 0.48,
+    "ambient_color": "FFE5C6",
+    "sun": 1.22,
+    "sun_color": "FFE3B6",
+    "sun_position": [
+      -4,
+      7,
+      3
+    ],
+    "sun_target": [
+      0,
+      0,
+      0
+    ],
+    "shadow_bias": 0.08,
+    "shadow_normal_bias": 0.7,
+    "shadow_distance": 25,
+    "background": "C4DFE5",
+    "background_gradient": true,
+    "points": [
+      {
+        "position": [
+          -2.25,
+          1.52,
+          -1.4
+        ],
+        "energy": 1.3,
+        "color": "FF9137",
+        "range": 3.0
+      },
+      {
+        "position": [
+          -0.92,
+          2.6,
+          0.35
+        ],
+        "energy": 0.6,
+        "color": "FFD391",
+        "range": 2.3
+      },
+      {
+        "position": [
+          -3.05,
+          2.55,
+          2.02
+        ],
+        "energy": 0.55,
+        "color": "FFD68D",
+        "range": 1.8
+      },
+      {
+        "position": [
+          2.26,
+          2.66,
+          -2.7
+        ],
+        "energy": 0.55,
+        "color": "FFD68D",
+        "range": 1.8
+      }
+    ]
+  },
+  "shared_plants": [
+    {
+      "name": "left_olive",
+      "file": "olive_tree.glb",
+      "position": [
+        -3.12,
+        0.083,
+        2.61
+      ],
+      "rotation_degrees": [
+        0,
+        10,
+        0
+      ],
+      "scale": [
+        0.68,
+        0.68,
+        0.68
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.25,
+            0
+          ],
+          "size": [
+            0.51,
+            0.5,
+            0.51
+          ]
+        }
+      ]
+    },
+    {
+      "name": "left_back_olive",
+      "file": "olive_tree.glb",
+      "position": [
+        -3.14,
+        0.083,
+        1.94
+      ],
+      "rotation_degrees": [
+        0,
+        100,
+        0
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.25,
+            0
+          ],
+          "size": [
+            0.51,
+            0.5,
+            0.51
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front_peace_lily",
+      "file": "peace_lily.glb",
+      "position": [
+        3.15,
+        0.083,
+        1.92
+      ],
+      "rotation_degrees": [
+        0,
+        -15,
+        0
+      ],
+      "scale": [
+        1.25,
+        1.25,
+        1.25
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.25,
+            0
+          ],
+          "size": [
+            0.51,
+            0.5,
+            0.51
+          ]
+        }
+      ]
+    },
+    {
+      "name": "window_left_pothos",
+      "file": "pothos.glb",
+      "position": [
+        -0.98,
+        1.4,
+        -2.91
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.68,
+        0.68,
+        0.68
+      ],
+      "colliders": []
+    },
+    {
+      "name": "window_right_pothos",
+      "file": "pothos.glb",
+      "position": [
+        2.41,
+        1.4,
+        -2.91
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.74,
+        0.74,
+        0.74
+      ],
+      "colliders": []
+    },
+    {
+      "name": "shelf_pothos",
+      "file": "pothos.glb",
+      "position": [
+        1.19,
+        2.51,
+        -2.74
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.93,
+        0.93,
+        0.93
+      ],
+      "colliders": []
+    }
+  ],
+  "review_views": [
+    {
+      "name": "detail-oven",
+      "position": [
+        4,
+        4,
+        5
+      ],
+      "target": [
+        -2.0,
+        1.55,
+        -1.75
+      ],
+      "size": 5.0
+    },
+    {
+      "name": "detail-pastries",
+      "position": [
+        6,
+        3.8,
+        6
+      ],
+      "target": [
+        1.6,
+        1.3,
+        0.55
+      ],
+      "size": 4.5
+    }
+  ],
+  "spawn": [
+    0.65,
+    0.09,
+    2.68
+  ],
+  "bench": {
+    "floor_y": 0.08,
+    "route": [
+      {
+        "name": "front entrance",
+        "position": [
+          0.65,
+          0.08,
+          2.52
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "pastry front",
+        "position": [
+          2.22,
+          0.08,
+          1.89
+        ]
+      },
+      {
+        "name": "display aisle",
+        "position": [
+          0.48,
+          0.08,
+          1.89
+        ]
+      },
+      {
+        "name": "register approach",
+        "position": [
+          0.48,
+          0.08,
+          -1.2
+        ]
+      },
+      {
+        "name": "checkout",
+        "position": [
+          2.43,
+          0.08,
+          -1.64
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "workbench rear",
+        "position": [
+          -0.65,
+          0.08,
+          -1.23
+        ]
+      },
+      {
+        "name": "workbench west",
+        "position": [
+          -2.15,
+          0.08,
+          -1.19
+        ]
+      },
+      {
+        "name": "cafe approach",
+        "position": [
+          -2.15,
+          0.08,
+          1.0
+        ]
+      },
+      {
+        "name": "cafe beside",
+        "position": [
+          -0.48,
+          0.08,
+          1.13
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "oven",
+        "from": [
+          -1.03,
+          0.09,
+          -1.93
+        ],
+        "to": [
+          -2.28,
+          0.09,
+          -2.2
+        ],
+        "target": "brick_oven"
+      },
+      {
+        "name": "workbench",
+        "from": [
+          0.45,
+          0.09,
+          -0.22
+        ],
+        "to": [
+          -0.99,
+          0.09,
+          -0.22
+        ],
+        "target": "baking_workbench"
+      },
+      {
+        "name": "display",
+        "from": [
+          0.5,
+          0.09,
+          0.85
+        ],
+        "to": [
+          2.06,
+          0.09,
+          0.85
+        ],
+        "target": "pastry_display"
+      },
+      {
+        "name": "checkout",
+        "from": [
+          2.85,
+          0.09,
+          -1.56
+        ],
+        "to": [
+          3,
+          0.09,
+          -0.74
+        ],
+        "target": "checkout_counter"
+      },
+      {
+        "name": "rack",
+        "from": [
+          -2.13,
+          0.09,
+          -0.27
+        ],
+        "to": [
+          -2.94,
+          0.09,
+          -0.27
+        ],
+        "target": "bakery_rack"
+      },
+      {
+        "name": "west wall",
+        "from": [
+          -2.1,
+          0.09,
+          1.0
+        ],
+        "to": [
+          -4,
+          0.09,
+          1.0
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "east edge",
+        "from": [
+          2.7,
+          0.09,
+          2.67
+        ],
+        "to": [
+          4.1,
+          0.09,
+          2.67
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "front boundary",
+        "from": [
+          1.75,
+          0.09,
+          2.6
+        ],
+        "to": [
+          1.75,
+          0.09,
+          3.8
+        ],
+        "target": "room_shell"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "workbench display aisle",
+        "from": [
+          0.45,
+          0.09,
+          1.4
+        ],
+        "to": [
+          0.45,
+          0.09,
+          -1.25
+        ],
+        "measure": [
+          [
+            -0.12095,
+            0.65,
+            0.25
+          ],
+          [
+            0.96,
+            0.65,
+            0.25
+          ]
+        ],
+        "minimum": 0.8,
+        "width": 1.08095
+      }
+    ],
+    "entrance": {
+      "inside": [
+        0.65,
+        0.09,
+        2.73
+      ],
+      "outside": [
+        0.65,
+        0.09,
+        3.64
+      ]
+    },
+    "slide": {
+      "from": [
+        1.8,
+        0.09,
+        -2.65
+      ],
+      "direction": [
+        1,
+        0,
+        -1
+      ],
+      "tangent": [
+        1,
+        0,
+        0
+      ],
+      "seconds": 0.6
+    },
+    "input_start": [
+      0.5,
+      0.09,
+      2.4
+    ],
+    "scale": {
+      "door": {
+        "applicable": false,
+        "reason": "Open-front bakery has a controlled floor entrance, no doorway"
+      },
+      "counter": {
+        "height": 1.15,
+        "source": "Checkout counter oak top"
+      },
+      "chair": {
+        "height": 0.73,
+        "source": "Curved cafe chair with green cushion"
+      },
+      "table": {
+        "height": 1.0024,
+        "source": "Round cafe tabletop; preparation worktable top1.035m"
+      }
+    }
+  }
 }

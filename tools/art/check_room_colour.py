@@ -1,10 +1,10 @@
 """Measure declared, fixed corresponding lit patches. Never searches for a match."""
 from pathlib import Path
-import sys,json,colorsys
+import sys,json,colorsys,os
 from PIL import Image,ImageDraw,ImageFont,ImageOps
 import numpy as np
 ROOT=Path(__file__).resolve().parents[2]
-slug=sys.argv[1];doc=ROOT/'docs/design'/(slug+'-2026-10-07');out=ROOT/'output'/('zhaoyun-'+sys.argv[2]+'-review-2026-10-07')
+slug=sys.argv[1];doc=ROOT/'docs/design'/(slug+'-2026-10-07');out=Path(os.environ.get('SCENE_REVIEW_OUTPUT',ROOT/'output'/('zhaoyun-'+sys.argv[2]+'-review-2026-10-07')))
 spec=json.loads((ROOT/'tools/art/source'/slug/'colour-patches.json').read_text())
 ims=[Image.open(doc/'reference.png').convert('RGB'),Image.open(out/'godot.png').convert('RGB')]
 # Coordinates are normalized to a 1440x1080 contained canvas (no stretching).

@@ -10,31 +10,31 @@
   "assets": [
     {
       "name": "room_shell",
-      "vertices": 5696,
-      "triangles": 10988,
+      "vertices": 9896,
+      "triangles": 19088,
       "surfaces": 1,
-      "bytes": 379344
+      "bytes": 658384
     },
     {
       "name": "window_wall",
-      "vertices": 832,
-      "triangles": 1616,
+      "vertices": 168,
+      "triangles": 324,
       "surfaces": 1,
-      "bytes": 54980
+      "bytes": 12512
     },
     {
       "name": "back_wall",
-      "vertices": 892,
-      "triangles": 1756,
+      "vertices": 476,
+      "triangles": 948,
       "surfaces": 1,
-      "bytes": 72584
+      "bytes": 45832
     },
     {
       "name": "back_window_left",
       "vertices": 600,
       "triangles": 1188,
       "surfaces": 1,
-      "bytes": 36804
+      "bytes": 37252
     },
     {
       "name": "back_window_left_garden",
@@ -48,7 +48,7 @@
       "vertices": 600,
       "triangles": 1188,
       "surfaces": 1,
-      "bytes": 36804
+      "bytes": 37252
     },
     {
       "name": "back_window_right_garden",
@@ -62,21 +62,14 @@
       "vertices": 3872,
       "triangles": 7368,
       "surfaces": 1,
-      "bytes": 285264
-    },
-    {
-      "name": "fire",
-      "vertices": 180,
-      "triangles": 348,
-      "surfaces": 1,
-      "bytes": 13416
+      "bytes": 288632
     },
     {
       "name": "baking_loaves",
       "vertices": 436,
       "triangles": 840,
       "surfaces": 1,
-      "bytes": 28632
+      "bytes": 28568
     },
     {
       "name": "oven_peel",
@@ -93,18 +86,11 @@
       "bytes": 53472
     },
     {
-      "name": "pastry_trays",
-      "vertices": 8898,
-      "triangles": 17364,
-      "surfaces": 1,
-      "bytes": 550944
-    },
-    {
       "name": "display_frame",
       "vertices": 140,
       "triangles": 264,
       "surfaces": 1,
-      "bytes": 12500
+      "bytes": 12628
     },
     {
       "name": "display_glass",
@@ -121,39 +107,18 @@
       "bytes": 31148
     },
     {
-      "name": "register",
-      "vertices": 952,
-      "triangles": 1836,
-      "surfaces": 1,
-      "bytes": 64620
-    },
-    {
-      "name": "bakery_sign",
-      "vertices": 1712,
-      "triangles": 2968,
-      "surfaces": 1,
-      "bytes": 238104
-    },
-    {
       "name": "bread_motto",
-      "vertices": 8432,
-      "triangles": 14468,
+      "vertices": 13566,
+      "triangles": 20492,
       "surfaces": 1,
-      "bytes": 1344168
+      "bytes": 1735836
     },
     {
       "name": "sink_cabinet",
       "vertices": 1736,
       "triangles": 3356,
       "surfaces": 1,
-      "bytes": 119292
-    },
-    {
-      "name": "utensil_crock",
-      "vertices": 300,
-      "triangles": 572,
-      "surfaces": 1,
-      "bytes": 23420
+      "bytes": 118748
     },
     {
       "name": "back_counter",
@@ -170,27 +135,6 @@
       "bytes": 23684
     },
     {
-      "name": "pantry_jars",
-      "vertices": 1056,
-      "triangles": 2040,
-      "surfaces": 1,
-      "bytes": 76200
-    },
-    {
-      "name": "baguette_basket",
-      "vertices": 1752,
-      "triangles": 3256,
-      "surfaces": 1,
-      "bytes": 130320
-    },
-    {
-      "name": "pantry_plant",
-      "vertices": 1514,
-      "triangles": 2868,
-      "surfaces": 1,
-      "bytes": 118116
-    },
-    {
       "name": "jar_wall_shelves",
       "vertices": 392,
       "triangles": 756,
@@ -198,18 +142,11 @@
       "bytes": 27428
     },
     {
-      "name": "jar_collection",
-      "vertices": 2112,
-      "triangles": 4080,
-      "surfaces": 1,
-      "bytes": 151040
-    },
-    {
       "name": "bakery_rack",
-      "vertices": 2524,
-      "triangles": 4852,
+      "vertices": 4966,
+      "triangles": 9592,
       "surfaces": 1,
-      "bytes": 162020
+      "bytes": 312444
     },
     {
       "name": "baking_workbench",
@@ -219,20 +156,6 @@
       "bytes": 46032
     },
     {
-      "name": "workbench_baking_props",
-      "vertices": 602,
-      "triangles": 1172,
-      "surfaces": 1,
-      "bytes": 42292
-    },
-    {
-      "name": "flour_storage",
-      "vertices": 2122,
-      "triangles": 3660,
-      "surfaces": 1,
-      "bytes": 280888
-    },
-    {
       "name": "cafe_table",
       "vertices": 288,
       "triangles": 556,
@@ -240,67 +163,120 @@
       "bytes": 23396
     },
     {
-      "name": "chair",
-      "vertices": 672,
-      "triangles": 1296,
-      "surfaces": 1,
-      "bytes": 46012
-    },
-    {
       "name": "cafe_rope_rug",
       "vertices": 6608,
       "triangles": 13148,
       "surfaces": 1,
-      "bytes": 559296
+      "bytes": 559456
     },
     {
-      "name": "cafe_flowers",
-      "vertices": 3814,
-      "triangles": 7260,
+      "name": "fire",
+      "vertices": 480,
+      "triangles": 944,
       "surfaces": 1,
-      "bytes": 260484
+      "bytes": 22360
     },
     {
-      "name": "cafe_cup",
-      "vertices": 242,
-      "triangles": 468,
+      "name": "display_shelves",
+      "vertices": 168,
+      "triangles": 324,
       "surfaces": 1,
-      "bytes": 20628
+      "bytes": 12540
     },
     {
-      "name": "floor_plant",
-      "vertices": 571,
-      "triangles": 1078,
+      "name": "bakery_sign",
+      "vertices": 3453,
+      "triangles": 5349,
       "surfaces": 1,
-      "bytes": 45588
+      "bytes": 419568
     },
     {
-      "name": "display_plant",
-      "vertices": 571,
-      "triangles": 1078,
+      "name": "cafe_chair",
+      "vertices": 514,
+      "triangles": 988,
       "surfaces": 1,
-      "bytes": 45592
+      "bytes": 41256
     },
     {
-      "name": "left_wall_light",
-      "vertices": 200,
-      "triangles": 368,
+      "name": "back_counter_dressing",
+      "vertices": 5612,
+      "triangles": 10524,
       "surfaces": 1,
-      "bytes": 17032
+      "bytes": 407016
     },
     {
-      "name": "right_wall_light",
-      "vertices": 200,
-      "triangles": 368,
+      "name": "prep_dressing",
+      "vertices": 5724,
+      "triangles": 10804,
       "surfaces": 1,
-      "bytes": 17036
+      "bytes": 467916
+    },
+    {
+      "name": "wall_and_cafe_dressing",
+      "vertices": 9536,
+      "triangles": 18328,
+      "surfaces": 1,
+      "bytes": 662424
+    },
+    {
+      "name": "wall_lamps",
+      "vertices": 432,
+      "triangles": 832,
+      "surfaces": 1,
+      "bytes": 32864
+    },
+    {
+      "name": "warm_lamps_glow",
+      "vertices": 438,
+      "triangles": 864,
+      "surfaces": 1,
+      "bytes": 26468
+    },
+    {
+      "name": "stocked_pastries",
+      "vertices": 13382,
+      "triangles": 26096,
+      "surfaces": 1,
+      "bytes": 835224
     }
   ],
-  "unique_triangles": 119848,
-  "scene_triangles": 121144,
-  "static_draw_surfaces": 42,
-  "glb_bytes": 5482500,
-  "atlas_bytes": 2776542,
-  "placed_instances": 42,
-  "materials": 4
+  "unique_triangles": 159585,
+  "scene_triangles": 173399,
+  "static_draw_surfaces": 40,
+  "glb_bytes": 7024260,
+  "atlas_bytes": 2641105,
+  "placed_instances": 40,
+  "materials": 4,
+  "local_scene_triangles": 160573,
+  "shared_scene_triangles": 12826,
+  "shared_assets": [
+    {
+      "name": "olive_tree",
+      "vertices": 3268,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 123052
+    },
+    {
+      "name": "peace_lily",
+      "vertices": 620,
+      "triangles": 946,
+      "surfaces": 1,
+      "bytes": 26780
+    },
+    {
+      "name": "pothos",
+      "vertices": 1670,
+      "triangles": 2048,
+      "surfaces": 1,
+      "bytes": 67012
+    }
+  ],
+  "plant_budget_triangles": 31154,
+  "budget_limits": {
+    "placed_triangles": 200000,
+    "plant_triangles": 100000,
+    "static_surfaces": 60
+  },
+  "budget_passed": true
 }

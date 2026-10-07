@@ -3,15 +3,17 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://6vyxyv4urts1"
-path="res://.godot/imported/room_albedo_ao.png-64f91a18fb5c9c5ee573b58ed487ddf3.ctex"
+path.s3tc="res://.godot/imported/room_albedo_ao.png-64f91a18fb5c9c5ee573b58ed487ddf3.s3tc.ctex"
+path.etc2="res://.godot/imported/room_albedo_ao.png-64f91a18fb5c9c5ee573b58ed487ddf3.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/rooms/bakery/room_albedo_ao.png"
-dest_files=["res://.godot/imported/room_albedo_ao.png-64f91a18fb5c9c5ee573b58ed487ddf3.ctex"]
+dest_files=["res://.godot/imported/room_albedo_ao.png-64f91a18fb5c9c5ee573b58ed487ddf3.s3tc.ctex", "res://.godot/imported/room_albedo_ao.png-64f91a18fb5c9c5ee573b58ed487ddf3.etc2.ctex"]
 
 [params]
 
