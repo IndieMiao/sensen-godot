@@ -178,6 +178,24 @@ func test_request_card_accepts_and_not_now_returns_to_the_bar() -> void:
 	card.action_pressed.emit()
 	assert_that(sent.back()).is_equal({"type": "accept", "request": "req_res_pip_1"})
 
+func test_bell_reads_the_inbox_badge() -> void:
+	var v := _view()
+	assert_int(int(P0Logic.hud_state(v).unread)).is_equal(0)
+	v["inbox"] = {"badge": 3, "waiting": 2, "parcels": []}   # SGODOT-232: queued rewards are not on the bell
+	assert_int(int(P0Logic.hud_state(v).unread)).is_equal(3)
+	assert_int(int(P0Logic.hud_state(v, {"unread": 0}).unread)).is_equal(0)
+
+func test_request_card_uses_the_requests_own_need_line() -> void:
+	var v := _view()
+	v["residents"] = {"res_old_kai": {"request": {"id": "req_res_kai_1", "kind": "fish", "rarity": 3, "qty": 1, "coins": 50, "have": 0}}}
+	var q: Dictionary = P0Logic.content().residents.res_old_kai.requests[0]
+	var had: Variant = q.get("need_line", null)
+	q["need_line"] = "1 Rare fish · Golden Koi · Pond"   # Li Bai q(46), 苏烈 ac0479c7
+	assert_str(str(P0Ui._request_card_data(v, "res_old_kai", {}).needs[0].name)).is_equal("Rare fish · Golden Koi · Pond")
+	q.erase("need_line")
+	assert_str(str(P0Ui._request_card_data(v, "res_old_kai", {}).needs[0].name)).is_equal("Rare fish")
+	if had != null: q["need_line"] = had
+
 func test_gift_drawer_shows_dishes_and_sends_gift() -> void:
 	var ui := _ui(true)
 	ui.set_view(_resident_view())

@@ -1166,10 +1166,12 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 	var def: Dictionary = P0Logic.content().get("residents", {}).get(id, {})
 	var req: Dictionary = view_.get("residents", {}).get(id, {}).get("request", {}) if view_.get("residents", {}).get(id, {}).get("request", null) != null else {}
 	var text := ""
+	var need_line := ""
 	var title := "%s's request" % str(def.get("name", ""))
 	for q in def.get("requests", []):
 		if str(q.get("id", "")) == str(req.get("id", "")):
 			text = str(q.get("text", ""))
+			need_line = str(q.get("need_line", ""))
 	var kind := str(req.get("kind", ""))
 	var need := {"name": "", "have": int(req.get("have", 0)), "need": int(req.get("qty", 1)), "icon": null}
 	match kind:
@@ -1183,6 +1185,8 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 		"sow":
 			need.name = "Plots sown"
 			need.icon = P0Logic.icon("sow")
+	# Li Bai q(46): a request's own need line wins (`1 Rare fish · Golden Koi · Pond`); the tile shows the count itself.
+	if need_line != "": need.name = need_line.trim_prefix("%d " % int(need.need))
 	var reward := []
 	if int(P0Logic.content().get("affinity", {}).get("request", 0)) > 0:
 		reward.append("+%d Friendship" % int(P0Logic.content().affinity.request))

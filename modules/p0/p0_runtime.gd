@@ -202,7 +202,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if reply != "": ui.toast(reply)
 			"gift_meal":
 				var who := str(P0Logic.content().get("residents", {}).get(str(ev.get("resident", "")), {}).get("name", ""))
-				if bool(ev.get("given", false)): ui.toast("%s gave you %s · in your bag" % [who, P0Logic.item_name(v, str(ev.get("dish", "")))])
+				# SGODOT-232: with the bag full the meal waits in the Inbox (to: parcel), gone at 04:00 like any gift meal.
+				if str(ev.get("to", "")) == "parcel": ui.toast("Bag full · %s's meal sent to Inbox" % who)
+				elif bool(ev.get("given", false)): ui.toast("%s gave you %s · in your bag" % [who, P0Logic.item_name(v, str(ev.get("dish", "")))])
 		dy -= 16.0
 	if ui.modal_kind == "stall" and events.size() > 0:
 		ui.set_view(session.current())

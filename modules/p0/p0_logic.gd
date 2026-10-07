@@ -300,7 +300,8 @@ static func skill_progress(s: Dictionary) -> float:
 	return clampf(float(int(s.xp) - int(s.floor)) / maxf(1.0, float(int(s.next) - int(s.floor))), 0.0, 1.0)
 
 ## HUD data for UiHud.apply (SGODOT-222, LOCK-06). ctx: next_cost (Energy the next action needs),
-## place (UiHud place dictionary), unread (Inbox count).
+## place (UiHud place dictionary), unread (overrides the Inbox count). The bell reads view.inbox.badge (SGODOT-232:
+## parcels + unread records; queued rewards stay off it) until the stage 4 Inbox owns it.
 static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	var e: Dictionary = view.get("energy", {})
 	var have := int(e.get("value", 0))
@@ -314,7 +315,7 @@ static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	var out := {
 		"energy": have, "energy_max": mx, "regen": regen, "next_cost": int(ctx.get("next_cost", 0)),
 		"skills": {"farming": skill_progress(sk.get("farming", {})), "fishing": skill_progress(sk.get("fishing", {}))},
-		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", 0)), "buff": {},
+		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", view.get("inbox", {}).get("badge", 0))), "buff": {},
 		"today": str(lines[0]) if not lines.is_empty() else "",
 	}
 	if ctx.has("place"): out["place"] = ctx.place
