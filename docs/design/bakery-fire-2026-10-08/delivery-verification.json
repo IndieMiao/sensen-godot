@@ -1,0 +1,165 @@
+{
+  "card": 175,
+  "revision": "SharedFire-R1",
+  "commit": "4dca14c6",
+  "plane": {
+    "comment_id": "129b46f7-e844-4c29-afbe-b7b869e83d1b",
+    "state": "Review",
+    "commit": "4dca14c6",
+    "attachments": 21
+  },
+  "attachments": [
+    {
+      "name": "bakery-SharedFire-R1-README.md",
+      "id": "d4e91b8b-c26c-4f59-a96b-45f965cec752",
+      "sha256": "0191951beef5cb8b4776139c8e97b45cfe5bdc2161e2672fe3caaa2b776d3741",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-bench-collisions.png",
+      "id": "e0d6ba9a-34cb-4572-8e5a-41261dec0027",
+      "sha256": "8e66d74f7c5797c24246433bd6b49c67777eea73f95c94ee8e4eea6fcccaff58",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-bench-door.png",
+      "id": "9961548b-be5d-4217-bbe0-8a050b5a6df1",
+      "sha256": "f2da18e12a09864ca164f3061b55f40d3a2764918f1e8938dce69acac45ef8bd",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-bench-main.png",
+      "id": "e8520e76-69d6-477a-a818-109e07d59c01",
+      "sha256": "64e7ca6e5fde1a06177df16f78da8e2defdd8527a5a6f6ddfe372ccbb7932023",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-bench-record-result.json",
+      "id": "20fda1c1-8eee-423e-b5ce-6155dbb3c411",
+      "sha256": "e1b70a797235897bcf940582255480c49b1e41b9964766754b3f10cb71817387",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-bench-result.json",
+      "id": "b9ff7014-b0cb-42fb-9793-58b18212347f",
+      "sha256": "fcdd6f322b0fe9737bbc8c32ba84b2663116ab867c4408b2a8e350c6f893be1a",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-bench-scale-measurements.json",
+      "id": "3705f788-cae0-4062-ac85-935025f8fa44",
+      "sha256": "e7aad4faa71bfd0904d44c0b184ade95ee7de48365e155b195dc9bbb1f00d246",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-bench-spawn.png",
+      "id": "39a47879-a1b6-4ec8-ac23-06b8a168b780",
+      "sha256": "1e5a604ce054f4265894329064bebf0e35b1ebe34e0421c149f1e450d60bd09a",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-bench-video-metadata.json",
+      "id": "7df63475-33c8-4275-a6af-f417a735fb7b",
+      "sha256": "8396ae13942d2f0da0b76e4ff8f8a1c45a2f1c63c05ddc9930fff43619ac240d",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-fire-close.png",
+      "id": "ba4ec43d-8ee7-4315-9325-78323d69124f",
+      "sha256": "8866538344b0a8815e0ba714585f5d66c273d83fa3711c5b188a5daca6b3138e",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-fire-runtime.json",
+      "id": "cf63e232-22fe-48ba-b23e-62d4ff1721ac",
+      "sha256": "7216ffa079eebc8ca23565216e48af5e79a3305cb7fccd97f087a5d6e244d309",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-fire-timeline.png",
+      "id": "21f11f87-8dfa-4dff-b45f-0af63332275c",
+      "sha256": "909dfd433c0cddc092348a4f8fc07f51ba6a0a43e98f97eacb2af76c0ef81ba2",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-fire-video-metadata.json",
+      "id": "1675b493-e3ec-443d-8501-5ec974381ff5",
+      "sha256": "489ce96149126315712494e8394220de1a1cfca43c7d7b41d149933b73b2c905",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-godot.png",
+      "id": "77c6df41-8a2a-43ad-b11f-d5a83044283e",
+      "sha256": "de418c464ea03c5e2e4d88310430a1f30ae2854032efd84e89df918db4cdba14",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-preservation-control.png",
+      "id": "8e0c4e74-cd45-40fd-b2fe-c7ffbc155e4b",
+      "sha256": "542e0bc14183b3feb7589b25ce5a58acbae364f3509048222b25c45166e6a713",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-preservation.json",
+      "id": "dacc294f-6a58-4ad3-ac18-4afb6475deef",
+      "sha256": "85bd13fd50effc33a2e644f26ca4dd576f79d68b1992ee1a95f79b24a6f3a015",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-render-preservation.json",
+      "id": "2a44d939-7799-4796-b60a-97a8a23cc1f2",
+      "sha256": "78b2c5f9a25ae67feeb1f13fcdb0259696970777062bf90be50f4da23ab286e5",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-verification-summary.json",
+      "id": "812d1d0f-3841-46e7-895f-732ce75c7b2d",
+      "sha256": "aa25568c6c674c6daf279b143fa3ed9c28295ff5db35d6b9e55e10b67a318db8",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-whole-and-fire.png",
+      "id": "d789b8a9-4c6a-4c36-b1c7-f7d21ea055fc",
+      "sha256": "21f3a55ad43591fdcc48fd6a446fc0aedc37a480e9f1d6b088c2fec8a48c48d9",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-walkthrough.mp4",
+      "id": "2199c475-2842-4523-82d8-658bfa51c4c7",
+      "sha256": "80553fd9e6a38df6c1ca0d57056b5601fcb0d6c141a38aa4f417c97c4448d4e3",
+      "verified": true
+    },
+    {
+      "name": "bakery-SharedFire-R1-hearth-8s.mp4",
+      "id": "e5d392c0-49f7-4148-99da-daf447ec474d",
+      "sha256": "4b24422870b41b7858281e7acca2ce59a114a7621e2d396f92fd92f595adcf28",
+      "verified": true
+    }
+  ],
+  "lark": [
+    {
+      "name": "note",
+      "message_id": "om_x100b635e1a5e48a0c4f4e26b4d69210",
+      "download_verified": null,
+      "sha256": null
+    },
+    {
+      "name": "image-0",
+      "message_id": "om_x100b635e1a7f94a8c2503c542785263",
+      "download_verified": true,
+      "sha256": "21f3a55ad43591fdcc48fd6a446fc0aedc37a480e9f1d6b088c2fec8a48c48d9"
+    },
+    {
+      "name": "image-1",
+      "message_id": "om_x100b635e1a19eca0c4691fe7ef8a5f5",
+      "download_verified": true,
+      "sha256": "909dfd433c0cddc092348a4f8fc07f51ba6a0a43e98f97eacb2af76c0ef81ba2"
+    },
+    {
+      "name": "video",
+      "message_id": "om_x100b635e1bc214a4c4518a4f40f53cd",
+      "download_verified": true,
+      "sha256": "4b24422870b41b7858281e7acca2ce59a114a7621e2d396f92fd92f595adcf28"
+    }
+  ]
+}

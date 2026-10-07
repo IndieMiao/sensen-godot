@@ -1,5 +1,7 @@
 # SGODOT-173 · Deluxe Room-10 R2.2 canonical anchors
 
+> 当前炉火已切换为共享粒子特效；本页保留此前美术/挂点/糕点评审证据。最新整景、近景录像、粒子预算与不重烘校验见[共享炉火交付](../deluxe_room_10-fire-2026-10-08/README.md)。
+
 赵云 · **R2.1 美术已通过；R2.2 正式挂点修正完成，工程校验与本轮实渲/录像通过，提交Review。** Reference: Figma `OMLTC3yw3u2WDjOZhLnhaR`, SceneDesign, node `545:2970`. Basic Room's accepted scale and Liu Bei's shared botanical library are read-only dependencies.
 
 ![Reference / revised actual Godot / direct 50% overlay](comparison.png)

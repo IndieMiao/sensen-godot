@@ -9,7 +9,7 @@
 - [Art environment setup](art-environment-setup.md): start here on a fresh host; toolchain, Git access, Figma MCP, Windows/remote OAuth callbacks, Lark CLI application/user authorization and readiness checks.
 - [Mobile 3D asset workflow](mobile-3d-asset-workflow.md): English production guide for agents, based on the accepted Basic Room; reference analysis, reusable modeling, atlases, mobile budgets, Godot/Android checks and verified delivery.
 - [Basic Room (2026-10-06)](basic-room-2026-10-06/README.md): user-accepted Blender assets, reusable Godot room, offline movement benchmark and Android checks; includes committed review images and an evidence summary. Not a production release.
-- [暖木室内系列当前进度](warm-wood-scenes-2026-10-07/README.md)：173正式anchors/175糕点小修已实渲、录像、推送并完成Plane/飞书回读；174/176验收Done。172/173/175粒子炉火等待刘备178共享特效合入。
+- [暖木室内系列当前进度](warm-wood-scenes-2026-10-07/README.md)：173正式anchors、175糕点小修已交付；172/173/175复用共享GPU炉火，109/109角色检查、每场8秒近景与15秒走位，房间GLB/图集未改。174/176已验收。
 - [UI 有效稿索引](ui-anchors-2026-10-03/REPORT.md)：当前源页、基础锚定图、批次1/2与最新修订说明。
 - [最新基础锚定图](ui-anchors-2026-10-03/out/current/)：FARM-1、FISH-1、COOK-1、BAG-1；从旧版本目录归一，图片内容未修改。Bag 的新 Gear 页以 batch2/BAG-2 为准。
 - [P0 道具与室内候选](p0-props-2026-10-05/)：厨房、灶台、渔具铺、摊位/长椅、Kai 与入口图标。候选 A/B 尚不能因清理被自动视为已选定。

@@ -4,37 +4,58 @@
     "173": {
       "owner": "赵云",
       "state": "Review",
-      "revision": "R2.2",
-      "commit": "bb33765a",
-      "triangles": 159455,
+      "revision": "SharedFire-R1",
+      "commit": "1ab7640b",
+      "triangles": 158511,
       "plant_triangles": 33952,
-      "surfaces": 60,
+      "surfaces": 59,
       "rendered_checks": 38,
       "video_seconds": 15.0,
-      "verified_plane_attachments": 31,
-      "verified_lark_messages": 5,
+      "verified_plane_attachments": 21,
+      "verified_lark_messages": 4,
       "review_media_path": "output/zhaoyun-173-r22-2026-10-08",
-      "subsequent_work": "Shared particle fire integration waits on178"
+      "particles": 16,
+      "fire_video_seconds": 8,
+      "route_video_seconds": 15,
+      "preservation_passed": true,
+      "state_readback_verified": true
     },
     "175": {
       "owner": "赵云",
       "state": "Review",
-      "revision": "R2.1",
-      "commit": "74b4c361",
-      "triangles": 181235,
+      "revision": "SharedFire-R1",
+      "commit": "4dca14c6",
+      "triangles": 180291,
       "plant_triangles": 31154,
-      "surfaces": 40,
+      "surfaces": 39,
       "rendered_checks": 34,
       "video_seconds": 15.0,
-      "verified_plane_attachments": 26,
-      "verified_lark_messages": 6,
+      "verified_plane_attachments": 21,
+      "verified_lark_messages": 4,
       "review_media_path": "output/zhaoyun-175-r21-2026-10-08",
-      "subsequent_work": "Shared particle fire integration waits on178"
+      "particles": 18,
+      "fire_video_seconds": 8,
+      "route_video_seconds": 15,
+      "preservation_passed": true,
+      "state_readback_verified": true
     },
     "172": {
       "owner": "赵云",
-      "state": "Todo",
-      "art": "PreviousR2.1accepted; user reopened only for shared particle fire"
+      "state": "Review",
+      "art": "PreviousR2.1accepted; user reopened only for shared particle fire",
+      "revision": "SharedFire-R1",
+      "commit": "59878eb6",
+      "triangles": 128292,
+      "plant_triangles": 31426,
+      "surfaces": 50,
+      "particles": 16,
+      "rendered_checks": 37,
+      "fire_video_seconds": 8,
+      "route_video_seconds": 15,
+      "preservation_passed": true,
+      "verified_plane_attachments": 21,
+      "verified_lark_messages": 4,
+      "state_readback_verified": true
     },
     "174": {
       "owner": "赵云",
@@ -65,7 +86,7 @@
       173,
       175
     ],
-    "status": "Awaiting separate shared-library commit on wp-3d-scene; absent in latest fetched shared tree",
-    "instruction": "Reuse after merge; do not create a separate flame implementation."
+    "status": "Shared library5e5bf6af integrated; all three consuming rooms tested and pushed",
+    "instruction": "Library consumed unchanged; every existing room GLB/PNG and all non-fire editable mesh data preserved."
   }
 }

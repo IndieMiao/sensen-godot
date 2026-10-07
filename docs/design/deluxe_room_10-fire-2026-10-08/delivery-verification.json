@@ -1,0 +1,165 @@
+{
+  "card": 173,
+  "revision": "SharedFire-R1",
+  "commit": "1ab7640b",
+  "plane": {
+    "comment_id": "7a7714f4-2684-43b5-8d28-af5d98ed007c",
+    "state": "Review",
+    "commit": "1ab7640b",
+    "attachments": 21
+  },
+  "attachments": [
+    {
+      "name": "deluxe_room_10-SharedFire-R1-README.md",
+      "id": "a431fc97-a13a-466f-9026-abb6e59c95fa",
+      "sha256": "2577ec055ee3c531f5099aa5cfe8e7fbfb97b8cb2b272e840f1650acd76d0175",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-bench-collisions.png",
+      "id": "c349f29b-a8f0-451e-a146-e0d15a485e56",
+      "sha256": "5d2d301f1ebd58b46fd35d83df89279deb6d99c5c3e394b976338758cc489142",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-bench-door.png",
+      "id": "f673a907-909b-4a60-822e-80f4ede87cbb",
+      "sha256": "dd8a64c6d5c675d6d928bf7d7f748d7cfb0db1b06e2a6e665a17c6eb1a64f0cc",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-bench-main.png",
+      "id": "91714663-4963-4585-98e8-f29409cc2b07",
+      "sha256": "e9226de934bc6f940e074e11b977fd6c4b424819b2c52c48b5911d7a6405ce4d",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-bench-record-result.json",
+      "id": "29c82987-d351-49dd-9aea-27b2c29eb94c",
+      "sha256": "5c3831118d52bf7c8c54c03ac6f12906d60bb8d74dcd07e4c2c44d7e7bae5c50",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-bench-result.json",
+      "id": "c967922d-c6d4-44b5-b3c1-d0d5b3a42bd6",
+      "sha256": "82ae04bb61e5d3fa1342719ae2a5b31bbdf178efbf9a3214a5321bb64368f981",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-bench-scale-measurements.json",
+      "id": "497f5396-dc64-44ab-83e7-589ef7d0ada2",
+      "sha256": "a8a233aa8c1e648a29cd2f6cc61be18b2f843d8bb3ac61e1b97f4b099dc1873c",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-bench-spawn.png",
+      "id": "579602c7-5b2d-40fe-bfdd-876c46c09d95",
+      "sha256": "3947fb5d1f8310b399c44a2a23d2eb7efc9a435a328d2a27fdb1ba16114a52e8",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-bench-video-metadata.json",
+      "id": "b2881573-5f35-414c-b977-d570fa1a7f9a",
+      "sha256": "e548a66060e22340ec1858a349e3df81fd0118917ec0451836afce0148babfc8",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-fire-close.png",
+      "id": "8ffc161c-2eee-4b61-b27b-e0779d6482d3",
+      "sha256": "57a3ff546f01193fe2448d44dca1102f2f12b18b0e7d159617914d393f209623",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-fire-runtime.json",
+      "id": "4b0a9b35-4510-490e-85ae-a901e507de9e",
+      "sha256": "2d702a3707ebd632728214ff7a0a5ee42db7ad14545526a4a65a9f05ce8c59ce",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-fire-timeline.png",
+      "id": "09f56977-d5e9-44fb-82e5-47720317280f",
+      "sha256": "b1024cf920d3c7bce60ad8dffbd770e6f7f6a60c7a08f498981417dc32f2431f",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-fire-video-metadata.json",
+      "id": "a1827c2b-2dbd-462c-9e1f-da8eabfe8592",
+      "sha256": "489ce96149126315712494e8394220de1a1cfca43c7d7b41d149933b73b2c905",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-godot.png",
+      "id": "c045ceb4-48f3-43ef-861d-f6bd3b018867",
+      "sha256": "f9f34bc63aa28fa98de8c9ae83bb7f5169475a965b7c703eddc17995021fac1a",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-preservation-control.png",
+      "id": "890a0edd-6f21-434a-9b4d-6e8ef92d08bc",
+      "sha256": "92bfe6df79123d8526c52d25bf73e1128198f54fcc6f561f24c7c6161f7a0886",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-preservation.json",
+      "id": "8d254730-2316-4c80-9cbd-6840eb5c9b78",
+      "sha256": "645ba4ccf3e01dfaa560c10c7063e128befb62ab9f0ff2d08dd7cab5f251e4c9",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-render-preservation.json",
+      "id": "ecc217f1-0e8c-4fd5-9473-596f6617b09b",
+      "sha256": "6e506386f78ead746520f3f73709152247519829125c8de7dc5d410033d9270d",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-verification-summary.json",
+      "id": "b7fda817-dcb8-4af1-b388-89f49d9c5b60",
+      "sha256": "96c44f5dc03c7653a7b6ac4c4ebc42c05ece41aa10af0717887e578843c977fb",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-whole-and-fire.png",
+      "id": "2d430a39-ad06-4141-9b9c-fa7107fb40e5",
+      "sha256": "77759629ea1e401b685b56a55ae1e967a529c95961e6d213fe4da0035fe9e7e0",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-walkthrough.mp4",
+      "id": "f0ca303c-b484-49a1-85e7-fc0415ea13b8",
+      "sha256": "cdbe31d2eb0ae14691ae8dfa7e91cc02d0f3f8f8db91a95148c49f0a74647143",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-SharedFire-R1-hearth-8s.mp4",
+      "id": "317c128f-1801-44c5-9165-f9918ac34ae8",
+      "sha256": "ca3676341631aae3f189e45bb9d9bc48da09db3835472306df9b7fc5ef094432",
+      "verified": true
+    }
+  ],
+  "lark": [
+    {
+      "name": "note",
+      "message_id": "om_x100b635e03846ca0c37a7545c0a4d23",
+      "download_verified": null,
+      "sha256": null
+    },
+    {
+      "name": "image-0",
+      "message_id": "om_x100b635e03a820a0c246615454a246d",
+      "download_verified": true,
+      "sha256": "77759629ea1e401b685b56a55ae1e967a529c95961e6d213fe4da0035fe9e7e0"
+    },
+    {
+      "name": "image-1",
+      "message_id": "om_x100b635e0347a8a0c3b07eb1ee73cfd",
+      "download_verified": true,
+      "sha256": "b1024cf920d3c7bce60ad8dffbd770e6f7f6a60c7a08f498981417dc32f2431f"
+    },
+    {
+      "name": "video",
+      "message_id": "om_x100b635e037930a4c3b1de81a3c6ab6",
+      "download_verified": true,
+      "sha256": "ca3676341631aae3f189e45bb9d9bc48da09db3835472306df9b7fc5ef094432"
+    }
+  ]
+}

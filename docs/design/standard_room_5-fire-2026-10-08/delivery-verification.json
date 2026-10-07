@@ -1,0 +1,165 @@
+{
+  "card": 172,
+  "revision": "SharedFire-R1",
+  "commit": "59878eb6",
+  "plane": {
+    "comment_id": "7f534fc5-287d-4394-ab5c-e074072396ba",
+    "state": "Review",
+    "commit": "59878eb6",
+    "attachments": 21
+  },
+  "attachments": [
+    {
+      "name": "standard_room_5-SharedFire-R1-README.md",
+      "id": "77603907-aaa7-4a96-a5cf-d60531dccbbc",
+      "sha256": "b384427359efed383aaabda48d2cbb3fdd31f60d7f5bb9d4561a793a56e3342d",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-bench-collisions.png",
+      "id": "ac6b9152-8df6-4dab-aeb1-5ebee62cc9f3",
+      "sha256": "0d62037affd639b106cd22ade0df0f812dcb75c935de4825172a1e54b5d4c220",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-bench-door.png",
+      "id": "e2213c22-9fb2-471e-a117-c076e791723e",
+      "sha256": "e1178a494b25a62002d221f7242dc6fc1f02494e8bc25522a594ded56263f46d",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-bench-main.png",
+      "id": "4dfdffd4-fc8a-4f20-8e39-d4b1e8811bb2",
+      "sha256": "49fd24beb8553104a27b1980b2de1c3876c37ce4fd85d1dcd64acfda048a86b2",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-bench-record-result.json",
+      "id": "8fc020e3-08bd-45f5-891c-2e3706f98bc6",
+      "sha256": "7d80c6fd73a6f1a1e0acd52753f67948da86f6091f95afd277fb9a05e997ee6a",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-bench-result.json",
+      "id": "695ca737-ccb1-43bf-bbd3-efec0c567696",
+      "sha256": "691ef7d8da1117f1cacdf802879cc9dc7ebd48cf82b31f4c73329dcc9a674487",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-bench-scale-measurements.json",
+      "id": "7c25b39d-c2a0-4916-a14f-323580e2779e",
+      "sha256": "4cf08fe3fb19ed2fcf4589b7d804218a7354cbddfa53549390c6eacae71c2d53",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-bench-spawn.png",
+      "id": "dcc6e95e-357f-43fa-b841-4d42f596e3fe",
+      "sha256": "b8750f1b116a02bb798cad030cbb827358f4d5fe3f3d300e08950c24fe9dc174",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-bench-video-metadata.json",
+      "id": "eb24fcd2-7711-4660-9ac3-655af6a904d5",
+      "sha256": "0ea18f7f69845daa1661f08ce3e1f2c1a03960053b9a1c99ddc6654307bbe26e",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-fire-close.png",
+      "id": "3e8be51d-d1ea-4673-8896-b9d6ee9557dd",
+      "sha256": "f0c0c4fa2a6197c918f9e72481817a13dce22f6d64ecc3d8e7c7c27ae1ed9c44",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-fire-runtime.json",
+      "id": "db829b68-e91a-4b94-a26e-03a07ccef968",
+      "sha256": "0ec9b27c97533aaceb3449da86fbe424fa6d36f02ad56761add2d348b78a14f9",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-fire-timeline.png",
+      "id": "27f7670a-f15f-4750-8fa3-bebb8e65f1ac",
+      "sha256": "c0485159d9c8a969fe4f9f2ce8cfbb42fc96fa3f398c800b8074aca1d113c5ac",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-fire-video-metadata.json",
+      "id": "47e08234-7089-4c93-b025-e5ae881ebc8e",
+      "sha256": "489ce96149126315712494e8394220de1a1cfca43c7d7b41d149933b73b2c905",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-godot.png",
+      "id": "674c2c3a-e794-4c42-8d55-2541466c8847",
+      "sha256": "595049940488ea40e34dcdca811a73d2945b992b125eef93f8220b69338bfe5b",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-preservation-control.png",
+      "id": "3f0e57a4-54bd-4467-bbfd-101261b0f01e",
+      "sha256": "17004b1756f95d1e31b7b056adca57e3857bcd1770a59d509a8fc10dd1311e65",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-preservation.json",
+      "id": "c10ce32e-12d5-442c-9e3d-dbc06e7ab64c",
+      "sha256": "e0cc92c506fcea6af481f9f92f47363f707e16a7865f3bd744d124ae20b7fec4",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-render-preservation.json",
+      "id": "358f54bc-50fd-4bca-88b5-6638cd94ff9e",
+      "sha256": "d627364f941b8a2354b8db75170e4af3d4e147034ff121ba12c38dec8815cfba",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-verification-summary.json",
+      "id": "470b16fa-2ef6-4efc-a5fa-02e3a069f0a0",
+      "sha256": "d181d660bd27cf4201009a3b9c6c2bfb0a9e7f36b83445d50656eddd6b838173",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-whole-and-fire.png",
+      "id": "2a68f56b-ff7a-4196-b8dc-a9fb0d03189c",
+      "sha256": "9c647e9847926ed40cd8f8dd4dcea1278f6fe9e4d142614d59b2d8899e33f606",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-walkthrough.mp4",
+      "id": "152cc1b0-8a67-486f-9807-0ddf138b7e1f",
+      "sha256": "a87cf69e7a942e49d437021038894177dbc0b3920261f91b6d724d416c56b3db",
+      "verified": true
+    },
+    {
+      "name": "standard_room_5-SharedFire-R1-hearth-8s.mp4",
+      "id": "fe0a0462-cd0d-40cf-a40b-44e749d22a7e",
+      "sha256": "9dbfa4187e4417f731a33ca2db4c1d5c69afb0bf6339cb38295d3166b360f750",
+      "verified": true
+    }
+  ],
+  "lark": [
+    {
+      "name": "note",
+      "message_id": "om_x100b635e06f0a0a4c2e0fb1de982155",
+      "download_verified": null,
+      "sha256": null
+    },
+    {
+      "name": "image-0",
+      "message_id": "om_x100b635e06a9cca0c11a61468c2cad1",
+      "download_verified": true,
+      "sha256": "9c647e9847926ed40cd8f8dd4dcea1278f6fe9e4d142614d59b2d8899e33f606"
+    },
+    {
+      "name": "image-1",
+      "message_id": "om_x100b635e064ec0a0c23961a016ac4eb",
+      "download_verified": true,
+      "sha256": "c0485159d9c8a969fe4f9f2ce8cfbb42fc96fa3f398c800b8074aca1d113c5ac"
+    },
+    {
+      "name": "video",
+      "message_id": "om_x100b635e060f18a0c3b245f909955f9",
+      "download_verified": true,
+      "sha256": "9dbfa4187e4417f731a33ca2db4c1d5c69afb0bf6339cb38295d3166b360f750"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # SGODOT-172 · R2.1 finishing
 
+> 当前炉火已切换为共享粒子特效；本页保留此前美术/挂点/糕点评审证据。最新整景、近景录像、粒子预算与不重烘校验见[共享炉火交付](../standard_room_5-fire-2026-10-08/README.md)。
+
 赵云 · **Review**. The director accepted R2 and released 173–178 on 2026-10-07. This closes the four remaining 172 items; it does not supersede the accepted camera/scale baseline or claim user acceptance of R2.1.
 
 ![Reference, R2.1 and direct 50% overlay](comparison-r21.png)
