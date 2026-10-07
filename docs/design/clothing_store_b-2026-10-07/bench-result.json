@@ -1,0 +1,859 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"checks": [
+		{
+			"details": null,
+			"name": "Default Avatar fixture assembles",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Bench route/probe schema",
+			"passed": true
+		},
+		{
+			"details": 0.0649999976158142,
+			"name": "Spawn stands on authored floor",
+			"passed": true
+		},
+		{
+			"details": "(-2.42, 0.065, 1.43)",
+			"name": "Spawn capsule clear",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-2.42000007629395,
+					0.0649999976158142,
+					1.42999994754791
+				],
+				"from": [
+					-2.42000007629395,
+					0.0649999976158142,
+					1.42999994754791
+				],
+				"name": "entry",
+				"reached": true,
+				"remaining_m": 0.0360554791986942,
+				"seconds": 0.001,
+				"target": [
+					-2.40000009536743,
+					0.0649999976158142,
+					1.39999997615814
+				]
+			},
+			"name": "Route: entry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.45450246334076,
+					0.0679269656538963,
+					0.986640572547913
+				],
+				"from": [
+					-2.42000007629395,
+					0.0649999976158142,
+					1.42999994754791
+				],
+				"name": "circle_start",
+				"reached": true,
+				"remaining_m": 0.097431518137455,
+				"seconds": 0.167,
+				"target": [
+					-1.36600005626678,
+					0.0649999976158142,
+					0.945999979972839
+				]
+			},
+			"name": "Route: circle_start",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.79547715187073,
+					0.0679346695542336,
+					-0.0737374648451805
+				],
+				"from": [
+					-1.45450246334076,
+					0.0679269656538963,
+					0.986640572547913
+				],
+				"name": "left_rack",
+				"reached": true,
+				"remaining_m": 0.0801620855927467,
+				"seconds": 0.316,
+				"target": [
+					-1.82000005245209,
+					0.0649999976158142,
+					-0.150000005960464
+				]
+			},
+			"name": "Route: left_rack",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.38612186908722,
+					0.0679139718413353,
+					-1.43317723274231
+				],
+				"from": [
+					-1.79547715187073,
+					0.0679346695542336,
+					-0.0737374648451805
+				],
+				"name": "fitting_room",
+				"reached": true,
+				"remaining_m": 0.0698474124073982,
+				"seconds": 0.4,
+				"target": [
+					-1.36600005626678,
+					0.0649999976158142,
+					-1.5
+				]
+			},
+			"name": "Route: fitting_room",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.357462584972382,
+					0.0679369419813156,
+					-1.6790908575058
+				],
+				"from": [
+					-1.38612186908722,
+					0.0679139718413353,
+					-1.43317723274231
+				],
+				"name": "mirror",
+				"reached": true,
+				"remaining_m": 0.089975118637085,
+				"seconds": 0.299,
+				"target": [
+					-0.270000010728836,
+					0.0649999976158142,
+					-1.70000004768372
+				]
+			},
+			"name": "Route: mirror",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.748619794845581,
+					0.0679352432489395,
+					-1.27431762218475
+				],
+				"from": [
+					-0.357462584972382,
+					0.0679369419813156,
+					-1.6790908575058
+				],
+				"name": "rear_rack",
+				"reached": true,
+				"remaining_m": 0.082451157271862,
+				"seconds": 0.333,
+				"target": [
+					0.825999975204468,
+					0.0649999976158142,
+					-1.24600005149841
+				]
+			},
+			"name": "Route: rear_rack",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.39706587791443,
+					0.067935474216938,
+					0.204873576760292
+				],
+				"from": [
+					0.748619794845581,
+					0.0679352432489395,
+					-1.27431762218475
+				],
+				"name": "jewelry",
+				"reached": true,
+				"remaining_m": 0.082080751657486,
+				"seconds": 0.45,
+				"target": [
+					1.42999994754791,
+					0.0649999976158142,
+					0.280000001192093
+				]
+			},
+			"name": "Route: jewelry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.87179297208786,
+					0.0679332762956619,
+					0.886570036411285
+				],
+				"from": [
+					1.39706587791443,
+					0.067935474216938,
+					0.204873576760292
+				],
+				"name": "circle_southeast",
+				"reached": true,
+				"remaining_m": 0.075083427131176,
+				"seconds": 0.117,
+				"target": [
+					0.825999975204468,
+					0.0649999976158142,
+					0.945999979972839
+				]
+			},
+			"name": "Route: circle_southeast",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.199462071061134,
+					0.0679342523217201,
+					1.36828136444092
+				],
+				"from": [
+					0.87179297208786,
+					0.0679332762956619,
+					0.886570036411285
+				],
+				"name": "circle_front",
+				"reached": true,
+				"remaining_m": 0.0773969069123268,
+				"seconds": 0.333,
+				"target": [
+					-0.270000010728836,
+					0.0649999976158142,
+					1.39999997615814
+				]
+			},
+			"name": "Route: circle_front",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.29975235462189,
+					0.0679313689470291,
+					0.969981253147125
+				],
+				"from": [
+					-0.199462071061134,
+					0.0679342523217201,
+					1.36828136444092
+				],
+				"name": "circle_complete",
+				"reached": true,
+				"remaining_m": 0.0705156177282333,
+				"seconds": 0.333,
+				"target": [
+					-1.36600005626678,
+					0.0649999976158142,
+					0.945999979972839
+				]
+			},
+			"name": "Route: circle_complete",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ClothingStoreBArt/round_display_island/Collider"
+				],
+				"final": [
+					-0.270000010728836,
+					0.0505106970667839,
+					1.25477635860443
+				],
+				"from": [
+					-0.270000010728836,
+					0.0649999976158142,
+					1.39999997615814
+				],
+				"reached": false,
+				"remaining_m": 0.954886257648468,
+				"seconds": 0.866,
+				"target": [
+					-0.270000010728836,
+					0.0649999976158142,
+					0.300000011920929
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ClothingStoreBArt/round_display_island/Collider"
+			},
+			"name": "Blocked: round_island",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ClothingStoreBArt/left_gold_rack/Collider"
+				],
+				"final": [
+					-2.1949999332428,
+					0.0503652766346931,
+					-1.0
+				],
+				"from": [
+					-1.82000005245209,
+					0.0649999976158142,
+					-1.0
+				],
+				"reached": false,
+				"remaining_m": 0.605177044868469,
+				"seconds": 0.867,
+				"target": [
+					-2.79999995231628,
+					0.0649999976158142,
+					-1.0
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ClothingStoreBArt/left_gold_rack/Collider"
+			},
+			"name": "Blocked: left_clothing_rack",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ClothingStoreBArt/jewelry_display/Collider"
+				],
+				"final": [
+					1.86749935150146,
+					0.0616354085505009,
+					0.649999976158142
+				],
+				"from": [
+					1.42999994754791,
+					0.0649999976158142,
+					0.649999976158142
+				],
+				"reached": false,
+				"remaining_m": 0.732508301734924,
+				"seconds": 0.883,
+				"target": [
+					2.59999990463257,
+					0.0649999976158142,
+					0.649999976158142
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ClothingStoreBArt/jewelry_display/Collider"
+			},
+			"name": "Blocked: jewelry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ClothingStoreBArt/pink_tufted_bench/Collider"
+				],
+				"final": [
+					-1.24000000953674,
+					0.0616396442055702,
+					1.61749994754791
+				],
+				"from": [
+					-1.24000000953674,
+					0.0649999976158142,
+					1.42999994754791
+				],
+				"reached": false,
+				"remaining_m": 0.682508289813995,
+				"seconds": 0.883,
+				"target": [
+					-1.24000000953674,
+					0.0649999976158142,
+					2.29999995231628
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ClothingStoreBArt/pink_tufted_bench/Collider"
+			},
+			"name": "Blocked: tufted_bench",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 0.985,
+				"measured_m": 0.984999895095825,
+				"minimum_m": 0.8
+			},
+			"name": "Gap width: island_to_left_rack",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.8400000333786,
+					0.067933589220047,
+					-1.17382800579071
+				],
+				"from": [
+					-1.8400000333786,
+					0.0649999976158142,
+					0.5
+				],
+				"reached": true,
+				"remaining_m": 0.0762284621596336,
+				"seconds": 0.483,
+				"target": [
+					-1.8400000333786,
+					0.0649999976158142,
+					-1.25
+				]
+			},
+			"name": "Traverse: island_to_left_rack",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.321,
+				"measured_m": 1.33384394645691,
+				"minimum_m": 0.8
+			},
+			"name": "Gap width: island_to_rear_rack",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.28859376907349,
+					0.067931093275547,
+					-1.70000004768372
+				],
+				"from": [
+					-0.270000010728836,
+					0.0649999976158142,
+					-1.70000004768372
+				],
+				"reached": true,
+				"remaining_m": 0.0914532095193863,
+				"seconds": 0.45,
+				"target": [
+					1.37999999523163,
+					0.0649999976158142,
+					-1.70000004768372
+				]
+			},
+			"name": "Traverse: island_to_rear_rack",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 0.857,
+				"measured_m": 0.857036948204041,
+				"minimum_m": 0.8
+			},
+			"name": "Gap width: island_to_bench",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.285312592983246,
+					0.0679362490773201,
+					1.39999997615814
+				],
+				"from": [
+					-1.3400000333786,
+					0.0649999976158142,
+					1.39999997615814
+				],
+				"reached": true,
+				"remaining_m": 0.0853631049394608,
+				"seconds": 0.317,
+				"target": [
+					-0.200000002980232,
+					0.0649999976158142,
+					1.39999997615814
+				]
+			},
+			"name": "Traverse: island_to_bench",
+			"passed": true
+		},
+		{
+			"details": {
+				"entry": {
+					"collisions": [],
+					"final": [
+						-2.45629334449768,
+						0.0679316371679306,
+						1.44119000434875
+					],
+					"from": [
+						-2.7445752620697,
+						0.0679350569844246,
+						1.6521281003952
+					],
+					"reached": true,
+					"remaining_m": 0.0698150619864464,
+					"seconds": 0.116,
+					"target": [
+						-2.40000009536743,
+						0.0649999976158142,
+						1.39999997615814
+					]
+				},
+				"exit": {
+					"collisions": [],
+					"final": [
+						-2.7445752620697,
+						0.0679350569844246,
+						1.6521281003952
+					],
+					"from": [
+						-2.40000009536743,
+						0.0649999976158142,
+						1.39999997615814
+					],
+					"reached": true,
+					"remaining_m": 0.0811216831207275,
+					"seconds": 0.15,
+					"target": [
+						-2.80999994277954,
+						0.0649999976158142,
+						1.70000004768372
+					]
+				}
+			},
+			"name": "Entrance gap allows exit and reentry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"delta": [
+					0.0584936141967773,
+					0.00279802829027176,
+					0.883883714675903
+				]
+			},
+			"name": "Diagonal collision preserves wall sliding",
+			"passed": true
+		},
+		{
+			"details": [
+				"run",
+				0.15,
+				0.316666666666667
+			],
+			"name": "Run animation advances in rendered viewport",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Input release stops horizontal motion",
+			"passed": true
+		},
+		{
+			"details": "idle",
+			"name": "Release returns to idle",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Focus loss cancels movement",
+			"passed": true
+		},
+		{
+			"details": 1.74549423158169,
+			"name": "Fixture head-top height measurable",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 1.33486548270553,
+				"difference": 0.055793991416309,
+				"height": 2.46,
+				"ratio_to_H": 1.40934295598952,
+				"reason": ""
+			},
+			"name": "Scale ±15%: door",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.660271445844686,
+				"difference": 0.0661605206073754,
+				"height": 1.07625,
+				"ratio_to_H": 0.616587543245417,
+				"reason": ""
+			},
+			"name": "Scale ±15%: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.392438993842612,
+				"difference": 0.00729927007299269,
+				"height": 0.68,
+				"ratio_to_H": 0.389574475639381,
+				"reason": ""
+			},
+			"name": "Scale ±15%: chair",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.650245632133378,
+				"difference": 0.0898678414096917,
+				"height": 1.033,
+				"ratio_to_H": 0.591809460787471,
+				"reason": ""
+			},
+			"name": "Scale ±15%: table",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"pid": 1077454,
+	"renderer": "mobile",
+	"route": [
+		{
+			"collisions": [],
+			"final": [
+				-2.42000007629395,
+				0.0649999976158142,
+				1.42999994754791
+			],
+			"from": [
+				-2.42000007629395,
+				0.0649999976158142,
+				1.42999994754791
+			],
+			"name": "entry",
+			"reached": true,
+			"remaining_m": 0.0360554791986942,
+			"seconds": 0.001,
+			"target": [
+				-2.40000009536743,
+				0.0649999976158142,
+				1.39999997615814
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.45450246334076,
+				0.0679269656538963,
+				0.986640572547913
+			],
+			"from": [
+				-2.42000007629395,
+				0.0649999976158142,
+				1.42999994754791
+			],
+			"name": "circle_start",
+			"reached": true,
+			"remaining_m": 0.097431518137455,
+			"seconds": 0.167,
+			"target": [
+				-1.36600005626678,
+				0.0649999976158142,
+				0.945999979972839
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.79547715187073,
+				0.0679346695542336,
+				-0.0737374648451805
+			],
+			"from": [
+				-1.45450246334076,
+				0.0679269656538963,
+				0.986640572547913
+			],
+			"name": "left_rack",
+			"reached": true,
+			"remaining_m": 0.0801620855927467,
+			"seconds": 0.316,
+			"target": [
+				-1.82000005245209,
+				0.0649999976158142,
+				-0.150000005960464
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.38612186908722,
+				0.0679139718413353,
+				-1.43317723274231
+			],
+			"from": [
+				-1.79547715187073,
+				0.0679346695542336,
+				-0.0737374648451805
+			],
+			"name": "fitting_room",
+			"reached": true,
+			"remaining_m": 0.0698474124073982,
+			"seconds": 0.4,
+			"target": [
+				-1.36600005626678,
+				0.0649999976158142,
+				-1.5
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.357462584972382,
+				0.0679369419813156,
+				-1.6790908575058
+			],
+			"from": [
+				-1.38612186908722,
+				0.0679139718413353,
+				-1.43317723274231
+			],
+			"name": "mirror",
+			"reached": true,
+			"remaining_m": 0.089975118637085,
+			"seconds": 0.299,
+			"target": [
+				-0.270000010728836,
+				0.0649999976158142,
+				-1.70000004768372
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.748619794845581,
+				0.0679352432489395,
+				-1.27431762218475
+			],
+			"from": [
+				-0.357462584972382,
+				0.0679369419813156,
+				-1.6790908575058
+			],
+			"name": "rear_rack",
+			"reached": true,
+			"remaining_m": 0.082451157271862,
+			"seconds": 0.333,
+			"target": [
+				0.825999975204468,
+				0.0649999976158142,
+				-1.24600005149841
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.39706587791443,
+				0.067935474216938,
+				0.204873576760292
+			],
+			"from": [
+				0.748619794845581,
+				0.0679352432489395,
+				-1.27431762218475
+			],
+			"name": "jewelry",
+			"reached": true,
+			"remaining_m": 0.082080751657486,
+			"seconds": 0.45,
+			"target": [
+				1.42999994754791,
+				0.0649999976158142,
+				0.280000001192093
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.87179297208786,
+				0.0679332762956619,
+				0.886570036411285
+			],
+			"from": [
+				1.39706587791443,
+				0.067935474216938,
+				0.204873576760292
+			],
+			"name": "circle_southeast",
+			"reached": true,
+			"remaining_m": 0.075083427131176,
+			"seconds": 0.117,
+			"target": [
+				0.825999975204468,
+				0.0649999976158142,
+				0.945999979972839
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.199462071061134,
+				0.0679342523217201,
+				1.36828136444092
+			],
+			"from": [
+				0.87179297208786,
+				0.0679332762956619,
+				0.886570036411285
+			],
+			"name": "circle_front",
+			"reached": true,
+			"remaining_m": 0.0773969069123268,
+			"seconds": 0.333,
+			"target": [
+				-0.270000010728836,
+				0.0649999976158142,
+				1.39999997615814
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.29975235462189,
+				0.0679313689470291,
+				0.969981253147125
+			],
+			"from": [
+				-0.199462071061134,
+				0.0679342523217201,
+				1.36828136444092
+			],
+			"name": "circle_complete",
+			"reached": true,
+			"remaining_m": 0.0705156177282333,
+			"seconds": 0.333,
+			"target": [
+				-1.36600005626678,
+				0.0649999976158142,
+				0.945999979972839
+			]
+		}
+	],
+	"scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+	"slug": "clothing_store_b"
+}

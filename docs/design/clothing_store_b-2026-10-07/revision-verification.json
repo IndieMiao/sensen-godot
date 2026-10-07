@@ -1,0 +1,249 @@
+{
+  "revision": "r1",
+  "reference_sha256": "05260b090aa79b5d1d848e62be65b513e9bbc1c9f6d1ebfe4656b1e93d25ca00",
+  "renderer": {
+    "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "draw_calls": 18.0,
+    "instances": 72,
+    "renderer": "mobile",
+    "resolution": [
+      1400,
+      1400
+    ],
+    "scope": "offline art render; no mobile/gameplay/performance acceptance",
+    "slug": "clothing_store_b",
+    "static_surfaces": 18,
+    "views": [
+      {
+        "draw_calls": 20.0,
+        "rendered_objects": 20.0,
+        "view": "godot-whole"
+      },
+      {
+        "draw_calls": 20.0,
+        "rendered_objects": 20.0,
+        "view": "model-front"
+      },
+      {
+        "draw_calls": 20.0,
+        "rendered_objects": 20.0,
+        "view": "model-side"
+      },
+      {
+        "draw_calls": 20.0,
+        "rendered_objects": 20.0,
+        "view": "model-top"
+      },
+      {
+        "draw_calls": 17.0,
+        "rendered_objects": 17.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 18.0,
+        "rendered_objects": 18.0,
+        "view": "godot-detail-plants"
+      }
+    ]
+  },
+  "budget": {
+    "after": {
+      "room_triangles": 107518,
+      "shared_plant_triangles": 6252,
+      "room_botanical_triangles": 5020,
+      "plant_triangles": 11272,
+      "total_triangles": 113770,
+      "static_surfaces": 18
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "entrance_frame",
+          "hanging_dress_ivory",
+          "hanging_dress_rose",
+          "hanging_dress_cream",
+          "handbag_pink",
+          "pink_round_rug",
+          "pink_pumps",
+          "black_pumps",
+          "folded_blue_knit",
+          "window_display_frame",
+          "display_mannequin_dress",
+          "gift_boxes",
+          "pink_entry_mat",
+          "ivory_sneakers",
+          "mint_mary_janes",
+          "island_bag_pink",
+          "island_bag_green",
+          "island_bag_cream",
+          "sconce_left",
+          "island_bag_blue",
+          "island_bag_coral",
+          "stacked_blue_knit"
+        ],
+        "triangles": 33926,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "entrance_glass",
+          "jewelry_glass"
+        ],
+        "triangles": 148,
+        "cast_shadow": false
+      },
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "hanging_dress_blue",
+          "hanging_dress_mint",
+          "hanging_blouse_blue",
+          "hanging_blouse_ivory",
+          "hanging_blouse_mint",
+          "scarf_rail",
+          "handbag_cream",
+          "handbag_green",
+          "handbag_blue",
+          "changing_room_arch",
+          "changing_curtain",
+          "folded_ivory_knit",
+          "wall_sconce",
+          "right_pink_bag",
+          "right_blue_bag",
+          "stacked_knit",
+          "sconce_fitting",
+          "sconce_right",
+          "left_extra_dress_0",
+          "left_extra_dress_1",
+          "left_extra_dress_2",
+          "right_upper_3",
+          "right_upper_4",
+          "right_upper_5",
+          "right_upper_6",
+          "right_lower_0",
+          "right_lower_1",
+          "right_lower_2",
+          "right_lower_3",
+          "right_lower_4",
+          "right_lower_5",
+          "cream_shoe_pair"
+        ],
+        "triangles": 41450,
+        "cast_shadow": true
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "island_bouquet"
+        ],
+        "triangles": 4596,
+        "cast_shadow": false
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "EntrancePlant"
+        ],
+        "triangles": 946,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "FittingPlant",
+          "RightTrailing"
+        ],
+        "triangles": 3258,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "LeftTrailing"
+        ],
+        "triangles": 2048,
+        "cast_shadow": false
+      }
+    ]
+  },
+  "glb_checks": {
+    "passed": true,
+    "single_surface_no_embedded_images": true,
+    "files": [
+      "assets/rooms/_shared/plants/monstera_woven.glb",
+      "assets/rooms/_shared/plants/peace_lily.glb",
+      "assets/rooms/_shared/plants/pothos.glb",
+      "assets/rooms/clothing_store_b/batches/review_back_dressing.glb",
+      "assets/rooms/clothing_store_b/batches/review_back_plants.glb",
+      "assets/rooms/clothing_store_b/batches/review_botanical.glb",
+      "assets/rooms/clothing_store_b/batches/review_front_dressing.glb",
+      "assets/rooms/clothing_store_b/batches/review_front_plants.glb",
+      "assets/rooms/clothing_store_b/batches/review_glass.glb",
+      "assets/rooms/clothing_store_b/batches/review_large_plants.glb",
+      "assets/rooms/clothing_store_b/black_pumps.glb",
+      "assets/rooms/clothing_store_b/boutique_back_wall.glb",
+      "assets/rooms/clothing_store_b/boutique_floor.glb",
+      "assets/rooms/clothing_store_b/boutique_left_wall.glb",
+      "assets/rooms/clothing_store_b/changing_curtain.glb",
+      "assets/rooms/clothing_store_b/changing_room_arch.glb",
+      "assets/rooms/clothing_store_b/display_mannequin_dress.glb",
+      "assets/rooms/clothing_store_b/entrance_frame.glb",
+      "assets/rooms/clothing_store_b/entrance_glass.glb",
+      "assets/rooms/clothing_store_b/entrance_sky.glb",
+      "assets/rooms/clothing_store_b/folded_blue_knit.glb",
+      "assets/rooms/clothing_store_b/folded_ivory_knit.glb",
+      "assets/rooms/clothing_store_b/gift_boxes.glb",
+      "assets/rooms/clothing_store_b/handbag_blue.glb",
+      "assets/rooms/clothing_store_b/handbag_cream.glb",
+      "assets/rooms/clothing_store_b/handbag_green.glb",
+      "assets/rooms/clothing_store_b/handbag_pink.glb",
+      "assets/rooms/clothing_store_b/hanging_blouse_blue.glb",
+      "assets/rooms/clothing_store_b/hanging_blouse_ivory.glb",
+      "assets/rooms/clothing_store_b/hanging_blouse_mint.glb",
+      "assets/rooms/clothing_store_b/hanging_dress_blue.glb",
+      "assets/rooms/clothing_store_b/hanging_dress_cream.glb",
+      "assets/rooms/clothing_store_b/hanging_dress_ivory.glb",
+      "assets/rooms/clothing_store_b/hanging_dress_mint.glb",
+      "assets/rooms/clothing_store_b/hanging_dress_rose.glb",
+      "assets/rooms/clothing_store_b/island_bouquet.glb",
+      "assets/rooms/clothing_store_b/ivory_sneakers.glb",
+      "assets/rooms/clothing_store_b/jewelry_display.glb",
+      "assets/rooms/clothing_store_b/jewelry_glass.glb",
+      "assets/rooms/clothing_store_b/left_gold_rack.glb",
+      "assets/rooms/clothing_store_b/mint_mary_janes.glb",
+      "assets/rooms/clothing_store_b/petal_pendant.glb",
+      "assets/rooms/clothing_store_b/pink_entry_mat.glb",
+      "assets/rooms/clothing_store_b/pink_pumps.glb",
+      "assets/rooms/clothing_store_b/pink_round_rug.glb",
+      "assets/rooms/clothing_store_b/pink_tufted_bench.glb",
+      "assets/rooms/clothing_store_b/right_gold_rack.glb",
+      "assets/rooms/clothing_store_b/round_display_island.glb",
+      "assets/rooms/clothing_store_b/scarf_rail.glb",
+      "assets/rooms/clothing_store_b/standing_mirror.glb",
+      "assets/rooms/clothing_store_b/wall_sconce.glb",
+      "assets/rooms/clothing_store_b/window_display_frame.glb"
+    ]
+  },
+  "visual_acceptance": "Pending art director Review; metrics do not establish reference fidelity."
+}

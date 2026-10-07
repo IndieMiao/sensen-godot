@@ -1,0 +1,116 @@
+{
+  "revision": "r1",
+  "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
+  "checks": [
+    {
+      "name": "pink beige parquet",
+      "surface": "Lit parquet on open front floor",
+      "reference_pixel": [
+        615,
+        1220
+      ],
+      "runtime_pixel": [
+        618,
+        1030
+      ],
+      "reference": {
+        "rgb": [
+          249,
+          208,
+          171
+        ],
+        "hex": "#F9D0AB",
+        "hue_degrees": 28.462,
+        "saturation": 0.3133,
+        "value": 0.9765
+      },
+      "runtime": {
+        "rgb": [
+          253,
+          225,
+          206
+        ],
+        "hex": "#FDE1CE",
+        "hue_degrees": 24.255,
+        "saturation": 0.1858,
+        "value": 0.9922
+      },
+      "hue_delta_degrees": 4.206,
+      "passed": true
+    },
+    {
+      "name": "pink wall panel",
+      "surface": "Lit upper left wall panel inside moulding",
+      "reference_pixel": [
+        373,
+        332
+      ],
+      "runtime_pixel": [
+        550,
+        310
+      ],
+      "reference": {
+        "rgb": [
+          246,
+          172,
+          166
+        ],
+        "hex": "#F6ACA6",
+        "hue_degrees": 4.5,
+        "saturation": 0.3252,
+        "value": 0.9647
+      },
+      "runtime": {
+        "rgb": [
+          255,
+          204,
+          195
+        ],
+        "hex": "#FFCCC3",
+        "hue_degrees": 9.0,
+        "saturation": 0.2353,
+        "value": 1.0
+      },
+      "hue_delta_degrees": 4.5,
+      "passed": true
+    },
+    {
+      "name": "pink bench cushion",
+      "surface": "Top of front bench cushion",
+      "reference_pixel": [
+        447,
+        1093
+      ],
+      "runtime_pixel": [
+        452,
+        850
+      ],
+      "reference": {
+        "rgb": [
+          235,
+          156,
+          169
+        ],
+        "hex": "#EB9CA9",
+        "hue_degrees": 350.127,
+        "saturation": 0.3362,
+        "value": 0.9216
+      },
+      "runtime": {
+        "rgb": [
+          255,
+          195,
+          204
+        ],
+        "hex": "#FFC3CC",
+        "hue_degrees": 351.0,
+        "saturation": 0.2353,
+        "value": 1.0
+      },
+      "hue_delta_degrees": 0.873,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Representative lit patches only, not a complete-image fidelity score; brightness/saturation retained for review."
+}

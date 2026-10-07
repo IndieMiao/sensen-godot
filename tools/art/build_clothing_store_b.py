@@ -110,10 +110,17 @@ def geometry():
     begin('trailing_rack_plant',at=(-2.65,2.49,-.26),yaw=90);k.plant(scale=.57,trailing=True)
     k.instance('trailing_rack_plant','right_trailing_plant',(2.55,2.49,-2.29))
     begin('pink_entry_mat',at=(-2.42,.079,1.96),yaw=90);cube('Pink entry mat',(0,0,0),(1.12,.024,.62),'D995A8',.04,'cloth')
+    sys.path.insert(0,str(Path(__file__).resolve().parent/'source/clothing_store_b'))
+    import revision
+    revision.revise()
     k.save('545:2963',{'position':[10,9.2,12],'target':[0,1.28,.05],'size':9.6})
+    revision.manifest()
 
 if __name__=='__main__':
     k.configure('clothing_store_b');args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
     if '--bake-only' in args:k.load()
     else:geometry()
-    if '--geometry-only' not in args:k.bake_and_export()
+    if '--geometry-only' not in args:k.bake_and_export(ao_strength=.45,ao_distance=.36,coherent_swatches=True)
+    if '--geometry-only' not in args:
+        from series_batch import build
+        build('clothing_store_b')

@@ -1,52 +1,34 @@
-# Clothing Store B — SGODOT-185
+# SGODOT-185 · Clothing Store B · 刘备 R1 修订
 
-Review draft produced by 刘备 on 2026-10-07. User art approval is pending; Plane remains In Progress.
+依据 Figma `545:2963` 原图与不知火舞两轮评论修订，沿用 179 R2.1 共享植物与合批做法。Basic Room 比例固定，待总监视觉 Review。
 
-## Reference and visual scope
+| Review 项 | 当前处理 |
+|---|---|
+| 长凳 | 2×4 方格鼓包：每块有曲面肩部、真实下凹中心和小钉扣；保留原占地，金色脚、连续软包基座。 |
+| 地板/墙 | 地板改粉米木色、减窄拼缝、降低粗糙度；墙面粉线框加深加厚。 |
+| 左衣架 | 八件裙装，蓬袖与裙褶体积，小花/波点；五种基础裙装，再实例化。 |
+| 右衣架 | 上排七件、下排六件，保留衣服厚度；三色上衣复用。 |
+| 圆台 | 保留 2.34m 直径，整体后移 0.4m；上层五包与花瓶，下层五双鞋和两摞针织衫。 |
+| 鞋包 | 四色基础包；粉/黑鞋、薄荷玛丽珍、小白运动鞋四种鞋型/配色，保留可复用原件。 |
+| 首饰柜 | 项链胸像、戒指、耳环 T 架/吊坠、太阳镜，透明玻璃。 |
+| 入口/橱窗 | 金框玻璃、门外天空树冠、粉垫、共享盆栽；橱窗粉裙腰部蝴蝶结、礼盒。 |
+| 灯与试衣间 | 三层花瓣吊灯、四盏暖壁灯；保留粉拱帘/圆凳，立镜改金框。 |
 
-Actual Figma export: file `OMLTC3yw3u2WDjOZhLnhaR`, node `545:2963`.
-[Reference](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=545-2963). Local export SHA-256: `05260b090aa79b5d1d848e62be65b513e9bbc1c9f6d1ebfe4656b1e93d25ca00`.
-The full image was inspected before modeling. Geometry is original; unshown backs, depths and metre dimensions are inferred.
+总摆放 **113,770 面**，植物 **11,272 面**（含花瓶、窗外树冠），静态 surface **18**，低于 200,000 / 100,000 / 60。房间 / 植物各一张 2048 图集；衣服、鞋包按前后组合并，保留独立 GLB、局部 pivot 与命名源零件。小叶、花、窗景不投影；吊灯为自发光，另加五盏局部无阴影点光。实际导入无嵌入贴图，启用 mipmap 和 VRAM 压缩。
 
-![Reference and runtime comparison](comparison.png)
+取色点见 `colour-patch-comparison.jpg` / `colour-verification.json`：对原图和运行时同类、同位置的亮面取 9×9 中位数，地板/墙板/长凳色相差 **4.21° / 4.50° / 0.87°**，阈值 10°。首轮地板偏差 10.13°，已据此重调；墙首选误取到压顶，重新标定到墙板后再检查。色相指标不涵盖全部明度、饱和度或造型相似度。
 
-## Deliverables and rebuild
-
-- Editable named Blender objects/collections: `tools/art/source/clothing_store_b/clothing_store_b.blend`.
-- Generator: `tools/art/build_clothing_store_b.py`; shared helpers remain in the Coffee Shop source directory. Basic Room is unchanged.
-- Runtime modules, atlas, layout/collisions and budget: `assets/rooms/clothing_store_b/`.
-- Reusable art scene: `scenes/clothing_store_b/clothing_store_b_art.tscn`. Contains artwork and simple box collisions only.
-- Godot metres, Y up, front +Z; each GLB has its own floor/mount pivot. Repeated objects use the same GLB.
+门 2.46m、首饰台 1.07625m、圆台 1.033m、长凳约 0.68m，均在 Basic Room 同类 ±15%。圆台碰撞使用 24 边凸体，保持真实圆形外轮廓。实际角色 **35/35 PASS**，完整绕台一圈、到试衣间/镜子/首饰柜；三处通道净宽：左衣架 **0.985m**、后衣架 **1.321m**、长凳 **0.857m**，均实际射线测量，不拿包围盒角落误算通道。15 秒原速视口视频与碰撞截图随卡；不是 Android/物理设备性能验收。
 
 ```sh
-blender --background --factory-startup --python "$PWD/tools/art/build_clothing_store_b.py"
-python3 tools/art/render_shop_review.py clothing_store_b
+blender -b -t 8 --python tools/art/build_clothing_store_b.py
+python tools/art/source/coffee_shop/render_r1.py r1 clothing_store_b
+python tools/art/source/coffee_shop/run_bench.py clothing_store_b --record
+output/art-tools/bin/python tools/art/source/coffee_shop/package_series.py clothing_store_b r1
+output/art-tools/bin/python tools/art/source/coffee_shop/check_series_colour.py clothing_store_b r1
+output/art-tools/bin/python tools/art/source/coffee_shop/prepare_series_media.py clothing_store_b r1
 ```
 
-For manual source edits, use `-- --bake-only` to rebake/export the saved source. A full rebuild overwrites the generated `.blend`; preserve intentional edits first.
-The renderer needs the current host's legitimate DISPLAY/XAUTHORITY. Pillow is needed only for packaging comparison images.
+源文件 `tools/art/source/clothing_store_b/clothing_store_b.blend`，同目录 `revision.py`、`boutique_bench.py`。隔离适配器沿用全部接触点采集，未改共享 harness。
 
-## Asset budget
-
-| Metric | Value |
-|---|---:|
-| Unique GLBs / placed instances | 42 / 53 |
-| Unique / placed triangles | 66,944 / 78,042 |
-| Static mesh surfaces | 53 |
-| Shared atlas | 2048 × 2048, mipmaps + VRAM compression |
-| GLB bytes, total | 1,946,832 |
-| Atlas PNG bytes | 3,648,206 |
-
-One shared matte atlas material; separate soft translucent material for glass modules where present. Color/surface detail and softened contact AO are baked; direct lighting remains dynamic. Padded palette swatches protect subpixel detail from black seams. Major rearrangements require rebaking contact AO.
-
-## Verification and limits
-
-Blender 5.2.2 LTS; Godot 4.7.2 Mobile/Vulkan on `AMD Custom GPU 0405 (RADV VANGOGH)`. All 42 GLBs pass container/mesh/surface checks and contain no duplicated embedded images; the assembled render contains all 53 instances. Whole/detail/front/side/top images rendered at 1400 × 1400. Source import settings are retained beside the atlas.
-
-The images are real Godot renders of the exported models. No Android, character/movement benchmark, gameplay integration, release or physical-phone performance claim is part of these art-only cards.
-
-Differences / inferred choices: The pink boutique layout, gold racks, hanging dresses, bags, two-tier round island, curtain arch, mirror, jewelry case, window mannequin and channel-tufted bench follow the source. Clothing is static low-detail display geometry, without cloth simulation or wearable rigs; fabric prints and seams are simplified. Shoes, jewelry and foliage are less dense than the concept. The floor uses chevron parquet; the display window has a plain blue recess instead of an exterior view. The mirror uses a stylized painted highlight, glass is simple translucency, and gold/lamp surfaces use the shared matte material without reference glow. Dimensions and unseen construction are inferred. The island tiers meet without overlapping coplanar sidewalls.
-
-![Actual model orthographic views](orthographic.png)
-
-Delivery: Lark self-review messages and downloaded-attachment verification are recorded privately under `output/clothing_store_b/delivery/`; no chat identifiers or credentials are committed.
+待视觉复审：服装仍是静态陈列资产；鞋包/首饰和印花比设计图简化；后排鞋部分被上层遮挡，镜面为绘制高光；植物种类和橱窗景色是共享库替代；整体更亮、陈列节奏更规则，圆台和长凳位置有为通行作出的差异。

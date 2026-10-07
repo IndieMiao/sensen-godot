@@ -1,0 +1,38 @@
+[
+  {
+    "name": "pink beige parquet",
+    "surface": "Lit parquet on open front floor",
+    "reference_pixel": [
+      615,
+      1220
+    ],
+    "runtime_pixel": [
+      618,
+      1030
+    ]
+  },
+  {
+    "name": "pink wall panel",
+    "surface": "Lit upper left wall panel inside moulding",
+    "reference_pixel": [
+      373,
+      332
+    ],
+    "runtime_pixel": [
+      550,
+      310
+    ]
+  },
+  {
+    "name": "pink bench cushion",
+    "surface": "Top of front bench cushion",
+    "reference_pixel": [
+      447,
+      1093
+    ],
+    "runtime_pixel": [
+      452,
+      850
+    ]
+  }
+]

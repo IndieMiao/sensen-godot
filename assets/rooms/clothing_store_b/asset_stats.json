@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3648206
+    "bytes": 3460403
   },
   "assets": [
     {
@@ -14,28 +14,28 @@
       "vertices": 1376,
       "triangles": 2108,
       "surfaces": 1,
-      "bytes": 142292
+      "bytes": 141780
     },
     {
       "name": "boutique_left_wall",
       "vertices": 998,
       "triangles": 1948,
       "surfaces": 1,
-      "bytes": 75100
+      "bytes": 73564
     },
     {
       "name": "boutique_back_wall",
       "vertices": 1162,
       "triangles": 2252,
       "surfaces": 1,
-      "bytes": 81916
+      "bytes": 83868
     },
     {
       "name": "entrance_frame",
       "vertices": 552,
       "triangles": 1092,
       "surfaces": 1,
-      "bytes": 31228
+      "bytes": 36700
     },
     {
       "name": "entrance_glass",
@@ -49,189 +49,189 @@
       "vertices": 316,
       "triangles": 604,
       "surfaces": 1,
-      "bytes": 20492
+      "bytes": 23372
     },
     {
       "name": "right_gold_rack",
       "vertices": 316,
       "triangles": 604,
       "surfaces": 1,
-      "bytes": 20492
+      "bytes": 23500
     },
     {
       "name": "hanging_dress_ivory",
-      "vertices": 1748,
-      "triangles": 3370,
+      "vertices": 2240,
+      "triangles": 4222,
       "surfaces": 1,
-      "bytes": 84692
+      "bytes": 129936
     },
     {
       "name": "hanging_dress_rose",
-      "vertices": 1340,
-      "triangles": 2602,
+      "vertices": 1520,
+      "triangles": 2926,
       "surfaces": 1,
-      "bytes": 67024
+      "bytes": 99112
     },
     {
       "name": "hanging_dress_cream",
-      "vertices": 1340,
-      "triangles": 2602,
+      "vertices": 2240,
+      "triangles": 4222,
       "surfaces": 1,
-      "bytes": 67024
+      "bytes": 129932
     },
     {
       "name": "hanging_dress_blue",
-      "vertices": 1340,
-      "triangles": 2602,
+      "vertices": 1520,
+      "triangles": 2926,
       "surfaces": 1,
-      "bytes": 67024
+      "bytes": 99112
     },
     {
       "name": "hanging_dress_mint",
-      "vertices": 1340,
-      "triangles": 2602,
+      "vertices": 2240,
+      "triangles": 4222,
       "surfaces": 1,
-      "bytes": 67024
+      "bytes": 129932
     },
     {
       "name": "hanging_blouse_blue",
       "vertices": 558,
       "triangles": 1096,
       "surfaces": 1,
-      "bytes": 29408
+      "bytes": 41988
     },
     {
       "name": "hanging_blouse_ivory",
       "vertices": 558,
       "triangles": 1096,
       "surfaces": 1,
-      "bytes": 29408
+      "bytes": 41992
     },
     {
       "name": "hanging_blouse_mint",
       "vertices": 558,
       "triangles": 1096,
       "surfaces": 1,
-      "bytes": 29404
+      "bytes": 41988
     },
     {
       "name": "scarf_rail",
-      "vertices": 432,
-      "triangles": 748,
+      "vertices": 16,
+      "triangles": 28,
       "surfaces": 1,
-      "bytes": 23008
+      "bytes": 2800
     },
     {
       "name": "handbag_pink",
       "vertices": 542,
       "triangles": 1056,
       "surfaces": 1,
-      "bytes": 27084
+      "bytes": 39120
     },
     {
       "name": "handbag_cream",
       "vertices": 542,
       "triangles": 1056,
       "surfaces": 1,
-      "bytes": 27088
+      "bytes": 39124
     },
     {
       "name": "handbag_green",
       "vertices": 342,
       "triangles": 668,
       "surfaces": 1,
-      "bytes": 18360
+      "bytes": 27064
     },
     {
       "name": "handbag_blue",
       "vertices": 342,
       "triangles": 668,
       "surfaces": 1,
-      "bytes": 18356
+      "bytes": 27060
     },
     {
       "name": "changing_room_arch",
       "vertices": 432,
       "triangles": 864,
       "surfaces": 1,
-      "bytes": 28588
+      "bytes": 26220
     },
     {
       "name": "changing_curtain",
       "vertices": 332,
       "triangles": 648,
       "surfaces": 1,
-      "bytes": 30744
+      "bytes": 28952
     },
     {
       "name": "standing_mirror",
       "vertices": 646,
       "triangles": 1270,
       "surfaces": 1,
-      "bytes": 36968
+      "bytes": 41836
     },
     {
       "name": "pink_round_rug",
       "vertices": 1771,
       "triangles": 3530,
       "surfaces": 1,
-      "bytes": 85388
+      "bytes": 125836
     },
     {
       "name": "round_display_island",
       "vertices": 496,
       "triangles": 976,
       "surfaces": 1,
-      "bytes": 39764
+      "bytes": 40000
     },
     {
       "name": "pink_pumps",
       "vertices": 848,
       "triangles": 1656,
       "surfaces": 1,
-      "bytes": 38940
+      "bytes": 46112
     },
     {
       "name": "black_pumps",
       "vertices": 848,
       "triangles": 1656,
       "surfaces": 1,
-      "bytes": 38940
+      "bytes": 46112
     },
     {
       "name": "folded_ivory_knit",
       "vertices": 142,
       "triangles": 248,
       "surfaces": 1,
-      "bytes": 9188
+      "bytes": 9892
     },
     {
       "name": "folded_blue_knit",
       "vertices": 142,
       "triangles": 248,
       "surfaces": 1,
-      "bytes": 9184
+      "bytes": 9888
     },
     {
       "name": "island_bouquet",
       "vertices": 2480,
       "triangles": 4596,
       "surfaces": 1,
-      "bytes": 110868
+      "bytes": 130580
     },
     {
       "name": "pink_tufted_bench",
-      "vertices": 1016,
-      "triangles": 1984,
+      "vertices": 1456,
+      "triangles": 2796,
       "surfaces": 1,
-      "bytes": 64476
+      "bytes": 90748
     },
     {
       "name": "jewelry_display",
-      "vertices": 3058,
-      "triangles": 5988,
+      "vertices": 5692,
+      "triangles": 11148,
       "surfaces": 1,
-      "bytes": 157448
+      "bytes": 425216
     },
     {
       "name": "jewelry_glass",
@@ -245,69 +245,210 @@
       "vertices": 400,
       "triangles": 768,
       "surfaces": 1,
-      "bytes": 28012
+      "bytes": 29036
     },
     {
       "name": "display_mannequin_dress",
-      "vertices": 1284,
-      "triangles": 2494,
+      "vertices": 1408,
+      "triangles": 2734,
       "surfaces": 1,
-      "bytes": 64852
+      "bytes": 93908
     },
     {
       "name": "gift_boxes",
       "vertices": 584,
       "triangles": 1128,
       "surfaces": 1,
-      "bytes": 29388
+      "bytes": 41172
     },
     {
       "name": "petal_pendant",
-      "vertices": 1746,
-      "triangles": 3448,
+      "vertices": 1690,
+      "triangles": 3268,
       "surfaces": 1,
-      "bytes": 79464
+      "bytes": 106960
     },
     {
       "name": "wall_sconce",
       "vertices": 152,
       "triangles": 292,
       "surfaces": 1,
-      "bytes": 12340
-    },
-    {
-      "name": "entrance_plant",
-      "vertices": 571,
-      "triangles": 1078,
-      "surfaces": 1,
-      "bytes": 34292
-    },
-    {
-      "name": "fitting_plant",
-      "vertices": 571,
-      "triangles": 1078,
-      "surfaces": 1,
-      "bytes": 35512
-    },
-    {
-      "name": "trailing_rack_plant",
-      "vertices": 1514,
-      "triangles": 2868,
-      "surfaces": 1,
-      "bytes": 69356
+      "bytes": 12084
     },
     {
       "name": "pink_entry_mat",
       "vertices": 56,
       "triangles": 108,
       "surfaces": 1,
-      "bytes": 4836
+      "bytes": 5092
+    },
+    {
+      "name": "ivory_sneakers",
+      "vertices": 944,
+      "triangles": 1816,
+      "surfaces": 1,
+      "bytes": 55144
+    },
+    {
+      "name": "mint_mary_janes",
+      "vertices": 884,
+      "triangles": 1720,
+      "surfaces": 1,
+      "bytes": 48940
+    },
+    {
+      "name": "entrance_sky",
+      "vertices": 228,
+      "triangles": 424,
+      "surfaces": 1,
+      "bytes": 15952
     }
   ],
-  "unique_triangles": 66944,
-  "scene_triangles": 78042,
-  "static_draw_surfaces": 53,
+  "unique_triangles": 75932,
+  "scene_triangles": 107518,
+  "static_draw_surfaces": 68,
   "unique_assets": 42,
-  "placed_instances": 53,
-  "glb_bytes": 1946832
+  "placed_instances": 68,
+  "glb_bytes": 2673484,
+  "scene_budget": {
+    "after": {
+      "room_triangles": 107518,
+      "shared_plant_triangles": 6252,
+      "room_botanical_triangles": 5020,
+      "plant_triangles": 11272,
+      "total_triangles": 113770,
+      "static_surfaces": 18
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "entrance_frame",
+          "hanging_dress_ivory",
+          "hanging_dress_rose",
+          "hanging_dress_cream",
+          "handbag_pink",
+          "pink_round_rug",
+          "pink_pumps",
+          "black_pumps",
+          "folded_blue_knit",
+          "window_display_frame",
+          "display_mannequin_dress",
+          "gift_boxes",
+          "pink_entry_mat",
+          "ivory_sneakers",
+          "mint_mary_janes",
+          "island_bag_pink",
+          "island_bag_green",
+          "island_bag_cream",
+          "sconce_left",
+          "island_bag_blue",
+          "island_bag_coral",
+          "stacked_blue_knit"
+        ],
+        "triangles": 33926,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "entrance_glass",
+          "jewelry_glass"
+        ],
+        "triangles": 148,
+        "cast_shadow": false
+      },
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "hanging_dress_blue",
+          "hanging_dress_mint",
+          "hanging_blouse_blue",
+          "hanging_blouse_ivory",
+          "hanging_blouse_mint",
+          "scarf_rail",
+          "handbag_cream",
+          "handbag_green",
+          "handbag_blue",
+          "changing_room_arch",
+          "changing_curtain",
+          "folded_ivory_knit",
+          "wall_sconce",
+          "right_pink_bag",
+          "right_blue_bag",
+          "stacked_knit",
+          "sconce_fitting",
+          "sconce_right",
+          "left_extra_dress_0",
+          "left_extra_dress_1",
+          "left_extra_dress_2",
+          "right_upper_3",
+          "right_upper_4",
+          "right_upper_5",
+          "right_upper_6",
+          "right_lower_0",
+          "right_lower_1",
+          "right_lower_2",
+          "right_lower_3",
+          "right_lower_4",
+          "right_lower_5",
+          "cream_shoe_pair"
+        ],
+        "triangles": 41450,
+        "cast_shadow": true
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "island_bouquet"
+        ],
+        "triangles": 4596,
+        "cast_shadow": false
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "EntrancePlant"
+        ],
+        "triangles": 946,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "FittingPlant",
+          "RightTrailing"
+        ],
+        "triangles": 3258,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/clothing_store_b/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "LeftTrailing"
+        ],
+        "triangles": 2048,
+        "cast_shadow": false
+      }
+    ]
+  }
 }
