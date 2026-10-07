@@ -1,0 +1,177 @@
+extends GdUnitTestSuite
+## SGODOT-231 P0MaterialLogic: mine mouth and floors (LOCK-21, q(44)), gathering marks, workbench cards (B2-06), storage rows.
+
+func _floor(n: int, paid := true, broken := [false, false, false, false, false, false], lit := false, bag_ok := true, preview = null) -> Dictionary:
+	var left := broken.filter(func(b): return not b).size()
+	return {"floor": n, "paid": paid, "cleared": left == 0, "left": left, "broken": broken, "lit": lit, "preview": preview, "bag_ok": bag_ok}
+
+func _view(run = null, energy := 200, used := 0) -> Dictionary:
+	return {
+		"energy": {"value": energy, "max": 200},
+		"names": {"stone": "Stone", "copper_ore": "Copper Ore", "wood": "Timber", "torch": "Torch"},
+		"bag": {"capacity": 25, "slots": []},
+		"mine": {"runs": {"used": used, "limit": 2, "resets_in": 33120000}, "ended": null, "floor_energy": 2, "rock_energy": 2, "rocks": 6,
+			"stone_per_rock": 1, "run": run},
+	}
+
+func _run(floors: Array, block = "clear_floor_2") -> Dictionary:
+	return {"id": 1, "deepest": 1, "can_new_run": block == null, "new_run_block": block, "floors": floors}
+
+const CLEARED := [true, true, true, true, true, true]
+
+func test_mine_mouth_key_follows_lock_21() -> void:
+	var enter := P0MaterialLogic.mine_entry_action(_view())
+	assert_str("%s · %s" % [enter.verb, enter.sub]).is_equal("Enter mine · 2 Energy")
+	assert_that(enter.cmd).is_equal({"type": "mine_enter"})
+	var cont := P0MaterialLogic.mine_entry_action(_view(_run([_floor(1), _floor(2, false)])))
+	assert_str("%s · %s" % [cont.verb, cont.sub]).is_equal("Continue run · Free")
+	var short := P0MaterialLogic.mine_entry_action(_view(null, 1))
+	assert_str(str(short.sub)).is_equal("Need 2 Energy")
+	assert_bool(bool(short.amber)).is_true()
+	assert_that(short.cmd).is_equal({"type": "energy_card"})
+	var none := P0MaterialLogic.mine_entry_action(_view(null, 200, 2))
+	assert_str("%s · %s" % [none.verb, none.sub]).is_equal("Enter mine · No runs left")
+	assert_that(none.cmd).is_equal({"type": "toast", "text": "Mine runs today 2/2 · Resets in 9h 12m"})
+
+func test_entry_card_offers_new_run_only_after_floor_2() -> void:
+	assert_bool(bool(P0MaterialLogic.mine_entry_card(_view()).show)).is_false()
+	var blocked := P0MaterialLogic.mine_entry_card(_view(_run([_floor(1), _floor(2, false)])))
+	assert_str(str(blocked.label)).is_equal("New run · Clear Floor 2 first")
+	assert_bool(bool(blocked.enabled)).is_false()
+	var open := P0MaterialLogic.mine_entry_card(_view(_run([_floor(1, true, CLEARED), _floor(2, true, CLEARED)], null), 200, 1))
+	assert_str(str(open.label)).is_equal("New run · 2 Energy")
+	assert_str(str(open.line2)).is_equal("Current run will end · Runs today 1/2")
+	assert_that(open.cmd).is_equal({"type": "mine_new_run"})
+	var spent := P0MaterialLogic.mine_entry_card(_view(_run([_floor(1, true, CLEARED), _floor(2, true, CLEARED)], "no_runs"), 200, 2))
+	assert_str(str(spent.label)).is_equal("Mine runs today 2/2 · Resets in 9h 12m")
+
+func test_rock_key_costs_two_and_greys_on_a_full_bag() -> void:
+	var v := _view(_run([_floor(1), _floor(2, false)]))
+	var mine := P0MaterialLogic.mine_action(v, {"floor": 1, "target": "rock", "rock": 2})
+	assert_str("%s · %s" % [mine.verb, mine.sub]).is_equal("Mine · 2 Energy")
+	assert_that(mine.cmd).is_equal({"type": "mine_rock", "floor": 1, "rock": 2})
+	var full := P0MaterialLogic.mine_action(_view(_run([_floor(1, true, [false, false, false, false, false, false], false, false), _floor(2, false)])),
+		{"floor": 1, "target": "rock", "rock": 2})
+	assert_str("%s · %s" % [full.verb, full.sub]).is_equal("Mine · Bag full")
+	var low := P0MaterialLogic.mine_action(_view(_run([_floor(1), _floor(2, false)]), 1), {"floor": 1, "target": "rock", "rock": 0})
+	assert_bool(bool(low.amber)).is_true()
+	assert_str(str(low.sub)).is_equal("Need 2 Energy")
+	var gone := P0MaterialLogic.mine_action(_view(_run([_floor(1, true, [true, false, false, false, false, false]), _floor(2, false)])),
+		{"floor": 1, "target": "rock", "rock": 0})
+	assert_bool(bool(gone.enabled)).is_false()
+
+func test_stairs_need_the_floor_cleared_then_cost_two() -> void:
+	var v := _view(_run([_floor(1), _floor(2, false)]))
+	var stairs := P0MaterialLogic.mine_action(v, {"floor": 1, "target": "stairs"})
+	assert_str("%s · %s" % [stairs.verb, stairs.sub]).is_equal("Floor 2 · Clear Floor 1")
+	assert_bool(bool(stairs.enabled)).is_false()
+	var open := P0MaterialLogic.mine_action(_view(_run([_floor(1, true, CLEARED), _floor(2, false)])), {"floor": 1, "target": "stairs"})
+	assert_str("%s · %s" % [open.verb, open.sub]).is_equal("Floor 2 · 2 Energy")
+	assert_that(open.cmd).is_equal({"type": "mine_floor", "floor": 2})
+	var paid := P0MaterialLogic.mine_action(_view(_run([_floor(1, true, CLEARED), _floor(2)])), {"floor": 1, "target": "stairs"})
+	assert_str(str(paid.sub)).is_equal("Free")
+	var elevator := P0MaterialLogic.mine_action(v, {"floor": 1, "target": "elevator"})
+	assert_str("%s · %s" % [elevator.verb, elevator.sub]).is_equal("Elevator · Free")
+
+func test_torch_lights_once_per_floor() -> void:
+	var lit := P0MaterialLogic.mine_action(_view(_run([_floor(1), _floor(2, false)])), {"floor": 1, "item": "torch"})
+	assert_str("%s · %s" % [lit.verb, lit.sub]).is_equal("Light Torch · Free")
+	assert_that(lit.cmd).is_equal({"type": "mine_torch", "floor": 1})
+	var again := P0MaterialLogic.mine_action(_view(_run([_floor(1, true, [false, false, false, false, false, false], true), _floor(2, false)])),
+		{"floor": 1, "item": "torch"})
+	assert_str(str(again.sub)).is_equal("Lit")
+	assert_bool(bool(again.enabled)).is_false()
+
+func test_elevator_rows_follow_the_run() -> void:
+	var rows := P0MaterialLogic.elevator_rows(_view(_run([_floor(1), _floor(2, false)])), 1)
+	assert_array(rows.map(func(r): return r.label)).is_equal(["Entrance · Free", "Floor 1 · Here", "Floor 2 · Clear Floor 1 first"])
+	assert_that(rows[0].cmd).is_equal({"type": "mine_leave"})
+	rows = P0MaterialLogic.elevator_rows(_view(_run([_floor(1, true, CLEARED), _floor(2, false)])), 1)
+	assert_str(str(rows[2].label)).is_equal("Floor 2 · 2 Energy")
+	assert_that(rows[2].cmd).is_equal({"type": "mine_floor", "floor": 2})
+	rows = P0MaterialLogic.elevator_rows(_view(_run([_floor(1, true, CLEARED), _floor(2)])), 2)
+	assert_array(rows.map(func(r): return r.label)).is_equal(["Entrance · Free", "Floor 1 · Free", "Floor 2 · Here"])
+	for r in rows: assert_int(str(r.label).length()).is_less_equal(26)
+
+func test_rock_marks_and_floats() -> void:
+	var marks := P0MaterialLogic.rock_marks(_view(_run([_floor(1, true, [true, false, false, false, false, false], true, true,
+		["copper_ore", null, "rock_salt", null, null, "clay"]), _floor(2, false)])), 1)
+	assert_bool(bool(marks[0].broken)).is_true()
+	assert_str(str(marks[0].preview)).is_equal("copper_ore")
+	assert_str(str(marks[1].preview)).is_equal("")
+	assert_str(P0MaterialLogic.mine_event_text({"kind": "mine", "action": "floor", "floor": 2, "cost": 2})).is_equal("Floor 2 · −2 Energy")
+	assert_str(P0MaterialLogic.mine_event_text({"kind": "mine", "action": "floor", "floor": 1, "cost": 0})).is_equal("")
+	assert_str(P0MaterialLogic.mine_event_text({"kind": "mine", "action": "cleared", "floor": 1})).is_equal("Floor 1 cleared · Elevator stop")
+
+func test_reset_and_stored_notices_show_once() -> void:
+	var v := _view()
+	v.mine.ended = {"reason": "reset", "at": 1000.0}
+	assert_str(P0MaterialLogic.reset_notice(v, 0.0)).is_equal("Run ended at daily reset")
+	assert_str(P0MaterialLogic.reset_notice(v, 1000.0)).is_equal("")
+	v["storage"] = {"items": [], "auto": {"at": 2000.0, "items": [["stone", 12], ["copper_ore", 3]]}}
+	assert_str(P0MaterialLogic.stored_notice(v, 0.0)).is_equal("Stored · Stone ×12 · Copper Ore ×3")
+	assert_str(P0MaterialLogic.stored_notice(v, 2000.0)).is_equal("")
+
+func test_gather_marks_and_today_line() -> void:
+	var v := {"names": {"wood": "Timber"}, "gather": {"gloves": false, "spots": [
+		{"id": "spot_grove", "name": "Timber Grove", "open": true, "homestead": 1, "ready": false, "ready_in": 7800000, "yield": [["wood", 6]]},
+		{"id": "spot_clay_bank", "name": "Clay Bank", "open": false, "homestead": 2, "ready": false, "ready_in": 0, "yield": [["clay", 2]]},
+	]}}
+	var marks := P0MaterialLogic.gather_marks(v)
+	assert_str(str(marks[0].caption)).is_equal("Timber Grove · Ready in 2h 10m")
+	assert_str(str(marks[0].badge)).is_equal("countdown")
+	assert_str(str(marks[1].caption)).is_equal("Clay Bank · Homestead Lv2")
+	assert_str(P0MaterialLogic.today_gather_line(v)).is_equal("Timber Grove ready in 2h 10m")
+	v.gather.spots[0].ready = true
+	assert_str(str(P0MaterialLogic.gather_marks(v)[0].caption)).is_equal("Timber Grove · Tap to gather")
+	assert_str(P0MaterialLogic.today_gather_line(v)).is_equal("")
+	assert_array(P0MaterialLogic.gather_floats(v, {"items": [["wood", 6, "storage"]]})).is_equal(["+6 Timber"])
+
+func _recipe(id: String, tab: String, item: String, name: String, to: String, cost: Array, block = null, owned := false, equipped := false) -> Dictionary:
+	return {"id": id, "tab": tab, "item": item, "name": name, "qty": 2 if to == "bag" else 1, "to": to, "have": 6 if to == "bag" else null,
+		"cost": cost, "gate": null, "owned": owned, "equipped": equipped, "can_craft": block == null and not owned, "block": block}
+
+func test_workbench_cards_write_gaps_on_the_button() -> void:
+	var ore := {"id": "copper_ore", "name": "Copper Ore", "need": 5, "have": 4, "storage": 4, "bag": 0}
+	var wood := {"id": "wood", "name": "Timber", "need": 4, "have": 4, "storage": 4, "bag": 0}
+	var v := {"workbench": {"tabs": ["tools", "supplies"], "recipes": [
+		_recipe("craft_copper_pickaxe", "tools", "pick_copper", "Copper Pickaxe", "gear", [ore, wood],
+			{"code": "need_material", "detail": {"item": "copper_ore", "need": 5, "have": 4}}),
+		_recipe("craft_gather_gloves", "tools", "gather_gloves", "Gather Gloves", "owned", [], null, true),
+		_recipe("craft_torch", "supplies", "torch", "Torch", "bag", [wood]),
+		_recipe("craft_compost", "supplies", "fert_compost", "Compost", "bag", [], {"code": "locked", "detail": {"skill": "farming", "level": 3}}),
+	]}}
+	var tools := P0MaterialLogic.workbench_model(v, "tools")
+	assert_int(tools.size()).is_equal(2)
+	assert_str(str(tools[0].effect)).is_equal("2 Stone per rock")
+	assert_that(tools[0].button).is_equal({"label": "Need 1 more Copper Ore", "kind": "unavailable", "cmd": {}})
+	assert_str(str(tools[1].effect)).is_equal("+1 at every gathering spot")
+	assert_str(str(tools[1].button.label)).is_equal("Owned")
+	var supplies := P0MaterialLogic.workbench_model(v, "supplies")
+	assert_that(supplies[0].button).is_equal({"label": "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": "craft_torch"}})
+	assert_str(str(supplies[0].yield)).is_equal("You get 2")
+	assert_str(str(supplies[0].have)).is_equal("You have 6")
+	assert_str(str(supplies[1].button.label)).is_equal("Farming Lv3")
+
+func test_workbench_pickaxe_equip_and_bag_full() -> void:
+	var v := {"workbench": {"tabs": ["tools", "supplies"], "recipes": [
+		_recipe("craft_copper_pickaxe", "tools", "pick_copper", "Copper Pickaxe", "gear", [], {"code": "owned"}, true, false),
+		_recipe("craft_torch", "supplies", "torch", "Torch", "bag", [], {"code": "bag_full", "detail": {"room": 0}}),
+	]}}
+	assert_that(P0MaterialLogic.workbench_model(v, "tools")[0].button).is_equal({"label": "Equip", "kind": "secondary", "cmd": {"type": "equip", "item": "pick_copper"}})
+	v.workbench.recipes[0].equipped = true
+	assert_str(str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label)).is_equal("Equipped")
+	assert_str(str(P0MaterialLogic.workbench_model(v, "supplies")[0].button.label)).is_equal("No room · free a slot first")
+
+func test_storage_rows_by_bag_tab() -> void:
+	var v := {"storage": {"items": [{"id": "wood", "name": "Timber", "qty": 18}, {"id": "seed_radish", "name": "Radish Seeds", "qty": 5},
+		{"id": "bait_worm", "name": "Worm Bait", "qty": 2}, {"id": "torch", "name": "Torch", "qty": 3}, {"id": "postcard_shanghai", "name": "Shanghai Postcard", "qty": 1}]}}
+	assert_array(P0MaterialLogic.storage_rows(v, "Materials").map(func(r): return r.id)).is_equal(["wood", "torch"])
+	assert_array(P0MaterialLogic.storage_rows(v, "Seeds").map(func(r): return r.id)).is_equal(["seed_radish"])
+	assert_that(P0MaterialLogic.storage_rows(v, "Tackle")).is_equal([{"id": "bait_worm", "qty": 2, "icon_id": "bait_worm"}])
+
+func test_mining_quick_bar_holds_torches_only() -> void:
+	var v := _view()
+	assert_array(P0MaterialLogic.mine_candidates(v)).is_empty()
+	v.bag.slots = [{"id": "torch", "qty": 3}, {"id": "seed_radish", "qty": 20}]
+	assert_array(P0MaterialLogic.mine_candidates(v)).is_equal(["torch"])

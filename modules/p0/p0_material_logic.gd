@@ -1,0 +1,265 @@
+class_name P0MaterialLogic
+extends RefCounted
+## SGODOT-231 client rules for the material chain, read only from the server view: the mine mouth, the mine floors
+## and elevator (plan §13.3, LOCK-21, q(44)), gathering spots (§13.2), the workbench (§13.4, B2-06) and Farm Storage
+## rows (§10.4.8). Every user-visible string is written here, so scenes only render. Pure and static: tested headless.
+## Key dicts have the P0Logic.main_action shape {icon, verb, sub, enabled, amber, cmd, need}; line 2 (sub) stays
+## within ~16 characters (q(44)), longer reasons go to a toast through cmd {type: "toast", text}.
+
+const ENTRANCE := 0
+
+static func _energy(view: Dictionary) -> int:
+	return int(view.get("energy", {}).get("value", 0))
+
+static func _key(icon: String, verb: String, sub: String, cmd := {}, enabled := true, amber := false, need := 0) -> Dictionary:
+	return {"icon": icon, "verb": verb, "sub": sub, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need}
+
+static func _runs_line(mine: Dictionary) -> String:
+	var runs: Dictionary = mine.get("runs", {})
+	return "Mine runs today %d/%d · Resets in %s" % [int(runs.get("used", 0)), int(runs.get("limit", 2)), P0Logic.duration(float(runs.get("resets_in", 0)))]
+
+static func _floor(view: Dictionary, n: int) -> Dictionary:
+	var run = view.get("mine", {}).get("run", null)
+	if run == null: return {}
+	for f in run.get("floors", []):
+		if int(f.get("floor", 0)) == n: return f
+	return {}
+
+# --- Mine mouth (farm side) ---
+
+## Main action key at the farm's mine mouth (LOCK-21): Continue run · Free with an unfinished run, else Enter mine.
+static func mine_entry_action(view: Dictionary) -> Dictionary:
+	var mine: Dictionary = view.get("mine", {})
+	var fee := int(mine.get("floor_energy", 2))
+	if mine.get("run", null) != null:
+		return _key("pickaxe", "Continue run", "Free", {"type": "mine_enter"})
+	var runs: Dictionary = mine.get("runs", {})
+	if int(runs.get("used", 0)) >= int(runs.get("limit", 2)):
+		return _key("pickaxe", "Enter mine", "No runs left", {"type": "toast", "text": _runs_line(mine)})
+	if _energy(view) < fee:
+		return _key("pickaxe", "Enter mine", "Need %d Energy" % fee, {"type": "energy_card"}, true, true, fee)
+	return _key("pickaxe", "Enter mine", "%d Energy" % fee, {"type": "mine_enter"}, true, false, fee)
+
+## The EntryCard over the mine mouth (MINE-P0-5): only with an unfinished run; a secondary text button to start over.
+## {show, label, line2, enabled, amber, cmd}; line2 is empty when unavailable (the reason is the label).
+static func mine_entry_card(view: Dictionary) -> Dictionary:
+	var mine: Dictionary = view.get("mine", {})
+	var run = mine.get("run", null)
+	if run == null: return {"show": false}
+	var fee := int(mine.get("floor_energy", 2))
+	var runs: Dictionary = mine.get("runs", {})
+	match str(run.get("new_run_block", "")):
+		"clear_floor_2":
+			return {"show": true, "label": "New run · Clear Floor 2 first", "line2": "", "enabled": false, "amber": false, "cmd": {}}
+		"no_runs":
+			return {"show": true, "label": _runs_line(mine), "line2": "", "enabled": false, "amber": false, "cmd": {}}
+	if _energy(view) < fee:
+		return {"show": true, "label": "New run · Need %d Energy" % fee, "line2": "", "enabled": true, "amber": true, "cmd": {"type": "energy_card"}}
+	return {"show": true, "label": "New run · %d Energy" % fee,
+		"line2": "Current run will end · Runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))],
+		"enabled": true, "amber": false, "cmd": {"type": "mine_new_run"}}
+
+## "Run ended at daily reset" once per ended run (q(44)): the text when the view's `ended.at` is newer than the last shown.
+static func reset_notice(view: Dictionary, shown_at: float) -> String:
+	var ended = view.get("mine", {}).get("ended", null)
+	if ended == null or float(ended.get("at", 0)) <= shown_at: return ""
+	return "Run ended at daily reset"
+
+# --- Inside the mine ---
+
+## Main action key in the mine. ctx: {floor: int, target: "rock" | "stairs" | "elevator" | "", rock: int, item: String}
+## where item is the quick-bar selection ("torch" or ""). Rocks and stairs never respond to taps (LOCK-02).
+static func mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
+	var mine: Dictionary = view.get("mine", {})
+	var n := int(ctx.get("floor", 1))
+	var floor := _floor(view, n)
+	if floor.is_empty(): return _key("pickaxe", "Mine", "Run ended", {}, false)
+	if str(ctx.get("item", "")) == "torch":
+		if floor.get("lit", false): return _key("torch", "Light Torch", "Lit", {}, false)
+		return _key("torch", "Light Torch", "Free", {"type": "mine_torch", "floor": n})
+	var fee := int(mine.get("floor_energy", 2))
+	match str(ctx.get("target", "")):
+		"elevator":
+			return _key("elevator", "Elevator", "Free", {"type": "elevator"})
+		"stairs":
+			var next := _floor(view, n + 1)
+			if next.is_empty(): return _key("stairs", "Stairs", "Deepest floor", {}, false)
+			var verb := "Floor %d" % (n + 1)
+			if next.get("paid", false): return _key("stairs", verb, "Free", {"type": "mine_floor", "floor": n + 1})
+			if not floor.get("cleared", false): return _key("stairs", verb, "Clear Floor %d" % n, {}, false)
+			if _energy(view) < fee: return _key("stairs", verb, "Need %d Energy" % fee, {"type": "energy_card"}, true, true, fee)
+			return _key("stairs", verb, "%d Energy" % fee, {"type": "mine_floor", "floor": n + 1}, true, false, fee)
+		"rock":
+			var rock := int(ctx.get("rock", -1))
+			var broken: Array = floor.get("broken", [])
+			var cost := int(mine.get("rock_energy", 2))
+			if rock < 0 or rock >= broken.size() or bool(broken[rock]): return _key("pickaxe", "Mine", "Walk to a rock", {}, false)
+			if not floor.get("bag_ok", true): return _key("pickaxe", "Mine", "Bag full", {"type": "toast", "text": "Bag full · free a slot to mine"})
+			if _energy(view) < cost: return _key("pickaxe", "Mine", "Need %d Energy" % cost, {"type": "energy_card"}, true, true, cost)
+			return _key("pickaxe", "Mine", "%d Energy" % cost, {"type": "mine_rock", "floor": n, "rock": rock}, true, false, cost)
+	if int(floor.get("left", 0)) == 0: return _key("pickaxe", "Mine", "Floor cleared", {}, false)
+	return _key("pickaxe", "Mine", "Walk to a rock", {}, false)
+
+## Mining quick bar: torches only (§13.3.8; P0 has no dynamite). Ghost word when empty: "Torch" (q(44)).
+static func mine_candidates(view: Dictionary) -> Array:
+	return ["torch"] if P0Logic.bag_count(view, "torch") > 0 else []
+
+## Elevator card rows (§13.3.9, q(44); P0: Entrance, Floor 1, Floor 2, no Express). here: 0 = entrance, else a floor.
+## Each row {label, enabled, amber, cmd}; cmd type "mine_leave" (back to the farm) or "mine_floor" {floor}.
+static func elevator_rows(view: Dictionary, here: int) -> Array:
+	var mine: Dictionary = view.get("mine", {})
+	var fee := int(mine.get("floor_energy", 2))
+	var rows: Array = []
+	rows.append({"label": "Entrance · Here" if here == ENTRANCE else "Entrance · Free", "enabled": here != ENTRANCE, "amber": false,
+		"cmd": {} if here == ENTRANCE else {"type": "mine_leave"}})
+	var run = mine.get("run", null)
+	if run == null: return rows
+	var floors: Array = run.get("floors", [])
+	for i in floors.size():
+		var f: Dictionary = floors[i]
+		var n := int(f.get("floor", i + 1))
+		var row := {"label": "", "enabled": false, "amber": false, "cmd": {}}
+		if n == here: row.label = "Floor %d · Here" % n
+		elif f.get("paid", false): row = {"label": "Floor %d · Free" % n, "enabled": true, "amber": false, "cmd": {"type": "mine_floor", "floor": n}}
+		elif i > 0 and not floors[i - 1].get("cleared", false): row.label = "Floor %d · Clear Floor %d first" % [n, n - 1]
+		elif _energy(view) < fee: row = {"label": "Floor %d · Need %d Energy" % [n, fee], "enabled": true, "amber": true, "cmd": {"type": "energy_card"}}
+		else: row = {"label": "Floor %d · %d Energy" % [n, fee], "enabled": true, "amber": false, "cmd": {"type": "mine_floor", "floor": n}}
+		rows.append(row)
+	return rows
+
+## What each rock of a floor shows: gone, greyed by a full bag (whole floor, q(44)), and the torch preview icon id
+## ("" = Stone only, null = not lit).
+static func rock_marks(view: Dictionary, n: int) -> Array:
+	var floor := _floor(view, n)
+	var out: Array = []
+	if floor.is_empty(): return out
+	var broken: Array = floor.get("broken", [])
+	var preview = floor.get("preview", null)
+	for i in broken.size():
+		var drop = null
+		if preview is Array and i < preview.size(): drop = "" if preview[i] == null else str(preview[i])
+		out.append({"broken": bool(broken[i]), "grey": not floor.get("bag_ok", true), "preview": drop})
+	return out
+
+## Floats for mine events: floor fees, a cleared floor (Floor 1 cleared · Elevator stop). Drops float as items (runtime).
+static func mine_event_text(e: Dictionary) -> String:
+	if str(e.get("kind", "")) != "mine": return ""
+	match str(e.get("action", "")):
+		"enter", "floor":
+			return "Floor %d · −%d Energy" % [int(e.get("floor", 1)), int(e.get("cost", 0))] if int(e.get("cost", 0)) > 0 else ""
+		"cleared":
+			return "Floor %d cleared · Elevator stop" % int(e.get("floor", 1))
+	return ""
+
+# --- Gathering spots (farm) ---
+
+## Finger card and badge per spot (§13.2.2, STATE-ICONS): READY with "Tap to gather", a countdown, or the Homestead gate.
+static func gather_marks(view: Dictionary) -> Array:
+	var out: Array = []
+	for sp in view.get("gather", {}).get("spots", []):
+		var name := str(sp.get("name", ""))
+		var mark := {"id": str(sp.get("id", "")), "name": name, "ready": bool(sp.get("ready", false)), "badge": "", "caption": ""}
+		if not sp.get("open", false):
+			mark.badge = "locked"
+			mark.caption = "%s · Homestead Lv%d" % [name, int(sp.get("homestead", 2))]
+		elif sp.get("ready", false):
+			mark.badge = "ready"
+			mark.caption = "%s · Tap to gather" % name
+		else:
+			mark.badge = "countdown"
+			mark.caption = "%s · Ready in %s" % [name, P0Logic.duration(float(sp.get("ready_in", 0)))]
+		out.append(mark)
+	return out
+
+## Today line 2 (§13.2.2): "Timber Grove ready in 2h 10m" for the soonest open spot that is not ready; "" if one is ready.
+static func today_gather_line(view: Dictionary) -> String:
+	var best := {}
+	for sp in view.get("gather", {}).get("spots", []):
+		if not sp.get("open", false): continue
+		if sp.get("ready", false): return ""
+		if best.is_empty() or float(sp.get("ready_in", 0)) < float(best.get("ready_in", 0)): best = sp
+	if best.is_empty(): return ""
+	return "%s ready in %s" % [str(best.get("name", "")), P0Logic.duration(float(best.get("ready_in", 0)))]
+
+## Floats for one gather event: "+6 Timber" per item (both storage and bag parts).
+static func gather_floats(view: Dictionary, e: Dictionary) -> Array:
+	var out: Array = []
+	for it in e.get("items", []):
+		out.append("+%d %s" % [int(it[1]), P0Logic.item_name(view, str(it[0]))])
+	return out
+
+## Coming home (q(40)): "Stored · Stone ×12 · Copper Ore ×3" once per new storage.auto.at.
+static func stored_notice(view: Dictionary, shown_at: float) -> String:
+	var auto = view.get("storage", {}).get("auto", null)
+	if auto == null or float(auto.get("at", 0)) <= shown_at: return ""
+	var parts: Array = []
+	for it in auto.get("items", []): parts.append("%s ×%d" % [P0Logic.item_name(view, str(it[0])), int(it[1])])
+	return "Stored · " + " · ".join(parts)
+
+# --- Workbench (B2-06) ---
+
+## Effect line under each recipe name (LOCK-29; q(45) gloves sentence).
+## TODO(SGODOT-231): the Compost line waits for Li Bai's final copy.
+const EFFECTS := {
+	"pick_copper": "2 Stone per rock",
+	"gather_gloves": "+1 at every gathering spot",
+	"torch": "See what rocks hold",
+	"fert_compost": "Crops ripen 20% sooner",
+}
+
+## Cards for one tab ("tools" | "supplies"): icon, name, effect, NEED-TILE costs, Supplies yield/have, one button.
+## button {label, kind: "primary" | "secondary" | "unavailable" | "done", cmd}; unavailable reasons sit on the button (LOCK-10).
+static func workbench_model(view: Dictionary, tab: String) -> Array:
+	var out: Array = []
+	for r in view.get("workbench", {}).get("recipes", []):
+		if str(r.get("tab", "")) != tab: continue
+		var item := str(r.get("item", ""))
+		var card := {
+			"id": str(r.get("id", "")), "item": item, "name": str(r.get("name", "")), "effect": str(EFFECTS.get(item, "")),
+			"cost": r.get("cost", []).map(func(c): return {"id": str(c.id), "name": str(c.name), "have": int(c.have), "need": int(c.need)}),
+			"yield": "", "have": "", "button": {},
+		}
+		if str(r.get("to", "")) == "bag":
+			card.yield = "You get %d" % int(r.get("qty", 1))
+			card.have = "You have %d" % int(r.get("have", 0))
+		card.button = _craft_button(r)
+		out.append(card)
+	return out
+
+static func _craft_button(r: Dictionary) -> Dictionary:
+	if r.get("owned", false):
+		if str(r.get("to", "")) == "gear":
+			if r.get("equipped", false): return {"label": "Equipped", "kind": "done", "cmd": {}}
+			return {"label": "Equip", "kind": "secondary", "cmd": {"type": "equip", "item": str(r.get("item", ""))}}
+		return {"label": "Owned", "kind": "done", "cmd": {}}   # TODO(SGODOT-231): gloves' owned label waits for Li Bai
+	var block = r.get("block", null)
+	if block == null: return {"label": "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": str(r.get("id", ""))}}
+	var d: Dictionary = block.get("detail", {})
+	match str(block.get("code", "")):
+		"locked":
+			return {"label": "%s Lv%d" % [str(d.get("skill", "")).capitalize(), int(d.get("level", 1))], "kind": "unavailable", "cmd": {}}
+		"need_material":
+			var short := int(d.get("need", 0)) - int(d.get("have", 0))
+			var cost_name := str(d.get("item", ""))
+			for c in r.get("cost", []):
+				if str(c.id) == cost_name: cost_name = str(c.name)
+			return {"label": "Need %d more %s" % [short, cost_name], "kind": "unavailable", "cmd": {}}
+		"bag_full":
+			return {"label": "No room · free a slot first", "kind": "unavailable", "cmd": {}}
+	return {"label": "Craft", "kind": "unavailable", "cmd": {}}
+
+# --- Farm Storage rows for the bag drawer (§10.4.8; 225 renders them) ---
+
+## Storage stacks for a bag tab: "Seeds" (seeds, fertilizer), "Materials" (materials, torches), "Tackle" (bait).
+static func storage_rows(view: Dictionary, category: String) -> Array:
+	var out: Array = []
+	for it in view.get("storage", {}).get("items", []):
+		var id := str(it.get("id", ""))
+		if storage_category(id) == category: out.append({"id": id, "qty": int(it.get("qty", 0)), "icon_id": id})
+	return out
+
+static func storage_category(id: String) -> String:
+	if id.begins_with("seed_") or id.begins_with("fert_"): return "Seeds"
+	if id.begins_with("bait_"): return "Tackle"
+	if id.begins_with("postcard_"): return ""   # ornaments live in storage only (q(29)), not in a bag tab
+	return "Materials"
