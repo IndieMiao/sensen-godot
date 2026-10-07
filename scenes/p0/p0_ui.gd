@@ -320,6 +320,7 @@ func _build_dev() -> void:
 # ---------------------------------------------------------------- refresh
 func set_view(v: Dictionary) -> void:
 	view = v
+	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear"]: _bag.refresh(v)
 	var e: Dictionary = v.get("energy", {})
 	var val := int(e.get("value", 0))
 	var mx := int(e.get("max", 200))
@@ -615,111 +616,50 @@ func _sheet(height: float, title: String, icon_id := "") -> VBoxContainer:
 	_open_modal(panel, 0.3, true)
 	return v
 
-## Bag drawer: capacity, a 5-column grid, and a detail row for the tapped item (dishes: Eat).
-## Bag drawer with the Bag | Gear switch (BAG-2, p(8)): one place to see and equip gear; no separate
-## Tools & Gear panel and no Outfit tab.
+## Bag | Gear drawer (SGODOT-225; LOCK-12 / 13, BAG-2-2 / BAG-2 · Gear): P0BagDrawer from the kit. Tapping a
+## cell opens the F-07 bag card (UiInfoSheet, no Sell in the bag); the Gear side lists the tapped slot's
+## candidates. No separate Tools & Gear panel and no Outfit tab (p(8)). The drawer follows the view while open.
 var bag_side := "bag"
 var gear_slot := "fishing"
+var _bag: P0BagDrawer
+var _eat_armed := ""   # dish whose partial-gain warning was shown; a second Eat eats (§7.17.1)
 
 func open_bag(focus := "", side := "") -> void:
 	if side != "": bag_side = side
-	var used := _bag_slots().size()
-	var capacity := int(view.get("bag", {}).get("capacity", 25))
-	var v := _sheet(500, "Bag" if bag_side == "bag" else "Gear", "bag" if bag_side == "bag" else "rod")
+	var d := P0BagDrawer.new(view, bag_side, focus)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.place = "pond" if surface in ["pond", "busy"] else "home"
+	d.set_gear_slot(gear_slot)
+	d.close_requested.connect(close_modal)
+	d.side_changed.connect(func(s: String):
+		bag_side = s
+		modal_kind = "bag" if s == "bag" else "gear")
+	d.gear_slot_changed.connect(func(k: String): gear_slot = k)
+	d.action_requested.connect(_bag_action)
+	_eat_armed = ""
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_bag = d
 	modal_kind = "bag" if bag_side == "bag" else "gear"
-	v.add_child(_bag_switch("Bag %d/%d" % [used, capacity]))
-	if bag_side == "gear":
-		_gear_side(v)
-		return
-	var cap := _CapBar.new()
-	cap.custom_minimum_size = Vector2(0, 5)
-	cap.set_meta("pct", float(_bag_slots().size()) / maxf(1.0, float(view.get("bag", {}).get("capacity", 25))))
-	v.add_child(cap)
-	var detail := HBoxContainer.new()
-	detail.custom_minimum_size = Vector2(0, 54)
-	detail.add_theme_constant_override("separation", 8)
-	var grid := GridContainer.new()
-	grid.columns = 5
-	grid.add_theme_constant_override("h_separation", 5)
-	grid.add_theme_constant_override("v_separation", 5)
-	var slots := _bag_slots()
-	for i in int(view.get("bag", {}).get("capacity", 25)):
-		var cell := PanelContainer.new()
-		cell.custom_minimum_size = Vector2(58, 58)
-		if i < slots.size():
-			var st: Dictionary = slots[i]
-			var id := str(st.id)
-			var info := P0Logic.item(view, id)
-			var edge := P0Logic.rarity_color(int(info.get("rarity", 1))) if info.has("rarity") and not id.begins_with("crop_") else EDGE
-			cell.add_theme_stylebox_override("panel", _box(PAPER, 10, edge, 2 if edge != EDGE else 1, Vector4(4, 4, 4, 2)))
-			var box := VBoxContainer.new()
-			box.add_theme_constant_override("separation", 0)
-			box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			var ic := _icon(str(info.get("base", id)), 30)
-			ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-			box.add_child(ic)
-			var q := _label(("%s ×%d" % ["★".repeat(int(info.get("quality", 0))), int(st.qty)]).strip_edges(), 9, INK, true)
-			q.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-			box.add_child(q)
-			cell.add_child(box)
-			cell.gui_input.connect(func(e: InputEvent):
-				if P0Ui.is_tap(e):
-					_fill_detail(detail, id))
-		else:
-			cell.add_theme_stylebox_override("panel", _box(Color(1, 1, 1, 0.2), 10, Color("d9c7a6"), 1, Vector4(4, 4, 4, 4)))
-		grid.add_child(cell)
-	v.add_child(detail)
-	v.add_child(grid)
-	v.add_child(_label(P0Logic.meal_line(view), 9, INK2))
-	if focus != "" and P0Logic.bag_count(view, focus) > 0: _fill_detail(detail, focus)
-	else: detail.add_child(_label("Tap an item. Dishes can be eaten here.", 9, INK2))
 
-func _fill_detail(detail: HBoxContainer, id: String) -> void:
-	for c in detail.get_children(): c.queue_free()
-	var info := P0Logic.item(view, id)
-	detail.add_child(_icon(str(info.get("base", id)), 40))
-	var mid := VBoxContainer.new()
-	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	mid.add_theme_constant_override("separation", 0)
-	var title := P0Logic.dish_label(view, id) if id.begins_with("dish_") else P0Logic.item_name(view, id)
-	mid.add_child(_label("%s ×%d" % [title, P0Logic.bag_count(view, id)], 11, INK, true))
-	var line := _label(_item_line(id), 8, INK2)
-	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	mid.add_child(line)
-	detail.add_child(mid)
-	if id.begins_with("dish_"):
-		var eb := P0Logic.eat_button(view, id)
-		var b := _pill_button(str(eb.text), true)
-		b.custom_minimum_size = Vector2(118, 34)
-		b.add_theme_font_size_override("font_size", 9)
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.disabled = not eb.get("enabled", false)
-		var confirm := str(eb.get("confirm", ""))
-		b.pressed.connect(func():
-			if confirm != "" and b.text != confirm:
-				b.text = confirm   # §7.17.1: say the real gain first, the second tap eats
+## A button on the bag card or a Gear row. The drawer only reports; commands go to the server from here.
+func _bag_action(action: StringName, id: String, _payload: Dictionary) -> void:
+	match action:
+		&"eat":
+			var confirm := str(P0Logic.eat_button(view, id).get("confirm", ""))
+			if confirm != "" and _eat_armed != id:
+				_eat_armed = id   # say the real gain first; the second Eat eats
+				toast(confirm)
 				return
+			_eat_armed = ""
 			close_modal()
-			command.emit({"type": "eat", "item": id}))
-		detail.add_child(b)
-
-func _item_line(id: String) -> String:
-	var info := P0Logic.item(view, id)
-	if id.begins_with("seed_"):
-		var c := P0Logic.crop_for_seed(view, id)
-		return "%d Energy per plot · ready in %dh" % [int(c.get("energy", 2)), int(c.get("grow_h", 4))]
-	if id.begins_with("crop_") or id.begins_with("fish_"):
-		var parts: Array = []
-		if id.begins_with("fish_"): parts.append(P0Logic.rarity_name(view, int(info.get("rarity", 1))))
-		parts.append("Sells for %d at the Homestead Stall" % int(info.get("sell", 0)))
-		if not info.get("cook", false) and id.begins_with("fish_"): parts.append("Not for cooking")
-		return " · ".join(parts)
-	if id.begins_with("dish_"):
-		if str(info.get("base", "")) == "dish_mystery": return "Mystery Dish · +%d Energy" % int(info.get("full", 5))
-		return "%s · +%d Energy" % [P0Logic.rarity_name(view, int(info.get("rarity", 1))), int(info.get("full", 20))]
-	if id.begins_with("bait_"):
-		return "Used at the bite · more Fine fish, shorter wait"
-	return ""
+			command.emit({"type": "eat", "item": id})
+		&"equip":
+			command.emit({"type": "equip", "item": id})
+		&"pin", &"unpin":
+			pass   # TODO(SGODOT-225 after #12): pin through the quick bar's pin record (P0Ui.bind_quick_bar)
+		_:
+			push_warning("P0 bag: no command for %s" % action)
 
 func _bag_slots() -> Array: return view.get("bag", {}).get("slots", [])
 
@@ -818,146 +758,6 @@ func open_tackle(bubble := "") -> void:
 	var gear := _pill_button("Bag › Gear", false)
 	gear.pressed.connect(open_gear)
 	v.add_child(gear)
-
-## Bag | Gear segmented switch under the drawer title.
-func _bag_switch(bag_text: String) -> Control:
-	var track := PanelContainer.new()
-	track.add_theme_stylebox_override("panel", _box(Color("ede8dc"), 16, Color("ede8dc"), 0, Vector4(3, 3, 3, 3)))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 3)
-	for side in [["bag", "bag", bag_text], ["gear", "rod", "Gear"]]:
-		var on: bool = bag_side == side[0]
-		var b := Button.new()
-		b.text = str(side[2])
-		b.icon = P0Logic.icon(str(side[1]))
-		b.expand_icon = false
-		b.add_theme_constant_override("icon_max_width", 13)
-		b.add_theme_font_size_override("font_size", 10)
-		b.custom_minimum_size = Vector2(0, 28)
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		_style_button(b, PAPER if on else Color("ede8dc"), EDGE if on else Color("ede8dc"), 13)
-		b.add_theme_color_override("font_color", INK if on else INK2)
-		var key := str(side[0])
-		b.pressed.connect(func(): if bag_side != key: open_bag("", key))
-		row.add_child(b)
-	track.add_child(row)
-	return track
-
-## Gear side (BAG-2): Equipped six slots; tap a slot to list what can go in it (Equipped / Equip / greyed
-## gate and where it comes from). Gear takes no Bag space.
-func _gear_side(v: VBoxContainer) -> void:
-	var g: Dictionary = view.get("gear", {})
-	var slots: Dictionary = g.get("slots", {})
-	var head := HBoxContainer.new()
-	var eq := _label("Equipped", 11, INK, true)
-	eq.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(eq)
-	head.add_child(_label("Tap a slot to change it", 8, INK2))
-	v.add_child(head)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 4)
-	for key in ["farming", "fishing", "mining", "combat", "ring", "charm"]:
-		var item := str(slots.get(key, ""))
-		var empty := item == ""
-		var on: bool = key == gear_slot
-		var cell := PanelContainer.new()
-		cell.custom_minimum_size = Vector2(0, 66)
-		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		cell.add_theme_stylebox_override("panel", _box(Color(1, 1, 1, 0.4) if empty else PAPER, 9,
-			GREEN_D if on else Color("cfc6b0") if empty else EDGE, 2 if on else 1, Vector4(2, 3, 2, 3)))
-		var col := VBoxContainer.new()
-		col.add_theme_constant_override("separation", 1)
-		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var t := _label(key.capitalize(), 6, Color("a98bd6") if key in ["ring", "charm"] else INK2, true)
-		t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		col.add_child(t)
-		var ic := _icon(item if not empty else "question", 22)
-		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		if empty: ic.modulate = Color(1, 1, 1, 0.3)
-		col.add_child(ic)
-		var n := _label("Empty" if empty else P0Logic.item_name(view, item), 6, INK2 if empty else INK, true)
-		n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		n.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		col.add_child(n)
-		cell.add_child(col)
-		var k := str(key)
-		cell.gui_input.connect(func(e: InputEvent):
-			if P0Ui.is_tap(e) and gear_slot != k:
-				gear_slot = k
-				open_bag("", "gear"))
-		row.add_child(cell)
-	v.add_child(row)
-	var gap := Control.new()
-	gap.custom_minimum_size = Vector2(0, 4)
-	v.add_child(gap)
-	var list_head := HBoxContainer.new()
-	var lt := _label("%s slot" % gear_slot.capitalize(), 11, INK, true)
-	lt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	list_head.add_child(lt)
-	v.add_child(list_head)
-	if gear_slot == "fishing":
-		var rods: Array = g.get("rods", [])
-		var level := int(view.get("skills", {}).get("fishing", {}).get("level", 1))
-		var locked := rods.filter(func(r): return not r.get("owned", false) and level < int(r.level)).size()
-		list_head.add_child(_label("%d rods%s" % [rods.size(), " · %d locked" % locked if locked > 0 else ""], 8, INK2))
-		var base_ms := float(P0Logic.content().get("fishing", {}).get("hook_window_ms", 2200))
-		for r in rods: v.add_child(_rod_row(r, level, base_ms))
-	elif slots.get(gear_slot, "") != "":
-		var item := str(slots[gear_slot])
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override("separation", 8)
-		h.add_child(_icon(item, 28))
-		var mid := VBoxContainer.new()
-		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		mid.add_child(_label(P0Logic.item_name(view, item), 10, INK, true))
-		mid.add_child(_label("Starter tool · better ones come later", 8, INK2))
-		h.add_child(mid)
-		h.add_child(_equipped_badge())
-		v.add_child(h)
-	else:
-		v.add_child(_label("Nothing for this slot yet.", 9, INK2))
-	var foot := _label("Gear doesn't take Bag space", 8, INK2)
-	foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	v.add_child(foot)
-
-func _rod_row(r: Dictionary, level: int, base_ms: float) -> Control:
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 8)
-	h.custom_minimum_size = Vector2(0, 40)
-	var owned: bool = r.get("owned", false)
-	var ic := _icon(str(r.id), 28)
-	if not owned: ic.modulate = Color(1, 1, 1, 0.5)
-	h.add_child(ic)
-	var mid := VBoxContainer.new()
-	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	mid.add_theme_constant_override("separation", 0)
-	var name_row := HBoxContainer.new()
-	name_row.add_theme_constant_override("separation", 5)
-	name_row.add_child(_label(str(r.name), 10, INK if owned else INK2, true))
-	if r.get("equipped", false): name_row.add_child(_equipped_badge())
-	mid.add_child(name_row)
-	var reach := P0Logic.rarity_name(view, int(r.reach))
-	var sub := "Bite window %.1f s · lands up to %s" % [(base_ms + float(r.hook_bonus_ms)) / 1000.0, reach] if owned \
-		else "Lands up to %s · %d coins at Old Kai's Tackle" % [reach, int(r.price)]
-	mid.add_child(_label(sub, 8, INK2))
-	h.add_child(mid)
-	if owned and not r.get("equipped", false):
-		var id := str(r.id)
-		var b := _pill_button("Equip", true)
-		b.custom_minimum_size = Vector2(64, 30)
-		b.pressed.connect(func(): command.emit({"type": "equip", "item": id}))
-		h.add_child(b)
-	elif not owned:
-		var gate := _label(("Fishing Lv%d" % int(r.level)) if level < int(r.level) else "At Old Kai's", 8, INK2, true)
-		gate.add_theme_stylebox_override("normal", _box(DIS, 12, DIS, 0, Vector4(8, 4, 8, 4)))
-		h.add_child(gate)
-	return h
-
-func _equipped_badge() -> Control:
-	var l := _label("Equipped", 7, GREEN_D, true)
-	l.add_theme_stylebox_override("normal", _box(Color("e6f4df"), 7, Color("bfe0b3"), 1, Vector4(5, 1, 5, 1)))
-	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	return l
 
 ## Gear lives in the bag drawer now (p(8)); callers that opened Tools & Gear land on the Gear side.
 func open_gear() -> void:
@@ -2156,8 +1956,3 @@ class _EnergyBar extends Control:
 		var col := Color("6cbf73") if pct >= 0.25 else (Color("e3b341") if pct >= 0.1 else Color("e07a5f"))
 		draw_rect(Rect2(Vector2.ZERO, Vector2(size.x * pct, size.y)), col)
 
-class _CapBar extends Control:
-	func _draw() -> void:
-		var pct := float(get_meta("pct", 0.0))
-		draw_rect(Rect2(Vector2.ZERO, size), Color(0.18, 0.23, 0.2, 0.12))
-		draw_rect(Rect2(Vector2.ZERO, Vector2(size.x * pct, size.y)), Color("e3b341") if pct >= 0.9 else Color("7fc66a"))
