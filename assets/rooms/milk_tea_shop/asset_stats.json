@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3022374
+    "bytes": 3018619
   },
   "assets": [
     {
@@ -196,7 +196,7 @@
       "vertices": 418,
       "triangles": 800,
       "surfaces": 1,
-      "bytes": 29812
+      "bytes": 29780
     },
     {
       "name": "table_flower_vase",
@@ -207,10 +207,10 @@
     },
     {
       "name": "pastel_bench",
-      "vertices": 616,
-      "triangles": 1188,
+      "vertices": 712,
+      "triangles": 1360,
       "surfaces": 1,
-      "bytes": 42652
+      "bytes": 48132
     },
     {
       "name": "street_signboard",
@@ -248,19 +248,19 @@
       "bytes": 31120
     }
   ],
-  "unique_triangles": 131250,
-  "scene_triangles": 150194,
+  "unique_triangles": 131422,
+  "scene_triangles": 150366,
   "static_draw_surfaces": 43,
   "unique_assets": 34,
   "placed_instances": 43,
-  "glb_bytes": 5326252,
+  "glb_bytes": 5331700,
   "scene_budget": {
     "after": {
-      "room_triangles": 150194,
+      "room_triangles": 150366,
       "shared_plant_triangles": 26664,
       "room_botanical_triangles": 13788,
       "plant_triangles": 40452,
-      "total_triangles": 176858,
+      "total_triangles": 177030,
       "static_surfaces": 27
     },
     "limits": {

@@ -474,9 +474,9 @@
       "name": "cafe_table",
       "file": "cafe_table.glb",
       "position": [
-        -1.45,
+        -1.8,
         0.06,
-        0.63
+        1.15
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -500,9 +500,9 @@
       "position": [
         -2.22,
         0.06,
-        0.63
+        0.28
       ],
-      "yaw_degrees": 90,
+      "yaw_degrees": 0,
       "colliders": [
         {
           "at": [
@@ -522,9 +522,9 @@
       "name": "table_flower_vase",
       "file": "table_flower_vase.glb",
       "position": [
-        -1.45,
+        -1.8,
         1.104,
-        0.63
+        1.15
       ],
       "yaw_degrees": 0,
       "colliders": []
@@ -533,22 +533,22 @@
       "name": "pastel_bench",
       "file": "pastel_bench.glb",
       "position": [
-        -1.8,
+        -1.86,
         0.07,
-        2.36
+        2.31
       ],
       "yaw_degrees": 0,
       "colliders": [
         {
           "at": [
             0,
-            0.4,
+            0.46,
             0
           ],
           "size": [
-            1.68,
-            0.8,
-            0.56
+            2.05,
+            0.92,
+            0.68
           ]
         }
       ]
@@ -654,11 +654,11 @@
       "name": "chair_2",
       "asset": "chair",
       "position": [
-        -0.68,
+        -1.36,
         0.06,
-        0.63
+        0.28
       ],
-      "yaw_degrees": -90
+      "yaw_degrees": 0
     },
     {
       "name": "chair_3",
@@ -714,7 +714,7 @@
     ],
     "size": 9.247567529782838
   },
-  "revision": "R2",
+  "revision": "R2.1",
   "shared_plants": [
     {
       "name": "MonsteraCorner",
@@ -1382,15 +1382,15 @@
         "position": [
           0,
           0.06,
-          1.65
+          1.95
         ]
       },
       {
         "name": "bench_front",
         "position": [
-          -1.5,
+          -0.46,
           0.06,
-          1.67
+          2.18
         ]
       },
       {
@@ -1450,28 +1450,28 @@
       {
         "name": "bench",
         "from": [
-          -1.8,
+          -0.5,
           0.06,
-          1.7
+          2.31
         ],
         "to": [
           -1.8,
           0.06,
-          2.5
+          2.31
         ],
         "target": "/pastel_bench/"
       },
       {
         "name": "table",
         "from": [
-          -1.45,
+          -0.8,
           0.06,
-          -0.5
+          1.15
         ],
         "to": [
-          -1.45,
+          -1.8,
           0.06,
-          0.6
+          1.15
         ],
         "target": "/cafe_table/"
       },
@@ -1547,17 +1547,17 @@
         ],
         "measure": [
           [
-            -0.38,
+            -1.25,
             0.7,
             0.9
           ],
           [
-            0.38,
+            0.385,
             0.7,
             0.9
           ]
         ],
-        "width": 0.76,
+        "width": 1.635,
         "minimum": 0.7
       },
       {
@@ -1581,10 +1581,10 @@
           [
             -1.4,
             0.7,
-            0.08
+            -0.02
           ]
         ],
-        "width": 1.27,
+        "width": 1.17,
         "minimum": 0.7
       },
       {
@@ -1772,6 +1772,22 @@
       ],
       "triangles": 21658,
       "cast_shadow": false
+    }
+  ],
+  "review_views": [
+    {
+      "name": "banquette-detail",
+      "position": [
+        3.8,
+        3.0,
+        -0.2
+      ],
+      "target": [
+        -1.8,
+        0.68,
+        1.95
+      ],
+      "size": 3.3
     }
   ]
 }

@@ -1,9 +1,9 @@
 {
-  "revision": "r2",
+  "revision": "r21",
   "reference_sha256": "71139bac1104cc37c5e3a3305ae7caa152f126933e609869824ae1c701c14b36",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "draw_calls": 27.0,
+    "draw_calls": 24.0,
     "instances": 60,
     "renderer": "mobile",
     "resolution": [
@@ -43,16 +43,21 @@
         "draw_calls": 27.0,
         "rendered_objects": 27.0,
         "view": "godot-detail-plants"
+      },
+      {
+        "draw_calls": 24.0,
+        "rendered_objects": 24.0,
+        "view": "banquette-detail"
       }
     ]
   },
   "budget": {
     "after": {
-      "room_triangles": 150194,
+      "room_triangles": 150366,
       "shared_plant_triangles": 26664,
       "room_botanical_triangles": 13788,
       "plant_triangles": 40452,
-      "total_triangles": 176858,
+      "total_triangles": 177030,
       "static_surfaces": 27
     },
     "limits": {

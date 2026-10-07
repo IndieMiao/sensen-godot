@@ -1,6 +1,6 @@
 {
   "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-  "draw_calls": 27.0,
+  "draw_calls": 24.0,
   "instances": 60,
   "renderer": "mobile",
   "resolution": [
@@ -40,6 +40,11 @@
       "draw_calls": 27.0,
       "rendered_objects": 27.0,
       "view": "godot-detail-plants"
+    },
+    {
+      "draw_calls": 24.0,
+      "rendered_objects": 24.0,
+      "view": "banquette-detail"
     }
   ]
 }

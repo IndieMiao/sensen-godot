@@ -88,6 +88,8 @@ def revise():
     k.CURRENT=k.KITS['entry_step'];cube('Lower rounded entry tread',(0,-.065,.33),(2.06,.13,.65),'F2D9D6',.045)
     polish()
     revise_r2()
+    import revision21
+    revision21.revise()
     r.sync_instances()
 
 def polish():
@@ -123,6 +125,8 @@ def manifest():
     fit_camera(d,(1544,1544),[(88,1016),(926,1409),(1484,1057)])
     from milk_bench import bench
     bench(d)
+    import revision21
+    revision21.manifest(d)
     p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)
 
 

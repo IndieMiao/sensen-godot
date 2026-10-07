@@ -1,5 +1,5 @@
 {
-  "revision": "r2",
+  "revision": "r21",
   "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
   "checks": [
     {
@@ -62,14 +62,14 @@
       },
       "runtime": {
         "rgb": [
-          242,
-          193,
-          211
+          244,
+          195,
+          213
         ],
-        "hex": "#F2C1D3",
+        "hex": "#F4C3D5",
         "hue_degrees": 337.959,
-        "saturation": 0.2025,
-        "value": 0.949
+        "saturation": 0.2008,
+        "value": 0.9569
       },
       "hue_delta_degrees": 2.449,
       "passed": true
@@ -99,15 +99,15 @@
       "runtime": {
         "rgb": [
           255,
-          232,
+          235,
           220
         ],
-        "hex": "#FFE8DC",
-        "hue_degrees": 20.571,
+        "hex": "#FFEBDC",
+        "hue_degrees": 25.714,
         "saturation": 0.1373,
         "value": 1.0
       },
-      "hue_delta_degrees": 3.429,
+      "hue_delta_degrees": 1.714,
       "passed": true
     }
   ],

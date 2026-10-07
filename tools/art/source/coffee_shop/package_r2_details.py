@@ -2,7 +2,7 @@
 from pathlib import Path
 import json,sys
 from PIL import Image,ImageOps,ImageDraw,ImageFont
-ROOT=Path(__file__).resolve().parents[4];slug=sys.argv[1];doc=ROOT/'docs/design'/(slug+'-2026-10-07')
+ROOT=Path(__file__).resolve().parents[4];slug=sys.argv[1];rev=sys.argv[2] if len(sys.argv)>2 else 'r2';doc=ROOT/'docs/design'/(slug+'-2026-10-07')
 fit=json.loads((ROOT/'tools/art/source'/slug/'camera-r2.json').read_text());(doc/'camera-registration.json').write_text(json.dumps(fit,indent=2)+'\n')
 font=ImageFont.truetype('/usr/share/fonts/TTF/DejaVuSans.ttf',22)
 ref=ImageOps.pad(Image.open(doc/'reference.png').convert('RGB'),(1400,1400),color='#eee7df');run=Image.open(doc/'godot-whole.png').convert('RGB')
@@ -25,6 +25,6 @@ p=doc/'detail-views.json'
 if p.exists():
  panels=json.loads(p.read_text());can=Image.new('RGB',(1600,850*((len(panels)+1)//2)),'#eee7df');dr=ImageDraw.Draw(can)
  for i,rec in enumerate(panels):
-  im=ImageOps.contain(Image.open(ROOT/'output'/slug/'r2'/rec['file']).convert('RGB'),(800,800));x=i%2*800;y=i//2*850
+  im=ImageOps.contain(Image.open(ROOT/'output'/slug/rev/rec['file']).convert('RGB'),(800,800));x=i%2*800;y=i//2*850
   can.paste(im,(x+(800-im.width)//2,y+50+(800-im.height)//2));dr.text((x+20,y+15),rec['label'],font=font,fill='#443b37')
  can.save(doc/'asset-details.jpg',quality=94)
