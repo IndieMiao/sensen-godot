@@ -34,7 +34,7 @@
       "vertices": 600,
       "triangles": 1188,
       "surfaces": 1,
-      "bytes": 37252
+      "bytes": 37124
     },
     {
       "name": "back_window_left_garden",
@@ -48,7 +48,7 @@
       "vertices": 600,
       "triangles": 1188,
       "surfaces": 1,
-      "bytes": 37252
+      "bytes": 37124
     },
     {
       "name": "back_window_right_garden",
@@ -62,14 +62,14 @@
       "vertices": 3872,
       "triangles": 7368,
       "surfaces": 1,
-      "bytes": 288632
+      "bytes": 288792
     },
     {
       "name": "baking_loaves",
-      "vertices": 436,
-      "triangles": 840,
+      "vertices": 796,
+      "triangles": 1584,
       "surfaces": 1,
-      "bytes": 28568
+      "bytes": 47376
     },
     {
       "name": "oven_peel",
@@ -90,7 +90,7 @@
       "vertices": 140,
       "triangles": 264,
       "surfaces": 1,
-      "bytes": 12628
+      "bytes": 12436
     },
     {
       "name": "display_glass",
@@ -118,7 +118,7 @@
       "vertices": 1736,
       "triangles": 3356,
       "surfaces": 1,
-      "bytes": 118748
+      "bytes": 119132
     },
     {
       "name": "back_counter",
@@ -143,10 +143,10 @@
     },
     {
       "name": "bakery_rack",
-      "vertices": 4966,
-      "triangles": 9592,
+      "vertices": 7666,
+      "triangles": 15172,
       "surfaces": 1,
-      "bytes": 312444
+      "bytes": 452588
     },
     {
       "name": "baking_workbench",
@@ -167,7 +167,7 @@
       "vertices": 6608,
       "triangles": 13148,
       "surfaces": 1,
-      "bytes": 559456
+      "bytes": 559200
     },
     {
       "name": "fire",
@@ -188,66 +188,66 @@
       "vertices": 3453,
       "triangles": 5349,
       "surfaces": 1,
-      "bytes": 419568
+      "bytes": 418928
     },
     {
       "name": "cafe_chair",
       "vertices": 514,
       "triangles": 988,
       "surfaces": 1,
-      "bytes": 41256
+      "bytes": 41352
     },
     {
       "name": "back_counter_dressing",
-      "vertices": 5612,
-      "triangles": 10524,
+      "vertices": 7298,
+      "triangles": 14024,
       "surfaces": 1,
-      "bytes": 407016
+      "bytes": 497812
     },
     {
       "name": "prep_dressing",
       "vertices": 5724,
       "triangles": 10804,
       "surfaces": 1,
-      "bytes": 467916
+      "bytes": 467980
     },
     {
       "name": "wall_and_cafe_dressing",
       "vertices": 9536,
       "triangles": 18328,
       "surfaces": 1,
-      "bytes": 662424
+      "bytes": 665080
     },
     {
       "name": "wall_lamps",
       "vertices": 432,
       "triangles": 832,
       "surfaces": 1,
-      "bytes": 32864
+      "bytes": 32832
     },
     {
       "name": "warm_lamps_glow",
       "vertices": 438,
       "triangles": 864,
       "surfaces": 1,
-      "bytes": 26468
+      "bytes": 26596
     },
     {
       "name": "stocked_pastries",
-      "vertices": 13382,
-      "triangles": 26096,
+      "vertices": 12298,
+      "triangles": 24108,
       "surfaces": 1,
-      "bytes": 835224
+      "bytes": 750368
     }
   ],
-  "unique_triangles": 159585,
-  "scene_triangles": 173399,
+  "unique_triangles": 167421,
+  "scene_triangles": 181235,
   "static_draw_surfaces": 40,
-  "glb_bytes": 7024260,
-  "atlas_bytes": 2641105,
+  "glb_bytes": 7191264,
+  "atlas_bytes": 2626384,
   "placed_instances": 40,
   "materials": 4,
-  "local_scene_triangles": 160573,
+  "local_scene_triangles": 168409,
   "shared_scene_triangles": 12826,
   "shared_assets": [
     {

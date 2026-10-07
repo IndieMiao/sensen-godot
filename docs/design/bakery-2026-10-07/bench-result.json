@@ -63,7 +63,7 @@
         "name": "pastry front",
         "reached": true,
         "remaining_m": 0.0649657025933266,
-        "seconds": 0.346,
+        "seconds": 0.366,
         "target": [
           2.22000002861023,
           0.0799999982118607,
@@ -115,7 +115,7 @@
         "name": "register approach",
         "reached": true,
         "remaining_m": 0.0946865081787109,
-        "seconds": 0.816,
+        "seconds": 0.817,
         "target": [
           0.479999989271164,
           0.0799999982118607,
@@ -141,7 +141,7 @@
         "name": "checkout",
         "reached": true,
         "remaining_m": 0.0887311846017838,
-        "seconds": 0.534,
+        "seconds": 0.533,
         "target": [
           2.4300000667572,
           0.0799999982118607,
@@ -167,7 +167,7 @@
         "name": "workbench rear",
         "reached": true,
         "remaining_m": 0.0888109728693962,
-        "seconds": 0.676,
+        "seconds": 0.679,
         "target": [
           -0.649999976158142,
           0.0799999982118607,
@@ -195,7 +195,7 @@
         "name": "workbench west",
         "reached": true,
         "remaining_m": 0.0757575333118439,
-        "seconds": 0.432,
+        "seconds": 0.433,
         "target": [
           -2.15000009536743,
           0.0799999982118607,
@@ -221,7 +221,7 @@
         "name": "cafe approach",
         "reached": true,
         "remaining_m": 0.0659887418150902,
-        "seconds": 0.583,
+        "seconds": 0.582,
         "target": [
           -2.15000009536743,
           0.0799999982118607,
@@ -274,7 +274,7 @@
         ],
         "reached": false,
         "remaining_m": 1.21641838550568,
-        "seconds": 0.866,
+        "seconds": 0.88,
         "target": [
           -2.27999997138977,
           0.0900000035762787,
@@ -328,7 +328,7 @@
         ],
         "reached": false,
         "remaining_m": 1.33365321159363,
-        "seconds": 0.881,
+        "seconds": 0.882,
         "target": [
           2.05999994277954,
           0.0900000035762787,
@@ -345,17 +345,17 @@
           "/root/SceneBenchmark/BakeryArt/checkout_counter/@StaticBody3D@27"
         ],
         "final": [
-          2.88373875617981,
-          0.0804684236645699,
-          -1.37556040287018
+          2.82822251319885,
+          0.072510689496994,
+          -1.39459443092346
         ],
         "from": [
-          2.84999990463257,
-          0.0900000035762787,
-          -1.55999994277954
+          2.81235837936401,
+          0.0801508501172066,
+          -1.45504760742188
         ],
         "reached": false,
-        "remaining_m": 0.646176874637604,
+        "remaining_m": 0.676983952522278,
         "seconds": 0.882,
         "target": [
           3.0,
@@ -384,7 +384,7 @@
         ],
         "reached": false,
         "remaining_m": 0.585709273815155,
-        "seconds": 0.882,
+        "seconds": 0.881,
         "target": [
           -2.94000005722046,
           0.0900000035762787,
@@ -440,7 +440,7 @@
         ],
         "reached": false,
         "remaining_m": 0.673845708370209,
-        "seconds": 0.883,
+        "seconds": 0.881,
         "target": [
           4.09999990463257,
           0.0900000035762787,
@@ -468,7 +468,7 @@
         ],
         "reached": false,
         "remaining_m": 0.762559652328491,
-        "seconds": 0.883,
+        "seconds": 0.866,
         "target": [
           1.75,
           0.0900000035762787,
@@ -529,7 +529,7 @@
           ],
           "reached": true,
           "remaining_m": 0.0768935903906822,
-          "seconds": 0.217,
+          "seconds": 0.216,
           "target": [
             0.649999976158142,
             0.0900000035762787,
@@ -550,7 +550,7 @@
           ],
           "reached": true,
           "remaining_m": 0.0970981419086456,
-          "seconds": 0.249,
+          "seconds": 0.25,
           "target": [
             0.649999976158142,
             0.0900000035762787,
@@ -568,7 +568,8 @@
           1.59099149703979,
           0.000156328082084656,
           -0.218608617782593
-        ]
+        ],
+        "wall_torso_ray": {}
       },
       "name": "Diagonal collision preserves wall sliding",
       "passed": true
@@ -684,7 +685,7 @@
       "name": "pastry front",
       "reached": true,
       "remaining_m": 0.0649657025933266,
-      "seconds": 0.346,
+      "seconds": 0.366,
       "target": [
         2.22000002861023,
         0.0799999982118607,
@@ -728,7 +729,7 @@
       "name": "register approach",
       "reached": true,
       "remaining_m": 0.0946865081787109,
-      "seconds": 0.816,
+      "seconds": 0.817,
       "target": [
         0.479999989271164,
         0.0799999982118607,
@@ -750,7 +751,7 @@
       "name": "checkout",
       "reached": true,
       "remaining_m": 0.0887311846017838,
-      "seconds": 0.534,
+      "seconds": 0.533,
       "target": [
         2.4300000667572,
         0.0799999982118607,
@@ -772,7 +773,7 @@
       "name": "workbench rear",
       "reached": true,
       "remaining_m": 0.0888109728693962,
-      "seconds": 0.676,
+      "seconds": 0.679,
       "target": [
         -0.649999976158142,
         0.0799999982118607,
@@ -796,7 +797,7 @@
       "name": "workbench west",
       "reached": true,
       "remaining_m": 0.0757575333118439,
-      "seconds": 0.432,
+      "seconds": 0.433,
       "target": [
         -2.15000009536743,
         0.0799999982118607,
@@ -818,7 +819,7 @@
       "name": "cafe approach",
       "reached": true,
       "remaining_m": 0.0659887418150902,
-      "seconds": 0.583,
+      "seconds": 0.582,
       "target": [
         -2.15000009536743,
         0.0799999982118607,
