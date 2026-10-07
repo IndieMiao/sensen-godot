@@ -1,0 +1,285 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    207
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiTodayPanel"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "TodayPanel 1145:81715 · TodayRow 1145:81714 · LOCK-06 (328/360)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        137
+      ],
+      "children": [
+        {
+          "type": "Control",
+          "rect": [
+            0,
+            70,
+            328,
+            137
+          ],
+          "children": [
+            {
+              "type": "Control",
+              "rect": [
+                0,
+                70,
+                328,
+                137
+              ],
+              "children": [
+                {
+                  "type": "UiTodayPanel",
+                  "rect": [
+                    9,
+                    70,
+                    310,
+                    140
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        20,
+                        77,
+                        288,
+                        126
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            20,
+                            77,
+                            288,
+                            40
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                20,
+                                88,
+                                18,
+                                18
+                              ]
+                            },
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                46,
+                                88,
+                                196,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    46,
+                                    88,
+                                    196,
+                                    18
+                                  ],
+                                  "variation": "BodyXB14",
+                                  "text": "Radishes ready in 1h 12m"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "UiCommandButton",
+                              "rect": [
+                                249,
+                                77,
+                                59,
+                                40
+                              ],
+                              "variation": "CmdSecondaryCompact",
+                              "text": "Show"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ColorRect",
+                          "rect": [
+                            20,
+                            119,
+                            288,
+                            1
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            20,
+                            122,
+                            288,
+                            40
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                20,
+                                133,
+                                18,
+                                18
+                              ]
+                            },
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                46,
+                                125,
+                                196,
+                                35
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    46,
+                                    125,
+                                    196,
+                                    18
+                                  ],
+                                  "variation": "BodyXB14",
+                                  "text": "Sow your first plot"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    46,
+                                    143,
+                                    196,
+                                    16
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "needs 2 Energy · +1 in 2:41"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "UiCommandButton",
+                              "rect": [
+                                249,
+                                122,
+                                59,
+                                40
+                              ],
+                              "variation": "CmdSecondaryCompact",
+                              "text": "Show"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "ColorRect",
+                          "rect": [
+                            20,
+                            164,
+                            288,
+                            1
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            20,
+                            167,
+                            288,
+                            36
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                20,
+                                176,
+                                18,
+                                18
+                              ]
+                            },
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                46,
+                                176,
+                                239,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    46,
+                                    176,
+                                    239,
+                                    18
+                                  ],
+                                  "variation": "BodyXB14",
+                                  "text": "Pond Catch · 2 Pond Crucian"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                292,
+                                177,
+                                16,
+                                16
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    296,
+                                    181,
+                                    8,
+                                    8
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

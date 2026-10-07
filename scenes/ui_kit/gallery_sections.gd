@@ -26,7 +26,23 @@ static func all() -> Array[Dictionary]:
 		{id = "filter_chip", title = "UiFilterChip", figma = "Compact/Filter 633:41280", build = _filter_chips},
 		{id = "segment_tab", title = "UiSegmentTab", figma = "Tab 483:322 · Compact/Kitchen/Mode 655:58504 · LOCK-13 / 20", build = _segment_tabs},
 		{id = "badge", title = "UiBadge", figma = "StateBadge 483:324", build = _badges},
-		{id = "empty_state", title = "UiEmptyState", figma = "Main pending: WP6 SGODOT-206 · provisional look per WP7-B F-08 §5", build = _empty_states},
+		# SGODOT-222 world display
+		{id = "need_tile", title = "UiNeedTile", figma = "NeedTile 1090:78003 · LOCK-10", build = _need_tiles},
+		{id = "need_source", title = "UiNeedSource", figma = "NeedSource 1092:77266 · LOCK-10 / 08", build = _need_sources},
+		{id = "hud", title = "UiHud", figma = "HUD 1143:103373 · LOCK-06 (shown at 328/360)", build = _huds},
+		{id = "today_panel", title = "UiTodayPanel", figma = "TodayPanel 1145:81715 · TodayRow 1145:81714 · LOCK-06 (328/360)", build = _today_panels},
+		{id = "energy_card", title = "UiEnergyCard · card", figma = "Energy 1094:77504 Kind=Card · EnergyTile 1093:77292 · LOCK-09", build = _energy_cards},
+		{id = "energy_panel", title = "UiEnergyCard · panel", figma = "Energy 1094:77504 Kind=Panel · LOCK-09", build = _energy_panels},
+		{id = "empty_state", title = "UiEmptyState", figma = "EmptyState 1234:87237 Kind=Panel / Row · WP6", build = _empty_states},
+		# SGODOT-225 shared panel parts
+		{id = "drawer", title = "UiDrawer", figma = "Sheet 483:190 · bag drawer of BAG-2-2 · LOCK-12 / 15 (328/360)", build = _drawers},
+		{id = "inventory_grid", title = "UiInventoryGrid", figma = "Bag layout five-column grid · LOCK-12 / 15", build = _inventory_grids},
+		{id = "dialogue_card", title = "UiDialogueCard", figma = "Head of KeeperGreeting 1205:83238 / ResidentDialogue 1213:83392 (336 at 328)", build = _dialogue_cards},
+		{id = "bag_header", title = "UiBagHeader", figma = "BagHeader 1225:83885 · LOCK-12 / 13", build = _bag_headers},
+		{id = "gear_row", title = "UiGearRow", figma = "Gear candidate rows of BAG-2 · Gear · LOCK-13", build = _gear_rows},
+		{id = "profile_parts", title = "Profile parts", figma = "ProfileTopBar 1233:107734 · ProfileMoreMenu 1233:107735 · SkillRing 1251:109246 · LOCK-22 (336 at 328)", build = _profile_parts},
+		{id = "request_card", title = "UiRequestCard", figma = "ResidentRequestCard 1211:83296 · LOCK-18 (336 at 328)", build = _request_cards},
+		{id = "resident_bar", title = "UiResidentBar", figma = "ResidentDialogue 1213:83392 Row / Stacked · LOCK-18 (336 at 328)", build = _resident_bars},
 		# SGODOT-224 panels
 		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
 	]
@@ -285,6 +301,7 @@ static func _cells_gear() -> Control:
 	var S := UiItemCell.State
 	row.add_child(_captioned(_cell(D, {role = "Fishing", icon = _tex("rod_starter"), title = "Starter Rod"}), "default"))
 	row.add_child(_captioned(_cell(D, {role = "Farming", icon = _tex("hoe_starter"), title = "Starter Hoe", state = S.SELECTED}), "selected"))
+	row.add_child(_captioned(_cell(D, {role = "Mining", icon = _tex("pick_starter"), title = "Starter Pickaxe"}), "two-line name"))
 	row.add_child(_captioned(_cell(D, {role = "Ring", state = S.EMPTY}), "empty"))
 	return row
 
@@ -354,10 +371,254 @@ static func _badges() -> Control:
 
 static func _empty_states() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
-	v.add_child(UiEmptyState.new("No fish yet", _tex("fish_unknown"), "Show on map"))
-	v.add_child(UiEmptyState.new("Nothing to sell here", _tex("stall")))
+	v.add_child(UiEmptyState.new("Your bag is empty", _tex("bag")))
+	v.add_child(UiEmptyState.new("No seeds yet", _tex("seed_radish"), "Show stall"))
+	v.add_child(UiEmptyState.new("No open requests · next in 3h 12m", _tex("board"), "", UiEmptyState.Kind.ROW))
 	return v
 
+# ---------------------------------------------------------------- SGODOT-222 world display
+
+## Full-width (360) components drawn at 328/360 so they fit the gallery column.
+static func _phone(content: Control, height: float) -> Control:
+	var frame := Control.new()
+	var k := (360.0 - UiTokens.SPACE_PAGE * 2.0) / 360.0
+	frame.custom_minimum_size = Vector2(360.0 * k, height * k)
+	var screen := Control.new()
+	screen.size = Vector2(360.0, height)
+	screen.scale = Vector2(k, k)
+	screen.add_child(content)
+	frame.add_child(screen)
+	return frame
+
+static func _need_tiles() -> Control:
+	var v := _column(UiTokens.SPACE_ROW)
+	var wood := _tex("wood")
+	var S := UiNeedTile.Size
+	for size in [S.L, S.M, S.S]:
+		v.add_child(UiNeedTile.group([
+			_captioned(UiNeedTile.new("Timber", 16, 16, size, wood), "met"),
+			_captioned(UiNeedTile.new("Timber", 10, 16, size, wood), "short"),
+			_captioned(UiNeedTile.new("Meals", 100, 300, size, _tex("eat"), true), "count"),
+		]))
+	v.add_child(UiNeedTile.group([
+		_captioned(UiNeedTile.new("Coins", 5, 4, S.M, _tex("coin")), "surplus 5/4"),
+		_captioned(UiNeedTile.new("Copper Ore", 0, 6, S.M, _tex("stone")), "short 0"),
+		_captioned(UiNeedTile.new("Fish-dex", 12, 20, S.M, _tex("fish_crucian"), true), "collection"),
+	]))
+	return v
+
+static func _need_sources() -> Control:
+	var v := _column()
+	v.add_child(UiNeedSource.new("Copper Ore · The mine, floors 1–4"))
+	v.add_child(UiNeedSource.new("Radish Seeds · Homestead Stall"))
+	return v
+
+static func _hud_sample(state: Dictionary) -> UiHud:
+	var h := UiHud.new()
+	h.apply(state)
+	return h
+
+static func _huds() -> Control:
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override(&"separation", 0)
+	var home := {city = "Shanghai", space = "Homestead", kind = UiHud.PlaceKind.HOME}
+	var samples := [
+		{energy = 142, energy_max = 200, regen = "+1 in 2:40", skills = {farming = 0.6, fishing = 0.4}, coins = 230,
+			today = "Radishes ready in 1h 12m", place = home},
+		{energy = 1, energy_max = 200, next_cost = 2, regen = "+1 in 2:41", skills = {farming = 0.6, fishing = 0.3}, coins = 230,
+			unread = 3, buff = {icon = _tex("crop_herb"), remaining = "2h 59m"}, today = "Sow your first plot",
+			place = {city = "Shanghai", space = "Farmhouse", kind = UiHud.PlaceKind.HOME}},
+		{energy = 0, energy_max = 200, regen = "+1 in 3:59", coins = 12, unread = 12, today = "",
+			place = {city = "Tokyo", space = "Arrived", kind = UiHud.PlaceKind.FOREIGN, day_pass = "23h"}},
+		{energy = 200, energy_max = 200, regen = "Full", skills = {farming = 1.0, fishing = 1.0}, coins = 1840,
+			today = "Pond Catch · 2 Pond Crucian · Stall Board", place = {city = "Shanghai", space = "Willow Pond", kind = UiHud.PlaceKind.HOME}},
+		{energy = 214, energy_max = 200, regen = "Bonus +14", coins = 230, today = "Herb Grilled Fish ready at the stove", place = home},
+	]
+	for s in samples:
+		var screen := Control.new()
+		screen.custom_minimum_size = Vector2(360, UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H)
+		screen.add_child(_hud_sample(s))
+		col.add_child(_phone(screen, UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H))
+	return col
+
+static func _today_panels() -> Control:
+	var col := _column()
+	var rows := [
+		{icon = _tex("crop_radish"), line = "Radishes ready in 1h 12m", action = "Show"},
+		{icon = _tex("seed_radish"), line = "Sow your first plot", tail = "needs 2 Energy · +1 in 2:41", action = "Show", state = "short"},
+		{icon = _tex("board"), line = "Pond Catch · 2 Pond Crucian", state = "done"},
+	]
+	var p := UiTodayPanel.new(rows)
+	p.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, 0)
+	col.add_child(_phone(p, 150))
+	return col
+
+static func _energy_facts(zero: bool, home: bool) -> Dictionary:
+	return {
+		have = 0 if zero else 1, max = 200, regen = "+1 in 3:59" if zero else "+1 in 2:41", zero = zero,
+		fact = "Recover or do something free" if zero else "Sow 1 plot needs 2 Energy · you have 1",
+		wait = "Wait · Full in 13h 20m",
+		tiles = [
+			{icon = _tex("dish_grilled_fish"), label = "Eat", fact = "3 dishes in bag", guide = "Open bag", go = "bag", on = true},
+			{icon = _tex("pot"), label = "Cook", fact = "4 fish in creel" if home else "At home", guide = "Show kitchen", go = "stove", on = home},
+			{icon = _tex("dish_fruit_tea"), label = "Tea", fact = "Tea House opens later", guide = "", go = "", on = false},
+			{icon = _tex("rest"), label = "Rest", fact = "Available" if home else "At home", guide = "Show bench", go = "home", on = home},
+		],
+	}
+
+static func _energy_cards() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(UiEnergyCard.card(_energy_facts(false, true)), "short"))
+	v.add_child(_captioned(UiEnergyCard.card(_energy_facts(true, false)), "empty · away from home"))
+	return v
+
+static func _energy_panels() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var facts := {max = 200, level = "Homestead Lv1", uses = [
+		{name = "Meals", have = 100, need = 300, icon = _tex("dish_grilled_fish")},
+		{name = "Tea", have = 1, need = 3, icon = _tex("dish_fruit_tea")},
+		{name = "Rest", have = 0, need = 1, icon = _tex("rest")},
+		{name = "Refunds", have = 3, need = 10, icon = _tex("rod_starter")},
+	], blessing = {title = "Newcomer Blessing · 5 days left", detail = "Energy returns 1.5× faster · Meals 300 a day"}}
+	var p := UiEnergyCard.panel(facts)
+	var holder := MarginContainer.new()
+	holder.add_theme_constant_override(&"margin_top", int(UiTokens.SPACE_ROW))
+	holder.add_child(p)
+	v.add_child(holder)
+	return v
+
+# ---------------------------------------------------------------- SGODOT-225 shared panel parts
+
+static func _bag_items() -> Array:
+	var out := []
+	for e in [["seed_radish", 24, 0], ["seed_carrot", 10, 0], ["fish_crucian", 3, 1], ["fish_perch", 1, 2],
+			["dish_grilled_fish", 2, 2], ["crop_radish", 12, 0], ["wood", 20, 0], ["stone", 64, 0], ["bait_worm", 7, 0]]:
+		out.append({id = e[0], icon = _tex(e[0]), qty = e[1], rarity = e[2], kind = String(e[0]).get_slice("_", 0)})
+	return out
+
+static func _sample_grid(sell := false) -> UiInventoryGrid:
+	var g := UiInventoryGrid.new()
+	g.custom_minimum_size.y = UiTokens.SIZE_INVENTORY_CELL * 2.0 + UiTokens.SPACE_WITHIN
+	g.capacity = 25
+	g.items = _bag_items()
+	if sell:
+		g.can_sell = func(it: Dictionary) -> bool: return it.kind in ["crop", "fish"]
+		g.sell_mode = true
+	g.select("fish_crucian")
+	return g
+
+static func _drawers() -> Control:
+	var screen := Control.new()
+	screen.size = Vector2(360, 420)
+	var scene := ColorRect.new()   # the world behind, under the drawer scrim (color/scrimDrawer)
+	scene.color = UiKit.alpha(UiTokens.COLOR_SCRIM, UiTokens.OPACITY_SCRIM_DRAWER)
+	scene.size = screen.size
+	screen.add_child(scene)
+	var d := UiDrawer.new(360.0)
+	d.animate = false
+	d.safe_bottom = UiTokens.SPACE_ROW
+	screen.add_child(d)
+	d.body.add_child(UiSegmentTab.new([{label = "Bag", count = "9/25"}, {label = "Gear"}], 0))
+	var gap := Control.new()
+	gap.custom_minimum_size.y = UiTokens.SPACE_WITHIN
+	d.body.add_child(gap)
+	d.body.add_child(UiFilterChip.row(PackedStringArray(["All", "Seeds", "Fish", "Produce", "Dishes"]), 0))
+	var grid := _sample_grid()
+	grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	d.body.add_child(grid)
+	return _phone(screen, 420.0)
+
+static func _inventory_grids() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(_sample_grid(), "bag · Crucian selected · dashed empties to capacity 25"))
+	v.add_child(_captioned(_sample_grid(true), "sell_mode · this counter takes crops and fish only"))
+	return v
+
+## Bottom cards are 336 wide on the 360 screen (12 at each side); laid out at 336 and drawn at 328/336.
+class _At336 extends Container:
+	const W := 336.0
+
+	func _k() -> float: return (360.0 - UiTokens.SPACE_PAGE * 2.0) / W
+
+	func _get_minimum_size() -> Vector2:
+		if get_child_count() == 0: return Vector2.ZERO
+		return Vector2(W, (get_child(0) as Control).get_combined_minimum_size().y) * _k()
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_SORT_CHILDREN and get_child_count() > 0:
+			var c := get_child(0) as Control
+			fit_child_in_rect(c, Rect2(Vector2.ZERO, Vector2(W, c.get_combined_minimum_size().y)))
+			c.scale = Vector2(_k(), _k())
+
+static func _at_336(c: Control) -> Control:
+	var box := _At336.new()
+	box.add_child(c)
+	return box
+
+static func _dialogue_cards() -> Control:
+	# The KeeperGreeting main's own sample (Mei); the greeting itself, with its Trade sub-copy, is 2A.
+	var c := UiDialogueCard.new(load("res://assets/ui/kit_images/keeper_mei.jpg"), "Market Keeper · Mei", "",
+		"Morning! Sweet potato seeds just came in — Farming Lv5 to plant. Anything I can get you?")
+	c.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
+	c.place = "Keeps the stall · Shanghai Market Square"
+	c.content.add_child(UiCommandButton.new("Trade · open the stall"))
+	c.content.add_child(UiCommandButton.new("What's fresh today?", UiCommandButton.Kind.SECONDARY))
+	c.content.add_child(UiDismissButton.new("Just passing by"))
+	return _captioned(_at_336(c), "keeper layout: Role · Name, place line, no profile link")
+
+static func _resident_bars() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var pip := {portrait = load("res://assets/p0/art/pip-portrait.jpg"), name = "Pip", role = "Courier Kid", stage = "Acquainted",
+		have = 28, need = 45, next = "Familiar", line = "Got a Common fish for me? Any kind.", meal = true, lesson = true}
+	v.add_child(_captioned(_at_336(UiResidentBar.new(pip)), "Choices=Row · Today’s meal and Recipe lesson available"))
+	var busy := pip.duplicate()
+	busy.merge({gift_reason = "Gift already given today", meal = false, lesson = false}, true)
+	v.add_child(_captioned(_at_336(UiResidentBar.new(busy)), "Choices=Stacked · Gift unavailable with its reason (NPC-5 layout)"))
+	return v
+
+static func _bag_headers() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(UiBagHeader.new(19, 25), "Bag side · Sort · Recent · capacity bar"))
+	v.add_child(_captioned(UiBagHeader.new(23, 25), "92 % full · amber bar"))
+	v.add_child(_captioned(UiBagHeader.new(19, 25, UiBagHeader.Pane.GEAR), "Gear side · no Sort, no bar"))
+	var gift := UiBagHeader.new(19, 25)
+	gift.show_tabs = false
+	v.add_child(_captioned(gift, "gift drawer · count only"))
+	return v
+
+static func _gear_rows() -> Control:
+	var v := _column(0)
+	var rod := _tex("rod_starter")
+	v.add_child(UiGearRow.equipped_badge())
+	v.add_child(UiGearRow.new({icon = rod, title = "Starter Rod", state = &"equipped", effect = "Lands up to Fine fish"}))
+	v.add_child(UiGearRow.new({icon = _tex("rod_reed"), title = "Reed Rod", state = &"owned", effect = "Lands up to Rare fish · Bite window +0.4 s",
+		action = {id = &"equip", label = "Equip", kind = &"secondary"}}))
+	v.add_child(UiGearRow.new({icon = _tex("rod"), title = "Carbon Rod", state = &"Fishing Lv5 · Tackle Shop", effect = "Lands up to Legendary fish"}))
+	return v
+
+static func _profile_parts() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(_at_336(UiProfileTopBar.new(UiProfileTopBar.Kind.SELF, "Profile")), "Kind=Self · back, Profile, gear (hidden in P0)"))
+	v.add_child(_captioned(_at_336(UiProfileTopBar.new(UiProfileTopBar.Kind.OTHER, "Ann")), "Kind=Other · ··· opens the more menu"))
+	var menus := _row(UiTokens.SPACE_ROW)
+	menus.add_child(_captioned(UiProfileMoreMenu.new(&"close_friend"), "close friend (P2)"))
+	menus.add_child(_captioned(UiProfileMoreMenu.new(&"blocked"), "blocked (P2)"))
+	v.add_child(menus)
+	var skills := HBoxContainer.new()
+	skills.add_theme_constant_override(&"separation", 8)
+	skills.add_child(UiSkillCard.new("Farming", 1, 0.6, _tex("hoe")))
+	skills.add_child(UiSkillCard.new("Fishing", 2, 0.2, _tex("rod")))
+	skills.add_child(UiSkillCard.new("Cooking", 2, 0.1, _tex("pot")))
+	v.add_child(_captioned(_at_336(skills), "SkillRing · ring floored to 10 %"))
+	var farm := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
+	v.add_child(_captioned(_at_336(farm), "farm overview"))
+	return v
+
+static func _request_cards() -> Control:
+	var d := {portrait = load("res://assets/p0/art/pip-portrait.jpg"), title = "Pip's request", who = "Pip · Courier Kid · personal request",
+		line = "Could you catch me a fish? Any kind is fine.", needs = [{name = "Common fish", have = 0, need = 1, icon = _tex("fish_crucian")}],
+		reward = "+5 Friendship · 20 coins", deliver_to = "Pip · Travel Post"}
+	return _captioned(_at_336(UiRequestCard.new(d)), "open · Accept")
 ## Specs as P0ItemInfo returns them for the F-07 states the card has to draw.
 static func _info_sheets() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)

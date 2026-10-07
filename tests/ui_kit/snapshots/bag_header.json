@@ -1,0 +1,595 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    368
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiBagHeader"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "BagHeader 1225:83885 · LOCK-12 / 13"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        316
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            328,
+            72
+          ],
+          "children": [
+            {
+              "type": "UiBagHeader",
+              "rect": [
+                6,
+                52,
+                315,
+                52
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    6,
+                    52,
+                    315,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "UiSegmentTab",
+                      "rect": [
+                        6,
+                        52,
+                        220,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Button",
+                          "rect": [
+                            6,
+                            52,
+                            107,
+                            44
+                          ],
+                          "variation": "SegmentTab",
+                          "text": "",
+                          "pressed": true,
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                6,
+                                52,
+                                107,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    25,
+                                    64,
+                                    68,
+                                    20
+                                  ],
+                                  "variation": "BodyB14",
+                                  "text": "Bag 19/25"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Button",
+                          "rect": [
+                            119,
+                            52,
+                            107,
+                            44
+                          ],
+                          "variation": "SegmentTab",
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                119,
+                                52,
+                                107,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    156,
+                                    64,
+                                    32,
+                                    20
+                                  ],
+                                  "variation": "BodyB14",
+                                  "text": "Gear"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        234,
+                        52,
+                        0,
+                        44
+                      ]
+                    },
+                    {
+                      "type": "UiNavButton",
+                      "rect": [
+                        242,
+                        52,
+                        79,
+                        44
+                      ],
+                      "variation": "NavCompact",
+                      "text": "Sort · Recent ›"
+                    }
+                  ]
+                },
+                {
+                  "type": "MarginContainer",
+                  "rect": [
+                    6,
+                    100,
+                    315,
+                    4
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        12,
+                        100,
+                        100,
+                        4
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                110,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Bag side · Sort · Recent · capacity bar"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            144,
+            328,
+            72
+          ],
+          "children": [
+            {
+              "type": "UiBagHeader",
+              "rect": [
+                6,
+                144,
+                315,
+                52
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    6,
+                    144,
+                    315,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "UiSegmentTab",
+                      "rect": [
+                        6,
+                        144,
+                        220,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Button",
+                          "rect": [
+                            6,
+                            144,
+                            107,
+                            44
+                          ],
+                          "variation": "SegmentTab",
+                          "text": "",
+                          "pressed": true,
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                6,
+                                144,
+                                107,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    25,
+                                    156,
+                                    68,
+                                    20
+                                  ],
+                                  "variation": "BodyB14",
+                                  "text": "Bag 23/25"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Button",
+                          "rect": [
+                            119,
+                            144,
+                            107,
+                            44
+                          ],
+                          "variation": "SegmentTab",
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                119,
+                                144,
+                                107,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    156,
+                                    156,
+                                    32,
+                                    20
+                                  ],
+                                  "variation": "BodyB14",
+                                  "text": "Gear"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        234,
+                        144,
+                        0,
+                        44
+                      ]
+                    },
+                    {
+                      "type": "UiNavButton",
+                      "rect": [
+                        242,
+                        144,
+                        79,
+                        44
+                      ],
+                      "variation": "NavCompact",
+                      "text": "Sort · Recent ›"
+                    }
+                  ]
+                },
+                {
+                  "type": "MarginContainer",
+                  "rect": [
+                    6,
+                    192,
+                    315,
+                    4
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        12,
+                        192,
+                        100,
+                        4
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                202,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "92 % full · amber bar"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            236,
+            328,
+            64
+          ],
+          "children": [
+            {
+              "type": "UiBagHeader",
+              "rect": [
+                50,
+                236,
+                228,
+                44
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    50,
+                    236,
+                    228,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "UiSegmentTab",
+                      "rect": [
+                        50,
+                        236,
+                        220,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Button",
+                          "rect": [
+                            50,
+                            236,
+                            107,
+                            44
+                          ],
+                          "variation": "SegmentTab",
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                50,
+                                236,
+                                107,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    69,
+                                    248,
+                                    68,
+                                    20
+                                  ],
+                                  "variation": "BodyB14",
+                                  "text": "Bag 19/25"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Button",
+                          "rect": [
+                            163,
+                            236,
+                            107,
+                            44
+                          ],
+                          "variation": "SegmentTab",
+                          "text": "",
+                          "pressed": true,
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                163,
+                                236,
+                                107,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    200,
+                                    248,
+                                    32,
+                                    20
+                                  ],
+                                  "variation": "BodyB14",
+                                  "text": "Gear"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        278,
+                        236,
+                        0,
+                        44
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                286,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Gear side · no Sort, no bar"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            320,
+            328,
+            48
+          ],
+          "children": [
+            {
+              "type": "UiBagHeader",
+              "rect": [
+                111,
+                320,
+                106,
+                28
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    111,
+                    320,
+                    106,
+                    20
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        111,
+                        320,
+                        69,
+                        20
+                      ],
+                      "variation": "C14XB",
+                      "text": "Bag 19/25"
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        188,
+                        320,
+                        29,
+                        20
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "MarginContainer",
+                  "rect": [
+                    111,
+                    344,
+                    106,
+                    4
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        117,
+                        344,
+                        100,
+                        4
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                354,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "gift drawer · count only"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

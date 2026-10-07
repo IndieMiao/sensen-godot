@@ -206,8 +206,9 @@ static func plural(name: String) -> String:
 	if name.ends_with("y"): return name.substr(0, name.length() - 1) + "ies"
 	return name + "s"
 
-## Energy Card facts (§3.7.2 / §3.7.3): one card for short and zero; only facts, tiles only guide.
-static func energy_card(view: Dictionary, need: int, verb: String) -> Dictionary:
+## Energy Card facts (§3.7.2 / §3.7.3, LOCK-09): one card for short and zero; only facts, tiles only guide.
+## Away from home (the pond, later the mine) Cook and Rest are greyed with `At home` (q(6)).
+static func energy_card(view: Dictionary, need: int, verb: String, at_home := true) -> Dictionary:
 	var e: Dictionary = view.get("energy", {})
 	var have := int(e.get("value", 0))
 	var mx := int(e.get("max", 200))
@@ -223,18 +224,119 @@ static func energy_card(view: Dictionary, need: int, verb: String) -> Dictionary
 		if id.begins_with("fish_") and item(view, id).get("cook", true): fish += int(st.get("qty", 0))
 	var rest: Dictionary = view.get("rest", {})
 	var rest_left := int(rest.get("limit", 1)) - int(rest.get("used", 0))
+	var subtitle := "Recover or do something free" if have <= 0 else "%s needs %d Energy · you have %d" % [verb, need, have]
+	var cook := {"icon": "pot", "label": "Cook", "fact": "%d fish in creel" % fish if fish > 0 else "No fish to cook", "guide": "Show kitchen", "go": "stove", "on": fish > 0}
+	# TODO(SGODOT-224, bench): LOCK-09 guides Rest with "Show bench"; P0 has no bench, rest is at the farmhouse (197 60c82ad2).
+	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show home", "go": "home", "on": true}
+	if rest_left <= 0:
+		rest_tile.fact = "Rested today"   # the reset time is on the bench card (李白, 225)
+		rest_tile.on = false
+	elif rest.has("away_ready_in"):   # q(41): Rest opens after 2 h away from the farm (SGODOT-228)
+		var away = rest.get("away_ready_in")
+		if away == null:
+			rest_tile.fact = "After %dh away" % int(rest.get("away_h", 2))
+			rest_tile.on = false
+		elif float(away) > 0.0:
+			rest_tile.fact = "Ready in %s" % duration(float(away))
+			rest_tile.on = false
+	var tea := {"icon": "dish_fruit_tea", "label": "Tea", "fact": "Tea House opens later", "guide": "", "go": "", "on": false}
+	var drinks: Dictionary = view.get("drinks", {})
+	if not drinks.is_empty():   # §3.4.4: three cups a day, shared by tea and coffee (SGODOT-228 view.drinks; copy 李白 225)
+		tea.guide = "Show on map"
+		tea.go = "outpost:tea"
+		tea.on = true
+		if int(drinks.get("left", 0)) <= 0:
+			tea.fact = "%d/%d today" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3))]
+			tea.on = false
+		elif bool(drinks.get("full", false)):
+			tea.fact = "Energy full"
+			tea.on = false
+		elif drinks.get("need", null) != null and int(drinks.need) > 0:
+			tea.fact = "Need %d more coins" % int(drinks.need)
+			tea.on = false
+		else:
+			tea.fact = "%d/%d today · %d coins" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3)), int(drinks.get("price", 0))]
+	if not at_home:
+		for t in [cook, rest_tile]:
+			t.fact = "At home"
+			t.on = false
 	return {
 		"title": "Energy %d/%d%s" % [have, mx, tick],
+		"have": have, "max": mx, "regen": "" if next_in == null else "+1 in %s" % duration(float(next_in)),
 		"zero": have <= 0,
-		"subtitle": "Recover or do something free" if have <= 0 else "%s needs %d Energy · you have %d" % [verb, need, have],
+		"subtitle": subtitle, "fact": subtitle,
 		"wait": "Wait · Full in %s" % duration(full_ms) if next_in != null else "Wait · Full now",
 		"tiles": [
-			{"icon": "eat", "label": "Eat", "fact": "%d dish%s in bag" % [dishes, "" if dishes == 1 else "es"] if dishes > 0 else "No dishes in bag", "guide": "Open bag", "go": "bag", "on": dishes > 0},
-			{"icon": "pot", "label": "Cook", "fact": "%d fish in creel" % fish if fish > 0 else "No fish to cook", "guide": "Show kitchen", "go": "stove", "on": fish > 0},
-			{"icon": "dish_fruit_tea", "label": "Tea", "fact": "Tea House opens later", "guide": "", "go": "", "on": false},
-			{"icon": "rest", "label": "Rest", "fact": "Available" if rest_left > 0 else "Rested today · %s" % duration(float(rest.get("resets_in", 0))), "guide": "Show home", "go": "home", "on": rest_left > 0},
+			{"icon": "dish_grilled_fish", "label": "Eat", "fact": "%d dish%s in bag" % [dishes, "" if dishes == 1 else "es"] if dishes > 0 else "No dishes in bag", "guide": "Open bag", "go": "bag", "on": dishes > 0},
+			cook,
+			tea,
+			rest_tile,
 		],
 	}
+
+## Energy panel under the HUD chip (LOCK-09 Kind=Panel): max, today's use as count tiles, the blessing.
+static func energy_panel(view: Dictionary) -> Dictionary:
+	var e: Dictionary = view.get("energy", {})
+	var m: Dictionary = view.get("meals", {})
+	var r: Dictionary = view.get("rest", {})
+	var out := {
+		"max": int(e.get("max", 200)), "level": "",
+		"uses": [
+			{"name": "Meals", "have": int(m.get("used", 0)), "need": int(m.get("cap", 200)), "icon": "dish_veggie_plate"},
+			{"name": "Rest", "have": int(r.get("used", 0)), "need": int(r.get("limit", 1)), "icon": "rest"},
+		],
+		"blessing": {},
+	}
+	var b = view.get("blessing", null)
+	if b is Dictionary:
+		var days := ceili(float(b.get("left", 0)) / 86400000.0)
+		out.blessing = {"title": "Newcomer Blessing · %d day%s left" % [days, "" if days == 1 else "s"],
+			"detail": "Energy returns %s× faster · Meals %d a day" % [str(snappedf(float(b.get("regen_mult", 1.5)), 0.1)), int(m.get("cap", 300))]}
+	return out
+
+## Level progress of a skill track, 0..1 (the HUD avatar ring).
+static func skill_progress(s: Dictionary) -> float:
+	if s.is_empty() or s.get("next", null) == null: return 1.0
+	return clampf(float(int(s.xp) - int(s.floor)) / maxf(1.0, float(int(s.next) - int(s.floor))), 0.0, 1.0)
+
+## HUD data for UiHud.apply (SGODOT-222, LOCK-06). ctx: next_cost (Energy the next action needs),
+## place (UiHud place dictionary), unread (overrides the Inbox count). The bell reads view.inbox.badge (SGODOT-232:
+## parcels + unread records; queued rewards stay off it) until the stage 4 Inbox owns it.
+static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
+	var e: Dictionary = view.get("energy", {})
+	var have := int(e.get("value", 0))
+	var mx := int(e.get("max", 200))
+	var nx = e.get("next_in", null)
+	var regen := "Full"
+	if have > mx: regen = "Bonus +%d" % (have - mx)
+	elif nx != null: regen = "+1 in " + duration(float(nx))
+	var sk: Dictionary = view.get("skills", {})
+	var lines := today_lines(view)
+	var out := {
+		"energy": have, "energy_max": mx, "regen": regen, "next_cost": int(ctx.get("next_cost", 0)),
+		"skills": {"farming": skill_progress(sk.get("farming", {})), "fishing": skill_progress(sk.get("fishing", {}))},
+		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", view.get("inbox", {}).get("badge", 0))), "buff": {},
+		"today": str(lines[0]) if not lines.is_empty() else "",
+	}
+	if ctx.has("place"): out["place"] = ctx.place
+	return out
+
+## Location chip data from a scene's "City · Space" text (P0 is always the home city).
+static func place_info(text: String, space_override := "") -> Dictionary:
+	var parts := text.split(" · ", false, 1)
+	var space := parts[1] if parts.size() > 1 else ""
+	if space_override != "": space = space_override
+	return {"city": parts[0] if parts.size() > 0 else "", "space": space, "kind": UiHud.PlaceKind.HOME, "day_pass": ""}
+
+## Where a material comes from, for the NeedSource line under a tapped NEED-TILE (LOCK-10): one line, and a
+## camera-only Show target ("" hides Show). Never a jump (LOCK-08).
+static func need_source(view: Dictionary, id: String) -> Dictionary:
+	var label := item_name(view, id)
+	if id.begins_with("seed_"): return {"text": "%s · Homestead Stall" % label, "go": "stall"}
+	if id.begins_with("crop_"): return {"text": "%s · Grow it on your plots" % label, "go": "plots"}
+	if id.begins_with("fish_"): return {"text": "%s · Ponds on the map" % label, "go": ""}
+	if id.begins_with("dish_"): return {"text": "%s · Cook it at the stove" % label, "go": "stove"}
+	return {"text": label, "go": ""}
 
 ## Locally advance a view by elapsed ms (energy ticks and crop timers) between server refreshes.
 static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
@@ -442,41 +544,47 @@ static func next_line(view: Dictionary, skill: String, level: int) -> String:
 ## Today panel (§14.5): up to 3 lines — doable now first, then the shortest countdown, then the skill
 ## closest to its next level. Facts only; never "spend your Energy".
 static func today_lines(view: Dictionary) -> Array:
-	var now_lines: Array = []
-	var timed: Array = []    # [ms, text]
+	return today_rows(view).map(func(r): return r.line)
+
+## Today rows (§14.5, LOCK-06 TodayRow): {line, icon, go, state, tail}. Now-lines first, then countdowns, then
+## the nearest skill level; at most 3. `go` is a camera-only Show target ("" hides Show, LOCK-08).
+static func today_rows(view: Dictionary) -> Array:
+	var now_rows: Array = []
+	var timed: Array = []    # [ms, row]
 	var farmed := (view.get("firsts", []) as Array).any(func(f): return str(f).begins_with("harvest:")) \
 		or (view.get("plots", []) as Array).any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"])
-	if not farmed: now_lines.append("Sow your first plot")
+	if not farmed: now_rows.append(_first_sow_row(view))
 	for r in view.get("stall", {}).get("board", {}).get("requests", []):
 		if str(r.get("status", "")) == "open":
-			now_lines.append("%s · %d %s · Stall Board" % [str(r.title), int(r.qty), item_name(view, str(r.item))])
+			now_rows.append(_row("%s · %d %s · Stall Board" % [str(r.title), int(r.qty), item_name(view, str(r.item))], "board", "stall"))
 			continue
 		if str(r.get("status", "")) != "accepted": continue
-		if int(r.have) >= int(r.qty): now_lines.append("%s · Deliver at the Stall" % str(r.title))
-		else: now_lines.append("%s · %s %d/%d" % [str(r.title), item_name(view, str(r.item)), int(r.have), int(r.qty)])
+		if int(r.have) >= int(r.qty): now_rows.append(_row("%s · Deliver at the Stall" % str(r.title), "board", "stall"))
+		else: now_rows.append(_row("%s · %s %d/%d" % [str(r.title), item_name(view, str(r.item)), int(r.have), int(r.qty)], str(r.item), ""))
 	var ready := {}
 	var sown := 0
 	for p in view.get("plots", []):
 		var st := str(p.get("state", ""))
 		if st == "ready": ready[str(p.crop)] = int(ready.get(str(p.crop), 0)) + 1
 		elif st == "sown": sown += 1
-		elif st == "growing": timed.append([float(p.get("ready_in", 0)), "%s ready in %s" % [plural(item_name(view, str(p.crop))), duration(float(p.get("ready_in", 0)))]])
-	for c in ready: now_lines.append("Harvest %d %s" % [int(ready[c]), plural(item_name(view, str(c))) if int(ready[c]) > 1 else item_name(view, str(c))])
-	if sown > 0: now_lines.append("Water %d sown plot%s · Free" % [sown, "" if sown == 1 else "s"])
+		elif st == "growing": timed.append([float(p.get("ready_in", 0)), _row("%s ready in %s" % [plural(item_name(view, str(p.crop))), duration(float(p.get("ready_in", 0)))], str(p.crop), "plots")])
+	for c in ready: now_rows.append(_row("Harvest %d %s" % [int(ready[c]), plural(item_name(view, str(c))) if int(ready[c]) > 1 else item_name(view, str(c))], str(c), "plots"))
+	if sown > 0: now_rows.append(_row("Water %d sown plot%s · Free" % [sown, "" if sown == 1 else "s"], "water", "plots"))
 	var stove = view.get("cooking", {}).get("stove", null)
 	if stove is Dictionary:
 		var dish := item_name(view, str(stove.dish)) if stove.get("dish", null) != null else "Your dish"
-		if float(stove.get("ready_in", 0)) <= 0.0: now_lines.append("%s ready at the stove" % dish)
-		else: timed.append([float(stove.ready_in), "%s · %s left at the stove" % [dish, duration(float(stove.ready_in))]])
+		var dish_icon := str(stove.dish) if stove.get("dish", null) != null else "pot"
+		if float(stove.get("ready_in", 0)) <= 0.0: now_rows.append(_row("%s ready at the stove" % dish, dish_icon, "stove"))
+		else: timed.append([float(stove.ready_in), _row("%s · %s left at the stove" % [dish, duration(float(stove.ready_in))], dish_icon, "stove")])
 	else:
 		var fish := 0
 		for st in view.get("bag", {}).get("slots", []):
 			if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
-		if fish > 0: now_lines.append("%d fish · the stove is free" % fish)
+		if fish > 0: now_rows.append(_row("%d fish · the stove is free" % fish, "pot", "stove"))
 	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
-	var lines: Array = now_lines.duplicate()
+	var rows: Array = now_rows.duplicate()
 	for t in timed:
-		if lines.size() < 3 and not lines.has(t[1]): lines.append(t[1])
+		if rows.size() < 3 and not rows.any(func(r): return r.line == t[1].line): rows.append(t[1])
 	var best := ""
 	var best_gap := 1 << 30
 	for key in ["farming", "fishing", "cooking"]:
@@ -486,9 +594,22 @@ static func today_lines(view: Dictionary) -> Array:
 		if gap < best_gap:
 			best_gap = gap
 			best = "%s Lv%d in %d XP" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]
-	if lines.size() < 3 and best != "": lines.append(best)
-	if lines.is_empty(): lines.append("Sow your first plot")
-	return lines.slice(0, 3)
+	if rows.size() < 3 and best != "": rows.append(_row(best, "xp", ""))
+	if rows.is_empty(): rows.append(_first_sow_row(view))
+	return rows.slice(0, 3)
+
+static func _row(line: String, icon_id: String, go: String) -> Dictionary:
+	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": ""}
+
+## "Sow your first plot", short of Energy when sowing a radish costs more than the player has (TodayRow Short).
+static func _first_sow_row(view: Dictionary) -> Dictionary:
+	var r := _row("Sow your first plot", "seed_radish", "plots")
+	var e: Dictionary = view.get("energy", {})
+	var cost := int(crop_for_seed(view, "seed_radish").get("energy", 2))
+	if int(e.get("value", 0)) < cost:
+		r.state = "short"
+		r.tail = "needs %d Energy" % cost + ("" if e.get("next_in", null) == null else " · +1 in %s" % duration(float(e.next_in)))
+	return r
 
 ## Resident dialogue bar data (LOCK-18, SGODOT-225 UiResidentBar) from view.residents facts + the content table:
 ## {id, portrait, name, role, stage, have, need, next, line, gift_reason, request_label, request_reason, request_cmd,

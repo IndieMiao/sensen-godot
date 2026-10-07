@@ -54,6 +54,8 @@ func _init() -> void:
 	ui.zoom.connect(func(f: float): _call("p0_zoom", [f]))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
 	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
+	ui.show_on_map.connect(func(target: String): _leave_then("show:" + target))   # the map points at the pin (p0_map resume)
+	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
 	ui.home_choice.connect(func(choice: String): _call("p0_home", [choice]))
 	ui.place_pressed.connect(leave_world)
 	ui.home_requested.connect(func(): _leave_then("farm"))
@@ -193,14 +195,25 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"level":
 				var lv: Dictionary = ev
 				ui.queue_card(func(): ui.show_level_up(lv))
+			"affinity":   # SGODOT-225 / 228: first chat of the day, gifts, requests
+				if int(ev.get("delta", 0)) != 0:
+					ui.float_text(("♥ %+d" % int(ev.delta)).replace("-", "−"), at + Vector2(0, dy), UiTokens.COLOR_FLOAT_AFFINITY)
+				var reply := P0Logic.resident_reply(str(ev.get("resident", "")), str(ev.get("verdict", "")))
+				if reply != "": ui.toast(reply)
+			"gift_meal":
+				var who := str(P0Logic.content().get("residents", {}).get(str(ev.get("resident", "")), {}).get("name", ""))
+				# SGODOT-232: with the bag full the meal waits in the Inbox (to: parcel), gone at 04:00 like any gift meal.
+				if str(ev.get("to", "")) == "parcel": ui.toast("Bag full · %s's meal sent to Inbox" % who)
+				elif bool(ev.get("given", false)): ui.toast("%s gave you %s · in your bag" % [who, P0Logic.item_name(v, str(ev.get("dish", "")))])
 		dy -= 16.0
 	if ui.modal_kind == "stall" and events.size() > 0:
 		ui.set_view(session.current())
 		ui.open_stall()   # refresh after Buy / Sell / Deliver; floats say what changed
+	elif ui.modal_kind == "resident" and events.size() > 0:
+		ui.set_view(session.current())
+		ui.open_resident(ui._resident)   # affinity, gift and request states follow the reply
 	elif ui.modal_kind == "tackle" and events.size() > 0:
 		ui.open_tackle("Strung and ready — it's on your belt. Swap rods in Bag › Gear.")
-	elif ui.modal_kind == "gear" and events.size() == 0:
-		ui.open_gear()
 
 ## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
 ## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
@@ -304,6 +317,13 @@ func _dev_shot(dt: float) -> void:
 			"release": ui.fab_held = false
 			"stall": ui.open_stall(step[1] if step.size() > 1 else "")
 			"bag": ui.open_bag(step[1] if step.size() > 1 else "")
+			"bagcat":   # bag drawer on one category tab, e.g. bagcat:Materials (SGODOT-225 storage stacks)
+				if ui._bag != null and is_instance_valid(ui._bag):
+					var i := P0BagDrawer.CATEGORIES.find(step[1])
+					if i >= 0: (ui._bag._chips.get_child(i) as Button).button_pressed = true
+			"bagpick":  # tap the first listed item of the open bag drawer
+				if ui._bag != null and is_instance_valid(ui._bag) and not ui._bag.grid.shown_items().is_empty():
+					ui._bag.grid.select(str(ui._bag.grid.shown_items().back().id))
 			"energy": ui.open_energy_card(3, "Sow ×1")
 			"close": ui.close_modal()
 			"auto":
@@ -315,7 +335,10 @@ func _dev_shot(dt: float) -> void:
 			"tackle": ui.open_tackle()
 			"gear": ui.open_gear()
 			"skills": ui.open_skills()
+			"profile": ui.open_profile()
 			"today": ui.open_today()
+			"energypanel": ui.open_energy_panel()
+			"inbox": ui.open_inbox()
 			"radial": ui.open_radial()
 			"kitchen": ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
 			"put":
