@@ -9,6 +9,8 @@ export type P0Event =
   | { kind: 'xp'; skill: Skill; amount: number; percent: number; capped?: true }   // capped: the day's anti-script limit cut it (§4.3.4)
   | { kind: 'item'; id: string; delta: number }
   | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
+  // Warming Cabinet (§7.7): delta portions in (+) or out (−); to_bag = portions that went to the bag instead (cabinet full) or out to it (Take one).
+  | { kind: 'cabinet'; id: string; delta: number; to_bag: number; have: number; cap: number }
   | { kind: 'coins'; delta: number }
   | { kind: 'first'; what: string; xp: number }
   | { kind: 'level'; skill: Skill; level: number; energy: number; gifts: [string, number][] }
