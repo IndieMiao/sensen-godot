@@ -339,7 +339,9 @@ func _tags(v: Dictionary) -> void:
 	if st != null: home = "Home · Dish ready" if float(st.get("ready_in", 0)) <= 0.0 else "Home · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))
 	rt.ui.tag("home", home, cam.unproject_position(_house + Vector3(0, 2.6, 0.4)), actor.position.distance_to(_house) < 4.2 or st != null, st != null)
 	var h: Dictionary = v.get("homestead", {})
-	rt.ui.tag("homestead", "Homestead Lv%d" % int(h.get("level", 1)), cam.unproject_position(_sign + SIGN_BADGE), true, bool(h.get("can_upgrade", false)))
+	var nxt = h.get("next", null)   # lit when the next level is ready to take
+	rt.ui.tag("homestead", "Homestead Lv%d" % int(h.get("level", 1)), cam.unproject_position(_sign + SIGN_BADGE), true,
+		nxt is Dictionary and bool(nxt.get("can_upgrade", false)))
 	rt.ui.lift_tag("homestead", "stall")
 
 func _teaching(v: Dictionary) -> void:

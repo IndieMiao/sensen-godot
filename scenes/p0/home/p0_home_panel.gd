@@ -12,8 +12,12 @@ static func open(ui: P0Ui, at_home := true) -> void:
 	var model := P0Logic.home_panel(ui.view, at_home)
 	var panel := PanelContainer.new()
 	panel.theme = UiKit.theme()
-	panel.set_anchors_preset(Control.PRESET_FULL_RECT)
-	panel.offset_top = SHEET_TOP
+	if bool(model.max):   # nothing to list: a short sheet that hugs the title, the button and Close
+		panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+		panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	else:
+		panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+		panel.offset_top = SHEET_TOP
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	var sheet := UiStyleBox.make(UiTokens.COLOR_SURFACE, 18)
 	sheet.corner_radius = Vector4(18, 18, 0, 0)
@@ -21,14 +25,17 @@ static func open(ui: P0Ui, at_home := true) -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 6)
 	panel.add_child(col)
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	col.add_child(scroll)
 	var body := VBoxContainer.new()
 	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override(&"separation", 8)
-	scroll.add_child(body)
+	if bool(model.max):
+		col.add_child(body)
+	else:
+		var scroll := ScrollContainer.new()
+		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		col.add_child(scroll)
+		scroll.add_child(body)
 	body.add_child(UiKit.label(str(model.title), UiTokens.STYLE_C14_XB))
 	if str(model.look) != "":
 		body.add_child(UiKit.label(str(model.look), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY))

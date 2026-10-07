@@ -102,6 +102,9 @@ func test_home_1_at_max_level_has_no_tiles_and_says_so() -> void:
 	HomePanel.open(ui)
 	assert_array(ui.find_children("*", "UiNeedTile", true, false)).is_empty()
 	assert_str((ui.find_children("*", "UiCommandButton", true, false)[0] as UiCommandButton).reason).is_equal("Highest level for now")
+	await get_tree().process_frame
+	var sheet: Control = ui.find_children("*", "PanelContainer", true, false).filter(func(p): return (p as Control).theme != null)[0]
+	assert_float(sheet.size.y).is_less(300.0)   # a short sheet, not the 606-high upgrade sheet
 
 func test_home_2_banner_sits_under_the_hud_and_a_tap_skips_it() -> void:
 	var ui := _ui(_view())
