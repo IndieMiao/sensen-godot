@@ -73,6 +73,7 @@ export interface P0Content {
   wallet_floor: number;                       // §8.1.1 / q(32): every coin spend except seeds keeps this much
   homestead: {
     max_level: number;
+    warming_cabinet: number;                  // portions once unlocked (Lv3; 12 from Lv8 is P1, §7.7)
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
     levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];

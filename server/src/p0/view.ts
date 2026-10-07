@@ -11,6 +11,7 @@ import { expireGiftMeals, progressOf, requestState, residentState, stageIndex } 
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest } from './state.js';
 import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
+import { cabinetCap, cabinetCount, rackOn, rackStock } from './kitchen_storage.js';
 import { haveTotal, stored } from './storage.js';
 import { restReadyIn } from './presence.js';
 
@@ -89,6 +90,11 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
         heats: s.stove.heats,
       } : null,
       first_fire: s.fires === 0,
+      // Spice Rack (Homestead Lv2, q(46)): stored seasonings the stove reaches; Experiment shows them with a Rack badge.
+      rack: { on: rackOn(c, s), items: [...rackStock(c, s)].map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
+      // Warming Cabinet (Homestead Lv3, §7.7): null until unlocked; energy = what one portion restores today.
+      cabinet: cabinetCap(c, s) > 0 ? { cap: cabinetCap(c, s), have: cabinetCount(s),
+        items: s.cabinet.map(b => ({ id: b.id, name: itemName(c, b.id), qty: b.qty, energy: mealValue(c, s, b.id) })) } : null,
       cookbook: c.cooking.recipes.map(r => {
         const known = s.cookbook.includes(r.id);
         const rarity = recipeRarity(c, r);

@@ -8,6 +8,8 @@ export type P0Event =
   | { kind: 'energy'; delta: number; reason: string }
   | { kind: 'xp'; skill: Skill; amount: number; percent: number }
   | { kind: 'item'; id: string; delta: number }
+  // Warming Cabinet (§7.7): delta portions in (+) or out (−); to_bag = portions that went to the bag instead (cabinet full) or out to it (Take one).
+  | { kind: 'cabinet'; id: string; delta: number; to_bag: number; have: number; cap: number }
   | { kind: 'coins'; delta: number }
   | { kind: 'first'; what: string; xp: number }
   | { kind: 'level'; skill: Skill; level: number; energy: number; gifts: [string, number][] }

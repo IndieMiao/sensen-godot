@@ -89,6 +89,7 @@ export interface P0State {
   fishing: { casts: number; bites: number; caught: Record<string, number>; seen: string[] };
   cast: Cast | null;
   stove: Pot | null;
+  cabinet: { id: string; qty: number }[];   // Warming Cabinet portions (Homestead Lv3, §7.7); stacks by dish id
   cookbook: string[];            // known recipe pages
   requests: Request[];
   gear: { rods: string[]; rod: string; hoes: string[]; hoe: string };   // Tools & Gear: owned and equipped rod / hoe (no bag slots)
@@ -120,7 +121,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     firsts: [], rewards: [],
     day: emptyDay(),
     fishing: { casts: 0, bites: 0, caught: {}, seen: [] },
-    cast: null, stove: null,
+    cast: null, stove: null, cabinet: [],
     cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id),
     requests: [{ ...c.requests.tutorial, status: 'open' }],
     gear: { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming },
@@ -171,6 +172,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     };
   }
   s.req_done ??= [];
+  s.cabinet ??= [];
   s.presence ??= { left_at: null, last_at: 0, space: null };
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
   s.v = 3;

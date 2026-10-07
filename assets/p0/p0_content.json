@@ -1015,6 +1015,7 @@
   "wallet_floor": 40,
   "homestead": {
     "max_level": 3,
+    "warming_cabinet": 6,
     "per_level": {
       "energy": 10,
       "meals": 10
