@@ -1,0 +1,14 @@
+{
+  "before": {
+    "back_tool_bench.glb": "090105921f1727c359d0fdd4d3b15d20ce38ed9a81316968bc7f42bb3e2a2466",
+    "bench_vise.glb": "53ca83afc2295272ed499f45b7cd36643518f01404799c3cf807acfc4e4a5867",
+    "room_albedo_ao.png": "bbcf3f147ec30df8fbd8f4e47ea732479fdc9f5642c9cae47ab2e06cbb06f701"
+  },
+  "after": {
+    "back_tool_bench.glb": "090105921f1727c359d0fdd4d3b15d20ce38ed9a81316968bc7f42bb3e2a2466",
+    "bench_vise.glb": "53ca83afc2295272ed499f45b7cd36643518f01404799c3cf807acfc4e4a5867",
+    "room_albedo_ao.png": "bbcf3f147ec30df8fbd8f4e47ea732479fdc9f5642c9cae47ab2e06cbb06f701"
+  },
+  "byte_identical": true,
+  "note": "工作台未改动；back_tool_bench.glb、bench_vise.glb、原房间图集字节一致。仅重组去掉旧烟的运行时合批，不重烘。"
+}

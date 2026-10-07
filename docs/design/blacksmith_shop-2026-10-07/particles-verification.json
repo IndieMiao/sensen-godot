@@ -1,0 +1,110 @@
+{
+  "revision": "R2.2",
+  "effects": {
+    "flames": 16,
+    "sparks": 4,
+    "smoke": 12,
+    "total_particles": 32,
+    "particle_surfaces": 3,
+    "fixed_fps": 30,
+    "collision": false,
+    "shadows": false,
+    "textures": {
+      "flame_strip.png": [
+        1024,
+        256
+      ],
+      "smoke_strip.png": [
+        1024,
+        256
+      ],
+      "spark.png": [
+        64,
+        64
+      ]
+    }
+  },
+  "clips": [
+    {
+      "draw_calls": 23.0,
+      "light_energy_max": 3.34449052810669,
+      "light_energy_min": 2.87407398223877,
+      "clip": "whole-motion.mp4",
+      "frames": 127,
+      "duration_seconds": 8,
+      "accelerated": false,
+      "renderer": "Godot Mobile/Vulkan",
+      "capture": "Wall-clock viewport samples at up to 20 Hz, resampled to 30fps; not a GPU timing benchmark."
+    },
+    {
+      "draw_calls": 14.0,
+      "light_energy_max": 3.29288482666016,
+      "light_energy_min": 2.91224980354309,
+      "clip": "fire-motion.mp4",
+      "frames": 128,
+      "duration_seconds": 8,
+      "accelerated": false,
+      "renderer": "Godot Mobile/Vulkan",
+      "capture": "Wall-clock viewport samples at up to 20 Hz, resampled to 30fps; not a GPU timing benchmark."
+    },
+    {
+      "draw_calls": 5.0,
+      "light_energy_max": 3.32152390480042,
+      "light_energy_min": 2.85918593406677,
+      "clip": "smoke-motion.mp4",
+      "frames": 131,
+      "duration_seconds": 8,
+      "accelerated": false,
+      "renderer": "Godot Mobile/Vulkan",
+      "capture": "Wall-clock viewport samples at up to 20 Hz, resampled to 30fps; not a GPU timing benchmark."
+    }
+  ],
+  "video_verification": [
+    {
+      "file": "whole-motion.mp4",
+      "sha256": "1d95d9acb1d97ab4b8b4c77bd6f34d0d70891715e1986603724b1b5182300cc8",
+      "sampled_black_frames": 0,
+      "max_pixel_delta": 0.8385228587962963
+    },
+    {
+      "file": "fire-motion.mp4",
+      "sha256": "256b2a3a75b9a9608ba926de30c5aecfb53f04833c8632e15b5da90c317e1980",
+      "sampled_black_frames": 0,
+      "max_pixel_delta": 2.706525607638889
+    },
+    {
+      "file": "smoke-motion.mp4",
+      "sha256": "be59973f1178c9e88b3c8ba41194703ee641e6ad35e8b60c508cc21449d6c15f",
+      "sampled_black_frames": 0,
+      "max_pixel_delta": 1.0211234085648149
+    }
+  ],
+  "whole_scene_draw_calls_R21": 21,
+  "whole_scene_draw_calls_R22": 23.0,
+  "static_surfaces": 18,
+  "particle_surfaces": 3,
+  "standalone_validation": {
+    "checks": [
+      "Borrow existing light without replacing owner/name",
+      "Three independent GPU emitters",
+      "Default hearth is 16 flames + 4 sparks, <=20",
+      "30Hz and full-lifetime warmup: Flames",
+      "No collision or shadow: Flames",
+      "Explicit AABB: Flames",
+      "30Hz and full-lifetime warmup: Sparks",
+      "No collision or shadow: Sparks",
+      "Explicit AABB: Sparks",
+      "30Hz and full-lifetime warmup: Smoke",
+      "No collision or shadow: Smoke",
+      "Explicit AABB: Smoke",
+      "Bounded animated light, no extra writer"
+    ],
+    "count": 13,
+    "light_max": 3.34452295303345,
+    "light_min": 2.96054315567017,
+    "passed": true,
+    "renderer": "mobile",
+    "self_contained": true
+  },
+  "limits": "Desktop Mobile/Vulkan only. Particle videos are real-time viewport capture, not hardware GPU performance data. 236 is gated on art-director approval; Basic Room has not changed."
+}

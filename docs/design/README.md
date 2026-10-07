@@ -4,7 +4,7 @@
 
 ## 当前 UI 与 P0 美术
 
-- [刘备 · 酒馆/铁匠铺 R2.1 收尾](tavern-forge-r2-2026-10-07/README.md)：177/178 Review，177 暖光/亮度/植物位置、178 烟团/冷墙/橙红炭火，63 项角色检查和每场景交付证据。
+- [刘备 · 酒馆 R2.1 / 铁匠铺 R2.2](tavern-forge-r2-2026-10-07/README.md)：177/178 Review，177 暖光/亮度/植物位置、178 共享粒子烟火、动态录像，63 项角色检查；Basic Room 236 等粒子复审后开工。
 - [刘备 · 场景返修统一复审（2026-10-07）](shop-series-2026-10-07/README.md)：179/181/184 Done；180/182/183 R2.1、185/186 R2 Review；252 项最新角色检查、地台对齐、预算/取色/交付回读。
 - [Art environment setup](art-environment-setup.md): start here on a fresh host; toolchain, Git access, Figma MCP, Windows/remote OAuth callbacks, Lark CLI application/user authorization and readiness checks.
 - [Mobile 3D asset workflow](mobile-3d-asset-workflow.md): English production guide for agents, based on the accepted Basic Room; reference analysis, reusable modeling, atlases, mobile budgets, Godot/Android checks and verified delivery.

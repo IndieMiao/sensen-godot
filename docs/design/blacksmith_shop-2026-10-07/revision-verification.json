@@ -1,10 +1,10 @@
 {
-  "revision": "r21",
+  "revision": "r22",
   "reference_sha256": "c9a36a357cc71217b4771613b44d4db121132f1ac8b26f8db130190840aad8ab",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "draw_calls": 17.0,
-    "instances": 54,
+    "draw_calls": 19.0,
+    "instances": 52,
     "renderer": "mobile",
     "resolution": [
       1400,
@@ -12,63 +12,63 @@
     ],
     "scope": "offline art render; no mobile/gameplay/performance acceptance",
     "slug": "blacksmith_shop",
-    "static_surfaces": 19,
+    "static_surfaces": 18,
     "views": [
       {
-        "draw_calls": 21.0,
-        "rendered_objects": 21.0,
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
         "view": "godot-whole"
       },
       {
-        "draw_calls": 21.0,
-        "rendered_objects": 21.0,
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
         "view": "model-front"
       },
       {
-        "draw_calls": 21.0,
-        "rendered_objects": 21.0,
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
         "view": "model-side"
       },
       {
-        "draw_calls": 21.0,
-        "rendered_objects": 21.0,
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
         "view": "model-top"
-      },
-      {
-        "draw_calls": 15.0,
-        "rendered_objects": 15.0,
-        "view": "godot-detail"
-      },
-      {
-        "draw_calls": 15.0,
-        "rendered_objects": 15.0,
-        "view": "godot-detail-plants"
-      },
-      {
-        "draw_calls": 14.0,
-        "rendered_objects": 14.0,
-        "view": "forge-fire-detail"
-      },
-      {
-        "draw_calls": 4.0,
-        "rendered_objects": 4.0,
-        "view": "smoke-detail"
       },
       {
         "draw_calls": 17.0,
         "rendered_objects": 17.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 16.0,
+        "rendered_objects": 16.0,
+        "view": "godot-detail-plants"
+      },
+      {
+        "draw_calls": 16.0,
+        "rendered_objects": 16.0,
+        "view": "forge-fire-detail"
+      },
+      {
+        "draw_calls": 5.0,
+        "rendered_objects": 5.0,
+        "view": "smoke-detail"
+      },
+      {
+        "draw_calls": 19.0,
+        "rendered_objects": 19.0,
         "view": "tools-bench-detail"
       }
     ]
   },
   "budget": {
     "after": {
-      "room_triangles": 95578,
+      "room_triangles": 83154,
       "shared_plant_triangles": 4096,
       "room_botanical_triangles": 0,
       "plant_triangles": 4096,
-      "total_triangles": 99674,
-      "static_surfaces": 19
+      "total_triangles": 87250,
+      "static_surfaces": 18
     },
     "limits": {
       "total_triangles": 200000,
@@ -106,7 +106,6 @@
         "sources": [
           "back_wall",
           "forge_hood",
-          "smoke",
           "forge_sign",
           "hammer_wall",
           "tongs_wall",
@@ -128,7 +127,7 @@
           "wall_tong_4",
           "wall_tong_5"
         ],
-        "triangles": 25514,
+        "triangles": 15218,
         "cast_shadow": true
       },
       {
@@ -173,7 +172,6 @@
       "assets/rooms/blacksmith_shop/coal_bucket.glb",
       "assets/rooms/blacksmith_shop/coal_shovel.glb",
       "assets/rooms/blacksmith_shop/display_swords.glb",
-      "assets/rooms/blacksmith_shop/fire.glb",
       "assets/rooms/blacksmith_shop/forge_coals.glb",
       "assets/rooms/blacksmith_shop/forge_hood.glb",
       "assets/rooms/blacksmith_shop/forge_lantern.glb",
@@ -199,7 +197,6 @@
       "assets/rooms/blacksmith_shop/room_shell.glb",
       "assets/rooms/blacksmith_shop/shelf_green_cloth.glb",
       "assets/rooms/blacksmith_shop/shelf_toolbox.glb",
-      "assets/rooms/blacksmith_shop/smoke.glb",
       "assets/rooms/blacksmith_shop/stump.glb",
       "assets/rooms/blacksmith_shop/tong_variant_0.glb",
       "assets/rooms/blacksmith_shop/tong_variant_1.glb",

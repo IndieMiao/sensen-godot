@@ -112,28 +112,6 @@
       "colliders": []
     },
     {
-      "name": "smoke",
-      "file": "smoke.glb",
-      "position": [
-        -1.55,
-        4.32,
-        -2.29
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "fire",
-      "file": "fire.glb",
-      "position": [
-        -1.55,
-        1.17,
-        -1.65
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
       "name": "forge_coals",
       "file": "forge_coals.glb",
       "position": [
@@ -769,7 +747,7 @@
     ],
     "points": []
   },
-  "revision": "R2.1",
+  "revision": "R2.2",
   "shared_plants": [
     {
       "name": "LeftPothos",
@@ -815,12 +793,6 @@
     }
   ],
   "material_overrides": {
-    "fire": {
-      "emission": "FF841F",
-      "emission_use_atlas": true,
-      "emission_energy": 0.22,
-      "unshaded": true
-    },
     "forge_coals": {
       "emission": "FF6225",
       "emission_use_atlas": true,
@@ -911,15 +883,15 @@
       "name": "smoke-detail",
       "position": [
         4.4,
-        6.7,
+        6.9,
         6.0
       ],
       "target": [
         -1.15,
-        4.9,
+        5.12,
         -2.29
       ],
-      "size": 2.8
+      "size": 3.5
     },
     {
       "name": "tools-bench-detail",
@@ -1343,7 +1315,6 @@
       "sources": [
         "back_wall",
         "forge_hood",
-        "smoke",
         "forge_sign",
         "hammer_wall",
         "tongs_wall",
@@ -1365,7 +1336,7 @@
         "wall_tong_4",
         "wall_tong_5"
       ],
-      "triangles": 25514,
+      "triangles": 15218,
       "cast_shadow": true
     },
     {
@@ -1387,6 +1358,51 @@
       ],
       "triangles": 2048,
       "cast_shadow": false
+    }
+  ],
+  "effects": [
+    {
+      "name": "ForgeFireFX",
+      "scene": "res://assets/rooms/_shared/fx/fx_hearth_fire.tscn",
+      "position": [
+        -1.55,
+        1.2,
+        -1.78
+      ],
+      "parameters": {
+        "flame_count": 16,
+        "spark_count": 4,
+        "flame_height": 0.67,
+        "flame_lifetime": 0.72,
+        "emission_box": [
+          0.32,
+          0.012,
+          0.055
+        ],
+        "light_energy": 3.1,
+        "flicker_strength": 0.08,
+        "light_path": "../LocalLight_forge_fire"
+      }
+    },
+    {
+      "name": "ChimneySmokeFX",
+      "scene": "res://assets/rooms/_shared/fx/fx_chimney_smoke.tscn",
+      "position": [
+        -1.55,
+        4.36,
+        -2.29
+      ],
+      "parameters": {
+        "smoke_count": 12,
+        "lifetime": 3.5,
+        "drift": [
+          0.19,
+          0.44,
+          -0.015
+        ],
+        "start_size": 0.3,
+        "end_size": 1.15
+      }
     }
   ]
 }

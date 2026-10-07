@@ -131,4 +131,7 @@ def revise():
     d['bench']={'floor_y':y,'route':[{'name':n,'position':[x,y,z],**({'capture':c} if c else {})} for n,x,z,c in [('entry',-.95,2.72,'door'),('left_front',-1.55,2.4,None),('left_bench',-1.48,.57,None),('forge_safe',-1.3,-.72,'main'),('water_side',-1.58,1.29,None),('front',-1.02,2.32,None),('bench_right',1.64,2.28,None),('stump_front',1.77,.28,None),('rear_bench',.45,-1.30,None)]],'blocked':[{'name':n,'from':[a[0],y,a[1]],'to':[b[0],y,b[1]],'target':target} for n,a,b,target in [('mainbench',(-1.55,1.25),(.15,1.25),'/anvil_workbench/'),('furnace',(-1.40,-.75),(-1.40,-2.2),'/brick_forge/'),('water',(-1.55,1.35),(-2.52,1.35),'/quench_barrel/'),('stump',(1.64,-.52),(2.39,-.52),'/stump/'),('smallbench',(1.50,-1.24),(1.5,-1.99),'/back_tool_bench/')]],'gaps':[{'name':'forge_to_mainbench','from':[-1.6,y,-.2],'to':[.7,y,-.2],'measure':[[-.8,.55,-1.48],[-.8,.55,.705]],'width':2.185,'minimum':.80}],'entrance':entry,'slide':{'from':[2.98,y,2.05],'direction':[1,0,-1],'tangent':[0,0,-1],'seconds':.4},'input_start':[-1.30,y,.10],'scale':{'door':{'applicable':False,'reason':'Open-front workshop; no human doorway asset.'},'counter':{'height':1.045,'source':'Main workbench serves as work counter'},'table':{'height':1.045,'source':'Main workbench .97+.075'},'chair':{'height':.66,'source':'Stool (.50+.06)*1.18'}}}
     t.finish(d,[(86,1114),(734,1455),(1394,1117)],(1489,1499),(6.8,6.4))
 
-    if '--geometry-only' not in sys.argv:thermal.export_fire()
+    if '--geometry-only' not in sys.argv:
+        thermal.export_fire()
+        import particles_r22
+        particles_r22.apply()
