@@ -295,7 +295,7 @@ func p0_tap(screen: Vector2) -> void:
 	elif cam.unproject_position(_mine + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		rt.ui.toast("The mine opens soon")
 
-## Facility marks (STATE-ICONS) always show; the finger card appears when you walk up (LOCK-07 / LOCK-17).
+## Facility marks (STATE-ICONS) show over the stall; finger cards appear when you walk up (LOCK-07 / LOCK-17).
 ## Tapping the card is tapping the facility, so it reuses p0_tap's own hit points.
 func _tags(v: Dictionary) -> void:
 	var stall_top := cam.unproject_position(_stall + Vector3(0, 1.05, 0))
@@ -306,12 +306,10 @@ func _tags(v: Dictionary) -> void:
 	rt.ui.badge("stall", maxi(request, 0), stall_top, request >= 0)
 	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
 		actor.position.distance_to(_stall) < 3.2, cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
-	var home_top := cam.unproject_position(_house + Vector3(0, 2.6, 0.4))
-	var st = v.get("cooking", {}).get("stove", null)
-	var left := float(st.get("ready_in", 0)) if st != null else 0.0
-	rt.ui.badge("home", UiStatusBadge.State.READY if left <= 0.0 else UiStatusBadge.State.COUNTDOWN, home_top, st != null,
-		"" if left <= 0.0 else P0Logic.duration(left))
-	rt.ui.tag("home", "Home · Kitchen · Rest", home_top - Vector2(0, rt.ui.badge_height("home")),
+	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
+	# and Today already names the dish and its time. The card's copy becomes "Farmhouse · Tap to go in" once the
+	# door card goes (bench SGODOT-224, room SGODOT-226).
+	rt.ui.tag("home", "Home · Kitchen · Rest", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
 		actor.position.distance_to(_house) < 4.2, cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
 
 func _teaching(v: Dictionary) -> void:
