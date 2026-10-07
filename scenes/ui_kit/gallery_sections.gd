@@ -462,9 +462,11 @@ static func _energy_cards() -> Control:
 
 static func _energy_panels() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
-	var facts := {max = 200, level = "", uses = [
-		{name = "Meals", have = 100, need = 300, icon = _tex("eat")},
+	var facts := {max = 200, level = "Homestead Lv1", uses = [
+		{name = "Meals", have = 100, need = 300, icon = _tex("dish_grilled_fish")},
+		{name = "Tea", have = 1, need = 3, icon = _tex("dish_fruit_tea")},
 		{name = "Rest", have = 0, need = 1, icon = _tex("rest")},
+		{name = "Refunds", have = 3, need = 10, icon = _tex("rod_starter")},
 	], blessing = {title = "Newcomer Blessing · 5 days left", detail = "Energy returns 1.5× faster · Meals 300 a day"}}
 	var p := UiEnergyCard.panel(facts)
 	var holder := MarginContainer.new()

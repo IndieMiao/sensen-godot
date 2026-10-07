@@ -166,7 +166,7 @@ func _build_panel(f: Dictionary) -> void:
 		var col := _column(_BLESS_GAP)
 		var head := HBoxContainer.new()
 		head.add_theme_constant_override(&"separation", int(UiTokens.SPACE_WITHIN))
-		head.add_child(_icon(ICON_STAR, _BLESS_ICON, UiTokens.COLOR_AMBER))
+		head.add_child(_icon(ICON_STAR, _BLESS_ICON, UiTokens.COLOR_TEXT))   # ink star, as the main draws it
 		head.add_child(UiKit.label(str(blessing.get("title", "")), UiTokens.STYLE_CAPTION_XB12))
 		col.add_child(head)
 		var detail := UiKit.label(str(blessing.get("detail", "")), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
