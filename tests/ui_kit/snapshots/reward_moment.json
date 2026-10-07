@@ -1,0 +1,873 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    1298
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiRewardMoment"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "RewardMoment 1179:82271 · COOK-4 / COOK-6 / COOK-P0-9"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        1228
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            70,
+            280,
+            335
+          ],
+          "children": [
+            {
+              "type": "UiRewardMoment",
+              "rect": [
+                0,
+                70,
+                280,
+                315
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    16,
+                    84,
+                    248,
+                    287
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        16,
+                        84,
+                        248,
+                        29
+                      ],
+                      "variation": "TitleXB20",
+                      "text": "New recipe!"
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        16,
+                        123,
+                        248,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            48,
+                            123,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                56,
+                                131,
+                                36,
+                                36
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            110,
+                            123,
+                            122,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                110,
+                                126,
+                                122,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Herb Grilled Fish"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                110,
+                                150,
+                                122,
+                                22
+                              ],
+                              "children": [
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    110,
+                                    156,
+                                    10,
+                                    10
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    126,
+                                    152,
+                                    24,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "Fine"
+                                },
+                                {
+                                  "type": "UiQualityBadge",
+                                  "rect": [
+                                    156,
+                                    150,
+                                    62,
+                                    22
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        164,
+                                        152,
+                                        46,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "★ Good"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        16,
+                        185,
+                        248,
+                        50
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            26,
+                            192,
+                            226,
+                            36
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                26,
+                                201,
+                                18,
+                                18
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                52,
+                                192,
+                                200,
+                                36
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "First cooked · +20 Cooking XP · Cookbook 2/48"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        16,
+                        245,
+                        248,
+                        126
+                      ],
+                      "children": [
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            16,
+                            245,
+                            248,
+                            48
+                          ],
+                          "variation": "CmdPrimary",
+                          "text": "Eat · +45 Energy"
+                        },
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            16,
+                            299,
+                            248,
+                            48
+                          ],
+                          "variation": "CmdSecondary",
+                          "text": "Keep"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            16,
+                            353,
+                            248,
+                            18
+                          ],
+                          "variation": "CaptionB12",
+                          "text": "Gift later from your bag"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                391,
+                280,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Reward · first cook (COOK-4)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            425,
+            280,
+            317
+          ],
+          "children": [
+            {
+              "type": "UiRewardMoment",
+              "rect": [
+                0,
+                425,
+                280,
+                297
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    16,
+                    439,
+                    248,
+                    269
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        16,
+                        439,
+                        248,
+                        29
+                      ],
+                      "variation": "TitleXB20",
+                      "text": "Dish ready"
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        16,
+                        478,
+                        248,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            48,
+                            478,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                56,
+                                486,
+                                36,
+                                36
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            110,
+                            478,
+                            122,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                110,
+                                481,
+                                122,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Herb Grilled Fish"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                110,
+                                505,
+                                122,
+                                22
+                              ],
+                              "children": [
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    110,
+                                    511,
+                                    10,
+                                    10
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    126,
+                                    507,
+                                    24,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "Fine"
+                                },
+                                {
+                                  "type": "UiQualityBadge",
+                                  "rect": [
+                                    156,
+                                    505,
+                                    62,
+                                    22
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        164,
+                                        507,
+                                        46,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "★ Good"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        16,
+                        540,
+                        248,
+                        32
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            26,
+                            547,
+                            226,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                26,
+                                547,
+                                18,
+                                18
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                52,
+                                547,
+                                200,
+                                18
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "Collected from Stove 1"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        16,
+                        582,
+                        248,
+                        126
+                      ],
+                      "children": [
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            16,
+                            582,
+                            248,
+                            48
+                          ],
+                          "variation": "CmdBlocked",
+                          "text": "Energy full"
+                        },
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            16,
+                            636,
+                            248,
+                            48
+                          ],
+                          "variation": "CmdSecondary",
+                          "text": "Keep"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            16,
+                            690,
+                            248,
+                            18
+                          ],
+                          "variation": "CaptionB12",
+                          "text": "Gift later from your bag"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                728,
+                280,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Reward · ready, Energy full (COOK-P0-9)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            762,
+            280,
+            335
+          ],
+          "children": [
+            {
+              "type": "UiRewardMoment",
+              "rect": [
+                0,
+                762,
+                280,
+                315
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    16,
+                    776,
+                    248,
+                    287
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        16,
+                        776,
+                        248,
+                        29
+                      ],
+                      "variation": "TitleXB20",
+                      "text": "Mystery Dish"
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        16,
+                        815,
+                        248,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            46,
+                            815,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                54,
+                                823,
+                                36,
+                                36
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            108,
+                            815,
+                            125,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                108,
+                                830,
+                                125,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Hmm… not a dish"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        16,
+                        877,
+                        248,
+                        50
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            26,
+                            884,
+                            226,
+                            36
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                26,
+                                893,
+                                18,
+                                18
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                52,
+                                884,
+                                200,
+                                36
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "A clue was added to your Cookbook"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        16,
+                        937,
+                        248,
+                        126
+                      ],
+                      "children": [
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            16,
+                            937,
+                            248,
+                            48
+                          ],
+                          "variation": "CmdPrimary",
+                          "text": "Eat · +5 Energy"
+                        },
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            16,
+                            991,
+                            248,
+                            48
+                          ],
+                          "variation": "CmdSecondary",
+                          "text": "Keep"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            16,
+                            1045,
+                            248,
+                            18
+                          ],
+                          "variation": "CaptionB12",
+                          "text": "Can't be sold or delivered"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                1083,
+                280,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Neutral · Mystery Dish (COOK-6)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            1117,
+            280,
+            181
+          ],
+          "children": [
+            {
+              "type": "UiRewardMoment",
+              "rect": [
+                0,
+                1117,
+                280,
+                161
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    16,
+                    1131,
+                    248,
+                    133
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        16,
+                        1131,
+                        248,
+                        29
+                      ],
+                      "variation": "TitleXB20",
+                      "text": "Home Cook"
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        16,
+                        1170,
+                        248,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            55,
+                            1170,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                63,
+                                1178,
+                                36,
+                                36
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            117,
+                            1170,
+                            108,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                117,
+                                1185,
+                                108,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Cookbook 8/48"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        16,
+                        1232,
+                        248,
+                        32
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            26,
+                            1239,
+                            226,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                26,
+                                1239,
+                                226,
+                                18
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "Title · +50 Energy"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                1284,
+                280,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Milestone · no buttons"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
