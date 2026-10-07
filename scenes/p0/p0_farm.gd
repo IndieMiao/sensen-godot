@@ -27,6 +27,7 @@ var _hi: MeshInstance3D
 var _house := Vector3.ZERO
 var _stall := Vector3.ZERO   # the Homestead Stall (unattended, p(6)); the seed box stands in until its model
 var _mine := Vector3.ZERO
+var _materials: P0FarmMaterials   # SGODOT-231: mine mouth (gathering spots and the workbench next)
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
@@ -64,7 +65,10 @@ func resume() -> void:
 	visible = true
 	set_process(true)
 	cam.make_current()
-	if rt: rt.attach(self)
+	if rt:
+		rt.attach(self)
+		rt.ui.set_mode("farm")   # back from the mine (SGODOT-231): seeds on the bar, the farm's chip
+		rt.ui.set_place(PLACE)
 
 func p0_surface() -> String: return "farm"
 
@@ -91,6 +95,8 @@ func _build_world() -> void:
 	mine.position = _mine
 	mine.rotation.y = PI * 0.15
 	props.add_child(mine)
+	_materials = P0FarmMaterials.new().setup(self, _mine)
+	add_child(_materials)
 	var scenery := GardenScenery.new()
 	add_child(scenery)
 	scenery.build(bp, STYLE)
@@ -212,7 +218,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_follow(dt)
 	_sync_plots(v, dt)
 	_pick_front(v)
-	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
+	rt.ui.set_action(_materials.action(v) if _materials.near_mouth() else P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
+	_materials.frame(v)
 	_hold_repeat()
 	_tags(v)
 	_teaching(v)
@@ -263,6 +270,7 @@ func _pick_front(v: Dictionary) -> void:
 
 # ---------------------------------------------------------------- actions
 func p0_action(cmd: Dictionary) -> void:
+	if _materials.act(cmd): return
 	var type := str(cmd.get("type", ""))
 	var target := int(cmd.get("plot", (cmd.get("plots", [-1]) as Array)[0] if cmd.has("plots") else -1))
 	if LABOUR_CLIP.has(type) and target >= 0:
@@ -295,8 +303,7 @@ func p0_tap(screen: Vector2) -> void:
 		rt.ui.open_stall()
 	elif cam.unproject_position(_house + Vector3(0, 1.0, 0.6)).distance_to(screen) < 80:
 		rt.ui.open_home_card()
-	elif cam.unproject_position(_mine + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
-		rt.ui.toast("The mine opens soon")
+	elif _materials.tap(screen): pass
 
 func _tags(v: Dictionary) -> void:
 	var near_stall := actor.position.distance_to(_stall) < 3.2

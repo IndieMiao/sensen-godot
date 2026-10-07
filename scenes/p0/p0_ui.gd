@@ -355,7 +355,7 @@ func set_surface(name: String) -> void:
 	if not is_node_ready():
 		_pending["surface"] = name
 		return
-	var action := name in ["farm", "pond"]
+	var action := name in ["farm", "pond", "mine"]   # SGODOT-231: the mine is an action space (Mining)
 	var world := name != "map"
 	for n in [_avatar, _ecard, _right, _today_chip, _place_chip]: n.visible = world
 	_right.visible = world and name != "busy"   # a busy world's own close button sits in that corner
@@ -378,13 +378,14 @@ func set_mode(mode: String, place := "") -> void:
 	_bar_ids = []
 	for c in _bar_box.get_children(): c.queue_free()
 	_bar_box.get_children().map(func(c): _bar_box.remove_child(c))
-	_fab_badge.texture = P0Logic.icon("rod" if mode == "fish" else "hoe")
-	_switch.icon = P0Logic.icon("rod" if mode == "fish" else "hoe")
+	var tool := "rod" if mode == "fish" else "pickaxe" if mode == "mine" else "hoe"
+	_fab_badge.texture = P0Logic.icon(tool)
+	_switch.icon = P0Logic.icon(tool)
 	_creel.visible = mode == "fish"
 	_refresh_bar()
 
 func _refresh_bar() -> void:
-	var ids := P0Logic.quick_bar(view, [] if _bar_ids.is_empty() else _bar_ids, bar_mode)
+	var ids := P0MaterialLogic.mine_candidates(view) if bar_mode == "mine" else P0Logic.quick_bar(view, [] if _bar_ids.is_empty() else _bar_ids, bar_mode)
 	if bar_mode == "fish":
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
 		var free := int(view.get("bag", {}).get("free", 0))
@@ -395,7 +396,8 @@ func _refresh_bar() -> void:
 		_creel.add_theme_stylebox_override("panel", _box(GOLD if full else CARD, 11, GOLD_D if full else EDGE, 1, Vector4(6, 3, 8, 3)))
 	else:
 		if selected_seed != "" and not ids.has(selected_seed): selected_seed = ""
-		if selected_seed == "" and not ids.is_empty():
+		# Seeds auto-pick the first slot; a torch is chosen on purpose, like bait (§13.3.8: the key stays Mine).
+		if selected_seed == "" and not ids.is_empty() and bar_mode != "mine":
 			selected_seed = str(ids[0])
 			seed_selected.emit(selected_seed)
 	if ids == _bar_ids and _bar_box.get_child_count() > 0:
