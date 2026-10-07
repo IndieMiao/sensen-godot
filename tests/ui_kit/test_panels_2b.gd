@@ -404,3 +404,81 @@ func test_stored_stack_shows_the_house_badge() -> void:
 	assert_bool(g.cells()[1]._home.visible).is_true()
 	assert_vector(g.cells()[1]._home.position).is_equal(Vector2(4, 38))
 	assert_bool(g.cells()[5]._home.visible).is_false()   # empty cells never
+
+# ---------------------------------------------------------------- resident profile, notice row, float text
+
+func test_drawer_pad_sets_the_sheet_inset() -> void:
+	var d := _drawer(443)
+	d.pad = UiTokens.SPACE_PAGE
+	await _settle()
+	assert_vector(d.body.position).is_equal(Vector2(16, 16))
+
+func test_resident_profile_lists_identity_stage_friendship_and_likes() -> void:
+	var p: UiResidentProfile = _host(UiResidentProfile.new({name = "Pip", role = "Courier Kid", stage = "Familiar",
+		friendship = "52/90", likes = "Dessert"}))
+	p.size = Vector2(328, 411)
+	await _settle()
+	var texts := p.find_children("*", "Label", true, false).filter(func(l): return l.is_visible_in_tree()).map(func(l): return l.text)
+	for t in ["Pip", "Courier Kid", "Familiar", "Friendship", "52/90", "Favourite dishes", "Dessert"]:
+		assert_bool(t in texts).override_failure_message("missing %s in %s" % [t, texts]).is_true()
+	assert_bool(p.details_button().visible).is_false()   # no page behind Details in P0: never a dead end
+	var back := [false]
+	p.back_pressed.connect(func(): back[0] = true)
+	var dismiss := p.find_children("*", "UiDismissButton", true, false)[0] as UiDismissButton
+	assert_str(dismiss.text).is_equal("Back")
+	dismiss.pressed.emit()
+	assert_bool(back[0]).is_true()
+
+func test_notice_row_reads_one_line_with_a_chevron() -> void:
+	var r: UiNoticeRow = _host(UiNoticeRow.new("Bag full · +5 slots at Homestead Lv3"))
+	r.size = Vector2(336, 44)
+	await _settle()
+	assert_str(r.notice()).is_equal("Bag full · +5 slots at Homestead Lv3")
+	assert_float(r.size.y).is_equal(44.0)
+
+func test_float_text_affinity_has_the_heart_and_rose_ink() -> void:
+	var f: UiFloatText = _host(UiFloatText.new("+2 · first chat today", UiFloatText.Tone.AFFINITY))
+	await _settle()
+	var label := f.find_children("*", "Label", true, false)[0] as Label
+	assert_str(label.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_FLOAT_AFFINITY.to_html())
+	assert_bool((f.find_children("*", "TextureRect", true, false)[0] as TextureRect).visible).is_true()
+	# laid out at the ×1.3 peak and shown at ×1.0
+	assert_float(f.shown_size().x).is_equal_approx(f.size.x / 1.3, 0.01)
+	assert_float(f.scale.x).is_equal_approx(1.0 / 1.3, 0.001)
+
+func test_float_text_plays_bottom_centre_and_frees_itself() -> void:
+	var f: UiFloatText = _host(UiFloatText.new("+5 XP", UiFloatText.Tone.XP))
+	await _settle()
+	var done := [false]
+	f.finished.connect(func(): done[0] = true)
+	f.play(Vector2(180, 400))
+	assert_vector(f.position + f.pivot_offset).is_equal(Vector2(180, 400))
+	assert_float(f.scale.x).is_equal_approx(0.5 / 1.3, 0.001)
+	await get_tree().create_timer(1.25).timeout
+	assert_bool(done[0]).is_true()
+	assert_bool(is_instance_valid(f) and not f.is_queued_for_deletion()).is_false()
+
+func test_float_text_stacks_and_caps_the_peak_width() -> void:
+	var a: UiFloatText = _host(UiFloatText.new("+48 XP · 12 plants", UiFloatText.Tone.XP))
+	var b: UiFloatText = _host(UiFloatText.new("−2 Energy", UiFloatText.Tone.ENERGY_COST))
+	await _settle()
+	a.play(Vector2(180, 400))
+	b.play(Vector2(180, 400), 1)
+	assert_float((a.position.y + a.pivot_offset.y) - (b.position.y + b.pivot_offset.y)).is_equal(28.0)
+	var wide: UiFloatText = _host(UiFloatText.new("Granny Wu shared a meal with you and it was very good indeed · +20 Energy",
+		UiFloatText.Tone.ENERGY_GAIN, null, UiFloatText.Layout.WRAP))
+	await _settle()
+	assert_float(wide.shown_size().x).is_less_equal(320.0 + 0.5)
+	assert_float(wide.shown_size().x * wide._peak).is_less_equal(336.0 + 0.5)
+
+func test_float_text_bump_updates_in_place() -> void:
+	var f: UiFloatText = _host(UiFloatText.new("+12 XP", UiFloatText.Tone.XP))
+	await _settle()
+	f.play(Vector2(180, 400))
+	await get_tree().create_timer(0.9).timeout
+	f.bump("+24 XP · 2 plants")
+	var y := f.position.y
+	await get_tree().create_timer(0.5).timeout
+	assert_bool(is_instance_valid(f)).is_true()   # the fade restarted 650 ms after the bump
+	assert_float(f.position.y).is_equal(y)        # it holds its height
+	assert_str((f.find_children("*", "Label", true, false)[0] as Label).text).is_equal("+24 XP · 2 plants")
