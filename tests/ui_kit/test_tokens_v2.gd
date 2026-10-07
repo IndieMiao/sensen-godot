@@ -28,6 +28,22 @@ func test_every_numeric_token_has_a_matching_constant() -> void:
 			assert_bool(consts.has(name)).override_failure_message("missing " + name).is_true()
 			assert_float(float(consts[name])).is_equal_approx(float(tokens[group][k]), 0.0001)
 
+func test_dash_patterns_are_dash_gap_pairs() -> void:
+	for k in tokens.dash:
+		var name := "DASH_" + GenTheme.const_name(k)
+		assert_bool(consts.has(name)).override_failure_message("missing " + name).is_true()
+		assert_int((consts[name] as Array).size()).is_equal(2)
+		assert_float(float(consts[name][0])).is_equal_approx(float(tokens.dash[k][0]), 0.001)
+
+func test_group_path_keys_become_valid_constants() -> void:
+	assert_str(GenTheme.const_name("role/marketTint")).is_equal("ROLE_MARKET_TINT")
+	assert_bool(consts.has("COLOR_RARITY_COMMON")).is_true()
+
+func test_unavailable_command_keeps_secondary_ink_and_primary_press_uses_figma_fill() -> void:
+	var th := UiKit.theme()
+	assert_str(th.get_color(&"font_color", &"CmdBlocked").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
+	assert_str(th.get_stylebox(&"pressed", &"CmdPrimary").bg_color.to_html()).is_equal(UiTokens.COLOR_PRIMARY_PRESSED.to_html())
+
 func test_theme_has_every_text_style_with_its_size_and_weight() -> void:
 	var th := UiKit.theme()
 	for name in tokens.font.styles:

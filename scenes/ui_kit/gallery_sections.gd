@@ -12,7 +12,7 @@ static func all() -> Array[Dictionary]:
 		{id = "theme_buttons", title = "Button variations", figma = "CommandButton 483:216 · Compact/Command 633:41273", build = _buttons},
 		{id = "theme_nav", title = "Navigation, dismiss, close, chips", figma = "NavigationRow 483:217 · Dismiss 483:220 · Close 483:336 · Compact/Filter 633:41280 · Tab 483:322", build = _nav},
 		{id = "theme_panels", title = "Panel variations", figma = "Sheet 483:190 · InformationSheet 932:71686 · Toast 483:302 · StateBadge 483:324", build = _panels},
-		{id = "style_box", title = "UiStyleBox inset and dashed", figma = "Compact/Command 633:41273 (34 in 44) · empty slot", build = _style_boxes},
+		{id = "style_box", title = "UiStyleBox inset, dashed, shadow", figma = "Compact/Command 633:41273 (34 in 44) · Compact/QuickSlot 633:41279 empty / lifted / drop-target", build = _style_boxes},
 	]
 	return out
 
@@ -69,11 +69,16 @@ static func _button(text: String, variation: StringName, disabled := false, togg
 static func _buttons() -> Control:
 	var v := _column()
 	for kind in [UiTokens.BUTTON_CMD_PRIMARY, UiTokens.BUTTON_CMD_SECONDARY, UiTokens.BUTTON_CMD_DESTRUCTIVE,
-			UiTokens.BUTTON_CMD_DANGER_SECONDARY, UiTokens.BUTTON_CMD_BLOCKED]:
+			UiTokens.BUTTON_CMD_DANGER_SECONDARY]:
 		var b := _button(String(kind), kind)
 		b.custom_minimum_size.y = UiTokens.SIZE_COMMAND
 		v.add_child(b)
-	var disabled := _button("Need 6 more Timber", UiTokens.BUTTON_CMD_PRIMARY, true)
+	# Unavailable (LOCK-10): the reason is the label and the button stays tappable to explain itself.
+	var unavailable := _button("Need 6 more Timber", UiTokens.BUTTON_CMD_BLOCKED)
+	unavailable.custom_minimum_size.y = UiTokens.SIZE_COMMAND
+	v.add_child(unavailable)
+	# Truly disabled (e.g. offline): Button.disabled on any kind.
+	var disabled := _button("Offline", UiTokens.BUTTON_CMD_PRIMARY, true)
 	disabled.custom_minimum_size.y = UiTokens.SIZE_COMMAND
 	v.add_child(disabled)
 	var row := _row()
@@ -141,20 +146,31 @@ static func _panels() -> Control:
 
 static func _style_boxes() -> Control:
 	var row := _row(UiTokens.SPACE_ROW)
-	var inset := Panel.new()
-	inset.custom_minimum_size = Vector2(UiTokens.SIZE_TOUCH * 1.6, UiTokens.SIZE_TOUCH)
 	var pill := UiStyleBox.make(UiTokens.COLOR_PRIMARY, UiTokens.RADIUS_COMPACT_COMMAND)
 	pill.visual_height = UiTokens.SIZE_COMMAND_COMPACT
-	inset.add_theme_stylebox_override(&"panel", pill)
-	row.add_child(inset)
-	var hit := Panel.new()
-	hit.custom_minimum_size = inset.custom_minimum_size
-	hit.add_theme_stylebox_override(&"panel", UiStyleBox.make(Color.TRANSPARENT, 0.0, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT))
-	row.add_child(hit)
-	var ghost := Panel.new()
-	ghost.custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_SLOT_W, UiTokens.SIZE_QUICK_SLOT_SURFACE_H)
-	var dashed := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CELL, UiTokens.COLOR_EDGE_STRONG, UiTokens.STROKE_SELECTED_CELL)
-	dashed.dashed = true
-	ghost.add_theme_stylebox_override(&"panel", dashed)
-	row.add_child(ghost)
+	row.add_child(_sample(Vector2(UiTokens.SIZE_TOUCH * 1.6, UiTokens.SIZE_TOUCH), pill))
+	row.add_child(_sample(Vector2(UiTokens.SIZE_TOUCH * 1.6, UiTokens.SIZE_TOUCH),
+		UiStyleBox.make(Color.TRANSPARENT, 0.0, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)))
+	var slot := Vector2(UiTokens.SIZE_QUICK_SLOT_W, UiTokens.SIZE_QUICK_SLOT_SURFACE_H)
+	var ghost := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CELL, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+	ghost.dashed = true
+	ghost.dash = UiTokens.DASH_QUICK[0]
+	ghost.gap = UiTokens.DASH_QUICK[1]
+	row.add_child(_sample(slot, ghost))
+	var lifted := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CELL, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_SELECTED)
+	lifted.shadow_color = UiTokens.COLOR_LIFT_SHADOW
+	lifted.shadow_size = UiTokens.SIZE_LIFT_SHADOW_RADIUS
+	lifted.shadow_offset = Vector2(0, UiTokens.SIZE_LIFT_SHADOW_OFFSET_Y)
+	row.add_child(_sample(slot, lifted))
+	var drop := UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, UiTokens.RADIUS_CELL, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_SELECTED)
+	drop.dashed = true
+	drop.dash = UiTokens.DASH_DROP_TARGET[0]
+	drop.gap = UiTokens.DASH_DROP_TARGET[1]
+	row.add_child(_sample(slot, drop))
 	return row
+
+static func _sample(min_size: Vector2, box: StyleBox) -> Panel:
+	var p := Panel.new()
+	p.custom_minimum_size = min_size
+	p.add_theme_stylebox_override(&"panel", box)
+	return p

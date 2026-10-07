@@ -10,10 +10,10 @@
       "toolBadge": "not in SceneAction main yet (WP1a)",
       "switchKey": "LOCK-03, WP1a",
       "hud": "LOCK-06, WP1a",
-      "pin": "LOCK-05 colours, WP1a",
+      "pin": "LOCK-05 pin colours read from the WP1a revision, not yet accepted",
       "needTile": "sizes from plan q(8); main re-export after WP1a",
       "joystick": "WP7-A Q1: main 130/60 vs shipped 86/40",
-      "cmdBlocked": "LOCK-10 neutral grey target, WP1a",
+      "cmdBlocked": "CommandButton Kind=unavailable from the WP1a revision, not yet accepted",
       "segmentTab": "selected style must not use command green (LOCK-13), WP1b"
     }
   },
@@ -230,16 +230,34 @@
     "energyHudDeep": "#C9962A",
     "energyHudFill": "#E3B341",
     "energyHudLight": "#F4D27A",
+    "float/affinity": "#C04F7A",
+    "float/coins": "#8F6410",
+    "float/energyCost": "#C0563F",
+    "float/energyGain": "#3E7D43",
+    "float/xp": "#17808F",
     "info": "#426A88",
     "joystickRing": "#FBF8F173",
     "joystickThumb": "#3E7D43B2",
+    "liftShadow": "#2E3B3338",
     "muted": "#6E7B74",
+    "pinAmber": "#E3B341",
+    "pinWarm": "#FBF4E6",
     "primary": "#3E7D43",
+    "primaryPressed": "#2E6136",
     "primaryTint": "#ECF4E7",
-    "rarityCommon": "#9DB89A",
-    "rarityFine": "#6FA8DC",
-    "rarityLegendary": "#E3B341",
-    "rarityRare": "#A98BD6",
+    "quality/gold": "#E3B341",
+    "rarity/common": "#9DB89A",
+    "rarity/fine": "#6FA8DC",
+    "rarity/legendary": "#E3B341",
+    "rarity/rare": "#A98BD6",
+    "role/market": "#9B3D6A",
+    "role/marketTint": "#F7E4EE",
+    "role/post": "#2F4467",
+    "role/postTint": "#E5E9F2",
+    "role/tackle": "#2C6A8E",
+    "role/tackleTint": "#E2EFF6",
+    "role/tea": "#2B7369",
+    "role/teaTint": "#DFF0EC",
     "scrim": "#2F3A33",
     "scrimDrawer": "#2F3A332E",
     "scrimModal": "#2F3A3352",
@@ -254,10 +272,15 @@
     "sheetSurface": 0.97,
     "scrimCounter": 0.14,
     "scrimDrawer": 0.18,
-    "scrimModal": 0.32
+    "scrimModal": 0.32,
+    "pending": 0.75,
+    "zeroIcon": 0.35,
+    "emptyCell": 0.35,
+    "kitchenEmpty": 0.55
   },
   "space": {
     "hudRowGap": 8,
+    "itemRowGap": 10,
     "overlayBlock": 12,
     "overlayBody": 8,
     "page": 16,
@@ -285,7 +308,8 @@
     "cellHairline": 0.5,
     "selectedCell": 1.5,
     "selected": 2,
-    "ring": 3
+    "ring": 3,
+    "pinBadge": 1.5
   },
   "size": {
     "touch": 44,
@@ -343,7 +367,39 @@
     "sheetGap": 12,
     "sheetBodyMaxH": 440,
     "energyRefW": 328,
-    "energyRefH": 82
+    "energyRefH": 82,
+    "pinBadge": 14,
+    "pinIcon": 10,
+    "pinStripW": 36,
+    "pinStripH": 2,
+    "quickSlotLiftDrag": 10,
+    "liftShadowRadius": 12,
+    "liftShadowOffsetY": 8,
+    "qtyPillW": 24,
+    "qtyPillH": 13,
+    "rarityDot": 6,
+    "kitchenCheck": 13,
+    "kitchenCheckIcon": 9,
+    "objectHeaderQtyW": 72,
+    "itemRowQtyW": 88
+  },
+  "dash": {
+    "inventory": [
+      2,
+      2
+    ],
+    "kitchen": [
+      2,
+      2
+    ],
+    "quick": [
+      3,
+      3
+    ],
+    "dropTarget": [
+      4,
+      3
+    ]
   },
   "motion": {
     "dissolveMs": 150,

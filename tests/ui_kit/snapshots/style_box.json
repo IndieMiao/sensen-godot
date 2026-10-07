@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    116
+    210
   ],
   "children": [
     {
@@ -16,7 +16,7 @@
         22
       ],
       "variation": "RowTitleXB15",
-      "text": "UiStyleBox inset and dashed"
+      "text": "UiStyleBox inset, dashed, shadow"
     },
     {
       "type": "Label",
@@ -24,25 +24,25 @@
         0,
         28,
         328,
-        18
+        36
       ],
       "variation": "CaptionR12",
-      "text": "Compact/Command 633:41273 (34 in 44) · empty slot"
+      "text": "Compact/Command 633:41273 (34 in 44) · Compact/QuickSlot 633:41279 empty / lifted / drop-target"
     },
     {
       "type": "HFlowContainer",
       "rect": [
         0,
-        52,
+        70,
         328,
-        64
+        140
       ],
       "children": [
         {
           "type": "Panel",
           "rect": [
             0,
-            52,
+            70,
             70,
             64
           ]
@@ -51,7 +51,7 @@
           "type": "Panel",
           "rect": [
             82,
-            52,
+            70,
             70,
             64
           ]
@@ -60,7 +60,25 @@
           "type": "Panel",
           "rect": [
             164,
+            70,
             52,
+            64
+          ]
+        },
+        {
+          "type": "Panel",
+          "rect": [
+            228,
+            70,
+            52,
+            64
+          ]
+        },
+        {
+          "type": "Panel",
+          "rect": [
+            0,
+            146,
             52,
             64
           ]

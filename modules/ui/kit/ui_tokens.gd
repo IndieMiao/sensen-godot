@@ -20,16 +20,34 @@ const COLOR_EDGE_STRONG := Color("CFC6B0")
 const COLOR_ENERGY_HUD_DEEP := Color("C9962A")
 const COLOR_ENERGY_HUD_FILL := Color("E3B341")
 const COLOR_ENERGY_HUD_LIGHT := Color("F4D27A")
+const COLOR_FLOAT_AFFINITY := Color("C04F7A")
+const COLOR_FLOAT_COINS := Color("8F6410")
+const COLOR_FLOAT_ENERGY_COST := Color("C0563F")
+const COLOR_FLOAT_ENERGY_GAIN := Color("3E7D43")
+const COLOR_FLOAT_XP := Color("17808F")
 const COLOR_INFO := Color("426A88")
 const COLOR_JOYSTICK_RING := Color("FBF8F173")
 const COLOR_JOYSTICK_THUMB := Color("3E7D43B2")
+const COLOR_LIFT_SHADOW := Color("2E3B3338")
 const COLOR_MUTED := Color("6E7B74")
+const COLOR_PIN_AMBER := Color("E3B341")
+const COLOR_PIN_WARM := Color("FBF4E6")
 const COLOR_PRIMARY := Color("3E7D43")
+const COLOR_PRIMARY_PRESSED := Color("2E6136")
 const COLOR_PRIMARY_TINT := Color("ECF4E7")
+const COLOR_QUALITY_GOLD := Color("E3B341")
 const COLOR_RARITY_COMMON := Color("9DB89A")
 const COLOR_RARITY_FINE := Color("6FA8DC")
 const COLOR_RARITY_LEGENDARY := Color("E3B341")
 const COLOR_RARITY_RARE := Color("A98BD6")
+const COLOR_ROLE_MARKET := Color("9B3D6A")
+const COLOR_ROLE_MARKET_TINT := Color("F7E4EE")
+const COLOR_ROLE_POST := Color("2F4467")
+const COLOR_ROLE_POST_TINT := Color("E5E9F2")
+const COLOR_ROLE_TACKLE := Color("2C6A8E")
+const COLOR_ROLE_TACKLE_TINT := Color("E2EFF6")
+const COLOR_ROLE_TEA := Color("2B7369")
+const COLOR_ROLE_TEA_TINT := Color("DFF0EC")
 const COLOR_SCRIM := Color("2F3A33")
 const COLOR_SCRIM_DRAWER := Color("2F3A332E")
 const COLOR_SCRIM_MODAL := Color("2F3A3352")
@@ -45,9 +63,14 @@ const OPACITY_SHEET_SURFACE := 0.97
 const OPACITY_SCRIM_COUNTER := 0.14
 const OPACITY_SCRIM_DRAWER := 0.18
 const OPACITY_SCRIM_MODAL := 0.32
+const OPACITY_PENDING := 0.75
+const OPACITY_ZERO_ICON := 0.35
+const OPACITY_EMPTY_CELL := 0.35
+const OPACITY_KITCHEN_EMPTY := 0.55
 
 # Space
 const SPACE_HUD_ROW_GAP := 8
+const SPACE_ITEM_ROW_GAP := 10
 const SPACE_OVERLAY_BLOCK := 12
 const SPACE_OVERLAY_BODY := 8
 const SPACE_PAGE := 16
@@ -76,6 +99,7 @@ const STROKE_CELL_HAIRLINE := 0.5
 const STROKE_SELECTED_CELL := 1.5
 const STROKE_SELECTED := 2
 const STROKE_RING := 3
+const STROKE_PIN_BADGE := 1.5
 
 # Size
 const SIZE_TOUCH := 44
@@ -134,6 +158,26 @@ const SIZE_SHEET_GAP := 12
 const SIZE_SHEET_BODY_MAX_H := 440
 const SIZE_ENERGY_REF_W := 328
 const SIZE_ENERGY_REF_H := 82
+const SIZE_PIN_BADGE := 14
+const SIZE_PIN_ICON := 10
+const SIZE_PIN_STRIP_W := 36
+const SIZE_PIN_STRIP_H := 2
+const SIZE_QUICK_SLOT_LIFT_DRAG := 10
+const SIZE_LIFT_SHADOW_RADIUS := 12
+const SIZE_LIFT_SHADOW_OFFSET_Y := 8
+const SIZE_QTY_PILL_W := 24
+const SIZE_QTY_PILL_H := 13
+const SIZE_RARITY_DOT := 6
+const SIZE_KITCHEN_CHECK := 13
+const SIZE_KITCHEN_CHECK_ICON := 9
+const SIZE_OBJECT_HEADER_QTY_W := 72
+const SIZE_ITEM_ROW_QTY_W := 88
+
+# Dash
+const DASH_INVENTORY := [2, 2]
+const DASH_KITCHEN := [2, 2]
+const DASH_QUICK := [3, 3]
+const DASH_DROP_TARGET := [4, 3]
 
 # Motion
 const MOTION_DISSOLVE_MS := 150
@@ -212,9 +256,9 @@ const PENDING := {
 	"toolBadge": "not in SceneAction main yet (WP1a)",
 	"switchKey": "LOCK-03, WP1a",
 	"hud": "LOCK-06, WP1a",
-	"pin": "LOCK-05 colours, WP1a",
+	"pin": "LOCK-05 pin colours read from the WP1a revision, not yet accepted",
 	"needTile": "sizes from plan q(8); main re-export after WP1a",
 	"joystick": "WP7-A Q1: main 130/60 vs shipped 86/40",
-	"cmdBlocked": "LOCK-10 neutral grey target, WP1a",
+	"cmdBlocked": "CommandButton Kind=unavailable from the WP1a revision, not yet accepted",
 	"segmentTab": "selected style must not use command green (LOCK-13), WP1b",
 }

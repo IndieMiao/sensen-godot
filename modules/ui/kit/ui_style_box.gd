@@ -28,6 +28,13 @@ extends StyleBox
 	set(v): dash = v; _dirty()
 @export var gap := 3.0:
 	set(v): gap = v; _dirty()
+## Drop shadow (e.g. a lifted quick slot: COLOR_LIFT_SHADOW, SIZE_LIFT_SHADOW_RADIUS, SIZE_LIFT_SHADOW_OFFSET_Y).
+@export var shadow_color := Color.TRANSPARENT:
+	set(v): shadow_color = v; _dirty()
+@export var shadow_size := 0.0:
+	set(v): shadow_size = v; _dirty()
+@export var shadow_offset := Vector2.ZERO:
+	set(v): shadow_offset = v; _dirty()
 
 var _flat: StyleBoxFlat
 
@@ -76,12 +83,16 @@ func _ensure_flat() -> StyleBoxFlat:
 		var w := maxi(1, roundi(border_width))
 		_flat.border_color = border_color
 		_flat.set_border_width_all(w)
+	if shadow_color.a > 0.0 and shadow_size > 0.0:
+		_flat.shadow_color = shadow_color
+		_flat.shadow_size = roundi(shadow_size)
+		_flat.shadow_offset = shadow_offset
 	return _flat
 
 func _draw(to_canvas_item: RID, rect: Rect2) -> void:
 	var r := visible_rect(rect)
 	if r.size.x <= 0.0 or r.size.y <= 0.0: return
-	if bg_color.a > 0.0 or (not dashed and border_width > 0.0):
+	if bg_color.a > 0.0 or (not dashed and border_width > 0.0) or shadow_color.a > 0.0:
 		_ensure_flat().draw(to_canvas_item, r)
 	if dashed and border_width > 0.0 and border_color.a > 0.0:
 		_draw_dashes(to_canvas_item, r)

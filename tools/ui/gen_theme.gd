@@ -111,14 +111,17 @@ func _margins(b: StyleBox, h: float, v: float) -> StyleBox:
 func _buttons(th: Theme) -> void:
 	var stroke := float(t.stroke.default)
 	var pill := r("pill")
-	# kind: [bg, border, ink]; pressed darkens the fill, disabled is the neutral grey of LOCK-10.
+	# kind: [bg, border, ink]. Pressed uses the Figma primary-pressed fill where it exists, otherwise a
+	# darkened fill. Blocked is CommandButton Kind=unavailable (still tappable, explains why); the real
+	# disabled state (e.g. offline) is the neutral grey with disabledInk.
 	var kinds := {
 		"Primary": [c("primary"), Color.TRANSPARENT, c("surfaceRaised")],
 		"Secondary": [c("surface"), c("primary"), c("primary")],
 		"Destructive": [c("danger"), Color.TRANSPARENT, c("surfaceRaised")],
 		"DangerSecondary": [c("surface"), c("danger"), c("danger")],
-		"Blocked": [c("disabled"), Color.TRANSPARENT, c("disabledInk")],
+		"Blocked": [c("disabled"), Color.TRANSPARENT, c("secondary")],
 	}
+	var pressed_fill := {"Primary": c("primaryPressed")}
 	for k in kinds:
 		var bg: Color = kinds[k][0]
 		var edge: Color = kinds[k][1]
@@ -131,7 +134,7 @@ func _buttons(th: Theme) -> void:
 				if compact: b.visual_height = s("commandCompact")
 				return b
 			_button(th, "Cmd%s%s" % [k, "Compact" if compact else ""],
-				mk.call(bg, edge), mk.call(bg.darkened(0.12), edge.darkened(0.12)),
+				mk.call(bg, edge), mk.call(pressed_fill.get(k, bg.darkened(0.12)), edge.darkened(0.12)),
 				mk.call(c("disabled"), Color.TRANSPARENT),
 				"C12XB" if compact else "ButtonXB15", ink, ink, c("disabledInk"))
 	var flat := func(pad_v: float) -> StyleBox: return _margins(_box(Color.TRANSPARENT, 0.0), 0.0, pad_v)
@@ -177,13 +180,15 @@ func _panels(th: Theme) -> void:
 
 # ---------------------------------------------------------------- UiTokens source
 
+## camelCase and Figma group paths to UPPER_SNAKE: "quickSlotW" -> QUICK_SLOT_W, "role/marketTint" -> ROLE_MARKET_TINT.
 static func const_name(key: String) -> String:
 	var re := RegEx.create_from_string("([a-z0-9])([A-Z])")
-	return re.sub(key, "$1_$2", true).to_upper()
+	return re.sub(key.replace("/", "_"), "$1_$2", true).to_upper()
 
 static func _literal(v) -> String:
 	if v is float and v == floorf(v): return str(int(v))
 	if v is String: return '"%s"' % v
+	if v is Array: return "[%s]" % ", ".join(v.map(func(x): return _literal(x)))
 	return str(v)
 
 func tokens_source() -> String:
@@ -201,7 +206,7 @@ func tokens_source() -> String:
 	L.append("")
 	L.append("# Colours (semantic Figma variables first, then values Figma still hard-codes).")
 	for k in t.color: L.append('const COLOR_%s := Color("%s")' % [const_name(k), String(t.color[k]).trim_prefix("#")])
-	for group in ["opacity", "space", "radius", "stroke", "size", "motion"]:
+	for group in ["opacity", "space", "radius", "stroke", "size", "dash", "motion"]:
 		L.append("")
 		L.append("# %s" % group.capitalize())
 		for k in t[group]:
