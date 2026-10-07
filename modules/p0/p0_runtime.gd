@@ -5,7 +5,8 @@ extends Node
 ## routes UI input to the active world and turns server events into floats, cards and toasts, so the
 ## new UI flow is identical everywhere.
 ##
-## A world implements (all optional; interiors extend P0Room): p0_surface() -> String, p0_frame(view, dt),
+## A world implements (all optional; interiors extend P0Room): p0_surface() -> String, p0_space() -> String
+## (where the player is for the server: home / pond / outpost / mine; see space_of), p0_frame(view, dt),
 ## p0_joystick(v), p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f),
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
@@ -70,10 +71,19 @@ func _init() -> void:
 ## The active world takes over input and the HUD surface; the previous one is simply forgotten.
 func attach(w: Node) -> void:
 	world = w
+	session.space = space_of(w)   # before the read below, which tells the server where the player is
 	if not session.busy and not session.view.is_empty(): session.refresh()   # entering a space reads fresh state
 	mark("attach " + str(w.name))
 	_first_frame.call_deferred(str(w.name))
 	ui.set_surface(str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm")
+
+## The space a world puts the player in, for the server (q(41)): its p0_space() when it has one (the farmhouse
+## says home, outposts say outpost), else from its surface — farm is home, pond and map as named, anything else
+## unknown (""), which the server ignores. Read once on attach, never from the per-frame surface ("busy").
+static func space_of(w: Object) -> String:
+	if w.has_method("p0_space"): return str(w.call("p0_space"))
+	var surface := str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm"
+	return str({"farm": "home", "pond": "pond", "map": "map"}.get(surface, ""))
 
 func _first_frame(tag: String) -> void:
 	await RenderingServer.frame_post_draw
@@ -86,6 +96,7 @@ func detach(w: Node) -> void:
 		world = null
 		ui.close_modal()
 		ui.set_surface("map")
+		session.space = "map"
 
 ## Back to the map (the place chip, LOCK-06): every P0 world stacked above it closes, the farm under the
 ## farmhouse included. Back locks still apply (a line in the water is reeled in first); a room's own Back

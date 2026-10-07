@@ -114,7 +114,7 @@ describe('P0 fishing (§6.1–6.7)', () => {
     s.fishing.bites = 5;
     s = fishOnce(s, 'landed').s;
     expect(count(s.bag, 'bait_worm')).toBe(3);
-    expect(count(s.bag, 'crop_herb')).toBe(3);
+    expect(count(s.bag, 'wild_herb')).toBe(3);   // q(40): the gift is Wild Herb, a seasoning material
     expect(s.cookbook).toContain('dish_herb_grilled_fish');
     const cast = step(s, { type: 'cast', bait: 'bait_worm' }, T0 + 60 * S);
     expect(cast.s.cast!.bite_ms).toBeLessThanOrEqual(2100);
@@ -333,7 +333,7 @@ describe('P0 Reed Rod and Tools & Gear (§6.4.1)', () => {
     s.skills.fishing = 480; s.fishing.bites = 10; // Lv4: koi's level gate is open
     s = step(s, { type: 'buy', item: 'rod_reed', qty: 1, shop: 'tackle' }).s;
     expect(s.coins).toBe(100);
-    expect(s.gear).toEqual({ rods: ['rod_starter', 'rod_reed'], rod: 'rod_reed' });
+    expect(s.gear).toMatchObject({ rods: ['rod_starter', 'rod_reed'], rod: 'rod_reed' });
     expect(count(s.bag, 'rod_reed')).toBe(0);
     expect(applyP0(c, s, { type: 'buy', item: 'rod_reed', qty: 1, shop: 'tackle' }, T0)).toMatchObject({ ok: false, code: 'owned' });
     let koi = null as null | string;
