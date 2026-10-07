@@ -6,19 +6,16 @@ from pathlib import Path
 import sys, math, random
 sys.path.insert(0,str(Path(__file__).resolve().parent/'source/coffee_shop'))
 import kit as k
+import revision as r
 from kit import begin,cube,cylinder,ellipsoid,tube,lathe,leaf,arch_trim,mesh
 
 def greenhouse_pane(name,at,size):
-    # Soft opaque glazing deliberately avoids costly refraction and sort artifacts.
-    cube(name,at,size,'B7D8CB',.003)
-    x,y,z=at
-    for j in range(24):
-        xx=x+random.uniform(-size[0]*.45,size[0]*.45)
-        yy=y+random.uniform(-size[1]*.44,size[1]*.44)
-        leaf('Blurred garden silhouette',(xx,yy,z+.013),(xx+random.uniform(-.16,.16),yy+.22,z+.015),.13,random.choice(['C9D7A9','DCE3B9','A6C8AE']))
+    # Geometry and transparent glass are split into independent modules in R1.
+    return
 
 def geometry():
-    k.PALETTE.update({'oak':'BA8F5B','oak_light':'D9AF79','oak_edge':'AE8252','plaster':'E8D8BF','plaster_light':'F4E8D3','sage':'A5B299','linen_green':'D4C6A2','linen':'F3E7CD','leaf':'678347','leaf_light':'8EA15C','leaf_dark':'3E623D','terra':'C6AC7C','terra_light':'DDC59C','jar_green':'ADBC91'})
+    k.PALETTE.update(r.PALETTE)
+    k.bpy.context.preferences.filepaths.save_version=0
     begin('floor',collision=[{'at':[0,-.08,0],'size':[6.2,.20,5.7]}])
     cube('Rounded diorama foundation',(0,-.14,0),(6.25,.28,5.75),'plaster',.12)
     for j in range(21):
@@ -46,7 +43,7 @@ def geometry():
     arch_trim('Oak door reveal',1.54,0,1.93,.73,.058,.30,.045,'oak_light')
     cube('Arch wall coping',(0,3.00,0),(2.80,.16,.29),'plaster_light',.045)
     path=[(x,y,.20) for x,y in k.arch_path(1.98,.62,1.99,.97,28)]
-    k.vine(path)
+
     begin('left_window',at=(-3,.04,-1.83),yaw=90,collision=[{'at':[0,1.40,0],'size':[1.66,2.8,.16]}])
     greenhouse_pane('Garden glazing',(0,1.57,-.02),(1.62,2.55,.028))
     for x in (-.83,0,.83):cube('Window vertical mullion',(x,1.58,.03),(.055,2.74,.095),'oak_light',.012,'wood','Y')
@@ -74,8 +71,8 @@ def geometry():
     k.vine([(x,y,.20) for x,y in k.arch_path(1.52,.56,2.14,.73,24)])
     begin('counter',at=(-.20,.06,-1.80),collision=[{'at':[0,.58,0],'size':[3.40,1.16,.98]}]);k.counter()
     begin('espresso_machine',at=(.45,1.26,-1.76))
-    cube('Cream espresso body',(0,.34,0),(.68,.43,.40),'porcelain',.055)
-    cube('Espresso warming tray',(0,.57,0),(.70,.045,.43),'oak_light',.025)
+    cube('Silver espresso body',(0,.34,0),(.68,.43,.40),'B9C3BE',.055,'metal')
+    cube('Espresso warming tray',(0,.57,0),(.70,.045,.43),'C7CEC5',.025,'metal')
     cube('Drip tray',(0,.065,.055),(.70,.07,.59),'porcelain',.045)
     cube('Dark drip grille',(0,.108,.14),(.58,.018,.31),'iron_edge',.012)
     for j in range(9):cube('Drip grille slat',(-.25+j*.062,.12,.14),(.012,.006,.27),'plaster',.001)
@@ -93,36 +90,17 @@ def geometry():
     lathe('Bean hopper',(0,.38,-.035),[(0,.07),(.13,.12),(.27,.125),(.29,.13)],'oak_dark',20)
     cylinder('Hopper lid',(0,.68,-.035),.135,.025,'iron',vertices=20)
     for j in range(19):ellipsoid('Coffee bean',(random.uniform(-.09,.09),.65,random.uniform(-.08,.06)),(.035,.018,.024),'iron_edge',8,4)
-    begin('pastry_case',at=(-.79,1.26,-1.79))
-    cube('Patisserie plinth',(0,.026,0),(1.07,.052,.63),'oak_light',.015)
-    for y in (.11,.43):
-        cube('Cream display shelf',(0,y,0),(.99,.027,.55),'porcelain',.012)
-        for i in range(3):
-            x=-.32+i*.32
-            if y<.2:
-                cylinder('Cupcake case',(x,y+.065,.08),.075,.09,'terra',top=.091,vertices=12)
-                ellipsoid('Cupcake cream',(x,y+.14,.08),(.16,.12,.16),'porcelain',16,6)
-                ellipsoid('Caramel topping',(x,y+.193,.08),(.055,.025,.055),'oak_edge',8,4)
-            else:
-                for j in range(6):ellipsoid('Croissant folded segment',(x+(j-2.5)*.029,y+.07,.025+abs(j-2.5)*.018),(.070,.09*(1-abs(j-2.5)*.10),.14),'D9A052',12,6)
-    for x in (-.525,.525):
-        tube('Display curved metal edge',[(x,.05,.30),(x,.52,.30),(x,.72,-.19),(x,.04,-.28)],.018,'brass',6)
-    for z,y in ((.30,.52),(-.19,.72),(-.28,.05)):
-        tube('Display edge crossbar',[(-.525,y,z),(.525,y,z)],.013,'brass',6)
-    # Glass exported as an independent module with its own shared translucent material.
-    begin('display_glass',at=(-.79,1.26,-1.79))
-    mesh('Display roof glass',[(-.51,.523,.298),(.51,.523,.298),(.51,.715,-.19),(-.51,.715,-.19)],[(0,1,2,3)],'C3DCD6')
-    for x in (-.52,.52):mesh('Display side glass',[(x,.06,.29),(x,.52,.29),(x,.71,-.19),(x,.06,-.27)],[(0,1,2,3)],'C3DCD6')
+    r.pastry_case()
     begin('cups_and_saucers',at=(1.17,1.26,-1.53))
     for j in range(4):cylinder('Stacked saucer',(0,j*.023,0),.155,.021,'porcelain',vertices=24)
     k.cup((0,.082,0),.95)
     begin('counter_daisies',at=(-1.49,1.26,-1.83));k.bouquet(scale=1.4)
     begin('small_planter',at=(1.36,1.26,-2.01));k.plant(scale=.63)
-    begin('pendant',at=(-1.06,2.92,-1.83))
+    begin('pendant',at=(-1.20,3.12,-1.32))
     tube('Pendant cable',[(0,0,0),(0,-.62,0)],.008,'iron',6)
     cylinder('Brass lampholder',(0,-.61,0),.055,.12,'brass',vertices=16)
-    lathe('Cream bell shade',(0,-.88,0),[(0,.25),(.03,.27),(.09,.24),(.21,.125),(.25,.058)],'porcelain',32)
-    k.instance('pendant','pendant_2',(.20,2.92,-1.83))
+    lathe('Cream bell shade',(0,-.88,0),[(0,.29),(.03,.31),(.10,.28),(.25,.145),(.29,.058)],'porcelain',32)
+    k.instance('pendant','pendant_2',(.30,3.12,-1.32))
     begin('botanical_picture',at=(.93,1.54,-2.56))
     cube('Picture oak frame',(0,.29,0),(.54,.72,.055),'oak_light',.02)
     cube('Picture ivory mount',(0,.29,.032),(.45,.62,.014),'porcelain',.003)
@@ -130,41 +108,29 @@ def geometry():
     for j in range(5):
         yy=.12+j*.070;sgn=1 if j%2 else -1
         leaf('Botanical print leaf',(0,yy,.047),(.14*sgn,yy+.13,.049),.082,'leaf')
-    begin('table',at=(-1.34,.065,.55),collision=[{'at':[0,.42,0],'size':[1.12,.84,1.12]}]);k.table()
+    begin('table',at=(-1.34,.065,.55),collision=[{'at':[0,.42,0],'size':[1.12,.84,1.12]}]);r.slim_table()
     k.instance('table','table_2',(1.45,.065,1.00))
-    begin('chair',at=(-2.13,.065,.55),yaw=90,collision=[{'at':[0,.49,0],'size':[.67,.98,.64]}]);k.chair()
-    for name,at,yaw in [('chair_2',(-.55,.065,.55),-90),('chair_3',(.66,.065,1.),90),('chair_4',(2.24,.065,1.),-90)]:k.instance('chair',name,at,yaw)
-    begin('jute_rug',at=(-1.34,.058,.55));k.rug();k.instance('jute_rug','jute_rug_2',(1.45,.058,1.))
+    begin('chair',at=(-2.13,.065,.55),yaw=90,collision=[{'at':[0,.49,0],'size':[.67,.98,.64]}]);r.upholstered_chair()
+    for name,at,yaw in [('chair_2',(-.55,.065,.35),-90),('chair_3',(.80,.065,1.20),90),('chair_4',(2.24,.065,1.),-90)]:k.instance('chair',name,at,yaw)
+    begin('jute_rug',at=(-1.34,.058,.55));r.soft_rug();k.instance('jute_rug','jute_rug_2',(1.45,.058,1.))
     begin('table_bouquet',at=(-1.41,.903,.40));k.bouquet(scale=.8)
     k.instance('table_bouquet','table_bouquet_2',(1.40,.903,.83))
     begin('table_coffee',at=(-1.08,.903,.70));cylinder('Coffee saucer',(0,.009,0),.15,.019,'porcelain',vertices=24);k.cup((0,.02,0),.90)
     k.instance('table_coffee','table_coffee_2',(1.67,.903,1.16))
-    begin('floor_planter',at=(-2.53,.067,-1.31),collision=[{'at':[0,.31,0],'size':[.62,.62,.62]}]);k.plant(scale=1.65)
-    k.instance('floor_planter','floor_planter_2',(2.52,.067,-1.96),-40)
-    begin('medium_planter',at=(-2.70,.067,-.57),collision=[{'at':[0,.23,0],'size':[.45,.46,.45]}]);k.plant(scale=1.0)
-    k.instance('medium_planter','medium_planter_2',(1.96,.067,-2.12),45)
-    begin('low_trailing_planter',at=(-2.80,.068,1.74));k.plant(scale=1.05)
-    begin('front_ivy',at=(1.63,.82,2.65))
-    for dx in (-.45,-.15,.15,.4):
-        k.vine([(dx+math.sin(j*.5)*.085,-j*.07,.08+j*.019) for j in range(13)])
-    begin('back_trailing_ivy',at=(-2.76,2.96,-2.52))
-    for dx in (0,.16):k.vine([(dx+math.sin(j*.5)*.065,-j*.080,.10) for j in range(17)])
-    k.instance('back_trailing_ivy','back_trailing_ivy_2',(-1.50,2.94,-2.50))
-    k.instance('back_trailing_ivy','back_trailing_ivy_3',(1.29,2.94,-2.50))
-    begin('hanging_cafe_sign',at=(-2.90,1.57,1.56),yaw=90)
-    cube('Rounded wood sign edge',(0,0,0),(1.12,.81,.10),'oak_light',.18,'wood')
-    cube('Cream sign face',(0,0,.058),(1.01,.70,.045),'porcelain',.16)
-    k.text_label('GREENHOUSE',(0,.08,.086),.125,'leaf_dark')
+    begin('hanging_cafe_sign',at=(-3.22,1.90,2.41),yaw=0)
+    cube('Rounded wood sign edge',(0,0,0),(1.32,.94,.10),'oak_light',.18,'wood')
+    cube('Cream sign face',(0,0,.058),(1.21,.83,.045),'porcelain',.16)
+    k.text_label('GREENHOUSE',(0,.08,.086),.132,'leaf_dark')
     k.text_label('CAFE',(0,-.10,.087),.165,'leaf_dark')
     for x in (-.30,.30):tube('Sign suspension',[(x,.40,0),(x,.65,0)],.012,'iron',6)
     tube('Wrought iron sign arm',[(-.65,.66,0),(.62,.66,0)],.030,'iron',8)
     tube('Iron bracket scroll',[(-.60,.67,0),(-.60,.95,0),(-.39,.89,0),(-.41,.75,0),(-.50,.76,0)],.015,'iron',6)
     for x in (-.20,-.07,.07,.20):leaf('Sign leaf ornament',(0,-.22,.087),(x,-.27,.094),.055,'leaf')
-    k.save('545:2956',{'position':[10,9.2,12],'target':[0,1.16,0],'size':9.15})
+    r.finish()
 
 if __name__=='__main__':
     k.configure('coffee_shop')
     args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
     if '--bake-only' in args:k.load()
     else:geometry()
-    if '--geometry-only' not in args:k.bake_and_export()
+    if '--geometry-only' not in args:k.bake_and_export(ao_strength=.68,ao_distance=.55)

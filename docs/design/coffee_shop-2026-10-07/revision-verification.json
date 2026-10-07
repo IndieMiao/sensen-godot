@@ -1,0 +1,110 @@
+{
+  "scope": "R1 art resource and actual renderer checks; benchmark reported separately",
+  "renderer": {
+    "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "draw_calls": 66.0,
+    "instances": 97,
+    "renderer": "mobile",
+    "resolution": [
+      1400,
+      1400
+    ],
+    "scope": "offline art render; no mobile/gameplay/performance acceptance",
+    "slug": "coffee_shop",
+    "views": [
+      {
+        "draw_calls": 99.0,
+        "rendered_objects": 99.0,
+        "view": "godot-whole"
+      },
+      {
+        "draw_calls": 99.0,
+        "rendered_objects": 99.0,
+        "view": "model-front"
+      },
+      {
+        "draw_calls": 99.0,
+        "rendered_objects": 99.0,
+        "view": "model-side"
+      },
+      {
+        "draw_calls": 99.0,
+        "rendered_objects": 99.0,
+        "view": "model-top"
+      },
+      {
+        "draw_calls": 63.0,
+        "rendered_objects": 63.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 66.0,
+        "rendered_objects": 66.0,
+        "view": "godot-detail-plants"
+      }
+    ]
+  },
+  "glb_checks": {
+    "pass": true,
+    "files": [
+      "assets/rooms/coffee_shop/floor.glb",
+      "assets/rooms/coffee_shop/entry_steps.glb",
+      "assets/rooms/coffee_shop/low_wall_long.glb",
+      "assets/rooms/coffee_shop/low_wall_front_left.glb",
+      "assets/rooms/coffee_shop/low_wall_front_right.glb",
+      "assets/rooms/coffee_shop/low_pillar.glb",
+      "assets/rooms/coffee_shop/tall_pillar.glb",
+      "assets/rooms/coffee_shop/ivy_arch_door.glb",
+      "assets/rooms/coffee_shop/left_window.glb",
+      "assets/rooms/coffee_shop/back_counter_wall.glb",
+      "assets/rooms/coffee_shop/right_arch_window.glb",
+      "assets/rooms/coffee_shop/counter.glb",
+      "assets/rooms/coffee_shop/espresso_machine.glb",
+      "assets/rooms/coffee_shop/coffee_grinder.glb",
+      "assets/rooms/coffee_shop/pastry_case.glb",
+      "assets/rooms/coffee_shop/display_glass.glb",
+      "assets/rooms/coffee_shop/cups_and_saucers.glb",
+      "assets/rooms/coffee_shop/counter_daisies.glb",
+      "assets/rooms/coffee_shop/small_planter.glb",
+      "assets/rooms/coffee_shop/pendant.glb",
+      "assets/rooms/coffee_shop/botanical_picture.glb",
+      "assets/rooms/coffee_shop/table.glb",
+      "assets/rooms/coffee_shop/chair.glb",
+      "assets/rooms/coffee_shop/jute_rug.glb",
+      "assets/rooms/coffee_shop/table_bouquet.glb",
+      "assets/rooms/coffee_shop/table_coffee.glb",
+      "assets/rooms/coffee_shop/hanging_cafe_sign.glb",
+      "assets/rooms/coffee_shop/window_glass_left.glb",
+      "assets/rooms/coffee_shop/window_glass_back.glb",
+      "assets/rooms/coffee_shop/window_glass_arch.glb",
+      "assets/rooms/coffee_shop/window_garden_backdrop.glb",
+      "assets/rooms/coffee_shop/wall_shelf.glb",
+      "assets/rooms/_shared/plants/monstera.glb",
+      "assets/rooms/_shared/plants/peace_lily.glb",
+      "assets/rooms/_shared/plants/pothos.glb",
+      "assets/rooms/_shared/plants/ivy_short.glb",
+      "assets/rooms/_shared/plants/ivy_medium.glb",
+      "assets/rooms/_shared/plants/ivy_long.glb",
+      "assets/rooms/_shared/plants/flower_shrub.glb",
+      "assets/rooms/_shared/plants/olive_tree.glb",
+      "assets/rooms/_shared/plants/fruit_tree.glb"
+    ],
+    "single_surface_no_embedded_images": true
+  },
+  "budget": {
+    "room_unique_triangles": 60678,
+    "room_placed_triangles": 80734,
+    "used_shared_plant_unique_triangles": 85372,
+    "placed_plant_triangles": 441576,
+    "total_placed_triangles": 522310,
+    "static_surfaces": 97,
+    "atlases": 2,
+    "atlas_resolution": [
+      2048,
+      2048
+    ]
+  },
+  "reference_sha256": "bac78a88a5cb5fdc3aa2d2e7a026c31ec402bc84b5a978c84413c2951d44ce7a",
+  "comparison": "full-frame letterbox, identical 900px panels, direct 50% blend, no perspective warp",
+  "visual_acceptance": "pending user sample review"
+}

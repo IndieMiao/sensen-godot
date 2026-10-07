@@ -1,0 +1,36 @@
+{
+	"avatar_top_H": 1.74549430608749,
+	"capsule_height": 1.25,
+	"capsule_radius": 0.21,
+	"measurements": {
+		"chair": {
+			"baseline_ratio": 0.392438977091492,
+			"difference": 0.0371532846715328,
+			"height": 0.71045,
+			"ratio_to_H": 0.407019374123578,
+			"reason": ""
+		},
+		"counter": {
+			"baseline_ratio": 0.660271417661233,
+			"difference": 0.0416485900216919,
+			"height": 1.2005,
+			"ratio_to_H": 0.687770791238447,
+			"reason": ""
+		},
+		"door": {
+			"baseline_ratio": 1.33486542572727,
+			"difference": 0.15450643776824,
+			"height": 2.69,
+			"ratio_to_H": 1.54111072755637,
+			"reason": "Greenhouse architectural arch is 15.45% taller than Basic Room 2.33m door; preserve reference transom/arch alignment. It is a decorative side arch; usable entrance is the front low-wall gap."
+		},
+		"table": {
+			"baseline_ratio": 0.650245604377874,
+			"difference": 0.10352422907489,
+			"height": 1.0175,
+			"ratio_to_H": 0.582929429475319,
+			"reason": ""
+		}
+	},
+	"speed": 3.75
+}
