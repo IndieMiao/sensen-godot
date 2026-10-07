@@ -15,6 +15,9 @@ func _init() -> void:
 	place_name = "Farmhouse"
 	exit_text = "Door · Back to farm"
 
+## The space commands are sent from (SGODOT-228 PR #16, Rest needs ≥ 2 h away, q(41)): the farmhouse is home.
+func p0_space() -> String: return "home"
+
 # ---------------------------------------------------------------- stove (COOK-1)
 ## Finger card and STATE-ICONS badge over the stove: Empty / countdown / Ready (plan §7.2.2 step 1).
 func _marker(n: String, v: Dictionary) -> Dictionary:
