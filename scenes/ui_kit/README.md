@@ -57,6 +57,17 @@ must not change structure, role, entry point or key copy. Engineering specs: SGO
 | `UiBadge` | StateBadge 483:324 | short state word pill |
 | `UiEmptyState` | pending, WP6 SGODOT-206 (WP7-B F-08 §5) | icon + one line + optional navigation; provisional look until the main lands |
 
+### World display (SGODOT-222)
+
+| Class | Figma main | Notes |
+|---|---|---|
+| `UiNeedTile` | NeedTile 1090:78003 | LOCK-10: L / M / S; met / short / count; ring = have ÷ need rounded down to 10 %; `UiNeedTile.group()` wraps; tap shows a `UiNeedSource` |
+| `UiNeedSource` | NeedSource 1092:77266 | one source line + `Show ›` (camera only, LOCK-08); `UiNeedSource.popup()` anchors it above the tile |
+| `UiHud` | HUD 1143:103373 | LOCK-06: two rows; stands alone (`apply(state)`, `P0Logic.hud_state`); Energy colour by the next action's cost, never by percentage; location chip = actual place |
+| `UiTodayPanel` | TodayPanel 1145:81715 · TodayRow 1145:81714 | LOCK-06: ≤ 3 rows under the chips; Show only moves the camera; done / short rows |
+| `UiEnergyCard` | Energy 1094:77504 | LOCK-09: `card()` (one button `Free to do now`, 2×2 guide-only tiles, At home away from home) and `panel()` (under the HUD chip) |
+| `UiEnergyTile` | EnergyTile 1093:77292 | guide-only RECOVER tile; unavailable shows the reason, no link |
+
 Positions inside a fixed-size main (e.g. the InventoryCell icon at y 10, the 3 px pill inset) are private
 constants in the component script, each citing its main; everything shared comes from `UiTokens`.
 Glyphs that are tinted in code (pin, check, close) are white SVGs exported from Figma under

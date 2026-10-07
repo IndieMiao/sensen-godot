@@ -26,6 +26,13 @@ static func all() -> Array[Dictionary]:
 		{id = "filter_chip", title = "UiFilterChip", figma = "Compact/Filter 633:41280", build = _filter_chips},
 		{id = "segment_tab", title = "UiSegmentTab", figma = "Tab 483:322 · Compact/Kitchen/Mode 655:58504 · LOCK-13 / 20", build = _segment_tabs},
 		{id = "badge", title = "UiBadge", figma = "StateBadge 483:324", build = _badges},
+		# SGODOT-222 world display
+		{id = "need_tile", title = "UiNeedTile", figma = "NeedTile 1090:78003 · LOCK-10", build = _need_tiles},
+		{id = "need_source", title = "UiNeedSource", figma = "NeedSource 1092:77266 · LOCK-10 / 08", build = _need_sources},
+		{id = "hud", title = "UiHud", figma = "HUD 1143:103373 · LOCK-06 (shown at 328/360)", build = _huds},
+		{id = "today_panel", title = "UiTodayPanel", figma = "TodayPanel 1145:81715 · TodayRow 1145:81714 · LOCK-06 (328/360)", build = _today_panels},
+		{id = "energy_card", title = "UiEnergyCard · card", figma = "Energy 1094:77504 Kind=Card · EnergyTile 1093:77292 · LOCK-09", build = _energy_cards},
+		{id = "energy_panel", title = "UiEnergyCard · panel", figma = "Energy 1094:77504 Kind=Panel · LOCK-09", build = _energy_panels},
 		{id = "empty_state", title = "UiEmptyState", figma = "Main pending: WP6 SGODOT-206 · provisional look per WP7-B F-08 §5", build = _empty_states},
 	]
 	return out
@@ -354,4 +361,113 @@ static func _empty_states() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
 	v.add_child(UiEmptyState.new("No fish yet", _tex("fish_unknown"), "Show on map"))
 	v.add_child(UiEmptyState.new("Nothing to sell here", _tex("stall")))
+	return v
+
+# ---------------------------------------------------------------- SGODOT-222 world display
+
+## Full-width (360) components drawn at 328/360 so they fit the gallery column.
+static func _phone(content: Control, height: float) -> Control:
+	var frame := Control.new()
+	var k := (360.0 - UiTokens.SPACE_PAGE * 2.0) / 360.0
+	frame.custom_minimum_size = Vector2(360.0 * k, height * k)
+	var screen := Control.new()
+	screen.size = Vector2(360.0, height)
+	screen.scale = Vector2(k, k)
+	screen.add_child(content)
+	frame.add_child(screen)
+	return frame
+
+static func _need_tiles() -> Control:
+	var v := _column(UiTokens.SPACE_ROW)
+	var wood := _tex("wood")
+	var S := UiNeedTile.Size
+	for size in [S.L, S.M, S.S]:
+		v.add_child(UiNeedTile.group([
+			_captioned(UiNeedTile.new("Timber", 16, 16, size, wood), "met"),
+			_captioned(UiNeedTile.new("Timber", 10, 16, size, wood), "short"),
+			_captioned(UiNeedTile.new("Meals", 100, 300, size, _tex("eat"), true), "count"),
+		]))
+	v.add_child(UiNeedTile.group([
+		_captioned(UiNeedTile.new("Coins", 5, 4, S.M, _tex("coin")), "surplus 5/4"),
+		_captioned(UiNeedTile.new("Copper Ore", 0, 6, S.M, _tex("stone")), "short 0"),
+		_captioned(UiNeedTile.new("Fish-dex", 12, 20, S.M, _tex("fish_crucian"), true), "collection"),
+	]))
+	return v
+
+static func _need_sources() -> Control:
+	var v := _column()
+	v.add_child(UiNeedSource.new("Copper Ore · The mine, floors 1–4"))
+	v.add_child(UiNeedSource.new("Radish Seeds · Homestead Stall"))
+	return v
+
+static func _hud_sample(state: Dictionary) -> UiHud:
+	var h := UiHud.new()
+	h.apply(state)
+	return h
+
+static func _huds() -> Control:
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override(&"separation", 0)
+	var home := {city = "Shanghai", space = "Homestead", kind = UiHud.PlaceKind.HOME}
+	var samples := [
+		{energy = 142, energy_max = 200, regen = "+1 in 2:40", skills = {farming = 0.6, fishing = 0.3}, coins = 230,
+			today = "Radishes ready in 1h 12m", place = home},
+		{energy = 1, energy_max = 200, next_cost = 2, regen = "+1 in 2:41", skills = {farming = 0.6, fishing = 0.3}, coins = 230,
+			unread = 3, buff = {icon = _tex("crop_herb"), remaining = "2h 59m"}, today = "Sow your first plot",
+			place = {city = "Shanghai", space = "Farmhouse", kind = UiHud.PlaceKind.HOME}},
+		{energy = 0, energy_max = 200, regen = "+1 in 3:59", coins = 12, unread = 12, today = "",
+			place = {city = "Tokyo", space = "Arrived", kind = UiHud.PlaceKind.FOREIGN, day_pass = "23h"}},
+		{energy = 200, energy_max = 200, regen = "Full", skills = {farming = 1.0, fishing = 1.0}, coins = 1840,
+			today = "Pond Catch · 2 Pond Crucian · Stall Board", place = {city = "Shanghai", space = "Willow Pond", kind = UiHud.PlaceKind.HOME}},
+		{energy = 214, energy_max = 200, regen = "Bonus +14", coins = 230, today = "Herb Grilled Fish ready at the stove", place = home},
+	]
+	for s in samples:
+		var screen := Control.new()
+		screen.custom_minimum_size = Vector2(360, UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H)
+		screen.add_child(_hud_sample(s))
+		col.add_child(_phone(screen, UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H))
+	return col
+
+static func _today_panels() -> Control:
+	var col := _column()
+	var rows := [
+		{icon = _tex("crop_radish"), line = "Radishes ready in 1h 12m", action = "Show"},
+		{icon = _tex("seed_radish"), line = "Sow your first plot", tail = "needs 2 Energy · +1 in 2:41", action = "Show", state = "short"},
+		{icon = _tex("board"), line = "Pond Catch · 2 Pond Crucian", state = "done"},
+	]
+	var p := UiTodayPanel.new(rows)
+	p.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, 0)
+	col.add_child(_phone(p, 150))
+	return col
+
+static func _energy_facts(zero: bool, home: bool) -> Dictionary:
+	return {
+		have = 0 if zero else 1, max = 200, regen = "+1 in 3:59" if zero else "+1 in 2:41", zero = zero,
+		fact = "Recover or do something free" if zero else "Sow 1 plot needs 2 Energy · you have 1",
+		wait = "Wait · Full in 13h 20m",
+		tiles = [
+			{icon = _tex("eat"), label = "Eat", fact = "3 dishes in bag", guide = "Open bag", go = "bag", on = true},
+			{icon = _tex("pot"), label = "Cook", fact = "4 fish in creel" if home else "At home", guide = "Show kitchen", go = "stove", on = home},
+			{icon = _tex("dish_fruit_tea"), label = "Tea", fact = "Tea House opens later", guide = "", go = "", on = false},
+			{icon = _tex("rest"), label = "Rest", fact = "Available" if home else "At home", guide = "Show bench", go = "home", on = home},
+		],
+	}
+
+static func _energy_cards() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(UiEnergyCard.card(_energy_facts(false, true)), "short"))
+	v.add_child(_captioned(UiEnergyCard.card(_energy_facts(true, false)), "empty · away from home"))
+	return v
+
+static func _energy_panels() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var facts := {max = 200, level = "", uses = [
+		{name = "Meals", have = 100, need = 300, icon = _tex("eat")},
+		{name = "Rest", have = 0, need = 1, icon = _tex("rest")},
+	], blessing = {title = "Newcomer Blessing · 5 days left", detail = "Energy returns 1.5× faster · Meals 300 a day"}}
+	var p := UiEnergyCard.panel(facts)
+	var holder := MarginContainer.new()
+	holder.add_theme_constant_override(&"margin_top", int(UiTokens.SPACE_ROW))
+	holder.add_child(p)
+	v.add_child(holder)
 	return v

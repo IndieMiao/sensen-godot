@@ -1,0 +1,2665 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    502
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiHud"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "HUD 1143:103373 · LOCK-06 (shown at 328/360)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        450
+      ],
+      "children": [
+        {
+          "type": "Control",
+          "rect": [
+            0,
+            52,
+            328,
+            90
+          ],
+          "children": [
+            {
+              "type": "Control",
+              "rect": [
+                0,
+                52,
+                328,
+                89
+              ],
+              "children": [
+                {
+                  "type": "Control",
+                  "rect": [
+                    0,
+                    52,
+                    328,
+                    89
+                  ],
+                  "children": [
+                    {
+                      "type": "UiHud",
+                      "rect": [
+                        0,
+                        52,
+                        328,
+                        89
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            7,
+                            67,
+                            313,
+                            75
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                9,
+                                105,
+                                310,
+                                40
+                              ],
+                              "children": [
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    9,
+                                    105,
+                                    155,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        9,
+                                        105,
+                                        155,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        9,
+                                        105,
+                                        155,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            16,
+                                            114,
+                                            142,
+                                            22
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                16,
+                                                118,
+                                                127,
+                                                14
+                                              ],
+                                              "variation": "C10B",
+                                              "text": "Today · Radishes ready in 1h 12m"
+                                            },
+                                            {
+                                              "type": "Control",
+                                              "rect": [
+                                                148,
+                                                119,
+                                                11,
+                                                11
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    171,
+                                    105,
+                                    148,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        171,
+                                        105,
+                                        148,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        171,
+                                        105,
+                                        148,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            179,
+                                            114,
+                                            135,
+                                            22
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                179,
+                                                119,
+                                                10,
+                                                10
+                                              ]
+                                            },
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                193,
+                                                114,
+                                                112,
+                                                22
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    193,
+                                                    118,
+                                                    47,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": "Shanghai · "
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    241,
+                                                    118,
+                                                    64,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": "Homestead"
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    304,
+                                                    118,
+                                                    1,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": ""
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                310,
+                                                117,
+                                                4,
+                                                16
+                                              ],
+                                              "variation": "C12B",
+                                              "text": "›"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                6,
+                                67,
+                                320,
+                                40
+                              ],
+                              "children": [
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    6,
+                                    67,
+                                    40,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        6,
+                                        67,
+                                        40,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        6,
+                                        67,
+                                        40,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            9,
+                                            70,
+                                            35,
+                                            35
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    46,
+                                    67,
+                                    2,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    48,
+                                    67,
+                                    91,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        48,
+                                        67,
+                                        91,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        48,
+                                        67,
+                                        91,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "VBoxContainer",
+                                          "rect": [
+                                            56,
+                                            70,
+                                            84,
+                                            36
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                56,
+                                                70,
+                                                84,
+                                                18
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "TextureRect",
+                                                  "rect": [
+                                                    56,
+                                                    74,
+                                                    11,
+                                                    11
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    67,
+                                                    70,
+                                                    51,
+                                                    18
+                                                  ],
+                                                  "variation": "C14XB",
+                                                  "text": "142/200"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Control",
+                                              "rect": [
+                                                56,
+                                                89,
+                                                77,
+                                                3
+                                              ]
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                56,
+                                                93,
+                                                84,
+                                                14
+                                              ],
+                                              "variation": "C10B",
+                                              "text": "+1 in 2:40"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    139,
+                                    67,
+                                    5,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    144,
+                                    67,
+                                    95,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    239,
+                                    67,
+                                    87,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PanelContainer",
+                                      "rect": [
+                                        239,
+                                        67,
+                                        46,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            245,
+                                            67,
+                                            34,
+                                            40
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                245,
+                                                80,
+                                                18,
+                                                15
+                                              ],
+                                              "variation": "C11XB",
+                                              "text": "230"
+                                            },
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                267,
+                                                81,
+                                                12,
+                                                12
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        285,
+                                        67,
+                                        1,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "BaseButton",
+                                      "rect": [
+                                        286,
+                                        67,
+                                        40,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Panel",
+                                          "rect": [
+                                            286,
+                                            67,
+                                            40,
+                                            40
+                                          ]
+                                        },
+                                        {
+                                          "type": "MarginContainer",
+                                          "rect": [
+                                            286,
+                                            67,
+                                            40,
+                                            40
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                298,
+                                                79,
+                                                16,
+                                                16
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Control",
+          "rect": [
+            0,
+            142,
+            328,
+            90
+          ],
+          "children": [
+            {
+              "type": "Control",
+              "rect": [
+                0,
+                142,
+                328,
+                89
+              ],
+              "children": [
+                {
+                  "type": "Control",
+                  "rect": [
+                    0,
+                    142,
+                    328,
+                    89
+                  ],
+                  "children": [
+                    {
+                      "type": "UiHud",
+                      "rect": [
+                        0,
+                        142,
+                        328,
+                        89
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            7,
+                            157,
+                            313,
+                            75
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                9,
+                                195,
+                                310,
+                                40
+                              ],
+                              "children": [
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    9,
+                                    195,
+                                    155,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        9,
+                                        195,
+                                        155,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        9,
+                                        195,
+                                        155,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            16,
+                                            204,
+                                            142,
+                                            22
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                16,
+                                                208,
+                                                127,
+                                                14
+                                              ],
+                                              "variation": "C10B",
+                                              "text": "Today · Sow your first plot"
+                                            },
+                                            {
+                                              "type": "Control",
+                                              "rect": [
+                                                148,
+                                                209,
+                                                11,
+                                                11
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    171,
+                                    195,
+                                    148,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        171,
+                                        195,
+                                        148,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        171,
+                                        195,
+                                        148,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            179,
+                                            204,
+                                            135,
+                                            22
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                179,
+                                                209,
+                                                10,
+                                                10
+                                              ]
+                                            },
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                193,
+                                                204,
+                                                112,
+                                                22
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    193,
+                                                    208,
+                                                    47,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": "Shanghai · "
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    241,
+                                                    208,
+                                                    64,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": "Farmhouse"
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    304,
+                                                    208,
+                                                    1,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": ""
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                310,
+                                                207,
+                                                4,
+                                                16
+                                              ],
+                                              "variation": "C12B",
+                                              "text": "›"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                6,
+                                157,
+                                320,
+                                40
+                              ],
+                              "children": [
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    6,
+                                    157,
+                                    40,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        6,
+                                        157,
+                                        40,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        6,
+                                        157,
+                                        40,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            9,
+                                            160,
+                                            35,
+                                            35
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    46,
+                                    157,
+                                    2,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    48,
+                                    157,
+                                    91,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        48,
+                                        157,
+                                        91,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        48,
+                                        157,
+                                        91,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "VBoxContainer",
+                                          "rect": [
+                                            56,
+                                            160,
+                                            84,
+                                            36
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                56,
+                                                160,
+                                                84,
+                                                18
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "TextureRect",
+                                                  "rect": [
+                                                    56,
+                                                    164,
+                                                    11,
+                                                    11
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    67,
+                                                    160,
+                                                    36,
+                                                    18
+                                                  ],
+                                                  "variation": "C14XB",
+                                                  "text": "1/200"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Control",
+                                              "rect": [
+                                                56,
+                                                179,
+                                                77,
+                                                3
+                                              ]
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                56,
+                                                183,
+                                                84,
+                                                14
+                                              ],
+                                              "variation": "C10B",
+                                              "text": "+1 in 2:41"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    139,
+                                    157,
+                                    5,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "PanelContainer",
+                                  "rect": [
+                                    144,
+                                    157,
+                                    66,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        150,
+                                        157,
+                                        53,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            150,
+                                            171,
+                                            13,
+                                            13
+                                          ]
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            167,
+                                            170,
+                                            36,
+                                            15
+                                          ],
+                                          "variation": "C11XB",
+                                          "text": "2h 59m"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    210,
+                                    157,
+                                    29,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    239,
+                                    157,
+                                    87,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PanelContainer",
+                                      "rect": [
+                                        239,
+                                        157,
+                                        46,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            245,
+                                            157,
+                                            34,
+                                            40
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                245,
+                                                170,
+                                                18,
+                                                15
+                                              ],
+                                              "variation": "C11XB",
+                                              "text": "230"
+                                            },
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                267,
+                                                171,
+                                                12,
+                                                12
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        285,
+                                        157,
+                                        1,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "BaseButton",
+                                      "rect": [
+                                        286,
+                                        157,
+                                        40,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Panel",
+                                          "rect": [
+                                            286,
+                                            157,
+                                            40,
+                                            40
+                                          ]
+                                        },
+                                        {
+                                          "type": "MarginContainer",
+                                          "rect": [
+                                            286,
+                                            157,
+                                            40,
+                                            40
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                298,
+                                                169,
+                                                16,
+                                                16
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "PanelContainer",
+                                          "rect": [
+                                            306,
+                                            156,
+                                            16,
+                                            14
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                306,
+                                                156,
+                                                16,
+                                                14
+                                              ],
+                                              "variation": "C10XB",
+                                              "text": "3"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Control",
+          "rect": [
+            0,
+            232,
+            328,
+            90
+          ],
+          "children": [
+            {
+              "type": "Control",
+              "rect": [
+                0,
+                232,
+                328,
+                89
+              ],
+              "children": [
+                {
+                  "type": "Control",
+                  "rect": [
+                    0,
+                    232,
+                    328,
+                    89
+                  ],
+                  "children": [
+                    {
+                      "type": "UiHud",
+                      "rect": [
+                        0,
+                        232,
+                        328,
+                        89
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            7,
+                            247,
+                            313,
+                            75
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                9,
+                                285,
+                                310,
+                                40
+                              ],
+                              "children": [
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    9,
+                                    285,
+                                    155,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        9,
+                                        285,
+                                        155,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        9,
+                                        285,
+                                        155,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            16,
+                                            294,
+                                            142,
+                                            22
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                16,
+                                                298,
+                                                127,
+                                                14
+                                              ],
+                                              "variation": "C10B",
+                                              "text": "Today · All caught up"
+                                            },
+                                            {
+                                              "type": "Control",
+                                              "rect": [
+                                                148,
+                                                299,
+                                                11,
+                                                11
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    171,
+                                    285,
+                                    148,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        171,
+                                        285,
+                                        148,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        171,
+                                        285,
+                                        148,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            179,
+                                            294,
+                                            135,
+                                            22
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                179,
+                                                299,
+                                                10,
+                                                10
+                                              ]
+                                            },
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                193,
+                                                294,
+                                                112,
+                                                22
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    193,
+                                                    298,
+                                                    33,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": "Tokyo · "
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    226,
+                                                    298,
+                                                    15,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": "Arrived"
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    241,
+                                                    298,
+                                                    65,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": " · Day Pass 23h"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                310,
+                                                297,
+                                                4,
+                                                16
+                                              ],
+                                              "variation": "C12B",
+                                              "text": "›"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                6,
+                                247,
+                                320,
+                                40
+                              ],
+                              "children": [
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    6,
+                                    247,
+                                    40,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        6,
+                                        247,
+                                        40,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        6,
+                                        247,
+                                        40,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            9,
+                                            250,
+                                            35,
+                                            35
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    46,
+                                    247,
+                                    2,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    48,
+                                    247,
+                                    91,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        48,
+                                        247,
+                                        91,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        48,
+                                        247,
+                                        91,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "VBoxContainer",
+                                          "rect": [
+                                            56,
+                                            250,
+                                            84,
+                                            36
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                56,
+                                                250,
+                                                84,
+                                                18
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "TextureRect",
+                                                  "rect": [
+                                                    56,
+                                                    254,
+                                                    11,
+                                                    11
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    67,
+                                                    250,
+                                                    36,
+                                                    18
+                                                  ],
+                                                  "variation": "C14XB",
+                                                  "text": "0/200"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Control",
+                                              "rect": [
+                                                56,
+                                                269,
+                                                77,
+                                                3
+                                              ]
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                56,
+                                                273,
+                                                84,
+                                                14
+                                              ],
+                                              "variation": "C10B",
+                                              "text": "+1 in 3:59"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    139,
+                                    247,
+                                    5,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    144,
+                                    247,
+                                    100,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    244,
+                                    247,
+                                    82,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PanelContainer",
+                                      "rect": [
+                                        244,
+                                        247,
+                                        41,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            251,
+                                            247,
+                                            28,
+                                            40
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                251,
+                                                260,
+                                                13,
+                                                15
+                                              ],
+                                              "variation": "C11XB",
+                                              "text": "12"
+                                            },
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                267,
+                                                261,
+                                                12,
+                                                12
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        285,
+                                        247,
+                                        1,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "BaseButton",
+                                      "rect": [
+                                        286,
+                                        247,
+                                        40,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Panel",
+                                          "rect": [
+                                            286,
+                                            247,
+                                            40,
+                                            40
+                                          ]
+                                        },
+                                        {
+                                          "type": "MarginContainer",
+                                          "rect": [
+                                            286,
+                                            247,
+                                            40,
+                                            40
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                298,
+                                                259,
+                                                16,
+                                                16
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "PanelContainer",
+                                          "rect": [
+                                            306,
+                                            246,
+                                            16,
+                                            14
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                306,
+                                                246,
+                                                16,
+                                                14
+                                              ],
+                                              "variation": "C10XB",
+                                              "text": "12"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Control",
+          "rect": [
+            0,
+            322,
+            328,
+            90
+          ],
+          "children": [
+            {
+              "type": "Control",
+              "rect": [
+                0,
+                322,
+                328,
+                89
+              ],
+              "children": [
+                {
+                  "type": "Control",
+                  "rect": [
+                    0,
+                    322,
+                    328,
+                    89
+                  ],
+                  "children": [
+                    {
+                      "type": "UiHud",
+                      "rect": [
+                        0,
+                        322,
+                        328,
+                        89
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            7,
+                            337,
+                            313,
+                            75
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                9,
+                                375,
+                                310,
+                                40
+                              ],
+                              "children": [
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    9,
+                                    375,
+                                    155,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        9,
+                                        375,
+                                        155,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        9,
+                                        375,
+                                        155,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            16,
+                                            384,
+                                            142,
+                                            22
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                16,
+                                                388,
+                                                127,
+                                                14
+                                              ],
+                                              "variation": "C10B",
+                                              "text": "Today · Pond Catch · 2 Pond Crucian · Stall Board"
+                                            },
+                                            {
+                                              "type": "Control",
+                                              "rect": [
+                                                148,
+                                                389,
+                                                11,
+                                                11
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    171,
+                                    375,
+                                    148,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        171,
+                                        375,
+                                        148,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        171,
+                                        375,
+                                        148,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            179,
+                                            384,
+                                            135,
+                                            22
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                179,
+                                                389,
+                                                10,
+                                                10
+                                              ]
+                                            },
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                193,
+                                                384,
+                                                112,
+                                                22
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    193,
+                                                    388,
+                                                    47,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": "Shanghai · "
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    241,
+                                                    388,
+                                                    64,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": "Willow Pond"
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    304,
+                                                    388,
+                                                    1,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": ""
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                310,
+                                                387,
+                                                4,
+                                                16
+                                              ],
+                                              "variation": "C12B",
+                                              "text": "›"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                6,
+                                337,
+                                320,
+                                40
+                              ],
+                              "children": [
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    6,
+                                    337,
+                                    40,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        6,
+                                        337,
+                                        40,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        6,
+                                        337,
+                                        40,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            9,
+                                            340,
+                                            35,
+                                            35
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    46,
+                                    337,
+                                    2,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    48,
+                                    337,
+                                    91,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        48,
+                                        337,
+                                        91,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        48,
+                                        337,
+                                        91,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "VBoxContainer",
+                                          "rect": [
+                                            56,
+                                            340,
+                                            84,
+                                            36
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                56,
+                                                340,
+                                                84,
+                                                18
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "TextureRect",
+                                                  "rect": [
+                                                    56,
+                                                    344,
+                                                    11,
+                                                    11
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    67,
+                                                    340,
+                                                    51,
+                                                    18
+                                                  ],
+                                                  "variation": "C14XB",
+                                                  "text": "200/200"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Control",
+                                              "rect": [
+                                                56,
+                                                359,
+                                                77,
+                                                3
+                                              ]
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                56,
+                                                363,
+                                                84,
+                                                14
+                                              ],
+                                              "variation": "C10B",
+                                              "text": "Full"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    139,
+                                    337,
+                                    5,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    144,
+                                    337,
+                                    88,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    232,
+                                    337,
+                                    94,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PanelContainer",
+                                      "rect": [
+                                        232,
+                                        337,
+                                        53,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            239,
+                                            337,
+                                            40,
+                                            40
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                239,
+                                                350,
+                                                25,
+                                                15
+                                              ],
+                                              "variation": "C11XB",
+                                              "text": "1840"
+                                            },
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                267,
+                                                351,
+                                                12,
+                                                12
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        285,
+                                        337,
+                                        1,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "BaseButton",
+                                      "rect": [
+                                        286,
+                                        337,
+                                        40,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Panel",
+                                          "rect": [
+                                            286,
+                                            337,
+                                            40,
+                                            40
+                                          ]
+                                        },
+                                        {
+                                          "type": "MarginContainer",
+                                          "rect": [
+                                            286,
+                                            337,
+                                            40,
+                                            40
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                298,
+                                                349,
+                                                16,
+                                                16
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Control",
+          "rect": [
+            0,
+            412,
+            328,
+            90
+          ],
+          "children": [
+            {
+              "type": "Control",
+              "rect": [
+                0,
+                412,
+                328,
+                89
+              ],
+              "children": [
+                {
+                  "type": "Control",
+                  "rect": [
+                    0,
+                    412,
+                    328,
+                    89
+                  ],
+                  "children": [
+                    {
+                      "type": "UiHud",
+                      "rect": [
+                        0,
+                        412,
+                        328,
+                        89
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            7,
+                            427,
+                            313,
+                            75
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                9,
+                                465,
+                                310,
+                                40
+                              ],
+                              "children": [
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    9,
+                                    465,
+                                    155,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        9,
+                                        465,
+                                        155,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        9,
+                                        465,
+                                        155,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            16,
+                                            474,
+                                            142,
+                                            22
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                16,
+                                                478,
+                                                127,
+                                                14
+                                              ],
+                                              "variation": "C10B",
+                                              "text": "Today · Herb Grilled Fish ready at the stove"
+                                            },
+                                            {
+                                              "type": "Control",
+                                              "rect": [
+                                                148,
+                                                479,
+                                                11,
+                                                11
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    171,
+                                    465,
+                                    148,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        171,
+                                        465,
+                                        148,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        171,
+                                        465,
+                                        148,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            179,
+                                            474,
+                                            135,
+                                            22
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                179,
+                                                479,
+                                                10,
+                                                10
+                                              ]
+                                            },
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                193,
+                                                474,
+                                                112,
+                                                22
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    193,
+                                                    478,
+                                                    47,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": "Shanghai · "
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    241,
+                                                    478,
+                                                    64,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": "Homestead"
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    304,
+                                                    478,
+                                                    1,
+                                                    14
+                                                  ],
+                                                  "variation": "C10B",
+                                                  "text": ""
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                310,
+                                                477,
+                                                4,
+                                                16
+                                              ],
+                                              "variation": "C12B",
+                                              "text": "›"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                6,
+                                427,
+                                320,
+                                40
+                              ],
+                              "children": [
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    6,
+                                    427,
+                                    40,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        6,
+                                        427,
+                                        40,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        6,
+                                        427,
+                                        40,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            9,
+                                            430,
+                                            35,
+                                            35
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    46,
+                                    427,
+                                    2,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "BaseButton",
+                                  "rect": [
+                                    48,
+                                    427,
+                                    91,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        48,
+                                        427,
+                                        91,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "MarginContainer",
+                                      "rect": [
+                                        48,
+                                        427,
+                                        91,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "VBoxContainer",
+                                          "rect": [
+                                            56,
+                                            430,
+                                            84,
+                                            36
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                56,
+                                                430,
+                                                84,
+                                                18
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "TextureRect",
+                                                  "rect": [
+                                                    56,
+                                                    434,
+                                                    11,
+                                                    11
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    67,
+                                                    430,
+                                                    51,
+                                                    18
+                                                  ],
+                                                  "variation": "C14XB",
+                                                  "text": "214/200"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Control",
+                                              "rect": [
+                                                56,
+                                                449,
+                                                77,
+                                                3
+                                              ]
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                56,
+                                                453,
+                                                84,
+                                                14
+                                              ],
+                                              "variation": "C10B",
+                                              "text": "Bonus +14"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    139,
+                                    427,
+                                    5,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    144,
+                                    427,
+                                    95,
+                                    40
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    239,
+                                    427,
+                                    87,
+                                    40
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "PanelContainer",
+                                      "rect": [
+                                        239,
+                                        427,
+                                        46,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            245,
+                                            427,
+                                            34,
+                                            40
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                245,
+                                                440,
+                                                18,
+                                                15
+                                              ],
+                                              "variation": "C11XB",
+                                              "text": "230"
+                                            },
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                267,
+                                                441,
+                                                12,
+                                                12
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        285,
+                                        427,
+                                        1,
+                                        40
+                                      ]
+                                    },
+                                    {
+                                      "type": "BaseButton",
+                                      "rect": [
+                                        286,
+                                        427,
+                                        40,
+                                        40
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Panel",
+                                          "rect": [
+                                            286,
+                                            427,
+                                            40,
+                                            40
+                                          ]
+                                        },
+                                        {
+                                          "type": "MarginContainer",
+                                          "rect": [
+                                            286,
+                                            427,
+                                            40,
+                                            40
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                298,
+                                                439,
+                                                16,
+                                                16
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

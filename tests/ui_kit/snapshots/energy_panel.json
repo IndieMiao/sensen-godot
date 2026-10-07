@@ -1,0 +1,377 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    242
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiEnergyCard · panel"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Energy 1094:77504 Kind=Panel · LOCK-09"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        190
+      ],
+      "children": [
+        {
+          "type": "MarginContainer",
+          "rect": [
+            0,
+            52,
+            328,
+            190
+          ],
+          "children": [
+            {
+              "type": "UiEnergyCard",
+              "rect": [
+                0,
+                64,
+                328,
+                178
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    14,
+                    76,
+                    300,
+                    154
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        76,
+                        300,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            14,
+                            78,
+                            16,
+                            16
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            36,
+                            76,
+                            58,
+                            20
+                          ],
+                          "variation": "BodyXB14",
+                          "text": "Max 200"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        108,
+                        300,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            14,
+                            108,
+                            78,
+                            56
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                14,
+                                108,
+                                78,
+                                56
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    35,
+                                    108,
+                                    36,
+                                    36
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        43,
+                                        116,
+                                        20,
+                                        20
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    14,
+                                    148,
+                                    78,
+                                    16
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        14,
+                                        148,
+                                        31,
+                                        16
+                                      ],
+                                      "variation": "C11XB",
+                                      "text": "Meals"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        48,
+                                        148,
+                                        44,
+                                        16
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            48,
+                                            148,
+                                            20,
+                                            16
+                                          ],
+                                          "variation": "C11XB",
+                                          "text": "100"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            68,
+                                            148,
+                                            24,
+                                            16
+                                          ],
+                                          "variation": "C11B",
+                                          "text": "/300"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            102,
+                            108,
+                            45,
+                            56
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                102,
+                                108,
+                                45,
+                                56
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    106,
+                                    108,
+                                    36,
+                                    36
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        114,
+                                        116,
+                                        20,
+                                        20
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    102,
+                                    148,
+                                    45,
+                                    16
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        102,
+                                        148,
+                                        24,
+                                        16
+                                      ],
+                                      "variation": "C11XB",
+                                      "text": "Rest"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        129,
+                                        148,
+                                        18,
+                                        16
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            129,
+                                            148,
+                                            7,
+                                            16
+                                          ],
+                                          "variation": "C11XB",
+                                          "text": "0"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            136,
+                                            148,
+                                            11,
+                                            16
+                                          ],
+                                          "variation": "C11B",
+                                          "text": "/1"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        14,
+                        176,
+                        300,
+                        54
+                      ],
+                      "children": [
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            24,
+                            184,
+                            280,
+                            38
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                24,
+                                184,
+                                280,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    24,
+                                    186,
+                                    14,
+                                    14
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    44,
+                                    184,
+                                    182,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "Newcomer Blessing · 5 days left"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                24,
+                                204,
+                                280,
+                                18
+                              ],
+                              "variation": "CaptionB12",
+                              "text": "Energy returns 1.5× faster · Meals 300 a day"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
