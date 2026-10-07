@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    470
+    573
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         70,
         328,
-        400
+        503
       ],
       "children": [
         {
@@ -466,7 +466,7 @@
                 14
               ],
               "variation": "C9B",
-              "text": "selected · pinned · zero (pinned, 0 left) · ghost"
+              "text": "selected · pinned · zero (pinned, 0 left) · empty"
             }
           ]
         },
@@ -519,7 +519,7 @@
                               "type": "Panel",
                               "rect": [
                                 0,
-                                171,
+                                181,
                                 51,
                                 62
                               ],
@@ -528,7 +528,7 @@
                                   "type": "Control",
                                   "rect": [
                                     4,
-                                    175,
+                                    185,
                                     43,
                                     55
                                   ],
@@ -537,7 +537,7 @@
                                       "type": "TextureRect",
                                       "rect": [
                                         15,
-                                        175,
+                                        185,
                                         21,
                                         21
                                       ]
@@ -546,52 +546,23 @@
                                       "type": "Label",
                                       "rect": [
                                         4,
-                                        193,
+                                        206,
                                         43,
-                                        28
+                                        21
                                       ],
                                       "variation": "C10B",
-                                      "text": "Radish Seeds"
+                                      "text": "Compost"
                                     },
                                     {
                                       "type": "Label",
                                       "rect": [
                                         4,
-                                        216,
+                                        226,
                                         43,
                                         15
                                       ],
                                       "variation": "C10XB",
-                                      "text": "×24"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "Panel",
-                                  "rect": [
-                                    8,
-                                    173,
-                                    35,
-                                    2
-                                  ]
-                                },
-                                {
-                                  "type": "Panel",
-                                  "rect": [
-                                    19,
-                                    164,
-                                    14,
-                                    14
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        21,
-                                        166,
-                                        10,
-                                        10
-                                      ]
+                                      "text": "×6"
                                     }
                                   ]
                                 }
@@ -639,23 +610,12 @@
                                       "type": "Label",
                                       "rect": [
                                         59,
-                                        203,
+                                        206,
                                         43,
-                                        28
+                                        21
                                       ],
                                       "variation": "C10B",
-                                      "text": "Carrot Seeds"
-                                    },
-                                    {
-                                      "type": "Label",
-                                      "rect": [
-                                        59,
-                                        226,
-                                        43,
-                                        15
-                                      ],
-                                      "variation": "C10XB",
-                                      "text": "×6"
+                                      "text": "Seeds"
                                     }
                                   ]
                                 }
@@ -688,68 +648,6 @@
                                     185,
                                     43,
                                     55
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        124,
-                                        185,
-                                        21,
-                                        21
-                                      ]
-                                    },
-                                    {
-                                      "type": "Label",
-                                      "rect": [
-                                        113,
-                                        206,
-                                        43,
-                                        21
-                                      ],
-                                      "variation": "C10B",
-                                      "text": "Compost"
-                                    },
-                                    {
-                                      "type": "Label",
-                                      "rect": [
-                                        113,
-                                        226,
-                                        43,
-                                        15
-                                      ],
-                                      "variation": "C10XB",
-                                      "text": "×0"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "Panel",
-                                  "rect": [
-                                    117,
-                                    182,
-                                    35,
-                                    2
-                                  ]
-                                },
-                                {
-                                  "type": "Panel",
-                                  "rect": [
-                                    128,
-                                    174,
-                                    14,
-                                    14
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        130,
-                                        176,
-                                        10,
-                                        10
-                                      ]
-                                    }
                                   ]
                                 }
                               ]
@@ -781,39 +679,6 @@
                                     185,
                                     43,
                                     55
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        179,
-                                        185,
-                                        21,
-                                        21
-                                      ]
-                                    },
-                                    {
-                                      "type": "Label",
-                                      "rect": [
-                                        168,
-                                        203,
-                                        43,
-                                        28
-                                      ],
-                                      "variation": "C10B",
-                                      "text": "Potato Seeds"
-                                    },
-                                    {
-                                      "type": "Label",
-                                      "rect": [
-                                        168,
-                                        226,
-                                        43,
-                                        15
-                                      ],
-                                      "variation": "C10XB",
-                                      "text": "×3"
-                                    }
                                   ]
                                 }
                               ]
@@ -880,15 +745,6 @@
                               ],
                               "variation": "C11B",
                               "text": "Bag"
-                            },
-                            {
-                              "type": "Panel",
-                              "rect": [
-                                313,
-                                192,
-                                7,
-                                7
-                              ]
                             }
                           ]
                         }
@@ -907,7 +763,7 @@
                 14
               ],
               "variation": "C9B",
-              "text": "lifted (dragging) · drop target · Bag at 90%"
+              "text": "no seeds on the bar: the first empty slot is the Seeds ghost"
             }
           ]
         },
@@ -960,7 +816,7 @@
                               "type": "Panel",
                               "rect": [
                                 0,
-                                284,
+                                274,
                                 51,
                                 62
                               ],
@@ -969,7 +825,7 @@
                                   "type": "Control",
                                   "rect": [
                                     4,
-                                    288,
+                                    278,
                                     43,
                                     55
                                   ],
@@ -978,7 +834,7 @@
                                       "type": "TextureRect",
                                       "rect": [
                                         15,
-                                        288,
+                                        278,
                                         21,
                                         21
                                       ]
@@ -987,7 +843,7 @@
                                       "type": "Label",
                                       "rect": [
                                         4,
-                                        306,
+                                        296,
                                         43,
                                         28
                                       ],
@@ -998,7 +854,7 @@
                                       "type": "Label",
                                       "rect": [
                                         4,
-                                        329,
+                                        319,
                                         43,
                                         15
                                       ],
@@ -1011,7 +867,7 @@
                                   "type": "Panel",
                                   "rect": [
                                     8,
-                                    285,
+                                    276,
                                     35,
                                     2
                                   ]
@@ -1020,7 +876,7 @@
                                   "type": "Panel",
                                   "rect": [
                                     19,
-                                    277,
+                                    267,
                                     14,
                                     14
                                   ],
@@ -1029,7 +885,7 @@
                                       "type": "TextureRect",
                                       "rect": [
                                         21,
-                                        279,
+                                        269,
                                         10,
                                         10
                                       ]
@@ -1320,7 +1176,16 @@
                                 16
                               ],
                               "variation": "C11B",
-                              "text": "Close"
+                              "text": "Bag"
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                313,
+                                295,
+                                7,
+                                7
+                              ]
                             }
                           ]
                         }
@@ -1339,7 +1204,7 @@
                 14
               ],
               "variation": "C9B",
-              "text": "bag drawer open: Close"
+              "text": "lifted (dragging) · drop target · Bag at 90%"
             }
           ]
         },
@@ -1380,6 +1245,351 @@
                       ],
                       "children": [
                         {
+                          "type": "UiItemCell",
+                          "rect": [
+                            0,
+                            383,
+                            51,
+                            66
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                0,
+                                387,
+                                51,
+                                62
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    4,
+                                    391,
+                                    43,
+                                    55
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        15,
+                                        391,
+                                        21,
+                                        21
+                                      ]
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        4,
+                                        409,
+                                        43,
+                                        28
+                                      ],
+                                      "variation": "C10B",
+                                      "text": "Radish Seeds"
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        4,
+                                        432,
+                                        43,
+                                        15
+                                      ],
+                                      "variation": "C10XB",
+                                      "text": "×24"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    8,
+                                    388,
+                                    35,
+                                    2
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    19,
+                                    380,
+                                    14,
+                                    14
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        21,
+                                        382,
+                                        10,
+                                        10
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiItemCell",
+                          "rect": [
+                            55,
+                            383,
+                            51,
+                            66
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                55,
+                                387,
+                                51,
+                                62
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    59,
+                                    391,
+                                    43,
+                                    55
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        69,
+                                        391,
+                                        21,
+                                        21
+                                      ]
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        59,
+                                        409,
+                                        43,
+                                        28
+                                      ],
+                                      "variation": "C10B",
+                                      "text": "Carrot Seeds"
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        59,
+                                        432,
+                                        43,
+                                        15
+                                      ],
+                                      "variation": "C10XB",
+                                      "text": "×6"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiItemCell",
+                          "rect": [
+                            109,
+                            383,
+                            51,
+                            66
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                109,
+                                387,
+                                51,
+                                62
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    113,
+                                    391,
+                                    43,
+                                    55
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        124,
+                                        391,
+                                        21,
+                                        21
+                                      ]
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        113,
+                                        412,
+                                        43,
+                                        21
+                                      ],
+                                      "variation": "C10B",
+                                      "text": "Compost"
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        113,
+                                        432,
+                                        43,
+                                        15
+                                      ],
+                                      "variation": "C10XB",
+                                      "text": "×0"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    117,
+                                    388,
+                                    35,
+                                    2
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    128,
+                                    380,
+                                    14,
+                                    14
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        130,
+                                        382,
+                                        10,
+                                        10
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiItemCell",
+                          "rect": [
+                            164,
+                            383,
+                            51,
+                            66
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                164,
+                                387,
+                                51,
+                                62
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    168,
+                                    391,
+                                    43,
+                                    55
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        179,
+                                        391,
+                                        21,
+                                        21
+                                      ]
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        168,
+                                        409,
+                                        43,
+                                        28
+                                      ],
+                                      "variation": "C10B",
+                                      "text": "Potato Seeds"
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        168,
+                                        432,
+                                        43,
+                                        15
+                                      ],
+                                      "variation": "C10XB",
+                                      "text": "×3"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiItemCell",
+                          "rect": [
+                            219,
+                            383,
+                            51,
+                            66
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                219,
+                                387,
+                                51,
+                                62
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    223,
+                                    391,
+                                    43,
+                                    55
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
                           "type": "Button",
                           "rect": [
                             273,
@@ -1407,6 +1617,93 @@
                                 16
                               ],
                               "variation": "C11B",
+                              "text": "Close"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                456,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "bag drawer open: Close"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            482,
+            328,
+            91
+          ],
+          "children": [
+            {
+              "type": "Control",
+              "rect": [
+                0,
+                482,
+                328,
+                71
+              ],
+              "children": [
+                {
+                  "type": "UiQuickBar",
+                  "rect": [
+                    0,
+                    486,
+                    328,
+                    66
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        0,
+                        486,
+                        328,
+                        66
+                      ],
+                      "children": [
+                        {
+                          "type": "Button",
+                          "rect": [
+                            273,
+                            486,
+                            55,
+                            66
+                          ],
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                290,
+                                505,
+                                21,
+                                21
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                273,
+                                530,
+                                55,
+                                16
+                              ],
+                              "variation": "C11B",
                               "text": "Bag"
                             }
                           ]
@@ -1417,7 +1714,7 @@
                       "type": "Button",
                       "rect": [
                         105,
-                        379,
+                        482,
                         117,
                         43
                       ],
@@ -1427,7 +1724,7 @@
                           "type": "Panel",
                           "rect": [
                             152,
-                            399,
+                            502,
                             23,
                             3
                           ]
@@ -1442,7 +1739,7 @@
               "type": "Label",
               "rect": [
                 0,
-                456,
+                559,
                 328,
                 14
               ],

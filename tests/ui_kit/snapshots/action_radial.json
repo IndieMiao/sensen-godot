@@ -259,7 +259,7 @@
                       "rect": [
                         161,
                         190,
-                        94,
+                        102,
                         48
                       ],
                       "children": [
@@ -268,7 +268,7 @@
                           "rect": [
                             171,
                             195,
-                            74,
+                            82,
                             38
                           ],
                           "children": [
@@ -277,7 +277,7 @@
                               "rect": [
                                 171,
                                 195,
-                                74,
+                                82,
                                 20
                               ],
                               "variation": "BodyXB14",
@@ -288,11 +288,11 @@
                               "rect": [
                                 171,
                                 215,
-                                74,
+                                82,
                                 18
                               ],
                               "variation": "CaptionB12",
-                              "text": "Not in a mine"
+                              "text": "Enter the mine"
                             }
                           ]
                         }
@@ -344,7 +344,7 @@
                       "rect": [
                         109,
                         244,
-                        113,
+                        107,
                         48
                       ],
                       "children": [
@@ -353,7 +353,7 @@
                           "rect": [
                             119,
                             249,
-                            93,
+                            87,
                             38
                           ],
                           "children": [
@@ -362,7 +362,7 @@
                               "rect": [
                                 119,
                                 249,
-                                93,
+                                87,
                                 20
                               ],
                               "variation": "BodyXB14",
@@ -373,11 +373,11 @@
                               "rect": [
                                 119,
                                 269,
-                                93,
+                                87,
                                 18
                               ],
                               "variation": "CaptionB12",
-                              "text": "No enemies here"
+                              "text": "Mine floors 3–5"
                             }
                           ]
                         }

@@ -41,6 +41,20 @@ func test_slots_draw_their_states() -> void:
 	assert_str(bar.cells()[0].quantity).is_equal("×24")
 	assert_str(bar.cells()[4].quantity).is_empty()   # a ghost slot has no count
 
+func test_a_ghost_slot_shows_the_family_without_a_count_or_pin() -> void:
+	bar.slots = [{id = "compost", icon = T, title = "Compost", quantity = 6},
+		{ghost = true, icon = T, title = "Seeds", pinned = true}]
+	var c: UiItemCell = bar.cells()[1]
+	assert_int(c.state).is_equal(UiItemCell.State.GHOST)
+	assert_str(c.title).is_equal("Seeds")
+	assert_str(c.quantity).is_empty()
+	assert_bool(c.pinned).is_false()   # never pinned (QuickSlot State=ghost, A-08)
+	assert_int(bar.cells()[2].state).is_equal(UiItemCell.State.EMPTY)
+	c.tapped.emit()
+	assert_array(events).contains_exactly([["ghost_tapped", 1, null]])
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
+	assert_int(c.state).is_equal(UiItemCell.State.GHOST)   # a ghost never floats
+
 func test_bar_matches_the_figma_frame() -> void:
 	assert_vector(bar.size).is_equal(Vector2(UiTokens.SIZE_QUICK_BAR_W, UiTokens.SIZE_QUICK_BAR_H))
 	assert_float(bar.end_button().size.x).is_equal(float(UiTokens.SIZE_QUICK_END_W))

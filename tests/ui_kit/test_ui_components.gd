@@ -99,12 +99,27 @@ func test_zero_quick_slot_dims_the_icon_and_greys_the_count() -> void:
 	var count: Label = _visible_named(c, "Label").filter(func(l): return (l as Label).text == "×0")[0]
 	assert_str(count.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
 
+func test_ghost_quick_slot_is_dashed_with_a_dimmed_icon_and_a_grey_family_name() -> void:
+	var c := _quick({state = UiItemCell.State.GHOST, title = "Seeds", quantity = "×5", pinned = true})
+	await _settle()
+	var icon: TextureRect = _visible_named(c, "TextureRect").filter(func(t): return (t as TextureRect).texture != UiItemCell.PIN_GLYPH)[0]
+	assert_float(icon.modulate.a).is_equal_approx(UiTokens.OPACITY_ZERO_ICON, 0.001)
+	var labels := _visible_named(c, "Label")
+	assert_array(labels.map(func(l): return (l as Label).text)).contains_exactly(["Seeds"])   # no count
+	assert_str((labels[0] as Label).get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
+	assert_bool(_visible_named(c, "TextureRect").any(func(t): return (t as TextureRect).texture == UiItemCell.PIN_GLYPH)).is_false()
+	var box := _surface(c).get_theme_stylebox(&"panel") as UiStyleBox
+	assert_bool(box.dashed).is_true()
+	assert_float(box.dash).is_equal(float(UiTokens.DASH_QUICK[0]))
+
 func test_quick_only_states_fall_back_to_default_on_other_mains() -> void:
 	for d in [UiItemCell.Density.INVENTORY, UiItemCell.Density.KITCHEN, UiItemCell.Density.GEAR]:
 		var c: UiItemCell = auto_free(UiItemCell.new(d))
 		for s in [UiItemCell.State.LIFTED, UiItemCell.State.DROP_TARGET, UiItemCell.State.ZERO]:
 			c.state = s
 			assert_int(c.drawn_state()).is_equal(UiItemCell.State.DEFAULT)
+		c.state = UiItemCell.State.GHOST
+		assert_int(c.drawn_state()).is_equal(UiItemCell.State.EMPTY)
 
 func test_inventory_cell_quantity_pill_and_rarity_dot() -> void:
 	var c: UiItemCell = _host(UiItemCell.new(UiItemCell.Density.INVENTORY))

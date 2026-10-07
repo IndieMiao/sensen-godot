@@ -264,7 +264,7 @@ static func _cells_quick() -> Control:
 		["default", {}], ["selected", {state = S.SELECTED}], ["pinned", {pinned = true}],
 		["pinned + selected", {pinned = true, state = S.SELECTED}], ["lifted", {pinned = true, state = S.LIFTED}],
 		["drop target", {state = S.DROP_TARGET}], ["zero", {pinned = true, state = S.ZERO, quantity = "×0"}],
-		["empty", {state = S.EMPTY}],
+		["empty", {state = S.EMPTY}], ["ghost", {state = S.GHOST, title = "Seeds", quantity = ""}],
 	]
 	for sample in samples:
 		var fields: Dictionary = radish.duplicate()
@@ -388,7 +388,11 @@ static func _quick_bars() -> Control:
 	var a := UiQuickBar.new()
 	a.slots = _bar_slots()
 	a.selected = "seed_carrot"
-	v.add_child(_fit_bar(a, "selected · pinned · zero (pinned, 0 left) · ghost"))
+	v.add_child(_fit_bar(a, "selected · pinned · zero (pinned, 0 left) · empty"))
+	var g := UiQuickBar.new()
+	g.slots = [{id = "compost", icon = _tex("compost"), title = "Compost", quantity = 6},
+		{ghost = true, icon = _tex("seed_radish"), title = "Seeds"}]
+	v.add_child(_fit_bar(g, "no seeds on the bar: the first empty slot is the Seeds ghost"))
 	var b := UiQuickBar.new()
 	b.slots = _bar_slots()
 	b.capacity_warning = true
@@ -454,9 +458,9 @@ static func _action_radial() -> Control:
 	host.add_child(r)   # full-rect inside the host; no explicit size (it would add to the anchors)
 	r.options = [
 		{id = "farming", name = "Farming", icon = _tex("hoe"), available = true},
-		{id = "fishing", name = "Fishing", icon = _tex("rod"), available = false, reason = "No water nearby"},
-		{id = "mining", name = "Mining", icon = _tex("pickaxe"), available = false, reason = "Not in a mine"},
-		{id = "combat", name = "Combat", icon = _tex("sword"), available = false, reason = "No enemies here"},
+		{id = "fishing", name = "Fishing", icon = _tex("fish"), available = false, reason = "No water nearby"},
+		{id = "mining", name = "Mining", icon = _tex("pickaxe"), available = false, reason = "Enter the mine"},
+		{id = "combat", name = "Combat", icon = _tex("sword"), available = false, reason = "Mine floors 3–5"},
 	]
 	r.selected = "farming"
 	r.open_at(Vector2(36, 125))

@@ -224,6 +224,25 @@ func test_a_seed_sown_to_zero_is_deselected_and_a_zero_slot_cannot_be_picked() -
 	assert_str(ui.selected_seed).is_empty()   # a 0 slot can't be picked
 	assert_str(ui._toast.text).is_equal("Buy at Homestead Stall")
 
+func test_a_bar_without_the_action_family_shows_its_ghost_in_the_first_empty_slot() -> void:
+	# A-08: Seeds on the farm, Bait at the pond; a tap opens the Bag.
+	var v := _view()
+	v.bag.slots = [{"id": "crop_radish", "qty": 3}]
+	ui.set_view(v)
+	assert_int(ui._bar.slots.size()).is_equal(1)
+	assert_bool(ui._bar.slots[0].get("ghost", false)).is_true()
+	assert_str(ui._bar.slots[0].title).is_equal("Seeds")
+	assert_int(ui._bar.cells()[0].state).is_equal(UiItemCell.State.GHOST)
+	assert_int(ui._bar.cells()[1].state).is_equal(UiItemCell.State.EMPTY)
+	ui.set_mode("fish")
+	ui.set_view(v)
+	assert_str(ui._bar.slots[0].title).is_equal("Bait")
+	ui._bar.cells()[0].tapped.emit()
+	assert_str(ui.modal_kind).is_equal("bag")
+	ui.set_mode("farm")
+	ui.set_view(_view())   # seeds back in the bag: the ghost goes
+	assert_bool(ui._bar.slots.any(func(s): return s.get("ghost", false))).is_false()
+
 func test_the_last_bait_on_a_hook_empties_the_hook_with_a_toast() -> void:
 	# 李白 q(44) ④: casting goes on without bait.
 	var v := _view()

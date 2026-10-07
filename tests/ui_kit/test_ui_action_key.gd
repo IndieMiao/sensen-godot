@@ -129,8 +129,8 @@ func _options() -> Array:
 	return [
 		{id = "farming", name = "Farming", icon = HOE, available = true},
 		{id = "fishing", name = "Fishing", icon = ROD, available = false, reason = "No water nearby"},
-		{id = "mining", name = "Mining", icon = HOE, available = false, reason = "Not in a mine"},
-		{id = "combat", name = "Combat", icon = HOE, available = false, reason = "No enemies here"},
+		{id = "mining", name = "Mining", icon = HOE, available = false, reason = "Enter the mine"},
+		{id = "combat", name = "Combat", icon = HOE, available = false, reason = "Mine floors 3–5"},
 	]
 
 func _radial() -> UiActionRadial:

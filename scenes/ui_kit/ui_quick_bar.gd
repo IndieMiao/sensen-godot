@@ -36,7 +36,8 @@ const _END_DOT_Y := 11.0
 const _HANDLE_RISE := 4.0         # the 44 px touch target starts 4 px above the bar's top edge
 
 ## One dictionary per slot, up to SLOTS: {id, icon: Texture2D, title, quantity: int, pinned: bool}; a missing or
-## empty entry is a ghost slot.
+## empty entry is an empty slot. An entry without id but with ghost = true draws the A-08 ghost: {ghost, icon,
+## title} = the family icon and its one-word name ("Seeds", "Bait"). Tapping any slot without id → ghost_tapped.
 var slots: Array = []: set = set_slots
 ## The selected id, drawn lifted with the green outline (§10.3.1).
 var selected := "": set = set_selected
@@ -166,7 +167,7 @@ func _refresh() -> void:
 		var qty := int(d.get("quantity", 0))
 		cell.quantity = "×%d" % qty if id != "" else ""
 		cell.pinned = bool(d.get("pinned", false)) and id != ""
-		if id == "": cell.state = UiItemCell.State.EMPTY
+		if id == "": cell.state = UiItemCell.State.GHOST if bool(d.get("ghost", false)) else UiItemCell.State.EMPTY
 		elif i == _target: cell.state = UiItemCell.State.DROP_TARGET
 		elif id == selected: cell.state = UiItemCell.State.SELECTED
 		elif qty <= 0 and cell.pinned: cell.state = UiItemCell.State.ZERO
