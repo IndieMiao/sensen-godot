@@ -19,6 +19,7 @@ export class P0Store {
     if (settleParcels(this.c, s, now + s.clock_ms)) this.flush();
     return s;
   }
+  size(): number { return this.players.size; }
   put(state: P0State): void { this.players.set(state.player, state); this.flush(); }
   reset(player: string, now: number): P0State { const s = freshState(this.c, player, now); this.put(s); return s; }
   private flush(): void {
