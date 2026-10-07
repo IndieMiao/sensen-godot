@@ -41,6 +41,9 @@ static func all() -> Array[Dictionary]:
 		{id = "bag_header", title = "UiBagHeader", figma = "BagHeader 1225:83885 · LOCK-12 / 13", build = _bag_headers},
 		{id = "gear_row", title = "UiGearRow", figma = "Gear candidate rows of BAG-2 · Gear · LOCK-13", build = _gear_rows},
 		{id = "resident_bar", title = "UiResidentBar", figma = "ResidentDialogue 1213:83392 Row / Stacked · LOCK-18 (336 at 328)", build = _resident_bars},
+		# SGODOT-226 cooking results (shared with the catch card, SGODOT-233)
+		{id = "quality_badge", title = "UiQualityBadge", figma = "QualityBadge 1178:82154", build = _quality_badges},
+		{id = "reward_moment", title = "UiRewardMoment", figma = "RewardMoment 1179:82271 · COOK-4 / COOK-6 / COOK-P0-9", build = _reward_moments},
 	]
 	return out
 
@@ -599,3 +602,30 @@ static func _gear_rows() -> Control:
 		action = {id = &"equip", label = "Equip", kind = &"secondary"}}))
 	v.add_child(UiGearRow.new({icon = _tex("rod"), title = "Carbon Rod", state = &"Fishing Lv5 · Tackle Shop", effect = "Lands up to Legendary fish"}))
 	return v
+
+static func _quality_badges() -> Control:
+	var row := _row(UiTokens.SPACE_ROW)
+	row.add_child(_captioned(UiQualityBadge.new(1), "Good"))
+	row.add_child(_captioned(UiQualityBadge.new(2), "Perfect"))
+	return row
+
+static func _reward_moment(fields: Dictionary) -> UiRewardMoment:
+	var r := UiRewardMoment.new()
+	r.show_fields(fields)
+	return r
+
+static func _reward_moments() -> Control:
+	var row := _row(UiTokens.SPACE_SECTION)
+	row.add_child(_captioned(_reward_moment({event = "New recipe!", icon = _tex("dish_herb_grilled_fish"), item_name = "Herb Grilled Fish",
+		rarity = 2, rarity_word = "Fine", quality = 1, strip = "First cooked · +20 Cooking XP · Cookbook 2/48", strip_icon = _tex("cookbook"),
+		primary = "Eat · +45 Energy", secondary = "Keep", note = "Gift later from your bag"}), "Reward · first cook (COOK-4)"))
+	row.add_child(_captioned(_reward_moment({event = "Dish ready", icon = _tex("dish_herb_grilled_fish"), item_name = "Herb Grilled Fish",
+		rarity = 2, rarity_word = "Fine", quality = 1, strip = "Collected from Stove 1", strip_icon = _tex("cookbook"),
+		primary = "Energy full", primary_reason = "Energy full", secondary = "Keep", note = "Gift later from your bag"}), "Reward · ready, Energy full (COOK-P0-9)"))
+	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.NEUTRAL, event = "Mystery Dish", icon = _tex("dish_mystery"),
+		item_name = "Hmm… not a dish", strip = "A clue was added to your Cookbook", strip_icon = _tex("cookbook"),
+		primary = "Eat · +5 Energy", secondary = "Keep", note = "Can't be sold or delivered"}), "Neutral · Mystery Dish (COOK-6)"))
+	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.MILESTONE, event = "Home Cook", icon = _tex("cookbook"),
+		item_name = "Cookbook 8/48", strip = "Title · +50 Energy"}), "Milestone · no buttons"))
+	return row
+
