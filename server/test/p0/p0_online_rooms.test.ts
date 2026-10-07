@@ -107,3 +107,14 @@ describe('P0 outpost rooms (SGODOT-227)', () => {
     expect(r.sit('room2', 'seat_table1_1')).toBe('ok');
   });
 });
+
+describe('P0 snapshot frame v1 fixture (shared with tests/p0/test_p0_online.gd)', () => {
+  it('encodes exactly the bytes the Godot client test decodes', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { snapshotFrame } = await import('../../src/p0/online/frame.js');
+    const m = (id: number, x: number, z: number, yaw: number, action: string, seq: number) =>
+      ({ player: 'p' + id, outpost: 'o', room: 1, id, x, z, yaw, action, seat: '', seq, at: 0 });
+    const frame = snapshotFrame(42, 3, [m(1, 1.25, -2.5, 0.75, 'walk', 7), m(4, -1, 2, 3.0, 'sit', 9)]);
+    expect(frame.toString('hex')).toBe(readFileSync(new URL('../../../tests/fixtures/p0/frame_v1.hex', import.meta.url), 'utf8').trim());
+  });
+});

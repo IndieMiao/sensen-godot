@@ -2,6 +2,10 @@ extends Node3D
 ## All 299 remote players remain visible. Eight nearby rigs animate; the rest use instanced silhouettes.
 
 const DETAIL_LIMIT := 8
+## The P0 outposts' "sit" action (appended after OnlineSpace.ACTIONS by the P0 server, SGODOT-227).
+const SIT_ACTION := 15
+## Name tags show "HP / max" in combat spaces; the P0 outposts have no health.
+var show_health := true
 var actors: Dictionary = {}
 var rigs: Array[Dictionary] = []
 var bodies: MultiMeshInstance3D
@@ -139,10 +143,11 @@ func step(delta: float, local_position: Vector3) -> void:
 			if animation == "mine": animation = "labour_drain"
 			if animation == "attack": animation = "labour_harvest"
 			if fishing_action: animation = "idle"
+			if int(actor.action) == SIT_ACTION: animation = "idle"   # sit clips are not in the library yet
 			if fishing.is_empty() and animation != entry.animation:
 				entry.animation = animation
 				entry.rig.play_motion(animation)
-			entry.label.text = L10n.format_text("Traveller %s", str(actor.member.player).substr(0, 4)) + "\n%d / %d" % [int(actor.hp), int(actor.max_hp)]
+			entry.label.text = L10n.format_text("Traveller %s", str(actor.member.player).substr(0, 4)) + ("\n%d / %d" % [int(actor.hp), int(actor.max_hp)] if show_health else "")
 		else:
 			var basis := Basis(Vector3.UP, float(actor.yaw))
 			if work: basis = basis.rotated(Vector3.RIGHT, sin(_time * 5) * .25)
