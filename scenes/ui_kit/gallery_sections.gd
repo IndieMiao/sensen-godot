@@ -33,7 +33,7 @@ static func all() -> Array[Dictionary]:
 		{id = "today_panel", title = "UiTodayPanel", figma = "TodayPanel 1145:81715 · TodayRow 1145:81714 · LOCK-06 (328/360)", build = _today_panels},
 		{id = "energy_card", title = "UiEnergyCard · card", figma = "Energy 1094:77504 Kind=Card · EnergyTile 1093:77292 · LOCK-09", build = _energy_cards},
 		{id = "energy_panel", title = "UiEnergyCard · panel", figma = "Energy 1094:77504 Kind=Panel · LOCK-09", build = _energy_panels},
-		{id = "empty_state", title = "UiEmptyState", figma = "Main pending: WP6 SGODOT-206 · provisional look per WP7-B F-08 §5", build = _empty_states},
+		{id = "empty_state", title = "UiEmptyState", figma = "EmptyState 1234:87237 Kind=Panel / Row · WP6", build = _empty_states},
 	]
 	return out
 
@@ -359,8 +359,9 @@ static func _badges() -> Control:
 
 static func _empty_states() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
-	v.add_child(UiEmptyState.new("No fish yet", _tex("fish_unknown"), "Show on map"))
-	v.add_child(UiEmptyState.new("Nothing to sell here", _tex("stall")))
+	v.add_child(UiEmptyState.new("Your bag is empty", _tex("bag")))
+	v.add_child(UiEmptyState.new("No seeds yet", _tex("seed_radish"), "Show stall"))
+	v.add_child(UiEmptyState.new("No open requests · next in 3h 12m", _tex("board"), "", UiEmptyState.Kind.ROW))
 	return v
 
 # ---------------------------------------------------------------- SGODOT-222 world display

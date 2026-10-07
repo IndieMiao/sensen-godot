@@ -426,11 +426,27 @@ func test_empty_state_navigation_row_is_optional() -> void:
 	(nav[0] as Button).pressed.emit()
 	assert_array(hits).is_equal([true])
 
+func test_empty_state_follows_the_panel_and_row_mains() -> void:
+	# EmptyState 1234:87237: Panel = icon in a 56 grey disc + Bold 14 line; Row = 20 icon + Bold 13 line.
+	var panel: UiEmptyState = _host(UiEmptyState.new("Your bag is empty", load("res://assets/p0/icons/bag.svg")))
+	var row: UiEmptyState = _host(UiEmptyState.new("No open requests · next in 3h 12m", load("res://assets/p0/icons/board.svg"), "", UiEmptyState.Kind.ROW))
+	await _settle()
+	var disc: Panel = panel.find_children("*", "Panel", true, false)[0]
+	assert_vector(disc.size).is_equal(Vector2(UiTokens.SIZE_EMPTY_DISC, UiTokens.SIZE_EMPTY_DISC))
+	assert_str((disc.get_theme_stylebox(&"panel") as UiStyleBox).bg_color.to_html()).is_equal(UiTokens.COLOR_DISABLED.to_html())
+	var icon: TextureRect = disc.get_child(0)
+	assert_float(icon.size.x).is_equal(float(UiTokens.SIZE_EMPTY_ICON))
+	assert_float(icon.modulate.a).is_equal_approx(UiTokens.OPACITY_EMPTY_ICON, 0.001)
+	var line: Label = row.find_children("*", "Label", true, false)[0]
+	assert_str(String(line.theme_type_variation)).is_equal(String(UiTokens.STYLE_C13_B))
+	var row_icon: TextureRect = row.find_children("*", "TextureRect", true, false)[0]
+	assert_float(row_icon.size.x).is_equal(float(UiTokens.SIZE_EMPTY_ROW_ICON))
+
 func test_badge_hugs_its_text() -> void:
 	var b: UiBadge = _host(UiBadge.new("Ready"))
 	await _settle()
 	assert_float(b.size.y).is_equal(float(UiTokens.SIZE_STATE_BADGE_H))
-	assert_float(b.size.x).is_less(UiTokens.SIZE_TOAST_W * 0.5)
+	assert_float(b.size.x).is_less((360.0 - UiTokens.SPACE_PAGE * 2.0) * 0.5)
 
 func test_every_gallery_section_fits_the_328_column() -> void:
 	# Registry contract (gallery_sections.gd): a wider section would widen the whole gallery column and
