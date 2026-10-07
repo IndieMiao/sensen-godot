@@ -3,7 +3,7 @@ from pathlib import Path
 import sys,json,subprocess
 from PIL import Image,ImageDraw,ImageFont,ImageOps
 import numpy as np
-ROOT=Path(__file__).resolve().parents[4];slug=sys.argv[1];out=ROOT/'output'/slug/'r2';stage=out/'godot-project';doc=ROOT/'docs/design'/(slug+'-2026-10-07')
+ROOT=Path(__file__).resolve().parents[4];slug=sys.argv[1];rev=sys.argv[2] if len(sys.argv)>2 else 'r2';out=ROOT/'output'/slug/rev;stage=out/'godot-project';doc=ROOT/'docs/design'/(slug+'-2026-10-07')
 s=(ROOT/'tools/art/source/coffee_shop/render_r1.gd').read_text()
 a=s.index('\tvar views := [');b=s.index('\tfor view in views:',a)
 s=s[:a]+'''\tvar views := [["local-lights-on",_vec(layout.camera.position),_vec(layout.camera.target),float(layout.camera.size)],["local-lights-off",_vec(layout.camera.position),_vec(layout.camera.target),float(layout.camera.size)]]

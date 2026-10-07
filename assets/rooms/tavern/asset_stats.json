@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3394038
+    "bytes": 3477815
   },
   "assets": [
     {
@@ -133,7 +133,7 @@
       "vertices": 86,
       "triangles": 168,
       "surfaces": 1,
-      "bytes": 6956
+      "bytes": 5128
     },
     {
       "name": "tavern_snacks",
@@ -175,7 +175,7 @@
       "vertices": 56,
       "triangles": 108,
       "surfaces": 1,
-      "bytes": 5120
+      "bytes": 3804
     },
     {
       "name": "hanging_chandelier",
@@ -323,7 +323,7 @@
   "static_draw_surfaces": 114,
   "unique_assets": 44,
   "placed_instances": 114,
-  "glb_bytes": 2823544,
+  "glb_bytes": 2820400,
   "scene_budget": {
     "after": {
       "room_triangles": 100380,

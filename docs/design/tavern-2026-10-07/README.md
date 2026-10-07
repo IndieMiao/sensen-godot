@@ -1,6 +1,6 @@
-# Tavern · Liu Bei R2 review candidate
+# Tavern · Liu Bei R2.1 review candidate
 
-[SGODOT-177](https://plane.sensenjoy.cn/zili/browse/SGODOT-177) · owner 刘备 · submitted for art-director **Review**, not Done. This R2 supersedes the earlier Zhao Yun package. Prior images named `godot.png` and `orthographic-sheet.png` are historical R1 media; use the R2 links below.
+[SGODOT-177](https://plane.sensenjoy.cn/zili/browse/SGODOT-177) · owner 刘备 · submitted for art-director **Review**, not Done. This R2.1 follows the R2 art-director review. Prior images named `godot.png` and `orthographic-sheet.png` are historical R1 media; use the R2.1 links below.
 
 Reference: Figma `OMLTC3yw3u2WDjOZhLnhaR`, node 545:2966; [original export](reference.png), inspected at native resolution.
 
@@ -8,7 +8,11 @@ Reference: Figma `OMLTC3yw3u2WDjOZhLnhaR`, node 545:2966; [original export](refe
 
 Dark wood walls now have three board widths, lower paneling and a dado rail. A wooden wagon wheel with eight spokes and individual chain links supports four lanterns. The framed iron-hung TAVERN sign uses Nunito Black with 4 mm depth. Open backbar shelves carry five bottle silhouettes with varied coloured labels and three mug variants. Round, square and low-backed stools, runners, a ceramic pitcher, copper cookware, a landscape painting, chalk beer board, a horizontal cask and bordered green rug complete the dressing. Shared plants use the accepted atlas; the front Monstera sits inside a reused terracotta sleeve.
 
-There are 12 unshadowed local Omni lights: the four chandelier lanterns share one, the two saloon sconces share one, four other wall lamps have one each, and six table/bar/shelf candles have one each. Ambient energy is 0.27. Small ranges retain separate pools; the on/off control uses identical emission and camera settings.
+R2.1 follows 不知火舞’s comment `8be01851-a864-4d01-9880-5ac25038e987`. Wall/floor base colours are raised about 20% toward caramel. The front Monstera and terracotta sleeve move together from (2.03, 0.082, 2.92) to (2.96, 0.082, 2.96), clearing the space between the round tables. Warm orange lantern/candle surfaces use low emission; the lights provide the surrounding illumination. The earlier R2 screenshots remain historical Plane attachments.
+
+[Reference / R2 / R2.1 brightness comparison](brightness-comparison.jpg) and [measurements](brightness-verification.json) use fixed corresponding wall/floor patches. Both relative HSV value and CIELAB L* differences must be <=15%, and hue <=10 degrees. The previous lower wall/dado colour patch remains separately checked.
+
+There are 12 unshadowed local Omni lights: the four chandelier lanterns share one, the two saloon sconces share one, four other wall lamps have one each, and six table/bar/shelf candles have one each. Ambient energy is 0.32 with a warm neutral colour; wall lamps have broader warm pools and bar candles are individually restrained to avoid clipping the counter. The strongest room sun energy is 0.77; the on/off control uses identical emission and camera settings.
 
 Furniture sizes retain the Basic Room baseline. The counter top is 1.3167 m above its floor pivot, round tables 1.0915 m, dining seats 0.65 m. Two table groups move 0.26/0.28 m to preserve perimeter traversal, without resizing. Stools intentionally have no blocking collision; tables, bar and barrels do. The 10-waypoint route loops around three tables; the live measured bar-to-table aisle is 1.25 m. The decorative saloon arch is not an operational gameplay door.
 
@@ -16,7 +20,7 @@ The accepted SGODOT-172 R2.1 editable structural meshes supply posts, beams, bea
 
 The orthographic camera fits three visible plinth edge intersections and an inferred fourth, following 172 R2. No geometry or comparison image is warped. [Camera evidence](camera-registration.png) / [fit data](camera-registration.json); residuals 15.10, 14.25, 15.80 px. Rounded reference edges are estimated intersections, not calibrated survey points.
 
-| Budget | R2 |
+| Budget | R2.1 |
 |---|---:|
 | Unique room modules / placed room modules | 44 / 114 |
 | Unique room triangles | 69,324 |
@@ -38,13 +42,14 @@ Editable source: [Blender](../../../tools/art/source/tavern/tavern.blend), [revi
 
 ```sh
 blender -b -t 4 --python tools/art/build_tavern.py
-DISPLAY=:0 python tools/art/source/coffee_shop/render_r1.py r2 tavern
+DISPLAY=:0 python tools/art/source/coffee_shop/render_r1.py r21 tavern
 DISPLAY=:0 python tools/art/source/coffee_shop/run_bench.py tavern --record
-DISPLAY=:0 output/art-tools/bin/python tools/art/source/tavern/light_controls.py tavern
-output/art-tools/bin/python tools/art/source/coffee_shop/package_series.py tavern r2
-output/art-tools/bin/python tools/art/source/coffee_shop/check_series_colour.py tavern r2
-output/art-tools/bin/python tools/art/source/coffee_shop/prepare_series_media.py tavern r2
-output/art-tools/bin/python tools/art/source/coffee_shop/package_r2_details.py tavern r2
+DISPLAY=:0 output/art-tools/bin/python tools/art/source/tavern/light_controls.py tavern r21
+output/art-tools/bin/python tools/art/source/coffee_shop/package_series.py tavern r21
+output/art-tools/bin/python tools/art/source/coffee_shop/check_series_colour.py tavern r21
+output/art-tools/bin/python tools/art/source/coffee_shop/prepare_series_media.py tavern r21
+output/art-tools/bin/python tools/art/source/coffee_shop/package_r2_details.py tavern r21
+output/art-tools/bin/python tools/art/source/tavern/check_r21.py
 ```
 
 Use the host's working display; `-- --geometry-only` skips bake/export. Rebuild replaces this scene's source file. Review attachments and Lark media are hash-readback verified in [delivery record](delivery-verification.json) after sending.

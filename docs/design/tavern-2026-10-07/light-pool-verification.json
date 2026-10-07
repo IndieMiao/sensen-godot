@@ -12,7 +12,7 @@
         606
       ],
       "patch_size": 17,
-      "mean_rgb_255_gain": 20.456,
+      "mean_rgb_255_gain": 27.884,
       "passed": true
     },
     {
@@ -27,7 +27,7 @@
         650
       ],
       "patch_size": 17,
-      "mean_rgb_255_gain": 64.08,
+      "mean_rgb_255_gain": 40.138,
       "passed": true
     },
     {
@@ -42,7 +42,7 @@
         688
       ],
       "patch_size": 17,
-      "mean_rgb_255_gain": 67.288,
+      "mean_rgb_255_gain": 88.015,
       "passed": true
     }
   ],
@@ -55,9 +55,9 @@
         2.38,
         -2.43
       ],
-      "energy": 1.05,
-      "range": 1.45,
-      "color": "FFC16C"
+      "energy": 2.1,
+      "range": 2.001,
+      "color": "FFBF76"
     },
     {
       "name": "chandelier",
@@ -66,9 +66,9 @@
         2.68,
         0.1
       ],
-      "energy": 1.6,
-      "range": 1.8,
-      "color": "FFC16C"
+      "energy": 3.2,
+      "range": 2.484,
+      "color": "FFBF76"
     },
     {
       "name": "left_wall",
@@ -77,9 +77,9 @@
         2.06,
         2.22
       ],
-      "energy": 1.15,
-      "range": 1.35,
-      "color": "FFC16C"
+      "energy": 2.3,
+      "range": 1.863,
+      "color": "FFBF76"
     },
     {
       "name": "bar_left",
@@ -88,9 +88,9 @@
         2.9,
         -2.87
       ],
-      "energy": 1.1,
-      "range": 1.45,
-      "color": "FFC16C"
+      "energy": 1.375,
+      "range": 2.001,
+      "color": "FFBF76"
     },
     {
       "name": "bar_right",
@@ -99,9 +99,9 @@
         2.9,
         -2.87
       ],
-      "energy": 1.1,
-      "range": 1.45,
-      "color": "FFC16C"
+      "energy": 1.375,
+      "range": 2.001,
+      "color": "FFBF76"
     },
     {
       "name": "right_wall",
@@ -110,9 +110,9 @@
         2.49,
         -2.87
       ],
-      "energy": 0.95,
-      "range": 1.35,
-      "color": "FFC16C"
+      "energy": 1.9,
+      "range": 1.863,
+      "color": "FFBF76"
     },
     {
       "name": "left_table",
@@ -121,9 +121,9 @@
         1.57,
         0.95
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
     },
     {
       "name": "front_table",
@@ -132,9 +132,9 @@
         1.45,
         1.9200000000000002
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
     },
     {
       "name": "right_table",
@@ -143,9 +143,9 @@
         1.45,
         0.94
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
     },
     {
       "name": "bar_left_candle",
@@ -154,9 +154,9 @@
         1.7,
         -1.4
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 0.6,
+      "range": 1.5,
+      "color": "FFAE50"
     },
     {
       "name": "bar_right_candle",
@@ -165,9 +165,9 @@
         1.7,
         -1.2
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 0.6,
+      "range": 1.5,
+      "color": "FFAE50"
     },
     {
       "name": "shelf_candle",
@@ -176,9 +176,9 @@
         1.95,
         0.03
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
     }
   ],
   "local_light_count": 12,

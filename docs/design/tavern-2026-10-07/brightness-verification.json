@@ -1,0 +1,99 @@
+{
+  "revision": "R2.1",
+  "method": "Fixed 9x9 median RGB at corresponding physical surfaces; brightness checked with BOTH relative HSV V and CIELAB L* (sRGB/D65). Each <=15%; circular hue <=10 degrees. Coordinates declared before final lighting tuning.",
+  "sampling_note": "Added the wall above the left sconce beside the stag flag. The previous colour-only sample is the lower dado/rail and is retained in colour-verification.json; it is not the lit-wall brightness sample. Floor coordinates unchanged. R2 is the prior delivered capture.",
+  "checks": [
+    {
+      "name": "Left wall above sconce, beside stag flag",
+      "reference_pixel": [
+        163,
+        571
+      ],
+      "runtime_pixel": [
+        138,
+        531
+      ],
+      "reference": {
+        "rgb": [
+          190,
+          99,
+          44
+        ],
+        "hue_degrees": 22.602739726027394,
+        "HSV_value": 0.7450980392156863,
+        "Lab_Lstar": 51.89671934661631
+      },
+      "R2": {
+        "rgb": [
+          80,
+          38,
+          15
+        ],
+        "hue_degrees": 21.230769230769226,
+        "HSV_value": 0.3137254901960784,
+        "Lab_Lstar": 20.54234552845218
+      },
+      "R2.1": {
+        "rgb": [
+          181,
+          80,
+          30
+        ],
+        "hue_degrees": 19.867549668874165,
+        "HSV_value": 0.7098039215686275,
+        "Lab_Lstar": 46.5183218911873
+      },
+      "hue_delta_degrees": 2.735,
+      "HSV_value_relative_difference_percent": 4.737,
+      "Lab_Lstar_relative_difference_percent": 10.364,
+      "passed": true
+    },
+    {
+      "name": "Front-right floor plank",
+      "reference_pixel": [
+        969,
+        1050
+      ],
+      "runtime_pixel": [
+        945,
+        1065
+      ],
+      "reference": {
+        "rgb": [
+          209,
+          122,
+          69
+        ],
+        "hue_degrees": 22.71428571428572,
+        "HSV_value": 0.8196078431372549,
+        "Lab_Lstar": 59.80195248676529
+      },
+      "R2": {
+        "rgb": [
+          129,
+          79,
+          35
+        ],
+        "hue_degrees": 28.085106382978722,
+        "HSV_value": 0.5058823529411764,
+        "Lab_Lstar": 38.516745200831544
+      },
+      "R2.1": {
+        "rgb": [
+          209,
+          116,
+          50
+        ],
+        "hue_degrees": 24.90566037735849,
+        "HSV_value": 0.8196078431372549,
+        "Lab_Lstar": 58.29846485343154
+      },
+      "hue_delta_degrees": 2.191,
+      "HSV_value_relative_difference_percent": 0.0,
+      "Lab_Lstar_relative_difference_percent": 2.514,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Two lit surface samples; no claim of full-image fidelity."
+}
