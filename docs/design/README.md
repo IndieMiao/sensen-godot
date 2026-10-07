@@ -9,6 +9,9 @@
 - [后续设计与组件整理（2026-10-06）](p1-p2-flows-2026-10-06/README.md)：08–12新增131张P1/P2/P3页面与状态稿；13内容样式板；00B/00C共享组件。**后续出图先复用已完成设计和组件规格**，以原BAG-1/BAG-2、Section00及kit样式为依据。07背包的样式偏差已修正，见[组件维护说明](p1-p2-flows-2026-10-06/COMPONENTS.md)。
 - [07 · P0流程与状态收口](p0-flow-2026-10-05/README.md)：新增73张可编辑Figma分镜与状态卡、4个审阅起点；首会话、材料制作、厨房、包裹与Profile往返。包含未定规则和共享美术边界，不表示P0全部完成。
 - [P1逐项资产登记](p0-flow-2026-10-05/P1-ASSET-REGISTER.md)：20作物、20鱼、48料理、12居民逐项列出来源与缺口；P2免费旅行与P3后续顺序。
+- [Art environment setup](art-environment-setup.md): start here on a fresh host; toolchain, Git access, Figma MCP, Windows/remote OAuth callbacks, Lark CLI application/user authorization and readiness checks.
+- [Mobile 3D asset workflow](mobile-3d-asset-workflow.md): English production guide for agents, based on the accepted Basic Room; reference analysis, reusable modeling, atlases, mobile budgets, Godot/Android checks and verified delivery.
+- [Basic Room (2026-10-06)](basic-room-2026-10-06/README.md): user-accepted Blender assets, reusable Godot room, offline movement benchmark and Android checks; includes committed review images and an evidence summary. Not a production release.
 - [UI 有效稿索引](ui-anchors-2026-10-03/REPORT.md)：当前源页、基础锚定图、批次1/2与最新修订说明。
 - [最新基础锚定图](ui-anchors-2026-10-03/out/current/)：FARM-1、FISH-1、COOK-1、BAG-1；从旧版本目录归一，图片内容未修改。Bag 的新 Gear 页以 batch2/BAG-2 为准。
 - [P0 道具与室内候选](p0-props-2026-10-05/)：厨房、灶台、渔具铺、摊位/长椅、Kai 与入口图标。候选 A/B 尚不能因清理被自动视为已选定。

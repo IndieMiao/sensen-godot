@@ -1,0 +1,368 @@
+{
+  "date": "2026-10-06",
+  "user_accepted_asset_quality": true,
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2968"
+  },
+  "tools": {
+    "blender": "5.2",
+    "godot": "4.7.2"
+  },
+  "native": {
+    "checks": [
+      {
+        "details": null,
+        "name": "Existing avatar fixture assembles",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "22 reusable room kits load",
+        "passed": true
+      },
+      {
+        "details": 0.0850000008940697,
+        "name": "Player stands on floorboard height",
+        "passed": true
+      },
+      {
+        "details": 0.812514543533325,
+        "name": "Free floor movement changes position",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Input release stops movement",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Idle clip resumes after movement",
+        "passed": true
+      },
+      {
+        "details": "(-0.12, 0.089939, 1.425)",
+        "name": "Dining table blocks passage",
+        "passed": true
+      },
+      {
+        "details": "(2.9375, 0.072365, 1.5)",
+        "name": "Open diorama edge is bounded",
+        "passed": true
+      },
+      {
+        "details": "(-2.745463, 0.072365, -0.6)",
+        "name": "Window wall prevents walking outside",
+        "passed": true
+      },
+      {
+        "details": "(2.948608, 0.090135, 0.243845)",
+        "name": "Blocked diagonal preserves free sliding",
+        "passed": true
+      },
+      {
+        "details": [
+          0.133333333333333,
+          0.266666666666667
+        ],
+        "name": "Run animation advances at distant camera",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Focus loss cancels active input",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Reference view hides character",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Movement view restores character",
+        "passed": true
+      },
+      {
+        "details": 6.61538461538462,
+        "name": "Two-finger input reduces camera size",
+        "passed": true
+      },
+      {
+        "details": null,
+        "name": "Pinch release leaves movement stopped",
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "android": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "Android Vulkan Mobile scene loads",
+        "passed": true,
+        "details": "llvmpipe (LLVM 21.0.0, 256 bits)"
+      },
+      {
+        "name": "Skinned body is visible below the head",
+        "passed": true,
+        "details": 4020
+      },
+      {
+        "name": "Android floating joystick moves character",
+        "passed": true,
+        "details": [
+          [
+            1.39999997615814,
+            0.0850000008940697,
+            1.64999997615814
+          ],
+          [
+            2.93622207641602,
+            0.0897980406880379,
+            -0.0977595448493958
+          ]
+        ]
+      },
+      {
+        "name": "Touch release returns to idle",
+        "passed": true,
+        "details": null
+      },
+      {
+        "name": "Real touch cannot cross dining table",
+        "passed": true,
+        "details": [
+          -0.120200641453266,
+          0.0800977721810341,
+          1.44227564334869
+        ]
+      },
+      {
+        "name": "Real touch cannot leave open room edge",
+        "passed": true,
+        "details": [
+          2.93395924568176,
+          0.0800789371132851,
+          1.49980962276459
+        ]
+      },
+      {
+        "name": "Two-finger pinch changes camera scale",
+        "passed": true,
+        "details": [
+          10.75,
+          6.03029655022745
+        ]
+      },
+      {
+        "name": "Two-finger zoom keeps avatar still",
+        "passed": true,
+        "details": [
+          [
+            1.39999997615814,
+            0.0850000008940697,
+            1.64999997615814
+          ],
+          [
+            1.39999997615814,
+            0.0850000008940697,
+            1.64999997615814
+          ]
+        ]
+      },
+      {
+        "name": "View button restores whole-room scale",
+        "passed": true,
+        "details": null
+      },
+      {
+        "name": "Foreground retains player position",
+        "passed": true,
+        "details": null
+      },
+      {
+        "name": "Foreground retains camera scale",
+        "passed": true,
+        "details": null
+      },
+      {
+        "name": "HUD remains within 720x1280",
+        "passed": true,
+        "details": [
+          {
+            "name": "ViewButton",
+            "rect": [
+              204.0,
+              63.5,
+              45.0,
+              28.0
+            ]
+          },
+          {
+            "name": "ResetButton",
+            "rect": [
+              254.0,
+              63.5,
+              45.0,
+              28.0
+            ]
+          },
+          {
+            "name": "StatsButton",
+            "rect": [
+              304.0,
+              63.5,
+              45.0,
+              28.0
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Movement after resize 720x1280",
+        "passed": true,
+        "details": null
+      },
+      {
+        "name": "HUD remains within 780x1688",
+        "passed": true,
+        "details": [
+          {
+            "name": "ViewButton",
+            "rect": [
+              204.0,
+              63.2263031005859,
+              45.0,
+              28.0
+            ]
+          },
+          {
+            "name": "ResetButton",
+            "rect": [
+              254.0,
+              63.2263031005859,
+              45.0,
+              28.0
+            ]
+          },
+          {
+            "name": "StatsButton",
+            "rect": [
+              304.0,
+              63.2263031005859,
+              45.0,
+              28.0
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Movement after resize 780x1688",
+        "passed": true,
+        "details": null
+      },
+      {
+        "name": "HUD remains within 1080x1920",
+        "passed": true,
+        "details": [
+          {
+            "name": "ViewButton",
+            "rect": [
+              204.0,
+              63.3333320617676,
+              45.0,
+              28.0
+            ]
+          },
+          {
+            "name": "ResetButton",
+            "rect": [
+              254.0,
+              63.3333320617676,
+              45.0,
+              28.0
+            ]
+          },
+          {
+            "name": "StatsButton",
+            "rect": [
+              304.0,
+              63.3333320617676,
+              45.0,
+              28.0
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Movement after resize 1080x1920",
+        "passed": true,
+        "details": null
+      },
+      {
+        "name": "Idle animation advances",
+        "passed": true,
+        "details": null
+      }
+    ],
+    "touch_operations": 13,
+    "metrics": {
+      "renderer": "mobile",
+      "device": "llvmpipe (LLVM 21.0.0, 256 bits)",
+      "fps_median": 7.0,
+      "fps_min": 7.0,
+      "draw_calls_median": 59.0,
+      "video_memory_max_bytes": 181613824.0,
+      "scope": "Android emulator; not physical phone GPU timing"
+    },
+    "resolutions": [
+      "720x1280",
+      "780x1688",
+      "1080x1920"
+    ],
+    "sample_count": 24
+  },
+  "apk_readback": {
+    "package": "com.sensen.basicroomqa",
+    "source_sha256": "e7953b88bb6e22f19139cfeadb0831f1398b5e001bf261bf2c5f172fb696d0cc",
+    "installed_sha256": "e7953b88bb6e22f19139cfeadb0831f1398b5e001bf261bf2c5f172fb696d0cc",
+    "matches": true,
+    "bytes": 63780591
+  },
+  "delivery": {
+    "verified": true,
+    "message_count": 7,
+    "attachment_count": 6,
+    "all_attachment_bytes_match": true
+  },
+  "limits": [
+    "Software Vulkan emulator; no physical phone performance acceptance.",
+    "No production release, account or save migration.",
+    "PNG comparison is visual evidence, not a registered fidelity score."
+  ],
+  "files": {
+    "tools/art/source/basic_room/basic_room.blend": {
+      "bytes": 542598,
+      "sha256": "07df683b0cf761718abba9db8eb7263ca23084f465eb0cd53e7750673459b139"
+    },
+    "assets/rooms/basic_room/room_albedo_ao.png": {
+      "bytes": 3397744,
+      "sha256": "ddcfcd8e9d79949758332bb82483dbd71692199d9691dc16336b069f3ca52764"
+    },
+    "docs/design/basic-room-2026-10-06/reference.png": {
+      "bytes": 3964088,
+      "sha256": "9f20c04a9707419e150dd1d0165a185cd1c87d43e3ee523c8ffc264f337ccb27"
+    },
+    "docs/design/basic-room-2026-10-06/comparison.png": {
+      "bytes": 1372225,
+      "sha256": "f44a0f337909decbb0ac78161a959ba5d4d4a0fe81a6077af2622046eb03f0f8"
+    },
+    "docs/design/basic-room-2026-10-06/orthographic-sheet.png": {
+      "bytes": 806625,
+      "sha256": "23a6fd84bb96d7ca90f24806b6022a8c235a927752316542cc5cfd7b3a7514c7"
+    }
+  }
+}

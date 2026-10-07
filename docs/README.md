@@ -23,6 +23,8 @@
 
 开发与发布工具见 [服务端](../server/README.md)、[Android](../tools/android/README.md)、[iOS](../tools/ios/README.md)。这些技术资料不能覆盖 v2 的玩法与分期，也不能把历史安装结果解释为当前设备状态。
 
+For a fresh art environment, start with the English [Art environment setup](design/art-environment-setup.md), then follow the [Mobile 3D asset workflow](design/mobile-3d-asset-workflow.md). The accepted Basic Room is the reproducible example.
+
 ## 清理与历史追溯
 
 2026-10-05 已移除明确被取代的玩法规格、阶段计划与界面草稿，见 [清理记录与逐文件清单](design-cleanup-2026-10-05.md)。历史 QA 引用旧设计时使用固定 Git 版本，避免误指向当前方案。运行代码、测试、工具脚本、运行资产与配置没有因本次清理而修改。

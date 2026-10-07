@@ -11,6 +11,20 @@
   Keep technical constraints and current data-preservation rules when relevant;
   design cleanup does not itself authorize a release, migration or save reset.
 
+- Art asset workflow adopted on 2026-10-06: before creating or substantially
+  revising Blender/Godot 3D art, read `docs/design/mobile-3d-asset-workflow.md`.
+  On a new or unverified environment, first read
+  `docs/design/art-environment-setup.md` for toolchain installation, Figma MCP
+  access, remote-browser OAuth callbacks and Lark CLI app/user authorization.
+  Reuse verified existing setup; do not restart working authorization flows.
+  The production guide records the accepted Basic Room workflow: inspect the actual reference,
+  retain editable named parts and reusable local-pivot exports, bake shared
+  surface detail, validate in the target Godot renderer and through real Android
+  inputs, and verify delivered review media. Use its budget numbers and emulator
+  workarounds as case evidence, not universal settings. The English guides and
+  committed comparison/verification snapshot are indexed from `docs/design/README.md`.
+  Art acceptance does not establish physical-phone performance or authorize release.
+
 - Stylized foam added on 2026-09-30, referencing only Ameye's section 5 Foam
   as requested. Contact froth follows offline distance maps derived from the
   actual bank meshes at water Y=0.055 for all 12 fixed pond seeds. Sparse
