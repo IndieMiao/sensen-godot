@@ -123,8 +123,10 @@ func _build_hud() -> void:
 	hud = UiHud.new()
 	hud.theme = UiKit.theme()
 	hud.safe_top = safe_top()
+	# TODO(WP7-C item 12, Profile page): the avatar opens Profile (LOCK-06); P0 opens Skills until then.
 	hud.avatar_pressed.connect(open_skills)
 	hud.energy_pressed.connect(open_energy_panel)
+	hud.inbox_pressed.connect(open_inbox)
 	hud.today_pressed.connect(open_today)
 	hud.place_pressed.connect(func(): place_pressed.emit())   # the location chip is the way back to the map
 	root.add_child(hud)
@@ -1243,6 +1245,16 @@ func open_today() -> void:
 		show_spot.emit(str(rows[i].go)))
 	_open_modal(panel, 0.0)
 	modal_kind = "today"
+
+## The bell (parcels / letters). TODO(stage 4, Inbox): replace this empty state with the Inbox drawer and its
+## tabs; P0 has no parcels yet, so it only shows the agreed EmptyState line.
+func open_inbox() -> void:
+	var v := _sheet(220, "Inbox", "bell")
+	modal_kind = "inbox"
+	var empty := UiEmptyState.new("No parcels", P0Logic.icon("bell"))
+	empty.theme = UiKit.theme()
+	empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	v.add_child(empty)
 
 ## SKILL-1 (P0 cut): three track cards — level ring, XP and how far to go, what the next level opens —
 ## and the "First times" collection tiles. Opened from the avatar ring.

@@ -306,6 +306,7 @@ func _dev_shot(dt: float) -> void:
 			"skills": ui.open_skills()
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
+			"inbox": ui.open_inbox()
 			"radial": ui.open_radial()
 			"kitchen": ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
 			"put":
