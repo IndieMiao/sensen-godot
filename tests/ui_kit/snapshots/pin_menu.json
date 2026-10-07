@@ -1,0 +1,304 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    338
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiPinMenu"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "PinMenu 1141:80291 · LOCK-05"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        286
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            200,
+            137
+          ],
+          "children": [
+            {
+              "type": "UiPinMenu",
+              "rect": [
+                0,
+                52,
+                200,
+                117
+              ],
+              "children": [
+                {
+                  "type": "PanelContainer",
+                  "rect": [
+                    0,
+                    52,
+                    200,
+                    110
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        10,
+                        62,
+                        180,
+                        90
+                      ],
+                      "children": [
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            10,
+                            62,
+                            180,
+                            48
+                          ],
+                          "variation": "CmdSecondary",
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                10,
+                                62,
+                                180,
+                                48
+                              ],
+                              "children": [
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    69,
+                                    79,
+                                    14,
+                                    14
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        71,
+                                        81,
+                                        10,
+                                        10
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    89,
+                                    75,
+                                    42,
+                                    22
+                                  ],
+                                  "variation": "ButtonB15",
+                                  "text": "Unpin"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            10,
+                            116,
+                            180,
+                            36
+                          ],
+                          "variation": "CaptionB12",
+                          "text": "Pinned slots stay when the bar refills."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiPointer",
+                  "rect": [
+                    19,
+                    162,
+                    14,
+                    7
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                175,
+                200,
+                14
+              ],
+              "variation": "C9B",
+              "text": "after pinning"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            201,
+            200,
+            137
+          ],
+          "children": [
+            {
+              "type": "UiPinMenu",
+              "rect": [
+                0,
+                201,
+                200,
+                117
+              ],
+              "children": [
+                {
+                  "type": "PanelContainer",
+                  "rect": [
+                    0,
+                    201,
+                    200,
+                    110
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        10,
+                        211,
+                        180,
+                        90
+                      ],
+                      "children": [
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            10,
+                            211,
+                            180,
+                            48
+                          ],
+                          "variation": "CmdSecondary",
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                10,
+                                211,
+                                180,
+                                48
+                              ],
+                              "children": [
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    78,
+                                    228,
+                                    14,
+                                    14
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        80,
+                                        230,
+                                        10,
+                                        10
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    98,
+                                    224,
+                                    23,
+                                    22
+                                  ],
+                                  "variation": "ButtonB15",
+                                  "text": "Pin"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            10,
+                            265,
+                            180,
+                            36
+                          ],
+                          "variation": "CaptionB12",
+                          "text": "Pin to keep it when the bar refills."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiPointer",
+                  "rect": [
+                    19,
+                    311,
+                    14,
+                    7
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                324,
+                200,
+                14
+              ],
+              "variation": "C9B",
+              "text": "after unpinning"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

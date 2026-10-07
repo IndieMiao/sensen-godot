@@ -27,6 +27,9 @@ static func all() -> Array[Dictionary]:
 		{id = "segment_tab", title = "UiSegmentTab", figma = "Tab 483:322 · Compact/Kitchen/Mode 655:58504 · LOCK-13 / 20", build = _segment_tabs},
 		{id = "badge", title = "UiBadge", figma = "StateBadge 483:324", build = _badges},
 		{id = "empty_state", title = "UiEmptyState", figma = "Main pending: WP6 SGODOT-206 · provisional look per WP7-B F-08 §5", build = _empty_states},
+		# SGODOT-221 world controls · interaction
+		{id = "quick_bar", title = "UiQuickBar (drawn at 328 of 336)", figma = "Compact/QuickSlot 633:41279 · QuickEnd/Bag 907:72112 · BAR-1 / BAR-1-2 · LOCK-04 / 05", build = _quick_bars},
+		{id = "pin_menu", title = "UiPinMenu", figma = "PinMenu 1141:80291 · LOCK-05", build = _pin_menus},
 	]
 	return out
 
@@ -355,3 +358,49 @@ static func _empty_states() -> Control:
 	v.add_child(UiEmptyState.new("No fish yet", _tex("fish_unknown"), "Show on map"))
 	v.add_child(UiEmptyState.new("Nothing to sell here", _tex("stall")))
 	return v
+
+## The real bar is 336 wide (12 px screen margins); the gallery column is 328, so it is drawn scaled.
+static func _fit_bar(bar: UiQuickBar, caption: String) -> VBoxContainer:
+	var k := 328.0 / UiTokens.SIZE_QUICK_BAR_W
+	var host := Control.new()
+	host.custom_minimum_size = Vector2(328, (UiTokens.SIZE_QUICK_BAR_H + UiTokens.SIZE_QUICK_SLOT_LIFT) * k)
+	bar.haptics = false
+	bar.scale = Vector2(k, k)
+	bar.position.y = UiTokens.SIZE_QUICK_SLOT_LIFT * k
+	host.add_child(bar)
+	return _captioned(host, caption)
+
+static func _bar_slots() -> Array:
+	return [
+		{id = "seed_radish", icon = _tex("seed_radish"), title = "Radish Seeds", quantity = 24, pinned = true},
+		{id = "seed_carrot", icon = _tex("seed_carrot"), title = "Carrot Seeds", quantity = 6},
+		{id = "compost", icon = _tex("compost"), title = "Compost", quantity = 0, pinned = true},
+		{id = "seed_potato", icon = _tex("seed_potato"), title = "Potato Seeds", quantity = 3},
+	]
+
+static func _quick_bars() -> Control:
+	var v := _column()
+	var a := UiQuickBar.new()
+	a.slots = _bar_slots()
+	a.selected = "seed_carrot"
+	v.add_child(_fit_bar(a, "selected · pinned · zero (pinned, 0 left) · ghost"))
+	var b := UiQuickBar.new()
+	b.slots = _bar_slots()
+	b.capacity_warning = true
+	b.cells()[0].state = UiItemCell.State.LIFTED
+	b.cells()[3].state = UiItemCell.State.DROP_TARGET
+	v.add_child(_fit_bar(b, "lifted (dragging) · drop target · Bag at 90%"))
+	var c := UiQuickBar.new()
+	c.slots = _bar_slots()
+	c.bag_open = true
+	v.add_child(_fit_bar(c, "bag drawer open: Close"))
+	var d := UiQuickBar.new()
+	d.collapsed = true
+	v.add_child(_fit_bar(d, "no action chosen: handle + Bag"))
+	return v
+
+static func _pin_menus() -> Control:
+	var row := _row(UiTokens.SPACE_ROW)
+	row.add_child(_captioned(UiPinMenu.new(true), "after pinning"))
+	row.add_child(_captioned(UiPinMenu.new(false), "after unpinning"))
+	return row
