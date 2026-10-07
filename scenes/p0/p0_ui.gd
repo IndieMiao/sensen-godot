@@ -56,6 +56,9 @@ var selected_bait := ""
 var tackle_place := "Reed Pond"
 var bar_mode := "farm"          # "farm" (seeds) or "fish" (bait) — the quick bar holds the current action's consumables
 var surface := "farm"
+## Set by the runtime: true when the current world can move its camera to a spot (p0_show_spot). Show
+## buttons (Today, NeedSource) only appear then, so a Show never closes a panel and does nothing (LOCK-08).
+var can_show_spot := Callable()
 var _pending := {}   # surface / place / mode set before the HUD exists (the runtime attaches early)
 var _dev_box: Control
 var _creel: PanelContainer
@@ -657,7 +660,7 @@ func _bag_slots() -> Array: return view.get("bag", {}).get("slots", [])
 ## A tapped NEED-TILE: one source line just above it; Show only moves the camera (LOCK-10 / LOCK-08).
 func _show_need_source(tile: Control, id: String) -> void:
 	var src := P0Logic.need_source(view, id)
-	var go := str(src.go)
+	var go := str(src.go) if spot_reachable() else ""
 	var on_show := Callable() if go == "" else func():
 		close_modal()
 		show_spot.emit(go)
@@ -1235,7 +1238,7 @@ func open_today() -> void:
 	var shown := rows.map(func(r):
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
-		d.action = "Show" if str(r.go) != "" else ""
+		d.action = "Show" if str(r.go) != "" and spot_reachable() else ""   # TODO(SGODOT-225): Show on map for targets elsewhere
 		return d)
 	var panel := UiTodayPanel.new(shown)
 	panel.theme = UiKit.theme()
@@ -1245,6 +1248,10 @@ func open_today() -> void:
 		show_spot.emit(str(rows[i].go)))
 	_open_modal(panel, 0.0)
 	modal_kind = "today"
+
+## Whether a Show can move the camera in the current world (the pond has no camera targets yet).
+func spot_reachable() -> bool:
+	return can_show_spot.is_valid() and bool(can_show_spot.call())
 
 ## The bell (parcels / letters). TODO(stage 4, Inbox): replace this empty state with the Inbox drawer and its
 ## tabs; P0 has no parcels yet, so it only shows the agreed EmptyState line.

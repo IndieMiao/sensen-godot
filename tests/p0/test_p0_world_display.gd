@@ -90,3 +90,24 @@ func test_need_source_is_one_line_with_a_camera_only_target() -> void:
 	assert_that(P0Logic.need_source(v, "crop_radish")).is_equal({"text": "Radish · Grow it on your plots", "go": "plots"})
 	assert_that(P0Logic.need_source(v, "fish_crucian")).is_equal({"text": "Pond Crucian · Ponds on the map", "go": ""})
 	assert_that(P0Logic.need_source(v, "dish_grilled_crucian")).is_equal({"text": "Grilled Crucian · Cook it at the stove", "go": "stove"})
+
+## PR #11 review: a Show that cannot move the camera (the pond has no p0_show_spot) must not be offered.
+func _ui(reachable: bool) -> P0Ui:
+	var ui: P0Ui = auto_free(P0Ui.new())
+	ui.can_show_spot = func() -> bool: return reachable
+	add_child(ui)
+	ui.set_view(_view())
+	return ui
+
+func _today_actions(ui: P0Ui) -> Array:
+	ui.open_today()
+	var panel: UiTodayPanel = ui.find_children("*", "UiTodayPanel", true, false)[0]
+	return panel.find_children("*", "UiCommandButton", true, false).map(func(b): return (b as Button).text)
+
+func test_today_show_only_where_the_camera_can_go() -> void:
+	var farm := _ui(true)
+	await get_tree().process_frame
+	assert_array(_today_actions(farm)).contains(["Show"])
+	var pond := _ui(false)
+	await get_tree().process_frame
+	assert_array(_today_actions(pond)).is_empty()
