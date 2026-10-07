@@ -260,7 +260,12 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"not_home":
 			ui.toast("At home only")
 		"need_material", "skills_short", "max_level":
-			ui.toast(P0Logic.home_panel(session.current()).reason)
+			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap.
+			if str(cmd.get("type", "")) == "homestead_upgrade": ui.toast(P0Logic.home_panel(session.current()).reason)
+			elif code == "need_material":
+				ui.toast("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
+					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
+			else: ui.toast("Can't do that (%s)" % code)
 		"energy_full":
 			ui.toast("Energy full · eat later" if str(cmd.get("type", "")) == "eat" else "Energy full")
 		"not_ready":

@@ -142,3 +142,39 @@ func test_material_sources_name_the_spots_and_the_mine() -> void:
 	assert_str(str(P0Logic.home_source(v, "clay").text)).is_equal("Clay · Clay Bank (Homestead Lv2) or the Mine")
 	assert_str(str(P0Logic.home_source(v, "rock_salt").text)).is_equal("Rock Salt · the Mine")
 	assert_str(str(P0Logic.home_source(v, "bait_worm").text)).is_equal("Worm Bait")   # a side yield is not the spot's material
+
+func test_plaque_lines_date_each_upgrade() -> void:
+	var v := _view(3)
+	v.homestead["plaque"] = [{"level": 2, "at": 1791158400000.0}, {"level": 3, "at": 1791504000000.0}]   # 2026-10-05 / 10-09 00:00 UTC
+	assert_array(P0Logic.plaque_lines(v, 0)).is_equal([{"label": "Lv2", "value": "Oct 5"}, {"label": "Lv3", "value": "Oct 9"}])
+	assert_array(P0Logic.plaque_lines(v, 8 * 60).map(func(l): return l.value)).is_equal(["Oct 5", "Oct 9"])   # Shanghai
+	assert_array(P0Logic.plaque_lines(_view(1))).is_empty()
+
+func test_plaque_read_is_a_read_only_sheet_with_only_close() -> void:
+	var v := _view(3)
+	v.homestead["plaque"] = [{"level": 2, "at": 1791158400000.0}, {"level": 3, "at": 1791504000000.0}]
+	var ui := _ui(v)
+	HomePanel.plaque(ui)
+	assert_str(ui.modal_kind).is_equal("plaque")
+	assert_array(ui.find_children("*", "UiFactRow", true, false).map(func(f): return (f as UiFactRow).label)).is_equal(["Lv2", "Lv3"])
+	assert_array(ui.find_children("*", "UiCommandButton", true, false)).is_empty()
+	(ui.find_children("*", "UiCloseButton", true, false)[0] as Button).pressed.emit()
+	assert_bool(ui.has_modal()).is_false()
+
+func test_the_plaque_stands_left_of_the_door_apart_from_the_sign() -> void:
+	var bp := P0Garden.blueprint()
+	var door := bp.cell_to_world(P0Garden.ANCHORS.house)
+	var plaque := P0Garden.plaque_point(bp)
+	assert_float(door.x - plaque.x).is_between(0.8, 2.0)
+	assert_float(plaque.distance_to(P0Garden.sign_point(bp))).is_greater(2.0)   # two tap targets that never overlap
+
+func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.view = _view()
+	rt.session.view["names"] = {"copper_ore": "Copper Ore"}
+	rt._on_refused("need_material", {"item": "copper_ore", "need": 4, "have": 2}, {"type": "craft", "recipe": "pick_copper"})
+	assert_str(rt.ui._toast.text).is_equal("Need 2 more Copper Ore")
+	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui._toast.text).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
