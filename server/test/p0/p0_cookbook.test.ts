@@ -85,18 +85,25 @@ describe('Kitchen Mishaps and clues (§7.5.2)', () => {
     expect(r2.ev.find(e => e.kind === 'mishap')).toMatchObject({ clue: { page: 'dish_carrot_cake', slots: [0, 1] } });
   });
 
-  it('in the Newcomer Blessing the first 10 failures a day give the ingredients back, then Common ones are spent', () => {
+  it('in the Newcomer Blessing the first 10 failures a day give the ingredients back and make no dish, then Common ones are spent', () => {
     let s = fresh();
     s.bag.push({ id: 'crop_radish', qty: 20 }, { id: 'crop_carrot', qty: 20 });
     expect(viewOf(c, s, T0).cooking.trial_refunds).toBe(10);
     for (let i = 0; i < 10; i++) {
       const r = cookOnce(s, ['crop_radish', 'crop_carrot'], T0 + i * 20 * S);
       expect(r.ev.find(e => e.kind === 'mishap')).toMatchObject({ refund: ['crop_radish', 'crop_carrot'], trial_left: 9 - i });
+      // 李白 2026-10-08: no Mystery Dish from a refunded pot (No dish this time · ingredients back)
+      expect(r.ev.find(e => e.kind === 'dish')).toMatchObject({ mystery: true, qty: 0, none: true, trial_left: 9 - i });
+      expect(r.s.stove).toBeNull();
       s = r.s;
     }
     expect(count(s.bag, 'crop_radish')).toBe(20);
+    expect(count(s.bag, c.cooking.mystery.id)).toBe(0);
     const r = cookOnce(s, ['crop_radish', 'crop_carrot'], T0 + 300 * S);
     expect(r.ev.find(e => e.kind === 'mishap')).toMatchObject({ refund: [], trial_left: 0 });
+    expect(r.ev.find(e => e.kind === 'dish')).toMatchObject({ mystery: true, qty: 1 });
+    expect(r.ev.find(e => e.kind === 'dish')).not.toHaveProperty('none');
+    expect(count(r.s.bag, c.cooking.mystery.id)).toBe(1);
     expect(count(r.s.bag, 'crop_radish')).toBe(19);
     expect(viewOf(c, veteran(), T0).cooking.trial_refunds).toBeNull();
   });

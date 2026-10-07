@@ -161,7 +161,7 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?
   if (!pot) return { code: 'stove_empty' };
   if (!aimsAt(cmd, pot)) return { code: 'stale_pot', detail: { pot: pot.id ?? null } };
   const eat = cmd.eat === true;
-  if (eat && s.energy.value >= max) return { code: 'energy_full' };
+  if (eat && s.energy.value >= max && !(pot.mystery && !pot.left && noDish(c, s, pot, now))) return { code: 'energy_full' };
   if (pot.left) {
     const refusal = collectLeft(c, s, pot, eat, now, events);
     if (!refusal) startQueued(c, s, now, events);
@@ -170,7 +170,7 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?
   const left = pot.started_at + pot.ms - now;
   if (left > 0) return { code: 'not_ready', detail: { ready_in: left } };
   // The waiting pot fires when this one was done, as settleStove would have done it, unless it had no place then.
-  const onTime = !pot.no_room && dishesFit(c, s, [[dishId(pot.dish, autoQuality(c, pot)), 1]]);
+  const onTime = !pot.no_room && potFits(c, s, pot, now);
   finishPot(c, s, pot, [...(pot.taps ?? []), ...readTaps(cmd.taps)], eat, now, events);
   startQueued(c, s, onTime ? pot.started_at + pot.ms : now, events);
   return null;
@@ -182,6 +182,20 @@ export function aimsAt(cmd: { pot?: unknown }, pot: Pot): boolean {
 }
 
 const autoQuality = (c: P0Content, pot: Pot): number => Math.min(pot.mystery ? 0 : heatHits(c, pot.heats, pot.taps ?? []), 2);
+
+/**
+ * A failed pot whose ingredients all come back (Newcomer Blessing, the first trial_refunds a day) makes no Mystery
+ * Dish (李白 2026-10-08, PR #22 review): otherwise those pots are free Energy. COOK-4 says
+ * `No dish this time · ingredients back (9 left today)`; from the 11th, and after the Blessing, the Mystery Dish comes out.
+ */
+function noDish(c: P0Content, s: P0State, pot: Pot, now: number): boolean {
+  return pot.mystery && (trialRefundsLeft(c, s, now) ?? 0) > 0;
+}
+
+/** Whether the pot, kept automatically, finds a place (a pot that makes no dish always does). */
+function potFits(c: P0Content, s: P0State, pot: Pot, now: number): boolean {
+  return noDish(c, s, pot, now) || dishesFit(c, s, [[dishId(pot.dish, autoQuality(c, pot)), 1]]);
+}
 
 const readTaps = (taps: unknown): number[] => (Array.isArray(taps) ? taps.slice(0, 20).map(Number).filter(Number.isFinite) : []);
 
@@ -210,7 +224,7 @@ export function settleStove(c: P0Content, s: P0State, now: number, events: P0Eve
   if (!pot || !next || pot.left) return;
   const readyAt = pot.started_at + pot.ms;
   if (now < readyAt) return;
-  if (!dishesFit(c, s, [[dishId(pot.dish, autoQuality(c, pot)), 1]])) { pot.no_room = true; return; }
+  if (!potFits(c, s, pot, now)) { pot.no_room = true; return; }
   const late = !!pot.no_room;
   finishPot(c, s, pot, pot.taps ?? [], false, now, events, true);
   startQueued(c, s, late ? now : readyAt, events);
@@ -232,13 +246,15 @@ function finishPot(c: P0Content, s: P0State, pot: Pot, taps: number[], eat: bool
   const quality = Math.min(hits, 2);
   const main = dishId(pot.dish, quality);
   const extra = quality === 2 ? 1 : 0; // Perfect: a second, Plain portion (§7.2.5)
-  const portions = extra ? [main, pot.dish] : [main];
+  const none = noDish(c, s, pot, now);
+  const portions = none ? [] : extra ? [main, pot.dish] : [main];
   keepOrLeave(c, s, pot, eat ? portions.slice(1) : portions, events);
   const firstKey = `cook:${pot.dish}`;
   const first = !s.firsts.includes(firstKey);
   if (first) s.firsts.push(firstKey);
-  events.push({ kind: 'dish', pot: pot.id, dish: pot.dish, quality, qty: 1 + extra, first, mystery: pot.mystery, hits, ...(auto ? { auto: true as const } : {}) });
-  if (eat) eatMeal(c, s, main, now, events);
+  events.push({ kind: 'dish', pot: pot.id, dish: pot.dish, quality, qty: portions.length, first, mystery: pot.mystery, hits,
+    ...(none ? { none: true as const, trial_left: Math.max(0, (trialRefundsLeft(c, s, now) ?? 0) - 1) } : {}), ...(auto ? { auto: true as const } : {}) });
+  if (eat && !none) eatMeal(c, s, main, now, events);
   if (pot.mystery) { failedPot(c, s, pot.items ?? [], pot.started_at, now, events); return; }
   if (!s.cookbook.includes(pot.dish)) s.cookbook.push(pot.dish);
   s.book.cooked[pot.dish] = (s.book.cooked[pot.dish] ?? 0) + 1;
