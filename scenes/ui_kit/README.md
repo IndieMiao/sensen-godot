@@ -57,6 +57,13 @@ must not change structure, role, entry point or key copy. Engineering specs: SGO
 | `UiBadge` | StateBadge 483:324 | short state word pill |
 | `UiEmptyState` | pending, WP6 SGODOT-206 (WP7-B F-08 §5) | icon + one line + optional navigation; provisional look until the main lands |
 
+## Panel parts (SGODOT-225)
+
+| Class | Figma main | Notes |
+|---|---|---|
+| `UiDrawer` | Sheet 483:190 as the bag / counter drawer (BAG-2-2, FARM-6) | bottom-pinned, 24 top corners, content in `body` inset 12 like the Bag layout, `height` in logical px, `safe_bottom`; slides up over `MOTION_DRAWER_MS`; a 48 px swipe down or a quick flick on the drawer itself emits `close_requested`. The scrim, Back and scrim taps stay with `ModalStack` / the P0 modal host |
+| `UiInventoryGrid` | Bag layout five-column grid (LOCK-12 / 15) | `TouchScrollContainer` of INVENTORY cells on the quick bar pitch (52 + 4, rows 58 apart), filled cells then dashed empties to `capacity`. Hooks for the counter (2A): `on_select` (Callable, or `item_selected`) on tapping a filled cell, tapping an empty cell clears; `sell_mode` + `can_sell` list only what that counter takes ("Sell here"). `filter` for category chips; other cell gestures come out of `cell_gesture(item, outcome)` |
+
 Positions inside a fixed-size main (e.g. the InventoryCell icon at y 10, the 3 px pill inset) are private
 constants in the component script, each citing its main; everything shared comes from `UiTokens`.
 Glyphs that are tinted in code (pin, check, close) are white SVGs exported from Figma under

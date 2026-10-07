@@ -27,6 +27,9 @@ static func all() -> Array[Dictionary]:
 		{id = "segment_tab", title = "UiSegmentTab", figma = "Tab 483:322 · Compact/Kitchen/Mode 655:58504 · LOCK-13 / 20", build = _segment_tabs},
 		{id = "badge", title = "UiBadge", figma = "StateBadge 483:324", build = _badges},
 		{id = "empty_state", title = "UiEmptyState", figma = "Main pending: WP6 SGODOT-206 · provisional look per WP7-B F-08 §5", build = _empty_states},
+		# SGODOT-225 shared panel parts
+		{id = "drawer", title = "UiDrawer", figma = "Sheet 483:190 · bag drawer of BAG-2-2 · LOCK-12 / 15 (328/360)", build = _drawers},
+		{id = "inventory_grid", title = "UiInventoryGrid", figma = "Bag layout five-column grid · LOCK-12 / 15", build = _inventory_grids},
 	]
 	return out
 
@@ -354,4 +357,63 @@ static func _empty_states() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
 	v.add_child(UiEmptyState.new("No fish yet", _tex("fish_unknown"), "Show on map"))
 	v.add_child(UiEmptyState.new("Nothing to sell here", _tex("stall")))
+	return v
+
+# ---------------------------------------------------------------- SGODOT-225 shared panel parts
+
+## Full-width (360) components drawn at 328/360 so they fit the gallery column.
+static func _phone(content: Control, height: float) -> Control:
+	var frame := Control.new()
+	var k := (360.0 - UiTokens.SPACE_PAGE * 2.0) / 360.0
+	frame.custom_minimum_size = Vector2(360.0 * k, height * k)
+	var screen := Control.new()
+	screen.size = Vector2(360.0, height)
+	screen.scale = Vector2(k, k)
+	screen.add_child(content)
+	frame.add_child(screen)
+	return frame
+
+static func _bag_items() -> Array:
+	var out := []
+	for e in [["seed_radish", 24, 0], ["seed_carrot", 10, 0], ["fish_crucian", 3, 1], ["fish_perch", 1, 2],
+			["dish_grilled_fish", 2, 2], ["crop_radish", 12, 0], ["wood", 20, 0], ["stone", 64, 0], ["bait_worm", 7, 0]]:
+		out.append({id = e[0], icon = _tex(e[0]), qty = e[1], rarity = e[2], kind = String(e[0]).get_slice("_", 0)})
+	return out
+
+static func _sample_grid(sell := false) -> UiInventoryGrid:
+	var g := UiInventoryGrid.new()
+	g.custom_minimum_size.y = UiTokens.SIZE_INVENTORY_CELL * 2.0 + UiTokens.SPACE_WITHIN
+	g.capacity = 25
+	g.items = _bag_items()
+	if sell:
+		g.can_sell = func(it: Dictionary) -> bool: return it.kind in ["crop", "fish"]
+		g.sell_mode = true
+	g.select("fish_crucian")
+	return g
+
+static func _drawers() -> Control:
+	var screen := Control.new()
+	screen.size = Vector2(360, 420)
+	var scene := ColorRect.new()   # the world behind, under the drawer scrim (color/scrimDrawer)
+	scene.color = UiKit.alpha(UiTokens.COLOR_SCRIM, UiTokens.OPACITY_SCRIM_DRAWER)
+	scene.size = screen.size
+	screen.add_child(scene)
+	var d := UiDrawer.new(360.0)
+	d.animate = false
+	d.safe_bottom = UiTokens.SPACE_ROW
+	screen.add_child(d)
+	d.body.add_child(UiSegmentTab.new([{label = "Bag", count = "9/25"}, {label = "Gear"}], 0))
+	var gap := Control.new()
+	gap.custom_minimum_size.y = UiTokens.SPACE_WITHIN
+	d.body.add_child(gap)
+	d.body.add_child(UiFilterChip.row(PackedStringArray(["All", "Seeds", "Fish", "Produce", "Dishes"]), 0))
+	var grid := _sample_grid()
+	grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	d.body.add_child(grid)
+	return _phone(screen, 420.0)
+
+static func _inventory_grids() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(_sample_grid(), "bag · Crucian selected · dashed empties to capacity 25"))
+	v.add_child(_captioned(_sample_grid(true), "sell_mode · this counter takes crops and fish only"))
 	return v
