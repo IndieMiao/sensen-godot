@@ -1,52 +1,45 @@
-# Milk Tea Shop — SGODOT-180
+# SGODOT-180 · Milk Tea Shop · 刘备 R1 修订
 
-Review draft produced by 刘备 on 2026-10-07. User art approval is pending; Plane remains In Progress.
+依据原始 Figma `OMLTC3yw3u2WDjOZhLnhaR / 545:2962` 的 1544×1544 reference.png，以及不知火舞两轮评论。179 R2 放行后接入共享植物 R2.1。状态目标为 Review，由美术总监确认效果；不把技术检查视为视觉验收。
 
-## Reference and visual scope
+| Review 项 | 本轮处理 |
+|---|---|
+| 粉桃 / 薰衣草 / 薄荷色板 | 重做粉白错缝长砖、粉米方砖与四角薰衣草菱形；紫粉柱和压顶、薄荷门拱与冷柜；独立暖粉日光配桃色背景。 |
+| 卡座 | 方鼓软包薰衣草长凳，粉/薄荷靠枕。前沿局部矮墙降低，让接受尺度的座面可见，不用抬高座面来掩盖遮挡。 |
+| 桌椅 | 原木框椅配粉坐垫；白色圆桌、木柱脚。桌椅高度按不变的 Basic Room 基线校准。 |
+| 菜单与左墙 | 原菜单英文，加入杯子/珍珠插画并腾出文字栏；薄荷 FRESHLY MADE；圆形奶茶标牌与暖光壁灯、GOOD TEA BRIGHTER DAYS。 |
+| 冷柜 | 薄荷外壳、4 层彩瓶、透明门，顶部两只纸箱与垂吊植物。 |
+| 吧台 | 6 个不同色配料格，透明茶桶罩/内层茶液，糖浆瓶高度轻微变化；薰衣草封口机、收银、花瓶、3 杯取餐架、吸管和糖果罐。 |
+| 植物 | 大龟背竹、两端绿萝、7 簇半球白花与垂藤，保留场景需要的覆盖。 |
+| 入口 | A 字牌、紫色地垫、两级视觉台阶与连续坡道碰撞。 |
 
-Actual Figma export: file `OMLTC3yw3u2WDjOZhLnhaR`, node `545:2962`.
-[Reference](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=545-2962). Local export SHA-256: `71139bac1104cc37c5e3a3305ae7caa152f126933e609869824ae1c701c14b36`.
-The full image was inspected before modeling. Geometry is original; unshown backs, depths and metre dimensions are inferred.
+| 预算 | 修订前 | 当前 | 限制 |
+|---|---:|---:|---:|
+| 总摆放三角面 | 150,800 | 154,222 | 200,000 |
+| 植物（含桌花） | 未单独统计 | 40,452 | 100,000 |
+| 静态 surface | 45 | 27 | 60 |
 
-![Reference and runtime comparison](comparison.png)
+本场景原件 34 个，含实例共 43 个；共享植物 17 个摆放。按前后装饰、玻璃、花草合并，运行时商品与藤段不产生独立节点；原件 GLB 和命名源对象保留。两张共享 2048 图集（房间 / 全系列植物），mipmap + VRAM 压缩，不向每个 GLB 内嵌纹理。小花、藤蔓和桌花不投影，大盆栽保留投影。`asset_stats.json` / `revision-verification.json` 包含分组与文件大小，实际 Godot 静态 surface 数与预算一致。
 
-## Deliverables and rebuild
+对应物理部位 9×9 像素中位数：粉白墙砖色相差 **2.73°**，薰衣草柱 **0.74°**，粉色地砖 **9.16°**。位置见 `colour-samples.json` 与 `colour-patch-comparison.jpg`；只测声明部位，饱和度/亮度另保留，当前墙面仍比原图浅，不能用色相通过宣称全图一致。
 
-- Editable named Blender objects/collections: `tools/art/source/milk_tea_shop/milk_tea_shop.blend`.
-- Generator: `tools/art/build_milk_tea_shop.py`; shared helpers remain in the Coffee Shop source directory. Basic Room is unchanged.
-- Runtime modules, atlas, layout/collisions and budget: `assets/rooms/milk_tea_shop/`.
-- Reusable art scene: `scenes/milk_tea_shop/milk_tea_shop_art.tscn`. Contains artwork and simple box collisions only.
-- Godot metres, Y up, front +Z; each GLB has its own floor/mount pivot. Repeated objects use the same GLB.
+Basic Room 不变，角色 H≈1.7455m：台面 1.2005m、椅面 0.69365m、桌面 1.048m、侧拱净高 2.63m，同类偏差均在 ±15%。源尺寸计算见 `layout.json > bench.scale`；真实测量报告见 `bench-scale-measurements.json`。
+
+实际 Godot Mobile/Vulkan **39/39 PASS**：入口→桌间→取餐→卡座→冷柜；家具/边界阻挡、入口往返、贴墙滑行、按键/摇杆、idle/run、放手停止。椅间净宽 0.76m、桌与柜台 1.27m、入口 1.85m，物理射线实测。首次缺少依赖脚本的空碰撞失败没有用于交付；刘备自己的适配器已复制装配器依赖，未修改共享 harness 核心。坡道平台延伸到地板边缘外，修复返回入口被地板侧面阻挡的问题。
+
+15 秒原速实际视口录像，按墙钟采集，不加速；8 个时间点解码确认非黑、完整角色与运动。这是桌面美术/行为证据，未做 Android 或物理手机性能验收。
+
+重建（仓库根目录）：
 
 ```sh
 blender --background --factory-startup --python "$PWD/tools/art/build_milk_tea_shop.py"
-python3 tools/art/render_shop_review.py milk_tea_shop
+python tools/art/source/coffee_shop/render_r1.py r1 milk_tea_shop
+python tools/art/source/coffee_shop/run_bench.py milk_tea_shop --record
+output/art-tools/bin/python tools/art/source/coffee_shop/package_series.py milk_tea_shop r1
+output/art-tools/bin/python tools/art/source/coffee_shop/check_series_colour.py milk_tea_shop r1
+output/art-tools/bin/python tools/art/source/coffee_shop/prepare_series_media.py milk_tea_shop r1
 ```
 
-For manual source edits, use `-- --bake-only` to rebake/export the saved source. A full rebuild overwrites the generated `.blend`; preserve intentional edits first.
-The renderer needs the current host's legitimate DISPLAY/XAUTHORITY. Pillow is needed only for packaging comparison images.
+可编辑源 `tools/art/source/milk_tea_shop/milk_tea_shop.blend`，修订脚本同目录 `revision.py` / `milk_bench.py`，米制 Y-up、各物件保持地面或安装轴心；源中有共享植物实例，运行时独立引用共享图集。生成会覆盖源，手工修改须回填脚本。基础制作脚本保留旧道具，再由修订脚本替换，不改其他人的场景。
 
-## Asset budget
-
-| Metric | Value |
-|---|---:|
-| Unique GLBs / placed instances | 34 / 45 |
-| Unique / placed triangles | 118,364 / 150,800 |
-| Static mesh surfaces | 45 |
-| Shared atlas | 2048 × 2048, mipmaps + VRAM compression |
-| GLB bytes, total | 3,762,664 |
-| Atlas PNG bytes | 3,322,251 |
-
-One shared matte atlas material; separate soft translucent material for glass modules where present. Color/surface detail and softened contact AO are baked; direct lighting remains dynamic. Padded palette swatches protect subpixel detail from black seams. Major rearrangements require rebaking contact AO.
-
-## Verification and limits
-
-Blender 5.2.2 LTS; Godot 4.7.2 Mobile/Vulkan on `AMD Custom GPU 0405 (RADV VANGOGH)`. All 34 GLBs pass container/mesh/surface checks and contain no duplicated embedded images; the assembled render contains all 45 instances. Whole/detail/front/side/top images rendered at 1400 × 1400. Source import settings are retained beside the atlas.
-
-The images are real Godot renders of the exported models. No Android, character/movement benchmark, gameplay integration, release or physical-phone performance claim is part of these art-only cards.
-
-Differences / inferred choices: The main English menu, drink dispensers, sealing machine, topping bins, pickup cups and pastel seating are modeled. Greenery is sparser, brick and tile patterns more regular, and machine controls/food contents simpler than the reference. The fridge is an open stylized display rather than refractive glass; hidden cabinet backs and work clearances are inferred.
-
-![Actual model orthographic views](orthographic.png)
-
-Delivery: Lark self-review messages and downloaded-attachment verification are recorded privately under `output/milk_tea_shop/delivery/`; no chat identifiers or credentials are committed.
+待视觉复审的简化：软椅木背比设计图更方；取餐架较窄、糖浆瓶仍较规则；墙和桌面的饱和度较淡；花簇使用共享形态，没有逐叶复刻插画。玻璃用透明材质与内层模型，无昂贵折射。三栏图为完整参考 / 完整运行时 / 50% 直接叠图，未变形配准，布局仍有差异。

@@ -1,0 +1,116 @@
+{
+  "revision": "r1",
+  "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
+  "checks": [
+    {
+      "name": "pink-white brick",
+      "surface": "Left interior wall brick between logo and GOOD TEA sign",
+      "reference_pixel": [
+        200,
+        670
+      ],
+      "runtime_pixel": [
+        151,
+        571
+      ],
+      "reference": {
+        "rgb": [
+          254,
+          209,
+          164
+        ],
+        "hex": "#FED1A4",
+        "hue_degrees": 30.0,
+        "saturation": 0.3543,
+        "value": 0.9961
+      },
+      "runtime": {
+        "rgb": [
+          255,
+          237,
+          222
+        ],
+        "hex": "#FFEDDE",
+        "hue_degrees": 27.273,
+        "saturation": 0.1294,
+        "value": 1.0
+      },
+      "hue_delta_degrees": 2.727,
+      "passed": true
+    },
+    {
+      "name": "lavender pier",
+      "surface": "Front-right entrance corner pier, outward front face",
+      "reference_pixel": [
+        906,
+        1344
+      ],
+      "runtime_pixel": [
+        728,
+        1130
+      ],
+      "reference": {
+        "rgb": [
+          202,
+          153,
+          173
+        ],
+        "hex": "#CA99AD",
+        "hue_degrees": 335.51,
+        "saturation": 0.2426,
+        "value": 0.7922
+      },
+      "runtime": {
+        "rgb": [
+          242,
+          194,
+          213
+        ],
+        "hex": "#F2C2D5",
+        "hue_degrees": 336.25,
+        "saturation": 0.1983,
+        "value": 0.949
+      },
+      "hue_delta_degrees": 0.74,
+      "passed": true
+    },
+    {
+      "name": "pink porcelain floor",
+      "surface": "Open front floor between the left seating and entrance",
+      "reference_pixel": [
+        669,
+        1046
+      ],
+      "runtime_pixel": [
+        498,
+        926
+      ],
+      "reference": {
+        "rgb": [
+          254,
+          230,
+          214
+        ],
+        "hex": "#FEE6D6",
+        "hue_degrees": 24.0,
+        "saturation": 0.1575,
+        "value": 0.9961
+      },
+      "runtime": {
+        "rgb": [
+          255,
+          238,
+          217
+        ],
+        "hex": "#FFEED9",
+        "hue_degrees": 33.158,
+        "saturation": 0.149,
+        "value": 1.0
+      },
+      "hue_delta_degrees": 9.158,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Representative lit patches only, not a complete-image fidelity score; brightness/saturation retained for review."
+}

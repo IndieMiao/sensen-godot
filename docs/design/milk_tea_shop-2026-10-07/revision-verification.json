@@ -1,0 +1,221 @@
+{
+  "revision": "r1",
+  "reference_sha256": "71139bac1104cc37c5e3a3305ae7caa152f126933e609869824ae1c701c14b36",
+  "renderer": {
+    "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "draw_calls": 27.0,
+    "instances": 60,
+    "renderer": "mobile",
+    "resolution": [
+      1400,
+      1400
+    ],
+    "scope": "offline art render; no mobile/gameplay/performance acceptance",
+    "slug": "milk_tea_shop",
+    "static_surfaces": 27,
+    "views": [
+      {
+        "draw_calls": 29.0,
+        "rendered_objects": 29.0,
+        "view": "godot-whole"
+      },
+      {
+        "draw_calls": 29.0,
+        "rendered_objects": 29.0,
+        "view": "model-front"
+      },
+      {
+        "draw_calls": 29.0,
+        "rendered_objects": 29.0,
+        "view": "model-side"
+      },
+      {
+        "draw_calls": 29.0,
+        "rendered_objects": 29.0,
+        "view": "model-top"
+      },
+      {
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 27.0,
+        "rendered_objects": 27.0,
+        "view": "godot-detail-plants"
+      }
+    ]
+  },
+  "budget": {
+    "after": {
+      "room_triangles": 127558,
+      "shared_plant_triangles": 26664,
+      "room_botanical_triangles": 13788,
+      "plant_triangles": 40452,
+      "total_triangles": 154222,
+      "static_surfaces": 27
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "main_menu",
+          "toppings_menu",
+          "freshly_made",
+          "wall_tea_symbol",
+          "syrup_shelf",
+          "tea_urns",
+          "cup_sealer",
+          "ingredient_jars",
+          "shakers",
+          "topping_case",
+          "checkout_register",
+          "pickup_counter",
+          "straw_box",
+          "cup_stacks"
+        ],
+        "triangles": 32284,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "topping_glass",
+          "fridge_glass",
+          "urn_glass"
+        ],
+        "triangles": 242,
+        "cast_shadow": false
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "table_flower_vase",
+          "table_flower_vase_2",
+          "counter_flower_vase"
+        ],
+        "triangles": 13788,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "street_signboard",
+          "good_tea_wall_sign",
+          "left_tea_logo"
+        ],
+        "triangles": 3820,
+        "cast_shadow": true
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "MonsteraCorner"
+        ],
+        "triangles": 910,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "WallPothos0",
+          "WallPothos1"
+        ],
+        "triangles": 4096,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "FlowerBox0",
+          "FlowerDrape0",
+          "FlowerBox1",
+          "FlowerDrape1",
+          "FlowerBox2",
+          "FlowerDrape2",
+          "FlowerBox3",
+          "FlowerDrape3",
+          "FlowerBox4",
+          "FlowerDrape4",
+          "FlowerBox5",
+          "FlowerDrape5",
+          "FlowerBox6",
+          "FlowerDrape6"
+        ],
+        "triangles": 21658,
+        "cast_shadow": false
+      }
+    ]
+  },
+  "glb_checks": {
+    "passed": true,
+    "single_surface_no_embedded_images": true,
+    "files": [
+      "assets/rooms/_shared/plants/flower_shrub.glb",
+      "assets/rooms/_shared/plants/ivy_short.glb",
+      "assets/rooms/_shared/plants/monstera.glb",
+      "assets/rooms/_shared/plants/pothos.glb",
+      "assets/rooms/milk_tea_shop/back_wall.glb",
+      "assets/rooms/milk_tea_shop/batches/review_back_dressing.glb",
+      "assets/rooms/milk_tea_shop/batches/review_back_plants.glb",
+      "assets/rooms/milk_tea_shop/batches/review_botanical.glb",
+      "assets/rooms/milk_tea_shop/batches/review_front_dressing.glb",
+      "assets/rooms/milk_tea_shop/batches/review_front_plants.glb",
+      "assets/rooms/milk_tea_shop/batches/review_glass.glb",
+      "assets/rooms/milk_tea_shop/batches/review_large_plants.glb",
+      "assets/rooms/milk_tea_shop/cafe_table.glb",
+      "assets/rooms/milk_tea_shop/chair.glb",
+      "assets/rooms/milk_tea_shop/checkout_register.glb",
+      "assets/rooms/milk_tea_shop/corner_pier.glb",
+      "assets/rooms/milk_tea_shop/cup_sealer.glb",
+      "assets/rooms/milk_tea_shop/cup_stacks.glb",
+      "assets/rooms/milk_tea_shop/drinks_fridge.glb",
+      "assets/rooms/milk_tea_shop/entry_step.glb",
+      "assets/rooms/milk_tea_shop/floor.glb",
+      "assets/rooms/milk_tea_shop/freshly_made.glb",
+      "assets/rooms/milk_tea_shop/fridge_glass.glb",
+      "assets/rooms/milk_tea_shop/front_wall_left.glb",
+      "assets/rooms/milk_tea_shop/front_wall_right.glb",
+      "assets/rooms/milk_tea_shop/good_tea_wall_sign.glb",
+      "assets/rooms/milk_tea_shop/ingredient_jars.glb",
+      "assets/rooms/milk_tea_shop/left_door_wall.glb",
+      "assets/rooms/milk_tea_shop/left_tea_logo.glb",
+      "assets/rooms/milk_tea_shop/main_menu.glb",
+      "assets/rooms/milk_tea_shop/pastel_bench.glb",
+      "assets/rooms/milk_tea_shop/pickup_counter.glb",
+      "assets/rooms/milk_tea_shop/service_counter.glb",
+      "assets/rooms/milk_tea_shop/shakers.glb",
+      "assets/rooms/milk_tea_shop/side_low_wall.glb",
+      "assets/rooms/milk_tea_shop/straw_box.glb",
+      "assets/rooms/milk_tea_shop/street_signboard.glb",
+      "assets/rooms/milk_tea_shop/syrup_shelf.glb",
+      "assets/rooms/milk_tea_shop/table_flower_vase.glb",
+      "assets/rooms/milk_tea_shop/tea_urns.glb",
+      "assets/rooms/milk_tea_shop/topping_case.glb",
+      "assets/rooms/milk_tea_shop/topping_glass.glb",
+      "assets/rooms/milk_tea_shop/toppings_menu.glb",
+      "assets/rooms/milk_tea_shop/urn_glass.glb",
+      "assets/rooms/milk_tea_shop/wall_tea_symbol.glb"
+    ]
+  },
+  "visual_acceptance": "Pending art director Review; metrics do not establish reference fidelity."
+}
