@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-07",
+  "parent": "SGODOT-171",
+  "comment_id": "1c389136-15be-4949-86b2-5488a5c7603c",
+  "readback_verified": true,
+  "review_requested": [
+    180,
+    182,
+    183,
+    185,
+    186
+  ],
+  "accepted_done": [
+    179,
+    181,
+    184
+  ],
+  "summary_commit": "588f3156",
+  "scope": "Review request posted in authorized Plane parent; not art approval."
+}

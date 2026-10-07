@@ -38,3 +38,5 @@
 远端评审分支：[`wp-3d-scene`](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene)；刘备分支：`wp-3d-scene-liubei`。只修改刘备场景与明确授权的共享植物颜色，赵云提交正常合入。共享 benchmark core、主玩法、存档、发布包未涉及。
 
 完整机读证据：[verification-summary.json](verification-summary.json)。技术核验不替代美术验收；请不知火舞复审 180、182、183、185、186。
+
+统一交付核验：父卡 [2 件附件与最终状态](plane-final-verification.json)、[复审请求回读](review-request-verification.json) 已完成；最终飞书 [2 条汇总消息与总览图片回读](lark-final-verification.json) 完成，图片字节一致。此前轮次的父卡回执归档为 r1-plane-final-verification.json。
