@@ -1,0 +1,418 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    400
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiSceneAction"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "SceneAction 1116:78934 · LOCK-02"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        348
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            88,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiSceneAction",
+              "rect": [
+                0,
+                52,
+                88,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    4,
+                    74,
+                    80,
+                    22
+                  ],
+                  "variation": "ButtonXB15",
+                  "text": "Cast"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    4,
+                    100,
+                    80,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "5 Energy"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                146,
+                88,
+                14
+              ],
+              "variation": "C9B",
+              "text": "default"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            100,
+            52,
+            88,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiSceneAction",
+              "rect": [
+                100,
+                52,
+                88,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    104,
+                    74,
+                    80,
+                    22
+                  ],
+                  "variation": "ButtonXB15",
+                  "text": "Sow ×1"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    104,
+                    100,
+                    80,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "Need 2 Energy"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                100,
+                146,
+                88,
+                14
+              ],
+              "variation": "C9B",
+              "text": "insufficient"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            200,
+            52,
+            88,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiSceneAction",
+              "rect": [
+                200,
+                52,
+                88,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    204,
+                    74,
+                    80,
+                    22
+                  ],
+                  "variation": "ButtonXB15",
+                  "text": "Growing"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    204,
+                    100,
+                    80,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "Ready in 2h"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                200,
+                146,
+                88,
+                14
+              ],
+              "variation": "C9B",
+              "text": "unavailable"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            172,
+            88,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiSceneAction",
+              "rect": [
+                0,
+                172,
+                88,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    4,
+                    194,
+                    80,
+                    22
+                  ],
+                  "variation": "ButtonXB15",
+                  "text": "Cast"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    4,
+                    220,
+                    80,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "5 Energy"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                266,
+                88,
+                14
+              ],
+              "variation": "C9B",
+              "text": "pressed"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            100,
+            172,
+            88,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiSceneAction",
+              "rect": [
+                100,
+                172,
+                88,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    104,
+                    194,
+                    80,
+                    22
+                  ],
+                  "variation": "ButtonXB15",
+                  "text": "Sow ×1"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    104,
+                    220,
+                    80,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "2 Energy"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                100,
+                266,
+                88,
+                14
+              ],
+              "variation": "C9B",
+              "text": "holding"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            200,
+            172,
+            88,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiSceneAction",
+              "rect": [
+                200,
+                172,
+                88,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    204,
+                    194,
+                    80,
+                    22
+                  ],
+                  "variation": "ButtonXB15",
+                  "text": "Cast"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    204,
+                    220,
+                    80,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "5 Energy"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                200,
+                266,
+                88,
+                14
+              ],
+              "variation": "C9B",
+              "text": "pending"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            292,
+            88,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiSceneAction",
+              "rect": [
+                0,
+                292,
+                88,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    4,
+                    314,
+                    80,
+                    22
+                  ],
+                  "variation": "ButtonXB15",
+                  "text": "Till"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                386,
+                88,
+                14
+              ],
+              "variation": "C9B",
+              "text": "0 Energy: no price"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

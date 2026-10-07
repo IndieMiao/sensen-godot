@@ -30,6 +30,9 @@ static func all() -> Array[Dictionary]:
 		# SGODOT-221 world controls · interaction
 		{id = "quick_bar", title = "UiQuickBar (drawn at 328 of 336)", figma = "Compact/QuickSlot 633:41279 · QuickEnd/Bag 907:72112 · BAR-1 / BAR-1-2 · LOCK-04 / 05", build = _quick_bars},
 		{id = "pin_menu", title = "UiPinMenu", figma = "PinMenu 1141:80291 · LOCK-05", build = _pin_menus},
+		{id = "scene_action", title = "UiSceneAction", figma = "SceneAction 1116:78934 · LOCK-02", build = _scene_actions},
+		{id = "action_key", title = "UiActionKey", figma = "ActionKey 1117:78924 · LOCK-02 / 03", build = _action_keys},
+		{id = "action_radial", title = "UiActionRadial", figma = "RadialPetal 1122:79385 · BAR-2 482:23 · LOCK-03", build = _action_radial},
 	]
 	return out
 
@@ -404,3 +407,56 @@ static func _pin_menus() -> Control:
 	row.add_child(_captioned(UiPinMenu.new(true), "after pinning"))
 	row.add_child(_captioned(UiPinMenu.new(false), "after unpinning"))
 	return row
+
+static func _scene_action(verb: String, cost: String, state: UiSceneAction.State, progress := 0.0) -> UiSceneAction:
+	var k := UiSceneAction.new()
+	k.verb = verb
+	k.cost = cost
+	k.state = state
+	k.hold_progress = progress
+	k.set_process(false)   # keep the Pending spinner still for the PNG snapshot
+	return k
+
+static func _scene_actions() -> Control:
+	var row := _row(UiTokens.SPACE_ROW)
+	var S := UiSceneAction.State
+	row.add_child(_captioned(_scene_action("Cast", "5 Energy", S.DEFAULT), "default"))
+	row.add_child(_captioned(_scene_action("Sow ×1", "Need 2 Energy", S.INSUFFICIENT), "insufficient"))
+	row.add_child(_captioned(_scene_action("Growing", "Ready in 2h", S.UNAVAILABLE), "unavailable"))
+	row.add_child(_captioned(_scene_action("Cast", "5 Energy", S.PRESSED), "pressed"))
+	row.add_child(_captioned(_scene_action("Sow ×1", "2 Energy", S.HOLDING, 0.6), "holding"))
+	row.add_child(_captioned(_scene_action("Cast", "5 Energy", S.PENDING), "pending"))
+	row.add_child(_captioned(_scene_action("Till", "", S.DEFAULT), "0 Energy: no price"))
+	return row
+
+static func _action_keys() -> Control:
+	var row := _row(UiTokens.SPACE_SECTION)
+	var a := UiActionKey.new()
+	a.tool_icon = _tex("hoe")
+	a.key().verb = "Sow ×1"
+	a.key().cost = "2 Energy"
+	a.caption = "uses your Energy"
+	row.add_child(_captioned(a, "farming · first-time caption"))
+	var b := UiActionKey.new()
+	b.tool_icon = _tex("rod")
+	b.key().verb = "Cast"
+	b.key().cost = "Need 5 Energy"
+	b.key().state = UiSceneAction.State.INSUFFICIENT
+	row.add_child(_captioned(b, "fishing · not enough Energy"))
+	return row
+
+static func _action_radial() -> Control:
+	var host := Control.new()
+	host.custom_minimum_size = Vector2(328, 250)
+	var r := UiActionRadial.new()
+	host.add_child(r)
+	r.size = host.custom_minimum_size
+	r.options = [
+		{id = "farming", name = "Farming", icon = _tex("hoe"), available = true},
+		{id = "fishing", name = "Fishing", icon = _tex("rod"), available = false, reason = "No water nearby"},
+		{id = "mining", name = "Mining", icon = _tex("pickaxe"), available = false, reason = "Not in a mine"},
+		{id = "combat", name = "Combat", icon = _tex("sword"), available = false, reason = "No enemies here"},
+	]
+	r.selected = "farming"
+	r.open_at(Vector2(36, 125))
+	return _captioned(host, "fanned from the character · Farming selected")

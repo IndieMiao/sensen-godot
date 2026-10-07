@@ -1,0 +1,406 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    322
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiActionRadial"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "RadialPetal 1122:79385 · BAR-2 482:23 · LOCK-03"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        270
+      ],
+      "children": [
+        {
+          "type": "Control",
+          "rect": [
+            0,
+            52,
+            328,
+            250
+          ],
+          "children": [
+            {
+              "type": "UiActionRadial",
+              "rect": [
+                0,
+                52,
+                656,
+                500
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    0,
+                    52,
+                    656,
+                    500
+                  ]
+                },
+                {
+                  "type": "Control",
+                  "rect": [
+                    0,
+                    52,
+                    656,
+                    500
+                  ],
+                  "children": [
+                    {
+                      "type": "Button",
+                      "rect": [
+                        51,
+                        60,
+                        52,
+                        52
+                      ],
+                      "text": "",
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            63,
+                            72,
+                            28,
+                            28
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        109,
+                        71,
+                        75,
+                        30
+                      ],
+                      "children": [
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            119,
+                            76,
+                            55,
+                            20
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                119,
+                                76,
+                                55,
+                                20
+                              ],
+                              "variation": "BodyXB14",
+                              "text": "Farming"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        103,
+                        114,
+                        52,
+                        52
+                      ],
+                      "text": "",
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            115,
+                            126,
+                            28,
+                            28
+                          ]
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            139,
+                            112,
+                            18,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                142,
+                                115,
+                                12,
+                                12
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        161,
+                        116,
+                        113,
+                        48
+                      ],
+                      "children": [
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            171,
+                            121,
+                            93,
+                            38
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                171,
+                                121,
+                                93,
+                                20
+                              ],
+                              "variation": "BodyXB14",
+                              "text": "Fishing"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                171,
+                                141,
+                                93,
+                                18
+                              ],
+                              "variation": "CaptionB12",
+                              "text": "No water nearby"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        103,
+                        188,
+                        52,
+                        52
+                      ],
+                      "text": "",
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            115,
+                            200,
+                            28,
+                            28
+                          ]
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            139,
+                            186,
+                            18,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                142,
+                                189,
+                                12,
+                                12
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        161,
+                        190,
+                        94,
+                        48
+                      ],
+                      "children": [
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            171,
+                            195,
+                            74,
+                            38
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                171,
+                                195,
+                                74,
+                                20
+                              ],
+                              "variation": "BodyXB14",
+                              "text": "Mining"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                171,
+                                215,
+                                74,
+                                18
+                              ],
+                              "variation": "CaptionB12",
+                              "text": "Not in a mine"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        51,
+                        242,
+                        52,
+                        52
+                      ],
+                      "text": "",
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            63,
+                            254,
+                            28,
+                            28
+                          ]
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            87,
+                            240,
+                            18,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                90,
+                                243,
+                                12,
+                                12
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        109,
+                        244,
+                        113,
+                        48
+                      ],
+                      "children": [
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            119,
+                            249,
+                            93,
+                            38
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                119,
+                                249,
+                                93,
+                                20
+                              ],
+                              "variation": "BodyXB14",
+                              "text": "Combat"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                119,
+                                269,
+                                93,
+                                18
+                              ],
+                              "variation": "CaptionB12",
+                              "text": "No enemies here"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            308,
+            328,
+            14
+          ],
+          "variation": "C9B",
+          "text": "fanned from the character · Farming selected"
+        }
+      ]
+    }
+  ]
+}
