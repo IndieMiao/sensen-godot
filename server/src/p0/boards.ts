@@ -5,12 +5,11 @@
  * never from the request's clock, so the id a client saw is the id the next command finds. Draws use their own
  * stream seeded by player, board, slot and time, so they never shift the fishing or cooking rolls.
  */
-import { take } from './bag.js';
 import { dishParts, type BoardId, type P0Content, type RequestTemplate } from './content.js';
 import type { Refusal } from './fishing.js';
 import { boardSlots } from './homestead.js';
 import type { P0Event } from './progress.js';
-import { haveFor, floorPrice, noteDone, payBonus, pick } from './requests.js';
+import { handOver, haveFor, floorPrice, noteDone, payBonus, pick } from './requests.js';
 import { skillLevel, untilRollover } from './rules.js';
 import type { BoardRequest, BoardSlot, P0State } from './state.js';
 
@@ -169,7 +168,7 @@ export function boardCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver
       ? { item: short, need: r.qty, have: haveFor(c, s, { kind: r.kind }, [short]) }
       : { item: r.items[0] ?? null, need: r.qty, have: haveFor(c, s, { kind: r.kind, rarity: r.rarity }, r.items) } };
   }
-  for (const [item, n] of parts) { take(s.bag, item, n, 'skip'); events.push({ kind: 'item', id: item, delta: -n }); }
+  for (const [item, n] of parts) { handOver(c, s, item, n); events.push({ kind: 'item', id: item, delta: -n }); }
   const pay = payout(c, r, parts);
   const bonus = payBonus(c, s, pay.bonus);
   s.coins += pay.base + bonus;
