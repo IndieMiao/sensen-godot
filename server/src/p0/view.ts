@@ -11,7 +11,11 @@ import { expireGiftMeals, progressOf, requestState, residentState, stageIndex } 
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest } from './state.js';
 import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
+import { cabinetCap, cabinetCount, rackOn, rackStock } from './kitchen_storage.js';
 import { haveTotal, stored } from './storage.js';
+import { mineView, settleMine } from './mine.js';
+import { gatherView } from './gathering.js';
+import { workbenchView } from './workbench.js';
 import { restReadyIn } from './presence.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
@@ -21,6 +25,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
   if (s.day.key !== dayKey(c, now)) s.day = emptyDay(dayKey(c, now));
   expireGiftMeals(s);
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
+  settleMine(c, s, now);
   const skills = Object.fromEntries(SKILLS.map(skill => {
     const level = skillLevel(c, s, skill), th = c.skills[skill];
     return [skill, { level, xp: s.skills[skill], floor: th[level - 1], next: level < th.length ? th[level] : null }];
@@ -47,7 +52,11 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     drinks: drinksView(c, s, now),
     shops: Object.fromEntries(SHOPS.map(shop => [shop, shopView(c, s, shop)])),
     quotas: Object.fromEntries((Object.keys(c.quotas) as QuotaId[]).map(q => [q, quotaView(c, s, q, now)])),
-    storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
+    storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })),
+      auto: s.storage_auto },   // last auto-store on coming home (q(40)): the client floats it once per new `at`
+    mine: mineView(c, s, now),
+    gather: gatherView(c, s, now),
+    workbench: workbenchView(c, s),
     homestead: homesteadView(c, s),
     profile: { name: c.profile.name, city: c.profile.city, climate: c.profile.climate, since_ms: s.created_at,
       farm: { name: c.profile.farm_name, level: s.homestead.level } },
@@ -89,6 +98,11 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
         heats: s.stove.heats,
       } : null,
       first_fire: s.fires === 0,
+      // Spice Rack (Homestead Lv2, q(46)): stored seasonings the stove reaches; Experiment shows them with a Rack badge.
+      rack: { on: rackOn(c, s), items: [...rackStock(c, s)].map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
+      // Warming Cabinet (Homestead Lv3, §7.7): null until unlocked; energy = what one portion restores today.
+      cabinet: cabinetCap(c, s) > 0 ? { cap: cabinetCap(c, s), have: cabinetCount(s),
+        items: s.cabinet.map(b => ({ id: b.id, name: itemName(c, b.id), qty: b.qty, energy: mealValue(c, s, b.id) })) } : null,
       cookbook: c.cooking.recipes.map(r => {
         const known = s.cookbook.includes(r.id);
         const rarity = recipeRarity(c, r);
@@ -101,12 +115,15 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       tiers: Object.fromEntries(Object.entries(c.cooking.tiers).map(([k, t]) => [k, { energy: t.energy, ms: t.ms, bonus: t.bonus }])),
     },
     gear: {
-      slots: { farming: s.gear.hoe, fishing: s.gear.rod, mining: c.tools.mining, combat: c.tools.combat },
+      slots: { farming: s.gear.hoe, fishing: s.gear.rod, mining: s.gear.pick, combat: c.tools.combat },
       // Hoes (§9.11.2): sow = plots per Sow action (Starter Hoe 1, Row Hoe 3).
       hoes: [c.tools.farming, c.tools.row_hoe.id].map(id => ({ id, name: itemName(c, id), owned: s.gear.hoes.includes(id),
         equipped: s.gear.hoe === id, sow: id === c.tools.row_hoe.id ? c.tools.row_hoe.sow : 1,
         price: id === c.tools.row_hoe.id ? c.tools.row_hoe.price : 0, gate: id === c.tools.row_hoe.id ? c.tools.row_hoe.gate : 1 })),
       rods: c.fishing.rods.map(r => ({ ...r, owned: s.gear.rods.includes(r.id), equipped: s.gear.rod === r.id })),
+      // Pickaxes (§13.1.3, LOCK-29): stone = Stone per rock; the Copper Pickaxe comes from the workbench, not a shop.
+      picks: Object.entries(c.mine.picks).map(([id, p]) => ({ id, name: itemName(c, id), owned: s.gear.picks.includes(id),
+        equipped: s.gear.pick === id, stone: p.stone, level: 0, price: 0, source: id === c.tools.mining ? 'start' : 'workbench' })),
     },
     tackle: {
       keeper: c.tackle.keeper,
@@ -184,6 +201,7 @@ function homesteadView(c: P0Content, s: P0State) {
       bag_upgrade_1: s.owned.includes(upgrade.id) ? 'owned' : unlocked(c, s, upgrade.id) ? 'for_sale' : 'locked',
       board_slots: boardSlots(c, s),
       fence: unlocked(c, s, 'fence'),
+      clay_bank: unlocked(c, s, 'clay_bank'),
     },
   };
 }

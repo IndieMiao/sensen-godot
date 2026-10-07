@@ -8,6 +8,8 @@ export type P0Event =
   | { kind: 'energy'; delta: number; reason: string }
   | { kind: 'xp'; skill: Skill; amount: number; percent: number }
   | { kind: 'item'; id: string; delta: number }
+  // Warming Cabinet (§7.7): delta portions in (+) or out (−); to_bag = portions that went to the bag instead (cabinet full) or out to it (Take one).
+  | { kind: 'cabinet'; id: string; delta: number; to_bag: number; have: number; cap: number }
   | { kind: 'coins'; delta: number }
   | { kind: 'first'; what: string; xp: number }
   | { kind: 'level'; skill: Skill; level: number; energy: number; gifts: [string, number][] }
@@ -23,7 +25,12 @@ export type P0Event =
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
   | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string }
   | { kind: 'gift_meal'; resident: string; dish: string; given: boolean }
-  | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null };
+  | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null }
+  | { kind: 'mine'; action: 'enter' | 'continue' | 'floor' | 'torch' | 'rock' | 'cleared'; run: number; floor: number; cost: number;
+      rock?: number; drop?: string | null }
+  | { kind: 'gather'; spot: string; items: [string, number, 'storage' | 'bag'][]; ready_in: number }
+  | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' }
+  | { kind: 'stored'; items: [string, number][]; reason: 'home' | 'spice_rack' };
 
 export function energyDetail(c: P0Content, s: P0State, now: number, need: number) {
   return { need, have: s.energy.value, next_in: nextTickIn(c, s, now) };

@@ -1,7 +1,6 @@
 /** Cooking and eating (plan §7.2–7.6, §7.17): pots cost no energy; quality comes from heat taps judged on the server. */
 import { dishId, dishParts, fishById, ingredient, itemKind, recipeById, type CookTier, type P0Content, type Recipe } from './content.js';
-import { count, take } from './bag.js';
-import { dishesFit, haveIngredient, ingredientStock, routeDish, takeIngredient } from './kitchen_storage.js';
+import { cabinetCap, dishesFit, eatFrom, haveDish, haveIngredient, ingredientStock, routeDish, takeIngredient } from './kitchen_storage.js';
 import { gainEnergy, gainXp, grantOnce, type P0Event } from './progress.js';
 import { draw, foodCap, scaledXp, skillLevel, xpPercent } from './rules.js';
 import type { Heat, P0State } from './state.js';
@@ -139,7 +138,9 @@ export function heatHits(c: P0Content, heats: Heat[], taps: number[]): number {
   return hits;
 }
 
-export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown }, now: number, events: P0Event[]): Refusal | null {
+/** Collect a ready pot. The portions go the Keep way (Warming Cabinet → bag). With eat: true (COOK-4 Eat) the
+ * main portion is eaten from the pot instead, so a full cabinet and bag never block eating (§7.2.6). */
+export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?: unknown }, now: number, events: P0Event[], max: number): Refusal | null {
   const pot = s.stove;
   if (!pot) return { code: 'stove_empty' };
   const left = pot.started_at + pot.ms - now;
@@ -149,14 +150,19 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown }, no
   const quality = Math.min(hits, 2);
   const main = dishId(pot.dish, quality);
   const extra = quality === 2 ? 1 : 0; // Perfect: a second, Plain portion (§7.2.5)
-  const portions: [string, number][] = extra ? [[main, 1], [pot.dish, 1]] : [[main, 1]];
-  if (!dishesFit(c, s, portions)) return { code: 'bag_full' };
+  const eat = cmd.eat === true;
+  if (eat && s.energy.value >= max) return { code: 'energy_full' };
+  const portions: [string, number][] = [];
+  if (!eat) portions.push([main, 1]);
+  if (extra) portions.push([pot.dish, 1]);
+  if (!dishesFit(c, s, portions)) return { code: 'bag_full', detail: { cabinet: cabinetCap(c, s) > 0 } };   // the dish stays on the stove
   s.stove = null;
   for (const [id, n] of portions) routeDish(c, s, id, n, events);
   const firstKey = `cook:${pot.dish}`;
   const first = !s.firsts.includes(firstKey);
   if (first) s.firsts.push(firstKey);
   events.push({ kind: 'dish', dish: pot.dish, quality, qty: 1 + extra, first, mystery: pot.mystery, hits });
+  if (eat) eatMeal(c, s, main, now, events);
   if (pot.mystery) return null;
   if (!s.cookbook.includes(pot.dish)) s.cookbook.push(pot.dish);
   if (first) {
@@ -191,22 +197,28 @@ export function mealValue(c: P0Content, s: P0State, id: string): number {
   return eaten === 0 ? full : eaten === 1 ? Math.ceil(full / 2) : 0;
 }
 
-export function eatDish(c: P0Content, s: P0State, cmd: { item?: unknown }, now: number, events: P0Event[], max: number): Refusal | null {
+/** Eat one portion from the bag, or from the Warming Cabinet with from: "cabinet" (§7.7). */
+export function eatDish(c: P0Content, s: P0State, cmd: { item?: unknown; from?: unknown }, now: number, events: P0Event[], max: number): Refusal | null {
   const id = String(cmd.item ?? '');
+  const from = cmd.from === 'cabinet' ? 'cabinet' : 'bag';
   if (itemKind(id) !== 'dish') return { code: 'not_edible' };
-  if (count(s.bag, id) < 1) return { code: 'not_enough', detail: { item: id, have: 0 } };
+  if (haveDish(c, s, id, from) < 1) return { code: 'not_enough', detail: { item: id, have: 0 } };
   if (s.energy.value >= max) return { code: 'energy_full' };
+  eatFrom(c, s, id, from, events);
+  eatMeal(c, s, id, now, events);
+  return null;
+}
+
+/** One portion eaten (already removed from where it was): daily cap, same-dish decay, energy (§7.17.1). */
+function eatMeal(c: P0Content, s: P0State, id: string, now: number, events: P0Event[]): void {
   const nominal = mealValue(c, s, id);
   const cap = foodCap(c, s, now);
   const counted = Math.max(0, Math.min(nominal, cap - s.day.meals));
-  take(s.bag, id, 1);
-  events.push({ kind: 'item', id, delta: -1 });
   const { base } = dishParts(id);
   s.day.eaten[base] = (s.day.eaten[base] ?? 0) + 1;
   s.day.meals += counted;
   const gain = gainEnergy(c, s, now, counted, events, 'eat');
   events.push({ kind: 'meal', dish: id, nominal, counted, gain, meals: s.day.meals, cap });
-  return null;
 }
 
 const round3 = (x: number) => Math.round(x * 1000) / 1000;

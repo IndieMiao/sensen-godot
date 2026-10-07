@@ -6,8 +6,12 @@ import { boardCommand, settleBoards, tracked } from './boards.js';
 import { expireGiftMeals, giftResident, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
+import { takeFromCabinet } from './kitchen_storage.js';
 import { energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { notePresence, restReadyIn } from './presence.js';
+import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
+import { gather, storeMaterials } from './gathering.js';
+import { craft } from './workbench.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
 import { emptyDay, type P0State, type Plot } from './state.js';
@@ -33,12 +37,16 @@ type P0CommandBody =
   | { type: 'rest' }
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string }
-  | { type: 'collect'; taps?: number[] }
-  | { type: 'eat'; item: string }
+  | { type: 'collect'; taps?: number[]; eat?: boolean }   // eat: COOK-4 Eat, the main portion straight from the pot
+  | { type: 'eat'; item: string; from?: 'bag' | 'cabinet' }
+  | { type: 'cabinet_take'; item: string }   // Warming Cabinet `Take one` (§7.7)
   | { type: 'accept' | 'deliver' | 'drop'; request: string }
   | { type: 'homestead_upgrade' }
   | { type: 'talk'; resident: string }
-  | { type: 'gift'; resident: string; item: string };
+  | { type: 'gift'; resident: string; item: string }
+  | MineCommand
+  | { type: 'gather'; spot: string }
+  | { type: 'craft'; recipe: string };
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
@@ -55,6 +63,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleEnergy(c, s, now);
   rollDay(c, s, now);
   settleBoards(c, s, now);
+  settleMine(c, s, now);
   notePresence(c, s, cmd.space, now, events);   // before the command: a session gap of ≥ 2 h already counts as having left
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
 
@@ -172,6 +181,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       const id = String(cmd.item);
       if (s.gear.rods.includes(id) && rodById(c, id)) s.gear.rod = id;
       else if (s.gear.hoes.includes(id)) s.gear.hoe = id;
+      else if (s.gear.picks.includes(id)) s.gear.pick = id;
       else return fail('not_owned');
       break;
     }
@@ -187,8 +197,20 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
+    case 'cabinet_take': {
+      const refusal = takeFromCabinet(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
     case 'homestead_upgrade': {
       const refusal = upgradeHomestead(c, s, now, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      // q(46): the Spice Rack takes the bag's seasonings (Spice Rack · seasonings off your bag); from now on they are stored.
+      if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
+      break;
+    }
+    case 'gather': case 'craft': {
+      const refusal = cmd.type === 'gather' ? gather(c, s, cmd, now, events) : craft(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
@@ -196,13 +218,16 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       const refusal = cmd.type === 'cast' ? castLine(c, s, cmd, now, events)
         : cmd.type === 'reel' ? reelLine(c, s, cmd, now, events)
         : cmd.type === 'cook' ? startPot(c, s, cmd, now, events)
-        : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events)
+        : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events, maxEnergy(c, s))
         : eatDish(c, s, cmd, now, events, maxEnergy(c, s));
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
-    default:
-      return fail('unknown_command');
+    default: {
+      if (!isMineCommand(cmd)) return fail('unknown_command');
+      const refusal = mineCommand(c, s, cmd, now, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+    }
   }
   s.seq += 1;
   return { ok: true, state: s, events };
