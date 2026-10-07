@@ -87,6 +87,22 @@ describe('kitchen storage (SGODOT-226)', () => {
     expect(ev).toEqual([{ kind: 'item', id: 'rock_salt', delta: -1 }]);   // only the bag part is an item event
   });
 
+  it('cooking at Lv2 uses the Rock Salt the Spice Rack put in storage; Lv1 does not reach storage', () => {
+    const lv1 = atLevel(1);
+    lv1.storage = { rock_salt: 2 };
+    lv1.bag = [{ id: 'fish_crucian', qty: 1 }];
+    expect(refused(lv1, { type: 'cook', items: ['fish_crucian', 'rock_salt'] })).toMatchObject({ code: 'not_enough', detail: { item: 'rock_salt' } });
+    const lv2 = atLevel(2);
+    lv2.storage = { rock_salt: 2 };
+    lv2.bag = [{ id: 'fish_crucian', qty: 2 }];
+    lv2.cookbook.push('dish_herb_grilled_fish');
+    expect(viewOf(c, lv2, T0).cooking.cookbook.find(p => p.id === 'dish_herb_grilled_fish')?.can_cook).toBe(true);
+    const r = step(lv2, { type: 'cook', recipe: 'dish_herb_grilled_fish' });
+    expect(r.s.storage).toEqual({ rock_salt: 1 });
+    expect(r.s.bag).toEqual([{ id: 'fish_crucian', qty: 1 }]);
+    expect(r.ev.filter(e => e.kind === 'item')).toEqual([{ kind: 'item', id: 'fish_crucian', delta: -1 }]);
+  });
+
   it('Lv3 keeps dishes in the Warming Cabinet, then the bag, then on the stove', () => {
     let s = readyPot(atLevel(3));
     s.cabinet = [{ id: 'dish_grilled_crucian', qty: 5 }];

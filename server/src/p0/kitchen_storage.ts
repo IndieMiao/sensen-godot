@@ -3,21 +3,16 @@
  * Warming Cabinet (Lv3) live here without touching the recipe code.
  * Ingredients: the bag; from Lv2 the Spice Rack also reaches the seasonings (Rock Salt, Wild Herb) in farm
  * storage, storage first. The rack is no separate stock (Li Bai, q(46)): the Lv2 upgrade puts the bag's
- * seasonings into storage (Zhou Yu's storeMaterials, PR #17), and Experiment shows the stored count with a Rack badge.
+ * seasonings into storage (gathering.storeMaterials), and Experiment shows the stored count with a Rack badge.
  * Dishes: the Warming Cabinet first (6 portions from Lv3), then the bag; when neither has room the dish
  * stays on the stove (collect refuses bag_full). Residents' gift meals never come here (q(20)). */
 import type { P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
+import { isSeasoning } from './gathering.js';
 import { unlocked } from './homestead.js';
 import type { P0Event } from './progress.js';
 import type { Refusal } from './fishing.js';
 import type { P0State } from './state.js';
-
-/** A seasoning the Spice Rack holds: a material with a cooking family (Rock Salt, Wild Herb; q(40)). Same rule as
- * gathering.isSeasoning in PR #17; keep one copy once it lands. */
-export function isSeasoning(c: P0Content, id: string): boolean {
-  return !!c.materials[id]?.ingr;
-}
 
 export function rackOn(c: P0Content, s: P0State): boolean { return unlocked(c, s, 'spice_rack'); }
 
