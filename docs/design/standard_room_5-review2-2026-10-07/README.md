@@ -1,10 +1,12 @@
 # SGODOT-172 · Standard Room-5 · R2
 
-**赵云 / Review — awaiting art-director and user confirmation.** This responds to [the latest 172 feedback](https://plane.sensenjoy.cn/zili/browse/SGODOT-172), retained in [review-r2.txt](review-r2.txt). Basic Room's accepted character/furniture scale is unchanged. This revision edits Zhao Yun's sample and consumes Liu Bei's shared plant R2; it does not edit another artist's scene or the library.
+**赵云 / Review — awaiting art-director and user confirmation.** This responds to [the latest 172 feedback](https://plane.sensenjoy.cn/zili/browse/SGODOT-172), retained in [review-r2.txt](review-r2.txt). Basic Room's accepted character/furniture scale is unchanged. This revision edits Zhao Yun's sample and consumes Liu Bei's shared plant R2.1; it does not edit another artist's scene or the library.
 
 ![Reference, actual R2 and direct 50% overlay](comparison-r2.png)
 
 [Whole scene](godot.png) · [R1 → R2](before-after.png) · [Kitchen](detail-kitchen.png) · [Living/textiles/chairs](detail-living.png) · [Fire and logs](detail-fire.png) · [Actual model orthographics](orthographic-sheet.png).
+
+Figma now places the unchanged reference node `545:2969` on the **SceneDesign** page (`1072:92318`). The art director confirmed the page move changed location only; the retained reference identity remains valid.
 
 ## Eight review items
 
@@ -17,7 +19,7 @@
 | 5 · Fabric and sofa | New continuous folded throw with metric UVs: U follows physical width, V follows accumulated fold arc length. Checks remain 0.115m squares around the fold; source length ratios are 0.984–1.030. Seat cushions and the two loose pillows are fuller. |
 | 6 · Dining chairs | Continuous solid rear stiles, thicker front legs, single upper/lower back rails and broad slats replace fragmented pieces. Thicker 0.145m pads have modeled rear ties/bows. The seat support was lowered so the actual sitting surface is **0.7825m**, +14.23% versus the 0.685m Basic Room baseline, within ±15%. |
 | 7 · Small defects | Both mugs use a smooth sampled curved handle and rounded junctions, with no block underneath. The towel is a folded striped cloth draped over a rail, not a pointed cone. Broad hearth faces use flat planar normals with smooth bevels; pipe/trim bevels are retained. A shadow-off control also isolated diagonal self-shadow bands, corrected with scene-specific shadow bias/distance while retaining shadows. |
-| 8 · Shared plants | Consumes shared library R2 commit `9c23ab2`, using its supplied double-sided alpha-scissor material. No opaque override or library edits. Shared placed foliage drops from **93,328 to 10,048 triangles**. Small foliage, flowers and background cards do not cast shadows. Total botanical budget conservatively includes entire local flower/herb/fruit modules. |
+| 8 · Shared plants | Consumes shared library R2 (`9c23ab2`) plus the merged R2.1 palette update `a054d81`, using its supplied double-sided alpha-scissor material. No opaque override or library edits. Shared placed foliage drops from **93,328 to 10,048 triangles**. Small foliage, flowers and background cards do not cast shadows. Total botanical budget conservatively includes entire local flower/herb/fruit modules. |
 
 ## Fixed colour checks
 

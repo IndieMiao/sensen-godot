@@ -27,7 +27,7 @@
         "name": "door",
         "reached": true,
         "remaining_m": 0.0938308164477348,
-        "seconds": 0.117,
+        "seconds": 0.116,
         "target": [
           2.30999994277954,
           0.0799999982118607,
@@ -157,7 +157,7 @@
         "name": "bookcase front",
         "reached": true,
         "remaining_m": 0.0649877935647964,
-        "seconds": 0.582,
+        "seconds": 0.583,
         "target": [
           -2.27999997138977,
           0.0799999982118607,
@@ -269,7 +269,7 @@
       "name": "door",
       "reached": true,
       "remaining_m": 0.0938308164477348,
-      "seconds": 0.117,
+      "seconds": 0.116,
       "target": [
         2.30999994277954,
         0.0799999982118607,
@@ -379,7 +379,7 @@
       "name": "bookcase front",
       "reached": true,
       "remaining_m": 0.0649877935647964,
-      "seconds": 0.582,
+      "seconds": 0.583,
       "target": [
         -2.27999997138977,
         0.0799999982118607,
