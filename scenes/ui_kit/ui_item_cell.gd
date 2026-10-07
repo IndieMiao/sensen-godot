@@ -10,6 +10,8 @@ extends Control
 ## everything else (lift, pin_toggle / long_press, drag_start / drag_move / drop, swipe_up, cancel) goes out
 ## through `gesture` for the quick bar / bag drawer, which then sets `state` / `pinned`. mouse_filter is
 ## PASS, so a TouchScrollContainer still takes vertical drags (CELL mode answers them with cancel).
+## Hosts outside a scroll container (the quick bar) need a STOP backing control, or the touch also reaches
+## _unhandled_input (the map's tap handling, for one).
 ## LIFTED, DROP_TARGET and ZERO exist on the QuickSlot main only; other densities draw them as DEFAULT.
 
 signal tapped
