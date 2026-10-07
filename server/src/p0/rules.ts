@@ -2,8 +2,9 @@
 import type { P0Content, Skill } from './content.js';
 import type { P0State } from './state.js';
 
-export function maxEnergy(c: P0Content, _s: P0State): number {
-  return c.energy.max_base; // Homestead Lv1 in M1; +10 per Homestead level later.
+/** §8.3.2: 200 + 10 × (Homestead Lv − 1). */
+export function maxEnergy(c: P0Content, s: P0State): number {
+  return c.energy.max_base + c.homestead.per_level.energy * (s.homestead.level - 1);
 }
 
 /** §3.4.6 Newcomer Blessing: the first 7 × 24 h after the account is created. */
@@ -16,8 +17,9 @@ export function regenMs(c: P0Content, s: P0State, now: number): number {
   return blessed(c, s, now) ? Math.round(c.energy.regen_ms / c.blessing.regen_mult) : c.energy.regen_ms;
 }
 
+/** §8.3.2: daily meals 200 + 10 × (Homestead Lv − 1), +100 under the Newcomer Blessing. */
 export function foodCap(c: P0Content, s: P0State, now: number): number {
-  return c.cooking.food_cap + (blessed(c, s, now) ? c.blessing.food_bonus : 0);
+  return c.cooking.food_cap + c.homestead.per_level.meals * (s.homestead.level - 1) + (blessed(c, s, now) ? c.blessing.food_bonus : 0);
 }
 
 /**
