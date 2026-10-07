@@ -63,9 +63,14 @@ static func kind_of(view: Dictionary, item_id: String) -> String:
 
 ## The bag drawer Tab an item sits on (§10.4.2): seeds and fertilizer on Seeds, crops on Produce, bait and rods on
 ## Tackle, torches and the rest on Materials (周瑜 / 刘邦).
+## Kinds the plan doesn't put on a Tab (postcards, décor; §10.4.8 keepsakes go to storage) get &"": All only (刘邦).
 static func tab_of(view: Dictionary, item_id: String) -> StringName:
-	return {"seed": &"seeds", "fert": &"seeds", "fish": &"fish", "crop": &"produce", "dish": &"dishes", "bait": &"tackle",
-		"rod": &"tackle", "pick": &"tackle"}.get(kind_of(view, item_id), &"materials")
+	var k := str(P0Logic.item(view, item_id).get("kind", ""))
+	if k == "": k = item_id.split("_")[0]
+	var tab = {"seed": &"seeds", "fert": &"seeds", "fish": &"fish", "crop": &"produce", "dish": &"dishes", "bait": &"tackle",
+		"rod": &"tackle", "pick": &"tackle", "material": &"materials", "torch": &"materials"}.get(k, null)
+	if tab != null: return tab
+	return &"materials" if P0Logic.content().get("materials", {}).has(item_id) else &""
 
 static func spec(view: Dictionary, item_id: String, context: StringName, opts := {}) -> Dictionary:
 	assert(context in CONTEXTS, "P0ItemInfo: unknown context %s" % context)
