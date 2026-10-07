@@ -142,3 +142,63 @@ describe('Cooking Lv1–6 conveniences (q(38))', () => {
     expect(v.cookbook.find(p => p.id === 'dish_fisher_stew')!.lock).toBeNull();
   });
 });
+
+describe('Queue ×2 (Cooking Lv5; 李白 2026-10-08)', () => {
+  const lv5 = () => { const s = veteran(); s.skills.cooking = 400; s.fires = 1; return s; };
+  const gold = (h: { at: number; gold: number; width: number; spin: number }) => h.at + (h.gold + h.width / 2) * h.spin;
+
+  it('a second pot waits behind the first and fires when the first is kept, judged on the taps sent while it cooked', () => {
+    let s = lv5();
+    s.bag.push({ id: 'fish_crucian', qty: 1 }, { id: 'crop_carrot', qty: 2 });
+    s = step(s, { type: 'cook', items: ['fish_crucian'] }).s;
+    const queued = step(s, { type: 'cook', items: ['crop_carrot', 'crop_carrot'] }, T0 + S);
+    expect(queued.ev.find(e => e.kind === 'pot')).toMatchObject({ queued: true });
+    expect(count(queued.s.bag, 'crop_carrot')).toBe(0);   // paid when queued
+    s = queued.s;
+    expect(viewOf(c, s, T0 + 2 * S).cooking.queued).toMatchObject({ rarity: 1, ms: 5000, starts_in: 3000 });
+    s = step(s, { type: 'heat', taps: [gold(s.stove!.heats[0])] }, T0 + 3 * S).s;
+    // any later command keeps the first pot (Good from its heat tap) and fires the queued one at the first one's end
+    const later = step(s, { type: 'read_inbox', keys: [] }, T0 + 7 * S);
+    expect(count(later.s.bag, 'dish_grilled_crucian@good')).toBe(1);
+    expect(later.ev.find(e => e.kind === 'queue')).toMatchObject({ started_at: T0 + 5 * S });
+    expect(later.s.stove).toMatchObject({ dish: 'dish_carrot_cake', started_at: T0 + 5 * S });
+    expect(later.s.queue).toBeNull();
+    // the view shows the same before any command
+    expect(viewOf(c, s, T0 + 7 * S).cooking).toMatchObject({ queued: null, stove: { ready_in: 3000 } });
+  });
+
+  it('with no room for the first pot the queued one does not fire until the player collects', () => {
+    let s = lv5();
+    s.bag.push({ id: 'fish_crucian', qty: 1 }, { id: 'crop_carrot', qty: 2 });
+    s = step(s, { type: 'cook', items: ['fish_crucian'] }).s;
+    s = step(s, { type: 'cook', items: ['crop_carrot', 'crop_carrot'] }, T0 + S).s;
+    while (s.bag.length < s.bag_cap) s.bag.push({ id: 'seed_radish', qty: 1 });
+    s = step(s, { type: 'read_inbox', keys: [] }, T0 + 10 * S).s;
+    expect(s.stove).toMatchObject({ dish: 'dish_grilled_crucian' });
+    expect(s.queue).toMatchObject({ dish: 'dish_carrot_cake' });
+    // collect judges it but, with no room, leaves the plate on the stove (SGODOT-226 #20): still no second pot
+    const judged = step(s, { type: 'collect' }, T0 + 11 * S);
+    expect(judged.ev.find(e => e.kind === 'plate')).toMatchObject({ ids: ['dish_grilled_crucian'] });
+    expect(judged.ev.some(e => e.kind === 'queue')).toBe(false);
+    s = judged.s;
+    s.bag.pop();
+    const collected = step(s, { type: 'collect' }, T0 + 12 * S);
+    expect(count(collected.s.bag, 'dish_grilled_crucian')).toBe(1);
+    expect(collected.ev.find(e => e.kind === 'queue')).toMatchObject({ started_at: T0 + 12 * S });
+    expect(collected.s.stove).toMatchObject({ dish: 'dish_carrot_cake', started_at: T0 + 12 * S });
+  });
+
+  it('is refused below Cooking Lv5, with a pot already waiting, and while plates are left on the stove', () => {
+    const s = veteran(); s.fires = 1;
+    s.bag.push({ id: 'fish_crucian', qty: 3 });
+    const busy = step(s, { type: 'cook', items: ['fish_crucian'] }).s;
+    expect(applyP0(c, busy, { type: 'cook', items: ['fish_crucian'] }, T0 + S)).toMatchObject({ ok: false, code: 'stove_busy', detail: { queued: false } });
+    const five = lv5(); five.bag.push({ id: 'fish_crucian', qty: 3 });
+    let q = step(five, { type: 'cook', items: ['fish_crucian'] }).s;
+    q = step(q, { type: 'cook', items: ['fish_crucian'] }, T0 + S).s;
+    expect(applyP0(c, q, { type: 'cook', items: ['fish_crucian'] }, T0 + 2 * S)).toMatchObject({ ok: false, code: 'stove_busy', detail: { queued: true } });
+    const plated = lv5(); plated.bag.push({ id: 'fish_crucian', qty: 1 });
+    plated.stove = { dish: 'dish_grilled_fish', rarity: 1, started_at: T0, ms: 0, heats: [], xp_pct: 100, mystery: false, left: ['dish_grilled_fish'] };
+    expect(applyP0(c, plated, { type: 'cook', items: ['fish_crucian'] }, T0)).toMatchObject({ ok: false, code: 'stove_busy', detail: { left: true } });
+  });
+});

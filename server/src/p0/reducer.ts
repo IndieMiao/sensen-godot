@@ -1,7 +1,7 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
-import { collectPot, eatDish, startPot } from './cooking.js';
+import { collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, settleBoards, tracked } from './boards.js';
 import { expireGiftMeals, giftResident, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
@@ -39,6 +39,7 @@ type P0CommandBody =
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string }
   | { type: 'collect'; taps?: number[]; eat?: boolean }   // eat: COOK-4 Eat, the main portion straight from the pot
+  | { type: 'heat'; taps: number[] }   // heat taps as they happen, kept on the pot (Queue ×2 keeps a pot on its own)
   | { type: 'eat'; item: string; from?: 'bag' | 'cabinet' }
   | { type: 'cabinet_take'; item: string }   // Warming Cabinet `Take one` (§7.7)
   | { type: 'accept' | 'deliver' | 'drop'; request: string }
@@ -67,6 +68,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleEnergy(c, s, now);
   rollDay(c, s, now);
   settleBoards(c, s, now);
+  if (cmd.type !== 'collect') settleStove(c, s, now, events);   // Queue ×2: a done pot makes way for the waiting one
   settleMine(c, s, now);
   settleParcels(c, s, now);
   notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
@@ -217,6 +219,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'gather': case 'craft': {
       const refusal = cmd.type === 'gather' ? gather(c, s, cmd, now, events) : craft(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'heat': {
+      const refusal = recordHeat(s, cmd);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }

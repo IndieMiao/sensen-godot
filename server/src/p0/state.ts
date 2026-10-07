@@ -38,6 +38,7 @@ export interface Pot {
   dish: string; rarity: number; started_at: number; ms: number; heats: Heat[];
   xp_pct: number; mystery: boolean;
   items?: string[];                     // what went in (a failed pot's refund and its Kitchen Mishaps entry, §7.5.2)
+  taps?: number[];                      // heat taps sent while it cooked (heat command), judged with collect's own
   left?: string[];   // collected (judged, XP paid) but no place to keep: these portions wait on the stove (§7.2.6)
 }
 
@@ -133,6 +134,7 @@ export interface P0State {
   fishing: { casts: number; bites: number; caught: Record<string, number>; seen: string[] };
   cast: Cast | null;
   stove: Pot | null;
+  queue: Pot | null;             // Queue ×2 (Cooking Lv5): the pot waiting behind the one on the stove
   cabinet: { id: string; qty: number }[];   // Warming Cabinet portions (Homestead Lv3, §7.7); stacks by dish id
   cookbook: string[];            // known recipe pages (Tasted or Discovered)
   book: CookbookBook;
@@ -169,7 +171,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     firsts: [], rewards: [],
     day: emptyDay(),
     fishing: { casts: 0, bites: 0, caught: {}, seen: [] },
-    cast: null, stove: null, cabinet: [],
+    cast: null, stove: null, queue: null, cabinet: [],
     cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id), book: emptyBook(),
     requests: [{ ...c.requests.tutorial, status: 'open' }],
     gear: { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining },
@@ -231,6 +233,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   }
   s.req_done ??= [];
   s.cabinet ??= [];
+  s.queue ??= null;
   if (!s.book) {   // SGODOT-232 S5: pages already cooked count once, with no date (no version of their own)
     s.book = emptyBook();
     for (const f of s.firsts) if (f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`) s.book.cooked[f.slice(5)] = 1;

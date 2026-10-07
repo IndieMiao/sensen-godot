@@ -1,7 +1,7 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
 import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ShopId } from './content.js';
 import { count, freeSlots } from './bag.js';
-import { cookSlots, ingredientsFor, mealValue, recipeRarity } from './cooking.js';
+import { cookSlots, mealValue, recipeRarity, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
@@ -27,6 +27,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
   if (s.day.key !== dayKey(c, now)) s.day = emptyDay(dayKey(c, now));
   expireGiftMeals(s);
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
+  settleStove(c, s, now, []);   // Queue ×2: show the waiting pot already fired, as the next command will
   settleMine(c, s, now);
   settleParcels(c, s, now);
   const skills = Object.fromEntries(SKILLS.map(skill => {
@@ -106,6 +107,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
         heats: s.stove.heats,
         left: s.stove.left ?? null,   // portions waiting on the stove after a collect with no room (§7.2.6)
       } : null,
+      // Queue ×2 (Cooking Lv5): the pot waiting behind the stove's; it fires when that one is kept (starts_in from now).
+      queued: s.queue ? { dish: s.cookbook.includes(s.queue.dish) && !s.queue.mystery ? s.queue.dish : null, rarity: s.queue.rarity,
+        ms: s.queue.ms, starts_in: s.stove && !s.stove.left ? Math.max(0, s.stove.started_at + s.stove.ms - now) : null } : null,
       first_fire: s.fires === 0,
       // Spice Rack (Homestead Lv2, q(46)): stored seasonings the stove reaches; Experiment shows them with a Rack badge.
       rack: { on: rackOn(c, s), items: [...rackStock(c, s)].map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
