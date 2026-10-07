@@ -1,0 +1,843 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"checks": [
+		{
+			"details": null,
+			"name": "Default Avatar fixture assembles",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Bench route/probe schema",
+			"passed": true
+		},
+		{
+			"details": 0.0649999976158142,
+			"name": "Spawn stands on authored floor",
+			"passed": true
+		},
+		{
+			"details": "(0.27, 0.065, 2.61)",
+			"name": "Spawn capsule clear",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.270000010728836,
+					0.0634357258677483,
+					2.24378871917725
+				],
+				"from": [
+					0.270000010728836,
+					0.0649999976158142,
+					2.60999989509583
+				],
+				"name": "stool_gap",
+				"reached": true,
+				"remaining_m": 0.0838032364845276,
+				"seconds": 0.003,
+				"target": [
+					0.270000010728836,
+					0.0649999976158142,
+					2.16000008583069
+				]
+			},
+			"name": "Route: stool_gap",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.270000010728836,
+					0.063425749540329,
+					2.5391833782196
+				],
+				"from": [
+					0.270000010728836,
+					0.0634357258677483,
+					2.24378871917725
+				],
+				"name": "front_lane",
+				"reached": true,
+				"remaining_m": 0.0708340108394623,
+				"seconds": 0.004,
+				"target": [
+					0.270000010728836,
+					0.0649999976158142,
+					2.60999989509583
+				]
+			},
+			"name": "Route: front_lane",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BurgerShopArt/red_diner_stool/Collider"
+				],
+				"final": [
+					-1.27914905548096,
+					0.0634286850690842,
+					2.60704922676086
+				],
+				"from": [
+					0.270000010728836,
+					0.063425749540329,
+					2.5391833782196
+				],
+				"name": "bar_left_end",
+				"reached": true,
+				"remaining_m": 0.0809200406074524,
+				"seconds": 0.397,
+				"target": [
+					-1.36000001430511,
+					0.0649999976158142,
+					2.60999989509583
+				]
+			},
+			"name": "Route: bar_left_end",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.35599207878113,
+					0.0634251236915588,
+					0.927595794200897
+				],
+				"from": [
+					-1.27914905548096,
+					0.0634286850690842,
+					2.60704922676086
+				],
+				"name": "counter_corner",
+				"reached": true,
+				"remaining_m": 0.087701603770256,
+				"seconds": 0.466,
+				"target": [
+					-1.36000001430511,
+					0.0649999976158142,
+					0.839999973773956
+				]
+			},
+			"name": "Route: counter_corner",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.134256303310394,
+					0.0634363815188408,
+					0.844765782356262
+				],
+				"from": [
+					-1.35599207878113,
+					0.0634251236915588,
+					0.927595794200897
+				],
+				"name": "order_position",
+				"reached": true,
+				"remaining_m": 0.0858902782201767,
+				"seconds": 0.416,
+				"target": [
+					0.219999998807907,
+					0.0649999976158142,
+					0.839999973773956
+				]
+			},
+			"name": "Route: order_position",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					2.30641865730286,
+					0.0634328275918961,
+					0.840156078338623
+				],
+				"from": [
+					0.134256303310394,
+					0.0634363815188408,
+					0.844765782356262
+				],
+				"name": "right_aisle",
+				"reached": true,
+				"remaining_m": 0.0735983103513718,
+				"seconds": 0.467,
+				"target": [
+					2.38000011444092,
+					0.0649999976158142,
+					0.839999973773956
+				]
+			},
+			"name": "Route: right_aisle",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					2.37675094604492,
+					0.0634368062019348,
+					-1.09078872203827
+				],
+				"from": [
+					2.30641865730286,
+					0.0634328275918961,
+					0.840156078338623
+				],
+				"name": "pickup_approach",
+				"reached": true,
+				"remaining_m": 0.0892840623855591,
+				"seconds": 0.533,
+				"target": [
+					2.38000011444092,
+					0.0649999976158142,
+					-1.17999994754791
+				]
+			},
+			"name": "Route: pickup_approach",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.17146837711334,
+					0.0634363293647766,
+					-1.41536808013916
+				],
+				"from": [
+					2.37675094604492,
+					0.0634368062019348,
+					-1.09078872203827
+				],
+				"name": "pickup_window",
+				"reached": true,
+				"remaining_m": 0.0947398319840431,
+				"seconds": 0.35,
+				"target": [
+					1.08000004291534,
+					0.0649999976158142,
+					-1.44000005722046
+				]
+			},
+			"name": "Route: pickup_window",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					2.31645464897156,
+					0.0634298995137215,
+					-1.19237565994263
+				],
+				"from": [
+					1.17146837711334,
+					0.0634363293647766,
+					-1.41536808013916
+				],
+				"name": "right_return",
+				"reached": true,
+				"remaining_m": 0.0647583976387978,
+				"seconds": 0.334,
+				"target": [
+					2.38000011444092,
+					0.0649999976158142,
+					-1.17999994754791
+				]
+			},
+			"name": "Route: right_return",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BurgerShopArt/red_order_counter/Collider"
+				],
+				"final": [
+					0.219999998807907,
+					0.0567951761186123,
+					0.632276177406311
+				],
+				"from": [
+					0.219999998807907,
+					0.0649999976158142,
+					0.839999973773956
+				],
+				"reached": false,
+				"remaining_m": 0.432354062795639,
+				"seconds": 0.883,
+				"target": [
+					0.219999998807907,
+					0.0649999976158142,
+					0.200000002980232
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/BurgerShopArt/red_order_counter/Collider"
+			},
+			"name": "Blocked: order_counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BurgerShopArt/customer_bar/Collider"
+				],
+				"final": [
+					0.219999998807907,
+					0.0467129126191139,
+					1.04772388935089
+				],
+				"from": [
+					0.219999998807907,
+					0.0649999976158142,
+					0.839999973773956
+				],
+				"reached": false,
+				"remaining_m": 0.442654013633728,
+				"seconds": 0.883,
+				"target": [
+					0.219999998807907,
+					0.0649999976158142,
+					1.49000000953674
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/BurgerShopArt/customer_bar/Collider"
+			},
+			"name": "Blocked: dining_bar",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BurgerShopArt/drinks_fridge/Collider"
+				],
+				"final": [
+					-1.25,
+					0.0571396350860596,
+					-1.74249970912933
+				],
+				"from": [
+					-1.25,
+					0.0649999976158142,
+					-0.930000007152557
+				],
+				"reached": false,
+				"remaining_m": 0.537557721138,
+				"seconds": 0.866,
+				"target": [
+					-1.25,
+					0.0649999976158142,
+					-2.27999997138977
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/BurgerShopArt/drinks_fridge/Collider"
+			},
+			"name": "Blocked: fridge",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BurgerShopArt/wood_planter_barrier/Collider"
+				],
+				"final": [
+					-2.48271560668945,
+					0.0457478761672974,
+					2.24000000953674
+				],
+				"from": [
+					-1.89999997615814,
+					0.0649999976158142,
+					2.24000000953674
+				],
+				"reached": false,
+				"remaining_m": 0.517642498016357,
+				"seconds": 0.883,
+				"target": [
+					-3.0,
+					0.0649999976158142,
+					2.24000000953674
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/BurgerShopArt/wood_planter_barrier/Collider"
+			},
+			"name": "Blocked: planter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BurgerShopArt/red_diner_stool/Collider"
+				],
+				"final": [
+					0.12478044629097,
+					0.0494707897305489,
+					2.07999992370605
+				],
+				"from": [
+					0.270000010728836,
+					0.0649999976158142,
+					2.07999992370605
+				],
+				"reached": false,
+				"remaining_m": 0.485029131174088,
+				"seconds": 0.883,
+				"target": [
+					-0.360000014305115,
+					0.0649999976158142,
+					2.07999992370605
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/BurgerShopArt/red_diner_stool/Collider"
+			},
+			"name": "Blocked: stool",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 0.865,
+				"measured_m": 0.864999979734421,
+				"minimum_m": 0.8
+			},
+			"name": "Gap width: counter_to_bar",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					2.30992150306702,
+					0.0634317323565483,
+					0.839999973773956
+				],
+				"from": [
+					-1.36000001430511,
+					0.0649999976158142,
+					0.839999973773956
+				],
+				"reached": true,
+				"remaining_m": 0.0700961574912071,
+				"seconds": 1.016,
+				"target": [
+					2.38000011444092,
+					0.0649999976158142,
+					0.839999973773956
+				]
+			},
+			"name": "Traverse: counter_to_bar",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 0.935,
+				"measured_m": 0.934999823570251,
+				"minimum_m": 0.8
+			},
+			"name": "Gap width: left_bar_access",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.36000001430511,
+					0.0634272620081902,
+					0.937500476837158
+				],
+				"from": [
+					-1.36000001430511,
+					0.0649999976158142,
+					2.25
+				],
+				"reached": true,
+				"remaining_m": 0.0975131914019585,
+				"seconds": 0.383,
+				"target": [
+					-1.36000001430511,
+					0.0649999976158142,
+					0.839999973773956
+				]
+			},
+			"name": "Traverse: left_bar_access",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 0.75,
+				"measured_m": 0.750000059604645,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: stools_entry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.270000010728836,
+					0.0634344294667244,
+					2.05921864509583
+				],
+				"from": [
+					0.270000010728836,
+					0.0649999976158142,
+					2.60999989509583
+				],
+				"reached": true,
+				"remaining_m": 0.0792340934276581,
+				"seconds": 0.183,
+				"target": [
+					0.270000010728836,
+					0.0649999976158142,
+					1.98000001907349
+				]
+			},
+			"name": "Traverse: stools_entry",
+			"passed": true
+		},
+		{
+			"details": {
+				"entry": {
+					"collisions": [],
+					"final": [
+						0.270000010728836,
+						0.0634253621101379,
+						2.37962579727173
+					],
+					"from": [
+						0.270000010728836,
+						0.06342863291502,
+						2.54925799369812
+					],
+					"reached": true,
+					"remaining_m": 0.0696436539292336,
+					"seconds": 0.067,
+					"target": [
+						0.270000010728836,
+						0.0649999976158142,
+						2.30999994277954
+					]
+				},
+				"exit": {
+					"collisions": [],
+					"final": [
+						0.270000010728836,
+						0.06342863291502,
+						2.54925799369812
+					],
+					"from": [
+						0.270000010728836,
+						0.0649999976158142,
+						2.30999994277954
+					],
+					"reached": true,
+					"remaining_m": 0.0807574093341827,
+					"seconds": 0.1,
+					"target": [
+						0.270000010728836,
+						0.0649999976158142,
+						2.63000011444092
+					]
+				}
+			},
+			"name": "Entrance gap allows exit and reentry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"delta": [
+					1.10485458374023,
+					-0.00170197337865829,
+					-0.204038858413696
+				]
+			},
+			"name": "Diagonal collision preserves wall sliding",
+			"passed": true
+		},
+		{
+			"details": [
+				"run",
+				0.15,
+				0.316655333333333
+			],
+			"name": "Run animation advances in rendered viewport",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Input release stops horizontal motion",
+			"passed": true
+		},
+		{
+			"details": "idle",
+			"name": "Release returns to idle",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Focus loss cancels movement",
+			"passed": true
+		},
+		{
+			"details": 1.74549420922995,
+			"name": "Fixture head-top height measurable",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 1.334865499799,
+				"difference": 0.0,
+				"height": 2.33,
+				"ratio_to_H": 1.334865499799,
+				"reason": "Open front diorama, no enclosing door; unchanged baseline placeholder."
+			},
+			"name": "Scale ±15%: door",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.660271454299722,
+				"difference": 0.0078091106290672,
+				"height": 1.1615,
+				"ratio_to_H": 0.665427587131564,
+				"reason": ""
+			},
+			"name": "Scale ±15%: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.392438998867948,
+				"difference": 0.316058394160584,
+				"height": 0.9015,
+				"ratio_to_H": 0.516472638656138,
+				"reason": "High diner stools paired with 1.2015 m bar: seat is 75% of bar height. Explicit high-stool exception in director feedback, not a changed Basic Room baseline."
+			},
+			"name": "Scale ±15%: chair",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.65024564046003,
+				"difference": 0.0585903083700441,
+				"height": 1.2015,
+				"ratio_to_H": 0.68834373305086,
+				"reason": ""
+			},
+			"name": "Scale ±15%: table",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"pid": 1076419,
+	"renderer": "mobile",
+	"route": [
+		{
+			"collisions": [],
+			"final": [
+				0.270000010728836,
+				0.0634357258677483,
+				2.24378871917725
+			],
+			"from": [
+				0.270000010728836,
+				0.0649999976158142,
+				2.60999989509583
+			],
+			"name": "stool_gap",
+			"reached": true,
+			"remaining_m": 0.0838032364845276,
+			"seconds": 0.003,
+			"target": [
+				0.270000010728836,
+				0.0649999976158142,
+				2.16000008583069
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.270000010728836,
+				0.063425749540329,
+				2.5391833782196
+			],
+			"from": [
+				0.270000010728836,
+				0.0634357258677483,
+				2.24378871917725
+			],
+			"name": "front_lane",
+			"reached": true,
+			"remaining_m": 0.0708340108394623,
+			"seconds": 0.004,
+			"target": [
+				0.270000010728836,
+				0.0649999976158142,
+				2.60999989509583
+			]
+		},
+		{
+			"collisions": [
+				"/root/SceneBenchmark/BurgerShopArt/red_diner_stool/Collider"
+			],
+			"final": [
+				-1.27914905548096,
+				0.0634286850690842,
+				2.60704922676086
+			],
+			"from": [
+				0.270000010728836,
+				0.063425749540329,
+				2.5391833782196
+			],
+			"name": "bar_left_end",
+			"reached": true,
+			"remaining_m": 0.0809200406074524,
+			"seconds": 0.397,
+			"target": [
+				-1.36000001430511,
+				0.0649999976158142,
+				2.60999989509583
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.35599207878113,
+				0.0634251236915588,
+				0.927595794200897
+			],
+			"from": [
+				-1.27914905548096,
+				0.0634286850690842,
+				2.60704922676086
+			],
+			"name": "counter_corner",
+			"reached": true,
+			"remaining_m": 0.087701603770256,
+			"seconds": 0.466,
+			"target": [
+				-1.36000001430511,
+				0.0649999976158142,
+				0.839999973773956
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.134256303310394,
+				0.0634363815188408,
+				0.844765782356262
+			],
+			"from": [
+				-1.35599207878113,
+				0.0634251236915588,
+				0.927595794200897
+			],
+			"name": "order_position",
+			"reached": true,
+			"remaining_m": 0.0858902782201767,
+			"seconds": 0.416,
+			"target": [
+				0.219999998807907,
+				0.0649999976158142,
+				0.839999973773956
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				2.30641865730286,
+				0.0634328275918961,
+				0.840156078338623
+			],
+			"from": [
+				0.134256303310394,
+				0.0634363815188408,
+				0.844765782356262
+			],
+			"name": "right_aisle",
+			"reached": true,
+			"remaining_m": 0.0735983103513718,
+			"seconds": 0.467,
+			"target": [
+				2.38000011444092,
+				0.0649999976158142,
+				0.839999973773956
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				2.37675094604492,
+				0.0634368062019348,
+				-1.09078872203827
+			],
+			"from": [
+				2.30641865730286,
+				0.0634328275918961,
+				0.840156078338623
+			],
+			"name": "pickup_approach",
+			"reached": true,
+			"remaining_m": 0.0892840623855591,
+			"seconds": 0.533,
+			"target": [
+				2.38000011444092,
+				0.0649999976158142,
+				-1.17999994754791
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.17146837711334,
+				0.0634363293647766,
+				-1.41536808013916
+			],
+			"from": [
+				2.37675094604492,
+				0.0634368062019348,
+				-1.09078872203827
+			],
+			"name": "pickup_window",
+			"reached": true,
+			"remaining_m": 0.0947398319840431,
+			"seconds": 0.35,
+			"target": [
+				1.08000004291534,
+				0.0649999976158142,
+				-1.44000005722046
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				2.31645464897156,
+				0.0634298995137215,
+				-1.19237565994263
+			],
+			"from": [
+				1.17146837711334,
+				0.0634363293647766,
+				-1.41536808013916
+			],
+			"name": "right_return",
+			"reached": true,
+			"remaining_m": 0.0647583976387978,
+			"seconds": 0.334,
+			"target": [
+				2.38000011444092,
+				0.0649999976158142,
+				-1.17999994754791
+			]
+		}
+	],
+	"scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+	"slug": "burger_shop"
+}

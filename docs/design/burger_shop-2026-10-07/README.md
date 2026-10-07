@@ -1,52 +1,33 @@
-# Burger Shop — SGODOT-184
+# SGODOT-184 · Burger Shop · 刘备 R1 修订
 
-Review draft produced by 刘备 on 2026-10-07. User art approval is pending; Plane remains In Progress.
+以 Figma `545:2960` 原图、不知火舞两轮评论和 179 R2.1 标准修订。Basic Room 基线不变，视觉验收待美术总监 Review。
 
-## Reference and visual scope
+| Review 项 | 当前处理 |
+|---|---|
+| L 柜台 | 保留主柜尺寸，补左前回转柜；厚奶油圆角台面，中央汉堡标识和两对横线独立发光材质。标识提高以避开吧台遮挡。 |
+| 后厨 | 四片大小与摆放不齐的肉饼、静态半透明蒸汽细带；两个薯条炸篮、蔬菜格、油烟罩、不锈钢柜门，双层面包与酱瓶。 |
+| 菜单/冷柜 | 三栏深红菜单与暗底清单，弱自发光；红框冷柜、彩色饮料、冷白灯条。 |
+| 取餐窗 | 保留真实开口、PICK UP HERE 和红白棚，纸袋改为两只。 |
+| 地面/墙 | 深咖厚底座、加厚红色圆角压顶、接近明度的两种米色棋盘砖。 |
+| 道具 | 两个盘装汉堡、酱瓶、两个外卖盒、收银机与餐巾；两幅带汉堡插图竖牌，三盏黄铜灯。 |
+| 吧台 | 保留高吧台比例，红凳加厚软垫与深色脚环，酱瓶、餐巾架；调整位置留出前方绕行。 |
+| 植物 | 花箱六组共享绿萝，右侧共享白掌；保留密度，小叶/花不投影。 |
 
-Actual Figma export: file `OMLTC3yw3u2WDjOZhLnhaR`, node `545:2960`.
-[Reference](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=545-2960). Local export SHA-256: `d197ef4ea5ea24de5823c2f938033e5e701d1ce51a4cee7ea2cd8f0cbddd329a`.
-The full image was inspected before modeling. Geometry is original; unshown backs, depths and metre dimensions are inferred.
+食物随各厨房组件合并：汉堡架四种尺寸 0.89/0.925/0.96/0.995，柜台汉堡 0.96/1.03；面包有独立大小变化，薯条交叉散放，饮料有多色包装。保留可复用模块 GLB、命名 Blender 源对象和局部 pivot，不为单件食物创建运行时节点。最终总摆放 **108,544 面**，植物 **13,234 面**，静态 surface **26**；角色 **35/35 PASS**，完整预算见 `revision-verification.json`；房间与共享植物各一张 2048 图集，mipmap + VRAM 压缩，无 GLB 内嵌图片。
 
-![Reference and runtime comparison](comparison.png)
+红压顶 / 红柜台 / 深咖底座 / 米色砖对应色相检查见 `colour-verification.json`，9×9 像素中位数，阈值 10°。原柜台运行时取样曾落到黄色吧台，已改到真正红柜面；此更正保留在说明中。当前亮度、饱和度高于插画，色相通过不代表全图一致。
 
-## Deliverables and rebuild
-
-- Editable named Blender objects/collections: `tools/art/source/burger_shop/burger_shop.blend`.
-- Generator: `tools/art/build_burger_shop.py`; shared helpers remain in the Coffee Shop source directory. Basic Room is unchanged.
-- Runtime modules, atlas, layout/collisions and budget: `assets/rooms/burger_shop/`.
-- Reusable art scene: `scenes/burger_shop/burger_shop_art.tscn`. Contains artwork and simple box collisions only.
-- Godot metres, Y up, front +Z; each GLB has its own floor/mount pivot. Repeated objects use the same GLB.
+柜台 1.1615m、吧台 1.2015m。高脚凳 0.9015m，约吧台高度 75%，采用总监明确允许的高凳例外；本场景开放前沿无门，door 项是明确不适用的基线占位。地面/家具尺寸和角色不随构图任意缩放。柜台—吧台 **0.865m**、左侧进入吧台 **0.935m**、两凳 **0.75m**，实际射线测量。角色从前沿穿凳间，再绕左侧去点餐、沿右侧到取餐窗；墙、柜台、吧台、冷柜、花箱与凳子均有实际阻挡检查。15 秒实际视口原速录像，八时点检查；不代表 Android 或实机性能。
 
 ```sh
-blender --background --factory-startup --python "$PWD/tools/art/build_burger_shop.py"
-python3 tools/art/render_shop_review.py burger_shop
+blender -b -t 8 --python tools/art/build_burger_shop.py
+python tools/art/source/coffee_shop/render_r1.py r1 burger_shop
+python tools/art/source/coffee_shop/run_bench.py burger_shop --record
+output/art-tools/bin/python tools/art/source/coffee_shop/package_series.py burger_shop r1
+output/art-tools/bin/python tools/art/source/coffee_shop/check_series_colour.py burger_shop r1
+output/art-tools/bin/python tools/art/source/coffee_shop/prepare_series_media.py burger_shop r1
 ```
 
-For manual source edits, use `-- --bake-only` to rebake/export the saved source. A full rebuild overwrites the generated `.blend`; preserve intentional edits first.
-The renderer needs the current host's legitimate DISPLAY/XAUTHORITY. Pillow is needed only for packaging comparison images.
+源文件 `tools/art/source/burger_shop/burger_shop.blend`，同目录 `revision.py`、`burger_bench.py`。共享 harness 原文件不变，隔离适配器采集 Jolt 全部侧面接触点。
 
-## Asset budget
-
-| Metric | Value |
-|---|---:|
-| Unique GLBs / placed instances | 22 / 26 |
-| Unique / placed triangles | 98,270 / 100,582 |
-| Static mesh surfaces | 26 |
-| Shared atlas | 2048 × 2048, mipmaps + VRAM compression |
-| GLB bytes, total | 3,385,744 |
-| Atlas PNG bytes | 2,910,271 |
-
-One shared matte atlas material; separate soft translucent material for glass modules where present. Color/surface detail and softened contact AO are baked; direct lighting remains dynamic. Padded palette swatches protect subpixel detail from black seams. Major rearrangements require rebaking contact AO.
-
-## Verification and limits
-
-Blender 5.2.2 LTS; Godot 4.7.2 Mobile/Vulkan on `AMD Custom GPU 0405 (RADV VANGOGH)`. All 22 GLBs pass container/mesh/surface checks and contain no duplicated embedded images; the assembled render contains all 26 instances. Whole/detail/front/side/top images rendered at 1400 × 1400. Source import settings are retained beside the atlas.
-
-The images are real Godot renders of the exported models. No Android, character/movement benchmark, gameplay integration, release or physical-phone performance claim is part of these art-only cards.
-
-Differences / inferred choices: The red/cream palette, warm checker floor, left-wall menu and cooking line, actual pickup opening, warming burgers and three front stools follow the source. Menu wording and prices are retained with approximate typography. The order counter uses a straight reusable cabinet instead of the full curved L-shaped return; the planter sits against the wall. Beverage stock, burger logos, poster illustrations and leaves are simplified. Steel shares the matte atlas and lamps are static geometry without the reference glow; glass uses a simple translucent material. Kitchen clearances and unseen backs are inferred; no cooking or shop interaction is implemented.
-
-![Actual model orthographic views](orthographic.png)
-
-Delivery: Lark self-review messages and downloaded-attachment verification are recorded privately under `output/burger_shop/delivery/`; no chat identifiers or credentials are committed.
+待视觉复审：L 回转柜在左前，吧台为保证通行相对原图移位；左侧绿萝被柜体部分遮挡；金属反射、食物纹理和霓虹溢光较参考简化；蒸汽为静态细带，没有动态烟雾模拟。附原图、真实 Godot 整景、直接 50% 叠图、细节、正交、角色与碰撞证据。

@@ -1,12 +1,45 @@
 {
   "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
   "draw_calls": 25.0,
-  "instances": 26,
+  "instances": 41,
   "renderer": "mobile",
   "resolution": [
     1400,
     1400
   ],
   "scope": "offline art render; no mobile/gameplay/performance acceptance",
-  "slug": "burger_shop"
+  "slug": "burger_shop",
+  "static_surfaces": 26,
+  "views": [
+    {
+      "draw_calls": 28.0,
+      "rendered_objects": 28.0,
+      "view": "godot-whole"
+    },
+    {
+      "draw_calls": 28.0,
+      "rendered_objects": 28.0,
+      "view": "model-front"
+    },
+    {
+      "draw_calls": 28.0,
+      "rendered_objects": 28.0,
+      "view": "model-side"
+    },
+    {
+      "draw_calls": 28.0,
+      "rendered_objects": 28.0,
+      "view": "model-top"
+    },
+    {
+      "draw_calls": 22.0,
+      "rendered_objects": 22.0,
+      "view": "godot-detail"
+    },
+    {
+      "draw_calls": 25.0,
+      "rendered_objects": 25.0,
+      "view": "godot-detail-plants"
+    }
+  ]
 }

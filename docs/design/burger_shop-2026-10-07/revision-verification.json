@@ -1,0 +1,172 @@
+{
+  "revision": "r1",
+  "reference_sha256": "d197ef4ea5ea24de5823c2f938033e5e701d1ce51a4cee7ea2cd8f0cbddd329a",
+  "renderer": {
+    "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "draw_calls": 25.0,
+    "instances": 41,
+    "renderer": "mobile",
+    "resolution": [
+      1400,
+      1400
+    ],
+    "scope": "offline art render; no mobile/gameplay/performance acceptance",
+    "slug": "burger_shop",
+    "static_surfaces": 26,
+    "views": [
+      {
+        "draw_calls": 28.0,
+        "rendered_objects": 28.0,
+        "view": "godot-whole"
+      },
+      {
+        "draw_calls": 28.0,
+        "rendered_objects": 28.0,
+        "view": "model-front"
+      },
+      {
+        "draw_calls": 28.0,
+        "rendered_objects": 28.0,
+        "view": "model-side"
+      },
+      {
+        "draw_calls": 28.0,
+        "rendered_objects": 28.0,
+        "view": "model-top"
+      },
+      {
+        "draw_calls": 22.0,
+        "rendered_objects": 22.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 25.0,
+        "rendered_objects": 25.0,
+        "view": "godot-detail-plants"
+      }
+    ]
+  },
+  "budget": {
+    "after": {
+      "room_triangles": 95310,
+      "shared_plant_triangles": 13234,
+      "room_botanical_triangles": 0,
+      "plant_triangles": 13234,
+      "total_triangles": 108544,
+      "static_surfaces": 26
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/burger_shop/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "pickup_window",
+          "pickup_canopy",
+          "pickup_sign",
+          "pickup_paper_bags",
+          "burger_warming_shelf",
+          "fresh_buns_poster",
+          "wall_lamp",
+          "wall_lamp_pickup"
+        ],
+        "triangles": 16424,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/burger_shop/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "drinks_glass"
+        ],
+        "triangles": 12,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/burger_shop/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "good_burgers_poster",
+          "counter_napkins",
+          "wall_lamp_left",
+          "bar_napkins"
+        ],
+        "triangles": 4168,
+        "cast_shadow": true
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/burger_shop/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "WhiteCornerPlant"
+        ],
+        "triangles": 946,
+        "cast_shadow": true
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/burger_shop/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "FencePothos0",
+          "FencePothos1",
+          "FencePothos2",
+          "FencePothos3",
+          "FencePothos4",
+          "FencePothos5"
+        ],
+        "triangles": 12288,
+        "cast_shadow": false
+      }
+    ]
+  },
+  "glb_checks": {
+    "passed": true,
+    "single_surface_no_embedded_images": true,
+    "files": [
+      "assets/rooms/_shared/plants/peace_lily.glb",
+      "assets/rooms/_shared/plants/pothos.glb",
+      "assets/rooms/burger_shop/batches/review_back_dressing.glb",
+      "assets/rooms/burger_shop/batches/review_front_dressing.glb",
+      "assets/rooms/burger_shop/batches/review_front_plants.glb",
+      "assets/rooms/burger_shop/batches/review_glass.glb",
+      "assets/rooms/burger_shop/batches/review_large_plants.glb",
+      "assets/rooms/burger_shop/burger_warming_shelf.glb",
+      "assets/rooms/burger_shop/checker_floor.glb",
+      "assets/rooms/burger_shop/counter_logo_glow.glb",
+      "assets/rooms/burger_shop/counter_napkins.glb",
+      "assets/rooms/burger_shop/customer_bar.glb",
+      "assets/rooms/burger_shop/drinks_fridge.glb",
+      "assets/rooms/burger_shop/drinks_glass.glb",
+      "assets/rooms/burger_shop/fresh_buns_poster.glb",
+      "assets/rooms/burger_shop/fridge_light_glow.glb",
+      "assets/rooms/burger_shop/fryer_station.glb",
+      "assets/rooms/burger_shop/good_burgers_poster.glb",
+      "assets/rooms/burger_shop/grill_station.glb",
+      "assets/rooms/burger_shop/grill_steam.glb",
+      "assets/rooms/burger_shop/lamp_bulb_glow.glb",
+      "assets/rooms/burger_shop/left_counter_return.glb",
+      "assets/rooms/burger_shop/left_wall.glb",
+      "assets/rooms/burger_shop/menu_board.glb",
+      "assets/rooms/burger_shop/pickup_canopy.glb",
+      "assets/rooms/burger_shop/pickup_paper_bags.glb",
+      "assets/rooms/burger_shop/pickup_sign.glb",
+      "assets/rooms/burger_shop/pickup_wall.glb",
+      "assets/rooms/burger_shop/pickup_window.glb",
+      "assets/rooms/burger_shop/prep_station.glb",
+      "assets/rooms/burger_shop/red_diner_stool.glb",
+      "assets/rooms/burger_shop/red_order_counter.glb",
+      "assets/rooms/burger_shop/wall_lamp.glb",
+      "assets/rooms/burger_shop/wood_planter_barrier.glb"
+    ]
+  },
+  "visual_acceptance": "Pending art director Review; metrics do not establish reference fidelity."
+}

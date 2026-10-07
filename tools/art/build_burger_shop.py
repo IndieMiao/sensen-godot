@@ -108,7 +108,7 @@ def geometry():
         for n in range(7):ellipsoid('Prep ingredient',(x+random.uniform(-.10,.10),1.08,z+random.uniform(-.07,.07)),(.085,.035,.08),c,8,5)
     begin('burger_warming_shelf',at=(-2.76,1.48,-1.93),yaw=90)
     cube('Warming shelf',(0,0,0),(1.46,.048,.46),STEEL,.023)
-    for j in range(4):burger((-.54+j*.36,.03,0),.95)
+    for j in range(4):burger((-.54+j*.36,.03,0),.89+j*.035)
     begin('menu_board',at=(-2.82,2.31,-1.30),yaw=90)
     cube('Dark menu edge',(0,0,0),(3.22,1.16,.10),'iron',.09)
     cube('Red menu panel',(0,0,.06),(3.13,1.07,.06),RED,.075)
@@ -134,7 +134,7 @@ def geometry():
     cube('Register casing',(-1.41,1.53,-.04),(.46,.30,.07),'iron',.026)
     cube('Register screen',(-1.41,1.53,.003),(.39,.23,.012),'68716B',.014)
     cube('Burger service tray',(-.57,1.18,.08),(.73,.035,.41),'oak_edge',.035)
-    for x in (-.74,-.40):burger((x,1.206,.08),1)
+    for j,x in enumerate((-.74,-.40)):burger((x,1.206,.08),.96+j*.07)
     for j,c in enumerate((RED,'E7BD42','947A58')):sauce((.25+j*.17,1.17,.03),c)
     for j in range(2):
         cube('Takeaway box',(1.11+j*.48,1.38,.03),(.42,.39,.33),'DDC39A',.035)
@@ -167,10 +167,17 @@ def geometry():
     ellipsoid('Warm lamp bulb',(0,-.17,.25),(.10,.07,.10),'FFF0BF',12,6)
     k.instance('wall_lamp','wall_lamp_left',(-2.81,2.63,1.70),90)
     k.instance('wall_lamp','wall_lamp_pickup',(.03,2.91,-2.57))
+    sys.path.insert(0,str(Path(__file__).resolve().parent/'source/burger_shop'))
+    import revision
+    revision.revise()
     k.save('545:2960',{'position':[10,9.2,12],'target':[0,1.16,.03],'size':9.5})
+    revision.manifest()
 
 if __name__=='__main__':
     k.configure('burger_shop');args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
     if '--bake-only' in args:k.load()
     else:geometry()
-    if '--geometry-only' not in args:k.bake_and_export()
+    if '--geometry-only' not in args:k.bake_and_export(ao_strength=.45,ao_distance=.36,coherent_swatches=True)
+    if '--geometry-only' not in args:
+        from series_batch import build
+        build('burger_shop')

@@ -1,0 +1,50 @@
+[
+  {
+    "name": "red wall coping",
+    "surface": "Lit top of left red wall coping above menu",
+    "reference_pixel": [
+      351,
+      247
+    ],
+    "runtime_pixel": [
+      359,
+      342
+    ]
+  },
+  {
+    "name": "red order counter",
+    "surface": "Red front counter cabinet panel left of the burger badge",
+    "reference_pixel": [
+      523,
+      971
+    ],
+    "runtime_pixel": [
+      550,
+      701
+    ]
+  },
+  {
+    "name": "dark coffee base",
+    "surface": "Front face of thick dark-brown diorama foundation",
+    "reference_pixel": [
+      818,
+      1368
+    ],
+    "runtime_pixel": [
+      824,
+      1089
+    ]
+  },
+  {
+    "name": "cream checker tile",
+    "surface": "Open light checker tile in front of the stools",
+    "reference_pixel": [
+      810,
+      1290
+    ],
+    "runtime_pixel": [
+      806,
+      1060
+    ]
+  }
+]

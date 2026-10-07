@@ -1,0 +1,36 @@
+{
+	"avatar_top_H": 1.74549420922995,
+	"capsule_height": 1.25,
+	"capsule_radius": 0.21,
+	"measurements": {
+		"chair": {
+			"baseline_ratio": 0.392438998867948,
+			"difference": 0.316058394160584,
+			"height": 0.9015,
+			"ratio_to_H": 0.516472638656138,
+			"reason": "High diner stools paired with 1.2015 m bar: seat is 75% of bar height. Explicit high-stool exception in director feedback, not a changed Basic Room baseline."
+		},
+		"counter": {
+			"baseline_ratio": 0.660271454299722,
+			"difference": 0.0078091106290672,
+			"height": 1.1615,
+			"ratio_to_H": 0.665427587131564,
+			"reason": ""
+		},
+		"door": {
+			"baseline_ratio": 1.334865499799,
+			"difference": 0.0,
+			"height": 2.33,
+			"ratio_to_H": 1.334865499799,
+			"reason": "Open front diorama, no enclosing door; unchanged baseline placeholder."
+		},
+		"table": {
+			"baseline_ratio": 0.65024564046003,
+			"difference": 0.0585903083700441,
+			"height": 1.2015,
+			"ratio_to_H": 0.68834373305086,
+			"reason": ""
+		}
+	},
+	"speed": 3.75
+}

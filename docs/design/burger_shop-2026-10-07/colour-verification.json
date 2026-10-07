@@ -1,0 +1,152 @@
+{
+  "revision": "r1",
+  "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
+  "checks": [
+    {
+      "name": "red wall coping",
+      "surface": "Lit top of left red wall coping above menu",
+      "reference_pixel": [
+        351,
+        247
+      ],
+      "runtime_pixel": [
+        359,
+        342
+      ],
+      "reference": {
+        "rgb": [
+          189,
+          80,
+          80
+        ],
+        "hex": "#BD5050",
+        "hue_degrees": 0.0,
+        "saturation": 0.5767,
+        "value": 0.7412
+      },
+      "runtime": {
+        "rgb": [
+          245,
+          81,
+          54
+        ],
+        "hex": "#F55136",
+        "hue_degrees": 8.482,
+        "saturation": 0.7796,
+        "value": 0.9608
+      },
+      "hue_delta_degrees": 8.482,
+      "passed": true
+    },
+    {
+      "name": "red order counter",
+      "surface": "Red front counter cabinet panel left of the burger badge",
+      "reference_pixel": [
+        523,
+        971
+      ],
+      "runtime_pixel": [
+        550,
+        701
+      ],
+      "reference": {
+        "rgb": [
+          165,
+          53,
+          36
+        ],
+        "hex": "#A53524",
+        "hue_degrees": 7.907,
+        "saturation": 0.7818,
+        "value": 0.6471
+      },
+      "runtime": {
+        "rgb": [
+          199,
+          48,
+          31
+        ],
+        "hex": "#C7301F",
+        "hue_degrees": 6.071,
+        "saturation": 0.8442,
+        "value": 0.7804
+      },
+      "hue_delta_degrees": 1.836,
+      "passed": true
+    },
+    {
+      "name": "dark coffee base",
+      "surface": "Front face of thick dark-brown diorama foundation",
+      "reference_pixel": [
+        818,
+        1368
+      ],
+      "runtime_pixel": [
+        824,
+        1089
+      ],
+      "reference": {
+        "rgb": [
+          99,
+          68,
+          51
+        ],
+        "hex": "#634433",
+        "hue_degrees": 21.25,
+        "saturation": 0.4848,
+        "value": 0.3882
+      },
+      "runtime": {
+        "rgb": [
+          146,
+          79,
+          42
+        ],
+        "hex": "#924F2A",
+        "hue_degrees": 21.346,
+        "saturation": 0.7123,
+        "value": 0.5725
+      },
+      "hue_delta_degrees": 0.096,
+      "passed": true
+    },
+    {
+      "name": "cream checker tile",
+      "surface": "Open light checker tile in front of the stools",
+      "reference_pixel": [
+        810,
+        1290
+      ],
+      "runtime_pixel": [
+        806,
+        1060
+      ],
+      "reference": {
+        "rgb": [
+          230,
+          185,
+          141
+        ],
+        "hex": "#E6B98D",
+        "hue_degrees": 29.663,
+        "saturation": 0.387,
+        "value": 0.902
+      },
+      "runtime": {
+        "rgb": [
+          255,
+          233,
+          193
+        ],
+        "hex": "#FFE9C1",
+        "hue_degrees": 38.71,
+        "saturation": 0.2431,
+        "value": 1.0
+      },
+      "hue_delta_degrees": 9.047,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Representative lit patches only, not a complete-image fidelity score; brightness/saturation retained for review."
+}
