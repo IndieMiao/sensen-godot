@@ -1,0 +1,6 @@
+[
+ {"name":"white lime plaster","surface":"Lit wall strip left of the arched entrance and above shop sign","reference_pixel":[198,488],"runtime_pixel":[243,493]},
+ {"name":"terracotta coping","surface":"Top lit surface of left wall coping above the entrance","reference_pixel":[395,346],"runtime_pixel":[363,349]},
+ {"name":"orange timber floor","surface":"Open lit timber floor in the central aisle between floor fruit crates","reference_pixel":[690,1024],"runtime_pixel":[598,852]},
+ {"name":"blue shutter","surface":"Rightmost shutter louver front face at midheight","reference_pixel":[1224,640],"runtime_pixel":[1159,577]}
+]

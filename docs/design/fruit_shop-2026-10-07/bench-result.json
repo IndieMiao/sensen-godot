@@ -1,0 +1,828 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"checks": [
+		{
+			"details": null,
+			"name": "Default Avatar fixture assembles",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Bench route/probe schema",
+			"passed": true
+		},
+		{
+			"details": 0.0599999986588955,
+			"name": "Spawn stands on authored floor",
+			"passed": true
+		},
+		{
+			"details": "(0.15, 0.06, 2.15)",
+			"name": "Spawn capsule clear",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.15000009536743
+				],
+				"from": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.15000009536743
+				],
+				"name": "entrance",
+				"reached": true,
+				"remaining_m": 0.00999999046325684,
+				"seconds": 0.001,
+				"target": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.14000010490417
+				]
+			},
+			"name": "Route: entrance",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.415307104587555,
+					0.0599338859319687,
+					1.78210175037384
+				],
+				"from": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.15000009536743
+				],
+				"name": "left_crate_front",
+				"reached": true,
+				"remaining_m": 0.077186331152916,
+				"seconds": 0.067,
+				"target": [
+					-0.479999989271164,
+					0.0599999986588955,
+					1.74000000953674
+				]
+			},
+			"name": "Route: left_crate_front",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.475125432014465,
+					0.0599085763096809,
+					0.596604883670807
+				],
+				"from": [
+					-0.415307104587555,
+					0.0599338859319687,
+					1.78210175037384
+				],
+				"name": "left_crate_side",
+				"reached": true,
+				"remaining_m": 0.0967278257012367,
+				"seconds": 0.334,
+				"target": [
+					-0.479999989271164,
+					0.0599999986588955,
+					0.5
+				]
+			},
+			"name": "Route: left_crate_side",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.0405344143509865,
+					0.0599422976374626,
+					-0.150332883000374
+				],
+				"from": [
+					-0.475125432014465,
+					0.0599085763096809,
+					0.596604883670807
+				],
+				"name": "produce_table",
+				"reached": true,
+				"remaining_m": 0.0806011706590652,
+				"seconds": 0.25,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-0.219999998807907
+				]
+			},
+			"name": "Route: produce_table",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-2.0250027179718,
+					0.0599332749843597,
+					-0.21746301651001
+				],
+				"from": [
+					-0.0405344143509865,
+					0.0599422976374626,
+					-0.150332883000374
+				],
+				"name": "left_olive",
+				"reached": true,
+				"remaining_m": 0.0750401169061661,
+				"seconds": 0.418,
+				"target": [
+					-2.09999990463257,
+					0.0599999986588955,
+					-0.219999998807907
+				]
+			},
+			"name": "Route: left_olive",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.0914076194167137,
+					0.0599375292658806,
+					-0.219885468482971
+				],
+				"from": [
+					-2.0250027179718,
+					0.0599332749843597,
+					-0.21746301651001
+				],
+				"name": "display_return",
+				"reached": true,
+				"remaining_m": 0.0914077088236809,
+				"seconds": 0.533,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-0.219999998807907
+				]
+			},
+			"name": "Route: display_return",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					2.2714467048645,
+					0.0599279031157494,
+					-0.219996318221092
+				],
+				"from": [
+					-0.0914076194167137,
+					0.0599375292658806,
+					-0.219885468482971
+				],
+				"name": "right_olive",
+				"reached": true,
+				"remaining_m": 0.0785532295703888,
+				"seconds": 0.65,
+				"target": [
+					2.34999990463257,
+					0.0599999986588955,
+					-0.219999998807907
+				]
+			},
+			"name": "Route: right_olive",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					2.1846330165863,
+					0.0599307417869568,
+					1.46032428741455
+				],
+				"from": [
+					2.2714467048645,
+					0.0599279031157494,
+					-0.219996318221092
+				],
+				"name": "right_crate",
+				"reached": true,
+				"remaining_m": 0.089795283973217,
+				"seconds": 0.467,
+				"target": [
+					2.1800000667572,
+					0.0599999986588955,
+					1.54999995231628
+				]
+			},
+			"name": "Route: right_crate",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					2.12872767448425,
+					0.0599088780581951,
+					2.08281922340393
+				],
+				"from": [
+					2.1846330165863,
+					0.0599307417869568,
+					1.46032428741455
+				],
+				"name": "front_return",
+				"reached": true,
+				"remaining_m": 0.0975720211863518,
+				"seconds": 0.183,
+				"target": [
+					2.11999988555908,
+					0.0599999986588955,
+					2.1800000667572
+				]
+			},
+			"name": "Route: front_return",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/FruitShopArt/floor_fig_crate/Collider"
+				],
+				"final": [
+					0.216870039701462,
+					0.0599244460463524,
+					2.17732357978821
+				],
+				"from": [
+					2.12872767448425,
+					0.0599088780581951,
+					2.08281922340393
+				],
+				"name": "entrance_return",
+				"reached": true,
+				"remaining_m": 0.0669236183166504,
+				"seconds": 0.533,
+				"target": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.1800000667572
+				]
+			},
+			"name": "Route: entrance_return",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/FruitShopArt/produce_display_table/Collider"
+				],
+				"final": [
+					0.0,
+					0.0500977709889412,
+					-0.617499887943268
+				],
+				"from": [
+					0.0,
+					0.0600000023841858,
+					-0.180000007152557
+				],
+				"reached": false,
+				"remaining_m": 0.682571887969971,
+				"seconds": 0.866,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-1.29999995231628
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/FruitShopArt/produce_display_table/Collider"
+			},
+			"name": "Blocked: produce_counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/FruitShopArt/floor_orange_crate/Collider"
+				],
+				"final": [
+					-1.36000001430511,
+					0.0429860949516296,
+					0.522499978542328
+				],
+				"from": [
+					-1.36000001430511,
+					0.0600000023841858,
+					0.209999993443489
+				],
+				"reached": false,
+				"remaining_m": 0.677713692188263,
+				"seconds": 0.882,
+				"target": [
+					-1.36000001430511,
+					0.0599999986588955,
+					1.20000004768372
+				]
+			},
+			"name": "Blocked: floor_crate",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/FruitShopArt/LeftOlive/Collider",
+					"/root/SceneBenchmark/FruitShopArt/floor_orange_crate/Collider"
+				],
+				"final": [
+					-2.02471899986267,
+					0.0500634089112282,
+					0.752038598060608
+				],
+				"from": [
+					-2.02471899986267,
+					0.0500634089112282,
+					0.752038598060608
+				],
+				"reached": false,
+				"remaining_m": 0.688405156135559,
+				"seconds": 0.882,
+				"target": [
+					-2.59999990463257,
+					0.0599999986588955,
+					1.12999999523163
+				]
+			},
+			"name": "Blocked: olive_pot",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/FruitShopArt/side_low_wall/Collider"
+				],
+				"final": [
+					2.625,
+					0.0458936542272568,
+					0.150000005960464
+				],
+				"from": [
+					2.5,
+					0.0599999986588955,
+					0.150000005960464
+				],
+				"reached": false,
+				"remaining_m": 0.975101947784424,
+				"seconds": 0.867,
+				"target": [
+					3.59999990463257,
+					0.0599999986588955,
+					0.150000005960464
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/FruitShopArt/side_low_wall/Collider"
+			},
+			"name": "Blocked: side_wall",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.605,
+				"measured_m": 1.60500001907349,
+				"minimum_m": 0.8
+			},
+			"name": "Gap width: crate_to_counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.61621153354645,
+					0.0599358752369881,
+					-0.0399999991059303
+				],
+				"from": [
+					-2.0,
+					0.0600000023841858,
+					-0.0399999991059303
+				],
+				"reached": true,
+				"remaining_m": 0.0837885364890099,
+				"seconds": 1.0,
+				"target": [
+					1.70000004768372,
+					0.0599999986588955,
+					-0.0399999991059303
+				]
+			},
+			"name": "Traverse: crate_to_counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.85,
+				"measured_m": 1.84999996423721,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: entrance",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.150000035762787,
+					0.0136307999491692,
+					3.17906951904297
+				],
+				"from": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.1800000667572
+				],
+				"reached": true,
+				"remaining_m": 0.200673893094063,
+				"seconds": 0.3,
+				"target": [
+					0.150000005960464,
+					-0.170000001788139,
+					3.25999999046326
+				]
+			},
+			"name": "Traverse: entrance",
+			"passed": true
+		},
+		{
+			"details": {
+				"entry": {
+					"collisions": [],
+					"final": [
+						0.150000035762787,
+						0.0599318146705627,
+						2.24523210525513
+					],
+					"from": [
+						0.150000035762787,
+						-0.004959711804986,
+						3.22107362747192
+					],
+					"reached": true,
+					"remaining_m": 0.0952320322394371,
+					"seconds": 0.3,
+					"target": [
+						0.150000005960464,
+						0.0599999986588955,
+						2.15000009536743
+					]
+				},
+				"exit": {
+					"collisions": [],
+					"final": [
+						0.150000035762787,
+						-0.004959711804986,
+						3.22107362747192
+					],
+					"from": [
+						0.150000005960464,
+						0.0599999986588955,
+						2.15000009536743
+					],
+					"reached": true,
+					"remaining_m": 0.209824502468109,
+					"seconds": 0.316,
+					"target": [
+						0.150000005960464,
+						-0.189999997615814,
+						3.3199999332428
+					]
+				}
+			},
+			"name": "Entrance gap allows exit and reentry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"delta": [
+					-0.0586659908294678,
+					-0.000220838934183121,
+					-0.972272634506226
+				]
+			},
+			"name": "Diagonal collision preserves wall sliding",
+			"passed": true
+		},
+		{
+			"details": [
+				"run",
+				0.15,
+				0.316666666666667
+			],
+			"name": "Run animation advances in rendered viewport",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Input release stops horizontal motion",
+			"passed": true
+		},
+		{
+			"details": "idle",
+			"name": "Release returns to idle",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Focus loss cancels movement",
+			"passed": true
+		},
+		{
+			"details": 1.74549429118633,
+			"name": "Fixture head-top height measurable",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 1.33486543712292,
+				"difference": 0.128755364806867,
+				"height": 2.63,
+				"ratio_to_H": 1.50673652344776,
+				"reason": ""
+			},
+			"name": "Scale ±15%: door",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.660271423297924,
+				"difference": 0.123644251626898,
+				"height": 1.01,
+				"ratio_to_H": 0.578632657293625,
+				"reason": ""
+			},
+			"name": "Scale ±15%: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.392438980441716,
+				"difference": 0.0,
+				"height": 0.685,
+				"ratio_to_H": 0.392438980441716,
+				"reason": "No chair in reference; baseline placeholder, not an invented prop."
+			},
+			"name": "Scale ±15%: chair",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.650245609928975,
+				"difference": 0.110132158590308,
+				"height": 1.01,
+				"ratio_to_H": 0.578632657293625,
+				"reason": ""
+			},
+			"name": "Scale ±15%: table",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"pid": 1066690,
+	"renderer": "mobile",
+	"route": [
+		{
+			"collisions": [],
+			"final": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.15000009536743
+			],
+			"from": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.15000009536743
+			],
+			"name": "entrance",
+			"reached": true,
+			"remaining_m": 0.00999999046325684,
+			"seconds": 0.001,
+			"target": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.14000010490417
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.415307104587555,
+				0.0599338859319687,
+				1.78210175037384
+			],
+			"from": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.15000009536743
+			],
+			"name": "left_crate_front",
+			"reached": true,
+			"remaining_m": 0.077186331152916,
+			"seconds": 0.067,
+			"target": [
+				-0.479999989271164,
+				0.0599999986588955,
+				1.74000000953674
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.475125432014465,
+				0.0599085763096809,
+				0.596604883670807
+			],
+			"from": [
+				-0.415307104587555,
+				0.0599338859319687,
+				1.78210175037384
+			],
+			"name": "left_crate_side",
+			"reached": true,
+			"remaining_m": 0.0967278257012367,
+			"seconds": 0.334,
+			"target": [
+				-0.479999989271164,
+				0.0599999986588955,
+				0.5
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.0405344143509865,
+				0.0599422976374626,
+				-0.150332883000374
+			],
+			"from": [
+				-0.475125432014465,
+				0.0599085763096809,
+				0.596604883670807
+			],
+			"name": "produce_table",
+			"reached": true,
+			"remaining_m": 0.0806011706590652,
+			"seconds": 0.25,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				-0.219999998807907
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-2.0250027179718,
+				0.0599332749843597,
+				-0.21746301651001
+			],
+			"from": [
+				-0.0405344143509865,
+				0.0599422976374626,
+				-0.150332883000374
+			],
+			"name": "left_olive",
+			"reached": true,
+			"remaining_m": 0.0750401169061661,
+			"seconds": 0.418,
+			"target": [
+				-2.09999990463257,
+				0.0599999986588955,
+				-0.219999998807907
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.0914076194167137,
+				0.0599375292658806,
+				-0.219885468482971
+			],
+			"from": [
+				-2.0250027179718,
+				0.0599332749843597,
+				-0.21746301651001
+			],
+			"name": "display_return",
+			"reached": true,
+			"remaining_m": 0.0914077088236809,
+			"seconds": 0.533,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				-0.219999998807907
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				2.2714467048645,
+				0.0599279031157494,
+				-0.219996318221092
+			],
+			"from": [
+				-0.0914076194167137,
+				0.0599375292658806,
+				-0.219885468482971
+			],
+			"name": "right_olive",
+			"reached": true,
+			"remaining_m": 0.0785532295703888,
+			"seconds": 0.65,
+			"target": [
+				2.34999990463257,
+				0.0599999986588955,
+				-0.219999998807907
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				2.1846330165863,
+				0.0599307417869568,
+				1.46032428741455
+			],
+			"from": [
+				2.2714467048645,
+				0.0599279031157494,
+				-0.219996318221092
+			],
+			"name": "right_crate",
+			"reached": true,
+			"remaining_m": 0.089795283973217,
+			"seconds": 0.467,
+			"target": [
+				2.1800000667572,
+				0.0599999986588955,
+				1.54999995231628
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				2.12872767448425,
+				0.0599088780581951,
+				2.08281922340393
+			],
+			"from": [
+				2.1846330165863,
+				0.0599307417869568,
+				1.46032428741455
+			],
+			"name": "front_return",
+			"reached": true,
+			"remaining_m": 0.0975720211863518,
+			"seconds": 0.183,
+			"target": [
+				2.11999988555908,
+				0.0599999986588955,
+				2.1800000667572
+			]
+		},
+		{
+			"collisions": [
+				"/root/SceneBenchmark/FruitShopArt/floor_fig_crate/Collider"
+			],
+			"final": [
+				0.216870039701462,
+				0.0599244460463524,
+				2.17732357978821
+			],
+			"from": [
+				2.12872767448425,
+				0.0599088780581951,
+				2.08281922340393
+			],
+			"name": "entrance_return",
+			"reached": true,
+			"remaining_m": 0.0669236183166504,
+			"seconds": 0.533,
+			"target": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.1800000667572
+			]
+		}
+	],
+	"scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+	"slug": "fruit_shop"
+}

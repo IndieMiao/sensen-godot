@@ -11,6 +11,23 @@ project=ROOT/'output/scene-bench'/slug/'project'
 if slug != 'coffee_shop':
     (project/'scenes/coffee_shop').mkdir(parents=True,exist_ok=True)
     shutil.copy2(ROOT/'scenes/coffee_shop/coffee_shop_art.gd',project/'scenes/coffee_shop/coffee_shop_art.gd')
+# Jolt can place floor and wall contacts in the same KinematicCollision3D.
+# The shared fixture reads only contact 0; collect every actual lateral contact
+# in this isolated staged copy, without changing motion, assertions or the core.
+physics_file=project/'tools/dev/scene_bench/scene_bench.gd'
+physics=physics_file.read_text()
+old="""		var collider=player.get_slide_collision(i).get_collider()
+		if collider and player.get_slide_collision(i).get_normal().y<.7:
+			var path:=str(collider.get_path())
+			if not collided_paths.has(path):collided_paths.append(path)"""
+new="""		var contact=player.get_slide_collision(i)
+		for j in contact.get_collision_count():
+			var collider=contact.get_collider(j)
+			if collider and contact.get_normal(j).y<.7:
+				var path:=str(collider.get_path())
+				if not collided_paths.has(path):collided_paths.append(path)"""
+assert old in physics, 'Shared contact collection changed; inspect before adapting.'
+physics_file.write_text(physics.replace(old,new))
 layout_file=project/'assets/rooms'/slug/'layout.json'
 layout=json.loads(layout_file.read_text())
 # Preserve yaw/pitch; widen framing for the harness 4:3 viewport so no roof is clipped.

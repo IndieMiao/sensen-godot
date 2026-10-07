@@ -64,6 +64,11 @@ def lighting(layout,background,ambient='D6BBCB',sun='FFE2C5',energy=1.5,lamps=No
 def append_plants(layout):
     import importlib.util
     from pathlib import Path
+    # Incremental source rebakes replace placements rather than duplicating them.
+    for collection in list(k.bpy.data.collections):
+        if collection.name.startswith('Shared botanical instances'):
+            for obj in list(collection.objects):k.bpy.data.objects.remove(obj,do_unlink=True)
+            k.bpy.data.collections.remove(collection)
     spec=importlib.util.spec_from_file_location('coffee_botanical_source',Path(__file__).with_name('revision.py'))
     revision=importlib.util.module_from_spec(spec);spec.loader.exec_module(revision)
     revision.PLANTS[:]=layout['shared_plants'];revision.append_source_plants()

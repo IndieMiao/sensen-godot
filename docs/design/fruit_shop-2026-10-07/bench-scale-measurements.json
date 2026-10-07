@@ -1,0 +1,36 @@
+{
+	"avatar_top_H": 1.74549429118633,
+	"capsule_height": 1.25,
+	"capsule_radius": 0.21,
+	"measurements": {
+		"chair": {
+			"baseline_ratio": 0.392438980441716,
+			"difference": 0.0,
+			"height": 0.685,
+			"ratio_to_H": 0.392438980441716,
+			"reason": "No chair in reference; baseline placeholder, not an invented prop."
+		},
+		"counter": {
+			"baseline_ratio": 0.660271423297924,
+			"difference": 0.123644251626898,
+			"height": 1.01,
+			"ratio_to_H": 0.578632657293625,
+			"reason": ""
+		},
+		"door": {
+			"baseline_ratio": 1.33486543712292,
+			"difference": 0.128755364806867,
+			"height": 2.63,
+			"ratio_to_H": 1.50673652344776,
+			"reason": ""
+		},
+		"table": {
+			"baseline_ratio": 0.650245609928975,
+			"difference": 0.110132158590308,
+			"height": 1.01,
+			"ratio_to_H": 0.578632657293625,
+			"reason": ""
+		}
+	},
+	"speed": 3.75
+}

@@ -85,10 +85,17 @@ def geometry():
         a=j*2.399;x=math.cos(a)*.12
         tube('Dried herb stem',[(0,.14,0),(x,-.37,.05)],.006,'oak_dark',5)
         for i in range(3):leaf('Hanging herb leaf',(x*.7,-.08-i*.07,.04),(x+.07,-.14-i*.07,.08),.036,'leaf_dark')
+    sys.path.insert(0,str(Path(__file__).resolve().parent/'source/fruit_shop'))
+    import revision
+    revision.revise()
     k.save('545:2957',{'position':[10,9.2,12],'target':[0,1.10,.05],'size':9.5})
+    revision.manifest()
 
 if __name__=='__main__':
     k.configure('fruit_shop');args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
     if '--bake-only' in args:k.load()
     else:geometry()
-    if '--geometry-only' not in args:k.bake_and_export()
+    if '--geometry-only' not in args:k.bake_and_export(ao_strength=.45,ao_distance=.36,coherent_swatches=True)
+    if '--geometry-only' not in args:
+        from series_batch import build
+        build('fruit_shop')

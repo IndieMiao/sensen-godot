@@ -1,0 +1,206 @@
+{
+  "revision": "r1",
+  "reference_sha256": "6eedf62d50c01a2d659290c314b8427920723a3988530ddab41e99839d079ce7",
+  "renderer": {
+    "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "draw_calls": 20.0,
+    "instances": 55,
+    "renderer": "mobile",
+    "resolution": [
+      1400,
+      1400
+    ],
+    "scope": "offline art render; no mobile/gameplay/performance acceptance",
+    "slug": "fruit_shop",
+    "static_surfaces": 21,
+    "views": [
+      {
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
+        "view": "godot-whole"
+      },
+      {
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
+        "view": "model-front"
+      },
+      {
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
+        "view": "model-side"
+      },
+      {
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
+        "view": "model-top"
+      },
+      {
+        "draw_calls": 18.0,
+        "rendered_objects": 18.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 20.0,
+        "rendered_objects": 20.0,
+        "view": "godot-detail-plants"
+      }
+    ]
+  },
+  "budget": {
+    "after": {
+      "room_triangles": 63777,
+      "shared_plant_triangles": 41458,
+      "room_botanical_triangles": 2816,
+      "plant_triangles": 44274,
+      "total_triangles": 105235,
+      "static_surfaces": 21
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/fruit_shop/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "striped_awning",
+          "blue_shutter",
+          "crate_orange",
+          "crate_lemon",
+          "crate_fig",
+          "crate_peach",
+          "crate_grape",
+          "analog_scale",
+          "striped_table_towel",
+          "blue_shutter_2",
+          "blue_shutter_3",
+          "shelf_orange_crate",
+          "shelf_lemon_crate",
+          "striped_table_towel_2"
+        ],
+        "triangles": 30716,
+        "cast_shadow": true
+      },
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/fruit_shop/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "orchard_market_sign",
+          "fruit_orange",
+          "fruit_lemon",
+          "fruit_fig",
+          "fruit_peach",
+          "fruit_grape"
+        ],
+        "triangles": 1725,
+        "cast_shadow": true
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/fruit_shop/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "hanging_herbs_leaves"
+        ],
+        "triangles": 2816,
+        "cast_shadow": false
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/fruit_shop/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "LeftOlive",
+          "RightOlive"
+        ],
+        "triangles": 5736,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/fruit_shop/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "ShelfPothos",
+          "ShelfHerb",
+          "WallFlower05",
+          "DoorWhiteVine0",
+          "DoorWhiteVine1",
+          "BackWhiteVine0",
+          "BackWhiteVine1"
+        ],
+        "triangles": 11702,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/fruit_shop/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "WallFlower00",
+          "WallFlower01",
+          "WallFlower02",
+          "WallFlower03",
+          "WallFlower04",
+          "WallFlower06",
+          "WallFlower07",
+          "WallFlower08",
+          "WallFlower09",
+          "WallFlower10"
+        ],
+        "triangles": 24020,
+        "cast_shadow": false
+      }
+    ]
+  },
+  "glb_checks": {
+    "passed": true,
+    "single_surface_no_embedded_images": true,
+    "files": [
+      "assets/rooms/_shared/plants/flower_shrub.glb",
+      "assets/rooms/_shared/plants/ivy_long.glb",
+      "assets/rooms/_shared/plants/ivy_medium.glb",
+      "assets/rooms/_shared/plants/olive_tree.glb",
+      "assets/rooms/_shared/plants/pothos.glb",
+      "assets/rooms/fruit_shop/analog_scale.glb",
+      "assets/rooms/fruit_shop/back_wall.glb",
+      "assets/rooms/fruit_shop/batches/review_back_dressing.glb",
+      "assets/rooms/fruit_shop/batches/review_back_plants.glb",
+      "assets/rooms/fruit_shop/batches/review_botanical.glb",
+      "assets/rooms/fruit_shop/batches/review_front_dressing.glb",
+      "assets/rooms/fruit_shop/batches/review_front_plants.glb",
+      "assets/rooms/fruit_shop/batches/review_large_plants.glb",
+      "assets/rooms/fruit_shop/blue_shutter.glb",
+      "assets/rooms/fruit_shop/corner_pier.glb",
+      "assets/rooms/fruit_shop/crate_fig.glb",
+      "assets/rooms/fruit_shop/crate_grape.glb",
+      "assets/rooms/fruit_shop/crate_lemon.glb",
+      "assets/rooms/fruit_shop/crate_orange.glb",
+      "assets/rooms/fruit_shop/crate_peach.glb",
+      "assets/rooms/fruit_shop/entry_step.glb",
+      "assets/rooms/fruit_shop/floor.glb",
+      "assets/rooms/fruit_shop/floor_fig_crate.glb",
+      "assets/rooms/fruit_shop/floor_orange_crate.glb",
+      "assets/rooms/fruit_shop/front_wall_left.glb",
+      "assets/rooms/fruit_shop/front_wall_right.glb",
+      "assets/rooms/fruit_shop/fruit_fig.glb",
+      "assets/rooms/fruit_shop/fruit_grape.glb",
+      "assets/rooms/fruit_shop/fruit_lemon.glb",
+      "assets/rooms/fruit_shop/fruit_orange.glb",
+      "assets/rooms/fruit_shop/fruit_peach.glb",
+      "assets/rooms/fruit_shop/hanging_herbs_leaves.glb",
+      "assets/rooms/fruit_shop/left_door_wall.glb",
+      "assets/rooms/fruit_shop/orchard_market_sign.glb",
+      "assets/rooms/fruit_shop/produce_display_table.glb",
+      "assets/rooms/fruit_shop/side_low_wall.glb",
+      "assets/rooms/fruit_shop/striped_awning.glb",
+      "assets/rooms/fruit_shop/striped_table_towel.glb",
+      "assets/rooms/fruit_shop/wood_display_hutch.glb"
+    ]
+  },
+  "visual_acceptance": "Pending art director Review; metrics do not establish reference fidelity."
+}

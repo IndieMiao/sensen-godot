@@ -1,0 +1,152 @@
+{
+  "revision": "r1",
+  "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
+  "checks": [
+    {
+      "name": "white lime plaster",
+      "surface": "Lit wall strip left of the arched entrance and above shop sign",
+      "reference_pixel": [
+        198,
+        488
+      ],
+      "runtime_pixel": [
+        243,
+        493
+      ],
+      "reference": {
+        "rgb": [
+          252,
+          224,
+          187
+        ],
+        "hex": "#FCE0BB",
+        "hue_degrees": 34.154,
+        "saturation": 0.2579,
+        "value": 0.9882
+      },
+      "runtime": {
+        "rgb": [
+          247,
+          241,
+          231
+        ],
+        "hex": "#F7F1E7",
+        "hue_degrees": 37.5,
+        "saturation": 0.0648,
+        "value": 0.9686
+      },
+      "hue_delta_degrees": 3.346,
+      "passed": true
+    },
+    {
+      "name": "terracotta coping",
+      "surface": "Top lit surface of left wall coping above the entrance",
+      "reference_pixel": [
+        395,
+        346
+      ],
+      "runtime_pixel": [
+        363,
+        349
+      ],
+      "reference": {
+        "rgb": [
+          251,
+          187,
+          148
+        ],
+        "hex": "#FBBB94",
+        "hue_degrees": 22.718,
+        "saturation": 0.4104,
+        "value": 0.9843
+      },
+      "runtime": {
+        "rgb": [
+          255,
+          196,
+          140
+        ],
+        "hex": "#FFC48C",
+        "hue_degrees": 29.217,
+        "saturation": 0.451,
+        "value": 1.0
+      },
+      "hue_delta_degrees": 6.499,
+      "passed": true
+    },
+    {
+      "name": "orange timber floor",
+      "surface": "Open lit timber floor in the central aisle between floor fruit crates",
+      "reference_pixel": [
+        690,
+        1024
+      ],
+      "runtime_pixel": [
+        598,
+        852
+      ],
+      "reference": {
+        "rgb": [
+          248,
+          183,
+          123
+        ],
+        "hex": "#F8B77B",
+        "hue_degrees": 28.8,
+        "saturation": 0.504,
+        "value": 0.9725
+      },
+      "runtime": {
+        "rgb": [
+          255,
+          203,
+          128
+        ],
+        "hex": "#FFCB80",
+        "hue_degrees": 35.433,
+        "saturation": 0.498,
+        "value": 1.0
+      },
+      "hue_delta_degrees": 6.633,
+      "passed": true
+    },
+    {
+      "name": "blue shutter",
+      "surface": "Rightmost shutter louver front face at midheight",
+      "reference_pixel": [
+        1224,
+        640
+      ],
+      "runtime_pixel": [
+        1159,
+        577
+      ],
+      "reference": {
+        "rgb": [
+          87,
+          138,
+          173
+        ],
+        "hex": "#578AAD",
+        "hue_degrees": 204.419,
+        "saturation": 0.4971,
+        "value": 0.6784
+      },
+      "runtime": {
+        "rgb": [
+          64,
+          112,
+          142
+        ],
+        "hex": "#40708E",
+        "hue_degrees": 203.077,
+        "saturation": 0.5493,
+        "value": 0.5569
+      },
+      "hue_delta_degrees": 1.342,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Representative lit patches only, not a complete-image fidelity score; brightness/saturation retained for review."
+}
