@@ -1,0 +1,167 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    253
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "Navigation, dismiss, close, chips"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "NavigationRow 483:217 · Dismiss 483:220 · Close 483:336 · Compact/Filter 633:41280 · Tab 483:322"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        183
+      ],
+      "children": [
+        {
+          "type": "Button",
+          "rect": [
+            0,
+            70,
+            328,
+            51
+          ],
+          "variation": "NavRow",
+          "text": "View details  ›"
+        },
+        {
+          "type": "Button",
+          "rect": [
+            0,
+            121,
+            328,
+            44
+          ],
+          "variation": "Dismiss",
+          "text": "Not now"
+        },
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            165,
+            328,
+            44
+          ],
+          "children": [
+            {
+              "type": "Button",
+              "rect": [
+                0,
+                165,
+                44,
+                44
+              ],
+              "variation": "CloseRound",
+              "text": ""
+            },
+            {
+              "type": "Button",
+              "rect": [
+                50,
+                165,
+                28,
+                44
+              ],
+              "variation": "NavCompact",
+              "text": "Gift ›"
+            },
+            {
+              "type": "Button",
+              "rect": [
+                84,
+                165,
+                40,
+                44
+              ],
+              "variation": "FilterChip",
+              "text": "All",
+              "pressed": true
+            },
+            {
+              "type": "Button",
+              "rect": [
+                130,
+                165,
+                55,
+                44
+              ],
+              "variation": "FilterChip",
+              "text": "Seeds"
+            },
+            {
+              "type": "Button",
+              "rect": [
+                191,
+                165,
+                46,
+                44
+              ],
+              "variation": "FilterChip",
+              "text": "Fish"
+            }
+          ]
+        },
+        {
+          "type": "HBoxContainer",
+          "rect": [
+            0,
+            209,
+            328,
+            44
+          ],
+          "children": [
+            {
+              "type": "Button",
+              "rect": [
+                0,
+                209,
+                160,
+                44
+              ],
+              "variation": "SegmentTab",
+              "text": "Bag",
+              "pressed": true
+            },
+            {
+              "type": "Button",
+              "rect": [
+                168,
+                209,
+                160,
+                44
+              ],
+              "variation": "SegmentTab",
+              "text": "Gear"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

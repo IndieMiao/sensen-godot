@@ -1,0 +1,396 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    805
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "Type ramp"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Text styles Gensen Refactor/* and Gensen/Compact/*"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        753
+      ],
+      "children": [
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            52,
+            328,
+            29
+          ],
+          "variation": "TitleXB20",
+          "text": "TitleXB20 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            83,
+            328,
+            29
+          ],
+          "variation": "TitleR20",
+          "text": "TitleR20 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            114,
+            328,
+            29
+          ],
+          "variation": "TitleB20",
+          "text": "TitleB20 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            145,
+            328,
+            22
+          ],
+          "variation": "RowTitleXB15",
+          "text": "RowTitleXB15 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            169,
+            328,
+            22
+          ],
+          "variation": "RowTitleR15",
+          "text": "RowTitleR15 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            193,
+            328,
+            22
+          ],
+          "variation": "RowTitleB15",
+          "text": "RowTitleB15 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            217,
+            328,
+            34
+          ],
+          "variation": "QuantityXB24",
+          "text": "QuantityXB24 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            253,
+            328,
+            34
+          ],
+          "variation": "QuantityR24",
+          "text": "QuantityR24 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            289,
+            328,
+            34
+          ],
+          "variation": "QuantityB24",
+          "text": "QuantityB24 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            325,
+            328,
+            22
+          ],
+          "variation": "EffectXB15",
+          "text": "EffectXB15 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            349,
+            328,
+            22
+          ],
+          "variation": "EffectR15",
+          "text": "EffectR15 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            373,
+            328,
+            22
+          ],
+          "variation": "EffectB15",
+          "text": "EffectB15 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            397,
+            328,
+            18
+          ],
+          "variation": "CaptionXB12",
+          "text": "CaptionXB12 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            417,
+            328,
+            18
+          ],
+          "variation": "CaptionR12",
+          "text": "CaptionR12 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            437,
+            328,
+            18
+          ],
+          "variation": "CaptionB12",
+          "text": "CaptionB12 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            457,
+            328,
+            14
+          ],
+          "variation": "C9B",
+          "text": "C9B · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            473,
+            328,
+            20
+          ],
+          "variation": "C14XB",
+          "text": "C14XB · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            495,
+            328,
+            20
+          ],
+          "variation": "C14B",
+          "text": "C14B · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            517,
+            328,
+            19
+          ],
+          "variation": "C13XB",
+          "text": "C13XB · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            538,
+            328,
+            19
+          ],
+          "variation": "C13B",
+          "text": "C13B · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            559,
+            328,
+            18
+          ],
+          "variation": "C12XB",
+          "text": "C12XB · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            579,
+            328,
+            18
+          ],
+          "variation": "C12B",
+          "text": "C12B · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            599,
+            328,
+            16
+          ],
+          "variation": "C11XB",
+          "text": "C11XB · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            617,
+            328,
+            16
+          ],
+          "variation": "C11B",
+          "text": "C11B · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            635,
+            328,
+            15
+          ],
+          "variation": "C10XB",
+          "text": "C10XB · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            652,
+            328,
+            15
+          ],
+          "variation": "C10B",
+          "text": "C10B · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            669,
+            328,
+            22
+          ],
+          "variation": "ButtonXB15",
+          "text": "ButtonXB15 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            693,
+            328,
+            22
+          ],
+          "variation": "ButtonR15",
+          "text": "ButtonR15 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            717,
+            328,
+            22
+          ],
+          "variation": "ButtonB15",
+          "text": "ButtonB15 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            741,
+            328,
+            20
+          ],
+          "variation": "BodyXB14",
+          "text": "BodyXB14 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            763,
+            328,
+            20
+          ],
+          "variation": "BodyR14",
+          "text": "BodyR14 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            785,
+            328,
+            20
+          ],
+          "variation": "BodyB14",
+          "text": "BodyB14 · Radish ×24"
+        }
+      ]
+    }
+  ]
+}

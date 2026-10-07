@@ -1,0 +1,364 @@
+{
+  "meta": {
+    "schema": 2,
+    "version": "2.0-draft",
+    "status": "draft",
+    "source": "Figma OMLTC3yw3u2WDjOZhLnhaR page 481:53 (read-only export, tools/ui/export_tokens_figma.js)",
+    "unit": "360-wide logical px = Godot UI unit",
+    "pending": {
+      "sceneAction": "LOCK-02 main under WP1a revision",
+      "toolBadge": "not in SceneAction main yet (WP1a)",
+      "switchKey": "LOCK-03, WP1a",
+      "hud": "LOCK-06, WP1a",
+      "pin": "LOCK-05 colours, WP1a",
+      "needTile": "sizes from plan q(8); main re-export after WP1a",
+      "joystick": "WP7-A Q1: main 130/60 vs shipped 86/40",
+      "cmdBlocked": "LOCK-10 neutral grey target, WP1a",
+      "segmentTab": "selected style must not use command green (LOCK-13), WP1b"
+    }
+  },
+  "font": {
+    "file": "res://assets/ui/fonts/Nunito.ttf",
+    "naturalLineHeight": 1.364,
+    "weights": {
+      "regular": 400,
+      "bold": 700,
+      "extrabold": 800
+    },
+    "styles": {
+      "BodyB14": {
+        "size": 14,
+        "weight": "bold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/body/Bold"
+      },
+      "BodyR14": {
+        "size": 14,
+        "weight": "regular",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/body/Regular"
+      },
+      "BodyXB14": {
+        "size": 14,
+        "weight": "extrabold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/body/ExtraBold"
+      },
+      "ButtonB15": {
+        "size": 15,
+        "weight": "bold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/button/Bold"
+      },
+      "ButtonR15": {
+        "size": 15,
+        "weight": "regular",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/button/Regular"
+      },
+      "ButtonXB15": {
+        "size": 15,
+        "weight": "extrabold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/button/ExtraBold"
+      },
+      "C10B": {
+        "size": 10,
+        "weight": "bold",
+        "lineHeight": 1.25,
+        "figma": "Gensen/Compact/10/Bold"
+      },
+      "C10XB": {
+        "size": 10,
+        "weight": "extrabold",
+        "lineHeight": 1.25,
+        "figma": "Gensen/Compact/10/ExtraBold"
+      },
+      "C11B": {
+        "size": 11,
+        "weight": "bold",
+        "lineHeight": 1.25,
+        "figma": "Gensen/Compact/11/Bold"
+      },
+      "C11XB": {
+        "size": 11,
+        "weight": "extrabold",
+        "lineHeight": 1.25,
+        "figma": "Gensen/Compact/11/ExtraBold"
+      },
+      "C12B": {
+        "size": 12,
+        "weight": "bold",
+        "lineHeight": 1.25,
+        "figma": "Gensen/Compact/12/Bold"
+      },
+      "C12XB": {
+        "size": 12,
+        "weight": "extrabold",
+        "lineHeight": 1.25,
+        "figma": "Gensen/Compact/12/ExtraBold"
+      },
+      "C13B": {
+        "size": 13,
+        "weight": "bold",
+        "lineHeight": 1.25,
+        "figma": "Gensen/Compact/13/Bold"
+      },
+      "C13XB": {
+        "size": 13,
+        "weight": "extrabold",
+        "lineHeight": 1.25,
+        "figma": "Gensen/Compact/13/ExtraBold"
+      },
+      "C14B": {
+        "size": 14,
+        "weight": "bold",
+        "lineHeight": 1.25,
+        "figma": "Gensen/Compact/14/Bold"
+      },
+      "C14XB": {
+        "size": 14,
+        "weight": "extrabold",
+        "lineHeight": 1.25,
+        "figma": "Gensen/Compact/14/ExtraBold"
+      },
+      "C9B": {
+        "size": 9,
+        "weight": "bold",
+        "lineHeight": 1.25,
+        "figma": "Gensen/Compact/9/Bold"
+      },
+      "CaptionB12": {
+        "size": 12,
+        "weight": "bold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/caption/Bold"
+      },
+      "CaptionR12": {
+        "size": 12,
+        "weight": "regular",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/caption/Regular"
+      },
+      "CaptionXB12": {
+        "size": 12,
+        "weight": "extrabold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/caption/ExtraBold"
+      },
+      "EffectB15": {
+        "size": 15,
+        "weight": "bold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/effect/Bold"
+      },
+      "EffectR15": {
+        "size": 15,
+        "weight": "regular",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/effect/Regular"
+      },
+      "EffectXB15": {
+        "size": 15,
+        "weight": "extrabold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/effect/ExtraBold"
+      },
+      "QuantityB24": {
+        "size": 24,
+        "weight": "bold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/quantity/Bold"
+      },
+      "QuantityR24": {
+        "size": 24,
+        "weight": "regular",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/quantity/Regular"
+      },
+      "QuantityXB24": {
+        "size": 24,
+        "weight": "extrabold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/quantity/ExtraBold"
+      },
+      "RowTitleB15": {
+        "size": 15,
+        "weight": "bold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/rowTitle/Bold"
+      },
+      "RowTitleR15": {
+        "size": 15,
+        "weight": "regular",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/rowTitle/Regular"
+      },
+      "RowTitleXB15": {
+        "size": 15,
+        "weight": "extrabold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/rowTitle/ExtraBold"
+      },
+      "TitleB20": {
+        "size": 20,
+        "weight": "bold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/title/Bold"
+      },
+      "TitleR20": {
+        "size": 20,
+        "weight": "regular",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/title/Regular"
+      },
+      "TitleXB20": {
+        "size": 20,
+        "weight": "extrabold",
+        "lineHeight": 1.35,
+        "figma": "Gensen Refactor/title/ExtraBold"
+      }
+    }
+  },
+  "color": {
+    "border": "#E1DAC8",
+    "danger": "#9C3F2E",
+    "dangerTint": "#FFF0EB",
+    "disabled": "#D6D5CE",
+    "disabledInk": "#8A918C",
+    "edgeStrong": "#CFC6B0",
+    "energyHudDeep": "#C9962A",
+    "energyHudFill": "#E3B341",
+    "energyHudLight": "#F4D27A",
+    "info": "#426A88",
+    "joystickRing": "#FBF8F173",
+    "joystickThumb": "#3E7D43B2",
+    "muted": "#6E7B74",
+    "primary": "#3E7D43",
+    "primaryTint": "#ECF4E7",
+    "rarityCommon": "#9DB89A",
+    "rarityFine": "#6FA8DC",
+    "rarityLegendary": "#E3B341",
+    "rarityRare": "#A98BD6",
+    "scrim": "#2F3A33",
+    "scrimDrawer": "#2F3A332E",
+    "scrimModal": "#2F3A3352",
+    "secondary": "#5D6A62",
+    "surface": "#FBF8F1",
+    "surfaceRaised": "#FFFFFF",
+    "text": "#2F3A33",
+    "warning": "#8C5F12",
+    "warningTint": "#FFF0D4"
+  },
+  "opacity": {
+    "sheetSurface": 0.97,
+    "scrimCounter": 0.14,
+    "scrimDrawer": 0.18,
+    "scrimModal": 0.32
+  },
+  "space": {
+    "hudRowGap": 8,
+    "overlayBlock": 12,
+    "overlayBody": 8,
+    "page": 16,
+    "quickBarGap": 4,
+    "row": 12,
+    "section": 20,
+    "within": 6
+  },
+  "radius": {
+    "bagDrawerTop": 20,
+    "card": 14,
+    "cell": 11,
+    "chip": 13,
+    "compactCommand": 17,
+    "counterDrawerTop": 18,
+    "hudChip": 12,
+    "inventoryCell": 10,
+    "kitchenMode": 15,
+    "pill": 22,
+    "sheet": 24,
+    "track": 3
+  },
+  "stroke": {
+    "default": 1,
+    "cellHairline": 0.5,
+    "selectedCell": 1.5,
+    "selected": 2,
+    "ring": 3
+  },
+  "size": {
+    "touch": 44,
+    "sceneAction": 88,
+    "toolBadge": 28,
+    "switchKey": 44,
+    "switchIcon": 24,
+    "quickSlotW": 52,
+    "quickSlotH": 68,
+    "quickSlotSurfaceH": 64,
+    "quickSlotIcon": 22,
+    "quickSlotLift": 4,
+    "quickEndW": 56,
+    "quickBarW": 336,
+    "quickBarH": 68,
+    "quickBarX": 12,
+    "quickBarBottom": 24,
+    "hudW": 344,
+    "hudH": 82,
+    "hudX": 8,
+    "hudTop": 16,
+    "hudRow1H": 46,
+    "hudRow2H": 24,
+    "command": 48,
+    "commandCompact": 34,
+    "navigationRow": 49,
+    "dismiss": 44,
+    "close": 44,
+    "closeIcon": 20,
+    "filterChip": 26,
+    "filterTouch": 36,
+    "segmentTab": 44,
+    "kitchenMode": 30,
+    "kitchenModeTouch": 36,
+    "inventoryCell": 52,
+    "inventoryIcon": 27,
+    "gearSlotW": 52,
+    "gearSlotH": 88,
+    "kitchenCellW": 52,
+    "kitchenCellH": 58,
+    "itemRowIcon": 32,
+    "stateBadgeH": 32,
+    "statusBadge": 56,
+    "statusBadgeIcon": 28,
+    "needTileRingL": 64,
+    "needTileRingM": 48,
+    "needTileRingS": 36,
+    "needTileLabelS": 11,
+    "joystickOuter": 86,
+    "joystickThumb": 40,
+    "toastW": 328,
+    "toastMinH": 43,
+    "toastPad": 12,
+    "sheetPad": 16,
+    "sheetGap": 12,
+    "sheetBodyMaxH": 440,
+    "energyRefW": 328,
+    "energyRefH": 82
+  },
+  "motion": {
+    "dissolveMs": 150,
+    "floatTextRise": 40,
+    "floatTextMs": 800,
+    "recenterMs": 600,
+    "doubleTapRecenterMs": 400,
+    "radialFadeMs": 200,
+    "quickBarRefillMs": 300,
+    "newUnlockFlashMs": 600,
+    "drawerMs": 250,
+    "joystickFadeInMs": 80,
+    "pendingDelayMs": 300,
+    "toastBaseMs": 2000,
+    "toastPer20CharsMs": 500,
+    "toastMaxMs": 5000
+  }
+}
