@@ -7,15 +7,18 @@ import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy,
 import { emptyDay, type P0State } from './state.js';
 import { catalog, drinkPrice, offerOf, owns, walletNeed } from './shops.js';
 import { BOARDS, handIn, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
+import { expireGiftMeals, progressOf, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest } from './state.js';
 import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
 import { haveTotal, stored } from './storage.js';
 
-export function viewOf(c: P0Content, input: P0State, now: number) {
+/** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
+export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
   const s = structuredClone(input);
   settleEnergy(c, s, now);
   if (s.day.key !== dayKey(c, now)) s.day = emptyDay(dayKey(c, now));
+  expireGiftMeals(s);
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
   const skills = Object.fromEntries(SKILLS.map(skill => {
     const level = skillLevel(c, s, skill), th = c.skills[skill];
@@ -46,6 +49,8 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
     storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
     homestead: homesteadView(c, s),
     boards: Object.fromEntries(BOARDS.map(b => [b, boardView(c, s, b, now)])),
+    residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
+    keepers: keepersView(c, s, now, opts.online ?? null),
     rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, now), amount: c.energy.rest_amount },
     stall: {
       keeper: c.stall.keeper,
@@ -255,5 +260,56 @@ function legacyBoard(c: P0Content, s: P0State, now: number) {
       return { id: r.id, title: r.title, item: r.icon ?? '', qty: r.qty, coins: r.coins, where: r.items.length ? 'any pond' : 'any kind', status: r.status, have: r.have };
     }),
     refill_in: empty.length ? Math.max(0, Math.min(...empty) - now) : 0,
+  };
+}
+
+/** A resident as facts (§9.4.4, LOCK-18): names, lines and request copy stay in the content table the client reads. */
+function residentView(c: P0Content, s: P0State, id: string, now: number) {
+  const r = structuredClone(residentState(s, id)), stages = c.affinity.stages;
+  const i = stageIndex(c, r.affinity), st = requestState(c, s, id);
+  const meal = s.day.gift_meal === id ? 'given'
+    : s.day.gift_meal ? 'none'
+    : i < stages.findIndex(([n]) => n === c.affinity.gift_meal_stage) ? 'none'
+    : freeSlots(s) < 1 ? 'bag_full' : 'ready';
+  return {
+    affinity: r.affinity, stage: stages[i][0], stage_from: stages[i][1],
+    next_stage: stages[i + 1]?.[0] ?? null, next_at: stages[i + 1]?.[1] ?? null,
+    chatted_today: r.chat_day === s.day.key, gift_today: r.gift_day === s.day.key,
+    meal,   // ready = the next talk gives today's gift meal; bag_full = it would, once a slot is free
+    request: st.req && {
+      id: st.req.id, kind: st.req.need.kind, rarity: st.req.need.rarity ?? null, qty: st.req.qty, coins: st.req.coins,
+      have: Math.min(st.req.qty, progressOf(c, s, id, st.req)),
+      ready: st.state === 'accepted' && progressOf(c, s, id, st.req) >= st.req.qty,
+    },
+    request_state: st.state,   // open | accepted | wait (next player day) | stage (need_stage) | none
+    need_stage: st.need_stage ?? null,
+    next_in: st.state === 'wait' ? untilRollover(c, now) : null,
+  };
+}
+
+/** Facts behind the four keepers' greeting cards (Li Bai b7d8b665 D); the client picks the line (SGODOT-224 keeper_lines). */
+function keepersView(c: P0Content, s: P0State, now: number, online: number | null) {
+  const left = c.drinks.daily - s.day.drinks, full = s.energy.value >= maxEnergy(c, s);
+  const market = boardView(c, s, 'market', now).slots;
+  const marketOpen = market.filter(x => 'id' in x) as { template: string }[];
+  const refills = s.boards.market.filter(sl => !sl.req).map(sl => Math.max(0, sl.refill_at - now));
+  const pip = requestState(c, s, 'res_pip').state;
+  const fishing = skillLevel(c, s, 'fishing');
+  const reed = c.fishing.rods.find(r => r.id === 'rod_reed');
+  const nextFish = Object.fromEntries(Object.entries(c.fishing.sites).map(([site, def]) => {
+    const above = def.fish.map(f => fishById(c, f)!).filter(f => f.level > fishing).sort((a, b) => a.level - b.level)[0];
+    return [site, above ? { id: above.id, level: above.level } : null];
+  }));
+  const tea = { cups_left: left, full, greet: left <= 0 ? 'cups_out' : full ? 'full' : 'cups_left', online };
+  return {
+    tea,
+    post: { cups_left: left, full, greet: left <= 0 ? 'cups_out' : pip === 'open' ? 'request' : 'cups_left',
+      request_by: pip === 'open' ? 'res_pip' : null, board_open: marketOpen.length,
+      refill_in: refills.length ? Math.min(...refills) : null },
+    tackle: { greet: reed && fishing >= reed.level && !s.gear.rods.includes(reed.id) ? 'reed_rod' : 'worms',
+      worms_left: Math.max(0, (c.goods.bait_worm?.daily ?? 0) - (s.day.bought.bait_worm ?? 0)), next_fish: nextFish },
+    market: { greet: s.gear.hoes.includes(c.tools.row_hoe.id) ? 'board' : 'row_hoe',
+      board_open: marketOpen.length, board_templates: marketOpen.map(x => x.template),
+      refill_in: refills.length ? Math.min(...refills) : null },
   };
 }

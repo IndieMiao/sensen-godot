@@ -2,7 +2,8 @@
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
 import { collectPot, eatDish, startPot } from './cooking.js';
-import { boardCommand, settleBoards } from './boards.js';
+import { boardCommand, settleBoards, tracked } from './boards.js';
+import { expireGiftMeals, giftResident, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
 import { energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
@@ -34,7 +35,9 @@ type P0CommandBody =
   | { type: 'collect'; taps?: number[] }
   | { type: 'eat'; item: string }
   | { type: 'accept' | 'deliver' | 'drop'; request: string }
-  | { type: 'homestead_upgrade' };
+  | { type: 'homestead_upgrade' }
+  | { type: 'talk'; resident: string }
+  | { type: 'gift'; resident: string; item: string };
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
@@ -80,6 +83,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       events.push({ kind: 'item', id: crop.seed, delta: -n });
       // §4.2.1: the level difference is locked at the moment the player pays.
       const pct = xpPercent(c, skillLevel(c, s, 'farming'), crop.level);
+      noteSown(c, s, n);
       for (const plot of plots as Plot[]) {
         plot.state = 'sown';
         plot.crop = crop.id;
@@ -164,7 +168,14 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'accept': case 'deliver': case 'drop': {
-      const refusal = boardCommand(c, s, cmd.type, String(cmd.request ?? ''), now, events);
+      const id = String(cmd.request ?? '');
+      const refusal = id.startsWith('req_res_') ? residentRequestCommand(c, s, cmd.type, id, now, events, tracked(s))
+        : boardCommand(c, s, cmd.type, id, now, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'talk': case 'gift': {
+      const refusal = cmd.type === 'talk' ? talk(c, s, cmd, events) : giftResident(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
@@ -204,6 +215,7 @@ export function sellPrice(c: P0Content, id: string): number | null {
 function rollDay(c: P0Content, s: P0State, now: number): void {
   const key = dayKey(c, now);
   if (s.day.key !== key) s.day = emptyDay(key);
+  expireGiftMeals(s);
 }
 
 export { count, room };

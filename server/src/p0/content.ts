@@ -85,7 +85,8 @@ export interface P0Content {
   quotas: Record<QuotaId, { cap: number; scope: string }>;
   affinity: {
     stages: [string, number][]; first_chat: number; request: number; gift_meal_stage: string;
-    gift: { loved_fine: number; liked: number; any: number; perfect: number; cap: number; chef_touch: { cooking: number; bonus: number; cap: number } };
+    gift: { loved_fine: number; liked: number; any: number; perfect: number; cap: number; mystery: number; chef_touch: { cooking: number; bonus: number; cap: number } };
+    mystery_line: string;
   };
   residents: Record<string, ResidentDef>;
   /** §9.6 / §9.13.2 request boards: the Stall Board (slot 1 starts with the tutorial) and the Market Board. */

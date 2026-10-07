@@ -21,6 +21,8 @@ export type P0Event =
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
   | { kind: 'homestead'; level: number; energy: number; unlocks: string[] }
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
+  | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string }
+  | { kind: 'gift_meal'; resident: string; dish: string; given: boolean }
   | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null };
 
 export function energyDetail(c: P0Content, s: P0State, now: number, need: number) {
