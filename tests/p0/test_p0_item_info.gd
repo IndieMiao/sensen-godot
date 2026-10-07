@@ -146,7 +146,7 @@ func test_locked_stack_shows_locked_and_unlock_only() -> void:
 func test_fish_gift_is_grey_without_mutual_friends() -> void:
 	var s := P0ItemInfo.spec(_full(), "fish_crucian", &"bag")
 	assert_array(_labels(s)).is_equal(["unavailable:Gift · Mutual friends only"])
-	assert_array(s.facts).is_equal(["3", "Sells for 6 · Fish-dex 1/2"])
+	assert_array(s.facts).is_equal(["Sells for 6 · Fish-dex 1/2"])   # no known source: no bare "3" line (×3 is in the title)
 	assert_str(s.rarity_text).is_equal("Common")   # rarity sits on the state line, not in facts
 	var v := _full()
 	v["social"] = {"mutual": 2}
@@ -236,3 +236,12 @@ func test_pickaxes_in_gear_say_stone_per_rock_and_where_from() -> void:
 	s = P0ItemInfo.spec(v, "pick_copper", &"gear")
 	assert_array(s.facts).is_equal(["2 Stone per rock", "Workbench"])
 	assert_array(_labels(s)).is_empty()
+
+func test_bag_tabs_follow_the_plan() -> void:
+	var v := _view()
+	v.items["torch"] = {"name": "Torch", "kind": "torch", "sell": null}
+	var tabs := {}
+	for id in ["seed_radish", "fert_compost", "crop_radish", "fish_crucian", "dish_grilled_crucian", "bait_worm", "rod_reed", "timber", "torch"]:
+		tabs[id] = P0ItemInfo.tab_of(v, id)
+	assert_dict(tabs).is_equal({"seed_radish": &"seeds", "fert_compost": &"seeds", "crop_radish": &"produce", "fish_crucian": &"fish",
+		"dish_grilled_crucian": &"dishes", "bait_worm": &"tackle", "rod_reed": &"tackle", "timber": &"materials", "torch": &"materials"})

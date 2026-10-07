@@ -61,6 +61,12 @@ static func kind_of(view: Dictionary, item_id: String) -> String:
 		k = head if head in KINDS + ["fert"] else "material"
 	return str(_KIND_ALIAS.get(k, k))
 
+## The bag drawer Tab an item sits on (§10.4.2): seeds and fertilizer on Seeds, crops on Produce, bait and rods on
+## Tackle, torches and the rest on Materials (周瑜 / 刘邦).
+static func tab_of(view: Dictionary, item_id: String) -> StringName:
+	return {"seed": &"seeds", "fert": &"seeds", "fish": &"fish", "crop": &"produce", "dish": &"dishes", "bait": &"tackle",
+		"rod": &"tackle", "pick": &"tackle"}.get(kind_of(view, item_id), &"materials")
+
 static func spec(view: Dictionary, item_id: String, context: StringName, opts := {}) -> Dictionary:
 	assert(context in CONTEXTS, "P0ItemInfo: unknown context %s" % context)
 	var kind := kind_of(view, item_id)
@@ -269,7 +275,8 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 	var t := {
 		count = str(count) if count > 0 else "",
 		source = {"crop": "Harvested at home"}.get(kind, str(stack.get("source", ""))),
-		sell = str(it.sell) if it.get("sell", null) != null else "",
+		sell = str(int(it.sell)) if it.get("sell", null) != null else "",
+		count_source = "",
 		sell_here = str(here) if here >= 0 else "",
 		sell_at_home = ("Sells for %d at home" % int(it.sell)) if it.get("sell", null) != null else "",
 		energy = str(int(crop.energy)) if crop.has("energy") else "",
@@ -302,6 +309,8 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		pick_effect = ("%d Stone per rock" % int(rod.stone)) if rod.has("stone") else "",
 		pick_source = str({"start": "Starter", "workbench": "Workbench"}.get(str(rod.get("source", "")), "")) if not rod.get("owned", false) else "",
 	}
+	var src := str(t.source)
+	t.count_source = ("%s · %s" % [t.count, src]) if src != "" and t.count != "" else ""
 	return t
 
 static func _deliverable(view: Dictionary, item_id: String, target: Dictionary) -> bool:
