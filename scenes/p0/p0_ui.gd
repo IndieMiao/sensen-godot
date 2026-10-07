@@ -989,7 +989,7 @@ func open_stall(tab := "") -> void:
 	if stall_tab == "board":
 		_board(v, board)
 		return
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScrollContainer.new()   # drags that start on a row or cell still scroll (WP7-B F-04 §4)
 	scroll.name = "StallScroll"
 	scroll.custom_minimum_size = Vector2(0, 370)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -1443,7 +1443,7 @@ func open_kitchen(tab := "") -> void:
 	else: _experiment(v, int(ck.get("slots", 2)))
 
 func _cookbook(v: VBoxContainer, pages: Array) -> void:
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScrollContainer.new()   # drags that start on a row or cell still scroll (WP7-B F-04 §4)
 	scroll.custom_minimum_size = Vector2(0, 420)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var list := VBoxContainer.new()

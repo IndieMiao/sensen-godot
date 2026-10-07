@@ -8,6 +8,9 @@ signal state_changed(view: Dictionary, events: Array)
 signal refused(code: String, detail: Dictionary, cmd: Dictionary)
 ## cmd is the command that never reached the server ({} for state refreshes and dev calls).
 signal connection_failed(message: String, cmd: Dictionary)
+## A keyed UI command was accepted for sending / has its result (ok, refusal code or "network").
+signal command_started(key: String)
+signal command_settled(key: String, ok: bool, code: String)
 
 const DEFAULT_URL := "http://127.0.0.1:3110/v1"
 const REFRESH_S := 30.0
@@ -16,7 +19,10 @@ var base_url := DEFAULT_URL
 var player_id := ""
 var view: Dictionary = {}
 var busy := false
-var _queue: Array = []        # commands sent while a request was in flight (reel / collect must never be dropped)
+var _queue: Array = []        # {cmd, key} sent while a request was in flight (reel / collect must never be dropped)
+var _inflight := {}           # the {cmd, key} on the wire; {} for state refreshes and dev calls
+## Tests replace the HTTP call: transport.call(method, path, body, cmd), then answer with _finish().
+var transport := Callable()
 var _received_ms := 0
 var _refresh_left := REFRESH_S
 
@@ -45,17 +51,37 @@ func current() -> Dictionary:
 func refresh() -> void:
 	_request(HTTPClient.METHOD_GET, "/p0/state", {}, {})
 
-func send(cmd: Dictionary) -> void:
-	if busy:
-		_queue.append(cmd)
-		return
-	_request(HTTPClient.METHOD_POST, "/p0/commands", cmd, cmd)
+## World actions send without a key and are never dropped. UI commands pass a key (ui_key) and are ignored
+## while the same key is on the wire or queued, so double taps on Buy / Sell submit once (WP7-B F-08 §2).
+func send(cmd: Dictionary, key := "") -> bool:
+	if key != "" and (str(_inflight.get("key", "")) == key or _queue.any(func(q): return q.key == key)):
+		return false
+	var entry := {cmd = cmd, key = key}
+	if key != "": command_started.emit(key)
+	if busy: _queue.append(entry)
+	else: _post(entry)
+	return true
+
+## Dedupe key for a UI command: its full content, so Sell one and Sell all stay distinct.
+static func ui_key(cmd: Dictionary) -> String:
+	return JSON.stringify(cmd, "", true)
+
+## Every command carries the state version the client saw; the server refuses a mismatch as stale_state,
+## so a retry after a lost response cannot apply twice.
+func _post(entry: Dictionary) -> void:
+	_inflight = entry
+	var body: Dictionary = (entry.cmd as Dictionary).duplicate()
+	if view.has("seq"): body["expect_seq"] = int(view.seq)
+	_request(HTTPClient.METHOD_POST, "/p0/commands", body, entry.cmd)
 
 func dev_skip(minutes: int) -> void:
 	_request(HTTPClient.METHOD_POST, "/p0/dev/skip", {"minutes": minutes}, {})
 
 func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> void:
 	busy = true
+	if transport.is_valid():
+		transport.call(method, path, body, cmd)
+		return
 	var http := HTTPRequest.new()
 	http.timeout = 8.0
 	add_child(http)
@@ -63,36 +89,44 @@ func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> v
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
 	var err := http.request(base_url + path, headers, method, "" if method == HTTPClient.METHOD_GET else JSON.stringify(body))
 	if err != OK:
-		busy = false
 		http.queue_free()
-		connection_failed.emit("Can't reach the farm server", cmd)
+		_finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), cmd)
 
 func _on_done(result: int, code: int, _h: PackedStringArray, raw: PackedByteArray, http: HTTPRequest, cmd: Dictionary) -> void:
-	busy = false
 	http.queue_free()
-	if not _queue.is_empty():
-		var next: Dictionary = _queue.pop_front()
-		_request(HTTPClient.METHOD_POST, "/p0/commands", next, next)
-		_handle(result, code, raw, cmd)
-		return
-	_handle(result, code, raw, cmd)
+	_finish(result, code, raw, cmd)
 
-func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> void:
+## One response, in order: handle it while still busy (so commands sent from signal handlers queue behind
+## the ones already waiting), settle its key, then send the next queued command with the fresh seq.
+func _finish(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> void:
+	var entry := _inflight
+	_inflight = {}
+	var outcome := _handle(result, code, raw, cmd)
+	busy = false
+	if outcome.network:
+		# Later UI commands were based on what the player saw before the failure: drop them.
+		for q in _queue.filter(func(q): return q.key != ""): command_settled.emit(q.key, false, "network")
+		_queue = _queue.filter(func(q): return q.key == "")
+	if str(entry.get("key", "")) != "": command_settled.emit(entry.key, outcome.ok, outcome.code)
+	if not busy and not _queue.is_empty(): _post(_queue.pop_front())
+
+func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> Dictionary:
 	if result != HTTPRequest.RESULT_SUCCESS or code >= 500 or code == 0:
 		connection_failed.emit("Can't reach the farm server", cmd)
-		return
+		return {ok = false, code = "network", network = true}
 	var data = JSON.parse_string(raw.get_string_from_utf8())
 	if typeof(data) != TYPE_DICTIONARY:
 		connection_failed.emit("Unexpected server reply", cmd)
-		return
+		return {ok = false, code = "network", network = true}
 	if data.has("state"):
 		view = data.state
 		_received_ms = Time.get_ticks_msec()
 	if bool(data.get("ok", false)):
 		state_changed.emit(view, data.get("events", []))
-	else:
-		refused.emit(str(data.get("code", "")), data.get("detail", {}), cmd)
-		if data.has("state"): state_changed.emit(view, [])
+		return {ok = true, code = "", network = false}
+	refused.emit(str(data.get("code", "")), data.get("detail", {}), cmd)
+	if data.has("state"): state_changed.emit(view, [])
+	return {ok = false, code = str(data.get("code", "")), network = false}
 
 ## P0 prototype entry: a user://p0_boot marker (adb run-as touch files/p0_boot) or SENSEN_P0=1 on desktop.
 static func boot_wanted() -> bool:

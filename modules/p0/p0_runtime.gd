@@ -48,7 +48,7 @@ func _init() -> void:
 	ui.joystick.connect(func(v): _call("p0_joystick", [v]))
 	ui.tapped.connect(func(p): _call("p0_tap", [p]))
 	ui.action_pressed.connect(_on_action)
-	ui.command.connect(func(cmd): session.send(cmd))
+	ui.command.connect(func(cmd): session.send(cmd, P0Session.ui_key(cmd)))   # panel buttons: one submit per result
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
 	ui.zoom.connect(func(f: float): _call("p0_zoom", [f]))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
@@ -263,6 +263,8 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast("Sold out today · %d left" % int(detail.get("left", 0)))
 		"wrong_state", "bad_plot":
 			pass   # the plot changed under a held repeat; the next frame shows its new state
+		"stale_state":
+			pass   # a retry of something the server already applied; the returned state re-renders the screen
 		_:
 			ui.toast("Can't do that (%s)" % code)
 

@@ -9,7 +9,11 @@ import { emptyDay, type P0State } from './state.js';
 
 export type { P0Event } from './progress.js';
 
-export type P0Command =
+/** Every command may carry `expect_seq`: the state version the client saw. A mismatch is refused as
+ * `stale_state` without applying, so a retry after a lost response can never apply twice (SGODOT-211). */
+export type P0Command = P0CommandBody & { expect_seq?: number };
+
+type P0CommandBody =
   | { type: 'till'; plot: number }
   | { type: 'sow'; plot: number; seed: string }
   | { type: 'water'; plot: number }
@@ -32,6 +36,9 @@ export type P0Result =
 const fail = (code: string, detail?: Record<string, unknown>): P0Result => ({ ok: false, code, detail });
 
 export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: number): P0Result {
+  if (cmd.expect_seq !== undefined && cmd.expect_seq !== input.seq) {
+    return fail('stale_state', { seq: input.seq, expected: cmd.expect_seq });
+  }
   const s = structuredClone(input);
   const events: P0Event[] = [];
   settleEnergy(c, s, now);
