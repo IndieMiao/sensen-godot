@@ -150,7 +150,7 @@ describe('dev grant (playtests only)', () => {
     const a = await app.inject({ method: 'POST', url: '/v1/p0/dev/grant', headers, payload: { id: 'wood', qty: 12, to: 'storage' } });
     expect(a.json().state.storage.items).toEqual([{ id: 'wood', name: 'Timber', qty: 12 }]);
     const b = await app.inject({ method: 'POST', url: '/v1/p0/dev/grant', headers, payload: { id: 'clay', qty: 4 } });
-    expect(b.json().state.bag.slots).toContainEqual({ id: 'clay', qty: 4 });
+    expect(b.json().state.bag.slots).toContainEqual({ id: 'clay', qty: 4, locked: false, gifted: false });
     const bad = await app.inject({ method: 'POST', url: '/v1/p0/dev/grant', headers, payload: { id: 'gold_bar', qty: 1 } });
     expect(bad.statusCode).toBe(400);
   });

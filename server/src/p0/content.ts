@@ -62,7 +62,7 @@ export interface P0Content {
     sites: Record<string, FishSite>;
     baits: Record<string, { shift: number[]; wait: number }>;
   };
-  goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number }>;
+  goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number; grow_mult?: number }>;
   blessing: { days: number; regen_mult: number; food_bonus: number };
   tackle: { keeper: { role: string; name: string }; buy: string[] };
   tools: {

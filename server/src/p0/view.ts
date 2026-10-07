@@ -1,10 +1,11 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
-import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SKILLS, type P0Content } from './content.js';
+import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type P0Content, type QuotaId, type ShopId } from './content.js';
 import { count, freeSlots } from './bag.js';
 import { cookSlots, ingredientsFor, mealValue, recipeRarity } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
+import { catalog, drinkPrice, offerOf, owns, walletNeed } from './shops.js';
 import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
 import { haveTotal, stored } from './storage.js';
 
@@ -29,7 +30,15 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
       crop: p.crop ?? null, ready_in: p.state === 'growing' && p.ready_at ? Math.max(0, p.ready_at - now) : null,
       xp_pct: p.xp_pct ?? null,
     })),
-    bag: { capacity: s.bag_cap, slots: s.bag, free: freeSlots(s) },
+    bag: {
+      capacity: s.bag_cap, free: freeSlots(s),
+      // Every slot says locked / gifted (the item-info rules gate Lock and Gift on these fields, SGODOT-224).
+      slots: s.bag.map(b => ({ id: b.id, qty: b.qty, locked: s.locked.includes(b.id), gifted: !!b.gift,
+        ...(b.gift ? { from: b.gift.from, expires_in: untilRollover(c, now) } : {}) })),
+    },
+    drinks: drinksView(c, s, now),
+    shops: Object.fromEntries(SHOPS.map(shop => [shop, shopView(c, s, shop)])),
+    quotas: Object.fromEntries((Object.keys(c.quotas) as QuotaId[]).map(q => [q, quotaView(c, s, q, now)])),
     storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
     homestead: homesteadView(c, s),
     rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, now), amount: c.energy.rest_amount },
@@ -159,5 +168,42 @@ function homesteadView(c: P0Content, s: P0State) {
       board_slots: boardSlots(c, s),
       fence: unlocked(c, s, 'fence'),
     },
+  };
+}
+
+/** Tea / coffee facts (§3.4.4): cups used of the shared 3, next price, what the next cup would actually add. */
+function drinksView(c: P0Content, s: P0State, now: number) {
+  const max = maxEnergy(c, s), price = drinkPrice(c, s);
+  return {
+    used: s.day.drinks, limit: c.drinks.daily, left: c.drinks.daily - s.day.drinks, resets_in: untilRollover(c, now),
+    price, need: price === null ? null : coinsNeeded(c, price), energy: c.drinks.energy,
+    gain: Math.max(0, Math.min(c.drinks.energy, max - s.energy.value)), full: s.energy.value >= max,
+    items: Object.entries(c.drinks.items).map(([id, d]) => ({ id, name: d.name, shop: d.shop })),
+  };
+}
+
+function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
+  const used = q === 'request_bonus' ? s.day.bonus : q === 'sys_requests' ? s.day.sys_done : s.day.quota[q] ?? 0;
+  return { used, cap: c.quotas[q].cap, resets_in: untilRollover(c, now), scope: c.quotas[q].scope };
+}
+
+/** One counter (§9.11): what it sells with every gate as a fact, and which kinds it buys back at what rate / quota. */
+function shopView(c: P0Content, s: P0State, shop: ShopId) {
+  return {
+    buy: catalog(c, shop).map(id => {
+      const o = offerOf(c, id)!;
+      const unlocked = !o.skill || skillLevel(c, s, o.skill) >= o.gate;
+      return {
+        id, name: itemName(c, id), price: o.price, need: walletNeed(c, o), to: o.to,
+        skill: o.skill, gate: o.gate, unlocked,
+        xp_to_go: o.skill ? Math.max(0, c.skills[o.skill][o.gate - 1] - s.skills[o.skill]) : 0,
+        homestead: o.homestead ?? null, homestead_ok: !o.homestead || s.homestead.level >= o.homestead,
+        once: o.once, owned: o.once && owns(c, s, id),
+        left: o.daily ? Math.max(0, o.daily - (s.day.bought[id] ?? 0)) : null,
+        materials: (o.materials ?? []).map(([m, n]) => ({ id: m, name: itemName(c, m), need: n, have: haveTotal(s, m) })),
+        in_bag: count(s.bag, id),
+      };
+    }),
+    sell: Object.entries(c.shops[shop].buys).map(([kind, r]) => ({ kind, rate: r.rate, quota: r.quota })),
   };
 }

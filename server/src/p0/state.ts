@@ -5,6 +5,7 @@ export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
   id: number; state: PlotState;
   crop?: string; xp_pct?: number; ready_at?: number;
+  fert?: boolean;                 // compost this round (§5.5): −20% of the ripening time, once, gone at harvest
 }
 /** One bag slot. A resident's gift meal is its own stack (gift), never merged with bought or cooked ones (§3.4.5). */
 export interface BagStack { id: string; qty: number; gift?: { from: string; day: string } }

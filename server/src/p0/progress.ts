@@ -19,7 +19,9 @@ export type P0Event =
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }
   | { kind: 'request'; id: string; status: 'accepted' | 'done'; coins: number }
-  | { kind: 'homestead'; level: number; energy: number; unlocks: string[] };
+  | { kind: 'homestead'; level: number; energy: number; unlocks: string[] }
+  | { kind: 'drink'; item: string; gain: number; price: number; left: number }
+  | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null };
 
 export function energyDetail(c: P0Content, s: P0State, now: number, need: number) {
   return { need, have: s.energy.value, next_in: nextTickIn(c, s, now) };
