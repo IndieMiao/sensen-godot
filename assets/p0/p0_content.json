@@ -1,5 +1,5 @@
 {
-  "version": "p0-m3a-2026-10-08",
+  "version": "p0-m3b-2026-10-08",
   "_note": "P0 content (M1 homestead + M2 fish/cook/eat) (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit; M2: §6.1.2–6.1.3 fishing gates and protection, §6.2.2 fish, §6.3.1 pond weights, §6.4 rod/bait, §6.6.1 cast energy, §6.7.1 fishing XP, §7.2.3–7.2.5 cooking, §7.3 ingredient families, §7.4.1 rarity derivation, §7.6.2 cooking XP, §7.14 recipes, §7.17.1 eating). Shared by server/src/p0 and the Godot client (labels only). M2b: P0 fish list (§17.2.1) — Willow Pond (Pond template) and Willow Creek (River template) on the homestead; mackerel is Coast-only (shown in the Fish-dex, not catchable here). Recipes: the 14 pages that need only P0 fish and crops; rock-salt pages (#11, #16, #29, #37) wait for materials. M3a (SGODOT-228): Homestead Lv1–3 (§8.1–8.3), farm storage (§10.4.8), materials and their buyback (§9.13.1, sources come with SGODOT-162/163), Bag Upgrade I, drinks (§3.4.4, §9.12), counters by role and buyback quotas (§9.11, §9.13.1), compost (§9.11.1, §17.2.1), Row Hoe and the Shanghai Postcard (§9.11.2, §9.11.5), residents Pip and Old Kai with affinity, gifts and gift meals (§3.4.5, §9.4.3–9.4.4, §7.6.3), and the Stall / Market boards (§9.6, §9.13.2). Numbers and copy per Li Bai on SGODOT-228 (b7d8b665, v1.1, 719ce953). Outpost names and keepers live in p0_outposts.json. q(40): Wild Herb is a material and a seasoning like Herb; the Fishing Lv2 gift gives Wild Herb ×3. q(41): Rest needs 2 h since the player last left the homestead (rest_away_h).",
   "energy": {
     "max_base": 200,
@@ -36,7 +36,8 @@
       "fish": 10,
       "material": 99,
       "bait": 99,
-      "fert": 99
+      "fert": 99,
+      "torch": 20
     }
   },
   "skills": {
@@ -891,8 +892,7 @@
         },
         "skill": "farming",
         "gate": [],
-        "bonus": 10,
-        "enabled": false
+        "bonus": 10
       },
       "req_sys_crop_mixed": {
         "title": "Market Basket",
@@ -964,7 +964,9 @@
       "hoe_starter": "Starter Hoe",
       "pick_starter": "Starter Pickaxe",
       "sword_wooden": "Wooden Sword",
-      "tool_row_hoe": "Row Hoe"
+      "tool_row_hoe": "Row Hoe",
+      "pick_copper": "Copper Pickaxe",
+      "gather_gloves": "Gather Gloves"
     },
     "row_hoe": {
       "id": "tool_row_hoe",
@@ -1053,7 +1055,8 @@
           ]
         ],
         "unlocks": [
-          "spice_rack"
+          "spice_rack",
+          "clay_bank"
         ]
       },
       {
@@ -1337,5 +1340,211 @@
     "city": "Shanghai",
     "climate": "Subtropical",
     "farm_name": "Farmer's Homestead"
+  },
+  "supplies": {
+    "torch": {
+      "name": "Torch"
+    }
+  },
+  "gather": {
+    "_note": "SGODOT-231 §13.2 gathering spots: 0 Energy, one tap, each spot 8 h after it was gathered (ready at start). The first yield is the spot's material and goes to Farm Storage (+1 with Gather Gloves); worms go to the bag, any that do not fit go to storage (q(44)). P0 has no Old Tree (hardwood is P1, q(44)).",
+    "regen_h": 8,
+    "tempo_ms": 900,
+    "gloves": "gather_gloves",
+    "gloves_bonus": 1,
+    "spots": {
+      "spot_grove": {
+        "name": "Timber Grove",
+        "yield": [
+          [
+            "wood",
+            6
+          ]
+        ],
+        "homestead": 1
+      },
+      "spot_rock_pile": {
+        "name": "Rock Pile",
+        "yield": [
+          [
+            "stone",
+            4
+          ]
+        ],
+        "homestead": 1
+      },
+      "spot_reed_bank": {
+        "name": "Reed Bank",
+        "yield": [
+          [
+            "fiber",
+            3
+          ],
+          [
+            "bait_worm",
+            2
+          ]
+        ],
+        "homestead": 1
+      },
+      "spot_herb_patch": {
+        "name": "Herb Patch",
+        "yield": [
+          [
+            "wild_herb",
+            2
+          ]
+        ],
+        "homestead": 1
+      },
+      "spot_clay_bank": {
+        "name": "Clay Bank",
+        "yield": [
+          [
+            "clay",
+            2
+          ]
+        ],
+        "homestead": 2
+      }
+    }
+  },
+  "mine": {
+    "_note": "SGODOT-231 §13.3 / LOCK-21, floors 1–2: 2 Energy the first time a run reaches a floor, 2 per rock, ≤ 2 runs a player day, a new run needs floor 2 cleared, 04:00 ends an unfinished run. Each rock: Stone by the pickaxe, plus one weighted extra drop derived from the run, floor and rock. Floor 2 quartz (15) is folded into none for P0 (q(44)).",
+    "runs_per_day": 2,
+    "floor_energy": 2,
+    "rock_energy": 2,
+    "rocks": 6,
+    "restart_floor": 2,
+    "tempo_ms": 900,
+    "floors": [
+      {
+        "floor": 1,
+        "drops": [
+          [
+            "copper_ore",
+            35
+          ],
+          [
+            "rock_salt",
+            25
+          ],
+          [
+            "clay",
+            15
+          ],
+          [
+            null,
+            25
+          ]
+        ]
+      },
+      {
+        "floor": 2,
+        "drops": [
+          [
+            "copper_ore",
+            30
+          ],
+          [
+            "rock_salt",
+            20
+          ],
+          [
+            null,
+            50
+          ]
+        ]
+      }
+    ],
+    "picks": {
+      "pick_starter": {
+        "stone": 1
+      },
+      "pick_copper": {
+        "stone": 2
+      }
+    }
+  },
+  "workbench": {
+    "_note": "SGODOT-231 §13.4, P0 tabs Tools / Supplies only (q(31)). Costs come from Farm Storage first, then the bag. Supplies go to the bag (no room → not crafted, q(44)); the Copper Pickaxe goes to Gear (Equip there); Gather Gloves work at once. Compost needs Farming Lv3 like the stall (q(44)).",
+    "tabs": [
+      "tools",
+      "supplies"
+    ],
+    "recipes": [
+      {
+        "id": "craft_copper_pickaxe",
+        "tab": "tools",
+        "out": "pick_copper",
+        "qty": 1,
+        "to": "gear",
+        "cost": [
+          [
+            "copper_ore",
+            5
+          ],
+          [
+            "wood",
+            4
+          ]
+        ]
+      },
+      {
+        "id": "craft_gather_gloves",
+        "tab": "tools",
+        "out": "gather_gloves",
+        "qty": 1,
+        "to": "owned",
+        "cost": [
+          [
+            "fiber",
+            8
+          ],
+          [
+            "wood",
+            4
+          ]
+        ]
+      },
+      {
+        "id": "craft_torch",
+        "tab": "supplies",
+        "out": "torch",
+        "qty": 2,
+        "to": "bag",
+        "cost": [
+          [
+            "wood",
+            1
+          ],
+          [
+            "fiber",
+            1
+          ]
+        ]
+      },
+      {
+        "id": "craft_compost",
+        "tab": "supplies",
+        "out": "fert_compost",
+        "qty": 2,
+        "to": "bag",
+        "cost": [
+          [
+            "fiber",
+            2
+          ],
+          [
+            "wood",
+            1
+          ]
+        ],
+        "gate": [
+          "farming",
+          3
+        ]
+      }
+    ]
   }
 }
