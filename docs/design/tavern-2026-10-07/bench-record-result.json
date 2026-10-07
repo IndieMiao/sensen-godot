@@ -1,0 +1,517 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"checks": [
+		{
+			"details": null,
+			"name": "Default Avatar fixture assembles",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Bench route/probe schema",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.14999997615814,
+					0.0820000022649765,
+					3.11999988555908
+				],
+				"from": [
+					-1.14999997615814,
+					0.0820000022649765,
+					3.11999988555908
+				],
+				"name": "entrance",
+				"reached": true,
+				"remaining_m": 0.0,
+				"seconds": 0.015,
+				"target": [
+					-1.14999997615814,
+					0.0820000022649765,
+					3.11999988555908
+				]
+			},
+			"name": "Recorded route: entrance",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.50294101238251,
+					0.0919386893510818,
+					2.4582359790802
+				],
+				"from": [
+					-1.14999997615814,
+					0.0820000022649765,
+					3.11999988555908
+				],
+				"name": "left_front",
+				"reached": true,
+				"remaining_m": 0.100493431091309,
+				"seconds": 0.234,
+				"target": [
+					-1.54999995231628,
+					0.0820000022649765,
+					2.36999988555908
+				]
+			},
+			"name": "Recorded route: left_front",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/TavernArt/square_table/Collider",
+					"/root/SceneBenchmark/TavernArt/round_table/Collider"
+				],
+				"final": [
+					-0.859944462776184,
+					0.0919219851493835,
+					0.964842200279236
+				],
+				"from": [
+					-1.50294101238251,
+					0.0919386893510818,
+					2.4582359790802
+				],
+				"name": "left_table_side",
+				"reached": true,
+				"remaining_m": 0.0768018215894699,
+				"seconds": 0.516,
+				"target": [
+					-0.819999992847443,
+					0.0820000022649765,
+					0.899999976158142
+				]
+			},
+			"name": "Recorded route: left_table_side",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.449068516492844,
+					0.0919431447982788,
+					-0.347177773714066
+				],
+				"from": [
+					-0.859944462776184,
+					0.0919219851493835,
+					0.964842200279236
+				],
+				"name": "bar_front",
+				"reached": true,
+				"remaining_m": 0.0977742820978165,
+				"seconds": 0.4,
+				"target": [
+					-0.419999986886978,
+					0.0820000022649765,
+					-0.439999997615814
+				]
+			},
+			"name": "Recorded route: bar_front",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					3.28591990470886,
+					0.0919329822063446,
+					-0.34994512796402
+				],
+				"from": [
+					-0.449068516492844,
+					0.0919431447982788,
+					-0.347177773714066
+				],
+				"name": "right_back_corner",
+				"reached": true,
+				"remaining_m": 0.0747429728507996,
+				"seconds": 1.045,
+				"target": [
+					3.35999989509583,
+					0.0820000022649765,
+					-0.349999994039536
+				]
+			},
+			"name": "Recorded route: right_back_corner",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					3.35712289810181,
+					0.0919386819005013,
+					2.14904165267944
+				],
+				"from": [
+					3.28591990470886,
+					0.0919329822063446,
+					-0.34994512796402
+				],
+				"name": "right_table_outer",
+				"reached": true,
+				"remaining_m": 0.101487152278423,
+				"seconds": 0.711,
+				"target": [
+					3.35999989509583,
+					0.0820000022649765,
+					2.25
+				]
+			},
+			"name": "Recorded route: right_table_outer",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/TavernArt/FrontTerracottaMonstera/Collider"
+				],
+				"final": [
+					1.24951982498169,
+					0.0919355452060699,
+					2.67850732803345
+				],
+				"from": [
+					3.35712289810181,
+					0.0919386819005013,
+					2.14904165267944
+				],
+				"name": "front_table_right",
+				"reached": true,
+				"remaining_m": 0.0829702466726303,
+				"seconds": 0.628,
+				"target": [
+					1.16999995708466,
+					0.0820000022649765,
+					2.70000004768372
+				]
+			},
+			"name": "Recorded route: front_table_right",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.17972159385681,
+					0.091930665075779,
+					3.15380072593689
+				],
+				"from": [
+					1.24951982498169,
+					0.0919355452060699,
+					2.67850732803345
+				],
+				"name": "front_table_corner",
+				"reached": true,
+				"remaining_m": 0.0676422640681267,
+				"seconds": 0.166,
+				"target": [
+					1.16999995708466,
+					0.0820000022649765,
+					3.22000002861023
+				]
+			},
+			"name": "Recorded route: front_table_corner",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.06279623508453,
+					0.0919364020228386,
+					3.21752262115479
+				],
+				"from": [
+					1.17972159385681,
+					0.091930665075779,
+					3.15380072593689
+				],
+				"name": "front_table_front",
+				"reached": true,
+				"remaining_m": 0.0878029689192772,
+				"seconds": 0.636,
+				"target": [
+					-1.14999997615814,
+					0.0820000022649765,
+					3.22000002861023
+				]
+			},
+			"name": "Recorded route: front_table_front",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.09686017036438,
+					0.091934822499752,
+					3.17942786216736
+				],
+				"from": [
+					-1.06279623508453,
+					0.0919364020228386,
+					3.21752262115479
+				],
+				"name": "entrance_return",
+				"reached": true,
+				"remaining_m": 0.080338180065155,
+				"seconds": 0.049,
+				"target": [
+					-1.14999997615814,
+					0.0820000022649765,
+					3.11999988555908
+				]
+			},
+			"name": "Recorded route: entrance_return",
+			"passed": true
+		},
+		{
+			"details": 6.785,
+			"name": "Full route fits unaccelerated 15s clip",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"pid": 1137244,
+	"renderer": "mobile",
+	"route": [
+		{
+			"collisions": [],
+			"final": [
+				-1.14999997615814,
+				0.0820000022649765,
+				3.11999988555908
+			],
+			"from": [
+				-1.14999997615814,
+				0.0820000022649765,
+				3.11999988555908
+			],
+			"name": "entrance",
+			"reached": true,
+			"remaining_m": 0.0,
+			"seconds": 0.015,
+			"target": [
+				-1.14999997615814,
+				0.0820000022649765,
+				3.11999988555908
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.50294101238251,
+				0.0919386893510818,
+				2.4582359790802
+			],
+			"from": [
+				-1.14999997615814,
+				0.0820000022649765,
+				3.11999988555908
+			],
+			"name": "left_front",
+			"reached": true,
+			"remaining_m": 0.100493431091309,
+			"seconds": 0.234,
+			"target": [
+				-1.54999995231628,
+				0.0820000022649765,
+				2.36999988555908
+			]
+		},
+		{
+			"collisions": [
+				"/root/SceneBenchmark/TavernArt/square_table/Collider",
+				"/root/SceneBenchmark/TavernArt/round_table/Collider"
+			],
+			"final": [
+				-0.859944462776184,
+				0.0919219851493835,
+				0.964842200279236
+			],
+			"from": [
+				-1.50294101238251,
+				0.0919386893510818,
+				2.4582359790802
+			],
+			"name": "left_table_side",
+			"reached": true,
+			"remaining_m": 0.0768018215894699,
+			"seconds": 0.516,
+			"target": [
+				-0.819999992847443,
+				0.0820000022649765,
+				0.899999976158142
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.449068516492844,
+				0.0919431447982788,
+				-0.347177773714066
+			],
+			"from": [
+				-0.859944462776184,
+				0.0919219851493835,
+				0.964842200279236
+			],
+			"name": "bar_front",
+			"reached": true,
+			"remaining_m": 0.0977742820978165,
+			"seconds": 0.4,
+			"target": [
+				-0.419999986886978,
+				0.0820000022649765,
+				-0.439999997615814
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				3.28591990470886,
+				0.0919329822063446,
+				-0.34994512796402
+			],
+			"from": [
+				-0.449068516492844,
+				0.0919431447982788,
+				-0.347177773714066
+			],
+			"name": "right_back_corner",
+			"reached": true,
+			"remaining_m": 0.0747429728507996,
+			"seconds": 1.045,
+			"target": [
+				3.35999989509583,
+				0.0820000022649765,
+				-0.349999994039536
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				3.35712289810181,
+				0.0919386819005013,
+				2.14904165267944
+			],
+			"from": [
+				3.28591990470886,
+				0.0919329822063446,
+				-0.34994512796402
+			],
+			"name": "right_table_outer",
+			"reached": true,
+			"remaining_m": 0.101487152278423,
+			"seconds": 0.711,
+			"target": [
+				3.35999989509583,
+				0.0820000022649765,
+				2.25
+			]
+		},
+		{
+			"collisions": [
+				"/root/SceneBenchmark/TavernArt/FrontTerracottaMonstera/Collider"
+			],
+			"final": [
+				1.24951982498169,
+				0.0919355452060699,
+				2.67850732803345
+			],
+			"from": [
+				3.35712289810181,
+				0.0919386819005013,
+				2.14904165267944
+			],
+			"name": "front_table_right",
+			"reached": true,
+			"remaining_m": 0.0829702466726303,
+			"seconds": 0.628,
+			"target": [
+				1.16999995708466,
+				0.0820000022649765,
+				2.70000004768372
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.17972159385681,
+				0.091930665075779,
+				3.15380072593689
+			],
+			"from": [
+				1.24951982498169,
+				0.0919355452060699,
+				2.67850732803345
+			],
+			"name": "front_table_corner",
+			"reached": true,
+			"remaining_m": 0.0676422640681267,
+			"seconds": 0.166,
+			"target": [
+				1.16999995708466,
+				0.0820000022649765,
+				3.22000002861023
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.06279623508453,
+				0.0919364020228386,
+				3.21752262115479
+			],
+			"from": [
+				1.17972159385681,
+				0.091930665075779,
+				3.15380072593689
+			],
+			"name": "front_table_front",
+			"reached": true,
+			"remaining_m": 0.0878029689192772,
+			"seconds": 0.636,
+			"target": [
+				-1.14999997615814,
+				0.0820000022649765,
+				3.22000002861023
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.09686017036438,
+				0.091934822499752,
+				3.17942786216736
+			],
+			"from": [
+				-1.06279623508453,
+				0.0919364020228386,
+				3.21752262115479
+			],
+			"name": "entrance_return",
+			"reached": true,
+			"remaining_m": 0.080338180065155,
+			"seconds": 0.049,
+			"target": [
+				-1.14999997615814,
+				0.0820000022649765,
+				3.11999988555908
+			]
+		}
+	],
+	"scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+	"slug": "tavern"
+}

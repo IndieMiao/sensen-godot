@@ -129,7 +129,9 @@ def build():
     lighting={'ambient':.50,'sun':.65,'points':[{'position':[-2.2,2.7,.1],'energy':1.5,'range':3.7},
               {'position':[-1.25,2.7,-2.85],'energy':.95,'range':2.8},
               {'position':[1.6,2.7,-2.85],'energy':.95,'range':2.8}]}
-    finalize({'position':[10.5,9.5,12.0],'target':[0,1.5,0],'size':12.0},lighting);complete()
+    sys.path.insert(0,str(Path(__file__).resolve().parent/'source/tavern'))
+    import revision2
+    revision2.revise()
 
 
 if __name__=='__main__':build()

@@ -1,0 +1,36 @@
+{
+	"avatar_top_H": 1.74549423158169,
+	"capsule_height": 1.25,
+	"capsule_radius": 0.21,
+	"measurements": {
+		"chair": {
+			"baseline_ratio": 0.392438993842612,
+			"difference": 0.051094890510949,
+			"height": 0.65,
+			"ratio_to_H": 0.372387366419996,
+			"reason": ""
+		},
+		"counter": {
+			"baseline_ratio": 0.660271445844686,
+			"difference": 0.142472885032538,
+			"height": 1.3167,
+			"ratio_to_H": 0.754342223638783,
+			"reason": ""
+		},
+		"door": {
+			"baseline_ratio": 1.33486548270553,
+			"difference": 0.0343347639484979,
+			"height": 2.41,
+			"ratio_to_H": 1.38069777395722,
+			"reason": ""
+		},
+		"table": {
+			"baseline_ratio": 0.650245632133378,
+			"difference": 0.0383259911894274,
+			"height": 1.0915,
+			"ratio_to_H": 0.625324323765271,
+			"reason": ""
+		}
+	},
+	"speed": 3.75
+}

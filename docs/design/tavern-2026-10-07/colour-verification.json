@@ -1,0 +1,113 @@
+{
+  "revision": "r2",
+  "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
+  "checks": [
+    {
+      "name": "Counter lit timber",
+      "reference_pixel": [
+        860,
+        648
+      ],
+      "runtime_pixel": [
+        802,
+        643
+      ],
+      "reference": {
+        "rgb": [
+          223,
+          124,
+          61
+        ],
+        "hex": "#DF7C3D",
+        "hue_degrees": 23.333,
+        "saturation": 0.7265,
+        "value": 0.8745
+      },
+      "runtime": {
+        "rgb": [
+          231,
+          148,
+          65
+        ],
+        "hex": "#E79441",
+        "hue_degrees": 30.0,
+        "saturation": 0.7186,
+        "value": 0.9059
+      },
+      "hue_delta_degrees": 6.667,
+      "passed": true
+    },
+    {
+      "name": "Floor front plank",
+      "reference_pixel": [
+        969,
+        1050
+      ],
+      "runtime_pixel": [
+        945,
+        1065
+      ],
+      "reference": {
+        "rgb": [
+          209,
+          122,
+          69
+        ],
+        "hex": "#D17A45",
+        "hue_degrees": 22.714,
+        "saturation": 0.6699,
+        "value": 0.8196
+      },
+      "runtime": {
+        "rgb": [
+          129,
+          79,
+          35
+        ],
+        "hex": "#814F23",
+        "hue_degrees": 28.085,
+        "saturation": 0.7287,
+        "value": 0.5059
+      },
+      "hue_delta_degrees": 5.371,
+      "passed": true
+    },
+    {
+      "name": "Left wall timber",
+      "reference_pixel": [
+        253,
+        747
+      ],
+      "runtime_pixel": [
+        207,
+        715
+      ],
+      "reference": {
+        "rgb": [
+          116,
+          56,
+          25
+        ],
+        "hex": "#743819",
+        "hue_degrees": 20.44,
+        "saturation": 0.7845,
+        "value": 0.4549
+      },
+      "runtime": {
+        "rgb": [
+          50,
+          23,
+          10
+        ],
+        "hex": "#32170A",
+        "hue_degrees": 19.5,
+        "saturation": 0.8,
+        "value": 0.1961
+      },
+      "hue_delta_degrees": 0.94,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Representative lit patches only, not a complete-image fidelity score; brightness/saturation retained for review."
+}
