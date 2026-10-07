@@ -1,0 +1,51 @@
+{
+  "owner": "刘备",
+  "revision": "R2",
+  "scenes": [
+    {
+      "card": 177,
+      "slug": "tavern",
+      "budget": {
+        "room_triangles": 100380,
+        "shared_plant_triangles": 5446,
+        "room_botanical_triangles": 2,
+        "plant_triangles": 5448,
+        "total_triangles": 105826,
+        "static_surfaces": 32
+      },
+      "character_checks": 32,
+      "character_passed": true,
+      "hue_deltas": [
+        6.667,
+        5.371,
+        0.94
+      ],
+      "dimensions_passed": true,
+      "local_lights": 12,
+      "light_control_passed": true
+    },
+    {
+      "card": 178,
+      "slug": "blacksmith_shop",
+      "budget": {
+        "room_triangles": 85352,
+        "shared_plant_triangles": 4096,
+        "room_botanical_triangles": 0,
+        "plant_triangles": 4096,
+        "total_triangles": 89448,
+        "static_surfaces": 18
+      },
+      "character_checks": 31,
+      "character_passed": true,
+      "hue_deltas": [
+        5.55,
+        4.431,
+        2.944
+      ],
+      "dimensions_passed": true,
+      "local_lights": 3,
+      "light_control_passed": true
+    }
+  ],
+  "scope": "Desktop Godot Mobile/Vulkan; no phone/Android/release/performance acceptance; art director review pending."
+}
