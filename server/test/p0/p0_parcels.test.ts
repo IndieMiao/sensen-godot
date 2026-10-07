@@ -42,6 +42,8 @@ describe('P0 passive rewards (§10.4.8, q(45); SGODOT-232 S1, rescued from SGODO
     expect(s.inbox.parcels.every(p => p.expires_at === T + PARCEL_LIFETIME_MS)).toBe(true);
     expect(s.cookbook).toContain('dish_herb_grilled_fish');
     expect(events.filter(e => e.kind === 'parcel')).toHaveLength(2);
+    expect(events.find(e => e.kind === 'parcel')).toMatchObject({ waiting: false, expires_in: PARCEL_LIFETIME_MS });
+    expect(events.some(e => e.kind === 'parcel' && 'gift' in e)).toBe(false);
     gainXp(c, s, T, 'fishing', 1, 100, events);
     expect(s.inbox.parcels).toHaveLength(2);
   });

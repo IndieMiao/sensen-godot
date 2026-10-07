@@ -84,6 +84,7 @@ describe('gift meal (§3.4.5, K-2, q(33))', () => {
     const r = step(s, { type: 'talk', resident: 'res_pip' });
     expect(r.ev).toContainEqual({ kind: 'gift_meal', resident: 'res_pip', dish: 'dish_carrot_cake', given: true, to: 'parcel' });
     expect(r.ev.some(e => e.kind === 'item')).toBe(false);
+    expect(r.ev).toContainEqual(expect.objectContaining({ kind: 'parcel', id: 'dish_carrot_cake', gift: true, expires_in: 18 * H }));
     expect(r.s.day.gift_meal).toBe('res_pip');
     expect(r.s.inbox.parcels).toMatchObject([{ id: 'dish_carrot_cake', qty: 1, gift: { from: 'res_pip', day: '2026-10-08' },
       source: "Pip's gift meal", expires_at: T0 + 18 * H }]);

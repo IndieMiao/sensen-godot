@@ -83,9 +83,11 @@ export function grantItems(c: P0Content, s: P0State, now: number, key: string, s
       const amount = Math.min(left, stackLimit(c, id));
       const p = { key: `${key}:${index++}`, id, qty: amount, ...(gift ? { gift: { ...gift } } : {}), source, created_at: now };
       const waiting = s.inbox.parcels.length >= PARCEL_LIMIT;
+      const end = lifetimeEnd(c, p, now);
       if (waiting) s.inbox.waiting.push(p);
-      else s.inbox.parcels.push({ ...p, expires_at: lifetimeEnd(c, p, now) });
-      events.push({ kind: 'parcel', id, qty: amount, key: p.key, waiting });
+      else s.inbox.parcels.push({ ...p, expires_at: end });
+      // expires_in: a gift meal's parcel is gone at 04:00, so its float must not promise 24 h.
+      events.push({ kind: 'parcel', id, qty: amount, key: p.key, waiting, ...(waiting ? {} : { expires_in: end - now }), ...(gift ? { gift: true } : {}) });
       left -= amount;
     }
   }

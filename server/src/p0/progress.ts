@@ -8,7 +8,7 @@ export type P0Event =
   | { kind: 'energy'; delta: number; reason: string }
   | { kind: 'xp'; skill: Skill; amount: number; percent: number }
   | { kind: 'item'; id: string; delta: number }
-  | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean }   // a reward that did not fit the bag (§10.4.8)
+  | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
   | { kind: 'coins'; delta: number }
   | { kind: 'first'; what: string; xp: number }
   | { kind: 'level'; skill: Skill; level: number; energy: number; gifts: [string, number][] }

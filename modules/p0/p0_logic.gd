@@ -266,6 +266,16 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 		parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
 	return v
 
+## LOCK-14: one float for the rewards of one server reply that did not fit the bag ("" when there is nothing to say).
+## A resident's gift meal is said by the resident bar instead (SGODOT-225), so gift parcels are left out here.
+static func parcel_toast(view: Dictionary, events: Array) -> String:
+	var parcels := events.filter(func(e): return str(e.get("kind", "")) == "parcel" and not bool(e.get("gift", false)))
+	if parcels.is_empty(): return ""
+	var waiting := parcels.all(func(e): return bool(e.get("waiting", false)))
+	var what := "%s ×%d" % [item_name(view, str(parcels[0].id)), int(parcels[0].qty)] if parcels.size() == 1 \
+		else "%d rewards" % parcels.size()
+	return ("Inbox full · %s saved for later" if waiting else "Bag full · %s sent to Inbox · 24h") % what
+
 # ---------------------------------------------------------------- M2: fishing, cooking, eating
 static func item(view: Dictionary, id: String) -> Dictionary:
 	return view.get("items", {}).get(id, {})
@@ -524,7 +534,6 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 			reason = "No more requests"
 	var meal := str(r.get("meal", "none"))
 	var note := ""
-	if meal == "bag_full": note = "Bag full · free a slot for %s's meal" % str(def.get("name", ""))
 	return {
 		"id": id, "portrait": str(def.get("portrait", "")), "name": str(def.get("name", "")), "role": str(def.get("role", "")),
 		"stage": stage, "have": int(r.get("affinity", 0)),

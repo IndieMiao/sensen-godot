@@ -94,3 +94,17 @@ func test_parcel_countdowns_run_between_responses() -> void:
 	assert_float(float(later.inbox.parcels[0].left)).is_equal(15000.0)
 	assert_float(float(P0Logic.project(v, 90000).inbox.parcels[0].left)).is_equal(0.0)
 	assert_float(float(v.inbox.parcels[0].left)).is_equal(60000.0)
+
+func test_one_inbox_float_per_reply_and_none_for_gift_meals() -> void:
+	var v := _view()
+	v["names"]["bait_worm"] = "Worm Bait"
+	var worm := {"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": false, "expires_in": 86400000}
+	var herb := {"kind": "parcel", "id": "wild_herb", "qty": 3, "waiting": false, "expires_in": 86400000}
+	var meal := {"kind": "parcel", "id": "dish_carrot_cake", "qty": 1, "waiting": false, "expires_in": 3600000, "gift": true}
+	assert_str(P0Logic.parcel_toast(v, [worm])).is_equal("Bag full · Worm Bait ×3 sent to Inbox · 24h")
+	assert_str(P0Logic.parcel_toast(v, [{"kind": "level"}, worm, herb])).is_equal("Bag full · 2 rewards sent to Inbox · 24h")
+	assert_str(P0Logic.parcel_toast(v, [meal])).is_equal("")
+	var queued := worm.duplicate()
+	queued["waiting"] = true
+	queued.erase("expires_in")
+	assert_str(P0Logic.parcel_toast(v, [queued])).is_equal("Inbox full · Worm Bait ×3 saved for later")
