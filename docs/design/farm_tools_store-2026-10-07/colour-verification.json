@@ -26,16 +26,16 @@
           264
         ],
         "rgb": [
-          212,
+          211,
           180,
-          137
+          135
         ],
-        "hex": "#D4B489",
-        "hue_degrees": 34.4,
-        "saturation": 0.3538,
-        "value": 0.8314
+        "hex": "#D3B487",
+        "hue_degrees": 35.526,
+        "saturation": 0.3602,
+        "value": 0.8275
       },
-      "hue_delta_degrees": 5.35,
+      "hue_delta_degrees": 4.224,
       "limit_degrees": 10,
       "passed": true
     },
@@ -64,16 +64,16 @@
           418
         ],
         "rgb": [
-          208,
-          176,
+          209,
+          177,
           129
         ],
-        "hex": "#D0B081",
-        "hue_degrees": 35.696,
-        "saturation": 0.3798,
-        "value": 0.8157
+        "hex": "#D1B181",
+        "hue_degrees": 36.0,
+        "saturation": 0.3828,
+        "value": 0.8196
       },
-      "hue_delta_degrees": 9.114,
+      "hue_delta_degrees": 9.418,
       "limit_degrees": 10,
       "passed": true
     },
@@ -102,16 +102,16 @@
           490
         ],
         "rgb": [
-          166,
+          167,
           93,
-          33
+          35
         ],
-        "hex": "#A65D21",
-        "hue_degrees": 27.068,
-        "saturation": 0.8012,
-        "value": 0.651
+        "hex": "#A75D23",
+        "hue_degrees": 26.364,
+        "saturation": 0.7904,
+        "value": 0.6549
       },
-      "hue_delta_degrees": 2.235,
+      "hue_delta_degrees": 2.939,
       "limit_degrees": 10,
       "passed": true
     },

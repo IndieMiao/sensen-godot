@@ -1,6 +1,6 @@
-# SGODOT-174 · Farm Tools Store review revision
+# SGODOT-174 · Farm Tools Store R2.1 finishing revision
 
-赵云 · **Review candidate**. Reference: Figma `OMLTC3yw3u2WDjOZhLnhaR`, SceneDesign, node `545:2961`. This responds to the card's display-density, counter-proportion and collision feedback under the SGODOT-172 R2 release.
+赵云 · **Review candidate · R2.1**. Reference: Figma `OMLTC3yw3u2WDjOZhLnhaR`, SceneDesign, node `545:2961`. This responds to the card's display-density, counter-proportion and collision feedback under the SGODOT-172 R2 release.
 
 ![Reference / revised Godot / direct 50% overlay](comparison.png)
 
@@ -14,13 +14,15 @@
 | Counter, door and sign | Register, small framed sign, pencil pot, daisies and metre-based folded checked cloth. Iron chain links and leaf motif complete the shop sign. Door has a copper bell and striped mat; a large shared plant is enclosed by the shared terracotta pot. Supplied botanical atlas/material remain unchanged. |
 | Materials | Shared static contact AO and warm runtime light. Tool blades, jaws, rivets, barrel hoops and bell form one material group with roughness .43/specular .52, contrasting with matte wood and cloth. No alpha-blended foliage. |
 
-Budget: **97,986 / 200,000 total triangles**, **39,662 / 100,000 botanical triangles** (conservatively counting complete flower-containing counter/display modules), **41 / 60 static surfaces**. Named editable source geometry remains separate inside meaningful module collections. Repeated seed packets share four local-pivot GLBs; zone grouping controls runtime surfaces.
+R2.1 responds to the latest three finishing items: the complete table display moves **0.55m right / 0.24m forward** from the prior reviewed revision, with an extra filled sack crate at the front-left and another three-pot stack by the counter. FARM TOOLS moves 0.49m left, clearing the right-hand pot shelf; letters use **Nunito Black with 4mm physical extrusion** and a plaque offset, with every main-view letter including the final S visible. The copper bell is raised and enlarged 23%; the striped door mat is 1.264m wide, covering the 1.02m leaf and frame, and the five hanging tools have greater height/angle variation. Fresh captures use the latest shared deeper-green foliage atlas without changing it.
 
-[Fixed colour samples](colour-samples.png): **5.350° / 9.114° / 2.235° / 5.859°**, all ≤10°. Full RGB/HSV coordinates are in [colour-verification.json](colour-verification.json). Before colour tuning the initial left-plaster patch was found to touch the oak arch cap; it was corrected to a declared world point on the narrow actual plaster strip and the original sample retained privately. The other fixed points are unchanged. These are representative lit faces, not a whole-image similarity score.
+Budget: **104,546 / 200,000 total triangles**, **39,662 / 100,000 botanical triangles** (conservatively counting complete flower-containing counter/display modules), **43 / 60 static surfaces**. Named editable source geometry remains separate inside meaningful module collections. Repeated seed packets share four local-pivot GLBs; zone grouping controls runtime surfaces.
+
+[Fixed colour samples](colour-samples.png): **4.224° / 9.418° / 2.939° / 5.859°**, all ≤10°. Full RGB/HSV coordinates are in [colour-verification.json](colour-verification.json). Before colour tuning the initial left-plaster patch was found to touch the oak arch cap; it was corrected to a declared world point on the narrow actual plaster strip and the original sample retained privately. The other fixed points are unchanged. These are representative lit faces, not a whole-image similarity score.
 
 The camera fits declared plinth-edge slopes and mean scale at the 6.8×6.2m physical base; the reference's stylized perspective still differs at upper wall corners. [Fit data](../../../tools/art/source/farm_tools_store/camera-review.json) and the unwarped 50% overlay retain those residuals.
 
-**34/34 rendered character checks and the 15-second real-time video pass.** Verification covers a nine-waypoint route from the door to the counter, around the display, to the left rack and window; blockers include counter, table, barrel, crate, shelf and diorama perimeter. The main counter/display aisle measures **2.535m**, above the required .80m. The entrance leg offsets left around the large planter instead of targeting its collision edge. No capsule/floor/guard bypass is used.
+**34/34 rendered character checks and the 15-second real-time video pass.** Verification covers a nine-waypoint route from the door to the counter, around the display, to the left rack and window; blockers include counter, table, barrel, crate, shelf and diorama perimeter. The main counter/display aisle measures **2.775m**, above the required .80m. The entrance leg offsets left around the large planter instead of targeting its collision edge. No capsule/floor/guard bypass is used.
 
 [Rendered checks](bench-result.json) · [Source scale](source-scale.json) · [Live ratios](bench-scale-measurements.json) · [Real colliders](bench-collisions.png) · [15-second real-time video frames](video-frames.png) · [Final budget, hashes and media](verification-summary.json).
 

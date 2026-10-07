@@ -7,18 +7,18 @@
   },
   "renderer": {
     "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "colliders": 19,
+    "colliders": 21,
     "finite_aabbs": true,
     "material_count": 4,
-    "mesh_instances": 41,
+    "mesh_instances": 43,
     "renderer": "mobile",
     "resolution": [
       1440,
       1080
     ],
     "scene": "farm_tools_store",
-    "surfaces": 41,
-    "triangles": 97986
+    "surfaces": 43,
+    "triangles": 104546
   },
   "asset_stats": {
     "atlas": {
@@ -42,14 +42,14 @@
         "vertices": 930,
         "triangles": 1820,
         "surfaces": 1,
-        "bytes": 66448
+        "bytes": 66480
       },
       {
         "name": "back_wall",
         "vertices": 738,
         "triangles": 1444,
         "surfaces": 1,
-        "bytes": 55448
+        "bytes": 55416
       },
       {
         "name": "arched_window",
@@ -70,7 +70,7 @@
         "vertices": 1308,
         "triangles": 2568,
         "surfaces": 1,
-        "bytes": 95524
+        "bytes": 95492
       },
       {
         "name": "entry_mat",
@@ -81,10 +81,10 @@
       },
       {
         "name": "farm_tools_sign",
-        "vertices": 2454,
-        "triangles": 4228,
+        "vertices": 4984,
+        "triangles": 7572,
         "surfaces": 1,
-        "bytes": 363444
+        "bytes": 620676
       },
       {
         "name": "sales_counter",
@@ -112,7 +112,7 @@
         "vertices": 2072,
         "triangles": 3924,
         "surfaces": 1,
-        "bytes": 155244
+        "bytes": 155372
       },
       {
         "name": "front_display",
@@ -147,7 +147,7 @@
         "vertices": 282,
         "triangles": 544,
         "surfaces": 1,
-        "bytes": 21128
+        "bytes": 21160
       },
       {
         "name": "seed_crop_1",
@@ -175,7 +175,7 @@
         "vertices": 1696,
         "triangles": 3292,
         "surfaces": 1,
-        "bytes": 278912
+        "bytes": 278848
       },
       {
         "name": "long_tools_wall",
@@ -203,38 +203,52 @@
         "vertices": 8140,
         "triangles": 15768,
         "surfaces": 1,
-        "bytes": 497576
+        "bytes": 497480
       },
       {
         "name": "display_dressing",
         "vertices": 8386,
         "triangles": 16100,
         "surfaces": 1,
-        "bytes": 558544
+        "bytes": 558384
       },
       {
         "name": "wall_dressing",
         "vertices": 2120,
         "triangles": 4116,
         "surfaces": 1,
-        "bytes": 163204
+        "bytes": 162948
+      },
+      {
+        "name": "front_sack_crate",
+        "vertices": 1176,
+        "triangles": 2268,
+        "surfaces": 1,
+        "bytes": 76808
+      },
+      {
+        "name": "counter_extra_pots",
+        "vertices": 480,
+        "triangles": 948,
+        "surfaces": 1,
+        "bytes": 36248
       },
       {
         "name": "metal_fittings",
         "vertices": 2506,
         "triangles": 4656,
         "surfaces": 1,
-        "bytes": 193052
+        "bytes": 192812
       }
     ],
-    "unique_triangles": 84479,
-    "scene_triangles": 97986,
-    "static_draw_surfaces": 41,
-    "glb_bytes": 3359860,
-    "atlas_bytes": 2778673,
-    "placed_instances": 41,
+    "unique_triangles": 91039,
+    "scene_triangles": 104546,
+    "static_draw_surfaces": 43,
+    "glb_bytes": 3729460,
+    "atlas_bytes": 2787875,
+    "placed_instances": 43,
     "materials": 2,
-    "local_scene_triangles": 90192,
+    "local_scene_triangles": 96752,
     "shared_scene_triangles": 7794,
     "shared_assets": [
       {
@@ -308,45 +322,47 @@
   },
   "video": {
     "duration_seconds": 15.0,
-    "sha256": "a03d7d6dac89db6eed681b7d3c970f4c3f809dcf70728afab8e6bd2e02168dda"
+    "sha256": "a440e7768c928ea9a9008374ae3730aea00427a48993d7a91d60895521729b3e"
   },
   "hashes": {
-    "assets/rooms/farm_tools_store/room_shell.glb": "35a2cdc90136e095dd31b8b8cb51cdc82a44714af9926dc255c43caa9d69395d",
-    "assets/rooms/farm_tools_store/window_wall.glb": "44f81dab428107bd1e1bdbd71152ea3bdb5887942ee58798bfcb7226ca8cbeb3",
-    "assets/rooms/farm_tools_store/back_wall.glb": "170a63e6614684b25b583f71273b38e72f183842150c15c2004029a32a170dbe",
-    "assets/rooms/farm_tools_store/arched_window.glb": "e42fafbccf8e0f14ef62b143f6320e82b344c1b1dbf659ee7dfec5ee7112fca0",
-    "assets/rooms/farm_tools_store/window_garden.glb": "252a6f4320fe894bc7c45fb671428bcaf0af1967623026007d541b2252b00f27",
-    "assets/rooms/farm_tools_store/green_door.glb": "921089dbb97c366cc030db7ff44d69e26e3bcc8d12f6b2e1db032f37a008a95d",
-    "assets/rooms/farm_tools_store/entry_mat.glb": "b67f3d8936c2cfd0545510571406688071e9acdd349dd150d91b3aefe1264e2b",
-    "assets/rooms/farm_tools_store/farm_tools_sign.glb": "0c6d20067da189b6e102b097d8cad1097546f14b7f9f039128153f37a4a628ab",
-    "assets/rooms/farm_tools_store/sales_counter.glb": "6c73f6ec80c32c4642590d436767a2d8a9454a58f64c9a282a82076a885d7efc",
-    "assets/rooms/farm_tools_store/seed_wall_shelf.glb": "20662b3aed92a816483cbddbaf85634e5b8805ca68f8feed7fc962f3a5bafcaa",
-    "assets/rooms/farm_tools_store/pot_wall_shelf.glb": "de70b2d7abb6231b8c5bab0a372035c0bb61f0107779b8e6cf0c6d718c863cfd",
-    "assets/rooms/farm_tools_store/hand_tools_board.glb": "5a70c5351eba74e362512e4dc41131375002450e436c47c4b6f021e92d02c09d",
-    "assets/rooms/farm_tools_store/front_display.glb": "4314046a0afa88aee7476eeb4bb695d4f1f1704c51cfd5c4cbbe346a1a5b6e06",
-    "assets/rooms/farm_tools_store/entry_crate.glb": "6d2152c02fc6a6be8df313a6f22d65c747a65ef2b25c4aa98df0bebcd2ba7e82",
-    "assets/rooms/farm_tools_store/door_lantern.glb": "3fbfe38b48aef7d0f60b10541a6c941a780cc80c65e15dd3d327e59481200b19",
-    "assets/rooms/farm_tools_store/door_frame.glb": "ebc21e967221de19ab7676403e7669dff63dd1f099f3c9a334899a7866b1fc83",
-    "assets/rooms/farm_tools_store/seed_crop_0.glb": "91a6c9f02c7e438c9745fb0b99cda2f1db083a70281696b5675ff6e4a6051045",
-    "assets/rooms/farm_tools_store/seed_crop_1.glb": "1b174e9a777430fe80479ffc82a48db3498df201238171924aabde805091d7b0",
-    "assets/rooms/farm_tools_store/seed_crop_2.glb": "6c84b2834b889cb396b8656b2f511f2cced122a2e9e2f161164a92bb988e2dd8",
-    "assets/rooms/farm_tools_store/seed_crop_3.glb": "e391ce420359dac6e82f7ec3d5677a8a28716b1af03d9a1990df42744a7d91f3",
-    "assets/rooms/farm_tools_store/tool_barrel.glb": "2ed3a0f4198c4c2f8a4add53ae4902b9abd467e62b9cf264c41b7b09a79ce389",
-    "assets/rooms/farm_tools_store/long_tools_wall.glb": "4f7d59bee9df39b44d77244e9ebdf5d6fc2e9e7f8c0bd60551b515975028898a",
-    "assets/rooms/farm_tools_store/left_sack_crate.glb": "2d4b43182c15a9856dee82d61986440336315784e638b9a070096f3bf5605ac9",
-    "assets/rooms/farm_tools_store/counter_side_stock.glb": "c23f40263c9b6fb0a15b8157e05f4f4bb7dafdce6fe96361d38a6d1b16f25f01",
-    "assets/rooms/farm_tools_store/counter_dressing.glb": "d72dafda70f6245641be3bcde1cd0328fb4e69d4f66307cbe1e735df47ee420d",
-    "assets/rooms/farm_tools_store/display_dressing.glb": "c572406769aa0e2558d54ad7440242b4df2c45d7807a84d5921f355ff7d78e62",
-    "assets/rooms/farm_tools_store/wall_dressing.glb": "3e91d1c5e7ba573ca62bdcb50328b5974414638a7dbf612b1b03ff927c4471c0",
-    "assets/rooms/farm_tools_store/metal_fittings.glb": "1628ee73aec444d87a00550e3862125511fa77053bfae892649d7b16f3e14ad8",
+    "assets/rooms/farm_tools_store/room_shell.glb": "25473e7222a01e0c2ee75d2c34df2a304062c192b1193b309cb489b3dd1340c1",
+    "assets/rooms/farm_tools_store/window_wall.glb": "3e5572b009913f2fc1943afec70de7428cd354574f74e8411e9e7fb5cfcaaac7",
+    "assets/rooms/farm_tools_store/back_wall.glb": "df7d6e29ee765c8ff1fee2fc6e3f4fb9ceb965218ae3ca08771ae6e1d6a56067",
+    "assets/rooms/farm_tools_store/arched_window.glb": "da567a78aaf8404463ebd3ccda92e161a9d6e55e08717828231df65574edf3c4",
+    "assets/rooms/farm_tools_store/window_garden.glb": "67d01d261e54ff8fdbd1d18c4bb303faeb884b3d27094f88c478911b387e165a",
+    "assets/rooms/farm_tools_store/green_door.glb": "bdbfeb98e5a6ee5bf23c9f1dc2951fc8da7aefd8022357dcd225ae7aa9e6b5c3",
+    "assets/rooms/farm_tools_store/entry_mat.glb": "d451e9f9e08fd5f4ce9644aae4e3d03f908ca89297c5c1c7e477e036ff82a84c",
+    "assets/rooms/farm_tools_store/farm_tools_sign.glb": "d9d5a543fb5fd1450e4ed47b8b46106998617e7bf4718bba089b084db5087f6c",
+    "assets/rooms/farm_tools_store/sales_counter.glb": "72f2956ab9c6705ceb071f1e8f982e73838e07004e3564ea75dfc3105d4037dc",
+    "assets/rooms/farm_tools_store/seed_wall_shelf.glb": "b645fe88a2b78c71ecaa121f419df8c1031879caef2e6c9e94bbbdbb7f1eedad",
+    "assets/rooms/farm_tools_store/pot_wall_shelf.glb": "2d836caefeb42eb1c9c0d120516d6e6940ee43148ac1e27516147a76adedfa0c",
+    "assets/rooms/farm_tools_store/hand_tools_board.glb": "5c9c65692920bd4d5aed524bf32c75313b55b95c8bd3cfe56605d97b79abb22b",
+    "assets/rooms/farm_tools_store/front_display.glb": "01530688100c5dfe02d4afb6eeb76f1b3b315b1641b7b21203a8b16967b4d91c",
+    "assets/rooms/farm_tools_store/entry_crate.glb": "dba577fdfa0ee364731fb27427d8b2dea1c1c31000a82af45004bbe1202b4171",
+    "assets/rooms/farm_tools_store/door_lantern.glb": "6515b1f2b2d4636f1a076fe4e094901e7c0841f35f48369162eb1992c5c64c83",
+    "assets/rooms/farm_tools_store/door_frame.glb": "69d5374146d9d8c00d44a8c4f9d7fb6c0c535a213d91a68ac4a3a917809b75ab",
+    "assets/rooms/farm_tools_store/seed_crop_0.glb": "bef712767e455c107ff0ddaa6788d58b84ef59c3c6eb567b5c97bbb9659890db",
+    "assets/rooms/farm_tools_store/seed_crop_1.glb": "a834d688bf15be331968d77357249408f7e350fa581f750f6dc635f2c94d9e1f",
+    "assets/rooms/farm_tools_store/seed_crop_2.glb": "82103c2e080a361ae733dc1bdaa3af00f313031d160b7a107712e60ad130ddc5",
+    "assets/rooms/farm_tools_store/seed_crop_3.glb": "ff0fa240c1898ea522c90c9cc9a42f9adb2e5c8082ead7cb33e5def672851c08",
+    "assets/rooms/farm_tools_store/tool_barrel.glb": "5b94d0eb85d9d798a29c6fc9a9b06e45aa45ff6cbb83bcb2bd4d2989d498dbac",
+    "assets/rooms/farm_tools_store/long_tools_wall.glb": "ae05e83ee9fec7e7c0d0ead01f922a4b52b57156feb5fd75139284f0eb33ad60",
+    "assets/rooms/farm_tools_store/left_sack_crate.glb": "02b83311946ae76c23963e98575733aa3410084a2cc573b089fa62c52918b697",
+    "assets/rooms/farm_tools_store/counter_side_stock.glb": "8970c3e712c6d76c2d5e563478c4c43933eaca9e11e14bf90e73514971d0732b",
+    "assets/rooms/farm_tools_store/counter_dressing.glb": "625e0c23058504eefea8e568b775ede231a5f9072bbf4ccb891b388684b09aaf",
+    "assets/rooms/farm_tools_store/display_dressing.glb": "387fa2eb0471959ea0756245734566a307d6129935636d81978268ec8934a074",
+    "assets/rooms/farm_tools_store/wall_dressing.glb": "c4d444f6633e3fdc865e3066e0be33a3b427504f2bbb156835a46fcd4ccfc925",
+    "assets/rooms/farm_tools_store/front_sack_crate.glb": "2b235295811225312bdb4b671a8b0262b4002586a2d39bf13936f26aead35f86",
+    "assets/rooms/farm_tools_store/counter_extra_pots.glb": "d490124252f55e0cb0f11b86b4f2731e1cc92cfff6e6a855a38912dcf2c560d5",
+    "assets/rooms/farm_tools_store/metal_fittings.glb": "b5b9d3d1d6a3c5423c92db5e6bf7bbedbbcea572df08f3f4bc4588054302294f",
     "assets/rooms/_shared/plants/monstera_woven.glb": "d130e2ddb7f5b1dfb31f2d1327ce6b743758c60787aa77d5b299ce7721027ab4",
     "assets/rooms/_shared/plants/pot_terracotta.glb": "2f182c751ffd0da50b10c9b92a14f78054da52ab8009b8906ea54fa8289dd171",
     "assets/rooms/_shared/plants/pothos.glb": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
-    "assets/rooms/farm_tools_store/room_albedo_ao.png": "b5bc2e68286ae8b1f832dc65bc4ed1248fbc251fa9ad22a1b58e49b81de503db",
-    "assets/rooms/_shared/plants/room_albedo_ao.png": "dfa29771ce118b5441cee6116e316c7644c558ca0f6e612d80529294a71c2dc3",
+    "assets/rooms/farm_tools_store/room_albedo_ao.png": "82fc94adef684da58e3386faeed200da3527700aec29a30f83a5e4393ec386d8",
+    "assets/rooms/_shared/plants/room_albedo_ao.png": "713c9f88ad08d91fccb6f2b0f1969162cbb6381367e632919ec8159ccf810b4a",
     "assets/rooms/_shared/plants/material.tres": "f75e3970edd6f8caeaa485218465d51f718b0caee941923ee5825da94adf791b",
-    "tools/art/source/farm_tools_store/farm_tools_store.blend": "bef61f8f965535952ee9fe2c3df45c2f858bea7592f8180a4512393f23c6c205",
-    "assets/rooms/farm_tools_store/layout.json": "e3c0dc6b44f4d89952742a69d9e74dd8e282251c9da03a7338ccc091e0b64755"
+    "tools/art/source/farm_tools_store/farm_tools_store.blend": "9855634ca6dd79faf82146ec5c2a985929d960253426a67e257daaa5cf1475c8",
+    "assets/rooms/farm_tools_store/layout.json": "45821c0aed7a08c6d116fe82c1f54fc9a8f482395a01df9c4bd4cb9bc53440df"
   },
   "scope": "Zhao Yun scene art revision; actual desktop rendered benchmark. No production update or physical-phone GPU claim."
 }
