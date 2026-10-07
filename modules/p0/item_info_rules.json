@@ -11,7 +11,8 @@
     "promote: the button id that becomes primary when its own `when` holds, demoting the default primary (Deliver over Eat).",
     "lock: the title-area lock icon is shown; price: the buy row has a price column; quota: the sell area shows the quota line.",
     "Capability flags (can_store, can_lock, can_gift) gate actions the P0 server can't do yet: no button and no grey text until the view carries the feature (storage, locked on bag stacks, residents / social).",
-    "Rarity and dish stars sit on the card's state line (spec.rarity_text, spec.quality), not in facts."
+    "Rarity and dish stars sit on the card's state line (spec.rarity_text, spec.quality), not in facts.",
+    "any/<context> is the fallback for every kind (storage: Take 10 shows only when more than 10 are stored; both send take_out with qty 10 / \"all\")."
   ],
   "seed/bag": {
     "facts": [
@@ -54,6 +55,10 @@
           {
             "when": "!unlocked",
             "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
           },
           {
             "when": "sold_out",
@@ -377,6 +382,10 @@
             "label": "{gate_text}"
           },
           {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
             "when": "sold_out",
             "label": "Sold out · {restock_in}"
           },
@@ -427,6 +436,10 @@
           {
             "when": "!unlocked",
             "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
           },
           {
             "when": "!can_afford",
@@ -499,6 +512,81 @@
         "label": "Locked",
         "kind": "unavailable",
         "when": "recyclable & locked"
+      }
+    ]
+  },
+  "fert/bag": {
+    "facts": [
+      "{count}"
+    ],
+    "buttons": [
+      {
+        "id": "pin",
+        "label": "{pin_verb}",
+        "kind": "secondary"
+      },
+      {
+        "id": "store",
+        "label": "Store",
+        "kind": "secondary",
+        "when": "can_store",
+        "unless": [
+          {
+            "when": "!at_home",
+            "label": "At home only"
+          }
+        ]
+      }
+    ],
+    "lock": true
+  },
+  "any/storage": {
+    "facts": [
+      "{stored} · Farm Storage"
+    ],
+    "buttons": [
+      {
+        "id": "take_out",
+        "label": "{take_some}",
+        "kind": "secondary",
+        "when": "take_some & at_home",
+        "payload": {
+          "qty": 10
+        }
+      },
+      {
+        "id": "take_out",
+        "label": "Take all",
+        "kind": "primary",
+        "payload": {
+          "qty": "all"
+        },
+        "unless": [
+          {
+            "when": "!at_home",
+            "label": "At home only"
+          }
+        ]
+      }
+    ]
+  },
+  "pick/gear": {
+    "facts": [
+      "{pick_effect}",
+      "{pick_source}"
+    ],
+    "buttons": [
+      {
+        "id": "equipped",
+        "label": "✓ Equipped",
+        "kind": "unavailable",
+        "when": "owned & equipped"
+      },
+      {
+        "id": "equip",
+        "label": "Equip",
+        "kind": "secondary",
+        "when": "owned & !equipped"
       }
     ]
   }
