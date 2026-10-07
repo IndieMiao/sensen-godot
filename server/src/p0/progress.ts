@@ -9,6 +9,7 @@ export type P0Event =
   | { kind: 'xp'; skill: Skill; amount: number; percent: number }
   | { kind: 'item'; id: string; delta: number }
   // Warming Cabinet (§7.7): delta portions in (+) or out (−); to_bag = portions that went to the bag instead (cabinet full) or out to it (Take one).
+  // Once the cabinet is unlocked every kept dish sends one, so a dish that all went to the bag has delta 0 (Cabinet full · … sent to bag).
   | { kind: 'cabinet'; id: string; delta: number; to_bag: number; have: number; cap: number }
   | { kind: 'coins'; delta: number }
   | { kind: 'first'; what: string; xp: number }

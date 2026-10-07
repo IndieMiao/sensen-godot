@@ -119,7 +119,7 @@ describe('kitchen storage (SGODOT-226)', () => {
     s = readyPot(r.s);
     s.bag_cap = 1;
     s.bag = [{ id: 'fish_crucian', qty: 1 }];
-    expect(refused(s, { type: 'collect', taps: [] })).toEqual({ code: 'bag_full', detail: { cabinet: true } });
+    expect(refused(s, { type: 'collect', taps: [] })).toEqual({ code: 'bag_full', detail: { cabinet: true, extra: 0 } });
     // …but COOK-4 Eat still works straight from the pot.
     s.energy = { value: 100, tick_ms: T0 };
     r = step(s, { type: 'collect', taps: [], eat: true });
@@ -154,5 +154,18 @@ describe('kitchen storage (SGODOT-226)', () => {
     full.bag_cap = 1;
     full.bag = [{ id: 'fish_crucian', qty: 1 }];
     expect(refused(full, { type: 'cabinet_take', item: 'dish_grilled_crucian' }).code).toBe('bag_full');
+    // The cabinet is in the farmhouse: away spaces are refused; older clients without a space keep working.
+    expect(refused(s, { type: 'cabinet_take', item: 'dish_grilled_crucian', space: 'pond' }).code).toBe('not_home');
+    expect(refused(s, { type: 'eat', item: 'dish_grilled_crucian', from: 'cabinet', space: 'outpost' }).code).toBe('not_home');
+    expect(step(s, { type: 'eat', item: 'dish_grilled_crucian', from: 'cabinet', space: 'home' }).s.cabinet).toEqual([{ id: 'dish_grilled_crucian', qty: 1 }]);
+  });
+
+  it('Eat from a full kitchen still needs a place for a Perfect pot\'s extra portion', () => {
+    const s = readyPot(atLevel(2));
+    s.stove!.heats = [{ at: 0, spin: 1000, gold: 0.4, width: 0.2 }, { at: 2000, spin: 1000, gold: 0.4, width: 0.2 }];
+    s.bag_cap = 1;
+    s.bag = [{ id: 'fish_crucian', qty: 1 }];
+    s.energy = { value: 100, tick_ms: T0 };
+    expect(refused(s, { type: 'collect', taps: [500, 2500], eat: true })).toEqual({ code: 'bag_full', detail: { cabinet: false, extra: 1 } });
   });
 });

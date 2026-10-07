@@ -139,7 +139,8 @@ export function heatHits(c: P0Content, heats: Heat[], taps: number[]): number {
 }
 
 /** Collect a ready pot. The portions go the Keep way (Warming Cabinet → bag). With eat: true (COOK-4 Eat) the
- * main portion is eaten from the pot instead, so a full cabinet and bag never block eating (§7.2.6). */
+ * main portion is eaten from the pot instead, so a full cabinet and bag never block eating one portion (§7.2.6);
+ * a Perfect pot's extra portion still needs a place (bag_full with detail.extra: 1). */
 export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?: unknown }, now: number, events: P0Event[], max: number): Refusal | null {
   const pot = s.stove;
   if (!pot) return { code: 'stove_empty' };
@@ -155,7 +156,7 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?
   const portions: [string, number][] = [];
   if (!eat) portions.push([main, 1]);
   if (extra) portions.push([pot.dish, 1]);
-  if (!dishesFit(c, s, portions)) return { code: 'bag_full', detail: { cabinet: cabinetCap(c, s) > 0 } };   // the dish stays on the stove
+  if (!dishesFit(c, s, portions)) return { code: 'bag_full', detail: { cabinet: cabinetCap(c, s) > 0, extra } };   // the dish stays on the stove
   s.stove = null;
   for (const [id, n] of portions) routeDish(c, s, id, n, events);
   const firstKey = `cook:${pot.dish}`;
