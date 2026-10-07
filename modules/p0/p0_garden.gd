@@ -12,16 +12,17 @@ const ROWS := 5
 const PLOT_ORIGIN := Vector2i(4, 3)   # plot 0 sits nearest the camera, on the left
 const BED_H := 0.15                   # soil bed thickness (plot.glb top), crops grow from here
 
-## Point anchors (cells). The house faces the field; the stall (seed box for now) stands on its right.
+## Point anchors (cells). The house faces the field; the stall (seed box for now) stands on its right and the
+## rest bench (FARM-7, q(30)) on its left, two cells wide, clear of the beds, the stall and the mine.
 const ANCHORS := {
 	"spawn": Vector2i(9, 1), "exit": Vector2i(9, 0),
 	"house": Vector2i(9, 16), "storage": Vector2i(14, 15),
-	"well": Vector2i(17, 8), "mine": Vector2i(2, 14),
+	"well": Vector2i(17, 8), "mine": Vector2i(2, 14), "bench": Vector2i(5, 16),
 }
 ## Solid footprints beyond the plots (inclusive rects: x, y, w, h).
 const FOOTPRINTS := {
 	"house": Rect2i(8, 15, 4, 3), "storage": Rect2i(14, 15, 1, 1),
-	"well": Rect2i(17, 8, 1, 1), "mine": Rect2i(1, 13, 2, 2),
+	"well": Rect2i(17, 8, 1, 1), "mine": Rect2i(1, 13, 2, 2), "bench": Rect2i(5, 16, 2, 1),
 }
 ## Scenery trees stand outside the walkable yard, so they are not footprints.
 const WALK_RECT := Rect2i(1, 0, 19, 20)

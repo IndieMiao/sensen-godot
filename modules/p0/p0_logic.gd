@@ -635,3 +635,37 @@ static func _rod_offer(view: Dictionary, id: String) -> Dictionary:
 	for r in view.get("gear", {}).get("rods", []):
 		if str(r.get("id", "")) == id: return r.merged({"price": _shop_price(view, "tackle", id, int(r.get("price", 0)))})
 	return {}
+
+# ---------------------------------------------------------------- rest bench (FARM-7, q(30) / q(41), SGODOT-224)
+## The bench's state from view.rest {used, limit, resets_in, amount, away_h, away_ready_in} and Energy (FARM-7-2 482:52):
+## state "ready" / "away" (2 h away from home first, q(41)) / "used" / "full"; the badge (STATE-ICONS: Available,
+## Countdown with the time left, Used today); the near card copy; the sheet's lines and its one button.
+## Near-full Rest says the real gain (WP4-D10 ②: "Rest · +25 Energy"). away_ready_in null = never left home.
+static func rest_state(view: Dictionary) -> Dictionary:
+	var r: Dictionary = view.get("rest", {})
+	var e: Dictionary = view.get("energy", {})
+	var amount := int(r.get("amount", 60))
+	var gain := mini(amount, maxi(0, int(e.get("max", 200)) - int(e.get("value", 0))))
+	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
+	var away = r.get("away_ready_in", 0)
+	var out := {
+		"state": "ready", "badge": "available", "caption": "",
+		"card": "Rest · +%d Energy · once a day" % amount,
+		"sheet_state": "Available", "effect": "Restores up to %d Energy" % amount,
+		"fact": "Uses left", "fact_value": "%d today" % maxi(0, int(r.get("limit", 1)) - int(r.get("used", 0))),
+		"button": ("Rest · +%d Energy" % gain) if gain < amount else "Rest", "reason": "", "can_rest": true,
+		"close": "Not now", "note": "",
+	}
+	if used:
+		out.merge({"state": "used", "badge": "used_today", "sheet_state": "Used today", "effect": "",
+			"fact": "Uses", "fact_value": "%d/%d" % [int(r.get("used", 0)), int(r.get("limit", 1))], "button": "", "can_rest": false,
+			"close": "Close", "note": "Available again at the next home-day reset."}, true)
+	elif away == null or float(away) > 0.0:
+		var left := "" if away == null else duration(float(away))
+		out.merge({"state": "away", "badge": "countdown", "caption": left, "sheet_state": "Cooling down", "effect": "",
+			"fact": "Available in" if away != null else "Away from home", "fact_value": left if away != null else "%dh first" % int(r.get("away_h", 2)),
+			"reason": ("Back in " + left) if away != null else "After %dh away" % int(r.get("away_h", 2)), "can_rest": false,
+			"close": "Close"}, true)
+	elif gain <= 0:
+		out.merge({"state": "full", "reason": "Energy full", "can_rest": false}, true)
+	return out
