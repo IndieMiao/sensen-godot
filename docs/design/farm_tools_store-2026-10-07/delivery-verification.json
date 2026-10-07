@@ -1,0 +1,189 @@
+{
+  "card": 174,
+  "revision": "R2",
+  "commit": "20b25ae7",
+  "plane": {
+    "comment_id": "39080036-026f-4489-8cf4-4eaf4d92aec9",
+    "state": "Review",
+    "commit": "20b25ae7",
+    "attachments": 23
+  },
+  "attachments": [
+    {
+      "name": "farm_tools_store-R2-README.md",
+      "id": "f92d62dd-138f-4c3a-b1c0-c7cfba5712a9",
+      "sha256": "9274c97574f4506be4eb57057362ee590a86a96a60a442e30434551765e5b43d",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-bench-collisions.png",
+      "id": "d305a03e-5d93-4614-a1cc-8fdcd1106966",
+      "sha256": "9a025b806fe53a037d842bd66a8c479644c3c1b1c3093f78ad460752ea99eb71",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-bench-door.png",
+      "id": "4c2f060d-8480-4e09-b96e-1c161eb54912",
+      "sha256": "6b97edb9c97a2304d81a7430a89e87305e18528c5d75ea970ff1dec4b7832a17",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-bench-main.png",
+      "id": "5a4059fd-afff-40b8-be72-127f440d3d9e",
+      "sha256": "527385e88e87bcae712df3567531e84242fad5e3935058bad6667875819721a4",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-bench-record-result.json",
+      "id": "d9b16035-22de-4b0e-8b30-a85e9478a67d",
+      "sha256": "62fb60c8a3cc94dc19430c5d1d59d63fd7d0fc32a7af307d22f58872c2941f31",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-bench-result.json",
+      "id": "65803bf3-df91-4d3f-a486-d5dd49240b56",
+      "sha256": "5de1e77d40cff822c9b296c5a653228cb9fc2e7c09b6c7dad567f9029ccb3349",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-bench-scale-measurements.json",
+      "id": "31871a92-991a-4d97-970d-72c1a78760fa",
+      "sha256": "809573679f526c501ad9d41f863b610178f2f7e93536a12782857928d1cb7913",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-bench-spawn.png",
+      "id": "abb1b6fc-a095-4bc3-8a3e-e7387fcf548e",
+      "sha256": "c337e5b16a82a4aa3293076492b6fb5d7964e78b353ea0dd15381e4b03bde996",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-bench-video-metadata.json",
+      "id": "5e4f5f29-7c14-4c7a-9e07-1e29a6730450",
+      "sha256": "f309bf186e61622f396e1f68587d4962a30ef5718e4916569e79ab319b077262",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-cloth-uv-verification.json",
+      "id": "84822961-ddab-4c29-832a-de98cfc37e38",
+      "sha256": "1255928deaf86caa5f37e6f923f9c4848c89fae4bc126ec1236d859a7ae954c5",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-colour-samples.png",
+      "id": "a956beb2-7396-40f8-80da-00ec9ec267dc",
+      "sha256": "c4b051fe550ffb9d332bf9303774cfa3d5332a4f54818b450c5461c9a1cd040d",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-colour-verification.json",
+      "id": "2698066c-4cae-43ca-beda-4301db91b778",
+      "sha256": "487e2c5933bbc7cc7968ea506b29de31660466de5ed0d846e09b3b88b53b4c4e",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-comparison.png",
+      "id": "bb8e4e44-0b30-40f7-9849-64d52d56f835",
+      "sha256": "c432272e811ffb055d3a5b2eac662f4940f017358baaae41ec2410102220efc1",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-detail-display.png",
+      "id": "a32e60f6-bb03-4aee-b69d-074b8cabbfb0",
+      "sha256": "47178f98489fad667e662b33f6c128942673b428e0742e70899c90e7b9078166",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-detail-tools.png",
+      "id": "e7da5a9f-2e98-4f46-8811-1b5318f04868",
+      "sha256": "5d45252d2786645c5fde0eb504052637c4a90c8c76dc7a5c2aa73c967795ea3b",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-godot.png",
+      "id": "10d40bab-6144-4ef7-9952-161bcc85b819",
+      "sha256": "1433373bd3060ab8a2a563e97df6c16937b56d7e4039ec7883eaf5bbc440a036",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-orthographic-sheet.png",
+      "id": "b81d3774-8a69-4d1c-8231-b6b436d7a77e",
+      "sha256": "bbe9ec99f4e1649c0414f151cc9f9498b1ec8c0b240e20c1b0de82d444801231",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-overlay-50.png",
+      "id": "d469d7eb-e844-4f7c-b183-59163aa73011",
+      "sha256": "281bedd1d5d7e3f38cec30307fafe22635f91c994c80b66170b61db9d0a24be6",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-production-notes.json",
+      "id": "13ca43dc-eb65-4a8c-8a2c-2b5dbe372a8b",
+      "sha256": "5c7d687a871534252e7a3a0c180e2de5221706fee0f15f3f0c981dd96eef86e6",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-source-scale.json",
+      "id": "b2b7a3bf-8128-4b42-8783-247ed33e106f",
+      "sha256": "4efca4b7ecbfbe4b3a24fe963c8b8df290bc9bd54710a417b019bb987c2b91f3",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-verification-summary.json",
+      "id": "9a20ee62-9267-499e-b0ad-a556e1c88bce",
+      "sha256": "0db83a9758e7df9d5f36490fb2723ad0032c58e825accfdc754d8c468b613915",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-video-frames.png",
+      "id": "7f4cca57-af94-4e8c-abe0-d8002e66a829",
+      "sha256": "35ba3052c21a64ec570dd311ef6a95cf3ce6dcacf64e15447c9cd6f2fbc73eab",
+      "verified": true
+    },
+    {
+      "name": "farm_tools_store-R2-walkthrough.mp4",
+      "id": "a29286f2-0484-4203-9ebd-ab3f22359478",
+      "sha256": "a03d7d6dac89db6eed681b7d3c970f4c3f809dcf70728afab8e6bd2e02168dda",
+      "verified": true
+    }
+  ],
+  "lark": [
+    {
+      "name": "note",
+      "message_id": "om_x100b6354eeb968a8c4f69bb957fe327",
+      "download_verified": null,
+      "sha256": null
+    },
+    {
+      "name": "image-0",
+      "message_id": "om_x100b6354ee5970b0c362c067cb494cb",
+      "download_verified": true,
+      "sha256": "c432272e811ffb055d3a5b2eac662f4940f017358baaae41ec2410102220efc1"
+    },
+    {
+      "name": "image-1",
+      "message_id": "om_x100b6354ee7528a8dfa4ea6e38a804f",
+      "download_verified": true,
+      "sha256": "47178f98489fad667e662b33f6c128942673b428e0742e70899c90e7b9078166"
+    },
+    {
+      "name": "image-2",
+      "message_id": "om_x100b6354ee27c8a4dfa6c17e07a33dd",
+      "download_verified": true,
+      "sha256": "5d45252d2786645c5fde0eb504052637c4a90c8c76dc7a5c2aa73c967795ea3b"
+    },
+    {
+      "name": "image-3",
+      "message_id": "om_x100b6354efcb7c70c07c026c4085249",
+      "download_verified": true,
+      "sha256": "527385e88e87bcae712df3567531e84242fad5e3935058bad6667875819721a4"
+    },
+    {
+      "name": "video",
+      "message_id": "om_x100b6354ef8c4d3cdee5cc170608d90",
+      "download_verified": true,
+      "sha256": "a03d7d6dac89db6eed681b7d3c970f4c3f809dcf70728afab8e6bd2e02168dda"
+    }
+  ]
+}
