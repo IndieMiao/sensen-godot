@@ -721,6 +721,18 @@ static func material_source(view: Dictionary, id: String) -> Dictionary:
 	var label := item_name(view, id)
 	return {"text": label if places.is_empty() else "%s · %s" % [label, " or ".join(places)], "go": ""}
 
+## PLAQUE-READ (Figma 1510:97745): the Upgrade Plaque's lines, one per Homestead upgrade, "Lv2" / "Oct 5" in the
+## device's time zone. Empty until the first upgrade (the plaque appears in the yard with its first line).
+const MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+static func plaque_lines(view: Dictionary, bias_min := 999999) -> Array:
+	var bias := bias_min if bias_min != 999999 else int(Time.get_time_zone_from_system().get("bias", 0))
+	var out: Array = []
+	for p in view.get("homestead", {}).get("plaque", []):
+		var d := Time.get_datetime_dict_from_unix_time(int(float(p.get("at", 0)) / 1000.0) + bias * 60)
+		out.append({"label": "Lv%d" % int(p.get("level", 1)), "value": "%s %d" % [MONTHS[int(d.month) - 1], int(d.day)]})
+	return out
+
 ## HOME-2 MomentBanner (Figma 482:154 / 1228:108620) from the server's homestead event: level disc, title,
 ## what changed (Energy refilled to the new max) and one line of consequences.
 static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:

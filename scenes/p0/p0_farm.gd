@@ -43,6 +43,8 @@ var _sync_t := 0.0
 var _cooking: P0Cooking
 var _fence: Node3D   # p0_fence.gd: front stretch always, the ring from Homestead Lv3
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
+var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
+var _plaque_node: Node3D
 
 func _ready() -> void:
 	P0Runtime.mark("%s _ready start" % name)
@@ -108,6 +110,13 @@ func _build_world() -> void:
 	_sign = P0Garden.sign_point(bp)
 	props.add_child(FarmArt.instance("sign", _sign, 0.8))
 	P0Garden.block_points(bp, [_sign])
+	# The Upgrade Plaque: art placeholder (a smaller sign.glb) until its model lands; solid even before it shows.
+	_plaque = P0Garden.plaque_point(bp)
+	_plaque_node = FarmArt.instance("sign", _plaque, 0.6)
+	_plaque_node.rotation.y = 0.35
+	_plaque_node.visible = false
+	props.add_child(_plaque_node)
+	P0Garden.block_points(bp, [_plaque])
 	grid = BlueprintGrid.new(bp)
 	# One thick soil bed per plot (plot.glb), tinted per state (watered beds read darker).
 	var xfs: Array = []
@@ -315,6 +324,9 @@ func p0_tap(screen: Vector2) -> void:
 	if _sign_hit(screen):
 		actor.face(_sign)
 		HomePanel.open(rt.ui)
+	elif _plaque_node.visible and cam.unproject_position(_plaque + Vector3(0, 0.35, 0)).distance_to(screen) < 34:
+		actor.face(_plaque)
+		HomePanel.plaque(rt.ui)
 	elif cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
 		actor.face(_stall)
 		rt.ui.open_stall()
@@ -343,6 +355,10 @@ func _tags(v: Dictionary) -> void:
 	rt.ui.tag("homestead", "Homestead Lv%d" % int(h.get("level", 1)), cam.unproject_position(_sign + SIGN_BADGE), true,
 		nxt is Dictionary and bool(nxt.get("can_upgrade", false)))
 	rt.ui.lift_tag("homestead", "stall")
+	# TapCard (LOCK-07): only near the plaque; tapping the card = tapping the plaque (the card sits right above it).
+	_plaque_node.visible = not h.get("plaque", []).is_empty()
+	rt.ui.tag("plaque", "Upgrade Plaque · Tap to read", cam.unproject_position(_plaque + Vector3(0, 0.85, 0)),
+		_plaque_node.visible and actor.position.distance_to(_plaque) < 2.6)
 
 func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return
@@ -412,6 +428,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_sync_t = 9999.0
 		"home": rt.ui.open_home_card()
 		"sign": p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)))   # HOME-1 through the sign's own tap
+		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
 		"moment":   # HOME-2 as after Lv2 → Lv3, without spending anything
 			HomePanel.moment(rt.ui, P0Logic.home_moment(rt.session.current(), {"level": 3, "unlocks": ["warming_cabinet", "bag_upgrade_1"]}))
 		"spot": p0_show_spot(step[1])

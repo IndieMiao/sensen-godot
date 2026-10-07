@@ -5,7 +5,8 @@ extends RefCounted
 
 const SHEET_TOP := 194.0        # sheet edge on the 360 × 800 frame; scrolling content above the fixed actions
 const MOMENT_TOP := 108.0       # MomentBanner sits under the HUD (x16 y108 w328)
-const MOMENT_S := 3.0           # ≤ 3 s, tap to skip
+const MOMENT_S := 3.0           # the first Homestead upgrade: 3 s; later ones MOMENT_LATER_S (§8.1.2 ②); tap to skip
+const MOMENT_LATER_S := 1.5
 
 ## HOME-1 over the farm. at_home false (e.g. from the Profile farm card) puts "Go home to upgrade" on the button.
 static func open(ui: P0Ui, at_home := true) -> void:
@@ -105,6 +106,34 @@ static func _source(ui: P0Ui, tile: Control, id: String) -> void:
 	var layer := UiNeedSource.popup(ui.root, tile.get_global_rect(), str(src.text), on_show)
 	layer.theme = UiKit.theme()
 
+## PLAQUE-READ (Figma 1510:97745): read-only, only ×. ObjectHeader "Upgrade Plaque" / "Homestead LvN", one fact per
+## upgrade with its date. TODO(224): swap for the InfoSheet once it lands; the content stays the same.
+static func plaque(ui: P0Ui) -> void:
+	var view: Dictionary = ui.view
+	var holder := Control.new()
+	holder.theme = UiKit.theme()
+	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var panel := PanelContainer.new()
+	panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	var sheet := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_SHEET, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+	panel.add_theme_stylebox_override(&"panel", sheet.with_margins(16, 16, 16, 24 + ui.safe_bottom()))
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override(&"separation", 8)
+	panel.add_child(col)
+	col.add_child(UiObjectHeader.new({"title": "Upgrade Plaque", "state": "Homestead Lv%d" % int(view.get("homestead", {}).get("level", 1))}))
+	for line in P0Logic.plaque_lines(view): col.add_child(UiFactRow.new(str(line.label), str(line.value)))
+	holder.add_child(panel)
+	var close := UiCloseButton.new()   # floats 6 above the sheet's top-right corner
+	close.pressed.connect(ui.close_modal)
+	holder.add_child(close)
+	panel.resized.connect(func():
+		close.position = Vector2(panel.size.x - 16 - UiTokens.SIZE_CLOSE, panel.position.y - 6 - UiTokens.SIZE_CLOSE))
+	ui._open_modal(holder, 0.0, false)
+	ui.modal_kind = "plaque"
+
 ## HOME-2: the MomentBanner (Kind=LevelUp: gold accent and level disc) under the HUD for MOMENT_S, gone on a
 ## tap; never covers the main key or quick bar.
 static func moment(ui: P0Ui, m: Dictionary) -> Control:
@@ -162,7 +191,8 @@ static func moment(ui: P0Ui, m: Dictionary) -> Control:
 	card.gui_input.connect(func(e: InputEvent):
 		if P0Ui.is_tap(e) and is_instance_valid(card): card.queue_free())
 	ui.root.add_child(card)
-	ui.root.get_tree().create_timer(MOMENT_S).timeout.connect(func():
+	var seconds := MOMENT_S if int(str(m.level)) <= 2 else MOMENT_LATER_S
+	ui.root.get_tree().create_timer(seconds).timeout.connect(func():
 		if is_instance_valid(card): card.queue_free())
 	return card
 

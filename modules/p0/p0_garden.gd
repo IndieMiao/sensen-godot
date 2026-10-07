@@ -137,6 +137,12 @@ const SIGN_CELL := Vector2i(11, 14)
 static func sign_point(bp: FarmBlueprint) -> Vector3:
 	return bp.cell_to_world(SIGN_CELL)
 
+## The Upgrade Plaque (HOME-LV3-FENCE 1510:97492): left of the farmhouse door, mirroring the sign, from the first upgrade.
+const PLAQUE_CELL := Vector2i(7, 14)
+
+static func plaque_point(bp: FarmBlueprint) -> Vector3:
+	return bp.cell_to_world(PLAQUE_CELL)
+
 ## Mark scenery rocks solid: each rock blocks the cell it stands in (trees already stand outside the yard).
 static func block_points(bp: FarmBlueprint, points: Array) -> void:
 	for p in points:
