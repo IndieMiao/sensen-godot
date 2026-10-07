@@ -138,3 +138,8 @@ func test_back_while_seated_stands_up_and_walks_out() -> void:
 	for i in 30: r.p0_frame({}, 1.0 / 30.0)   # sit_up
 	_walk_until_idle(r, 8.0)
 	assert_int(left[0]).is_equal(1)
+
+func test_the_keeper_greeting_gets_names_and_places_from_the_outpost_data() -> void:
+	assert_dict(_room("sh_market_1").keeper_ctx()).is_equal({"keeper": "Mei", "place": "Xuhui Market Square"})
+	assert_dict(_room("sh_tackle_1").keeper_ctx()).is_equal({"keeper": "Finn", "place": "Xuhui Tackle Shop",
+		"nearest": {"name": "Reed Pond", "site": "pond"}})
