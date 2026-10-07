@@ -7,6 +7,8 @@ import storefront as s
 from kit import begin,cube,cylinder,tube,ellipsoid,lathe,leaf
 
 def geometry():
+    from liubei_r2 import enable_lettering
+    enable_lettering()
     k.PALETTE.update({'oak':'B28555','oak_light':'CFA56D','porcelain':'EFE4CF','plaster':'E8D1AF','leaf':'637F43','leaf_light':'8BA153'})
     s.shell(wall='E8D7B7',accent='C58E67',floor='D3AC77',wood=True,door_center=.40)
     # Terracotta top courses, matching the reference instead of the shared cream caps.

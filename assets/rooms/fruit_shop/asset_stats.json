@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3603037
+    "bytes": 3671629
   },
   "assets": [
     {
@@ -28,14 +28,14 @@
       "vertices": 1608,
       "triangles": 3132,
       "surfaces": 1,
-      "bytes": 103860
+      "bytes": 104020
     },
     {
       "name": "front_wall_left",
       "vertices": 560,
       "triangles": 1080,
       "surfaces": 1,
-      "bytes": 38540
+      "bytes": 38536
     },
     {
       "name": "front_wall_right",
@@ -84,7 +84,7 @@
       "vertices": 896,
       "triangles": 1728,
       "surfaces": 1,
-      "bytes": 62216
+      "bytes": 60904
     },
     {
       "name": "produce_display_table",
@@ -98,14 +98,14 @@
       "vertices": 1433,
       "triangles": 2616,
       "surfaces": 1,
-      "bytes": 104696
+      "bytes": 104600
     },
     {
       "name": "crate_lemon",
       "vertices": 1433,
       "triangles": 2616,
       "surfaces": 1,
-      "bytes": 104852
+      "bytes": 105012
     },
     {
       "name": "crate_fig",
@@ -119,14 +119,14 @@
       "vertices": 1433,
       "triangles": 2616,
       "surfaces": 1,
-      "bytes": 104436
+      "bytes": 104532
     },
     {
       "name": "crate_grape",
       "vertices": 1719,
       "triangles": 2824,
       "surfaces": 1,
-      "bytes": 144984
+      "bytes": 146520
     },
     {
       "name": "analog_scale",
@@ -144,10 +144,10 @@
     },
     {
       "name": "orchard_market_sign",
-      "vertices": 1213,
-      "triangles": 1409,
+      "vertices": 3002,
+      "triangles": 3472,
       "surfaces": 1,
-      "bytes": 71868
+      "bytes": 165976
     },
     {
       "name": "fruit_orange",
@@ -182,43 +182,57 @@
       "vertices": 59,
       "triangles": 76,
       "surfaces": 1,
-      "bytes": 7396
+      "bytes": 6884
     },
     {
       "name": "floor_orange_crate",
       "vertices": 1433,
       "triangles": 2616,
       "surfaces": 1,
-      "bytes": 104328
+      "bytes": 104264
     },
     {
       "name": "floor_fig_crate",
       "vertices": 1433,
       "triangles": 2616,
       "surfaces": 1,
-      "bytes": 104256
+      "bytes": 104384
     },
     {
       "name": "hanging_herbs_leaves",
       "vertices": 1496,
       "triangles": 2816,
       "surfaces": 1,
-      "bytes": 123100
+      "bytes": 124252
+    },
+    {
+      "name": "olive_crown_leaves",
+      "vertices": 2816,
+      "triangles": 2112,
+      "surfaces": 1,
+      "bytes": 104176
+    },
+    {
+      "name": "arch_vine_leaves",
+      "vertices": 520,
+      "triangles": 516,
+      "surfaces": 1,
+      "bytes": 21120
     }
   ],
-  "unique_triangles": 53037,
-  "scene_triangles": 63777,
-  "static_draw_surfaces": 36,
-  "unique_assets": 28,
-  "placed_instances": 36,
-  "glb_bytes": 2046668,
+  "unique_triangles": 57728,
+  "scene_triangles": 73160,
+  "static_draw_surfaces": 44,
+  "unique_assets": 30,
+  "placed_instances": 44,
+  "glb_bytes": 2267316,
   "scene_budget": {
     "after": {
-      "room_triangles": 63777,
-      "shared_plant_triangles": 41458,
-      "room_botanical_triangles": 2816,
-      "plant_triangles": 44274,
-      "total_triangles": 105235,
+      "room_triangles": 73160,
+      "shared_plant_triangles": 45158,
+      "room_botanical_triangles": 10136,
+      "plant_triangles": 55294,
+      "total_triangles": 118318,
       "static_surfaces": 21
     },
     "limits": {
@@ -262,7 +276,7 @@
           "fruit_peach",
           "fruit_grape"
         ],
-        "triangles": 1725,
+        "triangles": 3788,
         "cast_shadow": true
       },
       {
@@ -270,9 +284,17 @@
         "file": "res://assets/rooms/fruit_shop/batches/review_botanical.glb",
         "material": "room",
         "sources": [
-          "hanging_herbs_leaves"
+          "hanging_herbs_leaves",
+          "olive_crown_leaves",
+          "arch_vine_leaves",
+          "right_olive_crown_leaves",
+          "arch_foliage_01",
+          "arch_foliage_10",
+          "arch_foliage_11",
+          "arch_foliage_20",
+          "arch_foliage_21"
         ],
-        "triangles": 2816,
+        "triangles": 10136,
         "cast_shadow": false
       },
       {
@@ -297,9 +319,12 @@
           "DoorWhiteVine0",
           "DoorWhiteVine1",
           "BackWhiteVine0",
-          "BackWhiteVine1"
+          "BackWhiteVine1",
+          "LeftWallCrown0",
+          "LeftWallCrown1",
+          "BackCornerFlowering"
         ],
-        "triangles": 11702,
+        "triangles": 15402,
         "cast_shadow": false
       },
       {

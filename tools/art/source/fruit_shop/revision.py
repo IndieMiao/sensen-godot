@@ -90,7 +90,7 @@ def revise():
             k.bpy.data.objects.remove(old,do_unlink=True)
         begin(name,at=at,collision=[{'at':[0,.27,0],'size':[.90,.54,.70]}]);produce_crate(kind,rng,False)
     r.clear('striped_awning');s.awning(4.04,.66,('EEE6D3','DCCCAD'))
-    r.recolor('blue_shutter','4D768C',lambda o:'hinge' not in o.name.lower())
+    r.recolor('blue_shutter','4D7698',lambda o:'hinge' not in o.name.lower())
     k.KITS['blue_shutter']['yaw']=-17;k.KITS['blue_shutter']['root'].rotation_euler.z=math.radians(-17)
     for p in k.INSTANCES:
         if p['name']=='blue_shutter_2':p['rotation_degrees']=[0,21,0];p['yaw_degrees']=21
@@ -109,6 +109,8 @@ def revise():
     for j in range(17):cube('Woven mat stitch',(-.50+j*.062,.160,0),(.013,.006,.43),'D3AD71',0)
     # Hanging herb geometry counts as botanical and never casts leaf shadows.
     rec=k.KITS.pop('hanging_herbs');rec['root'].name='hanging_herbs_leaves';rec['collection'].name='KIT_hanging_herbs_leaves';k.KITS['hanging_herbs_leaves']=rec
+    from revision2 import revise as revise_r2
+    revise_r2()
     r.sync_instances()
     for p in k.INSTANCES:
         k.bpy.data.objects[p['name']].rotation_euler.z=math.radians(p.get('yaw_degrees',0))
@@ -123,4 +125,7 @@ def manifest():
     r.lighting(d,'A3D5DF',ambient='AABDD2',sun='FFE1BD',energy=1.42)
     d['lighting']['sun_position']=[6,9,4];d['review_lighting']['sun_position']=[6,9,4];d['camera']={'position':[10,10,12],'target':[0,1.05,.15],'size':10.2}
     from fruit_bench import bench
-    bench(d);p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)
+    bench(d)
+    from revision2 import manifest as manifest_r2
+    manifest_r2(d)
+    p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)

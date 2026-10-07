@@ -409,7 +409,7 @@
       "file": "orchard_market_sign.glb",
       "position": [
         -2.82,
-        1.57,
+        1.83,
         1.75
       ],
       "yaw_degrees": 90,
@@ -498,9 +498,9 @@
       "name": "floor_fig_crate",
       "file": "floor_fig_crate.glb",
       "position": [
-        1.35,
+        0.85,
         0.064,
-        1.54
+        1.3
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -527,6 +527,28 @@
         -2.57
       ],
       "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "olive_crown_leaves",
+      "file": "olive_crown_leaves.glb",
+      "position": [
+        -2.43,
+        0.07,
+        0.78
+      ],
+      "yaw_degrees": 65,
+      "colliders": []
+    },
+    {
+      "name": "arch_vine_leaves",
+      "file": "arch_vine_leaves.glb",
+      "position": [
+        -2.76,
+        2.95,
+        -1.29
+      ],
+      "yaw_degrees": 90,
       "colliders": []
     }
   ],
@@ -615,22 +637,87 @@
         -1.12
       ],
       "yaw_degrees": 0
+    },
+    {
+      "name": "right_olive_crown_leaves",
+      "asset": "olive_crown_leaves",
+      "position": [
+        2.55,
+        0.07,
+        -0.12
+      ],
+      "yaw_degrees": 150,
+      "scale": [
+        1.12,
+        1.12,
+        1.12
+      ]
+    },
+    {
+      "name": "arch_foliage_01",
+      "asset": "arch_vine_leaves",
+      "position": [
+        -2.76,
+        1.76,
+        -1.29
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "arch_foliage_10",
+      "asset": "arch_vine_leaves",
+      "position": [
+        -2.76,
+        2.95,
+        -1.09
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "arch_foliage_11",
+      "asset": "arch_vine_leaves",
+      "position": [
+        -2.76,
+        1.76,
+        -1.09
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "arch_foliage_20",
+      "asset": "arch_vine_leaves",
+      "position": [
+        -2.76,
+        2.95,
+        -0.89
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "arch_foliage_21",
+      "asset": "arch_vine_leaves",
+      "position": [
+        -2.76,
+        1.76,
+        -0.89
+      ],
+      "yaw_degrees": 90
     }
   ],
   "camera": {
     "position": [
-      10,
-      10,
-      12
+      10.30107384280216,
+      12.869589477489207,
+      10.903611465414878
     ],
     "target": [
-      0,
-      1.05,
-      0.15
+      0.021422273715398357,
+      1.582688516651345,
+      -0.02015911155038907
     ],
-    "size": 10.2
+    "size": 9.518447343421212
   },
-  "revision": "R1",
+  "revision": "R2",
   "shared_plants": [
     {
       "name": "LeftOlive",
@@ -639,7 +726,7 @@
       "position": [
         -2.43,
         0.07,
-        1.13
+        0.78
       ],
       "rotation_degrees": [
         0,
@@ -671,9 +758,9 @@
       "asset": "olive_tree",
       "file": "res://assets/rooms/_shared/plants/olive_tree.glb",
       "position": [
-        2.48,
+        2.55,
         0.07,
-        -1.95
+        -0.12
       ],
       "rotation_degrees": [
         0,
@@ -681,9 +768,9 @@
         0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        1.12,
+        1.12,
+        1.12
       ],
       "colliders": [
         {
@@ -1056,6 +1143,69 @@
         1.06
       ],
       "colliders": []
+    },
+    {
+      "name": "LeftWallCrown0",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        -2.78,
+        3.0,
+        -2.18
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "colliders": []
+    },
+    {
+      "name": "LeftWallCrown1",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        -2.78,
+        3.0,
+        -1.52
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "colliders": []
+    },
+    {
+      "name": "BackCornerFlowering",
+      "asset": "ivy_long",
+      "file": "res://assets/rooms/_shared/plants/ivy_long.glb",
+      "position": [
+        -2.35,
+        2.99,
+        -2.52
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.95,
+        0.95,
+        0.95
+      ],
+      "colliders": []
     }
   ],
   "boundaries": [
@@ -1223,7 +1373,7 @@
       {
         "name": "right_olive",
         "position": [
-          2.35,
+          1.7,
           0.06,
           -0.22
         ]
@@ -1301,12 +1451,12 @@
         "from": [
           2.5,
           0.06,
-          0.15
+          1.4
         ],
         "to": [
           3.6,
           0.06,
-          0.15
+          1.4
         ],
         "target": "/side_low_wall/"
       }
@@ -1412,8 +1562,8 @@
         "source": "Produce worktop .94+.06+.06-.05"
       },
       "chair": {
-        "height": 0.685,
-        "reason": "No chair in reference; baseline placeholder, not an invented prop."
+        "applicable": false,
+        "reason": "N/A: no chair in the reference or delivered scene; no placeholder measurement."
       },
       "table": {
         "height": 1.01,
@@ -1421,6 +1571,124 @@
       }
     }
   },
+  "botanical_assets": [
+    "olive_crown_leaves",
+    "hanging_herbs_leaves",
+    "arch_vine_leaves"
+  ],
+  "review_camera_fit": {
+    "method": "orthographic fit to plinth edge intersections; no model scaling or image warp",
+    "reference_size": [
+      1544,
+      1544
+    ],
+    "reference_corners_left_front_right": [
+      [
+        90,
+        998
+      ],
+      [
+        809,
+        1405
+      ],
+      [
+        1452,
+        995
+      ]
+    ],
+    "inferred_back": [
+      733,
+      588
+    ],
+    "footprint_m": [
+      6.18,
+      5.68
+    ],
+    "plinth_y": -0.15,
+    "render_size": [
+      1400,
+      1400
+    ],
+    "fitted_corners": [
+      [
+        78.42899612294082,
+        899.2718451455208
+      ],
+      [
+        740.3889399522734,
+        1273.8115930737088
+      ],
+      [
+        1312.9178152201227,
+        908.004644682325
+      ]
+    ],
+    "observed_letterboxed_corners": [
+      [
+        81.60621761658031,
+        904.9222797927462
+      ],
+      [
+        733.5492227979274,
+        1273.9637305699482
+      ],
+      [
+        1316.580310880829,
+        902.2020725388601
+      ]
+    ],
+    "residual_px": [
+      6.482449237919966,
+      6.841408960822078,
+      6.861757642529161
+    ],
+    "pitch_degrees": 36.96,
+    "yaw_degrees": 43.26000000000001,
+    "camera": {
+      "position": [
+        10.30107384280216,
+        12.869589477489207,
+        10.903611465414878
+      ],
+      "target": [
+        0.021422273715398357,
+        1.582688516651345,
+        -0.02015911155038907
+      ],
+      "size": 9.518447343421212
+    },
+    "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
+  },
+  "review_views": [
+    {
+      "name": "olive-sign-detail",
+      "position": [
+        3.8,
+        3.9,
+        6.2
+      ],
+      "target": [
+        -2.3,
+        1.45,
+        1.1
+      ],
+      "size": 3.35
+    },
+    {
+      "name": "vine-detail",
+      "position": [
+        3.4,
+        4.0,
+        5.2
+      ],
+      "target": [
+        -2.57,
+        2.1,
+        -1.0
+      ],
+      "size": 3.6
+    }
+  ],
   "render_batches": [
     {
       "name": "back_dressing",
@@ -1457,7 +1725,7 @@
         "fruit_peach",
         "fruit_grape"
       ],
-      "triangles": 1725,
+      "triangles": 3788,
       "cast_shadow": true
     },
     {
@@ -1465,9 +1733,17 @@
       "file": "res://assets/rooms/fruit_shop/batches/review_botanical.glb",
       "material": "room",
       "sources": [
-        "hanging_herbs_leaves"
+        "hanging_herbs_leaves",
+        "olive_crown_leaves",
+        "arch_vine_leaves",
+        "right_olive_crown_leaves",
+        "arch_foliage_01",
+        "arch_foliage_10",
+        "arch_foliage_11",
+        "arch_foliage_20",
+        "arch_foliage_21"
       ],
-      "triangles": 2816,
+      "triangles": 10136,
       "cast_shadow": false
     },
     {
@@ -1492,9 +1768,12 @@
         "DoorWhiteVine0",
         "DoorWhiteVine1",
         "BackWhiteVine0",
-        "BackWhiteVine1"
+        "BackWhiteVine1",
+        "LeftWallCrown0",
+        "LeftWallCrown1",
+        "BackCornerFlowering"
       ],
-      "triangles": 11702,
+      "triangles": 15402,
       "cast_shadow": false
     },
     {

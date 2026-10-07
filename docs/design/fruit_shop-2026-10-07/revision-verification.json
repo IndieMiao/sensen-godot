@@ -1,10 +1,10 @@
 {
-  "revision": "r1",
+  "revision": "r2",
   "reference_sha256": "6eedf62d50c01a2d659290c314b8427920723a3988530ddab41e99839d079ce7",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "draw_calls": 20.0,
-    "instances": 55,
+    "draw_calls": 14.0,
+    "instances": 66,
     "renderer": "mobile",
     "resolution": [
       1400,
@@ -35,24 +35,34 @@
         "view": "model-top"
       },
       {
-        "draw_calls": 18.0,
-        "rendered_objects": 18.0,
+        "draw_calls": 19.0,
+        "rendered_objects": 19.0,
         "view": "godot-detail"
       },
       {
-        "draw_calls": 20.0,
-        "rendered_objects": 20.0,
+        "draw_calls": 21.0,
+        "rendered_objects": 21.0,
         "view": "godot-detail-plants"
+      },
+      {
+        "draw_calls": 17.0,
+        "rendered_objects": 17.0,
+        "view": "olive-sign-detail"
+      },
+      {
+        "draw_calls": 14.0,
+        "rendered_objects": 14.0,
+        "view": "vine-detail"
       }
     ]
   },
   "budget": {
     "after": {
-      "room_triangles": 63777,
-      "shared_plant_triangles": 41458,
-      "room_botanical_triangles": 2816,
-      "plant_triangles": 44274,
-      "total_triangles": 105235,
+      "room_triangles": 73160,
+      "shared_plant_triangles": 45158,
+      "room_botanical_triangles": 10136,
+      "plant_triangles": 55294,
+      "total_triangles": 118318,
       "static_surfaces": 21
     },
     "limits": {
@@ -96,7 +106,7 @@
           "fruit_peach",
           "fruit_grape"
         ],
-        "triangles": 1725,
+        "triangles": 3788,
         "cast_shadow": true
       },
       {
@@ -104,9 +114,17 @@
         "file": "res://assets/rooms/fruit_shop/batches/review_botanical.glb",
         "material": "room",
         "sources": [
-          "hanging_herbs_leaves"
+          "hanging_herbs_leaves",
+          "olive_crown_leaves",
+          "arch_vine_leaves",
+          "right_olive_crown_leaves",
+          "arch_foliage_01",
+          "arch_foliage_10",
+          "arch_foliage_11",
+          "arch_foliage_20",
+          "arch_foliage_21"
         ],
-        "triangles": 2816,
+        "triangles": 10136,
         "cast_shadow": false
       },
       {
@@ -131,9 +149,12 @@
           "DoorWhiteVine0",
           "DoorWhiteVine1",
           "BackWhiteVine0",
-          "BackWhiteVine1"
+          "BackWhiteVine1",
+          "LeftWallCrown0",
+          "LeftWallCrown1",
+          "BackCornerFlowering"
         ],
-        "triangles": 11702,
+        "triangles": 15402,
         "cast_shadow": false
       },
       {
@@ -167,6 +188,7 @@
       "assets/rooms/_shared/plants/olive_tree.glb",
       "assets/rooms/_shared/plants/pothos.glb",
       "assets/rooms/fruit_shop/analog_scale.glb",
+      "assets/rooms/fruit_shop/arch_vine_leaves.glb",
       "assets/rooms/fruit_shop/back_wall.glb",
       "assets/rooms/fruit_shop/batches/review_back_dressing.glb",
       "assets/rooms/fruit_shop/batches/review_back_plants.glb",
@@ -194,6 +216,7 @@
       "assets/rooms/fruit_shop/fruit_peach.glb",
       "assets/rooms/fruit_shop/hanging_herbs_leaves.glb",
       "assets/rooms/fruit_shop/left_door_wall.glb",
+      "assets/rooms/fruit_shop/olive_crown_leaves.glb",
       "assets/rooms/fruit_shop/orchard_market_sign.glb",
       "assets/rooms/fruit_shop/produce_display_table.glb",
       "assets/rooms/fruit_shop/side_low_wall.glb",
