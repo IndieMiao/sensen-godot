@@ -1,0 +1,256 @@
+{
+  "revision": "r1",
+  "reference_sha256": "696c1ba820110951c0a21d8b1f571d12806773fd5f3dc70252f0e8da432a085a",
+  "renderer": {
+    "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "draw_calls": 20.0,
+    "instances": 84,
+    "renderer": "mobile",
+    "resolution": [
+      1400,
+      1400
+    ],
+    "scope": "offline art render; no mobile/gameplay/performance acceptance",
+    "slug": "clothing_store_a",
+    "static_surfaces": 24,
+    "views": [
+      {
+        "draw_calls": 26.0,
+        "rendered_objects": 26.0,
+        "view": "godot-whole"
+      },
+      {
+        "draw_calls": 26.0,
+        "rendered_objects": 26.0,
+        "view": "model-front"
+      },
+      {
+        "draw_calls": 26.0,
+        "rendered_objects": 26.0,
+        "view": "model-side"
+      },
+      {
+        "draw_calls": 26.0,
+        "rendered_objects": 26.0,
+        "view": "model-top"
+      },
+      {
+        "draw_calls": 21.0,
+        "rendered_objects": 21.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 20.0,
+        "rendered_objects": 20.0,
+        "view": "godot-detail-plants"
+      }
+    ]
+  },
+  "budget": {
+    "after": {
+      "room_triangles": 74154,
+      "shared_plant_triangles": 8718,
+      "room_botanical_triangles": 568,
+      "plant_triangles": 9286,
+      "total_triangles": 82872,
+      "static_surfaces": 24
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/clothing_store_a/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "entrance_frame",
+          "street_top_gray",
+          "street_top_black",
+          "street_top_ivory",
+          "cargo_trousers_olive",
+          "cargo_trousers_black",
+          "entry_graffiti",
+          "display_rug",
+          "graphic_fold_black",
+          "graphic_fold_ivory",
+          "graphic_fold_blue",
+          "black_cap",
+          "blue_sneaker_pair",
+          "folded_black_trousers",
+          "display_storage_crate",
+          "monochrome_poster",
+          "entry_mat",
+          "front_black_pot",
+          "entry_black_pot",
+          "left_shelf_black_pot",
+          "lower_fold_black",
+          "lower_fold_stack_black",
+          "lower_fold_ivory",
+          "lower_fold_stack_ivory",
+          "lower_fold_blue",
+          "lower_fold_stack_blue",
+          "left_rack_cap",
+          "lower_sneaker_pair",
+          "sconce_door"
+        ],
+        "triangles": 26488,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/clothing_store_a/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "entrance_glass"
+        ],
+        "triangles": 88,
+        "cast_shadow": false
+      },
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/clothing_store_a/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "street_top_blue",
+          "street_top_purple",
+          "street_top_varsity",
+          "cargo_trousers_sand",
+          "dark_changing_arch",
+          "black_changing_curtain",
+          "brand_wall_panel",
+          "block_theory_brand",
+          "good_fit_poster",
+          "wear_ideas_poster",
+          "black_pendant",
+          "street_wall_sconce",
+          "orange_brush_left",
+          "purple_brush_right",
+          "orange_brush_brand",
+          "purple_brush_arch",
+          "printed_tee_black",
+          "printed_tee_white",
+          "checkout_black_pot",
+          "right_shelf_black_pot",
+          "right_cargo_olive",
+          "right_cargo_black",
+          "right_cargo_sand",
+          "right_rack_cap",
+          "rack_folded_knit",
+          "black_pendant_middle",
+          "black_pendant_back",
+          "sconce_arch",
+          "sconce_right"
+        ],
+        "triangles": 30012,
+        "cast_shadow": true
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/clothing_store_a/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "FrontFoliage",
+          "EntryFoliage"
+        ],
+        "triangles": 1892,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/clothing_store_a/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "CheckoutFoliage",
+          "RightTrailing",
+          "RightPlantCrown"
+        ],
+        "triangles": 3868,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/clothing_store_a/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "LeftTrailing",
+          "LeftPlantCrown"
+        ],
+        "triangles": 2958,
+        "cast_shadow": false
+      }
+    ]
+  },
+  "glb_checks": {
+    "passed": true,
+    "single_surface_no_embedded_images": true,
+    "files": [
+      "assets/rooms/_shared/plants/monstera.glb",
+      "assets/rooms/_shared/plants/peace_lily.glb",
+      "assets/rooms/_shared/plants/pothos.glb",
+      "assets/rooms/clothing_store_a/bar_light_glow.glb",
+      "assets/rooms/clothing_store_a/batches/review_back_dressing.glb",
+      "assets/rooms/clothing_store_a/batches/review_back_plants.glb",
+      "assets/rooms/clothing_store_a/batches/review_front_dressing.glb",
+      "assets/rooms/clothing_store_a/batches/review_front_plants.glb",
+      "assets/rooms/clothing_store_a/batches/review_glass.glb",
+      "assets/rooms/clothing_store_a/batches/review_large_plants.glb",
+      "assets/rooms/clothing_store_a/black_cap.glb",
+      "assets/rooms/clothing_store_a/black_changing_curtain.glb",
+      "assets/rooms/clothing_store_a/black_checkout.glb",
+      "assets/rooms/clothing_store_a/black_pendant.glb",
+      "assets/rooms/clothing_store_a/black_tufted_bench.glb",
+      "assets/rooms/clothing_store_a/block_theory_brand.glb",
+      "assets/rooms/clothing_store_a/blue_sneaker_pair.glb",
+      "assets/rooms/clothing_store_a/boutique_back_wall.glb",
+      "assets/rooms/clothing_store_a/boutique_floor.glb",
+      "assets/rooms/clothing_store_a/boutique_left_wall.glb",
+      "assets/rooms/clothing_store_a/brand_wall_panel.glb",
+      "assets/rooms/clothing_store_a/cargo_trousers_black.glb",
+      "assets/rooms/clothing_store_a/cargo_trousers_olive.glb",
+      "assets/rooms/clothing_store_a/cargo_trousers_sand.glb",
+      "assets/rooms/clothing_store_a/central_display_table.glb",
+      "assets/rooms/clothing_store_a/checkout_black_pot.glb",
+      "assets/rooms/clothing_store_a/dark_changing_arch.glb",
+      "assets/rooms/clothing_store_a/display_rug.glb",
+      "assets/rooms/clothing_store_a/display_storage_crate.glb",
+      "assets/rooms/clothing_store_a/entrance_frame.glb",
+      "assets/rooms/clothing_store_a/entrance_glass.glb",
+      "assets/rooms/clothing_store_a/entrance_tree_view.glb",
+      "assets/rooms/clothing_store_a/entry_black_pot.glb",
+      "assets/rooms/clothing_store_a/entry_graffiti.glb",
+      "assets/rooms/clothing_store_a/entry_mat.glb",
+      "assets/rooms/clothing_store_a/folded_black_trousers.glb",
+      "assets/rooms/clothing_store_a/front_black_pot.glb",
+      "assets/rooms/clothing_store_a/good_fit_poster.glb",
+      "assets/rooms/clothing_store_a/graphic_fold_black.glb",
+      "assets/rooms/clothing_store_a/graphic_fold_blue.glb",
+      "assets/rooms/clothing_store_a/graphic_fold_ivory.glb",
+      "assets/rooms/clothing_store_a/left_shelf_black_pot.glb",
+      "assets/rooms/clothing_store_a/mirror_led.glb",
+      "assets/rooms/clothing_store_a/monochrome_poster.glb",
+      "assets/rooms/clothing_store_a/orange_brush_brand.glb",
+      "assets/rooms/clothing_store_a/orange_brush_left.glb",
+      "assets/rooms/clothing_store_a/pendant_diffuser.glb",
+      "assets/rooms/clothing_store_a/printed_tee_black.glb",
+      "assets/rooms/clothing_store_a/printed_tee_white.glb",
+      "assets/rooms/clothing_store_a/purple_brush_arch.glb",
+      "assets/rooms/clothing_store_a/purple_brush_right.glb",
+      "assets/rooms/clothing_store_a/right_shelf_black_pot.glb",
+      "assets/rooms/clothing_store_a/standing_mirror.glb",
+      "assets/rooms/clothing_store_a/street_left_rack.glb",
+      "assets/rooms/clothing_store_a/street_right_rack.glb",
+      "assets/rooms/clothing_store_a/street_top_black.glb",
+      "assets/rooms/clothing_store_a/street_top_blue.glb",
+      "assets/rooms/clothing_store_a/street_top_gray.glb",
+      "assets/rooms/clothing_store_a/street_top_ivory.glb",
+      "assets/rooms/clothing_store_a/street_top_purple.glb",
+      "assets/rooms/clothing_store_a/street_top_varsity.glb",
+      "assets/rooms/clothing_store_a/street_wall_sconce.glb",
+      "assets/rooms/clothing_store_a/wear_ideas_poster.glb"
+    ]
+  },
+  "visual_acceptance": "Pending art director Review; metrics do not establish reference fidelity."
+}
