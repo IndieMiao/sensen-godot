@@ -141,7 +141,7 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     expect(s.v).toBe(3);
     expect(s.homestead.level).toBe(1);
     expect(s.bag_cap).toBe(25);
-    expect(s.boards.stall[0].req).toMatchObject({ id: 'req_pond_catch', status: 'accepted', qty: 2 });
+    expect(s.boards.stall[0].req).toMatchObject({ id: 'req_pond_catch', status: 'accepted', qty: 2, drawn_at: old.created_at });
     expect(s.gear.hoe).toBe('hoe_starter');
   });
 });
