@@ -90,7 +90,7 @@ static func mine_sheet(view: Dictionary) -> Dictionary:
 	return sheet
 
 ## New run confirmation (MINE-P0-7), opened from the EntryCard: {title, subtitle, facts, cost, note, confirm, keep}.
-## TODO(SGODOT-231): the "Unmined rocks…" line is held back until design settles it (209 31cd05af ①).
+## No "Unmined rocks…" line: a new run needs floor 2 cleared, so nothing is left to lose (Li Bai, 231 3f6b8fb5).
 static func new_run_sheet(view: Dictionary) -> Dictionary:
 	var mine: Dictionary = view.get("mine", {})
 	var runs: Dictionary = mine.get("runs", {})
