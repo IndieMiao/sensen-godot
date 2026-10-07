@@ -924,10 +924,6 @@ func open_energy_panel() -> void:
 
 ## The farmhouse (§3.4.3 "回家休息 Rest"; COOK-1 kitchen inside): one card, two doors.
 func open_home_card() -> void:
-	var r: Dictionary = view.get("rest", {})
-	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
-	var e: Dictionary = view.get("energy", {})
-	var full := int(e.get("value", 0)) >= int(e.get("max", 200))
 	var card := _center_card(280)
 	modal_kind = "home"
 	card.add_child(_label("Home · Farmhouse", 13, INK, true))
@@ -937,34 +933,50 @@ func open_home_card() -> void:
 	var k := _pill_button(kitchen_line, true)
 	k.pressed.connect(func(): close_modal(); home_choice.emit("kitchen"))
 	card.add_child(k)
-	var rest_text := "Rest · +%d Energy · once a day" % int(r.get("amount", 60))
-	if used: rest_text = "Rested today · resets in " + P0Logic.duration(float(r.get("resets_in", 0)))
-	elif full: rest_text = "Rest · Energy full"
-	var b := _pill_button(rest_text, false)
-	b.disabled = used or full
-	b.pressed.connect(func(): close_modal(); command.emit({"type": "rest"}))
-	card.add_child(b)
+	# Rest moved to the bench by the farmhouse (q(30), FARM-7): the door card keeps the kitchen only.
 	var bye := _flat_button("Not now")
 	bye.pressed.connect(close_modal)
 	card.add_child(bye)
 
+## Rest bench sheet (FARM-7-2 482:52, q(30)): the bench is the one Rest entry. Title, state and effect (ObjectHeader),
+## one fact row, then Rest (primary, the real gain when near full) or the reason it can't (grey), and Not now / Close.
 func open_rest_card() -> void:
-	var r: Dictionary = view.get("rest", {})
-	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
-	var e: Dictionary = view.get("energy", {})
-	var full := int(e.get("value", 0)) >= int(e.get("max", 200))
-	var card := _center_card(260)
-	card.add_child(_label("Home · Rest", 12, INK, true))
-	card.add_child(_label("+%d Energy · once a day" % int(r.get("amount", 60)), 11, INK))
-	var b := _pill_button("Rest", true)
-	if used:
-		card.add_child(_label("Used today · resets in " + P0Logic.duration(float(r.get("resets_in", 0))), 10, INK2))
-		b.disabled = true
-	elif full:
-		card.add_child(_label("Energy full", 10, INK2))
-		b.disabled = true
-	b.pressed.connect(func(): close_modal(); command.emit({"type": "rest"}))
-	card.add_child(b)
+	var st := P0Logic.rest_state(view)
+	var v := _kit_card()
+	modal_kind = "rest"
+	v.add_child(UiObjectHeader.new({title = "Rest bench", state = str(st.sheet_state), effect = str(st.effect)}))
+	v.add_child(UiFactRow.new(str(st.fact), str(st.fact_value)))
+	if str(st.state) != "used":
+		var b := UiCommandButton.new(str(st.button) if st.can_rest else "", UiCommandButton.Kind.PRIMARY)
+		if not st.can_rest: b.reason = str(st.reason)
+		b.activated.connect(func(): close_modal(); command.emit({"type": "rest"}))
+		v.add_child(b)
+	var bye := UiDismissButton.new(str(st.close))
+	bye.pressed.connect(close_modal)
+	v.add_child(bye)
+	if str(st.note) != "":
+		var note := UiKit.label(str(st.note), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		v.add_child(note)
+
+## A centred card in the UI kit's look (InformationSheet 932:71686: surface, card radius, 16 inset, 12 gap) for the
+## phase-2 panels; the older P0 cards keep _center_card until they are rebuilt.
+func _kit_card() -> VBoxContainer:
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.theme = UiKit.theme()
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size.x = UiTokens.SIZE_QUICK_BAR_W
+	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CARD, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+	box.with_margins(UiTokens.SIZE_SHEET_PAD, UiTokens.SIZE_SHEET_PAD, UiTokens.SIZE_SHEET_PAD, UiTokens.SIZE_SHEET_PAD)
+	panel.add_theme_stylebox_override(&"panel", box)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", int(UiTokens.SIZE_SHEET_GAP))
+	panel.add_child(v)
+	center.add_child(panel)
+	_open_modal(center, UiTokens.OPACITY_SCRIM_MODAL)
+	return v
 
 func show_level_up(ev: Dictionary) -> void:
 	var card := _center_card(310)

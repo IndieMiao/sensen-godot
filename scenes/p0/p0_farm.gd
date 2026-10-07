@@ -12,6 +12,8 @@ const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
 
 const STYLE := "cottage"          # the orange-roof cottage of the polished farm
 const PLACE := "Shanghai · Homestead"
+const BENCH_TAP_PX := 44.0   # a 44 px touch target around the bench seat (engineering default)
+const BENCH_NEAR_M := 2.6    # the bench's finger card shows within this distance (stall 3.2, house 4.2)
 const LABOUR_CLIP := {"till": "till", "sow": "sow", "water": "water", "harvest": "harvest"}
 
 @onready var cam: Camera3D = $Camera3D
@@ -27,6 +29,7 @@ var _hi: MeshInstance3D
 var _house := Vector3.ZERO
 var _stall := Vector3.ZERO   # the Homestead Stall (unattended, p(6)); the seed box stands in until its model
 var _mine := Vector3.ZERO
+var _bench := Vector3.ZERO   # the rest bench by the farmhouse (FARM-7, q(30)): Basic Room's bench.glb
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
@@ -86,6 +89,9 @@ func _build_world() -> void:
 	props.add_child(FarmProps.build("house", _house, 1.0, STYLE))
 	props.add_child(FarmProps.build("storage", bp.cell_to_world(bp.anchor("storage")), 1.0, STYLE))
 	props.add_child(FarmProps.build("well", bp.cell_to_world(bp.anchor("well")), 1.0, STYLE))
+	# The bench is two cells wide: its centre sits half a cell right of its anchor cell, facing the field (+z).
+	_bench = bp.cell_to_world(bp.anchor("bench")) + Vector3(bp.cell_m * 0.5, 0, 0)
+	props.add_child(_bench_prop(_bench))
 	_mine = bp.cell_to_world(bp.anchor("mine")) + Vector3(-0.3, 0, 0.3)
 	var mine := MineArt.entrance()
 	mine.position = _mine
@@ -184,7 +190,7 @@ func p0_recenter() -> void:
 	_cam_follow.held = false
 
 func p0_show_spot(where: String) -> void:
-	var at := _house if where in ["stove", "bench", "home"] else actor.position
+	var at := _bench if where == "bench" else (_house if where in ["stove", "home"] else actor.position)
 	if where == "stall": at = _stall
 	elif where == "plots": at = _plots_center()
 	_focus = at
@@ -217,6 +223,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
 	_hold_repeat()
 	_tags(v)
+	_bench_marker(v)
 	_teaching(v)
 
 func _sync_plots(v: Dictionary, dt: float) -> void:
@@ -298,7 +305,11 @@ func _hold_repeat() -> void:
 ## the farmhouse (Kitchen / Rest), the mine.
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal() or _cooking != null: return
-	if cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
+	# The bench stands beside the house: checked first so the house's wider radius doesn't take it.
+	if cam.unproject_position(_bench + Vector3(0, 0.35, 0)).distance_to(screen) < BENCH_TAP_PX:
+		actor.face(_bench)
+		rt.ui.open_rest_card()
+	elif cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
 		actor.face(_stall)
 		rt.ui.open_stall()
 	elif cam.unproject_position(_house + Vector3(0, 1.0, 0.6)).distance_to(screen) < 80:
@@ -316,6 +327,32 @@ func _tags(v: Dictionary) -> void:
 	var home := "Home · Kitchen · Rest"
 	if st != null: home = "Home · Dish ready" if float(st.get("ready_in", 0)) <= 0.0 else "Home · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))
 	rt.ui.tag("home", home, cam.unproject_position(_house + Vector3(0, 2.6, 0.4)), actor.position.distance_to(_house) < 4.2 or st != null, st != null)
+
+## The bench always shows its state (STATE-ICONS: Available / Countdown with the time left / Used today) and, when the
+## player is near, its finger card (FARM-7). The badge needs SGODOT-221's rt.ui.badge (PR #12); until then only the card.
+func _bench_marker(v: Dictionary) -> void:
+	var st := P0Logic.rest_state(v)
+	var top := cam.unproject_position(_bench + Vector3(0, 0.95, 0))
+	var lift := 0.0
+	if rt.ui.has_method("badge"):
+		var state: int = {"available": 0, "countdown": 2, "used_today": 4}.get(str(st.badge), 0)   # UiStatusBadge.State
+		rt.ui.call("badge", "bench", state, top, true, str(st.caption), P0Logic.icon("rest"))
+		if rt.ui.has_method("badge_height"): lift = float(rt.ui.call("badge_height", "bench"))
+	rt.ui.tag("bench", str(st.card), top - Vector2(0, lift), actor.position.distance_to(_bench) < BENCH_NEAR_M)
+
+## Basic Room's bench (648 tris; q(30)) with the room's shared atlas material.
+func _bench_prop(at: Vector3) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Bench"
+	root.position = at
+	var model := (load("res://assets/rooms/basic_room/bench.glb") as PackedScene).instantiate() as Node3D
+	var mat := StandardMaterial3D.new()
+	mat.albedo_texture = load("res://assets/rooms/basic_room/room_albedo_ao.png")
+	mat.roughness = 0.8
+	mat.metallic_specular = 0.28
+	for m in model.find_children("*", "MeshInstance3D", true, false): (m as MeshInstance3D).material_override = mat
+	root.add_child(model)
+	return root
 
 func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return
