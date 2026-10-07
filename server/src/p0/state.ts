@@ -164,7 +164,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     s.residents ??= {};
     const old = s.requests.find(r => r.id === c.requests.tutorial.id);
     s.req_done ??= old?.status === 'done' ? [old.id] : [];
-    const first = tutorialRequest(c, now);
+    const first = tutorialRequest(c, s.created_at ?? now);   // keep the request's age: it dates from the account (PR #15 review)
     s.boards ??= {
       stall: [old?.status === 'done' ? { req: null, refill_at: now } : { req: { ...first, status: old?.status === 'accepted' ? 'accepted' : 'open' }, refill_at: 0 }],
       market: [],
