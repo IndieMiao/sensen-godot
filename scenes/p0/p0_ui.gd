@@ -130,7 +130,7 @@ func _build_hud() -> void:
 	root.add_child(hud)
 	_creel = PanelContainer.new()
 	_creel.add_theme_stylebox_override("panel", _box(CARD, 11, EDGE, 1, Vector4(6, 3, 8, 3)))
-	_creel.position = Vector2(10, 91)
+	_creel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + UiTokens.SPACE_WITHIN + safe_top())   # under the two-row HUD
 	var crh := HBoxContainer.new()
 	crh.add_theme_constant_override("separation", 4)
 	crh.add_child(_icon("creel", 11))
