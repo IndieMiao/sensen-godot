@@ -1,0 +1,159 @@
+{
+  "method": "11x11 median RGB; circular HSV hue distance; fixed corresponding authored surfaces",
+  "checks": [
+    {
+      "name": "left_plaster",
+      "surface": "Left wall plaster between botanical picture and arched window",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          744,
+          882
+        ],
+        "rgb": [
+          255,
+          242,
+          200
+        ],
+        "hex": "#FFF2C8",
+        "hue_degrees": 45.818,
+        "saturation": 0.2157,
+        "value": 1.0
+      },
+      "runtime": {
+        "pixel": [
+          354,
+          375
+        ],
+        "rgb": [
+          237,
+          204,
+          145
+        ],
+        "hex": "#EDCC91",
+        "hue_degrees": 38.478,
+        "saturation": 0.3882,
+        "value": 0.9294
+      },
+      "hue_delta_degrees": 7.34,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "back_plaster",
+      "surface": "Back wall plaster above-left of the green doorway",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          2477,
+          875
+        ],
+        "rgb": [
+          240,
+          202,
+          164
+        ],
+        "hex": "#F0CAA4",
+        "hue_degrees": 30.0,
+        "saturation": 0.3167,
+        "value": 0.9412
+      },
+      "runtime": {
+        "pixel": [
+          1053,
+          375
+        ],
+        "rgb": [
+          228,
+          189,
+          134
+        ],
+        "hex": "#E4BD86",
+        "hue_degrees": 35.106,
+        "saturation": 0.4123,
+        "value": 0.8941
+      },
+      "hue_delta_degrees": 5.106,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "front_pillar",
+      "surface": "Front-left timber post, bright interior-facing flat strip",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          517,
+          1042
+        ],
+        "rgb": [
+          178,
+          123,
+          67
+        ],
+        "hex": "#B27B43",
+        "hue_degrees": 30.27,
+        "saturation": 0.6236,
+        "value": 0.698
+      },
+      "runtime": {
+        "pixel": [
+          238,
+          448
+        ],
+        "rgb": [
+          199,
+          117,
+          39
+        ],
+        "hex": "#C77527",
+        "hue_degrees": 29.25,
+        "saturation": 0.804,
+        "value": 0.7804
+      },
+      "hue_delta_degrees": 1.02,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "sunlit_floor",
+      "surface": "Clear wood floor to the right of the dining rug",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          2328,
+          1768
+        ],
+        "rgb": [
+          244,
+          179,
+          97
+        ],
+        "hex": "#F4B361",
+        "hue_degrees": 33.469,
+        "saturation": 0.6025,
+        "value": 0.9569
+      },
+      "runtime": {
+        "pixel": [
+          975,
+          750
+        ],
+        "rgb": [
+          238,
+          165,
+          71
+        ],
+        "hex": "#EEA547",
+        "hue_degrees": 33.772,
+        "saturation": 0.7017,
+        "value": 0.9333
+      },
+      "hue_delta_degrees": 0.303,
+      "limit_degrees": 10,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "These explicit lit patches only; saturation and brightness are separately reported. No full-image fidelity or pixel registration claim."
+}

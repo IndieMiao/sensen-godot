@@ -1,5 +1,26 @@
 {
-  "status": "art review candidate; user acceptance pending",
+  "revision": "R2",
+  "state": "Review",
+  "user_acceptance": "pending",
+  "reference": {
+    "file": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node": "545:2969"
+  },
+  "renderer": {
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "colliders": 24,
+    "finite_aabbs": true,
+    "material_count": 4,
+    "mesh_instances": 49,
+    "renderer": "mobile",
+    "resolution": [
+      1440,
+      1080
+    ],
+    "scene": "standard_room_5",
+    "surfaces": 49,
+    "triangles": 126952
+  },
   "asset_stats": {
     "atlas": {
       "size": [
@@ -15,28 +36,28 @@
         "vertices": 4912,
         "triangles": 9476,
         "surfaces": 1,
-        "bytes": 327296
+        "bytes": 327232
       },
       {
         "name": "window_wall",
         "vertices": 1368,
         "triangles": 2692,
         "surfaces": 1,
-        "bytes": 95036
+        "bytes": 94012
       },
       {
         "name": "back_wall",
         "vertices": 1080,
         "triangles": 2128,
         "surfaces": 1,
-        "bytes": 76896
+        "bytes": 75520
       },
       {
         "name": "arched_window",
         "vertices": 656,
         "triangles": 1296,
         "surfaces": 1,
-        "bytes": 41284
+        "bytes": 40676
       },
       {
         "name": "window_garden",
@@ -50,7 +71,7 @@
         "vertices": 1308,
         "triangles": 2568,
         "surfaces": 1,
-        "bytes": 97156
+        "bytes": 96900
       },
       {
         "name": "entry_mat",
@@ -64,56 +85,56 @@
         "vertices": 432,
         "triangles": 864,
         "surfaces": 1,
-        "bytes": 26192
+        "bytes": 25648
       },
       {
         "name": "hearth",
-        "vertices": 1330,
-        "triangles": 2624,
+        "vertices": 2740,
+        "triangles": 5348,
         "surfaces": 1,
-        "bytes": 94248
+        "bytes": 181092
       },
       {
         "name": "fire",
-        "vertices": 180,
-        "triangles": 348,
+        "vertices": 480,
+        "triangles": 944,
         "surfaces": 1,
-        "bytes": 13512
+        "bytes": 22360
       },
       {
         "name": "kettle",
         "vertices": 590,
         "triangles": 1144,
         "surfaces": 1,
-        "bytes": 42992
+        "bytes": 42608
       },
       {
         "name": "firewood_alcove",
-        "vertices": 1984,
-        "triangles": 3864,
+        "vertices": 2346,
+        "triangles": 4588,
         "surfaces": 1,
-        "bytes": 164604
+        "bytes": 170932
       },
       {
         "name": "range_cooker",
         "vertices": 1502,
         "triangles": 2916,
         "surfaces": 1,
-        "bytes": 103416
+        "bytes": 104184
       },
       {
         "name": "bookshelf",
         "vertices": 4280,
         "triangles": 8116,
         "surfaces": 1,
-        "bytes": 300836
+        "bytes": 300772
       },
       {
         "name": "sink_cabinet",
         "vertices": 1736,
         "triangles": 3356,
         "surfaces": 1,
-        "bytes": 119008
+        "bytes": 118624
       },
       {
         "name": "wall_shelf",
@@ -127,105 +148,105 @@
         "vertices": 572,
         "triangles": 1100,
         "surfaces": 1,
-        "bytes": 46904
+        "bytes": 46232
       },
       {
         "name": "hanging_towel",
-        "vertices": 504,
-        "triangles": 1000,
+        "vertices": 2922,
+        "triangles": 5828,
         "surfaces": 1,
-        "bytes": 36024
+        "bytes": 147400
       },
       {
         "name": "utensil_crock",
         "vertices": 300,
         "triangles": 572,
         "surfaces": 1,
-        "bytes": 23736
+        "bytes": 23416
       },
       {
         "name": "counter_board",
         "vertices": 524,
         "triangles": 1012,
         "surfaces": 1,
-        "bytes": 40776
+        "bytes": 40680
       },
       {
         "name": "straw_hat",
         "vertices": 1449,
         "triangles": 2878,
         "surfaces": 1,
-        "bytes": 102004
+        "bytes": 99316
       },
       {
         "name": "door_garden_fork",
         "vertices": 128,
         "triangles": 228,
         "surfaces": 1,
-        "bytes": 14528
+        "bytes": 14144
       },
       {
         "name": "entry_basket",
         "vertices": 1616,
         "triangles": 3008,
         "surfaces": 1,
-        "bytes": 122128
+        "bytes": 121936
       },
       {
         "name": "garden_boots",
         "vertices": 568,
         "triangles": 1120,
         "surfaces": 1,
-        "bytes": 36776
+        "bytes": 36712
       },
       {
         "name": "botanical_picture",
         "vertices": 544,
         "triangles": 1040,
         "surfaces": 1,
-        "bytes": 41972
+        "bytes": 40724
       },
       {
         "name": "bookcase_picture",
         "vertices": 544,
         "triangles": 1040,
         "surfaces": 1,
-        "bytes": 42436
+        "bytes": 40612
       },
       {
         "name": "window_daisies",
         "vertices": 3750,
         "triangles": 7136,
         "surfaces": 1,
-        "bytes": 254560
+        "bytes": 255712
       },
       {
         "name": "window_hanging_basket",
         "vertices": 184,
         "triangles": 356,
         "surfaces": 1,
-        "bytes": 15544
+        "bytes": 15576
       },
       {
         "name": "sofa",
-        "vertices": 1488,
-        "triangles": 2852,
+        "vertices": 5356,
+        "triangles": 10588,
         "surfaces": 1,
-        "bytes": 102256
+        "bytes": 287472
       },
       {
         "name": "round_rope_rug",
         "vertices": 6608,
         "triangles": 13148,
         "surfaces": 1,
-        "bytes": 589248
+        "bytes": 589696
       },
       {
         "name": "dining_rug",
         "vertices": 528,
         "triangles": 912,
         "surfaces": 1,
-        "bytes": 42052
+        "bytes": 44036
       },
       {
         "name": "reading_stool",
@@ -236,10 +257,10 @@
       },
       {
         "name": "reading_cup",
-        "vertices": 298,
-        "triangles": 576,
+        "vertices": 842,
+        "triangles": 1656,
         "surfaces": 1,
-        "bytes": 24548
+        "bytes": 57592
       },
       {
         "name": "bookcase_stool",
@@ -260,21 +281,21 @@
         "vertices": 196,
         "triangles": 388,
         "surfaces": 1,
-        "bytes": 14044
+        "bytes": 13820
       },
       {
         "name": "chair",
-        "vertices": 672,
-        "triangles": 1296,
+        "vertices": 616,
+        "triangles": 1188,
         "surfaces": 1,
-        "bytes": 46012
+        "bytes": 42292
       },
       {
         "name": "chair_cushion",
-        "vertices": 112,
-        "triangles": 216,
+        "vertices": 228,
+        "triangles": 428,
         "surfaces": 1,
-        "bytes": 8816
+        "bytes": 22316
       },
       {
         "name": "rug_fringe",
@@ -288,50 +309,58 @@
         "vertices": 3814,
         "triangles": 7260,
         "surfaces": 1,
-        "bytes": 260636
+        "bytes": 261084
       },
       {
         "name": "tabletop_still_life",
-        "vertices": 1172,
-        "triangles": 2288,
+        "vertices": 1716,
+        "triangles": 3368,
         "surfaces": 1,
-        "bytes": 79560
+        "bytes": 112792
       }
     ],
-    "unique_triangles": 96416,
-    "scene_triangles": 191256,
+    "unique_triangles": 115288,
+    "scene_triangles": 126952,
     "static_draw_surfaces": 49,
-    "glb_bytes": 3681936,
-    "atlas_bytes": 2730386,
+    "glb_bytes": 4149020,
+    "atlas_bytes": 2538672,
     "placed_instances": 49,
     "materials": 4,
-    "local_scene_triangles": 97928,
-    "shared_scene_triangles": 93328,
+    "local_scene_triangles": 116904,
+    "shared_scene_triangles": 10048,
     "shared_assets": [
       {
         "name": "monstera",
-        "vertices": 2760,
-        "triangles": 5344,
+        "vertices": 568,
+        "triangles": 910,
         "surfaces": 1,
-        "bytes": 206924
+        "bytes": 24892
       },
       {
         "name": "peace_lily",
-        "vertices": 1906,
-        "triangles": 3616,
+        "vertices": 620,
+        "triangles": 946,
         "surfaces": 1,
-        "bytes": 127604
+        "bytes": 26780
       },
       {
         "name": "pothos",
-        "vertices": 10882,
-        "triangles": 21092,
+        "vertices": 1670,
+        "triangles": 2048,
         "surfaces": 1,
-        "bytes": 509404
+        "bytes": 67012
       }
     ],
     "shared_placed_instances": 6,
     "shared_atlas": "res://assets/rooms/_shared/plants/room_albedo_ao.png",
+    "local_botanical_budget_triangles": 18776,
+    "plant_budget_triangles": 28824,
+    "budget_limits": {
+      "placed_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "budget_passed": true,
     "window_texture": {
       "file": "window_landscape.png",
       "size": [
@@ -340,86 +369,129 @@
       ],
       "purpose": "Original layered landscape outside real aperture",
       "bytes": 62294
+    },
+    "fire_texture": {
+      "file": "fire_gradient.png",
+      "size": [
+        32,
+        128
+      ],
+      "purpose": "Orange/red flame gradient in explicit height UVs",
+      "bytes": 568
     }
   },
-  "godot": {
-    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "colliders": 24,
-    "finite_aabbs": true,
-    "material_count": 4,
-    "mesh_instances": 49,
-    "renderer": "mobile",
-    "resolution": [
+  "shared_plant_revision": "9c23ab2",
+  "camera_fit": {
+    "method": "Three visible rounded plinth edge intersections; rectangular ground-plane constraint. No image warp.",
+    "reference_canvas": [
       1440,
       1080
     ],
-    "scene": "standard_room_5",
-    "surfaces": 49,
-    "triangles": 191256
+    "reference_source_size": [
+      3402,
+      2561
+    ],
+    "anchors": {
+      "left": [
+        198.0,
+        683.0
+      ],
+      "front": [
+        737.0,
+        945.0
+      ],
+      "right": [
+        1240.0,
+        699.0
+      ],
+      "back_inferred": [
+        701.0,
+        437.0
+      ]
+    },
+    "back_corner_visibility": "Occluded by room; inferred by parallelogram, not measured from visible pixels.",
+    "pitch_degrees": 29.18119932295211,
+    "yaw_degrees": 43.021278339258195,
+    "camera": {
+      "position": [
+        10.234048815405814,
+        9.775054585992919,
+        10.966505589470644
+      ],
+      "target": [
+        0,
+        1.3982961427291736,
+        0
+      ],
+      "size": 12.891239223541001
+    },
+    "limits": "Hand-selected intersections on a stylized perspective reference. Wall caps and furniture are independent visual checks, not claimed pixel-perfect."
+  },
+  "checks": {
+    "rendered_character_checks": 37,
+    "character_passed": true,
+    "route_video_passed": true,
+    "colour_passed": true,
+    "cloth_uv_passed": true,
+    "no_embedded_images": true
+  },
+  "video": {
+    "duration_seconds": 15.0,
+    "sha256": "7c86863467ee6cbfac2ecd2b08b3e2366b7ad5340770777420f47d95ea58461b",
+    "samples_visually_reviewed": true
   },
   "hashes": {
-    "assets/rooms/standard_room_5/hanging_cookware.glb": "892f598005586a70886224f68079228621e8e196912fe1276b46b80c48992bf8",
-    "assets/rooms/standard_room_5/kettle.glb": "14c315146306f07f6ae4d6fd6c92f122ee4d87f4552c1cd2f523f560475a4858",
-    "assets/rooms/standard_room_5/bookcase_picture.glb": "cc58ac31cc9c847e96306249905ff29191932c403c1e72405c90a00557358a3f",
-    "assets/rooms/standard_room_5/botanical_picture.glb": "7345abe32f2886ead2b840846373c1b4dbb78bea6bd438b1bd191c7073ce2059",
-    "assets/rooms/standard_room_5/arched_window.glb": "c8f550b3f0732964584c6f35d33e3ea54b6fb0a174e62f84cfe7f5ae200b1fdd",
-    "assets/rooms/standard_room_5/door_garden_fork.glb": "5ac57eb27c63bbdc53ed01dff9861ed7af75098f091cc8bb17a9c10d9dc61e94",
-    "assets/rooms/standard_room_5/daisy_jug.glb": "637f0ba6e35177e66ef0e0ba2076a6931bc93507c25cffab3fe1343d7a15fb2a",
-    "assets/rooms/standard_room_5/back_wall.glb": "f899e372d070caf711be15e717a376809f8e0e3cead0e4a051cdde89bdac44bd",
-    "assets/rooms/standard_room_5/reading_stool.glb": "8cfc19ab9d95283e0253b3b1216e375a0ddcfa02abd167d28d934fe79729ed01",
-    "assets/rooms/standard_room_5/window_daisies.glb": "16792a90b3937aa9f4d285a9294e23df1fa8bccf9049653374f39fe5f9d46aa8",
-    "assets/rooms/standard_room_5/chair_cushion.glb": "239389340b257130aee566ce5d06a331118d50ee4565d75c5023c71d6c54e2b0",
-    "assets/rooms/standard_room_5/window_hanging_basket.glb": "97e262d3a2d0f56f20760a346a810a513533f020de0b5ab683169a26bf6175c3",
-    "assets/rooms/standard_room_5/chair.glb": "a652603e64bfef3209b37a36f3091eec2f7bff44ab9d1229d517325f8a7a2db1",
-    "assets/rooms/standard_room_5/counter_board.glb": "86371213160397f66e5f093886ad228e2d9d370dcb7712c46788f906920f44f4",
-    "assets/rooms/standard_room_5/straw_hat.glb": "677a82a40679b3bb19a235a7bbbe1a98afecda823249fe236fb4f48f94848caa",
-    "assets/rooms/standard_room_5/round_rope_rug.glb": "2f6d644a87bb62a4d4b05d6a663eae6e0ee5d70754a8e002326006ea65ebdd0c",
-    "assets/rooms/standard_room_5/room_shell.glb": "ccd0af491a3caeee9f5a48f5d7ed0f1536e310aab6cdb219c4c0018204d3278b",
-    "assets/rooms/standard_room_5/hearth.glb": "c4fcb8563f603012e8cdb9660bd4786665ae86deaf4def8d07f535910f615eff",
-    "assets/rooms/standard_room_5/tabletop_still_life.glb": "efc982299869fb230d114634f6c91db9c5d2d8729f04a0d93c3c1bb1b7c2e6c2",
-    "assets/rooms/standard_room_5/door_frame.glb": "016a04b876b7f2f159ef5b710e95f71879e704ce98966992cbb8612fc788e7c6",
-    "assets/rooms/standard_room_5/bookcase_stool.glb": "e2c2ff572b2443c7d8cd9b4fda7106fd1338e686e1d98d4c352cc3134182c399",
-    "assets/rooms/standard_room_5/firewood_alcove.glb": "a9f9623dc17fcb2af70280ecaad6b334adf4a3d0c53ca95fef1b3222858e7571",
-    "assets/rooms/standard_room_5/range_cooker.glb": "6df2b9083e08ac57e3d710b3fa3ccb77c84bfc841c487c72fac71d8964e1328c",
-    "assets/rooms/standard_room_5/bookshelf.glb": "c8f2a8a4d1409f93949f40dca5488a61b0880133b0826dcb4cc95012ede9466a",
-    "assets/rooms/standard_room_5/fire.glb": "9fea9f490e4907da26a5f99b483c9fb03bc8252f6e62c67b7af040d6c7b59379",
-    "assets/rooms/standard_room_5/garden_boots.glb": "32cf7bc86e2905bdf1d2a5ea7be33c115e6eef100ceaf02ffd159678939bb6ae",
-    "assets/rooms/standard_room_5/wall_shelf.glb": "929af986b074a81c2b8f9e3983512b251fb993b1c759058a50a11c3fd8d5625a",
-    "assets/rooms/standard_room_5/hanging_towel.glb": "a2675a3abae7377d51f48e87e4379d9bf5e481df178622fcb92e286010ea1c3d",
-    "assets/rooms/standard_room_5/entry_mat.glb": "a5b5ba92d076f76696b452f5118c4d4df948d99c88a68d3127e811b55cbb1bbb",
-    "assets/rooms/standard_room_5/rug_fringe.glb": "889561a27ad043f946f026904dd7a35c54d8147344030ccac3d2a48eeff448a7",
-    "assets/rooms/standard_room_5/dining_table.glb": "14ffbf40646ab89a4e271931ae75dd070fd470315cb45eecedc4fd30b9c78064",
-    "assets/rooms/standard_room_5/dining_rug.glb": "826f012c8b1a157c24d3d8335efb72c1e33dcea86b810c4a3bc8766cc30494f8",
-    "assets/rooms/standard_room_5/green_door.glb": "bf38eddcc9d2616d25258042ec3c085e2744cdea388be60dcc3c6262d62c0b82",
-    "assets/rooms/standard_room_5/entry_basket.glb": "0fd0e3a1ae6ba4dad9d6fadc5a6f9d35f8ff24c13b55a0907618f3430ea99ba2",
-    "assets/rooms/standard_room_5/checked_runner.glb": "2612976d8513d9f36d755737d95d5b508310a9fb2abed948a1070df2afdc64b5",
-    "assets/rooms/standard_room_5/utensil_crock.glb": "fdf44f28c9dccf012352562d91ea377eb09599d8b03c09b639cca402bfd891c1",
-    "assets/rooms/standard_room_5/sink_cabinet.glb": "ca58b8a7b1a2f547acfeea7922880ee7f3a0243595b05c5db778a54c62f04ab1",
-    "assets/rooms/standard_room_5/reading_cup.glb": "10a98b304e41540b4df734a8bf9bdec919cc2bb264ef181e6bc7bf20a50895fa",
-    "assets/rooms/standard_room_5/window_wall.glb": "89b673bd07ee1f99da25bd9fe4b3d623d8b8130f8c0414e2fe33bfec0a4a8f96",
+    "assets/rooms/standard_room_5/room_shell.glb": "4b71cba07f8fc4ed84b405a8988e86b44a45b760f1c9be51f88c91ae22817d8a",
+    "assets/rooms/standard_room_5/window_wall.glb": "09c2f77c373327d8f65127911e16c812da1ac5e675143fca9ceb689fc3a13116",
+    "assets/rooms/standard_room_5/back_wall.glb": "3c3750ec19e72e6bea0b1f82dc8c296599be101324906bab840705606cd8398d",
+    "assets/rooms/standard_room_5/arched_window.glb": "a87d908dd7768291afd0690bfd04cb9b1346c07d28507654ccf3f52d8d712671",
     "assets/rooms/standard_room_5/window_garden.glb": "fb0786e84e2643d521f199ee909665234c3c87c459f32020ee3753e18b66f768",
-    "assets/rooms/standard_room_5/sofa.glb": "dcd584f9d0d0b6d33cff8d31b4576ba055e1ce67cd4faec58ce0bd31fb695f48",
-    "assets/rooms/standard_room_5/room_albedo_ao.png": "8a797f077acae1f8335a1855959978c709990ab528bf40d1b478363be363ec10",
+    "assets/rooms/standard_room_5/green_door.glb": "5e94e5b03d4f85950f9b91df633fa6ccab424f16df137a659ff83b1301a6d659",
+    "assets/rooms/standard_room_5/entry_mat.glb": "a6f41c203f3d27d57b3855e80dacd57a140febe2006015aa62e5e5ae27061534",
+    "assets/rooms/standard_room_5/door_frame.glb": "d7f2e355d8ead4190f07acb716b8d06651a8faa1343179a9599f40295f033112",
+    "assets/rooms/standard_room_5/hearth.glb": "18bb7a7831b65e81597c0a0c4dda7743eb077d38a3556945e7f60bfbf90a346c",
+    "assets/rooms/standard_room_5/fire.glb": "f1e623310bf86d81ba9bf8f35992141248fc2e593f04eb9e84362ec600ed28c8",
+    "assets/rooms/standard_room_5/kettle.glb": "9c610b2305ffd0bac320613c21495dd85fd4eeffd918b1666a1ae9b1adc0751f",
+    "assets/rooms/standard_room_5/firewood_alcove.glb": "fe139d84b02c036e044d9e65ccd1057ec7eb72426705d23bc8288aa84b09088b",
+    "assets/rooms/standard_room_5/range_cooker.glb": "131861a79663a49c75d39a017d28b45017d07ee3114af1bb876e15dfc15c1ab3",
+    "assets/rooms/standard_room_5/bookshelf.glb": "7c3e427f45e7015957428725ff0dcae57adfcc17716b7a971fdfd7c2f23c6c8d",
+    "assets/rooms/standard_room_5/sink_cabinet.glb": "df17c3e86b5c5d86c250bee7b4745e66d82614e89d34672e9c6d0b39ef7aa4da",
+    "assets/rooms/standard_room_5/wall_shelf.glb": "16fe3ec64082b60dbfa0ec8f2e62404b52237f0f1de8d8e3c73d13b16c691c8f",
+    "assets/rooms/standard_room_5/hanging_cookware.glb": "71b21e01484851d81100fc3d5e1d08a7205bdec5b06796b9cee9acbbdd8b8041",
+    "assets/rooms/standard_room_5/hanging_towel.glb": "1becd505c2be88a4144b4ace982312ddea13321c2816f3602b1e4a221495f56f",
+    "assets/rooms/standard_room_5/utensil_crock.glb": "52ad9a8574ffe156a028f0139f6b2fdbc21373da8ef6613b40fb3901609ca757",
+    "assets/rooms/standard_room_5/counter_board.glb": "ef806cb1b66501bb7edc751dcf84fd720cdd7d97c6e8b2d6316346cb38539375",
+    "assets/rooms/standard_room_5/straw_hat.glb": "09ec6b47b7d3944d6a602d9e7c0b25b9bc08a64b96fab9b6cdc9cea51dd0506d",
+    "assets/rooms/standard_room_5/door_garden_fork.glb": "f219fbff00a45e4c9b15fefb30035efc84bf42b3ba4cff29d0f8f26d1a986248",
+    "assets/rooms/standard_room_5/entry_basket.glb": "2fb3f8f3bf41b2952989d03ba5ebf9a6d373167deb46cb915e7c4f1de75fdf0f",
+    "assets/rooms/standard_room_5/garden_boots.glb": "3982097c6eac690a6d41d38d13ff3d72b73e4d9aee0221ca87cbe5736381181e",
+    "assets/rooms/standard_room_5/botanical_picture.glb": "ea0d941b14b5d0c6509f42d1fed2721d08ff88654405d103ca8639f2489e38b2",
+    "assets/rooms/standard_room_5/bookcase_picture.glb": "bbff3700264fca4e565c40ccfd3eb383b27208fdbb5d472736a20c3f5a4c49b9",
+    "assets/rooms/standard_room_5/window_daisies.glb": "5223b0b596dbc06c5e0dcd0a284294f6e031cdc92ce0f72fd81ae3f057a79662",
+    "assets/rooms/standard_room_5/window_hanging_basket.glb": "ed4dc0f181030134ea0ed322ea4b21240867b54a4e78b8e091528fdd38f13b2a",
+    "assets/rooms/standard_room_5/sofa.glb": "2a4f81851066c9a216ed87c9ca82638fdb819e3b125af4a36eb55bc957a802fa",
+    "assets/rooms/standard_room_5/round_rope_rug.glb": "8e92d74c767a1f474ea00d038d5223e33bc866fae71c4e9696713bd1f9ff1cff",
+    "assets/rooms/standard_room_5/dining_rug.glb": "b9dae6b519394fd980556d8474a5c7005fc5e0a4fb404e75df56ca5696b1af78",
+    "assets/rooms/standard_room_5/reading_stool.glb": "7ef214642b47141566b0f0ad179cf3b73d4a43cd6e55958512d14ad2d02f8a80",
+    "assets/rooms/standard_room_5/reading_cup.glb": "bf0b7ed3cdb87ab79d36005379cf64305c6d8777d0f962f74881a33d56e71e61",
+    "assets/rooms/standard_room_5/bookcase_stool.glb": "013a3016b36e5eefdb40e82914056623a531e71919c07e763213553dc7b5ef79",
+    "assets/rooms/standard_room_5/dining_table.glb": "7976fdbacb0c48888dfb5eb00caef9c2a46716584e1f623e00b5c838cc6d3afa",
+    "assets/rooms/standard_room_5/checked_runner.glb": "6dfc640f803f96b1e77917ebf6eada408410323278b6a79459b4cb3db608cc16",
+    "assets/rooms/standard_room_5/chair.glb": "bb5a3bbff8b3c2de4c227970c05aa138656c21e3279dcb0fe162f4ceb256c696",
+    "assets/rooms/standard_room_5/chair_cushion.glb": "187c27a7cc985d8cbbc3014743646ba35e0e538b068d41ba1c183f8735c1c506",
+    "assets/rooms/standard_room_5/rug_fringe.glb": "57124cb24fe25f1582494dc0de16fc815bbb48b171d07f5695520c5cf55e1d6a",
+    "assets/rooms/standard_room_5/daisy_jug.glb": "a9f046951271e1ae45aabc9a7d1e318cff2a5af84d01e3230f79e534283ad052",
+    "assets/rooms/standard_room_5/tabletop_still_life.glb": "3d118fa35ec123fa44f9230e8e8469f8b4f351de8cf6c611f248291c365f0a07",
+    "assets/rooms/_shared/plants/monstera.glb": "121c5e310388bfefb9e63e53b37e6101192f5fded30b13d0b496a22d445d3eac",
+    "assets/rooms/_shared/plants/peace_lily.glb": "090d0ee44ac75d9b1c97fc22dd3d9216eabc82e1769830dd86af4a65f142b865",
+    "assets/rooms/_shared/plants/pothos.glb": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
+    "assets/rooms/standard_room_5/room_albedo_ao.png": "66b429c05de8c3eea1fc5fec15d330ee483b6b708274c69d1a4413d37df80276",
     "assets/rooms/standard_room_5/window_landscape.png": "ddcc565e14a419c44dbf26e2626ed01098e4328d96d4fb75fb588382a9a62f81",
-    "tools/art/source/standard_room_5/standard_room_5.blend": "b91c24013ba727bb764fcdb29fa5b5f4752471843bca4b997c89b86f22133ec6",
-    "assets/rooms/_shared/plants/monstera.glb": "643df6a9672fbcf7b68fb162fbfc894a8db13189449ba99d53bf0a637e91c18c",
-    "assets/rooms/_shared/plants/peace_lily.glb": "e98a2a849067aaee89799149b959da211538365bb9d9bcff6fbad35027fefb1b",
-    "assets/rooms/_shared/plants/pothos.glb": "fa359a9cd9bae05e5df96d9b87225a9be19fe010294ea82387e62352338f49c3",
-    "assets/rooms/_shared/plants/room_albedo_ao.png": "47a9616f9f58a8cf237e01ff0f1ce0aebdff7f0aff765177af9abf5ce964c01e",
-    "assets/rooms/_shared/plants/material.tres": "0edbb6ed7b27f9d190da43996efa558e7a0f2b1f2d7993781c94cb12c87413bc"
+    "assets/rooms/standard_room_5/fire_gradient.png": "349870df4e628410dc128999d57558a6654b17e5ef4d5a2cabc06db6b8e89f5b",
+    "assets/rooms/_shared/plants/room_albedo_ao.png": "ad5f09a5eca35e1ed53f528b67d8cdf7bad8b845f2b96523f6e28a8d8e0ffcde",
+    "assets/rooms/_shared/plants/material.tres": "f75e3970edd6f8caeaa485218465d51f718b0caee941923ee5825da94adf791b",
+    "tools/art/source/standard_room_5/standard_room_5.blend": "1188bfdb9b26f0570c8c4a738d632d87c7bfcb9339ddc549db37fd70a50dc8f6",
+    "assets/rooms/standard_room_5/layout.json": "6f3fece4f980949b9edd890e0ed7ef9131ccbe8933c8d613c4289bfd5139b960"
   },
-  "scope": "R1 art sample plus rendered desktop avatar/collision checks; user acceptance pending; no Android/production claim",
-  "benchmark": {
-    "passed": true,
-    "checks": 37,
-    "clip_seconds": 15,
-    "video_sha256": "8d8c08caef74d54f4f32b58198bbcb8931ba64d905bce252688e87335690a901"
-  },
-  "review_basis": {
-    "parent": "SGODOT-171",
-    "sample": "SGODOT-172",
-    "status": "sample awaits approval before batch revisions",
-    "common_harness_commit": "39f50fb",
-    "shared_plants_commit": "26aed6f"
-  }
+  "scope": "Zhao Yun Standard Room R2 sample; no other artist scene edit, Android performance claim or production update."
 }

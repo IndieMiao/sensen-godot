@@ -1,0 +1,910 @@
+{
+  "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+  "checks": [
+    {
+      "details": null,
+      "name": "Default Avatar fixture assembles",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Bench route/probe schema",
+      "passed": true
+    },
+    {
+      "details": 0.0900000035762787,
+      "name": "Spawn stands on authored floor",
+      "passed": true
+    },
+    {
+      "details": "(2.36, 0.09, -2.0)",
+      "name": "Spawn capsule clear",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          2.32157278060913,
+          0.0899376347661018,
+          -1.69258260726929
+        ],
+        "from": [
+          2.35999989509583,
+          0.0900000035762787,
+          -2.0
+        ],
+        "name": "door",
+        "reached": true,
+        "remaining_m": 0.0938308164477348,
+        "seconds": 0.003,
+        "target": [
+          2.30999994277954,
+          0.0799999982118607,
+          -1.60000002384186
+        ]
+      },
+      "name": "Route: door",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          2.00686693191528,
+          0.0899263620376587,
+          2.60620188713074
+        ],
+        "from": [
+          2.32157278060913,
+          0.0899376347661018,
+          -1.69258260726929
+        ],
+        "name": "southeast aisle",
+        "reached": true,
+        "remaining_m": 0.0945715680718422,
+        "seconds": 1.074,
+        "target": [
+          2.0,
+          0.0799999982118607,
+          2.70000004768372
+        ]
+      },
+      "name": "Route: southeast aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.465047240257263,
+          0.0899267792701721,
+          2.85468196868896
+        ],
+        "from": [
+          2.00686693191528,
+          0.0899263620376587,
+          2.60620188713074
+        ],
+        "name": "table south",
+        "reached": true,
+        "remaining_m": 0.0967840701341629,
+        "seconds": 0.433,
+        "target": [
+          0.370000004768372,
+          0.0799999982118607,
+          2.86999988555908
+        ]
+      },
+      "name": "Route: table south",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.13231348991394,
+          0.0899310782551765,
+          2.68710112571716
+        ],
+        "from": [
+          0.465047240257263,
+          0.0899267792701721,
+          2.85468196868896
+        ],
+        "name": "southwest aisle",
+        "reached": true,
+        "remaining_m": 0.068778783082962,
+        "seconds": 0.45,
+        "target": [
+          -1.20000004768372,
+          0.0799999982118607,
+          2.6800000667572
+        ]
+      },
+      "name": "Route: southwest aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.37157082557678,
+          0.0899320170283318,
+          0.719326078891754
+        ],
+        "from": [
+          -1.13231348991394,
+          0.0899310782551765,
+          2.68710112571716
+        ],
+        "name": "sofa front",
+        "reached": true,
+        "remaining_m": 0.0705393776297569,
+        "seconds": 0.55,
+        "target": [
+          -1.37999999523163,
+          0.0799999982118607,
+          0.649999976158142
+        ]
+      },
+      "name": "Route: sofa front",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.25228834152222,
+          0.0899297297000885,
+          -1.12206137180328
+        ],
+        "from": [
+          -1.37157082557678,
+          0.0899320170283318,
+          0.719326078891754
+        ],
+        "name": "bookcase front",
+        "reached": true,
+        "remaining_m": 0.0649877935647964,
+        "seconds": 0.55,
+        "target": [
+          -2.27999997138977,
+          0.0799999982118607,
+          -1.17999994754791
+        ]
+      },
+      "name": "Route: bookcase front",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.6061338186264,
+          0.0899104028940201,
+          -1.47398102283478
+        ],
+        "from": [
+          -2.25228834152222,
+          0.0899297297000885,
+          -1.12206137180328
+        ],
+        "name": "hearth front",
+        "reached": true,
+        "remaining_m": 0.0759557038545609,
+        "seconds": 0.216,
+        "target": [
+          -1.53999996185303,
+          0.0799999982118607,
+          -1.50999999046326
+        ]
+      },
+      "name": "Route: hearth front",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.262286067008972,
+          0.0899367853999138,
+          -1.50838494300842
+        ],
+        "from": [
+          -1.6061338186264,
+          0.0899104028940201,
+          -1.47398102283478
+        ],
+        "name": "kitchen counter",
+        "reached": true,
+        "remaining_m": 0.0882897526025772,
+        "seconds": 0.332,
+        "target": [
+          0.349999994039536,
+          0.0799999982118607,
+          -1.50999999046326
+        ]
+      },
+      "name": "Route: kitchen counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.45400810241699,
+          0.0899257138371468,
+          -0.57940936088562
+        ],
+        "from": [
+          0.262286067008972,
+          0.0899367853999138,
+          -1.50838494300842
+        ],
+        "name": "window",
+        "reached": true,
+        "remaining_m": 0.0914222598075867,
+        "seconds": 0.783,
+        "target": [
+          -2.53999996185303,
+          0.0799999982118607,
+          -0.550000011920929
+        ]
+      },
+      "name": "Route: window",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/StandardRoom5Art/dining_table/@StaticBody3D@41"
+        ],
+        "final": [
+          1.54614233970642,
+          0.0830201059579849,
+          1.23000001907349
+        ],
+        "from": [
+          2.0,
+          0.0900000035762787,
+          1.23000001907349
+        ],
+        "reached": false,
+        "remaining_m": 1.11616408824921,
+        "seconds": 0.867,
+        "target": [
+          0.430000007152557,
+          0.0900000035762787,
+          1.23000001907349
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/StandardRoom5Art/dining_table/@StaticBody3D@41"
+      },
+      "name": "Blocked: table",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/StandardRoom5Art/sofa/@StaticBody3D@35"
+        ],
+        "final": [
+          -1.88838911056519,
+          0.0723652616143227,
+          0.899999976158142
+        ],
+        "from": [
+          -1.10000002384186,
+          0.0900000035762787,
+          0.899999976158142
+        ],
+        "reached": false,
+        "remaining_m": 0.681838929653168,
+        "seconds": 0.882,
+        "target": [
+          -2.5699999332428,
+          0.0900000035762787,
+          0.899999976158142
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/StandardRoom5Art/sofa/@StaticBody3D@35"
+      },
+      "name": "Blocked: sofa",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/StandardRoom5Art/hearth/@StaticBody3D@25"
+        ],
+        "final": [
+          -1.5900000333786,
+          0.0729749873280525,
+          -1.91249990463257
+        ],
+        "from": [
+          -1.5900000333786,
+          0.0900000035762787,
+          -1.35000002384186
+        ],
+        "reached": false,
+        "remaining_m": 0.697707712650299,
+        "seconds": 0.882,
+        "target": [
+          -1.5900000333786,
+          0.0900000035762787,
+          -2.60999989509583
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/StandardRoom5Art/hearth/@StaticBody3D@25"
+      },
+      "name": "Blocked: hearth",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/StandardRoom5Art/sink_cabinet/@StaticBody3D@33"
+        ],
+        "final": [
+          0.300000011920929,
+          0.0899387076497078,
+          -2.06250047683716
+        ],
+        "from": [
+          0.300000011920929,
+          0.0900000035762787,
+          -1.5
+        ],
+        "reached": false,
+        "remaining_m": 0.647499561309814,
+        "seconds": 0.882,
+        "target": [
+          0.300000011920929,
+          0.0900000035762787,
+          -2.71000003814697
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/StandardRoom5Art/sink_cabinet/@StaticBody3D@33"
+      },
+      "name": "Blocked: counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/StandardRoom5Art/bookshelf/@StaticBody3D@31"
+        ],
+        "final": [
+          -2.76860809326172,
+          0.0800789296627045,
+          -2.1015510559082
+        ],
+        "from": [
+          -2.7699670791626,
+          0.0801508501172066,
+          -1.48000001907349
+        ],
+        "reached": false,
+        "remaining_m": 0.495283097028732,
+        "seconds": 0.882,
+        "target": [
+          -2.84999990463257,
+          0.0900000035762787,
+          -2.58999991416931
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/StandardRoom5Art/bookshelf/@StaticBody3D@31"
+      },
+      "name": "Blocked: bookcase",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.75771975517273,
+          0.0723652616143227,
+          -0.550000011920929
+        ],
+        "from": [
+          -2.54999995231628,
+          0.0900000035762787,
+          -0.550000011920929
+        ],
+        "reached": false,
+        "remaining_m": 0.892454564571381,
+        "seconds": 0.882,
+        "target": [
+          -3.65000009536743,
+          0.0900000035762787,
+          -0.550000011920929
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/StandardRoom5Art/room_shell/@StaticBody3D@5"
+      },
+      "name": "Blocked: west wall",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          2.90771961212158,
+          0.0723652616143227,
+          1.64999997615814
+        ],
+        "from": [
+          2.45000004768372,
+          0.0900000035762787,
+          1.64999997615814
+        ],
+        "reached": false,
+        "remaining_m": 0.892454564571381,
+        "seconds": 0.883,
+        "target": [
+          3.79999995231628,
+          0.0900000035762787,
+          1.64999997615814
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/StandardRoom5Art/room_shell/@StaticBody3D@13"
+      },
+      "name": "Blocked: east edge",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.70000004768372,
+          0.0723652616143227,
+          2.90771961212158
+        ],
+        "from": [
+          1.70000004768372,
+          0.0900000035762787,
+          2.45000004768372
+        ],
+        "reached": false,
+        "remaining_m": 0.892454564571381,
+        "seconds": 0.883,
+        "target": [
+          1.70000004768372,
+          0.0900000035762787,
+          3.79999995231628
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/StandardRoom5Art/room_shell/@StaticBody3D@15"
+      },
+      "name": "Blocked: south edge",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/StandardRoom5Art/range_cooker/@StaticBody3D@29"
+        ],
+        "final": [
+          1.64999997615814,
+          0.0801420658826828,
+          -2.07874941825867
+        ],
+        "from": [
+          1.64999997615814,
+          0.0900000035762787,
+          -1.64999997615814
+        ],
+        "reached": false,
+        "remaining_m": 1.47128355503082,
+        "seconds": 0.882,
+        "target": [
+          1.64999997615814,
+          0.0900000035762787,
+          -3.54999995231628
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/StandardRoom5Art/range_cooker/@StaticBody3D@29"
+      },
+      "name": "Blocked: back wall",
+      "passed": true
+    },
+    {
+      "details": {
+        "authored_width": 1.657,
+        "measured_m": 1.65699988603592,
+        "minimum_m": 0.7
+      },
+      "name": "Gap width: table-sofa aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.37999999523163,
+          0.0899315774440765,
+          0.268554836511612
+        ],
+        "from": [
+          -1.37999999523163,
+          0.0900000035762787,
+          2.0
+        ],
+        "reached": true,
+        "remaining_m": 0.0685548707842827,
+        "seconds": 0.5,
+        "target": [
+          -1.37999999523163,
+          0.0900000035762787,
+          0.200000002980232
+        ]
+      },
+      "name": "Traverse: table-sofa aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "authored_width": 2.405,
+        "measured_m": 2.40500032901764,
+        "minimum_m": 0.7
+      },
+      "name": "Gap width: table-kitchen aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.67164063453674,
+          0.089930422604084,
+          -1.35000002384186
+        ],
+        "from": [
+          1.50999999046326,
+          0.0900000035762787,
+          -1.35000002384186
+        ],
+        "reached": true,
+        "remaining_m": 0.0883593857288361,
+        "seconds": 0.883,
+        "target": [
+          -1.75999999046326,
+          0.0900000035762787,
+          -1.35000002384186
+        ]
+      },
+      "name": "Traverse: table-kitchen aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "entry": {
+          "collisions": [],
+          "final": [
+            2.35999989509583,
+            0.0899302586913109,
+            -2.46891236305237
+          ],
+          "from": [
+            2.35999989509583,
+            0.0899351313710213,
+            -3.38889217376709
+          ],
+          "reached": true,
+          "remaining_m": 0.0689122974872589,
+          "seconds": 0.267,
+          "target": [
+            2.35999989509583,
+            0.0900000035762787,
+            -2.40000009536743
+          ]
+        },
+        "exit": {
+          "collisions": [],
+          "final": [
+            2.35999989509583,
+            0.0899351313710213,
+            -3.38889217376709
+          ],
+          "from": [
+            2.35999989509583,
+            0.0900000035762787,
+            -2.40000009536743
+          ],
+          "reached": true,
+          "remaining_m": 0.0811078771948814,
+          "seconds": 0.3,
+          "target": [
+            2.35999989509583,
+            0.0900000035762787,
+            -3.47000002861023
+          ]
+        }
+      },
+      "name": "Entrance gap allows exit and reentry",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "delta": [
+          0.298608541488647,
+          0.000122591853141785,
+          -1.6351842880249
+        ]
+      },
+      "name": "Diagonal collision preserves wall sliding",
+      "passed": true
+    },
+    {
+      "details": [
+        "run",
+        0.149994,
+        0.316654
+      ],
+      "name": "Run animation advances in rendered viewport",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Input release stops horizontal motion",
+      "passed": true
+    },
+    {
+      "details": "idle",
+      "name": "Release returns to idle",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Focus loss cancels movement",
+      "passed": true
+    },
+    {
+      "details": 1.74549412727356,
+      "name": "Fixture head-top height measurable",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 1.3348655624751,
+        "difference": 0.0,
+        "height": 2.33,
+        "ratio_to_H": 1.3348655624751,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: door",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.660271485301524,
+        "difference": 0.0,
+        "height": 1.1525,
+        "ratio_to_H": 0.660271485301524,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.392439017294181,
+        "difference": 0.142335766423358,
+        "height": 0.7825,
+        "ratio_to_H": 0.448297125595178,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: chair",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.650245670991088,
+        "difference": 0.0,
+        "height": 1.135,
+        "ratio_to_H": 0.650245670991088,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: table",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "renderer": "mobile",
+  "route": [
+    {
+      "collisions": [],
+      "final": [
+        2.32157278060913,
+        0.0899376347661018,
+        -1.69258260726929
+      ],
+      "from": [
+        2.35999989509583,
+        0.0900000035762787,
+        -2.0
+      ],
+      "name": "door",
+      "reached": true,
+      "remaining_m": 0.0938308164477348,
+      "seconds": 0.003,
+      "target": [
+        2.30999994277954,
+        0.0799999982118607,
+        -1.60000002384186
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        2.00686693191528,
+        0.0899263620376587,
+        2.60620188713074
+      ],
+      "from": [
+        2.32157278060913,
+        0.0899376347661018,
+        -1.69258260726929
+      ],
+      "name": "southeast aisle",
+      "reached": true,
+      "remaining_m": 0.0945715680718422,
+      "seconds": 1.074,
+      "target": [
+        2.0,
+        0.0799999982118607,
+        2.70000004768372
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        0.465047240257263,
+        0.0899267792701721,
+        2.85468196868896
+      ],
+      "from": [
+        2.00686693191528,
+        0.0899263620376587,
+        2.60620188713074
+      ],
+      "name": "table south",
+      "reached": true,
+      "remaining_m": 0.0967840701341629,
+      "seconds": 0.433,
+      "target": [
+        0.370000004768372,
+        0.0799999982118607,
+        2.86999988555908
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -1.13231348991394,
+        0.0899310782551765,
+        2.68710112571716
+      ],
+      "from": [
+        0.465047240257263,
+        0.0899267792701721,
+        2.85468196868896
+      ],
+      "name": "southwest aisle",
+      "reached": true,
+      "remaining_m": 0.068778783082962,
+      "seconds": 0.45,
+      "target": [
+        -1.20000004768372,
+        0.0799999982118607,
+        2.6800000667572
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -1.37157082557678,
+        0.0899320170283318,
+        0.719326078891754
+      ],
+      "from": [
+        -1.13231348991394,
+        0.0899310782551765,
+        2.68710112571716
+      ],
+      "name": "sofa front",
+      "reached": true,
+      "remaining_m": 0.0705393776297569,
+      "seconds": 0.55,
+      "target": [
+        -1.37999999523163,
+        0.0799999982118607,
+        0.649999976158142
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -2.25228834152222,
+        0.0899297297000885,
+        -1.12206137180328
+      ],
+      "from": [
+        -1.37157082557678,
+        0.0899320170283318,
+        0.719326078891754
+      ],
+      "name": "bookcase front",
+      "reached": true,
+      "remaining_m": 0.0649877935647964,
+      "seconds": 0.55,
+      "target": [
+        -2.27999997138977,
+        0.0799999982118607,
+        -1.17999994754791
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -1.6061338186264,
+        0.0899104028940201,
+        -1.47398102283478
+      ],
+      "from": [
+        -2.25228834152222,
+        0.0899297297000885,
+        -1.12206137180328
+      ],
+      "name": "hearth front",
+      "reached": true,
+      "remaining_m": 0.0759557038545609,
+      "seconds": 0.216,
+      "target": [
+        -1.53999996185303,
+        0.0799999982118607,
+        -1.50999999046326
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        0.262286067008972,
+        0.0899367853999138,
+        -1.50838494300842
+      ],
+      "from": [
+        -1.6061338186264,
+        0.0899104028940201,
+        -1.47398102283478
+      ],
+      "name": "kitchen counter",
+      "reached": true,
+      "remaining_m": 0.0882897526025772,
+      "seconds": 0.332,
+      "target": [
+        0.349999994039536,
+        0.0799999982118607,
+        -1.50999999046326
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -2.45400810241699,
+        0.0899257138371468,
+        -0.57940936088562
+      ],
+      "from": [
+        0.262286067008972,
+        0.0899367853999138,
+        -1.50838494300842
+      ],
+      "name": "window",
+      "reached": true,
+      "remaining_m": 0.0914222598075867,
+      "seconds": 0.783,
+      "target": [
+        -2.53999996185303,
+        0.0799999982118607,
+        -0.550000011920929
+      ]
+    }
+  ],
+  "scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+  "slug": "standard_room_5"
+}

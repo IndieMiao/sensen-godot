@@ -67,9 +67,9 @@ func setup_world()->void:
 	sun.look_at(vec(lighting.get("sun_target",[0,0,0])))
 	sun.light_color=Color(lighting.get("sun_color","ffe4b9"))
 	sun.light_energy=float(lighting.get("sun",1.05));sun.shadow_enabled=true
-	sun.shadow_bias=.025;sun.shadow_normal_bias=.18
+	sun.shadow_bias=float(lighting.get("shadow_bias",.025));sun.shadow_normal_bias=float(lighting.get("shadow_normal_bias",.18))
 	sun.directional_shadow_mode=DirectionalLight3D.SHADOW_ORTHOGONAL
-	sun.directional_shadow_max_distance=35;sun.light_angular_distance=1.4
+	sun.directional_shadow_max_distance=float(lighting.get("shadow_distance",35));sun.light_angular_distance=1.4
 	for data in lighting.get("points",[]):
 		var light:=OmniLight3D.new();add_child(light);light.position=vec(data.position)
 		light.light_color=Color(data.get("color","ffa35f"));light.light_energy=float(data.get("energy",1.0))

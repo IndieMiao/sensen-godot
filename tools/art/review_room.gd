@@ -43,9 +43,9 @@ func capture() -> void:
 	sun.light_energy = float(lighting.get("sun", 1.05))
 	sun.shadow_enabled = true
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
-	sun.directional_shadow_max_distance = 35
-	sun.shadow_bias = .025
-	sun.shadow_normal_bias = .18
+	sun.directional_shadow_max_distance = float(lighting.get("shadow_distance", 35))
+	sun.shadow_bias = float(lighting.get("shadow_bias", .025))
+	sun.shadow_normal_bias = float(lighting.get("shadow_normal_bias", .18))
 	sun.light_angular_distance = 1.4
 	world.add_child(sun)
 	sun.position = vec(lighting.get("sun_position", [-6,7,1.5]))

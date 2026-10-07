@@ -10,14 +10,15 @@
     "no_embedded_atlas": true,
     "unique_glbs": 41,
     "instances": 49,
-    "placed_triangles": 191256,
+    "placed_triangles": 126952,
     "lark_message_count": 4,
     "lark_images_sha256_verified": true,
     "plane_review_images": 3,
     "plane_comment_readback_verified": true,
-    "revision": "R1 sample",
+    "revision": "R2 sample",
     "shared_library_modules": 3,
-    "revision_evidence": "../standard_room_5-review1-2026-10-07/verification-summary.json"
+    "revision_evidence": "../standard_room_5-review2-2026-10-07/verification-summary.json",
+    "plant_budget_triangles": 28824
   },
   {
     "scene": "deluxe_room_10",
