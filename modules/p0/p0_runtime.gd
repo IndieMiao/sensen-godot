@@ -350,6 +350,8 @@ func _dev_shot(dt: float) -> void:
 			"gear": ui.open_gear()
 			"skills": ui.open_skills()
 			"profile": ui.open_profile()
+			"resident": ui.open_resident(step[1] if step.size() > 1 else "res_pip")   # SGODOT-225 dialogue bar
+			"resprofile": ui.open_resident_profile(ui._resident)                     # its name → profile sheet
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
