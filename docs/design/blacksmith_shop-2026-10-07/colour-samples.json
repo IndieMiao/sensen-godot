@@ -1,0 +1,35 @@
+[
+  {
+    "name": "Front floorboard",
+    "reference_pixel": [
+      1100,
+      1175
+    ],
+    "runtime_pixel": [
+      1090,
+      1150
+    ]
+  },
+  {
+    "name": "Right wall gray",
+    "reference_pixel": [
+      1245,
+      760
+    ],
+    "runtime_pixel": [
+      1135,
+      850
+    ]
+  },
+  {
+    "name": "Right timber post",
+    "reference_pixel": [
+      1342,
+      830
+    ],
+    "runtime_pixel": [
+      1247,
+      844
+    ]
+  }
+]

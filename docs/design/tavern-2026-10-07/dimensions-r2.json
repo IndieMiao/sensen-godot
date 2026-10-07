@@ -1,0 +1,90 @@
+{
+  "method": "Evaluated editable Blender mesh vertices transformed into the module floor-pivot frame; top of named seat/worktop parts; no manifest height values used.",
+  "checks": [
+    {
+      "asset": "long_bar",
+      "object_names": [
+        "Counter thick oak top"
+      ],
+      "floor_pivot_to_top_m": 1.3166999816894531,
+      "baseline_m": 1.1525,
+      "relative_difference": 0.14247286914486157,
+      "passed": true
+    },
+    {
+      "asset": "bar_return",
+      "object_names": [
+        "Counter thick oak top.001"
+      ],
+      "floor_pivot_to_top_m": 1.3166999816894531,
+      "baseline_m": 1.1525,
+      "relative_difference": 0.14247286914486157,
+      "passed": true
+    },
+    {
+      "asset": "round_table",
+      "object_names": [
+        "Round timber tabletop"
+      ],
+      "floor_pivot_to_top_m": 1.091499924659729,
+      "baseline_m": 1.135,
+      "relative_difference": 0.0383260575685207,
+      "passed": true
+    },
+    {
+      "asset": "square_table",
+      "object_names": [
+        "Individual tabletop board",
+        "Individual tabletop board.001",
+        "Individual tabletop board.002",
+        "Individual tabletop board.003",
+        "Individual tabletop board.004"
+      ],
+      "floor_pivot_to_top_m": 1.1349999904632568,
+      "baseline_m": 1.135,
+      "relative_difference": 8.402416873387608e-09,
+      "passed": true
+    },
+    {
+      "asset": "bar_stool",
+      "object_names": [
+        "Round stool seat"
+      ],
+      "floor_pivot_to_top_m": 0.7789999842643738,
+      "baseline_m": 0.685,
+      "relative_difference": 0.1372262544005456,
+      "passed": true
+    },
+    {
+      "asset": "dining_stool",
+      "object_names": [
+        "Round stool seat.004"
+      ],
+      "floor_pivot_to_top_m": 0.6499999761581421,
+      "baseline_m": 0.685,
+      "relative_difference": 0.051094925316581,
+      "passed": true
+    },
+    {
+      "asset": "square_dining_stool",
+      "object_names": [
+        "Squared softened seat"
+      ],
+      "floor_pivot_to_top_m": 0.6500000357627869,
+      "baseline_m": 0.685,
+      "relative_difference": 0.051094838302501056,
+      "passed": true
+    },
+    {
+      "asset": "backed_dining_stool",
+      "object_names": [
+        "Round chair seat"
+      ],
+      "floor_pivot_to_top_m": 0.6500000357627869,
+      "baseline_m": 0.685,
+      "relative_difference": 0.051094838302501056,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

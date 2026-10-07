@@ -177,7 +177,9 @@ def build():
     reuse('right_shelf_plant',(2.63,2.93,-2.73),original='shelf_plant')
     lighting={'ambient':.60,'sun':.92,'ambient_color':'eef0e9','sun_color':'fff2e5',
               'points':[{'position':[-1.55,1.60,-1.20],'color':'ff873b','energy':1.5,'range':2.4}]}
-    finalize({'position':[10,9.2,11.5],'target':[0,1.85,0],'size':12.5},lighting);complete()
+    sys.path.insert(0,str(Path(__file__).resolve().parent/'source/blacksmith_shop'))
+    import revision2
+    revision2.revise()
 
 
 if __name__=='__main__':build()

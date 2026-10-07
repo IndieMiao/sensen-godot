@@ -1,0 +1,772 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"checks": [
+		{
+			"details": null,
+			"name": "Default Avatar fixture assembles",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Bench route/probe schema",
+			"passed": true
+		},
+		{
+			"details": 0.0820000022649765,
+			"name": "Spawn stands on authored floor",
+			"passed": true
+		},
+		{
+			"details": "(-0.95, 0.082, 2.72)",
+			"name": "Spawn capsule clear",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.949999988079071,
+					0.0820000022649765,
+					2.72000002861023
+				],
+				"from": [
+					-0.949999988079071,
+					0.0820000022649765,
+					2.72000002861023
+				],
+				"name": "entry",
+				"reached": true,
+				"remaining_m": 0.0,
+				"seconds": 0.001,
+				"target": [
+					-0.949999988079071,
+					0.0820000022649765,
+					2.72000002861023
+				]
+			},
+			"name": "Route: entry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.48682177066803,
+					0.0919322445988655,
+					2.43369507789612
+				],
+				"from": [
+					-0.949999988079071,
+					0.0820000022649765,
+					2.72000002861023
+				],
+				"name": "left_front",
+				"reached": true,
+				"remaining_m": 0.0722875148057938,
+				"seconds": 0.067,
+				"target": [
+					-1.54999995231628,
+					0.0820000022649765,
+					2.40000009536743
+				]
+			},
+			"name": "Route: left_front",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.48025369644165,
+					0.0919318199157715,
+					0.639289736747742
+				],
+				"from": [
+					-1.48682177066803,
+					0.0919322445988655,
+					2.43369507789612
+				],
+				"name": "left_bench",
+				"reached": true,
+				"remaining_m": 0.0699983835220337,
+				"seconds": 0.5,
+				"target": [
+					-1.48000001907349,
+					0.0820000022649765,
+					0.569999992847443
+				]
+			},
+			"name": "Route: left_bench",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.30970788002014,
+					0.0919332578778267,
+					-0.646791338920593
+				],
+				"from": [
+					-1.48025369644165,
+					0.0919318199157715,
+					0.639289736747742
+				],
+				"name": "forge_safe",
+				"reached": true,
+				"remaining_m": 0.0745145976543427,
+				"seconds": 0.367,
+				"target": [
+					-1.29999995231628,
+					0.0820000022649765,
+					-0.720000028610229
+				]
+			},
+			"name": "Route: forge_safe",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.56795060634613,
+					0.0919366702437401,
+					1.20365905761719
+				],
+				"from": [
+					-1.30970788002014,
+					0.0919332578778267,
+					-0.646791338920593
+				],
+				"name": "water_side",
+				"reached": true,
+				"remaining_m": 0.0877421125769615,
+				"seconds": 0.384,
+				"target": [
+					-1.58000004291534,
+					0.0820000022649765,
+					1.28999996185303
+				]
+			},
+			"name": "Route: water_side",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BlacksmithShopArt/anvil_workbench/Collider"
+				],
+				"final": [
+					-1.05236649513245,
+					0.0919327586889267,
+					2.25539088249207
+				],
+				"from": [
+					-1.56795060634613,
+					0.0919366702437401,
+					1.20365905761719
+				],
+				"name": "front",
+				"reached": true,
+				"remaining_m": 0.0729423090815544,
+				"seconds": 0.333,
+				"target": [
+					-1.01999998092651,
+					0.0820000022649765,
+					2.3199999332428
+				]
+			},
+			"name": "Route: front",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.56079757213593,
+					0.0919347330927849,
+					2.27927565574646
+				],
+				"from": [
+					-1.05236649513245,
+					0.0919327586889267,
+					2.25539088249207
+				],
+				"name": "bench_right",
+				"reached": true,
+				"remaining_m": 0.0798263475298882,
+				"seconds": 0.716,
+				"target": [
+					1.63999998569489,
+					0.0820000022649765,
+					2.27999997138977
+				]
+			},
+			"name": "Route: bench_right",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.76142656803131,
+					0.0919355601072311,
+					0.361934810876846
+				],
+				"from": [
+					1.56079757213593,
+					0.0919347330927849,
+					2.27927565574646
+				],
+				"name": "stump_front",
+				"reached": true,
+				"remaining_m": 0.0829791054129601,
+				"seconds": 0.533,
+				"target": [
+					1.76999998092651,
+					0.0820000022649765,
+					0.280000001192093
+				]
+			},
+			"name": "Route: stump_front",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.494181662797928,
+					0.0919324904680252,
+					-1.24400985240936
+				],
+				"from": [
+					1.76142656803131,
+					0.0919355601072311,
+					0.361934810876846
+				],
+				"name": "rear_bench",
+				"reached": true,
+				"remaining_m": 0.07201087474823,
+				"seconds": 0.566,
+				"target": [
+					0.449999988079071,
+					0.0820000022649765,
+					-1.29999995231628
+				]
+			},
+			"name": "Route: rear_bench",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BlacksmithShopArt/anvil_workbench/Collider"
+				],
+				"final": [
+					-1.23749983310699,
+					0.0820977911353111,
+					1.25
+				],
+				"from": [
+					-1.54999995231628,
+					0.0820000022649765,
+					1.25
+				],
+				"reached": false,
+				"remaining_m": 1.38749980926514,
+				"seconds": 0.866,
+				"target": [
+					0.150000005960464,
+					0.0820000022649765,
+					1.25
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/BlacksmithShopArt/anvil_workbench/Collider"
+			},
+			"name": "Blocked: mainbench",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BlacksmithShopArt/brick_forge/Collider"
+				],
+				"final": [
+					-1.39999997615814,
+					0.0738635882735252,
+					-1.25
+				],
+				"from": [
+					-1.39999997615814,
+					0.0820000022649765,
+					-0.75
+				],
+				"reached": false,
+				"remaining_m": 0.950034916400909,
+				"seconds": 0.867,
+				"target": [
+					-1.39999997615814,
+					0.0820000022649765,
+					-2.20000004768372
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/BlacksmithShopArt/brick_forge/Collider"
+			},
+			"name": "Blocked: furnace",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BlacksmithShopArt/quench_barrel/Collider"
+				],
+				"final": [
+					-1.82021951675415,
+					0.0820960029959679,
+					1.35000002384186
+				],
+				"from": [
+					-1.54999995231628,
+					0.0820000022649765,
+					1.35000002384186
+				],
+				"reached": false,
+				"remaining_m": 0.699780464172363,
+				"seconds": 0.883,
+				"target": [
+					-2.51999998092651,
+					0.0820000022649765,
+					1.35000002384186
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/BlacksmithShopArt/quench_barrel/Collider"
+			},
+			"name": "Blocked: water",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BlacksmithShopArt/stump/Collider"
+				],
+				"final": [
+					1.72272193431854,
+					0.0745107084512711,
+					-0.519999980926514
+				],
+				"from": [
+					1.63999998569489,
+					0.0820000022649765,
+					-0.519999980926514
+				],
+				"reached": false,
+				"remaining_m": 0.667320191860199,
+				"seconds": 0.883,
+				"target": [
+					2.39000010490417,
+					0.0820000022649765,
+					-0.519999980926514
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/BlacksmithShopArt/stump/Collider"
+			},
+			"name": "Blocked: stump",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/BlacksmithShopArt/back_tool_bench/Collider"
+				],
+				"final": [
+					1.5,
+					0.0821743384003639,
+					-1.46646654605865
+				],
+				"from": [
+					1.5,
+					0.0820000022649765,
+					-1.24000000953674
+				],
+				"reached": false,
+				"remaining_m": 0.523533463478088,
+				"seconds": 0.883,
+				"target": [
+					1.5,
+					0.0820000022649765,
+					-1.99000000953674
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/BlacksmithShopArt/back_tool_bench/Collider"
+			},
+			"name": "Blocked: smallbench",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 2.185,
+				"measured_m": 2.18499994277954,
+				"minimum_m": 0.8
+			},
+			"name": "Gap width: forge_to_mainbench",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.631445467472076,
+					0.0919315740466118,
+					-0.200000002980232
+				],
+				"from": [
+					-1.60000002384186,
+					0.0820000022649765,
+					-0.200000002980232
+				],
+				"reached": true,
+				"remaining_m": 0.0692701861262321,
+				"seconds": 0.633,
+				"target": [
+					0.699999988079071,
+					0.0820000022649765,
+					-0.200000002980232
+				]
+			},
+			"name": "Traverse: forge_to_mainbench",
+			"passed": true
+		},
+		{
+			"details": {
+				"entry": {
+					"collisions": [],
+					"final": [
+						-0.949999988079071,
+						0.0919303894042969,
+						2.78605532646179
+					],
+					"from": [
+						-0.949999988079071,
+						0.0919322445988655,
+						2.95339822769165
+					],
+					"reached": true,
+					"remaining_m": 0.066797561943531,
+					"seconds": 0.066,
+					"target": [
+						-0.949999988079071,
+						0.0820000022649765,
+						2.72000002861023
+					]
+				},
+				"exit": {
+					"collisions": [],
+					"final": [
+						-0.949999988079071,
+						0.0919322445988655,
+						2.95339822769165
+					],
+					"from": [
+						-0.949999988079071,
+						0.0820000022649765,
+						2.72000002861023
+					],
+					"reached": true,
+					"remaining_m": 0.0722874626517296,
+					"seconds": 0.1,
+					"target": [
+						-0.949999988079071,
+						0.0820000022649765,
+						3.02500009536743
+					]
+				}
+			},
+			"name": "Entrance gap allows exit and reentry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"delta": [
+					0.0786075592041016,
+					0.0101561173796654,
+					-1.10485517978668
+				]
+			},
+			"name": "Diagonal collision preserves wall sliding",
+			"passed": true
+		},
+		{
+			"details": [
+				"run",
+				0.15,
+				0.316666666666667
+			],
+			"name": "Run animation advances in rendered viewport",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Input release stops horizontal motion",
+			"passed": true
+		},
+		{
+			"details": "idle",
+			"name": "Release returns to idle",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Focus loss cancels movement",
+			"passed": true
+		},
+		{
+			"details": 1.74549420177937,
+			"name": "Fixture head-top height measurable",
+			"passed": true
+		},
+		{
+			"details": {
+				"applicable": false,
+				"reason": "Open-front workshop; no human doorway asset."
+			},
+			"name": "Scale category absent: door",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.660271457118068,
+				"difference": 0.0932754880694144,
+				"height": 1.045,
+				"ratio_to_H": 0.598684314697076,
+				"reason": ""
+			},
+			"name": "Scale ±15%: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.39243900054306,
+				"difference": 0.0364963503649636,
+				"height": 0.66,
+				"ratio_to_H": 0.378116409282364,
+				"reason": ""
+			},
+			"name": "Scale ±15%: chair",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.650245643235581,
+				"difference": 0.0792951541850221,
+				"height": 1.045,
+				"ratio_to_H": 0.598684314697076,
+				"reason": ""
+			},
+			"name": "Scale ±15%: table",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"pid": 1141567,
+	"renderer": "mobile",
+	"route": [
+		{
+			"collisions": [],
+			"final": [
+				-0.949999988079071,
+				0.0820000022649765,
+				2.72000002861023
+			],
+			"from": [
+				-0.949999988079071,
+				0.0820000022649765,
+				2.72000002861023
+			],
+			"name": "entry",
+			"reached": true,
+			"remaining_m": 0.0,
+			"seconds": 0.001,
+			"target": [
+				-0.949999988079071,
+				0.0820000022649765,
+				2.72000002861023
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.48682177066803,
+				0.0919322445988655,
+				2.43369507789612
+			],
+			"from": [
+				-0.949999988079071,
+				0.0820000022649765,
+				2.72000002861023
+			],
+			"name": "left_front",
+			"reached": true,
+			"remaining_m": 0.0722875148057938,
+			"seconds": 0.067,
+			"target": [
+				-1.54999995231628,
+				0.0820000022649765,
+				2.40000009536743
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.48025369644165,
+				0.0919318199157715,
+				0.639289736747742
+			],
+			"from": [
+				-1.48682177066803,
+				0.0919322445988655,
+				2.43369507789612
+			],
+			"name": "left_bench",
+			"reached": true,
+			"remaining_m": 0.0699983835220337,
+			"seconds": 0.5,
+			"target": [
+				-1.48000001907349,
+				0.0820000022649765,
+				0.569999992847443
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.30970788002014,
+				0.0919332578778267,
+				-0.646791338920593
+			],
+			"from": [
+				-1.48025369644165,
+				0.0919318199157715,
+				0.639289736747742
+			],
+			"name": "forge_safe",
+			"reached": true,
+			"remaining_m": 0.0745145976543427,
+			"seconds": 0.367,
+			"target": [
+				-1.29999995231628,
+				0.0820000022649765,
+				-0.720000028610229
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.56795060634613,
+				0.0919366702437401,
+				1.20365905761719
+			],
+			"from": [
+				-1.30970788002014,
+				0.0919332578778267,
+				-0.646791338920593
+			],
+			"name": "water_side",
+			"reached": true,
+			"remaining_m": 0.0877421125769615,
+			"seconds": 0.384,
+			"target": [
+				-1.58000004291534,
+				0.0820000022649765,
+				1.28999996185303
+			]
+		},
+		{
+			"collisions": [
+				"/root/SceneBenchmark/BlacksmithShopArt/anvil_workbench/Collider"
+			],
+			"final": [
+				-1.05236649513245,
+				0.0919327586889267,
+				2.25539088249207
+			],
+			"from": [
+				-1.56795060634613,
+				0.0919366702437401,
+				1.20365905761719
+			],
+			"name": "front",
+			"reached": true,
+			"remaining_m": 0.0729423090815544,
+			"seconds": 0.333,
+			"target": [
+				-1.01999998092651,
+				0.0820000022649765,
+				2.3199999332428
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.56079757213593,
+				0.0919347330927849,
+				2.27927565574646
+			],
+			"from": [
+				-1.05236649513245,
+				0.0919327586889267,
+				2.25539088249207
+			],
+			"name": "bench_right",
+			"reached": true,
+			"remaining_m": 0.0798263475298882,
+			"seconds": 0.716,
+			"target": [
+				1.63999998569489,
+				0.0820000022649765,
+				2.27999997138977
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.76142656803131,
+				0.0919355601072311,
+				0.361934810876846
+			],
+			"from": [
+				1.56079757213593,
+				0.0919347330927849,
+				2.27927565574646
+			],
+			"name": "stump_front",
+			"reached": true,
+			"remaining_m": 0.0829791054129601,
+			"seconds": 0.533,
+			"target": [
+				1.76999998092651,
+				0.0820000022649765,
+				0.280000001192093
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.494181662797928,
+				0.0919324904680252,
+				-1.24400985240936
+			],
+			"from": [
+				1.76142656803131,
+				0.0919355601072311,
+				0.361934810876846
+			],
+			"name": "rear_bench",
+			"reached": true,
+			"remaining_m": 0.07201087474823,
+			"seconds": 0.566,
+			"target": [
+				0.449999988079071,
+				0.0820000022649765,
+				-1.29999995231628
+			]
+		}
+	],
+	"scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+	"slug": "blacksmith_shop"
+}

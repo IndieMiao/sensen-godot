@@ -19,37 +19,37 @@
         {
           "at": [
             0,
-            -0.09,
+            -0.088,
             0
           ],
           "size": [
-            6.7,
+            6.800000000000001,
             0.34,
-            6.3
+            6.4
           ]
         },
         {
           "at": [
             -3.2,
-            1.85,
+            1.8,
             0
           ],
           "size": [
-            0.22,
-            3.7,
-            6.2
+            0.2,
+            3.8,
+            6
           ]
         },
         {
           "at": [
             0,
-            1.85,
+            1.8,
             -3.0
           ],
           "size": [
-            6.6000000000000005,
-            3.7,
-            0.22
+            6.4,
+            3.8,
+            0.2
           ]
         }
       ]
@@ -222,17 +222,6 @@
       "colliders": []
     },
     {
-      "name": "shelf_plant",
-      "file": "shelf_plant.glb",
-      "position": [
-        -2.85,
-        2.49,
-        -0.29
-      ],
-      "yaw_degrees": 90,
-      "colliders": []
-    },
-    {
       "name": "quench_barrel",
       "file": "quench_barrel.glb",
       "position": [
@@ -309,7 +298,7 @@
       "file": "main_anvil.glb",
       "position": [
         0.15,
-        1.24,
+        1.13,
         1.23
       ],
       "yaw_degrees": 0,
@@ -333,7 +322,7 @@
       "file": "heated_bar_glow.glb",
       "position": [
         0.31,
-        1.865,
+        1.755,
         1.2
       ],
       "yaw_degrees": 0,
@@ -385,12 +374,12 @@
         {
           "at": [
             0,
-            0.385,
+            0.4466,
             0
           ],
           "size": [
             1.39,
-            0.77,
+            0.8932,
             0.58
           ]
         }
@@ -401,7 +390,7 @@
       "file": "punch_set.glb",
       "position": [
         1.31,
-        0.96,
+        1.0552,
         -2.0
       ],
       "yaw_degrees": 0,
@@ -464,20 +453,7 @@
         2.18
       ],
       "yaw_degrees": 0,
-      "colliders": [
-        {
-          "at": [
-            0,
-            0.25,
-            0
-          ],
-          "size": [
-            0.56,
-            0.5,
-            0.56
-          ]
-        }
-      ]
+      "colliders": []
     },
     {
       "name": "forge_mat",
@@ -513,12 +489,179 @@
       "colliders": []
     },
     {
-      "name": "right_shelf_plant",
-      "file": "right_shelf_plant.glb",
+      "name": "hammer_variant_0",
+      "file": "hammer_variant_0.glb",
       "position": [
-        2.63,
-        2.93,
-        -2.73
+        -0.06000000000000005,
+        1.49,
+        -2.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hammer_variant_1",
+      "file": "hammer_variant_1.glb",
+      "position": [
+        0.33999999999999997,
+        1.53,
+        -2.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hammer_variant_2",
+      "file": "hammer_variant_2.glb",
+      "position": [
+        0.74,
+        1.49,
+        -2.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tong_variant_0",
+      "file": "tong_variant_0.glb",
+      "position": [
+        -0.1100000000000001,
+        0.55,
+        -2.59
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tong_variant_1",
+      "file": "tong_variant_1.glb",
+      "position": [
+        0.2099999999999999,
+        0.6050000000000001,
+        -2.59
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tong_variant_2",
+      "file": "tong_variant_2.glb",
+      "position": [
+        0.5299999999999999,
+        0.55,
+        -2.59
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bench_tongs",
+      "file": "bench_tongs.glb",
+      "position": [
+        0.32,
+        1.69,
+        1.2
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "barrel_towel",
+      "file": "barrel_towel.glb",
+      "position": [
+        -2.25,
+        1.01,
+        1.35
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "shelf_green_cloth",
+      "file": "shelf_green_cloth.glb",
+      "position": [
+        -2.76,
+        1.65,
+        0.35
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "green_apron",
+      "file": "green_apron.glb",
+      "position": [
+        2.76,
+        1.67,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "left_floor_crate",
+      "file": "left_floor_crate.glb",
+      "position": [
+        -2.51,
+        0.082,
+        2.32
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.26,
+            0
+          ],
+          "size": [
+            0.64,
+            0.52,
+            0.49
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shelf_toolbox",
+      "file": "shelf_toolbox.glb",
+      "position": [
+        -2.75,
+        0.79,
+        0.41
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "coal_shovel",
+      "file": "coal_shovel.glb",
+      "position": [
+        -2.72,
+        0.18,
+        -1.22
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bench_vise",
+      "file": "bench_vise.glb",
+      "position": [
+        1.92,
+        1.0622,
+        -1.97
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "lantern_glow",
+      "file": "lantern_glow.glb",
+      "position": [
+        2.74,
+        2.54,
+        -2.76
       ],
       "yaw_degrees": 0,
       "colliders": []
@@ -539,20 +682,70 @@
         0.48,
         0.48
       ]
+    },
+    {
+      "name": "wall_hammer_3",
+      "asset": "hammer_variant_0",
+      "position": [
+        1.1400000000000001,
+        1.53,
+        -2.63
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "wall_hammer_4",
+      "asset": "hammer_variant_1",
+      "position": [
+        1.54,
+        1.49,
+        -2.63
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "wall_tong_3",
+      "asset": "tong_variant_0",
+      "position": [
+        0.8499999999999999,
+        0.6050000000000001,
+        -2.59
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "wall_tong_4",
+      "asset": "tong_variant_1",
+      "position": [
+        1.17,
+        0.55,
+        -2.59
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "wall_tong_5",
+      "asset": "tong_variant_2",
+      "position": [
+        1.49,
+        0.6050000000000001,
+        -2.59
+      ],
+      "yaw_degrees": 0
     }
   ],
   "camera": {
     "position": [
-      10,
-      9.2,
-      11.5
+      10.771119897678712,
+      11.95242651454662,
+      10.43977679136349
     ],
     "target": [
-      0,
-      1.85,
-      0
+      0.054029703186664065,
+      2.9038480133467233,
+      -0.055173316336992594
     ],
-    "size": 12.5
+    "size": 10.694750520516132
   },
   "sun_direction": [
     -6,
@@ -560,21 +753,621 @@
     1.5
   ],
   "review_lighting": {
-    "ambient": 0.6,
-    "sun": 0.92,
-    "ambient_color": "eef0e9",
-    "sun_color": "fff2e5",
-    "points": [
+    "ambient": 0.37,
+    "ambient_color": "B7C7D1",
+    "sun": 0.72,
+    "sun_color": "E1E7E8",
+    "sun_position": [
+      5,
+      8,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -1
+    ],
+    "points": []
+  },
+  "shared_plants": [
+    {
+      "name": "LeftPothos",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        -2.85,
+        2.49,
+        -0.29
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.66,
+        0.66,
+        0.66
+      ],
+      "colliders": []
+    },
+    {
+      "name": "RightPothos",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        2.63,
+        2.93,
+        -2.73
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ],
+      "colliders": []
+    }
+  ],
+  "material_overrides": {
+    "fire": {
+      "emission": "FFA928",
+      "emission_use_atlas": true,
+      "emission_energy": 3.7
+    },
+    "heated_bar_glow": {
+      "emission": "FFB12E",
+      "emission_use_atlas": true,
+      "emission_energy": 3.0
+    },
+    "lantern_glow": {
+      "emission": "FFCE80",
+      "emission_use_atlas": true,
+      "emission_energy": 2.5
+    }
+  },
+  "local_lights": [
+    {
+      "name": "forge_fire",
+      "position": [
+        -1.35,
+        2.04,
+        -1.16
+      ],
+      "energy": 3.1,
+      "range": 4.25,
+      "color": "FF8B36",
+      "attenuation": 1.15
+    },
+    {
+      "name": "lantern",
+      "position": [
+        2.66,
+        2.5,
+        -2.47
+      ],
+      "energy": 0.85,
+      "range": 1.9,
+      "color": "FFD08A"
+    },
+    {
+      "name": "hot_steel",
+      "position": [
+        0.31,
+        1.92,
+        1.2
+      ],
+      "energy": 0.5,
+      "range": 0.85,
+      "color": "FFAB37"
+    }
+  ],
+  "lighting": {
+    "background": "D5DAD3",
+    "ambient": "B7C7D1",
+    "ambient_energy": 0.37,
+    "sun_color": "E1E7E8",
+    "sun_energy": 0.72,
+    "sun_position": [
+      5,
+      8,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -1
+    ],
+    "angular_distance": 7,
+    "lamps": []
+  },
+  "review_views": [
+    {
+      "name": "forge-fire-detail",
+      "position": [
+        3.7,
+        3.7,
+        5.5
+      ],
+      "target": [
+        -1.48,
+        1.6,
+        -2.03
+      ],
+      "size": 3.5
+    },
+    {
+      "name": "tools-bench-detail",
+      "position": [
+        5,
+        4,
+        7
+      ],
+      "target": [
+        1.15,
+        1.75,
+        -1.0
+      ],
+      "size": 4.3
+    }
+  ],
+  "boundaries": [
+    {
+      "name": "right_edge",
+      "at": [
+        3.33,
+        0.7,
+        0
+      ],
+      "size": [
+        0.1,
+        1.5,
+        6.3
+      ]
+    },
+    {
+      "name": "front_left_edge",
+      "at": [
+        -2.335,
+        0.7,
+        3.13
+      ],
+      "size": [
+        1.73,
+        1.5,
+        0.1
+      ]
+    },
+    {
+      "name": "front_right_edge",
+      "at": [
+        1.385,
+        0.7,
+        3.13
+      ],
+      "size": [
+        3.6300000000000003,
+        1.5,
+        0.1
+      ]
+    },
+    {
+      "name": "entrance_end",
+      "at": [
+        -0.95,
+        0.7,
+        3.2800000000000002
+      ],
+      "size": [
+        1.1,
+        1.5,
+        0.1
+      ]
+    }
+  ],
+  "spawn": [
+    -0.95,
+    0.082,
+    2.72
+  ],
+  "bench": {
+    "floor_y": 0.082,
+    "route": [
       {
+        "name": "entry",
+        "position": [
+          -0.95,
+          0.082,
+          2.72
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "left_front",
         "position": [
           -1.55,
-          1.6,
-          -1.2
+          0.082,
+          2.4
+        ]
+      },
+      {
+        "name": "left_bench",
+        "position": [
+          -1.48,
+          0.082,
+          0.57
+        ]
+      },
+      {
+        "name": "forge_safe",
+        "position": [
+          -1.3,
+          0.082,
+          -0.72
         ],
-        "color": "ff873b",
-        "energy": 1.5,
-        "range": 2.4
+        "capture": "main"
+      },
+      {
+        "name": "water_side",
+        "position": [
+          -1.58,
+          0.082,
+          1.29
+        ]
+      },
+      {
+        "name": "front",
+        "position": [
+          -1.02,
+          0.082,
+          2.32
+        ]
+      },
+      {
+        "name": "bench_right",
+        "position": [
+          1.64,
+          0.082,
+          2.28
+        ]
+      },
+      {
+        "name": "stump_front",
+        "position": [
+          1.77,
+          0.082,
+          0.28
+        ]
+      },
+      {
+        "name": "rear_bench",
+        "position": [
+          0.45,
+          0.082,
+          -1.3
+        ]
       }
-    ]
-  }
+    ],
+    "blocked": [
+      {
+        "name": "mainbench",
+        "from": [
+          -1.55,
+          0.082,
+          1.25
+        ],
+        "to": [
+          0.15,
+          0.082,
+          1.25
+        ],
+        "target": "/anvil_workbench/"
+      },
+      {
+        "name": "furnace",
+        "from": [
+          -1.4,
+          0.082,
+          -0.75
+        ],
+        "to": [
+          -1.4,
+          0.082,
+          -2.2
+        ],
+        "target": "/brick_forge/"
+      },
+      {
+        "name": "water",
+        "from": [
+          -1.55,
+          0.082,
+          1.35
+        ],
+        "to": [
+          -2.52,
+          0.082,
+          1.35
+        ],
+        "target": "/quench_barrel/"
+      },
+      {
+        "name": "stump",
+        "from": [
+          1.64,
+          0.082,
+          -0.52
+        ],
+        "to": [
+          2.39,
+          0.082,
+          -0.52
+        ],
+        "target": "/stump/"
+      },
+      {
+        "name": "smallbench",
+        "from": [
+          1.5,
+          0.082,
+          -1.24
+        ],
+        "to": [
+          1.5,
+          0.082,
+          -1.99
+        ],
+        "target": "/back_tool_bench/"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "forge_to_mainbench",
+        "from": [
+          -1.6,
+          0.082,
+          -0.2
+        ],
+        "to": [
+          0.7,
+          0.082,
+          -0.2
+        ],
+        "measure": [
+          [
+            -0.8,
+            0.55,
+            -1.48
+          ],
+          [
+            -0.8,
+            0.55,
+            0.705
+          ]
+        ],
+        "width": 2.185,
+        "minimum": 0.8
+      }
+    ],
+    "entrance": {
+      "inside": [
+        -0.95,
+        0.082,
+        2.7199999999999998
+      ],
+      "outside": [
+        -0.95,
+        0.082,
+        3.025
+      ]
+    },
+    "slide": {
+      "from": [
+        2.98,
+        0.082,
+        2.05
+      ],
+      "direction": [
+        1,
+        0,
+        -1
+      ],
+      "tangent": [
+        0,
+        0,
+        -1
+      ],
+      "seconds": 0.4
+    },
+    "input_start": [
+      -1.3,
+      0.082,
+      0.1
+    ],
+    "scale": {
+      "door": {
+        "applicable": false,
+        "reason": "Open-front workshop; no human doorway asset."
+      },
+      "counter": {
+        "height": 1.045,
+        "source": "Main workbench serves as work counter"
+      },
+      "table": {
+        "height": 1.045,
+        "source": "Main workbench .97+.075"
+      },
+      "chair": {
+        "height": 0.66,
+        "source": "Stool (.50+.06)*1.18"
+      }
+    }
+  },
+  "review_camera_fit": {
+    "method": "orthographic fit to plinth edge intersections; no model scaling or image warp",
+    "reference_size": [
+      1489,
+      1499
+    ],
+    "reference_corners_left_front_right": [
+      [
+        86,
+        1114
+      ],
+      [
+        734,
+        1455
+      ],
+      [
+        1394,
+        1117
+      ]
+    ],
+    "inferred_back": [
+      746,
+      776
+    ],
+    "footprint_m": [
+      6.8,
+      6.4
+    ],
+    "plinth_y": -0.15,
+    "render_size": [
+      1400,
+      1400
+    ],
+    "fitted_corners": [
+      [
+        79.19575640754397,
+        1029.439176619311
+      ],
+      [
+        702.0055161031621,
+        1357.9504413229279
+      ],
+      [
+        1300.5865860616757,
+        1055.1720898629644
+      ]
+    ],
+    "observed_letterboxed_corners": [
+      [
+        84.98999332888602,
+        1040.4269513008671
+      ],
+      [
+        690.1934623082055,
+        1358.9059372915276
+      ],
+      [
+        1306.6044029352902,
+        1043.2288192128085
+      ]
+    ],
+    "residual_px": [
+      12.421931168433122,
+      11.850636582097952,
+      13.373699329177207
+    ],
+    "pitch_degrees": 31.10000000000005,
+    "yaw_degrees": 45.59999999999999,
+    "camera": {
+      "position": [
+        10.771119897678712,
+        11.95242651454662,
+        10.43977679136349
+      ],
+      "target": [
+        0.054029703186664065,
+        2.9038480133467233,
+        -0.055173316336992594
+      ],
+      "size": 10.694750520516132
+    },
+    "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
+  },
+  "revision": "R2",
+  "botanical_assets": [],
+  "render_batches": [
+    {
+      "name": "front_dressing",
+      "file": "res://assets/rooms/blacksmith_shop/batches/review_front_dressing.glb",
+      "material": "room",
+      "sources": [
+        "window_wall",
+        "left_tool_shelves",
+        "display_swords",
+        "horseshoe_stock",
+        "tool_shelf_mugs",
+        "bench_hammer",
+        "leather_apron",
+        "metal_ingot_crate",
+        "forge_stool",
+        "forge_mat",
+        "bench_tongs",
+        "barrel_towel",
+        "shelf_green_cloth",
+        "shelf_toolbox"
+      ],
+      "triangles": 11808,
+      "cast_shadow": true
+    },
+    {
+      "name": "back_dressing",
+      "file": "res://assets/rooms/blacksmith_shop/batches/review_back_dressing.glb",
+      "material": "room",
+      "sources": [
+        "back_wall",
+        "forge_hood",
+        "smoke",
+        "forge_coals",
+        "forge_sign",
+        "hammer_wall",
+        "tongs_wall",
+        "punch_set",
+        "forge_lantern",
+        "right_wall_shelf",
+        "hammer_variant_0",
+        "hammer_variant_1",
+        "hammer_variant_2",
+        "tong_variant_0",
+        "tong_variant_1",
+        "tong_variant_2",
+        "green_apron",
+        "coal_shovel",
+        "bench_vise",
+        "wall_hammer_3",
+        "wall_hammer_4",
+        "wall_tong_3",
+        "wall_tong_4",
+        "wall_tong_5"
+      ],
+      "triangles": 19474,
+      "cast_shadow": true
+    },
+    {
+      "name": "front_plants",
+      "file": "res://assets/rooms/blacksmith_shop/batches/review_front_plants.glb",
+      "material": "plants",
+      "sources": [
+        "LeftPothos"
+      ],
+      "triangles": 2048,
+      "cast_shadow": false
+    },
+    {
+      "name": "back_plants",
+      "file": "res://assets/rooms/blacksmith_shop/batches/review_back_plants.glb",
+      "material": "plants",
+      "sources": [
+        "RightPothos"
+      ],
+      "triangles": 2048,
+      "cast_shadow": false
+    }
+  ]
 }

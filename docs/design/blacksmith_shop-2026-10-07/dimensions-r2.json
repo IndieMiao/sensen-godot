@@ -1,0 +1,44 @@
+{
+  "method": "Evaluated editable Blender mesh vertices transformed into the module floor-pivot frame; top of named seat/worktop parts; no manifest height values used.",
+  "checks": [
+    {
+      "asset": "anvil_workbench",
+      "object_names": [
+        "Workbench top plank",
+        "Workbench top plank.001",
+        "Workbench top plank.002",
+        "Workbench top plank.003",
+        "Workbench top plank.004"
+      ],
+      "floor_pivot_to_top_m": 1.0450000762939453,
+      "baseline_m": 1.135,
+      "relative_difference": 0.07929508696568699,
+      "passed": true
+    },
+    {
+      "asset": "back_tool_bench",
+      "object_names": [
+        "Workbench top plank.005",
+        "Workbench top plank.006",
+        "Workbench top plank.007",
+        "Workbench top plank.008",
+        "Workbench top plank.009"
+      ],
+      "floor_pivot_to_top_m": 0.9801999926567078,
+      "baseline_m": 1.135,
+      "relative_difference": 0.13638767166809884,
+      "passed": true
+    },
+    {
+      "asset": "forge_stool",
+      "object_names": [
+        "Round stool seat"
+      ],
+      "floor_pivot_to_top_m": 0.6607999801635742,
+      "baseline_m": 0.685,
+      "relative_difference": 0.03532849611157052,
+      "passed": true
+    }
+  ],
+  "passed": true
+}
