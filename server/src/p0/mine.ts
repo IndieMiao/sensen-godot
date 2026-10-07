@@ -139,7 +139,7 @@ export function mineCommand(c: P0Content, s: P0State, cmd: MineCommand & { space
       const rock = Number(cmd.rock);
       if (!Number.isInteger(rock) || rock < 0 || rock >= c.mine.rocks) return { code: 'bad_rock' };
       if (floor.broken.includes(rock)) return { code: 'rock_gone' };
-      if (now - s.mine.swing_at < c.mine.tempo_ms) return { code: 'too_early', detail: { ready_in: c.mine.tempo_ms - (now - s.mine.swing_at) } };
+      if (now - s.mine.swing_at < c.mine.tempo_ms) return { code: 'tempo', detail: { ready_in: c.mine.tempo_ms - (now - s.mine.swing_at) } };
       if (!bagFitsFloor(c, s, n)) return { code: 'bag_full', detail: { floor: n } };
       if (s.energy.value < c.mine.rock_energy) return { code: 'need_energy', detail: energyDetail(c, s, now, c.mine.rock_energy) };
       spendEnergy(c, s, now, c.mine.rock_energy, events, 'mine_rock');

@@ -1347,7 +1347,7 @@
     }
   },
   "gather": {
-    "_note": "SGODOT-231 §13.2 gathering spots: 0 Energy, one tap, each spot 8 h after it was gathered (ready at start). The first yield is the spot's material and goes to Farm Storage (+1 with Gather Gloves); worms go to the bag, any that do not fit go to storage (q(44)). P0 has no Old Tree (hardwood is P1, q(44)).",
+    "_note": "SGODOT-231 §13.2 gathering spots: 0 Energy, one tap, each spot 8 h after it was gathered (ready at start). The first yield is the spot's material and goes to Farm Storage (+1 with Gather Gloves); worms go to the bag, any that do not fit go to storage (q(44)); seasonings (Rock Salt, Wild Herb) go to the bag and are not stored on coming home until the Spice Rack at Homestead Lv2, which puts them away (q(46)). P0 has no Old Tree (hardwood is P1, q(44)).",
     "regen_h": 8,
     "tempo_ms": 900,
     "gloves": "gather_gloves",

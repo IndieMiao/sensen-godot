@@ -9,7 +9,7 @@ import { upgradeHomestead } from './homestead.js';
 import { energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { notePresence, restReadyIn } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
-import { gather } from './gathering.js';
+import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
@@ -198,6 +198,8 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     case 'homestead_upgrade': {
       const refusal = upgradeHomestead(c, s, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
+      // q(46): the Spice Rack takes the bag's seasonings (Spice Rack · seasonings off your bag); from now on they are stored.
+      if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
       break;
     }
     case 'gather': case 'craft': {

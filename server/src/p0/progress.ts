@@ -28,7 +28,7 @@ export type P0Event =
       rock?: number; drop?: string | null }
   | { kind: 'gather'; spot: string; items: [string, number, 'storage' | 'bag'][]; ready_in: number }
   | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' }
-  | { kind: 'stored'; items: [string, number][]; reason: 'home' };
+  | { kind: 'stored'; items: [string, number][]; reason: 'home' | 'spice_rack' };
 
 export function energyDetail(c: P0Content, s: P0State, now: number, need: number) {
   return { need, have: s.energy.value, next_in: nextTickIn(c, s, now) };

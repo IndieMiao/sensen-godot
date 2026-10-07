@@ -73,10 +73,10 @@ describe('mine floors 1–2 (§13.3, LOCK-21)', () => {
     expect(refuse(s, { type: 'mine_rock', floor: 1, rock: 0 }, T0 + 2 * STEP).code).toBe('rock_gone');
   });
 
-  it('swings faster than 0.9 s are refused as too_early (anti-script tempo)', () => {
+  it('swings faster than 0.9 s are refused as tempo (anti-script tempo)', () => {
     let { s } = step(fresh(), { type: 'mine_enter' });
     s = step(s, { type: 'mine_rock', floor: 1, rock: 0 }, T0 + STEP).s;
-    expect(refuse(s, { type: 'mine_rock', floor: 1, rock: 1 }, T0 + STEP + 300).code).toBe('too_early');
+    expect(refuse(s, { type: 'mine_rock', floor: 1, rock: 1 }, T0 + STEP + 300).code).toBe('tempo');
   });
 
   it('floor 2 needs floor 1 cleared, then pays 2 once; going back to a paid floor is free', () => {
@@ -237,6 +237,17 @@ describe('gathering spots (§13.2, q(44))', () => {
     expect(s.storage).toEqual({ fiber: 3, bait_worm: 2 });
   });
 
+  it('the Herb Patch\'s Wild Herb goes to the bag before the Spice Rack and to storage from Homestead Lv2 (q(46))', () => {
+    const lv1 = step(fresh(), { type: 'gather', spot: 'spot_herb_patch' });
+    expect(count(lv1.s.bag, 'wild_herb')).toBe(2);
+    expect(lv1.ev).toContainEqual({ kind: 'gather', spot: 'spot_herb_patch', items: [['wild_herb', 2, 'bag']], ready_in: 8 * H });
+    const s2 = fresh();
+    s2.homestead.level = 2;
+    const lv2 = step(s2, { type: 'gather', spot: 'spot_herb_patch' });
+    expect(lv2.s.storage.wild_herb).toBe(2);
+    expect(count(lv2.s.bag, 'wild_herb')).toBe(0);
+  });
+
   it('the Clay Bank opens at Homestead Lv2; there is no Old Tree in P0', () => {
     const s = fresh();
     expect(refuse(s, { type: 'gather', spot: 'spot_clay_bank' })).toEqual({ code: 'homestead_level', detail: { need: 2 } });
@@ -246,9 +257,9 @@ describe('gathering spots (§13.2, q(44))', () => {
     expect(viewOf(c, fresh(), T0).gather.spots.map(sp => sp.id)).toEqual(['spot_grove', 'spot_rock_pile', 'spot_reed_bank', 'spot_herb_patch', 'spot_clay_bank']);
   });
 
-  it('taps faster than 0.9 s are too_early; gathering from away is not_home', () => {
+  it('taps faster than 0.9 s are refused as tempo; gathering from away is not_home', () => {
     const { s } = step(fresh(), { type: 'gather', spot: 'spot_grove' });
-    expect(refuse(s, { type: 'gather', spot: 'spot_rock_pile' }, T0 + 500).code).toBe('too_early');
+    expect(refuse(s, { type: 'gather', spot: 'spot_rock_pile' }, T0 + 500).code).toBe('tempo');
     expect(refuse(fresh(), { type: 'gather', spot: 'spot_grove', space: 'mine' }).code).toBe('not_home');
   });
 
@@ -344,16 +355,20 @@ describe('workbench (§13.4, q(31) / q(44))', () => {
 });
 
 describe('coming home (q(40)) and Timber Run from storage', () => {
-  it('the first command back at home moves the bag\'s materials to storage; seeds, worms and torches stay', () => {
+  it('the first command back at home moves the bag\'s materials to storage; seeds, worms, torches and (Lv1) seasonings stay', () => {
     let { s } = step(fresh(), { type: 'mine_enter', space: 'home' });
     s = step(s, { type: 'mine_rock', floor: 1, rock: 0, space: 'mine' }, T0 + STEP).s;
-    add(c, s, 'torch', 2); add(c, s, 'bait_worm', 3); add(c, s, 'wild_herb', 3);
+    add(c, s, 'torch', 2); add(c, s, 'bait_worm', 3); add(c, s, 'wild_herb', 3); add(c, s, 'rock_salt', 1); add(c, s, 'copper_ore', 2);
     const stone = count(s.bag, 'stone');
     const r = step(s, { type: 'gather', spot: 'spot_grove', space: 'home' }, T0 + 2 * STEP);
     expect(count(r.s.bag, 'stone')).toBe(0);
-    expect(count(r.s.bag, 'wild_herb')).toBe(0);
+    expect(count(r.s.bag, 'copper_ore')).toBe(0);
     expect(r.s.storage.stone).toBe(stone);
-    expect(r.s.storage.wild_herb).toBe(3);
+    expect(r.s.storage.copper_ore).toBeGreaterThanOrEqual(2);
+    // q(46): before the Spice Rack the Lv1 stove cooks from the bag, so seasonings stay with the player.
+    expect(count(r.s.bag, 'wild_herb')).toBe(3);
+    expect(count(r.s.bag, 'rock_salt')).toBeGreaterThanOrEqual(1);
+    expect(r.s.storage.wild_herb).toBeUndefined();
     expect(count(r.s.bag, 'torch')).toBe(2);
     expect(count(r.s.bag, 'bait_worm')).toBe(3);
     expect(count(r.s.bag, 'seed_radish')).toBe(20);
@@ -361,6 +376,30 @@ describe('coming home (q(40)) and Timber Run from storage', () => {
     expect(stored).toMatchObject({ kind: 'stored', reason: 'home' });
     expect(r.s.storage_auto?.at).toBe(T0 + 2 * STEP);
     expect(viewOf(c, r.s, T0 + 2 * STEP).storage.auto).toEqual(r.s.storage_auto);
+  });
+
+  it('with the Spice Rack (Homestead Lv2) seasonings are stored on coming home like any material (q(46))', () => {
+    const s = fresh();
+    s.homestead.level = 2;
+    s.presence.space = 'away';
+    add(c, s, 'rock_salt', 2); add(c, s, 'wild_herb', 3);
+    expect(notePresence(c, s, 'home', T0, null)).toBe(true);
+    expect(s.storage).toEqual({ rock_salt: 2, wild_herb: 3 });
+    expect(count(s.bag, 'rock_salt')).toBe(0);
+  });
+
+  it('the Homestead Lv2 upgrade puts the bag\'s seasonings away (Spice Rack · seasonings off your bag), nothing else', () => {
+    const s = fresh();
+    s.skills = { farming: 50, fishing: 0, cooking: 0 };
+    s.storage = { wood: 12, stone: 8, fiber: 6, rock_salt: 3 };
+    s.coins = 290;
+    add(c, s, 'rock_salt', 2); add(c, s, 'wild_herb', 3); add(c, s, 'bait_worm', 2);
+    const { s: after, ev } = step(s, { type: 'homestead_upgrade' });
+    expect(after.homestead.level).toBe(2);
+    expect(after.storage).toEqual({ rock_salt: 2, wild_herb: 3 });
+    expect(count(after.bag, 'bait_worm')).toBe(2);
+    expect(ev).toContainEqual({ kind: 'stored', items: [['rock_salt', 2], ['wild_herb', 3]], reason: 'spice_rack' });
+    expect(after.storage_auto).toBeNull();   // HOME-2 says it; no second float
   });
 
   it('the space read on entering home (no events) stores too and records storage_auto', () => {
