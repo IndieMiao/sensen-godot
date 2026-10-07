@@ -33,7 +33,8 @@ static func _colors() -> Control:
 	grid.add_theme_constant_override(&"h_separation", int(UiTokens.SPACE_WITHIN))
 	grid.add_theme_constant_override(&"v_separation", int(UiTokens.SPACE_WITHIN))
 	var consts: Dictionary = (UiTokens as Script).get_script_constant_map()
-	var names := consts.keys().filter(func(k): return String(k).begins_with("COLOR_"))
+	# StringName ordering is not alphabetical; sort plain Strings so snapshots stay stable.
+	var names := consts.keys().map(func(k): return String(k)).filter(func(k): return k.begins_with("COLOR_"))
 	names.sort()
 	for k in names:
 		var cell := _column(2)
@@ -48,7 +49,7 @@ static func _colors() -> Control:
 static func _type_ramp() -> Control:
 	var v := _column(2)
 	var consts: Dictionary = (UiTokens as Script).get_script_constant_map()
-	var names := consts.keys().filter(func(k): return String(k).begins_with("STYLE_"))
+	var names := consts.keys().map(func(k): return String(k)).filter(func(k): return k.begins_with("STYLE_"))
 	names.sort()
 	for k in names:
 		var l := UiKit.label("%s · Radish ×24" % consts[k], consts[k])
