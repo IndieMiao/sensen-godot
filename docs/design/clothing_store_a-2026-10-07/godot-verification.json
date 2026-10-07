@@ -1,12 +1,45 @@
 {
   "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-  "draw_calls": 59.0,
-  "instances": 64,
+  "draw_calls": 20.0,
+  "instances": 84,
   "renderer": "mobile",
   "resolution": [
     1400,
     1400
   ],
   "scope": "offline art render; no mobile/gameplay/performance acceptance",
-  "slug": "clothing_store_a"
+  "slug": "clothing_store_a",
+  "static_surfaces": 24,
+  "views": [
+    {
+      "draw_calls": 26.0,
+      "rendered_objects": 26.0,
+      "view": "godot-whole"
+    },
+    {
+      "draw_calls": 26.0,
+      "rendered_objects": 26.0,
+      "view": "model-front"
+    },
+    {
+      "draw_calls": 26.0,
+      "rendered_objects": 26.0,
+      "view": "model-side"
+    },
+    {
+      "draw_calls": 26.0,
+      "rendered_objects": 26.0,
+      "view": "model-top"
+    },
+    {
+      "draw_calls": 21.0,
+      "rendered_objects": 21.0,
+      "view": "godot-detail"
+    },
+    {
+      "draw_calls": 20.0,
+      "rendered_objects": 20.0,
+      "view": "godot-detail-plants"
+    }
+  ]
 }

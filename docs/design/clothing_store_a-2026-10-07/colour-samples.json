@@ -1,0 +1,50 @@
+[
+  {
+    "name": "royal blue wall",
+    "surface": "Left blue wall panel beside the clothing rack, upper lit area",
+    "reference_pixel": [
+      337,
+      374
+    ],
+    "runtime_pixel": [
+      348,
+      435
+    ]
+  },
+  {
+    "name": "entry concrete floor",
+    "surface": "Cool entrance-side lit concrete between mat and left bench end; low saturation, interpreted with the whole reference",
+    "reference_pixel": [
+      292,
+      936
+    ],
+    "runtime_pixel": [
+      330,
+      770
+    ]
+  },
+  {
+    "name": "walnut table",
+    "surface": "Lit exposed wood top at front-left of central display",
+    "reference_pixel": [
+      601,
+      871
+    ],
+    "runtime_pixel": [
+      546,
+      724
+    ]
+  },
+  {
+    "name": "black leather bench",
+    "surface": "Top of left leather bench cushion",
+    "reference_pixel": [
+      437,
+      992
+    ],
+    "runtime_pixel": [
+      325,
+      815
+    ]
+  }
+]

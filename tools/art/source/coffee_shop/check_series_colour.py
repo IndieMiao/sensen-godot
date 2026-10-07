@@ -11,7 +11,8 @@ for i,s in enumerate(spec):
  for j,(label,im) in enumerate([('reference',ref),('runtime',run)]):
   x,y=s[label+'_pixel'];rgb=np.median(np.array(im)[y-4:y+5,x-4:x+5],axis=(0,1));h,sat,val=colorsys.rgb_to_hsv(*(rgb/255));hues.append(h*360);rec[label]={'rgb':rgb.astype(int).tolist(),'hex':'#'+''.join(f'{int(c):02X}' for c in rgb),'hue_degrees':round(h*360,3),'saturation':round(sat,4),'value':round(val,4)}
   d=ImageDraw.Draw(marked[j]);d.rectangle((x-8,y-8,x+8,y+8),outline='#d52950',width=3);d.text((x+10,y),str(i+1),font=font,fill='#d52950')
- delta=abs(hues[1]-hues[0]);delta=min(delta,360-delta);rec.update(hue_delta_degrees=round(delta,3),passed=bool(delta<=10));checks.append(rec)
+ # HSV arithmetic can represent an exact 10 degrees as 10.000000000000028.
+ delta=abs(hues[1]-hues[0]);delta=min(delta,360-delta);rec.update(hue_delta_degrees=round(delta,3),passed=bool(delta<=10+1e-9));checks.append(rec)
 can=Image.new('RGB',(1800,1040),'#eee7df');draw=ImageDraw.Draw(can)
 for j,im in enumerate(marked):
  im.thumbnail((900,900));can.paste(im,(900*j+(900-im.width)//2,50+(900-im.height)//2));draw.text((j*900+20,15),['Reference surfaces','Runtime corresponding surfaces'][j],font=font,fill='#443b37')

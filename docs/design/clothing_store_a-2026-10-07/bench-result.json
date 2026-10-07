@@ -1,0 +1,863 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"checks": [
+		{
+			"details": null,
+			"name": "Default Avatar fixture assembles",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Bench route/probe schema",
+			"passed": true
+		},
+		{
+			"details": 0.0649999976158142,
+			"name": "Spawn stands on authored floor",
+			"passed": true
+		},
+		{
+			"details": "(-2.42, 0.065, 1.43)",
+			"name": "Spawn capsule clear",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-2.42000007629395,
+					0.0649999976158142,
+					1.42999994754791
+				],
+				"from": [
+					-2.42000007629395,
+					0.0649999976158142,
+					1.42999994754791
+				],
+				"name": "entry",
+				"reached": true,
+				"remaining_m": 0.0360554791986942,
+				"seconds": 0.001,
+				"target": [
+					-2.40000009536743,
+					0.0649999976158142,
+					1.39999997615814
+				]
+			},
+			"name": "Route: entry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-2.11183285713196,
+					0.0679259598255157,
+					1.40688753128052
+				],
+				"from": [
+					-2.42000007629395,
+					0.0649999976158142,
+					1.42999994754791
+				],
+				"name": "front_left",
+				"reached": true,
+				"remaining_m": 0.0921372771263123,
+				"seconds": 0.003,
+				"target": [
+					-2.01999998092651,
+					0.0649999976158142,
+					1.39999997615814
+				]
+			},
+			"name": "Route: front_left",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-2.02506995201111,
+					0.0679371803998947,
+					-0.149072736501694
+				],
+				"from": [
+					-2.11183285713196,
+					0.0679259598255157,
+					1.40688753128052
+				],
+				"name": "left_edge",
+				"reached": true,
+				"remaining_m": 0.0911158472299576,
+				"seconds": 0.396,
+				"target": [
+					-2.01999998092651,
+					0.0649999976158142,
+					-0.239999994635582
+				]
+			},
+			"name": "Route: left_edge",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ClothingStoreAArt/central_display_table/Collider"
+				],
+				"final": [
+					-1.40355157852173,
+					0.0679383054375648,
+					-1.31903600692749
+				],
+				"from": [
+					-2.02506995201111,
+					0.0679371803998947,
+					-0.149072736501694
+				],
+				"name": "fitting_room",
+				"reached": true,
+				"remaining_m": 0.0971162542700768,
+				"seconds": 0.383,
+				"target": [
+					-1.35000002384186,
+					0.0649999976158142,
+					-1.39999997615814
+				]
+			},
+			"name": "Route: fitting_room",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.36661946773529,
+					0.0679346993565559,
+					-1.14728677272797
+				],
+				"from": [
+					-1.40355157852173,
+					0.0679383054375648,
+					-1.31903600692749
+				],
+				"name": "mirror",
+				"reached": true,
+				"remaining_m": 0.0791078731417656,
+				"seconds": 0.066,
+				"target": [
+					-1.35000002384186,
+					0.0649999976158142,
+					-1.07000005245209
+				]
+			},
+			"name": "Route: mirror",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.121308475732803,
+					0.0679345950484276,
+					-1.14036583900452
+				],
+				"from": [
+					-1.36661946773529,
+					0.0679346993565559,
+					-1.14728677272797
+				],
+				"name": "checkout",
+				"reached": true,
+				"remaining_m": 0.0787470787763596,
+				"seconds": 0.416,
+				"target": [
+					0.200000002980232,
+					0.0649999976158142,
+					-1.13999998569489
+				]
+			},
+			"name": "Route: checkout",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.73673975467682,
+					0.0679292753338814,
+					-1.10197865962982
+				],
+				"from": [
+					0.121308475732803,
+					0.0679345950484276,
+					-1.14036583900452
+				],
+				"name": "back_right",
+				"reached": true,
+				"remaining_m": 0.0833353027701378,
+				"seconds": 0.317,
+				"target": [
+					1.82000005245209,
+					0.0649999976158142,
+					-1.10000002384186
+				]
+			},
+			"name": "Route: back_right",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.81442034244537,
+					0.0679377913475037,
+					0.206048354506493
+				],
+				"from": [
+					1.73673975467682,
+					0.0679292753338814,
+					-1.10197865962982
+				],
+				"name": "right_edge",
+				"reached": true,
+				"remaining_m": 0.0941630378365517,
+				"seconds": 0.367,
+				"target": [
+					1.82000005245209,
+					0.0649999976158142,
+					0.300000011920929
+				]
+			},
+			"name": "Route: right_edge",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.80077624320984,
+					0.0679357200860977,
+					1.37356078624725
+				],
+				"from": [
+					1.81442034244537,
+					0.0679377913475037,
+					0.206048354506493
+				],
+				"name": "front_right",
+				"reached": true,
+				"remaining_m": 0.0665086284279823,
+				"seconds": 0.333,
+				"target": [
+					1.79999995231628,
+					0.0649999976158142,
+					1.44000005722046
+				]
+			},
+			"name": "Route: front_right",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.93873083591461,
+					0.0679299458861351,
+					1.39943778514862
+				],
+				"from": [
+					1.80077624320984,
+					0.0679357200860977,
+					1.37356078624725
+				],
+				"name": "complete_circle",
+				"reached": true,
+				"remaining_m": 0.0813238844275475,
+				"seconds": 1.017,
+				"target": [
+					-2.01999998092651,
+					0.0649999976158142,
+					1.39999997615814
+				]
+			},
+			"name": "Route: complete_circle",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ClothingStoreAArt/central_display_table/Collider"
+				],
+				"final": [
+					0.0,
+					0.0580978021025658,
+					1.06499981880188
+				],
+				"from": [
+					0.0,
+					0.0649999976158142,
+					1.44000005722046
+				],
+				"reached": false,
+				"remaining_m": 0.865027368068695,
+				"seconds": 0.883,
+				"target": [
+					0.0,
+					0.0649999976158142,
+					0.200000002980232
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ClothingStoreAArt/central_display_table/Collider"
+			},
+			"name": "Blocked: table",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ClothingStoreAArt/street_left_rack/Collider"
+				],
+				"final": [
+					-2.14888119697571,
+					0.0522629171609879,
+					-0.5
+				],
+				"from": [
+					-2.00999999046326,
+					0.0649999976158142,
+					-0.5
+				],
+				"reached": false,
+				"remaining_m": 0.651243329048157,
+				"seconds": 0.866,
+				"target": [
+					-2.79999995231628,
+					0.0649999976158142,
+					-0.5
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ClothingStoreAArt/street_left_rack/Collider"
+			},
+			"name": "Blocked: left_rack",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ClothingStoreAArt/black_checkout/Collider"
+				],
+				"final": [
+					0.0,
+					0.0580789297819138,
+					-1.49522364139557
+				],
+				"from": [
+					0.0,
+					0.0649999976158142,
+					-1.10000002384186
+				],
+				"reached": false,
+				"remaining_m": 0.60481584072113,
+				"seconds": 0.882,
+				"target": [
+					0.0,
+					0.0649999976158142,
+					-2.09999990463257
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ClothingStoreAArt/black_checkout/Collider"
+			},
+			"name": "Blocked: checkout",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ClothingStoreAArt/black_tufted_bench/Collider"
+				],
+				"final": [
+					-1.35000002384186,
+					0.0580789372324944,
+					1.81499946117401
+				],
+				"from": [
+					-1.35000002384186,
+					0.0649999976158142,
+					1.44000005722046
+				],
+				"reached": false,
+				"remaining_m": 0.685035467147827,
+				"seconds": 0.882,
+				"target": [
+					-1.35000002384186,
+					0.0649999976158142,
+					2.5
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ClothingStoreAArt/black_tufted_bench/Collider"
+			},
+			"name": "Blocked: bench",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.215,
+				"measured_m": 1.2150000333786,
+				"minimum_m": 0.8
+			},
+			"name": "Gap width: table_to_bench",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.70859372615814,
+					0.0679085031151772,
+					1.44000005722046
+				],
+				"from": [
+					-1.35000002384186,
+					0.0649999976158142,
+					1.44000005722046
+				],
+				"reached": true,
+				"remaining_m": 0.0914524868130684,
+				"seconds": 0.85,
+				"target": [
+					1.79999995231628,
+					0.0649999976158142,
+					1.44000005722046
+				]
+			},
+			"name": "Traverse: table_to_bench",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.595,
+				"measured_m": 1.22000002861023,
+				"minimum_m": 0.8
+			},
+			"name": "Gap width: table_to_right_rack",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.82000005245209,
+					0.0679312497377396,
+					0.431445002555847
+				],
+				"from": [
+					1.82000005245209,
+					0.0649999976158142,
+					-1.54999995231628
+				],
+				"reached": true,
+				"remaining_m": 0.0686176344752312,
+				"seconds": 0.567,
+				"target": [
+					1.82000005245209,
+					0.0649999976158142,
+					0.5
+				]
+			},
+			"name": "Traverse: table_to_right_rack",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.22,
+				"measured_m": 1.22000002861023,
+				"minimum_m": 0.8
+			},
+			"name": "Gap width: table_to_checkout",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.7392578125,
+					0.0679288059473038,
+					-1.12000000476837
+				],
+				"from": [
+					-1.25,
+					0.0649999976158142,
+					-1.12000000476837
+				],
+				"reached": true,
+				"remaining_m": 0.0807953402400017,
+				"seconds": 0.833,
+				"target": [
+					1.82000005245209,
+					0.0649999976158142,
+					-1.12000000476837
+				]
+			},
+			"name": "Traverse: table_to_checkout",
+			"passed": true
+		},
+		{
+			"details": {
+				"entry": {
+					"collisions": [],
+					"final": [
+						-2.45629334449768,
+						0.0679316371679306,
+						1.44119000434875
+					],
+					"from": [
+						-2.7445752620697,
+						0.0679350569844246,
+						1.6521281003952
+					],
+					"reached": true,
+					"remaining_m": 0.0698150619864464,
+					"seconds": 0.117,
+					"target": [
+						-2.40000009536743,
+						0.0649999976158142,
+						1.39999997615814
+					]
+				},
+				"exit": {
+					"collisions": [],
+					"final": [
+						-2.7445752620697,
+						0.0679350569844246,
+						1.6521281003952
+					],
+					"from": [
+						-2.40000009536743,
+						0.0649999976158142,
+						1.39999997615814
+					],
+					"reached": true,
+					"remaining_m": 0.0811216831207275,
+					"seconds": 0.15,
+					"target": [
+						-2.80999994277954,
+						0.0649999976158142,
+						1.70000004768372
+					]
+				}
+			},
+			"name": "Entrance gap allows exit and reentry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"delta": [
+					1.01646590232849,
+					0.00307893753051758,
+					-0.367853879928589
+				]
+			},
+			"name": "Diagonal collision preserves wall sliding",
+			"passed": true
+		},
+		{
+			"details": [
+				"run",
+				0.149971666666667,
+				0.316638333333333
+			],
+			"name": "Run animation advances in rendered viewport",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Input release stops horizontal motion",
+			"passed": true
+		},
+		{
+			"details": "idle",
+			"name": "Release returns to idle",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Focus loss cancels movement",
+			"passed": true
+		},
+		{
+			"details": 1.74549429118633,
+			"name": "Fixture head-top height measurable",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 1.33486543712292,
+				"difference": 0.055793991416309,
+				"height": 2.46,
+				"ratio_to_H": 1.40934290786368,
+				"reason": ""
+			},
+			"name": "Scale ±15%: door",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.660271423297924,
+				"difference": 0.0429501084598698,
+				"height": 1.202,
+				"ratio_to_H": 0.688630152541522,
+				"reason": ""
+			},
+			"name": "Scale ±15%: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.392438980441716,
+				"difference": 0.00437956204379564,
+				"height": 0.682,
+				"ratio_to_H": 0.390720269578468,
+				"reason": ""
+			},
+			"name": "Scale ±15%: chair",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.650245609928975,
+				"difference": 0.107885462555066,
+				"height": 1.01255,
+				"ratio_to_H": 0.580093561527386,
+				"reason": ""
+			},
+			"name": "Scale ±15%: table",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"pid": 1080411,
+	"renderer": "mobile",
+	"route": [
+		{
+			"collisions": [],
+			"final": [
+				-2.42000007629395,
+				0.0649999976158142,
+				1.42999994754791
+			],
+			"from": [
+				-2.42000007629395,
+				0.0649999976158142,
+				1.42999994754791
+			],
+			"name": "entry",
+			"reached": true,
+			"remaining_m": 0.0360554791986942,
+			"seconds": 0.001,
+			"target": [
+				-2.40000009536743,
+				0.0649999976158142,
+				1.39999997615814
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-2.11183285713196,
+				0.0679259598255157,
+				1.40688753128052
+			],
+			"from": [
+				-2.42000007629395,
+				0.0649999976158142,
+				1.42999994754791
+			],
+			"name": "front_left",
+			"reached": true,
+			"remaining_m": 0.0921372771263123,
+			"seconds": 0.003,
+			"target": [
+				-2.01999998092651,
+				0.0649999976158142,
+				1.39999997615814
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-2.02506995201111,
+				0.0679371803998947,
+				-0.149072736501694
+			],
+			"from": [
+				-2.11183285713196,
+				0.0679259598255157,
+				1.40688753128052
+			],
+			"name": "left_edge",
+			"reached": true,
+			"remaining_m": 0.0911158472299576,
+			"seconds": 0.396,
+			"target": [
+				-2.01999998092651,
+				0.0649999976158142,
+				-0.239999994635582
+			]
+		},
+		{
+			"collisions": [
+				"/root/SceneBenchmark/ClothingStoreAArt/central_display_table/Collider"
+			],
+			"final": [
+				-1.40355157852173,
+				0.0679383054375648,
+				-1.31903600692749
+			],
+			"from": [
+				-2.02506995201111,
+				0.0679371803998947,
+				-0.149072736501694
+			],
+			"name": "fitting_room",
+			"reached": true,
+			"remaining_m": 0.0971162542700768,
+			"seconds": 0.383,
+			"target": [
+				-1.35000002384186,
+				0.0649999976158142,
+				-1.39999997615814
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.36661946773529,
+				0.0679346993565559,
+				-1.14728677272797
+			],
+			"from": [
+				-1.40355157852173,
+				0.0679383054375648,
+				-1.31903600692749
+			],
+			"name": "mirror",
+			"reached": true,
+			"remaining_m": 0.0791078731417656,
+			"seconds": 0.066,
+			"target": [
+				-1.35000002384186,
+				0.0649999976158142,
+				-1.07000005245209
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.121308475732803,
+				0.0679345950484276,
+				-1.14036583900452
+			],
+			"from": [
+				-1.36661946773529,
+				0.0679346993565559,
+				-1.14728677272797
+			],
+			"name": "checkout",
+			"reached": true,
+			"remaining_m": 0.0787470787763596,
+			"seconds": 0.416,
+			"target": [
+				0.200000002980232,
+				0.0649999976158142,
+				-1.13999998569489
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.73673975467682,
+				0.0679292753338814,
+				-1.10197865962982
+			],
+			"from": [
+				0.121308475732803,
+				0.0679345950484276,
+				-1.14036583900452
+			],
+			"name": "back_right",
+			"reached": true,
+			"remaining_m": 0.0833353027701378,
+			"seconds": 0.317,
+			"target": [
+				1.82000005245209,
+				0.0649999976158142,
+				-1.10000002384186
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.81442034244537,
+				0.0679377913475037,
+				0.206048354506493
+			],
+			"from": [
+				1.73673975467682,
+				0.0679292753338814,
+				-1.10197865962982
+			],
+			"name": "right_edge",
+			"reached": true,
+			"remaining_m": 0.0941630378365517,
+			"seconds": 0.367,
+			"target": [
+				1.82000005245209,
+				0.0649999976158142,
+				0.300000011920929
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.80077624320984,
+				0.0679357200860977,
+				1.37356078624725
+			],
+			"from": [
+				1.81442034244537,
+				0.0679377913475037,
+				0.206048354506493
+			],
+			"name": "front_right",
+			"reached": true,
+			"remaining_m": 0.0665086284279823,
+			"seconds": 0.333,
+			"target": [
+				1.79999995231628,
+				0.0649999976158142,
+				1.44000005722046
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.93873083591461,
+				0.0679299458861351,
+				1.39943778514862
+			],
+			"from": [
+				1.80077624320984,
+				0.0679357200860977,
+				1.37356078624725
+			],
+			"name": "complete_circle",
+			"reached": true,
+			"remaining_m": 0.0813238844275475,
+			"seconds": 1.017,
+			"target": [
+				-2.01999998092651,
+				0.0649999976158142,
+				1.39999997615814
+			]
+		}
+	],
+	"scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+	"slug": "clothing_store_a"
+}

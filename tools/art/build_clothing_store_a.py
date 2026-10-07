@@ -158,10 +158,19 @@ def geometry():
     begin('entry_mat',at=(-2.41,.078,1.96),yaw=90)
     cube('Graphite entrance mat',(0,0,0),(1.19,.023,.66),'474744',.024,'cloth')
     k.mesh('Entrance bolt mark',[(-.05,.013,-.24),(.12,.013,-.04),(.035,.013,-.04),(.11,.013,.23),(-.13,.013,.015),(-.04,.013,.015)],[(0,1,2,3,4,5)],'A5A59B')
+    sys.path.insert(0,str(Path(__file__).resolve().parent/'source/clothing_store_a'))
+    import revision
+    revision.revise()
     k.save('545:2959',{'position':[10,9.2,12],'target':[0,1.28,.05],'size':9.6})
+
+    revision.manifest()
 
 if __name__=='__main__':
     k.configure('clothing_store_a');args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
     if '--bake-only' in args:k.load()
     else:geometry()
-    if '--geometry-only' not in args:k.bake_and_export()
+    if '--geometry-only' not in args:k.bake_and_export(ao_strength=.45,ao_distance=.36,coherent_swatches=True)
+
+    if '--geometry-only' not in args:
+        from series_batch import build
+        build('clothing_store_a')
