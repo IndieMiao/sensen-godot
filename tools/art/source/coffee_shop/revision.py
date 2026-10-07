@@ -4,7 +4,7 @@ from pathlib import Path
 import kit as k
 from kit import cube,cylinder,ellipsoid,tube,lathe,mesh,begin
 
-PALETTE={'oak':'C79B6F','oak_light':'E0B17A','oak_edge':'B89571','plaster':'F0D0A0','plaster_light':'F7DFBA','sage':'98A58E','linen_green':'DEDCC6','linen':'F4E7CD','leaf':'678347','leaf_light':'8EA15C','leaf_dark':'3E623D','terra':'C6B797','terra_light':'D6C8A9','jar_green':'AFBEA2','porcelain':'F4EFDF','iron':'596366','iron_edge':'8F9997'}
+PALETTE={'oak':'C79B6F','oak_light':'E0B17A','oak_edge':'B89571','plaster':'EED3AD','plaster_light':'F7E1C2','sage':'98A58E','linen_green':'DEDCC6','linen':'F4E7CD','leaf':'678347','leaf_light':'8EA15C','leaf_dark':'3E623D','terra':'C6B797','terra_light':'D6C8A9','jar_green':'AFBEA2','porcelain':'F4EFDF','iron':'596366','iron_edge':'8F9997'}
 PLANTS=[]
 
 def put(name,asset,at,yaw=0,scale=1,roll=0,collision=None):
@@ -160,12 +160,16 @@ def architecture():
         if 'Vertical painted' in o.name:o.data.materials.clear();o.data.materials.append(k.material(['A5AC88','B0B494','A0A783','ABB18E'][i%4],'wood','Y'))
     begin('window_garden_backdrop')
     for layer,(z,tone) in enumerate(((-3.35,'C8D7BF'),(-3.25,'AEC6A2'),(-3.13,'90AA77'))):
-        for j in range(9):
-            x=-2.9+j*.72+(layer%2)*.23
+        for j in range(8):
+            x=-2.76+j*.69+(layer%2)*.08
             ellipsoid('Layered distant canopy', (x,2.03+.18*math.sin(j*1.8+layer),z),(.95,.95+.20*math.cos(j),.12),tone,10,6)
     for layer,(x,tone) in enumerate(((-3.5,'CADBC7'),(-3.39,'B2CBA9'),(-3.27,'94B181'))):
         for j in range(4):
             ellipsoid('Layered side canopy',(x,1.25+(j%2)*.56,-2.60+j*.43),(.12,1.18,.76),tone,10,6)
+    # Crop the rear canopy in geometry for both the art and wider Avatar cameras.
+    for o in k.KITS['window_garden_backdrop']['objects']:
+        for vertex in o.data.vertices:
+            vertex.co.x=min(vertex.co.x,(2.10-o.location.x)/o.scale.x)
     # Wall shelf / intentionally varied crockery sizes and rotations.
     begin('wall_shelf',at=(-.75,1.68,-2.45))
     cube('Oak wall shelf',(0,0,0),(1.58,.065,.29),'oak_light',.025,'wood')
@@ -199,6 +203,13 @@ def foliage():
         put('FrontFlowerDrape%02d'%i,'ivy_short',(x,.94,2.91),0,.83,i*8-8)
     put('LeftPierFlowers','flower_shrub',(-2.93,.9,2.58),40,.90)
     put('LeftPierDrape','ivy_medium',(-3.03,1.16,2.53),-90,.72,-8)
+    # Two interwoven runs on the arch, plus a horizontal garland above the glazing.
+    for i,a in enumerate([math.pi-j*math.pi/6 for j in range(7)]):
+        put('ArchWoven%02d'%i,'ivy_short',(-2.68,1.96+1.01*math.sin(a),.65-1.01*math.cos(a)),90,.70,math.degrees(a)+12)
+    for i,x in enumerate((-2.60,-1.78,-.94,-.10,.74,1.50)):
+        put('TransomGarland%02d'%i,'ivy_short',(x,2.89+(.05 if i%2 else 0),-2.47),0,.76,90+(-8 if i%2 else 8))
+    for i,(y,z) in enumerate(((2.08,1.60),(2.05,-.34),(.47,1.57))):
+        put('ArchShoulder%02d'%i,'flower_shrub',(-2.79,y,z),90,.45)
     # Far-to-near low-poly canopy masses are authored in the backdrop module.
 
 
@@ -237,7 +248,7 @@ def finish():
     k.save('545:2956',{'position':[10.85,11.0,11.15],'target':[-.15,1.27,.15],'size':9.6})
     path=k.OUT/'layout.json';d=json.loads(path.read_text());d['shared_plants']=PLANTS
     d['material_overrides']={'window_garden_backdrop':{'unshaded':True},'espresso_machine':{'roughness':.40,'metallic':.12},'table':{'roughness':.54},'window_glass_left':{'alpha':.08},'window_glass_back':{'alpha':.08},'window_glass_arch':{'alpha':.08}}
-    d['lighting']={'background':'D3E7D8','ambient':'C0ADA9','ambient_energy':.58,'sun_color':'FFE0AE','sun_energy':1.55,'sun_position':[6,9,-4],'sun_target':[0,0,.8],'angular_distance':4.5,'lamps':[{'position':[-1.20,2.25,-1.32],'color':'FFE0A3','energy':1.2,'range':1.45},{'position':[.30,2.25,-1.32],'color':'FFE0A3','energy':1.2,'range':1.45}]}
+    d['lighting']={'background':'D3E7D8','ambient':'C0ADA9','ambient_energy':.67,'sun_color':'FFE0AE','sun_energy':1.55,'sun_position':[6,9,-4],'sun_target':[0,0,.8],'angular_distance':4.5,'lamps':[{'position':[-3.5,2.0,5.0],'color':'FFF0D6','energy':1.3,'range':7.0},{'position':[-1.20,2.25,-1.32],'color':'FFE0A3','energy':1.2,'range':1.45},{'position':[.30,2.25,-1.32],'color':'FFE0A3','energy':1.2,'range':1.45}]}
     d['spawn']=[.15,-.12,3.25]
     d['boundaries']=[{'name':'left_open_arch_boundary','at':[-3.11,1.20,0],'size':[.10,2.7,5.8]},{'name':'entry_landing_floor','at':[.15,-.36,3.34],'size':[1.74,.10,.90]},{'name':'landing_front_edge','at':[.15,.45,3.79],'size':[1.90,1.7,.08]},{'name':'landing_left_edge','at':[-.76,.4,3.25],'size':[.08,1.7,1.15]},{'name':'landing_right_edge','at':[1.06,.4,3.25],'size':[.08,1.7,1.15]}]
     d['bench']={'route':[{'name':'entry_step','position':[.15,-.18,3.2]},{'name':'entry_inside','position':[.15,.07,2.20]},{'name':'between_tables','position':[.05,.07,.60]},{'name':'counter_front','position':[.05,.07,-.70]},{'name':'plant_corner_left','position':[-2.0,.07,-.70]},{'name':'center_return','position':[.05,.07,-.70]},{'name':'plant_corner_right','position':[2.2,.07,-.70]},{'name':'center_return_right','position':[.05,.07,-.70]},{'name':'between_tables_return','position':[.05,.07,.60]},{'name':'door_return','position':[.15,.07,2.20]}],

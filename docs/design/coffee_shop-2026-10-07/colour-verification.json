@@ -1,5 +1,5 @@
 {
-  "revision": "R2",
+  "revision": "R2.1",
   "method": "9x9 RGB median; HSV circular hue distance; corresponding authored surface positions, not same screen pixel",
   "correction": "R1 limestone sample (1229,674) was a wooden window mullion, not limestone. R1 honey_oak (606,1020) overlapped the rug edge. R2 labels and fresh physical-surface coordinates supersede those claims.",
   "checks": [
@@ -29,15 +29,15 @@
       "runtime": {
         "rgb": [
           255,
-          231,
-          179
+          235,
+          195
         ],
-        "hex": "#FFE7B3",
-        "hue_degrees": 41.053,
-        "saturation": 0.298,
+        "hex": "#FFEBC3",
+        "hue_degrees": 40.0,
+        "saturation": 0.2353,
         "value": 1.0
       },
-      "hue_delta_degrees": 6.915,
+      "hue_delta_degrees": 5.862,
       "limit_degrees": 10,
       "passed": true
     },
@@ -67,15 +67,15 @@
       "runtime": {
         "rgb": [
           255,
-          220,
-          144
+          224,
+          152
         ],
-        "hex": "#FFDC90",
-        "hue_degrees": 41.081,
-        "saturation": 0.4353,
+        "hex": "#FFE098",
+        "hue_degrees": 41.942,
+        "saturation": 0.4039,
         "value": 1.0
       },
-      "hue_delta_degrees": 9.118,
+      "hue_delta_degrees": 9.979,
       "limit_degrees": 10,
       "passed": true
     },
@@ -104,20 +104,35 @@
       },
       "runtime": {
         "rgb": [
+          201,
           196,
-          191,
-          140
+          146
         ],
-        "hex": "#C4BF8C",
-        "hue_degrees": 54.643,
-        "saturation": 0.2857,
-        "value": 0.7686
+        "hex": "#C9C492",
+        "hue_degrees": 54.545,
+        "saturation": 0.2736,
+        "value": 0.7882
       },
-      "hue_delta_degrees": 6.181,
+      "hue_delta_degrees": 6.084,
       "limit_degrees": 10,
       "passed": true
     }
   ],
   "passed": true,
-  "limits": "Only these declared representative lit patches are measured. This does not establish full-image colour or reference fidelity; brightness/saturation are recorded separately."
+  "limits": "Only these declared representative lit patches are measured. This does not establish full-image colour or reference fidelity; brightness/saturation are recorded separately.",
+  "shade_comparison": {
+    "shaded_pixel": [
+      258,
+      852
+    ],
+    "lit_pixel": [
+      1045,
+      982
+    ],
+    "shaded_L_star": 60.8894,
+    "lit_L_star": 78.4458,
+    "ratio": 0.7762,
+    "minimum": 0.7,
+    "passed": true
+  }
 }

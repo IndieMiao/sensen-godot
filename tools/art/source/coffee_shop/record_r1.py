@@ -1,11 +1,11 @@
 """Record the unchanged shared harness via real rendered viewport with wall-clock PTS."""
 from pathlib import Path
-import subprocess,json,shutil
-ROOT=Path(__file__).resolve().parents[4];project=ROOT/'output/scene-bench/coffee_shop/project';out=ROOT/'output/scene-bench/coffee_shop/evidence'
+import subprocess,json,shutil,sys
+ROOT=Path(__file__).resolve().parents[4];slug=sys.argv[1] if len(sys.argv)>1 else 'coffee_shop';project=ROOT/'output/scene-bench'/slug/'project';out=ROOT/'output/scene-bench'/slug/'evidence'
 shutil.copy2(Path(__file__).with_suffix('.gd'),project/'record_r1.gd')
 (out/'record-go').unlink(missing_ok=True)
 with (out/'record-viewport.log').open('w') as log:
-    subprocess.run(['godot','--disable-vsync','--max-fps','60','--path',str(project),'--resolution','960x720','--position','0,0','--borderless','--script','res://record_r1.gd','--','--slug','coffee_shop','--output',str(out),'--record-route'],stdout=log,stderr=subprocess.STDOUT,check=True,timeout=75)
+    subprocess.run(['godot','--disable-vsync','--max-fps','60','--path',str(project),'--resolution','960x720','--position','0,0','--borderless','--script','res://record_r1.gd','--','--slug',slug,'--output',str(out),'--record-route'],stdout=log,stderr=subprocess.STDOUT,check=True,timeout=75)
 result=json.loads((out/'record-result.json').read_text());assert result['passed']
 frames=json.loads((out/'viewport-frames.json').read_text())['frames'];assert len(frames)>100 and frames[-1]['seconds']>14.8
 # Use actual captured intervals; resample to 30fps without accelerating wall time.

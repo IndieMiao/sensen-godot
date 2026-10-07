@@ -1688,6 +1688,342 @@
         0.72
       ],
       "colliders": []
+    },
+    {
+      "name": "ArchWoven00",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        1.9600000000000002,
+        1.6600000000000001
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        192.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven01",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        2.465,
+        1.5246856578222832
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        162.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven02",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        2.8346856578222828,
+        1.1550000000000002
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        132.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven03",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        2.9699999999999998,
+        0.6499999999999999
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        102.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven04",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        2.834685657822283,
+        0.14500000000000013
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        72.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven05",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        2.465,
+        -0.2246856578222831
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        41.99999999999999
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven06",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        1.96,
+        -0.36
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        12.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland00",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.6,
+        2.89,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        98
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland01",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -1.78,
+        2.94,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        82
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland02",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -0.94,
+        2.89,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        98
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland03",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -0.1,
+        2.94,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        82
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland04",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        0.74,
+        2.89,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        98
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland05",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        1.5,
+        2.94,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        82
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchShoulder00",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.79,
+        2.08,
+        1.6
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchShoulder01",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.79,
+        2.05,
+        -0.34
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchShoulder02",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.79,
+        0.47,
+        1.57
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ],
+      "colliders": []
     }
   ],
   "material_overrides": {
@@ -1714,7 +2050,7 @@
   "lighting": {
     "background": "D3E7D8",
     "ambient": "C0ADA9",
-    "ambient_energy": 0.58,
+    "ambient_energy": 0.67,
     "sun_color": "FFE0AE",
     "sun_energy": 1.55,
     "sun_position": [
@@ -1729,6 +2065,16 @@
     ],
     "angular_distance": 4.5,
     "lamps": [
+      {
+        "position": [
+          -3.5,
+          2.0,
+          5.0
+        ],
+        "color": "FFF0D6",
+        "energy": 1.3,
+        "range": 7.0
+      },
       {
         "position": [
           -1.2,
@@ -2166,7 +2512,7 @@
   "review_lighting": {
     "background": "D3E7D8",
     "ambient_color": "C0ADA9",
-    "ambient": 0.58,
+    "ambient": 0.67,
     "sun_color": "FFE0AE",
     "sun": 1.55,
     "sun_position": [
@@ -2180,6 +2526,16 @@
       0.8
     ],
     "points": [
+      {
+        "position": [
+          -3.5,
+          2.0,
+          5.0
+        ],
+        "color": "FFF0D6",
+        "energy": 1.3,
+        "range": 7.0
+      },
       {
         "position": [
           -1.2,
@@ -2221,9 +2577,19 @@
         "ArchSide_front2",
         "ArchSide_back0",
         "ArchSide_back1",
-        "ArchSide_back2"
+        "ArchSide_back2",
+        "ArchWoven00",
+        "ArchWoven01",
+        "ArchWoven02",
+        "ArchWoven03",
+        "ArchWoven04",
+        "ArchWoven05",
+        "ArchWoven06",
+        "ArchShoulder00",
+        "ArchShoulder01",
+        "ArchShoulder02"
       ],
-      "triangles": 10760,
+      "triangles": 22550,
       "cast_shadow": false
     },
     {
@@ -2234,9 +2600,15 @@
         "TransomTrailing00",
         "TransomTrailing01",
         "TransomTrailing02",
-        "TransomTrailing03"
+        "TransomTrailing03",
+        "TransomGarland00",
+        "TransomGarland01",
+        "TransomGarland02",
+        "TransomGarland03",
+        "TransomGarland04",
+        "TransomGarland05"
       ],
-      "triangles": 4920,
+      "triangles": 8950,
       "cast_shadow": false
     },
     {
@@ -2254,7 +2626,7 @@
         "RightPillarVine01",
         "RightPillarVine02"
       ],
-      "triangles": 7240,
+      "triangles": 7040,
       "cast_shadow": false
     },
     {
@@ -2271,7 +2643,7 @@
         "LeftPierFlowers",
         "LeftPierDrape"
       ],
-      "triangles": 12124,
+      "triangles": 12782,
       "cast_shadow": false
     },
     {
@@ -2324,5 +2696,5 @@
       "cast_shadow": false
     }
   ],
-  "revision": "R2"
+  "revision": "R2.1"
 }
