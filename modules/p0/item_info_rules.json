@@ -9,7 +9,8 @@
     "  button with a grey reason (kind unavailable). kind: primary, secondary, nav (Gift ›). Never-possible actions have no",
     "  entry at all (no grey text: seeds and bait are never sold).",
     "promote: the button id that becomes primary when its own `when` holds, demoting the default primary (Deliver over Eat).",
-    "lock: the title-area lock icon is shown; price: the buy row has a price column; quota: the sell area shows the quota line."
+    "lock: the title-area lock icon is shown; price: the buy row has a price column; quota: the sell area shows the quota line.",
+    "Capability flags (can_store, can_lock, can_gift) gate actions the P0 server can't do yet: no button and no grey text until the view carries the feature (storage, locked on bag stacks, residents / social)."
   ],
   "seed/bag": {
     "facts": [
@@ -31,7 +32,8 @@
             "when": "!at_home",
             "label": "At home only"
           }
-        ]
+        ],
+        "when": "can_store"
       }
     ],
     "lock": true
@@ -151,7 +153,8 @@
             "when": "!has_friends",
             "label": "Gift · Mutual friends only"
           }
-        ]
+        ],
+        "when": "can_gift"
       }
     ],
     "lock": true
@@ -263,7 +266,7 @@
         "id": "gift",
         "label": "Gift ›",
         "kind": "nav",
-        "when": "!mystery"
+        "when": "!mystery & can_gift"
       }
     ],
     "lock": true
@@ -449,7 +452,7 @@
         "id": "store",
         "label": "Store",
         "kind": "secondary",
-        "when": "!gate_item",
+        "when": "!gate_item & can_store",
         "unless": [
           {
             "when": "!at_home",

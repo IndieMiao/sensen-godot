@@ -32,7 +32,9 @@ extends RefCounted
 ##
 ## Server facts not in the P0 view yet (SGODOT-228 PR-A: shops[role], quotas, bag stack locked / gifted / expires_in,
 ## residents) are read defensively: without them the homestead stall buys crops and fish at full price with no limit,
-## nothing is locked or gifted, and nobody is a mutual friend.
+## nothing is locked or gifted, and nobody is a mutual friend. Actions the server can't do yet are gated by capability
+## (can_store = view.storage, can_lock = bag stacks carry `locked`, can_gift = view.residents / view.social): no
+## button, no grey text and no lock icon until the field appears (刘邦 / 奕星 2026-10-08).
 
 const CONTEXTS: Array[StringName] = [&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift"]
 const RULES_PATH := "res://modules/p0/item_info_rules.json"
@@ -81,7 +83,7 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 		badge = badge,
 		facts = [],
 		buttons = [],
-		lock = {shown = bool(rule.get("lock", false)), locked = f.locked},
+		lock = {shown = bool(rule.get("lock", false)) and f.can_lock, locked = f.locked},
 		price = {},
 		quota = {},
 	}
@@ -214,6 +216,10 @@ static func flags(view: Dictionary, item_id: String, context: StringName, opts :
 		deliverable = _deliverable(view, item_id, target),
 		recyclable = it.get("sell", null) != null,
 		gate_item = bool(it.get("gate", false)),
+		# What the server can do at all (SGODOT-228 PR-A adds them): until then no button and no grey text.
+		can_store = view.has("storage"),
+		can_lock = stack.has("locked"),
+		can_gift = view.has("residents") or view.has("social"),
 	}
 
 static func tokens(view: Dictionary, item_id: String, context: StringName, opts := {}) -> Dictionary:

@@ -66,11 +66,25 @@ func test_rule_table_only_uses_known_flags_and_tokens() -> void:
 				var n := term.strip_edges().trim_prefix("!").strip_edges()
 				if n != "": assert_bool(f.has(n)).override_failure_message("%s: unknown flag %s" % [key, n]).is_true()
 
+func test_actions_the_server_cannot_do_yet_do_not_show() -> void:
+	var s := P0ItemInfo.spec(_view(), "seed_radish", &"bag", {place = "pond"})
+	assert_array(_labels(s)).is_equal(["secondary:Pin"])   # no Store, not even the grey At home only
+	assert_bool(s.lock.shown).is_false()
+	assert_array(_labels(P0ItemInfo.spec(_view(), "fish_crucian", &"bag"))).is_empty()   # no Gift › before gifting exists
+
+func _full() -> Dictionary:
+	var v := _view()
+	v["storage"] = {}
+	v["residents"] = []
+	for slot in v.bag.slots: slot["locked"] = false
+	return v
+
 func test_seed_in_the_bag_pins_and_stores_only_at_home() -> void:
-	var s := P0ItemInfo.spec(_view(), "seed_radish", &"bag", {place = "home"})
+	var s := P0ItemInfo.spec(_full(), "seed_radish", &"bag", {place = "home"})
 	assert_array(s.facts).is_equal(["2 Energy per plot · Ready in 4h 0m"])
 	assert_array(_labels(s)).is_equal(["secondary:Pin", "secondary:Store"])   # no primary button
-	s = P0ItemInfo.spec(_view(), "seed_radish", &"bag", {place = "pond", pinned = true})
+	assert_bool(s.lock.shown).is_true()
+	s = P0ItemInfo.spec(_full(), "seed_radish", &"bag", {place = "pond", pinned = true})
 	assert_array(_labels(s)).is_equal(["secondary:Unpin", "unavailable:At home only"])
 	assert_str(s.badge).is_equal("pinned")
 
@@ -112,18 +126,18 @@ func test_locked_stack_shows_locked_and_unlock_only() -> void:
 	assert_str(s.badge).is_equal("locked")   # Locked wins over Pinned
 
 func test_fish_gift_is_grey_without_mutual_friends() -> void:
-	var s := P0ItemInfo.spec(_view(), "fish_crucian", &"bag")
+	var s := P0ItemInfo.spec(_full(), "fish_crucian", &"bag")
 	assert_array(_labels(s)).is_equal(["unavailable:Gift · Mutual friends only"])
 	assert_array(s.facts).is_equal(["Common", "3", "Sells for 6 · Fish-dex 1/2"])
-	var v := _view()
+	var v := _full()
 	v["social"] = {"mutual": 2}
 	assert_array(_labels(P0ItemInfo.spec(v, "fish_crucian", &"bag"))).is_equal(["nav:Gift ›"])
 
 func test_dish_eats_and_deliver_takes_the_primary_slot() -> void:
-	var s := P0ItemInfo.spec(_view(), "dish_grilled_crucian", &"bag")
+	var s := P0ItemInfo.spec(_full(), "dish_grilled_crucian", &"bag")
 	assert_array(_labels(s)).is_equal(["primary:Eat · +45 Energy", "nav:Gift ›"])
 	assert_str(s.facts[0]).is_equal("Common ★")
-	var v := _view()
+	var v := _full()
 	v.energy.value = 200
 	assert_array(_labels(P0ItemInfo.spec(v, "dish_grilled_crucian", &"bag"))).is_equal(["unavailable:Energy full", "nav:Gift ›"])
 
