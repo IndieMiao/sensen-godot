@@ -77,7 +77,11 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 		applied.emission_texture = applied.albedo_texture
 		applied.emission_energy_multiplier = .22
 		fire = container
-	var variant := "garden" if str(asset.name).ends_with("garden") else "fire" if asset.name == "fire" else "plain"
+	if asset.name == "firewood_alcove":
+		applied = material.duplicate()
+		applied.roughness = 1.0
+		applied.metallic_specular = .06
+	var variant := "wood_niche" if asset.name == "firewood_alcove" else "garden" if str(asset.name).ends_with("garden") else "fire" if asset.name == "fire" else "plain"
 	if variant_materials.has(variant): applied = variant_materials[variant]
 	else: variant_materials[variant] = applied
 	_set_material(model, applied)

@@ -762,7 +762,7 @@
     1.5
   ],
   "review_lighting": {
-    "ambient": 0.63,
+    "ambient": 0.52,
     "ambient_color": "FFE6BD",
     "sun": 1.35,
     "sun_color": "FFE6AC",
@@ -808,9 +808,9 @@
       "name": "floor_monstera",
       "file": "monstera.glb",
       "position": [
-        -2.72,
+        -2.78,
         0.083,
-        2.1
+        2.22
       ],
       "rotation_degrees": [
         0,
@@ -818,9 +818,9 @@
         0
       ],
       "scale": [
-        0.77,
-        0.77,
-        0.77
+        1.31,
+        1.31,
+        1.31
       ],
       "colliders": [
         {
@@ -884,9 +884,9 @@
         0
       ],
       "scale": [
-        0.77,
-        0.77,
-        0.77
+        1.31,
+        1.31,
+        1.31
       ],
       "colliders": []
     },
@@ -904,9 +904,9 @@
         0
       ],
       "scale": [
-        0.68,
-        0.68,
-        0.68
+        1.19,
+        1.19,
+        1.19
       ],
       "colliders": []
     },
@@ -914,7 +914,7 @@
       "name": "pantry_pothos",
       "file": "pothos.glb",
       "position": [
-        1.14,
+        1.08,
         2.42,
         -2.65
       ],
@@ -924,9 +924,9 @@
         0
       ],
       "scale": [
-        0.59,
-        0.59,
-        0.59
+        0.95,
+        0.95,
+        0.95
       ],
       "colliders": []
     },
@@ -944,9 +944,49 @@
         0
       ],
       "scale": [
-        0.51,
-        0.51,
-        0.51
+        0.78,
+        0.78,
+        0.78
+      ],
+      "colliders": []
+    },
+    {
+      "name": "window_extra_vine",
+      "file": "ivy_medium.glb",
+      "position": [
+        -2.47,
+        1.63,
+        -0.48
+      ],
+      "rotation_degrees": [
+        0,
+        75,
+        0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "bookcase_extra_vine",
+      "file": "ivy_long.glb",
+      "position": [
+        -2.03,
+        2.64,
+        -2.22
+      ],
+      "rotation_degrees": [
+        0,
+        -15,
+        0
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
       ],
       "colliders": []
     }
