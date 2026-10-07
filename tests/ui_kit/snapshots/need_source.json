@@ -1,0 +1,132 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    176
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiNeedSource"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "NeedSource 1092:77266 · LOCK-10 / 08"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        124
+      ],
+      "children": [
+        {
+          "type": "UiNeedSource",
+          "rect": [
+            0,
+            52,
+            328,
+            56
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                14,
+                58,
+                308,
+                44
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    14,
+                    70,
+                    226,
+                    20
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Copper Ore · The mine, floors 1–4"
+                },
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    250,
+                    58,
+                    72,
+                    44
+                  ],
+                  "variation": "CmdSecondaryCompact",
+                  "text": "Show ›"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiNeedSource",
+          "rect": [
+            0,
+            120,
+            328,
+            56
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                14,
+                126,
+                308,
+                44
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    14,
+                    138,
+                    226,
+                    20
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Radish Seeds · Homestead Stall"
+                },
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    250,
+                    126,
+                    72,
+                    44
+                  ],
+                  "variation": "CmdSecondaryCompact",
+                  "text": "Show ›"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -53,6 +53,7 @@ func _init() -> void:
 	ui.zoom.connect(func(f: float): _call("p0_zoom", [f]))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
 	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
+	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
 	ui.home_choice.connect(func(choice: String): _call("p0_home", [choice]))
 	ui.place_pressed.connect(leave_world)
 	ui.home_requested.connect(func(): _leave_then("farm"))
@@ -304,6 +305,8 @@ func _dev_shot(dt: float) -> void:
 			"skills": ui.open_skills()
 			"profile": ui.open_profile()
 			"today": ui.open_today()
+			"energypanel": ui.open_energy_panel()
+			"inbox": ui.open_inbox()
 			"radial": ui.open_radial()
 			"kitchen": ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
 			"put":

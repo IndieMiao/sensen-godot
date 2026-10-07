@@ -55,7 +55,18 @@ must not change structure, role, entry point or key copy. Engineering specs: SGO
 | `UiFilterChip` | Compact/Filter 633:41280 | toggle chip, 26 drawn in 44; `UiFilterChip.row()` builds a grouped row |
 | `UiSegmentTab` | Tab 483:322 · Compact/Kitchen/Mode 655:58504 | 2–3 way mode switch with optional count; selected is never the command green (LOCK-13) |
 | `UiBadge` | StateBadge 483:324 | short state word pill |
-| `UiEmptyState` | pending, WP6 SGODOT-206 (WP7-B F-08 §5) | icon + one line + optional navigation; provisional look until the main lands |
+| `UiEmptyState` | EmptyState 1234:87237 | Kind PANEL (56 grey disc, one line, optional NavigationRow) / ROW (one line in a list); navigation never jumps (LOCK-08) |
+
+### World display (SGODOT-222)
+
+| Class | Figma main | Notes |
+|---|---|---|
+| `UiNeedTile` | NeedTile 1090:78003 | LOCK-10: L / M / S; met / short / count; ring = have ÷ need rounded down to 10 %; `UiNeedTile.group()` wraps; tap shows a `UiNeedSource` |
+| `UiNeedSource` | NeedSource 1092:77266 | one source line + `Show ›` (camera only, LOCK-08); `UiNeedSource.popup()` anchors it above the tile |
+| `UiHud` | HUD 1143:103373 | LOCK-06: two rows; stands alone (`apply(state)`, `P0Logic.hud_state`); Energy colour by the next action's cost, never by percentage; location chip = actual place |
+| `UiTodayPanel` | TodayPanel 1145:81715 · TodayRow 1145:81714 | LOCK-06: ≤ 3 rows under the chips; Show only moves the camera; done / short rows |
+| `UiEnergyCard` | Energy 1094:77504 | LOCK-09: `card()` (one button `Free to do now`, 2×2 guide-only tiles, At home away from home) and `panel()` (under the HUD chip) |
+| `UiEnergyTile` | EnergyTile 1093:77292 | guide-only RECOVER tile; unavailable shows the reason, no link |
 
 ## Panel parts (SGODOT-225)
 
