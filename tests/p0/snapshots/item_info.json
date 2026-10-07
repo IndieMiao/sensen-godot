@@ -9,7 +9,7 @@
     ],
     "lock": {
       "locked": false,
-      "shown": true
+      "shown": false
     },
     "price": {},
     "quota": {}
@@ -44,7 +44,7 @@
     ],
     "lock": {
       "locked": false,
-      "shown": true
+      "shown": false
     },
     "price": {},
     "quota": {}
@@ -85,8 +85,7 @@
   "dish_grilled_crucian/bag": {
     "badge": "",
     "buttons": [
-      "primary:Eat · +45 Energy",
-      "nav:Gift ›"
+      "primary:Eat · +45 Energy"
     ],
     "facts": [
       "Common ★",
@@ -94,7 +93,7 @@
     ],
     "lock": {
       "locked": false,
-      "shown": true
+      "shown": false
     },
     "price": {},
     "quota": {}
@@ -135,9 +134,7 @@
   },
   "fish_crucian/bag": {
     "badge": "",
-    "buttons": [
-      "unavailable:Gift · Mutual friends only"
-    ],
+    "buttons": [],
     "facts": [
       "Common",
       "3",
@@ -145,7 +142,7 @@
     ],
     "lock": {
       "locked": false,
-      "shown": true
+      "shown": false
     },
     "price": {},
     "quota": {}
@@ -254,15 +251,14 @@
   "seed_radish/bag": {
     "badge": "",
     "buttons": [
-      "secondary:Pin",
-      "secondary:Store"
+      "secondary:Pin"
     ],
     "facts": [
       "2 Energy per plot · Ready in 4h 0m"
     ],
     "lock": {
       "locked": false,
-      "shown": true
+      "shown": false
     },
     "price": {},
     "quota": {}
@@ -289,16 +285,14 @@
   },
   "timber/bag": {
     "badge": "",
-    "buttons": [
-      "secondary:Store"
-    ],
+    "buttons": [],
     "facts": [
       "12",
       "Sells for 2 at home"
     ],
     "lock": {
       "locked": false,
-      "shown": true
+      "shown": false
     },
     "price": {},
     "quota": {}
