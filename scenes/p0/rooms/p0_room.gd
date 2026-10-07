@@ -65,6 +65,8 @@ var _cam_size := 10.75
 var _focus := Vector3.ZERO
 var _follow := P0Follow.new()
 var _zoom := 1.0
+var _framed := Vector3.ZERO   # the opening shot's centre
+var _fits := false            # the whole floor fits the opening shot: hold it instead of following
 var _shot := {}           # push-in: {center: Vector3, size: float, release_on_move: bool}
 var _shot_k := 0.0
 var _shot_tween: Tween
@@ -72,6 +74,7 @@ var _walk := {}           # {name, point: Vector3, done: Callable}
 var _shown := {}          # marker ids currently on screen
 var _exit_armed := false
 var _leaving := false
+var _perf_left := -1.0    # debug builds with user://p0_perf: log fps / draw calls every 5 s (logcat tag godot)
 
 func setup(_args: Dictionary) -> void: pass
 
@@ -104,6 +107,7 @@ func _ready() -> void:
 	if spawn: actor.face(actor.position + yaw_dir(float(_data.spawn.get("yaw_degrees", 180))))
 	frame_all()
 	_room_ready()
+	if OS.is_debug_build() and FileAccess.file_exists("user://p0_perf"): _perf_left = 5.0
 	if use_runtime:
 		rt = P0Runtime.ensure()
 		rt.attach(self)
@@ -260,11 +264,15 @@ func frame_all() -> void:
 	var view := _view()
 	var tall := view.y / maxf(view.x, 1.0)
 	var base := float(layout.get("camera", {}).get("size", _cam_size))
-	_cam_size = clampf(maxf((hi.x - lo.x) / FRAME_W, (hi.y - lo.y) / (FRAME_H * tall)), base * MIN_VIEW_K, base)
+	var need := maxf((hi.x - lo.x) / FRAME_W, (hi.y - lo.y) / (FRAME_H * tall))
+	# Fits: everything is on screen at the room's accepted view, even if tighter than the opening margins.
+	_fits = hi.x - lo.x <= base and hi.y - lo.y <= base * tall * 0.85
+	_cam_size = clampf(need, base * MIN_VIEW_K, base)
 	var mid := (lo + hi) * 0.5
 	# The screen centre on the floor plane: move along the view axis until y = floor.
 	var t := (floor_y - up.y * mid.y) / forward.y
 	_focus = right * mid.x + up * mid.y + forward * t
+	_framed = _focus
 	_follow.hold()
 	_update_camera()
 
@@ -401,10 +409,20 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		else: _walk = {}
 	_door_check()
 	if _leaving or not is_inside_tree(): return   # the door popped this room mid-frame
-	_focus = _follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
+	# A room that fits the screen holds its diorama framing (following would crop it); zoomed in, or in
+	# a space larger than the screen (the market square), the safe box follows the player (§10.1).
+	if _fits and _zoom <= 1.0: _focus = _framed
+	else: _focus = _follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
 	_update_camera()
 	if rt: _markers(v)
 	_room_frame(v, dt)
+	if _perf_left >= 0.0:
+		_perf_left -= dt
+		if _perf_left < 0.0:
+			_perf_left = 5.0
+			print("P0_PERF %s fps=%d draws=%d prims=%d" % [name, Performance.get_monitor(Performance.TIME_FPS),
+				Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
+				Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)])
 
 ## Walking onto the door leaves (no confirmation); it arms once the player has stepped away from it.
 func _door_check() -> void:
@@ -448,9 +466,12 @@ static func badge_state(key: String) -> int:
 func p0_anchor() -> Vector2:
 	return cam.unproject_position(actor.position + Vector3(0, 2.0, 0))
 
-func p0_zoom(f: float) -> void: _zoom = clampf(_zoom / f, ZOOM_RANGE.x, ZOOM_RANGE.y)
+func p0_zoom(f: float) -> void:
+	_zoom = clampf(_zoom / f, ZOOM_RANGE.x, ZOOM_RANGE.y)
+	if _zoom > 1.0 and _fits: _follow.held = false
 
 func p0_recenter() -> void:
+	if _fits and _zoom <= 1.0: return   # the whole room is already in view
 	_focus = actor.position
 	_follow.held = false
 

@@ -225,3 +225,19 @@ func test_farmhouse_stove_card_and_badge_follow_the_server_stove() -> void:
 	var ready := r._marker("use_stove_1", {"cooking": {"stove": {"ready_in": 0, "dish": null}}})
 	assert_str(ready.text).is_equal("Stove · Ready · Unknown dish")
 	assert_str(ready.badge).is_equal("ready")
+
+func test_a_room_that_fits_the_screen_holds_its_framing_while_walking() -> void:
+	var r := _farmhouse()
+	assert_bool(r._fits).override_failure_message("the Basic Room fits a portrait screen").is_true()
+	var before := r.cam.global_position
+	r.p0_joystick(Vector2(1, 0))
+	for i in 20: r.p0_frame({}, 1.0 / 30.0)
+	r.p0_joystick(Vector2.ZERO)
+	for i in 40: r.p0_frame({}, 1.0 / 30.0)
+	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("spawn").global_position)).is_greater(0.3)
+	assert_vector(r.cam.global_position).is_equal_approx(before, Vector3.ONE * 0.001)
+	# Zoomed in, the safe box follows the player again.
+	r.p0_zoom(1.0 / 1.4)
+	r.p0_joystick(Vector2(-1, 0))
+	for i in 30: r.p0_frame({}, 1.0 / 30.0)
+	assert_bool(r.cam.global_position.is_equal_approx(before)).is_false()
