@@ -12,7 +12,8 @@ signal place_requested(entry: Dictionary)
 
 var pond_locations: Array = []
 ## Host-defined place pins: {id, kind: "place", name, category, lat, lng, art_path, action,
-## action_icon, filter} — e.g. the P0 tackle shop. They lay out like pond pins.
+## action_icon, filter, tag} — e.g. the P0 outposts. They lay out like pond pins; a non-empty tag
+## follows the name on the pin ("Lotus Tea House · 5 online").
 var extra_places: Array = []
 ## Pond directory by fixed 0.5° cells around the map centre (SystemPonds.CELL_DEG), not by active
 ## city: roaming San Francisco from a Shanghai farm still shows the ponds there.
@@ -480,6 +481,7 @@ func _name(entry: Dictionary) -> String:
 func _label_text(entry: Dictionary) -> String:
 	if entry.kind == "resident" and str(entry.get("status", "")) == "Ready to deliver":
 		return _name(entry) + " · " + L10n.text("Ready to deliver")
+	if not str(entry.get("tag", "")).is_empty(): return _name(entry) + " · " + str(entry.tag)
 	return _name(entry)
 
 ## 选中项名牌宽度：按 9 号字实测文本宽 + 样式内边距；超过上限就折行而不是继续变宽。
