@@ -228,7 +228,7 @@ func test_pickaxes_in_gear_say_stone_per_rock_and_where_from() -> void:
 	# LOCK-29; view.gear.picks as the server sends it (SGODOT-231 PR #17).
 	var v := _view()
 	v.gear["picks"] = [{"id": "pick_starter", "name": "Starter Pickaxe", "owned": true, "equipped": true, "stone": 1, "level": 1},
-		{"id": "pick_copper", "name": "Copper Pickaxe", "owned": false, "equipped": false, "stone": 2, "level": 2, "source": "Workbench"}]
+		{"id": "pick_copper", "name": "Copper Pickaxe", "owned": false, "equipped": false, "stone": 2, "level": 2, "price": 0, "source": "workbench"}]   # machine codes (周瑜 #17)
 	assert_str(P0ItemInfo.kind_of(v, "pick_copper")).is_equal("pick")
 	var s := P0ItemInfo.spec(v, "pick_starter", &"gear")
 	assert_array(s.facts).is_equal(["1 Stone per rock"])

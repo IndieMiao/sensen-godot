@@ -300,7 +300,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		owned_line = "In Gear" if rod.get("owned", false) else "",
 		# LOCK-29: "1 Stone per rock"; where a pickaxe comes from while it isn't owned (Copper Pickaxe: Workbench).
 		pick_effect = ("%d Stone per rock" % int(rod.stone)) if rod.has("stone") else "",
-		pick_source = str(rod.get("source", "")) if not rod.get("owned", false) else "",
+		pick_source = str({"start": "Starter", "workbench": "Workbench"}.get(str(rod.get("source", "")), "")) if not rod.get("owned", false) else "",
 	}
 	return t
 

@@ -556,3 +556,82 @@ static func _request_gap(req: Dictionary) -> String:
 			var what := (str(names[rarity - 1]) + " fish") if rarity > 0 and rarity <= names.size() else "fish"
 			return "Need %d more %s" % [left, what]
 	return "Need %d more" % left
+
+# ---------------------------------------------------------------- outpost keepers (SGODOT-224, LOCK-15 / 16)
+## Keeper greeting card copy (李白 SGODOT-228 b7d8b665 D, P0 version) from the server's facts in view.keepers[role]
+## (SGODOT-228: state codes and numbers, no names). Names and places are data (后裔's p0_outposts.json): the caller
+## passes them in ctx {keeper, place}; the tackle answer also takes ctx.nearest {name, site} (the closest pond).
+## Returns {line, greet, trade, question, answer} — line is "Pours the tea · Lotus Tea House" when ctx.place is given.
+const _KEEPER_COPY := {
+	"tea": {"does": "Pours the tea", "trade": "order tea", "question": "Any news in town?"},
+	"post": {"does": "Runs the post", "trade": "get a coffee", "question": "Who needs help today?"},
+	"tackle": {"does": "Minds the tackle", "trade": "see the rods", "question": "Where are they biting?"},
+	"market": {"does": "Keeps the stall", "trade": "open the stall", "question": "What's fresh today?"},
+}
+const _CUPS_OUT := "That's three cups today. Come back tomorrow."
+
+static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionary:
+	var copy: Dictionary = _KEEPER_COPY.get(role, {})
+	var k: Dictionary = view.get("keepers", {}).get(role, {})
+	var greet := ""
+	var answer := ""
+	match role:
+		"tea":
+			match str(k.get("greet", "")):
+				"cups_out": greet = _CUPS_OUT
+				"full": greet = "You look rested. Tea's here when you need it."
+				_: greet = "Sit a minute. Hot tea, %d Energy back." % int(view.get("drinks", {}).get("energy", 30))
+			answer = "Quiet day."
+			if k.get("online", null) != null: answer += " %d %s around Shanghai right now." % [int(k.online), "person" if int(k.online) == 1 else "people"]
+		"post":
+			var pip := _resident_name(str(k.get("request_by", ""))) if k.get("request_by", null) != null else ""
+			match str(k.get("greet", "")):
+				"cups_out": greet = _CUPS_OUT
+				"request": greet = "Coffee's fresh. %s's been asking for a hand." % pip
+				_: greet = "Coffee's fresh. %d %s left today." % [int(k.get("cups_left", 0)), "cup" if int(k.get("cups_left", 0)) == 1 else "cups"]
+			if pip != "": answer = "%s has a request for you." % pip
+			elif int(k.get("board_open", 0)) > 0: answer = _board_count(int(k.board_open))
+			else: answer = "All quiet." + ("" if k.get("refill_in", null) == null else " The Market Board refills in %s." % duration(float(k.refill_in)))
+		"tackle":
+			if str(k.get("greet", "")) == "reed_rod":
+				var rod := _rod_offer(view, "rod_reed")
+				greet = "Reed Rod's in. %d coins, lands up to %s." % [int(rod.get("price", 80)), rarity_name(view, int(rod.get("reach", 3)))]
+			else:
+				greet = "Worms are %d coins. %d left today." % [int(_shop_price(view, "tackle", "bait_worm", 2)), int(k.get("worms_left", 0))]
+			var near: Dictionary = ctx.get("nearest", {})
+			if not near.is_empty():
+				var nxt = k.get("next_fish", {}).get(str(near.get("site", "pond")), null)
+				answer = "%s is closest. " % str(near.name)
+				answer += ("%s need Fishing Lv%d." % [item_name(view, str(nxt.id)), int(nxt.level)]) if nxt is Dictionary else "You can land everything there."
+		"market":
+			if str(k.get("greet", "")) == "row_hoe":
+				var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
+				greet = "Row Hoe's %d coins. Farming Lv%d to use." % [int(_shop_price(view, "market", str(hoe.get("id", "tool_row_hoe")), int(hoe.get("price", 240)))), int(hoe.get("gate", 4))]
+			else:
+				greet = _board_count(int(k.get("board_open", 0)))
+			var titles: Array = k.get("board_templates", []).map(func(t): return str(content().get("requests", {}).get("templates", {}).get(str(t), {}).get("title", "")))
+			titles = titles.filter(func(t): return t != "")
+			if not titles.is_empty(): answer = "Fresh off the board: %s." % " and ".join(PackedStringArray(titles))
+			else: answer = "Board's empty." + ("" if k.get("refill_in", null) == null else " Next request in %s." % duration(float(k.refill_in)))
+	var place := str(ctx.get("place", ""))
+	return {
+		"line": ("%s · %s" % [str(copy.get("does", "")), place]) if place != "" else str(copy.get("does", "")),
+		"greet": greet, "trade": "Trade · " + str(copy.get("trade", "")),
+		"question": str(copy.get("question", "")), "answer": answer, "leave": "Just passing by",
+	}
+
+static func _board_count(n: int) -> String:
+	return "The Market Board has %d %s today." % [n, "request" if n == 1 else "requests"]
+
+static func _resident_name(id: String) -> String:
+	return str(content().get("residents", {}).get(id, {}).get("name", ""))
+
+static func _shop_price(view: Dictionary, role: String, id: String, fallback: int) -> int:
+	for o in view.get("shops", {}).get(role, {}).get("buy", []):
+		if str(o.get("id", "")) == id: return int(o.get("price", fallback))
+	return fallback
+
+static func _rod_offer(view: Dictionary, id: String) -> Dictionary:
+	for r in view.get("gear", {}).get("rods", []):
+		if str(r.get("id", "")) == id: return r.merged({"price": _shop_price(view, "tackle", id, int(r.get("price", 0)))})
+	return {}
