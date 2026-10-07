@@ -136,6 +136,9 @@ export class OutpostRooms {
     return out;
   }
 
+  /** Everyone in any outpost room (all P0 outposts are in Shanghai): Ama's "N people around Shanghai". */
+  total(): number { return this.byPlayer.size; }
+
   /** Drops expired reconnect reservations. */
   sweep(): void {
     const now = this.now();

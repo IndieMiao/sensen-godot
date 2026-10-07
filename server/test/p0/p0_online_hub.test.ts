@@ -124,6 +124,19 @@ describe('P0 online hub (/v1/p0/online, SGODOT-227)', () => {
     expect(await until(() => b.json.filter(m => m.t === 'result')[1])).toMatchObject({ ok: true });
   });
 
+  it('a sit carries the seat position, so the next input at the seat keeps the player seated', async () => {
+    const { port, rooms } = await server();
+    const a = await connect(port, 'player-aaaa');
+    const { epoch } = await join(a, 'sh_tea_1', [1.15, 0]);
+    await new Promise(r => setTimeout(r, 200));
+    send(a, { t: 'act', seq: 1, epoch, action: 'sit', node: 'seat_table1_1', at: [1.15, 0.62] });
+    await until(msg(a, 'result'));
+    send(a, { t: 'input', seq: 1, epoch, x: 1.15, z: 0.62, yaw: 1.57, action: 'idle' });
+    await until(() => rooms.occupant('player-aaaa')!.seq === 1);
+    expect(rooms.occupant('player-aaaa')).toMatchObject({ seat: 'seat_table1_1', action: 'sit' });
+    expect(rooms.occupant('player-aaaa')!.z).toBeCloseTo(0.62);
+  });
+
   it('a dropped connection that comes back within a minute returns to its room, flagged rejoined', async () => {
     const { port, rooms } = await server();
     const clients = await Promise.all(Array.from({ length: 13 }, (_, i) => connect(port, `player-${String(i).padStart(4, '0')}`)));

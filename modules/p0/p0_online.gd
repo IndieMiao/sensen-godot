@@ -88,9 +88,12 @@ func stop() -> void:
 		socket.close(1000, "LEAVING")
 	_reset()
 
-func sit(seat: String) -> int:
+## Claims a seat; `at` is its position in room metres (the server moves us onto it before seating us).
+func sit(seat: String, at := Vector2.INF) -> int:
 	_act_seq += 1
-	_send({"t": "act", "seq": _act_seq, "epoch": epoch, "action": "sit", "node": seat})
+	var m := {"t": "act", "seq": _act_seq, "epoch": epoch, "action": "sit", "node": seat}
+	if at.is_finite(): m["at"] = [at.x, at.y]
+	_send(m)
 	return _act_seq
 
 func stand() -> int:

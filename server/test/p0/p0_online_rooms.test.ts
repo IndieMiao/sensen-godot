@@ -19,6 +19,7 @@ describe('P0 outpost rooms (SGODOT-227)', () => {
     expect(fill(r, MARKET.id, 30, 'm').every(p => p.room === 1)).toBe(true);
     expect(r.join('m30', MARKET.id).room).toBe(2);
     expect(r.presence()).toEqual({ [TEA.id]: { online: 13, rooms: 2 }, [MARKET.id]: { online: 31, rooms: 2 } });
+    expect(r.total()).toBe(44);
   });
 
   it('a newcomer takes the lowest instance with a free place', () => {
