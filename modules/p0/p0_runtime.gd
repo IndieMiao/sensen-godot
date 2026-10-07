@@ -315,6 +315,13 @@ func _dev_shot(dt: float) -> void:
 			"release": ui.fab_held = false
 			"stall": ui.open_stall(step[1] if step.size() > 1 else "")
 			"bag": ui.open_bag(step[1] if step.size() > 1 else "")
+			"bagcat":   # bag drawer on one category tab, e.g. bagcat:Materials (SGODOT-225 storage stacks)
+				if ui._bag != null and is_instance_valid(ui._bag):
+					var i := P0BagDrawer.CATEGORIES.find(step[1])
+					if i >= 0: (ui._bag._chips.get_child(i) as Button).button_pressed = true
+			"bagpick":  # tap the first listed item of the open bag drawer
+				if ui._bag != null and is_instance_valid(ui._bag) and not ui._bag.grid.shown_items().is_empty():
+					ui._bag.grid.select(str(ui._bag.grid.shown_items().back().id))
 			"energy": ui.open_energy_card(3, "Sow ×1")
 			"close": ui.close_modal()
 			"auto":
