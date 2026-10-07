@@ -21,7 +21,8 @@ func tabs() -> Array[Button]: return _tabs
 
 func set_selected(v: int) -> void:
 	selected = clampi(v, 0, maxi(0, _tabs.size() - 1))
-	if selected < _tabs.size(): _tabs[selected].set_pressed_no_signal(true)
+	# set_pressed_no_signal does not release the other buttons of the group, so set every tab.
+	for i in _tabs.size(): _tabs[i].set_pressed_no_signal(i == selected)
 	_recolor()
 
 func _add_option(o: Dictionary) -> void:

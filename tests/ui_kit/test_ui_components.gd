@@ -140,15 +140,142 @@ func test_kitchen_mark_shows_when_selected_or_cooked() -> void:
 	await _settle()
 	assert_bool(mark.call()).is_false()
 
-func test_cells_inside_a_touch_scroll_release_to_tap() -> void:
-	# Drags that start on a cell must still scroll the bag grid (WP7-B F-04 §4).
-	var scroll := TouchScrollContainer.new()
-	_host(scroll)
-	var c := UiItemCell.new(UiItemCell.Density.INVENTORY)
-	scroll.add_child(c)
+# Touches fed straight into a cell with a fake clock (SGODOT-212 review: a touch is exactly one outcome).
+func _record(c: UiItemCell) -> Dictionary:
+	var rec := {taps = 0, gestures = [], now = 0}
+	c.clock = func() -> int: return rec.now
+	c.tapped.connect(func(): rec.taps += 1)
+	c.gesture.connect(func(g: Dictionary): rec.gestures.append(String(g.kind)))
+	return rec
+
+func _touch(c: UiItemCell, rec: Dictionary, at_ms: int, pos: Vector2, down: bool) -> void:
+	rec.now = at_ms
+	var e := InputEventScreenTouch.new()
+	e.position = pos
+	e.pressed = down
+	c._gui_input(e)
+
+func _drag(c: UiItemCell, rec: Dictionary, at_ms: int, pos: Vector2) -> void:
+	rec.now = at_ms
+	var e := InputEventScreenDrag.new()
+	e.position = pos
+	c._gui_input(e)
+
+func _hold(c: UiItemCell, rec: Dictionary, at_ms: int) -> void:
+	rec.now = at_ms
+	c._process(0.0)
+
+func test_short_press_taps_once() -> void:
+	for d in [UiItemCell.Density.QUICK, UiItemCell.Density.INVENTORY]:
+		var c: UiItemCell = _host(UiItemCell.new(d))
+		var rec := _record(c)
+		_touch(c, rec, 0, Vector2(26, 30), true)
+		_hold(c, rec, 100)
+		_touch(c, rec, 120, Vector2(28, 31), false)
+		assert_int(rec.taps).is_equal(1)
+		assert_array(rec.gestures).is_empty()
+
+func test_long_press_pins_without_a_tap() -> void:
+	# LOCK-05 (quick slot: release after the lift toggles the pin) and LOCK-12 (bag cell: long press).
+	var expect := {UiItemCell.Density.QUICK: "pin_toggle", UiItemCell.Density.INVENTORY: "long_press"}
+	for d in expect:
+		var c: UiItemCell = _host(UiItemCell.new(d))
+		var rec := _record(c)
+		_touch(c, rec, 0, Vector2(26, 30), true)
+		_hold(c, rec, GestureArbiter.LONG_PRESS_MS + 150)
+		_touch(c, rec, GestureArbiter.LONG_PRESS_MS + 150, Vector2(26, 30), false)
+		assert_int(rec.taps).is_equal(0)
+		assert_array(rec.gestures).is_equal(["lift", expect[d]])
+
+func test_swipe_up_in_a_quick_slot_opens_the_bag_without_a_tap() -> void:
+	var c: UiItemCell = _host(UiItemCell.new(UiItemCell.Density.QUICK))
+	var rec := _record(c)
+	_touch(c, rec, 0, Vector2(26, 50), true)
+	_drag(c, rec, 40, Vector2(27, 35))
+	_drag(c, rec, 80, Vector2(27, 20))
+	_touch(c, rec, 100, Vector2(27, 20), false)
+	assert_int(rec.taps).is_equal(0)
+	assert_array(rec.gestures).is_equal(["swipe_up"])
+
+func test_gesture_positions_are_global() -> void:
+	var box := MarginContainer.new()
+	box.add_theme_constant_override(&"margin_left", 40)
+	box.add_theme_constant_override(&"margin_top", 30)
+	_host(box)
+	var c := UiItemCell.new(UiItemCell.Density.QUICK)
+	box.add_child(c)
 	await _settle()
-	assert_int(c.action_mode).is_equal(BaseButton.ACTION_MODE_BUTTON_RELEASE)
+	var seen := []
+	var now := [0]
+	c.clock = func() -> int: return now[0]
+	c.gesture.connect(func(g: Dictionary): seen.append(g))
+	var e := InputEventScreenTouch.new()
+	e.position = Vector2(10, 12)
+	e.pressed = true
+	c._gui_input(e)
+	now[0] = GestureArbiter.LONG_PRESS_MS
+	c._process(0.0)
+	assert_vector(seen[0].pos).is_equal(c.get_global_rect().position + Vector2(10, 12))
+
+func test_vertical_drag_in_a_touch_scroll_is_not_a_tap() -> void:
+	# Real GUI routing: events pushed into the viewport reach the cell inside a TouchScrollContainer.
+	var scroll := TouchScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(360, 120)
+	_host(scroll)
+	var col := VBoxContainer.new()
+	scroll.add_child(col)
+	var cells: Array[UiItemCell] = []
+	for i in 6:
+		var c := UiItemCell.new(UiItemCell.Density.INVENTORY)
+		col.add_child(c)
+		cells.append(c)
+	await _settle()
+	var c := cells[0]
 	assert_int(c.mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
+	var taps := [0]
+	var kinds := []
+	c.tapped.connect(func(): taps[0] += 1)
+	c.gesture.connect(func(g: Dictionary): kinds.append(String(g.kind)))
+	var at := c.get_global_rect().get_center()
+	# Control: a still press and release is one tap.
+	_push(_press(at, true))
+	_push(_press(at, false))
+	await _settle()
+	assert_int(taps[0]).is_equal(1)
+	# A vertical drag that starts on the cell belongs to the scroll container.
+	_push(_press(at, true))
+	for step in range(1, 5): _push(_motion(at + Vector2(0, -10 * step)))
+	_push(_press(at + Vector2(0, -40), false))
+	await _settle()
+	assert_int(taps[0]).is_equal(1)
+	assert_array(kinds).contains(["cancel"])
+
+func _push(e: InputEvent) -> void: get_viewport().push_input(e)
+
+func _press(pos: Vector2, down: bool) -> InputEvent:
+	if DisplayServer.is_touchscreen_available():
+		var t := InputEventScreenTouch.new()
+		t.position = pos
+		t.pressed = down
+		return t
+	var m := InputEventMouseButton.new()
+	m.button_index = MOUSE_BUTTON_LEFT
+	m.position = pos
+	m.global_position = pos
+	m.pressed = down
+	m.button_mask = MOUSE_BUTTON_MASK_LEFT if down else 0
+	return m
+
+func _motion(pos: Vector2) -> InputEvent:
+	if DisplayServer.is_touchscreen_available():
+		var t := InputEventScreenDrag.new()
+		t.position = pos
+		return t
+	var m := InputEventMouseMotion.new()
+	m.position = pos
+	m.global_position = pos
+	m.button_mask = MOUSE_BUTTON_MASK_LEFT
+	return m
 
 # ---------------------------------------------------------------- UiCommandButton
 
@@ -239,6 +366,17 @@ func test_segment_tab_keeps_exactly_one_selected() -> void:
 	var titles := seg.find_children("Title", "Label", true, false)
 	assert_str((titles[1] as Label).get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_PRIMARY.to_html())
 	assert_str((titles[0] as Label).get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
+
+func test_selecting_a_segment_in_code_releases_the_others_silently() -> void:
+	# Reopening the bag on Gear and switching back to Bag in code must leave exactly one tab pressed.
+	var seg: UiSegmentTab = _host(UiSegmentTab.new(["Bag", "Gear", "Inbox"], 0))
+	var picked := []
+	seg.changed.connect(func(i): picked.append(i))
+	seg.selected = 2
+	assert_array(seg.tabs().map(func(t): return (t as Button).button_pressed)).is_equal([false, false, true])
+	seg.selected = 0
+	assert_array(seg.tabs().map(func(t): return (t as Button).button_pressed)).is_equal([true, false, false])
+	assert_array(picked).is_empty()
 
 func test_segment_tab_selected_look_is_not_the_command_green() -> void:
 	# LOCK-13: a mode switch never uses the primary command fill.

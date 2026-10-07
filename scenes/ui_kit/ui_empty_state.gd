@@ -20,6 +20,7 @@ func _init(text_: String = "", icon_: Texture2D = null, action_: String = "") ->
 	add_theme_constant_override(&"separation", int(UiTokens.SPACE_WITHIN))
 	_icon = UiKit.icon(null, UiTokens.SIZE_ITEM_ROW_ICON)
 	_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	# Borrowed: OPACITY_ZERO_ICON is the quick slot ×0 icon; the EmptyState main (WP6) will export its own value.
 	_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON
 	add_child(_icon)
 	_label = UiKit.label("", UiTokens.STYLE_BODY_B14, UiTokens.COLOR_SECONDARY)

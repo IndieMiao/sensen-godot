@@ -1,13 +1,20 @@
 class_name UiItemCell
-extends BaseButton
+extends Control
 ## One item cell, four densities (SGODOT-212; WP7-C F-05 "one item_cell, density picks the Figma main"):
 ##   INVENTORY  Compact/InventoryCell 633:41278  52×52  icon, quantity pill, rarity dot             (LOCK-12)
 ##   QUICK      Compact/QuickSlot 633:41279      52×68  icon + name + quantity only, pin state     (LOCK-04 / 05)
 ##   KITCHEN    Compact/Kitchen/Cell 655:58506   52×58  icon, state label, selected / cooked mark  (LOCK-20)
 ##   GEAR       Compact/GearSlot 663:61299       52×88  role above, equipment name below           (LOCK-13)
-## Data in (the fields below), signals out (BaseButton `pressed`). Long-press pin and drag are decided by
-## GestureArbiter in the quick bar / bag drawer that owns the cells, which then set `state` / `pinned`.
+## Data in (the fields below), signals out. Each cell runs its own GestureArbiter (QUICK: SLOT mode, others:
+## CELL mode, WP7-B F-04 §3 / §4), so a touch is exactly one outcome: `tapped` only for the arbiter's tap;
+## everything else (lift, pin_toggle / long_press, drag_start / drag_move / drop, swipe_up, cancel) goes out
+## through `gesture` for the quick bar / bag drawer, which then sets `state` / `pinned`. mouse_filter is
+## PASS, so a TouchScrollContainer still takes vertical drags (CELL mode answers them with cancel).
 ## LIFTED, DROP_TARGET and ZERO exist on the QuickSlot main only; other densities draw them as DEFAULT.
+
+signal tapped
+## A GestureArbiter outcome other than tap, e.g. {kind = &"pin_toggle", pos}; `pos` is in global coordinates.
+signal gesture(outcome: Dictionary)
 
 enum Density { INVENTORY, QUICK, KITCHEN, GEAR }
 enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO }
@@ -53,6 +60,10 @@ var status := "": set = set_status
 ## Kitchen check mark for a cooked dish; SELECTED shows it too ("Selected or cooked mark").
 var marked := false: set = set_marked
 
+## Milliseconds for the arbiter; tests inject a fake clock.
+var clock := Callable(Time, &"get_ticks_msec")
+
+var _arbiter: GestureArbiter
 var _surface: Panel
 var _icon: TextureRect
 var _name: Label
@@ -67,7 +78,9 @@ var _badge: Panel
 
 func _init(d: Density = Density.INVENTORY) -> void:
 	density = d
-	focus_mode = Control.FOCUS_NONE
+	mouse_filter = Control.MOUSE_FILTER_PASS
+	_arbiter = GestureArbiter.new(GestureArbiter.Mode.SLOT if d == Density.QUICK else GestureArbiter.Mode.CELL)
+	set_process(false)
 	match density:
 		Density.INVENTORY: custom_minimum_size = Vector2(UiTokens.SIZE_INVENTORY_CELL, UiTokens.SIZE_INVENTORY_CELL)
 		Density.QUICK: custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_SLOT_W, UiTokens.SIZE_QUICK_SLOT_H)
@@ -89,6 +102,31 @@ func set_pinned(v: bool) -> void: pinned = v; _refresh()
 func set_role(v: String) -> void: role = v; _refresh()
 func set_status(v: String) -> void: status = v; _refresh()
 func set_marked(v: bool) -> void: marked = v; _refresh()
+
+func _gui_input(event: InputEvent) -> void:
+	_emit(_arbiter.feed(event, clock.call()))
+	set_process(_arbiter.is_active())
+
+## Long presses fire on time alone, so tick while a finger is down.
+func _process(_delta: float) -> void:
+	_emit(_arbiter.tick(clock.call()))
+	if not _arbiter.is_active(): set_process(false)
+
+func _notification(what: int) -> void:
+	# A scroll container took over the drag: this touch is no longer the cell's.
+	if what == NOTIFICATION_SCROLL_BEGIN and _arbiter.is_active():
+		_arbiter.reset()
+		set_process(false)
+		gesture.emit({kind = &"cancel"})
+
+func _emit(outcomes: Array) -> void:
+	for o: Dictionary in outcomes:
+		if o.kind == &"tap":
+			tapped.emit()
+			continue
+		var g := o.duplicate()
+		if g.has("pos"): g.pos = get_global_transform() * (g.pos as Vector2)
+		gesture.emit(g)
 
 ## The state actually drawn: the extra QuickSlot states fall back to DEFAULT on the other mains.
 func drawn_state() -> State:

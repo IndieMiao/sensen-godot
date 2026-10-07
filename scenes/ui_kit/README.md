@@ -47,7 +47,7 @@ must not change structure, role, entry point or key copy. Engineering specs: SGO
 | `UiObjectHeader` | ObjectHeader 483:196 | title + quantity column, optional state line and effect sentence |
 | `UiFactRow` | Fact 483:222 · Cost 483:225 | `Kind.FACT` / `Kind.COST`; have / need counts are NEED-TILEs (LOCK-10), not fact rows |
 | `UiItemRow` | ItemRow 483:228 | icon, title / state / effect, quantity column; display only |
-| `UiItemCell` | Compact/InventoryCell 633:41278 · QuickSlot 633:41279 · Kitchen/Cell 655:58506 · GearSlot 663:61299 | one class, `Density` picks the main; `State` DEFAULT / SELECTED / EMPTY, plus LIFTED / DROP_TARGET / ZERO on QUICK; `pinned` draws LOCK-05 |
+| `UiItemCell` | Compact/InventoryCell 633:41278 · QuickSlot 633:41279 · Kitchen/Cell 655:58506 · GearSlot 663:61299 | one class, `Density` picks the main; `State` DEFAULT / SELECTED / EMPTY, plus LIFTED / DROP_TARGET / ZERO on QUICK; `pinned` draws LOCK-05. Own GestureArbiter (QUICK: SLOT, others: CELL): `tapped` only for its tap, every other outcome via `gesture(outcome)` (global `pos`) |
 | `UiCommandButton` | CommandButton 483:216 · Compact/Command 633:41273 | connect `activated`; `reason` = unavailable look with the reason as label, still tappable (`unavailable_pressed`, LOCK-10); `phase` / `track()` follow `CommandLifecycle` (submitting ignores taps, pending dims) |
 | `UiNavButton` | NavigationRow 483:217 · Compact/Navigation 633:41276 | row with right chevron, or compact `Label ›`; never jumps the player (LOCK-08) |
 | `UiDismissButton` | Dismiss 483:220 | quiet close text; not on the Energy card (LOCK-09) |
