@@ -184,10 +184,21 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"level":
 				var lv: Dictionary = ev
 				ui.queue_card(func(): ui.show_level_up(lv))
+			"affinity":   # SGODOT-225 / 228: first chat of the day, gifts, requests
+				if int(ev.get("delta", 0)) != 0:
+					ui.float_text(("♥ %+d" % int(ev.delta)).replace("-", "−"), at + Vector2(0, dy), UiTokens.COLOR_FLOAT_AFFINITY)
+				var reply := P0Logic.resident_reply(str(ev.get("resident", "")), str(ev.get("verdict", "")))
+				if reply != "": ui.toast(reply)
+			"gift_meal":
+				var who := str(P0Logic.content().get("residents", {}).get(str(ev.get("resident", "")), {}).get("name", ""))
+				if bool(ev.get("given", false)): ui.toast("%s gave you %s · in your bag" % [who, P0Logic.item_name(v, str(ev.get("dish", "")))])
 		dy -= 16.0
 	if ui.modal_kind == "stall" and events.size() > 0:
 		ui.set_view(session.current())
 		ui.open_stall()   # refresh after Buy / Sell / Deliver; floats say what changed
+	elif ui.modal_kind == "resident" and events.size() > 0:
+		ui.set_view(session.current())
+		ui.open_resident(ui._resident)   # affinity, gift and request states follow the reply
 	elif ui.modal_kind == "tackle" and events.size() > 0:
 		ui.open_tackle("Strung and ready — it's on your belt. Swap rods in Bag › Gear.")
 

@@ -135,3 +135,59 @@ func test_show_on_map_reports_the_pin() -> void:
 	var panel: UiTodayPanel = pond.find_children("*", "UiTodayPanel", true, false)[0]
 	panel.show_pressed.emit(0)
 	assert_array(got).is_equal(["home"])
+
+# ---------------------------------------------------------------- residents (SGODOT-225 / 228)
+
+func _resident_view() -> Dictionary:
+	var v := _view()
+	v["residents"] = {"res_pip": {"affinity": 12, "stage": "Acquainted", "next_stage": "Familiar", "next_at": 30,
+		"chatted_today": false, "gift_today": false, "meal": "none",
+		"request": {"id": "req_res_pip_1", "kind": "fish", "rarity": 1, "qty": 1, "coins": 20, "have": 0, "ready": false},
+		"request_state": "open", "need_stage": null, "next_in": null}}
+	v.bag.slots.append({"id": "dish_grilled_crucian", "qty": 1})
+	return v
+
+func test_open_resident_talks_once_and_shows_the_bar() -> void:
+	var ui := _ui(true)
+	ui.set_view(_resident_view())
+	await get_tree().process_frame
+	var sent := []
+	ui.command.connect(func(c: Dictionary): sent.append(c))
+	assert_bool(ui.open_resident("res_pip")).is_true()
+	assert_array(sent).is_equal([{"type": "talk", "resident": "res_pip"}])
+	var bar: UiResidentBar = ui.find_children("*", "UiResidentBar", true, false)[0]
+	assert_str(str(bar.data.name)).is_equal("Pip")
+	assert_str(bar.gift_button().reason).is_equal("")
+	ui.open_resident("res_pip")   # a refresh after the reply: no second talk
+	assert_int(sent.size()).is_equal(1)
+	assert_bool(ui.open_resident("res_nobody")).is_false()
+
+func test_request_card_accepts_and_not_now_returns_to_the_bar() -> void:
+	var ui := _ui(true)
+	ui.set_view(_resident_view())
+	await get_tree().process_frame
+	var sent := []
+	ui.command.connect(func(c: Dictionary): sent.append(c))
+	ui.open_resident("res_pip")
+	ui.open_resident_request("res_pip")
+	var card: UiRequestCard = ui.find_children("*", "UiRequestCard", true, false)[0]
+	assert_str(str(card.data.title)).is_equal("Pip's request")
+	assert_str(str(card.data.line)).is_equal("Could you catch me a fish? Any kind is fine.")
+	assert_str(str(card.data.reward)).is_equal("+5 Friendship · 20 coins")
+	assert_str(str(card.data.needs[0].name)).is_equal("Common fish")
+	card.action_pressed.emit()
+	assert_that(sent.back()).is_equal({"type": "accept", "request": "req_res_pip_1"})
+
+func test_gift_drawer_shows_dishes_and_sends_gift() -> void:
+	var ui := _ui(true)
+	ui.set_view(_resident_view())
+	await get_tree().process_frame
+	var sent := []
+	ui.command.connect(func(c: Dictionary): sent.append(c))
+	ui.open_gift("res_pip")
+	var d: P0BagDrawer = ui.find_children("*", "P0BagDrawer", true, false)[0]
+	assert_str(d.category).is_equal("Dishes")
+	assert_bool(d.header.tabs().visible).is_false()   # Bag side only, no Gear (WP1b)
+	assert_that(d.grid.shown_items().map(func(it): return it.id)).is_equal(["dish_grilled_crucian"])
+	d.action_requested.emit(&"gift", "dish_grilled_crucian", {})
+	assert_that(sent.back()).is_equal({"type": "gift", "resident": "res_pip", "item": "dish_grilled_crucian"})

@@ -41,6 +41,9 @@ var gear_slot := "fishing"
 var place := "home"
 ## Pins of the current action's quick bar, for the info card's Pin / Unpin (kept by the P0 UI).
 var pinned := func(_id: String) -> bool: return false
+## Gift drawer (RESIDENT-GIFT): {kind: "resident", id, name, likes}. The header becomes `Gift to <name>` and the
+## count only (Bag side, no Gear: WP1b), the Dishes chip is preselected, and the card uses the &"gift" rules.
+var gift_to := {}
 
 var quick_row: MarginContainer
 var header: UiBagHeader
@@ -53,10 +56,17 @@ var _gear_box: VBoxContainer
 var _chips: HBoxContainer
 var _hint: Label
 
-func _init(view_: Dictionary = {}, side_ := "bag", focus := "") -> void:
+func _init(view_: Dictionary = {}, side_ := "bag", focus := "", gift_to_ := {}) -> void:
 	super(HEIGHT)
 	view = view_
-	side = side_
+	gift_to = gift_to_
+	side = "bag" if not gift_to.is_empty() else side_
+	if not gift_to.is_empty():
+		var title := UiKit.label("Gift to %s" % str(gift_to.get("name", "")), UiTokens.STYLE_C14_XB)
+		body.add_child(title)
+		if str(gift_to.get("likes", "")) != "":
+			body.add_child(UiKit.label(str(gift_to.likes), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
+		_gap(body, _ROW_GAP)
 	# The quick bar goes here (P0Ui.bind_quick_bar, SGODOT-221); the row and its gap stay folded until it does.
 	quick_row = MarginContainer.new()
 	quick_row.visible = false
@@ -70,6 +80,7 @@ func _init(view_: Dictionary = {}, side_ := "bag", focus := "") -> void:
 	header.side_changed.connect(func(s: int): set_side("bag" if s == 0 else "gear"))
 	header.sort_pressed.connect(func(): set_sort(SORTS[(SORTS.find(sort) + 1) % SORTS.size()]))
 	sort = saved_sort()
+	header.show_tabs = gift_to.is_empty()
 	body.add_child(header)
 	_bag_box = VBoxContainer.new()
 	_bag_box.add_theme_constant_override(&"separation", 0)
@@ -79,6 +90,10 @@ func _init(view_: Dictionary = {}, side_ := "bag", focus := "") -> void:
 	_gear_box.add_theme_constant_override(&"separation", 0)
 	body.add_child(_gear_box)
 	_build_bag()
+	if not gift_to.is_empty():
+		var dishes := CATEGORIES.find("Dishes")
+		(_chips.get_child(dishes) as Button).button_pressed = true
+		set_category("Dishes")
 	refresh(view_)
 	if focus != "" and P0Logic.bag_count(view, focus) > 0: grid.select(focus)
 
@@ -226,7 +241,8 @@ func _build_bag() -> void:
 	grid = UiInventoryGrid.new()
 	grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	grid.on_select = func(it: Dictionary):
-		sheet.open(str(it.id), &"bag", {place = place, pinned = bool(pinned.call(str(it.id)))})
+		if gift_to.is_empty(): sheet.open(str(it.id), &"bag", {place = place, pinned = bool(pinned.call(str(it.id)))})
+		else: sheet.open(str(it.id), &"gift", {place = place, target = gift_to})
 		_hint.visible = false
 	grid.selection_cleared.connect(func():
 		sheet.close()

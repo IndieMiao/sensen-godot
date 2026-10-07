@@ -250,7 +250,7 @@ func _build_dev() -> void:
 # ---------------------------------------------------------------- refresh
 func set_view(v: Dictionary) -> void:
 	view = v
-	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear"]: _bag.refresh(v)
+	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear", "gift"]: _bag.refresh(v)
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	_refresh_hud()
 	_refresh_bar()
@@ -1098,6 +1098,114 @@ func open_inbox() -> void:
 	empty.theme = UiKit.theme()
 	empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(empty)
+
+## Resident dialogue bar (SGODOT-225, LOCK-18): greet first, then choose. Called by the outpost rooms (SGODOT-227)
+## for res_pip / res_old_kai. Sends the day's `talk` (first-chat affinity, gift meal: the server decides) and
+## shows the bar from P0Logic.resident_bar (SGODOT-228). Returns false when the view has no such resident.
+var _resident := ""
+
+func open_resident(id: String) -> bool:
+	var d := P0Logic.resident_bar(view, id)
+	if d.is_empty(): return false
+	if _resident != id or modal_kind != "resident": command.emit({"type": "talk", "resident": id})
+	_resident = id
+	_show_resident(d)
+	return true
+
+func _show_resident(d: Dictionary) -> void:
+	var data := d.duplicate()
+	data.portrait = _portrait(str(d.portrait))
+	var bar := UiResidentBar.new(data)
+	bar.theme = UiKit.theme()
+	bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	bar.offset_left = UiTokens.SIZE_QUICK_BAR_X
+	bar.offset_right = -UiTokens.SIZE_QUICK_BAR_X
+	bar.offset_bottom = -bottom_pad()
+	bar.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	var id := str(d.id)
+	bar.gift_pressed.connect(func(): open_gift(id))
+	bar.request_pressed.connect(func(): open_resident_request(id))
+	bar.identity_pressed.connect(func(): toast("%s's page comes later" % str(d.name)))   # RES-* profile: WP5
+	_open_modal(bar, 0.0, true)
+	modal_kind = "resident"
+
+## The resident's portrait (assets/p0/art/<key>-portrait.jpg), or none.
+static func _portrait(key: String) -> Texture2D:
+	var path := "res://assets/p0/art/%s-portrait.jpg" % key
+	return load(path) if key != "" and ResourceLoader.exists(path) else null
+
+## Request on the bar: an open request shows the card (Accept / Not now); an accepted one that is ready
+## delivers. The bar's button carries the gap or the wait, so it never dead-ends (LOCK-10 / 18).
+func open_resident_request(id: String) -> void:
+	var d := P0Logic.resident_bar(view, id)
+	if d.is_empty(): return
+	var cmd: Dictionary = d.get("request_cmd", {})
+	if str(cmd.get("type", "")) == "deliver":
+		close_modal()
+		command.emit(cmd)
+		return
+	var card := UiRequestCard.new(_request_card_data(view, id, d))
+	card.theme = UiKit.theme()
+	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	card.offset_left = UiTokens.SIZE_QUICK_BAR_X
+	card.offset_right = -UiTokens.SIZE_QUICK_BAR_X
+	card.offset_bottom = -bottom_pad()
+	card.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	card.action_pressed.connect(func():
+		close_modal()
+		if not cmd.is_empty(): command.emit(cmd))
+	card.dismissed.connect(func(): open_resident(id))
+	_open_modal(card, 0.0, true)
+	modal_kind = "resident_request"
+
+## ResidentRequestCard data from the resident's open request (content table + view facts).
+static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -> Dictionary:
+	var def: Dictionary = P0Logic.content().get("residents", {}).get(id, {})
+	var req: Dictionary = view_.get("residents", {}).get(id, {}).get("request", {}) if view_.get("residents", {}).get(id, {}).get("request", null) != null else {}
+	var text := ""
+	var title := "%s's request" % str(def.get("name", ""))
+	for q in def.get("requests", []):
+		if str(q.get("id", "")) == str(req.get("id", "")):
+			text = str(q.get("text", ""))
+	var kind := str(req.get("kind", ""))
+	var need := {"name": "", "have": int(req.get("have", 0)), "need": int(req.get("qty", 1)), "icon": null}
+	match kind:
+		"fish":
+			var rarity := int(req.get("rarity", 0)) if req.get("rarity", null) != null else 0
+			need.name = (P0Logic.rarity_name(view_, rarity) + " fish") if rarity > 0 else "Fish"
+			need.icon = P0Logic.icon("fish_crucian")
+		"dish":
+			need.name = "Any dish"
+			need.icon = P0Logic.icon("pot")
+		"sow":
+			need.name = "Plots sown"
+			need.icon = P0Logic.icon("sow")
+	var reward := []
+	if int(P0Logic.content().get("affinity", {}).get("request", 0)) > 0:
+		reward.append("+%d Friendship" % int(P0Logic.content().affinity.request))
+	if int(req.get("coins", 0)) > 0: reward.append("%d coins" % int(req.coins))
+	return {"portrait": _portrait(str(def.get("portrait", ""))), "title": title,
+		"who": "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))],
+		"line": text, "needs": [need] if kind != "" else [], "reward": " · ".join(reward),
+		"deliver_to": str(def.get("name", "")), "action": "Accept",
+		"reason": str(bar.get("request_reason", ""))}
+
+## Gift on the bar: the gift drawer (Bag side only, Dishes first); the card's Gift sends `gift`.
+func open_gift(id: String) -> void:
+	var def: Dictionary = P0Logic.content().get("residents", {}).get(id, {})
+	var likes := str(def.get("likes", ""))
+	var d := P0BagDrawer.new(view, "bag", "", {"kind": "resident", "id": id, "name": str(def.get("name", "")),
+		"likes": ("Likes %s · 1 gift a day" % likes) if likes != "" else "1 gift a day"})
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(func(): open_resident(id))
+	d.action_requested.connect(func(a: StringName, item: String, _p: Dictionary):
+		if a == &"gift":
+			close_modal()
+			command.emit({"type": "gift", "resident": id, "item": item}))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_bag = d
+	modal_kind = "gift"
 
 ## Own profile (SGODOT-225; PROFILE-1-P0, LOCK-22), opened from the HUD avatar. A skill ring opens the skill
 ## details; Edit look opens the dressing room above the current world and comes back here.
