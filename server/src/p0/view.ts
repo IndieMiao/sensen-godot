@@ -18,6 +18,7 @@ import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
+import { cookbookView } from './cookbook.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
 export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
@@ -110,14 +111,13 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       // Warming Cabinet (Homestead Lv3, §7.7): null until unlocked; energy = what one portion restores today.
       cabinet: cabinetCap(c, s) > 0 ? { cap: cabinetCap(c, s), have: cabinetCount(s),
         items: s.cabinet.map(b => ({ id: b.id, name: itemName(c, b.id), qty: b.qty, energy: mealValue(c, s, b.id) })) } : null,
-      cookbook: c.cooking.recipes.map(r => {
-        const known = s.cookbook.includes(r.id);
-        const rarity = recipeRarity(c, r);
-        return { id: r.id, name: known ? r.name : null, rarity, in: known ? r.in : r.in.map(() => '?'),
-          known, cooked: s.firsts.includes(`cook:${r.id}`), slots: r.in.length,
-          can_cook: known && r.in.length <= cookSlots(c, s) && ingredientsFor(c, s, r) !== null,
-          today: s.day.cooked[r.id] ?? 0 };
-      }),
+      // §7.5 / q(39): all 48 pages in order (14 cookable P0 pages + 34 silhouettes), with state, clue slots ("?" =
+      // not shown), Lv4 lock, "You might have it" and Mastered; then Kitchen Mishaps, conveniences and trial refunds.
+      ...(() => {
+        const book = cookbookView(c, s, now);
+        return { cookbook: book.pages, pages_total: book.total, discovered: book.discovered, mishaps: book.mishaps,
+          conveniences: book.conveniences, third_slot: book.third_slot, trial_refunds: book.trial_refunds };
+      })(),
       derive: c.cooking.derive,
       tiers: Object.fromEntries(Object.entries(c.cooking.tiers).map(([k, t]) => [k, { energy: t.energy, ms: t.ms, bonus: t.bonus }])),
     },

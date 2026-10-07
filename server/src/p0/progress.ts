@@ -17,7 +17,9 @@ export type P0Event =
   | { kind: 'cast'; bite_in: number; rarity: number; breaks: 'level' | 'rod' | null; bait: string | null }
   | { kind: 'catch'; fish: string; rarity: number; result: 'landed' | 'escaped' | 'broke_free' | 'cancelled'; refund: number;
       need_level?: number; protected_left?: number }
-  | { kind: 'pot'; dish: string | null; rarity: number; ms: number }
+  | { kind: 'pot'; dish: string | null; rarity: number; ms: number; tried?: boolean }   // tried: this failed combination was tried before
+  // A Mystery Dish (§7.5.2): tried = not new (no clue); refund = ingredients given back; clue = slots turned on a Hidden page.
+  | { kind: 'mishap'; items: string[]; tried: boolean; refund: string[]; trial_left: number | null; clue: { page: string; slots: number[] } | null }
   | { kind: 'dish'; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number }
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }

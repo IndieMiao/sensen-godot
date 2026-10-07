@@ -1,8 +1,13 @@
 /** Cooking and eating (plan §7.2–7.6, §7.17): pots cost no energy; quality comes from heat taps judged on the server. */
 import { dishId, dishParts, fishById, ingredient, itemKind, recipeById, type CookTier, type P0Content, type Recipe } from './content.js';
-import { cabinetCap, dishesFit, eatFrom, haveDish, haveIngredient, ingredientStock, routeDish, takeIngredient } from './kitchen_storage.js';
+import { add, room } from './bag.js';
+import { fireSpeed, giveClue, goldWidth, hasConvenience, noteMishap, triedBefore, trialRefundsLeft } from './cookbook.js';
+import { isSeasoning } from './gathering.js';
+import { cabinetCap, dishesFit, eatFrom, haveDish, haveIngredient, ingredientStock, rackOn, routeDish, takeIngredient } from './kitchen_storage.js';
+import { grantItems } from './parcels.js';
 import { gainEnergy, gainXp, grantOnce, type P0Event } from './progress.js';
 import { draw, foodCap, scaledXp, skillLevel, xpPercent } from './rules.js';
+import { putInStorage } from './storage.js';
 import type { Heat, P0State } from './state.js';
 import type { Refusal } from './fishing.js';
 
@@ -16,7 +21,7 @@ export function cookSlots(c: P0Content, s: P0State): number {
 }
 
 /** One token of a recipe: a specific id or a family × rarity tag such as W1 ("Any Common fish"). */
-function tokenInfo(c: P0Content, token: string): { family: string; rarity: number } | null {
+export function tokenInfo(c: P0Content, token: string): { family: string; rarity: number } | null {
   const tag = TAG.exec(token);
   if (tag) return { family: tag[1], rarity: Number(tag[2]) };
   return ingredient(c, token);
@@ -33,7 +38,7 @@ export function recipeRarity(c: P0Content, recipe: Recipe): number {
   return deriveRarity(c, recipe.in.map(t => tokenInfo(c, t)!));
 }
 
-function tokenMatches(c: P0Content, token: string, id: string): boolean {
+export function tokenMatches(c: P0Content, token: string, id: string): boolean {
   const tag = TAG.exec(token);
   if (!tag) return token === id;
   const ing = ingredient(c, id);
@@ -113,15 +118,18 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
   const rarity = deriveRarity(c, parts);
   const tier: CookTier = c.cooking.tiers[String(rarity)];
   const teach = s.fires === 0;
-  const width = teach ? c.cooking.first_fire.gold : tier.gold;
+  // The first fire is the wide teaching ring; later pots get Steady Hand I / Mastered widths and Quick Fire timing.
+  const width = teach ? c.cooking.first_fire.gold : goldWidth(c, s, recipe?.id ?? null, tier.gold);
   const spin = teach ? c.cooking.first_fire.spin_ms : tier.spin_ms;
-  const heats: Heat[] = tier.heats.map(at => ({ at, spin, width, gold: round3(0.1 + draw(s) * (0.85 - width)) }));
+  const speed = fireSpeed(c, s), ms = Math.round(tier.ms * speed);
+  const heats: Heat[] = tier.heats.map(at => ({ at: Math.round(at * speed), spin, width, gold: round3(0.1 + draw(s) * (0.85 - width)) }));
   s.fires += 1;
   s.stove = {
-    dish: recipe?.id ?? c.cooking.mystery.id, rarity, started_at: now, ms: tier.ms, heats,
-    xp_pct: xpPercent(c, skillLevel(c, s, 'cooking'), tier.level), mystery: !recipe,
+    dish: recipe?.id ?? c.cooking.mystery.id, rarity, started_at: now, ms, heats,
+    xp_pct: xpPercent(c, skillLevel(c, s, 'cooking'), tier.level), mystery: !recipe, items,
   };
-  events.push({ kind: 'pot', dish: recipe && s.cookbook.includes(recipe.id) ? recipe.id : null, rarity, ms: tier.ms });
+  events.push({ kind: 'pot', dish: recipe && s.cookbook.includes(recipe.id) ? recipe.id : null, rarity, ms,
+    ...(recipe ? {} : { tried: triedBefore(s, items) }) });
   return null;
 }
 
@@ -163,8 +171,11 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?
   if (first) s.firsts.push(firstKey);
   events.push({ kind: 'dish', dish: pot.dish, quality, qty: 1 + extra, first, mystery: pot.mystery, hits });
   if (eat) eatMeal(c, s, main, now, events);
-  if (pot.mystery) return null;
+  if (pot.mystery) { failedPot(c, s, pot.items ?? [], pot.started_at, now, events); return null; }
   if (!s.cookbook.includes(pot.dish)) s.cookbook.push(pot.dish);
+  s.book.cooked[pot.dish] = (s.book.cooked[pot.dish] ?? 0) + 1;
+  s.book.best[pot.dish] = Math.max(s.book.best[pot.dish] ?? 0, quality);
+  if (first) s.book.first_at[pot.dish] = now;
   if (first) {
     grantOnce(c, s, now, `first_dish_${pot.rarity}`, c.rewards.first_dish[pot.rarity - 1] ?? 0, events);
     const cooked = s.firsts.filter(f => f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`).length;
@@ -185,10 +196,39 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?
   return null;
 }
 
+/**
+ * A Mystery Dish came out (§7.5.2): Kitchen Mishaps keeps each combination once; a new one turns over a clue. In the
+ * Newcomer Blessing the first trial_refunds failures a day give every ingredient back; otherwise only Rare and
+ * Legendary ones come back. No XP either way.
+ */
+function failedPot(c: P0Content, s: P0State, items: string[], potAt: number, now: number, events: P0Event[]): void {
+  const trial = (trialRefundsLeft(c, s, now) ?? 0) > 0;
+  s.day.mishaps += 1;
+  const fresh = noteMishap(s, items, now);
+  const clue = fresh ? giveClue(c, s, items) : null;
+  const back: string[] = [];
+  items.forEach((id, i) => {
+    if (!trial && (ingredient(c, id)?.rarity ?? 1) < 3) return;
+    giveBack(c, s, id, `refund:${potAt}:${i}`, now, events);
+    back.push(id);
+  });
+  events.push({ kind: 'mishap', items: [...items].sort(), tried: !fresh, refund: back, trial_left: trialRefundsLeft(c, s, now),
+    clue: clue ? { page: clue.page, slots: clue.slots } : null });
+}
+
+/** A refunded ingredient goes back where the stove took it: seasonings to storage with the rack, the rest to the bag;
+ * with no room it waits in the Inbox rather than being lost. */
+function giveBack(c: P0Content, s: P0State, id: string, key: string, now: number, events: P0Event[]): void {
+  if (rackOn(c, s) && isSeasoning(c, id)) { putInStorage(s, id, 1); return; }
+  if (room(c, s, id) > 0) { add(c, s, id, 1); events.push({ kind: 'item', id, delta: 1 }); return; }
+  grantItems(c, s, now, key, 'Kitchen refund', [[id, 1]], events);
+}
+
 /** Nominal energy of one portion today: rarity + quality bonus, same page halves then zeroes (§7.17.1). */
 export function mealValue(c: P0Content, s: P0State, id: string): number {
   const { base, quality } = dishParts(id);
-  if (base === c.cooking.mystery.id) return c.cooking.mystery.energy;
+  // Mystery Dish: never decays; Cooking Lv3 Hearty Mishap raises it (§7.5.2).
+  if (base === c.cooking.mystery.id) return hasConvenience(c, s, 'hearty_mishap') ? c.cooking.mystery.hearty : c.cooking.mystery.energy;
   const recipe = recipeById(c, base);
   if (!recipe) return 0;
   const tier = c.cooking.tiers[String(recipeRarity(c, recipe))];

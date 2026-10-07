@@ -29,6 +29,8 @@ export interface CookTier {
 /** How a page can be learned, for the Hidden page's corner (§7.5.1): start = known from the start, gift = a level-up
  * recipe card, experiment, card = a stall recipe card, market = a Market card, taught = a resident, buy = bought. */
 export type Learn = 'start' | 'gift' | 'experiment' | 'card' | 'market' | 'taught' | 'buy';
+/** Cooking conveniences in P0 (§4.6.3, q(38)). */
+export type Convenience = 'cook_again' | 'clue_double' | 'hearty_mishap' | 'steady_hand_1' | 'queue_two' | 'quick_fire';
 /** A P0 Cookbook page that can be cooked (§7.14.0); n = its page number in the 48-page Cookbook. */
 export interface Recipe { n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[] }
 /** A page outside P0 (§7.14.1–7.14.4): only its silhouette shows, slots = the family of each slot. */
@@ -131,8 +133,13 @@ export interface P0Content {
     tolerance_ms: number;
     quality_xp: number[];
     derive: number[][];
-    mystery: { id: string; name: string; energy: number };
+    mystery: { id: string; name: string; energy: number; hearty: number };   // hearty: from Cooking Lv3 (Hearty Mishap)
     food_cap: number;
+    conveniences: Record<Convenience, number>;   // the Cooking level each P0 convenience comes at (q(38))
+    gold_cap: number; steady_hand_gold: number;  // gold arc share: bonuses stop at gold_cap; Steady Hand I adds steady_hand_gold
+    mastered: { cooked: number; gold: number };  // a page cooked this often is Mastered and its gold arc is wider (§7.5.1)
+    quick_fire: number;                          // Quick Fire: cooking time and heat times × this (§4.6.3 Lv6)
+    trial_refunds: number;                       // failed pots a day that refund their ingredients in the blessing (§7.5.2)
     recipes: Recipe[];
     pages: SilhouettePage[];   // the other 34 of the 48 pages, not cookable in P0 (q(39))
   };
