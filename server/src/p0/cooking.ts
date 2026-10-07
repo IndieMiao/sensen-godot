@@ -1,6 +1,7 @@
 /** Cooking and eating (plan §7.2–7.6, §7.17): pots cost no energy; quality comes from heat taps judged on the server. */
 import { dishId, dishParts, fishById, ingredient, itemKind, recipeById, type CookTier, type P0Content, type Recipe } from './content.js';
-import { add, count, room, take } from './bag.js';
+import { count, take } from './bag.js';
+import { dishesFit, haveIngredient, ingredientStock, routeDish, takeIngredient } from './kitchen_storage.js';
 import { gainEnergy, gainXp, grantOnce, type P0Event } from './progress.js';
 import { draw, foodCap, scaledXp, skillLevel, xpPercent } from './rules.js';
 import type { Heat, P0State } from './state.js';
@@ -62,10 +63,9 @@ export function matchRecipe(c: P0Content, items: string[]): Recipe | null {
   return c.cooking.recipes.filter(r => fits(c, r, items)).sort((a, b) => wild(a) - wild(b))[0] ?? null;
 }
 
-/** Concrete bag items for a known page: tag slots take the cheapest matching item the bag holds. */
+/** Concrete items for a known page: tag slots take the cheapest matching item the stove can reach. */
 export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe): string[] | null {
-  const left = new Map<string, number>();
-  for (const b of s.bag) left.set(b.id, (left.get(b.id) ?? 0) + b.qty);
+  const left = ingredientStock(c, s);
   const out: string[] = [];
   const priceOf = (id: string) => fishById(c, id)?.price ?? c.crops.find(cr => cr.id === id)?.price ?? 0;
   // Specific tokens first so a tag never eats the item a named slot needs.
@@ -102,13 +102,13 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
   }
   for (const id of new Set(items)) {
     const need = items.filter(x => x === id).length;
-    if (count(s.bag, id) < need) return { code: 'not_enough', detail: { item: id, need, have: count(s.bag, id) } };
+    const have = haveIngredient(c, s, id);
+    if (have < need) return { code: 'not_enough', detail: { item: id, need, have } };
   }
   if (parts.every(p => p.family === 'S')) return { code: 'needs_main' };
   for (const id of new Set(items)) {
     const need = items.filter(x => x === id).length;
-    take(s.bag, id, need);
-    events.push({ kind: 'item', id, delta: -need });
+    takeIngredient(c, s, id, need, events);
   }
   const recipe = matchRecipe(c, items);
   const rarity = deriveRarity(c, parts);
@@ -149,11 +149,10 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown }, no
   const quality = Math.min(hits, 2);
   const main = dishId(pot.dish, quality);
   const extra = quality === 2 ? 1 : 0; // Perfect: a second, Plain portion (§7.2.5)
-  if (room(c, s, main) < 1 || (extra && room(c, s, pot.dish) < (main === pot.dish ? 2 : 1))) return { code: 'bag_full' };
+  const portions: [string, number][] = extra ? [[main, 1], [pot.dish, 1]] : [[main, 1]];
+  if (!dishesFit(c, s, portions)) return { code: 'bag_full' };
   s.stove = null;
-  add(c, s, main, 1);
-  events.push({ kind: 'item', id: main, delta: 1 });
-  if (extra) { add(c, s, pot.dish, 1); events.push({ kind: 'item', id: pot.dish, delta: 1 }); }
+  for (const [id, n] of portions) routeDish(c, s, id, n, events);
   const firstKey = `cook:${pot.dish}`;
   const first = !s.firsts.includes(firstKey);
   if (first) s.firsts.push(firstKey);
