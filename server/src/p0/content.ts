@@ -19,6 +19,8 @@ export interface Crop {
 export interface Fish { id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[] }
 export interface Rod { id: string; name: string; reach: number; level: number; price: number; hook_bonus_ms: number; band_bonus: number }
 export interface FishSite { name: string; template: string; weights: number[]; fish: string[] }
+/** A catalog pond on the map (assets/ponds/catalog.json id): its fishing template follows the point, not its shape (q(36)). */
+export interface FishPlace { name: string; site: string; city: string; beginner?: boolean }
 
 export interface CookTier {
   energy: number; ms: number; heats: number[]; gold: number; spin_ms: number;
@@ -35,6 +37,16 @@ export type BoardId = 'stall' | 'market';
 export interface Need { kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; same?: boolean; distinct?: number }
 export interface RequestTemplate { title: string; need: Need; skill: Skill; gate: [Skill, number][]; bonus: number; enabled?: boolean }
 export interface ResidentRequest { id: string; title: string; text: string; stage: string; need: Need; qty: number; coins: number }
+/** §13.2 gathering spot (SGODOT-231): the first yield is the spot's material (Farm Storage, +1 with gloves). */
+export interface GatherSpot { name: string; yield: [string, number][]; homestead: number }
+/** §13.3.3 one mine floor: weighted extra drop per rock, null = nothing extra. */
+export interface MineFloorDef { floor: number; drops: [string | null, number][] }
+/** §13.4 workbench recipe: out goes to the bag, Gear (equipped) or the owned list (passive tools). */
+export interface WorkbenchRecipe {
+  id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned';
+  cost: [string, number][]; gate?: [Skill, number];
+}
+
 export interface ResidentDef {
   name: string; role: string; portrait: string; likes: string; gift_meal: string; one_per_day: boolean;
   lines: Record<string, string>; requests: ResidentRequest[];
@@ -50,6 +62,7 @@ export interface P0Content {
   level_up_energy: { first: number; later: number };
   level_gifts: Record<string, [string, number][]>;
   xp_multiplier: [number, number][];
+  skill_daily_cap: number;                    // §4.3.4: XP per skill per player day, an anti-script limit only
   crops: Crop[];
   stall: { keeper: { role: string; name: string }; buy: string[] };
   rarity_names: string[];
@@ -57,9 +70,10 @@ export interface P0Content {
   fishing: {
     cast_energy: number; refund_fail: number; protect_max_level: number; protect_fails: number;
     bite_min_ms: number; bite_spread_ms: number; hook_window_ms: number; stale_ms: number;
-    catch_xp: number[]; first_xp: number[]; first_cast_xp: number; first_landed_xp: number;
+    catch_xp: number[]; first_xp: number[]; first_cast_xp: number; first_landed_xp: number; first_city_xp: number;
     rods: Rod[];
-    sites: Record<string, FishSite>;
+    sites: Record<string, FishSite>;      // templates: pond (Pond) / river (River)
+    places: Record<string, FishPlace>;
     baits: Record<string, { shift: number[]; wait: number }>;
   };
   goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number; grow_mult?: number }>;
@@ -73,6 +87,7 @@ export interface P0Content {
   wallet_floor: number;                       // §8.1.1 / q(32): every coin spend except seeds keeps this much
   homestead: {
     max_level: number;
+    warming_cabinet: number;                  // portions once unlocked (Lv3; 12 from Lv8 is P1, §7.7)
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
     levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];
@@ -114,6 +129,17 @@ export interface P0Content {
     food_cap: number;
     recipes: Recipe[];
   };
+  /** Consumables made at the workbench, with no shop row (Torch). */
+  supplies: Record<string, { name: string }>;
+  /** §13.2 (SGODOT-231): spot regrow, anti-script tempo between taps, the gloves and their bonus. */
+  gather: { regen_h: number; tempo_ms: number; gloves: string; gloves_bonus: number; spots: Record<string, GatherSpot> };
+  /** §13.3 floors 1–2 (SGODOT-231, LOCK-21). picks: Stone per rock by pickaxe. */
+  mine: {
+    runs_per_day: number; floor_energy: number; rock_energy: number; rocks: number; restart_floor: number; tempo_ms: number;
+    floors: MineFloorDef[]; picks: Record<string, { stone: number }>;
+  };
+  /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231). */
+  workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
 }
 
 export const DEFAULT_P0_CONTENT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../assets/p0/p0_content.json');
@@ -128,10 +154,10 @@ export function fishById(c: P0Content, id: string): Fish | undefined { return c.
 export function rodById(c: P0Content, id: string): Rod | undefined { return c.fishing.rods.find(r => r.id === id); }
 export function recipeById(c: P0Content, id: string): Recipe | undefined { return c.cooking.recipes.find(r => r.id === id); }
 
-/** Bag kind from the id prefix: seed_*, crop_*, fish_*, dish_*, bait_*, fert_*, anything else is a material. */
+/** Bag kind from the id prefix: seed_*, crop_*, fish_*, dish_*, bait_*, fert_*, torch (stacks of 20, §13.1.2), anything else is a material. */
 export function itemKind(id: string): string {
   const head = id.split('_')[0];
-  return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert'].includes(head) ? head : 'material';
+  return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert', 'torch'].includes(head) ? head : 'material';
 }
 
 /** Dish stacks carry their quality in the id: dish_x (Plain), dish_x@good, dish_x@perfect (§7.2.5). */
@@ -166,6 +192,7 @@ export function itemName(c: P0Content, id: string): string {
   if (c.materials[id]) return c.materials[id].name;
   if (c.drinks.items[id]) return c.drinks.items[id].name;
   if (c.specialty[id]) return c.specialty[id].name;
+  if (c.supplies[id]) return c.supplies[id].name;
   const upgrade = c.bag_upgrades.find(u => u.id === id);
   if (upgrade) return upgrade.name;
   if (itemKind(id) === 'dish') {

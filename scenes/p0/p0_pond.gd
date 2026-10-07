@@ -6,7 +6,8 @@ extends Node3D
 
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 
-## Pond templates → P0 fishing sites (content `fishing.sites`): the meander reads as a stream.
+## Pond shapes → P0 fishing sites, kept only for the cast command's old `site` field. The server ignores it and
+## takes the template from its own table for the pond the player is at (p0_place, q(36): Reed Pond is a Pond).
 const SITE_FOR_TEMPLATE := {"meander": "river"}
 
 var rt: P0Runtime
@@ -29,6 +30,10 @@ var _plan: Dictionary = {}
 var _blend_from := Transform3D.IDENTITY
 var _blend_size := 7.5
 var _blend_t := 1.0
+
+## The catalog pond id: the session sends it with the entry read and every command from here (q(36)).
+func p0_place() -> String:
+	return str(entry.get("id", ""))
 
 static func site_for(template_id: String) -> String:
 	return str(SITE_FOR_TEMPLATE.get(template_id, "pond"))

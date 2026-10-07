@@ -6,7 +6,8 @@ extends Node
 ## new UI flow is identical everywhere.
 ##
 ## A world implements (all optional): p0_surface() -> String, p0_space() -> String (where the player is for
-## the server: home / pond / outpost / mine; see space_of), p0_frame(view, dt), p0_joystick(v),
+## the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the catalog pond id inside a
+## pond space), p0_frame(view, dt), p0_joystick(v),
 ## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f),
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
@@ -73,6 +74,7 @@ func _init() -> void:
 func attach(w: Node) -> void:
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
+	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
 	if not session.busy and not session.view.is_empty(): session.refresh()   # entering a space reads fresh state
 	mark("attach " + str(w.name))
 	_first_frame.call_deferred(str(w.name))
@@ -98,6 +100,7 @@ func detach(w: Node) -> void:
 		ui.close_modal()
 		ui.set_surface("map")
 		session.space = "map"
+		session.place = ""
 
 ## Back to the map: the active world is an AppRouter instance above it (back locks still apply,
 ## e.g. a line in the water is reeled in first).
@@ -156,7 +159,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					last_first_catch_xp = int(ev.xp)
 				elif what.begins_with("cook:"): xp_lines.append("New recipe! · First cooked · +%d Cooking XP" % int(ev.xp))
 				elif what == "landed": xp_lines.append("First fish landed · +%d XP" % int(ev.xp))
+				elif what == "cast": xp_lines.append("First cast · +%d XP" % int(ev.xp))
+				elif what.begins_with("fishing_city:"):
+					xp_lines.append("First catch in %s · +%d XP" % [what.trim_prefix("fishing_city:").capitalize(), int(ev.xp)])
 	last_xp_lines = xp_lines
+	var parcels_said := false
 	for ev in events:
 		match str(ev.get("kind", "")):
 			"energy":
@@ -173,6 +180,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at + Vector2(0, dy), Color("4f934b"))
 			"coins":
 				ui.float_text("%+d coins" % int(ev.delta), at + Vector2(0, dy), Color("c9962a"))
+			"parcel":
+				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one float for the whole reply.
+				if not parcels_said:
+					parcels_said = true
+					var line := P0Logic.parcel_toast(v, events)
+					if line != "": ui.toast(line, 2.0)
 			"catch":
 				# A world that shows the catch itself (the open fishing panel) returns true.
 				if not bool(_call("p0_event", [ev, v])): _on_catch(ev, xp_lines)
@@ -248,7 +261,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"no_coins":
 			ui.toast("Need %d more coins" % int(detail.get("need", 0)))
 		"bag_full":
-			ui.toast("Bag full · free a slot first")
+			ui.toast("Make room · 1 slot" if str(cmd.get("type", "")).begins_with("claim_parcel") else "Bag full · free a slot first")
+		"parcel_expired", "bad_parcel":
+			ui.toast("This parcel is no longer waiting")
 		"rest_used":
 			ui.toast("Rest used today")
 		"energy_full":
@@ -261,6 +276,8 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast("Your line is already in the water")
 		"no_bait":
 			ui.toast("No bait left")
+		"not_at_pond":
+			ui.toast("Fish from a pond · open one from the map")   # the server did not get which pond (q(36))
 		"too_early", "no_cast":
 			_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		"stove_busy":
