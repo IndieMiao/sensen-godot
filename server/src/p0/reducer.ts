@@ -11,6 +11,7 @@ import { notePresence, restReadyIn } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
+import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
 import { emptyDay, type P0State, type Plot } from './state.js';
@@ -44,7 +45,10 @@ type P0CommandBody =
   | { type: 'gift'; resident: string; item: string }
   | MineCommand
   | { type: 'gather'; spot: string }
-  | { type: 'craft'; recipe: string };
+  | { type: 'craft'; recipe: string }
+  | { type: 'claim_parcel'; key: string }
+  | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
+  | { type: 'read_inbox'; keys: string[] };
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
@@ -62,6 +66,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   rollDay(c, s, now);
   settleBoards(c, s, now);
   settleMine(c, s, now);
+  settleParcels(c, s, now);
   notePresence(c, s, cmd.space, now, events);   // before the command: a session gap of ≥ 2 h already counts as having left
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
 
@@ -191,7 +196,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'talk': case 'gift': {
-      const refusal = cmd.type === 'talk' ? talk(c, s, cmd, events) : giftResident(c, s, cmd, events);
+      const refusal = cmd.type === 'talk' ? talk(c, s, cmd, now, events) : giftResident(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
@@ -214,6 +219,26 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events)
         : eatDish(c, s, cmd, now, events, maxEnergy(c, s));
       if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'claim_parcel': {
+      const refusal = claimParcel(c, s, now, String(cmd.key), events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'claim_parcels': {
+      if (!Array.isArray(cmd.keys) || cmd.keys.length > PARCEL_LIMIT || cmd.keys.some(k => typeof k !== 'string')) return fail('bad_parcel');
+      // Claim all takes what the free slots hold, in the order shown; the rest stays for later.
+      let took = 0;
+      for (const key of new Set(cmd.keys)) {
+        if (s.inbox.parcels.some(p => p.key === key) && !claimParcel(c, s, now, key, events)) took += 1;
+      }
+      if (took === 0 && s.inbox.parcels.some(p => cmd.keys.includes(p.key))) return fail('bag_full', { slots: 1 });
+      break;
+    }
+    case 'read_inbox': {
+      if (!Array.isArray(cmd.keys) || cmd.keys.length > 100 || cmd.keys.some(k => typeof k !== 'string')) return fail('bad_parcel');
+      for (const u of s.inbox.updates) if (cmd.keys.includes(u.key)) u.read = true;
       break;
     }
     default: {

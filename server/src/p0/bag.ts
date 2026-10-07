@@ -13,7 +13,7 @@ const usable = (b: BagStack, gifts: GiftUse) => gifts === 'any' || !b.gift;
 export function count(bag: BagStack[], id: string, gifts: GiftUse = 'any'): number {
   return bag.filter(b => b.id === id && usable(b, gifts)).reduce((n, b) => n + b.qty, 0);
 }
-function stackLimit(c: P0Content, id: string): number { return c.bag.stack[itemKind(id)] ?? 99; }
+export function stackLimit(c: P0Content, id: string): number { return c.bag.stack[itemKind(id)] ?? 99; }
 export function freeSlots(s: BagHolder): number { return Math.max(0, s.bag_cap - s.bag.length); }
 
 /** How many more of id fit: partial plain stacks plus empty slots (gift stacks never take more). */

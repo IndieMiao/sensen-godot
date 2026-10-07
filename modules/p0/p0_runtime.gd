@@ -155,7 +155,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					last_first_catch_xp = int(ev.xp)
 				elif what.begins_with("cook:"): xp_lines.append("New recipe! · First cooked · +%d Cooking XP" % int(ev.xp))
 				elif what == "landed": xp_lines.append("First fish landed · +%d XP" % int(ev.xp))
+				elif what == "cast": xp_lines.append("First cast · +%d XP" % int(ev.xp))
+				elif what.begins_with("fishing_city:"):
+					xp_lines.append("First catch in %s · +%d XP" % [what.trim_prefix("fishing_city:").capitalize(), int(ev.xp)])
 	last_xp_lines = xp_lines
+	var parcels_said := false
 	for ev in events:
 		match str(ev.get("kind", "")):
 			"energy":
@@ -172,6 +176,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at + Vector2(0, dy), Color("4f934b"))
 			"coins":
 				ui.float_text("%+d coins" % int(ev.delta), at + Vector2(0, dy), Color("c9962a"))
+			"parcel":
+				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one float for the whole reply.
+				if not parcels_said:
+					parcels_said = true
+					var line := P0Logic.parcel_toast(v, events)
+					if line != "": ui.toast(line, 2.0)
 			"catch":
 				# A world that shows the catch itself (the open fishing panel) returns true.
 				if not bool(_call("p0_event", [ev, v])): _on_catch(ev, xp_lines)
@@ -247,7 +257,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"no_coins":
 			ui.toast("Need %d more coins" % int(detail.get("need", 0)))
 		"bag_full":
-			ui.toast("Bag full · free a slot first")
+			ui.toast("Make room · 1 slot" if str(cmd.get("type", "")).begins_with("claim_parcel") else "Bag full · free a slot first")
+		"parcel_expired", "bad_parcel":
+			ui.toast("This parcel is no longer waiting")
 		"rest_used":
 			ui.toast("Rest used today")
 		"energy_full":
