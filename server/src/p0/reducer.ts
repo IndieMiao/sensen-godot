@@ -7,6 +7,7 @@ import { expireGiftMeals, giftResident, noteSown, residentRequestCommand, talk }
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
 import { energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
+import { notePresence, restReadyIn } from './presence.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
 import { emptyDay, type P0State, type Plot } from './state.js';
@@ -15,7 +16,7 @@ export type { P0Event } from './progress.js';
 
 /** Every command may carry `expect_seq`: the state version the client saw. A mismatch is refused as
  * `stale_state` without applying, so a retry after a lost response can never apply twice (SGODOT-211). */
-export type P0Command = P0CommandBody & { expect_seq?: number };
+export type P0Command = P0CommandBody & { expect_seq?: number; space?: string };
 
 type P0CommandBody =
   | { type: 'till'; plot: number }
@@ -54,6 +55,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleEnergy(c, s, now);
   rollDay(c, s, now);
   settleBoards(c, s, now);
+  notePresence(c, s, cmd.space, now, events);   // before the command: a session gap of ≥ 2 h already counts as having left
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
 
   switch (cmd.type) {
@@ -151,6 +153,12 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'rest': {
       if (s.day.rest >= 1) return fail('rest_used');
+      // q(41): at home, 2 h after last leaving it. Older clients send no space; they keep the old rule.
+      if (cmd.space !== undefined) {
+        if (cmd.space !== 'home') return fail('not_home');
+        const wait = restReadyIn(c, s, now);
+        if (wait === null || wait > 0) return fail('away_short', { ready_in: wait, away_h: c.energy.rest_away_h });
+      }
       const max = maxEnergy(c, s);
       if (s.energy.value >= max) return fail('energy_full');
       const gain = Math.min(c.energy.rest_amount, max - s.energy.value);

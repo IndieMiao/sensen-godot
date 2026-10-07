@@ -42,7 +42,7 @@ export interface ResidentDef {
 
 export interface P0Content {
   version: string;
-  energy: { max_base: number; regen_ms: number; bonus_zone: number; rest_amount: number };
+  energy: { max_base: number; regen_ms: number; bonus_zone: number; rest_amount: number; rest_away_h: number };
   day: { utc_offset_hours: number; rollover_hour: number };
   start: { coins: number; tilled_plots: number; wild_plots: number; bag: [string, number][] };
   bag: { capacity: number; stack: Record<string, number> };
