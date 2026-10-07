@@ -1,0 +1,110 @@
+{
+  "source": "reference.png",
+  "method": "9x9 patch median; image lighting retained; material albedo tuned separately",
+  "samples": [
+    {
+      "name": "limestone",
+      "reference_pixel": [
+        1229,
+        674
+      ],
+      "rgb": [
+        245,
+        196,
+        133
+      ],
+      "hex": "#F5C485"
+    },
+    {
+      "name": "sage_board",
+      "reference_pixel": [
+        1008,
+        520
+      ],
+      "rgb": [
+        195,
+        182,
+        147
+      ],
+      "hex": "#C3B693"
+    },
+    {
+      "name": "honey_oak",
+      "reference_pixel": [
+        606,
+        1020
+      ],
+      "rgb": [
+        236,
+        180,
+        119
+      ],
+      "hex": "#ECB477"
+    },
+    {
+      "name": "upholstery",
+      "reference_pixel": [
+        705,
+        846
+      ],
+      "rgb": [
+        225,
+        179,
+        139
+      ],
+      "hex": "#E1B38B"
+    },
+    {
+      "name": "leaf_lit",
+      "reference_pixel": [
+        664,
+        540
+      ],
+      "rgb": [
+        120,
+        128,
+        59
+      ],
+      "hex": "#78803B"
+    },
+    {
+      "name": "leaf_shadow",
+      "reference_pixel": [
+        623,
+        503
+      ],
+      "rgb": [
+        115,
+        129,
+        65
+      ],
+      "hex": "#738141"
+    },
+    {
+      "name": "graphite_pedestal",
+      "reference_pixel": [
+        597,
+        949
+      ],
+      "rgb": [
+        96,
+        87,
+        84
+      ],
+      "hex": "#605754"
+    },
+    {
+      "name": "ivory_lamp",
+      "reference_pixel": [
+        821,
+        387
+      ],
+      "rgb": [
+        254,
+        250,
+        235
+      ],
+      "hex": "#FEFAEB"
+    }
+  ]
+}

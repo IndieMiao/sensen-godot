@@ -1,0 +1,121 @@
+{
+  "card": "SGODOT-179",
+  "revision": "R1 sample",
+  "plane": {
+    "attachment_count": 11,
+    "existing_attachments_preserved": 5,
+    "download_sha256_verified": true,
+    "attachments": [
+      {
+        "name": "SGODOT-179_R1_01-reference-comparison.png",
+        "source": "docs/design/coffee_shop-2026-10-07/comparison.png",
+        "bytes": 2955065,
+        "sha256": "5d51f4b8919d4241f19b720d9617f987380dc0679a6b40f010412553a6fb6231"
+      },
+      {
+        "name": "SGODOT-179_R1_02-whole.png",
+        "source": "docs/design/coffee_shop-2026-10-07/godot-whole.png",
+        "bytes": 1452984,
+        "sha256": "1798b3adcae82f4fb233485812aeb22214adc343551ccfa8820598f5e8685543"
+      },
+      {
+        "name": "SGODOT-179_R1_03-counter-detail.png",
+        "source": "docs/design/coffee_shop-2026-10-07/godot-detail.png",
+        "bytes": 1942580,
+        "sha256": "e58fabc58ac88098173f85ae38c7a57c654fd2ee720f694eaecdd63efe7ba6af"
+      },
+      {
+        "name": "SGODOT-179_R1_04-plants-detail.png",
+        "source": "docs/design/coffee_shop-2026-10-07/godot-detail-plants.png",
+        "bytes": 1767260,
+        "sha256": "b0e71584636f2dd826c3d2486c8d2ff0263fa64ca8cf2b704acd6b55316d86fc"
+      },
+      {
+        "name": "SGODOT-179_R1_05-orthographic.png",
+        "source": "docs/design/coffee_shop-2026-10-07/orthographic.png",
+        "bytes": 977205,
+        "sha256": "5372d874ff8152d95038d753d38cd39b76cd6b8157ec3c960e91d100c501682d"
+      },
+      {
+        "name": "SGODOT-179_R1_06-bench-spawn.png",
+        "source": "output/scene-bench/coffee_shop/evidence/spawn.png",
+        "bytes": 983616,
+        "sha256": "92c83a28a51543810a7870c41402d3b28bf692d07e5b99c0d25d7511de55b92e"
+      },
+      {
+        "name": "SGODOT-179_R1_07-bench-counter.png",
+        "source": "output/scene-bench/coffee_shop/evidence/main.png",
+        "bytes": 983651,
+        "sha256": "4713f03aa25fface63f001b51972e436fbeb3833651998416a89568432a3752f"
+      },
+      {
+        "name": "SGODOT-179_R1_08-bench-entrance.png",
+        "source": "output/scene-bench/coffee_shop/evidence/door.png",
+        "bytes": 983540,
+        "sha256": "2dfb29771d1810de3b4624ecc8bca4a7f4bbdbfa6bd6a64e3a632aad242594f6"
+      },
+      {
+        "name": "SGODOT-179_R1_09-collisions.png",
+        "source": "output/scene-bench/coffee_shop/evidence/collisions.png",
+        "bytes": 1044195,
+        "sha256": "d61e3562ce45f705aa34b76a4abe64064347fbcb411f8f88c27248e433a94d8e"
+      },
+      {
+        "name": "SGODOT-179_R1_10-walkthrough.mp4",
+        "source": "output/scene-bench/coffee_shop/evidence/walkthrough.mp4",
+        "bytes": 540463,
+        "sha256": "76fbed7fd93813e31d87b1025419f1f9766463d8e37b164d30ef2e6e56c89e0b"
+      },
+      {
+        "name": "SGODOT-179_R1_11-bench-result.json",
+        "source": "output/scene-bench/coffee_shop/evidence/result.json",
+        "bytes": 19191,
+        "sha256": "2118decdfa2035badc0885cabb1452def6c3342fe6e44072b8e47bb55ab89f75"
+      }
+    ]
+  },
+  "lark": {
+    "cli_profile": "gensen",
+    "identity": "user",
+    "recipient": "same authorized user self-review conversation",
+    "message_count": 6,
+    "media_download_sha256_verified": true,
+    "media": [
+      {
+        "name": "comparison",
+        "sha256": "5d51f4b8919d4241f19b720d9617f987380dc0679a6b40f010412553a6fb6231",
+        "byte_identical": true
+      },
+      {
+        "name": "whole",
+        "sha256": "1798b3adcae82f4fb233485812aeb22214adc343551ccfa8820598f5e8685543",
+        "byte_identical": true
+      },
+      {
+        "name": "details",
+        "sha256": "f30bf6f14ccf7bab2c866acc3c41480cf51a8dbff25ab2dc16cc9e13912bbfaf",
+        "byte_identical": true
+      },
+      {
+        "name": "character",
+        "sha256": "93c6d748161578555f6212028ef7239a8249fbe7ea27ba388f52565a714a6fa2",
+        "byte_identical": true
+      },
+      {
+        "name": "video",
+        "sha256": "76fbed7fd93813e31d87b1025419f1f9766463d8e37b164d30ef2e6e56c89e0b",
+        "byte_identical": true
+      }
+    ]
+  },
+  "video": {
+    "black_frames": 0,
+    "sample_count": 8,
+    "motion_max_mean_pixel_delta": 1.8289409722222223,
+    "duration_seconds": 15,
+    "accelerated": false,
+    "sha256": "76fbed7fd93813e31d87b1025419f1f9766463d8e37b164d30ef2e6e56c89e0b"
+  },
+  "state": "In Progress; user sample review pending",
+  "scope": "Desktop art and movement evidence. No physical phone or release acceptance."
+}
