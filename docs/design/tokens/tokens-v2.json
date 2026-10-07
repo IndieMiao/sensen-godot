@@ -243,6 +243,8 @@
     "primaryPressed": "#2E6136",
     "primaryTint": "#ECF4E7",
     "quality/gold": "#E3B341",
+    "quickHandle": "#FBF8F1",
+    "quickHandleGrip": "#E1DAC8",
     "rarity/common": "#9DB89A",
     "rarity/fine": "#6FA8DC",
     "rarity/legendary": "#E3B341",
@@ -285,7 +287,8 @@
     "emptyCell": 0.35,
     "kitchenEmpty": 0.55,
     "sceneActionPending": 0.7,
-    "radialIconUnavailable": 0.45
+    "unavailableIcon": 0.45,
+    "todayDone": 0.75
   },
   "space": {
     "hudRowGap": 8,
@@ -312,6 +315,7 @@
     "kitchenMode": 15,
     "pill": 22,
     "pinMenu": 14,
+    "quickHandle": 12,
     "radialLabel": 12,
     "sheet": 24,
     "track": 3
@@ -456,7 +460,14 @@
     "todayRowH": 40,
     "todayIcon": 20,
     "joystickOuter": 86,
-    "joystickThumb": 40
+    "joystickThumb": 40,
+    "capacityDot": 7,
+    "quickHandleTouchW": 120,
+    "quickHandleTouchH": 44,
+    "quickHandleW": 96,
+    "quickHandleH": 24,
+    "quickHandleGripW": 24,
+    "quickHandleGripH": 3
   },
   "dash": {
     "inventory": [

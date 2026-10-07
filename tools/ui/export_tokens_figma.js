@@ -193,6 +193,10 @@ const tapCard = await variant('1135:101133', 'Pointer=Center');
 const sbWorld = await variant('1132:79554', 'Size=World, State=Ready');
 const sbNpc = await variant('1132:79554', 'Size=NPC, State=Request');
 const pinMenu = await variant('1141:80291', 'Pinned=yes');
+const todayDone = await variant('1145:81714', 'State=Done');
+const quickEnd = await node('907:72112');
+// Collapsed quick bar (LOCK-04 "未选行动时收起成把手"): page-14 frames, not a main yet.
+const handleTouch = await node('676:63515'), handle = await node('676:63516'), grip = await node('676:63517');
 const shadow = {
   card: shadowOf(energyCard), float: shadowOf(tapCard), petal: shadowOf(child(petalSel, 'Petal')),
   menu: shadowOf(pinMenu), key: shadowOf(switchKey),
@@ -210,10 +214,12 @@ Object.assign(color, {
   tileCore: hex(firstFill(child(ntL, 'Core')).color),
   warm: hex(firstFill(child(ntShort, 'Core')).color),
   amber: hex(kit['kit/amber']),
+  quickHandle: hex(firstFill(handle).color), quickHandleGrip: hex(firstFill(grip).color),
 });
 Object.assign(radius, {
   radialLabel: child(petalSel, 'Label').cornerRadius, captionPill: child(sbWorld, 'CaptionPill').cornerRadius,
   pinMenu: pinMenu.cornerRadius, energyTile: child(energyCard, 'Guidance · Eat').cornerRadius,
+  quickHandle: handle.cornerRadius,
 });
 Object.assign(stroke, {
   ring: ringStroke(ntL),
@@ -222,7 +228,9 @@ Object.assign(stroke, {
 });
 Object.assign(opacity, {
   sceneActionPending: Math.round(saPending.opacity * 100) / 100,
-  radialIconUnavailable: Math.round(child(child(petalOff, 'Petal'), 'Icon').opacity * 100) / 100,
+  // Shared by the radial petal icon (1122:79385) and the EnergyTile unavailable icon disc (1093:77292).
+  unavailableIcon: Math.round(child(child(petalOff, 'Petal'), 'Icon').opacity * 100) / 100,
+  todayDone: Math.round(todayDone.opacity * 100) / 100,
 });
 Object.assign(size, {
   sceneAction: saDefault.width, switchKey: switchKey.width, switchIcon: switchKey.children[0].width,
@@ -251,6 +259,9 @@ Object.assign(size, {
   todayPanelW: todayPanel.width, todayPanelX: CONST.todayPanelX, todayPanelY: CONST.todayPanelY,
   todayRowH: todayRow.height, todayIcon: child(todayRow, 'Icon').width,
   joystickOuter: child(joy, 'Joystick outer touch circle').width, joystickThumb: child(joy, 'Joystick thumb').width,
+  capacityDot: child(quickEnd, 'Capacity warning').width,
+  quickHandleTouchW: handleTouch.width, quickHandleTouchH: handleTouch.height,
+  quickHandleW: handle.width, quickHandleH: handle.height, quickHandleGripW: grip.width, quickHandleGripH: grip.height,
 });
 for (const k of Object.keys(size)) size[k] = r1(size[k]);
 const weightOf = { Regular: 'regular', Bold: 'bold', ExtraBold: 'extrabold' };
