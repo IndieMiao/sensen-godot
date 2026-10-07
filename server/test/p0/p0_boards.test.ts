@@ -113,8 +113,8 @@ describe('Market Board (§9.6.3, §9.13.2)', () => {
     s = mb.s;
     s.bag.push({ id: 'dish_fish_soup@perfect', qty: 1 }, { id: 'dish_fish_soup@good', qty: 1 });
     const pm = step(s, { type: 'deliver', request: 'pm' });
-    // Fresh Fish Soup buyback ⌊(crucian 2.4 + radish 4.0) × 0.8⌋ = 5 each (§9.13.1); lowest quality handed in is Good: +10%
-    expect(done(pm.ev)).toMatchObject({ coins: Math.floor(10 * 1.1) + Math.floor(20 * 1.1), bonus: 22 });
+    // Fresh Fish Soup buyback 6 each (§7.14, q(42)); the lowest quality handed in is Good: +10% on the whole request
+    expect(done(pm.ev)).toMatchObject({ coins: Math.floor(12 * 1.1) + Math.floor(20 * 1.1), bonus: 22 });
   });
 
   it('a third Stall Board slot opens at Homestead Lv3', () => {

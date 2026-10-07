@@ -76,8 +76,11 @@ describe('selling by counter (§9.11, §9.13.1)', () => {
     expect(refuse(s, { type: 'sell', item: 'seed_radish', qty: 1, shop: 'tackle' })).toMatchObject({ ok: false, code: 'not_sellable' });
   });
   it('dishes sell only at the Homestead Stall at their buyback (120 a day); materials 30 a day; stone never', () => {
-    expect(dishBuyback(c, 'dish_grilled_crucian')).toBe(1);   // ⌊3 × 0.8 × 0.8⌋ (§9.13.1 example)
-    expect(dishBuyback(c, 'dish_herb_grilled_fish')).toBe(2);  // ⌊(2.4 + 1) × 0.8⌋
+    // §7.14 buyback column (q(42)): ⌊Σ ingredient buyback × 0.8⌋
+    expect(dishBuyback(c, 'dish_grilled_crucian')).toBe(2);    // ⌊3 × 0.8⌋
+    expect(dishBuyback(c, 'dish_herb_grilled_fish')).toBe(3);  // ⌊(3 + 1) × 0.8⌋
+    expect(dishBuyback(c, 'dish_fish_soup')).toBe(6);          // ⌊(crucian 3 + radish 5) × 0.8⌋
+    expect(dishBuyback(c, 'dish_carrot_cake')).toBe(19);       // ⌊24 × 0.8⌋
     const s = fresh();
     s.bag.push({ id: 'dish_carrot_cake', qty: 5 }, { id: 'wood', qty: 20 }, { id: 'stone', qty: 3 });
     expect(refuse(s, { type: 'sell', item: 'dish_carrot_cake', qty: 1, shop: 'tackle' })).toMatchObject({ ok: false, code: 'not_sellable_here' });

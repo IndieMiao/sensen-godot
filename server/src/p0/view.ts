@@ -35,7 +35,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     plots: s.plots.map(p => ({
       id: p.id, state: p.state === 'growing' && (p.ready_at ?? Infinity) <= now ? 'ready' : p.state,
       crop: p.crop ?? null, ready_in: p.state === 'growing' && p.ready_at ? Math.max(0, p.ready_at - now) : null,
-      xp_pct: p.xp_pct ?? null,
+      xp_pct: p.xp_pct ?? null, fert: !!p.fert,
     })),
     bag: {
       capacity: s.bag_cap, free: freeSlots(s),
@@ -96,7 +96,11 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       tiers: Object.fromEntries(Object.entries(c.cooking.tiers).map(([k, t]) => [k, { energy: t.energy, ms: t.ms, bonus: t.bonus }])),
     },
     gear: {
-      slots: { farming: c.tools.farming, fishing: s.gear.rod, mining: c.tools.mining, combat: c.tools.combat },
+      slots: { farming: s.gear.hoe, fishing: s.gear.rod, mining: c.tools.mining, combat: c.tools.combat },
+      // Hoes (§9.11.2): sow = plots per Sow action (Starter Hoe 1, Row Hoe 3).
+      hoes: [c.tools.farming, c.tools.row_hoe.id].map(id => ({ id, name: itemName(c, id), owned: s.gear.hoes.includes(id),
+        equipped: s.gear.hoe === id, sow: id === c.tools.row_hoe.id ? c.tools.row_hoe.sow : 1,
+        price: id === c.tools.row_hoe.id ? c.tools.row_hoe.price : 0, gate: id === c.tools.row_hoe.id ? c.tools.row_hoe.gate : 1 })),
       rods: c.fishing.rods.map(r => ({ ...r, owned: s.gear.rods.includes(r.id), equipped: s.gear.rod === r.id })),
     },
     tackle: {

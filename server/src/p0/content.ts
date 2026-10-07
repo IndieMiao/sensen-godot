@@ -182,24 +182,23 @@ export function sellPriceOf(c: P0Content, id: string): number | null {
   return null;
 }
 
-/** §9.13.1: ⌊Σ(ingredient price × 0.8) × 0.8⌋, at least 1; a tag slot counts its cheapest matching item, seasonings 1. */
+/**
+ * §7.13.1 / §9.13.1 (q(42)): ⌊Σ ingredient buyback × 0.8⌋, at least 1. An ingredient's buyback is what the
+ * Homestead Stall pays: crops and fish at full price, materials at their price; a tag slot counts its cheapest match.
+ */
 export function dishBuyback(c: P0Content, id: string): number | null {
   const { base } = dishParts(id);
   if (base === c.cooking.mystery.id) return null;
   const recipe = recipeById(c, base);
   if (!recipe) return null;
+  const priceOf = (x: string) => cropById(c, x)?.price ?? fishById(c, x)?.price ?? c.materials[x]?.price ?? 0;
   let sum = 0;
   for (const token of recipe.in) {
     const tag = /^([WFOS])(\d)$/.exec(token);
-    if (tag?.[1] === 'S') { sum += 1; continue; }
-    if (tag) {
-      const prices = [...c.crops.filter(cr => cr.ingr[0] === tag[1] && cr.ingr[1] === Number(tag[2])).map(cr => cr.price),
-        ...(tag[1] === 'W' ? c.fish.filter(f => f.cook !== false && f.rarity === Number(tag[2])).map(f => f.price) : [])];
-      sum += (prices.length ? Math.min(...prices) : 0) * 0.8;
-      continue;
-    }
-    const ing = ingredient(c, token);
-    sum += ing?.family === 'S' ? 1 : (cropById(c, token)?.price ?? fishById(c, token)?.price ?? 0) * 0.8;
+    if (!tag) { sum += priceOf(token); continue; }
+    const fits = [...c.crops.filter(cr => cr.ingr[0] === tag[1] && cr.ingr[1] === Number(tag[2])).map(cr => cr.price),
+      ...(tag[1] === 'W' ? c.fish.filter(f => f.cook !== false && f.rarity === Number(tag[2])).map(f => f.price) : [])];
+    sum += fits.length ? Math.min(...fits) : 0;
   }
   return Math.max(1, Math.floor(sum * 0.8 + 1e-9));
 }

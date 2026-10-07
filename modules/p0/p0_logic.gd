@@ -48,8 +48,11 @@ static func rod_for(view: Dictionary, rarity: int) -> Dictionary:
 		if int(r.get("reach", 0)) >= rarity and not r.get("owned", false): return r
 	return {}
 
+## Items that share an existing icon until they get their own (SGODOT-228 content).
+const ICON_ALIAS := {"fert_compost": "compost", "tool_row_hoe": "hoe", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
+
 static func icon(id: String) -> Texture2D:
-	var path := ICON_DIR % id
+	var path := ICON_DIR % str(ICON_ALIAS.get(id, id))
 	return load(path) if ResourceLoader.exists(path) else load(ICON_DIR % "field")
 
 ## "m:ss" under an hour, "1h 12m" from one hour (state-icons rule: durations, never clock times).
@@ -79,14 +82,47 @@ static func bag_count(view: Dictionary, id: String) -> int:
 		if str(s.get("id", "")) == id: n += int(s.get("qty", 0))
 	return n
 
+## Plots one Sow action covers with the equipped hoe (Starter Hoe 1, Row Hoe 3; §9.11.2).
+static func sow_count(view: Dictionary) -> int:
+	for h in view.get("gear", {}).get("hoes", []):
+		if h.get("equipped", false): return maxi(1, int(h.get("sow", 1)))
+	return 1
+
+## The plots a Row Hoe sows from the bed in front: that bed, then tilled beds next to it in the same row, the
+## walking direction first (dir +1 / −1 along the row), up to sow_count. Plot ids run row by row, `columns` a row.
+static func row_plots(view: Dictionary, front: Dictionary, columns: int, dir: int) -> Array:
+	var out: Array = []
+	if front.is_empty() or str(front.get("state", "")) != "tilled": return out
+	out.append(front)
+	var most := sow_count(view)
+	var by_id := {}
+	for p in view.get("plots", []): by_id[int(p.get("id", -1))] = p
+	var id := int(front.get("id", -1))
+	var row := id / columns
+	for side in [dir if dir != 0 else 1, -(dir if dir != 0 else 1)]:
+		var next: int = id + side
+		while out.size() < most and next >= 0 and next / columns == row and by_id.has(next) and str(by_id[next].get("state", "")) == "tilled":
+			out.append(by_id[next])
+			next += side
+	return out
+
 ## Main action button for the plot in front of the player (Farming).
 ## Returns {icon, verb, sub, enabled, amber, cmd, need}. Facilities never appear here (§10.2.2).
-static func main_action(view: Dictionary, plot: Dictionary, seed_id: String) -> Dictionary:
+## `row`: plots a Row Hoe would sow (row_plots); the selected item decides the verb (k(4)): seeds sow, Compost fertilizes.
+static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row: Array = []) -> Dictionary:
 	var a := {"icon": "sow", "verb": "Sow", "sub": "Walk to a plot", "enabled": false, "amber": false, "cmd": {}, "need": 0}
 	if plot.is_empty():
 		if seed_id == "": a.sub = "Pick a seed"
 		return a
 	var plot_id := int(plot.get("id", -1))
+	if seed_id.begins_with("fert_"):
+		var ripe := str(plot.get("state", "")) == "ready"
+		if str(plot.get("state", "")) in ["sown", "growing"] and not ripe and not plot.get("fert", false):
+			return {"icon": "compost", "verb": "Fertilize", "sub": "Free", "enabled": true, "amber": false,
+				"cmd": {"type": "fertilize", "plot": plot_id, "item": seed_id}, "need": 0}
+		if str(plot.get("state", "")) == "tilled":
+			a.sub = "Pick a seed"
+			return a
 	match str(plot.get("state", "")):
 		"wild":
 			return {"icon": "hoe", "verb": "Till", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "till", "plot": plot_id}, "need": 0}
@@ -96,11 +132,17 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String) -> 
 				return a
 			var cost := int(crop_for_seed(view, seed_id).get("energy", 2))
 			var have := int(view.get("energy", {}).get("value", 0))
+			# Row Hoe: as many of the row's plots as the seeds allow, then trimmed to what Energy covers (§5.3).
+			var plots: Array = row if row.size() > 1 and int(row[0].get("id", -1)) == plot_id else [plot]
+			var n := clampi(mini(plots.size(), bag_count(view, seed_id)), 1, plots.size())
 			if have < cost:
-				return {"icon": "sow", "verb": "Sow ×1", "sub": "Need %d Energy" % cost, "enabled": true, "amber": true,
-					"cmd": {"type": "energy_card"}, "need": cost}
-			return {"icon": "sow", "verb": "Sow ×1", "sub": "%d Energy" % cost, "enabled": true, "amber": false,
-				"cmd": {"type": "sow", "plot": plot_id, "seed": seed_id}, "need": cost}
+				return {"icon": "sow", "verb": "Sow ×%d" % n, "sub": "Need %d Energy" % (cost * n), "enabled": true, "amber": true,
+					"cmd": {"type": "energy_card"}, "need": cost * n}
+			n = mini(n, have / cost)
+			var cmd := {"type": "sow", "plot": plot_id, "seed": seed_id}
+			if n > 1: cmd = {"type": "sow", "plots": plots.slice(0, n).map(func(p): return int(p.get("id", -1))), "seed": seed_id}
+			return {"icon": "sow", "verb": "Sow ×%d" % n, "sub": "%d Energy" % (cost * n), "enabled": true, "amber": false,
+				"cmd": cmd, "need": cost * n}
 		"sown":
 			return {"icon": "water", "verb": "Water", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "water", "plot": plot_id}, "need": 0}
 		"growing":
@@ -447,3 +489,70 @@ static func today_lines(view: Dictionary) -> Array:
 	if lines.size() < 3 and best != "": lines.append(best)
 	if lines.is_empty(): lines.append("Sow your first plot")
 	return lines.slice(0, 3)
+
+## Resident dialogue bar data (LOCK-18, SGODOT-225 UiResidentBar) from view.residents facts + the content table:
+## {id, portrait, name, role, stage, have, need, next, line, gift_reason, request_label, request_reason, request_cmd,
+##  meal, meal_note, lesson}. An empty reason means the button works; otherwise the button is grey with that reason.
+static func resident_bar(view: Dictionary, id: String) -> Dictionary:
+	var def: Dictionary = content().get("residents", {}).get(id, {})
+	var r: Dictionary = view.get("residents", {}).get(id, {})
+	if def.is_empty() or r.is_empty(): return {}
+	var lines: Dictionary = def.get("lines", {})
+	var stage := str(r.get("stage", "Stranger"))
+	var line := str(lines.get(stage, lines.get("Familiar", lines.get("Stranger", ""))))
+	var gift_reason := ""
+	if r.get("gift_today", false): gift_reason = "Gift already given today"
+	elif not _has_dish(view): gift_reason = "No dishes in your bag"
+	var label := "Request"
+	var reason := ""
+	var cmd := {}
+	var req = r.get("request", null)
+	match str(r.get("request_state", "none")):
+		"open":
+			cmd = {"type": "accept", "request": str(req.id)}
+		"accepted":
+			label = "Deliver"
+			if req.get("ready", false): cmd = {"type": "deliver", "request": str(req.id)}
+			else: reason = _request_gap(req)
+		"wait":
+			reason = "Next request in " + duration(float(r.get("next_in", 0)))
+		"stage":
+			reason = "Next request at " + str(r.get("need_stage", ""))
+		_:
+			reason = "No more requests"
+	var meal := str(r.get("meal", "none"))
+	var note := ""
+	if meal == "bag_full": note = "Bag full · free a slot for %s's meal" % str(def.get("name", ""))
+	return {
+		"id": id, "portrait": str(def.get("portrait", "")), "name": str(def.get("name", "")), "role": str(def.get("role", "")),
+		"stage": stage, "have": int(r.get("affinity", 0)),
+		"need": int(r.get("next_at", r.get("affinity", 0))) if r.get("next_at", null) != null else int(r.get("affinity", 0)),
+		"next": str(r.get("next_stage", "")) if r.get("next_stage", null) != null else "",
+		"line": line, "gift_reason": gift_reason,
+		"request_label": label, "request_reason": reason, "request_cmd": cmd,
+		"meal": meal == "given", "meal_note": note, "lesson": false,
+	}
+
+## A resident's line after a gift (Mystery Dish only so far, q(33)); "" keeps the stage line.
+static func resident_reply(id: String, verdict: String) -> String:
+	if verdict != "not_a_fan": return ""
+	var def: Dictionary = content().get("residents", {}).get(id, {})
+	return str(def.get("lines", {}).get("mystery", content().get("affinity", {}).get("mystery_line", "")))
+
+static func _has_dish(view: Dictionary) -> bool:
+	for s in view.get("bag", {}).get("slots", []):
+		if str(s.get("id", "")).begins_with("dish_"): return true
+	return false
+
+## What an accepted request still needs, written on the button (LOCK-10: gaps on buttons).
+static func _request_gap(req: Dictionary) -> String:
+	var left := maxi(0, int(req.get("qty", 0)) - int(req.get("have", 0)))
+	match str(req.get("kind", "")):
+		"sow": return "Plant %d more plot%s" % [left, "" if left == 1 else "s"]
+		"dish": return "Need %d more dish%s" % [left, "" if left == 1 else "es"]
+		"fish":
+			var rarity := int(req.get("rarity", 0)) if req.get("rarity", null) != null else 0
+			var names: Array = content().get("rarity_names", [])
+			var what := (str(names[rarity - 1]) + " fish") if rarity > 0 and rarity <= names.size() else "fish"
+			return "Need %d more %s" % [left, what]
+	return "Need %d more" % left
