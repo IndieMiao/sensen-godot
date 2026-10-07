@@ -6,8 +6,13 @@ import type { P0State } from './state.js';
 
 export type P0Event =
   | { kind: 'energy'; delta: number; reason: string }
-  | { kind: 'xp'; skill: Skill; amount: number; percent: number }
+  | { kind: 'xp'; skill: Skill; amount: number; percent: number; capped?: true }   // capped: the day's anti-script limit cut it (§4.3.4)
   | { kind: 'item'; id: string; delta: number }
+  // Warming Cabinet (§7.7): delta portions in (+) or out (−); to_bag = portions that went to the bag instead (cabinet full) or out to it (Take one).
+  // Once the cabinet is unlocked every kept dish sends one, so a dish that all went to the bag has delta 0 (Cabinet full · … sent to bag).
+  | { kind: 'cabinet'; id: string; delta: number; to_bag: number; have: number; cap: number }
+  // Portions left on the stove because neither the cabinet nor the bag had room (Bag full · dish left on the stove).
+  | { kind: 'plate'; ids: string[]; cabinet: boolean }
   | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
   | { kind: 'coins'; delta: number }
   | { kind: 'first'; what: string; xp: number }
@@ -59,9 +64,18 @@ export function gainEnergy(c: P0Content, s: P0State, now: number, amount: number
  */
 export function gainXp(c: P0Content, s: P0State, now: number, skill: Skill, amount: number, percent: number, events: P0Event[]): void {
   if (amount <= 0) { events.push({ kind: 'xp', skill, amount: 0, percent }); return; }
+  // §4.3.4: at most skill_daily_cap XP per skill per player day, first-time bonuses included. No human gets near it.
+  const today = s.day.xp[skill] ?? 0, allowed = Math.max(0, Math.min(amount, c.skill_daily_cap - today));
+  if (allowed < amount) {
+    events.push({ kind: 'xp', skill, amount: allowed, percent, capped: true });
+    if (allowed <= 0) return;
+  }
+  s.day.xp[skill] = today + allowed;
+  const capped = allowed < amount;
+  amount = allowed;
   const before = skillLevel(c, s, skill);
   s.skills[skill] += amount;
-  events.push({ kind: 'xp', skill, amount, percent });
+  if (!capped) events.push({ kind: 'xp', skill, amount, percent });
   const after = skillLevel(c, s, skill);
   for (let level = before + 1; level <= after; level++) {
     const paysEnergy = skill !== 'cooking';

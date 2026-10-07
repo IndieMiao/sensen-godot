@@ -14,7 +14,9 @@ function step(s: P0State, cmd: P0Command, now = T0): { s: P0State; ev: P0Event[]
   if (!r.ok) throw new Error(`${cmd.type}: ${r.code} ${JSON.stringify(r.detail ?? {})}`);
   return { s: r.state, ev: r.events };
 }
-const fresh = () => ({ ...freshState(c, 'player-test-02', T0, 7), created_at: T0 - 8 * 24 * H });
+const REED = 'pond_shanghai_05', PEBBLE = 'pond_shanghai_04';   // q(36): Reed Pond = Pond template, Pebble Pond = River
+// Standing at Reed Pond: casts take their template from the pond the player entered (SGODOT-232 S6).
+const fresh = (): P0State => { const s = { ...freshState(c, 'player-test-02', T0, 7), created_at: T0 - 8 * 24 * H }; s.presence.place = REED; return s; };
 const catchOf = (ev: P0Event[]) => ev.find(e => e.kind === 'catch') as Extract<P0Event, { kind: 'catch' }>;
 
 /** Cast and wait out the bite, then report the outcome. */
@@ -75,13 +77,13 @@ describe('P0 fishing (§6.1–6.7)', () => {
     const s = step(fresh(), { type: 'cast' }).s;
     expect(applyP0(c, s, { type: 'reel', outcome: 'landed' }, T0 + 100)).toMatchObject({ ok: false, code: 'too_early' });
   });
-  it('Willow Creek (River template) draws mullet and trout; the pond never does; mackerel stays Coast-only', () => {
+  it('a River-template pond draws mullet and trout; a Pond-template one never does; mackerel stays Coast-only', () => {
     let s = fresh();
     s.fishing.bites = 10; s.skills.fishing = 480;
     const seen = { pond: new Set<string>(), river: new Set<string>() };
     for (const site of ['pond', 'river'] as const) {
       for (let i = 0; i < 120; i++) {
-        const r = applyP0(c, s, { type: 'cast', site }, T0 + i * 60 * S);
+        const r = applyP0(c, s, { type: 'cast', space: 'pond', place: site === 'pond' ? REED : PEBBLE }, T0 + i * 60 * S);
         if (!r.ok) throw new Error(r.code);
         seen[site].add(r.state.cast!.fish);
         s = { ...r.state, cast: null };
@@ -91,7 +93,8 @@ describe('P0 fishing (§6.1–6.7)', () => {
     expect(seen.river.has('fish_trout') && seen.river.has('fish_mullet')).toBe(true);
     expect(seen.pond.has('fish_trout') || seen.pond.has('fish_mullet')).toBe(false);
     expect(seen.pond.has('fish_mackerel') || seen.river.has('fish_mackerel')).toBe(false);
-    expect(applyP0(c, fresh(), { type: 'cast', site: 'sea' }, T0)).toMatchObject({ ok: false, code: 'bad_site' });
+    const away = fresh(); away.presence.place = null;
+    expect(applyP0(c, away, { type: 'cast' }, T0)).toMatchObject({ ok: false, code: 'not_at_pond' });
   });
   it('the Starter Rod cannot hold Rare fish even at a high level (rod gate after level gate)', () => {
     const s = fresh();

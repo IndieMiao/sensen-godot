@@ -11,6 +11,7 @@ import { expireGiftMeals, progressOf, requestState, residentState, stageIndex } 
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest } from './state.js';
 import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
+import { cabinetCap, cabinetCount, rackOn, rackStock } from './kitchen_storage.js';
 import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
 import { gatherView } from './gathering.js';
@@ -81,6 +82,10 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     },
     fishing: {
       sites: Object.fromEntries(Object.entries(f.sites).map(([id, site]) => [id, { name: site.name, template: site.template }])),
+      // q(36): every catalog pond with its template; place = the pond the player is at (null away from ponds).
+      places: Object.fromEntries(Object.entries(f.places).map(([id, p]) => [id, {
+        name: p.name, site: p.site, template: f.sites[p.site]?.template ?? '', beginner: p.beginner === true }])),
+      place: s.presence.place ?? null,
       rod: (rodById(c, s.gear.rod) ?? f.rods[0]).name, rod_reach: (rodById(c, s.gear.rod) ?? f.rods[0]).reach,
       hook_bonus_ms: (rodById(c, s.gear.rod) ?? f.rods[0]).hook_bonus_ms, band_bonus: (rodById(c, s.gear.rod) ?? f.rods[0]).band_bonus,
       cast_energy: f.cast_energy,
@@ -98,8 +103,14 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
         dish: s.cookbook.includes(s.stove.dish) && !s.stove.mystery ? s.stove.dish : null, rarity: s.stove.rarity,
         ms: s.stove.ms, elapsed: Math.max(0, now - s.stove.started_at), ready_in: Math.max(0, s.stove.started_at + s.stove.ms - now),
         heats: s.stove.heats,
+        left: s.stove.left ?? null,   // portions waiting on the stove after a collect with no room (§7.2.6)
       } : null,
       first_fire: s.fires === 0,
+      // Spice Rack (Homestead Lv2, q(46)): stored seasonings the stove reaches; Experiment shows them with a Rack badge.
+      rack: { on: rackOn(c, s), items: [...rackStock(c, s)].map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
+      // Warming Cabinet (Homestead Lv3, §7.7): null until unlocked; energy = what one portion restores today.
+      cabinet: cabinetCap(c, s) > 0 ? { cap: cabinetCap(c, s), have: cabinetCount(s),
+        items: s.cabinet.map(b => ({ id: b.id, name: itemName(c, b.id), qty: b.qty, energy: mealValue(c, s, b.id) })) } : null,
       cookbook: c.cooking.recipes.map(r => {
         const known = s.cookbook.includes(r.id);
         const rarity = recipeRarity(c, r);

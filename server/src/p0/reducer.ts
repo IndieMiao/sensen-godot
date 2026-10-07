@@ -6,6 +6,7 @@ import { boardCommand, settleBoards, tracked } from './boards.js';
 import { expireGiftMeals, giftResident, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
+import { takeFromCabinet } from './kitchen_storage.js';
 import { energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { notePresence, restReadyIn } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
@@ -20,7 +21,7 @@ export type { P0Event } from './progress.js';
 
 /** Every command may carry `expect_seq`: the state version the client saw. A mismatch is refused as
  * `stale_state` without applying, so a retry after a lost response can never apply twice (SGODOT-211). */
-export type P0Command = P0CommandBody & { expect_seq?: number; space?: string };
+export type P0Command = P0CommandBody & { expect_seq?: number; space?: string; place?: string };
 
 type P0CommandBody =
   | { type: 'till'; plot: number }
@@ -37,8 +38,9 @@ type P0CommandBody =
   | { type: 'rest' }
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string }
-  | { type: 'collect'; taps?: number[] }
-  | { type: 'eat'; item: string }
+  | { type: 'collect'; taps?: number[]; eat?: boolean }   // eat: COOK-4 Eat, the main portion straight from the pot
+  | { type: 'eat'; item: string; from?: 'bag' | 'cabinet' }
+  | { type: 'cabinet_take'; item: string }   // Warming Cabinet `Take one` (§7.7)
   | { type: 'accept' | 'deliver' | 'drop'; request: string }
   | { type: 'homestead_upgrade' }
   | { type: 'talk'; resident: string }
@@ -67,7 +69,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleBoards(c, s, now);
   settleMine(c, s, now);
   settleParcels(c, s, now);
-  notePresence(c, s, cmd.space, now, events);   // before the command: a session gap of ≥ 2 h already counts as having left
+  notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
 
   switch (cmd.type) {
@@ -200,6 +202,12 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
+    case 'cabinet_take': {
+      if (cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');   // the cabinet is in the farmhouse
+      const refusal = takeFromCabinet(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
     case 'homestead_upgrade': {
       const refusal = upgradeHomestead(c, s, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
@@ -213,10 +221,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'cast': case 'reel': case 'cook': case 'collect': case 'eat': {
+      if (cmd.type === 'eat' && cmd.from === 'cabinet' && cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');
       const refusal = cmd.type === 'cast' ? castLine(c, s, cmd, now, events)
         : cmd.type === 'reel' ? reelLine(c, s, cmd, now, events)
         : cmd.type === 'cook' ? startPot(c, s, cmd, now, events)
-        : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events)
+        : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events, maxEnergy(c, s))
         : eatDish(c, s, cmd, now, events, maxEnergy(c, s));
       if (refusal) return fail(refusal.code, refusal.detail);
       break;

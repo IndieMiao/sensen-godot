@@ -21,6 +21,8 @@ var view: Dictionary = {}
 ## Where the player is (P0Runtime sets it on attach / detach): home, pond, outpost, mine, map or "" when unknown.
 ## Sent beside each command for Rest's 2 h away rule (q(41)); never part of the command or its dedupe key.
 var space := ""
+## The catalog pond inside a pond space (q(36)): the server reads the pond's template from its own table.
+var place := ""
 var busy := false
 var _queue: Array = []        # {cmd, key} sent while a request was in flight (reel / collect must never be dropped)
 var _inflight := {}           # the {cmd, key} on the wire; {} for state refreshes and dev calls
@@ -53,14 +55,15 @@ func current() -> Dictionary:
 
 ## The read also says where the player is, so entering a space counts even before the first command (q(41)).
 func refresh() -> void:
-	_request(HTTPClient.METHOD_GET, "/p0/state" + ("?space=" + space.uri_encode() if space != "" else ""), {}, {})
+	var query := ("?space=" + space.uri_encode() if space != "" else "") + ("&place=" + place.uri_encode() if space != "" and place != "" else "")
+	_request(HTTPClient.METHOD_GET, "/p0/state" + query, {}, {})
 
 ## World actions send without a key and are never dropped. UI commands pass a key (ui_key) and are ignored
 ## while the same key is on the wire or queued, so double taps on Buy / Sell submit once (WP7-B F-08 §2).
 func send(cmd: Dictionary, key := "") -> bool:
 	if key != "" and (str(_inflight.get("key", "")) == key or _queue.any(func(q): return q.key == key)):
 		return false
-	var entry := {cmd = cmd, key = key, space = space}   # the space the player issued it from, even if it waits in the queue
+	var entry := {cmd = cmd, key = key, space = space, place = place}   # where the player issued it from, even if it waits in the queue
 	if key != "": command_started.emit(key)
 	if busy: _queue.append(entry)
 	else: _post(entry)
@@ -77,6 +80,7 @@ func _post(entry: Dictionary) -> void:
 	var body: Dictionary = (entry.cmd as Dictionary).duplicate()
 	if view.has("seq"): body["expect_seq"] = int(view.seq)
 	if str(entry.get("space", "")) != "": body["space"] = str(entry.space)
+	if str(entry.get("place", "")) != "": body["place"] = str(entry.place)
 	_request(HTTPClient.METHOD_POST, "/p0/commands", body, entry.cmd)
 
 func dev_skip(minutes: int) -> void:

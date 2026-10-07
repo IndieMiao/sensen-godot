@@ -16,9 +16,11 @@ function step(s: P0State, cmd: P0Command, at = T, content = c) {
   if (!r.ok) throw new Error(r.code);
   return r.state;
 }
+const REED = 'pond_shanghai_05', PEBBLE = 'pond_shanghai_04';
 const fresh = () => freshState(c, 'progression-player', T, 7);
-function catchFish(s: P0State, site = 'pond', at = T, content = c) {
-  s = step(s, { type: 'cast', site }, at, content);
+/** Enter a pond (space + place, q(36)) and land one fish there. */
+function catchFish(s: P0State, place = REED, at = T, content = c) {
+  s = step(s, { type: 'cast', space: 'pond', place }, at, content);
   return step(s, { type: 'reel', outcome: 'landed' }, at + s.cast!.bite_ms + 10, content);
 }
 function goodDish(s: P0State, items: string[], at = T) {
@@ -33,23 +35,26 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
     let s = catchFish(fresh());
     expect(s.skills.fishing).toBe(50);
     expect(s.firsts).toContain('fishing_city:shanghai');
-    s = catchFish(s, 'river', T + 60_000);
+    s = catchFish(s, PEBBLE, T + 60_000);
     expect(s.skills.fishing).toBe(55);
   });
 
-  it('uses the server site city, ignoring a forged request city', () => {
-    let s = step(fresh(), { type: 'cast', site: 'pond', city: 'invented' } as P0Command);
+  it('takes the city from the server pond table, ignoring a forged site or city in the command', () => {
+    let s = step(fresh(), { type: 'cast', space: 'pond', place: REED, site: 'river', city: 'invented' } as P0Command);
+    expect(s.cast).toMatchObject({ site: 'pond', place: REED });
     s = step(s, { type: 'reel', outcome: 'landed' }, T + s.cast!.bite_ms + 10);
     expect(s.firsts.filter(f => f.startsWith('fishing_city:'))).toEqual(['fishing_city:shanghai']);
     const other = structuredClone(c);
-    other.fishing.sites.river.city = 'test-other-city';
-    s = catchFish(s, 'river', T + 60_000, other);
+    other.fishing.places[PEBBLE].city = 'test-other-city';
+    s.presence.place = PEBBLE;   // entered before the table changed
+    s = step(s, { type: 'cast' }, T + 60_000, other);
+    s = step(s, { type: 'reel', outcome: 'landed' }, T + 60_000 + s.cast!.bite_ms + 10, other);
     expect(s.skills.fishing).toBe(65);
     expect(s.firsts).toContain('fishing_city:test-other-city');
   });
 
   it('cancel and escape do not grant city/landing XP; first-cast bonus cannot be repeated', () => {
-    let s = step(fresh(), { type: 'cast' });
+    let s = step(fresh(), { type: 'cast', space: 'pond', place: REED });
     s = step(s, { type: 'reel', outcome: 'cancel' }, T + 10);
     expect(s.skills.fishing).toBe(10);
     expect(s.firsts).not.toContain('fishing_city:shanghai');
@@ -57,7 +62,7 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
     s = step(s, { type: 'reel', outcome: 'escaped' }, T + 100 + s.cast!.bite_ms + 10);
     expect(s.skills.fishing).toBe(10);
     expect(s.firsts).not.toContain('landed');
-    s = catchFish(s, 'pond', T + 60_000);
+    s = catchFish(s, REED, T + 60_000);
     expect(s.skills.fishing).toBe(50);
   });
 
@@ -88,9 +93,9 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
     expect(done.events).toContainEqual(expect.objectContaining({ kind: 'level', skill: 'cooking', level: 2, energy: 0 }));
     expect(done.events.some(e => e.kind === 'energy')).toBe(false);
     expect(done.state.rewards).not.toContain('levelup_first');
-    s = catchFish(done.state, 'pond', T + 60_000);
+    s = catchFish(done.state, REED, T + 60_000);
     s.skills.fishing = 69;
-    s = catchFish(s, 'pond', T + 120_000);
+    s = catchFish(s, REED, T + 120_000);
     expect(s.rewards).toContain('levelup_first');
   });
 
@@ -130,7 +135,7 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
     try {
       const store = new P0Store(c, file);
       registerP0Routes(app, { content: c, store, now: () => now, dev: false });
-      await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'cast' } });
+      await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'cast', space: 'pond', place: REED } });
       now += store.get('progression-player', now).cast!.bite_ms + 10;
       const payload = { type: 'reel', outcome: 'landed' };
       const first = await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload });
