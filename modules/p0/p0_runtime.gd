@@ -67,6 +67,7 @@ func _init() -> void:
 	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
 		P0Fishing.auto_play = true
 		P0Cooking.auto_play = true
+		P0Kitchen.auto_play = true
 
 ## The active world takes over input and the HUD surface; the previous one is simply forgotten.
 func attach(w: Node) -> void:
@@ -307,7 +308,10 @@ func _dev_shot(dt: float) -> void:
 			"auto":
 				P0Fishing.auto_play = true
 				P0Cooking.auto_play = true
-			"manual": P0Cooking.auto_play = false
+				P0Kitchen.auto_play = true
+			"manual":
+				P0Cooking.auto_play = false
+				P0Kitchen.auto_play = false
 			"dex": ui.open_fishdex()
 			"kai": ui.open_kai_greeting()
 			"tackle": ui.open_tackle()
@@ -318,10 +322,11 @@ func _dev_shot(dt: float) -> void:
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
 			"radial": ui.open_radial()
-			"kitchen": ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
-			"put":
-				ui._exp_slots.append(step[1])
-				ui.open_kitchen("experiment")
+			"kitchen", "put":
+				# The farmhouse owns the cooking drawer; elsewhere the interim panel opens.
+				if not bool(_call("p0_dev", [step])):
+					if step[0] == "put": ui._exp_slots.append(step[1])
+					ui.open_kitchen(step[1] if step[0] == "kitchen" and step.size() > 1 else ("experiment" if step[0] == "put" else "cookbook"))
 			"cook": session.send({"type": "cook", "recipe": step[1]})
 			"send":
 				# send:type=reel|outcome=landed (commas separate steps, so no JSON here)

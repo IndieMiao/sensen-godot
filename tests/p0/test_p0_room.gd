@@ -264,3 +264,27 @@ func test_back_at_the_door_leaves_at_once_and_is_still_handled() -> void:
 	assert_bool(r.is_back_navigation_locked()).is_true()
 	assert_int(left[0]).is_equal(1)
 	r.p0_frame({}, 0.1)   # a frame after leaving does nothing
+
+## Hard constraint (Arthur, SGODOT-226): with the cooking drawer up (480 of 800 at 360 wide), the whole stove stays
+## above the drawer's top edge, and the pot sits between the HUD and the slot bar.
+func test_pushed_in_stove_clears_the_cooking_drawer_on_a_360_by_800_screen() -> void:
+	var sv := SubViewport.new()
+	sv.size = Vector2i(360, 800)
+	sv.own_world_3d = true
+	add_child(auto_free(sv))
+	var r: P0Room = FARMHOUSE.new()
+	r.use_runtime = false
+	sv.add_child(r)
+	r.focus("cam_stove", {band = r.band_below_hud(P0Kitchen.BAND_TOP_DRAWER), size = r.view_size() * P0Kitchen.FOCUS_SIZE})
+	r._shot_k = 1.0
+	r._update_camera()
+	var drawer_top := 800.0 - P0KitchenDrawer.HEIGHT
+	var lowest := -INF
+	var hearth: Node3D = r.art.get_node("hearth")
+	for mi in hearth.find_children("*", "MeshInstance3D", true, false):
+		var box: AABB = (mi as MeshInstance3D).global_transform * (mi as MeshInstance3D).get_aabb()
+		for i in 8: lowest = maxf(lowest, r.cam.unproject_position(box.get_endpoint(i)).y)
+	assert_float(lowest).override_failure_message("stove bottom %.0f vs drawer top %.0f" % [lowest, drawer_top]).is_less(drawer_top)
+	var pot := r.cam.unproject_position(r.anchor("drop_pot_1").global_position).y
+	assert_float(pot).is_greater(P0Room.HUD_BOTTOM)
+	assert_float(pot).is_less(drawer_top - 80.0)   # slot bar (50) and preview (26) sit above the drawer

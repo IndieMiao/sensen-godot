@@ -1194,6 +1194,11 @@ func teach(key: String, text: String) -> void:
 ## Stove panel (§7.2.7, COOK-2a/2b): Cookbook (known pages cook in one tap, missing ones say what is short)
 ## and Experiment (free slots from the bag). Cooking costs no Energy.
 func open_kitchen(tab := "") -> void:
+	# The farmhouse's stove corner owns the cooking drawer (SGODOT-226): walk there and open it.
+	var world = P0Runtime.ensure().world
+	if is_instance_valid(world) and world.has_method("p0_open_kitchen"):
+		world.call("p0_open_kitchen", tab if tab != "" else _kitchen_tab)
+		return
 	if tab != "": _kitchen_tab = tab
 	var ck: Dictionary = view.get("cooking", {})
 	var lvl := int(view.get("skills", {}).get("cooking", {}).get("level", 1))

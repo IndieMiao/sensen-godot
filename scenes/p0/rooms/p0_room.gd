@@ -312,6 +312,9 @@ func release_focus() -> void:
 
 func is_focused() -> bool: return not _shot.is_empty() and _shot_k > 0.0
 
+## Orthographic width of the room's opening view, in metres (push-in sizes are fractions of it).
+func view_size() -> float: return _cam_size
+
 ## Screen band from the HUD's bottom edge to `bottom` (fraction of the screen height).
 func band_below_hud(bottom: float) -> Rect2:
 	var view := _view()
