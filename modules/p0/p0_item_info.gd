@@ -10,6 +10,7 @@ extends RefCounted
 ##   &"counter_buy"   a counter's Buy list row (LOCK-15)
 ##   &"counter_sell"  a counter's Sell here selection (LOCK-15)
 ##   &"gift"          the gift drawer, Bag side only
+##   &"storage"       a Farm Storage stack in the bag drawer (Take 10 / Take all; take_out {item, qty})
 ##
 ## opts (all optional):
 ##   place: String     "home" (own farm / farmhouse), "pond", "outpost" — at-home rules (Store, Sell at home)
@@ -36,14 +37,14 @@ extends RefCounted
 ## (can_store = view.storage, can_lock = bag stacks carry `locked`, can_gift = view.residents / view.social): no
 ## button, no grey text and no lock icon until the field appears (刘邦 / 奕星 2026-10-08).
 
-const CONTEXTS: Array[StringName] = [&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift"]
+const CONTEXTS: Array[StringName] = [&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift", &"storage"]
 const RULES_PATH := "res://modules/p0/item_info_rules.json"
-const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod"]
+const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick"]
 const SEP := " · "
-## Homestead stall buys these at full price with no daily limit (§9.13.1 / §6.6.3) until shops[role] arrives.
-const _HOME_BUYS := ["crop", "fish"]
-const _TACKLE_MULT := 0.8   # tackle shop pays 80 %, rounded down (F-07, 李白 25f3cb4c); shops[role].mult wins
 const _MYSTERY := "dish_mystery"
+const _TAKE_SOME := 10   # F-07 storage: Take 10 + Take all
+## Server kinds the card treats as another kind's rules (刘邦 / 周瑜: torches are materials here).
+const _KIND_ALIAS := {"torch": "material"}
 
 static var _rules: Dictionary = {}
 
@@ -55,9 +56,10 @@ static func rules() -> Dictionary:
 
 static func kind_of(view: Dictionary, item_id: String) -> String:
 	var k := str(P0Logic.item(view, item_id).get("kind", ""))
-	if k != "": return k
-	var head := item_id.split("_")[0]
-	return head if head in KINDS else "material"
+	if k == "":
+		var head := item_id.split("_")[0]
+		k = head if head in KINDS + ["fert"] else "material"
+	return str(_KIND_ALIAS.get(k, k))
 
 static func spec(view: Dictionary, item_id: String, context: StringName, opts := {}) -> Dictionary:
 	assert(context in CONTEXTS, "P0ItemInfo: unknown context %s" % context)
@@ -66,7 +68,7 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 	var rarity := int(it.get("rarity", 0))
 	var f := flags(view, item_id, context, opts)
 	var t := tokens(view, item_id, context, opts)
-	var rule: Dictionary = rules().get("%s/%s" % [kind, context], {})
+	var rule: Dictionary = rules().get("%s/%s" % [kind, context], rules().get("any/%s" % context, {}))
 	var badge: StringName = &"locked" if f.locked else (&"pinned" if f.pinned else &"")
 	var out := {
 		card = not rule.is_empty(),
@@ -93,7 +95,7 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 		if text != "": out.facts.append(text)
 	out.buttons = _buttons(rule, f, t)
 	if rule.get("price", false): out.price = _price(view, item_id, opts)
-	if rule.get("quota", false): out.quota = _quota(view, kind, opts)
+	if rule.get("quota", false): out.quota = _quota(view, item_id, kind, opts)
 	return out
 
 ## Fills {tokens}. Segments are " · "-separated: a segment whose token is empty drops out, and a line with no
@@ -136,11 +138,19 @@ static func _buttons(rule: Dictionary, f: Dictionary, t: Dictionary) -> Array:
 				label = fill(str(u.get("label", "")), t)
 				break
 		if str(b.id) == promote and kind != &"unavailable": promoted = true
-		out.append({id = StringName(str(b.id)), label = label, kind = kind, payload = b.get("payload", {})})
+		out.append({id = StringName(str(b.id)), label = label, kind = kind, payload = _ints(b.get("payload", {}))})
 	if promoted:
 		for b in out:
 			if b.id == StringName(promote): b.kind = &"primary"
 			elif b.kind == &"primary": b.kind = &"secondary"
+	return out
+
+## JSON numbers load as floats; a payload's whole numbers go to the server as ints ({qty: 10}, not 10.0).
+static func _ints(payload: Dictionary) -> Dictionary:
+	var out := {}
+	for k in payload:
+		var v = payload[k]
+		out[k] = int(v) if v is float and v == floor(v) else v
 	return out
 
 # ---------------------------------------------------------------- facts from the view
@@ -152,7 +162,7 @@ static func _stack(view: Dictionary, item_id: String) -> Dictionary:
 
 static func _counter(opts: Dictionary) -> String: return str(opts.get("counter", "homestead"))
 
-## The shop's offer row for a Buy list (stall.buy / tackle.buy; shops[role].buy once 228 lands).
+## The shop's offer row for a Buy list: view.shops[role].buy (SGODOT-228), else the older stall / tackle lists.
 static func _offer(view: Dictionary, item_id: String, opts: Dictionary) -> Dictionary:
 	var role := _counter(opts)
 	var lists := []
@@ -164,23 +174,42 @@ static func _offer(view: Dictionary, item_id: String, opts: Dictionary) -> Dicti
 			if str(o.get("id", "")) == item_id: return o
 	return {}
 
-## What this counter pays for one, or -1 when it doesn't buy this kind.
-static func _sell_here(view: Dictionary, item_id: String, opts: Dictionary) -> int:
+## This counter's buy-back entry for the item's kind ({kind, rate, quota}), {} when it doesn't take the kind.
+## view.shops[role].sell (SGODOT-228); without it the Homestead Stall takes crops and fish at full price.
+static func _buyback(view: Dictionary, item_id: String, opts: Dictionary) -> Dictionary:
 	var kind := kind_of(view, item_id)
-	var base = P0Logic.item(view, item_id).get("sell", null)
-	var role := _counter(opts)
-	var shop: Dictionary = view.get("shops", {}).get(role, {})
-	if shop.has("accepts"):
-		if not kind in shop.accepts or base == null: return -1
-		return int(floor(float(base) * float(shop.get("mult", 1.0))))
-	if base == null: return -1
-	if role == "homestead": return int(base) if kind in _HOME_BUYS else -1
-	if role == "tackle": return int(floor(float(base) * _TACKLE_MULT)) if kind == "fish" else -1
-	return -1
+	var shop: Dictionary = view.get("shops", {}).get(_counter(opts), {})
+	if shop.has("sell"):
+		for e in shop.sell:
+			if str(e.get("kind", "")) == kind: return e
+		return {}
+	return {kind = kind, rate = 1.0, quota = null} if _counter(opts) == "homestead" and kind in ["crop", "fish"] else {}
 
-static func _quota_of(view: Dictionary, kind: String, opts: Dictionary) -> Dictionary:
-	var q: Dictionary = view.get("shops", {}).get(_counter(opts), {}).get("quotas", {})
-	return q.get(kind, {})
+## What this counter pays for one (view.items[id].sell is the Homestead price; a rate below 1 rounds down), or -1.
+static func _sell_here(view: Dictionary, item_id: String, opts: Dictionary) -> int:
+	var base = P0Logic.item(view, item_id).get("sell", null)
+	var e := _buyback(view, item_id, opts)
+	if e.is_empty() or base == null: return -1
+	return int(floor(float(base) * float(e.get("rate", 1.0))))
+
+## The quota this counter counts the kind against (view.quotas[id]: {used, cap, resets_in, scope}), {} for none.
+static func _quota_of(view: Dictionary, item_id: String, opts: Dictionary) -> Dictionary:
+	var e := _buyback(view, item_id, opts)
+	var id = e.get("quota", null)
+	if id == null: return {}
+	var q: Dictionary = view.get("quotas", {}).get(str(id), {})
+	return q
+
+static func _stored(view: Dictionary, item_id: String) -> int:
+	for it in view.get("storage", {}).get("items", []):
+		if str(it.get("id", "")) == item_id: return int(it.get("qty", 0))
+	return 0
+
+## "4h", "1h 30m", "45m" — crop growth hours as F-07 writes them (no trailing 0m).
+static func hours(h: float) -> String:
+	var m := int(round(h * 60.0))
+	if m < 60: return "%dm" % m
+	return ("%dh" % (m / 60)) if m % 60 == 0 else "%dh %dm" % [m / 60, m % 60]
 
 static func flags(view: Dictionary, item_id: String, context: StringName, opts := {}) -> Dictionary:
 	var kind := kind_of(view, item_id)
@@ -189,10 +218,11 @@ static func flags(view: Dictionary, item_id: String, context: StringName, opts :
 	var offer := _offer(view, item_id, opts)
 	var e: Dictionary = view.get("energy", {})
 	var target: Dictionary = opts.get("target", {})
-	var quota := _quota_of(view, kind, opts)
+	var quota := _quota_of(view, item_id, opts)
 	var qty := maxi(1, int(opts.get("qty", 1)))
 	var rod := _rod(view, item_id)
 	var gifted := bool(stack.get("gifted", false))
+	var wallet := int(offer.get("need", int(offer.get("price", 0)) * qty))   # need includes the 40-coin floor (228)
 	return {
 		at_home = str(opts.get("place", "home")) == "home",
 		pinned = bool(opts.get("pinned", false)),
@@ -204,8 +234,10 @@ static func flags(view: Dictionary, item_id: String, context: StringName, opts :
 		quota_left = quota.is_empty() or int(quota.get("used", 0)) < int(quota.get("cap", 0)),
 		energy_full = int(e.get("value", 0)) >= int(e.get("max", 200)),
 		unlocked = bool(offer.get("unlocked", true)),
+		homestead_ok = bool(offer.get("homestead_ok", true)),
 		sold_out = offer.get("left", null) != null and int(offer.left) <= 0,
-		can_afford = int(view.get("coins", 0)) >= int(offer.get("price", 0)) * qty,
+		can_afford = int(view.get("coins", 0)) >= (wallet if qty == 1 else wallet + int(offer.get("price", 0)) * (qty - 1)),
+		take_some = _stored(view, item_id) > _TAKE_SOME,
 		owned = bool(rod.get("owned", offer.get("owned", false))),
 		equipped = bool(rod.get("equipped", false)),
 		has_friends = int(view.get("social", {}).get("mutual", 0)) > 0,
@@ -230,10 +262,9 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 	var crop := P0Logic.crop_for_seed(view, item_id) if kind == "seed" else {}
 	var offer := _offer(view, item_id, opts)
 	var here := _sell_here(view, item_id, opts)
-	var quota := _quota_of(view, kind, opts)
+	var quota := _quota_of(view, item_id, opts)
 	var sellable := count
 	if not quota.is_empty(): sellable = mini(count, maxi(0, int(quota.get("cap", 0)) - int(quota.get("used", 0))))
-	var rarity := int(it.get("rarity", 0))
 	var rod := _rod(view, item_id)
 	var t := {
 		count = str(count) if count > 0 else "",
@@ -241,13 +272,15 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		sell = str(it.sell) if it.get("sell", null) != null else "",
 		sell_here = str(here) if here >= 0 else "",
 		sell_at_home = ("Sells for %d at home" % int(it.sell)) if it.get("sell", null) != null else "",
-		energy = str(crop.get("energy", "")) if not crop.is_empty() else "",
-		grow = P0Logic.duration(float(crop.grow_h) * 3600000.0) if crop.has("grow_h") else "",
+		energy = str(int(crop.energy)) if crop.has("energy") else "",
+		grow = hours(float(crop.grow_h)) if crop.has("grow_h") else "",
+		stored = str(_stored(view, item_id)) if _stored(view, item_id) > 0 else "",
+		take_some = "Take %d" % _TAKE_SOME,
+		homestead_gate = ("Homestead Lv%d needed" % int(offer.homestead)) if offer.get("homestead", null) != null else "",
 		xp_hint = "",
 		use = "",
 		region_line = "",
 		pin_verb = "Unpin" if opts.get("pinned", false) else "Pin",
-		rarity_line = (P0Logic.rarity_name(view, rarity) + " ★".repeat(int(it.get("quality", 0)))) if rarity > 0 else "",
 		dex = _dex(view),
 		meal = str(int(it.get("meal", 0))) if kind == "dish" else "",
 		eat_label = str(P0Logic.eat_button(view, item_id).get("text", "")) if kind == "dish" else "",
@@ -259,11 +292,15 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		quota_resets_in = P0Logic.duration(float(quota.get("resets_in", 0))) if quota.has("resets_in") else "",
 		stock_line = _stock_line(offer, count),
 		gate_text = ("%s Lv%d needed" % [str(offer.get("skill", "")).capitalize(), int(offer.get("gate", 0))]) if offer.has("gate") else "",
-		restock_in = P0Logic.duration(float(offer.restock_in)) if offer.has("restock_in") else "",
-		coins_short = str(maxi(0, int(offer.get("price", 0)) * maxi(1, int(opts.get("qty", 1))) - int(view.get("coins", 0)))),
+		# Daily stock comes back at the day's rollover, the same moment as Rest (view.rest.resets_in).
+		restock_in = P0Logic.duration(float(view.get("rest", {}).get("resets_in", 0))) if view.get("rest", {}).has("resets_in") else "",
+		coins_short = str(maxi(0, int(offer.get("need", int(offer.get("price", 0)))) + int(offer.get("price", 0)) * (maxi(1, int(opts.get("qty", 1))) - 1) - int(view.get("coins", 0)))),
 		rod_effect = _rod_effect(view, rod),
 		rod_gate = "" if rod.get("owned", false) or rod.is_empty() else "Fishing Lv%d · Tackle Shop" % int(rod.get("level", 1)),
 		owned_line = "In Gear" if rod.get("owned", false) else "",
+		# LOCK-29: "1 Stone per rock"; where a pickaxe comes from while it isn't owned (Copper Pickaxe: Workbench).
+		pick_effect = ("%d Stone per rock" % int(rod.stone)) if rod.has("stone") else "",
+		pick_source = str(rod.get("source", "")) if not rod.get("owned", false) else "",
 	}
 	return t
 
@@ -279,9 +316,11 @@ static func _dex(view: Dictionary) -> String:
 	if dex.is_empty(): return ""
 	return "%d/%d" % [dex.filter(func(d): return int(d.get("caught", 0)) > 0).size(), dex.size()]
 
+## A tool's Gear row: view.gear.rods / view.gear.picks ({id, name, owned, equipped, ...}).
 static func _rod(view: Dictionary, item_id: String) -> Dictionary:
-	for r in view.get("gear", {}).get("rods", []):
-		if str(r.get("id", "")) == item_id: return r
+	for list in ["rods", "picks"]:
+		for r in view.get("gear", {}).get(list, []):
+			if str(r.get("id", "")) == item_id: return r
 	return {}
 
 static func _rod_effect(view: Dictionary, rod: Dictionary) -> String:
@@ -308,8 +347,9 @@ static func _price(view: Dictionary, item_id: String, opts: Dictionary) -> Dicti
 	var qty := maxi(1, int(opts.get("qty", 1)))
 	return {each = each, total = each * qty, text = "%d coins" % (each * qty), line = ("%d × %d coins" % [qty, each]) if qty > 1 else ""}
 
-static func _quota(view: Dictionary, kind: String, opts: Dictionary) -> Dictionary:
-	var q := _quota_of(view, kind, opts)
+static func _quota(view: Dictionary, item_id: String, kind: String, opts: Dictionary) -> Dictionary:
+	var q := _quota_of(view, item_id, opts)
+	if not q.is_empty() and not q.has("label"): q = q.merged({label = kind.capitalize()})   # "Fish buy-back today 30/80"
 	if q.is_empty():
 		return {text = "Crops & fish · no daily limit", note = "", have = 0, total = 0} if _counter(opts) == "homestead" else {}
 	# "Buy-back today 30/60" at a market, "Fish buy-back today 30/80" at the tackle shop (F-07): label = category.
