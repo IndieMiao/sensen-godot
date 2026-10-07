@@ -184,13 +184,6 @@
       "bytes": 144268
     },
     {
-      "name": "fire",
-      "vertices": 480,
-      "triangles": 944,
-      "surfaces": 1,
-      "bytes": 22360
-    },
-    {
       "name": "firewood_alcove",
       "vertices": 2188,
       "triangles": 3198,
@@ -289,14 +282,14 @@
       "bytes": 55252
     }
   ],
-  "unique_triangles": 131591,
-  "scene_triangles": 159455,
-  "static_draw_surfaces": 60,
-  "glb_bytes": 4444880,
+  "unique_triangles": 130647,
+  "scene_triangles": 158511,
+  "static_draw_surfaces": 59,
+  "glb_bytes": 4422520,
   "atlas_bytes": 2520114,
-  "placed_instances": 60,
+  "placed_instances": 59,
   "materials": 3,
-  "local_scene_triangles": 140023,
+  "local_scene_triangles": 139079,
   "shared_scene_triangles": 19432,
   "shared_assets": [
     {
@@ -334,5 +327,21 @@
     "plant_triangles": 100000,
     "static_surfaces": 60
   },
-  "budget_passed": true
+  "budget_passed": true,
+  "archived_assets": [
+    {
+      "name": "fire",
+      "vertices": 480,
+      "triangles": 944,
+      "surfaces": 1,
+      "bytes": 22360
+    }
+  ],
+  "particles": {
+    "library_commit": "5e5bf6af",
+    "capacity": 16,
+    "limit": 40,
+    "emitters": 2,
+    "dynamic_draws": 2
+  }
 }

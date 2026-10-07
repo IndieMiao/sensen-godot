@@ -794,19 +794,6 @@
       "cast_shadow": true
     },
     {
-      "name": "fire",
-      "file": "fire.glb",
-      "position": [
-        2.14,
-        0.3,
-        -1.45
-      ],
-      "yaw_degrees": 0,
-      "colliders": [],
-      "material": "fire",
-      "cast_shadow": true
-    },
-    {
       "name": "firewood_alcove",
       "file": "firewood_alcove.glb",
       "position": [
@@ -1201,16 +1188,6 @@
     "background": "D5EAE0",
     "background_gradient": true,
     "points": [
-      {
-        "position": [
-          2.14,
-          0.7,
-          -1.24
-        ],
-        "energy": 1.0,
-        "color": "FF943D",
-        "range": 2.4
-      },
       {
         "position": [
           -2.2,
@@ -2060,5 +2037,80 @@
         -3.56
       ]
     }
-  ]
+  ],
+  "archived_assets": [
+    {
+      "name": "fire",
+      "file": "fire.glb",
+      "position": [
+        2.14,
+        0.3,
+        -1.45
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "fire",
+      "cast_shadow": true
+    }
+  ],
+  "effects": [
+    {
+      "name": "fx_hearth_fire",
+      "scene": "res://assets/rooms/_shared/fx/fx_hearth_fire.tscn",
+      "position": [
+        2.14,
+        0.3,
+        -1.45
+      ],
+      "emission_box": [
+        0.17,
+        0.006,
+        0.035
+      ],
+      "flame_height": 0.42,
+      "flame_count": 14,
+      "spark_count": 2,
+      "flame_lifetime": 0.72,
+      "flicker_strength": 0.08,
+      "light": {
+        "position": [
+          2.14,
+          0.7,
+          -1.24
+        ],
+        "color": "FF943D",
+        "range": 2.4,
+        "energy": 1.0
+      }
+    }
+  ],
+  "ember_surfaces": [
+    {
+      "asset": "hearth",
+      "min": [
+        -0.31,
+        0.155,
+        -0.12
+      ],
+      "max": [
+        0.31,
+        0.26,
+        0.35
+      ],
+      "energy": 0.38
+    }
+  ],
+  "fx_review_camera": {
+    "position": [
+      2.14,
+      1.15,
+      -0.72
+    ],
+    "target": [
+      2.14,
+      0.57,
+      -1.5
+    ],
+    "size": 1.8
+  }
 }

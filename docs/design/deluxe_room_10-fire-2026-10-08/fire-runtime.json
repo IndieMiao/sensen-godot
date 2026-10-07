@@ -1,0 +1,27 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"capture": "8 second real-time X11 video; no speed adjustment",
+	"frame_draw_calls": [
+		26,
+		26,
+		26,
+		26,
+		26,
+		26,
+		26,
+		26,
+		26
+	],
+	"light_base": 1.0,
+	"light_max": 1.07882118225098,
+	"light_min": 0.927129626274109,
+	"light_position": [
+		2.14000010490417,
+		0.699999988079071,
+		-1.24000000953674
+	],
+	"particle_capacity": 16,
+	"passed": true,
+	"renderer": "mobile",
+	"scene": "deluxe_room_10"
+}
