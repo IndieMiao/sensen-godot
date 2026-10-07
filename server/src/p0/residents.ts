@@ -3,7 +3,7 @@
  * affinity in five stages (P0 counts and shows them), a first chat a day, one gift a day, the day's single gift meal
  * across all residents, and each resident's request line. Requests pay coins against the daily bonus cap, never XP.
  */
-import { add, count, freeSlots, take } from './bag.js';
+import { count, take } from './bag.js';
 import { dishParts, itemKind, recipeById, type P0Content, type ResidentDef, type ResidentRequest } from './content.js';
 import { recipeRarity } from './cooking.js';
 import type { Refusal } from './fishing.js';
@@ -11,6 +11,7 @@ import type { P0Event } from './progress.js';
 import { floorPrice, handOver, haveFor, noteDone, payBonus, pick } from './requests.js';
 import { skillLevel, untilRollover } from './rules.js';
 import type { P0State, ResidentState } from './state.js';
+import { grantItems } from './parcels.js';
 
 export function residentDef(c: P0Content, id: string): ResidentDef | null { return c.residents[id] ?? null; }
 
@@ -53,21 +54,26 @@ export function progressOf(c: P0Content, s: P0State, id: string, q: ResidentRequ
   return haveFor(c, s, q.need, q.need.id ? [q.need.id] : []);
 }
 
-/** Today's gift meal (§3.4.5): from Familiar, one a day across all residents; not given while the bag is full (q(33)). */
-function offerGiftMeal(c: P0Content, s: P0State, id: string, events: P0Event[]): void {
+/**
+ * Today's gift meal (§3.4.5): from Familiar, one a day across all residents. It is its own stack, so with no empty slot
+ * it goes to the Inbox as a parcel instead (q(33), once parcels exist), still gone at the 04:00 rollover.
+ */
+function offerGiftMeal(c: P0Content, s: P0State, id: string, now: number, events: P0Event[]): void {
   const def = residentDef(c, id)!;
   if (s.day.gift_meal || stageIndex(c, residentState(s, id).affinity) < stageAt(c, c.affinity.gift_meal_stage)) return;
-  if (freeSlots(s) < 1) {   // a gift meal is its own stack, so it needs an empty slot
-    events.push({ kind: 'gift_meal', resident: id, dish: def.gift_meal, given: false });
-    return;
-  }
-  add(c, s, def.gift_meal, 1, { from: id, day: s.day.key });
+  const bagged = grantItems(c, s, now, `gift_meal:${id}:${s.day.key}`, `${def.name}'s gift meal`, [[def.gift_meal, 1]], events,
+    { from: id, day: s.day.key });
+  if (!bagged) return;
   s.day.gift_meal = id;
-  events.push({ kind: 'gift_meal', resident: id, dish: def.gift_meal, given: true }, { kind: 'item', id: def.gift_meal, delta: 1 });
+  if (bagged[def.gift_meal]) {
+    events.push({ kind: 'gift_meal', resident: id, dish: def.gift_meal, given: true }, { kind: 'item', id: def.gift_meal, delta: 1 });
+  } else {
+    events.push({ kind: 'gift_meal', resident: id, dish: def.gift_meal, given: true, to: 'parcel' });
+  }
 }
 
 /** Opening a resident's dialogue bar: +2 on the first chat of the day, then the day's gift meal if it is theirs to give. */
-export function talk(c: P0Content, s: P0State, cmd: { resident?: unknown }, events: P0Event[]): Refusal | null {
+export function talk(c: P0Content, s: P0State, cmd: { resident?: unknown }, now: number, events: P0Event[]): Refusal | null {
   const id = String(cmd.resident ?? '');
   if (!residentDef(c, id)) return { code: 'bad_resident' };
   const r = residentState(s, id);
@@ -75,7 +81,7 @@ export function talk(c: P0Content, s: P0State, cmd: { resident?: unknown }, even
     r.chat_day = s.day.key;
     addAffinity(c, s, id, c.affinity.first_chat, 'chat', events);
   }
-  offerGiftMeal(c, s, id, events);
+  offerGiftMeal(c, s, id, now, events);
   return null;
 }
 

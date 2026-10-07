@@ -17,6 +17,7 @@ import { mineView, settleMine } from './mine.js';
 import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { restReadyIn } from './presence.js';
+import { inboxView, settleParcels } from './parcels.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
 export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
@@ -26,6 +27,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
   expireGiftMeals(s);
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
   settleMine(c, s, now);
+  settleParcels(c, s, now);
   const skills = Object.fromEntries(SKILLS.map(skill => {
     const level = skillLevel(c, s, skill), th = c.skills[skill];
     return [skill, { level, xp: s.skills[skill], floor: th[level - 1], next: level < th.length ? th[level] : null }];
@@ -37,6 +39,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     energy: { value: s.energy.value, max: maxEnergy(c, s), next_in: nextTickIn(c, s, now), regen_ms: regenMs(c, s, now) },
     blessing: blessed(c, s, now) ? { left: s.created_at + c.blessing.days * 86_400_000 - now, regen_mult: c.blessing.regen_mult, food_bonus: c.blessing.food_bonus } : null,
     coins: s.coins,
+    inbox: inboxView(s, now),   // §10.4.8 parcels; the Inbox panel comes with stage 4, the bell reads `badge`
     skills,
     plots: s.plots.map(p => ({
       id: p.id, state: p.state === 'growing' && (p.ready_at ?? Infinity) <= now ? 'ready' : p.state,
@@ -79,6 +82,10 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     },
     fishing: {
       sites: Object.fromEntries(Object.entries(f.sites).map(([id, site]) => [id, { name: site.name, template: site.template }])),
+      // q(36): every catalog pond with its template; place = the pond the player is at (null away from ponds).
+      places: Object.fromEntries(Object.entries(f.places).map(([id, p]) => [id, {
+        name: p.name, site: p.site, template: f.sites[p.site]?.template ?? '', beginner: p.beginner === true }])),
+      place: s.presence.place ?? null,
       rod: (rodById(c, s.gear.rod) ?? f.rods[0]).name, rod_reach: (rodById(c, s.gear.rod) ?? f.rods[0]).reach,
       hook_bonus_ms: (rodById(c, s.gear.rod) ?? f.rods[0]).hook_bonus_ms, band_bonus: (rodById(c, s.gear.rod) ?? f.rods[0]).band_bonus,
       cast_energy: f.cast_energy,
@@ -96,6 +103,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
         dish: s.cookbook.includes(s.stove.dish) && !s.stove.mystery ? s.stove.dish : null, rarity: s.stove.rarity,
         ms: s.stove.ms, elapsed: Math.max(0, now - s.stove.started_at), ready_in: Math.max(0, s.stove.started_at + s.stove.ms - now),
         heats: s.stove.heats,
+        left: s.stove.left ?? null,   // portions waiting on the stove after a collect with no room (§7.2.6)
       } : null,
       first_fire: s.fires === 0,
       // Spice Rack (Homestead Lv2, q(46)): stored seasonings the stove reaches; Experiment shows them with a Rack badge.
@@ -301,12 +309,12 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
   const meal = s.day.gift_meal === id ? 'given'
     : s.day.gift_meal ? 'none'
     : i < stages.findIndex(([n]) => n === c.affinity.gift_meal_stage) ? 'none'
-    : freeSlots(s) < 1 ? 'bag_full' : 'ready';
+    : 'ready';
   return {
     affinity: r.affinity, stage: stages[i][0], stage_from: stages[i][1],
     next_stage: stages[i + 1]?.[0] ?? null, next_at: stages[i + 1]?.[1] ?? null,
     chatted_today: r.chat_day === s.day.key, gift_today: r.gift_day === s.day.key,
-    meal,   // ready = the next talk gives today's gift meal; bag_full = it would, once a slot is free
+    meal,   // ready = the next talk gives today's gift meal (into the Inbox when the bag is full)
     request: st.req && {
       id: st.req.id, kind: st.req.need.kind, rarity: st.req.need.rarity ?? null, qty: st.req.qty, coins: st.req.coins,
       have: Math.min(st.req.qty, progressOf(c, s, id, st.req)),

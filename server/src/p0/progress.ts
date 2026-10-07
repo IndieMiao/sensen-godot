@@ -1,15 +1,19 @@
 /** Shared progression effects: energy spend / refund and XP with level-up rewards. */
 import type { P0Content, Skill } from './content.js';
-import { add, room } from './bag.js';
+import { grantItems } from './parcels.js';
 import { maxEnergy, nextTickIn, skillLevel } from './rules.js';
 import type { P0State } from './state.js';
 
 export type P0Event =
   | { kind: 'energy'; delta: number; reason: string }
-  | { kind: 'xp'; skill: Skill; amount: number; percent: number }
+  | { kind: 'xp'; skill: Skill; amount: number; percent: number; capped?: true }   // capped: the day's anti-script limit cut it (§4.3.4)
   | { kind: 'item'; id: string; delta: number }
   // Warming Cabinet (§7.7): delta portions in (+) or out (−); to_bag = portions that went to the bag instead (cabinet full) or out to it (Take one).
+  // Once the cabinet is unlocked every kept dish sends one, so a dish that all went to the bag has delta 0 (Cabinet full · … sent to bag).
   | { kind: 'cabinet'; id: string; delta: number; to_bag: number; have: number; cap: number }
+  // Portions left on the stove because neither the cabinet nor the bag had room (Bag full · dish left on the stove).
+  | { kind: 'plate'; ids: string[]; cabinet: boolean }
+  | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
   | { kind: 'coins'; delta: number }
   | { kind: 'first'; what: string; xp: number }
   | { kind: 'level'; skill: Skill; level: number; energy: number; gifts: [string, number][] }
@@ -24,7 +28,7 @@ export type P0Event =
   | { kind: 'homestead'; level: number; energy: number; unlocks: string[] }
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
   | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string }
-  | { kind: 'gift_meal'; resident: string; dish: string; given: boolean }
+  | { kind: 'gift_meal'; resident: string; dish: string; given: boolean; to?: 'parcel' }   // to: the bag was full, so it waits in the Inbox
   | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null }
   | { kind: 'mine'; action: 'enter' | 'continue' | 'floor' | 'torch' | 'rock' | 'cleared'; run: number; floor: number; cost: number;
       rock?: number; drop?: string | null }
@@ -53,28 +57,38 @@ export function gainEnergy(c: P0Content, s: P0State, now: number, amount: number
   return gain;
 }
 
-/** Add XP; every level crossed grants the one-time energy reward (may enter the bonus zone, §3.4.8) and gifts. */
+/**
+ * Add XP; every Farming / Fishing level crossed grants the one-time energy reward (may enter the bonus zone, §3.4.8).
+ * Cooking levels give no Energy (q(37)): their rewards are the slot, recipe cards and conveniences. Level gifts go
+ * into the bag, and what does not fit becomes Inbox parcels (§10.4.8).
+ */
 export function gainXp(c: P0Content, s: P0State, now: number, skill: Skill, amount: number, percent: number, events: P0Event[]): void {
   if (amount <= 0) { events.push({ kind: 'xp', skill, amount: 0, percent }); return; }
+  // §4.3.4: at most skill_daily_cap XP per skill per player day, first-time bonuses included. No human gets near it.
+  const today = s.day.xp[skill] ?? 0, allowed = Math.max(0, Math.min(amount, c.skill_daily_cap - today));
+  if (allowed < amount) {
+    events.push({ kind: 'xp', skill, amount: allowed, percent, capped: true });
+    if (allowed <= 0) return;
+  }
+  s.day.xp[skill] = today + allowed;
+  const capped = allowed < amount;
+  amount = allowed;
   const before = skillLevel(c, s, skill);
   s.skills[skill] += amount;
-  events.push({ kind: 'xp', skill, amount, percent });
+  if (!capped) events.push({ kind: 'xp', skill, amount, percent });
   const after = skillLevel(c, s, skill);
   for (let level = before + 1; level <= after; level++) {
-    const firstEver = !s.rewards.includes('levelup_first');
-    const energy = firstEver ? c.level_up_energy.first : c.level_up_energy.later;
+    const paysEnergy = skill !== 'cooking';
+    const firstEver = paysEnergy && !s.rewards.includes('levelup_first');
+    const energy = !paysEnergy ? 0 : firstEver ? c.level_up_energy.first : c.level_up_energy.later;
     if (firstEver) s.rewards.push('levelup_first');
     const cap = maxEnergy(c, s) + c.energy.bonus_zone;
     const granted = Math.max(0, Math.min(energy, cap - s.energy.value));
     s.energy.value += granted;
     if (s.energy.value >= maxEnergy(c, s)) s.energy.tick_ms = now;
     const gifts = c.level_gifts[`${skill}:${level}`] ?? [];
-    for (const [id, qty] of gifts) {
-      if (id.startsWith('recipe:')) { const page = id.slice(7); if (!s.cookbook.includes(page)) s.cookbook.push(page); continue; }
-      const put = Math.min(qty, room(c, s, id));
-      if (put > 0) add(c, s, id, put);
-    }
     events.push({ kind: 'level', skill, level, energy: granted, gifts });
+    grantItems(c, s, now, `level:${skill}:${level}`, `${skill[0].toUpperCase()}${skill.slice(1)} Lv${level} reward`, gifts, events);
   }
 }
 
