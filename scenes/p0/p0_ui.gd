@@ -12,6 +12,9 @@ signal command(cmd: Dictionary)
 signal dev_skip(minutes: int)
 signal zoom(factor: float)
 signal show_spot(where: String)
+## A target in another space (TodayRow `Show on map`): leave for the map and point at its pin ("home",
+## "pond:<id>", "tackle").
+signal show_on_map(target: String)
 signal home_choice(choice: String)
 signal recenter()
 signal place_pressed()
@@ -1054,16 +1057,33 @@ func open_today() -> void:
 	var shown := rows.map(func(r):
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
-		d.action = "Show" if str(r.go) != "" and spot_reachable() else ""   # TODO(SGODOT-225): Show on map for targets elsewhere
+		d.action = show_label(str(r.go), surface, spot_reachable())
 		return d)
 	var panel := UiTodayPanel.new(shown)
 	panel.theme = UiKit.theme()
 	panel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_TODAY_PANEL_Y + safe_top())
 	panel.show_pressed.connect(func(i: int):
 		close_modal()
-		show_spot.emit(str(rows[i].go)))
+		var go := str(rows[i].go)
+		if show_label(go, surface, spot_reachable()) == "Show": show_spot.emit(go)
+		else: show_on_map.emit(map_target(go)))
 	_open_modal(panel, 0.0)
 	modal_kind = "today"
+
+## TodayRow action (不知火舞 on 197, 2026-10-08): a target in the current space reads `Show` and only moves the
+## camera; a target somewhere else reads `Show on map` (the map opens on its pin). Homestead targets (plots,
+## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button.
+const HOME_TARGETS := ["plots", "stall", "stove", "board", "home"]
+
+static func show_label(go: String, here: String, camera_here: bool) -> String:
+	if go == "": return ""
+	var on_farm := go in HOME_TARGETS
+	if on_farm and here == "farm": return "Show" if camera_here else ""
+	return "Show on map"
+
+## The map pin for a target elsewhere: the homestead for farm targets, else the target itself.
+static func map_target(go: String) -> String:
+	return "home" if go in HOME_TARGETS else go
 
 ## Whether a Show can move the camera in the current world (the pond has no camera targets yet).
 func spot_reachable() -> bool:

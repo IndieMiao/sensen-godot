@@ -133,6 +133,9 @@ func test_hud_rows_read_today_and_the_actual_place() -> void:
 	await _settle()
 	assert_array(_labels(hud)).contains(["Today · Radishes ready in 1h 12m", "Tokyo · ", " · Day Pass 23h"])
 	assert_str(UiHud.place_text(hud.data.place)).is_equal("Tokyo · Arrived · Day Pass 23h")
+	# LOCK-06 v1.9: Helping wins over the pass; an expired pass leaves no third segment
+	assert_str(UiHud.place_text({city = "Tokyo", space = "Mia's Farm", day_pass = "3h", helping = true})).is_equal("Tokyo · Mia's Farm · Helping")
+	assert_str(UiHud.place_text({city = "Tokyo", space = "Sumida Pond", day_pass = ""})).is_equal("Tokyo · Sumida Pond")
 	# the space is truncated first and always shows its "…" (Godot alone only adds it once 6 letters fit)
 	var space: Label = hud._place_space
 	assert_str(space.text).ends_with("…")
