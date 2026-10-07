@@ -221,7 +221,16 @@ func test_vertical_drag_in_a_touch_scroll_is_not_a_tap() -> void:
 	# Real GUI routing: events pushed into the viewport reach the cell inside a TouchScrollContainer.
 	var scroll := TouchScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(360, 120)
-	_host(scroll)
+	# On the top canvas layer: an earlier suite can leave a scene in the tree (tests/scenes leaks a MapPoc whose
+	# HUD would take the press), and this case needs the real GUI routing.
+	var top := CanvasLayer.new()
+	top.layer = 128
+	add_child(auto_free(top))
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	top.add_child(host)
+	host.add_child(scroll)
 	var col := VBoxContainer.new()
 	scroll.add_child(col)
 	var cells: Array[UiItemCell] = []
