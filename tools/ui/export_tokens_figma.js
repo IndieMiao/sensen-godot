@@ -147,8 +147,10 @@ const size = {
   itemRowIcon: (await node('483:228')).children.find(c => c.type === 'INSTANCE').width,
   stateBadgeH: (await node('483:324')).height,
   statusBadge: badge.width, statusBadgeIcon: badge.children[0].width,
-  toastW: toast.width, toastPad: toast.paddingTop, toastIcon: child(toast, 'Tone icon').width,
-  toastMinH: toast.paddingTop + toast.paddingBottom + child(toast, 'Tone icon').height,
+  toastW: toast.width, toastIcon: child(toast, 'Tone icon').width,
+  toastPadTop: toast.paddingTop, toastPadRight: toast.paddingRight, toastPadBottom: toast.paddingBottom, toastPadLeft: toast.paddingLeft,
+  // One-line toasts on page 14 are 232 × 40: padding + tone icon + the 1 px stroke top and bottom.
+  toastMinH: toast.paddingTop + toast.paddingBottom + child(toast, 'Tone icon').height + 2 * toast.strokeWeight,
   sheetPad: info.paddingTop, sheetGap: info.itemSpacing, sheetBodyMaxH: 440,
   energyRefW: energyRef.width, energyRefH: energyRef.height,
   pinBadge: child(quickDefault, 'Pinned icon surface').width, pinIcon: child(quickDefault, 'Pin glyph').width,
@@ -297,6 +299,8 @@ const tokens = {
     pending: {
       wp1b: 'container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)',
       segmentTab: 'selected style must not use command green (LOCK-13), WP1b',
+      toast: 'sizes read Toast R1 (1178:82265); its tone look (light fills, tone icon, optional action) is not generated yet: ToastPanel and ToastLayer still draw the old dark panel',
+      emptyState: 'EmptyState 1234:87237 is a WP6 main (SGODOT-206), not yet accepted',
     },
   },
   font: { file: 'res://assets/ui/fonts/Nunito.ttf', naturalLineHeight: CONST.naturalLineHeight,

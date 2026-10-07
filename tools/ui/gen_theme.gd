@@ -108,6 +108,13 @@ func _margins(b: StyleBox, h: float, v: float) -> StyleBox:
 	b.content_margin_bottom = v
 	return b
 
+func _margins4(b: StyleBox, left: float, top: float, right: float, bottom: float) -> StyleBox:
+	b.content_margin_left = left
+	b.content_margin_top = top
+	b.content_margin_right = right
+	b.content_margin_bottom = bottom
+	return b
+
 func _buttons(th: Theme) -> void:
 	var stroke := float(t.stroke.default)
 	var pill := r("pill")
@@ -175,7 +182,7 @@ func _panels(th: Theme) -> void:
 		_panel(th, name, b)
 	_panel(th, "Card", _margins(_box(c("surface"), r("card"), c("border"), float(t.stroke.default)), float(t.space.row), float(t.space.row)))
 	_panel(th, "HudChip", _margins(_box(c("surface"), r("hudChip")), 8.0, 4.0))
-	_panel(th, "ToastPanel", _margins(_box(c("text"), r("card")), s("toastPad"), s("toastPad")))
+	_panel(th, "ToastPanel", _margins4(_box(c("text"), r("card")), s("toastPadLeft"), s("toastPadTop"), s("toastPadRight"), s("toastPadBottom")))
 	_panel(th, "Badge", _margins(_box(c("primaryTint"), s("stateBadgeH") * 0.5), 8.0, 0.0))
 
 # ---------------------------------------------------------------- UiTokens source

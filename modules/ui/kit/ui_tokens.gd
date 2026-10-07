@@ -23,10 +23,12 @@ const COLOR_ENERGY_HUD_DEEP := Color("C9962A")
 const COLOR_ENERGY_HUD_FILL := Color("E3B341")
 const COLOR_ENERGY_HUD_LIGHT := Color("F4D27A")
 const COLOR_FLOAT_AFFINITY := Color("C04F7A")
-const COLOR_FLOAT_COINS := Color("8F6410")
+const COLOR_FLOAT_COINS := Color("806C0C")
 const COLOR_FLOAT_ENERGY_COST := Color("C0563F")
 const COLOR_FLOAT_ENERGY_GAIN := Color("3E7D43")
 const COLOR_FLOAT_XP := Color("17808F")
+const COLOR_GOLD := Color("F0D75E")
+const COLOR_GOLD_INK := Color("806C0C")
 const COLOR_INFO := Color("426A88")
 const COLOR_JOYSTICK_RING := Color("FBF8F173")
 const COLOR_JOYSTICK_THUMB := Color("3E7D43B2")
@@ -37,7 +39,7 @@ const COLOR_PIN_WARM := Color("FBF4E6")
 const COLOR_PRIMARY := Color("3E7D43")
 const COLOR_PRIMARY_PRESSED := Color("2E6136")
 const COLOR_PRIMARY_TINT := Color("ECF4E7")
-const COLOR_QUALITY_GOLD := Color("E3B341")
+const COLOR_QUALITY_GOLD := Color("F0D75E")
 const COLOR_QUICK_HANDLE := Color("FBF8F1")
 const COLOR_QUICK_HANDLE_GRIP := Color("E1DAC8")
 const COLOR_RARITY_COMMON := Color("9DB89A")
@@ -88,8 +90,8 @@ const COLOR_STATUS_NEW_RING := Color("6FA8DC")
 const COLOR_STATUS_READY := Color("3E7D43")
 const COLOR_STATUS_READY_RING := Color("3E7D43")
 const COLOR_STATUS_REQUEST := Color("FBF8F1")
-const COLOR_STATUS_REQUEST_RING := Color("E3B341")
-const COLOR_STATUS_SELL := Color("E3B341")
+const COLOR_STATUS_REQUEST_RING := Color("806C0C")
+const COLOR_STATUS_SELL := Color("F0D75E")
 const COLOR_STATUS_SELL_RING := Color("8A918C")
 const COLOR_STATUS_USED_TODAY := Color("D6D5CE")
 const COLOR_STATUS_USED_TODAY_RING := Color("8A918C")
@@ -198,9 +200,12 @@ const SIZE_STATE_BADGE_H := 32
 const SIZE_STATUS_BADGE := 56
 const SIZE_STATUS_BADGE_ICON := 28
 const SIZE_TOAST_W := 232
-const SIZE_TOAST_PAD := 9
 const SIZE_TOAST_ICON := 20
-const SIZE_TOAST_MIN_H := 38
+const SIZE_TOAST_PAD_TOP := 9
+const SIZE_TOAST_PAD_RIGHT := 12
+const SIZE_TOAST_PAD_BOTTOM := 9
+const SIZE_TOAST_PAD_LEFT := 10
+const SIZE_TOAST_MIN_H := 40
 const SIZE_SHEET_PAD := 16
 const SIZE_SHEET_GAP := 12
 const SIZE_SHEET_BODY_MAX_H := 440
@@ -380,4 +385,6 @@ const PANEL_BADGE := &"Badge"
 const PENDING := {
 	"wp1b": "container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)",
 	"segmentTab": "selected style must not use command green (LOCK-13), WP1b",
+	"toast": "sizes read Toast R1 (1178:82265); its tone look (light fills, tone icon, optional action) is not generated yet: ToastPanel and ToastLayer still draw the old dark panel",
+	"emptyState": "EmptyState 1234:87237 is a WP6 main (SGODOT-206), not yet accepted",
 }
