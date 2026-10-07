@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[5]
 sys.path.insert(0,str(ROOT/'tools/art/source/coffee_shop'))
 import kit as k
 from mathutils import Vector
-GREENS=['718D42','829B4D','93AA59','5E7935','9AB35F','678442']
+GREENS=['4F713F','5B7C49','678855','426133','6C8F5A','486A3F']
 LEAF_COSTS=[]
 
 def blade(name,a,b,width,color,split=False,seed=0):
@@ -121,7 +121,7 @@ def olive():
         for j in range(16):
             angle=j*2.399+i;start=(p[0]+math.cos(angle)*.09,p[1]+rng.uniform(-.07,.12),p[2]+math.sin(angle)*.09)
             end=(start[0]+math.cos(angle)*.16,start[1]+.06,start[2]+math.sin(angle)*.16)
-            blade('Silver olive leaf',start,end,.046,['829369','909F77','6C8459','99A681'][j%4],seed=j+i)
+            blade('Silver olive leaf',start,end,.046,['59744F','64805A','49683E','6F8961'][j%4],seed=j+i)
 
 def fruit_tree():
     pot(.42,.55,'terra')

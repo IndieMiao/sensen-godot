@@ -1,0 +1,90 @@
+{
+  "geometry_unchanged_with_float_tolerance": 1e-06,
+  "unique_triangles": 17378,
+  "checks": [
+    {
+      "asset": "flower_shrub",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    },
+    {
+      "asset": "fruit_tree",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    },
+    {
+      "asset": "ivy_long",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    },
+    {
+      "asset": "ivy_medium",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    },
+    {
+      "asset": "ivy_short",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    },
+    {
+      "asset": "monstera",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    },
+    {
+      "asset": "monstera_woven",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    },
+    {
+      "asset": "olive_tree",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    },
+    {
+      "asset": "peace_lily",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    },
+    {
+      "asset": "pot_terracotta",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    },
+    {
+      "asset": "pot_woven",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    },
+    {
+      "asset": "pothos",
+      "POSITION_max_delta": 0.0,
+      "NORMAL_max_delta": 0.0,
+      "TEXCOORD_0_max_delta": 0.0,
+      "indices_unchanged": true
+    }
+  ]
+}
