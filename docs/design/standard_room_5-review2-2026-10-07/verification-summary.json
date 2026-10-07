@@ -380,7 +380,7 @@
       "bytes": 568
     }
   },
-  "shared_plant_revision": "9c23ab2",
+  "shared_plant_revision": "a054d81 (R2.1, geometry budget inherited from R2)",
   "camera_fit": {
     "method": "Three visible rounded plinth edge intersections; rectangular ground-plane constraint. No image warp.",
     "reference_canvas": [
@@ -437,7 +437,7 @@
   },
   "video": {
     "duration_seconds": 15.0,
-    "sha256": "7c86863467ee6cbfac2ecd2b08b3e2366b7ad5340770777420f47d95ea58461b",
+    "sha256": "424ebe4df3a7a6f3b6f2543a53fa5889565edbc35251d3459ba35a3b92021bff",
     "samples_visually_reviewed": true
   },
   "hashes": {
@@ -483,14 +483,14 @@
     "assets/rooms/standard_room_5/daisy_jug.glb": "a9f046951271e1ae45aabc9a7d1e318cff2a5af84d01e3230f79e534283ad052",
     "assets/rooms/standard_room_5/tabletop_still_life.glb": "3d118fa35ec123fa44f9230e8e8469f8b4f351de8cf6c611f248291c365f0a07",
     "assets/rooms/_shared/plants/monstera.glb": "121c5e310388bfefb9e63e53b37e6101192f5fded30b13d0b496a22d445d3eac",
-    "assets/rooms/_shared/plants/peace_lily.glb": "090d0ee44ac75d9b1c97fc22dd3d9216eabc82e1769830dd86af4a65f142b865",
+    "assets/rooms/_shared/plants/peace_lily.glb": "c08e656b11a7dfcf41d2831a73d1ae547001247ff2eab45a4bee0ed494016d21",
     "assets/rooms/_shared/plants/pothos.glb": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
     "assets/rooms/standard_room_5/room_albedo_ao.png": "66b429c05de8c3eea1fc5fec15d330ee483b6b708274c69d1a4413d37df80276",
     "assets/rooms/standard_room_5/window_landscape.png": "ddcc565e14a419c44dbf26e2626ed01098e4328d96d4fb75fb588382a9a62f81",
     "assets/rooms/standard_room_5/fire_gradient.png": "349870df4e628410dc128999d57558a6654b17e5ef4d5a2cabc06db6b8e89f5b",
-    "assets/rooms/_shared/plants/room_albedo_ao.png": "ad5f09a5eca35e1ed53f528b67d8cdf7bad8b845f2b96523f6e28a8d8e0ffcde",
+    "assets/rooms/_shared/plants/room_albedo_ao.png": "dfa29771ce118b5441cee6116e316c7644c558ca0f6e612d80529294a71c2dc3",
     "assets/rooms/_shared/plants/material.tres": "f75e3970edd6f8caeaa485218465d51f718b0caee941923ee5825da94adf791b",
-    "tools/art/source/standard_room_5/standard_room_5.blend": "1188bfdb9b26f0570c8c4a738d632d87c7bfcb9339ddc549db37fd70a50dc8f6",
+    "tools/art/source/standard_room_5/standard_room_5.blend": "cb3328d2f933fe2da8d0a53750e90fea0094a1fb270fa98cfd1b27ea9c3df7d2",
     "assets/rooms/standard_room_5/layout.json": "6f3fece4f980949b9edd890e0ed7ef9131ccbe8933c8d613c4289bfd5139b960"
   },
   "scope": "Zhao Yun Standard Room R2 sample; no other artist scene edit, Android performance claim or production update."

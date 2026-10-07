@@ -38,7 +38,7 @@ bench=json.loads((BENCH/'result.json').read_text());record=json.loads((BENCH/'re
 assert bench['passed'] and record['passed'] and video['image_content_valid']
 colour=json.loads((DOC/'colour-verification.json').read_text());cloth=json.loads((DOC/'cloth-uv-verification.json').read_text());assert colour['passed'] and cloth['passed']
 summary={'revision':'R2','state':'Review','user_acceptance':'pending','reference':{'file':'OMLTC3yw3u2WDjOZhLnhaR','node':'545:2969'},
-         'renderer':render,'asset_stats':stats,'shared_plant_revision':'9c23ab2','camera_fit':json.loads(Path(__file__).with_name('camera-r2.json').read_text()),
+         'renderer':render,'asset_stats':stats,'shared_plant_revision':'a054d81 (R2.1, geometry budget inherited from R2)' ,'camera_fit':json.loads(Path(__file__).with_name('camera-r2.json').read_text()),
          'checks':{'rendered_character_checks':len(bench['checks']),'character_passed':bench['passed'],'route_video_passed':record['passed'],'colour_passed':colour['passed'],'cloth_uv_passed':cloth['passed'],'no_embedded_images':True},
          'video':{'duration_seconds':float(video['format']['duration']),'sha256':hashlib.sha256((BENCH/'walkthrough.mp4').read_bytes()).hexdigest(),'samples_visually_reviewed':True},
          'hashes':{str(file.relative_to(ROOT)):hashlib.sha256(file.read_bytes()).hexdigest() for file in files},

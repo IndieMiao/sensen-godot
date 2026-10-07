@@ -1,0 +1,14 @@
+{
+  "scene": "standard_room_5",
+  "revision": "R2",
+  "plane": "SGODOT-172",
+  "state": "Review",
+  "art_commit": "088d3902",
+  "verified_shared_sync_commit": "fd645af0",
+  "shared_plants_commit": "a054d81b",
+  "plane_attachments_download_sha256_verified": 19,
+  "lark_messages_readback_verified": 5,
+  "lark_media_download_sha256_verified": 4,
+  "video_sha256": "424ebe4df3a7a6f3b6f2543a53fa5889565edbc35251d3459ba35a3b92021bff",
+  "scope": "Zhao Yun sample R2; director/user visual confirmation pending"
+}
