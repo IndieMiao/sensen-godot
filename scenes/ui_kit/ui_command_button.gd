@@ -28,6 +28,9 @@ var label := "": set = set_label
 ## Non-empty = unavailable; this text replaces the label on the button (LOCK-10).
 var reason := "": set = set_reason
 var phase: CommandLifecycle.State = CommandLifecycle.State.IDLE: set = set_phase
+## Full-width rows with a long reason (ResidentDialogue Choices=Stacked): the label may use the side padding,
+## as the main draws it (a 200 px reason in a 208 button on NPC-5).
+var fit_text := false: set = set_fit_text
 
 var _lifecycle: CommandLifecycle
 var _key := ""
@@ -45,6 +48,28 @@ func set_compact(v: bool) -> void: compact = v; _apply()
 func set_label(v: String) -> void: label = v; _apply()
 func set_reason(v: String) -> void: reason = v; _apply()
 func set_phase(v: CommandLifecycle.State) -> void: phase = v; _apply()
+func set_fit_text(v: bool) -> void: fit_text = v; _fit()
+
+const _FIT_PAD := 4.0
+const _STYLES: Array[StringName] = [&"normal", &"hover", &"pressed", &"disabled", &"focus", &"hover_pressed"]
+var _fitting := false
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED and not _fitting: _fit()
+
+## Narrow side padding on top of whatever variation is current (re-run when the variation changes).
+func _fit() -> void:
+	_fitting = true
+	for st in _STYLES: remove_theme_stylebox_override(st)
+	if fit_text:
+		for st in _STYLES:
+			var sb := get_theme_stylebox(st)
+			if sb == null: continue
+			var t := sb.duplicate() as StyleBox
+			t.content_margin_left = minf(t.content_margin_left, _FIT_PAD)
+			t.content_margin_right = minf(t.content_margin_right, _FIT_PAD)
+			add_theme_stylebox_override(st, t)
+	_fitting = false
 
 func is_unavailable() -> bool: return reason != ""
 func is_busy() -> bool: return phase != CommandLifecycle.State.IDLE
@@ -79,3 +104,4 @@ func _apply() -> void:
 	else:
 		custom_minimum_size = Vector2(UiTokens.SIZE_TOUCH, UiTokens.SIZE_COMMAND)
 	modulate.a = UiTokens.OPACITY_PENDING if phase == CommandLifecycle.State.PENDING else 1.0
+	if fit_text: _fit()

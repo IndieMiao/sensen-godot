@@ -30,6 +30,8 @@ static func all() -> Array[Dictionary]:
 		# SGODOT-225 shared panel parts
 		{id = "drawer", title = "UiDrawer", figma = "Sheet 483:190 · bag drawer of BAG-2-2 · LOCK-12 / 15 (328/360)", build = _drawers},
 		{id = "inventory_grid", title = "UiInventoryGrid", figma = "Bag layout five-column grid · LOCK-12 / 15", build = _inventory_grids},
+		{id = "dialogue_card", title = "UiDialogueCard", figma = "Head of KeeperGreeting 1205:83238 / ResidentDialogue 1213:83392 (336 at 328)", build = _dialogue_cards},
+		{id = "resident_bar", title = "UiResidentBar", figma = "ResidentDialogue 1213:83392 Row / Stacked · LOCK-18 (336 at 328)", build = _resident_bars},
 	]
 	return out
 
@@ -416,4 +418,46 @@ static func _inventory_grids() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
 	v.add_child(_captioned(_sample_grid(), "bag · Crucian selected · dashed empties to capacity 25"))
 	v.add_child(_captioned(_sample_grid(true), "sell_mode · this counter takes crops and fish only"))
+	return v
+
+## Bottom cards are 336 wide on the 360 screen (12 at each side); laid out at 336 and drawn at 328/336.
+class _At336 extends Container:
+	const W := 336.0
+
+	func _k() -> float: return (360.0 - UiTokens.SPACE_PAGE * 2.0) / W
+
+	func _get_minimum_size() -> Vector2:
+		if get_child_count() == 0: return Vector2.ZERO
+		return Vector2(W, (get_child(0) as Control).get_combined_minimum_size().y) * _k()
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_SORT_CHILDREN and get_child_count() > 0:
+			var c := get_child(0) as Control
+			fit_child_in_rect(c, Rect2(Vector2.ZERO, Vector2(W, c.get_combined_minimum_size().y)))
+			c.scale = Vector2(_k(), _k())
+
+static func _at_336(c: Control) -> Control:
+	var box := _At336.new()
+	box.add_child(c)
+	return box
+
+static func _dialogue_cards() -> Control:
+	# The KeeperGreeting main's own sample (Mei); the greeting itself, with its Trade sub-copy, is 2A.
+	var c := UiDialogueCard.new(load("res://assets/ui/kit_images/keeper_mei.jpg"), "Market Keeper · Mei", "",
+		"Morning! Sweet potato seeds just came in — Farming Lv5 to plant. Anything I can get you?")
+	c.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
+	c.place = "Keeps the stall · Shanghai Market Square"
+	c.content.add_child(UiCommandButton.new("Trade · open the stall"))
+	c.content.add_child(UiCommandButton.new("What's fresh today?", UiCommandButton.Kind.SECONDARY))
+	c.content.add_child(UiDismissButton.new("Just passing by"))
+	return _captioned(_at_336(c), "keeper layout: Role · Name, place line, no profile link")
+
+static func _resident_bars() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var pip := {portrait = load("res://assets/p0/art/pip-portrait.jpg"), name = "Pip", role = "Courier Kid", stage = "Acquainted",
+		have = 28, need = 45, next = "Familiar", line = "Got a Common fish for me? Any kind.", meal = true, lesson = true}
+	v.add_child(_captioned(_at_336(UiResidentBar.new(pip)), "Choices=Row · Today’s meal and Recipe lesson available"))
+	var busy := pip.duplicate()
+	busy.merge({gift_reason = "Gift already given today", meal = false, lesson = false}, true)
+	v.add_child(_captioned(_at_336(UiResidentBar.new(busy)), "Choices=Stacked · Gift unavailable with its reason (NPC-5 layout)"))
 	return v

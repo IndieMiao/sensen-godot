@@ -184,3 +184,73 @@ func test_grid_scrolls_vertically_only() -> void:
 	await _settle()
 	assert_int(g.horizontal_scroll_mode).is_equal(ScrollContainer.SCROLL_MODE_DISABLED)
 	assert_float(g.get_v_scroll_bar().max_value).is_greater(g.size.y)
+
+# ---------------------------------------------------------------- UiDialogueCard / UiResidentBar
+
+const PIP := preload("res://assets/p0/art/pip-portrait.jpg")
+
+func _pip(fields := {}) -> Dictionary:
+	var d := {portrait = PIP, name = "Pip", role = "Courier", stage = "Familiar", have = 52, need = 90, next = "Trusted",
+		line = "Got anything from the pond today?"}
+	d.merge(fields, true)
+	return d
+
+func _texts(c: Node) -> Array:
+	return c.find_children("*", "Label", true, false).filter(func(l): return l.is_visible_in_tree()).map(func(l): return l.text)
+
+func _navs(c: Node) -> Array:
+	return c.find_children("*", "UiNavButton", true, false).map(func(n): return n.label)
+
+func _click(c: Control, at: Vector2) -> void:
+	for down in [true, false]:
+		var e := InputEventMouseButton.new()
+		e.button_index = MOUSE_BUTTON_LEFT
+		e.pressed = down
+		e.position = at
+		c._gui_input(e)
+
+func test_keeper_head_has_a_place_line_and_no_profile_link() -> void:
+	var c: UiDialogueCard = _host(UiDialogueCard.new(PIP, "Tackle Keeper · Finn", "", "Pick a rod, I'll string it."))
+	c.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
+	c.place = "Rods and bait · Shanghai Tackle Shop"
+	await _settle()
+	assert_array(_texts(c)).contains(["Tackle Keeper · Finn", "Rods and bait · Shanghai Tackle Shop", "Pick a rod, I'll string it."])
+	assert_array(_texts(c)).not_contains(["›"])
+	assert_vector(c._portrait.size).is_equal(UiDialogueCard.KEEPER_PORTRAIT)
+	var hits := [0]
+	c.identity_pressed.connect(func(): hits[0] += 1)
+	if not DisplayServer.is_touchscreen_available(): _click(c._identity, Vector2(4, 4))
+	assert_int(hits[0]).is_equal(0)
+
+func test_resident_bar_greets_first_then_offers_gift_and_request() -> void:
+	var b: UiResidentBar = _host(UiResidentBar.new(_pip()))
+	await _settle()
+	assert_array(_texts(b)).contains(["Pip", "· Courier", "›", "Familiar", "52/90 · next Trusted", "Got anything from the pond today?"])
+	assert_float(b.progress()).is_equal_approx(0.5, 0.0001)   # 52/90 floored to 10 %
+	assert_bool(b.gift_button().get_parent() is HBoxContainer).is_true()   # Choices=Row
+	assert_float(b.gift_button().get_global_rect().position.y).is_greater(b._bubble.get_global_rect().end.y)
+	var got := []
+	b.gift_pressed.connect(func(): got.append("gift"))
+	b.request_pressed.connect(func(): got.append("request"))
+	b.identity_pressed.connect(func(): got.append("profile"))
+	b.gift_button().activated.emit()
+	b.request_button().activated.emit()
+	if not DisplayServer.is_touchscreen_available():
+		_click(b._portrait, Vector2(10, 10))
+		_click(b._identity, Vector2(4, -8))   # the 18 px name row still takes a tap 8 px above it (44 hit area)
+	assert_array(got).is_equal(["gift", "request"] + ([] if DisplayServer.is_touchscreen_available() else ["profile", "profile"]))
+	assert_array(_navs(b)).is_empty()   # Today’s meal / Recipe lesson only when available
+
+func test_resident_bar_stacks_the_choices_when_one_carries_a_reason() -> void:
+	var b: UiResidentBar = _host(UiResidentBar.new(_pip({gift_reason = "Gift already given today", meal = true, lesson = true})))
+	await _settle()
+	assert_bool(b.gift_button().get_parent() is VBoxContainer).is_true()   # Choices=Stacked
+	assert_str(b.gift_button().text).is_equal("Gift already given today")
+	assert_float(b.gift_button().size.x).is_equal_approx(b.request_button().size.x, 0.5)
+	var got := []
+	b.gift_pressed.connect(func(): got.append("gift"))
+	b.gift_button().unavailable_pressed.emit("Gift already given today")
+	assert_array(got).is_empty()
+	assert_array(_navs(b)).is_equal(["Today’s meal", "Recipe lesson"])
+	var deliver: UiResidentBar = _host(UiResidentBar.new(_pip({request_label = "Deliver"})))
+	assert_str(deliver.request_button().text).is_equal("Deliver")
