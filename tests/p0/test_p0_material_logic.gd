@@ -72,6 +72,12 @@ func test_stairs_need_the_floor_cleared_then_cost_two() -> void:
 	assert_str(str(paid.sub)).is_equal("Free")
 	var elevator := P0MaterialLogic.mine_action(v, {"floor": 1, "target": "elevator"})
 	assert_str("%s · %s" % [elevator.verb, elevator.sub]).is_equal("Elevator · Free")
+	var out := P0MaterialLogic.mine_action(v, {"floor": 1, "target": "exit"})
+	assert_str("%s · %s" % [out.verb, out.sub]).is_equal("Exit mine · Free")
+	assert_that(out.cmd).is_equal({"type": "mine_exit"})
+	var up := P0MaterialLogic.mine_action(_view(_run([_floor(1, true, CLEARED), _floor(2)])), {"floor": 2, "target": "up"})
+	assert_str("%s · %s" % [up.verb, up.sub]).is_equal("Floor 1 · Free")
+	assert_that(up.cmd).is_equal({"type": "mine_floor", "floor": 1})
 
 func test_torch_lights_once_per_floor() -> void:
 	var lit := P0MaterialLogic.mine_action(_view(_run([_floor(1), _floor(2, false)])), {"floor": 1, "item": "torch"})
@@ -109,7 +115,7 @@ func test_reset_and_stored_notices_show_once() -> void:
 	assert_str(P0MaterialLogic.reset_notice(v, 0.0)).is_equal("Run ended at daily reset")
 	assert_str(P0MaterialLogic.reset_notice(v, 1000.0)).is_equal("")
 	v["storage"] = {"items": [], "auto": {"at": 2000.0, "items": [["stone", 12], ["copper_ore", 3]]}}
-	assert_str(P0MaterialLogic.stored_notice(v, 0.0)).is_equal("Stored · Stone ×12 · Copper Ore ×3")
+	assert_str(P0MaterialLogic.stored_notice(v, 0.0)).is_equal("Stored · 12 Stone · 3 Copper Ore")
 	assert_str(P0MaterialLogic.stored_notice(v, 2000.0)).is_equal("")
 
 func test_gather_marks_and_today_line() -> void:
@@ -121,7 +127,7 @@ func test_gather_marks_and_today_line() -> void:
 	assert_str(str(marks[0].caption)).is_equal("Timber Grove · Ready in 2h 10m")
 	assert_str(str(marks[0].badge)).is_equal("countdown")
 	assert_str(str(marks[1].caption)).is_equal("Clay Bank · Homestead Lv2")
-	assert_str(P0MaterialLogic.today_gather_line(v)).is_equal("Timber Grove ready in 2h 10m")
+	assert_str(P0MaterialLogic.today_gather_line(v)).is_equal("Timber Grove · Ready in 2h 10m")
 	v.gather.spots[0].ready = true
 	assert_str(str(P0MaterialLogic.gather_marks(v)[0].caption)).is_equal("Timber Grove · Tap to gather")
 	assert_str(P0MaterialLogic.today_gather_line(v)).is_equal("")
@@ -146,7 +152,7 @@ func test_workbench_cards_write_gaps_on_the_button() -> void:
 	assert_str(str(tools[0].effect)).is_equal("2 Stone per rock")
 	assert_that(tools[0].button).is_equal({"label": "Need 1 more Copper Ore", "kind": "unavailable", "cmd": {}})
 	assert_str(str(tools[1].effect)).is_equal("+1 at every gathering spot")
-	assert_str(str(tools[1].button.label)).is_equal("Owned")
+	assert_str(str(tools[1].button.label)).is_equal("Owned · always on")
 	var supplies := P0MaterialLogic.workbench_model(v, "supplies")
 	assert_that(supplies[0].button).is_equal({"label": "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": "craft_torch"}})
 	assert_str(str(supplies[0].yield)).is_equal("You get 2")

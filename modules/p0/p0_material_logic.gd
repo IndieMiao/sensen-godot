@@ -68,8 +68,9 @@ static func reset_notice(view: Dictionary, shown_at: float) -> String:
 
 # --- Inside the mine ---
 
-## Main action key in the mine. ctx: {floor: int, target: "rock" | "stairs" | "elevator" | "", rock: int, item: String}
-## where item is the quick-bar selection ("torch" or ""). Rocks and stairs never respond to taps (LOCK-02).
+## Main action key in the mine. ctx: {floor: int, target: "rock" | "stairs" | "up" | "exit" | "elevator" | "", rock: int,
+## item: String} where item is the quick-bar selection ("torch" or ""). Rocks and stairs never respond to taps (LOCK-02).
+## Every 0-Energy move reads "· Free" (Exit mine · Free, Floor 1 · Free; Li Bai q(46)).
 static func mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 	var mine: Dictionary = view.get("mine", {})
 	var n := int(ctx.get("floor", 1))
@@ -82,6 +83,10 @@ static func mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 	match str(ctx.get("target", "")):
 		"elevator":
 			return _key("elevator", "Elevator", "Free", {"type": "elevator"})
+		"exit":
+			return _key("stairs", "Exit mine", "Free", {"type": "mine_exit"})
+		"up":
+			return _key("stairs", "Floor %d" % (n - 1), "Free", {"type": "mine_floor", "floor": n - 1})
 		"stairs":
 			var next := _floor(view, n + 1)
 			if next.is_empty(): return _key("stairs", "Stairs", "Deepest floor", {}, false)
@@ -172,7 +177,7 @@ static func gather_marks(view: Dictionary) -> Array:
 		out.append(mark)
 	return out
 
-## Today line 2 (§13.2.2): "Timber Grove ready in 2h 10m" for the soonest open spot that is not ready; "" if one is ready.
+## Today line 2 (§13.2.2, q(46) wording): "Timber Grove · Ready in 2h 10m" for the soonest open spot that is not ready; "" if one is ready.
 static func today_gather_line(view: Dictionary) -> String:
 	var best := {}
 	for sp in view.get("gather", {}).get("spots", []):
@@ -180,7 +185,7 @@ static func today_gather_line(view: Dictionary) -> String:
 		if sp.get("ready", false): return ""
 		if best.is_empty() or float(sp.get("ready_in", 0)) < float(best.get("ready_in", 0)): best = sp
 	if best.is_empty(): return ""
-	return "%s ready in %s" % [str(best.get("name", "")), P0Logic.duration(float(best.get("ready_in", 0)))]
+	return "%s · Ready in %s" % [str(best.get("name", "")), P0Logic.duration(float(best.get("ready_in", 0)))]
 
 ## Floats for one gather event: "+6 Timber" per item (both storage and bag parts).
 static func gather_floats(view: Dictionary, e: Dictionary) -> Array:
@@ -189,23 +194,22 @@ static func gather_floats(view: Dictionary, e: Dictionary) -> Array:
 		out.append("+%d %s" % [int(it[1]), P0Logic.item_name(view, str(it[0]))])
 	return out
 
-## Coming home (q(40)): "Stored · Stone ×12 · Copper Ore ×3" once per new storage.auto.at.
+## Coming home (q(40)): "Stored · 12 Stone · 3 Copper Ore" once per new storage.auto.at (number first, appendix B).
 static func stored_notice(view: Dictionary, shown_at: float) -> String:
 	var auto = view.get("storage", {}).get("auto", null)
 	if auto == null or float(auto.get("at", 0)) <= shown_at: return ""
 	var parts: Array = []
-	for it in auto.get("items", []): parts.append("%s ×%d" % [P0Logic.item_name(view, str(it[0])), int(it[1])])
+	for it in auto.get("items", []): parts.append("%d %s" % [int(it[1]), P0Logic.item_name(view, str(it[0]))])
 	return "Stored · " + " · ".join(parts)
 
 # --- Workbench (B2-06) ---
 
-## Effect line under each recipe name (LOCK-29; q(45) gloves sentence).
-## TODO(SGODOT-231): the Compost line waits for Li Bai's final copy.
+## Effect line under each recipe name (LOCK-29; q(45) gloves sentence; Compost per Li Bai / Anqila, B2-06).
 const EFFECTS := {
 	"pick_copper": "2 Stone per rock",
 	"gather_gloves": "+1 at every gathering spot",
 	"torch": "See what rocks hold",
-	"fert_compost": "Crops ripen 20% sooner",
+	"fert_compost": "Crops ready 20% sooner",
 }
 
 ## Cards for one tab ("tools" | "supplies"): icon, name, effect, NEED-TILE costs, Supplies yield/have, one button.
@@ -232,7 +236,7 @@ static func _craft_button(r: Dictionary) -> Dictionary:
 		if str(r.get("to", "")) == "gear":
 			if r.get("equipped", false): return {"label": "Equipped", "kind": "done", "cmd": {}}
 			return {"label": "Equip", "kind": "secondary", "cmd": {"type": "equip", "item": str(r.get("item", ""))}}
-		return {"label": "Owned", "kind": "done", "cmd": {}}   # TODO(SGODOT-231): gloves' owned label waits for Li Bai
+		return {"label": "Owned · always on", "kind": "done", "cmd": {}}   # Gather Gloves (B2-06 GLOVES-DONE)
 	var block = r.get("block", null)
 	if block == null: return {"label": "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": str(r.get("id", ""))}}
 	var d: Dictionary = block.get("detail", {})
