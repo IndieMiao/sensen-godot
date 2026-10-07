@@ -1,0 +1,27 @@
+{
+  "previous_reference_pixel": [
+    1245,
+    760
+  ],
+  "previous_runtime_pixel": [
+    1135,
+    850
+  ],
+  "previous_reference_RGB": [
+    152,
+    109,
+    89
+  ],
+  "previous_R21_runtime_RGB": [
+    52,
+    59,
+    69
+  ],
+  "previous_R21_hue_difference": 163.754,
+  "reason": "Mismatched illumination zones: reference below warm lantern; old runtime point outside lantern pool. Cold unlit walls intentionally preserve cool gray under the latest review.",
+  "new_lit_runtime_pixel": [
+    1194,
+    790
+  ],
+  "sampling_rule": "Same wall surface directly below the lantern. Original reference point retained. Inspect r21-changes.jpg and colour-patch-comparison.jpg."
+}

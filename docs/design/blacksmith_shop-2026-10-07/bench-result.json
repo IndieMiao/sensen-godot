@@ -63,7 +63,7 @@
 				"name": "left_front",
 				"reached": true,
 				"remaining_m": 0.0722875148057938,
-				"seconds": 0.067,
+				"seconds": 0.05,
 				"target": [
 					-1.54999995231628,
 					0.0820000022649765,
@@ -89,7 +89,7 @@
 				"name": "left_bench",
 				"reached": true,
 				"remaining_m": 0.0699983835220337,
-				"seconds": 0.5,
+				"seconds": 0.499,
 				"target": [
 					-1.48000001907349,
 					0.0820000022649765,
@@ -274,7 +274,7 @@
 				],
 				"reached": false,
 				"remaining_m": 1.38749980926514,
-				"seconds": 0.866,
+				"seconds": 0.867,
 				"target": [
 					0.150000005960464,
 					0.0820000022649765,
@@ -292,7 +292,7 @@
 				],
 				"final": [
 					-1.39999997615814,
-					0.0738635882735252,
+					0.0821441262960434,
 					-1.25
 				],
 				"from": [
@@ -301,8 +301,8 @@
 					-0.75
 				],
 				"reached": false,
-				"remaining_m": 0.950034916400909,
-				"seconds": 0.867,
+				"remaining_m": 0.950000047683716,
+				"seconds": 0.883,
 				"target": [
 					-1.39999997615814,
 					0.0820000022649765,
@@ -386,7 +386,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.523533463478088,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					1.5,
 					0.0820000022649765,
@@ -486,7 +486,8 @@
 					0.0786075592041016,
 					0.0101561173796654,
 					-1.10485517978668
-				]
+				],
+				"wall_torso_ray": {}
 			},
 			"name": "Diagonal collision preserves wall sliding",
 			"passed": true
@@ -563,7 +564,7 @@
 		}
 	],
 	"passed": true,
-	"pid": 1141567,
+	"pid": 1153098,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -603,7 +604,7 @@
 			"name": "left_front",
 			"reached": true,
 			"remaining_m": 0.0722875148057938,
-			"seconds": 0.067,
+			"seconds": 0.05,
 			"target": [
 				-1.54999995231628,
 				0.0820000022649765,
@@ -625,7 +626,7 @@
 			"name": "left_bench",
 			"reached": true,
 			"remaining_m": 0.0699983835220337,
-			"seconds": 0.5,
+			"seconds": 0.499,
 			"target": [
 				-1.48000001907349,
 				0.0820000022649765,

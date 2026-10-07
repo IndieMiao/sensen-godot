@@ -9,6 +9,7 @@ func _ready() -> void:
   var node := get_node(NodePath(placement.name)) as Node3D
   if placement.has("scale"): node.scale = _vec(placement.scale)
   _multiply_emission(node)
+  if placement.name == "fire": _fire_material(node)
  for lamp: Dictionary in layout.get("local_lights", []):
   var light := OmniLight3D.new()
   light.name = "LocalLight_" + str(lamp.name)
@@ -27,3 +28,11 @@ func _multiply_emission(node: Node) -> void:
   if material and material.emission_enabled:
    material.emission_operator = BaseMaterial3D.EMISSION_OP_MULTIPLY
  for child in node.get_children(): _multiply_emission(child)
+
+func _fire_material(node: Node) -> void:
+ if node is MeshInstance3D:
+  var material := node.material_override as StandardMaterial3D
+  material.albedo_texture = load(kit_path + "/fire_gradient.png")
+  material.emission_texture = material.albedo_texture
+  material.albedo_color = Color("ffc487")
+ for child in node.get_children(): _fire_material(child)

@@ -1,9 +1,9 @@
 {
-  "revision": "r2",
+  "revision": "r21",
   "reference_sha256": "c9a36a357cc71217b4771613b44d4db121132f1ac8b26f8db130190840aad8ab",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "draw_calls": 16.0,
+    "draw_calls": 17.0,
     "instances": 54,
     "renderer": "mobile",
     "resolution": [
@@ -12,58 +12,63 @@
     ],
     "scope": "offline art render; no mobile/gameplay/performance acceptance",
     "slug": "blacksmith_shop",
-    "static_surfaces": 18,
+    "static_surfaces": 19,
     "views": [
       {
-        "draw_calls": 20.0,
-        "rendered_objects": 20.0,
+        "draw_calls": 21.0,
+        "rendered_objects": 21.0,
         "view": "godot-whole"
       },
       {
-        "draw_calls": 20.0,
-        "rendered_objects": 20.0,
+        "draw_calls": 21.0,
+        "rendered_objects": 21.0,
         "view": "model-front"
       },
       {
-        "draw_calls": 20.0,
-        "rendered_objects": 20.0,
+        "draw_calls": 21.0,
+        "rendered_objects": 21.0,
         "view": "model-side"
       },
       {
-        "draw_calls": 20.0,
-        "rendered_objects": 20.0,
+        "draw_calls": 21.0,
+        "rendered_objects": 21.0,
         "view": "model-top"
       },
       {
-        "draw_calls": 14.0,
-        "rendered_objects": 14.0,
+        "draw_calls": 15.0,
+        "rendered_objects": 15.0,
         "view": "godot-detail"
       },
       {
-        "draw_calls": 14.0,
-        "rendered_objects": 14.0,
+        "draw_calls": 15.0,
+        "rendered_objects": 15.0,
         "view": "godot-detail-plants"
       },
       {
-        "draw_calls": 13.0,
-        "rendered_objects": 13.0,
+        "draw_calls": 14.0,
+        "rendered_objects": 14.0,
         "view": "forge-fire-detail"
       },
       {
-        "draw_calls": 16.0,
-        "rendered_objects": 16.0,
+        "draw_calls": 4.0,
+        "rendered_objects": 4.0,
+        "view": "smoke-detail"
+      },
+      {
+        "draw_calls": 17.0,
+        "rendered_objects": 17.0,
         "view": "tools-bench-detail"
       }
     ]
   },
   "budget": {
     "after": {
-      "room_triangles": 85352,
+      "room_triangles": 95578,
       "shared_plant_triangles": 4096,
       "room_botanical_triangles": 0,
       "plant_triangles": 4096,
-      "total_triangles": 89448,
-      "static_surfaces": 18
+      "total_triangles": 99674,
+      "static_surfaces": 19
     },
     "limits": {
       "total_triangles": 200000,
@@ -102,7 +107,6 @@
           "back_wall",
           "forge_hood",
           "smoke",
-          "forge_coals",
           "forge_sign",
           "hammer_wall",
           "tongs_wall",
@@ -124,7 +128,7 @@
           "wall_tong_4",
           "wall_tong_5"
         ],
-        "triangles": 19474,
+        "triangles": 25514,
         "cast_shadow": true
       },
       {

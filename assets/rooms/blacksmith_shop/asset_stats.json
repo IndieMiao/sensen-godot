@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3472555
+    "bytes": 3478675
   },
   "assets": [
     {
@@ -14,63 +14,63 @@
       "vertices": 4912,
       "triangles": 9476,
       "surfaces": 1,
-      "bytes": 327200
+      "bytes": 327296
     },
     {
       "name": "window_wall",
       "vertices": 920,
       "triangles": 1800,
       "surfaces": 1,
-      "bytes": 58164
+      "bytes": 59028
     },
     {
       "name": "back_wall",
       "vertices": 728,
       "triangles": 1424,
       "surfaces": 1,
-      "bytes": 46364
+      "bytes": 47036
     },
     {
       "name": "brick_forge",
       "vertices": 7140,
       "triangles": 13764,
       "surfaces": 1,
-      "bytes": 523400
+      "bytes": 532200
     },
     {
       "name": "forge_hood",
       "vertices": 1312,
       "triangles": 2532,
       "surfaces": 1,
-      "bytes": 74424
+      "bytes": 74680
     },
     {
       "name": "smoke",
-      "vertices": 1032,
-      "triangles": 2016,
+      "vertices": 5156,
+      "triangles": 10296,
       "surfaces": 1,
-      "bytes": 66456
+      "bytes": 228140
     },
     {
       "name": "fire",
-      "vertices": 840,
-      "triangles": 1344,
+      "vertices": 1078,
+      "triangles": 2128,
       "surfaces": 1,
-      "bytes": 36288
+      "bytes": 48476
     },
     {
       "name": "forge_coals",
-      "vertices": 1176,
-      "triangles": 2240,
+      "vertices": 1809,
+      "triangles": 3402,
       "surfaces": 1,
-      "bytes": 77544
+      "bytes": 79680
     },
     {
       "name": "forge_sign",
       "vertices": 5290,
       "triangles": 5594,
       "surfaces": 1,
-      "bytes": 290820
+      "bytes": 290564
     },
     {
       "name": "hammer_wall",
@@ -105,14 +105,14 @@
       "vertices": 1356,
       "triangles": 2628,
       "surfaces": 1,
-      "bytes": 78212
+      "bytes": 77828
     },
     {
       "name": "tool_shelf_mugs",
       "vertices": 484,
       "triangles": 936,
       "surfaces": 1,
-      "bytes": 39868
+      "bytes": 39484
     },
     {
       "name": "quench_barrel",
@@ -126,21 +126,21 @@
       "vertices": 3832,
       "triangles": 7400,
       "surfaces": 1,
-      "bytes": 333512
+      "bytes": 337512
     },
     {
       "name": "anvil_workbench",
       "vertices": 1328,
       "triangles": 2560,
       "surfaces": 1,
-      "bytes": 89964
+      "bytes": 90476
     },
     {
       "name": "main_anvil",
       "vertices": 448,
       "triangles": 852,
       "surfaces": 1,
-      "bytes": 42056
+      "bytes": 42088
     },
     {
       "name": "heated_bar_glow",
@@ -161,7 +161,7 @@
       "vertices": 108,
       "triangles": 212,
       "surfaces": 1,
-      "bytes": 8600
+      "bytes": 9432
     },
     {
       "name": "metal_ingot_crate",
@@ -189,14 +189,14 @@
       "vertices": 1325,
       "triangles": 2622,
       "surfaces": 1,
-      "bytes": 99376
+      "bytes": 98896
     },
     {
       "name": "tool_bucket",
       "vertices": 3148,
       "triangles": 6108,
       "surfaces": 1,
-      "bytes": 294144
+      "bytes": 293632
     },
     {
       "name": "forge_stool",
@@ -217,84 +217,84 @@
       "vertices": 144,
       "triangles": 260,
       "surfaces": 1,
-      "bytes": 12792
+      "bytes": 13432
     },
     {
       "name": "right_wall_shelf",
       "vertices": 410,
       "triangles": 792,
       "surfaces": 1,
-      "bytes": 31780
+      "bytes": 32036
     },
     {
       "name": "hammer_variant_0",
       "vertices": 154,
       "triangles": 292,
       "surfaces": 1,
-      "bytes": 12992
+      "bytes": 12864
     },
     {
       "name": "hammer_variant_1",
       "vertices": 154,
       "triangles": 292,
       "surfaces": 1,
-      "bytes": 12992
+      "bytes": 12864
     },
     {
       "name": "hammer_variant_2",
       "vertices": 154,
       "triangles": 292,
       "surfaces": 1,
-      "bytes": 12992
+      "bytes": 12864
     },
     {
       "name": "tong_variant_0",
       "vertices": 148,
       "triangles": 284,
       "surfaces": 1,
-      "bytes": 14096
+      "bytes": 13776
     },
     {
       "name": "tong_variant_1",
       "vertices": 148,
       "triangles": 284,
       "surfaces": 1,
-      "bytes": 14412
+      "bytes": 14156
     },
     {
       "name": "tong_variant_2",
       "vertices": 148,
       "triangles": 284,
       "surfaces": 1,
-      "bytes": 14096
+      "bytes": 14032
     },
     {
       "name": "bench_tongs",
       "vertices": 64,
       "triangles": 120,
       "surfaces": 1,
-      "bytes": 6188
+      "bytes": 6348
     },
     {
       "name": "barrel_towel",
       "vertices": 72,
       "triangles": 140,
       "surfaces": 1,
-      "bytes": 6756
+      "bytes": 6820
     },
     {
       "name": "shelf_green_cloth",
       "vertices": 72,
       "triangles": 140,
       "surfaces": 1,
-      "bytes": 6768
+      "bytes": 6832
     },
     {
       "name": "green_apron",
       "vertices": 86,
       "triangles": 164,
       "surfaces": 1,
-      "bytes": 8048
+      "bytes": 8176
     },
     {
       "name": "left_floor_crate",
@@ -308,14 +308,14 @@
       "vertices": 200,
       "triangles": 384,
       "surfaces": 1,
-      "bytes": 15332
+      "bytes": 15460
     },
     {
       "name": "coal_shovel",
       "vertices": 112,
       "triangles": 212,
       "surfaces": 1,
-      "bytes": 10552
+      "bytes": 10488
     },
     {
       "name": "bench_vise",
@@ -332,20 +332,20 @@
       "bytes": 5088
     }
   ],
-  "unique_triangles": 83064,
-  "scene_triangles": 85352,
+  "unique_triangles": 93290,
+  "scene_triangles": 95578,
   "static_draw_surfaces": 52,
   "unique_assets": 46,
   "placed_instances": 52,
-  "glb_bytes": 3316028,
+  "glb_bytes": 3506436,
   "scene_budget": {
     "after": {
-      "room_triangles": 85352,
+      "room_triangles": 95578,
       "shared_plant_triangles": 4096,
       "room_botanical_triangles": 0,
       "plant_triangles": 4096,
-      "total_triangles": 89448,
-      "static_surfaces": 18
+      "total_triangles": 99674,
+      "static_surfaces": 19
     },
     "limits": {
       "total_triangles": 200000,
@@ -384,7 +384,6 @@
           "back_wall",
           "forge_hood",
           "smoke",
-          "forge_coals",
           "forge_sign",
           "hammer_wall",
           "tongs_wall",
@@ -406,7 +405,7 @@
           "wall_tong_4",
           "wall_tong_5"
         ],
-        "triangles": 19474,
+        "triangles": 25514,
         "cast_shadow": true
       },
       {
@@ -430,5 +429,14 @@
         "cast_shadow": false
       }
     ]
+  },
+  "fire_gradient": {
+    "file": "fire_gradient.png",
+    "size": [
+      32,
+      128
+    ],
+    "source": "accepted SGODOT-172 R2.1",
+    "bytes": 568
   }
 }

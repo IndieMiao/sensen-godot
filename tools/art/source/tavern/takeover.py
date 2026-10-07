@@ -137,7 +137,7 @@ def finish(d,corners,reference_size,footprint):
     sync();bind()
     from liubei_r2 import fit_camera
     fit_camera(d,reference_size,corners,footprint)
-    d['revision']='R2';d.setdefault('shared_plants',[]);d.setdefault('material_overrides',{});d.setdefault('botanical_assets',[])
+    d.setdefault('revision','R2');d.setdefault('shared_plants',[]);d.setdefault('material_overrides',{});d.setdefault('botanical_assets',[])
     p.MANIFEST_EXTRA.update(d)
     p.finalize(d['camera'],d['review_lighting'])
     # Include the same shared editable plant source instances without flattening them.

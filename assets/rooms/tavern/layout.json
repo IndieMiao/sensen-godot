@@ -1327,10 +1327,10 @@
     1.5
   ],
   "review_lighting": {
-    "ambient": 0.27,
-    "ambient_color": "BEC8C8",
-    "sun": 0.62,
-    "sun_color": "EDE0C9",
+    "ambient": 0.32,
+    "ambient_color": "E2C3A0",
+    "sun": 0.77,
+    "sun_color": "FFD3A3",
     "sun_position": [
       5,
       8,
@@ -1343,15 +1343,16 @@
     ],
     "points": []
   },
+  "revision": "R2.1",
   "shared_plants": [
     {
       "name": "FrontTerracottaMonstera",
       "asset": "monstera",
       "file": "res://assets/rooms/_shared/plants/monstera.glb",
       "position": [
-        2.03,
+        2.96,
         0.082,
-        2.92
+        2.96
       ],
       "rotation_degrees": [
         0,
@@ -1425,9 +1426,9 @@
       "asset": "pot_terracotta",
       "file": "res://assets/rooms/_shared/plants/pot_terracotta.glb",
       "position": [
-        2.03,
+        2.96,
         0.082,
-        2.92
+        2.96
       ],
       "rotation_degrees": [
         0,
@@ -1447,14 +1448,16 @@
   ],
   "material_overrides": {
     "lantern_glow": {
-      "emission": "FFDC88",
+      "emission": "FF8E24",
       "emission_use_atlas": true,
-      "emission_energy": 2.7
+      "emission_energy": 0.24,
+      "unshaded": true
     },
     "candle_glow": {
-      "emission": "FFE1A3",
+      "emission": "FF9D32",
       "emission_use_atlas": true,
-      "emission_energy": 3.0
+      "emission_energy": 0.3,
+      "unshaded": true
     },
     "tavern_window_garden": {
       "unshaded": true
@@ -1468,9 +1471,9 @@
         2.38,
         -2.43
       ],
-      "energy": 1.05,
-      "range": 1.45,
-      "color": "FFC16C"
+      "energy": 2.1,
+      "range": 2.001,
+      "color": "FFBF76"
     },
     {
       "name": "chandelier",
@@ -1479,9 +1482,9 @@
         2.68,
         0.1
       ],
-      "energy": 1.6,
-      "range": 1.8,
-      "color": "FFC16C"
+      "energy": 3.2,
+      "range": 2.484,
+      "color": "FFBF76"
     },
     {
       "name": "left_wall",
@@ -1490,9 +1493,9 @@
         2.06,
         2.22
       ],
-      "energy": 1.15,
-      "range": 1.35,
-      "color": "FFC16C"
+      "energy": 2.3,
+      "range": 1.863,
+      "color": "FFBF76"
     },
     {
       "name": "bar_left",
@@ -1501,9 +1504,9 @@
         2.9,
         -2.87
       ],
-      "energy": 1.1,
-      "range": 1.45,
-      "color": "FFC16C"
+      "energy": 1.375,
+      "range": 2.001,
+      "color": "FFBF76"
     },
     {
       "name": "bar_right",
@@ -1512,9 +1515,9 @@
         2.9,
         -2.87
       ],
-      "energy": 1.1,
-      "range": 1.45,
-      "color": "FFC16C"
+      "energy": 1.375,
+      "range": 2.001,
+      "color": "FFBF76"
     },
     {
       "name": "right_wall",
@@ -1523,9 +1526,9 @@
         2.49,
         -2.87
       ],
-      "energy": 0.95,
-      "range": 1.35,
-      "color": "FFC16C"
+      "energy": 1.9,
+      "range": 1.863,
+      "color": "FFBF76"
     },
     {
       "name": "left_table",
@@ -1534,9 +1537,9 @@
         1.57,
         0.95
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
     },
     {
       "name": "front_table",
@@ -1545,9 +1548,9 @@
         1.45,
         1.9200000000000002
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
     },
     {
       "name": "right_table",
@@ -1556,9 +1559,9 @@
         1.45,
         0.94
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
     },
     {
       "name": "bar_left_candle",
@@ -1567,9 +1570,9 @@
         1.7,
         -1.4
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 0.6,
+      "range": 1.5,
+      "color": "FFAE50"
     },
     {
       "name": "bar_right_candle",
@@ -1578,9 +1581,9 @@
         1.7,
         -1.2
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 0.6,
+      "range": 1.5,
+      "color": "FFAE50"
     },
     {
       "name": "shelf_candle",
@@ -1589,17 +1592,17 @@
         1.95,
         0.03
       ],
-      "energy": 0.75,
-      "range": 1.3,
-      "color": "FFCA77"
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
     }
   ],
   "lighting": {
     "background": "D9DDD1",
-    "ambient": "BEC8C8",
-    "ambient_energy": 0.27,
-    "sun_color": "EDE0C9",
-    "sun_energy": 0.62,
+    "ambient": "E2C3A0",
+    "ambient_energy": 0.32,
+    "sun_color": "FFD3A3",
+    "sun_energy": 0.77,
     "sun_position": [
       5,
       8,
@@ -2026,7 +2029,6 @@
     },
     "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
   },
-  "revision": "R2",
   "render_batches": [
     {
       "name": "front_dressing",

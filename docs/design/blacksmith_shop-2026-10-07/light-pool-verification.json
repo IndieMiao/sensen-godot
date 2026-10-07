@@ -12,7 +12,7 @@
         895
       ],
       "patch_size": 17,
-      "mean_rgb_255_gain": 3.698,
+      "mean_rgb_255_gain": 3.604,
       "passed": true
     },
     {
@@ -27,7 +27,7 @@
         925
       ],
       "patch_size": 17,
-      "mean_rgb_255_gain": 15.314,
+      "mean_rgb_255_gain": 15.285,
       "passed": true
     },
     {
@@ -42,7 +42,7 @@
         960
       ],
       "patch_size": 17,
-      "mean_rgb_255_gain": 3.671,
+      "mean_rgb_255_gain": 3.603,
       "passed": true
     }
   ],

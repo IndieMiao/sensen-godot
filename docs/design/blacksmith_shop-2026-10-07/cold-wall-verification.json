@@ -1,0 +1,32 @@
+{
+  "method": "Same unlit plaster surface and camera, 9x9 median RGB; demonstrates cold/dark correction separately from lit-surface hue test.",
+  "samples": [
+    {
+      "revision": "R2",
+      "pixel": [
+        210,
+        845
+      ],
+      "median_RGB": [
+        94,
+        83,
+        75
+      ]
+    },
+    {
+      "revision": "R2.1",
+      "pixel": [
+        210,
+        845
+      ],
+      "median_RGB": [
+        48,
+        55,
+        69
+      ]
+    }
+  ],
+  "albedo_before": "766D65",
+  "albedo_after": "4E565F",
+  "review": "Visual acceptance pending art director."
+}

@@ -1,4 +1,4 @@
-"""SGODOT-177 R2: dark timber tavern, 172 structure, varied props and local lamplight."""
+"""SGODOT-177 R2.1: dark timber tavern, 172 structure, varied props and local lamplight."""
 import math,random,json
 from mathutils import Matrix,Vector
 import bpy
@@ -56,7 +56,7 @@ def wall_panels():
     for name in ('window_wall','back_wall'):
         for o in p.KITS[name]['objects']:
             if 'plaster infill' not in o.name.lower():continue
-            mat=material('734B32','wood').copy();mat.name='Tavern varied wide timber '+name;o.data.materials.clear();o.data.materials.append(mat)
+            mat=material('8A5B3C','wood').copy();mat.name='Tavern varied wide timber '+name;o.data.materials.clear();o.data.materials.append(mat)
             nt=mat.node_tree;bsdf=nt.nodes.get('Principled BSDF');base=bsdf.inputs['Base Color'].links[0].from_socket
             geo=nt.nodes.new('ShaderNodeNewGeometry');sep=nt.nodes.new('ShaderNodeSeparateXYZ');nt.links.new(geo.outputs['Position'],sep.inputs[0])
             def op(kind,a,b):
@@ -75,7 +75,7 @@ def wall_panels():
         length=6.8 if name=='window_wall' else 7.4
         for x in [(-length/2+.28)+i*.20 for i in range(int((length-.4)/.20))]:
             if name=='window_wall' and 1.83<x<3.17:continue
-            cube('Lower vertical oak wainscot',(x,.40,.115),(.188,.72,.032),['624630','72513A','694A33'][int(abs(x)*10)%3],.005,'wood','Y')
+            cube('Lower vertical oak wainscot',(x,.40,.115),(.188,.72,.032),['735338','866043','7C583C'][int(abs(x)*10)%3],.005,'wood','Y')
         t.remove_matching(name,['timber dado rail'])
         if name=='window_wall':
             for x,w in [(-.72,4.92),(3.23,.13)]:cube('Dark dado rail around arch',(x,.84,.155),(w,.105,.095),'oak_edge',.022,'wood')
@@ -142,7 +142,7 @@ def details():
 
 
 def revise():
-    p.b.PALETTE.update({'oak':'795437','oak_light':'A27346','oak_edge':'60452F','oak_end':'795437','oak_dark':'3D2D22','floor':'986B43','floor_light':'A27247','floor_shade':'906440','joint':'58412B','iron':'333731','iron_edge':'4C4C43','linen_green':'777B54','linen_dark':'596247'})
+    p.b.PALETTE.update({'oak':'8D623E','oak_light':'B88451','oak_edge':'60452F','oak_end':'8D623E','oak_dark':'3D2D22','floor':'B78050','floor_light':'C18855','floor_shade':'AA774C','joint':'58412B','iron':'333731','iron_edge':'4C4C43','linen_green':'777B54','linen_dark':'596247'})
     t.structure(7.4,6.8,3.8);wall_panels()
     # Preserve the Basic Room scale: table tops 1.04–1.21m and stool seats 0.65/0.78m.
     t.stretch('round_table',(1,1.18,1));t.stretch('bar_stool',(1,.95,1))
@@ -185,15 +185,18 @@ def revise():
         instance('lantern_glow','saloon_sconce_glow_'+str(idx),(-3.45,2.38,z),90)
     for name,at in [('bar_candle_left',(-.70,1.418,-1.40)),('bar_candle_right',(.90,1.418,-1.20)),('shelf_candle',(-3.18,1.67,.03))]:
         instance('table_candle',name,at);instance('candle_glow',name+'_flame',(at[0],at[1]+.28,at[2]))
-    d={};t.add_plant(d,'FrontTerracottaMonstera','monstera', (2.03,.082,2.92),.94,25,colliders=[{'at':[0,.20,0],'size':[.39,.40,.39]}]);t.add_plant(d,'ShelfPothos','pothos',(-3.30,1.65,.65),.68,90);t.add_plant(d,'RightShelfPothos','pothos',(2.25,2.22,-3.12),.54)
+    for name,color in [('lantern_glow','FFAB49'),('candle_glow','FFBD59')]:
+        for o in p.KITS[name]['objects']:
+            o.data.materials.clear();o.data.materials.append(material(color));o['atlas_constant_colour']=True
+    d={'revision':'R2.1'};t.add_plant(d,'FrontTerracottaMonstera','monstera', (2.96,.082,2.96),.94,25,colliders=[{'at':[0,.20,0],'size':[.39,.40,.39]}]);t.add_plant(d,'ShelfPothos','pothos',(-3.30,1.65,.65),.68,90);t.add_plant(d,'RightShelfPothos','pothos',(2.25,2.22,-3.12),.54)
     d['botanical_assets']=['tavern_window_garden']
-    d['material_overrides']={'lantern_glow':{'emission':'FFDC88','emission_use_atlas':True,'emission_energy':2.7},'candle_glow':{'emission':'FFE1A3','emission_use_atlas':True,'emission_energy':3.0},'tavern_window_garden':{'unshaded':True}}
+    d['material_overrides']={'lantern_glow':{'emission':'FF8E24','emission_use_atlas':True,'emission_energy':.24,'unshaded':True},'candle_glow':{'emission':'FF9D32','emission_use_atlas':True,'emission_energy':.30,'unshaded':True},'tavern_window_garden':{'unshaded':True}}
     d['local_lights']=[]
     lamps=[('saloon_pair',[-3.18,2.38,-2.43],1.05,1.45),('chandelier',[-2.2,2.68,.1],1.6,1.8),('left_wall',[-3.23,2.06,2.22],1.15,1.35),('bar_left',[-1.31,2.90,-2.87],1.1,1.45),('bar_right',[1.56,2.90,-2.87],1.1,1.45),('right_wall',[3.12,2.49,-2.87],.95,1.35)]
-    for name,pos,e,ran in lamps:d['local_lights'].append({'name':name,'position':pos,'energy':e,'range':ran,'color':'FFC16C'})
-    for name,pos in [('left_table',[-2.12,1.57,.95]),('front_table',[.10,1.45,2.18]),('right_table',[2.50,1.45,.94]),('bar_left_candle',[-.70,1.70,-1.40]),('bar_right_candle',[.90,1.70,-1.20]),('shelf_candle',[-3.18,1.95,.03])]:d['local_lights'].append({'name':name,'position':pos,'energy':.75,'range':1.30,'color':'FFCA77'})
-    d['lighting']={'background':'D9DDD1','ambient':'BEC8C8','ambient_energy':.27,'sun_color':'EDE0C9','sun_energy':.62,'sun_position':[5,8,4],'sun_target':[0,0,-1],'angular_distance':6,'lamps':[]}
-    d['review_lighting']={'ambient':.27,'ambient_color':'BEC8C8','sun':.62,'sun_color':'EDE0C9','sun_position':[5,8,4],'sun_target':[0,0,-1],'points':[]}
+    for name,pos,e,ran in lamps:d['local_lights'].append({'name':name,'position':pos,'energy':e*(1.25 if name.startswith('bar_') else 2.0),'range':ran*1.38,'color':'FFBF76'})
+    for name,pos in [('left_table',[-2.12,1.57,.95]),('front_table',[.10,1.45,2.18]),('right_table',[2.50,1.45,.94]),('bar_left_candle',[-.70,1.70,-1.40]),('bar_right_candle',[.90,1.70,-1.20]),('shelf_candle',[-3.18,1.95,.03])]:d['local_lights'].append({'name':name,'position':pos,'energy':(.60 if name.startswith('bar_') else 1.05),'range':1.50,'color':'FFAE50'})
+    d['lighting']={'background':'D9DDD1','ambient':'E2C3A0','ambient_energy':.32,'sun_color':'FFD3A3','sun_energy':.77,'sun_position':[5,8,4],'sun_target':[0,0,-1],'angular_distance':6,'lamps':[]}
+    d['review_lighting']={'ambient':.32,'ambient_color':'E2C3A0','sun':.77,'sun_color':'FFD3A3','sun_position':[5,8,4],'sun_target':[0,0,-1],'points':[]}
     d['review_views']=[{'name':'bar-stock-detail','position':[3.5,3.8,5.5],'target':[.1,2,-2.1],'size':4.8},{'name':'wheel-table-detail','position':[4.5,4.5,7],'target':[-2.0,2,.65],'size':4.7}]
     entrance=t.bounds(d,7.4,6.8,entrance_x=-1.15)
     y=.082;d['spawn']=[-1.15,y,3.12]
@@ -209,5 +212,5 @@ def revise():
     for lamp in d['local_lights']:
         if lamp['name']=='right_table':lamp['position'][0]-=.28
         if lamp['name']=='front_table':lamp['position'][2]-=.26
-    t.add_plant(d,'FrontTerracottaSleeve','pot_terracotta',(2.03,.082,2.92),1.30)
+    t.add_plant(d,'FrontTerracottaSleeve','pot_terracotta',(2.96,.082,2.96),1.30)
     t.finish(d,[(37,993),(805,1364),(1518,971)],(1547,1516),(7.8,7.2))
