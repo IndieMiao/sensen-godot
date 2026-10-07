@@ -1,0 +1,232 @@
+{
+  "floor_y": 0.08,
+  "spawn": [
+    1.4,
+    0.09,
+    1.65
+  ],
+  "route": [
+    {
+      "name": "east aisle",
+      "position": [
+        2.05,
+        0.08,
+        1.65
+      ]
+    },
+    {
+      "name": "door",
+      "position": [
+        2.05,
+        0.08,
+        -1.32
+      ],
+      "capture": "door"
+    },
+    {
+      "name": "kitchen",
+      "position": [
+        0.4,
+        0.08,
+        -1.32
+      ],
+      "capture": "main"
+    },
+    {
+      "name": "hearth",
+      "position": [
+        -1.65,
+        0.08,
+        -1.32
+      ]
+    },
+    {
+      "name": "window",
+      "position": [
+        -2.1,
+        0.08,
+        -0.48
+      ]
+    },
+    {
+      "name": "west aisle",
+      "position": [
+        -2.1,
+        0.08,
+        2.18
+      ]
+    },
+    {
+      "name": "south aisle",
+      "position": [
+        0.2,
+        0.08,
+        2.18
+      ]
+    },
+    {
+      "name": "spawn return",
+      "position": [
+        1.4,
+        0.08,
+        1.65
+      ]
+    }
+  ],
+  "blocked": [
+    {
+      "name": "table",
+      "from": [
+        0,
+        0.09,
+        1.7
+      ],
+      "to": [
+        0,
+        0.09,
+        0.62
+      ],
+      "target": "dining_table"
+    },
+    {
+      "name": "hearth",
+      "from": [
+        -2.05,
+        0.09,
+        -1.38
+      ],
+      "to": [
+        -2.05,
+        0.09,
+        -2.57
+      ],
+      "target": "hearth"
+    },
+    {
+      "name": "kitchen",
+      "from": [
+        -0.4,
+        0.09,
+        -1.38
+      ],
+      "to": [
+        -0.4,
+        0.09,
+        -2.62
+      ],
+      "target": "sink_cabinet"
+    },
+    {
+      "name": "west wall",
+      "from": [
+        -2.2,
+        0.09,
+        -0.6
+      ],
+      "to": [
+        -3.5,
+        0.09,
+        -0.6
+      ],
+      "target": "room_shell"
+    },
+    {
+      "name": "east open edge",
+      "from": [
+        2.4,
+        0.09,
+        1.6
+      ],
+      "to": [
+        3.8,
+        0.09,
+        1.6
+      ],
+      "target": "room_shell"
+    },
+    {
+      "name": "south open edge",
+      "from": [
+        0,
+        0.09,
+        2.25
+      ],
+      "to": [
+        0,
+        0.09,
+        3.8
+      ],
+      "target": "room_shell"
+    }
+  ],
+  "gaps": [
+    {
+      "name": "table-kitchen aisle",
+      "from": [
+        1.9,
+        0.09,
+        -1.25
+      ],
+      "to": [
+        -1.8,
+        0.09,
+        -1.25
+      ],
+      "measure": [
+        [
+          0,
+          0.7,
+          -2.19
+        ],
+        [
+          0,
+          0.7,
+          0.03
+        ]
+      ],
+      "minimum": 0.7,
+      "width": 2.22
+    }
+  ],
+  "slide": {
+    "from": [
+      2.6,
+      0.09,
+      1.8
+    ],
+    "direction": [
+      1,
+      0,
+      -1
+    ],
+    "tangent": [
+      0,
+      0,
+      -1
+    ],
+    "seconds": 0.6
+  },
+  "input_start": [
+    1.4,
+    0.09,
+    1.65
+  ],
+  "scale": {
+    "door": {
+      "height": 2.33,
+      "source": "Sage arched door"
+    },
+    "counter": {
+      "height": 1.1525,
+      "source": "Oak countertop top"
+    },
+    "chair": {
+      "height": 0.685,
+      "source": "Chair seat plank top"
+    },
+    "table": {
+      "height": 1.135,
+      "source": "Individual tabletop board top"
+    }
+  }
+}
