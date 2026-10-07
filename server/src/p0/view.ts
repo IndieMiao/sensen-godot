@@ -12,7 +12,11 @@ import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest } from './state.js';
 import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
 import { haveTotal, stored } from './storage.js';
+import { mineView, settleMine } from './mine.js';
+import { gatherView } from './gathering.js';
+import { workbenchView } from './workbench.js';
 import { restReadyIn } from './presence.js';
+import { inboxView, settleParcels } from './parcels.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
 export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
@@ -21,6 +25,8 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
   if (s.day.key !== dayKey(c, now)) s.day = emptyDay(dayKey(c, now));
   expireGiftMeals(s);
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
+  settleMine(c, s, now);
+  settleParcels(c, s, now);
   const skills = Object.fromEntries(SKILLS.map(skill => {
     const level = skillLevel(c, s, skill), th = c.skills[skill];
     return [skill, { level, xp: s.skills[skill], floor: th[level - 1], next: level < th.length ? th[level] : null }];
@@ -32,6 +38,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     energy: { value: s.energy.value, max: maxEnergy(c, s), next_in: nextTickIn(c, s, now), regen_ms: regenMs(c, s, now) },
     blessing: blessed(c, s, now) ? { left: s.created_at + c.blessing.days * 86_400_000 - now, regen_mult: c.blessing.regen_mult, food_bonus: c.blessing.food_bonus } : null,
     coins: s.coins,
+    inbox: inboxView(s, now),   // §10.4.8 parcels; the Inbox panel comes with stage 4, the bell reads `badge`
     skills,
     plots: s.plots.map(p => ({
       id: p.id, state: p.state === 'growing' && (p.ready_at ?? Infinity) <= now ? 'ready' : p.state,
@@ -47,7 +54,11 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     drinks: drinksView(c, s, now),
     shops: Object.fromEntries(SHOPS.map(shop => [shop, shopView(c, s, shop)])),
     quotas: Object.fromEntries((Object.keys(c.quotas) as QuotaId[]).map(q => [q, quotaView(c, s, q, now)])),
-    storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
+    storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })),
+      auto: s.storage_auto },   // last auto-store on coming home (q(40)): the client floats it once per new `at`
+    mine: mineView(c, s, now),
+    gather: gatherView(c, s, now),
+    workbench: workbenchView(c, s),
     homestead: homesteadView(c, s),
     profile: { name: c.profile.name, city: c.profile.city, climate: c.profile.climate, since_ms: s.created_at,
       farm: { name: c.profile.farm_name, level: s.homestead.level } },
@@ -101,12 +112,15 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       tiers: Object.fromEntries(Object.entries(c.cooking.tiers).map(([k, t]) => [k, { energy: t.energy, ms: t.ms, bonus: t.bonus }])),
     },
     gear: {
-      slots: { farming: s.gear.hoe, fishing: s.gear.rod, mining: c.tools.mining, combat: c.tools.combat },
+      slots: { farming: s.gear.hoe, fishing: s.gear.rod, mining: s.gear.pick, combat: c.tools.combat },
       // Hoes (§9.11.2): sow = plots per Sow action (Starter Hoe 1, Row Hoe 3).
       hoes: [c.tools.farming, c.tools.row_hoe.id].map(id => ({ id, name: itemName(c, id), owned: s.gear.hoes.includes(id),
         equipped: s.gear.hoe === id, sow: id === c.tools.row_hoe.id ? c.tools.row_hoe.sow : 1,
         price: id === c.tools.row_hoe.id ? c.tools.row_hoe.price : 0, gate: id === c.tools.row_hoe.id ? c.tools.row_hoe.gate : 1 })),
       rods: c.fishing.rods.map(r => ({ ...r, owned: s.gear.rods.includes(r.id), equipped: s.gear.rod === r.id })),
+      // Pickaxes (§13.1.3, LOCK-29): stone = Stone per rock; the Copper Pickaxe comes from the workbench, not a shop.
+      picks: Object.entries(c.mine.picks).map(([id, p]) => ({ id, name: itemName(c, id), owned: s.gear.picks.includes(id),
+        equipped: s.gear.pick === id, stone: p.stone, level: 0, price: 0, source: id === c.tools.mining ? 'start' : 'workbench' })),
     },
     tackle: {
       keeper: c.tackle.keeper,
@@ -184,6 +198,7 @@ function homesteadView(c: P0Content, s: P0State) {
       bag_upgrade_1: s.owned.includes(upgrade.id) ? 'owned' : unlocked(c, s, upgrade.id) ? 'for_sale' : 'locked',
       board_slots: boardSlots(c, s),
       fence: unlocked(c, s, 'fence'),
+      clay_bank: unlocked(c, s, 'clay_bank'),
     },
   };
 }
@@ -283,12 +298,12 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
   const meal = s.day.gift_meal === id ? 'given'
     : s.day.gift_meal ? 'none'
     : i < stages.findIndex(([n]) => n === c.affinity.gift_meal_stage) ? 'none'
-    : freeSlots(s) < 1 ? 'bag_full' : 'ready';
+    : 'ready';
   return {
     affinity: r.affinity, stage: stages[i][0], stage_from: stages[i][1],
     next_stage: stages[i + 1]?.[0] ?? null, next_at: stages[i + 1]?.[1] ?? null,
     chatted_today: r.chat_day === s.day.key, gift_today: r.gift_day === s.day.key,
-    meal,   // ready = the next talk gives today's gift meal; bag_full = it would, once a slot is free
+    meal,   // ready = the next talk gives today's gift meal (into the Inbox when the bag is full)
     request: st.req && {
       id: st.req.id, kind: st.req.need.kind, rarity: st.req.need.rarity ?? null, qty: st.req.qty, coins: st.req.coins,
       have: Math.min(st.req.qty, progressOf(c, s, id, st.req)),

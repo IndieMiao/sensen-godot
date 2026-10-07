@@ -21,6 +21,11 @@ signal place_pressed()
 signal home_requested()        # FISH-4 "Go home · Free"
 signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
 
+const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
+const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
+const _CLOSE_ABOVE_CARD := 8.0     # RES-KAI-TALK: 8 above the dialogue bar, flush with its right edge
+const _AFFINITY_INSET := 8.0       # RES-KAI-TALK: the affinity float sits 8 in from the bar's left edge …
+const _AFFINITY_ABOVE := 6.0       # … and 6 above its top
 const PAPER := Color("fbf8f1")
 const CARD := Color(0.984, 0.973, 0.945, 0.94)
 const EDGE := Color("e1dac8")
@@ -594,6 +599,10 @@ func open_bag(focus := "", side := "") -> void:
 ## A button on the bag card or a Gear row. The drawer only reports; commands go to the server from here.
 func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 	match action:
+		&"bag_room":   # BAG-5: Bag Upgrade I is a homestead matter; Show the house (or the homestead on the map)
+			close_modal()
+			if show_label("home", surface, spot_reachable()) == "Show": show_spot.emit("home")
+			else: show_on_map.emit("home")
 		&"eat":
 			var confirm := str(P0Logic.eat_button(view, id).get("confirm", ""))
 			if confirm != "" and _eat_armed != id:
@@ -1088,7 +1097,7 @@ func open_today() -> void:
 ## TodayRow action (不知火舞 on 197, 2026-10-08): a target in the current space reads `Show` and only moves the
 ## camera; a target somewhere else reads `Show on map` (the map opens on its pin). Homestead targets (plots,
 ## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button.
-const HOME_TARGETS := ["plots", "stall", "stove", "board", "home"]
+const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench"]
 
 static func show_label(go: String, here: String, camera_here: bool) -> String:
 	if go == "": return ""
@@ -1118,18 +1127,49 @@ func open_inbox() -> void:
 ## for res_pip / res_old_kai. Sends the day's `talk` (first-chat affinity, gift meal: the server decides) and
 ## shows the bar from P0Logic.resident_bar (SGODOT-228). Returns false when the view has no such resident.
 var _resident := ""
+var _reply := {}   # {id, line}: the resident's answer shown in the bubble until another resident's bar opens
 
 func open_resident(id: String) -> bool:
 	var d := P0Logic.resident_bar(view, id)
 	if d.is_empty(): return false
 	if _resident != id or modal_kind != "resident": command.emit({"type": "talk", "resident": id})
+	if _resident != id: _reply = {}
 	_resident = id
 	_show_resident(d)
 	return true
 
+## RES-KAI-TALK / RESIDENT-GIFT-MYSTERY: with the resident's bar open, an affinity change is a FloatText pill
+## (Affinity tone) over the bar's top-left, `+2 · first chat today`, and their answer replaces the bubble line until
+## another resident's bar opens. Returns false when the bar is not showing that resident (the caller floats it).
+func resident_affinity(ev: Dictionary, reply := "") -> bool:
+	var id := str(ev.get("resident", ""))
+	if modal_kind != "resident" or id != _resident or _modal == null: return false
+	if reply != "": _reply = {"id": id, "line": reply}
+	if int(ev.get("delta", 0)) == 0: return true
+	var bar: Control = _modal.get_child(1) if _modal.get_child_count() > 1 else null
+	var ft := UiFloatText.new(affinity_text(ev), UiFloatText.Tone.AFFINITY)
+	ft.theme = UiKit.theme()
+	root.add_child(ft)
+	var top_left := (bar.global_position - root.global_position) if bar != null else Vector2(UiTokens.SIZE_QUICK_BAR_X, root.size.y * 0.6)
+	ft.play(top_left + Vector2(_AFFINITY_INSET + ft.shown_size().x * 0.5, -_AFFINITY_ABOVE))
+	return true
+
+## `+2 · first chat today`, `−2 · not a fan` (RES-KAI-TALK, RESIDENT-GIFT-MYSTERY); the other reasons are 刘邦's
+## wording pending 李白 (SGODOT-225).
+static func affinity_text(ev: Dictionary) -> String:
+	var why := ""
+	match str(ev.get("reason", "")):
+		"chat": why = "first chat today"
+		"request": why = "request done"
+		"gift":
+			why = {"loved": "loved it", "liked": "liked it", "received": "thanks", "not_a_fan": "not a fan"}.get(str(ev.get("verdict", "")), "")
+	var n := ("%+d" % int(ev.get("delta", 0))).replace("-", "−")
+	return n if why == "" else "%s · %s" % [n, why]
+
 func _show_resident(d: Dictionary) -> void:
 	var data := d.duplicate()
 	data.portrait = _portrait(str(d.portrait))
+	if str(_reply.get("id", "")) == str(d.id): data.line = str(_reply.line)
 	var bar := UiResidentBar.new(data)
 	bar.theme = UiKit.theme()
 	bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
@@ -1140,9 +1180,59 @@ func _show_resident(d: Dictionary) -> void:
 	var id := str(d.id)
 	bar.gift_pressed.connect(func(): open_gift(id))
 	bar.request_pressed.connect(func(): open_resident_request(id))
-	bar.identity_pressed.connect(func(): toast("%s's page comes later" % str(d.name)))   # RES-* profile: WP5
+	bar.identity_pressed.connect(func(): open_resident_profile(id))
 	_open_modal(bar, 0.0, true)
+	_close_above(bar, _CLOSE_ABOVE_CARD)
 	modal_kind = "resident"
+
+## The name on the bar: the resident's profile sheet (RES-PIP / RES-KAI). Back returns to the bar.
+func open_resident_profile(id: String) -> void:
+	var d := resident_profile_data(view, id)
+	if d.is_empty(): return
+	var sheet := UiDrawer.new(_RESIDENT_SHEET_H)
+	sheet.pad = UiTokens.SPACE_PAGE
+	sheet.theme = UiKit.theme()
+	sheet.safe_bottom = safe_bottom()
+	var page := UiResidentProfile.new(d)
+	page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	page.back_pressed.connect(func(): open_resident(id))
+	sheet.body.add_child(page)
+	sheet.close_requested.connect(close_modal)
+	_open_modal(sheet, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(sheet, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	modal_kind = "resident_profile"
+
+## RES-PIP data: face, name, role, stage, `Friendship have/need`, favourite style with a dish of that style.
+## Details › has no page behind it in P0, so it stays hidden (TODO SGODOT-225 / 209: the resident's details page).
+static func resident_profile_data(view_: Dictionary, id: String) -> Dictionary:
+	var bar := P0Logic.resident_bar(view_, id)
+	if bar.is_empty(): return {}
+	var def: Dictionary = P0Logic.content().get("residents", {}).get(id, {})
+	var likes := str(def.get("likes", ""))
+	var dish := ""
+	for r in P0Logic.content().get("cooking", {}).get("recipes", []):
+		if str(r.get("style", "")) == likes:
+			dish = str(r.get("id", ""))
+			break
+	var face_path := "res://assets/p0/art/residents/%s.svg" % id
+	return {"face": load(face_path) if ResourceLoader.exists(face_path) else _portrait(str(def.get("portrait", ""))),
+		"name": str(bar.name), "role": str(bar.role), "stage": str(bar.stage),
+		"friendship": ("%d/%d" % [int(bar.have), int(bar.need)]) if str(bar.get("next", "")) != "" else str(int(bar.have)),
+		"likes": likes, "likes_icon": P0Logic.icon(dish) if dish != "" else null, "details": false}
+
+## A 44 Close above a bottom card or sheet, right-aligned `inset` in from its right edge and `gap` above its top
+## (Close · 44 px: 6 above a sheet, 8 above the dialogue bar). It follows the content as it slides and resizes.
+func _close_above(content: Control, gap: float, inset := 0.0) -> void:
+	var close := UiCloseButton.new()
+	close.theme = UiKit.theme()
+	close.size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE)
+	var follow := func():
+		if is_instance_valid(close):
+			close.position = content.position + Vector2(content.size.x - inset - UiTokens.SIZE_CLOSE, -gap - UiTokens.SIZE_CLOSE)
+	content.item_rect_changed.connect(follow)
+	close.pressed.connect(close_modal)
+	_modal.add_child(close)
+	follow.call()
 
 ## The resident's portrait (assets/p0/art/<key>-portrait.jpg), or none.
 static func _portrait(key: String) -> Texture2D:
@@ -1230,8 +1320,8 @@ func open_gift(id: String) -> void:
 ## details; Edit look opens the dressing room above the current world and comes back here.
 var _profile: P0ProfilePage
 
-func open_profile() -> void:
-	var page := P0ProfilePage.new(view, safe_top())
+func open_profile(look_saved := false) -> void:
+	var page := P0ProfilePage.new(view, safe_top(), look_saved)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(close_modal)
 	page.skill_pressed.connect(func(_skill: String): open_skills())
@@ -1247,9 +1337,13 @@ func edit_look() -> void:
 	var room := AppRouter.push_instance(AppRouter.DRESS)
 	if room == null: return
 	visible = false
+	var saved := [false]   # Done saves the outfit; Back drops the draft
+	var on_saved := func(_config): saved[0] = true
+	Avatar.outfit_saved.connect(on_saved)
 	room.tree_exited.connect(func():
+		Avatar.outfit_saved.disconnect(on_saved)
 		visible = true
-		open_profile(), CONNECT_ONE_SHOT)
+		open_profile(saved[0]), CONNECT_ONE_SHOT)
 
 ## SKILL-1 (P0 cut): three track cards — level ring, XP and how far to go, what the next level opens —
 ## and the "First times" collection tiles. Opened from the avatar ring.

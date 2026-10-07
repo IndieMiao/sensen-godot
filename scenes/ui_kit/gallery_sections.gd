@@ -43,6 +43,9 @@ static func all() -> Array[Dictionary]:
 		{id = "profile_parts", title = "Profile parts", figma = "ProfileTopBar 1233:107734 · ProfileMoreMenu 1233:107735 · SkillRing 1251:109246 · LOCK-22 (336 at 328)", build = _profile_parts},
 		{id = "request_card", title = "UiRequestCard", figma = "ResidentRequestCard 1211:83296 · LOCK-18 (336 at 328)", build = _request_cards},
 		{id = "resident_bar", title = "UiResidentBar", figma = "ResidentDialogue 1213:83392 Row / Stacked · LOCK-18 (336 at 328)", build = _resident_bars},
+		{id = "resident_profile", title = "UiResidentProfile", figma = "RES-PIP 482:586 / RES-KAI 482:592 · sheet content (328/360)", build = _resident_profiles},
+		{id = "notice_row", title = "UiNoticeRow", figma = "Bag capacity recovery of BAG-5 482:144 (336 at 328)", build = _notice_rows},
+		{id = "float_text", title = "UiFloatText", figma = "FloatText 1178:82191 · six tones, Hug / Wrap (static pills)", build = _float_texts},
 		# SGODOT-224 panels
 		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
 		{id = "shop_row", title = "UiShopRow · UiStepper", figma = "Compact/ShopProduct 702:80447 · Compact/Stepper 1245:108953 · FARM-6 482:46 · C1-01", build = _shop_rows},
@@ -620,6 +623,36 @@ static func _request_cards() -> Control:
 		line = "Could you catch me a fish? Any kind is fine.", needs = [{name = "Common fish", have = 0, need = 1, icon = _tex("fish_crucian")}],
 		reward = "+5 Friendship · 20 coins", deliver_to = "Pip · Travel Post"}
 	return _captioned(_at_336(UiRequestCard.new(d)), "open · Accept")
+static func _resident_profiles() -> Control:
+	var d := {face = load("res://assets/p0/art/residents/res_pip.svg"), name = "Pip", role = "Courier Kid", stage = "Familiar",
+		friendship = "52/90", likes = "Dessert", likes_icon = _tex("dish_carrot_cake")}
+	var page := UiResidentProfile.new(d)
+	page.custom_minimum_size = Vector2(296, 411)   # Profile content + fixed decision area of the 443 sheet
+	var sheet := PanelContainer.new()
+	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, 0.0)
+	box.corner_radius = Vector4(UiTokens.RADIUS_SHEET, UiTokens.RADIUS_SHEET, 0.0, 0.0)
+	sheet.add_theme_stylebox_override(&"panel", box.with_margins(UiTokens.SPACE_PAGE, UiTokens.SPACE_PAGE, UiTokens.SPACE_PAGE, UiTokens.SPACE_PAGE))
+	sheet.add_child(page)
+	return _captioned(sheet, "Details hidden in P0 (no page behind it) · Back returns to the bar")
+
+static func _notice_rows() -> Control:
+	return _captioned(_at_336(UiNoticeRow.new("Bag full · +5 slots at Homestead Lv3")), "Bag full · navigation only (LOCK-08)")
+
+static func _float_texts() -> Control:
+	var v := _column(UiTokens.SPACE_ROW)
+	var tones := [["+5 XP", UiFloatText.Tone.XP, null], ["+25 Energy", UiFloatText.Tone.ENERGY_GAIN, null],
+		["−2 Energy", UiFloatText.Tone.ENERGY_COST, null], ["+12 coins", UiFloatText.Tone.COINS, null],
+		["+2 · first chat today", UiFloatText.Tone.AFFINITY, null], ["+6 Timber", UiFloatText.Tone.ITEM, _tex("wood")]]
+	for t in tones:
+		var row := HBoxContainer.new()   # hugs the pill
+		row.add_child(UiFloatText.pill(t[0], t[1], t[2]))
+		v.add_child(row)
+	var scene := PanelContainer.new()   # a scene-dark ground so the 82 % cream backing shows
+	scene.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_BORDER, UiTokens.RADIUS_CARD)
+		.with_margins(UiTokens.SPACE_ROW, UiTokens.SPACE_ROW, UiTokens.SPACE_ROW, UiTokens.SPACE_ROW))
+	scene.add_child(v)
+	return _captioned(scene, "static look (×1.0) · play() pops, rises 48 and fades over 1100 ms")
+
 ## Specs as P0ItemInfo returns them for the F-07 states the card has to draw.
 static func _info_sheets() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)

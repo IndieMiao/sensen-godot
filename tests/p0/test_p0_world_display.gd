@@ -234,3 +234,50 @@ func test_energy_card_tea_and_rest_read_the_drinks_and_away_facts() -> void:
 	for t in P0Logic.energy_card(v, 2, "Sow ×1").tiles: tiles[t.label] = t
 	assert_str(str(tiles["Rest"].fact)).is_equal("Available")
 	assert_bool(bool(tiles["Rest"].on)).is_true()
+
+# ---------------------------------------------------------------- 225 registry additions (209 c 8cd572de)
+
+func test_rest_tile_guides_to_the_bench_and_says_the_real_gain_near_full() -> void:
+	var v := _view()
+	v.rest = {"used": 0, "limit": 1, "resets_in": 3600000, "amount": 60, "away_h": 2, "away_ready_in": 0}
+	v.energy.value = 180
+	var rest: Dictionary = P0Logic.energy_card(v, 30, "Cast").tiles.filter(func(t): return t.label == "Rest")[0]
+	assert_that([rest.guide, rest.go, rest.fact]).is_equal(["Show bench", "bench", "+20 Energy"])
+	assert_str(P0Ui.show_label("bench", "farm", true)).is_equal("Show")
+	assert_str(P0Ui.show_label("bench", "pond", true)).is_equal("Show on map")
+
+func test_resident_profile_sheet_from_the_name_on_the_bar() -> void:
+	var ui := _ui(true)
+	ui.set_view(_resident_view())
+	await get_tree().process_frame
+	var d := P0Ui.resident_profile_data(_resident_view(), "res_pip")
+	assert_that([d.name, d.role, d.stage, d.friendship, d.likes, d.details]).is_equal(["Pip", "Courier Kid", "Acquainted", "12/30", "Dessert", false])
+	assert_object(d.face).is_not_null()
+	assert_object(d.likes_icon).is_not_null()
+	ui.open_resident("res_pip")
+	(ui.find_children("*", "UiResidentBar", true, false)[0] as UiResidentBar).identity_pressed.emit()
+	await get_tree().process_frame   # the bar's modal frees on the next frame
+	assert_str(ui.modal_kind).is_equal("resident_profile")
+	assert_int(ui.find_children("*", "UiResidentProfile", true, false).size()).is_equal(1)
+	assert_int(ui.find_children("*", "UiCloseButton", true, false).size()).is_equal(1)
+	(ui.find_children("*", "UiResidentProfile", true, false)[0] as UiResidentProfile).back_pressed.emit()
+	assert_str(ui.modal_kind).is_equal("resident")   # Back returns to the bar
+
+func test_affinity_on_the_open_bar_floats_a_pill_and_puts_the_answer_in_the_bubble() -> void:
+	assert_str(P0Ui.affinity_text({"delta": 2, "reason": "chat"})).is_equal("+2 · first chat today")
+	assert_str(P0Ui.affinity_text({"delta": -2, "reason": "gift", "verdict": "not_a_fan"})).is_equal("−2 · not a fan")
+	var ui := _ui(true)
+	ui.set_view(_resident_view())
+	await get_tree().process_frame
+	assert_bool(ui.resident_affinity({"resident": "res_pip", "delta": 2, "reason": "chat"})).is_false()   # bar not open
+	ui.open_resident("res_pip")
+	await get_tree().process_frame
+	assert_bool(ui.resident_affinity({"resident": "res_pip", "delta": -2, "reason": "gift", "verdict": "not_a_fan"},
+		"Um… thanks? I'll save it for later.")).is_true()
+	var pills := ui.find_children("*", "UiFloatText", true, false)
+	assert_int(pills.size()).is_equal(1)
+	assert_str((pills[0] as UiFloatText).text).is_equal("−2 · not a fan")
+	ui.open_resident("res_pip")   # the runtime's refresh after the reply
+	await get_tree().process_frame
+	assert_str(str((ui.find_children("*", "UiResidentBar", true, false)[0] as UiResidentBar).data.line)).is_equal("Um… thanks? I'll save it for later.")
+	assert_int(ui.find_children("*", "UiCloseButton", true, false).size()).is_equal(1)

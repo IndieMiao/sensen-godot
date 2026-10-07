@@ -20,6 +20,8 @@ const _FLICK_MS := 160        # … i.e. released within this many ms of the pre
 var height := 0.0: set = set_height
 ## Bottom safe inset (gesture bar), added under the content.
 var safe_bottom := 0.0: set = set_safe_bottom
+## Content inset at the sides, top and bottom: 12 for the Bag layout, 16 for profile sheets (RES-PIP).
+var pad := _PAD: set = set_pad
 ## Slide up over MOTION_DRAWER_MS when entering the tree.
 var animate := true
 ## Content column; separation 0, the caller adds its own gaps (the Bag layout uses explicit spacers).
@@ -62,6 +64,10 @@ func set_safe_bottom(v: float) -> void:
 	safe_bottom = v
 	_restyle()
 
+func set_pad(v: float) -> void:
+	pad = v
+	_restyle()
+
 ## Height actually used: `height`, at most the parent's height.
 func _shown_height() -> float:
 	var parent := get_parent_control()
@@ -77,7 +83,7 @@ func _place() -> void:
 func _restyle() -> void:
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, 0.0)
 	box.corner_radius = Vector4(UiTokens.RADIUS_SHEET, UiTokens.RADIUS_SHEET, 0.0, 0.0)
-	add_theme_stylebox_override(&"panel", box.with_margins(_PAD, _PAD, _PAD, _PAD + safe_bottom))
+	add_theme_stylebox_override(&"panel", box.with_margins(pad, pad, pad, pad + safe_bottom))
 
 # ------------------------------------------------------------------ swipe-down close
 

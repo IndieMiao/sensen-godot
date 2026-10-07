@@ -226,8 +226,11 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 	var rest_left := int(rest.get("limit", 1)) - int(rest.get("used", 0))
 	var subtitle := "Recover or do something free" if have <= 0 else "%s needs %d Energy · you have %d" % [verb, need, have]
 	var cook := {"icon": "pot", "label": "Cook", "fact": "%d fish in creel" % fish if fish > 0 else "No fish to cook", "guide": "Show kitchen", "go": "stove", "on": fish > 0}
-	# TODO(SGODOT-224, bench): LOCK-09 guides Rest with "Show bench"; P0 has no bench, rest is at the farmhouse (197 60c82ad2).
-	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show home", "go": "home", "on": true}
+	# LOCK-09: Rest guides to the bench by the farmhouse (SGODOT-224 3fb574b0, q(30)). Near full it says the real
+	# gain, like the bench card (rest_state.button `Rest · +25 Energy`).
+	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show bench", "go": "bench", "on": true}
+	var rs := rest_state(view)
+	if str(rs.button).begins_with("Rest · "): rest_tile.fact = str(rs.button).trim_prefix("Rest · ")
 	if rest_left <= 0:
 		rest_tile.fact = "Rested today"   # the reset time is on the bench card (李白, 225)
 		rest_tile.on = false
@@ -364,7 +367,19 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 		stove["ready_in"] = maxf(0.0, float(stove.get("ready_in", 0)) - elapsed_ms)
 	var cast = v.get("fishing", {}).get("cast", null)
 	if cast is Dictionary: cast["bite_in"] = maxf(0.0, float(cast.get("bite_in", 0)) - elapsed_ms)
+	for parcel in v.get("inbox", {}).get("parcels", []):
+		parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
 	return v
+
+## LOCK-14: one float for the rewards of one server reply that did not fit the bag ("" when there is nothing to say).
+## A resident's gift meal is said by the resident bar instead (SGODOT-225), so gift parcels are left out here.
+static func parcel_toast(view: Dictionary, events: Array) -> String:
+	var parcels := events.filter(func(e): return str(e.get("kind", "")) == "parcel" and not bool(e.get("gift", false)))
+	if parcels.is_empty(): return ""
+	var waiting := parcels.all(func(e): return bool(e.get("waiting", false)))
+	var what := "%s ×%d" % [item_name(view, str(parcels[0].id)), int(parcels[0].qty)] if parcels.size() == 1 \
+		else "%d rewards" % parcels.size()
+	return ("Inbox full · %s saved for later" if waiting else "Bag full · %s sent to Inbox · 24h") % what
 
 # ---------------------------------------------------------------- M2: fishing, cooking, eating
 static func item(view: Dictionary, id: String) -> Dictionary:
@@ -643,7 +658,6 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 			reason = "No more requests"
 	var meal := str(r.get("meal", "none"))
 	var note := ""
-	if meal == "bag_full": note = "Bag full · free a slot for %s's meal" % str(def.get("name", ""))
 	return {
 		"id": id, "portrait": str(def.get("portrait", "")), "name": str(def.get("name", "")), "role": str(def.get("role", "")),
 		"stage": stage, "have": int(r.get("affinity", 0)),

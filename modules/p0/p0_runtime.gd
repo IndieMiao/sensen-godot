@@ -157,7 +157,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					last_first_catch_xp = int(ev.xp)
 				elif what.begins_with("cook:"): xp_lines.append("New recipe! · First cooked · +%d Cooking XP" % int(ev.xp))
 				elif what == "landed": xp_lines.append("First fish landed · +%d XP" % int(ev.xp))
+				elif what == "cast": xp_lines.append("First cast · +%d XP" % int(ev.xp))
+				elif what.begins_with("fishing_city:"):
+					xp_lines.append("First catch in %s · +%d XP" % [what.trim_prefix("fishing_city:").capitalize(), int(ev.xp)])
 	last_xp_lines = xp_lines
+	var parcels_said := false
 	for ev in events:
 		match str(ev.get("kind", "")):
 			"energy":
@@ -174,6 +178,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at + Vector2(0, dy), Color("4f934b"))
 			"coins":
 				ui.float_text("%+d coins" % int(ev.delta), at + Vector2(0, dy), Color("c9962a"))
+			"parcel":
+				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one float for the whole reply.
+				if not parcels_said:
+					parcels_said = true
+					var line := P0Logic.parcel_toast(v, events)
+					if line != "": ui.toast(line, 2.0)
 			"catch":
 				# A world that shows the catch itself (the open fishing panel) returns true.
 				if not bool(_call("p0_event", [ev, v])): _on_catch(ev, xp_lines)
@@ -196,10 +206,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var lv: Dictionary = ev
 				ui.queue_card(func(): ui.show_level_up(lv))
 			"affinity":   # SGODOT-225 / 228: first chat of the day, gifts, requests
-				if int(ev.get("delta", 0)) != 0:
-					ui.float_text(("♥ %+d" % int(ev.delta)).replace("-", "−"), at + Vector2(0, dy), UiTokens.COLOR_FLOAT_AFFINITY)
 				var reply := P0Logic.resident_reply(str(ev.get("resident", "")), str(ev.get("verdict", "")))
-				if reply != "": ui.toast(reply)
+				# On the resident's open bar: the Affinity pill over it and the answer in the bubble (RES-KAI-TALK).
+				if not ui.resident_affinity(ev, reply):
+					if int(ev.get("delta", 0)) != 0:
+						ui.float_text("♥ " + P0Ui.affinity_text(ev), at + Vector2(0, dy), UiTokens.COLOR_FLOAT_AFFINITY)
+					if reply != "": ui.toast(reply)
 			"gift_meal":
 				var who := str(P0Logic.content().get("residents", {}).get(str(ev.get("resident", "")), {}).get("name", ""))
 				# SGODOT-232: with the bag full the meal waits in the Inbox (to: parcel), gone at 04:00 like any gift meal.
@@ -260,7 +272,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"no_coins":
 			ui.toast("Need %d more coins" % int(detail.get("need", 0)))
 		"bag_full":
-			ui.toast("Bag full · free a slot first")
+			ui.toast("Make room · 1 slot" if str(cmd.get("type", "")).begins_with("claim_parcel") else "Bag full · free a slot first")
+		"parcel_expired", "bad_parcel":
+			ui.toast("This parcel is no longer waiting")
 		"rest_used":
 			ui.toast("Rest used today")
 		"energy_full":
@@ -336,6 +350,8 @@ func _dev_shot(dt: float) -> void:
 			"gear": ui.open_gear()
 			"skills": ui.open_skills()
 			"profile": ui.open_profile()
+			"resident": ui.open_resident(step[1] if step.size() > 1 else "res_pip")   # SGODOT-225 dialogue bar
+			"resprofile": ui.open_resident_profile(ui._resident)                     # its name → profile sheet
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()

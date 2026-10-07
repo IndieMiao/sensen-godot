@@ -55,6 +55,9 @@ var _bag_box: VBoxContainer
 var _gear_box: VBoxContainer
 var _chips: HBoxContainer
 var _hint: Label
+## BAG-5 "Bag capacity recovery" under the grid (Bag side, full bag, not while gifting).
+var full_row: UiNoticeRow
+var _full_gap: Control
 
 func _init(view_: Dictionary = {}, side_ := "bag", focus := "", gift_to_ := {}) -> void:
 	super(HEIGHT)
@@ -101,7 +104,7 @@ func _init(view_: Dictionary = {}, side_ := "bag", focus := "", gift_to_ := {}) 
 ## calls this every frame, so a view that changes nothing the drawer shows is skipped.
 func refresh(view_: Dictionary, force := false) -> void:
 	var key := [view_.get("bag", {}), view_.get("gear", {}), view_.get("storage", {}), int(view_.get("energy", {}).get("value", 0)),
-		view_.get("meals", {}).get("used", 0), side].hash()
+		view_.get("meals", {}).get("used", 0), view_.get("homestead", {}).get("unlocks", {}), side].hash()
 	view = view_
 	if key == _key and not force: return
 	_key = key
@@ -115,6 +118,10 @@ func refresh(view_: Dictionary, force := false) -> void:
 	grid.items = items()
 	_hint.visible = not sheet.is_open()
 	_hint.text = hint_for(category, not storage_items(view, category, place).is_empty())
+	var full := bag_full_text(view) if gift_to.is_empty() else ""
+	full_row.set_notice(full)
+	full_row.visible = full != ""
+	_full_gap.visible = full_row.visible
 	if sheet.is_open(): sheet.refresh()
 	if side == "gear": _build_gear()
 
@@ -173,6 +180,22 @@ static func storage_items(view: Dictionary, cat: String, at := "home") -> Array:
 			kind = P0ItemInfo.kind_of(view, id), tab = P0ItemInfo.tab_of(view, id), stored = true}
 		if in_category(it, cat): out.append(it)
 	return out
+
+## BAG-5: with every slot taken, where more room comes from — `Bag full · +5 slots at Homestead Lv3` while Bag
+## Upgrade I is locked, `Bag full · +5 slots · Bag Upgrade I` once it is for sale; "" when the bag has room or no
+## upgrade is left (the row only shows where it can lead somewhere).
+static func bag_full_text(view: Dictionary) -> String:
+	var bag: Dictionary = view.get("bag", {})
+	var cap := int(bag.get("capacity", 25))
+	if (bag.get("slots", []) as Array).size() < cap: return ""
+	var state := str(view.get("homestead", {}).get("unlocks", {}).get("bag_upgrade_1", ""))
+	var ups: Array = P0Logic.content().get("bag_upgrades", [])
+	if ups.is_empty() or state in ["", "owned"]: return ""
+	var up: Dictionary = ups[0]
+	var more := int(up.get("capacity", cap)) - cap
+	if more <= 0: return ""
+	if state == "locked": return "Bag full · +%d slots at Homestead Lv%d" % [more, int(up.get("homestead", 0))]
+	return "Bag full · +%d slots · %s" % [more, str(up.get("name", ""))]
 
 ## The line above the grid: `Materials · Bag first, then Farm Storage` when storage stacks follow.
 static func hint_for(cat: String, has_storage: bool) -> String:
@@ -278,6 +301,10 @@ func _build_bag() -> void:
 		sheet.close()
 		_hint.visible = true)
 	_bag_box.add_child(grid)
+	_full_gap = _gap(_bag_box, _ROW_GAP)
+	full_row = UiNoticeRow.new()
+	full_row.pressed.connect(func(): action_requested.emit(&"bag_room", "", {}))
+	_bag_box.add_child(full_row)
 
 # ---------------------------------------------------------------- Gear side
 

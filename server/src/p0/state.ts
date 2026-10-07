@@ -10,6 +10,20 @@ export interface Plot {
 /** One bag slot. A resident's gift meal is its own stack (gift), never merged with bought or cooked ones (§3.4.5). */
 export interface BagStack { id: string; qty: number; gift?: { from: string; day: string } }
 
+/** A passive reward that did not fit the bag (§10.4.8, q(45)): kept 24 h from when it enters the Inbox. */
+export interface Parcel extends BagStack { key: string; source: string; created_at: number; expires_at: number }
+/** What became of a parcel: claimed, expired (sellable items paid out as coins) or, for a gift, returned to its sender. */
+export interface ParcelUpdate extends BagStack {
+  key: string; source: string; at: number; status: 'claimed' | 'expired' | 'returned'; coins: number; read: boolean;
+}
+export interface P0Inbox {
+  granted: string[];                          // reward sources already granted, one key each
+  parcels: Parcel[];                          // at most 8 (§10.4.8)
+  waiting: Omit<Parcel, 'expires_at'>[];      // queued while 8 parcels wait; their 24 h starts on admission (q(45))
+  updates: ParcelUpdate[];                    // the last 100 claims and expiries
+}
+export const emptyInbox = (): P0Inbox => ({ granted: [], parcels: [], waiting: [], updates: [] });
+
 /** A line in the water: the fish is drawn when it is cast (§6.1.2), the client only sees its rarity. */
 export interface Cast {
   fish: string; site: string; at: number; bite_ms: number; bait: string | null;
@@ -47,6 +61,18 @@ export interface ResidentState {
 
 export interface Homestead { level: number; plaque: { level: number; at: number }[] }
 
+/** One mine run on floors 1–2 (§13.3, SGODOT-231): floors[i] is floor i + 1; drops derive from the run seed. */
+export interface MineRun {
+  id: number; seed: number; day: string;    // day = the player day it started; 04:00 ends it
+  floors: { paid: boolean; broken: number[]; lit: boolean }[];
+}
+export interface MineState {
+  run: MineRun | null;
+  count: number;                            // runs ever started (run ids)
+  ended: { reason: 'reset'; at: number } | null;   // an unfinished run the 04:00 rollover ended (shown once at the mine mouth)
+  swing_at: number;                         // last rock, for the 0.9 s anti-script tempo
+}
+
 /** Where the player's commands come from (q(41)): when they last left the homestead, for Rest's 2 h rule. */
 export interface Presence { left_at: number | null; last_at: number; space: string | null }
 
@@ -62,10 +88,11 @@ export interface P0Day {
   bonus: number;                        // request completion bonus paid today (§9.13.2)
   sys_done: number;                     // system requests completed today (§9.6.4)
   gift_meal: string | null;             // resident who gave today's gift meal (§3.4.5)
+  mine_runs: number;                    // mine runs started today (§13.3.1, ≤ 2)
 }
 
 export interface P0State {
-  v: 3;
+  v: 4;
   player: string;
   created_at: number;
   clock_ms: number;              // dev-only clock offset (time skip)
@@ -83,6 +110,7 @@ export interface P0State {
   boards: { stall: BoardSlot[]; market: BoardSlot[] };
   req_done: string[];            // last completed request ids (a repeated deliver says request_done)
   presence: Presence;
+  inbox: P0Inbox;                // passive rewards that did not fit the bag (§10.4.8)
   firsts: string[];              // e.g. harvest:crop_radish, catch:fish_crucian, cook:dish_grilled_crucian
   rewards: string[];             // one-time rewards already granted
   day: P0Day;
@@ -91,14 +119,17 @@ export interface P0State {
   stove: Pot | null;
   cookbook: string[];            // known recipe pages
   requests: Request[];
-  gear: { rods: string[]; rod: string; hoes: string[]; hoe: string };   // Tools & Gear: owned and equipped rod / hoe (no bag slots)
+  gear: { rods: string[]; rod: string; hoes: string[]; hoe: string; picks: string[]; pick: string };   // Tools & Gear: owned and equipped rod / hoe / pickaxe (no bag slots)
+  gather: { ready_at: Record<string, number>; last_at: number };   // §13.2: when each spot can be gathered again; last tap (tempo)
+  mine: MineState;
+  storage_auto: { at: number; items: [string, number][] } | null;   // last auto-store on coming home (q(40)), floated once by the client
   fires: number;                 // pots ever started (first fire is the tutorial ring)
   rng: number;
   seq: number;
 }
 
 export const emptyDay = (key = ''): P0Day => ({
-  key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null,
+  key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0,
 });
 
 export function freshState(c: P0Content, player: string, now: number, seed = hashSeed(player)): P0State {
@@ -106,13 +137,13 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
   for (let i = 0; i < c.start.tilled_plots; i++) plots.push({ id: i, state: 'tilled' });
   for (let i = 0; i < c.start.wild_plots; i++) plots.push({ id: c.start.tilled_plots + i, state: 'wild' });
   return {
-    v: 3, player, created_at: now, clock_ms: 0,
+    v: 4, player, created_at: now, clock_ms: 0,
     energy: { value: c.energy.max_base, tick_ms: now },
     coins: c.start.coins,
     skills: { farming: 0, fishing: 0, cooking: 0 },
     plots,
     bag: c.start.bag.map(([id, qty]) => ({ id, qty })),
-    bag_cap: c.bag.capacity, storage: {}, locked: [], owned: [],
+    bag_cap: c.bag.capacity, storage: {}, locked: [], owned: [], inbox: emptyInbox(),
     homestead: { level: 1, plaque: [] },
     residents: {},
     boards: { stall: [{ req: tutorialRequest(c, now), refill_at: 0 }], market: [] }, req_done: [],
@@ -123,7 +154,10 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     cast: null, stove: null,
     cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id),
     requests: [{ ...c.requests.tutorial, status: 'open' }],
-    gear: { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming },
+    gear: { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining },
+    gather: { ready_at: {}, last_at: 0 },
+    mine: freshMine(),
+    storage_auto: null,
     fires: 0,
     rng: seed, seq: 0,
   };
@@ -137,14 +171,14 @@ export function tutorialRequest(c: P0Content, now: number): BoardRequest {
 }
 
 /**
- * Bring a stored playtest save up to the current shape (v1 M1 → v2 M2 → v3 SGODOT-228). The prototype promises no
+ * Bring a stored playtest save up to the current shape (v1 M1 → v2 M2 → v3 SGODOT-228 → v4 SGODOT-231). The prototype promises no
  * compatibility, but filling defaults keeps local saves playable: v3 adds Homestead Lv1, an empty farm storage and
  * the boards, moving the old tutorial request into Stall Board slot 1 with its status.
  */
 export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0State {
   const s = raw as P0State & { v: number };
   s.requests ??= [{ ...c.requests.tutorial, status: 'open' }];
-  s.gear ??= { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming };
+  s.gear ??= { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining };
   if (s.v < 2) {
     s.fishing ??= { casts: 0, bites: 0, caught: {}, seen: [] };
     s.cast ??= null;
@@ -170,12 +204,22 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
       market: [],
     };
   }
+  if (s.v < 4) {   // SGODOT-231: pickaxes, gathering spots, the mine run, the last auto-store
+    s.gear.picks ??= [c.tools.mining];
+    s.gear.pick ??= c.tools.mining;
+    s.gather ??= { ready_at: {}, last_at: 0 };
+    s.mine ??= freshMine();
+    s.storage_auto ??= null;
+  }
   s.req_done ??= [];
   s.presence ??= { left_at: null, last_at: 0, space: null };
+  s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
-  s.v = 3;
+  s.v = 4;
   return s;
 }
+
+const freshMine = (): MineState => ({ run: null, count: 0, ended: null, swing_at: 0 });
 
 function hashSeed(text: string): number {
   let h = 2166136261;

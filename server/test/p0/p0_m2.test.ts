@@ -31,8 +31,8 @@ describe('P0 fishing (§6.1–6.7)', () => {
     expect(s.energy.value).toBe(195);
     expect(catchOf(ev)).toMatchObject({ fish: 'fish_crucian', result: 'landed', refund: 0 });
     expect(count(s.bag, 'fish_crucian')).toBe(1);
-    // 5 (first cast) + 5 (catch) + 15 (first crucian) + 5 (first landed)
-    expect(s.skills.fishing).toBe(30);
+    // 10 (first cast) + 5 (catch) + 15 (first crucian) + 10 (first landed) + 10 (first in the city), q(37)
+    expect(s.skills.fishing).toBe(50);
   });
   it('line in before the bite refunds all 5 and keeps the novice draw', () => {
     let s = fresh();
@@ -157,7 +157,7 @@ describe('P0 cooking (§7.2.4–7.2.5 / §7.6.2)', () => {
     const tap = h.at + (h.gold + h.width / 2) * h.spin;
     const done = step(s, { type: 'collect', taps: [tap] }, T0 + 6 * S);
     expect(count(done.s.bag, 'dish_grilled_crucian@good')).toBe(1);
-    expect(done.s.skills.cooking).toBe(10); // first cook, no level difference
+    expect(done.s.skills.cooking).toBe(15); // 10 first-cook + floor(4 × 1.25) Good base XP (§14.2.2)
     expect(done.s.energy.value).toBe(200);  // cooking costs no energy
   });
   it('judges only the first tap per ring; misses stay Plain', () => {
@@ -214,7 +214,7 @@ describe('P0 cooking (§7.2.4–7.2.5 / §7.6.2)', () => {
     s = step(s, { type: 'collect', taps }, T0 + 31 * S).s;
     expect(count(s.bag, 'dish_herb_baked_perch@perfect')).toBe(1);
     expect(count(s.bag, 'dish_herb_baked_perch')).toBe(1);
-    expect(s.skills.cooking).toBe(40);
+    expect(s.skills.cooking).toBe(64); // first Rare 40 + Perfect base 16 × 1.5
   });
 });
 

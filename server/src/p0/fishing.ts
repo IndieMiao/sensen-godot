@@ -96,7 +96,11 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
     events.push({ kind: 'item', id: fish.id, delta: 1 });
     events.push({ kind: 'catch', fish: fish.id, rarity: fish.rarity, result: 'landed', refund: 0 });
     gainXp(c, s, now, 'fishing', scaledXp(s, c.fishing.catch_xp[fish.rarity - 1], cast.xp_pct), cast.xp_pct, events);
-    for (const [key, xp] of [[`catch:${fish.id}`, c.fishing.first_xp[fish.rarity - 1]], ['landed', c.fishing.first_landed_xp]] as const) {
+    // q(37): the first catch in a city counts the site's city from the server's table, never a city the client names.
+    const city = c.fishing.sites[cast.site]?.city ?? '';
+    for (const [key, xp] of [[`catch:${fish.id}`, c.fishing.first_xp[fish.rarity - 1]], ['landed', c.fishing.first_landed_xp],
+      [`fishing_city:${city}`, city ? c.fishing.first_city_xp : 0]] as const) {
+      if (xp <= 0) continue;
       if (s.firsts.includes(key)) continue;
       s.firsts.push(key);
       events.push({ kind: 'first', what: key, xp });
