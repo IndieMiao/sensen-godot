@@ -1,0 +1,159 @@
+{
+  "method": "11x11 RGB median; circular HSV hue distance; fixed declared corresponding lit faces",
+  "checks": [
+    {
+      "name": "left_plaster",
+      "surface": "Plaster between window arch and top beam, runtime world [-3.10,3.28,0.23]",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          464,
+          275
+        ],
+        "rgb": [
+          254,
+          227,
+          174
+        ],
+        "hex": "#FEE3AE",
+        "hue_degrees": 39.75,
+        "saturation": 0.315,
+        "value": 0.9961
+      },
+      "runtime": {
+        "pixel": [
+          444,
+          264
+        ],
+        "rgb": [
+          212,
+          180,
+          137
+        ],
+        "hex": "#D4B489",
+        "hue_degrees": 34.4,
+        "saturation": 0.3538,
+        "value": 0.8314
+      },
+      "hue_delta_degrees": 5.35,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "back_plaster",
+      "surface": "Open lit plaster below the shop sign, above the counter",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          826,
+          399
+        ],
+        "rgb": [
+          221,
+          177,
+          142
+        ],
+        "hex": "#DDB18E",
+        "hue_degrees": 26.582,
+        "saturation": 0.3575,
+        "value": 0.8667
+      },
+      "runtime": {
+        "pixel": [
+          933,
+          418
+        ],
+        "rgb": [
+          208,
+          176,
+          129
+        ],
+        "hex": "#D0B081",
+        "hue_degrees": 35.696,
+        "saturation": 0.3798,
+        "value": 0.8157
+      },
+      "hue_delta_degrees": 9.114,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "front_post",
+      "surface": "Front-left timber upright interior face",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          230,
+          495
+        ],
+        "rgb": [
+          232,
+          144,
+          60
+        ],
+        "hex": "#E8903C",
+        "hue_degrees": 29.302,
+        "saturation": 0.7414,
+        "value": 0.9098
+      },
+      "runtime": {
+        "pixel": [
+          237,
+          490
+        ],
+        "rgb": [
+          166,
+          93,
+          33
+        ],
+        "hex": "#A65D21",
+        "hue_degrees": 27.068,
+        "saturation": 0.8012,
+        "value": 0.651
+      },
+      "hue_delta_degrees": 2.235,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "floor",
+      "surface": "Clear horizontal floor to the right of the display, runtime world [2.3,0.083,1.0]",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          1000,
+          760
+        ],
+        "rgb": [
+          254,
+          205,
+          113
+        ],
+        "hex": "#FECD71",
+        "hue_degrees": 39.149,
+        "saturation": 0.5551,
+        "value": 0.9961
+      },
+      "runtime": {
+        "pixel": [
+          828,
+          837
+        ],
+        "rgb": [
+          244,
+          175,
+          89
+        ],
+        "hex": "#F4AF59",
+        "hue_degrees": 33.29,
+        "saturation": 0.6352,
+        "value": 0.9569
+      },
+      "hue_delta_degrees": 5.859,
+      "limit_degrees": 10,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Representative patches only. Full image retains independent brightness/saturation/composition differences."
+}

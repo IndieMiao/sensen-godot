@@ -1,0 +1,32 @@
+{
+  "method": "Three visible plinth-edge intersections on a 1544x1503 planning reference, contained proportionally in 1440x1080. Slopes determine angles, mean scale fits retained plinth; fourth corner inferred.",
+  "anchors": {
+    "left": [
+      183.23353293413174,
+      716.4071856287425
+    ],
+    "front": [
+      748.7425149700599,
+      989.4610778443114
+    ],
+    "right": [
+      1258.2035928143714,
+      741.556886227545
+    ]
+  },
+  "pitch_degrees": 28.994123541615693,
+  "yaw_degrees": 44.889048630464536,
+  "camera": {
+    "position": [
+      10.58604251266429,
+      10.010750012057159,
+      10.62712114921366
+    ],
+    "target": [
+      0,
+      1.698125282011132,
+      0
+    ],
+    "size": 12.317351160224227
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "patches": [
+    {
+      "name": "left_plaster",
+      "surface": "Plaster between window arch and top beam, runtime world [-3.10,3.28,0.23]",
+      "reference": [
+        464,
+        275
+      ],
+      "runtime": [
+        444,
+        264
+      ]
+    },
+    {
+      "name": "back_plaster",
+      "surface": "Open lit plaster below the shop sign, above the counter",
+      "reference": [
+        826,
+        399
+      ],
+      "runtime": [
+        933,
+        418
+      ]
+    },
+    {
+      "name": "front_post",
+      "surface": "Front-left timber upright interior face",
+      "reference": [
+        230,
+        495
+      ],
+      "runtime": [
+        237,
+        490
+      ]
+    },
+    {
+      "name": "floor",
+      "surface": "Clear horizontal floor to the right of the display, runtime world [2.3,0.083,1.0]",
+      "reference": [
+        1000,
+        760
+      ],
+      "runtime": [
+        828,
+        837
+      ]
+    }
+  ],
+  "sample_classification_correction": {
+    "discarded_pixel": [
+      466,
+      268
+    ],
+    "reason": "Initial 11px patch touched the narrow oak arch cap. Projected a true plaster point from world [-3.10,3.28,0.23], between arch top 3.15m and beam bottom 3.39m, before colour tuning."
+  }
+}

@@ -10,31 +10,31 @@
   "assets": [
     {
       "name": "room_shell",
-      "vertices": 5416,
-      "triangles": 10448,
+      "vertices": 4632,
+      "triangles": 8936,
       "surfaces": 1,
-      "bytes": 360776
+      "bytes": 298136
     },
     {
       "name": "window_wall",
-      "vertices": 986,
-      "triangles": 1928,
+      "vertices": 930,
+      "triangles": 1820,
       "surfaces": 1,
-      "bytes": 71572
+      "bytes": 66448
     },
     {
       "name": "back_wall",
       "vertices": 738,
       "triangles": 1444,
       "surfaces": 1,
-      "bytes": 56056
+      "bytes": 55448
     },
     {
       "name": "arched_window",
       "vertices": 656,
       "triangles": 1296,
       "surfaces": 1,
-      "bytes": 41284
+      "bytes": 39840
     },
     {
       "name": "window_garden",
@@ -45,227 +45,203 @@
     },
     {
       "name": "green_door",
-      "vertices": 1740,
-      "triangles": 3432,
+      "vertices": 1308,
+      "triangles": 2568,
       "surfaces": 1,
-      "bytes": 122028
+      "bytes": 95524
     },
     {
       "name": "entry_mat",
       "vertices": 280,
       "triangles": 540,
       "surfaces": 1,
-      "bytes": 19972
+      "bytes": 19332
     },
     {
       "name": "farm_tools_sign",
       "vertices": 2454,
       "triangles": 4228,
       "surfaces": 1,
-      "bytes": 362612
-    },
-    {
-      "name": "sign_sprout",
-      "vertices": 84,
-      "triangles": 160,
-      "surfaces": 1,
-      "bytes": 7772
+      "bytes": 363444
     },
     {
       "name": "sales_counter",
       "vertices": 896,
       "triangles": 1728,
       "surfaces": 1,
-      "bytes": 60908
-    },
-    {
-      "name": "cash_register",
-      "vertices": 952,
-      "triangles": 1836,
-      "surfaces": 1,
-      "bytes": 64632
-    },
-    {
-      "name": "counter_flowers",
-      "vertices": 3814,
-      "triangles": 7260,
-      "surfaces": 1,
-      "bytes": 262280
-    },
-    {
-      "name": "counter_pencil_pot",
-      "vertices": 220,
-      "triangles": 416,
-      "surfaces": 1,
-      "bytes": 18976
-    },
-    {
-      "name": "counter_price_card",
-      "vertices": 544,
-      "triangles": 1040,
-      "surfaces": 1,
-      "bytes": 41288
+      "bytes": 58860
     },
     {
       "name": "seed_wall_shelf",
       "vertices": 336,
       "triangles": 648,
       "surfaces": 1,
-      "bytes": 23704
-    },
-    {
-      "name": "seed_packet",
-      "vertices": 240,
-      "triangles": 464,
-      "surfaces": 1,
-      "bytes": 16996
-    },
-    {
-      "name": "seed_packet_top",
-      "vertices": 1092,
-      "triangles": 2104,
-      "surfaces": 1,
-      "bytes": 75812
-    },
-    {
-      "name": "shelf_plant",
-      "vertices": 1514,
-      "triangles": 2868,
-      "surfaces": 1,
-      "bytes": 119300
-    },
-    {
-      "name": "silver_watering_can",
-      "vertices": 214,
-      "triangles": 412,
-      "surfaces": 1,
-      "bytes": 18500
-    },
-    {
-      "name": "window_plant",
-      "vertices": 1514,
-      "triangles": 2868,
-      "surfaces": 1,
-      "bytes": 119200
-    },
-    {
-      "name": "long_tools_wall",
-      "vertices": 656,
-      "triangles": 1220,
-      "surfaces": 1,
-      "bytes": 53064
+      "bytes": 22936
     },
     {
       "name": "pot_wall_shelf",
       "vertices": 280,
       "triangles": 540,
       "surfaces": 1,
-      "bytes": 19984
-    },
-    {
-      "name": "pots_on_shelf",
-      "vertices": 640,
-      "triangles": 1264,
-      "surfaces": 1,
-      "bytes": 48892
-    },
-    {
-      "name": "pot_shelf_plant",
-      "vertices": 1514,
-      "triangles": 2868,
-      "surfaces": 1,
-      "bytes": 119304
+      "bytes": 19344
     },
     {
       "name": "hand_tools_board",
-      "vertices": 2108,
-      "triangles": 3972,
+      "vertices": 2072,
+      "triangles": 3924,
       "surfaces": 1,
-      "bytes": 162572
-    },
-    {
-      "name": "shelf_supplies",
-      "vertices": 690,
-      "triangles": 1324,
-      "surfaces": 1,
-      "bytes": 53492
+      "bytes": 155244
     },
     {
       "name": "front_display",
       "vertices": 672,
       "triangles": 1296,
       "surfaces": 1,
-      "bytes": 46028
-    },
-    {
-      "name": "display_seed_tray",
-      "vertices": 2044,
-      "triangles": 3940,
-      "surfaces": 1,
-      "bytes": 139132
-    },
-    {
-      "name": "display_gloves",
-      "vertices": 672,
-      "triangles": 1296,
-      "surfaces": 1,
-      "bytes": 46032
-    },
-    {
-      "name": "display_tools",
-      "vertices": 58,
-      "triangles": 104,
-      "surfaces": 1,
-      "bytes": 7888
-    },
-    {
-      "name": "display_flowers",
-      "vertices": 3814,
-      "triangles": 7260,
-      "surfaces": 1,
-      "bytes": 262280
-    },
-    {
-      "name": "display_under_crates",
-      "vertices": 2820,
-      "triangles": 5472,
-      "surfaces": 1,
-      "bytes": 193896
-    },
-    {
-      "name": "tool_barrel",
-      "vertices": 1846,
-      "triangles": 3472,
-      "surfaces": 1,
-      "bytes": 152976
+      "bytes": 44488
     },
     {
       "name": "entry_crate",
       "vertices": 1152,
       "triangles": 2228,
       "surfaces": 1,
-      "bytes": 79500
-    },
-    {
-      "name": "floor_plant",
-      "vertices": 571,
-      "triangles": 1078,
-      "surfaces": 1,
-      "bytes": 45784
+      "bytes": 77068
     },
     {
       "name": "door_lantern",
       "vertices": 200,
       "triangles": 368,
       "surfaces": 1,
-      "bytes": 17028
+      "bytes": 16420
+    },
+    {
+      "name": "door_frame",
+      "vertices": 432,
+      "triangles": 864,
+      "surfaces": 1,
+      "bytes": 25584
+    },
+    {
+      "name": "seed_crop_0",
+      "vertices": 282,
+      "triangles": 544,
+      "surfaces": 1,
+      "bytes": 21128
+    },
+    {
+      "name": "seed_crop_1",
+      "vertices": 364,
+      "triangles": 696,
+      "surfaces": 1,
+      "bytes": 30008
+    },
+    {
+      "name": "seed_crop_2",
+      "vertices": 580,
+      "triangles": 1116,
+      "surfaces": 1,
+      "bytes": 39124
+    },
+    {
+      "name": "seed_crop_3",
+      "vertices": 241,
+      "triangles": 457,
+      "surfaces": 1,
+      "bytes": 19552
+    },
+    {
+      "name": "tool_barrel",
+      "vertices": 1696,
+      "triangles": 3292,
+      "surfaces": 1,
+      "bytes": 278912
+    },
+    {
+      "name": "long_tools_wall",
+      "vertices": 264,
+      "triangles": 488,
+      "surfaces": 1,
+      "bytes": 28692
+    },
+    {
+      "name": "left_sack_crate",
+      "vertices": 2012,
+      "triangles": 3868,
+      "surfaces": 1,
+      "bytes": 134216
+    },
+    {
+      "name": "counter_side_stock",
+      "vertices": 480,
+      "triangles": 948,
+      "surfaces": 1,
+      "bytes": 36248
+    },
+    {
+      "name": "counter_dressing",
+      "vertices": 8140,
+      "triangles": 15768,
+      "surfaces": 1,
+      "bytes": 497576
+    },
+    {
+      "name": "display_dressing",
+      "vertices": 8386,
+      "triangles": 16100,
+      "surfaces": 1,
+      "bytes": 558544
+    },
+    {
+      "name": "wall_dressing",
+      "vertices": 2120,
+      "triangles": 4116,
+      "surfaces": 1,
+      "bytes": 163204
+    },
+    {
+      "name": "metal_fittings",
+      "vertices": 2506,
+      "triangles": 4656,
+      "surfaces": 1,
+      "bytes": 193052
     }
   ],
-  "unique_triangles": 82824,
-  "scene_triangles": 85144,
+  "unique_triangles": 84479,
+  "scene_triangles": 97986,
   "static_draw_surfaces": 41,
-  "glb_bytes": 3313008,
-  "atlas_bytes": 2867417,
+  "glb_bytes": 3359860,
+  "atlas_bytes": 2778673,
   "placed_instances": 41,
-  "materials": 2
+  "materials": 2,
+  "local_scene_triangles": 90192,
+  "shared_scene_triangles": 7794,
+  "shared_assets": [
+    {
+      "name": "monstera_woven",
+      "vertices": 690,
+      "triangles": 1210,
+      "surfaces": 1,
+      "bytes": 30608
+    },
+    {
+      "name": "pot_terracotta",
+      "vertices": 248,
+      "triangles": 440,
+      "surfaces": 1,
+      "bytes": 11844
+    },
+    {
+      "name": "pothos",
+      "vertices": 1670,
+      "triangles": 2048,
+      "surfaces": 1,
+      "bytes": 67012
+    }
+  ],
+  "plant_budget_triangles": 39662,
+  "budget_limits": {
+    "placed_triangles": 200000,
+    "plant_triangles": 100000,
+    "static_surfaces": 60
+  },
+  "budget_passed": true
 }

@@ -77,4 +77,6 @@ def build():
     finalize({'position':[10,8.5,11.5],'target':[0,1.45,0],'size':11.2});complete()
 
 
-if __name__=='__main__':build()
+if __name__=='__main__':
+    import runpy
+    runpy.run_path(str(Path(__file__).resolve().parent/'source/farm_tools_store/revision.py'),run_name='__main__')

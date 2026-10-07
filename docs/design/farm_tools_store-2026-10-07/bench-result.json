@@ -1,0 +1,844 @@
+{
+  "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+  "checks": [
+    {
+      "details": null,
+      "name": "Default Avatar fixture assembles",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Bench route/probe schema",
+      "passed": true
+    },
+    {
+      "details": 0.0900000035762787,
+      "name": "Spawn stands on authored floor",
+      "passed": true
+    },
+    {
+      "details": "(2.29, 0.09, -2.1)",
+      "name": "Spawn capsule clear",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          2.0727276802063,
+          0.0899317562580109,
+          -1.46628999710083
+        ],
+        "from": [
+          2.28999996185303,
+          0.0900000035762787,
+          -2.09999990463257
+        ],
+        "name": "entry",
+        "reached": true,
+        "remaining_m": 0.0707782208919525,
+        "seconds": 0.084,
+        "target": [
+          2.04999995231628,
+          0.0799999982118607,
+          -1.39999997615814
+        ]
+      },
+      "name": "Route: entry",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -0.371214151382446,
+          0.0899350196123123,
+          -0.995186984539032
+        ],
+        "from": [
+          2.0727276802063,
+          0.0899317562580109,
+          -1.46628999710083
+        ],
+        "name": "counter front",
+        "reached": true,
+        "remaining_m": 0.0808489769697189,
+        "seconds": 0.568,
+        "target": [
+          -0.449999988079071,
+          0.0799999982118607,
+          -0.980000019073486
+        ]
+      },
+      "name": "Route: counter front",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.24179399013519,
+          0.0899359881877899,
+          0.737476170063019
+        ],
+        "from": [
+          -0.371214151382446,
+          0.0899350196123123,
+          -0.995186984539032
+        ],
+        "name": "display east",
+        "reached": true,
+        "remaining_m": 0.0859993547201157,
+        "seconds": 0.537,
+        "target": [
+          1.29999995231628,
+          0.0799999982118607,
+          0.800000011920929
+        ]
+      },
+      "name": "Route: display east",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.34543442726135,
+          0.0899328738451004,
+          2.40648055076599
+        ],
+        "from": [
+          1.24179399013519,
+          0.0899359881877899,
+          0.737476170063019
+        ],
+        "name": "front right",
+        "reached": true,
+        "remaining_m": 0.0743277817964554,
+        "seconds": 0.466,
+        "target": [
+          1.35000002384186,
+          0.0799999982118607,
+          2.48000001907349
+        ]
+      },
+      "name": "Route: front right",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -0.402322977781296,
+          0.08992700278759,
+          2.49505043029785
+        ],
+        "from": [
+          1.34543442726135,
+          0.0899328738451004,
+          2.40648055076599
+        ],
+        "name": "front display",
+        "reached": true,
+        "remaining_m": 0.0983048528432846,
+        "seconds": 0.484,
+        "target": [
+          -0.5,
+          0.0799999982118607,
+          2.5
+        ]
+      },
+      "name": "Route: front display",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.69437885284424,
+          0.0899302214384079,
+          2.49976062774658
+        ],
+        "from": [
+          -0.402322977781296,
+          0.08992700278759,
+          2.49505043029785
+        ],
+        "name": "display west",
+        "reached": true,
+        "remaining_m": 0.0663686692714691,
+        "seconds": 0.366,
+        "target": [
+          -1.75999999046326,
+          0.0799999982118607,
+          2.5
+        ]
+      },
+      "name": "Route: display west",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.75700879096985,
+          0.0899248644709587,
+          1.32560670375824
+        ],
+        "from": [
+          -1.69437885284424,
+          0.0899302214384079,
+          2.49976062774658
+        ],
+        "name": "wall seed rack",
+        "reached": true,
+        "remaining_m": 0.086231991648674,
+        "seconds": 0.334,
+        "target": [
+          -1.75999999046326,
+          0.0799999982118607,
+          1.24000000953674
+        ]
+      },
+      "name": "Route: wall seed rack",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.64964985847473,
+          0.0899266451597214,
+          0.751663088798523
+        ],
+        "from": [
+          -1.75700879096985,
+          0.0899248644709587,
+          1.32560670375824
+        ],
+        "name": "window approach",
+        "reached": true,
+        "remaining_m": 0.0960404202342033,
+        "seconds": 0.3,
+        "target": [
+          -2.73000001907349,
+          0.0799999982118607,
+          0.699999988079071
+        ]
+      },
+      "name": "Route: window approach",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.7242329120636,
+          0.0899361968040466,
+          -0.363754838705063
+        ],
+        "from": [
+          -2.64964985847473,
+          0.0899266451597214,
+          0.751663088798523
+        ],
+        "name": "window",
+        "reached": true,
+        "remaining_m": 0.0870069712400436,
+        "seconds": 0.316,
+        "target": [
+          -2.73000001907349,
+          0.0799999982118607,
+          -0.449999988079071
+        ]
+      },
+      "name": "Route: window",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/FarmToolsStoreArt/sales_counter/@StaticBody3D@25"
+        ],
+        "final": [
+          -0.550000011920929,
+          0.0771522372961044,
+          -1.33088982105255
+        ],
+        "from": [
+          -0.550000011920929,
+          0.0900000035762787,
+          -0.980000019073486
+        ],
+        "reached": false,
+        "remaining_m": 0.609245717525482,
+        "seconds": 0.867,
+        "target": [
+          -0.550000011920929,
+          0.0900000035762787,
+          -1.94000005722046
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/FarmToolsStoreArt/sales_counter/@StaticBody3D@25"
+      },
+      "name": "Blocked: counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/FarmToolsStoreArt/front_display/@StaticBody3D@29"
+        ],
+        "final": [
+          1.02411079406738,
+          0.0834495350718498,
+          1.53999996185303
+        ],
+        "from": [
+          1.5,
+          0.0900000035762787,
+          1.53999996185303
+        ],
+        "reached": false,
+        "remaining_m": 1.57412433624268,
+        "seconds": 0.883,
+        "target": [
+          -0.550000011920929,
+          0.0900000035762787,
+          1.53999996185303
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/FarmToolsStoreArt/front_display/@StaticBody3D@29"
+      },
+      "name": "Blocked: display",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/FarmToolsStoreArt/tool_barrel/@StaticBody3D@33"
+        ],
+        "final": [
+          -2.34999990463257,
+          0.0761130526661873,
+          1.24521970748901
+        ],
+        "from": [
+          -2.34999990463257,
+          0.0900000035762787,
+          0.850000023841858
+        ],
+        "reached": false,
+        "remaining_m": 0.554954051971436,
+        "seconds": 0.882,
+        "target": [
+          -2.34999990463257,
+          0.0900000035762787,
+          1.79999995231628
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/FarmToolsStoreArt/tool_barrel/@StaticBody3D@33"
+      },
+      "name": "Blocked: barrel",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/FarmToolsStoreArt/entry_crate/@StaticBody3D@31"
+        ],
+        "final": [
+          1.39999997615814,
+          0.083145797252655,
+          -1.71206951141357
+        ],
+        "from": [
+          1.39999997615814,
+          0.0900000035762787,
+          -1.29999995231628
+        ],
+        "reached": false,
+        "remaining_m": 0.537974119186401,
+        "seconds": 0.884,
+        "target": [
+          1.39999997615814,
+          0.0900000035762787,
+          -2.25
+        ]
+      },
+      "name": "Blocked: crate",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/FarmToolsStoreArt/seed_wall_shelf/@StaticBody3D@27"
+        ],
+        "final": [
+          -2.59999990463257,
+          0.0753797292709351,
+          1.14999997615814
+        ],
+        "from": [
+          -2.09999990463257,
+          0.0900000035762787,
+          1.14999997615814
+        ],
+        "reached": false,
+        "remaining_m": 0.430248558521271,
+        "seconds": 0.883,
+        "target": [
+          -3.02999997138977,
+          0.0900000035762787,
+          1.14999997615814
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/FarmToolsStoreArt/seed_wall_shelf/@StaticBody3D@27"
+      },
+      "name": "Blocked: wall shelf",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.85771989822388,
+          0.0723652616143227,
+          -0.400000005960464
+        ],
+        "from": [
+          -2.65000009536743,
+          0.0900000035762787,
+          -0.400000005960464
+        ],
+        "reached": false,
+        "remaining_m": 0.942445039749146,
+        "seconds": 0.883,
+        "target": [
+          -3.79999995231628,
+          0.0900000035762787,
+          -0.400000005960464
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/FarmToolsStoreArt/room_shell/@StaticBody3D@5"
+      },
+      "name": "Blocked: west wall",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          3.02021956443787,
+          0.0800789371132851,
+          1.5
+        ],
+        "from": [
+          2.5,
+          0.0900000035762787,
+          1.5
+        ],
+        "reached": false,
+        "remaining_m": 0.77984344959259,
+        "seconds": 0.883,
+        "target": [
+          3.79999995231628,
+          0.0900000035762787,
+          1.5
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/FarmToolsStoreArt/room_shell/@StaticBody3D@13"
+      },
+      "name": "Blocked: east edge",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.60000002384186,
+          0.0800789371132851,
+          2.71250033378601
+        ],
+        "from": [
+          1.60000002384186,
+          0.0900000035762787,
+          2.40000009536743
+        ],
+        "reached": false,
+        "remaining_m": 0.787562191486359,
+        "seconds": 0.867,
+        "target": [
+          1.60000002384186,
+          0.0900000035762787,
+          3.5
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/FarmToolsStoreArt/room_shell/@StaticBody3D@15"
+      },
+      "name": "Blocked: front edge",
+      "passed": true
+    },
+    {
+      "details": {
+        "authored_width": 2.535,
+        "measured_m": 2.53500008583069,
+        "minimum_m": 0.8
+      },
+      "name": "Gap width: counter display main aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.43144595623016,
+          0.0899315699934959,
+          -0.379999995231628
+        ],
+        "from": [
+          1.29999995231628,
+          0.0900000035762787,
+          -0.379999995231628
+        ],
+        "reached": true,
+        "remaining_m": 0.0685540735721588,
+        "seconds": 0.767,
+        "target": [
+          -1.5,
+          0.0900000035762787,
+          -0.379999995231628
+        ]
+      },
+      "name": "Traverse: counter display main aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "entry": {
+          "collisions": [],
+          "final": [
+            2.28999996185303,
+            0.0899254232645035,
+            -2.27023530006409
+          ],
+          "from": [
+            2.28999996185303,
+            0.0899367928504944,
+            -3.18952989578247
+          ],
+          "reached": true,
+          "remaining_m": 0.0702352896332741,
+          "seconds": 0.267,
+          "target": [
+            2.28999996185303,
+            0.0900000035762787,
+            -2.20000004768372
+          ]
+        },
+        "exit": {
+          "collisions": [],
+          "final": [
+            2.28999996185303,
+            0.0899367928504944,
+            -3.18952989578247
+          ],
+          "from": [
+            2.28999996185303,
+            0.0900000035762787,
+            -2.20000004768372
+          ],
+          "reached": true,
+          "remaining_m": 0.0804701149463654,
+          "seconds": 0.3,
+          "target": [
+            2.28999996185303,
+            0.0900000035762787,
+            -3.26999998092651
+          ]
+        }
+      },
+      "name": "Entrance gap allows exit and reentry",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "delta": [
+          0.248231649398804,
+          0.000118628144264221,
+          -1.72357285022736
+        ]
+      },
+      "name": "Diagonal collision preserves wall sliding",
+      "passed": true
+    },
+    {
+      "details": [
+        "run",
+        0.15,
+        0.316666666666667
+      ],
+      "name": "Run animation advances in rendered viewport",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Input release stops horizontal motion",
+      "passed": true
+    },
+    {
+      "details": "idle",
+      "name": "Release returns to idle",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Focus loss cancels movement",
+      "passed": true
+    },
+    {
+      "details": 1.74549426138401,
+      "name": "Fixture head-top height measurable",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 1.33486545991422,
+        "difference": 0.0,
+        "height": 2.33,
+        "ratio_to_H": 1.33486545991422,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: door",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.660271434571305,
+        "difference": 0.0116268980477223,
+        "height": 1.1659,
+        "ratio_to_H": 0.667948343224888,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "applicable": false,
+        "reason": "No seating in farm tools store"
+      },
+      "name": "Scale category absent: chair",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.650245621031176,
+        "difference": 0.105726872246696,
+        "height": 1.015,
+        "ratio_to_H": 0.581497185327439,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: table",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "renderer": "mobile",
+  "route": [
+    {
+      "collisions": [],
+      "final": [
+        2.0727276802063,
+        0.0899317562580109,
+        -1.46628999710083
+      ],
+      "from": [
+        2.28999996185303,
+        0.0900000035762787,
+        -2.09999990463257
+      ],
+      "name": "entry",
+      "reached": true,
+      "remaining_m": 0.0707782208919525,
+      "seconds": 0.084,
+      "target": [
+        2.04999995231628,
+        0.0799999982118607,
+        -1.39999997615814
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -0.371214151382446,
+        0.0899350196123123,
+        -0.995186984539032
+      ],
+      "from": [
+        2.0727276802063,
+        0.0899317562580109,
+        -1.46628999710083
+      ],
+      "name": "counter front",
+      "reached": true,
+      "remaining_m": 0.0808489769697189,
+      "seconds": 0.568,
+      "target": [
+        -0.449999988079071,
+        0.0799999982118607,
+        -0.980000019073486
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        1.24179399013519,
+        0.0899359881877899,
+        0.737476170063019
+      ],
+      "from": [
+        -0.371214151382446,
+        0.0899350196123123,
+        -0.995186984539032
+      ],
+      "name": "display east",
+      "reached": true,
+      "remaining_m": 0.0859993547201157,
+      "seconds": 0.537,
+      "target": [
+        1.29999995231628,
+        0.0799999982118607,
+        0.800000011920929
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        1.34543442726135,
+        0.0899328738451004,
+        2.40648055076599
+      ],
+      "from": [
+        1.24179399013519,
+        0.0899359881877899,
+        0.737476170063019
+      ],
+      "name": "front right",
+      "reached": true,
+      "remaining_m": 0.0743277817964554,
+      "seconds": 0.466,
+      "target": [
+        1.35000002384186,
+        0.0799999982118607,
+        2.48000001907349
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -0.402322977781296,
+        0.08992700278759,
+        2.49505043029785
+      ],
+      "from": [
+        1.34543442726135,
+        0.0899328738451004,
+        2.40648055076599
+      ],
+      "name": "front display",
+      "reached": true,
+      "remaining_m": 0.0983048528432846,
+      "seconds": 0.484,
+      "target": [
+        -0.5,
+        0.0799999982118607,
+        2.5
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -1.69437885284424,
+        0.0899302214384079,
+        2.49976062774658
+      ],
+      "from": [
+        -0.402322977781296,
+        0.08992700278759,
+        2.49505043029785
+      ],
+      "name": "display west",
+      "reached": true,
+      "remaining_m": 0.0663686692714691,
+      "seconds": 0.366,
+      "target": [
+        -1.75999999046326,
+        0.0799999982118607,
+        2.5
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -1.75700879096985,
+        0.0899248644709587,
+        1.32560670375824
+      ],
+      "from": [
+        -1.69437885284424,
+        0.0899302214384079,
+        2.49976062774658
+      ],
+      "name": "wall seed rack",
+      "reached": true,
+      "remaining_m": 0.086231991648674,
+      "seconds": 0.334,
+      "target": [
+        -1.75999999046326,
+        0.0799999982118607,
+        1.24000000953674
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -2.64964985847473,
+        0.0899266451597214,
+        0.751663088798523
+      ],
+      "from": [
+        -1.75700879096985,
+        0.0899248644709587,
+        1.32560670375824
+      ],
+      "name": "window approach",
+      "reached": true,
+      "remaining_m": 0.0960404202342033,
+      "seconds": 0.3,
+      "target": [
+        -2.73000001907349,
+        0.0799999982118607,
+        0.699999988079071
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -2.7242329120636,
+        0.0899361968040466,
+        -0.363754838705063
+      ],
+      "from": [
+        -2.64964985847473,
+        0.0899266451597214,
+        0.751663088798523
+      ],
+      "name": "window",
+      "reached": true,
+      "remaining_m": 0.0870069712400436,
+      "seconds": 0.316,
+      "target": [
+        -2.73000001907349,
+        0.0799999982118607,
+        -0.449999988079071
+      ]
+    }
+  ],
+  "scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+  "slug": "farm_tools_store"
+}

@@ -1,0 +1,14 @@
+{
+  "checks": [
+    {
+      "object": "Counter folded square gingham",
+      "uv_layer": "MetricClothUV",
+      "edges": 4928,
+      "minimum": 0.9905815971622769,
+      "maximum": 1.0303264296126542,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "scope": "Authored folded cloth only; no metric UV claim for props without this layer."
+}

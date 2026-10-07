@@ -158,6 +158,14 @@ func measure_scale()->void:
 	check("Fixture head-top height measurable",top>1.0 and top<2.5,top)
 	for key in baseline:
 		if not scale.has(key):check("Scale measurement present: "+key,false);continue
+		if not bool(scale[key].get("applicable", true)):
+			var reason := str(scale[key].get("reason", ""))
+			result.measurements[key] = {"applicable":false,"reason":reason}
+			check("Scale category absent: "+key,not reason.is_empty(),result.measurements[key])
+			continue
+		if not scale[key].has("height"):
+			check("Scale height present: "+key,false)
+			continue
 		var current:float=float(scale[key].height);var base:float=float(baseline[key].height)
 		var difference:float=absf(current/base-1)
 		result.measurements[key]={"height":current,"ratio_to_H":current/top,"baseline_ratio":base/top,"difference":difference,"reason":scale[key].get("reason","")}
