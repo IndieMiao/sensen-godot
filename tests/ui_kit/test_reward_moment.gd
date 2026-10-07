@@ -91,3 +91,21 @@ func test_the_quality_badge_hides_for_plain() -> void:
 	g.quality = 2
 	assert_bool(g.visible).is_true()
 	assert_str((g.get_child(0) as Label).text).is_equal("★★ Perfect")
+
+func test_a_freely_placed_card_shrinks_to_its_content() -> void:
+	# The kitchen's way: the card goes into a full-screen holder before it is in the tree, themed on itself.
+	var host := Control.new()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	var wrap := Control.new()
+	wrap.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var r := UiRewardMoment.new()
+	r.theme = UiKit.theme()
+	r.show_fields({event = "Dish ready", item_name = "Herb Grilled Fish", rarity = 2, rarity_word = "Fine",
+		strip = "First cooked · +20 Cooking XP · Cookbook 2/48", primary = "Eat · +45 Energy", secondary = "Keep", note = "Gift later from your bag"})
+	wrap.add_child(r)
+	host.add_child(wrap)
+	for i in 4: await get_tree().process_frame
+	print("RM_SIZE ", r.size, " min ", r.get_combined_minimum_size())
+	assert_float(r.size.y).is_equal_approx(r.get_combined_minimum_size().y, 0.5)
+	assert_float(r.size.y).is_less(400.0)

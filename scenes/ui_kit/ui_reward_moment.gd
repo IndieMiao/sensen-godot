@@ -105,7 +105,13 @@ func _init() -> void:
 	v.add_child(_rewards)
 	v.add_child(_build_strip())
 	v.add_child(_build_actions())
+	minimum_size_changed.connect(_shrink_wrap)
 	_refresh()
+
+## Placed freely (not in a container), the card follows its minimum size back down: wrapped labels report a tall
+## minimum before their first layout, and a Control never shrinks on its own.
+func _shrink_wrap() -> void:
+	if not (get_parent() is Container): reset_size.call_deferred()
 
 func _build_item() -> Control:
 	var row := HBoxContainer.new()
