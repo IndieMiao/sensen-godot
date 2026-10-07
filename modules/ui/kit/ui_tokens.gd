@@ -63,6 +63,36 @@ const COLOR_SHADOW_MENU := Color("2E3B3329")
 const COLOR_SHADOW_PETAL := Color("2E3B3324")
 const COLOR_SKILL_FARMING := Color("7FC66A")
 const COLOR_SKILL_FISHING := Color("6FA8DC")
+const COLOR_STATUS_AVAILABLE := Color("FBF8F1")
+const COLOR_STATUS_AVAILABLE_RING := Color("7FC66A")
+const COLOR_STATUS_BLOCKED := Color("FBF8F1")
+const COLOR_STATUS_BLOCKED_RING := Color("E07A5F")
+const COLOR_STATUS_COOLING := Color("D6D5CE")
+const COLOR_STATUS_COOLING_RING := Color("8A918C")
+const COLOR_STATUS_COUNTDOWN := Color("FBF8F1")
+const COLOR_STATUS_COUNTDOWN_RING := Color("8A918C")
+const COLOR_STATUS_DELIVERABLE := Color("FBF8F1")
+const COLOR_STATUS_DELIVERABLE_RING := Color("3E7D43")
+const COLOR_STATUS_EVENT := Color("FBF8F1")
+const COLOR_STATUS_EVENT_RING := Color("8D75ED")
+const COLOR_STATUS_FULL := Color("E3B341")
+const COLOR_STATUS_FULL_RING := Color("8A918C")
+const COLOR_STATUS_GIFT := Color("FBF8F1")
+const COLOR_STATUS_GIFT_RING := Color("E07A5F")
+const COLOR_STATUS_INSUFFICIENT := Color("E3B341")
+const COLOR_STATUS_INSUFFICIENT_RING := Color("8A918C")
+const COLOR_STATUS_LOCKED := Color("D6D5CE")
+const COLOR_STATUS_LOCKED_RING := Color("8A918C")
+const COLOR_STATUS_NEW := Color("FBF8F1")
+const COLOR_STATUS_NEW_RING := Color("6FA8DC")
+const COLOR_STATUS_READY := Color("3E7D43")
+const COLOR_STATUS_READY_RING := Color("3E7D43")
+const COLOR_STATUS_REQUEST := Color("FBF8F1")
+const COLOR_STATUS_REQUEST_RING := Color("E3B341")
+const COLOR_STATUS_SELL := Color("E3B341")
+const COLOR_STATUS_SELL_RING := Color("8A918C")
+const COLOR_STATUS_USED_TODAY := Color("D6D5CE")
+const COLOR_STATUS_USED_TODAY_RING := Color("8A918C")
 const COLOR_SURFACE := Color("FBF8F1")
 const COLOR_SURFACE_RAISED := Color("FFFFFF")
 const COLOR_TEXT := Color("2F3A33")
@@ -84,6 +114,7 @@ const OPACITY_KITCHEN_EMPTY := 0.55
 const OPACITY_SCENE_ACTION_PENDING := 0.7
 const OPACITY_UNAVAILABLE_ICON := 0.45
 const OPACITY_TODAY_DONE := 0.75
+const OPACITY_EMPTY_ICON := 0.6
 
 # Space
 const SPACE_HUD_ROW_GAP := 8
@@ -166,9 +197,10 @@ const SIZE_ITEM_ROW_ICON := 32
 const SIZE_STATE_BADGE_H := 32
 const SIZE_STATUS_BADGE := 56
 const SIZE_STATUS_BADGE_ICON := 28
-const SIZE_TOAST_W := 328
-const SIZE_TOAST_MIN_H := 43
-const SIZE_TOAST_PAD := 12
+const SIZE_TOAST_W := 232
+const SIZE_TOAST_PAD := 9
+const SIZE_TOAST_ICON := 20
+const SIZE_TOAST_MIN_H := 38
 const SIZE_SHEET_PAD := 16
 const SIZE_SHEET_GAP := 12
 const SIZE_SHEET_BODY_MAX_H := 440
@@ -263,6 +295,9 @@ const SIZE_QUICK_HANDLE_W := 96
 const SIZE_QUICK_HANDLE_H := 24
 const SIZE_QUICK_HANDLE_GRIP_W := 24
 const SIZE_QUICK_HANDLE_GRIP_H := 3
+const SIZE_EMPTY_DISC := 56
+const SIZE_EMPTY_ICON := 28
+const SIZE_EMPTY_ROW_ICON := 20
 
 # Dash
 const DASH_INVENTORY := [2, 2]
@@ -345,5 +380,4 @@ const PANEL_BADGE := &"Badge"
 const PENDING := {
 	"wp1b": "container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)",
 	"segmentTab": "selected style must not use command green (LOCK-13), WP1b",
-	"toast": "Toast R1 (1178:82265) replaces the old Toast main 483:302 in the WP2 migration; toastW is still the old 328",
 }

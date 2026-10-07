@@ -56,7 +56,11 @@ static func _colors() -> Control:
 		sw.custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_SLOT_W * 1.4, UiTokens.SIZE_TOUCH * 0.5)
 		sw.add_theme_stylebox_override(&"panel", UiStyleBox.make(consts[k], UiTokens.RADIUS_CHIP * 0.5, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT))
 		cell.add_child(sw)
-		cell.add_child(UiKit.label(String(k).trim_prefix("COLOR_").to_lower(), UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY))
+		# Long keys (status_insufficient_ring) wrap inside the swatch width so the grid stays in the 328 column.
+		var name := UiKit.label(String(k).trim_prefix("COLOR_").to_lower().replace("_", " "), UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY)
+		name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name.custom_minimum_size.x = sw.custom_minimum_size.x
+		cell.add_child(name)
 		grid.add_child(cell)
 	return grid
 
