@@ -229,24 +229,24 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 	# TODO(SGODOT-224, bench): LOCK-09 guides Rest with "Show bench"; P0 has no bench, rest is at the farmhouse (197 60c82ad2).
 	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show home", "go": "home", "on": true}
 	if rest_left <= 0:
-		rest_tile.fact = "Rested today · %s" % duration(float(rest.get("resets_in", 0)))
+		rest_tile.fact = "Rested today"   # the reset time is on the bench card (李白, 225)
 		rest_tile.on = false
 	elif rest.has("away_ready_in"):   # q(41): Rest opens after 2 h away from the farm (SGODOT-228)
 		var away = rest.get("away_ready_in")
 		if away == null:
-			rest_tile.fact = "Leave the farm for %dh" % int(rest.get("away_h", 2))
+			rest_tile.fact = "After %dh away" % int(rest.get("away_h", 2))
 			rest_tile.on = false
 		elif float(away) > 0.0:
-			rest_tile.fact = "Back after %dh away · %s to go" % [int(rest.get("away_h", 2)), duration(float(away))]
+			rest_tile.fact = "Ready in %s" % duration(float(away))
 			rest_tile.on = false
 	var tea := {"icon": "dish_fruit_tea", "label": "Tea", "fact": "Tea House opens later", "guide": "", "go": "", "on": false}
 	var drinks: Dictionary = view.get("drinks", {})
-	if not drinks.is_empty():   # §3.4.4: three cups a day, shared by tea and coffee (SGODOT-228 view.drinks)
+	if not drinks.is_empty():   # §3.4.4: three cups a day, shared by tea and coffee (SGODOT-228 view.drinks; copy 李白 225)
 		tea.guide = "Show on map"
 		tea.go = "outpost:tea"
 		tea.on = true
 		if int(drinks.get("left", 0)) <= 0:
-			tea.fact = "%d/%d today · %s" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3)), duration(float(drinks.get("resets_in", 0)))]
+			tea.fact = "%d/%d today" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3))]
 			tea.on = false
 		elif bool(drinks.get("full", false)):
 			tea.fact = "Energy full"

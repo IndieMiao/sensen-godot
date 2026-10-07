@@ -202,7 +202,7 @@ func test_energy_card_tea_and_rest_read_the_drinks_and_away_facts() -> void:
 	assert_str(str(tiles["Tea"].fact)).is_equal("1/3 today · 50 coins")
 	assert_bool(bool(tiles["Tea"].on)).is_true()
 	assert_str(str(tiles["Tea"].go)).is_equal("outpost:tea")
-	assert_str(str(tiles["Rest"].fact)).is_equal("Back after 2h away · 1h 12m to go")
+	assert_str(str(tiles["Rest"].fact)).is_equal("Ready in 1h 12m")
 	assert_bool(bool(tiles["Rest"].on)).is_false()
 	v.drinks.need = 15
 	v.rest.away_ready_in = null
@@ -210,7 +210,7 @@ func test_energy_card_tea_and_rest_read_the_drinks_and_away_facts() -> void:
 	for t in P0Logic.energy_card(v, 2, "Sow ×1").tiles: tiles[t.label] = t
 	assert_str(str(tiles["Tea"].fact)).is_equal("Need 15 more coins")
 	assert_bool(bool(tiles["Tea"].on)).is_false()
-	assert_str(str(tiles["Rest"].fact)).is_equal("Leave the farm for 2h")
+	assert_str(str(tiles["Rest"].fact)).is_equal("After 2h away")
 	v.rest.away_ready_in = 0
 	tiles = {}
 	for t in P0Logic.energy_card(v, 2, "Sow ×1").tiles: tiles[t.label] = t
