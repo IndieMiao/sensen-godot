@@ -1,32 +1,30 @@
-# 刘备：八个店面场景审阅稿 · 2026-10-07
+# 刘备 · 八个店面场景修订与统一复审 · 2026-10-07
 
-SGODOT-179～186 已按顺序完成美术审阅稿，并逐张通过 Lark CLI 发送到用户飞书。每张开工时改为 In Progress；八张卡目前都保持 In Progress，等待用户确认效果后再改 Done。
+179 R2 已获放行；本次完成 **179 R2.1 收尾与 180–186 R1 修改**。八张卡均提交 Review，等待不知火舞统一视觉复审。开工卡先设 In Progress，179 依要求始终保留 Review。父卡 171 保留团队原状态，只追加刘备范围的交付与复审请求。
 
-![Eight actual Godot scene renders](overview.jpg)
+![Eight revised actual Godot scene renders](overview.jpg)
 
-下表链接进入各场景的原设计/Godot 对照、整景、细节、模型正交图和完整制作记录。审阅稿与参考仍有明确差异，不代表美术已验收。
+| 卡片 | 场景记录 | 总三角面 | 植物面 | 静态 surface | 角色检查 | 修订提交 |
+|---|---|---:|---:|---:|---:|---|
+| SGODOT-179 | [coffee_shop R2.1](../coffee_shop-2026-10-07/README.md) | 147,150 | 78,716 | 49 | 39/39 | `754aa2d` |
+| SGODOT-180 | [milk_tea_shop R1](../milk_tea_shop-2026-10-07/README.md) | 154,222 | 40,452 | 27 | 39/39 | `687726c` |
+| SGODOT-181 | [coffee_shop_0 R1](../coffee_shop_0-2026-10-07/README.md) | 132,026 | 54,134 | 29 | 37/37 | `7a37aca0` |
+| SGODOT-182 | [fruit_shop R1](../fruit_shop-2026-10-07/README.md) | 105,235 | 44,274 | 21 | 33/33 | `fc863d4e` |
+| SGODOT-183 | [convenience_store R1](../convenience_store-2026-10-07/README.md) | 101,173 | 29,112 | 28 | 36/36 | `9d4efd5b` |
+| SGODOT-184 | [burger_shop R1](../burger_shop-2026-10-07/README.md) | 108,544 | 13,234 | 26 | 35/35 | `67f1ca6e` |
+| SGODOT-185 | [clothing_store_b R1](../clothing_store_b-2026-10-07/README.md) | 113,770 | 11,272 | 18 | 35/35 | `9a2d624b` |
+| SGODOT-186 | [clothing_store_a R1](../clothing_store_a-2026-10-07/README.md) | 82,872 | 9,286 | 24 | 35/35 | `4aa11134` |
 
-| 卡片 | 场景记录 | GLB / 摆放实例 | unique / placed 三角面 | 美术提交 |
-|---|---|---:|---:|---|
-| SGODOT-179 | [coffee_shop](../coffee_shop-2026-10-07/README.md) | 32 / 52 | 110,588 / 166,484 | `9e2d431` |
-| SGODOT-180 | [milk_tea_shop](../milk_tea_shop-2026-10-07/README.md) | 34 / 45 | 118,364 / 150,800 | `ca1feb8` |
-| SGODOT-181 | [coffee_shop_0](../coffee_shop_0-2026-10-07/README.md) | 34 / 49 | 98,995 / 151,377 | `6a88aa7` |
-| SGODOT-182 | [fruit_shop](../fruit_shop-2026-10-07/README.md) | 24 / 39 | 103,588 / 161,916 | `90227a6` |
-| SGODOT-183 | [convenience_store](../convenience_store-2026-10-07/README.md) | 28 / 36 | 124,203 / 141,855 | `c516d32` |
-| SGODOT-184 | [burger_shop](../burger_shop-2026-10-07/README.md) | 22 / 26 | 98,270 / 100,582 | `c1e0806` |
-| SGODOT-185 | [clothing_store_b](../clothing_store_b-2026-10-07/README.md) | 42 / 53 | 66,944 / 78,042 | `b6e7f60` |
-| SGODOT-186 | [clothing_store_a](../clothing_store_a-2026-10-07/README.md) | 43 / 64 | 70,398 / 90,716 | `26452cc` |
+每场景均低于 **200,000 总三角面 / 100,000 植物面 / 60 静态 surface**。植物预算包括内嵌花束、草、花坛和窗外树冠；保留 179 R2.1 共享小叶/薄叶、龟背竹孔洞、陶土/藤编盆与深绿色图集。按组合并导出，同时保留命名可编辑 Blender、独立可复用 GLB、局部 pivot、重建脚本和摆放/碰撞清单。
 
-每张均包含命名可编辑 Blender、可复现生成脚本、按局部轴心导出的模块 GLB、共享 2048 图集、摆放/简单碰撞清单，以及只含美术的 Godot 场景。文件位置和重建命令见对应记录；重建历史版本时应连同该提交的共享 helpers 一起检出。后续改动源模型后请重新烘焙。
+179 补回双层花藤与墙沿圆鼓花团、修正背光矮墙/外伸树冠；180 补粉色吧台/配料/冷藏/软包；181 重建石墙、浅拱、碎石路、草花和四猫；182 加低面水果变体与倾斜水果箱；183 商品合进货架、补双门冷柜/冰柜并打通双岛通道；184 补 L 柜台、后厨、发光标识和绕吧台路线；185 补方格软包、服饰/鞋包/首饰与绕圆台路线；186 改冷灰水泥/宝蓝/胡桃木/皮凳、局部灯池和黑方盆。
 
-Blender 5.2.2 LTS / Godot 4.7.2。八张均在实际 Mobile/Vulkan 渲染器加载，核对整景、细节和三向正交图；GLB 容器、单模块单 surface、无重复内嵌图集及摆放数量检查通过。八次飞书交付共 32 条消息、24 张图片，下载 SHA-256 与对应本地审阅图完全一致。简洁证据见 [verification-summary.json](verification-summary.json)，私有消息回执留在忽略的 `output/<slug>/delivery/`。
+固定 Basic Room 同类尺度 ±15%，未改基线与角色。179 已认可尺寸保留；无门/椅的场景记录不适用，184 高脚凳使用总监允许的配套吧台例外。**289/289** 实际 Godot Mobile/Vulkan 检查通过，含移动、阻挡、通道射线、进出、滑行、输入、动画和放手停止。共享 benchmark core 未改；仅隔离适配器修正 Jolt 一次碰撞返回多个接触点时的采集。15 秒录像是原速实际视口，桌面结果不代表 Android 或物理手机性能。
 
-优先 review 整体构图和资产尺度，再看单件细节。主要待审差异：植被密度、布料/商品图案、圆角与细部、金属与镜面表现，以及统一静帧光照和参考的差别；汉堡店柜台为直柜简化。每张详细差异已写入其 README。
+每张卡上传 **14 个本轮附件**，共 **112 个**：原图对照、整景/细节/植物、正交、角色/碰撞、录像、取色和预算等；保留原附件，下载 SHA-256 核验全部通过。逐场景 Lark CLI 共 **32 条消息 / 24 个媒体**（整景、对照、录像）发送并回读，媒体字节一致。私有回执在忽略的 `output/<slug>/<revision>/delivery/`；仓库只放脱敏的 `delivery-verification.json`。
 
-本轮按卡片限定只做美术：没有角色控制、玩法接入、Android/真机验证、录屏或发包。渲染成功不代表手机性能验收。Basic Room 已验收源文件与资产未修改。
+取色采用标注真实对应表面的 9×9 RGB 中位数，亮面色相差均 ≤10°，并保留 RGB、明度和饱和度。误落相邻物体的取样位置已纠正并在各 README 记录。低饱和灰材质的色相敏感，指标不等于全画面一致，也不替代总监目测。整体构图、灯光、布料/包装印花、植物替代种类、镜面和反射仍有已注明的简化。
 
-八张 Plane 卡片各附四张 PNG：Godot 整景、细节、参考对照和模型正交图，共 32 个附件，均已下载核对 SHA-256；原参考附件保留。私有上传回执位于忽略的 `output/plane-scene-attachments/verified.json`。
+远端评审分支为 [`wp-3d-scene`](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene)，刘备分支为 `wp-3d-scene-liubei`，已包含表中提交。共享分支上赵云提交仅正常合入，刘备未修改其场景；原有 `.codex/config.toml` 改动保留。没有主开发合并、发包或生产数据操作。
 
-本地工作分支为 `wt-3d-scene`，远端评审分支为 [`wp-3d-scene`](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene)，未合入主开发分支；各卡 Plane 评论含提交、预算与飞书审阅链接。用户原有 `.codex/config.toml` 改动保留。
-
-远端评审分支同时保留[赵云的七个暖木室内场景](../warm-wood-scenes-2026-10-07/README.md)。两批共用基线 `2d18868`，完整评审差异可用 `git diff 2d18868..origin/wp-3d-scene` 查看。
+完整机读证据：[verification-summary.json](verification-summary.json)。旧初稿与旧交付可在 Git 历史中回溯，当前总览仅对应这轮修订。
