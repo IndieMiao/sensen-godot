@@ -12,7 +12,8 @@
     "lock: the title-area lock icon is shown; price: the buy row has a price column; quota: the sell area shows the quota line.",
     "Capability flags (can_store, can_lock, can_gift) gate actions the P0 server can't do yet: no button and no grey text until the view carries the feature (storage, locked on bag stacks, residents / social).",
     "Rarity and dish stars sit on the card's state line (spec.rarity_text, spec.quality), not in facts.",
-    "any/<context> is the fallback for every kind (storage: Take 10 shows only when more than 10 are stored; both send take_out with qty 10 / \"all\")."
+    "any/<context> is the fallback for every kind (storage: Take 10 shows only when more than 10 are stored; both send take_out with qty 10 / \"all\").",
+    "{count_source} is \"12 · Harvested at home\"; without a known source the line drops (the title already shows ×N)."
   ],
   "seed/bag": {
     "facts": [
@@ -74,7 +75,7 @@
   },
   "crop/bag": {
     "facts": [
-      "{count} · {source}",
+      "{count_source}",
       "Sells for {sell}"
     ],
     "buttons": [],
@@ -144,7 +145,7 @@
   },
   "fish/bag": {
     "facts": [
-      "{count} · {source}",
+      "{count_source}",
       "Sells for {sell} · Fish-dex {dex}",
       "{xp_hint}"
     ],
@@ -451,7 +452,7 @@
   },
   "material/bag": {
     "facts": [
-      "{count} · {source}",
+      "{count_source}",
       "{sell_at_home}"
     ],
     "buttons": [
