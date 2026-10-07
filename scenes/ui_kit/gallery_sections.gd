@@ -33,6 +33,8 @@ static func all() -> Array[Dictionary]:
 		{id = "scene_action", title = "UiSceneAction", figma = "SceneAction 1116:78934 · LOCK-02", build = _scene_actions},
 		{id = "action_key", title = "UiActionKey", figma = "ActionKey 1117:78924 · LOCK-02 / 03", build = _action_keys},
 		{id = "action_radial", title = "UiActionRadial", figma = "RadialPetal 1122:79385 · BAR-2 482:23 · LOCK-03", build = _action_radial},
+		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
+		{id = "tap_card", title = "UiTapCard", figma = "TapCard 1135:101133 · LOCK-07", build = _tap_cards},
 	]
 	return out
 
@@ -449,8 +451,7 @@ static func _action_radial() -> Control:
 	var host := Control.new()
 	host.custom_minimum_size = Vector2(328, 250)
 	var r := UiActionRadial.new()
-	host.add_child(r)
-	r.size = host.custom_minimum_size
+	host.add_child(r)   # full-rect inside the host; no explicit size (it would add to the anchors)
 	r.options = [
 		{id = "farming", name = "Farming", icon = _tex("hoe"), available = true},
 		{id = "fishing", name = "Fishing", icon = _tex("rod"), available = false, reason = "No water nearby"},
@@ -460,3 +461,31 @@ static func _action_radial() -> Control:
 	r.selected = "farming"
 	r.open_at(Vector2(36, 125))
 	return _captioned(host, "fanned from the character · Farming selected")
+
+static func _status_badges() -> Control:
+	var v := _column()
+	var row := _row(UiTokens.SPACE_ROW)
+	var names := ["available", "ready", "countdown", "cooling", "used today", "locked", "insufficient", "full", "new",
+		"request", "deliverable", "event", "gift", "blocked", "sell"]
+	for s in UiStatusBadge.State.values():
+		var b := UiStatusBadge.new(s)
+		b.icon = _tex("dish_grilled_fish")
+		if s == UiStatusBadge.State.COUNTDOWN: b.caption = "1h 12m"
+		row.add_child(_captioned(b, names[s]))
+	v.add_child(row)
+	var npc := _row(UiTokens.SPACE_ROW)
+	for s in [UiStatusBadge.State.REQUEST, UiStatusBadge.State.DELIVERABLE, UiStatusBadge.State.GIFT, UiStatusBadge.State.NEW]:
+		npc.add_child(_captioned(UiStatusBadge.new(s, UiStatusBadge.Size.NPC), "NPC · " + names[s]))
+	v.add_child(npc)
+	return v
+
+static func _tap_cards() -> Control:
+	var v := _column()
+	v.add_child(_captioned(UiTapCard.new("Tap to cook"), "centred"))
+	var left := UiTapCard.new("Rest · +60 Energy · once a day")
+	left.point_at(0.0)
+	v.add_child(_captioned(left, "facility near the left edge"))
+	var right := UiTapCard.new("Mei · Tap to talk")
+	right.point_at(1000.0)
+	v.add_child(_captioned(right, "facility near the right edge"))
+	return v
