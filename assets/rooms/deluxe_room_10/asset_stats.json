@@ -13,28 +13,28 @@
       "vertices": 8384,
       "triangles": 16172,
       "surfaces": 1,
-      "bytes": 557812
+      "bytes": 557876
     },
     {
       "name": "window_wall",
       "vertices": 986,
       "triangles": 1928,
       "surfaces": 1,
-      "bytes": 70936
+      "bytes": 71192
     },
     {
       "name": "back_wall",
       "vertices": 948,
       "triangles": 1864,
       "surfaces": 1,
-      "bytes": 75792
+      "bytes": 75920
     },
     {
       "name": "arched_window",
       "vertices": 656,
       "triangles": 1296,
       "surfaces": 1,
-      "bytes": 40868
+      "bytes": 41060
     },
     {
       "name": "window_garden",
@@ -62,14 +62,14 @@
       "vertices": 432,
       "triangles": 864,
       "surfaces": 1,
-      "bytes": 25488
+      "bytes": 25552
     },
     {
       "name": "sink_cabinet",
       "vertices": 1736,
       "triangles": 3356,
       "surfaces": 1,
-      "bytes": 119136
+      "bytes": 119232
     },
     {
       "name": "range_cooker",
@@ -107,25 +107,18 @@
       "bytes": 9592
     },
     {
-      "name": "island_daisies",
-      "vertices": 3814,
-      "triangles": 7260,
-      "surfaces": 1,
-      "bytes": 260808
-    },
-    {
       "name": "green_pendant",
       "vertices": 156,
       "triangles": 304,
       "surfaces": 1,
-      "bytes": 11564
+      "bytes": 11500
     },
     {
       "name": "kitchen_fittings",
       "vertices": 7268,
       "triangles": 14280,
       "surfaces": 1,
-      "bytes": 445576
+      "bytes": 445224
     },
     {
       "name": "loft_structure",
@@ -146,21 +139,21 @@
       "vertices": 3564,
       "triangles": 7088,
       "surfaces": 1,
-      "bytes": 182980
+      "bytes": 183236
     },
     {
       "name": "bedside_table",
       "vertices": 422,
       "triangles": 816,
       "surfaces": 1,
-      "bytes": 28976
+      "bytes": 28912
     },
     {
       "name": "loft_window",
       "vertices": 600,
       "triangles": 1188,
       "surfaces": 1,
-      "bytes": 36988
+      "bytes": 36924
     },
     {
       "name": "loft_garden",
@@ -174,7 +167,7 @@
       "vertices": 1436,
       "triangles": 2800,
       "surfaces": 1,
-      "bytes": 111052
+      "bytes": 111308
     },
     {
       "name": "bookshelf",
@@ -188,7 +181,7 @@
       "vertices": 2120,
       "triangles": 4128,
       "surfaces": 1,
-      "bytes": 143788
+      "bytes": 144268
     },
     {
       "name": "fire",
@@ -202,7 +195,7 @@
       "vertices": 2188,
       "triangles": 3198,
       "surfaces": 1,
-      "bytes": 124988
+      "bytes": 125148
     },
     {
       "name": "hearth_mantel_details",
@@ -216,7 +209,7 @@
       "vertices": 1104,
       "triangles": 2152,
       "surfaces": 1,
-      "bytes": 69876
+      "bytes": 70292
     },
     {
       "name": "coffee_table",
@@ -237,7 +230,7 @@
       "vertices": 144,
       "triangles": 272,
       "surfaces": 1,
-      "bytes": 11580
+      "bytes": 11708
     },
     {
       "name": "dining_table",
@@ -258,21 +251,14 @@
       "vertices": 844,
       "triangles": 1616,
       "surfaces": 1,
-      "bytes": 63432
-    },
-    {
-      "name": "dining_daisies",
-      "vertices": 3814,
-      "triangles": 7260,
-      "surfaces": 1,
-      "bytes": 260808
+      "bytes": 63496
     },
     {
       "name": "living_dressing",
       "vertices": 1706,
       "triangles": 3192,
       "surfaces": 1,
-      "bytes": 129792
+      "bytes": 129952
     },
     {
       "name": "natural_woven_rugs",
@@ -282,22 +268,36 @@
       "bytes": 109156
     },
     {
-      "name": "warm_lamps_glow",
-      "vertices": 744,
-      "triangles": 1468,
+      "name": "stair_wall_dressing",
+      "vertices": 812,
+      "triangles": 1556,
       "surfaces": 1,
-      "bytes": 47188
+      "bytes": 61548
+    },
+    {
+      "name": "dining_island_flowers",
+      "vertices": 7628,
+      "triangles": 14520,
+      "surfaces": 1,
+      "bytes": 520468
+    },
+    {
+      "name": "warm_lamps_glow",
+      "vertices": 890,
+      "triangles": 1756,
+      "surfaces": 1,
+      "bytes": 55252
     }
   ],
-  "unique_triangles": 129747,
-  "scene_triangles": 153671,
-  "static_draw_surfaces": 57,
-  "glb_bytes": 4374240,
-  "atlas_bytes": 2501182,
-  "placed_instances": 57,
+  "unique_triangles": 131591,
+  "scene_triangles": 159455,
+  "static_draw_surfaces": 60,
+  "glb_bytes": 4444880,
+  "atlas_bytes": 2520114,
+  "placed_instances": 60,
   "materials": 3,
-  "local_scene_triangles": 138179,
-  "shared_scene_triangles": 15492,
+  "local_scene_triangles": 140023,
+  "shared_scene_triangles": 19432,
   "shared_assets": [
     {
       "name": "ivy_long",
@@ -328,7 +328,7 @@
       "bytes": 67012
     }
   ],
-  "plant_budget_triangles": 30012,
+  "plant_budget_triangles": 33952,
   "budget_limits": {
     "placed_triangles": 200000,
     "plant_triangles": 100000,

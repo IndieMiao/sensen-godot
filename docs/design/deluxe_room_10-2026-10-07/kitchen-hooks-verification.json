@@ -1,0 +1,159 @@
+{
+  "attachment_points": [
+    {
+      "name": "hob_slot_1",
+      "position": [
+        -3.915,
+        1.291,
+        -0.381
+      ],
+      "purpose": "Pot mount on forward right burner",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y",
+      "source_position": [
+        -3.9149999618530273,
+        1.2910000085830688,
+        -0.38100001215934753
+      ],
+      "source_error_m": 4.094765353471279e-08,
+      "source_up_dot": 1.0
+    },
+    {
+      "name": "hob_slot_2",
+      "position": [
+        -4.245,
+        1.291,
+        -0.381
+      ],
+      "purpose": "Pot mount on rear right burner",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y",
+      "source_position": [
+        -4.244999885559082,
+        1.2910000085830688,
+        -0.38100001215934753
+      ],
+      "source_error_m": 1.1540469026160245e-07,
+      "source_up_dot": 1.0
+    },
+    {
+      "name": "hob_slot_3",
+      "position": [
+        -3.915,
+        1.291,
+        -0.859
+      ],
+      "purpose": "Pot mount on forward left burner",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y",
+      "source_position": [
+        -3.9149999618530273,
+        1.2910000085830688,
+        -0.859000027179718
+      ],
+      "source_error_m": 4.761929934342867e-08,
+      "source_up_dot": 1.0
+    },
+    {
+      "name": "prep_area",
+      "position": [
+        -4.04,
+        1.296,
+        -1.69
+      ],
+      "size": [
+        0.7,
+        0.1,
+        0.55
+      ],
+      "purpose": "Clear 0.55m preparation worktop; utensil crock moved beside sink",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y",
+      "source_position": [
+        -4.039999961853027,
+        1.2960000038146973,
+        -1.690000057220459
+      ],
+      "source_error_m": 6.887615242553135e-08,
+      "source_up_dot": 1.0
+    },
+    {
+      "name": "spice_rack",
+      "position": [
+        -4.22,
+        2.62,
+        0.38
+      ],
+      "size": [
+        0.38,
+        0.35,
+        0.98
+      ],
+      "purpose": "Open pantry shelf accepts Lv2 spice module",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y",
+      "source_position": [
+        -4.21999979019165,
+        2.619999885559082,
+        0.3799999952316284
+      ],
+      "source_error_m": 2.390376634737017e-07,
+      "source_up_dot": 1.0
+    },
+    {
+      "name": "warmer_slot",
+      "position": [
+        -4.08,
+        0.082,
+        -1.69
+      ],
+      "size": [
+        0.69,
+        1.08,
+        0.56
+      ],
+      "purpose": "Lv3 replaceable green cabinet slot under prep, 0.56m along counter",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y",
+      "source_position": [
+        -4.079999923706055,
+        0.0820000022649765,
+        -1.690000057220459
+      ],
+      "source_error_m": 9.539432453352002e-08,
+      "source_up_dot": 1.0
+    }
+  ],
+  "pendant_shade_bottom_y": 2.6700000762939453,
+  "minimum_y": 2.0,
+  "avatar_visual_H": 1.7455,
+  "shade_above_avatar_m": 0.9245000762939453,
+  "prep_usable_width_m": 0.5,
+  "prep_source_obstructions": [],
+  "passed": true,
+  "scope": "Named source empties/up axes and evaluated shade/clear worktop geometry. Marker nodes are independently read back in Godot capture; kitchen behavior and modules belong to213."
+}
