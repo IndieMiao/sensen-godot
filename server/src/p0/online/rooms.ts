@@ -3,10 +3,11 @@
  * holds seats and counts who is online. Pure state; the WebSocket hub drives it and owns the clock.
  */
 
-export type OutpostKind = 'tackle' | 'tea' | 'travel' | 'market';
+/** Outpost roles, the same ids as the counter entries (open_keeper_greeting(role), SGODOT-224). */
+export type OutpostRole = 'tackle' | 'tea' | 'post' | 'market';
 export interface OutpostSpec {
   id: string;
-  kind: OutpostKind;
+  role: OutpostRole;
   /** Players per instance: indoor 12, Market Square 30 (§9.3.2). */
   capacity: number;
   /** Walkable box in room metres [min_x, max_x, min_z, max_z]; positions outside are clamped. */
@@ -14,8 +15,16 @@ export interface OutpostSpec {
   /** Anchor names of the seats (seat_table1_1 …); empty when the space has none. */
   seats: string[];
 }
-export interface Occupant { player: string; outpost: string; room: number; x: number; z: number; yaw: number; action: string; seat: string; at: number }
-export interface Placement { outpost: string; room: number; capacity: number }
+export interface Occupant {
+  player: string; outpost: string; room: number;
+  /** Small id within the instance, used in snapshot frames (lowest free, from 1). */
+  id: number;
+  x: number; z: number; yaw: number; action: string; seat: string;
+  /** Last accepted input sequence and its time. */
+  seq: number; at: number;
+}
+/** `rejoined`: back in the instance this player just left (no "Room 2" notice on a reconnect). */
+export interface Placement { outpost: string; room: number; capacity: number; rejoined: boolean }
 
 /** A reconnect within this window goes back to the same instance when it still has a free seat. */
 export const REJOIN_MS = 60_000;
@@ -57,15 +66,20 @@ export class OutpostRooms {
     const free = (n: number) => (rooms.get(n)?.size ?? 0) < spec.capacity;
     const back = this.recent.get(player);
     let room = back && back.outpost === outpost && back.until >= this.now() && free(back.room) ? back.room : 0;
+    const rejoined = room > 0;
     for (let n = 1; !room && n <= MAX_ROOMS; n++) if (free(n)) room = n;
     if (!room) throw new Error('SERVER_FULL');
     this.recent.delete(player);
-    const [x, z] = clamp(spec, at);
-    const occupant: Occupant = { player, outpost, room, x, z, yaw: 0, action: 'idle', seat: '', at: this.now() };
     if (!rooms.has(room)) rooms.set(room, new Map());
-    rooms.get(room)!.set(player, occupant);
+    const members = rooms.get(room)!;
+    const taken = new Set([...members.values()].map(m => m.id));
+    let id = 1;
+    while (taken.has(id)) id++;
+    const [x, z] = clamp(spec, at);
+    const occupant: Occupant = { player, outpost, room, id, x, z, yaw: 0, action: 'idle', seat: '', seq: -1, at: this.now() };
+    members.set(player, occupant);
     this.byPlayer.set(player, occupant);
-    return { outpost, room, capacity: spec.capacity };
+    return { outpost, room, capacity: spec.capacity, rejoined };
   }
 
   /** Frees the seat and the place. `remember` keeps the instance for a quick reconnect. */

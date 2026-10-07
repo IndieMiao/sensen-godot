@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "_note": "P0 home set (SGODOT-227). Names and map positions of tea / post / market are provisional until the product answer on SGODOT-227 question 4; the tackle shop keeps its current pin. All four use the Basic Room placeholder until wp-3d-scene lands (SGODOT-208). role = counter entry id (open_keeper_greeting(role), SGODOT-224). bounds = walkable box in room metres [min_x, max_x, min_z, max_z]; seats must match the seat_* anchors of the anchors file.",
+  "outposts": [
+    {
+      "id": "sh_tackle_1", "role": "tackle", "name": "Old Kai's Tackle", "category": "Tackle shop · Rods and bait",
+      "lat": 31.2168, "lng": 121.4398, "capacity": 12,
+      "art": "basic_room", "anchors": "res://assets/p0/outposts/tackle.anchors.json",
+      "bounds": [-3.0, 3.0, -3.0, 3.2], "seats": []
+    },
+    {
+      "id": "sh_tea_1", "role": "tea", "name": "Shanghai Tea House", "category": "Tea house · Hot tea",
+      "lat": 31.2132, "lng": 121.4462, "capacity": 12,
+      "art": "basic_room", "anchors": "res://assets/p0/outposts/tea.anchors.json",
+      "bounds": [-3.0, 3.0, -3.0, 3.2], "seats": ["seat_table1_1", "seat_table1_2", "seat_bench_1", "seat_bench_2"]
+    },
+    {
+      "id": "sh_post_1", "role": "post", "name": "Shanghai Travel Post", "category": "Travel post · Passport stamps",
+      "lat": 31.2196, "lng": 121.4471, "capacity": 12,
+      "art": "basic_room", "anchors": "res://assets/p0/outposts/post.anchors.json",
+      "bounds": [-3.0, 3.0, -3.0, 3.2], "seats": []
+    },
+    {
+      "id": "sh_market_1", "role": "market", "name": "Shanghai Market Square", "category": "Market square · Requests and specialties",
+      "lat": 31.2101, "lng": 121.4392, "capacity": 30,
+      "art": "basic_room", "anchors": "res://assets/p0/outposts/market.anchors.json",
+      "bounds": [-3.0, 3.0, -3.0, 3.2], "seats": []
+    }
+  ]
+}

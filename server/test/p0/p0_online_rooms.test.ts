@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_ROOMS, OutpostRooms, REJOIN_MS, type OutpostSpec } from '../../src/p0/rooms.js';
+import { MAX_ROOMS, OutpostRooms, REJOIN_MS, type OutpostSpec } from '../../src/p0/online/rooms.js';
 
-const TEA: OutpostSpec = { id: 'outpost_tea_1', kind: 'tea', capacity: 12, bounds: [0, 10, -10, 0], seats: ['seat_table1_1', 'seat_table1_2'] };
-const MARKET: OutpostSpec = { id: 'outpost_market_1', kind: 'market', capacity: 30, bounds: [0, 20, -20, 0], seats: [] };
+const TEA: OutpostSpec = { id: 'outpost_tea_1', role: 'tea', capacity: 12, bounds: [0, 10, -10, 0], seats: ['seat_table1_1', 'seat_table1_2'] };
+const MARKET: OutpostSpec = { id: 'outpost_market_1', role: 'market', capacity: 30, bounds: [0, 20, -20, 0], seats: [] };
 
 function rooms(start = 1_000_000) {
   const clock = { t: start };
@@ -15,7 +15,7 @@ describe('P0 outpost rooms (SGODOT-227)', () => {
   it('fills Room 1 to capacity, then opens Room 2 (indoor 12, market 30)', () => {
     const { r } = rooms();
     expect(fill(r, TEA.id, 12).every(p => p.room === 1)).toBe(true);
-    expect(r.join('late', TEA.id)).toEqual({ outpost: TEA.id, room: 2, capacity: 12 });
+    expect(r.join('late', TEA.id)).toEqual({ outpost: TEA.id, room: 2, capacity: 12, rejoined: false });
     expect(fill(r, MARKET.id, 30, 'm').every(p => p.room === 1)).toBe(true);
     expect(r.join('m30', MARKET.id).room).toBe(2);
     expect(r.presence()).toEqual({ [TEA.id]: { online: 13, rooms: 2 }, [MARKET.id]: { online: 31, rooms: 2 } });
@@ -35,10 +35,10 @@ describe('P0 outpost rooms (SGODOT-227)', () => {
     r.leave('p12');
     r.leave('p0', false);              // Room 1 now has a free place …
     clock.t += REJOIN_MS - 1;
-    expect(r.join('p12', TEA.id).room).toBe(2);   // … but p12 goes back to Room 2
+    expect(r.join('p12', TEA.id)).toMatchObject({ room: 2, rejoined: true });   // … but p12 goes back to Room 2
     r.leave('p12');
     clock.t += REJOIN_MS + 1;
-    expect(r.join('p12', TEA.id).room).toBe(1);   // reservation expired
+    expect(r.join('p12', TEA.id)).toMatchObject({ room: 1, rejoined: false });   // reservation expired
   });
 
   it('joining another outpost moves the player; leaving empties the instance', () => {
@@ -86,6 +86,17 @@ describe('P0 outpost rooms (SGODOT-227)', () => {
     expect(r.sit('b', 'seat_table1_1')).toBe('ok');
     r.leave('b');
     expect(r.sit('a', 'seat_table1_1')).toBe('ok');
+  });
+
+  it('member ids are small and reused within an instance', () => {
+    const { r } = rooms();
+    fill(r, TEA.id, 3);
+    expect(['p0', 'p1', 'p2'].map(p => r.occupant(p)!.id)).toEqual([1, 2, 3]);
+    r.leave('p1', false);
+    r.join('q', TEA.id);
+    expect(r.occupant('q')!.id).toBe(2);
+    fill(r, TEA.id, 12, 'x');
+    expect(r.occupant('x9')).toMatchObject({ room: 2, id: 1 });   // Room 1 full after x8
   });
 
   it('seats are per instance', () => {
