@@ -1,0 +1,901 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    240
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiItemCell · quick"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Compact/QuickSlot 633:41279 · LOCK-04 / 05"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        188
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            52,
+            88
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                0,
+                52,
+                52,
+                68
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    0,
+                    56,
+                    52,
+                    64
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        4,
+                        60,
+                        44,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            15,
+                            60,
+                            22,
+                            22
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            4,
+                            79,
+                            44,
+                            29
+                          ],
+                          "variation": "C10B",
+                          "text": "Radish Seeds"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            4,
+                            103,
+                            44,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×24"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                126,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "default"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            64,
+            52,
+            52,
+            88
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                64,
+                52,
+                52,
+                68
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    64,
+                    52,
+                    52,
+                    64
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        68,
+                        56,
+                        44,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            79,
+                            56,
+                            22,
+                            22
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            75,
+                            44,
+                            29
+                          ],
+                          "variation": "C10B",
+                          "text": "Radish Seeds"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            99,
+                            44,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×24"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                64,
+                126,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "selected"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            128,
+            52,
+            52,
+            88
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                128,
+                52,
+                52,
+                68
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    128,
+                    56,
+                    52,
+                    64
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        132,
+                        60,
+                        44,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            143,
+                            60,
+                            22,
+                            22
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            132,
+                            79,
+                            44,
+                            29
+                          ],
+                          "variation": "C10B",
+                          "text": "Radish Seeds"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            132,
+                            103,
+                            44,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×24"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        136,
+                        57,
+                        36,
+                        2
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        147,
+                        49,
+                        14,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            149,
+                            51,
+                            10,
+                            10
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                128,
+                126,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "pinned"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            192,
+            52,
+            74,
+            88
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                203,
+                52,
+                52,
+                68
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    203,
+                    52,
+                    52,
+                    64
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        207,
+                        56,
+                        44,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            218,
+                            56,
+                            22,
+                            22
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            207,
+                            75,
+                            44,
+                            29
+                          ],
+                          "variation": "C10B",
+                          "text": "Radish Seeds"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            207,
+                            99,
+                            44,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×24"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        211,
+                        54,
+                        36,
+                        2
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        222,
+                        45,
+                        14,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            224,
+                            47,
+                            10,
+                            10
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                192,
+                126,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "pinned + selected"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            152,
+            52,
+            88
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                0,
+                152,
+                52,
+                68
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    0,
+                    146,
+                    52,
+                    64
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        4,
+                        150,
+                        44,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            15,
+                            150,
+                            22,
+                            22
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            4,
+                            169,
+                            44,
+                            29
+                          ],
+                          "variation": "C10B",
+                          "text": "Radish Seeds"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            4,
+                            193,
+                            44,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×24"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        8,
+                        148,
+                        36,
+                        2
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        19,
+                        139,
+                        14,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            21,
+                            141,
+                            10,
+                            10
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                226,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "lifted"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            64,
+            152,
+            52,
+            88
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                64,
+                152,
+                52,
+                68
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    64,
+                    156,
+                    52,
+                    64
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        68,
+                        160,
+                        44,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            79,
+                            160,
+                            22,
+                            22
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            179,
+                            44,
+                            29
+                          ],
+                          "variation": "C10B",
+                          "text": "Radish Seeds"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            203,
+                            44,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×24"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                64,
+                226,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "drop target"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            128,
+            152,
+            52,
+            88
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                128,
+                152,
+                52,
+                68
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    128,
+                    156,
+                    52,
+                    64
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        132,
+                        160,
+                        44,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            143,
+                            160,
+                            22,
+                            22
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            132,
+                            179,
+                            44,
+                            29
+                          ],
+                          "variation": "C10B",
+                          "text": "Radish Seeds"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            132,
+                            203,
+                            44,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        136,
+                        157,
+                        36,
+                        2
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        147,
+                        149,
+                        14,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            149,
+                            151,
+                            10,
+                            10
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                128,
+                226,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "zero"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            192,
+            152,
+            52,
+            88
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                192,
+                152,
+                52,
+                68
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    192,
+                    156,
+                    52,
+                    64
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        196,
+                        160,
+                        44,
+                        56
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                192,
+                226,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "empty"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            256,
+            152,
+            61,
+            88
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                260,
+                152,
+                52,
+                68
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    260,
+                    156,
+                    52,
+                    64
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        264,
+                        160,
+                        44,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            275,
+                            160,
+                            22,
+                            22
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            264,
+                            182,
+                            44,
+                            22
+                          ],
+                          "variation": "C10B",
+                          "text": "Compost"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            264,
+                            203,
+                            44,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×6"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                256,
+                226,
+                61,
+                14
+              ],
+              "variation": "C9B",
+              "text": "one-line name"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

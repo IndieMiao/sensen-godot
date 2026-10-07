@@ -1,0 +1,258 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    160
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiItemCell · gear"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Compact/GearSlot 663:61299 · LOCK-13"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        108
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            52,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                0,
+                52,
+                52,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    0,
+                    68,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        13,
+                        81,
+                        27,
+                        27
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    51,
+                    52,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "Fishing"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    123,
+                    52,
+                    16
+                  ],
+                  "variation": "C9B",
+                  "text": "Starter Rod"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                146,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "default"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            64,
+            52,
+            52,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                64,
+                52,
+                52,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    64,
+                    68,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        77,
+                        81,
+                        27,
+                        27
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    64,
+                    51,
+                    52,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "Farming"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    64,
+                    123,
+                    52,
+                    16
+                  ],
+                  "variation": "C9B",
+                  "text": "Starter Hoe"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                64,
+                146,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "selected"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            128,
+            52,
+            52,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                128,
+                52,
+                52,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    128,
+                    68,
+                    52,
+                    52
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    128,
+                    51,
+                    52,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "Ring"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    128,
+                    123,
+                    52,
+                    16
+                  ],
+                  "variation": "C9B",
+                  "text": ""
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                128,
+                146,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "empty"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

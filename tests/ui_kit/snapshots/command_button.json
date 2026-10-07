@@ -1,0 +1,277 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    614
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiCommandButton"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "CommandButton 483:216 · Compact/Command 633:41273 · LOCK-10"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        544
+      ],
+      "children": [
+        {
+          "type": "UiCommandButton",
+          "rect": [
+            0,
+            70,
+            328,
+            48
+          ],
+          "variation": "CmdPrimary",
+          "text": "Craft"
+        },
+        {
+          "type": "UiCommandButton",
+          "rect": [
+            0,
+            130,
+            328,
+            48
+          ],
+          "variation": "CmdSecondary",
+          "text": "Store"
+        },
+        {
+          "type": "UiCommandButton",
+          "rect": [
+            0,
+            190,
+            328,
+            48
+          ],
+          "variation": "CmdDestructive",
+          "text": "Discard"
+        },
+        {
+          "type": "UiCommandButton",
+          "rect": [
+            0,
+            250,
+            328,
+            48
+          ],
+          "variation": "CmdDangerSecondary",
+          "text": "Leave"
+        },
+        {
+          "type": "UiCommandButton",
+          "rect": [
+            0,
+            310,
+            328,
+            48
+          ],
+          "variation": "CmdPrimary",
+          "text": "Craft · pressed",
+          "pressed": true
+        },
+        {
+          "type": "UiCommandButton",
+          "rect": [
+            0,
+            370,
+            328,
+            48
+          ],
+          "variation": "CmdBlocked",
+          "text": "Need 6 more Timber"
+        },
+        {
+          "type": "UiCommandButton",
+          "rect": [
+            0,
+            430,
+            328,
+            48
+          ],
+          "variation": "CmdPrimary",
+          "text": "Craft"
+        },
+        {
+          "type": "UiCommandButton",
+          "rect": [
+            0,
+            490,
+            328,
+            48
+          ],
+          "variation": "CmdPrimary",
+          "text": "Offline",
+          "disabled": true
+        },
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            550,
+            328,
+            64
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                550,
+                51,
+                64
+              ],
+              "children": [
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    0,
+                    550,
+                    51,
+                    44
+                  ],
+                  "variation": "CmdPrimaryCompact",
+                  "text": "Eat"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    600,
+                    51,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "primary"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                57,
+                550,
+                55,
+                64
+              ],
+              "children": [
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    57,
+                    550,
+                    55,
+                    44
+                  ],
+                  "variation": "CmdSecondaryCompact",
+                  "text": "Sell"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    57,
+                    600,
+                    55,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "secondary"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                118,
+                550,
+                104,
+                64
+              ],
+              "children": [
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    118,
+                    550,
+                    104,
+                    44
+                  ],
+                  "variation": "CmdBlockedCompact",
+                  "text": "Sell at home"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    118,
+                    600,
+                    104,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "unavailable"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                228,
+                550,
+                54,
+                64
+              ],
+              "children": [
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    228,
+                    550,
+                    54,
+                    44
+                  ],
+                  "variation": "CmdPrimaryCompact",
+                  "text": "Buy"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    228,
+                    600,
+                    54,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "pending"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

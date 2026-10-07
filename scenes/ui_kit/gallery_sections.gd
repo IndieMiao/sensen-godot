@@ -13,6 +13,20 @@ static func all() -> Array[Dictionary]:
 		{id = "theme_nav", title = "Navigation, dismiss, close, chips", figma = "NavigationRow 483:217 · Dismiss 483:220 · Close 483:336 · Compact/Filter 633:41280 · Tab 483:322", build = _nav},
 		{id = "theme_panels", title = "Panel variations", figma = "Sheet 483:190 · InformationSheet 932:71686 · Toast 483:302 · StateBadge 483:324", build = _panels},
 		{id = "style_box", title = "UiStyleBox inset, dashed, shadow", figma = "Compact/Command 633:41273 (34 in 44) · Compact/QuickSlot 633:41279 empty / lifted / drop-target", build = _style_boxes},
+		# SGODOT-212 atomic components
+		{id = "object_header", title = "UiObjectHeader", figma = "ObjectHeader 483:196", build = _object_header},
+		{id = "fact_row", title = "UiFactRow", figma = "Fact 483:222 · Cost 483:225", build = _fact_rows},
+		{id = "item_row", title = "UiItemRow", figma = "ItemRow 483:228", build = _item_rows},
+		{id = "item_cell_inventory", title = "UiItemCell · inventory", figma = "Compact/InventoryCell 633:41278 · LOCK-12", build = _cells_inventory},
+		{id = "item_cell_quick", title = "UiItemCell · quick", figma = "Compact/QuickSlot 633:41279 · LOCK-04 / 05", build = _cells_quick},
+		{id = "item_cell_kitchen", title = "UiItemCell · kitchen", figma = "Compact/Kitchen/Cell 655:58506 · LOCK-20", build = _cells_kitchen},
+		{id = "item_cell_gear", title = "UiItemCell · gear", figma = "Compact/GearSlot 663:61299 · LOCK-13", build = _cells_gear},
+		{id = "command_button", title = "UiCommandButton", figma = "CommandButton 483:216 · Compact/Command 633:41273 · LOCK-10", build = _commands},
+		{id = "nav_buttons", title = "UiNavButton · Dismiss · Close", figma = "NavigationRow 483:217 · Compact/Navigation 633:41276 · Dismiss 483:220 · Close 483:336", build = _navigation},
+		{id = "filter_chip", title = "UiFilterChip", figma = "Compact/Filter 633:41280", build = _filter_chips},
+		{id = "segment_tab", title = "UiSegmentTab", figma = "Tab 483:322 · Compact/Kitchen/Mode 655:58504 · LOCK-13 / 20", build = _segment_tabs},
+		{id = "badge", title = "UiBadge", figma = "StateBadge 483:324", build = _badges},
+		{id = "empty_state", title = "UiEmptyState", figma = "No Figma main yet (engineering default, WP7-B F-08 §5)", build = _empty_states},
 	]
 	return out
 
@@ -174,3 +188,166 @@ static func _sample(min_size: Vector2, box: StyleBox) -> Panel:
 	p.custom_minimum_size = min_size
 	p.add_theme_stylebox_override(&"panel", box)
 	return p
+
+# ---------------------------------------------------------------- SGODOT-212 atomic components
+
+static func _tex(id: String) -> Texture2D:
+	return load("res://assets/p0/icons/%s.svg" % id)
+
+## A sample with its state name underneath, so every shot says which state it shows.
+static func _captioned(c: Control, caption: String) -> VBoxContainer:
+	var v := _column(UiTokens.SPACE_WITHIN)
+	c.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	v.add_child(c)
+	var l := UiKit.label(caption, UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(l)
+	return v
+
+static func _object_header() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(UiObjectHeader.new({title = "Grilled Crucian", quantity = "2", quantity_label = "dishes",
+		state = "Good", effect = "Restores 40 Energy."}))
+	v.add_child(UiObjectHeader.new({title = "Starter Rod", effect = "Reaches Common and Fine fish."}))
+	v.add_child(UiObjectHeader.new({title = "Herb Baked Perch with Lemon", quantity = "12", quantity_label = "dishes"}))
+	return v
+
+static func _fact_rows() -> Control:
+	var v := _column(0)
+	v.add_child(UiFactRow.new("Progress", "2/8"))
+	v.add_child(UiFactRow.new("Grows in", "4m 30s"))
+	v.add_child(UiFactRow.new("Cost", "120 coins", UiFactRow.Kind.COST))
+	return v
+
+static func _item_rows() -> Control:
+	var v := _column(0)
+	v.add_child(UiItemRow.new({icon = _tex("fish_crucian"), title = "Pond Crucian", state = "Common",
+		effect = "A simple pond fish", quantity = "7", quantity_label = "fish"}))
+	v.add_child(UiItemRow.new({icon = _tex("bait_worm"), title = "Worm Bait", effect = "Faster bites",
+		quantity = "12", quantity_label = "bait"}))
+	v.add_child(UiItemRow.new({icon = _tex("crop_herb"), title = "Herb"}))
+	return v
+
+static func _cell(density: UiItemCell.Density, fields: Dictionary) -> UiItemCell:
+	var c := UiItemCell.new(density)
+	for k in fields: c.set(k, fields[k])
+	return c
+
+static func _cells_inventory() -> Control:
+	var row := _row(UiTokens.SPACE_ROW)
+	var D := UiItemCell.Density.INVENTORY
+	var S := UiItemCell.State
+	row.add_child(_captioned(_cell(D, {icon = _tex("fish_crucian"), quantity = "×3"}), "default"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("fish_trout"), quantity = "×1", rarity = 2}), "rarity"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("crop_radish"), quantity = "×19", state = S.SELECTED}), "selected"))
+	row.add_child(_captioned(_cell(D, {state = S.EMPTY}), "empty"))
+	return row
+
+static func _cells_quick() -> Control:
+	var row := _row(UiTokens.SPACE_ROW)
+	var D := UiItemCell.Density.QUICK
+	var S := UiItemCell.State
+	var radish := {icon = _tex("seed_radish"), title = "Radish Seeds", quantity = "×24"}
+	var samples := [
+		["default", {}], ["selected", {state = S.SELECTED}], ["pinned", {pinned = true}],
+		["pinned + selected", {pinned = true, state = S.SELECTED}], ["lifted", {pinned = true, state = S.LIFTED}],
+		["drop target", {state = S.DROP_TARGET}], ["zero", {pinned = true, state = S.ZERO, quantity = "×0"}],
+		["empty", {state = S.EMPTY}],
+	]
+	for sample in samples:
+		var fields: Dictionary = radish.duplicate()
+		fields.merge(sample[1], true)
+		row.add_child(_captioned(_cell(D, fields), sample[0]))
+	row.add_child(_captioned(_cell(D, {icon = _tex("compost"), title = "Compost", quantity = "×6"}), "one-line name"))
+	return row
+
+static func _cells_kitchen() -> Control:
+	var row := _row(UiTokens.SPACE_ROW)
+	var D := UiItemCell.Density.KITCHEN
+	var S := UiItemCell.State
+	row.add_child(_captioned(_cell(D, {icon = _tex("dish_grilled_crucian")}), "default"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("dish_fish_soup"), status = "Tasted"}), "state label"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("fish_crucian"), quantity = "×3", rarity = 1}), "quantity"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("dish_carp_cakes"), state = S.SELECTED}), "selected"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("dish_radish_salad"), marked = true}), "cooked"))
+	row.add_child(_captioned(_cell(D, {state = S.EMPTY}), "empty"))
+	return row
+
+static func _cells_gear() -> Control:
+	var row := _row(UiTokens.SPACE_ROW)
+	var D := UiItemCell.Density.GEAR
+	var S := UiItemCell.State
+	row.add_child(_captioned(_cell(D, {role = "Fishing", icon = _tex("rod_starter"), title = "Starter Rod"}), "default"))
+	row.add_child(_captioned(_cell(D, {role = "Farming", icon = _tex("hoe_starter"), title = "Starter Hoe", state = S.SELECTED}), "selected"))
+	row.add_child(_captioned(_cell(D, {role = "Ring", state = S.EMPTY}), "empty"))
+	return row
+
+static func _commands() -> Control:
+	var v := _column()
+	var K := UiCommandButton.Kind
+	for k in [[K.PRIMARY, "Craft"], [K.SECONDARY, "Store"], [K.DESTRUCTIVE, "Discard"], [K.DANGER_SECONDARY, "Leave"]]:
+		v.add_child(UiCommandButton.new(k[1], k[0]))
+	var pressed := UiCommandButton.new("Craft · pressed")
+	pressed.toggle_mode = true   # gallery only: hold the pressed look for the shot
+	pressed.button_pressed = true
+	v.add_child(pressed)
+	var unavailable := UiCommandButton.new("Craft")
+	unavailable.reason = "Need 6 more Timber"
+	v.add_child(unavailable)
+	var pending := UiCommandButton.new("Craft")
+	pending.phase = CommandLifecycle.State.PENDING
+	v.add_child(pending)
+	var offline := UiCommandButton.new("Offline")
+	offline.disabled = true
+	v.add_child(offline)
+	var row := _row()
+	row.add_child(_captioned(UiCommandButton.new("Eat", K.PRIMARY, true), "primary"))
+	row.add_child(_captioned(UiCommandButton.new("Sell", K.SECONDARY, true), "secondary"))
+	var c_unavailable := UiCommandButton.new("Sell", K.PRIMARY, true)
+	c_unavailable.reason = "Sell at home"
+	row.add_child(_captioned(c_unavailable, "unavailable"))
+	var c_pending := UiCommandButton.new("Buy", K.PRIMARY, true)
+	c_pending.phase = CommandLifecycle.State.PENDING
+	row.add_child(_captioned(c_pending, "pending"))
+	v.add_child(row)
+	return v
+
+static func _navigation() -> Control:
+	var v := _column(0)
+	v.add_child(UiNavButton.new("View details"))
+	var pressed := UiNavButton.new("View details · pressed")
+	pressed.toggle_mode = true   # gallery only
+	pressed.button_pressed = true
+	v.add_child(pressed)
+	v.add_child(UiDismissButton.new("Not now"))
+	var row := _row(UiTokens.SPACE_ROW)
+	row.add_child(_captioned(UiNavButton.new("Gift", true), "compact"))
+	row.add_child(_captioned(UiCloseButton.new(), "close"))
+	var close_pressed := UiCloseButton.new()
+	close_pressed.toggle_mode = true   # gallery only
+	close_pressed.button_pressed = true
+	row.add_child(_captioned(close_pressed, "close · pressed"))
+	v.add_child(row)
+	return v
+
+static func _filter_chips() -> Control:
+	return UiFilterChip.row(PackedStringArray(["All", "Seeds", "Fish", "Produce", "Dishes"]), 0)
+
+static func _segment_tabs() -> Control:
+	var v := _column()
+	v.add_child(UiSegmentTab.new(["Bag", "Gear"], 0))
+	v.add_child(UiSegmentTab.new([{label = "Cookbook", count = "4/48"}, {label = "Experiment"}], 1))
+	v.add_child(UiSegmentTab.new(["To do", "Parcels", "Updates"], 1))
+	return v
+
+static func _badges() -> Control:
+	var row := _row()
+	row.add_child(UiBadge.new("Ready"))
+	row.add_child(UiBadge.new("Familiar"))
+	return row
+
+static func _empty_states() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(UiEmptyState.new("No fish yet", _tex("fish_unknown"), "Show on map"))
+	v.add_child(UiEmptyState.new("Nothing to sell here", _tex("stall")))
+	return v

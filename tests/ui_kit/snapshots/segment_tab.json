@@ -1,0 +1,336 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    226
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiSegmentTab"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "Tab 483:322 · Compact/Kitchen/Mode 655:58504 · LOCK-13 / 20"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        156
+      ],
+      "children": [
+        {
+          "type": "UiSegmentTab",
+          "rect": [
+            0,
+            70,
+            328,
+            44
+          ],
+          "children": [
+            {
+              "type": "Button",
+              "rect": [
+                0,
+                70,
+                161,
+                44
+              ],
+              "variation": "SegmentTab",
+              "text": "",
+              "pressed": true,
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    0,
+                    70,
+                    161,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        67,
+                        82,
+                        26,
+                        20
+                      ],
+                      "variation": "BodyB14",
+                      "text": "Bag"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Button",
+              "rect": [
+                167,
+                70,
+                161,
+                44
+              ],
+              "variation": "SegmentTab",
+              "text": "",
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    167,
+                    70,
+                    161,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        231,
+                        82,
+                        32,
+                        20
+                      ],
+                      "variation": "BodyB14",
+                      "text": "Gear"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiSegmentTab",
+          "rect": [
+            0,
+            126,
+            328,
+            44
+          ],
+          "children": [
+            {
+              "type": "Button",
+              "rect": [
+                0,
+                126,
+                161,
+                44
+              ],
+              "variation": "SegmentTab",
+              "text": "",
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    0,
+                    126,
+                    161,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        34,
+                        138,
+                        65,
+                        20
+                      ],
+                      "variation": "BodyB14",
+                      "text": "Cookbook"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        105,
+                        140,
+                        22,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "4/48"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Button",
+              "rect": [
+                167,
+                126,
+                161,
+                44
+              ],
+              "variation": "SegmentTab",
+              "text": "",
+              "pressed": true,
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    167,
+                    126,
+                    161,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        210,
+                        138,
+                        75,
+                        20
+                      ],
+                      "variation": "BodyB14",
+                      "text": "Experiment"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiSegmentTab",
+          "rect": [
+            0,
+            182,
+            328,
+            44
+          ],
+          "children": [
+            {
+              "type": "Button",
+              "rect": [
+                0,
+                182,
+                105,
+                44
+              ],
+              "variation": "SegmentTab",
+              "text": "",
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    0,
+                    182,
+                    105,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        34,
+                        194,
+                        36,
+                        20
+                      ],
+                      "variation": "BodyB14",
+                      "text": "To do"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Button",
+              "rect": [
+                111,
+                182,
+                105,
+                44
+              ],
+              "variation": "SegmentTab",
+              "text": "",
+              "pressed": true,
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    111,
+                    182,
+                    105,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        139,
+                        194,
+                        48,
+                        20
+                      ],
+                      "variation": "BodyB14",
+                      "text": "Parcels"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Button",
+              "rect": [
+                222,
+                182,
+                106,
+                44
+              ],
+              "variation": "SegmentTab",
+              "text": "",
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    222,
+                    182,
+                    106,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        247,
+                        194,
+                        55,
+                        20
+                      ],
+                      "variation": "BodyB14",
+                      "text": "Updates"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

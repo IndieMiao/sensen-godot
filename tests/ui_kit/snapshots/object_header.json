@@ -1,0 +1,242 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    317
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiObjectHeader"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "ObjectHeader 483:196"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        265
+      ],
+      "children": [
+        {
+          "type": "UiObjectHeader",
+          "rect": [
+            0,
+            52,
+            328,
+            110
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                52,
+                328,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    66,
+                    248,
+                    29
+                  ],
+                  "variation": "TitleXB20",
+                  "text": "Grilled Crucian"
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    256,
+                    52,
+                    72,
+                    58
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        256,
+                        52,
+                        72,
+                        34
+                      ],
+                      "variation": "QuantityXB24",
+                      "text": "2"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        256,
+                        92,
+                        72,
+                        18
+                      ],
+                      "variation": "CaptionR12",
+                      "text": "dishes"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                116,
+                328,
+                18
+              ],
+              "variation": "CaptionB12",
+              "text": "Good"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                140,
+                328,
+                22
+              ],
+              "variation": "EffectB15",
+              "text": "Restores 40 Energy."
+            }
+          ]
+        },
+        {
+          "type": "UiObjectHeader",
+          "rect": [
+            0,
+            182,
+            328,
+            57
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                182,
+                328,
+                29
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    182,
+                    328,
+                    29
+                  ],
+                  "variation": "TitleXB20",
+                  "text": "Starter Rod"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                217,
+                328,
+                22
+              ],
+              "variation": "EffectB15",
+              "text": "Reaches Common and Fine fish."
+            }
+          ]
+        },
+        {
+          "type": "UiObjectHeader",
+          "rect": [
+            0,
+            259,
+            328,
+            58
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                259,
+                328,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    273,
+                    248,
+                    29
+                  ],
+                  "variation": "TitleXB20",
+                  "text": "Herb Baked Perch with Lemon"
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    256,
+                    259,
+                    72,
+                    58
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        256,
+                        259,
+                        72,
+                        34
+                      ],
+                      "variation": "QuantityXB24",
+                      "text": "12"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        256,
+                        299,
+                        72,
+                        18
+                      ],
+                      "variation": "CaptionR12",
+                      "text": "dishes"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

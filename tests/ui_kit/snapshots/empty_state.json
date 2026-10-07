@@ -1,0 +1,117 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    238
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiEmptyState"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "No Figma main yet (engineering default, WP7-B F-08 §5)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        186
+      ],
+      "children": [
+        {
+          "type": "UiEmptyState",
+          "rect": [
+            0,
+            52,
+            328,
+            108
+          ],
+          "children": [
+            {
+              "type": "TextureRect",
+              "rect": [
+                148,
+                52,
+                32,
+                32
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                90,
+                328,
+                20
+              ],
+              "variation": "BodyB14",
+              "text": "No fish yet"
+            },
+            {
+              "type": "UiNavButton",
+              "rect": [
+                122,
+                116,
+                84,
+                44
+              ],
+              "variation": "NavCompact",
+              "text": "Show on map ›"
+            }
+          ]
+        },
+        {
+          "type": "UiEmptyState",
+          "rect": [
+            0,
+            180,
+            328,
+            58
+          ],
+          "children": [
+            {
+              "type": "TextureRect",
+              "rect": [
+                148,
+                180,
+                32,
+                32
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                218,
+                328,
+                20
+              ],
+              "variation": "BodyB14",
+              "text": "Nothing to sell here"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

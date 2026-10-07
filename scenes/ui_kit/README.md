@@ -40,6 +40,28 @@ must not change structure, role, entry point or key copy. Engineering specs: SGO
 `UiKit` (`modules/ui/kit/ui_kit.gd`) has the shared helpers: `theme()`, `font(weight)`,
 `label(text, style, color)`, `ensure_hit_area()`, `icon(texture, side)`, `alpha()`, `secs()`.
 
+## Components (SGODOT-212)
+
+| Class | Figma main | Notes |
+|---|---|---|
+| `UiObjectHeader` | ObjectHeader 483:196 | title + quantity column, optional state line and effect sentence |
+| `UiFactRow` | Fact 483:222 · Cost 483:225 | `Kind.FACT` / `Kind.COST`; have / need counts are NEED-TILEs (LOCK-10), not fact rows |
+| `UiItemRow` | ItemRow 483:228 | icon, title / state / effect, quantity column; display only |
+| `UiItemCell` | Compact/InventoryCell 633:41278 · QuickSlot 633:41279 · Kitchen/Cell 655:58506 · GearSlot 663:61299 | one class, `Density` picks the main; `State` DEFAULT / SELECTED / EMPTY, plus LIFTED / DROP_TARGET / ZERO on QUICK; `pinned` draws LOCK-05 |
+| `UiCommandButton` | CommandButton 483:216 · Compact/Command 633:41273 | connect `activated`; `reason` = unavailable look with the reason as label, still tappable (`unavailable_pressed`, LOCK-10); `phase` / `track()` follow `CommandLifecycle` (submitting ignores taps, pending dims) |
+| `UiNavButton` | NavigationRow 483:217 · Compact/Navigation 633:41276 | row with right chevron, or compact `Label ›`; never jumps the player (LOCK-08) |
+| `UiDismissButton` | Dismiss 483:220 | quiet close text; not on the Energy card (LOCK-09) |
+| `UiCloseButton` | Close 483:336 | 44 round, 20 px glyph |
+| `UiFilterChip` | Compact/Filter 633:41280 | toggle chip, 26 drawn in 44; `UiFilterChip.row()` builds a grouped row |
+| `UiSegmentTab` | Tab 483:322 · Compact/Kitchen/Mode 655:58504 | 2–3 way mode switch with optional count; selected is never the command green (LOCK-13) |
+| `UiBadge` | StateBadge 483:324 | short state word pill |
+| `UiEmptyState` | none yet (WP7-B F-08 §5) | icon + one line + optional navigation; engineering default until a main exists |
+
+Positions inside a fixed-size main (e.g. the InventoryCell icon at y 10, the 3 px pill inset) are private
+constants in the component script, each citing its main; everything shared comes from `UiTokens`.
+Glyphs that are tinted in code (pin, check, close) are white SVGs exported from Figma under
+`assets/ui/kit_icons/`.
+
 ## Gallery and snapshots
 
 - Register each component in `scenes/ui_kit/gallery_sections.gd` with a stable `id`, a title and its

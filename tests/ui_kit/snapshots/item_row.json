@@ -1,0 +1,302 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    262
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiItemRow"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "ItemRow 483:228"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        210
+      ],
+      "children": [
+        {
+          "type": "UiItemRow",
+          "rect": [
+            0,
+            52,
+            328,
+            88
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                60,
+                328,
+                72
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    0,
+                    80,
+                    32,
+                    32
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    42,
+                    60,
+                    188,
+                    72
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        42,
+                        60,
+                        188,
+                        22
+                      ],
+                      "variation": "RowTitleXB15",
+                      "text": "Pond Crucian"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        42,
+                        88,
+                        188,
+                        18
+                      ],
+                      "variation": "CaptionB12",
+                      "text": "Common"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        42,
+                        112,
+                        188,
+                        20
+                      ],
+                      "variation": "BodyR14",
+                      "text": "A simple pond fish"
+                    }
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    240,
+                    67,
+                    88,
+                    58
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        240,
+                        67,
+                        88,
+                        34
+                      ],
+                      "variation": "QuantityXB24",
+                      "text": "7"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        240,
+                        107,
+                        88,
+                        18
+                      ],
+                      "variation": "CaptionR12",
+                      "text": "fish"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiItemRow",
+          "rect": [
+            0,
+            140,
+            328,
+            74
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                148,
+                328,
+                58
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    0,
+                    161,
+                    32,
+                    32
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    42,
+                    153,
+                    188,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        42,
+                        153,
+                        188,
+                        22
+                      ],
+                      "variation": "RowTitleXB15",
+                      "text": "Worm Bait"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        42,
+                        181,
+                        188,
+                        20
+                      ],
+                      "variation": "BodyR14",
+                      "text": "Faster bites"
+                    }
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    240,
+                    148,
+                    88,
+                    58
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        240,
+                        148,
+                        88,
+                        34
+                      ],
+                      "variation": "QuantityXB24",
+                      "text": "12"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        240,
+                        188,
+                        88,
+                        18
+                      ],
+                      "variation": "CaptionR12",
+                      "text": "bait"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiItemRow",
+          "rect": [
+            0,
+            214,
+            328,
+            48
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                222,
+                328,
+                32
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    0,
+                    222,
+                    32,
+                    32
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    42,
+                    227,
+                    286,
+                    22
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        42,
+                        227,
+                        286,
+                        22
+                      ],
+                      "variation": "RowTitleXB15",
+                      "text": "Herb"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    84
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiBadge"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "StateBadge 483:324"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        32
+      ],
+      "children": [
+        {
+          "type": "UiBadge",
+          "rect": [
+            0,
+            52,
+            51,
+            32
+          ],
+          "variation": "Badge",
+          "children": [
+            {
+              "type": "Label",
+              "rect": [
+                8,
+                59,
+                35,
+                18
+              ],
+              "variation": "CaptionB12",
+              "text": "Ready"
+            }
+          ]
+        },
+        {
+          "type": "UiBadge",
+          "rect": [
+            57,
+            52,
+            61,
+            32
+          ],
+          "variation": "Badge",
+          "children": [
+            {
+              "type": "Label",
+              "rect": [
+                65,
+                59,
+                45,
+                18
+              ],
+              "variation": "CaptionB12",
+              "text": "Familiar"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

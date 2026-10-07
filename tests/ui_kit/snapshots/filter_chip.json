@@ -1,0 +1,100 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    96
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiFilterChip"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Compact/Filter 633:41280"
+    },
+    {
+      "type": "HBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        44
+      ],
+      "children": [
+        {
+          "type": "UiFilterChip",
+          "rect": [
+            0,
+            52,
+            44,
+            44
+          ],
+          "variation": "FilterChip",
+          "text": "All",
+          "pressed": true
+        },
+        {
+          "type": "UiFilterChip",
+          "rect": [
+            50,
+            52,
+            55,
+            44
+          ],
+          "variation": "FilterChip",
+          "text": "Seeds"
+        },
+        {
+          "type": "UiFilterChip",
+          "rect": [
+            111,
+            52,
+            46,
+            44
+          ],
+          "variation": "FilterChip",
+          "text": "Fish"
+        },
+        {
+          "type": "UiFilterChip",
+          "rect": [
+            163,
+            52,
+            66,
+            44
+          ],
+          "variation": "FilterChip",
+          "text": "Produce"
+        },
+        {
+          "type": "UiFilterChip",
+          "rect": [
+            235,
+            52,
+            59,
+            44
+          ],
+          "variation": "FilterChip",
+          "text": "Dishes"
+        }
+      ]
+    }
+  ]
+}

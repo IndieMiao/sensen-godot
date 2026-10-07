@@ -1,0 +1,215 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    280
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiNavButton · Dismiss · Close"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "NavigationRow 483:217 · Compact/Navigation 633:41276 · Dismiss 483:220 · Close 483:336"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        210
+      ],
+      "children": [
+        {
+          "type": "UiNavButton",
+          "rect": [
+            0,
+            70,
+            328,
+            51
+          ],
+          "variation": "NavRow",
+          "text": "View details",
+          "children": [
+            {
+              "type": "Label",
+              "rect": [
+                322,
+                70,
+                6,
+                51
+              ],
+              "variation": "TitleB20",
+              "text": "›"
+            }
+          ]
+        },
+        {
+          "type": "UiNavButton",
+          "rect": [
+            0,
+            121,
+            328,
+            51
+          ],
+          "variation": "NavRow",
+          "text": "View details · pressed",
+          "pressed": true,
+          "children": [
+            {
+              "type": "Label",
+              "rect": [
+                322,
+                121,
+                6,
+                51
+              ],
+              "variation": "TitleB20",
+              "text": "›"
+            }
+          ]
+        },
+        {
+          "type": "UiDismissButton",
+          "rect": [
+            0,
+            172,
+            328,
+            44
+          ],
+          "variation": "Dismiss",
+          "text": "Not now"
+        },
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            216,
+            328,
+            64
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                216,
+                44,
+                64
+              ],
+              "children": [
+                {
+                  "type": "UiNavButton",
+                  "rect": [
+                    0,
+                    216,
+                    44,
+                    44
+                  ],
+                  "variation": "NavCompact",
+                  "text": "Gift ›"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    266,
+                    44,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "compact"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                56,
+                216,
+                44,
+                64
+              ],
+              "children": [
+                {
+                  "type": "UiCloseButton",
+                  "rect": [
+                    56,
+                    216,
+                    44,
+                    44
+                  ],
+                  "variation": "CloseRound",
+                  "text": ""
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    56,
+                    266,
+                    44,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "close"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                112,
+                216,
+                62,
+                64
+              ],
+              "children": [
+                {
+                  "type": "UiCloseButton",
+                  "rect": [
+                    121,
+                    216,
+                    44,
+                    44
+                  ],
+                  "variation": "CloseRound",
+                  "text": "",
+                  "pressed": true
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    112,
+                    266,
+                    62,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "close · pressed"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
