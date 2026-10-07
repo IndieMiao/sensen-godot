@@ -115,16 +115,26 @@ describe('kitchen storage (SGODOT-226)', () => {
     r = step(s, { type: 'collect', taps: [] });
     expect(r.s.bag).toEqual([{ id: 'dish_grilled_crucian', qty: 1 }]);
     expect(r.ev).toContainEqual({ kind: 'cabinet', id: 'dish_grilled_crucian', delta: 0, to_bag: 1, have: 6, cap: 6 });
-    // Cabinet and bag full: the dish stays on the stove.
+    // Cabinet and bag full: the pot is judged (XP paid) and the dish waits on the stove, which stays busy.
     s = readyPot(r.s);
     s.bag_cap = 1;
     s.bag = [{ id: 'fish_crucian', qty: 1 }];
-    expect(refused(s, { type: 'collect', taps: [] })).toEqual({ code: 'bag_full', detail: { cabinet: true } });
-    // …but COOK-4 Eat still works straight from the pot.
-    s.energy = { value: 100, tick_ms: T0 };
-    r = step(s, { type: 'collect', taps: [], eat: true });
+    r = step(s, { type: 'collect', taps: [] });
+    expect(r.s.stove?.left).toEqual(['dish_grilled_crucian']);
+    expect(r.ev).toContainEqual({ kind: 'plate', ids: ['dish_grilled_crucian'], cabinet: true });
+    expect(r.ev.some(e => e.kind === 'xp')).toBe(true);
+    expect(viewOf(c, r.s, T0).cooking.stove).toMatchObject({ ready_in: 0, left: ['dish_grilled_crucian'] });
+    r.s.bag = [{ id: 'fish_crucian', qty: 1 }, { id: 'fish_crucian', qty: 1 }];
+    r.s.bag_cap = 2;
+    expect(refused(r.s, { type: 'cook', items: ['fish_crucian'] }).code).toBe('stove_busy');
+    // Collecting again with no room changes nothing…
+    expect(refused(r.s, { type: 'collect' })).toEqual({ code: 'bag_full', detail: { cabinet: true, left: 1 } });
+    // …but COOK-4 Eat takes it straight from the stove, with no second XP.
+    r.s.energy = { value: 100, tick_ms: T0 };
+    const xp = r.s.skills.cooking;
+    r = step(r.s, { type: 'collect', eat: true });
     expect(r.s.stove).toBeNull();
-    expect(r.s.cabinet).toEqual([{ id: 'dish_grilled_crucian', qty: 6 }]);
+    expect(r.s.skills.cooking).toBe(xp);
     expect(r.ev.find(e => e.kind === 'meal')).toMatchObject({ dish: 'dish_grilled_crucian' });
   });
 
@@ -154,5 +164,27 @@ describe('kitchen storage (SGODOT-226)', () => {
     full.bag_cap = 1;
     full.bag = [{ id: 'fish_crucian', qty: 1 }];
     expect(refused(full, { type: 'cabinet_take', item: 'dish_grilled_crucian' }).code).toBe('bag_full');
+    // The cabinet is in the farmhouse: away spaces are refused; older clients without a space keep working.
+    expect(refused(s, { type: 'cabinet_take', item: 'dish_grilled_crucian', space: 'pond' }).code).toBe('not_home');
+    expect(refused(s, { type: 'eat', item: 'dish_grilled_crucian', from: 'cabinet', space: 'outpost' }).code).toBe('not_home');
+    expect(step(s, { type: 'eat', item: 'dish_grilled_crucian', from: 'cabinet', space: 'home' }).s.cabinet).toEqual([{ id: 'dish_grilled_crucian', qty: 1 }]);
+  });
+
+  it('Eat on a full kitchen eats the Perfect portion; the extra Plain one waits on the stove (never the Inbox)', () => {
+    const s = readyPot(atLevel(2));
+    s.stove!.heats = [{ at: 0, spin: 1000, gold: 0.4, width: 0.2 }, { at: 2000, spin: 1000, gold: 0.4, width: 0.2 }];
+    s.bag_cap = 1;
+    s.bag = [{ id: 'fish_crucian', qty: 1 }];
+    s.energy = { value: 100, tick_ms: T0 };
+    let r = step(s, { type: 'collect', taps: [500, 2500], eat: true });
+    expect(r.ev.find(e => e.kind === 'meal')).toMatchObject({ dish: 'dish_grilled_crucian@perfect' });
+    expect(r.s.stove?.left).toEqual(['dish_grilled_crucian']);
+    expect(r.ev).toContainEqual({ kind: 'plate', ids: ['dish_grilled_crucian'], cabinet: false });
+    expect(r.ev.some(e => e.kind === 'parcel')).toBe(false);
+    // Room again: a plain collect keeps it and frees the stove.
+    r.s.bag = [];
+    r = step(r.s, { type: 'collect' });
+    expect(r.s.stove).toBeNull();
+    expect(r.s.bag).toEqual([{ id: 'dish_grilled_crucian', qty: 1 }]);
   });
 });

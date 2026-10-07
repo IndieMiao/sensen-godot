@@ -38,6 +38,7 @@ export interface Pot {
   dish: string; rarity: number; started_at: number; ms: number; heats: Heat[];
   xp_pct: number; mystery: boolean;
   items?: string[];                     // what went in (a failed pot's refund and its Kitchen Mishaps entry, §7.5.2)
+  left?: string[];   // collected (judged, XP paid) but no place to keep: these portions wait on the stove (§7.2.6)
 }
 
 /** The Cookbook beyond the known pages (§7.5, SGODOT-232 S5). */

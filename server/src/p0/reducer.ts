@@ -203,6 +203,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'cabinet_take': {
+      if (cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');   // the cabinet is in the farmhouse
       const refusal = takeFromCabinet(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
@@ -220,6 +221,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'cast': case 'reel': case 'cook': case 'collect': case 'eat': {
+      if (cmd.type === 'eat' && cmd.from === 'cabinet' && cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');
       const refusal = cmd.type === 'cast' ? castLine(c, s, cmd, now, events)
         : cmd.type === 'reel' ? reelLine(c, s, cmd, now, events)
         : cmd.type === 'cook' ? startPot(c, s, cmd, now, events)

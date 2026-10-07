@@ -8,9 +8,12 @@ export type P0Event =
   | { kind: 'energy'; delta: number; reason: string }
   | { kind: 'xp'; skill: Skill; amount: number; percent: number; capped?: true }   // capped: the day's anti-script limit cut it (§4.3.4)
   | { kind: 'item'; id: string; delta: number }
-  | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
   // Warming Cabinet (§7.7): delta portions in (+) or out (−); to_bag = portions that went to the bag instead (cabinet full) or out to it (Take one).
+  // Once the cabinet is unlocked every kept dish sends one, so a dish that all went to the bag has delta 0 (Cabinet full · … sent to bag).
   | { kind: 'cabinet'; id: string; delta: number; to_bag: number; have: number; cap: number }
+  // Portions left on the stove because neither the cabinet nor the bag had room (Bag full · dish left on the stove).
+  | { kind: 'plate'; ids: string[]; cabinet: boolean }
+  | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
   | { kind: 'coins'; delta: number }
   | { kind: 'first'; what: string; xp: number }
   | { kind: 'level'; skill: Skill; level: number; energy: number; gifts: [string, number][] }
