@@ -11,10 +11,10 @@ const CONST = {
   energyHudLight: '#F4D27A', energyHudDeep: '#C9962A',
   // Fallback only: page 14 now defines color/scrimDrawer and color/scrimModal (alpha = scrim opacity).
   scrimDrawer: 0.18, scrimModal: 0.32,
-  // Joystick: main ReferenceJoystick is 130/60, world-card instances and the shipped _TouchPad are 86/40 (WP7-A Q1, pending WP1a).
-  joystickOuter: 86, joystickThumb: 40,
-  // Need Tile rings and labels decided 2026-10-07, gameplay plan §1.5 q(8); main component re-export pending WP1a.
-  needTileRingL: 64, needTileRingM: 48, needTileRingS: 36, needTileLabelS: 11,
+  // Need Tile wrap gaps (column / row) of grouped tiles, plan §1.5 q(8) "成组用换行布局", as laid out in CRAFT-1.
+  needTileGapX: 10, needTileGapY: 12,
+  // Today panel position under the HUD (HUD-2 overlay frame), SGODOT-222.
+  todayPanelX: 10, todayPanelY: 96,
   // Motion: Figma only has the 150 ms dissolve; others from plan §16 / §10 or engineering defaults (WP7-B).
   motion: { floatTextRise: 40, floatTextMs: 800, recenterMs: 600, doubleTapRecenterMs: 400, radialFadeMs: 200,
             quickBarRefillMs: 300, newUnlockFlashMs: 600, drawerMs: 250, joystickFadeInMs: 80, pendingDelayMs: 300,
@@ -107,7 +107,6 @@ const stroke = {
   cellHairline: invDefault.strokeWeight,
   selectedCell: (await variant('633:41278', 'State=selected')).strokeWeight,
   selected: child(quickSelected, 'Slot surface').strokeWeight,
-  ring: (await variant('483:261', 'State=met')).findOne(c => c.name === 'Progress ring').strokeWeight,
   pinBadge: child(quickDefault, 'Pinned icon surface').strokeWeight,
 };
 const opacity = {
@@ -126,8 +125,6 @@ const badge = await variant('517:11951', 'State=Available');
 const close = await node('483:336');
 const size = {
   touch: 44,
-  sceneAction: (await node('488:781')).width,
-  toolBadge: 28, switchKey: 44, switchIcon: 24,
   quickSlotW: quickDefault.width, quickSlotH: quickDefault.height,
   quickSlotSurfaceH: child(quickDefault, 'Slot surface').height,
   quickSlotIcon: child(quickDefault, 'Slot surface').children.find(c => c.type === 'INSTANCE').width,
@@ -149,8 +146,6 @@ const size = {
   itemRowIcon: (await node('483:228')).children.find(c => c.type === 'INSTANCE').width,
   stateBadgeH: (await node('483:324')).height,
   statusBadge: badge.width, statusBadgeIcon: badge.children[0].width,
-  needTileRingL: CONST.needTileRingL, needTileRingM: CONST.needTileRingM, needTileRingS: CONST.needTileRingS, needTileLabelS: CONST.needTileLabelS,
-  joystickOuter: CONST.joystickOuter, joystickThumb: CONST.joystickThumb,
   toastW: toast.width, toastMinH: toast.height, toastPad: toast.paddingTop,
   sheetPad: info.paddingTop, sheetGap: info.itemSpacing, sheetBodyMaxH: 440,
   energyRefW: energyRef.width, energyRefH: energyRef.height,
@@ -170,6 +165,93 @@ const dash = {
   inventory: invEmpty.dashPattern, kitchen: child(kitchenEmpty, 'Cell surface').dashPattern,
   quick: child(quickEmpty, 'Slot surface').dashPattern, dropTarget: child(quickDrop, 'Slot surface').dashPattern,
 };
+// WP1a mains, accepted 2026-10-07 (SGODOT-200): HUD 1143:103373, NeedTile 1090:78003, Energy 1094:77504,
+// TodayPanel 1145:81715 / TodayRow 1145:81714, ActionKey 1117:78924, SceneAction 1116:78934,
+// RadialPetal 1122:79385, TapCard 1135:101133, StatusBadge 1132:79554, PinMenu 1141:80291.
+const hudN = await variant('1143:103373', 'Energy=Normal');
+const hudBonus = await variant('1143:103373', 'Energy=Bonus');
+const hudChip = hudN.findOne(c => c.name === 'Energy' && c.type === 'FRAME');
+const ntL = await variant('1090:78003', 'Size=L, State=met, Progress=100');
+const ntM = await variant('1090:78003', 'Size=M, State=met, Progress=100');
+const ntS = await variant('1090:78003', 'Size=S, State=met, Progress=100');
+const ntShort = await variant('1090:78003', 'Size=L, State=short, Progress=50');
+const ringStroke = t => (child(t, 'Ring').width - child(t, 'Core').width) / 2;
+const energyCard = await variant('1094:77504', 'Kind=Card, State=Short');
+const energyPanel = await variant('1094:77504', 'Kind=Panel, State=Normal');
+const todayPanel = await node('1145:81715');
+const todayRow = await variant('1145:81714', 'State=Default');
+const actionKey = await node('1117:78924');
+const switchKey = child(actionKey, 'Switch key · LOCK-03');
+const toolBadge = child(actionKey, 'Tool badge · display only');
+const saDefault = await variant('1116:78934', 'State=Default');
+const saPressed = await variant('1116:78934', 'State=Pressed');
+const saPending = await variant('1116:78934', 'State=Pending');
+const arcWidth = (v, name) => (v.width / 2) * (1 - child(v, name).arcData.innerRadius);
+const petalSel = await variant('1122:79385', 'State=Selected');
+const petalOff = await variant('1122:79385', 'State=Unavailable');
+const tapCard = await variant('1135:101133', 'Pointer=Center');
+const sbWorld = await variant('1132:79554', 'Size=World, State=Ready');
+const sbNpc = await variant('1132:79554', 'Size=NPC, State=Request');
+const pinMenu = await variant('1141:80291', 'Pinned=yes');
+const shadow = {
+  card: shadowOf(energyCard), float: shadowOf(tapCard), petal: shadowOf(child(petalSel, 'Petal')),
+  menu: shadowOf(pinMenu), key: shadowOf(switchKey),
+};
+for (const [k, e] of Object.entries(shadow)) {
+  color['shadow/' + k] = hex(e.color, e.color.a);
+  size['shadow' + k[0].toUpperCase() + k.slice(1) + 'Radius'] = e.radius;
+  size['shadow' + k[0].toUpperCase() + k.slice(1) + 'OffsetY'] = e.offset.y;
+}
+Object.assign(color, {
+  'skill/farming': hex(firstFill(child(hudN, 'Skill ring · Farming')).color),
+  'skill/fishing': hex(firstFill(child(hudN, 'Skill ring · Fishing')).color),
+  unreadBadge: hex(firstFill(child(hudN, 'Inbox unread badge')).color),
+  energyBonus: hex(firstFill(child(hudBonus, 'Energy bonus segment')).color),
+  tileCore: hex(firstFill(child(ntL, 'Core')).color),
+  warm: hex(firstFill(child(ntShort, 'Core')).color),
+  amber: hex(kit['kit/amber']),
+});
+Object.assign(radius, {
+  radialLabel: child(petalSel, 'Label').cornerRadius, captionPill: child(sbWorld, 'CaptionPill').cornerRadius,
+  pinMenu: pinMenu.cornerRadius, energyTile: child(energyCard, 'Guidance · Eat').cornerRadius,
+});
+Object.assign(stroke, {
+  ring: ringStroke(ntL),
+  sceneAction: saDefault.strokeWeight, sceneActionPressed: saPressed.strokeWeight,
+  radialSelected: child(petalSel, 'Petal').strokeWeight, statusBadgeNpc: child(sbNpc, 'Badge').strokeWeight,
+});
+Object.assign(opacity, {
+  sceneActionPending: Math.round(saPending.opacity * 100) / 100,
+  radialIconUnavailable: Math.round(child(child(petalOff, 'Petal'), 'Icon').opacity * 100) / 100,
+});
+Object.assign(size, {
+  sceneAction: saDefault.width, switchKey: switchKey.width, switchIcon: switchKey.children[0].width,
+  toolBadge: toolBadge.width, toolBadgeIcon: child(toolBadge, 'Tool').width,
+  actionKeyW: actionKey.width, actionKeyH: actionKey.height,
+  holdRing: arcWidth(await variant('1116:78934', 'State=Holding'), 'Hold progress'), pendingRing: arcWidth(saPending, 'Pending spinner'),
+  radialPetal: child(petalSel, 'Petal').width, radialIcon: child(child(petalSel, 'Petal'), 'Icon').width,
+  radialLockBadge: child(petalOff, 'Lock badge').width, radialLockIcon: child(petalOff, 'Lock badge').children[0].width,
+  tapCardH: tapCard.height, tapGlyph: child(tapCard, 'Tap glyph').width,
+  pointerW: child(tapCard, 'Pointer').width, pointerH: child(tapCard, 'Pointer').height,
+  statusBadgeWorld: sbWorld.width, statusBadgeNpc: sbNpc.width,
+  statusGlyphWorld: child(sbWorld, 'Glyph').width, statusGlyphNpc: child(sbNpc, 'Glyph').width,
+  captionPillH: child(sbWorld, 'CaptionPill').height, pinMenuW: pinMenu.width,
+  hudAvatar: child(hudN, 'Icon/i-face-player').width, skillRing: child(hudN, 'Skill ring · track').width,
+  energyChipW: hudChip.width, energyChipH: hudChip.height,
+  energyTrackW: child(hudChip, 'Energy track').width, energyTrackH: child(hudChip, 'Energy track').height,
+  hudCapsuleH: child(hudN, 'Coins capsule').height, inbox: child(hudN, 'Inbox capsule').width,
+  unreadBadgeW: child(hudN, 'Inbox unread badge').width, unreadBadgeH: child(hudN, 'Inbox unread badge').height,
+  todayChipW: child(hudN, 'Today navigation').width,
+  needTileRingL: child(ntL, 'Ring').width, needTileRingM: child(ntM, 'Ring').width, needTileRingS: child(ntS, 'Ring').width,
+  needTileStrokeL: ringStroke(ntL), needTileStrokeM: ringStroke(ntM), needTileStrokeS: ringStroke(ntS),
+  needTileIconL: child(ntL, 'Icon').width, needTileIconM: child(ntM, 'Icon').width, needTileIconS: child(ntS, 'Icon').width,
+  needTileW: ntL.width, needTileWS: ntS.width, needTileLabelS: child(ntS, 'Name').fontSize,
+  needTileGapX: CONST.needTileGapX, needTileGapY: CONST.needTileGapY,
+  energyCardW: energyCard.width, energyPanelW: energyPanel.width, energyTileH: child(energyCard, 'Guidance · Eat').height,
+  todayPanelW: todayPanel.width, todayPanelX: CONST.todayPanelX, todayPanelY: CONST.todayPanelY,
+  todayRowH: todayRow.height, todayIcon: child(todayRow, 'Icon').width,
+  joystickOuter: child(joy, 'Joystick outer touch circle').width, joystickThumb: child(joy, 'Joystick thumb').width,
+});
 for (const k of Object.keys(size)) size[k] = r1(size[k]);
 const weightOf = { Regular: 'regular', Bold: 'bold', ExtraBold: 'extrabold' };
 const wShort = { Regular: 'R', Bold: 'B', ExtraBold: 'XB' };
@@ -184,14 +266,14 @@ for (const s of await figma.getLocalTextStylesAsync()) {
 const sorted = o => Object.fromEntries(Object.keys(o).sort().map(k => [k, o[k]]));
 const tokens = {
   meta: {
-    schema: 2, version: '2.0-draft', status: 'draft',
+    schema: 2, version: '2.1-draft', status: 'draft',
     source: 'Figma OMLTC3yw3u2WDjOZhLnhaR page 481:53 (read-only export, tools/ui/export_tokens_figma.js)',
     unit: '360-wide logical px = Godot UI unit',
+    accepted: 'WP1a mains (HUD, NeedTile, Energy, Today, ActionKey, SceneAction, RadialPetal, TapCard, StatusBadge, PinMenu, QuickSlot, CommandButton, joystick) accepted 2026-10-07, SGODOT-200',
     pending: {
-      sceneAction: 'LOCK-02 main under WP1a revision', toolBadge: 'not in SceneAction main yet (WP1a)', switchKey: 'LOCK-03, WP1a',
-      hud: 'LOCK-06, WP1a', pin: 'LOCK-05 pin colours read from the WP1a revision, not yet accepted', needTile: 'sizes from plan q(8); main re-export after WP1a',
-      joystick: 'WP7-A Q1: main 130/60 vs shipped 86/40', cmdBlocked: 'CommandButton Kind=unavailable from the WP1a revision, not yet accepted',
+      wp1b: 'container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)',
       segmentTab: 'selected style must not use command green (LOCK-13), WP1b',
+      toast: 'Toast R1 (1178:82265) replaces the old Toast main 483:302 in the WP2 migration; toastW is still the old 328',
     },
   },
   font: { file: 'res://assets/ui/fonts/Nunito.ttf', naturalLineHeight: CONST.naturalLineHeight,
