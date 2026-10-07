@@ -25,4 +25,6 @@ Blender 5.2.2 LTS / Godot 4.7.2。八张均在实际 Mobile/Vulkan 渲染器加�
 
 本轮按卡片限定只做美术：没有角色控制、玩法接入、Android/真机验证、录屏或发包。渲染成功不代表手机性能验收。Basic Room 已验收源文件与资产未修改。
 
-所有提交在本地 `wt-3d-scene`，未推送或合并；各卡 Plane 评论含提交、预算与飞书审阅链接。用户原有 `.codex/config.toml` 改动保留。
+八张 Plane 卡片各附四张 PNG：Godot 整景、细节、参考对照和模型正交图，共 32 个附件，均已下载核对 SHA-256；原参考附件保留。私有上传回执位于忽略的 `output/plane-scene-attachments/verified.json`。
+
+本地工作分支为 `wt-3d-scene`，远端评审分支为 [`wp-3d-scene`](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene)，未合并；各卡 Plane 评论含提交、预算与飞书审阅链接。用户原有 `.codex/config.toml` 改动保留。
