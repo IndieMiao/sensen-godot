@@ -746,8 +746,10 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 				answer += ("%s need Fishing Lv%d." % [item_name(view, str(nxt.id)), int(nxt.level)]) if nxt is Dictionary else "You can land everything there."
 		"market":
 			if str(k.get("greet", "")) == "row_hoe":
+				# 李白 q(46): Mei's P0 greeting is the Row Hoe (the stall's only gear), not the sweet-potato line.
 				var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
-				greet = "Row Hoe's %d coins. Farming Lv%d to use." % [int(_shop_price(view, "market", str(hoe.get("id", "tool_row_hoe")), int(hoe.get("price", 240)))), int(hoe.get("gate", 4))]
+				greet = "Morning! Row Hoes just came in — sows %s plots at once, Farming Lv%d. Anything I can get you?" % [
+					_count_word(int(hoe.get("sow", 3))), int(hoe.get("gate", 4))]
 			else:
 				greet = _board_count(int(k.get("board_open", 0)))
 			var titles: Array = k.get("board_templates", []).map(func(t): return str(content().get("requests", {}).get("templates", {}).get(str(t), {}).get("title", "")))
@@ -760,6 +762,11 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 		"greet": greet, "trade": "Trade · " + str(copy.get("trade", "")),
 		"question": str(copy.get("question", "")), "answer": answer, "leave": "Just passing by",
 	}
+
+## Small counts in keeper speech ("sows three plots"), digits from ten up.
+static func _count_word(n: int) -> String:
+	var words := ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+	return words[n] if n >= 0 and n < words.size() else str(n)
 
 static func _board_count(n: int) -> String:
 	return "The Market Board has %d %s today." % [n, "request" if n == 1 else "requests"]
