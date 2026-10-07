@@ -80,6 +80,56 @@ static func blueprint() -> FarmBlueprint:
 		bp.masks.cultivable.append(cultivable)
 	return bp
 
+## Homestead fence (plan §8.3, q(35); 不知火舞 on SGODOT-228 7e1db1f8), one fence.glb kit:
+## Lv1–2 only the stretch in front of the farmhouse, either side of the door path with a 2 m opening;
+## Lv3 adds the ring round the field and yard, open at the mine and the way out to the map.
+## Each segment is {pos: Vector3, yaw: float, stretch: float} (stretch scales fence.glb along its length).
+const FENCE_SEG := 1.24              # fence.glb length (m)
+const FENCE_FRONT_ROW := 13          # the yard row between the field and the farmhouse
+const FENCE_RING := {"west": 0.38, "east": 12.95, "back": -12.35, "front": 0.1}
+
+static func fence_front(bp: FarmBlueprint) -> Array:
+	var door := bp.cell_to_world(ANCHORS.house)
+	var z := bp.cell_to_world(Vector2i(0, FENCE_FRONT_ROW)).z
+	return [{"pos": Vector3(door.x - 1.0 - FENCE_SEG * 0.5, 0, z), "yaw": 0.0, "stretch": 1.0},
+		{"pos": Vector3(door.x + 1.0 + FENCE_SEG * 0.5, 0, z), "yaw": 0.0, "stretch": 1.0}]
+
+static func fence_ring(bp: FarmBlueprint) -> Array:
+	var r := FENCE_RING
+	var exit := bp.cell_to_world(ANCHORS.exit)
+	var mine := Rect2i(FOOTPRINTS.mine)
+	var mine_z0 := bp.cell_to_world(mine.position).z + bp.cell_m * 0.5        # near edge of the mine (towards the camera)
+	var mine_z1 := mine_z0 - mine.size.y * bp.cell_m
+	var out: Array = []
+	out.append_array(_fence_run(Vector2(r.west, r.back), Vector2(r.east, r.back), []))
+	out.append_array(_fence_run(Vector2(r.west, r.back), Vector2(r.west, r.front), [Vector2(mine_z1 - 0.2, mine_z0 + 0.2)]))
+	out.append_array(_fence_run(Vector2(r.east, r.back), Vector2(r.east, r.front), []))
+	out.append_array(_fence_run(Vector2(r.west, r.front), Vector2(r.east, r.front), [Vector2(exit.x - 1.0, exit.x + 1.0)]))
+	return out
+
+## Segments along a → b (xz), evenly stretched to fill it; gaps are [from, to] on the axis the run follows.
+static func _fence_run(a: Vector2, b: Vector2, gaps: Array) -> Array:
+	var length := a.distance_to(b)
+	var n := maxi(1, roundi(length / FENCE_SEG))
+	var step := length / n
+	var along_x := absf(b.x - a.x) > absf(b.y - a.y)
+	var out: Array = []
+	for i in n:
+		var p := a.lerp(b, (i + 0.5) / n)
+		var c := p.x if along_x else p.y
+		var lo := c - step * 0.5
+		var hi := c + step * 0.5
+		if gaps.any(func(g: Vector2): return hi > minf(g.x, g.y) and lo < maxf(g.x, g.y)): continue
+		out.append({"pos": Vector3(p.x, 0, p.y), "yaw": 0.0 if along_x else PI * 0.5, "stretch": step / FENCE_SEG})
+	return out
+
+## Points along the yard fence for block_points: the player walks round it, through the door opening.
+static func fence_block_points(bp: FarmBlueprint) -> Array:
+	var points: Array = []
+	for seg in fence_front(bp):
+		for k in 5: points.append(seg.pos + Vector3((k / 4.0 - 0.5) * FENCE_SEG * 0.9, 0, 0))
+	return points
+
 ## Mark scenery rocks solid: each rock blocks the cell it stands in (trees already stand outside the yard).
 static func block_points(bp: FarmBlueprint, points: Array) -> void:
 	for p in points:

@@ -9,6 +9,7 @@ const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const FarmArt = preload("res://modules/farm/farm_art.gd")
 const MineArt = preload("res://modules/mining/mine_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
+const Fence = preload("res://scenes/p0/p0_fence.gd")
 
 const STYLE := "cottage"          # the orange-roof cottage of the polished farm
 const PLACE := "Shanghai · Homestead"
@@ -38,6 +39,7 @@ var _front_cell := Vector2i(-1, -1)
 var _plot_sig := ""
 var _sync_t := 0.0
 var _cooking: P0Cooking
+var _fence: Node3D   # p0_fence.gd: front stretch always, the ring from Homestead Lv3
 
 func _ready() -> void:
 	P0Runtime.mark("%s _ready start" % name)
@@ -95,6 +97,10 @@ func _build_world() -> void:
 	add_child(scenery)
 	scenery.build(bp, STYLE)
 	P0Garden.block_points(bp, scenery.rock_points)   # rocks collide; crops and bushes don't
+	_fence = Fence.new()
+	add_child(_fence)
+	_fence.build(bp)
+	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))   # the yard fence in front of the house collides
 	grid = BlueprintGrid.new(bp)
 	# One thick soil bed per plot (plot.glb), tinted per state (watered beds read darker).
 	var xfs: Array = []
@@ -211,6 +217,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	actor.step(dt)
 	_follow(dt)
 	_sync_plots(v, dt)
+	_fence.sync(v)
 	_pick_front(v)
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
 	_hold_repeat()
