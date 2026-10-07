@@ -309,6 +309,39 @@
                                         88,
                                         40,
                                         51
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            178,
+                                            88,
+                                            20,
+                                            20
+                                          ]
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            168,
+                                            105,
+                                            40,
+                                            26
+                                          ],
+                                          "variation": "C10B",
+                                          "text": "Orchard Feed"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            168,
+                                            127,
+                                            40,
+                                            14
+                                          ],
+                                          "variation": "C10XB",
+                                          "text": "×2"
+                                        }
                                       ]
                                     }
                                   ]
@@ -316,35 +349,75 @@
                               ]
                             },
                             {
-                              "type": "VBoxContainer",
+                              "type": "UiItemCell",
                               "rect": [
                                 215,
                                 81,
-                                40,
+                                47,
                                 62
                               ],
                               "children": [
                                 {
-                                  "type": "UiCloseButton",
+                                  "type": "Panel",
                                   "rect": [
                                     215,
-                                    81,
-                                    40,
-                                    40
+                                    85,
+                                    47,
+                                    58
                                   ],
-                                  "variation": "CloseRound",
-                                  "text": ""
-                                },
+                                  "children": [
+                                    {
+                                      "type": "Control",
+                                      "rect": [
+                                        219,
+                                        88,
+                                        40,
+                                        51
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                266,
+                                81,
+                                47,
+                                62
+                              ],
+                              "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "VBoxContainer",
                                   "rect": [
-                                    215,
-                                    128,
-                                    40,
-                                    14
+                                    266,
+                                    81,
+                                    47,
+                                    62
                                   ],
-                                  "variation": "C10B",
-                                  "text": "Close"
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        281,
+                                        94,
+                                        18,
+                                        18
+                                      ]
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        266,
+                                        116,
+                                        47,
+                                        14
+                                      ],
+                                      "variation": "C10B",
+                                      "text": "Close"
+                                    }
+                                  ]
                                 }
                               ]
                             }

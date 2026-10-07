@@ -528,15 +528,9 @@ static func _drawers() -> Control:
 	quick.add_theme_constant_override(&"separation", int(UiTokens.SPACE_QUICK_BAR_GAP))
 	for f in [{icon = _tex("seed_radish"), title = "Radish Seeds", quantity = "×24", state = UiItemCell.State.SELECTED},
 			{icon = _tex("seed_carrot"), title = "Carrot Seeds", quantity = "×10"}, {icon = _tex("compost"), title = "Compost", quantity = "×6"},
-			{state = UiItemCell.State.EMPTY}]:
+			{icon = _tex("seed_radish"), title = "Orchard Feed", quantity = "×2"}, {state = UiItemCell.State.EMPTY}]:
 		quick.add_child(_cell(UiItemCell.Density.QUICK, f))
-	var close := VBoxContainer.new()   # stand-in for QuickEnd/Close (PR #12)
-	close.alignment = BoxContainer.ALIGNMENT_CENTER
-	var x := UiCloseButton.new()
-	x.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	close.add_child(x)
-	close.add_child(UiKit.label("Close", UiTokens.STYLE_C10_B))
-	quick.add_child(close)
+	quick.add_child(_QuickEndClose.new())   # stand-in for Compact/QuickEnd · Close (PR #12's UiQuickBar draws the real one)
 	d.body.add_child(quick)
 	var gap := Control.new()
 	gap.custom_minimum_size.y = UiTokens.SPACE_OVERLAY_BODY
@@ -555,6 +549,25 @@ static func _inventory_grids() -> Control:
 	v.add_child(_captioned(_sample_grid(), "bag · Crucian selected · dashed empties to capacity 25"))
 	v.add_child(_captioned(_sample_grid(true), "sell_mode · this counter takes crops and fish only"))
 	return v
+
+## Compact/QuickEnd · Close (52 × 68, the Bag end cell's shape: cross above, label below) for the drawer sample;
+## the game draws PR #12's UiQuickBar end cell.
+class _QuickEndClose extends PanelContainer:
+	func _init() -> void:
+		custom_minimum_size = Vector2(52, 68)   # Compact/QuickEnd main
+		add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, UiTokens.RADIUS_CELL,
+			UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT))
+		var v := VBoxContainer.new()
+		v.alignment = BoxContainer.ALIGNMENT_CENTER
+		v.add_theme_constant_override(&"separation", int(UiTokens.SPACE_QUICK_BAR_GAP))
+		add_child(v)
+		var x := UiKit.icon(preload("res://assets/ui/kit_icons/close.svg"), UiTokens.SIZE_CLOSE_ICON)
+		x.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		x.self_modulate = UiTokens.COLOR_TEXT
+		v.add_child(x)
+		var l := UiKit.label("Close", UiTokens.STYLE_C10_B)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		v.add_child(l)
 
 ## Bottom cards are 336 wide on the 360 screen (12 at each side); laid out at 336 and drawn at 328/336.
 class _At336 extends Container:
@@ -616,8 +629,10 @@ static func _gear_rows() -> Control:
 	v.add_child(UiGearRow.new({icon = _tex("rod_reed"), title = "Reed Rod", state = &"owned", effect = "Lands up to Rare fish · Bite window 2.6 s",
 		action = {id = &"equip", label = "Equip", kind = &"primary"}}))
 	# A locked candidate: P0 lists no Carbon Rod (no source); from P1 it reads like this (李白 q(46)).
-	var p1 := UiGearRow.new({icon = _tex("rod"), title = "Carbon Rod", state = &"Fishing Lv6 · 350 coins at the Tackle Shop", effect = "Lands up to Legendary fish"})
-	v.add_child(_captioned(p1, "locked · P1 only (BAG-2 lists Starter and Reed in P0)"))
+	v.add_child(UiGearRow.new({icon = _tex("rod"), title = "Carbon Rod", state = &"Fishing Lv6 · 350 coins at the Tackle Shop", effect = "Lands up to Legendary fish"}))
+	var note := UiKit.label("locked · P1 only (BAG-2 lists Starter and Reed in P0)", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(note)
 	return v
 
 static func _profile_parts() -> Control:

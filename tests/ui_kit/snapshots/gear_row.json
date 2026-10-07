@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    287
+    281
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         52,
         328,
-        235
+        229
       ],
       "children": [
         {
@@ -255,112 +255,101 @@
           ]
         },
         {
-          "type": "VBoxContainer",
+          "type": "UiGearRow",
           "rect": [
             0,
             202,
             328,
-            85
+            65
           ],
           "children": [
             {
-              "type": "UiGearRow",
+              "type": "HBoxContainer",
               "rect": [
-                48,
+                0,
                 202,
-                232,
+                328,
                 65
               ],
               "children": [
                 {
-                  "type": "HBoxContainer",
+                  "type": "MarginContainer",
                   "rect": [
-                    48,
+                    0,
                     202,
-                    232,
+                    29,
                     65
                   ],
                   "children": [
                     {
-                      "type": "MarginContainer",
+                      "type": "TextureRect",
                       "rect": [
-                        48,
+                        5,
                         202,
-                        29,
-                        65
-                      ],
-                      "children": [
-                        {
-                          "type": "TextureRect",
-                          "rect": [
-                            53,
-                            202,
-                            24,
-                            24
-                          ]
-                        }
+                        24,
+                        24
                       ]
+                    }
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    38,
+                    208,
+                    290,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        208,
+                        290,
+                        18
+                      ],
+                      "variation": "C12XB",
+                      "text": "Carbon Rod"
                     },
                     {
-                      "type": "VBoxContainer",
+                      "type": "Label",
                       "rect": [
-                        86,
-                        208,
-                        194,
-                        52
+                        38,
+                        228,
+                        290,
+                        15
                       ],
-                      "children": [
-                        {
-                          "type": "Label",
-                          "rect": [
-                            86,
-                            208,
-                            194,
-                            18
-                          ],
-                          "variation": "C12XB",
-                          "text": "Carbon Rod"
-                        },
-                        {
-                          "type": "Label",
-                          "rect": [
-                            86,
-                            228,
-                            194,
-                            15
-                          ],
-                          "variation": "C10B",
-                          "text": "Fishing Lv6 · 350 coins at the Tackle Shop"
-                        },
-                        {
-                          "type": "Label",
-                          "rect": [
-                            86,
-                            245,
-                            194,
-                            15
-                          ],
-                          "variation": "C10B",
-                          "text": "Lands up to Legendary fish"
-                        }
-                      ]
+                      "variation": "C10B",
+                      "text": "Fishing Lv6 · 350 coins at the Tackle Shop"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        245,
+                        290,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "Lands up to Legendary fish"
                     }
                   ]
                 }
               ]
-            },
-            {
-              "type": "Label",
-              "rect": [
-                0,
-                273,
-                328,
-                14
-              ],
-              "variation": "C9B",
-              "text": "locked · P1 only (BAG-2 lists Starter and Reed in P0)"
             }
           ]
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            267,
+            328,
+            14
+          ],
+          "variation": "C9B",
+          "text": "locked · P1 only (BAG-2 lists Starter and Reed in P0)"
         }
       ]
     }
