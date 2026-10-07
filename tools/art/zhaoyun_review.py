@@ -113,12 +113,13 @@ def finish(camera,lighting,bench,materials=None,no_shadow=(),botanical=(),post_e
     assert stats['budget_passed'],stats
     if '--views' in sys.argv:p.render_views()
 
-def draft_scene(slug):
+def draft_scene(slug,configure=None):
     """Load named first-draft parts without exporting stale layout or media."""
     spec=importlib.util.spec_from_file_location('zhaoyun_draft_'+slug,ROOT/'tools/art'/('build_'+slug+'.py'))
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
     module.finalize=lambda *a,**kw:None
     module.complete=lambda:None
+    if configure:configure(module)
     module.build()
     return module
 
@@ -128,10 +129,10 @@ def drop_modules(*names):
         kit=p.KITS.pop(name)
         for obj in list(kit['objects']):bpy.data.objects.remove(obj,do_unlink=True)
         bpy.data.objects.remove(kit['root'],do_unlink=True);bpy.data.collections.remove(kit['collection'])
-        for root in list(bpy.context.scene.objects):
-            if root.type=='EMPTY' and root.get('linked_asset')==name:
-                for obj in list(root.children):bpy.data.objects.remove(obj,do_unlink=True)
-                bpy.data.objects.remove(root,do_unlink=True)
+        roots=[o for o in bpy.context.scene.objects if o.type=='EMPTY' and o.get('linked_asset')==name]
+        for root in roots:
+            for obj in list(root.children):bpy.data.objects.remove(obj,do_unlink=True)
+            bpy.data.objects.remove(root,do_unlink=True)
         p.INSTANCES[:]=[i for i in p.INSTANCES if i['asset']!=name]
 
 def move_zone(names,delta):

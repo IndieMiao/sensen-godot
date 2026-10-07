@@ -81,6 +81,10 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 		applied.albedo_color = Color(.9,.97,1,.12)
 		applied.roughness = .15
 		applied.cull_mode = BaseMaterial3D.CULL_DISABLED
+	elif mode == "metal":
+		applied = material.duplicate()
+		applied.roughness = .43
+		applied.metallic_specular = .52
 	elif mode == "matte":
 		applied = material.duplicate()
 		applied.roughness = 1.0

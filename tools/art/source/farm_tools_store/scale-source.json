@@ -1,0 +1,18 @@
+{
+  "door": {
+    "kit": "green_door",
+    "name": "Sage arched door",
+    "clear_height": true
+  },
+  "counter": {
+    "kit": "sales_counter",
+    "name": "Counter thick oak top"
+  },
+  "chair": {
+    "applicable": false
+  },
+  "table": {
+    "kit": "front_display",
+    "name": "Workbench top plank"
+  }
+}

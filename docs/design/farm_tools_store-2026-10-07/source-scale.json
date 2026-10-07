@@ -1,0 +1,40 @@
+{
+  "door": {
+    "source_objects": [
+      "Sage arched door"
+    ],
+    "world_min_y": 0.05000000074505806,
+    "world_max_y": 2.379999876022339,
+    "measured_height": 2.329999875277281,
+    "declared_height": 2.33,
+    "passed": true
+  },
+  "counter": {
+    "source_objects": [
+      "Counter thick oak top"
+    ],
+    "world_min_y": 1.1143999099731445,
+    "world_max_y": 1.2479000091552734,
+    "measured_height": 1.1659000091552734,
+    "declared_height": 1.1659,
+    "passed": true
+  },
+  "chair": {
+    "applicable": false,
+    "reason": "No seating in farm tools store"
+  },
+  "table": {
+    "source_objects": [
+      "Workbench top plank",
+      "Workbench top plank.001",
+      "Workbench top plank.002",
+      "Workbench top plank.003",
+      "Workbench top plank.004"
+    ],
+    "world_min_y": 0.9469999670982361,
+    "world_max_y": 1.097000002861023,
+    "measured_height": 1.0150000028610229,
+    "declared_height": 1.015,
+    "passed": true
+  }
+}

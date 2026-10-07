@@ -1,4 +1,6 @@
 {
-  "description": "The farm tools shop keeps the warm timber/plaster shell, real arched window, green entrance and English FARM TOOLS sign. New editable modules include a planked sales counter with register, pegboard tools, long shovel/fork/rake rack, seed packet shelves, open terracotta pots, watering cans, display table with gloves and sacks, tool barrel and supply crates. Repeated seed packets share one GLB; other goods remain named inside their source modules.",
-  "differences": "The 6.8 × 6.0m footprint, hidden backs and aisle dimensions are inferred from a single perspective. Compared with the source image, the register and plants use simpler geometry, the gloves are flatter, and labels use original crop emblems rather than detailed print. FARM TOOLS remains verbatim English. The round lantern replaces a more elaborate door-side fixture. Broad layout and colors are retained, with real-time lighting and lower-frequency surface detail."
+  "revision": "Review revision after 172 release",
+  "description": "Shorter rear counter, stocked tiered 3x2 seed display with four reused crop prototypes, gloves/tools/price boards, left-front five-tool barrel, five hanging tools, seven pegboard tools, sacks/pots/twine/crates, chains, sprout sign and copper bell.",
+  "differences": "Single stylized reference; inferred 6.4x5.8m usable floor and 3.6m walls, hidden backs and shelf depth. Upper-wall camera residual remains visible in unwarped overlay.",
+  "collision": "Art scene owns counter/table/barrel/crate/shelf/planter/entry/perimeter blockers. Actual rendered nine-waypoint traversal and 2.535m main aisle pass; see verification-summary.json."
 }

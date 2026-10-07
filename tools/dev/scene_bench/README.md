@@ -35,7 +35,7 @@ Add a top-level `spawn: [x,y,z]` and `bench` dictionary:
 - `entrance`: `{inside, outside}` positions on continuous supporting floor on each side of an authored entrance gap. Exit and reentry are driven through the gap. Open dioramas can use one controlled entrance segment plus bounded remaining edges.
 - `slide`: `{from, direction, tangent, seconds: 0.6}` against a wall, requiring contact and >0.45m movement along the free tangent.
 - `input_start`: a clear point with room for a brief joystick gesture.
-- `scale`: `door`, `counter`, `chair`, `table`, each `{height, source, reason?}`. Heights are measured in metres from the supporting floor in the editable source, except door clear height. Differences from Basic Room must be within ±15%, or have a specific documented reason. An inapplicable category must explicitly explain why; do not invent a measurement.
+- `scale`: `door`, `counter`, `chair`, `table`, each `{height, source, reason?}`. Heights are measured in metres from the supporting floor in the editable source, except door clear height. Differences from Basic Room must be within ±15%, or have a specific documented reason. An inapplicable category must use `{applicable: false, reason: "..."}` and explicitly explain why; the result records absence without inventing a height or ratio. Missing applicable heights fail.
 
 See [the Basic Room calibration fixture](fixtures/basic_room.json) for concrete fields. That fixture overrides only harness inputs and does not edit the accepted Basic Room. Its historically closed doorway is exempt from the new entrance check **only during baseline calibration**; new scene cards must supply `entrance`.
 
