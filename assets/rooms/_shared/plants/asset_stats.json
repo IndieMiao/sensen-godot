@@ -1,0 +1,82 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
+    "bytes": 4854647
+  },
+  "assets": [
+    {
+      "name": "monstera",
+      "vertices": 2760,
+      "triangles": 5344,
+      "surfaces": 1,
+      "bytes": 206924
+    },
+    {
+      "name": "peace_lily",
+      "vertices": 1906,
+      "triangles": 3616,
+      "surfaces": 1,
+      "bytes": 127604
+    },
+    {
+      "name": "pothos",
+      "vertices": 10882,
+      "triangles": 21092,
+      "surfaces": 1,
+      "bytes": 509404
+    },
+    {
+      "name": "ivy_short",
+      "vertices": 3042,
+      "triangles": 5784,
+      "surfaces": 1,
+      "bytes": 135284
+    },
+    {
+      "name": "ivy_medium",
+      "vertices": 4910,
+      "triangles": 9312,
+      "surfaces": 1,
+      "bytes": 216360
+    },
+    {
+      "name": "ivy_long",
+      "vertices": 6292,
+      "triangles": 11956,
+      "surfaces": 1,
+      "bytes": 277020
+    },
+    {
+      "name": "flower_shrub",
+      "vertices": 7904,
+      "triangles": 14992,
+      "surfaces": 1,
+      "bytes": 358096
+    },
+    {
+      "name": "olive_tree",
+      "vertices": 6908,
+      "triangles": 13276,
+      "surfaces": 1,
+      "bytes": 329820
+    },
+    {
+      "name": "fruit_tree",
+      "vertices": 7394,
+      "triangles": 14248,
+      "surfaces": 1,
+      "bytes": 460520
+    }
+  ],
+  "unique_triangles": 99620,
+  "scene_triangles": 99620,
+  "static_draw_surfaces": 9,
+  "unique_assets": 9,
+  "placed_instances": 9,
+  "glb_bytes": 2621032
+}

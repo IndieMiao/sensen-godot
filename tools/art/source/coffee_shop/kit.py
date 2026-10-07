@@ -20,11 +20,11 @@ QA = None
 SLUG = None
 INSTANCES = []
 
-def configure(slug):
+def configure(slug, source=None):
     global OUT, SOURCE, QA, SLUG
     SLUG=slug
     OUT=ROOT/'assets/rooms'/slug
-    SOURCE=ROOT/'tools/art/source'/slug
+    SOURCE=Path(source) if source is not None else ROOT/'tools/art/source'/slug
     QA=ROOT/'output'/slug
     for p in (OUT,SOURCE,QA): p.mkdir(parents=True,exist_ok=True)
     (SOURCE/'.gdignore').touch()
@@ -250,7 +250,7 @@ def plant(at=(0,0,0), scale=1, trailing=False):
                 leaf("Vine leaf",p,(p[0]+side*.12*s,p[1]-.045*s,p[2]+.02*s),.095*s,"leaf" if i%2 else "leaf_light")
 
 
-def bake_and_export():
+def bake_and_export(ao_strength=.40, ao_distance=.38):
     scene=bpy.context.scene;scene.render.engine="CYCLES";scene.cycles.samples=8
     scene.cycles.bake_type="EMIT";scene.render.bake.margin=8;scene.render.bake.use_clear=True
     bpy.context.view_layer.update();deps=bpy.context.evaluated_depsgraph_get()
@@ -287,9 +287,9 @@ def bake_and_export():
         nt=mat.node_tree;p=nt.nodes.get("Principled BSDF");out=nt.nodes.get("Material Output")
         image=nt.nodes.new("ShaderNodeTexImage");image.image=tex;nt.nodes.active=image
         emission=nt.nodes.new("ShaderNodeEmission")
-        ao=nt.nodes.new("ShaderNodeAmbientOcclusion");ao.samples=8;ao.inputs["Distance"].default_value=.38
+        ao=nt.nodes.new("ShaderNodeAmbientOcclusion");ao.samples=16 if ao_strength>.4 else 8;ao.inputs["Distance"].default_value=ao_distance
         # Keep occluded surfaces legible; this is contact AO, not baked sun/shadows.
-        mix=nt.nodes.new("ShaderNodeMixRGB");mix.blend_type="MIX";mix.inputs[0].default_value=.40
+        mix=nt.nodes.new("ShaderNodeMixRGB");mix.blend_type="MIX";mix.inputs[0].default_value=ao_strength
         mix.inputs[1].default_value=(1,1,1,1);nt.links.new(ao.outputs["Color"],mix.inputs[2])
         multiply=nt.nodes.new("ShaderNodeMixRGB");multiply.blend_type="MULTIPLY";multiply.inputs[0].default_value=1
         base=p.inputs["Base Color"]

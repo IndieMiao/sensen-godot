@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/rooms/_shared/plants/room_albedo_ao.png" id="1"]
+
+[resource]
+resource_name = "SharedBotanicalAtlas"
+albedo_texture = ExtResource("1")
+roughness = 0.86
+metallic_specular = 0.22
+texture_filter = 3
