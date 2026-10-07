@@ -3,7 +3,7 @@ class_name UiTokens
 ## re-export tokens with tools/ui/export_tokens_figma.js, then run the generator (SGODOT-211).
 ## Values marked in PENDING are provisional until the R1 design revisions (WP1a / WP1b) are accepted.
 
-const VERSION := "2.0-draft"
+const VERSION := "2.1-draft"
 const STATUS := "draft"
 const THEME_PATH := "res://assets/ui/gensen_theme.tres"
 const FONT_REGULAR_PATH := "res://assets/ui/fonts/nunito_w400.tres"
@@ -11,12 +11,14 @@ const FONT_BOLD_PATH := "res://assets/ui/fonts/nunito_w700.tres"
 const FONT_EXTRABOLD_PATH := "res://assets/ui/fonts/nunito_w800.tres"
 
 # Colours (semantic Figma variables first, then values Figma still hard-codes).
+const COLOR_AMBER := Color("E3B341")
 const COLOR_BORDER := Color("E1DAC8")
 const COLOR_DANGER := Color("9C3F2E")
 const COLOR_DANGER_TINT := Color("FFF0EB")
 const COLOR_DISABLED := Color("D6D5CE")
 const COLOR_DISABLED_INK := Color("8A918C")
 const COLOR_EDGE_STRONG := Color("CFC6B0")
+const COLOR_ENERGY_BONUS := Color("7FC66A")
 const COLOR_ENERGY_HUD_DEEP := Color("C9962A")
 const COLOR_ENERGY_HUD_FILL := Color("E3B341")
 const COLOR_ENERGY_HUD_LIGHT := Color("F4D27A")
@@ -36,6 +38,8 @@ const COLOR_PRIMARY := Color("3E7D43")
 const COLOR_PRIMARY_PRESSED := Color("2E6136")
 const COLOR_PRIMARY_TINT := Color("ECF4E7")
 const COLOR_QUALITY_GOLD := Color("E3B341")
+const COLOR_QUICK_HANDLE := Color("FBF8F1")
+const COLOR_QUICK_HANDLE_GRIP := Color("E1DAC8")
 const COLOR_RARITY_COMMON := Color("9DB89A")
 const COLOR_RARITY_FINE := Color("6FA8DC")
 const COLOR_RARITY_LEGENDARY := Color("E3B341")
@@ -52,21 +56,34 @@ const COLOR_SCRIM := Color("2F3A33")
 const COLOR_SCRIM_DRAWER := Color("2F3A332E")
 const COLOR_SCRIM_MODAL := Color("2F3A3352")
 const COLOR_SECONDARY := Color("5D6A62")
+const COLOR_SHADOW_CARD := Color("2E3B3329")
+const COLOR_SHADOW_FLOAT := Color("2E3B3329")
+const COLOR_SHADOW_KEY := Color("2E3B331F")
+const COLOR_SHADOW_MENU := Color("2E3B3329")
+const COLOR_SHADOW_PETAL := Color("2E3B3324")
+const COLOR_SKILL_FARMING := Color("7FC66A")
+const COLOR_SKILL_FISHING := Color("6FA8DC")
 const COLOR_SURFACE := Color("FBF8F1")
 const COLOR_SURFACE_RAISED := Color("FFFFFF")
 const COLOR_TEXT := Color("2F3A33")
+const COLOR_TILE_CORE := Color("F4EEE1")
+const COLOR_UNREAD_BADGE := Color("E07A5F")
+const COLOR_WARM := Color("FBF4E6")
 const COLOR_WARNING := Color("8C5F12")
 const COLOR_WARNING_TINT := Color("FFF0D4")
 
 # Opacity
 const OPACITY_SHEET_SURFACE := 0.97
-const OPACITY_SCRIM_COUNTER := 0.14
+const OPACITY_SCRIM_COUNTER := 0.18
 const OPACITY_SCRIM_DRAWER := 0.18
 const OPACITY_SCRIM_MODAL := 0.32
 const OPACITY_PENDING := 0.75
 const OPACITY_ZERO_ICON := 0.35
 const OPACITY_EMPTY_CELL := 0.35
 const OPACITY_KITCHEN_EMPTY := 0.55
+const OPACITY_SCENE_ACTION_PENDING := 0.7
+const OPACITY_UNAVAILABLE_ICON := 0.45
+const OPACITY_TODAY_DONE := 0.75
 
 # Space
 const SPACE_HUD_ROW_GAP := 8
@@ -80,16 +97,21 @@ const SPACE_SECTION := 20
 const SPACE_WITHIN := 6
 
 # Radius
-const RADIUS_BAG_DRAWER_TOP := 20
+const RADIUS_BAG_DRAWER_TOP := 24
+const RADIUS_CAPTION_PILL := 8
 const RADIUS_CARD := 14
 const RADIUS_CELL := 11
 const RADIUS_CHIP := 13
 const RADIUS_COMPACT_COMMAND := 17
-const RADIUS_COUNTER_DRAWER_TOP := 18
+const RADIUS_COUNTER_DRAWER_TOP := 24
+const RADIUS_ENERGY_TILE := 11
 const RADIUS_HUD_CHIP := 12
 const RADIUS_INVENTORY_CELL := 10
 const RADIUS_KITCHEN_MODE := 15
 const RADIUS_PILL := 22
+const RADIUS_PIN_MENU := 14
+const RADIUS_QUICK_HANDLE := 12
+const RADIUS_RADIAL_LABEL := 12
 const RADIUS_SHEET := 24
 const RADIUS_TRACK := 3
 
@@ -98,15 +120,15 @@ const STROKE_DEFAULT := 1
 const STROKE_CELL_HAIRLINE := 0.5
 const STROKE_SELECTED_CELL := 1.5
 const STROKE_SELECTED := 2
-const STROKE_RING := 3
 const STROKE_PIN_BADGE := 1.5
+const STROKE_RING := 5
+const STROKE_SCENE_ACTION := 2
+const STROKE_SCENE_ACTION_PRESSED := 3
+const STROKE_RADIAL_SELECTED := 3
+const STROKE_STATUS_BADGE_NPC := 2
 
 # Size
 const SIZE_TOUCH := 44
-const SIZE_SCENE_ACTION := 88
-const SIZE_TOOL_BADGE := 28
-const SIZE_SWITCH_KEY := 44
-const SIZE_SWITCH_ICON := 24
 const SIZE_QUICK_SLOT_W := 52
 const SIZE_QUICK_SLOT_H := 68
 const SIZE_QUICK_SLOT_SURFACE_H := 64
@@ -144,12 +166,6 @@ const SIZE_ITEM_ROW_ICON := 32
 const SIZE_STATE_BADGE_H := 32
 const SIZE_STATUS_BADGE := 56
 const SIZE_STATUS_BADGE_ICON := 28
-const SIZE_NEED_TILE_RING_L := 64
-const SIZE_NEED_TILE_RING_M := 48
-const SIZE_NEED_TILE_RING_S := 36
-const SIZE_NEED_TILE_LABEL_S := 11
-const SIZE_JOYSTICK_OUTER := 86
-const SIZE_JOYSTICK_THUMB := 40
 const SIZE_TOAST_W := 328
 const SIZE_TOAST_MIN_H := 43
 const SIZE_TOAST_PAD := 12
@@ -172,6 +188,81 @@ const SIZE_KITCHEN_CHECK := 13
 const SIZE_KITCHEN_CHECK_ICON := 9
 const SIZE_OBJECT_HEADER_QTY_W := 72
 const SIZE_ITEM_ROW_QTY_W := 88
+const SIZE_SHADOW_CARD_RADIUS := 24
+const SIZE_SHADOW_CARD_OFFSET_Y := 8
+const SIZE_SHADOW_FLOAT_RADIUS := 8
+const SIZE_SHADOW_FLOAT_OFFSET_Y := 3
+const SIZE_SHADOW_PETAL_RADIUS := 8
+const SIZE_SHADOW_PETAL_OFFSET_Y := 3
+const SIZE_SHADOW_MENU_RADIUS := 12
+const SIZE_SHADOW_MENU_OFFSET_Y := 4
+const SIZE_SHADOW_KEY_RADIUS := 6
+const SIZE_SHADOW_KEY_OFFSET_Y := 2
+const SIZE_SCENE_ACTION := 88
+const SIZE_SWITCH_KEY := 48
+const SIZE_SWITCH_ICON := 24
+const SIZE_TOOL_BADGE := 28
+const SIZE_TOOL_BADGE_ICON := 18
+const SIZE_ACTION_KEY_W := 95
+const SIZE_ACTION_KEY_H := 148
+const SIZE_HOLD_RING := 4.4
+const SIZE_PENDING_RING := 3.5
+const SIZE_RADIAL_PETAL := 52
+const SIZE_RADIAL_ICON := 28
+const SIZE_RADIAL_LOCK_BADGE := 18
+const SIZE_RADIAL_LOCK_ICON := 12
+const SIZE_TAP_CARD_H := 32
+const SIZE_TAP_GLYPH := 14
+const SIZE_POINTER_W := 14
+const SIZE_POINTER_H := 7
+const SIZE_STATUS_BADGE_WORLD := 28
+const SIZE_STATUS_BADGE_NPC := 36
+const SIZE_STATUS_GLYPH_WORLD := 17
+const SIZE_STATUS_GLYPH_NPC := 22
+const SIZE_CAPTION_PILL_H := 18
+const SIZE_PIN_MENU_W := 200
+const SIZE_HUD_AVATAR := 38
+const SIZE_SKILL_RING := 44
+const SIZE_ENERGY_CHIP_W := 100
+const SIZE_ENERGY_CHIP_H := 42
+const SIZE_ENERGY_TRACK_W := 84
+const SIZE_ENERGY_TRACK_H := 3
+const SIZE_HUD_CAPSULE_H := 26
+const SIZE_INBOX := 32
+const SIZE_UNREAD_BADGE_W := 18
+const SIZE_UNREAD_BADGE_H := 15
+const SIZE_TODAY_CHIP_W := 170
+const SIZE_NEED_TILE_RING_L := 64
+const SIZE_NEED_TILE_RING_M := 48
+const SIZE_NEED_TILE_RING_S := 36
+const SIZE_NEED_TILE_STROKE_L := 5
+const SIZE_NEED_TILE_STROKE_M := 4
+const SIZE_NEED_TILE_STROKE_S := 3
+const SIZE_NEED_TILE_ICON_L := 34
+const SIZE_NEED_TILE_ICON_M := 26
+const SIZE_NEED_TILE_ICON_S := 20
+const SIZE_NEED_TILE_W := 78
+const SIZE_NEED_TILE_WS := 72
+const SIZE_NEED_TILE_LABEL_S := 11
+const SIZE_NEED_TILE_GAP_X := 10
+const SIZE_NEED_TILE_GAP_Y := 12
+const SIZE_ENERGY_CARD_W := 307
+const SIZE_ENERGY_PANEL_W := 300
+const SIZE_ENERGY_TILE_H := 80
+const SIZE_TODAY_PANEL_W := 340
+const SIZE_TODAY_PANEL_X := 10
+const SIZE_TODAY_PANEL_Y := 96
+const SIZE_TODAY_ROW_H := 40
+const SIZE_TODAY_ICON := 20
+const SIZE_JOYSTICK_OUTER := 86
+const SIZE_JOYSTICK_THUMB := 40
+const SIZE_CAPACITY_DOT := 7
+const SIZE_QUICK_HANDLE_TOUCH_W := 120
+const SIZE_QUICK_HANDLE_TOUCH_H := 44
+const SIZE_QUICK_HANDLE_W := 96
+const SIZE_QUICK_HANDLE_H := 24
+const SIZE_QUICK_HANDLE_GRIP_W := 24
+const SIZE_QUICK_HANDLE_GRIP_H := 3
 
 # Dash
 const DASH_INVENTORY := [2, 2]
@@ -252,13 +343,7 @@ const PANEL_TOAST_PANEL := &"ToastPanel"
 const PANEL_BADGE := &"Badge"
 
 const PENDING := {
-	"sceneAction": "LOCK-02 main under WP1a revision",
-	"toolBadge": "not in SceneAction main yet (WP1a)",
-	"switchKey": "LOCK-03, WP1a",
-	"hud": "LOCK-06, WP1a",
-	"pin": "LOCK-05 pin colours read from the WP1a revision, not yet accepted",
-	"needTile": "sizes from plan q(8); main re-export after WP1a",
-	"joystick": "WP7-A Q1: main 130/60 vs shipped 86/40",
-	"cmdBlocked": "CommandButton Kind=unavailable from the WP1a revision, not yet accepted",
+	"wp1b": "container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)",
 	"segmentTab": "selected style must not use command green (LOCK-13), WP1b",
+	"toast": "Toast R1 (1178:82265) replaces the old Toast main 483:302 in the WP2 migration; toastW is still the old 328",
 }
