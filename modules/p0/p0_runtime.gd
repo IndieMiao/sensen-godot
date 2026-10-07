@@ -275,6 +275,8 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast("Your line is already in the water")
 		"no_bait":
 			ui.toast("No bait left")
+		"not_at_pond":
+			ui.toast("Fish from a pond · open one from the map")   # the server did not get which pond (q(36))
 		"too_early", "no_cast":
 			_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		"stove_busy":

@@ -5,6 +5,7 @@
  * home, or the previous command when two commands are ≥ 2 h apart (the session ended in between).
  */
 import type { P0Content } from './content.js';
+import { storeMaterials } from './gathering.js';
 import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
 
@@ -29,9 +30,10 @@ export function trackPresence(c: P0Content, s: P0State, space: unknown, now: num
  * having left. Returns true on arriving home; SGODOT-231 hangs auto-storing materials here (events is null on reads).
  * `place` names the catalog pond inside a pond space (SGODOT-232 S6): see notePlace.
  */
-export function notePresence(c: P0Content, s: P0State, space: unknown, now: number, _events: P0Event[] | null, place?: unknown): boolean {
+export function notePresence(c: P0Content, s: P0State, space: unknown, now: number, events: P0Event[] | null, place?: unknown): boolean {
   const home = trackPresence(c, s, space, now);
   notePlace(c, s, space, place);
+  if (home) storeMaterials(c, s, now, events);   // q(40): coming home stores the bag's materials (SGODOT-231)
   return home;
 }
 

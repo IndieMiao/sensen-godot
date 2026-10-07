@@ -176,9 +176,9 @@ export function setLock(c: P0Content, s: P0State, cmd: { item?: unknown }, lock:
   return null;
 }
 
-/** What the player can Store at home (§10.4.8, q(40)): materials, seeds, fertilizer, bait; never produce, fish or dishes. */
+/** What the player can Store at home (§10.4.8, q(40)): materials, seeds, fertilizer, bait, torches; never produce, fish or dishes. */
 export function storable(c: P0Content, id: string): boolean {
-  return ['seed', 'fert', 'bait', 'material'].includes(itemKind(id)) && !c.drinks.items[id];
+  return ['seed', 'fert', 'bait', 'torch', 'material'].includes(itemKind(id)) && !c.drinks.items[id];
 }
 
 /** Bag → farm storage (Store) and back (Take). TODO(P1): at home only; the client offers both at home. */

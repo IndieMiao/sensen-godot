@@ -142,11 +142,13 @@ describe('P0 passive rewards (§10.4.8, q(45); SGODOT-232 S1, rescued from SGODO
     expect(viewOf(c, s, T + PARCEL_LIFETIME_MS).inbox.badge).toBe(0);
   });
 
-  it('gives v3 saves an empty Inbox without inventing historical rewards', () => {
+  it('gives v3 and v4 saves an empty Inbox without inventing historical rewards', () => {
     const s = full();
     s.skills.fishing = 70;
-    const old = JSON.parse(JSON.stringify(s)); delete old.inbox;
-    const upgraded = upgradeState(c, old);
+    const v4 = JSON.parse(JSON.stringify(s)); delete v4.inbox;
+    const v3 = JSON.parse(JSON.stringify(v4)); v3.v = 3; delete v3.mine; delete v3.gather;
+    expect(upgradeState(c, v3)).toMatchObject({ v: 4, inbox: { granted: [], parcels: [], waiting: [], updates: [] } });
+    const upgraded = upgradeState(c, v4);
     expect(upgraded.inbox).toEqual({ granted: [], parcels: [], waiting: [], updates: [] });
     expect(upgraded.bag).toEqual(s.bag);
     expect(upgraded.skills).toEqual(s.skills);

@@ -8,7 +8,7 @@ import { dishParts, itemKind, recipeById, type P0Content, type ResidentDef, type
 import { recipeRarity } from './cooking.js';
 import type { Refusal } from './fishing.js';
 import type { P0Event } from './progress.js';
-import { floorPrice, haveFor, noteDone, payBonus, pick } from './requests.js';
+import { floorPrice, handOver, haveFor, noteDone, payBonus, pick } from './requests.js';
 import { skillLevel, untilRollover } from './rules.js';
 import type { P0State, ResidentState } from './state.js';
 import { grantItems } from './parcels.js';
@@ -143,7 +143,7 @@ export function residentRequestCommand(c: P0Content, s: P0State, type: 'accept' 
     const parts = pick(c, s, q.need, q.need.id ? [q.need.id] : [], q.qty);
     if (!parts) return { code: 'not_enough', detail: { need: q.qty, have: progressOf(c, s, owner, q) } };
     for (const [item, n] of parts) {
-      take(s.bag, item, n, 'skip');
+      handOver(c, s, item, n);
       floor += floorPrice(c, item) * n;
       events.push({ kind: 'item', id: item, delta: -n });
     }
