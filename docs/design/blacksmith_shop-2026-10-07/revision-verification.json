@@ -1,0 +1,210 @@
+{
+  "revision": "r2",
+  "reference_sha256": "c9a36a357cc71217b4771613b44d4db121132f1ac8b26f8db130190840aad8ab",
+  "renderer": {
+    "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "draw_calls": 16.0,
+    "instances": 54,
+    "renderer": "mobile",
+    "resolution": [
+      1400,
+      1400
+    ],
+    "scope": "offline art render; no mobile/gameplay/performance acceptance",
+    "slug": "blacksmith_shop",
+    "static_surfaces": 18,
+    "views": [
+      {
+        "draw_calls": 20.0,
+        "rendered_objects": 20.0,
+        "view": "godot-whole"
+      },
+      {
+        "draw_calls": 20.0,
+        "rendered_objects": 20.0,
+        "view": "model-front"
+      },
+      {
+        "draw_calls": 20.0,
+        "rendered_objects": 20.0,
+        "view": "model-side"
+      },
+      {
+        "draw_calls": 20.0,
+        "rendered_objects": 20.0,
+        "view": "model-top"
+      },
+      {
+        "draw_calls": 14.0,
+        "rendered_objects": 14.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 14.0,
+        "rendered_objects": 14.0,
+        "view": "godot-detail-plants"
+      },
+      {
+        "draw_calls": 13.0,
+        "rendered_objects": 13.0,
+        "view": "forge-fire-detail"
+      },
+      {
+        "draw_calls": 16.0,
+        "rendered_objects": 16.0,
+        "view": "tools-bench-detail"
+      }
+    ]
+  },
+  "budget": {
+    "after": {
+      "room_triangles": 85352,
+      "shared_plant_triangles": 4096,
+      "room_botanical_triangles": 0,
+      "plant_triangles": 4096,
+      "total_triangles": 89448,
+      "static_surfaces": 18
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/blacksmith_shop/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "window_wall",
+          "left_tool_shelves",
+          "display_swords",
+          "horseshoe_stock",
+          "tool_shelf_mugs",
+          "bench_hammer",
+          "leather_apron",
+          "metal_ingot_crate",
+          "forge_stool",
+          "forge_mat",
+          "bench_tongs",
+          "barrel_towel",
+          "shelf_green_cloth",
+          "shelf_toolbox"
+        ],
+        "triangles": 11808,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/blacksmith_shop/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "back_wall",
+          "forge_hood",
+          "smoke",
+          "forge_coals",
+          "forge_sign",
+          "hammer_wall",
+          "tongs_wall",
+          "punch_set",
+          "forge_lantern",
+          "right_wall_shelf",
+          "hammer_variant_0",
+          "hammer_variant_1",
+          "hammer_variant_2",
+          "tong_variant_0",
+          "tong_variant_1",
+          "tong_variant_2",
+          "green_apron",
+          "coal_shovel",
+          "bench_vise",
+          "wall_hammer_3",
+          "wall_hammer_4",
+          "wall_tong_3",
+          "wall_tong_4",
+          "wall_tong_5"
+        ],
+        "triangles": 19474,
+        "cast_shadow": true
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/blacksmith_shop/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "LeftPothos"
+        ],
+        "triangles": 2048,
+        "cast_shadow": false
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/blacksmith_shop/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "RightPothos"
+        ],
+        "triangles": 2048,
+        "cast_shadow": false
+      }
+    ]
+  },
+  "glb_checks": {
+    "passed": true,
+    "single_surface_no_embedded_images": true,
+    "files": [
+      "assets/rooms/_shared/plants/pothos.glb",
+      "assets/rooms/blacksmith_shop/anvil_workbench.glb",
+      "assets/rooms/blacksmith_shop/back_tool_bench.glb",
+      "assets/rooms/blacksmith_shop/back_wall.glb",
+      "assets/rooms/blacksmith_shop/barrel_towel.glb",
+      "assets/rooms/blacksmith_shop/batches/review_back_dressing.glb",
+      "assets/rooms/blacksmith_shop/batches/review_back_plants.glb",
+      "assets/rooms/blacksmith_shop/batches/review_front_dressing.glb",
+      "assets/rooms/blacksmith_shop/batches/review_front_plants.glb",
+      "assets/rooms/blacksmith_shop/bench_hammer.glb",
+      "assets/rooms/blacksmith_shop/bench_tongs.glb",
+      "assets/rooms/blacksmith_shop/bench_vise.glb",
+      "assets/rooms/blacksmith_shop/brick_forge.glb",
+      "assets/rooms/blacksmith_shop/coal_bucket.glb",
+      "assets/rooms/blacksmith_shop/coal_shovel.glb",
+      "assets/rooms/blacksmith_shop/display_swords.glb",
+      "assets/rooms/blacksmith_shop/fire.glb",
+      "assets/rooms/blacksmith_shop/forge_coals.glb",
+      "assets/rooms/blacksmith_shop/forge_hood.glb",
+      "assets/rooms/blacksmith_shop/forge_lantern.glb",
+      "assets/rooms/blacksmith_shop/forge_mat.glb",
+      "assets/rooms/blacksmith_shop/forge_sign.glb",
+      "assets/rooms/blacksmith_shop/forge_stool.glb",
+      "assets/rooms/blacksmith_shop/green_apron.glb",
+      "assets/rooms/blacksmith_shop/hammer_variant_0.glb",
+      "assets/rooms/blacksmith_shop/hammer_variant_1.glb",
+      "assets/rooms/blacksmith_shop/hammer_variant_2.glb",
+      "assets/rooms/blacksmith_shop/hammer_wall.glb",
+      "assets/rooms/blacksmith_shop/heated_bar_glow.glb",
+      "assets/rooms/blacksmith_shop/horseshoe_stock.glb",
+      "assets/rooms/blacksmith_shop/lantern_glow.glb",
+      "assets/rooms/blacksmith_shop/leather_apron.glb",
+      "assets/rooms/blacksmith_shop/left_floor_crate.glb",
+      "assets/rooms/blacksmith_shop/left_tool_shelves.glb",
+      "assets/rooms/blacksmith_shop/main_anvil.glb",
+      "assets/rooms/blacksmith_shop/metal_ingot_crate.glb",
+      "assets/rooms/blacksmith_shop/punch_set.glb",
+      "assets/rooms/blacksmith_shop/quench_barrel.glb",
+      "assets/rooms/blacksmith_shop/right_wall_shelf.glb",
+      "assets/rooms/blacksmith_shop/room_shell.glb",
+      "assets/rooms/blacksmith_shop/shelf_green_cloth.glb",
+      "assets/rooms/blacksmith_shop/shelf_toolbox.glb",
+      "assets/rooms/blacksmith_shop/smoke.glb",
+      "assets/rooms/blacksmith_shop/stump.glb",
+      "assets/rooms/blacksmith_shop/tong_variant_0.glb",
+      "assets/rooms/blacksmith_shop/tong_variant_1.glb",
+      "assets/rooms/blacksmith_shop/tong_variant_2.glb",
+      "assets/rooms/blacksmith_shop/tongs_wall.glb",
+      "assets/rooms/blacksmith_shop/tool_bucket.glb",
+      "assets/rooms/blacksmith_shop/tool_shelf_mugs.glb",
+      "assets/rooms/blacksmith_shop/window_wall.glb"
+    ]
+  },
+  "visual_acceptance": "Pending art director Review; metrics do not establish reference fidelity."
+}

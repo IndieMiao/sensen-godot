@@ -1,0 +1,33 @@
+{
+	"avatar_top_H": 1.74549420177937,
+	"capsule_height": 1.25,
+	"capsule_radius": 0.21,
+	"measurements": {
+		"chair": {
+			"baseline_ratio": 0.39243900054306,
+			"difference": 0.0364963503649636,
+			"height": 0.66,
+			"ratio_to_H": 0.378116409282364,
+			"reason": ""
+		},
+		"counter": {
+			"baseline_ratio": 0.660271457118068,
+			"difference": 0.0932754880694144,
+			"height": 1.045,
+			"ratio_to_H": 0.598684314697076,
+			"reason": ""
+		},
+		"door": {
+			"applicable": false,
+			"reason": "Open-front workshop; no human doorway asset."
+		},
+		"table": {
+			"baseline_ratio": 0.650245643235581,
+			"difference": 0.0792951541850221,
+			"height": 1.045,
+			"ratio_to_H": 0.598684314697076,
+			"reason": ""
+		}
+	},
+	"speed": 3.75
+}

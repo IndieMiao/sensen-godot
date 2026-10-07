@@ -1,56 +1,50 @@
-# Blacksmith Shop · art review candidate
+# Blacksmith Shop · Liu Bei R2 review candidate
 
-Plane [SGODOT-178](https://plane.sensenjoy.cn/zili/browse/SGODOT-178), owner Zhao Yun / 赵云. **In Progress, awaiting user review.** Produced 2026-10-07 under the user's request to proceed sequentially overnight and send each scene through Lark CLI.
+[SGODOT-178](https://plane.sensenjoy.cn/zili/browse/SGODOT-178) · owner 刘备 · submitted for art-director **Review**, not Done. This R2 supersedes the earlier Zhao Yun package. Prior images named `godot.png` and `orthographic-sheet.png` are historical R1 media; use the R2 links below.
 
-Reference: Figma file `OMLTC3yw3u2WDjOZhLnhaR`, node [545:2965](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=545-2965). The [original export](reference.png) was downloaded and visually inspected before modeling.
+Reference: Figma `OMLTC3yw3u2WDjOZhLnhaR`, node 545:2965; [original export](reference.png), inspected at native resolution.
 
-![Figma and actual Godot render](comparison.png)
+![Reference, actual Godot and unwarped overlay](comparison.png)
 
-The forge workshop includes a true arched furnace cavity and shallow lining, stone piers and log store, tapered riveted extraction hood, open flue with sculpted smoke, coal bed and fire. The foreground anvil has a flared waist, tapered horn and cut-out hardy socket. Other modules include a small stump-mounted anvil, tool racks, swords, horseshoes, hammers/tongs, quenching barrel, coal bucket, workbench, ingot crate and draped leather apron. The sign retains FORGE WORKSHOP on two lines. The stump anvil instances the same GLB at a uniform 0.48 scale; its collider inherits that transform.
+Dark gray lime walls and reddish brown wood replace the pale warm kit colours. The old square yellow post caps are removed. The furnace has staggered red brick courses, a stone hearth, strapped/riveted iron extraction hood, curved emissive flame tongues and readable bark/endgrain logs. Four irregular smoke groups drift sideways in silhouette; these are static art meshes, not a particle simulation.
 
-## Deliverables
+Three hammer and three tong source variants supply five wall hammers and six wall tongs. The workshop also has three swords, horseshoes, metal mugs, cloth, two crate sizes, a towel over the water barrel, a long coal shovel, corner-braced workbench, corrected tapered anvil horn, hot steel, bench tongs, vise, leather/green aprons and a checked gray-green mat. The FORGE WORKSHOP sign uses Nunito Black with 4 mm depth. Shared pothos plants retain the accepted library atlas.
 
-- [Editable Blender model](../../../tools/art/source/blacksmith_shop/blacksmith_shop.blend), with named objects and module collections.
-- [Deterministic scene generator](../../../tools/art/build_blacksmith_shop.py), using the [room pipeline](../../../tools/art/scene_room_pipeline.py).
-- [GLB placement and collision manifest](../../../assets/rooms/blacksmith_shop/layout.json), individual local pivots and a shared external base-color/contact-AO atlas.
-- [Reusable Godot art scene](../../../scenes/blacksmith_shop/blacksmith_shop_art.tscn), without gameplay/account/network dependencies.
-- [Whole-scene runtime image](godot.png), [model orthographic views](orthographic-sheet.png), [budget and verification hashes](verification-summary.json).
+Three unshadowed local lights cover the furnace, lantern and hot steel. Neutral sun and low ambient preserve gray walls; the forge contributes most of the warm light. On/off screenshots isolate the forge light alone at the anvil, main bench and floor; the lantern and hot-steel lights stay off in both controls. The furnace-to-mainbench aisle is 2.185 m, above 0.8 m. The route stops 0.81 m in front of the furnace mouth, above 0.5 m. Furnace, both benches, water barrel and stump block the avatar. The low stool intentionally has no blocking collision. Main worktop is 1.045 m above its floor pivot, rear worktop 0.9802 m (13.64% below Basic Room), and stool seat 0.6608 m. No human doorway is present in this open-front scene.
 
-## Reconstruction and contract
+The accepted SGODOT-172 R2.1 editable structural meshes supply posts, beams, beam pegs/corbels, feet, skirting and plinth. Only spans and positions adapt to the existing room; cross sections and bevel modifiers are retained. The [reuse ledger](../../../tools/art/source/blacksmith_shop/structure-reuse.json) records source SHA-256, per-part dimensions/modifiers and retained/removed parts. Basic Room, 172 and the shared plant library remain read-only.
+
+The orthographic camera fits three visible plinth edge intersections and an inferred fourth, following 172 R2. No geometry or comparison image is warped. [Camera evidence](camera-registration.png) / [fit data](camera-registration.json); residuals 12.42, 11.85, 13.37 px. Rounded reference edges are estimated intersections, not calibrated survey points.
+
+| Budget | R2 |
+|---|---:|
+| Unique room modules / placed room modules | 46 / 52 |
+| Unique room triangles | 83,064 |
+| Placed triangles including all plants | 89,448 / 200,000 |
+| All plants, including incidental room vegetation | 4,096 / 100,000 |
+| Runtime static surfaces after grouping | 18 / 60 |
+| Individual room GLB bytes | 3,316,028 |
+| Room atlas | 2048 × 2048, base colour + contact AO |
+
+Exported groups share material/atlas and preserve unmerged editable parts plus individual local-pivot GLBs. Small leaves do not cast shadows. Godot imports use mipmaps and VRAM compression. Source PNG/GLB bytes are not GPU memory; static surfaces exclude shadow passes and the avatar.
+
+[Whole scene](godot-whole.png), [detail sheet](asset-details.jpg), [orthographic views](orthographic.png), [native-pixel sign check](signage-check.png), [colour patches](colour-patch-comparison.jpg), [local light controls](light-pool-controls.jpg), [budget/import verification](revision-verification.json), [character checks](bench-result.json), [video timeline](bench-video-timeline.jpg).
+
+Actual checks run in Godot 4.7.2 **Mobile / Vulkan**, AMD Custom GPU 0405 / RADV VANGOGH, on this Linux host. Hero renders are 1400×1400. Rendered character/collision/input-fixture checks and a real-time 15 s viewport recording use the existing isolated shared harness; the shared core is unchanged. This is desktop evidence, not Android/physical-phone performance or production gameplay acceptance. No APK, phone install or save operation is included.
+
+Differences retained for art-director review: The reference has taller walls relative to its floor, a different furnace/bench spacing and more elaborate metal surface highlights. The original room envelope and Basic Room furniture sizes remain; rigid floor-corner registration exposes the remaining height/composition difference instead of stretching the model. Smoke is static and simplified; no animated fire/smoke acceptance is claimed. [Evaluated source-mesh height audit](dimensions-r2.json) independently measures every worktop and seat against the Basic Room baseline. Representative colour medians test corresponding physical surfaces; they do not establish complete-image fidelity. During inspection, samples accidentally landing on rails/props were rejected before declaring the final surface coordinates.
+
+Editable source: [Blender](../../../tools/art/source/blacksmith_shop/blacksmith_shop.blend), [revision generator](../../../tools/art/source/blacksmith_shop/revision2.py), [layout](../../../assets/rooms/blacksmith_shop/layout.json), [Godot scene](../../../scenes/blacksmith_shop/blacksmith_shop_art.tscn). Coordinates are metres, Godot Y-up/front +Z; source Blender coordinates are `(x,-z,y)`.
 
 ```sh
-blender --background --factory-startup --python "$PWD/tools/art/build_blacksmith_shop.py" -- --views
-python3 tools/art/prepare_room_review.py blacksmith_shop
-godot --headless --editor --path output/blacksmith_shop-2026-10-07/godot-project --import --quit
-godot --path output/blacksmith_shop-2026-10-07/godot-project \
-  --script res://tools/art/review_room.gd -- blacksmith_shop \
-  "$PWD/output/blacksmith_shop-2026-10-07"
+blender -b -t 4 --python tools/art/build_blacksmith_shop.py
+DISPLAY=:0 python tools/art/source/coffee_shop/render_r1.py r2 blacksmith_shop
+DISPLAY=:0 python tools/art/source/coffee_shop/run_bench.py blacksmith_shop --record
+DISPLAY=:0 output/art-tools/bin/python tools/art/source/tavern/light_controls.py blacksmith_shop
+output/art-tools/bin/python tools/art/source/coffee_shop/package_series.py blacksmith_shop r2
+output/art-tools/bin/python tools/art/source/coffee_shop/check_series_colour.py blacksmith_shop r2
+output/art-tools/bin/python tools/art/source/coffee_shop/prepare_series_media.py blacksmith_shop r2
+output/art-tools/bin/python tools/art/source/coffee_shop/package_r2_details.py blacksmith_shop r2
 ```
 
-Use the actual host display for rendering. Blender 5.2.0 LTS and Godot 4.7.2 were used here. `--geometry-only` skips bake/export. Rebuilding replaces this scene's `.blend`; preserve manual edits deliberately. Source assets from Basic Room remain read-only.
-
-Coordinates are metres, Godot Y-up/front +Z and Blender `(x,-z,y)`. Modules export about their own floor/mounting pivot; placement is in the manifest. The baked atlas contains procedural surface detail and softened contact AO, with live runtime sunlight. Rebake after major rearrangement. Raw GLBs must bind this atlas. Triangulation occurs before UV bake/export to keep surface interpolation consistent, and empty atlas gutters are extended before mip generation.
-
-## Validation and budget
-
-Actual Godot **Mobile / Vulkan**, AMD Custom GPU 0405 (RADV VANGOGH), 1440×1080. 34 meshes have atlas materials and finite nonempty bounds; 13 simple collision shapes are present. The imported triangle count matches the export manifest.
-
-| Metric | Measured |
-|---|---:|
-| Unique GLBs / placed instances | 33 / 34 |
-| Unique / placed triangles | 74,274 / 75,186 |
-| Static surfaces | 34 |
-| Runtime materials | 2 |
-| GLB bytes combined | 3,583,580 |
-| Atlas source PNG bytes | 2,543,312 |
-| Shared atlas | 2048 × 2048 |
-
-Texture imports enable mipmaps and VRAM compression. Fine geometry keeps uncompressed vertices and disables automatic mesh LODs. Static surface counts exclude renderer shadow passes; PNG bytes are not GPU memory. No physical-phone performance measurement is claimed.
-
-## Inferences and differences
-
-The 6.4 × 6.0m footprint, backs and construction dimensions are inferred. Surface wear, heat shimmer, sparks and smoke motion are simplified: smoke is seven static low-poly puffs, fire is the existing sculpted Basic Room flame kit, and quenching water is a static colored surface. Iron uses a matte stylized response and the hanging tool assortment is reduced. The review renderer uses a single small unshadowed forge light; no particle system or new render pass is required.
-
-Simple boxes cover the main furniture, barrels and forge. Furnace arch, chimney throat and anvil socket are modeled as actual openings. Tool use, forging, physics, walking and resource interactions are outside this art-only scope.
-
-This is an art-only candidate awaiting review. No gameplay/map integration, avatar benchmark, Android QA, production build, migration or release is included.
+Use the host's working display; `-- --geometry-only` skips bake/export. Rebuild replaces this scene's source file. Review attachments and Lark media are hash-readback verified in [delivery record](delivery-verification.json) after sending.

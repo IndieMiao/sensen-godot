@@ -1,0 +1,89 @@
+{
+  "checks": [
+    {
+      "name": "Anvil face",
+      "position": [
+        0.05,
+        1.725,
+        1.28
+      ],
+      "pixel": [
+        574,
+        895
+      ],
+      "patch_size": 17,
+      "mean_rgb_255_gain": 3.698,
+      "passed": true
+    },
+    {
+      "name": "Workbench",
+      "position": [
+        -0.73,
+        1.137,
+        1.32
+      ],
+      "pixel": [
+        499,
+        925
+      ],
+      "patch_size": 17,
+      "mean_rgb_255_gain": 15.314,
+      "passed": true
+    },
+    {
+      "name": "Floor",
+      "position": [
+        -0.8,
+        0.083,
+        -0.35
+      ],
+      "pixel": [
+        649,
+        960
+      ],
+      "patch_size": 17,
+      "mean_rgb_255_gain": 3.671,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "lights": [
+    {
+      "name": "forge_fire",
+      "position": [
+        -1.35,
+        2.04,
+        -1.16
+      ],
+      "energy": 3.1,
+      "range": 4.25,
+      "color": "FF8B36",
+      "attenuation": 1.15
+    },
+    {
+      "name": "lantern",
+      "position": [
+        2.66,
+        2.5,
+        -2.47
+      ],
+      "energy": 0.85,
+      "range": 1.9,
+      "color": "FFD08A"
+    },
+    {
+      "name": "hot_steel",
+      "position": [
+        0.31,
+        1.92,
+        1.2
+      ],
+      "energy": 0.5,
+      "range": 0.85,
+      "color": "FFAB37"
+    }
+  ],
+  "local_light_count": 3,
+  "all_local_shadows": false,
+  "method": "Same camera/materials; forge light alone vs all local lights off; lantern and hot-steel lights stay off in both controls."
+}

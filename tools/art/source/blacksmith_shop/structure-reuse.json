@@ -1,0 +1,535 @@
+{
+  "source": "tools/art/source/standard_room_5/standard_room_5.blend",
+  "sha256": "696d3515588f138823e29dbce3af7d935fd4cb1ddc0c2a638e74a0e1f94d605d",
+  "source_revision": "accepted SGODOT-172 R2.1 ef7e48c6",
+  "parts": [
+    {
+      "source_collection": "window_wall",
+      "source_object": "Upright oak timber",
+      "object": "172 reused Upright oak timber",
+      "before_blender_extent": [
+        0.25999999046325684,
+        0.30000001192092896,
+        3.5
+      ],
+      "after_blender_extent": [
+        0.25999999046325684,
+        0.30000001192092896,
+        3.8499999046325684
+      ],
+      "length_axis": 2,
+      "bevels": [
+        {
+          "width": 0.08749999850988388,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "window_wall",
+      "source_object": "Timber joint cap",
+      "object": "172 reused Timber joint cap",
+      "before_blender_extent": [
+        0.4300000071525574,
+        0.4300000071525574,
+        0.38999998569488525
+      ],
+      "after_blender_extent": [
+        0.4300000071525574,
+        0.4300000071525574,
+        0.38999998569488525
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.10999999940395355,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": false
+    },
+    {
+      "source_collection": "window_wall",
+      "source_object": "Post foot",
+      "object": "172 reused Post foot",
+      "before_blender_extent": [
+        0.3700000047683716,
+        0.36000001430511475,
+        0.27000001072883606
+      ],
+      "after_blender_extent": [
+        0.3700000047683716,
+        0.36000001430511475,
+        0.27000001072883606
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.04999999701976776,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "window_wall",
+      "source_object": "Upright oak timber.001",
+      "object": "172 reused Upright oak timber.001",
+      "before_blender_extent": [
+        0.25999999046325684,
+        0.30000001192092896,
+        3.5
+      ],
+      "after_blender_extent": [
+        0.25999999046325684,
+        0.30000001192092896,
+        3.8499999046325684
+      ],
+      "length_axis": 2,
+      "bevels": [
+        {
+          "width": 0.08749999850988388,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "window_wall",
+      "source_object": "Timber joint cap.001",
+      "object": "172 reused Timber joint cap.001",
+      "before_blender_extent": [
+        0.4300000071525574,
+        0.4300000071525574,
+        0.38999998569488525
+      ],
+      "after_blender_extent": [
+        0.4300000071525574,
+        0.4300000071525574,
+        0.38999998569488525
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.10999999940395355,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": false
+    },
+    {
+      "source_collection": "window_wall",
+      "source_object": "Post foot.001",
+      "object": "172 reused Post foot.001",
+      "before_blender_extent": [
+        0.3700000047683716,
+        0.36000001430511475,
+        0.27000001072883606
+      ],
+      "after_blender_extent": [
+        0.3700000047683716,
+        0.36000001430511475,
+        0.27000001072883606
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.04999999701976776,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "window_wall",
+      "source_object": "Heavy top beam",
+      "object": "172 reused Heavy top beam",
+      "before_blender_extent": [
+        6.099999904632568,
+        0.2800000011920929,
+        0.2800000011920929
+      ],
+      "after_blender_extent": [
+        5.900000095367432,
+        0.2800000011920929,
+        0.2800000011920929
+      ],
+      "length_axis": 0,
+      "bevels": [
+        {
+          "width": 0.06875000149011612,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "window_wall",
+      "source_object": "Beam peg",
+      "object": "172 reused Beam peg",
+      "before_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "after_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.04124999791383743,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "window_wall",
+      "source_object": "Beam peg.001",
+      "object": "172 reused Beam peg.001",
+      "before_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "after_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.04124999791383743,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "window_wall",
+      "source_object": "Beam peg.002",
+      "object": "172 reused Beam peg.002",
+      "before_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "after_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.04124999791383743,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "window_wall",
+      "source_object": "Wall skirting",
+      "object": "172 reused Wall skirting",
+      "before_blender_extent": [
+        5.860000133514404,
+        0.14000000059604645,
+        0.1899999976158142
+      ],
+      "after_blender_extent": [
+        5.660000324249268,
+        0.14000000059604645,
+        0.1899999976158142
+      ],
+      "length_axis": 0,
+      "bevels": [
+        {
+          "width": 0.03125,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "back_wall",
+      "source_object": "Upright oak timber.002",
+      "object": "172 reused Upright oak timber.002",
+      "before_blender_extent": [
+        0.25999999046325684,
+        0.30000001192092896,
+        3.5
+      ],
+      "after_blender_extent": [
+        0.25999999046325684,
+        0.30000001192092896,
+        3.8499999046325684
+      ],
+      "length_axis": 2,
+      "bevels": [
+        {
+          "width": 0.08749999850988388,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "back_wall",
+      "source_object": "Timber joint cap.002",
+      "object": "172 reused Timber joint cap.002",
+      "before_blender_extent": [
+        0.4300000071525574,
+        0.4300000071525574,
+        0.38999998569488525
+      ],
+      "after_blender_extent": [
+        0.4300000071525574,
+        0.4300000071525574,
+        0.38999998569488525
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.10999999940395355,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": false
+    },
+    {
+      "source_collection": "back_wall",
+      "source_object": "Post foot.002",
+      "object": "172 reused Post foot.002",
+      "before_blender_extent": [
+        0.3700000047683716,
+        0.36000001430511475,
+        0.27000001072883606
+      ],
+      "after_blender_extent": [
+        0.3700000047683716,
+        0.36000001430511475,
+        0.27000001072883606
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.04999999701976776,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "back_wall",
+      "source_object": "Heavy top beam.001",
+      "object": "172 reused Heavy top beam.001",
+      "before_blender_extent": [
+        6.099999904632568,
+        0.2800000011920929,
+        0.2800000011920929
+      ],
+      "after_blender_extent": [
+        6.299999713897705,
+        0.2800000011920929,
+        0.2800000011920929
+      ],
+      "length_axis": 0,
+      "bevels": [
+        {
+          "width": 0.06875000149011612,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "back_wall",
+      "source_object": "Beam peg.003",
+      "object": "172 reused Beam peg.003",
+      "before_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "after_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.04124999791383743,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "back_wall",
+      "source_object": "Beam peg.004",
+      "object": "172 reused Beam peg.004",
+      "before_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "after_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.04124999791383743,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "back_wall",
+      "source_object": "Beam peg.005",
+      "object": "172 reused Beam peg.005",
+      "before_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "after_blender_extent": [
+        0.20000000298023224,
+        0.1599999964237213,
+        0.3199999928474426
+      ],
+      "length_axis": null,
+      "bevels": [
+        {
+          "width": 0.04124999791383743,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "back_wall",
+      "source_object": "Door left skirting",
+      "object": "172 reused Door left skirting",
+      "before_blender_extent": [
+        4.639999866485596,
+        0.14000000059604645,
+        0.1899999976158142
+      ],
+      "after_blender_extent": [
+        6.059999942779541,
+        0.14000000059604645,
+        0.1899999976158142
+      ],
+      "length_axis": 0,
+      "bevels": [
+        {
+          "width": 0.03125,
+          "segments": 3
+        }
+      ],
+      "cross_section_preserved": true,
+      "retained": true
+    },
+    {
+      "source_collection": "room_shell",
+      "source_object": "Rounded timber foundation",
+      "object": "172 reused Rounded timber foundation",
+      "cross_section_preserved": true,
+      "bevels": [
+        {
+          "width": 0.14000000059604645,
+          "segments": 3
+        }
+      ],
+      "adaptation": "Span lengths only; plinth thickness and edging section retained.",
+      "retained": true
+    },
+    {
+      "source_collection": "room_shell",
+      "source_object": "Floor long edging",
+      "object": "172 reused Floor long edging",
+      "cross_section_preserved": true,
+      "bevels": [
+        {
+          "width": 0.05000000074505806,
+          "segments": 2
+        }
+      ],
+      "adaptation": "Span lengths only; plinth thickness and edging section retained.",
+      "retained": true
+    },
+    {
+      "source_collection": "room_shell",
+      "source_object": "Floor long edging.001",
+      "object": "172 reused Floor long edging.001",
+      "cross_section_preserved": true,
+      "bevels": [
+        {
+          "width": 0.05000000074505806,
+          "segments": 2
+        }
+      ],
+      "adaptation": "Span lengths only; plinth thickness and edging section retained.",
+      "retained": true
+    },
+    {
+      "source_collection": "room_shell",
+      "source_object": "Floor end edging",
+      "object": "172 reused Floor end edging",
+      "cross_section_preserved": true,
+      "bevels": [
+        {
+          "width": 0.05000000074505806,
+          "segments": 2
+        }
+      ],
+      "adaptation": "Span lengths only; plinth thickness and edging section retained.",
+      "retained": true
+    },
+    {
+      "source_collection": "room_shell",
+      "source_object": "Floor end edging.001",
+      "object": "172 reused Floor end edging.001",
+      "cross_section_preserved": true,
+      "bevels": [
+        {
+          "width": 0.05000000074505806,
+          "segments": 2
+        }
+      ],
+      "adaptation": "Span lengths only; plinth thickness and edging section retained.",
+      "retained": true
+    }
+  ],
+  "source_read_only": true,
+  "scope": "Only span lengths and placements adapted to existing envelope; cross sections and bevel modifiers copied."
+}

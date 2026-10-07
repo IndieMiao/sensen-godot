@@ -4,3 +4,4 @@
 
 [node name="BlacksmithShopArt" type="Node3D"]
 script = ExtResource("1")
+kit_path = "res://assets/rooms/blacksmith_shop"

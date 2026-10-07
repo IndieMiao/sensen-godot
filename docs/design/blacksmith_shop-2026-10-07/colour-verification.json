@@ -1,0 +1,113 @@
+{
+  "revision": "r2",
+  "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
+  "checks": [
+    {
+      "name": "Front floorboard",
+      "reference_pixel": [
+        1100,
+        1175
+      ],
+      "runtime_pixel": [
+        1090,
+        1150
+      ],
+      "reference": {
+        "rgb": [
+          122,
+          87,
+          75
+        ],
+        "hex": "#7A574B",
+        "hue_degrees": 15.319,
+        "saturation": 0.3852,
+        "value": 0.4784
+      },
+      "runtime": {
+        "rgb": [
+          80,
+          50,
+          34
+        ],
+        "hex": "#503222",
+        "hue_degrees": 20.87,
+        "saturation": 0.575,
+        "value": 0.3137
+      },
+      "hue_delta_degrees": 5.55,
+      "passed": true
+    },
+    {
+      "name": "Right wall gray",
+      "reference_pixel": [
+        1245,
+        760
+      ],
+      "runtime_pixel": [
+        1135,
+        850
+      ],
+      "reference": {
+        "rgb": [
+          152,
+          109,
+          89
+        ],
+        "hex": "#986D59",
+        "hue_degrees": 19.048,
+        "saturation": 0.4145,
+        "value": 0.5961
+      },
+      "runtime": {
+        "rgb": [
+          100,
+          86,
+          77
+        ],
+        "hex": "#64564D",
+        "hue_degrees": 23.478,
+        "saturation": 0.23,
+        "value": 0.3922
+      },
+      "hue_delta_degrees": 4.431,
+      "passed": true
+    },
+    {
+      "name": "Right timber post",
+      "reference_pixel": [
+        1342,
+        830
+      ],
+      "runtime_pixel": [
+        1247,
+        844
+      ],
+      "reference": {
+        "rgb": [
+          172,
+          99,
+          64
+        ],
+        "hex": "#AC6340",
+        "hue_degrees": 19.444,
+        "saturation": 0.6279,
+        "value": 0.6745
+      },
+      "runtime": {
+        "rgb": [
+          112,
+          70,
+          45
+        ],
+        "hex": "#70462D",
+        "hue_degrees": 22.388,
+        "saturation": 0.5982,
+        "value": 0.4392
+      },
+      "hue_delta_degrees": 2.944,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Representative lit patches only, not a complete-image fidelity score; brightness/saturation retained for review."
+}
