@@ -226,7 +226,7 @@ func _build_fab() -> void:
 func _build_dev() -> void:
 	var box := HBoxContainer.new()
 	box.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	box.position = Vector2(-96, 118)
+	box.position = Vector2(-96, 118 + safe_top())   # debug time skips, kept under the HUD on notched screens
 	box.add_theme_constant_override("separation", 4)
 	for m in [60, 240]:
 		var b := _pill_button("+%dh" % (m / 60), false)
@@ -970,7 +970,7 @@ func _board(v: VBoxContainer, board: Dictionary) -> void:
 		if int(r.qty) > 1 and not str(r.item).begins_with("fish_"): what = P0Logic.plural(what)
 		var line := _label("%d %s · %s · %d coins · Deliver here" % [int(r.qty), what, str(r.get("where", "")), int(r.coins)], 8, INK2)
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		line.custom_minimum_size = Vector2(150, 0)
+		line.custom_minimum_size = Vector2(1, 0)   # wraps in what the NEED-TILE and the button leave
 		mid.add_child(line)
 		h.add_child(mid)
 		if not done:
@@ -986,6 +986,7 @@ func _board(v: VBoxContainer, board: Dictionary) -> void:
 				b = _pill_button("Tracking", false)
 				b.disabled = true
 			b.custom_minimum_size = Vector2(78, 34)
+			b.size_flags_vertical = Control.SIZE_SHRINK_CENTER   # the NEED-TILE makes the card taller
 			h.add_child(b)
 		card.add_child(h)
 		v.add_child(card)
