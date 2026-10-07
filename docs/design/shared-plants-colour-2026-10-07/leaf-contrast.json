@@ -1,0 +1,26 @@
+{
+  "monstera_dark_leaf": {
+    "pixel": [
+      636,
+      590
+    ],
+    "median_rgb": [
+      33,
+      56,
+      17
+    ],
+    "luma_srgb": 48.29
+  },
+  "left_plaster_shadow": {
+    "pixel": [
+      489,
+      532
+    ],
+    "median_rgb": [
+      190,
+      153,
+      115
+    ],
+    "luma_srgb": 158.12
+  }
+}

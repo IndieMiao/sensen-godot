@@ -29,3 +29,5 @@ Generator: `source/build_plants.py`; explicit UV atlas/export: `source/export_at
 ![R2 actual runtime catalogue](catalogue.jpg)
 
 179 R2 passed art-director review on 2026-10-07. 180–186 may consume the library. R2.1 restores twice as many 1.5x white vine flowers, a closed hemispherical shrub canopy, silver-green olive leaves and three deep Monstera splits plus oval holes. Eight-triangle pollen centres preserve density within the budget. Basic Room and the shared scene benchmark remain unchanged by Liu Bei.
+
+2026-10-07 parent 171 follow-up: ordinary and olive leaf albedo is darker and greener after the 180–186 review. All 12 delivered GLBs remain byte-identical; 17,378 unique triangles. Updated source/atlas and actual runtime catalogue; same-camera 179 regression and numerical checks are in `docs/design/shared-plants-colour-2026-10-07/`. Earlier R2.1 colour wording above describes the superseded palette.
