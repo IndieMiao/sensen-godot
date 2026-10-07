@@ -188,8 +188,6 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		ui.open_stall()   # refresh after Buy / Sell / Deliver; floats say what changed
 	elif ui.modal_kind == "tackle" and events.size() > 0:
 		ui.open_tackle("Strung and ready — it's on your belt. Swap rods in Bag › Gear.")
-	elif ui.modal_kind == "gear" and events.size() == 0:
-		ui.open_gear()
 
 ## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
 ## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";

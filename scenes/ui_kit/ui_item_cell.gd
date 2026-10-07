@@ -42,7 +42,7 @@ const _QUICK_QTY_H := 12.0
 const _GEAR_ROLE_H := 11.0        # GearSlot: role 11 high, slot at y 16, name at y 71 (16 high)
 const _GEAR_SLOT_TOP := 16.0
 const _GEAR_NAME_TOP := 71.0
-const _GEAR_NAME_H := 16.0
+const _GEAR_NAME_H := 23.0       # two lines of 9 / 125 % (WP1b: names wrap, never truncate; they may hang below 88)
 
 var density: Density
 var state: State = State.DEFAULT: set = set_state
@@ -247,7 +247,10 @@ func _build_gear() -> void:
 	var side := UiTokens.SIZE_INVENTORY_ICON
 	_add_icon(_surface, side, (UiTokens.SIZE_INVENTORY_CELL - side) * 0.5)
 	_name = _band_label(self, UiTokens.STYLE_C9_B, _GEAR_NAME_TOP, _GEAR_NAME_H)
-	_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_name.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	_name.grow_vertical = Control.GROW_DIRECTION_END
+	_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_name.max_lines_visible = 2
 
 # ------------------------------------------------------------------ refresh
 
@@ -262,7 +265,7 @@ func _refresh() -> void:
 		Density.GEAR:
 			_surface.add_theme_stylebox_override(&"panel", _cell_box(s, UiTokens.RADIUS_INVENTORY_CELL))
 			_role.text = role
-			_name.text = title
+			_name.text = "Empty" if empty else title   # an empty slot says only Empty (WP1b, A-08)
 		_:
 			_surface.add_theme_stylebox_override(&"panel", _cell_box(s, UiTokens.RADIUS_INVENTORY_CELL))
 			_pill.visible = quantity != "" and not empty

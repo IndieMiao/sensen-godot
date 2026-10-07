@@ -290,6 +290,7 @@ static func _cells_gear() -> Control:
 	var S := UiItemCell.State
 	row.add_child(_captioned(_cell(D, {role = "Fishing", icon = _tex("rod_starter"), title = "Starter Rod"}), "default"))
 	row.add_child(_captioned(_cell(D, {role = "Farming", icon = _tex("hoe_starter"), title = "Starter Hoe", state = S.SELECTED}), "selected"))
+	row.add_child(_captioned(_cell(D, {role = "Mining", icon = _tex("pick_starter"), title = "Starter Pickaxe"}), "two-line name"))
 	row.add_child(_captioned(_cell(D, {role = "Ring", state = S.EMPTY}), "empty"))
 	return row
 

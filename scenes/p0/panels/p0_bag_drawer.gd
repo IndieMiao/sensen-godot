@@ -14,6 +14,7 @@ extends UiDrawer
 
 signal action_requested(action: StringName, item_id: String, payload: Dictionary)
 signal side_changed(side: String)
+signal gear_slot_changed(key: String)
 
 const HEIGHT := 546.0   # drawer top at y 254 of 800 (BAG-2-2)
 const CATEGORIES := ["All", "Seeds", "Fish", "Produce", "Dishes", "Materials", "Tackle"]
@@ -46,6 +47,7 @@ var header: UiBagHeader
 var sheet: UiInfoSheet
 var grid: UiInventoryGrid
 
+var _key := 0   # hash of what the drawer shows; refresh() skips a view that changes none of it
 var _bag_box: VBoxContainer
 var _gear_box: VBoxContainer
 var _chips: HBoxContainer
@@ -55,10 +57,15 @@ func _init(view_: Dictionary = {}, side_ := "bag", focus := "") -> void:
 	super(HEIGHT)
 	view = view_
 	side = side_
+	# The quick bar goes here (P0Ui.bind_quick_bar, SGODOT-221); the row and its gap stay folded until it does.
 	quick_row = MarginContainer.new()
-	quick_row.custom_minimum_size.y = UiTokens.SIZE_QUICK_BAR_H
+	quick_row.visible = false
 	body.add_child(quick_row)
-	_gap(body, _ROW_GAP)
+	var quick_gap := _gap(body, _ROW_GAP)
+	quick_gap.visible = false
+	quick_row.child_entered_tree.connect(func(_n):
+		quick_row.visible = true
+		quick_gap.visible = true)
 	header = UiBagHeader.new(0, 25, UiBagHeader.Pane.BAG if side == "bag" else UiBagHeader.Pane.GEAR)
 	header.side_changed.connect(func(s: int): set_side("bag" if s == 0 else "gear"))
 	header.sort_pressed.connect(func(): set_sort(SORTS[(SORTS.find(sort) + 1) % SORTS.size()]))
@@ -75,9 +82,14 @@ func _init(view_: Dictionary = {}, side_ := "bag", focus := "") -> void:
 	refresh(view_)
 	if focus != "" and P0Logic.bag_count(view, focus) > 0: grid.select(focus)
 
-## New server view: counts, cells and the open card follow it; the selection, filter and scroll stay.
-func refresh(view_: Dictionary) -> void:
+## New server view: counts, cells and the open card follow it; the selection, filter and scroll stay. The P0 UI
+## calls this every frame, so a view that changes nothing the drawer shows is skipped.
+func refresh(view_: Dictionary, force := false) -> void:
+	var key := [view_.get("bag", {}), view_.get("gear", {}), int(view_.get("energy", {}).get("value", 0)),
+		view_.get("meals", {}).get("used", 0), side].hash()
 	view = view_
+	if key == _key and not force: return
+	_key = key
 	var bag: Dictionary = view.get("bag", {})
 	header.used = (bag.get("slots", []) as Array).size()
 	header.capacity = int(bag.get("capacity", 25))
@@ -95,7 +107,7 @@ func set_side(v: String) -> void:
 	side = v
 	header.side = UiBagHeader.Pane.BAG if v == "bag" else UiBagHeader.Pane.GEAR
 	grid.clear_selection()
-	refresh(view)
+	refresh(view, true)
 	side_changed.emit(v)
 
 func set_category(v: String) -> void:
@@ -119,8 +131,10 @@ static func saved_sort() -> String:
 	return v if v in SORTS else SORTS[0]
 
 func set_gear_slot(v: String) -> void:
+	if v == gear_slot: return
 	gear_slot = v
-	_build_gear()
+	if side == "gear": _build_gear()
+	gear_slot_changed.emit(v)
 
 # ---------------------------------------------------------------- data
 
@@ -252,8 +266,9 @@ func _build_gear() -> void:
 	_gap(_gear_box, _ROW_GAP)
 	_gear_box.add_child(UiKit.label("Gear does not use Bag slots.", UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
 
-static func _gap(parent: Control, h: float) -> void:
+static func _gap(parent: Control, h: float) -> Control:
 	var g := Control.new()
 	g.custom_minimum_size.y = h
 	g.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(g)
+	return g

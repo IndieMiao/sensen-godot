@@ -61,8 +61,7 @@ func _drawer(side := "bag") -> P0BagDrawer:
 	var d := P0BagDrawer.new(_view(), side)
 	d.animate = false
 	d.persist = false
-	d.sort = "Recent"
-	d.refresh(d.view)
+	d.set_sort("Recent")
 	var host := Control.new()
 	host.theme = UiKit.theme()
 	host.size = Vector2(360, 800)
@@ -111,3 +110,27 @@ func test_gear_side_lists_the_slot_and_forwards_equip() -> void:
 	d.set_side("bag")
 	assert_bool(d._bag_box.visible).is_true()
 	assert_bool(d._gear_box.visible).is_false()
+
+func test_refresh_skips_a_view_that_changes_nothing_shown_and_follows_a_new_count() -> void:
+	var d := _drawer()
+	await get_tree().process_frame
+	var cell := d.grid.cell_for("fish_crucian")
+	var v := _view()
+	v["coins"] = 999            # not shown in the drawer
+	d.refresh(v)
+	assert_object(d.grid.cell_for("fish_crucian")).is_same(cell)
+	v.bag.slots[0].qty = 4      # shown: the count follows
+	d.refresh(v)
+	assert_str(d.grid.cell_for("fish_crucian").quantity).is_equal("×4")
+	assert_str(d.header._tabs.tabs()[0].find_child("Title", true, false).text).is_equal("Bag 5/25")
+
+func test_gear_slot_change_is_reported_for_the_next_open() -> void:
+	var d := _drawer("gear")
+	await get_tree().process_frame
+	var got := []
+	d.gear_slot_changed.connect(func(k: String): got.append(k))
+	var cells := d._gear_box.find_children("*", "UiItemCell", true, false)
+	(cells[0] as UiItemCell).tapped.emit()   # Farming
+	assert_array(got).is_equal(["farming"])
+	await get_tree().process_frame   # the fishing rows leave at the end of the frame
+	assert_int(d._gear_box.find_children("*", "UiGearRow", true, false).size()).is_equal(1)
