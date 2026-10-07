@@ -10,8 +10,9 @@ extends Control
 ##   swipe up before floating → bag_requested; Bag → bag_requested, Close → close_requested
 ##   collapsed handle → handle_tapped (same as the switch key, §10.3.4)
 ## Each cell arbitrates its own touch (GestureArbiter SLOT mode, SGODOT-212); this bar turns the outcomes into
-## the intents above. The backing is MOUSE_FILTER_STOP: cells sit outside a scroll container, so without it
-## their touches would also reach _unhandled_input (the map's tap handling, SGODOT-212 note).
+## the intents above. With cells shown the backing is MOUSE_FILTER_STOP: cells sit outside a scroll container, so
+## without it their touches would also reach _unhandled_input (the map's tap handling, SGODOT-212 note). Collapsed
+## or bag-only, the backing lets touches through: only the handle and the end take them, the gap stays world.
 
 signal slot_tapped(id: String)
 signal ghost_tapped(index: int)
@@ -171,6 +172,7 @@ func _refresh() -> void:
 		elif qty <= 0 and cell.pinned: cell.state = UiItemCell.State.ZERO
 		else: cell.state = UiItemCell.State.DEFAULT
 	_handle.visible = collapsed and not bag_only
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if collapsed or bag_only else Control.MOUSE_FILTER_STOP
 	# Collapsed or bag-only: the end stays at the right (BAR-1-2); the handle sits centred when collapsed.
 	_row.alignment = BoxContainer.ALIGNMENT_END if collapsed or bag_only else BoxContainer.ALIGNMENT_BEGIN
 	_end_icon.texture = CLOSE_GLYPH if bag_open else BAG_GLYPH

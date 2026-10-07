@@ -209,6 +209,7 @@ func p0_joystick(v: Vector2) -> void:
 func p0_frame(v: Dictionary, dt: float) -> void:
 	actor.step(dt)
 	_follow(dt)
+	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
 	_pick_front(v)
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed))

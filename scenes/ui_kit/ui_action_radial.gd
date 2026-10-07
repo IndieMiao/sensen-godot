@@ -7,7 +7,8 @@ extends Control
 ##   Combat); `selected` is the current action. Available petal → picked(id) then closed. Unavailable petals stay
 ##   grey with the lock badge and their reason under the name (`Fishing · No water nearby`); tapping one does
 ##   nothing. open_at(point) places the fan around the character's screen point; it opens to the right and
-##   mirrors to the left when the character is right of centre, so labels stay on screen.
+##   mirrors to the left when the character is right of centre, or when the labels only fit on that side. If the
+##   fan still does not fit (character near an edge) it slides inward; the connector keeps pointing at the character.
 
 signal picked(id: String)
 signal closed
@@ -31,7 +32,8 @@ var _scrim: ColorRect
 var _layer: Control
 var _petals: Array[Button] = []
 var _labels: Array[PanelContainer] = []
-var _anchor := Vector2.ZERO
+var _anchor := Vector2.ZERO      # the character's point
+var _fan := Vector2.ZERO         # the fan's centre: the anchor, slid inward when the fan would leave the screen
 var _mirrored := false
 
 func _init() -> void:
@@ -71,7 +73,7 @@ func petal_center(i: int) -> Vector2:
 	var a := deg_to_rad(float(_FAN_ANGLES[i]))
 	var dir := Vector2(cos(a), sin(a))
 	if _mirrored: dir.x = -dir.x
-	return _anchor + dir * _FAN_RADIUS
+	return _fan + dir * _FAN_RADIUS
 
 # ------------------------------------------------------------------ build
 
@@ -157,8 +159,25 @@ func _queue_layout() -> void:
 
 func _layout() -> void:
 	# Decided at layout time: the overlay may be opened before it has its full-screen size.
-	_mirrored = size.x > 0.0 and _anchor.x > size.x * 0.5
 	var s := UiTokens.SIZE_RADIAL_PETAL
+	_fan = _anchor
+	_mirrored = size.x > 0.0 and _anchor.x > size.x * 0.5
+	if size.x > 0.0:
+		var label_w := 0.0
+		for l in _labels: label_w = maxf(label_w, l.get_combined_minimum_size().x)
+		# Horizontal reach of the fan on its open side: the outermost petals sit at cos(22°) of the radius.
+		var reach := _FAN_RADIUS * cos(deg_to_rad(absf(float(_FAN_ANGLES[1])))) + s * 0.5 + _LABEL_GAP + label_w
+		var back := s * 0.5   # the inner petals reach back past the centre by about half a petal
+		var room_right := size.x - UiTokens.SPACE_WITHIN - _anchor.x
+		var room_left := _anchor.x - UiTokens.SPACE_WITHIN
+		if not _mirrored and reach > room_right and room_left > room_right: _mirrored = true
+		elif _mirrored and reach > room_left and room_right > room_left: _mirrored = false
+		var lo := UiTokens.SPACE_WITHIN + (reach if _mirrored else back)
+		var hi := size.x - UiTokens.SPACE_WITHIN - (back if _mirrored else reach)
+		_fan.x = clampf(_anchor.x, lo, maxf(lo, hi))
+		# Vertically the outer petals sit at sin(66°) of the radius.
+		var rise := _FAN_RADIUS * sin(deg_to_rad(absf(float(_FAN_ANGLES[0])))) + s * 0.5 + UiTokens.SPACE_WITHIN
+		_fan.y = clampf(_anchor.y, rise, maxf(rise, size.y - rise))
 	for i in _petals.size():
 		var c := petal_center(i)
 		_petals[i].position = c - Vector2(s, s) * 0.5

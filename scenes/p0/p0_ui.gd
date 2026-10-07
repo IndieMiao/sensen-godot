@@ -63,6 +63,9 @@ var _badges := {}         # id -> UiStatusBadge
 var _quick := {}          # per action: {pins: [], removed: []}, saved in quick_store (LOCK-05: 每个行动各记各的)
 var _bar_sig := []        # last state pushed to the bar, so the per-frame refresh only rebuilds on change
 var _auto_pick := true    # pick the first slot once when an action is entered (§10.3.3 ①), not after a deselect
+## MAP-1 keeps only Bag at the bottom of the map. The P0 map still carries the old Map / Farm / Me dock and its
+## zoom column where Bag would sit, so the map turns this on when that dock leaves (with the new HUD, SGODOT-222).
+var map_bag := false
 var _bar_ids: Array = []
 var selected_seed := ""
 var selected_bait := ""
@@ -81,7 +84,7 @@ var _creel: PanelContainer
 var _creel_count: Label
 var _creel_free: Label
 var _fab_pills: HBoxContainer
-var player_screen := Vector2(180, 320)   # set by the farm each frame: the radial fans out from the character
+var player_screen := Vector2(180, 320)   # set by the farm / pond each frame (mid-body): the radial fans out from it
 var _modal: Control
 var modal_kind := ""            # "stall", "bag", "kitchen", "card", ... — which drawer is open
 var _kitchen_tab := "cookbook"
@@ -263,6 +266,7 @@ func _build_fab() -> void:
 		_fab_pressed())
 	_keys.key().released.connect(func(): fab_held = false)
 	_keys.switch_pressed.connect(open_radial)
+	_keys.tool_icon = P0Logic.icon("rod" if bar_mode == "fish" else "hoe")   # set_mode skips the mode it starts in
 	_radial = UiActionRadial.new()
 	_kit.add_child(_radial)
 	_radial.picked.connect(func(id: String): if id != bar_mode: set_mode(id))
@@ -363,7 +367,7 @@ func set_surface(name: String) -> void:
 	_keys.visible = action and _modal == null
 	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
 	# Action spaces show the full bar; the map keeps only Bag (MAP-1, §10.3.5); busy worlds hide it.
-	_bar.visible = (action or name == "map") and _modal == null
+	_bar.visible = (action or (name == "map" and map_bag)) and _modal == null
 	_bar.bag_only = not action
 	_bar_sig = []
 	if _radial.visible: _radial.close()
@@ -544,7 +548,7 @@ func tag(id: String, text: String, screen: Vector2, show: bool, hit := Vector2.I
 	if not c.visible: return
 	_card_hits[id] = screen if hit == Vector2.INF else hit
 	c.text = text
-	_place_marker(c, screen)
+	_place_marker(c, screen, true)
 
 ## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.
 func badge(id: String, state: UiStatusBadge.State, screen: Vector2, show: bool, caption := "", icon: Texture2D = null) -> void:
@@ -560,17 +564,20 @@ func badge(id: String, state: UiStatusBadge.State, screen: Vector2, show: bool, 
 	b.state = state
 	b.caption = caption
 	b.icon = icon
-	_place_marker(b, screen)
+	_place_marker(b, screen, false)
 
 ## Height a shown badge takes over `screen`, so a finger card over the same facility can sit above it.
 func badge_height(id: String) -> float:
 	var b: UiStatusBadge = _badges.get(id)
 	return b.get_combined_minimum_size().y + _BADGE_CARD_GAP if b and b.visible else 0.0
 
-func _place_marker(m: Control, screen: Vector2) -> void:
+## Finger cards stay on screen (their facility is near, so on screen); a badge over an off-screen facility hides.
+func _place_marker(m: Control, screen: Vector2, clamp_inside: bool) -> void:
 	var size := m.get_combined_minimum_size()
 	var area := Rect2(Vector2.ZERO, _kit.size)
-	var r := WorldAnchor.place(size, screen - Vector2(0, UiTokens.SPACE_WITHIN), area, UiTokens.SPACE_WITHIN, true)
+	var r := WorldAnchor.place(size, screen - Vector2(0, UiTokens.SPACE_WITHIN), area, UiTokens.SPACE_WITHIN, clamp_inside)
+	m.visible = r.has_area()
+	if not m.visible: return
 	m.size = size
 	m.position = r.position
 	if m.has_method(&"point_at"): m.point_at(screen.x - r.position.x)
@@ -612,7 +619,7 @@ func _drop_modal() -> void:
 	_modal = null
 	modal_kind = ""
 	_keys.visible = surface in ["farm", "pond"]
-	_bar.visible = surface in ["farm", "pond", "map"]
+	_bar.visible = surface in ["farm", "pond"] or (surface == "map" and map_bag)
 	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:

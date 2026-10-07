@@ -130,6 +130,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		_plan = {}
 		if actor.position.distance_to(plan.origin) < 0.35: _open_panel(plan)
 	_follow(dt)
+	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	if _blend_t < 1.0:
 		_blend_t = minf(1.0, _blend_t + dt / 0.45)
 		var k := ease(_blend_t, -2.0)

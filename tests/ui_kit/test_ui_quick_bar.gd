@@ -268,3 +268,25 @@ func _move(pos: Vector2) -> InputEvent:
 	m.global_position = pos
 	m.button_mask = MOUSE_BUTTON_MASK_LEFT
 	return m
+
+func test_collapsed_or_bag_only_bar_leaves_its_gap_to_the_world() -> void:
+	var sink := _Sink.new()
+	add_child(auto_free(sink))
+	await _into_view()
+	var gap := bar.get_global_rect().position + Vector2(40, bar.size.y * 0.5)   # where the first slot would be
+	for mode in ["collapsed", "bag_only"]:
+		bar.collapsed = mode == "collapsed"
+		bar.bag_only = mode == "bag_only"
+		await await_idle_frame()
+		sink.n = 0
+		_push(_press(gap, true))
+		_push(_press(gap, false))
+		await await_idle_frame()
+		assert_int(sink.n).is_equal(2)
+	bar.bag_only = false
+	await await_idle_frame()
+	sink.n = 0
+	_push(_press(gap, true))
+	_push(_press(gap, false))
+	await await_idle_frame()
+	assert_int(sink.n).is_equal(0)   # with cells shown the bar keeps its touches

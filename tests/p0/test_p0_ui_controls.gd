@@ -40,6 +40,7 @@ func _touch(at: Vector2, down: bool) -> void:
 	get_viewport().push_input(e, true)
 
 func test_action_key_shows_the_main_action_states() -> void:
+	assert_object(ui._keys.tool_icon).is_equal(P0Logic.icon("hoe"))   # the starting mode has its tool badge
 	var k := ui._keys.key()
 	ui.set_action({"verb": "Till", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "till"}, "need": 0})
 	assert_str(k.verb).is_equal("Till")
@@ -105,6 +106,10 @@ func test_pins_and_removals_persist_per_action() -> void:
 
 func test_map_keeps_only_bag_and_hides_the_keys() -> void:
 	ui.set_surface("map")
+	assert_bool(ui._bar.visible).is_false()   # until the map drops its old dock (map_bag)
+	assert_bool(ui._keys.visible).is_false()
+	ui.map_bag = true
+	ui.set_surface("map")
 	assert_bool(ui._bar.visible).is_true()
 	assert_bool(ui._bar.bag_only).is_true()
 	assert_bool(ui._keys.visible).is_false()
@@ -151,3 +156,5 @@ func test_badges_show_state_and_lift_the_finger_card() -> void:
 	assert_float(ui.badge_height("home")).is_greater(float(UiTokens.SIZE_STATUS_BADGE_WORLD))
 	ui.badge("home", UiStatusBadge.State.READY, Vector2(200, 260), false)
 	assert_float(ui.badge_height("home")).is_equal(0.0)
+	ui.badge("home", UiStatusBadge.State.READY, Vector2(500, 260), true)   # facility off screen
+	assert_bool(b.visible).is_false()

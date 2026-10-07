@@ -36,6 +36,20 @@ func test_key_is_88_and_hides_an_empty_price() -> void:
 	k.cost = "2 Energy"
 	assert_bool(k._cost.visible).is_true()
 
+func test_long_copy_steps_its_font_down_instead_of_clipping() -> void:
+	var k := _host(UiSceneAction.new()) as UiSceneAction
+	await _settle()
+	var room := UiTokens.SIZE_SCENE_ACTION - 8.0
+	for text in ["Need 2 Energy", "Ready in 3h 59m", "Walk to a plot"]:
+		k.cost = text
+		var font := k._cost.get_theme_font(&"font")
+		var fs := k._cost.get_theme_font_size(&"font_size")
+		assert_float(font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x).is_less_equal(room)
+		assert_int(fs).is_greater_equal(UiSceneAction._MIN_FONT)
+		assert_str(k._cost.text).is_equal(text)   # the whole copy, no ellipsis
+	k.cost = "2 Energy"
+	assert_int(k._cost.get_theme_font_size(&"font_size")).is_equal(12)   # short copy keeps the style size
+
 func test_fires_on_touch_down_and_releases_on_lift() -> void:
 	var k := _host(UiSceneAction.new()) as UiSceneAction
 	var log := []
@@ -136,6 +150,18 @@ func test_fan_follows_bar_2_and_mirrors_on_the_right() -> void:
 	await _settle()
 	assert_bool(r.is_mirrored()).is_true()
 	assert_float(r._labels[0].position.x + r._labels[0].size.x).is_less(r.petal_center(0).x)
+
+func test_fan_and_labels_stay_on_screen_near_any_edge() -> void:
+	var r := _radial()
+	for at in [Vector2(125, 520), Vector2(180, 320), Vector2(20, 300), Vector2(345, 300), Vector2(180, 40), Vector2(180, 630)]:
+		r.open_at(at)
+		await _settle()
+		for i in 4:
+			var p := r.petals()[i].get_rect()
+			var l := r._labels[i].get_rect()
+			for rect in [p, l]:
+				assert_bool(Rect2(Vector2.ZERO, r.size).encloses(rect)).override_failure_message("%s off screen at %s" % [rect, at]).is_true()
+		r.close()
 
 func test_available_petal_picks_and_closes_unavailable_does_nothing() -> void:
 	var r := _radial()
