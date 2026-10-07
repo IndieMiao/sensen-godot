@@ -12,6 +12,7 @@ import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest } from './state.js';
 import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
 import { haveTotal, stored } from './storage.js';
+import { restReadyIn } from './presence.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
 export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
@@ -53,7 +54,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     boards: Object.fromEntries(BOARDS.map(b => [b, boardView(c, s, b, now)])),
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
     keepers: keepersView(c, s, now, opts.online ?? null),
-    rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, now), amount: c.energy.rest_amount },
+    // away_ready_in: ms until Rest opens by the 2 h away rule (0 = open, null = not left yet), q(41).
+    rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, now), amount: c.energy.rest_amount,
+      away_h: c.energy.rest_away_h, away_ready_in: restReadyIn(c, s, now) },
     stall: {
       keeper: c.stall.keeper,
       board: legacyBoard(c, s, now),   // the current Homestead Stall panel; SGODOT-224 reads boards.stall

@@ -18,6 +18,9 @@ const REFRESH_S := 30.0
 var base_url := DEFAULT_URL
 var player_id := ""
 var view: Dictionary = {}
+## Where the player is (P0Runtime sets it on attach / detach): home, pond, outpost, mine, map or "" when unknown.
+## Sent beside each command for Rest's 2 h away rule (q(41)); never part of the command or its dedupe key.
+var space := ""
 var busy := false
 var _queue: Array = []        # {cmd, key} sent while a request was in flight (reel / collect must never be dropped)
 var _inflight := {}           # the {cmd, key} on the wire; {} for state refreshes and dev calls
@@ -48,15 +51,16 @@ func current() -> Dictionary:
 	if view.is_empty(): return view
 	return P0Logic.project(view, float(Time.get_ticks_msec() - _received_ms))
 
+## The read also says where the player is, so entering a space counts even before the first command (q(41)).
 func refresh() -> void:
-	_request(HTTPClient.METHOD_GET, "/p0/state", {}, {})
+	_request(HTTPClient.METHOD_GET, "/p0/state" + ("?space=" + space.uri_encode() if space != "" else ""), {}, {})
 
 ## World actions send without a key and are never dropped. UI commands pass a key (ui_key) and are ignored
 ## while the same key is on the wire or queued, so double taps on Buy / Sell submit once (WP7-B F-08 §2).
 func send(cmd: Dictionary, key := "") -> bool:
 	if key != "" and (str(_inflight.get("key", "")) == key or _queue.any(func(q): return q.key == key)):
 		return false
-	var entry := {cmd = cmd, key = key}
+	var entry := {cmd = cmd, key = key, space = space}   # the space the player issued it from, even if it waits in the queue
 	if key != "": command_started.emit(key)
 	if busy: _queue.append(entry)
 	else: _post(entry)
@@ -72,6 +76,7 @@ func _post(entry: Dictionary) -> void:
 	_inflight = entry
 	var body: Dictionary = (entry.cmd as Dictionary).duplicate()
 	if view.has("seq"): body["expect_seq"] = int(view.seq)
+	if str(entry.get("space", "")) != "": body["space"] = str(entry.space)
 	_request(HTTPClient.METHOD_POST, "/p0/commands", body, entry.cmd)
 
 func dev_skip(minutes: int) -> void:

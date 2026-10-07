@@ -47,6 +47,9 @@ export interface ResidentState {
 
 export interface Homestead { level: number; plaque: { level: number; at: number }[] }
 
+/** Where the player's commands come from (q(41)): when they last left the homestead, for Rest's 2 h rule. */
+export interface Presence { left_at: number | null; last_at: number; space: string | null }
+
 export interface P0Day {
   key: string; rest: number;
   fails: number;                        // fishing failures (catch protection, §6.1.3)
@@ -79,6 +82,7 @@ export interface P0State {
   residents: Record<string, ResidentState>;
   boards: { stall: BoardSlot[]; market: BoardSlot[] };
   req_done: string[];            // last completed request ids (a repeated deliver says request_done)
+  presence: Presence;
   firsts: string[];              // e.g. harvest:crop_radish, catch:fish_crucian, cook:dish_grilled_crucian
   rewards: string[];             // one-time rewards already granted
   day: P0Day;
@@ -112,6 +116,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     homestead: { level: 1, plaque: [] },
     residents: {},
     boards: { stall: [{ req: tutorialRequest(c, now), refill_at: 0 }], market: [] }, req_done: [],
+    presence: { left_at: null, last_at: 0, space: null },
     firsts: [], rewards: [],
     day: emptyDay(),
     fishing: { casts: 0, bites: 0, caught: {}, seen: [] },
@@ -166,6 +171,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     };
   }
   s.req_done ??= [];
+  s.presence ??= { left_at: null, last_at: 0, space: null };
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
   s.v = 3;
   return s;
