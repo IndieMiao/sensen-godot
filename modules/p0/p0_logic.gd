@@ -227,7 +227,18 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 	var subtitle := "Recover or do something free" if have <= 0 else "%s needs %d Energy · you have %d" % [verb, need, have]
 	var cook := {"icon": "pot", "label": "Cook", "fact": "%d fish in creel" % fish if fish > 0 else "No fish to cook", "guide": "Show kitchen", "go": "stove", "on": fish > 0}
 	# TODO(SGODOT-224, bench): LOCK-09 guides Rest with "Show bench"; P0 has no bench, rest is at the farmhouse (197 60c82ad2).
-	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available" if rest_left > 0 else "Rested today · %s" % duration(float(rest.get("resets_in", 0))), "guide": "Show home", "go": "home", "on": rest_left > 0}
+	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show home", "go": "home", "on": true}
+	if rest_left <= 0:
+		rest_tile.fact = "Rested today"   # the reset time is on the bench card (李白, 225)
+		rest_tile.on = false
+	elif rest.has("away_ready_in"):   # q(41): Rest opens after 2 h away from the farm (SGODOT-228 / PR #16)
+		var away = rest.get("away_ready_in")
+		if away == null:
+			rest_tile.fact = "After %dh away" % int(rest.get("away_h", 2))
+			rest_tile.on = false
+		elif float(away) > 0.0:
+			rest_tile.fact = "Ready in %s" % duration(float(away))
+			rest_tile.on = false
 	if not at_home:
 		for t in [cook, rest_tile]:
 			t.fact = "At home"
@@ -262,12 +273,23 @@ static func _tea_tile(view: Dictionary) -> Dictionary:
 	elif bool(drinks.get("full", false)):
 		tea.fact = "Energy full"
 		tea.on = false
-	elif drinks.get("need", null) != null and int(drinks.need) > 0:
-		tea.fact = "Need %d more coins" % int(drinks.need)
+	elif drinks.get("need", null) != null and int(drinks.need) > int(view.get("coins", 0)):
+		# drinks.need is the whole sum a cup asks (price + the 40-coin floor), so the gap is need − coins
+		tea.fact = "Need %d more coins" % (int(drinks.need) - int(view.get("coins", 0)))
 		tea.on = false
 	else:
 		tea.fact = "%d/%d today · %d coins" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3)), int(drinks.get("price", 0))]
 	return tea
+
+## Inbox parcels as read-only lines until the stage 4 Inbox (SGODOT-234): `Radish ×3 · 22h left`, soonest to expire
+## first (奕星 on #11, LOCK-14). The view already sorts them by expiry; left is projected between replies.
+static func parcel_lines(view: Dictionary) -> Array:
+	var parcels: Array = view.get("inbox", {}).get("parcels", []).duplicate()
+	parcels.sort_custom(func(a, b) -> bool: return float(a.get("left", 0)) < float(b.get("left", 0)))
+	return parcels.map(func(p) -> String:
+		var left := float(p.get("left", 0))
+		var when := ("%dh left" % ceili(left / 3600000.0)) if left >= 3600000.0 else ("%dm left" % maxi(1, ceili(left / 60000.0)))
+		return "%s ×%d · %s" % [item_name(view, str(p.get("id", ""))), int(p.get("qty", 1)), when])
 
 ## Energy panel under the HUD chip (LOCK-09 Kind=Panel): max, today's use as count tiles, the blessing.
 static func energy_panel(view: Dictionary) -> Dictionary:
@@ -295,7 +317,8 @@ static func skill_progress(s: Dictionary) -> float:
 	return clampf(float(int(s.xp) - int(s.floor)) / maxf(1.0, float(int(s.next) - int(s.floor))), 0.0, 1.0)
 
 ## HUD data for UiHud.apply (SGODOT-222, LOCK-06). ctx: next_cost (Energy the next action needs),
-## place (UiHud place dictionary), unread (Inbox count).
+## place (UiHud place dictionary), unread (overrides the Inbox count). The bell reads view.inbox.badge (SGODOT-232:
+## parcels + unread records; queued rewards stay off it) until the stage 4 Inbox owns it.
 static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	var e: Dictionary = view.get("energy", {})
 	var have := int(e.get("value", 0))
@@ -309,7 +332,7 @@ static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	var out := {
 		"energy": have, "energy_max": mx, "regen": regen, "next_cost": int(ctx.get("next_cost", 0)),
 		"skills": {"farming": skill_progress(sk.get("farming", {})), "fishing": skill_progress(sk.get("fishing", {}))},
-		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", 0)), "buff": {},
+		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", view.get("inbox", {}).get("badge", 0))), "buff": {},
 		"today": str(lines[0]) if not lines.is_empty() else "",
 	}
 	if ctx.has("place"): out["place"] = ctx.place
