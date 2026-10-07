@@ -1,207 +1,231 @@
 {
   "card": 173,
-  "revision": "R2.1",
-  "commit": "f4b79bc4",
+  "revision": "R2.2",
+  "commit": "bb33765a",
   "plane": {
-    "comment_id": "6870ede5-a45e-4ca0-a6fd-576965d30695",
+    "comment_id": "a46b47dd-7155-4193-be71-c4806f3bab1f",
     "state": "Review",
-    "commit": "f4b79bc4",
-    "attachments": 26
+    "commit": "bb33765a",
+    "attachments": 31
   },
   "attachments": [
     {
-      "name": "deluxe_room_10-R2.1-README.md",
-      "id": "611317cb-4d46-413e-82d2-5bb8f4b23516",
-      "sha256": "43dd811ef50bcfbe580364f79ad41535e977242feb9440d7ac947eac8d6ec8d2",
+      "name": "deluxe_room_10-R2.2-README.md",
+      "id": "c5e6dd49-cc72-4a3e-933d-2c44ddd4fe11",
+      "sha256": "fbf28c4990e171dbe9b2bfe393325945e94b5fbed2d3c93bf1553f859cbc7726",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-bench-collisions.png",
-      "id": "b2e43b92-aa87-4068-83f3-73943d336b4a",
+      "name": "deluxe_room_10-R2.2-anchor-annotation-provenance.json",
+      "id": "c66e319a-f48b-459b-ac18-37d0c8ba8b06",
+      "sha256": "f9ad0ad15369bfbf0afd8cd911d04c032e4a6fe515a3b14e4a14c8ca4aab1ed0",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-R2.2-anchor-engineering-verification.json",
+      "id": "cd748253-c3c3-4bea-9a4c-88adff5df1e2",
+      "sha256": "39557c30e29949aeb132ca1f1cfbb2e556ac7e0fcb4cb83a24a8004e7f0cf352",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-R2.2-anchor-runtime-verification.json",
+      "id": "a3fb3d0b-eb2a-4a9b-81cb-7be4f1b32d10",
+      "sha256": "a8d0e2c9a6cb7e184d1f68d740d25c58870664d156e13206e64aaac1e77fcbcd",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-R2.2-anchor-schema-verification.json",
+      "id": "9b631148-be1e-4791-85f7-65d429164159",
+      "sha256": "74ef977058f6a06cc3250f510dd4a12711a5def1bd80a7d3b4ef693fe9f2ade7",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-R2.2-anchor-source-preservation.json",
+      "id": "6c201102-9986-4795-9263-dbec08dcb481",
+      "sha256": "b01fc918c9de8c583ed5e2a04e88344e5d78aa22e13ca7aac3b8f944e7a010c6",
+      "verified": true
+    },
+    {
+      "name": "deluxe_room_10-R2.2-bench-collisions.png",
+      "id": "86b27e32-b84d-4db2-8f77-c012d9a5c56d",
       "sha256": "35d5665cd42b62013a4a0ea0147851c5a53ed8c0d32148c51edaab4e53a5920b",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-bench-door.png",
-      "id": "76481d6f-abc2-4928-8201-be8993effd03",
+      "name": "deluxe_room_10-R2.2-bench-door.png",
+      "id": "39ba239e-f54b-4f51-9801-8e5526c581c3",
       "sha256": "51df890128c805508d7e3461d06783c00359287d6987ac44078939a786dae2cd",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-bench-main.png",
-      "id": "5f717681-13b3-400e-9505-ad1d80189ae6",
+      "name": "deluxe_room_10-R2.2-bench-main.png",
+      "id": "07411330-5534-45cd-bb16-d4dc46187db0",
       "sha256": "fb5bbb5bcc476bb61814deecd3b4f32de9e4474bd27c9389da9ebaae3ca6854e",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-bench-record-result.json",
-      "id": "4d33daaa-afaa-4598-8bc6-a171b7d4c145",
-      "sha256": "6ab743bc6a26f11e7ff582fefbf907ebe147158a78e9512de9a001a9fff3bf82",
+      "name": "deluxe_room_10-R2.2-bench-record-result.json",
+      "id": "152d0910-c993-409a-9956-4a8dd82b261a",
+      "sha256": "4af6edfe2737a29b2b7e54d6a5af286b474dfb7beffc2f512b2c9051e80b2231",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-bench-result.json",
-      "id": "232d762e-6169-458d-a428-8f3720a286fa",
-      "sha256": "a25304fb4d28b3eefa2c2d3aa8352cc434a9376d583f9a60bd6b77173295e18a",
+      "name": "deluxe_room_10-R2.2-bench-result.json",
+      "id": "69e7e656-c6a3-4fa4-b37c-a560949f0a8b",
+      "sha256": "1a0e6a7fbf8417acab8bb391419b41c4413d45d5a1e81b396a28281b6847de56",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-bench-scale-measurements.json",
-      "id": "85712229-6522-473d-bcdc-fc2bdb1bfa77",
-      "sha256": "b58b0b7bb42a7f5e8ff9c4bebc2baac0999d7db20d9a52ba52378a031d2259c2",
+      "name": "deluxe_room_10-R2.2-bench-scale-measurements.json",
+      "id": "52dd55c0-b912-4652-bb55-2dff0f966916",
+      "sha256": "8eafda6abdf5ea257bd605d88f3e443c27017f096bf07b145ceebad8f35c5bed",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-bench-spawn.png",
-      "id": "28f8fcf6-8e35-43ae-9e05-e4e79cd684a5",
-      "sha256": "7fdf35653a58858e6221c0f3d9878c56f36195cdf68ee3529aabbc783d2d46ab",
+      "name": "deluxe_room_10-R2.2-bench-spawn.png",
+      "id": "27d850be-84b4-4f2a-941c-abec738c3092",
+      "sha256": "912b22c9c9bec9bbf47ccc17716eee8f456b6e9f9b6e2d13b4d82c0867bfaa26",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-bench-video-metadata.json",
-      "id": "7768ed2d-6140-4e09-8399-ebd63655b359",
-      "sha256": "8b56278223efaee42630c942e349ab9d34c61497495330598decf1797ae8ec03",
+      "name": "deluxe_room_10-R2.2-bench-video-metadata.json",
+      "id": "83f0e060-ecb0-4b6d-90b2-73e6f43c5442",
+      "sha256": "f984ce16aea6424eecc219eff22d0806863822289890ca93d032cd3c3f2b3461",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-cloth-uv-verification.json",
-      "id": "3360fa5c-a122-4886-8f20-60fec4dba512",
+      "name": "deluxe_room_10-R2.2-cloth-uv-verification.json",
+      "id": "a77e80e9-6fbb-4831-ab4c-6a37777e418d",
       "sha256": "681c3bffa397a85fd369d4d5454c5d941d67268353d2d18add0d3951cd92dbf1",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-colour-samples.png",
-      "id": "999921f5-42bf-43f9-8625-bb5e84d5b4a6",
+      "name": "deluxe_room_10-R2.2-colour-samples.png",
+      "id": "98a8e526-e04e-4253-b8d4-ee5297ef970c",
       "sha256": "5de58964ccce1d17215d25c81e416b73706d2c8c866fcc449af341c55c301793",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-colour-verification.json",
-      "id": "07f0b045-ff45-4a8a-9a11-9b696aff95ef",
+      "name": "deluxe_room_10-R2.2-colour-verification.json",
+      "id": "3f5241d5-36e5-4f49-833a-59df07aed487",
       "sha256": "6d2bb37cbd9be921d24f41fbc383e5f69bf84cd7d52ac2c0a7fb73b48b5de5b7",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-comparison.png",
-      "id": "3d1acd8b-4baa-46d9-8fa4-864c1c4f6a10",
+      "name": "deluxe_room_10-R2.2-comparison.png",
+      "id": "5af268bc-789c-4d4f-b270-139ae1e2105e",
       "sha256": "cc32bff25aacac6abd2a31859a7b31a285ec8dc071c757e54c7632867806b289",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-detail-kitchen.png",
-      "id": "ce21506c-1544-4e61-a01c-e548ef3ba6e4",
+      "name": "deluxe_room_10-R2.2-detail-kitchen.png",
+      "id": "17c5eeed-501e-425c-9d50-0d07a7ddff7a",
       "sha256": "f0bf3c041c4ad6a48def86523516ead65be6acf05c676a0af1eaa4c09f9132e6",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-detail-living.png",
-      "id": "f660c952-4ef1-4b7d-819a-1c1536a5d3f4",
+      "name": "deluxe_room_10-R2.2-detail-living.png",
+      "id": "e21b40b4-79cc-42c2-82aa-19ddf73cbfef",
       "sha256": "c8b364c5118fc139f16dcab1c605e6745072c67dceb7af46061fc9153c7b739a",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-detail-loft.png",
-      "id": "3c9de4db-abcd-4113-afa8-c612663101e0",
+      "name": "deluxe_room_10-R2.2-detail-loft.png",
+      "id": "3a84cff0-135e-40cf-938d-912d21a204e2",
       "sha256": "549ef178b53c2f5f71f9ad6e3d2e6e7d2992676cafb5845bb2a9acaf66a15fa0",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-godot.png",
-      "id": "498e2fe9-27dd-4261-87f1-efdc66ac99cb",
+      "name": "deluxe_room_10-R2.2-godot.png",
+      "id": "c913bc2c-3c21-4684-a614-bf4b3e9fa6f0",
       "sha256": "2c63dd8ea60bd53da49a42600f60acf50b616ec8576d2cb4e5c4edf22e685ba4",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-kitchen-attachment-points.png",
-      "id": "1b14e2ba-e8d7-49ab-ab33-044bdb4e0b71",
-      "sha256": "14bcace86ef3142f933a73cec8611d55bc45b05040ee5dc930256a6823748bcb",
+      "name": "deluxe_room_10-R2.2-kitchen-attachment-points.png",
+      "id": "642037ae-7f22-43b2-9ef5-1ed288379912",
+      "sha256": "9825a92c177b85bfdbd4f72603c6963157f70706c7eba79758408c45e30e48dc",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-kitchen-hooks-verification.json",
-      "id": "76c52d50-08ff-41e4-8241-e3b77ebf3cf6",
-      "sha256": "f87b7b064b8898ddbae33150b83af8e58be964d9450022e1fe3c5c5c7c3b5841",
+      "name": "deluxe_room_10-R2.2-kitchen-hooks-verification.json",
+      "id": "a62842b7-ef78-4896-a0c6-4b60b999a4a0",
+      "sha256": "4d54bf34b8b3d53eb157ed2d1fa2374e4b31f20f326000e426fe838d6b0cc578",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-orthographic-sheet.png",
-      "id": "a770d633-fbec-4e6a-9c31-71ca4229b59a",
+      "name": "deluxe_room_10-R2.2-orthographic-sheet.png",
+      "id": "8b8a52d6-2417-48af-90c3-eaeb4d3c1426",
       "sha256": "8a9f6f58e47af2a114cd327d77a4f2810e76dd32ffd0fa07952d60d02b71ab43",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-overlay-50.png",
-      "id": "8ce8d87f-eae6-429d-bce1-51210b453746",
+      "name": "deluxe_room_10-R2.2-overlay-50.png",
+      "id": "6168478e-3786-45c1-b597-10497c3eb298",
       "sha256": "0a1f23e75b68fdb0fb85f7e35b018e459688494ec2387ea076cb650369223afb",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-production-notes.json",
-      "id": "a77e1cea-628d-44ca-b295-6abe480c99cd",
-      "sha256": "470f7d0b776678951330ae1bc85e38b169527f70d45e6d76b6242d6dad0c2e6c",
+      "name": "deluxe_room_10-R2.2-production-notes.json",
+      "id": "08973675-82aa-4553-a6c5-9f1c95e62be5",
+      "sha256": "e8b90cad1a8d50997f962906afd1b4c58681e64be4389c2e836b184750f1d1e8",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-source-scale.json",
-      "id": "0ba3d143-9f4c-43cd-ab04-2b0743609562",
+      "name": "deluxe_room_10-R2.2-source-scale.json",
+      "id": "1bab5204-5ba5-4461-8d13-ccf9cd8d9bc6",
       "sha256": "a8114e5f45633411202bf28a21e073fbcf6bf92618ab5ffc9c1ca68801ec1e45",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-verification-summary.json",
-      "id": "efd66f39-30e3-4392-9715-7f00de163069",
-      "sha256": "07636fff415bae4e1698b4c86554816bf580936d24c7d47df833ef62fb5dcc9e",
+      "name": "deluxe_room_10-R2.2-verification-summary.json",
+      "id": "6e529352-a805-43dd-9d95-7d6e846486e9",
+      "sha256": "7a6180381ffef1ccb928155fa56bc6db05868679bfd5c73489a066c7f8ea3780",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-video-frames.png",
-      "id": "fbcce316-e3f2-445c-812e-573dd33be8ec",
-      "sha256": "081f7a27fcdfc5a4e0a37fe04f7b5b9ce05354dfe4ddf6d45708e4a8d6dba14f",
+      "name": "deluxe_room_10-R2.2-video-frames.png",
+      "id": "e1b63d21-9087-4187-b9c4-0a236e524b99",
+      "sha256": "2707ccefb19f74746c6a316bc688a76c11d7d3bfcb7175fa9297b9c7840e8f11",
       "verified": true
     },
     {
-      "name": "deluxe_room_10-R2.1-walkthrough.mp4",
-      "id": "cd1e3942-b025-4ff7-9680-4cee2242cc38",
-      "sha256": "603899b59a86a8326eb2785b05dafc6b1de559d6776f78e1c4e2e8542dd5ff8d",
+      "name": "deluxe_room_10-R2.2-walkthrough.mp4",
+      "id": "4d2d2d77-e07b-4634-86ec-2ee5ff1e2fc9",
+      "sha256": "e70a16051828f79432ae8800abb4a483c58ff654e701c7c7641b6308d8029113",
       "verified": true
     }
   ],
   "lark": [
     {
       "name": "note",
-      "message_id": "om_x100b635200c768a8c454b46f93c5c55",
+      "message_id": "om_x100b635d67fac4a0c426aa6de387330",
       "download_verified": null,
       "sha256": null
     },
     {
       "name": "image-0",
-      "message_id": "om_x100b635200a028a0c3fb15c073666dd",
+      "message_id": "om_x100b635d67975ca0c33890f9f23fea2",
       "download_verified": true,
       "sha256": "cc32bff25aacac6abd2a31859a7b31a285ec8dc071c757e54c7632867806b289"
     },
     {
       "name": "image-1",
-      "message_id": "om_x100b63520059a8a0c0240c5d37f8d64",
+      "message_id": "om_x100b635d675dc0a4c34f05c8c542f16",
       "download_verified": true,
-      "sha256": "14bcace86ef3142f933a73cec8611d55bc45b05040ee5dc930256a6823748bcb"
+      "sha256": "9825a92c177b85bfdbd4f72603c6963157f70706c7eba79758408c45e30e48dc"
     },
     {
       "name": "image-2",
-      "message_id": "om_x100b63520019e0a4c31bbc05b7b9d01",
-      "download_verified": true,
-      "sha256": "c8b364c5118fc139f16dcab1c605e6745072c67dceb7af46061fc9153c7b739a"
-    },
-    {
-      "name": "image-3",
-      "message_id": "om_x100b635201d7c4a0c29e550d660aba0",
+      "message_id": "om_x100b635d677b54a0c3f4342eeb2885f",
       "download_verified": true,
       "sha256": "fb5bbb5bcc476bb61814deecd3b4f32de9e4474bd27c9389da9ebaae3ca6854e"
     },
     {
       "name": "video",
-      "message_id": "om_x100b635201982ca0c0739f60fb4d4ff",
+      "message_id": "om_x100b635d6720fca0c4a2d0b8e3c1380",
       "download_verified": true,
-      "sha256": "603899b59a86a8326eb2785b05dafc6b1de559d6776f78e1c4e2e8542dd5ff8d"
+      "sha256": "e70a16051828f79432ae8800abb4a483c58ff654e701c7c7641b6308d8029113"
     }
   ]
 }

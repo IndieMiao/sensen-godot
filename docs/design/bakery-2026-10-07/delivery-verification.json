@@ -1,189 +1,207 @@
 {
   "card": 175,
-  "revision": "R2",
-  "commit": "f4b88a42",
+  "revision": "R2.1",
+  "commit": "74b4c361",
   "plane": {
-    "comment_id": "7756cee1-943e-4a0f-823d-6e2bcb36774e",
+    "comment_id": "a8010cf0-bdb5-4f96-b0c9-09cda3974ee2",
     "state": "Review",
-    "commit": "f4b88a42",
-    "attachments": 23
+    "commit": "74b4c361",
+    "attachments": 26
   },
   "attachments": [
     {
-      "name": "bakery-R2-README.md",
-      "id": "3e512d01-0050-4a07-b49b-a47bea0daf6f",
-      "sha256": "1d3bfaf5bb0a46d609e7e907df843a2cc595c01b7a810744bfd981fe54425600",
+      "name": "bakery-R2.1-README.md",
+      "id": "124d69e8-4d42-447a-81ae-961a321ca305",
+      "sha256": "cfb0da8cbaacb76af5bdc442aad14f2f4422886e1aeb7b0f5cceeb870e950796",
       "verified": true
     },
     {
-      "name": "bakery-R2-bench-collisions.png",
-      "id": "08a353b9-8483-47f3-9d5f-ad058cc62eee",
-      "sha256": "10fcde196ee58e48603157d9bada8fdb22fa97cd55c5118f4dd4039270aeefe6",
+      "name": "bakery-R2.1-bench-collisions.png",
+      "id": "651a0284-c34b-4160-8109-2cf33949ef50",
+      "sha256": "2625cda84538d9249b1b89ca50d1f17446cdc7a3a8889e320b695ab08e1fe2a5",
       "verified": true
     },
     {
-      "name": "bakery-R2-bench-door.png",
-      "id": "9432180d-c652-4fc4-bd7e-f6db61512bdc",
-      "sha256": "4a52ea39ca378f67e5ecca41d9b28968f6653cc2ac3bee4b6e5bd340b4b63135",
+      "name": "bakery-R2.1-bench-door.png",
+      "id": "88120a96-cc5b-4f97-b61e-f70fd2bc7b16",
+      "sha256": "4de73918237b260c908657ca68ae35d479d3d8dfbeb759280153018502a78a77",
       "verified": true
     },
     {
-      "name": "bakery-R2-bench-main.png",
-      "id": "2269016f-a7cb-4c1b-98b3-df57f4a8428a",
-      "sha256": "2c9665a39d18e0abb99948d179bfa73ef126b7abcb65608daa363da0477eef9a",
+      "name": "bakery-R2.1-bench-main.png",
+      "id": "e5c71332-fa7a-4a67-8b14-bb5a9033c32a",
+      "sha256": "322b2415c96ec2ebdcf0a30f4d35c8b82f062ea1d33d952491bd1d9688ea6b61",
       "verified": true
     },
     {
-      "name": "bakery-R2-bench-record-result.json",
-      "id": "0c05ef67-3543-413b-9df0-c959a1222740",
-      "sha256": "7735bd135833ed745dd5d3ba4f689cfa09b8bb7656e44af322f3534692d13127",
+      "name": "bakery-R2.1-bench-record-result.json",
+      "id": "05060181-183f-4ba0-be74-afb808ebfca6",
+      "sha256": "179fd448fd9d0ab1fb5e0e2082c3b58465679860718e922a3faf3eab98f4e214",
       "verified": true
     },
     {
-      "name": "bakery-R2-bench-result.json",
-      "id": "cd2fbb12-05f6-4716-9a6b-7d143edd7799",
-      "sha256": "4970b59bf4fb3ae22a9bf66abe42976992fab0f326c1ee17099b8708d774e895",
+      "name": "bakery-R2.1-bench-result.json",
+      "id": "fbde5f69-db6b-4da6-a910-bc623d0a234d",
+      "sha256": "da9f24d833ff11dbed99dd85b0d69b710be9ccbd661f2f18ced6255d1b14658a",
       "verified": true
     },
     {
-      "name": "bakery-R2-bench-scale-measurements.json",
-      "id": "95cc5f5f-5d6f-4432-9353-69eb7dce3991",
+      "name": "bakery-R2.1-bench-scale-measurements.json",
+      "id": "6a4c89e5-e2fb-412f-a7c1-1eee4cd23c2c",
       "sha256": "fb9f848c973455bdf6143daea1f4975964c6a3b18993774498a7106588090d2a",
       "verified": true
     },
     {
-      "name": "bakery-R2-bench-spawn.png",
-      "id": "422d2353-2735-4a1f-a2e2-fd7048f813a0",
-      "sha256": "cb30365ccf015d8cafd6e88297913fdda8ceead6cd998910b82f201d5032c7b4",
+      "name": "bakery-R2.1-bench-spawn.png",
+      "id": "657ee1c7-8fc0-468d-9e78-263d0f6ee066",
+      "sha256": "1348084a9cdd05dc696dc4422228756939b3c3ac5be2b6867d79e1e9636542b6",
       "verified": true
     },
     {
-      "name": "bakery-R2-bench-video-metadata.json",
-      "id": "ccb49e1c-b5ac-4bbe-bef8-2ca7558f4a94",
-      "sha256": "078611d616652a9ad0458f0949433b430c7adb8e1638b14a302334c5f4929a99",
+      "name": "bakery-R2.1-bench-video-metadata.json",
+      "id": "20b6ea13-d039-4899-ba0f-d3d5a10265d8",
+      "sha256": "0674bfae90a1b6c831f0d695df2b40c7fb59871a35558af8b5076ecdef8196c9",
       "verified": true
     },
     {
-      "name": "bakery-R2-cloth-uv-verification.json",
-      "id": "9b714ad3-c003-4a72-8306-293d801fcb66",
+      "name": "bakery-R2.1-cloth-uv-verification.json",
+      "id": "536c12c3-796b-486d-80d6-3269ad6d1d65",
       "sha256": "1fd842d29c9fbf119abed1153333faa02c4d6814f44768f5ad324fd94be63c5b",
       "verified": true
     },
     {
-      "name": "bakery-R2-colour-samples.png",
-      "id": "ef98052f-bd7c-48fb-b2b1-a69e4bea657c",
-      "sha256": "c16a0f054623c02be343f72b4f5cfe7b53fed2ced317ae11e3030cb68bdcf6bc",
+      "name": "bakery-R2.1-colour-samples.png",
+      "id": "fccfe69b-81a0-4974-a018-3e87e6829f6b",
+      "sha256": "d411e4bf32f4d2f2d19aba1ea1cee0cb20baad8a37b4147f8efd6799479003b2",
       "verified": true
     },
     {
-      "name": "bakery-R2-colour-verification.json",
-      "id": "9da3a6db-b2ac-4470-b207-cba26535b9d8",
-      "sha256": "b61e3e2a9dc5333bd205b278af8be1a8ac87ff438dcdf4656a130fadea11893b",
+      "name": "bakery-R2.1-colour-verification.json",
+      "id": "aafd55fb-2d05-4884-8715-ef9d27ec0c33",
+      "sha256": "51db919a90c6f9d42157b9032625e111ce7f4cfe7dc0b54a2b23f7faaa84c904",
       "verified": true
     },
     {
-      "name": "bakery-R2-comparison.png",
-      "id": "7c406e32-c5d2-43da-bacf-7bdcbe2f7191",
-      "sha256": "0c3db0fe2d1eb44f0af70aacf18f006871fec26a978822adfb215afd1be630e4",
+      "name": "bakery-R2.1-comparison.png",
+      "id": "747b7609-0aa9-4f79-83f1-66c706d55fc9",
+      "sha256": "713859ebbdba532ddfad57e09e30d243f6f688463d7d0ee2f649c091f56b3a4e",
       "verified": true
     },
     {
-      "name": "bakery-R2-detail-oven.png",
-      "id": "da0b4172-3111-425f-b1ab-4a0636f523ef",
-      "sha256": "707c562c18834a006069fc9719b139c7f2a42811d5fadbcffee0173d1f6ffb8e",
+      "name": "bakery-R2.1-detail-oven.png",
+      "id": "b0759383-accb-4caa-b137-657b48777c4d",
+      "sha256": "e80938a155b627752c29a5cbf1a17645053375389dea6b08c4cead63330fe4d5",
       "verified": true
     },
     {
-      "name": "bakery-R2-detail-pastries.png",
-      "id": "75e5c4ad-2f51-4649-b25f-f5f0952fc5f5",
-      "sha256": "773b1ebddc5d352467337ca5365ed9bfb5b6a4cb279d00cf90e44d4a1f58d9c7",
+      "name": "bakery-R2.1-detail-pastries.png",
+      "id": "4231d966-f59a-4af7-99e6-136fcd9add35",
+      "sha256": "74eaa0a17898a2fc2702da657275c36c31525a60de9eb455003320aa7b3a2c90",
       "verified": true
     },
     {
-      "name": "bakery-R2-godot.png",
-      "id": "c4bf9f49-b23a-4ce4-9b50-d5a4c36e958a",
-      "sha256": "3934a578f671ea943c1230b099b02922906217d6791cf44ab7c78e141532f479",
+      "name": "bakery-R2.1-godot.png",
+      "id": "4842ef6d-4304-4b18-81cd-ff999b2444b1",
+      "sha256": "763793114a631f1c997d0eb44a64610a221483ea79ca3ed596404bf69d978068",
       "verified": true
     },
     {
-      "name": "bakery-R2-orthographic-sheet.png",
-      "id": "e4ef03d9-0b53-4790-a6ce-95900e2e2ef6",
-      "sha256": "c2a52037088a80d9caf6273ec26d8033f5961ce91cabc667337c0fbfa5a35315",
+      "name": "bakery-R2.1-local-runtime-contract.json",
+      "id": "52b85cde-7125-4ed4-8d12-1c67850c66f7",
+      "sha256": "89f380c74584db1ab6392b60c03f084a21dc9a2b5f4b722c8ec43f5a1081d6a1",
       "verified": true
     },
     {
-      "name": "bakery-R2-overlay-50.png",
-      "id": "530e80a0-50a5-448f-842c-f1f304b51d15",
-      "sha256": "a641d76774fbae567c3f589b48e14bc3e3e4d6dd80da83efa95c1b4ccc9b0b6a",
+      "name": "bakery-R2.1-orthographic-sheet.png",
+      "id": "a22dda00-5441-4975-93df-a414b107abd8",
+      "sha256": "5c3528326e0ecbeb834f289163985ea017329cf222e682957d733692419f216f",
       "verified": true
     },
     {
-      "name": "bakery-R2-production-notes.json",
-      "id": "dd090351-8427-464c-ab99-de6e882e393a",
-      "sha256": "12a98a09c9d824903769d8684297b6e586e7469c927b04707aa99b17c7c41adb",
+      "name": "bakery-R2.1-overlay-50.png",
+      "id": "d0f88ad3-839c-4da1-91ae-f3e9213875be",
+      "sha256": "f4a91ebe8e1ae23516a6224f9faabc73b413a849a34e44166c8816ae5b5319d7",
       "verified": true
     },
     {
-      "name": "bakery-R2-source-scale.json",
-      "id": "15e37272-7385-4ce2-a025-54f1888a619f",
+      "name": "bakery-R2.1-pastry-display-inventory.json",
+      "id": "8086ef30-1449-4c98-8db7-4189984b21dc",
+      "sha256": "48d230f3c334846ad44e6531a2aeb1cf2fc66a71c895d7f2b6a066c92e1e5895",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2.1-production-notes.json",
+      "id": "da47575b-90b8-47ff-8863-6f7ba3500fab",
+      "sha256": "319a41ec31db1517810487b768138b2c0a9ef8361b25fa103fa92d89ce019b01",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2.1-source-audit.json",
+      "id": "af996065-7faf-4c48-93d8-43aebc04ce03",
+      "sha256": "5cbb53b855e86aede1942dc90b79414f08ae328fb0f3c1e7d2e7ca3ea0d47952",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2.1-source-scale.json",
+      "id": "191db5ef-311b-42d8-95c3-453e64916f84",
       "sha256": "cc10dde5e2175e167b68bf5749deb4239cd0bbf3458ab793dfa959f1433a030a",
       "verified": true
     },
     {
-      "name": "bakery-R2-verification-summary.json",
-      "id": "aa9f8c8f-807c-488d-a61b-20c05fd2e8c8",
-      "sha256": "c6dcdc23684a9c182bc879274912f129b6441c17ebc04a0015d5cfa362fb4cec",
+      "name": "bakery-R2.1-verification-summary.json",
+      "id": "b2fe690b-0ec9-4ebf-b064-ae1600e3fef3",
+      "sha256": "1f07b30796b9403f0a879e8f7d4e99d23cabba74bc40f380bbd9bbd177e77d26",
       "verified": true
     },
     {
-      "name": "bakery-R2-video-frames.png",
-      "id": "e62eacf4-63de-439c-b299-6389721f4c47",
-      "sha256": "92b5935d015ec3d86ebcdd8383b21dae18f6ccf1620cc573679e58f7f28539f8",
+      "name": "bakery-R2.1-video-frames.png",
+      "id": "d1c3e1c7-b8f4-48f9-8d4e-5762aad6146f",
+      "sha256": "c62dcc0a91d6e261202074b9ac57ed01f17823a4d5ea8ea8461af219e7f12462",
       "verified": true
     },
     {
-      "name": "bakery-R2-walkthrough.mp4",
-      "id": "7e3aecbd-ddb1-4c0f-8ce7-211fc311f5fb",
-      "sha256": "c869718d4209b006b86edf74d047f75c097480e02aa340aa8be46e3479c0c985",
+      "name": "bakery-R2.1-walkthrough.mp4",
+      "id": "d536ed26-c0a7-4da9-87af-c260dbcb8d88",
+      "sha256": "544a4a114805ce5d1492c5f37fddd1be1192901d2aeaea253d62def3677997d7",
       "verified": true
     }
   ],
   "lark": [
     {
       "name": "note",
-      "message_id": "om_x100b6351b71024a0c32b0a911bf96b2",
+      "message_id": "om_x100b635d7affa8a0c475e8175dd1105",
       "download_verified": null,
       "sha256": null
     },
     {
       "name": "image-0",
-      "message_id": "om_x100b6351b4965ca4c3e42324b4a7c4a",
+      "message_id": "om_x100b635d7a829ca0c33c01df319c492",
       "download_verified": true,
-      "sha256": "0c3db0fe2d1eb44f0af70aacf18f006871fec26a978822adfb215afd1be630e4"
+      "sha256": "713859ebbdba532ddfad57e09e30d243f6f688463d7d0ee2f649c091f56b3a4e"
     },
     {
       "name": "image-1",
-      "message_id": "om_x100b6351b40a28a0c3ae7f080382192",
+      "message_id": "om_x100b635d7ab8b8a0c3ebffc3f18353a",
       "download_verified": true,
-      "sha256": "707c562c18834a006069fc9719b139c7f2a42811d5fadbcffee0173d1f6ffb8e"
+      "sha256": "74eaa0a17898a2fc2702da657275c36c31525a60de9eb455003320aa7b3a2c90"
     },
     {
       "name": "image-2",
-      "message_id": "om_x100b6351b43faca8c4f79807e729084",
+      "message_id": "om_x100b635d7a56f0a0c10356747e6c1d6",
       "download_verified": true,
-      "sha256": "773b1ebddc5d352467337ca5365ed9bfb5b6a4cb279d00cf90e44d4a1f58d9c7"
+      "sha256": "e80938a155b627752c29a5cbf1a17645053375389dea6b08c4cead63330fe4d5"
     },
     {
       "name": "image-3",
-      "message_id": "om_x100b6351b5c618a4c00ad1c4e59cb60",
+      "message_id": "om_x100b635d7a08e8a4c32765fff044ca7",
       "download_verified": true,
-      "sha256": "2c9665a39d18e0abb99948d179bfa73ef126b7abcb65608daa363da0477eef9a"
+      "sha256": "322b2415c96ec2ebdcf0a30f4d35c8b82f062ea1d33d952491bd1d9688ea6b61"
     },
     {
       "name": "video",
-      "message_id": "om_x100b6351b5a524a4c4b24a1751cb3e5",
+      "message_id": "om_x100b635d7bcc0ca0c4acff74f5409cb",
       "download_verified": true,
-      "sha256": "c869718d4209b006b86edf74d047f75c097480e02aa340aa8be46e3479c0c985"
+      "sha256": "544a4a114805ce5d1492c5f37fddd1be1192901d2aeaea253d62def3677997d7"
     }
   ]
 }
