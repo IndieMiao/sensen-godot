@@ -26,7 +26,13 @@ export interface CookTier {
   energy: number; ms: number; heats: number[]; gold: number; spin_ms: number;
   first_xp: number; xp: number; level: number; bonus: number[];
 }
-export interface Recipe { id: string; name: string; in: string[]; known?: boolean; style?: string }
+/** How a page can be learned, for the Hidden page's corner (§7.5.1): start = known from the start, gift = a level-up
+ * recipe card, experiment, card = a stall recipe card, market = a Market card, taught = a resident, buy = bought. */
+export type Learn = 'start' | 'gift' | 'experiment' | 'card' | 'market' | 'taught' | 'buy';
+/** A P0 Cookbook page that can be cooked (§7.14.0); n = its page number in the 48-page Cookbook. */
+export interface Recipe { n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[] }
+/** A page outside P0 (§7.14.1–7.14.4): only its silhouette shows, slots = the family of each slot. */
+export interface SilhouettePage { n: number; id: string; name: string; rarity: number; slots: string[]; style: string; learn: Learn[] }
 
 export type ShopId = 'homestead' | 'tackle' | 'market' | 'tea' | 'post';
 export const SHOPS: readonly ShopId[] = ['homestead', 'tackle', 'market', 'tea', 'post'];
@@ -128,6 +134,7 @@ export interface P0Content {
     mystery: { id: string; name: string; energy: number };
     food_cap: number;
     recipes: Recipe[];
+    pages: SilhouettePage[];   // the other 34 of the 48 pages, not cookable in P0 (q(39))
   };
   /** Consumables made at the workbench, with no shop row (Torch). */
   supplies: Record<string, { name: string }>;
