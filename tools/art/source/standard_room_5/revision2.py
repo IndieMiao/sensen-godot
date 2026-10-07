@@ -1,4 +1,4 @@
-"""SGODOT-172 R2: warm sample, repaired textiles/fittings and R2 plants."""
+"""SGODOT-172 R2.1: approved warm sample with fuller plants and grounded details."""
 from pathlib import Path
 import math
 import json
@@ -79,11 +79,11 @@ def sofa(at=(-2.57,.082,.82),yaw=90):
     cube('Full upholstered sofa back',(0,.93,-.29),(1.88,.70,.31),'linen',.14,'cloth')
     for x in (-.47,.47):cube('Plump seat cushion',(x,.53,.065),(.945,.32,.75),'porcelain',.14,'cloth')
     for x in (-.99,.99):
-        cube('Continuous oak sofa arm post',(x,.54,.255),(.17,.86,.20),'oak_light',.055,'wood','Y')
-        cube('Soft padded sofa arm',(x,.83,-.025),(.26,.25,.77),'linen',.11,'cloth')
+        cube('Recessed oak sofa arm support',(x,.42,.255),(.15,.62,.18),'oak',.035,'wood','Y')
+        cube('Clean continuous upholstered arm',(x,.75,-.025),(.32,.46,.85),'linen',.12,'cloth')
     for x,color,lean in [(-.15,'EABC48',-.18),(.46,'linen_green',.15)]:
         o=cube('Puffed loose cushion',(x,.94,-.035),(.53,.54,.29),color,.14,'cloth');o.rotation_euler.y=lean
-    profile=[(-.47,1.235),(-.31,1.295),(-.15,1.15),(-.065,.725),(.15,.714),(.39,.714),(.49,.65),(.53,.43),(.54,.23)]
+    profile=[(-.47,1.29),(-.31,1.34),(-.15,1.31),(-.065,.725),(.15,.714),(.39,.714),(.49,.65),(.53,.43),(.54,.23)]
     metric_cloth('Square gingham sofa throw',profile,-.91,.70)
     for i in range(16):tube('Throw fringe',[(-.91+i*.045,.23,.54),(-.91+i*.045,.15,.55)],.007,'sage',6)
 
@@ -303,9 +303,23 @@ def hearth():
     cube('Firewood cabinet countertop',(0,1.06,0),(.77,.13,.89),'oak_light',.04,'wood')
     for i,(x,y) in enumerate([(-.16,.22),(.06,.22),(.21,.23),(-.11,.40),(.13,.42),(0,.58)]):
         z=.03+(i%2)*.05;r=.095+(i%3)*.008
-        o=cylinder('Cross stacked split log',(x,y,z),r,.46,'oak',vertices=12);o.rotation_euler.x=math.pi/2
-        o=cylinder('Visible warm end grain',(x,y,z+.237),r*.85,.012,'oak_light',vertices=14);o.rotation_euler.x=math.pi/2
-        for rad in (.034,.060):tube('Endgrain arc',[(x+rad*math.cos(a),y+rad*math.sin(a),z+.246) for a in [j*math.pi/8 for j in range(17)]],.0035,'oak_edge',4)
+        o=cylinder('Rough dark bark log',(x,y,z),r,.46,'704728',vertices=11);o.rotation_euler.x=math.pi/2
+        o=cylinder('Matte irregular pale endgrain',(x,y,z+.237),r*.82,.007,'B78550',vertices=11);o.rotation_euler.x=math.pi/2
+        # Broken, off-centre rings vary in spacing/thickness. Flat ribbons have
+        # no raised glossy tube profile; dark bark remains visible at the rim.
+        for j,fraction in enumerate((.22,.43,.64,.79)[:3+i%2]):
+            pts=[]
+            start=.31*i+.72*j;span=math.tau*(.62+.07*((i+j)%3))
+            for k in range(25):
+                a=start+span*k/24;rad=r*fraction*(1+.10*math.sin(a*3+i)+.05*math.sin(a*5+j))
+                for d in (-1,1):
+                    rr=rad+d*(.0012+.00045*((i+j)%3))
+                    pts.append((x+r*.06+rr*math.cos(a),y-r*.055+rr*math.sin(a)*.91,z+.243))
+            mesh('Broken matte endgrain ribbon',pts,[(k*2,k*2+1,k*2+3,k*2+2) for k in range(24)],'8D6038')
+        angle=.9+i*1.71
+        mesh('Natural radial log split',[(x+r*.77*math.cos(angle),y+r*.77*math.sin(angle),z+.244),
+             (x+r*.26*math.cos(angle+.07),y+r*.26*math.sin(angle+.07),z+.244),
+             (x+r*.75*math.cos(angle+.085),y+r*.75*math.sin(angle+.085),z+.244)],[(0,1,2)],'684329')
 
 def fire():
     begin('fire',(-1.59,.30,-2.29))
@@ -514,7 +528,7 @@ def color_and_bake():
         mask=math_node('MULTIPLY',math_node('MULTIPLY',horizontal,vertical),math_node('MULTIPLY',open_bar_x,open_bar_y))
         warm=nt.nodes.new('ShaderNodeMixRGB');warm.blend_type='SCREEN';warm.inputs[2].default_value=(*rgb('EDB45B'),1)
         nt.links.new(math_node('MULTIPLY',mask,.50),warm.inputs[0]);nt.links.new(mix.outputs[0],warm.inputs[1]);nt.links.new(warm.outputs[0],bsdf.inputs['Base Color'])
-    p.BAKE_SETTINGS.update(ao_distance=.75,ao_strength=.68,floor_ao_strength=.42)
+    p.BAKE_SETTINGS.update(ao_distance=.86,ao_strength=.80,floor_ao_strength=.62)
 
 def finish_normals():
     # Apply bevels to named source pieces, keeping their editable geometry. Broad
@@ -563,17 +577,19 @@ def build():
         leaf('Apple leaf',(x,.37,z),(x+.11,.40,z+.035),.04,'leaf')
     mug((.59,0,.19))
     finish_normals();color_and_bake()
-    shared_plant('floor_monstera','monstera',(-2.72,.083,2.10),.77,35,[{'at':[0,.30,0],'size':[.64,.60,.64]}])
+    shared_plant('floor_monstera','monstera',(-2.78,.083,2.22),1.31,35,[{'at':[0,.30,0],'size':[.64,.60,.64]}])
     shared_plant('entry_peace_lily','peace_lily',(2.92,.083,-2.13),.69,-28,[{'at':[0,.20,0],'size':[.46,.40,.46]}])
-    shared_plant('window_pothos','pothos',(-2.70,1.40,-.47),.77,98)
-    shared_plant('bookcase_pothos','pothos',(-2.26,2.30,-2.38),.68,-18)
-    shared_plant('pantry_pothos','pothos',(1.14,2.42,-2.65),.59,9)
-    shared_plant('hanging_pothos','pothos',(-2.84,2.57,-1.18),.51,102)
+    shared_plant('window_pothos','pothos',(-2.70,1.40,-.47),1.31,98)
+    shared_plant('bookcase_pothos','pothos',(-2.26,2.30,-2.38),1.19,-18)
+    shared_plant('pantry_pothos','pothos',(1.08,2.42,-2.65),.95,9)
+    shared_plant('hanging_pothos','pothos',(-2.84,2.57,-1.18),.78,102)
+    shared_plant('window_extra_vine','ivy_medium',(-2.47,1.63,-.48),.75,75)
+    shared_plant('bookcase_extra_vine','ivy_long',(-2.03,2.64,-2.22),.76,-15)
     p.MANIFEST_EXTRA.update(json.loads((Path(__file__).with_name('bench-r2.json')).read_text()))
     p.MANIFEST_EXTRA['review_views']=[{'name':'detail-kitchen','position':[5.4,4.2,5.1],'target':[-.60,1.72,-2.44],'size':5.6},
                                     {'name':'detail-living','position':[5.5,4.8,7.4],'target':[-1.74,.91,.90],'size':5.5},
                                     {'name':'detail-fire','position':[-1.59,1.60,-.55],'target':[-1.59,.57,-2.47],'size':2.6}]
-    lighting={'ambient':.63,'ambient_color':'FFE6BD','sun':1.35,'sun_color':'FFE6AC',
+    lighting={'ambient':.52,'ambient_color':'FFE6BD','sun':1.35,'sun_color':'FFE6AC',
               'shadow_bias':.08,'shadow_normal_bias':1.0,'shadow_distance':25,
               'sun_position':[-7,4.5,-2.8],'sun_target':[0,0,0],'background':'DBE5CD','background_gradient':True,
               'points':[{'position':[-1.59,.56,-1.98],'energy':.95,'color':'FF8B35','range':2.0}]}
