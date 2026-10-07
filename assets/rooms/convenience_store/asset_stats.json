@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3674797
+    "bytes": 3693405
   },
   "assets": [
     {
@@ -14,7 +14,7 @@
       "vertices": 8368,
       "triangles": 15764,
       "surfaces": 1,
-      "bytes": 641404
+      "bytes": 641372
     },
     {
       "name": "back_wall",
@@ -67,10 +67,10 @@
     },
     {
       "name": "entrance_frame",
-      "vertices": 647,
-      "triangles": 990,
+      "vertices": 1043,
+      "triangles": 1394,
       "surfaces": 1,
-      "bytes": 42556
+      "bytes": 64600
     },
     {
       "name": "entrance_glass",
@@ -88,17 +88,17 @@
     },
     {
       "name": "convenience_sign",
-      "vertices": 724,
-      "triangles": 788,
+      "vertices": 2046,
+      "triangles": 2178,
       "surfaces": 1,
-      "bytes": 41640
+      "bytes": 115264
     },
     {
       "name": "drink_cabinet",
-      "vertices": 1594,
-      "triangles": 2808,
+      "vertices": 1863,
+      "triangles": 3129,
       "surfaces": 1,
-      "bytes": 117308
+      "bytes": 102820
     },
     {
       "name": "chiller_glass",
@@ -109,45 +109,45 @@
     },
     {
       "name": "drinks_header",
-      "vertices": 556,
-      "triangles": 654,
+      "vertices": 1286,
+      "triangles": 1414,
       "surfaces": 1,
-      "bytes": 33340
+      "bytes": 74064
     },
     {
       "name": "snacks_wall_rack",
-      "vertices": 1476,
-      "triangles": 1918,
+      "vertices": 2625,
+      "triangles": 3049,
       "surfaces": 1,
-      "bytes": 92880
+      "bytes": 139316
     },
     {
       "name": "essentials_wall_rack",
-      "vertices": 1930,
-      "triangles": 2562,
+      "vertices": 3811,
+      "triangles": 4493,
       "surfaces": 1,
-      "bytes": 126576
+      "bytes": 203992
     },
     {
       "name": "checkout",
-      "vertices": 1392,
-      "triangles": 2652,
+      "vertices": 1400,
+      "triangles": 2660,
       "surfaces": 1,
-      "bytes": 94340
+      "bytes": 93620
     },
     {
       "name": "produce_aisle",
-      "vertices": 2524,
-      "triangles": 4402,
+      "vertices": 2696,
+      "triangles": 4498,
       "surfaces": 1,
-      "bytes": 163676
+      "bytes": 156312
     },
     {
       "name": "essentials_aisle",
-      "vertices": 1372,
-      "triangles": 2204,
+      "vertices": 1508,
+      "triangles": 2294,
       "surfaces": 1,
-      "bytes": 102296
+      "bytes": 74932
     },
     {
       "name": "ice_cream_freezer",
@@ -179,10 +179,10 @@
     },
     {
       "name": "checkout_small_goods",
-      "vertices": 920,
-      "triangles": 1104,
+      "vertices": 1867,
+      "triangles": 2085,
       "surfaces": 1,
-      "bytes": 55704
+      "bytes": 103036
     },
     {
       "name": "microwave",
@@ -196,7 +196,7 @@
       "vertices": 2480,
       "triangles": 4596,
       "surfaces": 1,
-      "bytes": 127364
+      "bytes": 126948
     },
     {
       "name": "entrance_sky",
@@ -204,22 +204,29 @@
       "triangles": 348,
       "surfaces": 1,
       "bytes": 11844
+    },
+    {
+      "name": "cold_light_strips",
+      "vertices": 16,
+      "triangles": 24,
+      "surfaces": 1,
+      "bytes": 3052
     }
   ],
-  "unique_triangles": 72829,
-  "scene_triangles": 77005,
-  "static_draw_surfaces": 34,
-  "unique_assets": 28,
-  "placed_instances": 34,
-  "glb_bytes": 2786044,
+  "unique_triangles": 79965,
+  "scene_triangles": 84486,
+  "static_draw_surfaces": 36,
+  "unique_assets": 29,
+  "placed_instances": 36,
+  "glb_bytes": 3046288,
   "scene_budget": {
     "after": {
-      "room_triangles": 77005,
+      "room_triangles": 84486,
       "shared_plant_triangles": 24168,
       "room_botanical_triangles": 4944,
       "plant_triangles": 29112,
-      "total_triangles": 101173,
-      "static_surfaces": 28
+      "total_triangles": 108654,
+      "static_surfaces": 30
     },
     "limits": {
       "total_triangles": 200000,
@@ -238,7 +245,7 @@
           "entrance_sconce",
           "entrance_sconce_2"
         ],
-        "triangles": 4338,
+        "triangles": 6132,
         "cast_shadow": true
       },
       {
@@ -263,7 +270,7 @@
           "checkout_small_goods",
           "microwave"
         ],
-        "triangles": 2154,
+        "triangles": 3895,
         "cast_shadow": true
       },
       {

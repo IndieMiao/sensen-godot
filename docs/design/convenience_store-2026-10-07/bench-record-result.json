@@ -53,7 +53,7 @@
 				"name": "aisle_between",
 				"reached": true,
 				"remaining_m": 0.0834697857499123,
-				"seconds": 0.31,
+				"seconds": 0.312,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -79,7 +79,7 @@
 				"name": "checkout",
 				"reached": true,
 				"remaining_m": 0.0721634551882744,
-				"seconds": 0.477,
+				"seconds": 0.467,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -105,7 +105,7 @@
 				"name": "refrigerator",
 				"reached": true,
 				"remaining_m": 0.080877348780632,
-				"seconds": 0.633,
+				"seconds": 0.621,
 				"target": [
 					-1.89999997615814,
 					0.0599999986588955,
@@ -131,7 +131,7 @@
 				"name": "checkout_return",
 				"reached": true,
 				"remaining_m": 0.0695670768618584,
-				"seconds": 0.618,
+				"seconds": 0.604,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -157,7 +157,7 @@
 				"name": "freezer",
 				"reached": true,
 				"remaining_m": 0.0947521030902863,
-				"seconds": 0.439,
+				"seconds": 0.45,
 				"target": [
 					2.0,
 					0.0599999986588955,
@@ -183,7 +183,7 @@
 				"name": "aisle_return",
 				"reached": true,
 				"remaining_m": 0.0680781751871109,
-				"seconds": 0.428,
+				"seconds": 0.404,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -209,7 +209,7 @@
 				"name": "island_center",
 				"reached": true,
 				"remaining_m": 0.0742038190364838,
-				"seconds": 0.41,
+				"seconds": 0.4,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -246,13 +246,13 @@
 			"passed": true
 		},
 		{
-			"details": 5.813,
+			"details": 5.844,
 			"name": "Full route fits unaccelerated 15s clip",
 			"passed": true
 		}
 	],
 	"passed": true,
-	"pid": 1070542,
+	"pid": 1103573,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -292,7 +292,7 @@
 			"name": "aisle_between",
 			"reached": true,
 			"remaining_m": 0.0834697857499123,
-			"seconds": 0.31,
+			"seconds": 0.312,
 			"target": [
 				0.419999986886978,
 				0.0599999986588955,
@@ -314,7 +314,7 @@
 			"name": "checkout",
 			"reached": true,
 			"remaining_m": 0.0721634551882744,
-			"seconds": 0.477,
+			"seconds": 0.467,
 			"target": [
 				0.419999986886978,
 				0.0599999986588955,
@@ -336,7 +336,7 @@
 			"name": "refrigerator",
 			"reached": true,
 			"remaining_m": 0.080877348780632,
-			"seconds": 0.633,
+			"seconds": 0.621,
 			"target": [
 				-1.89999997615814,
 				0.0599999986588955,
@@ -358,7 +358,7 @@
 			"name": "checkout_return",
 			"reached": true,
 			"remaining_m": 0.0695670768618584,
-			"seconds": 0.618,
+			"seconds": 0.604,
 			"target": [
 				0.419999986886978,
 				0.0599999986588955,
@@ -380,7 +380,7 @@
 			"name": "freezer",
 			"reached": true,
 			"remaining_m": 0.0947521030902863,
-			"seconds": 0.439,
+			"seconds": 0.45,
 			"target": [
 				2.0,
 				0.0599999986588955,
@@ -402,7 +402,7 @@
 			"name": "aisle_return",
 			"reached": true,
 			"remaining_m": 0.0680781751871109,
-			"seconds": 0.428,
+			"seconds": 0.404,
 			"target": [
 				0.419999986886978,
 				0.0599999986588955,
@@ -424,7 +424,7 @@
 			"name": "island_center",
 			"reached": true,
 			"remaining_m": 0.0742038190364838,
-			"seconds": 0.41,
+			"seconds": 0.4,
 			"target": [
 				0.419999986886978,
 				0.0599999986588955,

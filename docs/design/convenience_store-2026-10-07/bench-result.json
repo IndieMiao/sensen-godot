@@ -141,7 +141,7 @@
 				"name": "checkout_return",
 				"reached": true,
 				"remaining_m": 0.0695670768618584,
-				"seconds": 0.6,
+				"seconds": 0.599,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -193,7 +193,7 @@
 				"name": "aisle_return",
 				"reached": true,
 				"remaining_m": 0.0680781751871109,
-				"seconds": 0.399,
+				"seconds": 0.4,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -262,7 +262,7 @@
 				],
 				"final": [
 					0.300000011920929,
-					0.0430829748511314,
+					0.0501615181565285,
 					-0.832723677158356
 				],
 				"from": [
@@ -271,8 +271,8 @@
 					-0.5
 				],
 				"reached": false,
-				"remaining_m": 0.667490720748901,
-				"seconds": 0.883,
+				"remaining_m": 0.667348861694336,
+				"seconds": 0.867,
 				"target": [
 					0.300000011920929,
 					0.0599999986588955,
@@ -300,7 +300,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.586641371250153,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					-1.20000004768372,
 					0.0599999986588955,
@@ -328,7 +328,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.537975490093231,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					1.45000004768372,
 					0.0599999986588955,
@@ -356,7 +356,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.780063033103943,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					2.0,
 					0.0599999986588955,
@@ -384,7 +384,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.574999809265137,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					-2.79999995231628,
 					0.0599999986588955,
@@ -412,7 +412,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.979560077190399,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					3.59999990463257,
 					0.0599999986588955,
@@ -481,7 +481,7 @@
 				],
 				"reached": true,
 				"remaining_m": 0.0959759503602982,
-				"seconds": 0.599,
+				"seconds": 0.6,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -515,7 +515,7 @@
 				],
 				"reached": true,
 				"remaining_m": 0.200680062174797,
-				"seconds": 0.299,
+				"seconds": 0.3,
 				"target": [
 					0.150000005960464,
 					-0.170000001788139,
@@ -541,7 +541,7 @@
 					],
 					"reached": true,
 					"remaining_m": 0.0955293402075768,
-					"seconds": 0.3,
+					"seconds": 0.299,
 					"target": [
 						0.150000005960464,
 						0.0599999986588955,
@@ -589,7 +589,7 @@
 			"details": [
 				"run",
 				0.15,
-				0.316656666666667
+				0.316666666666667
 			],
 			"name": "Run animation advances in rendered viewport",
 			"passed": true
@@ -638,13 +638,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.392438998867948,
-				"difference": 0.0,
-				"height": 0.685,
-				"ratio_to_H": 0.392438998867948,
-				"reason": "No seating in this shop reference; baseline placeholder only."
+				"applicable": false,
+				"reason": "No chair is present in this reference/shop."
 			},
-			"name": "Scale ±15%: chair",
+			"name": "Scale category absent: chair",
 			"passed": true
 		},
 		{
@@ -660,7 +657,7 @@
 		}
 	],
 	"passed": true,
-	"pid": 1070464,
+	"pid": 1103493,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -766,7 +763,7 @@
 			"name": "checkout_return",
 			"reached": true,
 			"remaining_m": 0.0695670768618584,
-			"seconds": 0.6,
+			"seconds": 0.599,
 			"target": [
 				0.419999986886978,
 				0.0599999986588955,
@@ -810,7 +807,7 @@
 			"name": "aisle_return",
 			"reached": true,
 			"remaining_m": 0.0680781751871109,
-			"seconds": 0.399,
+			"seconds": 0.4,
 			"target": [
 				0.419999986886978,
 				0.0599999986588955,

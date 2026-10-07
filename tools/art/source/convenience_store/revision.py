@@ -9,33 +9,7 @@ PACKAGE_STATS={}
 
 def panel(name,verts,c):return mesh(name,verts,[(0,1,2,3)],c)
 
-def package(at,index=0,kind='bag'):
-    x,y,z=at;variant=index%3;c=COLORS[(index+variant)%8];start=len(k.CURRENT['objects'])
-    if kind=='bag':
-        verts=[]
-        for h,w,dep in [(0,.103,.035),(.14,.119,.083),(.29,.105,.03)]:
-            verts.extend([(x-w,y+h,z-dep),(x+w,y+h,z-dep),(x+w,y+h,z+dep),(x-w,y+h,z+dep)])
-        faces=[(0,3,2,1),(8,9,10,11)]+[(j*4+i,j*4+(i+1)%4,(j+1)*4+(i+1)%4,(j+1)*4+i) for j in range(2) for i in range(4)]
-        mesh('Puffed snack bag v'+str(variant),verts,faces,c,smooth=True)
-        for h in (.01,.28):panel('Crimped packet seal',[(x-.106,y+h-.007,z+.035),(x+.106,y+h-.007,z+.035),(x+.106,y+h+.007,z+.035),(x-.106,y+h+.007,z+.035)],'F2DEB5')
-    elif kind in ('bottle','drink','wash'):
-        h=.27 if kind=='drink' else .32
-        lathe('Bottled '+kind+' v'+str(variant),at,[(0,.077),(h*.76,.079),(h*.90,.040),(h,.040)],c,5)
-        cylinder('Bottle cap',(x,y+h+.012,z),.044,.024,'EDE4D5',vertices=5)
-    elif kind=='roll':
-        lathe('Hollow paper roll v'+str(variant),at,[(0,.088),(.25,.088),(.25,.031),(0,.031)],'EEE5D4',6)
-    elif kind=='can':
-        cylinder('Food tin v'+str(variant),(x,y+.12,z),.083,.24,c,vertices=8)
-        panel('Tin top label',[(x-.046,y+.241,z-.037),(x+.046,y+.241,z-.037),(x+.046,y+.241,z+.037),(x-.046,y+.241,z+.037)],'CBCBC1')
-    else:
-        cube(('Soap' if kind=='soap' else 'Snack carton')+' v'+str(variant),(x,y+.13,z),(.19,.26,.135),c,0)
-    depth=.085 if kind in ('bag','bottle','drink','wash','can','roll') else .069
-    panel('Package colour label',[(x-.049,y+.08,z+depth),(x+.049,y+.08,z+depth),(x+.049,y+.19,z+depth),(x-.049,y+.19,z+depth)],'F1EAD5')
-    mesh('Printed product icon',[(x-.029,y+.11,z+depth+.001),(x+.029,y+.11,z+depth+.001),(x+.016,y+.164,z+depth+.001),(x-.018,y+.157,z+depth+.001)],[(0,1,2,3)],COLORS[(index+3)%8])
-    count=0
-    for o in k.CURRENT['objects'][start:]:o.data.calc_loop_triangles();count+=len(o.data.loop_triangles)
-    assert count<=60,(kind,count)
-    PACKAGE_STATS[kind+'_'+str(variant)]=count
+from revision2 import package, PACKAGE_STATS
 
 
 def tiles():
@@ -125,6 +99,8 @@ def revise():
     for j in range(9):cube('Coral mat stitch',(-.50+j*.125,.16,0),(.009,.004,.42),'EAA587',0)
     finishing_details()
     window_sky()
+    from revision2 import revise as revise_r2
+    revise_r2()
     r.sync_instances()
     (k.OUT/'product-budget.json').write_text(json.dumps({'per_variant_triangles':PACKAGE_STATS,'max_triangles':max(PACKAGE_STATS.values()),'limit':60,'runtime':'merged into each fixture mesh; no product nodes'},indent=2)+'\n')
 
@@ -144,4 +120,7 @@ def manifest():
     r.lighting(d,'E5B78E',ambient='C5B9AF',sun='FFE0C6',energy=1.22,lamps=[{'position':[-2.27,1.48,-1.06],'color':'DAF0FF','energy':.60,'range':1.7},{'position':[-2.56,1.94,2.04],'color':'FFDB99','energy':.65,'range':1.15},{'position':[-2.56,1.94,.04],'color':'FFDB99','energy':.65,'range':1.15}])
     d['lighting']['sun_position']=[6,9,4];d['review_lighting']['sun_position']=[6,9,4];d['camera']={'position':[10,10,12],'target':[0,1.08,.15],'size':10.2}
     from convenience_bench import bench
-    bench(d);p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)
+    bench(d)
+    from revision2 import manifest as manifest_r2
+    manifest_r2(d)
+    p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)

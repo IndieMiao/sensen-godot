@@ -3,6 +3,8 @@ from pathlib import Path
 import sys,math,random
 sys.path.insert(0,str(Path(__file__).resolve().parent/'source/coffee_shop'))
 import kit as k
+from liubei_r2 import enable_lettering
+enable_lettering()
 import storefront as s
 from kit import begin,cube,cylinder,tube,ellipsoid,lathe,leaf
 
@@ -50,7 +52,7 @@ def aisle(name,at,daily=False):
 
 def geometry():
     k.PALETTE.update({'oak':'BF915D','oak_light':'D7AA70','sage':'8FAB9A','porcelain':'F0E4CF','leaf':'628C42','leaf_light':'8DAE55'})
-    s.shell(wall='E9D9C4',accent='A3BCAF',floor='E5D4BA',rectangular=True)
+    s.shell(wall='E9D3C8',accent='A3BCAF',floor='E5D4BA',rectangular=True)
     for i,o in enumerate(k.KITS['floor']['objects']):
         if 'Rounded ceramic' in o.name and i%4==0:o.data.materials.clear();o.data.materials.append(k.material('BAC6AD'))
     begin('entrance_frame',at=(-2.90,.07,1.05),yaw=90)

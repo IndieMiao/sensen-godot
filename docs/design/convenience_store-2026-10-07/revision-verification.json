@@ -1,10 +1,10 @@
 {
-  "revision": "r1",
+  "revision": "r2",
   "reference_sha256": "cb193c5a017295d6773cb6c2859a8fbd5660fdf14943518aa3f2a43139f93615",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "draw_calls": 24.0,
-    "instances": 45,
+    "draw_calls": 27.0,
+    "instances": 47,
     "renderer": "mobile",
     "resolution": [
       1400,
@@ -12,48 +12,58 @@
     ],
     "scope": "offline art render; no mobile/gameplay/performance acceptance",
     "slug": "convenience_store",
-    "static_surfaces": 28,
+    "static_surfaces": 30,
     "views": [
       {
-        "draw_calls": 30.0,
-        "rendered_objects": 30.0,
+        "draw_calls": 32.0,
+        "rendered_objects": 32.0,
         "view": "godot-whole"
       },
       {
-        "draw_calls": 30.0,
-        "rendered_objects": 30.0,
+        "draw_calls": 32.0,
+        "rendered_objects": 32.0,
         "view": "model-front"
       },
       {
-        "draw_calls": 30.0,
-        "rendered_objects": 30.0,
+        "draw_calls": 32.0,
+        "rendered_objects": 32.0,
         "view": "model-side"
       },
       {
-        "draw_calls": 30.0,
-        "rendered_objects": 30.0,
+        "draw_calls": 32.0,
+        "rendered_objects": 32.0,
         "view": "model-top"
       },
       {
-        "draw_calls": 22.0,
-        "rendered_objects": 22.0,
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
         "view": "godot-detail"
       },
       {
-        "draw_calls": 24.0,
-        "rendered_objects": 24.0,
+        "draw_calls": 26.0,
+        "rendered_objects": 26.0,
         "view": "godot-detail-plants"
+      },
+      {
+        "draw_calls": 30.0,
+        "rendered_objects": 30.0,
+        "view": "signs-stock-detail"
+      },
+      {
+        "draw_calls": 27.0,
+        "rendered_objects": 27.0,
+        "view": "groceries-detail"
       }
     ]
   },
   "budget": {
     "after": {
-      "room_triangles": 77005,
+      "room_triangles": 84486,
       "shared_plant_triangles": 24168,
       "room_botanical_triangles": 4944,
       "plant_triangles": 29112,
-      "total_triangles": 101173,
-      "static_surfaces": 28
+      "total_triangles": 108654,
+      "static_surfaces": 30
     },
     "limits": {
       "total_triangles": 200000,
@@ -72,7 +82,7 @@
           "entrance_sconce",
           "entrance_sconce_2"
         ],
-        "triangles": 4338,
+        "triangles": 6132,
         "cast_shadow": true
       },
       {
@@ -97,7 +107,7 @@
           "checkout_small_goods",
           "microwave"
         ],
-        "triangles": 2154,
+        "triangles": 3895,
         "cast_shadow": true
       },
       {
@@ -170,6 +180,7 @@
       "assets/rooms/convenience_store/checkout_flowers.glb",
       "assets/rooms/convenience_store/checkout_small_goods.glb",
       "assets/rooms/convenience_store/chiller_glass.glb",
+      "assets/rooms/convenience_store/cold_light_strips.glb",
       "assets/rooms/convenience_store/convenience_sign.glb",
       "assets/rooms/convenience_store/corner_pier.glb",
       "assets/rooms/convenience_store/drink_cabinet.glb",

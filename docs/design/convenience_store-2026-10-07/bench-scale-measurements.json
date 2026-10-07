@@ -4,11 +4,8 @@
 	"capsule_radius": 0.21,
 	"measurements": {
 		"chair": {
-			"baseline_ratio": 0.392438998867948,
-			"difference": 0.0,
-			"height": 0.685,
-			"ratio_to_H": 0.392438998867948,
-			"reason": "No seating in this shop reference; baseline placeholder only."
+			"applicable": false,
+			"reason": "No chair is present in this reference/shop."
 		},
 		"counter": {
 			"baseline_ratio": 0.660271454299722,
