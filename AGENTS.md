@@ -11,6 +11,25 @@
   Keep technical constraints and current data-preservation rules when relevant;
   design cleanup does not itself authorize a release, migration or save reset.
 
+- Locked UI decisions adopted on 2026-10-07: before changing any UI design,
+  Figma component, generator script or UI implementation, read Plane card
+  SGODOT-197 "拍板组件清单 Locked Components". Locked items keep their structure,
+  semantic role, primary action, visual weight, entry point and key copy;
+  refactors may only unify tokens (colors, type sizes, radius, spacing, touch
+  targets, copy format). Changing a locked attribute requires an explicit user
+  decision recorded as a 复议 comment on that card and in gameplay-plan-v2 §1.5;
+  never "normalize" a locked component silently. Treat unapproved deviations as
+  P0 regressions. Locked items: Energy card, NEED-TILE (gaps on buttons), main
+  action key, action radial, quick bar, pin state, two-row HUD and location
+  chip, tap-triggered facilities, no auto-jumps, STATE-ICONS, bag drawer,
+  Bag | Gear, parcels and Inbox tabs, counter + bag drawer, outpost keeper
+  greeting and keeper bar, unattended Homestead Stall, resident dialogue bar,
+  one space per outpost role, cooking panel v5, per-floor mine costs and labels,
+  full-screen Profile, English-only UI copy, P0 reuse of old art and feel.
+  Unless explicitly specified, do not reference the Figma Legacy page (formerly
+  "Approved / App UI") and keep to portrait only (multi-size adaptation is
+  postponed).
+
 - Art asset workflow adopted on 2026-10-06: before creating or substantially
   revising Blender/Godot 3D art, read `docs/design/mobile-3d-asset-workflow.md`.
   On a new or unverified environment, first read
