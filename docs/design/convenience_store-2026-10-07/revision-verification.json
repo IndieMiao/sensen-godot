@@ -1,0 +1,198 @@
+{
+  "revision": "r1",
+  "reference_sha256": "cb193c5a017295d6773cb6c2859a8fbd5660fdf14943518aa3f2a43139f93615",
+  "renderer": {
+    "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "draw_calls": 24.0,
+    "instances": 45,
+    "renderer": "mobile",
+    "resolution": [
+      1400,
+      1400
+    ],
+    "scope": "offline art render; no mobile/gameplay/performance acceptance",
+    "slug": "convenience_store",
+    "static_surfaces": 28,
+    "views": [
+      {
+        "draw_calls": 30.0,
+        "rendered_objects": 30.0,
+        "view": "godot-whole"
+      },
+      {
+        "draw_calls": 30.0,
+        "rendered_objects": 30.0,
+        "view": "model-front"
+      },
+      {
+        "draw_calls": 30.0,
+        "rendered_objects": 30.0,
+        "view": "model-side"
+      },
+      {
+        "draw_calls": 30.0,
+        "rendered_objects": 30.0,
+        "view": "model-top"
+      },
+      {
+        "draw_calls": 22.0,
+        "rendered_objects": 22.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 24.0,
+        "rendered_objects": 24.0,
+        "view": "godot-detail-plants"
+      }
+    ]
+  },
+  "budget": {
+    "after": {
+      "room_triangles": 77005,
+      "shared_plant_triangles": 24168,
+      "room_botanical_triangles": 4944,
+      "plant_triangles": 29112,
+      "total_triangles": 101173,
+      "static_surfaces": 28
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/convenience_store/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "entrance_frame",
+          "entrance_awning",
+          "convenience_sign",
+          "entrance_sconce",
+          "entrance_sconce_2"
+        ],
+        "triangles": 4338,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/convenience_store/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "entrance_glass",
+          "chiller_glass",
+          "freezer_glass",
+          "chiller_glass_1"
+        ],
+        "triangles": 48,
+        "cast_shadow": false
+      },
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/convenience_store/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "drinks_header",
+          "checkout_small_goods",
+          "microwave"
+        ],
+        "triangles": 2154,
+        "cast_shadow": true
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/convenience_store/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "checkout_flowers"
+        ],
+        "triangles": 4596,
+        "cast_shadow": false
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/convenience_store/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "EntranceMonstera"
+        ],
+        "triangles": 1210,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/convenience_store/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "HighPothos"
+        ],
+        "triangles": 2048,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/convenience_store/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "IslandPothos",
+          "IslandHangingPothos",
+          "FlowerBox00",
+          "FlowerBox01",
+          "FlowerBox02",
+          "FlowerBox03",
+          "FlowerBox04",
+          "FlowerBox05",
+          "FlowerBox06"
+        ],
+        "triangles": 20910,
+        "cast_shadow": false
+      }
+    ]
+  },
+  "glb_checks": {
+    "passed": true,
+    "single_surface_no_embedded_images": true,
+    "files": [
+      "assets/rooms/_shared/plants/flower_shrub.glb",
+      "assets/rooms/_shared/plants/monstera_woven.glb",
+      "assets/rooms/_shared/plants/pothos.glb",
+      "assets/rooms/convenience_store/back_wall.glb",
+      "assets/rooms/convenience_store/basket_stack.glb",
+      "assets/rooms/convenience_store/batches/review_back_dressing.glb",
+      "assets/rooms/convenience_store/batches/review_back_plants.glb",
+      "assets/rooms/convenience_store/batches/review_botanical.glb",
+      "assets/rooms/convenience_store/batches/review_front_dressing.glb",
+      "assets/rooms/convenience_store/batches/review_front_plants.glb",
+      "assets/rooms/convenience_store/batches/review_glass.glb",
+      "assets/rooms/convenience_store/batches/review_large_plants.glb",
+      "assets/rooms/convenience_store/checkout.glb",
+      "assets/rooms/convenience_store/checkout_flowers.glb",
+      "assets/rooms/convenience_store/checkout_small_goods.glb",
+      "assets/rooms/convenience_store/chiller_glass.glb",
+      "assets/rooms/convenience_store/convenience_sign.glb",
+      "assets/rooms/convenience_store/corner_pier.glb",
+      "assets/rooms/convenience_store/drink_cabinet.glb",
+      "assets/rooms/convenience_store/drinks_header.glb",
+      "assets/rooms/convenience_store/entrance_awning.glb",
+      "assets/rooms/convenience_store/entrance_frame.glb",
+      "assets/rooms/convenience_store/entrance_glass.glb",
+      "assets/rooms/convenience_store/entrance_sconce.glb",
+      "assets/rooms/convenience_store/entrance_sky.glb",
+      "assets/rooms/convenience_store/entry_step.glb",
+      "assets/rooms/convenience_store/essentials_aisle.glb",
+      "assets/rooms/convenience_store/essentials_wall_rack.glb",
+      "assets/rooms/convenience_store/floor.glb",
+      "assets/rooms/convenience_store/freezer_glass.glb",
+      "assets/rooms/convenience_store/front_wall_left.glb",
+      "assets/rooms/convenience_store/front_wall_right.glb",
+      "assets/rooms/convenience_store/ice_cream_freezer.glb",
+      "assets/rooms/convenience_store/left_door_wall.glb",
+      "assets/rooms/convenience_store/microwave.glb",
+      "assets/rooms/convenience_store/produce_aisle.glb",
+      "assets/rooms/convenience_store/side_low_wall.glb",
+      "assets/rooms/convenience_store/snacks_wall_rack.glb"
+    ]
+  },
+  "visual_acceptance": "Pending art director Review; metrics do not establish reference fidelity."
+}

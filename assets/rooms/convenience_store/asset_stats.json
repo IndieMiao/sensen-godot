@@ -6,43 +6,43 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3601910
+    "bytes": 3674797
   },
   "assets": [
     {
       "name": "floor",
-      "vertices": 9952,
-      "triangles": 19196,
+      "vertices": 8368,
+      "triangles": 15764,
       "surfaces": 1,
-      "bytes": 471116
+      "bytes": 641404
     },
     {
       "name": "back_wall",
-      "vertices": 4592,
-      "triangles": 8856,
+      "vertices": 3808,
+      "triangles": 7344,
       "surfaces": 1,
-      "bytes": 286456
+      "bytes": 254344
     },
     {
       "name": "left_door_wall",
-      "vertices": 3976,
-      "triangles": 7668,
+      "vertices": 3080,
+      "triangles": 5940,
       "surfaces": 1,
-      "bytes": 201000
+      "bytes": 205992
     },
     {
       "name": "front_wall_left",
       "vertices": 616,
       "triangles": 1188,
       "surfaces": 1,
-      "bytes": 36880
+      "bytes": 42260
     },
     {
       "name": "front_wall_right",
       "vertices": 504,
       "triangles": 972,
       "surfaces": 1,
-      "bytes": 30496
+      "bytes": 34852
     },
     {
       "name": "side_low_wall",
@@ -56,21 +56,21 @@
       "vertices": 168,
       "triangles": 324,
       "surfaces": 1,
-      "bytes": 14068
+      "bytes": 12532
     },
     {
       "name": "entry_step",
-      "vertices": 112,
-      "triangles": 216,
+      "vertices": 240,
+      "triangles": 432,
       "surfaces": 1,
-      "bytes": 9064
+      "bytes": 20092
     },
     {
       "name": "entrance_frame",
       "vertices": 647,
       "triangles": 990,
       "surfaces": 1,
-      "bytes": 37628
+      "bytes": 42556
     },
     {
       "name": "entrance_glass",
@@ -84,21 +84,21 @@
       "vertices": 932,
       "triangles": 1792,
       "surfaces": 1,
-      "bytes": 48108
+      "bytes": 64364
     },
     {
       "name": "convenience_sign",
       "vertices": 724,
       "triangles": 788,
       "surfaces": 1,
-      "bytes": 41512
+      "bytes": 41640
     },
     {
       "name": "drink_cabinet",
-      "vertices": 3108,
-      "triangles": 5964,
+      "vertices": 1594,
+      "triangles": 2808,
       "surfaces": 1,
-      "bytes": 145588
+      "bytes": 117308
     },
     {
       "name": "chiller_glass",
@@ -109,52 +109,52 @@
     },
     {
       "name": "drinks_header",
-      "vertices": 536,
-      "triangles": 624,
+      "vertices": 556,
+      "triangles": 654,
       "surfaces": 1,
-      "bytes": 31748
+      "bytes": 33340
     },
     {
       "name": "snacks_wall_rack",
-      "vertices": 5848,
-      "triangles": 10740,
+      "vertices": 1476,
+      "triangles": 1918,
       "surfaces": 1,
-      "bytes": 314008
+      "bytes": 92880
     },
     {
       "name": "essentials_wall_rack",
-      "vertices": 4588,
-      "triangles": 8012,
+      "vertices": 1930,
+      "triangles": 2562,
       "surfaces": 1,
-      "bytes": 232048
+      "bytes": 126576
     },
     {
       "name": "checkout",
-      "vertices": 4148,
-      "triangles": 7808,
+      "vertices": 1392,
+      "triangles": 2652,
       "surfaces": 1,
-      "bytes": 197984
+      "bytes": 94340
     },
     {
       "name": "produce_aisle",
-      "vertices": 6318,
-      "triangles": 12088,
+      "vertices": 2524,
+      "triangles": 4402,
       "surfaces": 1,
-      "bytes": 326784
+      "bytes": 163676
     },
     {
       "name": "essentials_aisle",
-      "vertices": 4382,
-      "triangles": 8420,
+      "vertices": 1372,
+      "triangles": 2204,
       "surfaces": 1,
-      "bytes": 213644
+      "bytes": 102296
     },
     {
       "name": "ice_cream_freezer",
       "vertices": 1491,
       "triangles": 2851,
       "surfaces": 1,
-      "bytes": 88976
+      "bytes": 100112
     },
     {
       "name": "freezer_glass",
@@ -168,48 +168,152 @@
       "vertices": 4096,
       "triangles": 7896,
       "surfaces": 1,
-      "bytes": 181864
-    },
-    {
-      "name": "entrance_plant",
-      "vertices": 571,
-      "triangles": 1078,
-      "surfaces": 1,
-      "bytes": 29812
-    },
-    {
-      "name": "trailing_plant",
-      "vertices": 1514,
-      "triangles": 2868,
-      "surfaces": 1,
-      "bytes": 69348
-    },
-    {
-      "name": "front_flowers",
-      "vertices": 2500,
-      "triangles": 4728,
-      "surfaces": 1,
-      "bytes": 111272
-    },
-    {
-      "name": "side_leaves",
-      "vertices": 3296,
-      "triangles": 6232,
-      "surfaces": 1,
-      "bytes": 145768
+      "bytes": 275048
     },
     {
       "name": "entrance_sconce",
       "vertices": 200,
       "triangles": 384,
       "surfaces": 1,
-      "bytes": 13928
+      "bytes": 15976
+    },
+    {
+      "name": "checkout_small_goods",
+      "vertices": 920,
+      "triangles": 1104,
+      "surfaces": 1,
+      "bytes": 55704
+    },
+    {
+      "name": "microwave",
+      "vertices": 208,
+      "triangles": 396,
+      "surfaces": 1,
+      "bytes": 16016
+    },
+    {
+      "name": "checkout_flowers",
+      "vertices": 2480,
+      "triangles": 4596,
+      "surfaces": 1,
+      "bytes": 127364
+    },
+    {
+      "name": "entrance_sky",
+      "vertices": 190,
+      "triangles": 348,
+      "surfaces": 1,
+      "bytes": 11844
     }
   ],
-  "unique_triangles": 124203,
-  "scene_triangles": 141855,
-  "static_draw_surfaces": 36,
+  "unique_triangles": 72829,
+  "scene_triangles": 77005,
+  "static_draw_surfaces": 34,
   "unique_assets": 28,
-  "placed_instances": 36,
-  "glb_bytes": 3372628
+  "placed_instances": 34,
+  "glb_bytes": 2786044,
+  "scene_budget": {
+    "after": {
+      "room_triangles": 77005,
+      "shared_plant_triangles": 24168,
+      "room_botanical_triangles": 4944,
+      "plant_triangles": 29112,
+      "total_triangles": 101173,
+      "static_surfaces": 28
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/convenience_store/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "entrance_frame",
+          "entrance_awning",
+          "convenience_sign",
+          "entrance_sconce",
+          "entrance_sconce_2"
+        ],
+        "triangles": 4338,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/convenience_store/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "entrance_glass",
+          "chiller_glass",
+          "freezer_glass",
+          "chiller_glass_1"
+        ],
+        "triangles": 48,
+        "cast_shadow": false
+      },
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/convenience_store/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "drinks_header",
+          "checkout_small_goods",
+          "microwave"
+        ],
+        "triangles": 2154,
+        "cast_shadow": true
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/convenience_store/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "checkout_flowers"
+        ],
+        "triangles": 4596,
+        "cast_shadow": false
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/convenience_store/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "EntranceMonstera"
+        ],
+        "triangles": 1210,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/convenience_store/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "HighPothos"
+        ],
+        "triangles": 2048,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/convenience_store/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "IslandPothos",
+          "IslandHangingPothos",
+          "FlowerBox00",
+          "FlowerBox01",
+          "FlowerBox02",
+          "FlowerBox03",
+          "FlowerBox04",
+          "FlowerBox05",
+          "FlowerBox06"
+        ],
+        "triangles": 20910,
+        "cast_shadow": false
+      }
+    ]
+  }
 }

@@ -7,22 +7,8 @@ import storefront as s
 from kit import begin,cube,cylinder,tube,ellipsoid,lathe,leaf
 
 COLORS=['D99273','87AAA0','E6BE74','98B9C6','D6A7AB','93A17A']
-def package(at,index=0,kind='bag'):
-    x,y,z=at;c=COLORS[index%len(COLORS)]
-    if kind=='bottle':s.bottle(at,c,.28);return
-    if kind=='roll':
-        lathe('Paper roll',at,[(0,.095),(.25,.095),(.25,.035),(0,.035)],'porcelain',16)
-        cube('Roll band',(x,y+.12,z+.095),(.10,.085,.008),c,.01);return
-    if kind=='can':
-        cylinder('Pantry tin',(x,y+.12,z),.085,.24,c,vertices=16)
-        for h in (.014,.233):cylinder('Tin rim',(x,y+h,z),.09,.018,'porcelain',vertices=16)
-    else:
-        cube('Snack packet' if kind=='bag' else 'Grocery carton',(x,y+.15,z),(.21,.30,.13),c,.044 if kind=='bag' else .015)
-        if kind=='bag':
-            for h in (.023,.278):cube('Packet sealed edge',(x,y+h,z),(.22,.022,.075),c,.007)
-    cube('Product label',(x,y+.14,z+.08),(.12,.115,.009),'porcelain',.015)
-    # Tiny packaging uses a simple icon rather than unresolvable invented text.
-    leaf('Package leaf icon',(x-.025,y+.115,z+.09),(x+.03,y+.19,z+.09),.033,'leaf')
+sys.path.insert(0,str(Path(__file__).resolve().parent/'source/convenience_store'))
+from revision import package
 
 def stock_rack(name,at,title,daily=False):
     begin(name,at=at,collision=[{'at':[0,.78,0],'size':[2.28,1.56,.49]}])
@@ -31,7 +17,9 @@ def stock_rack(name,at,title,daily=False):
     for row in range(3):
         y=.045+row*.47
         cube('Retail shelf',(0,y,.10),(2.25,.065,.52),'oak_light',.022,'wood')
-        for j in range(8):package((-.94+j*.267,y+.036,.12),j+row,(['roll','bottle','box'][(j+row)%3] if daily else ['bag','can','box'][(row+j//3)%3]))
+        for j in range(8):
+            if (j+row*3)%11==4:continue
+            package((-.94+j*.267,y+.036,.12),j+row,(['roll','wash','soap'][(j+row)%3] if daily else ['bag','can','box'][(row+j//3)%3]))
     cube('Mint category frame',(0,1.69,.06),(2.34,.44,.13),'83A69A',.075)
     cube('Deep green category sign',(0,1.69,.14),(2.18,.32,.035),'496F60',.047)
     k.text_label(title,(0,1.64,.168),.16 if not daily else .13,'porcelain')
@@ -83,7 +71,7 @@ def geometry():
     for row in range(5):
         y=.25+row*.355
         cube('Chiller shelf',(0,y,.08),(.65,.036,.46),'porcelain',.01)
-        for j in range(3):s.bottle((-.20+j*.20,y+.02,.07),COLORS[(j+row)%6],.27)
+        for j in range(3):package((-.20+j*.20,y+.02,.07),j+row,'drink')
     for x in (-.306,.306):cube('Glass door trim',(x,1.23,.329),(.034,1.98,.045),'AEC6AF',.011)
     for y in (.245,2.21):cube('Glass door trim',(0,y,.329),(.64,.036,.045),'AEC6AF',.010)
     cube('Chiller handle',(.256,1.20,.38),(.029,.38,.038),'oak_light',.012)
@@ -141,10 +129,16 @@ def geometry():
     cube('Lamp backplate',(0,0,0),(.14,.39,.035),'brass',.025)
     lathe('Warm opal lantern',(0,-.17,.095),[(0,.066),(.045,.093),(.30,.093),(.35,.066)],'FFF0BA',16)
     for y in (-.18,.17):cylinder('Lantern cap',(0,y,.095),.105,.045,'brass',vertices=20)
+    import revision
+    revision.revise()
     k.save('545:2958',{'position':[10,9.2,12],'target':[0,1.12,.04],'size':9.5})
+    revision.manifest()
 
 if __name__=='__main__':
     k.configure('convenience_store');args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
     if '--bake-only' in args:k.load()
     else:geometry()
-    if '--geometry-only' not in args:k.bake_and_export()
+    if '--geometry-only' not in args:k.bake_and_export(ao_strength=.45,ao_distance=.36,coherent_swatches=True)
+    if '--geometry-only' not in args:
+        from series_batch import build
+        build('convenience_store')

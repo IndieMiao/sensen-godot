@@ -1,0 +1,38 @@
+[
+  {
+    "name": "mint entrance pier",
+    "surface": "Forward-facing mint section of left front entrance pier under cream cap",
+    "reference_pixel": [
+      265,
+      978
+    ],
+    "runtime_pixel": [
+      369,
+      856
+    ]
+  },
+  {
+    "name": "cream wall block",
+    "surface": "Cream left wall block between outside edge and entrance door",
+    "reference_pixel": [
+      70,
+      550
+    ],
+    "runtime_pixel": [
+      177,
+      622
+    ]
+  },
+  {
+    "name": "coral entrance mat",
+    "surface": "Lit top of coral mat at the open front entrance",
+    "reference_pixel": [
+      484,
+      1060
+    ],
+    "runtime_pixel": [
+      476,
+      986
+    ]
+  }
+]

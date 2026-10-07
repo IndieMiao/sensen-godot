@@ -81,6 +81,12 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 		applied.roughness = settings.get("roughness", applied.roughness)
 		applied.metallic = settings.get("metallic", applied.metallic)
 		if settings.has("alpha"): applied.albedo_color.a = settings.alpha
+		if settings.has("emission"):
+			applied.emission_enabled = true
+			if settings.get("emission_use_atlas", false): applied.emission_texture = applied.albedo_texture
+			applied.emission = Color(settings.emission)
+			applied.emission_energy_multiplier = float(settings.get("emission_energy", 1.0))
+			_disable_shadows(model)
 		if settings.get("unshaded", false):
 			applied.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			_disable_shadows(model)

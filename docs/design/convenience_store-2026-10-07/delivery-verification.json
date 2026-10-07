@@ -1,0 +1,108 @@
+{
+  "revision": "R1",
+  "plane": {
+    "attachments": 14,
+    "all_download_sha256_match": true,
+    "files": [
+      {
+        "name": "SGODOT-183_R1_01-reference-comparison.png",
+        "bytes": 2280430,
+        "sha256": "0eb5dedfef576d9ee55775e560ebee61bae2fee9d39d0d8c53b853030b1ea163"
+      },
+      {
+        "name": "SGODOT-183_R1_02-whole.png",
+        "bytes": 1153479,
+        "sha256": "e8d4369b1d3bef73e7f5c1d434b996104ca55f88bb20b3a42f2e66876f020e2d"
+      },
+      {
+        "name": "SGODOT-183_R1_03-counter-detail.png",
+        "bytes": 1756409,
+        "sha256": "734e19d3649225f507d748155f403458d5f902e6b5afd559f6af0eaf728d0087"
+      },
+      {
+        "name": "SGODOT-183_R1_04-plants-detail.png",
+        "bytes": 1798696,
+        "sha256": "4686e1125ad530bb69bdaa752b3c5b0734b9d8744c6940821c9f2f58296aaa05"
+      },
+      {
+        "name": "SGODOT-183_R1_05-orthographic.png",
+        "bytes": 658165,
+        "sha256": "159139a0bd0b69256e0fc1883439c1e18815c36c0a41d5469c9d8f4cb681d586"
+      },
+      {
+        "name": "SGODOT-183_R1_06-bench-spawn.png",
+        "bytes": 853670,
+        "sha256": "86cd1fac24e5f9d36bc9ec0e361a11ad1ff783311e193fb02dae7b49976c2783"
+      },
+      {
+        "name": "SGODOT-183_R1_07-bench-counter.png",
+        "bytes": 853450,
+        "sha256": "81b2cabf379befd22ee9c797750f2f12f0a4150a5e288709da826780638df382"
+      },
+      {
+        "name": "SGODOT-183_R1_08-bench-entrance.png",
+        "bytes": 853601,
+        "sha256": "52889188cfbce035b2f3e713f8a6aefc528f5d1ef436258880d795a0b834900b"
+      },
+      {
+        "name": "SGODOT-183_R1_09-collisions.png",
+        "bytes": 946644,
+        "sha256": "342ca92459d1fad056ff5a9625ecda6664d969e91f24f33d491c1a72fe05417f"
+      },
+      {
+        "name": "SGODOT-183_R1_10-walkthrough.mp4",
+        "bytes": 489043,
+        "sha256": "e321dcb26e2551628a98d922d88ffdc8ab54dfae29705985e278b61846a2232e"
+      },
+      {
+        "name": "SGODOT-183_R1_11-bench-result.json",
+        "bytes": 16923,
+        "sha256": "a638b4b920a76d20fa00d7344520ef8f58927f76b50ff36e693a4336cd172464"
+      },
+      {
+        "name": "SGODOT-183_R1_13-colour-patches.jpg",
+        "bytes": 457706,
+        "sha256": "892a10d0c677833a9860c40f6503dac42999c7759a18b182ea1b4bbdb3206ae8"
+      },
+      {
+        "name": "SGODOT-183_R1_14-plant-catalogue.jpg",
+        "bytes": 277449,
+        "sha256": "b94b2ed30db9a3a4b7b542b51e56ad9b113102620f102fbae34606757a4ab257"
+      },
+      {
+        "name": "SGODOT-183_R1_15-budget-verification.json",
+        "bytes": 6428,
+        "sha256": "09cc5ca3647089147a271b5775cc2738fe20884a88a80ed3b98530e5625cb10d"
+      }
+    ]
+  },
+  "lark": {
+    "messages": 4,
+    "media": [
+      {
+        "name": "whole",
+        "sha256": "e8d4369b1d3bef73e7f5c1d434b996104ca55f88bb20b3a42f2e66876f020e2d",
+        "byte_identical": true
+      },
+      {
+        "name": "comparison",
+        "sha256": "0eb5dedfef576d9ee55775e560ebee61bae2fee9d39d0d8c53b853030b1ea163",
+        "byte_identical": true
+      },
+      {
+        "name": "video",
+        "sha256": "e321dcb26e2551628a98d922d88ffdc8ab54dfae29705985e278b61846a2232e",
+        "byte_identical": true
+      }
+    ],
+    "recipient": "previously verified self DM"
+  },
+  "video": {
+    "black_frames": 0,
+    "sample_count": 8,
+    "motion_max_mean_pixel_delta": 1.5751379243827162,
+    "duration_seconds": 15,
+    "accelerated": false,
+    "sha256": "e321dcb26e2551628a98d922d88ffdc8ab54dfae29705985e278b61846a2232e"
+  }
+}

@@ -19,12 +19,12 @@
         {
           "at": [
             0,
-            -0.09,
+            -0.08,
             0
           ],
           "size": [
             6.1,
-            0.22,
+            0.26,
             5.6
           ]
         }
@@ -151,12 +151,12 @@
         {
           "at": [
             0,
-            0.32,
+            0.38,
             0
           ],
           "size": [
             5.28,
-            0.64,
+            0.76,
             0.3
           ]
         }
@@ -199,13 +199,60 @@
         {
           "at": [
             0,
-            0.025,
-            0.05
+            0,
+            0
           ],
-          "size": [
-            2.06,
-            0.17,
-            0.5
+          "points": [
+            [
+              -1.03,
+              -0.19,
+              -0.4
+            ],
+            [
+              -1.03,
+              0.211,
+              -0.4
+            ],
+            [
+              -1.03,
+              0.211,
+              0.21
+            ],
+            [
+              -1.03,
+              -0.02,
+              0.7
+            ],
+            [
+              -1.03,
+              -0.19,
+              0.7
+            ],
+            [
+              1.03,
+              -0.19,
+              -0.4
+            ],
+            [
+              1.03,
+              0.211,
+              -0.4
+            ],
+            [
+              1.03,
+              0.211,
+              0.21
+            ],
+            [
+              1.03,
+              -0.02,
+              0.7
+            ],
+            [
+              1.03,
+              -0.19,
+              0.7
+            ]
           ]
         }
       ]
@@ -260,7 +307,7 @@
       "position": [
         -2.68,
         0.065,
-        -0.55
+        -0.72
       ],
       "yaw_degrees": 90,
       "colliders": [
@@ -284,7 +331,7 @@
       "position": [
         -2.68,
         0.065,
-        -0.55
+        -0.72
       ],
       "yaw_degrees": 90,
       "colliders": []
@@ -376,9 +423,9 @@
       "name": "produce_aisle",
       "file": "produce_aisle.glb",
       "position": [
-        -1.18,
+        -1.19,
         0.07,
-        0.48
+        0.25
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -400,11 +447,11 @@
       "name": "essentials_aisle",
       "file": "essentials_aisle.glb",
       "position": [
-        1.05,
+        1.45,
         0.07,
-        1.35
+        1.19
       ],
-      "yaw_degrees": 0,
+      "yaw_degrees": 90,
       "colliders": [
         {
           "at": [
@@ -459,9 +506,9 @@
       "name": "basket_stack",
       "file": "basket_stack.glb",
       "position": [
-        2.57,
+        2.56,
         0.07,
-        -0.18
+        0.06
       ],
       "yaw_degrees": 0,
       "colliders": [
@@ -480,56 +527,56 @@
       ]
     },
     {
-      "name": "entrance_plant",
-      "file": "entrance_plant.glb",
-      "position": [
-        -2.25,
-        0.07,
-        0.01
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "trailing_plant",
-      "file": "trailing_plant.glb",
-      "position": [
-        2.56,
-        2.56,
-        -2.23
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "front_flowers",
-      "file": "front_flowers.glb",
-      "position": [
-        -2.14,
-        0.79,
-        2.68
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "side_leaves",
-      "file": "side_leaves.glb",
-      "position": [
-        3,
-        0.79,
-        1.28
-      ],
-      "yaw_degrees": 90,
-      "colliders": []
-    },
-    {
       "name": "entrance_sconce",
       "file": "entrance_sconce.glb",
       "position": [
         -2.8,
         1.93,
         2.06
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "checkout_small_goods",
+      "file": "checkout_small_goods.glb",
+      "position": [
+        -0.37,
+        1.17,
+        -1.42
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "microwave",
+      "file": "microwave.glb",
+      "position": [
+        0.9,
+        1.17,
+        -1.65
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "checkout_flowers",
+      "file": "checkout_flowers.glb",
+      "position": [
+        -0.37,
+        0.06,
+        -1.42
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "entrance_sky",
+      "file": "entrance_sky.glb",
+      "position": [
+        -3.2,
+        0.07,
+        1.05
       ],
       "yaw_degrees": 90,
       "colliders": []
@@ -572,17 +619,7 @@
       "position": [
         -2.68,
         0.065,
-        -1.27
-      ],
-      "yaw_degrees": 90
-    },
-    {
-      "name": "drink_cabinet_2",
-      "asset": "drink_cabinet",
-      "position": [
-        -2.68,
-        0.065,
-        -1.99
+        -1.48
       ],
       "yaw_degrees": 90
     },
@@ -592,42 +629,857 @@
       "position": [
         -2.68,
         0.065,
-        -1.27
+        -1.48
       ],
       "yaw_degrees": 90
     },
     {
-      "name": "chiller_glass_2",
-      "asset": "chiller_glass",
+      "name": "entrance_sconce_2",
+      "asset": "entrance_sconce",
       "position": [
-        -2.68,
-        0.065,
-        -1.99
+        -2.8,
+        1.93,
+        0.06
       ],
       "yaw_degrees": 90
-    },
-    {
-      "name": "front_flowers_right",
-      "asset": "front_flowers",
-      "position": [
-        2.16,
-        0.79,
-        2.68
-      ],
-      "yaw_degrees": 0
     }
   ],
   "camera": {
     "position": [
       10,
-      9.2,
+      10,
       12
     ],
     "target": [
       0,
-      1.12,
-      0.04
+      1.08,
+      0.15
     ],
-    "size": 9.5
-  }
+    "size": 10.2
+  },
+  "revision": "R1",
+  "shared_plants": [
+    {
+      "name": "EntranceMonstera",
+      "asset": "monstera_woven",
+      "file": "res://assets/rooms/_shared/plants/monstera_woven.glb",
+      "position": [
+        -2.21,
+        0.07,
+        -0.03
+      ],
+      "rotation_degrees": [
+        0,
+        25,
+        0
+      ],
+      "scale": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.25,
+            0
+          ],
+          "size": [
+            0.5,
+            0.5,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HighPothos",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        2.62,
+        2.51,
+        -2.26
+      ],
+      "rotation_degrees": [
+        0,
+        10,
+        0
+      ],
+      "scale": [
+        0.82,
+        0.82,
+        0.82
+      ],
+      "colliders": []
+    },
+    {
+      "name": "IslandPothos",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        1.42,
+        1.34,
+        0.33
+      ],
+      "rotation_degrees": [
+        0,
+        45,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ],
+      "colliders": []
+    },
+    {
+      "name": "IslandHangingPothos",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        1.71,
+        0.7,
+        2.01
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.47,
+        0.47,
+        0.47
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox00",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.63,
+        0.75,
+        2.68
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox01",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -1.98,
+        0.75,
+        2.68
+      ],
+      "rotation_degrees": [
+        0,
+        37,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox02",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -1.33,
+        0.75,
+        2.68
+      ],
+      "rotation_degrees": [
+        0,
+        74,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox03",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        1.64,
+        0.75,
+        2.68
+      ],
+      "rotation_degrees": [
+        0,
+        111,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox04",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.3,
+        0.75,
+        2.68
+      ],
+      "rotation_degrees": [
+        0,
+        148,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox05",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        3,
+        0.75,
+        2.14
+      ],
+      "rotation_degrees": [
+        0,
+        185,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox06",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        3,
+        0.75,
+        1.38
+      ],
+      "rotation_degrees": [
+        0,
+        222,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "colliders": []
+    }
+  ],
+  "boundaries": [
+    {
+      "name": "side_arch_limit",
+      "at": [
+        -3.13,
+        1.4,
+        0
+      ],
+      "size": [
+        0.1,
+        3,
+        5.6
+      ]
+    },
+    {
+      "name": "landing_floor",
+      "at": [
+        0.15,
+        -0.245,
+        3.2
+      ],
+      "size": [
+        2.06,
+        0.1,
+        0.8
+      ]
+    },
+    {
+      "name": "landing_front_edge",
+      "at": [
+        0.15,
+        0.5,
+        3.63
+      ],
+      "size": [
+        2.16,
+        1.6,
+        0.1
+      ]
+    },
+    {
+      "name": "landing_left_edge",
+      "at": [
+        -0.93,
+        0.5,
+        3.17
+      ],
+      "size": [
+        0.1,
+        1.6,
+        0.9
+      ]
+    },
+    {
+      "name": "landing_right_edge",
+      "at": [
+        1.23,
+        0.5,
+        3.17
+      ],
+      "size": [
+        0.1,
+        1.6,
+        0.9
+      ]
+    }
+  ],
+  "material_overrides": {
+    "chiller_glass": {
+      "alpha": 0.11
+    },
+    "freezer_glass": {
+      "alpha": 0.16
+    },
+    "entrance_glass": {
+      "alpha": 0.075
+    },
+    "entrance_sky": {
+      "unshaded": true
+    }
+  },
+  "lighting": {
+    "background": "E5B78E",
+    "ambient": "C5B9AF",
+    "ambient_energy": 0.72,
+    "sun_color": "FFE0C6",
+    "sun_energy": 1.22,
+    "sun_position": [
+      6,
+      9,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -0.8
+    ],
+    "angular_distance": 6,
+    "lamps": [
+      {
+        "position": [
+          -2.27,
+          1.48,
+          -1.06
+        ],
+        "color": "DAF0FF",
+        "energy": 0.6,
+        "range": 1.7
+      },
+      {
+        "position": [
+          -2.56,
+          1.94,
+          2.04
+        ],
+        "color": "FFDB99",
+        "energy": 0.65,
+        "range": 1.15
+      },
+      {
+        "position": [
+          -2.56,
+          1.94,
+          0.04
+        ],
+        "color": "FFDB99",
+        "energy": 0.65,
+        "range": 1.15
+      }
+    ]
+  },
+  "review_lighting": {
+    "background": "E5B78E",
+    "ambient_color": "C5B9AF",
+    "ambient": 0.72,
+    "sun_color": "FFE0C6",
+    "sun": 1.22,
+    "sun_position": [
+      6,
+      9,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -0.8
+    ],
+    "points": [
+      {
+        "position": [
+          -2.27,
+          1.48,
+          -1.06
+        ],
+        "color": "DAF0FF",
+        "energy": 0.6,
+        "range": 1.7
+      },
+      {
+        "position": [
+          -2.56,
+          1.94,
+          2.04
+        ],
+        "color": "FFDB99",
+        "energy": 0.65,
+        "range": 1.15
+      },
+      {
+        "position": [
+          -2.56,
+          1.94,
+          0.04
+        ],
+        "color": "FFDB99",
+        "energy": 0.65,
+        "range": 1.15
+      }
+    ]
+  },
+  "spawn": [
+    0.15,
+    0.06,
+    2.14
+  ],
+  "bench": {
+    "floor_y": 0.05,
+    "route": [
+      {
+        "name": "entrance",
+        "position": [
+          0.15,
+          0.06,
+          2.15
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "aisle_between",
+        "position": [
+          0.42,
+          0.06,
+          1.1
+        ]
+      },
+      {
+        "name": "checkout",
+        "position": [
+          0.42,
+          0.06,
+          -0.5
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "refrigerator",
+        "position": [
+          -1.9,
+          0.06,
+          -0.5
+        ]
+      },
+      {
+        "name": "checkout_return",
+        "position": [
+          0.42,
+          0.06,
+          -0.5
+        ]
+      },
+      {
+        "name": "freezer",
+        "position": [
+          2.0,
+          0.06,
+          -0.36
+        ]
+      },
+      {
+        "name": "aisle_return",
+        "position": [
+          0.42,
+          0.06,
+          -0.31
+        ]
+      },
+      {
+        "name": "island_center",
+        "position": [
+          0.42,
+          0.06,
+          1.12
+        ]
+      },
+      {
+        "name": "entrance_return",
+        "position": [
+          0.15,
+          0.06,
+          2.15
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "checkout",
+        "from": [
+          0.3,
+          0.06,
+          -0.5
+        ],
+        "to": [
+          0.3,
+          0.06,
+          -1.5
+        ],
+        "target": "/checkout/"
+      },
+      {
+        "name": "produce_island",
+        "from": [
+          -1.2,
+          0.06,
+          1.2
+        ],
+        "to": [
+          -1.2,
+          0.06,
+          0.2
+        ],
+        "target": "/produce_aisle/"
+      },
+      {
+        "name": "essentials_island",
+        "from": [
+          0.5,
+          0.06,
+          1.2
+        ],
+        "to": [
+          1.45,
+          0.06,
+          1.2
+        ],
+        "target": "/essentials_aisle/"
+      },
+      {
+        "name": "freezer",
+        "from": [
+          2.0,
+          0.06,
+          -0.27
+        ],
+        "to": [
+          2.0,
+          0.06,
+          -1.3
+        ],
+        "target": "/ice_cream_freezer/"
+      },
+      {
+        "name": "fridge",
+        "from": [
+          -1.85,
+          0.06,
+          -0.72
+        ],
+        "to": [
+          -2.8,
+          0.06,
+          -0.72
+        ],
+        "target": "/drink_cabinet/"
+      },
+      {
+        "name": "side_wall",
+        "from": [
+          2.6,
+          0.06,
+          1.3
+        ],
+        "to": [
+          3.6,
+          0.06,
+          1.3
+        ],
+        "target": "/side_low_wall/"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "two_islands",
+        "from": [
+          0.42,
+          0.06,
+          1.55
+        ],
+        "to": [
+          0.42,
+          0.06,
+          -0.5
+        ],
+        "measure": [
+          [
+            -0.23,
+            0.7,
+            0.35
+          ],
+          [
+            1.135,
+            0.7,
+            0.35
+          ]
+        ],
+        "width": 1.365,
+        "minimum": 0.7
+      },
+      {
+        "name": "checkout_island",
+        "from": [
+          -1.8,
+          0.06,
+          -0.52
+        ],
+        "to": [
+          0.42,
+          0.06,
+          -0.52
+        ],
+        "measure": [
+          [
+            -1.19,
+            0.7,
+            -1.06
+          ],
+          [
+            -1.19,
+            0.7,
+            -0.065
+          ]
+        ],
+        "width": 0.995,
+        "minimum": 0.7
+      },
+      {
+        "name": "entrance",
+        "from": [
+          0.15,
+          0.06,
+          2.18
+        ],
+        "to": [
+          0.15,
+          -0.17,
+          3.26
+        ],
+        "measure": [
+          [
+            -0.77,
+            0.6,
+            2.68
+          ],
+          [
+            1.08,
+            0.6,
+            2.68
+          ]
+        ],
+        "width": 1.85,
+        "minimum": 0.7
+      }
+    ],
+    "entrance": {
+      "inside": [
+        0.15,
+        0.06,
+        2.15
+      ],
+      "outside": [
+        0.15,
+        -0.19,
+        3.32
+      ]
+    },
+    "slide": {
+      "from": [
+        -0.9,
+        0.06,
+        -0.81
+      ],
+      "direction": [
+        1,
+        0,
+        -1
+      ],
+      "tangent": [
+        1,
+        0,
+        0
+      ],
+      "seconds": 0.5
+    },
+    "input_start": [
+      0.42,
+      0.06,
+      0.8
+    ],
+    "scale": {
+      "door": {
+        "height": 2.44,
+        "source": "Rectangular entrance jamb"
+      },
+      "counter": {
+        "height": 1.1025,
+        "source": "Checkout top 1.035+.0575+.06-.05"
+      },
+      "chair": {
+        "height": 0.685,
+        "reason": "No seating in this shop reference; baseline placeholder only."
+      },
+      "table": {
+        "height": 1.1025,
+        "source": "Checkout counter is the customer tabletop."
+      }
+    }
+  },
+  "render_batches": [
+    {
+      "name": "front_dressing",
+      "file": "res://assets/rooms/convenience_store/batches/review_front_dressing.glb",
+      "material": "room",
+      "sources": [
+        "entrance_frame",
+        "entrance_awning",
+        "convenience_sign",
+        "entrance_sconce",
+        "entrance_sconce_2"
+      ],
+      "triangles": 4338,
+      "cast_shadow": true
+    },
+    {
+      "name": "glass",
+      "file": "res://assets/rooms/convenience_store/batches/review_glass.glb",
+      "material": "glass",
+      "sources": [
+        "entrance_glass",
+        "chiller_glass",
+        "freezer_glass",
+        "chiller_glass_1"
+      ],
+      "triangles": 48,
+      "cast_shadow": false
+    },
+    {
+      "name": "back_dressing",
+      "file": "res://assets/rooms/convenience_store/batches/review_back_dressing.glb",
+      "material": "room",
+      "sources": [
+        "drinks_header",
+        "checkout_small_goods",
+        "microwave"
+      ],
+      "triangles": 2154,
+      "cast_shadow": true
+    },
+    {
+      "name": "botanical",
+      "file": "res://assets/rooms/convenience_store/batches/review_botanical.glb",
+      "material": "room",
+      "sources": [
+        "checkout_flowers"
+      ],
+      "triangles": 4596,
+      "cast_shadow": false
+    },
+    {
+      "name": "large_plants",
+      "file": "res://assets/rooms/convenience_store/batches/review_large_plants.glb",
+      "material": "plants",
+      "sources": [
+        "EntranceMonstera"
+      ],
+      "triangles": 1210,
+      "cast_shadow": true
+    },
+    {
+      "name": "back_plants",
+      "file": "res://assets/rooms/convenience_store/batches/review_back_plants.glb",
+      "material": "plants",
+      "sources": [
+        "HighPothos"
+      ],
+      "triangles": 2048,
+      "cast_shadow": false
+    },
+    {
+      "name": "front_plants",
+      "file": "res://assets/rooms/convenience_store/batches/review_front_plants.glb",
+      "material": "plants",
+      "sources": [
+        "IslandPothos",
+        "IslandHangingPothos",
+        "FlowerBox00",
+        "FlowerBox01",
+        "FlowerBox02",
+        "FlowerBox03",
+        "FlowerBox04",
+        "FlowerBox05",
+        "FlowerBox06"
+      ],
+      "triangles": 20910,
+      "cast_shadow": false
+    }
+  ],
+  "botanical_assets": [
+    "entrance_sky"
+  ]
 }

@@ -1,0 +1,29 @@
+{
+  "per_variant_triangles": {
+    "drink_0": 56,
+    "drink_1": 56,
+    "drink_2": 56,
+    "bag_0": 28,
+    "bag_1": 28,
+    "bag_2": 28,
+    "can_0": 34,
+    "can_2": 34,
+    "box_0": 16,
+    "box_1": 16,
+    "can_1": 34,
+    "box_2": 16,
+    "roll_0": 48,
+    "wash_1": 56,
+    "soap_2": 16,
+    "bottle_0": 56,
+    "roll_1": 48,
+    "bottle_1": 56,
+    "bottle_2": 56,
+    "soap_0": 16,
+    "soap_1": 16,
+    "wash_0": 56
+  },
+  "max_triangles": 56,
+  "limit": 60,
+  "runtime": "merged into each fixture mesh; no product nodes"
+}

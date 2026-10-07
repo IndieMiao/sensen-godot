@@ -1,0 +1,867 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"checks": [
+		{
+			"details": null,
+			"name": "Default Avatar fixture assembles",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Bench route/probe schema",
+			"passed": true
+		},
+		{
+			"details": 0.0599999986588955,
+			"name": "Spawn stands on authored floor",
+			"passed": true
+		},
+		{
+			"details": "(0.15, 0.06, 2.14)",
+			"name": "Spawn capsule clear",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.14000010490417
+				],
+				"from": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.14000010490417
+				],
+				"name": "entrance",
+				"reached": true,
+				"remaining_m": 0.00999999046325684,
+				"seconds": 0.001,
+				"target": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.15000009536743
+				]
+			},
+			"name": "Route: entrance",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.39902526140213,
+					0.0599358230829239,
+					1.18079149723053
+				],
+				"from": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.14000010490417
+				],
+				"name": "aisle_between",
+				"reached": true,
+				"remaining_m": 0.0834697857499123,
+				"seconds": 0.15,
+				"target": [
+					0.419999986886978,
+					0.0599999986588955,
+					1.10000002384186
+				]
+			},
+			"name": "Route: aisle_between",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.419099569320679,
+					0.059926375746727,
+					-0.427842199802399
+				],
+				"from": [
+					0.39902526140213,
+					0.0599358230829239,
+					1.18079149723053
+				],
+				"name": "checkout",
+				"reached": true,
+				"remaining_m": 0.0721634551882744,
+				"seconds": 0.449,
+				"target": [
+					0.419999986886978,
+					0.0599999986588955,
+					-0.5
+				]
+			},
+			"name": "Route: checkout",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.81916177272797,
+					0.059935174882412,
+					-0.497484743595123
+				],
+				"from": [
+					0.419099569320679,
+					0.059926375746727,
+					-0.427842199802399
+				],
+				"name": "refrigerator",
+				"reached": true,
+				"remaining_m": 0.080877348780632,
+				"seconds": 0.484,
+				"target": [
+					-1.89999997615814,
+					0.0599999986588955,
+					-0.5
+				]
+			},
+			"name": "Route: refrigerator",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.350432991981506,
+					0.0599241480231285,
+					-0.499921888113022
+				],
+				"from": [
+					-1.81916177272797,
+					0.059935174882412,
+					-0.497484743595123
+				],
+				"name": "checkout_return",
+				"reached": true,
+				"remaining_m": 0.0695670768618584,
+				"seconds": 0.6,
+				"target": [
+					0.419999986886978,
+					0.0599999986588955,
+					-0.5
+				]
+			},
+			"name": "Route: checkout_return",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.90558695793152,
+					0.0599379166960716,
+					-0.368008464574814
+				],
+				"from": [
+					0.350432991981506,
+					0.0599241480231285,
+					-0.499921888113022
+				],
+				"name": "freezer",
+				"reached": true,
+				"remaining_m": 0.0947521030902863,
+				"seconds": 0.433,
+				"target": [
+					2.0,
+					0.0599999986588955,
+					-0.360000014305115
+				]
+			},
+			"name": "Route: freezer",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.488026291131973,
+					0.0599304288625717,
+					-0.312656283378601
+				],
+				"from": [
+					1.90558695793152,
+					0.0599379166960716,
+					-0.368008464574814
+				],
+				"name": "aisle_return",
+				"reached": true,
+				"remaining_m": 0.0680781751871109,
+				"seconds": 0.399,
+				"target": [
+					0.419999986886978,
+					0.0599999986588955,
+					-0.310000002384186
+				]
+			},
+			"name": "Route: aisle_return",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.423519432544708,
+					0.0599330216646194,
+					1.04587972164154
+				],
+				"from": [
+					0.488026291131973,
+					0.0599304288625717,
+					-0.312656283378601
+				],
+				"name": "island_center",
+				"reached": true,
+				"remaining_m": 0.0742038190364838,
+				"seconds": 0.383,
+				"target": [
+					0.419999986886978,
+					0.0599999986588955,
+					1.12000000476837
+				]
+			},
+			"name": "Route: island_center",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.170146971940994,
+					0.059929370880127,
+					2.06867265701294
+				],
+				"from": [
+					0.423519432544708,
+					0.0599330216646194,
+					1.04587972164154
+				],
+				"name": "entrance_return",
+				"reached": true,
+				"remaining_m": 0.0837857872247696,
+				"seconds": 0.3,
+				"target": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.15000009536743
+				]
+			},
+			"name": "Route: entrance_return",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ConvenienceStoreArt/checkout/Collider"
+				],
+				"final": [
+					0.300000011920929,
+					0.0430829748511314,
+					-0.832723677158356
+				],
+				"from": [
+					0.300000011920929,
+					0.0599999986588955,
+					-0.5
+				],
+				"reached": false,
+				"remaining_m": 0.667490720748901,
+				"seconds": 0.883,
+				"target": [
+					0.300000011920929,
+					0.0599999986588955,
+					-1.5
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ConvenienceStoreArt/checkout/Collider"
+			},
+			"name": "Blocked: checkout",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ConvenienceStoreArt/produce_aisle/Collider"
+				],
+				"final": [
+					-1.20000004768372,
+					0.0542305409908295,
+					0.786612987518311
+				],
+				"from": [
+					-1.20000004768372,
+					0.0599999986588955,
+					1.20000004768372
+				],
+				"reached": false,
+				"remaining_m": 0.586641371250153,
+				"seconds": 0.883,
+				"target": [
+					-1.20000004768372,
+					0.0599999986588955,
+					0.200000002980232
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ConvenienceStoreArt/produce_aisle/Collider"
+			},
+			"name": "Blocked: produce_island",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ConvenienceStoreArt/essentials_aisle/Collider"
+				],
+				"final": [
+					0.912069499492645,
+					0.053047988563776,
+					1.20000004768372
+				],
+				"from": [
+					0.5,
+					0.0600000023841858,
+					1.20000004768372
+				],
+				"reached": false,
+				"remaining_m": 0.537975490093231,
+				"seconds": 0.883,
+				"target": [
+					1.45000004768372,
+					0.0599999986588955,
+					1.20000004768372
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ConvenienceStoreArt/essentials_aisle/Collider"
+			},
+			"name": "Blocked: essentials_island",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ConvenienceStoreArt/ice_cream_freezer/Collider"
+				],
+				"final": [
+					2.0,
+					0.0500789284706116,
+					-0.519999980926514
+				],
+				"from": [
+					2.0,
+					0.0600000023841858,
+					-0.270000010728836
+				],
+				"reached": false,
+				"remaining_m": 0.780063033103943,
+				"seconds": 0.883,
+				"target": [
+					2.0,
+					0.0599999986588955,
+					-1.29999995231628
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ConvenienceStoreArt/ice_cream_freezer/Collider"
+			},
+			"name": "Blocked: freezer",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ConvenienceStoreArt/drink_cabinet/Collider"
+				],
+				"final": [
+					-2.22500014305115,
+					0.0599269792437553,
+					-0.720000028610229
+				],
+				"from": [
+					-1.85000002384186,
+					0.0600000023841858,
+					-0.720000028610229
+				],
+				"reached": false,
+				"remaining_m": 0.574999809265137,
+				"seconds": 0.883,
+				"target": [
+					-2.79999995231628,
+					0.0599999986588955,
+					-0.720000028610229
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ConvenienceStoreArt/drink_cabinet/Collider"
+			},
+			"name": "Blocked: fridge",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/ConvenienceStoreArt/side_low_wall/Collider"
+				],
+				"final": [
+					2.62049007415771,
+					0.0500789284706116,
+					1.29999995231628
+				],
+				"from": [
+					2.59999990463257,
+					0.0600000023841858,
+					1.29999995231628
+				],
+				"reached": false,
+				"remaining_m": 0.979560077190399,
+				"seconds": 0.883,
+				"target": [
+					3.59999990463257,
+					0.0599999986588955,
+					1.29999995231628
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/ConvenienceStoreArt/side_low_wall/Collider"
+			},
+			"name": "Blocked: side_wall",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.365,
+				"measured_m": 1.36500006914139,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: two_islands",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.419999986886978,
+					0.0599315762519836,
+					-0.431445717811584
+				],
+				"from": [
+					0.419999986886978,
+					0.0600000023841858,
+					1.54999995231628
+				],
+				"reached": true,
+				"remaining_m": 0.0685543194413185,
+				"seconds": 0.558,
+				"target": [
+					0.419999986886978,
+					0.0599999986588955,
+					-0.5
+				]
+			},
+			"name": "Traverse: two_islands",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 0.995,
+				"measured_m": 0.994999945163727,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: checkout_island",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.324024051427841,
+					0.0599381439387798,
+					-0.519999980926514
+				],
+				"from": [
+					-1.79999995231628,
+					0.0600000023841858,
+					-0.519999980926514
+				],
+				"reached": true,
+				"remaining_m": 0.0959759503602982,
+				"seconds": 0.599,
+				"target": [
+					0.419999986886978,
+					0.0599999986588955,
+					-0.519999980926514
+				]
+			},
+			"name": "Traverse: checkout_island",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.85,
+				"measured_m": 1.84999996423721,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: entrance",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.150000035762787,
+					0.013637837022543,
+					3.17907023429871
+				],
+				"from": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.1800000667572
+				],
+				"reached": true,
+				"remaining_m": 0.200680062174797,
+				"seconds": 0.299,
+				"target": [
+					0.150000005960464,
+					-0.170000001788139,
+					3.25999999046326
+				]
+			},
+			"name": "Traverse: entrance",
+			"passed": true
+		},
+		{
+			"details": {
+				"entry": {
+					"collisions": [],
+					"final": [
+						0.150000035762787,
+						0.0599317438900471,
+						2.24552941322327
+					],
+					"from": [
+						0.150000035762787,
+						-0.00496998429298401,
+						3.22109460830688
+					],
+					"reached": true,
+					"remaining_m": 0.0955293402075768,
+					"seconds": 0.3,
+					"target": [
+						0.150000005960464,
+						0.0599999986588955,
+						2.15000009536743
+					]
+				},
+				"exit": {
+					"collisions": [],
+					"final": [
+						0.150000035762787,
+						-0.00496998429298401,
+						3.22109460830688
+					],
+					"from": [
+						0.150000005960464,
+						0.0599999986588955,
+						2.15000009536743
+					],
+					"reached": true,
+					"remaining_m": 0.209805548191071,
+					"seconds": 0.317,
+					"target": [
+						0.150000005960464,
+						-0.189999997615814,
+						3.3199999332428
+					]
+				}
+			},
+			"name": "Entrance gap allows exit and reentry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"delta": [
+					1.37001919746399,
+					0.00000339001417160034,
+					-0.0271543264389038
+				]
+			},
+			"name": "Diagonal collision preserves wall sliding",
+			"passed": true
+		},
+		{
+			"details": [
+				"run",
+				0.15,
+				0.316656666666667
+			],
+			"name": "Run animation advances in rendered viewport",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Input release stops horizontal motion",
+			"passed": true
+		},
+		{
+			"details": "idle",
+			"name": "Release returns to idle",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Focus loss cancels movement",
+			"passed": true
+		},
+		{
+			"details": 1.74549420922995,
+			"name": "Fixture head-top height measurable",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 1.334865499799,
+				"difference": 0.0472103004291844,
+				"height": 2.44,
+				"ratio_to_H": 1.39788490107707,
+				"reason": ""
+			},
+			"name": "Scale ±15%: door",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.660271454299722,
+				"difference": 0.0433839479392625,
+				"height": 1.1025,
+				"ratio_to_H": 0.631626271900602,
+				"reason": ""
+			},
+			"name": "Scale ±15%: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.392438998867948,
+				"difference": 0.0,
+				"height": 0.685,
+				"ratio_to_H": 0.392438998867948,
+				"reason": "No seating in this shop reference; baseline placeholder only."
+			},
+			"name": "Scale ±15%: chair",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.65024564046003,
+				"difference": 0.0286343612334802,
+				"height": 1.1025,
+				"ratio_to_H": 0.631626271900602,
+				"reason": ""
+			},
+			"name": "Scale ±15%: table",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"pid": 1070464,
+	"renderer": "mobile",
+	"route": [
+		{
+			"collisions": [],
+			"final": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.14000010490417
+			],
+			"from": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.14000010490417
+			],
+			"name": "entrance",
+			"reached": true,
+			"remaining_m": 0.00999999046325684,
+			"seconds": 0.001,
+			"target": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.15000009536743
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.39902526140213,
+				0.0599358230829239,
+				1.18079149723053
+			],
+			"from": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.14000010490417
+			],
+			"name": "aisle_between",
+			"reached": true,
+			"remaining_m": 0.0834697857499123,
+			"seconds": 0.15,
+			"target": [
+				0.419999986886978,
+				0.0599999986588955,
+				1.10000002384186
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.419099569320679,
+				0.059926375746727,
+				-0.427842199802399
+			],
+			"from": [
+				0.39902526140213,
+				0.0599358230829239,
+				1.18079149723053
+			],
+			"name": "checkout",
+			"reached": true,
+			"remaining_m": 0.0721634551882744,
+			"seconds": 0.449,
+			"target": [
+				0.419999986886978,
+				0.0599999986588955,
+				-0.5
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.81916177272797,
+				0.059935174882412,
+				-0.497484743595123
+			],
+			"from": [
+				0.419099569320679,
+				0.059926375746727,
+				-0.427842199802399
+			],
+			"name": "refrigerator",
+			"reached": true,
+			"remaining_m": 0.080877348780632,
+			"seconds": 0.484,
+			"target": [
+				-1.89999997615814,
+				0.0599999986588955,
+				-0.5
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.350432991981506,
+				0.0599241480231285,
+				-0.499921888113022
+			],
+			"from": [
+				-1.81916177272797,
+				0.059935174882412,
+				-0.497484743595123
+			],
+			"name": "checkout_return",
+			"reached": true,
+			"remaining_m": 0.0695670768618584,
+			"seconds": 0.6,
+			"target": [
+				0.419999986886978,
+				0.0599999986588955,
+				-0.5
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.90558695793152,
+				0.0599379166960716,
+				-0.368008464574814
+			],
+			"from": [
+				0.350432991981506,
+				0.0599241480231285,
+				-0.499921888113022
+			],
+			"name": "freezer",
+			"reached": true,
+			"remaining_m": 0.0947521030902863,
+			"seconds": 0.433,
+			"target": [
+				2.0,
+				0.0599999986588955,
+				-0.360000014305115
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.488026291131973,
+				0.0599304288625717,
+				-0.312656283378601
+			],
+			"from": [
+				1.90558695793152,
+				0.0599379166960716,
+				-0.368008464574814
+			],
+			"name": "aisle_return",
+			"reached": true,
+			"remaining_m": 0.0680781751871109,
+			"seconds": 0.399,
+			"target": [
+				0.419999986886978,
+				0.0599999986588955,
+				-0.310000002384186
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.423519432544708,
+				0.0599330216646194,
+				1.04587972164154
+			],
+			"from": [
+				0.488026291131973,
+				0.0599304288625717,
+				-0.312656283378601
+			],
+			"name": "island_center",
+			"reached": true,
+			"remaining_m": 0.0742038190364838,
+			"seconds": 0.383,
+			"target": [
+				0.419999986886978,
+				0.0599999986588955,
+				1.12000000476837
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.170146971940994,
+				0.059929370880127,
+				2.06867265701294
+			],
+			"from": [
+				0.423519432544708,
+				0.0599330216646194,
+				1.04587972164154
+			],
+			"name": "entrance_return",
+			"reached": true,
+			"remaining_m": 0.0837857872247696,
+			"seconds": 0.3,
+			"target": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.15000009536743
+			]
+		}
+	],
+	"scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+	"slug": "convenience_store"
+}
