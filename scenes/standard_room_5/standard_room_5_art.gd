@@ -39,6 +39,9 @@ func _setup_room() -> void:
 		var model := (load("res://assets/rooms/_shared/plants/" + str(plant.file)) as PackedScene).instantiate()
 		container.add_child(model)
 		_set_material(model, plant_material)
+		# R2 library uses small leaves and alpha-scissor cutouts. Keep their
+		# shadows disabled per the shared budget standard (pots included).
+		_disable_shadows(model)
 		for c in plant.get("colliders", []):
 			var body := StaticBody3D.new(); body.position = _vec(c.at)
 			var shape := BoxShape3D.new(); shape.size = _vec(c.size)
@@ -66,15 +69,20 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 		applied.cull_mode = BaseMaterial3D.CULL_DISABLED
 	if asset.name == "fire":
 		applied = material.duplicate()
+		applied.albedo_texture = load(KIT + "fire_gradient.png")
+		applied.albedo_color = Color("ffc487")
+		applied.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		applied.emission_enabled = true
-		applied.emission = Color("ffb041")
-		applied.emission_energy_multiplier = 1.3
+		applied.emission = Color("ff841f")
+		applied.emission_texture = applied.albedo_texture
+		applied.emission_energy_multiplier = .22
 		fire = container
 	var variant := "garden" if str(asset.name).ends_with("garden") else "fire" if asset.name == "fire" else "plain"
 	if variant_materials.has(variant): applied = variant_materials[variant]
 	else: variant_materials[variant] = applied
 	_set_material(model, applied)
 	if str(asset.name).ends_with("garden"): _disable_shadows(model)
+	if asset.name in ["fire", "daisy_jug", "window_daisies", "counter_board"]: _disable_shadows(model)
 	for c in asset.colliders:
 		var body := StaticBody3D.new()
 		body.position = _vec(c.at)

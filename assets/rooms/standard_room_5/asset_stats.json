@@ -13,28 +13,28 @@
       "vertices": 4912,
       "triangles": 9476,
       "surfaces": 1,
-      "bytes": 327296
+      "bytes": 327232
     },
     {
       "name": "window_wall",
       "vertices": 1368,
       "triangles": 2692,
       "surfaces": 1,
-      "bytes": 95036
+      "bytes": 94012
     },
     {
       "name": "back_wall",
       "vertices": 1080,
       "triangles": 2128,
       "surfaces": 1,
-      "bytes": 76896
+      "bytes": 75520
     },
     {
       "name": "arched_window",
       "vertices": 656,
       "triangles": 1296,
       "surfaces": 1,
-      "bytes": 41284
+      "bytes": 40676
     },
     {
       "name": "window_garden",
@@ -48,7 +48,7 @@
       "vertices": 1308,
       "triangles": 2568,
       "surfaces": 1,
-      "bytes": 97156
+      "bytes": 96900
     },
     {
       "name": "entry_mat",
@@ -62,56 +62,56 @@
       "vertices": 432,
       "triangles": 864,
       "surfaces": 1,
-      "bytes": 26192
+      "bytes": 25648
     },
     {
       "name": "hearth",
-      "vertices": 1330,
-      "triangles": 2624,
+      "vertices": 2740,
+      "triangles": 5348,
       "surfaces": 1,
-      "bytes": 94248
+      "bytes": 181092
     },
     {
       "name": "fire",
-      "vertices": 180,
-      "triangles": 348,
+      "vertices": 480,
+      "triangles": 944,
       "surfaces": 1,
-      "bytes": 13512
+      "bytes": 22360
     },
     {
       "name": "kettle",
       "vertices": 590,
       "triangles": 1144,
       "surfaces": 1,
-      "bytes": 42992
+      "bytes": 42608
     },
     {
       "name": "firewood_alcove",
-      "vertices": 1984,
-      "triangles": 3864,
+      "vertices": 2346,
+      "triangles": 4588,
       "surfaces": 1,
-      "bytes": 164604
+      "bytes": 170932
     },
     {
       "name": "range_cooker",
       "vertices": 1502,
       "triangles": 2916,
       "surfaces": 1,
-      "bytes": 103416
+      "bytes": 104184
     },
     {
       "name": "bookshelf",
       "vertices": 4280,
       "triangles": 8116,
       "surfaces": 1,
-      "bytes": 300836
+      "bytes": 300772
     },
     {
       "name": "sink_cabinet",
       "vertices": 1736,
       "triangles": 3356,
       "surfaces": 1,
-      "bytes": 119008
+      "bytes": 118624
     },
     {
       "name": "wall_shelf",
@@ -125,105 +125,105 @@
       "vertices": 572,
       "triangles": 1100,
       "surfaces": 1,
-      "bytes": 46904
+      "bytes": 46232
     },
     {
       "name": "hanging_towel",
-      "vertices": 504,
-      "triangles": 1000,
+      "vertices": 2922,
+      "triangles": 5828,
       "surfaces": 1,
-      "bytes": 36024
+      "bytes": 147400
     },
     {
       "name": "utensil_crock",
       "vertices": 300,
       "triangles": 572,
       "surfaces": 1,
-      "bytes": 23736
+      "bytes": 23416
     },
     {
       "name": "counter_board",
       "vertices": 524,
       "triangles": 1012,
       "surfaces": 1,
-      "bytes": 40776
+      "bytes": 40680
     },
     {
       "name": "straw_hat",
       "vertices": 1449,
       "triangles": 2878,
       "surfaces": 1,
-      "bytes": 102004
+      "bytes": 99316
     },
     {
       "name": "door_garden_fork",
       "vertices": 128,
       "triangles": 228,
       "surfaces": 1,
-      "bytes": 14528
+      "bytes": 14144
     },
     {
       "name": "entry_basket",
       "vertices": 1616,
       "triangles": 3008,
       "surfaces": 1,
-      "bytes": 122128
+      "bytes": 121936
     },
     {
       "name": "garden_boots",
       "vertices": 568,
       "triangles": 1120,
       "surfaces": 1,
-      "bytes": 36776
+      "bytes": 36712
     },
     {
       "name": "botanical_picture",
       "vertices": 544,
       "triangles": 1040,
       "surfaces": 1,
-      "bytes": 41972
+      "bytes": 40724
     },
     {
       "name": "bookcase_picture",
       "vertices": 544,
       "triangles": 1040,
       "surfaces": 1,
-      "bytes": 42436
+      "bytes": 40612
     },
     {
       "name": "window_daisies",
       "vertices": 3750,
       "triangles": 7136,
       "surfaces": 1,
-      "bytes": 254560
+      "bytes": 255712
     },
     {
       "name": "window_hanging_basket",
       "vertices": 184,
       "triangles": 356,
       "surfaces": 1,
-      "bytes": 15544
+      "bytes": 15576
     },
     {
       "name": "sofa",
-      "vertices": 1488,
-      "triangles": 2852,
+      "vertices": 5356,
+      "triangles": 10588,
       "surfaces": 1,
-      "bytes": 102256
+      "bytes": 287472
     },
     {
       "name": "round_rope_rug",
       "vertices": 6608,
       "triangles": 13148,
       "surfaces": 1,
-      "bytes": 589248
+      "bytes": 589696
     },
     {
       "name": "dining_rug",
       "vertices": 528,
       "triangles": 912,
       "surfaces": 1,
-      "bytes": 42052
+      "bytes": 44036
     },
     {
       "name": "reading_stool",
@@ -234,10 +234,10 @@
     },
     {
       "name": "reading_cup",
-      "vertices": 298,
-      "triangles": 576,
+      "vertices": 842,
+      "triangles": 1656,
       "surfaces": 1,
-      "bytes": 24548
+      "bytes": 57592
     },
     {
       "name": "bookcase_stool",
@@ -258,21 +258,21 @@
       "vertices": 196,
       "triangles": 388,
       "surfaces": 1,
-      "bytes": 14044
+      "bytes": 13820
     },
     {
       "name": "chair",
-      "vertices": 672,
-      "triangles": 1296,
+      "vertices": 616,
+      "triangles": 1188,
       "surfaces": 1,
-      "bytes": 46012
+      "bytes": 42292
     },
     {
       "name": "chair_cushion",
-      "vertices": 112,
-      "triangles": 216,
+      "vertices": 228,
+      "triangles": 428,
       "surfaces": 1,
-      "bytes": 8816
+      "bytes": 22316
     },
     {
       "name": "rug_fringe",
@@ -286,50 +286,58 @@
       "vertices": 3814,
       "triangles": 7260,
       "surfaces": 1,
-      "bytes": 260636
+      "bytes": 261084
     },
     {
       "name": "tabletop_still_life",
-      "vertices": 1172,
-      "triangles": 2288,
+      "vertices": 1716,
+      "triangles": 3368,
       "surfaces": 1,
-      "bytes": 79560
+      "bytes": 112792
     }
   ],
-  "unique_triangles": 96416,
-  "scene_triangles": 191256,
+  "unique_triangles": 115288,
+  "scene_triangles": 126952,
   "static_draw_surfaces": 49,
-  "glb_bytes": 3681936,
-  "atlas_bytes": 2730386,
+  "glb_bytes": 4149020,
+  "atlas_bytes": 2538672,
   "placed_instances": 49,
   "materials": 4,
-  "local_scene_triangles": 97928,
-  "shared_scene_triangles": 93328,
+  "local_scene_triangles": 116904,
+  "shared_scene_triangles": 10048,
   "shared_assets": [
     {
       "name": "monstera",
-      "vertices": 2760,
-      "triangles": 5344,
+      "vertices": 568,
+      "triangles": 910,
       "surfaces": 1,
-      "bytes": 206924
+      "bytes": 24892
     },
     {
       "name": "peace_lily",
-      "vertices": 1906,
-      "triangles": 3616,
+      "vertices": 620,
+      "triangles": 946,
       "surfaces": 1,
-      "bytes": 127604
+      "bytes": 26780
     },
     {
       "name": "pothos",
-      "vertices": 10882,
-      "triangles": 21092,
+      "vertices": 1670,
+      "triangles": 2048,
       "surfaces": 1,
-      "bytes": 509404
+      "bytes": 67012
     }
   ],
   "shared_placed_instances": 6,
   "shared_atlas": "res://assets/rooms/_shared/plants/room_albedo_ao.png",
+  "local_botanical_budget_triangles": 18776,
+  "plant_budget_triangles": 28824,
+  "budget_limits": {
+    "placed_triangles": 200000,
+    "plant_triangles": 100000,
+    "static_surfaces": 60
+  },
+  "budget_passed": true,
   "window_texture": {
     "file": "window_landscape.png",
     "size": [
@@ -338,5 +346,14 @@
     ],
     "purpose": "Original layered landscape outside real aperture",
     "bytes": 62294
+  },
+  "fire_texture": {
+    "file": "fire_gradient.png",
+    "size": [
+      32,
+      128
+    ],
+    "purpose": "Orange/red flame gradient in explicit height UVs",
+    "bytes": 568
   }
 }

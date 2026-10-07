@@ -395,9 +395,9 @@
       "name": "hanging_towel",
       "file": "hanging_towel.glb",
       "position": [
-        0.94,
-        1.72,
-        -2.96
+        0.96,
+        1.75,
+        -2.89
       ],
       "yaw_degrees": 0,
       "colliders": []
@@ -745,16 +745,16 @@
   ],
   "camera": {
     "position": [
-      10,
-      7.5,
-      11.2
+      10.234048815405814,
+      9.775054585992919,
+      10.966505589470644
     ],
     "target": [
       0,
-      1.42,
+      1.3982961427291736,
       0
     ],
-    "size": 12.65
+    "size": 12.891239223541001
   },
   "sun_direction": [
     -6,
@@ -762,14 +762,17 @@
     1.5
   ],
   "review_lighting": {
-    "ambient": 0.53,
-    "ambient_color": "C3D6D6",
-    "sun": 1.25,
-    "sun_color": "FFE0AE",
+    "ambient": 0.63,
+    "ambient_color": "FFE6BD",
+    "sun": 1.35,
+    "sun_color": "FFE6AC",
+    "shadow_bias": 0.08,
+    "shadow_normal_bias": 1.0,
+    "shadow_distance": 25,
     "sun_position": [
       -7,
       4.5,
-      1.4
+      -2.8
     ],
     "sun_target": [
       0,
@@ -785,8 +788,8 @@
           0.56,
           -1.98
         ],
-        "energy": 1.1,
-        "color": "FF973D",
+        "energy": 0.95,
+        "color": "FF8B35",
         "range": 2.0
       }
     ]
@@ -1260,8 +1263,8 @@
         "source": "Oak countertop"
       },
       "chair": {
-        "height": 0.779,
-        "source": "Sage chair seat pad top (actual sitting surface; Basic Room has no pad)"
+        "height": 0.7825,
+        "source": "R2 thicker pad on lowered solid seat; sitting top .7825m"
       },
       "table": {
         "height": 1.135,
@@ -1297,6 +1300,66 @@
         0.9
       ],
       "size": 5.5
+    },
+    {
+      "name": "detail-fire",
+      "position": [
+        -1.59,
+        1.6,
+        -0.55
+      ],
+      "target": [
+        -1.59,
+        0.57,
+        -2.47
+      ],
+      "size": 2.6
     }
-  ]
+  ],
+  "reference_camera_fit": {
+    "method": "Three visible rounded plinth edge intersections; rectangular ground-plane constraint. No image warp.",
+    "reference_canvas": [
+      1440,
+      1080
+    ],
+    "reference_source_size": [
+      3402,
+      2561
+    ],
+    "anchors": {
+      "left": [
+        198.0,
+        683.0
+      ],
+      "front": [
+        737.0,
+        945.0
+      ],
+      "right": [
+        1240.0,
+        699.0
+      ],
+      "back_inferred": [
+        701.0,
+        437.0
+      ]
+    },
+    "back_corner_visibility": "Occluded by room; inferred by parallelogram, not measured from visible pixels.",
+    "pitch_degrees": 29.18119932295211,
+    "yaw_degrees": 43.021278339258195,
+    "camera": {
+      "position": [
+        10.234048815405814,
+        9.775054585992919,
+        10.966505589470644
+      ],
+      "target": [
+        0,
+        1.3982961427291736,
+        0
+      ],
+      "size": 12.891239223541001
+    },
+    "limits": "Hand-selected intersections on a stylized perspective reference. Wall caps and furniture are independent visual checks, not claimed pixel-perfect."
+  }
 }

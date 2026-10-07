@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "source_object": "Square gingham sofa throw",
+      "uv_layer": "MetricClothUV",
+      "minimum_3d_length_per_uv_metre": 0.9840410492148747,
+      "maximum_3d_length_per_uv_metre": 1.0303250024218578,
+      "checked_edges": 7728,
+      "cell_size_metres": 0.115,
+      "passed": true
+    },
+    {
+      "source_object": "Folded striped kitchen towel",
+      "uv_layer": "MetricClothUV",
+      "minimum_3d_length_per_uv_metre": 0.9938197132093216,
+      "maximum_3d_length_per_uv_metre": 1.0303261256278662,
+      "checked_edges": 5152,
+      "cell_size_metres": 0.115,
+      "passed": true
+    }
+  ],
+  "scope": "Source surface-to-UV metric ratios; visual bake inspection remains required."
+}

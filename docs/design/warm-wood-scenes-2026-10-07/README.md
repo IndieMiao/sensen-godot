@@ -1,14 +1,14 @@
 # 赵云 · 暖木室内系场景评审包（2026-10-07）
 
-按 Plane 父卡 SGODOT-171 的顺序完成了赵云负责的七个场景评审版。每张卡在实际开工时改为 **In Progress**。当前 SGODOT-172 已完成第 1 轮样板返工并转 **Review**；173–178 仍是原审阅稿，待样板确认后按新 review 推进。用户在本轮明确要求依次制作、每完成一个用 Lark CLI 发消息，并留待早上 review，因此没有在第一张后中断。
+按 Plane 父卡 SGODOT-171 的顺序完成了赵云负责的七个场景评审版。每张卡在实际开工时改为 **In Progress**。当前 SGODOT-172 已完成第 2 轮样板返工并转 **Review**；173–178 仍是原审阅稿，待样板确认后按新 review 推进。用户在本轮明确要求依次制作、每完成一个用 Lark CLI 发消息，并留待早上 review，因此没有在第一张后中断。
 
-最新入口：[172 样板 R1：三栏叠图、角色走位与逐项清单](../standard_room_5-review1-2026-10-07/README.md)。下图保留为首轮七场景总览。
+最新入口：[172 样板 R2：三栏叠图、角色走位与逐项清单](../standard_room_5-review2-2026-10-07/README.md)。下图保留为首轮七场景总览。
 
 ![首轮七个场景的 Godot 实际渲染](overview.jpg)
 
 | Plane | 完整参考、对照图和交付文档 | GLB / 摆放实例 | 场景三角面 |
 |---|---|---:|---:|
-| [SGODOT-172](https://plane.sensenjoy.cn/zili/browse/SGODOT-172) | [Standard Room-5](../standard_room_5-2026-10-07/README.md) | 41 本地 + 3 共享 / 49 | 191,256 |
+| [SGODOT-172](https://plane.sensenjoy.cn/zili/browse/SGODOT-172) | [Standard Room-5](../standard_room_5-2026-10-07/README.md) | 41 本地 + 3 共享 / 49 | 126,952 |
 | [SGODOT-173](https://plane.sensenjoy.cn/zili/browse/SGODOT-173) | [Deluxe Room-10](../deluxe_room_10-2026-10-07/README.md) | 50 / 55 | 120,302 |
 | [SGODOT-174](https://plane.sensenjoy.cn/zili/browse/SGODOT-174) | [Farm Tools Store](../farm_tools_store-2026-10-07/README.md) | 36 / 41 | 85,144 |
 | [SGODOT-175](https://plane.sensenjoy.cn/zili/browse/SGODOT-175) | [Bakery](../bakery-2026-10-07/README.md) | 41 / 42 | 121,144 |
