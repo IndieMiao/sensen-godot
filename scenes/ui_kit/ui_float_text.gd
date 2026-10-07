@@ -69,27 +69,40 @@ func _init(text_: String = "", tone_: Tone = Tone.XP, icon_: Texture2D = null, l
 	layout = layout_
 	icon = icon_ if icon_ != null else (HEART if tone_ == Tone.AFFINITY else null)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_pill = PanelContainer.new()
-	_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_pill = _compose(tone, icon, _PEAK)
 	add_child(_pill)
-	var row := HBoxContainer.new()
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_pill.add_child(row)
-	_icon_rect = UiKit.icon(icon, _ICON * _PEAK)
-	_icon_rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_icon_rect.visible = icon != null
-	row.add_child(_icon_rect)
-	_label = UiKit.label("", UiTokens.STYLE_ROW_TITLE_XB15, TONE_COLORS[tone])
-	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	row.add_child(_label)
-	row.add_theme_constant_override(&"separation", roundi(_ICON_GAP * _PEAK))
-	var box := UiStyleBox.make(Color(UiTokens.COLOR_SURFACE, _BACKING_ALPHA), _RADIUS * _PEAK)
-	_pill.add_theme_stylebox_override(&"panel", box.with_margins(_PAD.x * _PEAK, _PAD.y * _PEAK, _PAD.x * _PEAK, _PAD.y * _PEAK))
+	_icon_rect = _pill.get_child(0).get_child(0)
+	_label = _pill.get_child(0).get_child(1)
 	scale = Vector2.ONE * _unit
 	_pill.minimum_size_changed.connect(_fit)
 	text = text_
+
+## The FloatText look without motion, at ×1.0: e.g. the reward pills inside a RewardMoment card (哪吒, 226).
+static func pill(text_: String, tone_: Tone, icon_: Texture2D = null) -> PanelContainer:
+	var p := _compose(tone_, icon_ if icon_ != null else (HEART if tone_ == Tone.AFFINITY else null), 1.0)
+	(p.get_child(0).get_child(1) as Label).text = text_
+	return p
+
+## Backing pill, icon and line, every length multiplied by `k` (the animated float lays out at the ×1.3 peak).
+static func _compose(tone_: Tone, icon_: Texture2D, k: float) -> PanelContainer:
+	var p := PanelContainer.new()
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var box := UiStyleBox.make(Color(UiTokens.COLOR_SURFACE, _BACKING_ALPHA), _RADIUS * k)
+	p.add_theme_stylebox_override(&"panel", box.with_margins(_PAD.x * k, _PAD.y * k, _PAD.x * k, _PAD.y * k))
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override(&"separation", roundi(_ICON_GAP * k))
+	p.add_child(row)
+	var ic := UiKit.icon(icon_, _ICON * k)
+	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ic.visible = icon_ != null
+	row.add_child(ic)
+	var l := UiKit.label("", UiTokens.STYLE_ROW_TITLE_XB15, TONE_COLORS[tone_])
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	row.add_child(l)
+	return p
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED: _relayout()

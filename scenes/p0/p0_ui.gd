@@ -1097,7 +1097,7 @@ func open_today() -> void:
 ## TodayRow action (不知火舞 on 197, 2026-10-08): a target in the current space reads `Show` and only moves the
 ## camera; a target somewhere else reads `Show on map` (the map opens on its pin). Homestead targets (plots,
 ## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button.
-const HOME_TARGETS := ["plots", "stall", "stove", "board", "home"]
+const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench"]
 
 static func show_label(go: String, here: String, camera_here: bool) -> String:
 	if go == "": return ""

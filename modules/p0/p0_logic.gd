@@ -226,8 +226,11 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 	var rest_left := int(rest.get("limit", 1)) - int(rest.get("used", 0))
 	var subtitle := "Recover or do something free" if have <= 0 else "%s needs %d Energy · you have %d" % [verb, need, have]
 	var cook := {"icon": "pot", "label": "Cook", "fact": "%d fish in creel" % fish if fish > 0 else "No fish to cook", "guide": "Show kitchen", "go": "stove", "on": fish > 0}
-	# TODO(SGODOT-224, bench): LOCK-09 guides Rest with "Show bench"; P0 has no bench, rest is at the farmhouse (197 60c82ad2).
-	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show home", "go": "home", "on": true}
+	# LOCK-09: Rest guides to the bench by the farmhouse (SGODOT-224 3fb574b0, q(30)). Near full it says the real
+	# gain, like the bench card (rest_state.button `Rest · +25 Energy`).
+	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show bench", "go": "bench", "on": true}
+	var rs := rest_state(view)
+	if str(rs.button).begins_with("Rest · "): rest_tile.fact = str(rs.button).trim_prefix("Rest · ")
 	if rest_left <= 0:
 		rest_tile.fact = "Rested today"   # the reset time is on the bench card (李白, 225)
 		rest_tile.on = false

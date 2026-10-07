@@ -482,3 +482,12 @@ func test_float_text_bump_updates_in_place() -> void:
 	assert_bool(is_instance_valid(f)).is_true()   # the fade restarted 650 ms after the bump
 	assert_float(f.position.y).is_equal(y)        # it holds its height
 	assert_str((f.find_children("*", "Label", true, false)[0] as Label).text).is_equal("+24 XP · 2 plants")
+
+func test_float_text_static_pill_is_the_same_look_at_one_x() -> void:
+	var p: PanelContainer = _host(UiFloatText.pill("+20 Cooking XP", UiFloatText.Tone.XP))
+	await _settle()
+	var label := p.find_children("*", "Label", true, false)[0] as Label
+	assert_str(label.text).is_equal("+20 Cooking XP")
+	assert_str(label.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_FLOAT_XP.to_html())
+	assert_int(label.get_theme_font_size(&"font_size")).is_equal(15)
+	assert_float((p.get_theme_stylebox(&"panel") as UiStyleBox).content_margin_left).is_equal(8.0)

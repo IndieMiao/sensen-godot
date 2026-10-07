@@ -220,3 +220,18 @@ func test_mining_slot_lists_the_picks_with_equip() -> void:
 	assert_str(str(rows[1].effect)).is_equal("2 Stone per rock")
 	assert_str(str(rows[1].action.label)).is_equal("Equip")
 	assert_bool((rows[0].action as Dictionary).is_empty()).is_true()
+
+func test_full_bag_shows_where_more_room_comes_from() -> void:
+	var v := _view()
+	v.bag.capacity = 2
+	v.bag.slots = [{"id": "seed_radish", "qty": 5}, {"id": "fish_crucian", "qty": 1}]
+	v["homestead"] = {"unlocks": {"bag_upgrade_1": "locked"}}
+	var up: Dictionary = P0Logic.content().bag_upgrades[0]
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +%d slots at Homestead Lv%d" % [int(up.capacity) - 2, int(up.homestead)])
+	v.homestead.unlocks.bag_upgrade_1 = "for_sale"
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +%d slots · %s" % [int(up.capacity) - 2, str(up.name)])
+	v.homestead.unlocks.bag_upgrade_1 = "owned"
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("")
+	v.homestead.unlocks.bag_upgrade_1 = "locked"
+	v.bag.capacity = 25
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("")   # room left: no row
