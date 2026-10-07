@@ -86,44 +86,33 @@
                           "text": "",
                           "children": [
                             {
-                              "type": "HBoxContainer",
+                              "type": "Label",
                               "rect": [
                                 10,
                                 62,
                                 180,
                                 48
                               ],
+                              "variation": "ButtonXB15",
+                              "text": "Unpin"
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                28,
+                                76,
+                                20,
+                                20
+                              ],
                               "children": [
                                 {
-                                  "type": "Panel",
+                                  "type": "TextureRect",
                                   "rect": [
-                                    69,
+                                    31,
                                     79,
                                     14,
                                     14
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        71,
-                                        81,
-                                        10,
-                                        10
-                                      ]
-                                    }
                                   ]
-                                },
-                                {
-                                  "type": "Label",
-                                  "rect": [
-                                    89,
-                                    75,
-                                    42,
-                                    22
-                                  ],
-                                  "variation": "ButtonB15",
-                                  "text": "Unpin"
                                 }
                               ]
                             }
@@ -138,7 +127,7 @@
                             36
                           ],
                           "variation": "CaptionB12",
-                          "text": "Pinned slots stay when the bar refills."
+                          "text": "Pinned slots stay when the bar refills"
                         }
                       ]
                     }
@@ -216,46 +205,15 @@
                           "text": "",
                           "children": [
                             {
-                              "type": "HBoxContainer",
+                              "type": "Label",
                               "rect": [
                                 10,
                                 211,
                                 180,
                                 48
                               ],
-                              "children": [
-                                {
-                                  "type": "Panel",
-                                  "rect": [
-                                    78,
-                                    228,
-                                    14,
-                                    14
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        80,
-                                        230,
-                                        10,
-                                        10
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "Label",
-                                  "rect": [
-                                    98,
-                                    224,
-                                    23,
-                                    22
-                                  ],
-                                  "variation": "ButtonB15",
-                                  "text": "Pin"
-                                }
-                              ]
+                              "variation": "ButtonXB15",
+                              "text": "Pin"
                             }
                           ]
                         },
@@ -268,7 +226,7 @@
                             36
                           ],
                           "variation": "CaptionB12",
-                          "text": "Pin to keep it when the bar refills."
+                          "text": "Pin to keep it when the bar refills"
                         }
                       ]
                     }

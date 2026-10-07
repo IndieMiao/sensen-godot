@@ -48,6 +48,14 @@ func test_quick_bar_keeps_order_then_fills_by_count() -> void:
 	assert_that(P0Logic.quick_bar(v, [])).is_equal(["seed_radish", "seed_lettuce"])
 	assert_that(P0Logic.quick_bar(v, ["seed_lettuce"])).is_equal(["seed_lettuce", "seed_radish"])
 
+func test_quick_bar_keeps_pinned_slots_at_zero_and_skips_removed_ones() -> void:
+	var v := _view()
+	# A pinned seed the bag no longer holds stays in its place at 0 (LOCK-05, §10.3.3 归零).
+	assert_that(P0Logic.quick_bar(v, ["seed_carrot", "seed_radish"], "farm", ["seed_carrot"])).is_equal(["seed_carrot", "seed_radish", "seed_lettuce"])
+	# A seed dragged off the bar is not refilled until it is pinned again (§10.3.4).
+	assert_that(P0Logic.quick_bar(v, [], "farm", [], ["seed_radish"])).is_equal(["seed_lettuce"])
+	assert_that(P0Logic.quick_bar(v, [], "farm", ["seed_radish"], ["seed_radish"])).is_equal(["seed_radish", "seed_lettuce"])
+
 func test_today_line_names_the_nearest_crop() -> void:
 	var v := _view()
 	assert_str(P0Logic.today_line(v)).is_equal("Sow your first plot")

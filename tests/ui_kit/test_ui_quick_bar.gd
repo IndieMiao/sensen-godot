@@ -108,10 +108,12 @@ func test_pin_menu_reads_the_new_state_and_offers_the_reverse() -> void:
 	var menu := UiPinMenu.new(true)
 	add_child(auto_free(menu))
 	assert_str(menu.verb()).is_equal("Unpin")
-	assert_str(menu._note.text).is_equal(UiPinMenu.NOTE_PINNED)
+	assert_str(menu._note.text).is_equal("Pinned slots stay when the bar refills")
+	assert_bool(menu._badge.visible).is_true()   # Unpin carries the slot's pin badge (§10.3)
 	menu.pinned = false
 	assert_str(menu.verb()).is_equal("Pin")
-	assert_str(menu._note.text).is_equal(UiPinMenu.NOTE_UNPINNED)
+	assert_str(menu._note.text).is_equal("Pin to keep it when the bar refills")
+	assert_bool(menu._badge.visible).is_false()
 	var hits := [0]
 	menu.toggled.connect(func(): hits[0] += 1)
 	menu.button().activated.emit()
@@ -191,3 +193,78 @@ func test_pin_menu_matches_the_main_and_the_pointer_sits_under_the_card() -> voi
 		assert_float(m._card.size.y).is_equal_approx(108.0, 3.0)
 		assert_float(m._pointer.position.y).is_equal(m._card.size.y)
 		assert_float(m.get_combined_minimum_size().y).is_equal(m._card.size.y + UiTokens.SIZE_POINTER_H)
+
+func test_bag_only_keeps_just_the_bag_end() -> void:
+	bar.bag_only = true
+	await await_idle_frame()
+	assert_bool(bar.cells().any(func(c): return c.visible)).is_false()
+	assert_bool(bar.handle_button().visible).is_false()
+	assert_bool(bar.end_button().visible).is_true()
+	assert_float(bar.end_button().position.x).is_equal(280.0)
+
+func test_pin_menu_dismisses_after_three_seconds_or_a_press_elsewhere() -> void:
+	var menu := UiPinMenu.new(true)
+	menu.position = Vector2(20, 40)
+	add_child(auto_free(menu))
+	await await_idle_frame()
+	var gone := [0]
+	menu.dismissed.connect(func(): gone[0] += 1)
+	menu._process(UiPinMenu.DISMISS_S - 0.1)
+	assert_int(gone[0]).is_equal(0)
+	menu._process(0.2)
+	assert_int(gone[0]).is_equal(1)
+	menu._process(5.0)
+	assert_int(gone[0]).is_equal(1)   # once
+	var other := UiPinMenu.new(false)
+	other.position = Vector2(20, 40)
+	add_child(auto_free(other))
+	await await_idle_frame()
+	var hits := [0, 0]
+	other.dismissed.connect(func(): hits[0] += 1)
+	other.toggled.connect(func(): hits[1] += 1)
+	var inside := other._card.get_global_rect().get_center()
+	_push(_press(inside, true))
+	await await_idle_frame()
+	assert_int(hits[0]).is_equal(0)   # a press on the card is not "elsewhere"
+	_push(_press(inside + Vector2(0, 200), true))
+	await await_idle_frame()
+	assert_int(hits[0]).is_equal(1)
+
+func test_pin_badge_sits_at_the_buttons_left_like_the_main() -> void:
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	add_child(auto_free(host))
+	var menu := UiPinMenu.new(true)
+	host.add_child(menu)
+	for i in 3: await get_tree().process_frame
+	var b := menu._badge.get_rect()
+	assert_vector(b.size).is_equal(Vector2(20, 20))
+	assert_float(b.position.x).is_equal(18.0)
+	assert_float(b.get_center().y).is_equal(menu.button().size.y * 0.5)
+	assert_float(menu._verb.get_rect().get_center().x).is_equal(menu.button().size.x * 0.5)   # verb stays centred
+
+func test_long_press_that_turns_into_a_drag_does_not_pin() -> void:
+	var now := [0]
+	for c in bar.cells(): c.clock = func() -> int: return now[0]
+	await _into_view()
+	var at := _center(1)
+	_push(_press(at, true))
+	await await_idle_frame()
+	now[0] = GestureArbiter.LONG_PRESS_MS + 10
+	bar.cells()[1]._process(0.0)
+	_push(_move(at + Vector2(30, 0)))
+	_push(_move(at))   # back over its own slot
+	_push(_press(at, false))
+	await await_idle_frame()
+	assert_array(events.filter(func(e): return e[0] in ["pin_toggled", "slots_swapped", "slot_removed"])).is_empty()
+
+func _move(pos: Vector2) -> InputEvent:
+	if DisplayServer.is_touchscreen_available():
+		var d := InputEventScreenDrag.new()
+		d.position = pos
+		return d
+	var m := InputEventMouseMotion.new()
+	m.position = pos
+	m.global_position = pos
+	m.button_mask = MOUSE_BUTTON_MASK_LEFT
+	return m

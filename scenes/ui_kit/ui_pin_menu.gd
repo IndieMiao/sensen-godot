@@ -1,19 +1,28 @@
 class_name UiPinMenu
 extends Control
-## PinMenu 1141:80291 (SGODOT-221, LOCK-05; plan §10.3.3): the small card a long press leaves above a quick
-## slot. The pin state has already toggled when it appears (WP7-B F-04 §3, confirmed by WP1a); the card says
-## which state the slot is now in and offers the reverse in one tap: `Unpin` with the amber pin badge before
-## it, then "Pinned slots stay when the bar refills." (or `Pin` / "Pin to keep it when the bar refills.").
+## PinMenu 1141:80291 (SGODOT-221, LOCK-05; plan §10.3.3): the result bubble of a long press on a quick slot.
+## The pin state toggles when the finger lifts (no second tap; 不知火舞 2026-10-07 on SGODOT-221); the bubble then
+## shows the NEW state and undoes it in one tap: after pinning `Unpin` with the slot's pin badge +
+## "Pinned slots stay when the bar refills"; after unpinning `Pin` + "Pin to keep it when the bar refills".
 ## The pointer sits under the slot it belongs to: set `pointer_x` to that slot's centre in local x.
-## Emits `toggled` when the button is tapped; the owner flips the pin and closes the card.
+## Emits `toggled` when the button is tapped (the owner flips the pin and closes the card), and `dismissed`
+## after DISMISS_S or on any press outside the card (the press still goes through). One at a time is the
+## owner's job; a long press that turns into a drag never opens one (UiQuickBar emits no pin_toggled).
 
 signal toggled
+signal dismissed
 
 const PIN_GLYPH := preload("res://assets/ui/kit_icons/pin.svg")
-const NOTE_PINNED := "Pinned slots stay when the bar refills."
-const NOTE_UNPINNED := "Pin to keep it when the bar refills."
+const NOTE_PINNED := "Pinned slots stay when the bar refills"
+const NOTE_UNPINNED := "Pin to keep it when the bar refills"
+const DISMISS_S := 3.0     # the main's description: dismisses after 3 s
 const _POINTER_X := 19.0   # PinMenu pointer at x 19 of the 200 px card: under the first slot's centre
 const _PAD := 10.0         # PinMenu auto-layout padding 10 on all sides, gap 6 (SPACE_WITHIN)
+# "Pin badge (same as slot)" in Pinned=yes: 20 × 20, radius 7, glyph 14, at x 18 inside the button, centred.
+const _BADGE := 20.0
+const _BADGE_R := 7.0
+const _BADGE_GLYPH := 14.0
+const _BADGE_X := 18.0
 
 var pinned := true: set = set_pinned
 ## Local x of the pointer's left edge; default as drawn in the main.
@@ -25,6 +34,8 @@ var _badge: Panel
 var _verb: Label
 var _note: Label
 var _pointer: UiPointer
+var _left := DISMISS_S
+var _done := false
 
 func _init(pinned_ := true) -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -41,33 +52,32 @@ func _init(pinned_ := true) -> void:
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override(&"separation", int(UiTokens.SPACE_WITHIN))
 	_card.add_child(v)
-	# The verb is drawn by a centred badge + label pair inside the button (badge before `Unpin`, as in the main);
-	# the button's own text stays empty so UiCommandButton keeps its secondary look and 48 px height.
+	# The button's own text stays empty so UiCommandButton keeps its secondary look and 48 px height; the verb is
+	# centred over the whole button and the badge sits at its left edge, as in the main.
 	_button = UiCommandButton.new("", UiCommandButton.Kind.SECONDARY)
 	_button.activated.connect(func(): toggled.emit())
 	v.add_child(_button)
-	var content := HBoxContainer.new()
-	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	content.alignment = BoxContainer.ALIGNMENT_CENTER
-	content.add_theme_constant_override(&"separation", int(UiTokens.SPACE_WITHIN))
-	_button.add_child(content)
+	_verb = UiKit.label("", UiTokens.STYLE_BUTTON_XB15, UiTokens.COLOR_PRIMARY)
+	_verb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_verb.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_verb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_verb.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_button.add_child(_verb)
 	_badge = Panel.new()
 	_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var b := UiTokens.SIZE_PIN_BADGE
-	_badge.custom_minimum_size = Vector2(b, b)
-	_badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_badge.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PIN_AMBER, b * 0.5,
+	_badge.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PIN_AMBER, _BADGE_R,
 		UiTokens.COLOR_SURFACE, UiTokens.STROKE_PIN_BADGE))
-	var glyph := UiKit.icon(PIN_GLYPH, UiTokens.SIZE_PIN_ICON)
+	_badge.set_anchors_preset(Control.PRESET_CENTER_LEFT)
+	_badge.offset_left = _BADGE_X
+	_badge.offset_right = _BADGE_X + _BADGE
+	_badge.offset_top = -_BADGE * 0.5
+	_badge.offset_bottom = _BADGE * 0.5
+	var glyph := UiKit.icon(PIN_GLYPH, _BADGE_GLYPH)
 	glyph.self_modulate = UiTokens.COLOR_SURFACE_RAISED
-	glyph.position = Vector2((b - UiTokens.SIZE_PIN_ICON) * 0.5, (b - UiTokens.SIZE_PIN_ICON) * 0.5)
-	glyph.size = Vector2(UiTokens.SIZE_PIN_ICON, UiTokens.SIZE_PIN_ICON)
+	glyph.position = Vector2((_BADGE - _BADGE_GLYPH) * 0.5, (_BADGE - _BADGE_GLYPH) * 0.5)
+	glyph.size = Vector2(_BADGE_GLYPH, _BADGE_GLYPH)
 	_badge.add_child(glyph)
-	content.add_child(_badge)
-	_verb = UiKit.label("", UiTokens.STYLE_BUTTON_B15, UiTokens.COLOR_PRIMARY)
-	_verb.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	content.add_child(_verb)
+	_button.add_child(_badge)
 	_note = UiKit.label("", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 	_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_note.custom_minimum_size.x = UiTokens.SIZE_PIN_MENU_W - _PAD * 2.0
@@ -83,7 +93,22 @@ func set_pinned(v: bool) -> void:
 	pinned = v
 	if _button == null: return
 	_verb.text = "Unpin" if pinned else "Pin"
+	_badge.visible = pinned   # only Pinned=yes carries the badge
 	_note.text = NOTE_PINNED if pinned else NOTE_UNPINNED
+
+func _process(dt: float) -> void:
+	_left -= dt
+	if _left <= 0.0: _dismiss()
+
+func _input(e: InputEvent) -> void:
+	var down: bool = (e is InputEventScreenTouch and e.pressed) or (e is InputEventMouseButton and e.pressed)
+	if down and is_visible_in_tree() and not _card.get_global_rect().has_point(e.position): _dismiss()
+
+func _dismiss() -> void:
+	if _done: return
+	_done = true
+	set_process(false)
+	dismissed.emit()
 
 func set_pointer_x(v: float) -> void: pointer_x = v; _layout()
 

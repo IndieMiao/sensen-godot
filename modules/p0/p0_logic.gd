@@ -110,7 +110,9 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String) -> 
 	return a
 
 ## Five candidates for the current action — Farming: seeds, Fishing: bait — kept order: previously shown → most plentiful (§10.3.3).
-static func quick_bar(view: Dictionary, previous: Array, mode := "farm") -> Array:
+## Pinned ids always stay on the bar, also at 0 left (LOCK-05, §10.3.3 归零); ids the player dragged off the bar
+## (`removed`) are not refilled until pinned again (§10.3.4 "从栏上移除，物品仍在背包").
+static func quick_bar(view: Dictionary, previous: Array, mode := "farm", pinned: Array = [], removed: Array = []) -> Array:
 	var prefix := "bait_" if mode == "fish" else "seed_"
 	var counts := {}
 	for s in view.get("bag", {}).get("slots", []):
@@ -118,8 +120,10 @@ static func quick_bar(view: Dictionary, previous: Array, mode := "farm") -> Arra
 		if id.begins_with(prefix): counts[id] = int(counts.get(id, 0)) + int(s.get("qty", 0))
 	var bar: Array = []
 	for id in previous:
-		if counts.has(id) and bar.size() < 5: bar.append(id)
-	var rest: Array = counts.keys().filter(func(id): return not bar.has(id))
+		if bar.size() < 5 and not bar.has(id) and (pinned.has(id) or (counts.has(id) and not removed.has(id))): bar.append(id)
+	for id in pinned:
+		if bar.size() < 5 and not bar.has(id): bar.append(id)
+	var rest: Array = counts.keys().filter(func(id): return not bar.has(id) and not removed.has(id))
 	rest.sort_custom(func(a, b): return counts[a] > counts[b] if counts[a] != counts[b] else str(a) < str(b))
 	for id in rest:
 		if bar.size() < 5: bar.append(id)

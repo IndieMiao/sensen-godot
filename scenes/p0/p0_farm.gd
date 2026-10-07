@@ -294,16 +294,24 @@ func p0_tap(screen: Vector2) -> void:
 	elif cam.unproject_position(_mine + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		rt.ui.toast("The mine opens soon")
 
+## Facility marks (STATE-ICONS) always show; the finger card appears when you walk up (LOCK-07 / LOCK-17).
+## Tapping the card is tapping the facility, so it reuses p0_tap's own hit points.
 func _tags(v: Dictionary) -> void:
-	var near_stall := actor.position.distance_to(_stall) < 3.2
-	var note := ""
+	var stall_top := cam.unproject_position(_stall + Vector3(0, 1.05, 0))
+	var request := -1
 	for r in v.get("stall", {}).get("board", {}).get("requests", []):
-		if str(r.status) == "open" or (str(r.status) == "accepted" and int(r.have) >= int(r.qty)): note = " · !"
-	rt.ui.tag("stall", "Homestead Stall · Tap to shop" + note, cam.unproject_position(_stall + Vector3(0, 1.05, 0)), near_stall or note != "", true)
+		if str(r.status) == "accepted" and int(r.have) >= int(r.qty): request = UiStatusBadge.State.DELIVERABLE
+		elif str(r.status) == "open" and request < 0: request = UiStatusBadge.State.REQUEST
+	rt.ui.badge("stall", maxi(request, 0), stall_top, request >= 0)
+	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
+		actor.position.distance_to(_stall) < 3.2, cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
+	var home_top := cam.unproject_position(_house + Vector3(0, 2.6, 0.4))
 	var st = v.get("cooking", {}).get("stove", null)
-	var home := "Home · Kitchen · Rest"
-	if st != null: home = "Home · Dish ready" if float(st.get("ready_in", 0)) <= 0.0 else "Home · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))
-	rt.ui.tag("home", home, cam.unproject_position(_house + Vector3(0, 2.6, 0.4)), actor.position.distance_to(_house) < 4.2 or st != null, st != null)
+	var left := float(st.get("ready_in", 0)) if st != null else 0.0
+	rt.ui.badge("home", UiStatusBadge.State.READY if left <= 0.0 else UiStatusBadge.State.COUNTDOWN, home_top, st != null,
+		"" if left <= 0.0 else P0Logic.duration(left))
+	rt.ui.tag("home", "Home · Kitchen · Rest", home_top - Vector2(0, rt.ui.badge_height("home")),
+		actor.position.distance_to(_house) < 4.2, cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
 
 func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return

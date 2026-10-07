@@ -45,6 +45,8 @@ var collapsed := false: set = set_collapsed
 var bag_open := false: set = set_bag_open
 ## Bag at ≥ 90% capacity: amber dot on the end (§10.3.1).
 var capacity_warning := false: set = set_capacity_warning
+## Spaces without a quick bar (kitchen, counters, the map): only the Bag end stays (plan §10.3.5, MAP-1).
+var bag_only := false: set = set_bag_only
 ## Vibrate on lift; off in tests and the gallery.
 var haptics := true
 
@@ -84,6 +86,7 @@ func set_selected(v: String) -> void: selected = v; _refresh()
 func set_collapsed(v: bool) -> void: collapsed = v; _refresh()
 func set_bag_open(v: bool) -> void: bag_open = v; _refresh()
 func set_capacity_warning(v: bool) -> void: capacity_warning = v; _refresh()
+func set_bag_only(v: bool) -> void: bag_only = v; _refresh()
 
 func cells() -> Array[UiItemCell]: return _cells
 func end_button() -> Button: return _end
@@ -153,7 +156,7 @@ func _refresh() -> void:
 	if _row == null: return
 	for i in SLOTS:
 		var cell := _cells[i]
-		cell.visible = not collapsed
+		cell.visible = not collapsed and not bag_only
 		if i == _dragging: continue
 		var d := slot(i)
 		var id := str(d.get("id", ""))
@@ -167,9 +170,9 @@ func _refresh() -> void:
 		elif id == selected: cell.state = UiItemCell.State.SELECTED
 		elif qty <= 0 and cell.pinned: cell.state = UiItemCell.State.ZERO
 		else: cell.state = UiItemCell.State.DEFAULT
-	_handle.visible = collapsed
-	# Collapsed: the handle sits centred on the bar and the end stays at the right (BAR-1-2).
-	_row.alignment = BoxContainer.ALIGNMENT_END if collapsed else BoxContainer.ALIGNMENT_BEGIN
+	_handle.visible = collapsed and not bag_only
+	# Collapsed or bag-only: the end stays at the right (BAR-1-2); the handle sits centred when collapsed.
+	_row.alignment = BoxContainer.ALIGNMENT_END if collapsed or bag_only else BoxContainer.ALIGNMENT_BEGIN
 	_end_icon.texture = CLOSE_GLYPH if bag_open else BAG_GLYPH
 	_end_icon.self_modulate = UiTokens.COLOR_TEXT if bag_open else Color.WHITE
 	_end_label.text = "Close" if bag_open else "Bag"
