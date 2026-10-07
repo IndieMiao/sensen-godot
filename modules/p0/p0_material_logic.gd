@@ -15,6 +15,11 @@ static func _energy(view: Dictionary) -> int:
 static func _key(icon: String, verb: String, sub: String, cmd := {}, enabled := true, amber := false, need := 0) -> Dictionary:
 	return {"icon": icon, "verb": verb, "sub": sub, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need}
 
+## The key's tool badge in the mine and at its mouth (LOCK-02, LOCK-29): the equipped pickaxe (P0Ui.set_action `tool`).
+static func _with_pick(view: Dictionary, key: Dictionary) -> Dictionary:
+	key["tool"] = str(view.get("gear", {}).get("slots", {}).get("mining", "pickaxe"))
+	return key
+
 static func _runs_line(mine: Dictionary) -> String:
 	var runs: Dictionary = mine.get("runs", {})
 	return "Mine runs today %d/%d · Resets in %s" % [int(runs.get("used", 0)), int(runs.get("limit", 2)), P0Logic.duration(float(runs.get("resets_in", 0)))]
@@ -30,6 +35,9 @@ static func _floor(view: Dictionary, n: int) -> Dictionary:
 
 ## Main action key at the farm's mine mouth (LOCK-21): Continue run · Free with an unfinished run, else Enter mine.
 static func mine_entry_action(view: Dictionary) -> Dictionary:
+	return _with_pick(view, _mine_entry_action(view))
+
+static func _mine_entry_action(view: Dictionary) -> Dictionary:
 	var mine: Dictionary = view.get("mine", {})
 	var fee := int(mine.get("floor_energy", 2))
 	if mine.get("run", null) != null:
@@ -117,6 +125,9 @@ static func mine_status(view: Dictionary, n: int, just_entered := false) -> Stri
 ## item: String} where item is the quick-bar selection ("torch" or ""). Rocks and stairs never respond to taps (LOCK-02).
 ## Every 0-Energy move reads "· Free" (Exit mine · Free, Floor 1 · Free; Li Bai q(46)).
 static func mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
+	return _with_pick(view, _mine_action(view, ctx))
+
+static func _mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 	var mine: Dictionary = view.get("mine", {})
 	var n := int(ctx.get("floor", 1))
 	var floor := _floor(view, n)
@@ -244,12 +255,12 @@ static func today_gather_line(view: Dictionary) -> String:
 	if best.is_empty(): return ""
 	return "%s · Ready in %s" % [str(best.get("name", "")), P0Logic.duration(float(best.get("ready_in", 0)))]
 
-## Floats for one gather event (MAT-2): "+6 Timber · Stored" for what went to Farm Storage, "+2 Worm Bait" for the bag.
+## Floats for one gather event (MAT-2): "+6 Timber · Stored" for what went to Farm Storage. What went to the bag
+## ("+2 Worm Bait") is an item event the runtime floats already, so the Reed Bank still shows two lines (Li Bai 3f6b8fb5).
 static func gather_floats(view: Dictionary, e: Dictionary) -> Array:
 	var out: Array = []
 	for it in e.get("items", []):
-		var line := "+%d %s" % [int(it[1]), P0Logic.item_name(view, str(it[0]))]
-		out.append(line + " · Stored" if str(it[2]) == "storage" else line)
+		if str(it[2]) == "storage": out.append("+%d %s · Stored" % [int(it[1]), P0Logic.item_name(view, str(it[0]))])
 	return out
 
 ## Coming home (q(40)): "Stored · 12 Stone · 3 Copper Ore" once per new storage.auto.at (number first, appendix B).

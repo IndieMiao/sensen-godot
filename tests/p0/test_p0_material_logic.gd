@@ -134,7 +134,7 @@ func test_gather_marks_and_today_line() -> void:
 	v.gather.spots[0].ready = true
 	assert_str(str(P0MaterialLogic.gather_marks(v)[0].caption)).is_equal("Timber Grove · Tap to gather")
 	assert_str(P0MaterialLogic.today_gather_line(v)).is_equal("")
-	assert_array(P0MaterialLogic.gather_floats(v, {"items": [["wood", 6, "storage"], ["bait_worm", 2, "bag"]]})).is_equal(["+6 Timber · Stored", "+2 bait_worm"])
+	assert_array(P0MaterialLogic.gather_floats(v, {"items": [["wood", 6, "storage"], ["bait_worm", 2, "bag"]]})).is_equal(["+6 Timber · Stored"])
 
 func _recipe(id: String, tab: String, item: String, name: String, to: String, cost: Array, block = null, owned := false, equipped := false) -> Dictionary:
 	return {"id": id, "tab": tab, "item": item, "name": name, "qty": 2 if to == "bag" else 1, "to": to, "have": 6 if to == "bag" else null,
@@ -206,3 +206,9 @@ func test_locked_spot_sheet_and_gloves_moment() -> void:
 	var moment := P0MaterialLogic.gloves_moment(v)
 	assert_str(str(moment.fact)).is_equal("Next Timber harvest: 7")
 	assert_str(str(moment.note)).is_equal("Passive · no gear slot needed")
+
+func test_mine_keys_carry_the_equipped_pickaxe_badge() -> void:
+	var v := _view(_run([_floor(1), _floor(2, false)]))
+	v["gear"] = {"slots": {"mining": "pick_copper"}}
+	assert_str(str(P0MaterialLogic.mine_action(v, {"floor": 1, "target": "rock", "rock": 0}).tool)).is_equal("pick_copper")
+	assert_str(str(P0MaterialLogic.mine_entry_action(_view()).tool)).is_equal("pickaxe")
