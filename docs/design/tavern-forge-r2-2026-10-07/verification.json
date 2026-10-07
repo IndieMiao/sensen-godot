@@ -1,6 +1,6 @@
 {
   "owner": "刘备",
-  "revision": "R2.1",
+  "revision": "177 R2.1 / 178 R2.2",
   "scenes": [
     {
       "card": 177,
@@ -127,12 +127,12 @@
       "card": 178,
       "slug": "blacksmith_shop",
       "budget": {
-        "room_triangles": 95578,
+        "room_triangles": 83154,
         "shared_plant_triangles": 4096,
         "room_botanical_triangles": 0,
         "plant_triangles": 4096,
-        "total_triangles": 99674,
-        "static_surfaces": 19
+        "total_triangles": 87250,
+        "static_surfaces": 18
       },
       "character_checks": 31,
       "character_passed": true,
@@ -144,8 +144,38 @@
       "dimensions_passed": true,
       "local_lights": 3,
       "light_control_passed": true,
-      "wall_sampling_correction": "docs/design/blacksmith_shop-2026-10-07/wall-sampling-correction.json"
+      "wall_sampling_correction": "docs/design/blacksmith_shop-2026-10-07/wall-sampling-correction.json",
+      "particles": {
+        "flames": 16,
+        "sparks": 4,
+        "smoke": 12,
+        "total_particles": 32,
+        "particle_surfaces": 3,
+        "fixed_fps": 30,
+        "collision": false,
+        "shadows": false,
+        "textures": {
+          "flame_strip.png": [
+            1024,
+            256
+          ],
+          "smoke_strip.png": [
+            1024,
+            256
+          ],
+          "spark.png": [
+            64,
+            64
+          ]
+        }
+      }
     }
   ],
-  "scope": "Desktop Godot Mobile/Vulkan; no phone/Android/release/performance acceptance; art director review pending."
+  "scope": "Desktop Godot Mobile/Vulkan; no phone/Android/release/performance acceptance; art director review pending.",
+  "basic_room_236": {
+    "state": "Todo",
+    "gate": "Await art-director approval of 178 R2.2 shared FX",
+    "modified": false,
+    "PR_created": false
+  }
 }
