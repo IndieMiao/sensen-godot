@@ -450,9 +450,11 @@ func _refresh_bar() -> void:
 	_bar.bag_open = sig[6]
 
 func _on_slot_tapped(id: String) -> void:
-	# A slot at 0 can't be picked; a light buzz says so (李白 q(44) ③). Its refill hint is on the slot.
+	# A slot at 0 can't be picked; a light buzz says so (李白 q(44) ③), and a toast too: the release Journey build
+	# has no vibrate permission (PR #12 re-review). The copy is the slot's refill hint (§10.3.3).
 	if P0Logic.bag_count(view, id) <= 0 and id != selected_seed and id != selected_bait:
 		if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(10)
+		toast("Buy at Homestead Stall")
 		return
 	if bar_mode == "fish":
 		# Tapping bait only sets the current bait (0 Energy, nothing consumed); tap again to fish without bait.
@@ -584,15 +586,16 @@ func tag(id: String, text: String, screen: Vector2, show: bool, hit := Vector2.I
 
 ## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.
 ## A scene tap: on a shown finger card it is that facility's tap, elsewhere the world's (also a double tap: a card
-## never recenters the camera by accident).
-func _tap_at(global_pos: Vector2, double: bool) -> void:
+## never recenters the camera by accident). Returns true for a card tap, which then can't start a double tap either.
+func _tap_at(global_pos: Vector2, double: bool) -> bool:
 	for id in _cards:
 		var c: UiTapCard = _cards[id]
 		if c.is_visible_in_tree() and c.hit_rect().has_point(global_pos):
 			if _modal == null: tapped.emit(_card_hits[id])
-			return
+			return true
 	if double: recenter.emit()
 	else: tapped.emit(global_pos - root.global_position)
+	return false
 
 func badge(id: String, state: UiStatusBadge.State, screen: Vector2, show: bool, caption := "", icon: Texture2D = null) -> void:
 	var b: UiStatusBadge = _badges.get(id)
@@ -2101,7 +2104,8 @@ class _TouchPad extends Control:
 				&"joystick_end":
 					ui.joystick.emit(Vector2.ZERO)
 					queue_redraw()
-				&"tap": ui._tap_at(get_global_transform() * o.pos, bool(o.double))
+				&"tap":
+					if ui._tap_at(get_global_transform() * o.pos, bool(o.double)): _arb.consume_tap()
 				&"pinch": ui.zoom.emit(o.factor)
 	func _draw() -> void:
 		var start := _arb.origin()
