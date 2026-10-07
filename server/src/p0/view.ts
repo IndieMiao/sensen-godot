@@ -5,6 +5,8 @@ import { cookSlots, ingredientsFor, mealValue, recipeRarity } from './cooking.js
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
+import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
+import { haveTotal, stored } from './storage.js';
 
 export function viewOf(c: P0Content, input: P0State, now: number) {
   const s = structuredClone(input);
@@ -27,7 +29,9 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
       crop: p.crop ?? null, ready_in: p.state === 'growing' && p.ready_at ? Math.max(0, p.ready_at - now) : null,
       xp_pct: p.xp_pct ?? null,
     })),
-    bag: { capacity: c.bag.capacity, slots: s.bag, free: freeSlots(c, s.bag) },
+    bag: { capacity: s.bag_cap, slots: s.bag, free: freeSlots(s) },
+    storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
+    homestead: homesteadView(c, s),
     rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, now), amount: c.energy.rest_amount },
     stall: {
       keeper: c.stall.keeper,
@@ -129,4 +133,31 @@ function itemInfo(c: P0Content, s: P0State, id: string) {
     info.full = recipe ? c.cooking.tiers[String(info.rarity)].energy + (c.cooking.tiers[String(info.rarity)].bonus[quality] ?? 0) : c.cooking.mystery.energy;
   }
   return info;
+}
+
+/** HOME-1 facts (§8.6.1): what the next level needs, what the player has (storage and bag apart) and what is unlocked. */
+function homesteadView(c: P0Content, s: P0State) {
+  const next = nextLevel(c, s);
+  const upgrade = c.bag_upgrades[0];
+  return {
+    level: s.homestead.level, max: c.homestead.max_level, plaque: s.homestead.plaque,
+    next: next && {
+      level: next.level,
+      coins: { need: coinsNeeded(c, next.coins), have: s.coins },
+      skills: { need: next.skills, have: skillsTotal(c, s), farming: skillLevel(c, s, 'farming'), fishing: skillLevel(c, s, 'fishing') },
+      materials: next.materials.map(([id, need]) => ({ id, name: itemName(c, id), need, have: haveTotal(s, id), storage: stored(s, id), bag: haveTotal(s, id) - stored(s, id) })),
+      energy: c.energy.max_base + c.homestead.per_level.energy * (next.level - 1),
+      meals: c.cooking.food_cap + c.homestead.per_level.meals * (next.level - 1),
+      unlocks: next.unlocks,
+      can_upgrade: upgradeBlock(c, s) === null,
+      block: upgradeBlock(c, s),
+    },
+    unlocks: {
+      spice_rack: unlocked(c, s, 'spice_rack'),
+      warming_cabinet: unlocked(c, s, 'warming_cabinet'),
+      bag_upgrade_1: s.owned.includes(upgrade.id) ? 'owned' : unlocked(c, s, upgrade.id) ? 'for_sale' : 'locked',
+      board_slots: boardSlots(c, s),
+      fence: unlocked(c, s, 'fence'),
+    },
+  };
 }

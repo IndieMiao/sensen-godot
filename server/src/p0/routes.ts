@@ -5,6 +5,8 @@ import { applyP0, type P0Command } from './reducer.js';
 import type { P0Store } from './store.js';
 import { viewOf } from './view.js';
 import { add } from './bag.js';
+import { itemName } from './content.js';
+import { putInStorage } from './storage.js';
 
 export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean }
 
@@ -66,7 +68,21 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const id = String((req.body as { id?: string } | undefined)?.id ?? 'fish_crucian');
     if (!c.fish.some(f => f.id === id)) return reply.code(400).send({ ok: false, code: 'bad_item' });
     const s = store.get(player, deps.now());
-    add(c, s.bag, id, 1_000_000);
+    add(c, s, id, 1_000_000);
+    store.put(s);
+    return reply.send({ ok: true, state: viewOf(c, s, clock(s.clock_ms)) });
+  });
+  /** Playtests only: put items in the bag or the farm storage (materials have no P0 source until the mine / gathering land). */
+  app.post('/v1/p0/dev/grant', async (req, reply) => {
+    const player = playerOf(req.headers);
+    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const body = (req.body ?? {}) as { id?: string; qty?: number; to?: string };
+    const id = String(body.id ?? ''), qty = Number(body.qty ?? 1), to = body.to === 'storage' ? 'storage' : 'bag';
+    if (!/^[a-z0-9_@]{2,48}$/.test(id) || itemName(c, id) === id) return reply.code(400).send({ ok: false, code: 'bad_item' });
+    if (!Number.isInteger(qty) || qty < 1 || qty > 999) return reply.code(400).send({ ok: false, code: 'bad_qty' });
+    const s = store.get(player, deps.now());
+    if (to === 'storage') putInStorage(s, id, qty);
+    else add(c, s, id, qty);
     store.put(s);
     return reply.send({ ok: true, state: viewOf(c, s, clock(s.clock_ms)) });
   });

@@ -3,6 +3,7 @@ import { cropById, cropBySeed, fishById, itemKind, rodById, type P0Content } fro
 import { add, count, room, take } from './bag.js';
 import { collectPot, eatDish, startPot } from './cooking.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
+import { upgradeHomestead } from './homestead.js';
 import { energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
@@ -27,7 +28,8 @@ type P0CommandBody =
   | { type: 'collect'; taps?: number[] }
   | { type: 'eat'; item: string }
   | { type: 'accept'; request: string }
-  | { type: 'deliver'; request: string };
+  | { type: 'deliver'; request: string }
+  | { type: 'homestead_upgrade' };
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
@@ -86,8 +88,8 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (plot.state !== 'growing' || !plot.crop || (plot.ready_at ?? Infinity) > now)
         return fail('not_ready', { ready_in: plot.ready_at ? plot.ready_at - now : null });
       const crop = cropById(c, plot.crop)!;
-      if (room(c, s.bag, crop.id) < crop.yield) return fail('bag_full', { need: crop.yield });
-      add(c, s.bag, crop.id, crop.yield);
+      if (room(c, s, crop.id) < crop.yield) return fail('bag_full', { need: crop.yield });
+      add(c, s, crop.id, crop.yield);
       events.push({ kind: 'item', id: crop.id, delta: crop.yield });
       gainXp(c, s, now, 'farming', scaledXp(s, crop.xp, plot.xp_pct ?? 100), plot.xp_pct ?? 100, events);
       const first = `harvest:${crop.id}`;
@@ -122,10 +124,10 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         events.push({ kind: 'coins', delta: -cost }, { kind: 'item', id: cmd.item, delta: 1 });
         break;
       }
-      if (room(c, s.bag, cmd.item) < qty) return fail('bag_full', { room: room(c, s.bag, cmd.item) });
+      if (room(c, s, cmd.item) < qty) return fail('bag_full', { room: room(c, s, cmd.item) });
       s.coins -= cost;
       if (offer.daily) s.day.bought[cmd.item] = (s.day.bought[cmd.item] ?? 0) + qty;
-      add(c, s.bag, cmd.item, qty);
+      add(c, s, cmd.item, qty);
       events.push({ kind: 'coins', delta: -cost }, { kind: 'item', id: cmd.item, delta: qty });
       break;
     }
@@ -173,6 +175,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       req.status = 'done';
       events.push({ kind: 'item', id: req.item, delta: -req.qty }, { kind: 'coins', delta: req.coins },
         { kind: 'request', id: req.id, status: 'done', coins: req.coins });
+      break;
+    }
+    case 'homestead_upgrade': {
+      const refusal = upgradeHomestead(c, s, now, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'cast': case 'reel': case 'cook': case 'collect': case 'eat': {
