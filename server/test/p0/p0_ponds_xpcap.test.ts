@@ -98,6 +98,13 @@ describe('the daily XP cap per skill (§4.3.4, SGODOT-232 S6)', () => {
     if (!cast.ok) throw new Error(cast.code);
     expect(cast.events.some(e => e.kind === 'first')).toBe(false);
     expect(cast.events).toContainEqual({ kind: 'xp', skill: 'fishing', amount: 0, percent: 100, capped: true });
+    // part of it: 2,995 already today, so the first cast's 10 says +5
+    const part = fresh();
+    part.day = { ...part.day, key: '2026-10-08', xp: { fishing: 2_995 } };
+    const cast5 = applyP0(c, part, { type: 'cast', space: 'pond', place: REED }, T);
+    if (!cast5.ok) throw new Error(cast5.code);
+    expect(cast5.events.find(e => e.kind === 'first')).toMatchObject({ xp: 5 });
+    expect(cast5.events).toContainEqual({ kind: 'xp', skill: 'fishing', amount: 5, percent: 100, capped: true });
     // the next player day (after the 04:00 rollover) starts from 0
     const next = step(s, { type: 'cast', space: 'pond', place: REED }, T + 24 * 3_600_000);
     expect(next.day.xp).toEqual({ fishing: 10 });   // first cast +10

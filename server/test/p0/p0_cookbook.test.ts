@@ -189,6 +189,86 @@ describe('Queue ×2 (Cooking Lv5; 李白 2026-10-08)', () => {
     expect(collected.s.stove).toMatchObject({ dish: 'dish_carrot_cake', started_at: T0 + 12 * S });
   });
 
+  // PR #22 review (刘邦): heat / collect name their pot, and the waiting pot never fires before it was queued.
+  const twoPots = () => {
+    let s = lv5();
+    s.bag.push({ id: 'fish_crucian', qty: 1 }, { id: 'crop_carrot', qty: 2 });
+    const first = step(s, { type: 'cook', items: ['fish_crucian'] });
+    s = step(first.s, { type: 'cook', items: ['crop_carrot', 'crop_carrot'] }, T0 + S).s;
+    return { s, one: s.stove!.id!, two: s.queue!.id! };
+  };
+
+  it('every pot has an id: pot and queue events, dish events and the view carry it', () => {
+    const { s, one, two } = twoPots();
+    expect(two).toBe(one + 1);
+    expect(viewOf(c, s, T0 + 2 * S).cooking).toMatchObject({ stove: { id: one }, queued: { id: two } });
+    const later = step(s, { type: 'read_inbox', keys: [] }, T0 + 7 * S);
+    expect(later.ev.find(e => e.kind === 'dish')).toMatchObject({ pot: one, auto: true });
+    expect(later.ev.find(e => e.kind === 'queue')).toMatchObject({ id: two });
+    // tried is on every pot, not only on combinations that will fail
+    const fresh = veteran(); fresh.fires = 1; fresh.bag.push({ id: 'fish_crucian', qty: 1 });
+    expect(step(fresh, { type: 'cook', items: ['fish_crucian'] }).ev.find(e => e.kind === 'pot')).toMatchObject({ tried: false });
+  });
+
+  it('collect naming the done pot judges it with its own taps (COOK-4); the waiting pot fires when the view says', () => {
+    const { s, one, two } = twoPots();
+    const h = s.stove!.heats[0];
+    // the view at 7 s already shows the carrot cake fired at 5 s
+    expect(viewOf(c, s, T0 + 7 * S).cooking.stove).toMatchObject({ id: two, ready_in: 3000 });
+    const r = step(s, { type: 'collect', pot: one, taps: [gold(h)] }, T0 + 7 * S);
+    expect(r.ev.find(e => e.kind === 'dish')).toMatchObject({ pot: one, quality: 1 });
+    expect(r.ev.find(e => e.kind === 'dish')).not.toHaveProperty('auto');
+    expect(r.ev.find(e => e.kind === 'queue')).toMatchObject({ started_at: T0 + 5 * S });
+    expect(r.s.stove).toMatchObject({ dish: 'dish_carrot_cake', started_at: T0 + 5 * S });
+  });
+
+  it('collect without a pot sees what the view sees; a pot already kept is refused as stale_pot', () => {
+    const { s, one, two } = twoPots();
+    // no pot: the done crucian is kept first, as the view shows, and the carrot cake is not ready yet
+    expect(applyP0(c, s, { type: 'collect' }, T0 + 7 * S)).toMatchObject({ ok: false, code: 'not_ready', detail: { ready_in: 3000 } });
+    const kept = step(s, { type: 'read_inbox', keys: [] }, T0 + 7 * S).s;
+    expect(applyP0(c, kept, { type: 'collect', pot: one }, T0 + 11 * S)).toMatchObject({ ok: false, code: 'stale_pot', detail: { pot: two } });
+    expect(applyP0(c, kept, { type: 'heat', pot: one, taps: [100] }, T0 + 8 * S)).toMatchObject({ ok: false, code: 'stale_pot' });
+    expect(step(kept, { type: 'collect', pot: two }, T0 + 11 * S).ev.find(e => e.kind === 'dish')).toMatchObject({ pot: two });
+  });
+
+  it('a late heat tap naming the first pot counts for it, not for the pot that fires after it', () => {
+    let s = lv5();
+    s.bag.push({ id: 'fish_crucian', qty: 2 });
+    s = step(s, { type: 'cook', items: ['fish_crucian'] }).s;
+    s = step(s, { type: 'cook', items: ['fish_crucian'] }, T0 + S).s;
+    const one = s.stove!.id!, h = s.stove!.heats[0];
+    // the tap was made in the ring, but arrives after the pot is done (5.2 s)
+    const r = step(s, { type: 'heat', pot: one, taps: [gold(h)] }, T0 + 5 * S + 200);
+    expect(r.ev.find(e => e.kind === 'dish')).toMatchObject({ pot: one, quality: 1, auto: true });
+    expect(r.s.stove).toMatchObject({ started_at: T0 + 5 * S });
+    expect(r.s.stove!.taps ?? []).toEqual([]);
+  });
+
+  it('a pot queued behind one already done fires now, not at the first one\'s end', () => {
+    let s = lv5();
+    s.bag.push({ id: 'fish_crucian', qty: 1 }, { id: 'crop_carrot', qty: 2 });
+    s = step(s, { type: 'cook', items: ['fish_crucian'] }).s;
+    const r = step(s, { type: 'cook', items: ['crop_carrot', 'crop_carrot'] }, T0 + 8 * S);
+    expect(r.ev.map(e => e.kind)).toEqual(expect.arrayContaining(['pot', 'dish', 'queue']));
+    expect(r.ev.find(e => e.kind === 'queue')).toMatchObject({ started_at: T0 + 8 * S });
+    expect(r.s.stove).toMatchObject({ dish: 'dish_carrot_cake', started_at: T0 + 8 * S });
+    expect(r.s.queue).toBeNull();
+  });
+
+  it('a done pot with no room waits; once a command makes room the waiting pot fires then, not at the first one\'s end', () => {
+    let { s, two } = twoPots();
+    while (s.bag.length < s.bag_cap) s.bag.push({ id: 'seed_radish', qty: 1 });
+    expect(viewOf(c, s, T0 + 9 * S).cooking.queued).toMatchObject({ starts_in: null });
+    s = step(s, { type: 'read_inbox', keys: [] }, T0 + 10 * S).s;
+    expect(s.stove).toMatchObject({ dish: 'dish_grilled_crucian', no_room: true });
+    s.bag.pop();   // room made (as a sell would)
+    expect(viewOf(c, s, T0 + 11 * S).cooking.stove).toMatchObject({ id: two, ready_in: 5000 });
+    const r = step(s, { type: 'read_inbox', keys: [] }, T0 + 12 * S);
+    expect(r.ev.find(e => e.kind === 'dish')).toMatchObject({ auto: true });
+    expect(r.s.stove).toMatchObject({ dish: 'dish_carrot_cake', started_at: T0 + 12 * S });
+  });
+
   it('is refused below Cooking Lv5, with a pot already waiting, and while plates are left on the stove', () => {
     const s = veteran(); s.fires = 1;
     s.bag.push({ id: 'fish_crucian', qty: 3 });

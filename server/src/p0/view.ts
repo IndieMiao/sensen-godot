@@ -102,14 +102,17 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     cooking: {
       slots: cookSlots(c, s),
       stove: s.stove ? {
+        id: s.stove.id ?? null,   // send it back as `pot` on heat / collect
         dish: s.cookbook.includes(s.stove.dish) && !s.stove.mystery ? s.stove.dish : null, rarity: s.stove.rarity,
         ms: s.stove.ms, elapsed: Math.max(0, now - s.stove.started_at), ready_in: Math.max(0, s.stove.started_at + s.stove.ms - now),
         heats: s.stove.heats,
         left: s.stove.left ?? null,   // portions waiting on the stove after a collect with no room (§7.2.6)
       } : null,
       // Queue ×2 (Cooking Lv5): the pot waiting behind the stove's; it fires when that one is kept (starts_in from now).
-      queued: s.queue ? { dish: s.cookbook.includes(s.queue.dish) && !s.queue.mystery ? s.queue.dish : null, rarity: s.queue.rarity,
-        ms: s.queue.ms, starts_in: s.stove && !s.stove.left ? Math.max(0, s.stove.started_at + s.stove.ms - now) : null } : null,
+      // null when it waits on the player: plates left on the stove, or a done pot with no place to keep it.
+      queued: s.queue ? { id: s.queue.id ?? null, dish: s.cookbook.includes(s.queue.dish) && !s.queue.mystery ? s.queue.dish : null,
+        rarity: s.queue.rarity, ms: s.queue.ms,
+        starts_in: s.stove && !s.stove.left && s.stove.started_at + s.stove.ms > now ? s.stove.started_at + s.stove.ms - now : null } : null,
       first_fire: s.fires === 0,
       // Spice Rack (Homestead Lv2, q(46)): stored seasonings the stove reaches; Experiment shows them with a Rack badge.
       rack: { on: rackOn(c, s), items: [...rackStock(c, s)].map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },

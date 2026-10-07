@@ -40,6 +40,8 @@ export interface Pot {
   items?: string[];                     // what went in (a failed pot's refund and its Kitchen Mishaps entry, §7.5.2)
   taps?: number[];                      // heat taps sent while it cooked (heat command), judged with collect's own
   left?: string[];   // collected (judged, XP paid) but no place to keep: these portions wait on the stove (§7.2.6)
+  id?: number;       // which pot this is (s.fires when it was put on), so heat / collect name the pot they mean (Queue ×2)
+  no_room?: boolean; // done but found no place to keep it: the waiting pot fires when it is taken, not when it was done
 }
 
 /** The Cookbook beyond the known pages (§7.5, SGODOT-232 S5). */

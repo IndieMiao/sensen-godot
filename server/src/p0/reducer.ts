@@ -38,8 +38,10 @@ type P0CommandBody =
   | { type: 'rest' }
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string }
-  | { type: 'collect'; taps?: number[]; eat?: boolean }   // eat: COOK-4 Eat, the main portion straight from the pot
-  | { type: 'heat'; taps: number[] }   // heat taps as they happen, kept on the pot (Queue ×2 keeps a pot on its own)
+  | { type: 'collect'; taps?: number[]; eat?: boolean; pot?: number }   // eat: COOK-4 Eat, the main portion straight from the pot
+  | { type: 'heat'; taps: number[]; pot?: number }   // heat taps as they happen, kept on the pot (Queue ×2 keeps a pot on its own)
+  // pot: the pot's id (pot / queue events, view.cooking.stove.id). With Queue ×2 send it on every heat and collect:
+  // a different pot is refused as stale_pot instead of taking taps meant for another one.
   | { type: 'eat'; item: string; from?: 'bag' | 'cabinet' }
   | { type: 'cabinet_take'; item: string }   // Warming Cabinet `Take one` (§7.7)
   | { type: 'accept' | 'deliver' | 'drop'; request: string }
@@ -68,7 +70,10 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleEnergy(c, s, now);
   rollDay(c, s, now);
   settleBoards(c, s, now);
-  if (cmd.type !== 'collect') settleStove(c, s, now, events);   // Queue ×2: a done pot makes way for the waiting one
+  // Queue ×2: a done pot makes way for the waiting one, as the view shows; heat / collect naming the pot on the stove
+  // bring its taps first, and the settle after the command keeps it if it is done.
+  const aimed = (cmd.type === 'heat' || cmd.type === 'collect') && cmd.pot !== undefined && s.stove !== null && cmd.pot === (s.stove.id ?? null);
+  if (!aimed) settleStove(c, s, now, events);
   settleMine(c, s, now);
   settleParcels(c, s, now);
   notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
@@ -262,6 +267,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
     }
   }
+  settleStove(c, s, now, events);   // a pot queued behind a done one, room just made, or heat taps just in
   s.seq += 1;
   return { ok: true, state: s, events };
 }
