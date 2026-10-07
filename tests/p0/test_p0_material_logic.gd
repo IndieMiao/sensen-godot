@@ -98,6 +98,9 @@ func test_elevator_rows_follow_the_run() -> void:
 	rows = P0MaterialLogic.elevator_rows(_view(_run([_floor(1, true, CLEARED), _floor(2)])), 2)
 	assert_array(rows.map(func(r): return r.label)).is_equal(["Entrance · Free", "Floor 1 · Free", "Floor 2 · Here"])
 	for r in rows: assert_int(str(r.label).length()).is_less_equal(26)
+	assert_str(str(rows[1].name)).is_equal("Floor 1")
+	assert_str(str(rows[1].state)).is_equal("Free")
+	assert_str(str(rows[2].state)).is_equal("Here")
 
 func test_rock_marks_and_floats() -> void:
 	var marks := P0MaterialLogic.rock_marks(_view(_run([_floor(1, true, [true, false, false, false, false, false], true, true,
@@ -131,7 +134,7 @@ func test_gather_marks_and_today_line() -> void:
 	v.gather.spots[0].ready = true
 	assert_str(str(P0MaterialLogic.gather_marks(v)[0].caption)).is_equal("Timber Grove · Tap to gather")
 	assert_str(P0MaterialLogic.today_gather_line(v)).is_equal("")
-	assert_array(P0MaterialLogic.gather_floats(v, {"items": [["wood", 6, "storage"]]})).is_equal(["+6 Timber"])
+	assert_array(P0MaterialLogic.gather_floats(v, {"items": [["wood", 6, "storage"], ["bait_worm", 2, "bag"]]})).is_equal(["+6 Timber · Stored", "+2 bait_worm"])
 
 func _recipe(id: String, tab: String, item: String, name: String, to: String, cost: Array, block = null, owned := false, equipped := false) -> Dictionary:
 	return {"id": id, "tab": tab, "item": item, "name": name, "qty": 2 if to == "bag" else 1, "to": to, "have": 6 if to == "bag" else null,
@@ -174,3 +177,32 @@ func test_mining_quick_bar_holds_torches_only() -> void:
 	assert_array(P0MaterialLogic.mine_candidates(v)).is_empty()
 	v.bag.slots = [{"id": "torch", "qty": 3}, {"id": "seed_radish", "qty": 20}]
 	assert_array(P0MaterialLogic.mine_candidates(v)).is_equal(["torch"])
+
+func test_mine_mouth_badge_sheet_and_status() -> void:
+	assert_str(P0MaterialLogic.mine_badge(_view())).is_equal("Explore")
+	assert_str(P0MaterialLogic.mine_badge(_view(_run([_floor(1), _floor(2, false)]), 200, 1))).is_equal("Run 1/2")
+	var sheet := P0MaterialLogic.mine_sheet(_view())
+	assert_str(str(sheet.line)).is_equal("Explore two floors and gather materials.")
+	assert_that(sheet.facts).is_equal([["Runs today", "0/2"]])
+	var spent := P0MaterialLogic.mine_sheet(_view(null, 200, 2))
+	assert_str(str(spent.subtitle)).is_equal("No run · Runs today 2/2")
+	assert_that(spent.button).is_equal({"label": "Mine runs today 2/2 · Resets in 9h 12m", "enabled": false})
+	var confirm := P0MaterialLogic.new_run_sheet(_view(_run([_floor(1, true, CLEARED), _floor(2, true, CLEARED)], null), 200, 1))
+	assert_that(confirm.facts).is_equal([["Runs today", "1/2 → 2/2"]])
+	assert_that(confirm.confirm.cmd).is_equal({"type": "mine_new_run"})
+	assert_str(str(confirm.keep)).is_equal("Keep current run")
+	var v := _view(_run([_floor(1, true, [true, true, false, false, false, false]), _floor(2, false)]), 200, 1)
+	assert_str(P0MaterialLogic.mine_status(v, 1)).is_equal("Rocks 2/6")
+	assert_str(P0MaterialLogic.mine_status(v, 1, true)).is_equal("Run 1/2 today")
+
+func test_locked_spot_sheet_and_gloves_moment() -> void:
+	var v := {"names": {"clay": "Clay"}, "gather": {"gloves": true, "spots": [
+		{"id": "spot_grove", "name": "Timber Grove", "open": true, "homestead": 1, "ready": true, "ready_in": 0, "yield": [["wood", 7]]},
+		{"id": "spot_clay_bank", "name": "Clay Bank", "open": false, "homestead": 2, "ready": false, "ready_in": 0, "yield": [["clay", 2]]},
+	]}}
+	var locked := P0MaterialLogic.locked_spot_sheet(v, "spot_clay_bank")
+	assert_str(str(locked.line)).is_equal("Gather Clay from this spot once unlocked.")
+	assert_that(locked.facts).is_equal([["Unlock", "Homestead Lv2"]])
+	var moment := P0MaterialLogic.gloves_moment(v)
+	assert_str(str(moment.fact)).is_equal("Next Timber harvest: 7")
+	assert_str(str(moment.note)).is_equal("Passive · no gear slot needed")

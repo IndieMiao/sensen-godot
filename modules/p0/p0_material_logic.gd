@@ -66,6 +66,51 @@ static func reset_notice(view: Dictionary, shown_at: float) -> String:
 	if ended == null or float(ended.get("at", 0)) <= shown_at: return ""
 	return "Run ended at daily reset"
 
+## The mine mouth's world badge (MAT-1 / MINE-P0-5): "Explore" with no run, "Run 1/2" with one.
+static func mine_badge(view: Dictionary) -> String:
+	var mine: Dictionary = view.get("mine", {})
+	if mine.get("run", null) == null: return "Explore"
+	var runs: Dictionary = mine.get("runs", {})
+	return "Run %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))]
+
+## "The mine" sheet from tapping the mouth (MINE-P0-1 / P0-8): {title, subtitle, line, facts: [[k, v]], button}.
+## button {label, enabled}: only when no run is possible today (Mine runs today 2/2 · Resets in 9h 12m, grey).
+static func mine_sheet(view: Dictionary) -> Dictionary:
+	var mine: Dictionary = view.get("mine", {})
+	var runs: Dictionary = mine.get("runs", {})
+	var used := int(runs.get("used", 0))
+	var limit := int(runs.get("limit", 2))
+	var sheet := {"title": "The mine", "subtitle": "Entrance", "line": "Explore two floors and gather materials.",
+		"facts": [["Runs today", "%d/%d" % [used, limit]]], "button": {}}
+	if mine.get("run", null) == null and used >= limit:
+		sheet.subtitle = "No run · Runs today %d/%d" % [used, limit]
+		sheet.line = ""
+		sheet.facts = []
+		sheet.button = {"label": _runs_line(mine), "enabled": false}
+	return sheet
+
+## New run confirmation (MINE-P0-7), opened from the EntryCard: {title, subtitle, facts, cost, note, confirm, keep}.
+## TODO(SGODOT-231): the "Unmined rocks…" line is held back until design settles it (209 31cd05af ①).
+static func new_run_sheet(view: Dictionary) -> Dictionary:
+	var mine: Dictionary = view.get("mine", {})
+	var runs: Dictionary = mine.get("runs", {})
+	var used := int(runs.get("used", 0))
+	var limit := int(runs.get("limit", 2))
+	return {"title": "The mine", "subtitle": "New run", "facts": [["Runs today", "%d/%d → %d/%d" % [used, limit, mini(used + 1, limit), limit]]],
+		"cost": ["New run", "%d Energy" % int(mine.get("floor_energy", 2))], "note": "Your stored materials stay yours.",
+		"confirm": {"label": "Start new run", "cmd": {"type": "mine_new_run"}}, "keep": "Keep current run"}
+
+## Status line under the HUD in the mine (MINE-1 / P0-2): "Rocks 2/6" for the floor; "Run 1/2 today" just after entering.
+static func mine_status(view: Dictionary, n: int, just_entered := false) -> String:
+	var mine: Dictionary = view.get("mine", {})
+	if just_entered:
+		var runs: Dictionary = mine.get("runs", {})
+		return "Run %d/%d today" % [int(runs.get("used", 0)), int(runs.get("limit", 2))]
+	var floor := _floor(view, n)
+	if floor.is_empty(): return ""
+	var rocks := int(mine.get("rocks", 6))
+	return "Rocks %d/%d" % [rocks - int(floor.get("left", rocks)), rocks]
+
 # --- Inside the mine ---
 
 ## Main action key in the mine. ctx: {floor: int, target: "rock" | "stairs" | "up" | "exit" | "elevator" | "", rock: int,
@@ -110,9 +155,21 @@ static func mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 static func mine_candidates(view: Dictionary) -> Array:
 	return ["torch"] if P0Logic.bag_count(view, "torch") > 0 else []
 
+const ELEVATOR_TITLE := "Elevator · stops this run"   # MINE-P0-6 panel header
+
 ## Elevator card rows (§13.3.9, q(44); P0: Entrance, Floor 1, Floor 2, no Express). here: 0 = entrance, else a floor.
-## Each row {label, enabled, amber, cmd}; cmd type "mine_leave" (back to the farm) or "mine_floor" {floor}.
+## Each row {name, state, label, enabled, amber, cmd}: MINE-P0-6 draws name left and state right ("Floor 1" · "Free");
+## label is the joined line (≤ 26 characters). cmd type "mine_leave" (back to the farm) or "mine_floor" {floor}.
 static func elevator_rows(view: Dictionary, here: int) -> Array:
+	var rows: Array = []
+	for r in _elevator_rows(view, here):
+		var parts := str(r.label).split(" · ", true, 1)
+		r["name"] = parts[0]
+		r["state"] = parts[1] if parts.size() > 1 else ""
+		rows.append(r)
+	return rows
+
+static func _elevator_rows(view: Dictionary, here: int) -> Array:
 	var mine: Dictionary = view.get("mine", {})
 	var fee := int(mine.get("floor_energy", 2))
 	var rows: Array = []
@@ -187,11 +244,12 @@ static func today_gather_line(view: Dictionary) -> String:
 	if best.is_empty(): return ""
 	return "%s · Ready in %s" % [str(best.get("name", "")), P0Logic.duration(float(best.get("ready_in", 0)))]
 
-## Floats for one gather event: "+6 Timber" per item (both storage and bag parts).
+## Floats for one gather event (MAT-2): "+6 Timber · Stored" for what went to Farm Storage, "+2 Worm Bait" for the bag.
 static func gather_floats(view: Dictionary, e: Dictionary) -> Array:
 	var out: Array = []
 	for it in e.get("items", []):
-		out.append("+%d %s" % [int(it[1]), P0Logic.item_name(view, str(it[0]))])
+		var line := "+%d %s" % [int(it[1]), P0Logic.item_name(view, str(it[0]))]
+		out.append(line + " · Stored" if str(it[2]) == "storage" else line)
 	return out
 
 ## Coming home (q(40)): "Stored · 12 Stone · 3 Copper Ore" once per new storage.auto.at (number first, appendix B).
@@ -201,6 +259,24 @@ static func stored_notice(view: Dictionary, shown_at: float) -> String:
 	var parts: Array = []
 	for it in auto.get("items", []): parts.append("%d %s" % [int(it[1]), P0Logic.item_name(view, str(it[0]))])
 	return "Stored · " + " · ".join(parts)
+
+## Locked spot sheet (MAT-3): tapping the Clay Bank before Homestead Lv2.
+static func locked_spot_sheet(view: Dictionary, spot_id: String) -> Dictionary:
+	for sp in view.get("gather", {}).get("spots", []):
+		if str(sp.get("id", "")) != spot_id: continue
+		var item := str((sp.get("yield", [[""]]) as Array)[0][0])
+		return {"title": str(sp.get("name", "")), "subtitle": "Locked",
+			"line": "Gather %s from this spot once unlocked." % P0Logic.item_name(view, item),
+			"facts": [["Unlock", "Homestead Lv%d" % int(sp.get("homestead", 2))]]}
+	return {}
+
+## Gather Gloves moment (MAT-GLOVES-RESULT): MomentBanner lines after crafting them.
+static func gloves_moment(view: Dictionary) -> Dictionary:
+	var next := 0
+	for sp in view.get("gather", {}).get("spots", []):
+		if str(sp.get("id", "")) == "spot_grove": next = int((sp.get("yield", [["", 0]]) as Array)[0][1])
+	return {"title": "Gather Gloves", "line": "+1 at every gathering spot",
+		"fact": "Next Timber harvest: %d" % next, "note": "Passive · no gear slot needed"}
 
 # --- Workbench (B2-06) ---
 
