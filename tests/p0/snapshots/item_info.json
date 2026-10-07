@@ -240,7 +240,7 @@
       "unavailable:Fishing Lv3 needed"
     ],
     "facts": [
-      "Lands up to Rare fish · Bite window +0.4 s"
+      "Lands up to Rare fish · Bite window 2.6 s"
     ],
     "lock": {
       "locked": false,
@@ -258,7 +258,7 @@
     "badge": "",
     "buttons": [],
     "facts": [
-      "Lands up to Rare fish · Bite window +0.4 s",
+      "Lands up to Rare fish · Bite window 2.6 s",
       "Fishing Lv3 · Tackle Shop"
     ],
     "lock": {
@@ -289,7 +289,7 @@
       "unavailable:Owned"
     ],
     "facts": [
-      "Lands up to Fine fish",
+      "Lands up to Fine fish · Bite window 2.2 s",
       "In Gear"
     ],
     "lock": {
@@ -305,7 +305,7 @@
       "unavailable:✓ Equipped"
     ],
     "facts": [
-      "Lands up to Fine fish"
+      "Lands up to Fine fish · Bite window 2.2 s"
     ],
     "lock": {
       "locked": false,

@@ -108,16 +108,45 @@
                               "rect": [
                                 58,
                                 80,
-                                199,
+                                203,
                                 20
                               ],
                               "variation": "C14XB",
                               "text": "Grilled Crucian"
                             },
                             {
+                              "type": "Control",
+                              "rect": [
+                                267,
+                                83,
+                                14,
+                                14
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    267,
+                                    83,
+                                    14,
+                                    14
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    252,
+                                    68,
+                                    44,
+                                    44
+                                  ]
+                                }
+                              ]
+                            },
+                            {
                               "type": "PanelContainer",
                               "rect": [
-                                263,
+                                287,
                                 81,
                                 22,
                                 18
@@ -126,42 +155,13 @@
                                 {
                                   "type": "Label",
                                   "rect": [
-                                    267,
+                                    291,
                                     82,
                                     14,
                                     16
                                   ],
                                   "variation": "C11XB",
                                   "text": "×3"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "Control",
-                              "rect": [
-                                291,
-                                81,
-                                18,
-                                18
-                              ],
-                              "children": [
-                                {
-                                  "type": "TextureRect",
-                                  "rect": [
-                                    291,
-                                    81,
-                                    18,
-                                    18
-                                  ]
-                                },
-                                {
-                                  "type": "Control",
-                                  "rect": [
-                                    278,
-                                    68,
-                                    44,
-                                    44
-                                  ]
                                 }
                               ]
                             },
@@ -353,16 +353,45 @@
                               "rect": [
                                 58,
                                 202,
-                                193,
+                                197,
                                 20
                               ],
                               "variation": "C14XB",
                               "text": "Radish"
                             },
                             {
+                              "type": "Control",
+                              "rect": [
+                                261,
+                                205,
+                                14,
+                                14
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    261,
+                                    205,
+                                    14,
+                                    14
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    246,
+                                    190,
+                                    44,
+                                    44
+                                  ]
+                                }
+                              ]
+                            },
+                            {
                               "type": "PanelContainer",
                               "rect": [
-                                257,
+                                281,
                                 203,
                                 28,
                                 18
@@ -371,42 +400,13 @@
                                 {
                                   "type": "Label",
                                   "rect": [
-                                    261,
+                                    285,
                                     204,
                                     20,
                                     16
                                   ],
                                   "variation": "C11XB",
                                   "text": "×12"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "Control",
-                              "rect": [
-                                291,
-                                203,
-                                18,
-                                18
-                              ],
-                              "children": [
-                                {
-                                  "type": "TextureRect",
-                                  "rect": [
-                                    291,
-                                    203,
-                                    18,
-                                    18
-                                  ]
-                                },
-                                {
-                                  "type": "Control",
-                                  "rect": [
-                                    278,
-                                    190,
-                                    44,
-                                    44
-                                  ]
                                 }
                               ]
                             },
@@ -618,12 +618,32 @@
                               "text": "Radish"
                             },
                             {
-                              "type": "TextureRect",
+                              "type": "Control",
                               "rect": [
                                 261,
                                 347,
                                 14,
                                 14
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    261,
+                                    347,
+                                    14,
+                                    14
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    246,
+                                    332,
+                                    44,
+                                    44
+                                  ]
+                                }
                               ]
                             },
                             {
@@ -825,7 +845,7 @@
                               "rect": [
                                 58,
                                 458,
-                                173,
+                                177,
                                 20
                               ],
                               "variation": "C14XB",
@@ -834,16 +854,45 @@
                             {
                               "type": "TextureRect",
                               "rect": [
-                                237,
+                                241,
                                 461,
                                 14,
                                 14
                               ]
                             },
                             {
+                              "type": "Control",
+                              "rect": [
+                                261,
+                                461,
+                                14,
+                                14
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    261,
+                                    461,
+                                    14,
+                                    14
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    246,
+                                    446,
+                                    44,
+                                    44
+                                  ]
+                                }
+                              ]
+                            },
+                            {
                               "type": "PanelContainer",
                               "rect": [
-                                257,
+                                281,
                                 459,
                                 28,
                                 18
@@ -852,42 +901,13 @@
                                 {
                                   "type": "Label",
                                   "rect": [
-                                    261,
+                                    285,
                                     460,
                                     20,
                                     16
                                   ],
                                   "variation": "C11XB",
                                   "text": "×20"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "Control",
-                              "rect": [
-                                291,
-                                459,
-                                18,
-                                18
-                              ],
-                              "children": [
-                                {
-                                  "type": "TextureRect",
-                                  "rect": [
-                                    291,
-                                    459,
-                                    18,
-                                    18
-                                  ]
-                                },
-                                {
-                                  "type": "Control",
-                                  "rect": [
-                                    278,
-                                    446,
-                                    44,
-                                    44
-                                  ]
                                 }
                               ]
                             },

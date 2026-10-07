@@ -4,7 +4,7 @@ extends PanelContainer
 ## card inside the bag drawer, the Gear side, a counter and the gift drawer, drawn like Compact/SelectedItem
 ## 633:41257 (BAG-1 482:10). It draws the spec its rules give it (P0ItemInfo.spec bound to the live view); it decides
 ## nothing itself.
-##   medallion (40, primary tint) · title, state badge, ×N pill, lock icon, › · state line (rarity, ★) ·
+##   medallion (40, primary tint) · title, pin badge, LockToggle, ×N pill, › · state line (rarity, ★) ·
 ##   fact lines · the last fact on the button row's left, buttons on its right (nav Gift ›, compact commands).
 ##
 ##   rules: Callable(item_id: String, context: StringName, opts: Dictionary) -> Dictionary (the spec). Owners bind
@@ -21,7 +21,9 @@ signal action_requested(action: StringName, item_id: String, payload: Dictionary
 signal info_requested(item_id: String)
 signal closed
 
-const LOCK_GLYPH := preload("res://assets/ui/kit_icons/lock.svg")   # white, tinted per use
+## LockToggle 1539:97939 (F-07, 安其拉 10-08): outline open lock in secondary ink / solid closed lock in text ink.
+const LOCK_OPEN_GLYPH := preload("res://assets/ui/kit_icons/lock_open.svg")
+const LOCK_CLOSED_GLYPH := preload("res://assets/ui/kit_icons/lock_closed.svg")
 const PIN_GLYPH := preload("res://assets/ui/kit_icons/pin.svg")
 # Compact/SelectedItem 633:41257 (336 × 82): insets 10 / 10 / 8 / 0, medallion 40 (radius 20) with a 27 icon,
 # text column at x 58 (gap 8), quantity pill 18 high (radius 9), chevron 14, buttons in 44 touch rows.
@@ -120,6 +122,9 @@ func _title_row() -> HBoxContainer:
 	_badge = UiKit.icon(null, _GLYPH)
 	_badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(_badge)
+	# LockToggle sits left of the count: `icon · name … 🔒 ×3 ›` (225 walkthrough 2fcfd08f).
+	_lock = _lock_icon()
+	h.add_child(_lock)
 	_qty_pill = PanelContainer.new()
 	_qty_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_qty_pill.custom_minimum_size.y = _PILL_H
@@ -129,8 +134,6 @@ func _title_row() -> HBoxContainer:
 	_qty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_qty_pill.add_child(_qty)
 	h.add_child(_qty_pill)
-	_lock = _lock_icon()
-	h.add_child(_lock)
 	_chevron = UiKit.label("›", UiTokens.STYLE_C14_B, UiTokens.COLOR_SECONDARY)
 	_chevron.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	h.add_child(_chevron)
@@ -139,19 +142,22 @@ func _title_row() -> HBoxContainer:
 	h.gui_input.connect(func(e: InputEvent): if _tapped(e) and bool(_spec.get("info", false)): info_requested.emit(_item))
 	return h
 
-## The title-area lock: an 18 px glyph with a 44 px touch area centred on it (F-07: 触区 44), outside the layout.
+## The title-area LockToggle (1539:97939): a 14 px glyph with a 44 px touch area centred on it (F-07: 触区 44),
+## outside the layout. Locked, the lock is the stack's Locked badge too; a locked stack whose lock can't be
+## toggled here still shows it, without the touch area.
 func _lock_icon() -> Control:
 	var c := Control.new()
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	c.custom_minimum_size = Vector2(_PILL_H, _PILL_H)
+	c.custom_minimum_size = Vector2(_GLYPH, _GLYPH)
 	c.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var glyph := UiKit.icon(LOCK_GLYPH, _PILL_H)
-	glyph.self_modulate = UiTokens.COLOR_SECONDARY
+	var glyph := UiKit.icon(LOCK_OPEN_GLYPH, _GLYPH)
+	glyph.name = "Glyph"
 	c.add_child(glyph)
 	var hit := Control.new()
+	hit.name = "Hit"
 	hit.mouse_filter = Control.MOUSE_FILTER_STOP
 	hit.size = Vector2(UiTokens.SIZE_TOUCH, UiTokens.SIZE_TOUCH)
-	hit.position = Vector2.ONE * (_PILL_H - UiTokens.SIZE_TOUCH) * 0.5
+	hit.position = Vector2.ONE * (_GLYPH - UiTokens.SIZE_TOUCH) * 0.5
 	hit.gui_input.connect(func(e: InputEvent):
 		if _tapped(e): action_requested.emit(&"unlock" if _spec.get("lock", {}).get("locked", false) else &"lock", _item, {}))
 	c.add_child(hit)
@@ -176,11 +182,17 @@ func refresh() -> void:
 	_qty.text = "×%d" % qty
 	_qty_pill.visible = qty > 0
 	var badge := StringName(_spec.get("badge", &""))
-	_badge.visible = badge != &""
-	_badge.texture = LOCK_GLYPH if badge == &"locked" else PIN_GLYPH
-	_badge.self_modulate = UiTokens.COLOR_SECONDARY if badge == &"locked" else UiTokens.COLOR_PIN_AMBER
+	# Locked > Pinned > New: the lock is the Locked badge, so the pin badge shows only on an unlocked stack.
+	_badge.visible = badge == &"pinned"
+	_badge.texture = PIN_GLYPH
+	_badge.self_modulate = UiTokens.COLOR_PIN_AMBER
 	var lock: Dictionary = _spec.get("lock", {})
-	_lock.visible = bool(lock.get("shown", false)) and badge != &"locked"   # one lock mark, not two
+	var locked := bool(lock.get("locked", false)) or badge == &"locked"
+	_lock.visible = bool(lock.get("shown", false)) or locked
+	var glyph := _lock.get_node("Glyph") as TextureRect
+	glyph.texture = LOCK_CLOSED_GLYPH if locked else LOCK_OPEN_GLYPH
+	glyph.self_modulate = UiTokens.COLOR_TEXT if locked else UiTokens.COLOR_SECONDARY
+	(_lock.get_node("Hit") as Control).mouse_filter = Control.MOUSE_FILTER_STOP if bool(lock.get("shown", false)) else Control.MOUSE_FILTER_IGNORE
 	_chevron.visible = bool(_spec.get("info", false))
 	var stars := " ★".repeat(int(_spec.get("quality", 0)))
 	_state.text = str(_spec.get("rarity_text", "")) + stars

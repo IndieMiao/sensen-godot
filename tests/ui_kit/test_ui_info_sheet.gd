@@ -120,7 +120,27 @@ func test_lock_icon_toggles_lock_and_unlock() -> void:
 	up.pressed = false
 	sheet._lock.get_child(1).gui_input.emit(up)
 	assert_vector(sheet._lock.get_child(1).size).is_equal(Vector2(44, 44))   # F-07: 44 touch area
+	var glyph := sheet._lock.get_node("Glyph") as TextureRect
+	assert_object(glyph.texture).is_same(UiInfoSheet.LOCK_OPEN_GLYPH)   # outline open lock, secondary ink
+	assert_str(glyph.self_modulate.to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
 	locked[0] = true
 	sheet.refresh()
-	assert_bool(sheet._badge.visible).is_true()   # the locked badge replaces the lock icon
-	assert_array(got).is_equal([&"lock"])
+	assert_bool(sheet._lock.visible).is_true()   # the lock is the Locked badge (LockToggle 1539:97939)
+	assert_object(glyph.texture).is_same(UiInfoSheet.LOCK_CLOSED_GLYPH)
+	assert_str(glyph.self_modulate.to_html()).is_equal(UiTokens.COLOR_TEXT.to_html())
+	assert_bool(sheet._badge.visible).is_false()
+	sheet._lock.get_child(1).gui_input.emit(up)
+	assert_array(got).is_equal([&"lock", &"unlock"])
+
+func test_lock_sits_left_of_the_count_and_hides_the_pin_when_locked() -> void:
+	var st := {badge = &"pinned", locked = false}
+	sheet.rules = func(id, ctx, o): return {id = id, title = "Radish", quantity = 3, info = true,
+		lock = {shown = true, locked = st.locked}, badge = st.badge}
+	sheet.open("crop_radish", &"bag")
+	await await_idle_frame()
+	assert_float(sheet._lock.get_global_rect().end.x).is_less_equal(sheet._qty_pill.get_global_rect().position.x)
+	assert_bool(sheet._badge.visible).is_true()   # unlocked + pinned: the pin shows
+	st.locked = true
+	st.badge = &"locked"
+	sheet.refresh()
+	assert_bool(sheet._badge.visible).is_false()   # Locked > Pinned > New

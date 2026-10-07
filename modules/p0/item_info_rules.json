@@ -413,7 +413,7 @@
       {
         "id": "equip",
         "label": "Equip",
-        "kind": "secondary",
+        "kind": "primary",
         "when": "owned & !equipped"
       }
     ]
@@ -586,7 +586,7 @@
       {
         "id": "equip",
         "label": "Equip",
-        "kind": "secondary",
+        "kind": "primary",
         "when": "owned & !equipped"
       }
     ]

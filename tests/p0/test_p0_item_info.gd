@@ -175,10 +175,15 @@ func test_buy_rows_say_why_they_cannot_be_bought() -> void:
 	assert_bool(s.facts.has("Stock 7/30 · Bag ×5")).is_true()
 
 func test_rods_in_gear_equip_or_show_equipped() -> void:
-	assert_array(_labels(P0ItemInfo.spec(_view(), "rod_starter", &"gear"))).is_equal(["unavailable:✓ Equipped"])
+	var starter := P0ItemInfo.spec(_view(), "rod_starter", &"gear")
+	assert_array(_labels(starter)).is_equal(["unavailable:✓ Equipped"])
+	assert_str(str(starter.facts[0])).is_equal("Lands up to Fine fish · Bite window 2.2 s")   # absolute window (76834e35)
 	var s := P0ItemInfo.spec(_view(), "rod_reed", &"gear")
 	assert_array(_labels(s)).is_empty()
-	assert_array(s.facts).is_equal(["Lands up to Rare fish · Bite window +0.4 s", "Fishing Lv3 · Tackle Shop"])
+	assert_array(s.facts).is_equal(["Lands up to Rare fish · Bite window 2.6 s", "Fishing Lv3 · Tackle Shop"])
+	var v := _view()
+	for r in v.gear.rods: if str(r.id) == "rod_reed": r.owned = true
+	assert_array(_labels(P0ItemInfo.spec(v, "rod_reed", &"gear"))).is_equal(["primary:Equip"])   # solid (BAG-2)
 
 func test_snapshot_of_every_kind_and_context() -> void:
 	var v := _view()
