@@ -135,14 +135,18 @@ describe('Pip and Old Kai requests (§9.4.3; Li Bai b7d8b665, 719ce953)', () => 
     expect(refuse(r.s, { type: 'deliver', request: 'req_res_pip_3' }, day3)).toMatchObject({ ok: false, code: 'request_done' });
   });
 
-  it("Old Kai's one request takes a Rare fish for 50 coins; resident coins share the 100-coin bonus cap", () => {
+  it("Old Kai's one request takes a Rare fish for 50 coins; only the part above the fish's floor shares the bonus cap (q(44))", () => {
     let s = fresh();
     s = step(s, { type: 'accept', request: 'req_res_kai_1' }).s;
     expect(viewOf(c, s, T0).residents.res_old_kai).toMatchObject({ request_state: 'accepted', request: { kind: 'fish', rarity: 3, qty: 1, coins: 50, ready: false } });
     s.bag.push({ id: 'fish_koi', qty: 1 });
     s.day.key = '2026-10-08'; s.day.bonus = 70;
     const r = step(s, { type: 'deliver', request: 'req_res_kai_1' });
-    expect(r.ev).toContainEqual({ kind: 'request', id: 'req_res_kai_1', status: 'done', coins: 30, bonus: 30 });
+    // Golden Koi floor ⌊13 × 0.8⌋ = 10 is paid in full; the 40 above it is capped by the 30 left today
+    expect(r.ev).toContainEqual({ kind: 'request', id: 'req_res_kai_1', status: 'done', coins: 40, bonus: 30 });
+    const spent = structuredClone(s);
+    spent.day.bonus = 100;
+    expect(step(spent, { type: 'deliver', request: 'req_res_kai_1' }).ev).toContainEqual({ kind: 'request', id: 'req_res_kai_1', status: 'done', coins: 10, bonus: 0 });
     expect(viewOf(c, r.s, T0 + DAY).residents.res_old_kai.request_state).toBe('none');
     expect(refuse(r.s, { type: 'drop', request: 'req_res_kai_1' })).toMatchObject({ ok: false, code: 'cannot_drop' });
   });
