@@ -201,6 +201,9 @@ func test_storage_stacks_follow_the_bag_on_their_tabs_at_home_only() -> void:
 		assert_array(mats).is_empty()   # no storage card in the rules yet: no dead cells
 	assert_array(P0BagDrawer.storage_items(v, "All")).is_empty()
 	assert_array(P0BagDrawer.storage_items(v, "Materials", "pond")).is_empty()
+	v.storage.items.append({"id": "fert_compost", "qty": 6})   # §10.4.2: compost sits on the Seeds tab
+	if ready:
+		assert_that(P0BagDrawer.storage_items(v, "Seeds").map(func(it): return it.item)).is_equal(["seed_radish", "fert_compost"])
 	v.erase("storage")
 	assert_array(P0BagDrawer.storage_items(v, "Seeds")).is_empty()
 	assert_str(P0BagDrawer.hint_for("Seeds", false)).is_equal("Select an item to see its details.")

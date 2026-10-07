@@ -18,8 +18,6 @@ signal gear_slot_changed(key: String)
 
 const HEIGHT := 546.0   # drawer top at y 254 of 800 (BAG-2-2)
 const CATEGORIES := ["All", "Seeds", "Fish", "Produce", "Dishes", "Materials", "Tackle"]
-const _KIND_OF_CATEGORY := {"Seeds": ["seed"], "Fish": ["fish"], "Produce": ["crop"], "Dishes": ["dish"],
-	"Materials": ["material"], "Tackle": ["bait", "rod"]}
 const GEAR_SLOTS := ["farming", "fishing", "mining", "combat", "ring", "charm"]
 ## Tabs that also list Farm Storage stacks, after the bag's, while at home (§10.4.8, BAG-2-2; SGODOT-228 / 231).
 const STORAGE_TABS := ["Seeds", "Materials", "Tackle"]
@@ -172,7 +170,7 @@ static func storage_items(view: Dictionary, cat: String, at := "home") -> Array:
 	for st in view.get("storage", {}).get("items", []):
 		var id := str(st.get("id", ""))
 		var it := {id = "storage:" + id, item = id, icon = P0Logic.icon(id), qty = int(st.get("qty", 0)), rarity = 0,
-			kind = P0ItemInfo.kind_of(view, id), stored = true}
+			kind = P0ItemInfo.kind_of(view, id), tab = P0ItemInfo.tab_of(view, id), stored = true}
 		if in_category(it, cat): out.append(it)
 	return out
 
@@ -187,7 +185,7 @@ static func bag_items(view: Dictionary, sort_by := "Type") -> Array:
 		var it := P0Logic.item(view, id)
 		out.append({id = id, icon = P0Logic.icon(str(it.get("base", id))), qty = int(s.get("qty", 0)),
 			rarity = int(it.get("rarity", 0)) if id.begins_with("fish_") or id.begins_with("dish_") else 0,
-			kind = P0ItemInfo.kind_of(view, id)})
+			kind = P0ItemInfo.kind_of(view, id), tab = P0ItemInfo.tab_of(view, id)})
 	if sort_by == "Type":
 		var order := func(it: Dictionary) -> int:
 			for i in CATEGORIES.size():
@@ -203,9 +201,9 @@ static func bag_items(view: Dictionary, sort_by := "Type") -> Array:
 		out = keyed.map(func(k): return k[4])
 	return out
 
+## Tabs follow P0ItemInfo.tab_of (§10.4.2: compost on Seeds, torches on Materials, bait / rods / picks on Tackle).
 static func in_category(it: Dictionary, cat: String) -> bool:
-	if cat == "All": return true
-	return str(it.get("kind", "")) in _KIND_OF_CATEGORY.get(cat, [])
+	return cat == "All" or StringName(cat.to_lower()) == it.get("tab", &"")
 
 ## The six Gear slots: {key, role, item, icon, name, empty}.
 static func gear_slots(view: Dictionary) -> Array:
