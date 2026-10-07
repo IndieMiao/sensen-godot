@@ -1,0 +1,176 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    150
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiFactRow"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Fact 483:222 · Cost 483:225"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        98
+      ],
+      "children": [
+        {
+          "type": "UiFactRow",
+          "rect": [
+            0,
+            52,
+            328,
+            32
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                58,
+                328,
+                20
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    59,
+                    160,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "Progress"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    168,
+                    58,
+                    160,
+                    20
+                  ],
+                  "variation": "BodyXB14",
+                  "text": "2/8"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiFactRow",
+          "rect": [
+            0,
+            84,
+            328,
+            32
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                90,
+                328,
+                20
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    91,
+                    160,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "Grows in"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    168,
+                    90,
+                    160,
+                    20
+                  ],
+                  "variation": "BodyXB14",
+                  "text": "4m 30s"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiFactRow",
+          "rect": [
+            0,
+            116,
+            328,
+            34
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                122,
+                328,
+                22
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    124,
+                    160,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "Cost"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    168,
+                    122,
+                    160,
+                    22
+                  ],
+                  "variation": "RowTitleXB15",
+                  "text": "120 coins"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

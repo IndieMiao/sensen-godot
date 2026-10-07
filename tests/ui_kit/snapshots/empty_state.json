@@ -1,0 +1,117 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    256
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiEmptyState"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "Main pending: WP6 SGODOT-206 · provisional look per WP7-B F-08 §5"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        186
+      ],
+      "children": [
+        {
+          "type": "UiEmptyState",
+          "rect": [
+            0,
+            70,
+            328,
+            108
+          ],
+          "children": [
+            {
+              "type": "TextureRect",
+              "rect": [
+                148,
+                70,
+                32,
+                32
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                108,
+                328,
+                20
+              ],
+              "variation": "BodyB14",
+              "text": "No fish yet"
+            },
+            {
+              "type": "UiNavButton",
+              "rect": [
+                122,
+                134,
+                84,
+                44
+              ],
+              "variation": "NavCompact",
+              "text": "Show on map ›"
+            }
+          ]
+        },
+        {
+          "type": "UiEmptyState",
+          "rect": [
+            0,
+            198,
+            328,
+            58
+          ],
+          "children": [
+            {
+              "type": "TextureRect",
+              "rect": [
+                148,
+                198,
+                32,
+                32
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                236,
+                328,
+                20
+              ],
+              "variation": "BodyB14",
+              "text": "Nothing to sell here"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

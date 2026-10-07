@@ -1,0 +1,320 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    124
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiItemCell · inventory"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Compact/InventoryCell 633:41278 · LOCK-12"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        72
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            52,
+            72
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                0,
+                52,
+                52,
+                52
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    0,
+                    52,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        13,
+                        62,
+                        27,
+                        27
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        25,
+                        88,
+                        24,
+                        13
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            25,
+                            87,
+                            24,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×3"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                110,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "default"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            64,
+            52,
+            52,
+            72
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                64,
+                52,
+                52,
+                52
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    64,
+                    52,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        77,
+                        62,
+                        27,
+                        27
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        69,
+                        57,
+                        6,
+                        6
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        89,
+                        88,
+                        24,
+                        13
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            89,
+                            87,
+                            24,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×1"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                64,
+                110,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "rarity"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            128,
+            52,
+            52,
+            72
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                128,
+                52,
+                52,
+                52
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    128,
+                    52,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        141,
+                        62,
+                        27,
+                        27
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        153,
+                        88,
+                        24,
+                        13
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            153,
+                            87,
+                            24,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×19"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                128,
+                110,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "selected"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            192,
+            52,
+            52,
+            72
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                192,
+                52,
+                52,
+                52
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    192,
+                    52,
+                    52,
+                    52
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                192,
+                110,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "empty"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

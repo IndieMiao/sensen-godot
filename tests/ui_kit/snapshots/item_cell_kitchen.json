@@ -1,0 +1,444 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    220
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiItemCell · kitchen"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Compact/Kitchen/Cell 655:58506 · LOCK-20"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        168
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            52,
+            78
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                0,
+                52,
+                52,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    0,
+                    52,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        13,
+                        60,
+                        27,
+                        27
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                116,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "default"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            64,
+            52,
+            52,
+            78
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                64,
+                52,
+                52,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    64,
+                    52,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        77,
+                        60,
+                        27,
+                        27
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Panel",
+                  "rect": [
+                    64,
+                    83,
+                    52,
+                    25
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        64,
+                        82,
+                        52,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "Tasted"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                64,
+                116,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "state label"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            128,
+            52,
+            52,
+            78
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                128,
+                52,
+                52,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    128,
+                    52,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        141,
+                        60,
+                        27,
+                        27
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        132,
+                        56,
+                        6,
+                        6
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        153,
+                        88,
+                        24,
+                        13
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            153,
+                            87,
+                            24,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×3"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                128,
+                116,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "quantity"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            192,
+            52,
+            52,
+            78
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                192,
+                52,
+                52,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    192,
+                    52,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        205,
+                        60,
+                        27,
+                        27
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Panel",
+                  "rect": [
+                    233,
+                    50,
+                    13,
+                    13
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        235,
+                        52,
+                        9,
+                        9
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                192,
+                116,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "selected"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            256,
+            52,
+            52,
+            78
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                256,
+                52,
+                52,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    256,
+                    52,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        269,
+                        60,
+                        27,
+                        27
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Panel",
+                  "rect": [
+                    297,
+                    50,
+                    13,
+                    13
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        299,
+                        52,
+                        9,
+                        9
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                256,
+                116,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "cooked"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            142,
+            52,
+            78
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                0,
+                142,
+                52,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    0,
+                    142,
+                    52,
+                    52
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                206,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "empty"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
