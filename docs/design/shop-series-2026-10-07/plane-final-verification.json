@@ -2,7 +2,7 @@
   "states": [
     {
       "card": 179,
-      "state": "Review",
+      "state": "Done",
       "assignee": "刘备"
     },
     {
@@ -12,7 +12,7 @@
     },
     {
       "card": 181,
-      "state": "Review",
+      "state": "Done",
       "assignee": "刘备"
     },
     {
@@ -27,7 +27,7 @@
     },
     {
       "card": 184,
-      "state": "Review",
+      "state": "Done",
       "assignee": "刘备"
     },
     {
@@ -43,13 +43,13 @@
   ],
   "parent_attachments": [
     {
-      "file": "SGODOT-171_LiuBei_revisions_overview.jpg",
-      "sha256": "649650ebc63e1d1d61a041090c929399679ff05f62d4d6645f9ccd72d88aed7f",
+      "file": "SGODOT-171_LiuBei_R2_overview.jpg",
+      "sha256": "ddb57c8b62d653179f82ff1669fb5985d5e9417846f2ff3ef23bebc96501a1eb",
       "byte_identical": true
     },
     {
-      "file": "SGODOT-171_LiuBei_revisions_verification.json",
-      "sha256": "ebad75480e82ed32c26e03ef72af10349b7545f978db7a6a19af0c44226973dc",
+      "file": "SGODOT-171_LiuBei_R2_verification.json",
+      "sha256": "31d3a892598aafd613a9a9817ec23fc71c335cdfdc54206cd26a227d3ce02b15",
       "byte_identical": true
     }
   ]

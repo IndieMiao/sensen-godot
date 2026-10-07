@@ -27,3 +27,5 @@ output/art-tools/bin/python tools/art/source/coffee_shop/package_r2_details.py b
 ```
 
 源文件 tools/art/source/burger_shop/burger_shop.blend，revision.py / revision2.py 与 burger_bench.py 可复现。等待不知火舞美术复审。
+
+2026-10-07 验收更新：不知火舞在 Plane 记录用户已确认，R2 d691caf6 已验收，状态 Done。菜单板尺寸和花箱密度为不阻塞的可选后续项；本次保留已通过资产。

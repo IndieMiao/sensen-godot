@@ -38,3 +38,5 @@ output/art-tools/bin/python tools/art/source/coffee_shop/package_r2_details.py c
 ```
 
 源文件 `tools/art/source/coffee_shop_0/coffee_shop_0.blend`；`revision.py` / `revision2.py` 与 `courtyard_bench.py` 可复现，米制 Y-up、保留局部轴心。猫是静态装饰，不含动画或交互。豆罐新增小搁板、灰白猫换到无遮挡位置属于本轮为解决穿插/遮挡作的布置调整，已在全景中直接呈现。
+
+2026-10-07 验收更新：不知火舞在 Plane 记录用户已确认，R2 17b266d3 已验收，状态 Done。树冠密度和草地边缘为不阻塞的可选后续项；本次保留已通过资产。

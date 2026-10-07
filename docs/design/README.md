@@ -4,7 +4,7 @@
 
 ## 当前 UI 与 P0 美术
 
-- [刘备 · 八个店面场景修订（2026-10-07）](shop-series-2026-10-07/README.md)：179 R2.1、180–186 R1，289/289 实际角色检查、预算/取色、112 个 Plane 附件与飞书媒体回读；八卡 Review，等待不知火舞统一视觉复审。
+- [刘备 · 场景返修统一复审（2026-10-07）](shop-series-2026-10-07/README.md)：179/181/184 Done；180/182/183 R2.1、185/186 R2 Review；252 项最新角色检查、地台对齐、预算/取色/交付回读。
 - [Art environment setup](art-environment-setup.md): start here on a fresh host; toolchain, Git access, Figma MCP, Windows/remote OAuth callbacks, Lark CLI application/user authorization and readiness checks.
 - [Mobile 3D asset workflow](mobile-3d-asset-workflow.md): English production guide for agents, based on the accepted Basic Room; reference analysis, reusable modeling, atlases, mobile budgets, Godot/Android checks and verified delivery.
 - [Basic Room (2026-10-06)](basic-room-2026-10-06/README.md): user-accepted Blender assets, reusable Godot room, offline movement benchmark and Android checks; includes committed review images and an evidence summary. Not a production release.
