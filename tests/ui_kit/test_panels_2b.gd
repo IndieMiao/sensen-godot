@@ -391,3 +391,16 @@ func test_request_card_short_of_items_puts_the_gap_on_the_button() -> void:
 	await _settle()
 	assert_str(c.action_button().text).is_equal("Need 1 more Common fish")
 	assert_bool(c.action_button().is_unavailable()).is_true()
+
+func test_stored_stack_shows_the_house_badge() -> void:
+	var g := UiInventoryGrid.new()
+	g.custom_minimum_size = Vector2(336, 240)
+	var it := _items(2)
+	it[1]["stored"] = true
+	g.items = it
+	_host(g)
+	await _settle()
+	assert_bool(g.cells()[0]._home.visible).is_false()
+	assert_bool(g.cells()[1]._home.visible).is_true()
+	assert_vector(g.cells()[1]._home.position).is_equal(Vector2(4, 38))
+	assert_bool(g.cells()[5]._home.visible).is_false()   # empty cells never

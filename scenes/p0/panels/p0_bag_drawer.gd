@@ -21,6 +21,8 @@ const CATEGORIES := ["All", "Seeds", "Fish", "Produce", "Dishes", "Materials", "
 const _KIND_OF_CATEGORY := {"Seeds": ["seed"], "Fish": ["fish"], "Produce": ["crop"], "Dishes": ["dish"],
 	"Materials": ["material"], "Tackle": ["bait", "rod"]}
 const GEAR_SLOTS := ["farming", "fishing", "mining", "combat", "ring", "charm"]
+## Tabs that also list Farm Storage stacks, after the bag's, while at home (§10.4.8, BAG-2-2; SGODOT-228 / 231).
+const STORAGE_TABS := ["Seeds", "Materials", "Tackle"]
 const _ROW_GAP := 8.0      # Bag layout spacers: 8 under the quick bar, under the header, above the grid
 const _SMALL_GAP := 4.0
 const _SLOT_LIST_GAP := 12.0
@@ -100,7 +102,7 @@ func _init(view_: Dictionary = {}, side_ := "bag", focus := "", gift_to_ := {}) 
 ## New server view: counts, cells and the open card follow it; the selection, filter and scroll stay. The P0 UI
 ## calls this every frame, so a view that changes nothing the drawer shows is skipped.
 func refresh(view_: Dictionary, force := false) -> void:
-	var key := [view_.get("bag", {}), view_.get("gear", {}), int(view_.get("energy", {}).get("value", 0)),
+	var key := [view_.get("bag", {}), view_.get("gear", {}), view_.get("storage", {}), int(view_.get("energy", {}).get("value", 0)),
 		view_.get("meals", {}).get("used", 0), side].hash()
 	view = view_
 	if key == _key and not force: return
@@ -114,6 +116,7 @@ func refresh(view_: Dictionary, force := false) -> void:
 	grid.capacity = int(bag.get("capacity", 25))
 	grid.items = items()
 	_hint.visible = not sheet.is_open()
+	_hint.text = hint_for(category, not storage_items(view, category, place).is_empty())
 	if sheet.is_open(): sheet.refresh()
 	if side == "gear": _build_gear()
 
@@ -128,6 +131,8 @@ func set_side(v: String) -> void:
 func set_category(v: String) -> void:
 	category = v
 	grid.filter = func(it: Dictionary) -> bool: return in_category(it, category)
+	grid.items = items()
+	_hint.text = hint_for(category, not storage_items(view, category, place).is_empty())
 
 func set_sort(v: String) -> void:
 	sort = v
@@ -153,9 +158,27 @@ func set_gear_slot(v: String) -> void:
 
 # ---------------------------------------------------------------- data
 
-## Bag stacks as grid items: {id, icon, qty, rarity, kind}, in the chosen sort order.
+## Bag stacks as grid items: {id, icon, qty, rarity, kind}, in the chosen sort order, then Farm Storage stacks
+## on the storage tabs.
 func items() -> Array:
-	return bag_items(view, sort)
+	return bag_items(view, sort) + storage_items(view, category, place)
+
+## Farm Storage stacks for a tab: {id = "storage:<item>", item, icon, qty, kind, stored = true}. Only at home,
+## only on Seeds / Materials / Tackle, and only when the server sends storage and the item-info rules have the
+## storage card (capability gating: no dead cells).
+static func storage_items(view: Dictionary, cat: String, at := "home") -> Array:
+	if at != "home" or cat not in STORAGE_TABS or not view.has("storage") or &"storage" not in P0ItemInfo.CONTEXTS: return []
+	var out := []
+	for st in view.get("storage", {}).get("items", []):
+		var id := str(st.get("id", ""))
+		var it := {id = "storage:" + id, item = id, icon = P0Logic.icon(id), qty = int(st.get("qty", 0)), rarity = 0,
+			kind = P0ItemInfo.kind_of(view, id), stored = true}
+		if in_category(it, cat): out.append(it)
+	return out
+
+## The line above the grid: `Materials · Bag first, then Farm Storage` when storage stacks follow.
+static func hint_for(cat: String, has_storage: bool) -> String:
+	return "%s · Bag first, then Farm Storage" % cat if has_storage else "Select an item to see its details."
 
 static func bag_items(view: Dictionary, sort_by := "Type") -> Array:
 	var out := []
@@ -194,10 +217,14 @@ static func gear_slots(view: Dictionary) -> Array:
 
 ## Candidates for one slot as UiGearRow data. Rods come from the view (owned, equipped, gates); the other P0
 ## slots only hold their starter tool.
+## The view list behind a slot that has candidates: rods (fishing), picks (mining, SGODOT-231).
+const _SLOT_LISTS := {"fishing": "rods", "mining": "picks"}
+
 static func gear_rows(view: Dictionary, key: String) -> Array:
 	var out := []
-	if key == "fishing":
-		for r in view.get("gear", {}).get("rods", []):
+	var list: Array = view.get("gear", {}).get(_SLOT_LISTS.get(key, ""), []) if _SLOT_LISTS.has(key) else []
+	if not list.is_empty():
+		for r in list:
 			var id := str(r.id)
 			var spec := P0ItemInfo.spec(view, id, &"gear")
 			var facts: Array = spec.get("facts", [])
@@ -205,8 +232,12 @@ static func gear_rows(view: Dictionary, key: String) -> Array:
 			var action := {}
 			for b in spec.get("buttons", []):
 				if StringName(b.get("id", &"")) != &"equipped": action = b
-			out.append({id = id, icon = P0Logic.icon(id), title = str(spec.get("title", id)), state = state,
-				effect = str(facts[0]) if facts.size() > 0 else "", action = action})
+			var effect := str(facts[0]) if facts.size() > 0 else ""
+			if not bool(spec.get("card", true)):   # no "<kind>/gear" rule yet (picks before SGODOT-224 adds it)
+				if r.has("stone"): effect = "%d Stone per rock" % int(r.stone)   # LOCK-29 wording
+				if r.get("owned", false) and not r.get("equipped", false): action = {id = &"equip", label = "Equip", kind = &"secondary"}
+			out.append({id = id, icon = P0Logic.icon(id), title = str(spec.get("title", r.get("name", id))), state = state,
+				effect = effect, action = action})
 		return out
 	var id := _slot_item(view.get("gear", {}).get("slots", {}), key)
 	if id != "":
@@ -241,7 +272,8 @@ func _build_bag() -> void:
 	grid = UiInventoryGrid.new()
 	grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	grid.on_select = func(it: Dictionary):
-		if gift_to.is_empty(): sheet.open(str(it.id), &"bag", {place = place, pinned = bool(pinned.call(str(it.id)))})
+		if bool(it.get("stored", false)): sheet.open(str(it.item), &"storage", {place = place})
+		elif gift_to.is_empty(): sheet.open(str(it.id), &"bag", {place = place, pinned = bool(pinned.call(str(it.id)))})
 		else: sheet.open(str(it.id), &"gift", {place = place, target = gift_to})
 		_hint.visible = false
 	grid.selection_cleared.connect(func():

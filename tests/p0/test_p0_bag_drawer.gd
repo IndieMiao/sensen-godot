@@ -185,3 +185,35 @@ func test_profile_page_emits_back_edit_look_and_skill() -> void:
 	(page.find_children("*", "UiSkillCard", true, false)[1] as UiSkillCard).pressed.emit()
 	assert_array(got).is_equal(["back", "look", "fishing"])
 	assert_float(page.top_bar.right_button().modulate.a).is_equal(0.0)   # no Settings page in P0 yet
+
+# ---------------------------------------------------------------- Farm Storage (§10.4.8)
+
+func test_storage_stacks_follow_the_bag_on_their_tabs_at_home_only() -> void:
+	var v := _view()
+	v["storage"] = {"items": [{"id": "wood", "qty": 99}, {"id": "seed_radish", "qty": 40}]}
+	v.items["wood"] = {"kind": "material"}
+	var ready := &"storage" in P0ItemInfo.CONTEXTS
+	var mats := P0BagDrawer.storage_items(v, "Materials")
+	if ready:
+		assert_that(mats.map(func(it): return [it.id, it.item, it.qty, it.stored])).is_equal([["storage:wood", "wood", 99, true]])
+		assert_str(P0BagDrawer.hint_for("Materials", true)).is_equal("Materials · Bag first, then Farm Storage")
+	else:
+		assert_array(mats).is_empty()   # no storage card in the rules yet: no dead cells
+	assert_array(P0BagDrawer.storage_items(v, "All")).is_empty()
+	assert_array(P0BagDrawer.storage_items(v, "Materials", "pond")).is_empty()
+	v.erase("storage")
+	assert_array(P0BagDrawer.storage_items(v, "Seeds")).is_empty()
+	assert_str(P0BagDrawer.hint_for("Seeds", false)).is_equal("Select an item to see its details.")
+
+func test_mining_slot_lists_the_picks_with_equip() -> void:
+	var v := _view()
+	v.gear.slots.mining = "pick_starter"
+	v.gear["picks"] = [{"id": "pick_starter", "name": "Starter Pickaxe", "owned": true, "equipped": true, "stone": 1, "level": 0, "price": 0, "source": "start"},
+		{"id": "pick_copper", "name": "Copper Pickaxe", "owned": true, "equipped": false, "stone": 2, "level": 0, "price": 0, "source": "workbench"}]
+	v.names["pick_copper"] = "Copper Pickaxe"
+	v.names["pick_starter"] = "Starter Pickaxe"
+	var rows := P0BagDrawer.gear_rows(v, "mining")
+	assert_that(rows.map(func(r): return r.state)).is_equal([&"equipped", &"owned"])
+	assert_str(str(rows[1].effect)).is_equal("2 Stone per rock")
+	assert_str(str(rows[1].action.label)).is_equal("Equip")
+	assert_bool((rows[0].action as Dictionary).is_empty()).is_true()

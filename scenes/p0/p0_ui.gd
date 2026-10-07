@@ -609,6 +609,8 @@ func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 			command.emit({"type": String(action), "item": id})
 		&"store":             # farm storage (SGODOT-228 store / take_out); the card shows Store only at home
 			command.emit({"type": "store", "item": id, "qty": payload.get("qty", "all")})
+		&"take_out":          # a Farm Storage stack's card: Take 10 / Take all (payload qty 10 or "all")
+			command.emit({"type": "take_out", "item": id, "qty": payload.get("qty", "all")})
 		&"pin", &"unpin":
 			pass   # TODO(SGODOT-225 after #12): pin through the quick bar's pin record (P0Ui.bind_quick_bar)
 		_:

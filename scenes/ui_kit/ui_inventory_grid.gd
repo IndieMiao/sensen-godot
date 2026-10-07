@@ -110,12 +110,14 @@ func refresh() -> void:
 			c.rarity = int(it.get("rarity", 0))
 			c.status = str(it.get("status", ""))
 			c.marked = bool(it.get("marked", false))
+			c.stored = bool(it.get("stored", false))
 		else:
 			c.icon = null
 			c.quantity = ""
 			c.rarity = 0
 			c.status = ""
 			c.marked = false
+			c.stored = false
 	if selected_id != "" and _item(selected_id).is_empty():
 		clear_selection()
 	else:
