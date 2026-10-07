@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    372
+    388
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         70,
         328,
-        302
+        318
       ],
       "children": [
         {
@@ -44,7 +44,7 @@
             0,
             70,
             328,
-            282
+            298
           ],
           "children": [
             {
@@ -53,7 +53,7 @@
                 0,
                 70,
                 328,
-                281
+                298
               ],
               "children": [
                 {
@@ -62,7 +62,7 @@
                     12,
                     82,
                     305,
-                    258
+                    274
                   ],
                   "children": [
                     {
@@ -102,7 +102,7 @@
                         121,
                         82,
                         195,
-                        258
+                        274
                       ],
                       "children": [
                         {
@@ -154,7 +154,7 @@
                                     15
                                   ],
                                   "variation": "C10B",
-                                  "text": "Keeps the stall · Shanghai Market Square"
+                                  "text": "Keeps the stall · Xuhui Market Square"
                                 }
                               ]
                             }
@@ -166,7 +166,7 @@
                             121,
                             123,
                             195,
-                            62
+                            79
                           ],
                           "children": [
                             {
@@ -175,10 +175,10 @@
                                 131,
                                 129,
                                 176,
-                                51
+                                67
                               ],
                               "variation": "C12B",
-                              "text": "Morning! Sweet potato seeds just came in — Farming Lv5 to plant. Anything I can get you?"
+                              "text": "Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?"
                             }
                           ]
                         },
@@ -186,7 +186,7 @@
                           "type": "VBoxContainer",
                           "rect": [
                             121,
-                            191,
+                            208,
                             195,
                             148
                           ],
@@ -195,7 +195,7 @@
                               "type": "UiCommandButton",
                               "rect": [
                                 121,
-                                191,
+                                208,
                                 195,
                                 47
                               ],
@@ -206,7 +206,7 @@
                               "type": "UiCommandButton",
                               "rect": [
                                 121,
-                                244,
+                                260,
                                 195,
                                 47
                               ],
@@ -217,7 +217,7 @@
                               "type": "UiDismissButton",
                               "rect": [
                                 121,
-                                296,
+                                313,
                                 195,
                                 43
                               ],
@@ -238,7 +238,7 @@
           "type": "Label",
           "rect": [
             0,
-            358,
+            374,
             328,
             14
           ],

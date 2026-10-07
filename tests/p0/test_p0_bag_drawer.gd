@@ -95,6 +95,11 @@ func test_category_chip_and_sort_change_what_the_grid_lists() -> void:
 	assert_str(d.header.sort_button().label).is_equal("Sort · Type")
 	d.header.sort_pressed.emit()   # and back
 	assert_str(d.sort).is_equal("Recent")
+	d.set_category("Fish")         # each Tab keeps its own Sort (BagHeader main)
+	assert_str(d.sort).is_equal("Type")
+	assert_str(d.header.sort_button().label).is_equal("Sort · Type")
+	d.set_category("All")
+	assert_str(d.sort).is_equal("Recent")
 
 func test_gear_side_lists_the_slot_and_forwards_equip() -> void:
 	var d := _drawer("gear")

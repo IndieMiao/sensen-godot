@@ -157,6 +157,7 @@ func test_open_resident_talks_once_and_shows_the_bar() -> void:
 	assert_array(sent).is_equal([{"type": "talk", "resident": "res_pip"}])
 	var bar: UiResidentBar = ui.find_children("*", "UiResidentBar", true, false)[0]
 	assert_str(str(bar.data.name)).is_equal("Pip")
+	assert_str(str(bar.data.line)).is_equal("Could you catch me a fish? Any kind is fine.")   # the open request asks
 	assert_str(bar.gift_button().reason).is_equal("")
 	ui.open_resident("res_pip")   # a refresh after the reply: no second talk
 	assert_int(sent.size()).is_equal(1)

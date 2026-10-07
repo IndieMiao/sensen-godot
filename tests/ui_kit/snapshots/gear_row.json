@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    267
+    287
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         52,
         328,
-        215
+        235
       ],
       "children": [
         {
@@ -149,7 +149,7 @@
                         15
                       ],
                       "variation": "C10B",
-                      "text": "Lands up to Fine fish"
+                      "text": "Lands up to Fine fish · Bite window 2.2 s"
                     }
                   ]
                 }
@@ -235,7 +235,7 @@
                         15
                       ],
                       "variation": "C10B",
-                      "text": "Lands up to Rare fish · Bite window +0.4 s"
+                      "text": "Lands up to Rare fish · Bite window 2.6 s"
                     }
                   ]
                 },
@@ -247,7 +247,7 @@
                     65,
                     44
                   ],
-                  "variation": "CmdSecondaryCompact",
+                  "variation": "CmdPrimaryCompact",
                   "text": "Equip"
                 }
               ]
@@ -255,88 +255,110 @@
           ]
         },
         {
-          "type": "UiGearRow",
+          "type": "VBoxContainer",
           "rect": [
             0,
             202,
             328,
-            65
+            85
           ],
           "children": [
             {
-              "type": "HBoxContainer",
+              "type": "UiGearRow",
               "rect": [
-                0,
+                48,
                 202,
-                328,
+                232,
                 65
               ],
               "children": [
                 {
-                  "type": "MarginContainer",
+                  "type": "HBoxContainer",
                   "rect": [
-                    0,
+                    48,
                     202,
-                    29,
+                    232,
                     65
                   ],
                   "children": [
                     {
-                      "type": "TextureRect",
+                      "type": "MarginContainer",
                       "rect": [
-                        5,
+                        48,
                         202,
-                        24,
-                        24
+                        29,
+                        65
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            53,
+                            202,
+                            24,
+                            24
+                          ]
+                        }
                       ]
-                    }
-                  ]
-                },
-                {
-                  "type": "VBoxContainer",
-                  "rect": [
-                    38,
-                    208,
-                    290,
-                    52
-                  ],
-                  "children": [
+                    },
                     {
-                      "type": "Label",
+                      "type": "VBoxContainer",
                       "rect": [
-                        38,
+                        86,
                         208,
-                        290,
-                        18
+                        194,
+                        52
                       ],
-                      "variation": "C12XB",
-                      "text": "Carbon Rod"
-                    },
-                    {
-                      "type": "Label",
-                      "rect": [
-                        38,
-                        228,
-                        290,
-                        15
-                      ],
-                      "variation": "C10B",
-                      "text": "Fishing Lv5 · Tackle Shop"
-                    },
-                    {
-                      "type": "Label",
-                      "rect": [
-                        38,
-                        245,
-                        290,
-                        15
-                      ],
-                      "variation": "C10B",
-                      "text": "Lands up to Legendary fish"
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            86,
+                            208,
+                            194,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Carbon Rod"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            86,
+                            228,
+                            194,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Fishing Lv6 · 350 coins at the Tackle Shop"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            86,
+                            245,
+                            194,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Lands up to Legendary fish"
+                        }
+                      ]
                     }
                   ]
                 }
               ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                273,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "locked · P1 only (BAG-2 lists Starter and Reed in P0)"
             }
           ]
         }
