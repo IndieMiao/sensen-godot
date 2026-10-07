@@ -24,7 +24,7 @@ const _QTY_Y := 20.0
 const _QTY := Vector2(20, 13)
 const _RING_STROKE := 1.2
 const _DASHED_STROKE := 0.7
-const LOCK_GLYPH := preload("res://assets/p0/icons/lock.svg")
+const LOCK_GLYPH := preload("res://assets/ui/kit_icons/lock.svg")
 
 var state: State = State.EMPTY: set = set_state
 var icon: Texture2D: set = set_icon
@@ -114,6 +114,7 @@ func _refresh() -> void:
 	_icon.size = Vector2(side, side)
 	_icon.position = (Vector2(_RING, _RING) - _icon.size) * 0.5
 	_icon.texture = LOCK_GLYPH if state == State.LOCKED else icon
+	_icon.self_modulate = UiTokens.COLOR_SECONDARY if state == State.LOCKED else Color.WHITE
 	_icon.visible = state != State.EMPTY and _icon.texture != null
 	_plus.visible = state == State.EMPTY
 	_label.text = title
