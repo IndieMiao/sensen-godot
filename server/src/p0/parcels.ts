@@ -1,7 +1,8 @@
 /**
  * Inbox parcels (§10.4.8, q(45)): passive rewards that do not fit the bag wait here, 8 at most, each kept 24 h.
  * With 8 waiting, new rewards queue instead of being dropped, pushing a parcel out or turning into coins; a queued
- * reward enters in order when a place frees up, and its 24 h starts then. Expired sellable items pay ⌊floor × 0.8⌋.
+ * reward enters in order when a place frees up, and its 24 h starts then. Expired sellable items pay ⌊floor × 0.8⌋,
+ * others are gone, and gifts go back to their sender.
  */
 import { add, freeSlots, room, stackLimit } from './bag.js';
 import { itemKind, sellPriceOf, type P0Content } from './content.js';
@@ -43,14 +44,14 @@ export function settleParcels(c: P0Content, s: P0State, now: number): boolean {
     if (now < p.expires_at) return true;
     const coins = expiryCoins(c, p);
     s.coins += coins;
-    record(s, p, p.expires_at, 'expired', coins);
+    record(s, p, p.expires_at, p.gift ? 'returned' : 'expired', coins);   // an unclaimed gift goes back to its sender
     changed = true;
     return false;
   });
   while (s.inbox.parcels.length < PARCEL_LIMIT && s.inbox.waiting.length > 0) {
     const p = s.inbox.waiting.shift()!;
     changed = true;
-    if (p.gift && untilRollover(c, p.created_at) <= now - p.created_at) { record(s, p, now, 'expired'); continue; }
+    if (p.gift && untilRollover(c, p.created_at) <= now - p.created_at) { record(s, p, now, 'returned'); continue; }
     s.inbox.parcels.push({ ...p, expires_at: lifetimeEnd(c, p, now) });
   }
   return changed;
@@ -111,7 +112,8 @@ export function inboxView(s: P0State, now: number) {
   const free = freeSlots(s);
   return {
     limit: PARCEL_LIMIT,
-    badge: s.inbox.parcels.length + s.inbox.waiting.length + s.inbox.updates.filter(u => !u.read).length,
+    // Queued rewards show only as a count on the Parcels rule line, never on the bell (q(45) detail, PARCEL-4).
+    badge: s.inbox.parcels.length + s.inbox.updates.filter(u => !u.read).length,
     waiting: s.inbox.waiting.length,
     claim_slots: Math.min(free, s.inbox.parcels.length),
     parcels: [...s.inbox.parcels].sort((a, b) => a.expires_at - b.expires_at)

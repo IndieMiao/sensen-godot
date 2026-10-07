@@ -95,7 +95,7 @@ describe('gift meal (§3.4.5, K-2, q(33))', () => {
     const coins = r.s.coins;
     const v = viewOf(c, r.s, T0 + 18 * H);
     expect(v.inbox.parcels).toEqual([]);
-    expect(v.inbox.updates[0]).toMatchObject({ id: 'dish_carrot_cake', status: 'expired', coins: 0 });
+    expect(v.inbox.updates[0]).toMatchObject({ id: 'dish_carrot_cake', status: 'returned', coins: 0 });
     expect(v.coins).toBe(coins);
   });
 

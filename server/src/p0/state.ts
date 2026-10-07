@@ -12,9 +12,9 @@ export interface BagStack { id: string; qty: number; gift?: { from: string; day:
 
 /** A passive reward that did not fit the bag (§10.4.8, q(45)): kept 24 h from when it enters the Inbox. */
 export interface Parcel extends BagStack { key: string; source: string; created_at: number; expires_at: number }
-/** What became of a parcel: claimed, or expired (sellable items paid out as coins). */
+/** What became of a parcel: claimed, expired (sellable items paid out as coins) or, for a gift, returned to its sender. */
 export interface ParcelUpdate extends BagStack {
-  key: string; source: string; at: number; status: 'claimed' | 'expired'; coins: number; read: boolean;
+  key: string; source: string; at: number; status: 'claimed' | 'expired' | 'returned'; coins: number; read: boolean;
 }
 export interface P0Inbox {
   granted: string[];                          // reward sources already granted, one key each

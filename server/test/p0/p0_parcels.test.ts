@@ -70,6 +70,7 @@ describe('P0 passive rewards (§10.4.8, q(45); SGODOT-232 S1, rescued from SGODO
     expect(s.inbox.waiting).toHaveLength(3);
     expect([...s.inbox.parcels, ...s.inbox.waiting].reduce((n, p) => n + p.qty, 0)).toBe(501);
     expect(s.inbox.waiting.every(p => !('expires_at' in p))).toBe(true);
+    expect(viewOf(c, s, T).inbox).toMatchObject({ badge: 8, waiting: 3 });   // queued rewards stay off the bell
     s.bag.pop();
     const claimed = step(s, { type: 'claim_parcel', key: s.inbox.parcels[0].key }, T + 1000);
     expect(claimed.inbox.parcels).toHaveLength(8);
