@@ -386,11 +386,11 @@ static func _need_tiles() -> Control:
 		v.add_child(UiNeedTile.group([
 			_captioned(UiNeedTile.new("Timber", 16, 16, size, wood), "met"),
 			_captioned(UiNeedTile.new("Timber", 10, 16, size, wood), "short"),
-			_captioned(UiNeedTile.new("Meals", 100, 300, size, _tex("eat"), true), "count"),
+			_captioned(UiNeedTile.new("Meals", 100, 300, size, _tex("dish_grilled_fish"), true), "count"),
 		]))
 	v.add_child(UiNeedTile.group([
 		_captioned(UiNeedTile.new("Coins", 5, 4, S.M, _tex("coin")), "surplus 5/4"),
-		_captioned(UiNeedTile.new("Copper Ore", 0, 6, S.M, _tex("stone")), "short 0"),
+		_captioned(UiNeedTile.new("Timber", 0, 6, S.M, _tex("wood")), "short 0"),
 		_captioned(UiNeedTile.new("Fish-dex", 12, 20, S.M, _tex("fish_crucian"), true), "collection"),
 	]))
 	return v
@@ -449,7 +449,7 @@ static func _energy_facts(zero: bool, home: bool) -> Dictionary:
 		tiles = [
 			{icon = _tex("dish_grilled_fish"), label = "Eat", fact = "3 dishes in bag", guide = "Open bag", go = "bag", on = true},
 			{icon = _tex("pot"), label = "Cook", fact = "4 fish in creel" if home else "At home", guide = "Show kitchen", go = "stove", on = home},
-			{icon = _tex("dish_fruit_tea"), label = "Tea", fact = "Tea House opens later", guide = "", go = "", on = false},
+			{icon = _tex("dish_fruit_tea"), label = "Tea", fact = "1/3 today · 40 coins", guide = "Show on map", go = "outpost:tea", on = true},
 			{icon = _tex("rest"), label = "Rest", fact = "Available" if home else "At home", guide = "Show bench", go = "home", on = home},
 		],
 	}

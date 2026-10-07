@@ -62,7 +62,7 @@
                     9,
                     70,
                     310,
-                    140
+                    133
                   ],
                   "children": [
                     {
@@ -71,7 +71,7 @@
                         20,
                         77,
                         288,
-                        126
+                        118
                       ],
                       "children": [
                         {
@@ -80,14 +80,14 @@
                             20,
                             77,
                             288,
-                            40
+                            36
                           ],
                           "children": [
                             {
                               "type": "TextureRect",
                               "rect": [
                                 20,
-                                88,
+                                86,
                                 18,
                                 18
                               ]
@@ -96,8 +96,8 @@
                               "type": "VBoxContainer",
                               "rect": [
                                 46,
-                                88,
-                                196,
+                                86,
+                                205,
                                 18
                               ],
                               "children": [
@@ -105,8 +105,8 @@
                                   "type": "Label",
                                   "rect": [
                                     46,
-                                    88,
-                                    196,
+                                    86,
+                                    205,
                                     18
                                   ],
                                   "variation": "BodyXB14",
@@ -115,15 +115,27 @@
                               ]
                             },
                             {
-                              "type": "UiCommandButton",
+                              "type": "UiShowPill",
                               "rect": [
-                                249,
-                                77,
-                                59,
-                                40
+                                258,
+                                83,
+                                50,
+                                26
                               ],
-                              "variation": "CmdSecondaryCompact",
-                              "text": "Show"
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    268,
+                                    87,
+                                    30,
+                                    16
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "Show"
+                                }
+                              ]
                             }
                           ]
                         },
@@ -131,7 +143,7 @@
                           "type": "ColorRect",
                           "rect": [
                             20,
-                            119,
+                            116,
                             288,
                             1
                           ]
@@ -140,16 +152,16 @@
                           "type": "HBoxContainer",
                           "rect": [
                             20,
-                            122,
+                            118,
                             288,
-                            40
+                            36
                           ],
                           "children": [
                             {
                               "type": "TextureRect",
                               "rect": [
                                 20,
-                                133,
+                                127,
                                 18,
                                 18
                               ]
@@ -158,8 +170,8 @@
                               "type": "VBoxContainer",
                               "rect": [
                                 46,
-                                125,
-                                196,
+                                119,
+                                205,
                                 35
                               ],
                               "children": [
@@ -167,8 +179,8 @@
                                   "type": "Label",
                                   "rect": [
                                     46,
-                                    125,
-                                    196,
+                                    119,
+                                    205,
                                     18
                                   ],
                                   "variation": "BodyXB14",
@@ -178,8 +190,8 @@
                                   "type": "Label",
                                   "rect": [
                                     46,
-                                    143,
-                                    196,
+                                    137,
+                                    205,
                                     16
                                   ],
                                   "variation": "CaptionB12",
@@ -188,15 +200,27 @@
                               ]
                             },
                             {
-                              "type": "UiCommandButton",
+                              "type": "UiShowPill",
                               "rect": [
-                                249,
-                                122,
-                                59,
-                                40
+                                258,
+                                124,
+                                50,
+                                26
                               ],
-                              "variation": "CmdSecondaryCompact",
-                              "text": "Show"
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    268,
+                                    128,
+                                    30,
+                                    16
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "Show"
+                                }
+                              ]
                             }
                           ]
                         },
@@ -204,7 +228,7 @@
                           "type": "ColorRect",
                           "rect": [
                             20,
-                            164,
+                            157,
                             288,
                             1
                           ]
@@ -213,7 +237,7 @@
                           "type": "HBoxContainer",
                           "rect": [
                             20,
-                            167,
+                            159,
                             288,
                             36
                           ],
@@ -222,7 +246,7 @@
                               "type": "TextureRect",
                               "rect": [
                                 20,
-                                176,
+                                168,
                                 18,
                                 18
                               ]
@@ -231,7 +255,7 @@
                               "type": "VBoxContainer",
                               "rect": [
                                 46,
-                                176,
+                                168,
                                 239,
                                 18
                               ],
@@ -240,7 +264,7 @@
                                   "type": "Label",
                                   "rect": [
                                     46,
-                                    176,
+                                    168,
                                     239,
                                     18
                                   ],
@@ -253,7 +277,7 @@
                               "type": "Panel",
                               "rect": [
                                 292,
-                                177,
+                                169,
                                 16,
                                 16
                               ],
@@ -262,7 +286,7 @@
                                   "type": "TextureRect",
                                   "rect": [
                                     296,
-                                    181,
+                                    173,
                                     8,
                                     8
                                   ]

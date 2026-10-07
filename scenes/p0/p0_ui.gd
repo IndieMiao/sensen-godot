@@ -1082,6 +1082,7 @@ func open_energy_card(need: int, verb: String) -> void:
 	card.tile_pressed.connect(func(go: String):
 		close_modal()
 		if go == "bag": open_bag()
+		elif go.begins_with("outpost:"): place_pressed.emit()   # Show on map: the Tea House is a map place (pin focus: MAP-1)
 		else: show_spot.emit(go))
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)

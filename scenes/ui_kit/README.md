@@ -63,6 +63,7 @@ must not change structure, role, entry point or key copy. Engineering specs: SGO
 |---|---|---|
 | `UiNeedTile` | NeedTile 1090:78003 | LOCK-10: L / M / S; met / short / count; ring = have ÷ need rounded down to 10 %; `UiNeedTile.group()` wraps; tap shows a `UiNeedSource` |
 | `UiNeedSource` | NeedSource 1092:77266 | one source line + `Show ›` (camera only, LOCK-08); `UiNeedSource.popup()` anchors it above the tile |
+| `UiShowPill` | Show pill of TodayRow 1145:81714 / NeedSource 1092:77266 | the guide-only outlined `Show` pill: TODAY 1.2 stroke, 10 / 5, radius 14, 28 high; SOURCE 1.5 stroke, 12 · 10 / 6, radius 16, 31 high. Draws at the main size; `_has_point` grows the touch area to 44 × 44 without changing the layout |
 | `UiHud` | HUD 1143:103373 | LOCK-06: two rows; stands alone (`apply(state)`, `P0Logic.hud_state`); Energy colour by the next action's cost, never by percentage; location chip = actual place |
 | `UiTodayPanel` | TodayPanel 1145:81715 · TodayRow 1145:81714 | LOCK-06: ≤ 3 rows under the chips; Show only moves the camera; done / short rows |
 | `UiEnergyCard` | Energy 1094:77504 | LOCK-09: `card()` (one button `Free to do now`, 2×2 guide-only tiles, At home away from home) and `panel()` (under the HUD chip) |

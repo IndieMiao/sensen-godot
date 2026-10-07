@@ -241,10 +241,33 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 		"tiles": [
 			{"icon": "dish_grilled_fish", "label": "Eat", "fact": "%d dish%s in bag" % [dishes, "" if dishes == 1 else "es"] if dishes > 0 else "No dishes in bag", "guide": "Open bag", "go": "bag", "on": dishes > 0},
 			cook,
-			{"icon": "dish_fruit_tea", "label": "Tea", "fact": "Tea House opens later", "guide": "", "go": "", "on": false},
+			_tea_tile(view),
 			rest_tile,
 		],
 	}
+
+## Tea on the Energy card (BAR-3 / E-11, §3.4.4): three cups a day shared by tea and coffee, from view.drinks
+## (SGODOT-228); copy 李白 (225). Facts only: the tile guides to the Tea House on the map. Without the server's
+## drinks the tile stays greyed with no line (安其拉 on #11: no placeholder state).
+static func _tea_tile(view: Dictionary) -> Dictionary:
+	var tea := {"icon": "dish_fruit_tea", "label": "Tea", "fact": "", "guide": "", "go": "", "on": false}
+	var drinks: Dictionary = view.get("drinks", {})
+	if drinks.is_empty(): return tea
+	tea.guide = "Show on map"
+	tea.go = "outpost:tea"
+	tea.on = true
+	if int(drinks.get("left", 0)) <= 0:
+		tea.fact = "%d/%d today" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3))]
+		tea.on = false
+	elif bool(drinks.get("full", false)):
+		tea.fact = "Energy full"
+		tea.on = false
+	elif drinks.get("need", null) != null and int(drinks.need) > 0:
+		tea.fact = "Need %d more coins" % int(drinks.need)
+		tea.on = false
+	else:
+		tea.fact = "%d/%d today · %d coins" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3)), int(drinks.get("price", 0))]
+	return tea
 
 ## Energy panel under the HUD chip (LOCK-09 Kind=Panel): max, today's use as count tiles, the blessing.
 static func energy_panel(view: Dictionary) -> Dictionary:

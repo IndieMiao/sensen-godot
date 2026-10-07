@@ -102,7 +102,7 @@ func _ui(reachable: bool) -> P0Ui:
 func _today_actions(ui: P0Ui) -> Array:
 	ui.open_today()
 	var panel: UiTodayPanel = ui.find_children("*", "UiTodayPanel", true, false)[0]
-	return panel.find_children("*", "UiCommandButton", true, false).map(func(b): return (b as Button).text)
+	return panel.find_children("*", "UiShowPill", true, false).map(func(b): return (b as UiShowPill).label_text())
 
 func test_today_show_only_where_the_camera_can_go() -> void:
 	var farm := _ui(true)
@@ -111,3 +111,20 @@ func test_today_show_only_where_the_camera_can_go() -> void:
 	var pond := _ui(false)
 	await get_tree().process_frame
 	assert_array(_today_actions(pond)).is_empty()
+
+func test_energy_card_tea_tile_reads_the_drinks_without_a_placeholder() -> void:
+	var v := _view()
+	var tea: Dictionary = P0Logic.energy_card(v, 2, "Sow ×1").tiles[2]
+	assert_that([tea.label, tea.fact, tea.guide, tea.on]).is_equal(["Tea", "", "", false])   # no server drinks: no line
+	v["drinks"] = {"used": 1, "limit": 3, "left": 2, "price": 40, "need": null, "full": false}
+	tea = P0Logic.energy_card(v, 2, "Sow ×1").tiles[2]
+	assert_that([tea.fact, tea.guide, tea.go, tea.on]).is_equal(["1/3 today · 40 coins", "Show on map", "outpost:tea", true])
+	v.drinks.left = 0
+	v.drinks.used = 3
+	assert_str(str(P0Logic.energy_card(v, 2, "Sow ×1").tiles[2].fact)).is_equal("3/3 today")
+	var ui := _ui(true)
+	var left := [false]
+	ui.place_pressed.connect(func(): left[0] = true)
+	ui.open_energy_card(2, "Sow ×1")
+	(ui.find_children("*", "UiEnergyCard", true, false)[0] as UiEnergyCard).tile_pressed.emit("outpost:tea")
+	assert_bool(left[0]).is_true()   # Show on map leaves for the map
