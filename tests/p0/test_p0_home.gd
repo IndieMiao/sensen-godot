@@ -125,3 +125,17 @@ func test_the_sign_stands_beside_the_door_off_its_path_and_is_solid() -> void:
 	var c := bp.world_to_cell(sign)
 	assert_str(str(bp.masks.walkable[c.y])[c.x]).is_equal("0")
 	assert_str(str(bp.masks.walkable[c.y])[P0Garden.ANCHORS.house.x]).is_equal("1")   # the door path stays open
+
+func test_material_sources_name_the_spots_and_the_mine() -> void:
+	var v := _view()
+	v["gather"] = {"spots": [
+		{"id": "spot_grove", "name": "Timber Grove", "open": true, "homestead": 1, "yield": [["wood", 6]]},
+		{"id": "spot_rock_pile", "name": "Rock Pile", "open": true, "homestead": 1, "yield": [["stone", 4]]},
+		{"id": "spot_reed_bank", "name": "Reed Bank", "open": true, "homestead": 1, "yield": [["fiber", 3], ["bait_worm", 2]]},
+		{"id": "spot_clay_bank", "name": "Clay Bank", "open": false, "homestead": 2, "yield": [["clay", 2]]}]}
+	v["names"] = {"wood": "Timber", "stone": "Stone", "fiber": "Reeds", "clay": "Clay", "rock_salt": "Rock Salt", "bait_worm": "Worm Bait"}
+	assert_str(str(P0Logic.home_source(v, "wood").text)).is_equal("Timber · Timber Grove")
+	assert_str(str(P0Logic.home_source(v, "stone").text)).is_equal("Stone · Rock Pile or the Mine")
+	assert_str(str(P0Logic.home_source(v, "clay").text)).is_equal("Clay · Clay Bank (Homestead Lv2) or the Mine")
+	assert_str(str(P0Logic.home_source(v, "rock_salt").text)).is_equal("Rock Salt · the Mine")
+	assert_str(str(P0Logic.home_source(v, "bait_worm").text)).is_equal("Worm Bait")   # a side yield is not the spot's material
