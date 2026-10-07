@@ -3,7 +3,7 @@ import { dishId, dishParts, fishById, ingredient, itemKind, recipeById, type Coo
 import { cabinetCap, dishesFit, eatFrom, haveDish, haveIngredient, ingredientStock, routeDish, takeIngredient } from './kitchen_storage.js';
 import { gainEnergy, gainXp, grantOnce, type P0Event } from './progress.js';
 import { draw, foodCap, scaledXp, skillLevel, xpPercent } from './rules.js';
-import type { Heat, P0State } from './state.js';
+import type { Heat, P0State, Pot } from './state.js';
 import type { Refusal } from './fishing.js';
 
 const TAG = /^([WFOS])(\d)$/;
@@ -138,12 +138,16 @@ export function heatHits(c: P0Content, heats: Heat[], taps: number[]): number {
   return hits;
 }
 
-/** Collect a ready pot. The portions go the Keep way (Warming Cabinet → bag). With eat: true (COOK-4 Eat) the
- * main portion is eaten from the pot instead, so a full cabinet and bag never block eating one portion (§7.2.6);
- * a Perfect pot's extra portion still needs a place (bag_full with detail.extra: 1). */
+/** Collect a ready pot: heat is judged and XP paid now, and the portions go the Keep way (Warming Cabinet → bag).
+ * With eat: true (COOK-4 Eat) the main portion is eaten from the pot instead, so a full kitchen never blocks
+ * eating (§7.2.6). Portions with no place stay on the stove as `left` (Bag full · dish left on the stove); the
+ * stove can't start a pot until a later collect takes them (Li Bai, 226 comment 250e4ef1). Never to the Inbox. */
 export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?: unknown }, now: number, events: P0Event[], max: number): Refusal | null {
   const pot = s.stove;
   if (!pot) return { code: 'stove_empty' };
+  const eat = cmd.eat === true;
+  if (eat && s.energy.value >= max) return { code: 'energy_full' };
+  if (pot.left) return collectLeft(c, s, pot, eat, now, events);
   const left = pot.started_at + pot.ms - now;
   if (left > 0) return { code: 'not_ready', detail: { ready_in: left } };
   const taps = Array.isArray(cmd.taps) ? cmd.taps.slice(0, 20).map(Number).filter(Number.isFinite) : [];
@@ -151,14 +155,8 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?
   const quality = Math.min(hits, 2);
   const main = dishId(pot.dish, quality);
   const extra = quality === 2 ? 1 : 0; // Perfect: a second, Plain portion (§7.2.5)
-  const eat = cmd.eat === true;
-  if (eat && s.energy.value >= max) return { code: 'energy_full' };
-  const portions: [string, number][] = [];
-  if (!eat) portions.push([main, 1]);
-  if (extra) portions.push([pot.dish, 1]);
-  if (!dishesFit(c, s, portions)) return { code: 'bag_full', detail: { cabinet: cabinetCap(c, s) > 0, extra } };   // the dish stays on the stove
-  s.stove = null;
-  for (const [id, n] of portions) routeDish(c, s, id, n, events);
+  const portions = extra ? [main, pot.dish] : [main];
+  keepOrLeave(c, s, pot, eat ? portions.slice(1) : portions, events);
   const firstKey = `cook:${pot.dish}`;
   const first = !s.firsts.includes(firstKey);
   if (first) s.firsts.push(firstKey);
@@ -184,6 +182,27 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?
   const decayed = before === 0 ? scaled : before === 1 ? Math.ceil(scaled / 2) : 0;
   gainXp(c, s, now, 'cooking', Math.floor(decayed * c.cooking.quality_xp[quality]), pot.xp_pct, events);
   return null;
+}
+
+/** Portions already judged and waiting on the stove: Eat takes the first, the rest go the Keep way again. */
+function collectLeft(c: P0Content, s: P0State, pot: Pot, eat: boolean, now: number, events: P0Event[]): Refusal | null {
+  const ids = [...pot.left!];
+  if (!eat && !ids.some(id => dishesFit(c, s, [[id, 1]]))) return { code: 'bag_full', detail: { cabinet: cabinetCap(c, s) > 0, left: ids.length } };
+  const eaten = eat ? ids.shift()! : null;
+  keepOrLeave(c, s, pot, ids, events);
+  if (eaten) eatMeal(c, s, eaten, now, events);
+  return null;
+}
+
+/** Keep each portion that has a place; the others stay on the stove (a `plate` event says which). */
+function keepOrLeave(c: P0Content, s: P0State, pot: Pot, ids: string[], events: P0Event[]): void {
+  const left: string[] = [];
+  for (const id of ids) {
+    if (dishesFit(c, s, [[id, 1]])) routeDish(c, s, id, 1, events);
+    else left.push(id);
+  }
+  s.stove = left.length ? { ...pot, left } : null;
+  if (left.length) events.push({ kind: 'plate', ids: left, cabinet: cabinetCap(c, s) > 0 });
 }
 
 /** Nominal energy of one portion today: rarity + quality bonus, same page halves then zeroes (§7.17.1). */

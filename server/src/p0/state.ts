@@ -36,6 +36,7 @@ export interface Heat { at: number; spin: number; gold: number; width: number }
 export interface Pot {
   dish: string; rarity: number; started_at: number; ms: number; heats: Heat[];
   xp_pct: number; mystery: boolean;
+  left?: string[];   // collected (judged, XP paid) but no place to keep: these portions wait on the stove (§7.2.6)
 }
 
 /** A request on the stall board: open → accepted (tracked) → done. Requests never pay skill XP (§6.7.1). */

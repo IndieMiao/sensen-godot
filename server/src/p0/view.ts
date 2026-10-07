@@ -99,6 +99,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
         dish: s.cookbook.includes(s.stove.dish) && !s.stove.mystery ? s.stove.dish : null, rarity: s.stove.rarity,
         ms: s.stove.ms, elapsed: Math.max(0, now - s.stove.started_at), ready_in: Math.max(0, s.stove.started_at + s.stove.ms - now),
         heats: s.stove.heats,
+        left: s.stove.left ?? null,   // portions waiting on the stove after a collect with no room (§7.2.6)
       } : null,
       first_fire: s.fires === 0,
       // Spice Rack (Homestead Lv2, q(46)): stored seasonings the stove reaches; Experiment shows them with a Rack badge.
