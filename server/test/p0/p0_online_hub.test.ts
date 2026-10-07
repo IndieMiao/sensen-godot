@@ -5,6 +5,9 @@ import { FRAME_HEADER, FRAME_MEMBER, P0_ACTIONS } from '../../src/p0/online/fram
 import { LIMITS, PATH, registerP0Online } from '../../src/p0/online/hub.js';
 import { loadOutposts } from '../../src/p0/online/outposts.js';
 import { OutpostRooms } from '../../src/p0/online/rooms.js';
+import { loadP0Content } from '../../src/p0/content.js';
+import { registerP0Routes } from '../../src/p0/routes.js';
+import { P0Store } from '../../src/p0/store.js';
 
 let app: FastifyInstance | undefined;
 const sockets: WebSocket[] = [];
@@ -190,5 +193,22 @@ describe('P0 online hub (/v1/p0/online, SGODOT-227)', () => {
     const d = await connect(port, 'player-dddd');
     for (let i = 0; i < LIMITS.burst + 5; i++) send(d, { t: 'ping', at: i });
     expect(await until(() => d.closed)).toEqual({ code: 4002, reason: 'RATE_OR_SCHEMA' });
+  });
+  it('the rooms that seat players also give the Tea Host her online count (p0_server wiring)', async () => {
+    app = Fastify({ logger: false });
+    const rooms = new OutpostRooms(loadOutposts());
+    const content = loadP0Content();
+    registerP0Routes(app, { content, store: new P0Store(content), now: Date.now, dev: true, presence: () => rooms.total() });
+    registerP0Online(app, { rooms });
+    await app.listen({ port: 0, host: '127.0.0.1' });
+    const address = app.server.address();
+    const port = typeof address === 'object' && address ? address.port : 0;
+    const online = async () => (await app!.inject({ method: 'GET', url: '/v1/p0/state', headers: { 'x-p0-player': 'tea-reader-01' } })).json().state.keepers.tea.online;
+    expect(await online()).toBe(0);
+    const a = await connect(port, 'tea-guest-001');
+    await join(a, 'sh_tea_1');
+    const b = await connect(port, 'tackle-guest-02');
+    await join(b, 'sh_tackle_1');
+    expect(await online()).toBe(2);   // every outpost room, like GET /v1/p0/presence
   });
 });

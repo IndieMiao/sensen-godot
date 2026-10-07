@@ -22,9 +22,11 @@ mkdirSync(dir, { recursive: true });
 const content = loadP0Content();
 const store = new P0Store(content, process.env.P0_STATE_FILE ?? path.join(dir, 'p0-state.json'));
 const app = Fastify({ logger: false });
-registerP0Routes(app, { content, store, now: Date.now, dev: process.env.P0_DEV !== '0' });
-// Outpost rooms (SGODOT-227): WebSocket /v1/p0/online and GET /v1/p0/presence, in memory only.
-registerP0Online(app, { rooms: new OutpostRooms(loadOutposts()), appearances: new AppearanceCatalog(path.join(root, 'assets/farm/data/regions.json')) });
+// Outpost rooms (SGODOT-227): WebSocket /v1/p0/online and GET /v1/p0/presence, in memory only. The same rooms
+// give the Tea Host's "N online" in the state view (SGODOT-228).
+const rooms = new OutpostRooms(loadOutposts());
+registerP0Routes(app, { content, store, now: Date.now, dev: process.env.P0_DEV !== '0', presence: () => rooms.total() });
+registerP0Online(app, { rooms, appearances: new AppearanceCatalog(path.join(root, 'assets/farm/data/regions.json')) });
 app.get('/v1/healthz', async () => ({ ok: true, p0: content.version }));
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
