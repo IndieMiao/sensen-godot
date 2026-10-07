@@ -73,9 +73,9 @@ func test_tapping_the_tea_table_sits_on_the_nearest_free_seat_and_the_joystick_s
 	_walk_until_idle(r)
 	assert_str(r.seat).is_equal("seat_table1_1")   # the chair on the door side is nearer
 	assert_str(r.actor.state).is_equal("locked")
-	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("seat_table1_1").global_position)).is_less(0.05)
 	assert_dict(r._marker("use_tea_table_1", {})).is_empty()   # no Sit card while seated
-	for i in 12: r.p0_frame({}, 1.0 / 30.0)   # the root eases up onto the seat within 0.3 s
+	for i in 12: r.p0_frame({}, 1.0 / 30.0)   # the root glides onto the seat within 0.3 s
+	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("seat_table1_1").global_position)).is_less(0.02)
 	assert_float(r.actor.position.y).is_equal_approx(r.anchor("seat_table1_1").global_position.y - OutpostScript.SIT_ROOT_BELOW_SEAT, 0.02)
 	var ap := r.actor.rig.get_node("AnimationPlayer") as AnimationPlayer
 	assert_str(ap.current_animation).is_equal("sit_down")
@@ -84,9 +84,16 @@ func test_tapping_the_tea_table_sits_on_the_nearest_free_seat_and_the_joystick_s
 	assert_str(r.seat).is_equal("")
 	assert_str(ap.current_animation).is_equal("sit_up")
 	assert_str(r.actor.state).override_failure_message("held while sit_up plays").is_equal("locked")
-	for i in 30: r.p0_frame({}, 1.0 / 30.0)
+	var steps: Array[float] = []
+	var last := r.actor.position
+	for i in 30:
+		var standing := r.actor.state == "locked"
+		r.p0_frame({}, 1.0 / 30.0)
+		if standing: steps.append(r.actor.position.distance_to(last))   # the joystick walks on after release
+		last = r.actor.position
 	assert_str(r.actor.state).is_not_equal("locked")
 	assert_float(r.actor.position.y).is_equal_approx(r.floor_y, 0.02)
+	assert_float(steps.max()).override_failure_message("no jump while standing up: %s" % [steps]).is_less(0.12)
 
 func test_other_players_on_seats_are_lifted_onto_them() -> void:
 	var r := _room("sh_tea_1")

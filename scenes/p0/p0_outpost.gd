@@ -19,6 +19,9 @@ const SIT_ROOT_BELOW_SEAT := 0.34
 ## sit_up runs at this speed; the player is released once it is upright.
 const STAND_SPEED := 2.0
 const STAND_S := 0.55
+## The root eases onto the seat within this time (art director: aligned within 0.3 s); clips cross-fade in.
+const SIT_GLIDE_S := 0.3
+const CLIP_BLEND_S := 0.1
 
 var outpost: Dictionary = {}
 var role := ""
@@ -28,7 +31,8 @@ var crowd: Node3D
 var npcs := {}           # npc anchor name → {id, name, root}
 var seat := ""           # the seat we sit on ("" while standing)
 var _sit_request := {}   # {seq, seat} waiting for the server
-var _standing := {}      # {left, at, then} while sit_up plays
+var _standing := {}      # {left, then} while sit_up plays
+var _glide := {}         # {from, to, t, dur}: the root eases between the floor and the seat
 
 func setup(args: Dictionary) -> void:
 	outpost = P0Outposts.find(str(args.get("outpost_id", "")))
@@ -40,7 +44,9 @@ func setup(args: Dictionary) -> void:
 
 func _room_ready() -> void:
 	_spawn_npcs()
-	actor.ground_height = func(_p: Vector3) -> float: return seat_root_y(seat) if seat != "" else floor_y
+	actor.ground_height = func(_p: Vector3) -> float:
+		if not _glide.is_empty(): return _glide_point().y
+		return seat_root_y(seat) if seat != "" else floor_y
 	crowd = OnlineCrowd.new()
 	crowd.show_health = false
 	crowd.height_of = _crowd_height
@@ -94,6 +100,12 @@ func to_room(world: Vector3) -> Vector3:
 	return world - room.position
 
 func _room_frame(_view: Dictionary, dt: float) -> void:
+	if not _glide.is_empty():
+		_glide.t = float(_glide.t) + dt
+		var p := _glide_point()
+		actor.mover.position = Vector3(p.x, actor.mover.position.y, p.z)   # x / z here, y through ground_height
+		actor.position = Vector3(p.x, actor.position.y, p.z)
+		if float(_glide.t) >= float(_glide.dur) and _standing.is_empty(): _glide = {}
 	if not _standing.is_empty():
 		_standing.left = float(_standing.left) - dt
 		if float(_standing.left) <= 0.0: _finish_stand()
@@ -221,49 +233,60 @@ func _sit_down(n: String) -> void:
 	if m == null: return
 	seat = n
 	_standing = {}
-	actor.teleport(Vector3(m.global_position.x, actor.position.y, m.global_position.z))
+	actor.lock(true)
+	_glide_to(Vector3(m.global_position.x, seat_root_y(n), m.global_position.z), SIT_GLIDE_S)
 	actor.face(actor.position + yaw_dir(float(anchor_data(n).get("yaw_degrees", 0))))
-	actor.lock(true)   # ground_height lifts the root onto the seat (§ seat_root_y) while sit_down plays
 	_play_seated(actor.rig, true)
 
-## sit_down then the sit_idle loop (in place: the hips stay over the seat anchor).
+## sit_down then the sit_idle loop (in place: the hips stay over the seat anchor); cross-faded in.
 static func _play_seated(rig: AvatarRig, from_standing: bool) -> void:
 	var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	if ap == null or not ap.has_animation("sit_idle"): return
 	if from_standing and ap.has_animation("sit_down"):
-		rig.play_motion("sit_down")
+		ap.play("sit_down", CLIP_BLEND_S)
 		ap.queue("sit_idle")
-	else: rig.play_motion("sit_idle")
+	else: ap.play("sit_idle", CLIP_BLEND_S)
+
+## Ease the rig root (world position) to `to` over `dur` seconds; P0Actor follows ground_height for y.
+func _glide_to(to: Vector3, dur: float) -> void:
+	_glide = {from = actor.position, to = to, t = 0.0, dur = maxf(dur, 0.01)}
+
+func _glide_point() -> Vector3:
+	var k := ease(clampf(float(_glide.t) / float(_glide.dur), 0.0, 1.0), -2.0)
+	return (_glide.from as Vector3).lerp(_glide.to, k)
 
 ## Rig root height (world) for a player on this seat: the seat anchor is the seat surface.
 func seat_root_y(seat_name: String) -> float:
 	var m := anchor(seat_name)
 	return m.global_position.y - SIT_ROOT_BELOW_SEAT if m else floor_y
 
-## Stand up: sit_up (sped up), then the player is back on the floor next to the seat and `then` runs
-## (walk to the door on Back, the tapped facility, or nothing for the joystick, which moves on its own).
+## Stand up: sit_up (sped up) while the root eases down to the floor beside the seat, then the player is
+## released and `then` runs (walk to the door on Back, the tapped facility; the joystick moves on its own).
 func _stand_up(then := Callable()) -> void:
 	if seat == "":
 		if then.is_valid(): then.call()
 		return
 	var m := anchor(seat)
+	var at := m.global_position if m else actor.position
 	seat = ""
 	_sit_request = {}
 	if online and online.epoch > 0: online.stand()
+	var floor_at := P0RoomNav.nearest_walkable(bp, at)
+	if floor_at == Vector3.INF: floor_at = actor.position
 	var ap := actor.rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
-	if ap and ap.has_animation("sit_up"):
-		ap.play("sit_up", -1, STAND_SPEED)
-		_standing = {left = STAND_S, at = m.global_position if m else actor.position, then = then}
-	else:
-		_standing = {left = 0.0, at = m.global_position if m else actor.position, then = then}
-		_finish_stand()
+	var dur := STAND_S if ap and ap.has_animation("sit_up") else 0.0
+	if dur > 0.0: ap.play("sit_up", CLIP_BLEND_S, STAND_SPEED)
+	_glide_to(Vector3(floor_at.x, floor_y, floor_at.z), dur)
+	_standing = {left = dur, then = then}
+	if dur <= 0.0: _finish_stand()
 
 func _finish_stand() -> void:
 	var s := _standing
 	_standing = {}
+	if not _glide.is_empty():
+		actor.teleport(_glide.to)
+		_glide = {}
 	actor.lock(false)
-	var p := P0RoomNav.nearest_walkable(bp, s.at)
-	if p != Vector3.INF: actor.teleport(Vector3(p.x, floor_y, p.z))
 	if (s.then as Callable).is_valid(): (s.then as Callable).call()
 
 ## Back while seated stands up first: the seat is inside the chair's collider, so the walk to the door
