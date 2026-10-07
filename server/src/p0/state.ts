@@ -78,6 +78,7 @@ export interface P0State {
   homestead: Homestead;
   residents: Record<string, ResidentState>;
   boards: { stall: BoardSlot[]; market: BoardSlot[] };
+  req_done: string[];            // last completed request ids (a repeated deliver says request_done)
   firsts: string[];              // e.g. harvest:crop_radish, catch:fish_crucian, cook:dish_grilled_crucian
   rewards: string[];             // one-time rewards already granted
   day: P0Day;
@@ -110,7 +111,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     bag_cap: c.bag.capacity, storage: {}, locked: [], owned: [],
     homestead: { level: 1, plaque: [] },
     residents: {},
-    boards: { stall: [{ req: tutorialRequest(c, now), refill_at: 0 }], market: [] },
+    boards: { stall: [{ req: tutorialRequest(c, now), refill_at: 0 }], market: [] }, req_done: [],
     firsts: [], rewards: [],
     day: emptyDay(),
     fishing: { casts: 0, bites: 0, caught: {}, seen: [] },
@@ -157,6 +158,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     s.homestead ??= { level: 1, plaque: [] };
     s.residents ??= {};
     const old = s.requests.find(r => r.id === c.requests.tutorial.id);
+    s.req_done ??= old?.status === 'done' ? [old.id] : [];
     const first = tutorialRequest(c, now);
     s.boards ??= {
       stall: [old?.status === 'done' ? { req: null, refill_at: now } : { req: { ...first, status: old?.status === 'accepted' ? 'accepted' : 'open' }, refill_at: 0 }],

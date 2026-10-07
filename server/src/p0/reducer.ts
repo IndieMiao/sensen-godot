@@ -2,6 +2,7 @@
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
 import { collectPot, eatDish, startPot } from './cooking.js';
+import { boardCommand, settleBoards } from './boards.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
 import { energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
@@ -32,8 +33,7 @@ type P0CommandBody =
   | { type: 'cook'; items?: string[]; recipe?: string }
   | { type: 'collect'; taps?: number[] }
   | { type: 'eat'; item: string }
-  | { type: 'accept'; request: string }
-  | { type: 'deliver'; request: string }
+  | { type: 'accept' | 'deliver' | 'drop'; request: string }
   | { type: 'homestead_upgrade' };
 
 export type P0Result =
@@ -50,6 +50,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   const events: P0Event[] = [];
   settleEnergy(c, s, now);
   rollDay(c, s, now);
+  settleBoards(c, s, now);
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
 
   switch (cmd.type) {
@@ -162,23 +163,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       else return fail('not_owned');
       break;
     }
-    case 'accept': case 'deliver': {
-      const req = s.requests.find(r => r.id === String(cmd.request));
-      if (!req) return fail('bad_request');
-      if (req.status === 'done') return fail('request_done');
-      if (cmd.type === 'accept') {
-        if (req.status === 'accepted') return fail('already_accepted');
-        req.status = 'accepted';
-        events.push({ kind: 'request', id: req.id, status: 'accepted', coins: 0 });
-        break;
-      }
-      const have = count(s.bag, req.item);
-      if (have < req.qty) return fail('not_enough', { item: req.item, need: req.qty, have });
-      take(s.bag, req.item, req.qty);
-      s.coins += req.coins;
-      req.status = 'done';
-      events.push({ kind: 'item', id: req.item, delta: -req.qty }, { kind: 'coins', delta: req.coins },
-        { kind: 'request', id: req.id, status: 'done', coins: req.coins });
+    case 'accept': case 'deliver': case 'drop': {
+      const refusal = boardCommand(c, s, cmd.type, String(cmd.request ?? ''), now, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'homestead_upgrade': {

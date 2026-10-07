@@ -1,11 +1,14 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
-import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type P0Content, type QuotaId, type ShopId } from './content.js';
+import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ShopId } from './content.js';
 import { count, freeSlots } from './bag.js';
 import { cookSlots, ingredientsFor, mealValue, recipeRarity } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
 import { catalog, drinkPrice, offerOf, owns, walletNeed } from './shops.js';
+import { BOARDS, handIn, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
+import { floorPrice, haveFor, matches } from './requests.js';
+import type { BoardRequest } from './state.js';
 import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
 import { haveTotal, stored } from './storage.js';
 
@@ -13,6 +16,7 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
   const s = structuredClone(input);
   settleEnergy(c, s, now);
   if (s.day.key !== dayKey(c, now)) s.day = emptyDay(dayKey(c, now));
+  settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
   const skills = Object.fromEntries(SKILLS.map(skill => {
     const level = skillLevel(c, s, skill), th = c.skills[skill];
     return [skill, { level, xp: s.skills[skill], floor: th[level - 1], next: level < th.length ? th[level] : null }];
@@ -41,14 +45,11 @@ export function viewOf(c: P0Content, input: P0State, now: number) {
     quotas: Object.fromEntries((Object.keys(c.quotas) as QuotaId[]).map(q => [q, quotaView(c, s, q, now)])),
     storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
     homestead: homesteadView(c, s),
+    boards: Object.fromEntries(BOARDS.map(b => [b, boardView(c, s, b, now)])),
     rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, now), amount: c.energy.rest_amount },
     stall: {
       keeper: c.stall.keeper,
-      board: {
-        slots: c.requests.slots,
-        requests: s.requests.map(r => ({ ...r, have: count(s.bag, r.item) })),
-        refill_in: Math.max(0, s.created_at + c.requests.refill_h * 3_600_000 - now),
-      },
+      board: legacyBoard(c, s, now),   // the current Homestead Stall panel; SGODOT-224 reads boards.stall
       buy: c.stall.buy.map(id => {
         const offer = stallOffer(c, id);
         const level = skillLevel(c, s, offer.skill);
@@ -205,5 +206,54 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
       };
     }),
     sell: Object.entries(c.shops[shop].buys).map(([kind, r]) => ({ kind, rate: r.rate, quota: r.quota })),
+  };
+}
+
+/** Ids a request could take, cheapest floor first: the fixed items, or every crop / fish / dish that fits its kind and rarity. */
+function candidates(c: P0Content, r: BoardRequest): string[] {
+  if (r.items.length) return r.items;
+  const ids = r.kind === 'fish' ? c.fish.map(f => f.id) : r.kind === 'dish' ? c.cooking.recipes.map(x => x.id) : c.crops.map(x => x.id);
+  return ids.filter(id => matches(c, { kind: r.kind, rarity: r.rarity }, [], id)).sort((a, b) => floorPrice(c, a) - floorPrice(c, b));
+}
+
+/** One request as facts (§9.6.5): what it takes, what the bag holds for it, and what delivering now would pay. */
+function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
+  const parts = handIn(c, s, r);
+  const each = r.items.length > 1 ? Math.min(...r.items.map(i => haveFor(c, s, { kind: r.kind }, [i]))) : haveFor(c, s, { kind: r.kind, rarity: r.rarity }, r.items);
+  const cheapest = candidates(c, r)[0];
+  const estimate = parts ? payout(c, r, parts)
+    : { base: r.items.length > 1 ? r.items.reduce((n, i) => n + floorPrice(c, i) * r.qty, 0) : (cheapest ? floorPrice(c, cheapest) : 0) * r.qty, bonus: r.bonus };
+  return {
+    id: r.id, template: r.template, title: c.requests.templates[r.template]?.title ?? r.template, kind: r.kind,
+    items: r.items, rarity: r.rarity ?? null, icon: r.items[0] ?? cheapest ?? null,
+    qty: r.qty, have: Math.min(each, r.qty), ready: parts !== null,
+    coins: estimate.base + estimate.bonus, base: estimate.base, bonus: estimate.bonus,
+    status: r.status,
+    expires_in: r.status === 'open' && r.id !== c.requests.tutorial.id ? Math.max(0, r.drawn_at + c.requests.expire_h * 3_600_000 - now) : null,
+  };
+}
+
+/** A board: its slots as requests, empty slots with their refill time, or the lowest gate when nothing is open yet. */
+function boardView(c: P0Content, s: P0State, board: BoardId, now: number) {
+  const locked = lockedTemplate(c, s, board);
+  return {
+    title: c.requests.boards[board].title, deliver_at: board === 'stall' ? 'homestead' : 'market',
+    slots: s.boards[board].slice(0, slotCount(c, s, board)).map(sl => sl.req ? requestView(c, s, sl.req, now)
+      : locked ? { empty: true, locked: { template: locked.template, title: c.requests.templates[locked.template].title, gate: locked.gate } }
+      : { empty: true, refill_in: Math.max(0, sl.refill_at - now) }),
+  };
+}
+
+/** The pre-SGODOT-224 shape of the Stall Board (scenes/p0/p0_ui.gd _board, P0Logic Today lines). */
+function legacyBoard(c: P0Content, s: P0State, now: number) {
+  const slots = s.boards.stall.slice(0, slotCount(c, s, 'stall'));
+  const empty = slots.filter(sl => !sl.req).map(sl => sl.refill_at);
+  return {
+    slots: slots.length,
+    requests: slots.filter(sl => sl.req).map(sl => {
+      const r = requestView(c, s, sl.req!, now);
+      return { id: r.id, title: r.title, item: r.icon ?? '', qty: r.qty, coins: r.coins, where: r.items.length ? 'any pond' : 'any kind', status: r.status, have: r.have };
+    }),
+    refill_in: empty.length ? Math.max(0, Math.min(...empty) - now) : 0,
   };
 }

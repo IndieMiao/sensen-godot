@@ -18,7 +18,7 @@ export type P0Event =
   | { kind: 'dish'; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number }
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }
-  | { kind: 'request'; id: string; status: 'accepted' | 'done'; coins: number }
+  | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
   | { kind: 'homestead'; level: number; energy: number; unlocks: string[] }
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
   | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null };
