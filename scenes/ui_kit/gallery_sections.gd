@@ -40,6 +40,7 @@ static func all() -> Array[Dictionary]:
 		{id = "dialogue_card", title = "UiDialogueCard", figma = "Head of KeeperGreeting 1205:83238 / ResidentDialogue 1213:83392 (336 at 328)", build = _dialogue_cards},
 		{id = "bag_header", title = "UiBagHeader", figma = "BagHeader 1225:83885 · LOCK-12 / 13", build = _bag_headers},
 		{id = "gear_row", title = "UiGearRow", figma = "Gear candidate rows of BAG-2 · Gear · LOCK-13", build = _gear_rows},
+		{id = "profile_parts", title = "Profile parts", figma = "ProfileTopBar 1233:107734 · ProfileMoreMenu 1233:107735 · SkillRing 1251:109246 · LOCK-22 (336 at 328)", build = _profile_parts},
 		{id = "resident_bar", title = "UiResidentBar", figma = "ResidentDialogue 1213:83392 Row / Stacked · LOCK-18 (336 at 328)", build = _resident_bars},
 	]
 	return out
@@ -590,4 +591,22 @@ static func _gear_rows() -> Control:
 	v.add_child(UiGearRow.new({icon = _tex("rod_reed"), title = "Reed Rod", state = &"owned", effect = "Lands up to Rare fish · Bite window +0.4 s",
 		action = {id = &"equip", label = "Equip", kind = &"secondary"}}))
 	v.add_child(UiGearRow.new({icon = _tex("rod"), title = "Carbon Rod", state = &"Fishing Lv5 · Tackle Shop", effect = "Lands up to Legendary fish"}))
+	return v
+
+static func _profile_parts() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(_at_336(UiProfileTopBar.new(UiProfileTopBar.Kind.SELF, "Profile")), "Kind=Self · back, Profile, gear (hidden in P0)"))
+	v.add_child(_captioned(_at_336(UiProfileTopBar.new(UiProfileTopBar.Kind.OTHER, "Ann")), "Kind=Other · ··· opens the more menu"))
+	var menus := _row(UiTokens.SPACE_ROW)
+	menus.add_child(_captioned(UiProfileMoreMenu.new(&"close_friend"), "close friend (P2)"))
+	menus.add_child(_captioned(UiProfileMoreMenu.new(&"blocked"), "blocked (P2)"))
+	v.add_child(menus)
+	var skills := HBoxContainer.new()
+	skills.add_theme_constant_override(&"separation", 8)
+	skills.add_child(UiSkillCard.new("Farming", 1, 0.6, _tex("hoe")))
+	skills.add_child(UiSkillCard.new("Fishing", 2, 0.2, _tex("rod")))
+	skills.add_child(UiSkillCard.new("Cooking", 2, 0.1, _tex("pot")))
+	v.add_child(_captioned(_at_336(skills), "SkillRing · ring floored to 10 %"))
+	var farm := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
+	v.add_child(_captioned(_at_336(farm), "farm overview"))
 	return v

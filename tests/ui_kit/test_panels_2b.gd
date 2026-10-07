@@ -313,3 +313,54 @@ func test_gear_row_states() -> void:
 	assert_array(_texts(locked)).contains(["Fishing Lv5 · Tackle Shop"])
 	assert_object(locked.action_button()).is_null()
 	assert_float(locked._icon.modulate.a).is_equal_approx(UiTokens.OPACITY_UNAVAILABLE_ICON, 0.001)
+
+# ---------------------------------------------------------------- profile parts (LOCK-22)
+
+func test_profile_top_bar_self_and_other() -> void:
+	var me: UiProfileTopBar = _host(UiProfileTopBar.new(UiProfileTopBar.Kind.SELF, "Profile"))
+	var other: UiProfileTopBar = _host(UiProfileTopBar.new(UiProfileTopBar.Kind.OTHER, "Ann"))
+	await _settle()
+	assert_array(_texts(me)).contains(["Profile"])
+	assert_array(_texts(other)).contains(["Ann"])
+	var got := []
+	me.back_pressed.connect(func(): got.append("back"))
+	me.settings_pressed.connect(func(): got.append("settings"))
+	other.more_pressed.connect(func(_r: Rect2): got.append("more"))
+	me.get_child(0).pressed.emit()
+	me.right_button().pressed.emit()
+	other.right_button().pressed.emit()
+	assert_array(got).is_equal(["back", "settings", "more"])
+	assert_vector(me.right_button().size).is_equal(Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE))
+	me.show_settings = false   # P0: no Settings page; the slot stays so the title does not move
+	assert_float(me.right_button().modulate.a).is_equal(0.0)
+	assert_int(me.right_button().mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+
+func test_more_menu_rows_follow_the_relation() -> void:
+	for case in [[&"default", ["Unfollow", "Block", "Report"]], [&"close_friend", ["Remove Close Friend", "Unfollow", "Block", "Report"]],
+			[&"blocked", ["Report"]]]:
+		var menu: UiProfileMoreMenu = auto_free(UiProfileMoreMenu.new(case[0]))
+		assert_array(menu.labels()).is_equal(case[1])
+	var m: UiProfileMoreMenu = _host(UiProfileMoreMenu.new())
+	var got := []
+	m.picked.connect(func(id: StringName): got.append(id))
+	(m.get_child(0).get_child(1) as Button).pressed.emit()
+	assert_array(got).is_equal([&"block"])
+
+func test_skill_card_ring_floors_to_ten_percent_and_reads_the_level() -> void:
+	var c: UiSkillCard = _host(UiSkillCard.new("Farming", 3, 0.67, load("res://assets/p0/icons/hoe.svg")))
+	await _settle()
+	assert_array(_texts(c)).contains(["Farming", "Lv3"])
+	assert_float(c.shown_progress()).is_equal_approx(0.6, 0.0001)
+	assert_vector(c.size).is_equal(Vector2(107, 56))
+	var hits := [0]
+	c.pressed.connect(func(): hits[0] += 1)
+	c.pressed.emit()
+	assert_int(hits[0]).is_equal(1)
+
+func test_farm_card_lines() -> void:
+	var f: UiFarmCard = _host(UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg")))
+	await _settle()
+	assert_array(_texts(f)).contains(["Farmer's Homestead", "Level 1", "Radishes ready 3h 32m"])
+	f.status = ""
+	assert_array(_texts(f)).not_contains(["Radishes ready 3h 32m"])
+	assert_float(f.size.y).is_equal(76.0)

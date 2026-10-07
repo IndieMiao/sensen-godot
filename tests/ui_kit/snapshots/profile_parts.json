@@ -1,0 +1,788 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    760
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "Profile parts"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        54
+      ],
+      "variation": "CaptionR12",
+      "text": "ProfileTopBar 1233:107734 · ProfileMoreMenu 1233:107735 · SkillRing 1251:109246 · LOCK-22 (336 at 328)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        88,
+        328,
+        672
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            88,
+            328,
+            63
+          ],
+          "children": [
+            {
+              "type": "Container",
+              "rect": [
+                0,
+                88,
+                328,
+                43
+              ],
+              "children": [
+                {
+                  "type": "UiProfileTopBar",
+                  "rect": [
+                    0,
+                    88,
+                    328,
+                    43
+                  ],
+                  "children": [
+                    {
+                      "type": "Button",
+                      "rect": [
+                        0,
+                        88,
+                        43,
+                        43
+                      ],
+                      "text": ""
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        53,
+                        99,
+                        223,
+                        21
+                      ],
+                      "variation": "RowTitleXB15",
+                      "text": "Profile"
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        285,
+                        88,
+                        43,
+                        43
+                      ],
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                137,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Kind=Self · back, Profile, gear (hidden in P0)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            171,
+            328,
+            63
+          ],
+          "children": [
+            {
+              "type": "Container",
+              "rect": [
+                0,
+                171,
+                328,
+                43
+              ],
+              "children": [
+                {
+                  "type": "UiProfileTopBar",
+                  "rect": [
+                    0,
+                    171,
+                    328,
+                    43
+                  ],
+                  "children": [
+                    {
+                      "type": "Button",
+                      "rect": [
+                        0,
+                        171,
+                        43,
+                        43
+                      ],
+                      "text": ""
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        53,
+                        182,
+                        223,
+                        21
+                      ],
+                      "variation": "RowTitleXB15",
+                      "text": "Ann"
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        285,
+                        171,
+                        43,
+                        43
+                      ],
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                220,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Kind=Other · ··· opens the more menu"
+            }
+          ]
+        },
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            254,
+            328,
+            296
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                254,
+                200,
+                208
+              ],
+              "children": [
+                {
+                  "type": "UiProfileMoreMenu",
+                  "rect": [
+                    0,
+                    254,
+                    200,
+                    188
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        0,
+                        260,
+                        200,
+                        176
+                      ],
+                      "children": [
+                        {
+                          "type": "Button",
+                          "rect": [
+                            0,
+                            260,
+                            200,
+                            44
+                          ],
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                16,
+                                260,
+                                184,
+                                44
+                              ],
+                              "variation": "BodyB14",
+                              "text": "Remove Close Friend"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Button",
+                          "rect": [
+                            0,
+                            304,
+                            200,
+                            44
+                          ],
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                16,
+                                304,
+                                184,
+                                44
+                              ],
+                              "variation": "BodyB14",
+                              "text": "Unfollow"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Button",
+                          "rect": [
+                            0,
+                            348,
+                            200,
+                            44
+                          ],
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                16,
+                                348,
+                                184,
+                                44
+                              ],
+                              "variation": "BodyB14",
+                              "text": "Block"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Button",
+                          "rect": [
+                            0,
+                            392,
+                            200,
+                            44
+                          ],
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                16,
+                                392,
+                                184,
+                                44
+                              ],
+                              "variation": "BodyB14",
+                              "text": "Report"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    448,
+                    200,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "close friend (P2)"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                474,
+                200,
+                76
+              ],
+              "children": [
+                {
+                  "type": "UiProfileMoreMenu",
+                  "rect": [
+                    0,
+                    474,
+                    200,
+                    56
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        0,
+                        480,
+                        200,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Button",
+                          "rect": [
+                            0,
+                            480,
+                            200,
+                            44
+                          ],
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                16,
+                                480,
+                                184,
+                                44
+                              ],
+                              "variation": "BodyB14",
+                              "text": "Report"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    536,
+                    200,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "blocked (P2)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            570,
+            328,
+            75
+          ],
+          "children": [
+            {
+              "type": "Container",
+              "rect": [
+                0,
+                570,
+                328,
+                55
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    0,
+                    570,
+                    329,
+                    55
+                  ],
+                  "children": [
+                    {
+                      "type": "UiSkillCard",
+                      "rect": [
+                        0,
+                        570,
+                        104,
+                        55
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            0,
+                            570,
+                            104,
+                            55
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            8,
+                            578,
+                            39,
+                            39
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                18,
+                                588,
+                                20,
+                                20
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            55,
+                            570,
+                            50,
+                            55
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                55,
+                                580,
+                                50,
+                                15
+                              ],
+                              "variation": "C10B",
+                              "text": "Farming"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                55,
+                                596,
+                                50,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "Lv1"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiSkillCard",
+                      "rect": [
+                        112,
+                        570,
+                        104,
+                        55
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            112,
+                            570,
+                            104,
+                            55
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            120,
+                            578,
+                            39,
+                            39
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                130,
+                                588,
+                                20,
+                                20
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            167,
+                            570,
+                            50,
+                            55
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                167,
+                                580,
+                                50,
+                                15
+                              ],
+                              "variation": "C10B",
+                              "text": "Fishing"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                167,
+                                596,
+                                50,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "Lv2"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiSkillCard",
+                      "rect": [
+                        225,
+                        570,
+                        104,
+                        55
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            225,
+                            570,
+                            104,
+                            55
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            232,
+                            578,
+                            39,
+                            39
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                242,
+                                588,
+                                20,
+                                20
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            279,
+                            570,
+                            50,
+                            55
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                279,
+                                580,
+                                50,
+                                15
+                              ],
+                              "variation": "C10B",
+                              "text": "Cooking"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                279,
+                                596,
+                                50,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "Lv2"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                631,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "SkillRing · ring floored to 10 %"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            665,
+            328,
+            95
+          ],
+          "children": [
+            {
+              "type": "Container",
+              "rect": [
+                0,
+                665,
+                328,
+                75
+              ],
+              "children": [
+                {
+                  "type": "UiFarmCard",
+                  "rect": [
+                    0,
+                    665,
+                    328,
+                    74
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        0,
+                        665,
+                        328,
+                        74
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        7,
+                        672,
+                        61,
+                        61
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            7,
+                            672,
+                            61,
+                            61
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        78,
+                        665,
+                        243,
+                        74
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            78,
+                            677,
+                            243,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Farmer's Homestead"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            78,
+                            696,
+                            243,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Level 1"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            78,
+                            713,
+                            243,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Radishes ready 3h 32m"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                746,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "farm overview"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
