@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 2764217
+    "bytes": 2911485
   },
   "assets": [
     {
@@ -46,10 +46,10 @@
     },
     {
       "name": "pickup_sign",
-      "vertices": 800,
-      "triangles": 876,
+      "vertices": 1792,
+      "triangles": 1880,
       "surfaces": 1,
-      "bytes": 45800
+      "bytes": 99956
     },
     {
       "name": "pickup_paper_bags",
@@ -60,10 +60,10 @@
     },
     {
       "name": "drinks_fridge",
-      "vertices": 5144,
-      "triangles": 7932,
+      "vertices": 3720,
+      "triangles": 6852,
       "surfaces": 1,
-      "bytes": 324824
+      "bytes": 255748
     },
     {
       "name": "drinks_glass",
@@ -84,7 +84,7 @@
       "vertices": 2620,
       "triangles": 4972,
       "surfaces": 1,
-      "bytes": 186792
+      "bytes": 186856
     },
     {
       "name": "prep_station",
@@ -102,17 +102,17 @@
     },
     {
       "name": "menu_board",
-      "vertices": 18100,
-      "triangles": 18272,
+      "vertices": 29404,
+      "triangles": 30370,
       "surfaces": 1,
-      "bytes": 992080
+      "bytes": 1634524
     },
     {
       "name": "red_order_counter",
       "vertices": 4500,
       "triangles": 8628,
       "surfaces": 1,
-      "bytes": 281964
+      "bytes": 282028
     },
     {
       "name": "customer_bar",
@@ -137,17 +137,17 @@
     },
     {
       "name": "good_burgers_poster",
-      "vertices": 2368,
-      "triangles": 2588,
+      "vertices": 5496,
+      "triangles": 6234,
       "surfaces": 1,
-      "bytes": 132224
+      "bytes": 296340
     },
     {
       "name": "fresh_buns_poster",
-      "vertices": 1864,
-      "triangles": 2076,
+      "vertices": 4556,
+      "triangles": 5232,
       "surfaces": 1,
-      "bytes": 104668
+      "bytes": 242900
     },
     {
       "name": "wall_lamp",
@@ -161,7 +161,7 @@
       "vertices": 640,
       "triangles": 1240,
       "surfaces": 1,
-      "bytes": 42944
+      "bytes": 43008
     },
     {
       "name": "counter_logo_glow",
@@ -189,7 +189,7 @@
       "vertices": 16,
       "triangles": 24,
       "surfaces": 1,
-      "bytes": 3052
+      "bytes": 3048
     },
     {
       "name": "grill_steam",
@@ -197,21 +197,28 @@
       "triangles": 258,
       "surfaces": 1,
       "bytes": 14820
+    },
+    {
+      "name": "planter_dense_leaves",
+      "vertices": 2240,
+      "triangles": 1680,
+      "surfaces": 1,
+      "bytes": 83156
     }
   ],
-  "unique_triangles": 92350,
-  "scene_triangles": 95310,
-  "static_draw_surfaces": 34,
-  "unique_assets": 27,
-  "placed_instances": 34,
-  "glb_bytes": 3684744,
+  "unique_triangles": 112854,
+  "scene_triangles": 127574,
+  "static_draw_surfaces": 42,
+  "unique_assets": 28,
+  "placed_instances": 42,
+  "glb_bytes": 4697960,
   "scene_budget": {
     "after": {
-      "room_triangles": 95310,
-      "shared_plant_triangles": 13234,
-      "room_botanical_triangles": 0,
-      "plant_triangles": 13234,
-      "total_triangles": 108544,
+      "room_triangles": 127574,
+      "shared_plant_triangles": 946,
+      "room_botanical_triangles": 13440,
+      "plant_triangles": 14386,
+      "total_triangles": 128520,
       "static_surfaces": 26
     },
     "limits": {
@@ -234,7 +241,7 @@
           "wall_lamp",
           "wall_lamp_pickup"
         ],
-        "triangles": 16424,
+        "triangles": 20584,
         "cast_shadow": true
       },
       {
@@ -257,8 +264,25 @@
           "wall_lamp_left",
           "bar_napkins"
         ],
-        "triangles": 4168,
+        "triangles": 7814,
         "cast_shadow": true
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/burger_shop/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "planter_dense_leaves",
+          "planter_crown_1",
+          "planter_crown_2",
+          "planter_crown_3",
+          "planter_crown_4",
+          "planter_crown_5",
+          "planter_crown_6",
+          "planter_crown_7"
+        ],
+        "triangles": 13440,
+        "cast_shadow": false
       },
       {
         "name": "large_plants",
@@ -269,21 +293,6 @@
         ],
         "triangles": 946,
         "cast_shadow": true
-      },
-      {
-        "name": "front_plants",
-        "file": "res://assets/rooms/burger_shop/batches/review_front_plants.glb",
-        "material": "plants",
-        "sources": [
-          "FencePothos0",
-          "FencePothos1",
-          "FencePothos2",
-          "FencePothos3",
-          "FencePothos4",
-          "FencePothos5"
-        ],
-        "triangles": 12288,
-        "cast_shadow": false
       }
     ]
   }

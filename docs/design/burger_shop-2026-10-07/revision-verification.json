@@ -1,10 +1,10 @@
 {
-  "revision": "r1",
+  "revision": "r2",
   "reference_sha256": "d197ef4ea5ea24de5823c2f938033e5e701d1ce51a4cee7ea2cd8f0cbddd329a",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "draw_calls": 25.0,
-    "instances": 41,
+    "draw_calls": 18.0,
+    "instances": 43,
     "renderer": "mobile",
     "resolution": [
       1400,
@@ -40,19 +40,29 @@
         "view": "godot-detail"
       },
       {
-        "draw_calls": 25.0,
-        "rendered_objects": 25.0,
+        "draw_calls": 24.0,
+        "rendered_objects": 24.0,
         "view": "godot-detail-plants"
+      },
+      {
+        "draw_calls": 24.0,
+        "rendered_objects": 24.0,
+        "view": "menu-kitchen-detail"
+      },
+      {
+        "draw_calls": 18.0,
+        "rendered_objects": 18.0,
+        "view": "soda-poster-detail"
       }
     ]
   },
   "budget": {
     "after": {
-      "room_triangles": 95310,
-      "shared_plant_triangles": 13234,
-      "room_botanical_triangles": 0,
-      "plant_triangles": 13234,
-      "total_triangles": 108544,
+      "room_triangles": 127574,
+      "shared_plant_triangles": 946,
+      "room_botanical_triangles": 13440,
+      "plant_triangles": 14386,
+      "total_triangles": 128520,
       "static_surfaces": 26
     },
     "limits": {
@@ -75,7 +85,7 @@
           "wall_lamp",
           "wall_lamp_pickup"
         ],
-        "triangles": 16424,
+        "triangles": 20584,
         "cast_shadow": true
       },
       {
@@ -98,8 +108,25 @@
           "wall_lamp_left",
           "bar_napkins"
         ],
-        "triangles": 4168,
+        "triangles": 7814,
         "cast_shadow": true
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/burger_shop/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "planter_dense_leaves",
+          "planter_crown_1",
+          "planter_crown_2",
+          "planter_crown_3",
+          "planter_crown_4",
+          "planter_crown_5",
+          "planter_crown_6",
+          "planter_crown_7"
+        ],
+        "triangles": 13440,
+        "cast_shadow": false
       },
       {
         "name": "large_plants",
@@ -110,21 +137,6 @@
         ],
         "triangles": 946,
         "cast_shadow": true
-      },
-      {
-        "name": "front_plants",
-        "file": "res://assets/rooms/burger_shop/batches/review_front_plants.glb",
-        "material": "plants",
-        "sources": [
-          "FencePothos0",
-          "FencePothos1",
-          "FencePothos2",
-          "FencePothos3",
-          "FencePothos4",
-          "FencePothos5"
-        ],
-        "triangles": 12288,
-        "cast_shadow": false
       }
     ]
   },
@@ -133,10 +145,9 @@
     "single_surface_no_embedded_images": true,
     "files": [
       "assets/rooms/_shared/plants/peace_lily.glb",
-      "assets/rooms/_shared/plants/pothos.glb",
       "assets/rooms/burger_shop/batches/review_back_dressing.glb",
+      "assets/rooms/burger_shop/batches/review_botanical.glb",
       "assets/rooms/burger_shop/batches/review_front_dressing.glb",
-      "assets/rooms/burger_shop/batches/review_front_plants.glb",
       "assets/rooms/burger_shop/batches/review_glass.glb",
       "assets/rooms/burger_shop/batches/review_large_plants.glb",
       "assets/rooms/burger_shop/burger_warming_shelf.glb",
@@ -161,6 +172,7 @@
       "assets/rooms/burger_shop/pickup_sign.glb",
       "assets/rooms/burger_shop/pickup_wall.glb",
       "assets/rooms/burger_shop/pickup_window.glb",
+      "assets/rooms/burger_shop/planter_dense_leaves.glb",
       "assets/rooms/burger_shop/prep_station.glb",
       "assets/rooms/burger_shop/red_diner_stool.glb",
       "assets/rooms/burger_shop/red_order_counter.glb",

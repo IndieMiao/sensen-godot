@@ -1,5 +1,5 @@
 {
-  "revision": "r1",
+  "revision": "r2",
   "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
   "checks": [
     {
@@ -10,8 +10,8 @@
         247
       ],
       "runtime_pixel": [
-        359,
-        342
+        342,
+        310
       ],
       "reference": {
         "rgb": [
@@ -26,16 +26,16 @@
       },
       "runtime": {
         "rgb": [
-          245,
-          81,
-          54
+          241,
+          78,
+          53
         ],
-        "hex": "#F55136",
-        "hue_degrees": 8.482,
-        "saturation": 0.7796,
-        "value": 0.9608
+        "hex": "#F14E35",
+        "hue_degrees": 7.979,
+        "saturation": 0.7801,
+        "value": 0.9451
       },
-      "hue_delta_degrees": 8.482,
+      "hue_delta_degrees": 7.979,
       "passed": true
     },
     {
@@ -46,8 +46,8 @@
         971
       ],
       "runtime_pixel": [
-        550,
-        701
+        520,
+        772
       ],
       "reference": {
         "rgb": [
@@ -62,16 +62,16 @@
       },
       "runtime": {
         "rgb": [
-          199,
-          48,
-          31
+          192,
+          50,
+          33
         ],
-        "hex": "#C7301F",
-        "hue_degrees": 6.071,
-        "saturation": 0.8442,
-        "value": 0.7804
+        "hex": "#C03221",
+        "hue_degrees": 6.415,
+        "saturation": 0.8281,
+        "value": 0.7529
       },
-      "hue_delta_degrees": 1.836,
+      "hue_delta_degrees": 1.492,
       "passed": true
     },
     {
@@ -82,8 +82,8 @@
         1368
       ],
       "runtime_pixel": [
-        824,
-        1089
+        868,
+        1192
       ],
       "reference": {
         "rgb": [
@@ -98,16 +98,16 @@
       },
       "runtime": {
         "rgb": [
-          146,
-          79,
-          42
+          121,
+          64,
+          34
         ],
-        "hex": "#924F2A",
-        "hue_degrees": 21.346,
-        "saturation": 0.7123,
-        "value": 0.5725
+        "hex": "#794022",
+        "hue_degrees": 20.69,
+        "saturation": 0.719,
+        "value": 0.4745
       },
-      "hue_delta_degrees": 0.096,
+      "hue_delta_degrees": 0.56,
       "passed": true
     },
     {
@@ -118,8 +118,8 @@
         1290
       ],
       "runtime_pixel": [
-        806,
-        1060
+        776,
+        1159
       ],
       "reference": {
         "rgb": [
@@ -135,15 +135,15 @@
       "runtime": {
         "rgb": [
           255,
-          233,
-          193
+          226,
+          175
         ],
-        "hex": "#FFE9C1",
-        "hue_degrees": 38.71,
-        "saturation": 0.2431,
+        "hex": "#FFE2AF",
+        "hue_degrees": 38.25,
+        "saturation": 0.3137,
         "value": 1.0
       },
-      "hue_delta_degrees": 9.047,
+      "hue_delta_degrees": 8.587,
       "passed": true
     }
   ],

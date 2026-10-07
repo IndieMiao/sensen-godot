@@ -83,6 +83,8 @@ def revise():
     r.recolor('counter_logo_glow','DDAE4A')
     add_steam()
     layout_open_path()
+    from revision2 import revise as revise_r2
+    revise_r2()
     r.sync_instances()
 
 def add_steam():
@@ -112,4 +114,7 @@ def manifest():
     d['boundaries']=[{'name':'front_edge','at':[0,.60,2.94],'size':[6.2,1.8,.12]}, {'name':'right_edge','at':[3.06,.60,0],'size':[.12,1.8,5.9]}]
     d['camera']={'position':[10,10,12],'target':[0,1.10,.04],'size':10.2}
     from burger_bench import bench
-    bench(d);p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)
+    bench(d)
+    from revision2 import manifest as manifest_r2
+    manifest_r2(d)
+    p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)

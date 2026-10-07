@@ -3,6 +3,8 @@ from pathlib import Path
 import sys,math,random
 sys.path.insert(0,str(Path(__file__).resolve().parent/'source/coffee_shop'))
 import kit as k
+from liubei_r2 import enable_lettering
+enable_lettering()
 import storefront as s
 from kit import begin,cube,cylinder,tube,ellipsoid,lathe,leaf
 RED='B94E3D';STEEL='AEA89A'

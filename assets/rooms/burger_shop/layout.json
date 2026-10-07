@@ -160,12 +160,12 @@
           "at": [
             0,
             1.15,
-            0
+            0.2
           ],
           "size": [
-            1.1,
+            1.13,
             2.3,
-            0.67
+            1.0
           ]
         }
       ]
@@ -258,7 +258,7 @@
       "file": "burger_warming_shelf.glb",
       "position": [
         -2.76,
-        1.48,
+        1.32,
         -1.93
       ],
       "yaw_degrees": 90,
@@ -269,8 +269,8 @@
       "file": "menu_board.glb",
       "position": [
         -2.82,
-        2.31,
-        -1.3
+        2.5,
+        -0.4
       ],
       "yaw_degrees": 90,
       "colliders": []
@@ -376,8 +376,8 @@
       "file": "good_burgers_poster.glb",
       "position": [
         -2.82,
-        1.91,
-        1.7
+        1.95,
+        2.42
       ],
       "yaw_degrees": 90,
       "colliders": []
@@ -482,6 +482,17 @@
       ],
       "yaw_degrees": 90,
       "colliders": []
+    },
+    {
+      "name": "planter_dense_leaves",
+      "file": "planter_dense_leaves.glb",
+      "position": [
+        -2.88,
+        0.94,
+        0.42
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
     }
   ],
   "instances": [
@@ -510,8 +521,8 @@
       "asset": "wall_lamp",
       "position": [
         -2.81,
-        2.63,
-        1.7
+        2.8,
+        2.42
       ],
       "yaw_degrees": 90
     },
@@ -519,7 +530,7 @@
       "name": "wall_lamp_pickup",
       "asset": "wall_lamp",
       "position": [
-        0.03,
+        -0.35,
         2.91,
         -2.57
       ],
@@ -540,8 +551,8 @@
       "asset": "lamp_bulb_glow",
       "position": [
         -2.81,
-        2.63,
-        1.7
+        2.8,
+        2.42
       ],
       "yaw_degrees": 90
     },
@@ -549,27 +560,97 @@
       "name": "wall_lamp_pickup_glow",
       "asset": "lamp_bulb_glow",
       "position": [
-        0.03,
+        -0.35,
         2.91,
         -2.57
       ],
       "yaw_degrees": 0
+    },
+    {
+      "name": "planter_crown_1",
+      "asset": "planter_dense_leaves",
+      "position": [
+        -2.88,
+        0.94,
+        0.72
+      ],
+      "yaw_degrees": 127
+    },
+    {
+      "name": "planter_crown_2",
+      "asset": "planter_dense_leaves",
+      "position": [
+        -2.88,
+        0.94,
+        1.02
+      ],
+      "yaw_degrees": 164
+    },
+    {
+      "name": "planter_crown_3",
+      "asset": "planter_dense_leaves",
+      "position": [
+        -2.88,
+        0.94,
+        1.3199999999999998
+      ],
+      "yaw_degrees": 201
+    },
+    {
+      "name": "planter_crown_4",
+      "asset": "planter_dense_leaves",
+      "position": [
+        -2.88,
+        0.94,
+        1.6199999999999999
+      ],
+      "yaw_degrees": 238
+    },
+    {
+      "name": "planter_crown_5",
+      "asset": "planter_dense_leaves",
+      "position": [
+        -2.88,
+        0.94,
+        1.92
+      ],
+      "yaw_degrees": 275
+    },
+    {
+      "name": "planter_crown_6",
+      "asset": "planter_dense_leaves",
+      "position": [
+        -2.88,
+        0.94,
+        2.2199999999999998
+      ],
+      "yaw_degrees": 312
+    },
+    {
+      "name": "planter_crown_7",
+      "asset": "planter_dense_leaves",
+      "position": [
+        -2.88,
+        0.94,
+        2.52
+      ],
+      "yaw_degrees": 349
     }
   ],
   "camera": {
     "position": [
-      10,
-      10,
-      12
+      11.998581501630813,
+      10.640038204783755,
+      9.001989420771965
     ],
     "target": [
-      0,
-      1.1,
-      0.04
+      0.02535396193400923,
+      1.5950300011112766,
+      -0.03359701745361411
     ],
-    "size": 10.2
+    "size": 8.798069211906466
   },
-  "revision": "R1",
+  "revision": "R2",
   "shared_plants": [
     {
       "name": "WhiteCornerPlant",
@@ -604,132 +685,6 @@
           ]
         }
       ]
-    },
-    {
-      "name": "FencePothos0",
-      "asset": "pothos",
-      "file": "res://assets/rooms/_shared/plants/pothos.glb",
-      "position": [
-        -2.88,
-        0.94,
-        0.49
-      ],
-      "rotation_degrees": [
-        0,
-        90,
-        0
-      ],
-      "scale": [
-        0.75,
-        0.75,
-        0.75
-      ],
-      "colliders": []
-    },
-    {
-      "name": "FencePothos1",
-      "asset": "pothos",
-      "file": "res://assets/rooms/_shared/plants/pothos.glb",
-      "position": [
-        -2.88,
-        0.94,
-        0.85
-      ],
-      "rotation_degrees": [
-        0,
-        90,
-        0
-      ],
-      "scale": [
-        0.75,
-        0.75,
-        0.75
-      ],
-      "colliders": []
-    },
-    {
-      "name": "FencePothos2",
-      "asset": "pothos",
-      "file": "res://assets/rooms/_shared/plants/pothos.glb",
-      "position": [
-        -2.88,
-        0.94,
-        1.21
-      ],
-      "rotation_degrees": [
-        0,
-        90,
-        0
-      ],
-      "scale": [
-        0.75,
-        0.75,
-        0.75
-      ],
-      "colliders": []
-    },
-    {
-      "name": "FencePothos3",
-      "asset": "pothos",
-      "file": "res://assets/rooms/_shared/plants/pothos.glb",
-      "position": [
-        -2.88,
-        0.94,
-        1.57
-      ],
-      "rotation_degrees": [
-        0,
-        90,
-        0
-      ],
-      "scale": [
-        0.75,
-        0.75,
-        0.75
-      ],
-      "colliders": []
-    },
-    {
-      "name": "FencePothos4",
-      "asset": "pothos",
-      "file": "res://assets/rooms/_shared/plants/pothos.glb",
-      "position": [
-        -2.88,
-        0.94,
-        1.93
-      ],
-      "rotation_degrees": [
-        0,
-        90,
-        0
-      ],
-      "scale": [
-        0.75,
-        0.75,
-        0.75
-      ],
-      "colliders": []
-    },
-    {
-      "name": "FencePothos5",
-      "asset": "pothos",
-      "file": "res://assets/rooms/_shared/plants/pothos.glb",
-      "position": [
-        -2.88,
-        0.94,
-        2.29
-      ],
-      "rotation_degrees": [
-        0,
-        90,
-        0
-      ],
-      "scale": [
-        0.75,
-        0.75,
-        0.75
-      ],
-      "colliders": []
     }
   ],
   "material_overrides": {
@@ -753,11 +708,11 @@
     },
     "menu_board": {
       "emission": "FFFFFF",
-      "emission_energy": 0.025,
+      "emission_energy": 0.045,
       "emission_use_atlas": true
     },
     "drinks_glass": {
-      "alpha": 0.1
+      "alpha": 0.045
     }
   },
   "lighting": {
@@ -791,8 +746,8 @@
       {
         "position": [
           -2.45,
-          2.4,
-          1.7
+          2.57,
+          2.42
         ],
         "color": "FFD187",
         "energy": 0.8,
@@ -800,7 +755,7 @@
       },
       {
         "position": [
-          0.03,
+          -0.35,
           2.7,
           -2.1
         ],
@@ -817,6 +772,16 @@
         "color": "D9EFFF",
         "energy": 0.45,
         "range": 1.1
+      },
+      {
+        "position": [
+          -1.85,
+          2.35,
+          -1.3
+        ],
+        "color": "FFD498",
+        "energy": 0.42,
+        "range": 2.0
       }
     ]
   },
@@ -850,8 +815,8 @@
       {
         "position": [
           -2.45,
-          2.4,
-          1.7
+          2.57,
+          2.42
         ],
         "color": "FFD187",
         "energy": 0.8,
@@ -859,7 +824,7 @@
       },
       {
         "position": [
-          0.03,
+          -0.35,
           2.7,
           -2.1
         ],
@@ -876,6 +841,16 @@
         "color": "D9EFFF",
         "energy": 0.45,
         "range": 1.1
+      },
+      {
+        "position": [
+          -1.85,
+          2.35,
+          -1.3
+        ],
+        "color": "FFD498",
+        "energy": 0.42,
+        "range": 2.0
       }
     ]
   },
@@ -1182,8 +1157,8 @@
     ],
     "scale": {
       "door": {
-        "height": 2.33,
-        "reason": "Open front diorama, no enclosing door; unchanged baseline placeholder."
+        "applicable": false,
+        "reason": "Open front diorama; no doorway is modeled, so there is no door-height measurement."
       },
       "counter": {
         "height": 1.1615,
@@ -1199,6 +1174,122 @@
       }
     }
   },
+  "botanical_assets": [
+    "planter_dense_leaves"
+  ],
+  "review_camera_fit": {
+    "method": "orthographic fit to plinth edge intersections; no model scaling or image warp",
+    "reference_size": [
+      1544,
+      1544
+    ],
+    "reference_corners_left_front_right": [
+      [
+        41,
+        1015
+      ],
+      [
+        677,
+        1456
+      ],
+      [
+        1498,
+        1127
+      ]
+    ],
+    "inferred_back": [
+      862,
+      686
+    ],
+    "footprint_m": [
+      6.16,
+      5.76
+    ],
+    "plinth_y": -0.4056,
+    "render_size": [
+      1400,
+      1400
+    ],
+    "fitted_corners": [
+      [
+        32.267161895339086,
+        913.1589640003534
+      ],
+      [
+        622.7216928190406,
+        1317.1893441365958
+      ],
+      [
+        1354.3375701560867,
+        1032.0869250236728
+      ]
+    ],
+    "observed_letterboxed_corners": [
+      [
+        37.17616580310881,
+        920.3367875647668
+      ],
+      [
+        613.860103626943,
+        1320.2072538860104
+      ],
+      [
+        1358.2901554404145,
+        1021.8911917098445
+      ]
+    ],
+    "residual_px": [
+      8.6959456350846,
+      9.361385702187158,
+      10.935076965279835
+    ],
+    "pitch_degrees": 31.09000000000005,
+    "yaw_degrees": 52.96,
+    "camera": {
+      "position": [
+        11.998581501630813,
+        10.640038204783755,
+        9.001989420771965
+      ],
+      "target": [
+        0.02535396193400923,
+        1.5950300011112766,
+        -0.03359701745361411
+      ],
+      "size": 8.798069211906466
+    },
+    "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
+  },
+  "review_views": [
+    {
+      "name": "menu-kitchen-detail",
+      "position": [
+        3.4,
+        3.9,
+        4.0
+      ],
+      "target": [
+        -1.95,
+        1.95,
+        -0.65
+      ],
+      "size": 4.4
+    },
+    {
+      "name": "soda-poster-detail",
+      "position": [
+        3.2,
+        3.1,
+        4.8
+      ],
+      "target": [
+        0.5,
+        1.56,
+        -2.03
+      ],
+      "size": 4.0
+    }
+  ],
   "render_batches": [
     {
       "name": "back_dressing",
@@ -1214,7 +1305,7 @@
         "wall_lamp",
         "wall_lamp_pickup"
       ],
-      "triangles": 16424,
+      "triangles": 20584,
       "cast_shadow": true
     },
     {
@@ -1237,8 +1328,25 @@
         "wall_lamp_left",
         "bar_napkins"
       ],
-      "triangles": 4168,
+      "triangles": 7814,
       "cast_shadow": true
+    },
+    {
+      "name": "botanical",
+      "file": "res://assets/rooms/burger_shop/batches/review_botanical.glb",
+      "material": "room",
+      "sources": [
+        "planter_dense_leaves",
+        "planter_crown_1",
+        "planter_crown_2",
+        "planter_crown_3",
+        "planter_crown_4",
+        "planter_crown_5",
+        "planter_crown_6",
+        "planter_crown_7"
+      ],
+      "triangles": 13440,
+      "cast_shadow": false
     },
     {
       "name": "large_plants",
@@ -1249,21 +1357,6 @@
       ],
       "triangles": 946,
       "cast_shadow": true
-    },
-    {
-      "name": "front_plants",
-      "file": "res://assets/rooms/burger_shop/batches/review_front_plants.glb",
-      "material": "plants",
-      "sources": [
-        "FencePothos0",
-        "FencePothos1",
-        "FencePothos2",
-        "FencePothos3",
-        "FencePothos4",
-        "FencePothos5"
-      ],
-      "triangles": 12288,
-      "cast_shadow": false
     }
   ]
 }

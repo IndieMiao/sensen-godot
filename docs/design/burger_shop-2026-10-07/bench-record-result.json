@@ -53,7 +53,7 @@
 				"name": "front_lane",
 				"reached": true,
 				"remaining_m": 0.0708340108394623,
-				"seconds": 0.117,
+				"seconds": 0.116,
 				"target": [
 					0.270000010728836,
 					0.0649999976158142,
@@ -81,7 +81,7 @@
 				"name": "bar_left_end",
 				"reached": true,
 				"remaining_m": 0.0809200406074524,
-				"seconds": 0.45,
+				"seconds": 0.449,
 				"target": [
 					-1.36000001430511,
 					0.0649999976158142,
@@ -107,7 +107,7 @@
 				"name": "counter_corner",
 				"reached": true,
 				"remaining_m": 0.087701603770256,
-				"seconds": 0.494,
+				"seconds": 0.482,
 				"target": [
 					-1.36000001430511,
 					0.0649999976158142,
@@ -133,7 +133,7 @@
 				"name": "order_position",
 				"reached": true,
 				"remaining_m": 0.0858902782201767,
-				"seconds": 0.433,
+				"seconds": 0.422,
 				"target": [
 					0.219999998807907,
 					0.0649999976158142,
@@ -159,7 +159,7 @@
 				"name": "right_aisle",
 				"reached": true,
 				"remaining_m": 0.0735983103513718,
-				"seconds": 0.616,
+				"seconds": 0.604,
 				"target": [
 					2.38000011444092,
 					0.0649999976158142,
@@ -185,7 +185,7 @@
 				"name": "pickup_approach",
 				"reached": true,
 				"remaining_m": 0.0892840623855591,
-				"seconds": 0.56,
+				"seconds": 0.538,
 				"target": [
 					2.38000011444092,
 					0.0649999976158142,
@@ -211,7 +211,7 @@
 				"name": "pickup_window",
 				"reached": true,
 				"remaining_m": 0.0947398319840431,
-				"seconds": 0.366,
+				"seconds": 0.355,
 				"target": [
 					1.08000004291534,
 					0.0649999976158142,
@@ -237,7 +237,7 @@
 				"name": "right_return",
 				"reached": true,
 				"remaining_m": 0.0647583976387978,
-				"seconds": 0.35,
+				"seconds": 0.339,
 				"target": [
 					2.38000011444092,
 					0.0649999976158142,
@@ -248,13 +248,13 @@
 			"passed": true
 		},
 		{
-			"details": 5.685,
+			"details": 5.694,
 			"name": "Full route fits unaccelerated 15s clip",
 			"passed": true
 		}
 	],
 	"passed": true,
-	"pid": 1076489,
+	"pid": 1107066,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -294,7 +294,7 @@
 			"name": "front_lane",
 			"reached": true,
 			"remaining_m": 0.0708340108394623,
-			"seconds": 0.117,
+			"seconds": 0.116,
 			"target": [
 				0.270000010728836,
 				0.0649999976158142,
@@ -318,7 +318,7 @@
 			"name": "bar_left_end",
 			"reached": true,
 			"remaining_m": 0.0809200406074524,
-			"seconds": 0.45,
+			"seconds": 0.449,
 			"target": [
 				-1.36000001430511,
 				0.0649999976158142,
@@ -340,7 +340,7 @@
 			"name": "counter_corner",
 			"reached": true,
 			"remaining_m": 0.087701603770256,
-			"seconds": 0.494,
+			"seconds": 0.482,
 			"target": [
 				-1.36000001430511,
 				0.0649999976158142,
@@ -362,7 +362,7 @@
 			"name": "order_position",
 			"reached": true,
 			"remaining_m": 0.0858902782201767,
-			"seconds": 0.433,
+			"seconds": 0.422,
 			"target": [
 				0.219999998807907,
 				0.0649999976158142,
@@ -384,7 +384,7 @@
 			"name": "right_aisle",
 			"reached": true,
 			"remaining_m": 0.0735983103513718,
-			"seconds": 0.616,
+			"seconds": 0.604,
 			"target": [
 				2.38000011444092,
 				0.0649999976158142,
@@ -406,7 +406,7 @@
 			"name": "pickup_approach",
 			"reached": true,
 			"remaining_m": 0.0892840623855591,
-			"seconds": 0.56,
+			"seconds": 0.538,
 			"target": [
 				2.38000011444092,
 				0.0649999976158142,
@@ -428,7 +428,7 @@
 			"name": "pickup_window",
 			"reached": true,
 			"remaining_m": 0.0947398319840431,
-			"seconds": 0.366,
+			"seconds": 0.355,
 			"target": [
 				1.08000004291534,
 				0.0649999976158142,
@@ -450,7 +450,7 @@
 			"name": "right_return",
 			"reached": true,
 			"remaining_m": 0.0647583976387978,
-			"seconds": 0.35,
+			"seconds": 0.339,
 			"target": [
 				2.38000011444092,
 				0.0649999976158142,

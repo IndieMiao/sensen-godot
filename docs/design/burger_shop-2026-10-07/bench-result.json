@@ -37,7 +37,7 @@
 				"name": "stool_gap",
 				"reached": true,
 				"remaining_m": 0.0838032364845276,
-				"seconds": 0.003,
+				"seconds": 0.004,
 				"target": [
 					0.270000010728836,
 					0.0649999976158142,
@@ -117,7 +117,7 @@
 				"name": "counter_corner",
 				"reached": true,
 				"remaining_m": 0.087701603770256,
-				"seconds": 0.466,
+				"seconds": 0.467,
 				"target": [
 					-1.36000001430511,
 					0.0649999976158142,
@@ -221,7 +221,7 @@
 				"name": "pickup_window",
 				"reached": true,
 				"remaining_m": 0.0947398319840431,
-				"seconds": 0.35,
+				"seconds": 0.349,
 				"target": [
 					1.08000004291534,
 					0.0649999976158142,
@@ -247,7 +247,7 @@
 				"name": "right_return",
 				"reached": true,
 				"remaining_m": 0.0647583976387978,
-				"seconds": 0.334,
+				"seconds": 0.333,
 				"target": [
 					2.38000011444092,
 					0.0649999976158142,
@@ -320,8 +320,8 @@
 				],
 				"final": [
 					-1.25,
-					0.0571396350860596,
-					-1.74249970912933
+					0.0458652675151825,
+					-1.3675000667572
 				],
 				"from": [
 					-1.25,
@@ -329,8 +329,8 @@
 					-0.930000007152557
 				],
 				"reached": false,
-				"remaining_m": 0.537557721138,
-				"seconds": 0.866,
+				"remaining_m": 0.912700533866882,
+				"seconds": 0.882,
 				"target": [
 					-1.25,
 					0.0649999976158142,
@@ -358,7 +358,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.517642498016357,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					-3.0,
 					0.0649999976158142,
@@ -386,7 +386,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.485029131174088,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					-0.360000014305115,
 					0.0649999976158142,
@@ -515,7 +515,7 @@
 					],
 					"reached": true,
 					"remaining_m": 0.0696436539292336,
-					"seconds": 0.067,
+					"seconds": 0.066,
 					"target": [
 						0.270000010728836,
 						0.0649999976158142,
@@ -563,7 +563,7 @@
 			"details": [
 				"run",
 				0.15,
-				0.316655333333333
+				0.316666666666667
 			],
 			"name": "Run animation advances in rendered viewport",
 			"passed": true
@@ -584,27 +584,24 @@
 			"passed": true
 		},
 		{
-			"details": 1.74549420922995,
+			"details": 1.74549422413111,
 			"name": "Fixture head-top height measurable",
 			"passed": true
 		},
 		{
 			"details": {
-				"baseline_ratio": 1.334865499799,
-				"difference": 0.0,
-				"height": 2.33,
-				"ratio_to_H": 1.334865499799,
-				"reason": "Open front diorama, no enclosing door; unchanged baseline placeholder."
+				"applicable": false,
+				"reason": "Open front diorama; no doorway is modeled, so there is no door-height measurement."
 			},
-			"name": "Scale ±15%: door",
+			"name": "Scale category absent: door",
 			"passed": true
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.660271454299722,
+				"baseline_ratio": 0.660271448663031,
 				"difference": 0.0078091106290672,
 				"height": 1.1615,
-				"ratio_to_H": 0.665427587131564,
+				"ratio_to_H": 0.665427581450855,
 				"reason": ""
 			},
 			"name": "Scale ±15%: counter",
@@ -612,10 +609,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.392438998867948,
+				"baseline_ratio": 0.392438995517724,
 				"difference": 0.316058394160584,
 				"height": 0.9015,
-				"ratio_to_H": 0.516472638656138,
+				"ratio_to_H": 0.516472634247048,
 				"reason": "High diner stools paired with 1.2015 m bar: seat is 75% of bar height. Explicit high-stool exception in director feedback, not a changed Basic Room baseline."
 			},
 			"name": "Scale ±15%: chair",
@@ -623,10 +620,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.65024564046003,
+				"baseline_ratio": 0.650245634908929,
 				"difference": 0.0585903083700441,
 				"height": 1.2015,
-				"ratio_to_H": 0.68834373305086,
+				"ratio_to_H": 0.688343727174518,
 				"reason": ""
 			},
 			"name": "Scale ±15%: table",
@@ -634,7 +631,7 @@
 		}
 	],
 	"passed": true,
-	"pid": 1076419,
+	"pid": 1106970,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -652,7 +649,7 @@
 			"name": "stool_gap",
 			"reached": true,
 			"remaining_m": 0.0838032364845276,
-			"seconds": 0.003,
+			"seconds": 0.004,
 			"target": [
 				0.270000010728836,
 				0.0649999976158142,
@@ -720,7 +717,7 @@
 			"name": "counter_corner",
 			"reached": true,
 			"remaining_m": 0.087701603770256,
-			"seconds": 0.466,
+			"seconds": 0.467,
 			"target": [
 				-1.36000001430511,
 				0.0649999976158142,
@@ -808,7 +805,7 @@
 			"name": "pickup_window",
 			"reached": true,
 			"remaining_m": 0.0947398319840431,
-			"seconds": 0.35,
+			"seconds": 0.349,
 			"target": [
 				1.08000004291534,
 				0.0649999976158142,
@@ -830,7 +827,7 @@
 			"name": "right_return",
 			"reached": true,
 			"remaining_m": 0.0647583976387978,
-			"seconds": 0.334,
+			"seconds": 0.333,
 			"target": [
 				2.38000011444092,
 				0.0649999976158142,
