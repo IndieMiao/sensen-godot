@@ -15,9 +15,10 @@ const REED := Color("8a9a4a")
 const REED_TIP := Color("b3b26a")
 const CATTAIL := Color("8a6440")
 const MUD := Color("5d4a37")
-const PUDDLE := Color("4b4639")
-const CLAY := Color("b5603f")
-const CLAY_DARK := Color("8e4630")
+const PUDDLE := Color("4f4a34")       # deep olive-brown wet mud, one value step under MUD (Shiranui Mai review)
+const PUDDLE_RIM := Color("564a36")   # soft edge between the two
+const CLAY := Color("c45a37")
+const CLAY_DARK := Color("7e3a26")
 
 static func build(spot: String, at: Vector3) -> Node3D:
 	var root := Node3D.new()
@@ -58,14 +59,16 @@ static func _herb_patch(root: Node3D) -> void:
 		h.scale = Vector3.ONE * 1.25
 		root.add_child(h)
 
-## Dark wet earth, a matte puddle (no reflection, no motion: not water) and reed clumps with a few cattails.
+## Dark wet earth, a flat matte puddle of wet mud (no reflection, no motion: not water, not a hole) with a soft rim,
+## and reed clumps gathered on its edge with a few cattails.
 static func _reed_bank(root: Node3D) -> void:
 	var s := Meshes.surface()
-	Meshes.oval(s, Vector3(0, 0.0, 0), Vector3(0.95, 0.03, 0.7), MUD)
-	Meshes.oval(s, Vector3(0.18, 0.012, 0.15), Vector3(0.42, 0.02, 0.3), PUDDLE)
+	Meshes.oval(s, Vector3(0, 0.0, 0), Vector3(1.0, 0.025, 0.72), MUD)
+	Meshes.oval(s, Vector3(0.12, 0.008, 0.1), Vector3(0.72, 0.012, 0.46), PUDDLE_RIM)
+	Meshes.oval(s, Vector3(0.12, 0.012, 0.1), Vector3(0.6, 0.012, 0.38), PUDDLE)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 4031
-	for clump in [Vector3(-0.42, 0, -0.18), Vector3(0.35, 0, -0.38), Vector3(-0.1, 0, 0.42)]:
+	for clump in [Vector3(-0.5, 0, -0.08), Vector3(0.42, 0, -0.32), Vector3(-0.22, 0, 0.42)]:
 		for i in 9:
 			var base: Vector3 = clump + Vector3(rng.randf_range(-0.12, 0.12), 0.02, rng.randf_range(-0.1, 0.1))
 			var lean := Vector3(rng.randf_range(-0.08, 0.08), 0, rng.randf_range(-0.08, 0.08))
@@ -78,14 +81,17 @@ static func _reed_bank(root: Node3D) -> void:
 			Meshes.oval(s, stem + Vector3.UP * h, Vector3(0.03, 0.09, 0.03), CATTAIL)
 	root.add_child(Meshes.finish(s, "ReedBank", "wood"))
 
-## A red-brown clay slope with spade marks and a few loose lumps.
+## A red-brown clay slope about 1.5–2 cells wide whose face turns to the camera (+Z), three spade marks cut down that
+## face so the default view shows them, and a few loose lumps at its foot. Shown the same while locked (only the badge).
 static func _clay_bank(root: Node3D) -> void:
 	var s := Meshes.surface()
-	Meshes.oval(s, Vector3(0, 0.0, 0), Vector3(0.85, 0.03, 0.62), MUD)
-	Meshes.oval(s, Vector3(-0.1, 0.12, -0.12), Vector3(0.62, 0.26, 0.42), CLAY)
+	Meshes.oval(s, Vector3(0, 0.0, 0.05), Vector3(0.95, 0.025, 0.7), MUD)
+	Meshes.oval(s, Vector3(0, 0.16, -0.2), Vector3(0.66, 0.34, 0.5), CLAY)
+	Meshes.oval(s, Vector3(0, 0.06, 0.12), Vector3(0.6, 0.14, 0.3), CLAY.lightened(0.05))
 	for i in 3:
-		Meshes.box(s, Vector3(-0.25 + i * 0.2, 0.3, 0.12), Vector3(0.1, 0.05, 0.03), CLAY_DARK)
-	for p in [Vector3(0.42, 0.04, 0.25), Vector3(0.3, 0.035, 0.38), Vector3(-0.45, 0.04, 0.3)]:
+		var x := -0.22 + i * 0.22
+		Meshes.beam(s, Vector3(x, 0.1, 0.33), Vector3(x + 0.02, 0.36, 0.05), 0.04, CLAY_DARK)
+	for p in [Vector3(0.48, 0.04, 0.34), Vector3(0.3, 0.035, 0.46), Vector3(-0.5, 0.04, 0.36)]:
 		Meshes.oval(s, p, Vector3(0.07, 0.05, 0.06), CLAY.darkened(0.08))
 	root.add_child(Meshes.finish(s, "ClayBank", "stone"))
 
