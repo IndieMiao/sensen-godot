@@ -22,7 +22,7 @@ var side: Pane = Pane.BAG: set = set_side
 var used := 0: set = set_used
 var capacity := 25: set = set_capacity
 ## Sort label after `Sort · `, e.g. "Recent" / "Type"; "" hides Sort.
-var sort_label := "Recent": set = set_sort_label
+var sort_label := "Type": set = set_sort_label   # BagHeader main default (Type, then Recent on a tap)
 var show_tabs := true: set = set_show_tabs
 
 var _tabs: UiSegmentTab
@@ -50,6 +50,7 @@ func _init(used_ := 0, capacity_ := 25, side_: Pane = Pane.BAG) -> void:
 	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(gap)
 	_sort = UiNavButton.new("", true)
+	_sort.chevron = false   # BagHeader main: `Sort · Type` in the link colour, no ›
 	_sort.pressed.connect(func(): sort_pressed.emit())
 	row.add_child(_sort)
 	var bar_row := MarginContainer.new()

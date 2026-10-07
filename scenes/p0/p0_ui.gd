@@ -1169,6 +1169,8 @@ static func affinity_text(ev: Dictionary) -> String:
 func _show_resident(d: Dictionary) -> void:
 	var data := d.duplicate()
 	data.portrait = _portrait(str(d.portrait))
+	var ask := resident_ask(view, str(d.id))
+	if ask != "": data.line = ask   # NPC-5: with a request open the bar asks it, in the request card's words (李白 q(46))
 	if str(_reply.get("id", "")) == str(d.id): data.line = str(_reply.line)
 	var bar := UiResidentBar.new(data)
 	bar.theme = UiKit.theme()
@@ -1201,6 +1203,16 @@ func open_resident_profile(id: String) -> void:
 	_open_modal(sheet, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	_close_above(sheet, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
 	modal_kind = "resident_profile"
+
+## The open (not yet accepted) request's own line, e.g. Pip's `Could you catch me a fish? Any kind is fine.`; ""
+## when the resident has no open request.
+static func resident_ask(view_: Dictionary, id: String) -> String:
+	var r: Dictionary = view_.get("residents", {}).get(id, {})
+	var req = r.get("request", null)
+	if not (req is Dictionary) or str(r.get("request_state", "open")) != "open": return ""
+	for q in P0Logic.content().get("residents", {}).get(id, {}).get("requests", []):
+		if str(q.get("id", "")) == str(req.get("id", "")): return str(q.get("text", ""))
+	return ""
 
 ## RES-PIP data: face, name, role, stage, `Friendship have/need`, favourite style with a dish of that style.
 ## Details › has no page behind it in P0, so it stays hidden (TODO SGODOT-225 / 209: the resident's details page).

@@ -6,13 +6,13 @@ extends PanelContainer
 
 signal show_pressed
 
-const _PAD := Vector4(14, 6, 6, 6)   # NeedSource main: padding left / top / right / bottom
+const _PAD := Vector4(15, 7, 7, 7)   # NeedSource main: padding 14 / 6 / 6 / 6 plus its 1 px border (the card is 45 high)
 const _GAP := 10
 
 var text := "": set = set_text
 
 var _label: Label
-var _show: UiCommandButton
+var _show: UiShowPill
 
 ## can_show false hides Show when there is nothing to point the camera at (e.g. a place on the map).
 func _init(text_: String = "", can_show := true) -> void:
@@ -30,9 +30,8 @@ func _init(text_: String = "", can_show := true) -> void:
 	_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	row.add_child(_label)
-	_show = UiCommandButton.new("Show ›", UiCommandButton.Kind.SECONDARY, true)
-	_show.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_show.activated.connect(func(): show_pressed.emit())
+	_show = UiShowPill.new("Show ›", UiShowPill.Kind.SOURCE)   # 65 × 31 like the main, 44 to the touch
+	_show.pressed.connect(func(): show_pressed.emit())
 	_show.visible = can_show
 	row.add_child(_show)
 	text = text_

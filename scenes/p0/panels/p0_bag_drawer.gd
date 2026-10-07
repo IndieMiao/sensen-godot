@@ -3,7 +3,7 @@ extends UiDrawer
 ## P0 Bag | Gear drawer (SGODOT-225; BAG-1-P0 / BAG-2-2 / BAG-2 · Gear; LOCK-12 / 13). Built from the kit:
 ##   quick_row   the drawer's first row is the quick bar (LOCK-12); the P0 UI puts its UiQuickBar here
 ##               (P0Ui.bind_quick_bar, SGODOT-221) and keeps it in step with the bottom bar.
-##   header      UiBagHeader: Bag N/cap | Gear, Sort · Recent / Type (Bag side), capacity bar.
+##   header      UiBagHeader: Bag N/cap | Gear, Sort · Type / Recent (Bag side, per Tab), capacity bar.
 ##   Bag side    seven category chips (one capacity), a hint, the item-info card of the tapped cell
 ##               (UiInfoSheet, F-07 bag context; no Sell in the bag, no close button: tap another cell to
 ##               switch, a blank cell to fold it) and the five-column grid.
@@ -26,7 +26,8 @@ const _SMALL_GAP := 4.0
 const _SLOT_LIST_GAP := 12.0
 ## Sort behind `Sort · …` (Bag side; 不知火舞 on SGODOT-225): Type is the default — by category in Tab order,
 ## then rarity high → low, count high → low, most recent first (§10); a tap switches to Recent (most recent
-## first, the server's order) and back. Kept on this device; the quick bar and Gear are not sorted.
+## first, the server's order) and back. Kept on this device for each Tab apart (BagHeader main, 安其拉 on 225);
+## the quick bar and Gear are not sorted.
 const SORTS := ["Type", "Recent"]
 const _PREFS := "user://p0_ui.cfg"
 
@@ -34,6 +35,7 @@ var view := {}
 var side := "bag"
 var category := "All"
 var sort := "Type"
+var _sorts := {}   # Tab → Sort chosen this time (and in user://)
 ## Remember the Sort choice in user:// (off in tests).
 var persist := true
 var gear_slot := "fishing"
@@ -82,7 +84,7 @@ func _init(view_: Dictionary = {}, side_ := "bag", focus := "", gift_to_ := {}) 
 	header = UiBagHeader.new(0, 25, UiBagHeader.Pane.BAG if side == "bag" else UiBagHeader.Pane.GEAR)
 	header.side_changed.connect(func(s: int): set_side("bag" if s == 0 else "gear"))
 	header.sort_pressed.connect(func(): set_sort(SORTS[(SORTS.find(sort) + 1) % SORTS.size()]))
-	sort = saved_sort()
+	sort = saved_sort(category) if persist else SORTS[0]
 	header.show_tabs = gift_to.is_empty()
 	body.add_child(header)
 	_bag_box = VBoxContainer.new()
@@ -135,24 +137,28 @@ func set_side(v: String) -> void:
 
 func set_category(v: String) -> void:
 	category = v
+	sort = str(_sorts.get(v, saved_sort(v) if persist else SORTS[0]))
+	header.sort_label = sort
 	grid.filter = func(it: Dictionary) -> bool: return in_category(it, category)
 	grid.items = items()
 	_hint.text = hint_for(category, not storage_items(view, category, place).is_empty())
 
 func set_sort(v: String) -> void:
 	sort = v
+	_sorts[category] = v
 	header.sort_label = v
 	grid.items = items()
 	if persist:
 		var cfg := ConfigFile.new()
 		cfg.load(_PREFS)
-		cfg.set_value("bag", "sort", v)
+		cfg.set_value("bag_sort", category, v)
 		cfg.save(_PREFS)
 
-static func saved_sort() -> String:
+## The Sort kept for a Tab on this device; Type when none.
+static func saved_sort(cat := "All") -> String:
 	var cfg := ConfigFile.new()
 	if cfg.load(_PREFS) != OK: return SORTS[0]
-	var v := str(cfg.get_value("bag", "sort", SORTS[0]))
+	var v := str(cfg.get_value("bag_sort", cat, SORTS[0]))
 	return v if v in SORTS else SORTS[0]
 
 func set_gear_slot(v: String) -> void:

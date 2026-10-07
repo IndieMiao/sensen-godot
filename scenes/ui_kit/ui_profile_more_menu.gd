@@ -3,7 +3,7 @@ extends PanelContainer
 ## ··· menu on someone else's profile (SGODOT-225; ProfileMoreMenu 1233:107735, LOCK-22). Rows by relation, the
 ## destructive ones in the danger colour; confirmations and done states are WP5 (P2, not built in P0):
 ##   default        Unfollow · Block · Report
-##   close_friend   Remove Close Friend · Unfollow · Block · Report   (LOCK-22 2026-10-07: un-close, keep mutual)
+##   close_friend   Unfollow · Remove Close Friend · Block · Report   (LOCK-22 2026-10-07: un-close, keep mutual; ProfileMoreMenu order)
 ##   blocked        Report                                            (the relation pill reads Blocked, button Unblock)
 ## Emits `picked(id)`.
 
@@ -21,7 +21,7 @@ static func rows_for(relation: StringName) -> Array:
 	var unfollow := {id = &"unfollow", label = "Unfollow", danger = false}
 	match relation:
 		&"blocked": return [report]
-		&"close_friend": return [{id = &"remove_close_friend", label = "Remove Close Friend", danger = false}, unfollow, block, report]
+		&"close_friend": return [unfollow, {id = &"remove_close_friend", label = "Remove Close Friend", danger = false}, block, report]
 		_: return [unfollow, block, report]
 
 func _init(relation: StringName = &"default") -> void:

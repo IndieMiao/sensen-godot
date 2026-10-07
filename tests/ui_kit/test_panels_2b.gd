@@ -230,9 +230,9 @@ func _click(c: Control, at: Vector2) -> void:
 func test_keeper_head_has_a_place_line_and_no_profile_link() -> void:
 	var c: UiDialogueCard = _host(UiDialogueCard.new(PIP, "Tackle Keeper · Finn", "", "Pick a rod, I'll string it."))
 	c.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
-	c.place = "Rods and bait · Shanghai Tackle Shop"
+	c.place = "Rods and bait · Xuhui Tackle Shop"
 	await _settle()
-	assert_array(_texts(c)).contains(["Tackle Keeper · Finn", "Rods and bait · Shanghai Tackle Shop", "Pick a rod, I'll string it."])
+	assert_array(_texts(c)).contains(["Tackle Keeper · Finn", "Rods and bait · Xuhui Tackle Shop", "Pick a rod, I'll string it."])
 	assert_array(_texts(c)).not_contains(["›"])
 	assert_vector(c._portrait.size).is_equal(UiDialogueCard.KEEPER_PORTRAIT)
 	var hits := [0]
@@ -279,8 +279,12 @@ func test_bag_header_count_sort_and_capacity_bar() -> void:
 	var h: UiBagHeader = _host(UiBagHeader.new(19, 25))
 	await _settle()
 	assert_array(_texts(h)).contains(["Bag 19/25"])
-	assert_str(h.sort_button().label).is_equal("Sort · Recent")
+	assert_str(h.sort_button().label).is_equal("Sort · Type")
+	assert_str(h.sort_button().text).is_equal("Sort · Type")   # a toggle, so no ›
+	assert_str(h.sort_button().get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_INFO.to_html())
 	assert_bool(h.sort_button().visible).is_true()
+	assert_float(h.tabs().size.y).is_equal(34.0)   # SegmentedTabs track 34, segments 28
+	assert_float(h.tabs().tabs()[0].size.y).is_equal(28.0)
 	assert_bool(h.is_nearly_full()).is_false()
 	h.used = 23   # 92 %: amber (§10.4.1)
 	assert_bool(h.is_nearly_full()).is_true()
@@ -336,7 +340,7 @@ func test_profile_top_bar_self_and_other() -> void:
 	assert_int(me.right_button().mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 
 func test_more_menu_rows_follow_the_relation() -> void:
-	for case in [[&"default", ["Unfollow", "Block", "Report"]], [&"close_friend", ["Remove Close Friend", "Unfollow", "Block", "Report"]],
+	for case in [[&"default", ["Unfollow", "Block", "Report"]], [&"close_friend", ["Unfollow", "Remove Close Friend", "Block", "Report"]],
 			[&"blocked", ["Report"]]]:
 		var menu: UiProfileMoreMenu = auto_free(UiProfileMoreMenu.new(case[0]))
 		assert_array(menu.labels()).is_equal(case[1])
