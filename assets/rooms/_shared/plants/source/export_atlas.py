@@ -30,13 +30,13 @@ def export():
         if '_split_leaf_' in m.name:
             shape=np.sin(np.pi*v)**.55
             mask=(abs(u-.5)<.49*shape)&(v>.018)&(v<.988)
-            for j,level in enumerate((.28,.43,.58,.73,.85)):
+            for j,level in enumerate((.30,.54,.76)):
                 diagonal=level+.20*(abs(u-.5)-.12)
-                slit=(abs(v-diagonal)<.020)&(abs(u-.5)>.13)&(abs(u-.5)<.50)
+                slit=(abs(v-diagonal)<.030)&(abs(u-.5)>.15)&(abs(u-.5)<.50)
                 mask &= ~slit
             for side in (-1,1):
-                for level in (.36,.54):
-                    hole=((u-(.5+side*.11))/.023)**2+((v-level)/.041)**2<1
+                for level in (.40,.64):
+                    hole=((u-(.5+side*.105))/.035)**2+((v-level)/.048)**2<1
                     mask &= ~hole
             tile[:,:,3]=mask
         row,col=divmod(i,16);pixels[row*128:(row+1)*128,col*128:(col+1)*128]=tile
@@ -51,7 +51,7 @@ def export():
     image=material.node_tree.nodes.new('ShaderNodeTexImage');image.image=tex
     material.node_tree.links.new(image.outputs['Color'],material.node_tree.nodes.get('Principled BSDF').inputs['Base Color'])
     material.node_tree.links.new(image.outputs['Alpha'],material.node_tree.nodes.get('Principled BSDF').inputs['Alpha'])
-    stats={'revision':'R2','atlas':{'size':[2048,2048],'file':'room_albedo_ao.png','purpose':'authored UV leaf veins, wicker weave, per-component safe colour; no baked direct light','guard_pixels':12,'tile_pixels':128,'bytes':(k.OUT/'room_albedo_ao.png').stat().st_size},'assets':[]}
+    stats={'revision':'R2.1','atlas':{'size':[2048,2048],'file':'room_albedo_ao.png','purpose':'authored UV leaf veins, wicker weave, per-component safe colour; no baked direct light','guard_pixels':12,'tile_pixels':128,'bytes':(k.OUT/'room_albedo_ao.png').stat().st_size},'assets':[]}
     for name,record in k.KITS.items():
         verts=[];faces=[];uvs=[];normals=[];smooth=[]
         for source in record['objects']:

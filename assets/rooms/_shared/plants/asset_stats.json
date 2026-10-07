@@ -1,5 +1,5 @@
 {
-  "revision": "R2",
+  "revision": "R2.1",
   "atlas": {
     "size": [
       2048,
@@ -9,7 +9,7 @@
     "purpose": "authored UV leaf veins, wicker weave, per-component safe colour; no baked direct light",
     "guard_pixels": 12,
     "tile_pixels": 128,
-    "bytes": 144142
+    "bytes": 144502
   },
   "assets": [
     {
@@ -42,31 +42,31 @@
     },
     {
       "name": "ivy_short",
-      "vertices": 636,
-      "triangles": 704,
+      "vertices": 792,
+      "triangles": 692,
       "surfaces": 1,
-      "bytes": 25860
+      "bytes": 37696
     },
     {
       "name": "ivy_medium",
-      "vertices": 1040,
-      "triangles": 1156,
+      "vertices": 1254,
+      "triangles": 1098,
       "surfaces": 1,
-      "bytes": 41508
+      "bytes": 58952
     },
     {
       "name": "ivy_long",
-      "vertices": 1378,
-      "triangles": 1530,
+      "vertices": 1716,
+      "triangles": 1504,
       "surfaces": 1,
-      "bytes": 54564
+      "bytes": 80200
     },
     {
       "name": "flower_shrub",
-      "vertices": 2150,
-      "triangles": 2214,
+      "vertices": 3114,
+      "triangles": 2402,
       "surfaces": 1,
-      "bytes": 83380
+      "bytes": 126300
     },
     {
       "name": "olive_tree",
@@ -97,10 +97,10 @@
       "bytes": 19912
     }
   ],
-  "unique_triangles": 17286,
+  "unique_triangles": 17378,
   "unique_assets": 12,
   "static_draw_surfaces": 12,
-  "glb_bytes": 596108,
+  "glb_bytes": 693944,
   "r1_comparison": {
     "monstera": {
       "before": 5344,
@@ -120,19 +120,19 @@
     },
     "ivy_short": {
       "before": 5784,
-      "after": 704
+      "after": 692
     },
     "ivy_medium": {
       "before": 9312,
-      "after": 1156
+      "after": 1098
     },
     "ivy_long": {
       "before": 11956,
-      "after": 1530
+      "after": 1504
     },
     "flower_shrub": {
       "before": 14992,
-      "after": 2214
+      "after": 2402
     },
     "olive_tree": {
       "before": 13276,
@@ -152,5 +152,5 @@
     }
   },
   "leaf_triangle_max": 8,
-  "leaf_count": 1158
+  "leaf_count": 1482
 }
