@@ -1,0 +1,799 @@
+{
+  "reviewDate": "2026-10-07",
+  "fileKey": "OMLTC3yw3u2WDjOZhLnhaR",
+  "pageId": "481:53",
+  "legacyMainCards": 84,
+  "originalSourceCardsInspected": 84,
+  "rebuiltCardsActuallyOpened": 84,
+  "latestViewportVisualPass": 84,
+  "pendingViewportCorrections": 0,
+  "pending": [],
+  "scope": "All84legacyreviewframes opened through freshFigmaPNG screenshots; sourceproportions/nativeUI/fixedfieldroles/actionsemantics/carddensity andknownHUDvalues inspected. Repeatedunchangedframesnotrecaptured. Fullscrollcontentbehavior andeveryprototypepath were not interactivelytestedbythisagent.",
+  "additionalReviewedScreens": [
+    {
+      "id": "COOK-FINE-EATEN",
+      "evidence": "final-card-COOK-FINE-EATEN.png",
+      "energy": "187/200",
+      "remainingPortions": 0
+    },
+    {
+      "id": "COOK-MYSTERY-EATEN",
+      "evidence": "final-card-COOK-MYSTERY-EATEN.png",
+      "energy": "147/200",
+      "remainingPortions": 0
+    },
+    {
+      "id": "CROP-DEX-P1",
+      "nodeId": "758:74294",
+      "evidence": "final-card-CROP-DEX-P1.png",
+      "entries": 20,
+      "harvestedExample": 7,
+      "unknownInventoryQuantitiesOmitted": true,
+      "chamomileArtworkCorrectedInNewLibraryOnly": true
+    }
+  ],
+  "businessLimitations": [
+    "Visualpassdoesnotmeanallphasegameplayiscomplete.",
+    "Unspecifiedsame-requestStoptracking/HarborLunchsettlementoutcomesremainexplicitledgerwarnings.",
+    "HomesteadGrilledCruciansalehasknown2coinpriceand120dailylimit,butusedquotaunknown;nosuccessstateisinvented.",
+    "SourceillustrativeMarketBoardthreeexamplesversusproductiontwo-slotruleisstillabusinessreferencegap;notvalidatedaslivecapacity."
+  ],
+  "cards": [
+    {
+      "id": "FARM-1",
+      "index": 0,
+      "nodeId": "482:4",
+      "evidence": "final-row-01-1.png",
+      "sha256": "5ed907269a9f6ca0f96cf41d4ae6eb375b6a141540e1bf9a957d4d836ba4430b",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FISH-1",
+      "index": 1,
+      "nodeId": "482:6",
+      "evidence": "final-row-01-1.png",
+      "sha256": "5ed907269a9f6ca0f96cf41d4ae6eb375b6a141540e1bf9a957d4d836ba4430b",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "COOK-1",
+      "index": 2,
+      "nodeId": "482:8",
+      "evidence": "final-row-01-1.png",
+      "sha256": "5ed907269a9f6ca0f96cf41d4ae6eb375b6a141540e1bf9a957d4d836ba4430b",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAG-1",
+      "index": 3,
+      "nodeId": "482:10",
+      "evidence": "final-row-01-1.png",
+      "sha256": "5ed907269a9f6ca0f96cf41d4ae6eb375b6a141540e1bf9a957d4d836ba4430b",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAG-3",
+      "index": 4,
+      "nodeId": "482:12",
+      "evidence": "final-row-01-2.png",
+      "sha256": "f8fd8218cf16e3034a6df03d6045c5bd7b6953d12cfe0a945c4ae75d5e116db1",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAG-4",
+      "index": 5,
+      "nodeId": "482:14",
+      "evidence": "final-row-01-2.png",
+      "sha256": "f8fd8218cf16e3034a6df03d6045c5bd7b6953d12cfe0a945c4ae75d5e116db1",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAG-4-2",
+      "index": 6,
+      "nodeId": "482:16",
+      "evidence": "final-row-01-2.png",
+      "sha256": "f8fd8218cf16e3034a6df03d6045c5bd7b6953d12cfe0a945c4ae75d5e116db1",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAR-1",
+      "index": 7,
+      "nodeId": "482:18",
+      "evidence": "final-row-01-2.png",
+      "sha256": "f8fd8218cf16e3034a6df03d6045c5bd7b6953d12cfe0a945c4ae75d5e116db1",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAR-1-2",
+      "index": 8,
+      "nodeId": "482:21",
+      "evidence": "final-row-02-1.png",
+      "sha256": "11089d8c78a35199cd09b86ddf2f23f84be7ac5a5314c38e0b028a33d3683a41",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAR-2",
+      "index": 9,
+      "nodeId": "482:23",
+      "evidence": "final-card-BAR-2.png",
+      "sha256": "effcfe4e04f570f70ad839236b0ec483164f7f3b9d11e82c315e4349e5c4812a",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAR-3",
+      "index": 10,
+      "nodeId": "482:25",
+      "evidence": "final-row-02-1.png",
+      "sha256": "11089d8c78a35199cd09b86ddf2f23f84be7ac5a5314c38e0b028a33d3683a41",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAR-3-2",
+      "index": 11,
+      "nodeId": "482:27",
+      "evidence": "final-row-02-1.png",
+      "sha256": "11089d8c78a35199cd09b86ddf2f23f84be7ac5a5314c38e0b028a33d3683a41",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "HUD-3",
+      "index": 12,
+      "nodeId": "482:29",
+      "evidence": "final-row-02-2.png",
+      "sha256": "fb2c83ae52d73f8de248a6cf3829d11264aca8fafd72237a8e5e93abd763bea6",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "HUD-4",
+      "index": 13,
+      "nodeId": "482:31",
+      "evidence": "final-row-02-2.png",
+      "sha256": "fb2c83ae52d73f8de248a6cf3829d11264aca8fafd72237a8e5e93abd763bea6",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "HUD-1",
+      "index": 14,
+      "nodeId": "482:33",
+      "evidence": "final-row-02-2.png",
+      "sha256": "fb2c83ae52d73f8de248a6cf3829d11264aca8fafd72237a8e5e93abd763bea6",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "HUD-1-2",
+      "index": 15,
+      "nodeId": "482:35",
+      "evidence": "final-row-02-2.png",
+      "sha256": "fb2c83ae52d73f8de248a6cf3829d11264aca8fafd72237a8e5e93abd763bea6",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "CTRL-1",
+      "index": 16,
+      "nodeId": "482:38",
+      "evidence": "final-row-03-1.png",
+      "sha256": "ff182d0bcaef9c6477fcc3276338bcfaecee8747aaa9f452bc35366dd2a413f7",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "CTRL-1-2",
+      "index": 17,
+      "nodeId": "482:40",
+      "evidence": "final-row-03-1.png",
+      "sha256": "ff182d0bcaef9c6477fcc3276338bcfaecee8747aaa9f452bc35366dd2a413f7",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FARM-2",
+      "index": 18,
+      "nodeId": "482:42",
+      "evidence": "final-row-03-1.png",
+      "sha256": "ff182d0bcaef9c6477fcc3276338bcfaecee8747aaa9f452bc35366dd2a413f7",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FARM-3",
+      "index": 19,
+      "nodeId": "482:44",
+      "evidence": "final-row-03-1.png",
+      "sha256": "ff182d0bcaef9c6477fcc3276338bcfaecee8747aaa9f452bc35366dd2a413f7",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FARM-6",
+      "index": 20,
+      "nodeId": "482:46",
+      "evidence": "final-card-FARM-6.png",
+      "sha256": "269c6d0463159e091cf90a61459141b356f73fe8a541f6c2b4994c144a92e1cd",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FARM-6-2",
+      "index": 21,
+      "nodeId": "482:48",
+      "evidence": "../legacy-shop-FARM-6-2-final.png",
+      "sha256": "b5491dbd8c34f43dc73c5f4fc0245d3e3cb3e1e564fbe79ea81726bdc78da901",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FARM-7",
+      "index": 22,
+      "nodeId": "482:50",
+      "evidence": "final-row-03-2.png",
+      "sha256": "6cea0902b7de4d72805f220ca2dc17793eb0d52c0cb8063d99a893d536b43a1e",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FARM-7-2",
+      "index": 23,
+      "nodeId": "482:52",
+      "evidence": "final-row-03-2.png",
+      "sha256": "6cea0902b7de4d72805f220ca2dc17793eb0d52c0cb8063d99a893d536b43a1e",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FISH-2",
+      "index": 24,
+      "nodeId": "482:55",
+      "evidence": "final-row-04-1.png",
+      "sha256": "73d1298f67ac9c09bee9375cdbaed8e7ff2c900bf6e67a63ca5047db9b10d769",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FISH-3",
+      "index": 25,
+      "nodeId": "482:57",
+      "evidence": "final-row-04-1.png",
+      "sha256": "73d1298f67ac9c09bee9375cdbaed8e7ff2c900bf6e67a63ca5047db9b10d769",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FISH-4",
+      "index": 26,
+      "nodeId": "482:59",
+      "evidence": "final-row-04-1.png",
+      "sha256": "73d1298f67ac9c09bee9375cdbaed8e7ff2c900bf6e67a63ca5047db9b10d769",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FISH-5",
+      "index": 27,
+      "nodeId": "482:61",
+      "evidence": "final-row-04-1.png",
+      "sha256": "73d1298f67ac9c09bee9375cdbaed8e7ff2c900bf6e67a63ca5047db9b10d769",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FISH-5-2",
+      "index": 28,
+      "nodeId": "482:63",
+      "evidence": "final-row-04-2.png",
+      "sha256": "170718c8468b0dbe4ce013a860b5ae9d87bdfbe2497a2e2fa4b29b94cb43bbed",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "SKILL-3",
+      "index": 29,
+      "nodeId": "482:65",
+      "evidence": "final-row-04-2.png",
+      "sha256": "170718c8468b0dbe4ce013a860b5ae9d87bdfbe2497a2e2fa4b29b94cb43bbed",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "SKILL-3-2",
+      "index": 30,
+      "nodeId": "482:67",
+      "evidence": "final-row-04-2.png",
+      "sha256": "170718c8468b0dbe4ce013a860b5ae9d87bdfbe2497a2e2fa4b29b94cb43bbed",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "TUT-2-2",
+      "index": 31,
+      "nodeId": "482:69",
+      "evidence": "final-row-04-2.png",
+      "sha256": "170718c8468b0dbe4ce013a860b5ae9d87bdfbe2497a2e2fa4b29b94cb43bbed",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "TUT-2",
+      "index": 32,
+      "nodeId": "482:72",
+      "evidence": "final-row-05-1.png",
+      "sha256": "ae799bf52ba0f7d62bf0d8efe1508dfd5d2c74ed8b930712e3b166e5fbf8abe2",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "COOK-2a",
+      "index": 33,
+      "nodeId": "482:74",
+      "evidence": "final-row-05-1.png",
+      "sha256": "ae799bf52ba0f7d62bf0d8efe1508dfd5d2c74ed8b930712e3b166e5fbf8abe2",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "COOK-2a-2",
+      "index": 34,
+      "nodeId": "482:76",
+      "evidence": "final-row-05-1.png",
+      "sha256": "ae799bf52ba0f7d62bf0d8efe1508dfd5d2c74ed8b930712e3b166e5fbf8abe2",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "COOK-2b",
+      "index": 35,
+      "nodeId": "482:78",
+      "evidence": "final-row-05-1.png",
+      "sha256": "ae799bf52ba0f7d62bf0d8efe1508dfd5d2c74ed8b930712e3b166e5fbf8abe2",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "COOK-2b-2",
+      "index": 36,
+      "nodeId": "482:80",
+      "evidence": "final-row-05-2.png",
+      "sha256": "2d89d7d847a7a6a9c601fc9429f1a9e82376373289e2df02a9a24fedddefd648",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "COOK-3",
+      "index": 37,
+      "nodeId": "482:82",
+      "evidence": "final-row-05-2.png",
+      "sha256": "2d89d7d847a7a6a9c601fc9429f1a9e82376373289e2df02a9a24fedddefd648",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "COOK-3-2",
+      "index": 38,
+      "nodeId": "482:84",
+      "evidence": "final-row-05-2.png",
+      "sha256": "2d89d7d847a7a6a9c601fc9429f1a9e82376373289e2df02a9a24fedddefd648",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "COOK-4",
+      "index": 39,
+      "nodeId": "482:86",
+      "evidence": "final-card-COOK-4.png",
+      "sha256": "439c7cdb4846ba334bad14fe9bc4c67f5923025dff3dc19aa1a7965a939b4ad0",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "COOK-6",
+      "index": 40,
+      "nodeId": "482:89",
+      "evidence": "final-card-COOK-6.png",
+      "sha256": "419dfda163f3412754aca0ed6745a6db57a746d289117cc896e1b615c975dc6b",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "COOK-7",
+      "index": 41,
+      "nodeId": "482:91",
+      "evidence": "final-row-06-1.png",
+      "sha256": "ab7d6e83c24b5329de76fa4671e47b4ca1724b747c5e6804122e0ace7e98ed58",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "COOK-7-2",
+      "index": 42,
+      "nodeId": "482:93",
+      "evidence": "final-row-06-1.png",
+      "sha256": "ab7d6e83c24b5329de76fa4671e47b4ca1724b747c5e6804122e0ace7e98ed58",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "MAP-1",
+      "index": 43,
+      "nodeId": "482:95",
+      "evidence": "final-card-MAP-1.png",
+      "sha256": "7621e20b79907b1b37a21009a9e056e41c44540f5043fe318117303baa492a40",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-1a",
+      "index": 44,
+      "nodeId": "482:97",
+      "evidence": "final-row-06-2.png",
+      "sha256": "8c9cd433f82a24588f7e874df518b83eddf49b7dadf06e47c03c81bece2219a3",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-1b",
+      "index": 45,
+      "nodeId": "482:99",
+      "evidence": "final-row-06-2.png",
+      "sha256": "8c9cd433f82a24588f7e874df518b83eddf49b7dadf06e47c03c81bece2219a3",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-1c",
+      "index": 46,
+      "nodeId": "482:101",
+      "evidence": "final-row-06-2.png",
+      "sha256": "8c9cd433f82a24588f7e874df518b83eddf49b7dadf06e47c03c81bece2219a3",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-1d",
+      "index": 47,
+      "nodeId": "482:103",
+      "evidence": "final-card-NPC-1d.png",
+      "sha256": "42f70f2f050ce08606920169a2992a1232f1f06678816adb24af1ed5971ccdf3",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-1e",
+      "index": 48,
+      "nodeId": "482:106",
+      "evidence": "final-card-NPC-1e.png",
+      "sha256": "1ec4e02d29cd0dcf5939283ae7db96e06595f3779ff502ae63ff0891e1462666",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-G1",
+      "index": 49,
+      "nodeId": "482:108",
+      "evidence": "final-row-07-1.png",
+      "sha256": "6096a16ad2163b6ec3dab889698ae042021c03d7192fd36a7b809f634e3baa80",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-G1-2",
+      "index": 50,
+      "nodeId": "482:110",
+      "evidence": "final-row-07-1.png",
+      "sha256": "6096a16ad2163b6ec3dab889698ae042021c03d7192fd36a7b809f634e3baa80",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-G1-3",
+      "index": 51,
+      "nodeId": "482:112",
+      "evidence": "final-row-07-1.png",
+      "sha256": "6096a16ad2163b6ec3dab889698ae042021c03d7192fd36a7b809f634e3baa80",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-G1-4",
+      "index": 52,
+      "nodeId": "482:114",
+      "evidence": "final-row-07-2.png",
+      "sha256": "65a869adcd6fd04609852b6d3dddb7733d151c53eaf5d6cd45a2725b7837ad4e",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-2",
+      "index": 53,
+      "nodeId": "482:116",
+      "evidence": "final-card-NPC-2.png",
+      "sha256": "d41869300a773f7c65737344358999935f78f563ea731174ca0168bf10ba0f35",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-2-2",
+      "index": 54,
+      "nodeId": "482:118",
+      "evidence": "final-row-07-2.png",
+      "sha256": "65a869adcd6fd04609852b6d3dddb7733d151c53eaf5d6cd45a2725b7837ad4e",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-3",
+      "index": 55,
+      "nodeId": "482:120",
+      "evidence": "final-card-NPC-3.png",
+      "sha256": "1db2275113ec70cd87d6bd6f7e89448564dba93463ae499dc8efac357d366583",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-3-2",
+      "index": 56,
+      "nodeId": "482:123",
+      "evidence": "final-card-NPC-3-2.png",
+      "sha256": "c156970994d589ee3701419663b8c823be36c6a18471abf1ff12474f02c41188",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-4",
+      "index": 57,
+      "nodeId": "482:125",
+      "evidence": "final-card-NPC-4.png",
+      "sha256": "6f332217bae352ceee818e2ecfc97a5b768d84fe9cb6b4d68584a0f96df61774",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-4-2",
+      "index": 58,
+      "nodeId": "482:127",
+      "evidence": "final-row-08-1.png",
+      "sha256": "b34da7a52d00282d2acfa866b55d0ccd49f692957adfae1ad274992c96af2eef",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-5",
+      "index": 59,
+      "nodeId": "482:129",
+      "evidence": "final-row-08-1.png",
+      "sha256": "b34da7a52d00282d2acfa866b55d0ccd49f692957adfae1ad274992c96af2eef",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-5-2",
+      "index": 60,
+      "nodeId": "482:131",
+      "evidence": "final-row-08-2.png",
+      "sha256": "aa0500b20d38a64cf9f66c36429014c737b8d4d48a77ca3773721f56cd926e1e",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-6",
+      "index": 61,
+      "nodeId": "482:133",
+      "evidence": "final-row-08-2.png",
+      "sha256": "aa0500b20d38a64cf9f66c36429014c737b8d4d48a77ca3773721f56cd926e1e",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-6-2",
+      "index": 62,
+      "nodeId": "482:135",
+      "evidence": "final-row-08-2.png",
+      "sha256": "aa0500b20d38a64cf9f66c36429014c737b8d4d48a77ca3773721f56cd926e1e",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NPC-7",
+      "index": 63,
+      "nodeId": "482:137",
+      "evidence": "final-row-08-2.png",
+      "sha256": "aa0500b20d38a64cf9f66c36429014c737b8d4d48a77ca3773721f56cd926e1e",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAG-2",
+      "index": 64,
+      "nodeId": "482:140",
+      "evidence": "final-row-09-1.png",
+      "sha256": "33c9d1305abfbcf0ce2632747288620fb13cc8e546689ba50c9bc2b60e3a17cf",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAG-2-2",
+      "index": 65,
+      "nodeId": "482:142",
+      "evidence": "final-row-09-1.png",
+      "sha256": "33c9d1305abfbcf0ce2632747288620fb13cc8e546689ba50c9bc2b60e3a17cf",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAG-5",
+      "index": 66,
+      "nodeId": "482:144",
+      "evidence": "final-row-09-1.png",
+      "sha256": "33c9d1305abfbcf0ce2632747288620fb13cc8e546689ba50c9bc2b60e3a17cf",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "BAG-5-2",
+      "index": 67,
+      "nodeId": "482:146",
+      "evidence": "final-row-09-1.png",
+      "sha256": "33c9d1305abfbcf0ce2632747288620fb13cc8e546689ba50c9bc2b60e3a17cf",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FARM-4",
+      "index": 68,
+      "nodeId": "482:148",
+      "evidence": "final-row-09-2.png",
+      "sha256": "5107eb9f9529ee8cf58d73fc22b3d6732d895cdeb171ee905c0295f263ae09f7",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FARM-5",
+      "index": 69,
+      "nodeId": "482:150",
+      "evidence": "final-row-09-2.png",
+      "sha256": "5107eb9f9529ee8cf58d73fc22b3d6732d895cdeb171ee905c0295f263ae09f7",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "HOME-1",
+      "index": 70,
+      "nodeId": "482:152",
+      "evidence": "final-card-HOME-1.png",
+      "sha256": "34120daec2b3acc82ab33b11550a5eb4a2c2af54a199312382a3f6a5cc4a8c30",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "HOME-2",
+      "index": 71,
+      "nodeId": "482:154",
+      "evidence": "final-row-09-2.png",
+      "sha256": "5107eb9f9529ee8cf58d73fc22b3d6732d895cdeb171ee905c0295f263ae09f7",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "HUD-2",
+      "index": 72,
+      "nodeId": "482:157",
+      "evidence": "final-row-10-1.png",
+      "sha256": "4231734c36eb0e9ac571d7400a27f6e1d9581d42358339c7e809345b70484f06",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "MINE-1",
+      "index": 73,
+      "nodeId": "482:159",
+      "evidence": "final-card-MINE-1.png",
+      "sha256": "0499650963571b44f7d2d2c485eb3bdb82257b0aac1d86a26d068d354a335a69",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "PROFILE-1",
+      "index": 74,
+      "nodeId": "482:161",
+      "evidence": "final-row-10-1.png",
+      "sha256": "4231734c36eb0e9ac571d7400a27f6e1d9581d42358339c7e809345b70484f06",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "PROFILE-2",
+      "index": 75,
+      "nodeId": "482:163",
+      "evidence": "final-row-10-1.png",
+      "sha256": "4231734c36eb0e9ac571d7400a27f6e1d9581d42358339c7e809345b70484f06",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "SETTINGS-1",
+      "index": 76,
+      "nodeId": "482:165",
+      "evidence": "final-card-SETTINGS-1.png",
+      "sha256": "ccada7f4999a78654711ffcb1c53ce7dbb4521f77b0ff946e5ec729c5ecc6aa6",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "SKILL-1",
+      "index": 77,
+      "nodeId": "482:167",
+      "evidence": "final-row-10-2.png",
+      "sha256": "874a50a6177b30530d5dbeb9f23c3d890c0da8caf8ff942d385e64ad77accb9f",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "SKILL-2",
+      "index": 78,
+      "nodeId": "482:169",
+      "evidence": "final-row-10-2.png",
+      "sha256": "874a50a6177b30530d5dbeb9f23c3d890c0da8caf8ff942d385e64ad77accb9f",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "FISH-6",
+      "index": 79,
+      "nodeId": "482:171",
+      "evidence": "final-row-10-2.png",
+      "sha256": "874a50a6177b30530d5dbeb9f23c3d890c0da8caf8ff942d385e64ad77accb9f",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "SOC-4",
+      "index": 80,
+      "nodeId": "482:174",
+      "evidence": "final-card-SOC-4.png",
+      "sha256": "e5f6124cb2d2588dbdf6de5eee37853e7880f0966c87da2161134d6f1dce43a1",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "NEED-TILE",
+      "index": 81,
+      "nodeId": "482:176",
+      "evidence": "final-row-11-1.png",
+      "sha256": "f630c5ef8343a0b2e7e995598151bf4acec56bf0c6374c659b19b0fbc951bf2c",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "STATE-ICONS",
+      "index": 82,
+      "nodeId": "482:178",
+      "evidence": "final-row-11-1.png",
+      "sha256": "f630c5ef8343a0b2e7e995598151bf4acec56bf0c6374c659b19b0fbc951bf2c",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    },
+    {
+      "id": "OUTPOST-DIAGRAM",
+      "index": 83,
+      "nodeId": "482:180",
+      "evidence": "final-row-11-1.png",
+      "sha256": "f630c5ef8343a0b2e7e995598151bf4acec56bf0c6374c659b19b0fbc951bf2c",
+      "status": "visual-pass",
+      "scope": "Initial360x800viewport and visiblecontent; longpanelsuseintentionalverticalscroll."
+    }
+  ]
+}

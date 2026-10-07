@@ -1,0 +1,50 @@
+{
+  "createdNodeIds": [
+    "650:57905",
+    "650:57906",
+    "650:57907",
+    "650:57908",
+    "650:57909",
+    "650:57910",
+    "650:57911",
+    "650:57912",
+    "650:57922",
+    "650:57923",
+    "650:57924",
+    "650:57934",
+    "650:57935",
+    "650:57936",
+    "650:57946"
+  ],
+  "inheritedNodeIdGroups": {
+    "I650:57912": "483:197|483:198|483:199|483:203|483:204|483:205",
+    "I650:57924": "483:197|483:198|483:199|483:203|483:204|483:205",
+    "I650:57936": "483:197|483:198|483:199|483:203|483:204|483:205"
+  },
+  "mutatedNodeIds": [
+    "482:282",
+    "482:281"
+  ],
+  "screens": [
+    {
+      "id": "COOK-P0-10",
+      "nodeId": "482:282"
+    }
+  ],
+  "overlayIndex": 1077,
+  "warnings": [],
+  "overlays": {},
+  "prototypeReactions": 0,
+  "sourceReferences": {
+    "COOK-P0-10": {
+      "sourceNodeId": "406:738",
+      "newNodeId": "482:282",
+      "sourceFile": "docs/design/p0-flow-2026-10-05/figma/all-screens.json",
+      "sourceGroup": "07",
+      "layout": "states",
+      "variant": null,
+      "reviewOnly": true,
+      "stateExamples": 0
+    }
+  }
+}

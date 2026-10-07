@@ -1,0 +1,2478 @@
+[
+  {
+    "id": "TUT-1",
+    "title": "选城",
+    "kind": "city",
+    "scene": "map",
+    "heading": "This is home",
+    "meta": "Shanghai · Temperate",
+    "rows": [
+      [
+        "Search another city",
+        "Where would you like to begin?",
+        "i-showmap"
+      ]
+    ],
+    "body": "You can travel anywhere later. Home is where your farm is.",
+    "actions": [
+      [
+        "This is home",
+        "TUT-1-2"
+      ]
+    ],
+    "note": "前置｜IP 预填，可搜索改城；选城不受迷雾限制。地图底图仅作构图示意。→ 建场。",
+    "col": 0,
+    "y": 200
+  },
+  {
+    "id": "TUT-1-2",
+    "title": "建场确认",
+    "scene": "farm",
+    "heading": "Your home in Shanghai",
+    "meta": "Homestead Lv1",
+    "rows": [
+      [
+        "A little room to grow",
+        "20 tilled plots · a kitchen · your own stall",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Create farm",
+        "TUT-3-01"
+      ],
+      [
+        "Change city",
+        "TUT-1",
+        "soft"
+      ]
+    ],
+    "note": "前置｜确认家城后建场；建场成功才进入农场。失败保留选城与选择，不重复创建。",
+    "energy": "200",
+    "coins": "180",
+    "col": 1,
+    "y": 200
+  },
+  {
+    "id": "TUT-3-01",
+    "title": "01 · 落地",
+    "kind": "game",
+    "scene": "farm",
+    "energy": "200",
+    "coins": "180",
+    "banner": "Pick a seed, walk up to a plot and press Sow. Hold to keep sowing.",
+    "action": "Sow ×1\n2 Energy",
+    "quick": [
+      {
+        "icon": "i-radish-seeds",
+        "count": "20"
+      },
+      {
+        "icon": "i-sprout",
+        "count": "10"
+      }
+    ],
+    "next": "TUT-3-02",
+    "note": "检查点 01｜0–3′。初级四工具已装备；Radish 已选；20 格已翻地。仅教学提示，不代操作。",
+    "col": 2,
+    "y": 200
+  },
+  {
+    "id": "TUT-3-02",
+    "title": "02 · 播种与浇水",
+    "kind": "game",
+    "scene": "farm",
+    "energy": "160",
+    "coins": "180",
+    "tag": "Radishes · ready in 3h 58m",
+    "banner": "20 seeds planted",
+    "sub": "Water your new seedlings.",
+    "action": "Water\nFree",
+    "quick": [
+      {
+        "icon": "i-radish-seeds",
+        "count": "0"
+      },
+      {
+        "icon": "i-sprout",
+        "count": "10"
+      }
+    ],
+    "next": "TUT-3-03",
+    "note": "检查点 02｜Sow 每格 −2，共 −40；Water 免费。点田格不劳作，走位后按主行动键。",
+    "col": 3,
+    "y": 200
+  },
+  {
+    "id": "TUT-3-03",
+    "title": "03 · 接教学委托",
+    "scene": "stall",
+    "energy": "160",
+    "coins": "180",
+    "heading": "Stall Board",
+    "tabs": [
+      "Buy",
+      "Stall Board"
+    ],
+    "on": 1,
+    "rows": [
+      [
+        "Pond Catch",
+        "2 Pond Crucian · any pond · 14 coins",
+        "i-fish"
+      ],
+      [
+        "Deliver here",
+        "Homestead Stall",
+        "i-board"
+      ]
+    ],
+    "actions": [
+      [
+        "Track",
+        "TUT-3-04"
+      ]
+    ],
+    "foot": "Next request in 72h",
+    "note": "检查点 03｜3–5′。无人驿站，无 Bao 或问候卡。Track 后板 ! 消失，鱼塘图钉 ! 出现。",
+    "col": 4,
+    "y": 200
+  },
+  {
+    "id": "TUT-3-04",
+    "title": "04 · 找到新手塘",
+    "scene": "map",
+    "energy": "161",
+    "coins": "180",
+    "place": "Map",
+    "tag": "!  Willow Pond",
+    "heading": "Willow Pond",
+    "meta": "Beginner pond · 1.2 km",
+    "rows": [
+      [
+        "Best for Lv1–3",
+        "Pond Crucian OK · 2 regional fish ?",
+        "i-pond"
+      ]
+    ],
+    "actions": [
+      [
+        "Go",
+        "FISH-P0-CAST"
+      ]
+    ],
+    "foot": "Same city · Free",
+    "note": "检查点 04｜5–9′。位置芯片 → 塘卡 → Go。同城不弹 Travel；Show on map 只移动相机。",
+    "col": 5,
+    "y": 200
+  },
+  {
+    "id": "TUT-3-05",
+    "title": "05 · 第一条鱼",
+    "scene": "pond",
+    "energy": "156",
+    "coins": "180",
+    "place": "Willow Pond",
+    "tag": "Creel 1 · 24 free",
+    "heading": "Caught! Pond Crucian",
+    "meta": "Common · First catch!",
+    "rows": [
+      [
+        "Fishing +50 XP",
+        "First cast · first reel · new city · new fish",
+        "i-fish"
+      ],
+      [
+        "Fish-dex 1/20",
+        "Fishing Lv2 in 20 XP",
+        "i-book"
+      ]
+    ],
+    "actions": [
+      [
+        "Keep fishing",
+        "TUT-3-06"
+      ]
+    ],
+    "note": "检查点 05｜9–14′。前三次咬钩鲫鱼。首鱼按 §14.2.2 总账 +50；§14.8.3 的 40 为待修订矛盾。",
+    "col": 0,
+    "y": 1210
+  },
+  {
+    "id": "TUT-3-06",
+    "title": "06 · 失手与再试",
+    "scene": "pond",
+    "energy": "156",
+    "coins": "180",
+    "place": "Willow Pond",
+    "heading": "It got away",
+    "rows": [
+      [
+        "Energy refunded",
+        "+5 Energy · 9 left today",
+        "i-energy"
+      ],
+      [
+        "Try another cast",
+        "Pond Catch · 1/2 Pond Crucian",
+        "i-rod"
+      ]
+    ],
+    "actions": [
+      [
+        "Cast · 5 Energy",
+        "TUT-3-06B"
+      ]
+    ],
+    "note": "检查点 06A｜故意错过提竿的支路。Lv1–3 前 10 次全退；保留委托与已钓鱼。",
+    "col": 1,
+    "y": 1210
+  },
+  {
+    "id": "TUT-3-06B",
+    "title": "06 · 三鱼准备齐",
+    "scene": "pond",
+    "energy": "146",
+    "coins": "180",
+    "place": "Willow Pond",
+    "tag": "Creel 3 · 24 free",
+    "heading": "Pond Catch · Ready",
+    "rows": [
+      [
+        "2 Pond Crucian to deliver",
+        "1 more for your first meal",
+        "i-fish"
+      ],
+      [
+        "Fishing 60/70",
+        "Lv2 in 10 XP · about 2 casts",
+        "i-xp"
+      ]
+    ],
+    "actions": [
+      [
+        "Go home · Free",
+        "TUT-3-07A"
+      ]
+    ],
+    "note": "检查点 06B｜第 2、3 条各 +5，累计 60。保留第 3 条给烤鱼；同种鱼堆叠 10/格。",
+    "col": 2,
+    "y": 1210
+  },
+  {
+    "id": "TUT-3-07A",
+    "title": "07 · 交付",
+    "scene": "stall",
+    "energy": "151",
+    "coins": "180",
+    "heading": "Pond Catch",
+    "meta": "Ready to deliver · Homestead Stall",
+    "needs": [
+      [
+        "Pond Crucian",
+        3,
+        2,
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Deliver · +14 coins",
+        "TUT-3-07B"
+      ]
+    ],
+    "foot": "After delivery: Pond Crucian ×1",
+    "note": "检查点 07A｜14–16′。只扣 2 鲫鱼，钱包 180→194。下一张为点厨房门、点灶台之后。",
+    "col": 3,
+    "y": 1210
+  },
+  {
+    "id": "TUT-3-07B",
+    "title": "07 · 第一锅",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "energy": "151",
+    "heading": "Stove 1/1",
+    "meta": "Cooking Lv1 · 2 ingredient slots",
+    "tabs": [
+      "Cookbook",
+      "Experiment"
+    ],
+    "needs": [
+      [
+        "Crucian",
+        1,
+        1,
+        "i-fish"
+      ]
+    ],
+    "rows": [
+      [
+        "Grilled Crucian",
+        "Common · +20 Energy · 5 s",
+        "i-dish-grilled"
+      ]
+    ],
+    "actions": [
+      [
+        "Cook",
+        "TUT-3-07C"
+      ]
+    ],
+    "note": "检查点 07B｜仅一口灶、2 投料槽。Cookbook 点 Cook 扣 1 鲫鱼；第 2.5 秒点场景锅，首轮金区 50%。",
+    "col": 4,
+    "y": 1210
+  },
+  {
+    "id": "TUT-3-07C",
+    "title": "07 · 吃回体力",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "energy": "151",
+    "heading": "Grilled Crucian ★ Good",
+    "meta": "First cooked! +15 Cooking XP · Cookbook 1/48",
+    "rows": [
+      [
+        "+25 Energy",
+        "Meals today 25/300",
+        "i-energy"
+      ]
+    ],
+    "actions": [
+      [
+        "Eat · +25 Energy",
+        "TUT-3-08"
+      ],
+      [
+        "Keep",
+        "COOK-KEEP-BRANCH",
+        "soft"
+      ]
+    ],
+    "foot": "Energy comes back over time. A meal brings it back now.",
+    "note": "检查点 07C｜Eat 路径 151→176，≤16′闭环。Keep 为可停支路，不伪称已经完成进食指标。",
+    "col": 5,
+    "y": 1210
+  },
+  {
+    "id": "TUT-3-08",
+    "title": "08 · 再种一轮",
+    "kind": "game",
+    "scene": "farm",
+    "energy": "176",
+    "banner": "Sow 10 Lettuce · 20 Energy",
+    "sub": "Your next harvest starts here.",
+    "action": "Sow ×1\n2 Energy",
+    "quick": [
+      {
+        "icon": "i-sprout",
+        "count": "10"
+      }
+    ],
+    "next": "TUT-3-09",
+    "note": "检查点 08｜16–18′。Today 完成补位；回田预选 Farming，点 Lettuce 后播 10 格：176→156。",
+    "col": 0,
+    "y": 2220
+  },
+  {
+    "id": "TUT-3-09",
+    "title": "09 · 等级门可理解",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "energy": "156",
+    "heading": "Fine fish got away",
+    "rows": [
+      [
+        "Fishing Lv2 needed",
+        "10 XP to go · about 2 casts",
+        "i-fish-sil"
+      ],
+      [
+        "Fine fish stay hooked",
+        "Energy refunded · +5 Energy",
+        "i-energy"
+      ]
+    ],
+    "actions": [
+      [
+        "Keep fishing",
+        "TUT-3-10"
+      ]
+    ],
+    "note": "检查点 09｜第 4 次咬钩为 Fine；Lv1 挣脱不加 XP，退 5。等级／差距／后果／退款同屏。",
+    "col": 1,
+    "y": 2220
+  },
+  {
+    "id": "TUT-3-10",
+    "title": "10 · Fishing Lv2",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "energy": "198",
+    "heading": "Fishing Lv2",
+    "meta": "Fine fish now stay on the hook · +50 Energy",
+    "grid": [
+      {
+        "name": "Worm Bait",
+        "icon": "i-worm",
+        "count": "×3"
+      },
+      {
+        "name": "Wild Herb",
+        "icon": "i-herb",
+        "count": "×3"
+      },
+      {
+        "name": "Herb Fish",
+        "icon": "i-recipe-card",
+        "count": "Recipe"
+      }
+    ],
+    "cols": 3,
+    "actions": [
+      [
+        "Use Worm Bait",
+        "TUT-3-11"
+      ]
+    ],
+    "note": "检查点 10｜约22′，第5/6竿累计70–85 XP。礼物进 Bag，满包进 Parcels；快捷栏闪一次。",
+    "col": 2,
+    "y": 2220
+  },
+  {
+    "id": "TUT-3-11",
+    "title": "11 · 立刻用新能力",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "energy": "213",
+    "heading": "River Perch · Fine",
+    "meta": "First catch! +30 XP · Catch +10 XP",
+    "rows": [
+      [
+        "First Fine fish! +20 Energy",
+        "Worm Bait ×2 left",
+        "i-fish"
+      ],
+      [
+        "Cook: Herb Grilled Fish",
+        "A new recipe is waiting at home.",
+        "i-cookbook"
+      ]
+    ],
+    "actions": [
+      [
+        "Go home · Free",
+        "TUT-3-12"
+      ]
+    ],
+    "note": "检查点 11｜22–25′。Lv2 后首次挂饵咬钩 Fine；193→213 奖励区，自然回复暂停。",
+    "col": 3,
+    "y": 2220
+  },
+  {
+    "id": "TUT-3-12",
+    "title": "12 · 第二锅与 Cooking Lv2",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "energy": "213",
+    "heading": "Herb Grilled Fish ★ Good",
+    "meta": "Cooking Lv2 · Recipe: Fresh Fish Soup",
+    "rows": [
+      [
+        "New recipe! +30 Cooking XP",
+        "Cooking 45/100 · Cookbook 2/48",
+        "i-cookbook"
+      ]
+    ],
+    "actions": [
+      [
+        "Energy full",
+        null,
+        "disabled"
+      ],
+      [
+        "Keep",
+        "TODAY-2"
+      ],
+      [
+        "Cook Again · 2nd today · half XP",
+        "COOK-P0-7",
+        "soft"
+      ]
+    ],
+    "note": "检查点 12｜25–28′。Common 鱼+香草，15s／第9s火候；Eat 灰显，Keep 留下 +45 的菜。",
+    "col": 4,
+    "y": 2220
+  },
+  {
+    "id": "TUT-3-END",
+    "title": "会话结束与下次回来",
+    "scene": "farm",
+    "energy": "213",
+    "heading": "A good start",
+    "rows": [
+      [
+        "Radishes ready in 3h 32m",
+        "Farming Lv2 at your first harvest",
+        "i-radish"
+      ],
+      [
+        "Lettuce ready in 7h 46m",
+        "Fresh Fish Soup when radishes are ready",
+        "i-sprout"
+      ],
+      [
+        "Fishing Lv2 · Cooking Lv2",
+        "Farming Lv1 · your crops are growing",
+        "i-xp"
+      ]
+    ],
+    "actions": [
+      [
+        "View profile",
+        "PROFILE-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "28–30′停点｜Fishing110–125、Cooking45、体力213。时间是观察窗口，不定时弹剧情。",
+    "col": 5,
+    "y": 2220
+  },
+  {
+    "id": "MAT-1",
+    "title": "六个采集点",
+    "scene": "farm",
+    "heading": "Around your homestead",
+    "panelY": 300,
+    "rows": [
+      [
+        "Timber Grove · Ready",
+        "Timber ×6 · every 8h",
+        "i-wood"
+      ],
+      [
+        "Rock Pile · Ready",
+        "Stone ×4 · every 8h",
+        "i-stone"
+      ],
+      [
+        "Reed Bank · Ready",
+        "Reeds ×3 + Worm Bait ×2",
+        "i-reeds"
+      ],
+      [
+        "Herb Patch · Ready",
+        "Wild Herb ×2 · every 8h",
+        "i-herb"
+      ],
+      [
+        "Clay Bank · Homestead Lv2",
+        "Clay ×2 · every 8h",
+        "i-clay"
+      ],
+      [
+        "Old Tree · Homestead Lv3",
+        "Hardwood · more to discover",
+        "i-hardwood"
+      ]
+    ],
+    "actions": [
+      [
+        "Show Timber Grove",
+        "MAT-2",
+        "soft"
+      ]
+    ],
+    "note": "§13.2 总览／审阅导航，不新增采集菜单。场景点位 Ready 可点。老树可见；硬木属 P1，P0 不产出。",
+    "col": 0,
+    "y": 3420
+  },
+  {
+    "id": "MAT-2",
+    "title": "点击采集 → 自动入库",
+    "scene": "farm",
+    "tag": "Timber Grove · Ready",
+    "heading": "Stored · 6 Timber",
+    "meta": "Farm Storage · 12 Timber",
+    "rows": [
+      [
+        "Timber Grove ready in 8h",
+        "Gathering is free.",
+        "i-wood"
+      ]
+    ],
+    "actions": [
+      [
+        "View storage",
+        "STORE-1",
+        "soft"
+      ],
+      [
+        "Back to farm",
+        "MAT-1",
+        "soft"
+      ]
+    ],
+    "note": "点场景树林，一次收完直接入仓；0体力0XP。Ready 变独立8小时计时；Bag满也可采集。",
+    "col": 1,
+    "y": 3420
+  },
+  {
+    "id": "MAT-3",
+    "title": "采集冷却与等级门",
+    "scene": "farm",
+    "tag": "Timber Grove · 2h 10m",
+    "heading": "Clay Bank",
+    "rows": [
+      [
+        "Homestead Lv2 needed",
+        "1 level to go · Gather Clay here",
+        "i-clay"
+      ]
+    ],
+    "actions": [
+      [
+        "View homestead",
+        "HOME-P0-1",
+        "soft"
+      ]
+    ],
+    "note": "计时点不重复收取。点未开放黏土溪岸显示等级／差距／后果；来源信息按需打开。",
+    "col": 2,
+    "y": 3420
+  },
+  {
+    "id": "MINE-P0-1",
+    "title": "矿口 · 首次进入",
+    "kind": "game",
+    "scene": "farm",
+    "energy": "142",
+    "tag": "Mine runs today 0/2",
+    "banner": "The mine",
+    "sub": "6 rocks on each floor. Leave whenever you like.",
+    "action": "Enter mine\n2 Energy",
+    "next": "MINE-P0-2",
+    "note": "固定矿口，走近主行动键进入；只付第1层2体力。工作台另点，不设 Explore 菜单。",
+    "col": 3,
+    "y": 3420
+  },
+  {
+    "id": "MINE-P0-2",
+    "title": "第一层 · 逐岩开采",
+    "kind": "game",
+    "scene": "mine",
+    "place": "Mine · Floor 1",
+    "energy": "140",
+    "tag": "Floor 1 · Rocks 0/6",
+    "banner": "Starter Pickaxe · 1 rock per swing",
+    "sub": "Floor 2 · Clear this floor first",
+    "action": "Mine\n2 Energy",
+    "quick": [
+      {
+        "icon": "i-torch",
+        "count": "2"
+      }
+    ],
+    "next": "MINE-P0-3",
+    "note": "每岩2，6岩12；本层合计14。岩石不响应点击；Mining已选，1–2层无Combat主按钮。",
+    "col": 4,
+    "y": 3420
+  },
+  {
+    "id": "MINE-P0-3",
+    "title": "清层与第二层层费",
+    "scene": "mine",
+    "place": "Mine · Floor 1",
+    "energy": "128",
+    "heading": "Floor 1 cleared",
+    "meta": "Elevator stop · 6/6 rocks",
+    "actions": [
+      [
+        "Floor 2 · 2 Energy",
+        "MINE-P0-4"
+      ],
+      [
+        "Entrance · Free",
+        "MINE-P0-5",
+        "soft"
+      ]
+    ],
+    "foot": "Floor 1 is free to return to during this run.",
+    "note": "楼梯亮起；第一次进2层扣2，同局已付层往返免费。素材是Floor1共享底图，非Floor2专属美术。",
+    "col": 5,
+    "y": 3420
+  },
+  {
+    "id": "MINE-P0-4",
+    "title": "第二层 · 铜与岩盐",
+    "kind": "game",
+    "scene": "mine",
+    "place": "Mine · Floor 2",
+    "energy": "126",
+    "tag": "Floor 2 · Rocks 0/6",
+    "banner": "Torch · see what rocks hold",
+    "sub": "One torch per floor. No Energy cost.",
+    "action": "Light Torch\nFree",
+    "quick": [
+      {
+        "icon": "i-torch",
+        "count": "2"
+      }
+    ],
+    "next": "MINE-P0-6",
+    "note": "火把预览固定掉落，−1火把，0体力；选回Mining敲岩。2层清完全局总耗28，0技能XP。",
+    "col": 0,
+    "y": 4430
+  },
+  {
+    "id": "MINE-P0-5",
+    "title": "续局与免费往返",
+    "scene": "farm",
+    "heading": "Your mine run is waiting",
+    "meta": "Floor 1 · 4/6 rocks cleared · Runs today 1/2",
+    "actions": [
+      [
+        "Continue run · Free",
+        "MINE-CONTINUE"
+      ],
+      [
+        "New run · Clear Floor 2 first",
+        null,
+        "disabled"
+      ]
+    ],
+    "foot": "Your progress stays until 04:00 at home.",
+    "note": "中途离矿保留进度，续局落最深已付层，不再收层费。未清2层不可重开，已入包材料保留。",
+    "col": 1,
+    "y": 4430
+  },
+  {
+    "id": "MINE-P0-6",
+    "title": "P0两层清完",
+    "scene": "mine",
+    "place": "Mine · Floor 2",
+    "energy": "114",
+    "heading": "Floor 2 cleared",
+    "meta": "Elevator stop · Mine runs today 1/2",
+    "rows": [
+      [
+        "Entrance · Free",
+        "Return home and store your materials.",
+        "i-elevator"
+      ],
+      [
+        "Floor 1 · Free",
+        "Floor 2 · Here",
+        "i-stairs"
+      ]
+    ],
+    "actions": [
+      [
+        "Go home · Free",
+        "MINE-P0-7"
+      ]
+    ],
+    "note": "P0只呈现1–2层，清2层不伪称精英Run complete。电梯0；回农场材料自动入库。",
+    "col": 2,
+    "y": 4430
+  },
+  {
+    "id": "MINE-P0-7",
+    "title": "可重开 · 明示后果",
+    "scene": "farm",
+    "heading": "Start a new run?",
+    "meta": "Current run will end · Runs today 1/2",
+    "rows": [
+      [
+        "Your stored materials stay",
+        "The mine starts again on Floor 1.",
+        "i-bag"
+      ]
+    ],
+    "actions": [
+      [
+        "New run · 2 Energy",
+        "MINE-P0-2"
+      ],
+      [
+        "Continue run · Free",
+        "MINE-P0-6",
+        "soft"
+      ]
+    ],
+    "note": "已清2层才可重开；计第2局，所有层费重算。确认卡为本批交互方案，避免误丢当前局进度。",
+    "col": 3,
+    "y": 4430
+  },
+  {
+    "id": "MINE-P0-8",
+    "title": "满包、日上限与日切",
+    "scene": "mine",
+    "place": "Mine · Floor 2",
+    "heading": "Bag full · free a slot to mine",
+    "rows": [
+      [
+        "Your run is saved",
+        "Return home to store materials, then continue free.",
+        "i-bag"
+      ],
+      [
+        "Mine runs today 2/2",
+        "Resets in 9h 12m",
+        "i-clock"
+      ]
+    ],
+    "actions": [
+      [
+        "Go home · Free",
+        "STORE-1"
+      ],
+      [
+        "Open bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "foot": "Run ended at daily reset → Enter mine · 2 Energy",
+    "note": "三状态规则板：主动挖矿满包阻止；2/2只限制新局、不挡续局；04:00结束旧局，材料不丢。",
+    "col": 4,
+    "y": 4430
+  },
+  {
+    "id": "CRAFT-1",
+    "title": "工作台 · Tools不足",
+    "scene": "farm",
+    "heading": "Workbench",
+    "tabs": [
+      "Facilities",
+      "Tools",
+      "Supplies"
+    ],
+    "on": 1,
+    "meta": "Copper Pickaxe · 2 rocks per swing",
+    "needs": [
+      [
+        "Copper Ore",
+        3,
+        5,
+        "i-copper"
+      ],
+      [
+        "Timber",
+        4,
+        4,
+        "i-wood"
+      ]
+    ],
+    "actions": [
+      [
+        "Need 2 more Copper Ore",
+        null,
+        "disabled"
+      ],
+      [
+        "Show mine",
+        "MINE-P0-1",
+        "soft"
+      ]
+    ],
+    "note": "点工作台打开。材料全用环形进度格；从Farm Storage扣，缺口只写按钮，点材料格才看来源。",
+    "col": 5,
+    "y": 4430
+  },
+  {
+    "id": "CRAFT-2",
+    "title": "铜镐制作成功",
+    "scene": "farm",
+    "heading": "Copper Pickaxe",
+    "meta": "Workbench · Tools · 0 coins",
+    "needs": [
+      [
+        "Copper Ore",
+        5,
+        5,
+        "i-copper"
+      ],
+      [
+        "Timber",
+        4,
+        4,
+        "i-wood"
+      ]
+    ],
+    "actions": [
+      [
+        "Craft",
+        "GEAR-P0-1"
+      ]
+    ],
+    "foot": "2 rocks per swing · 4 Energy for 2 rocks",
+    "note": "足料→Craft→获得铜镐。工具不占Bag；不自动替换当前镐，成功态给Equip入口。",
+    "col": 0,
+    "y": 5440
+  },
+  {
+    "id": "CRAFT-3",
+    "title": "工作台 · Supplies",
+    "scene": "farm",
+    "heading": "Workbench",
+    "tabs": [
+      "Facilities",
+      "Tools",
+      "Supplies"
+    ],
+    "on": 2,
+    "meta": "Torch ×2 · see what rocks hold",
+    "needs": [
+      [
+        "Timber",
+        6,
+        1,
+        "i-wood"
+      ],
+      [
+        "Reeds",
+        3,
+        1,
+        "i-reeds"
+      ]
+    ],
+    "rows": [
+      [
+        "Compost ×2",
+        "Reeds 2 + Timber 1 · 0 coins",
+        "i-compost"
+      ]
+    ],
+    "actions": [
+      [
+        "Craft · Torch ×2",
+        "STORE-1"
+      ]
+    ],
+    "note": "火把1木1芦→2、堆肥2芦1木→2；均0金币。产物在家仓库存储，带出门Take；炸药属P1不列P0。",
+    "col": 1,
+    "y": 5440
+  },
+  {
+    "id": "CRAFT-4",
+    "title": "采集手套 · 被动生效",
+    "scene": "farm",
+    "heading": "Gather Gloves",
+    "meta": "Workbench · Tools · 0 coins",
+    "needs": [
+      [
+        "Reeds",
+        8,
+        8,
+        "i-reeds"
+      ],
+      [
+        "Timber",
+        4,
+        4,
+        "i-wood"
+      ]
+    ],
+    "rows": [
+      [
+        "+1 item per gathering spot",
+        "Timber 7 · Stone 5 · Reeds 4 · Herbs 3",
+        "i-wood"
+      ]
+    ],
+    "actions": [
+      [
+        "Craft",
+        "MAT-GLOVES-RESULT"
+      ]
+    ],
+    "note": "做出即被动生效，不进Gear六槽，不新增装备槽。副产蚯蚓不随主材料+1；再次制作不可重复叠加。",
+    "col": 2,
+    "y": 5440
+  },
+  {
+    "id": "GEAR-P0-1",
+    "title": "制作后 → 装备铜镐",
+    "scene": "farm",
+    "heading": "Bag  |  Gear",
+    "meta": "Mining slot · Copper Pickaxe crafted",
+    "grid": [
+      {
+        "name": "Hoe",
+        "icon": "i-hoe"
+      },
+      {
+        "name": "Rod",
+        "icon": "i-rod"
+      },
+      {
+        "name": "Pickaxe",
+        "icon": "i-pickaxe",
+        "selected": true
+      },
+      {
+        "name": "Weapon",
+        "icon": "i-sword"
+      },
+      {
+        "name": "No ring",
+        "icon": "i-ring"
+      },
+      {
+        "name": "No charm",
+        "icon": "i-charm"
+      }
+    ],
+    "cols": 3,
+    "rows": [
+      [
+        "Copper Pickaxe",
+        "2 rocks per swing",
+        "i-pickaxe"
+      ]
+    ],
+    "actions": [
+      [
+        "Equip",
+        "GEAR-P0-2"
+      ]
+    ],
+    "note": "Craft成功经同一Bag/Gear抽屉进入Mining槽；旧镐保留。Gear无容量条，工具不入Tackle。",
+    "col": 3,
+    "y": 5440
+  },
+  {
+    "id": "GEAR-P0-2",
+    "title": "已装备与劳作后果",
+    "scene": "farm",
+    "heading": "Copper Pickaxe · Equipped",
+    "rows": [
+      [
+        "2 rocks per swing",
+        "2 rocks still cost 4 Energy.",
+        "i-pickaxe"
+      ],
+      [
+        "Starter Pickaxe",
+        "Owned · 1 rock per swing",
+        "i-pickaxe"
+      ]
+    ],
+    "actions": [
+      [
+        "Return to the mine",
+        "MINE-P0-1"
+      ],
+      [
+        "Bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "装备标识即时改；主行动键徽标同步。两岩4体力，不能显示一次两岩只扣2；资料石料加成冲突另列。",
+    "col": 4,
+    "y": 5440
+  },
+  {
+    "id": "HOME-P0-1",
+    "title": "材料 → 农场升级",
+    "scene": "farm",
+    "heading": "Homestead Lv2",
+    "meta": "Farming 2 + Fishing 2 · Skills 4/3",
+    "needs": [
+      [
+        "Timber",
+        12,
+        12,
+        "i-wood"
+      ],
+      [
+        "Stone",
+        8,
+        8,
+        "i-stone"
+      ],
+      [
+        "Reeds",
+        6,
+        6,
+        "i-reeds"
+      ],
+      [
+        "Rock Salt",
+        3,
+        3,
+        "i-salt"
+      ]
+    ],
+    "actions": [
+      [
+        "Upgrade · 250 coins",
+        "COOK-P0-5"
+      ]
+    ],
+    "foot": "210 Energy · Spice Rack storage · Clay Bank",
+    "note": "第5天独立示例，需Farming+Fishing技能和与金币同时满足；Cooking不计入。材料数字取§8.2.1。",
+    "coins": "250",
+    "col": 5,
+    "y": 5440
+  },
+  {
+    "id": "COOK-P0-1",
+    "title": "新手厨房 · 单灶",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "energy": "151",
+    "tag": "Stove 1/1 · Tap to cook",
+    "tagY": 300,
+    "tagTo": "TUT-3-07B",
+    "heading": "A kitchen of your own",
+    "meta": "Homestead Lv1 · Cooking Lv1",
+    "rows": [
+      [
+        "Stove 1/1 · Empty",
+        "2 ingredient slots",
+        "i-stove-off"
+      ]
+    ],
+    "actions": [
+      [
+        "Tap to cook",
+        "TUT-3-07B"
+      ],
+      [
+        "Bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "场景灶台点击打开Cookbook。厨房无主行动键、切换键或五格快捷栏；单灶镜头，新增整屋美术另计。",
+    "col": 0,
+    "y": 6640
+  },
+  {
+    "id": "COOK-P0-2",
+    "title": "Experiment · 两槽投料",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "tag": "Pond Crucian ×1  ×     + Add",
+    "tagY": 325,
+    "heading": "Stove 1/1 · Experiment",
+    "meta": "Grilled Crucian · Common · +20 Energy · 5 s",
+    "tabs": [
+      "Cookbook",
+      "Experiment"
+    ],
+    "on": 1,
+    "grid": [
+      {
+        "name": "Crucian",
+        "icon": "i-fish",
+        "count": "×2",
+        "selected": true
+      },
+      {
+        "name": "Herb",
+        "icon": "i-herb",
+        "count": "×3"
+      },
+      {
+        "name": "Radish",
+        "icon": "i-radish",
+        "count": "0"
+      },
+      {
+        "name": "Salt",
+        "icon": "i-salt",
+        "count": "0"
+      },
+      {
+        "name": "Carp",
+        "icon": "i-carp",
+        "count": "0"
+      }
+    ],
+    "actions": [
+      [
+        "Cook",
+        "COOK-P0-3"
+      ]
+    ],
+    "note": "点击格入场景锅；锅下两槽，×撤回。投料预览不扣料，Cook才扣；第3槽Cooking Lv4，不画额外灰槽。",
+    "col": 1,
+    "y": 6640
+  },
+  {
+    "id": "COOK-P0-3",
+    "title": "场景锅 · 火候",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heat": "Tap when the needle hits gold!",
+    "heading": "Grilled Crucian · Cooking",
+    "meta": "Stove 1/1 · 0:03 left",
+    "rows": [
+      [
+        "One good tap",
+        "First cook · a generous gold window",
+        "i-pot"
+      ]
+    ],
+    "actions": [
+      [
+        "Tap the pot",
+        "TUT-3-07C"
+      ]
+    ],
+    "note": "首次5s锅在2.5s出现火候，点场景锅。此按钮是可点击原型热区说明，产品不新增劳作FAB。",
+    "col": 2,
+    "y": 6640
+  },
+  {
+    "id": "COOK-P0-4",
+    "title": "满包 · 菜留在灶上",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "energy": "213",
+    "tag": "Stove 1/1 · Ready",
+    "heading": "Bag full",
+    "meta": "Herb Grilled Fish ★ Good · +45 Energy",
+    "rows": [
+      [
+        "Dish left on the stove",
+        "Free a slot, then come back to collect.",
+        "i-stove-off"
+      ]
+    ],
+    "actions": [
+      [
+        "Open bag",
+        "BAG-1-P0"
+      ],
+      [
+        "Cook Again · collect dish first",
+        null,
+        "disabled"
+      ]
+    ],
+    "note": "主动烹饪结果不进Parcels。菜不消失，单灶占用，不能再开火；满体力不以Eat绕开。",
+    "col": 3,
+    "y": 6640
+  },
+  {
+    "id": "COOK-P0-5",
+    "title": "Lv2 · 调味架储物",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Spice Rack",
+    "meta": "Homestead Lv2 · 30 of each seasoning",
+    "grid": [
+      {
+        "name": "Rock Salt",
+        "icon": "i-salt",
+        "count": "12/30"
+      },
+      {
+        "name": "Wild Herb",
+        "icon": "i-herb",
+        "count": "3/30"
+      }
+    ],
+    "cols": 2,
+    "rows": [
+      [
+        "Ready to cook",
+        "Experiment marks these ingredients as Rack.",
+        "i-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Open Experiment",
+        "COOK-P0-2",
+        "soft"
+      ]
+    ],
+    "note": "只储物、不解投料槽。Cooking Lv1仍2槽，Lv4才3槽；四类调味容量每类30，P0展示已有盐与香草。",
+    "col": 4,
+    "y": 6640,
+    "capacity": 210
+  },
+  {
+    "id": "COOK-P0-6",
+    "title": "Lv3 · 保温柜领取",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Warming Cabinet · 4/6",
+    "meta": "Homestead Lv3",
+    "rows": [
+      [
+        "Herb Grilled Fish ★ Good",
+        "+45 Energy · ×1",
+        "i-dish-herb"
+      ],
+      [
+        "Grilled Crucian ★ Good",
+        "+25 Energy · ×3",
+        "i-dish-grilled"
+      ]
+    ],
+    "actions": [
+      [
+        "Take 1 to bag",
+        "COOK-P0-7"
+      ],
+      [
+        "Eat · +45 Energy",
+        "COOK-P0-7",
+        "soft"
+      ]
+    ],
+    "foot": "Cooked dishes go here while there is room.",
+    "note": "柜里可直接吃；取包需空格。6份按份数计，柜满且Bag满则留灶。新手Lv1不显示柜。",
+    "col": 5,
+    "y": 6640,
+    "capacity": 220
+  },
+  {
+    "id": "COOK-P0-7",
+    "title": "Cook Again · 有料",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Cook Again",
+    "meta": "Herb Grilled Fish · 2nd today · half XP",
+    "needs": [
+      [
+        "Fish",
+        2,
+        1,
+        "i-fish"
+      ],
+      [
+        "Wild Herb",
+        2,
+        1,
+        "i-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Cook Again · 15 s",
+        "COOK-HERB-HEAT"
+      ],
+      [
+        "Choose another recipe",
+        "TUT-3-07B",
+        "soft"
+      ]
+    ],
+    "note": "Cooking Lv2才显示；先收走上锅且有空闲灶，再次按下才扣料。2nd half XP；第3锅No XP提示。",
+    "col": 0,
+    "y": 7650
+  },
+  {
+    "id": "COOK-P0-8",
+    "title": "Cook Again · 缺料",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Herb Grilled Fish",
+    "meta": "Cook Again · 2nd today · half XP",
+    "needs": [
+      [
+        "Fish",
+        0,
+        1,
+        "i-fish"
+      ],
+      [
+        "Wild Herb",
+        2,
+        1,
+        "i-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Need Fish ×1",
+        null,
+        "disabled"
+      ],
+      [
+        "Choose another recipe",
+        "TUT-3-07B",
+        "soft"
+      ],
+      [
+        "Show pond",
+        "TUT-3-04",
+        "soft"
+      ]
+    ],
+    "note": "缺料不先扣现有材料。Show pond仅地图高亮；不传送、不自动钓鱼。",
+    "col": 1,
+    "y": 7650
+  },
+  {
+    "id": "STORE-1",
+    "title": "农场仓库 · 带出门",
+    "scene": "farm",
+    "heading": "Farm Storage",
+    "meta": "At home · materials stored automatically",
+    "tabs": [
+      "Seeds",
+      "Materials"
+    ],
+    "on": 1,
+    "grid": [
+      {
+        "name": "Timber",
+        "icon": "i-wood",
+        "count": "12"
+      },
+      {
+        "name": "Stone",
+        "icon": "i-stone",
+        "count": "8"
+      },
+      {
+        "name": "Reeds",
+        "icon": "i-reeds",
+        "count": "6"
+      },
+      {
+        "name": "Copper",
+        "icon": "i-copper",
+        "count": "5"
+      },
+      {
+        "name": "Torch",
+        "icon": "i-torch",
+        "count": "12"
+      }
+    ],
+    "rows": [
+      [
+        "Torch ×12",
+        "Bag 22/25 · 3 slots free",
+        "i-torch"
+      ]
+    ],
+    "actions": [
+      [
+        "Take 10",
+        "BAG-1-P0"
+      ],
+      [
+        "Take all",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "仓库不限格每堆99；材料／种子／肥料／火把／摆件回家入库。鱼、作物、料理不自动入库。Take受Bag可容纳数裁剪。",
+    "col": 2,
+    "y": 7650
+  },
+  {
+    "id": "STORE-2",
+    "title": "离家 · 仓库只读",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "heading": "Farm Storage",
+    "tabs": [
+      "Seeds",
+      "Materials"
+    ],
+    "on": 1,
+    "rows": [
+      [
+        "Torch ×12",
+        "Stored at your homestead",
+        "i-torch"
+      ]
+    ],
+    "actions": [
+      [
+        "At home",
+        null,
+        "disabled"
+      ],
+      [
+        "Go home · Free",
+        "STORE-1"
+      ]
+    ],
+    "note": "在外只读，不凭空取物；返回农场再Take。回家引导是明确Go home，不冒充Show on map。",
+    "col": 3,
+    "y": 7650
+  },
+  {
+    "id": "COOK-P0-9",
+    "title": "留灶后 · 空位再领取",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Your dish is ready",
+    "meta": "Bag 24/25 · 1 slot free",
+    "rows": [
+      [
+        "Herb Grilled Fish ★ Good",
+        "Stove 1/1 · +45 Energy",
+        "i-dish-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Keep",
+        "COOK-P0-7"
+      ]
+    ],
+    "foot": "Collecting frees this stove for your next dish.",
+    "note": "从Bag整理返回保留同一道菜、品质和数量；Keep成功才清灶，再允许Cook Again。",
+    "col": 4,
+    "y": 7650
+  },
+  {
+    "id": "COOK-P0-10",
+    "title": "火候三态 · 修订替代稿",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Heat results",
+    "rows": [
+      [
+        "Missed · still cooking",
+        "Plain · the dish is kept",
+        "i-pot"
+      ],
+      [
+        "Nice heat! ★",
+        "Good · better recovery",
+        "i-dish-grilled"
+      ],
+      [
+        "Perfect! ★★",
+        "Extra portion",
+        "i-star"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to stove",
+        "COOK-P0-1",
+        "soft"
+      ]
+    ],
+    "note": "替代旧COOK-3-2主操作示意。无Cook · Free、无切换FAB；多灶并行属于P1，沿用旧火候节奏说明。",
+    "col": 5,
+    "y": 7650
+  },
+  {
+    "id": "BOARD-1",
+    "title": "无人驿站 · 已追踪",
+    "scene": "stall",
+    "heading": "Homestead Stall",
+    "tabs": [
+      "Buy",
+      "Stall Board"
+    ],
+    "on": 1,
+    "rows": [
+      [
+        "Pond Catch · Tracked",
+        "Pond Crucian 1/2 · 14 coins · Deliver here",
+        "i-board"
+      ],
+      [
+        "Next request in 72h",
+        "Your second board slot",
+        "i-clock"
+      ]
+    ],
+    "actions": [
+      [
+        "Show on map",
+        "TUT-3-04",
+        "soft"
+      ],
+      [
+        "Drop request",
+        "BOARD-3",
+        "soft"
+      ]
+    ],
+    "note": "首会话2槽；第二槽72h为新手特例。Tracked物品受Sell All保护；点棚即进交易，无人像。",
+    "col": 0,
+    "y": 8870
+  },
+  {
+    "id": "BOARD-2",
+    "title": "交付成功 · 四小时补位",
+    "scene": "stall",
+    "coins": "194",
+    "heading": "Request complete · +14 coins",
+    "tabs": [
+      "Buy",
+      "Stall Board"
+    ],
+    "on": 1,
+    "rows": [
+      [
+        "Pond Catch · Done",
+        "Next request in 3h 58m",
+        "i-check"
+      ],
+      [
+        "Requests today 1 of 6",
+        "All system boards share this limit.",
+        "i-board"
+      ]
+    ],
+    "actions": [
+      [
+        "Close",
+        "TODAY-1",
+        "soft"
+      ]
+    ],
+    "note": "普通完成槽4h补位；到账、扣物、Done一起发生。日6份合并计数；不重复点领同份奖励。",
+    "col": 1,
+    "y": 8870
+  },
+  {
+    "id": "BOARD-3",
+    "title": "放弃与每日上限",
+    "scene": "stall",
+    "heading": "Drop Pond Catch?",
+    "rows": [
+      [
+        "Next request in 8h",
+        "Your fish stay in your bag.",
+        "i-clock"
+      ]
+    ],
+    "actions": [
+      [
+        "Keep tracking",
+        "BOARD-1"
+      ],
+      [
+        "Drop",
+        "BOARD-DROPPED",
+        "soft"
+      ]
+    ],
+    "foot": "Requests today 6 of 6 · resets at 04:00",
+    "note": "放弃8h；普通未接72h换单，已追踪永不过期。底部日满额为独立状态文案，不算放弃后额度增加。",
+    "col": 2,
+    "y": 8870
+  },
+  {
+    "id": "TODAY-1",
+    "title": "Today · 完成后补位",
+    "scene": "farm",
+    "heading": "Today",
+    "rows": [
+      [
+        "✓ Pond Catch delivered",
+        "+14 coins",
+        "i-check"
+      ],
+      [
+        "Cook it: Grilled Crucian",
+        "You have Pond Crucian ×1",
+        "i-kitchen"
+      ],
+      [
+        "Radishes ready in 3h 58m",
+        "Farming Lv2 at your first harvest",
+        "i-radish"
+      ]
+    ],
+    "actions": [
+      [
+        "Show kitchen",
+        "COOK-P0-1",
+        "soft"
+      ]
+    ],
+    "note": "完成行短暂打勾后补位，始终≤3行；可立即做优先。不加全部完成奖励；Show只相机高亮，仍需点灶。",
+    "col": 3,
+    "y": 8870
+  },
+  {
+    "id": "TODAY-2",
+    "title": "Today · 结束与低体力",
+    "scene": "farm",
+    "energy": "213",
+    "heading": "Today",
+    "rows": [
+      [
+        "Radishes ready in 3h 32m",
+        "Farming Lv2 at your first harvest",
+        "i-radish"
+      ],
+      [
+        "Lettuce ready in 7h 46m",
+        "Your next harvest is growing.",
+        "i-sprout"
+      ],
+      [
+        "Fresh Fish Soup",
+        "When radishes are ready",
+        "i-dish-soup"
+      ]
+    ],
+    "actions": [
+      [
+        "Close",
+        "TUT-3-END",
+        "soft"
+      ]
+    ],
+    "note": "首会话结束三行。低体力变体：Sow10→needs20 Energy · +8 in21m，不隐藏、不灰掉；不催花光体力。",
+    "col": 4,
+    "y": 8870
+  },
+  {
+    "id": "BAG-1-P0",
+    "title": "Bag · 七类统一容量",
+    "scene": "farm",
+    "heading": "Bag  |  Gear",
+    "meta": "Bag 22/25 · 3 slots free",
+    "tabs": [
+      "All",
+      "Seeds",
+      "Fish",
+      "Dishes"
+    ],
+    "grid": [
+      {
+        "name": "Radish",
+        "icon": "i-radish",
+        "count": "50"
+      },
+      {
+        "name": "Crucian",
+        "icon": "i-fish",
+        "count": "10"
+      },
+      {
+        "name": "Herb Fish",
+        "icon": "i-dish-herb",
+        "count": "5"
+      },
+      {
+        "name": "Worm",
+        "icon": "i-worm",
+        "count": "20"
+      },
+      {
+        "name": "Torch",
+        "icon": "i-torch",
+        "count": "20"
+      },
+      {
+        "name": "Radish",
+        "icon": "i-radish",
+        "count": "50"
+      },
+      {
+        "name": "Crucian",
+        "icon": "i-fish",
+        "count": "10"
+      },
+      {
+        "name": "Herb Fish",
+        "icon": "i-dish-herb",
+        "count": "5"
+      },
+      {
+        "name": "Worm",
+        "icon": "i-worm",
+        "count": "20"
+      },
+      {
+        "name": "Torch",
+        "icon": "i-torch",
+        "count": "20"
+      },
+      {
+        "name": "Radish",
+        "icon": "i-radish",
+        "count": "50"
+      },
+      {
+        "name": "Crucian",
+        "icon": "i-fish",
+        "count": "10"
+      },
+      {
+        "name": "Herb Fish",
+        "icon": "i-dish-herb",
+        "count": "5"
+      },
+      {
+        "name": "Worm",
+        "icon": "i-worm",
+        "count": "20"
+      },
+      {
+        "name": "Torch",
+        "icon": "i-torch",
+        "count": "20"
+      },
+      {
+        "name": "Radish",
+        "icon": "i-radish",
+        "count": "20"
+      },
+      {
+        "name": "Crucian",
+        "icon": "i-fish",
+        "count": "3"
+      },
+      {
+        "name": "Herb Fish",
+        "icon": "i-dish-herb",
+        "count": "1"
+      },
+      {
+        "name": "Worm",
+        "icon": "i-worm",
+        "count": "2"
+      },
+      {
+        "name": "Torch",
+        "icon": "i-torch",
+        "count": "2"
+      },
+      {
+        "name": "Lettuce",
+        "icon": "i-sprout",
+        "count": "10"
+      },
+      {
+        "name": "Herb",
+        "icon": "i-herb",
+        "count": "3"
+      },
+      {
+        "name": "Empty",
+        "icon": "i-question"
+      },
+      {
+        "name": "Empty",
+        "icon": "i-question"
+      },
+      {
+        "name": "Empty",
+        "icon": "i-question"
+      }
+    ],
+    "rows": [],
+    "actions": [
+      [
+        "Gear",
+        "GEAR-P0-1",
+        "soft"
+      ]
+    ],
+    "foot": "All · Seeds · Fish · Produce · Dishes · Materials · Tackle",
+    "note": "25格密度状态：五列五行、22/25、7分类横向滑动。工具仅在Gear，Tackle计容量；首行快捷栏见原BAG-1，切页保持选择。",
+    "panelY": 170,
+    "col": 5,
+    "y": 8870
+  },
+  {
+    "id": "PARCEL-1",
+    "title": "包裹 · 正常领取",
+    "scene": "farm",
+    "heading": "Inbox",
+    "tabs": [
+      "To do",
+      "Parcels 3",
+      "Updates"
+    ],
+    "on": 1,
+    "meta": "Bag 22/25 · 3 slots free · Parcels 3/8",
+    "rows": [
+      [
+        "Perch ×7 · 23h 40m",
+        "Request reward · Stall Board",
+        "i-fish"
+      ],
+      [
+        "Carrot Seeds ×5 · 12h",
+        "Level-up gift",
+        "i-carrot-seeds"
+      ],
+      [
+        "Worm Bait ×3 · 1h 05m",
+        "Achievement reward",
+        "i-worm",
+        "warm"
+      ]
+    ],
+    "actions": [
+      [
+        "Claim all · 3 slots",
+        "PARCEL-2"
+      ]
+    ],
+    "foot": "Kept 24h. Sellable items expire into coins at 80%.",
+    "note": "HUD铃铛、农舍信箱同入口，非两容器。P0只成就/委托/升级被动奖励，赠礼和首访例留P2。",
+    "col": 0,
+    "y": 9880
+  },
+  {
+    "id": "PARCEL-2",
+    "title": "已领 · 列表与角标更新",
+    "scene": "farm",
+    "heading": "Inbox",
+    "tabs": [
+      "To do",
+      "Parcels 0",
+      "Updates"
+    ],
+    "on": 1,
+    "meta": "Bag 25/25 · Parcels 0/8",
+    "rows": [
+      [
+        "Claimed · 3 parcels",
+        "Items are now in your bag.",
+        "i-check"
+      ],
+      [
+        "No parcels waiting",
+        "Rewards will appear here when your bag is full.",
+        "i-parcel"
+      ]
+    ],
+    "actions": [
+      [
+        "Open bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "只在领取成功后移除、更新Bag与待操作角标。重复点击不能再次入账；并发容量变化重检。",
+    "col": 1,
+    "y": 9880
+  },
+  {
+    "id": "PARCEL-3",
+    "title": "满包 · 领取门禁",
+    "scene": "farm",
+    "heading": "Inbox",
+    "tabs": [
+      "To do",
+      "Parcels 3",
+      "Updates"
+    ],
+    "on": 1,
+    "meta": "Bag 25/25 · 0 slots free",
+    "rows": [
+      [
+        "Perch ×7 · 1h 05m left",
+        "Request reward · Stall Board",
+        "i-fish",
+        "warm"
+      ]
+    ],
+    "actions": [
+      [
+        "Make room · 1 slot",
+        "BAG-1-P0",
+        "soft"
+      ],
+      [
+        "Claim all · no free slots",
+        null,
+        "disabled"
+      ]
+    ],
+    "foot": "Parcels stay here while you make room.",
+    "note": "不挤出原Bag物品，不弹Keep which。整理返回保留待领包裹与倒计时；允许空间范围内部分批量领取。",
+    "col": 2,
+    "y": 9880
+  },
+  {
+    "id": "PARCEL-4",
+    "title": "包裹满额 · 8/8",
+    "scene": "farm",
+    "heading": "Parcels · 8/8",
+    "meta": "Bag 25/25 · Make room to claim",
+    "rows": [
+      [
+        "Perch ×7 · 42m left",
+        "Request reward · Stall Board",
+        "i-fish",
+        "warm"
+      ],
+      [
+        "Carrot Seeds ×5 · 2h left",
+        "Level-up gift",
+        "i-carrot-seeds"
+      ]
+    ],
+    "actions": [
+      [
+        "Open bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "foot": "Claim a parcel to make room here.",
+    "note": "覆盖现有8/8状态。第9份系统奖励去向在基线未定义，不能虚构覆盖或丢弃；实现前须补规则（阻塞项）。",
+    "col": 3,
+    "y": 9880
+  },
+  {
+    "id": "PARCEL-5",
+    "title": "到期 · Updates回执",
+    "scene": "farm",
+    "coins": "212",
+    "heading": "Inbox",
+    "tabs": [
+      "To do",
+      "Parcels",
+      "Updates"
+    ],
+    "on": 2,
+    "rows": [
+      [
+        "Parcel expired · +18 coins",
+        "Sellable reward · 80% buyback value",
+        "i-coin"
+      ],
+      [
+        "Your bag stayed the same",
+        "You can collect rewards within 24h.",
+        "i-bag"
+      ]
+    ],
+    "actions": [
+      [
+        "Parcels",
+        "PARCEL-1",
+        "soft"
+      ]
+    ],
+    "note": "可回收品折现、不占回收额度，示例+18。P2赠礼到期退回、区域种子到期丢失另列，不混入P0奖励。",
+    "col": 4,
+    "y": 9880
+  },
+  {
+    "id": "PARCEL-6",
+    "title": "被动奖励 → 铃铛与信箱",
+    "kind": "game",
+    "scene": "farm",
+    "tag": "Parcel · Tap to open",
+    "tagTo": "PARCEL-1",
+    "banner": "Bag full · Perch ×7 sent to Inbox · 24h",
+    "sub": "Open the bell or your farmhouse mailbox.",
+    "action": "Sow ×1\n2 Energy",
+    "note": "2秒铃铛下飘条、铃铛+1、家中信箱Parcel小牌。此卡主行动键仍劳作；包裹只能点铃/信箱进入。",
+    "col": 5,
+    "y": 9880
+  },
+  {
+    "id": "PROFILE-1-P0",
+    "title": "Profile · P0入口",
+    "kind": "profile",
+    "scene": "avatar",
+    "heading": "Alex",
+    "meta": "Shanghai · Temperate · Since Oct 2026",
+    "rows": [
+      [
+        "Farming Lv1 · Fishing Lv2 · Cooking Lv2",
+        "All skills",
+        "i-xp"
+      ],
+      [
+        "My farm · Homestead Lv1",
+        "Radishes ready in 3h 32m",
+        "i-home"
+      ],
+      [
+        "Collections",
+        "Fish-dex 3/20 · Cookbook 2/48",
+        "i-book"
+      ]
+    ],
+    "actions": [
+      [
+        "Edit look",
+        "KEEP-P0-1"
+      ],
+      [
+        "Back",
+        "TUT-3-END",
+        "soft"
+      ]
+    ],
+    "note": "HUD头像/地图Me → Profile，Edit look →换装。P2关系等入口沿PROFILE-1，不在P0假装已实现。",
+    "col": 0,
+    "y": 10890
+  },
+  {
+    "id": "KEEP-P0-1",
+    "title": "换装 · 预览与保存",
+    "kind": "look",
+    "scene": "avatar",
+    "heading": "Make yourself at home",
+    "tabs": [
+      "Hair",
+      "Top",
+      "Bottom",
+      "Shoes",
+      "Hat"
+    ],
+    "on": 1,
+    "grid": [
+      {
+        "name": "Blue",
+        "icon": "i-hanger",
+        "selected": true
+      },
+      {
+        "name": "Green",
+        "icon": "i-hanger"
+      },
+      {
+        "name": "Cream",
+        "icon": "i-hanger"
+      },
+      {
+        "name": "Rose",
+        "icon": "i-hanger"
+      },
+      {
+        "name": "Brown",
+        "icon": "i-hanger"
+      }
+    ],
+    "actions": [
+      [
+        "Save",
+        "KEEP-P0-2"
+      ],
+      [
+        "Cancel",
+        "PROFILE-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "沿用现有换装逻辑，选择只预览，Save成功回Profile；Cancel保留旧外观。服装格共用占位图，未声称专属资产。",
+    "col": 1,
+    "y": 10890
+  },
+  {
+    "id": "KEEP-P0-2",
+    "title": "保存后返回个人页",
+    "kind": "profile",
+    "scene": "avatar",
+    "heading": "Look saved",
+    "meta": "Alex · Shanghai · Temperate",
+    "rows": [
+      [
+        "Your look is up to date",
+        "Your avatar and profile now match.",
+        "i-check"
+      ]
+    ],
+    "actions": [
+      [
+        "Edit look",
+        "KEEP-P0-1",
+        "soft"
+      ],
+      [
+        "Back to farm",
+        "TUT-3-END"
+      ]
+    ],
+    "note": "保存成功回Profile，同一外观同步HUD与场景；不经过Gear、不加Outfit Tab。失败状态保留预览可Retry。",
+    "col": 2,
+    "y": 10890
+  },
+  {
+    "id": "ENERGY-P0-1",
+    "title": "低体力 · 只引导",
+    "scene": "mine",
+    "place": "Mine · Floor 2",
+    "energy": "1",
+    "heading": "1/200 · +1 in 2:40",
+    "meta": "Mine needs 2 Energy · you have 1",
+    "rows": [
+      [
+        "Wait",
+        "+1 in 2:40",
+        "i-clock"
+      ],
+      [
+        "Eat · 1 dish in bag",
+        "Open bag ›",
+        "i-dish-herb"
+      ],
+      [
+        "Rest · Available",
+        "Show bench ›",
+        "i-rest"
+      ]
+    ],
+    "actions": [
+      [
+        "Open bag",
+        "BAG-1-P0",
+        "soft"
+      ],
+      [
+        "Free to do now",
+        "MINE-P0-6",
+        "soft"
+      ]
+    ],
+    "note": "统一Energy Card，不写预测Eat+40，不替玩家吃/休息。零体力仍能离矿、坐电梯，免费支路可退出。",
+    "col": 3,
+    "y": 10890
+  },
+  {
+    "id": "COOK-KEEP-BRANCH",
+    "title": "首锅选择Keep的支路",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "energy": "151",
+    "heading": "Saved for later",
+    "rows": [
+      [
+        "Grilled Crucian ★ Good",
+        "In your bag · +25 Energy",
+        "i-dish-grilled"
+      ]
+    ],
+    "actions": [
+      [
+        "Open bag",
+        "BAG-1-P0"
+      ],
+      [
+        "Back to farm",
+        "TUT-3-END",
+        "soft"
+      ]
+    ],
+    "note": "未Eat则没有+25，不能套用176/213标准路径。Today保留进食提醒；完成观察指标取实际操作。",
+    "col": 4,
+    "y": 10890
+  },
+  {
+    "id": "SAVE-RETRY",
+    "title": "保存失败 · 可恢复",
+    "kind": "look",
+    "scene": "avatar",
+    "heading": "Couldn’t save your look",
+    "meta": "Your preview is still here.",
+    "rows": [
+      [
+        "Try again when connected",
+        "Your previous look is unchanged.",
+        "i-info"
+      ]
+    ],
+    "actions": [
+      [
+        "Retry",
+        "KEEP-P0-2"
+      ],
+      [
+        "Keep editing",
+        "KEEP-P0-1",
+        "soft"
+      ],
+      [
+        "Cancel",
+        "PROFILE-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "网络失败保持预览；Retry幂等保存，只有成功才出Look saved。关闭前Cancel放弃本次预览，不丢旧外观。",
+    "col": 5,
+    "y": 10890
+  },
+  {
+    "id": "BOARD-DROPPED",
+    "title": "放弃成功 · 八小时补位",
+    "scene": "stall",
+    "heading": "Pond Catch · Dropped",
+    "rows": [
+      [
+        "Next request in 8h",
+        "Your fish are still in your bag.",
+        "i-clock"
+      ]
+    ],
+    "actions": [
+      [
+        "Close",
+        "TODAY-1",
+        "soft"
+      ]
+    ],
+    "note": "放弃分支：不加金币、不记一次完成；只该槽进入8h补位，Today移除追踪。",
+    "col": 0,
+    "y": 11900
+  },
+  {
+    "id": "COOK-HERB-HEAT",
+    "title": "香草鱼 · 再做火候",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heat": "Tap when the needle hits gold!",
+    "heading": "Herb Grilled Fish · Cooking",
+    "meta": "Stove 1/1 · 15 s · 2nd today",
+    "rows": [
+      [
+        "Half Cooking XP this time",
+        "Heat moment at 9 s",
+        "i-pot"
+      ]
+    ],
+    "actions": [
+      [
+        "Tap the pot",
+        "COOK-P0-9"
+      ]
+    ],
+    "note": "Cook Again实际仍是香草烤鱼15s、9s火候；不会错误回到烤鲫鱼5s的状态。",
+    "col": 1,
+    "y": 11900
+  },
+  {
+    "id": "MAT-GLOVES-RESULT",
+    "title": "手套制作后 · 增量可见",
+    "scene": "farm",
+    "heading": "Gather Gloves crafted",
+    "rows": [
+      [
+        "Gathering bonus active",
+        "No equipment slot needed.",
+        "i-check"
+      ],
+      [
+        "Next Timber Grove harvest: 7",
+        "6 Timber + 1 from Gather Gloves",
+        "i-wood"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to farm",
+        "MAT-1",
+        "soft"
+      ]
+    ],
+    "note": "制作即被动生效；现有冷却不提前刷新。下一次采集主材料+1，不给蚯蚓副产追加奖励。",
+    "col": 2,
+    "y": 11900
+  },
+  {
+    "id": "FISH-P0-CAST",
+    "title": "到塘 · 抛竿与开局空饵",
+    "kind": "game",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "energy": "161",
+    "coins": "180",
+    "tag": "Creel 0 · 25 free",
+    "banner": "Your creel is your bag: 10 fish per free slot.",
+    "sub": "Casting uses 5 Energy.",
+    "action": "Cast\n5 Energy",
+    "next": "TUT-3-05",
+    "note": "地图Go后真实落点。Fishing自动预选，五个幽灵格，仅鱼饵候选不放鱼竿；按Cast预扣5。",
+    "col": 3,
+    "y": 11900
+  },
+  {
+    "id": "MINE-CONTINUE",
+    "title": "续局 · 原进度恢复",
+    "kind": "game",
+    "scene": "mine",
+    "place": "Mine · Floor 1",
+    "energy": "142",
+    "tag": "Floor 1 · Rocks 4/6",
+    "banner": "Run continued · no Energy used",
+    "sub": "Your cleared rocks stay cleared.",
+    "action": "Mine\n2 Energy",
+    "next": "MINE-P0-3",
+    "note": "从4/6离场恢复4/6，不复活石头、不重收层费；材料回家入库后继续。",
+    "col": 4,
+    "y": 11900
+  },
+  {
+    "id": "BUILD-RETRY",
+    "title": "建场失败 · 保留选择",
+    "scene": "farm",
+    "heading": "Couldn’t create your farm",
+    "meta": "Shanghai · your choice is saved",
+    "body": "Reconnect and try again.",
+    "actions": [
+      [
+        "Try again",
+        "TUT-3-01"
+      ],
+      [
+        "Change city",
+        "TUT-1",
+        "soft"
+      ]
+    ],
+    "note": "建场请求失败保留选择；重复提交必须复用创建幂等标识。未知成功状态先查询，不能生成第二座农场。",
+    "col": 5,
+    "y": 11900
+  },
+  {
+    "id": "PARCEL-ONE",
+    "title": "单件领取后 · 继续领取",
+    "scene": "farm",
+    "heading": "Inbox",
+    "tabs": [
+      "To do",
+      "Parcels 2",
+      "Updates"
+    ],
+    "on": 1,
+    "meta": "Bag 23/25 · 2 slots free · Parcels 2/8",
+    "rows": [
+      [
+        "Claimed · Perch ×7",
+        "1 slot used in your bag",
+        "i-check"
+      ],
+      [
+        "Carrot Seeds ×5 · 12h",
+        "Level-up gift",
+        "i-carrot-seeds"
+      ],
+      [
+        "Worm Bait ×3 · 1h 05m",
+        "Achievement reward",
+        "i-worm",
+        "warm"
+      ]
+    ],
+    "actions": [
+      [
+        "Claim all · 2 slots",
+        "PARCEL-2"
+      ],
+      [
+        "Open bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "单件Claim成功只移除这一包；原3/8→2/8，Bag22→23，另外两件倒计时继续。",
+    "col": 0,
+    "y": 12920
+  }
+]

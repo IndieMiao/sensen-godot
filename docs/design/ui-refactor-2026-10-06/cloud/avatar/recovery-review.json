@@ -1,0 +1,25 @@
+{
+  "id": "SAVE-RETRY",
+  "screenId": "482:320",
+  "draftMaster": "602:37618",
+  "draftInstance": "805:77457",
+  "sameDraftBeforeAfterHide": true,
+  "defaultVisibilityRestored": true,
+  "createdNewMasters": false,
+  "visualStatus": "passed: real Silver Crop full-character draft;failure dialog separates Retry/Keep editing/Discard;hidden dialog returns the same selected Silver Crop with five categories and three columns",
+  "screenshots": [
+    {
+      "file": "recovery-failed.png",
+      "sha256": "d61f201daa410d57bfb1688d06b11c0aff009bfc977d78ca887e7085ee5ae5c8"
+    },
+    {
+      "file": "recovery-keep-editing.png",
+      "sha256": "1de1e22bdc44e46a6742800118faf658de678413d0af4a7c34b95ff9b90266af"
+    }
+  ],
+  "receipts": [
+    "../avatar-recovery-result-1791308250677.json",
+    "recovery-keep-editing-result.json"
+  ],
+  "prototypeClicksTested": false
+}

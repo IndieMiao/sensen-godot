@@ -1,0 +1,48 @@
+{
+  "createdNodeIds": [],
+  "kit": {
+    "Compact/HUD": "633:41154",
+    "Compact/InventoryCell/default": "633:41188",
+    "Compact/InventoryCell/selected": "633:41199",
+    "Compact/InventoryCell/empty": "633:41210",
+    "Compact/QuickSlot/default": "633:41221",
+    "Compact/QuickSlot/selected": "633:41231",
+    "Compact/QuickSlot/empty": "633:41241",
+    "Compact/Filter/default": "633:41251",
+    "Compact/Filter/selected": "633:41254",
+    "Compact/SelectedItem": "633:41257",
+    "Compact/Command": "633:41273",
+    "Compact/Navigation": "633:41276"
+  },
+  "styles": {
+    "compact/10/Bold": "S:10468057d69109a50bd2ffda48217ce9c13c977e,",
+    "compact/10/ExtraBold": "S:3b4974f0914e3f5101f2433d4acbec42393c86af,",
+    "compact/11/Bold": "S:a03e83607574bc0deaa5454b052a2fbea42c8c0f,",
+    "compact/11/ExtraBold": "S:997272bc45475ee4b5ba27f411856fc17be9506e,",
+    "compact/12/Bold": "S:1db15c03658638d40e24547fff743264672a2d4b,",
+    "compact/12/ExtraBold": "S:2b5a9261020ebd86343a7ac8e0a7c848a1421a5a,",
+    "compact/13/Bold": "S:d4804b59dc885cf8c05e4031697b0463ccfa8d9d,",
+    "compact/13/ExtraBold": "S:952b401176b1b7ac28d1f99afdaa529ac3c20f84,",
+    "compact/14/Bold": "S:9f0d5632eb61e47e16618b0231f0e83024651ecc,",
+    "compact/14/ExtraBold": "S:a4d6ab9915c1ad87a5a5d3969bdbe5e3e551fe18,"
+  },
+  "components": {},
+  "componentSets": {},
+  "variables": {
+    "bag/active/All": "VariableID:647:53221",
+    "bag/visible/All": "VariableID:647:53222",
+    "bag/active/Seeds": "VariableID:647:53223",
+    "bag/visible/Seeds": "VariableID:647:53224",
+    "bag/active/Fish": "VariableID:647:53225",
+    "bag/visible/Fish": "VariableID:647:53226",
+    "bag/active/Produce": "VariableID:647:53227",
+    "bag/visible/Produce": "VariableID:647:53228",
+    "bag/active/Dishes": "VariableID:647:53229",
+    "bag/visible/Dishes": "VariableID:647:53230",
+    "bag/active/Materials": "VariableID:647:53231",
+    "bag/visible/Materials": "VariableID:647:53232",
+    "bag/active/Tackle": "VariableID:647:53233",
+    "bag/visible/Tackle": "VariableID:647:53234"
+  },
+  "libraryHeight": 16552
+}

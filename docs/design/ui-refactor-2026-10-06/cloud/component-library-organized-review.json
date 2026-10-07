@@ -1,0 +1,8 @@
+{
+  "receipt": "organize-library-result-1791308126560.json",
+  "screenshot": "component-library-organized.png",
+  "sha256": "bc8df2b55a9ed19bc9c9237bcf5c30da3c56d5372b1d3d7ca96782a9ecac6d25",
+  "visualStatus": "passed: six functional columns, separate real Avatar thumbnails and original fallback icons; full 30-variant wardrobe gallery in 5 columns by 6 rows; no visible overlap",
+  "preservationEvidence": "212 components, 25 sets, 11636 instance references retained at organization; properties unchanged; support frames unchanged; no lane overlaps",
+  "scope": "Organization overview only; individual product screen visual checks are recorded separately."
+}

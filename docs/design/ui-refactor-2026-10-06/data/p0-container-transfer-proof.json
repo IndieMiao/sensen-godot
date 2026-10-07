@@ -1,0 +1,83 @@
+{
+  "source": "current-all.json BAG-1-P0 and STORE-1",
+  "bagTorchStacksBefore": [
+    20,
+    20,
+    20,
+    2
+  ],
+  "storageTorchBefore": 12,
+  "stackCap": 20,
+  "derivedResults": [
+    {
+      "id": "STORE-TORCH-TAKEN-10",
+      "operation": "take-torch",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 62,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          2
+        ],
+        "storageTorch": 12
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 72,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          12
+        ],
+        "storageTorch": 2
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "STORE-TORCH-TAKEN-ALL",
+      "operation": "take-torch",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 62,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          2
+        ],
+        "storageTorch": 12
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 74,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          14
+        ],
+        "storageTorch": 0
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    }
+  ],
+  "noUnshownStockAssumedZero": true,
+  "noRealTransaction": true
+}

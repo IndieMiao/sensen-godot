@@ -1,0 +1,7 @@
+const fs=require('fs'),acorn=require('/tmp/gensen-ui-cloud-build/node_modules/acorn');
+const coreNames=new Set('rgb solid fill border radius bounds frame auto horizontal pad absolute text ctext cvisible propKeys inst inferIcon icon cicon line button heading factNode facts needs semanticRow sectionTitle bytes scroll tabs navAndDetails'.split(' '));
+let out='';for(let i=0;i<process.argv.slice(2).length;i++){const source=fs.readFileSync(process.argv.slice(2)[i],'utf8').split('figma.showUI(__html__')[0],ast=acorn.parse(source,{ecmaVersion:'latest'});for(const n of ast.body){const name=n.type==='FunctionDeclaration'?n.id.name:null,vars=n.type==='VariableDeclaration'?n.declarations.map(x=>x.id.name):[],assigned=n.type==='ExpressionStatement'&&n.expression.type==='AssignmentExpression'?n.expression.left.name:null;
+if(i===0){if(name&&!coreNames.has(name))continue;if(!name&&!vars.some(x=>['T','RUN','W','KIT','LEDGER','PAGE'].includes(x)))continue;}else{if(vars.includes('AVATAR_PREVIOUS_BUILD')||assigned==='buildScreen')continue;}out+=source.slice(n.start,n.end)+'\n';}}
+// Use the MCP's native auto-layout constructor, as required by the Figma skill.
+out=out.replace("function auto(p,name,w,dir='VERTICAL',gap=6,color) {const n=frame(p,name,w,1,color);n.layoutMode=dir;", "function auto(p,name,w,dir='VERTICAL',gap=6,color) {const n=figma.createAutoLayout(dir);n.name=name;n.resize(w,1);fill(n,color);p.appendChild(n);");
+process.stdout.write(out);

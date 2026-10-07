@@ -1,0 +1,50 @@
+{
+  "rebuild": [
+    {
+      "index": 126,
+      "id": "COOK-P0-7"
+    },
+    {
+      "index": 127,
+      "id": "COOK-P0-8"
+    },
+    {
+      "index": 170,
+      "id": "COOK-P1-2"
+    },
+    {
+      "index": 172,
+      "id": "COOK-P1-4"
+    },
+    {
+      "index": 174,
+      "id": "COOK-P1-6"
+    },
+    {
+      "index": 175,
+      "id": "COOK-P1-7"
+    },
+    {
+      "index": 186,
+      "id": "COOK-EMPTY"
+    },
+    {
+      "index": 239,
+      "id": "EXPAND-4"
+    },
+    {
+      "index": 240,
+      "id": "EXPAND-5"
+    }
+  ],
+  "existingMastersOnly": true,
+  "afterRebuildDeltas": [
+    "current-heat-camera-delta.root.js",
+    "current-scene-controls-delta.root.js"
+  ],
+  "frozenAlreadyVerified": [
+    "COOK-2b",
+    "COOK-P0-2"
+  ],
+  "purpose": "Last actual screenshot findings:shared empty slot plus,Compact three-stove row,content-fit kitchen sheets andrestored world controls."
+}

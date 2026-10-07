@@ -1,0 +1,461 @@
+{
+  "schemaVersion": 1,
+  "bundleSha256": "2f98f8d870a60767130a2f8c20aabef00c85b7519cf823078368e2e6eaa8258e",
+  "warningOccurrences": 50,
+  "uniqueScreenActionKindTarget": 36,
+  "classificationSource": "Local build destination warnings;not a cloud click run. Gameplay may be defined even when its illustrative result frame is missing.",
+  "simulationRequiredForDesignReview": false,
+  "noFakeResultPolicy": "Do not wire to different items, repeat rewards, infer unknown inventory or reset resource snapshots.",
+  "groupCounts": {
+    "authored-state-not-simulated": 7,
+    "gameplay-result-not-authored": 21,
+    "account-action-not-simulated": 3,
+    "informational-navigation": 1,
+    "already-open-entry": 4
+  },
+  "groups": {
+    "authored-state-not-simulated": [
+      {
+        "screen": "NPC-1a",
+        "action": "Sit",
+        "kind": "commit",
+        "target": "NPC-1a",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "authored-state-not-simulated",
+        "handoff": "Local control/state change remains an illustrated specimen for this screen; a generic toast or an unrelated page is not treated as the completed state."
+      },
+      {
+        "screen": "NPC-4",
+        "action": "Stop tracking",
+        "kind": "commit",
+        "target": "NPC-4",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "authored-state-not-simulated",
+        "handoff": "Local control/state change remains an illustrated specimen for this screen; a generic toast or an unrelated page is not treated as the completed state."
+      },
+      {
+        "screen": "FARM-7",
+        "action": "Rest",
+        "kind": "commit",
+        "target": "FARM-7",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "authored-state-not-simulated",
+        "handoff": "Local control/state change remains an illustrated specimen for this screen; a generic toast or an unrelated page is not treated as the completed state."
+      },
+      {
+        "screen": "COOK-P0-7",
+        "action": "Remove",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 2,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "authored-state-not-simulated",
+        "handoff": "Local control/state change remains an illustrated specimen for this screen; a generic toast or an unrelated page is not treated as the completed state."
+      },
+      {
+        "screen": "COOK-P0-8",
+        "action": "Remove",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 2,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "authored-state-not-simulated",
+        "handoff": "Local control/state change remains an illustrated specimen for this screen; a generic toast or an unrelated page is not treated as the completed state."
+      },
+      {
+        "screen": "COOK-P1-2",
+        "action": "Remove",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "authored-state-not-simulated",
+        "handoff": "Local control/state change remains an illustrated specimen for this screen; a generic toast or an unrelated page is not treated as the completed state."
+      },
+      {
+        "screen": "COOK-P1-6",
+        "action": "Remove",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "authored-state-not-simulated",
+        "handoff": "Local control/state change remains an illustrated specimen for this screen; a generic toast or an unrelated page is not treated as the completed state."
+      }
+    ],
+    "gameplay-result-not-authored": [
+      {
+        "screen": "COOK-1",
+        "action": "Collect",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 2,
+        "reasons": [
+          "Ready dish is Grilled Crucian; COOK-4 is Herb Grilled Fish. No matching collection outcome was authored, so the unrelated result is not linked.",
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "BAR-1",
+        "action": "Sow ×1",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "FARM-2",
+        "action": "Sow",
+        "kind": "commit",
+        "target": "FARM-2",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "FARM-3",
+        "action": "Harvest",
+        "kind": "commit",
+        "target": "FARM-3",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "FARM-6",
+        "action": "Sell one",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 3,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "FARM-6",
+        "action": "Sell all",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 3,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "FARM-7",
+        "action": "Sow ×1",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "NPC-4",
+        "action": "Deliver",
+        "kind": "commit",
+        "target": "NPC-4",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "NPC-6",
+        "action": "Buy and drink",
+        "kind": "commit",
+        "target": "NPC-6",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "NPC-7",
+        "action": "Craft",
+        "kind": "commit",
+        "target": "NPC-7",
+        "occurrences": 2,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "NPC-7",
+        "action": "Buy",
+        "kind": "commit",
+        "target": "NPC-7",
+        "occurrences": 2,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "BAG-5-2",
+        "action": "Sow",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "FARM-4",
+        "action": "Pick",
+        "kind": "commit",
+        "target": "FARM-4",
+        "occurrences": 2,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "MINE-1",
+        "action": "Mine",
+        "kind": "commit",
+        "target": "MINE-1",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "SOC-4",
+        "action": "Claim",
+        "kind": "commit",
+        "target": "SOC-4",
+        "occurrences": 5,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "SOC-4",
+        "action": "Claim all",
+        "kind": "commit",
+        "target": "SOC-4",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "PARCEL-6",
+        "action": "Sow ×1",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "TICKET-1",
+        "action": "Craft",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "BUFF-ACTIVE",
+        "action": "Sow",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "BUFF-TIMEOUT",
+        "action": "Sow",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      },
+      {
+        "screen": "MINE-3",
+        "action": "Mine",
+        "kind": "commit",
+        "target": null,
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "gameplay-result-not-authored",
+        "handoff": "Exact same-item resulting resources/state are not authored for this legacy/example action. The control is not linked to a false success or unrelated reward."
+      }
+    ],
+    "account-action-not-simulated": [
+      {
+        "screen": "SETTINGS-1",
+        "action": "Toggle",
+        "kind": "commit",
+        "target": "SETTINGS-1",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "account-action-not-simulated",
+        "handoff": "Settings/account action is illustrated; the static design does not toggle live preferences, sign out or delete accounts."
+      },
+      {
+        "screen": "SETTINGS-1",
+        "action": "Sign out",
+        "kind": "destructive",
+        "target": "SETTINGS-1",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "account-action-not-simulated",
+        "handoff": "Settings/account action is illustrated; the static design does not toggle live preferences, sign out or delete accounts."
+      },
+      {
+        "screen": "SETTINGS-1",
+        "action": "Delete account",
+        "kind": "destructive",
+        "target": "SETTINGS-1",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "account-action-not-simulated",
+        "handoff": "Settings/account action is illustrated; the static design does not toggle live preferences, sign out or delete accounts."
+      }
+    ],
+    "informational-navigation": [
+      {
+        "screen": "SOC-4",
+        "action": "Expiry rules",
+        "kind": "navigate",
+        "target": "SOC-4",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "informational-navigation",
+        "handoff": "Information entry is shown, but this exact explanatory overlay or destination has not been authored; no execution outcome is substituted."
+      }
+    ],
+    "already-open-entry": [
+      {
+        "screen": "TODAY-1",
+        "action": "Today",
+        "kind": "navigate",
+        "target": "TODAY-1",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "already-open-entry",
+        "handoff": "The current page is already the requested destination. No self-navigation or resource change is needed."
+      },
+      {
+        "screen": "PARCEL-1",
+        "action": "Inbox",
+        "kind": "navigate",
+        "target": "PARCEL-1",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "already-open-entry",
+        "handoff": "The current page is already the requested destination. No self-navigation or resource change is needed."
+      },
+      {
+        "screen": "ENERGY-P0-1",
+        "action": "Energy",
+        "kind": "navigate",
+        "target": "ENERGY-P0-1",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "already-open-entry",
+        "handoff": "The current page is already the requested destination. No self-navigation or resource change is needed."
+      },
+      {
+        "screen": "MAP-2-FREE",
+        "action": "Location",
+        "kind": "navigate",
+        "target": "MAP-2-FREE",
+        "occurrences": 1,
+        "reasons": [
+          "No valid outcome frame; no fake success was wired."
+        ],
+        "classification": "already-open-entry",
+        "handoff": "The current page is already the requested destination. No self-navigation or resource change is needed."
+      }
+    ]
+  }
+}

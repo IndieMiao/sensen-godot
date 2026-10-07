@@ -1,0 +1,471 @@
+{
+  "authoritativeRules": [
+    {
+      "source": "§6.4 fish_crucian",
+      "rule": "Direct price3; Tackle floor(3×0.8)=2."
+    },
+    {
+      "source": "§9.11.3 rod_reed",
+      "rule": "80 coins, Fishing Lv3, owned in Tools & Gear; no bag slot."
+    },
+    {
+      "source": "§4.6.1",
+      "rule": "Buy Reed Rod, then equip it in Fishing slot; not automatically equipped."
+    },
+    {
+      "source": "§5.1 crop_sweet_potato + §9.13.1",
+      "rule": "Direct price10; regional buyback8, quota60/city/day."
+    },
+    {
+      "source": "§9.6.4–9.5.3",
+      "rule": "Track adds to Today; max3, protected from batch sales. Tracking spends no resources."
+    },
+    {
+      "source": "§10.5",
+      "rule": "One equipped rod; changing equipment uses no Energy, keeps both owned rods, does not occupy Bag slots."
+    },
+    {
+      "source": "BAG-1.html Timber20 + BAG-2-2.html storageTimber99 + §10.4.8 stack99",
+      "rule": "Continuous Bag/Gear/Materials navigation preserves known20 in Bag; missing filtered cell was not evidence of0. Take10 merges20→30 with19 slots; Take99 gives119 across99+20,20 slots. Materials view must restore its missing BagTimber20 cell."
+    }
+  ],
+  "states": [
+    {
+      "id": "NPC-REED-BOUGHT",
+      "operation": "buy-reed-rod",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "bagCapacity": 25,
+        "ownedReedRod": false,
+        "equippedRod": "Starter Rod"
+      },
+      "after": {
+        "coins": 150,
+        "energy": 142,
+        "bagUsed": 19,
+        "bagCapacity": 25,
+        "ownedReedRod": true,
+        "equippedRod": "Starter Rod"
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "NPC-CRUCIAN-SOLD-ONE",
+      "operation": "sell-one",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 3,
+        "buybackUsed": 30,
+        "buybackLimit": 80
+      },
+      "after": {
+        "coins": 232,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 2,
+        "buybackUsed": 32,
+        "buybackLimit": 80
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "NPC-CRUCIAN-SOLD-ALL",
+      "operation": "sell-all",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 3,
+        "buybackUsed": 30,
+        "buybackLimit": 80
+      },
+      "after": {
+        "coins": 236,
+        "energy": 142,
+        "bagUsed": 18,
+        "owned": 0,
+        "buybackUsed": 36,
+        "buybackLimit": 80
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "NPC-DUSK-TRACKED",
+      "operation": "track",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "requestState": "Open",
+        "fineFishHave": 1,
+        "fineFishNeed": 4,
+        "requestsCompleted": 4
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "requestState": "Tracked",
+        "fineFishHave": 1,
+        "fineFishNeed": 4,
+        "requestsCompleted": 4
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "NPC-SWEET-POTATO-SOLD-ONE",
+      "operation": "sell-one",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 12,
+        "buybackUsed": 24,
+        "buybackLimit": 60,
+        "unitPrice": 8
+      },
+      "after": {
+        "coins": 238,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 11,
+        "buybackUsed": 32,
+        "buybackLimit": 60,
+        "unitPrice": 8
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "GEAR-REED-EQUIPPED",
+      "operation": "gear-reed-equipped",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 19,
+        "equippedRod": "Starter Rod",
+        "ownsReedRod": true
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 19,
+        "equippedRod": "Reed Rod",
+        "ownsStarterRod": true
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "STORAGE-TIMBER-TAKEN-10",
+      "operation": "storage-timber-taken-10",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 19,
+        "bagTimber": 20,
+        "storageTimber": 99,
+        "bagTimberStacks": [
+          20
+        ]
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 19,
+        "bagTimber": 30,
+        "storageTimber": 89,
+        "bagTimberStacks": [
+          30
+        ]
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "STORAGE-TIMBER-TAKEN-ALL",
+      "operation": "storage-timber-taken-all",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 19,
+        "bagTimber": 20,
+        "storageTimber": 99,
+        "bagTimberStacks": [
+          20
+        ]
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 20,
+        "bagTimber": 119,
+        "storageTimber": 0,
+        "bagTimberStacks": [
+          99,
+          20
+        ]
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "STORE-TORCH-TAKEN-10",
+      "operation": "take-torch",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 62,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          2
+        ],
+        "storageTorch": 12
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 72,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          12
+        ],
+        "storageTorch": 2
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "STORE-TORCH-TAKEN-ALL",
+      "operation": "take-torch",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 62,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          2
+        ],
+        "storageTorch": 12
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 74,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          14
+        ],
+        "storageTorch": 0
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "STALL-RADISH-SEEDS-BOUGHT",
+      "operation": "buy-seeds",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 24
+      },
+      "after": {
+        "coins": 222,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 26
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "STALL-RADISH-SOLD-ONE",
+      "operation": "sell-crop",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 12
+      },
+      "after": {
+        "coins": 235,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 11
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "STALL-RADISH-SOLD-ALL",
+      "operation": "sell-crop",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 12
+      },
+      "after": {
+        "coins": 290,
+        "energy": 142,
+        "bagUsed": 18,
+        "owned": 0
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "COOK-FINE-EATEN",
+      "operation": "eat-dish",
+      "before": {
+        "energy": 142,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 1,
+        "mealsToday": null
+      },
+      "after": {
+        "energy": 187,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 0,
+        "mealsToday": null
+      },
+      "mealsAllowanceDelta": 45,
+      "firstServingFixture": true,
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "COOK-MYSTERY-EATEN",
+      "operation": "eat-dish",
+      "before": {
+        "energy": 142,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 1,
+        "mealsToday": null
+      },
+      "after": {
+        "energy": 147,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 0,
+        "mealsToday": null
+      },
+      "mealsAllowanceDelta": 5,
+      "firstServingFixture": true,
+      "serverTransaction": false,
+      "prototypeOnly": true
+    }
+  ],
+  "sourceCorrections": [
+    {
+      "screens": [
+        "NPC-2",
+        "NPC-3"
+      ],
+      "item": "Sweet Potato Seeds",
+      "before": "Buy enabled; source Apple Lv7 says3 levels to go (Farming4)",
+      "after": "Farming Lv5; blocked with next-step toast",
+      "rules": [
+        "§5.2",
+        "§9.11.2"
+      ]
+    },
+    {
+      "screens": [
+        "NPC-2",
+        "NPC-3"
+      ],
+      "item": "Orchard Feed",
+      "before": "Buy enabled at Farming4 and no level gate",
+      "after": "Farming Lv7; regrow time -50%; blocked",
+      "rules": [
+        "§5.6",
+        "§9.11.2"
+      ]
+    },
+    {
+      "screens": [
+        "NPC-2-2"
+      ],
+      "item": "Spinner Lure",
+      "before": "Buy enabled at Fishing4; faster bites3 casts",
+      "after": "Fishing Lv5; Rare bites +15%, regional fish weight×2; blocked",
+      "rules": [
+        "§6.7",
+        "§9.11.3"
+      ]
+    },
+    {
+      "screens": [
+        "NPC-3",
+        "NPC-3-2"
+      ],
+      "item": "Sweet Potato",
+      "before": "5 coins and quota80",
+      "after": "8 coins and quota60; Sell all12 would need96 vs36 remaining",
+      "rules": [
+        "§5.1",
+        "§9.13.1"
+      ]
+    }
+  ],
+  "unresolved": [
+    {
+      "screen": "NPC-4",
+      "action": "Stop tracking Morning Greens",
+      "reason": "OldHTML exposes Stop tracking; §9.6 only defines Track/Deliver/Drop and Drop causes8h replacement. Whether untracking without dropping is supported is not explicit."
+    },
+    {
+      "screen": "NPC-4",
+      "action": "Deliver Harbor Lunch",
+      "reason": "Old three-card MarketBoard contradicts two-slot rule, and40coin reward for2FisherStew conflicts with current recipe recovery/reward tables. Dish quality and completion-bonus remaining are absent. No invented settlement."
+    },
+    {
+      "screen": "NPC-3",
+      "action": "Sell all",
+      "reason": "All12 cannot fit remaining regional quota. Explicit feedback blocks whole request; no silent partial sell or unknown protected-item exception."
+    }
+  ],
+  "newPrimaryCount": 0,
+  "additionalPrototypeStates": 15,
+  "resolvedSourceReplacements": {
+    "Fisher’s Stew recipe200": "Removed invalidMarket item,substitutedcurrentv2SweetPotatoCakesLegendaryRecipeCard500. See market-recipe-correction.json."
+  },
+  "crossReferencedProofs": [
+    "p0-container-transfer-proof.json",
+    "legacy-eating-result-proof.json",
+    "homestead-stall-proof.json"
+  ]
+}

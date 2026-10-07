@@ -1,0 +1,47 @@
+[
+  {
+    "file": "row-01.png",
+    "sha256": "e74c68beaca26bb5ee1e86d911c2f2f00dcbbed3807c165d82cf62cbabe7005d",
+    "bytes": 1680390
+  },
+  {
+    "file": "row-01-a.png",
+    "sha256": "5515938dd0d67f66adeaf608ff479394b8a226ee8432126a7631746925b53956",
+    "bytes": 1255221
+  },
+  {
+    "file": "row-01-b.png",
+    "sha256": "512f93294816d56ec2b6832d153348a38cabb8e8425351150c165843d9ec71a7",
+    "bytes": 770884
+  },
+  {
+    "file": "row-02.png",
+    "sha256": "401b34f7f08c67a795b847f4226295f6df0e86423515a145ce9f40ae2ffe7cf2",
+    "bytes": 1126285
+  },
+  {
+    "file": "row-02-a.png",
+    "sha256": "d55a4b65b9871600d4d07d1c13ba4ac180aeafa421be9b92d172702bcc66f1b1",
+    "bytes": 711026
+  },
+  {
+    "file": "row-02-b.png",
+    "sha256": "bb68a9347bcf05ae31a8d173cd03fddb639fb0208d12bbc23d63fe593a50387b",
+    "bytes": 668199
+  },
+  {
+    "file": "row-03.png",
+    "sha256": "142b1a5bd0ffd7e8e07f21b8bf599a0108a4aebbc4c6c3d8e142a533ec0ac6b7",
+    "bytes": 1450359
+  },
+  {
+    "file": "row-03-a.png",
+    "sha256": "4c70d992fb3e5c361a9267317671567c14e9991cfc6d871e130f98485eb5d063",
+    "bytes": 1065893
+  },
+  {
+    "file": "row-03-b.png",
+    "sha256": "804cc6a6d33781a017d45d3d2bd812569e0702fa4dba00e60b20048cc2548c27",
+    "bytes": 708826
+  }
+]

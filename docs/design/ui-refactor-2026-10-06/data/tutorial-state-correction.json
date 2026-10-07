@@ -1,0 +1,19 @@
+{
+  "changedAt": "2026-10-06T09:43:14.306546+00:00",
+  "ids": [
+    "TUT-3-07B",
+    "TUT-3-07C",
+    "TUT-3-08",
+    "TUT-3-09",
+    "TUT-3-10",
+    "TUT-3-11",
+    "TUT-3-12",
+    "TUT-3-END"
+  ],
+  "source": "Gameplay baseline 14.2 first-session director table, 14–16 minute row: wallet194 after +14 coins; Meals today25/300 is after Eat.",
+  "changes": [
+    "Set the post-delivery tutorial HUD to194coins explicitly, so missing fields do not inherit unrelated230coin defaults.",
+    "Label25/300 as Meals after eating on the pre-Eat result card."
+  ],
+  "originalSnapshotsPreserved": true
+}

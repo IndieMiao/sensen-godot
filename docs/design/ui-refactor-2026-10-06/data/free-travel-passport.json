@@ -1,0 +1,53 @@
+{
+  "id": "PASS-1",
+  "sourceGroup": "09",
+  "title": "Passport",
+  "state": "Collection",
+  "effect": "Browse your visited cities and stamps.",
+  "keyFacts": [
+    {
+      "kind": "progress",
+      "label": "Cities visited",
+      "value": "2"
+    },
+    {
+      "kind": "progress",
+      "label": "First visits today",
+      "value": "1/2"
+    }
+  ],
+  "requirements": [],
+  "supporting": "",
+  "disclosure": [
+    "Viewing this Passport does not spend or grant resources."
+  ],
+  "actions": [
+    {
+      "label": "Close",
+      "kind": "dismiss"
+    }
+  ],
+  "rows": [
+    {
+      "title": "Shanghai",
+      "state": "Home",
+      "effect": "Your home city",
+      "keyFacts": [],
+      "disclosure": [],
+      "icon": "i-home"
+    },
+    {
+      "title": "Tokyo",
+      "state": "Visited",
+      "effect": "A new connection",
+      "keyFacts": [],
+      "disclosure": [],
+      "icon": "i-stamp"
+    }
+  ],
+  "items": [],
+  "sourceNote": "此版只画免费旅行的可用章页；第二故乡设定在收费扩展。地图Me仍Profile入口，再进Collections/Passport。",
+  "reviewOnly": false,
+  "reviewActions": [],
+  "unresolvedRules": []
+}

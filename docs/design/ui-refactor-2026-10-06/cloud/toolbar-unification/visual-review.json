@@ -1,0 +1,1488 @@
+{
+  "schema": "gensen.toolbar.visual-review.v1",
+  "reviewedAt": "2026-10-07T00:38:31.668760+00:00",
+  "reviewer": "normalize_legacy",
+  "scope": "40 main-screen toolbar compositions, 200 item slots, 40 Bag/Close tails. Does not claim full game flow acceptance or every overlay interaction.",
+  "method": "All 40 screenshots opened individually and inspected visually. Latest corrected HUD-1, BAR-1, FARM-3, FISH-4 and BAG-5-2 re-opened after fixes.",
+  "result": {
+    "reviewed": 40,
+    "passed": 40,
+    "failed": 0,
+    "pending": 0,
+    "itemSlots": 200,
+    "tailControls": 40
+  },
+  "resolvedFindings": [
+    {
+      "screenId": "HUD-1",
+      "issue": "Bag right edge clipped by 328px stage around a 336px toolbar",
+      "resolution": "Stage expanded; full Bag tail visible in latest screenshot."
+    },
+    {
+      "screenId": "BAR-1",
+      "issue": "Pin state needed stronger source-consistent visual signal",
+      "resolution": "Warm body, top stripe and pin markers visible after update."
+    },
+    {
+      "screenId": "FARM-3",
+      "issue": "Harvest incorrectly labeled 2 Energy",
+      "resolution": "Free verified against source and gameplay §10.2.2."
+    },
+    {
+      "screenId": "FISH-4",
+      "issue": "Full creel still showed ordinary Cast price",
+      "resolution": "Creel full and capacity dot verified."
+    },
+    {
+      "screenId": "BAG-5-2",
+      "issue": "Missing Bag capacity warning while full",
+      "resolution": "Warning dot visible."
+    },
+    {
+      "screenId": "PARCEL-6 / LOCAL-FISH",
+      "issue": "Active action modes had only Bag instead of five empty slots plus Bag",
+      "resolution": "Both missing empty toolbars added without invented inventory."
+    }
+  ],
+  "screens": [
+    {
+      "screenId": "FARM-1",
+      "screenNodeId": "482:4",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/FARM-1-after.png",
+      "sha256": "02b34d56d3a6da6240fc045709ed935ce04e2ed8cc833486432d5d40d3d77316",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "FISH-1",
+      "screenNodeId": "482:6",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/FISH-1-after.png",
+      "sha256": "5e242740c64113a0037fb7e63290d3e9cabfe308d2b4f4d25a6d76884debb28e",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Worm Bait",
+          "quantity": "×12",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Spinner Lure",
+          "quantity": "×3",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Fish Trap",
+          "quantity": "×1",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "BAG-1",
+      "screenNodeId": "482:10",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BAG-1-after.png",
+      "sha256": "ffdb610c794bbd2814a658c80ca1099cec36babbe89a8cb6489b7bdab5365924",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Close",
+      "notes": []
+    },
+    {
+      "screenId": "BAG-3",
+      "screenNodeId": "482:12",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BAG-3-after.png",
+      "sha256": "42efba235642483b5735c44347b63b2428d0b28fb92c7954e699883ce69c05f3",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Close",
+      "notes": []
+    },
+    {
+      "screenId": "BAG-4",
+      "screenNodeId": "482:14",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BAG-4-after.png",
+      "sha256": "ad3a06e418d5c15989784d1690c021640fd867008b1c30558b76755208ac3e6f",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Pumpkin Seeds",
+          "quantity": "×4",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Close",
+      "notes": [
+        "Pumpkin Seeds ×4 remains the third target slot; Compost ×6 remains a separate drag preview."
+      ]
+    },
+    {
+      "screenId": "BAR-1",
+      "screenNodeId": "482:18",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BAR-1-after.png",
+      "sha256": "c4877f2fbad57717f1d8e2d95475d3dbab50a39464f930e7d10b0d3dbb040b48",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": true
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": true
+        },
+        {
+          "title": "Pumpkin Seeds",
+          "quantity": "×4",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": [
+        "Final recheck: two pinned slots show warm background, top stripe and pin badge; selected Radish remains distinct."
+      ]
+    },
+    {
+      "screenId": "BAR-2",
+      "screenNodeId": "482:23",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BAR-2-after.png",
+      "sha256": "5c4015035c81b472ca7ea45cca70e05684c0d2b85443d617b2188aa0f8e08d1d",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "BAR-3-2",
+      "screenNodeId": "482:27",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BAR-3-2-after.png",
+      "sha256": "3e5d72809d66155b408e6e7b8056dfca0a610b6cbbb40659ab2e0d4927a696d9",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "HUD-1",
+      "screenNodeId": "482:33",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/HUD-1-after.png",
+      "sha256": "e8b3d7d0354961874ff602d78838f77a74df1b73083ebb716321e5119b6bac31",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": [
+        "Final recheck: complete Bag tail and right corner now visible after stage width correction. Reference sample is illustrative, not gameplay inventory."
+      ]
+    },
+    {
+      "screenId": "FARM-2",
+      "screenNodeId": "482:42",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/FARM-2-after.png",
+      "sha256": "8b3933c44273d3161110ebfcf0a8e4c828597069dbb5d5144f44ee9ee4b06926",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "FARM-3",
+      "screenNodeId": "482:44",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/FARM-3-after.png",
+      "sha256": "80b44138a5a09c0e42dfae2224a9977029bd5c12372c6b3c189b176377239273",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": [
+        "Final recheck: Harvest cost corrected to Free."
+      ]
+    },
+    {
+      "screenId": "FARM-7",
+      "screenNodeId": "482:50",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/FARM-7-after.png",
+      "sha256": "07b8f2a622bb27a45af4d7a781105a29405d92d7f0c4930c83d9e80356088ba1",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "FISH-3",
+      "screenNodeId": "482:57",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/FISH-3-after.png",
+      "sha256": "b4894ae4c8fe0a537b558d58d89b3b9a2a580d9fea14e38ff45e8320c21e6e76",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Worm Bait",
+          "quantity": "×12",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Spinner Lure",
+          "quantity": "×3",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Fish Trap",
+          "quantity": "×1",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "FISH-4",
+      "screenNodeId": "482:59",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/FISH-4-after.png",
+      "sha256": "273c27ce42561136562873a30cf072d415a5092841624d13f9343acbd25f16d6",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Worm Bait",
+          "quantity": "×12",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Spinner Lure",
+          "quantity": "×3",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Fish Trap",
+          "quantity": "×1",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": [
+        "Final recheck: Cast shows Creel full; Bag capacity warning dot visible."
+      ]
+    },
+    {
+      "screenId": "BAG-2",
+      "screenNodeId": "482:140",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BAG-2-after.png",
+      "sha256": "caa18cc9d58b8716e535726718a97ee0fee7c91fe246cae43dea2a849434913d",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Close",
+      "notes": []
+    },
+    {
+      "screenId": "BAG-2-2",
+      "screenNodeId": "482:142",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BAG-2-2-after.png",
+      "sha256": "c626c496380f36e7bd6b706c5a7c2fe6708d42d36ece050c850181076f07a5b0",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Close",
+      "notes": []
+    },
+    {
+      "screenId": "BAG-5",
+      "screenNodeId": "482:144",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BAG-5-after.png",
+      "sha256": "167a9c6841e799f29946316edb4020e6bca2a3accfb5b2cc688a6e5fb5605d8d",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Close",
+      "notes": []
+    },
+    {
+      "screenId": "BAG-5-2",
+      "screenNodeId": "482:146",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BAG-5-2-after.png",
+      "sha256": "982f0aff51f25964d3e6e28cefc3adbb7d9375ff34af1d2a8c895f1a127c4a09",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": [
+        "Final recheck: full Bag warning dot visible; Perch ×7 stays a separate Inbox parcel."
+      ]
+    },
+    {
+      "screenId": "FARM-4",
+      "screenNodeId": "482:148",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/FARM-4-after.png",
+      "sha256": "302f0336bba8c45bce65b9c193daeba392a618b45f3e6ae6eb41a3e65c7d275e",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "MINE-1",
+      "screenNodeId": "482:159",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/MINE-1-after.png",
+      "sha256": "f8e54ebbff43d1e2f05b128cc03da4ec3bbfbbc52968abb2cc404bdd6177ca65",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Torch",
+          "quantity": "×8",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "TUT-3-01",
+      "screenNodeId": "482:186",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/TUT-3-01-after.png",
+      "sha256": "4ddd53ad682358d440ca0f98bbd12da4ec52a8fd293497864663165e58d9349c",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×20",
+          "selected": true,
+          "pinned": false
+        },
+        {
+          "title": "Lettuce Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "TUT-3-02",
+      "screenNodeId": "482:188",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/TUT-3-02-after.png",
+      "sha256": "704f5e8d6b29a16cb6be239a3c92208d6ecd873f929e2250d2d11a9cd76e8c2f",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×0",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Lettuce Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": [
+        "Radish Seeds ×0 is visible and separate from Lettuce Seeds ×10."
+      ]
+    },
+    {
+      "screenId": "TUT-3-08",
+      "screenNodeId": "482:208",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/TUT-3-08-after.png",
+      "sha256": "a899a7ad8245ceea3bbd825b8a757084e19f33ab18307905b9dcb2110b60138a",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Lettuce Seeds",
+          "quantity": "×10",
+          "selected": true,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "MINE-P0-1",
+      "screenNodeId": "482:227",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/MINE-P0-1-after.png",
+      "sha256": "9316e12ded2a4bb0b369f85386f03764ba4e845608e56598b381d14ffae696db",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "MINE-P0-2",
+      "screenNodeId": "482:229",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/MINE-P0-2-after.png",
+      "sha256": "486d485c4daf314ad3c881dd48b0f8ca1bdc098f14a1f961bffb11c56b96210c",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Torch",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "MINE-P0-4",
+      "screenNodeId": "482:233",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/MINE-P0-4-after.png",
+      "sha256": "cdd4e83c4fd75c44472707f36aac737802dac8a4d1e84da05bd65568dd5204ee",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Torch",
+          "quantity": "×2",
+          "selected": true,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "GEAR-P0-1",
+      "screenNodeId": "482:252",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/GEAR-P0-1-after.png",
+      "sha256": "43c0248e69adf68e2324eac17299c159eb93b2dedef3beeeea0301e8397a23ab",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [],
+      "endAction": "Close",
+      "notes": []
+    },
+    {
+      "screenId": "GEAR-P0-2",
+      "screenNodeId": "482:254",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/GEAR-P0-2-after.png",
+      "sha256": "c1ab4fe451cc5463f38c86a4e4a65a34be1f41a6046101729a17b66ba1249154",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [],
+      "endAction": "Close",
+      "notes": []
+    },
+    {
+      "screenId": "BAG-1-P0",
+      "screenNodeId": "482:295",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BAG-1-P0-after.png",
+      "sha256": "96c7d1be71c592b6f916bb56982334e10ed2421f936359ae73f5fed8edd477bd",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [],
+      "endAction": "Close",
+      "notes": []
+    },
+    {
+      "screenId": "FISH-P0-CAST",
+      "screenNodeId": "482:329",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/FISH-P0-CAST-after.png",
+      "sha256": "be441846e40c97310306547891e2b7391372500941e7b2098330bf081307bef7",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "MINE-CONTINUE",
+      "screenNodeId": "482:331",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/MINE-CONTINUE-after.png",
+      "sha256": "88c23c5572299d2e71bad06278f976315514d70ec0c4d7797d8dc5daad922b50",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "TRAP-2",
+      "screenNodeId": "482:352",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/TRAP-2-after.png",
+      "sha256": "5355b64174458a5476e815ccc01969fc94121e336c19c8925a6be739b6d33360",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Fish Trap",
+          "quantity": "×1",
+          "selected": true,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "BUFF-ACTIVE",
+      "screenNodeId": "482:533",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BUFF-ACTIVE-after.png",
+      "sha256": "70322a6e28691aefc28d836c4ecdf29ef5230314edf33c68c5922be9807b6d18",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": [
+        "Quantities are authorized design examples with provenance in source-expectations.json; no Buff consumption or actual inventory claim."
+      ]
+    },
+    {
+      "screenId": "BUFF-CASTS",
+      "screenNodeId": "482:535",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BUFF-CASTS-after.png",
+      "sha256": "bf9fdc42bd71486b6dd407ce9cd7f077852c39146bc58662496568433e4107a5",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Worm Bait",
+          "quantity": "×12",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Spinner Lure",
+          "quantity": "×3",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Fish Trap",
+          "quantity": "×1",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": [
+        "Quantities are authorized design examples with provenance in source-expectations.json; no Buff consumption or actual inventory claim."
+      ]
+    },
+    {
+      "screenId": "BUFF-LAST",
+      "screenNodeId": "482:537",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BUFF-LAST-after.png",
+      "sha256": "6346826f7c9746bdf63e806568268bb1ec6210eedb876f3d631465cebb8413c0",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Worm Bait",
+          "quantity": "×12",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Spinner Lure",
+          "quantity": "×3",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Fish Trap",
+          "quantity": "×1",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": [
+        "Quantities are authorized design examples with provenance in source-expectations.json; no Buff consumption or actual inventory claim."
+      ]
+    },
+    {
+      "screenId": "BUFF-TIMEOUT",
+      "screenNodeId": "482:539",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/BUFF-TIMEOUT-after.png",
+      "sha256": "b455f8a4c9345e1527760f8c36e1e2861dbb6dabf8ef3242da179e95111e1f37",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Radish Seeds",
+          "quantity": "×24",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Carrot Seeds",
+          "quantity": "×10",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Compost",
+          "quantity": "×6",
+          "selected": false,
+          "pinned": false
+        },
+        {
+          "title": "Orchard Feed",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": [
+        "Quantities are authorized design examples with provenance in source-expectations.json; no Buff consumption or actual inventory claim."
+      ]
+    },
+    {
+      "screenId": "MINE-3",
+      "screenNodeId": "482:560",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/MINE-3-after.png",
+      "sha256": "38e3e318361756046301f1c83b4b9e01be88a27554ed9f30409ec4082e04e31a",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "COMBAT-1",
+      "screenNodeId": "482:562",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/COMBAT-1-after.png",
+      "sha256": "b1e485367f6766f4fb5fbec9bdb699fa9e0c126c1655249ed33dffa4d41d67ac",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [
+        {
+          "title": "Healing Potion",
+          "quantity": "×2",
+          "selected": false,
+          "pinned": false
+        }
+      ],
+      "endAction": "Bag",
+      "notes": []
+    },
+    {
+      "screenId": "PARCEL-6",
+      "screenNodeId": "482:307",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/PARCEL-6-after.png",
+      "sha256": "9510672e8a5b938bda1a49530864e55057a78b0a139ed2b5fb8547ab0e82a18a",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [],
+      "endAction": "Bag",
+      "notes": [
+        "Missing toolbar added with five empty slots plus Bag; no inventory invented."
+      ]
+    },
+    {
+      "screenId": "LOCAL-FISH",
+      "screenNodeId": "482:416",
+      "screenshot": "docs/design/ui-refactor-2026-10-06/cloud/toolbar-unification/LOCAL-FISH-after.png",
+      "sha256": "9c8a70e22e0dc9f739bb485c1b1f161a2f38992a440ba645fb9d7ab6543a6572",
+      "method": "Image opened and visually inspected at native 360×800; not inferred from structural checks.",
+      "status": "pass",
+      "checks": {
+        "fiveItemSlotsAndCorrectTail": true,
+        "allOccupiedNamesVisible": true,
+        "allOccupiedQuantitiesVisible": true,
+        "nameAndQuantityDoNotOverlap": true,
+        "noToolbarClipping": true,
+        "emptySlotsDoNotInventItemsOrCounts": true,
+        "selectedAndPinnedStatesMatchReviewedExpectation": true
+      },
+      "visibleExpectedItems": [],
+      "endAction": "Bag",
+      "notes": [
+        "Missing toolbar added with five empty slots plus Bag; Cast remains 5 Energy."
+      ]
+    }
+  ]
+}

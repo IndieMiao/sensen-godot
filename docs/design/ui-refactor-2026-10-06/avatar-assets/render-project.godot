@@ -1,0 +1,18 @@
+config_version=5
+[application]
+config/name="Gensen Avatar Design Render"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="/tmp/gensen-avatar-design-user"
+[autoload]
+Avatar="*res://modules/avatar/avatar_service.gd"
+[display]
+window/size/viewport_width=480
+window/size/viewport_height=600
+window/size/window_width_override=480
+window/size/window_height_override=600
+[rendering]
+renderer/rendering_method="mobile"
+renderer/rendering_method.mobile="mobile"
+textures/default_filters/use_nearest_mipmap_filter=false
+[debug]
+file_logging/enable_file_logging=false

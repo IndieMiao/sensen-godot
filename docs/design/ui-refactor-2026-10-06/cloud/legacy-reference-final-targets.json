@@ -1,0 +1,107 @@
+{
+  "reason": "Dynamic reference title/scope positioning and neutral reference canvas; explicit status variant icons; precise known material assets.",
+  "targets": [
+    {
+      "index": 14,
+      "id": "HUD-1",
+      "nodeId": "482:33"
+    },
+    {
+      "index": 15,
+      "id": "HUD-1-2",
+      "nodeId": "482:35"
+    },
+    {
+      "index": 16,
+      "id": "CTRL-1",
+      "nodeId": "482:38"
+    },
+    {
+      "index": 17,
+      "id": "CTRL-1-2",
+      "nodeId": "482:40"
+    },
+    {
+      "index": 23,
+      "id": "FARM-7-2",
+      "nodeId": "482:52"
+    },
+    {
+      "index": 24,
+      "id": "FISH-2",
+      "nodeId": "482:55"
+    },
+    {
+      "index": 28,
+      "id": "FISH-5-2",
+      "nodeId": "482:63"
+    },
+    {
+      "index": 30,
+      "id": "SKILL-3-2",
+      "nodeId": "482:67"
+    },
+    {
+      "index": 32,
+      "id": "TUT-2",
+      "nodeId": "482:72"
+    },
+    {
+      "index": 34,
+      "id": "COOK-2a-2",
+      "nodeId": "482:76"
+    },
+    {
+      "index": 36,
+      "id": "COOK-2b-2",
+      "nodeId": "482:80"
+    },
+    {
+      "index": 38,
+      "id": "COOK-3-2",
+      "nodeId": "482:84"
+    },
+    {
+      "index": 42,
+      "id": "COOK-7-2",
+      "nodeId": "482:93"
+    },
+    {
+      "index": 58,
+      "id": "NPC-4-2",
+      "nodeId": "482:127"
+    },
+    {
+      "index": 62,
+      "id": "NPC-6-2",
+      "nodeId": "482:135"
+    },
+    {
+      "index": 81,
+      "id": "NEED-TILE",
+      "nodeId": "482:176"
+    },
+    {
+      "index": 82,
+      "id": "STATE-ICONS",
+      "nodeId": "482:178"
+    },
+    {
+      "index": 83,
+      "id": "OUTPOST-DIAGRAM",
+      "nodeId": "482:180"
+    }
+  ],
+  "playableBottomSafeTargets": [
+    {
+      "index": 0,
+      "id": "FARM-1",
+      "nodeId": "482:4"
+    },
+    {
+      "index": 1,
+      "id": "FISH-1",
+      "nodeId": "482:6"
+    }
+  ]
+}

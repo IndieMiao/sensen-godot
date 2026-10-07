@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "bundleSha256": "2f98f8d870a60767130a2f8c20aabef00c85b7519cf823078368e2e6eaa8258e",
+  "zip": "gensen-ui-refactor-plugin.zip",
+  "zipBytes": 6697170,
+  "zipSha256": "9c2a9c1c8200bde8b5160aceb64ee7b2e852f46e675a1050c1dcf9fa1416933e",
+  "members": [
+    {
+      "path": "gensen-ui-refactor/manifest.json",
+      "bytes": 279,
+      "sha256": "c6941e9f7a0aaa44d204cfadb849fa542e558912f19135ee37aaff14dec94af3"
+    },
+    {
+      "path": "gensen-ui-refactor/code.js",
+      "bytes": 10103777,
+      "sha256": "2f98f8d870a60767130a2f8c20aabef00c85b7519cf823078368e2e6eaa8258e"
+    },
+    {
+      "path": "gensen-ui-refactor/ui.html",
+      "bytes": 3115,
+      "sha256": "8dc26059698945efc159606c0a6e6209149d72a323176daeaed5bf176e09828d"
+    },
+    {
+      "path": "gensen-ui-refactor/README.md",
+      "bytes": 14056,
+      "sha256": "09dd0c0ce73723f9693100bdc66f8a9dfb058ce127b1b5732e69600decb295df"
+    },
+    {
+      "path": "gensen-ui-refactor/bundle-report.json",
+      "bytes": 678,
+      "sha256": "8010534a5a2860e2e0dd34cb401ffc540b4f96c004fab9e875798d23b6d247b8"
+    },
+    {
+      "path": "gensen-ui-refactor/local-validation.json",
+      "bytes": 8424,
+      "sha256": "f27e4849e14fdec33a4df06fd6bdef81764f7ba6490f68dc65f6ebf2d0e327a8"
+    },
+    {
+      "path": "gensen-ui-refactor/local-destination-warnings.json",
+      "bytes": 8594,
+      "sha256": "aa191ce5f7f6744404a47445c60f6a6acbb0222d71fe2707dd8e47a5466393b0"
+    },
+    {
+      "path": "gensen-ui-refactor/source-grid-evidence.json",
+      "bytes": 101465,
+      "sha256": "cd2a646ba3f537d08a1c81d726248e5b3d12498966d5f121c754453973fcacc9"
+    },
+    {
+      "path": "gensen-ui-refactor/source-manifest.json",
+      "bytes": 32928,
+      "sha256": "8e5afbd1651df0e403a80039992ac0e03f211f336197dd3d302dc25dd07db6b0"
+    },
+    {
+      "path": "gensen-ui-refactor/prototype-gap-ledger.json",
+      "bytes": 18137,
+      "sha256": "e348b1903ef859a149e268cf2dd46f00acb28fb4fe6a750d67fc2d0625a9e02b"
+    }
+  ],
+  "localValidation": "local-construction-passed",
+  "cloudVisualAcceptance": "See cloud receipts and screenshot reports;this ZIP verification does not establish visual acceptance."
+}

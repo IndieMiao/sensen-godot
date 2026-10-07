@@ -1,0 +1,42 @@
+<frame id="482:261" name="COOK-P0-2 · Grilled Crucian" x="0" y="0" width="360" height="800">
+  <frame id="523:13429" name="Scene art · kitchen" x="0" y="0" width="360" height="800" />
+  <instance id="523:13430" name="HUD" x="8" y="16" width="344" height="89" />
+  <frame id="523:13467" name="HUD touch · Profile" x="16" y="24" width="44" height="44" />
+  <frame id="523:13468" name="HUD touch · Energy" x="68" y="24" width="142" height="44" />
+  <frame id="523:13469" name="HUD touch · Inbox" x="296" y="24" width="44" height="44" />
+  <frame id="523:13470" name="HUD touch · Location" x="16" y="70" width="328" height="44" />
+  <instance id="523:13471" name="Sheet" x="0" y="250" width="360" height="550" />
+  <frame id="523:13472" name="Fixed decision area" x="16" y="685" width="328" height="99">
+    <instance id="523:13473" name="Fact" x="0" y="12" width="328" height="31" />
+    <instance id="523:13476" name="Command/primary · Cook" x="0" y="51" width="328" height="48" />
+  </frame>
+  <frame id="523:13478" name="Kitchen content" x="16" y="266" width="328" height="407">
+    <frame id="523:13479" name="Scrollable content" x="0" y="0" width="328" height="440">
+      <instance id="523:13480" name="ObjectHeader" x="0" y="0" width="328" height="75" />
+      <frame id="523:13490" name="Tabs · scroll horizontally" x="0" y="87" width="328" height="44">
+        <frame id="523:13491" name="Tab list" x="0" y="0" width="328" height="44">
+          <instance id="523:13492" name="Tab · Cookbook" x="0" y="0" width="80" height="44" />
+          <instance id="523:13494" name="Tab · Experiment" x="86" y="0" width="94" height="44" />
+        </frame>
+      </frame>
+      <text id="523:13496" name="Section title" x="0" y="143" width="328" height="20" />
+      <frame id="523:13497" name="Ingredient slots" x="0" y="175" width="328" height="96">
+        <instance id="523:13498" name="Ingredient 1 · selected" x="0" y="0" width="102.66666412353516" height="96" />
+        <instance id="523:13514" name="Ingredient 2 · empty" x="112.66666412353516" y="0" width="102.66666412353516" height="96" />
+        <instance id="523:13526" name="Third ingredient slot · locked" x="225.3333282470703" y="0" width="102.66666412353516" height="96" />
+      </frame>
+      <text id="523:13538" name="Section title" x="0" y="283" width="328" height="20" />
+      <frame id="523:13539" name="Inventory grid · 5 columns" x="0" y="315" width="328" height="64">
+        <frame id="523:13540" name="Inventory row 1" x="0" y="0" width="328" height="64">
+          <instance id="523:13541" name="InventoryCell/selected" x="0" y="0" width="59.20000076293945" height="64" />
+          <instance id="523:13557" name="InventoryCell/default" x="67.19999694824219" y="0" width="59.20000076293945" height="64" />
+          <instance id="523:13571" name="InventoryCell/default" x="134.39999389648438" y="0" width="59.20000076293945" height="64" />
+          <instance id="523:13586" name="InventoryCell/default" x="201.59999084472656" y="0" width="59.20000076293945" height="64" />
+          <instance id="523:13602" name="InventoryCell/default" x="268.79998779296875" y="0" width="59.20000076293945" height="64" />
+        </frame>
+      </frame>
+      <instance id="523:13618" name="NavigationRow · Details" x="0" y="391" width="328" height="49" />
+    </frame>
+  </frame>
+  <instance id="523:13622" name="Close · 44 px" x="300" y="200" width="44" height="44" />
+</frame>

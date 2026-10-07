@@ -1,0 +1,902 @@
+[
+  {
+    "id": "crop_radish",
+    "name": "Radish",
+    "category": "crop",
+    "componentId": "442:6783",
+    "specimenId": "442:6784",
+    "instanceId": "442:6786",
+    "source": "existing i-radish"
+  },
+  {
+    "id": "crop_lettuce",
+    "name": "Lettuce",
+    "category": "crop",
+    "componentId": "442:6799",
+    "specimenId": "442:6800",
+    "instanceId": "442:6802",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_herb",
+    "name": "Herb",
+    "category": "crop",
+    "componentId": "442:6814",
+    "specimenId": "442:6815",
+    "instanceId": "442:6817",
+    "source": "existing i-herb"
+  },
+  {
+    "id": "crop_carrot",
+    "name": "Carrot",
+    "category": "crop",
+    "componentId": "442:6828",
+    "specimenId": "442:6829",
+    "instanceId": "442:6831",
+    "source": "existing i-carrot"
+  },
+  {
+    "id": "crop_potato",
+    "name": "Potato",
+    "category": "crop",
+    "componentId": "442:6843",
+    "specimenId": "442:6844",
+    "instanceId": "442:6846",
+    "source": "existing i-potato"
+  },
+  {
+    "id": "crop_chamomile",
+    "name": "Chamomile",
+    "category": "crop",
+    "componentId": "442:6862",
+    "specimenId": "442:6863",
+    "instanceId": "442:6865",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_chili",
+    "name": "Chili",
+    "category": "crop",
+    "componentId": "442:6880",
+    "specimenId": "442:6881",
+    "instanceId": "442:6883",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_tomato",
+    "name": "Tomato",
+    "category": "crop",
+    "componentId": "442:6893",
+    "specimenId": "442:6894",
+    "instanceId": "442:6896",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_cabbage",
+    "name": "Cabbage",
+    "category": "crop",
+    "componentId": "442:6905",
+    "specimenId": "442:6906",
+    "instanceId": "442:6908",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_corn",
+    "name": "Corn",
+    "category": "crop",
+    "componentId": "442:6926",
+    "specimenId": "442:6927",
+    "instanceId": "442:6929",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_cucumber",
+    "name": "Cucumber",
+    "category": "crop",
+    "componentId": "442:6948",
+    "specimenId": "442:6949",
+    "instanceId": "442:6951",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_strawberry",
+    "name": "Strawberry",
+    "category": "crop",
+    "componentId": "442:6966",
+    "specimenId": "442:6967",
+    "instanceId": "442:6969",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_melon",
+    "name": "Melon",
+    "category": "crop",
+    "componentId": "442:6985",
+    "specimenId": "442:6986",
+    "instanceId": "442:6988",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_pineapple",
+    "name": "Pineapple",
+    "category": "crop",
+    "componentId": "442:7001",
+    "specimenId": "442:7002",
+    "instanceId": "442:7004",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_sweet_potato",
+    "name": "Sweet Potato",
+    "category": "crop",
+    "componentId": "442:7015",
+    "specimenId": "442:7016",
+    "instanceId": "442:7018",
+    "source": "existing i-sweet-potato"
+  },
+  {
+    "id": "crop_pumpkin",
+    "name": "Pumpkin",
+    "category": "crop",
+    "componentId": "442:7029",
+    "specimenId": "442:7030",
+    "instanceId": "442:7032",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_beet",
+    "name": "Beetroot",
+    "category": "crop",
+    "componentId": "442:7045",
+    "specimenId": "442:7046",
+    "instanceId": "442:7048",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_apple",
+    "name": "Apple",
+    "category": "crop",
+    "componentId": "442:7061",
+    "specimenId": "442:7062",
+    "instanceId": "442:7064",
+    "source": "existing i-apple"
+  },
+  {
+    "id": "crop_citrus",
+    "name": "Citrus",
+    "category": "crop",
+    "componentId": "442:7075",
+    "specimenId": "442:7076",
+    "instanceId": "442:7078",
+    "source": "existing i-citrus"
+  },
+  {
+    "id": "crop_grape",
+    "name": "Grapes",
+    "category": "crop",
+    "componentId": "442:7093",
+    "specimenId": "442:7094",
+    "instanceId": "442:7096",
+    "source": "existing i-grape"
+  },
+  {
+    "id": "fish_crucian",
+    "name": "Pond Crucian",
+    "category": "fish",
+    "componentId": "442:10068",
+    "specimenId": "442:10069",
+    "instanceId": "442:10071",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_carp",
+    "name": "Common Carp",
+    "category": "fish",
+    "componentId": "442:10087",
+    "specimenId": "442:10088",
+    "instanceId": "442:10090",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_mullet",
+    "name": "Grey Mullet",
+    "category": "fish",
+    "componentId": "442:10106",
+    "specimenId": "442:10107",
+    "instanceId": "442:10109",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_perch",
+    "name": "River Perch",
+    "category": "fish",
+    "componentId": "442:10128",
+    "specimenId": "442:10129",
+    "instanceId": "442:10131",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_bass",
+    "name": "Largemouth Bass",
+    "category": "fish",
+    "componentId": "442:10150",
+    "specimenId": "442:10151",
+    "instanceId": "442:10153",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_trout",
+    "name": "Rainbow Trout",
+    "category": "fish",
+    "componentId": "442:10174",
+    "specimenId": "442:10175",
+    "instanceId": "442:10177",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_mackerel",
+    "name": "Mackerel",
+    "category": "fish",
+    "componentId": "442:10201",
+    "specimenId": "442:10202",
+    "instanceId": "442:10204",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_koi",
+    "name": "Golden Koi",
+    "category": "fish",
+    "componentId": "442:10225",
+    "specimenId": "442:10226",
+    "instanceId": "442:10228",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_catfish",
+    "name": "Catfish",
+    "category": "fish",
+    "componentId": "442:10247",
+    "specimenId": "442:10248",
+    "instanceId": "442:10250",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_seabass",
+    "name": "Sea Bass",
+    "category": "fish",
+    "componentId": "442:10267",
+    "specimenId": "442:10268",
+    "instanceId": "442:10270",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_sturgeon",
+    "name": "Silver Sturgeon",
+    "category": "fish",
+    "componentId": "442:10289",
+    "specimenId": "442:10290",
+    "instanceId": "442:10292",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_eel",
+    "name": "River Eel",
+    "category": "fish",
+    "componentId": "442:10308",
+    "specimenId": "442:10309",
+    "instanceId": "442:10311",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_tilapia",
+    "name": "Tilapia",
+    "category": "fish",
+    "componentId": "442:10327",
+    "specimenId": "442:10328",
+    "instanceId": "442:10330",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_smelt",
+    "name": "Smelt",
+    "category": "fish",
+    "componentId": "442:10349",
+    "specimenId": "442:10350",
+    "instanceId": "442:10352",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_grass_carp",
+    "name": "Grass Carp",
+    "category": "fish",
+    "componentId": "442:10368",
+    "specimenId": "442:10369",
+    "instanceId": "442:10371",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_arctic_char",
+    "name": "Arctic Char",
+    "category": "fish",
+    "componentId": "442:10392",
+    "specimenId": "442:10393",
+    "instanceId": "442:10395",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_snakehead",
+    "name": "Snakehead",
+    "category": "fish",
+    "componentId": "442:10416",
+    "specimenId": "442:10417",
+    "instanceId": "442:10419",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_pike",
+    "name": "Northern Pike",
+    "category": "fish",
+    "componentId": "442:10435",
+    "specimenId": "442:10436",
+    "instanceId": "442:10438",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_barramundi",
+    "name": "Barramundi",
+    "category": "fish",
+    "componentId": "442:10454",
+    "specimenId": "442:10455",
+    "instanceId": "442:10457",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "fish_salmon",
+    "name": "Atlantic Salmon",
+    "category": "fish",
+    "componentId": "442:10478",
+    "specimenId": "442:10479",
+    "instanceId": "442:10481",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "dish_grilled_crucian",
+    "name": "Grilled Crucian",
+    "category": "dish",
+    "componentId": "443:7030",
+    "specimenId": "443:7031",
+    "instanceId": "443:7033",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_grilled_fish",
+    "name": "Grilled Fish",
+    "category": "dish",
+    "componentId": "443:7057",
+    "specimenId": "443:7058",
+    "instanceId": "443:7060",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_carp_cakes",
+    "name": "Carp Fish Cakes",
+    "category": "dish",
+    "componentId": "443:7083",
+    "specimenId": "443:7084",
+    "instanceId": "443:7086",
+    "source": "existing i-dish-cakes with recipe garnish variant"
+  },
+  {
+    "id": "dish_mullet_skewers",
+    "name": "Mullet Skewers",
+    "category": "dish",
+    "componentId": "443:7108",
+    "specimenId": "443:7109",
+    "instanceId": "443:7111",
+    "source": "existing i-dish-skewer with recipe garnish variant"
+  },
+  {
+    "id": "dish_radish_salad",
+    "name": "Radish Salad",
+    "category": "dish",
+    "componentId": "443:7134",
+    "specimenId": "443:7135",
+    "instanceId": "443:7137",
+    "source": "existing i-dish-salad with recipe garnish variant"
+  },
+  {
+    "id": "dish_veggie_plate",
+    "name": "Veggie Plate",
+    "category": "dish",
+    "componentId": "443:7159",
+    "specimenId": "443:7160",
+    "instanceId": "443:7162",
+    "source": "existing i-dish-plate with recipe garnish variant"
+  },
+  {
+    "id": "dish_carrot_cake",
+    "name": "Carrot Cake",
+    "category": "dish",
+    "componentId": "443:7182",
+    "specimenId": "443:7183",
+    "instanceId": "443:7185",
+    "source": "existing i-dish-cake with recipe garnish variant"
+  },
+  {
+    "id": "dish_cabbage_stew",
+    "name": "Cabbage Stew",
+    "category": "dish",
+    "componentId": "443:7210",
+    "specimenId": "443:7211",
+    "instanceId": "443:7213",
+    "source": "existing i-dish-stew with recipe garnish variant"
+  },
+  {
+    "id": "dish_travel_biscuits",
+    "name": "Travel Biscuits",
+    "category": "dish",
+    "componentId": "443:7240",
+    "specimenId": "443:7241",
+    "instanceId": "443:7243",
+    "source": "existing i-dish-biscuit with recipe garnish variant"
+  },
+  {
+    "id": "dish_herb_grilled_fish",
+    "name": "Herb Grilled Fish",
+    "category": "dish",
+    "componentId": "443:7267",
+    "specimenId": "443:7268",
+    "instanceId": "443:7270",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_salt_grilled_fish",
+    "name": "Salt-Grilled Fish",
+    "category": "dish",
+    "componentId": "443:7297",
+    "specimenId": "443:7298",
+    "instanceId": "443:7300",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_fish_soup",
+    "name": "Fresh Fish Soup",
+    "category": "dish",
+    "componentId": "443:7327",
+    "specimenId": "443:7328",
+    "instanceId": "443:7330",
+    "source": "existing i-dish-soup with recipe garnish variant"
+  },
+  {
+    "id": "dish_tilapia_wraps",
+    "name": "Tilapia Wraps",
+    "category": "dish",
+    "componentId": "443:7354",
+    "specimenId": "443:7355",
+    "instanceId": "443:7357",
+    "source": "existing i-dish-salad with recipe garnish variant"
+  },
+  {
+    "id": "dish_crispy_smelt",
+    "name": "Crispy Smelt",
+    "category": "dish",
+    "componentId": "443:7384",
+    "specimenId": "443:7385",
+    "instanceId": "443:7387",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_pan_fried_fish",
+    "name": "Pan-Fried Fish",
+    "category": "dish",
+    "componentId": "443:7414",
+    "specimenId": "443:7415",
+    "instanceId": "443:7417",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_rock_salt_soup",
+    "name": "Rock-Salt Soup",
+    "category": "dish",
+    "componentId": "443:7444",
+    "specimenId": "443:7445",
+    "instanceId": "443:7447",
+    "source": "existing i-dish-soup with recipe garnish variant"
+  },
+  {
+    "id": "dish_salted_potatoes",
+    "name": "Salted Potatoes",
+    "category": "dish",
+    "componentId": "443:7480",
+    "specimenId": "443:7481",
+    "instanceId": "443:7483",
+    "source": "existing i-dish-stew with recipe garnish variant"
+  },
+  {
+    "id": "dish_cucumber_salad",
+    "name": "Cucumber Salad",
+    "category": "dish",
+    "componentId": "443:7513",
+    "specimenId": "443:7514",
+    "instanceId": "443:7516",
+    "source": "existing i-dish-salad with recipe garnish variant"
+  },
+  {
+    "id": "dish_fruit_tea",
+    "name": "Fruit Tea",
+    "category": "dish",
+    "componentId": "443:7539",
+    "specimenId": "443:7540",
+    "instanceId": "443:7542",
+    "source": "existing i-tea with recipe garnish variant"
+  },
+  {
+    "id": "dish_apple_tea",
+    "name": "Apple Tea",
+    "category": "dish",
+    "componentId": "443:7564",
+    "specimenId": "443:7565",
+    "instanceId": "443:7567",
+    "source": "existing i-tea with recipe garnish variant"
+  },
+  {
+    "id": "dish_roast_veggies",
+    "name": "Roast Veggies",
+    "category": "dish",
+    "componentId": "443:10543",
+    "specimenId": "443:10544",
+    "instanceId": "443:10546",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_corn_cake",
+    "name": "Corn Cake",
+    "category": "dish",
+    "componentId": "443:10568",
+    "specimenId": "443:10569",
+    "instanceId": "443:10571",
+    "source": "existing i-dish-cake with recipe garnish variant"
+  },
+  {
+    "id": "dish_charcoal_fish",
+    "name": "Charcoal Fish",
+    "category": "dish",
+    "componentId": "443:10593",
+    "specimenId": "443:10594",
+    "instanceId": "443:10596",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_fruit_platter",
+    "name": "Fruit Platter",
+    "category": "dish",
+    "componentId": "443:10618",
+    "specimenId": "443:10619",
+    "instanceId": "443:10621",
+    "source": "existing i-dish-plate with recipe garnish variant"
+  },
+  {
+    "id": "dish_harvest_roast",
+    "name": "Harvest Roast",
+    "category": "dish",
+    "componentId": "443:10643",
+    "specimenId": "443:10644",
+    "instanceId": "443:10646",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_herb_baked_perch",
+    "name": "Herb Baked Perch",
+    "category": "dish",
+    "componentId": "443:10670",
+    "specimenId": "443:10671",
+    "instanceId": "443:10673",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_bass_tomato_stew",
+    "name": "Bass Tomato Stew",
+    "category": "dish",
+    "componentId": "443:10700",
+    "specimenId": "443:10701",
+    "instanceId": "443:10703",
+    "source": "existing i-dish-stew with recipe garnish variant"
+  },
+  {
+    "id": "dish_smoked_trout",
+    "name": "Smoked Trout",
+    "category": "dish",
+    "componentId": "443:10733",
+    "specimenId": "443:10734",
+    "instanceId": "443:10736",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_salt_mackerel",
+    "name": "Salt Mackerel",
+    "category": "dish",
+    "componentId": "443:10766",
+    "specimenId": "443:10767",
+    "instanceId": "443:10769",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_grass_carp_soup",
+    "name": "Grass Carp Soup",
+    "category": "dish",
+    "componentId": "443:10796",
+    "specimenId": "443:10797",
+    "instanceId": "443:10799",
+    "source": "existing i-dish-soup with recipe garnish variant"
+  },
+  {
+    "id": "dish_char_chowder",
+    "name": "Char Chowder",
+    "category": "dish",
+    "componentId": "443:10823",
+    "specimenId": "443:10824",
+    "instanceId": "443:10826",
+    "source": "existing i-dish-soup with recipe garnish variant"
+  },
+  {
+    "id": "dish_catfish_stew",
+    "name": "Catfish Stew",
+    "category": "dish",
+    "componentId": "443:10853",
+    "specimenId": "443:10854",
+    "instanceId": "443:10856",
+    "source": "existing i-dish-stew with recipe garnish variant"
+  },
+  {
+    "id": "dish_sea_bass_salt",
+    "name": "Sea Bass in Salt",
+    "category": "dish",
+    "componentId": "443:10886",
+    "specimenId": "443:10887",
+    "instanceId": "443:10889",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_chili_snakehead",
+    "name": "Chili Snakehead",
+    "category": "dish",
+    "componentId": "443:10920",
+    "specimenId": "443:10921",
+    "instanceId": "443:10923",
+    "source": "existing i-dish-stew with recipe garnish variant"
+  },
+  {
+    "id": "dish_grilled_pike",
+    "name": "Grilled Pike",
+    "category": "dish",
+    "componentId": "443:10951",
+    "specimenId": "443:10952",
+    "instanceId": "443:10954",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_pineapple_barra",
+    "name": "Pineapple Barra",
+    "category": "dish",
+    "componentId": "443:10978",
+    "specimenId": "443:10979",
+    "instanceId": "443:10981",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_fisher_stew",
+    "name": "Fisher's Stew",
+    "category": "dish",
+    "componentId": "443:11011",
+    "specimenId": "443:11012",
+    "instanceId": "443:11014",
+    "source": "existing i-dish-stew with recipe garnish variant"
+  },
+  {
+    "id": "dish_strawberry_tart",
+    "name": "Strawberry Tart",
+    "category": "dish",
+    "componentId": "443:11042",
+    "specimenId": "443:11043",
+    "instanceId": "443:11045",
+    "source": "existing i-dish-cake with recipe garnish variant"
+  },
+  {
+    "id": "dish_melon_platter",
+    "name": "Melon Platter",
+    "category": "dish",
+    "componentId": "443:11065",
+    "specimenId": "443:11066",
+    "instanceId": "443:11068",
+    "source": "existing i-dish-plate with recipe garnish variant"
+  },
+  {
+    "id": "dish_orchard_tea",
+    "name": "Orchard Tea",
+    "category": "dish",
+    "componentId": "443:11089",
+    "specimenId": "443:11090",
+    "instanceId": "443:11092",
+    "source": "existing i-tea with recipe garnish variant"
+  },
+  {
+    "id": "dish_legend_sashimi",
+    "name": "Legend Sashimi",
+    "category": "dish",
+    "componentId": "443:11115",
+    "specimenId": "443:11116",
+    "instanceId": "443:11118",
+    "source": "existing i-dish-salad with recipe garnish variant"
+  },
+  {
+    "id": "dish_steamed_sturgeon",
+    "name": "Steamed Sturgeon",
+    "category": "dish",
+    "componentId": "443:11148",
+    "specimenId": "443:11149",
+    "instanceId": "443:11151",
+    "source": "existing i-dish-stew with recipe garnish variant"
+  },
+  {
+    "id": "dish_eel_skewers",
+    "name": "Eel Skewers",
+    "category": "dish",
+    "componentId": "443:11184",
+    "specimenId": "443:11185",
+    "instanceId": "443:11187",
+    "source": "existing i-dish-skewer with recipe garnish variant"
+  },
+  {
+    "id": "dish_herb_salmon",
+    "name": "Herb Salmon",
+    "category": "dish",
+    "componentId": "443:11214",
+    "specimenId": "443:11215",
+    "instanceId": "443:11217",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_pineapple_fish",
+    "name": "Pineapple Fish",
+    "category": "dish",
+    "componentId": "443:11242",
+    "specimenId": "443:11243",
+    "instanceId": "443:11245",
+    "source": "existing i-dish-grilled with recipe garnish variant"
+  },
+  {
+    "id": "dish_sweet_potato_cakes",
+    "name": "Sweet Potato Cakes",
+    "category": "dish",
+    "componentId": "443:11269",
+    "specimenId": "443:11270",
+    "instanceId": "443:11272",
+    "source": "existing i-dish-cakes with recipe garnish variant"
+  },
+  {
+    "id": "dish_pumpkin_chowder",
+    "name": "Pumpkin Chowder",
+    "category": "dish",
+    "componentId": "443:11298",
+    "specimenId": "443:11299",
+    "instanceId": "443:11301",
+    "source": "existing i-dish-soup with recipe garnish variant"
+  },
+  {
+    "id": "dish_beet_fish_soup",
+    "name": "Beet Fish Soup",
+    "category": "dish",
+    "componentId": "443:11331",
+    "specimenId": "443:11332",
+    "instanceId": "443:11334",
+    "source": "existing i-dish-soup with recipe garnish variant"
+  },
+  {
+    "id": "res_pip",
+    "name": "Pip",
+    "category": "resident",
+    "componentId": "443:11361",
+    "specimenId": "443:11362",
+    "instanceId": "443:11364",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_granny_wu",
+    "name": "Granny Wu",
+    "category": "resident",
+    "componentId": "443:11387",
+    "specimenId": "443:11388",
+    "instanceId": "443:11390",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_mira",
+    "name": "Mira",
+    "category": "resident",
+    "componentId": "443:11411",
+    "specimenId": "443:11412",
+    "instanceId": "443:11414",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_old_kai",
+    "name": "Old Kai",
+    "category": "resident",
+    "componentId": "443:11434",
+    "specimenId": "443:11435",
+    "instanceId": "443:11437",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_rafa",
+    "name": "Rafa",
+    "category": "resident",
+    "componentId": "443:11457",
+    "specimenId": "443:11458",
+    "instanceId": "443:11460",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_ivo",
+    "name": "Ivo",
+    "category": "resident",
+    "componentId": "443:11481",
+    "specimenId": "443:11482",
+    "instanceId": "443:11484",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_hana",
+    "name": "Hana",
+    "category": "resident",
+    "componentId": "443:11505",
+    "specimenId": "443:11506",
+    "instanceId": "443:11508",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_sam",
+    "name": "Sam",
+    "category": "resident",
+    "componentId": "443:11528",
+    "specimenId": "443:11529",
+    "instanceId": "443:11531",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_lena",
+    "name": "Lena",
+    "category": "resident",
+    "componentId": "443:11551",
+    "specimenId": "443:11552",
+    "instanceId": "443:11554",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_tomo",
+    "name": "Tomo",
+    "category": "resident",
+    "componentId": "443:11575",
+    "specimenId": "443:11576",
+    "instanceId": "443:11578",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_theo",
+    "name": "Theo",
+    "category": "resident",
+    "componentId": "443:11599",
+    "specimenId": "443:11600",
+    "instanceId": "443:11602",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_nadia",
+    "name": "Nadia",
+    "category": "resident",
+    "componentId": "443:11623",
+    "specimenId": "443:11624",
+    "instanceId": "443:11626",
+    "source": "new native portrait draft; not a 3D character model"
+  }
+]

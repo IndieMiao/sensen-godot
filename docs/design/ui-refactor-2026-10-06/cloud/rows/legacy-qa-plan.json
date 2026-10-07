@@ -1,0 +1,531 @@
+{
+  "fileKey": "OMLTC3yw3u2WDjOZhLnhaR",
+  "pageId": "481:53",
+  "status": "24 of84 reviewed; fixes outstanding",
+  "legacyCount": 84,
+  "rows": [
+    {
+      "rowNumber": 1,
+      "rowNodeId": "482:2",
+      "legacyScreens": [
+        {
+          "id": "FARM-1",
+          "nodeId": "482:4",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/current/FARM-1.png"
+        },
+        {
+          "id": "FISH-1",
+          "nodeId": "482:6",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/current/FISH-1.png"
+        },
+        {
+          "id": "COOK-1",
+          "nodeId": "482:8",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/current/COOK-1.png"
+        },
+        {
+          "id": "BAG-1",
+          "nodeId": "482:10",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/current/BAG-1.png"
+        },
+        {
+          "id": "BAG-3",
+          "nodeId": "482:12",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/BAG-3.png"
+        },
+        {
+          "id": "BAG-4",
+          "nodeId": "482:14",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/BAG-4.png"
+        },
+        {
+          "id": "BAG-4-2",
+          "nodeId": "482:16",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/BAG-4-2.png"
+        },
+        {
+          "id": "BAR-1",
+          "nodeId": "482:18",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/BAR-1.png"
+        }
+      ],
+      "expectedCapture": "legacy-row-01.png",
+      "captureStatus": "captured-current",
+      "inspectionStatus": "reviewed-with-findings",
+      "reviewFile": "review-01-03.json"
+    },
+    {
+      "rowNumber": 2,
+      "rowNodeId": "482:19",
+      "legacyScreens": [
+        {
+          "id": "BAR-1-2",
+          "nodeId": "482:21",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/BAR-1-2.png"
+        },
+        {
+          "id": "BAR-2",
+          "nodeId": "482:23",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/BAR-2.png"
+        },
+        {
+          "id": "BAR-3",
+          "nodeId": "482:25",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/BAR-3.png"
+        },
+        {
+          "id": "BAR-3-2",
+          "nodeId": "482:27",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/BAR-3-2.png"
+        },
+        {
+          "id": "HUD-3",
+          "nodeId": "482:29",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/HUD-3.png"
+        },
+        {
+          "id": "HUD-4",
+          "nodeId": "482:31",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/HUD-4.png"
+        },
+        {
+          "id": "HUD-1",
+          "nodeId": "482:33",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/HUD-1.png"
+        },
+        {
+          "id": "HUD-1-2",
+          "nodeId": "482:35",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/HUD-1-2.png"
+        }
+      ],
+      "expectedCapture": "legacy-row-02.png",
+      "captureStatus": "captured-current",
+      "inspectionStatus": "reviewed-with-findings",
+      "reviewFile": "review-01-03.json"
+    },
+    {
+      "rowNumber": 3,
+      "rowNodeId": "482:36",
+      "legacyScreens": [
+        {
+          "id": "CTRL-1",
+          "nodeId": "482:38",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/CTRL-1.png"
+        },
+        {
+          "id": "CTRL-1-2",
+          "nodeId": "482:40",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/CTRL-1-2.png"
+        },
+        {
+          "id": "FARM-2",
+          "nodeId": "482:42",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/FARM-2.png"
+        },
+        {
+          "id": "FARM-3",
+          "nodeId": "482:44",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/FARM-3.png"
+        },
+        {
+          "id": "FARM-6",
+          "nodeId": "482:46",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/FARM-6.png"
+        },
+        {
+          "id": "FARM-6-2",
+          "nodeId": "482:48",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/FARM-6-2.png"
+        },
+        {
+          "id": "FARM-7",
+          "nodeId": "482:50",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/FARM-7.png"
+        },
+        {
+          "id": "FARM-7-2",
+          "nodeId": "482:52",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/FARM-7-2.png"
+        }
+      ],
+      "expectedCapture": "legacy-row-03.png",
+      "captureStatus": "captured-current",
+      "inspectionStatus": "reviewed-with-findings",
+      "reviewFile": "review-01-03.json"
+    },
+    {
+      "rowNumber": 4,
+      "rowNodeId": "482:53",
+      "legacyScreens": [
+        {
+          "id": "FISH-2",
+          "nodeId": "482:55",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/FISH-2.png"
+        },
+        {
+          "id": "FISH-3",
+          "nodeId": "482:57",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/FISH-3.png"
+        },
+        {
+          "id": "FISH-4",
+          "nodeId": "482:59",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/FISH-4.png"
+        },
+        {
+          "id": "FISH-5",
+          "nodeId": "482:61",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/FISH-5.png"
+        },
+        {
+          "id": "FISH-5-2",
+          "nodeId": "482:63",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/FISH-5-2.png"
+        },
+        {
+          "id": "SKILL-3",
+          "nodeId": "482:65",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/SKILL-3.png"
+        },
+        {
+          "id": "SKILL-3-2",
+          "nodeId": "482:67",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/SKILL-3-2.png"
+        },
+        {
+          "id": "TUT-2-2",
+          "nodeId": "482:69",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/TUT-2-2.png"
+        }
+      ],
+      "expectedCapture": "legacy-row-04.png",
+      "captureStatus": "pending",
+      "inspectionStatus": "pending"
+    },
+    {
+      "rowNumber": 5,
+      "rowNodeId": "482:70",
+      "legacyScreens": [
+        {
+          "id": "TUT-2",
+          "nodeId": "482:72",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/TUT-2.png"
+        },
+        {
+          "id": "COOK-2a",
+          "nodeId": "482:74",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/COOK-2a.png"
+        },
+        {
+          "id": "COOK-2a-2",
+          "nodeId": "482:76",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/COOK-2a-2.png"
+        },
+        {
+          "id": "COOK-2b",
+          "nodeId": "482:78",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/COOK-2b.png"
+        },
+        {
+          "id": "COOK-2b-2",
+          "nodeId": "482:80",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/COOK-2b-2.png"
+        },
+        {
+          "id": "COOK-3",
+          "nodeId": "482:82",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/COOK-3.png"
+        },
+        {
+          "id": "COOK-3-2",
+          "nodeId": "482:84",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/COOK-3-2.png"
+        },
+        {
+          "id": "COOK-4",
+          "nodeId": "482:86",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/COOK-4.png"
+        }
+      ],
+      "expectedCapture": "legacy-row-05.png",
+      "captureStatus": "pending",
+      "inspectionStatus": "pending"
+    },
+    {
+      "rowNumber": 6,
+      "rowNodeId": "482:87",
+      "legacyScreens": [
+        {
+          "id": "COOK-6",
+          "nodeId": "482:89",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/COOK-6.png"
+        },
+        {
+          "id": "COOK-7",
+          "nodeId": "482:91",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/COOK-7.png"
+        },
+        {
+          "id": "COOK-7-2",
+          "nodeId": "482:93",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/COOK-7-2.png"
+        },
+        {
+          "id": "MAP-1",
+          "nodeId": "482:95",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/MAP-1.png"
+        },
+        {
+          "id": "NPC-1a",
+          "nodeId": "482:97",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-1a.png"
+        },
+        {
+          "id": "NPC-1b",
+          "nodeId": "482:99",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-1b.png"
+        },
+        {
+          "id": "NPC-1c",
+          "nodeId": "482:101",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-1c.png"
+        },
+        {
+          "id": "NPC-1d",
+          "nodeId": "482:103",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-1d.png"
+        }
+      ],
+      "expectedCapture": "legacy-row-06.png",
+      "captureStatus": "pending",
+      "inspectionStatus": "pending"
+    },
+    {
+      "rowNumber": 7,
+      "rowNodeId": "482:104",
+      "legacyScreens": [
+        {
+          "id": "NPC-1e",
+          "nodeId": "482:106",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-1e.png"
+        },
+        {
+          "id": "NPC-G1",
+          "nodeId": "482:108",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-G1.png"
+        },
+        {
+          "id": "NPC-G1-2",
+          "nodeId": "482:110",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-G1-2.png"
+        },
+        {
+          "id": "NPC-G1-3",
+          "nodeId": "482:112",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-G1-3.png"
+        },
+        {
+          "id": "NPC-G1-4",
+          "nodeId": "482:114",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-G1-4.png"
+        },
+        {
+          "id": "NPC-2",
+          "nodeId": "482:116",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-2.png"
+        },
+        {
+          "id": "NPC-2-2",
+          "nodeId": "482:118",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-2-2.png"
+        },
+        {
+          "id": "NPC-3",
+          "nodeId": "482:120",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-3.png"
+        }
+      ],
+      "expectedCapture": "legacy-row-07.png",
+      "captureStatus": "pending",
+      "inspectionStatus": "pending"
+    },
+    {
+      "rowNumber": 8,
+      "rowNodeId": "482:121",
+      "legacyScreens": [
+        {
+          "id": "NPC-3-2",
+          "nodeId": "482:123",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-3-2.png"
+        },
+        {
+          "id": "NPC-4",
+          "nodeId": "482:125",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-4.png"
+        },
+        {
+          "id": "NPC-4-2",
+          "nodeId": "482:127",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-4-2.png"
+        },
+        {
+          "id": "NPC-5",
+          "nodeId": "482:129",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-5.png"
+        },
+        {
+          "id": "NPC-5-2",
+          "nodeId": "482:131",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-5-2.png"
+        },
+        {
+          "id": "NPC-6",
+          "nodeId": "482:133",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-6.png"
+        },
+        {
+          "id": "NPC-6-2",
+          "nodeId": "482:135",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-6-2.png"
+        },
+        {
+          "id": "NPC-7",
+          "nodeId": "482:137",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NPC-7.png"
+        }
+      ],
+      "expectedCapture": "legacy-row-08.png",
+      "captureStatus": "pending",
+      "inspectionStatus": "pending"
+    },
+    {
+      "rowNumber": 9,
+      "rowNodeId": "482:138",
+      "legacyScreens": [
+        {
+          "id": "BAG-2",
+          "nodeId": "482:140",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/BAG-2.png"
+        },
+        {
+          "id": "BAG-2-2",
+          "nodeId": "482:142",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/BAG-2-2.png"
+        },
+        {
+          "id": "BAG-5",
+          "nodeId": "482:144",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/BAG-5.png"
+        },
+        {
+          "id": "BAG-5-2",
+          "nodeId": "482:146",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/BAG-5-2.png"
+        },
+        {
+          "id": "FARM-4",
+          "nodeId": "482:148",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/FARM-4.png"
+        },
+        {
+          "id": "FARM-5",
+          "nodeId": "482:150",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/FARM-5.png"
+        },
+        {
+          "id": "HOME-1",
+          "nodeId": "482:152",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/HOME-1.png"
+        },
+        {
+          "id": "HOME-2",
+          "nodeId": "482:154",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/HOME-2.png"
+        }
+      ],
+      "expectedCapture": "legacy-row-09.png",
+      "captureStatus": "pending",
+      "inspectionStatus": "pending"
+    },
+    {
+      "rowNumber": 10,
+      "rowNodeId": "482:155",
+      "legacyScreens": [
+        {
+          "id": "HUD-2",
+          "nodeId": "482:157",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/HUD-2.png"
+        },
+        {
+          "id": "MINE-1",
+          "nodeId": "482:159",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/MINE-1.png"
+        },
+        {
+          "id": "PROFILE-1",
+          "nodeId": "482:161",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/PROFILE-1.png"
+        },
+        {
+          "id": "PROFILE-2",
+          "nodeId": "482:163",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/PROFILE-2.png"
+        },
+        {
+          "id": "SETTINGS-1",
+          "nodeId": "482:165",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/SETTINGS-1.png"
+        },
+        {
+          "id": "SKILL-1",
+          "nodeId": "482:167",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/SKILL-1.png"
+        },
+        {
+          "id": "SKILL-2",
+          "nodeId": "482:169",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/SKILL-2.png"
+        },
+        {
+          "id": "FISH-6",
+          "nodeId": "482:171",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/FISH-6.png"
+        }
+      ],
+      "expectedCapture": "legacy-row-10.png",
+      "captureStatus": "pending",
+      "inspectionStatus": "pending"
+    },
+    {
+      "rowNumber": 11,
+      "rowNodeId": "482:172",
+      "legacyScreens": [
+        {
+          "id": "SOC-4",
+          "nodeId": "482:174",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch2/SOC-4.png"
+        },
+        {
+          "id": "NEED-TILE",
+          "nodeId": "482:176",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/NEED-TILE.png"
+        },
+        {
+          "id": "STATE-ICONS",
+          "nodeId": "482:178",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/STATE-ICONS.png"
+        },
+        {
+          "id": "OUTPOST-DIAGRAM",
+          "nodeId": "482:180",
+          "sourceScreenshot": "docs/design/ui-anchors-2026-10-03/out/batch1/OUTPOST-DIAGRAM.png"
+        }
+      ],
+      "expectedCapture": "legacy-row-11.png",
+      "captureStatus": "pending",
+      "inspectionStatus": "pending"
+    }
+  ],
+  "reviewedLegacyCards": 24
+}

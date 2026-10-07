@@ -1,0 +1,58 @@
+{
+  "pageId": "481:53",
+  "libraryId": "481:54",
+  "components": [
+    "FacilityMarker/compact/navigate",
+    "FacilityMarker/compact/commit",
+    "FacilityMarker/compact/blocked",
+    "FacilityMarker/wide/navigate",
+    "FacilityMarker/wide/commit",
+    "FacilityMarker/wide/blocked"
+  ],
+  "markerSet": "FacilityMarker",
+  "requiredIcons": [
+    "i-lock"
+  ],
+  "screens": {
+    "COOK-1": "482:8",
+    "COOK-2a": "482:74",
+    "COOK-2b": "482:78",
+    "COOK-P0-1": "482:259",
+    "COOK-P0-2": "482:261",
+    "COOK-P1-1": "482:363",
+    "COOK-P1-3": "482:367",
+    "COOK-P1-5": "482:371"
+  },
+  "selection": [
+    "COOK-2a",
+    "COOK-2b",
+    "COOK-P0-2"
+  ],
+  "entrance": [
+    "COOK-1",
+    "COOK-P0-1",
+    "COOK-P1-1",
+    "COOK-P1-3",
+    "COOK-P1-5"
+  ],
+  "pureRenderEntry": "kitchenSceneEntrance(frame, descriptor)",
+  "selectionEntry": "kitchen(frame, descriptor)",
+  "doNotRebuild": [
+    "COOK-P0-3",
+    "COOK-HERB-HEAT",
+    "COOK-3"
+  ],
+  "sourceOrder": [
+    "src.js",
+    "current-fixes.js",
+    "legacy-fixes.js",
+    "legacy-scene-fixes.js",
+    "legacy-reference-fixes.js",
+    "legacy-pin-fixes.js",
+    "kitchen-scene-fixes.js",
+    "kitchen-selection-fixes.js",
+    "action-picker-fixes.js",
+    "hud-navigation-fixes.js"
+  ],
+  "avatar": "Not included. Root/UX own avatarAssets and final avatar-fixes.js integration."
+}

@@ -1,0 +1,51 @@
+{
+  "states": [
+    {
+      "id": "COOK-FINE-EATEN",
+      "operation": "eat-dish",
+      "before": {
+        "energy": 142,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 1,
+        "mealsToday": null
+      },
+      "after": {
+        "energy": 187,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 0,
+        "mealsToday": null
+      },
+      "mealsAllowanceDelta": 45,
+      "firstServingFixture": true,
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "COOK-MYSTERY-EATEN",
+      "operation": "eat-dish",
+      "before": {
+        "energy": 142,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 1,
+        "mealsToday": null
+      },
+      "after": {
+        "energy": 147,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 0,
+        "mealsToday": null
+      },
+      "mealsAllowanceDelta": 5,
+      "firstServingFixture": true,
+      "serverTransaction": false,
+      "prototypeOnly": true
+    }
+  ],
+  "absoluteMealsCountInvented": false,
+  "recoveryFromSourceEffect": true,
+  "originalCOOK7Unchanged": true
+}

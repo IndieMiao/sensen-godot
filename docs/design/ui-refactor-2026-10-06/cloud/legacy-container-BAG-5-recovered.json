@@ -1,0 +1,419 @@
+{
+  "screens": [
+    {
+      "id": "BAG-5",
+      "nodeId": "482:144"
+    }
+  ],
+  "overlayIndex": 1311,
+  "sourceComposition": true,
+  "reactions": [
+    {
+      "id": "664:64729",
+      "name": "HUD touch \u00b7 Profile",
+      "targets": [
+        "482:310"
+      ]
+    },
+    {
+      "id": "664:64730",
+      "name": "HUD touch \u00b7 Energy",
+      "targets": [
+        "482:316"
+      ]
+    },
+    {
+      "id": "664:64731",
+      "name": "HUD touch \u00b7 Inbox",
+      "targets": [
+        "482:297"
+      ]
+    },
+    {
+      "id": "664:64732",
+      "name": "HUD touch \u00b7 Today",
+      "targets": [
+        "482:290"
+      ]
+    },
+    {
+      "id": "664:64733",
+      "name": "HUD touch \u00b7 Location",
+      "targets": [
+        "482:401"
+      ]
+    },
+    {
+      "id": "664:64737",
+      "name": "Quick slot \u00b7 Radish Seeds",
+      "targets": [
+        "664:65313"
+      ]
+    },
+    {
+      "id": "664:64752",
+      "name": "Quick slot \u00b7 Carrot Seeds",
+      "targets": [
+        "664:65330"
+      ]
+    },
+    {
+      "id": "664:64766",
+      "name": "Quick slot \u00b7 Compost",
+      "targets": [
+        "664:65347"
+      ]
+    },
+    {
+      "id": "664:64783",
+      "name": "Quick slot \u00b7 Orchard Feed",
+      "targets": [
+        "664:65364"
+      ]
+    },
+    {
+      "id": "664:64812",
+      "name": "Close bag",
+      "targets": [
+        "482:4"
+      ]
+    },
+    {
+      "id": "664:64820",
+      "name": "Compact/Navigation",
+      "targets": [
+        "482:140"
+      ]
+    },
+    {
+      "id": "664:64822",
+      "name": "Compact/Navigation",
+      "targets": [
+        "664:65383"
+      ]
+    },
+    {
+      "id": "664:64827",
+      "name": "Category \u00b7 All",
+      "targets": [
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE"
+      ]
+    },
+    {
+      "id": "664:64834",
+      "name": "Category \u00b7 Seeds",
+      "targets": [
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE"
+      ]
+    },
+    {
+      "id": "664:64841",
+      "name": "Category \u00b7 Fish",
+      "targets": [
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE"
+      ]
+    },
+    {
+      "id": "664:64848",
+      "name": "Category \u00b7 Produce",
+      "targets": [
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE"
+      ]
+    },
+    {
+      "id": "664:64855",
+      "name": "Category \u00b7 Dishes",
+      "targets": [
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE"
+      ]
+    },
+    {
+      "id": "664:64862",
+      "name": "Category \u00b7 Materials",
+      "targets": [
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE"
+      ]
+    },
+    {
+      "id": "664:64869",
+      "name": "Category \u00b7 Tackle",
+      "targets": [
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE",
+        "SET_VARIABLE"
+      ]
+    },
+    {
+      "id": "664:64878",
+      "name": "Inventory cell \u00b7 Grilled Crucian",
+      "targets": [
+        "664:65451"
+      ]
+    },
+    {
+      "id": "664:64896",
+      "name": "Inventory cell \u00b7 Pond Crucian",
+      "targets": [
+        "664:65468"
+      ]
+    },
+    {
+      "id": "664:64913",
+      "name": "Inventory cell \u00b7 Carp",
+      "targets": [
+        "664:65485"
+      ]
+    },
+    {
+      "id": "664:64930",
+      "name": "Inventory cell \u00b7 Minnow",
+      "targets": [
+        "664:65502"
+      ]
+    },
+    {
+      "id": "664:64946",
+      "name": "Inventory cell \u00b7 Fresh Fish Soup",
+      "targets": [
+        "664:65519"
+      ]
+    },
+    {
+      "id": "664:64965",
+      "name": "Inventory cell \u00b7 Radish",
+      "targets": [
+        "664:65536"
+      ]
+    },
+    {
+      "id": "664:64981",
+      "name": "Inventory cell \u00b7 Carrot",
+      "targets": [
+        "664:65553"
+      ]
+    },
+    {
+      "id": "664:64995",
+      "name": "Inventory cell \u00b7 Apple",
+      "targets": [
+        "664:65570"
+      ]
+    },
+    {
+      "id": "664:65010",
+      "name": "Inventory cell \u00b7 Potato",
+      "targets": [
+        "664:65587"
+      ]
+    },
+    {
+      "id": "664:65027",
+      "name": "Inventory cell \u00b7 Radish Seeds",
+      "targets": [
+        "664:65604"
+      ]
+    },
+    {
+      "id": "664:65043",
+      "name": "Inventory cell \u00b7 Carrot Seeds",
+      "targets": [
+        "664:65621"
+      ]
+    },
+    {
+      "id": "664:65058",
+      "name": "Inventory cell \u00b7 Compost",
+      "targets": [
+        "664:65638"
+      ]
+    },
+    {
+      "id": "664:65076",
+      "name": "Inventory cell \u00b7 Rock Salt",
+      "targets": [
+        "664:65655"
+      ]
+    },
+    {
+      "id": "664:65093",
+      "name": "Inventory cell \u00b7 Wild Herb",
+      "targets": [
+        "664:65672"
+      ]
+    },
+    {
+      "id": "664:65108",
+      "name": "Inventory cell \u00b7 Timber",
+      "targets": [
+        "664:65689"
+      ]
+    },
+    {
+      "id": "664:65123",
+      "name": "Inventory cell \u00b7 Stone",
+      "targets": [
+        "664:65706"
+      ]
+    },
+    {
+      "id": "664:65137",
+      "name": "Inventory cell \u00b7 Copper Ore",
+      "targets": [
+        "664:65723"
+      ]
+    },
+    {
+      "id": "664:65152",
+      "name": "Inventory cell \u00b7 Worm Bait",
+      "targets": [
+        "664:65740"
+      ]
+    },
+    {
+      "id": "664:65169",
+      "name": "Inventory cell \u00b7 Spinner Lure",
+      "targets": [
+        "664:65757"
+      ]
+    },
+    {
+      "id": "664:65186",
+      "name": "Inventory cell \u00b7 Koi",
+      "targets": [
+        "664:65774"
+      ]
+    },
+    {
+      "id": "664:65205",
+      "name": "Inventory cell \u00b7 Orchard Feed",
+      "targets": [
+        "664:65791"
+      ]
+    },
+    {
+      "id": "664:65223",
+      "name": "Inventory cell \u00b7 Reeds",
+      "targets": [
+        "664:65808"
+      ]
+    },
+    {
+      "id": "664:65242",
+      "name": "Inventory cell \u00b7 Clay",
+      "targets": [
+        "664:65825"
+      ]
+    },
+    {
+      "id": "664:65258",
+      "name": "Inventory cell \u00b7 Dish Stew",
+      "targets": [
+        "664:65842"
+      ]
+    },
+    {
+      "id": "664:65280",
+      "name": "Inventory cell \u00b7 Dish Herb",
+      "targets": [
+        "664:65859"
+      ]
+    },
+    {
+      "id": "664:65297",
+      "name": "Bag capacity recovery",
+      "targets": [
+        "482:152"
+      ]
+    }
+  ],
+  "notes": 1
+}

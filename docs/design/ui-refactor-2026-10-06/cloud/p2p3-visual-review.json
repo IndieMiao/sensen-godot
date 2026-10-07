@@ -1,0 +1,299 @@
+{
+  "kind": "Independent visual review of actual Figma captures, row27–36",
+  "date": "2026-10-06",
+  "reviewedCardCount": 80,
+  "reviewedIds": [
+    "TRAVEL-GUIDE",
+    "TRAVEL-CANCEL",
+    "TRAVEL-REFUNDED",
+    "DAYPASS",
+    "DAYPASS-EXPIRED",
+    "PERMIT-1",
+    "PERMIT-DONE",
+    "TICKET-1",
+    "SECOND-HOME",
+    "SECOND-HOME-DONE",
+    "SOC-1",
+    "SOC-1-GATE",
+    "SOC-1-CONFIRM",
+    "SOC-2",
+    "SOC-2-INBOX",
+    "SOC-2-ARRIVE",
+    "SOC-2-ERROR",
+    "SOC-3",
+    "HELPER-INBOX",
+    "HELPER-SUMMARY",
+    "HELPER-ONSITE",
+    "HELPER-BUDGET",
+    "SOC-5",
+    "GIFT-SENT",
+    "GIFT-CLAIM",
+    "GIFT-DETAIL",
+    "SOC-6",
+    "GUESTBOOK",
+    "TOGETHER",
+    "TOGETHER-PROGRESS",
+    "TOGETHER-DONE",
+    "EXPAND-RECIPES",
+    "TRADER",
+    "BUFF-FARM",
+    "BUFF-FISH",
+    "BUFF-HANDS",
+    "BUFF-TRAVEL",
+    "BUFF-CREEL",
+    "BUFF-REPLACE",
+    "BUFF-RATIONS-USE",
+    "HOME-LV4",
+    "HOME-LV5",
+    "HOME-LV6",
+    "HOME-LV7",
+    "HOME-LV8",
+    "HOME-LV9",
+    "HOME-LV10",
+    "COMBAT-LOOT",
+    "COMBAT-HEAL",
+    "MINE-4",
+    "MINE-5",
+    "MINE-KO",
+    "RESIDENT-TALK",
+    "RESIDENT-CHAT",
+    "RESIDENT-MEAL",
+    "RESIDENT-MEAL-DONE",
+    "RESIDENT-TEACH",
+    "RES-PIP",
+    "RES-GRANNY",
+    "RES-MIRA",
+    "RES-KAI",
+    "RES-RAFA",
+    "RES-IVO",
+    "RES-HANA",
+    "RES-SAM",
+    "RES-LENA",
+    "RES-TOMO",
+    "RES-THEO",
+    "RES-NADIA",
+    "DEX-MILESTONE",
+    "EXPAND-4",
+    "EXPAND-5",
+    "BUFF-ACTIVE",
+    "BUFF-CASTS",
+    "BUFF-LAST",
+    "BUFF-TIMEOUT",
+    "BUFF-CREEL-END",
+    "MINE-3",
+    "COMBAT-1",
+    "COOK-MILESTONE"
+  ],
+  "blankAtCaptureNotAssessed": [],
+  "evidenceDirectory": "cloud/rows/p2p3-visual-qa",
+  "rowScreenshots": {
+    "row-27.png": "6203beafc17339557c2ac3fa52715373d97311e164a917266f50af366bc3dcf9",
+    "row-28.png": "1fa35dbb6b7059ba49976302755d9d850180d5bda3d288bdbc0ed4ee9c6aff78",
+    "row-29.png": "d02e490bc0d78a1dc51f2a82364a9098619cc52f2f7640662e902799f79786bc",
+    "row-30.png": "9663c0cc066985f42bea833bfbcb11af1e3a9f309a50c24a4d4054cdfb943235",
+    "row-31.png": "7929edcab75c0e92189fd2365d27adad613e3a4f6e0b7ac8148089f31902281a",
+    "row-32.png": "d0dd4e0b374e858a8ab3a13aea4a892695c09be28381ed3971124d63d76825dc",
+    "row-33.png": "1562a53b7d38611dce89eb483ae427f809b25e2e35cf67e8a1a32951874876ef",
+    "row-34.png": "0e1e36ae7bb207de0a42256fa4f79f5c5be83400ed064b577eb3f350738ca345",
+    "row-35.png": "f908bdeb94cd03db8a4c493355dfeba5c2fbdc28dd64961cf334867dfde91a3b",
+    "row-36.png": "38b09f9c8f348245b2dcf38e80d5655149446f450b5e5c1425e7fbdbb7c03bd7"
+  },
+  "visualReference": "cloud/bag-polish-v2.png",
+  "findings": [
+    {
+      "severity": "must-fix",
+      "issue": "Sparse content occupies tall sheets, separating context and action with 200–330px blank space. All short generic result/permission/Buff sheets need content-sized composition.",
+      "representativeIds": [
+        "SOC-2",
+        "SOC-2-ERROR",
+        "HELPER-INBOX",
+        "GIFT-SENT",
+        "TOGETHER",
+        "TOGETHER-PROGRESS",
+        "TOGETHER-DONE",
+        "BUFF-HANDS",
+        "COMBAT-HEAL",
+        "RESIDENT-CHAT"
+      ],
+      "repair": "7-card real Figma benchmark passed; source adapter integrated in standard/cloud builds; all existing-node delta ready."
+    },
+    {
+      "severity": "must-fix",
+      "issue": "Actual cloud frames still show older duplicated refund/recovery/Quartz information despite repaired local source.",
+      "ids": [
+        "TRAVEL-CANCEL",
+        "GIFT-DETAIL",
+        "MINE-5",
+        "RESIDENT-MEAL"
+      ],
+      "repair": "Replay latest data/current-qa source before visual delta. Precise 16 semantic source targets: cloud/p2p3-semantic-rebuild-targets.json."
+    },
+    {
+      "severity": "must-fix",
+      "issue": "12 resident cards still share one emoji portrait; local source now binds individual existing portrait assets.",
+      "ids": [
+        "RES-PIP",
+        "RES-GRANNY",
+        "RES-MIRA",
+        "RES-KAI",
+        "RES-RAFA",
+        "RES-IVO",
+        "RES-HANA",
+        "RES-SAM",
+        "RES-LENA",
+        "RES-TOMO",
+        "RES-THEO",
+        "RES-NADIA"
+      ],
+      "repair": "Included in the 16 semantic source replays."
+    },
+    {
+      "severity": "must-fix",
+      "issue": "SOC-6 repeats Guestbook as an informational item and a separate navigation row, pushing later content into the footer boundary.",
+      "ids": [
+        "SOC-6"
+      ],
+      "repair": "Applied in benchmark, one Guestbook navigation remains; visual screenshot passed."
+    },
+    {
+      "severity": "needs-product-content",
+      "issue": "Contribution confirmation says 1 item / selected fish without naming the item being spent; the source template remains undefined.",
+      "ids": [
+        "TOGETHER-PROGRESS"
+      ],
+      "repair": "Local source updated to existing Pond Crucian ×1; main source replay pending. Total request template remains explicitly undefined."
+    },
+    {
+      "severity": "needs-product-content",
+      "issue": "Teaching result says recipe name/ingredients are revealed but neither appears.",
+      "ids": [
+        "RESIDENT-TEACH"
+      ],
+      "repair": "Local source updated to approved Hana recipe #22 Corn Cake / Corn ×2 / Fine /15s; no item/XP awarded. Main source replay pending."
+    },
+    {
+      "severity": "needs-state-design",
+      "issue": "Travel Permit displays ?/1 inside a green satisfied-material ring while Fly is enabled.",
+      "ids": [
+        "BUFF-RATIONS-USE"
+      ],
+      "repair": "Fixed and verified in actual Figma screenshot: NeedTile/check variant uses existing owner-bound Title/Value/Icon properties; have remains null. Initial broken clone was rejected and repaired, not accepted."
+    },
+    {
+      "severity": "must-fix",
+      "issue": "MINE-3 still uses an unpadded generic scene information card and places Per rock 2 Energy above Switch to Combat, conflating mining cost with mode switching.",
+      "ids": [
+        "MINE-3"
+      ],
+      "repair": "Assigned to normalize_current scene renderer; preserve actual mining/mode controls."
+    },
+    {
+      "severity": "must-fix",
+      "issue": "Buff active/last-cast quick bars are empty, while the paired expiry/last-result cards suddenly show populated quick bars.",
+      "ids": [
+        "BUFF-ACTIVE",
+        "BUFF-CASTS",
+        "BUFF-LAST",
+        "BUFF-TIMEOUT"
+      ],
+      "repair": "Assigned to normalize_current; reuse paired existing quick-item fixtures without invented counts."
+    },
+    {
+      "severity": "visual-cleanup",
+      "issue": "Expansion previews show an empty Available ingredients section.",
+      "ids": [
+        "EXPAND-4",
+        "EXPAND-5"
+      ],
+      "repair": "Assigned to normalize_current kitchen renderer; hide the empty section, keep rule gaps outside viewport."
+    }
+  ],
+  "notChanged": [
+    "Avatar already accepted",
+    "Kitchen renderer",
+    "HUD masters",
+    "gameplay rules",
+    "original Prototype"
+  ],
+  "scopeLimit": "Actual screenshots and source inspection; no browser interaction QA.",
+  "lateFilledScreenshots": {
+    "EXPAND-4": "118843b92e272f0bbec8f4ba3c84dc87c28e204471a61369ba2bd85b9ecae52a",
+    "EXPAND-5": "2fec8d17e87c1fa06f3a26b63133c7c715d65834567b48560500a8ab5cd68cb1",
+    "BUFF-ACTIVE": "da29c8adb2a999d6013b82b826a0b2557ce4b5f29cd4d64ea0c543e5b0e2ac5a",
+    "BUFF-CASTS": "3bbef3ba59c65fdb3638a83baa0b7f687631396939082f568a35515ee30c2fc5",
+    "BUFF-LAST": "5f865d5e28f03538ce748009b5a2eb2547ce6301d33cf5bb95175766f72aef66",
+    "BUFF-TIMEOUT": "94073db25f6e41069e4d6527a655f8c04957d1f1a286d2738cc1c139fbe0bf57",
+    "BUFF-CREEL-END": "5b22ac0018920f14152165ec1fb4dadf284a3337ddd9ffe66ae383d63cfa1ecb",
+    "MINE-3": "22a531d3bee8eb09cc8cb7c13573bb4de659b21c2880ae4fb73e52f94e92a46e",
+    "COMBAT-1": "4bb315bab409f92e093df1d97dca8f40e67430fea6623b9fa5a87c8fb226d83f",
+    "COOK-MILESTONE": "141e8623d69ecb3c4c603d4bbb1f9541835179811d36ed0326e592bb79a2d0a3"
+  },
+  "compactBenchmark": {
+    "receipt": "p2p3-visual-benchmark-result-1791287554017.json",
+    "checks": {
+      "applied": 7,
+      "reactionsPreserved": 60,
+      "reactionErrors": [],
+      "wrongGaps": [],
+      "screenIdsPreserved": true
+    },
+    "actualFigmaScreenshotsReviewed": [
+      "GIFT-SENT",
+      "SOC-2",
+      "BUFF-HANDS",
+      "COMBAT-HEAL",
+      "TRAVEL-GUIDE",
+      "SOC-6",
+      "RES-HANA"
+    ],
+    "result": "passed",
+    "screenshotSha256": {
+      "GIFT-SENT": "56c344c532a79046e018e1f3895d36ef7819e0329ea726f704fd2f6b020b5ce6",
+      "SOC-2": "ff4ed71af67b9d60a98af9d93290fbfe2a8bced122701204262f37e8fec56e88",
+      "BUFF-HANDS": "79d9c7fc730989ae80f5d26183ad20a717d39a3d58d2a6dd3a276b646d9d68f6",
+      "COMBAT-HEAL": "bd3cbdefe39bd0afe7775195580af3280b8fd01dfdeb51c53f834b367f4305db",
+      "TRAVEL-GUIDE": "e0f3e93a7fc464532789b327867a65fa1a9b0b4fabc8bf89e3785b87ef18c5fe",
+      "SOC-6": "af305931b31601f03ef83194815c1cc1fac818f220f874cfa2c0a618061bd580",
+      "RES-HANA": "bdbc0762291d2896d27b51372f6048845ad099380353232c0f2639fb1f0436d1"
+    },
+    "observations": [
+      "Short results and invitations fit their content; actions remain adjacent to the decision context.",
+      "Long Tokyo guide expands to show all three entries without cut text.",
+      "SOC-6 retains one real Guestbook navigation, and all Watering quantities remain visible.",
+      "Hana uses its existing dedicated portrait and retains all information/actions.",
+      "New light HUD and variable-height sheets do not overlap."
+    ],
+    "allDeltaReady": "p2p3-visual-all.js"
+  },
+  "allCompactExecution": {
+    "receipt": "p2p3-visual-all-result-1791287955685.json",
+    "checks": {
+      "applied": 68,
+      "reactionsPreserved": 674,
+      "reactionErrors": [],
+      "wrongGaps": [],
+      "screenIdsPreserved": true
+    },
+    "visualScope": "7 benchmark screenshots passed; structural rollout to68 generic sheets does not imply68 final screenshot reviews."
+  },
+  "neutralRequirement": {
+    "receipt": "neutral-rations-requirement-result-1791292037348.json",
+    "checks": {
+      "haveStillUnknown": true,
+      "value": "Required ×1",
+      "tileIdPreserved": true,
+      "screenIdPreserved": true,
+      "reactionsPreserved": 9,
+      "reactionErrors": [],
+      "variantCount": 3,
+      "checkParentId": "483:261",
+      "renderedTitle": "Travel Permit",
+      "renderedValue": "Required ×1",
+      "renderedIconId": "431:311",
+      "originalMetFieldsPreserved": true
+    },
+    "actualScreenshot": "rows/p2p3-visual-qa/BUFF-RATIONS-USE-neutral.png",
+    "sha256": "4d073ea2ac26a1e06d0a9a9a2daa0e378dbf64758e4f13dcdda7827b143d0b0f",
+    "visualResult": "passed; correct Travel Permit icon/name, Required ×1, neutral gray outline/value, no green satisfied claim"
+  }
+}

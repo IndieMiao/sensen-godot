@@ -1,0 +1,4085 @@
+[
+  {
+    "id": "MAP-4-PAID",
+    "sourceGroup": "10",
+    "title": "Tokyo",
+    "state": "Ready to travel",
+    "effect": "Review the full cost before departure.",
+    "keyFacts": [
+      {
+        "label": "Energy",
+        "value": "40",
+        "kind": "cost"
+      },
+      {
+        "label": "Coins",
+        "value": "200",
+        "kind": "cost"
+      },
+      {
+        "label": "Travel Permit",
+        "value": "1",
+        "kind": "cost"
+      },
+      {
+        "label": "Journey",
+        "value": "10 min",
+        "kind": "time"
+      }
+    ],
+    "requirements": [],
+    "supporting": "After departure: 142 Energy and 230 coins.",
+    "disclosure": [
+      "Trip 5 · Continental · First visit.",
+      "Your farm remains available during the trip."
+    ],
+    "actions": [
+      {
+        "label": "Fly",
+        "target": "MAP-5-PAID",
+        "kind": "commit"
+      },
+      {
+        "label": "Not now",
+        "target": "MAP-3-FREE",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "sheet",
+    "sourceNote": "§11.2/11.8。此为收费版，出发一次扣齐；首版免费流程不共用此费用状态。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MAP-4-PAID",
+      "nodeId": "439:3178",
+      "designLabel": "收费旅行 · 原子扣费"
+    },
+    "original": {
+      "id": "MAP-4-PAID",
+      "title": "收费旅行 · 原子扣费",
+      "heading": "Fly to Tokyo",
+      "meta": "1,758 km · Trip 5 · First visit",
+      "rows": [
+        [
+          "40 Energy → 142 left",
+          "200 coins → 230 left",
+          "i-energy"
+        ],
+        [
+          "Travel Permit ×1 · Stamps 6/5",
+          "10 min · your farm stays open",
+          "i-passport"
+        ]
+      ],
+      "actions": [
+        [
+          "Fly",
+          "MAP-5-PAID"
+        ],
+        [
+          "Not now",
+          "MAP-3-FREE",
+          "soft"
+        ]
+      ],
+      "note": "§11.2/11.8。此为收费版，出发一次扣齐；首版免费流程不共用此费用状态。",
+      "scene": "map",
+      "energy": 182,
+      "coins": 430
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "energy": 182,
+      "coins": 430,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "MAP-4-GATE",
+    "sourceGroup": "10",
+    "title": "Tokyo",
+    "state": "Permit needed",
+    "effect": "Get a Travel Permit before departure.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Energy",
+        "value": "40"
+      },
+      {
+        "kind": "cost",
+        "label": "Coins",
+        "value": "200"
+      },
+      {
+        "kind": "time",
+        "label": "Journey",
+        "value": "10 min"
+      }
+    ],
+    "requirements": [
+      {
+        "title": "Travel Permit",
+        "have": 0,
+        "need": 1,
+        "icon": "i-passport",
+        "state": "short",
+        "source": "Homestead Stall or Travel Post"
+      }
+    ],
+    "supporting": "",
+    "disclosure": [
+      "Tokyo · Trip 5",
+      "Stamps 6/5 · Energy 182/40",
+      "Get a permit at the Homestead Stall or Travel Post."
+    ],
+    "actions": [
+      {
+        "label": "Fly",
+        "target": null,
+        "kind": "blocked",
+        "feedback": "A Travel Permit is required. Open permit details to obtain one."
+      },
+      {
+        "label": "View permit",
+        "target": "PERMIT-1",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "sheet",
+    "sourceNote": "只显示缺的条件；道具、体力、币、印章任一不足整笔拒绝。钱包扣后须≥40。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MAP-4-GATE",
+      "nodeId": "439:3249",
+      "designLabel": "出发门禁 · 明确缺口"
+    },
+    "original": {
+      "id": "MAP-4-GATE",
+      "title": "出发门禁 · 明确缺口",
+      "heading": "Travel Permit needed",
+      "meta": "Tokyo · Trip 5",
+      "rows": [
+        [
+          "Stamps 6/5 · Energy 182/40",
+          "Get a permit at the Homestead Stall or Travel Post.",
+          "i-passport"
+        ]
+      ],
+      "actions": [
+        [
+          "Travel Permit needed",
+          null,
+          "disabled"
+        ],
+        [
+          "View permit",
+          "PERMIT-1",
+          "soft"
+        ]
+      ],
+      "note": "只显示缺的条件；道具、体力、币、印章任一不足整笔拒绝。钱包扣后须≥40。",
+      "scene": "map",
+      "energy": 182,
+      "coins": 430
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "energy": 182,
+      "coins": 430,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true,
+      "suppressMaterialSummary": true
+    }
+  },
+  {
+    "id": "MAP-5-PAID",
+    "sourceGroup": "10",
+    "title": "Tokyo",
+    "state": "In transit",
+    "effect": "Your farm, kitchen and bag remain available.",
+    "keyFacts": [
+      {
+        "kind": "time",
+        "label": "Arrival in",
+        "value": "7:42"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Trip 5 · 7:42 left",
+      "Your farm stays open",
+      "Farming, cooking and your bag are available.",
+      "Ponds and mines wait until arrival",
+      "One active trip at a time."
+    ],
+    "actions": [
+      {
+        "label": "Travel guide",
+        "target": "TRAVEL-GUIDE",
+        "kind": "navigate"
+      },
+      {
+        "label": "Cancel trip",
+        "target": "TRAVEL-CANCEL",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "按真实时间继续；重启读同一旅程。到点Land，日票按计划到达时刻起算。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MAP-5-PAID",
+      "nodeId": "439:3312",
+      "designLabel": "在途 · 登机牌"
+    },
+    "original": {
+      "id": "MAP-5-PAID",
+      "title": "在途 · 登机牌",
+      "heading": "In transit · Tokyo",
+      "meta": "Trip 5 · 7:42 left",
+      "rows": [
+        [
+          "Your farm stays open",
+          "Farming, cooking and your bag are available.",
+          "i-home"
+        ],
+        [
+          "Ponds and mines wait until arrival",
+          "One active trip at a time.",
+          "i-travel"
+        ]
+      ],
+      "actions": [
+        [
+          "Travel guide",
+          "TRAVEL-GUIDE",
+          "soft"
+        ],
+        [
+          "Cancel trip",
+          "TRAVEL-CANCEL",
+          "soft"
+        ]
+      ],
+      "note": "按真实时间继续；重启读同一旅程。到点Land，日票按计划到达时刻起算。",
+      "scene": "map",
+      "route": true,
+      "energy": 142,
+      "coins": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "energy": 142,
+      "coins": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAVEL-GUIDE",
+    "sourceGroup": "10",
+    "title": "Tokyo",
+    "state": "Travel guide",
+    "effect": "Plan what to do after arrival.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Climate",
+        "value": "Temperate"
+      },
+      {
+        "kind": "time",
+        "label": "Local time",
+        "value": "09:12"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Temperate · 09:12 local · 14 online",
+      "Smelt Lv1 · Northern Pike Lv5",
+      "Local river fish · active times shown in Fish-dex",
+      "Market Square",
+      "Local seeds, recipes and requests"
+    ],
+    "actions": [
+      {
+        "label": "Back to boarding pass",
+        "target": "MAP-5-PAID",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Smelt",
+        "state": "Fishing Lv1",
+        "effect": "Local river fish",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-fish-sil"
+      },
+      {
+        "title": "Northern Pike",
+        "state": "Fishing Lv5",
+        "effect": "Local river fish",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-fish-sil"
+      },
+      {
+        "title": "Market Square",
+        "state": "",
+        "effect": "Local seeds, recipes and requests",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-home"
+      }
+    ],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "信息预览不允许远程交易；地区鱼由城市簇分配。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAVEL-GUIDE",
+      "nodeId": "439:3392",
+      "designLabel": "在途 · 当地指南"
+    },
+    "original": {
+      "id": "TRAVEL-GUIDE",
+      "title": "在途 · 当地指南",
+      "heading": "Tokyo travel guide",
+      "meta": "Temperate · 09:12 local · 14 online",
+      "rows": [
+        [
+          "Smelt Lv1 · Northern Pike Lv5",
+          "Local river fish · active times shown in Fish-dex",
+          "i-fish-sil"
+        ],
+        [
+          "Market Square",
+          "Local seeds, recipes and requests",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "Back to boarding pass",
+          "MAP-5-PAID",
+          "soft"
+        ]
+      ],
+      "note": "信息预览不允许远程交易；地区鱼由城市簇分配。",
+      "scene": "map"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAVEL-CANCEL",
+    "sourceGroup": "10",
+    "title": "Tokyo trip",
+    "state": "Cancel trip",
+    "effect": "Cancel before arrival to receive the listed refund.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "The refund applies only before arrival."
+    ],
+    "actions": [
+      {
+        "label": "Cancel and refund",
+        "target": "TRAVEL-REFUNDED",
+        "kind": "destructive"
+      },
+      {
+        "label": "Keep travelling",
+        "target": "MAP-5-PAID",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Energy",
+        "state": "",
+        "effect": "",
+        "quantity": {
+          "value": "40",
+          "label": "returned"
+        },
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-energy"
+      },
+      {
+        "title": "Coins",
+        "state": "",
+        "effect": "",
+        "quantity": {
+          "value": "200",
+          "label": "returned"
+        },
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-coin"
+      },
+      {
+        "title": "Travel Permit",
+        "state": "",
+        "effect": "",
+        "quantity": {
+          "value": "1",
+          "label": "returned"
+        },
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-passport"
+      }
+    ],
+    "items": [],
+    "scene": "map",
+    "layout": "sheet",
+    "sourceNote": "取消前有效时整笔退款，无到访无盖章无冷却；已到达竞争结果以服务端为准。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAVEL-CANCEL",
+      "nodeId": "439:3462",
+      "designLabel": "取消 · 返还明细"
+    },
+    "original": {
+      "id": "TRAVEL-CANCEL",
+      "title": "取消 · 返还明细",
+      "heading": "Cancel your trip?",
+      "meta": "You have not arrived yet.",
+      "rows": [
+        [
+          "Return 40 Energy + 200 coins",
+          "Travel Permit ×1 also returned",
+          "i-coin"
+        ]
+      ],
+      "actions": [
+        [
+          "Keep travelling",
+          "MAP-5-PAID"
+        ],
+        [
+          "Cancel and refund",
+          "TRAVEL-REFUNDED",
+          "soft"
+        ]
+      ],
+      "note": "取消前有效时整笔退款，无到访无盖章无冷却；已到达竞争结果以服务端为准。",
+      "scene": "map"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAVEL-REFUNDED",
+    "sourceGroup": "10",
+    "title": "Tokyo trip",
+    "state": "Cancelled",
+    "effect": "The trip cost has been refunded.",
+    "keyFacts": [
+      {
+        "kind": "reward",
+        "label": "Energy returned",
+        "value": "40"
+      },
+      {
+        "kind": "reward",
+        "label": "Coins returned",
+        "value": "200"
+      },
+      {
+        "kind": "reward",
+        "label": "Permit returned",
+        "value": "1"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Your resources are back.",
+      "40 Energy · 200 coins · Permit ×1",
+      "No visit or stamp was counted."
+    ],
+    "actions": [
+      {
+        "label": "Back to map",
+        "target": "MAP-2-FREE",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "sheet",
+    "sourceNote": "回显退款一次；中断后查询已取消状态，不再重复退款。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAVEL-REFUNDED",
+      "nodeId": "439:3525",
+      "designLabel": "退款成功"
+    },
+    "original": {
+      "id": "TRAVEL-REFUNDED",
+      "title": "退款成功",
+      "heading": "Trip cancelled",
+      "meta": "Your resources are back.",
+      "rows": [
+        [
+          "40 Energy · 200 coins · Permit ×1",
+          "No visit or stamp was counted.",
+          "i-check"
+        ]
+      ],
+      "actions": [
+        [
+          "Back to map",
+          "MAP-2-FREE",
+          "soft"
+        ]
+      ],
+      "note": "回显退款一次；中断后查询已取消状态，不再重复退款。",
+      "scene": "map",
+      "energy": 182,
+      "coins": 430
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "energy": 182,
+      "coins": 430,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "DAYPASS",
+    "sourceGroup": "10",
+    "title": "Tokyo",
+    "state": "Day Pass active",
+    "effect": "Return here free while your pass is active.",
+    "keyFacts": [
+      {
+        "kind": "time",
+        "label": "Pass remaining",
+        "value": "23h 59m"
+      },
+      {
+        "kind": "cost",
+        "label": "Return during pass",
+        "value": "Free"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Day Pass · 23h 59m",
+      "Return here free while the pass is active",
+      "Home + Tokyo · no third-city access"
+    ],
+    "actions": [
+      {
+        "label": "Show local pond",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "operation": "highlight-target",
+          "ownerId": "DAYPASS",
+          "view": "map",
+          "placeName": "Tokyo · Local pond",
+          "anchor": [
+            246,
+            352
+          ],
+          "originalDestination": "MAP-8-FREE",
+          "preservePlayer": true,
+          "preserveResources": true
+        }
+      },
+      {
+        "label": "Return home",
+        "target": "HOME-RETURN",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "§16.1.3覆盖旧右上独立日票卡：时间在位置芯片；24h滚动，Local48h。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "DAYPASS",
+      "nodeId": "439:3583",
+      "designLabel": "到达 · 日票并入位置芯片"
+    },
+    "original": {
+      "id": "DAYPASS",
+      "title": "到达 · 日票并入位置芯片",
+      "heading": "Welcome back to Tokyo",
+      "meta": "Day Pass · 23h 59m",
+      "rows": [
+        [
+          "Return here free while the pass is active",
+          "Home + Tokyo · no third-city access",
+          "i-passport"
+        ]
+      ],
+      "actions": [
+        [
+          "Visit the local pond",
+          "MAP-8-FREE"
+        ],
+        [
+          "Return home · Free",
+          "HOME-RETURN",
+          "soft"
+        ]
+      ],
+      "note": "§16.1.3覆盖旧右上独立日票卡：时间在位置芯片；24h滚动，Local48h。",
+      "scene": "map",
+      "city": "Tokyo",
+      "place": "Map · Pass 23h"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Map · Pass 23h",
+      "placeExplicit": true
+    },
+    "hud": {
+      "city": "Tokyo",
+      "place": "Map · Pass 23h",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "DAYPASS-EXPIRED",
+    "sourceGroup": "10",
+    "title": "Day Pass",
+    "state": "Expired",
+    "effect": "You can stay in the current room.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Return home",
+        "value": "Free"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "You can stay in this room.",
+      "Leaving does not take you home",
+      "Re-entry needs a new pass · return travel is half price."
+    ],
+    "actions": [
+      {
+        "label": "Stay here",
+        "target": "LOCAL-FISH",
+        "kind": "dismiss"
+      },
+      {
+        "label": "Return home",
+        "target": "HOME-RETURN",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "pond",
+    "layout": "sheet",
+    "sourceNote": "到期不踢人不自动返家；离房后新入口检查日票。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "DAYPASS-EXPIRED",
+      "nodeId": "439:3646",
+      "designLabel": "日票到期 · 不踢人"
+    },
+    "original": {
+      "id": "DAYPASS-EXPIRED",
+      "title": "日票到期 · 不踢人",
+      "heading": "Day Pass expired",
+      "meta": "You can stay in this room.",
+      "rows": [
+        [
+          "Leaving does not take you home",
+          "Re-entry needs a new pass · return travel is half price.",
+          "i-passport"
+        ]
+      ],
+      "actions": [
+        [
+          "Stay here",
+          "LOCAL-FISH",
+          "soft"
+        ],
+        [
+          "Return home · Free",
+          "HOME-RETURN"
+        ]
+      ],
+      "note": "到期不踢人不自动返家；离房后新入口检查日票。",
+      "scene": "pond",
+      "city": "Tokyo",
+      "place": "Sumida Pond"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Sumida Pond",
+      "placeExplicit": true
+    },
+    "hud": {
+      "city": "Tokyo",
+      "place": "Sumida Pond",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "PERMIT-1",
+    "sourceGroup": "10",
+    "title": "Travel Permit",
+    "state": "Can craft",
+    "effect": "Required for travel beyond 1,600 km.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Coins",
+        "value": "100"
+      },
+      {
+        "kind": "progress",
+        "label": "Made this week",
+        "value": "1/3"
+      }
+    ],
+    "requirements": [
+      {
+        "title": "Tilapia",
+        "have": 1,
+        "need": 1,
+        "icon": "i-fish",
+        "state": "met",
+        "source": "Inventory"
+      },
+      {
+        "title": "Smelt",
+        "have": 1,
+        "need": 1,
+        "icon": "i-minnow",
+        "state": "met",
+        "source": "Inventory"
+      },
+      {
+        "title": "Coins",
+        "have": 230,
+        "need": 100,
+        "icon": "i-coin",
+        "state": "met",
+        "source": "Inventory"
+      }
+    ],
+    "supporting": "",
+    "disclosure": [
+      "Homestead Stall · Made this week 1/3",
+      "Tilapia · Subtropical + Smelt · Temperate"
+    ],
+    "actions": [
+      {
+        "label": "Craft",
+        "target": "PERMIT-DONE",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "§11.3.2 两个不同气候带特产+100；每周3张，购买250且每周2张另列。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "PERMIT-1",
+      "nodeId": "439:3709",
+      "designLabel": "旅行许可 · 双带制作"
+    },
+    "original": {
+      "id": "PERMIT-1",
+      "title": "旅行许可 · 双带制作",
+      "heading": "Travel Permit",
+      "meta": "Homestead Stall · Made this week 1/3",
+      "rows": [],
+      "actions": [
+        [
+          "Craft · 100 coins",
+          "PERMIT-DONE"
+        ]
+      ],
+      "note": "§11.3.2 两个不同气候带特产+100；每周3张，购买250且每周2张另列。",
+      "needs": [
+        [
+          "Tilapia",
+          1,
+          1,
+          "i-fish"
+        ],
+        [
+          "Smelt",
+          1,
+          1,
+          "i-minnow"
+        ],
+        [
+          "Coins",
+          230,
+          100,
+          "i-coin"
+        ]
+      ],
+      "body": "Tilapia · Subtropical + Smelt · Temperate"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "PERMIT-DONE",
+    "sourceGroup": "10",
+    "title": "Travel Permit",
+    "state": "Crafted",
+    "effect": "Ready in your bag for a future trip.",
+    "quantity": {
+      "value": "1",
+      "label": "permit"
+    },
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Made this week",
+        "value": "2/3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Crafted · 2/3 this week",
+      "For trips beyond 1,600 km",
+      "Cannot sell or gift this item."
+    ],
+    "actions": [
+      {
+        "label": "View Tokyo trip",
+        "target": "MAP-4-PAID",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "即时0体力；先容量检查再扣100和两件特产。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "PERMIT-DONE",
+      "nodeId": "439:3795",
+      "designLabel": "许可入包"
+    },
+    "original": {
+      "id": "PERMIT-DONE",
+      "title": "许可入包",
+      "heading": "Travel Permit ×1",
+      "meta": "Crafted · 2/3 this week",
+      "rows": [
+        [
+          "For trips beyond 1,600 km",
+          "Cannot sell or gift this item.",
+          "i-passport"
+        ]
+      ],
+      "actions": [
+        [
+          "View Tokyo trip",
+          "MAP-4-PAID",
+          "soft"
+        ]
+      ],
+      "note": "即时0体力；先容量检查再扣100和两件特产。",
+      "coins": 130
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "coins": 130,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TICKET-1",
+    "sourceGroup": "10",
+    "title": "Long-haul Ticket",
+    "state": "Can craft",
+    "effect": "Used for Trip 6–7 departures.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Coins",
+        "value": "150"
+      },
+      {
+        "kind": "progress",
+        "label": "Stamps",
+        "value": "8/8"
+      },
+      {
+        "kind": "progress",
+        "label": "Required Homestead",
+        "value": "Lv4"
+      }
+    ],
+    "requirements": [
+      {
+        "title": "Permit",
+        "have": 1,
+        "need": 1,
+        "icon": "i-passport",
+        "state": "met",
+        "source": "Inventory"
+      },
+      {
+        "title": "Hardwood",
+        "have": 2,
+        "need": 2,
+        "icon": "i-wood",
+        "state": "met",
+        "source": "Inventory"
+      },
+      {
+        "title": "Quartz",
+        "have": 2,
+        "need": 2,
+        "icon": "i-stone",
+        "state": "met",
+        "source": "Inventory"
+      },
+      {
+        "title": "Coins",
+        "have": 430,
+        "need": 150,
+        "icon": "i-coin",
+        "state": "met",
+        "source": "Inventory"
+      }
+    ],
+    "supporting": "",
+    "disclosure": [
+      "Homestead Lv4 · Stamps 8/8",
+      "For Trip 6–7 · one ticket per departure"
+    ],
+    "actions": [
+      {
+        "label": "Craft",
+        "target": null,
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "§11.3.3。许可1+硬木2+石英2+150。Trip7另验Lv5与12章。图中返回Trip5仅审阅导航，长途票用途为Trip6–7。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TICKET-1",
+      "nodeId": "439:3856",
+      "designLabel": "长途票 · 制作条件"
+    },
+    "original": {
+      "id": "TICKET-1",
+      "title": "长途票 · 制作条件",
+      "heading": "Long-haul Ticket",
+      "meta": "Homestead Lv4 · Stamps 8/8",
+      "rows": [],
+      "actions": [
+        [
+          "Craft · 150 coins",
+          null
+        ]
+      ],
+      "note": "§11.3.3。许可1+硬木2+石英2+150。Trip7另验Lv5与12章。图中返回Trip5仅审阅导航，长途票用途为Trip6–7。",
+      "needs": [
+        [
+          "Permit",
+          1,
+          1,
+          "i-passport"
+        ],
+        [
+          "Hardwood",
+          2,
+          2,
+          "i-wood"
+        ],
+        [
+          "Quartz",
+          2,
+          2,
+          "i-stone"
+        ],
+        [
+          "Coins",
+          430,
+          150,
+          "i-coin"
+        ]
+      ],
+      "coins": 430,
+      "foot": "For Trip 6–7 · one ticket per departure"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Craft result screen is not present in the source cards. Do not misroute to Trip 5."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "coins": 430,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "SECOND-HOME",
+    "sourceGroup": "10",
+    "title": "Tokyo",
+    "state": "Set Second Home",
+    "effect": "Travel here free with no Day Pass requirement.",
+    "keyFacts": [
+      {
+        "kind": "time",
+        "label": "Assignment locked",
+        "value": "7 days"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Regular · 5 visits · 3 local trades",
+      "Free travel, no Day Pass needed",
+      "One slot stays assigned for 7 days."
+    ],
+    "actions": [
+      {
+        "label": "Set Second Home",
+        "target": "SECOND-HOME-DONE",
+        "kind": "commit"
+      },
+      {
+        "label": "Not now",
+        "target": "PASS-2",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "常客+对应档印章/Homestead+空槽全部校验；设定后7天不能释放或换城。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SECOND-HOME",
+      "nodeId": "439:3947",
+      "designLabel": "第二故乡 · 七日锁"
+    },
+    "original": {
+      "id": "SECOND-HOME",
+      "title": "第二故乡 · 七日锁",
+      "heading": "Make Tokyo a Second Home?",
+      "meta": "Regular · 5 visits · 3 local trades",
+      "rows": [
+        [
+          "Free travel, no Day Pass needed",
+          "One slot stays assigned for 7 days.",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "Set Second Home",
+          "SECOND-HOME-DONE"
+        ],
+        [
+          "Not now",
+          "PASS-2",
+          "soft"
+        ]
+      ],
+      "note": "常客+对应档印章/Homestead+空槽全部校验；设定后7天不能释放或换城。",
+      "scene": "map"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "SECOND-HOME-DONE",
+    "sourceGroup": "10",
+    "title": "Tokyo",
+    "state": "Second Home",
+    "effect": "Travel stays free until you choose to change it.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Slots",
+        "value": "1/3"
+      },
+      {
+        "kind": "time",
+        "label": "Can change in",
+        "value": "6d 23h"
+      },
+      {
+        "kind": "cost",
+        "label": "Travel",
+        "value": "Free"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Slot 1/3 · Change available in 6d 23h",
+      "Home crest added",
+      "Travel stays free."
+    ],
+    "actions": [
+      {
+        "label": "Travel free",
+        "target": "MAP-5-FREE",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "已探索全彩叠家徽描边；到期只是允许更换，不自动失效。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SECOND-HOME-DONE",
+      "nodeId": "439:4009",
+      "designLabel": "第二故乡 · 永久痕迹"
+    },
+    "original": {
+      "id": "SECOND-HOME-DONE",
+      "title": "第二故乡 · 永久痕迹",
+      "heading": "Tokyo · Second Home",
+      "meta": "Slot 1/3 · Change available in 6d 23h",
+      "rows": [
+        [
+          "Home crest added",
+          "Travel stays free.",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "Travel free",
+          "MAP-5-FREE"
+        ]
+      ],
+      "note": "已探索全彩叠家徽描边；到期只是允许更换，不自动失效。",
+      "scene": "map"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "SOC-1",
+    "sourceGroup": "10",
+    "title": "Friends",
+    "state": "Relationships",
+    "effect": "Browse people you follow and know.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Following · Mutual · Close Friends",
+      "Mia · Mutual",
+      "2/3 interactions this week",
+      "Alex · Close Friend",
+      "Shanghai · online"
+    ],
+    "actions": [
+      {
+        "label": "Mia’s profile",
+        "target": "SOC-1-GATE",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Mia",
+        "state": "Mutual",
+        "effect": "Share activities together",
+        "keyFacts": [
+          {
+            "label": "Interactions this week",
+            "value": "2/3",
+            "kind": "progress"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-face-player"
+      },
+      {
+        "title": "Alex",
+        "state": "Close Friend",
+        "effect": "Shanghai",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-face-player"
+      }
+    ],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "延续PROFILE-2，无新社交头像体系；昵称公开为基线待拍板，设计用示例名字。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SOC-1",
+      "nodeId": "439:4069",
+      "designLabel": "关系 · 四级入口"
+    },
+    "original": {
+      "id": "SOC-1",
+      "title": "关系 · 四级入口",
+      "heading": "Friends",
+      "meta": "Following · Mutual · Close Friends",
+      "rows": [
+        [
+          "Mia · Mutual",
+          "2/3 interactions this week",
+          "i-face-player"
+        ],
+        [
+          "Alex · Close Friend",
+          "Shanghai · online",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Mia’s profile",
+          "SOC-1-GATE"
+        ]
+      ],
+      "note": "延续PROFILE-2，无新社交头像体系；昵称公开为基线待拍板，设计用示例名字。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Public nickname policy remains undecided. Names are sample content."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "SOC-1-GATE",
+    "sourceGroup": "10",
+    "title": "Mia",
+    "state": "Mutual",
+    "effect": "Share one more interaction to qualify as Close Friends.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Recent interactions",
+        "value": "2/3"
+      },
+      {
+        "kind": "capacity",
+        "label": "Close Friends",
+        "value": "2/3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Close Friend slots 2/3",
+      "1 more interaction this week",
+      "Visit, gift, help or fish together."
+    ],
+    "actions": [
+      {
+        "label": "Request Close Friend",
+        "target": null,
+        "kind": "blocked",
+        "feedback": "Share 1 more interaction this week before sending a request."
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "每对每日最多3次、近7天≥3，双方空槽且接收方确认。此进度按钮仅分镜链接，非一键增加关系。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SOC-1-GATE",
+      "nodeId": "439:4144",
+      "designLabel": "密友门槛"
+    },
+    "original": {
+      "id": "SOC-1-GATE",
+      "title": "密友门槛",
+      "heading": "Mia · Mutual",
+      "meta": "Close Friend slots 2/3",
+      "rows": [
+        [
+          "1 more interaction this week",
+          "Visit, gift, help or fish together.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "1 more interaction",
+          null,
+          "disabled"
+        ],
+        [
+          "View progress after interaction",
+          "SOC-1-CONFIRM",
+          "soft"
+        ]
+      ],
+      "note": "每对每日最多3次、近7天≥3，双方空槽且接收方确认。此进度按钮仅分镜链接，非一键增加关系。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [
+      {
+        "label": "View progress after interaction",
+        "target": "SOC-1-CONFIRM",
+        "reason": "Review link must not grant relationship progress."
+      }
+    ],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "SOC-1-CONFIRM",
+    "sourceGroup": "10",
+    "title": "Mia",
+    "state": "Close Friend request",
+    "effect": "Accept to become Close Friends.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Recent interactions",
+        "value": "3"
+      },
+      {
+        "kind": "capacity",
+        "label": "Close Friends",
+        "value": "2/3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "3 interactions in the last 7 days",
+      "Close Friend slots 2/3",
+      "Both of you need a free slot."
+    ],
+    "actions": [
+      {
+        "label": "Accept",
+        "target": "SOC-2",
+        "kind": "commit"
+      },
+      {
+        "label": "Not now",
+        "target": "SOC-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "Inbox To do接受才建立，任一方取消或取关可解除，不自动过期。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SOC-1-CONFIRM",
+      "nodeId": "439:4209",
+      "designLabel": "密友 · 接收方确认"
+    },
+    "original": {
+      "id": "SOC-1-CONFIRM",
+      "title": "密友 · 接收方确认",
+      "heading": "Mia wants to be close friends",
+      "meta": "3 interactions in the last 7 days",
+      "rows": [
+        [
+          "Close Friend slots 2/3",
+          "Both of you need a free slot.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Accept",
+          "SOC-2"
+        ],
+        [
+          "Not now",
+          "SOC-1",
+          "soft"
+        ]
+      ],
+      "note": "Inbox To do接受才建立，任一方取消或取关可解除，不自动过期。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "SOC-2",
+    "sourceGroup": "10",
+    "title": "Mia",
+    "state": "Guest invitation",
+    "effect": "Invite Mia to your current room.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Mia's travel",
+        "value": "20 Energy"
+      },
+      {
+        "kind": "progress",
+        "label": "Invites today",
+        "value": "1/5"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Guest Pass · 20 Energy for Mia",
+      "You are home and online",
+      "Invites today 1/5 · same pair 0/1"
+    ],
+    "actions": [
+      {
+        "label": "Send invitation",
+        "target": null,
+        "kind": "commit",
+        "context": {
+          "operation": "send-invitation",
+          "resultOnly": true
+        },
+        "feedback": "Invitation sent."
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "主人在家城实时房间；发送与接受双检。此只是设计原型按钮，不发送真实消息。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SOC-2",
+      "nodeId": "439:4274",
+      "designLabel": "客票 · 主人邀请"
+    },
+    "original": {
+      "id": "SOC-2",
+      "title": "客票 · 主人邀请",
+      "heading": "Invite Mia over",
+      "meta": "Guest Pass · 20 Energy for Mia",
+      "rows": [
+        [
+          "You are home and online",
+          "Invites today 1/5 · same pair 0/1",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "Send invitation",
+          "SOC-2-INBOX"
+        ]
+      ],
+      "note": "主人在家城实时房间；发送与接受双检。此只是设计原型按钮，不发送真实消息。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [
+      {
+        "label": "Review other role / later state",
+        "target": "SOC-2-INBOX",
+        "reason": "Different role or later offline settlement; not an immediate player action result."
+      }
+    ],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Sender/recipient/offline settlement are separate review entry points; no player-facing jump changes the acting identity.",
+      "Sender/recipient/offline settlement are separate review entry points; no player-facing jump changes the acting identity."
+    ]
+  },
+  {
+    "id": "SOC-2-INBOX",
+    "sourceGroup": "10",
+    "title": "Mia's invitation",
+    "state": "Waiting",
+    "effect": "Travel directly to Mia's room in Tokyo.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Travel",
+        "value": "20 Energy"
+      },
+      {
+        "kind": "time",
+        "label": "Invitation expires",
+        "value": "28:40"
+      },
+      {
+        "kind": "progress",
+        "label": "Guest passes today",
+        "value": "0/2"
+      }
+    ],
+    "requirements": [],
+    "supporting": "Accepting spends your Energy and takes you to Mia’s room.",
+    "disclosure": [
+      "Expires in 28:40",
+      "20 Energy · 0 coins · instant",
+      "No permit or stamp requirement",
+      "Guest passes today 0/2",
+      "You arrive in Mia’s current room."
+    ],
+    "actions": [
+      {
+        "label": "Accept invitation",
+        "target": "SOC-2-ARRIVE",
+        "kind": "commit"
+      },
+      {
+        "label": "Decline",
+        "target": "SOC-1",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "Trip5一半20，客票价格不是折扣；到达+min(10,已付体力)，不发首访礼。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SOC-2-INBOX",
+      "nodeId": "439:4334",
+      "designLabel": "客票 · 接收预览"
+    },
+    "original": {
+      "id": "SOC-2-INBOX",
+      "title": "客票 · 接收预览",
+      "heading": "Mia invites you to Tokyo",
+      "meta": "Expires in 28:40",
+      "rows": [
+        [
+          "20 Energy · 0 coins · instant",
+          "No permit or stamp requirement",
+          "i-travel"
+        ],
+        [
+          "Guest passes today 0/2",
+          "You arrive in Mia’s current room.",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "Accept · 20 Energy",
+          "SOC-2-ARRIVE"
+        ],
+        [
+          "Decline",
+          "SOC-1",
+          "soft"
+        ]
+      ],
+      "note": "Trip5一半20，客票价格不是折扣；到达+min(10,已付体力)，不发首访礼。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "SOC-2-ARRIVE",
+    "sourceGroup": "10",
+    "title": "Mia's homestead",
+    "state": "Arrived",
+    "effect": "Your Guest Pass is active.",
+    "keyFacts": [
+      {
+        "kind": "reward",
+        "label": "Arrival",
+        "value": "+10 Energy"
+      },
+      {
+        "kind": "time",
+        "label": "Guest Pass",
+        "value": "24h"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Guest of Mia · +10 Energy",
+      "Guest Pass · 24h",
+      "Return home is always free."
+    ],
+    "actions": [
+      {
+        "label": "Close",
+        "target": null,
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "从142扣20加10=132；主人所在房间不是城市概览。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SOC-2-ARRIVE",
+      "nodeId": "439:4410",
+      "designLabel": "客票 · 到达主人房间"
+    },
+    "original": {
+      "id": "SOC-2-ARRIVE",
+      "title": "客票 · 到达主人房间",
+      "heading": "Welcome to Tokyo",
+      "meta": "Guest of Mia · +10 Energy",
+      "rows": [
+        [
+          "Guest Pass · 24h",
+          "Return home is always free.",
+          "i-passport"
+        ]
+      ],
+      "actions": [
+        [
+          "Visit farm together",
+          "SOC-3"
+        ]
+      ],
+      "note": "从142扣20加10=132；主人所在房间不是城市概览。",
+      "city": "Tokyo",
+      "place": "Mia’s farm",
+      "energy": 132
+    },
+    "reviewOnly": false,
+    "reviewActions": [
+      {
+        "label": "View helpers",
+        "target": "SOC-3",
+        "reason": "§12.3.4 identifies SOC-3 as the owner Helpers management panel, not a guest-arrival action."
+      }
+    ],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Mia’s farm",
+      "placeExplicit": true
+    },
+    "hud": {
+      "energy": 132,
+      "city": "Tokyo",
+      "place": "Mia’s farm",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Guest arrival does not grant helper-management permissions. Helpers management is an owner-only review branch (§12.3.4, §16 SOC-3)."
+    ]
+  },
+  {
+    "id": "SOC-2-ERROR",
+    "sourceGroup": "10",
+    "title": "Mia's invitation",
+    "state": "Host unavailable",
+    "effect": "Try again when Mia is home and online.",
+    "keyFacts": [
+      {
+        "kind": "time",
+        "label": "Invitation expires",
+        "value": "12:20"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Your invitation has not been used.",
+      "Try again while Mia is home and online",
+      "Invitation expires in 12:20"
+    ],
+    "actions": [
+      {
+        "label": "Review invitation",
+        "target": "SOC-2-INBOX",
+        "kind": "navigate"
+      },
+      {
+        "label": "Close",
+        "target": "SOC-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "还要覆盖30min到期、Close Friends only、客人2/2和体力不足；全部先验不扣费。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SOC-2-ERROR",
+      "nodeId": "439:4471",
+      "designLabel": "客票失效 · 不扣费"
+    },
+    "original": {
+      "id": "SOC-2-ERROR",
+      "title": "客票失效 · 不扣费",
+      "heading": "Host isn’t home right now",
+      "meta": "Your invitation has not been used.",
+      "rows": [
+        [
+          "Try again while Mia is home and online",
+          "Invitation expires in 12:20",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "Try again",
+          "SOC-2-INBOX",
+          "soft"
+        ],
+        [
+          "Close",
+          "SOC-1",
+          "soft"
+        ]
+      ],
+      "note": "还要覆盖30min到期、Close Friends only、客人2/2和体力不足；全部先验不扣费。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "SOC-3",
+    "sourceGroup": "10",
+    "title": "Helpers",
+    "state": "Permissions",
+    "effect": "Choose who may water and harvest your farm.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Helpers",
+        "value": "1/2"
+      },
+      {
+        "kind": "progress",
+        "label": "Required Homestead",
+        "value": "Lv4"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Homestead Lv4 · Helpers 1/2",
+      "Mia · Mutual",
+      "Water: On · Harvest: On",
+      "Replant: Off",
+      "On-site Close Friends only · their Energy"
+    ],
+    "actions": [
+      {
+        "label": "Invite helper",
+        "target": null,
+        "kind": "commit",
+        "context": {
+          "operation": "invite-helper",
+          "resultOnly": true
+        },
+        "feedback": "Invitation sent."
+      }
+    ],
+    "rows": [
+      {
+        "title": "Mia",
+        "state": "Mutual",
+        "effect": "Watering and annual harvests enabled",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-face-player"
+      },
+      {
+        "title": "Replanting",
+        "state": "Off",
+        "effect": "Requires an on-site Close Friend and their Energy",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-sprout"
+      }
+    ],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "自动轮只浇水/一年生收获0体力；主人在线跳过。邀请7天有效，双方可撤销。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SOC-3",
+      "nodeId": "439:4533",
+      "designLabel": "帮工 · 自动轮授权"
+    },
+    "original": {
+      "id": "SOC-3",
+      "title": "帮工 · 自动轮授权",
+      "heading": "Helpers",
+      "meta": "Homestead Lv4 · Helpers 1/2",
+      "rows": [
+        [
+          "Mia · Mutual",
+          "Water: On · Harvest: On",
+          "i-face-player"
+        ],
+        [
+          "Replant: Off",
+          "On-site Close Friends only · their Energy",
+          "i-sprout"
+        ]
+      ],
+      "actions": [
+        [
+          "Invite as helper",
+          "HELPER-INBOX"
+        ]
+      ],
+      "note": "自动轮只浇水/一年生收获0体力；主人在线跳过。邀请7天有效，双方可撤销。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [
+      {
+        "label": "Review other role / later state",
+        "target": "HELPER-INBOX",
+        "reason": "Different role or later offline settlement; not an immediate player action result."
+      }
+    ],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Sender/recipient/offline settlement are separate review entry points; no player-facing jump changes the acting identity.",
+      "Sender/recipient/offline settlement are separate review entry points; no player-facing jump changes the acting identity."
+    ]
+  },
+  {
+    "id": "HELPER-INBOX",
+    "sourceGroup": "10",
+    "title": "Alex's homestead",
+    "state": "Helper invitation",
+    "effect": "Help with watering and annual harvests while away.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Offline help",
+        "value": "0 Energy"
+      },
+      {
+        "kind": "capacity",
+        "label": "Farms you can help",
+        "value": "3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Water + annual harvests",
+      "No Energy used while you are away",
+      "You can help up to 3 farms."
+    ],
+    "actions": [
+      {
+        "label": "Accept",
+        "target": null,
+        "kind": "commit",
+        "context": {
+          "operation": "accept-helper",
+          "resultOnly": true
+        },
+        "feedback": "Helper invitation accepted."
+      },
+      {
+        "label": "Not now",
+        "target": "SOC-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "帮工自己接受后生效；每农场每日1轮，主人每农场被帮合计≤60格，帮工金币≤12/日。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HELPER-INBOX",
+      "nodeId": "439:4606",
+      "designLabel": "帮工邀请 · 接受"
+    },
+    "original": {
+      "id": "HELPER-INBOX",
+      "title": "帮工邀请 · 接受",
+      "heading": "Help Alex’s farm?",
+      "meta": "Water + annual harvests",
+      "rows": [
+        [
+          "No Energy used while you are away",
+          "You can help up to 3 farms.",
+          "i-sprout"
+        ]
+      ],
+      "actions": [
+        [
+          "Accept",
+          "HELPER-SUMMARY"
+        ],
+        [
+          "Not now",
+          "SOC-1",
+          "soft"
+        ]
+      ],
+      "note": "帮工自己接受后生效；每农场每日1轮，主人每农场被帮合计≤60格，帮工金币≤12/日。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [
+      {
+        "label": "Review other role / later state",
+        "target": "HELPER-SUMMARY",
+        "reason": "Different role or later offline settlement; not an immediate player action result."
+      }
+    ],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Sender/recipient/offline settlement are separate review entry points; no player-facing jump changes the acting identity.",
+      "Sender/recipient/offline settlement are separate review entry points; no player-facing jump changes the acting identity."
+    ]
+  },
+  {
+    "id": "HELPER-SUMMARY",
+    "sourceGroup": "10",
+    "title": "Your homestead",
+    "state": "Help received",
+    "effect": "Mia watered and harvested while you were away.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Watered",
+        "value": "9 plots"
+      },
+      {
+        "kind": "reward",
+        "label": "Harvested",
+        "value": "6 Radishes"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Watered 9 plots · harvested 6 radishes",
+      "Your crops and harvest XP are yours",
+      "View the marked plots on your farm."
+    ],
+    "actions": [
+      {
+        "label": "View farm",
+        "target": "HOME-RETURN",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "已结算只回显；不是用户实账号数据。主人仓库/包裹路径基线有矛盾，保留问题清单。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HELPER-SUMMARY",
+      "nodeId": "439:4669",
+      "designLabel": "离线帮工 · 小结"
+    },
+    "original": {
+      "id": "HELPER-SUMMARY",
+      "title": "离线帮工 · 小结",
+      "heading": "Mia helped while you were away",
+      "meta": "Watered 9 plots · harvested 6 radishes",
+      "rows": [
+        [
+          "Your crops and harvest XP are yours",
+          "View the marked plots on your farm.",
+          "i-radish"
+        ]
+      ],
+      "actions": [
+        [
+          "View farm",
+          "HOME-RETURN",
+          "soft"
+        ]
+      ],
+      "note": "已结算只回显；不是用户实账号数据。主人仓库/包裹路径基线有矛盾，保留问题清单。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "The baseline conflicts between host storage and parcel delivery of helper harvests."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "HELPER-ONSITE",
+    "sourceGroup": "10",
+    "title": "Mia's homestead",
+    "state": "Replanting",
+    "effect": "Sow with your Energy and Mia's seeds.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Your Energy per plot",
+        "value": "2"
+      },
+      {
+        "kind": "progress",
+        "label": "Your budget",
+        "value": "36/40"
+      },
+      {
+        "kind": "progress",
+        "label": "Host budget",
+        "value": "13/15"
+      }
+    ],
+    "requirements": [],
+    "supporting": "Each sow uses your Energy and the host’s seeds.",
+    "disclosure": [
+      "Uses your Energy · Mia’s seeds",
+      "Sow ×1 · 2 Energy",
+      "Helper budget 36/40 · host budget 13/15"
+    ],
+    "actions": [
+      {
+        "label": "Sow ×1",
+        "target": "HELPER-BUDGET",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "主人种子、帮工体力；只能用帮工等级可买种子。付费成功才XP给帮工，主人收获不再拿重复XP。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HELPER-ONSITE",
+      "nodeId": "439:4731",
+      "designLabel": "到场补播 · 谁付体力"
+    },
+    "original": {
+      "id": "HELPER-ONSITE",
+      "title": "到场补播 · 谁付体力",
+      "heading": "Replant for Mia",
+      "meta": "Uses your Energy · Mia’s seeds",
+      "rows": [
+        [
+          "Sow ×1 · 2 Energy",
+          "Helper budget 36/40 · host budget 13/15",
+          "i-sprout"
+        ]
+      ],
+      "actions": [
+        [
+          "Sow ×1 · 2 Energy",
+          "HELPER-BUDGET"
+        ]
+      ],
+      "note": "主人种子、帮工体力；只能用帮工等级可买种子。付费成功才XP给帮工，主人收获不再拿重复XP。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "HELPER-BUDGET",
+    "sourceGroup": "10",
+    "title": "Replanting",
+    "state": "Daily limit",
+    "effect": "You can still water and harvest.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Host budget today",
+        "value": "15/15"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Host budget 15/15 today",
+      "Water and harvest are still free",
+      "Your remaining Energy is safe."
+    ],
+    "actions": [
+      {
+        "label": "Sow",
+        "target": null,
+        "kind": "blocked",
+        "feedback": "The host’s daily replanting budget is reached."
+      },
+      {
+        "label": "Back to farm",
+        "target": "HOME-RETURN",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "主人预算跨所有帮工15等值，帮工预算跨农场40；不拆多条命令绕过。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HELPER-BUDGET",
+      "nodeId": "439:4792",
+      "designLabel": "帮工额度 · 阻止超额"
+    },
+    "original": {
+      "id": "HELPER-BUDGET",
+      "title": "帮工额度 · 阻止超额",
+      "heading": "Replant budget reached",
+      "meta": "Host budget 15/15 today",
+      "rows": [
+        [
+          "Water and harvest are still free",
+          "Your remaining Energy is safe.",
+          "i-sprout"
+        ]
+      ],
+      "actions": [
+        [
+          "Replant budget reached",
+          null,
+          "disabled"
+        ],
+        [
+          "Back to farm",
+          "HOME-RETURN",
+          "soft"
+        ]
+      ],
+      "note": "主人预算跨所有帮工15等值，帮工预算跨农场40；不拆多条命令绕过。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "SOC-5",
+    "sourceGroup": "10",
+    "title": "Gift to Mia",
+    "state": "Review",
+    "effect": "Send the selected fish and dish.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Selected",
+        "value": "2 items"
+      },
+      {
+        "kind": "progress",
+        "label": "Gifts sent today",
+        "value": "1/3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Mutual · 1 gift per pair per day",
+      "River Perch ×1 + Herb Grilled Fish ×1",
+      "2 items · 1/3 sent today"
+    ],
+    "actions": [
+      {
+        "label": "Send gift",
+        "target": "GIFT-SENT",
+        "kind": "commit"
+      }
+    ],
+    "rows": [
+      {
+        "title": "River Perch",
+        "state": "",
+        "effect": "Fish",
+        "keyFacts": [],
+        "disclosure": [],
+        "quantity": {
+          "value": "1",
+          "label": "fish"
+        },
+        "icon": "i-fish"
+      },
+      {
+        "title": "Herb Grilled Fish",
+        "state": "",
+        "effect": "Cooked dish",
+        "keyFacts": [],
+        "disclosure": [],
+        "quantity": {
+          "value": "1",
+          "label": "dish"
+        },
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "选择界面复用Bag图标格与详情卡；不开放种子/材料/金币/鱼饵/门禁物。实际外发只原型不执行。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SOC-5",
+      "nodeId": "439:4855",
+      "designLabel": "赠礼 · 只鱼与料理"
+    },
+    "original": {
+      "id": "SOC-5",
+      "title": "赠礼 · 只鱼与料理",
+      "heading": "Send a gift to Mia",
+      "meta": "Mutual · 1 gift per pair per day",
+      "rows": [
+        [
+          "River Perch ×1 + Herb Grilled Fish ×1",
+          "2 items · 1/3 sent today",
+          "i-fish"
+        ]
+      ],
+      "actions": [
+        [
+          "Send gift",
+          "GIFT-SENT"
+        ]
+      ],
+      "note": "选择界面复用Bag图标格与详情卡；不开放种子/材料/金币/鱼饵/门禁物。实际外发只原型不执行。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "GIFT-SENT",
+    "sourceGroup": "10",
+    "title": "Gift to Mia",
+    "state": "Sent",
+    "effect": "Mia can claim your gift from Inbox.",
+    "keyFacts": [
+      {
+        "kind": "time",
+        "label": "Claim within",
+        "value": "24h"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Mia can claim it within 24h.",
+      "Unclaimed gifts return to you",
+      "No sale value is created."
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "target": "SOC-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "发送与领取各计互动；包裹满8件时不挤旧包，赠礼退回发送者。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "GIFT-SENT",
+      "nodeId": "439:4918",
+      "designLabel": "赠礼已投递"
+    },
+    "original": {
+      "id": "GIFT-SENT",
+      "title": "赠礼已投递",
+      "heading": "Gift sent",
+      "meta": "Mia can claim it within 24h.",
+      "rows": [
+        [
+          "Unclaimed gifts return to you",
+          "No sale value is created.",
+          "i-bag"
+        ]
+      ],
+      "actions": [
+        [
+          "Done",
+          "SOC-1",
+          "soft"
+        ]
+      ],
+      "note": "发送与领取各计互动；包裹满8件时不挤旧包，赠礼退回发送者。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "GIFT-CLAIM",
+    "sourceGroup": "10",
+    "title": "Gift from Mia",
+    "state": "Waiting",
+    "effect": "Claim the gifted dish into your bag.",
+    "quantity": {
+      "value": "1",
+      "label": "dish"
+    },
+    "keyFacts": [
+      {
+        "kind": "time",
+        "label": "Expires in",
+        "value": "23h 40m"
+      },
+      {
+        "kind": "capacity",
+        "label": "Bag",
+        "value": "22/25"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "23h 40m left · Bag 22/25",
+      "Herb Grilled Fish ×1 · Gifted",
+      "Can eat or give to a Resident"
+    ],
+    "actions": [
+      {
+        "label": "Claim",
+        "target": "GIFT-DETAIL",
+        "kind": "commit"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Herb Grilled Fish",
+        "state": "Gifted",
+        "effect": "Eat or give to a Resident",
+        "keyFacts": [],
+        "disclosure": [],
+        "quantity": {
+          "value": "1",
+          "label": "portion"
+        },
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "沿SOC-4/Parcels入口，只一个收件箱。满包Make room，过24h原物退回、不折现。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "GIFT-CLAIM",
+      "nodeId": "439:4980",
+      "designLabel": "赠礼领取 · Gifted"
+    },
+    "original": {
+      "id": "GIFT-CLAIM",
+      "title": "赠礼领取 · Gifted",
+      "heading": "Gift from Mia",
+      "meta": "23h 40m left · Bag 22/25",
+      "rows": [
+        [
+          "Herb Grilled Fish ×1 · Gifted",
+          "Can eat or give to a Resident",
+          "i-dish-herb"
+        ]
+      ],
+      "actions": [
+        [
+          "Claim",
+          "GIFT-DETAIL"
+        ]
+      ],
+      "note": "沿SOC-4/Parcels入口，只一个收件箱。满包Make room，过24h原物退回、不折现。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "GIFT-DETAIL",
+    "sourceGroup": "10",
+    "title": "Herb Grilled Fish",
+    "state": "Gifted",
+    "effect": "Eat it or give it to a Resident.",
+    "quantity": {
+      "value": "1",
+      "label": "portion"
+    },
+    "keyFacts": [
+      {
+        "kind": "reward",
+        "label": "Recovery",
+        "value": "+45 Energy"
+      }
+    ],
+    "requirements": [],
+    "supporting": "Gifted items cannot be sold, re-gifted or delivered for coins.",
+    "disclosure": [
+      "+45 Energy · Good",
+      "Cannot sell, re-gift or deliver for coins",
+      "Gifted fish makes Gifted dishes."
+    ],
+    "actions": [
+      {
+        "label": "Eat",
+        "target": "HOME-RETURN",
+        "kind": "commit"
+      },
+      {
+        "label": "Choose a Resident",
+        "target": "RESIDENT-TALK",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "赠礼始终0金币价值；吃按接收者食物上限与同菜递减，非额外无限体力。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "GIFT-DETAIL",
+      "nodeId": "439:5042",
+      "designLabel": "Gifted · 不可售与继承"
+    },
+    "original": {
+      "id": "GIFT-DETAIL",
+      "title": "Gifted · 不可售与继承",
+      "heading": "Herb Grilled Fish · Gifted",
+      "meta": "+45 Energy · Good",
+      "rows": [
+        [
+          "Cannot sell, re-gift or deliver for coins",
+          "Gifted fish makes Gifted dishes.",
+          "i-dish-herb"
+        ]
+      ],
+      "actions": [
+        [
+          "Eat · +45 Energy",
+          "HOME-RETURN"
+        ],
+        [
+          "Gift to a Resident",
+          "RESIDENT-TALK",
+          "soft"
+        ]
+      ],
+      "note": "赠礼始终0金币价值；吃按接收者食物上限与同菜递减，非额外无限体力。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "SOC-6",
+    "sourceGroup": "10",
+    "title": "Mia's homestead",
+    "state": "Open to friends",
+    "effect": "Leave a note or help with watering.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Visitors watered today",
+        "value": "0/3"
+      },
+      {
+        "kind": "reward",
+        "label": "Host visit reward",
+        "value": "+10 Energy"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Open to friends",
+      "Guestbook",
+      "Leave a preset note",
+      "Water 3 plots · Free",
+      "Visitors today 0/3",
+      "Close Friend visit",
+      "Stay 30s · host +10 Energy once today"
+    ],
+    "actions": [
+      {
+        "label": "Guestbook",
+        "target": "GUESTBOOK",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Guestbook",
+        "state": "",
+        "effect": "Choose a preset note",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-home"
+      },
+      {
+        "title": "Watering",
+        "state": "",
+        "effect": "Help water the farm",
+        "keyFacts": [
+          {
+            "label": "Energy",
+            "value": "Free",
+            "kind": "cost"
+          }
+        ],
+        "disclosure": [],
+        "quantity": {
+          "value": "3",
+          "label": "plots"
+        },
+        "icon": "i-sprout"
+      }
+    ],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "来访主人每天最多10；任何访客免费浇3；不给访客田产，真实玩家范围。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "SOC-6",
+      "nodeId": "439:5106",
+      "designLabel": "主人三件套"
+    },
+    "original": {
+      "id": "SOC-6",
+      "title": "主人三件套",
+      "heading": "Mia’s homestead",
+      "meta": "Open to friends",
+      "rows": [
+        [
+          "Guestbook",
+          "Leave a preset note",
+          "i-home"
+        ],
+        [
+          "Water 3 plots · Free",
+          "Visitors today 0/3",
+          "i-sprout"
+        ],
+        [
+          "Close Friend visit",
+          "Stay 30s · host +10 Energy once today",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Leave a note",
+          "GUESTBOOK"
+        ]
+      ],
+      "note": "来访主人每天最多10；任何访客免费浇3；不给访客田产，真实玩家范围。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "GUESTBOOK",
+    "sourceGroup": "10",
+    "title": "Guestbook",
+    "state": "Choose a note",
+    "effect": "Pick a preset message to leave for Mia.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "Selected note: Nice farm!",
+    "disclosure": [
+      "Choose a message",
+      "Nice farm!",
+      "Thanks for the fish!",
+      "Come visit mine!"
+    ],
+    "actions": [
+      {
+        "label": "Post note",
+        "kind": "commit",
+        "target": null,
+        "feedback": "Note posted.",
+        "context": {
+          "operation": "post-note",
+          "selectionFrom": "GUESTBOOK",
+          "resultOnly": true
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Nice farm!",
+        "state": "",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-home"
+      },
+      {
+        "title": "Thanks for the fish!",
+        "state": "",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-fish"
+      },
+      {
+        "title": "Come visit mine!",
+        "state": "",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-face-player"
+      }
+    ],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "不是自由文本；最近20条，主人可删/拉黑，关注以上才能留言。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "GUESTBOOK",
+      "nodeId": "439:5188",
+      "designLabel": "留言板 · 预设短句"
+    },
+    "original": {
+      "id": "GUESTBOOK",
+      "title": "留言板 · 预设短句",
+      "heading": "Leave a note",
+      "meta": "Choose a message",
+      "rows": [
+        [
+          "Nice farm!",
+          "",
+          "i-home"
+        ],
+        [
+          "Thanks for the fish!",
+          "",
+          "i-fish"
+        ],
+        [
+          "Come visit mine!",
+          "",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Post selected note",
+          "SOC-6"
+        ]
+      ],
+      "note": "不是自由文本；最近20条，主人可删/拉黑，关注以上才能留言。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "selection": {
+      "kind": "single",
+      "selected": "Nice farm!",
+      "options": [
+        "Nice farm!",
+        "Thanks for the fish!",
+        "Come visit mine!"
+      ]
+    }
+  },
+  {
+    "id": "TOGETHER",
+    "sourceGroup": "10",
+    "title": "Pond supper",
+    "state": "Together",
+    "effect": "Join the group request and contribute an item.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Players",
+        "value": "2/6"
+      },
+      {
+        "kind": "time",
+        "label": "Join within",
+        "value": "8:42"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "2 of 6 players · 8:42 to gather",
+      "Every player contributes at least 1 item",
+      "Everyone earns the full reward."
+    ],
+    "actions": [
+      {
+        "label": "Join",
+        "target": "TOGETHER-PROGRESS",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "同一实时据点2–6人，需求ceil(单人量×人数×0.8)；每日参与1份。10分钟不足转发起人单人。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TOGETHER",
+      "nodeId": "439:5269",
+      "designLabel": "共做委托 · 同场加入"
+    },
+    "original": {
+      "id": "TOGETHER",
+      "title": "共做委托 · 同场加入",
+      "heading": "Together · Pond supper",
+      "meta": "2 of 6 players · 8:42 to gather",
+      "rows": [
+        [
+          "Every player contributes at least 1 item",
+          "Everyone earns the full reward.",
+          "i-fish"
+        ]
+      ],
+      "actions": [
+        [
+          "Join",
+          "TOGETHER-PROGRESS"
+        ]
+      ],
+      "note": "同一实时据点2–6人，需求ceil(单人量×人数×0.8)；每日参与1份。10分钟不足转发起人单人。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TOGETHER-PROGRESS",
+    "sourceGroup": "10",
+    "title": "Pond supper",
+    "state": "Together",
+    "effect": "Your selected fish will be delivered to the group.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Mia + Alex · Same Market Square",
+      "Shared progress updates for everyone."
+    ],
+    "actions": [
+      {
+        "label": "Deliver",
+        "target": "TOGETHER-DONE",
+        "kind": "commit"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Pond Crucian",
+        "state": "Common",
+        "effect": "Selected contribution",
+        "quantity": {
+          "value": "1",
+          "label": "fish"
+        },
+        "icon": "fish_crucian",
+        "selected": true,
+        "keyFacts": [],
+        "disclosure": []
+      }
+    ],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "奖励/物品原子结算，需求随确定人数计算。此样例不虚构主方案未定模板量。 本轮使用已存在的普通鱼Pond Crucian作为原“1 item”的明确示例，数量仍为1；不定义整份委托总需求、额外奖励或人数锁定规则。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TOGETHER-PROGRESS",
+      "nodeId": "439:5332",
+      "designLabel": "共做进度 · 交付"
+    },
+    "original": {
+      "id": "TOGETHER-PROGRESS",
+      "title": "共做进度 · 交付",
+      "heading": "Pond supper · Together",
+      "meta": "Mia + Alex · Same Market Square",
+      "rows": [
+        [
+          "Your contribution 1 item",
+          "Shared progress updates for everyone.",
+          "i-check"
+        ]
+      ],
+      "actions": [
+        [
+          "Deliver selected fish",
+          "TOGETHER-DONE"
+        ]
+      ],
+      "note": "奖励/物品原子结算，需求随确定人数计算。此样例不虚构主方案未定模板量。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Contribution template quantities and membership-lock timing are not fully specified."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "sourceCorrections": [
+      {
+        "field": "selected contribution identity",
+        "before": "Unspecified selected fish ×1",
+        "after": "Pond Crucian ×1",
+        "basis": "User-authorized concrete example using existing fish_crucian; source quantity preserved."
+      }
+    ]
+  },
+  {
+    "id": "TOGETHER-DONE",
+    "sourceGroup": "10",
+    "title": "Pond supper",
+    "state": "Complete",
+    "effect": "Every contributor receives the full reward.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Participation today",
+        "value": "1/1"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Everyone contributed",
+      "Your full reward is ready",
+      "Your participation today: 1/1"
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "target": "SOC-6",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "超时则发起人单人单，退离队物品/人数变动的锁定时点列待定。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TOGETHER-DONE",
+      "nodeId": "439:5390",
+      "designLabel": "共做 · 完成与超时"
+    },
+    "original": {
+      "id": "TOGETHER-DONE",
+      "title": "共做 · 完成与超时",
+      "heading": "Request complete",
+      "meta": "Everyone contributed",
+      "rows": [
+        [
+          "Your full reward is ready",
+          "Your participation today: 1/1",
+          "i-check"
+        ]
+      ],
+      "actions": [
+        [
+          "Return to the board",
+          "SOC-6",
+          "soft"
+        ]
+      ],
+      "note": "超时则发起人单人单，退离队物品/人数变动的锁定时点列待定。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Timeout membership lock and item returns need a product decision."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "EXPAND-4",
+    "sourceGroup": "10",
+    "title": "Homestead Feast",
+    "state": "Signature",
+    "effect": "Cook with four ingredients and two heat moments.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Ingredient slots",
+        "value": "4"
+      },
+      {
+        "kind": "time",
+        "label": "Cooking",
+        "value": "60 s"
+      },
+      {
+        "kind": "progress",
+        "label": "Heat moments",
+        "value": "2"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Cooking expansion · 4 slots",
+      "Homestead Feast",
+      "Signature · 60 s · 2 heat moments"
+    ],
+    "actions": [
+      {
+        "label": "Preview 4-slot recipe",
+        "target": "EXPAND-RECIPES",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "4槽解锁具体等级未定（Lv11–15或Master）；不擅自写Lv11。材料明细未定，UI先画槽位与状态。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "EXPAND-4",
+      "nodeId": "439:5448",
+      "designLabel": "烹饪扩展 · 第四槽"
+    },
+    "original": {
+      "id": "EXPAND-4",
+      "title": "烹饪扩展 · 第四槽",
+      "heading": "Four ingredients",
+      "meta": "Cooking expansion · 4 slots",
+      "rows": [
+        [
+          "Homestead Feast",
+          "Signature · 60 s · 2 heat moments",
+          "i-pot"
+        ]
+      ],
+      "actions": [
+        [
+          "Preview 4-slot recipe",
+          "EXPAND-RECIPES"
+        ]
+      ],
+      "note": "4槽解锁具体等级未定（Lv11–15或Master）；不擅自写Lv11。材料明细未定，UI先画槽位与状态。",
+      "scene": "kitchen",
+      "place": "Kitchen",
+      "capacity": 290
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Unlock level and ingredient recipe remain undefined."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 290,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "kitchen": {
+      "mode": "recipe",
+      "ingredientSlots": 4,
+      "selectedIngredients": [],
+      "heat": null,
+      "stoves": [],
+      "previewOnly": true
+    }
+  },
+  {
+    "id": "EXPAND-5",
+    "sourceGroup": "10",
+    "title": "World Platter",
+    "state": "Feast",
+    "effect": "Combine three climates across three ingredient families.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Ingredient slots",
+        "value": "5"
+      },
+      {
+        "kind": "time",
+        "label": "Cooking",
+        "value": "90 s"
+      },
+      {
+        "kind": "progress",
+        "label": "Heat moments",
+        "value": "3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Cooking expansion · 5 slots",
+      "World Platter",
+      "Feast · 90 s · 3 heat moments",
+      "3 climates across 3 ingredient families",
+      "Base 2 portions · Perfect 3"
+    ],
+    "actions": [
+      {
+        "label": "Preview 5-slot recipe",
+        "target": "EXPAND-RECIPES",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "5槽不能降匹配3槽，重复原料不能偷触发跨带；回复70不变，首做120。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "EXPAND-5",
+      "nodeId": "439:5513",
+      "designLabel": "烹饪扩展 · 第五槽"
+    },
+    "original": {
+      "id": "EXPAND-5",
+      "title": "烹饪扩展 · 第五槽",
+      "heading": "Five ingredients",
+      "meta": "Cooking expansion · 5 slots",
+      "rows": [
+        [
+          "World Platter",
+          "Feast · 90 s · 3 heat moments",
+          "i-pot"
+        ],
+        [
+          "3 climates across 3 ingredient families",
+          "Base 2 portions · Perfect 3",
+          "i-map"
+        ]
+      ],
+      "actions": [
+        [
+          "Preview 5-slot recipe",
+          "EXPAND-RECIPES"
+        ]
+      ],
+      "note": "5槽不能降匹配3槽，重复原料不能偷触发跨带；回复70不变，首做120。",
+      "scene": "kitchen",
+      "place": "Kitchen",
+      "capacity": 290
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Unlock level and ingredient recipe remain undefined."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 290,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "kitchen": {
+      "mode": "recipe",
+      "ingredientSlots": 5,
+      "selectedIngredients": [],
+      "heat": null,
+      "stoves": [],
+      "previewOnly": true
+    }
+  },
+  {
+    "id": "EXPAND-RECIPES",
+    "sourceGroup": "10",
+    "title": "Cookbook expansion",
+    "state": "Preview",
+    "effect": "New recipes use four or five ingredient slots.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Expanded cookbook",
+        "value": "56 recipes"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Signature / Feast",
+      "Homestead Feast · Two-Seas Grill",
+      "Two-Zone Stew · North-South Soup",
+      "Beet & Yam Cakes · World Platter",
+      "Four-Zone Hotpot · Passport Pie",
+      "Ferment Jar / Jelly Mold",
+      "Wall tools · never use ingredient slots"
+    ],
+    "actions": [
+      {
+        "label": "Back to kitchen",
+        "target": "COOK-P1-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Homestead Feast",
+        "state": "Preview",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      },
+      {
+        "title": "Two-Seas Grill",
+        "state": "Preview",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      },
+      {
+        "title": "Two-Zone Stew",
+        "state": "Preview",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      },
+      {
+        "title": "North-South Soup",
+        "state": "Preview",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      },
+      {
+        "title": "Beet & Yam Cakes",
+        "state": "Preview",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      },
+      {
+        "title": "World Platter",
+        "state": "Preview",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      },
+      {
+        "title": "Four-Zone Hotpot",
+        "state": "Preview",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      },
+      {
+        "title": "Passport Pie",
+        "state": "Preview",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      }
+    ],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "8页原料配方与器具工作台配方待定；进口食材箱可选，不在未拍板时加必经商店。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "EXPAND-RECIPES",
+      "nodeId": "439:5586",
+      "designLabel": "8页扩展与器具"
+    },
+    "original": {
+      "id": "EXPAND-RECIPES",
+      "title": "8页扩展与器具",
+      "heading": "Cookbook · 48 → 56",
+      "meta": "Signature / Feast",
+      "rows": [
+        [
+          "Homestead Feast · Two-Seas Grill",
+          "Two-Zone Stew · North-South Soup",
+          "i-cookbook"
+        ],
+        [
+          "Beet & Yam Cakes · World Platter",
+          "Four-Zone Hotpot · Passport Pie",
+          "i-cookbook"
+        ],
+        [
+          "Ferment Jar / Jelly Mold",
+          "Wall tools · never use ingredient slots",
+          "i-pot"
+        ]
+      ],
+      "actions": [
+        [
+          "Back to kitchen",
+          "COOK-P1-1",
+          "soft"
+        ]
+      ],
+      "note": "8页原料配方与器具工作台配方待定；进口食材箱可选，不在未拍板时加必经商店。",
+      "scene": "kitchen",
+      "place": "Kitchen",
+      "capacity": 290
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Ingredient recipes and workstation recipes for Ferment Jar/Jelly Mold remain undefined."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 290,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRADER",
+    "sourceGroup": "10",
+    "title": "Mira",
+    "state": "This week's route",
+    "effect": "Find a specialty from another climate.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "This week",
+        "value": "Tokyo"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "This week · Tokyo",
+      "One specialty from another climate",
+      "Next city announced on Monday"
+    ],
+    "actions": [
+      {
+        "label": "Show Travel Post",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "overlay": "map",
+          "targetType": "Travel Post",
+          "city": "Tokyo",
+          "operation": "highlight-target",
+          "ownerId": "TRADER",
+          "view": "map",
+          "placeName": "Tokyo · Travel Post",
+          "anchor": [
+            178,
+            445
+          ],
+          "originalDestination": null,
+          "preservePlayer": true,
+          "preserveResources": true
+        }
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "travel-post",
+    "layout": "sheet",
+    "sourceNote": "全服周路线、人口加权且月内至少1非大城；显示实际路由，不凭空承诺当地售卖清单。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRADER",
+      "nodeId": "439:5673",
+      "designLabel": "旅行商人 · 本周路线"
+    },
+    "original": {
+      "id": "TRADER",
+      "title": "旅行商人 · 本周路线",
+      "heading": "Mira’s route",
+      "meta": "This week · Tokyo",
+      "rows": [
+        [
+          "One specialty from another climate",
+          "Next city announced on Monday",
+          "i-travel"
+        ]
+      ],
+      "actions": [
+        [
+          "Show Travel Post",
+          "LOCAL-SHOP",
+          "soft"
+        ]
+      ],
+      "note": "全服周路线、人口加权且月内至少1非大城；显示实际路由，不凭空承诺当地售卖清单。",
+      "scene": "travel-post"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "reviewNotes": [
+      "The source target was an unrelated state/scene. Use a context-preserving coverage/map overlay; the old cross-link is retained only in original."
+    ],
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  }
+]

@@ -1,0 +1,56 @@
+{
+  "createdNodeIds": [
+    "676:64411",
+    "676:64412",
+    "676:64413",
+    "676:64414",
+    "676:64415",
+    "676:64416",
+    "676:64417",
+    "676:64418",
+    "676:64419",
+    "676:64420",
+    "676:64421",
+    "676:64422",
+    "676:64423",
+    "676:64424",
+    "676:64425",
+    "676:64426",
+    "676:64427",
+    "676:64428",
+    "676:64429",
+    "676:64430",
+    "676:64431",
+    "676:64432",
+    "676:64433",
+    "676:64434",
+    "676:64435"
+  ],
+  "inheritedNodeIdGroups": {},
+  "mutatedNodeIds": [
+    "482:40",
+    "482:39"
+  ],
+  "screens": [
+    {
+      "id": "CTRL-1-2",
+      "nodeId": "482:40"
+    }
+  ],
+  "overlayIndex": 1402,
+  "warnings": [],
+  "overlays": {},
+  "prototypeReactions": 0,
+  "sourceReferences": {
+    "CTRL-1-2": {
+      "sourceNodeId": "313:29",
+      "newNodeId": "482:40",
+      "sourceFile": "docs/design/ui-anchors-2026-10-03/ui/batch1/CTRL-1-2.html",
+      "sourceGroup": "01",
+      "layout": "states",
+      "variant": "state-sheet",
+      "reviewOnly": true,
+      "stateExamples": 3
+    }
+  }
+}

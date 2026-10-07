@@ -1,0 +1,1083 @@
+[
+  {
+    "id": "NPC-REED-BOUGHT",
+    "ownerId": "NPC-2-2",
+    "title": "Reed Rod",
+    "state": "Purchased",
+    "sceneName": "tackle-shop",
+    "scene": "tackle-shop",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 150
+    },
+    "effect": "Added to Tools & Gear. Equip it from the Fishing slot.",
+    "quantity": {
+      "value": "1",
+      "label": "Owned"
+    },
+    "keyFacts": [
+      {
+        "label": "Coins",
+        "value": "150",
+        "kind": "progress"
+      },
+      {
+        "label": "Bag",
+        "value": "19/25",
+        "kind": "capacity"
+      },
+      {
+        "label": "Equipped",
+        "value": "Starter Rod",
+        "kind": "progress"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "NPC-REED-BOUGHT/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "sections": [
+        "4.6.1",
+        "6.4",
+        "9.6.4",
+        "9.11.3",
+        "9.13.1",
+        "16.3"
+      ]
+    },
+    "resultContext": {
+      "operation": "buy-reed-rod",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "bagCapacity": 25,
+        "ownedReedRod": false,
+        "equippedRod": "Starter Rod"
+      },
+      "after": {
+        "coins": 150,
+        "energy": 142,
+        "bagUsed": 19,
+        "bagCapacity": 25,
+        "ownedReedRod": true,
+        "equippedRod": "Starter Rod"
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Independent native prototype result. Derived from this same item and verified rules; does not execute a real transaction. Closing keeps the after-state HUD."
+  },
+  {
+    "id": "NPC-CRUCIAN-SOLD-ONE",
+    "ownerId": "NPC-2-2",
+    "title": "Pond Crucian",
+    "state": "Sold 1",
+    "sceneName": "tackle-shop",
+    "scene": "tackle-shop",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 232
+    },
+    "effect": "2 Pond Crucian remain in your Bag.",
+    "quantity": {
+      "value": "2",
+      "label": "Remaining"
+    },
+    "keyFacts": [
+      {
+        "label": "Received",
+        "value": "+2 coins",
+        "kind": "reward"
+      },
+      {
+        "label": "Fish buyback today",
+        "value": "32/80",
+        "kind": "progress"
+      },
+      {
+        "label": "Bag",
+        "value": "19/25",
+        "kind": "capacity"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "NPC-CRUCIAN-SOLD-ONE/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "sections": [
+        "4.6.1",
+        "6.4",
+        "9.6.4",
+        "9.11.3",
+        "9.13.1",
+        "16.3"
+      ]
+    },
+    "resultContext": {
+      "operation": "sell-one",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 3,
+        "buybackUsed": 30,
+        "buybackLimit": 80
+      },
+      "after": {
+        "coins": 232,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 2,
+        "buybackUsed": 32,
+        "buybackLimit": 80
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Independent native prototype result. Derived from this same item and verified rules; does not execute a real transaction. Closing keeps the after-state HUD."
+  },
+  {
+    "id": "NPC-CRUCIAN-SOLD-ALL",
+    "ownerId": "NPC-2-2",
+    "title": "Pond Crucian",
+    "state": "Sold 3",
+    "sceneName": "tackle-shop",
+    "scene": "tackle-shop",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 236
+    },
+    "effect": "This stack is gone. One Bag slot is now free.",
+    "quantity": {
+      "value": "0",
+      "label": "Remaining"
+    },
+    "keyFacts": [
+      {
+        "label": "Received",
+        "value": "+6 coins",
+        "kind": "reward"
+      },
+      {
+        "label": "Fish buyback today",
+        "value": "36/80",
+        "kind": "progress"
+      },
+      {
+        "label": "Bag",
+        "value": "18/25",
+        "kind": "capacity"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "NPC-CRUCIAN-SOLD-ALL/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "sections": [
+        "4.6.1",
+        "6.4",
+        "9.6.4",
+        "9.11.3",
+        "9.13.1",
+        "16.3"
+      ]
+    },
+    "resultContext": {
+      "operation": "sell-all",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 3,
+        "buybackUsed": 30,
+        "buybackLimit": 80
+      },
+      "after": {
+        "coins": 236,
+        "energy": 142,
+        "bagUsed": 18,
+        "owned": 0,
+        "buybackUsed": 36,
+        "buybackLimit": 80
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Independent native prototype result. Derived from this same item and verified rules; does not execute a real transaction. Closing keeps the after-state HUD."
+  },
+  {
+    "id": "NPC-DUSK-TRACKED",
+    "ownerId": "NPC-4",
+    "title": "Dusk Haul",
+    "state": "Tracked",
+    "sceneName": "market-square-v2",
+    "scene": "market-square-v2",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 230
+    },
+    "effect": "Added to Today. Required items are protected during Sell all.",
+    "quantity": null,
+    "keyFacts": [
+      {
+        "label": "Fine fish",
+        "value": "1/4",
+        "kind": "progress"
+      },
+      {
+        "label": "Requests today",
+        "value": "4/6",
+        "kind": "progress"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "NPC-DUSK-TRACKED/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "sections": [
+        "4.6.1",
+        "6.4",
+        "9.6.4",
+        "9.11.3",
+        "9.13.1",
+        "16.3"
+      ]
+    },
+    "resultContext": {
+      "operation": "track",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "requestState": "Open",
+        "fineFishHave": 1,
+        "fineFishNeed": 4,
+        "requestsCompleted": 4
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "requestState": "Tracked",
+        "fineFishHave": 1,
+        "fineFishNeed": 4,
+        "requestsCompleted": 4
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Independent native prototype result. Derived from this same item and verified rules; does not execute a real transaction. Closing keeps the after-state HUD."
+  },
+  {
+    "id": "NPC-SWEET-POTATO-SOLD-ONE",
+    "ownerId": "NPC-3",
+    "title": "Sweet Potato",
+    "state": "Sold 1",
+    "sceneName": "market-square-v2",
+    "scene": "market-square-v2",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 238
+    },
+    "effect": "11 Sweet Potatoes remain in your Bag.",
+    "quantity": {
+      "value": "11",
+      "label": "Remaining"
+    },
+    "keyFacts": [
+      {
+        "label": "Received",
+        "value": "+8 coins",
+        "kind": "reward"
+      },
+      {
+        "label": "Regional buyback today",
+        "value": "32/60",
+        "kind": "progress"
+      },
+      {
+        "label": "Bag",
+        "value": "19/25",
+        "kind": "capacity"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "NPC-SWEET-POTATO-SOLD-ONE/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "sections": [
+        "4.6.1",
+        "6.4",
+        "9.6.4",
+        "9.11.3",
+        "9.13.1",
+        "16.3"
+      ]
+    },
+    "resultContext": {
+      "operation": "sell-one",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 12,
+        "buybackUsed": 24,
+        "buybackLimit": 60,
+        "unitPrice": 8
+      },
+      "after": {
+        "coins": 238,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 11,
+        "buybackUsed": 32,
+        "buybackLimit": 60,
+        "unitPrice": 8
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Independent native prototype result. Derived from this same item and verified rules; does not execute a real transaction. Closing keeps the after-state HUD."
+  },
+  {
+    "id": "GEAR-REED-EQUIPPED",
+    "ownerId": "BAG-2",
+    "title": "Reed Rod",
+    "state": "Equipped",
+    "sceneName": "farm",
+    "scene": "farm",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 230
+    },
+    "effect": "Fishing now uses the Reed Rod. Your Starter Rod stays owned.",
+    "quantity": null,
+    "keyFacts": [
+      {
+        "label": "Bite window",
+        "value": "2.6 s",
+        "kind": "progress"
+      },
+      {
+        "label": "Lands up to",
+        "value": "Rare fish",
+        "kind": "progress"
+      },
+      {
+        "label": "Bag",
+        "value": "19/25",
+        "kind": "progress"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "GEAR-REED-EQUIPPED/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "sections": [
+        "10.4.7",
+        "10.5",
+        "16.3 BAG-2 / BAG-2-2",
+        "6.4.1 rod_reed"
+      ]
+    },
+    "resultContext": {
+      "operation": "gear-reed-equipped",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 19,
+        "equippedRod": "Starter Rod",
+        "ownsReedRod": true
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 19,
+        "equippedRod": "Reed Rod",
+        "ownsStarterRod": true
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Same-item local prototype continuation. No real resource operation. At home; after-state coins and Energy stay unchanged. Reed attributes are current v2 §6.4.1: Rare,2.6 seconds."
+  },
+  {
+    "id": "STORAGE-TIMBER-TAKEN-10",
+    "ownerId": "BAG-2-2",
+    "title": "Timber",
+    "state": "Moved to Bag",
+    "sceneName": "farm",
+    "scene": "farm",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 230
+    },
+    "effect": "10 Timber moved from Farm Storage. Your existing stack now has 30.",
+    "quantity": {
+      "value": "30",
+      "label": "In Bag"
+    },
+    "keyFacts": [
+      {
+        "label": "Farm Storage",
+        "value": "89",
+        "kind": "progress"
+      },
+      {
+        "label": "Bag",
+        "value": "19/25",
+        "kind": "capacity"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "STORAGE-TIMBER-TAKEN-10/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "sections": [
+        "10.4.7",
+        "10.5",
+        "16.3 BAG-2 / BAG-2-2"
+      ]
+    },
+    "resultContext": {
+      "operation": "storage-timber-taken-10",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 19,
+        "bagTimber": 20,
+        "storageTimber": 99,
+        "bagTimberStacks": [
+          20
+        ]
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 19,
+        "bagTimber": 30,
+        "storageTimber": 89,
+        "bagTimberStacks": [
+          30
+        ]
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "One continuous Bag→Gear→Materials context preserves BAG-1 Timber20. Warehouse99 is explicit in BAG-2-2. No real transaction; stack cap99 and6 free slots permit Take all."
+  },
+  {
+    "id": "STORAGE-TIMBER-TAKEN-ALL",
+    "ownerId": "BAG-2-2",
+    "title": "Timber",
+    "state": "Moved to Bag",
+    "sceneName": "farm",
+    "scene": "farm",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 230
+    },
+    "effect": "99 Timber moved from Farm Storage. Your Bag has two stacks: 99 and 20.",
+    "quantity": {
+      "value": "119",
+      "label": "In Bag"
+    },
+    "keyFacts": [
+      {
+        "label": "Farm Storage",
+        "value": "0",
+        "kind": "progress"
+      },
+      {
+        "label": "Bag",
+        "value": "20/25",
+        "kind": "capacity"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "STORAGE-TIMBER-TAKEN-ALL/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "sections": [
+        "10.4.7",
+        "10.5",
+        "16.3 BAG-2 / BAG-2-2"
+      ]
+    },
+    "resultContext": {
+      "operation": "storage-timber-taken-all",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 19,
+        "bagTimber": 20,
+        "storageTimber": 99,
+        "bagTimberStacks": [
+          20
+        ]
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagCapacity": 25,
+        "bagUsed": 20,
+        "bagTimber": 119,
+        "storageTimber": 0,
+        "bagTimberStacks": [
+          99,
+          20
+        ]
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "One continuous Bag→Gear→Materials context preserves BAG-1 Timber20. Warehouse99 is explicit in BAG-2-2. No real transaction; stack cap99 and6 free slots permit Take all."
+  },
+  {
+    "id": "STORE-TORCH-TAKEN-10",
+    "ownerId": "STORE-1",
+    "title": "Torch",
+    "state": "Moved to Bag",
+    "sceneName": "farm",
+    "scene": "farm",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 230
+    },
+    "effect": "10 Torches added to your existing stack. No extra Bag slot was needed.",
+    "quantity": {
+      "value": "72",
+      "label": "Total in Bag"
+    },
+    "keyFacts": [
+      {
+        "label": "Farm Storage",
+        "value": "2",
+        "kind": "progress"
+      },
+      {
+        "label": "Bag",
+        "value": "22/25",
+        "kind": "capacity"
+      },
+      {
+        "label": "Torch stacks",
+        "value": "20 · 20 · 20 · 12",
+        "kind": "progress"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "STORE-TORCH-TAKEN-10/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/design/ui-refactor-2026-10-06/data/current-all.json",
+      "sections": [
+        "BAG-1-P0.items",
+        "STORE-1.items/rows",
+        "gameplay v2 §10.4 torch stack20"
+      ]
+    },
+    "resultContext": {
+      "operation": "take-torch",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 62,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          2
+        ],
+        "storageTorch": 12
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 72,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          12
+        ],
+        "storageTorch": 2
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Explicit P0 fixture:22 occupied Bag stacks include Torch20/20/20/2; Farm Storage holdsTorch12. Taking10/all12 merges into the existing partial2 stack (cap20),so occupancy stays22/25. Does not modify original five screen fixtures or execute a real transaction."
+  },
+  {
+    "id": "STORE-TORCH-TAKEN-ALL",
+    "ownerId": "STORE-1",
+    "title": "Torch",
+    "state": "Moved to Bag",
+    "sceneName": "farm",
+    "scene": "farm",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 230
+    },
+    "effect": "12 Torches added to your existing stack. No extra Bag slot was needed.",
+    "quantity": {
+      "value": "74",
+      "label": "Total in Bag"
+    },
+    "keyFacts": [
+      {
+        "label": "Farm Storage",
+        "value": "0",
+        "kind": "progress"
+      },
+      {
+        "label": "Bag",
+        "value": "22/25",
+        "kind": "capacity"
+      },
+      {
+        "label": "Torch stacks",
+        "value": "20 · 20 · 20 · 14",
+        "kind": "progress"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "STORE-TORCH-TAKEN-ALL/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/design/ui-refactor-2026-10-06/data/current-all.json",
+      "sections": [
+        "BAG-1-P0.items",
+        "STORE-1.items/rows",
+        "gameplay v2 §10.4 torch stack20"
+      ]
+    },
+    "resultContext": {
+      "operation": "take-torch",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 62,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          2
+        ],
+        "storageTorch": 12
+      },
+      "after": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 22,
+        "bagCapacity": 25,
+        "bagTorch": 74,
+        "bagTorchStacks": [
+          20,
+          20,
+          20,
+          14
+        ],
+        "storageTorch": 0
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Explicit P0 fixture:22 occupied Bag stacks include Torch20/20/20/2; Farm Storage holdsTorch12. Taking10/all12 merges into the existing partial2 stack (cap20),so occupancy stays22/25. Does not modify original five screen fixtures or execute a real transaction."
+  },
+  {
+    "id": "STALL-RADISH-SEEDS-BOUGHT",
+    "ownerId": "FARM-6",
+    "title": "Radish Seeds",
+    "state": "Purchased",
+    "sceneName": "farm",
+    "scene": "farm",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 222
+    },
+    "effect": "2 seeds added to the existing stack.",
+    "quantity": {
+      "value": "26",
+      "label": "In Bag"
+    },
+    "keyFacts": [
+      {
+        "label": "Spent",
+        "value": "8 coins",
+        "kind": "cost"
+      },
+      {
+        "label": "Bag",
+        "value": "19/25",
+        "kind": "capacity"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "STALL-RADISH-SEEDS-BOUGHT/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "sections": [
+        "5.2.2 Radish seed4/sale5",
+        "9.11.1 Homestead Stall",
+        "9.13.1 direct crop sale unlimited",
+        "FARM-6.html quantity2/bag24",
+        "FARM-6-2.html Radish12"
+      ]
+    },
+    "resultContext": {
+      "operation": "buy-seeds",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 24
+      },
+      "after": {
+        "coins": 222,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 26
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Same-item Homestead fixture. RadishSeeds2×4=8; cropRadish5 each and no daily buyback quota. Energy unchanged. No real transaction."
+  },
+  {
+    "id": "STALL-RADISH-SOLD-ONE",
+    "ownerId": "FARM-6-2",
+    "title": "Radish",
+    "state": "Sold 1",
+    "sceneName": "farm",
+    "scene": "farm",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 235
+    },
+    "effect": "Sold 1 Radish at the Homestead Stall.",
+    "quantity": {
+      "value": "11",
+      "label": "In Bag"
+    },
+    "keyFacts": [
+      {
+        "label": "Received",
+        "value": "5 coins",
+        "kind": "reward"
+      },
+      {
+        "label": "Bag",
+        "value": "19/25",
+        "kind": "capacity"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "STALL-RADISH-SOLD-ONE/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "sections": [
+        "5.2.2 Radish seed4/sale5",
+        "9.11.1 Homestead Stall",
+        "9.13.1 direct crop sale unlimited",
+        "FARM-6.html quantity2/bag24",
+        "FARM-6-2.html Radish12"
+      ]
+    },
+    "resultContext": {
+      "operation": "sell-crop",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 12
+      },
+      "after": {
+        "coins": 235,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 11
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Same-item Homestead fixture. RadishSeeds2×4=8; cropRadish5 each and no daily buyback quota. Energy unchanged. No real transaction."
+  },
+  {
+    "id": "STALL-RADISH-SOLD-ALL",
+    "ownerId": "FARM-6-2",
+    "title": "Radish",
+    "state": "Sold 12",
+    "sceneName": "farm",
+    "scene": "farm",
+    "hud": {
+      "energy": 142,
+      "capacity": 200,
+      "coins": 290
+    },
+    "effect": "Sold 12 Radishes at the Homestead Stall.",
+    "quantity": {
+      "value": "0",
+      "label": "In Bag"
+    },
+    "keyFacts": [
+      {
+        "label": "Received",
+        "value": "60 coins",
+        "kind": "reward"
+      },
+      {
+        "label": "Bag",
+        "value": "18/25",
+        "kind": "capacity"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "STALL-RADISH-SOLD-ALL/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "sections": [
+        "5.2.2 Radish seed4/sale5",
+        "9.11.1 Homestead Stall",
+        "9.13.1 direct crop sale unlimited",
+        "FARM-6.html quantity2/bag24",
+        "FARM-6-2.html Radish12"
+      ]
+    },
+    "resultContext": {
+      "operation": "sell-crop",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 12
+      },
+      "after": {
+        "coins": 290,
+        "energy": 142,
+        "bagUsed": 18,
+        "owned": 0
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Same-item Homestead fixture. RadishSeeds2×4=8; cropRadish5 each and no daily buyback quota. Energy unchanged. No real transaction."
+  },
+  {
+    "id": "COOK-FINE-EATEN",
+    "ownerId": "COOK-4",
+    "title": "Herb Grilled Fish",
+    "state": "Eaten",
+    "sceneName": "kitchen",
+    "scene": "kitchen",
+    "hud": {
+      "energy": 187,
+      "capacity": 200,
+      "coins": 230
+    },
+    "effect": "Restored 45 Energy.",
+    "quantity": {
+      "value": "0",
+      "label": "Portions remaining"
+    },
+    "keyFacts": [
+      {
+        "label": "Energy",
+        "value": "187/200",
+        "kind": "capacity"
+      },
+      {
+        "label": "Consumed",
+        "value": "1 portion",
+        "kind": "progress"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "COOK-FINE-EATEN/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/design/ui-refactor-2026-10-06/data/legacy-screens.json",
+      "sections": [
+        "COOK-4.effect/quantity",
+        "gameplayv2 eating recovery/dish portion consumption"
+      ]
+    },
+    "resultContext": {
+      "operation": "eat-dish",
+      "before": {
+        "energy": 142,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 1,
+        "mealsToday": null
+      },
+      "after": {
+        "energy": 187,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 0,
+        "mealsToday": null
+      },
+      "mealsAllowanceDelta": 45,
+      "firstServingFixture": true,
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Same-dish eating result forCOOK-4:the source selected portion restores45Energy andHUDbefore142/200.Prototype fixture:the shown recovery applies(first serving if applicable,meal allowance sufficient).Consume1/1portion;after187/200,coins230unchanged.Original source does not give cumulative MealsToday,so no total/counter is invented.Done keeps matchingafterHUDscene;does not replayCOOK7+40."
+  },
+  {
+    "id": "COOK-MYSTERY-EATEN",
+    "ownerId": "COOK-6",
+    "title": "Mystery Dish",
+    "state": "Eaten",
+    "sceneName": "kitchen",
+    "scene": "kitchen",
+    "hud": {
+      "energy": 147,
+      "capacity": 200,
+      "coins": 230
+    },
+    "effect": "Restored 5 Energy.",
+    "quantity": {
+      "value": "0",
+      "label": "Portions remaining"
+    },
+    "keyFacts": [
+      {
+        "label": "Energy",
+        "value": "147/200",
+        "kind": "capacity"
+      },
+      {
+        "label": "Consumed",
+        "value": "1 portion",
+        "kind": "progress"
+      }
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "COOK-MYSTERY-EATEN/scene"
+      }
+    ],
+    "sourceRef": {
+      "file": "docs/design/ui-refactor-2026-10-06/data/legacy-screens.json",
+      "sections": [
+        "COOK-6.effect/quantity",
+        "gameplayv2 eating recovery/dish portion consumption"
+      ]
+    },
+    "resultContext": {
+      "operation": "eat-dish",
+      "before": {
+        "energy": 142,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 1,
+        "mealsToday": null
+      },
+      "after": {
+        "energy": 147,
+        "capacity": 200,
+        "coins": 230,
+        "selectedDishPortions": 0,
+        "mealsToday": null
+      },
+      "mealsAllowanceDelta": 5,
+      "firstServingFixture": true,
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    "sourceNote": "Same-dish eating result forCOOK-6:the source selected portion restores5Energy andHUDbefore142/200.Prototype fixture:the shown recovery applies(first serving if applicable,meal allowance sufficient).Consume1/1portion;after147/200,coins230unchanged.Original source does not give cumulative MealsToday,so no total/counter is invented.Done keeps matchingafterHUDscene;does not replayCOOK7+40."
+  }
+]

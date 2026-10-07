@@ -1,0 +1,385 @@
+[
+  {
+    "id": "MINE-5-ARRIVAL",
+    "sourceGroup": "12",
+    "title": "The mine",
+    "state": "Floor 5 · Arrived",
+    "effect": "The elite is still here. Switch to Combat to face it.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Elite",
+        "value": "Not defeated"
+      },
+      {
+        "kind": "progress",
+        "label": "Run",
+        "value": "In progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Express arrival is free and does not defeat the elite.",
+      "Combat uses your equipped weapon; entering the floor does not award loot.",
+      "Leaving the mine preserves this run until the daily reset."
+    ],
+    "actions": [
+      {
+        "label": "Return to entrance",
+        "target": "HOME-RETURN",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "mine",
+    "layout": "sheet",
+    "hud": {
+      "place": "Mine · Floor 5",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "energy": 142,
+      "capacity": 200,
+      "coins": 230
+    },
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Mine · Floor 5",
+      "placeExplicit": true
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": false
+    },
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "section": "13.3.8–13.3.9",
+      "designLabel": "Express到达5层 · 精英未击败"
+    },
+    "sourceNote": "§13.3.9已解锁Express可局内0体力到第5层；本卡仅到达，不虚构攻击次数、敌方HP、概率或战利品。战斗结果的真实条件转移尚未定义，MINE-5仅作为独立击败结果审阅，不绑定在Floor 5导航上。",
+    "reviewNotes": [
+      "ARRIVAL-ONLY PROTOTYPE STATE. Combat outcome transition remains undefined; do not wire this arrival directly to the elite-defeated reward."
+    ],
+    "reviewActions": [
+      {
+        "label": "Inspect elite-defeated outcome (separate condition)",
+        "target": "MINE-5"
+      }
+    ],
+    "reviewOnly": false,
+    "unresolvedRules": []
+  },
+  {
+    "id": "RESIDENT-TALK-MEAL-CLAIMED",
+    "sourceGroup": "12",
+    "title": "Hana",
+    "state": "Familiar",
+    "effect": "Chat with Hana. Today's Resident meal has been claimed.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Friendship",
+        "value": "52/90"
+      },
+      {
+        "kind": "progress",
+        "label": "Resident meal today",
+        "value": "1/1"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "A warm meal for a busy day",
+      "I have something fresh for you."
+    ],
+    "actions": [
+      {
+        "label": "Chat",
+        "target": "RESIDENT-CHAT",
+        "kind": "commit"
+      },
+      {
+        "label": "Today’s meal",
+        "target": "RESIDENT-MEAL-DONE",
+        "kind": "navigate"
+      },
+      {
+        "label": "Recipe lesson",
+        "target": "RESIDENT-TEACH",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "tea-house",
+    "layout": "sheet",
+    "sourceNote": "领取赠餐后的Hana面板；今日赠餐1/1，Today’s meal只查看已领取状态，不再回到可领取0/1。保留原对话/教学入口；本次领取没有自动进食或加体力。",
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "section": "3.4.5",
+      "designLabel": "Hana · 今日赠餐已领"
+    },
+    "original": {
+      "id": "RESIDENT-TALK",
+      "title": "居民 · 对话与好感",
+      "heading": "Hana · Café Owner",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "A warm meal for a busy day",
+          "I have something fresh for you.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Chat",
+          "RESIDENT-CHAT"
+        ],
+        [
+          "Today’s meal",
+          "RESIDENT-MEAL",
+          "soft"
+        ],
+        [
+          "Learn a recipe",
+          "RESIDENT-TEACH",
+          "soft"
+        ]
+      ],
+      "note": "角色NPC跟岗位掌柜分开：角色谈话不直接商业Trade。熟悉45–89，赠餐全居民合计每日1份。",
+      "scene": "tea-house",
+      "place": "Tea House"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Tea House",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Tea House",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "energy": 142,
+      "capacity": 200
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "sourceGroup": "07",
+    "scene": "kitchen",
+    "layout": "sheet",
+    "requirements": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true,
+      "closeResult": "scene"
+    },
+    "hud": {
+      "capacity": 220,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 2:40",
+      "energy": 142
+    },
+    "id": "COOK-CABINET-TAKEN",
+    "title": "Herb Grilled Fish",
+    "state": "Added to Bag",
+    "effect": "Your dish is in Bag · Dishes.",
+    "quantity": {
+      "value": "1",
+      "label": "portion"
+    },
+    "keyFacts": [
+      {
+        "label": "Cabinet",
+        "value": "3/6",
+        "kind": "capacity"
+      },
+      {
+        "label": "Energy",
+        "value": "142/220",
+        "kind": "progress"
+      }
+    ],
+    "supporting": "Remaining in cabinet",
+    "rows": [
+      {
+        "title": "Grilled Crucian",
+        "state": "Good",
+        "effect": "Restores Energy",
+        "keyFacts": [
+          {
+            "label": "Recovery",
+            "value": "+25 Energy",
+            "kind": "reward"
+          }
+        ],
+        "disclosure": [],
+        "quantity": {
+          "value": "3",
+          "label": "portions"
+        },
+        "icon": "i-dish-grilled"
+      }
+    ],
+    "items": [],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss"
+      }
+    ],
+    "disclosure": [],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "designLabel": "保温柜取包结果"
+    },
+    "sourceNote": "同一次保温柜操作的独立结果。Herb Grilled Fish ×1移到Bag，体力保持142/220；此示例背包有空间。关闭进入142/220的厨房场景，不返回旧4/6柜状态。",
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "resultContext": {
+      "operation": "cabinet-take",
+      "cabinetPortions": 3,
+      "bagAdded": {
+        "title": "Herb Grilled Fish",
+        "quality": "Good",
+        "quantity": 1
+      },
+      "energyBefore": 142,
+      "energyAfter": 142,
+      "capacity": 220
+    }
+  },
+  {
+    "sourceGroup": "07",
+    "scene": "kitchen",
+    "layout": "sheet",
+    "requirements": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true,
+      "closeResult": "scene"
+    },
+    "hud": {
+      "capacity": 220,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 2:40",
+      "energy": 187
+    },
+    "id": "COOK-CABINET-EATEN",
+    "title": "Herb Grilled Fish",
+    "state": "Eaten",
+    "effect": "Restored 45 Energy.",
+    "quantity": {
+      "value": "1",
+      "label": "portion"
+    },
+    "keyFacts": [
+      {
+        "label": "Cabinet",
+        "value": "3/6",
+        "kind": "capacity"
+      },
+      {
+        "label": "Energy",
+        "value": "187/220",
+        "kind": "progress"
+      }
+    ],
+    "supporting": "Remaining in cabinet",
+    "rows": [
+      {
+        "title": "Grilled Crucian",
+        "state": "Good",
+        "effect": "Restores Energy",
+        "keyFacts": [
+          {
+            "label": "Recovery",
+            "value": "+25 Energy",
+            "kind": "reward"
+          }
+        ],
+        "disclosure": [],
+        "quantity": {
+          "value": "3",
+          "label": "portions"
+        },
+        "icon": "i-dish-grilled"
+      }
+    ],
+    "items": [],
+    "actions": [
+      {
+        "label": "Done",
+        "kind": "dismiss"
+      }
+    ],
+    "disclosure": [],
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "designLabel": "保温柜直接进食结果"
+    },
+    "sourceNote": "同一次保温柜操作的独立结果。Herb Grilled Fish ×1从柜内消耗并恢复45体力，没有加入背包。关闭进入187/220的厨房场景，不返回旧4/6柜状态。",
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "resultContext": {
+      "operation": "cabinet-eat",
+      "cabinetPortions": 3,
+      "bagAdded": null,
+      "energyBefore": 142,
+      "energyAfter": 187,
+      "capacity": 220
+    }
+  }
+]

@@ -1,0 +1,836 @@
+[
+  {
+    "id": "HOME-LV4",
+    "title": "农场Lv4 · 可见后果",
+    "heading": "Second Stove",
+    "meta": "230 Energy · 320 plots",
+    "rows": [
+      [
+        "Two dishes at once",
+        "Homestead Lv4",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View kitchen",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 230,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "HOME-LV5",
+    "title": "农场Lv5 · 可见后果",
+    "heading": "Notice Board + porch",
+    "meta": "240 Energy · 360 plots",
+    "rows": [
+      [
+        "A place for visitors",
+        "Homestead Lv5",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View farm",
+        "FAC-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 240,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "HOME-LV6",
+    "title": "农场Lv6 · 可见后果",
+    "heading": "Big Pot · Double",
+    "meta": "250 Energy · Bag Upgrade II available",
+    "rows": [
+      [
+        "Two portions per cook",
+        "Homestead Lv6",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View kitchen",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 250,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "HOME-LV7",
+    "title": "农场Lv7 · 可见后果",
+    "heading": "Orchard 8/8 · Sprinklers 10/10",
+    "meta": "260 Energy · 450 plots",
+    "rows": [
+      [
+        "Your growing space reaches new limits",
+        "Homestead Lv7",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View farm",
+        "FAC-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 260,
+    "scene": "farm-orchard"
+  },
+  {
+    "id": "HOME-LV8",
+    "title": "农场Lv8 · 可见后果",
+    "heading": "Third Stove · cabinet 12",
+    "meta": "270 Energy · 500 plots",
+    "rows": [
+      [
+        "A bigger kitchen and refreshed stall",
+        "Homestead Lv8",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View kitchen",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 270,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "HOME-LV9",
+    "title": "农场Lv9 · 可见后果",
+    "heading": "Bag Upgrade III available",
+    "meta": "280 Energy · 550 plots",
+    "rows": [
+      [
+        "40 slots after purchase",
+        "Homestead Lv9",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View farm",
+        "FAC-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 280,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "HOME-LV10",
+    "title": "农场Lv10 · 可见后果",
+    "heading": "Homestead Master",
+    "meta": "290 Energy · 600 plots",
+    "rows": [
+      [
+        "Chef’s Sign · gold collection frame",
+        "Homestead Lv10",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View kitchen",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 290,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "MINE-3",
+    "title": "第三层 · 行动选择",
+    "heading": "Mine · Floor 3",
+    "meta": "6 rocks · 1 Slime",
+    "rows": [
+      [
+        "Mining · 2 Energy per rock",
+        "Combat · Attack · no Energy",
+        "i-pickaxe"
+      ]
+    ],
+    "actions": [
+      [
+        "Switch to Combat",
+        "COMBAT-1"
+      ]
+    ],
+    "note": "3层首次到达仍Mining；怪可不打，下层看6岩全碎。玩家主动切Combat；上层已清才能付2到新层。",
+    "scene": "mine",
+    "place": "Mine · Floor 3"
+  },
+  {
+    "id": "COMBAT-1",
+    "title": "Combat · 武器与HP",
+    "heading": "Wooden Sword · Attack 3",
+    "meta": "HP · 70%",
+    "rows": [
+      [
+        "Attack · no Energy used",
+        "Move to avoid the Slime’s leap.",
+        "i-sword"
+      ]
+    ],
+    "actions": [
+      [
+        "Attack",
+        "COMBAT-LOOT"
+      ],
+      [
+        "Use Healing Potion",
+        "COMBAT-HEAL",
+        "soft"
+      ]
+    ],
+    "note": "主行动键剑徽标Attack，Combat快捷栏仅药水；木剑史莱姆3击/精英12击，镐不参与。此为状态截帧不模拟实时战斗。",
+    "scene": "mine",
+    "place": "Mine · Floor 3"
+  },
+  {
+    "id": "COMBAT-LOOT",
+    "title": "击败 · 材料掉落",
+    "heading": "Slime defeated",
+    "meta": "No Energy used · no skill XP",
+    "rows": [
+      [
+        "Copper Ore ×1",
+        "Added to your materials",
+        "i-copper"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to Mining",
+        "MINE-4",
+        "soft"
+      ]
+    ],
+    "note": "随机示例非必掉铜；35铜/25盐/40蚯蚓。种子/亮片/Rare装备不进此掉落池。",
+    "scene": "mine",
+    "place": "Mine · Floor 3"
+  },
+  {
+    "id": "COMBAT-HEAL",
+    "title": "药水 · 只回HP",
+    "heading": "HP restored",
+    "meta": "Healing Potion ×1 used",
+    "rows": [
+      [
+        "Your Energy is unchanged",
+        "Meals recover Energy, not HP.",
+        "i-energy"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to Combat",
+        "COMBAT-1",
+        "soft"
+      ]
+    ],
+    "note": "药水只3–5层，HP满不消耗；治疗0体力。药水购买来源在据点，非工作台。",
+    "scene": "mine",
+    "place": "Mine · Floor 3"
+  },
+  {
+    "id": "MINE-4",
+    "title": "第四层 · 清层与Express",
+    "heading": "Floor 4 cleared",
+    "meta": "6/6 rocks · Elevator stop",
+    "rows": [
+      [
+        "Express unlocked",
+        "Floor 5 · Express · Free",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "Floor 5 · Express · Free",
+        "MINE-5"
+      ],
+      [
+        "Entrance · Free",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "曾清4层账号级解锁Express，整程0，不另收第5层层费；当日两局上限仍生效。",
+    "scene": "mine",
+    "place": "Mine · Floor 4"
+  },
+  {
+    "id": "MINE-5",
+    "title": "精英与石英日限",
+    "heading": "Elite Slime defeated",
+    "meta": "Run complete",
+    "rows": [
+      [
+        "Quartz ×2",
+        "Quartz reward available once per day",
+        "i-stone"
+      ]
+    ],
+    "actions": [
+      [
+        "Return to entrance",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "精英20%掉2石英示例，已掉过时权重转铜/盐/蚯蚓。不是每日保证石英；Express不绕过日限。",
+    "scene": "mine",
+    "place": "Mine · Floor 5"
+  },
+  {
+    "id": "MINE-KO",
+    "title": "被击倒 · 可恢复",
+    "heading": "Back at the mine entrance",
+    "meta": "Your current run is saved.",
+    "rows": [
+      [
+        "HP restored",
+        "Stored materials stay yours.",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Continue run · Free",
+        "MINE-3"
+      ],
+      [
+        "Go home · Free",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "此为击倒恢复独立状态，不能把精英Run complete链到Continue；精英完成入口应新局。正式连线拆开检查。",
+    "scene": "farm"
+  },
+  {
+    "id": "RESIDENT-TALK",
+    "title": "居民 · 对话与好感",
+    "heading": "Hana · Café Owner",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "A warm meal for a busy day",
+        "I have something fresh for you.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Chat",
+        "RESIDENT-CHAT"
+      ],
+      [
+        "Today’s meal",
+        "RESIDENT-MEAL",
+        "soft"
+      ],
+      [
+        "Learn a recipe",
+        "RESIDENT-TEACH",
+        "soft"
+      ]
+    ],
+    "note": "角色NPC跟岗位掌柜分开：角色谈话不直接商业Trade。熟悉45–89，赠餐全居民合计每日1份。",
+    "scene": "tea-house",
+    "place": "Tea House"
+  },
+  {
+    "id": "RESIDENT-CHAT",
+    "title": "每日首谈 · 好感",
+    "heading": "Good to see you again",
+    "meta": "Hana · +2 friendship",
+    "rows": [
+      [
+        "Today’s first conversation",
+        "Friendship follows Hana across cities.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Back",
+        "RESIDENT-TALK",
+        "soft"
+      ]
+    ],
+    "note": "每日首谈每角色一次；跨城不会再次领。角色外观不随城市变，岗位掌柜才气候换装。",
+    "scene": "tea-house",
+    "place": "Tea House"
+  },
+  {
+    "id": "RESIDENT-MEAL",
+    "title": "居民赠餐 · 日额度",
+    "heading": "Veggie Plate",
+    "meta": "Today’s Resident meal · 0/1",
+    "rows": [
+      [
+        "Common · +20 Energy",
+        "Sent to your Warming Cabinet when available",
+        "i-dish-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Accept meal",
+        "RESIDENT-MEAL-DONE"
+      ]
+    ],
+    "note": "熟悉起所有居民共享每日1份。无柜/柜满的去向按容量规则保持，不把赠餐绕成无限。",
+    "scene": "tea-house",
+    "place": "Tea House"
+  },
+  {
+    "id": "RESIDENT-MEAL-DONE",
+    "title": "赠餐领取后",
+    "heading": "Enjoy your meal",
+    "meta": "Resident meal today 1/1",
+    "rows": [
+      [
+        "A new meal tomorrow",
+        "Other Residents share today’s allowance.",
+        "i-clock"
+      ]
+    ],
+    "actions": [
+      [
+        "Done",
+        "RESIDENT-TALK",
+        "soft"
+      ]
+    ],
+    "note": "完成后任何居民均显示已领，不依城市/据点多发。",
+    "scene": "tea-house",
+    "place": "Tea House"
+  },
+  {
+    "id": "RESIDENT-TEACH",
+    "title": "教学配方 · Tasted",
+    "heading": "A recipe from Hana",
+    "meta": "Learned · Tasted",
+    "rows": [
+      [
+        "Ingredients and name revealed",
+        "Cook it yourself to discover it and earn first-cook XP.",
+        "i-cookbook"
+      ]
+    ],
+    "actions": [
+      [
+        "View Cookbook",
+        "DEX-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "教学不直接Discovered、不发首做XP；居民具体菜池见§9/7.16，不自定未定配方奖励。",
+    "scene": "tea-house",
+    "place": "Tea House"
+  },
+  {
+    "id": "RES-PIP",
+    "title": "Pip · 居民内容卡",
+    "heading": "Pip · Courier Kid",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Dessert",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "travel-post",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-GRANNY",
+    "title": "Granny Wu · 居民内容卡",
+    "heading": "Granny Wu · Campfire Elder",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Soup",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "trading-post",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-MIRA",
+    "title": "Mira · 居民内容卡",
+    "heading": "Mira · Travelling Trader",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Rare or better",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "travel-post",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-KAI",
+    "title": "Old Kai · 居民内容卡",
+    "heading": "Old Kai · Harbour Elder",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Grilled",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "tackle-shop",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-RAFA",
+    "title": "Rafa · 居民内容卡",
+    "heading": "Rafa · Ferryman",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Soup",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "tackle-shop",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-IVO",
+    "title": "Ivo · 居民内容卡",
+    "heading": "Ivo · Old Miner",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Grilled",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "mine",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-HANA",
+    "title": "Hana · 居民内容卡",
+    "heading": "Hana · Café Owner",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Fine or better",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "tea-house",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-SAM",
+    "title": "Sam · 居民内容卡",
+    "heading": "Sam · Station Master",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Grilled",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "travel-post",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-LENA",
+    "title": "Lena · 居民内容卡",
+    "heading": "Lena · Lighthouse Keeper",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Tea",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "tea-house",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-TOMO",
+    "title": "Tomo · 居民内容卡",
+    "heading": "Tomo · Curator",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Rare or better",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "market-square-v2",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-THEO",
+    "title": "Theo · 居民内容卡",
+    "heading": "Theo · Gardener",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Salad",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "market-square-v2",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-NADIA",
+    "title": "Nadia · 居民内容卡",
+    "heading": "Nadia · Market Baker",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Stew",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "market-square-v2",
+    "place": "Outpost"
+  },
+  {
+    "id": "DEX-MILESTONE",
+    "title": "图鉴里程碑 · 领取后果",
+    "heading": "Fish-dex · 10/20",
+    "meta": "Milestone reached",
+    "rows": [
+      [
+        "+30 Energy · +100 coins",
+        "One-time collection reward",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Continue",
+        "DEX-P1-2",
+        "soft"
+      ]
+    ],
+    "note": "20种时+50体力+300金币+完成徽记。被动物品奖励满包入Parcels，币/体力直接到账。",
+    "scene": "pond"
+  },
+  {
+    "id": "COOK-MILESTONE",
+    "title": "Cookbook · 四级痕迹",
+    "heading": "Home Cook · 8/48",
+    "meta": "+50 Energy",
+    "rows": [
+      [
+        "20 pages · Line Cook",
+        "100 coins + Cookbook Shelf",
+        "i-cookbook"
+      ],
+      [
+        "36 pages · Head Chef",
+        "Warming Cabinet +4 slots",
+        "i-pot"
+      ],
+      [
+        "48 pages · Master Chef",
+        "Gold Cookbook + farm title",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to Cookbook",
+        "DEX-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "Mastered10另称号Muscle Memory。P2扩56页按9/22/42/56，不能沿旧8门槛混用。",
+    "scene": "kitchen",
+    "place": "Kitchen"
+  }
+]

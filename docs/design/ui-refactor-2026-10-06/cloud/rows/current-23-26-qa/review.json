@@ -1,0 +1,101 @@
+{
+  "kind": "Actual Figma visual review of current rows23–26",
+  "count": 32,
+  "ids": [
+    "COOK-P1-8",
+    "FAC-GH",
+    "TRAP-DONE",
+    "DEX-P1-1",
+    "DEX-P1-2",
+    "FAC-GH-PLACE",
+    "FAC-GH-DONE",
+    "DOUBLE-RESULT",
+    "FAC-LIMIT",
+    "TRAP-NOROOM",
+    "COOK-EMPTY",
+    "MAP-2-FREE",
+    "MAP-3-FREE",
+    "MAP-4-FREE",
+    "MAP-5-FREE",
+    "MAP-6-FREE",
+    "MAP-7-FREE",
+    "MAP-8-FREE",
+    "LOCAL-FISH",
+    "LOCAL-CATCH",
+    "LOCAL-SHOP",
+    "LOCAL-TRADE",
+    "LOCAL-BOUGHT",
+    "HOME-RETURN",
+    "PASS-1",
+    "PASS-2",
+    "TRAVEL-RETRY",
+    "TRAVEL-RECONNECT",
+    "FOG-THREE",
+    "MAP-4-PAID",
+    "MAP-4-GATE",
+    "MAP-5-PAID"
+  ],
+  "screenshots": {
+    "row-23.png": "d81241d35fe64afc7b64b46ae1596de635273143621562678fc21550d801b4c6",
+    "row-24.png": "031ff89c00428a34bc61c8426610d438342e9dc8cf8cbe1a54a2a8cb8992fb73",
+    "row-25.png": "cb8755db5b8770d1c22044e0226508aa61a306c346dad9faddaaa6f8596202c0",
+    "row-26.png": "648856025528d27fb594f7496314a5a564b947744f8df4fd3527059affb6e64a"
+  },
+  "findings": [
+    {
+      "ids": [
+        "COOK-EMPTY"
+      ],
+      "severity": "must-fix",
+      "issue": "No-space state says all three stoves/queues are full while its visible Stove1 says Empty; source kitchen.stoves also contains Empty.",
+      "owner": "normalize_current kitchen",
+      "status": "reported"
+    },
+    {
+      "ids": [
+        "FAC-GH"
+      ],
+      "severity": "must-verify-rebuild",
+      "issue": "Actual cloud image still shows fourth Coin requirement cut by footer, while current source has only three materials.",
+      "owner": "normalize_current/root",
+      "status": "reported source/canvas mismatch; check after source replay/hug"
+    },
+    {
+      "ids": [
+        "MAP-2-FREE",
+        "MAP-3-FREE"
+      ],
+      "severity": "must-fix",
+      "issue": "Expected fixed BrowseTokyo/Traveldetails navigation absent from visible footer despite presentation.fixedNavigationLabels in current source.",
+      "owner": "normalize_current/root",
+      "status": "reported"
+    },
+    {
+      "ids": [
+        "MAP-4-GATE"
+      ],
+      "severity": "information-hierarchy",
+      "issue": "Travel Permit is repeated as 0/1 tile, Missing row, required1 and Uses footer.",
+      "owner": "normalize_current",
+      "status": "merge presentation, retain actual source/help"
+    },
+    {
+      "ids": [
+        "MAP-7-FREE",
+        "LOCAL-SHOP",
+        "LOCAL-BOUGHT",
+        "HOME-RETURN"
+      ],
+      "severity": "flow-continuity-boundary",
+      "issue": "A shared static return path changes152Energy to142 and213coins to230; individual fixtures do not prove resource continuity for an end-to-end free-trip narrative.",
+      "owner": "root",
+      "status": "recorded; no shared-state logic changed"
+    }
+  ],
+  "knownRollout": "Ordinary short sheets and cropped long-list endings are being handled by the already validated content-sized sheet adapter; no duplicate renderer was created.",
+  "reviewOnlyCards": [
+    "DEX-P1-1",
+    "FOG-THREE"
+  ],
+  "scopeLimit": "All32 images viewed; no browser play-through and no claim that final owner fixes are already visually accepted."
+}

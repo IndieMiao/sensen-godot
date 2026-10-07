@@ -1,0 +1,320 @@
+[
+  {
+    "id": "FREE-HOME-BROWSE",
+    "sourceGroup": "09",
+    "title": "Your homestead",
+    "state": "Home",
+    "effect": "Your discoveries and items came home with you.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Your Tokyo stamp and exploration stay unlocked.",
+      "Returning home costs no Energy or coins."
+    ],
+    "actions": [
+      {
+        "label": "Open passport",
+        "kind": "navigate",
+        "target": null,
+        "context": {
+          "operation": "free-trip-passport"
+        }
+      },
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "FREE-HOME-BROWSE/scene"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "免费旅行独立返家示例；不修改共用HOME-RETURN。资源保持为152/200 Energy、230 coins。没有新增物品。返家不再扣费、不再发首访或首城奖励；Done进入同资源农场场景。",
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "designLabel": "Return without a purchase",
+      "section": "11.10"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": true
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "energy": 152,
+      "capacity": 200,
+      "coins": 230,
+      "city": "Shanghai",
+      "place": "Homestead"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "resultContext": {
+      "energy": 152,
+      "coins": 230,
+      "capacity": 200,
+      "homeCity": "Shanghai",
+      "tripCity": "Tokyo",
+      "keptFromTrip": {},
+      "ownedTotalsKnown": false
+    }
+  },
+  {
+    "id": "FREE-HOME-CATCH",
+    "sourceGroup": "09",
+    "title": "Your homestead",
+    "state": "Home",
+    "effect": "Your discoveries and items came home with you.",
+    "keyFacts": [
+      {
+        "label": "Pond Crucian",
+        "value": "×1 kept",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Your Tokyo stamp and exploration stay unlocked.",
+      "Returning home costs no Energy or coins."
+    ],
+    "actions": [
+      {
+        "label": "Open passport",
+        "kind": "navigate",
+        "target": null,
+        "context": {
+          "operation": "free-trip-passport"
+        }
+      },
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "FREE-HOME-CATCH/scene"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "免费旅行独立返家示例；不修改共用HOME-RETURN。资源保持为147/200 Energy、230 coins。显示本次旅程保留的Pond Crucian×1，不声明Bag已有总量。返家不再扣费、不再发首访或首城奖励；Done进入同资源农场场景。",
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "designLabel": "Return after the local catch",
+      "section": "11.10"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": true
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "energy": 147,
+      "capacity": 200,
+      "coins": 230,
+      "city": "Shanghai",
+      "place": "Homestead"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "resultContext": {
+      "energy": 147,
+      "coins": 230,
+      "capacity": 200,
+      "homeCity": "Shanghai",
+      "tripCity": "Tokyo",
+      "keptFromTrip": {
+        "Pond Crucian": 1
+      },
+      "ownedTotalsKnown": false
+    }
+  },
+  {
+    "id": "FREE-HOME-BOUGHT",
+    "sourceGroup": "09",
+    "title": "Your homestead",
+    "state": "Home",
+    "effect": "Your discoveries and items came home with you.",
+    "keyFacts": [
+      {
+        "label": "Pumpkin Seeds",
+        "value": "×1 kept",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Your Tokyo stamp and exploration stay unlocked.",
+      "Returning home costs no Energy or coins."
+    ],
+    "actions": [
+      {
+        "label": "Open passport",
+        "kind": "navigate",
+        "target": null,
+        "context": {
+          "operation": "free-trip-passport"
+        }
+      },
+      {
+        "label": "Done",
+        "kind": "dismiss",
+        "target": "FREE-HOME-BOUGHT/scene"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "免费旅行独立返家示例；不修改共用HOME-RETURN。资源保持为152/200 Energy、213 coins。显示本次旅程保留的Pumpkin Seeds×1，不声明Bag已有总量。返家不再扣费、不再发首访或首城奖励；Done进入同资源农场场景。",
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "designLabel": "Return after the seed purchase",
+      "section": "11.10"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": true
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "energy": 152,
+      "capacity": 200,
+      "coins": 213,
+      "city": "Shanghai",
+      "place": "Homestead"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "resultContext": {
+      "energy": 152,
+      "coins": 213,
+      "capacity": 200,
+      "homeCity": "Shanghai",
+      "tripCity": "Tokyo",
+      "keptFromTrip": {
+        "Pumpkin Seeds": 1
+      },
+      "ownedTotalsKnown": false
+    }
+  },
+  {
+    "id": "FREE-EXPLORE-BOUGHT",
+    "sourceGroup": "09",
+    "title": "Tokyo",
+    "state": "Exploring",
+    "effect": "",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [],
+    "actions": [
+      {
+        "label": "Open passport",
+        "kind": "navigate",
+        "target": null,
+        "context": {
+          "operation": "free-trip-passport"
+        }
+      },
+      {
+        "label": "Go home",
+        "kind": "commit",
+        "target": "FREE-HOME-BOUGHT"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "scene",
+    "sourceNote": "购买后收起面板继续看东京地图；保持152/200 Energy与213coins，种子仍在Bag。本分镜只覆盖该次购买后的地图浏览、查看护照和返家；不宣称模拟任意后续生产/重复交易。",
+    "sourceRef": {
+      "file": "docs/product/gameplay-plan-v2-2026-10-02.md",
+      "section": "11.10",
+      "designLabel": "Purchase retained · Continue browsing Tokyo"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Map",
+      "placeExplicit": true
+    },
+    "hud": {
+      "energy": 152,
+      "city": "Tokyo",
+      "place": "Map",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "capacity": 200,
+      "coins": 213
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": false,
+      "suppressDecisionArea": true
+    },
+    "resultContext": {
+      "energy": 152,
+      "capacity": 200,
+      "coins": 213,
+      "keptFromTrip": {
+        "Pumpkin Seeds": 1
+      },
+      "ownedTotalsKnown": false
+    }
+  }
+]

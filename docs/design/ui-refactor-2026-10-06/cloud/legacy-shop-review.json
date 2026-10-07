@@ -1,0 +1,378 @@
+{
+  "kind": "Native legacy counter + Bag visual refinement",
+  "sourceIds": [
+    "NPC-2",
+    "NPC-2-2",
+    "NPC-3",
+    "NPC-3-2",
+    "FARM-6",
+    "FARM-6-2"
+  ],
+  "dataAndLogic": "normalizeLegacyNpcFlowData is applied unchanged; renderer checks exact items/selection/quota/actions/grid before and after composition.",
+  "components": [
+    "Compact/ShopProduct essential48",
+    "Compact/ShopProduct detailed58",
+    "Compact/SelectedItem",
+    "Compact/Command",
+    "Compact/Navigation",
+    "Compact/InventoryCell",
+    "Compact/Filter"
+  ],
+  "sourceAssetFix": "Source icon nominal sizes differ. New Sapling/Carbon Rod are32px. Shop Sweet Potato wraps an instance of the unchanged original64px master.",
+  "benchmark": {
+    "id": "NPC-2-2",
+    "frameReceipt": "legacy-shop-NPC-2-2-result-1791295701180.json",
+    "iconCorrectionReceipt": "legacy-shop-library-result-1791296975788.json",
+    "checks": {
+      "drawerTop": 104,
+      "catalogueHeight": 232,
+      "products": 4,
+      "sourceCells": 20,
+      "visibleFullBagRows": 3,
+      "selectedTitle": "Pond Crucian",
+      "selectedQuantity": "3",
+      "prices": [
+        {
+          "title": "Reed Rod",
+          "price": "80 coins",
+          "gate": "Fishing Lv3"
+        },
+        {
+          "title": "Carbon Rod",
+          "price": "350 coins",
+          "gate": "Fishing Lv6"
+        },
+        {
+          "title": "Spinner Lure",
+          "price": "6 coins",
+          "gate": "Fishing Lv5"
+        },
+        {
+          "title": "Fish Trap",
+          "price": "120 coins",
+          "gate": "Fishing Lv5"
+        }
+      ],
+      "selectedActions": [
+        {
+          "label": "Sell one",
+          "kind": "commit",
+          "target": "NPC-CRUCIAN-SOLD-ONE"
+        },
+        {
+          "label": "Sell all",
+          "kind": "commit",
+          "target": "NPC-CRUCIAN-SOLD-ALL"
+        }
+      ],
+      "quota": "30/80",
+      "dataContractUnchanged": true
+    },
+    "screenshot": "legacy-shop-NPC-2-2-final.png",
+    "sha256": "ebf9235cb95606eb756dc6c8cb482fbeff3a66183321e60f1edd082e96728aca",
+    "visualStatus": "passed: four products, distinct prices/gates/actions, selected item and three complete Bag rows; no icon overlap"
+  },
+  "pendingVisualChecks": [],
+  "prototypeClicksTested": false,
+  "finalMarketScreens": {
+    "NPC-2": {
+      "receipt": "legacy-shop-NPC-2-result-1791307713460.json",
+      "screenshot": "legacy-shop-NPC-2-final.png",
+      "sha256": "d41869300a773f7c65737344358999935f78f563ea731174ca0168bf10ba0f35",
+      "visualStatus": "passed: legal recipe card, price and gate separated, no clipped product or bag rows",
+      "checks": {
+        "drawerTop": 114,
+        "catalogueHeight": 222,
+        "products": 4,
+        "sourceCells": 20,
+        "visibleFullBagRows": 3,
+        "selectedTitle": "Grilled Crucian",
+        "selectedQuantity": "3",
+        "prices": [
+          {
+            "title": "Sweet Potato Seeds",
+            "price": "15 coins",
+            "gate": "Farming Lv5"
+          },
+          {
+            "title": "Apple Sapling",
+            "price": "40 coins",
+            "gate": "Farming Lv7"
+          },
+          {
+            "title": "Orchard Feed",
+            "price": "6 coins",
+            "gate": "Farming Lv7"
+          },
+          {
+            "title": "Sweet Potato Cakes",
+            "price": "500 coins",
+            "gate": "Recipe Card · Legendary"
+          }
+        ],
+        "selectedActions": [
+          {
+            "label": "Sell location",
+            "kind": "navigate",
+            "target": "FARM-6"
+          }
+        ],
+        "quota": null,
+        "dataContractUnchanged": true
+      }
+    },
+    "NPC-3": {
+      "receipt": "legacy-shop-NPC-3-result-1791307720784.json",
+      "screenshot": "legacy-shop-NPC-3-final.png",
+      "sha256": "1db2275113ec70cd87d6bd6f7e89448564dba93463ae499dc8efac357d366583",
+      "visualStatus": "passed: legal recipe card, price and gate separated, no clipped product or bag rows",
+      "checks": {
+        "drawerTop": 114,
+        "catalogueHeight": 222,
+        "products": 4,
+        "sourceCells": 20,
+        "visibleFullBagRows": 3,
+        "selectedTitle": "Sweet Potato",
+        "selectedQuantity": "12",
+        "prices": [
+          {
+            "title": "Sweet Potato Seeds",
+            "price": "15 coins",
+            "gate": "Farming Lv5"
+          },
+          {
+            "title": "Apple Sapling",
+            "price": "40 coins",
+            "gate": "Farming Lv7"
+          },
+          {
+            "title": "Orchard Feed",
+            "price": "6 coins",
+            "gate": "Farming Lv7"
+          },
+          {
+            "title": "Sweet Potato Cakes",
+            "price": "500 coins",
+            "gate": "Recipe Card · Legendary"
+          }
+        ],
+        "selectedActions": [
+          {
+            "label": "Sell one",
+            "kind": "commit",
+            "target": "NPC-SWEET-POTATO-SOLD-ONE"
+          },
+          {
+            "label": "Sell all",
+            "kind": "blocked",
+            "target": null
+          }
+        ],
+        "quota": "24/60",
+        "dataContractUnchanged": true
+      }
+    },
+    "NPC-3-2": {
+      "receipt": "legacy-shop-NPC-3-2-result-1791307727226.json",
+      "screenshot": "legacy-shop-NPC-3-2-final.png",
+      "sha256": "c156970994d589ee3701419663b8c823be36c6a18471abf1ff12474f02c41188",
+      "visualStatus": "passed: legal recipe card, price and gate separated, no clipped product or bag rows",
+      "checks": {
+        "drawerTop": 114,
+        "catalogueHeight": 222,
+        "products": 4,
+        "sourceCells": 20,
+        "visibleFullBagRows": 3,
+        "selectedTitle": "Sweet Potato",
+        "selectedQuantity": "12",
+        "prices": [
+          {
+            "title": "Sweet Potato Seeds",
+            "price": "15 coins",
+            "gate": "Farming Lv5"
+          },
+          {
+            "title": "Apple Sapling",
+            "price": "40 coins",
+            "gate": "Farming Lv7"
+          },
+          {
+            "title": "Orchard Feed",
+            "price": "6 coins",
+            "gate": "Farming Lv7"
+          },
+          {
+            "title": "Sweet Potato Cakes",
+            "price": "500 coins",
+            "gate": "Recipe Card · Legendary"
+          }
+        ],
+        "selectedActions": [
+          {
+            "label": "Sell one",
+            "kind": "blocked",
+            "target": "NPC-3-2"
+          },
+          {
+            "label": "Sell all",
+            "kind": "blocked",
+            "target": "NPC-3-2"
+          }
+        ],
+        "quota": "60/60",
+        "dataContractUnchanged": true
+      }
+    }
+  },
+  "homeStallScreens": {
+    "FARM-6": {
+      "receipt": "legacy-shop-FARM-6-result-1791308637376.json",
+      "screenshot": "legacy-shop-FARM-6-final.png",
+      "sha256": "269c6d0463159e091cf90a61459141b356f73fe8a541f6c2b4994c144a92e1cd",
+      "visualStatus": "passed: original unattended counter; four catalogue rows; 2 × 4 = 8 coins; known 120-coin dish daily limit; four complete Bag rows; original Grilled Crucian ×3 selection",
+      "checks": {
+        "drawerTop": 104,
+        "catalogueHeight": 192,
+        "products": 4,
+        "sourceCells": 20,
+        "visibleFullBagRows": 4,
+        "unattended": true,
+        "selectedTitle": "Grilled Crucian",
+        "selectedQuantity": "3",
+        "prices": [
+          {
+            "title": "Radish Seeds",
+            "price": "4 coins",
+            "gate": ""
+          },
+          {
+            "title": "Carrot Seeds",
+            "price": "9 coins",
+            "gate": "Farming Lv2"
+          },
+          {
+            "title": "Worm Bait",
+            "price": "2 coins",
+            "gate": "Sold out"
+          },
+          {
+            "title": "Compost",
+            "price": "2 coins",
+            "gate": "Farming Lv3"
+          }
+        ],
+        "selectedActions": [
+          {
+            "label": "Sell one",
+            "kind": "commit",
+            "target": null
+          },
+          {
+            "label": "Sell all",
+            "kind": "commit",
+            "target": null
+          }
+        ],
+        "quota": "120 coins",
+        "dataContractUnchanged": true
+      },
+      "warnings": [
+        {
+          "screen": "FARM-6",
+          "action": "Sell one",
+          "kind": "commit",
+          "target": null,
+          "reason": "No valid outcome frame; no fake success was wired."
+        },
+        {
+          "screen": "FARM-6",
+          "action": "Sell all",
+          "kind": "commit",
+          "target": null,
+          "reason": "No valid outcome frame; no fake success was wired."
+        },
+        {
+          "screen": "FARM-6",
+          "action": "Sell one",
+          "kind": "commit",
+          "target": null,
+          "reason": "No valid outcome frame; no fake success was wired."
+        },
+        {
+          "screen": "FARM-6",
+          "action": "Sell all",
+          "kind": "commit",
+          "target": null,
+          "reason": "No valid outcome frame; no fake success was wired."
+        },
+        {
+          "screen": "FARM-6",
+          "action": "Sell one",
+          "kind": "commit",
+          "target": null,
+          "reason": "No valid outcome frame; no fake success was wired."
+        },
+        {
+          "screen": "FARM-6",
+          "action": "Sell all",
+          "kind": "commit",
+          "target": null,
+          "reason": "No valid outcome frame; no fake success was wired."
+        }
+      ]
+    },
+    "FARM-6-2": {
+      "receipt": "legacy-shop-FARM-6-2-result-1791308921286.json",
+      "screenshot": "legacy-shop-FARM-6-2-final.png",
+      "sha256": "b5491dbd8c34f43dc73c5f4fc0245d3e3cb3e1e564fbe79ea81726bdc78da901",
+      "visualStatus": "passed: Produce filter matches three source produce stacks; Stall Board navigation restored; crop sale has no invented quota; quantity, unit price, stack price and actions remain separate; four complete Bag rows",
+      "checks": {
+        "drawerTop": 104,
+        "catalogueHeight": 192,
+        "products": 4,
+        "sourceCells": 20,
+        "visibleFullBagRows": 4,
+        "unattended": true,
+        "selectedTitle": "Radish",
+        "selectedQuantity": "12",
+        "prices": [
+          {
+            "title": "Radish Seeds",
+            "price": "4 coins",
+            "gate": ""
+          },
+          {
+            "title": "Carrot Seeds",
+            "price": "9 coins",
+            "gate": "Farming Lv2"
+          },
+          {
+            "title": "Worm Bait",
+            "price": "2 coins",
+            "gate": "Sold out"
+          },
+          {
+            "title": "Compost",
+            "price": "2 coins",
+            "gate": "Farming Lv3"
+          }
+        ],
+        "selectedActions": [
+          {
+            "label": "Sell one",
+            "kind": "commit",
+            "target": "STALL-RADISH-SOLD-ONE"
+          },
+          {
+            "label": "Sell all",
+            "kind": "commit",
+            "target": "STALL-RADISH-SOLD-ALL"
+          }
+        ],
+        "quota": null,
+        "dataContractUnchanged": true
+      },
+      "warnings": []
+    }
+  }
+}

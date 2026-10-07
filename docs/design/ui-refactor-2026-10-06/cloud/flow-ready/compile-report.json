@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-06T10:41:59.446121+00:00",
+  "figmaExecuted": false,
+  "results": [
+    {
+      "id": "MINE-5-ARRIVAL",
+      "exit": 0,
+      "characters": 46196,
+      "stdout": "{\"file\":\"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/MINE-5-ARRIVAL.js\",\"length\":46196,\"bytes\":46402}\n{\"file\":\"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/MINE-5-ARRIVAL.js\",\"syntax\":true,\"topLevelCaptures\":true,\"figmaExecuted\":false}\n{\"id\": \"MINE-5-ARRIVAL\", \"file\": \"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/MINE-5-ARRIVAL.js\", \"figmaExecuted\": false, \"stateWritten\": false}\n",
+      "stderr": ""
+    },
+    {
+      "id": "RESIDENT-TALK-MEAL-CLAIMED",
+      "exit": 0,
+      "characters": 45925,
+      "stdout": "{\"file\":\"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/RESIDENT-TALK-MEAL-CLAIMED.js\",\"length\":45925,\"bytes\":46094}\n{\"file\":\"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/RESIDENT-TALK-MEAL-CLAIMED.js\",\"syntax\":true,\"topLevelCaptures\":true,\"figmaExecuted\":false}\n{\"id\": \"RESIDENT-TALK-MEAL-CLAIMED\", \"file\": \"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/RESIDENT-TALK-MEAL-CLAIMED.js\", \"figmaExecuted\": false, \"stateWritten\": false}\n",
+      "stderr": ""
+    },
+    {
+      "id": "COOK-CABINET-TAKEN",
+      "exit": 0,
+      "characters": 46087,
+      "stdout": "{\"file\":\"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/COOK-CABINET-TAKEN.js\",\"length\":46087,\"bytes\":46240}\n{\"file\":\"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/COOK-CABINET-TAKEN.js\",\"syntax\":true,\"topLevelCaptures\":true,\"figmaExecuted\":false}\n{\"id\": \"COOK-CABINET-TAKEN\", \"file\": \"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/COOK-CABINET-TAKEN.js\", \"figmaExecuted\": false, \"stateWritten\": false}\n",
+      "stderr": ""
+    },
+    {
+      "id": "COOK-CABINET-EATEN",
+      "exit": 0,
+      "characters": 46015,
+      "stdout": "{\"file\":\"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/COOK-CABINET-EATEN.js\",\"length\":46015,\"bytes\":46173}\n{\"file\":\"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/COOK-CABINET-EATEN.js\",\"syntax\":true,\"topLevelCaptures\":true,\"figmaExecuted\":false}\n{\"id\": \"COOK-CABINET-EATEN\", \"file\": \"docs/design/ui-refactor-2026-10-06/cloud/flow-ready/COOK-CABINET-EATEN.js\", \"figmaExecuted\": false, \"stateWritten\": false}\n",
+      "stderr": ""
+    }
+  ]
+}

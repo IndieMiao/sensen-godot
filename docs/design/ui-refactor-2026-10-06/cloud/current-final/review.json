@@ -1,0 +1,754 @@
+{
+  "reviewScope": "Current P0/P1/main travel cards indices84–207;this agent visually inspected84–175 inclusive (92),UX agent176–207 (32).",
+  "reviewedCount": 92,
+  "reviewed": [
+    {
+      "id": "TUT-1",
+      "index": 84,
+      "nodeId": "482:182"
+    },
+    {
+      "id": "TUT-1-2",
+      "index": 85,
+      "nodeId": "482:184"
+    },
+    {
+      "id": "TUT-3-01",
+      "index": 86,
+      "nodeId": "482:186"
+    },
+    {
+      "id": "TUT-3-02",
+      "index": 87,
+      "nodeId": "482:188"
+    },
+    {
+      "id": "TUT-3-03",
+      "index": 88,
+      "nodeId": "482:191"
+    },
+    {
+      "id": "TUT-3-04",
+      "index": 89,
+      "nodeId": "482:193"
+    },
+    {
+      "id": "TUT-3-05",
+      "index": 90,
+      "nodeId": "482:195"
+    },
+    {
+      "id": "TUT-3-06",
+      "index": 91,
+      "nodeId": "482:197"
+    },
+    {
+      "id": "TUT-3-06B",
+      "index": 92,
+      "nodeId": "482:199"
+    },
+    {
+      "id": "TUT-3-07A",
+      "index": 93,
+      "nodeId": "482:201"
+    },
+    {
+      "id": "TUT-3-07B",
+      "index": 94,
+      "nodeId": "482:203"
+    },
+    {
+      "id": "TUT-3-07C",
+      "index": 95,
+      "nodeId": "482:205"
+    },
+    {
+      "id": "TUT-3-08",
+      "index": 96,
+      "nodeId": "482:208"
+    },
+    {
+      "id": "TUT-3-09",
+      "index": 97,
+      "nodeId": "482:210"
+    },
+    {
+      "id": "TUT-3-10",
+      "index": 98,
+      "nodeId": "482:212"
+    },
+    {
+      "id": "TUT-3-11",
+      "index": 99,
+      "nodeId": "482:214"
+    },
+    {
+      "id": "TUT-3-12",
+      "index": 100,
+      "nodeId": "482:216"
+    },
+    {
+      "id": "TUT-3-END",
+      "index": 101,
+      "nodeId": "482:218"
+    },
+    {
+      "id": "MAT-1",
+      "index": 102,
+      "nodeId": "482:220"
+    },
+    {
+      "id": "MAT-2",
+      "index": 103,
+      "nodeId": "482:222"
+    },
+    {
+      "id": "MAT-3",
+      "index": 104,
+      "nodeId": "482:225"
+    },
+    {
+      "id": "MINE-P0-1",
+      "index": 105,
+      "nodeId": "482:227"
+    },
+    {
+      "id": "MINE-P0-2",
+      "index": 106,
+      "nodeId": "482:229"
+    },
+    {
+      "id": "MINE-P0-3",
+      "index": 107,
+      "nodeId": "482:231"
+    },
+    {
+      "id": "MINE-P0-4",
+      "index": 108,
+      "nodeId": "482:233"
+    },
+    {
+      "id": "MINE-P0-5",
+      "index": 109,
+      "nodeId": "482:235"
+    },
+    {
+      "id": "MINE-P0-6",
+      "index": 110,
+      "nodeId": "482:237"
+    },
+    {
+      "id": "MINE-P0-7",
+      "index": 111,
+      "nodeId": "482:239"
+    },
+    {
+      "id": "MINE-P0-8",
+      "index": 112,
+      "nodeId": "482:242"
+    },
+    {
+      "id": "CRAFT-1",
+      "index": 113,
+      "nodeId": "482:244"
+    },
+    {
+      "id": "CRAFT-2",
+      "index": 114,
+      "nodeId": "482:246"
+    },
+    {
+      "id": "CRAFT-3",
+      "index": 115,
+      "nodeId": "482:248"
+    },
+    {
+      "id": "CRAFT-4",
+      "index": 116,
+      "nodeId": "482:250"
+    },
+    {
+      "id": "GEAR-P0-1",
+      "index": 117,
+      "nodeId": "482:252"
+    },
+    {
+      "id": "GEAR-P0-2",
+      "index": 118,
+      "nodeId": "482:254"
+    },
+    {
+      "id": "HOME-P0-1",
+      "index": 119,
+      "nodeId": "482:256"
+    },
+    {
+      "id": "COOK-P0-1",
+      "index": 120,
+      "nodeId": "482:259"
+    },
+    {
+      "id": "COOK-P0-2",
+      "index": 121,
+      "nodeId": "482:261"
+    },
+    {
+      "id": "COOK-P0-3",
+      "index": 122,
+      "nodeId": "482:263"
+    },
+    {
+      "id": "COOK-P0-4",
+      "index": 123,
+      "nodeId": "482:265"
+    },
+    {
+      "id": "COOK-P0-5",
+      "index": 124,
+      "nodeId": "482:267"
+    },
+    {
+      "id": "COOK-P0-6",
+      "index": 125,
+      "nodeId": "482:269"
+    },
+    {
+      "id": "COOK-P0-7",
+      "index": 126,
+      "nodeId": "482:271"
+    },
+    {
+      "id": "COOK-P0-8",
+      "index": 127,
+      "nodeId": "482:273"
+    },
+    {
+      "id": "STORE-1",
+      "index": 128,
+      "nodeId": "482:276"
+    },
+    {
+      "id": "STORE-2",
+      "index": 129,
+      "nodeId": "482:278"
+    },
+    {
+      "id": "COOK-P0-9",
+      "index": 130,
+      "nodeId": "482:280"
+    },
+    {
+      "id": "COOK-P0-10",
+      "index": 131,
+      "nodeId": "482:282"
+    },
+    {
+      "id": "BOARD-1",
+      "index": 132,
+      "nodeId": "482:284"
+    },
+    {
+      "id": "BOARD-2",
+      "index": 133,
+      "nodeId": "482:286"
+    },
+    {
+      "id": "BOARD-3",
+      "index": 134,
+      "nodeId": "482:288"
+    },
+    {
+      "id": "TODAY-1",
+      "index": 135,
+      "nodeId": "482:290"
+    },
+    {
+      "id": "TODAY-2",
+      "index": 136,
+      "nodeId": "482:293"
+    },
+    {
+      "id": "BAG-1-P0",
+      "index": 137,
+      "nodeId": "482:295"
+    },
+    {
+      "id": "PARCEL-1",
+      "index": 138,
+      "nodeId": "482:297"
+    },
+    {
+      "id": "PARCEL-2",
+      "index": 139,
+      "nodeId": "482:299"
+    },
+    {
+      "id": "PARCEL-3",
+      "index": 140,
+      "nodeId": "482:301"
+    },
+    {
+      "id": "PARCEL-4",
+      "index": 141,
+      "nodeId": "482:303"
+    },
+    {
+      "id": "PARCEL-5",
+      "index": 142,
+      "nodeId": "482:305"
+    },
+    {
+      "id": "PARCEL-6",
+      "index": 143,
+      "nodeId": "482:307"
+    },
+    {
+      "id": "PROFILE-1-P0",
+      "index": 144,
+      "nodeId": "482:310"
+    },
+    {
+      "id": "KEEP-P0-1",
+      "index": 145,
+      "nodeId": "482:312"
+    },
+    {
+      "id": "KEEP-P0-2",
+      "index": 146,
+      "nodeId": "482:314"
+    },
+    {
+      "id": "ENERGY-P0-1",
+      "index": 147,
+      "nodeId": "482:316"
+    },
+    {
+      "id": "COOK-KEEP-BRANCH",
+      "index": 148,
+      "nodeId": "482:318"
+    },
+    {
+      "id": "SAVE-RETRY",
+      "index": 149,
+      "nodeId": "482:320"
+    },
+    {
+      "id": "BOARD-DROPPED",
+      "index": 150,
+      "nodeId": "482:322"
+    },
+    {
+      "id": "COOK-HERB-HEAT",
+      "index": 151,
+      "nodeId": "482:324"
+    },
+    {
+      "id": "MAT-GLOVES-RESULT",
+      "index": 152,
+      "nodeId": "482:327"
+    },
+    {
+      "id": "FISH-P0-CAST",
+      "index": 153,
+      "nodeId": "482:329"
+    },
+    {
+      "id": "MINE-CONTINUE",
+      "index": 154,
+      "nodeId": "482:331"
+    },
+    {
+      "id": "BUILD-RETRY",
+      "index": 155,
+      "nodeId": "482:333"
+    },
+    {
+      "id": "PARCEL-ONE",
+      "index": 156,
+      "nodeId": "482:335"
+    },
+    {
+      "id": "FAC-1",
+      "index": 157,
+      "nodeId": "482:337"
+    },
+    {
+      "id": "FAC-2",
+      "index": 158,
+      "nodeId": "482:339"
+    },
+    {
+      "id": "FAC-3",
+      "index": 159,
+      "nodeId": "482:341"
+    },
+    {
+      "id": "FAC-4",
+      "index": 160,
+      "nodeId": "482:344"
+    },
+    {
+      "id": "FAC-5",
+      "index": 161,
+      "nodeId": "482:346"
+    },
+    {
+      "id": "FAC-6",
+      "index": 162,
+      "nodeId": "482:348"
+    },
+    {
+      "id": "TRAP-1",
+      "index": 163,
+      "nodeId": "482:350"
+    },
+    {
+      "id": "TRAP-2",
+      "index": 164,
+      "nodeId": "482:352"
+    },
+    {
+      "id": "TRAP-3",
+      "index": 165,
+      "nodeId": "482:354"
+    },
+    {
+      "id": "TRAP-4",
+      "index": 166,
+      "nodeId": "482:356"
+    },
+    {
+      "id": "TRAP-5",
+      "index": 167,
+      "nodeId": "482:358"
+    },
+    {
+      "id": "TRAP-6",
+      "index": 168,
+      "nodeId": "482:361"
+    },
+    {
+      "id": "COOK-P1-1",
+      "index": 169,
+      "nodeId": "482:363"
+    },
+    {
+      "id": "COOK-P1-2",
+      "index": 170,
+      "nodeId": "482:365"
+    },
+    {
+      "id": "COOK-P1-3",
+      "index": 171,
+      "nodeId": "482:367"
+    },
+    {
+      "id": "COOK-P1-4",
+      "index": 172,
+      "nodeId": "482:369"
+    },
+    {
+      "id": "COOK-P1-5",
+      "index": 173,
+      "nodeId": "482:371"
+    },
+    {
+      "id": "COOK-P1-6",
+      "index": 174,
+      "nodeId": "482:373"
+    },
+    {
+      "id": "COOK-P1-7",
+      "index": 175,
+      "nodeId": "482:375"
+    }
+  ],
+  "allCurrentCoverageIncludingUX": 124,
+  "visualAcceptance": false,
+  "findings": [
+    {
+      "ids": [
+        "TUT-1",
+        "TUT-1-2",
+        "MAT-2",
+        "TUT-3-09",
+        "TUT-3-12"
+      ],
+      "issue": "Ordinary short sheets leave large empty areas and separate meaning from actions. Two TUT results still show230 coins instead of the current194 data.",
+      "fix": "current-visual-fixes.js content-fit wrapper + source data rebuild",
+      "status": "source-ready;8 representatives pending root render"
+    },
+    {
+      "ids": [
+        "TUT-3-07B"
+      ],
+      "issue": "Old100×96 ingredient slots and the tall body hide the pot and clip recipe requirements.",
+      "fix": "Focused tutorial recipe drawer using Compact/Kitchen masters and native5-second first-heat overlay.",
+      "status": "source-ready;representative pending render"
+    },
+    {
+      "ids": [
+        "TODAY-1",
+        "TODAY-2"
+      ],
+      "issue": "Three tasks exist but final card controls are below fold.",
+      "fix": "currentTodayCompact direct renderer",
+      "status": "source-ready;rebuild135/136"
+    },
+    {
+      "ids": [
+        "BAG-1-P0",
+        "GEAR-P0-1",
+        "GEAR-P0-2",
+        "STORE-1",
+        "STORE-2"
+      ],
+      "issue": "Old generic containers diverged from approved Bag proportions and mislabeled storage capacity.",
+      "fix": "Dedicated reusable Compact container adapters.",
+      "status": "Five post-fix screenshots inspected. STORE2 Go home is an actual return-home command and retains solid primary styling;GEAR2 Return to mine information navigation follow-up delegated."
+    },
+    {
+      "ids": [
+        "SAVE-RETRY"
+      ],
+      "issue": "Save failure loses the real outfit preview and shows a generic emoji profile card.",
+      "fix": "Reuse wardrobe draft with failure overlay;Keep editing retains draft,Retry saves same look,Discard returns prior look.",
+      "status": "assigned root/ux;not complete"
+    },
+    {
+      "ids": [
+        "COOK-P1-2",
+        "COOK-P1-6"
+      ],
+      "issue": "Oversized ingredient slots and repeat material footer crowd the recipe;second content row is clipped.",
+      "fix": "Use shared Compact/Kitchen/Slot masters and remove duplicate material summary.",
+      "status": "source-ready;late rebuild list"
+    },
+    {
+      "ids": [
+        "COOK-P1-4"
+      ],
+      "issue": "Cook All shows one Empty Stove while availability says three.",
+      "fix": "Data now lists all three empty stoves.",
+      "status": "source-ready"
+    },
+    {
+      "ids": [
+        "COOK-P1-7"
+      ],
+      "issue": "Legendary single-only explanation shows an empty ingredient browser without recipe data.",
+      "fix": "Readonly explanation omits unprovided ingredient slots/browser.",
+      "status": "source-ready"
+    },
+    {
+      "ids": [
+        "FAC-1",
+        "FAC-5"
+      ],
+      "issue": "Required materials duplicate in the footer.",
+      "fix": "Material source/owned/needed stay in requirements;footer no longer repeats identical Uses list.",
+      "status": "source-ready"
+    },
+    {
+      "ids": [
+        "FAC-2",
+        "FAC-3"
+      ],
+      "issue": "Coverage preview footer cuts through lower requirement facts.",
+      "fix": "Move coverage panel upward while preserving diagram and action distinction.",
+      "status": "source-ready"
+    },
+    {
+      "ids": [
+        "FISH-P0-CAST",
+        "MINE-CONTINUE",
+        "TRAP-2"
+      ],
+      "issue": "Some scene renderers bypass current five-slot controls;TRAP2 context lacks inset.",
+      "fix": "Direct currentSceneInto dispatcher for explicit sceneControls;context inset and fixed-width facts.",
+      "status": "source-ready"
+    },
+    {
+      "ids": [
+        "COOK-HERB-HEAT"
+      ],
+      "issue": "Opaque timing-ring centre hides the3D pot.",
+      "fix": "HeatRing instance centre transparent.",
+      "status": "source-ready"
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "cloud/current-final/BAG-1-P0.png",
+      "sha256": "8273204b9aa9b05a57b8ea0ac710e86ef6811e789a233fe0372f04d2ff935211"
+    },
+    {
+      "file": "cloud/current-final/GEAR-P0-1.png",
+      "sha256": "7595905f528ea8ae0ee75c76401bc6ffab378ec09a655ad43841fa568219c0d9"
+    },
+    {
+      "file": "cloud/current-final/GEAR-P0-2.png",
+      "sha256": "fa118ae6691b01ccd89d939cbc2cd35409b90b68179a7d577e8dfbf92a4e958e"
+    },
+    {
+      "file": "cloud/current-final/STORE-1.png",
+      "sha256": "decdeeacc9c3a5842ca2cc05ab780f3d98442a4df04ffeb0888025cd8a9a6352"
+    },
+    {
+      "file": "cloud/current-final/STORE-2.png",
+      "sha256": "cf90775a32d213be1271e1f582170930a7ef70415ac4f5974c967dda0c22b403"
+    },
+    {
+      "file": "cloud/current-final/row-11-a.png",
+      "sha256": "723fc579ec3522ffd33b04f172d700ffc2f95b0824a9eb3e9e80ae2dca220ac1"
+    },
+    {
+      "file": "cloud/current-final/row-11-b.png",
+      "sha256": "7eb77b86fc53ae47e5be72a7b8bb1bd55d556cef0e69d42da13cc9c3b69c4c81"
+    },
+    {
+      "file": "cloud/current-final/row-11.png",
+      "sha256": "199d381dc138e47cf5349414c69b7c09446db0aad34a72fa1f00bc06af37177f"
+    },
+    {
+      "file": "cloud/current-final/row-12-a.png",
+      "sha256": "2c54ded909eb82cacb90a5359bccf930b134d261a0be76797730051641b5fc50"
+    },
+    {
+      "file": "cloud/current-final/row-12-b.png",
+      "sha256": "7309cd918d90d628863ef00fe0dd473b3511f8f5855a68c1fec0ae9837a61a03"
+    },
+    {
+      "file": "cloud/current-final/row-12.png",
+      "sha256": "bdd1d0ff6e2328a6f29f37f62d3032290b1b93cd655468dd0fef5c7a1a4ed97a"
+    },
+    {
+      "file": "cloud/current-final/row-13-a.png",
+      "sha256": "96ef6af6b36fc835476d195b1d88cdd1232d878382400fe28039e86c7a13ec9c"
+    },
+    {
+      "file": "cloud/current-final/row-13-b.png",
+      "sha256": "1b43a2d5ca10d82bc5df36601af17be4c98a694a068ef30dc62d237ae16b025e"
+    },
+    {
+      "file": "cloud/current-final/row-13.png",
+      "sha256": "a840e8ae74c2efb51b048f70196dddc0d4651fc5d5d144e4463ef392129aac43"
+    },
+    {
+      "file": "cloud/current-final/row-14-a.png",
+      "sha256": "0f7181cbe1ae8f0c1a3d6b12cd5c03d493ed7cb9ee9a6e5add3ce279338a7997"
+    },
+    {
+      "file": "cloud/current-final/row-14-b.png",
+      "sha256": "3c924a52f3e876f868382c319ffe76701ba0f1b35b9cc1bbf96636dcd4678014"
+    },
+    {
+      "file": "cloud/current-final/row-14.png",
+      "sha256": "ab016292994c327f4e765f2259033475b092945e3434e9d20f862af6f4e5e5ef"
+    },
+    {
+      "file": "cloud/current-final/row-15-a.png",
+      "sha256": "e817df09226aa304203772706edb8e2cc275ddd74c8786e6330a91e931e6e3f8"
+    },
+    {
+      "file": "cloud/current-final/row-15-b.png",
+      "sha256": "1a83950eeeeb0fb6cac6aa1cf0d5c8e34ff83c898fe130b8eb928be0b81646d9"
+    },
+    {
+      "file": "cloud/current-final/row-15.png",
+      "sha256": "4137efef83fa11b326139bccd5414e3647ac89a5a7e6781be15dc43203821d6e"
+    },
+    {
+      "file": "cloud/current-final/row-16-a.png",
+      "sha256": "ce4fc6f4e92381db327356abe9a17b9faaa54d2684899ea7ed6fe6c1ea1f2a2a"
+    },
+    {
+      "file": "cloud/current-final/row-16-b.png",
+      "sha256": "3e33a223b14867eb5a6f5000fd4420feb407e2e2ed743a9ce8865c10795b41b5"
+    },
+    {
+      "file": "cloud/current-final/row-16.png",
+      "sha256": "e99e9c229b3a5da939c48052c9fc23ed0d3e8a07846ae5c3af7505e39c769242"
+    },
+    {
+      "file": "cloud/current-final/row-17-a.png",
+      "sha256": "ef360ab7016809ba351c0ad46a7a0eef6437ce27ea88d9184778ec41a6e2a176"
+    },
+    {
+      "file": "cloud/current-final/row-17-b.png",
+      "sha256": "3291114382b3385b8cc2ba2bfe8912bf68d389e781651c22e9566c259e0b26b0"
+    },
+    {
+      "file": "cloud/current-final/row-17.png",
+      "sha256": "e779afed10ffd8709bd6a3e284d5e4b96c44f075f9389739035ce776141b1b56"
+    },
+    {
+      "file": "cloud/current-final/row-18-a.png",
+      "sha256": "2ea96a6fdce76eb5818b7b4ba92309b3a51093ce8bf7afb6e4bdba02f3421a24"
+    },
+    {
+      "file": "cloud/current-final/row-18-b.png",
+      "sha256": "ad1027012a002883cbe289b3527c880bfb35a6e690eebe05ef31836609a1c142"
+    },
+    {
+      "file": "cloud/current-final/row-18.png",
+      "sha256": "c3e40122f536761c989ab7bf606c17fec61384a7e9bb74dc91dce0d77b209e67"
+    },
+    {
+      "file": "cloud/current-final/row-19-a.png",
+      "sha256": "83c8f50d9b329143061fb951ff58e1c8926781d475accb48047771cf1557dbc1"
+    },
+    {
+      "file": "cloud/current-final/row-19-b.png",
+      "sha256": "6accc5d2ef435ffb6261932cc26b16c5b132f3ce5b501b44015961426d17b5c9"
+    },
+    {
+      "file": "cloud/current-final/row-19.png",
+      "sha256": "ddb63dedecca35888195e34c2b1b1e35b02d9942ad0acd620db250a09aefd70d"
+    },
+    {
+      "file": "cloud/current-final/row-20-a.png",
+      "sha256": "f4a80f544096a426e4da613d99b79f9446446916d8130131d9590fb88db6860b"
+    },
+    {
+      "file": "cloud/current-final/row-20-b.png",
+      "sha256": "230a1594b546908b54a573d6ea285bb15111923c3c0d1eb52768a29d655b5272"
+    },
+    {
+      "file": "cloud/current-final/row-20.png",
+      "sha256": "2a922996824b1f90ec37a6f9faf0f1ea05cc5a594042e34b941f653b73fe05b3"
+    },
+    {
+      "file": "cloud/current-final/row-21-a.png",
+      "sha256": "dd55d523b21b7426129610c32f5af6c93bbfdcde486a69c4c71bb2e6cb6272ea"
+    },
+    {
+      "file": "cloud/current-final/row-21-b.png",
+      "sha256": "5e762cbb0176603e5d9c0db7a29fd0d73b6080d1eb3e1c90c79378035cd66dfb"
+    },
+    {
+      "file": "cloud/current-final/row-21.png",
+      "sha256": "a871a3817a782ff5ce17fa22fae9ecb36f41688e70ca5b0b2a319f99197fe2d2"
+    },
+    {
+      "file": "cloud/current-final/row-22-a.png",
+      "sha256": "5f60e9d9627742b6d68b878d1670f7455ce47c5ebf4989ed2dad82608934034d"
+    },
+    {
+      "file": "cloud/current-final/row-22-b.png",
+      "sha256": "08775e7a224f4a54f86714cb875a0ec5f006febcf5ace86c1b54186312b87ac1"
+    },
+    {
+      "file": "cloud/current-final/row-22.png",
+      "sha256": "3f6e6aa1669c0e08ab64985732ad66493d1dc85bd69504cb353c7cdf6bb172f6"
+    }
+  ],
+  "finalClosure": {
+    "currentVisualFixes": "Passed native targeted final screenshots;see../current-accepted/review.json",
+    "ordinarySheets": "81 native current sheets refit;root readback reportedallBounds=true",
+    "kitchenSelection": "Actual serialized reaction andunknown-ownership assertions passed;see../kitchen-final-acceptance.json",
+    "externalOwnership": [
+      "Free travel andSave Retry closure are owned byroot/UX agent."
+    ]
+  }
+}

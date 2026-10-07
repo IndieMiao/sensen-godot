@@ -1,0 +1,56 @@
+[
+  {
+    "file": "section-07.png",
+    "width": 2576,
+    "height": 14080,
+    "sha256": "e0742b7e472788006f835ef3f420f74705fc8d791e29b29d31b04732207f3958"
+  },
+  {
+    "file": "section-08.png",
+    "width": 2576,
+    "height": 5120,
+    "sha256": "2fd0e4bb57653aca23aeed579be1915ff64fcf4c9820f30992ba9abd0bb1b2b6"
+  },
+  {
+    "file": "section-09.png",
+    "width": 2576,
+    "height": 3200,
+    "sha256": "d1a28fd57fe7d1c7136a8c11ffaef049225b34b95c40dbd5388f4c86fe1c849b"
+  },
+  {
+    "file": "section-10.png",
+    "width": 2576,
+    "height": 7040,
+    "sha256": "4ca63e7f58646842aaf35f6b8a74ab1e209923a7c51844e9c71fa84e6ce6fd5e"
+  },
+  {
+    "file": "section-11.png",
+    "width": 2576,
+    "height": 2240,
+    "sha256": "9a8e4a7d2c160c96a3f770062dbc201f45dfac8d2186479a39243a9584f3d590"
+  },
+  {
+    "file": "section-12.png",
+    "width": 2576,
+    "height": 6080,
+    "sha256": "3e3c83dc00a06f9eb831e98bec53cd88b74c55b4d5eef19defe97761c8313f5e"
+  },
+  {
+    "file": "section-13.png",
+    "width": 2576,
+    "height": 7980,
+    "sha256": "cb1ba31d34707b3e4ff43e505d399c0fe3844f75b219e7b505c1257bd4d8b746"
+  },
+  {
+    "file": "section-00B.png",
+    "width": 2576,
+    "height": 4680,
+    "sha256": "739b9842cf09a74cd653c7668416aaafc04e9d5b6da5ce3ade44510bf7a004e5"
+  },
+  {
+    "file": "section-00C.png",
+    "width": 2576,
+    "height": 2380,
+    "sha256": "cf8a63db534e98a6e6b8e89a56149a88a129bdd248475ee5e09dcfd9a0dd6643"
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "scope": [
+    "COOK-2b",
+    "COOK-P0-2"
+  ],
+  "rootConfirmed": true,
+  "truthTable": "Root executed the actual serialized reactions against private Figma variables:remove herb ->fish only;remove fish ->empty;add fish ->fish only;add herb ->both.Each step asserts expected fish/herb andinverse visibility.",
+  "ownership": "Root re-tested remove/restore herb after fail-closed cell defaults andexplicit native owned quantity pills.Unknown herb quantity stays absent;authored fish×2 stays visible.",
+  "finalSelection": "fish+herb2/2 inCOOK-2b",
+  "source": "figma-plugin/kitchen-selection-state-fixes.js andvisual-kitchen-fixes.js",
+  "localTruthCases": 16,
+  "evidence": [
+    {
+      "file": "cloud/kitchen-remove-herb-quantity-final.png",
+      "sha256": "89fb5e218d5d1596e4b6318bad35241fa3aed4f2325d46d8971e38ea1326089a"
+    },
+    {
+      "file": "cloud/kitchen-restore-herb-quantity-final.png",
+      "sha256": "32aaeac36483b1aa0521aa9007177f204d32cba147f1887ea727853ad92c28b7"
+    }
+  ],
+  "status": "Frozen after actual variable assertions andscreenshot acceptance;no unrelated rebuild needed."
+}

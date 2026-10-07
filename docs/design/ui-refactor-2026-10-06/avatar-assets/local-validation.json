@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-06",
+  "kind": "Local source/API-shape/destination validation; not Figma execution or browser QA",
+  "realPartThumbnails": 27,
+  "actualEnginePreviews": 29,
+  "sharedTileVariants": 2,
+  "wardrobeVariants": 30,
+  "savedProfileFrames": 29,
+  "editContinuationFrames": 29,
+  "backLinks": 30,
+  "missingDestinations": [],
+  "defaultResetRender": "previews/defaults.png",
+  "defaultResetSlots": {
+    "hairHat": "hairhat0",
+    "cloth": "cloth0",
+    "shoes": "shoes0"
+  },
+  "allPlayerDataReadOrWritten": false,
+  "backendRequests": 0,
+  "figmaWrittenBySubagent": false,
+  "sourceFiles": [
+    "figma-plugin/avatar-fixes.js",
+    "avatar-assets/render_avatar.gd",
+    "avatar-assets/prepare_payload.py",
+    "figma-plugin/avatar-integration.js",
+    "figma-plugin/avatar-polish-fixes.js",
+    "preview/review.js"
+  ],
+  "visualSamples": [
+    "previews/base.png",
+    "previews/hairhat0.png",
+    "previews/hairhat20.png",
+    "previews/cloth42.png",
+    "previews/messengerbag3.png",
+    "previews/glass5.png",
+    "previews/defaults.png",
+    "thumbs/cloth1.png"
+  ],
+  "offlineViewerChecks": {
+    "all288SourcesRender": true,
+    "fourSupplementaryStatesRender": true,
+    "savedLookAppearsOnProfile": true,
+    "cancelThenEditDiscardsDraft": true,
+    "resetUsesActualDefaults": true,
+    "cancelResetPreservesSavedLook": true,
+    "saveResetShowsDefaults": true,
+    "farmAndCollectionsRetained": true,
+    "browserVisualQa": false
+  },
+  "standardPluginBuild": {
+    "syntax": true,
+    "mockConstruction": "passed",
+    "mainScreens": 288,
+    "supplementaryStates": 4,
+    "originalPageUntouchedInMock": true,
+    "actualFigmaRendererCoveredByMock": false
+  },
+  "rootCloudEvidence": {
+    "record": "cloud/avatar/polish-state.json",
+    "realScreenshotsReviewed": 3,
+    "checkedAvatarLinks": 386,
+    "legalSelfSkip": 1,
+    "resetOnReentry": 31,
+    "interactionErrors": 0,
+    "profileOriginalReactionsPreserved": 93
+  }
+}

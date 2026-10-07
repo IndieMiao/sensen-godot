@@ -1,0 +1,70 @@
+{
+  "reason": "Source semantic/portrait corrections exist locally but the 2026-10-06 row27\u201336 cloud screenshots still show prior content. Replay these source frames before compact visual refinement.",
+  "count": 16,
+  "screens": [
+    {
+      "id": "MINE-4",
+      "nodeId": "482:569"
+    },
+    {
+      "id": "MINE-5",
+      "nodeId": "482:571"
+    },
+    {
+      "id": "RESIDENT-MEAL",
+      "nodeId": "482:579"
+    },
+    {
+      "id": "RESIDENT-MEAL-DONE",
+      "nodeId": "482:582"
+    },
+    {
+      "id": "RES-PIP",
+      "nodeId": "482:586"
+    },
+    {
+      "id": "RES-GRANNY",
+      "nodeId": "482:588"
+    },
+    {
+      "id": "RES-MIRA",
+      "nodeId": "482:590"
+    },
+    {
+      "id": "RES-KAI",
+      "nodeId": "482:592"
+    },
+    {
+      "id": "RES-RAFA",
+      "nodeId": "482:594"
+    },
+    {
+      "id": "RES-IVO",
+      "nodeId": "482:596"
+    },
+    {
+      "id": "RES-HANA",
+      "nodeId": "482:599"
+    },
+    {
+      "id": "RES-SAM",
+      "nodeId": "482:601"
+    },
+    {
+      "id": "RES-LENA",
+      "nodeId": "482:603"
+    },
+    {
+      "id": "RES-TOMO",
+      "nodeId": "482:605"
+    },
+    {
+      "id": "RES-THEO",
+      "nodeId": "482:607"
+    },
+    {
+      "id": "RES-NADIA",
+      "nodeId": "482:609"
+    }
+  ]
+}

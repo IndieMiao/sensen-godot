@@ -1,0 +1,207 @@
+{
+  "representatives": [
+    84,
+    85,
+    94,
+    97,
+    100,
+    136,
+    103,
+    188
+  ],
+  "late": [
+    {
+      "id": "COOK-P1-2",
+      "index": 170,
+      "nodeId": "482:365"
+    },
+    {
+      "id": "COOK-P1-4",
+      "index": 172,
+      "nodeId": "482:369"
+    },
+    {
+      "id": "COOK-P1-6",
+      "index": 174,
+      "nodeId": "482:373"
+    },
+    {
+      "id": "COOK-P1-7",
+      "index": 175,
+      "nodeId": "482:375"
+    },
+    {
+      "id": "COOK-EMPTY",
+      "index": 186,
+      "nodeId": "482:399"
+    },
+    {
+      "id": "FAC-2",
+      "index": 158,
+      "nodeId": "482:339"
+    },
+    {
+      "id": "FAC-3",
+      "index": 159,
+      "nodeId": "482:341"
+    },
+    {
+      "id": "FAC-GH-PLACE",
+      "index": 181,
+      "nodeId": "482:388"
+    },
+    {
+      "id": "FISH-P0-CAST",
+      "index": 153,
+      "nodeId": "482:329"
+    },
+    {
+      "id": "MINE-CONTINUE",
+      "index": 154,
+      "nodeId": "482:331"
+    },
+    {
+      "id": "TRAP-2",
+      "index": 164,
+      "nodeId": "482:352"
+    },
+    {
+      "id": "TODAY-1",
+      "index": 135,
+      "nodeId": "482:290"
+    },
+    {
+      "id": "TODAY-2",
+      "index": 136,
+      "nodeId": "482:293"
+    },
+    {
+      "id": "COOK-KEEP-BRANCH",
+      "index": 148,
+      "nodeId": "482:318"
+    },
+    {
+      "id": "COOK-HERB-HEAT",
+      "index": 151,
+      "nodeId": "482:324"
+    },
+    {
+      "id": "MAP-2-FREE",
+      "index": 187,
+      "nodeId": "482:401"
+    },
+    {
+      "id": "FAC-GH",
+      "index": 177,
+      "nodeId": "482:380"
+    },
+    {
+      "id": "MAP-4-GATE",
+      "index": 206,
+      "nodeId": "482:441"
+    }
+  ],
+  "shortSheets": {
+    "date": "2026-10-06T14:47:10.449082+00:00",
+    "ids": [
+      "TUT-1",
+      "TUT-1-2",
+      "TUT-3-03",
+      "TUT-3-04",
+      "TUT-3-05",
+      "TUT-3-06",
+      "TUT-3-06B",
+      "TUT-3-07A",
+      "TUT-3-07C",
+      "TUT-3-09",
+      "TUT-3-10",
+      "TUT-3-11",
+      "TUT-3-12",
+      "TUT-3-END",
+      "MAT-1",
+      "MAT-2",
+      "MAT-3",
+      "MINE-P0-3",
+      "MINE-P0-5",
+      "MINE-P0-6",
+      "MINE-P0-7",
+      "MINE-P0-8",
+      "CRAFT-1",
+      "CRAFT-2",
+      "CRAFT-3",
+      "CRAFT-4",
+      "HOME-P0-1",
+      "COOK-P0-4",
+      "COOK-P0-5",
+      "COOK-P0-6",
+      "COOK-P0-9",
+      "BOARD-1",
+      "BOARD-2",
+      "BOARD-3",
+      "PARCEL-1",
+      "PARCEL-2",
+      "PARCEL-3",
+      "PARCEL-4",
+      "PARCEL-5",
+      "ENERGY-P0-1",
+      "COOK-KEEP-BRANCH",
+      "BOARD-DROPPED",
+      "MAT-GLOVES-RESULT",
+      "BUILD-RETRY",
+      "PARCEL-ONE",
+      "FAC-1",
+      "FAC-4",
+      "FAC-5",
+      "FAC-6",
+      "TRAP-1",
+      "TRAP-3",
+      "TRAP-4",
+      "TRAP-5",
+      "TRAP-6",
+      "COOK-P1-8",
+      "FAC-GH",
+      "TRAP-DONE",
+      "DEX-P1-2",
+      "FAC-GH-DONE",
+      "DOUBLE-RESULT",
+      "FAC-LIMIT",
+      "TRAP-NOROOM",
+      "MAP-2-FREE",
+      "MAP-3-FREE",
+      "MAP-4-FREE",
+      "MAP-5-FREE",
+      "MAP-6-FREE",
+      "MAP-7-FREE",
+      "MAP-8-FREE",
+      "LOCAL-CATCH",
+      "LOCAL-SHOP",
+      "LOCAL-TRADE",
+      "LOCAL-BOUGHT",
+      "HOME-RETURN",
+      "PASS-1",
+      "PASS-2",
+      "TRAVEL-RETRY",
+      "TRAVEL-RECONNECT",
+      "MAP-4-PAID",
+      "MAP-4-GATE",
+      "MAP-5-PAID"
+    ],
+    "firstReview": [
+      "TUT-1",
+      "TUT-1-2",
+      "TUT-3-07B",
+      "TUT-3-09",
+      "TUT-3-12",
+      "TODAY-2",
+      "MAT-2",
+      "MAP-3-FREE"
+    ],
+    "sameAlgorithmAs": "p2p3VisualRefine(force=true)",
+    "excluded": "scene, kitchen, Avatar, inventory, Gear, specialToday and review specimens"
+  },
+  "notes": [
+    "Root is sole cloud writer. Recompile each ID immediately before execution so overlayIndex is fresh.",
+    "Do not claim visual acceptance from source/mock/size preflight.",
+    "All92 current cards now inspected in native screenshots;follow-ups documented in review.json."
+  ]
+}

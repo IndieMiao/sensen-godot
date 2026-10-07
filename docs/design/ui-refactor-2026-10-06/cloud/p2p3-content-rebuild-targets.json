@@ -1,0 +1,16 @@
+{
+  "screens": [
+    {
+      "id": "TOGETHER-PROGRESS",
+      "nodeId": "482:507"
+    },
+    {
+      "id": "RESIDENT-TEACH",
+      "nodeId": "482:584"
+    }
+  ],
+  "basis": [
+    "Existing selected quantity one; Pond Crucian concrete example authorized",
+    "Hana recipe pool22 and existingCornCake recipe/ingredient assets"
+  ]
+}

@@ -1,0 +1,1086 @@
+{
+  "sourceImages": 57,
+  "batches": 44,
+  "maxScriptCharacters": 46501,
+  "originalsRetained": true,
+  "images": [
+    {
+      "key": "thumbs/cloth0",
+      "index": 0,
+      "file": "optimized/thumbs/cloth0.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 10861,
+      "sourceSHA": "6417a36b724bc23fe1c790ef45800e671ebf762d0bb41fb17fb073bf3c9829ac",
+      "uploadSHA": "d9c7e6d5a29359e42ec511b9fe4c9fe6dcd1fb7069d0fa971e33fc73dd97bd6c",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/cloth1",
+      "index": 1,
+      "file": "optimized/thumbs/cloth1.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 14918,
+      "sourceSHA": "30773d6c7155f81c431194b580f23d586ae6d20ab18c2add4fa99f424b8d3646",
+      "uploadSHA": "2b47026c2216a50d5caed900aa925c9d796feea9574e377981044ced2ed671f1",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/cloth11",
+      "index": 2,
+      "file": "optimized/thumbs/cloth11.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 16195,
+      "sourceSHA": "2e1fde2714b9c9237b515ddf71314451e724439972efc421ec1cac71a79cdc01",
+      "uploadSHA": "d8efc64377f388b043cf391123b1e9c04091def06a5888e1156d93cd40ee4457",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/cloth1_1",
+      "index": 3,
+      "file": "optimized/thumbs/cloth1_1.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 17062,
+      "sourceSHA": "7c7da0e106dcbcb42ae7a97fd0f37ac4a0df22121399c73069cc0f3da93bede8",
+      "uploadSHA": "88e4337c61b994a087df54ce2fb870788188643f36ac0eadfb55d7016c15c615",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/cloth28",
+      "index": 4,
+      "file": "optimized/thumbs/cloth28.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 13424,
+      "sourceSHA": "043de5869b8c2e977f38c6a4c5814949f4100a51a7e3d3abb48b7c726cec5ddd",
+      "uploadSHA": "f0c684139832662a3a05d293dcd8538dc914a24d3e43777f1ec9f007f755b314",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/cloth42",
+      "index": 5,
+      "file": "optimized/thumbs/cloth42.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 18684,
+      "sourceSHA": "4b223513366187f586ab2064efee2111593cc6711ec519b89f7cf42fafb54743",
+      "uploadSHA": "e9bcdff82e41e45a2696cf2f64347ec7e2d1f959a5bee2ee72f4e0425bd6b975",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/glass0",
+      "index": 6,
+      "file": "optimized/thumbs/glass0.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 6446,
+      "sourceSHA": "fd5a02aa5b3ccedb700ece51b431fc73e22a549cbe862b5dd87c9c602d2d8770",
+      "uploadSHA": "d9941faaadae545136f34a723979ad4e596788e207c66b4dcc68138e08e5fc2c",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/glass1",
+      "index": 7,
+      "file": "optimized/thumbs/glass1.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 6389,
+      "sourceSHA": "824fc5164fa76ff63e3cc029088aae9a87fa1da26493cf569c69178593d61e76",
+      "uploadSHA": "e9d2104f355c494a39155a5be3f5e7c7cb9b90f85bac405e043d05e4985f3dab",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/glass3",
+      "index": 8,
+      "file": "optimized/thumbs/glass3.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 9301,
+      "sourceSHA": "bde746663796be1d2a0588eef37f42c8de39b926a23fd45c06f04815c036fbf6",
+      "uploadSHA": "38c4f5f921e4702daf922b395d32eca983b116682e460ea2e0f3f59e70d7184a",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/glass5",
+      "index": 9,
+      "file": "optimized/thumbs/glass5.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 10635,
+      "sourceSHA": "770ac3ae12a8cb607492beb5f1152023c9cbfb52c62a00f60b21110adf97cd87",
+      "uploadSHA": "2fca453afa65e107242a58f7d26e594429de2245bfe79dc71a15bd57556f4413",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/glass8",
+      "index": 10,
+      "file": "optimized/thumbs/glass8.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 7039,
+      "sourceSHA": "50f6d3aeddb1c7e7d131bd8df1b63ba436e712da456455cf5218f33040cabc89",
+      "uploadSHA": "1f0f5fc710babfa20270e57d5e37bb27753bf1c9a74cff511c9efe5accd360ac",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/hairhat0",
+      "index": 11,
+      "file": "optimized/thumbs/hairhat0.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 19121,
+      "sourceSHA": "b9c23d95e9bc01f27e326e86c9ea579d66411039dac77f75c005485338e0553c",
+      "uploadSHA": "f72286712706a94477b23a0d9db9843094ab7d5bf30fd0806436c499c14a0559",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/hairhat20",
+      "index": 12,
+      "file": "optimized/thumbs/hairhat20.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 18576,
+      "sourceSHA": "52cc3f39292a7fd1a0909ffc967b798c782fa7b02bb7e42205c08a4315a9066e",
+      "uploadSHA": "98a57d3e10eb56af417936e50e0f0bbc6da8863b9976852ea1561bc85e76cafa",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/hairhat41",
+      "index": 13,
+      "file": "optimized/thumbs/hairhat41.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 24884,
+      "sourceSHA": "86c55ece7eb2afcae475140dbc25923059fe3734f417163113d315872b0fd945",
+      "uploadSHA": "ab38c2695a9f8e4262c0bef5bd1f9464e0504801edbb8d67a2374936aab62c43",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/hairhat43",
+      "index": 14,
+      "file": "optimized/thumbs/hairhat43.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 14478,
+      "sourceSHA": "c4c5e1296dc6874bc2f251f6326585e29a1ac759cba772893e29cda1ff3df73b",
+      "uploadSHA": "b7e9b5760ab8c247f05531d2d2e68ea3a02c3b5af5cfcdf0dc75cc50d5b6ef57",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/hairhat51",
+      "index": 15,
+      "file": "optimized/thumbs/hairhat51.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 15103,
+      "sourceSHA": "c283bac57d2364dfe537c23ad63c95064af8a94afb3e7c581e278c492e6822cf",
+      "uploadSHA": "a6d44532171c531556ae24bce53437d4d30681e12ec9f94ff82e0ee05423051e",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/hairhat70",
+      "index": 16,
+      "file": "optimized/thumbs/hairhat70.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 14024,
+      "sourceSHA": "6a9cb9fb08d89725fe409f127aea33157e24c0d3f1b4002781b31c1842765272",
+      "uploadSHA": "62764f044e98e249c4c6b5012a600ae60711a41500d2f884bf12882ab90dfa59",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/messengerbag1",
+      "index": 17,
+      "file": "optimized/thumbs/messengerbag1.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 14956,
+      "sourceSHA": "dbb9b4ced10f79e3a196fd76f5a2e68740ddd7b8f90a0fd663d40963875122b0",
+      "uploadSHA": "e35a01ce7e5b7f24e25a1a7f687d61fcb9b3be16445e4f97315171a42c57267c",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/messengerbag2",
+      "index": 18,
+      "file": "optimized/thumbs/messengerbag2.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 9968,
+      "sourceSHA": "5f92884a524e8d72509e1e97dfe958dc836edbdf57e12375548a403d99ed2c6b",
+      "uploadSHA": "78641513e22c64192e057203140dff158340e1f87c158729c27cf2db9f2fcc70",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/messengerbag3",
+      "index": 19,
+      "file": "optimized/thumbs/messengerbag3.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 11873,
+      "sourceSHA": "02e9c361d59236e94bacae27310d8a3d991adfb4886709d13d891798380a5aa6",
+      "uploadSHA": "159597619f1e133c6736454fdf62f49fa69d5a8b0df1047b294d3344b974bd98",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/messengerbag4",
+      "index": 20,
+      "file": "optimized/thumbs/messengerbag4.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 12227,
+      "sourceSHA": "8c22bdca4531e868636692dd609c1e245e64c7061019419a90b6cc4082a72626",
+      "uploadSHA": "94df75d8d79c623ef1992598cf5815238d66b5ebf81ff75da60b78969fc4381f",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/shoes0",
+      "index": 21,
+      "file": "optimized/thumbs/shoes0.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 13812,
+      "sourceSHA": "cb6d030ad30bc3e8acab40da753e90a529dc44441c98aa74dfe2feeb7607d764",
+      "uploadSHA": "8ca85c0bcc63d6ce964a3dd3ec3fed3f10c22472cc490328068cc8919050ccd0",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/shoes1",
+      "index": 22,
+      "file": "optimized/thumbs/shoes1.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 16149,
+      "sourceSHA": "777dfa639d6d854f2224f9b75411c921abb732b4241942e5b21c36f97070f8df",
+      "uploadSHA": "bfc5b4c33bbff3d8eb8ecc118724bbb51da7078c90cc12b649e94d34cf3faef5",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/shoes2",
+      "index": 23,
+      "file": "optimized/thumbs/shoes2.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 17029,
+      "sourceSHA": "285746bd16a2d290a8892a829efb741422cefbefa2e6ba493dd4dc7298ce116e",
+      "uploadSHA": "a9b58ba55dbd214220ce53bc4326bf13c8117dc7f32a6fdef0c4282bdbb89353",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/shoes3",
+      "index": 24,
+      "file": "optimized/thumbs/shoes3.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 18369,
+      "sourceSHA": "4bb6eff44a873d249a513c89b45ee26eec5fbcde697c5496833b480236c62307",
+      "uploadSHA": "000a93341748b2116c01c54224f5c91668ed38c9b2af6ac0db632bc521571ac4",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/shoes4",
+      "index": 25,
+      "file": "optimized/thumbs/shoes4.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 11873,
+      "sourceSHA": "5a13753377e5f442f1e009ca16c36013387c5e307d895de53794cec5f59c1cf2",
+      "uploadSHA": "3ff536cf89d21a60e77c6666ea79d23de4cfb10c3a40daefa818f3d610901294",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "thumbs/shoes5",
+      "index": 26,
+      "file": "optimized/thumbs/shoes5.png",
+      "width": 160,
+      "height": 160,
+      "format": "png",
+      "bytes": 19365,
+      "sourceSHA": "98956971e4db0042af631221f59538984848ebf45ce5391971446d67ac2cb646",
+      "uploadSHA": "d95288521d49e872b87b7dd7495ba93c2d4e0ef840ccb76253d80031c255bdf8",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "background",
+      "index": 27,
+      "file": "optimized/background.jpg",
+      "width": 360,
+      "height": 540,
+      "format": "jpg",
+      "bytes": 16956,
+      "sourceSHA": "09733868bff20e1088f2cfb59cb56757d8c0194f069c3fa79f1987ce0d26e809",
+      "uploadSHA": "12e7d12e05eb00db0deb156f4b190b618608515f402690b859968d296e32ce3b",
+      "quantizationMeanAbsoluteRGBA": null,
+      "alphaPreservedAtDisplaySize": false,
+      "displayCopyMethod": "JPEG"
+    },
+    {
+      "key": "previews/base",
+      "index": 28,
+      "file": "optimized/previews/base.png",
+      "width": 264,
+      "height": 308,
+      "format": "png",
+      "bytes": 32391,
+      "sourceSHA": "d082bd5439916110fdadaabad2140be942e66ea2e5b22305ad1ddef63f540fe4",
+      "uploadSHA": "e705d529c2b09a0f11476dffa1a7a7a5d9b522f9fec56f7a9a7ed3d6bce2a4cc",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/defaults",
+      "index": 29,
+      "file": "optimized/previews/defaults.png",
+      "width": 288,
+      "height": 336,
+      "format": "png",
+      "bytes": 31008,
+      "sourceSHA": "76aabb9aaee54bfd2d8572787f9aae0a2e158430a9b9b4e6cd6ea4eb820e4751",
+      "uploadSHA": "e64416af0b9a11939f3f09bc0024e4ab37c78abf058d8bd231b7ae75183b0e1f",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/cloth0",
+      "index": 30,
+      "file": "optimized/previews/cloth0.png",
+      "width": 288,
+      "height": 336,
+      "format": "png",
+      "bytes": 32010,
+      "sourceSHA": "9e1a82d4243c6d1738b4bc67ac73c3f1fd868f45d07ebef08654d7f2a6945a01",
+      "uploadSHA": "429801fad2731032a5256e4bdc9e902535ae343f46929bc68df2ee82287a917a",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/cloth1",
+      "index": 31,
+      "file": "optimized/previews/cloth1.png",
+      "width": 264,
+      "height": 308,
+      "format": "png",
+      "bytes": 29198,
+      "sourceSHA": "6c8bd0ca32d79f6ceb1235cc2245a26c5011e8139288ec91fb9e4a7142486d58",
+      "uploadSHA": "da3d77ac902096cc7d50597a07172946cf4f08c174cb1bf34536389cffb70e68",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/cloth11",
+      "index": 32,
+      "file": "optimized/previews/cloth11.png",
+      "width": 264,
+      "height": 308,
+      "format": "png",
+      "bytes": 30241,
+      "sourceSHA": "6f94cb4523d4f57a5d36e9695cdded3cd79603ec39f94886818e62a814070ad6",
+      "uploadSHA": "ad4ae7ecdb9c95d757f49b11c0d4a514b54c19d549ccf832270331a7b97499cc",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/cloth1_1",
+      "index": 33,
+      "file": "optimized/previews/cloth1_1.png",
+      "width": 264,
+      "height": 308,
+      "format": "png",
+      "bytes": 30855,
+      "sourceSHA": "83698bdc8b0f96dae745f659526379c359f6da8e9131d085ace1709869f0a182",
+      "uploadSHA": "4c018408763ded32d6d138f6be5c85831a54381b96ee3be7c125ceb540f520fa",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/cloth28",
+      "index": 34,
+      "file": "optimized/previews/cloth28.png",
+      "width": 264,
+      "height": 308,
+      "format": "png",
+      "bytes": 32391,
+      "sourceSHA": "d082bd5439916110fdadaabad2140be942e66ea2e5b22305ad1ddef63f540fe4",
+      "uploadSHA": "e705d529c2b09a0f11476dffa1a7a7a5d9b522f9fec56f7a9a7ed3d6bce2a4cc",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/cloth42",
+      "index": 35,
+      "file": "optimized/previews/cloth42.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 30629,
+      "sourceSHA": "9faa9621588237d88baae740b207912a7c8bdaea369c99c221a214d2c6515236",
+      "uploadSHA": "b06f83c3a6276d4c1da6dfb20e5ef142845e4d8403aebd0773a80f530a62026f",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/glass0",
+      "index": 36,
+      "file": "optimized/previews/glass0.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28364,
+      "sourceSHA": "c5dfb6e2fc718499f7f75b33c8ec254859525279d6826897f8d19e019f193251",
+      "uploadSHA": "9ba974801230afc788e2ea826cab691c33fc5a6d8201cc767680df6336440a6b",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/glass1",
+      "index": 37,
+      "file": "optimized/previews/glass1.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28364,
+      "sourceSHA": "bab313340901bdd6733db1935785d34693b00ef7b0e1775b687d98eb2242f12c",
+      "uploadSHA": "2bb8840601bb83ea30938ddd938e02462492e3cefa9dd4c4f6cacb37a534f822",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/glass3",
+      "index": 38,
+      "file": "optimized/previews/glass3.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28094,
+      "sourceSHA": "cc416d778908d4b8320bab45c7c6b1a40c88316fdec2bd5a0a3dc74bf6ba8f8c",
+      "uploadSHA": "7b60defd7b75a90715f99d9a92f6f9e49a31d6e386cf613fb0510919fe0a1e10",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/glass5",
+      "index": 39,
+      "file": "optimized/previews/glass5.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28233,
+      "sourceSHA": "681fd6605ea8fdfc9f2315c625aa3148e74401da7c2b51df4fb564de6104f749",
+      "uploadSHA": "cb26b0d390590e5689089dff13296b9b18e5abbe32cb3bd1a7429eb76e908ced",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/glass8",
+      "index": 40,
+      "file": "optimized/previews/glass8.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28287,
+      "sourceSHA": "ee8e9c6ca0c8ded64bd6623d57478abfd21f6df4cfa7dc6fd55d8e4b3e73f48b",
+      "uploadSHA": "2b71d9032778fa4566f33f93b6670971cc4eab9838aadab0c1420c111b47482c",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/hairhat0",
+      "index": 41,
+      "file": "optimized/previews/hairhat0.png",
+      "width": 264,
+      "height": 308,
+      "format": "png",
+      "bytes": 31551,
+      "sourceSHA": "d429d35ab3392243def0089c949aa14c482e55541275a471a16df2220c10100e",
+      "uploadSHA": "56ee65ab3be042d827c3418bcebe1fcfe40b5f20051baa3160fc29380d50b467",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/hairhat20",
+      "index": 42,
+      "file": "optimized/previews/hairhat20.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 29797,
+      "sourceSHA": "d068e0cdd105102e5ca681ab589a670ff15e666eac32384bcc3de1c0e5917486",
+      "uploadSHA": "8bf48979e2327f715ff5ea84fb11b846756d738bb44ae007af630532a58dbdf0",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/hairhat41",
+      "index": 43,
+      "file": "optimized/previews/hairhat41.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 32476,
+      "sourceSHA": "f1440223382d2da29245ce4a84c4ee3e14347a6b80b0cb31395718b60ee049b0",
+      "uploadSHA": "81c4cbe25059a06f1c614084620d16dbdab997fe21250d2c2839250ea3efd6f7",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/hairhat43",
+      "index": 44,
+      "file": "optimized/previews/hairhat43.png",
+      "width": 264,
+      "height": 308,
+      "format": "png",
+      "bytes": 32391,
+      "sourceSHA": "d082bd5439916110fdadaabad2140be942e66ea2e5b22305ad1ddef63f540fe4",
+      "uploadSHA": "e705d529c2b09a0f11476dffa1a7a7a5d9b522f9fec56f7a9a7ed3d6bce2a4cc",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/hairhat51",
+      "index": 45,
+      "file": "optimized/previews/hairhat51.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28476,
+      "sourceSHA": "600cd9b7d861962df40544f76b66b5a681bbb8c84dfabd5be95e864504a970ef",
+      "uploadSHA": "89e40236c1ccab9998f0bec1a75b305d37f43b30f161cf6be090c7dca40cf198",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/hairhat70",
+      "index": 46,
+      "file": "optimized/previews/hairhat70.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 29075,
+      "sourceSHA": "ba7e365d11e239faf8b18be2c95100e4de8344335385ada8bdfab0eb328d374c",
+      "uploadSHA": "d3d19db646ad6fadad30baa64c651843cd85a5f3c1158b11108383b203e1017f",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/messengerbag1",
+      "index": 47,
+      "file": "optimized/previews/messengerbag1.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28634,
+      "sourceSHA": "2846dbd592eb1c9c9f0a0ca23356ed60c0b10708e42ef238257ff092b761251e",
+      "uploadSHA": "1f33301ed1c5c2f5b3cf608e6cd5135d1911d36f17a51a5b9339640df408d205",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/messengerbag2",
+      "index": 48,
+      "file": "optimized/previews/messengerbag2.png",
+      "width": 264,
+      "height": 308,
+      "format": "png",
+      "bytes": 32464,
+      "sourceSHA": "6d7a410d65dcc12bf965c3da2956c9a47a97ddf3e41f3b3410e82d1d37be0782",
+      "uploadSHA": "091d9caaaed711da2a280a7e18861f658b4f840ff3095500ae29dc1966b4b6da",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/messengerbag3",
+      "index": 49,
+      "file": "optimized/previews/messengerbag3.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28250,
+      "sourceSHA": "1e763e95766fab0c88415d1d4d1b33f717d309027dfd7a32846588a1c93d62ea",
+      "uploadSHA": "1379beee3d1f03e72bc6ae708fe53011fdd4857a1bdc8dea3f0e844600572961",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/messengerbag4",
+      "index": 50,
+      "file": "optimized/previews/messengerbag4.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28267,
+      "sourceSHA": "a7a2ab98e6e6cd803055f46d765dfe7cc0e840cdbb69b87c8757da2186c7a9e9",
+      "uploadSHA": "d3b94637e7856433bf9189f19944a7527de14debf92c8c9d36d2ad3bdefca80f",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/shoes0",
+      "index": 51,
+      "file": "optimized/previews/shoes0.png",
+      "width": 264,
+      "height": 308,
+      "format": "png",
+      "bytes": 32391,
+      "sourceSHA": "d082bd5439916110fdadaabad2140be942e66ea2e5b22305ad1ddef63f540fe4",
+      "uploadSHA": "e705d529c2b09a0f11476dffa1a7a7a5d9b522f9fec56f7a9a7ed3d6bce2a4cc",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/shoes1",
+      "index": 52,
+      "file": "optimized/previews/shoes1.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 27971,
+      "sourceSHA": "3cb2b88e06b5b2befbd8bf2ed1efaff25acfb1d64863fe5f885124f8c5baa739",
+      "uploadSHA": "50a1dffc3792a18aad8d3f9857fb81c53bfae6a2cce01900ef685e9deb9ba661",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/shoes2",
+      "index": 53,
+      "file": "optimized/previews/shoes2.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28232,
+      "sourceSHA": "2448900d24c3515c1f92542fc00f720741392e612edba62ad7a9182c8aa27b30",
+      "uploadSHA": "838e37ccc9ebb307559e9827b76798eb338e18c262ef94f2fc916a532dc222ee",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/shoes3",
+      "index": 54,
+      "file": "optimized/previews/shoes3.png",
+      "width": 264,
+      "height": 308,
+      "format": "png",
+      "bytes": 32136,
+      "sourceSHA": "8762370c5be6ae5d94a19973ac9cd2db58d2e1fa7e08c063fd95137ff62c23dc",
+      "uploadSHA": "240c538b381879620a03d83961111ec1700f9cd13d819e080efc541d5551a743",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/shoes4",
+      "index": 55,
+      "file": "optimized/previews/shoes4.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28164,
+      "sourceSHA": "940558f531ec5aaf9ad101b6112272a7c82c541b1e3d2346890c9800351495a1",
+      "uploadSHA": "ebce91dcf3171413a123762f4b622e717ee9838dd40d478a32bc1278ce0622ed",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    },
+    {
+      "key": "previews/shoes5",
+      "index": 56,
+      "file": "optimized/previews/shoes5.png",
+      "width": 240,
+      "height": 280,
+      "format": "png",
+      "bytes": 28375,
+      "sourceSHA": "8089e8a22918a14730bdc6ad8b705681ad2990577e157f06d1f9b87086baeddf",
+      "uploadSHA": "fe1de6ced3b385cf21d0e25c662cf327fa3721bcef66cdb07682f55daeb14b77",
+      "quantizationMeanAbsoluteRGBA": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "alphaPreservedAtDisplaySize": true,
+      "displayCopyMethod": "RGBA resize + lossless PNG (no color/alpha quantization)"
+    }
+  ]
+}

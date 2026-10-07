@@ -1,0 +1,98 @@
+[
+  {
+    "name": "farm-lv3",
+    "exit": 0,
+    "result": {
+      "success": true,
+      "imageHash": "c856b5fbdcfb0d2aff1fbf243344765736674224",
+      "sizeBytes": 1905001,
+      "contentType": "image/png",
+      "placedOnNodeId": "440:8577"
+    },
+    "error": ""
+  },
+  {
+    "name": "farm-facilities",
+    "exit": 0,
+    "result": {
+      "success": true,
+      "imageHash": "d4294ae3856a8df03f05cbb723e883fcaaec9437",
+      "sizeBytes": 1884927,
+      "contentType": "image/png",
+      "placedOnNodeId": "440:8576"
+    },
+    "error": ""
+  },
+  {
+    "name": "farm-orchard",
+    "exit": 0,
+    "result": {
+      "success": true,
+      "imageHash": "33e7a95aaa6ea621bdb6c512071ce0029ba73cb2",
+      "sizeBytes": 1828799,
+      "contentType": "image/png",
+      "placedOnNodeId": "440:5620"
+    },
+    "error": ""
+  },
+  {
+    "name": "tea-house",
+    "exit": 0,
+    "result": {
+      "success": true,
+      "imageHash": "522982f7a4262676e862c4ff21d4274cbf04bae0",
+      "sizeBytes": 1953069,
+      "contentType": "image/png",
+      "placedOnNodeId": "440:8579"
+    },
+    "error": ""
+  },
+  {
+    "name": "tackle-shop",
+    "exit": 0,
+    "result": {
+      "success": true,
+      "imageHash": "3e1afd9481d772b197c0d95f769179ab2e5902d5",
+      "sizeBytes": 1927134,
+      "contentType": "image/png",
+      "placedOnNodeId": "440:8575"
+    },
+    "error": ""
+  },
+  {
+    "name": "market-square-v2",
+    "exit": 0,
+    "result": {
+      "success": true,
+      "imageHash": "aaead9675a5c642f6eb81a75ad258c87e0e63d9e",
+      "sizeBytes": 1996863,
+      "contentType": "image/png",
+      "placedOnNodeId": "440:8580"
+    },
+    "error": ""
+  },
+  {
+    "name": "travel-post",
+    "exit": 0,
+    "result": {
+      "success": true,
+      "imageHash": "8eb555496e3b762a0b743861fc3526dd6635e718",
+      "sizeBytes": 1882341,
+      "contentType": "image/png",
+      "placedOnNodeId": "440:8578"
+    },
+    "error": ""
+  },
+  {
+    "name": "trading-post",
+    "exit": 0,
+    "result": {
+      "success": true,
+      "imageHash": "a73e52b726362c820a2c1abecfc3ed9ffb2a1bc9",
+      "sizeBytes": 2020766,
+      "contentType": "image/png",
+      "placedOnNodeId": "440:8574"
+    },
+    "error": ""
+  }
+]

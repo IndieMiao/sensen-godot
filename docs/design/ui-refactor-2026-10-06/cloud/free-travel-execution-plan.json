@@ -1,0 +1,74 @@
+{
+  "createFirst": [
+    {
+      "id": "FREE-HOME-BROWSE",
+      "script": "free-travel-FREE-HOME-BROWSE.js"
+    },
+    {
+      "id": "FREE-HOME-CATCH",
+      "script": "free-travel-FREE-HOME-CATCH.js"
+    },
+    {
+      "id": "FREE-HOME-BOUGHT",
+      "script": "free-travel-FREE-HOME-BOUGHT.js"
+    },
+    {
+      "id": "FREE-EXPLORE-BOUGHT",
+      "script": "free-travel-FREE-EXPLORE-BOUGHT.js"
+    }
+  ],
+  "thenRebuildMain": [
+    {
+      "id": "LOCAL-SHOP",
+      "nodeId": "482:420"
+    },
+    {
+      "id": "LOCAL-TRADE",
+      "nodeId": "482:422"
+    },
+    {
+      "id": "LOCAL-BOUGHT",
+      "nodeId": "482:424"
+    },
+    {
+      "id": "LOCAL-CATCH",
+      "nodeId": "482:418"
+    },
+    {
+      "id": "BUFF-LAST",
+      "nodeId": "482:537"
+    }
+  ],
+  "sharedHomeReturnUntouched": "482:426",
+  "resultKeys": [
+    "freeTravelScreens",
+    "freeTravelSceneScreens"
+  ],
+  "newAuthoredStates": 4,
+  "newSupportScenes": 3,
+  "resourceSnapshots": {
+    "FREE-HOME-BROWSE": [
+      152,
+      230
+    ],
+    "FREE-HOME-CATCH": [
+      147,
+      230
+    ],
+    "FREE-HOME-BOUGHT": [
+      152,
+      213
+    ],
+    "FREE-EXPLORE-BOUGHT": [
+      152,
+      213
+    ]
+  },
+  "checks": [
+    "Returned/closed Home scenes retain the same Energy and coins",
+    "Passport opens as a no-HUD overlay; Close returns to the same owner",
+    "Owned totals stay unknown; only the authored one item is shown as kept",
+    "BUFF-LAST uses the already authored normal Cast target FISH-2, not a foreign-city first-catch reward",
+    "Shared HOME-RETURN remains unchanged"
+  ]
+}

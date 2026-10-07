@@ -1,0 +1,674 @@
+[
+	{
+		"id": "base",
+		"preview": "previews/base.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "cloth0",
+		"preview": "previews/cloth0.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth0",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "cloth1",
+		"preview": "previews/cloth1.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth1",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "cloth11",
+		"preview": "previews/cloth11.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth11",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "cloth1_1",
+		"preview": "previews/cloth1_1.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth1_1",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "cloth28",
+		"preview": "previews/cloth28.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "cloth42",
+		"preview": "previews/cloth42.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth42",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "glass0",
+		"preview": "previews/glass0.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "glass0",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "glass1",
+		"preview": "previews/glass1.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "glass1",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "glass3",
+		"preview": "previews/glass3.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "glass3",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "glass5",
+		"preview": "previews/glass5.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "glass5",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "glass8",
+		"preview": "previews/glass8.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "glass8",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "hairhat0",
+		"preview": "previews/hairhat0.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat0",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "hairhat20",
+		"preview": "previews/hairhat20.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat20",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "hairhat41",
+		"preview": "previews/hairhat41.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat41",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "hairhat43",
+		"preview": "previews/hairhat43.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "hairhat51",
+		"preview": "previews/hairhat51.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat51",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "hairhat70",
+		"preview": "previews/hairhat70.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat70",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "messengerbag1",
+		"preview": "previews/messengerbag1.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "messengerbag1",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "messengerbag2",
+		"preview": "previews/messengerbag2.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "messengerbag2",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "messengerbag3",
+		"preview": "previews/messengerbag3.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "messengerbag3",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "messengerbag4",
+		"preview": "previews/messengerbag4.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "messengerbag4",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "shoes0",
+		"preview": "previews/shoes0.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "shoes1",
+		"preview": "previews/shoes1.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes1",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "shoes2",
+		"preview": "previews/shoes2.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes2",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "shoes3",
+		"preview": "previews/shoes3.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes3",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "shoes4",
+		"preview": "previews/shoes4.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes4",
+			"shoulderBag": ""
+		}
+	},
+	{
+		"id": "shoes5",
+		"preview": "previews/shoes5.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth28",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat43",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes5",
+			"shoulderBag": ""
+		}
+	}
+]

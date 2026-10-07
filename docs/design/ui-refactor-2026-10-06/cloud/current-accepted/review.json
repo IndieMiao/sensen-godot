@@ -1,0 +1,46 @@
+{
+  "review": "Final targeted actual Figma screenshot inspection",
+  "passed": true,
+  "cards": [
+    "COOK-P1-2",
+    "COOK-P1-4",
+    "COOK-P1-7",
+    "COOK-HERB-HEAT",
+    "FISH-P0-CAST"
+  ],
+  "checks": [
+    "Ingredient empty slots show native plus symbols;no question-mark overlay.",
+    "Three stoves share existing FacilityMarker instances in one row;Empty stoves3 andQueue spaces3 remain fully visible.",
+    "Legendary single-only explanation is a content-fit short sheet without invented recipe slots.",
+    "Heat ring has a transparent centre andis aligned to the actual3D pot at180,193 in the approved camera.",
+    "FISH world controls show the original floating joystick,action chooser,Cast5Energy,five quick slots andBag."
+  ],
+  "images": [
+    {
+      "file": "FISH-P0-CAST.png",
+      "sha256": "cc3fe64d965da21f07f53fc23027e5d263e6edcab1054c669db8254b6486d4e8"
+    },
+    {
+      "file": "COOK-HERB-HEAT.png",
+      "sha256": "09f2d137340cd763e848b5f1ea74aea52ff7206030f98d37b9af26e6668b5f14"
+    },
+    {
+      "file": "COOK-P1-7.png",
+      "sha256": "32908e9c4b833055e98d20773460b30cdb4bea48ae4313636d1e14ae5dba4430"
+    },
+    {
+      "file": "COOK-P1-4.png",
+      "sha256": "e47d159b2a7862dce92a7814b61866e84d992c05c45198451057cd356ab237ab"
+    },
+    {
+      "file": "COOK-P1-2.png",
+      "sha256": "f31df068be27c1cfabb7fa3ff2801682662c16ce6749932ca48ba65ccf776e22"
+    }
+  ],
+  "otherAcceptedEvidence": [
+    "../current-representative-final/review.json",
+    "../current-late-final/review.json",
+    "../kitchen-final-acceptance.json"
+  ],
+  "scope": "Final targeted repair checks pass;full initial current review covered92 cards here plus32 byUX agent. Root owns the independent travel andSave Retry closure."
+}

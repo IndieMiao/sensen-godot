@@ -1,0 +1,984 @@
+[
+  {
+    "id": "MAP-4-PAID",
+    "title": "收费旅行 · 原子扣费",
+    "heading": "Fly to Tokyo",
+    "meta": "1,758 km · Trip 5 · First visit",
+    "rows": [
+      [
+        "40 Energy → 142 left",
+        "200 coins → 230 left",
+        "i-energy"
+      ],
+      [
+        "Travel Permit ×1 · Stamps 6/5",
+        "10 min · your farm stays open",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Fly",
+        "MAP-5-PAID"
+      ],
+      [
+        "Not now",
+        "MAP-3-FREE",
+        "soft"
+      ]
+    ],
+    "note": "§11.2/11.8。此为收费版，出发一次扣齐；首版免费流程不共用此费用状态。",
+    "scene": "map",
+    "energy": 182,
+    "coins": 430
+  },
+  {
+    "id": "MAP-4-GATE",
+    "title": "出发门禁 · 明确缺口",
+    "heading": "Travel Permit needed",
+    "meta": "Tokyo · Trip 5",
+    "rows": [
+      [
+        "Stamps 6/5 · Energy 182/40",
+        "Get a permit at the Homestead Stall or Travel Post.",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Travel Permit needed",
+        null,
+        "disabled"
+      ],
+      [
+        "View permit",
+        "PERMIT-1",
+        "soft"
+      ]
+    ],
+    "note": "只显示缺的条件；道具、体力、币、印章任一不足整笔拒绝。钱包扣后须≥40。",
+    "scene": "map",
+    "energy": 182,
+    "coins": 430
+  },
+  {
+    "id": "MAP-5-PAID",
+    "title": "在途 · 登机牌",
+    "heading": "In transit · Tokyo",
+    "meta": "Trip 5 · 7:42 left",
+    "rows": [
+      [
+        "Your farm stays open",
+        "Farming, cooking and your bag are available.",
+        "i-home"
+      ],
+      [
+        "Ponds and mines wait until arrival",
+        "One active trip at a time.",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "Travel guide",
+        "TRAVEL-GUIDE",
+        "soft"
+      ],
+      [
+        "Cancel trip",
+        "TRAVEL-CANCEL",
+        "soft"
+      ]
+    ],
+    "note": "按真实时间继续；重启读同一旅程。到点Land，日票按计划到达时刻起算。",
+    "scene": "map",
+    "route": true,
+    "energy": 142,
+    "coins": 230
+  },
+  {
+    "id": "TRAVEL-GUIDE",
+    "title": "在途 · 当地指南",
+    "heading": "Tokyo travel guide",
+    "meta": "Temperate · 09:12 local · 14 online",
+    "rows": [
+      [
+        "Smelt Lv1 · Northern Pike Lv5",
+        "Local river fish · active times shown in Fish-dex",
+        "i-fish-sil"
+      ],
+      [
+        "Market Square",
+        "Local seeds, recipes and requests",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to boarding pass",
+        "MAP-5-PAID",
+        "soft"
+      ]
+    ],
+    "note": "信息预览不允许远程交易；地区鱼由城市簇分配。",
+    "scene": "map"
+  },
+  {
+    "id": "TRAVEL-CANCEL",
+    "title": "取消 · 返还明细",
+    "heading": "Cancel your trip?",
+    "meta": "You have not arrived yet.",
+    "rows": [
+      [
+        "Return 40 Energy + 200 coins",
+        "Travel Permit ×1 also returned",
+        "i-coin"
+      ]
+    ],
+    "actions": [
+      [
+        "Keep travelling",
+        "MAP-5-PAID"
+      ],
+      [
+        "Cancel and refund",
+        "TRAVEL-REFUNDED",
+        "soft"
+      ]
+    ],
+    "note": "取消前有效时整笔退款，无到访无盖章无冷却；已到达竞争结果以服务端为准。",
+    "scene": "map"
+  },
+  {
+    "id": "TRAVEL-REFUNDED",
+    "title": "退款成功",
+    "heading": "Trip cancelled",
+    "meta": "Your resources are back.",
+    "rows": [
+      [
+        "40 Energy · 200 coins · Permit ×1",
+        "No visit or stamp was counted.",
+        "i-check"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to map",
+        "MAP-2-FREE",
+        "soft"
+      ]
+    ],
+    "note": "回显退款一次；中断后查询已取消状态，不再重复退款。",
+    "scene": "map",
+    "energy": 182,
+    "coins": 430
+  },
+  {
+    "id": "DAYPASS",
+    "title": "到达 · 日票并入位置芯片",
+    "heading": "Welcome back to Tokyo",
+    "meta": "Day Pass · 23h 59m",
+    "rows": [
+      [
+        "Return here free while the pass is active",
+        "Home + Tokyo · no third-city access",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Visit the local pond",
+        "MAP-8-FREE"
+      ],
+      [
+        "Return home · Free",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "§16.1.3覆盖旧右上独立日票卡：时间在位置芯片；24h滚动，Local48h。",
+    "scene": "map",
+    "city": "Tokyo",
+    "place": "Map · Pass 23h"
+  },
+  {
+    "id": "DAYPASS-EXPIRED",
+    "title": "日票到期 · 不踢人",
+    "heading": "Day Pass expired",
+    "meta": "You can stay in this room.",
+    "rows": [
+      [
+        "Leaving does not take you home",
+        "Re-entry needs a new pass · return travel is half price.",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Stay here",
+        "LOCAL-FISH",
+        "soft"
+      ],
+      [
+        "Return home · Free",
+        "HOME-RETURN"
+      ]
+    ],
+    "note": "到期不踢人不自动返家；离房后新入口检查日票。",
+    "scene": "pond",
+    "city": "Tokyo",
+    "place": "Sumida Pond"
+  },
+  {
+    "id": "PERMIT-1",
+    "title": "旅行许可 · 双带制作",
+    "heading": "Travel Permit",
+    "meta": "Homestead Stall · Made this week 1/3",
+    "rows": [],
+    "actions": [
+      [
+        "Craft · 100 coins",
+        "PERMIT-DONE"
+      ]
+    ],
+    "note": "§11.3.2 两个不同气候带特产+100；每周3张，购买250且每周2张另列。",
+    "needs": [
+      [
+        "Tilapia",
+        1,
+        1,
+        "i-fish"
+      ],
+      [
+        "Smelt",
+        1,
+        1,
+        "i-minnow"
+      ],
+      [
+        "Coins",
+        230,
+        100,
+        "i-coin"
+      ]
+    ],
+    "body": "Tilapia · Subtropical + Smelt · Temperate"
+  },
+  {
+    "id": "PERMIT-DONE",
+    "title": "许可入包",
+    "heading": "Travel Permit ×1",
+    "meta": "Crafted · 2/3 this week",
+    "rows": [
+      [
+        "For trips beyond 1,600 km",
+        "Cannot sell or gift this item.",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "View Tokyo trip",
+        "MAP-4-PAID",
+        "soft"
+      ]
+    ],
+    "note": "即时0体力；先容量检查再扣100和两件特产。",
+    "coins": 130
+  },
+  {
+    "id": "TICKET-1",
+    "title": "长途票 · 制作条件",
+    "heading": "Long-haul Ticket",
+    "meta": "Homestead Lv4 · Stamps 8/8",
+    "rows": [],
+    "actions": [
+      [
+        "Craft · 150 coins",
+        null
+      ]
+    ],
+    "note": "§11.3.3。许可1+硬木2+石英2+150。Trip7另验Lv5与12章。图中返回Trip5仅审阅导航，长途票用途为Trip6–7。",
+    "needs": [
+      [
+        "Permit",
+        1,
+        1,
+        "i-passport"
+      ],
+      [
+        "Hardwood",
+        2,
+        2,
+        "i-wood"
+      ],
+      [
+        "Quartz",
+        2,
+        2,
+        "i-stone"
+      ],
+      [
+        "Coins",
+        430,
+        150,
+        "i-coin"
+      ]
+    ],
+    "coins": 430,
+    "foot": "For Trip 6–7 · one ticket per departure"
+  },
+  {
+    "id": "SECOND-HOME",
+    "title": "第二故乡 · 七日锁",
+    "heading": "Make Tokyo a Second Home?",
+    "meta": "Regular · 5 visits · 3 local trades",
+    "rows": [
+      [
+        "Free travel, no Day Pass needed",
+        "One slot stays assigned for 7 days.",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Set Second Home",
+        "SECOND-HOME-DONE"
+      ],
+      [
+        "Not now",
+        "PASS-2",
+        "soft"
+      ]
+    ],
+    "note": "常客+对应档印章/Homestead+空槽全部校验；设定后7天不能释放或换城。",
+    "scene": "map"
+  },
+  {
+    "id": "SECOND-HOME-DONE",
+    "title": "第二故乡 · 永久痕迹",
+    "heading": "Tokyo · Second Home",
+    "meta": "Slot 1/3 · Change available in 6d 23h",
+    "rows": [
+      [
+        "Home crest added",
+        "Travel stays free.",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Travel free",
+        "MAP-5-FREE"
+      ]
+    ],
+    "note": "已探索全彩叠家徽描边；到期只是允许更换，不自动失效。",
+    "scene": "map"
+  },
+  {
+    "id": "SOC-1",
+    "title": "关系 · 四级入口",
+    "heading": "Friends",
+    "meta": "Following · Mutual · Close Friends",
+    "rows": [
+      [
+        "Mia · Mutual",
+        "2/3 interactions this week",
+        "i-face-player"
+      ],
+      [
+        "Alex · Close Friend",
+        "Shanghai · online",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Mia’s profile",
+        "SOC-1-GATE"
+      ]
+    ],
+    "note": "延续PROFILE-2，无新社交头像体系；昵称公开为基线待拍板，设计用示例名字。"
+  },
+  {
+    "id": "SOC-1-GATE",
+    "title": "密友门槛",
+    "heading": "Mia · Mutual",
+    "meta": "Close Friend slots 2/3",
+    "rows": [
+      [
+        "1 more interaction this week",
+        "Visit, gift, help or fish together.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "1 more interaction",
+        null,
+        "disabled"
+      ],
+      [
+        "View progress after interaction",
+        "SOC-1-CONFIRM",
+        "soft"
+      ]
+    ],
+    "note": "每对每日最多3次、近7天≥3，双方空槽且接收方确认。此进度按钮仅分镜链接，非一键增加关系。"
+  },
+  {
+    "id": "SOC-1-CONFIRM",
+    "title": "密友 · 接收方确认",
+    "heading": "Mia wants to be close friends",
+    "meta": "3 interactions in the last 7 days",
+    "rows": [
+      [
+        "Close Friend slots 2/3",
+        "Both of you need a free slot.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Accept",
+        "SOC-2"
+      ],
+      [
+        "Not now",
+        "SOC-1",
+        "soft"
+      ]
+    ],
+    "note": "Inbox To do接受才建立，任一方取消或取关可解除，不自动过期。"
+  },
+  {
+    "id": "SOC-2",
+    "title": "客票 · 主人邀请",
+    "heading": "Invite Mia over",
+    "meta": "Guest Pass · 20 Energy for Mia",
+    "rows": [
+      [
+        "You are home and online",
+        "Invites today 1/5 · same pair 0/1",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Send invitation",
+        "SOC-2-INBOX"
+      ]
+    ],
+    "note": "主人在家城实时房间；发送与接受双检。此只是设计原型按钮，不发送真实消息。"
+  },
+  {
+    "id": "SOC-2-INBOX",
+    "title": "客票 · 接收预览",
+    "heading": "Mia invites you to Tokyo",
+    "meta": "Expires in 28:40",
+    "rows": [
+      [
+        "20 Energy · 0 coins · instant",
+        "No permit or stamp requirement",
+        "i-travel"
+      ],
+      [
+        "Guest passes today 0/2",
+        "You arrive in Mia’s current room.",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Accept · 20 Energy",
+        "SOC-2-ARRIVE"
+      ],
+      [
+        "Decline",
+        "SOC-1",
+        "soft"
+      ]
+    ],
+    "note": "Trip5一半20，客票价格不是折扣；到达+min(10,已付体力)，不发首访礼。"
+  },
+  {
+    "id": "SOC-2-ARRIVE",
+    "title": "客票 · 到达主人房间",
+    "heading": "Welcome to Tokyo",
+    "meta": "Guest of Mia · +10 Energy",
+    "rows": [
+      [
+        "Guest Pass · 24h",
+        "Return home is always free.",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Visit farm together",
+        "SOC-3"
+      ]
+    ],
+    "note": "从142扣20加10=132；主人所在房间不是城市概览。",
+    "city": "Tokyo",
+    "place": "Mia’s farm",
+    "energy": 132
+  },
+  {
+    "id": "SOC-2-ERROR",
+    "title": "客票失效 · 不扣费",
+    "heading": "Host isn’t home right now",
+    "meta": "Your invitation has not been used.",
+    "rows": [
+      [
+        "Try again while Mia is home and online",
+        "Invitation expires in 12:20",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Try again",
+        "SOC-2-INBOX",
+        "soft"
+      ],
+      [
+        "Close",
+        "SOC-1",
+        "soft"
+      ]
+    ],
+    "note": "还要覆盖30min到期、Close Friends only、客人2/2和体力不足；全部先验不扣费。"
+  },
+  {
+    "id": "SOC-3",
+    "title": "帮工 · 自动轮授权",
+    "heading": "Helpers",
+    "meta": "Homestead Lv4 · Helpers 1/2",
+    "rows": [
+      [
+        "Mia · Mutual",
+        "Water: On · Harvest: On",
+        "i-face-player"
+      ],
+      [
+        "Replant: Off",
+        "On-site Close Friends only · their Energy",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Invite as helper",
+        "HELPER-INBOX"
+      ]
+    ],
+    "note": "自动轮只浇水/一年生收获0体力；主人在线跳过。邀请7天有效，双方可撤销。"
+  },
+  {
+    "id": "HELPER-INBOX",
+    "title": "帮工邀请 · 接受",
+    "heading": "Help Alex’s farm?",
+    "meta": "Water + annual harvests",
+    "rows": [
+      [
+        "No Energy used while you are away",
+        "You can help up to 3 farms.",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Accept",
+        "HELPER-SUMMARY"
+      ],
+      [
+        "Not now",
+        "SOC-1",
+        "soft"
+      ]
+    ],
+    "note": "帮工自己接受后生效；每农场每日1轮，主人每农场被帮合计≤60格，帮工金币≤12/日。"
+  },
+  {
+    "id": "HELPER-SUMMARY",
+    "title": "离线帮工 · 小结",
+    "heading": "Mia helped while you were away",
+    "meta": "Watered 9 plots · harvested 6 radishes",
+    "rows": [
+      [
+        "Your crops and harvest XP are yours",
+        "View the marked plots on your farm.",
+        "i-radish"
+      ]
+    ],
+    "actions": [
+      [
+        "View farm",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "已结算只回显；不是用户实账号数据。主人仓库/包裹路径基线有矛盾，保留问题清单。"
+  },
+  {
+    "id": "HELPER-ONSITE",
+    "title": "到场补播 · 谁付体力",
+    "heading": "Replant for Mia",
+    "meta": "Uses your Energy · Mia’s seeds",
+    "rows": [
+      [
+        "Sow ×1 · 2 Energy",
+        "Helper budget 36/40 · host budget 13/15",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Sow ×1 · 2 Energy",
+        "HELPER-BUDGET"
+      ]
+    ],
+    "note": "主人种子、帮工体力；只能用帮工等级可买种子。付费成功才XP给帮工，主人收获不再拿重复XP。"
+  },
+  {
+    "id": "HELPER-BUDGET",
+    "title": "帮工额度 · 阻止超额",
+    "heading": "Replant budget reached",
+    "meta": "Host budget 15/15 today",
+    "rows": [
+      [
+        "Water and harvest are still free",
+        "Your remaining Energy is safe.",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Replant budget reached",
+        null,
+        "disabled"
+      ],
+      [
+        "Back to farm",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "主人预算跨所有帮工15等值，帮工预算跨农场40；不拆多条命令绕过。"
+  },
+  {
+    "id": "SOC-5",
+    "title": "赠礼 · 只鱼与料理",
+    "heading": "Send a gift to Mia",
+    "meta": "Mutual · 1 gift per pair per day",
+    "rows": [
+      [
+        "River Perch ×1 + Herb Grilled Fish ×1",
+        "2 items · 1/3 sent today",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Send gift",
+        "GIFT-SENT"
+      ]
+    ],
+    "note": "选择界面复用Bag图标格与详情卡；不开放种子/材料/金币/鱼饵/门禁物。实际外发只原型不执行。"
+  },
+  {
+    "id": "GIFT-SENT",
+    "title": "赠礼已投递",
+    "heading": "Gift sent",
+    "meta": "Mia can claim it within 24h.",
+    "rows": [
+      [
+        "Unclaimed gifts return to you",
+        "No sale value is created.",
+        "i-bag"
+      ]
+    ],
+    "actions": [
+      [
+        "Done",
+        "SOC-1",
+        "soft"
+      ]
+    ],
+    "note": "发送与领取各计互动；包裹满8件时不挤旧包，赠礼退回发送者。"
+  },
+  {
+    "id": "GIFT-CLAIM",
+    "title": "赠礼领取 · Gifted",
+    "heading": "Gift from Mia",
+    "meta": "23h 40m left · Bag 22/25",
+    "rows": [
+      [
+        "Herb Grilled Fish ×1 · Gifted",
+        "Can eat or give to a Resident",
+        "i-dish-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Claim",
+        "GIFT-DETAIL"
+      ]
+    ],
+    "note": "沿SOC-4/Parcels入口，只一个收件箱。满包Make room，过24h原物退回、不折现。"
+  },
+  {
+    "id": "GIFT-DETAIL",
+    "title": "Gifted · 不可售与继承",
+    "heading": "Herb Grilled Fish · Gifted",
+    "meta": "+45 Energy · Good",
+    "rows": [
+      [
+        "Cannot sell, re-gift or deliver for coins",
+        "Gifted fish makes Gifted dishes.",
+        "i-dish-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Eat · +45 Energy",
+        "HOME-RETURN"
+      ],
+      [
+        "Gift to a Resident",
+        "RESIDENT-TALK",
+        "soft"
+      ]
+    ],
+    "note": "赠礼始终0金币价值；吃按接收者食物上限与同菜递减，非额外无限体力。"
+  },
+  {
+    "id": "SOC-6",
+    "title": "主人三件套",
+    "heading": "Mia’s homestead",
+    "meta": "Open to friends",
+    "rows": [
+      [
+        "Guestbook",
+        "Leave a preset note",
+        "i-home"
+      ],
+      [
+        "Water 3 plots · Free",
+        "Visitors today 0/3",
+        "i-sprout"
+      ],
+      [
+        "Close Friend visit",
+        "Stay 30s · host +10 Energy once today",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Leave a note",
+        "GUESTBOOK"
+      ]
+    ],
+    "note": "来访主人每天最多10；任何访客免费浇3；不给访客田产，真实玩家范围。"
+  },
+  {
+    "id": "GUESTBOOK",
+    "title": "留言板 · 预设短句",
+    "heading": "Leave a note",
+    "meta": "Choose a message",
+    "rows": [
+      [
+        "Nice farm!",
+        "",
+        "i-home"
+      ],
+      [
+        "Thanks for the fish!",
+        "",
+        "i-fish"
+      ],
+      [
+        "Come visit mine!",
+        "",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Post selected note",
+        "SOC-6"
+      ]
+    ],
+    "note": "不是自由文本；最近20条，主人可删/拉黑，关注以上才能留言。"
+  },
+  {
+    "id": "TOGETHER",
+    "title": "共做委托 · 同场加入",
+    "heading": "Together · Pond supper",
+    "meta": "2 of 6 players · 8:42 to gather",
+    "rows": [
+      [
+        "Every player contributes at least 1 item",
+        "Everyone earns the full reward.",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Join",
+        "TOGETHER-PROGRESS"
+      ]
+    ],
+    "note": "同一实时据点2–6人，需求ceil(单人量×人数×0.8)；每日参与1份。10分钟不足转发起人单人。"
+  },
+  {
+    "id": "TOGETHER-PROGRESS",
+    "title": "共做进度 · 交付",
+    "heading": "Pond supper · Together",
+    "meta": "Mia + Alex · Same Market Square",
+    "rows": [
+      [
+        "Your contribution 1 item",
+        "Shared progress updates for everyone.",
+        "i-check"
+      ]
+    ],
+    "actions": [
+      [
+        "Deliver selected fish",
+        "TOGETHER-DONE"
+      ]
+    ],
+    "note": "奖励/物品原子结算，需求随确定人数计算。此样例不虚构主方案未定模板量。"
+  },
+  {
+    "id": "TOGETHER-DONE",
+    "title": "共做 · 完成与超时",
+    "heading": "Request complete",
+    "meta": "Everyone contributed",
+    "rows": [
+      [
+        "Your full reward is ready",
+        "Your participation today: 1/1",
+        "i-check"
+      ]
+    ],
+    "actions": [
+      [
+        "Return to the board",
+        "SOC-6",
+        "soft"
+      ]
+    ],
+    "note": "超时则发起人单人单，退离队物品/人数变动的锁定时点列待定。"
+  },
+  {
+    "id": "EXPAND-4",
+    "title": "烹饪扩展 · 第四槽",
+    "heading": "Four ingredients",
+    "meta": "Cooking expansion · 4 slots",
+    "rows": [
+      [
+        "Homestead Feast",
+        "Signature · 60 s · 2 heat moments",
+        "i-pot"
+      ]
+    ],
+    "actions": [
+      [
+        "Preview 4-slot recipe",
+        "EXPAND-RECIPES"
+      ]
+    ],
+    "note": "4槽解锁具体等级未定（Lv11–15或Master）；不擅自写Lv11。材料明细未定，UI先画槽位与状态。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "EXPAND-5",
+    "title": "烹饪扩展 · 第五槽",
+    "heading": "Five ingredients",
+    "meta": "Cooking expansion · 5 slots",
+    "rows": [
+      [
+        "World Platter",
+        "Feast · 90 s · 3 heat moments",
+        "i-pot"
+      ],
+      [
+        "3 climates across 3 ingredient families",
+        "Base 2 portions · Perfect 3",
+        "i-map"
+      ]
+    ],
+    "actions": [
+      [
+        "Preview 5-slot recipe",
+        "EXPAND-RECIPES"
+      ]
+    ],
+    "note": "5槽不能降匹配3槽，重复原料不能偷触发跨带；回复70不变，首做120。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "EXPAND-RECIPES",
+    "title": "8页扩展与器具",
+    "heading": "Cookbook · 48 → 56",
+    "meta": "Signature / Feast",
+    "rows": [
+      [
+        "Homestead Feast · Two-Seas Grill",
+        "Two-Zone Stew · North-South Soup",
+        "i-cookbook"
+      ],
+      [
+        "Beet & Yam Cakes · World Platter",
+        "Four-Zone Hotpot · Passport Pie",
+        "i-cookbook"
+      ],
+      [
+        "Ferment Jar / Jelly Mold",
+        "Wall tools · never use ingredient slots",
+        "i-pot"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to kitchen",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "8页原料配方与器具工作台配方待定；进口食材箱可选，不在未拍板时加必经商店。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "TRADER",
+    "title": "旅行商人 · 本周路线",
+    "heading": "Mira’s route",
+    "meta": "This week · Tokyo",
+    "rows": [
+      [
+        "One specialty from another climate",
+        "Next city announced on Monday",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "Show Travel Post",
+        "LOCAL-SHOP",
+        "soft"
+      ]
+    ],
+    "note": "全服周路线、人口加权且月内至少1非大城；显示实际路由，不凭空承诺当地售卖清单。",
+    "scene": "travel-post"
+  }
+]

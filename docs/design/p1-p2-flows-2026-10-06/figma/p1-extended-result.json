@@ -1,0 +1,505 @@
+{
+  "createdNodeManifest": "created-nodes.json",
+  "pages": [
+    {
+      "id": "HOME-LV4",
+      "cardId": "441:5369",
+      "nodeId": "441:5371"
+    },
+    {
+      "id": "HOME-LV5",
+      "cardId": "441:5429",
+      "nodeId": "441:5431"
+    },
+    {
+      "id": "HOME-LV6",
+      "cardId": "441:5489",
+      "nodeId": "441:5491"
+    },
+    {
+      "id": "HOME-LV7",
+      "cardId": "441:5549",
+      "nodeId": "441:5551"
+    },
+    {
+      "id": "HOME-LV8",
+      "cardId": "441:5609",
+      "nodeId": "441:5611"
+    },
+    {
+      "id": "HOME-LV9",
+      "cardId": "441:5669",
+      "nodeId": "441:5671"
+    },
+    {
+      "id": "HOME-LV10",
+      "cardId": "441:5729",
+      "nodeId": "441:5731"
+    },
+    {
+      "id": "MINE-3",
+      "cardId": "441:5789",
+      "nodeId": "441:5791"
+    },
+    {
+      "id": "COMBAT-1",
+      "cardId": "441:5849",
+      "nodeId": "441:5851"
+    },
+    {
+      "id": "COMBAT-LOOT",
+      "cardId": "441:5912",
+      "nodeId": "441:5914"
+    },
+    {
+      "id": "COMBAT-HEAL",
+      "cardId": "441:5973",
+      "nodeId": "441:5975"
+    },
+    {
+      "id": "MINE-4",
+      "cardId": "441:6032",
+      "nodeId": "441:6034"
+    },
+    {
+      "id": "MINE-5",
+      "cardId": "441:6099",
+      "nodeId": "441:6101"
+    },
+    {
+      "id": "MINE-KO",
+      "cardId": "441:6159",
+      "nodeId": "441:6161"
+    },
+    {
+      "id": "RESIDENT-TALK",
+      "cardId": "441:6221",
+      "nodeId": "441:6223"
+    },
+    {
+      "id": "RESIDENT-CHAT",
+      "cardId": "441:6288",
+      "nodeId": "441:6290"
+    },
+    {
+      "id": "RESIDENT-MEAL",
+      "cardId": "441:6351",
+      "nodeId": "441:6353"
+    },
+    {
+      "id": "RESIDENT-MEAL-DONE",
+      "cardId": "441:6413",
+      "nodeId": "441:6415"
+    },
+    {
+      "id": "RESIDENT-TEACH",
+      "cardId": "441:6475",
+      "nodeId": "441:6477"
+    },
+    {
+      "id": "RES-PIP",
+      "cardId": "441:6537",
+      "nodeId": "441:6539"
+    },
+    {
+      "id": "RES-GRANNY",
+      "cardId": "441:6602",
+      "nodeId": "441:6604"
+    },
+    {
+      "id": "RES-MIRA",
+      "cardId": "441:6667",
+      "nodeId": "441:6669"
+    },
+    {
+      "id": "RES-KAI",
+      "cardId": "441:6732",
+      "nodeId": "441:6734"
+    },
+    {
+      "id": "RES-RAFA",
+      "cardId": "441:6797",
+      "nodeId": "441:6799"
+    },
+    {
+      "id": "RES-IVO",
+      "cardId": "441:6862",
+      "nodeId": "441:6864"
+    },
+    {
+      "id": "RES-HANA",
+      "cardId": "441:6927",
+      "nodeId": "441:6929"
+    },
+    {
+      "id": "RES-SAM",
+      "cardId": "441:6992",
+      "nodeId": "441:6994"
+    },
+    {
+      "id": "RES-LENA",
+      "cardId": "441:7057",
+      "nodeId": "441:7059"
+    },
+    {
+      "id": "RES-TOMO",
+      "cardId": "441:7122",
+      "nodeId": "441:7124"
+    },
+    {
+      "id": "RES-THEO",
+      "cardId": "441:7187",
+      "nodeId": "441:7189"
+    },
+    {
+      "id": "RES-NADIA",
+      "cardId": "441:7252",
+      "nodeId": "441:7254"
+    },
+    {
+      "id": "DEX-MILESTONE",
+      "cardId": "441:7317",
+      "nodeId": "441:7319"
+    },
+    {
+      "id": "COOK-MILESTONE",
+      "cardId": "441:7380",
+      "nodeId": "441:7382"
+    }
+  ],
+  "links": [
+    {
+      "id": "441:5413",
+      "back": true
+    },
+    {
+      "id": "441:5426",
+      "target": "COOK-P1-1"
+    },
+    {
+      "id": "441:5473",
+      "back": true
+    },
+    {
+      "id": "441:5486",
+      "target": "FAC-1"
+    },
+    {
+      "id": "441:5533",
+      "back": true
+    },
+    {
+      "id": "441:5546",
+      "target": "COOK-P1-1"
+    },
+    {
+      "id": "441:5593",
+      "back": true
+    },
+    {
+      "id": "441:5606",
+      "target": "FAC-1"
+    },
+    {
+      "id": "441:5653",
+      "back": true
+    },
+    {
+      "id": "441:5666",
+      "target": "COOK-P1-1"
+    },
+    {
+      "id": "441:5713",
+      "back": true
+    },
+    {
+      "id": "441:5726",
+      "target": "FAC-1"
+    },
+    {
+      "id": "441:5773",
+      "back": true
+    },
+    {
+      "id": "441:5786",
+      "target": "COOK-P1-1"
+    },
+    {
+      "id": "441:5833",
+      "back": true
+    },
+    {
+      "id": "441:5846",
+      "target": "COMBAT-1"
+    },
+    {
+      "id": "441:5893",
+      "back": true
+    },
+    {
+      "id": "441:5907",
+      "target": "COMBAT-LOOT"
+    },
+    {
+      "id": "441:5909",
+      "target": "COMBAT-HEAL"
+    },
+    {
+      "id": "441:5956",
+      "back": true
+    },
+    {
+      "id": "441:5970",
+      "target": "MINE-4"
+    },
+    {
+      "id": "441:6017",
+      "back": true
+    },
+    {
+      "id": "441:6029",
+      "target": "COMBAT-1"
+    },
+    {
+      "id": "441:6076",
+      "back": true
+    },
+    {
+      "id": "441:6094",
+      "target": "MINE-5"
+    },
+    {
+      "id": "441:6096",
+      "target": "MINE-KO"
+    },
+    {
+      "id": "441:6143",
+      "back": true
+    },
+    {
+      "id": "441:6156",
+      "target": "MINE-KO"
+    },
+    {
+      "id": "441:6203",
+      "back": true
+    },
+    {
+      "id": "441:6216",
+      "target": "MINE-3"
+    },
+    {
+      "id": "441:6218",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "441:6265",
+      "back": true
+    },
+    {
+      "id": "441:6281",
+      "target": "RESIDENT-CHAT"
+    },
+    {
+      "id": "441:6283",
+      "target": "RESIDENT-MEAL"
+    },
+    {
+      "id": "441:6285",
+      "target": "RESIDENT-TEACH"
+    },
+    {
+      "id": "441:6332",
+      "back": true
+    },
+    {
+      "id": "441:6348",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:6395",
+      "back": true
+    },
+    {
+      "id": "441:6410",
+      "target": "RESIDENT-MEAL-DONE"
+    },
+    {
+      "id": "441:6457",
+      "back": true
+    },
+    {
+      "id": "441:6472",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:6519",
+      "back": true
+    },
+    {
+      "id": "441:6534",
+      "target": "DEX-P1-1"
+    },
+    {
+      "id": "441:6581",
+      "back": true
+    },
+    {
+      "id": "441:6597",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:6599",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:6646",
+      "back": true
+    },
+    {
+      "id": "441:6662",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:6664",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:6711",
+      "back": true
+    },
+    {
+      "id": "441:6727",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:6729",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:6776",
+      "back": true
+    },
+    {
+      "id": "441:6792",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:6794",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:6841",
+      "back": true
+    },
+    {
+      "id": "441:6857",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:6859",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:6906",
+      "back": true
+    },
+    {
+      "id": "441:6922",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:6924",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:6971",
+      "back": true
+    },
+    {
+      "id": "441:6987",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:6989",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:7036",
+      "back": true
+    },
+    {
+      "id": "441:7052",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:7054",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:7101",
+      "back": true
+    },
+    {
+      "id": "441:7117",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:7119",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:7166",
+      "back": true
+    },
+    {
+      "id": "441:7182",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:7184",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:7231",
+      "back": true
+    },
+    {
+      "id": "441:7247",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:7249",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:7296",
+      "back": true
+    },
+    {
+      "id": "441:7312",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "441:7314",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "441:7361",
+      "back": true
+    },
+    {
+      "id": "441:7377",
+      "target": "DEX-P1-2"
+    },
+    {
+      "id": "441:7424",
+      "back": true
+    },
+    {
+      "id": "441:7462",
+      "target": "DEX-P1-1"
+    }
+  ],
+  "count": 33
+}

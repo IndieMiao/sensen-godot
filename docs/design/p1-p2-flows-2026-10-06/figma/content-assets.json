@@ -1,0 +1,866 @@
+[
+  {
+    "id": "crop_radish",
+    "name": "Radish",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#7FC66A\" d=\"M30 24c-8-3-11-11-9-19 7 2 11 9 11 17zM34 24c8-3 11-11 9-19-7 2-11 9-11 17z\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"30\" y=\"18\" width=\"4\" height=\"10\" rx=\"2\" fill=\"#5FA85A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" r=\"15\" fill=\"#EF8E97\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"26\" cy=\"33\" rx=\"5\" ry=\"3.5\" fill=\"#F7B5BB\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#EF8E97\" d=\"M32 51c-3 4-3 8 0 12 3-4 3-8 0-12z\" />\n    </svg>",
+    "source": "existing i-radish"
+  },
+  {
+    "id": "crop_lettuce",
+    "name": "Lettuce",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse cx=\"32\" cy=\"38\" rx=\"23\" ry=\"19\" fill=\"#94BF6C\"/><ellipse cx=\"23\" cy=\"30\" rx=\"13\" ry=\"13\" fill=\"#B8D891\"/><ellipse cx=\"39\" cy=\"29\" rx=\"14\" ry=\"14\" fill=\"#A4CD7D\"/><ellipse cx=\"30\" cy=\"42\" rx=\"15\" ry=\"12\" fill=\"#C9DDA7\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_herb",
+    "name": "Herb",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"30\" y=\"26\" width=\"4\" height=\"34\" rx=\"2\" fill=\"#5FA85A\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#7FC66A\" d=\"M32 30c-10 0-16-7-16-18 10 0 16 7 16 18z\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#7FC66A\" d=\"M32 30c10 0 16-7 16-18-10 0-16 7-16 18z\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#5FA85A\" d=\"M32 46c-9 0-14-6-14-15 9 0 14 6 14 15zM32 46c9 0 14-6 14-15-9 0-14 6-14 15z\" />\n    </svg>",
+    "source": "existing i-herb"
+  },
+  {
+    "id": "crop_carrot",
+    "name": "Carrot",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#F0A24A\" d=\"M30 22c10 0 14 10 12 22S36 60 32 60s-8-6-10-16 0-22 8-22z\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E8893A\" d=\"M24 34h14M26 44h12\" stroke=\"#E8893A\" stroke-width=\"3\" stroke-linecap=\"round\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#7FC66A\" d=\"M30 24c-9-2-13-9-12-18 8 2 12 8 12 18zM34 24c9-2 13-9 12-18-8 2-12 8-12 18zM32 22c-2-8 0-14 4-18 2 7 0 13-4 18z\" />\n    </svg>",
+    "source": "existing i-carrot"
+  },
+  {
+    "id": "crop_potato",
+    "name": "Potato",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9A06A\" d=\"M12 36c-4-12 8-24 22-22 12 2 20 10 18 22-2 10-12 16-22 14S14 44 12 36z\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#DDB884\" d=\"M20 30c0-6 8-10 14-8 6 2 10 8 8 14-4 2-8 0-12 0s-10-2-10-6z\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"40\" r=\"2.5\" fill=\"#9A7149\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"40\" cy=\"42\" r=\"2.5\" fill=\"#9A7149\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"36\" cy=\"26\" r=\"2\" fill=\"#9A7149\" />\n    </svg>",
+    "source": "existing i-potato"
+  },
+  {
+    "id": "crop_chamomile",
+    "name": "Chamomile",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse cx=\"32\" cy=\"17\" rx=\"7\" ry=\"7\" fill=\"#EAE8D9\"/><ellipse cx=\"42\" cy=\"24\" rx=\"7\" ry=\"7\" fill=\"#EAE8D9\"/><ellipse cx=\"38\" cy=\"36\" rx=\"7\" ry=\"7\" fill=\"#EAE8D9\"/><ellipse cx=\"26\" cy=\"36\" rx=\"7\" ry=\"7\" fill=\"#EAE8D9\"/><ellipse cx=\"22\" cy=\"24\" rx=\"7\" ry=\"7\" fill=\"#EAE8D9\"/><ellipse cx=\"32\" cy=\"27\" rx=\"7\" ry=\"7\" fill=\"#E3B341\"/><rect x=\"30\" y=\"37\" width=\"4\" height=\"21\" rx=\"2\" fill=\"#7FC66A\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_chili",
+    "name": "Chili",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M32 27C12 26 12 11 17 9c10 0 16 6 15 18z\" fill=\"#7FC66A\"/><path d=\"M32 26c0-13 9-18 20-17 2 12-6 18-20 17z\" fill=\"#5FA85A\"/><rect x=\"30\" y=\"16\" width=\"4\" height=\"23\" rx=\"2\" fill=\"#5FA85A\"/><path d=\"M29 26C55 22 54 49 21 58c13-16 3-20 8-32z\" fill=\"#E07A5F\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_tomato",
+    "name": "Tomato",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse cx=\"32\" cy=\"39\" rx=\"22\" ry=\"19\" fill=\"#E78D70\"/><path d=\"M32 20l6 8 12-4-7 9-11-3-12 3-6-9 12 4z\" fill=\"#6FAE63\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_cabbage",
+    "name": "Cabbage",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse cx=\"32\" cy=\"35\" rx=\"23\" ry=\"22\" fill=\"#96BDA0\"/><ellipse cx=\"28\" cy=\"34\" rx=\"17\" ry=\"19\" fill=\"#BDD8AA\"/><ellipse cx=\"35\" cy=\"33\" rx=\"11\" ry=\"16\" fill=\"#D5E6BE\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_corn",
+    "name": "Corn",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse cx=\"32\" cy=\"34\" rx=\"11\" ry=\"23\" fill=\"#EBC665\"/><path d=\"M20 22C9 39 19 57 34 59L20 22z\" fill=\"#7FB979\"/><path d=\"M43 22c13 13 2 35-11 37l11-37z\" fill=\"#609B69\"/><ellipse cx=\"28\" cy=\"18\" rx=\"2.1\" ry=\"2.4\" fill=\"#F4DA88\"/><ellipse cx=\"28\" cy=\"26\" rx=\"2.1\" ry=\"2.4\" fill=\"#F4DA88\"/><ellipse cx=\"28\" cy=\"34\" rx=\"2.1\" ry=\"2.4\" fill=\"#F4DA88\"/><ellipse cx=\"28\" cy=\"42\" rx=\"2.1\" ry=\"2.4\" fill=\"#F4DA88\"/><ellipse cx=\"34\" cy=\"18\" rx=\"2.1\" ry=\"2.4\" fill=\"#F4DA88\"/><ellipse cx=\"34\" cy=\"26\" rx=\"2.1\" ry=\"2.4\" fill=\"#F4DA88\"/><ellipse cx=\"34\" cy=\"34\" rx=\"2.1\" ry=\"2.4\" fill=\"#F4DA88\"/><ellipse cx=\"34\" cy=\"42\" rx=\"2.1\" ry=\"2.4\" fill=\"#F4DA88\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_cucumber",
+    "name": "Cucumber",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect x=\"10\" y=\"21\" width=\"44\" height=\"24\" rx=\"12\" fill=\"#79AA74\"/><ellipse cx=\"20\" cy=\"28\" rx=\"1.5\" ry=\"1.5\" fill=\"#B6D493\"/><ellipse cx=\"30\" cy=\"28\" rx=\"1.5\" ry=\"1.5\" fill=\"#B6D493\"/><ellipse cx=\"40\" cy=\"28\" rx=\"1.5\" ry=\"1.5\" fill=\"#B6D493\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_strawberry",
+    "name": "Strawberry",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M12 27c6-13 33-13 40 0 4 13-13 31-20 32-8-2-25-19-20-32z\" fill=\"#E78D8A\"/><path d=\"M15 17l12 3 5-8 7 8 12-3-7 10H21z\" fill=\"#7FB979\"/><ellipse cx=\"23\" cy=\"31\" rx=\"1.2\" ry=\"2\" fill=\"#F4DCA5\"/><ellipse cx=\"39\" cy=\"31\" rx=\"1.2\" ry=\"2\" fill=\"#F4DCA5\"/><ellipse cx=\"31\" cy=\"40\" rx=\"1.2\" ry=\"2\" fill=\"#F4DCA5\"/><ellipse cx=\"22\" cy=\"42\" rx=\"1.2\" ry=\"2\" fill=\"#F4DCA5\"/><ellipse cx=\"38\" cy=\"43\" rx=\"1.2\" ry=\"2\" fill=\"#F4DCA5\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_melon",
+    "name": "Melon",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse cx=\"32\" cy=\"36\" rx=\"24\" ry=\"20\" fill=\"#B8C987\"/><path d=\"M30 17q-5-12 5-13v16z\" fill=\"#7CAA65\"/><path d=\"M24 19q-9 18 0 35\" fill=\"none\" stroke=\"#D4DDA6\" stroke-width=\"2\"/><path d=\"M35 19q-9 18 0 35\" fill=\"none\" stroke=\"#D4DDA6\" stroke-width=\"2\"/><path d=\"M43 19q-9 18 0 35\" fill=\"none\" stroke=\"#D4DDA6\" stroke-width=\"2\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_pineapple",
+    "name": "Pineapple",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse cx=\"32\" cy=\"40\" rx=\"17\" ry=\"21\" fill=\"#E6BE64\"/><path d=\"M32 25L16 9l13 4 3-11 5 12 14-7-13 18z\" fill=\"#75B180\"/><path d=\"M17 30l30 12M17 42l30-12\" stroke=\"#C99E54\" fill=\"none\" stroke-width=\"1.5\"/><path d=\"M17 40l30 12M17 52l30-12\" stroke=\"#C99E54\" fill=\"none\" stroke-width=\"1.5\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_sweet_potato",
+    "name": "Sweet Potato",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"34\" rx=\"24\" ry=\"12\" fill=\"#B07A9B\" transform=\"rotate(-20 32 34)\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"32\" rx=\"14\" ry=\"6\" fill=\"#C994B4\" transform=\"rotate(-20 32 34)\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#7FC66A\" d=\"M40 14c4-2 8-1 10 2-4 1-7 3-9 6-1-3-1-6-1-8z\" />\n    </svg>",
+    "source": "existing i-sweet-potato"
+  },
+  {
+    "id": "crop_pumpkin",
+    "name": "Pumpkin",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse cx=\"21\" cy=\"37\" rx=\"12\" ry=\"19\" fill=\"#E5A45E\"/><ellipse cx=\"43\" cy=\"37\" rx=\"12\" ry=\"19\" fill=\"#E5A45E\"/><ellipse cx=\"32\" cy=\"37\" rx=\"14\" ry=\"22\" fill=\"#F0BC70\"/><rect x=\"29\" y=\"9\" width=\"6\" height=\"12\" rx=\"3\" fill=\"#91A571\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_beet",
+    "name": "Beetroot",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M32 27C12 26 12 11 17 9c10 0 16 6 15 18z\" fill=\"#7FC66A\"/><path d=\"M32 26c0-13 9-18 20-17 2 12-6 18-20 17z\" fill=\"#5FA85A\"/><rect x=\"30\" y=\"16\" width=\"4\" height=\"23\" rx=\"2\" fill=\"#5FA85A\"/><ellipse cx=\"31\" cy=\"39\" rx=\"19\" ry=\"17\" fill=\"#BF8094\"/><path d=\"M29 51l8 10-3-13z\" fill=\"#BF8094\"/></svg>",
+    "source": "new native vector draft"
+  },
+  {
+    "id": "crop_apple",
+    "name": "Apple",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E07A5F\" d=\"M22 18c6-2 9 1 10 3 1-2 4-5 10-3 10 3 12 16 7 28s-11 12-17 10c-6 2-12 2-17-10S12 21 22 18z\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#F2A08A\" d=\"M20 26c-3 6-3 12 0 18-5-5-6-12 0-18z\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"30\" y=\"8\" width=\"4\" height=\"12\" rx=\"2\" fill=\"#8C6A4A\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#7FC66A\" d=\"M34 16c2-7 7-10 14-10-1 7-6 11-14 10z\" />\n    </svg>",
+    "source": "existing i-apple"
+  },
+  {
+    "id": "crop_citrus",
+    "name": "Citrus",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"36\" r=\"20\" fill=\"#F2B544\" />\n    <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"26\" cy=\"30\" r=\"5\" fill=\"#F8D27E\" />\n    <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M32 16c2-6 8-8 14-6-2 6-8 8-14 6z\" fill=\"#7FC66A\" />\n  </svg>",
+    "source": "existing i-citrus"
+  },
+  {
+    "id": "crop_grape",
+    "name": "Grapes",
+    "category": "crop",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><g xmlns=\"http://www.w3.org/2000/svg\" fill=\"#9C7BC7\"><circle cx=\"24\" cy=\"24\" r=\"7\" /><circle cx=\"38\" cy=\"24\" r=\"7\" /><circle cx=\"31\" cy=\"35\" r=\"7\" /><circle cx=\"20\" cy=\"37\" r=\"6\" /><circle cx=\"42\" cy=\"37\" r=\"6\" /><circle cx=\"31\" cy=\"48\" r=\"7\" /></g>\n    <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M31 17V8M31 10c6-4 12-2 14 2\" stroke=\"#7FA65A\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\" />\n  </svg>",
+    "source": "existing i-grape"
+  },
+  {
+    "id": "fish_crucian",
+    "name": "Pond Crucian",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#A9C5BA\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#A9C5BA\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#A9C5BA\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Common"
+  },
+  {
+    "id": "fish_carp",
+    "name": "Common Carp",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#DFA65E\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#DFA65E\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#DFA65E\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Common"
+  },
+  {
+    "id": "fish_mullet",
+    "name": "Grey Mullet",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 24v16z\" fill=\"#A9BCC2\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"8\" fill=\"#A9BCC2\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"3.2\" fill=\"#DDE5DB\"/><path d=\"M24 24q9-11 19 1z\" fill=\"#A9BCC2\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Common"
+  },
+  {
+    "id": "fish_perch",
+    "name": "River Perch",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#91B8A2\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#91B8A2\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#91B8A2\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/><path d=\"M26 22l2 16\" stroke=\"#6E8C86\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><path d=\"M33 22l2 16\" stroke=\"#6E8C86\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><path d=\"M40 22l2 16\" stroke=\"#6E8C86\" stroke-width=\"2.8\" stroke-linecap=\"round\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Fine"
+  },
+  {
+    "id": "fish_bass",
+    "name": "Largemouth Bass",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#9AAE85\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#9AAE85\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#9AAE85\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Fine"
+  },
+  {
+    "id": "fish_trout",
+    "name": "Rainbow Trout",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#A9C5D4\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#A9C5D4\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#A9C5D4\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/><ellipse cx=\"25\" cy=\"26\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"35\" cy=\"24\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"43\" cy=\"30\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"30\" cy=\"33\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"38\" cy=\"34\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Fine"
+  },
+  {
+    "id": "fish_mackerel",
+    "name": "Mackerel",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#94B4C3\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#94B4C3\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#94B4C3\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/><path d=\"M26 22l2 16\" stroke=\"#6E8C86\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><path d=\"M33 22l2 16\" stroke=\"#6E8C86\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><path d=\"M40 22l2 16\" stroke=\"#6E8C86\" stroke-width=\"2.8\" stroke-linecap=\"round\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Fine"
+  },
+  {
+    "id": "fish_koi",
+    "name": "Golden Koi",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#E9C76D\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#E9C76D\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#E9C76D\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/><ellipse cx=\"28\" cy=\"28\" rx=\"7\" ry=\"6\" fill=\"#E29170\"/><ellipse cx=\"42\" cy=\"32\" rx=\"5\" ry=\"7\" fill=\"#FBF8F1\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Rare"
+  },
+  {
+    "id": "fish_catfish",
+    "name": "Catfish",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#A4A9B9\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#A4A9B9\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#A4A9B9\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/><path d=\"M10 34L3 41M12 35l-1 11\" stroke=\"#879399\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Rare"
+  },
+  {
+    "id": "fish_seabass",
+    "name": "Sea Bass",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#88A9B2\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#88A9B2\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#88A9B2\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Rare"
+  },
+  {
+    "id": "fish_sturgeon",
+    "name": "Silver Sturgeon",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 24v16z\" fill=\"#BFC8CC\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"8\" fill=\"#BFC8CC\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"3.2\" fill=\"#DDE5DB\"/><path d=\"M24 24q9-11 19 1z\" fill=\"#BFC8CC\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/><path d=\"M20 26l4-5 4 5z\" fill=\"#ECEDDE\"/><path d=\"M28 26l4-5 4 5z\" fill=\"#ECEDDE\"/><path d=\"M36 26l4-5 4 5z\" fill=\"#ECEDDE\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Legendary"
+  },
+  {
+    "id": "fish_eel",
+    "name": "River Eel",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M10 23C39 3 57 23 45 36S21 48 45 54\" fill=\"none\" stroke=\"#A3B99D\" stroke-width=\"12\" stroke-linecap=\"round\"/><ellipse cx=\"13\" cy=\"23\" rx=\"7\" ry=\"7\" fill=\"#A3B99D\"/><ellipse cx=\"10\" cy=\"21\" rx=\"2\" ry=\"2\" fill=\"#2F3A33\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Legendary"
+  },
+  {
+    "id": "fish_tilapia",
+    "name": "Tilapia",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#A1BFB7\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#A1BFB7\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#A1BFB7\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/><path d=\"M26 22l2 16\" stroke=\"#6E8C86\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><path d=\"M33 22l2 16\" stroke=\"#6E8C86\" stroke-width=\"2.8\" stroke-linecap=\"round\"/><path d=\"M40 22l2 16\" stroke=\"#6E8C86\" stroke-width=\"2.8\" stroke-linecap=\"round\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Common"
+  },
+  {
+    "id": "fish_smelt",
+    "name": "Smelt",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 24v16z\" fill=\"#BED0D6\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"8\" fill=\"#BED0D6\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"3.2\" fill=\"#DDE5DB\"/><path d=\"M24 24q9-11 19 1z\" fill=\"#BED0D6\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Common"
+  },
+  {
+    "id": "fish_grass_carp",
+    "name": "Grass Carp",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#B3CBA9\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#B3CBA9\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#B3CBA9\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Fine"
+  },
+  {
+    "id": "fish_arctic_char",
+    "name": "Arctic Char",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#CFB8B2\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#CFB8B2\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#CFB8B2\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/><ellipse cx=\"25\" cy=\"26\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"35\" cy=\"24\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"43\" cy=\"30\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"30\" cy=\"33\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"38\" cy=\"34\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Fine"
+  },
+  {
+    "id": "fish_snakehead",
+    "name": "Snakehead",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#A5B995\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#A5B995\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#A5B995\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Rare"
+  },
+  {
+    "id": "fish_pike",
+    "name": "Northern Pike",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 24v16z\" fill=\"#C1BA8C\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"8\" fill=\"#C1BA8C\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"3.2\" fill=\"#DDE5DB\"/><path d=\"M24 24q9-11 19 1z\" fill=\"#C1BA8C\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Rare"
+  },
+  {
+    "id": "fish_barramundi",
+    "name": "Barramundi",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 24v16z\" fill=\"#B9C6B7\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"8\" fill=\"#B9C6B7\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"3.2\" fill=\"#DDE5DB\"/><path d=\"M24 24q9-11 19 1z\" fill=\"#B9C6B7\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Rare"
+  },
+  {
+    "id": "fish_salmon",
+    "name": "Atlantic Salmon",
+    "category": "fish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M48 32 61 19v26z\" fill=\"#D8B3A5\"/><ellipse cx=\"29\" cy=\"32\" rx=\"22\" ry=\"13\" fill=\"#D8B3A5\"/><ellipse cx=\"29\" cy=\"36\" rx=\"15\" ry=\"5.2\" fill=\"#DDE5DB\"/><path d=\"M24 19q9-11 19 1z\" fill=\"#D8B3A5\"/><ellipse cx=\"15\" cy=\"29\" rx=\"3.5\" ry=\"3.5\" fill=\"#FBF8F1\"/><ellipse cx=\"14\" cy=\"29\" rx=\"1.7\" ry=\"1.7\" fill=\"#2F3A33\"/><ellipse cx=\"25\" cy=\"26\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"35\" cy=\"24\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"43\" cy=\"30\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"30\" cy=\"33\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/><ellipse cx=\"38\" cy=\"34\" rx=\"1.4\" ry=\"1.4\" fill=\"#8B8C99\"/></svg>",
+    "source": "new native vector draft",
+    "rarity": "Legendary"
+  },
+  {
+    "id": "dish_grilled_crucian",
+    "name": "Grilled Crucian",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_crucian ×1",
+    "page": 1
+  },
+  {
+    "id": "dish_grilled_fish",
+    "name": "Grilled Fish",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "Any Common fish ×1",
+    "page": 2
+  },
+  {
+    "id": "dish_carp_cakes",
+    "name": "Carp Fish Cakes",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"42\" rx=\"28\" ry=\"13\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"22\" ry=\"9\" fill=\"#FBF8F1\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"14\" y=\"26\" width=\"18\" height=\"14\" rx=\"7\" fill=\"#D9A066\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"32\" y=\"28\" width=\"18\" height=\"14\" rx=\"7\" fill=\"#C9884A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"23\" cy=\"31\" r=\"1.6\" fill=\"#A8761A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"41\" cy=\"33\" r=\"1.6\" fill=\"#A8761A\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/></svg>",
+    "source": "existing i-dish-cakes with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_carp ×2",
+    "page": 3
+  },
+  {
+    "id": "dish_mullet_skewers",
+    "name": "Mullet Skewers",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"42\" rx=\"28\" ry=\"13\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"22\" ry=\"9\" fill=\"#FBF8F1\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"6\" y=\"33\" width=\"52\" height=\"4\" rx=\"2\" fill=\"#A8761A\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"16\" y=\"26\" width=\"12\" height=\"16\" rx=\"5\" fill=\"#C9884A\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"30\" y=\"25\" width=\"12\" height=\"16\" rx=\"5\" fill=\"#D9A066\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"44\" y=\"27\" width=\"10\" height=\"14\" rx=\"5\" fill=\"#C9884A\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/></svg>",
+    "source": "existing i-dish-skewer with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_mullet ×2",
+    "page": 4
+  },
+  {
+    "id": "dish_radish_salad",
+    "name": "Radish Salad",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E9EAE6\" d=\"M8 30h48c0 14-8 24-24 24S8 44 8 30z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"30\" rx=\"24\" ry=\"7\" fill=\"#9DB89A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"28\" r=\"5\" fill=\"#7FC66A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"36\" cy=\"27\" r=\"5.5\" fill=\"#7FC66A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"46\" cy=\"30\" r=\"4\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"31\" r=\"3.2\" fill=\"#F2B1A6\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"42\" cy=\"26\" r=\"2.6\" fill=\"#F2B1A6\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/></svg>",
+    "source": "existing i-dish-salad with recipe garnish variant",
+    "style": "Salad",
+    "recipe": "crop_radish ×1 + crop_lettuce ×1",
+    "page": 5
+  },
+  {
+    "id": "dish_veggie_plate",
+    "name": "Veggie Plate",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"37\" r=\"6\" fill=\"#E8893A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"35\" r=\"6.5\" fill=\"#7FC66A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"38\" r=\"5\" fill=\"#F2B1A6\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/></svg>",
+    "source": "existing i-dish-plate with recipe garnish variant",
+    "style": "Salad",
+    "recipe": "Any Common vegetable ×1",
+    "page": 6
+  },
+  {
+    "id": "dish_carrot_cake",
+    "name": "Carrot Cake",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"46\" rx=\"26\" ry=\"10\" fill=\"#E9EAE6\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#F2C9A0\" d=\"M14 42 32 16l18 26z\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E8893A\" d=\"M14 42h36l-2 6H16z\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#FBF8F1\" d=\"M26 32h12l3 5H23z\" opacity=\".8\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"18\" r=\"3.5\" fill=\"#EF8E97\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/></svg>",
+    "source": "existing i-dish-cake with recipe garnish variant",
+    "style": "Dessert",
+    "recipe": "crop_carrot ×2",
+    "page": 7
+  },
+  {
+    "id": "dish_cabbage_stew",
+    "name": "Cabbage Stew",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"8\" y=\"28\" width=\"48\" height=\"26\" rx=\"10\" fill=\"#8A918C\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"2\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"52\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"28\" rx=\"22\" ry=\"6\" fill=\"#E8893A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"24\" cy=\"27\" r=\"3.5\" fill=\"#F0A24A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"29\" r=\"3\" fill=\"#8FB7D9\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"26\" r=\"2.5\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"8\" r=\"4\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/></svg>",
+    "source": "existing i-dish-stew with recipe garnish variant",
+    "style": "Stew",
+    "recipe": "crop_cabbage ×1 + crop_potato ×1",
+    "page": 8
+  },
+  {
+    "id": "dish_travel_biscuits",
+    "name": "Travel Biscuits",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"44\" rx=\"28\" ry=\"12\" fill=\"#E9EAE6\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"24\" cy=\"32\" r=\"13\" fill=\"#D9A066\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"42\" cy=\"36\" r=\"12\" fill=\"#E3B57A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"29\" r=\"1.8\" fill=\"#A8761A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"28\" cy=\"35\" r=\"1.8\" fill=\"#A8761A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"40\" cy=\"33\" r=\"1.8\" fill=\"#A8761A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"45\" cy=\"40\" r=\"1.8\" fill=\"#A8761A\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/></svg>",
+    "source": "existing i-dish-biscuit with recipe garnish variant",
+    "style": "Dessert",
+    "recipe": "**不可烹饪**；Travel Post 购买 40 金币，每人每日 3 份",
+    "page": 9
+  },
+  {
+    "id": "dish_herb_grilled_fish",
+    "name": "Herb Grilled Fish",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "Any Common fish ×1 + Any seasoning ×1",
+    "page": 10
+  },
+  {
+    "id": "dish_salt_grilled_fish",
+    "name": "Salt-Grilled Fish",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "Any Common fish ×1 + rock_salt ×1",
+    "page": 11
+  },
+  {
+    "id": "dish_fish_soup",
+    "name": "Fresh Fish Soup",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E9EAE6\" d=\"M8 30h48c0 14-8 24-24 24S8 44 8 30z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"30\" rx=\"24\" ry=\"7\" fill=\"#F2B1A6\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"26\" cy=\"29\" r=\"4\" fill=\"#EF8E97\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"31\" r=\"3\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"12\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/></svg>",
+    "source": "existing i-dish-soup with recipe garnish variant",
+    "style": "Soup",
+    "recipe": "Any Common fish ×1 + Any Common vegetable ×1",
+    "page": 12
+  },
+  {
+    "id": "dish_tilapia_wraps",
+    "name": "Tilapia Wraps",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse cx=\"32\" cy=\"44\" rx=\"28\" ry=\"12\" fill=\"#E9EAE6\"/><path d=\"M9 29q18-22 46 0l-8 21H19z\" fill=\"#B3CB94\"/><ellipse cx=\"32\" cy=\"29\" rx=\"23\" ry=\"10\" fill=\"#8FB783\"/><rect x=\"15\" y=\"24\" width=\"14\" height=\"10\" rx=\"4\" fill=\"#D4B298\"/><rect x=\"32\" y=\"25\" width=\"14\" height=\"10\" rx=\"4\" fill=\"#DDBEAA\"/><path d=\"M12 37q17 14 38 1L42 52H22z\" fill=\"#CDE0AA\"/></svg>",
+    "source": "native lettuce fish wraps draft",
+    "style": "Salad",
+    "recipe": "fish_tilapia ×1 + crop_lettuce ×1",
+    "page": 13
+  },
+  {
+    "id": "dish_crispy_smelt",
+    "name": "Crispy Smelt",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_smelt ×1 + rock_salt ×1",
+    "page": 14
+  },
+  {
+    "id": "dish_pan_fried_fish",
+    "name": "Pan-Fried Fish",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "Any Fine fish ×1",
+    "page": 15
+  },
+  {
+    "id": "dish_rock_salt_soup",
+    "name": "Rock-Salt Soup",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E9EAE6\" d=\"M8 30h48c0 14-8 24-24 24S8 44 8 30z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"30\" rx=\"24\" ry=\"7\" fill=\"#F2B1A6\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"26\" cy=\"29\" r=\"4\" fill=\"#EF8E97\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"31\" r=\"3\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"12\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-soup with recipe garnish variant",
+    "style": "Soup",
+    "recipe": "Any Common vegetable ×1 + rock_salt ×1",
+    "page": 16
+  },
+  {
+    "id": "dish_salted_potatoes",
+    "name": "Salted Potatoes",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"8\" y=\"28\" width=\"48\" height=\"26\" rx=\"10\" fill=\"#8A918C\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"2\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"52\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"28\" rx=\"22\" ry=\"6\" fill=\"#E8893A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"24\" cy=\"27\" r=\"3.5\" fill=\"#F0A24A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"29\" r=\"3\" fill=\"#8FB7D9\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"26\" r=\"2.5\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"8\" r=\"4\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-stew with recipe garnish variant",
+    "style": "Stew",
+    "recipe": "crop_potato ×2 + rock_salt ×1",
+    "page": 17
+  },
+  {
+    "id": "dish_cucumber_salad",
+    "name": "Cucumber Salad",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E9EAE6\" d=\"M8 30h48c0 14-8 24-24 24S8 44 8 30z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"30\" rx=\"24\" ry=\"7\" fill=\"#9DB89A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"28\" r=\"5\" fill=\"#7FC66A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"36\" cy=\"27\" r=\"5.5\" fill=\"#7FC66A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"46\" cy=\"30\" r=\"4\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"31\" r=\"3.2\" fill=\"#F2B1A6\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"42\" cy=\"26\" r=\"2.6\" fill=\"#F2B1A6\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/></svg>",
+    "source": "existing i-dish-salad with recipe garnish variant",
+    "style": "Salad",
+    "recipe": "crop_cucumber ×1 + crop_herb ×1",
+    "page": 18
+  },
+  {
+    "id": "dish_fruit_tea",
+    "name": "Fruit Tea",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"12\" y=\"26\" width=\"32\" height=\"24\" rx=\"9\" fill=\"#FBF8F1\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"12\" y=\"26\" width=\"32\" height=\"24\" rx=\"9\" fill=\"none\" stroke=\"#C9A27A\" stroke-width=\"2\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"#C9A27A\" stroke-width=\"5\" d=\"M44 31h5a6 6 0 0 1 0 13h-5\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"28\" cy=\"30\" rx=\"13\" ry=\"4\" fill=\"#A9D982\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"10\" y=\"52\" width=\"36\" height=\"5\" rx=\"2.5\" fill=\"#C9A27A\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"#D6D5CE\" stroke-width=\"3\" stroke-linecap=\"round\" d=\"M22 10c-2 4 2 7 0 11M30 7c-2 4 2 7 0 11M38 10c-2 4 2 7 0 11\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/></svg>",
+    "source": "existing i-tea with recipe garnish variant",
+    "style": "Tea",
+    "recipe": "Any Fine fruit ×1",
+    "page": 19
+  },
+  {
+    "id": "dish_apple_tea",
+    "name": "Apple Tea",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"12\" y=\"26\" width=\"32\" height=\"24\" rx=\"9\" fill=\"#FBF8F1\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"12\" y=\"26\" width=\"32\" height=\"24\" rx=\"9\" fill=\"none\" stroke=\"#C9A27A\" stroke-width=\"2\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"#C9A27A\" stroke-width=\"5\" d=\"M44 31h5a6 6 0 0 1 0 13h-5\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"28\" cy=\"30\" rx=\"13\" ry=\"4\" fill=\"#A9D982\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"10\" y=\"52\" width=\"36\" height=\"5\" rx=\"2.5\" fill=\"#C9A27A\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"#D6D5CE\" stroke-width=\"3\" stroke-linecap=\"round\" d=\"M22 10c-2 4 2 7 0 11M30 7c-2 4 2 7 0 11M38 10c-2 4 2 7 0 11\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/></svg>",
+    "source": "existing i-tea with recipe garnish variant",
+    "style": "Tea",
+    "recipe": "crop_chamomile ×1 + crop_apple ×2",
+    "page": 20
+  },
+  {
+    "id": "dish_roast_veggies",
+    "name": "Roast Veggies",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"37\" r=\"6\" fill=\"#D79F66\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"35\" r=\"6.5\" fill=\"#91B574\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"38\" r=\"5\" fill=\"#F2B1A6\" />\n    </svg>",
+    "source": "existing vegetable plate, warm roast palette",
+    "style": "Grilled",
+    "recipe": "Any Fine vegetable ×1",
+    "page": 21
+  },
+  {
+    "id": "dish_corn_cake",
+    "name": "Corn Cake",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"46\" rx=\"26\" ry=\"10\" fill=\"#E9EAE6\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#F2C9A0\" d=\"M14 42 32 16l18 26z\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E8893A\" d=\"M14 42h36l-2 6H16z\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#FBF8F1\" d=\"M26 32h12l3 5H23z\" opacity=\".8\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"18\" r=\"3.5\" fill=\"#EF8E97\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/></svg>",
+    "source": "existing i-dish-cake with recipe garnish variant",
+    "style": "Dessert",
+    "recipe": "crop_corn ×2",
+    "page": 22
+  },
+  {
+    "id": "dish_charcoal_fish",
+    "name": "Charcoal Fish",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "Any Rare fish ×1",
+    "page": 23
+  },
+  {
+    "id": "dish_fruit_platter",
+    "name": "Fruit Platter",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"37\" r=\"6\" fill=\"#E8893A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"35\" r=\"6.5\" fill=\"#7FC66A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"38\" r=\"5\" fill=\"#F2B1A6\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/></svg>",
+    "source": "existing i-dish-plate with recipe garnish variant",
+    "style": "Salad",
+    "recipe": "Any Rare fruit ×1",
+    "page": 24
+  },
+  {
+    "id": "dish_harvest_roast",
+    "name": "Harvest Roast",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"37\" r=\"6\" fill=\"#D79F66\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"35\" r=\"6.5\" fill=\"#91B574\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"38\" r=\"5\" fill=\"#F2B1A6\" />\n    </svg>",
+    "source": "existing vegetable plate, warm roast palette",
+    "style": "Grilled",
+    "recipe": "Any Rare vegetable ×1",
+    "page": 25
+  },
+  {
+    "id": "dish_herb_baked_perch",
+    "name": "Herb Baked Perch",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_perch ×1 + crop_herb ×1",
+    "page": 26
+  },
+  {
+    "id": "dish_bass_tomato_stew",
+    "name": "Bass Tomato Stew",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"8\" y=\"28\" width=\"48\" height=\"26\" rx=\"10\" fill=\"#8A918C\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"2\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"52\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"28\" rx=\"22\" ry=\"6\" fill=\"#E8893A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"24\" cy=\"27\" r=\"3.5\" fill=\"#F0A24A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"29\" r=\"3\" fill=\"#8FB7D9\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"26\" r=\"2.5\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"8\" r=\"4\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/></svg>",
+    "source": "existing i-dish-stew with recipe garnish variant",
+    "style": "Stew",
+    "recipe": "fish_bass ×1 + crop_tomato ×1",
+    "page": 27
+  },
+  {
+    "id": "dish_smoked_trout",
+    "name": "Smoked Trout",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_trout ×1 + wild_herb ×1 + rock_salt ×1",
+    "page": 28
+  },
+  {
+    "id": "dish_salt_mackerel",
+    "name": "Salt Mackerel",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_mackerel ×1 + rock_salt ×1",
+    "page": 29
+  },
+  {
+    "id": "dish_grass_carp_soup",
+    "name": "Grass Carp Soup",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E9EAE6\" d=\"M8 30h48c0 14-8 24-24 24S8 44 8 30z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"30\" rx=\"24\" ry=\"7\" fill=\"#F2B1A6\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"26\" cy=\"29\" r=\"4\" fill=\"#EF8E97\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"31\" r=\"3\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"12\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/></svg>",
+    "source": "existing i-dish-soup with recipe garnish variant",
+    "style": "Soup",
+    "recipe": "fish_grass_carp ×1 + crop_radish ×1",
+    "page": 30
+  },
+  {
+    "id": "dish_char_chowder",
+    "name": "Char Chowder",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E9EAE6\" d=\"M8 30h48c0 14-8 24-24 24S8 44 8 30z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"30\" rx=\"24\" ry=\"7\" fill=\"#F2B1A6\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"26\" cy=\"29\" r=\"4\" fill=\"#EF8E97\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"31\" r=\"3\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"12\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/></svg>",
+    "source": "existing i-dish-soup with recipe garnish variant",
+    "style": "Soup",
+    "recipe": "fish_arctic_char ×1 + crop_potato ×1",
+    "page": 31
+  },
+  {
+    "id": "dish_catfish_stew",
+    "name": "Catfish Stew",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"8\" y=\"28\" width=\"48\" height=\"26\" rx=\"10\" fill=\"#8A918C\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"2\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"52\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"28\" rx=\"22\" ry=\"6\" fill=\"#E8893A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"24\" cy=\"27\" r=\"3.5\" fill=\"#F0A24A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"29\" r=\"3\" fill=\"#8FB7D9\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"26\" r=\"2.5\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"8\" r=\"4\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/></svg>",
+    "source": "existing i-dish-stew with recipe garnish variant",
+    "style": "Stew",
+    "recipe": "fish_catfish ×1 + crop_potato ×1",
+    "page": 32
+  },
+  {
+    "id": "dish_sea_bass_salt",
+    "name": "Sea Bass in Salt",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_seabass ×1 + rock_salt ×1",
+    "page": 33
+  },
+  {
+    "id": "dish_chili_snakehead",
+    "name": "Chili Snakehead",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"8\" y=\"28\" width=\"48\" height=\"26\" rx=\"10\" fill=\"#8A918C\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"2\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"52\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"28\" rx=\"22\" ry=\"6\" fill=\"#E8893A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"24\" cy=\"27\" r=\"3.5\" fill=\"#F0A24A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"29\" r=\"3\" fill=\"#8FB7D9\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"26\" r=\"2.5\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"8\" r=\"4\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><path d=\"M30 27q14-3 9 9l-10 3q8-7 1-12z\" fill=\"#D98170\"/></svg>",
+    "source": "existing i-dish-stew with recipe garnish variant",
+    "style": "Stew",
+    "recipe": "fish_snakehead ×1 + crop_chili ×1",
+    "page": 34
+  },
+  {
+    "id": "dish_grilled_pike",
+    "name": "Grilled Pike",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_pike ×1 + wild_herb ×1",
+    "page": 35
+  },
+  {
+    "id": "dish_pineapple_barra",
+    "name": "Pineapple Barra",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_barramundi ×1 + crop_pineapple ×1",
+    "page": 36
+  },
+  {
+    "id": "dish_fisher_stew",
+    "name": "Fisher's Stew",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"8\" y=\"28\" width=\"48\" height=\"26\" rx=\"10\" fill=\"#8A918C\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"2\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"52\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"28\" rx=\"22\" ry=\"6\" fill=\"#E8893A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"24\" cy=\"27\" r=\"3.5\" fill=\"#F0A24A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"29\" r=\"3\" fill=\"#8FB7D9\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"26\" r=\"2.5\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"8\" r=\"4\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-stew with recipe garnish variant",
+    "style": "Stew",
+    "recipe": "Any Fine fish ×1 + crop_potato ×1 + rock_salt ×1",
+    "page": 37
+  },
+  {
+    "id": "dish_strawberry_tart",
+    "name": "Strawberry Tart",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"46\" rx=\"26\" ry=\"10\" fill=\"#E9EAE6\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#F2C9A0\" d=\"M14 42 32 16l18 26z\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E8893A\" d=\"M14 42h36l-2 6H16z\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#FBF8F1\" d=\"M26 32h12l3 5H23z\" opacity=\".8\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"18\" r=\"3.5\" fill=\"#EF8E97\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/></svg>",
+    "source": "existing i-dish-cake with recipe garnish variant",
+    "style": "Dessert",
+    "recipe": "crop_strawberry ×2 + crop_herb ×1",
+    "page": 38
+  },
+  {
+    "id": "dish_melon_platter",
+    "name": "Melon Platter",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"37\" r=\"6\" fill=\"#E8893A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"35\" r=\"6.5\" fill=\"#7FC66A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"38\" r=\"5\" fill=\"#F2B1A6\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/></svg>",
+    "source": "existing i-dish-plate with recipe garnish variant",
+    "style": "Dessert",
+    "recipe": "crop_melon ×1 + crop_strawberry ×1",
+    "page": 39
+  },
+  {
+    "id": "dish_orchard_tea",
+    "name": "Orchard Tea",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"12\" y=\"26\" width=\"32\" height=\"24\" rx=\"9\" fill=\"#FBF8F1\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"12\" y=\"26\" width=\"32\" height=\"24\" rx=\"9\" fill=\"none\" stroke=\"#C9A27A\" stroke-width=\"2\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"#C9A27A\" stroke-width=\"5\" d=\"M44 31h5a6 6 0 0 1 0 13h-5\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"28\" cy=\"30\" rx=\"13\" ry=\"4\" fill=\"#A9D982\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"10\" y=\"52\" width=\"36\" height=\"5\" rx=\"2.5\" fill=\"#C9A27A\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"#D6D5CE\" stroke-width=\"3\" stroke-linecap=\"round\" d=\"M22 10c-2 4 2 7 0 11M30 7c-2 4 2 7 0 11M38 10c-2 4 2 7 0 11\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/></svg>",
+    "source": "existing i-tea with recipe garnish variant",
+    "style": "Tea",
+    "recipe": "crop_grape ×1 + crop_citrus ×1 + crop_chamomile ×1",
+    "page": 40
+  },
+  {
+    "id": "dish_legend_sashimi",
+    "name": "Legend Sashimi",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse cx=\"32\" cy=\"42\" rx=\"29\" ry=\"13\" fill=\"#E9EAE6\"/><ellipse cx=\"32\" cy=\"40\" rx=\"25\" ry=\"10\" fill=\"#FBF8F1\"/><rect x=\"12\" y=\"29\" width=\"13\" height=\"14\" rx=\"4\" fill=\"#DAACA3\"/><rect x=\"26\" y=\"26\" width=\"13\" height=\"14\" rx=\"4\" fill=\"#EDC2B7\"/><rect x=\"40\" y=\"30\" width=\"12\" height=\"14\" rx=\"4\" fill=\"#D5B7AE\"/><path d=\"M18 31v10M32 28v10M46 32v10\" stroke=\"#F4DBCB\" stroke-width=\"2\"/><ellipse cx=\"30\" cy=\"46\" rx=\"7\" ry=\"3\" fill=\"#A8C493\"/></svg>",
+    "source": "native sashimi plate draft",
+    "style": "Salad",
+    "recipe": "Any Legendary fish ×1",
+    "page": 41
+  },
+  {
+    "id": "dish_steamed_sturgeon",
+    "name": "Steamed Sturgeon",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"8\" y=\"28\" width=\"48\" height=\"26\" rx=\"10\" fill=\"#8A918C\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"2\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"52\" y=\"32\" width=\"10\" height=\"7\" rx=\"3.5\" fill=\"#8A918C\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"28\" rx=\"22\" ry=\"6\" fill=\"#E8893A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"24\" cy=\"27\" r=\"3.5\" fill=\"#F0A24A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"29\" r=\"3\" fill=\"#8FB7D9\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"26\" r=\"2.5\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"8\" r=\"4\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"14\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-stew with recipe garnish variant",
+    "style": "Stew",
+    "recipe": "fish_sturgeon ×1 + crop_herb ×1 + rock_salt ×1",
+    "page": 42
+  },
+  {
+    "id": "dish_eel_skewers",
+    "name": "Eel Skewers",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"42\" rx=\"28\" ry=\"13\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"22\" ry=\"9\" fill=\"#FBF8F1\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"6\" y=\"33\" width=\"52\" height=\"4\" rx=\"2\" fill=\"#A8761A\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"16\" y=\"26\" width=\"12\" height=\"16\" rx=\"5\" fill=\"#C9884A\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"30\" y=\"25\" width=\"12\" height=\"16\" rx=\"5\" fill=\"#D9A066\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"44\" y=\"27\" width=\"10\" height=\"14\" rx=\"5\" fill=\"#C9884A\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><path d=\"M30 27q14-3 9 9l-10 3q8-7 1-12z\" fill=\"#D98170\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-skewer with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_eel ×1 + crop_chili ×1 + rock_salt ×1",
+    "page": 43
+  },
+  {
+    "id": "dish_herb_salmon",
+    "name": "Herb Salmon",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "fish_salmon ×1 + crop_herb ×1",
+    "page": 44
+  },
+  {
+    "id": "dish_pineapple_fish",
+    "name": "Pineapple Fish",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"28\" ry=\"14\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"38\" rx=\"22\" ry=\"10\" fill=\"#FBF8F1\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#C9884A\" d=\"M46 36 56 28v16z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"36\" rx=\"18\" ry=\"8\" fill=\"#D9A066\" />\n      <path xmlns=\"http://www.w3.org/2000/svg\" d=\"M20 34h18M22 39h14\" stroke=\"#B5743A\" stroke-width=\"2.5\" stroke-linecap=\"round\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"20\" cy=\"28\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"30\" cy=\"22\" r=\"3.5\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><path d=\"M30 27q14-3 9 9l-10 3q8-7 1-12z\" fill=\"#D98170\"/></svg>",
+    "source": "existing i-dish-grilled with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "crop_pineapple ×1 + Any Common fish ×1 + crop_chili ×1",
+    "page": 45
+  },
+  {
+    "id": "dish_sweet_potato_cakes",
+    "name": "Sweet Potato Cakes",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"42\" rx=\"28\" ry=\"13\" fill=\"#E9EAE6\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"40\" rx=\"22\" ry=\"9\" fill=\"#FBF8F1\" />\n      <rect xmlns=\"http://www.w3.org/2000/svg\" x=\"14\" y=\"26\" width=\"18\" height=\"14\" rx=\"7\" fill=\"#D9A066\" /><rect xmlns=\"http://www.w3.org/2000/svg\" x=\"32\" y=\"28\" width=\"18\" height=\"14\" rx=\"7\" fill=\"#C9884A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"23\" cy=\"31\" r=\"1.6\" fill=\"#A8761A\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"41\" cy=\"33\" r=\"1.6\" fill=\"#A8761A\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/></svg>",
+    "source": "existing i-dish-cakes with recipe garnish variant",
+    "style": "Grilled",
+    "recipe": "crop_sweet_potato ×1 + Any Common fish ×1 + crop_herb ×1",
+    "page": 46
+  },
+  {
+    "id": "dish_pumpkin_chowder",
+    "name": "Pumpkin Chowder",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E9EAE6\" d=\"M8 30h48c0 14-8 24-24 24S8 44 8 30z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"30\" rx=\"24\" ry=\"7\" fill=\"#F2B1A6\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"26\" cy=\"29\" r=\"4\" fill=\"#EF8E97\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"31\" r=\"3\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"12\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"32\" cy=\"36\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"40\" cy=\"36\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-soup with recipe garnish variant",
+    "style": "Soup",
+    "recipe": "crop_pumpkin ×1 + Any Fine fish ×1 + rock_salt ×1",
+    "page": 47
+  },
+  {
+    "id": "dish_beet_fish_soup",
+    "name": "Beet Fish Soup",
+    "category": "dish",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path xmlns=\"http://www.w3.org/2000/svg\" fill=\"#E9EAE6\" d=\"M8 30h48c0 14-8 24-24 24S8 44 8 30z\" />\n      <ellipse xmlns=\"http://www.w3.org/2000/svg\" cx=\"32\" cy=\"30\" rx=\"24\" ry=\"7\" fill=\"#F2B1A6\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"26\" cy=\"29\" r=\"4\" fill=\"#EF8E97\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"38\" cy=\"31\" r=\"3\" fill=\"#7FC66A\" />\n      <circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"22\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"34\" cy=\"12\" r=\"3.5\" fill=\"#D6D5CE\" /><circle xmlns=\"http://www.w3.org/2000/svg\" cx=\"44\" cy=\"18\" r=\"3\" fill=\"#D6D5CE\" />\n    <ellipse cx=\"24\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#7FB979\"/><ellipse cx=\"32\" cy=\"33\" rx=\"3\" ry=\"2\" fill=\"#E8BD65\"/><ellipse cx=\"40\" cy=\"33\" rx=\"2\" ry=\"2\" fill=\"#DB997F\"/><ellipse cx=\"26\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/><ellipse cx=\"38\" cy=\"28\" rx=\"1\" ry=\"1\" fill=\"#FBF8F1\"/></svg>",
+    "source": "existing i-dish-soup with recipe garnish variant",
+    "style": "Soup",
+    "recipe": "crop_beet ×1 + Any Common fish ×1 + rock_salt ×1",
+    "page": 48
+  },
+  {
+    "id": "res_pip",
+    "name": "Pip",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#E3B341\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#846C55\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#F6D7BC\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#846C55\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M10 23c2-24 42-24 44 0z\" fill=\"#E3B341\"/><rect x=\"7\" y=\"22\" width=\"50\" height=\"6\" rx=\"3\" fill=\"#E3B341\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_granny_wu",
+    "name": "Granny Wu",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#A6B9A1\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#C2BAB0\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#EAC6A3\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#C2BAB0\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"37\" r=\"7\" fill=\"none\" stroke=\"#8D9287\" stroke-width=\"2\"/><circle cx=\"40\" cy=\"37\" r=\"7\" fill=\"none\" stroke=\"#8D9287\" stroke-width=\"2\"/><path d=\"M31 37h2\" stroke=\"#8D9287\" stroke-width=\"2\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_mira",
+    "name": "Mira",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#AF9EC2\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#694F43\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#DDB390\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#694F43\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_old_kai",
+    "name": "Old Kai",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#779DA9\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#B28F62\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#F6D7BC\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#B28F62\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M10 23c2-24 42-24 44 0z\" fill=\"#779DA9\"/><rect x=\"7\" y=\"22\" width=\"50\" height=\"6\" rx=\"3\" fill=\"#779DA9\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_rafa",
+    "name": "Rafa",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#C49577\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#846C55\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#EAC6A3\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#846C55\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_ivo",
+    "name": "Ivo",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#E3B341\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#C2BAB0\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#DDB390\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#C2BAB0\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M10 23c2-24 42-24 44 0z\" fill=\"#E3B341\"/><rect x=\"7\" y=\"22\" width=\"50\" height=\"6\" rx=\"3\" fill=\"#E3B341\"/><ellipse cx=\"32\" cy=\"18\" rx=\"5\" ry=\"5\" fill=\"#F4D27A\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_hana",
+    "name": "Hana",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#A6B9A1\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#694F43\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#F6D7BC\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#694F43\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_sam",
+    "name": "Sam",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#AF9EC2\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#B28F62\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#EAC6A3\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#B28F62\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M10 23c2-24 42-24 44 0z\" fill=\"#AF9EC2\"/><rect x=\"7\" y=\"22\" width=\"50\" height=\"6\" rx=\"3\" fill=\"#AF9EC2\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_lena",
+    "name": "Lena",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#779DA9\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#846C55\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#DDB390\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#846C55\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_tomo",
+    "name": "Tomo",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#C49577\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#C2BAB0\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#F6D7BC\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#C2BAB0\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/><circle cx=\"24\" cy=\"37\" r=\"7\" fill=\"none\" stroke=\"#8D9287\" stroke-width=\"2\"/><circle cx=\"40\" cy=\"37\" r=\"7\" fill=\"none\" stroke=\"#8D9287\" stroke-width=\"2\"/><path d=\"M31 37h2\" stroke=\"#8D9287\" stroke-width=\"2\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_theo",
+    "name": "Theo",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#E3B341\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#694F43\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#EAC6A3\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#694F43\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  },
+  {
+    "id": "res_nadia",
+    "name": "Nadia",
+    "category": "resident",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><path d=\"M7 64v-5c0-15 50-15 50 0v5z\" fill=\"#A6B9A1\"/><ellipse cx=\"32\" cy=\"34\" rx=\"22\" ry=\"24\" fill=\"#B28F62\"/><ellipse cx=\"32\" cy=\"37\" rx=\"19\" ry=\"20\" fill=\"#DDB390\"/><path d=\"M13 29c0-24 39-25 39 0L39 16l-8 9-8-6-10 10z\" fill=\"#B28F62\"/><ellipse cx=\"24\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><ellipse cx=\"40\" cy=\"37\" rx=\"2.4\" ry=\"2.8\" fill=\"#2F3A33\"/><path d=\"M27 47q5 4 10 0\" fill=\"none\" stroke=\"#A67761\" stroke-width=\"2\" stroke-linecap=\"round\"/><ellipse cx=\"20\" cy=\"14\" rx=\"9\" ry=\"9\" fill=\"#FBF8F1\"/><ellipse cx=\"32\" cy=\"10\" rx=\"12\" ry=\"11\" fill=\"#FBF8F1\"/><ellipse cx=\"44\" cy=\"14\" rx=\"9\" ry=\"9\" fill=\"#FBF8F1\"/></svg>",
+    "source": "new native portrait draft; not a 3D character model"
+  }
+]

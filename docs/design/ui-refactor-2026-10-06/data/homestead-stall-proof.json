@@ -1,0 +1,70 @@
+{
+  "source": "Original FARM6/6-2 fixtures + v2 §§5.2.2,7.14.1#1,9.11.1,9.13.1",
+  "recipeSelected": {
+    "title": "Grilled Crucian",
+    "owned": 3,
+    "priceEach": 2,
+    "priceAll": 6,
+    "dailyDishLimit": 120,
+    "usedDishQuota": null,
+    "successNotInvented": true
+  },
+  "derivedStates": [
+    {
+      "id": "STALL-RADISH-SEEDS-BOUGHT",
+      "operation": "buy-seeds",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 24
+      },
+      "after": {
+        "coins": 222,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 26
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "STALL-RADISH-SOLD-ONE",
+      "operation": "sell-crop",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 12
+      },
+      "after": {
+        "coins": 235,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 11
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    },
+    {
+      "id": "STALL-RADISH-SOLD-ALL",
+      "operation": "sell-crop",
+      "before": {
+        "coins": 230,
+        "energy": 142,
+        "bagUsed": 19,
+        "owned": 12
+      },
+      "after": {
+        "coins": 290,
+        "energy": 142,
+        "bagUsed": 18,
+        "owned": 0
+      },
+      "serverTransaction": false,
+      "prototypeOnly": true
+    }
+  ],
+  "plantQuota": "Unlimited at Homestead; old64/80 removed",
+  "compostGate": "Farming3; current seed-unlock fixture is below Farming2"
+}

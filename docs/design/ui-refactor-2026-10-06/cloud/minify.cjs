@@ -1,0 +1,2 @@
+const fs=require('fs'),terser=require('/tmp/gensen-ui-cloud-build/node_modules/terser');
+(async()=>{const path=process.argv[2],code=fs.readFileSync(path,'utf8');const result=await terser.minify(code,{module:true,parse:{bare_returns:true},compress:{toplevel:true,passes:2},mangle:{toplevel:true},format:{comments:false},ecma:2022});if(result.error)throw result.error;fs.writeFileSync(path,result.code);console.log(JSON.stringify({file:path,length:result.code.length,bytes:Buffer.byteLength(result.code)}));if(result.code.length>50000)process.exitCode=2;})();

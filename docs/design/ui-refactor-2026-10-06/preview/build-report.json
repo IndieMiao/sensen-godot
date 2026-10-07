@@ -1,0 +1,22 @@
+{
+  "screenCount": 288,
+  "legacy": 84,
+  "current": 204,
+  "supplementaryStates": 4,
+  "avatarTrueParts": 27,
+  "dataAndCodeInlined": true,
+  "sceneImagesRepositoryRelative": true,
+  "browserVisualQa": false,
+  "figmaRendered": false,
+  "sha256": "48011ba2ad922c57d5cd4622dc5f29365627863d8d4be839e6b63d5831e4d3d6",
+  "sources": {
+    "ui-refactor-2026-10-06/data/legacy-screens.json": "29e56c278841a98cae7c51fcbcb7f9b4b58d18f1163f24ab51b6da53cb253abe",
+    "ui-refactor-2026-10-06/data/current-all.json": "d9c0b07a2329c4ac79488baf0be7ee685765f0c4e7f6fe8f74c079fd07c8304c",
+    "p0-flow-2026-10-05/figma/icons.json": "5d69457b59a4c3f0d0825ae1c1545b0251a42b348472a0e1ee572ca62f22ea39",
+    "ui-refactor-2026-10-06/avatar-assets/manifest.json": "61b0dc99bc146e0dfc04e2d095f11c25ff7e6e63a60c6f503aad2c8e0c142285",
+    "ui-refactor-2026-10-06/data/flow-repair-states.json": "753ba25bf902fa0716640f46c297e504851f1202209b197ece733788bedccc49",
+    "ui-refactor-2026-10-06/data/avatar-control-icons.json": "9d321b9b09cd22437350729c9cd12964f113d5b1c17e42e8802fecd244ced993",
+    "ui-refactor-2026-10-06/preview/review.js": "b0b08a3e123823381df92e4eb068ea1af2878ede8c350311a32d5fe47bb2d127",
+    "ui-refactor-2026-10-06/preview/review.css": "5b8b5cf6de5ba9ce6ed17f9cb4b6c5eb667a172083809abd3dac6c7a2eac6d99"
+  }
+}

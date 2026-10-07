@@ -1,0 +1,28 @@
+{
+  "nodeManifest": "componentization-node-ids.json",
+  "informationRow": "445:8601",
+  "properties": {
+    "titleKey": "Title#445:0",
+    "bodyKey": "Body#445:1",
+    "iconKey": "Icon#445:2"
+  },
+  "rowInstances": 155,
+  "textStyles": [
+    {
+      "id": "S:3db0be2187c5115e38204064b10e165cb9c82a1c,",
+      "name": "Gensen / Source / Button"
+    },
+    {
+      "id": "S:d6215e976b8a1ddbd0000d156a3d5105d1086585,",
+      "name": "Gensen / Source / Heading"
+    },
+    {
+      "id": "S:6132b2b9e89bf8eef9a7f4ad4586f7e6814e3dd7,",
+      "name": "Gensen / Source / Body"
+    },
+    {
+      "id": "S:37fb4ad426e9010d0190c2ddec83834d818a4f84,",
+      "name": "Gensen / Source / Caption"
+    }
+  ]
+}

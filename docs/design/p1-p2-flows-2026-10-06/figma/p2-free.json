@@ -1,0 +1,532 @@
+[
+  {
+    "id": "MAP-2-FREE",
+    "title": "目的地四列表",
+    "scene": "map",
+    "place": "Map",
+    "heading": "Where to next?",
+    "tabs": [
+      "Nearby",
+      "Friends",
+      "Open farms",
+      "Featured"
+    ],
+    "rows": [
+      [
+        "Hangzhou · China",
+        "Trip 3 · Free · 1 new stamp",
+        "i-map"
+      ],
+      [
+        "Tokyo · Japan",
+        "Trip 5 · Free · 2 regional fish",
+        "i-map"
+      ],
+      [
+        "Los Angeles · United States",
+        "Trip 7 · Free · 3 things to do",
+        "i-map"
+      ]
+    ],
+    "actions": [
+      [
+        "Browse Tokyo",
+        "MAP-3-FREE"
+      ]
+    ],
+    "foot": "Looking around the map never moves you.",
+    "note": "§11.10四列表；本页Nearby示例，其余标签仅列表筛选。免费首版所有Trip只显示档名；从家城计算距离，不扣费无证件。"
+  },
+  {
+    "id": "MAP-3-FREE",
+    "title": "未探索城 · 浏览",
+    "scene": "map",
+    "grey": true,
+    "place": "Map",
+    "heading": "Tokyo · Japan",
+    "meta": "Temperate · Trip 5 · 14 online · 09:12 local",
+    "rows": [
+      [
+        "3 ponds · 17 outposts · 8 residents",
+        "2 regional fish · 12 open farms",
+        "i-pond"
+      ],
+      [
+        "Fishing Lv1 / Lv5",
+        "Local fish silhouettes",
+        "i-fish-sil"
+      ]
+    ],
+    "actions": [
+      [
+        "Travel here",
+        "MAP-4-FREE"
+      ],
+      [
+        "Keep browsing",
+        "MAP-2-FREE",
+        "soft"
+      ]
+    ],
+    "note": "城市名/人数/时间不遮，服务图钉剪影；当前玩家仍Shanghai。数量是示例夹具，正式从城市簇数据，不从POI猜。"
+  },
+  {
+    "id": "MAP-4-FREE",
+    "title": "免费出发确认",
+    "scene": "map",
+    "heading": "Travel to Tokyo",
+    "meta": "Trip 5 · Continental · First visit",
+    "rows": [
+      [
+        "Free travel",
+        "No Energy, coins or travel items",
+        "i-travel"
+      ],
+      [
+        "3 things to do here",
+        "Fish the local pond · visit an outpost · get a stamp",
+        "i-pond"
+      ]
+    ],
+    "actions": [
+      [
+        "Fly",
+        "MAP-5-FREE"
+      ],
+      [
+        "Not now",
+        "MAP-3-FREE",
+        "soft"
+      ]
+    ],
+    "foot": "Return home is always free.",
+    "note": "明确Travel改变玩家城，Browse不变。首版不套用10min收费档；短过渡显示出发请求状态，确定成功再落地。"
+  },
+  {
+    "id": "MAP-5-FREE",
+    "title": "出发中 · 在途反馈",
+    "scene": "map",
+    "route": true,
+    "heading": "On your way to Tokyo",
+    "meta": "Trip 5 · Free travel",
+    "rows": [
+      [
+        "Preparing your arrival",
+        "Your farm and bag are saved.",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "Skip animation",
+        "MAP-6-FREE",
+        "soft"
+      ]
+    ],
+    "note": "短过渡分镜，不新增收费等待倒计时。请求未回包时不允许第二次发起；Skip只跳动画，不伪造到达。长时登机牌另在收费版。"
+  },
+  {
+    "id": "MAP-6-FREE",
+    "title": "首访到达 · 印章",
+    "scene": "map",
+    "city": "Tokyo",
+    "place": "Map",
+    "energy": 152,
+    "heading": "Welcome to Tokyo",
+    "meta": "New stamp · +10 Energy",
+    "rows": [
+      [
+        "Tokyo stamp added",
+        "Passport · 2 cities visited",
+        "i-stamp"
+      ]
+    ],
+    "actions": [
+      [
+        "See what’s nearby",
+        "MAP-7-FREE"
+      ]
+    ],
+    "note": "首访计数未到日2次上限时+10；相机城市→玩家城市一致。印章与迷雾永久保留；不展示付费版Day Pass倒计时。"
+  },
+  {
+    "id": "MAP-7-FREE",
+    "title": "落地 · 可做的三件事",
+    "scene": "map",
+    "city": "Tokyo",
+    "place": "Map",
+    "energy": 152,
+    "heading": "3 things to do here",
+    "rows": [
+      [
+        "Fish the local pond",
+        "Pond Crucian · ready for every level",
+        "i-pond"
+      ],
+      [
+        "Visit the outpost",
+        "Temperate seeds · local requests",
+        "i-home"
+      ],
+      [
+        "View your new stamp",
+        "Tokyo · now explored",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Show local pond",
+        "MAP-8-FREE"
+      ],
+      [
+        "Visit the outpost",
+        "LOCAL-SHOP",
+        "soft"
+      ]
+    ],
+    "note": "落地兑现卡10s收起；Show仅高亮目标，下一张塘卡Go才进场。系统新手塘与据点保底，真实POI只读名片。"
+  },
+  {
+    "id": "MAP-8-FREE",
+    "title": "当地新手塘 · 可进入",
+    "scene": "map",
+    "city": "Tokyo",
+    "place": "Map",
+    "energy": 152,
+    "heading": "Sumida Pond",
+    "meta": "Beginner pond · Same city · Free",
+    "rows": [
+      [
+        "Pond Crucian OK",
+        "Everyone can start with a basic fish.",
+        "i-fish"
+      ],
+      [
+        "2 regional fish",
+        "Smelt Lv1 · Northern Pike Lv5",
+        "i-fish-sil"
+      ]
+    ],
+    "actions": [
+      [
+        "Go",
+        "LOCAL-FISH"
+      ]
+    ],
+    "note": "地区鱼示例须按城市哈希池落实，不宣称真实东京固定两种。本卡不能在到塘后才以技能阻止基础钓鱼。"
+  },
+  {
+    "id": "LOCAL-FISH",
+    "title": "当地行动 · 基础钓鱼",
+    "scene": "pond",
+    "city": "Tokyo",
+    "place": "Sumida Pond",
+    "energy": 152,
+    "heading": "Cast a line in Tokyo",
+    "meta": "Creel 0 · 25 free",
+    "rows": [
+      [
+        "Starter Rod equipped",
+        "Bait is optional.",
+        "i-rod"
+      ]
+    ],
+    "actions": [
+      [
+        "Cast · 5 Energy",
+        "LOCAL-CATCH"
+      ],
+      [
+        "Back to map",
+        "MAP-7-FREE",
+        "soft"
+      ]
+    ],
+    "note": "基础钓鱼执行常规Cast5，免费旅行不等于当地生产免费。收线小游戏沿已完成FISH-2，只补旅行落点。"
+  },
+  {
+    "id": "LOCAL-CATCH",
+    "title": "当地兑现 · 首城钓获",
+    "scene": "pond",
+    "city": "Tokyo",
+    "place": "Sumida Pond",
+    "energy": 147,
+    "heading": "Caught! Pond Crucian",
+    "meta": "First fish in Tokyo · +10 Fishing XP",
+    "rows": [
+      [
+        "Tokyo · 1 fish caught",
+        "Your visit now has a story.",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "View passport",
+        "PASS-1"
+      ],
+      [
+        "Go home · Free",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "10是首城额外奖励，鱼种/钓获XP另按既有规则。到达后10分钟发生一次当地动作计兑现，不拿浏览当动作。"
+  },
+  {
+    "id": "LOCAL-SHOP",
+    "title": "当地据点 · 先问候",
+    "scene": "market-square-v2",
+    "city": "Tokyo",
+    "place": "Market Square",
+    "heading": "Market Keeper · Mei",
+    "meta": "Temperate produce is fresh today.",
+    "rows": [
+      [
+        "Trade",
+        "See local seeds and requests",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Trade",
+        "LOCAL-TRADE"
+      ],
+      [
+        "Just passing by",
+        "MAP-7-FREE",
+        "soft"
+      ]
+    ],
+    "note": "岗位名称/名牌复用NPC-G1规范，此处共享场景占位。角色美术气候变体另列，农场无人驿站例外不变。"
+  },
+  {
+    "id": "LOCAL-TRADE",
+    "title": "当地购买 · 气候带种子",
+    "scene": "market-square-v2",
+    "city": "Tokyo",
+    "place": "Market Square",
+    "heading": "Mei’s Stall · Market Square",
+    "tabs": [
+      "Buy",
+      "Market Board"
+    ],
+    "rows": [
+      [
+        "Pumpkin Seeds · Farming Lv5",
+        "17 coins each · 10/10 today",
+        "i-radish-seeds"
+      ],
+      [
+        "Buyback today 0/80",
+        "All markets in this city share the limit.",
+        "i-coin"
+      ]
+    ],
+    "actions": [
+      [
+        "Buy 1 · 17 coins",
+        "LOCAL-BOUGHT"
+      ],
+      [
+        "Go home · Free",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "本样例玩家Farming5；低等级可看不可买。首次计数Trip3+礼物2种子另经包裹，不代替玩家购买；免费版先验证实际本地行为。"
+  },
+  {
+    "id": "LOCAL-BOUGHT",
+    "title": "特产带回家",
+    "scene": "market-square-v2",
+    "city": "Tokyo",
+    "place": "Market Square",
+    "coins": 213,
+    "heading": "Pumpkin Seeds ×1",
+    "meta": "Added to your bag",
+    "rows": [
+      [
+        "A little piece of Tokyo",
+        "Plant at home when you’re ready.",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Go home · Free",
+        "HOME-RETURN"
+      ],
+      [
+        "Keep exploring",
+        "MAP-7-FREE",
+        "soft"
+      ]
+    ],
+    "note": "购买成功才扣17、入包，失败保留币。种子气候带固定温带，回家异带露天时长惩罚按种植规则，不抹标签。"
+  },
+  {
+    "id": "HOME-RETURN",
+    "title": "免费返家",
+    "scene": "farm",
+    "heading": "Welcome home",
+    "meta": "Shanghai · Homestead",
+    "rows": [
+      [
+        "Your discoveries stay with you",
+        "Tokyo stamp · new fish · local seeds",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Open passport",
+        "PASS-1",
+        "soft"
+      ],
+      [
+        "Browse again",
+        "MAP-2-FREE",
+        "soft"
+      ]
+    ],
+    "note": "返家不扣体力/金币、无旅途；保留背包与永久探索记录。返家不是重置旅行成就，也不能再领同城首访奖励。"
+  },
+  {
+    "id": "PASS-1",
+    "title": "护照 · 城市章与进度",
+    "scene": "map",
+    "heading": "Passport",
+    "meta": "2 cities visited · First visits today 1/2",
+    "rows": [
+      [
+        "Shanghai · Home",
+        "Home city · explored",
+        "i-home"
+      ],
+      [
+        "Tokyo · Visited",
+        "Next: 4 more visits + 3 local trades",
+        "i-stamp"
+      ]
+    ],
+    "actions": [
+      [
+        "Tokyo city page",
+        "PASS-2"
+      ],
+      [
+        "Back home",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "此版只画免费旅行的可用章页；第二故乡设定在收费扩展。地图Me仍Profile入口，再进Collections/Passport。"
+  },
+  {
+    "id": "PASS-2",
+    "title": "每城三档 · 下个目标",
+    "scene": "map",
+    "heading": "Tokyo",
+    "meta": "Visited · 1 visit",
+    "rows": [
+      [
+        "Visited · arrived once",
+        "Stamp collected",
+        "i-stamp"
+      ],
+      [
+        "Regular · 1/5 visits · 0/3 local trades",
+        "Local trades count once per city per day",
+        "i-home"
+      ],
+      [
+        "Local · 10 visits",
+        "Catch both regional fish + learn a regional recipe",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Show local pond",
+        "MAP-8-FREE",
+        "soft"
+      ]
+    ],
+    "note": "§11.9.1/11.5.3：Visited→Regular(5访+3本地交付/交易)→Local(10访+2地区鱼+本带配方)。实际交易计数须主方案统一，免费版先展示进度。"
+  },
+  {
+    "id": "TRAVEL-RETRY",
+    "title": "出发失败 · 未到达",
+    "scene": "map",
+    "heading": "Couldn’t start the trip",
+    "meta": "You’re still in Shanghai.",
+    "rows": [
+      [
+        "Your destination is saved",
+        "Try again when connected.",
+        "i-map"
+      ]
+    ],
+    "actions": [
+      [
+        "Retry",
+        "MAP-5-FREE"
+      ],
+      [
+        "Not now",
+        "MAP-3-FREE",
+        "soft"
+      ]
+    ],
+    "note": "失败不盖章、不揭雾、不写首访。未知成功先查询同一旅行状态，Retry不创建双旅行。"
+  },
+  {
+    "id": "TRAVEL-RECONNECT",
+    "title": "重连 · 回到到达状态",
+    "scene": "map",
+    "heading": "Arrived in Tokyo",
+    "meta": "Your trip is ready to continue.",
+    "actions": [
+      [
+        "Land",
+        "MAP-6-FREE"
+      ]
+    ],
+    "foot": "Your stamp and rewards are granted once.",
+    "note": "恢复服务端旅程；已到账奖励只回显，不再发。免费短过渡可能遇到重连，不能因重启回家重跑首访。"
+  },
+  {
+    "id": "FOG-THREE",
+    "title": "迷雾三态 · 复用地图",
+    "scene": "map",
+    "heading": "A world you’ve visited",
+    "rows": [
+      [
+        "Unexplored",
+        "Names and people visible · service silhouettes",
+        "i-question"
+      ],
+      [
+        "Explored",
+        "Full color · pond and outpost entries",
+        "i-stamp"
+      ],
+      [
+        "Second Home",
+        "Full color · home crest · free travel",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Browse a city",
+        "MAP-3-FREE",
+        "soft"
+      ]
+    ],
+    "note": "三态样式页；第二故乡标为P2后续，免费首版不开放设定流程。POI只亮灯和只读名片，不成为岗位商店。"
+  }
+]

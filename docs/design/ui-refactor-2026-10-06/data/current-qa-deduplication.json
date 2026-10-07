@@ -1,0 +1,18 @@
+{
+  "changedAt": "2026-10-06T09:34:30.683290+00:00",
+  "ids": [
+    "TUT-3-END",
+    "MAT-2",
+    "CRAFT-2",
+    "CRAFT-3",
+    "CRAFT-4",
+    "COOK-P1-6"
+  ],
+  "rules": [
+    "One fact appears once: a dedicated header quantity or per-row timer supersedes its repeated fact.",
+    "Zero coin fees are secondary details.",
+    "Gather Gloves benefit stays in its effect line."
+  ],
+  "originalSnapshotsPreserved": true,
+  "source": "Actual row13–15 screenshots; COOK-P1-6 same explicit header/output duplication found in source."
+}

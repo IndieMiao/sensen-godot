@@ -1,0 +1,31 @@
+{
+  "applied": true,
+  "successfulReceipts": [
+    "overlay-dedup-0-result.json",
+    "overlay-dedup-20-result.json",
+    "overlay-dedup-40-result.json",
+    "overlay-dedup-60-result.json",
+    "overlay-dedup-round2-0-result.json"
+  ],
+  "resolvedAliases": 138,
+  "liveStateFiles": [
+    {
+      "file": "state.json",
+      "pointerChanges": 0,
+      "contentChanged": true,
+      "beforeSHA256": "dc6fa17c6eca494f4d7a1df161edfddd0b900786fd604a2c23c7b15ac700ba0b",
+      "afterSHA256": "857a046b4d0b52b913436c2715e78ae80f77a89fb61f35ca5946d1965af94b29"
+    },
+    {
+      "file": "avatar/state.json",
+      "pointerChanges": 0,
+      "contentChanged": false,
+      "beforeSHA256": "b5375cbc983c8da860327230faf48011af79bcd2d336b9a9d486ba9c8000cdd1",
+      "afterSHA256": "b5375cbc983c8da860327230faf48011af79bcd2d336b9a9d486ba9c8000cdd1"
+    }
+  ],
+  "pointerChangeCount": 0,
+  "changes": [],
+  "historicalReceiptsChanged": false,
+  "sourceDataChanged": false
+}

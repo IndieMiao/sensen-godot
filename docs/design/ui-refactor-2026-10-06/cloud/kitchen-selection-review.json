@@ -1,0 +1,70 @@
+{
+  "reviewedAt": "2026-10-06T07:56:56.295641+00:00",
+  "capture": "Fresh Figma screenshot maxDimension1600, exact360x800 return; each local PNG viewed at original detail",
+  "cloudWrites": false,
+  "records": [
+    {
+      "id": "COOK-2a",
+      "nodeId": "482:74",
+      "png": "COOK-2a.png",
+      "sha256": "5d0b870a256c11b99f7e349d65362c3919ffd43935b4d1bf7f76caba34989a77",
+      "size": [
+        360,
+        800
+      ],
+      "inspected": true,
+      "nativeGridCells": 25,
+      "status": "needs-selection-layout-fix",
+      "findings": [
+        "All 25 grid cells exist natively, but the entire grid begins below the first viewport.",
+        "The material ring is clipped at the viewport bottom; have/need is not readable initially.",
+        "This cook 2 Cooking XP repeats in content and the fixed footer."
+      ]
+    },
+    {
+      "id": "COOK-2b",
+      "nodeId": "482:78",
+      "png": "COOK-2b.png",
+      "sha256": "6409fbe0035e956a860e983a817152e3ca104602f09a1c0bc93c4a78c38e8f75",
+      "size": [
+        360,
+        800
+      ],
+      "inspected": true,
+      "nativeGridCells": 20,
+      "status": "needs-selection-layout-fix",
+      "findings": [
+        "All 20 grid cells exist; only one full row is initially visible.",
+        "Pond Crucian and Wild Herb selected slots render question marks despite known identities.",
+        "The Koi cell leaks the technical word Silhouette and breaks it midword. Source HTML marks this ornamental fish Not for cooking.",
+        "The authored 15-second cook time is absent from the visible decision area."
+      ]
+    },
+    {
+      "id": "COOK-P0-2",
+      "nodeId": "482:261",
+      "png": "COOK-P0-2.png",
+      "sha256": "370a73fde5ee05d9b22154270a0ac3eb68c29bff7842bc850e17f30d9e9d78d8",
+      "size": [
+        360,
+        800
+      ],
+      "inspected": true,
+      "nativeGridCells": 5,
+      "status": "needs-selection-layout-fix",
+      "findings": [
+        "Selected1/2, the locked third slot, all five candidates, +20 Energy and Cook are visible.",
+        "The authored 5-second cooking time is absent."
+      ]
+    }
+  ],
+  "plannedPatch": "figma-plugin/kitchen-selection-fixes.js",
+  "patchStatus": "syntax-checked, not yet applied or visually accepted",
+  "sourceGrounding": [
+    "COOK-2b source HTML explicitly previews Fine / 15s / Unknown dish; do not reveal Herb Grilled Fish or assume40 Energy before discovery.",
+    "COOK-2a source grid25; COOK-2b source grid20 with two actual in-pot ingredients plus Cooking Lv4 lock."
+  ],
+  "limits": [
+    "Read-only screenshot/metadata audit; no prototype clicks or completed cooking transaction tested."
+  ]
+}

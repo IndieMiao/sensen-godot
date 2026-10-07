@@ -1,0 +1,323 @@
+{
+  "version": 1,
+  "review_date": "2026-10-06",
+  "scope": {
+    "target_total_cards": 288,
+    "flow_data_records_reviewed": 204,
+    "current_figma_screenshots_reviewed": 20,
+    "older_reference_screenshots_viewed": 3,
+    "screen_reader_keyboard_runtime_tested": false
+  },
+  "component_contract": {
+    "entity_row": {
+      "identity": "Object name only; 1–2 lines; fixed semantic role",
+      "quantity": "Independent value+unit; trailing alignment; tabular figures",
+      "status": "One badge; optional; not concatenated with title",
+      "category": "Optional type/source; supporting text",
+      "outcome": "Decision-critical benefit or effect; prominent before cost",
+      "cost": "All consumed resources and total amount; independent group",
+      "action": "Explicit enum; never inferred from placement"
+    },
+    "action_types": [
+      "commit",
+      "navigate",
+      "dismiss",
+      "destructive",
+      "selection",
+      "worldAction"
+    ],
+    "visual_anchor": {
+      "font": "Nunito",
+      "surface": "warm cream",
+      "shape": "rounded source family",
+      "icons": "reuse approved original SVG and content IDs",
+      "bag_columns": 5,
+      "gear_slots": 6,
+      "quick_slots": "5 + Bag"
+    },
+    "proposed_360_scale": {
+      "heading": 20,
+      "body": 14,
+      "support": 12,
+      "touch_target": 44,
+      "normal_text_contrast": 4.5,
+      "nontext_contrast": 3
+    }
+  },
+  "checks": [
+    {
+      "id": "SEM-01",
+      "priority": "critical",
+      "scope": "All entity rows",
+      "rule": "Title contains object identity only",
+      "verification": "property schema + visual",
+      "pass_criteria": "0 titles contain quantity, price, owned/needed ratio, source/state label or action text; legitimate object numbers such as Stove 1 are allowed"
+    },
+    {
+      "id": "SEM-02",
+      "priority": "critical",
+      "scope": "Item, need, equipment, destination rows",
+      "rule": "Quantity has a dedicated right-aligned value/unit slot",
+      "verification": "property schema + visual",
+      "pass_criteria": "100% counts, limits, balance deltas, timers are separate from title; no unexplained numerator/denominator"
+    },
+    {
+      "id": "SEM-03",
+      "priority": "critical",
+      "scope": "Every commit sheet",
+      "rule": "User can identify outcome before costs and commit",
+      "verification": "manual 5-second scan",
+      "pass_criteria": "Exactly one prominent outcome group shows item/effect/quantity; no unique core benefit appears only in footnotes"
+    },
+    {
+      "id": "SEM-04",
+      "priority": "critical",
+      "scope": "Purchase, craft, travel, replacement, gift",
+      "rule": "Costs, recipient and consequences remain visible before commitment",
+      "verification": "per-flow data comparison",
+      "pass_criteria": "100% consumed coin/Energy/material/ticket quantities, actual gain, recipient and destructive/lock duration shown before submission"
+    },
+    {
+      "id": "SEM-05",
+      "priority": "high",
+      "scope": "All content",
+      "rule": "Remove rule repetition from primary reading order",
+      "verification": "manual",
+      "pass_criteria": "No duplicate same fact in header/body/footer; general fulfilled conditions moved to details unless decision-critical"
+    },
+    {
+      "id": "ACT-01",
+      "priority": "critical",
+      "scope": "All interactive nodes",
+      "rule": "Every action declares one semantic type",
+      "verification": "action manifest",
+      "pass_criteria": "100% actions classified commit/navigate/dismiss/destructive/selection/worldAction; no implicit first-array-item style"
+    },
+    {
+      "id": "ACT-02",
+      "priority": "critical",
+      "scope": "All navigate nodes",
+      "rule": "Information navigation uses a chevron row/link treatment",
+      "verification": "component inspection",
+      "pass_criteria": "0 pure-navigation actions use filled commit component; destination name explicit"
+    },
+    {
+      "id": "ACT-03",
+      "priority": "critical",
+      "scope": "All commit sheets",
+      "rule": "One main state-changing CTA",
+      "verification": "component count",
+      "pass_criteria": "At most 1 primary commit per focused decision; inline Equip/row item choices documented exceptions"
+    },
+    {
+      "id": "ACT-04",
+      "priority": "critical",
+      "scope": "Cancel and destructive flows",
+      "rule": "Cancel destination and consequences are explicit",
+      "verification": "prototype + data review",
+      "pass_criteria": "Cancel/dismiss never submits; destructive confirmation carries target and refund/loss summary; no guide-like ambiguous cancel control"
+    },
+    {
+      "id": "ACT-05",
+      "priority": "critical",
+      "scope": "All flow screens",
+      "rule": "Remove fake storyboard progression from device viewport",
+      "verification": "text and action scan",
+      "pass_criteria": "0 Tap Stove, Tap pot, After collecting continue, View progress after interaction, Return after making room pseudo-actions; review navigation outside device"
+    },
+    {
+      "id": "ACT-06",
+      "priority": "high",
+      "scope": "Scene interaction",
+      "rule": "Actual objects/controls own their interactions",
+      "verification": "hotspot inspection",
+      "pass_criteria": "Stove/pot/heat action targets match visible control; no duplicate bottom CTA for same scene action"
+    },
+    {
+      "id": "ACT-07",
+      "priority": "critical",
+      "scope": "Energy Card",
+      "rule": "Only facts and navigation, never preselected consumption",
+      "verification": "data/action scan",
+      "pass_criteria": "Eat/Cook/Tea/Rest entries navigate to relevant source; 0 predicted Eat +40 or direct Rest executions from Energy Card"
+    },
+    {
+      "id": "ACT-08",
+      "priority": "critical",
+      "scope": "Skill locks",
+      "rule": "Locked object remains inspectable",
+      "verification": "prototype check",
+      "pass_criteria": "Locked row opens four-facts gate card; reason, progress, outcome visible; no dead gray-only locked row"
+    },
+    {
+      "id": "STATE-01",
+      "priority": "high",
+      "scope": "All affected component variants",
+      "rule": "State has dedicated visual/semantic slot",
+      "verification": "variant schema",
+      "pass_criteria": "Each family includes relevant default, selected, loading, empty, blocked, completed, failure states; impossible combinations prevented"
+    },
+    {
+      "id": "STATE-02",
+      "priority": "critical",
+      "scope": "Bag, stove, trap, parcels",
+      "rule": "Capacity failure preserves and locates items",
+      "verification": "scenario review",
+      "pass_criteria": "Full states identify exact remaining location; zero fabricated loss, overwrite, cash conversion or cross-container bypass"
+    },
+    {
+      "id": "STATE-03",
+      "priority": "critical",
+      "scope": "Repeat submissions",
+      "rule": "Pending and completed are distinct",
+      "verification": "prototype contract",
+      "pass_criteria": "Pending disables duplicate submit; completed is feedback/status; retry does not imply repeated charge/reward"
+    },
+    {
+      "id": "STATE-04",
+      "priority": "high",
+      "scope": "Toasts",
+      "rule": "Single short message with recovery when useful",
+      "verification": "component + manual",
+      "pass_criteria": "One toast at a time, duplicate event deduplicated, icon + text; no hidden mandatory costs or permanent rules only in toast"
+    },
+    {
+      "id": "TYPE-01",
+      "priority": "high",
+      "scope": "360-wide design cards",
+      "rule": "Readable semantic type scale",
+      "verification": "node style inspection",
+      "pass_criteria": "Body >=14 px; primary heading >=20 px; supporting text >=12 px; any compact HUD exception listed and tested on device, never for unique critical info"
+    },
+    {
+      "id": "TYPE-02",
+      "priority": "high",
+      "scope": "All text",
+      "rule": "Long content wraps without shrinking",
+      "verification": "layout stress test",
+      "pass_criteria": "At +30% label length and two-line object name: no overlap/crop, no font-size reduction below token, quantity remains aligned"
+    },
+    {
+      "id": "A11Y-01",
+      "priority": "high",
+      "scope": "Body and button text",
+      "rule": "Normal text color contrast >=4.5:1",
+      "verification": "token contrast calculation + final screenshot spot check",
+      "pass_criteria": "All enabled text/CTA labels >=4.5:1 against worst background/gradient endpoint"
+    },
+    {
+      "id": "A11Y-02",
+      "priority": "high",
+      "scope": "Controls and state cues",
+      "rule": "Critical icon/boundary contrast >=3:1 and non-color cue",
+      "verification": "token + visual",
+      "pass_criteria": "Selected/short/locked/error states carry shape/icon/text; color alone never communicates result"
+    },
+    {
+      "id": "A11Y-03",
+      "priority": "high",
+      "scope": "Interactive controls",
+      "rule": "Touch target >=44x44 at 360 scale",
+      "verification": "node bounds inspection",
+      "pass_criteria": "100% close/icon/link/action hit regions >=44x44; small visual icon may sit within expanded transparent region"
+    },
+    {
+      "id": "LAY-01",
+      "priority": "high",
+      "scope": "Sheets and drawers",
+      "rule": "Predictable spacing and reading order",
+      "verification": "auto-layout inspection",
+      "pass_criteria": "Shared spacing tokens; identity/outcome/cost/action in order; no entire scene shrink to preserve tiny panel"
+    },
+    {
+      "id": "LAY-02",
+      "priority": "high",
+      "scope": "Bag/Gear",
+      "rule": "Retain original recognizable shell",
+      "verification": "side-by-side source comparison",
+      "pass_criteria": "Cream drawer, five-column Bag, six-slot Gear, Quick Bar, Nunito and icon palette preserved; semantic improvements documented"
+    },
+    {
+      "id": "LAY-03",
+      "priority": "high",
+      "scope": "HUD/world actions",
+      "rule": "Retain source interaction model",
+      "verification": "source-rule comparison",
+      "pass_criteria": "Two-row HUD/location map entry; five consumables + Bag; 176 source-unit action circle; facility rooms do not gain Cook/Shop world button"
+    },
+    {
+      "id": "SYS-01",
+      "priority": "critical",
+      "scope": "288 page inventory",
+      "rule": "Every source card has a migration mapping",
+      "verification": "manifest join",
+      "pass_criteria": "288/288 listed with source and target IDs/files, status, family and relevant state; no silent omissions or duplicate active authority"
+    },
+    {
+      "id": "SYS-02",
+      "priority": "critical",
+      "scope": "Old 01–06 screenshot cards",
+      "rule": "Editable reconstruction, not screenshot tracing overlay",
+      "verification": "node tree inspection",
+      "pass_criteria": "Player UI labels/buttons/panels/grids are editable instances; only scene/art bitmaps allowed; original screenshots kept as comparison references"
+    },
+    {
+      "id": "SYS-03",
+      "priority": "high",
+      "scope": "All shared controls",
+      "rule": "Reusable components expose semantic props",
+      "verification": "component dependency inspection",
+      "pass_criteria": "EntityRow has Identity/Quantity/Status/Outcome/Action; controls instantiated; no detached local copies for routine text/quantity changes"
+    },
+    {
+      "id": "SYS-04",
+      "priority": "high",
+      "scope": "Component changes",
+      "rule": "One master edit propagates predictably",
+      "verification": "sample propagation check",
+      "pass_criteria": "Change component label/type spacing in master, verify at least 3 families, restore; no stale local overrides"
+    },
+    {
+      "id": "FLOW-01",
+      "priority": "critical",
+      "scope": "All real product routes",
+      "rule": "Navigation and commitment reflect product behavior",
+      "verification": "reaction manifest + walkthrough",
+      "pass_criteria": "No one-click condition/time fast-forward in player UI; all navigation destinations exist; back returns to source"
+    },
+    {
+      "id": "FLOW-02",
+      "priority": "critical",
+      "scope": "Economy examples",
+      "rule": "Before/after facts reconcile",
+      "verification": "data review",
+      "pass_criteria": "Costs equal balance/inventory changes, canceled action no charge, refund once, capacity counts consistent"
+    },
+    {
+      "id": "RULE-01",
+      "priority": "critical",
+      "scope": "Known unresolved rules",
+      "rule": "Do not convert open decisions into approved behavior",
+      "verification": "source reference check",
+      "pass_criteria": "Every unresolved rule labeled outside player viewport and linked to OPEN-ITEMS; no invented numeric recipe/unlock/refund"
+    },
+    {
+      "id": "QA-01",
+      "priority": "high",
+      "scope": "All rebuilt families",
+      "rule": "Final screenshots prove current result",
+      "verification": "new capture manifest",
+      "pass_criteria": "Every family/state has final screenshot and inspected status; audit before-captures never counted as final QA"
+    },
+    {
+      "id": "QA-02",
+      "priority": "high",
+      "scope": "Accessibility and runtime",
+      "rule": "Report evidence boundary",
+      "verification": "handoff review",
+      "pass_criteria": "Static design checks separated from keyboard/screen-reader/touch/network/runtime checks; no unsupported compliance claim"
+    }
+  ],
+  "evidence_manifest": "data/audit-evidence.json",
+  "audit": "AUDIT.md"
+}

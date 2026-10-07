@@ -1,0 +1,3512 @@
+[
+  {
+    "id": "HOME-LV4",
+    "sourceGroup": "12",
+    "title": "Homestead",
+    "state": "Level 4",
+    "effect": "Cook on two stoves at once.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Energy limit",
+        "value": "230"
+      },
+      {
+        "kind": "capacity",
+        "label": "Plots",
+        "value": "320"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "230 Energy · 320 plots",
+      "Two dishes at once",
+      "Homestead Lv4"
+    ],
+    "actions": [
+      {
+        "label": "View kitchen",
+        "target": "COOK-P1-1",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-lv3",
+    "layout": "sheet",
+    "sourceNote": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HOME-LV4",
+      "nodeId": "441:5369",
+      "designLabel": "农场Lv4 · 可见后果"
+    },
+    "original": {
+      "id": "HOME-LV4",
+      "title": "农场Lv4 · 可见后果",
+      "heading": "Second Stove",
+      "meta": "230 Energy · 320 plots",
+      "rows": [
+        [
+          "Two dishes at once",
+          "Homestead Lv4",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "View kitchen",
+          "COOK-P1-1",
+          "soft"
+        ]
+      ],
+      "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+      "capacity": 230,
+      "scene": "farm-lv3"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "HOME-LV5",
+    "sourceGroup": "12",
+    "title": "Homestead",
+    "state": "Level 5",
+    "effect": "A new Notice Board and porch welcome visitors.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Energy limit",
+        "value": "240"
+      },
+      {
+        "kind": "capacity",
+        "label": "Plots",
+        "value": "360"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "240 Energy · 360 plots",
+      "A place for visitors",
+      "Homestead Lv5"
+    ],
+    "actions": [
+      {
+        "label": "View farm",
+        "target": "FAC-1",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-lv3",
+    "layout": "sheet",
+    "sourceNote": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HOME-LV5",
+      "nodeId": "441:5429",
+      "designLabel": "农场Lv5 · 可见后果"
+    },
+    "original": {
+      "id": "HOME-LV5",
+      "title": "农场Lv5 · 可见后果",
+      "heading": "Notice Board + porch",
+      "meta": "240 Energy · 360 plots",
+      "rows": [
+        [
+          "A place for visitors",
+          "Homestead Lv5",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "View farm",
+          "FAC-1",
+          "soft"
+        ]
+      ],
+      "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+      "capacity": 240,
+      "scene": "farm-lv3"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 240,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "HOME-LV6",
+    "sourceGroup": "12",
+    "title": "Homestead",
+    "state": "Level 6",
+    "effect": "Cook two portions with the Big Pot.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Energy limit",
+        "value": "250"
+      },
+      {
+        "kind": "capacity",
+        "label": "Portions per cook",
+        "value": "2"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "250 Energy · Bag Upgrade II available",
+      "Two portions per cook",
+      "Homestead Lv6"
+    ],
+    "actions": [
+      {
+        "label": "View kitchen",
+        "target": "COOK-P1-1",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-lv3",
+    "layout": "sheet",
+    "sourceNote": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HOME-LV6",
+      "nodeId": "441:5489",
+      "designLabel": "农场Lv6 · 可见后果"
+    },
+    "original": {
+      "id": "HOME-LV6",
+      "title": "农场Lv6 · 可见后果",
+      "heading": "Big Pot · Double",
+      "meta": "250 Energy · Bag Upgrade II available",
+      "rows": [
+        [
+          "Two portions per cook",
+          "Homestead Lv6",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "View kitchen",
+          "COOK-P1-1",
+          "soft"
+        ]
+      ],
+      "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+      "capacity": 250,
+      "scene": "farm-lv3"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 250,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "HOME-LV7",
+    "sourceGroup": "12",
+    "title": "Homestead",
+    "state": "Level 7",
+    "effect": "Your orchard and sprinkler limits increase.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Energy limit",
+        "value": "260"
+      },
+      {
+        "kind": "capacity",
+        "label": "Orchard",
+        "value": "8"
+      },
+      {
+        "kind": "capacity",
+        "label": "Sprinklers",
+        "value": "10"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "260 Energy · 450 plots",
+      "Your growing space reaches new limits",
+      "Homestead Lv7"
+    ],
+    "actions": [
+      {
+        "label": "View farm",
+        "target": "FAC-1",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-orchard",
+    "layout": "sheet",
+    "sourceNote": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HOME-LV7",
+      "nodeId": "441:5549",
+      "designLabel": "农场Lv7 · 可见后果"
+    },
+    "original": {
+      "id": "HOME-LV7",
+      "title": "农场Lv7 · 可见后果",
+      "heading": "Orchard 8/8 · Sprinklers 10/10",
+      "meta": "260 Energy · 450 plots",
+      "rows": [
+        [
+          "Your growing space reaches new limits",
+          "Homestead Lv7",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "View farm",
+          "FAC-1",
+          "soft"
+        ]
+      ],
+      "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+      "capacity": 260,
+      "scene": "farm-orchard"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 260,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "HOME-LV8",
+    "sourceGroup": "12",
+    "title": "Homestead",
+    "state": "Level 8",
+    "effect": "A third stove and a larger cabinet expand your kitchen.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Energy limit",
+        "value": "270"
+      },
+      {
+        "kind": "capacity",
+        "label": "Plots",
+        "value": "500"
+      },
+      {
+        "kind": "capacity",
+        "label": "Cabinet",
+        "value": "12"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "270 Energy · 500 plots",
+      "A bigger kitchen and refreshed stall",
+      "Homestead Lv8"
+    ],
+    "actions": [
+      {
+        "label": "View kitchen",
+        "target": "COOK-P1-1",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-lv3",
+    "layout": "sheet",
+    "sourceNote": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HOME-LV8",
+      "nodeId": "441:5609",
+      "designLabel": "农场Lv8 · 可见后果"
+    },
+    "original": {
+      "id": "HOME-LV8",
+      "title": "农场Lv8 · 可见后果",
+      "heading": "Third Stove · cabinet 12",
+      "meta": "270 Energy · 500 plots",
+      "rows": [
+        [
+          "A bigger kitchen and refreshed stall",
+          "Homestead Lv8",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "View kitchen",
+          "COOK-P1-1",
+          "soft"
+        ]
+      ],
+      "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+      "capacity": 270,
+      "scene": "farm-lv3"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 270,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "HOME-LV9",
+    "sourceGroup": "12",
+    "title": "Homestead",
+    "state": "Level 9",
+    "effect": "Bag Upgrade III is now available to buy.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Energy limit",
+        "value": "280"
+      },
+      {
+        "kind": "capacity",
+        "label": "Plots",
+        "value": "550"
+      },
+      {
+        "kind": "capacity",
+        "label": "After bag purchase",
+        "value": "40 slots"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "280 Energy · 550 plots",
+      "40 slots after purchase",
+      "Homestead Lv9"
+    ],
+    "actions": [
+      {
+        "label": "View farm",
+        "target": "FAC-1",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-lv3",
+    "layout": "sheet",
+    "sourceNote": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HOME-LV9",
+      "nodeId": "441:5669",
+      "designLabel": "农场Lv9 · 可见后果"
+    },
+    "original": {
+      "id": "HOME-LV9",
+      "title": "农场Lv9 · 可见后果",
+      "heading": "Bag Upgrade III available",
+      "meta": "280 Energy · 550 plots",
+      "rows": [
+        [
+          "40 slots after purchase",
+          "Homestead Lv9",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "View farm",
+          "FAC-1",
+          "soft"
+        ]
+      ],
+      "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+      "capacity": 280,
+      "scene": "farm-lv3"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 280,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "HOME-LV10",
+    "sourceGroup": "12",
+    "title": "Homestead",
+    "state": "Level 10",
+    "effect": "Show your Homestead Master title and Chef's Sign.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Energy limit",
+        "value": "290"
+      },
+      {
+        "kind": "capacity",
+        "label": "Plots",
+        "value": "600"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "290 Energy · 600 plots",
+      "Chef’s Sign · gold collection frame",
+      "Homestead Lv10"
+    ],
+    "actions": [
+      {
+        "label": "View kitchen",
+        "target": "COOK-P1-1",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-lv3",
+    "layout": "sheet",
+    "sourceNote": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HOME-LV10",
+      "nodeId": "441:5729",
+      "designLabel": "农场Lv10 · 可见后果"
+    },
+    "original": {
+      "id": "HOME-LV10",
+      "title": "农场Lv10 · 可见后果",
+      "heading": "Homestead Master",
+      "meta": "290 Energy · 600 plots",
+      "rows": [
+        [
+          "Chef’s Sign · gold collection frame",
+          "Homestead Lv10",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "View kitchen",
+          "COOK-P1-1",
+          "soft"
+        ]
+      ],
+      "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+      "capacity": 290,
+      "scene": "farm-lv3"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 290,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "MINE-3",
+    "sourceGroup": "12",
+    "title": "The mine",
+    "state": "Floor 3",
+    "effect": "Mine the rocks or switch to Combat.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Per rock",
+        "value": "2 Energy"
+      },
+      {
+        "kind": "progress",
+        "label": "Rocks",
+        "value": "6"
+      },
+      {
+        "kind": "progress",
+        "label": "Slimes",
+        "value": "1"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "6 rocks · 1 Slime",
+      "Mining · 2 Energy per rock",
+      "Combat · Attack · no Energy"
+    ],
+    "actions": [
+      {
+        "label": "Switch to Combat",
+        "kind": "navigate",
+        "target": "COMBAT-1",
+        "context": {
+          "operation": "select-action-mode",
+          "mode": "Combat",
+          "resourceMutation": false
+        }
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "mine",
+    "layout": "scene",
+    "sourceNote": "3层首次到达仍Mining；怪可不打，下层看6岩全碎。玩家主动切Combat；上层已清才能付2到新层。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MINE-3",
+      "nodeId": "441:5789",
+      "designLabel": "第三层 · 行动选择"
+    },
+    "original": {
+      "id": "MINE-3",
+      "title": "第三层 · 行动选择",
+      "heading": "Mine · Floor 3",
+      "meta": "6 rocks · 1 Slime",
+      "rows": [
+        [
+          "Mining · 2 Energy per rock",
+          "Combat · Attack · no Energy",
+          "i-pickaxe"
+        ]
+      ],
+      "actions": [
+        [
+          "Switch to Combat",
+          "COMBAT-1"
+        ]
+      ],
+      "note": "3层首次到达仍Mining；怪可不打，下层看6岩全碎。玩家主动切Combat；上层已清才能付2到新层。",
+      "scene": "mine",
+      "place": "Mine · Floor 3"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Mine · Floor 3",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Mine · Floor 3",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": false,
+      "suppressDecisionArea": true
+    },
+    "sceneControls": {
+      "label": "Mine",
+      "cost": "2 Energy",
+      "icon": "i-pickaxe",
+      "quick": [],
+      "target": null,
+      "mode": "Mining"
+    }
+  },
+  {
+    "id": "COMBAT-1",
+    "sourceGroup": "12",
+    "title": "Wooden Sword",
+    "state": "Combat",
+    "effect": "Attack the Slime and dodge its leap.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "HP",
+        "value": "70%"
+      },
+      {
+        "kind": "progress",
+        "label": "Attack",
+        "value": "3"
+      },
+      {
+        "kind": "cost",
+        "label": "Attack",
+        "value": "Free"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "HP · 70%",
+      "Attack · no Energy used",
+      "Move to avoid the Slime’s leap."
+    ],
+    "actions": [
+      {
+        "label": "Attack",
+        "target": "COMBAT-LOOT",
+        "kind": "commit"
+      },
+      {
+        "label": "Use Healing Potion",
+        "target": "COMBAT-HEAL",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "mine",
+    "layout": "scene",
+    "sourceNote": "主行动键剑徽标Attack，Combat快捷栏仅药水；木剑史莱姆3击/精英12击，镐不参与。此为状态截帧不模拟实时战斗。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COMBAT-1",
+      "nodeId": "441:5849",
+      "designLabel": "Combat · 武器与HP"
+    },
+    "original": {
+      "id": "COMBAT-1",
+      "title": "Combat · 武器与HP",
+      "heading": "Wooden Sword · Attack 3",
+      "meta": "HP · 70%",
+      "rows": [
+        [
+          "Attack · no Energy used",
+          "Move to avoid the Slime’s leap.",
+          "i-sword"
+        ]
+      ],
+      "actions": [
+        [
+          "Attack",
+          "COMBAT-LOOT"
+        ],
+        [
+          "Use Healing Potion",
+          "COMBAT-HEAL",
+          "soft"
+        ]
+      ],
+      "note": "主行动键剑徽标Attack，Combat快捷栏仅药水；木剑史莱姆3击/精英12击，镐不参与。此为状态截帧不模拟实时战斗。",
+      "scene": "mine",
+      "place": "Mine · Floor 3"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Mine · Floor 3",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Mine · Floor 3",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": false
+    },
+    "sceneControls": {
+      "label": "Attack",
+      "cost": "Free",
+      "icon": "i-sword",
+      "quick": [
+        {
+          "title": "Healing Potion",
+          "icon": "i-feed-bag",
+          "quantity": {
+            "value": "2",
+            "label": "Owned"
+          }
+        }
+      ],
+      "target": "COMBAT-LOOT",
+      "mode": "Combat"
+    }
+  },
+  {
+    "id": "COMBAT-LOOT",
+    "sourceGroup": "12",
+    "title": "Slime",
+    "state": "Defeated",
+    "effect": "Your loot has been collected.",
+    "keyFacts": [
+      {
+        "kind": "reward",
+        "label": "Copper Ore",
+        "value": "1"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "No Energy used · no skill XP",
+      "Copper Ore ×1",
+      "Added to your materials"
+    ],
+    "actions": [
+      {
+        "label": "Back to Mining",
+        "target": "MINE-3",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "mine",
+    "layout": "sheet",
+    "sourceNote": "随机示例非必掉铜；35铜/25盐/40蚯蚓。种子/亮片/Rare装备不进此掉落池。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COMBAT-LOOT",
+      "nodeId": "441:5912",
+      "designLabel": "击败 · 材料掉落"
+    },
+    "original": {
+      "id": "COMBAT-LOOT",
+      "title": "击败 · 材料掉落",
+      "heading": "Slime defeated",
+      "meta": "No Energy used · no skill XP",
+      "rows": [
+        [
+          "Copper Ore ×1",
+          "Added to your materials",
+          "i-copper"
+        ]
+      ],
+      "actions": [
+        [
+          "Back to Mining",
+          "MINE-4",
+          "soft"
+        ]
+      ],
+      "note": "随机示例非必掉铜；35铜/25盐/40蚯蚓。种子/亮片/Rare装备不进此掉落池。",
+      "scene": "mine",
+      "place": "Mine · Floor 3"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Mine · Floor 3",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Mine · Floor 3",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "COMBAT-HEAL",
+    "sourceGroup": "12",
+    "title": "Healing Potion",
+    "state": "Used",
+    "effect": "Your HP is restored.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Healing Potion",
+        "value": "1"
+      },
+      {
+        "kind": "progress",
+        "label": "HP",
+        "value": "Full"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Healing Potion ×1 used",
+      "Your Energy is unchanged",
+      "Meals recover Energy, not HP."
+    ],
+    "actions": [
+      {
+        "label": "Back to Combat",
+        "target": "COMBAT-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "mine",
+    "layout": "sheet",
+    "sourceNote": "药水只3–5层，HP满不消耗；治疗0体力。药水购买来源在据点，非工作台。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COMBAT-HEAL",
+      "nodeId": "441:5973",
+      "designLabel": "药水 · 只回HP"
+    },
+    "original": {
+      "id": "COMBAT-HEAL",
+      "title": "药水 · 只回HP",
+      "heading": "HP restored",
+      "meta": "Healing Potion ×1 used",
+      "rows": [
+        [
+          "Your Energy is unchanged",
+          "Meals recover Energy, not HP.",
+          "i-energy"
+        ]
+      ],
+      "actions": [
+        [
+          "Back to Combat",
+          "COMBAT-1",
+          "soft"
+        ]
+      ],
+      "note": "药水只3–5层，HP满不消耗；治疗0体力。药水购买来源在据点，非工作台。",
+      "scene": "mine",
+      "place": "Mine · Floor 3"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Mine · Floor 3",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Mine · Floor 3",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "MINE-4",
+    "sourceGroup": "12",
+    "title": "The mine",
+    "state": "Floor 4 cleared",
+    "effect": "Express travel to Floor 5 is now unlocked.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Rocks",
+        "value": "6/6"
+      },
+      {
+        "kind": "cost",
+        "label": "Floor 5 Express",
+        "value": "Free"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "6/6 rocks · Elevator stop",
+      "Express unlocked",
+      "Floor 5 · Express · Free"
+    ],
+    "actions": [
+      {
+        "label": "Floor 5",
+        "target": "MINE-5-ARRIVAL",
+        "kind": "commit"
+      },
+      {
+        "label": "Entrance",
+        "target": "HOME-RETURN",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "mine",
+    "layout": "sheet",
+    "sourceNote": "曾清4层账号级解锁Express，整程0，不另收第5层层费；当日两局上限仍生效。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MINE-4",
+      "nodeId": "441:6032",
+      "designLabel": "第四层 · 清层与Express"
+    },
+    "original": {
+      "id": "MINE-4",
+      "title": "第四层 · 清层与Express",
+      "heading": "Floor 4 cleared",
+      "meta": "6/6 rocks · Elevator stop",
+      "rows": [
+        [
+          "Express unlocked",
+          "Floor 5 · Express · Free",
+          "i-travel"
+        ]
+      ],
+      "actions": [
+        [
+          "Floor 5 · Express · Free",
+          "MINE-5"
+        ],
+        [
+          "Entrance · Free",
+          "HOME-RETURN",
+          "soft"
+        ]
+      ],
+      "note": "曾清4层账号级解锁Express，整程0，不另收第5层层费；当日两局上限仍生效。",
+      "scene": "mine",
+      "place": "Mine · Floor 4"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Mine · Floor 4",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Mine · Floor 4",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Entering Floor 5 leads only to the arrived/elite-not-defeated state. It must not grant the MINE-5 defeated-elite loot."
+    ],
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "MINE-5",
+    "sourceGroup": "12",
+    "title": "Elite Slime",
+    "state": "Defeated",
+    "effect": "Your run is complete.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Quartz collected",
+        "value": "2"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Run complete",
+      "Quartz ×2",
+      "Quartz reward available once per day"
+    ],
+    "actions": [
+      {
+        "label": "Return to entrance",
+        "target": "HOME-RETURN",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "mine",
+    "layout": "sheet",
+    "sourceNote": "精英20%掉2石英示例，已掉过时权重转铜/盐/蚯蚓。不是每日保证石英；Express不绕过日限。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MINE-5",
+      "nodeId": "441:6099",
+      "designLabel": "精英与石英日限"
+    },
+    "original": {
+      "id": "MINE-5",
+      "title": "精英与石英日限",
+      "heading": "Elite Slime defeated",
+      "meta": "Run complete",
+      "rows": [
+        [
+          "Quartz ×2",
+          "Quartz reward available once per day",
+          "i-stone"
+        ]
+      ],
+      "actions": [
+        [
+          "Return to entrance",
+          "HOME-RETURN",
+          "soft"
+        ]
+      ],
+      "note": "精英20%掉2石英示例，已掉过时权重转铜/盐/蚯蚓。不是每日保证石英；Express不绕过日限。",
+      "scene": "mine",
+      "place": "Mine · Floor 5"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Mine · Floor 5",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Mine · Floor 5",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Quartz is an already-settled outcome in this fixture, not a reward/cost of Return to entrance. Show once in the content area."
+    ],
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "MINE-KO",
+    "sourceGroup": "12",
+    "title": "The mine",
+    "state": "Recovered",
+    "effect": "Your run is saved and your HP is restored.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "HP",
+        "value": "Full"
+      },
+      {
+        "kind": "cost",
+        "label": "Continue run",
+        "value": "Free"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Your current run is saved.",
+      "HP restored",
+      "Stored materials stay yours."
+    ],
+    "actions": [
+      {
+        "label": "Continue run",
+        "target": "MINE-3",
+        "kind": "commit"
+      },
+      {
+        "label": "Go home",
+        "target": "HOME-RETURN",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "此为击倒恢复独立状态，不能把精英Run complete链到Continue；精英完成入口应新局。正式连线拆开检查。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MINE-KO",
+      "nodeId": "441:6159",
+      "designLabel": "被击倒 · 可恢复"
+    },
+    "original": {
+      "id": "MINE-KO",
+      "title": "被击倒 · 可恢复",
+      "heading": "Back at the mine entrance",
+      "meta": "Your current run is saved.",
+      "rows": [
+        [
+          "HP restored",
+          "Stored materials stay yours.",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "Continue run · Free",
+          "MINE-3"
+        ],
+        [
+          "Go home · Free",
+          "HOME-RETURN",
+          "soft"
+        ]
+      ],
+      "note": "此为击倒恢复独立状态，不能把精英Run complete链到Continue；精英完成入口应新局。正式连线拆开检查。",
+      "scene": "farm"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "RESIDENT-TALK",
+    "sourceGroup": "12",
+    "title": "Hana",
+    "state": "Familiar",
+    "effect": "Chat or see what Hana has for you today.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Friendship",
+        "value": "52/90"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "A warm meal for a busy day",
+      "I have something fresh for you."
+    ],
+    "actions": [
+      {
+        "label": "Chat",
+        "target": "RESIDENT-CHAT",
+        "kind": "commit"
+      },
+      {
+        "label": "Today’s meal",
+        "target": "RESIDENT-MEAL",
+        "kind": "navigate"
+      },
+      {
+        "label": "Recipe lesson",
+        "target": "RESIDENT-TEACH",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "tea-house",
+    "layout": "sheet",
+    "sourceNote": "角色NPC跟岗位掌柜分开：角色谈话不直接商业Trade。熟悉45–89，赠餐全居民合计每日1份。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RESIDENT-TALK",
+      "nodeId": "441:6221",
+      "designLabel": "居民 · 对话与好感"
+    },
+    "original": {
+      "id": "RESIDENT-TALK",
+      "title": "居民 · 对话与好感",
+      "heading": "Hana · Café Owner",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "A warm meal for a busy day",
+          "I have something fresh for you.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Chat",
+          "RESIDENT-CHAT"
+        ],
+        [
+          "Today’s meal",
+          "RESIDENT-MEAL",
+          "soft"
+        ],
+        [
+          "Learn a recipe",
+          "RESIDENT-TEACH",
+          "soft"
+        ]
+      ],
+      "note": "角色NPC跟岗位掌柜分开：角色谈话不直接商业Trade。熟悉45–89，赠餐全居民合计每日1份。",
+      "scene": "tea-house",
+      "place": "Tea House"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Tea House",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Tea House",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "RESIDENT-CHAT",
+    "sourceGroup": "12",
+    "title": "Hana",
+    "state": "Chatted",
+    "effect": "Your friendship has grown.",
+    "keyFacts": [
+      {
+        "kind": "reward",
+        "label": "Friendship",
+        "value": "+2"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Hana · +2 friendship",
+      "Today’s first conversation",
+      "Friendship follows Hana across cities."
+    ],
+    "actions": [
+      {
+        "label": "Back",
+        "target": "RESIDENT-TALK",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "tea-house",
+    "layout": "sheet",
+    "sourceNote": "每日首谈每角色一次；跨城不会再次领。角色外观不随城市变，岗位掌柜才气候换装。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RESIDENT-CHAT",
+      "nodeId": "441:6288",
+      "designLabel": "每日首谈 · 好感"
+    },
+    "original": {
+      "id": "RESIDENT-CHAT",
+      "title": "每日首谈 · 好感",
+      "heading": "Good to see you again",
+      "meta": "Hana · +2 friendship",
+      "rows": [
+        [
+          "Today’s first conversation",
+          "Friendship follows Hana across cities.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Back",
+          "RESIDENT-TALK",
+          "soft"
+        ]
+      ],
+      "note": "每日首谈每角色一次；跨城不会再次领。角色外观不随城市变，岗位掌柜才气候换装。",
+      "scene": "tea-house",
+      "place": "Tea House"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Tea House",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Tea House",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "RESIDENT-MEAL",
+    "sourceGroup": "12",
+    "title": "Veggie Plate",
+    "state": "Resident meal",
+    "effect": "Receive today's meal from Hana.",
+    "quantity": {
+      "value": "1",
+      "label": "portion"
+    },
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "When eaten",
+        "value": "Up to 20 Energy"
+      },
+      {
+        "kind": "progress",
+        "label": "Resident meal today",
+        "value": "0/1"
+      },
+      {
+        "kind": "progress",
+        "label": "Destination",
+        "value": "Bag · Dishes"
+      },
+      {
+        "kind": "time",
+        "label": "Eat before",
+        "value": "04:00 · home time"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Uneaten Resident meals expire at the next 04:00 reset in your home city.",
+      "Energy is restored only when you eat the dish; receiving it does not restore Energy.",
+      "Food recovery follows your food allowance and same-dish limits.",
+      "One Resident meal per day, shared by all Residents."
+    ],
+    "actions": [
+      {
+        "label": "Accept meal",
+        "target": "RESIDENT-MEAL-DONE",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "tea-house",
+    "layout": "sheet",
+    "sourceNote": "§3.4.5实物赠餐示例：当前无保温柜且背包有空间，Veggie Plate ×1进入Bag/Dishes；有保温柜的分支按§7.7/7.16处理，不在本卡虚构柜满协议。领取不进食，HUD前后均142/200；吃后才按食物余量/同菜递减回复，下一次家城04:00前未吃失效。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RESIDENT-MEAL",
+      "nodeId": "441:6351",
+      "designLabel": "居民赠餐 · 日额度"
+    },
+    "original": {
+      "id": "RESIDENT-MEAL",
+      "title": "居民赠餐 · 日额度",
+      "heading": "Veggie Plate",
+      "meta": "Today’s Resident meal · 0/1",
+      "rows": [
+        [
+          "Common · +20 Energy",
+          "Sent to your Warming Cabinet when available",
+          "i-dish-herb"
+        ]
+      ],
+      "actions": [
+        [
+          "Accept meal",
+          "RESIDENT-MEAL-DONE"
+        ]
+      ],
+      "note": "熟悉起所有居民共享每日1份。无柜/柜满的去向按容量规则保持，不把赠餐绕成无限。",
+      "scene": "tea-house",
+      "place": "Tea House"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Tea House",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Tea House",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "energy": 142,
+      "capacity": 200
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "The displayed +20 is the dish’s maximum eating effect, never a claim reward. The food item, destination and expiry are visible; no duplicate recovery appears above Accept."
+    ],
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RESIDENT-MEAL-DONE",
+    "sourceGroup": "12",
+    "title": "Veggie Plate",
+    "state": "Received",
+    "effect": "Added to Bag · Dishes.",
+    "quantity": {
+      "value": "1",
+      "label": "portion"
+    },
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "When eaten",
+        "value": "Up to 20 Energy"
+      },
+      {
+        "kind": "progress",
+        "label": "Resident meal today",
+        "value": "1/1"
+      },
+      {
+        "kind": "time",
+        "label": "Eat before",
+        "value": "04:00 · home time"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Uneaten Resident meals expire at the next 04:00 reset in your home city.",
+      "Energy is restored only when you eat the dish; receiving it does not restore Energy.",
+      "Food recovery follows your food allowance and same-dish limits.",
+      "One Resident meal per day, shared by all Residents."
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "target": "RESIDENT-TALK-MEAL-CLAIMED",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "tea-house",
+    "layout": "sheet",
+    "sourceNote": "§3.4.5实物赠餐示例：当前无保温柜且背包有空间，Veggie Plate ×1进入Bag/Dishes；有保温柜的分支按§7.7/7.16处理，不在本卡虚构柜满协议。领取不进食，HUD前后均142/200；吃后才按食物余量/同菜递减回复，下一次家城04:00前未吃失效。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RESIDENT-MEAL-DONE",
+      "nodeId": "441:6413",
+      "designLabel": "赠餐领取后"
+    },
+    "original": {
+      "id": "RESIDENT-MEAL-DONE",
+      "title": "赠餐领取后",
+      "heading": "Enjoy your meal",
+      "meta": "Resident meal today 1/1",
+      "rows": [
+        [
+          "A new meal tomorrow",
+          "Other Residents share today’s allowance.",
+          "i-clock"
+        ]
+      ],
+      "actions": [
+        [
+          "Done",
+          "RESIDENT-TALK",
+          "soft"
+        ]
+      ],
+      "note": "完成后任何居民均显示已领，不依城市/据点多发。",
+      "scene": "tea-house",
+      "place": "Tea House"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Tea House",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Tea House",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "energy": 142,
+      "capacity": 200
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "The displayed +20 is the dish’s maximum eating effect, never a claim reward. The food item, destination and expiry are visible; no duplicate recovery appears above Accept."
+    ],
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RESIDENT-TEACH",
+    "sourceGroup": "12",
+    "title": "Corn Cake",
+    "state": "Tasted",
+    "effect": "Hana taught you this recipe. Cook it once to discover it.",
+    "keyFacts": [
+      {
+        "kind": "information",
+        "label": "Rarity",
+        "value": "Fine"
+      },
+      {
+        "kind": "time",
+        "label": "Cook time",
+        "value": "15 s"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Recipe #22 · Corn Cake",
+      "Corn ×2 · 2 ingredient slots",
+      "Plain dish restores 40 Energy; 1 heat tap.",
+      "Corn becomes available at Farming Lv5.",
+      "Teaching reveals this page as Tasted. Cook it yourself to discover it and earn first-cook XP."
+    ],
+    "actions": [
+      {
+        "label": "View Cookbook",
+        "target": "DEX-P1-1",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Corn",
+        "state": "Ingredient",
+        "effect": "",
+        "quantity": {
+          "value": "2",
+          "label": "required"
+        },
+        "icon": "crop_corn",
+        "keyFacts": [],
+        "disclosure": []
+      }
+    ],
+    "items": [],
+    "scene": "tea-house",
+    "layout": "sheet",
+    "sourceNote": "Hana明确教学池22/38/39/46中选已有#22 Corn Cake示例（v2第2920/3087行）。Corn×2、Fine、40基础体力/15秒/1次火候；只揭示Tasted，不发实物、不发首做XP。使用现有dish_corn_cake/crop_corn资产。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RESIDENT-TEACH",
+      "nodeId": "441:6475",
+      "designLabel": "教学配方 · Tasted"
+    },
+    "original": {
+      "id": "RESIDENT-TEACH",
+      "title": "教学配方 · Tasted",
+      "heading": "A recipe from Hana",
+      "meta": "Learned · Tasted",
+      "rows": [
+        [
+          "Ingredients and name revealed",
+          "Cook it yourself to discover it and earn first-cook XP.",
+          "i-cookbook"
+        ]
+      ],
+      "actions": [
+        [
+          "View Cookbook",
+          "DEX-P1-1",
+          "soft"
+        ]
+      ],
+      "note": "教学不直接Discovered、不发首做XP；居民具体菜池见§9/7.16，不自定未定配方奖励。",
+      "scene": "tea-house",
+      "place": "Tea House"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Tea House",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Tea House",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "icon": "dish_corn_cake",
+    "sourceCorrections": [
+      {
+        "field": "taught recipe identity and ingredients",
+        "before": "Unspecified recipe name/ingredients",
+        "after": "Corn Cake · Corn ×2",
+        "basis": "gameplay-plan-v2-2026-10-02.md lines2920,3087 and §7.5.3; no teaching reward added."
+      }
+    ]
+  },
+  {
+    "id": "RES-PIP",
+    "sourceGroup": "12",
+    "title": "Pip",
+    "state": "Familiar",
+    "effect": "Courier Kid",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Dessert",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Pip"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Pip"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Dessert",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "travel-post",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-PIP",
+      "nodeId": "441:6537",
+      "designLabel": "Pip · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-PIP",
+      "title": "Pip · 居民内容卡",
+      "heading": "Pip · Courier Kid",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Dessert",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "travel-post",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_pip",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RES-GRANNY",
+    "sourceGroup": "12",
+    "title": "Granny Wu",
+    "state": "Familiar",
+    "effect": "Campfire Elder",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Soup",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Granny Wu"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Granny Wu"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Soup",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "trading-post",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-GRANNY",
+      "nodeId": "441:6602",
+      "designLabel": "Granny Wu · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-GRANNY",
+      "title": "Granny Wu · 居民内容卡",
+      "heading": "Granny Wu · Campfire Elder",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Soup",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "trading-post",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_granny_wu",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RES-MIRA",
+    "sourceGroup": "12",
+    "title": "Mira",
+    "state": "Familiar",
+    "effect": "Travelling Trader",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Rare or better",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Mira"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Mira"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Rare or better",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "travel-post",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-MIRA",
+      "nodeId": "441:6667",
+      "designLabel": "Mira · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-MIRA",
+      "title": "Mira · 居民内容卡",
+      "heading": "Mira · Travelling Trader",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Rare or better",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "travel-post",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_mira",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RES-KAI",
+    "sourceGroup": "12",
+    "title": "Old Kai",
+    "state": "Familiar",
+    "effect": "Harbour Elder",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Grilled",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Old Kai"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Old Kai"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Grilled",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "tackle-shop",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-KAI",
+      "nodeId": "441:6732",
+      "designLabel": "Old Kai · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-KAI",
+      "title": "Old Kai · 居民内容卡",
+      "heading": "Old Kai · Harbour Elder",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Grilled",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "tackle-shop",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_old_kai",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RES-RAFA",
+    "sourceGroup": "12",
+    "title": "Rafa",
+    "state": "Familiar",
+    "effect": "Ferryman",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Soup",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Rafa"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Rafa"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Soup",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "tackle-shop",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-RAFA",
+      "nodeId": "441:6797",
+      "designLabel": "Rafa · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-RAFA",
+      "title": "Rafa · 居民内容卡",
+      "heading": "Rafa · Ferryman",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Soup",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "tackle-shop",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_rafa",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RES-IVO",
+    "sourceGroup": "12",
+    "title": "Ivo",
+    "state": "Familiar",
+    "effect": "Old Miner",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Grilled",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Ivo"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Ivo"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Grilled",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "mine",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-IVO",
+      "nodeId": "441:6862",
+      "designLabel": "Ivo · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-IVO",
+      "title": "Ivo · 居民内容卡",
+      "heading": "Ivo · Old Miner",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Grilled",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "mine",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_ivo",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RES-HANA",
+    "sourceGroup": "12",
+    "title": "Hana",
+    "state": "Familiar",
+    "effect": "Café Owner",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Fine or better",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Hana"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Hana"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Fine or better",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "tea-house",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-HANA",
+      "nodeId": "441:6927",
+      "designLabel": "Hana · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-HANA",
+      "title": "Hana · 居民内容卡",
+      "heading": "Hana · Café Owner",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Fine or better",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "tea-house",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_hana",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RES-SAM",
+    "sourceGroup": "12",
+    "title": "Sam",
+    "state": "Familiar",
+    "effect": "Station Master",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Grilled",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Sam"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Sam"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Grilled",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "travel-post",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-SAM",
+      "nodeId": "441:6992",
+      "designLabel": "Sam · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-SAM",
+      "title": "Sam · 居民内容卡",
+      "heading": "Sam · Station Master",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Grilled",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "travel-post",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_sam",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RES-LENA",
+    "sourceGroup": "12",
+    "title": "Lena",
+    "state": "Familiar",
+    "effect": "Lighthouse Keeper",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Tea",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Lena"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Lena"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Tea",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "tea-house",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-LENA",
+      "nodeId": "441:7057",
+      "designLabel": "Lena · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-LENA",
+      "title": "Lena · 居民内容卡",
+      "heading": "Lena · Lighthouse Keeper",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Tea",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "tea-house",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_lena",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RES-TOMO",
+    "sourceGroup": "12",
+    "title": "Tomo",
+    "state": "Familiar",
+    "effect": "Curator",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Rare or better",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Tomo"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Tomo"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Rare or better",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "market-square-v2",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-TOMO",
+      "nodeId": "441:7122",
+      "designLabel": "Tomo · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-TOMO",
+      "title": "Tomo · 居民内容卡",
+      "heading": "Tomo · Curator",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Rare or better",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "market-square-v2",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_tomo",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RES-THEO",
+    "sourceGroup": "12",
+    "title": "Theo",
+    "state": "Familiar",
+    "effect": "Gardener",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Salad",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Theo"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Theo"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Salad",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "market-square-v2",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-THEO",
+      "nodeId": "441:7187",
+      "designLabel": "Theo · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-THEO",
+      "title": "Theo · 居民内容卡",
+      "heading": "Theo · Gardener",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Salad",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "market-square-v2",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_theo",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "RES-NADIA",
+    "sourceGroup": "12",
+    "title": "Nadia",
+    "state": "Familiar",
+    "effect": "Market Baker",
+    "keyFacts": [
+      {
+        "label": "Friendship",
+        "value": "52/90",
+        "kind": "progress"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Familiar · 52/90",
+      "Favorite style: Stew",
+      "Learn more as friendship grows."
+    ],
+    "actions": [
+      {
+        "label": "Talk",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Nadia"
+        }
+      },
+      {
+        "label": "Choose a dish",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "resident": "Nadia"
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Favourite dishes",
+        "state": "",
+        "effect": "Stew",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-herb"
+      }
+    ],
+    "items": [],
+    "scene": "market-square-v2",
+    "layout": "profile",
+    "sourceNote": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "RES-NADIA",
+      "nodeId": "441:7252",
+      "designLabel": "Nadia · 居民内容卡"
+    },
+    "original": {
+      "id": "RES-NADIA",
+      "title": "Nadia · 居民内容卡",
+      "heading": "Nadia · Market Baker",
+      "meta": "Familiar · 52/90",
+      "rows": [
+        [
+          "Favorite style: Stew",
+          "Learn more as friendship grows.",
+          "i-face-player"
+        ]
+      ],
+      "actions": [
+        [
+          "Talk",
+          "RESIDENT-TALK"
+        ],
+        [
+          "Give a dish",
+          "GIFT-DETAIL",
+          "soft"
+        ]
+      ],
+      "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+      "scene": "market-square-v2",
+      "place": "Outpost"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Outpost",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Outpost",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "reviewNotes": [
+      "Talk and dish selection must retain this resident identity. The old cross-link to Hana/Gifted dish was removed; use parameterized detail templates.",
+      "Uses the existing per-resident portrait master. This is a prototype portrait candidate, not approved final character art."
+    ],
+    "icon": "res_nadia",
+    "reviewAmendment": "2026-10-06 row 29/34/35 review"
+  },
+  {
+    "id": "DEX-MILESTONE",
+    "sourceGroup": "12",
+    "title": "Fish-dex",
+    "state": "Milestone reached",
+    "effect": "Your collection reward has been added.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Discovered",
+        "value": "10/20"
+      },
+      {
+        "kind": "reward",
+        "label": "Energy",
+        "value": "+30"
+      },
+      {
+        "kind": "reward",
+        "label": "Coins",
+        "value": "+100"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Milestone reached",
+      "+30 Energy · +100 coins",
+      "One-time collection reward"
+    ],
+    "actions": [
+      {
+        "label": "Continue",
+        "target": "DEX-P1-2",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "pond",
+    "layout": "sheet",
+    "sourceNote": "20种时+50体力+300金币+完成徽记。被动物品奖励满包入Parcels，币/体力直接到账。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "DEX-MILESTONE",
+      "nodeId": "441:7317",
+      "designLabel": "图鉴里程碑 · 领取后果"
+    },
+    "original": {
+      "id": "DEX-MILESTONE",
+      "title": "图鉴里程碑 · 领取后果",
+      "heading": "Fish-dex · 10/20",
+      "meta": "Milestone reached",
+      "rows": [
+        [
+          "+30 Energy · +100 coins",
+          "One-time collection reward",
+          "i-fish"
+        ]
+      ],
+      "actions": [
+        [
+          "Continue",
+          "DEX-P1-2",
+          "soft"
+        ]
+      ],
+      "note": "20种时+50体力+300金币+完成徽记。被动物品奖励满包入Parcels，币/体力直接到账。",
+      "scene": "pond"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "COOK-MILESTONE",
+    "sourceGroup": "12",
+    "title": "Cookbook",
+    "state": "Home Cook",
+    "effect": "Your collection has reached a new milestone.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Discovered",
+        "value": "8/48"
+      },
+      {
+        "kind": "reward",
+        "label": "Energy",
+        "value": "+50"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "+50 Energy",
+      "20 pages · Line Cook",
+      "100 coins + Cookbook Shelf",
+      "36 pages · Head Chef",
+      "Warming Cabinet +4 slots",
+      "48 pages · Master Chef",
+      "Gold Cookbook + farm title"
+    ],
+    "actions": [
+      {
+        "label": "Back to Cookbook",
+        "target": "DEX-P1-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Line Cook",
+        "state": "",
+        "effect": "100 coins and Cookbook Shelf",
+        "keyFacts": [
+          {
+            "label": "Recipes",
+            "value": "20",
+            "kind": "progress"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      },
+      {
+        "title": "Head Chef",
+        "state": "",
+        "effect": "Warming Cabinet gains four slots",
+        "keyFacts": [
+          {
+            "label": "Recipes",
+            "value": "36",
+            "kind": "progress"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-pot"
+      },
+      {
+        "title": "Master Chef",
+        "state": "",
+        "effect": "Gold Cookbook and farm title",
+        "keyFacts": [
+          {
+            "label": "Recipes",
+            "value": "48",
+            "kind": "progress"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-home"
+      }
+    ],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "Mastered10另称号Muscle Memory。P2扩56页按9/22/42/56，不能沿旧8门槛混用。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COOK-MILESTONE",
+      "nodeId": "441:7380",
+      "designLabel": "Cookbook · 四级痕迹"
+    },
+    "original": {
+      "id": "COOK-MILESTONE",
+      "title": "Cookbook · 四级痕迹",
+      "heading": "Home Cook · 8/48",
+      "meta": "+50 Energy",
+      "rows": [
+        [
+          "20 pages · Line Cook",
+          "100 coins + Cookbook Shelf",
+          "i-cookbook"
+        ],
+        [
+          "36 pages · Head Chef",
+          "Warming Cabinet +4 slots",
+          "i-pot"
+        ],
+        [
+          "48 pages · Master Chef",
+          "Gold Cookbook + farm title",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "Back to Cookbook",
+          "DEX-P1-1",
+          "soft"
+        ]
+      ],
+      "note": "Mastered10另称号Muscle Memory。P2扩56页按9/22/42/56，不能沿旧8门槛混用。",
+      "scene": "kitchen",
+      "place": "Kitchen"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  }
+]

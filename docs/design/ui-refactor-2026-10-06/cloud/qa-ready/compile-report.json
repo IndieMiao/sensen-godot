@@ -1,0 +1,441 @@
+{
+  "preparedAt": "2026-10-06T10:07:02.176602+00:00",
+  "figmaExecuted": false,
+  "stateMutated": false,
+  "bundleSha256": "745179d67a1115196dc69c621e4898eec9e0aaf0fe2505b86d3125ddab84f5d4",
+  "scripts": [
+    {
+      "id": "BAR-3",
+      "index": 10,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "10",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/BAR-3.js",
+      "characters": 42303,
+      "bytes": 42344,
+      "sha256": "da020ccb8bc5d7aba85c8eb163cf906361588095011ded1f3ba9f6af1e77140e",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "HUD-3",
+      "index": 12,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "12",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/HUD-3.js",
+      "characters": 42316,
+      "bytes": 42357,
+      "sha256": "6a558ea4244ed73693aa2aacbc2f49c1ca2e64187ed4ce65931ff1b68e215dc7",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "BAR-3-2",
+      "index": 11,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "11",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/BAR-3-2.js",
+      "characters": 49334,
+      "bytes": 49384,
+      "sha256": "bf9296254375db53ae9de7abe9a5c14ed3e9af6a8fad9e557ea5ef07d1e8f72d",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "HUD-4",
+      "index": 13,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "13",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/HUD-4.js",
+      "characters": 41741,
+      "bytes": 41782,
+      "sha256": "86d5bffd4a26786bf35b3572f1fda95ad0f2ada60d824f172b94ab30a662c360",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "BAR-1",
+      "index": 7,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "7",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/BAR-1.js",
+      "characters": 49207,
+      "bytes": 49258,
+      "sha256": "7b9fc8a6d3e9fc4c6670760dff1c5f6955ea3f6e107e6e6191e47a4cfc4a5d90",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "BAR-1-2",
+      "index": 8,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "8",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/BAR-1-2.js",
+      "characters": 48040,
+      "bytes": 48091,
+      "sha256": "a324f232755fa3b0da735e06bf243c9a27ecad7d5fe33839b52e3901e344e438",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "FARM-7",
+      "index": 22,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "22",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/FARM-7.js",
+      "characters": 49034,
+      "bytes": 49084,
+      "sha256": "ebacd37708dcdb9f64b4d63c946fc8c6ed70296b2f266decec5ac72046c82125",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "FARM-7-2",
+      "index": 23,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "23",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/FARM-7-2.js",
+      "characters": 48603,
+      "bytes": 48669,
+      "sha256": "c02cb75e68fc86bc4e0be2182b8c21605f47f655cd0984310e88e3c295850a1c",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "FARM-6",
+      "index": 20,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "20",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/FARM-6.js",
+      "characters": 47684,
+      "bytes": 47723,
+      "sha256": "2a4a90e6edd69f77638102d77ad8d0a6a4b439cf3a52301e95acf7ef4986af86",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "FARM-6-2",
+      "index": 21,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "21",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/FARM-6-2.js",
+      "characters": 48123,
+      "bytes": 48163,
+      "sha256": "538a9bf519f06487f36c8b035e7c10bf6c488fcce98769b0806266b935e7952c",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "FARM-3",
+      "index": 19,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "19",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/FARM-3.js",
+      "characters": 46686,
+      "bytes": 46730,
+      "sha256": "13f061ffa8767f29291546c205815b812378d4147facfbe25c9b2127fbee8980",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "BAG-4",
+      "index": 5,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "5",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/BAG-4.js",
+      "characters": 49021,
+      "bytes": 49066,
+      "sha256": "583d2dc43978510ffa1da6ebcbc167ee30b20247bcfdfa49737407c207e1c9f2",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "BAG-4-2",
+      "index": 6,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "6",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/BAG-4-2.js",
+      "characters": 49608,
+      "bytes": 49674,
+      "sha256": "1adc6caa5a4287b570a1c5e7762c8efa7073d8ca36d1c5075967d9b5d8d90391",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "HUD-1",
+      "index": 14,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "14",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/HUD-1.js",
+      "characters": 49244,
+      "bytes": 49317,
+      "sha256": "d09a4b243180e0e630d696bf6240144efbf0f3a68fdfe9d05655f3891317597b",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "HUD-1-2",
+      "index": 15,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "15",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/HUD-1-2.js",
+      "characters": 48265,
+      "bytes": 48335,
+      "sha256": "5ea3f4f0633186bfc2cc5faa6ec455c07e2267321772999d1b488174947ddf60",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "CTRL-1",
+      "index": 16,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "16",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/CTRL-1.js",
+      "characters": 47977,
+      "bytes": 48043,
+      "sha256": "1cc3d41a0abf43d2df5ec57ff87661bb260dc7b45cac74abf393bd49e90854be",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "CTRL-1-2",
+      "index": 17,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "17",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/CTRL-1-2.js",
+      "characters": 48215,
+      "bytes": 48282,
+      "sha256": "80e084f8792106ca34e3a6d2d6abefce848d90b96331bef6ba9118be32f0f906",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "FISH-2",
+      "index": 24,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "24",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/FISH-2.js",
+      "characters": 47782,
+      "bytes": 47848,
+      "sha256": "2e74fd0102e6f67ec6ec7f920af803a6da2ce80590152916b63fe46034a66040",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "COOK-2a",
+      "index": 33,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "33",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/COOK-2a.js",
+      "characters": 48162,
+      "bytes": 48201,
+      "sha256": "600960b5cc2a72604c51b6d9d057e6d5969055cefb32f3f0a41c5da5e963a13e",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "COOK-2b",
+      "index": 35,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "35",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/COOK-2b.js",
+      "characters": 46149,
+      "bytes": 46186,
+      "sha256": "60b401840d0b568d2c3757e0260700e7c1a44c85a40ffd80936e739a82cfaf81",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "COOK-P0-2",
+      "index": 121,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "121",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/COOK-P0-2.js",
+      "characters": 45502,
+      "bytes": 45628,
+      "sha256": "40c2fcbc5465238429917cc2c762a376ac28dc870ec98dffc9d6b3f291341b1e",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "TODAY-1",
+      "index": 135,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "135",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/TODAY-1.js",
+      "characters": 41607,
+      "bytes": 41749,
+      "sha256": "ff486a431880b2ca974a11f8dfb5d24401dff0927d85c18a88dc289149119040",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "TODAY-2",
+      "index": 136,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "136",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/TODAY-2.js",
+      "characters": 41540,
+      "bytes": 41658,
+      "sha256": "9aa157b3b897cbfcc96bb019e97a3b0ab33ecc94c056636c9960b1eceb4a1cd4",
+      "preflightExitCode": 0
+    },
+    {
+      "id": "TUT-1",
+      "index": 84,
+      "compileExitCode": 0,
+      "regenerateCommand": [
+        "python3",
+        "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/build_cloud.py",
+        "screens",
+        "84",
+        "1",
+        "rebuild"
+      ],
+      "file": "/Users/zhangshaojie/.herdr/worktrees/sensen-godot/wt-p0-design/docs/design/ui-refactor-2026-10-06/cloud/qa-ready/TUT-1.js",
+      "characters": 37837,
+      "bytes": 37943,
+      "sha256": "d20d5dabb271ca0d930587decad723d9dd9fb1d3d9855c04c6b5ba9353377729",
+      "preflightExitCode": 0
+    }
+  ],
+  "allPassed": true
+}

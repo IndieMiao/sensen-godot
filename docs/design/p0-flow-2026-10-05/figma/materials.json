@@ -1,0 +1,546 @@
+[
+  {
+    "id": "MAT-1",
+    "title": "六个采集点",
+    "scene": "farm",
+    "heading": "Around your homestead",
+    "panelY": 300,
+    "rows": [
+      [
+        "Timber Grove · Ready",
+        "Timber ×6 · every 8h",
+        "i-wood"
+      ],
+      [
+        "Rock Pile · Ready",
+        "Stone ×4 · every 8h",
+        "i-stone"
+      ],
+      [
+        "Reed Bank · Ready",
+        "Reeds ×3 + Worm Bait ×2",
+        "i-reeds"
+      ],
+      [
+        "Herb Patch · Ready",
+        "Wild Herb ×2 · every 8h",
+        "i-herb"
+      ],
+      [
+        "Clay Bank · Homestead Lv2",
+        "Clay ×2 · every 8h",
+        "i-clay"
+      ],
+      [
+        "Old Tree · Homestead Lv3",
+        "Hardwood · more to discover",
+        "i-hardwood"
+      ]
+    ],
+    "actions": [
+      [
+        "Show Timber Grove",
+        "MAT-2",
+        "soft"
+      ]
+    ],
+    "note": "§13.2 总览／审阅导航，不新增采集菜单。场景点位 Ready 可点。老树可见；硬木属 P1，P0 不产出。"
+  },
+  {
+    "id": "MAT-2",
+    "title": "点击采集 → 自动入库",
+    "scene": "farm",
+    "tag": "Timber Grove · Ready",
+    "heading": "Stored · 6 Timber",
+    "meta": "Farm Storage · 12 Timber",
+    "rows": [
+      [
+        "Timber Grove ready in 8h",
+        "Gathering is free.",
+        "i-wood"
+      ]
+    ],
+    "actions": [
+      [
+        "View storage",
+        "STORE-1",
+        "soft"
+      ],
+      [
+        "Back to farm",
+        "MAT-1",
+        "soft"
+      ]
+    ],
+    "note": "点场景树林，一次收完直接入仓；0体力0XP。Ready 变独立8小时计时；Bag满也可采集。"
+  },
+  {
+    "id": "MAT-3",
+    "title": "采集冷却与等级门",
+    "scene": "farm",
+    "tag": "Timber Grove · 2h 10m",
+    "heading": "Clay Bank",
+    "rows": [
+      [
+        "Homestead Lv2 needed",
+        "1 level to go · Gather Clay here",
+        "i-clay"
+      ]
+    ],
+    "actions": [
+      [
+        "View homestead",
+        "HOME-P0-1",
+        "soft"
+      ]
+    ],
+    "note": "计时点不重复收取。点未开放黏土溪岸显示等级／差距／后果；来源信息按需打开。"
+  },
+  {
+    "id": "MINE-P0-1",
+    "title": "矿口 · 首次进入",
+    "kind": "game",
+    "scene": "farm",
+    "energy": "142",
+    "tag": "Mine runs today 0/2",
+    "banner": "The mine",
+    "sub": "6 rocks on each floor. Leave whenever you like.",
+    "action": "Enter mine\n2 Energy",
+    "next": "MINE-P0-2",
+    "note": "固定矿口，走近主行动键进入；只付第1层2体力。工作台另点，不设 Explore 菜单。"
+  },
+  {
+    "id": "MINE-P0-2",
+    "title": "第一层 · 逐岩开采",
+    "kind": "game",
+    "scene": "mine",
+    "place": "Mine · Floor 1",
+    "energy": "140",
+    "tag": "Floor 1 · Rocks 0/6",
+    "banner": "Starter Pickaxe · 1 rock per swing",
+    "sub": "Floor 2 · Clear this floor first",
+    "action": "Mine\n2 Energy",
+    "quick": [
+      {
+        "icon": "i-torch",
+        "count": "2"
+      }
+    ],
+    "next": "MINE-P0-3",
+    "note": "每岩2，6岩12；本层合计14。岩石不响应点击；Mining已选，1–2层无Combat主按钮。"
+  },
+  {
+    "id": "MINE-P0-3",
+    "title": "清层与第二层层费",
+    "scene": "mine",
+    "place": "Mine · Floor 1",
+    "energy": "128",
+    "heading": "Floor 1 cleared",
+    "meta": "Elevator stop · 6/6 rocks",
+    "actions": [
+      [
+        "Floor 2 · 2 Energy",
+        "MINE-P0-4"
+      ],
+      [
+        "Entrance · Free",
+        "MINE-P0-5",
+        "soft"
+      ]
+    ],
+    "foot": "Floor 1 is free to return to during this run.",
+    "note": "楼梯亮起；第一次进2层扣2，同局已付层往返免费。素材是Floor1共享底图，非Floor2专属美术。"
+  },
+  {
+    "id": "MINE-P0-4",
+    "title": "第二层 · 铜与岩盐",
+    "kind": "game",
+    "scene": "mine",
+    "place": "Mine · Floor 2",
+    "energy": "126",
+    "tag": "Floor 2 · Rocks 0/6",
+    "banner": "Torch · see what rocks hold",
+    "sub": "One torch per floor. No Energy cost.",
+    "action": "Light Torch\nFree",
+    "quick": [
+      {
+        "icon": "i-torch",
+        "count": "2"
+      }
+    ],
+    "next": "MINE-P0-6",
+    "note": "火把预览固定掉落，−1火把，0体力；选回Mining敲岩。2层清完全局总耗28，0技能XP。"
+  },
+  {
+    "id": "MINE-P0-5",
+    "title": "续局与免费往返",
+    "scene": "farm",
+    "heading": "Your mine run is waiting",
+    "meta": "Floor 1 · 4/6 rocks cleared · Runs today 1/2",
+    "actions": [
+      [
+        "Continue run · Free",
+        "MINE-CONTINUE"
+      ],
+      [
+        "New run · Clear Floor 2 first",
+        null,
+        "disabled"
+      ]
+    ],
+    "foot": "Your progress stays until 04:00 at home.",
+    "note": "中途离矿保留进度，续局落最深已付层，不再收层费。未清2层不可重开，已入包材料保留。"
+  },
+  {
+    "id": "MINE-P0-6",
+    "title": "P0两层清完",
+    "scene": "mine",
+    "place": "Mine · Floor 2",
+    "energy": "114",
+    "heading": "Floor 2 cleared",
+    "meta": "Elevator stop · Mine runs today 1/2",
+    "rows": [
+      [
+        "Entrance · Free",
+        "Return home and store your materials.",
+        "i-elevator"
+      ],
+      [
+        "Floor 1 · Free",
+        "Floor 2 · Here",
+        "i-stairs"
+      ]
+    ],
+    "actions": [
+      [
+        "Go home · Free",
+        "MINE-P0-7"
+      ]
+    ],
+    "note": "P0只呈现1–2层，清2层不伪称精英Run complete。电梯0；回农场材料自动入库。"
+  },
+  {
+    "id": "MINE-P0-7",
+    "title": "可重开 · 明示后果",
+    "scene": "farm",
+    "heading": "Start a new run?",
+    "meta": "Current run will end · Runs today 1/2",
+    "rows": [
+      [
+        "Your stored materials stay",
+        "The mine starts again on Floor 1.",
+        "i-bag"
+      ]
+    ],
+    "actions": [
+      [
+        "New run · 2 Energy",
+        "MINE-P0-2"
+      ],
+      [
+        "Continue run · Free",
+        "MINE-P0-6",
+        "soft"
+      ]
+    ],
+    "note": "已清2层才可重开；计第2局，所有层费重算。确认卡为本批交互方案，避免误丢当前局进度。"
+  },
+  {
+    "id": "MINE-P0-8",
+    "title": "满包、日上限与日切",
+    "scene": "mine",
+    "place": "Mine · Floor 2",
+    "heading": "Bag full · free a slot to mine",
+    "rows": [
+      [
+        "Your run is saved",
+        "Return home to store materials, then continue free.",
+        "i-bag"
+      ],
+      [
+        "Mine runs today 2/2",
+        "Resets in 9h 12m",
+        "i-clock"
+      ]
+    ],
+    "actions": [
+      [
+        "Go home · Free",
+        "STORE-1"
+      ],
+      [
+        "Open bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "foot": "Run ended at daily reset → Enter mine · 2 Energy",
+    "note": "三状态规则板：主动挖矿满包阻止；2/2只限制新局、不挡续局；04:00结束旧局，材料不丢。"
+  },
+  {
+    "id": "CRAFT-1",
+    "title": "工作台 · Tools不足",
+    "scene": "farm",
+    "heading": "Workbench",
+    "tabs": [
+      "Facilities",
+      "Tools",
+      "Supplies"
+    ],
+    "on": 1,
+    "meta": "Copper Pickaxe · 2 rocks per swing",
+    "needs": [
+      [
+        "Copper Ore",
+        3,
+        5,
+        "i-copper"
+      ],
+      [
+        "Timber",
+        4,
+        4,
+        "i-wood"
+      ]
+    ],
+    "actions": [
+      [
+        "Need 2 more Copper Ore",
+        null,
+        "disabled"
+      ],
+      [
+        "Show mine",
+        "MINE-P0-1",
+        "soft"
+      ]
+    ],
+    "note": "点工作台打开。材料全用环形进度格；从Farm Storage扣，缺口只写按钮，点材料格才看来源。"
+  },
+  {
+    "id": "CRAFT-2",
+    "title": "铜镐制作成功",
+    "scene": "farm",
+    "heading": "Copper Pickaxe",
+    "meta": "Workbench · Tools · 0 coins",
+    "needs": [
+      [
+        "Copper Ore",
+        5,
+        5,
+        "i-copper"
+      ],
+      [
+        "Timber",
+        4,
+        4,
+        "i-wood"
+      ]
+    ],
+    "actions": [
+      [
+        "Craft",
+        "GEAR-P0-1"
+      ]
+    ],
+    "foot": "2 rocks per swing · 4 Energy for 2 rocks",
+    "note": "足料→Craft→获得铜镐。工具不占Bag；不自动替换当前镐，成功态给Equip入口。"
+  },
+  {
+    "id": "CRAFT-3",
+    "title": "工作台 · Supplies",
+    "scene": "farm",
+    "heading": "Workbench",
+    "tabs": [
+      "Facilities",
+      "Tools",
+      "Supplies"
+    ],
+    "on": 2,
+    "meta": "Torch ×2 · see what rocks hold",
+    "needs": [
+      [
+        "Timber",
+        6,
+        1,
+        "i-wood"
+      ],
+      [
+        "Reeds",
+        3,
+        1,
+        "i-reeds"
+      ]
+    ],
+    "rows": [
+      [
+        "Compost ×2",
+        "Reeds 2 + Timber 1 · 0 coins",
+        "i-compost"
+      ]
+    ],
+    "actions": [
+      [
+        "Craft · Torch ×2",
+        "STORE-1"
+      ]
+    ],
+    "note": "火把1木1芦→2、堆肥2芦1木→2；均0金币。产物在家仓库存储，带出门Take；炸药属P1不列P0。"
+  },
+  {
+    "id": "CRAFT-4",
+    "title": "采集手套 · 被动生效",
+    "scene": "farm",
+    "heading": "Gather Gloves",
+    "meta": "Workbench · Tools · 0 coins",
+    "needs": [
+      [
+        "Reeds",
+        8,
+        8,
+        "i-reeds"
+      ],
+      [
+        "Timber",
+        4,
+        4,
+        "i-wood"
+      ]
+    ],
+    "rows": [
+      [
+        "+1 item per gathering spot",
+        "Timber 7 · Stone 5 · Reeds 4 · Herbs 3",
+        "i-wood"
+      ]
+    ],
+    "actions": [
+      [
+        "Craft",
+        "MAT-GLOVES-RESULT"
+      ]
+    ],
+    "note": "做出即被动生效，不进Gear六槽，不新增装备槽。副产蚯蚓不随主材料+1；再次制作不可重复叠加。"
+  },
+  {
+    "id": "GEAR-P0-1",
+    "title": "制作后 → 装备铜镐",
+    "scene": "farm",
+    "heading": "Bag  |  Gear",
+    "meta": "Mining slot · Copper Pickaxe crafted",
+    "grid": [
+      {
+        "name": "Hoe",
+        "icon": "i-hoe"
+      },
+      {
+        "name": "Rod",
+        "icon": "i-rod"
+      },
+      {
+        "name": "Pickaxe",
+        "icon": "i-pickaxe",
+        "selected": true
+      },
+      {
+        "name": "Weapon",
+        "icon": "i-sword"
+      },
+      {
+        "name": "No ring",
+        "icon": "i-ring"
+      },
+      {
+        "name": "No charm",
+        "icon": "i-charm"
+      }
+    ],
+    "cols": 6,
+    "rows": [
+      [
+        "Copper Pickaxe",
+        "2 rocks per swing",
+        "i-pickaxe"
+      ]
+    ],
+    "actions": [
+      [
+        "Equip",
+        "GEAR-P0-2"
+      ]
+    ],
+    "note": "Craft成功经同一Bag/Gear抽屉进入Mining槽；旧镐保留。Gear无容量条，工具不入Tackle。"
+  },
+  {
+    "id": "GEAR-P0-2",
+    "title": "已装备与劳作后果",
+    "scene": "farm",
+    "heading": "Copper Pickaxe · Equipped",
+    "rows": [
+      [
+        "2 rocks per swing",
+        "2 rocks still cost 4 Energy.",
+        "i-pickaxe"
+      ],
+      [
+        "Starter Pickaxe",
+        "Owned · 1 rock per swing",
+        "i-pickaxe"
+      ]
+    ],
+    "actions": [
+      [
+        "Return to the mine",
+        "MINE-P0-1"
+      ],
+      [
+        "Bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "装备标识即时改；主行动键徽标同步。两岩4体力，不能显示一次两岩只扣2；资料石料加成冲突另列。"
+  },
+  {
+    "id": "HOME-P0-1",
+    "title": "材料 → 农场升级",
+    "scene": "farm",
+    "heading": "Homestead Lv2",
+    "meta": "Farming 2 + Fishing 2 · Skills 4/3",
+    "needs": [
+      [
+        "Timber",
+        12,
+        12,
+        "i-wood"
+      ],
+      [
+        "Stone",
+        8,
+        8,
+        "i-stone"
+      ],
+      [
+        "Reeds",
+        6,
+        6,
+        "i-reeds"
+      ],
+      [
+        "Rock Salt",
+        3,
+        3,
+        "i-salt"
+      ]
+    ],
+    "actions": [
+      [
+        "Upgrade · 250 coins",
+        "COOK-P0-5"
+      ]
+    ],
+    "foot": "210 Energy · Spice Rack storage · Clay Bank",
+    "note": "第5天独立示例，需Farming+Fishing技能和与金币同时满足；Cooking不计入。材料数字取§8.2.1。",
+    "coins": "250"
+  }
+]

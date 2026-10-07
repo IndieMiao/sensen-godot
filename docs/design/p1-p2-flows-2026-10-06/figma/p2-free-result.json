@@ -1,0 +1,286 @@
+{
+  "createdNodeManifest": "created-nodes.json",
+  "pages": [
+    {
+      "id": "MAP-2-FREE",
+      "cardId": "437:2372",
+      "nodeId": "437:2374"
+    },
+    {
+      "id": "MAP-3-FREE",
+      "cardId": "437:2456",
+      "nodeId": "437:2458"
+    },
+    {
+      "id": "MAP-4-FREE",
+      "cardId": "437:2530",
+      "nodeId": "437:2532"
+    },
+    {
+      "id": "MAP-5-FREE",
+      "cardId": "437:2609",
+      "nodeId": "437:2611"
+    },
+    {
+      "id": "MAP-6-FREE",
+      "cardId": "437:2678",
+      "nodeId": "437:2680"
+    },
+    {
+      "id": "MAP-7-FREE",
+      "cardId": "437:2740",
+      "nodeId": "437:2742"
+    },
+    {
+      "id": "MAP-8-FREE",
+      "cardId": "437:2822",
+      "nodeId": "437:2824"
+    },
+    {
+      "id": "LOCAL-FISH",
+      "cardId": "437:2895",
+      "nodeId": "437:2897"
+    },
+    {
+      "id": "LOCAL-CATCH",
+      "cardId": "437:2960",
+      "nodeId": "437:2962"
+    },
+    {
+      "id": "LOCAL-SHOP",
+      "cardId": "437:3025",
+      "nodeId": "437:3027"
+    },
+    {
+      "id": "LOCAL-TRADE",
+      "cardId": "437:3087",
+      "nodeId": "437:3089"
+    },
+    {
+      "id": "LOCAL-BOUGHT",
+      "cardId": "437:3165",
+      "nodeId": "437:3167"
+    },
+    {
+      "id": "HOME-RETURN",
+      "cardId": "437:3228",
+      "nodeId": "437:3230"
+    },
+    {
+      "id": "PASS-1",
+      "cardId": "437:3291",
+      "nodeId": "437:3293"
+    },
+    {
+      "id": "PASS-2",
+      "cardId": "437:3364",
+      "nodeId": "437:3366"
+    },
+    {
+      "id": "TRAVEL-RETRY",
+      "cardId": "437:3447",
+      "nodeId": "437:3449"
+    },
+    {
+      "id": "TRAVEL-RECONNECT",
+      "cardId": "437:3508",
+      "nodeId": "437:3510"
+    },
+    {
+      "id": "FOG-THREE",
+      "cardId": "437:3560",
+      "nodeId": "437:3562"
+    }
+  ],
+  "links": [
+    {
+      "id": "437:2416",
+      "back": true
+    },
+    {
+      "id": "437:2452",
+      "target": "MAP-3-FREE"
+    },
+    {
+      "id": "437:2500",
+      "back": true
+    },
+    {
+      "id": "437:2525",
+      "target": "MAP-4-FREE"
+    },
+    {
+      "id": "437:2527",
+      "target": "MAP-2-FREE"
+    },
+    {
+      "id": "437:2574",
+      "back": true
+    },
+    {
+      "id": "437:2603",
+      "target": "MAP-5-FREE"
+    },
+    {
+      "id": "437:2605",
+      "target": "MAP-3-FREE"
+    },
+    {
+      "id": "437:2657",
+      "back": true
+    },
+    {
+      "id": "437:2675",
+      "target": "MAP-6-FREE"
+    },
+    {
+      "id": "437:2722",
+      "back": true
+    },
+    {
+      "id": "437:2737",
+      "target": "MAP-7-FREE"
+    },
+    {
+      "id": "437:2784",
+      "back": true
+    },
+    {
+      "id": "437:2817",
+      "target": "MAP-8-FREE"
+    },
+    {
+      "id": "437:2819",
+      "target": "LOCAL-SHOP"
+    },
+    {
+      "id": "437:2866",
+      "back": true
+    },
+    {
+      "id": "437:2892",
+      "target": "LOCAL-FISH"
+    },
+    {
+      "id": "437:2939",
+      "back": true
+    },
+    {
+      "id": "437:2955",
+      "target": "LOCAL-CATCH"
+    },
+    {
+      "id": "437:2957",
+      "target": "MAP-7-FREE"
+    },
+    {
+      "id": "437:3004",
+      "back": true
+    },
+    {
+      "id": "437:3020",
+      "target": "PASS-1"
+    },
+    {
+      "id": "437:3022",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "437:3069",
+      "back": true
+    },
+    {
+      "id": "437:3082",
+      "target": "LOCAL-TRADE"
+    },
+    {
+      "id": "437:3084",
+      "target": "MAP-7-FREE"
+    },
+    {
+      "id": "437:3131",
+      "back": true
+    },
+    {
+      "id": "437:3160",
+      "target": "LOCAL-BOUGHT"
+    },
+    {
+      "id": "437:3162",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "437:3209",
+      "back": true
+    },
+    {
+      "id": "437:3223",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "437:3225",
+      "target": "MAP-7-FREE"
+    },
+    {
+      "id": "437:3272",
+      "back": true
+    },
+    {
+      "id": "437:3286",
+      "target": "PASS-1"
+    },
+    {
+      "id": "437:3288",
+      "target": "MAP-2-FREE"
+    },
+    {
+      "id": "437:3335",
+      "back": true
+    },
+    {
+      "id": "437:3359",
+      "target": "PASS-2"
+    },
+    {
+      "id": "437:3361",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "437:3408",
+      "back": true
+    },
+    {
+      "id": "437:3444",
+      "target": "MAP-8-FREE"
+    },
+    {
+      "id": "437:3491",
+      "back": true
+    },
+    {
+      "id": "437:3503",
+      "target": "MAP-5-FREE"
+    },
+    {
+      "id": "437:3505",
+      "target": "MAP-3-FREE"
+    },
+    {
+      "id": "437:3552",
+      "back": true
+    },
+    {
+      "id": "437:3556",
+      "target": "MAP-6-FREE"
+    },
+    {
+      "id": "437:3604",
+      "back": true
+    },
+    {
+      "id": "437:3635",
+      "target": "MAP-3-FREE"
+    }
+  ],
+  "count": 18
+}

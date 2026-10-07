@@ -1,0 +1,28 @@
+const page=await figma.getNodeByIdAsync('481:53');await figma.setCurrentPageAsync(page);
+const created=[],changed=new Set(),removed=[],records=[];const touch=n=>{changed.add(n.id);return n;};
+await figma.loadFontAsync({family:'Nunito',style:'Bold'});await figma.loadFontAsync({family:'Nunito',style:'ExtraBold'});await figma.loadFontAsync({family:'Nunito',style:'Regular'});
+const masters={};for(const [k,id] of Object.entries({default:'633:41221',selected:'633:41231',empty:'633:41241',Bag:'907:72112',Close:'907:72121'}))masters[k]=await figma.getNodeByIdAsync(id);
+function setp(n,props){const keys=Object.keys(n.componentProperties),p={};for(const [k,v]of Object.entries(props)){const key=keys.find(s=>s.split('#')[0]===k);if(key)p[key]=v;}n.setProperties(p);}
+function shortName(t){return t.replace(' Seeds','\nSeeds').replace('Orchard Feed','Orchard\nFeed').replace('Worm Bait','Worm\nBait').replace('Spinner Lure','Spinner\nLure').replace('Fish Trap','Fish\nTrap').replace('Healing Potion','Healing\nPotion');}
+for(const row of DATA){
+ const bar=touch(await figma.getNodeByIdAsync(row.id));const screen=await figma.getNodeByIdAsync(row.screen);
+ for(let i=0;i<5;i++){
+  const n=touch(bar.children[i]),item=row.slots[i];const actions=JSON.stringify(n.reactions);n.swapComponent(masters[item.empty?'empty':item.selected?'selected':'default']);n.resize(52,68);n.layoutPositioning='AUTO';n.layoutSizingHorizontal='FIXED';n.layoutSizingVertical='FIXED';
+  setp(n,{Title:shortName(item.title||''),Quantity:item.quantityDisplay||'',Icon:item.iconId||'431:28','Show icon':!item.empty,'Show title':!item.empty,'Show quantity':!item.empty,'Show pin':!!item.pinned});n.name='Quick slot · '+(item.empty?'Empty':item.title);
+  if(JSON.stringify(n.reactions)!==actions)throw Error('Reaction changed on '+n.id);
+ }
+ const old=bar.children[5];let end;if(old.type==='INSTANCE'&&['907:72112','907:72121'].includes(old.mainComponent?.id)){end=old;end.swapComponent(masters[row.end]);}else{end=masters[row.end].createInstance();created.push(end.id);bar.appendChild(end);await end.setReactionsAsync(old.reactions);end.name=row.end==='Close'?'Close bag':'Open Bag';removed.push(old.id);old.remove();}end.resize(56,68);end.layoutPositioning='AUTO';touch(end);
+ bar.layoutMode='HORIZONTAL';bar.primaryAxisSizingMode='FIXED';bar.counterAxisSizingMode='FIXED';bar.itemSpacing=4;bar.setBoundVariable('itemSpacing',null);bar.paddingTop=0;bar.paddingBottom=0;bar.paddingLeft=0;bar.paddingRight=0;bar.counterAxisAlignItems='MIN';bar.resize(336,68);bar.name='Quick Bar · unified · five slots + '+row.end;
+ const selection=bar.parent;if(selection.name==='Quick Bar · items and selected name'){
+  for(const n of [...selection.children])if(n!==bar){removed.push(n.id);n.remove();}
+  touch(selection);selection.itemSpacing=0;selection.resize(336,68);selection.primaryAxisSizingMode='AUTO';
+ }
+ if(row.role==='world'){
+  let top=bar;while(top.parent&&top.parent.id!==screen.id)top=top.parent;
+  if(top!==screen){touch(top);top.resize(336,68);top.x=12;top.y=708;if(top.layoutMode!=='NONE'){top.primaryAxisSizingMode='AUTO';top.counterAxisSizingMode='FIXED';}}
+ } else {
+  for(let x=bar.parent;x&&x.id!==screen.id;x=x.parent){if(x.layoutMode==='VERTICAL'){touch(x);x.primaryAxisSizingMode='AUTO';}}
+ }
+ records.push({screen:row.screen,id:bar.id,role:row.role,end:end.id,bounds:[bar.width,bar.height],slotIds:bar.children.slice(0,5).map(n=>n.id)});
+}
+return {createdNodeIds:created,mutatedNodeIds:[...changed],removedNodeIds:removed,records};

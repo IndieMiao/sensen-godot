@@ -5,6 +5,8 @@
 1. [玩法方案 v2](product/gameplay-plan-v2-2026-10-02.md)：玩法、数值、文案、操作与 P0/P1/P2/P3 分期的唯一来源，采用正文最新修订。
 2. [Figma · Prototype](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955)：当前原型画板；[本地设计索引](design/README.md) 标出有效稿与素材来源。
 3. [P0 进度核查](qa/p0-progress-audit-2026-10-05.md)：实现证据、剩余范围和 SGODOT-131/150/153–170 卡片。
+4. [后续设计与组件整理](design/p1-p2-flows-2026-10-06/README.md)：P1/P2/P3首轮后续图稿、原背包样式修正和共享组件入口；设计稿不等于实现验收。
+5. [全量 UI 重构审阅](design/ui-refactor-2026-10-06/README.md)：288 张主卡已写入独立 Figma 审阅页，另有 23 张独立补态（4 张流程修复＋15 张操作结果＋4 张免费旅行分支均已写入）；含原稿规格复用、实际截图与连线复核。写入数不等于全部最终视觉通过，本轮图稿重构、组件整理与截图复核完成，原型动作缺口见 ledger。
 
 方案中的 P1/P2/P3 设计仍有效，只是不属于 P0；不能因尚未开发而删除。当前文档内部的待收口矛盾按 SGODOT-153 处理，不用旧方案补写新规则。
 

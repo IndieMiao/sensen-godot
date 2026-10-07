@@ -1,0 +1,13 @@
+const CLOUD_STATE=__STATE__;
+PAGE=await figma.getNodeByIdAsync(CLOUD_STATE.pageId);await figma.setCurrentPageAsync(PAGE);
+LIBRARY=await figma.getNodeByIdAsync(CLOUD_STATE.libraryId);
+await Promise.all(['Regular','Bold','ExtraBold'].map(style=>figma.loadFontAsync({family:T.font.family,style})));
+for(const [key,id]of Object.entries(CLOUD_STATE.variables))VAR[key]=await figma.variables.getVariableByIdAsync(id);
+for(const [key,id]of Object.entries(CLOUD_STATE.styles))STYLE[key]=await figma.getStyleByIdAsync(id);
+for(const [key,id]of Object.entries(CLOUD_STATE.kit))KIT[key]=await figma.getNodeByIdAsync(id);
+for(const [key,id]of Object.entries(CLOUD_STATE.icons))ICON[key]=await figma.getNodeByIdAsync(id);
+for(const row of PAGE.children.filter(n=>n.type==='SECTION'))for(const section of row.children.filter(n=>n.type==='SECTION'))for(const n of section.children.filter(n=>n.type==='FRAME'))LEDGER.screens[n.name.split(' · ')[0]]=n.id;
+overlayIndex=CLOUD_STATE.overlayIndex||0;
+const beforeIds=new Set(PAGE.findAll(()=>true).map(n=>n.id));
+function legacyNewNodeIds(){const created=PAGE.findAll(()=>true).filter(n=>!beforeIds.has(n.id));const inherited={};for(const n of created)if(n.id.startsWith('I')){const at=n.id.indexOf(';'),prefix=n.id.slice(0,at),suffix=n.id.slice(at+1);(inherited[prefix]??=[]).push(suffix);}return {createdNodeIds:created.filter(n=>!n.id.startsWith('I')).map(n=>n.id),inheritedNodeIdGroups:Object.fromEntries(Object.entries(inherited).map(([prefix,suffixes])=>[prefix,suffixes.join('|')])),createdNodeCount:created.length};}
+const CLOUD_REACTION_BASE=setReaction;setReaction=async function(node,action){const clean={...action};delete clean.overlayRelativePosition;return await CLOUD_REACTION_BASE(node,clean);};

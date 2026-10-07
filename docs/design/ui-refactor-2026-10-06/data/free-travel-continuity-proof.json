@@ -1,0 +1,45 @@
+{
+  "changedMainIds": [
+    "LOCAL-SHOP",
+    "LOCAL-TRADE",
+    "LOCAL-BOUGHT",
+    "LOCAL-CATCH",
+    "BUFF-LAST"
+  ],
+  "newAuthoredStateIds": [
+    "FREE-HOME-BROWSE",
+    "FREE-HOME-CATCH",
+    "FREE-HOME-BOUGHT",
+    "FREE-EXPLORE-BOUGHT"
+  ],
+  "supportSceneIds": [
+    "FREE-HOME-BROWSE/scene",
+    "FREE-HOME-CATCH/scene",
+    "FREE-HOME-BOUGHT/scene"
+  ],
+  "homeReturnUntouched": true,
+  "resourceSteps": {
+    "departure": {
+      "energy": 142,
+      "coins": 230
+    },
+    "arrival": {
+      "energy": 152,
+      "coins": 230
+    },
+    "catch": {
+      "energy": 147,
+      "coins": 230,
+      "Pond Crucian added": 1
+    },
+    "purchase": {
+      "energy": 152,
+      "coins": 213,
+      "Pumpkin Seeds added": 1
+    }
+  },
+  "ownedTotalInvented": false,
+  "prototypeScope": "One authored free-trip branch at a time; final same-resource scenes are the bounded proof endpoint. Arbitrary subsequent cycles are not simulated.",
+  "sharedHomeBaselineSha256": "90a492b7e5e6e1405d8bc9e62b018e6b361950fd4526cd91e466fcebf7fe523b",
+  "sharedHomeNotInChangedIds": true
+}

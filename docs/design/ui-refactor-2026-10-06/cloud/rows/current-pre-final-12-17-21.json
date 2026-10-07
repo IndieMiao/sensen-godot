@@ -1,0 +1,158 @@
+{
+  "capturedAt": "2026-10-06T09:43:14.373415+00:00",
+  "status": "pre-final-render-reviewed",
+  "rows": [
+    12,
+    17,
+    21
+  ],
+  "captures": [
+    {
+      "row": 12,
+      "file": "row-12.png",
+      "sha256": "a2e727704d883ceaad2a519d35db54ffd7bb55062caf39e61e59ee19fabd7df3"
+    },
+    {
+      "row": 17,
+      "file": "row-17.png",
+      "sha256": "124c09953fbbb97ef985fcc1afa934b0eb2b3562840dda160209fbd544a6075d"
+    },
+    {
+      "row": 21,
+      "file": "row-21.png",
+      "sha256": "e5f5fd5e621169876156184df689e38591f89f4364e2d4976c4da1d093b81133"
+    }
+  ],
+  "cards": [
+    {
+      "id": "TUT-3-03",
+      "status": "reviewed"
+    },
+    {
+      "id": "TUT-3-04",
+      "status": "reviewed"
+    },
+    {
+      "id": "TUT-3-05",
+      "status": "reviewed"
+    },
+    {
+      "id": "TUT-3-06",
+      "status": "reviewed"
+    },
+    {
+      "id": "TUT-3-06B",
+      "status": "reviewed"
+    },
+    {
+      "id": "TUT-3-07A",
+      "status": "reviewed"
+    },
+    {
+      "id": "TUT-3-07B",
+      "status": "pending-first-build"
+    },
+    {
+      "id": "TUT-3-07C",
+      "status": "reviewed"
+    },
+    {
+      "id": "STORE-1",
+      "status": "pending-first-build"
+    },
+    {
+      "id": "STORE-2",
+      "status": "pending-first-build"
+    },
+    {
+      "id": "COOK-P0-9",
+      "status": "reviewed"
+    },
+    {
+      "id": "COOK-P0-10",
+      "status": "pending-first-build"
+    },
+    {
+      "id": "BOARD-1",
+      "status": "reviewed"
+    },
+    {
+      "id": "BOARD-2",
+      "status": "reviewed"
+    },
+    {
+      "id": "BOARD-3",
+      "status": "reviewed"
+    },
+    {
+      "id": "TODAY-1",
+      "status": "reviewed"
+    },
+    {
+      "id": "FAC-4",
+      "status": "reviewed"
+    },
+    {
+      "id": "FAC-5",
+      "status": "reviewed"
+    },
+    {
+      "id": "FAC-6",
+      "status": "reviewed"
+    },
+    {
+      "id": "TRAP-1",
+      "status": "reviewed"
+    },
+    {
+      "id": "TRAP-2",
+      "status": "pending-first-build"
+    },
+    {
+      "id": "TRAP-3",
+      "status": "reviewed"
+    },
+    {
+      "id": "TRAP-4",
+      "status": "reviewed"
+    },
+    {
+      "id": "TRAP-5",
+      "status": "reviewed"
+    }
+  ],
+  "findings": [
+    {
+      "ids": [
+        "TUT-3-03",
+        "TUT-3-06",
+        "TUT-3-07A",
+        "TUT-3-07C",
+        "COOK-P0-9",
+        "FAC-5"
+      ],
+      "issue": "Repeated body/footer reward",
+      "resolution": "Covered by current-qa-fixes.js; final native rendering pending."
+    },
+    {
+      "ids": [
+        "TUT-3-07C"
+      ],
+      "issue": "Wallet230 clashes with director-table194; meal allowance counted before Eat.",
+      "resolution": "Data corrected:194 coins and explicit Meals after eating25/300 preview."
+    },
+    {
+      "ids": [
+        "TODAY-1"
+      ],
+      "issue": "Show kitchen below initial viewport; generic navigation target opens kitchen directly, contrary to camera-only guidance.",
+      "resolution": "Reported to root for common Show/highlight interaction factory."
+    }
+  ],
+  "passingExamples": [
+    "TRAP-1 price120coins,8h interval and3fish storage clear",
+    "TRAP-3 timer0/3 and TRAP-4 catch species/counts separate",
+    "TRAP-5 full bag25/25 preservesfish",
+    "BOARD-3 cancellation loss and dismiss distinct"
+  ]
+}

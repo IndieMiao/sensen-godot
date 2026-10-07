@@ -1,0 +1,2285 @@
+[
+  {
+    "id": "MAP-2-FREE",
+    "sourceGroup": "09",
+    "title": "Destinations",
+    "state": "Browse",
+    "effect": "Choose a city to explore on the map.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Looking around the map never moves you.",
+      "Hangzhou · China",
+      "Trip 3 · Free · 1 new stamp",
+      "Tokyo · Japan",
+      "Trip 5 · Free · 2 regional fish",
+      "Los Angeles · United States",
+      "Trip 7 · Free · 3 things to do"
+    ],
+    "actions": [
+      {
+        "label": "Browse Tokyo",
+        "target": "MAP-3-FREE",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Hangzhou",
+        "state": "Trip 3",
+        "effect": "China",
+        "keyFacts": [
+          {
+            "label": "Travel",
+            "value": "Free",
+            "kind": "cost"
+          },
+          {
+            "label": "New stamp",
+            "value": "1",
+            "kind": "reward"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-map"
+      },
+      {
+        "title": "Tokyo",
+        "state": "Trip 5",
+        "effect": "Japan",
+        "keyFacts": [
+          {
+            "label": "Travel",
+            "value": "Free",
+            "kind": "cost"
+          },
+          {
+            "label": "Regional fish",
+            "value": "2",
+            "kind": "progress"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-map"
+      },
+      {
+        "title": "Los Angeles",
+        "state": "Trip 7",
+        "effect": "United States",
+        "keyFacts": [
+          {
+            "label": "Travel",
+            "value": "Free",
+            "kind": "cost"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-map"
+      }
+    ],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "§11.10四列表；本页Nearby示例，其余标签仅列表筛选。免费首版所有Trip只显示档名；从家城计算距离，不扣费无证件。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MAP-2-FREE",
+      "nodeId": "437:2372",
+      "designLabel": "目的地四列表"
+    },
+    "original": {
+      "id": "MAP-2-FREE",
+      "title": "目的地四列表",
+      "scene": "map",
+      "place": "Map",
+      "heading": "Where to next?",
+      "tabs": [
+        "Nearby",
+        "Friends",
+        "Open farms",
+        "Featured"
+      ],
+      "rows": [
+        [
+          "Hangzhou · China",
+          "Trip 3 · Free · 1 new stamp",
+          "i-map"
+        ],
+        [
+          "Tokyo · Japan",
+          "Trip 5 · Free · 2 regional fish",
+          "i-map"
+        ],
+        [
+          "Los Angeles · United States",
+          "Trip 7 · Free · 3 things to do",
+          "i-map"
+        ]
+      ],
+      "actions": [
+        [
+          "Browse Tokyo",
+          "MAP-3-FREE"
+        ]
+      ],
+      "foot": "Looking around the map never moves you.",
+      "note": "§11.10四列表；本页Nearby示例，其余标签仅列表筛选。免费首版所有Trip只显示档名；从家城计算距离，不扣费无证件。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [
+        "Nearby",
+        "Friends",
+        "Open farms",
+        "Featured"
+      ],
+      "selectedTab": 0,
+      "place": "Map",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Map",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true,
+      "fixedNavigationLabels": [
+        "Browse Tokyo"
+      ]
+    }
+  },
+  {
+    "id": "MAP-3-FREE",
+    "sourceGroup": "09",
+    "title": "Tokyo",
+    "state": "Unexplored",
+    "effect": "Preview the city before travelling.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Climate",
+        "value": "Temperate"
+      },
+      {
+        "kind": "progress",
+        "label": "Trip",
+        "value": "5 · Continental"
+      },
+      {
+        "kind": "time",
+        "label": "Local time",
+        "value": "09:12"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Temperate · Trip 5 · 14 online · 09:12 local",
+      "3 ponds · 17 outposts · 8 residents",
+      "2 regional fish · 12 open farms",
+      "Fishing Lv1 / Lv5",
+      "Local fish silhouettes"
+    ],
+    "actions": [
+      {
+        "label": "Travel details",
+        "target": "MAP-4-FREE",
+        "kind": "navigate"
+      },
+      {
+        "label": "Keep browsing",
+        "target": "MAP-2-FREE",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Ponds",
+        "state": "",
+        "effect": "Basic and regional fishing",
+        "keyFacts": [],
+        "disclosure": [],
+        "quantity": {
+          "value": "3",
+          "label": "ponds"
+        },
+        "icon": "i-pond"
+      },
+      {
+        "title": "Outposts",
+        "state": "",
+        "effect": "Local shops and requests",
+        "keyFacts": [],
+        "disclosure": [],
+        "quantity": {
+          "value": "17",
+          "label": "outposts"
+        },
+        "icon": "i-home"
+      },
+      {
+        "title": "Residents",
+        "state": "",
+        "effect": "People to meet",
+        "keyFacts": [],
+        "disclosure": [],
+        "quantity": {
+          "value": "8",
+          "label": "residents"
+        },
+        "icon": "i-face-player"
+      }
+    ],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "城市名/人数/时间不遮，服务图钉剪影；当前玩家仍Shanghai。数量是示例夹具，正式从城市簇数据，不从POI猜。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MAP-3-FREE",
+      "nodeId": "437:2456",
+      "designLabel": "未探索城 · 浏览"
+    },
+    "original": {
+      "id": "MAP-3-FREE",
+      "title": "未探索城 · 浏览",
+      "scene": "map",
+      "grey": true,
+      "place": "Map",
+      "heading": "Tokyo · Japan",
+      "meta": "Temperate · Trip 5 · 14 online · 09:12 local",
+      "rows": [
+        [
+          "3 ponds · 17 outposts · 8 residents",
+          "2 regional fish · 12 open farms",
+          "i-pond"
+        ],
+        [
+          "Fishing Lv1 / Lv5",
+          "Local fish silhouettes",
+          "i-fish-sil"
+        ]
+      ],
+      "actions": [
+        [
+          "Travel here",
+          "MAP-4-FREE"
+        ],
+        [
+          "Keep browsing",
+          "MAP-2-FREE",
+          "soft"
+        ]
+      ],
+      "note": "城市名/人数/时间不遮，服务图钉剪影；当前玩家仍Shanghai。数量是示例夹具，正式从城市簇数据，不从POI猜。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Map",
+      "placeExplicit": true
+    },
+    "hud": {
+      "place": "Map",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true,
+      "fixedNavigationLabels": [
+        "Travel details"
+      ]
+    }
+  },
+  {
+    "id": "MAP-4-FREE",
+    "sourceGroup": "09",
+    "title": "Tokyo",
+    "state": "Ready to travel",
+    "effect": "Fly here and explore the local pond and outpost.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Travel",
+        "value": "Free"
+      },
+      {
+        "kind": "cost",
+        "label": "Return home",
+        "value": "Free"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Trip 5 · Continental · First visit",
+      "Return home is always free.",
+      "Free travel",
+      "No Energy, coins or travel items",
+      "3 things to do here",
+      "Fish the local pond · visit an outpost · get a stamp"
+    ],
+    "actions": [
+      {
+        "label": "Fly",
+        "target": "MAP-5-FREE",
+        "kind": "commit"
+      },
+      {
+        "label": "Not now",
+        "target": "MAP-3-FREE",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Pond",
+        "state": "",
+        "effect": "Fish locally",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-pond"
+      },
+      {
+        "title": "Outpost",
+        "state": "",
+        "effect": "Visit shops and requests",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-home"
+      },
+      {
+        "title": "Tokyo stamp",
+        "state": "",
+        "effect": "Receive it on your first arrival",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-stamp"
+      }
+    ],
+    "items": [],
+    "scene": "map",
+    "layout": "sheet",
+    "sourceNote": "明确Travel改变玩家城，Browse不变。首版不套用10min收费档；短过渡显示出发请求状态，确定成功再落地。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MAP-4-FREE",
+      "nodeId": "437:2530",
+      "designLabel": "免费出发确认"
+    },
+    "original": {
+      "id": "MAP-4-FREE",
+      "title": "免费出发确认",
+      "scene": "map",
+      "heading": "Travel to Tokyo",
+      "meta": "Trip 5 · Continental · First visit",
+      "rows": [
+        [
+          "Free travel",
+          "No Energy, coins or travel items",
+          "i-travel"
+        ],
+        [
+          "3 things to do here",
+          "Fish the local pond · visit an outpost · get a stamp",
+          "i-pond"
+        ]
+      ],
+      "actions": [
+        [
+          "Fly",
+          "MAP-5-FREE"
+        ],
+        [
+          "Not now",
+          "MAP-3-FREE",
+          "soft"
+        ]
+      ],
+      "foot": "Return home is always free.",
+      "note": "明确Travel改变玩家城，Browse不变。首版不套用10min收费档；短过渡显示出发请求状态，确定成功再落地。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "MAP-5-FREE",
+    "sourceGroup": "09",
+    "title": "Tokyo",
+    "state": "Departing",
+    "effect": "Preparing your arrival.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Travel",
+        "value": "Free"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Trip 5 · Free travel",
+      "Preparing your arrival",
+      "Your farm and bag are saved."
+    ],
+    "actions": [
+      {
+        "label": "Skip animation",
+        "target": "MAP-6-FREE",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "短过渡分镜，不新增收费等待倒计时。请求未回包时不允许第二次发起；Skip只跳动画，不伪造到达。长时登机牌另在收费版。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MAP-5-FREE",
+      "nodeId": "437:2609",
+      "designLabel": "出发中 · 在途反馈"
+    },
+    "original": {
+      "id": "MAP-5-FREE",
+      "title": "出发中 · 在途反馈",
+      "scene": "map",
+      "route": true,
+      "heading": "On your way to Tokyo",
+      "meta": "Trip 5 · Free travel",
+      "rows": [
+        [
+          "Preparing your arrival",
+          "Your farm and bag are saved.",
+          "i-travel"
+        ]
+      ],
+      "actions": [
+        [
+          "Skip animation",
+          "MAP-6-FREE",
+          "soft"
+        ]
+      ],
+      "note": "短过渡分镜，不新增收费等待倒计时。请求未回包时不允许第二次发起；Skip只跳动画，不伪造到达。长时登机牌另在收费版。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "MAP-6-FREE",
+    "sourceGroup": "09",
+    "title": "Tokyo",
+    "state": "Arrived",
+    "effect": "Your new city stamp has been added.",
+    "keyFacts": [
+      {
+        "kind": "reward",
+        "label": "First visit",
+        "value": "+10 Energy"
+      },
+      {
+        "kind": "reward",
+        "label": "Stamp",
+        "value": "Tokyo"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "New stamp · +10 Energy",
+      "Tokyo stamp added",
+      "Passport · 2 cities visited"
+    ],
+    "actions": [
+      {
+        "label": "Explore nearby",
+        "target": "MAP-7-FREE",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "首访计数未到日2次上限时+10；相机城市→玩家城市一致。印章与迷雾永久保留；不展示付费版Day Pass倒计时。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MAP-6-FREE",
+      "nodeId": "437:2678",
+      "designLabel": "首访到达 · 印章"
+    },
+    "original": {
+      "id": "MAP-6-FREE",
+      "title": "首访到达 · 印章",
+      "scene": "map",
+      "city": "Tokyo",
+      "place": "Map",
+      "energy": 152,
+      "heading": "Welcome to Tokyo",
+      "meta": "New stamp · +10 Energy",
+      "rows": [
+        [
+          "Tokyo stamp added",
+          "Passport · 2 cities visited",
+          "i-stamp"
+        ]
+      ],
+      "actions": [
+        [
+          "See what’s nearby",
+          "MAP-7-FREE"
+        ]
+      ],
+      "note": "首访计数未到日2次上限时+10；相机城市→玩家城市一致。印章与迷雾永久保留；不展示付费版Day Pass倒计时。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Map",
+      "placeExplicit": true
+    },
+    "hud": {
+      "energy": 152,
+      "city": "Tokyo",
+      "place": "Map",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "MAP-7-FREE",
+    "sourceGroup": "09",
+    "title": "Tokyo",
+    "state": "Nearby",
+    "effect": "Choose your first local activity.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Fish the local pond",
+      "Pond Crucian · ready for every level",
+      "Visit the outpost",
+      "Temperate seeds · local requests",
+      "View your new stamp",
+      "Tokyo · now explored"
+    ],
+    "actions": [
+      {
+        "label": "Show local pond",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "operation": "highlight-target",
+          "ownerId": "MAP-7-FREE",
+          "view": "map",
+          "placeName": "Tokyo · Local pond",
+          "anchor": [
+            246,
+            352
+          ],
+          "originalDestination": "MAP-8-FREE",
+          "preservePlayer": true,
+          "preserveResources": true
+        }
+      },
+      {
+        "label": "Visit the outpost",
+        "target": "LOCAL-SHOP",
+        "kind": "commit"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Local pond",
+        "state": "",
+        "effect": "Pond Crucian for every level",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-pond"
+      },
+      {
+        "title": "Outpost",
+        "state": "",
+        "effect": "Temperate seeds and local requests",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-home"
+      },
+      {
+        "title": "Tokyo stamp",
+        "state": "New",
+        "effect": "View it in your Passport",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-passport"
+      }
+    ],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "落地兑现卡10s收起；Show仅高亮目标，下一张塘卡Go才进场。系统新手塘与据点保底，真实POI只读名片。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MAP-7-FREE",
+      "nodeId": "437:2740",
+      "designLabel": "落地 · 可做的三件事"
+    },
+    "original": {
+      "id": "MAP-7-FREE",
+      "title": "落地 · 可做的三件事",
+      "scene": "map",
+      "city": "Tokyo",
+      "place": "Map",
+      "energy": 152,
+      "heading": "3 things to do here",
+      "rows": [
+        [
+          "Fish the local pond",
+          "Pond Crucian · ready for every level",
+          "i-pond"
+        ],
+        [
+          "Visit the outpost",
+          "Temperate seeds · local requests",
+          "i-home"
+        ],
+        [
+          "View your new stamp",
+          "Tokyo · now explored",
+          "i-passport"
+        ]
+      ],
+      "actions": [
+        [
+          "Show local pond",
+          "MAP-8-FREE"
+        ],
+        [
+          "Visit the outpost",
+          "LOCAL-SHOP",
+          "soft"
+        ]
+      ],
+      "note": "落地兑现卡10s收起；Show仅高亮目标，下一张塘卡Go才进场。系统新手塘与据点保底，真实POI只读名片。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Map",
+      "placeExplicit": true
+    },
+    "hud": {
+      "energy": 152,
+      "city": "Tokyo",
+      "place": "Map",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "MAP-8-FREE",
+    "sourceGroup": "09",
+    "title": "Sumida Pond",
+    "state": "Beginner",
+    "effect": "Basic fishing is available to every player.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Entry",
+        "value": "Free"
+      },
+      {
+        "kind": "progress",
+        "label": "Regional fish",
+        "value": "2"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Beginner pond · Same city · Free",
+      "Pond Crucian OK",
+      "Everyone can start with a basic fish.",
+      "2 regional fish",
+      "Smelt Lv1 · Northern Pike Lv5"
+    ],
+    "actions": [
+      {
+        "label": "Go",
+        "target": "LOCAL-FISH",
+        "kind": "commit"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Pond Crucian",
+        "state": "",
+        "effect": "A fish every player can catch",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-fish"
+      },
+      {
+        "title": "Smelt",
+        "state": "Fishing Lv1",
+        "effect": "Regional fish",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-fish-sil"
+      },
+      {
+        "title": "Northern Pike",
+        "state": "Fishing Lv5",
+        "effect": "Regional fish",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-fish-sil"
+      }
+    ],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "地区鱼示例须按城市哈希池落实，不宣称真实东京固定两种。本卡不能在到塘后才以技能阻止基础钓鱼。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "MAP-8-FREE",
+      "nodeId": "437:2822",
+      "designLabel": "当地新手塘 · 可进入"
+    },
+    "original": {
+      "id": "MAP-8-FREE",
+      "title": "当地新手塘 · 可进入",
+      "scene": "map",
+      "city": "Tokyo",
+      "place": "Map",
+      "energy": 152,
+      "heading": "Sumida Pond",
+      "meta": "Beginner pond · Same city · Free",
+      "rows": [
+        [
+          "Pond Crucian OK",
+          "Everyone can start with a basic fish.",
+          "i-fish"
+        ],
+        [
+          "2 regional fish",
+          "Smelt Lv1 · Northern Pike Lv5",
+          "i-fish-sil"
+        ]
+      ],
+      "actions": [
+        [
+          "Go",
+          "LOCAL-FISH"
+        ]
+      ],
+      "note": "地区鱼示例须按城市哈希池落实，不宣称真实东京固定两种。本卡不能在到塘后才以技能阻止基础钓鱼。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Map",
+      "placeExplicit": true
+    },
+    "hud": {
+      "energy": 152,
+      "city": "Tokyo",
+      "place": "Map",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "LOCAL-FISH",
+    "sourceGroup": "09",
+    "title": "Sumida Pond",
+    "state": "Fishing",
+    "effect": "Cast your line in Tokyo.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Cast",
+        "value": "5 Energy"
+      },
+      {
+        "kind": "capacity",
+        "label": "Bag space",
+        "value": "25 slots"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Creel 0 · 25 free",
+      "Starter Rod equipped",
+      "Bait is optional."
+    ],
+    "actions": [
+      {
+        "label": "Cast",
+        "target": "LOCAL-CATCH",
+        "kind": "commit"
+      },
+      {
+        "label": "Back to map",
+        "target": "MAP-7-FREE",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "pond",
+    "layout": "scene",
+    "sourceNote": "基础钓鱼执行常规Cast5，免费旅行不等于当地生产免费。收线小游戏沿已完成FISH-2，只补旅行落点。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "LOCAL-FISH",
+      "nodeId": "437:2895",
+      "designLabel": "当地行动 · 基础钓鱼"
+    },
+    "original": {
+      "id": "LOCAL-FISH",
+      "title": "当地行动 · 基础钓鱼",
+      "scene": "pond",
+      "city": "Tokyo",
+      "place": "Sumida Pond",
+      "energy": 152,
+      "heading": "Cast a line in Tokyo",
+      "meta": "Creel 0 · 25 free",
+      "rows": [
+        [
+          "Starter Rod equipped",
+          "Bait is optional.",
+          "i-rod"
+        ]
+      ],
+      "actions": [
+        [
+          "Cast · 5 Energy",
+          "LOCAL-CATCH"
+        ],
+        [
+          "Back to map",
+          "MAP-7-FREE",
+          "soft"
+        ]
+      ],
+      "note": "基础钓鱼执行常规Cast5，免费旅行不等于当地生产免费。收线小游戏沿已完成FISH-2，只补旅行落点。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Sumida Pond",
+      "placeExplicit": true
+    },
+    "hud": {
+      "energy": 152,
+      "city": "Tokyo",
+      "place": "Sumida Pond",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": false
+    },
+    "sceneControls": {
+      "label": "Cast",
+      "cost": "5 Energy",
+      "icon": "i-rod",
+      "quick": [],
+      "target": "LOCAL-CATCH",
+      "mode": "Fishing"
+    }
+  },
+  {
+    "id": "LOCAL-CATCH",
+    "sourceGroup": "09",
+    "title": "Pond Crucian",
+    "state": "First local catch",
+    "effect": "Your first fish in Tokyo earns a city bonus.",
+    "quantity": {
+      "value": "1",
+      "label": "fish"
+    },
+    "keyFacts": [
+      {
+        "kind": "reward",
+        "label": "First local catch",
+        "value": "+10 Fishing XP"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "First fish in Tokyo · +10 Fishing XP",
+      "Tokyo · 1 fish caught",
+      "Your visit now has a story."
+    ],
+    "actions": [
+      {
+        "label": "View passport",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "operation": "free-trip-passport"
+        }
+      },
+      {
+        "label": "Go home",
+        "target": "FREE-HOME-CATCH",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "pond",
+    "layout": "sheet",
+    "sourceNote": "10是首城额外奖励，鱼种/钓获XP另按既有规则。到达后10分钟发生一次当地动作计兑现，不拿浏览当动作。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "LOCAL-CATCH",
+      "nodeId": "437:2960",
+      "designLabel": "当地兑现 · 首城钓获"
+    },
+    "original": {
+      "id": "LOCAL-CATCH",
+      "title": "当地兑现 · 首城钓获",
+      "scene": "pond",
+      "city": "Tokyo",
+      "place": "Sumida Pond",
+      "energy": 147,
+      "heading": "Caught! Pond Crucian",
+      "meta": "First fish in Tokyo · +10 Fishing XP",
+      "rows": [
+        [
+          "Tokyo · 1 fish caught",
+          "Your visit now has a story.",
+          "i-fish"
+        ]
+      ],
+      "actions": [
+        [
+          "View passport",
+          "PASS-1"
+        ],
+        [
+          "Go home · Free",
+          "HOME-RETURN",
+          "soft"
+        ]
+      ],
+      "note": "10是首城额外奖励，鱼种/钓获XP另按既有规则。到达后10分钟发生一次当地动作计兑现，不拿浏览当动作。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Sumida Pond",
+      "placeExplicit": true
+    },
+    "hud": {
+      "energy": 147,
+      "city": "Tokyo",
+      "place": "Sumida Pond",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "capacity": 200,
+      "coins": 230
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "sourceCorrections": [
+      {
+        "field": "free-travel resource continuity",
+        "before": {
+          "hud": {
+            "energy": 147,
+            "city": "Tokyo",
+            "place": "Sumida Pond",
+            "recoveryState": "recovering",
+            "recoveryText": "+1 in 3:59"
+          },
+          "actions": [
+            {
+              "label": "View passport",
+              "target": "PASS-1",
+              "kind": "navigate"
+            },
+            {
+              "label": "Go home",
+              "target": "HOME-RETURN",
+              "kind": "commit"
+            }
+          ]
+        },
+        "after": {
+          "hud": {
+            "energy": 147,
+            "city": "Tokyo",
+            "place": "Sumida Pond",
+            "recoveryState": "recovering",
+            "recoveryText": "+1 in 3:59",
+            "capacity": 200,
+            "coins": 230
+          },
+          "actions": [
+            {
+              "label": "View passport",
+              "target": null,
+              "kind": "navigate",
+              "context": {
+                "operation": "free-trip-passport"
+              }
+            },
+            {
+              "label": "Go home",
+              "target": "FREE-HOME-CATCH",
+              "kind": "commit"
+            }
+          ]
+        },
+        "basis": "Free travel spends no Energy/coins; first visit +10, cast5, authored seed purchase17. Buff expiry retains normal local fishing; no foreign-city catch or first-city XP jump."
+      }
+    ]
+  },
+  {
+    "id": "LOCAL-SHOP",
+    "sourceGroup": "09",
+    "title": "Mei",
+    "state": "Market Keeper",
+    "effect": "Browse local seeds and requests.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Temperate produce is fresh today.",
+      "Trade",
+      "See local seeds and requests"
+    ],
+    "actions": [
+      {
+        "label": "Trade",
+        "target": "LOCAL-TRADE",
+        "kind": "navigate"
+      },
+      {
+        "label": "Just passing by",
+        "target": "MAP-7-FREE",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "market-square-v2",
+    "layout": "sheet",
+    "sourceNote": "岗位名称/名牌复用NPC-G1规范，此处共享场景占位。角色美术气候变体另列，农场无人驿站例外不变。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "LOCAL-SHOP",
+      "nodeId": "437:3025",
+      "designLabel": "当地据点 · 先问候"
+    },
+    "original": {
+      "id": "LOCAL-SHOP",
+      "title": "当地据点 · 先问候",
+      "scene": "market-square-v2",
+      "city": "Tokyo",
+      "place": "Market Square",
+      "heading": "Market Keeper · Mei",
+      "meta": "Temperate produce is fresh today.",
+      "rows": [
+        [
+          "Trade",
+          "See local seeds and requests",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "Trade",
+          "LOCAL-TRADE"
+        ],
+        [
+          "Just passing by",
+          "MAP-7-FREE",
+          "soft"
+        ]
+      ],
+      "note": "岗位名称/名牌复用NPC-G1规范，此处共享场景占位。角色美术气候变体另列，农场无人驿站例外不变。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Market Square",
+      "placeExplicit": true
+    },
+    "hud": {
+      "city": "Tokyo",
+      "place": "Market Square",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "energy": 152,
+      "capacity": 200,
+      "coins": 230
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "sourceCorrections": [
+      {
+        "field": "free-travel resource continuity",
+        "before": {
+          "hud": {
+            "city": "Tokyo",
+            "place": "Market Square",
+            "recoveryState": "recovering",
+            "recoveryText": "+1 in 3:59"
+          },
+          "actions": [
+            {
+              "label": "Trade",
+              "target": "LOCAL-TRADE",
+              "kind": "navigate"
+            },
+            {
+              "label": "Just passing by",
+              "target": "MAP-7-FREE",
+              "kind": "dismiss"
+            }
+          ]
+        },
+        "after": {
+          "hud": {
+            "city": "Tokyo",
+            "place": "Market Square",
+            "recoveryState": "recovering",
+            "recoveryText": "+1 in 3:59",
+            "energy": 152,
+            "capacity": 200,
+            "coins": 230
+          },
+          "actions": [
+            {
+              "label": "Trade",
+              "target": "LOCAL-TRADE",
+              "kind": "navigate"
+            },
+            {
+              "label": "Just passing by",
+              "target": "MAP-7-FREE",
+              "kind": "dismiss"
+            }
+          ]
+        },
+        "basis": "Free travel spends no Energy/coins; first visit +10, cast5, authored seed purchase17. Buff expiry retains normal local fishing; no foreign-city catch or first-city XP jump."
+      }
+    ]
+  },
+  {
+    "id": "LOCAL-TRADE",
+    "sourceGroup": "09",
+    "title": "Pumpkin Seeds",
+    "state": "For sale",
+    "effect": "A Temperate crop to plant at home.",
+    "quantity": {
+      "value": "1",
+      "label": "seed"
+    },
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Price each",
+        "value": "17 coins"
+      },
+      {
+        "kind": "progress",
+        "label": "Stock today",
+        "value": "10/10"
+      },
+      {
+        "kind": "progress",
+        "label": "Unlock",
+        "value": "Farming Lv5"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Pumpkin Seeds · Farming Lv5",
+      "17 coins each · 10/10 today",
+      "Buyback today 0/80",
+      "All markets in this city share the limit."
+    ],
+    "actions": [
+      {
+        "label": "Buy",
+        "target": "LOCAL-BOUGHT",
+        "kind": "commit"
+      },
+      {
+        "label": "Go home",
+        "target": "FREE-HOME-BROWSE",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "market-square-v2",
+    "layout": "sheet",
+    "sourceNote": "本样例玩家Farming5；低等级可看不可买。首次计数Trip3+礼物2种子另经包裹，不代替玩家购买；免费版先验证实际本地行为。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "LOCAL-TRADE",
+      "nodeId": "437:3087",
+      "designLabel": "当地购买 · 气候带种子"
+    },
+    "original": {
+      "id": "LOCAL-TRADE",
+      "title": "当地购买 · 气候带种子",
+      "scene": "market-square-v2",
+      "city": "Tokyo",
+      "place": "Market Square",
+      "heading": "Mei’s Stall · Market Square",
+      "tabs": [
+        "Buy",
+        "Market Board"
+      ],
+      "rows": [
+        [
+          "Pumpkin Seeds · Farming Lv5",
+          "17 coins each · 10/10 today",
+          "i-radish-seeds"
+        ],
+        [
+          "Buyback today 0/80",
+          "All markets in this city share the limit.",
+          "i-coin"
+        ]
+      ],
+      "actions": [
+        [
+          "Buy 1 · 17 coins",
+          "LOCAL-BOUGHT"
+        ],
+        [
+          "Go home · Free",
+          "HOME-RETURN",
+          "soft"
+        ]
+      ],
+      "note": "本样例玩家Farming5；低等级可看不可买。首次计数Trip3+礼物2种子另经包裹，不代替玩家购买；免费版先验证实际本地行为。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [
+        "Buy",
+        "Market Board"
+      ],
+      "selectedTab": 0,
+      "place": "Market Square",
+      "placeExplicit": true
+    },
+    "hud": {
+      "city": "Tokyo",
+      "place": "Market Square",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "energy": 152,
+      "capacity": 200,
+      "coins": 230
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "sourceCorrections": [
+      {
+        "field": "free-travel resource continuity",
+        "before": {
+          "hud": {
+            "city": "Tokyo",
+            "place": "Market Square",
+            "recoveryState": "recovering",
+            "recoveryText": "+1 in 3:59"
+          },
+          "actions": [
+            {
+              "label": "Buy",
+              "target": "LOCAL-BOUGHT",
+              "kind": "commit"
+            },
+            {
+              "label": "Go home",
+              "target": "HOME-RETURN",
+              "kind": "commit"
+            }
+          ]
+        },
+        "after": {
+          "hud": {
+            "city": "Tokyo",
+            "place": "Market Square",
+            "recoveryState": "recovering",
+            "recoveryText": "+1 in 3:59",
+            "energy": 152,
+            "capacity": 200,
+            "coins": 230
+          },
+          "actions": [
+            {
+              "label": "Buy",
+              "target": "LOCAL-BOUGHT",
+              "kind": "commit"
+            },
+            {
+              "label": "Go home",
+              "target": "FREE-HOME-BROWSE",
+              "kind": "commit"
+            }
+          ]
+        },
+        "basis": "Free travel spends no Energy/coins; first visit +10, cast5, authored seed purchase17. Buff expiry retains normal local fishing; no foreign-city catch or first-city XP jump."
+      }
+    ]
+  },
+  {
+    "id": "LOCAL-BOUGHT",
+    "sourceGroup": "09",
+    "title": "Pumpkin Seeds",
+    "state": "Purchased",
+    "effect": "Added to your bag.",
+    "quantity": {
+      "value": "1",
+      "label": "seed"
+    },
+    "keyFacts": [
+      {
+        "kind": "reward",
+        "label": "Added to bag",
+        "value": "1"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Added to your bag",
+      "A little piece of Tokyo",
+      "Plant at home when you’re ready."
+    ],
+    "actions": [
+      {
+        "label": "Go home",
+        "target": "FREE-HOME-BOUGHT",
+        "kind": "commit"
+      },
+      {
+        "label": "Keep exploring",
+        "target": "FREE-EXPLORE-BOUGHT",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "market-square-v2",
+    "layout": "sheet",
+    "sourceNote": "购买成功才扣17、入包，失败保留币。种子气候带固定温带，回家异带露天时长惩罚按种植规则，不抹标签。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "LOCAL-BOUGHT",
+      "nodeId": "437:3165",
+      "designLabel": "特产带回家"
+    },
+    "original": {
+      "id": "LOCAL-BOUGHT",
+      "title": "特产带回家",
+      "scene": "market-square-v2",
+      "city": "Tokyo",
+      "place": "Market Square",
+      "coins": 213,
+      "heading": "Pumpkin Seeds ×1",
+      "meta": "Added to your bag",
+      "rows": [
+        [
+          "A little piece of Tokyo",
+          "Plant at home when you’re ready.",
+          "i-sprout"
+        ]
+      ],
+      "actions": [
+        [
+          "Go home · Free",
+          "HOME-RETURN"
+        ],
+        [
+          "Keep exploring",
+          "MAP-7-FREE",
+          "soft"
+        ]
+      ],
+      "note": "购买成功才扣17、入包，失败保留币。种子气候带固定温带，回家异带露天时长惩罚按种植规则，不抹标签。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Market Square",
+      "placeExplicit": true
+    },
+    "hud": {
+      "coins": 213,
+      "city": "Tokyo",
+      "place": "Market Square",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "energy": 152,
+      "capacity": 200
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "sourceCorrections": [
+      {
+        "field": "free-travel resource continuity",
+        "before": {
+          "hud": {
+            "coins": 213,
+            "city": "Tokyo",
+            "place": "Market Square",
+            "recoveryState": "recovering",
+            "recoveryText": "+1 in 3:59"
+          },
+          "actions": [
+            {
+              "label": "Go home",
+              "target": "HOME-RETURN",
+              "kind": "commit"
+            },
+            {
+              "label": "Keep exploring",
+              "target": "MAP-7-FREE",
+              "kind": "dismiss"
+            }
+          ]
+        },
+        "after": {
+          "hud": {
+            "coins": 213,
+            "city": "Tokyo",
+            "place": "Market Square",
+            "recoveryState": "recovering",
+            "recoveryText": "+1 in 3:59",
+            "energy": 152,
+            "capacity": 200
+          },
+          "actions": [
+            {
+              "label": "Go home",
+              "target": "FREE-HOME-BOUGHT",
+              "kind": "commit"
+            },
+            {
+              "label": "Keep exploring",
+              "target": "FREE-EXPLORE-BOUGHT",
+              "kind": "dismiss"
+            }
+          ]
+        },
+        "basis": "Free travel spends no Energy/coins; first visit +10, cast5, authored seed purchase17. Buff expiry retains normal local fishing; no foreign-city catch or first-city XP jump."
+      }
+    ]
+  },
+  {
+    "id": "HOME-RETURN",
+    "sourceGroup": "09",
+    "title": "Your homestead",
+    "state": "Home",
+    "effect": "Your discoveries and items came home with you.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Shanghai · Homestead",
+      "Your discoveries stay with you",
+      "Tokyo stamp · new fish · local seeds"
+    ],
+    "actions": [
+      {
+        "label": "Open passport",
+        "target": "PASS-1",
+        "kind": "navigate"
+      },
+      {
+        "label": "Browse again",
+        "target": "MAP-2-FREE",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm",
+    "layout": "sheet",
+    "sourceNote": "返家不扣体力/金币、无旅途；保留背包与永久探索记录。返家不是重置旅行成就，也不能再领同城首访奖励。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "HOME-RETURN",
+      "nodeId": "437:3228",
+      "designLabel": "免费返家"
+    },
+    "original": {
+      "id": "HOME-RETURN",
+      "title": "免费返家",
+      "scene": "farm",
+      "heading": "Welcome home",
+      "meta": "Shanghai · Homestead",
+      "rows": [
+        [
+          "Your discoveries stay with you",
+          "Tokyo stamp · new fish · local seeds",
+          "i-passport"
+        ]
+      ],
+      "actions": [
+        [
+          "Open passport",
+          "PASS-1",
+          "soft"
+        ],
+        [
+          "Browse again",
+          "MAP-2-FREE",
+          "soft"
+        ]
+      ],
+      "note": "返家不扣体力/金币、无旅途；保留背包与永久探索记录。返家不是重置旅行成就，也不能再领同城首访奖励。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "PASS-1",
+    "sourceGroup": "09",
+    "title": "Passport",
+    "state": "Collection",
+    "effect": "Browse your visited cities and stamps.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Cities visited",
+        "value": "2"
+      },
+      {
+        "kind": "progress",
+        "label": "First visits today",
+        "value": "1/2"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "2 cities visited · First visits today 1/2",
+      "Shanghai · Home",
+      "Home city · explored",
+      "Tokyo · Visited",
+      "Next: 4 more visits + 3 local trades"
+    ],
+    "actions": [
+      {
+        "label": "Tokyo city page",
+        "target": "PASS-2",
+        "kind": "navigate"
+      },
+      {
+        "label": "Back home",
+        "target": "HOME-RETURN",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Shanghai",
+        "state": "Home",
+        "effect": "Your home city",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-home"
+      },
+      {
+        "title": "Tokyo",
+        "state": "Visited",
+        "effect": "A new connection",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-stamp"
+      }
+    ],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "此版只画免费旅行的可用章页；第二故乡设定在收费扩展。地图Me仍Profile入口，再进Collections/Passport。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "PASS-1",
+      "nodeId": "437:3291",
+      "designLabel": "护照 · 城市章与进度"
+    },
+    "original": {
+      "id": "PASS-1",
+      "title": "护照 · 城市章与进度",
+      "scene": "map",
+      "heading": "Passport",
+      "meta": "2 cities visited · First visits today 1/2",
+      "rows": [
+        [
+          "Shanghai · Home",
+          "Home city · explored",
+          "i-home"
+        ],
+        [
+          "Tokyo · Visited",
+          "Next: 4 more visits + 3 local trades",
+          "i-stamp"
+        ]
+      ],
+      "actions": [
+        [
+          "Tokyo city page",
+          "PASS-2"
+        ],
+        [
+          "Back home",
+          "HOME-RETURN",
+          "soft"
+        ]
+      ],
+      "note": "此版只画免费旅行的可用章页；第二故乡设定在收费扩展。地图Me仍Profile入口，再进Collections/Passport。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "PASS-2",
+    "sourceGroup": "09",
+    "title": "Tokyo",
+    "state": "Visited",
+    "effect": "Build your connection with this city.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Visits",
+        "value": "1/5"
+      },
+      {
+        "kind": "progress",
+        "label": "Local trades",
+        "value": "0/3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Visited · 1 visit",
+      "Visited · arrived once",
+      "Stamp collected",
+      "Regular · 1/5 visits · 0/3 local trades",
+      "Local trades count once per city per day",
+      "Local · 10 visits",
+      "Catch both regional fish + learn a regional recipe"
+    ],
+    "actions": [
+      {
+        "label": "Show local pond",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "operation": "highlight-target",
+          "ownerId": "PASS-2",
+          "view": "map",
+          "placeName": "Tokyo · Local pond",
+          "anchor": [
+            246,
+            352
+          ],
+          "originalDestination": "MAP-8-FREE",
+          "preservePlayer": true,
+          "preserveResources": true
+        }
+      }
+    ],
+    "rows": [
+      {
+        "title": "Visited",
+        "state": "Complete",
+        "effect": "Your stamp has been collected",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-stamp"
+      },
+      {
+        "title": "Regular",
+        "state": "",
+        "effect": "Keep visiting and trading",
+        "keyFacts": [
+          {
+            "label": "Visits",
+            "value": "1/5",
+            "kind": "progress"
+          },
+          {
+            "label": "Local trades",
+            "value": "0/3",
+            "kind": "progress"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-home"
+      },
+      {
+        "title": "Local",
+        "state": "",
+        "effect": "Catch both regional fish and learn a regional recipe",
+        "keyFacts": [
+          {
+            "label": "Visits needed",
+            "value": "10",
+            "kind": "progress"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-fish"
+      }
+    ],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "§11.9.1/11.5.3：Visited→Regular(5访+3本地交付/交易)→Local(10访+2地区鱼+本带配方)。实际交易计数须主方案统一，免费版先展示进度。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "PASS-2",
+      "nodeId": "437:3364",
+      "designLabel": "每城三档 · 下个目标"
+    },
+    "original": {
+      "id": "PASS-2",
+      "title": "每城三档 · 下个目标",
+      "scene": "map",
+      "heading": "Tokyo",
+      "meta": "Visited · 1 visit",
+      "rows": [
+        [
+          "Visited · arrived once",
+          "Stamp collected",
+          "i-stamp"
+        ],
+        [
+          "Regular · 1/5 visits · 0/3 local trades",
+          "Local trades count once per city per day",
+          "i-home"
+        ],
+        [
+          "Local · 10 visits",
+          "Catch both regional fish + learn a regional recipe",
+          "i-fish"
+        ]
+      ],
+      "actions": [
+        [
+          "Show local pond",
+          "MAP-8-FREE",
+          "soft"
+        ]
+      ],
+      "note": "§11.9.1/11.5.3：Visited→Regular(5访+3本地交付/交易)→Local(10访+2地区鱼+本带配方)。实际交易计数须主方案统一，免费版先展示进度。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Regular local-trade versus delivery counting requires baseline consolidation."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAVEL-RETRY",
+    "sourceGroup": "09",
+    "title": "Tokyo",
+    "state": "Departure failed",
+    "effect": "You are still in Shanghai.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "You’re still in Shanghai.",
+      "Your destination is saved",
+      "Try again when connected."
+    ],
+    "actions": [
+      {
+        "label": "Retry",
+        "target": "MAP-5-FREE",
+        "kind": "commit"
+      },
+      {
+        "label": "Not now",
+        "target": "MAP-3-FREE",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "失败不盖章、不揭雾、不写首访。未知成功先查询同一旅行状态，Retry不创建双旅行。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAVEL-RETRY",
+      "nodeId": "437:3447",
+      "designLabel": "出发失败 · 未到达"
+    },
+    "original": {
+      "id": "TRAVEL-RETRY",
+      "title": "出发失败 · 未到达",
+      "scene": "map",
+      "heading": "Couldn’t start the trip",
+      "meta": "You’re still in Shanghai.",
+      "rows": [
+        [
+          "Your destination is saved",
+          "Try again when connected.",
+          "i-map"
+        ]
+      ],
+      "actions": [
+        [
+          "Retry",
+          "MAP-5-FREE"
+        ],
+        [
+          "Not now",
+          "MAP-3-FREE",
+          "soft"
+        ]
+      ],
+      "note": "失败不盖章、不揭雾、不写首访。未知成功先查询同一旅行状态，Retry不创建双旅行。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAVEL-RECONNECT",
+    "sourceGroup": "09",
+    "title": "Tokyo",
+    "state": "Arrived",
+    "effect": "Continue from your saved journey.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Your trip is ready to continue.",
+      "Your stamp and rewards are granted once."
+    ],
+    "actions": [
+      {
+        "label": "Land",
+        "target": "MAP-6-FREE",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "map",
+    "layout": "map",
+    "sourceNote": "恢复服务端旅程；已到账奖励只回显，不再发。免费短过渡可能遇到重连，不能因重启回家重跑首访。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAVEL-RECONNECT",
+      "nodeId": "437:3508",
+      "designLabel": "重连 · 回到到达状态"
+    },
+    "original": {
+      "id": "TRAVEL-RECONNECT",
+      "title": "重连 · 回到到达状态",
+      "scene": "map",
+      "heading": "Arrived in Tokyo",
+      "meta": "Your trip is ready to continue.",
+      "actions": [
+        [
+          "Land",
+          "MAP-6-FREE"
+        ]
+      ],
+      "foot": "Your stamp and rewards are granted once.",
+      "note": "恢复服务端旅程；已到账奖励只回显，不再发。免费短过渡可能遇到重连，不能因重启回家重跑首访。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59",
+      "city": "Tokyo",
+      "place": "Map"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "FOG-THREE",
+    "sourceGroup": "09",
+    "title": "Map exploration",
+    "state": "State reference",
+    "effect": "Map appearance reflects your connection to the city.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Unexplored",
+      "Names and people visible · service silhouettes",
+      "Explored",
+      "Full color · pond and outpost entries",
+      "Second Home",
+      "Full color · home crest · free travel"
+    ],
+    "actions": [],
+    "rows": [
+      {
+        "title": "Unexplored",
+        "state": "",
+        "effect": "City names and people remain visible",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-question"
+      },
+      {
+        "title": "Explored",
+        "state": "",
+        "effect": "Ponds and outposts are shown in full colour",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-stamp"
+      },
+      {
+        "title": "Second Home",
+        "state": "",
+        "effect": "A home crest marks your free-travel city",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-home"
+      }
+    ],
+    "items": [],
+    "scene": "map",
+    "layout": "states",
+    "sourceNote": "三态样式页；第二故乡标为P2后续，免费首版不开放设定流程。POI只亮灯和只读名片，不成为岗位商店。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "FOG-THREE",
+      "nodeId": "437:3560",
+      "designLabel": "迷雾三态 · 复用地图"
+    },
+    "original": {
+      "id": "FOG-THREE",
+      "title": "迷雾三态 · 复用地图",
+      "scene": "map",
+      "heading": "A world you’ve visited",
+      "rows": [
+        [
+          "Unexplored",
+          "Names and people visible · service silhouettes",
+          "i-question"
+        ],
+        [
+          "Explored",
+          "Full color · pond and outpost entries",
+          "i-stamp"
+        ],
+        [
+          "Second Home",
+          "Full color · home crest · free travel",
+          "i-home"
+        ]
+      ],
+      "actions": [
+        [
+          "Browse a city",
+          "MAP-3-FREE",
+          "soft"
+        ]
+      ],
+      "note": "三态样式页；第二故乡标为P2后续，免费首版不开放设定流程。POI只亮灯和只读名片，不成为岗位商店。"
+    },
+    "reviewOnly": true,
+    "reviewActions": [
+      {
+        "label": "Browse a city",
+        "target": "MAP-3-FREE",
+        "reason": "State specimen navigation belongs outside the product viewport."
+      }
+    ],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": false
+    }
+  }
+]

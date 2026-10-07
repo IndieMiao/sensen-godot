@@ -1,0 +1,3480 @@
+[
+  {
+    "id": "FAC-1",
+    "sourceGroup": "08",
+    "title": "Sprinkler",
+    "state": "",
+    "effect": "Waters 8 surrounding plots automatically; annual-crop maturity time −15%.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Placed",
+        "value": "2/7"
+      },
+      {
+        "kind": "capacity",
+        "label": "Occupies",
+        "value": "1 plot"
+      }
+    ],
+    "requirements": [
+      {
+        "title": "Timber",
+        "have": 8,
+        "need": 8,
+        "icon": "i-wood",
+        "state": "met",
+        "source": "Farm Storage"
+      },
+      {
+        "title": "Stone",
+        "have": 6,
+        "need": 6,
+        "icon": "i-stone",
+        "state": "met",
+        "source": "Farm Storage"
+      },
+      {
+        "title": "Copper",
+        "have": 3,
+        "need": 3,
+        "icon": "i-copper",
+        "state": "met",
+        "source": "Farm Storage"
+      }
+    ],
+    "supporting": "",
+    "disclosure": [
+      "Farming Lv6 · Homestead Lv4 · 2/7 placed",
+      "Waters 8 plots for you · occupies 1 plot",
+      "Requires Farming Lv6."
+    ],
+    "actions": [
+      {
+        "label": "Craft",
+        "target": "FAC-2",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-facilities",
+    "layout": "sheet",
+    "sourceNote": "§5.7/13.4。木8+石6+铜3，从仓库扣；本样例Homestead4故上限7。制作成功进入放置，不把取消放置当退款。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "FAC-1",
+      "nodeId": "435:999",
+      "designLabel": "洒水器 · 制作"
+    },
+    "original": {
+      "id": "FAC-1",
+      "title": "洒水器 · 制作",
+      "heading": "Sprinkler",
+      "meta": "Farming Lv6 · Homestead Lv4 · 2/7 placed",
+      "needs": [
+        [
+          "Timber",
+          8,
+          8,
+          "i-wood"
+        ],
+        [
+          "Stone",
+          6,
+          6,
+          "i-stone"
+        ],
+        [
+          "Copper",
+          3,
+          3,
+          "i-copper"
+        ]
+      ],
+      "actions": [
+        [
+          "Craft",
+          "FAC-2"
+        ]
+      ],
+      "foot": "Waters 8 plots for you · occupies 1 plot",
+      "note": "§5.7/13.4。木8+石6+铜3，从仓库扣；本样例Homestead4故上限7。制作成功进入放置，不把取消放置当退款。",
+      "capacity": 230,
+      "scene": "farm-facilities"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "FAC-2",
+    "sourceGroup": "08",
+    "title": "Sprinkler",
+    "state": "Placement preview",
+    "effect": "Waters 8 surrounding plots automatically; annual-crop maturity time −15%.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Coverage",
+        "value": "8 plots"
+      },
+      {
+        "kind": "capacity",
+        "label": "Occupies",
+        "value": "1 plot"
+      },
+      {
+        "kind": "reward",
+        "label": "Growth time",
+        "value": "−15%"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "8 plots covered · 1 plot occupied",
+      "Automatically waters nearby plots. Annual crops grow 15% faster."
+    ],
+    "actions": [
+      {
+        "label": "Place",
+        "target": "FAC-4",
+        "kind": "commit"
+      },
+      {
+        "label": "Cancel placement",
+        "target": "FAC-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-facilities",
+    "layout": "scene",
+    "sourceNote": "蓝色3×3范围含中心占地，实际浇周围8格。Place确认前仅预览；取消保留已制成设施，扣料时点与制作分开。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "FAC-2",
+      "nodeId": "435:1081",
+      "designLabel": "放置 · 有效覆盖"
+    },
+    "original": {
+      "id": "FAC-2",
+      "title": "放置 · 有效覆盖",
+      "heading": "Place Sprinkler",
+      "meta": "8 plots covered · 1 plot occupied",
+      "placement": true,
+      "actions": [
+        [
+          "Place",
+          "FAC-4"
+        ],
+        [
+          "Cancel placement",
+          "FAC-1",
+          "soft"
+        ]
+      ],
+      "foot": "Automatically waters nearby plots. Annual crops grow 15% faster.",
+      "note": "蓝色3×3范围含中心占地，实际浇周围8格。Place确认前仅预览；取消保留已制成设施，扣料时点与制作分开。",
+      "capacity": 230,
+      "scene": "farm-facilities"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Facility movement/recovery/refund rules are undefined. Cancel retains the already-crafted facility in this fixture."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": false,
+      "coverage": {
+        "kind": "sprinkler",
+        "columns": 3,
+        "schematic": true,
+        "occupiedCenter": true,
+        "blocked": false
+      }
+    },
+    "reviewNotes": [
+      "Coverage is a labelled schematic. Runtime world anchors, terrain registration and collision placement remain unverified.",
+      "Coverage is a labelled schematic. Runtime world anchors, terrain registration and collision placement remain unverified."
+    ]
+  },
+  {
+    "id": "FAC-3",
+    "sourceGroup": "08",
+    "title": "Sprinkler",
+    "state": "Space occupied",
+    "effect": "Move the preview to an empty plot.",
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "Choose a clear plot to place this facility.",
+    "disclosure": [
+      "Something is already here."
+    ],
+    "actions": [
+      {
+        "label": "Place",
+        "target": null,
+        "kind": "blocked",
+        "feedback": "This plot is occupied. Choose a clear plot."
+      },
+      {
+        "label": "Cancel placement",
+        "target": "FAC-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-facilities",
+    "layout": "scene",
+    "sourceNote": "无效预览红格+原因，不能确认落地；拖至空格恢复有效态。服务器拒绝放置后保留待放设施，不再次扣材料。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "FAC-3",
+      "nodeId": "435:1157",
+      "designLabel": "放置 · 占地冲突"
+    },
+    "original": {
+      "id": "FAC-3",
+      "title": "放置 · 占地冲突",
+      "heading": "Choose a clear plot",
+      "meta": "Something is already here.",
+      "placement": true,
+      "blocked": true,
+      "actions": [
+        [
+          "Space occupied",
+          null,
+          "disabled"
+        ],
+        [
+          "Try another plot",
+          "FAC-2",
+          "soft"
+        ],
+        [
+          "Cancel placement",
+          "FAC-1",
+          "soft"
+        ]
+      ],
+      "note": "无效预览红格+原因，不能确认落地；拖至空格恢复有效态。服务器拒绝放置后保留待放设施，不再次扣材料。",
+      "capacity": 230,
+      "scene": "farm-facilities"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": false,
+      "coverage": {
+        "kind": "sprinkler",
+        "columns": 3,
+        "schematic": true,
+        "occupiedCenter": true,
+        "blocked": true
+      }
+    },
+    "reviewNotes": [
+      "Coverage is a labelled schematic. Runtime world anchors, terrain registration and collision placement remain unverified.",
+      "Coverage is a labelled schematic. Runtime world anchors, terrain registration and collision placement remain unverified."
+    ]
+  },
+  {
+    "id": "FAC-4",
+    "sourceGroup": "08",
+    "title": "Sprinkler",
+    "state": "Placed",
+    "effect": "Waters 8 surrounding plots automatically; annual-crop maturity time −15%.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Placed",
+        "value": "3/7"
+      },
+      {
+        "kind": "capacity",
+        "label": "Coverage",
+        "value": "8 plots"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "8 plots watered automatically",
+      "Annual crops: 15% faster",
+      "Sowing still uses Energy",
+      "Your seeds and harvest yield stay the same."
+    ],
+    "actions": [
+      {
+        "label": "View coverage",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "overlay": "facility-coverage",
+          "facility": "Sprinkler",
+          "editable": false
+        }
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-facilities",
+    "layout": "sheet",
+    "sourceNote": "落地后数量2→3，范围播种即生长；只省浇水与等待。移动/回收规则尚未定义，不在本批虚构返料比例。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "FAC-4",
+      "nodeId": "435:1234",
+      "designLabel": "洒水器 · 已落地"
+    },
+    "original": {
+      "id": "FAC-4",
+      "title": "洒水器 · 已落地",
+      "heading": "Sprinkler placed",
+      "tag": "Sprinklers 3/7",
+      "rows": [
+        [
+          "8 plots watered automatically",
+          "Annual crops: 15% faster",
+          "i-sprinkler"
+        ],
+        [
+          "Sowing still uses Energy",
+          "Your seeds and harvest yield stay the same.",
+          "i-sprout"
+        ]
+      ],
+      "actions": [
+        [
+          "View coverage",
+          "FAC-2",
+          "soft"
+        ]
+      ],
+      "note": "落地后数量2→3，范围播种即生长；只省浇水与等待。移动/回收规则尚未定义，不在本批虚构返料比例。",
+      "capacity": 230,
+      "scene": "farm-facilities"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "reviewNotes": [
+      "The source target was an unrelated state/scene. Use a context-preserving coverage/map overlay; the old cross-link is retained only in original."
+    ],
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "FAC-5",
+    "sourceGroup": "08",
+    "title": "Compost Bin",
+    "state": "Ready",
+    "effect": "Convert crops 1:1 into Compost; it cuts annual-crop maturity time by 20%.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Daily crops used",
+        "value": "0/5"
+      },
+      {
+        "kind": "reward",
+        "label": "Output",
+        "value": "5 Compost"
+      }
+    ],
+    "requirements": [
+      {
+        "title": "Crops",
+        "have": 8,
+        "need": 5,
+        "icon": "i-radish",
+        "state": "met",
+        "source": "Farm Storage"
+      }
+    ],
+    "supporting": "",
+    "disclosure": [
+      "Farming Lv7 · Today 0/5",
+      "5 crops → 5 Compost",
+      "No coins or Energy needed"
+    ],
+    "actions": [
+      {
+        "label": "Make Compost",
+        "target": "FAC-6",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-facilities",
+    "layout": "sheet",
+    "sourceNote": "§5.7。每天最多5份任意作物，等量转化；本样例选择5份。可用次数与作物不足都写按钮，不把材料变金币。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "FAC-5",
+      "nodeId": "435:1310",
+      "designLabel": "堆肥箱 · 每日转化"
+    },
+    "original": {
+      "id": "FAC-5",
+      "title": "堆肥箱 · 每日转化",
+      "heading": "Compost Bin",
+      "meta": "Farming Lv7 · Today 0/5",
+      "needs": [
+        [
+          "Crops",
+          8,
+          5,
+          "i-radish"
+        ]
+      ],
+      "rows": [
+        [
+          "5 crops → 5 Compost",
+          "No coins or Energy needed",
+          "i-compost"
+        ]
+      ],
+      "actions": [
+        [
+          "Make 5 Compost",
+          "FAC-6"
+        ]
+      ],
+      "note": "§5.7。每天最多5份任意作物，等量转化；本样例选择5份。可用次数与作物不足都写按钮，不把材料变金币。",
+      "capacity": 230,
+      "scene": "farm-facilities"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "FAC-6",
+    "sourceGroup": "08",
+    "title": "Compost",
+    "state": "Ready",
+    "effect": "Compost cuts annual-crop maturity time by 20%.",
+    "quantity": {
+      "value": "5",
+      "label": "Compost"
+    },
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Daily crops used",
+        "value": "5/5"
+      },
+      {
+        "kind": "time",
+        "label": "Resets",
+        "value": "04:00 at home"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Compost Bin · Today 5/5",
+      "More after 04:00 at home",
+      "Today's crops have been used.",
+      "Next: Greenhouse · Farming Lv8",
+      "16 indoor plots · automatic watering"
+    ],
+    "actions": [
+      {
+        "label": "Make Compost",
+        "target": null,
+        "kind": "blocked",
+        "feedback": "The daily limit is reached. Try again after 04:00 at home."
+      },
+      {
+        "label": "View Greenhouse",
+        "target": "FAC-GH",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Greenhouse",
+        "state": "Farming Lv8",
+        "effect": "Annual crops grow indoors",
+        "keyFacts": [
+          {
+            "label": "Space",
+            "value": "16 plots",
+            "kind": "capacity"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-greenhouse"
+      }
+    ],
+    "items": [],
+    "scene": "farm-facilities",
+    "layout": "sheet",
+    "sourceNote": "堆肥结果与上限同屏。温室入口继续下一张：4×4，成熟−25%，与堆肥上限−45%，不允许多年生。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "FAC-6",
+      "nodeId": "435:1386",
+      "designLabel": "设施 · 今日满额与温室"
+    },
+    "original": {
+      "id": "FAC-6",
+      "title": "设施 · 今日满额与温室",
+      "heading": "Compost ready · ×5",
+      "meta": "Compost Bin · Today 5/5",
+      "rows": [
+        [
+          "More after 04:00 at home",
+          "Today's crops have been used.",
+          "i-clock"
+        ],
+        [
+          "Next: Greenhouse · Farming Lv8",
+          "16 indoor plots · automatic watering",
+          "i-greenhouse"
+        ]
+      ],
+      "actions": [
+        [
+          "Daily limit reached",
+          null,
+          "disabled"
+        ],
+        [
+          "View greenhouse",
+          "FAC-GH",
+          "soft"
+        ]
+      ],
+      "note": "堆肥结果与上限同屏。温室入口继续下一张：4×4，成熟−25%，与堆肥上限−45%，不允许多年生。",
+      "capacity": 230,
+      "scene": "farm-facilities"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAP-1",
+    "sourceGroup": "08",
+    "title": "Fish Trap",
+    "state": "For sale",
+    "effect": "Catches one fish every eight hours.",
+    "quantity": {
+      "value": "1",
+      "label": "trap"
+    },
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Price",
+        "value": "120 coins"
+      },
+      {
+        "kind": "time",
+        "label": "One fish",
+        "value": "8h"
+      },
+      {
+        "kind": "capacity",
+        "label": "Storage",
+        "value": "3 fish"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Fishing Lv5 · Finn's Tackle Shop",
+      "Use the Fishing Quick Bar to set your trap.",
+      "1 fish every 8 hours",
+      "Stores up to 3 fish",
+      "Bag 20/25 · 5 slots free",
+      "Trap slots 0/1"
+    ],
+    "actions": [
+      {
+        "label": "Buy",
+        "target": "TRAP-2",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "tackle-shop",
+    "layout": "sheet",
+    "sourceNote": "由Finn问候→Trade→商品。只售不做；价格120。Tackle计容量，堆叠3；购买前检查钱与空位，不能直接从商店落笼。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAP-1",
+      "nodeId": "435:1460",
+      "designLabel": "渔具铺 · 买鱼笼"
+    },
+    "original": {
+      "id": "TRAP-1",
+      "title": "渔具铺 · 买鱼笼",
+      "scene": "tackle-shop",
+      "place": "Tackle Shop",
+      "heading": "Fish Trap",
+      "meta": "Fishing Lv5 · Finn's Tackle Shop",
+      "rows": [
+        [
+          "1 fish every 8 hours",
+          "Stores up to 3 fish",
+          "i-trap"
+        ],
+        [
+          "Bag 20/25 · 5 slots free",
+          "Trap slots 0/1",
+          "i-bag"
+        ]
+      ],
+      "actions": [
+        [
+          "Buy · 120 coins",
+          "TRAP-2"
+        ]
+      ],
+      "foot": "Use the Fishing Quick Bar to set your trap.",
+      "note": "由Finn问候→Trade→商品。只售不做；价格120。Tackle计容量，堆叠3；购买前检查钱与空位，不能直接从商店落笼。",
+      "capacity": 230,
+      "coins": 350
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Tackle Shop",
+      "placeExplicit": true
+    },
+    "hud": {
+      "coins": 350,
+      "capacity": 230,
+      "place": "Tackle Shop",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAP-2",
+    "sourceGroup": "08",
+    "title": "Fish Trap",
+    "state": "Placement",
+    "effect": "Set your trap by the water.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Trap slots",
+        "value": "0/1"
+      },
+      {
+        "kind": "cost",
+        "label": "Set Trap",
+        "value": "Free"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Trap slots 0/1 · No trap in this pond"
+    ],
+    "actions": [
+      {
+        "label": "Set Trap",
+        "target": "TRAP-3",
+        "kind": "commit"
+      },
+      {
+        "label": "Back to fishing",
+        "target": "FISH-P0-CAST",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "pond",
+    "layout": "scene",
+    "sourceNote": "已到访系统塘本人到场；Fishing快捷栏选中鱼笼，主行动键Set Trap。每塘每人1只、0体力；本稿用大按钮呈现该行动。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAP-2",
+      "nodeId": "435:1536",
+      "designLabel": "到塘 · 投放鱼笼"
+    },
+    "original": {
+      "id": "TRAP-2",
+      "title": "到塘 · 投放鱼笼",
+      "scene": "pond",
+      "place": "Willow Pond",
+      "coins": 230,
+      "tag": "Fish Trap ×1 selected",
+      "heading": "Choose a spot by the water",
+      "meta": "Trap slots 0/1 · No trap in this pond",
+      "actions": [
+        [
+          "Set Trap · Free",
+          "TRAP-3"
+        ],
+        [
+          "Back to fishing",
+          "TRAP-1",
+          "soft"
+        ]
+      ],
+      "note": "已到访系统塘本人到场；Fishing快捷栏选中鱼笼，主行动键Set Trap。每塘每人1只、0体力；本稿用大按钮呈现该行动。",
+      "capacity": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Willow Pond",
+      "placeExplicit": true
+    },
+    "hud": {
+      "coins": 230,
+      "capacity": 230,
+      "place": "Willow Pond",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": false
+    },
+    "sceneControls": {
+      "label": "Set Trap",
+      "cost": "Free",
+      "icon": "i-trap",
+      "quick": [
+        {
+          "title": "Fish Trap",
+          "icon": "i-trap",
+          "quantity": {
+            "value": "1",
+            "label": "Owned"
+          }
+        }
+      ],
+      "target": "TRAP-3",
+      "mode": "SetTrap"
+    }
+  },
+  {
+    "id": "TRAP-3",
+    "sourceGroup": "08",
+    "title": "Fish Trap",
+    "state": "Catching",
+    "effect": "Come back to collect your fish in person.",
+    "keyFacts": [
+      {
+        "kind": "time",
+        "label": "Next fish",
+        "value": "8h"
+      },
+      {
+        "kind": "capacity",
+        "label": "Trap",
+        "value": "0/3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Trap slots 1/1",
+      "Common or Fine fish",
+      "Come back to collect in person."
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "target": "FISH-P0-CAST",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "pond",
+    "layout": "sheet",
+    "sourceNote": "每8h有效时间1条，离线累计最多3条；满笼分镜另列，不在产品中放快进按钮。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAP-3",
+      "nodeId": "435:1591",
+      "designLabel": "鱼笼 · 计时"
+    },
+    "original": {
+      "id": "TRAP-3",
+      "title": "鱼笼 · 计时",
+      "scene": "pond",
+      "place": "Willow Pond",
+      "coins": 230,
+      "tag": "Trap · 0 fish · ready in 8h",
+      "heading": "Your trap is set",
+      "meta": "Trap slots 1/1",
+      "rows": [
+        [
+          "Common or Fine fish",
+          "Come back to collect in person.",
+          "i-trap"
+        ]
+      ],
+      "actions": [
+        [
+          "Done",
+          "TRAP-2",
+          "soft"
+        ]
+      ],
+      "note": "每8h有效时间1条，离线累计最多3条；满笼分镜另列，不在产品中放快进按钮。",
+      "capacity": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Willow Pond",
+      "placeExplicit": true
+    },
+    "hud": {
+      "coins": 230,
+      "capacity": 230,
+      "place": "Willow Pond",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAP-4",
+    "sourceGroup": "08",
+    "title": "Fish Trap",
+    "state": "Ready",
+    "effect": "Collect the fish into your bag.",
+    "quantity": {
+      "value": "3",
+      "label": "fish"
+    },
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Trap",
+        "value": "3/3"
+      },
+      {
+        "kind": "capacity",
+        "label": "Bag space",
+        "value": "2 slots"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Bag 23/25 · 2 slots free",
+      "Trap pauses while full. Collection gives reduced XP."
+    ],
+    "actions": [
+      {
+        "label": "Collect",
+        "target": "TRAP-DONE",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [
+      {
+        "title": "Crucian",
+        "state": "",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-fish",
+        "quantity": {
+          "value": "2",
+          "label": "items"
+        }
+      },
+      {
+        "title": "Perch",
+        "state": "",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-fish",
+        "quantity": {
+          "value": "1",
+          "label": "items"
+        }
+      }
+    ],
+    "scene": "pond",
+    "layout": "sheet",
+    "sourceNote": "必须本人到塘，0体力；Common/Fine候选含地区、时段。XP为鱼种XP×50%×等级差，不写固定+XP。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAP-4",
+      "nodeId": "435:1657",
+      "designLabel": "鱼笼 · 满笼收取"
+    },
+    "original": {
+      "id": "TRAP-4",
+      "title": "鱼笼 · 满笼收取",
+      "scene": "pond",
+      "place": "Willow Pond",
+      "coins": 230,
+      "tag": "Trap full · 3 fish",
+      "heading": "Fish ready to collect",
+      "meta": "Bag 23/25 · 2 slots free",
+      "grid": [
+        {
+          "name": "Crucian",
+          "icon": "i-fish",
+          "count": "×2"
+        },
+        {
+          "name": "Perch",
+          "icon": "i-fish",
+          "count": "×1"
+        }
+      ],
+      "cols": 2,
+      "actions": [
+        [
+          "Collect · Free",
+          "TRAP-DONE"
+        ]
+      ],
+      "foot": "Trap pauses while full. Collection gives reduced XP.",
+      "note": "必须本人到塘，0体力；Common/Fine候选含地区、时段。XP为鱼种XP×50%×等级差，不写固定+XP。",
+      "capacity": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Willow Pond",
+      "placeExplicit": true
+    },
+    "hud": {
+      "coins": 230,
+      "capacity": 230,
+      "place": "Willow Pond",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAP-5",
+    "sourceGroup": "08",
+    "title": "Fish Trap",
+    "state": "Bag full",
+    "effect": "Make space to collect; your fish stay in the trap.",
+    "quantity": {
+      "value": "3",
+      "label": "fish"
+    },
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Bag",
+        "value": "25/25"
+      },
+      {
+        "kind": "capacity",
+        "label": "Trap",
+        "value": "3/3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Bag 25/25 · Trap full · 3 fish",
+      "Your fish stay in the trap",
+      "No fish sent to Parcels."
+    ],
+    "actions": [
+      {
+        "label": "Open bag",
+        "target": "BAG-1-P0",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "pond",
+    "layout": "sheet",
+    "sourceNote": "装不下部分留笼，笼满暂停产出；部分收取按实际容量，不能丢鱼或冒用被动奖励包裹通道。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAP-5",
+      "nodeId": "435:1732",
+      "designLabel": "鱼笼 · 满包保留"
+    },
+    "original": {
+      "id": "TRAP-5",
+      "title": "鱼笼 · 满包保留",
+      "scene": "pond",
+      "place": "Willow Pond",
+      "coins": 230,
+      "heading": "Make room to collect",
+      "meta": "Bag 25/25 · Trap full · 3 fish",
+      "rows": [
+        [
+          "Your fish stay in the trap",
+          "No fish sent to Parcels.",
+          "i-trap"
+        ]
+      ],
+      "actions": [
+        [
+          "Open bag",
+          "BAG-1-P0",
+          "soft"
+        ],
+        [
+          "Return after making room",
+          "TRAP-4",
+          "soft"
+        ]
+      ],
+      "note": "装不下部分留笼，笼满暂停产出；部分收取按实际容量，不能丢鱼或冒用被动奖励包裹通道。",
+      "capacity": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [
+      {
+        "label": "Return after making room",
+        "target": "TRAP-4",
+        "reason": "Simulation of a later capacity state."
+      }
+    ],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Willow Pond",
+      "placeExplicit": true
+    },
+    "hud": {
+      "coins": 230,
+      "capacity": 230,
+      "place": "Willow Pond",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAP-6",
+    "sourceGroup": "08",
+    "title": "Fish Trap",
+    "state": "Already placed",
+    "effect": "Choose another visited pond for your next trap.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Trap slots",
+        "value": "1/2"
+      },
+      {
+        "kind": "capacity",
+        "label": "Per pond",
+        "value": "1 trap"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Fishing Lv8 · Trap slots 1/2",
+      "One trap per pond",
+      "Your next trap needs another visited pond.",
+      "Fishing Lv10 · 3 trap slots",
+      "Fishing Lv9 adds a 10% Rare chance."
+    ],
+    "actions": [
+      {
+        "label": "Find another pond",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "overlay": "map",
+          "filter": "visited-ponds"
+        }
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "pond",
+    "layout": "sheet",
+    "sourceNote": "有空总槽也不能同塘放第2只。Lv5/8/10为1/2/3；P1只家城已访塘，P2后才跨城；此地图按钮为后续共用入口。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAP-6",
+      "nodeId": "435:1798",
+      "designLabel": "鱼笼 · 槽位与同塘限制"
+    },
+    "original": {
+      "id": "TRAP-6",
+      "title": "鱼笼 · 槽位与同塘限制",
+      "scene": "pond",
+      "place": "Willow Pond",
+      "heading": "A trap is already here",
+      "meta": "Fishing Lv8 · Trap slots 1/2",
+      "rows": [
+        [
+          "One trap per pond",
+          "Your next trap needs another visited pond.",
+          "i-trap"
+        ],
+        [
+          "Fishing Lv10 · 3 trap slots",
+          "Fishing Lv9 adds a 10% Rare chance.",
+          "i-fish"
+        ]
+      ],
+      "actions": [
+        [
+          "Show another pond",
+          "DEX-P1-2",
+          "soft"
+        ]
+      ],
+      "note": "有空总槽也不能同塘放第2只。Lv5/8/10为1/2/3；P1只家城已访塘，P2后才跨城；此地图按钮为后续共用入口。",
+      "capacity": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Willow Pond",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 230,
+      "place": "Willow Pond",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "reviewNotes": [
+      "The source target was an unrelated state/scene. Use a context-preserving coverage/map overlay; the old cross-link is retained only in original."
+    ],
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "COOK-P1-1",
+    "sourceGroup": "08",
+    "title": "Kitchen",
+    "state": "Two stoves",
+    "effect": "Select a stove to cook another dish.",
+    "keyFacts": [
+      {
+        "kind": "time",
+        "label": "Stove 1",
+        "value": "0:09"
+      },
+      {
+        "kind": "capacity",
+        "label": "Stove 2",
+        "value": "Empty"
+      },
+      {
+        "kind": "capacity",
+        "label": "Ingredient slots",
+        "value": "3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Homestead Lv4 · Cooking Lv5 · 3 slots"
+    ],
+    "actions": [
+      {
+        "label": "Select Stove 2",
+        "target": "COOK-P1-2",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "第二灶由Homestead4，3槽由Cooking4；两个门分开。灶台点击选中，无Cook/Shop设施FAB。背景裁切既有厨房，不计新整屋美术。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COOK-P1-1",
+      "nodeId": "435:1874",
+      "designLabel": "第二灶 · 并行操作"
+    },
+    "original": {
+      "id": "COOK-P1-1",
+      "title": "第二灶 · 并行操作",
+      "scene": "kitchen",
+      "stoves": 2,
+      "place": "Kitchen",
+      "heading": "Two stoves, one kitchen",
+      "meta": "Homestead Lv4 · Cooking Lv5 · 3 slots",
+      "stoveStates": [
+        "Cooking 0:09",
+        "Empty"
+      ],
+      "actions": [
+        [
+          "Tap Stove 2",
+          "COOK-P1-2"
+        ]
+      ],
+      "note": "第二灶由Homestead4，3槽由Cooking4；两个门分开。灶台点击选中，无Cook/Shop设施FAB。背景裁切既有厨房，不计新整屋美术。",
+      "capacity": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 230,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "kitchen": {
+      "mode": "stoves",
+      "ingredientSlots": 3,
+      "selectedIngredients": [],
+      "heat": null,
+      "stoves": [
+        {
+          "title": "Stove 1",
+          "state": "Cooking 0:09"
+        },
+        {
+          "title": "Stove 2",
+          "state": "Empty"
+        }
+      ]
+    }
+  },
+  {
+    "id": "COOK-P1-2",
+    "sourceGroup": "08",
+    "title": "Grilled Crucian",
+    "state": "Queue next",
+    "effect": "Starts after the current dish leaves the stove.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Queue per stove",
+        "value": "1 next dish"
+      },
+      {
+        "kind": "time",
+        "label": "Stove 1",
+        "value": "0:04"
+      }
+    ],
+    "requirements": [
+      {
+        "title": "Crucian",
+        "have": 2,
+        "need": 1,
+        "icon": "i-fish",
+        "state": "met",
+        "source": "Inventory"
+      }
+    ],
+    "supporting": "",
+    "disclosure": [
+      "Cooking Lv5 · Cooking now + 1 queued max"
+    ],
+    "actions": [
+      {
+        "label": "Add to queue",
+        "target": "COOK-P1-3",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "一灶最多当前+下一锅，前锅离灶后自动开火，火候照常。预扣/预留与取消队列的材料时点未在基线定义，本稿只定显示与启动前重检。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COOK-P1-2",
+      "nodeId": "435:1930",
+      "designLabel": "Queue ×2 · 排下一锅"
+    },
+    "original": {
+      "id": "COOK-P1-2",
+      "title": "Queue ×2 · 排下一锅",
+      "scene": "kitchen",
+      "stoves": 2,
+      "place": "Kitchen",
+      "heading": "Stove 1 · Queue next",
+      "meta": "Cooking Lv5 · Cooking now + 1 queued max",
+      "needs": [
+        [
+          "Crucian",
+          2,
+          1,
+          "i-fish"
+        ]
+      ],
+      "stoveStates": [
+        "Cooking 0:04",
+        "Cooking 0:09"
+      ],
+      "actions": [
+        [
+          "Queue Grilled Crucian",
+          "COOK-P1-3"
+        ]
+      ],
+      "note": "一灶最多当前+下一锅，前锅离灶后自动开火，火候照常。预扣/预留与取消队列的材料时点未在基线定义，本稿只定显示与启动前重检。",
+      "capacity": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Queue material reserve/debit/cancel timing is undefined."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 230,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "kitchen": {
+      "mode": "recipe",
+      "ingredientSlots": 3,
+      "selectedIngredients": [
+        {
+          "title": "Crucian",
+          "icon": "i-fish",
+          "quantity": {
+            "value": "1",
+            "label": "In pot"
+          }
+        }
+      ],
+      "heat": null,
+      "stoves": [],
+      "previewOnly": false
+    }
+  },
+  {
+    "id": "COOK-P1-3",
+    "sourceGroup": "08",
+    "title": "Kitchen",
+    "state": "Collection needed",
+    "effect": "Collect the ready dish so the next one can start.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Bag",
+        "value": "Full"
+      },
+      {
+        "kind": "capacity",
+        "label": "Cabinet",
+        "value": "6/6"
+      },
+      {
+        "kind": "progress",
+        "label": "Queued",
+        "value": "1"
+      }
+    ],
+    "requirements": [],
+    "supporting": "The next queued dish starts after collection.",
+    "disclosure": [
+      "Bag full · Warming Cabinet 6/6",
+      "Next dish is waiting",
+      "The current dish stays on Stove 1."
+    ],
+    "actions": [
+      {
+        "label": "Open bag",
+        "target": "BAG-1-P0",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "满包且柜满，成品留灶；队列不覆盖成品。整理/收走后才自动开下一锅，第二灶继续独立运行。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COOK-P1-3",
+      "nodeId": "435:1999",
+      "designLabel": "队列 · 留灶阻塞"
+    },
+    "original": {
+      "id": "COOK-P1-3",
+      "title": "队列 · 留灶阻塞",
+      "scene": "kitchen",
+      "stoves": 2,
+      "place": "Kitchen",
+      "heading": "Collect this dish first",
+      "meta": "Bag full · Warming Cabinet 6/6",
+      "stoveStates": [
+        "Ready · Queued 1",
+        "Cooking 0:03"
+      ],
+      "rows": [
+        [
+          "Next dish is waiting",
+          "The current dish stays on Stove 1.",
+          "i-pot"
+        ]
+      ],
+      "actions": [
+        [
+          "Open bag",
+          "BAG-1-P0",
+          "soft"
+        ],
+        [
+          "After collecting: continue",
+          "COOK-P1-1",
+          "soft"
+        ]
+      ],
+      "note": "满包且柜满，成品留灶；队列不覆盖成品。整理/收走后才自动开下一锅，第二灶继续独立运行。",
+      "capacity": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [
+      {
+        "label": "After collecting: continue",
+        "target": "COOK-P1-1",
+        "reason": "Continuation is automatic after actual collection."
+      }
+    ],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 230,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "kitchen": {
+      "mode": "stoves",
+      "ingredientSlots": 3,
+      "selectedIngredients": [],
+      "heat": null,
+      "stoves": [
+        {
+          "title": "Stove 1",
+          "state": "Ready · Queued 1"
+        },
+        {
+          "title": "Stove 2",
+          "state": "Cooking 0:03"
+        }
+      ]
+    }
+  },
+  {
+    "id": "COOK-P1-4",
+    "sourceGroup": "08",
+    "title": "Cook All",
+    "state": "Ready",
+    "effect": "Fill available stoves and queues with known recipes.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Empty stoves",
+        "value": "3"
+      },
+      {
+        "kind": "capacity",
+        "label": "Queue spaces",
+        "value": "3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "Review the selected recipes and ingredient total before cooking.",
+    "disclosure": [
+      "Cooking Lv8 · 3 empty stoves · 3 queue spaces",
+      "Rare → Fine → Common",
+      "Known recipes with enough ingredients",
+      "Starts and queues what fits",
+      "Heat taps still happen on each stove."
+    ],
+    "actions": [
+      {
+        "label": "Cook All",
+        "target": "COOK-P1-5",
+        "kind": "commit"
+      }
+    ],
+    "rows": [
+      {
+        "title": "Recipe priority",
+        "state": "",
+        "effect": "Rare, then Fine, then Common",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      }
+    ],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "§4.6.3：按稀有度高→低排满空灶与队列，受同一库存约束；同稀有度排序与预留时点未定，不以任意材料表伪装确定算法。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COOK-P1-4",
+      "nodeId": "435:2071",
+      "designLabel": "Cook All · 开火前可读"
+    },
+    "original": {
+      "id": "COOK-P1-4",
+      "title": "Cook All · 开火前可读",
+      "scene": "kitchen",
+      "stoves": 3,
+      "place": "Kitchen",
+      "capacity": 270,
+      "heading": "Cook All",
+      "meta": "Cooking Lv8 · 3 empty stoves · 3 queue spaces",
+      "rows": [
+        [
+          "Rare → Fine → Common",
+          "Known recipes with enough ingredients",
+          "i-cookbook"
+        ],
+        [
+          "Starts and queues what fits",
+          "Heat taps still happen on each stove.",
+          "i-pot"
+        ]
+      ],
+      "actions": [
+        [
+          "Cook All",
+          "COOK-P1-5"
+        ]
+      ],
+      "note": "§4.6.3：按稀有度高→低排满空灶与队列，受同一库存约束；同稀有度排序与预留时点未定，不以任意材料表伪装确定算法。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Cook All ordering within rarity and material reservation are undefined; production confirmation must show the actual selected dishes and total debits."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 270,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "kitchen": {
+      "mode": "stoves",
+      "ingredientSlots": 3,
+      "selectedIngredients": [],
+      "heat": null,
+      "stoves": [
+        {
+          "title": "Stove 1",
+          "state": "Empty"
+        },
+        {
+          "title": "Stove 2",
+          "state": "Empty"
+        },
+        {
+          "title": "Stove 3",
+          "state": "Empty"
+        }
+      ]
+    }
+  },
+  {
+    "id": "COOK-P1-5",
+    "sourceGroup": "08",
+    "title": "Kitchen",
+    "state": "Cooking",
+    "effect": "Each stove has its own heat tap.",
+    "keyFacts": [
+      {
+        "kind": "time",
+        "label": "Stove 1",
+        "value": "0:04"
+      },
+      {
+        "kind": "time",
+        "label": "Stove 2",
+        "value": "0:12"
+      },
+      {
+        "kind": "time",
+        "label": "Stove 3",
+        "value": "0:24"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Quick Fire · 20% shorter cooking time",
+      "Queued 1 on each stove",
+      "The next heat card calls your attention."
+    ],
+    "actions": [],
+    "rows": [],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "示例时长4/12/24来自Cooking6；各灶火候独立，不是一键自动完美。下一张为独立Big Pot设置状态，非时间继续。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COOK-P1-5",
+      "nodeId": "435:2147",
+      "designLabel": "三灶 · 状态独立"
+    },
+    "original": {
+      "id": "COOK-P1-5",
+      "title": "三灶 · 状态独立",
+      "scene": "kitchen",
+      "stoves": 3,
+      "place": "Kitchen",
+      "capacity": 270,
+      "heading": "Dinner is underway",
+      "meta": "Quick Fire · 20% shorter cooking time",
+      "stoveStates": [
+        "Cooking · 0:04",
+        "Cooking · 0:12",
+        "Cooking · 0:24"
+      ],
+      "rows": [
+        [
+          "Queued 1 on each stove",
+          "The next heat card calls your attention.",
+          "i-pot"
+        ]
+      ],
+      "actions": [
+        [
+          "Tap next heat ring",
+          "COOK-P1-6",
+          "soft"
+        ]
+      ],
+      "note": "示例时长4/12/24来自Cooking6；各灶火候独立，不是一键自动完美。下一张为独立Big Pot设置状态，非时间继续。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [
+      {
+        "label": "Tap next heat ring",
+        "target": "COOK-P1-6",
+        "reason": "Original link jumped to an unrelated Double setup fixture."
+      }
+    ],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 270,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "kitchen": {
+      "mode": "stoves",
+      "ingredientSlots": 3,
+      "selectedIngredients": [],
+      "heat": null,
+      "stoves": [
+        {
+          "title": "Stove 1",
+          "state": "Cooking · 0:04"
+        },
+        {
+          "title": "Stove 2",
+          "state": "Cooking · 0:12"
+        },
+        {
+          "title": "Stove 3",
+          "state": "Cooking · 0:24"
+        }
+      ]
+    }
+  },
+  {
+    "id": "COOK-P1-6",
+    "sourceGroup": "08",
+    "title": "Grilled Crucian",
+    "state": "Double",
+    "effect": "Use double ingredients to cook two portions together.",
+    "quantity": {
+      "value": "2",
+      "label": "portions"
+    },
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Ingredients",
+        "value": "2×"
+      },
+      {
+        "kind": "progress",
+        "label": "Counts as",
+        "value": "1 cook"
+      }
+    ],
+    "requirements": [
+      {
+        "title": "Crucian",
+        "have": 3,
+        "need": 2,
+        "icon": "i-fish",
+        "state": "met",
+        "source": "Inventory"
+      }
+    ],
+    "supporting": "",
+    "disclosure": [
+      "Homestead Lv6 · 2 portions · 1 heat round",
+      "Ingredients ×2 · counts as one cook for daily XP"
+    ],
+    "actions": [
+      {
+        "label": "Cook",
+        "target": "DOUBLE-RESULT",
+        "kind": "commit"
+      },
+      {
+        "label": "Use single portion",
+        "target": "COOK-P1-1",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "大锅由Homestead6；用料×2、同轮火候、出2份，按1锅计同页递减；不与Lucky Double叠加。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COOK-P1-6",
+      "nodeId": "435:2219",
+      "designLabel": "Big Pot · 一锅双份"
+    },
+    "original": {
+      "id": "COOK-P1-6",
+      "title": "Big Pot · 一锅双份",
+      "scene": "kitchen",
+      "stoves": 2,
+      "place": "Kitchen",
+      "capacity": 250,
+      "heading": "Grilled Crucian · Double",
+      "meta": "Homestead Lv6 · 2 portions · 1 heat round",
+      "needs": [
+        [
+          "Crucian",
+          3,
+          2,
+          "i-fish"
+        ]
+      ],
+      "actions": [
+        [
+          "Cook · 2 portions",
+          "DOUBLE-RESULT"
+        ],
+        [
+          "Switch to single",
+          "COOK-P1-1",
+          "soft"
+        ]
+      ],
+      "foot": "Ingredients ×2 · counts as one cook for daily XP",
+      "note": "大锅由Homestead6；用料×2、同轮火候、出2份，按1锅计同页递减；不与Lucky Double叠加。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 250,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "kitchen": {
+      "mode": "recipe",
+      "ingredientSlots": 3,
+      "selectedIngredients": [
+        {
+          "title": "Crucian",
+          "icon": "i-fish",
+          "quantity": {
+            "value": "2",
+            "label": "In pot"
+          }
+        }
+      ],
+      "heat": null,
+      "stoves": [],
+      "previewOnly": false
+    }
+  },
+  {
+    "id": "COOK-P1-7",
+    "sourceGroup": "08",
+    "title": "Legendary recipe",
+    "state": "Single only",
+    "effect": "This recipe cannot use Double.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Ingredient slots",
+        "value": "3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "3 ingredients · single cook only",
+      "Buff · coming later",
+      "Double is not available",
+      "Legendary recipes use their own portion rule."
+    ],
+    "actions": [
+      {
+        "label": "Double",
+        "target": null,
+        "kind": "blocked",
+        "feedback": "Legendary recipes cannot use Double."
+      },
+      {
+        "label": "Cookbook",
+        "target": "DEX-P1-1",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "Legendary不允许大锅Double，也不触发Lucky Double；P1菜谱保留Buff coming later，实际Buff属P3。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COOK-P1-7",
+      "nodeId": "435:2286",
+      "designLabel": "Legendary · 不可Double"
+    },
+    "original": {
+      "id": "COOK-P1-7",
+      "title": "Legendary · 不可Double",
+      "scene": "kitchen",
+      "stoves": 3,
+      "place": "Kitchen",
+      "capacity": 290,
+      "heading": "Legendary recipe",
+      "meta": "3 ingredients · single cook only",
+      "rows": [
+        [
+          "Double is not available",
+          "Legendary recipes use their own portion rule.",
+          "i-cookbook"
+        ]
+      ],
+      "actions": [
+        [
+          "Double unavailable",
+          null,
+          "disabled"
+        ],
+        [
+          "Back to Cookbook",
+          "DEX-P1-1",
+          "soft"
+        ]
+      ],
+      "foot": "Buff · coming later",
+      "note": "Legendary不允许大锅Double，也不触发Lucky Double；P1菜谱保留Buff coming later，实际Buff属P3。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 290,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "kitchen": {
+      "mode": "recipe",
+      "ingredientSlots": 3,
+      "selectedIngredients": [],
+      "heat": null,
+      "stoves": [],
+      "previewOnly": true,
+      "omitIngredientSlots": true
+    }
+  },
+  {
+    "id": "COOK-P1-8",
+    "sourceGroup": "08",
+    "title": "Grilled Crucian",
+    "state": "Lucky Double",
+    "effect": "One extra Plain portion was added.",
+    "quantity": {
+      "value": "2",
+      "label": "portions"
+    },
+    "keyFacts": [],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Cooking Lv10 · Chef",
+      "10% chance · single cooks · non-Legendary"
+    ],
+    "actions": [
+      {
+        "label": "Keep both",
+        "target": "COOK-P1-1",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [
+      {
+        "title": "Grilled Crucian",
+        "state": "Good",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-grilled",
+        "quantity": {
+          "value": "1",
+          "label": "portion"
+        }
+      },
+      {
+        "title": "Grilled Crucian",
+        "state": "Plain",
+        "effect": "",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-dish-grilled",
+        "quantity": {
+          "value": "1",
+          "label": "portion"
+        }
+      }
+    ],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "本卡是非Double普通锅的独立10%结果，不是上一张Double锅的后续；多1份Plain。容量不足仍按柜/包/灶，不进Parcels。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COOK-P1-8",
+      "nodeId": "435:2351",
+      "designLabel": "Chef · 额外份数反馈"
+    },
+    "original": {
+      "id": "COOK-P1-8",
+      "title": "Chef · 额外份数反馈",
+      "scene": "kitchen",
+      "stoves": 3,
+      "place": "Kitchen",
+      "capacity": 290,
+      "heading": "Lucky Double!",
+      "meta": "Cooking Lv10 · Chef",
+      "grid": [
+        {
+          "name": "Good ★",
+          "icon": "i-dish-grilled",
+          "count": "×1"
+        },
+        {
+          "name": "Plain",
+          "icon": "i-dish-grilled",
+          "count": "Bonus ×1"
+        }
+      ],
+      "cols": 2,
+      "actions": [
+        [
+          "Keep both",
+          "COOK-P1-1"
+        ]
+      ],
+      "foot": "10% chance · single cooks · non-Legendary",
+      "note": "本卡是非Double普通锅的独立10%结果，不是上一张Double锅的后续；多1份Plain。容量不足仍按柜/包/灶，不进Parcels。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 290,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "FAC-GH",
+    "sourceGroup": "08",
+    "title": "Greenhouse",
+    "state": "Can craft",
+    "effect": "Automatic watering; annual-crop maturity time −25%; no off-climate penalty.",
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Price",
+        "value": "300 coins"
+      },
+      {
+        "kind": "capacity",
+        "label": "Occupies",
+        "value": "16 plots"
+      },
+      {
+        "kind": "capacity",
+        "label": "Placed",
+        "value": "0/1"
+      }
+    ],
+    "requirements": [
+      {
+        "title": "Timber",
+        "have": 20,
+        "need": 20,
+        "icon": "i-wood",
+        "state": "met",
+        "source": "Farm Storage"
+      },
+      {
+        "title": "Stone",
+        "have": 12,
+        "need": 12,
+        "icon": "i-stone",
+        "state": "met",
+        "source": "Farm Storage"
+      },
+      {
+        "title": "Copper",
+        "have": 8,
+        "need": 8,
+        "icon": "i-copper",
+        "state": "met",
+        "source": "Farm Storage"
+      }
+    ],
+    "supporting": "Crafting uses the materials and coins shown, then opens placement.",
+    "disclosure": [
+      "Farming Lv8 · Greenhouses 0/1",
+      "4 × 4 indoor plots",
+      "No perennial trees · automatic watering"
+    ],
+    "actions": [
+      {
+        "label": "Craft",
+        "target": "FAC-GH-PLACE",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-facilities",
+    "layout": "sheet",
+    "sourceNote": "§5.7。温室1座Lv8、2座Lv10；占16格开垦额度，材料与300金币制作后进入独立4×4放置预览。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "FAC-GH",
+      "nodeId": "435:2426",
+      "designLabel": "温室 · 占地与门槛"
+    },
+    "original": {
+      "id": "FAC-GH",
+      "title": "温室 · 占地与门槛",
+      "heading": "Greenhouse",
+      "meta": "Farming Lv8 · Greenhouses 0/1",
+      "needs": [
+        [
+          "Timber",
+          20,
+          20,
+          "i-wood"
+        ],
+        [
+          "Stone",
+          12,
+          12,
+          "i-stone"
+        ],
+        [
+          "Copper",
+          8,
+          8,
+          "i-copper"
+        ],
+        [
+          "Coins",
+          350,
+          300,
+          "i-coin"
+        ]
+      ],
+      "rows": [
+        [
+          "4 × 4 indoor plots",
+          "No perennial trees · automatic watering",
+          "i-greenhouse"
+        ]
+      ],
+      "actions": [
+        [
+          "Preview 4 × 4 footprint",
+          "FAC-GH-PLACE",
+          "soft"
+        ]
+      ],
+      "note": "§5.7。温室1座Lv8、2座Lv10；占16格开垦额度，材料与300金币制作后进入独立4×4放置预览。",
+      "capacity": 230,
+      "scene": "farm-facilities",
+      "coins": 350
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "coins": 350,
+      "capacity": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAP-DONE",
+    "sourceGroup": "08",
+    "title": "Fish Trap",
+    "state": "Collected",
+    "effect": "Your fish have been added to your bag.",
+    "quantity": {
+      "value": "3",
+      "label": "fish"
+    },
+    "keyFacts": [
+      {
+        "kind": "reward",
+        "label": "Pond Crucian",
+        "value": "2"
+      },
+      {
+        "kind": "reward",
+        "label": "River Perch",
+        "value": "1"
+      },
+      {
+        "kind": "capacity",
+        "label": "Trap",
+        "value": "0/3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Bag 25/25 · Trap 0/3",
+      "Pond Crucian ×2 · River Perch ×1",
+      "The trap starts filling again."
+    ],
+    "actions": [
+      {
+        "label": "Done",
+        "target": "TRAP-3",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "pond",
+    "layout": "sheet",
+    "sourceNote": "仅成功装入后从笼删除，失败保留；本示例分成2个物品堆占2空格，23→25。余下有效时间如何保留按结算协议，不重置成任意时间。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAP-DONE",
+      "nodeId": "435:2527",
+      "designLabel": "鱼笼 · 收取成功"
+    },
+    "original": {
+      "id": "TRAP-DONE",
+      "title": "鱼笼 · 收取成功",
+      "scene": "pond",
+      "place": "Willow Pond",
+      "coins": 230,
+      "heading": "Collected · 3 fish",
+      "meta": "Bag 25/25 · Trap 0/3",
+      "rows": [
+        [
+          "Pond Crucian ×2 · River Perch ×1",
+          "The trap starts filling again.",
+          "i-fish"
+        ]
+      ],
+      "actions": [
+        [
+          "Done",
+          "TRAP-3",
+          "soft"
+        ]
+      ],
+      "note": "仅成功装入后从笼删除，失败保留；本示例分成2个物品堆占2空格，23→25。余下有效时间如何保留按结算协议，不重置成任意时间。",
+      "capacity": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Willow Pond",
+      "placeExplicit": true
+    },
+    "hud": {
+      "coins": 230,
+      "capacity": 230,
+      "place": "Willow Pond",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "DEX-P1-1",
+    "sourceGroup": "08",
+    "title": "Cookbook",
+    "state": "State reference",
+    "effect": "Track recipes you have learned and cooked.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Discovered",
+        "value": "18/48"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Hidden → Clued → Tasted",
+      "Tasted reveals the recipe, not first-cook XP.",
+      "Discovered → Mastered",
+      "Cook it yourself · mastery records best heat"
+    ],
+    "actions": [],
+    "rows": [
+      {
+        "title": "Hidden",
+        "state": "",
+        "effect": "No clue yet",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-question"
+      },
+      {
+        "title": "Clued",
+        "state": "",
+        "effect": "Some ingredients are known",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-question"
+      },
+      {
+        "title": "Tasted",
+        "state": "",
+        "effect": "Recipe revealed by a taste or lesson",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      },
+      {
+        "title": "Discovered",
+        "state": "",
+        "effect": "Cooked by you",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-cookbook"
+      },
+      {
+        "title": "Mastered",
+        "state": "",
+        "effect": "Best heat recorded",
+        "keyFacts": [],
+        "disclosure": [],
+        "icon": "i-star"
+      }
+    ],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "states",
+    "sourceNote": "图鉴状态口径先统一；48份独立料理资产仍按清单交付。五态说明是审阅说明页，不能代替48菜的逐页内容。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "DEX-P1-1",
+      "nodeId": "435:2590",
+      "designLabel": "Cookbook · 五态与图鉴"
+    },
+    "original": {
+      "id": "DEX-P1-1",
+      "title": "Cookbook · 五态与图鉴",
+      "scene": "kitchen",
+      "stoves": 3,
+      "place": "Kitchen",
+      "capacity": 270,
+      "heading": "Cookbook · 18/48",
+      "tabs": [
+        "All",
+        "Can cook",
+        "Not cooked"
+      ],
+      "rows": [
+        [
+          "Hidden → Clued → Tasted",
+          "Tasted reveals the recipe, not first-cook XP.",
+          "i-question"
+        ],
+        [
+          "Discovered → Mastered",
+          "Cook it yourself · mastery records best heat",
+          "i-cookbook"
+        ]
+      ],
+      "actions": [
+        [
+          "View fish collection",
+          "DEX-P1-2",
+          "soft"
+        ]
+      ],
+      "note": "图鉴状态口径先统一；48份独立料理资产仍按清单交付。五态说明是审阅说明页，不能代替48菜的逐页内容。"
+    },
+    "reviewOnly": true,
+    "reviewActions": [
+      {
+        "label": "View fish collection",
+        "target": "DEX-P1-2",
+        "reason": "Unrelated collection jump used for storyboard review."
+      }
+    ],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [
+        "All",
+        "Can cook",
+        "Not cooked"
+      ],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 270,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": false
+    },
+    "reviewNotes": [
+      "This source is a five-state explanation, not a populated cookbook collection; keep its state comparison outside player-facing screens."
+    ]
+  },
+  {
+    "id": "DEX-P1-2",
+    "sourceGroup": "08",
+    "title": "River Eel",
+    "state": "Undiscovered",
+    "effect": "Look in rivers or ponds after dark.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Unlock",
+        "value": "Fishing Lv9"
+      },
+      {
+        "kind": "time",
+        "label": "Active",
+        "value": "Night"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Legendary · River / Pond · night",
+      "Fishing Lv9 needed",
+      "1 level to go · this fish stays hooked at Lv9",
+      "Look here after dark",
+      "Fishing Lv8 route hints"
+    ],
+    "actions": [
+      {
+        "label": "Show a river",
+        "target": null,
+        "kind": "navigate",
+        "context": {
+          "operation": "highlight-target",
+          "ownerId": "DEX-P1-2",
+          "view": "map",
+          "placeName": "River",
+          "anchor": [
+            251,
+            302
+          ],
+          "originalDestination": "MAP-2-FREE",
+          "preservePlayer": true,
+          "preserveResources": true
+        }
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "pond",
+    "layout": "sheet",
+    "sourceNote": "Lv8起路标；河鳗Lv9仅夜，不推荐Coast。占位鱼剪影不计独立河鳗资产，仍需20鱼专属图稿。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "DEX-P1-2",
+      "nodeId": "435:2666",
+      "designLabel": "Fish-dex · 寻鱼路标"
+    },
+    "original": {
+      "id": "DEX-P1-2",
+      "title": "Fish-dex · 寻鱼路标",
+      "scene": "pond",
+      "place": "Willow Pond",
+      "heading": "River Eel",
+      "meta": "Legendary · River / Pond · night",
+      "rows": [
+        [
+          "Fishing Lv9 needed",
+          "1 level to go · this fish stays hooked at Lv9",
+          "i-fish-sil"
+        ],
+        [
+          "Look here after dark",
+          "Fishing Lv8 route hints",
+          "i-moon"
+        ]
+      ],
+      "actions": [
+        [
+          "Show a river",
+          "MAP-2-FREE",
+          "soft"
+        ]
+      ],
+      "note": "Lv8起路标；河鳗Lv9仅夜，不推荐Coast。占位鱼剪影不计独立河鳗资产，仍需20鱼专属图稿。",
+      "capacity": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Willow Pond",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 230,
+      "place": "Willow Pond",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "FAC-GH-PLACE",
+    "sourceGroup": "08",
+    "title": "Greenhouse",
+    "state": "Placement preview",
+    "effect": "Choose a clear four-by-four area.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Footprint",
+        "value": "4×4 plots"
+      },
+      {
+        "kind": "capacity",
+        "label": "Placed",
+        "value": "0/1"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "16 plots · Greenhouses 0/1"
+    ],
+    "actions": [
+      {
+        "label": "Place",
+        "target": "FAC-GH-DONE",
+        "kind": "commit"
+      },
+      {
+        "label": "Cancel placement",
+        "target": "FAC-GH",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-facilities",
+    "layout": "scene",
+    "sourceNote": "独立4×4占地预览：先验证开垦额度与连续空地；取消保留已制作设施。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "FAC-GH-PLACE",
+      "nodeId": "435:2736",
+      "designLabel": "温室 · 4×4有效放置"
+    },
+    "original": {
+      "id": "FAC-GH-PLACE",
+      "title": "温室 · 4×4有效放置",
+      "heading": "Place Greenhouse",
+      "meta": "16 plots · Greenhouses 0/1",
+      "placement": true,
+      "footprint": 4,
+      "actions": [
+        [
+          "Place",
+          "FAC-GH-DONE"
+        ],
+        [
+          "Cancel placement",
+          "FAC-GH",
+          "soft"
+        ]
+      ],
+      "note": "独立4×4占地预览：先验证开垦额度与连续空地；取消保留已制作设施。",
+      "capacity": 230,
+      "scene": "farm-facilities"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [
+      "Facility movement/recovery/refund rules are undefined. Cancel retains the already-crafted facility in this fixture."
+    ],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": false,
+      "coverage": {
+        "kind": "greenhouse",
+        "columns": 4,
+        "schematic": true,
+        "occupiedCenter": false,
+        "blocked": false
+      }
+    },
+    "reviewNotes": [
+      "Coverage is a labelled schematic. Runtime world anchors, terrain registration and collision placement remain unverified.",
+      "Coverage is a labelled schematic. Runtime world anchors, terrain registration and collision placement remain unverified."
+    ]
+  },
+  {
+    "id": "FAC-GH-DONE",
+    "sourceGroup": "08",
+    "title": "Greenhouse",
+    "state": "Placed",
+    "effect": "Automatic watering; annual-crop maturity time −25%; no off-climate penalty.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Placed",
+        "value": "1/1"
+      },
+      {
+        "kind": "capacity",
+        "label": "Indoor plots",
+        "value": "16"
+      },
+      {
+        "kind": "reward",
+        "label": "Growth time",
+        "value": "−25%"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Greenhouses 1/1 · 16 indoor plots",
+      "Annual crops grow 25% faster",
+      "Compost adds 20% · combined cap 45%",
+      "Regional crops feel at home",
+      "No off-climate time penalty indoors"
+    ],
+    "actions": [
+      {
+        "label": "Back to farm",
+        "target": "FAC-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-facilities",
+    "layout": "sheet",
+    "sourceNote": "播种体力和产量不改；不允许多年生。温室单独3D外观沿设施源，不新增无据规则。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "FAC-GH-DONE",
+      "nodeId": "435:2815",
+      "designLabel": "温室 · 落地后果"
+    },
+    "original": {
+      "id": "FAC-GH-DONE",
+      "title": "温室 · 落地后果",
+      "heading": "Greenhouse placed",
+      "meta": "Greenhouses 1/1 · 16 indoor plots",
+      "rows": [
+        [
+          "Annual crops grow 25% faster",
+          "Compost adds 20% · combined cap 45%",
+          "i-greenhouse"
+        ],
+        [
+          "Regional crops feel at home",
+          "No off-climate time penalty indoors",
+          "i-sprout"
+        ]
+      ],
+      "actions": [
+        [
+          "Back to farm",
+          "FAC-1",
+          "soft"
+        ]
+      ],
+      "note": "播种体力和产量不改；不允许多年生。温室单独3D外观沿设施源，不新增无据规则。",
+      "capacity": 230,
+      "scene": "farm-facilities"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "DOUBLE-RESULT",
+    "sourceGroup": "08",
+    "title": "Grilled Crucian",
+    "state": "Good",
+    "effect": "Two portions cooked together.",
+    "quantity": {
+      "value": "2",
+      "label": "portions"
+    },
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Cooks counted",
+        "value": "1"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Big Pot · one cook counted today",
+      "Two portions, one heat round",
+      "Lucky Double does not add another portion."
+    ],
+    "actions": [
+      {
+        "label": "Keep both",
+        "target": "COOK-P1-1",
+        "kind": "commit"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "Double锅结果独立于Lucky Double；两份遵循柜/包/留灶容量，Extra Plain不是此锅必有。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "DOUBLE-RESULT",
+      "nodeId": "435:2886",
+      "designLabel": "双份出锅 · 同一品质"
+    },
+    "original": {
+      "id": "DOUBLE-RESULT",
+      "title": "双份出锅 · 同一品质",
+      "scene": "kitchen",
+      "place": "Kitchen",
+      "capacity": 250,
+      "heading": "Grilled Crucian ★ Good ×2",
+      "meta": "Big Pot · one cook counted today",
+      "rows": [
+        [
+          "Two portions, one heat round",
+          "Lucky Double does not add another portion.",
+          "i-dish-grilled"
+        ]
+      ],
+      "actions": [
+        [
+          "Keep both",
+          "COOK-P1-1"
+        ]
+      ],
+      "note": "Double锅结果独立于Lucky Double；两份遵循柜/包/留灶容量，Extra Plain不是此锅必有。"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 250,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "FAC-LIMIT",
+    "sourceGroup": "08",
+    "title": "Sprinkler",
+    "state": "Placement limit",
+    "effect": "Upgrade your Homestead to place another.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Placed",
+        "value": "7/7"
+      },
+      {
+        "kind": "progress",
+        "label": "Next slot",
+        "value": "Homestead Lv5"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Homestead Lv4",
+      "Homestead Lv5 adds one",
+      "Maximum 10 sprinklers at Homestead Lv7"
+    ],
+    "actions": [
+      {
+        "label": "Place",
+        "target": null,
+        "kind": "blocked",
+        "feedback": "Sprinkler limit reached. Homestead Lv5 adds one slot."
+      },
+      {
+        "label": "Back",
+        "target": "FAC-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "farm-facilities",
+    "layout": "sheet",
+    "sourceNote": "数量门槛可见，不在放置成功后再拒绝。未定义的移动回收流程只记待定，不赋予返料。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "FAC-LIMIT",
+      "nodeId": "435:2950",
+      "designLabel": "设施 · 上限不可超"
+    },
+    "original": {
+      "id": "FAC-LIMIT",
+      "title": "设施 · 上限不可超",
+      "heading": "Sprinklers 7/7",
+      "meta": "Homestead Lv4",
+      "rows": [
+        [
+          "Homestead Lv5 adds one",
+          "Maximum 10 sprinklers at Homestead Lv7",
+          "i-sprinkler"
+        ]
+      ],
+      "actions": [
+        [
+          "Placement limit reached",
+          null,
+          "disabled"
+        ],
+        [
+          "Back",
+          "FAC-1",
+          "soft"
+        ]
+      ],
+      "note": "数量门槛可见，不在放置成功后再拒绝。未定义的移动回收流程只记待定，不赋予返料。",
+      "capacity": 230,
+      "scene": "farm-facilities"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "capacity": 230,
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "TRAP-NOROOM",
+    "sourceGroup": "08",
+    "title": "Fish Trap",
+    "state": "Bag full",
+    "effect": "Make space before buying a trap.",
+    "quantity": {
+      "value": "1",
+      "label": "trap"
+    },
+    "keyFacts": [
+      {
+        "kind": "cost",
+        "label": "Price",
+        "value": "120 coins"
+      },
+      {
+        "kind": "capacity",
+        "label": "Bag",
+        "value": "25/25"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "120 coins · Bag 25/25",
+      "Free a slot first",
+      "Owned trap stacks of 3 can accept more if not full."
+    ],
+    "actions": [
+      {
+        "label": "Buy",
+        "target": null,
+        "kind": "blocked",
+        "feedback": "Make room in your bag before buying a Fish Trap."
+      },
+      {
+        "label": "Open bag",
+        "target": "BAG-1-P0",
+        "kind": "navigate"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "tackle-shop",
+    "layout": "sheet",
+    "sourceNote": "购买放不下先拒绝，不扣币；必须考虑同物品可堆叠空间，不仅看空格。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "TRAP-NOROOM",
+      "nodeId": "435:3017",
+      "designLabel": "购买前 · 满包门禁"
+    },
+    "original": {
+      "id": "TRAP-NOROOM",
+      "title": "购买前 · 满包门禁",
+      "scene": "tackle-shop",
+      "place": "Tackle Shop",
+      "heading": "Fish Trap",
+      "meta": "120 coins · Bag 25/25",
+      "rows": [
+        [
+          "Free a slot first",
+          "Owned trap stacks of 3 can accept more if not full.",
+          "i-bag"
+        ]
+      ],
+      "actions": [
+        [
+          "No room · free a slot first",
+          null,
+          "disabled"
+        ],
+        [
+          "Open bag",
+          "BAG-1-P0",
+          "soft"
+        ]
+      ],
+      "note": "购买放不下先拒绝，不扣币；必须考虑同物品可堆叠空间，不仅看空格。",
+      "capacity": 230,
+      "coins": 350
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Tackle Shop",
+      "placeExplicit": true
+    },
+    "hud": {
+      "coins": 350,
+      "capacity": 230,
+      "place": "Tackle Shop",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    }
+  },
+  {
+    "id": "COOK-EMPTY",
+    "sourceGroup": "08",
+    "title": "Cook All",
+    "state": "No space",
+    "effect": "Wait for a stove or collect a ready dish.",
+    "keyFacts": [
+      {
+        "kind": "capacity",
+        "label": "Stoves",
+        "value": "3/3"
+      },
+      {
+        "kind": "capacity",
+        "label": "Queues",
+        "value": "3/3"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Stoves 3/3 · queues 3/3",
+      "Cook All needs an empty place",
+      "Let a dish finish or collect a ready dish."
+    ],
+    "actions": [
+      {
+        "label": "Cook All",
+        "target": null,
+        "kind": "blocked",
+        "feedback": "All stoves and queues are full. Collect a dish or wait."
+      },
+      {
+        "label": "Kitchen",
+        "target": "COOK-P1-1",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [],
+    "items": [],
+    "scene": "kitchen",
+    "layout": "sheet",
+    "sourceNote": "Cook All无可用灶/队列不扣料；材料不足和空位不足分别写原因。",
+    "sourceRef": {
+      "file": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "id": "COOK-EMPTY",
+      "nodeId": "435:3081",
+      "designLabel": "Cook All · 无空灶"
+    },
+    "original": {
+      "id": "COOK-EMPTY",
+      "title": "Cook All · 无空灶",
+      "scene": "kitchen",
+      "place": "Kitchen",
+      "heading": "Every stove is busy",
+      "meta": "Stoves 3/3 · queues 3/3",
+      "rows": [
+        [
+          "Cook All needs an empty place",
+          "Let a dish finish or collect a ready dish.",
+          "i-pot"
+        ]
+      ],
+      "actions": [
+        [
+          "No stove or queue space",
+          null,
+          "disabled"
+        ],
+        [
+          "Back to kitchen",
+          "COOK-P1-1",
+          "soft"
+        ]
+      ],
+      "note": "Cook All无可用灶/队列不扣料；材料不足和空位不足分别写原因。",
+      "capacity": 230
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Kitchen",
+      "placeExplicit": true
+    },
+    "hud": {
+      "capacity": 230,
+      "place": "Kitchen",
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 3:59"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "kitchen": {
+      "mode": "stoves",
+      "ingredientSlots": 3,
+      "selectedIngredients": [],
+      "heat": null,
+      "stoves": [
+        {
+          "title": "Stove 1",
+          "state": "Busy · queue full"
+        },
+        {
+          "title": "Stove 2",
+          "state": "Busy · queue full"
+        },
+        {
+          "title": "Stove 3",
+          "state": "Busy · queue full"
+        }
+      ]
+    }
+  }
+]

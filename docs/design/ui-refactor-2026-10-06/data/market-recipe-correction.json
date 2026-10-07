@@ -1,0 +1,32 @@
+{
+  "screens": [
+    "NPC-2",
+    "NPC-3",
+    "NPC-3-2"
+  ],
+  "old": {
+    "title": "Fisher's Stew recipe",
+    "price": 200,
+    "invalidReason": "§7.14.3 #37 lists experiment or Rafa/Nadia teaching, not a Market card."
+  },
+  "replacement": {
+    "id": "dish_sweet_potato_cakes",
+    "title": "Sweet Potato Cakes",
+    "kind": "Recipe Card",
+    "rarity": "Legendary",
+    "climate": "Subtropical",
+    "price": 500,
+    "stock": 1,
+    "levelGate": null,
+    "sources": [
+      "gameplay v2 §7.14.4 #46",
+      "§9.11.2 regional recipe card Legendary500"
+    ]
+  },
+  "fixture": {
+    "coins": 230,
+    "shortfall": 270,
+    "action": "blocked Buy with toast",
+    "resourceMutation": false
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "screens": [
+    {
+      "id": "BAG-1",
+      "nodeId": "482:10"
+    }
+  ],
+  "overlayIndex": 671,
+  "children": [
+    {
+      "id": "633:41281",
+      "name": "Scene art \u00b7 farm",
+      "w": 360,
+      "h": 800
+    },
+    {
+      "id": "633:41282",
+      "name": "Compact/HUD",
+      "w": 340,
+      "h": 78
+    },
+    {
+      "id": "633:41316",
+      "name": "HUD touch \u00b7 Profile",
+      "w": 38,
+      "h": 44
+    },
+    {
+      "id": "633:41317",
+      "name": "HUD touch \u00b7 Energy",
+      "w": 100,
+      "h": 44
+    },
+    {
+      "id": "633:41318",
+      "name": "HUD touch \u00b7 Inbox",
+      "w": 36,
+      "h": 44
+    },
+    {
+      "id": "633:41319",
+      "name": "HUD touch \u00b7 Today",
+      "w": 170,
+      "h": 44
+    },
+    {
+      "id": "633:41320",
+      "name": "HUD touch \u00b7 Location",
+      "w": 162,
+      "h": 44
+    },
+    {
+      "id": "633:41323",
+      "name": "Bag drawer \u00b7 source proportions",
+      "w": 360,
+      "h": 546
+    },
+    {
+      "id": "633:41324",
+      "name": "Bag layout",
+      "w": 336,
+      "h": 508
+    }
+  ],
+  "overlays": [
+    {
+      "id": "633:41885",
+      "name": "Overlay \u00b7 Grilled Crucian"
+    },
+    {
+      "id": "633:41908",
+      "name": "Overlay \u00b7 Carrot Seeds"
+    },
+    {
+      "id": "633:41925",
+      "name": "Overlay \u00b7 Compost"
+    },
+    {
+      "id": "633:41942",
+      "name": "Overlay \u00b7 Orchard Feed"
+    },
+    {
+      "id": "633:41961",
+      "name": "Overlay \u00b7 Sort"
+    },
+    {
+      "id": "633:42029",
+      "name": "Overlay \u00b7 Seeds"
+    },
+    {
+      "id": "633:42434",
+      "name": "Overlay \u00b7 Fish"
+    },
+    {
+      "id": "633:42839",
+      "name": "Overlay \u00b7 Produce"
+    },
+    {
+      "id": "633:43244",
+      "name": "Overlay \u00b7 Dishes"
+    },
+    {
+      "id": "633:43649",
+      "name": "Overlay \u00b7 Materials"
+    },
+    {
+      "id": "633:44054",
+      "name": "Overlay \u00b7 Tackle"
+    },
+    {
+      "id": "633:44459",
+      "name": "Overlay \u00b7 Grilled Crucian"
+    },
+    {
+      "id": "633:44484",
+      "name": "Overlay \u00b7 Grilled Crucian"
+    },
+    {
+      "id": "633:44507",
+      "name": "Overlay \u00b7 Pond Crucian"
+    },
+    {
+      "id": "633:44524",
+      "name": "Overlay \u00b7 Carp"
+    },
+    {
+      "id": "633:44541",
+      "name": "Overlay \u00b7 Minnow"
+    },
+    {
+      "id": "633:44558",
+      "name": "Overlay \u00b7 Fresh Fish Soup"
+    },
+    {
+      "id": "633:44575",
+      "name": "Overlay \u00b7 Radish"
+    },
+    {
+      "id": "633:44592",
+      "name": "Overlay \u00b7 Carrot"
+    },
+    {
+      "id": "633:44609",
+      "name": "Overlay \u00b7 Apple"
+    },
+    {
+      "id": "633:44626",
+      "name": "Overlay \u00b7 Radish Seeds"
+    },
+    {
+      "id": "633:44643",
+      "name": "Overlay \u00b7 Carrot Seeds"
+    },
+    {
+      "id": "633:44660",
+      "name": "Overlay \u00b7 Compost"
+    },
+    {
+      "id": "633:44677",
+      "name": "Overlay \u00b7 Rock Salt"
+    },
+    {
+      "id": "633:44694",
+      "name": "Overlay \u00b7 Wild Herb"
+    },
+    {
+      "id": "633:44711",
+      "name": "Overlay \u00b7 Timber"
+    },
+    {
+      "id": "633:44728",
+      "name": "Overlay \u00b7 Stone"
+    },
+    {
+      "id": "633:44745",
+      "name": "Overlay \u00b7 Worm Bait"
+    },
+    {
+      "id": "633:44762",
+      "name": "Overlay \u00b7 Spinner Lure"
+    },
+    {
+      "id": "633:44779",
+      "name": "Overlay \u00b7 Orchard Feed"
+    },
+    {
+      "id": "633:44796",
+      "name": "Overlay \u00b7 Fish Trap"
+    }
+  ],
+  "reactionCount": 40
+}

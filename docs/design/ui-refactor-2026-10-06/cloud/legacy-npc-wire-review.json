@@ -1,0 +1,17 @@
+{
+  "scope": ["NPC-2", "NPC-2-2", "NPC-3", "NPC-4"],
+  "reviewedReceipts": ["batch-screens-53-1-1791283741932-parsed.json", "batch-screens-54-1-1791283746933-parsed.json", "batch-screens-55-1-1791283751874-parsed.json", "batch-screens-57-1-1791283762165-parsed.json"],
+  "warningsReviewed": 22,
+  "commitWarnings": 19,
+  "selfOverlayWarnings": 3,
+  "safeOutcomeRemaps": [],
+  "findings": [
+    {"screen": "NPC-2", "warnings": 3, "status": "Retain unresolved", "reason": "Sweet Potato Seeds, Orchard Feed and Fisher's Stew recipe have no matching before/after purchase state. LOCAL-BOUGHT is Pumpkin Seeds and is not an interchangeable success frame."},
+    {"screen": "NPC-2-2", "warnings": 6, "status": "Retain unresolved", "reason": "Reed Rod and Spinner Lure purchases, plus Pond Crucian sell-one/sell-all, have no matching outcome with authoritative inventory, coins and buyback values."},
+    {"screen": "NPC-3", "warnings": 4, "status": "Retain unresolved", "reason": "Sweet Potato sell-one/sell-all outcomes are not authored. Do not reuse another crop's sale, fake success, or self-navigation."},
+    {"screen": "NPC-4", "warnings": 6, "status": "Retain unresolved", "reason": "Dusk Haul track, Morning Greens stop-tracking and Harbor Lunch delivery have no corresponding distinct same-request state. BOARD-2 is Pond Catch for 14 coins and cannot represent Harbor Lunch 40 coins plus City stamp."},
+    {"screen": "NPC-4", "warnings": 3, "status": "Serialization replay candidate", "reason": "Show on map carries operation=highlight-target, map, Market Board, anchor=[145,426]. camera-highlight-fixes.js already defines a dedicated read-only camera overlay and Close. Latest source replay must use that helper; do not remap to NPC-1c or a teleport. These receipts predate the explicit cloud helper dispatch repair."}
+  ],
+  "newCloudWrites": false,
+  "sourceDataMutated": false
+}

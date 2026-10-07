@@ -1,0 +1,79 @@
+{
+  "createdNodeIdsFile": "asset-node-ids.json",
+  "assets": [
+    {
+      "id": "dish_legend_sashimi",
+      "name": "Legend Sashimi",
+      "category": "dish",
+      "componentId": "443:11115",
+      "specimenId": "443:11116",
+      "instanceId": "443:11118",
+      "source": "existing i-dish-salad with recipe garnish variant"
+    },
+    {
+      "id": "dish_steamed_sturgeon",
+      "name": "Steamed Sturgeon",
+      "category": "dish",
+      "componentId": "443:11148",
+      "specimenId": "443:11149",
+      "instanceId": "443:11151",
+      "source": "existing i-dish-stew with recipe garnish variant"
+    },
+    {
+      "id": "dish_eel_skewers",
+      "name": "Eel Skewers",
+      "category": "dish",
+      "componentId": "443:11184",
+      "specimenId": "443:11185",
+      "instanceId": "443:11187",
+      "source": "existing i-dish-skewer with recipe garnish variant"
+    },
+    {
+      "id": "dish_herb_salmon",
+      "name": "Herb Salmon",
+      "category": "dish",
+      "componentId": "443:11214",
+      "specimenId": "443:11215",
+      "instanceId": "443:11217",
+      "source": "existing i-dish-grilled with recipe garnish variant"
+    },
+    {
+      "id": "dish_pineapple_fish",
+      "name": "Pineapple Fish",
+      "category": "dish",
+      "componentId": "443:11242",
+      "specimenId": "443:11243",
+      "instanceId": "443:11245",
+      "source": "existing i-dish-grilled with recipe garnish variant"
+    },
+    {
+      "id": "dish_sweet_potato_cakes",
+      "name": "Sweet Potato Cakes",
+      "category": "dish",
+      "componentId": "443:11269",
+      "specimenId": "443:11270",
+      "instanceId": "443:11272",
+      "source": "existing i-dish-cakes with recipe garnish variant"
+    },
+    {
+      "id": "dish_pumpkin_chowder",
+      "name": "Pumpkin Chowder",
+      "category": "dish",
+      "componentId": "443:11298",
+      "specimenId": "443:11299",
+      "instanceId": "443:11301",
+      "source": "existing i-dish-soup with recipe garnish variant"
+    },
+    {
+      "id": "dish_beet_fish_soup",
+      "name": "Beet Fish Soup",
+      "category": "dish",
+      "componentId": "443:11331",
+      "specimenId": "443:11332",
+      "instanceId": "443:11334",
+      "source": "existing i-dish-soup with recipe garnish variant"
+    }
+  ],
+  "count": 8,
+  "group": "48 · 料理图标 / 菜系底盘与原料装饰"
+}

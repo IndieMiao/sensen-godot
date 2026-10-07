@@ -1,0 +1,50 @@
+{
+  "createdNodeIds": [
+    "654:57893",
+    "654:57894",
+    "654:57895",
+    "654:57896",
+    "654:57897",
+    "654:57898",
+    "654:57899",
+    "654:57900",
+    "654:57910",
+    "654:57911",
+    "654:57912",
+    "654:57922",
+    "654:57923",
+    "654:57924",
+    "654:57934"
+  ],
+  "inheritedNodeIdGroups": {
+    "I654:57900": "483:197|483:198|483:199|483:205",
+    "I654:57912": "483:197|483:198|483:199|483:205",
+    "I654:57924": "483:197|483:198|483:199|483:205"
+  },
+  "mutatedNodeIds": [
+    "482:437",
+    "482:436"
+  ],
+  "screens": [
+    {
+      "id": "FOG-THREE",
+      "nodeId": "482:437"
+    }
+  ],
+  "overlayIndex": 1119,
+  "warnings": [],
+  "overlays": {},
+  "prototypeReactions": 0,
+  "sourceReferences": {
+    "FOG-THREE": {
+      "sourceNodeId": "437:3560",
+      "newNodeId": "482:437",
+      "sourceFile": "docs/design/p1-p2-flows-2026-10-06/figma/all-pages.json",
+      "sourceGroup": "09",
+      "layout": "states",
+      "variant": null,
+      "reviewOnly": true,
+      "stateExamples": 0
+    }
+  }
+}

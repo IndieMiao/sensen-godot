@@ -1,0 +1,78 @@
+{
+  "capturedAt": "2026-10-06T09:30:47.568133+00:00",
+  "status": "pre-final-render-findings; not acceptance",
+  "scope": "Rows 13–15, all 24 cards viewed in exact half-width crops",
+  "captures": [
+    {
+      "row": 13,
+      "file": "row-13.png",
+      "sha256": "d0d4a1d55f36ceb88038131d3a7f02881ab5b97ed702355c3ee067d42ea89cbd"
+    },
+    {
+      "row": 14,
+      "file": "row-14.png",
+      "sha256": "3a7eb5e124fcfae1239bc979264f4c0c65d1e78014ecc8539292f36723f7c0c0"
+    },
+    {
+      "row": 15,
+      "file": "row-15.png",
+      "sha256": "4b6ecc0302c0e9f3ace66aaf8f1b554135e25dfad82cdb10521774ff8d34a48d"
+    }
+  ],
+  "blankCards": [
+    "TUT-3-08",
+    "MINE-P0-1",
+    "MINE-P0-2",
+    "MINE-P0-4",
+    "GEAR-P0-2"
+  ],
+  "findings": [
+    {
+      "ids": [
+        "TUT-3-10",
+        "TUT-3-11",
+        "CRAFT-3",
+        "CRAFT-4"
+      ],
+      "issue": "Reward facts duplicated between main content and fixed decision footer.",
+      "cause": "current-fixes.js bottom renders cost/reward but src.js content excludes only cost.",
+      "suggestion": "Rewards remain in main content once; footer shows upcoming spend/consequence only."
+    },
+    {
+      "ids": [
+        "TUT-3-END"
+      ],
+      "issue": "Radish/Lettuce countdowns duplicated as top facts and per-row facts.",
+      "suggestion": "Retain separate crop rows with one countdown each."
+    },
+    {
+      "ids": [
+        "MAT-2",
+        "CRAFT-3"
+      ],
+      "issue": "Output quantity repeated as header quantity and fact.",
+      "suggestion": "Retain dedicated quantity field and remove exact output duplicate fact."
+    },
+    {
+      "ids": [
+        "GEAR-P0-1"
+      ],
+      "issue": "Ring/charm still visually equipped in cloud; current data records Empty.",
+      "suggestion": "Rebuild using final Gear rendering."
+    },
+    {
+      "ids": [
+        "CRAFT-2"
+      ],
+      "issue": "0 coin Craft fee shown despite no coin cost.",
+      "suggestion": "Remove free coin condition from main decision area."
+    }
+  ],
+  "passingExamples": [
+    "TUT-3-11 Bonus213/200 without regeneration timer",
+    "MINE-P0-7 loss before destructive action and cancel distinct",
+    "MINE-P0-5 Continue Free separate from New run action",
+    "HOME-P0-1 Upgrade250coin cost and required material ratios readable"
+  ],
+  "next": "Wait for parent final render integration, then capture affected rows again."
+}

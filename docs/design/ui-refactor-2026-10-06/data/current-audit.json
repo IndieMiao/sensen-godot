@@ -1,0 +1,76 @@
+{
+  "screens": 204,
+  "byGroup": {
+    "07": 73,
+    "08": 30,
+    "09": 18,
+    "10": 38,
+    "11": 12,
+    "12": 33
+  },
+  "actions": {
+    "navigate": 105,
+    "commit": 101,
+    "dismiss": 52,
+    "blocked": 16,
+    "destructive": 5
+  },
+  "normalizedRows": 115,
+  "normalizedItems": 55,
+  "requirements": 38,
+  "visibleKeyFacts": 360,
+  "removedReviewButtons": 7,
+  "reviewOnlyScreens": [
+    "COOK-P0-10",
+    "DEX-P1-1",
+    "FOG-THREE",
+    "BUFF-CREEL-END"
+  ],
+  "cardsWithUnresolvedRules": [
+    "TUT-3-05",
+    "MAT-1",
+    "PARCEL-4",
+    "FAC-2",
+    "COOK-P1-2",
+    "COOK-P1-4",
+    "FAC-GH-PLACE",
+    "PASS-2",
+    "TICKET-1",
+    "SOC-1",
+    "HELPER-SUMMARY",
+    "TOGETHER-PROGRESS",
+    "TOGETHER-DONE",
+    "EXPAND-4",
+    "EXPAND-5",
+    "EXPAND-RECIPES",
+    "BUFF-FARM",
+    "BUFF-REPLACE",
+    "BUFF-ACTIVE",
+    "BUFF-CASTS",
+    "BUFF-TIMEOUT",
+    "BUFF-RATIONS-USE",
+    "BUFF-CREEL-END"
+  ],
+  "sourceRefsFound": 204,
+  "checks": {
+    "uniqueIds": true,
+    "allCardsReviewedIdentity": true,
+    "titleNoQuantityOrSeparatedMetadata": true,
+    "blockedActionsHaveFeedback": true,
+    "allOriginalsPreserved": true
+  },
+  "unprocessedRows": [],
+  "rowActions": 5,
+  "visualAudit": {
+    "screens": 204,
+    "strips": 36,
+    "report": "../VISUAL-CURRENT.md",
+    "coverage": "../audit-evidence/current/coverage.json"
+  },
+  "uiSupplements": {
+    "kitchenCards": 17,
+    "sceneControlCards": 16,
+    "fullOrBonusHUDs": 7,
+    "buffHUDs": 2
+  }
+}

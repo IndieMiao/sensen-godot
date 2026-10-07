@@ -1,0 +1,108 @@
+{
+  "source": "figma-plugin/legacy-qa-fixes.js",
+  "status": "source ready; syntax passed; cloud rebuild and screenshot pending",
+  "newLibraryMasters": 0,
+  "targets": [
+    {
+      "id": "BAR-3",
+      "nodeId": "482:25"
+    },
+    {
+      "id": "HUD-3",
+      "nodeId": "482:29"
+    },
+    {
+      "id": "BAR-3-2",
+      "nodeId": "482:27"
+    },
+    {
+      "id": "HUD-4",
+      "nodeId": "482:31"
+    },
+    {
+      "id": "BAR-1",
+      "nodeId": "482:18"
+    },
+    {
+      "id": "BAR-1-2",
+      "nodeId": "482:21"
+    },
+    {
+      "id": "FARM-7",
+      "nodeId": "482:50"
+    },
+    {
+      "id": "FARM-7-2",
+      "nodeId": "482:52"
+    },
+    {
+      "id": "FARM-6",
+      "nodeId": "482:46"
+    },
+    {
+      "id": "FARM-6-2",
+      "nodeId": "482:48"
+    },
+    {
+      "id": "FARM-3",
+      "nodeId": "482:44"
+    },
+    {
+      "id": "BAG-4",
+      "nodeId": "482:14"
+    },
+    {
+      "id": "BAG-4-2",
+      "nodeId": "482:16"
+    },
+    {
+      "id": "HUD-1",
+      "nodeId": "482:33"
+    },
+    {
+      "id": "HUD-1-2",
+      "nodeId": "482:35"
+    },
+    {
+      "id": "CTRL-1",
+      "nodeId": "482:38"
+    },
+    {
+      "id": "CTRL-1-2",
+      "nodeId": "482:40"
+    },
+    {
+      "id": "FISH-2",
+      "nodeId": "482:55"
+    }
+  ],
+  "dataChanges": {
+    "BAR-3": {
+      "energy": 1,
+      "capacity": 200,
+      "recovery": "2:41"
+    },
+    "HUD-3": {
+      "energy": 0,
+      "capacity": 200,
+      "recovery": "3:59"
+    },
+    "BAR-3-2": {
+      "energy": 1,
+      "capacity": 200,
+      "recovery": "2:39"
+    },
+    "FARM-3": {
+      "Radish harvestCost": "2 Energy"
+    },
+    "HUD-1-2": {
+      "freeActionReference": "Attack"
+    }
+  },
+  "knownPendingNotReimplemented": [
+    "BAG-1 Pin eligibility",
+    "FARM-1/FISH-1 safe-bottom",
+    "BAR-2 dedicated action picker"
+  ],
+  "cloudExecuted": false
+}

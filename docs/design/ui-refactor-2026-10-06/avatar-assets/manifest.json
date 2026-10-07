@@ -1,0 +1,768 @@
+{
+  "version": 2,
+  "categories": [
+    {
+      "slot": "hairHat",
+      "label": "Hair",
+      "defaultPart": "hairhat43",
+      "optional": false
+    },
+    {
+      "slot": "cloth",
+      "label": "Outfits",
+      "defaultPart": "cloth28",
+      "optional": false
+    },
+    {
+      "slot": "shoes",
+      "label": "Shoes",
+      "defaultPart": "shoes0",
+      "optional": false
+    },
+    {
+      "slot": "messengerBag",
+      "label": "Bags",
+      "defaultPart": "none",
+      "optional": true
+    },
+    {
+      "slot": "glass",
+      "label": "Glasses",
+      "defaultPart": "none",
+      "optional": true
+    }
+  ],
+  "parts": [
+    {
+      "id": "hairhat0",
+      "slot": "hairHat",
+      "label": "Silver Crop",
+      "thumb": "thumbs/hairhat0.png",
+      "preview": "previews/hairhat0.png"
+    },
+    {
+      "id": "cloth0",
+      "slot": "cloth",
+      "label": "Mint Casual",
+      "thumb": "thumbs/cloth0.png",
+      "preview": "previews/cloth0.png"
+    },
+    {
+      "id": "shoes0",
+      "slot": "shoes",
+      "label": "Gray Sneakers",
+      "thumb": "thumbs/shoes0.png",
+      "preview": "previews/shoes0.png"
+    },
+    {
+      "id": "glass0",
+      "slot": "glass",
+      "label": "Classic Black",
+      "thumb": "thumbs/glass0.png",
+      "preview": "previews/glass0.png"
+    },
+    {
+      "id": "cloth1",
+      "slot": "cloth",
+      "label": "Cream Suit",
+      "thumb": "thumbs/cloth1.png",
+      "preview": "previews/cloth1.png"
+    },
+    {
+      "id": "cloth1_1",
+      "slot": "cloth",
+      "label": "Blue Stripe",
+      "thumb": "thumbs/cloth1_1.png",
+      "preview": "previews/cloth1_1.png"
+    },
+    {
+      "id": "shoes1",
+      "slot": "shoes",
+      "label": "Cream Loafers",
+      "thumb": "thumbs/shoes1.png",
+      "preview": "previews/shoes1.png"
+    },
+    {
+      "id": "glass1",
+      "slot": "glass",
+      "label": "Minimal Square",
+      "thumb": "thumbs/glass1.png",
+      "preview": "previews/glass1.png"
+    },
+    {
+      "id": "messengerbag1",
+      "slot": "messengerBag",
+      "label": "Coral Satchel",
+      "thumb": "thumbs/messengerbag1.png",
+      "preview": "previews/messengerbag1.png"
+    },
+    {
+      "id": "hairhat20",
+      "slot": "hairHat",
+      "label": "Playful Hood",
+      "thumb": "thumbs/hairhat20.png",
+      "preview": "previews/hairhat20.png"
+    },
+    {
+      "id": "shoes2",
+      "slot": "shoes",
+      "label": "Coral Sneakers",
+      "thumb": "thumbs/shoes2.png",
+      "preview": "previews/shoes2.png"
+    },
+    {
+      "id": "shoes3",
+      "slot": "shoes",
+      "label": "Black Runners",
+      "thumb": "thumbs/shoes3.png",
+      "preview": "previews/shoes3.png"
+    },
+    {
+      "id": "shoes4",
+      "slot": "shoes",
+      "label": "Graffiti Tops",
+      "thumb": "thumbs/shoes4.png",
+      "preview": "previews/shoes4.png"
+    },
+    {
+      "id": "shoes5",
+      "slot": "shoes",
+      "label": "Sand Boots",
+      "thumb": "thumbs/shoes5.png",
+      "preview": "previews/shoes5.png"
+    },
+    {
+      "id": "glass3",
+      "slot": "glass",
+      "label": "Gold Rounds",
+      "thumb": "thumbs/glass3.png",
+      "preview": "previews/glass3.png"
+    },
+    {
+      "id": "glass5",
+      "slot": "glass",
+      "label": "Lime Frames",
+      "thumb": "thumbs/glass5.png",
+      "preview": "previews/glass5.png"
+    },
+    {
+      "id": "messengerbag2",
+      "slot": "messengerBag",
+      "label": "Court Sling",
+      "thumb": "thumbs/messengerbag2.png",
+      "preview": "previews/messengerbag2.png"
+    },
+    {
+      "id": "messengerbag3",
+      "slot": "messengerBag",
+      "label": "Explorer Kit",
+      "thumb": "thumbs/messengerbag3.png",
+      "preview": "previews/messengerbag3.png"
+    },
+    {
+      "id": "messengerbag4",
+      "slot": "messengerBag",
+      "label": "Playful Pack",
+      "thumb": "thumbs/messengerbag4.png",
+      "preview": "previews/messengerbag4.png"
+    },
+    {
+      "id": "cloth11",
+      "slot": "cloth",
+      "label": "Garden Apron",
+      "thumb": "thumbs/cloth11.png",
+      "preview": "previews/cloth11.png"
+    },
+    {
+      "id": "cloth28",
+      "slot": "cloth",
+      "label": "Navy Utility",
+      "thumb": "thumbs/cloth28.png",
+      "preview": "previews/cloth28.png"
+    },
+    {
+      "id": "cloth42",
+      "slot": "cloth",
+      "label": "Blue Overalls",
+      "thumb": "thumbs/cloth42.png",
+      "preview": "previews/cloth42.png"
+    },
+    {
+      "id": "hairhat41",
+      "slot": "hairHat",
+      "label": "Chestnut Long",
+      "thumb": "thumbs/hairhat41.png",
+      "preview": "previews/hairhat41.png"
+    },
+    {
+      "id": "hairhat43",
+      "slot": "hairHat",
+      "label": "Blonde Bob",
+      "thumb": "thumbs/hairhat43.png",
+      "preview": "previews/hairhat43.png"
+    },
+    {
+      "id": "hairhat51",
+      "slot": "hairHat",
+      "label": "Straw Bucket",
+      "thumb": "thumbs/hairhat51.png",
+      "preview": "previews/hairhat51.png"
+    },
+    {
+      "id": "hairhat70",
+      "slot": "hairHat",
+      "label": "Propeller Cap",
+      "thumb": "thumbs/hairhat70.png",
+      "preview": "previews/hairhat70.png"
+    },
+    {
+      "id": "glass8",
+      "slot": "glass",
+      "label": "Sharp Shades",
+      "thumb": "thumbs/glass8.png",
+      "preview": "previews/glass8.png"
+    }
+  ],
+  "base": {
+    "hairHat": "hairhat43",
+    "cloth": "cloth28",
+    "shoes": "shoes0",
+    "messengerBag": "",
+    "glass": ""
+  },
+  "profile": {
+    "id": "PROFILE-1-P0",
+    "sourceGroup": "07",
+    "title": "Alex",
+    "state": "Profile",
+    "effect": "Your farm, skills and collections.",
+    "keyFacts": [
+      {
+        "kind": "progress",
+        "label": "Farming",
+        "value": "Lv1"
+      },
+      {
+        "kind": "progress",
+        "label": "Fishing",
+        "value": "Lv2"
+      },
+      {
+        "kind": "progress",
+        "label": "Cooking",
+        "value": "Lv2"
+      }
+    ],
+    "requirements": [],
+    "supporting": "",
+    "disclosure": [
+      "Shanghai · Subtropical · Since Oct 2026",
+      "Farming Lv1 · Fishing Lv2 · Cooking Lv2",
+      "All skills",
+      "My farm · Homestead Lv1",
+      "Radishes ready in 3h 32m",
+      "Collections",
+      "Fish-dex 3/20 · Cookbook 2/48"
+    ],
+    "actions": [
+      {
+        "label": "Edit look",
+        "target": "KEEP-P0-1",
+        "kind": "navigate"
+      },
+      {
+        "label": "Back",
+        "target": "TUT-3-END",
+        "kind": "dismiss"
+      }
+    ],
+    "rows": [
+      {
+        "title": "My farm",
+        "state": "Homestead Lv1",
+        "effect": "Your home in Shanghai",
+        "keyFacts": [
+          {
+            "label": "Radishes ready",
+            "value": "3h 32m",
+            "kind": "time"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-home"
+      },
+      {
+        "title": "Collections",
+        "state": "",
+        "effect": "Fish-dex and Cookbook",
+        "keyFacts": [
+          {
+            "label": "Fish",
+            "value": "3/20",
+            "kind": "progress"
+          },
+          {
+            "label": "Recipes",
+            "value": "2/48",
+            "kind": "progress"
+          }
+        ],
+        "disclosure": [],
+        "icon": "i-book"
+      }
+    ],
+    "items": [],
+    "scene": "avatar",
+    "layout": "profile",
+    "sourceNote": "HUD头像/地图Me → Profile，Edit look →换装。P2关系等入口沿PROFILE-1，不在P0假装已实现。",
+    "sourceRef": {
+      "file": "docs/design/p0-flow-2026-10-05/figma/all-screens.json",
+      "id": "PROFILE-1-P0",
+      "nodeId": "407:995",
+      "designLabel": "Profile · P0入口"
+    },
+    "reviewOnly": false,
+    "reviewActions": [],
+    "unresolvedRules": [],
+    "navigation": {
+      "tabs": [],
+      "selectedTab": 0,
+      "place": "Homestead",
+      "placeExplicit": false
+    },
+    "hud": {
+      "recoveryState": "recovering",
+      "recoveryText": "+1 in 2:40"
+    },
+    "presentation": {
+      "singlePrimaryAction": true,
+      "maxInlineFacts": 3,
+      "overflow": "scroll-content",
+      "secondaryInformation": "disclosure",
+      "errorFeedback": "toast-with-next-step",
+      "commitCostPlacement": "immediately-above-actions",
+      "reviewNotesLocation": "outside-viewport",
+      "close": true
+    },
+    "identity": {
+      "city": "Shanghai",
+      "climate": "Subtropical",
+      "since": "Oct 2026"
+    },
+    "sourceCorrections": [
+      {
+        "field": "Shanghai climate",
+        "before": "Temperate",
+        "after": "Subtropical",
+        "basis": "gameplay-plan-v2-2026-10-02.md §5.2, line1522: Shanghai31.2° is Subtropical",
+        "originalPreserved": true
+      }
+    ]
+  },
+  "profileSource": "data/current-all.json#PROFILE-1-P0",
+  "prototypeBoundary": "Each variant is an actual one-part try-on relative to the declared base outfit. Reset uses the actual slot_table.default_config. Free multi-slot combinations, drag rotation and category close-up remain the existing Godot runtime capabilities.",
+  "images": {
+    "previews/base": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/base.png",
+      "sha256": "d082bd5439916110fdadaabad2140be942e66ea2e5b22305ad1ddef63f540fe4",
+      "width": 480,
+      "height": 560,
+      "bytes": 76286
+    },
+    "previews/cloth0": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/cloth0.png",
+      "sha256": "9e1a82d4243c6d1738b4bc67ac73c3f1fd868f45d07ebef08654d7f2a6945a01",
+      "width": 480,
+      "height": 560,
+      "bytes": 62982
+    },
+    "previews/cloth1": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/cloth1.png",
+      "sha256": "6c8bd0ca32d79f6ceb1235cc2245a26c5011e8139288ec91fb9e4a7142486d58",
+      "width": 480,
+      "height": 560,
+      "bytes": 67663
+    },
+    "previews/cloth11": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/cloth11.png",
+      "sha256": "6f94cb4523d4f57a5d36e9695cdded3cd79603ec39f94886818e62a814070ad6",
+      "width": 480,
+      "height": 560,
+      "bytes": 70159
+    },
+    "previews/cloth1_1": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/cloth1_1.png",
+      "sha256": "83698bdc8b0f96dae745f659526379c359f6da8e9131d085ace1709869f0a182",
+      "width": 480,
+      "height": 560,
+      "bytes": 71076
+    },
+    "previews/cloth28": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/cloth28.png",
+      "sha256": "d082bd5439916110fdadaabad2140be942e66ea2e5b22305ad1ddef63f540fe4",
+      "width": 480,
+      "height": 560,
+      "bytes": 76286
+    },
+    "previews/cloth42": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/cloth42.png",
+      "sha256": "9faa9621588237d88baae740b207912a7c8bdaea369c99c221a214d2c6515236",
+      "width": 480,
+      "height": 560,
+      "bytes": 84934
+    },
+    "previews/defaults": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/defaults.png",
+      "sha256": "76aabb9aaee54bfd2d8572787f9aae0a2e158430a9b9b4e6cd6ea4eb820e4751",
+      "width": 480,
+      "height": 560,
+      "bytes": 60139
+    },
+    "previews/glass0": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/glass0.png",
+      "sha256": "c5dfb6e2fc718499f7f75b33c8ec254859525279d6826897f8d19e019f193251",
+      "width": 480,
+      "height": 560,
+      "bytes": 77386
+    },
+    "previews/glass1": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/glass1.png",
+      "sha256": "bab313340901bdd6733db1935785d34693b00ef7b0e1775b687d98eb2242f12c",
+      "width": 480,
+      "height": 560,
+      "bytes": 77379
+    },
+    "previews/glass3": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/glass3.png",
+      "sha256": "cc416d778908d4b8320bab45c7c6b1a40c88316fdec2bd5a0a3dc74bf6ba8f8c",
+      "width": 480,
+      "height": 560,
+      "bytes": 76350
+    },
+    "previews/glass5": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/glass5.png",
+      "sha256": "681fd6605ea8fdfc9f2315c625aa3148e74401da7c2b51df4fb564de6104f749",
+      "width": 480,
+      "height": 560,
+      "bytes": 77742
+    },
+    "previews/glass8": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/glass8.png",
+      "sha256": "ee8e9c6ca0c8ded64bd6623d57478abfd21f6df4cfa7dc6fd55d8e4b3e73f48b",
+      "width": 480,
+      "height": 560,
+      "bytes": 77376
+    },
+    "previews/hairhat0": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/hairhat0.png",
+      "sha256": "d429d35ab3392243def0089c949aa14c482e55541275a471a16df2220c10100e",
+      "width": 480,
+      "height": 560,
+      "bytes": 73894
+    },
+    "previews/hairhat20": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/hairhat20.png",
+      "sha256": "d068e0cdd105102e5ca681ab589a670ff15e666eac32384bcc3de1c0e5917486",
+      "width": 480,
+      "height": 560,
+      "bytes": 82669
+    },
+    "previews/hairhat41": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/hairhat41.png",
+      "sha256": "f1440223382d2da29245ce4a84c4ee3e14347a6b80b0cb31395718b60ee049b0",
+      "width": 480,
+      "height": 560,
+      "bytes": 92496
+    },
+    "previews/hairhat43": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/hairhat43.png",
+      "sha256": "d082bd5439916110fdadaabad2140be942e66ea2e5b22305ad1ddef63f540fe4",
+      "width": 480,
+      "height": 560,
+      "bytes": 76286
+    },
+    "previews/hairhat51": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/hairhat51.png",
+      "sha256": "600cd9b7d861962df40544f76b66b5a681bbb8c84dfabd5be95e864504a970ef",
+      "width": 480,
+      "height": 560,
+      "bytes": 77698
+    },
+    "previews/hairhat70": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/hairhat70.png",
+      "sha256": "ba7e365d11e239faf8b18be2c95100e4de8344335385ada8bdfab0eb328d374c",
+      "width": 480,
+      "height": 560,
+      "bytes": 79083
+    },
+    "previews/messengerbag1": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/messengerbag1.png",
+      "sha256": "2846dbd592eb1c9c9f0a0ca23356ed60c0b10708e42ef238257ff092b761251e",
+      "width": 480,
+      "height": 560,
+      "bytes": 78667
+    },
+    "previews/messengerbag2": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/messengerbag2.png",
+      "sha256": "6d7a410d65dcc12bf965c3da2956c9a47a97ddf3e41f3b3410e82d1d37be0782",
+      "width": 480,
+      "height": 560,
+      "bytes": 77141
+    },
+    "previews/messengerbag3": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/messengerbag3.png",
+      "sha256": "1e763e95766fab0c88415d1d4d1b33f717d309027dfd7a32846588a1c93d62ea",
+      "width": 480,
+      "height": 560,
+      "bytes": 77744
+    },
+    "previews/messengerbag4": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/messengerbag4.png",
+      "sha256": "a7a2ab98e6e6cd803055f46d765dfe7cc0e840cdbb69b87c8757da2186c7a9e9",
+      "width": 480,
+      "height": 560,
+      "bytes": 77330
+    },
+    "previews/shoes0": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/shoes0.png",
+      "sha256": "d082bd5439916110fdadaabad2140be942e66ea2e5b22305ad1ddef63f540fe4",
+      "width": 480,
+      "height": 560,
+      "bytes": 76286
+    },
+    "previews/shoes1": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/shoes1.png",
+      "sha256": "3cb2b88e06b5b2befbd8bf2ed1efaff25acfb1d64863fe5f885124f8c5baa739",
+      "width": 480,
+      "height": 560,
+      "bytes": 76754
+    },
+    "previews/shoes2": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/shoes2.png",
+      "sha256": "2448900d24c3515c1f92542fc00f720741392e612edba62ad7a9182c8aa27b30",
+      "width": 480,
+      "height": 560,
+      "bytes": 77221
+    },
+    "previews/shoes3": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/shoes3.png",
+      "sha256": "8762370c5be6ae5d94a19973ac9cd2db58d2e1fa7e08c063fd95137ff62c23dc",
+      "width": 480,
+      "height": 560,
+      "bytes": 77051
+    },
+    "previews/shoes4": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/shoes4.png",
+      "sha256": "940558f531ec5aaf9ad101b6112272a7c82c541b1e3d2346890c9800351495a1",
+      "width": 480,
+      "height": 560,
+      "bytes": 77188
+    },
+    "previews/shoes5": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/previews/shoes5.png",
+      "sha256": "8089e8a22918a14730bdc6ad8b705681ad2990577e157f06d1f9b87086baeddf",
+      "width": 480,
+      "height": 560,
+      "bytes": 78563
+    },
+    "thumbs/cloth0": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/cloth0.png",
+      "sha256": "6417a36b724bc23fe1c790ef45800e671ebf762d0bb41fb17fb073bf3c9829ac",
+      "width": 160,
+      "height": 160,
+      "bytes": 11437
+    },
+    "thumbs/cloth1": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/cloth1.png",
+      "sha256": "30773d6c7155f81c431194b580f23d586ae6d20ab18c2add4fa99f424b8d3646",
+      "width": 160,
+      "height": 160,
+      "bytes": 15565
+    },
+    "thumbs/cloth11": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/cloth11.png",
+      "sha256": "2e1fde2714b9c9237b515ddf71314451e724439972efc421ec1cac71a79cdc01",
+      "width": 160,
+      "height": 160,
+      "bytes": 16716
+    },
+    "thumbs/cloth1_1": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/cloth1_1.png",
+      "sha256": "7c7da0e106dcbcb42ae7a97fd0f37ac4a0df22121399c73069cc0f3da93bede8",
+      "width": 160,
+      "height": 160,
+      "bytes": 17682
+    },
+    "thumbs/cloth28": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/cloth28.png",
+      "sha256": "043de5869b8c2e977f38c6a4c5814949f4100a51a7e3d3abb48b7c726cec5ddd",
+      "width": 160,
+      "height": 160,
+      "bytes": 13793
+    },
+    "thumbs/cloth42": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/cloth42.png",
+      "sha256": "4b223513366187f586ab2064efee2111593cc6711ec519b89f7cf42fafb54743",
+      "width": 160,
+      "height": 160,
+      "bytes": 19149
+    },
+    "thumbs/glass0": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/glass0.png",
+      "sha256": "fd5a02aa5b3ccedb700ece51b431fc73e22a549cbe862b5dd87c9c602d2d8770",
+      "width": 160,
+      "height": 160,
+      "bytes": 6723
+    },
+    "thumbs/glass1": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/glass1.png",
+      "sha256": "824fc5164fa76ff63e3cc029088aae9a87fa1da26493cf569c69178593d61e76",
+      "width": 160,
+      "height": 160,
+      "bytes": 6665
+    },
+    "thumbs/glass3": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/glass3.png",
+      "sha256": "bde746663796be1d2a0588eef37f42c8de39b926a23fd45c06f04815c036fbf6",
+      "width": 160,
+      "height": 160,
+      "bytes": 9651
+    },
+    "thumbs/glass5": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/glass5.png",
+      "sha256": "770ac3ae12a8cb607492beb5f1152023c9cbfb52c62a00f60b21110adf97cd87",
+      "width": 160,
+      "height": 160,
+      "bytes": 10924
+    },
+    "thumbs/glass8": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/glass8.png",
+      "sha256": "50f6d3aeddb1c7e7d131bd8df1b63ba436e712da456455cf5218f33040cabc89",
+      "width": 160,
+      "height": 160,
+      "bytes": 7195
+    },
+    "thumbs/hairhat0": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/hairhat0.png",
+      "sha256": "b9c23d95e9bc01f27e326e86c9ea579d66411039dac77f75c005485338e0553c",
+      "width": 160,
+      "height": 160,
+      "bytes": 19651
+    },
+    "thumbs/hairhat20": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/hairhat20.png",
+      "sha256": "52cc3f39292a7fd1a0909ffc967b798c782fa7b02bb7e42205c08a4315a9066e",
+      "width": 160,
+      "height": 160,
+      "bytes": 19158
+    },
+    "thumbs/hairhat41": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/hairhat41.png",
+      "sha256": "86c55ece7eb2afcae475140dbc25923059fe3734f417163113d315872b0fd945",
+      "width": 160,
+      "height": 160,
+      "bytes": 25423
+    },
+    "thumbs/hairhat43": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/hairhat43.png",
+      "sha256": "c4c5e1296dc6874bc2f251f6326585e29a1ac759cba772893e29cda1ff3df73b",
+      "width": 160,
+      "height": 160,
+      "bytes": 14968
+    },
+    "thumbs/hairhat51": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/hairhat51.png",
+      "sha256": "c283bac57d2364dfe537c23ad63c95064af8a94afb3e7c581e278c492e6822cf",
+      "width": 160,
+      "height": 160,
+      "bytes": 15538
+    },
+    "thumbs/hairhat70": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/hairhat70.png",
+      "sha256": "6a9cb9fb08d89725fe409f127aea33157e24c0d3f1b4002781b31c1842765272",
+      "width": 160,
+      "height": 160,
+      "bytes": 14487
+    },
+    "thumbs/messengerbag1": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/messengerbag1.png",
+      "sha256": "dbb9b4ced10f79e3a196fd76f5a2e68740ddd7b8f90a0fd663d40963875122b0",
+      "width": 160,
+      "height": 160,
+      "bytes": 15519
+    },
+    "thumbs/messengerbag2": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/messengerbag2.png",
+      "sha256": "5f92884a524e8d72509e1e97dfe958dc836edbdf57e12375548a403d99ed2c6b",
+      "width": 160,
+      "height": 160,
+      "bytes": 10454
+    },
+    "thumbs/messengerbag3": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/messengerbag3.png",
+      "sha256": "02e9c361d59236e94bacae27310d8a3d991adfb4886709d13d891798380a5aa6",
+      "width": 160,
+      "height": 160,
+      "bytes": 12270
+    },
+    "thumbs/messengerbag4": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/messengerbag4.png",
+      "sha256": "8c22bdca4531e868636692dd609c1e245e64c7061019419a90b6cc4082a72626",
+      "width": 160,
+      "height": 160,
+      "bytes": 12825
+    },
+    "thumbs/shoes0": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/shoes0.png",
+      "sha256": "cb6d030ad30bc3e8acab40da753e90a529dc44441c98aa74dfe2feeb7607d764",
+      "width": 160,
+      "height": 160,
+      "bytes": 14452
+    },
+    "thumbs/shoes1": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/shoes1.png",
+      "sha256": "777dfa639d6d854f2224f9b75411c921abb732b4241942e5b21c36f97070f8df",
+      "width": 160,
+      "height": 160,
+      "bytes": 16793
+    },
+    "thumbs/shoes2": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/shoes2.png",
+      "sha256": "285746bd16a2d290a8892a829efb741422cefbefa2e6ba493dd4dc7298ce116e",
+      "width": 160,
+      "height": 160,
+      "bytes": 17783
+    },
+    "thumbs/shoes3": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/shoes3.png",
+      "sha256": "4bb6eff44a873d249a513c89b45ee26eec5fbcde697c5496833b480236c62307",
+      "width": 160,
+      "height": 160,
+      "bytes": 18774
+    },
+    "thumbs/shoes4": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/shoes4.png",
+      "sha256": "5a13753377e5f442f1e009ca16c36013387c5e307d895de53794cec5f59c1cf2",
+      "width": 160,
+      "height": 160,
+      "bytes": 12287
+    },
+    "thumbs/shoes5": {
+      "file": "docs/design/ui-refactor-2026-10-06/avatar-assets/thumbs/shoes5.png",
+      "sha256": "98956971e4db0042af631221f59538984848ebf45ce5391971446d67ac2cb646",
+      "width": 160,
+      "height": 160,
+      "bytes": 19876
+    },
+    "background": {
+      "file": "assets/ui/backgrounds/dressing-room.png",
+      "sha256": "09733868bff20e1088f2cfb59cb56757d8c0194f069c3fa79f1987ce0d26e809",
+      "width": 1024,
+      "height": 1536,
+      "bytes": 1822635
+    }
+  },
+  "engineRenders": 29,
+  "partThumbnails": 27,
+  "resetRenderAvailable": true
+}

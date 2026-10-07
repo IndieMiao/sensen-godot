@@ -1,0 +1,213 @@
+{
+  "orderedCreators": [
+    {
+      "builder": "build_legacy_npc_flows.py",
+      "args": [
+        "COOK-FINE-EATEN"
+      ]
+    },
+    {
+      "builder": "build_legacy_npc_flows.py",
+      "args": [
+        "COOK-MYSTERY-EATEN"
+      ]
+    },
+    {
+      "builder": "build_legacy_npc_flows.py",
+      "args": [
+        "STALL-RADISH-SEEDS-BOUGHT"
+      ]
+    },
+    {
+      "builder": "build_legacy_npc_flows.py",
+      "args": [
+        "STALL-RADISH-SOLD-ONE"
+      ]
+    },
+    {
+      "builder": "build_legacy_npc_flows.py",
+      "args": [
+        "STALL-RADISH-SOLD-ALL"
+      ]
+    }
+  ],
+  "legacySurfaceReplays": [
+    {
+      "id": "COOK-4",
+      "index": 39,
+      "nodeId": "482:86",
+      "builder": "build_legacy_surfaces.py",
+      "args": [
+        "COOK-4"
+      ],
+      "reason": "Compact reveal; same-dish Eat187/200,sourceeffect45onlyafterEat."
+    },
+    {
+      "id": "COOK-6",
+      "index": 40,
+      "nodeId": "482:89",
+      "builder": "build_legacy_surfaces.py",
+      "args": [
+        "COOK-6"
+      ],
+      "reason": "Same-dish Eat147/200; no inventedMealsTodaytotal."
+    },
+    {
+      "id": "MAP-1",
+      "index": 43,
+      "nodeId": "482:95",
+      "builder": "build_legacy_surfaces.py",
+      "args": [
+        "MAP-1"
+      ],
+      "reason": "Restore map artwork alias; native sourcepins andPOIcards instead ofscreen-coveringdirectory."
+    },
+    {
+      "id": "MINE-1",
+      "index": 73,
+      "nodeId": "482:159",
+      "builder": "build_legacy_surfaces.py",
+      "args": [
+        "MINE-1"
+      ],
+      "reason": "Restore missing mine-floor1alias; sourcecamera mustcontainart."
+    },
+    {
+      "id": "NPC-1d",
+      "index": 47,
+      "nodeId": "482:103",
+      "builder": "build_legacy_surfaces.py",
+      "args": [
+        "NPC-1d"
+      ],
+      "reason": "Stamp desk whole label width164."
+    },
+    {
+      "id": "NPC-1e",
+      "index": 48,
+      "nodeId": "482:106",
+      "builder": "build_legacy_surfaces.py",
+      "args": [
+        "NPC-1e"
+      ],
+      "reason": "Granny Wu whole label width164."
+    },
+    {
+      "id": "NPC-4",
+      "index": 57,
+      "nodeId": "482:125",
+      "builder": "build_legacy_surfaces.py",
+      "args": [
+        "NPC-4"
+      ],
+      "reason": "Single primary command; actual3camera-highlight destinationsasserted."
+    },
+    {
+      "id": "SOC-4",
+      "index": 80,
+      "nodeId": "482:174",
+      "builder": "build_legacy_surfaces.py",
+      "args": [
+        "SOC-4"
+      ],
+      "reason": "Claim all primary; each parcelClaim secondaryoutline."
+    },
+    {
+      "id": "SETTINGS-1",
+      "index": 76,
+      "nodeId": "482:165",
+      "builder": "build_legacy_surfaces.py",
+      "args": [
+        "SETTINGS-1"
+      ],
+      "reason": "PreferenceToggle secondary; destructiveSignout remains singleprimary."
+    },
+    {
+      "id": "HOME-1",
+      "index": 70,
+      "nodeId": "482:152",
+      "builder": "build_legacy_surfaces.py",
+      "args": [
+        "HOME-1"
+      ],
+      "reason": "ClarifyCurrent maximum210,notcurrentEnergy142."
+    }
+  ],
+  "tradeReplaysOwnedByUx": [
+    {
+      "id": "NPC-2",
+      "index": 53,
+      "nodeId": "482:116",
+      "owner": "ux_audit",
+      "reason": "CompactsharedBagcells plus finalauthoritativeproductdata/quotas."
+    },
+    {
+      "id": "NPC-3",
+      "index": 55,
+      "nodeId": "482:120",
+      "owner": "ux_audit",
+      "reason": "CompactsharedBagcells plus finalauthoritativeproductdata/quotas."
+    },
+    {
+      "id": "NPC-3-2",
+      "index": 56,
+      "nodeId": "482:123",
+      "owner": "ux_audit",
+      "reason": "CompactsharedBagcells plus finalauthoritativeproductdata/quotas."
+    },
+    {
+      "id": "FARM-6",
+      "index": 20,
+      "nodeId": "482:46",
+      "owner": "ux_audit",
+      "reason": "CompactsharedBagcells plus finalauthoritativeproductdata/quotas."
+    },
+    {
+      "id": "FARM-6-2",
+      "index": 21,
+      "nodeId": "482:48",
+      "owner": "ux_audit",
+      "reason": "CompactsharedBagcells plus finalauthoritativeproductdata/quotas."
+    }
+  ],
+  "alreadyReplayedNeedsScreenshot": [
+    {
+      "id": "BAR-2",
+      "index": 9,
+      "nodeId": "482:23"
+    },
+    {
+      "id": "FISH-6",
+      "index": 79,
+      "nodeId": "482:171"
+    },
+    {
+      "id": "PROFILE-1",
+      "index": 74,
+      "nodeId": "482:161"
+    },
+    {
+      "id": "PROFILE-2",
+      "index": 75,
+      "nodeId": "482:163"
+    }
+  ],
+  "additionalContent": [
+    {
+      "id": "CROP-DEX-P1",
+      "nodeId": "758:74294",
+      "expected20entries": true,
+      "expected7Harvested": true
+    }
+  ],
+  "currentFollowup": {
+    "id": "GEAR-P0-2",
+    "builder": "build_current_containers.py",
+    "args": [
+      "screen",
+      "GEAR-P0-2"
+    ],
+    "reason": "Mine entrance isnavigation;realEnterstillseparatecommit2Energy."
+  },
+  "scope": "FinalvisualQA differences fromall84actualcurrentrowcaptures;do notrecaptureunmodifiedpassedcards."
+}

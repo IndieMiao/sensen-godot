@@ -1,0 +1,187 @@
+{
+  "createdNodeIdsFile": "asset-node-ids.json",
+  "assets": [
+    {
+      "id": "fish_crucian",
+      "name": "Pond Crucian",
+      "category": "fish",
+      "componentId": "442:10068",
+      "specimenId": "442:10069",
+      "instanceId": "442:10071",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_carp",
+      "name": "Common Carp",
+      "category": "fish",
+      "componentId": "442:10087",
+      "specimenId": "442:10088",
+      "instanceId": "442:10090",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_mullet",
+      "name": "Grey Mullet",
+      "category": "fish",
+      "componentId": "442:10106",
+      "specimenId": "442:10107",
+      "instanceId": "442:10109",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_perch",
+      "name": "River Perch",
+      "category": "fish",
+      "componentId": "442:10128",
+      "specimenId": "442:10129",
+      "instanceId": "442:10131",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_bass",
+      "name": "Largemouth Bass",
+      "category": "fish",
+      "componentId": "442:10150",
+      "specimenId": "442:10151",
+      "instanceId": "442:10153",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_trout",
+      "name": "Rainbow Trout",
+      "category": "fish",
+      "componentId": "442:10174",
+      "specimenId": "442:10175",
+      "instanceId": "442:10177",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_mackerel",
+      "name": "Mackerel",
+      "category": "fish",
+      "componentId": "442:10201",
+      "specimenId": "442:10202",
+      "instanceId": "442:10204",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_koi",
+      "name": "Golden Koi",
+      "category": "fish",
+      "componentId": "442:10225",
+      "specimenId": "442:10226",
+      "instanceId": "442:10228",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_catfish",
+      "name": "Catfish",
+      "category": "fish",
+      "componentId": "442:10247",
+      "specimenId": "442:10248",
+      "instanceId": "442:10250",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_seabass",
+      "name": "Sea Bass",
+      "category": "fish",
+      "componentId": "442:10267",
+      "specimenId": "442:10268",
+      "instanceId": "442:10270",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_sturgeon",
+      "name": "Silver Sturgeon",
+      "category": "fish",
+      "componentId": "442:10289",
+      "specimenId": "442:10290",
+      "instanceId": "442:10292",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_eel",
+      "name": "River Eel",
+      "category": "fish",
+      "componentId": "442:10308",
+      "specimenId": "442:10309",
+      "instanceId": "442:10311",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_tilapia",
+      "name": "Tilapia",
+      "category": "fish",
+      "componentId": "442:10327",
+      "specimenId": "442:10328",
+      "instanceId": "442:10330",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_smelt",
+      "name": "Smelt",
+      "category": "fish",
+      "componentId": "442:10349",
+      "specimenId": "442:10350",
+      "instanceId": "442:10352",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_grass_carp",
+      "name": "Grass Carp",
+      "category": "fish",
+      "componentId": "442:10368",
+      "specimenId": "442:10369",
+      "instanceId": "442:10371",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_arctic_char",
+      "name": "Arctic Char",
+      "category": "fish",
+      "componentId": "442:10392",
+      "specimenId": "442:10393",
+      "instanceId": "442:10395",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_snakehead",
+      "name": "Snakehead",
+      "category": "fish",
+      "componentId": "442:10416",
+      "specimenId": "442:10417",
+      "instanceId": "442:10419",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_pike",
+      "name": "Northern Pike",
+      "category": "fish",
+      "componentId": "442:10435",
+      "specimenId": "442:10436",
+      "instanceId": "442:10438",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_barramundi",
+      "name": "Barramundi",
+      "category": "fish",
+      "componentId": "442:10454",
+      "specimenId": "442:10455",
+      "instanceId": "442:10457",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "fish_salmon",
+      "name": "Atlantic Salmon",
+      "category": "fish",
+      "componentId": "442:10478",
+      "specimenId": "442:10479",
+      "instanceId": "442:10481",
+      "source": "new native vector draft"
+    }
+  ],
+  "count": 20,
+  "group": "20 · 鱼类图标 / 形态与色彩"
+}

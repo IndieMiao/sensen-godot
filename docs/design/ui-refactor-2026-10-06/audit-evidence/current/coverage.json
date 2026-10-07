@@ -1,0 +1,965 @@
+{
+  "capturedAt": "2026-10-06T02:11:57.844603+00:00",
+  "source": "Fresh Figma get_screenshot, maxDimension 16000, 2026-10-06",
+  "download": "Direct DNS blocked; enableBase64Response used; exact bytes decoded locally",
+  "screens": 204,
+  "sections": 6,
+  "strips": 36,
+  "coverage": [
+    "07:73",
+    "08:30",
+    "09:18",
+    "10:38",
+    "11:12",
+    "12:33"
+  ],
+  "sources": [
+    {
+      "group": "07",
+      "nodeId": "396:2",
+      "file": "section-07.png",
+      "width": 2576,
+      "height": 14080,
+      "sha256": "e0742b7e472788006f835ef3f420f74705fc8d791e29b29d31b04732207f3958",
+      "bytes": 10751247
+    },
+    {
+      "group": "08",
+      "nodeId": "430:14",
+      "file": "section-08.png",
+      "width": 2576,
+      "height": 5120,
+      "sha256": "2fd0e4bb57653aca23aeed579be1915ff64fcf4c9820f30992ba9abd0bb1b2b6",
+      "bytes": 4073984
+    },
+    {
+      "group": "09",
+      "nodeId": "430:16",
+      "file": "section-09.png",
+      "width": 2576,
+      "height": 3200,
+      "sha256": "d1a28fd57fe7d1c7136a8c11ffaef049225b34b95c40dbd5388f4c86fe1c849b",
+      "bytes": 2579906
+    },
+    {
+      "group": "10",
+      "nodeId": "438:3178",
+      "file": "section-10.png",
+      "width": 2576,
+      "height": 7040,
+      "sha256": "4ca63e7f58646842aaf35f6b8a74ab1e209923a7c51844e9c71fa84e6ce6fd5e",
+      "bytes": 4696736
+    },
+    {
+      "group": "11",
+      "nodeId": "438:3180",
+      "file": "section-11.png",
+      "width": 2576,
+      "height": 2240,
+      "sha256": "9a8e4a7d2c160c96a3f770062dbc201f45dfac8d2186479a39243a9584f3d590",
+      "bytes": 1868288
+    },
+    {
+      "group": "12",
+      "nodeId": "438:3182",
+      "file": "section-12.png",
+      "width": 2576,
+      "height": 6080,
+      "sha256": "3e3c83dc00a06f9eb831e98bec53cd88b74c55b4d5eef19defe97761c8313f5e",
+      "bytes": 5961076
+    }
+  ],
+  "rows": [
+    {
+      "group": "07",
+      "row": 1,
+      "file": "07-row-01.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 240,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "TUT-1",
+        "TUT-1-2",
+        "TUT-3-01",
+        "TUT-3-02",
+        "TUT-3-03",
+        "TUT-3-04"
+      ],
+      "inspected": true,
+      "sha256": "3eac9d3c6d063df26aa76e6f2c13ab4c2248f9fc8853711c2d6d08d3931030f3",
+      "reviewedAt": "2026-10-06T02:25:57.172544+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "选城确认与信息入口均像执行；场景教学提示比HUD倒计时更易读。"
+    },
+    {
+      "group": "07",
+      "row": 2,
+      "file": "07-row-02.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 1250,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "TUT-3-05",
+        "TUT-3-06",
+        "TUT-3-06B",
+        "TUT-3-07A",
+        "TUT-3-07B",
+        "TUT-3-07C"
+      ],
+      "inspected": true,
+      "sha256": "7edb11bdffa1c50bcc7182e4b122cb1d01690480c28c7c077330f9078d4e5504",
+      "reviewedAt": "2026-10-06T02:25:57.172614+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "首鱼奖励/品质/剩余容量混在标题；Keep与Eat语义不分。"
+    },
+    {
+      "group": "07",
+      "row": 3,
+      "file": "07-row-03.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 2260,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "TUT-3-08",
+        "TUT-3-09",
+        "TUT-3-10",
+        "TUT-3-11",
+        "TUT-3-12",
+        "TUT-3-END"
+      ],
+      "inspected": true,
+      "sha256": "8ff9edd8d6fe8d4b9b739a9a9b3a0ae4ec0faa1633dabd86e84c5e36c28572f3",
+      "reviewedAt": "2026-10-06T02:25:57.172616+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "213/200状态的Bonus与HUD下行叠写；升级奖励和下次目标可拆清楚。"
+    },
+    {
+      "group": "07",
+      "row": 4,
+      "file": "07-row-04.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 3460,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "MAT-1",
+        "MAT-2",
+        "MAT-3",
+        "MINE-P0-1",
+        "MINE-P0-2",
+        "MINE-P0-3"
+      ],
+      "inspected": true,
+      "sha256": "8c9f558bd037e3d5b7fa1c8a4c4465e87ec0be631cbd9d03eec12c19004e8312",
+      "reviewedAt": "2026-10-06T02:25:57.172618+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "采集列表混入Ready/等级；Clay Bank弹层同时保留Timber计时；矿层进度与场景石头示意未同步。"
+    },
+    {
+      "group": "07",
+      "row": 5,
+      "file": "07-row-05.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 4470,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "MINE-P0-4",
+        "MINE-P0-5",
+        "MINE-P0-6",
+        "MINE-P0-7",
+        "MINE-P0-8",
+        "CRAFT-1"
+      ],
+      "inspected": true,
+      "sha256": "4e3b14edf8a50cf31695f1226a96fdedae1809e3a74aa963b17289873c552b2c",
+      "reviewedAt": "2026-10-06T02:25:57.172619+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "满包、日局数与日切规则合在同一失败卡；重开局需突出结束当前局。"
+    },
+    {
+      "group": "07",
+      "row": 6,
+      "file": "07-row-06.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 5480,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "CRAFT-2",
+        "CRAFT-3",
+        "CRAFT-4",
+        "GEAR-P0-1",
+        "GEAR-P0-2",
+        "HOME-P0-1"
+      ],
+      "inspected": true,
+      "sha256": "567f9bb953ab60686c880014ff16712d12161ee105ca2b80645c872dd9eb4d45",
+      "reviewedAt": "2026-10-06T02:25:57.172620+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "制作收益在底部小字；Gear虽恢复六槽，装备按钮与效果字号仍极小。"
+    },
+    {
+      "group": "07",
+      "row": 7,
+      "file": "07-row-07.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 6680,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "COOK-P0-1",
+        "COOK-P0-2",
+        "COOK-P0-3",
+        "COOK-P0-4",
+        "COOK-P0-5",
+        "COOK-P0-6"
+      ],
+      "inspected": true,
+      "sha256": "60560a8bfd6eaa1c7aa93c1cae13b0d6b950bf2d1638753710451765748f07ff",
+      "reviewedAt": "2026-10-06T02:25:57.172621+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "Experiment选中材料挤成单一文本条；火候环必须保留原生控件；满包菜应保留同菜身份。"
+    },
+    {
+      "group": "07",
+      "row": 8,
+      "file": "07-row-08.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 7690,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "COOK-P0-7",
+        "COOK-P0-8",
+        "STORE-1",
+        "STORE-2",
+        "COOK-P0-9",
+        "COOK-P0-10"
+      ],
+      "inspected": true,
+      "sha256": "494be850e099e1227272668e6f4be33ccbf76c7f51a0b90fc8f7740a55082699",
+      "reviewedAt": "2026-10-06T02:25:57.172623+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "仓库选中Torch与网格值需保持同步；Cook Again费用/经验不能藏于按钮或细字。"
+    },
+    {
+      "group": "07",
+      "row": 9,
+      "file": "07-row-09.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 8910,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "BOARD-1",
+        "BOARD-2",
+        "BOARD-3",
+        "TODAY-1",
+        "TODAY-2",
+        "BAG-1-P0"
+      ],
+      "inspected": true,
+      "sha256": "560227dc1e8808207f3102787a458196e6e993e582ebb85a5e464102da3e2beb",
+      "reviewedAt": "2026-10-06T02:25:57.172625+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "委托完成/日限/下一份混排；Today三条可理解；Bag格子结构是后续复用锚点。"
+    },
+    {
+      "group": "07",
+      "row": 10,
+      "file": "07-row-10.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 9920,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "PARCEL-1",
+        "PARCEL-2",
+        "PARCEL-3",
+        "PARCEL-4",
+        "PARCEL-5",
+        "PARCEL-6"
+      ],
+      "inspected": true,
+      "sha256": "bc88994b02ebcfcd43814119eb1c6f8c5fea45b3de2081bf22d921b64519e3fe",
+      "reviewedAt": "2026-10-06T02:25:57.172626+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "live PARCEL-1第一条已有单件Claim，静态JSON漏记；期限/数量/来源混入标题。"
+    },
+    {
+      "group": "07",
+      "row": 11,
+      "file": "07-row-11.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 10930,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "PROFILE-1-P0",
+        "KEEP-P0-1",
+        "KEEP-P0-2",
+        "ENERGY-P0-1",
+        "COOK-KEEP-BRANCH",
+        "SAVE-RETRY"
+      ],
+      "inspected": true,
+      "sha256": "bacae55aaa739863f8c2a2e5ee2d973bbae1a18678467b8dc218735ded570cfe",
+      "reviewedAt": "2026-10-06T02:25:57.172627+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "换装无明显选中勾；低体力四件事需分开；保存失败应保留编辑和退出。"
+    },
+    {
+      "group": "07",
+      "row": 12,
+      "file": "07-row-12.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 11940,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "BOARD-DROPPED",
+        "COOK-HERB-HEAT",
+        "MAT-GLOVES-RESULT",
+        "FISH-P0-CAST",
+        "MINE-CONTINUE",
+        "BUILD-RETRY"
+      ],
+      "inspected": true,
+      "sha256": "eb499227be4a4455654efbb961eafc7dde7f2f2ce54cdae94049eb05ddc23779",
+      "reviewedAt": "2026-10-06T02:25:57.172628+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "再做香草鱼有实际火候环；续局仍需显示4/6，不能由普通信息卡代替操作层。"
+    },
+    {
+      "group": "07",
+      "row": 13,
+      "file": "07-row-13.png",
+      "sourceFile": "section-07.png",
+      "crop": {
+        "x": 0,
+        "y": 12960,
+        "width": 2576,
+        "height": 950
+      },
+      "screens": [
+        "PARCEL-ONE"
+      ],
+      "inspected": true,
+      "sha256": "25a50fc320776f8449d3c134ba01e9eb6659d0287cd076ea029edd526a6909d9",
+      "reviewedAt": "2026-10-06T02:25:57.172629+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "单件领取后清晰展示余下两包，但已领回执与待领列表使用同一信息行样式。"
+    },
+    {
+      "group": "08",
+      "row": 1,
+      "file": "08-row-01.png",
+      "sourceFile": "section-08.png",
+      "crop": {
+        "x": 0,
+        "y": 180,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "FAC-1",
+        "FAC-2",
+        "FAC-3",
+        "FAC-4",
+        "FAC-5",
+        "FAC-6"
+      ],
+      "inspected": true,
+      "sha256": "13d1cf0e247eab7a2e1f55b0acc4e6e9f6bdb4c86fc940082642b09e8a71a210",
+      "reviewedAt": "2026-10-06T02:25:57.172630+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "效果藏末尾；3×3范围悬在温室屋顶，无法证明真实覆盖；放置取消与预览同样描边。"
+    },
+    {
+      "group": "08",
+      "row": 2,
+      "file": "08-row-02.png",
+      "sourceFile": "section-08.png",
+      "crop": {
+        "x": 0,
+        "y": 1140,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "TRAP-1",
+        "TRAP-2",
+        "TRAP-3",
+        "TRAP-4",
+        "TRAP-5",
+        "TRAP-6"
+      ],
+      "inspected": true,
+      "sha256": "d1dae3127bdb969dd151beaa6c150f3de196afeb84a4fc015f75305d4a576168",
+      "reviewedAt": "2026-10-06T02:25:57.172631+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "鱼笼数量/容量/时长跨多行；返回整理后继续按钮是审阅快进；现场鱼笼锚点缺失。"
+    },
+    {
+      "group": "08",
+      "row": 3,
+      "file": "08-row-03.png",
+      "sourceFile": "section-08.png",
+      "crop": {
+        "x": 0,
+        "y": 2100,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "COOK-P1-1",
+        "COOK-P1-2",
+        "COOK-P1-3",
+        "COOK-P1-4",
+        "COOK-P1-5",
+        "COOK-P1-6"
+      ],
+      "inspected": true,
+      "sha256": "7c84013952febdd7720b451a5a46a075515466b9425db73bafa53b27c13970ca",
+      "reviewedAt": "2026-10-06T02:25:57.172632+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "多灶标签并未明确锚到各灶；排队材料/扣料待定；Cook All缺实际批次计划。"
+    },
+    {
+      "group": "08",
+      "row": 4,
+      "file": "08-row-04.png",
+      "sourceFile": "section-08.png",
+      "crop": {
+        "x": 0,
+        "y": 3060,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "COOK-P1-7",
+        "COOK-P1-8",
+        "FAC-GH",
+        "TRAP-DONE",
+        "DEX-P1-1",
+        "DEX-P1-2"
+      ],
+      "inspected": true,
+      "sha256": "2c0f0e99f3ec70504a6f5a3213af353d33a47c8931d5a38b43ce95d53a1aaa85",
+      "reviewedAt": "2026-10-06T02:25:57.172633+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "Preview温室实际扣料应Craft；Lucky Double两份品质要独立；DEX-P1-1是五态说明非真实图鉴。"
+    },
+    {
+      "group": "08",
+      "row": 5,
+      "file": "08-row-05.png",
+      "sourceFile": "section-08.png",
+      "crop": {
+        "x": 0,
+        "y": 4020,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "FAC-GH-PLACE",
+        "FAC-GH-DONE",
+        "DOUBLE-RESULT",
+        "FAC-LIMIT",
+        "TRAP-NOROOM",
+        "COOK-EMPTY"
+      ],
+      "inspected": true,
+      "sha256": "f097fc527fdd1c91fd6e8a02ad821c9fd20c579b0ea45d338df76a671c2a0e08",
+      "reviewedAt": "2026-10-06T02:25:57.172634+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "4×4占地悬浮而未注册地块；双份菜数量与品质混标题；上限/满包用长按钮原因代替动词。"
+    },
+    {
+      "group": "09",
+      "row": 1,
+      "file": "09-row-01.png",
+      "sourceFile": "section-09.png",
+      "crop": {
+        "x": 0,
+        "y": 180,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "MAP-2-FREE",
+        "MAP-3-FREE",
+        "MAP-4-FREE",
+        "MAP-5-FREE",
+        "MAP-6-FREE",
+        "MAP-7-FREE"
+      ],
+      "inspected": true,
+      "sha256": "c773a541ab61b2cb4a7617226002a7cd08f57adca90c4289800e6e5131aaa704",
+      "reviewedAt": "2026-10-06T02:25:57.172635+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "Browse/Travel/Fly形态无区别；大地图几乎无定位信息；落地首访奖励应独立。"
+    },
+    {
+      "group": "09",
+      "row": 2,
+      "file": "09-row-02.png",
+      "sourceFile": "section-09.png",
+      "crop": {
+        "x": 0,
+        "y": 1140,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "MAP-8-FREE",
+        "LOCAL-FISH",
+        "LOCAL-CATCH",
+        "LOCAL-SHOP",
+        "LOCAL-TRADE",
+        "LOCAL-BOUGHT"
+      ],
+      "inspected": true,
+      "sha256": "e124890eb6617eca941734e389eec261d628cff43bdcf070fa85d158c686d379",
+      "reviewedAt": "2026-10-06T02:25:57.172636+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "当前城市与所访地点基本有位置芯片；鱼种/XP与入口动作混排；当地购买与回家应区分。"
+    },
+    {
+      "group": "09",
+      "row": 3,
+      "file": "09-row-03.png",
+      "sourceFile": "section-09.png",
+      "crop": {
+        "x": 0,
+        "y": 2100,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "HOME-RETURN",
+        "PASS-1",
+        "PASS-2",
+        "TRAVEL-RETRY",
+        "TRAVEL-RECONNECT",
+        "FOG-THREE"
+      ],
+      "inspected": true,
+      "sha256": "cc2fa3220833f268c9ba1533ca09485035cb84dfa63726af8c6b61e7e46b4d23",
+      "reviewedAt": "2026-10-06T02:25:57.172637+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "Passport进度层次不足；重连到达Tokyo但HUD仍Shanghai；三态解释页不应进入产品导航。"
+    },
+    {
+      "group": "10",
+      "row": 1,
+      "file": "10-row-01.png",
+      "sourceFile": "section-10.png",
+      "crop": {
+        "x": 0,
+        "y": 180,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "MAP-4-PAID",
+        "MAP-4-GATE",
+        "MAP-5-PAID",
+        "TRAVEL-GUIDE",
+        "TRAVEL-CANCEL",
+        "TRAVEL-REFUNDED"
+      ],
+      "inspected": true,
+      "sha256": "3cf407fb7f8f40b698bdd93cd8092fb4439772e7d2881cf17c49b611ce4bfa60",
+      "reviewedAt": "2026-10-06T02:25:57.172638+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "出发40体力/200币/许可应常驻在确认区；取消退款应区别于保留旅程；在途可做/不可做不能压细字。"
+    },
+    {
+      "group": "10",
+      "row": 2,
+      "file": "10-row-02.png",
+      "sourceFile": "section-10.png",
+      "crop": {
+        "x": 0,
+        "y": 1140,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "DAYPASS",
+        "DAYPASS-EXPIRED",
+        "PERMIT-1",
+        "PERMIT-DONE",
+        "TICKET-1",
+        "SECOND-HOME"
+      ],
+      "inspected": true,
+      "sha256": "2930a34395216b80bcc8a4c01d135a6b847589fa9afaef47c0f770905a84ecdb",
+      "reviewedAt": "2026-10-06T02:25:57.172639+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "日票去向清楚但极小；证件成本占多域；第二故乡7日锁需成为确认后果。"
+    },
+    {
+      "group": "10",
+      "row": 3,
+      "file": "10-row-03.png",
+      "sourceFile": "section-10.png",
+      "crop": {
+        "x": 0,
+        "y": 2100,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "SECOND-HOME-DONE",
+        "SOC-1",
+        "SOC-1-GATE",
+        "SOC-1-CONFIRM",
+        "SOC-2",
+        "SOC-2-INBOX"
+      ],
+      "inspected": true,
+      "sha256": "2714e9160b6e6e01ac9fb3f53ff4471439f5388f066cf5113b64a6a9abe7e986",
+      "reviewedAt": "2026-10-06T02:25:57.172640+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "SOC-2发给Mia而下张变Mia邀请自己，发送/接收角色视角跳变；关系进度链接是快进。"
+    },
+    {
+      "group": "10",
+      "row": 4,
+      "file": "10-row-04.png",
+      "sourceFile": "section-10.png",
+      "crop": {
+        "x": 0,
+        "y": 3060,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "SOC-2-ARRIVE",
+        "SOC-2-ERROR",
+        "SOC-3",
+        "HELPER-INBOX",
+        "HELPER-SUMMARY",
+        "HELPER-ONSITE"
+      ],
+      "inspected": true,
+      "sha256": "aa709d054ab12495af5d32a03c38ee6df6d096157447fcff9e67f0e330b037a8",
+      "reviewedAt": "2026-10-06T02:25:57.172640+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "帮工邀请接受后直接离线结算是时间/角色快进；补播必须明确谁付体力、谁供种子。"
+    },
+    {
+      "group": "10",
+      "row": 5,
+      "file": "10-row-05.png",
+      "sourceFile": "section-10.png",
+      "crop": {
+        "x": 0,
+        "y": 4020,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "HELPER-BUDGET",
+        "SOC-5",
+        "GIFT-SENT",
+        "GIFT-CLAIM",
+        "GIFT-DETAIL",
+        "SOC-6"
+      ],
+      "inspected": true,
+      "sha256": "d2d4cf1ebf292e2854dcf63698ece7ef60d46e562fda624c05dee4dda12036e7",
+      "reviewedAt": "2026-10-06T02:25:57.172641+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "礼物两物品被挤一行；Gifted不可售是必要限制；访问与自己农场截图相同需保留对象身份。"
+    },
+    {
+      "group": "10",
+      "row": 6,
+      "file": "10-row-06.png",
+      "sourceFile": "section-10.png",
+      "crop": {
+        "x": 0,
+        "y": 4980,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "GUESTBOOK",
+        "TOGETHER",
+        "TOGETHER-PROGRESS",
+        "TOGETHER-DONE",
+        "EXPAND-4",
+        "EXPAND-5"
+      ],
+      "inspected": true,
+      "sha256": "4fd77c84c46d5fd87bfcca23913687968a50d2a8e3e3eb93bd657e64057bf9c6",
+      "reviewedAt": "2026-10-06T02:25:57.172642+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "留言没有可见选中态却可Post；共做未给实需/实奖不得伪造；4/5槽必须保留独立槽位。"
+    },
+    {
+      "group": "10",
+      "row": 7,
+      "file": "10-row-07.png",
+      "sourceFile": "section-10.png",
+      "crop": {
+        "x": 0,
+        "y": 5940,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "EXPAND-RECIPES",
+        "TRADER"
+      ],
+      "inspected": true,
+      "sha256": "efbe304a6c989c98338bd8771e14e3206aab69f45a6b459374d937c46c6f0817",
+      "reviewedAt": "2026-10-06T02:25:57.172643+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "八配方名称成对挤标题；旅行商人当前据点与Show目标要一致。"
+    },
+    {
+      "group": "11",
+      "row": 1,
+      "file": "11-row-01.png",
+      "sourceFile": "section-11.png",
+      "crop": {
+        "x": 0,
+        "y": 180,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "BUFF-FARM",
+        "BUFF-FISH",
+        "BUFF-HANDS",
+        "BUFF-TRAVEL",
+        "BUFF-CREEL",
+        "BUFF-REPLACE"
+      ],
+      "inspected": true,
+      "sha256": "8607c0f2fd758d28548691b60e396697f5f3ea1822ec61a61d970e05fd86855d",
+      "reviewedAt": "2026-10-06T02:25:57.172644+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "Buff效果、品质对应时长和替换损失应分层；查看当前Buff也被画为主执行按钮。"
+    },
+    {
+      "group": "11",
+      "row": 2,
+      "file": "11-row-02.png",
+      "sourceFile": "section-11.png",
+      "crop": {
+        "x": 0,
+        "y": 1140,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "BUFF-ACTIVE",
+        "BUFF-CASTS",
+        "BUFF-LAST",
+        "BUFF-TIMEOUT",
+        "BUFF-RATIONS-USE",
+        "BUFF-CREEL-END"
+      ],
+      "inspected": true,
+      "sha256": "ee51fa2468dec220f27c5c362e27aca2fced48d756c15e00a16b6a3b9e967474",
+      "reviewedAt": "2026-10-06T02:25:57.172644+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "Buff常驻胶囊离Energy太远；live失效已改轻Toast+Cast/Sow，JSON未完全同步；临时容量到期仍未定。"
+    },
+    {
+      "group": "12",
+      "row": 1,
+      "file": "12-row-01.png",
+      "sourceFile": "section-12.png",
+      "crop": {
+        "x": 0,
+        "y": 180,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "HOME-LV4",
+        "HOME-LV5",
+        "HOME-LV6",
+        "HOME-LV7",
+        "HOME-LV8",
+        "HOME-LV9"
+      ],
+      "inspected": true,
+      "sha256": "622cf8421788202c76c4f4b990c7ab850efd0ef761ce8b9d7e8b855d4f70ae43",
+      "reviewedAt": "2026-10-06T02:25:57.172645+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "等级后果文字清楚但不能以同一农场底图代表独立外观完成；容量数值混标题。"
+    },
+    {
+      "group": "12",
+      "row": 2,
+      "file": "12-row-02.png",
+      "sourceFile": "section-12.png",
+      "crop": {
+        "x": 0,
+        "y": 1140,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "HOME-LV10",
+        "MINE-3",
+        "COMBAT-1",
+        "COMBAT-LOOT",
+        "COMBAT-HEAL",
+        "MINE-4"
+      ],
+      "inspected": true,
+      "sha256": "9e9f2fedfedd296a5963aa4d045b0c7509b6ad9a723ea9b54049e036608e068b",
+      "reviewedAt": "2026-10-06T02:25:57.172646+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "战斗HP/武器/药水需留在操作层；清层场景仍满岩石，是非运行状态美术示意。"
+    },
+    {
+      "group": "12",
+      "row": 3,
+      "file": "12-row-03.png",
+      "sourceFile": "section-12.png",
+      "crop": {
+        "x": 0,
+        "y": 2100,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "MINE-5",
+        "MINE-KO",
+        "RESIDENT-TALK",
+        "RESIDENT-CHAT",
+        "RESIDENT-MEAL",
+        "RESIDENT-MEAL-DONE"
+      ],
+      "inspected": true,
+      "sha256": "2f96bb04cc97e9cc26d74090e9fe9a80777020194aaceaa434afdb785028d810",
+      "reviewedAt": "2026-10-06T02:25:57.172647+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "败退和Elite完成必须分支；居民赠餐日额度与XP区别需保留；实际敌人画面缺失。"
+    },
+    {
+      "group": "12",
+      "row": 4,
+      "file": "12-row-04.png",
+      "sourceFile": "section-12.png",
+      "crop": {
+        "x": 0,
+        "y": 3060,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "RESIDENT-TEACH",
+        "RES-PIP",
+        "RES-GRANNY",
+        "RES-MIRA",
+        "RES-KAI",
+        "RES-RAFA"
+      ],
+      "inspected": true,
+      "sha256": "73d67985f9569763c19e099d9983bcd8f8c9e0daf58d68f62885845676e12d0f",
+      "reviewedAt": "2026-10-06T02:25:57.172648+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "五名居民有不同候选头像；会话不应跳成同一个Hana；场景共享不表示角色归属改变。"
+    },
+    {
+      "group": "12",
+      "row": 5,
+      "file": "12-row-05.png",
+      "sourceFile": "section-12.png",
+      "crop": {
+        "x": 0,
+        "y": 4020,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "RES-IVO",
+        "RES-HANA",
+        "RES-SAM",
+        "RES-LENA",
+        "RES-TOMO",
+        "RES-THEO"
+      ],
+      "inspected": true,
+      "sha256": "683b200880c58ff529d829ad6d71d1208a3d8b38e18927d7b8e68b649e4b47ab",
+      "reviewedAt": "2026-10-06T02:25:57.172649+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "六名居民头像各异但信息层级重复且过小；职业/喜好/友情应独立。"
+    },
+    {
+      "group": "12",
+      "row": 6,
+      "file": "12-row-06.png",
+      "sourceFile": "section-12.png",
+      "crop": {
+        "x": 0,
+        "y": 4980,
+        "width": 2576,
+        "height": 930
+      },
+      "screens": [
+        "RES-NADIA",
+        "DEX-MILESTONE",
+        "COOK-MILESTONE"
+      ],
+      "inspected": true,
+      "sha256": "6e20a15e6ee90c575f205326c3495d6936c0379aa9b80882ac4ee4ac91924f2e",
+      "reviewedAt": "2026-10-06T02:25:57.172650+00:00",
+      "health": "Needs hierarchy/state refactor",
+      "finding": "Nadia同样需稳定身份；里程碑应区分已获奖励、下阶段门槛，避免领取与查看混淆。"
+    }
+  ],
+  "inspectionComplete": true,
+  "readOnly": true,
+  "scopeLimit": "Current Figma artwork only; not an interactive runtime or reconstructed native-page visual acceptance."
+}

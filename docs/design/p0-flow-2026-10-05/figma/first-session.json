@@ -1,0 +1,504 @@
+[
+  {
+    "id": "TUT-1",
+    "title": "选城",
+    "kind": "city",
+    "scene": "map",
+    "heading": "This is home",
+    "meta": "Shanghai · Temperate",
+    "rows": [
+      [
+        "Search another city",
+        "Where would you like to begin?",
+        "i-showmap"
+      ]
+    ],
+    "body": "You can travel anywhere later. Home is where your farm is.",
+    "actions": [
+      [
+        "This is home",
+        "TUT-1-2"
+      ]
+    ],
+    "note": "前置｜IP 预填，可搜索改城；选城不受迷雾限制。地图底图仅作构图示意。→ 建场。"
+  },
+  {
+    "id": "TUT-1-2",
+    "title": "建场确认",
+    "scene": "farm",
+    "heading": "Your home in Shanghai",
+    "meta": "Homestead Lv1",
+    "rows": [
+      [
+        "A little room to grow",
+        "20 tilled plots · a kitchen · your own stall",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Create farm",
+        "TUT-3-01"
+      ],
+      [
+        "Change city",
+        "TUT-1",
+        "soft"
+      ]
+    ],
+    "note": "前置｜确认家城后建场；建场成功才进入农场。失败保留选城与选择，不重复创建。"
+  },
+  {
+    "id": "TUT-3-01",
+    "title": "01 · 落地",
+    "kind": "game",
+    "scene": "farm",
+    "energy": "200",
+    "coins": "180",
+    "banner": "Pick a seed, walk up to a plot and press Sow. Hold to keep sowing.",
+    "action": "Sow ×1\n2 Energy",
+    "quick": [
+      {
+        "icon": "i-radish-seeds",
+        "count": "20"
+      },
+      {
+        "icon": "i-sprout",
+        "count": "10"
+      }
+    ],
+    "next": "TUT-3-02",
+    "note": "检查点 01｜0–3′。初级四工具已装备；Radish 已选；20 格已翻地。仅教学提示，不代操作。"
+  },
+  {
+    "id": "TUT-3-02",
+    "title": "02 · 播种与浇水",
+    "kind": "game",
+    "scene": "farm",
+    "energy": "160",
+    "coins": "180",
+    "tag": "Radishes · ready in 3h 58m",
+    "banner": "20 seeds planted",
+    "sub": "Water your new seedlings.",
+    "action": "Water\nFree",
+    "quick": [
+      {
+        "icon": "i-radish-seeds",
+        "count": "0"
+      },
+      {
+        "icon": "i-sprout",
+        "count": "10"
+      }
+    ],
+    "next": "TUT-3-03",
+    "note": "检查点 02｜Sow 每格 −2，共 −40；Water 免费。点田格不劳作，走位后按主行动键。"
+  },
+  {
+    "id": "TUT-3-03",
+    "title": "03 · 接教学委托",
+    "scene": "stall",
+    "energy": "160",
+    "coins": "180",
+    "heading": "Stall Board",
+    "tabs": [
+      "Buy",
+      "Stall Board"
+    ],
+    "on": 1,
+    "rows": [
+      [
+        "Pond Catch",
+        "2 Pond Crucian · any pond · 14 coins",
+        "i-fish"
+      ],
+      [
+        "Deliver here",
+        "Homestead Stall",
+        "i-board"
+      ]
+    ],
+    "actions": [
+      [
+        "Track",
+        "TUT-3-04"
+      ]
+    ],
+    "foot": "Next request in 72h",
+    "note": "检查点 03｜3–5′。无人驿站，无 Bao 或问候卡。Track 后板 ! 消失，鱼塘图钉 ! 出现。"
+  },
+  {
+    "id": "TUT-3-04",
+    "title": "04 · 找到新手塘",
+    "scene": "map",
+    "energy": "161",
+    "coins": "180",
+    "place": "Map",
+    "tag": "!  Willow Pond",
+    "heading": "Willow Pond",
+    "meta": "Beginner pond · 1.2 km",
+    "rows": [
+      [
+        "Best for Lv1–3",
+        "Pond Crucian OK · 2 regional fish ?",
+        "i-pond"
+      ]
+    ],
+    "actions": [
+      [
+        "Go",
+        "FISH-P0-CAST"
+      ]
+    ],
+    "foot": "Same city · Free",
+    "note": "检查点 04｜5–9′。位置芯片 → 塘卡 → Go。同城不弹 Travel；Show on map 只移动相机。"
+  },
+  {
+    "id": "TUT-3-05",
+    "title": "05 · 第一条鱼",
+    "scene": "pond",
+    "energy": "156",
+    "coins": "180",
+    "place": "Willow Pond",
+    "tag": "Creel 1 · 24 free",
+    "heading": "Caught! Pond Crucian",
+    "meta": "Common · First catch!",
+    "rows": [
+      [
+        "Fishing +50 XP",
+        "First cast · first reel · new city · new fish",
+        "i-fish"
+      ],
+      [
+        "Fish-dex 1/20",
+        "Fishing Lv2 in 20 XP",
+        "i-book"
+      ]
+    ],
+    "actions": [
+      [
+        "Keep fishing",
+        "TUT-3-06"
+      ]
+    ],
+    "note": "检查点 05｜9–14′。前三次咬钩鲫鱼。首鱼按 §14.2.2 总账 +50；§14.8.3 的 40 为待修订矛盾。"
+  },
+  {
+    "id": "TUT-3-06",
+    "title": "06 · 失手与再试",
+    "scene": "pond",
+    "energy": "156",
+    "coins": "180",
+    "place": "Willow Pond",
+    "heading": "It got away",
+    "rows": [
+      [
+        "Energy refunded",
+        "+5 Energy · 9 left today",
+        "i-energy"
+      ],
+      [
+        "Try another cast",
+        "Pond Catch · 1/2 Pond Crucian",
+        "i-rod"
+      ]
+    ],
+    "actions": [
+      [
+        "Cast · 5 Energy",
+        "TUT-3-06B"
+      ]
+    ],
+    "note": "检查点 06A｜故意错过提竿的支路。Lv1–3 前 10 次全退；保留委托与已钓鱼。"
+  },
+  {
+    "id": "TUT-3-06B",
+    "title": "06 · 三鱼准备齐",
+    "scene": "pond",
+    "energy": "146",
+    "coins": "180",
+    "place": "Willow Pond",
+    "tag": "Creel 3 · 24 free",
+    "heading": "Pond Catch · Ready",
+    "rows": [
+      [
+        "2 Pond Crucian to deliver",
+        "1 more for your first meal",
+        "i-fish"
+      ],
+      [
+        "Fishing 60/70",
+        "Lv2 in 10 XP · about 2 casts",
+        "i-xp"
+      ]
+    ],
+    "actions": [
+      [
+        "Go home · Free",
+        "TUT-3-07A"
+      ]
+    ],
+    "note": "检查点 06B｜第 2、3 条各 +5，累计 60。保留第 3 条给烤鱼；同种鱼堆叠 10/格。"
+  },
+  {
+    "id": "TUT-3-07A",
+    "title": "07 · 交付",
+    "scene": "stall",
+    "energy": "151",
+    "coins": "180",
+    "heading": "Pond Catch",
+    "meta": "Ready to deliver · Homestead Stall",
+    "needs": [
+      [
+        "Pond Crucian",
+        3,
+        2,
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Deliver · +14 coins",
+        "TUT-3-07B"
+      ]
+    ],
+    "foot": "After delivery: Pond Crucian ×1",
+    "note": "检查点 07A｜14–16′。只扣 2 鲫鱼，钱包 180→194。下一张为点厨房门、点灶台之后。"
+  },
+  {
+    "id": "TUT-3-07B",
+    "title": "07 · 第一锅",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "energy": "151",
+    "heading": "Stove 1/1",
+    "meta": "Cooking Lv1 · 2 ingredient slots",
+    "tabs": [
+      "Cookbook",
+      "Experiment"
+    ],
+    "needs": [
+      [
+        "Crucian",
+        1,
+        1,
+        "i-fish"
+      ]
+    ],
+    "rows": [
+      [
+        "Grilled Crucian",
+        "Common · +20 Energy · 5 s",
+        "i-dish-grilled"
+      ]
+    ],
+    "actions": [
+      [
+        "Cook",
+        "TUT-3-07C"
+      ]
+    ],
+    "note": "检查点 07B｜仅一口灶、2 投料槽。Cookbook 点 Cook 扣 1 鲫鱼；第 2.5 秒点场景锅，首轮金区 50%。"
+  },
+  {
+    "id": "TUT-3-07C",
+    "title": "07 · 吃回体力",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "energy": "151",
+    "heading": "Grilled Crucian ★ Good",
+    "meta": "First cooked! +15 Cooking XP · Cookbook 1/48",
+    "rows": [
+      [
+        "+25 Energy",
+        "Meals today 25/300",
+        "i-energy"
+      ]
+    ],
+    "actions": [
+      [
+        "Eat · +25 Energy",
+        "TUT-3-08"
+      ],
+      [
+        "Keep",
+        "COOK-KEEP-BRANCH",
+        "soft"
+      ]
+    ],
+    "foot": "Energy comes back over time. A meal brings it back now.",
+    "note": "检查点 07C｜Eat 路径 151→176，≤16′闭环。Keep 为可停支路，不伪称已经完成进食指标。"
+  },
+  {
+    "id": "TUT-3-08",
+    "title": "08 · 再种一轮",
+    "kind": "game",
+    "scene": "farm",
+    "energy": "176",
+    "banner": "Sow 10 Lettuce · 20 Energy",
+    "sub": "Your next harvest starts here.",
+    "action": "Sow ×1\n2 Energy",
+    "quick": [
+      {
+        "icon": "i-sprout",
+        "count": "10"
+      }
+    ],
+    "next": "TUT-3-09",
+    "note": "检查点 08｜16–18′。Today 完成补位；回田预选 Farming，点 Lettuce 后播 10 格：176→156。"
+  },
+  {
+    "id": "TUT-3-09",
+    "title": "09 · 等级门可理解",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "energy": "156",
+    "heading": "Fine fish got away",
+    "rows": [
+      [
+        "Fishing Lv2 needed",
+        "10 XP to go · about 2 casts",
+        "i-fish-sil"
+      ],
+      [
+        "Fine fish stay hooked",
+        "Energy refunded · +5 Energy",
+        "i-energy"
+      ]
+    ],
+    "actions": [
+      [
+        "Keep fishing",
+        "TUT-3-10"
+      ]
+    ],
+    "note": "检查点 09｜第 4 次咬钩为 Fine；Lv1 挣脱不加 XP，退 5。等级／差距／后果／退款同屏。"
+  },
+  {
+    "id": "TUT-3-10",
+    "title": "10 · Fishing Lv2",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "energy": "198",
+    "heading": "Fishing Lv2",
+    "meta": "Fine fish now stay on the hook · +50 Energy",
+    "grid": [
+      {
+        "name": "Worm Bait",
+        "icon": "i-worm",
+        "count": "×3"
+      },
+      {
+        "name": "Wild Herb",
+        "icon": "i-herb",
+        "count": "×3"
+      },
+      {
+        "name": "Herb Fish",
+        "icon": "i-recipe-card",
+        "count": "Recipe"
+      }
+    ],
+    "cols": 3,
+    "actions": [
+      [
+        "Use Worm Bait",
+        "TUT-3-11"
+      ]
+    ],
+    "note": "检查点 10｜约22′，第5/6竿累计70–85 XP。礼物进 Bag，满包进 Parcels；快捷栏闪一次。"
+  },
+  {
+    "id": "TUT-3-11",
+    "title": "11 · 立刻用新能力",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "energy": "213",
+    "heading": "River Perch · Fine",
+    "meta": "First catch! +30 XP · Catch +10 XP",
+    "rows": [
+      [
+        "First Fine fish! +20 Energy",
+        "Worm Bait ×2 left",
+        "i-fish"
+      ],
+      [
+        "Cook: Herb Grilled Fish",
+        "A new recipe is waiting at home.",
+        "i-cookbook"
+      ]
+    ],
+    "actions": [
+      [
+        "Go home · Free",
+        "TUT-3-12"
+      ]
+    ],
+    "note": "检查点 11｜22–25′。Lv2 后首次挂饵咬钩 Fine；193→213 奖励区，自然回复暂停。"
+  },
+  {
+    "id": "TUT-3-12",
+    "title": "12 · 第二锅与 Cooking Lv2",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "energy": "213",
+    "heading": "Herb Grilled Fish ★ Good",
+    "meta": "Cooking Lv2 · Recipe: Fresh Fish Soup",
+    "rows": [
+      [
+        "New recipe! +30 Cooking XP",
+        "Cooking 45/100 · Cookbook 2/48",
+        "i-cookbook"
+      ]
+    ],
+    "actions": [
+      [
+        "Energy full",
+        null,
+        "disabled"
+      ],
+      [
+        "Keep",
+        "TODAY-2"
+      ],
+      [
+        "Cook Again · 2nd today · half XP",
+        "COOK-P0-7",
+        "soft"
+      ]
+    ],
+    "note": "检查点 12｜25–28′。Common 鱼+香草，15s／第9s火候；Eat 灰显，Keep 留下 +45 的菜。"
+  },
+  {
+    "id": "TUT-3-END",
+    "title": "会话结束与下次回来",
+    "scene": "farm",
+    "energy": "213",
+    "heading": "A good start",
+    "rows": [
+      [
+        "Radishes ready in 3h 32m",
+        "Farming Lv2 at your first harvest",
+        "i-radish"
+      ],
+      [
+        "Lettuce ready in 7h 46m",
+        "Fresh Fish Soup when radishes are ready",
+        "i-sprout"
+      ],
+      [
+        "Fishing Lv2 · Cooking Lv2",
+        "Farming Lv1 · your crops are growing",
+        "i-xp"
+      ]
+    ],
+    "actions": [
+      [
+        "View profile",
+        "PROFILE-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "28–30′停点｜Fishing110–125、Cooking45、体力213。时间是观察窗口，不定时弹剧情。"
+  }
+]

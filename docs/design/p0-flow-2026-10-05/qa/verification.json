@@ -1,0 +1,50 @@
+{
+  "screens": 73,
+  "textNodes": 1226,
+  "sceneImageNodes": 73,
+  "reactions": 438,
+  "issues": [],
+  "panelIssues": [],
+  "energy": [
+    {
+      "id": "406:280",
+      "text": "142/210"
+    },
+    {
+      "id": "406:350",
+      "text": "142/220"
+    },
+    {
+      "id": "399:41",
+      "text": "Full"
+    },
+    {
+      "id": "399:91",
+      "text": "Full"
+    }
+  ],
+  "startingPoints": [
+    {
+      "nodeId": "399:2",
+      "name": "P0 · 首会话"
+    },
+    {
+      "nodeId": "402:2",
+      "name": "P0 · 材料与矿洞"
+    },
+    {
+      "nodeId": "406:2",
+      "name": "P0 · 厨房"
+    },
+    {
+      "nodeId": "407:593",
+      "name": "P0 · 包裹与换装"
+    }
+  ],
+  "energyBarCheck": {
+    "basis": "HUD §16.1.3: <25% amber; <10% red",
+    "refund": "156/200 after missed cast refund",
+    "low": "1/200 red",
+    "width": "current / capacity, capped at 1"
+  }
+}

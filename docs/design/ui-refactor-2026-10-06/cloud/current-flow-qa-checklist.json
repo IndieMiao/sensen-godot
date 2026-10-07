@@ -1,0 +1,1146 @@
+{
+  "preparedAt": "2026-10-06T08:24:57.640764+00:00",
+  "status": "checklist-only; not a claim of new native visual acceptance",
+  "fileKey": "OMLTC3yw3u2WDjOZhLnhaR",
+  "scope": "Current-flow QA owns row11 columns5–8, allrow12 and rows13–24. Legacy owns row11 columns1–4.",
+  "ownedScreens": 108,
+  "sourceCurrentGroups": {
+    "07": 73,
+    "08": 30,
+    "09": 5
+  },
+  "universalChecks": [
+    "Title identity, quantity, state and effect separate",
+    "Required price/result/loss visible beforecommit",
+    "Navigation versus execute versus dismiss distinct",
+    "No clipped key facts, ingredient slots, quantities or actions",
+    "No cross-role/scene/recipe destination mismatch",
+    "One visible exit for modal/selection surfaces; no fake background action",
+    "Unknown rules remain outside player viewport and are not settled by copy"
+  ],
+  "rows": [
+    {
+      "row": 11,
+      "rowNodeId": "482:172",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 4,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Shanghai home-city climate is Subtropical (31.2°), not Temperate; Tokyo destination facts remain Temperate.",
+        "First city/farm creation retains clear selected city and separates confirmation from navigation.",
+        "Sow/Water use scene controls; no fake action by tapping a guide."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "SOC-4",
+          "nodeId": "482:174",
+          "sourceGroup": "06",
+          "qaOwner": "legacy",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "NEED-TILE",
+          "nodeId": "482:176",
+          "sourceGroup": "00",
+          "qaOwner": "legacy",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "STATE-ICONS",
+          "nodeId": "482:178",
+          "sourceGroup": "00",
+          "qaOwner": "legacy",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "OUTPOST-DIAGRAM",
+          "nodeId": "482:180",
+          "sourceGroup": "05",
+          "qaOwner": "legacy",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "TUT-1",
+          "nodeId": "482:182",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "TUT-1-2",
+          "nodeId": "482:184",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "TUT-3-01",
+          "nodeId": "482:186",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "TUT-3-02",
+          "nodeId": "482:188",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 12,
+      "rowNodeId": "482:189",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Request consumption and14-coin reward each appear once.",
+        "Cast5Energy, escape refund andfirstfish rewards remain distinct.",
+        "First cooking uses correct Grilled Crucian ingredients,5s and eating outcome."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "TUT-3-03",
+          "nodeId": "482:191",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "TUT-3-04",
+          "nodeId": "482:193",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "TUT-3-05",
+          "nodeId": "482:195",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "TUT-3-06",
+          "nodeId": "482:197",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "TUT-3-06B",
+          "nodeId": "482:199",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "TUT-3-07A",
+          "nodeId": "482:201",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "TUT-3-07B",
+          "nodeId": "482:203",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "TUT-3-07C",
+          "nodeId": "482:205",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 13,
+      "rowNodeId": "482:206",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Bonus213/200 has no regeneration timer or overlapping Bonus copy.",
+        "Fishing/Cooking level-up gains and next-crop countdown remain readable.",
+        "Six gathering spots preserve state and quantity separately."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "TUT-3-08",
+          "nodeId": "482:208",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "TUT-3-09",
+          "nodeId": "482:210",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "TUT-3-10",
+          "nodeId": "482:212",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "TUT-3-11",
+          "nodeId": "482:214",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "TUT-3-12",
+          "nodeId": "482:216",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "TUT-3-END",
+          "nodeId": "482:218",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "MAT-1",
+          "nodeId": "482:220",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "MAT-2",
+          "nodeId": "482:222",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 14,
+      "rowNodeId": "482:223",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Mine entrance/newfloor2Energy versus continue/elevatorFree stay distinct.",
+        "Saved4/6 progress and day-reset boundary are not misrepresented.",
+        "New-run loss remains visible before confirmation."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "MAT-3",
+          "nodeId": "482:225",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "MINE-P0-1",
+          "nodeId": "482:227",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "MINE-P0-2",
+          "nodeId": "482:229",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "MINE-P0-3",
+          "nodeId": "482:231",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "MINE-P0-4",
+          "nodeId": "482:233",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "MINE-P0-5",
+          "nodeId": "482:235",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "MINE-P0-6",
+          "nodeId": "482:237",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "MINE-P0-7",
+          "nodeId": "482:239",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 15,
+      "rowNodeId": "482:240",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Copper Pickaxe4Energy is a two-rock usage cost, not Craft/Equip cost.",
+        "Current Gear has six icon slots, single selected detail, Empty Ring/Charm and current Bag/Gear routes.",
+        "Homestead250coins and required materials remain visible before Upgrade."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "MINE-P0-8",
+          "nodeId": "482:242",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "CRAFT-1",
+          "nodeId": "482:244",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "CRAFT-2",
+          "nodeId": "482:246",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "CRAFT-3",
+          "nodeId": "482:248",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "CRAFT-4",
+          "nodeId": "482:250",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "GEAR-P0-1",
+          "nodeId": "482:252",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "GEAR-P0-2",
+          "nodeId": "482:254",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "HOME-P0-1",
+          "nodeId": "482:256",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 16,
+      "rowNodeId": "482:257",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Kitchen entrance shows one real interactive stove marker and no labour controls.",
+        "Experiment1/2 + locked third + five actual candidates +5s/+20Energy/Cook.",
+        "Heat is a world ring, not duplicated ordinaryTap button.",
+        "Ready dish identity survives bag-full and cabinet handling."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "COOK-P0-1",
+          "nodeId": "482:259",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "COOK-P0-2",
+          "nodeId": "482:261",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "COOK-P0-3",
+          "nodeId": "482:263",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "COOK-P0-4",
+          "nodeId": "482:265",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "COOK-P0-5",
+          "nodeId": "482:267",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "COOK-P0-6",
+          "nodeId": "482:269",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "COOK-P0-7",
+          "nodeId": "482:271",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "COOK-P0-8",
+          "nodeId": "482:273",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 17,
+      "rowNodeId": "482:274",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Storage selected item/quantity and at-home restriction stay explicit.",
+        "Keep succeeds before stove/queue is freed.",
+        "Heat-result specimen stays review-only.",
+        "Drop request8h is distinct from completed replacement4h."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "STORE-1",
+          "nodeId": "482:276",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "STORE-2",
+          "nodeId": "482:278",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "COOK-P0-9",
+          "nodeId": "482:280",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "COOK-P0-10",
+          "nodeId": "482:282",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "BOARD-1",
+          "nodeId": "482:284",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "BOARD-2",
+          "nodeId": "482:286",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "BOARD-3",
+          "nodeId": "482:288",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "TODAY-1",
+          "nodeId": "482:290",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 18,
+      "rowNodeId": "482:291",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Today has at most three useful rows.",
+        "Bag22/25 and five-column grid remain consistent; no tool capacity leakage.",
+        "Parcel quantity/expiry/source and singleClaim/Claimall remain distinct.",
+        "Full/expired cases preserve rewards and show appropriate next step."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "TODAY-2",
+          "nodeId": "482:293",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "BAG-1-P0",
+          "nodeId": "482:295",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "PARCEL-1",
+          "nodeId": "482:297",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "PARCEL-2",
+          "nodeId": "482:299",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "PARCEL-3",
+          "nodeId": "482:301",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "PARCEL-4",
+          "nodeId": "482:303",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "PARCEL-5",
+          "nodeId": "482:305",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "PARCEL-6",
+          "nodeId": "482:307",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 19,
+      "rowNodeId": "482:308",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Current/saved Alex Profile identity must both show Shanghai / Subtropical / Since Oct2026.",
+        "Profile/Wardrobe use real avatar assets after their dedicated patch.",
+        "Save/Cancel/Retry preserve current versus preview appearance.",
+        "Energy-needed/owned/wait/action guidance remain legible.",
+        "Herb Grilled Fish repeat-cook heat preserves recipe identity and15s."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "PROFILE-1-P0",
+          "nodeId": "482:310",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "KEEP-P0-1",
+          "nodeId": "482:312",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "KEEP-P0-2",
+          "nodeId": "482:314",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "ENERGY-P0-1",
+          "nodeId": "482:316",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "COOK-KEEP-BRANCH",
+          "nodeId": "482:318",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "SAVE-RETRY",
+          "nodeId": "482:320",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "BOARD-DROPPED",
+          "nodeId": "482:322",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "COOK-HERB-HEAT",
+          "nodeId": "482:324",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 20,
+      "rowNodeId": "482:325",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Gather Gloves bonus applies to future main-material gathering.",
+        "Cast/continuedMine scene actions remain available.",
+        "Farm creation failure does not imply a second farm.",
+        "Single-claim count and remaining parcel identities update together.",
+        "Sprinkler8-neighbour coverage andmaturity−15% visible; placement labelled schematic."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "MAT-GLOVES-RESULT",
+          "nodeId": "482:327",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "FISH-P0-CAST",
+          "nodeId": "482:329",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "MINE-CONTINUE",
+          "nodeId": "482:331",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "BUILD-RETRY",
+          "nodeId": "482:333",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "PARCEL-ONE",
+          "nodeId": "482:335",
+          "sourceGroup": "07",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "FAC-1",
+          "nodeId": "482:337",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "FAC-2",
+          "nodeId": "482:339",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "FAC-3",
+          "nodeId": "482:341",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 21,
+      "rowNodeId": "482:342",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Sprinkler/Compost unique effects anddaily limits do not become action prices.",
+        "Fish Trap120coins,8h,3fish capacity before purchase.",
+        "SetTrap uses scene control; collection/partial/full bag keeps fish."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "FAC-4",
+          "nodeId": "482:344",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "FAC-5",
+          "nodeId": "482:346",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "FAC-6",
+          "nodeId": "482:348",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "TRAP-1",
+          "nodeId": "482:350",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "TRAP-2",
+          "nodeId": "482:352",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "TRAP-3",
+          "nodeId": "482:354",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "TRAP-4",
+          "nodeId": "482:356",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "TRAP-5",
+          "nodeId": "482:358",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 22,
+      "rowNodeId": "482:359",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Single trap per pond stays distinct from total trap-slot quota.",
+        "Two-/three-stove markers preserve independent timers and queued/ready states.",
+        "CookAll does not invent material totals or queue reservations.",
+        "Double uses two ingredients/two portions; Legendary remains single-only."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "TRAP-6",
+          "nodeId": "482:361",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "COOK-P1-1",
+          "nodeId": "482:363",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "COOK-P1-2",
+          "nodeId": "482:365",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "COOK-P1-3",
+          "nodeId": "482:367",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "COOK-P1-4",
+          "nodeId": "482:369",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "COOK-P1-5",
+          "nodeId": "482:371",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "COOK-P1-6",
+          "nodeId": "482:373",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "COOK-P1-7",
+          "nodeId": "482:375",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 23,
+      "rowNodeId": "482:376",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Lucky Double bonusquality/quantity distinct from BigPot result.",
+        "Greenhouse16plots,300coins,−25%/nooff-climate penalty are visible.",
+        "Cookbook five-state explanation stays review-only.",
+        "Fish route hints preserveRiverEel night/Lv9.",
+        "4×4 schematic does not claim calibrated world collision."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "COOK-P1-8",
+          "nodeId": "482:378",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "FAC-GH",
+          "nodeId": "482:380",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "TRAP-DONE",
+          "nodeId": "482:382",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "DEX-P1-1",
+          "nodeId": "482:384",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "DEX-P1-2",
+          "nodeId": "482:386",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "FAC-GH-PLACE",
+          "nodeId": "482:388",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "FAC-GH-DONE",
+          "nodeId": "482:390",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "DOUBLE-RESULT",
+          "nodeId": "482:392",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    },
+    {
+      "row": 24,
+      "rowNodeId": "482:393",
+      "expectedSourceScreens": 8,
+      "currentOwnedCount": 8,
+      "captureMaxDimension": 4000,
+      "crop": "Split exactly at half width with CoreGraphics; view both halves. Do not use sips cropOffset0 centering.",
+      "focus": [
+        "Placement/bag/queue limits retain verbs with clearfeedback.",
+        "Free-travel Browse andFly remain distinct, with no paid-permit requirement.",
+        "Arrival grants citystamp/+10 once; correctcurrentcityvisible."
+      ],
+      "cards": [
+        {
+          "column": 1,
+          "id": "FAC-LIMIT",
+          "nodeId": "482:395",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 2,
+          "id": "TRAP-NOROOM",
+          "nodeId": "482:397",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 3,
+          "id": "COOK-EMPTY",
+          "nodeId": "482:399",
+          "sourceGroup": "08",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 4,
+          "id": "MAP-2-FREE",
+          "nodeId": "482:401",
+          "sourceGroup": "09",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 5,
+          "id": "MAP-3-FREE",
+          "nodeId": "482:403",
+          "sourceGroup": "09",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 6,
+          "id": "MAP-4-FREE",
+          "nodeId": "482:405",
+          "sourceGroup": "09",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 7,
+          "id": "MAP-5-FREE",
+          "nodeId": "482:407",
+          "sourceGroup": "09",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        },
+        {
+          "column": 8,
+          "id": "MAP-6-FREE",
+          "nodeId": "482:409",
+          "sourceGroup": "09",
+          "qaOwner": "current-flow",
+          "status": "pending-fresh-native-screenshot"
+        }
+      ]
+    }
+  ],
+  "alreadyCapturedElsewhere": [
+    "COOK-P0-2 selection audit before latestfix",
+    "COOK-P0-3 heat representative screenshot",
+    "GEAR-P0-1 representative screenshot",
+    "row27–28 independent read-only audit"
+  ],
+  "notCoveredByThisChecklist": "Rows25–36, legacy rows1–10 androw11columns1–4, component-library overallQA andnew avatar-asset acceptance are separate owners."
+}

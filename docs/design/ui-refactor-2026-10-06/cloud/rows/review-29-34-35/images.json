@@ -1,0 +1,47 @@
+[
+  {
+    "file": "row-34-half-1.png",
+    "sha256": "a9e08881c3052606f9fd3ecc74cd7c6ffca42dd789e65d3677ce71217e394bdd",
+    "evidence": "current Figma capture before scoped data repair"
+  },
+  {
+    "file": "row-34-half-2.png",
+    "sha256": "cd1951417b2b82eccb3685dca039965175599e8b5e729ba0e1602a12a5cbcd33",
+    "evidence": "current Figma capture before scoped data repair"
+  },
+  {
+    "file": "row-29.png",
+    "sha256": "d02e490bc0d78a1dc51f2a82364a9098619cc52f2f7640662e902799f79786bc",
+    "evidence": "current Figma capture before scoped data repair"
+  },
+  {
+    "file": "row-35.png",
+    "sha256": "f908bdeb94cd03db8a4c493355dfeba5c2fbdc28dd64961cf334867dfde91a3b",
+    "evidence": "current Figma capture before scoped data repair"
+  },
+  {
+    "file": "row-35-half-1.png",
+    "sha256": "eed69d18df157c33060633d679101961c63fcebb5b9452bf1554ab1b46cef76b",
+    "evidence": "current Figma capture before scoped data repair"
+  },
+  {
+    "file": "row-34.png",
+    "sha256": "0e1e36ae7bb207de0a42256fa4f79f5c5be83400ed064b577eb3f350738ca345",
+    "evidence": "current Figma capture before scoped data repair"
+  },
+  {
+    "file": "row-29-half-1.png",
+    "sha256": "47686ce5617081cb02d56d9ddc0aacb928aa931958e8f882e55a04a0ed29dde5",
+    "evidence": "current Figma capture before scoped data repair"
+  },
+  {
+    "file": "row-35-half-2.png",
+    "sha256": "4bec673bba2c9922b9d5022602fb546cf77e7477e2cd8ad54b02e1580281b8cf",
+    "evidence": "current Figma capture before scoped data repair"
+  },
+  {
+    "file": "row-29-half-2.png",
+    "sha256": "d5f8eb72d8780feeca1f6a29c50989c8a321cc82ce867d54c916822b8f70e54d",
+    "evidence": "current Figma capture before scoped data repair"
+  }
+]

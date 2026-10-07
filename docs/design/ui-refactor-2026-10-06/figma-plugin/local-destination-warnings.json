@@ -1,0 +1,352 @@
+[
+  {
+    "screen": "COOK-1",
+    "action": "Collect",
+    "kind": "commit",
+    "target": null,
+    "reason": "Ready dish is Grilled Crucian; COOK-4 is Herb Grilled Fish. No matching collection outcome was authored, so the unrelated result is not linked."
+  },
+  {
+    "screen": "COOK-1",
+    "action": "Collect",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "BAR-1",
+    "action": "Sow ×1",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-2",
+    "action": "Sow",
+    "kind": "commit",
+    "target": "FARM-2",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-3",
+    "action": "Harvest",
+    "kind": "commit",
+    "target": "FARM-3",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-6",
+    "action": "Sell one",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-6",
+    "action": "Sell all",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-7",
+    "action": "Sow ×1",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "NPC-1a",
+    "action": "Sit",
+    "kind": "commit",
+    "target": "NPC-1a",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "NPC-4",
+    "action": "Stop tracking",
+    "kind": "commit",
+    "target": "NPC-4",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "NPC-4",
+    "action": "Deliver",
+    "kind": "commit",
+    "target": "NPC-4",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "NPC-6",
+    "action": "Buy and drink",
+    "kind": "commit",
+    "target": "NPC-6",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "NPC-7",
+    "action": "Craft",
+    "kind": "commit",
+    "target": "NPC-7",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "NPC-7",
+    "action": "Buy",
+    "kind": "commit",
+    "target": "NPC-7",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "BAG-5-2",
+    "action": "Sow",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-4",
+    "action": "Pick",
+    "kind": "commit",
+    "target": "FARM-4",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "MINE-1",
+    "action": "Mine",
+    "kind": "commit",
+    "target": "MINE-1",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "SETTINGS-1",
+    "action": "Toggle",
+    "kind": "commit",
+    "target": "SETTINGS-1",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "SETTINGS-1",
+    "action": "Sign out",
+    "kind": "destructive",
+    "target": "SETTINGS-1",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "SETTINGS-1",
+    "action": "Delete account",
+    "kind": "destructive",
+    "target": "SETTINGS-1",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "SOC-4",
+    "action": "Claim",
+    "kind": "commit",
+    "target": "SOC-4",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "SOC-4",
+    "action": "Claim",
+    "kind": "commit",
+    "target": "SOC-4",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "SOC-4",
+    "action": "Claim",
+    "kind": "commit",
+    "target": "SOC-4",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "SOC-4",
+    "action": "Claim all",
+    "kind": "commit",
+    "target": "SOC-4",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "SOC-4",
+    "action": "Expiry rules",
+    "kind": "navigate",
+    "target": "SOC-4",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "TODAY-1",
+    "action": "Today",
+    "kind": "navigate",
+    "target": "TODAY-1",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "PARCEL-1",
+    "action": "Inbox",
+    "kind": "navigate",
+    "target": "PARCEL-1",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "PARCEL-6",
+    "action": "Sow ×1",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "ENERGY-P0-1",
+    "action": "Energy",
+    "kind": "navigate",
+    "target": "ENERGY-P0-1",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "MAP-2-FREE",
+    "action": "Location",
+    "kind": "navigate",
+    "target": "MAP-2-FREE",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "TICKET-1",
+    "action": "Craft",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "BUFF-ACTIVE",
+    "action": "Sow",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "BUFF-TIMEOUT",
+    "action": "Sow",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "MINE-3",
+    "action": "Mine",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-6",
+    "action": "Sell one",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-6",
+    "action": "Sell all",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-6",
+    "action": "Sell one",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-6",
+    "action": "Sell all",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-7",
+    "action": "Rest",
+    "kind": "commit",
+    "target": "FARM-7",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "NPC-7",
+    "action": "Craft",
+    "kind": "commit",
+    "target": "NPC-7",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "NPC-7",
+    "action": "Buy",
+    "kind": "commit",
+    "target": "NPC-7",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "FARM-4",
+    "action": "Pick",
+    "kind": "commit",
+    "target": "FARM-4",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "SOC-4",
+    "action": "Claim",
+    "kind": "commit",
+    "target": "SOC-4",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "SOC-4",
+    "action": "Claim",
+    "kind": "commit",
+    "target": "SOC-4",
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "COOK-P0-7",
+    "action": "Remove",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "COOK-P0-7",
+    "action": "Remove",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "COOK-P0-8",
+    "action": "Remove",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "COOK-P0-8",
+    "action": "Remove",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "COOK-P1-2",
+    "action": "Remove",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  },
+  {
+    "screen": "COOK-P1-6",
+    "action": "Remove",
+    "kind": "commit",
+    "target": null,
+    "reason": "No valid outcome frame; no fake success was wired."
+  }
+]

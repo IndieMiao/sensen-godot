@@ -1,0 +1,57 @@
+{
+  "ids": [
+    "TUT-1",
+    "TUT-1-2",
+    "TUT-3-07B",
+    "TUT-3-09",
+    "TUT-3-12",
+    "TODAY-2",
+    "MAT-2",
+    "MAP-3-FREE"
+  ],
+  "review": "8 actual Figma renders inspected at800px",
+  "visualLayoutPassed": true,
+  "checks": [
+    "Content follows its nearby decision area without large empty sheet bodies.",
+    "TUT-3-07B uses original kitchen camera and editable Compact components;Cook exposes authored first5-second heat moment.",
+    "TUT9 andTUT12 wallet194;TUT12 bonus213/200 visible.",
+    "TODAY2 all three task cards fit.",
+    "MAP3 informational Travel details link clearly separated from Keep browsing.",
+    "TODAY2 wallet194 verified in current-late-final/TODAY-2.png"
+  ],
+  "remainingDataCorrection": {},
+  "screenshots": [
+    {
+      "file": "MAP-3-FREE.png",
+      "sha256": "bf5c646f0589a3cb030bdb1142ba7fe93fe5de8b0835e07e52f44f8012789ff4"
+    },
+    {
+      "file": "TUT-3-07B.png",
+      "sha256": "31043135afcf9cbe2945d713c50f06fc319b20286e8d97e8d480ad99ffe8f346"
+    },
+    {
+      "file": "TODAY-2.png",
+      "sha256": "cdb0df47fc3f84dc227a6c67a470094bed640525ed3231e5aba1ae32cc477cc0"
+    },
+    {
+      "file": "MAT-2.png",
+      "sha256": "1b65c9ffb397b15b462b600935d77e123ae35eb0faf4626247ed0136c4051a1c"
+    },
+    {
+      "file": "TUT-3-09.png",
+      "sha256": "f663a7031a509dc32daf781def10d1a1f814cd03ec4905ab607f6b6c832b622e"
+    },
+    {
+      "file": "TUT-3-12.png",
+      "sha256": "9ac8ecf8fa06dbbad7b7772cb5eb471c4ccb8b43653a1d4243621413347e94ea"
+    },
+    {
+      "file": "TUT-1.png",
+      "sha256": "d2908c7daaabbe22f7250e4a7824324b13136faad5a965ea589a5f580494d572"
+    },
+    {
+      "file": "TUT-1-2.png",
+      "sha256": "e01522d7bd33b6d652156f5481e77d9cd557f6cf99a7c94a19b42724e0bd9be1"
+    }
+  ]
+}

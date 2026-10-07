@@ -1,0 +1,853 @@
+{
+  "schemaVersion": 1,
+  "bundleSha256": "2f98f8d870a60767130a2f8c20aabef00c85b7519cf823078368e2e6eaa8258e",
+  "sourceModules": [
+    "src.js",
+    "legacy-icon-fixes.js",
+    "current-fixes.js",
+    "legacy-fixes.js",
+    "legacy-scene-fixes.js",
+    "legacy-reference-fixes.js",
+    "legacy-pin-fixes.js",
+    "kitchen-scene-fixes.js",
+    "kitchen-selection-fixes.js",
+    "action-picker-fixes.js",
+    "hud-navigation-fixes.js",
+    "legacy-qa-fixes.js",
+    "current-qa-fixes.js",
+    "camera-highlight-fixes.js",
+    "responsive-component-fixes.js",
+    "avatar-fixes.js",
+    "avatar-integration.js",
+    "avatar-polish-fixes.js",
+    "visual-polish-fixes.js",
+    "hud-lightweight-fixes.js",
+    "visual-container-fixes.js",
+    "visual-current-containers.js",
+    "visual-fishing-fixes.js",
+    "visual-kitchen-fixes.js",
+    "kitchen-selection-state-fixes.js",
+    "current-kitchen-focus-fixes.js",
+    "unknown-requirement-fixes.js",
+    "p2p3-visual-fixes.js",
+    "current-visual-fixes.js",
+    "visual-legacy-surfaces.js",
+    "flow-repair-fixes.js",
+    "legacy-npc-flow-fixes.js",
+    "visual-legacy-shops.js",
+    "crop-dex-fixes.js",
+    "free-travel-flow-fixes.js",
+    "avatar-recovery-fixes.js",
+    "overlay-cleanup-fixes.js",
+    "component-family-fixes.js"
+  ],
+  "sourceModuleCount": 38,
+  "files": [
+    {
+      "path": "docs/design/p0-flow-2026-10-05/figma/icons.json",
+      "bytes": 97870,
+      "sha256": "5d69457b59a4c3f0d0825ae1c1545b0251a42b348472a0e1ee572ca62f22ea39"
+    },
+    {
+      "path": "docs/design/p1-p2-flows-2026-10-06/figma/all-asset-components.json",
+      "bytes": 23649,
+      "sha256": "b9802ea3b271a1129bfa0f5130c5f499d4d3ad92bae781aa73c125bdaf1345eb"
+    },
+    {
+      "path": "docs/design/p1-p2-flows-2026-10-06/figma/approved-kit-state.json",
+      "bytes": 8068,
+      "sha256": "f7860102a5c189d1788d25d392a8df2fe9d04682da41c4e3a08c06a6eb48ee9b"
+    },
+    {
+      "path": "docs/design/p1-p2-flows-2026-10-06/figma/content-assets.json",
+      "bytes": 98998,
+      "sha256": "7da88112cc629bc99b5657d1809f8f47733b3651cd142b3ea172b5947b0c2862"
+    },
+    {
+      "path": "docs/design/p1-p2-flows-2026-10-06/figma/scenes.json",
+      "bytes": 768,
+      "sha256": "9f0f12e02f227e54750fe73f8b6962345f489f732fba8b174194977b2d804a03"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/farm-facilities.png",
+      "bytes": 1884927,
+      "sha256": "212cadb8b81dbb08141c385c29c2372ba5530aa899f1dba975cb0156ec8c93be"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/farm-lv3.png",
+      "bytes": 1905001,
+      "sha256": "36424395acc1d847383d5868858be77ac42a82ff8f43e647638505ab7293ea88"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/farm-orchard.png",
+      "bytes": 1828799,
+      "sha256": "e3112cef7dd9bbd1c0f7bb9fc2029b8b7dc0a7ddc97ca403146095a1bf428d9b"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/farm.png",
+      "bytes": 1925887,
+      "sha256": "d0e41f6ba2b931411dc5865f6eb24b2f2066526c3fefa69870a5db9e2ecd4fb7"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/homestead-stall-v2.png",
+      "bytes": 1856432,
+      "sha256": "abee9cc83f553f2e2f9eea14a2461c48089527b2216ad70e31c34783bca6aaa9"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/kitchen.png",
+      "bytes": 1776836,
+      "sha256": "b150a2a4d5ed3179abc263ae2daf15527e8fff35ce3c122f81a79a6fb75c2667"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/map-tile.png",
+      "bytes": 2278984,
+      "sha256": "2815bbcc25616334340bce7b9bdb6b850753593be435589e0e0b6c17147e0ffe"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/market-square-v2.png",
+      "bytes": 1996863,
+      "sha256": "a1aeaf4d070d6fb47eb5d5fe2b990e1be65efcdc339ce2c9963cbe72815e1ffe"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/mine-floor1.png",
+      "bytes": 1801720,
+      "sha256": "b2cee11d59fd74719c31209522ab1a658ac4e99b40201d70fa64984976706f59"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/pond.png",
+      "bytes": 1957855,
+      "sha256": "99000b328edadab900dceffdac106f68f7be7e4c34b7ff8290f4661b4d4784ea"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/profile-avatar-mia.png",
+      "bytes": 1600275,
+      "sha256": "cc068522b499551a70a336ac386d43fd2973e8dcf192c10b64dd606d489fe811"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/profile-avatar.png",
+      "bytes": 1601606,
+      "sha256": "74c5b654dcb7450c047e9926cba756f8360c12b39b57ebcf94c8c92e524fca97"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/tackle-shop.png",
+      "bytes": 1927134,
+      "sha256": "e569b4557ee1d8f5d8e28bd2644b98a2cdd12aeeaa10dfe6994cdc3b07bd8ecf"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/tea-house.png",
+      "bytes": 1953069,
+      "sha256": "499586b415c82f463995a50a4ce9216571b500ff26401c306c142224f1a6b3ed"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/trading-post.png",
+      "bytes": 2020766,
+      "sha256": "53d08dbc54a3f839b31873c0403e97721ac71aaa324c2728605a555a99fe6afd"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/scenes/travel-post.png",
+      "bytes": 1882341,
+      "sha256": "08ccc30b7e0d3fb4193590e442eac5d167ab6e87e804646262cbcd91d2d93f9f"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/bag.html",
+      "bytes": 12079,
+      "sha256": "f3727ae6d882a145356c6b62cdd07a4b0bbd71b27b2882f0e65816b1dc1a4f61"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/BAG-3.html",
+      "bytes": 10130,
+      "sha256": "a01bbc1956337264b9bc38a14a741f25f22c4b970dbe8d6ebf8452537d620a11"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/BAG-4-2.html",
+      "bytes": 19808,
+      "sha256": "c3cf32eaaed65a77227a5b1a274280ed87d20fb8ade0fd86f7ef5ea4789aac85"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/BAG-4.html",
+      "bytes": 11337,
+      "sha256": "5dea5f13486a9c6ae758b34164ad7ed0909778bdc7907a0a2c0aeaf123eb1b36"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/BAR-1-2.html",
+      "bytes": 6683,
+      "sha256": "6c64c8e6a8f17bec71e4a3bfb2bdb59ff8f84cd957995dcf12a49cefd148577a"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/BAR-1.html",
+      "bytes": 8394,
+      "sha256": "5c3073f93f4cbe1fc364362421f9c29940c013734caa51bcda65c279bb878ebd"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/BAR-2.html",
+      "bytes": 9745,
+      "sha256": "699f760cb78f188f4ce447d926c6ca1a9c15b8cb9480fb99367c40a18bd3a26d"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/BAR-3-2.html",
+      "bytes": 8785,
+      "sha256": "8f50a7aebdb65d9c9a164745cfed383f6fee45d0c6d5d86f129413d892cfeabc"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/BAR-3.html",
+      "bytes": 10612,
+      "sha256": "e444a81bae99078d677b4c530d7375f88459ea849dd90027509d698fe6b0277e"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/COOK-2a-2.html",
+      "bytes": 19047,
+      "sha256": "e3f0b45376c5cdbc32d26f87c99526487725095ebfc81386ee5b0280dd31b531"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/COOK-2a.html",
+      "bytes": 18511,
+      "sha256": "1936e3f8c65f393ea8a018a4396d0370ee922678e8f6e429b3badf8aa7c415a1"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/COOK-2b-2.html",
+      "bytes": 35667,
+      "sha256": "80920de2050d724d4a923a306dd3948a56a1f881c67d52a9f3f9a039c7dcf28e"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/COOK-2b.html",
+      "bytes": 11136,
+      "sha256": "3945f26cc72896404192ef410c520483d68eb561ed943d18213d135b5f712996"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/COOK-3-2.html",
+      "bytes": 8209,
+      "sha256": "34b03dc08fba7f13da23b2b6ac76161ae85bf3fd8132f0137874ebf2ff2b202a"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/COOK-3.html",
+      "bytes": 7247,
+      "sha256": "b18f113114fa90e1af9395db446aa17e0f62b2c4207f8b5d8d9e9c4767af4755"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/COOK-4.html",
+      "bytes": 6154,
+      "sha256": "c46400b2b1969d334049b227d6f082967306b1d920a16ae90881b9dd86f87cc4"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/COOK-6.html",
+      "bytes": 6231,
+      "sha256": "dde22f83b12c3903076cc1ac675569d3864b6cf54051dd962405839ea9ce480e"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/COOK-7-2.html",
+      "bytes": 2291,
+      "sha256": "f1a3b301953191dd07fd3a667d537c6c19cbc050534d0bc14643e6328790fb5e"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/COOK-7.html",
+      "bytes": 6323,
+      "sha256": "65a8ec59b7a17d5776af9ab6bc23a8511c97aa631fbdb4278f739e2e3f4fdc87"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/CTRL-1-2.html",
+      "bytes": 17166,
+      "sha256": "d47e7e4a5f8e0e3a2f008f8c778e2957f3680b7a0431a21dc0a54b7432a82e4f"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/CTRL-1.html",
+      "bytes": 8947,
+      "sha256": "d4827da4b0438c99b8362d789d5ebef67cd97e69b2a6abec8d47569ea3732992"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/FARM-2.html",
+      "bytes": 10347,
+      "sha256": "a8a75f067321c2c54558dab5d9aceaec5482bc8c13a822df7fe2ddc72d959038"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/FARM-3.html",
+      "bytes": 9093,
+      "sha256": "067f3246675f3e1aa5045e312e41bed187e7d588586e71a8fb1538aff1e79e14"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/FARM-6-2.html",
+      "bytes": 11858,
+      "sha256": "bc470f3ecd5e6cb3b3c69c18f5d7403531c44d3bdfdba35697752baa8ea1e938"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/FARM-6.html",
+      "bytes": 13229,
+      "sha256": "d5b2717ec50fc6c49122f3ebcd1308e38206234e7cc2deccdf20a473dca54332"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/FARM-7-2.html",
+      "bytes": 10318,
+      "sha256": "c8cd28cbc9efe0bc1679aa2d056241fff40335bdf9e37fd9accce7ecba851e10"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/FARM-7.html",
+      "bytes": 8203,
+      "sha256": "5c5bd93dbf306624f962792dcb80c22bd701cfea6c101f9eac9e21e8ed5372fd"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/FISH-2.html",
+      "bytes": 13630,
+      "sha256": "a8d0ba7f247bc6dc71634fc5ff52e67a1b6345ce638f3dbb8692f44fa894fe4b"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/FISH-3.html",
+      "bytes": 8196,
+      "sha256": "4fb5136260aa1bb1bece9a4ff6cd048fa21e41cd8773eb933cf4b1d0ed183fb1"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/FISH-4.html",
+      "bytes": 7057,
+      "sha256": "18df6a5ae63fd735bbb4e4235ea37f659e7801fd5dae3e0ae678e1c8a6d89e31"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/FISH-5-2.html",
+      "bytes": 19580,
+      "sha256": "ecc6a6e9150798142bb1731042350852c9ead49d39e4a4f60e64b7f8d7f95bc3"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/FISH-5.html",
+      "bytes": 8620,
+      "sha256": "55db435b43b951f11a5b5eff39633645f4613fbb42edc5eebaee28462431ee89"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/HUD-1-2.html",
+      "bytes": 12282,
+      "sha256": "7c5d177870b30061dd9aa13cd8dfd3376cf9fdfb18efe662c636e826de12109e"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/HUD-1.html",
+      "bytes": 8700,
+      "sha256": "68334edd1f42965a507bca1caf136992eb38693ecdc5a6734a25d05131c7d0a8"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/HUD-3.html",
+      "bytes": 9969,
+      "sha256": "7adf6fdea76886120a4270deafef05bb94dcaefe3ff472301626204c50aaf58a"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/HUD-4.html",
+      "bytes": 8862,
+      "sha256": "ed1b9671966cb13c69973fec96f37665c80dfaad9c5769a5b34162d331eb6c6c"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/MAP-1.html",
+      "bytes": 10814,
+      "sha256": "9dac641be898f1d5f85be547f68305c7df0135702cf80cc06f08221ac6c5c1c8"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NEED-TILE.html",
+      "bytes": 13855,
+      "sha256": "19151d0cfef4097f388648083f3b7f12017249113a1a7406fd13270ac346f5f9"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-1a.html",
+      "bytes": 7024,
+      "sha256": "6f4eb93efd6ae52096567c448e1865dacac779e6483eb6504d0ddf1a4b867ea0"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-1b.html",
+      "bytes": 6673,
+      "sha256": "1289ce5187d769224f71602fe0eb3a4153214dadf277065a8f44b9e5a1b6f912"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-1c.html",
+      "bytes": 7415,
+      "sha256": "100eea7bc452a5e889979877f0bd72735a76d33a6df13db89d055bb8f940eb02"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-1d.html",
+      "bytes": 7091,
+      "sha256": "f79190cc049c7358642f4fd4afb4602b5ec98cb2e8c455ead377a418a156a421"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-1e.html",
+      "bytes": 7124,
+      "sha256": "8bcee15fdb1775988814cce8036a641057e70f29c1f575daf3121b893259ad9a"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-2-2.html",
+      "bytes": 10582,
+      "sha256": "ce70235b1459a8cc91892689317eec01d664ea2fdf2a39f24cef9bc4d94625db"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-2.html",
+      "bytes": 12223,
+      "sha256": "8c38677d011d662df6031e2b6b33e3a2aad1397f56cb2652875fbc1c53a1b196"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-3-2.html",
+      "bytes": 10631,
+      "sha256": "e11f18c90b0b558a2506dc3159bcb291f67756559286ceaea6976720ba271fef"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-3.html",
+      "bytes": 10661,
+      "sha256": "f8ffba4eea9a4049f96b7a382b6db0ae344341ec1b4b2ac2ec8c1eeba7a337bf"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-4-2.html",
+      "bytes": 7425,
+      "sha256": "a3af116d6b3ebdcbf4f79d0e448a329caa66fa09a57bdc68cf2de9ea74f7a2be"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-4.html",
+      "bytes": 7153,
+      "sha256": "115aecf5d4dbf5f868eca11b33346f2da383843532b0e33ec3b80d09e25577b1"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-5-2.html",
+      "bytes": 5272,
+      "sha256": "69a47ca637cf13b7dacf0efb27676cfee39dbbbf0ecfaa120a55db9c8051c2ce"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-5.html",
+      "bytes": 4641,
+      "sha256": "834d8e491601303d1f3dc3bbc2cc923d06e14e6d8fd01df11c6e354ee9b104f5"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-6-2.html",
+      "bytes": 5823,
+      "sha256": "d35942859e1681a6b4220c437817539e5c81dd4458e638a343a520594509e8d3"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-6.html",
+      "bytes": 6162,
+      "sha256": "00d2737d5e568341a9a8b272be42e003ba1cb84839fc4ca49b5a98d7f6cf62ff"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-7.html",
+      "bytes": 8628,
+      "sha256": "c6ddae8fdcfdfee0ff37c49615b3e1c48dbb6c9786cab72e90e98f998a031281"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-G1-2.html",
+      "bytes": 6207,
+      "sha256": "cc660f30b9ab7242d971f56bde73664208caf658cba163ec8bde657814d40410"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-G1-3.html",
+      "bytes": 6226,
+      "sha256": "a9e35a4178ed9c42f30be5954f016651b817998f6ffc5fa743e2b5cba147c206"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-G1-4.html",
+      "bytes": 6205,
+      "sha256": "843ddeb6b01a334837f1fa75e8ca85682e2c8a9229d9d2a19bdf3d365d6e9373"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-G1.html",
+      "bytes": 6230,
+      "sha256": "c005421d2291682ad94eae1c8fbbfeb67d635f4b3b00e3b68741d66b416c4a7c"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/OUTPOST-DIAGRAM.html",
+      "bytes": 12642,
+      "sha256": "610c420506fbbb05d5ed3ab11d7ccdf0479849c8e49c8760927a4ba1aa8e0121"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/SKILL-3-2.html",
+      "bytes": 12658,
+      "sha256": "4fdcb902cb351e90660af408fd88e2ac1adc662aa86a43223e3f560e89f26706"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/SKILL-3.html",
+      "bytes": 7905,
+      "sha256": "8264dc23f53070f701a980f27ce99f952938911227dcaec40e16e99479d97aad"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/STATE-ICONS.html",
+      "bytes": 31194,
+      "sha256": "6b5146b63b9d079111e032871e7363180d2e6d9232a11b2d60d777b212639b2b"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/TUT-2-2.html",
+      "bytes": 8588,
+      "sha256": "4c146fb56cc8487f5613c7841aba53f5a211c22e1f0a4d02570b5898e1273613"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch1/TUT-2.html",
+      "bytes": 3319,
+      "sha256": "11f0131fa34966cd0a1757d11566520828468788c26ed0f48750257f830b70f7"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/BAG-2-2.html",
+      "bytes": 7921,
+      "sha256": "05211d08b04a3612303c95502d1282b6b4c55a177f12a9ac771ef3140e1e8137"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/BAG-2.html",
+      "bytes": 7926,
+      "sha256": "138df92c49eff1637cff986afbfbf3788e9a2f16dc67b1cf8fc9ef3010d6d218"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/BAG-5-2.html",
+      "bytes": 6222,
+      "sha256": "742a8a06f1bfe66415ede7a9279ba5250620493751767b6f32d88ded9d3b0e85"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/BAG-5.html",
+      "bytes": 9537,
+      "sha256": "2551317b5241394f4839f59f399d5ec902f49599dee7bded5f5fbb621479d876"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/FARM-4.html",
+      "bytes": 6373,
+      "sha256": "cc34208b8030da6884bcdc12a3b2c06140c8766559923e969be5d100211bf091"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/FARM-5.html",
+      "bytes": 8261,
+      "sha256": "f38c648364b16f6ef0205638bd14ae7c4f23bcef68f1c752af03043bd4e4593b"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/FISH-6.html",
+      "bytes": 10424,
+      "sha256": "bde99bfe154208a50fb7aa32abc15d501efbce4896461ef608e2d4c6cbbe00a2"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/HOME-1.html",
+      "bytes": 10102,
+      "sha256": "b532346d89c54fdd3ca50ea8582e512d819f28722a30139618f31a43c6c4238e"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/HOME-2.html",
+      "bytes": 6200,
+      "sha256": "7153a3a9d20421e1715aa8480c8002d480f388f2ddbec50c91d4a893db55a63d"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/HUD-2.html",
+      "bytes": 7276,
+      "sha256": "47373c9272cbeac3786cc1e5466b19fafc67c8e7c093e0b7f9368a0eb20d6910"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/MINE-1.html",
+      "bytes": 5737,
+      "sha256": "094de0b33a82d2449a5c23a668b625eef73a411da883ce039dfdce0c7fef0be0"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/PROFILE-1.html",
+      "bytes": 7137,
+      "sha256": "28e01a1a3c200b0a77310d7c1a160c297cd1fe6837ababa698a16786bb53de24"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/PROFILE-2.html",
+      "bytes": 6138,
+      "sha256": "3bda04c9c8f9082c2900b40da658656276b8cf1f5a568764d2ff646478aaa0c1"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/SETTINGS-1.html",
+      "bytes": 4549,
+      "sha256": "b9d7f3953fec7c19b7f77096d2aeb1932fa710615eae94f4b7754ae603a22645"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/SKILL-1.html",
+      "bytes": 9771,
+      "sha256": "da9b4af20c347ed16cbac28d994793569f32d6ddde3d71b950e80b06468d6303"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/SKILL-2.html",
+      "bytes": 14350,
+      "sha256": "be85368f9354629c26dd421f216bcf0b2b96e031e95a5f74d3faf9e15c412765"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/batch2/SOC-4.html",
+      "bytes": 6912,
+      "sha256": "b74a340e63856a6d13162f479a1062c1971a14a4d4cb5637b340d52579d63b63"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/farm.html",
+      "bytes": 8356,
+      "sha256": "74d6b3f50ac3ae19c9d8c21e378d367dbdd5b61e9af935d530c64c788ba0e2b9"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/kitchen.html",
+      "bytes": 7574,
+      "sha256": "8111127f1c826cf7582deaca99b5be4ff42667bc20351195e11f95fd4837ccca"
+    },
+    {
+      "path": "docs/design/ui-anchors-2026-10-03/ui/pond.html",
+      "bytes": 8145,
+      "sha256": "9cf85861503be3cfa0d977fea00997452c50613662ba957f519ae83585a793a7"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/avatar-assets/figma-payload.json",
+      "bytes": 5916845,
+      "sha256": "8acfe8c89f40c1b7ceeadec7027703239949cc63ce9d8365b3d97405130a86cd"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/data/avatar-control-icons.json",
+      "bytes": 2963,
+      "sha256": "9d321b9b09cd22437350729c9cd12964f113d5b1c17e42e8802fecd244ced993"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/data/crop-dex.json",
+      "bytes": 8793,
+      "sha256": "9fe724abc7a587c01fee0691682088f4febe66ed1d2fd1a1e125f0765c68837c"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/data/current-all.json",
+      "bytes": 621287,
+      "sha256": "5997b92948aff56b79ad91fa4036b698019babfc6ac67ee23959e4a05bfecc1a"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/data/flow-repair-states.json",
+      "bytes": 10246,
+      "sha256": "753ba25bf902fa0716640f46c297e504851f1202209b197ece733788bedccc49"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/data/free-travel-flow-states.json",
+      "bytes": 8793,
+      "sha256": "f7fcaa640c33c93cb97535d7c4a3b40e4b84063a4681c1c26717d6d65c6a4d15"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/data/free-travel-passport.json",
+      "bytes": 1153,
+      "sha256": "bff6b1b6634fdfe56838907370c4a0235db29477b75c4b8f55d36af4d21de046"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/data/legacy-npc-flow-states.json",
+      "bytes": 26254,
+      "sha256": "3a7655a0f461f0a713e67798fec0ce67a02c8293bc00739879667bc469f79e99"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/data/legacy-scene-hashes.json",
+      "bytes": 1343,
+      "sha256": "7440997ce67cb1b90aa45f9ce6f42acce7d9a4fd68a63d48c939b865d6beb7fd"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/data/legacy-screens.json",
+      "bytes": 1030217,
+      "sha256": "c59e8f122ab2552ea81a2d73ee2d3b3938d89f2829a660a139f818f2108308c1"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/data/tokens.json",
+      "bytes": 713,
+      "sha256": "4f987b8ff1cc878b3e2408d76a1d652fbe5038dedaca9920c08a9db8afd8f36c"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/data/toolbar-fixture-provenance.json",
+      "bytes": 1373,
+      "sha256": "4c7efd5f6ecbf65cb70f3b9fcc4de8b96c03d41e3a41294aa43a2e8aa0fde78b"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/action-picker-fixes.js",
+      "bytes": 3824,
+      "sha256": "688fc29610ef3a80640c704459cd7611c1d7b2dbdc86a472bcdb2552608cb042"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/avatar-fixes.js",
+      "bytes": 18293,
+      "sha256": "f1969e727fa585da27b6edc529d472d984149a23d5e157b7cbb9b8a96416b4b0"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/avatar-integration.js",
+      "bytes": 1140,
+      "sha256": "679b40200d3a02a605ccf3d2cdc5f7b23303b62a9461d4e79c3fb42624b49488"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/avatar-polish-fixes.js",
+      "bytes": 10803,
+      "sha256": "c2b8bdaa218e2dfd325ea81c62ce45998699a79798e93b6252ab9c67b3a17b43"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/avatar-recovery-fixes.js",
+      "bytes": 4630,
+      "sha256": "ab1412be368078853b18d97b7e1aea9b12c7b117a9a57671a11c0eea0adf6d6d"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/build.py",
+      "bytes": 9541,
+      "sha256": "24cdda30f4c96c37a19ef067f1e8dc915d46a5bccbc31895f095bdfcff6f1ce7"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/build_gap_ledger.py",
+      "bytes": 2995,
+      "sha256": "9b896e3593bfafbc428e423e0c25d9669d9b4a7c2850927af95d86c2f2f2fd6c"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/camera-highlight-fixes.js",
+      "bytes": 3575,
+      "sha256": "f3692d524acc1e97c0dabefe0c20326eec3369151c9b40f62e94fc8f0edc937a"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/component-family-fixes.js",
+      "bytes": 16530,
+      "sha256": "1dc41def7d17dc72f46c4b6e2a72d05914a5142c7b8dced28fae74e322ef466d"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/crop-dex-fixes.js",
+      "bytes": 5551,
+      "sha256": "68f16b9f15bdf97e721c4d499d01441688644d7e7ad071ffe7549b1e48a4cd15"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/current-fixes.js",
+      "bytes": 20544,
+      "sha256": "be08b9a19fdcedce5bb25bdbaf2472724f9e42a7dabca2b6209047aba278983a"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/current-kitchen-focus-fixes.js",
+      "bytes": 4710,
+      "sha256": "72c03bd3734966a72085afb09225810aa0f8f533bb9f8138f937a647e1debec5"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/current-qa-fixes.js",
+      "bytes": 3611,
+      "sha256": "07a37557e645176ca24e577f83c5b5e6590328e2d8d71da46c62dec241009e91"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/current-visual-fixes.js",
+      "bytes": 1632,
+      "sha256": "b9c65f12fcc8380bab80c14e058f5c04053990b5e5eac60c53e6de2f76fcf021"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/flow-repair-fixes.js",
+      "bytes": 3336,
+      "sha256": "239ff548ca81667c24e1105a1ae84d033754d78804015737661799ae5d5486dc"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/free-travel-flow-fixes.js",
+      "bytes": 3412,
+      "sha256": "d6d0df3604d0c2cd8173f991035e28b020a335bd649f04c3c7e55f8320b4c9aa"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/hud-lightweight-fixes.js",
+      "bytes": 10690,
+      "sha256": "a88ee8d2fe640c9953884cab3970b7edb067bbf7a924d165094a5d90a064be63"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/hud-navigation-fixes.js",
+      "bytes": 5261,
+      "sha256": "193acb03e90e6a42ff74d4f354c930fb7148af8e30a8c983f798a0420c37fa64"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/kitchen-scene-fixes.js",
+      "bytes": 9583,
+      "sha256": "199dd8cb01c97d68312171c2e26941ae6c798c11c5df2ff70b9e73f4e7f43bd7"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/kitchen-selection-fixes.js",
+      "bytes": 9672,
+      "sha256": "fb9aaa8aa697996dda4c30c23c6fc6506e18a1b028d6e8543ee2d894f750c273"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/kitchen-selection-state-fixes.js",
+      "bytes": 10390,
+      "sha256": "4b52511616654df621becfafe533f111fe36adabc869f6f5da272ef8870e60d8"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/legacy-fixes.js",
+      "bytes": 13677,
+      "sha256": "dfa485546e16ddd2e041a72f0c2cbe53164a936b4b15deb443aaf4369ad52285"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/legacy-icon-fixes.js",
+      "bytes": 1424,
+      "sha256": "f50e4ed38ef3cd338795cb635ad2021f2ba9a69c016b75e5abf14fb7c233e8f3"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/legacy-npc-flow-fixes.js",
+      "bytes": 7540,
+      "sha256": "d03db16018d8fb404aff94c31af88ecd6f6c8d52eedc88352ec8a7895d9d8bfb"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/legacy-pin-fixes.js",
+      "bytes": 4651,
+      "sha256": "9ac35d0a16a8a1ce82622749dce9bf51c3dc261fe27c6ee771da999d695c9a37"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/legacy-qa-fixes.js",
+      "bytes": 14446,
+      "sha256": "a81335f8085bcc3d59ae76e9826430e1147e6e6ae7ad25eda7d554320cd4b22a"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/legacy-reference-fixes.js",
+      "bytes": 12166,
+      "sha256": "782593d5266ae0605a79803c0c49410e1723ba06679ca136c36463d656b9a47c"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/legacy-scene-fixes.js",
+      "bytes": 5756,
+      "sha256": "002713d4d2429db96d87e22444877173d4d70614481295c76f43f66c664bf42d"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/manifest.json",
+      "bytes": 279,
+      "sha256": "c6941e9f7a0aaa44d204cfadb849fa542e558912f19135ee37aaff14dec94af3"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/overlay-cleanup-fixes.js",
+      "bytes": 4904,
+      "sha256": "b8e0a2bd9e4b7e59a6b79d5afcbbc895a6e10500d39b4c641764fc21dcd96001"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/p2p3-visual-fixes.js",
+      "bytes": 3888,
+      "sha256": "063df8fb478110c5bcad7c843937c493992dc2d57e93c66d3993ec1fe0c8a3e7"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/package.py",
+      "bytes": 3358,
+      "sha256": "0fcd00ba047b39e929660e2768658f0f0d1b208adc959966f086f25cd4eb3ccb"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/responsive-component-fixes.js",
+      "bytes": 1547,
+      "sha256": "1e3b4a4295bda060eae5919817bbe030da2147d4ef8cedd0de85096f56506ad0"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/src.js",
+      "bytes": 50728,
+      "sha256": "c3e9a4bd1551545f40dfb5a096e3dd31bc9b555210774a2325cc72acd90d4dfa"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/ui.html",
+      "bytes": 3115,
+      "sha256": "8dc26059698945efc159606c0a6e6209149d72a323176daeaed5bf176e09828d"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/unknown-requirement-fixes.js",
+      "bytes": 4194,
+      "sha256": "4e46a87b0f6a38a8bc8075047823d8a48bb5fd73274ca6452cd8e899fa20a049"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/validate.cjs",
+      "bytes": 37099,
+      "sha256": "117b920b084ae7d5e6fd2626fad6e5df63008369282edf5635a4c45b47401890"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/visual-container-fixes.js",
+      "bytes": 16985,
+      "sha256": "ca11a1f10409f7a4c60f1d72feb228a296c038fbd349a81980e78592d1e8ab66"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/visual-current-containers.js",
+      "bytes": 10418,
+      "sha256": "694fbc936ce5f0d29860ee294513dd86d5f11155d013c05e98211f91e86f8e31"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/visual-fishing-fixes.js",
+      "bytes": 6430,
+      "sha256": "e515e9e1d728bf4dd64fe78acbce6d713438c72b87143e0023d5c67427f07e25"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/visual-kitchen-fixes.js",
+      "bytes": 18588,
+      "sha256": "a7de0092cb8c0f44c0f514ab8c61c546332f402494fc0687f7bb6c40343c2053"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/visual-legacy-shops.js",
+      "bytes": 14420,
+      "sha256": "93013f1c77b59ee0627f04dba60a2b7a48cc25c90a973c1993c993b38eb4eeda"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/visual-legacy-surfaces.js",
+      "bytes": 25144,
+      "sha256": "ece017ef780dee1681ed17761d73e4a0481e6e07ddba2bab4a7b089ae0024871"
+    },
+    {
+      "path": "docs/design/ui-refactor-2026-10-06/figma-plugin/visual-polish-fixes.js",
+      "bytes": 19795,
+      "sha256": "4855436d4bb4a541019179cdfc26a84212576f4190a0006ee4b87c4b4debbe9e"
+    }
+  ],
+  "scope": "Exact local build inputs;code.js contains native UI plus source scene and Avatar artwork only. This manifest is not cloud visual acceptance."
+}

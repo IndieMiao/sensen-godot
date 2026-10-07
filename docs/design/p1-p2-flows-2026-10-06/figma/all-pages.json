@@ -1,0 +1,3511 @@
+[
+  {
+    "id": "FAC-1",
+    "title": "洒水器 · 制作",
+    "heading": "Sprinkler",
+    "meta": "Farming Lv6 · Homestead Lv4 · 2/7 placed",
+    "needs": [
+      [
+        "Timber",
+        8,
+        8,
+        "i-wood"
+      ],
+      [
+        "Stone",
+        6,
+        6,
+        "i-stone"
+      ],
+      [
+        "Copper",
+        3,
+        3,
+        "i-copper"
+      ]
+    ],
+    "actions": [
+      [
+        "Craft",
+        "FAC-2"
+      ]
+    ],
+    "foot": "Waters 8 plots for you · occupies 1 plot",
+    "note": "§5.7/13.4。木8+石6+铜3，从仓库扣；本样例Homestead4故上限7。制作成功进入放置，不把取消放置当退款。",
+    "capacity": 230,
+    "scene": "farm-facilities"
+  },
+  {
+    "id": "FAC-2",
+    "title": "放置 · 有效覆盖",
+    "heading": "Place Sprinkler",
+    "meta": "8 plots covered · 1 plot occupied",
+    "placement": true,
+    "actions": [
+      [
+        "Place",
+        "FAC-4"
+      ],
+      [
+        "Cancel placement",
+        "FAC-1",
+        "soft"
+      ]
+    ],
+    "foot": "Automatically waters nearby plots. Annual crops grow 15% faster.",
+    "note": "蓝色3×3范围含中心占地，实际浇周围8格。Place确认前仅预览；取消保留已制成设施，扣料时点与制作分开。",
+    "capacity": 230,
+    "scene": "farm-facilities"
+  },
+  {
+    "id": "FAC-3",
+    "title": "放置 · 占地冲突",
+    "heading": "Choose a clear plot",
+    "meta": "Something is already here.",
+    "placement": true,
+    "blocked": true,
+    "actions": [
+      [
+        "Space occupied",
+        null,
+        "disabled"
+      ],
+      [
+        "Try another plot",
+        "FAC-2",
+        "soft"
+      ],
+      [
+        "Cancel placement",
+        "FAC-1",
+        "soft"
+      ]
+    ],
+    "note": "无效预览红格+原因，不能确认落地；拖至空格恢复有效态。服务器拒绝放置后保留待放设施，不再次扣材料。",
+    "capacity": 230,
+    "scene": "farm-facilities"
+  },
+  {
+    "id": "FAC-4",
+    "title": "洒水器 · 已落地",
+    "heading": "Sprinkler placed",
+    "tag": "Sprinklers 3/7",
+    "rows": [
+      [
+        "8 plots watered automatically",
+        "Annual crops: 15% faster",
+        "i-sprinkler"
+      ],
+      [
+        "Sowing still uses Energy",
+        "Your seeds and harvest yield stay the same.",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "View coverage",
+        "FAC-2",
+        "soft"
+      ]
+    ],
+    "note": "落地后数量2→3，范围播种即生长；只省浇水与等待。移动/回收规则尚未定义，不在本批虚构返料比例。",
+    "capacity": 230,
+    "scene": "farm-facilities"
+  },
+  {
+    "id": "FAC-5",
+    "title": "堆肥箱 · 每日转化",
+    "heading": "Compost Bin",
+    "meta": "Farming Lv7 · Today 0/5",
+    "needs": [
+      [
+        "Crops",
+        8,
+        5,
+        "i-radish"
+      ]
+    ],
+    "rows": [
+      [
+        "5 crops → 5 Compost",
+        "No coins or Energy needed",
+        "i-compost"
+      ]
+    ],
+    "actions": [
+      [
+        "Make 5 Compost",
+        "FAC-6"
+      ]
+    ],
+    "note": "§5.7。每天最多5份任意作物，等量转化；本样例选择5份。可用次数与作物不足都写按钮，不把材料变金币。",
+    "capacity": 230,
+    "scene": "farm-facilities"
+  },
+  {
+    "id": "FAC-6",
+    "title": "设施 · 今日满额与温室",
+    "heading": "Compost ready · ×5",
+    "meta": "Compost Bin · Today 5/5",
+    "rows": [
+      [
+        "More after 04:00 at home",
+        "Today's crops have been used.",
+        "i-clock"
+      ],
+      [
+        "Next: Greenhouse · Farming Lv8",
+        "16 indoor plots · automatic watering",
+        "i-greenhouse"
+      ]
+    ],
+    "actions": [
+      [
+        "Daily limit reached",
+        null,
+        "disabled"
+      ],
+      [
+        "View greenhouse",
+        "FAC-GH",
+        "soft"
+      ]
+    ],
+    "note": "堆肥结果与上限同屏。温室入口继续下一张：4×4，成熟−25%，与堆肥上限−45%，不允许多年生。",
+    "capacity": 230,
+    "scene": "farm-facilities"
+  },
+  {
+    "id": "TRAP-1",
+    "title": "渔具铺 · 买鱼笼",
+    "scene": "tackle-shop",
+    "place": "Tackle Shop",
+    "heading": "Fish Trap",
+    "meta": "Fishing Lv5 · Finn's Tackle Shop",
+    "rows": [
+      [
+        "1 fish every 8 hours",
+        "Stores up to 3 fish",
+        "i-trap"
+      ],
+      [
+        "Bag 20/25 · 5 slots free",
+        "Trap slots 0/1",
+        "i-bag"
+      ]
+    ],
+    "actions": [
+      [
+        "Buy · 120 coins",
+        "TRAP-2"
+      ]
+    ],
+    "foot": "Use the Fishing Quick Bar to set your trap.",
+    "note": "由Finn问候→Trade→商品。只售不做；价格120。Tackle计容量，堆叠3；购买前检查钱与空位，不能直接从商店落笼。",
+    "capacity": 230,
+    "coins": 350
+  },
+  {
+    "id": "TRAP-2",
+    "title": "到塘 · 投放鱼笼",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "coins": 230,
+    "tag": "Fish Trap ×1 selected",
+    "heading": "Choose a spot by the water",
+    "meta": "Trap slots 0/1 · No trap in this pond",
+    "actions": [
+      [
+        "Set Trap · Free",
+        "TRAP-3"
+      ],
+      [
+        "Back to fishing",
+        "TRAP-1",
+        "soft"
+      ]
+    ],
+    "note": "已到访系统塘本人到场；Fishing快捷栏选中鱼笼，主行动键Set Trap。每塘每人1只、0体力；本稿用大按钮呈现该行动。",
+    "capacity": 230
+  },
+  {
+    "id": "TRAP-3",
+    "title": "鱼笼 · 计时",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "coins": 230,
+    "tag": "Trap · 0 fish · ready in 8h",
+    "heading": "Your trap is set",
+    "meta": "Trap slots 1/1",
+    "rows": [
+      [
+        "Common or Fine fish",
+        "Come back to collect in person.",
+        "i-trap"
+      ]
+    ],
+    "actions": [
+      [
+        "Done",
+        "TRAP-2",
+        "soft"
+      ]
+    ],
+    "note": "每8h有效时间1条，离线累计最多3条；满笼分镜另列，不在产品中放快进按钮。",
+    "capacity": 230
+  },
+  {
+    "id": "TRAP-4",
+    "title": "鱼笼 · 满笼收取",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "coins": 230,
+    "tag": "Trap full · 3 fish",
+    "heading": "Fish ready to collect",
+    "meta": "Bag 23/25 · 2 slots free",
+    "grid": [
+      {
+        "name": "Crucian",
+        "icon": "i-fish",
+        "count": "×2"
+      },
+      {
+        "name": "Perch",
+        "icon": "i-fish",
+        "count": "×1"
+      }
+    ],
+    "cols": 2,
+    "actions": [
+      [
+        "Collect · Free",
+        "TRAP-DONE"
+      ]
+    ],
+    "foot": "Trap pauses while full. Collection gives reduced XP.",
+    "note": "必须本人到塘，0体力；Common/Fine候选含地区、时段。XP为鱼种XP×50%×等级差，不写固定+XP。",
+    "capacity": 230
+  },
+  {
+    "id": "TRAP-5",
+    "title": "鱼笼 · 满包保留",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "coins": 230,
+    "heading": "Make room to collect",
+    "meta": "Bag 25/25 · Trap full · 3 fish",
+    "rows": [
+      [
+        "Your fish stay in the trap",
+        "No fish sent to Parcels.",
+        "i-trap"
+      ]
+    ],
+    "actions": [
+      [
+        "Open bag",
+        "BAG-1-P0",
+        "soft"
+      ],
+      [
+        "Return after making room",
+        "TRAP-4",
+        "soft"
+      ]
+    ],
+    "note": "装不下部分留笼，笼满暂停产出；部分收取按实际容量，不能丢鱼或冒用被动奖励包裹通道。",
+    "capacity": 230
+  },
+  {
+    "id": "TRAP-6",
+    "title": "鱼笼 · 槽位与同塘限制",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "heading": "A trap is already here",
+    "meta": "Fishing Lv8 · Trap slots 1/2",
+    "rows": [
+      [
+        "One trap per pond",
+        "Your next trap needs another visited pond.",
+        "i-trap"
+      ],
+      [
+        "Fishing Lv10 · 3 trap slots",
+        "Fishing Lv9 adds a 10% Rare chance.",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Show another pond",
+        "DEX-P1-2",
+        "soft"
+      ]
+    ],
+    "note": "有空总槽也不能同塘放第2只。Lv5/8/10为1/2/3；P1只家城已访塘，P2后才跨城；此地图按钮为后续共用入口。",
+    "capacity": 230
+  },
+  {
+    "id": "COOK-P1-1",
+    "title": "第二灶 · 并行操作",
+    "scene": "kitchen",
+    "stoves": 2,
+    "place": "Kitchen",
+    "heading": "Two stoves, one kitchen",
+    "meta": "Homestead Lv4 · Cooking Lv5 · 3 slots",
+    "stoveStates": [
+      "Cooking 0:09",
+      "Empty"
+    ],
+    "actions": [
+      [
+        "Tap Stove 2",
+        "COOK-P1-2"
+      ]
+    ],
+    "note": "第二灶由Homestead4，3槽由Cooking4；两个门分开。灶台点击选中，无Cook/Shop设施FAB。背景裁切既有厨房，不计新整屋美术。",
+    "capacity": 230
+  },
+  {
+    "id": "COOK-P1-2",
+    "title": "Queue ×2 · 排下一锅",
+    "scene": "kitchen",
+    "stoves": 2,
+    "place": "Kitchen",
+    "heading": "Stove 1 · Queue next",
+    "meta": "Cooking Lv5 · Cooking now + 1 queued max",
+    "needs": [
+      [
+        "Crucian",
+        2,
+        1,
+        "i-fish"
+      ]
+    ],
+    "stoveStates": [
+      "Cooking 0:04",
+      "Cooking 0:09"
+    ],
+    "actions": [
+      [
+        "Queue Grilled Crucian",
+        "COOK-P1-3"
+      ]
+    ],
+    "note": "一灶最多当前+下一锅，前锅离灶后自动开火，火候照常。预扣/预留与取消队列的材料时点未在基线定义，本稿只定显示与启动前重检。",
+    "capacity": 230
+  },
+  {
+    "id": "COOK-P1-3",
+    "title": "队列 · 留灶阻塞",
+    "scene": "kitchen",
+    "stoves": 2,
+    "place": "Kitchen",
+    "heading": "Collect this dish first",
+    "meta": "Bag full · Warming Cabinet 6/6",
+    "stoveStates": [
+      "Ready · Queued 1",
+      "Cooking 0:03"
+    ],
+    "rows": [
+      [
+        "Next dish is waiting",
+        "The current dish stays on Stove 1.",
+        "i-pot"
+      ]
+    ],
+    "actions": [
+      [
+        "Open bag",
+        "BAG-1-P0",
+        "soft"
+      ],
+      [
+        "After collecting: continue",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "满包且柜满，成品留灶；队列不覆盖成品。整理/收走后才自动开下一锅，第二灶继续独立运行。",
+    "capacity": 230
+  },
+  {
+    "id": "COOK-P1-4",
+    "title": "Cook All · 开火前可读",
+    "scene": "kitchen",
+    "stoves": 3,
+    "place": "Kitchen",
+    "capacity": 270,
+    "heading": "Cook All",
+    "meta": "Cooking Lv8 · 3 empty stoves · 3 queue spaces",
+    "rows": [
+      [
+        "Rare → Fine → Common",
+        "Known recipes with enough ingredients",
+        "i-cookbook"
+      ],
+      [
+        "Starts and queues what fits",
+        "Heat taps still happen on each stove.",
+        "i-pot"
+      ]
+    ],
+    "actions": [
+      [
+        "Cook All",
+        "COOK-P1-5"
+      ]
+    ],
+    "note": "§4.6.3：按稀有度高→低排满空灶与队列，受同一库存约束；同稀有度排序与预留时点未定，不以任意材料表伪装确定算法。"
+  },
+  {
+    "id": "COOK-P1-5",
+    "title": "三灶 · 状态独立",
+    "scene": "kitchen",
+    "stoves": 3,
+    "place": "Kitchen",
+    "capacity": 270,
+    "heading": "Dinner is underway",
+    "meta": "Quick Fire · 20% shorter cooking time",
+    "stoveStates": [
+      "Cooking · 0:04",
+      "Cooking · 0:12",
+      "Cooking · 0:24"
+    ],
+    "rows": [
+      [
+        "Queued 1 on each stove",
+        "The next heat card calls your attention.",
+        "i-pot"
+      ]
+    ],
+    "actions": [
+      [
+        "Tap next heat ring",
+        "COOK-P1-6",
+        "soft"
+      ]
+    ],
+    "note": "示例时长4/12/24来自Cooking6；各灶火候独立，不是一键自动完美。下一张为独立Big Pot设置状态，非时间继续。"
+  },
+  {
+    "id": "COOK-P1-6",
+    "title": "Big Pot · 一锅双份",
+    "scene": "kitchen",
+    "stoves": 2,
+    "place": "Kitchen",
+    "capacity": 250,
+    "heading": "Grilled Crucian · Double",
+    "meta": "Homestead Lv6 · 2 portions · 1 heat round",
+    "needs": [
+      [
+        "Crucian",
+        3,
+        2,
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Cook · 2 portions",
+        "DOUBLE-RESULT"
+      ],
+      [
+        "Switch to single",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "foot": "Ingredients ×2 · counts as one cook for daily XP",
+    "note": "大锅由Homestead6；用料×2、同轮火候、出2份，按1锅计同页递减；不与Lucky Double叠加。"
+  },
+  {
+    "id": "COOK-P1-7",
+    "title": "Legendary · 不可Double",
+    "scene": "kitchen",
+    "stoves": 3,
+    "place": "Kitchen",
+    "capacity": 290,
+    "heading": "Legendary recipe",
+    "meta": "3 ingredients · single cook only",
+    "rows": [
+      [
+        "Double is not available",
+        "Legendary recipes use their own portion rule.",
+        "i-cookbook"
+      ]
+    ],
+    "actions": [
+      [
+        "Double unavailable",
+        null,
+        "disabled"
+      ],
+      [
+        "Back to Cookbook",
+        "DEX-P1-1",
+        "soft"
+      ]
+    ],
+    "foot": "Buff · coming later",
+    "note": "Legendary不允许大锅Double，也不触发Lucky Double；P1菜谱保留Buff coming later，实际Buff属P3。"
+  },
+  {
+    "id": "COOK-P1-8",
+    "title": "Chef · 额外份数反馈",
+    "scene": "kitchen",
+    "stoves": 3,
+    "place": "Kitchen",
+    "capacity": 290,
+    "heading": "Lucky Double!",
+    "meta": "Cooking Lv10 · Chef",
+    "grid": [
+      {
+        "name": "Good ★",
+        "icon": "i-dish-grilled",
+        "count": "×1"
+      },
+      {
+        "name": "Plain",
+        "icon": "i-dish-grilled",
+        "count": "Bonus ×1"
+      }
+    ],
+    "cols": 2,
+    "actions": [
+      [
+        "Keep both",
+        "COOK-P1-1"
+      ]
+    ],
+    "foot": "10% chance · single cooks · non-Legendary",
+    "note": "本卡是非Double普通锅的独立10%结果，不是上一张Double锅的后续；多1份Plain。容量不足仍按柜/包/灶，不进Parcels。"
+  },
+  {
+    "id": "FAC-GH",
+    "title": "温室 · 占地与门槛",
+    "heading": "Greenhouse",
+    "meta": "Farming Lv8 · Greenhouses 0/1",
+    "needs": [
+      [
+        "Timber",
+        20,
+        20,
+        "i-wood"
+      ],
+      [
+        "Stone",
+        12,
+        12,
+        "i-stone"
+      ],
+      [
+        "Copper",
+        8,
+        8,
+        "i-copper"
+      ],
+      [
+        "Coins",
+        350,
+        300,
+        "i-coin"
+      ]
+    ],
+    "rows": [
+      [
+        "4 × 4 indoor plots",
+        "No perennial trees · automatic watering",
+        "i-greenhouse"
+      ]
+    ],
+    "actions": [
+      [
+        "Preview 4 × 4 footprint",
+        "FAC-GH-PLACE",
+        "soft"
+      ]
+    ],
+    "note": "§5.7。温室1座Lv8、2座Lv10；占16格开垦额度，材料与300金币制作后进入独立4×4放置预览。",
+    "capacity": 230,
+    "scene": "farm-facilities",
+    "coins": 350
+  },
+  {
+    "id": "TRAP-DONE",
+    "title": "鱼笼 · 收取成功",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "coins": 230,
+    "heading": "Collected · 3 fish",
+    "meta": "Bag 25/25 · Trap 0/3",
+    "rows": [
+      [
+        "Pond Crucian ×2 · River Perch ×1",
+        "The trap starts filling again.",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Done",
+        "TRAP-3",
+        "soft"
+      ]
+    ],
+    "note": "仅成功装入后从笼删除，失败保留；本示例分成2个物品堆占2空格，23→25。余下有效时间如何保留按结算协议，不重置成任意时间。",
+    "capacity": 230
+  },
+  {
+    "id": "DEX-P1-1",
+    "title": "Cookbook · 五态与图鉴",
+    "scene": "kitchen",
+    "stoves": 3,
+    "place": "Kitchen",
+    "capacity": 270,
+    "heading": "Cookbook · 18/48",
+    "tabs": [
+      "All",
+      "Can cook",
+      "Not cooked"
+    ],
+    "rows": [
+      [
+        "Hidden → Clued → Tasted",
+        "Tasted reveals the recipe, not first-cook XP.",
+        "i-question"
+      ],
+      [
+        "Discovered → Mastered",
+        "Cook it yourself · mastery records best heat",
+        "i-cookbook"
+      ]
+    ],
+    "actions": [
+      [
+        "View fish collection",
+        "DEX-P1-2",
+        "soft"
+      ]
+    ],
+    "note": "图鉴状态口径先统一；48份独立料理资产仍按清单交付。五态说明是审阅说明页，不能代替48菜的逐页内容。"
+  },
+  {
+    "id": "DEX-P1-2",
+    "title": "Fish-dex · 寻鱼路标",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "heading": "River Eel",
+    "meta": "Legendary · River / Pond · night",
+    "rows": [
+      [
+        "Fishing Lv9 needed",
+        "1 level to go · this fish stays hooked at Lv9",
+        "i-fish-sil"
+      ],
+      [
+        "Look here after dark",
+        "Fishing Lv8 route hints",
+        "i-moon"
+      ]
+    ],
+    "actions": [
+      [
+        "Show a river",
+        "MAP-2-FREE",
+        "soft"
+      ]
+    ],
+    "note": "Lv8起路标；河鳗Lv9仅夜，不推荐Coast。占位鱼剪影不计独立河鳗资产，仍需20鱼专属图稿。",
+    "capacity": 230
+  },
+  {
+    "id": "FAC-GH-PLACE",
+    "title": "温室 · 4×4有效放置",
+    "heading": "Place Greenhouse",
+    "meta": "16 plots · Greenhouses 0/1",
+    "placement": true,
+    "footprint": 4,
+    "actions": [
+      [
+        "Place",
+        "FAC-GH-DONE"
+      ],
+      [
+        "Cancel placement",
+        "FAC-GH",
+        "soft"
+      ]
+    ],
+    "note": "独立4×4占地预览：先验证开垦额度与连续空地；取消保留已制作设施。",
+    "capacity": 230,
+    "scene": "farm-facilities"
+  },
+  {
+    "id": "FAC-GH-DONE",
+    "title": "温室 · 落地后果",
+    "heading": "Greenhouse placed",
+    "meta": "Greenhouses 1/1 · 16 indoor plots",
+    "rows": [
+      [
+        "Annual crops grow 25% faster",
+        "Compost adds 20% · combined cap 45%",
+        "i-greenhouse"
+      ],
+      [
+        "Regional crops feel at home",
+        "No off-climate time penalty indoors",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to farm",
+        "FAC-1",
+        "soft"
+      ]
+    ],
+    "note": "播种体力和产量不改；不允许多年生。温室单独3D外观沿设施源，不新增无据规则。",
+    "capacity": 230,
+    "scene": "farm-facilities"
+  },
+  {
+    "id": "DOUBLE-RESULT",
+    "title": "双份出锅 · 同一品质",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 250,
+    "heading": "Grilled Crucian ★ Good ×2",
+    "meta": "Big Pot · one cook counted today",
+    "rows": [
+      [
+        "Two portions, one heat round",
+        "Lucky Double does not add another portion.",
+        "i-dish-grilled"
+      ]
+    ],
+    "actions": [
+      [
+        "Keep both",
+        "COOK-P1-1"
+      ]
+    ],
+    "note": "Double锅结果独立于Lucky Double；两份遵循柜/包/留灶容量，Extra Plain不是此锅必有。"
+  },
+  {
+    "id": "FAC-LIMIT",
+    "title": "设施 · 上限不可超",
+    "heading": "Sprinklers 7/7",
+    "meta": "Homestead Lv4",
+    "rows": [
+      [
+        "Homestead Lv5 adds one",
+        "Maximum 10 sprinklers at Homestead Lv7",
+        "i-sprinkler"
+      ]
+    ],
+    "actions": [
+      [
+        "Placement limit reached",
+        null,
+        "disabled"
+      ],
+      [
+        "Back",
+        "FAC-1",
+        "soft"
+      ]
+    ],
+    "note": "数量门槛可见，不在放置成功后再拒绝。未定义的移动回收流程只记待定，不赋予返料。",
+    "capacity": 230,
+    "scene": "farm-facilities"
+  },
+  {
+    "id": "TRAP-NOROOM",
+    "title": "购买前 · 满包门禁",
+    "scene": "tackle-shop",
+    "place": "Tackle Shop",
+    "heading": "Fish Trap",
+    "meta": "120 coins · Bag 25/25",
+    "rows": [
+      [
+        "Free a slot first",
+        "Owned trap stacks of 3 can accept more if not full.",
+        "i-bag"
+      ]
+    ],
+    "actions": [
+      [
+        "No room · free a slot first",
+        null,
+        "disabled"
+      ],
+      [
+        "Open bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "购买放不下先拒绝，不扣币；必须考虑同物品可堆叠空间，不仅看空格。",
+    "capacity": 230,
+    "coins": 350
+  },
+  {
+    "id": "COOK-EMPTY",
+    "title": "Cook All · 无空灶",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Every stove is busy",
+    "meta": "Stoves 3/3 · queues 3/3",
+    "rows": [
+      [
+        "Cook All needs an empty place",
+        "Let a dish finish or collect a ready dish.",
+        "i-pot"
+      ]
+    ],
+    "actions": [
+      [
+        "No stove or queue space",
+        null,
+        "disabled"
+      ],
+      [
+        "Back to kitchen",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "Cook All无可用灶/队列不扣料；材料不足和空位不足分别写原因。",
+    "capacity": 230
+  },
+  {
+    "id": "MAP-2-FREE",
+    "title": "目的地四列表",
+    "scene": "map",
+    "place": "Map",
+    "heading": "Where to next?",
+    "tabs": [
+      "Nearby",
+      "Friends",
+      "Open farms",
+      "Featured"
+    ],
+    "rows": [
+      [
+        "Hangzhou · China",
+        "Trip 3 · Free · 1 new stamp",
+        "i-map"
+      ],
+      [
+        "Tokyo · Japan",
+        "Trip 5 · Free · 2 regional fish",
+        "i-map"
+      ],
+      [
+        "Los Angeles · United States",
+        "Trip 7 · Free · 3 things to do",
+        "i-map"
+      ]
+    ],
+    "actions": [
+      [
+        "Browse Tokyo",
+        "MAP-3-FREE"
+      ]
+    ],
+    "foot": "Looking around the map never moves you.",
+    "note": "§11.10四列表；本页Nearby示例，其余标签仅列表筛选。免费首版所有Trip只显示档名；从家城计算距离，不扣费无证件。"
+  },
+  {
+    "id": "MAP-3-FREE",
+    "title": "未探索城 · 浏览",
+    "scene": "map",
+    "grey": true,
+    "place": "Map",
+    "heading": "Tokyo · Japan",
+    "meta": "Temperate · Trip 5 · 14 online · 09:12 local",
+    "rows": [
+      [
+        "3 ponds · 17 outposts · 8 residents",
+        "2 regional fish · 12 open farms",
+        "i-pond"
+      ],
+      [
+        "Fishing Lv1 / Lv5",
+        "Local fish silhouettes",
+        "i-fish-sil"
+      ]
+    ],
+    "actions": [
+      [
+        "Travel here",
+        "MAP-4-FREE"
+      ],
+      [
+        "Keep browsing",
+        "MAP-2-FREE",
+        "soft"
+      ]
+    ],
+    "note": "城市名/人数/时间不遮，服务图钉剪影；当前玩家仍Shanghai。数量是示例夹具，正式从城市簇数据，不从POI猜。"
+  },
+  {
+    "id": "MAP-4-FREE",
+    "title": "免费出发确认",
+    "scene": "map",
+    "heading": "Travel to Tokyo",
+    "meta": "Trip 5 · Continental · First visit",
+    "rows": [
+      [
+        "Free travel",
+        "No Energy, coins or travel items",
+        "i-travel"
+      ],
+      [
+        "3 things to do here",
+        "Fish the local pond · visit an outpost · get a stamp",
+        "i-pond"
+      ]
+    ],
+    "actions": [
+      [
+        "Fly",
+        "MAP-5-FREE"
+      ],
+      [
+        "Not now",
+        "MAP-3-FREE",
+        "soft"
+      ]
+    ],
+    "foot": "Return home is always free.",
+    "note": "明确Travel改变玩家城，Browse不变。首版不套用10min收费档；短过渡显示出发请求状态，确定成功再落地。"
+  },
+  {
+    "id": "MAP-5-FREE",
+    "title": "出发中 · 在途反馈",
+    "scene": "map",
+    "route": true,
+    "heading": "On your way to Tokyo",
+    "meta": "Trip 5 · Free travel",
+    "rows": [
+      [
+        "Preparing your arrival",
+        "Your farm and bag are saved.",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "Skip animation",
+        "MAP-6-FREE",
+        "soft"
+      ]
+    ],
+    "note": "短过渡分镜，不新增收费等待倒计时。请求未回包时不允许第二次发起；Skip只跳动画，不伪造到达。长时登机牌另在收费版。"
+  },
+  {
+    "id": "MAP-6-FREE",
+    "title": "首访到达 · 印章",
+    "scene": "map",
+    "city": "Tokyo",
+    "place": "Map",
+    "energy": 152,
+    "heading": "Welcome to Tokyo",
+    "meta": "New stamp · +10 Energy",
+    "rows": [
+      [
+        "Tokyo stamp added",
+        "Passport · 2 cities visited",
+        "i-stamp"
+      ]
+    ],
+    "actions": [
+      [
+        "See what’s nearby",
+        "MAP-7-FREE"
+      ]
+    ],
+    "note": "首访计数未到日2次上限时+10；相机城市→玩家城市一致。印章与迷雾永久保留；不展示付费版Day Pass倒计时。"
+  },
+  {
+    "id": "MAP-7-FREE",
+    "title": "落地 · 可做的三件事",
+    "scene": "map",
+    "city": "Tokyo",
+    "place": "Map",
+    "energy": 152,
+    "heading": "3 things to do here",
+    "rows": [
+      [
+        "Fish the local pond",
+        "Pond Crucian · ready for every level",
+        "i-pond"
+      ],
+      [
+        "Visit the outpost",
+        "Temperate seeds · local requests",
+        "i-home"
+      ],
+      [
+        "View your new stamp",
+        "Tokyo · now explored",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Show local pond",
+        "MAP-8-FREE"
+      ],
+      [
+        "Visit the outpost",
+        "LOCAL-SHOP",
+        "soft"
+      ]
+    ],
+    "note": "落地兑现卡10s收起；Show仅高亮目标，下一张塘卡Go才进场。系统新手塘与据点保底，真实POI只读名片。"
+  },
+  {
+    "id": "MAP-8-FREE",
+    "title": "当地新手塘 · 可进入",
+    "scene": "map",
+    "city": "Tokyo",
+    "place": "Map",
+    "energy": 152,
+    "heading": "Sumida Pond",
+    "meta": "Beginner pond · Same city · Free",
+    "rows": [
+      [
+        "Pond Crucian OK",
+        "Everyone can start with a basic fish.",
+        "i-fish"
+      ],
+      [
+        "2 regional fish",
+        "Smelt Lv1 · Northern Pike Lv5",
+        "i-fish-sil"
+      ]
+    ],
+    "actions": [
+      [
+        "Go",
+        "LOCAL-FISH"
+      ]
+    ],
+    "note": "地区鱼示例须按城市哈希池落实，不宣称真实东京固定两种。本卡不能在到塘后才以技能阻止基础钓鱼。"
+  },
+  {
+    "id": "LOCAL-FISH",
+    "title": "当地行动 · 基础钓鱼",
+    "scene": "pond",
+    "city": "Tokyo",
+    "place": "Sumida Pond",
+    "energy": 152,
+    "heading": "Cast a line in Tokyo",
+    "meta": "Creel 0 · 25 free",
+    "rows": [
+      [
+        "Starter Rod equipped",
+        "Bait is optional.",
+        "i-rod"
+      ]
+    ],
+    "actions": [
+      [
+        "Cast · 5 Energy",
+        "LOCAL-CATCH"
+      ],
+      [
+        "Back to map",
+        "MAP-7-FREE",
+        "soft"
+      ]
+    ],
+    "note": "基础钓鱼执行常规Cast5，免费旅行不等于当地生产免费。收线小游戏沿已完成FISH-2，只补旅行落点。"
+  },
+  {
+    "id": "LOCAL-CATCH",
+    "title": "当地兑现 · 首城钓获",
+    "scene": "pond",
+    "city": "Tokyo",
+    "place": "Sumida Pond",
+    "energy": 147,
+    "heading": "Caught! Pond Crucian",
+    "meta": "First fish in Tokyo · +10 Fishing XP",
+    "rows": [
+      [
+        "Tokyo · 1 fish caught",
+        "Your visit now has a story.",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "View passport",
+        "PASS-1"
+      ],
+      [
+        "Go home · Free",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "10是首城额外奖励，鱼种/钓获XP另按既有规则。到达后10分钟发生一次当地动作计兑现，不拿浏览当动作。"
+  },
+  {
+    "id": "LOCAL-SHOP",
+    "title": "当地据点 · 先问候",
+    "scene": "market-square-v2",
+    "city": "Tokyo",
+    "place": "Market Square",
+    "heading": "Market Keeper · Mei",
+    "meta": "Temperate produce is fresh today.",
+    "rows": [
+      [
+        "Trade",
+        "See local seeds and requests",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Trade",
+        "LOCAL-TRADE"
+      ],
+      [
+        "Just passing by",
+        "MAP-7-FREE",
+        "soft"
+      ]
+    ],
+    "note": "岗位名称/名牌复用NPC-G1规范，此处共享场景占位。角色美术气候变体另列，农场无人驿站例外不变。"
+  },
+  {
+    "id": "LOCAL-TRADE",
+    "title": "当地购买 · 气候带种子",
+    "scene": "market-square-v2",
+    "city": "Tokyo",
+    "place": "Market Square",
+    "heading": "Mei’s Stall · Market Square",
+    "tabs": [
+      "Buy",
+      "Market Board"
+    ],
+    "rows": [
+      [
+        "Pumpkin Seeds · Farming Lv5",
+        "17 coins each · 10/10 today",
+        "i-radish-seeds"
+      ],
+      [
+        "Buyback today 0/80",
+        "All markets in this city share the limit.",
+        "i-coin"
+      ]
+    ],
+    "actions": [
+      [
+        "Buy 1 · 17 coins",
+        "LOCAL-BOUGHT"
+      ],
+      [
+        "Go home · Free",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "本样例玩家Farming5；低等级可看不可买。首次计数Trip3+礼物2种子另经包裹，不代替玩家购买；免费版先验证实际本地行为。"
+  },
+  {
+    "id": "LOCAL-BOUGHT",
+    "title": "特产带回家",
+    "scene": "market-square-v2",
+    "city": "Tokyo",
+    "place": "Market Square",
+    "coins": 213,
+    "heading": "Pumpkin Seeds ×1",
+    "meta": "Added to your bag",
+    "rows": [
+      [
+        "A little piece of Tokyo",
+        "Plant at home when you’re ready.",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Go home · Free",
+        "HOME-RETURN"
+      ],
+      [
+        "Keep exploring",
+        "MAP-7-FREE",
+        "soft"
+      ]
+    ],
+    "note": "购买成功才扣17、入包，失败保留币。种子气候带固定温带，回家异带露天时长惩罚按种植规则，不抹标签。"
+  },
+  {
+    "id": "HOME-RETURN",
+    "title": "免费返家",
+    "scene": "farm",
+    "heading": "Welcome home",
+    "meta": "Shanghai · Homestead",
+    "rows": [
+      [
+        "Your discoveries stay with you",
+        "Tokyo stamp · new fish · local seeds",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Open passport",
+        "PASS-1",
+        "soft"
+      ],
+      [
+        "Browse again",
+        "MAP-2-FREE",
+        "soft"
+      ]
+    ],
+    "note": "返家不扣体力/金币、无旅途；保留背包与永久探索记录。返家不是重置旅行成就，也不能再领同城首访奖励。"
+  },
+  {
+    "id": "PASS-1",
+    "title": "护照 · 城市章与进度",
+    "scene": "map",
+    "heading": "Passport",
+    "meta": "2 cities visited · First visits today 1/2",
+    "rows": [
+      [
+        "Shanghai · Home",
+        "Home city · explored",
+        "i-home"
+      ],
+      [
+        "Tokyo · Visited",
+        "Next: 4 more visits + 3 local trades",
+        "i-stamp"
+      ]
+    ],
+    "actions": [
+      [
+        "Tokyo city page",
+        "PASS-2"
+      ],
+      [
+        "Back home",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "此版只画免费旅行的可用章页；第二故乡设定在收费扩展。地图Me仍Profile入口，再进Collections/Passport。"
+  },
+  {
+    "id": "PASS-2",
+    "title": "每城三档 · 下个目标",
+    "scene": "map",
+    "heading": "Tokyo",
+    "meta": "Visited · 1 visit",
+    "rows": [
+      [
+        "Visited · arrived once",
+        "Stamp collected",
+        "i-stamp"
+      ],
+      [
+        "Regular · 1/5 visits · 0/3 local trades",
+        "Local trades count once per city per day",
+        "i-home"
+      ],
+      [
+        "Local · 10 visits",
+        "Catch both regional fish + learn a regional recipe",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Show local pond",
+        "MAP-8-FREE",
+        "soft"
+      ]
+    ],
+    "note": "§11.9.1/11.5.3：Visited→Regular(5访+3本地交付/交易)→Local(10访+2地区鱼+本带配方)。实际交易计数须主方案统一，免费版先展示进度。"
+  },
+  {
+    "id": "TRAVEL-RETRY",
+    "title": "出发失败 · 未到达",
+    "scene": "map",
+    "heading": "Couldn’t start the trip",
+    "meta": "You’re still in Shanghai.",
+    "rows": [
+      [
+        "Your destination is saved",
+        "Try again when connected.",
+        "i-map"
+      ]
+    ],
+    "actions": [
+      [
+        "Retry",
+        "MAP-5-FREE"
+      ],
+      [
+        "Not now",
+        "MAP-3-FREE",
+        "soft"
+      ]
+    ],
+    "note": "失败不盖章、不揭雾、不写首访。未知成功先查询同一旅行状态，Retry不创建双旅行。"
+  },
+  {
+    "id": "TRAVEL-RECONNECT",
+    "title": "重连 · 回到到达状态",
+    "scene": "map",
+    "heading": "Arrived in Tokyo",
+    "meta": "Your trip is ready to continue.",
+    "actions": [
+      [
+        "Land",
+        "MAP-6-FREE"
+      ]
+    ],
+    "foot": "Your stamp and rewards are granted once.",
+    "note": "恢复服务端旅程；已到账奖励只回显，不再发。免费短过渡可能遇到重连，不能因重启回家重跑首访。"
+  },
+  {
+    "id": "FOG-THREE",
+    "title": "迷雾三态 · 复用地图",
+    "scene": "map",
+    "heading": "A world you’ve visited",
+    "rows": [
+      [
+        "Unexplored",
+        "Names and people visible · service silhouettes",
+        "i-question"
+      ],
+      [
+        "Explored",
+        "Full color · pond and outpost entries",
+        "i-stamp"
+      ],
+      [
+        "Second Home",
+        "Full color · home crest · free travel",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Browse a city",
+        "MAP-3-FREE",
+        "soft"
+      ]
+    ],
+    "note": "三态样式页；第二故乡标为P2后续，免费首版不开放设定流程。POI只亮灯和只读名片，不成为岗位商店。"
+  },
+  {
+    "id": "MAP-4-PAID",
+    "title": "收费旅行 · 原子扣费",
+    "heading": "Fly to Tokyo",
+    "meta": "1,758 km · Trip 5 · First visit",
+    "rows": [
+      [
+        "40 Energy → 142 left",
+        "200 coins → 230 left",
+        "i-energy"
+      ],
+      [
+        "Travel Permit ×1 · Stamps 6/5",
+        "10 min · your farm stays open",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Fly",
+        "MAP-5-PAID"
+      ],
+      [
+        "Not now",
+        "MAP-3-FREE",
+        "soft"
+      ]
+    ],
+    "note": "§11.2/11.8。此为收费版，出发一次扣齐；首版免费流程不共用此费用状态。",
+    "scene": "map",
+    "energy": 182,
+    "coins": 430
+  },
+  {
+    "id": "MAP-4-GATE",
+    "title": "出发门禁 · 明确缺口",
+    "heading": "Travel Permit needed",
+    "meta": "Tokyo · Trip 5",
+    "rows": [
+      [
+        "Stamps 6/5 · Energy 182/40",
+        "Get a permit at the Homestead Stall or Travel Post.",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Travel Permit needed",
+        null,
+        "disabled"
+      ],
+      [
+        "View permit",
+        "PERMIT-1",
+        "soft"
+      ]
+    ],
+    "note": "只显示缺的条件；道具、体力、币、印章任一不足整笔拒绝。钱包扣后须≥40。",
+    "scene": "map",
+    "energy": 182,
+    "coins": 430
+  },
+  {
+    "id": "MAP-5-PAID",
+    "title": "在途 · 登机牌",
+    "heading": "In transit · Tokyo",
+    "meta": "Trip 5 · 7:42 left",
+    "rows": [
+      [
+        "Your farm stays open",
+        "Farming, cooking and your bag are available.",
+        "i-home"
+      ],
+      [
+        "Ponds and mines wait until arrival",
+        "One active trip at a time.",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "Travel guide",
+        "TRAVEL-GUIDE",
+        "soft"
+      ],
+      [
+        "Cancel trip",
+        "TRAVEL-CANCEL",
+        "soft"
+      ]
+    ],
+    "note": "按真实时间继续；重启读同一旅程。到点Land，日票按计划到达时刻起算。",
+    "scene": "map",
+    "route": true,
+    "energy": 142,
+    "coins": 230
+  },
+  {
+    "id": "TRAVEL-GUIDE",
+    "title": "在途 · 当地指南",
+    "heading": "Tokyo travel guide",
+    "meta": "Temperate · 09:12 local · 14 online",
+    "rows": [
+      [
+        "Smelt Lv1 · Northern Pike Lv5",
+        "Local river fish · active times shown in Fish-dex",
+        "i-fish-sil"
+      ],
+      [
+        "Market Square",
+        "Local seeds, recipes and requests",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to boarding pass",
+        "MAP-5-PAID",
+        "soft"
+      ]
+    ],
+    "note": "信息预览不允许远程交易；地区鱼由城市簇分配。",
+    "scene": "map"
+  },
+  {
+    "id": "TRAVEL-CANCEL",
+    "title": "取消 · 返还明细",
+    "heading": "Cancel your trip?",
+    "meta": "You have not arrived yet.",
+    "rows": [
+      [
+        "Return 40 Energy + 200 coins",
+        "Travel Permit ×1 also returned",
+        "i-coin"
+      ]
+    ],
+    "actions": [
+      [
+        "Keep travelling",
+        "MAP-5-PAID"
+      ],
+      [
+        "Cancel and refund",
+        "TRAVEL-REFUNDED",
+        "soft"
+      ]
+    ],
+    "note": "取消前有效时整笔退款，无到访无盖章无冷却；已到达竞争结果以服务端为准。",
+    "scene": "map"
+  },
+  {
+    "id": "TRAVEL-REFUNDED",
+    "title": "退款成功",
+    "heading": "Trip cancelled",
+    "meta": "Your resources are back.",
+    "rows": [
+      [
+        "40 Energy · 200 coins · Permit ×1",
+        "No visit or stamp was counted.",
+        "i-check"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to map",
+        "MAP-2-FREE",
+        "soft"
+      ]
+    ],
+    "note": "回显退款一次；中断后查询已取消状态，不再重复退款。",
+    "scene": "map",
+    "energy": 182,
+    "coins": 430
+  },
+  {
+    "id": "DAYPASS",
+    "title": "到达 · 日票并入位置芯片",
+    "heading": "Welcome back to Tokyo",
+    "meta": "Day Pass · 23h 59m",
+    "rows": [
+      [
+        "Return here free while the pass is active",
+        "Home + Tokyo · no third-city access",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Visit the local pond",
+        "MAP-8-FREE"
+      ],
+      [
+        "Return home · Free",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "§16.1.3覆盖旧右上独立日票卡：时间在位置芯片；24h滚动，Local48h。",
+    "scene": "map",
+    "city": "Tokyo",
+    "place": "Map · Pass 23h"
+  },
+  {
+    "id": "DAYPASS-EXPIRED",
+    "title": "日票到期 · 不踢人",
+    "heading": "Day Pass expired",
+    "meta": "You can stay in this room.",
+    "rows": [
+      [
+        "Leaving does not take you home",
+        "Re-entry needs a new pass · return travel is half price.",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Stay here",
+        "LOCAL-FISH",
+        "soft"
+      ],
+      [
+        "Return home · Free",
+        "HOME-RETURN"
+      ]
+    ],
+    "note": "到期不踢人不自动返家；离房后新入口检查日票。",
+    "scene": "pond",
+    "city": "Tokyo",
+    "place": "Sumida Pond"
+  },
+  {
+    "id": "PERMIT-1",
+    "title": "旅行许可 · 双带制作",
+    "heading": "Travel Permit",
+    "meta": "Homestead Stall · Made this week 1/3",
+    "rows": [],
+    "actions": [
+      [
+        "Craft · 100 coins",
+        "PERMIT-DONE"
+      ]
+    ],
+    "note": "§11.3.2 两个不同气候带特产+100；每周3张，购买250且每周2张另列。",
+    "needs": [
+      [
+        "Tilapia",
+        1,
+        1,
+        "i-fish"
+      ],
+      [
+        "Smelt",
+        1,
+        1,
+        "i-minnow"
+      ],
+      [
+        "Coins",
+        230,
+        100,
+        "i-coin"
+      ]
+    ],
+    "body": "Tilapia · Subtropical + Smelt · Temperate"
+  },
+  {
+    "id": "PERMIT-DONE",
+    "title": "许可入包",
+    "heading": "Travel Permit ×1",
+    "meta": "Crafted · 2/3 this week",
+    "rows": [
+      [
+        "For trips beyond 1,600 km",
+        "Cannot sell or gift this item.",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "View Tokyo trip",
+        "MAP-4-PAID",
+        "soft"
+      ]
+    ],
+    "note": "即时0体力；先容量检查再扣100和两件特产。",
+    "coins": 130
+  },
+  {
+    "id": "TICKET-1",
+    "title": "长途票 · 制作条件",
+    "heading": "Long-haul Ticket",
+    "meta": "Homestead Lv4 · Stamps 8/8",
+    "rows": [],
+    "actions": [
+      [
+        "Craft · 150 coins",
+        null
+      ]
+    ],
+    "note": "§11.3.3。许可1+硬木2+石英2+150。Trip7另验Lv5与12章。图中返回Trip5仅审阅导航，长途票用途为Trip6–7。",
+    "needs": [
+      [
+        "Permit",
+        1,
+        1,
+        "i-passport"
+      ],
+      [
+        "Hardwood",
+        2,
+        2,
+        "i-wood"
+      ],
+      [
+        "Quartz",
+        2,
+        2,
+        "i-stone"
+      ],
+      [
+        "Coins",
+        430,
+        150,
+        "i-coin"
+      ]
+    ],
+    "coins": 430,
+    "foot": "For Trip 6–7 · one ticket per departure"
+  },
+  {
+    "id": "SECOND-HOME",
+    "title": "第二故乡 · 七日锁",
+    "heading": "Make Tokyo a Second Home?",
+    "meta": "Regular · 5 visits · 3 local trades",
+    "rows": [
+      [
+        "Free travel, no Day Pass needed",
+        "One slot stays assigned for 7 days.",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Set Second Home",
+        "SECOND-HOME-DONE"
+      ],
+      [
+        "Not now",
+        "PASS-2",
+        "soft"
+      ]
+    ],
+    "note": "常客+对应档印章/Homestead+空槽全部校验；设定后7天不能释放或换城。",
+    "scene": "map"
+  },
+  {
+    "id": "SECOND-HOME-DONE",
+    "title": "第二故乡 · 永久痕迹",
+    "heading": "Tokyo · Second Home",
+    "meta": "Slot 1/3 · Change available in 6d 23h",
+    "rows": [
+      [
+        "Home crest added",
+        "Travel stays free.",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Travel free",
+        "MAP-5-FREE"
+      ]
+    ],
+    "note": "已探索全彩叠家徽描边；到期只是允许更换，不自动失效。",
+    "scene": "map"
+  },
+  {
+    "id": "SOC-1",
+    "title": "关系 · 四级入口",
+    "heading": "Friends",
+    "meta": "Following · Mutual · Close Friends",
+    "rows": [
+      [
+        "Mia · Mutual",
+        "2/3 interactions this week",
+        "i-face-player"
+      ],
+      [
+        "Alex · Close Friend",
+        "Shanghai · online",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Mia’s profile",
+        "SOC-1-GATE"
+      ]
+    ],
+    "note": "延续PROFILE-2，无新社交头像体系；昵称公开为基线待拍板，设计用示例名字。"
+  },
+  {
+    "id": "SOC-1-GATE",
+    "title": "密友门槛",
+    "heading": "Mia · Mutual",
+    "meta": "Close Friend slots 2/3",
+    "rows": [
+      [
+        "1 more interaction this week",
+        "Visit, gift, help or fish together.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "1 more interaction",
+        null,
+        "disabled"
+      ],
+      [
+        "View progress after interaction",
+        "SOC-1-CONFIRM",
+        "soft"
+      ]
+    ],
+    "note": "每对每日最多3次、近7天≥3，双方空槽且接收方确认。此进度按钮仅分镜链接，非一键增加关系。"
+  },
+  {
+    "id": "SOC-1-CONFIRM",
+    "title": "密友 · 接收方确认",
+    "heading": "Mia wants to be close friends",
+    "meta": "3 interactions in the last 7 days",
+    "rows": [
+      [
+        "Close Friend slots 2/3",
+        "Both of you need a free slot.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Accept",
+        "SOC-2"
+      ],
+      [
+        "Not now",
+        "SOC-1",
+        "soft"
+      ]
+    ],
+    "note": "Inbox To do接受才建立，任一方取消或取关可解除，不自动过期。"
+  },
+  {
+    "id": "SOC-2",
+    "title": "客票 · 主人邀请",
+    "heading": "Invite Mia over",
+    "meta": "Guest Pass · 20 Energy for Mia",
+    "rows": [
+      [
+        "You are home and online",
+        "Invites today 1/5 · same pair 0/1",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Send invitation",
+        "SOC-2-INBOX"
+      ]
+    ],
+    "note": "主人在家城实时房间；发送与接受双检。此只是设计原型按钮，不发送真实消息。"
+  },
+  {
+    "id": "SOC-2-INBOX",
+    "title": "客票 · 接收预览",
+    "heading": "Mia invites you to Tokyo",
+    "meta": "Expires in 28:40",
+    "rows": [
+      [
+        "20 Energy · 0 coins · instant",
+        "No permit or stamp requirement",
+        "i-travel"
+      ],
+      [
+        "Guest passes today 0/2",
+        "You arrive in Mia’s current room.",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Accept · 20 Energy",
+        "SOC-2-ARRIVE"
+      ],
+      [
+        "Decline",
+        "SOC-1",
+        "soft"
+      ]
+    ],
+    "note": "Trip5一半20，客票价格不是折扣；到达+min(10,已付体力)，不发首访礼。"
+  },
+  {
+    "id": "SOC-2-ARRIVE",
+    "title": "客票 · 到达主人房间",
+    "heading": "Welcome to Tokyo",
+    "meta": "Guest of Mia · +10 Energy",
+    "rows": [
+      [
+        "Guest Pass · 24h",
+        "Return home is always free.",
+        "i-passport"
+      ]
+    ],
+    "actions": [
+      [
+        "Visit farm together",
+        "SOC-3"
+      ]
+    ],
+    "note": "从142扣20加10=132；主人所在房间不是城市概览。",
+    "city": "Tokyo",
+    "place": "Mia’s farm",
+    "energy": 132
+  },
+  {
+    "id": "SOC-2-ERROR",
+    "title": "客票失效 · 不扣费",
+    "heading": "Host isn’t home right now",
+    "meta": "Your invitation has not been used.",
+    "rows": [
+      [
+        "Try again while Mia is home and online",
+        "Invitation expires in 12:20",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Try again",
+        "SOC-2-INBOX",
+        "soft"
+      ],
+      [
+        "Close",
+        "SOC-1",
+        "soft"
+      ]
+    ],
+    "note": "还要覆盖30min到期、Close Friends only、客人2/2和体力不足；全部先验不扣费。"
+  },
+  {
+    "id": "SOC-3",
+    "title": "帮工 · 自动轮授权",
+    "heading": "Helpers",
+    "meta": "Homestead Lv4 · Helpers 1/2",
+    "rows": [
+      [
+        "Mia · Mutual",
+        "Water: On · Harvest: On",
+        "i-face-player"
+      ],
+      [
+        "Replant: Off",
+        "On-site Close Friends only · their Energy",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Invite as helper",
+        "HELPER-INBOX"
+      ]
+    ],
+    "note": "自动轮只浇水/一年生收获0体力；主人在线跳过。邀请7天有效，双方可撤销。"
+  },
+  {
+    "id": "HELPER-INBOX",
+    "title": "帮工邀请 · 接受",
+    "heading": "Help Alex’s farm?",
+    "meta": "Water + annual harvests",
+    "rows": [
+      [
+        "No Energy used while you are away",
+        "You can help up to 3 farms.",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Accept",
+        "HELPER-SUMMARY"
+      ],
+      [
+        "Not now",
+        "SOC-1",
+        "soft"
+      ]
+    ],
+    "note": "帮工自己接受后生效；每农场每日1轮，主人每农场被帮合计≤60格，帮工金币≤12/日。"
+  },
+  {
+    "id": "HELPER-SUMMARY",
+    "title": "离线帮工 · 小结",
+    "heading": "Mia helped while you were away",
+    "meta": "Watered 9 plots · harvested 6 radishes",
+    "rows": [
+      [
+        "Your crops and harvest XP are yours",
+        "View the marked plots on your farm.",
+        "i-radish"
+      ]
+    ],
+    "actions": [
+      [
+        "View farm",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "已结算只回显；不是用户实账号数据。主人仓库/包裹路径基线有矛盾，保留问题清单。"
+  },
+  {
+    "id": "HELPER-ONSITE",
+    "title": "到场补播 · 谁付体力",
+    "heading": "Replant for Mia",
+    "meta": "Uses your Energy · Mia’s seeds",
+    "rows": [
+      [
+        "Sow ×1 · 2 Energy",
+        "Helper budget 36/40 · host budget 13/15",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Sow ×1 · 2 Energy",
+        "HELPER-BUDGET"
+      ]
+    ],
+    "note": "主人种子、帮工体力；只能用帮工等级可买种子。付费成功才XP给帮工，主人收获不再拿重复XP。"
+  },
+  {
+    "id": "HELPER-BUDGET",
+    "title": "帮工额度 · 阻止超额",
+    "heading": "Replant budget reached",
+    "meta": "Host budget 15/15 today",
+    "rows": [
+      [
+        "Water and harvest are still free",
+        "Your remaining Energy is safe.",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Replant budget reached",
+        null,
+        "disabled"
+      ],
+      [
+        "Back to farm",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "主人预算跨所有帮工15等值，帮工预算跨农场40；不拆多条命令绕过。"
+  },
+  {
+    "id": "SOC-5",
+    "title": "赠礼 · 只鱼与料理",
+    "heading": "Send a gift to Mia",
+    "meta": "Mutual · 1 gift per pair per day",
+    "rows": [
+      [
+        "River Perch ×1 + Herb Grilled Fish ×1",
+        "2 items · 1/3 sent today",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Send gift",
+        "GIFT-SENT"
+      ]
+    ],
+    "note": "选择界面复用Bag图标格与详情卡；不开放种子/材料/金币/鱼饵/门禁物。实际外发只原型不执行。"
+  },
+  {
+    "id": "GIFT-SENT",
+    "title": "赠礼已投递",
+    "heading": "Gift sent",
+    "meta": "Mia can claim it within 24h.",
+    "rows": [
+      [
+        "Unclaimed gifts return to you",
+        "No sale value is created.",
+        "i-bag"
+      ]
+    ],
+    "actions": [
+      [
+        "Done",
+        "SOC-1",
+        "soft"
+      ]
+    ],
+    "note": "发送与领取各计互动；包裹满8件时不挤旧包，赠礼退回发送者。"
+  },
+  {
+    "id": "GIFT-CLAIM",
+    "title": "赠礼领取 · Gifted",
+    "heading": "Gift from Mia",
+    "meta": "23h 40m left · Bag 22/25",
+    "rows": [
+      [
+        "Herb Grilled Fish ×1 · Gifted",
+        "Can eat or give to a Resident",
+        "i-dish-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Claim",
+        "GIFT-DETAIL"
+      ]
+    ],
+    "note": "沿SOC-4/Parcels入口，只一个收件箱。满包Make room，过24h原物退回、不折现。"
+  },
+  {
+    "id": "GIFT-DETAIL",
+    "title": "Gifted · 不可售与继承",
+    "heading": "Herb Grilled Fish · Gifted",
+    "meta": "+45 Energy · Good",
+    "rows": [
+      [
+        "Cannot sell, re-gift or deliver for coins",
+        "Gifted fish makes Gifted dishes.",
+        "i-dish-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Eat · +45 Energy",
+        "HOME-RETURN"
+      ],
+      [
+        "Gift to a Resident",
+        "RESIDENT-TALK",
+        "soft"
+      ]
+    ],
+    "note": "赠礼始终0金币价值；吃按接收者食物上限与同菜递减，非额外无限体力。"
+  },
+  {
+    "id": "SOC-6",
+    "title": "主人三件套",
+    "heading": "Mia’s homestead",
+    "meta": "Open to friends",
+    "rows": [
+      [
+        "Guestbook",
+        "Leave a preset note",
+        "i-home"
+      ],
+      [
+        "Water 3 plots · Free",
+        "Visitors today 0/3",
+        "i-sprout"
+      ],
+      [
+        "Close Friend visit",
+        "Stay 30s · host +10 Energy once today",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Leave a note",
+        "GUESTBOOK"
+      ]
+    ],
+    "note": "来访主人每天最多10；任何访客免费浇3；不给访客田产，真实玩家范围。"
+  },
+  {
+    "id": "GUESTBOOK",
+    "title": "留言板 · 预设短句",
+    "heading": "Leave a note",
+    "meta": "Choose a message",
+    "rows": [
+      [
+        "Nice farm!",
+        "",
+        "i-home"
+      ],
+      [
+        "Thanks for the fish!",
+        "",
+        "i-fish"
+      ],
+      [
+        "Come visit mine!",
+        "",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Post selected note",
+        "SOC-6"
+      ]
+    ],
+    "note": "不是自由文本；最近20条，主人可删/拉黑，关注以上才能留言。"
+  },
+  {
+    "id": "TOGETHER",
+    "title": "共做委托 · 同场加入",
+    "heading": "Together · Pond supper",
+    "meta": "2 of 6 players · 8:42 to gather",
+    "rows": [
+      [
+        "Every player contributes at least 1 item",
+        "Everyone earns the full reward.",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Join",
+        "TOGETHER-PROGRESS"
+      ]
+    ],
+    "note": "同一实时据点2–6人，需求ceil(单人量×人数×0.8)；每日参与1份。10分钟不足转发起人单人。"
+  },
+  {
+    "id": "TOGETHER-PROGRESS",
+    "title": "共做进度 · 交付",
+    "heading": "Pond supper · Together",
+    "meta": "Mia + Alex · Same Market Square",
+    "rows": [
+      [
+        "Your contribution 1 item",
+        "Shared progress updates for everyone.",
+        "i-check"
+      ]
+    ],
+    "actions": [
+      [
+        "Deliver selected fish",
+        "TOGETHER-DONE"
+      ]
+    ],
+    "note": "奖励/物品原子结算，需求随确定人数计算。此样例不虚构主方案未定模板量。"
+  },
+  {
+    "id": "TOGETHER-DONE",
+    "title": "共做 · 完成与超时",
+    "heading": "Request complete",
+    "meta": "Everyone contributed",
+    "rows": [
+      [
+        "Your full reward is ready",
+        "Your participation today: 1/1",
+        "i-check"
+      ]
+    ],
+    "actions": [
+      [
+        "Return to the board",
+        "SOC-6",
+        "soft"
+      ]
+    ],
+    "note": "超时则发起人单人单，退离队物品/人数变动的锁定时点列待定。"
+  },
+  {
+    "id": "EXPAND-4",
+    "title": "烹饪扩展 · 第四槽",
+    "heading": "Four ingredients",
+    "meta": "Cooking expansion · 4 slots",
+    "rows": [
+      [
+        "Homestead Feast",
+        "Signature · 60 s · 2 heat moments",
+        "i-pot"
+      ]
+    ],
+    "actions": [
+      [
+        "Preview 4-slot recipe",
+        "EXPAND-RECIPES"
+      ]
+    ],
+    "note": "4槽解锁具体等级未定（Lv11–15或Master）；不擅自写Lv11。材料明细未定，UI先画槽位与状态。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "EXPAND-5",
+    "title": "烹饪扩展 · 第五槽",
+    "heading": "Five ingredients",
+    "meta": "Cooking expansion · 5 slots",
+    "rows": [
+      [
+        "World Platter",
+        "Feast · 90 s · 3 heat moments",
+        "i-pot"
+      ],
+      [
+        "3 climates across 3 ingredient families",
+        "Base 2 portions · Perfect 3",
+        "i-map"
+      ]
+    ],
+    "actions": [
+      [
+        "Preview 5-slot recipe",
+        "EXPAND-RECIPES"
+      ]
+    ],
+    "note": "5槽不能降匹配3槽，重复原料不能偷触发跨带；回复70不变，首做120。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "EXPAND-RECIPES",
+    "title": "8页扩展与器具",
+    "heading": "Cookbook · 48 → 56",
+    "meta": "Signature / Feast",
+    "rows": [
+      [
+        "Homestead Feast · Two-Seas Grill",
+        "Two-Zone Stew · North-South Soup",
+        "i-cookbook"
+      ],
+      [
+        "Beet & Yam Cakes · World Platter",
+        "Four-Zone Hotpot · Passport Pie",
+        "i-cookbook"
+      ],
+      [
+        "Ferment Jar / Jelly Mold",
+        "Wall tools · never use ingredient slots",
+        "i-pot"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to kitchen",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "8页原料配方与器具工作台配方待定；进口食材箱可选，不在未拍板时加必经商店。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "TRADER",
+    "title": "旅行商人 · 本周路线",
+    "heading": "Mira’s route",
+    "meta": "This week · Tokyo",
+    "rows": [
+      [
+        "One specialty from another climate",
+        "Next city announced on Monday",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "Show Travel Post",
+        "LOCAL-SHOP",
+        "soft"
+      ]
+    ],
+    "note": "全服周路线、人口加权且月内至少1非大城；显示实际路由，不凭空承诺当地售卖清单。",
+    "scene": "travel-post"
+  },
+  {
+    "id": "BUFF-FARM",
+    "title": "丰收手感",
+    "heading": "Harvest Focus",
+    "meta": "Legendary dish · one food Buff",
+    "rows": [
+      [
+        "Harvest XP +20%",
+        "2h / 3h / 4h · Plain / Good / Perfect",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Eat and apply",
+        "BUFF-REPLACE"
+      ]
+    ],
+    "note": "§7.4.2白名单；不改任何体力单价、不改产量。食物本身按现行回复/递减，此页说明Buff。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "BUFF-FISH",
+    "title": "钓手专注",
+    "heading": "Angler Focus",
+    "meta": "Legendary dish · one food Buff",
+    "rows": [
+      [
+        "Fishing XP +20%",
+        "2h / 3h / 4h · Plain / Good / Perfect",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "View current food Buff",
+        "BUFF-REPLACE",
+        "soft"
+      ]
+    ],
+    "note": "§7.4.2白名单；不改任何体力单价、不改产量。食物本身按现行回复/递减，此页说明Buff。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "BUFF-HANDS",
+    "title": "稳手",
+    "heading": "Steady Hands",
+    "meta": "Legendary dish · one food Buff",
+    "rows": [
+      [
+        "Bite window +0.3 s",
+        "10 / 15 / 20 casts · Plain / Good / Perfect",
+        "i-rod"
+      ]
+    ],
+    "actions": [
+      [
+        "View current food Buff",
+        "BUFF-REPLACE",
+        "soft"
+      ]
+    ],
+    "note": "§7.4.2白名单；不改任何体力单价、不改产量。食物本身按现行回复/递减，此页说明Buff。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "BUFF-TRAVEL",
+    "title": "路粮",
+    "heading": "Travel Rations",
+    "meta": "Legendary dish · one food Buff",
+    "rows": [
+      [
+        "Next Trip 3–7 time −20%",
+        "Use within 24h · all qualities",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "View current food Buff",
+        "BUFF-REPLACE",
+        "soft"
+      ]
+    ],
+    "note": "§7.4.2白名单；不改任何体力单价、不改产量。食物本身按现行回复/递减，此页说明Buff。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "BUFF-CREEL",
+    "title": "宽篓",
+    "heading": "Roomy Creel",
+    "meta": "Legendary dish · one food Buff",
+    "rows": [
+      [
+        "Temporary creel +2 slots",
+        "2h / 3h / 4h · Plain / Good / Perfect",
+        "i-bag"
+      ]
+    ],
+    "actions": [
+      [
+        "View current food Buff",
+        "BUFF-REPLACE",
+        "soft"
+      ]
+    ],
+    "note": "§7.4.2白名单；不改任何体力单价、不改产量。食物本身按现行回复/递减，此页说明Buff。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "BUFF-REPLACE",
+    "title": "新Buff · 替换确认",
+    "heading": "Replace your food Buff?",
+    "meta": "Only one food Buff at a time",
+    "rows": [
+      [
+        "Current · Angler Focus",
+        "1h 42m remaining will end",
+        "i-fish"
+      ],
+      [
+        "New · Harvest Focus",
+        "Good · 3h · Harvest XP +20%",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Replace and eat",
+        "BUFF-ACTIVE"
+      ],
+      [
+        "Keep current Buff",
+        "BUFF-FISH",
+        "soft"
+      ]
+    ],
+    "note": "确认前不吃、不扣菜；Cancel保留旧Buff与菜，新吃的替换旧的，不叠时长。"
+  },
+  {
+    "id": "BUFF-ACTIVE",
+    "title": "HUD · 剩余时间",
+    "heading": "Harvest Focus",
+    "meta": "Active · 2h 59m left",
+    "rows": [
+      [
+        "Harvest XP +20%",
+        "Energy prices and harvest amounts stay the same.",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to farming",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "HUD单个Buff胶囊+图标，点开详情。不能用Newcomer祝福混占料理Buff槽；计时离线是否继续见问题清单。",
+    "tag": "Harvest Focus · 2h 59m"
+  },
+  {
+    "id": "BUFF-CASTS",
+    "title": "HUD · 剩余抛竿次数",
+    "heading": "Steady Hands",
+    "meta": "1 cast left",
+    "rows": [
+      [
+        "Bite window +0.3 s",
+        "One count used by each cast",
+        "i-rod"
+      ]
+    ],
+    "actions": [
+      [
+        "Cast · 5 Energy",
+        "BUFF-LAST"
+      ]
+    ],
+    "note": "次数从抛竿扣，失败退款是否退Buff次数基线未定义，先标待定不自动补次数。",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "tag": "Steady Hands · 1 cast"
+  },
+  {
+    "id": "BUFF-LAST",
+    "title": "最后一次与失效反馈",
+    "heading": "Steady Hands ended",
+    "meta": "Your last boosted cast is complete.",
+    "rows": [
+      [
+        "Bite window back to normal",
+        "Your rod keeps its own bonuses.",
+        "i-rod"
+      ]
+    ],
+    "actions": [
+      [
+        "Continue fishing",
+        "LOCAL-FISH",
+        "soft"
+      ]
+    ],
+    "note": "轻量飘字，不强制弹窗中断收线；HUD清除Buff，不改鱼竿能力。",
+    "scene": "pond",
+    "place": "Willow Pond"
+  },
+  {
+    "id": "BUFF-TIMEOUT",
+    "title": "时间到期",
+    "heading": "Harvest Focus ended",
+    "meta": "Harvest XP is back to normal.",
+    "rows": [
+      [
+        "Your crops are still growing",
+        "No crops or Energy were removed.",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Continue",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "时间型到期移除胶囊，单次反馈；前后台一致，具体时钟口径待产品统一。"
+  },
+  {
+    "id": "BUFF-RATIONS-USE",
+    "title": "路粮 · 出发消耗",
+    "heading": "Travel Rations applied",
+    "meta": "Tokyo · Trip 5 · 10 min → 8 min",
+    "rows": [
+      [
+        "20% shorter travel time",
+        "Energy, coins and permits are unchanged.",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "Fly · 40 Energy · 200 coins",
+        "MAP-5-PAID"
+      ]
+    ],
+    "note": "下一次Trip3–7减时向下取整到分钟；24h内使用。取消退款是否返还路粮效果未定义，需补规则。",
+    "scene": "map"
+  },
+  {
+    "id": "BUFF-CREEL-END",
+    "title": "宽篓结束 · 满容量恢复",
+    "heading": "Roomy Creel ended",
+    "meta": "Your fish are safe.",
+    "rows": [
+      [
+        "Make room before casting again",
+        "Your existing fish stay with you.",
+        "i-bag"
+      ]
+    ],
+    "actions": [
+      [
+        "Open bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "基线未定义临时2格过期而占用时的去向。本卡保鱼/阻新增为待审安全方案，不能伪称已定；不丢弃、不挤包裹。",
+    "scene": "pond",
+    "place": "Willow Pond"
+  },
+  {
+    "id": "HOME-LV4",
+    "title": "农场Lv4 · 可见后果",
+    "heading": "Second Stove",
+    "meta": "230 Energy · 320 plots",
+    "rows": [
+      [
+        "Two dishes at once",
+        "Homestead Lv4",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View kitchen",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 230,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "HOME-LV5",
+    "title": "农场Lv5 · 可见后果",
+    "heading": "Notice Board + porch",
+    "meta": "240 Energy · 360 plots",
+    "rows": [
+      [
+        "A place for visitors",
+        "Homestead Lv5",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View farm",
+        "FAC-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 240,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "HOME-LV6",
+    "title": "农场Lv6 · 可见后果",
+    "heading": "Big Pot · Double",
+    "meta": "250 Energy · Bag Upgrade II available",
+    "rows": [
+      [
+        "Two portions per cook",
+        "Homestead Lv6",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View kitchen",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 250,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "HOME-LV7",
+    "title": "农场Lv7 · 可见后果",
+    "heading": "Orchard 8/8 · Sprinklers 10/10",
+    "meta": "260 Energy · 450 plots",
+    "rows": [
+      [
+        "Your growing space reaches new limits",
+        "Homestead Lv7",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View farm",
+        "FAC-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 260,
+    "scene": "farm-orchard"
+  },
+  {
+    "id": "HOME-LV8",
+    "title": "农场Lv8 · 可见后果",
+    "heading": "Third Stove · cabinet 12",
+    "meta": "270 Energy · 500 plots",
+    "rows": [
+      [
+        "A bigger kitchen and refreshed stall",
+        "Homestead Lv8",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View kitchen",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 270,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "HOME-LV9",
+    "title": "农场Lv9 · 可见后果",
+    "heading": "Bag Upgrade III available",
+    "meta": "280 Energy · 550 plots",
+    "rows": [
+      [
+        "40 slots after purchase",
+        "Homestead Lv9",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View farm",
+        "FAC-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 280,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "HOME-LV10",
+    "title": "农场Lv10 · 可见后果",
+    "heading": "Homestead Master",
+    "meta": "290 Energy · 600 plots",
+    "rows": [
+      [
+        "Chef’s Sign · gold collection frame",
+        "Homestead Lv10",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "View kitchen",
+        "COOK-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "§8.3逐级后果稿。高等级农舍外观为模块示意，沿既有farm-lv3并标出门廊/灶房/招牌；不冒充新3D生产资产。",
+    "capacity": 290,
+    "scene": "farm-lv3"
+  },
+  {
+    "id": "MINE-3",
+    "title": "第三层 · 行动选择",
+    "heading": "Mine · Floor 3",
+    "meta": "6 rocks · 1 Slime",
+    "rows": [
+      [
+        "Mining · 2 Energy per rock",
+        "Combat · Attack · no Energy",
+        "i-pickaxe"
+      ]
+    ],
+    "actions": [
+      [
+        "Switch to Combat",
+        "COMBAT-1"
+      ]
+    ],
+    "note": "3层首次到达仍Mining；怪可不打，下层看6岩全碎。玩家主动切Combat；上层已清才能付2到新层。",
+    "scene": "mine",
+    "place": "Mine · Floor 3"
+  },
+  {
+    "id": "COMBAT-1",
+    "title": "Combat · 武器与HP",
+    "heading": "Wooden Sword · Attack 3",
+    "meta": "HP · 70%",
+    "rows": [
+      [
+        "Attack · no Energy used",
+        "Move to avoid the Slime’s leap.",
+        "i-sword"
+      ]
+    ],
+    "actions": [
+      [
+        "Attack",
+        "COMBAT-LOOT"
+      ],
+      [
+        "Use Healing Potion",
+        "COMBAT-HEAL",
+        "soft"
+      ]
+    ],
+    "note": "主行动键剑徽标Attack，Combat快捷栏仅药水；木剑史莱姆3击/精英12击，镐不参与。此为状态截帧不模拟实时战斗。",
+    "scene": "mine",
+    "place": "Mine · Floor 3"
+  },
+  {
+    "id": "COMBAT-LOOT",
+    "title": "击败 · 材料掉落",
+    "heading": "Slime defeated",
+    "meta": "No Energy used · no skill XP",
+    "rows": [
+      [
+        "Copper Ore ×1",
+        "Added to your materials",
+        "i-copper"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to Mining",
+        "MINE-4",
+        "soft"
+      ]
+    ],
+    "note": "随机示例非必掉铜；35铜/25盐/40蚯蚓。种子/亮片/Rare装备不进此掉落池。",
+    "scene": "mine",
+    "place": "Mine · Floor 3"
+  },
+  {
+    "id": "COMBAT-HEAL",
+    "title": "药水 · 只回HP",
+    "heading": "HP restored",
+    "meta": "Healing Potion ×1 used",
+    "rows": [
+      [
+        "Your Energy is unchanged",
+        "Meals recover Energy, not HP.",
+        "i-energy"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to Combat",
+        "COMBAT-1",
+        "soft"
+      ]
+    ],
+    "note": "药水只3–5层，HP满不消耗；治疗0体力。药水购买来源在据点，非工作台。",
+    "scene": "mine",
+    "place": "Mine · Floor 3"
+  },
+  {
+    "id": "MINE-4",
+    "title": "第四层 · 清层与Express",
+    "heading": "Floor 4 cleared",
+    "meta": "6/6 rocks · Elevator stop",
+    "rows": [
+      [
+        "Express unlocked",
+        "Floor 5 · Express · Free",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "Floor 5 · Express · Free",
+        "MINE-5"
+      ],
+      [
+        "Entrance · Free",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "曾清4层账号级解锁Express，整程0，不另收第5层层费；当日两局上限仍生效。",
+    "scene": "mine",
+    "place": "Mine · Floor 4"
+  },
+  {
+    "id": "MINE-5",
+    "title": "精英与石英日限",
+    "heading": "Elite Slime defeated",
+    "meta": "Run complete",
+    "rows": [
+      [
+        "Quartz ×2",
+        "Quartz reward available once per day",
+        "i-stone"
+      ]
+    ],
+    "actions": [
+      [
+        "Return to entrance",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "精英20%掉2石英示例，已掉过时权重转铜/盐/蚯蚓。不是每日保证石英；Express不绕过日限。",
+    "scene": "mine",
+    "place": "Mine · Floor 5"
+  },
+  {
+    "id": "MINE-KO",
+    "title": "被击倒 · 可恢复",
+    "heading": "Back at the mine entrance",
+    "meta": "Your current run is saved.",
+    "rows": [
+      [
+        "HP restored",
+        "Stored materials stay yours.",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Continue run · Free",
+        "MINE-3"
+      ],
+      [
+        "Go home · Free",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "此为击倒恢复独立状态，不能把精英Run complete链到Continue；精英完成入口应新局。正式连线拆开检查。",
+    "scene": "farm"
+  },
+  {
+    "id": "RESIDENT-TALK",
+    "title": "居民 · 对话与好感",
+    "heading": "Hana · Café Owner",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "A warm meal for a busy day",
+        "I have something fresh for you.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Chat",
+        "RESIDENT-CHAT"
+      ],
+      [
+        "Today’s meal",
+        "RESIDENT-MEAL",
+        "soft"
+      ],
+      [
+        "Learn a recipe",
+        "RESIDENT-TEACH",
+        "soft"
+      ]
+    ],
+    "note": "角色NPC跟岗位掌柜分开：角色谈话不直接商业Trade。熟悉45–89，赠餐全居民合计每日1份。",
+    "scene": "tea-house",
+    "place": "Tea House"
+  },
+  {
+    "id": "RESIDENT-CHAT",
+    "title": "每日首谈 · 好感",
+    "heading": "Good to see you again",
+    "meta": "Hana · +2 friendship",
+    "rows": [
+      [
+        "Today’s first conversation",
+        "Friendship follows Hana across cities.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Back",
+        "RESIDENT-TALK",
+        "soft"
+      ]
+    ],
+    "note": "每日首谈每角色一次；跨城不会再次领。角色外观不随城市变，岗位掌柜才气候换装。",
+    "scene": "tea-house",
+    "place": "Tea House"
+  },
+  {
+    "id": "RESIDENT-MEAL",
+    "title": "居民赠餐 · 日额度",
+    "heading": "Veggie Plate",
+    "meta": "Today’s Resident meal · 0/1",
+    "rows": [
+      [
+        "Common · +20 Energy",
+        "Sent to your Warming Cabinet when available",
+        "i-dish-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Accept meal",
+        "RESIDENT-MEAL-DONE"
+      ]
+    ],
+    "note": "熟悉起所有居民共享每日1份。无柜/柜满的去向按容量规则保持，不把赠餐绕成无限。",
+    "scene": "tea-house",
+    "place": "Tea House"
+  },
+  {
+    "id": "RESIDENT-MEAL-DONE",
+    "title": "赠餐领取后",
+    "heading": "Enjoy your meal",
+    "meta": "Resident meal today 1/1",
+    "rows": [
+      [
+        "A new meal tomorrow",
+        "Other Residents share today’s allowance.",
+        "i-clock"
+      ]
+    ],
+    "actions": [
+      [
+        "Done",
+        "RESIDENT-TALK",
+        "soft"
+      ]
+    ],
+    "note": "完成后任何居民均显示已领，不依城市/据点多发。",
+    "scene": "tea-house",
+    "place": "Tea House"
+  },
+  {
+    "id": "RESIDENT-TEACH",
+    "title": "教学配方 · Tasted",
+    "heading": "A recipe from Hana",
+    "meta": "Learned · Tasted",
+    "rows": [
+      [
+        "Ingredients and name revealed",
+        "Cook it yourself to discover it and earn first-cook XP.",
+        "i-cookbook"
+      ]
+    ],
+    "actions": [
+      [
+        "View Cookbook",
+        "DEX-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "教学不直接Discovered、不发首做XP；居民具体菜池见§9/7.16，不自定未定配方奖励。",
+    "scene": "tea-house",
+    "place": "Tea House"
+  },
+  {
+    "id": "RES-PIP",
+    "title": "Pip · 居民内容卡",
+    "heading": "Pip · Courier Kid",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Dessert",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "travel-post",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-GRANNY",
+    "title": "Granny Wu · 居民内容卡",
+    "heading": "Granny Wu · Campfire Elder",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Soup",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "trading-post",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-MIRA",
+    "title": "Mira · 居民内容卡",
+    "heading": "Mira · Travelling Trader",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Rare or better",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "travel-post",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-KAI",
+    "title": "Old Kai · 居民内容卡",
+    "heading": "Old Kai · Harbour Elder",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Grilled",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "tackle-shop",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-RAFA",
+    "title": "Rafa · 居民内容卡",
+    "heading": "Rafa · Ferryman",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Soup",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "tackle-shop",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-IVO",
+    "title": "Ivo · 居民内容卡",
+    "heading": "Ivo · Old Miner",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Grilled",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "mine",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-HANA",
+    "title": "Hana · 居民内容卡",
+    "heading": "Hana · Café Owner",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Fine or better",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "tea-house",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-SAM",
+    "title": "Sam · 居民内容卡",
+    "heading": "Sam · Station Master",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Grilled",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "travel-post",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-LENA",
+    "title": "Lena · 居民内容卡",
+    "heading": "Lena · Lighthouse Keeper",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Tea",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "tea-house",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-TOMO",
+    "title": "Tomo · 居民内容卡",
+    "heading": "Tomo · Curator",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Rare or better",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "market-square-v2",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-THEO",
+    "title": "Theo · 居民内容卡",
+    "heading": "Theo · Gardener",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Salad",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "market-square-v2",
+    "place": "Outpost"
+  },
+  {
+    "id": "RES-NADIA",
+    "title": "Nadia · 居民内容卡",
+    "heading": "Nadia · Market Baker",
+    "meta": "Familiar · 52/90",
+    "rows": [
+      [
+        "Favorite style: Stew",
+        "Learn more as friendship grows.",
+        "i-face-player"
+      ]
+    ],
+    "actions": [
+      [
+        "Talk",
+        "RESIDENT-TALK"
+      ],
+      [
+        "Give a dish",
+        "GIFT-DETAIL",
+        "soft"
+      ]
+    ],
+    "note": "12居民名册§9.4。角色职业/喜好与住址分流独立登记；人物候选外观见内容资产区，不以此共用头像计完整立绘。",
+    "scene": "market-square-v2",
+    "place": "Outpost"
+  },
+  {
+    "id": "DEX-MILESTONE",
+    "title": "图鉴里程碑 · 领取后果",
+    "heading": "Fish-dex · 10/20",
+    "meta": "Milestone reached",
+    "rows": [
+      [
+        "+30 Energy · +100 coins",
+        "One-time collection reward",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "Continue",
+        "DEX-P1-2",
+        "soft"
+      ]
+    ],
+    "note": "20种时+50体力+300金币+完成徽记。被动物品奖励满包入Parcels，币/体力直接到账。",
+    "scene": "pond"
+  },
+  {
+    "id": "COOK-MILESTONE",
+    "title": "Cookbook · 四级痕迹",
+    "heading": "Home Cook · 8/48",
+    "meta": "+50 Energy",
+    "rows": [
+      [
+        "20 pages · Line Cook",
+        "100 coins + Cookbook Shelf",
+        "i-cookbook"
+      ],
+      [
+        "36 pages · Head Chef",
+        "Warming Cabinet +4 slots",
+        "i-pot"
+      ],
+      [
+        "48 pages · Master Chef",
+        "Gold Cookbook + farm title",
+        "i-home"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to Cookbook",
+        "DEX-P1-1",
+        "soft"
+      ]
+    ],
+    "note": "Mastered10另称号Muscle Memory。P2扩56页按9/22/42/56，不能沿旧8门槛混用。",
+    "scene": "kitchen",
+    "place": "Kitchen"
+  }
+]

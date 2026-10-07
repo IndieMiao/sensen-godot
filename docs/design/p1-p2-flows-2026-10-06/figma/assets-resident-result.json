@@ -1,0 +1,115 @@
+{
+  "createdNodeIdsFile": "asset-node-ids.json",
+  "assets": [
+    {
+      "id": "res_pip",
+      "name": "Pip",
+      "category": "resident",
+      "componentId": "443:11361",
+      "specimenId": "443:11362",
+      "instanceId": "443:11364",
+      "source": "new native portrait draft; not a 3D character model"
+    },
+    {
+      "id": "res_granny_wu",
+      "name": "Granny Wu",
+      "category": "resident",
+      "componentId": "443:11387",
+      "specimenId": "443:11388",
+      "instanceId": "443:11390",
+      "source": "new native portrait draft; not a 3D character model"
+    },
+    {
+      "id": "res_mira",
+      "name": "Mira",
+      "category": "resident",
+      "componentId": "443:11411",
+      "specimenId": "443:11412",
+      "instanceId": "443:11414",
+      "source": "new native portrait draft; not a 3D character model"
+    },
+    {
+      "id": "res_old_kai",
+      "name": "Old Kai",
+      "category": "resident",
+      "componentId": "443:11434",
+      "specimenId": "443:11435",
+      "instanceId": "443:11437",
+      "source": "new native portrait draft; not a 3D character model"
+    },
+    {
+      "id": "res_rafa",
+      "name": "Rafa",
+      "category": "resident",
+      "componentId": "443:11457",
+      "specimenId": "443:11458",
+      "instanceId": "443:11460",
+      "source": "new native portrait draft; not a 3D character model"
+    },
+    {
+      "id": "res_ivo",
+      "name": "Ivo",
+      "category": "resident",
+      "componentId": "443:11481",
+      "specimenId": "443:11482",
+      "instanceId": "443:11484",
+      "source": "new native portrait draft; not a 3D character model"
+    },
+    {
+      "id": "res_hana",
+      "name": "Hana",
+      "category": "resident",
+      "componentId": "443:11505",
+      "specimenId": "443:11506",
+      "instanceId": "443:11508",
+      "source": "new native portrait draft; not a 3D character model"
+    },
+    {
+      "id": "res_sam",
+      "name": "Sam",
+      "category": "resident",
+      "componentId": "443:11528",
+      "specimenId": "443:11529",
+      "instanceId": "443:11531",
+      "source": "new native portrait draft; not a 3D character model"
+    },
+    {
+      "id": "res_lena",
+      "name": "Lena",
+      "category": "resident",
+      "componentId": "443:11551",
+      "specimenId": "443:11552",
+      "instanceId": "443:11554",
+      "source": "new native portrait draft; not a 3D character model"
+    },
+    {
+      "id": "res_tomo",
+      "name": "Tomo",
+      "category": "resident",
+      "componentId": "443:11575",
+      "specimenId": "443:11576",
+      "instanceId": "443:11578",
+      "source": "new native portrait draft; not a 3D character model"
+    },
+    {
+      "id": "res_theo",
+      "name": "Theo",
+      "category": "resident",
+      "componentId": "443:11599",
+      "specimenId": "443:11600",
+      "instanceId": "443:11602",
+      "source": "new native portrait draft; not a 3D character model"
+    },
+    {
+      "id": "res_nadia",
+      "name": "Nadia",
+      "category": "resident",
+      "componentId": "443:11623",
+      "specimenId": "443:11624",
+      "instanceId": "443:11626",
+      "source": "new native portrait draft; not a 3D character model"
+    }
+  ],
+  "count": 12,
+  "group": "12 · 居民头像 / 原型候选"
+}

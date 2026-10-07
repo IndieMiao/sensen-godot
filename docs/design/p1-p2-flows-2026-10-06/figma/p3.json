@@ -1,0 +1,284 @@
+[
+  {
+    "id": "BUFF-FARM",
+    "title": "丰收手感",
+    "heading": "Harvest Focus",
+    "meta": "Legendary dish · one food Buff",
+    "rows": [
+      [
+        "Harvest XP +20%",
+        "2h / 3h / 4h · Plain / Good / Perfect",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Eat and apply",
+        "BUFF-REPLACE"
+      ]
+    ],
+    "note": "§7.4.2白名单；不改任何体力单价、不改产量。食物本身按现行回复/递减，此页说明Buff。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "BUFF-FISH",
+    "title": "钓手专注",
+    "heading": "Angler Focus",
+    "meta": "Legendary dish · one food Buff",
+    "rows": [
+      [
+        "Fishing XP +20%",
+        "2h / 3h / 4h · Plain / Good / Perfect",
+        "i-fish"
+      ]
+    ],
+    "actions": [
+      [
+        "View current food Buff",
+        "BUFF-REPLACE",
+        "soft"
+      ]
+    ],
+    "note": "§7.4.2白名单；不改任何体力单价、不改产量。食物本身按现行回复/递减，此页说明Buff。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "BUFF-HANDS",
+    "title": "稳手",
+    "heading": "Steady Hands",
+    "meta": "Legendary dish · one food Buff",
+    "rows": [
+      [
+        "Bite window +0.3 s",
+        "10 / 15 / 20 casts · Plain / Good / Perfect",
+        "i-rod"
+      ]
+    ],
+    "actions": [
+      [
+        "View current food Buff",
+        "BUFF-REPLACE",
+        "soft"
+      ]
+    ],
+    "note": "§7.4.2白名单；不改任何体力单价、不改产量。食物本身按现行回复/递减，此页说明Buff。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "BUFF-TRAVEL",
+    "title": "路粮",
+    "heading": "Travel Rations",
+    "meta": "Legendary dish · one food Buff",
+    "rows": [
+      [
+        "Next Trip 3–7 time −20%",
+        "Use within 24h · all qualities",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "View current food Buff",
+        "BUFF-REPLACE",
+        "soft"
+      ]
+    ],
+    "note": "§7.4.2白名单；不改任何体力单价、不改产量。食物本身按现行回复/递减，此页说明Buff。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "BUFF-CREEL",
+    "title": "宽篓",
+    "heading": "Roomy Creel",
+    "meta": "Legendary dish · one food Buff",
+    "rows": [
+      [
+        "Temporary creel +2 slots",
+        "2h / 3h / 4h · Plain / Good / Perfect",
+        "i-bag"
+      ]
+    ],
+    "actions": [
+      [
+        "View current food Buff",
+        "BUFF-REPLACE",
+        "soft"
+      ]
+    ],
+    "note": "§7.4.2白名单；不改任何体力单价、不改产量。食物本身按现行回复/递减，此页说明Buff。",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "capacity": 290
+  },
+  {
+    "id": "BUFF-REPLACE",
+    "title": "新Buff · 替换确认",
+    "heading": "Replace your food Buff?",
+    "meta": "Only one food Buff at a time",
+    "rows": [
+      [
+        "Current · Angler Focus",
+        "1h 42m remaining will end",
+        "i-fish"
+      ],
+      [
+        "New · Harvest Focus",
+        "Good · 3h · Harvest XP +20%",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Replace and eat",
+        "BUFF-ACTIVE"
+      ],
+      [
+        "Keep current Buff",
+        "BUFF-FISH",
+        "soft"
+      ]
+    ],
+    "note": "确认前不吃、不扣菜；Cancel保留旧Buff与菜，新吃的替换旧的，不叠时长。"
+  },
+  {
+    "id": "BUFF-ACTIVE",
+    "title": "HUD · 剩余时间",
+    "heading": "Harvest Focus",
+    "meta": "Active · 2h 59m left",
+    "rows": [
+      [
+        "Harvest XP +20%",
+        "Energy prices and harvest amounts stay the same.",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to farming",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "HUD单个Buff胶囊+图标，点开详情。不能用Newcomer祝福混占料理Buff槽；计时离线是否继续见问题清单。",
+    "tag": "Harvest Focus · 2h 59m"
+  },
+  {
+    "id": "BUFF-CASTS",
+    "title": "HUD · 剩余抛竿次数",
+    "heading": "Steady Hands",
+    "meta": "1 cast left",
+    "rows": [
+      [
+        "Bite window +0.3 s",
+        "One count used by each cast",
+        "i-rod"
+      ]
+    ],
+    "actions": [
+      [
+        "Cast · 5 Energy",
+        "BUFF-LAST"
+      ]
+    ],
+    "note": "次数从抛竿扣，失败退款是否退Buff次数基线未定义，先标待定不自动补次数。",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "tag": "Steady Hands · 1 cast"
+  },
+  {
+    "id": "BUFF-LAST",
+    "title": "最后一次与失效反馈",
+    "heading": "Steady Hands ended",
+    "meta": "Your last boosted cast is complete.",
+    "rows": [
+      [
+        "Bite window back to normal",
+        "Your rod keeps its own bonuses.",
+        "i-rod"
+      ]
+    ],
+    "actions": [
+      [
+        "Continue fishing",
+        "LOCAL-FISH",
+        "soft"
+      ]
+    ],
+    "note": "轻量飘字，不强制弹窗中断收线；HUD清除Buff，不改鱼竿能力。",
+    "scene": "pond",
+    "place": "Willow Pond"
+  },
+  {
+    "id": "BUFF-TIMEOUT",
+    "title": "时间到期",
+    "heading": "Harvest Focus ended",
+    "meta": "Harvest XP is back to normal.",
+    "rows": [
+      [
+        "Your crops are still growing",
+        "No crops or Energy were removed.",
+        "i-sprout"
+      ]
+    ],
+    "actions": [
+      [
+        "Continue",
+        "HOME-RETURN",
+        "soft"
+      ]
+    ],
+    "note": "时间型到期移除胶囊，单次反馈；前后台一致，具体时钟口径待产品统一。"
+  },
+  {
+    "id": "BUFF-RATIONS-USE",
+    "title": "路粮 · 出发消耗",
+    "heading": "Travel Rations applied",
+    "meta": "Tokyo · Trip 5 · 10 min → 8 min",
+    "rows": [
+      [
+        "20% shorter travel time",
+        "Energy, coins and permits are unchanged.",
+        "i-travel"
+      ]
+    ],
+    "actions": [
+      [
+        "Fly · 40 Energy · 200 coins",
+        "MAP-5-PAID"
+      ]
+    ],
+    "note": "下一次Trip3–7减时向下取整到分钟；24h内使用。取消退款是否返还路粮效果未定义，需补规则。",
+    "scene": "map"
+  },
+  {
+    "id": "BUFF-CREEL-END",
+    "title": "宽篓结束 · 满容量恢复",
+    "heading": "Roomy Creel ended",
+    "meta": "Your fish are safe.",
+    "rows": [
+      [
+        "Make room before casting again",
+        "Your existing fish stay with you.",
+        "i-bag"
+      ]
+    ],
+    "actions": [
+      [
+        "Open bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "基线未定义临时2格过期而占用时的去向。本卡保鱼/阻新增为待审安全方案，不能伪称已定；不丢弃、不挤包裹。",
+    "scene": "pond",
+    "place": "Willow Pond"
+  }
+]

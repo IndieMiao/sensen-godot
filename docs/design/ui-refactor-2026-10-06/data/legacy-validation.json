@@ -1,0 +1,33 @@
+{
+  "count": 84,
+  "rasterSources": 83,
+  "nativeSourceRevisions": 1,
+  "stateExamples": 96,
+  "allCurrentLegacyIdsMatched": true,
+  "sourceScreenshots": 84,
+  "unresolvedActionTargets": [],
+  "excludedObsolete": [
+    "NPC-G1-5",
+    "EQUIP-1",
+    "COOK-5"
+  ],
+  "groupCounts": {
+    "00": 2,
+    "01": 22,
+    "02": 6,
+    "03": 11,
+    "04": 4,
+    "05": 22,
+    "06": 17
+  },
+  "semanticObjectsChecked": 382,
+  "actionsChecked": 325,
+  "titleValueCollisions": [],
+  "gridPages": 18,
+  "gridCells": 390,
+  "sourceEmptyCells": 137,
+  "quickBarPages": 33,
+  "gearSlots": 6,
+  "specializationCount": 84,
+  "errors": []
+}

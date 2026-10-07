@@ -1,0 +1,58 @@
+{
+  "scope": "Historical rebuilt UI capture before full legacy generation",
+  "legacySourceAudit": {
+    "cards": 84,
+    "status": "source inspected"
+  },
+  "rebuiltVisibleReview": {
+    "cards": 29,
+    "firstBatch": 24,
+    "additional": [
+      "FISH-2",
+      "FISH-3",
+      "FISH-4",
+      "COOK-2a",
+      "COOK-2b"
+    ],
+    "status": "reviewed with defects; not passed"
+  },
+  "unreviewedAtCapture": 55,
+  "unreviewedReason": "Blank scaffolds in rows 04–11, except listed five visible cards. Root later completed them; these historical PNGs are not final evidence.",
+  "rowImages": [
+    "row-04.png",
+    "row-05.png",
+    "row-06.png",
+    "row-07.png",
+    "row-08.png",
+    "row-09.png",
+    "row-10.png",
+    "row-11.png"
+  ],
+  "findings": [
+    {
+      "screens": [
+        "FISH-2"
+      ],
+      "issue": "64% and 100% reference rings rendered 0%; explicit variant properties required.",
+      "preparedFix": "legacy-qa-fixes.js"
+    },
+    {
+      "screens": [
+        "FISH-3",
+        "FISH-4"
+      ],
+      "issue": "Large generic half-screen sheets obscured the source pond and replaced the original local result/creel state.",
+      "preparedFix": "visual-fishing-fixes.js"
+    },
+    {
+      "screens": [
+        "COOK-2a",
+        "COOK-2b"
+      ],
+      "issue": "Wrong camera and y=250 drawer obscure pot; selected recipe stack hides cookbook grid, duplicate XP, known ingredient assets show question marks.",
+      "owner": "normalize_current",
+      "preparedFix": "visual-kitchen-fixes.js"
+    }
+  ],
+  "latestStatus": "Superseded for completion counts by the next final legacy capture; never count blank captures as reviewed designs."
+}

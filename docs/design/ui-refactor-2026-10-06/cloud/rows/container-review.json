@@ -1,0 +1,35 @@
+{
+  "captureScope": "7 native compact container screens after first cloud rebuild",
+  "cardsActuallyOpened": 7,
+  "screenshots": [
+    "container-final-1.png",
+    "container-final-2.png"
+  ],
+  "visualPass": [
+    "BAG-2",
+    "BAG-2-2",
+    "BAG-3",
+    "BAG-4",
+    "BAG-5"
+  ],
+  "followup": [
+    {
+      "id": "BAG-2",
+      "issue": "Visual okay; Starter bite-window source corrected2.0→2.2; Equip result pending."
+    },
+    {
+      "id": "BAG-2-2",
+      "issue": "Visual okay; restore known BagTimber20 and separate warehouse badges; Take results pending."
+    },
+    {
+      "id": "BAG-4-2",
+      "issue": "Two reference cases vertically offset; fixedtop alignment prepared."
+    },
+    {
+      "id": "BAG-5-2",
+      "issue": "Teal hard edge in bottom scene and lowcontrast mailbox label; gradient/pill fixes prepared."
+    }
+  ],
+  "outcomeProof": "../data/legacy-npc-flow-proof.json",
+  "completeInteractionPass": false
+}

@@ -1,0 +1,157 @@
+{
+  "scope": "Actual Figma snapshots after adaptive information-overlay refit",
+  "reviewedFrames": [
+    {
+      "id": "498:2011",
+      "title": "Food Buff",
+      "height": 146
+    },
+    {
+      "id": "508:2942",
+      "title": "Gathering spots",
+      "height": 443
+    },
+    {
+      "id": "540:16314",
+      "title": "Compost",
+      "height": 224
+    },
+    {
+      "id": "655:61182",
+      "title": "Fish Trap",
+      "height": 224
+    },
+    {
+      "id": "727:73293",
+      "title": "Fishing slot",
+      "height": 588,
+      "scrolls": true
+    }
+  ],
+  "passed": true,
+  "checks": [
+    "Header/body/Close now follow content height rather than fixed620px",
+    "Exact redundant Details state hidden;business values and actions preserved",
+    "Long Fishing slot viewport ends at completePricefact;remainingrequirements stay scrollable",
+    "Reuses existing Sheet,ObjectHeader,Fact,NeedTile,Dismiss component instances;no new masters"
+  ],
+  "screenshots": [
+    {
+      "file": "overlay-short-final.png",
+      "sha256": "c92d7ad53a5fea75ea7c9aa7acf2bc6f56b8849346938e6b71ad64c807083278"
+    },
+    {
+      "file": "overlay-long-final.png",
+      "sha256": "fa6780b6e2735291fde576bb06afc2c448494f28d4fcbfbdd8ad50b02980d284"
+    },
+    {
+      "file": "overlay-compost-final.png",
+      "sha256": "af157134a8fee38f62d4722d3374d1cf924e6834120b63f13c742147133a718a"
+    },
+    {
+      "file": "overlay-fish-trap-final.png",
+      "sha256": "9a08a5b5493f2376648e57ea49295d3b594348ce6ff5f0d3e0564b4b0afbf115"
+    },
+    {
+      "file": "overlay-scroll-final.png",
+      "sha256": "5dea2a23818a87ddb47f6e9b150f70827cb6065e4c95b07138aa4238d860ce6c"
+    }
+  ],
+  "deduplication": {
+    "exactDuplicatesRemoved": 138,
+    "firstRound": 135,
+    "secondRound": 3,
+    "remainingExactGroupsAfterRefit": 0,
+    "semanticEqualityCheckedLiveBeforeEachDeletion": true
+  },
+  "refit": {
+    "informationFrames": 576,
+    "reducedFromOriginal620": 576,
+    "heightRange": [
+      115,
+      588
+    ],
+    "scrollingFrames": 1,
+    "reactionFieldPreservation": "9860 node reaction properties compared in initial9batches,including emptyarrays;not a countofactiveactions"
+  },
+  "organization": {
+    "informationFrames": 576,
+    "interactionStateFrames": 99,
+    "feedbackFrames": 60,
+    "total": 735,
+    "sectionIds": [
+      "920:71414",
+      "920:71415",
+      "920:71416"
+    ],
+    "maxColumns": 8,
+    "componentLibraryMoved": false
+  },
+  "prototypeClickTested": false,
+  "finalNativeAudit": {
+    "receipt": "final-overlay-audit-result.json",
+    "counts": {
+      "overlayFrames": 735,
+      "informationFrames": 576,
+      "exactDuplicateGroups": 0,
+      "exactDuplicates": 0,
+      "sparseInformationFrames": 0,
+      "excludedFromDedup": 0,
+      "scannedNodes": 53517,
+      "nodeEdges": 7682,
+      "conditionalActions": 32,
+      "instanceNodes": 10448,
+      "signatureReadFailures": 0,
+      "missingTargets": 0,
+      "reachableOverlays": 735,
+      "unreachableOverlays": 0,
+      "expectedMainScreens": 288,
+      "mainIssues": 0,
+      "brokenInstances": 0,
+      "destinationIssues": 0
+    },
+    "sections": [
+      {
+        "id": "920:71414",
+        "name": "Prototype overlays · Information",
+        "x": 14000,
+        "y": 4628,
+        "width": 3152,
+        "height": 30216,
+        "overlayFrames": 576
+      },
+      {
+        "id": "920:71415",
+        "name": "Prototype overlays · Interaction states",
+        "x": 14000,
+        "y": 34972,
+        "width": 3152,
+        "height": 6548,
+        "overlayFrames": 99
+      },
+      {
+        "id": "920:71416",
+        "name": "Prototype overlays · Feedback",
+        "x": 14000,
+        "y": 41648,
+        "width": 3152,
+        "height": 6936,
+        "overlayFrames": 60
+      }
+    ],
+    "unreachableIds": [],
+    "mainIssues": [],
+    "brokenInstanceIds": [],
+    "destinationIssues": [],
+    "missingTargetIds": [],
+    "exactDuplicateGroups": [],
+    "sparseNonScrollingIds": [],
+    "preservation": {
+      "sectionAwareReachability": true,
+      "conditionalAndInstanceReactionsScanned": true,
+      "styledTextNodeLinksScanned": true,
+      "noWrites": true,
+      "allInformationAndSpecialOverlaysIncluded": true
+    }
+  }
+}

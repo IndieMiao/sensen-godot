@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-06",
+  "basis": "docs/product/gameplay-plan-v2-2026-10-02.md §5.2 line1522",
+  "change": "Shanghai31.2° → Subtropical",
+  "affectedIds": [
+    "TUT-1",
+    "PROFILE-1-P0",
+    "KEEP-P0-2"
+  ],
+  "paths": [
+    "TUT-1.keyFacts[Climate].value",
+    "TUT-1.rows[Shanghai].effect",
+    "TUT-1.disclosure[0]",
+    "PROFILE-1-P0.identity",
+    "PROFILE-1-P0.disclosure[0]",
+    "KEEP-P0-2.identity",
+    "KEEP-P0-2.disclosure[0]"
+  ],
+  "verifiedUnchanged": [
+    "MAP-3-FREE Climate=Temperate (Tokyo)",
+    "TRAVEL-GUIDE Climate=Temperate (Tokyo)",
+    "legacy PROFILE-1 andPROFILE-2 already correctly Subtropical"
+  ],
+  "historicalOriginals": "Preserved; excluded from rendered bundle",
+  "avatarFollowup": "Reprepared by UX and readback-verified: profile identity and Shanghai disclosure are Subtropical.",
+  "bundleSha256": "5265777aefd8088726f9d0c126085f99350d65980b2a2056a28a4da1922b217a",
+  "avatarPayloadSha256": "8acfe8c89f40c1b7ceeadec7027703239949cc63ce9d8365b3d97405130a86cd"
+}

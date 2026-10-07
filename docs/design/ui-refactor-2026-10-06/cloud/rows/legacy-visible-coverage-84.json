@@ -1,0 +1,864 @@
+{
+  "legacyMainCards": 84,
+  "originalSourceCardsInspected": 84,
+  "rebuiltCardsActuallyOpened": 84,
+  "rebuiltCoverageComplete": true,
+  "finalPassingScreenshotsComplete": false,
+  "notACompletionClaim": "All84 rebuilt cards were visually inspected from content-bearing captures. This found defects. Followup repairs and final visual verification remain; do not convert coverage to84/84 passed.",
+  "cards": [
+    {
+      "id": "FARM-1",
+      "index": 0,
+      "row": 1,
+      "evidence": "row-01-a.png",
+      "sha256": "5515938dd0d67f66adeaf608ff479394b8a226ee8432126a7631746925b53956",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "FISH-1",
+      "index": 1,
+      "row": 1,
+      "evidence": "row-01-a.png",
+      "sha256": "5515938dd0d67f66adeaf608ff479394b8a226ee8432126a7631746925b53956",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "COOK-1",
+      "index": 2,
+      "row": 1,
+      "evidence": "row-01-a.png",
+      "sha256": "5515938dd0d67f66adeaf608ff479394b8a226ee8432126a7631746925b53956",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "BAG-1",
+      "index": 3,
+      "row": 1,
+      "evidence": "row-01-a.png",
+      "sha256": "5515938dd0d67f66adeaf608ff479394b8a226ee8432126a7631746925b53956",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "BAG-3",
+      "index": 4,
+      "row": 1,
+      "evidence": "row-01-b.png",
+      "sha256": "512f93294816d56ec2b6832d153348a38cabb8e8425351150c165843d9ec71a7",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "BAG-4",
+      "index": 5,
+      "row": 1,
+      "evidence": "row-01-b.png",
+      "sha256": "512f93294816d56ec2b6832d153348a38cabb8e8425351150c165843d9ec71a7",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "BAG-4-2",
+      "index": 6,
+      "row": 1,
+      "evidence": "row-01-b.png",
+      "sha256": "512f93294816d56ec2b6832d153348a38cabb8e8425351150c165843d9ec71a7",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "BAR-1",
+      "index": 7,
+      "row": 1,
+      "evidence": "row-01-b.png",
+      "sha256": "512f93294816d56ec2b6832d153348a38cabb8e8425351150c165843d9ec71a7",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "BAR-1-2",
+      "index": 8,
+      "row": 2,
+      "evidence": "row-02-a.png",
+      "sha256": "d55a4b65b9871600d4d07d1c13ba4ac180aeafa421be9b92d172702bcc66f1b1",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "BAR-2",
+      "index": 9,
+      "row": 2,
+      "evidence": "row-02-a.png",
+      "sha256": "d55a4b65b9871600d4d07d1c13ba4ac180aeafa421be9b92d172702bcc66f1b1",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "BAR-3",
+      "index": 10,
+      "row": 2,
+      "evidence": "row-02-a.png",
+      "sha256": "d55a4b65b9871600d4d07d1c13ba4ac180aeafa421be9b92d172702bcc66f1b1",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "BAR-3-2",
+      "index": 11,
+      "row": 2,
+      "evidence": "row-02-a.png",
+      "sha256": "d55a4b65b9871600d4d07d1c13ba4ac180aeafa421be9b92d172702bcc66f1b1",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "HUD-3",
+      "index": 12,
+      "row": 2,
+      "evidence": "row-02-b.png",
+      "sha256": "bb68a9347bcf05ae31a8d173cd03fddb639fb0208d12bbc23d63fe593a50387b",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "HUD-4",
+      "index": 13,
+      "row": 2,
+      "evidence": "row-02-b.png",
+      "sha256": "bb68a9347bcf05ae31a8d173cd03fddb639fb0208d12bbc23d63fe593a50387b",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "HUD-1",
+      "index": 14,
+      "row": 2,
+      "evidence": "row-02-b.png",
+      "sha256": "bb68a9347bcf05ae31a8d173cd03fddb639fb0208d12bbc23d63fe593a50387b",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "HUD-1-2",
+      "index": 15,
+      "row": 2,
+      "evidence": "row-02-b.png",
+      "sha256": "bb68a9347bcf05ae31a8d173cd03fddb639fb0208d12bbc23d63fe593a50387b",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "CTRL-1",
+      "index": 16,
+      "row": 3,
+      "evidence": "row-03-a.png",
+      "sha256": "4c70d992fb3e5c361a9267317671567c14e9991cfc6d871e130f98485eb5d063",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "CTRL-1-2",
+      "index": 17,
+      "row": 3,
+      "evidence": "row-03-a.png",
+      "sha256": "4c70d992fb3e5c361a9267317671567c14e9991cfc6d871e130f98485eb5d063",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "FARM-2",
+      "index": 18,
+      "row": 3,
+      "evidence": "row-03-a.png",
+      "sha256": "4c70d992fb3e5c361a9267317671567c14e9991cfc6d871e130f98485eb5d063",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "FARM-3",
+      "index": 19,
+      "row": 3,
+      "evidence": "row-03-a.png",
+      "sha256": "4c70d992fb3e5c361a9267317671567c14e9991cfc6d871e130f98485eb5d063",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "FARM-6",
+      "index": 20,
+      "row": 3,
+      "evidence": "row-03-b.png",
+      "sha256": "804cc6a6d33781a017d45d3d2bd812569e0702fa4dba00e60b20048cc2548c27",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "FARM-6-2",
+      "index": 21,
+      "row": 3,
+      "evidence": "row-03-b.png",
+      "sha256": "804cc6a6d33781a017d45d3d2bd812569e0702fa4dba00e60b20048cc2548c27",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "FARM-7",
+      "index": 22,
+      "row": 3,
+      "evidence": "row-03-b.png",
+      "sha256": "804cc6a6d33781a017d45d3d2bd812569e0702fa4dba00e60b20048cc2548c27",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "FARM-7-2",
+      "index": 23,
+      "row": 3,
+      "evidence": "row-03-b.png",
+      "sha256": "804cc6a6d33781a017d45d3d2bd812569e0702fa4dba00e60b20048cc2548c27",
+      "visibleCardOpened": true,
+      "captureStage": "initial-built-visible",
+      "finalPass": false
+    },
+    {
+      "id": "FISH-2",
+      "index": 24,
+      "row": 4,
+      "evidence": "stable-row-04-1.png",
+      "sha256": "6f43a415f8fadea0b82163368b94aa5c7393e4f60705342f6167147985178ae1",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "FISH-3",
+      "index": 25,
+      "row": 4,
+      "evidence": "stable-row-04-1.png",
+      "sha256": "6f43a415f8fadea0b82163368b94aa5c7393e4f60705342f6167147985178ae1",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "FISH-4",
+      "index": 26,
+      "row": 4,
+      "evidence": "stable-row-04-1.png",
+      "sha256": "6f43a415f8fadea0b82163368b94aa5c7393e4f60705342f6167147985178ae1",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "FISH-5",
+      "index": 27,
+      "row": 4,
+      "evidence": "stable-row-04-1.png",
+      "sha256": "6f43a415f8fadea0b82163368b94aa5c7393e4f60705342f6167147985178ae1",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "FISH-5-2",
+      "index": 28,
+      "row": 4,
+      "evidence": "stable-row-04-2.png",
+      "sha256": "5524b2b5218e20b40c5f3061d9f040bb6d9db9dd09e2c8cbbf50339d6be9d63b",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "SKILL-3",
+      "index": 29,
+      "row": 4,
+      "evidence": "stable-row-04-2.png",
+      "sha256": "5524b2b5218e20b40c5f3061d9f040bb6d9db9dd09e2c8cbbf50339d6be9d63b",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "SKILL-3-2",
+      "index": 30,
+      "row": 4,
+      "evidence": "stable-row-04-2.png",
+      "sha256": "5524b2b5218e20b40c5f3061d9f040bb6d9db9dd09e2c8cbbf50339d6be9d63b",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "TUT-2-2",
+      "index": 31,
+      "row": 4,
+      "evidence": "stable-row-04-2.png",
+      "sha256": "5524b2b5218e20b40c5f3061d9f040bb6d9db9dd09e2c8cbbf50339d6be9d63b",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "TUT-2",
+      "index": 32,
+      "row": 5,
+      "evidence": "stable-row-05-1.png",
+      "sha256": "b1b4f150e90d6a81e6c4ef80db30d9b27379e112fe4fbcc2d24ca0b2dd2ecb3f",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "COOK-2a",
+      "index": 33,
+      "row": 5,
+      "evidence": "stable-row-05-1.png",
+      "sha256": "b1b4f150e90d6a81e6c4ef80db30d9b27379e112fe4fbcc2d24ca0b2dd2ecb3f",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "COOK-2a-2",
+      "index": 34,
+      "row": 5,
+      "evidence": "stable-row-05-1.png",
+      "sha256": "b1b4f150e90d6a81e6c4ef80db30d9b27379e112fe4fbcc2d24ca0b2dd2ecb3f",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "COOK-2b",
+      "index": 35,
+      "row": 5,
+      "evidence": "stable-row-05-1.png",
+      "sha256": "b1b4f150e90d6a81e6c4ef80db30d9b27379e112fe4fbcc2d24ca0b2dd2ecb3f",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "COOK-2b-2",
+      "index": 36,
+      "row": 5,
+      "evidence": "stable-row-05-2.png",
+      "sha256": "07961f75dcecadcd1c9b464d5ab18d0c4cc7ab0b6013ea86c84fd3921906bb69",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "COOK-3",
+      "index": 37,
+      "row": 5,
+      "evidence": "stable-row-05-2.png",
+      "sha256": "07961f75dcecadcd1c9b464d5ab18d0c4cc7ab0b6013ea86c84fd3921906bb69",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "COOK-3-2",
+      "index": 38,
+      "row": 5,
+      "evidence": "stable-row-05-2.png",
+      "sha256": "07961f75dcecadcd1c9b464d5ab18d0c4cc7ab0b6013ea86c84fd3921906bb69",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "COOK-4",
+      "index": 39,
+      "row": 5,
+      "evidence": "stable-row-05-2.png",
+      "sha256": "07961f75dcecadcd1c9b464d5ab18d0c4cc7ab0b6013ea86c84fd3921906bb69",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "COOK-6",
+      "index": 40,
+      "row": 6,
+      "evidence": "stable-row-06-1.png",
+      "sha256": "7aaf194885cceeaf1541996065712d2a8fae4edb559f77106b35c538614b7a7d",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "COOK-7",
+      "index": 41,
+      "row": 6,
+      "evidence": "stable-row-06-1.png",
+      "sha256": "7aaf194885cceeaf1541996065712d2a8fae4edb559f77106b35c538614b7a7d",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "COOK-7-2",
+      "index": 42,
+      "row": 6,
+      "evidence": "stable-row-06-1.png",
+      "sha256": "7aaf194885cceeaf1541996065712d2a8fae4edb559f77106b35c538614b7a7d",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "MAP-1",
+      "index": 43,
+      "row": 6,
+      "evidence": "stable-row-06-1.png",
+      "sha256": "7aaf194885cceeaf1541996065712d2a8fae4edb559f77106b35c538614b7a7d",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-1a",
+      "index": 44,
+      "row": 6,
+      "evidence": "stable-row-06-2.png",
+      "sha256": "999763c60726ef8686e6c311e7d2ff92c37500e35f9a847edcca2ce06731ad51",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-1b",
+      "index": 45,
+      "row": 6,
+      "evidence": "stable-row-06-2.png",
+      "sha256": "999763c60726ef8686e6c311e7d2ff92c37500e35f9a847edcca2ce06731ad51",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-1c",
+      "index": 46,
+      "row": 6,
+      "evidence": "stable-row-06-2.png",
+      "sha256": "999763c60726ef8686e6c311e7d2ff92c37500e35f9a847edcca2ce06731ad51",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-1d",
+      "index": 47,
+      "row": 6,
+      "evidence": "stable-row-06-2.png",
+      "sha256": "999763c60726ef8686e6c311e7d2ff92c37500e35f9a847edcca2ce06731ad51",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-1e",
+      "index": 48,
+      "row": 7,
+      "evidence": "stable-row-07-1.png",
+      "sha256": "caada6120b59f61363e92642a187234825bcccb923369be4a0adcca05686644f",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-G1",
+      "index": 49,
+      "row": 7,
+      "evidence": "stable-row-07-1.png",
+      "sha256": "caada6120b59f61363e92642a187234825bcccb923369be4a0adcca05686644f",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-G1-2",
+      "index": 50,
+      "row": 7,
+      "evidence": "stable-row-07-1.png",
+      "sha256": "caada6120b59f61363e92642a187234825bcccb923369be4a0adcca05686644f",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-G1-3",
+      "index": 51,
+      "row": 7,
+      "evidence": "stable-row-07-1.png",
+      "sha256": "caada6120b59f61363e92642a187234825bcccb923369be4a0adcca05686644f",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-G1-4",
+      "index": 52,
+      "row": 7,
+      "evidence": "stable-row-07-2.png",
+      "sha256": "4df4a17456aa67185a9092286cb7f65abe163f33210ddf2eb216a41f6a9934d8",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-2",
+      "index": 53,
+      "row": 7,
+      "evidence": "stable-row-07-2.png",
+      "sha256": "4df4a17456aa67185a9092286cb7f65abe163f33210ddf2eb216a41f6a9934d8",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-2-2",
+      "index": 54,
+      "row": 7,
+      "evidence": "stable-row-07-2.png",
+      "sha256": "4df4a17456aa67185a9092286cb7f65abe163f33210ddf2eb216a41f6a9934d8",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-3",
+      "index": 55,
+      "row": 7,
+      "evidence": "stable-row-07-2.png",
+      "sha256": "4df4a17456aa67185a9092286cb7f65abe163f33210ddf2eb216a41f6a9934d8",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-3-2",
+      "index": 56,
+      "row": 8,
+      "evidence": "stable-row-08-1.png",
+      "sha256": "66c807113c804b6ef76ab52a381c83826567ba165ec5ab2daec99e65ca0e9949",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-4",
+      "index": 57,
+      "row": 8,
+      "evidence": "stable-row-08-1.png",
+      "sha256": "66c807113c804b6ef76ab52a381c83826567ba165ec5ab2daec99e65ca0e9949",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-4-2",
+      "index": 58,
+      "row": 8,
+      "evidence": "stable-row-08-1.png",
+      "sha256": "66c807113c804b6ef76ab52a381c83826567ba165ec5ab2daec99e65ca0e9949",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-5",
+      "index": 59,
+      "row": 8,
+      "evidence": "stable-row-08-1.png",
+      "sha256": "66c807113c804b6ef76ab52a381c83826567ba165ec5ab2daec99e65ca0e9949",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-5-2",
+      "index": 60,
+      "row": 8,
+      "evidence": "stable-row-08-2.png",
+      "sha256": "9de7a20870d3172048f1f7fa0988fd34a02a50166f8032f59b7431776ef8c581",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-6",
+      "index": 61,
+      "row": 8,
+      "evidence": "stable-row-08-2.png",
+      "sha256": "9de7a20870d3172048f1f7fa0988fd34a02a50166f8032f59b7431776ef8c581",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-6-2",
+      "index": 62,
+      "row": 8,
+      "evidence": "stable-row-08-2.png",
+      "sha256": "9de7a20870d3172048f1f7fa0988fd34a02a50166f8032f59b7431776ef8c581",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NPC-7",
+      "index": 63,
+      "row": 8,
+      "evidence": "stable-row-08-2.png",
+      "sha256": "9de7a20870d3172048f1f7fa0988fd34a02a50166f8032f59b7431776ef8c581",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "BAG-2",
+      "index": 64,
+      "row": 9,
+      "evidence": "stable-row-09-1.png",
+      "sha256": "355c2823d8475968c86db81f36c713f2640c5fd6f130a7cb3885e18eb00a05e4",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "BAG-2-2",
+      "index": 65,
+      "row": 9,
+      "evidence": "stable-row-09-1.png",
+      "sha256": "355c2823d8475968c86db81f36c713f2640c5fd6f130a7cb3885e18eb00a05e4",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "BAG-5",
+      "index": 66,
+      "row": 9,
+      "evidence": "stable-row-09-1.png",
+      "sha256": "355c2823d8475968c86db81f36c713f2640c5fd6f130a7cb3885e18eb00a05e4",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "BAG-5-2",
+      "index": 67,
+      "row": 9,
+      "evidence": "stable-row-09-1.png",
+      "sha256": "355c2823d8475968c86db81f36c713f2640c5fd6f130a7cb3885e18eb00a05e4",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "FARM-4",
+      "index": 68,
+      "row": 9,
+      "evidence": "stable-row-09-2.png",
+      "sha256": "238c0492a56567f443a3aa4fe5b47c0c2c8831fab4ea0fdd9ef18a29ea059247",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "FARM-5",
+      "index": 69,
+      "row": 9,
+      "evidence": "stable-row-09-2.png",
+      "sha256": "238c0492a56567f443a3aa4fe5b47c0c2c8831fab4ea0fdd9ef18a29ea059247",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "HOME-1",
+      "index": 70,
+      "row": 9,
+      "evidence": "stable-row-09-2.png",
+      "sha256": "238c0492a56567f443a3aa4fe5b47c0c2c8831fab4ea0fdd9ef18a29ea059247",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "HOME-2",
+      "index": 71,
+      "row": 9,
+      "evidence": "stable-row-09-2.png",
+      "sha256": "238c0492a56567f443a3aa4fe5b47c0c2c8831fab4ea0fdd9ef18a29ea059247",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "HUD-2",
+      "index": 72,
+      "row": 10,
+      "evidence": "stable-row-10-1.png",
+      "sha256": "c679ba8a6b382bbe744ecbd0ac20b6ed0d937ced579a45eb028ec254e5548aa0",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "MINE-1",
+      "index": 73,
+      "row": 10,
+      "evidence": "stable-row-10-1.png",
+      "sha256": "c679ba8a6b382bbe744ecbd0ac20b6ed0d937ced579a45eb028ec254e5548aa0",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "PROFILE-1",
+      "index": 74,
+      "row": 10,
+      "evidence": "stable-row-10-1.png",
+      "sha256": "c679ba8a6b382bbe744ecbd0ac20b6ed0d937ced579a45eb028ec254e5548aa0",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "PROFILE-2",
+      "index": 75,
+      "row": 10,
+      "evidence": "stable-row-10-1.png",
+      "sha256": "c679ba8a6b382bbe744ecbd0ac20b6ed0d937ced579a45eb028ec254e5548aa0",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "SETTINGS-1",
+      "index": 76,
+      "row": 10,
+      "evidence": "stable-row-10-2.png",
+      "sha256": "d479d72db637613c62483f791cddfb36898ac0fd4f5ed96977f25f7a71c70740",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "SKILL-1",
+      "index": 77,
+      "row": 10,
+      "evidence": "stable-row-10-2.png",
+      "sha256": "d479d72db637613c62483f791cddfb36898ac0fd4f5ed96977f25f7a71c70740",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "SKILL-2",
+      "index": 78,
+      "row": 10,
+      "evidence": "stable-row-10-2.png",
+      "sha256": "d479d72db637613c62483f791cddfb36898ac0fd4f5ed96977f25f7a71c70740",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "FISH-6",
+      "index": 79,
+      "row": 10,
+      "evidence": "stable-row-10-2.png",
+      "sha256": "d479d72db637613c62483f791cddfb36898ac0fd4f5ed96977f25f7a71c70740",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "SOC-4",
+      "index": 80,
+      "row": 11,
+      "evidence": "stable-row-11-1.png",
+      "sha256": "1e7aac98428017f9223e7a37bb6ff8b00e404d5e9cf34ef2eb704b0a15609773",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "NEED-TILE",
+      "index": 81,
+      "row": 11,
+      "evidence": "stable-row-11-1.png",
+      "sha256": "1e7aac98428017f9223e7a37bb6ff8b00e404d5e9cf34ef2eb704b0a15609773",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "STATE-ICONS",
+      "index": 82,
+      "row": 11,
+      "evidence": "stable-row-11-1.png",
+      "sha256": "1e7aac98428017f9223e7a37bb6ff8b00e404d5e9cf34ef2eb704b0a15609773",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    },
+    {
+      "id": "OUTPOST-DIAGRAM",
+      "index": 83,
+      "row": 11,
+      "evidence": "stable-row-11-1.png",
+      "sha256": "1e7aac98428017f9223e7a37bb6ff8b00e404d5e9cf34ef2eb704b0a15609773",
+      "visibleCardOpened": true,
+      "captureStage": "stable-rows-before-followup-repairs",
+      "finalPass": false
+    }
+  ],
+  "additionalPassingViews": [
+    "../hud-fishing-final.png",
+    "../hud-buff-final.png",
+    "container-final-1.png",
+    "container-final-2.png"
+  ],
+  "pendingRepairFamilies": [
+    "32 source-proportioned legacy surfaces",
+    "4 counter+Bag layouts",
+    "18 reference heading/icon repairs",
+    "Gear/storage outcomes and contextual inventory fixes",
+    "Kitchen result/heat review",
+    "P0 farm/pond safe-bottom"
+  ]
+}

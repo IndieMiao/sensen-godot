@@ -1,0 +1,11 @@
+# Local communication receipts, transfer copies and private delivery metadata.
+/delivery/
+
+# Rebuildable per-screen compiler output; keep builders and final evidence.
+/cloud/*preflight/
+/cloud/avatar/state.lock
+/cloud/ROOT-CHECKPOINT.json
+/cloud/toolbar-unification/live-state-backups/
+/cloud/**/screenshot-urls*.json
+/cloud/toolbar-unification/inventory-raw.json
+/figma-plugin/local-failed-ledger.json

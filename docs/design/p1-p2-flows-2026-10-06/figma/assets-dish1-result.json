@@ -1,0 +1,187 @@
+{
+  "createdNodeIdsFile": "asset-node-ids.json",
+  "assets": [
+    {
+      "id": "dish_grilled_crucian",
+      "name": "Grilled Crucian",
+      "category": "dish",
+      "componentId": "443:7030",
+      "specimenId": "443:7031",
+      "instanceId": "443:7033",
+      "source": "existing i-dish-grilled with recipe garnish variant"
+    },
+    {
+      "id": "dish_grilled_fish",
+      "name": "Grilled Fish",
+      "category": "dish",
+      "componentId": "443:7057",
+      "specimenId": "443:7058",
+      "instanceId": "443:7060",
+      "source": "existing i-dish-grilled with recipe garnish variant"
+    },
+    {
+      "id": "dish_carp_cakes",
+      "name": "Carp Fish Cakes",
+      "category": "dish",
+      "componentId": "443:7083",
+      "specimenId": "443:7084",
+      "instanceId": "443:7086",
+      "source": "existing i-dish-cakes with recipe garnish variant"
+    },
+    {
+      "id": "dish_mullet_skewers",
+      "name": "Mullet Skewers",
+      "category": "dish",
+      "componentId": "443:7108",
+      "specimenId": "443:7109",
+      "instanceId": "443:7111",
+      "source": "existing i-dish-skewer with recipe garnish variant"
+    },
+    {
+      "id": "dish_radish_salad",
+      "name": "Radish Salad",
+      "category": "dish",
+      "componentId": "443:7134",
+      "specimenId": "443:7135",
+      "instanceId": "443:7137",
+      "source": "existing i-dish-salad with recipe garnish variant"
+    },
+    {
+      "id": "dish_veggie_plate",
+      "name": "Veggie Plate",
+      "category": "dish",
+      "componentId": "443:7159",
+      "specimenId": "443:7160",
+      "instanceId": "443:7162",
+      "source": "existing i-dish-plate with recipe garnish variant"
+    },
+    {
+      "id": "dish_carrot_cake",
+      "name": "Carrot Cake",
+      "category": "dish",
+      "componentId": "443:7182",
+      "specimenId": "443:7183",
+      "instanceId": "443:7185",
+      "source": "existing i-dish-cake with recipe garnish variant"
+    },
+    {
+      "id": "dish_cabbage_stew",
+      "name": "Cabbage Stew",
+      "category": "dish",
+      "componentId": "443:7210",
+      "specimenId": "443:7211",
+      "instanceId": "443:7213",
+      "source": "existing i-dish-stew with recipe garnish variant"
+    },
+    {
+      "id": "dish_travel_biscuits",
+      "name": "Travel Biscuits",
+      "category": "dish",
+      "componentId": "443:7240",
+      "specimenId": "443:7241",
+      "instanceId": "443:7243",
+      "source": "existing i-dish-biscuit with recipe garnish variant"
+    },
+    {
+      "id": "dish_herb_grilled_fish",
+      "name": "Herb Grilled Fish",
+      "category": "dish",
+      "componentId": "443:7267",
+      "specimenId": "443:7268",
+      "instanceId": "443:7270",
+      "source": "existing i-dish-grilled with recipe garnish variant"
+    },
+    {
+      "id": "dish_salt_grilled_fish",
+      "name": "Salt-Grilled Fish",
+      "category": "dish",
+      "componentId": "443:7297",
+      "specimenId": "443:7298",
+      "instanceId": "443:7300",
+      "source": "existing i-dish-grilled with recipe garnish variant"
+    },
+    {
+      "id": "dish_fish_soup",
+      "name": "Fresh Fish Soup",
+      "category": "dish",
+      "componentId": "443:7327",
+      "specimenId": "443:7328",
+      "instanceId": "443:7330",
+      "source": "existing i-dish-soup with recipe garnish variant"
+    },
+    {
+      "id": "dish_tilapia_wraps",
+      "name": "Tilapia Wraps",
+      "category": "dish",
+      "componentId": "443:7354",
+      "specimenId": "443:7355",
+      "instanceId": "443:7357",
+      "source": "existing i-dish-salad with recipe garnish variant"
+    },
+    {
+      "id": "dish_crispy_smelt",
+      "name": "Crispy Smelt",
+      "category": "dish",
+      "componentId": "443:7384",
+      "specimenId": "443:7385",
+      "instanceId": "443:7387",
+      "source": "existing i-dish-grilled with recipe garnish variant"
+    },
+    {
+      "id": "dish_pan_fried_fish",
+      "name": "Pan-Fried Fish",
+      "category": "dish",
+      "componentId": "443:7414",
+      "specimenId": "443:7415",
+      "instanceId": "443:7417",
+      "source": "existing i-dish-grilled with recipe garnish variant"
+    },
+    {
+      "id": "dish_rock_salt_soup",
+      "name": "Rock-Salt Soup",
+      "category": "dish",
+      "componentId": "443:7444",
+      "specimenId": "443:7445",
+      "instanceId": "443:7447",
+      "source": "existing i-dish-soup with recipe garnish variant"
+    },
+    {
+      "id": "dish_salted_potatoes",
+      "name": "Salted Potatoes",
+      "category": "dish",
+      "componentId": "443:7480",
+      "specimenId": "443:7481",
+      "instanceId": "443:7483",
+      "source": "existing i-dish-stew with recipe garnish variant"
+    },
+    {
+      "id": "dish_cucumber_salad",
+      "name": "Cucumber Salad",
+      "category": "dish",
+      "componentId": "443:7513",
+      "specimenId": "443:7514",
+      "instanceId": "443:7516",
+      "source": "existing i-dish-salad with recipe garnish variant"
+    },
+    {
+      "id": "dish_fruit_tea",
+      "name": "Fruit Tea",
+      "category": "dish",
+      "componentId": "443:7539",
+      "specimenId": "443:7540",
+      "instanceId": "443:7542",
+      "source": "existing i-tea with recipe garnish variant"
+    },
+    {
+      "id": "dish_apple_tea",
+      "name": "Apple Tea",
+      "category": "dish",
+      "componentId": "443:7564",
+      "specimenId": "443:7565",
+      "instanceId": "443:7567",
+      "source": "existing i-tea with recipe garnish variant"
+    }
+  ],
+  "count": 20,
+  "group": "48 · 料理图标 / 菜系底盘与原料装饰"
+}

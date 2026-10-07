@@ -1,0 +1,207 @@
+{
+  "reviewedAt": "2026-10-06T04:20:52.720829+00:00",
+  "fileKey": "OMLTC3yw3u2WDjOZhLnhaR",
+  "rowNodes": {
+    "27": "482:444",
+    "28": "482:461"
+  },
+  "screensReviewed": 16,
+  "method": "Fresh get_screenshot maxDimension4000; no scaling; exact CoreGraphics four-card pixel crops; each crop opened with view_image original.",
+  "cloudWrites": false,
+  "images": [
+    {
+      "file": "row-27.png",
+      "sha256": "9261bf24e830be9baccba44ee8ed66733db9a4d59457324d107bc92012a56409",
+      "bytes": 867298,
+      "inspected": true
+    },
+    {
+      "file": "row-27-a.png",
+      "sha256": "2c0ba8617964c8f8852da520748b5ef4d7ee8f012786a18ecd9e8a598d8fd725",
+      "bytes": 457756,
+      "inspected": true
+    },
+    {
+      "file": "row-27-b.png",
+      "sha256": "c3b36c0b787ad6596f9638664ea91777143554edfff47ff63bf32e7fae137c8e",
+      "bytes": 687395,
+      "inspected": true
+    },
+    {
+      "file": "row-28.png",
+      "sha256": "9e4cf8ede69d76b2c86d067e651b98b1feae8a44ce46d09b298b2c10a03eea26",
+      "bytes": 773295,
+      "inspected": true
+    },
+    {
+      "file": "row-28-a.png",
+      "sha256": "ed76e785ea322477040ddd03ec59408e5b0a8d6d709498156fbf7770fbb1969b",
+      "bytes": 712140,
+      "inspected": true
+    },
+    {
+      "file": "row-28-b.png",
+      "sha256": "b48e095083098b6548b9a4e6ff91da3f06f1c55f548e69d9ade5dcb85c9631e4",
+      "bytes": 584081,
+      "inspected": true
+    }
+  ],
+  "screenChecks": [
+    {
+      "row": "27",
+      "column": 1,
+      "id": "TRAVEL-GUIDE",
+      "status": "pass-with-note",
+      "notes": "City, climate, local time and fish are readable; Market Square starts below the scroll fold. The partial next row is treated as intentional scroll continuation, not an overlap.",
+      "issues": []
+    },
+    {
+      "row": "27",
+      "column": 2,
+      "id": "TRAVEL-CANCEL",
+      "status": "needs-fix",
+      "notes": "Refund assets repeat twice: 40 Energy, 200 coins, 1 Permit in the content and again above confirmation.",
+      "issues": [
+        "refund-duplicate"
+      ]
+    },
+    {
+      "row": "27",
+      "column": 3,
+      "id": "TRAVEL-REFUNDED",
+      "status": "pass",
+      "notes": "Refund receipt gives each returned asset once, with a quiet map return; no clipping.",
+      "issues": []
+    },
+    {
+      "row": "27",
+      "column": 4,
+      "id": "DAYPASS",
+      "status": "pass",
+      "notes": "City, active pass and 23h59m expiry are clear; information navigation and free return action are visually distinct.",
+      "issues": []
+    },
+    {
+      "row": "27",
+      "column": 5,
+      "id": "DAYPASS-EXPIRED",
+      "status": "pass",
+      "notes": "Expired state and staying-in-room effect are prominent; staying and returning are distinct. No overlap.",
+      "issues": []
+    },
+    {
+      "row": "27",
+      "column": 6,
+      "id": "PERMIT-1",
+      "status": "pass-with-note",
+      "notes": "Purpose, 1/3 weekly usage, two materials and 100 coins are visible before Craft. Can craft and coin have/need plus price are minor repeated information.",
+      "issues": []
+    },
+    {
+      "row": "27",
+      "column": 7,
+      "id": "PERMIT-DONE",
+      "status": "needs-fix",
+      "notes": "Quantity 1 permit in the identity area repeats as Received 1 permit. Keep the quantity and weekly2/3 only.",
+      "issues": [
+        "permit-count-duplicate"
+      ]
+    },
+    {
+      "row": "27",
+      "column": 8,
+      "id": "TICKET-1",
+      "status": "pass-with-note",
+      "notes": "Permit1, Hardwood2, Quartz2 and 150 coins all remain visible before Craft. Already-met Stamps8/8 and HomesteadLv4 could be quieter; no critical content loss.",
+      "issues": []
+    },
+    {
+      "row": "28",
+      "column": 1,
+      "id": "SECOND-HOME",
+      "status": "needs-fix",
+      "notes": "Seven-day lock is repeated; future free travel benefit is incorrectly placed in the current Set-action cost area.",
+      "issues": [
+        "second-home-duplicate-cost"
+      ]
+    },
+    {
+      "row": "28",
+      "column": 2,
+      "id": "SECOND-HOME-DONE",
+      "status": "pass",
+      "notes": "Slot1/3 and change-in6d23h are legible. Travel is the current action, so its Free cost is appropriate here.",
+      "issues": []
+    },
+    {
+      "row": "28",
+      "column": 3,
+      "id": "SOC-1",
+      "status": "pass-with-note",
+      "notes": "Mia and Alex have separate identity/state rows; progress no longer pollutes names. List uses a separate Mia-profile navigation row rather than row-wide navigation.",
+      "issues": []
+    },
+    {
+      "row": "28",
+      "column": 4,
+      "id": "SOC-1-GATE",
+      "status": "pass",
+      "notes": "One more interaction, progress2/3 and close-friend capacity2/3 are visible; blocked request is separate from Details.",
+      "issues": []
+    },
+    {
+      "row": "28",
+      "column": 5,
+      "id": "SOC-1-CONFIRM",
+      "status": "pass",
+      "notes": "Mia identity, CloseFriendrequest state, acceptance effect and remaining slot are readable; Accept and Notnow are distinct.",
+      "issues": []
+    },
+    {
+      "row": "28",
+      "column": 6,
+      "id": "SOC-2",
+      "status": "pass",
+      "notes": "Invitation recipient is clear and cost explicitly belongs to Mia. Send is a command and Details is navigation; no overlap.",
+      "issues": []
+    },
+    {
+      "row": "28",
+      "column": 7,
+      "id": "SOC-2-INBOX",
+      "status": "pass",
+      "notes": "Mia/Tokyo, expires28:40 and20Energy charge are all visible. Acceptance consequence remains beside the action.",
+      "issues": []
+    },
+    {
+      "row": "28",
+      "column": 8,
+      "id": "SOC-2-ARRIVE",
+      "status": "needs-fix",
+      "notes": "Arrival at Mia’s farm and+10Energy/24h are correct, but Viewhelpers links to the owner management panel. Baseline§12.3.4 confirms this is the wrong role branch.",
+      "issues": [
+        "guest-owner-route"
+      ]
+    }
+  ],
+  "summary": {
+    "pass-with-note": 4,
+    "needs-fix": 4,
+    "pass": 8
+  },
+  "changesAfterReview": {
+    "status": "data-updated-awaiting-cloud-rebuild-and-screenshot",
+    "ids": [
+      "TRAVEL-CANCEL",
+      "PERMIT-DONE",
+      "SECOND-HOME",
+      "SOC-2-ARRIVE"
+    ],
+    "bundleSha256": "b3372d235e147395b26dd4aad383de605ef186b9725a8eec8076d228caf6105c",
+    "sourceEvidence": "gameplay-plan-v2-2026-10-02.md §12.3.4 (line5559); §16 SOC-3 (line7217)"
+  },
+  "limits": [
+    "No prototype clicks or permission enforcement were tested.",
+    "Current PNGs precede the four follow-up data changes; do not count those changes as visually verified yet."
+  ]
+}

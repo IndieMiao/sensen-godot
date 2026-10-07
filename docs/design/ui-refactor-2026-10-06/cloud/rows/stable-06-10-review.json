@@ -1,0 +1,109 @@
+{
+  "captureScope": "Stable row6 and row10 before visual-legacy-surfaces refinement",
+  "cardsActuallyOpened": 16,
+  "screenshots": [
+    "stable-row-06-1.png",
+    "stable-row-06-2.png",
+    "stable-row-10-1.png",
+    "stable-row-10-2.png"
+  ],
+  "findings": [
+    {
+      "id": "COOK-6",
+      "issue": "Oversized generic sheet; 5 Energy dish incorrectly links to +40 result.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "COOK-7",
+      "issue": "Transparent generic list and tall blank bottom region replace source floating recovery and daily allowance strip. HUD142 is correct for explicit102→142 source.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "COOK-7-2",
+      "issue": "Reference states visible; last case may require scrolling. Distinct command versus blocked semantics preserved.",
+      "status": "reference-review-only",
+      "preparedVisualFix": null
+    },
+    {
+      "id": "MAP-1",
+      "issue": "Oversized sheet exposes only2–3 entries, black question placeholders.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "NPC-1a",
+      "issue": "Generic transparent list overlaps scene; missing local tags; blank QuickBar should not exist indoors.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "NPC-1b",
+      "issue": "Generic transparent list overlaps scene; question placeholders; blank QuickBar.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "NPC-1c",
+      "issue": "Generic transparent list overlaps scene; Theo overlaps bottom utilities; blank QuickBar.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "NPC-1d",
+      "issue": "Generic transparent list overlaps scene; Sam overlaps bottom utilities; blank QuickBar.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "HUD-2",
+      "issue": "Overlarge rows hide Protected refunds and Newcomer Blessing in initial viewport; unknown question icons.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "MINE-1",
+      "issue": "Floor2 blocked Enter detached from its object label; generic Details plus world action confuse scope.",
+      "status": "needs-repair",
+      "preparedVisualFix": null
+    },
+    {
+      "id": "PROFILE-1",
+      "issue": "Fake emoji avatar replaces actual character; sections below Skills clipped to scroll, Editlook not visible initially.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "PROFILE-2",
+      "issue": "Fake emoji avatar replaces actual character; Following reads as filled primary command, repeated bio.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "SETTINGS-1",
+      "issue": "Only first2 settings visible above destructive actions; question icons.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "SKILL-1",
+      "issue": "Cooking row below fold despite3-track overview; excessive row spacing.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "SKILL-2",
+      "issue": "Future Carrot gift incorrectly marked Owned; source corrected to AtLv2.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    },
+    {
+      "id": "FISH-6",
+      "issue": "138px narrow collection cards, broken Silhouette word, onlyone full group visible instead of source6-column overview.",
+      "status": "needs-repair",
+      "preparedVisualFix": "visual-legacy-surfaces.js"
+    }
+  ],
+  "notFinalPass": true
+}

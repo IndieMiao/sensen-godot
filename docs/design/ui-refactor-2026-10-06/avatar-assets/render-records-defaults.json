@@ -1,0 +1,26 @@
+[
+	{
+		"id": "defaults",
+		"preview": "previews/defaults.png",
+		"size": [
+			480,
+			560
+		],
+		"slots": {
+			"backpack": "",
+			"body": "body00",
+			"cloth": "cloth0",
+			"eyes": "eyes00",
+			"glass": "",
+			"hairHat": "hairhat0",
+			"handleft": "",
+			"handright": "",
+			"headset": "",
+			"mask": "",
+			"messengerBag": "",
+			"pocketBag": "",
+			"shoes": "shoes0",
+			"shoulderBag": ""
+		}
+	}
+]

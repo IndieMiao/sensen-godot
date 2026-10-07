@@ -1,0 +1,1070 @@
+{
+  "nodeManifest": "final-update-node-ids.json",
+  "pages": 40,
+  "linkCount": 49,
+  "missing": [],
+  "starts": [
+    {
+      "name": "P1 · 设施放置",
+      "id": "FAC-1",
+      "nodeId": "435:999"
+    },
+    {
+      "name": "P1 · 鱼笼巡线",
+      "id": "TRAP-1",
+      "nodeId": "435:1460"
+    },
+    {
+      "name": "P1 · 多灶与便利",
+      "id": "COOK-P1-1",
+      "nodeId": "435:1874"
+    },
+    {
+      "name": "P2 · 免费旅行闭环",
+      "id": "MAP-2-FREE",
+      "nodeId": "437:2372"
+    },
+    {
+      "name": "P2 · 收费旅行",
+      "id": "MAP-4-PAID",
+      "nodeId": "439:3178"
+    },
+    {
+      "name": "P2 · 社交",
+      "id": "SOC-1",
+      "nodeId": "439:4069"
+    },
+    {
+      "name": "P3 · 料理Buff",
+      "id": "BUFF-FARM",
+      "nodeId": "440:4852"
+    },
+    {
+      "name": "P1 · 深层矿洞",
+      "id": "MINE-3",
+      "nodeId": "441:5789"
+    }
+  ],
+  "cards": [
+    {
+      "id": "FAC-1",
+      "cardId": "435:999",
+      "nodeId": "435:1001"
+    },
+    {
+      "id": "FAC-2",
+      "cardId": "435:1081",
+      "nodeId": "435:1083"
+    },
+    {
+      "id": "FAC-3",
+      "cardId": "435:1157",
+      "nodeId": "435:1159"
+    },
+    {
+      "id": "FAC-4",
+      "cardId": "435:1234",
+      "nodeId": "435:1236"
+    },
+    {
+      "id": "FAC-5",
+      "cardId": "435:1310",
+      "nodeId": "435:1312"
+    },
+    {
+      "id": "FAC-6",
+      "cardId": "435:1386",
+      "nodeId": "435:1388"
+    },
+    {
+      "id": "TRAP-1",
+      "cardId": "435:1460",
+      "nodeId": "435:1462"
+    },
+    {
+      "id": "TRAP-2",
+      "cardId": "435:1536",
+      "nodeId": "435:1538"
+    },
+    {
+      "id": "TRAP-3",
+      "cardId": "435:1591",
+      "nodeId": "435:1593"
+    },
+    {
+      "id": "TRAP-4",
+      "cardId": "435:1657",
+      "nodeId": "435:1659"
+    },
+    {
+      "id": "TRAP-5",
+      "cardId": "435:1732",
+      "nodeId": "435:1734"
+    },
+    {
+      "id": "TRAP-6",
+      "cardId": "435:1798",
+      "nodeId": "435:1800"
+    },
+    {
+      "id": "COOK-P1-1",
+      "cardId": "435:1874",
+      "nodeId": "435:1876"
+    },
+    {
+      "id": "COOK-P1-2",
+      "cardId": "435:1930",
+      "nodeId": "435:1932"
+    },
+    {
+      "id": "COOK-P1-3",
+      "cardId": "435:1999",
+      "nodeId": "435:2001"
+    },
+    {
+      "id": "COOK-P1-4",
+      "cardId": "435:2071",
+      "nodeId": "435:2073"
+    },
+    {
+      "id": "COOK-P1-5",
+      "cardId": "435:2147",
+      "nodeId": "435:2149"
+    },
+    {
+      "id": "COOK-P1-6",
+      "cardId": "435:2219",
+      "nodeId": "435:2221"
+    },
+    {
+      "id": "COOK-P1-7",
+      "cardId": "435:2286",
+      "nodeId": "435:2288"
+    },
+    {
+      "id": "COOK-P1-8",
+      "cardId": "435:2351",
+      "nodeId": "435:2353"
+    },
+    {
+      "id": "FAC-GH",
+      "cardId": "435:2426",
+      "nodeId": "435:2428"
+    },
+    {
+      "id": "TRAP-DONE",
+      "cardId": "435:2527",
+      "nodeId": "435:2529"
+    },
+    {
+      "id": "DEX-P1-1",
+      "cardId": "435:2590",
+      "nodeId": "435:2592"
+    },
+    {
+      "id": "DEX-P1-2",
+      "cardId": "435:2666",
+      "nodeId": "435:2668"
+    },
+    {
+      "id": "FAC-GH-PLACE",
+      "cardId": "435:2736",
+      "nodeId": "435:2738"
+    },
+    {
+      "id": "FAC-GH-DONE",
+      "cardId": "435:2815",
+      "nodeId": "435:2817"
+    },
+    {
+      "id": "DOUBLE-RESULT",
+      "cardId": "435:2886",
+      "nodeId": "435:2888"
+    },
+    {
+      "id": "FAC-LIMIT",
+      "cardId": "435:2950",
+      "nodeId": "435:2952"
+    },
+    {
+      "id": "TRAP-NOROOM",
+      "cardId": "435:3017",
+      "nodeId": "435:3019"
+    },
+    {
+      "id": "COOK-EMPTY",
+      "cardId": "435:3081",
+      "nodeId": "435:3083"
+    },
+    {
+      "id": "MAP-2-FREE",
+      "cardId": "437:2372",
+      "nodeId": "437:2374"
+    },
+    {
+      "id": "MAP-3-FREE",
+      "cardId": "437:2456",
+      "nodeId": "437:2458"
+    },
+    {
+      "id": "MAP-4-FREE",
+      "cardId": "437:2530",
+      "nodeId": "437:2532"
+    },
+    {
+      "id": "MAP-5-FREE",
+      "cardId": "437:2609",
+      "nodeId": "437:2611"
+    },
+    {
+      "id": "MAP-6-FREE",
+      "cardId": "437:2678",
+      "nodeId": "437:2680"
+    },
+    {
+      "id": "MAP-7-FREE",
+      "cardId": "437:2740",
+      "nodeId": "437:2742"
+    },
+    {
+      "id": "MAP-8-FREE",
+      "cardId": "437:2822",
+      "nodeId": "437:2824"
+    },
+    {
+      "id": "LOCAL-FISH",
+      "cardId": "437:2895",
+      "nodeId": "437:2897"
+    },
+    {
+      "id": "LOCAL-CATCH",
+      "cardId": "437:2960",
+      "nodeId": "437:2962"
+    },
+    {
+      "id": "LOCAL-SHOP",
+      "cardId": "437:3025",
+      "nodeId": "437:3027"
+    },
+    {
+      "id": "LOCAL-TRADE",
+      "cardId": "437:3087",
+      "nodeId": "437:3089"
+    },
+    {
+      "id": "LOCAL-BOUGHT",
+      "cardId": "437:3165",
+      "nodeId": "437:3167"
+    },
+    {
+      "id": "HOME-RETURN",
+      "cardId": "437:3228",
+      "nodeId": "437:3230"
+    },
+    {
+      "id": "PASS-1",
+      "cardId": "437:3291",
+      "nodeId": "437:3293"
+    },
+    {
+      "id": "PASS-2",
+      "cardId": "437:3364",
+      "nodeId": "437:3366"
+    },
+    {
+      "id": "TRAVEL-RETRY",
+      "cardId": "437:3447",
+      "nodeId": "437:3449"
+    },
+    {
+      "id": "TRAVEL-RECONNECT",
+      "cardId": "437:3508",
+      "nodeId": "437:3510"
+    },
+    {
+      "id": "FOG-THREE",
+      "cardId": "437:3560",
+      "nodeId": "437:3562"
+    },
+    {
+      "id": "MAP-4-PAID",
+      "cardId": "439:3178",
+      "nodeId": "439:3180"
+    },
+    {
+      "id": "MAP-4-GATE",
+      "cardId": "439:3249",
+      "nodeId": "439:3251"
+    },
+    {
+      "id": "MAP-5-PAID",
+      "cardId": "439:3312",
+      "nodeId": "439:3314"
+    },
+    {
+      "id": "TRAVEL-GUIDE",
+      "cardId": "439:3392",
+      "nodeId": "439:3394"
+    },
+    {
+      "id": "TRAVEL-CANCEL",
+      "cardId": "439:3462",
+      "nodeId": "439:3464"
+    },
+    {
+      "id": "TRAVEL-REFUNDED",
+      "cardId": "439:3525",
+      "nodeId": "439:3527"
+    },
+    {
+      "id": "DAYPASS",
+      "cardId": "439:3583",
+      "nodeId": "439:3585"
+    },
+    {
+      "id": "DAYPASS-EXPIRED",
+      "cardId": "439:3646",
+      "nodeId": "439:3648"
+    },
+    {
+      "id": "PERMIT-1",
+      "cardId": "439:3709",
+      "nodeId": "439:3711"
+    },
+    {
+      "id": "PERMIT-DONE",
+      "cardId": "439:3795",
+      "nodeId": "439:3797"
+    },
+    {
+      "id": "TICKET-1",
+      "cardId": "439:3856",
+      "nodeId": "439:3858"
+    },
+    {
+      "id": "SECOND-HOME",
+      "cardId": "439:3947",
+      "nodeId": "439:3949"
+    },
+    {
+      "id": "SECOND-HOME-DONE",
+      "cardId": "439:4009",
+      "nodeId": "439:4011"
+    },
+    {
+      "id": "SOC-1",
+      "cardId": "439:4069",
+      "nodeId": "439:4071"
+    },
+    {
+      "id": "SOC-1-GATE",
+      "cardId": "439:4144",
+      "nodeId": "439:4146"
+    },
+    {
+      "id": "SOC-1-CONFIRM",
+      "cardId": "439:4209",
+      "nodeId": "439:4211"
+    },
+    {
+      "id": "SOC-2",
+      "cardId": "439:4274",
+      "nodeId": "439:4276"
+    },
+    {
+      "id": "SOC-2-INBOX",
+      "cardId": "439:4334",
+      "nodeId": "439:4336"
+    },
+    {
+      "id": "SOC-2-ARRIVE",
+      "cardId": "439:4410",
+      "nodeId": "439:4412"
+    },
+    {
+      "id": "SOC-2-ERROR",
+      "cardId": "439:4471",
+      "nodeId": "439:4473"
+    },
+    {
+      "id": "SOC-3",
+      "cardId": "439:4533",
+      "nodeId": "439:4535"
+    },
+    {
+      "id": "HELPER-INBOX",
+      "cardId": "439:4606",
+      "nodeId": "439:4608"
+    },
+    {
+      "id": "HELPER-SUMMARY",
+      "cardId": "439:4669",
+      "nodeId": "439:4671"
+    },
+    {
+      "id": "HELPER-ONSITE",
+      "cardId": "439:4731",
+      "nodeId": "439:4733"
+    },
+    {
+      "id": "HELPER-BUDGET",
+      "cardId": "439:4792",
+      "nodeId": "439:4794"
+    },
+    {
+      "id": "SOC-5",
+      "cardId": "439:4855",
+      "nodeId": "439:4857"
+    },
+    {
+      "id": "GIFT-SENT",
+      "cardId": "439:4918",
+      "nodeId": "439:4920"
+    },
+    {
+      "id": "GIFT-CLAIM",
+      "cardId": "439:4980",
+      "nodeId": "439:4982"
+    },
+    {
+      "id": "GIFT-DETAIL",
+      "cardId": "439:5042",
+      "nodeId": "439:5044"
+    },
+    {
+      "id": "SOC-6",
+      "cardId": "439:5106",
+      "nodeId": "439:5108"
+    },
+    {
+      "id": "GUESTBOOK",
+      "cardId": "439:5188",
+      "nodeId": "439:5190"
+    },
+    {
+      "id": "TOGETHER",
+      "cardId": "439:5269",
+      "nodeId": "439:5271"
+    },
+    {
+      "id": "TOGETHER-PROGRESS",
+      "cardId": "439:5332",
+      "nodeId": "439:5334"
+    },
+    {
+      "id": "TOGETHER-DONE",
+      "cardId": "439:5390",
+      "nodeId": "439:5392"
+    },
+    {
+      "id": "EXPAND-4",
+      "cardId": "439:5448",
+      "nodeId": "439:5450"
+    },
+    {
+      "id": "EXPAND-5",
+      "cardId": "439:5513",
+      "nodeId": "439:5515"
+    },
+    {
+      "id": "EXPAND-RECIPES",
+      "cardId": "439:5586",
+      "nodeId": "439:5588"
+    },
+    {
+      "id": "TRADER",
+      "cardId": "439:5673",
+      "nodeId": "439:5675"
+    },
+    {
+      "id": "BUFF-FARM",
+      "cardId": "440:4852",
+      "nodeId": "440:4854"
+    },
+    {
+      "id": "BUFF-FISH",
+      "cardId": "440:4913",
+      "nodeId": "440:4915"
+    },
+    {
+      "id": "BUFF-HANDS",
+      "cardId": "440:4976",
+      "nodeId": "440:4978"
+    },
+    {
+      "id": "BUFF-TRAVEL",
+      "cardId": "440:5039",
+      "nodeId": "440:5041"
+    },
+    {
+      "id": "BUFF-CREEL",
+      "cardId": "440:5104",
+      "nodeId": "440:5106"
+    },
+    {
+      "id": "BUFF-REPLACE",
+      "cardId": "440:5166",
+      "nodeId": "440:5168"
+    },
+    {
+      "id": "BUFF-ACTIVE",
+      "cardId": "440:5241",
+      "nodeId": "440:5243"
+    },
+    {
+      "id": "BUFF-CASTS",
+      "cardId": "440:5304",
+      "nodeId": "440:5306"
+    },
+    {
+      "id": "BUFF-LAST",
+      "cardId": "440:5369",
+      "nodeId": "440:5371"
+    },
+    {
+      "id": "BUFF-TIMEOUT",
+      "cardId": "440:5432",
+      "nodeId": "440:5434"
+    },
+    {
+      "id": "BUFF-RATIONS-USE",
+      "cardId": "440:5493",
+      "nodeId": "440:5495"
+    },
+    {
+      "id": "BUFF-CREEL-END",
+      "cardId": "440:5558",
+      "nodeId": "440:5560"
+    },
+    {
+      "id": "HOME-LV4",
+      "cardId": "441:5369",
+      "nodeId": "441:5371"
+    },
+    {
+      "id": "HOME-LV5",
+      "cardId": "441:5429",
+      "nodeId": "441:5431"
+    },
+    {
+      "id": "HOME-LV6",
+      "cardId": "441:5489",
+      "nodeId": "441:5491"
+    },
+    {
+      "id": "HOME-LV7",
+      "cardId": "441:5549",
+      "nodeId": "441:5551"
+    },
+    {
+      "id": "HOME-LV8",
+      "cardId": "441:5609",
+      "nodeId": "441:5611"
+    },
+    {
+      "id": "HOME-LV9",
+      "cardId": "441:5669",
+      "nodeId": "441:5671"
+    },
+    {
+      "id": "HOME-LV10",
+      "cardId": "441:5729",
+      "nodeId": "441:5731"
+    },
+    {
+      "id": "MINE-3",
+      "cardId": "441:5789",
+      "nodeId": "441:5791"
+    },
+    {
+      "id": "COMBAT-1",
+      "cardId": "441:5849",
+      "nodeId": "441:5851"
+    },
+    {
+      "id": "COMBAT-LOOT",
+      "cardId": "441:5912",
+      "nodeId": "441:5914"
+    },
+    {
+      "id": "COMBAT-HEAL",
+      "cardId": "441:5973",
+      "nodeId": "441:5975"
+    },
+    {
+      "id": "MINE-4",
+      "cardId": "441:6032",
+      "nodeId": "441:6034"
+    },
+    {
+      "id": "MINE-5",
+      "cardId": "441:6099",
+      "nodeId": "441:6101"
+    },
+    {
+      "id": "MINE-KO",
+      "cardId": "441:6159",
+      "nodeId": "441:6161"
+    },
+    {
+      "id": "RESIDENT-TALK",
+      "cardId": "441:6221",
+      "nodeId": "441:6223"
+    },
+    {
+      "id": "RESIDENT-CHAT",
+      "cardId": "441:6288",
+      "nodeId": "441:6290"
+    },
+    {
+      "id": "RESIDENT-MEAL",
+      "cardId": "441:6351",
+      "nodeId": "441:6353"
+    },
+    {
+      "id": "RESIDENT-MEAL-DONE",
+      "cardId": "441:6413",
+      "nodeId": "441:6415"
+    },
+    {
+      "id": "RESIDENT-TEACH",
+      "cardId": "441:6475",
+      "nodeId": "441:6477"
+    },
+    {
+      "id": "RES-PIP",
+      "cardId": "441:6537",
+      "nodeId": "441:6539"
+    },
+    {
+      "id": "RES-GRANNY",
+      "cardId": "441:6602",
+      "nodeId": "441:6604"
+    },
+    {
+      "id": "RES-MIRA",
+      "cardId": "441:6667",
+      "nodeId": "441:6669"
+    },
+    {
+      "id": "RES-KAI",
+      "cardId": "441:6732",
+      "nodeId": "441:6734"
+    },
+    {
+      "id": "RES-RAFA",
+      "cardId": "441:6797",
+      "nodeId": "441:6799"
+    },
+    {
+      "id": "RES-IVO",
+      "cardId": "441:6862",
+      "nodeId": "441:6864"
+    },
+    {
+      "id": "RES-HANA",
+      "cardId": "441:6927",
+      "nodeId": "441:6929"
+    },
+    {
+      "id": "RES-SAM",
+      "cardId": "441:6992",
+      "nodeId": "441:6994"
+    },
+    {
+      "id": "RES-LENA",
+      "cardId": "441:7057",
+      "nodeId": "441:7059"
+    },
+    {
+      "id": "RES-TOMO",
+      "cardId": "441:7122",
+      "nodeId": "441:7124"
+    },
+    {
+      "id": "RES-THEO",
+      "cardId": "441:7187",
+      "nodeId": "441:7189"
+    },
+    {
+      "id": "RES-NADIA",
+      "cardId": "441:7252",
+      "nodeId": "441:7254"
+    },
+    {
+      "id": "DEX-MILESTONE",
+      "cardId": "441:7317",
+      "nodeId": "441:7319"
+    },
+    {
+      "id": "COOK-MILESTONE",
+      "cardId": "441:7380",
+      "nodeId": "441:7382"
+    },
+    {
+      "id": "TUT-1",
+      "cardId": "399:2",
+      "nodeId": "399:4"
+    },
+    {
+      "id": "TUT-1-2",
+      "cardId": "399:25",
+      "nodeId": "399:27"
+    },
+    {
+      "id": "TUT-3-01",
+      "cardId": "399:75",
+      "nodeId": "399:77"
+    },
+    {
+      "id": "TUT-3-02",
+      "cardId": "399:151",
+      "nodeId": "399:153"
+    },
+    {
+      "id": "TUT-3-03",
+      "cardId": "399:230",
+      "nodeId": "399:232"
+    },
+    {
+      "id": "TUT-3-04",
+      "cardId": "399:299",
+      "nodeId": "399:301"
+    },
+    {
+      "id": "TUT-3-05",
+      "cardId": "399:352",
+      "nodeId": "399:354"
+    },
+    {
+      "id": "TUT-3-06",
+      "cardId": "399:415",
+      "nodeId": "399:417"
+    },
+    {
+      "id": "TUT-3-06B",
+      "cardId": "399:472",
+      "nodeId": "399:474"
+    },
+    {
+      "id": "TUT-3-07A",
+      "cardId": "399:531",
+      "nodeId": "399:533"
+    },
+    {
+      "id": "TUT-3-07B",
+      "cardId": "399:584",
+      "nodeId": "399:586"
+    },
+    {
+      "id": "TUT-3-07C",
+      "cardId": "399:654",
+      "nodeId": "399:656"
+    },
+    {
+      "id": "TUT-3-08",
+      "cardId": "399:705",
+      "nodeId": "399:707"
+    },
+    {
+      "id": "TUT-3-09",
+      "cardId": "399:779",
+      "nodeId": "399:781"
+    },
+    {
+      "id": "TUT-3-10",
+      "cardId": "399:834",
+      "nodeId": "399:836"
+    },
+    {
+      "id": "TUT-3-11",
+      "cardId": "399:903",
+      "nodeId": "399:905"
+    },
+    {
+      "id": "TUT-3-12",
+      "cardId": "399:964",
+      "nodeId": "399:966"
+    },
+    {
+      "id": "TUT-3-END",
+      "cardId": "399:1019",
+      "nodeId": "399:1021"
+    },
+    {
+      "id": "MAT-1",
+      "cardId": "402:2",
+      "nodeId": "402:4"
+    },
+    {
+      "id": "MAT-2",
+      "cardId": "402:97",
+      "nodeId": "402:99"
+    },
+    {
+      "id": "MAT-3",
+      "cardId": "402:150",
+      "nodeId": "402:152"
+    },
+    {
+      "id": "MINE-P0-1",
+      "cardId": "402:200",
+      "nodeId": "402:202"
+    },
+    {
+      "id": "MINE-P0-2",
+      "cardId": "402:274",
+      "nodeId": "402:276"
+    },
+    {
+      "id": "MINE-P0-3",
+      "cardId": "402:350",
+      "nodeId": "402:352"
+    },
+    {
+      "id": "MINE-P0-4",
+      "cardId": "402:393",
+      "nodeId": "402:395"
+    },
+    {
+      "id": "MINE-P0-5",
+      "cardId": "402:469",
+      "nodeId": "402:471"
+    },
+    {
+      "id": "MINE-P0-6",
+      "cardId": "402:512",
+      "nodeId": "402:514"
+    },
+    {
+      "id": "MINE-P0-7",
+      "cardId": "402:566",
+      "nodeId": "402:568"
+    },
+    {
+      "id": "MINE-P0-8",
+      "cardId": "402:618",
+      "nodeId": "402:620"
+    },
+    {
+      "id": "CRAFT-1",
+      "cardId": "402:680",
+      "nodeId": "402:682"
+    },
+    {
+      "id": "CRAFT-2",
+      "cardId": "402:748",
+      "nodeId": "402:750"
+    },
+    {
+      "id": "CRAFT-3",
+      "cardId": "402:808",
+      "nodeId": "402:810"
+    },
+    {
+      "id": "CRAFT-4",
+      "cardId": "402:889",
+      "nodeId": "402:891"
+    },
+    {
+      "id": "GEAR-P0-1",
+      "cardId": "402:960",
+      "nodeId": "402:962"
+    },
+    {
+      "id": "GEAR-P0-2",
+      "cardId": "402:1061",
+      "nodeId": "402:1063"
+    },
+    {
+      "id": "HOME-P0-1",
+      "cardId": "402:1118",
+      "nodeId": "402:1120"
+    },
+    {
+      "id": "COOK-P0-1",
+      "cardId": "406:2",
+      "nodeId": "406:4"
+    },
+    {
+      "id": "COOK-P0-2",
+      "cardId": "406:55",
+      "nodeId": "406:57"
+    },
+    {
+      "id": "COOK-P0-3",
+      "cardId": "406:152",
+      "nodeId": "406:154"
+    },
+    {
+      "id": "COOK-P0-4",
+      "cardId": "406:212",
+      "nodeId": "406:214"
+    },
+    {
+      "id": "COOK-P0-5",
+      "cardId": "406:265",
+      "nodeId": "406:267"
+    },
+    {
+      "id": "COOK-P0-6",
+      "cardId": "406:335",
+      "nodeId": "406:337"
+    },
+    {
+      "id": "COOK-P0-7",
+      "cardId": "406:401",
+      "nodeId": "406:403"
+    },
+    {
+      "id": "COOK-P0-8",
+      "cardId": "406:465",
+      "nodeId": "406:467"
+    },
+    {
+      "id": "STORE-1",
+      "cardId": "406:531",
+      "nodeId": "406:533"
+    },
+    {
+      "id": "STORE-2",
+      "cardId": "406:631",
+      "nodeId": "406:633"
+    },
+    {
+      "id": "COOK-P0-9",
+      "cardId": "406:686",
+      "nodeId": "406:688"
+    },
+    {
+      "id": "COOK-P0-10",
+      "cardId": "406:738",
+      "nodeId": "406:740"
+    },
+    {
+      "id": "BOARD-1",
+      "cardId": "407:2",
+      "nodeId": "407:4"
+    },
+    {
+      "id": "BOARD-2",
+      "cardId": "407:71",
+      "nodeId": "407:73"
+    },
+    {
+      "id": "BOARD-3",
+      "cardId": "407:134",
+      "nodeId": "407:136"
+    },
+    {
+      "id": "TODAY-1",
+      "cardId": "407:186",
+      "nodeId": "407:188"
+    },
+    {
+      "id": "TODAY-2",
+      "cardId": "407:252",
+      "nodeId": "407:254"
+    },
+    {
+      "id": "BAG-1-P0",
+      "cardId": "407:322",
+      "nodeId": "407:324"
+    },
+    {
+      "id": "PARCEL-1",
+      "cardId": "407:593",
+      "nodeId": "407:595"
+    },
+    {
+      "id": "PARCEL-2",
+      "cardId": "407:672",
+      "nodeId": "407:674"
+    },
+    {
+      "id": "PARCEL-3",
+      "cardId": "407:734",
+      "nodeId": "407:736"
+    },
+    {
+      "id": "PARCEL-4",
+      "cardId": "407:795",
+      "nodeId": "407:797"
+    },
+    {
+      "id": "PARCEL-5",
+      "cardId": "407:856",
+      "nodeId": "407:858"
+    },
+    {
+      "id": "PARCEL-6",
+      "cardId": "407:921",
+      "nodeId": "407:923"
+    },
+    {
+      "id": "PROFILE-1-P0",
+      "cardId": "407:995",
+      "nodeId": "407:997"
+    },
+    {
+      "id": "KEEP-P0-1",
+      "cardId": "407:1034",
+      "nodeId": "407:1036"
+    },
+    {
+      "id": "KEEP-P0-2",
+      "cardId": "407:1090",
+      "nodeId": "407:1092"
+    },
+    {
+      "id": "ENERGY-P0-1",
+      "cardId": "407:1110",
+      "nodeId": "407:1112"
+    },
+    {
+      "id": "COOK-KEEP-BRANCH",
+      "cardId": "407:1183",
+      "nodeId": "407:1185"
+    },
+    {
+      "id": "SAVE-RETRY",
+      "cardId": "407:1237",
+      "nodeId": "407:1239"
+    },
+    {
+      "id": "BOARD-DROPPED",
+      "cardId": "407:1261",
+      "nodeId": "407:1263"
+    },
+    {
+      "id": "COOK-HERB-HEAT",
+      "cardId": "407:1310",
+      "nodeId": "407:1312"
+    },
+    {
+      "id": "MAT-GLOVES-RESULT",
+      "cardId": "407:1370",
+      "nodeId": "407:1372"
+    },
+    {
+      "id": "FISH-P0-CAST",
+      "cardId": "407:1424",
+      "nodeId": "407:1426"
+    },
+    {
+      "id": "MINE-CONTINUE",
+      "cardId": "407:1498",
+      "nodeId": "407:1500"
+    },
+    {
+      "id": "BUILD-RETRY",
+      "cardId": "407:1572",
+      "nodeId": "407:1574"
+    },
+    {
+      "id": "PARCEL-ONE",
+      "cardId": "419:2",
+      "nodeId": "419:4"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "row": "01",
+    "nodeId": "482:2",
+    "width": 3324,
+    "height": 1080,
+    "format": "png",
+    "original_width": 3244,
+    "original_height": 1000,
+    "capturedAt": "2026-10-06T08:33:00.860Z"
+  },
+  {
+    "row": "02",
+    "nodeId": "482:19",
+    "width": 3324,
+    "height": 1080,
+    "format": "png",
+    "original_width": 3244,
+    "original_height": 1000,
+    "capturedAt": "2026-10-06T08:33:00.928Z"
+  },
+  {
+    "row": "03",
+    "nodeId": "482:36",
+    "width": 3324,
+    "height": 1080,
+    "format": "png",
+    "original_width": 3244,
+    "original_height": 1000,
+    "capturedAt": "2026-10-06T08:33:00.979Z"
+  }
+]

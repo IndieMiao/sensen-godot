@@ -1,0 +1,422 @@
+[
+  {
+    "id": "COOK-P0-1",
+    "title": "新手厨房 · 单灶",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "energy": "151",
+    "tag": "Stove 1/1 · Tap to cook",
+    "tagY": 300,
+    "tagTo": "TUT-3-07B",
+    "heading": "A kitchen of your own",
+    "meta": "Homestead Lv1 · Cooking Lv1",
+    "rows": [
+      [
+        "Stove 1/1 · Empty",
+        "2 ingredient slots",
+        "i-stove-off"
+      ]
+    ],
+    "actions": [
+      [
+        "Tap to cook",
+        "TUT-3-07B"
+      ],
+      [
+        "Bag",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "场景灶台点击打开Cookbook。厨房无主行动键、切换键或五格快捷栏；单灶镜头，新增整屋美术另计。"
+  },
+  {
+    "id": "COOK-P0-2",
+    "title": "Experiment · 两槽投料",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "tag": "Pond Crucian ×1  ×     + Add",
+    "tagY": 325,
+    "heading": "Stove 1/1 · Experiment",
+    "meta": "Grilled Crucian · Common · +20 Energy · 5 s",
+    "tabs": [
+      "Cookbook",
+      "Experiment"
+    ],
+    "on": 1,
+    "grid": [
+      {
+        "name": "Crucian",
+        "icon": "i-fish",
+        "count": "×2",
+        "selected": true
+      },
+      {
+        "name": "Herb",
+        "icon": "i-herb",
+        "count": "×3"
+      },
+      {
+        "name": "Radish",
+        "icon": "i-radish",
+        "count": "0"
+      },
+      {
+        "name": "Salt",
+        "icon": "i-salt",
+        "count": "0"
+      },
+      {
+        "name": "Carp",
+        "icon": "i-carp",
+        "count": "0"
+      }
+    ],
+    "actions": [
+      [
+        "Cook",
+        "COOK-P0-3"
+      ]
+    ],
+    "note": "点击格入场景锅；锅下两槽，×撤回。投料预览不扣料，Cook才扣；第3槽Cooking Lv4，不画额外灰槽。"
+  },
+  {
+    "id": "COOK-P0-3",
+    "title": "场景锅 · 火候",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heat": "Tap when the needle hits gold!",
+    "heading": "Grilled Crucian · Cooking",
+    "meta": "Stove 1/1 · 0:03 left",
+    "rows": [
+      [
+        "One good tap",
+        "First cook · a generous gold window",
+        "i-pot"
+      ]
+    ],
+    "actions": [
+      [
+        "Tap the pot",
+        "TUT-3-07C"
+      ]
+    ],
+    "note": "首次5s锅在2.5s出现火候，点场景锅。此按钮是可点击原型热区说明，产品不新增劳作FAB。"
+  },
+  {
+    "id": "COOK-P0-4",
+    "title": "满包 · 菜留在灶上",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "energy": "213",
+    "tag": "Stove 1/1 · Ready",
+    "heading": "Bag full",
+    "meta": "Herb Grilled Fish ★ Good · +45 Energy",
+    "rows": [
+      [
+        "Dish left on the stove",
+        "Free a slot, then come back to collect.",
+        "i-stove-off"
+      ]
+    ],
+    "actions": [
+      [
+        "Open bag",
+        "BAG-1-P0"
+      ],
+      [
+        "Cook Again · collect dish first",
+        null,
+        "disabled"
+      ]
+    ],
+    "note": "主动烹饪结果不进Parcels。菜不消失，单灶占用，不能再开火；满体力不以Eat绕开。"
+  },
+  {
+    "id": "COOK-P0-5",
+    "title": "Lv2 · 调味架储物",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Spice Rack",
+    "meta": "Homestead Lv2 · 30 of each seasoning",
+    "grid": [
+      {
+        "name": "Rock Salt",
+        "icon": "i-salt",
+        "count": "12/30"
+      },
+      {
+        "name": "Wild Herb",
+        "icon": "i-herb",
+        "count": "3/30"
+      }
+    ],
+    "cols": 2,
+    "rows": [
+      [
+        "Ready to cook",
+        "Experiment marks these ingredients as Rack.",
+        "i-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Open Experiment",
+        "COOK-P0-2",
+        "soft"
+      ]
+    ],
+    "note": "只储物、不解投料槽。Cooking Lv1仍2槽，Lv4才3槽；四类调味容量每类30，P0展示已有盐与香草。"
+  },
+  {
+    "id": "COOK-P0-6",
+    "title": "Lv3 · 保温柜领取",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Warming Cabinet · 4/6",
+    "meta": "Homestead Lv3",
+    "rows": [
+      [
+        "Herb Grilled Fish ★ Good",
+        "+45 Energy · ×1",
+        "i-dish-herb"
+      ],
+      [
+        "Grilled Crucian ★ Good",
+        "+25 Energy · ×3",
+        "i-dish-grilled"
+      ]
+    ],
+    "actions": [
+      [
+        "Take 1 to bag",
+        "COOK-P0-7"
+      ],
+      [
+        "Eat · +45 Energy",
+        "COOK-P0-7",
+        "soft"
+      ]
+    ],
+    "foot": "Cooked dishes go here while there is room.",
+    "note": "柜里可直接吃；取包需空格。6份按份数计，柜满且Bag满则留灶。新手Lv1不显示柜。"
+  },
+  {
+    "id": "COOK-P0-7",
+    "title": "Cook Again · 有料",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Cook Again",
+    "meta": "Herb Grilled Fish · 2nd today · half XP",
+    "needs": [
+      [
+        "Fish",
+        2,
+        1,
+        "i-fish"
+      ],
+      [
+        "Wild Herb",
+        2,
+        1,
+        "i-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Cook Again · 15 s",
+        "COOK-HERB-HEAT"
+      ],
+      [
+        "Choose another recipe",
+        "TUT-3-07B",
+        "soft"
+      ]
+    ],
+    "note": "Cooking Lv2才显示；先收走上锅且有空闲灶，再次按下才扣料。2nd half XP；第3锅No XP提示。"
+  },
+  {
+    "id": "COOK-P0-8",
+    "title": "Cook Again · 缺料",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Herb Grilled Fish",
+    "meta": "Cook Again · 2nd today · half XP",
+    "needs": [
+      [
+        "Fish",
+        0,
+        1,
+        "i-fish"
+      ],
+      [
+        "Wild Herb",
+        2,
+        1,
+        "i-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Need Fish ×1",
+        null,
+        "disabled"
+      ],
+      [
+        "Choose another recipe",
+        "TUT-3-07B",
+        "soft"
+      ],
+      [
+        "Show pond",
+        "TUT-3-04",
+        "soft"
+      ]
+    ],
+    "note": "缺料不先扣现有材料。Show pond仅地图高亮；不传送、不自动钓鱼。"
+  },
+  {
+    "id": "STORE-1",
+    "title": "农场仓库 · 带出门",
+    "scene": "farm",
+    "heading": "Farm Storage",
+    "meta": "At home · materials stored automatically",
+    "tabs": [
+      "Seeds",
+      "Materials"
+    ],
+    "on": 1,
+    "grid": [
+      {
+        "name": "Timber",
+        "icon": "i-wood",
+        "count": "12"
+      },
+      {
+        "name": "Stone",
+        "icon": "i-stone",
+        "count": "8"
+      },
+      {
+        "name": "Reeds",
+        "icon": "i-reeds",
+        "count": "6"
+      },
+      {
+        "name": "Copper",
+        "icon": "i-copper",
+        "count": "5"
+      },
+      {
+        "name": "Torch",
+        "icon": "i-torch",
+        "count": "12"
+      }
+    ],
+    "rows": [
+      [
+        "Torch ×12",
+        "Bag 22/25 · 3 slots free",
+        "i-torch"
+      ]
+    ],
+    "actions": [
+      [
+        "Take 10",
+        "BAG-1-P0"
+      ],
+      [
+        "Take all",
+        "BAG-1-P0",
+        "soft"
+      ]
+    ],
+    "note": "仓库不限格每堆99；材料／种子／肥料／火把／摆件回家入库。鱼、作物、料理不自动入库。Take受Bag可容纳数裁剪。"
+  },
+  {
+    "id": "STORE-2",
+    "title": "离家 · 仓库只读",
+    "scene": "pond",
+    "place": "Willow Pond",
+    "heading": "Farm Storage",
+    "tabs": [
+      "Seeds",
+      "Materials"
+    ],
+    "on": 1,
+    "rows": [
+      [
+        "Torch ×12",
+        "Stored at your homestead",
+        "i-torch"
+      ]
+    ],
+    "actions": [
+      [
+        "At home",
+        null,
+        "disabled"
+      ],
+      [
+        "Go home · Free",
+        "STORE-1"
+      ]
+    ],
+    "note": "在外只读，不凭空取物；返回农场再Take。回家引导是明确Go home，不冒充Show on map。"
+  },
+  {
+    "id": "COOK-P0-9",
+    "title": "留灶后 · 空位再领取",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Your dish is ready",
+    "meta": "Bag 24/25 · 1 slot free",
+    "rows": [
+      [
+        "Herb Grilled Fish ★ Good",
+        "Stove 1/1 · +45 Energy",
+        "i-dish-herb"
+      ]
+    ],
+    "actions": [
+      [
+        "Keep",
+        "COOK-P0-7"
+      ]
+    ],
+    "foot": "Collecting frees this stove for your next dish.",
+    "note": "从Bag整理返回保留同一道菜、品质和数量；Keep成功才清灶，再允许Cook Again。"
+  },
+  {
+    "id": "COOK-P0-10",
+    "title": "火候三态 · 修订替代稿",
+    "scene": "kitchen",
+    "place": "Kitchen",
+    "heading": "Heat results",
+    "rows": [
+      [
+        "Missed · still cooking",
+        "Plain · the dish is kept",
+        "i-pot"
+      ],
+      [
+        "Nice heat! ★",
+        "Good · better recovery",
+        "i-dish-grilled"
+      ],
+      [
+        "Perfect! ★★",
+        "Extra portion",
+        "i-star"
+      ]
+    ],
+    "actions": [
+      [
+        "Back to stove",
+        "COOK-P0-1",
+        "soft"
+      ]
+    ],
+    "note": "替代旧COOK-3-2主操作示意。无Cook · Free、无切换FAB；多灶并行属于P1，沿用旧火候节奏说明。"
+  }
+]

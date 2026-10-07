@@ -1,0 +1,274 @@
+{
+  "generatedAt": "2026-10-06T11:22:45.290964+00:00",
+  "scope": "Main frames composed before serializer fix; root reported completed264 immediately before repair. First264 ordered completedIDs used.",
+  "preFixCompletedBoundary": 264,
+  "currentCompleted": 272,
+  "bug": "Python value membership in [...,False] also matched numeric0. Explicit false flags were also omitted.",
+  "fix": "Keep numeric0 and false; remove onlyNone/empty string/empty array.",
+  "ignored": "selected:false, reviewOnly:false, previewOnly:false, HUD unread0 and similar fields whose normal default already matches; close:false where default/ownClose already suppresses it.",
+  "targets": [
+    {
+      "id": "HUD-3",
+      "nodeId": "482:29",
+      "paths": [
+        {
+          "path": "hud.energy",
+          "value": 0,
+          "reason": "Numeric0 was omitted by False equality; may become unknown, blank or a default resource value."
+        }
+      ]
+    },
+    {
+      "id": "COOK-2a-2",
+      "nodeId": "482:76",
+      "paths": [
+        {
+          "path": "stateExamples[1].requirements[1].have",
+          "value": 0,
+          "reason": "Numeric0 was omitted by False equality; may become unknown, blank or a default resource value."
+        }
+      ]
+    },
+    {
+      "id": "NPC-7",
+      "nodeId": "482:137",
+      "paths": [
+        {
+          "path": "items[1].requirements[0].have",
+          "value": 0,
+          "reason": "Numeric0 was omitted by False equality; may become unknown, blank or a default resource value."
+        },
+        {
+          "path": "items[1].requirements[1].have",
+          "value": 0,
+          "reason": "Numeric0 was omitted by False equality; may become unknown, blank or a default resource value."
+        },
+        {
+          "path": "items[1].requirements[2].have",
+          "value": 0,
+          "reason": "Numeric0 was omitted by False equality; may become unknown, blank or a default resource value."
+        }
+      ]
+    },
+    {
+      "id": "NEED-TILE",
+      "nodeId": "482:176",
+      "paths": [
+        {
+          "path": "stateExamples[2].requirements[0].have",
+          "value": 0,
+          "reason": "Numeric0 was omitted by False equality; may become unknown, blank or a default resource value."
+        },
+        {
+          "path": "stateExamples[6].requirements[0].have",
+          "value": 0,
+          "reason": "Numeric0 was omitted by False equality; may become unknown, blank or a default resource value."
+        }
+      ]
+    },
+    {
+      "id": "TUT-1",
+      "nodeId": "482:182",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "COOK-P0-8",
+      "nodeId": "482:273",
+      "paths": [
+        {
+          "path": "requirements[0].have",
+          "value": 0,
+          "reason": "Numeric0 was omitted by False equality; may become unknown, blank or a default resource value."
+        }
+      ]
+    },
+    {
+      "id": "MAP-4-FREE",
+      "nodeId": "482:405",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "MAP-5-FREE",
+      "nodeId": "482:407",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "PASS-1",
+      "nodeId": "482:429",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "PASS-2",
+      "nodeId": "482:431",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "TRAVEL-RETRY",
+      "nodeId": "482:433",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "MAP-4-PAID",
+      "nodeId": "482:439",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "MAP-4-GATE",
+      "nodeId": "482:441",
+      "paths": [
+        {
+          "path": "requirements[0].have",
+          "value": 0,
+          "reason": "Numeric0 was omitted by False equality; may become unknown, blank or a default resource value."
+        },
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "MAP-5-PAID",
+      "nodeId": "482:443",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "TRAVEL-GUIDE",
+      "nodeId": "482:446",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "TRAVEL-CANCEL",
+      "nodeId": "482:448",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "TRAVEL-REFUNDED",
+      "nodeId": "482:450",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "SECOND-HOME",
+      "nodeId": "482:463",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "SECOND-HOME-DONE",
+      "nodeId": "482:465",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "TRADER",
+      "nodeId": "482:518",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'Travel Post' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "BUFF-RATIONS-USE",
+      "nodeId": "482:541",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'City map' when false was omitted."
+        }
+      ]
+    },
+    {
+      "id": "DEX-MILESTONE",
+      "nodeId": "482:611",
+      "paths": [
+        {
+          "path": "navigation.placeExplicit",
+          "value": false,
+          "reason": "Generated place 'Homestead' overrode scene-derived 'Willow Pond' when false was omitted."
+        }
+      ]
+    }
+  ],
+  "count": 22
+}

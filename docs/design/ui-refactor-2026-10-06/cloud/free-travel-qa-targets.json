@@ -1,0 +1,68 @@
+[
+  {
+    "id": "LOCAL-SHOP",
+    "node": "482:420",
+    "energy": "152/200",
+    "coins": "230"
+  },
+  {
+    "id": "LOCAL-TRADE",
+    "node": "482:422",
+    "energy": "152/200",
+    "coins": "230"
+  },
+  {
+    "id": "LOCAL-BOUGHT",
+    "node": "482:424",
+    "energy": "152/200",
+    "coins": "213"
+  },
+  {
+    "id": "LOCAL-CATCH",
+    "node": "482:418",
+    "energy": "147/200",
+    "coins": "230"
+  },
+  {
+    "id": "FREE-HOME-BROWSE",
+    "node": "776:75938",
+    "energy": "152/200",
+    "coins": "230"
+  },
+  {
+    "id": "FREE-HOME-BROWSE/scene",
+    "node": "776:75874",
+    "energy": "152/200",
+    "coins": "230"
+  },
+  {
+    "id": "FREE-HOME-CATCH",
+    "node": "776:76178",
+    "energy": "147/200",
+    "coins": "230"
+  },
+  {
+    "id": "FREE-HOME-CATCH/scene",
+    "node": "776:76118",
+    "energy": "147/200",
+    "coins": "230"
+  },
+  {
+    "id": "FREE-HOME-BOUGHT",
+    "node": "776:76421",
+    "energy": "152/200",
+    "coins": "213"
+  },
+  {
+    "id": "FREE-HOME-BOUGHT/scene",
+    "node": "776:76361",
+    "energy": "152/200",
+    "coins": "213"
+  },
+  {
+    "id": "FREE-EXPLORE-BOUGHT",
+    "node": "776:76604",
+    "energy": "152/200",
+    "coins": "213"
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "method": "Compared literal energy-num/of and coins card in all playable legacy source HTML against missing normalized HUD fields. Retained explicit newer corrections.",
+  "updates": {
+    "FARM-2": {
+      "energy": 136
+    },
+    "FARM-7": {
+      "energy": 120
+    },
+    "SKILL-3": {
+      "energy": 192
+    },
+    "HOME-1": {
+      "coins": 830
+    },
+    "HOME-2": {
+      "energy": 220,
+      "capacity": 220,
+      "coins": 430
+    },
+    "NPC-5-2": {
+      "energy": 142
+    }
+  },
+  "sourcePaths": {
+    "FARM-2": "docs/design/ui-anchors-2026-10-03/ui/batch1/FARM-2.html",
+    "FARM-7": "docs/design/ui-anchors-2026-10-03/ui/batch1/FARM-7.html",
+    "SKILL-3": "docs/design/ui-anchors-2026-10-03/ui/batch1/SKILL-3.html",
+    "NPC-5-2": "docs/design/ui-anchors-2026-10-03/ui/batch1/NPC-5-2.html",
+    "HOME-1": "docs/design/ui-anchors-2026-10-03/ui/batch2/HOME-1.html",
+    "HOME-2": "docs/design/ui-anchors-2026-10-03/ui/batch2/HOME-2.html"
+  },
+  "preservedCorrection": {
+    "NPC-5-2": "Original162 was a stale automatic+20 on receiving a gift. Current authorized rule says claiming adds a dish, not Energy. Keep142 explicitly; do not parse162 back."
+  }
+}

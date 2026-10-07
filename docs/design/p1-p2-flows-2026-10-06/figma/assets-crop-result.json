@@ -1,0 +1,187 @@
+{
+  "createdNodeIdsFile": "asset-node-ids.json",
+  "assets": [
+    {
+      "id": "crop_radish",
+      "name": "Radish",
+      "category": "crop",
+      "componentId": "442:6783",
+      "specimenId": "442:6784",
+      "instanceId": "442:6786",
+      "source": "existing i-radish"
+    },
+    {
+      "id": "crop_lettuce",
+      "name": "Lettuce",
+      "category": "crop",
+      "componentId": "442:6799",
+      "specimenId": "442:6800",
+      "instanceId": "442:6802",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_herb",
+      "name": "Herb",
+      "category": "crop",
+      "componentId": "442:6814",
+      "specimenId": "442:6815",
+      "instanceId": "442:6817",
+      "source": "existing i-herb"
+    },
+    {
+      "id": "crop_carrot",
+      "name": "Carrot",
+      "category": "crop",
+      "componentId": "442:6828",
+      "specimenId": "442:6829",
+      "instanceId": "442:6831",
+      "source": "existing i-carrot"
+    },
+    {
+      "id": "crop_potato",
+      "name": "Potato",
+      "category": "crop",
+      "componentId": "442:6843",
+      "specimenId": "442:6844",
+      "instanceId": "442:6846",
+      "source": "existing i-potato"
+    },
+    {
+      "id": "crop_chamomile",
+      "name": "Chamomile",
+      "category": "crop",
+      "componentId": "442:6862",
+      "specimenId": "442:6863",
+      "instanceId": "442:6865",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_chili",
+      "name": "Chili",
+      "category": "crop",
+      "componentId": "442:6880",
+      "specimenId": "442:6881",
+      "instanceId": "442:6883",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_tomato",
+      "name": "Tomato",
+      "category": "crop",
+      "componentId": "442:6893",
+      "specimenId": "442:6894",
+      "instanceId": "442:6896",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_cabbage",
+      "name": "Cabbage",
+      "category": "crop",
+      "componentId": "442:6905",
+      "specimenId": "442:6906",
+      "instanceId": "442:6908",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_corn",
+      "name": "Corn",
+      "category": "crop",
+      "componentId": "442:6926",
+      "specimenId": "442:6927",
+      "instanceId": "442:6929",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_cucumber",
+      "name": "Cucumber",
+      "category": "crop",
+      "componentId": "442:6948",
+      "specimenId": "442:6949",
+      "instanceId": "442:6951",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_strawberry",
+      "name": "Strawberry",
+      "category": "crop",
+      "componentId": "442:6966",
+      "specimenId": "442:6967",
+      "instanceId": "442:6969",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_melon",
+      "name": "Melon",
+      "category": "crop",
+      "componentId": "442:6985",
+      "specimenId": "442:6986",
+      "instanceId": "442:6988",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_pineapple",
+      "name": "Pineapple",
+      "category": "crop",
+      "componentId": "442:7001",
+      "specimenId": "442:7002",
+      "instanceId": "442:7004",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_sweet_potato",
+      "name": "Sweet Potato",
+      "category": "crop",
+      "componentId": "442:7015",
+      "specimenId": "442:7016",
+      "instanceId": "442:7018",
+      "source": "existing i-sweet-potato"
+    },
+    {
+      "id": "crop_pumpkin",
+      "name": "Pumpkin",
+      "category": "crop",
+      "componentId": "442:7029",
+      "specimenId": "442:7030",
+      "instanceId": "442:7032",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_beet",
+      "name": "Beetroot",
+      "category": "crop",
+      "componentId": "442:7045",
+      "specimenId": "442:7046",
+      "instanceId": "442:7048",
+      "source": "new native vector draft"
+    },
+    {
+      "id": "crop_apple",
+      "name": "Apple",
+      "category": "crop",
+      "componentId": "442:7061",
+      "specimenId": "442:7062",
+      "instanceId": "442:7064",
+      "source": "existing i-apple"
+    },
+    {
+      "id": "crop_citrus",
+      "name": "Citrus",
+      "category": "crop",
+      "componentId": "442:7075",
+      "specimenId": "442:7076",
+      "instanceId": "442:7078",
+      "source": "existing i-citrus"
+    },
+    {
+      "id": "crop_grape",
+      "name": "Grapes",
+      "category": "crop",
+      "componentId": "442:7093",
+      "specimenId": "442:7094",
+      "instanceId": "442:7096",
+      "source": "existing i-grape"
+    }
+  ],
+  "count": 20,
+  "group": "20 · 作物图标 / 既有样式扩展"
+}

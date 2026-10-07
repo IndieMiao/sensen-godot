@@ -1,0 +1,3 @@
+from pathlib import Path
+import json,subprocess
+p=Path(__file__).resolve().parent;state=json.loads((p.parent/'state.json').read_text());config={'pageId':state['pageId'],'mainScreens':state['screens']};source=(p/'overlay-audit-organized.js').read_text();source=source[:source.index("return {kind:'readonly-section-aware-overlay-audit'")];tail=(p/'overlay-final-audit-tail.js.txt').read_text();out=p/'overlay-final-audit.js';out.write_text('const FINAL_AUDIT='+json.dumps(config,separators=(',',':'))+';\n'+source+'\n'+tail);subprocess.run(['node',str(p.parent/'minify.cjs'),str(out)],check=True);subprocess.run(['node',str(p.parent/'preflight_script.cjs'),str(out)],check=True);print(out.stat().st_size)

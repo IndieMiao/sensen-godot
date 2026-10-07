@@ -1,0 +1,14 @@
+{
+  "updatedAt": "2026-10-06T10:10:12.542283+00:00",
+  "ids": [
+    "COOK-P1-8",
+    "FAC-GH",
+    "DOUBLE-RESULT"
+  ],
+  "changes": [
+    "Lucky Double uses two portion rows once; no duplicate Good/Plain count facts.",
+    "Double output2 is the title quantity only.",
+    "Greenhouse300coin price remains directly aboveCraft; duplicate currency NeedTile removed. Affordability remains visible through HUD350."
+  ],
+  "originalSnapshotsPreserved": true
+}

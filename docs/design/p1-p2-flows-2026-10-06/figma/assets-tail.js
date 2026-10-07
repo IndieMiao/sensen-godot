@@ -1,0 +1,8 @@
+const review=await figma.getNodeByIdAsync('438:3184');
+const library=await figma.getNodeByIdAsync(KIT.sectionId);
+const result=[];
+const heading=txt(review,GROUP_TITLE,28,2200,'ExtraBold','ink',40);heading.fontName={family:'Noto Sans SC',style:'Bold'};heading.x=48;heading.y=BASE_Y;
+for(let i=0;i<ASSETS.length;i++){const d=ASSETS[i];const art=figma.createNodeFromSvg(d.svg);made.push(art.id,...art.findAll(()=>true).map(n=>n.id));art.name=d.name;art.resize(64,64);library.appendChild(art);const component=figma.createComponentFromNode(art);mark(component);component.name='Gensen / Content / '+d.category+' / '+d.id;component.description=d.name+' · '+d.source+'. Canonical ID: '+d.id+'. Editable vector concept; does not imply a finished 3D asset.';component.x=40+(i%14)*100;component.y=LIB_Y+Math.floor(i/14)*110;
+const tile=a(review,d.id+' · specimen',216,'VERTICAL',8);tile.x=48+(i%10)*240;tile.y=BASE_Y+64+Math.floor(i/10)*190;tile.counterAxisAlignItems='CENTER';const box=round(f(tile,'Specimen well',216,110,'cream'),16);stroke(box);const inst=component.createInstance();box.appendChild(inst);made.push(inst.id);inst.resize(84,84);inst.x=66;inst.y=13;const n=txt(tile,d.name,14,216,'ExtraBold','ink',20);n.textAlignHorizontal='CENTER';const id=txt(tile,d.id,9,216,'Bold','muted',13);id.textAlignHorizontal='CENTER';result.push({id:d.id,name:d.name,category:d.category,componentId:component.id,specimenId:tile.id,instanceId:inst.id,source:d.source});}
+figma.io.write('asset-node-ids.json',JSON.stringify({createdNodeIds:made}));
+return {createdNodeIdsFile:'asset-node-ids.json',assets:result,count:result.length,group:GROUP_TITLE};

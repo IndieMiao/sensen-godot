@@ -1,0 +1,112 @@
+{
+  "bag": [
+    {
+      "id": "432:306",
+      "name": "Mode=Bag",
+      "w": 360,
+      "h": 533.3333129882812,
+      "quickWidth": 340,
+      "quickHeight": 53.33333206176758,
+      "quickSlots": 6,
+      "inventoryRows": 5,
+      "inventoryCell": 53.33333206176758
+    },
+    {
+      "id": "432:460",
+      "name": "Mode=MiningAvailable",
+      "w": 360,
+      "h": 533.3333129882812,
+      "quickWidth": 340,
+      "quickHeight": 53.33333206176758,
+      "quickSlots": 6,
+      "gearColumns": 6
+    },
+    {
+      "id": "432:614",
+      "name": "Mode=MiningEquipped",
+      "w": 360,
+      "h": 533.3333129882812,
+      "quickWidth": 340,
+      "quickHeight": 53.33333206176758,
+      "quickSlots": 6,
+      "gearColumns": 6
+    }
+  ],
+  "buttonVariants": [
+    {
+      "id": "430:7",
+      "name": "Size=Standard, Tone=Primary",
+      "w": 320,
+      "h": 37.33333206176758
+    },
+    {
+      "id": "430:8",
+      "name": "Size=Standard, Tone=Secondary",
+      "w": 320,
+      "h": 37.33333206176758
+    },
+    {
+      "id": "430:9",
+      "name": "Size=Standard, Tone=Disabled",
+      "w": 320,
+      "h": 37.33333206176758
+    },
+    {
+      "id": "452:12054",
+      "name": "Size=Small, Tone=Primary",
+      "w": 56.66666793823242,
+      "h": 26.66666603088379
+    },
+    {
+      "id": "452:12056",
+      "name": "Size=Small, Tone=Secondary",
+      "w": 56.66666793823242,
+      "h": 26.66666603088379
+    },
+    {
+      "id": "452:12058",
+      "name": "Size=Small, Tone=Disabled",
+      "w": 56.66666793823242,
+      "h": 26.66666603088379
+    }
+  ],
+  "needVariants": [
+    {
+      "id": "448:11744",
+      "name": "Size=L, State=Complete",
+      "ring": 52,
+      "labelWidth": 105
+    },
+    {
+      "id": "448:11754",
+      "name": "Size=L, State=Short",
+      "ring": 52,
+      "labelWidth": 105
+    },
+    {
+      "id": "448:11764",
+      "name": "Size=M, State=Complete",
+      "ring": 37.33333206176758,
+      "labelWidth": 105
+    },
+    {
+      "id": "448:11774",
+      "name": "Size=M, State=Short",
+      "ring": 37.33333206176758,
+      "labelWidth": 105
+    },
+    {
+      "id": "448:11784",
+      "name": "Size=S, State=Complete",
+      "ring": 24,
+      "labelWidth": 105
+    },
+    {
+      "id": "448:11794",
+      "name": "Size=S, State=Short",
+      "ring": 24,
+      "labelWidth": 105
+    }
+  ],
+  "instanceCounts": 1647
+}

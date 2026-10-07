@@ -1,0 +1,4979 @@
+{
+  "FARM-1": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "FISH-1": {
+    "quickContents": [
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": true,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Spinner Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fish Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-worm",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-lure",
+        "selected": false
+      }
+    ]
+  },
+  "BAG-1": {
+    "bagContents": [
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": true,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        },
+        "state": "Common",
+        "effect": "Restores 20 Energy",
+        "keyFacts": [],
+        "requirements": [],
+        "supporting": "",
+        "disclosure": [
+          "Simple grilled pond fish. Tastes like home."
+        ],
+        "actions": [
+          {
+            "label": "Eat",
+            "target": "COOK-7",
+            "kind": "commit"
+          },
+          {
+            "label": "Choose recipient",
+            "target": "SOC-5",
+            "kind": "navigate"
+          }
+        ]
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Timber",
+        "icon": "i-wood",
+        "selected": false,
+        "quantity": {
+          "value": "20",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Stone",
+        "icon": "i-stone",
+        "selected": false,
+        "quantity": {
+          "value": "8",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ],
+    "quickContents": [
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        },
+        "state": "Common",
+        "effect": "Restores 20 Energy",
+        "keyFacts": [],
+        "requirements": [],
+        "supporting": "",
+        "disclosure": [
+          "Simple grilled pond fish. Tastes like home."
+        ],
+        "actions": [
+          {
+            "label": "Eat",
+            "target": "COOK-7",
+            "kind": "commit"
+          },
+          {
+            "label": "Choose recipient",
+            "target": "SOC-5",
+            "kind": "navigate"
+          }
+        ]
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "BAG-3": {
+    "bagContents": [
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Golden Koi",
+        "icon": "i-koi",
+        "selected": true,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        },
+        "state": "Rare",
+        "effect": "Not for cooking",
+        "keyFacts": [
+          {
+            "label": "Sell value",
+            "value": "10 coins each",
+            "kind": "reward"
+          }
+        ],
+        "requirements": [],
+        "supporting": "",
+        "disclosure": [
+          "Caught at Willow Pond.",
+          "Fish-dex 9/20.",
+          "XP earned at this level: 50%.",
+          "A prized koi with a golden sheen."
+        ],
+        "actions": [
+          {
+            "label": "Sell location",
+            "target": "NPC-2-2",
+            "kind": "navigate"
+          },
+          {
+            "label": "Choose recipient",
+            "target": "SOC-5",
+            "kind": "navigate"
+          }
+        ]
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ],
+    "quickContents": [
+      {
+        "title": "Golden Koi",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        },
+        "state": "Rare",
+        "effect": "Not for cooking",
+        "keyFacts": [
+          {
+            "label": "Sell value",
+            "value": "10 coins each",
+            "kind": "reward"
+          }
+        ],
+        "requirements": [],
+        "supporting": "",
+        "disclosure": [
+          "Caught at Willow Pond.",
+          "Fish-dex 9/20.",
+          "XP earned at this level: 50%.",
+          "A prized koi with a golden sheen."
+        ],
+        "actions": [
+          {
+            "label": "Sell location",
+            "target": "NPC-2-2",
+            "kind": "navigate"
+          },
+          {
+            "label": "Choose recipient",
+            "target": "SOC-5",
+            "kind": "navigate"
+          }
+        ]
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "BAG-4": {
+    "bagContents": [
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Timber",
+        "icon": "i-wood",
+        "selected": false,
+        "quantity": {
+          "value": "20",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Stone",
+        "icon": "i-stone",
+        "selected": false,
+        "quantity": {
+          "value": "8",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ],
+    "quickContents": [
+      {
+        "title": "Compost",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        },
+        "state": "",
+        "effect": "",
+        "keyFacts": [],
+        "requirements": [],
+        "supporting": "",
+        "disclosure": [],
+        "actions": []
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Pumpkin Seeds",
+        "icon": "i-pumpkin-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "BAG-4-2": {
+    "bagContents": [
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Timber",
+        "icon": "i-wood",
+        "selected": false,
+        "quantity": {
+          "value": "20",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Stone",
+        "icon": "i-stone",
+        "selected": false,
+        "quantity": {
+          "value": "8",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Timber",
+        "icon": "i-wood",
+        "selected": false,
+        "quantity": {
+          "value": "20",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Stone",
+        "icon": "i-stone",
+        "selected": false,
+        "quantity": {
+          "value": "8",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ],
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "BAR-1": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Pumpkin Seeds",
+        "icon": "i-pumpkin-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "BAR-2": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "BAR-3": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "BAR-3-2": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "HUD-3": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "HUD-4": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "CTRL-1": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "CTRL-1-2": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "FARM-2": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "FARM-3": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "FARM-6": {
+    "bagContents": [
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": true,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        },
+        "state": "Common dish",
+        "effect": "Restores 20 Energy",
+        "keyFacts": [
+          {
+            "label": "Each",
+            "value": "2 coins",
+            "kind": "reward"
+          },
+          {
+            "label": "Sell all",
+            "value": "6 coins",
+            "kind": "reward"
+          }
+        ],
+        "requirements": [],
+        "supporting": "",
+        "disclosure": [
+          "Dish buyback limit:120 coins per day."
+        ],
+        "actions": [
+          {
+            "label": "Sell one",
+            "kind": "commit",
+            "target": null
+          },
+          {
+            "label": "Sell all",
+            "kind": "commit",
+            "target": null
+          }
+        ]
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Timber",
+        "icon": "i-wood",
+        "selected": false,
+        "quantity": {
+          "value": "20",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Stone",
+        "icon": "i-stone",
+        "selected": false,
+        "quantity": {
+          "value": "8",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "FARM-6-2": {
+    "bagContents": [
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": true,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        },
+        "state": "Common",
+        "effect": "",
+        "keyFacts": [
+          {
+            "label": "Each",
+            "value": "5 coins",
+            "kind": "reward"
+          },
+          {
+            "label": "Sell all",
+            "value": "60 coins",
+            "kind": "reward"
+          }
+        ],
+        "requirements": [],
+        "supporting": "",
+        "disclosure": [],
+        "actions": [
+          {
+            "label": "Sell one",
+            "kind": "commit",
+            "target": "STALL-RADISH-SOLD-ONE"
+          },
+          {
+            "label": "Sell all",
+            "kind": "commit",
+            "target": "STALL-RADISH-SOLD-ALL"
+          }
+        ]
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "FARM-7": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "FARM-7-2": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "FISH-3": {
+    "quickContents": [
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": true,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Spinner Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fish Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-worm",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-lure",
+        "selected": false
+      }
+    ]
+  },
+  "FISH-4": {
+    "quickContents": [
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": true,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Spinner Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fish Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-worm",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-lure",
+        "selected": false
+      }
+    ]
+  },
+  "FISH-5": {
+    "quickContents": [
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": true,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Spinner Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fish Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-worm",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-lure",
+        "selected": false
+      }
+    ]
+  },
+  "FISH-5-2": {
+    "quickContents": [
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": true,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Spinner Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fish Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-worm",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-lure",
+        "selected": false
+      }
+    ]
+  },
+  "SKILL-3": {
+    "quickContents": [
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": true,
+        "quantity": {
+          "value": "15",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Spinner Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fish Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-worm",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-lure",
+        "selected": false
+      }
+    ]
+  },
+  "SKILL-3-2": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-radish-seeds",
+        "selected": false
+      }
+    ]
+  },
+  "TUT-2-2": {
+    "quickContents": [
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": true,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Spinner Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fish Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-worm",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-lure",
+        "selected": false
+      }
+    ]
+  },
+  "COOK-2a": {
+    "bagContents": [
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": true
+      },
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": false
+      },
+      {
+        "title": "Dish Salad",
+        "icon": "i-dish-salad",
+        "selected": false
+      },
+      {
+        "title": "Dish Plate",
+        "icon": "i-dish-plate",
+        "selected": false
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false
+      },
+      {
+        "title": "Herb Grilled Fish",
+        "icon": "i-dish-herb",
+        "selected": false
+      },
+      {
+        "title": "Dish Cakes",
+        "icon": "i-dish-cakes",
+        "selected": false
+      },
+      {
+        "title": "Dish Skewer",
+        "icon": "i-dish-skewer",
+        "selected": false
+      },
+      {
+        "title": "Dish Cake",
+        "icon": "i-dish-cake",
+        "selected": false
+      },
+      {
+        "title": "Dish Stew",
+        "icon": "i-dish-stew",
+        "selected": false
+      },
+      {
+        "title": "Dish Biscuit",
+        "icon": "i-dish-biscuit",
+        "selected": false
+      },
+      {
+        "title": "Dish Bowl",
+        "icon": "i-dish-bowl",
+        "selected": false
+      },
+      {
+        "title": "Dish Pie",
+        "icon": "i-dish-pie",
+        "selected": false
+      },
+      {
+        "title": "Dish Plate",
+        "icon": "i-dish-plate",
+        "selected": false
+      },
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": false
+      },
+      {
+        "title": "Dish Stew",
+        "icon": "i-dish-stew",
+        "selected": false
+      },
+      {
+        "title": "Dish Cakes",
+        "icon": "i-dish-cakes",
+        "selected": false
+      },
+      {
+        "title": "Dish Salad",
+        "icon": "i-dish-salad",
+        "selected": false
+      },
+      {
+        "title": "Dish Bowl",
+        "icon": "i-dish-bowl",
+        "selected": false
+      },
+      {
+        "title": "Dish Skewer",
+        "icon": "i-dish-skewer",
+        "selected": false
+      },
+      {
+        "title": "Dish Stew",
+        "icon": "i-dish-stew",
+        "selected": false
+      },
+      {
+        "title": "Dish Pie",
+        "icon": "i-dish-pie",
+        "selected": false
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false
+      },
+      {
+        "title": "Dish Plate",
+        "icon": "i-dish-plate",
+        "selected": false
+      },
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": false
+      }
+    ]
+  },
+  "COOK-2a-2": {
+    "bagContents": [
+      {
+        "title": "Herb Grilled Fish",
+        "icon": "i-dish-herb",
+        "selected": false
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false
+      },
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": false
+      },
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": false
+      },
+      {
+        "title": "Dish Salad",
+        "icon": "i-dish-salad",
+        "selected": false
+      },
+      {
+        "title": "Dish Plate",
+        "icon": "i-dish-plate",
+        "selected": false
+      },
+      {
+        "title": "Dish Cakes",
+        "icon": "i-dish-cakes",
+        "selected": false
+      },
+      {
+        "title": "Dish Bowl",
+        "icon": "i-dish-bowl",
+        "selected": false
+      },
+      {
+        "title": "Dish Cake",
+        "icon": "i-dish-cake",
+        "selected": false
+      },
+      {
+        "title": "Dish Skewer",
+        "icon": "i-dish-skewer",
+        "selected": false
+      },
+      {
+        "title": "Dish Stew",
+        "icon": "i-dish-stew",
+        "selected": true
+      },
+      {
+        "title": "Dish Bowl",
+        "icon": "i-dish-bowl",
+        "selected": false
+      },
+      {
+        "title": "Dish Biscuit",
+        "icon": "i-dish-biscuit",
+        "selected": false
+      },
+      {
+        "title": "Dish Stew",
+        "icon": "i-dish-stew",
+        "selected": false
+      },
+      {
+        "title": "Dish Pie",
+        "icon": "i-dish-pie",
+        "selected": false
+      },
+      {
+        "title": "Dish Plate",
+        "icon": "i-dish-plate",
+        "selected": false
+      },
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": false
+      },
+      {
+        "title": "Dish Stew",
+        "icon": "i-dish-stew",
+        "selected": false
+      },
+      {
+        "title": "Dish Cakes",
+        "icon": "i-dish-cakes",
+        "selected": false
+      },
+      {
+        "title": "Dish Salad",
+        "icon": "i-dish-salad",
+        "selected": false
+      },
+      {
+        "title": "Dish Bowl",
+        "icon": "i-dish-bowl",
+        "selected": false
+      },
+      {
+        "title": "Dish Skewer",
+        "icon": "i-dish-skewer",
+        "selected": false
+      },
+      {
+        "title": "Dish Pie",
+        "icon": "i-dish-pie",
+        "selected": false
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false
+      },
+      {
+        "title": "Dish Plate",
+        "icon": "i-dish-plate",
+        "selected": false
+      }
+    ]
+  },
+  "COOK-2b": {
+    "bagContents": [
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Koi",
+        "icon": "i-koi",
+        "selected": false
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Potato",
+        "icon": "i-potato",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "COOK-2b-2": {
+    "bagContents": [
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Potato",
+        "icon": "i-potato",
+        "selected": false
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Koi",
+        "icon": "i-koi",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Koi",
+        "icon": "i-koi",
+        "selected": false
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Potato",
+        "icon": "i-potato",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Potato",
+        "icon": "i-potato",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Koi",
+        "icon": "i-koi",
+        "selected": false
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Potato",
+        "icon": "i-potato",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "NPC-2": {
+    "bagContents": [
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": true,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        },
+        "state": "Common",
+        "effect": "Restores 20 Energy",
+        "keyFacts": [],
+        "requirements": [],
+        "supporting": "",
+        "disclosure": [
+          "This market only buys local specialties."
+        ],
+        "actions": [
+          {
+            "label": "Sell location",
+            "target": "FARM-6",
+            "kind": "navigate"
+          }
+        ]
+      },
+      {
+        "title": "Sweet Potato",
+        "icon": "i-sweet-potato",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Dish Stew",
+        "icon": "i-dish-stew",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Timber",
+        "icon": "i-wood",
+        "selected": false,
+        "quantity": {
+          "value": "20",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Stone",
+        "icon": "i-stone",
+        "selected": false,
+        "quantity": {
+          "value": "8",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "NPC-2-2": {
+    "bagContents": [
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": true,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        },
+        "state": "Common",
+        "effect": "",
+        "keyFacts": [
+          {
+            "label": "Each",
+            "value": "2 coins",
+            "kind": "reward"
+          },
+          {
+            "label": "Sell all",
+            "value": "6 coins",
+            "kind": "reward"
+          }
+        ],
+        "requirements": [],
+        "supporting": "",
+        "disclosure": [],
+        "actions": [
+          {
+            "label": "Sell one",
+            "target": "NPC-2-2",
+            "kind": "commit"
+          },
+          {
+            "label": "Sell all",
+            "target": "NPC-2-2",
+            "kind": "commit"
+          }
+        ]
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Koi",
+        "icon": "i-koi",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "NPC-3": {
+    "bagContents": [
+      {
+        "title": "Sweet Potato",
+        "icon": "i-sweet-potato",
+        "selected": true,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        },
+        "state": "Regional crop",
+        "effect": "",
+        "keyFacts": [
+          {
+            "label": "Each",
+            "value": "5 coins",
+            "kind": "reward"
+          },
+          {
+            "label": "Sell all",
+            "value": "60 coins",
+            "kind": "reward"
+          }
+        ],
+        "requirements": [],
+        "supporting": "",
+        "disclosure": [],
+        "actions": [
+          {
+            "label": "Sell one",
+            "target": "NPC-3",
+            "kind": "commit"
+          },
+          {
+            "label": "Sell all",
+            "target": "NPC-3",
+            "kind": "commit"
+          }
+        ]
+      },
+      {
+        "title": "Dish Stew",
+        "icon": "i-dish-stew",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "NPC-3-2": {
+    "bagContents": [
+      {
+        "title": "Sweet Potato",
+        "icon": "i-sweet-potato",
+        "selected": true,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        },
+        "state": "Regional crop",
+        "effect": "",
+        "keyFacts": [
+          {
+            "label": "Each",
+            "value": "5 coins",
+            "kind": "reward"
+          },
+          {
+            "label": "Sell all",
+            "value": "60 coins",
+            "kind": "reward"
+          }
+        ],
+        "requirements": [],
+        "supporting": "",
+        "disclosure": [],
+        "actions": [
+          {
+            "label": "Sell one",
+            "target": "NPC-3-2",
+            "kind": "blocked",
+            "feedback": "Buyback limit reached. Resets in 9h 12m."
+          },
+          {
+            "label": "Sell all",
+            "target": "NPC-3-2",
+            "kind": "blocked",
+            "feedback": "Buyback limit reached. Resets in 9h 12m."
+          }
+        ]
+      },
+      {
+        "title": "Dish Stew",
+        "icon": "i-dish-stew",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "BAG-2": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "BAG-2-2": {
+    "bagContents": [
+      {
+        "title": "Copper",
+        "icon": "i-copper",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Timber",
+        "icon": "i-wood",
+        "selected": true,
+        "quantity": {
+          "value": "99",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Stone",
+        "icon": "i-stone",
+        "selected": false,
+        "quantity": {
+          "value": "64",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Reeds",
+        "icon": "i-reeds",
+        "selected": false,
+        "quantity": {
+          "value": "30",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Clay",
+        "icon": "i-clay",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Quartz",
+        "icon": "i-quartz",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ],
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "BAG-5": {
+    "bagContents": [
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "7",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "50",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "50",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Potato",
+        "icon": "i-potato",
+        "selected": false,
+        "quantity": {
+          "value": "18",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false,
+        "quantity": {
+          "value": "5",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Timber",
+        "icon": "i-wood",
+        "selected": false,
+        "quantity": {
+          "value": "20",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Stone",
+        "icon": "i-stone",
+        "selected": false,
+        "quantity": {
+          "value": "8",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Copper",
+        "icon": "i-copper",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Koi",
+        "icon": "i-koi",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Reeds",
+        "icon": "i-reeds",
+        "selected": false,
+        "quantity": {
+          "value": "9",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Clay",
+        "icon": "i-clay",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Dish Stew",
+        "icon": "i-dish-stew",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb Grilled Fish",
+        "icon": "i-dish-herb",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      }
+    ],
+    "quickContents": [
+      {
+        "title": "Bag Upgrade I",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        },
+        "state": "Locked",
+        "effect": "Adds 5 slots",
+        "keyFacts": [],
+        "requirements": [
+          {
+            "label": "Homestead",
+            "level": 3
+          }
+        ],
+        "supporting": "",
+        "disclosure": [],
+        "actions": [
+          {
+            "label": "Upgrade details",
+            "target": "HOME-1",
+            "kind": "navigate"
+          }
+        ]
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "BAG-5-2": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "FARM-4": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "HOME-2": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "HUD-2": {
+    "quickContents": [
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": true,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "MINE-1": {
+    "quickContents": [
+      {
+        "title": "Torch",
+        "icon": "i-torch",
+        "selected": false,
+        "quantity": {
+          "value": "8",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "SKILL-2": {
+    "bagContents": [
+      {
+        "title": "Grilled Crucian",
+        "icon": "i-dish-grilled",
+        "selected": true,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Pond Crucian",
+        "icon": "i-fish",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carp",
+        "icon": "i-carp",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Minnow",
+        "icon": "i-minnow",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Fresh Fish Soup",
+        "icon": "i-dish-soup",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish",
+        "icon": "i-radish",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot",
+        "icon": "i-carrot",
+        "selected": false,
+        "quantity": {
+          "value": "4",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Apple",
+        "icon": "i-apple",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Radish Seeds",
+        "icon": "i-radish-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "24",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Carrot Seeds",
+        "icon": "i-carrot-seeds",
+        "selected": false,
+        "quantity": {
+          "value": "10",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Compost",
+        "icon": "i-compost",
+        "selected": false,
+        "quantity": {
+          "value": "6",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Rock Salt",
+        "icon": "i-salt",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Herb",
+        "icon": "i-herb",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Timber",
+        "icon": "i-wood",
+        "selected": false,
+        "quantity": {
+          "value": "20",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Stone",
+        "icon": "i-stone",
+        "selected": false,
+        "quantity": {
+          "value": "8",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Worm Bait",
+        "icon": "i-worm",
+        "selected": false,
+        "quantity": {
+          "value": "12",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Lure",
+        "icon": "i-lure",
+        "selected": false,
+        "quantity": {
+          "value": "3",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false,
+        "quantity": {
+          "value": "2",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Trap",
+        "icon": "i-trap",
+        "selected": false,
+        "quantity": {
+          "value": "1",
+          "label": "Owned"
+        }
+      },
+      {
+        "title": "Empty",
+        "icon": "i-question",
+        "selected": false
+      }
+    ]
+  },
+  "STATE-ICONS": {
+    "quickContents": [
+      {
+        "title": "Orchard Feed",
+        "icon": "i-feed-bag",
+        "selected": false
+      },
+      {
+        "title": "Empty",
+        "icon": "i-worm",
+        "selected": false
+      }
+    ]
+  }
+}

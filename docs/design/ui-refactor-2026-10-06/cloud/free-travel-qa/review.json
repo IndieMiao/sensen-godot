@@ -1,0 +1,181 @@
+{
+  "kind": "Actual free-travel resource/visual acceptance",
+  "verificationReceipt": "verify-free-travel-result-1791306872086.json",
+  "verification": {
+    "kind": "readonly-free-travel-verification",
+    "frames": [
+      {
+        "id": "LOCAL-SHOP",
+        "nodeId": "482:420",
+        "energy": [
+          "152/200"
+        ],
+        "coins": [
+          "230"
+        ]
+      },
+      {
+        "id": "LOCAL-TRADE",
+        "nodeId": "482:422",
+        "energy": [
+          "152/200"
+        ],
+        "coins": [
+          "230"
+        ]
+      },
+      {
+        "id": "LOCAL-BOUGHT",
+        "nodeId": "482:424",
+        "energy": [
+          "152/200"
+        ],
+        "coins": [
+          "213"
+        ]
+      },
+      {
+        "id": "LOCAL-CATCH",
+        "nodeId": "482:418",
+        "energy": [
+          "147/200"
+        ],
+        "coins": [
+          "230"
+        ]
+      },
+      {
+        "id": "FREE-HOME-BROWSE",
+        "nodeId": "776:75938",
+        "energy": [
+          "152/200"
+        ],
+        "coins": [
+          "230"
+        ]
+      },
+      {
+        "id": "FREE-HOME-BROWSE/scene",
+        "nodeId": "776:75874",
+        "energy": [
+          "152/200"
+        ],
+        "coins": [
+          "230"
+        ]
+      },
+      {
+        "id": "FREE-HOME-CATCH",
+        "nodeId": "776:76178",
+        "energy": [
+          "147/200"
+        ],
+        "coins": [
+          "230"
+        ]
+      },
+      {
+        "id": "FREE-HOME-CATCH/scene",
+        "nodeId": "776:76118",
+        "energy": [
+          "147/200"
+        ],
+        "coins": [
+          "230"
+        ]
+      },
+      {
+        "id": "FREE-HOME-BOUGHT",
+        "nodeId": "776:76421",
+        "energy": [
+          "152/200"
+        ],
+        "coins": [
+          "213"
+        ]
+      },
+      {
+        "id": "FREE-HOME-BOUGHT/scene",
+        "nodeId": "776:76361",
+        "energy": [
+          "152/200"
+        ],
+        "coins": [
+          "213"
+        ]
+      },
+      {
+        "id": "FREE-EXPLORE-BOUGHT",
+        "nodeId": "776:76604",
+        "energy": [
+          "152/200"
+        ],
+        "coins": [
+          "213"
+        ]
+      }
+    ],
+    "passports": [
+      {
+        "owner": "LOCAL-CATCH",
+        "overlay": "776:77183",
+        "navigation": "OVERLAY",
+        "hasHud": false,
+        "hasClose": true
+      },
+      {
+        "owner": "FREE-HOME-BROWSE",
+        "overlay": "776:76034",
+        "navigation": "OVERLAY",
+        "hasHud": false,
+        "hasClose": true
+      },
+      {
+        "owner": "FREE-HOME-CATCH",
+        "overlay": "776:76277",
+        "navigation": "OVERLAY",
+        "hasHud": false,
+        "hasClose": true
+      },
+      {
+        "owner": "FREE-HOME-BOUGHT",
+        "overlay": "776:76520",
+        "navigation": "OVERLAY",
+        "hasHud": false,
+        "hasClose": true
+      },
+      {
+        "owner": "FREE-EXPLORE-BOUGHT",
+        "overlay": "776:76676",
+        "navigation": "OVERLAY",
+        "hasHud": false,
+        "hasClose": true
+      }
+    ],
+    "expectedRouteCount": 12,
+    "buffDestinations": [
+      {
+        "source": "776:77336",
+        "target": "776:77429",
+        "name": "Overlay · Bite"
+      }
+    ],
+    "errors": [],
+    "sharedHomeReturnId": "482:426"
+  },
+  "screenshots": {
+    "FREE-HOME-BOUGHT-scene.png": "91e72967aade3a2cb569a33300585f7742eacff3c17acd080ba41057ac62ca13",
+    "FREE-EXPLORE-BOUGHT.png": "cee162a594009a5bc26357d6bb8da938f8a737343e24155183a290fd829b230f",
+    "FREE-HOME-CATCH.png": "d6f1c1dbaab779b0cc1ba73b940252da269785e76855cb3d58dbe73c48f236d9",
+    "LOCAL-TRADE.png": "e72b690eeffdee8d89cac915bd5519dc1b3c2090e969ec12849627e06df4ac20",
+    "LOCAL-CATCH.png": "1eba1f0e43cc5457782d5020cac293099e03daa74bd346f02c50eb582a2b3347",
+    "FREE-HOME-BOUGHT.png": "e3a0712bc3654cfdcaa0b8206a858cc18f0f6071da2c12b42da3256efbf25fc9",
+    "LOCAL-SHOP.png": "1f8dd7ef46faa6f0f653a0c5e872194e112908e60477cf4e54120b07060283b8",
+    "LOCAL-BOUGHT.png": "8c4b183f25fd45a1ae18ca676ed789ddf1177c254f201bb63b41017a91174e5b",
+    "FREE-HOME-BROWSE.png": "0bb88fad95d49f6c9eb71a1509a52989b8d48d3194ead91d645aca2a5d5802eb"
+  },
+  "visualResult": "Passed: explicit pre/post purchase resources; three Home variants; continued Tokyo browsing and matching Home close scene; item count denotes kept from this trip, not totalOwned.",
+  "visualFramesReviewed": 9,
+  "browserClickQa": false,
+  "scope": "One authored free-trip branch at a time, ending at a same-resource scene. Does not simulate arbitrary subsequent cycles."
+}

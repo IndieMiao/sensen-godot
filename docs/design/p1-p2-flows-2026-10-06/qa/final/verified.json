@@ -1,0 +1,177 @@
+{
+  "summary": [
+    {
+      "id": "396:2",
+      "name": "07 · P0流程与状态收口",
+      "cards": 73,
+      "counts": {
+        "TEXT": 1326,
+        "FRAME": 1896,
+        "VECTOR": 1807,
+        "INSTANCE": 370,
+        "ELLIPSE": 252,
+        "RECTANGLE": 2
+      }
+    },
+    {
+      "id": "430:14",
+      "name": "08 · P1日常操作",
+      "cards": 30,
+      "counts": {
+        "TEXT": 447,
+        "FRAME": 755,
+        "INSTANCE": 221,
+        "ELLIPSE": 110,
+        "VECTOR": 665
+      }
+    },
+    {
+      "id": "430:16",
+      "name": "09 · P2免费旅行闭环",
+      "cards": 18,
+      "counts": {
+        "TEXT": 280,
+        "FRAME": 437,
+        "INSTANCE": 146,
+        "ELLIPSE": 54,
+        "VECTOR": 384
+      }
+    },
+    {
+      "id": "438:3178",
+      "name": "10 · P2收费旅行与社交",
+      "cards": 38,
+      "counts": {
+        "TEXT": 545,
+        "FRAME": 879,
+        "INSTANCE": 278,
+        "ELLIPSE": 128,
+        "VECTOR": 754
+      }
+    },
+    {
+      "id": "438:3180",
+      "name": "11 · P3料理Buff",
+      "cards": 12,
+      "counts": {
+        "TEXT": 183,
+        "FRAME": 286,
+        "INSTANCE": 90,
+        "ELLIPSE": 36,
+        "VECTOR": 290
+      }
+    },
+    {
+      "id": "438:3182",
+      "name": "12 · P1成长、战斗与居民",
+      "cards": 33,
+      "counts": {
+        "TEXT": 458,
+        "FRAME": 739,
+        "INSTANCE": 223,
+        "ELLIPSE": 99,
+        "VECTOR": 641
+      }
+    },
+    {
+      "id": "438:3184",
+      "name": "13 · 内容资产与变体",
+      "cards": 0,
+      "counts": {
+        "TEXT": 410,
+        "FRAME": 508,
+        "INSTANCE": 280,
+        "VECTOR": 1329,
+        "GROUP": 3,
+        "ELLIPSE": 200
+      }
+    },
+    {
+      "id": "431:20",
+      "name": "00B · 既有UI组件复用",
+      "cards": 0,
+      "counts": {
+        "TEXT": 182,
+        "COMPONENT": 277,
+        "VECTOR": 1900,
+        "COMPONENT_SET": 24,
+        "FRAME": 261,
+        "ELLIPSE": 223,
+        "INSTANCE": 134,
+        "GROUP": 3
+      }
+    },
+    {
+      "id": "456:12024",
+      "name": "00C · 场景气候组件",
+      "cards": 0,
+      "counts": {
+        "COMPONENT_SET": 5,
+        "COMPONENT": 20
+      }
+    }
+  ],
+  "fonts": [
+    "Noto Sans SC",
+    "Nunito"
+  ],
+  "reactions": 1293,
+  "bad": [],
+  "overflow": [],
+  "components": 325,
+  "componentSets": 30,
+  "starts": [
+    {
+      "nodeId": "399:2",
+      "name": "P0 · 首会话"
+    },
+    {
+      "nodeId": "402:2",
+      "name": "P0 · 材料与矿洞"
+    },
+    {
+      "nodeId": "406:2",
+      "name": "P0 · 厨房"
+    },
+    {
+      "nodeId": "407:593",
+      "name": "P0 · 包裹与换装"
+    },
+    {
+      "nodeId": "435:999",
+      "name": "P1 · 设施放置"
+    },
+    {
+      "nodeId": "435:1460",
+      "name": "P1 · 鱼笼巡线"
+    },
+    {
+      "nodeId": "435:1874",
+      "name": "P1 · 多灶与便利"
+    },
+    {
+      "nodeId": "437:2372",
+      "name": "P2 · 免费旅行闭环"
+    },
+    {
+      "nodeId": "439:3178",
+      "name": "P2 · 收费旅行"
+    },
+    {
+      "nodeId": "439:4069",
+      "name": "P2 · 社交"
+    },
+    {
+      "nodeId": "440:4852",
+      "name": "P3 · 料理Buff"
+    },
+    {
+      "nodeId": "441:5789",
+      "name": "P1 · 深层矿洞"
+    }
+  ],
+  "meterVerified": {
+    "200/200": 80,
+    "Equip": "Equip"
+  }
+}

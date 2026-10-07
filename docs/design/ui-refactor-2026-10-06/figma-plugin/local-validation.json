@@ -1,0 +1,322 @@
+{
+  "bundleSha256": "2f98f8d870a60767130a2f8c20aabef00c85b7519cf823078368e2e6eaa8258e",
+  "status": "local-construction-passed",
+  "cloudExecuted": false,
+  "figmaRendered": false,
+  "screens": 288,
+  "stateExamples": 96,
+  "components": 180,
+  "componentSets": 25,
+  "instances": 12209,
+  "prototypeReactions": 4100,
+  "missingOutcomeWarnings": 50,
+  "uniqueMissingOutcomes": 36,
+  "semanticComponentNodes": 145,
+  "fallbackVectorMasters": 31,
+  "originalPageUnchanged": true,
+  "textPropertiesPropagated": true,
+  "navigateTargetsHaveNoFrameAncestor": true,
+  "navigateTargetsOnSamePage": true,
+  "inventoryGridTitlesHidden": true,
+  "objectHeaderFieldsIndependentlyBound": true,
+  "opacityPaintsUnbound": true,
+  "textWrappingSetAfterResize": true,
+  "textBelow12": [],
+  "compactAuxiliaryType": {
+    "minimumAllowed": 10,
+    "quickSlotNameMinimum": 10,
+    "roles": {
+      "Compact/QuickSlot.Title": 10,
+      "Compact/GearSlot.Title/Role": 9,
+      "Compact readonly Profile ID/social labels/collection captions": 9,
+      "Compact auxiliary labels and counts": 10,
+      "Shared HUD auxiliary labels": 10,
+      "Core title": 14,
+      "Core effect": 12
+    },
+    "actualMinimum": 9,
+    "nodes": 6065,
+    "scope": "Compact components only; source-proportioned auxiliary text, user-requested visual benchmark"
+  },
+  "flowRepairStates": {
+    "screens": {
+      "MINE-5-ARRIVAL": "test:37175",
+      "RESIDENT-TALK-MEAL-CLAIMED": "test:37240",
+      "COOK-CABINET-TAKEN": "test:37353",
+      "COOK-CABINET-EATEN": "test:37471"
+    },
+    "resultScenes": {
+      "COOK-CABINET-TAKEN/scene": "test:37313",
+      "COOK-CABINET-EATEN/scene": "test:37431"
+    },
+    "mainScreenCountPreserved": true
+  },
+  "npcFlowStates": {
+    "states": 15,
+    "resultScenes": 15,
+    "mainScreenCountPreserved": true
+  },
+  "freeTravelStates": {
+    "screens": {
+      "FREE-HOME-BROWSE": "test:35195",
+      "FREE-HOME-CATCH": "test:35299",
+      "FREE-HOME-BOUGHT": "test:35406",
+      "FREE-EXPLORE-BOUGHT": "test:35473"
+    },
+    "afterScenes": {
+      "FREE-HOME-BROWSE/scene": "test:35155",
+      "FREE-HOME-CATCH/scene": "test:35259",
+      "FREE-HOME-BOUGHT/scene": "test:35366"
+    },
+    "sharedHomeReturnPreserved": true
+  },
+  "cropDex": {
+    "screenId": "test:35520",
+    "entries": 20,
+    "harvested": 7,
+    "perCropQuantitiesProvided": false,
+    "noteId": "test:35749"
+  },
+  "avatarRecovery": {
+    "screenId": "test:23906",
+    "draftInstanceId": "test:23907",
+    "draftMasterId": "test:16979",
+    "visibilityVariableId": "variable:936",
+    "retryTarget": "test:23658",
+    "discardTarget": "test:23507",
+    "closeAndKeepEditing": "hide overlay only; no navigation or draft reset",
+    "existingWardrobeMastersUnchanged": true
+  },
+  "componentFamilies": {
+    "informationAndContext": 691,
+    "information": 607,
+    "pinContext": 84,
+    "feedback": 48,
+    "paragraphInstances": 695,
+    "sharedMasters": {
+      "paragraph": "test:54338",
+      "information": "test:54340",
+      "feedback": "test:54355"
+    },
+    "outerPrototypeTargetsPreserved": true,
+    "nativeSemanticReadbackRequired": true
+  },
+  "wrongScreenSizes": [],
+  "scenarioChecks": {
+    "hookOpensReel": true,
+    "noSelfOverlay": true,
+    "ObjectHeaderMinimumHeight": true,
+    "HUDMinimumHeight": true,
+    "ItemRowMinimumHeight": true,
+    "NavigationRowMinimumHeight": true,
+    "COOK-P0-2Slots": 2,
+    "COOK-P1-6Slots": 3,
+    "EXPAND-4Slots": 4,
+    "EXPAND-5Slots": 5,
+    "COOK-2bSlots": 2,
+    "COOK-P0-3HeatRing": true,
+    "COOK-HERB-HEATHeatRing": true,
+    "COOK-3HeatRing": true,
+    "TUT-1-2Recovery": "Full",
+    "TUT-3-11Recovery": "Bonus +13",
+    "BUFF-LASTNonmodal": true,
+    "BUFF-TIMEOUTNonmodal": true,
+    "legacyKitchenCells": {
+      "COOK-2a": 25,
+      "COOK-2b": 20
+    },
+    "kitchenLayout": {
+      "COOK-1": {
+        "stoves": 3,
+        "sceneOnly": true
+      },
+      "COOK-P0-1": {
+        "stoves": 1,
+        "sceneOnly": true
+      },
+      "COOK-P1-1": {
+        "stoves": 2,
+        "sceneOnly": true
+      },
+      "COOK-P1-3": {
+        "stoves": 2,
+        "sceneOnly": true
+      },
+      "COOK-P1-5": {
+        "stoves": 3,
+        "sceneOnly": true
+      },
+      "COOK-2a": {
+        "nativeCellCount": 25,
+        "gridHeight": 262,
+        "cookTime": "5 s",
+        "potStageVisible": true,
+        "sourceCameraPreserved": true
+      },
+      "COOK-2b": {
+        "nativeCellCount": 20,
+        "gridHeight": 250,
+        "cookTime": "15 s",
+        "potStageVisible": true,
+        "sourceCameraPreserved": true
+      },
+      "COOK-P0-2": {
+        "nativeCellCount": 5,
+        "gridHeight": 250,
+        "cookTime": "5 s",
+        "potStageVisible": true,
+        "sourceCameraPreserved": true
+      }
+    },
+    "hudNavigationSeparate44px": true,
+    "factsShownOnce": {
+      "TUT-3-10 +50 Energy": 1,
+      "TUT-3-11 +30 XP": 1,
+      "TUT-3-11 +10 XP": 1,
+      "TUT-3-11 +20 Energy": 1,
+      "TUT-3-END 3h 32m": 1,
+      "TUT-3-END 7h 46m": 1,
+      "MAT-2 6 Timber": 0,
+      "CRAFT-3 2 Torches": 0,
+      "COOK-P1-6 2 portions": 0
+    },
+    "recipeFactsVisible": true,
+    "cameraOnlyOverlays": 19,
+    "todayThreeTasksVisible": true,
+    "travelNavigationVisible": true,
+    "tutorialWalletConsistent": true,
+    "unifiedQuickBar": {
+      "screenInstances": 40,
+      "screenIds": [
+        "FARM-1",
+        "FISH-1",
+        "BAG-1",
+        "BAG-3",
+        "BAG-4",
+        "BAR-1",
+        "BAR-2",
+        "BAR-3-2",
+        "HUD-1",
+        "FARM-2",
+        "FARM-3",
+        "FARM-7",
+        "FISH-3",
+        "FISH-4",
+        "BAG-2",
+        "BAG-2-2",
+        "BAG-5",
+        "BAG-5-2",
+        "FARM-4",
+        "MINE-1",
+        "TUT-3-01",
+        "TUT-3-02",
+        "TUT-3-08",
+        "MINE-P0-1",
+        "MINE-P0-2",
+        "MINE-P0-4",
+        "GEAR-P0-1",
+        "GEAR-P0-2",
+        "BAG-1-P0",
+        "PARCEL-6",
+        "FISH-P0-CAST",
+        "MINE-CONTINUE",
+        "TRAP-2",
+        "LOCAL-FISH",
+        "BUFF-ACTIVE",
+        "BUFF-CASTS",
+        "BUFF-LAST",
+        "BUFF-TIMEOUT",
+        "MINE-3",
+        "COMBAT-1"
+      ],
+      "slotsPerBar": 5,
+      "slotSize": [
+        52,
+        68
+      ],
+      "endSize": [
+        56,
+        68
+      ],
+      "rowSize": [
+        336,
+        68
+      ],
+      "worldPosition": [
+        12,
+        708
+      ],
+      "authoredFixtureCases": 5,
+      "unknownQuantitiesRemainBlank": true,
+      "buffQuantitiesUseExplicitIllustrativeFixtures": true,
+      "selectedAndBagTargetsPreserved": true
+    },
+    "kitchenLocalSelectionPreservesInventory": true,
+    "kitchenSelectionTruthCases": 16,
+    "avatarRecoveryPreservesDraft": true,
+    "overlayCompositeFamilies": {
+      "informationAndContext": 691,
+      "pinContext": 84,
+      "feedback": 48,
+      "paragraphs": 695,
+      "outerTargetIdsPreserved": true,
+      "nativeSlotSemanticsModelled": true,
+      "mcpDescendantRekeyingNotSimulated": true
+    },
+    "standaloneRouting": {
+      "mainScreens": 288,
+      "standardPluginApiOnly": true,
+      "flow": {
+        "declared": 4,
+        "built": [
+          "MINE-5-ARRIVAL",
+          "RESIDENT-TALK-MEAL-CLAIMED",
+          "COOK-CABINET-TAKEN",
+          "COOK-CABINET-EATEN"
+        ]
+      },
+      "npc": {
+        "declared": 15,
+        "built": [
+          "NPC-REED-BOUGHT",
+          "NPC-CRUCIAN-SOLD-ONE",
+          "NPC-CRUCIAN-SOLD-ALL",
+          "NPC-DUSK-TRACKED",
+          "NPC-SWEET-POTATO-SOLD-ONE",
+          "GEAR-REED-EQUIPPED",
+          "STORAGE-TIMBER-TAKEN-10",
+          "STORAGE-TIMBER-TAKEN-ALL",
+          "STORE-TORCH-TAKEN-10",
+          "STORE-TORCH-TAKEN-ALL",
+          "STALL-RADISH-SEEDS-BOUGHT",
+          "STALL-RADISH-SOLD-ONE",
+          "STALL-RADISH-SOLD-ALL",
+          "COOK-FINE-EATEN",
+          "COOK-MYSTERY-EATEN"
+        ]
+      },
+      "freeTravel": {
+        "declared": 4,
+        "built": [
+          "FREE-HOME-BROWSE",
+          "FREE-HOME-CATCH",
+          "FREE-HOME-BOUGHT",
+          "FREE-EXPLORE-BOUGHT"
+        ]
+      },
+      "cropDex": {
+        "entries": 20,
+        "screenId": "test:35520"
+      },
+      "supportScenes": {
+        "flow": 2,
+        "npc": 15,
+        "freeTravel": 3
+      }
+    }
+  },
+  "issues": [],
+  "notes": [
+    "Mocked Plugin API construction and property wiring only. Real Figma layout, visual rendering and image decoding remain unverified."
+  ]
+}

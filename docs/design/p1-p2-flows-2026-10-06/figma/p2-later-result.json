@@ -1,0 +1,546 @@
+{
+  "createdNodeManifest": "created-nodes.json",
+  "pages": [
+    {
+      "id": "MAP-4-PAID",
+      "cardId": "439:3178",
+      "nodeId": "439:3180"
+    },
+    {
+      "id": "MAP-4-GATE",
+      "cardId": "439:3249",
+      "nodeId": "439:3251"
+    },
+    {
+      "id": "MAP-5-PAID",
+      "cardId": "439:3312",
+      "nodeId": "439:3314"
+    },
+    {
+      "id": "TRAVEL-GUIDE",
+      "cardId": "439:3392",
+      "nodeId": "439:3394"
+    },
+    {
+      "id": "TRAVEL-CANCEL",
+      "cardId": "439:3462",
+      "nodeId": "439:3464"
+    },
+    {
+      "id": "TRAVEL-REFUNDED",
+      "cardId": "439:3525",
+      "nodeId": "439:3527"
+    },
+    {
+      "id": "DAYPASS",
+      "cardId": "439:3583",
+      "nodeId": "439:3585"
+    },
+    {
+      "id": "DAYPASS-EXPIRED",
+      "cardId": "439:3646",
+      "nodeId": "439:3648"
+    },
+    {
+      "id": "PERMIT-1",
+      "cardId": "439:3709",
+      "nodeId": "439:3711"
+    },
+    {
+      "id": "PERMIT-DONE",
+      "cardId": "439:3795",
+      "nodeId": "439:3797"
+    },
+    {
+      "id": "TICKET-1",
+      "cardId": "439:3856",
+      "nodeId": "439:3858"
+    },
+    {
+      "id": "SECOND-HOME",
+      "cardId": "439:3947",
+      "nodeId": "439:3949"
+    },
+    {
+      "id": "SECOND-HOME-DONE",
+      "cardId": "439:4009",
+      "nodeId": "439:4011"
+    },
+    {
+      "id": "SOC-1",
+      "cardId": "439:4069",
+      "nodeId": "439:4071"
+    },
+    {
+      "id": "SOC-1-GATE",
+      "cardId": "439:4144",
+      "nodeId": "439:4146"
+    },
+    {
+      "id": "SOC-1-CONFIRM",
+      "cardId": "439:4209",
+      "nodeId": "439:4211"
+    },
+    {
+      "id": "SOC-2",
+      "cardId": "439:4274",
+      "nodeId": "439:4276"
+    },
+    {
+      "id": "SOC-2-INBOX",
+      "cardId": "439:4334",
+      "nodeId": "439:4336"
+    },
+    {
+      "id": "SOC-2-ARRIVE",
+      "cardId": "439:4410",
+      "nodeId": "439:4412"
+    },
+    {
+      "id": "SOC-2-ERROR",
+      "cardId": "439:4471",
+      "nodeId": "439:4473"
+    },
+    {
+      "id": "SOC-3",
+      "cardId": "439:4533",
+      "nodeId": "439:4535"
+    },
+    {
+      "id": "HELPER-INBOX",
+      "cardId": "439:4606",
+      "nodeId": "439:4608"
+    },
+    {
+      "id": "HELPER-SUMMARY",
+      "cardId": "439:4669",
+      "nodeId": "439:4671"
+    },
+    {
+      "id": "HELPER-ONSITE",
+      "cardId": "439:4731",
+      "nodeId": "439:4733"
+    },
+    {
+      "id": "HELPER-BUDGET",
+      "cardId": "439:4792",
+      "nodeId": "439:4794"
+    },
+    {
+      "id": "SOC-5",
+      "cardId": "439:4855",
+      "nodeId": "439:4857"
+    },
+    {
+      "id": "GIFT-SENT",
+      "cardId": "439:4918",
+      "nodeId": "439:4920"
+    },
+    {
+      "id": "GIFT-CLAIM",
+      "cardId": "439:4980",
+      "nodeId": "439:4982"
+    },
+    {
+      "id": "GIFT-DETAIL",
+      "cardId": "439:5042",
+      "nodeId": "439:5044"
+    },
+    {
+      "id": "SOC-6",
+      "cardId": "439:5106",
+      "nodeId": "439:5108"
+    },
+    {
+      "id": "GUESTBOOK",
+      "cardId": "439:5188",
+      "nodeId": "439:5190"
+    },
+    {
+      "id": "TOGETHER",
+      "cardId": "439:5269",
+      "nodeId": "439:5271"
+    },
+    {
+      "id": "TOGETHER-PROGRESS",
+      "cardId": "439:5332",
+      "nodeId": "439:5334"
+    },
+    {
+      "id": "TOGETHER-DONE",
+      "cardId": "439:5390",
+      "nodeId": "439:5392"
+    },
+    {
+      "id": "EXPAND-4",
+      "cardId": "439:5448",
+      "nodeId": "439:5450"
+    },
+    {
+      "id": "EXPAND-5",
+      "cardId": "439:5513",
+      "nodeId": "439:5515"
+    },
+    {
+      "id": "EXPAND-RECIPES",
+      "cardId": "439:5586",
+      "nodeId": "439:5588"
+    },
+    {
+      "id": "TRADER",
+      "cardId": "439:5673",
+      "nodeId": "439:5675"
+    }
+  ],
+  "links": [
+    {
+      "id": "439:3222",
+      "back": true
+    },
+    {
+      "id": "439:3244",
+      "target": "MAP-5-PAID"
+    },
+    {
+      "id": "439:3246",
+      "target": "MAP-3-FREE"
+    },
+    {
+      "id": "439:3293",
+      "back": true
+    },
+    {
+      "id": "439:3309",
+      "target": "PERMIT-1"
+    },
+    {
+      "id": "439:3360",
+      "back": true
+    },
+    {
+      "id": "439:3387",
+      "target": "TRAVEL-GUIDE"
+    },
+    {
+      "id": "439:3389",
+      "target": "TRAVEL-CANCEL"
+    },
+    {
+      "id": "439:3436",
+      "back": true
+    },
+    {
+      "id": "439:3459",
+      "target": "MAP-5-PAID"
+    },
+    {
+      "id": "439:3506",
+      "back": true
+    },
+    {
+      "id": "439:3520",
+      "target": "MAP-5-PAID"
+    },
+    {
+      "id": "439:3522",
+      "target": "TRAVEL-REFUNDED"
+    },
+    {
+      "id": "439:3569",
+      "back": true
+    },
+    {
+      "id": "439:3580",
+      "target": "MAP-2-FREE"
+    },
+    {
+      "id": "439:3627",
+      "back": true
+    },
+    {
+      "id": "439:3641",
+      "target": "MAP-8-FREE"
+    },
+    {
+      "id": "439:3643",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "439:3690",
+      "back": true
+    },
+    {
+      "id": "439:3704",
+      "target": "LOCAL-FISH"
+    },
+    {
+      "id": "439:3706",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "439:3753",
+      "back": true
+    },
+    {
+      "id": "439:3792",
+      "target": "PERMIT-DONE"
+    },
+    {
+      "id": "439:3839",
+      "back": true
+    },
+    {
+      "id": "439:3853",
+      "target": "MAP-4-PAID"
+    },
+    {
+      "id": "439:3900",
+      "back": true
+    },
+    {
+      "id": "439:3944",
+      "target": "MAP-4-PAID"
+    },
+    {
+      "id": "439:3991",
+      "back": true
+    },
+    {
+      "id": "439:4004",
+      "target": "SECOND-HOME-DONE"
+    },
+    {
+      "id": "439:4006",
+      "target": "PASS-2"
+    },
+    {
+      "id": "439:4053",
+      "back": true
+    },
+    {
+      "id": "439:4066",
+      "target": "MAP-5-FREE"
+    },
+    {
+      "id": "439:4113",
+      "back": true
+    },
+    {
+      "id": "439:4141",
+      "target": "SOC-1-GATE"
+    },
+    {
+      "id": "439:4188",
+      "back": true
+    },
+    {
+      "id": "439:4206",
+      "target": "SOC-1-CONFIRM"
+    },
+    {
+      "id": "439:4253",
+      "back": true
+    },
+    {
+      "id": "439:4269",
+      "target": "SOC-2"
+    },
+    {
+      "id": "439:4271",
+      "target": "SOC-1"
+    },
+    {
+      "id": "439:4318",
+      "back": true
+    },
+    {
+      "id": "439:4331",
+      "target": "SOC-2-INBOX"
+    },
+    {
+      "id": "439:4378",
+      "back": true
+    },
+    {
+      "id": "439:4405",
+      "target": "SOC-2-ARRIVE"
+    },
+    {
+      "id": "439:4407",
+      "target": "SOC-1"
+    },
+    {
+      "id": "439:4454",
+      "back": true
+    },
+    {
+      "id": "439:4468",
+      "target": "SOC-3"
+    },
+    {
+      "id": "439:4515",
+      "back": true
+    },
+    {
+      "id": "439:4528",
+      "target": "SOC-2-INBOX"
+    },
+    {
+      "id": "439:4530",
+      "target": "SOC-1"
+    },
+    {
+      "id": "439:4577",
+      "back": true
+    },
+    {
+      "id": "439:4603",
+      "target": "HELPER-INBOX"
+    },
+    {
+      "id": "439:4650",
+      "back": true
+    },
+    {
+      "id": "439:4664",
+      "target": "HELPER-SUMMARY"
+    },
+    {
+      "id": "439:4666",
+      "target": "SOC-1"
+    },
+    {
+      "id": "439:4713",
+      "back": true
+    },
+    {
+      "id": "439:4728",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "439:4775",
+      "back": true
+    },
+    {
+      "id": "439:4789",
+      "target": "HELPER-BUDGET"
+    },
+    {
+      "id": "439:4836",
+      "back": true
+    },
+    {
+      "id": "439:4852",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "439:4899",
+      "back": true
+    },
+    {
+      "id": "439:4915",
+      "target": "GIFT-SENT"
+    },
+    {
+      "id": "439:4962",
+      "back": true
+    },
+    {
+      "id": "439:4977",
+      "target": "SOC-1"
+    },
+    {
+      "id": "439:5024",
+      "back": true
+    },
+    {
+      "id": "439:5039",
+      "target": "GIFT-DETAIL"
+    },
+    {
+      "id": "439:5086",
+      "back": true
+    },
+    {
+      "id": "439:5101",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "439:5103",
+      "target": "RESIDENT-TALK"
+    },
+    {
+      "id": "439:5150",
+      "back": true
+    },
+    {
+      "id": "439:5185",
+      "target": "GUESTBOOK"
+    },
+    {
+      "id": "439:5232",
+      "back": true
+    },
+    {
+      "id": "439:5266",
+      "target": "SOC-6"
+    },
+    {
+      "id": "439:5313",
+      "back": true
+    },
+    {
+      "id": "439:5329",
+      "target": "TOGETHER-PROGRESS"
+    },
+    {
+      "id": "439:5376",
+      "back": true
+    },
+    {
+      "id": "439:5387",
+      "target": "TOGETHER-DONE"
+    },
+    {
+      "id": "439:5434",
+      "back": true
+    },
+    {
+      "id": "439:5445",
+      "target": "SOC-6"
+    },
+    {
+      "id": "439:5492",
+      "back": true
+    },
+    {
+      "id": "439:5510",
+      "target": "EXPAND-RECIPES"
+    },
+    {
+      "id": "439:5557",
+      "back": true
+    },
+    {
+      "id": "439:5583",
+      "target": "EXPAND-RECIPES"
+    },
+    {
+      "id": "439:5630",
+      "back": true
+    },
+    {
+      "id": "439:5670",
+      "target": "COOK-P1-1"
+    },
+    {
+      "id": "439:5717",
+      "back": true
+    },
+    {
+      "id": "439:5735",
+      "target": "LOCAL-SHOP"
+    }
+  ],
+  "count": 38
+}

@@ -1,0 +1,120 @@
+{
+  "actualScreenshots": 13,
+  "passedContent": [
+    "FAC-2",
+    "FAC-GH-PLACE",
+    "FISH-P0-CAST",
+    "TRAP-2",
+    "TODAY-1",
+    "TODAY-2",
+    "COOK-KEEP-BRANCH"
+  ],
+  "passedCorrections": [
+    "TODAY-2:194coins and213/200bonus matches the first-session after-state",
+    "COOK-P1-4:all3empty stoves are represented",
+    "COOK-EMPTY:all3busy/full queues are represented",
+    "COOK-P1-7:no invented empty ingredient browser",
+    "Coverage facts fit above Place / Cancel",
+    "FISH/TRAP five quick slots are preserved without invented items"
+  ],
+  "followups": [
+    {
+      "ids": [
+        "COOK-P1-2",
+        "COOK-P1-6"
+      ],
+      "fix": "Empty-slot icon override removed;shared empty plus remains.",
+      "status": "Source ready;rebuild requested"
+    },
+    {
+      "ids": [
+        "COOK-P1-4",
+        "COOK-EMPTY"
+      ],
+      "fix": "Three existing FacilityMarker instances placed in a single row,keeping availability totals visible.",
+      "status": "Source ready;rebuild requested"
+    },
+    {
+      "ids": [
+        "COOK-P1-2",
+        "COOK-P1-4",
+        "COOK-P1-6",
+        "COOK-P1-7",
+        "COOK-EMPTY"
+      ],
+      "fix": "Kitchen content fitted to body height.",
+      "status": "Source ready;rebuild requested"
+    },
+    {
+      "ids": [
+        "COOK-HERB-HEAT"
+      ],
+      "fix": "Use the approved close pot camera andcentre heat ring at180,193.",
+      "status": "Small root delta ready"
+    },
+    {
+      "ids": [
+        "FISH-P0-CAST",
+        "TRAP-2"
+      ],
+      "fix": "Restore original floating joystick/action chooser after direct dispatcher.",
+      "status": "Small root delta ready"
+    }
+  ],
+  "images": [
+    {
+      "file": "COOK-EMPTY.png",
+      "sha256": "8a68ab104784a062cf08f56e7138b9d4f439576ceed00c3d0b22339773855b8d"
+    },
+    {
+      "file": "TODAY-2.png",
+      "sha256": "736c6c6c23ef4eec91a10e9002ede19db37a49ab15e2811e4ddee5aed7ba4c8e"
+    },
+    {
+      "file": "FISH-P0-CAST.png",
+      "sha256": "6d32b43a89de51b8533f2acdf87cf8d7260cd889253693d96eeaa840e4386cc6"
+    },
+    {
+      "file": "TODAY-1.png",
+      "sha256": "4846d2616a55bcb8d34337f330c3476a0e18d087ae0fc77436c01c10abb35325"
+    },
+    {
+      "file": "COOK-HERB-HEAT.png",
+      "sha256": "5b8bfdd131c51249b23a9293f7b0024e228cd3270d9655e2dcd00f787b2c5017"
+    },
+    {
+      "file": "COOK-P1-7.png",
+      "sha256": "8777ac8beee9b9ec8f84f49cfb5b676b75970e2faad60eaa02ec861d1b76a047"
+    },
+    {
+      "file": "COOK-P1-6.png",
+      "sha256": "3ac42255a6c272e87a36b780d6d7b6b11da0ec7fa2b558d1e44070e4091fc616"
+    },
+    {
+      "file": "COOK-P1-4.png",
+      "sha256": "48e092d36ac5959bf9391f2e10b4afb66a45270821b0d54855ad3a0d63b3c013"
+    },
+    {
+      "file": "TRAP-2.png",
+      "sha256": "2a646973faefedbb190d980726f134a3ba36bcadd4ea560247902be3744d8082"
+    },
+    {
+      "file": "FAC-GH-PLACE.png",
+      "sha256": "f5202649267da5f8ca19bd37b7ac89993f3a9a4662d1a76670774433c9a81804"
+    },
+    {
+      "file": "COOK-P1-2.png",
+      "sha256": "6413df49660857976a088734536cc6160f510e48aaf8d3c3b32785ec8eebdd0e"
+    },
+    {
+      "file": "COOK-KEEP-BRANCH.png",
+      "sha256": "4b77a1375580b2ca65ab6d76e799f2d6ecd16b4e531ae7b6803b928d77975606"
+    },
+    {
+      "file": "FAC-2.png",
+      "sha256": "78d108668dbd1a449bd987752a3705e12474cc9c9fe7dcbf0c7ba297a682a8ea"
+    }
+  ],
+  "scope": "Native Figma render evidence;not all final acceptance until pending repairs are rendered.",
+  "finalFollowupStatus": "All listed fixes received actual final screenshot acceptance in../current-accepted/review.json;earlier images here remainpre-fix evidence."
+}

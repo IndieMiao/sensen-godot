@@ -1,0 +1,15 @@
+{
+  "updatedAt": "2026-10-06T12:57:31.036484+00:00",
+  "ids": [
+    "MINE-3",
+    "BUFF-ACTIVE",
+    "BUFF-CASTS",
+    "EXPAND-4",
+    "EXPAND-5"
+  ],
+  "changes": [
+    "Mine3 uses Mine2Energy work control and a separate free mode navigation to Combat; it does not claim rock-clear or own missing supplies.",
+    "Buffactive/last-state quickbar item identities reuse the same authored contents; no quantities invented.",
+    "Four/five-slot preview has no empty Availableingredients section. Unsettled recipe detail remains outside viewport."
+  ]
+}

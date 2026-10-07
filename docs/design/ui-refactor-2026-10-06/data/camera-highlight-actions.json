@@ -1,0 +1,503 @@
+{
+  "updatedAt": "2026-10-06T09:51:24.143926+00:00",
+  "actions": [
+    {
+      "id": "MAT-1",
+      "path": ".actions",
+      "label": "Show Timber Grove",
+      "originalTarget": "MAT-2",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "MAT-1",
+        "view": "scene",
+        "placeName": "Timber Grove",
+        "anchor": [
+          30,
+          325
+        ],
+        "originalDestination": "MAT-2",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "BOARD-1",
+      "path": ".actions",
+      "label": "Show on map",
+      "originalTarget": "TUT-3-04",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "BOARD-1",
+        "view": "map",
+        "placeName": "Willow Pond",
+        "anchor": [
+          246,
+          352
+        ],
+        "originalDestination": "TUT-3-04",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "TODAY-1",
+      "path": ".actions",
+      "label": "Show kitchen",
+      "originalTarget": "COOK-P0-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "TODAY-1",
+        "view": "scene",
+        "placeName": "Kitchen entrance",
+        "anchor": [
+          90,
+          287
+        ],
+        "originalDestination": "COOK-P0-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "DEX-P1-2",
+      "path": ".actions",
+      "label": "Show a river",
+      "originalTarget": "MAP-2-FREE",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "DEX-P1-2",
+        "view": "map",
+        "placeName": "River",
+        "anchor": [
+          251,
+          302
+        ],
+        "originalDestination": "MAP-2-FREE",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "MAP-7-FREE",
+      "path": ".actions",
+      "label": "Show local pond",
+      "originalTarget": "MAP-8-FREE",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "MAP-7-FREE",
+        "view": "map",
+        "placeName": "Tokyo · Local pond",
+        "anchor": [
+          246,
+          352
+        ],
+        "originalDestination": "MAP-8-FREE",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "PASS-2",
+      "path": ".actions",
+      "label": "Show local pond",
+      "originalTarget": "MAP-8-FREE",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "PASS-2",
+        "view": "map",
+        "placeName": "Tokyo · Local pond",
+        "anchor": [
+          246,
+          352
+        ],
+        "originalDestination": "MAP-8-FREE",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "DAYPASS",
+      "path": ".actions",
+      "label": "Show local pond",
+      "originalTarget": "MAP-8-FREE",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "DAYPASS",
+        "view": "map",
+        "placeName": "Tokyo · Local pond",
+        "anchor": [
+          246,
+          352
+        ],
+        "originalDestination": "MAP-8-FREE",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "TRADER",
+      "path": ".actions",
+      "label": "Show Travel Post",
+      "originalTarget": null,
+      "context": {
+        "overlay": "map",
+        "targetType": "Travel Post",
+        "city": "Tokyo",
+        "operation": "highlight-target",
+        "ownerId": "TRADER",
+        "view": "map",
+        "placeName": "Tokyo · Travel Post",
+        "anchor": [
+          178,
+          445
+        ],
+        "originalDestination": null,
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "BAR-3",
+      "path": ".items[1].actions",
+      "label": "Show kitchen",
+      "originalTarget": "COOK-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "BAR-3",
+        "view": "scene",
+        "placeName": "Kitchen entrance",
+        "anchor": [
+          90,
+          287
+        ],
+        "originalDestination": "COOK-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "BAR-3",
+      "path": ".items[2].actions",
+      "label": "Show on map",
+      "originalTarget": "MAP-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "BAR-3",
+        "view": "map",
+        "placeName": "Tea House",
+        "anchor": [
+          176,
+          405
+        ],
+        "originalDestination": "MAP-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "BAR-3",
+      "path": ".items[3].actions",
+      "label": "Show bench",
+      "originalTarget": "BAR-3-2",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "BAR-3",
+        "view": "scene",
+        "placeName": "Bench",
+        "anchor": [
+          50,
+          323
+        ],
+        "originalDestination": "BAR-3-2",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "HUD-3",
+      "path": ".items[1].actions",
+      "label": "Show kitchen",
+      "originalTarget": "COOK-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "HUD-3",
+        "view": "scene",
+        "placeName": "Kitchen entrance",
+        "anchor": [
+          90,
+          287
+        ],
+        "originalDestination": "COOK-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "HUD-3",
+      "path": ".items[2].actions",
+      "label": "Show on map",
+      "originalTarget": "MAP-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "HUD-3",
+        "view": "map",
+        "placeName": "Tea House",
+        "anchor": [
+          176,
+          405
+        ],
+        "originalDestination": "MAP-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "HUD-3",
+      "path": ".items[3].actions",
+      "label": "Show bench",
+      "originalTarget": "BAR-3-2",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "HUD-3",
+        "view": "scene",
+        "placeName": "Bench",
+        "anchor": [
+          50,
+          323
+        ],
+        "originalDestination": "BAR-3-2",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "HUD-4",
+      "path": ".items[0].actions",
+      "label": "Show on map",
+      "originalTarget": "MAP-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "HUD-4",
+        "view": "map",
+        "placeName": "Market Board",
+        "anchor": [
+          145,
+          426
+        ],
+        "originalDestination": "MAP-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "HUD-4",
+      "path": ".items[1].actions",
+      "label": "Show plots",
+      "originalTarget": "FARM-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "HUD-4",
+        "view": "scene",
+        "placeName": "Radish plots",
+        "anchor": [
+          219,
+          397
+        ],
+        "originalDestination": "FARM-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "HUD-4",
+      "path": ".items[2].actions",
+      "label": "Show on map",
+      "originalTarget": "MAP-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "HUD-4",
+        "view": "map",
+        "placeName": "River",
+        "anchor": [
+          251,
+          302
+        ],
+        "originalDestination": "MAP-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "NPC-4",
+      "path": ".items[0].actions",
+      "label": "Show on map",
+      "originalTarget": "MAP-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "NPC-4",
+        "view": "map",
+        "placeName": "Market Board",
+        "anchor": [
+          145,
+          426
+        ],
+        "originalDestination": "MAP-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "NPC-4",
+      "path": ".items[1].actions",
+      "label": "Show on map",
+      "originalTarget": "MAP-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "NPC-4",
+        "view": "map",
+        "placeName": "Market Board",
+        "anchor": [
+          145,
+          426
+        ],
+        "originalDestination": "MAP-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "NPC-4",
+      "path": ".items[2].actions",
+      "label": "Show on map",
+      "originalTarget": "MAP-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "NPC-4",
+        "view": "map",
+        "placeName": "Market Board",
+        "anchor": [
+          145,
+          426
+        ],
+        "originalDestination": "MAP-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "NPC-4-2",
+      "path": ".stateExamples[0].actions",
+      "label": "Show on map",
+      "originalTarget": "MAP-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "NPC-4-2",
+        "view": "map",
+        "placeName": "Market Board",
+        "anchor": [
+          145,
+          426
+        ],
+        "originalDestination": "MAP-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "NPC-4-2",
+      "path": ".stateExamples[1].actions",
+      "label": "Show on map",
+      "originalTarget": "MAP-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "NPC-4-2",
+        "view": "map",
+        "placeName": "Market Board",
+        "anchor": [
+          145,
+          426
+        ],
+        "originalDestination": "MAP-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "NPC-4-2",
+      "path": ".stateExamples[2].actions",
+      "label": "Show on map",
+      "originalTarget": "MAP-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "NPC-4-2",
+        "view": "map",
+        "placeName": "Market Board",
+        "anchor": [
+          145,
+          426
+        ],
+        "originalDestination": "MAP-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "SKILL-2",
+      "path": ".actions",
+      "label": "Show my plots",
+      "originalTarget": "FARM-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "SKILL-2",
+        "view": "map",
+        "placeName": "Radish plots",
+        "anchor": [
+          219,
+          397
+        ],
+        "originalDestination": "FARM-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    },
+    {
+      "id": "NEED-TILE",
+      "path": ".stateExamples[4].actions",
+      "label": "Show source",
+      "originalTarget": "MAT-1",
+      "context": {
+        "operation": "highlight-target",
+        "ownerId": "NEED-TILE",
+        "view": "scene",
+        "placeName": "Timber Grove",
+        "anchor": [
+          30,
+          325
+        ],
+        "originalDestination": "MAT-1",
+        "preservePlayer": true,
+        "preserveResources": true
+      }
+    }
+  ],
+  "count": 25,
+  "ids": [
+    "BAR-3",
+    "BOARD-1",
+    "DAYPASS",
+    "DEX-P1-2",
+    "HUD-3",
+    "HUD-4",
+    "MAP-7-FREE",
+    "MAT-1",
+    "NEED-TILE",
+    "NPC-4",
+    "NPC-4-2",
+    "PASS-2",
+    "SKILL-2",
+    "TODAY-1",
+    "TRADER"
+  ],
+  "rule": "Show is read-only scene/map focus. Never enter POI, move player, execute gathering, reserve travel or settle rewards.",
+  "anchorStatus": "Illustrative anchors on approved scene/map art; not production geometry or geocoordinates."
+}

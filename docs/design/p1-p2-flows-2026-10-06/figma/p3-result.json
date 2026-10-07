@@ -1,0 +1,168 @@
+{
+  "createdNodeManifest": "created-nodes.json",
+  "pages": [
+    {
+      "id": "BUFF-FARM",
+      "cardId": "440:4852",
+      "nodeId": "440:4854"
+    },
+    {
+      "id": "BUFF-FISH",
+      "cardId": "440:4913",
+      "nodeId": "440:4915"
+    },
+    {
+      "id": "BUFF-HANDS",
+      "cardId": "440:4976",
+      "nodeId": "440:4978"
+    },
+    {
+      "id": "BUFF-TRAVEL",
+      "cardId": "440:5039",
+      "nodeId": "440:5041"
+    },
+    {
+      "id": "BUFF-CREEL",
+      "cardId": "440:5104",
+      "nodeId": "440:5106"
+    },
+    {
+      "id": "BUFF-REPLACE",
+      "cardId": "440:5166",
+      "nodeId": "440:5168"
+    },
+    {
+      "id": "BUFF-ACTIVE",
+      "cardId": "440:5241",
+      "nodeId": "440:5243"
+    },
+    {
+      "id": "BUFF-CASTS",
+      "cardId": "440:5304",
+      "nodeId": "440:5306"
+    },
+    {
+      "id": "BUFF-LAST",
+      "cardId": "440:5369",
+      "nodeId": "440:5371"
+    },
+    {
+      "id": "BUFF-TIMEOUT",
+      "cardId": "440:5432",
+      "nodeId": "440:5434"
+    },
+    {
+      "id": "BUFF-RATIONS-USE",
+      "cardId": "440:5493",
+      "nodeId": "440:5495"
+    },
+    {
+      "id": "BUFF-CREEL-END",
+      "cardId": "440:5558",
+      "nodeId": "440:5560"
+    }
+  ],
+  "links": [
+    {
+      "id": "440:4896",
+      "back": true
+    },
+    {
+      "id": "440:4910",
+      "target": "BUFF-REPLACE"
+    },
+    {
+      "id": "440:4957",
+      "back": true
+    },
+    {
+      "id": "440:4973",
+      "target": "BUFF-REPLACE"
+    },
+    {
+      "id": "440:5020",
+      "back": true
+    },
+    {
+      "id": "440:5036",
+      "target": "BUFF-REPLACE"
+    },
+    {
+      "id": "440:5083",
+      "back": true
+    },
+    {
+      "id": "440:5101",
+      "target": "BUFF-REPLACE"
+    },
+    {
+      "id": "440:5148",
+      "back": true
+    },
+    {
+      "id": "440:5163",
+      "target": "BUFF-REPLACE"
+    },
+    {
+      "id": "440:5210",
+      "back": true
+    },
+    {
+      "id": "440:5236",
+      "target": "BUFF-ACTIVE"
+    },
+    {
+      "id": "440:5238",
+      "target": "BUFF-FISH"
+    },
+    {
+      "id": "440:5287",
+      "back": true
+    },
+    {
+      "id": "440:5301",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "440:5350",
+      "back": true
+    },
+    {
+      "id": "440:5366",
+      "target": "BUFF-LAST"
+    },
+    {
+      "id": "440:5413",
+      "back": true
+    },
+    {
+      "id": "440:5429",
+      "target": "LOCAL-FISH"
+    },
+    {
+      "id": "440:5476",
+      "back": true
+    },
+    {
+      "id": "440:5490",
+      "target": "HOME-RETURN"
+    },
+    {
+      "id": "440:5537",
+      "back": true
+    },
+    {
+      "id": "440:5555",
+      "target": "MAP-5-PAID"
+    },
+    {
+      "id": "440:5602",
+      "back": true
+    },
+    {
+      "id": "440:5617",
+      "target": "BAG-1-P0"
+    }
+  ],
+  "count": 12
+}

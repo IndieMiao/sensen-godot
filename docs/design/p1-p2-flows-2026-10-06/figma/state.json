@@ -1,0 +1,251 @@
+{
+  "createdNodeIds": [
+    "430:10",
+    "430:7",
+    "430:8",
+    "430:9",
+    "430:11",
+    "430:12",
+    "430:13",
+    "430:14",
+    "430:15",
+    "430:16",
+    "430:17"
+  ],
+  "sections": [
+    {
+      "id": "430:14",
+      "name": "08 · P1日常操作"
+    },
+    {
+      "id": "430:16",
+      "name": "09 · P2免费旅行闭环"
+    }
+  ],
+  "componentSetId": "430:10",
+  "variants": [
+    {
+      "id": "430:7",
+      "name": "Tone=Primary"
+    },
+    {
+      "id": "430:8",
+      "name": "Tone=Secondary"
+    },
+    {
+      "id": "430:9",
+      "name": "Tone=Disabled"
+    }
+  ],
+  "labelKey": "Label#430:0",
+  "textStyleId": "S:aee2aeb7f298f8bf368bac76ffc59f63a43d7aba,",
+  "geometryVariables": {
+    "control-padding": "VariableID:430:3",
+    "control-radius": "VariableID:430:4",
+    "control-gap": "VariableID:430:5"
+  },
+  "variantCount": 3,
+  "fonts": [
+    "Nunito Bold"
+  ],
+  "bindings": [
+    {
+      "id": "430:7",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 0.49803921580314636,
+            "g": 0.7764706015586853,
+            "b": 0.4156862795352936
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:396:7"
+            }
+          }
+        }
+      ],
+      "boundVariables": {
+        "itemSpacing": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:5"
+        },
+        "paddingLeft": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "paddingTop": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "paddingRight": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "paddingBottom": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "topLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "topRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "bottomLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "bottomRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:396:7"
+          }
+        ]
+      }
+    },
+    {
+      "id": "430:8",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 0.9372549057006836,
+            "g": 0.9529411792755127,
+            "b": 0.9137254953384399
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:396:17"
+            }
+          }
+        }
+      ],
+      "boundVariables": {
+        "itemSpacing": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:5"
+        },
+        "paddingLeft": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "paddingTop": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "paddingRight": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "paddingBottom": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "topLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "topRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "bottomLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "bottomRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:396:17"
+          }
+        ]
+      }
+    },
+    {
+      "id": "430:9",
+      "fills": [
+        {
+          "type": "SOLID",
+          "visible": true,
+          "opacity": 1,
+          "blendMode": "NORMAL",
+          "color": {
+            "r": 0.8392156958580017,
+            "g": 0.8352941274642944,
+            "b": 0.8078431487083435
+          },
+          "boundVariables": {
+            "color": {
+              "type": "VARIABLE_ALIAS",
+              "id": "VariableID:396:15"
+            }
+          }
+        }
+      ],
+      "boundVariables": {
+        "itemSpacing": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:5"
+        },
+        "paddingLeft": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "paddingTop": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "paddingRight": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "paddingBottom": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:3"
+        },
+        "topLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "topRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "bottomLeftRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "bottomRightRadius": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:430:4"
+        },
+        "fills": [
+          {
+            "type": "VARIABLE_ALIAS",
+            "id": "VariableID:396:15"
+          }
+        ]
+      }
+    }
+  ]
+}

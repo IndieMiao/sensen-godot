@@ -1,0 +1,45 @@
+{
+  "mainScreensChanged": [
+    "MINE-4",
+    "MINE-5",
+    "RESIDENT-MEAL",
+    "RESIDENT-MEAL-DONE",
+    "RES-PIP",
+    "RES-GRANNY",
+    "RES-MIRA",
+    "RES-KAI",
+    "RES-RAFA",
+    "RES-IVO",
+    "RES-HANA",
+    "RES-SAM",
+    "RES-LENA",
+    "RES-TOMO",
+    "RES-THEO",
+    "RES-NADIA"
+  ],
+  "additionalStates": [
+    "MINE-5-ARRIVAL",
+    "RESIDENT-TALK-MEAL-CLAIMED"
+  ],
+  "mainLegacyCount": 84,
+  "mainCurrentCount": 204,
+  "mainTotalUnchanged": 288,
+  "newStatesSeparate": true,
+  "foodEnergyBefore": 142,
+  "foodEnergyAfter": 142,
+  "residentPortraits": {
+    "RES-PIP": "res_pip",
+    "RES-GRANNY": "res_granny_wu",
+    "RES-MIRA": "res_mira",
+    "RES-KAI": "res_old_kai",
+    "RES-RAFA": "res_rafa",
+    "RES-IVO": "res_ivo",
+    "RES-HANA": "res_hana",
+    "RES-SAM": "res_sam",
+    "RES-LENA": "res_lena",
+    "RES-TOMO": "res_tomo",
+    "RES-THEO": "res_theo",
+    "RES-NADIA": "res_nadia"
+  },
+  "figmaExecution": "Not performed by this data script."
+}

@@ -1,0 +1,8 @@
+/* Current P0/P1 sheets share the screenshot-verified content-fit algorithm.
+ * Only these reviewed ordinary sheets participate; kitchen, scene, Avatar,
+ * inventory and Gear retain their dedicated layouts.
+ */
+const CURRENT_VISUAL_IDS=new Set(["TUT-1","TUT-1-2","TUT-3-03","TUT-3-04","TUT-3-05","TUT-3-06","TUT-3-06B","TUT-3-07A","TUT-3-07C","TUT-3-09","TUT-3-10","TUT-3-11","TUT-3-12","TUT-3-END","MAT-1","MAT-2","MAT-3","MINE-P0-3","MINE-P0-5","MINE-P0-6","MINE-P0-7","MINE-P0-8","CRAFT-1","CRAFT-2","CRAFT-3","CRAFT-4","HOME-P0-1","COOK-P0-4","COOK-P0-5","COOK-P0-6","COOK-P0-9","BOARD-1","BOARD-2","BOARD-3","PARCEL-1","PARCEL-2","PARCEL-3","PARCEL-4","PARCEL-5","ENERGY-P0-1","COOK-KEEP-BRANCH","BOARD-DROPPED","MAT-GLOVES-RESULT","BUILD-RETRY","PARCEL-ONE","FAC-1","FAC-4","FAC-5","FAC-6","TRAP-1","TRAP-3","TRAP-4","TRAP-5","TRAP-6","COOK-P1-8","FAC-GH","TRAP-DONE","DEX-P1-2","FAC-GH-DONE","DOUBLE-RESULT","FAC-LIMIT","TRAP-NOROOM","MAP-2-FREE","MAP-3-FREE","MAP-4-FREE","MAP-5-FREE","MAP-6-FREE","MAP-7-FREE","MAP-8-FREE","LOCAL-CATCH","LOCAL-SHOP","LOCAL-TRADE","LOCAL-BOUGHT","HOME-RETURN","PASS-1","PASS-2","TRAVEL-RETRY","TRAVEL-RECONNECT","MAP-4-PAID","MAP-4-GATE","MAP-5-PAID"]);
+function currentVisualRefine(screen,s){if(!CURRENT_VISUAL_IDS.has(s.id))return {id:s.id,applied:false};return p2p3VisualRefine(screen,s,true);}
+const CURRENT_VISUAL_BASE=buildScreen;
+buildScreen=function(s,index){const n=CURRENT_VISUAL_BASE(s,index),result=currentVisualRefine(n,s);if(result.applied){LEDGER.checks.currentCompactSheets=LEDGER.checks.currentCompactSheets||{};LEDGER.checks.currentCompactSheets[s.id]=result;}return n;};

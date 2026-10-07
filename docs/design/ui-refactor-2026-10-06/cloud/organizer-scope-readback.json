@@ -1,0 +1,1388 @@
+{
+  "groups": {
+    "library": {
+      "count": 1,
+      "left": 5000,
+      "top": 180,
+      "right": 6260,
+      "bottom": 18598,
+      "examples": [
+        {
+          "id": "481:54",
+          "name": "Shared native components \u00b7 edit here",
+          "type": "FRAME",
+          "x": 5000,
+          "y": 180,
+          "w": 1260,
+          "h": 18418
+        }
+      ]
+    },
+    "main-sections": {
+      "count": 36,
+      "left": 100,
+      "top": 180,
+      "right": 3344,
+      "bottom": 38630,
+      "examples": [
+        {
+          "id": "482:2",
+          "name": "Review row 01",
+          "type": "SECTION",
+          "x": 100,
+          "y": 180,
+          "w": 3244,
+          "h": 1000
+        },
+        {
+          "id": "482:19",
+          "name": "Review row 02",
+          "type": "SECTION",
+          "x": 100,
+          "y": 1250,
+          "w": 3244,
+          "h": 1000
+        },
+        {
+          "id": "482:36",
+          "name": "Review row 03",
+          "type": "SECTION",
+          "x": 100,
+          "y": 2320,
+          "w": 3244,
+          "h": 1000
+        },
+        {
+          "id": "482:53",
+          "name": "Review row 04",
+          "type": "SECTION",
+          "x": 100,
+          "y": 3390,
+          "w": 3244,
+          "h": 1000
+        },
+        {
+          "id": "482:70",
+          "name": "Review row 05",
+          "type": "SECTION",
+          "x": 100,
+          "y": 4460,
+          "w": 3244,
+          "h": 1000
+        },
+        {
+          "id": "482:87",
+          "name": "Review row 06",
+          "type": "SECTION",
+          "x": 100,
+          "y": 5530,
+          "w": 3244,
+          "h": 1000
+        },
+        {
+          "id": "482:104",
+          "name": "Review row 07",
+          "type": "SECTION",
+          "x": 100,
+          "y": 6600,
+          "w": 3244,
+          "h": 1000
+        },
+        {
+          "id": "482:121",
+          "name": "Review row 08",
+          "type": "SECTION",
+          "x": 100,
+          "y": 7670,
+          "w": 3244,
+          "h": 1000
+        },
+        {
+          "id": "482:138",
+          "name": "Review row 09",
+          "type": "SECTION",
+          "x": 100,
+          "y": 8740,
+          "w": 3244,
+          "h": 1000
+        },
+        {
+          "id": "482:155",
+          "name": "Review row 10",
+          "type": "SECTION",
+          "x": 100,
+          "y": 9810,
+          "w": 3244,
+          "h": 1000
+        }
+      ]
+    },
+    "other-support": {
+      "count": 1201,
+      "left": 3560,
+      "top": 180,
+      "right": 6732,
+      "bottom": 393200,
+      "examples": [
+        {
+          "id": "485:748",
+          "name": "Overlay \u00b7 Compost",
+          "type": "FRAME",
+          "x": 3560,
+          "y": 180,
+          "w": 360,
+          "h": 620
+        },
+        {
+          "id": "485:768",
+          "name": "Overlay \u00b7 Radish Seeds",
+          "type": "FRAME",
+          "x": 3960,
+          "y": 180,
+          "w": 360,
+          "h": 620
+        },
+        {
+          "id": "485:787",
+          "name": "Overlay \u00b7 Carrot Seeds",
+          "type": "FRAME",
+          "x": 4360,
+          "y": 180,
+          "w": 360,
+          "h": 620
+        },
+        {
+          "id": "485:806",
+          "name": "Overlay \u00b7 Compost",
+          "type": "FRAME",
+          "x": 3560,
+          "y": 1080,
+          "w": 360,
+          "h": 620
+        },
+        {
+          "id": "485:825",
+          "name": "Overlay \u00b7 Orchard Feed",
+          "type": "FRAME",
+          "x": 3960,
+          "y": 1080,
+          "w": 360,
+          "h": 620
+        },
+        {
+          "id": "485:846",
+          "name": "Overlay \u00b7 All",
+          "type": "FRAME",
+          "x": 4360,
+          "y": 1080,
+          "w": 360,
+          "h": 620
+        },
+        {
+          "id": "485:895",
+          "name": "Overlay \u00b7 Seeds",
+          "type": "FRAME",
+          "x": 3560,
+          "y": 1980,
+          "w": 360,
+          "h": 620
+        },
+        {
+          "id": "485:912",
+          "name": "Overlay \u00b7 Fish",
+          "type": "FRAME",
+          "x": 3960,
+          "y": 1980,
+          "w": 360,
+          "h": 620
+        },
+        {
+          "id": "485:929",
+          "name": "Overlay \u00b7 Produce",
+          "type": "FRAME",
+          "x": 4360,
+          "y": 1980,
+          "w": 360,
+          "h": 620
+        },
+        {
+          "id": "485:946",
+          "name": "Overlay \u00b7 Dishes",
+          "type": "FRAME",
+          "x": 3560,
+          "y": 2880,
+          "w": 360,
+          "h": 620
+        }
+      ]
+    },
+    "source-scenes": {
+      "count": 3,
+      "left": 6600,
+      "top": 180,
+      "right": 6960,
+      "bottom": 2700,
+      "examples": [
+        {
+          "id": "494:1048",
+          "name": "Source scene \u00b7 homestead-stall-v2",
+          "type": "FRAME",
+          "x": 6600,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "494:17004",
+          "name": "Source scene \u00b7 profile-avatar",
+          "type": "FRAME",
+          "x": 6600,
+          "y": 1040,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "494:17005",
+          "name": "Source scene \u00b7 profile-avatar-mia",
+          "type": "FRAME",
+          "x": 6600,
+          "y": 1900,
+          "w": 360,
+          "h": 800
+        }
+      ]
+    },
+    "assets-and-avatar": {
+      "count": 3,
+      "left": 9000,
+      "top": 0,
+      "right": 21680,
+      "bottom": 3800,
+      "examples": [
+        {
+          "id": "543:19411",
+          "name": "Avatar \u00b7 source assets \u00b7 2026-10-06",
+          "type": "FRAME",
+          "x": 20000,
+          "y": 0,
+          "w": 1680,
+          "h": 1920
+        },
+        {
+          "id": "604:37696",
+          "name": "Avatar \u00b7 preview verification",
+          "type": "FRAME",
+          "x": 9000,
+          "y": 3000,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "631:41616",
+          "name": "Avatar \u00b7 preserved Profile details",
+          "type": "FRAME",
+          "x": 19200,
+          "y": 0,
+          "w": 360,
+          "h": 620
+        }
+      ]
+    },
+    "avatar-profiles": {
+      "count": 29,
+      "left": 14000,
+      "top": 180,
+      "right": 16340,
+      "bottom": 4500,
+      "examples": [
+        {
+          "id": "629:38467",
+          "name": "Avatar Profile \u00b7 base",
+          "type": "FRAME",
+          "x": 14000,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:38553",
+          "name": "Avatar Profile \u00b7 hairhat0",
+          "type": "FRAME",
+          "x": 14396,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:38640",
+          "name": "Avatar Profile \u00b7 cloth0",
+          "type": "FRAME",
+          "x": 14792,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:38883",
+          "name": "Avatar Profile \u00b7 shoes0",
+          "type": "FRAME",
+          "x": 15188,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:38970",
+          "name": "Avatar Profile \u00b7 glass0",
+          "type": "FRAME",
+          "x": 15584,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39057",
+          "name": "Avatar Profile \u00b7 cloth1",
+          "type": "FRAME",
+          "x": 15980,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39303",
+          "name": "Avatar Profile \u00b7 cloth1_1",
+          "type": "FRAME",
+          "x": 14000,
+          "y": 1060,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39390",
+          "name": "Avatar Profile \u00b7 shoes1",
+          "type": "FRAME",
+          "x": 14396,
+          "y": 1060,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39477",
+          "name": "Avatar Profile \u00b7 glass1",
+          "type": "FRAME",
+          "x": 14792,
+          "y": 1060,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39723",
+          "name": "Avatar Profile \u00b7 messengerbag1",
+          "type": "FRAME",
+          "x": 15188,
+          "y": 1060,
+          "w": 360,
+          "h": 800
+        }
+      ]
+    },
+    "avatar-continuations": {
+      "count": 29,
+      "left": 16600,
+      "top": 180,
+      "right": 18940,
+      "bottom": 4500,
+      "examples": [
+        {
+          "id": "629:38727",
+          "name": "Avatar edit continuation \u00b7 base",
+          "type": "FRAME",
+          "x": 16600,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:38779",
+          "name": "Avatar edit continuation \u00b7 hairhat0",
+          "type": "FRAME",
+          "x": 16996,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:38831",
+          "name": "Avatar edit continuation \u00b7 cloth0",
+          "type": "FRAME",
+          "x": 17392,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39144",
+          "name": "Avatar edit continuation \u00b7 shoes0",
+          "type": "FRAME",
+          "x": 17788,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39196",
+          "name": "Avatar edit continuation \u00b7 glass0",
+          "type": "FRAME",
+          "x": 18184,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39251",
+          "name": "Avatar edit continuation \u00b7 cloth1",
+          "type": "FRAME",
+          "x": 18580,
+          "y": 180,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39564",
+          "name": "Avatar edit continuation \u00b7 cloth1_1",
+          "type": "FRAME",
+          "x": 16600,
+          "y": 1060,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39616",
+          "name": "Avatar edit continuation \u00b7 shoes1",
+          "type": "FRAME",
+          "x": 16996,
+          "y": 1060,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39668",
+          "name": "Avatar edit continuation \u00b7 glass1",
+          "type": "FRAME",
+          "x": 17392,
+          "y": 1060,
+          "w": 360,
+          "h": 800
+        },
+        {
+          "id": "629:39984",
+          "name": "Avatar edit continuation \u00b7 messengerbag1",
+          "type": "FRAME",
+          "x": 17788,
+          "y": 1060,
+          "w": 360,
+          "h": 800
+        }
+      ]
+    }
+  },
+  "library": {
+    "id": "481:54",
+    "x": 5000,
+    "y": 180,
+    "width": 1260,
+    "height": 18418
+  },
+  "units": [
+    [
+      "483:12",
+      "Gensen Refactor/Icon/i-board",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:19",
+      "Gensen Refactor/Icon/i-book",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:25",
+      "Gensen Refactor/Icon/i-clay",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:34",
+      "Gensen Refactor/Icon/i-dish-biscuit",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:40",
+      "Gensen Refactor/Icon/i-dish-bowl",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:47",
+      "Gensen Refactor/Icon/i-dish-cake",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:55",
+      "Gensen Refactor/Icon/i-dish-cakes",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:61",
+      "Gensen Refactor/Icon/i-dish-pie",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:68",
+      "Gensen Refactor/Icon/i-dish-plate",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:77",
+      "Gensen Refactor/Icon/i-dish-salad",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:85",
+      "Gensen Refactor/Icon/i-dish-skewer",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:94",
+      "Gensen Refactor/Icon/i-dish-soup",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:106",
+      "Gensen Refactor/Icon/i-dish-stew",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:111",
+      "Gensen Refactor/Icon/i-hanger",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:117",
+      "Gensen Refactor/Icon/i-hardwood",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:125",
+      "Gensen Refactor/Icon/i-kitchen",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:134",
+      "Gensen Refactor/Icon/i-koi",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:140",
+      "Gensen Refactor/Icon/i-parcel",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:147",
+      "Gensen Refactor/Icon/i-potato",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:153",
+      "Gensen Refactor/Icon/i-pumpkin-seeds",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:159",
+      "Gensen Refactor/Icon/i-quartz",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:168",
+      "Gensen Refactor/Icon/i-reeds",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:176",
+      "Gensen Refactor/Icon/i-rest",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:181",
+      "Gensen Refactor/Icon/i-showmap",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:184",
+      "Gensen Refactor/Icon/i-star",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:189",
+      "Gensen Refactor/Icon/i-sweet-potato",
+      "COMPONENT",
+      64,
+      64,
+      "483:2"
+    ],
+    [
+      "483:190",
+      "Gensen Refactor/Sheet",
+      "COMPONENT",
+      360,
+      520,
+      "481:54"
+    ],
+    [
+      "483:191",
+      "Gensen Refactor/Quantity",
+      "COMPONENT",
+      72,
+      54,
+      "481:54"
+    ],
+    [
+      "483:194",
+      "Gensen Refactor/Effect",
+      "COMPONENT",
+      328,
+      20,
+      "481:54"
+    ],
+    [
+      "483:196",
+      "Gensen Refactor/ObjectHeader",
+      "COMPONENT",
+      328,
+      102,
+      "481:54"
+    ],
+    [
+      "483:216",
+      "Gensen Refactor/CommandButton",
+      "COMPONENT_SET",
+      376,
+      364,
+      "481:54"
+    ],
+    [
+      "483:217",
+      "Gensen Refactor/NavigationRow",
+      "COMPONENT",
+      328,
+      49,
+      "481:54"
+    ],
+    [
+      "483:220",
+      "Gensen Refactor/Dismiss",
+      "COMPONENT",
+      328,
+      44,
+      "481:54"
+    ],
+    [
+      "483:222",
+      "Gensen Refactor/Fact",
+      "COMPONENT",
+      328,
+      31,
+      "481:54"
+    ],
+    [
+      "483:225",
+      "Gensen Refactor/Cost",
+      "COMPONENT",
+      328,
+      32,
+      "481:54"
+    ],
+    [
+      "483:228",
+      "Gensen Refactor/ItemRow",
+      "COMPONENT",
+      328,
+      83,
+      "481:54"
+    ],
+    [
+      "483:261",
+      "Gensen Refactor/NeedTile",
+      "COMPONENT_SET",
+      152,
+      66,
+      "481:54"
+    ],
+    [
+      "483:292",
+      "Gensen Refactor/InventoryCell",
+      "COMPONENT_SET",
+      107,
+      276,
+      "481:54"
+    ],
+    [
+      "483:293",
+      "Gensen Refactor/GearSlot",
+      "COMPONENT",
+      48,
+      60,
+      "481:54"
+    ],
+    [
+      "483:302",
+      "Gensen Refactor/Toast",
+      "COMPONENT",
+      328,
+      43,
+      "481:54"
+    ],
+    [
+      "483:304",
+      "Gensen Refactor/HUD",
+      "COMPONENT",
+      344,
+      82,
+      "481:54"
+    ],
+    [
+      "483:322",
+      "Gensen Refactor/Tab",
+      "COMPONENT",
+      104,
+      44,
+      "481:54"
+    ],
+    [
+      "483:324",
+      "Gensen Refactor/StateBadge",
+      "COMPONENT",
+      150,
+      32,
+      "481:54"
+    ],
+    [
+      "483:326",
+      "Gensen Refactor/ProfileIdentity",
+      "COMPONENT",
+      328,
+      138,
+      "481:54"
+    ],
+    [
+      "483:336",
+      "Gensen Refactor/Close",
+      "COMPONENT",
+      44,
+      44,
+      "481:54"
+    ],
+    [
+      "483:339",
+      "Gensen Refactor/BuffChip",
+      "COMPONENT",
+      328,
+      36,
+      "481:54"
+    ],
+    [
+      "483:355",
+      "Gensen Refactor/HeatRing",
+      "COMPONENT",
+      120,
+      120,
+      "481:54"
+    ],
+    [
+      "483:389",
+      "Gensen Refactor/IngredientSlot",
+      "COMPONENT_SET",
+      148,
+      372,
+      "481:54"
+    ],
+    [
+      "483:429",
+      "Gensen Refactor/NoteSelection",
+      "COMPONENT_SET",
+      376,
+      87,
+      "481:54"
+    ],
+    [
+      "483:562",
+      "Gensen Refactor/LegacyInventoryCell",
+      "COMPONENT_SET",
+      107,
+      318,
+      "481:54"
+    ],
+    [
+      "483:563",
+      "Gensen Refactor/LegacyCollectionCell",
+      "COMPONENT_SET",
+      107,
+      498,
+      "481:54"
+    ],
+    [
+      "483:564",
+      "Gensen Refactor/LegacyQuickSlot",
+      "COMPONENT_SET",
+      97,
+      324,
+      "481:54"
+    ],
+    [
+      "483:565",
+      "Gensen Refactor/LegacyGearSlot",
+      "COMPONENT_SET",
+      96,
+      354,
+      "481:54"
+    ],
+    [
+      "488:781",
+      "Gensen Refactor/SceneAction",
+      "COMPONENT",
+      88,
+      88,
+      "481:54"
+    ],
+    [
+      "495:1048",
+      "Gensen Refactor/LegacySelectedSummary",
+      "COMPONENT",
+      328,
+      70,
+      "481:54"
+    ],
+    [
+      "517:11812",
+      "Gensen Refactor/ReferenceCatchProgress",
+      "COMPONENT_SET",
+      160,
+      420,
+      "481:54"
+    ],
+    [
+      "517:11813",
+      "Gensen Refactor/ReferenceHook",
+      "COMPONENT",
+      144,
+      144,
+      "481:54"
+    ],
+    [
+      "517:11823",
+      "Gensen Refactor/ReferenceReelMeter",
+      "COMPONENT",
+      56,
+      184,
+      "481:54"
+    ],
+    [
+      "517:11840",
+      "Gensen Refactor/ReferenceJoystick",
+      "COMPONENT_SET",
+      188,
+      344,
+      "481:54"
+    ],
+    [
+      "517:11873",
+      "Gensen Refactor/ReferenceEnergy",
+      "COMPONENT_SET",
+      376,
+      432,
+      "481:54"
+    ],
+    [
+      "517:11874",
+      "Gensen Refactor/ReferenceToday",
+      "COMPONENT",
+      328,
+      44,
+      "481:54"
+    ],
+    [
+      "517:11951",
+      "Gensen Refactor/ReferenceStatusBadge",
+      "COMPONENT_SET",
+      104,
+      1088,
+      "481:54"
+    ],
+    [
+      "534:13708",
+      "Gensen Refactor/FacilityMarker",
+      "COMPONENT_SET",
+      204,
+      780,
+      "481:54"
+    ],
+    [
+      "594:37616",
+      "Gensen Refactor/Avatar thumbnail/hairhat0",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37618",
+      "Gensen Refactor/Avatar thumbnail/cloth0",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37620",
+      "Gensen Refactor/Avatar thumbnail/shoes0",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37622",
+      "Gensen Refactor/Avatar thumbnail/glass0",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37624",
+      "Gensen Refactor/Avatar thumbnail/cloth1",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37626",
+      "Gensen Refactor/Avatar thumbnail/cloth1_1",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37628",
+      "Gensen Refactor/Avatar thumbnail/shoes1",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37630",
+      "Gensen Refactor/Avatar thumbnail/glass1",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37632",
+      "Gensen Refactor/Avatar thumbnail/messengerbag1",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37634",
+      "Gensen Refactor/Avatar thumbnail/hairhat20",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37636",
+      "Gensen Refactor/Avatar thumbnail/shoes2",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37638",
+      "Gensen Refactor/Avatar thumbnail/shoes3",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37640",
+      "Gensen Refactor/Avatar thumbnail/shoes4",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37642",
+      "Gensen Refactor/Avatar thumbnail/shoes5",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37644",
+      "Gensen Refactor/Avatar thumbnail/glass3",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37646",
+      "Gensen Refactor/Avatar thumbnail/glass5",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37648",
+      "Gensen Refactor/Avatar thumbnail/messengerbag2",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37650",
+      "Gensen Refactor/Avatar thumbnail/messengerbag3",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37652",
+      "Gensen Refactor/Avatar thumbnail/messengerbag4",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37654",
+      "Gensen Refactor/Avatar thumbnail/cloth11",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37656",
+      "Gensen Refactor/Avatar thumbnail/cloth28",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37658",
+      "Gensen Refactor/Avatar thumbnail/cloth42",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37660",
+      "Gensen Refactor/Avatar thumbnail/hairhat41",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37662",
+      "Gensen Refactor/Avatar thumbnail/hairhat43",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37664",
+      "Gensen Refactor/Avatar thumbnail/hairhat51",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37666",
+      "Gensen Refactor/Avatar thumbnail/hairhat70",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37668",
+      "Gensen Refactor/Avatar thumbnail/glass8",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37670",
+      "Gensen Refactor/Avatar thumbnail/No accessory",
+      "COMPONENT",
+      56,
+      56,
+      "481:54"
+    ],
+    [
+      "594:37683",
+      "Gensen Refactor/Avatar Part Tile",
+      "COMPONENT_SET",
+      256,
+      138,
+      "481:54"
+    ],
+    [
+      "629:38466",
+      "Gensen Refactor/Avatar Wardrobe",
+      "COMPONENT_SET",
+      1968,
+      4968,
+      "481:54"
+    ],
+    [
+      "633:41154",
+      "Gensen Refactor/Compact/HUD",
+      "COMPONENT",
+      340,
+      78,
+      "481:54"
+    ],
+    [
+      "633:41257",
+      "Gensen Refactor/Compact/SelectedItem",
+      "COMPONENT",
+      336,
+      82,
+      "481:54"
+    ],
+    [
+      "633:41273",
+      "Gensen Refactor/Compact/Command",
+      "COMPONENT",
+      68,
+      44,
+      "481:54"
+    ],
+    [
+      "633:41276",
+      "Gensen Refactor/Compact/Navigation",
+      "COMPONENT",
+      54,
+      44,
+      "481:54"
+    ],
+    [
+      "633:41278",
+      "Gensen Refactor/Compact/InventoryCell",
+      "COMPONENT_SET",
+      100,
+      240,
+      "481:54"
+    ],
+    [
+      "633:41279",
+      "Gensen Refactor/Compact/QuickSlot",
+      "COMPONENT_SET",
+      100,
+      246,
+      "481:54"
+    ],
+    [
+      "633:41280",
+      "Gensen Refactor/Compact/Filter",
+      "COMPONENT_SET",
+      98,
+      136,
+      "481:54"
+    ],
+    [
+      "641:45233",
+      "Gensen Refactor/Avatar Back",
+      "COMPONENT",
+      44,
+      44,
+      "481:54"
+    ],
+    [
+      "641:45313",
+      "Gensen Refactor/Avatar Category",
+      "COMPONENT_SET",
+      442,
+      160,
+      "481:54"
+    ],
+    [
+      "641:45314",
+      "Gensen Refactor/Avatar Skill",
+      "COMPONENT",
+      104,
+      42,
+      "481:54"
+    ],
+    [
+      "641:45317",
+      "Gensen Refactor/Avatar Profile Row",
+      "COMPONENT",
+      328,
+      48,
+      "481:54"
+    ],
+    [
+      "655:58436",
+      "Gensen Refactor/Compact/Kitchen/Preview",
+      "COMPONENT",
+      292,
+      26,
+      "481:54"
+    ],
+    [
+      "655:58440",
+      "Gensen Refactor/Compact/Kitchen/Recipe",
+      "COMPONENT",
+      336,
+      72,
+      "481:54"
+    ],
+    [
+      "655:58504",
+      "Gensen Refactor/Compact/Kitchen/Mode",
+      "COMPONENT_SET",
+      210,
+      136,
+      "481:54"
+    ],
+    [
+      "655:58505",
+      "Gensen Refactor/Compact/Kitchen/Slot",
+      "COMPONENT_SET",
+      138,
+      234,
+      "481:54"
+    ],
+    [
+      "655:58506",
+      "Gensen Refactor/Compact/Kitchen/Cell",
+      "COMPONENT_SET",
+      100,
+      258,
+      "481:54"
+    ],
+    [
+      "659:59627",
+      "Gensen Refactor/Compact/PlayerPortrait",
+      "COMPONENT",
+      38,
+      38,
+      "481:54"
+    ],
+    [
+      "663:61299",
+      "Gensen Refactor/Compact/GearSlot",
+      "COMPONENT_SET",
+      100,
+      348,
+      "481:54"
+    ]
+  ],
+  "rootChildren": 1302
+}

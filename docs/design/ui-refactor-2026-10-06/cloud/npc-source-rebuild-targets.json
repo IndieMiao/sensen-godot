@@ -1,0 +1,16 @@
+{
+  "ids": [
+    "NPC-1",
+    "NPC-2",
+    "NPC-2-2",
+    "NPC-3",
+    "NPC-3-2",
+    "NPC-4",
+    "NPC-7"
+  ],
+  "changes": [
+    "Five actionable source cards use existing same-item result frames.",
+    "NPC1/7 retain their source gate/list corrections; NPC flow discovery is read-only."
+  ],
+  "newStatesCreatedByMainBuilder": false
+}

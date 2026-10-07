@@ -1,0 +1,58 @@
+{
+  "BUFF-ACTIVE": {
+    "kind": "illustrative-design-fixture",
+    "sourceScreens": [
+      "FARM-4"
+    ],
+    "counts": [
+      24,
+      10,
+      6,
+      2
+    ],
+    "authority": "User explicitly requested visible quantities on every nonempty Quick Bar slot;reuse matching authored scene examples.",
+    "runtimeInventory": false
+  },
+  "BUFF-CASTS": {
+    "kind": "illustrative-design-fixture",
+    "sourceScreens": [
+      "FISH-1",
+      "FISH-4"
+    ],
+    "counts": [
+      12,
+      3,
+      1
+    ],
+    "authority": "User explicitly requested visible quantities on every nonempty Quick Bar slot;reuse matching authored scene examples.",
+    "runtimeInventory": false
+  },
+  "BUFF-LAST": {
+    "kind": "illustrative-design-fixture",
+    "sourceScreens": [
+      "FISH-1",
+      "FISH-4"
+    ],
+    "counts": [
+      12,
+      3,
+      1
+    ],
+    "authority": "User explicitly requested visible quantities on every nonempty Quick Bar slot;reuse matching authored scene examples.",
+    "runtimeInventory": false
+  },
+  "BUFF-TIMEOUT": {
+    "kind": "illustrative-design-fixture",
+    "sourceScreens": [
+      "FARM-4"
+    ],
+    "counts": [
+      24,
+      10,
+      6,
+      2
+    ],
+    "authority": "User explicitly requested visible quantities on every nonempty Quick Bar slot;reuse matching authored scene examples.",
+    "runtimeInventory": false
+  }
+}

@@ -1,0 +1,657 @@
+{
+  "createdNodeIdsFile": "content-state-node-ids.json",
+  "results": [
+    {
+      "id": "crop_radish",
+      "componentSetId": "444:7709",
+      "stages": [
+        {
+          "id": "444:7645",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:7655",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:7667",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:7691",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_lettuce",
+      "componentSetId": "444:7773",
+      "stages": [
+        {
+          "id": "444:7713",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:7723",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:7735",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:7757",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_herb",
+      "componentSetId": "444:7837",
+      "stages": [
+        {
+          "id": "444:7777",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:7787",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:7799",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:7821",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_carrot",
+      "componentSetId": "444:7897",
+      "stages": [
+        {
+          "id": "444:7841",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:7851",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:7863",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:7883",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_potato",
+      "componentSetId": "444:7965",
+      "stages": [
+        {
+          "id": "444:7901",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:7911",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:7923",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:7947",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_chamomile",
+      "componentSetId": "444:8041",
+      "stages": [
+        {
+          "id": "444:7969",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:7979",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:7991",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8019",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_chili",
+      "componentSetId": "444:8105",
+      "stages": [
+        {
+          "id": "444:8045",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8055",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8067",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8089",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_tomato",
+      "componentSetId": "444:8161",
+      "stages": [
+        {
+          "id": "444:8109",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8119",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8131",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8149",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_cabbage",
+      "componentSetId": "444:8221",
+      "stages": [
+        {
+          "id": "444:8165",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8175",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8187",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8207",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_corn",
+      "componentSetId": "444:8313",
+      "stages": [
+        {
+          "id": "444:8225",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8235",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8247",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8283",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_cucumber",
+      "componentSetId": "444:8377",
+      "stages": [
+        {
+          "id": "444:8317",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8327",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8339",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8361",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_strawberry",
+      "componentSetId": "444:8453",
+      "stages": [
+        {
+          "id": "444:8381",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8391",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8403",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8431",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_melon",
+      "componentSetId": "444:8521",
+      "stages": [
+        {
+          "id": "444:8457",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8467",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8479",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8503",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_pineapple",
+      "componentSetId": "444:8585",
+      "stages": [
+        {
+          "id": "444:8525",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8535",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8547",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8569",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_sweet_potato",
+      "componentSetId": "444:8645",
+      "stages": [
+        {
+          "id": "444:8589",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8599",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8611",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8631",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_pumpkin",
+      "componentSetId": "444:8709",
+      "stages": [
+        {
+          "id": "444:8649",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8659",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8671",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8693",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_beet",
+      "componentSetId": "444:8777",
+      "stages": [
+        {
+          "id": "444:8713",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8723",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8735",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8759",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_apple",
+      "componentSetId": "444:8841",
+      "stages": [
+        {
+          "id": "444:8781",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8791",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8803",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8825",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_citrus",
+      "componentSetId": "444:8901",
+      "stages": [
+        {
+          "id": "444:8845",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8855",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8867",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8887",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "crop_grape",
+      "componentSetId": "444:8981",
+      "stages": [
+        {
+          "id": "444:8905",
+          "name": "Stage=Seeded"
+        },
+        {
+          "id": "444:8915",
+          "name": "Stage=Sprout"
+        },
+        {
+          "id": "444:8927",
+          "name": "Stage=Growing"
+        },
+        {
+          "id": "444:8957",
+          "name": "Stage=Ready"
+        }
+      ]
+    },
+    {
+      "id": "fish_crucian",
+      "silhouetteId": "444:8984"
+    },
+    {
+      "id": "fish_carp",
+      "silhouetteId": "444:9009"
+    },
+    {
+      "id": "fish_mullet",
+      "silhouetteId": "444:9034"
+    },
+    {
+      "id": "fish_perch",
+      "silhouetteId": "444:9059"
+    },
+    {
+      "id": "fish_bass",
+      "silhouetteId": "444:9093"
+    },
+    {
+      "id": "fish_trout",
+      "silhouetteId": "444:9118"
+    },
+    {
+      "id": "fish_mackerel",
+      "silhouetteId": "444:9158"
+    },
+    {
+      "id": "fish_koi",
+      "silhouetteId": "444:9192"
+    },
+    {
+      "id": "fish_catfish",
+      "silhouetteId": "444:9223"
+    },
+    {
+      "id": "fish_seabass",
+      "silhouetteId": "444:9251"
+    },
+    {
+      "id": "fish_sturgeon",
+      "silhouetteId": "444:9276"
+    },
+    {
+      "id": "fish_eel",
+      "silhouetteId": "444:9310"
+    },
+    {
+      "id": "fish_tilapia",
+      "silhouetteId": "444:9326"
+    },
+    {
+      "id": "fish_smelt",
+      "silhouetteId": "444:9360"
+    },
+    {
+      "id": "fish_grass_carp",
+      "silhouetteId": "444:9385"
+    },
+    {
+      "id": "fish_arctic_char",
+      "silhouetteId": "444:9410"
+    },
+    {
+      "id": "fish_snakehead",
+      "silhouetteId": "444:9450"
+    },
+    {
+      "id": "fish_pike",
+      "silhouetteId": "444:9475"
+    },
+    {
+      "id": "fish_barramundi",
+      "silhouetteId": "444:9500"
+    },
+    {
+      "id": "fish_salmon",
+      "silhouetteId": "444:9525"
+    },
+    {
+      "room": "tea-house",
+      "climate": "Tropical",
+      "specimenId": "444:9565"
+    },
+    {
+      "room": "tea-house",
+      "climate": "Subtropical",
+      "specimenId": "444:9572"
+    },
+    {
+      "room": "tea-house",
+      "climate": "Temperate",
+      "specimenId": "444:9579"
+    },
+    {
+      "room": "tea-house",
+      "climate": "Cool",
+      "specimenId": "444:9586"
+    },
+    {
+      "room": "tackle-shop",
+      "climate": "Tropical",
+      "specimenId": "444:9593"
+    },
+    {
+      "room": "tackle-shop",
+      "climate": "Subtropical",
+      "specimenId": "444:9600"
+    },
+    {
+      "room": "tackle-shop",
+      "climate": "Temperate",
+      "specimenId": "444:9607"
+    },
+    {
+      "room": "tackle-shop",
+      "climate": "Cool",
+      "specimenId": "444:9614"
+    },
+    {
+      "room": "market-square-v2",
+      "climate": "Tropical",
+      "specimenId": "444:9621"
+    },
+    {
+      "room": "market-square-v2",
+      "climate": "Subtropical",
+      "specimenId": "444:9628"
+    },
+    {
+      "room": "market-square-v2",
+      "climate": "Temperate",
+      "specimenId": "444:9635"
+    },
+    {
+      "room": "market-square-v2",
+      "climate": "Cool",
+      "specimenId": "444:9642"
+    },
+    {
+      "room": "travel-post",
+      "climate": "Tropical",
+      "specimenId": "444:9649"
+    },
+    {
+      "room": "travel-post",
+      "climate": "Subtropical",
+      "specimenId": "444:9656"
+    },
+    {
+      "room": "travel-post",
+      "climate": "Temperate",
+      "specimenId": "444:9663"
+    },
+    {
+      "room": "travel-post",
+      "climate": "Cool",
+      "specimenId": "444:9670"
+    },
+    {
+      "room": "trading-post",
+      "climate": "Tropical",
+      "specimenId": "444:9677"
+    },
+    {
+      "room": "trading-post",
+      "climate": "Subtropical",
+      "specimenId": "444:9684"
+    },
+    {
+      "room": "trading-post",
+      "climate": "Temperate",
+      "specimenId": "444:9691"
+    },
+    {
+      "room": "trading-post",
+      "climate": "Cool",
+      "specimenId": "444:9698"
+    },
+    {
+      "home": "Lv4",
+      "specimenId": "444:9706"
+    },
+    {
+      "home": "Lv5",
+      "specimenId": "444:9712"
+    },
+    {
+      "home": "Lv6",
+      "specimenId": "444:9718"
+    },
+    {
+      "home": "Lv7",
+      "specimenId": "444:9724"
+    },
+    {
+      "home": "Lv8",
+      "specimenId": "444:9730"
+    },
+    {
+      "home": "Lv9",
+      "specimenId": "444:9736"
+    },
+    {
+      "home": "Lv10",
+      "specimenId": "444:9742"
+    }
+  ],
+  "growthSets": 20,
+  "fishSilhouettes": 20,
+  "roomPalettes": 20,
+  "homeStages": 7
+}

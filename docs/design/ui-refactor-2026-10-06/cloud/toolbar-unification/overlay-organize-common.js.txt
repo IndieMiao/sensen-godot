@@ -1,0 +1,12 @@
+const page=await figma.getNodeByIdAsync('481:53');await figma.setCurrentPageAsync(page);
+const LABELS=['Prototype overlays · Information','Prototype overlays · Interaction states','Prototype overlays · Feedback'];
+function legalOverlay(n){if(n.type!=='FRAME'||!n.name.startsWith('Overlay · '))return false;let p=n.parent;while(p&&p!==page){if(p.type!=='SECTION')return false;p=p.parent;}return p===page;}
+const overlays=page.findAll(n=>legalOverlay(n));if(overlays.some(n=>n.width>360.1))throw Error('Unexpected overlay width;inspect before organizing');
+function category(n){if(n.children.some(c=>c.name==='Detail identity')&&n.children.some(c=>c.name==='Detail body'))return 0;if(n.name==='Overlay · Feedback'||n.children.some(c=>c.type==='INSTANCE'&&c.name==='Toast'))return 2;return 1;}
+const groups=LABELS.map((label,i)=>({label,nodes:overlays.filter(n=>category(n)===i).sort((a,b)=>a.name.localeCompare(b.name)||a.id.localeCompare(b.id))}));
+const overlayIds=new Set(overlays.map(n=>n.id)),oldSections=page.children.filter(n=>n.type==='SECTION'&&LABELS.includes(n.name));
+const left=14000,width=3152,columns=8,gapX=32,gapY=64,padding=24,header=64;
+const blockers=page.children.filter(n=>!overlayIds.has(n.id)&&!oldSections.includes(n)&&'x'in n&&'width'in n&&n.visible!==false&&n.x<left+width&&n.x+n.width>left);
+const suggestedY=Math.max(180,...blockers.map(n=>n.y+n.height+128));
+const cameraNotes=new Map();for(const frame of overlays){const candidates=frame.parent.children.filter(n=>n.type==='TEXT'&&n.name==='Camera review note · outside player viewport'&&Math.abs(n.x-frame.x)<.1&&Math.abs(n.y-(frame.y+frame.height+12))<.1);if(candidates.length===1)cameraNotes.set(frame.id,candidates[0]);}
+function planRows(nodes){const rows=[];let y=header;for(let start=0;start<nodes.length;start+=columns){const row=nodes.slice(start,start+columns);let height=0;row.forEach((node,col)=>{const note=cameraNotes.get(node.id);const h=node.height+(note?12+note.height:0);height=Math.max(height,h);rows.push({node,x:padding+col*(360+gapX),y,note});});y+=height+gapY;}return {rows,height:Math.max(120,y-gapY+padding)};}

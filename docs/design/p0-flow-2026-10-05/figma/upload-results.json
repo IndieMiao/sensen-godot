@@ -1,0 +1,44 @@
+[
+  {
+    "file": "farm.png",
+    "exit": 0,
+    "result": "{\"success\":true,\"imageHash\":\"cb273ca6510844bd53794ed84b6def12481f7348\",\"sizeBytes\":1925887,\"contentType\":\"image/png\",\"placedOnNodeId\":\"395:2959\"}",
+    "error": ""
+  },
+  {
+    "file": "pond.png",
+    "exit": 0,
+    "result": "{\"success\":true,\"imageHash\":\"03a1d7eb1dc689656b370d69b3cef33811b89ca7\",\"sizeBytes\":1957855,\"contentType\":\"image/png\",\"placedOnNodeId\":\"395:2960\"}",
+    "error": ""
+  },
+  {
+    "file": "kitchen-v2.png",
+    "exit": 0,
+    "result": "{\"success\":true,\"imageHash\":\"1697ac43ca16d1d8483a3117e5c7fbab7e2499ff\",\"sizeBytes\":1776836,\"contentType\":\"image/png\",\"placedOnNodeId\":\"395:2957\"}",
+    "error": ""
+  },
+  {
+    "file": "mine-floor1.png",
+    "exit": 0,
+    "result": "{\"success\":true,\"imageHash\":\"bd0786a869d87bba25c3ab07c7d2053b09d70a95\",\"sizeBytes\":1801720,\"contentType\":\"image/png\",\"placedOnNodeId\":\"395:2958\"}",
+    "error": ""
+  },
+  {
+    "file": "homestead-stall-v2.png",
+    "exit": 0,
+    "result": "{\"success\":true,\"imageHash\":\"97627c7187292075a29cccd8179db291499b87c8\",\"sizeBytes\":1856432,\"contentType\":\"image/png\",\"placedOnNodeId\":\"395:2961\"}",
+    "error": ""
+  },
+  {
+    "file": "map-tile.png",
+    "exit": 0,
+    "result": "{\"success\":true,\"imageHash\":\"6dfe96951cc884895b669deb6d0edab1c09d9e80\",\"sizeBytes\":2278984,\"contentType\":\"image/png\",\"placedOnNodeId\":\"395:2\"}",
+    "error": ""
+  },
+  {
+    "file": "profile-avatar.png",
+    "exit": 0,
+    "result": "{\"success\":true,\"imageHash\":\"15cd8b1a1424a1222978eeacffc42a88db53f464\",\"sizeBytes\":1601606,\"contentType\":\"image/png\",\"placedOnNodeId\":\"395:2956\"}",
+    "error": ""
+  }
+]

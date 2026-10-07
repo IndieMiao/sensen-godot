@@ -1,0 +1,14 @@
+const p=await figma.getNodeByIdAsync('481:53');await figma.setCurrentPageAsync(p);await figma.loadFontAsync({family:'Nunito',style:'Bold'});await figma.loadFontAsync({family:'Nunito',style:'ExtraBold'});
+const created=[],changed=[],removed=[],newBars=[];const bagMaster=await figma.getNodeByIdAsync('907:72112'),emptyMaster=await figma.getNodeByIdAsync('633:41241');
+for(const id of ['676:63518','807:78554','650:59501','654:57834']){
+ const old=await figma.getNodeByIdAsync(id);if(!old)continue;const parent=old.parent;const actions=old.reactions;const end=bagMaster.createInstance();created.push(end.id);parent.appendChild(end);end.name='Bag · unified navigation';end.x=292;end.y=708;await end.setReactionsAsync(actions);
+ if(['650:59501','654:57834'].includes(id)){
+  const bar=figma.createAutoLayout('HORIZONTAL');created.push(bar.id);parent.appendChild(bar);bar.name='Quick Bar · unified · five slots + Bag';bar.resize(336,68);bar.primaryAxisSizingMode='FIXED';bar.counterAxisSizingMode='FIXED';bar.itemSpacing=4;bar.counterAxisAlignItems='MIN';bar.fills=[];bar.x=12;bar.y=708;
+  for(let i=0;i<5;i++){const slot=emptyMaster.createInstance();created.push(slot.id);bar.appendChild(slot);slot.name='Quick slot · Empty';const props={};for(const [key,v] of Object.entries(slot.componentProperties)){const name=key.split('#')[0];if(['Show icon','Show title','Show quantity','Show pin'].includes(name))props[key]=false;if(['Quantity','Title'].includes(name))props[key]='';}slot.setProperties(props);await slot.setReactionsAsync(actions);}bar.appendChild(end);newBars.push({screenId:parent.id,barNodeId:bar.id,endNodeId:end.id,slotIds:bar.children.slice(0,5).map(n=>n.id)});
+ }removed.push(old.id);old.remove();
+}
+const vars=await figma.variables.getLocalVariablesAsync();const warning=vars.find(v=>v.name==='color/warningTint');const set=await figma.getNodeByIdAsync('633:41279');const pinKey=Object.keys(set.componentPropertyDefinitions).find(k=>k.startsWith('Show pin#'));const qtyKey=Object.keys(set.componentPropertyDefinitions).find(k=>k.startsWith('Show quantity#'));
+for(const id of ['633:41221','633:41231','633:41241']){const c=await figma.getNodeByIdAsync(id),surface=c.children.find(n=>n.name==='Slot surface');if(!surface.children.some(n=>n.name==='Pinned warm fill')){const bg=figma.createRectangle();created.push(bg.id);surface.insertChild(0,bg);bg.name='Pinned warm fill';bg.layoutPositioning='ABSOLUTE';bg.resize(50,62);bg.x=1;bg.y=1;bg.cornerRadius=10;bg.fills=[figma.variables.setBoundVariableForPaint({type:'SOLID',color:{r:1,g:1,b:1}},'color',warning)];bg.componentPropertyReferences={visible:pinKey};bg.visible=false;}
+ const qty=c.findOne(n=>n.name==='Quantity'&&n.type==='TEXT');qty.componentPropertyReferences={...qty.componentPropertyReferences,visible:qtyKey};changed.push(qty.id);
+}
+return {createdNodeIds:created,mutatedNodeIds:changed,removedNodeIds:removed,newBars};
