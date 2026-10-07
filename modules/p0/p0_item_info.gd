@@ -290,7 +290,9 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		take_some = "Take %d" % _TAKE_SOME,
 		homestead_gate = ("Homestead Lv%d needed" % int(offer.homestead)) if offer.get("homestead", null) != null else "",
 		xp_hint = "",
-		use = "",
+		# A buy row's line 2 (FARM-6 482:46): what the item does, in a few words.
+		use = {"seed": ("Ready in " + hours(float(crop.grow_h))) if crop.has("grow_h") else "", "bait": "Bites come faster",
+			"fert": "Grows faster"}.get(kind, ""),
 		region_line = "",
 		pin_verb = "Unpin" if opts.get("pinned", false) else "Pin",
 		dex = _dex(view),

@@ -187,13 +187,13 @@ func refresh() -> void:
 	_state.visible = _state.text != ""
 	var facts: Array = _spec.get("facts", [])
 	for c in _facts.get_children():
-		_facts.remove_child(c)
+		c.hide()
 		c.queue_free()
 	for i in maxi(0, facts.size() - 1): _add_fact_line(str(facts[i]))
 	_overflow = _add_fact_line("")
 	_last_fact = str(facts[-1]) if not facts.is_empty() else ""
 	for c in _buttons.get_children():
-		_buttons.remove_child(c)
+		c.hide()
 		c.queue_free()
 	for b in _spec.get("buttons", []):
 		_buttons.add_child(_button(b))

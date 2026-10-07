@@ -45,6 +45,7 @@ static func all() -> Array[Dictionary]:
 		{id = "resident_bar", title = "UiResidentBar", figma = "ResidentDialogue 1213:83392 Row / Stacked · LOCK-18 (336 at 328)", build = _resident_bars},
 		# SGODOT-224 panels
 		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
+		{id = "shop_row", title = "UiShopRow · UiStepper", figma = "Compact/ShopProduct 702:80447 · Compact/Stepper 1245:108953 · FARM-6 482:46 · C1-01", build = _shop_rows},
 	]
 	return out
 
@@ -643,5 +644,29 @@ static func _info_sheets() -> Control:
 		sheet.custom_minimum_size.x = 328   # the gallery column (the main is 336 inside the 360 drawer)
 		sheet.open("sample", &"bag")
 		v.add_child(_captioned(sheet, pair[0]))
+	return v
+
+## Counter buy rows as FARM-6 draws them: available (stepper + Buy), more than one, sold out, gated, a one-off rod.
+static func _shop_rows() -> Control:
+	var v := _column(0)
+	var buy := [{id = &"buy", label = "Buy", kind = &"secondary", payload = {}}]
+	var rows := [
+		[{id = "seed_radish", icon = _tex("seed_radish"), title = "Radish Seeds", info = true, facts = ["Ready in 4h", "Bag ×24"],
+			price = {text = "4 coins", line = ""}, buttons = buy}, false, 1],
+		[{id = "fert_compost", icon = _tex("compost"), title = "Compost", info = true, facts = ["Grows faster", "Bag ×6"],
+			price = {text = "4 coins", line = "2 × 2 coins"}, buttons = buy}, false, 2],
+		[{id = "bait_worm", icon = _tex("bait_worm"), title = "Worm Bait", info = true, facts = ["Bites come faster", "Stock 0/30 · Bag ×5"],
+			price = {text = "2 coins", line = ""}, buttons = [{id = &"buy", label = "Sold out · 9h 12m", kind = &"unavailable", payload = {}}]}, false, 1],
+		[{id = "seed_tomato", icon = _tex("seed_tomato"), title = "Tomato Seeds", info = true, facts = ["Ready in 6h", "210 XP to go"],
+			price = {text = "12 coins", line = ""}, buttons = [{id = &"buy", label = "Farming Lv4 needed", kind = &"unavailable", payload = {}}]}, false, 1],
+		[{id = "rod_reed", icon = _tex("rod"), title = "Reed Rod", info = true, facts = ["Lands up to Rare fish", "Fishing Lv3"],
+			price = {text = "80 coins", line = ""}, buttons = buy}, true, 1],
+	]
+	for r in rows:
+		var row := UiShopRow.new()
+		row.custom_minimum_size.x = 328   # the gallery column (336 in the 360 drawer)
+		row.show_spec(r[0], r[1], 9)
+		if row.stepper: row.stepper.value = r[2]
+		v.add_child(row)
 	return v
 

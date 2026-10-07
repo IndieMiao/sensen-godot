@@ -368,7 +368,7 @@
   },
   "bait/counter_buy": {
     "facts": [
-      "Faster bites",
+      "{use}",
       "{stock_line}"
     ],
     "price": true,
@@ -588,6 +588,38 @@
         "label": "Equip",
         "kind": "secondary",
         "when": "owned & !equipped"
+      }
+    ]
+  },
+  "fert/counter_buy": {
+    "facts": [
+      "{use}",
+      "{stock_line}"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "!unlocked",
+            "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
+            "when": "sold_out",
+            "label": "Sold out · {restock_in}"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
       }
     ]
   }

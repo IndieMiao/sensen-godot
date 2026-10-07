@@ -20,7 +20,7 @@
       "secondary:Buy"
     ],
     "facts": [
-      "Faster bites",
+      "Bites come faster",
       "Stock 7/30 · Bag ×5"
     ],
     "lock": {
@@ -350,6 +350,7 @@
       "secondary:Buy"
     ],
     "facts": [
+      "Ready in 4h",
       "Bag ×20"
     ],
     "lock": {
