@@ -188,7 +188,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'talk': case 'gift': {
-      const refusal = cmd.type === 'talk' ? talk(c, s, cmd, events) : giftResident(c, s, cmd, events);
+      const refusal = cmd.type === 'talk' ? talk(c, s, cmd, now, events) : giftResident(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }

@@ -286,12 +286,12 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
   const meal = s.day.gift_meal === id ? 'given'
     : s.day.gift_meal ? 'none'
     : i < stages.findIndex(([n]) => n === c.affinity.gift_meal_stage) ? 'none'
-    : freeSlots(s) < 1 ? 'bag_full' : 'ready';
+    : 'ready';
   return {
     affinity: r.affinity, stage: stages[i][0], stage_from: stages[i][1],
     next_stage: stages[i + 1]?.[0] ?? null, next_at: stages[i + 1]?.[1] ?? null,
     chatted_today: r.chat_day === s.day.key, gift_today: r.gift_day === s.day.key,
-    meal,   // ready = the next talk gives today's gift meal; bag_full = it would, once a slot is free
+    meal,   // ready = the next talk gives today's gift meal (into the Inbox when the bag is full)
     request: st.req && {
       id: st.req.id, kind: st.req.need.kind, rarity: st.req.need.rarity ?? null, qty: st.req.qty, coins: st.req.coins,
       have: Math.min(st.req.qty, progressOf(c, s, id, st.req)),
