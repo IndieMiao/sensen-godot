@@ -17,6 +17,8 @@ const NOTE_PINNED := "Pinned slots stay when the bar refills"
 const NOTE_UNPINNED := "Pin to keep it when the bar refills"
 const DISMISS_S := 3.0     # the main's description: dismisses after 3 s
 const _POINTER_X := 19.0   # PinMenu pointer at x 19 of the 200 px card: under the first slot's centre
+## Where the pointer's tip sits in the main: owners place the card so the slot's centre lands here when room allows.
+const POINTER_TIP_X := _POINTER_X + UiTokens.SIZE_POINTER_W * 0.5
 const _PAD := 10.0         # PinMenu auto-layout padding 10 on all sides, gap 6 (SPACE_WITHIN)
 # "Pin badge (same as slot)" in Pinned=yes: 20 × 20, radius 7, glyph 14, at x 18 inside the button, centred.
 const _BADGE := 20.0

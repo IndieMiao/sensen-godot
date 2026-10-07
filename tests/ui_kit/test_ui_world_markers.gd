@@ -34,15 +34,43 @@ func test_pointer_follows_the_anchor_but_stays_off_the_rounded_ends() -> void:
 	t.point_at(40.0)
 	assert_float(t.pointer_tip_x()).is_equal(40.0)
 
+func _mouse(pos: Vector2, down: bool) -> InputEventMouseButton:
+	var m := InputEventMouseButton.new()
+	m.button_index = MOUSE_BUTTON_LEFT
+	m.position = pos
+	m.pressed = down
+	return m
+
 func test_tapping_the_card_is_tapping_the_facility() -> void:
 	var t := _host(UiTapCard.new("Tap to cook")) as UiTapCard
 	var hits := [0]
 	t.tapped.connect(func(): hits[0] += 1)
-	var up := InputEventMouseButton.new()
-	up.button_index = MOUSE_BUTTON_LEFT
-	up.pressed = false
-	t._on_input(up)
+	t._on_input(_mouse(Vector2(20, 10), true))
+	t._on_input(_mouse(Vector2(24, 12), false))
 	assert_int(hits[0]).is_equal(1)
+	t._on_input(_mouse(Vector2(20, 10), false))   # a release without its press is not a tap
+	assert_int(hits[0]).is_equal(1)
+
+func test_a_drag_that_starts_on_the_card_is_not_a_tap() -> void:
+	# WP7-B F-04 §2: a tap moves at most TAP_SLOP and lifts within TAP_MAX_MS (PR #12 review, fix 3).
+	var t := _host(UiTapCard.new("Tap to shop")) as UiTapCard
+	var hits := [0]
+	t.tapped.connect(func(): hits[0] += 1)
+	t._on_input(_mouse(Vector2(20, 10), true))
+	t._on_input(_mouse(Vector2(20 + GestureArbiter.TAP_SLOP + 1, 10), false))
+	assert_int(hits[0]).is_equal(0)
+	t._on_input(_mouse(Vector2(20, 10), true))
+	t._down_ms -= GestureArbiter.TAP_MAX_MS + 1   # held too long
+	t._on_input(_mouse(Vector2(20, 10), false))
+	assert_int(hits[0]).is_equal(0)
+
+func test_passive_card_lets_touches_through_and_has_a_44_hit_rect() -> void:
+	var t := _host(UiTapCard.new("Tap to shop")) as UiTapCard
+	t.passive = true
+	await _settle()
+	assert_int(t._card.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_float(t.hit_rect().size.y).is_equal(float(UiTokens.SIZE_TOUCH))
+	assert_float(t.hit_rect().get_center().y).is_equal(t._card.get_global_rect().get_center().y)
 
 func test_world_anchor_keeps_the_pointer_on_a_facility_at_the_screen_edge() -> void:
 	var world := Node3D.new()

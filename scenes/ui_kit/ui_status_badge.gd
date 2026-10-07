@@ -60,11 +60,17 @@ func _init(state_: State = State.AVAILABLE, size_: Size = Size.WORLD) -> void:
 	_pill.minimum_size_changed.connect(_layout)
 	size_kind = size_
 	state = state_
+	_refresh()   # the setters skip unchanged values, so the defaults still need one draw
 
-func set_size_kind(v: Size) -> void: size_kind = v; _refresh()
-func set_state(v: State) -> void: state = v; _refresh()
-func set_icon(v: Texture2D) -> void: icon = v; _refresh()
-func set_caption(v: String) -> void: caption = v; _refresh()
+# P0 sets these every frame: unchanged values skip the restyle.
+func set_size_kind(v: Size) -> void:
+	if v != size_kind: size_kind = v; _refresh()
+func set_state(v: State) -> void:
+	if v != state: state = v; _refresh()
+func set_icon(v: Texture2D) -> void:
+	if v != icon: icon = v; _refresh()
+func set_caption(v: String) -> void:
+	if v != caption: caption = v; _refresh()
 
 func side() -> float: return float(UiTokens.SIZE_STATUS_BADGE_NPC if size_kind == Size.NPC else UiTokens.SIZE_STATUS_BADGE_WORLD)
 

@@ -65,6 +65,8 @@ var _bar_sig := []        # last state pushed to the bar, so the per-frame refre
 var _auto_pick := true    # pick the first slot once when an action is entered (§10.3.3 ①), not after a deselect
 ## MAP-1 keeps only Bag at the bottom of the map. The P0 map still carries the old Map / Farm / Me dock and its
 ## zoom column where Bag would sit, so the map turns this on when that dock leaves (with the new HUD, SGODOT-222).
+## TODO(MAP-1, follow-up PR after #11 and #12, reviewed by 刘邦): p0_map drops the old dock and sets map_bag = true.
+## Not part of PR #12 (奕星 2026-10-08).
 var map_bag := false
 var _bar_ids: Array = []
 var selected_seed := ""
@@ -301,6 +303,13 @@ func _place_controls() -> void:
 	_keys.offset_left = -UiTokens.SPACE_PAGE - UiTokens.SIZE_ACTION_KEY_W
 	_keys.offset_bottom = -key_bottom
 	_keys.offset_top = -key_bottom - UiTokens.SIZE_ACTION_KEY_H
+	if _teach:
+		# The one-line teaching card sits above the quick bar and left of the action key group, clear of both
+		# (PR #12 review fix 5), with the safe area already in `bottom`.
+		_teach.offset_left = UiTokens.SPACE_PAGE
+		_teach.offset_right = -(UiTokens.SPACE_PAGE + UiTokens.SIZE_ACTION_KEY_W + UiTokens.SPACE_OVERLAY_BODY)
+		_teach.offset_bottom = -(bottom + UiTokens.SIZE_QUICK_BAR_H + UiTokens.SPACE_OVERLAY_BODY)
+		_teach.offset_top = _teach.offset_bottom
 	var pills_bottom := key_bottom + UiTokens.SIZE_ACTION_KEY_H + UiTokens.SPACE_OVERLAY_BODY
 	_fab_pills.offset_right = -UiTokens.SPACE_PAGE
 	_fab_pills.offset_left = -UiTokens.SPACE_PAGE - 1
@@ -370,6 +379,7 @@ func set_surface(name: String) -> void:
 	_bar.bag_only = not action
 	_bar_sig = []
 	if _radial.visible: _radial.close()
+	_close_pin_menu()   # no PinMenu left over when fishing starts or the map opens (PR #12 review)
 	_creel.visible = action and bar_mode == "fish"
 	if _dev_box: _dev_box.visible = world
 	for c in _cards.values(): (c as Control).visible = false
@@ -399,6 +409,10 @@ func _refresh_bar() -> void:
 	var ids := P0Logic.quick_bar(view, _bar_ids, bar_mode, store.pins, store.removed)
 	if bar_mode == "fish":
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
+		# The last bait went on a hook: the slot stays pinned at 0, the hook goes empty (李白 q(44) ④).
+		if selected_bait != "" and P0Logic.bag_count(view, selected_bait) <= 0:
+			toast("Out of %s · no bait on the hook" % P0Logic.item_name(view, selected_bait))
+			selected_bait = ""
 		var free := int(view.get("bag", {}).get("free", 0))
 		_creel_count.text = P0Logic.creel_line(view).get_slice(" · ", 0)
 		_creel_free.text = "%d free" % free
@@ -407,9 +421,15 @@ func _refresh_bar() -> void:
 		_creel.add_theme_stylebox_override("panel", _box(GOLD if full else CARD, 11, GOLD_D if full else EDGE, 1, Vector4(6, 3, 8, 3)))
 	else:
 		if selected_seed != "" and not ids.has(selected_seed): selected_seed = ""
+		# A pinned seed sown to 0 stays on the bar but is deselected: the key reads Sow · Pick a seed and a held
+		# row stops there (李白 q(44) ③, PR #12 review fix 2).
+		if selected_seed != "" and P0Logic.bag_count(view, selected_seed) <= 0:
+			selected_seed = ""
+			seed_selected.emit("")
 		# First slot on entering the action (§10.3.3 ①); a deliberate deselect stays deselected.
-		if _auto_pick and selected_seed == "" and not ids.is_empty():
-			selected_seed = str(ids[0])
+		var stocked := ids.filter(func(id): return P0Logic.bag_count(view, str(id)) > 0)
+		if _auto_pick and selected_seed == "" and not stocked.is_empty():
+			selected_seed = str(stocked[0])
 			seed_selected.emit(selected_seed)
 		if not ids.is_empty(): _auto_pick = false
 	_bar_ids = ids
@@ -430,6 +450,10 @@ func _refresh_bar() -> void:
 	_bar.bag_open = sig[6]
 
 func _on_slot_tapped(id: String) -> void:
+	# A slot at 0 can't be picked; a light buzz says so (李白 q(44) ③). Its refill hint is on the slot.
+	if P0Logic.bag_count(view, id) <= 0 and id != selected_seed and id != selected_bait:
+		if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(10)
+		return
 	if bar_mode == "fish":
 		# Tapping bait only sets the current bait (0 Energy, nothing consumed); tap again to fish without bait.
 		selected_bait = "" if selected_bait == id else id
@@ -486,7 +510,7 @@ func _show_pin_menu(id: String, pinned: bool) -> void:
 	var cell := _bar.cells()[clampi(i, 0, UiQuickBar.SLOTS - 1)]
 	var tip := cell.get_global_rect().get_center().x - _kit.global_position.x
 	var size := _pin_menu.get_combined_minimum_size()
-	var x := clampf(tip - 26.0, UiTokens.SPACE_PAGE, _kit.size.x - UiTokens.SPACE_PAGE - size.x)
+	var x := clampf(tip - UiPinMenu.POINTER_TIP_X, UiTokens.SPACE_PAGE, _kit.size.x - UiTokens.SPACE_PAGE - size.x)
 	_pin_menu.position = Vector2(x, _bar.position.y - size.y - UiTokens.SPACE_WITHIN)
 	_pin_menu.pointer_x = tip - x - UiTokens.SIZE_POINTER_W * 0.5
 	_pin_menu.toggled.connect(func():
@@ -515,6 +539,8 @@ func _save_quick() -> void:
 	if f: f.store_string(JSON.stringify(_quick))
 
 ## Main action key from P0Logic.main_action() / fish_action() (LOCK-02).
+## TODO(SGODOT-221 → stage 3, F-08 command lifecycle): drive HOLDING (hold_progress) and PENDING from the command
+## queue; P0 has no source for them yet.
 func set_action(a: Dictionary) -> void:
 	_fab_state = a
 	var k := _keys.key()
@@ -538,15 +564,17 @@ func fab_state() -> Dictionary: return _fab_state
 
 # ---------------------------------------------------------------- world tags & floats
 ## Facility finger card (TapCard 1135:101133, LOCK-07 / LOCK-17): bottom centre `SPACE_WITHIN` above `screen`,
-## kept inside the screen with its pointer still on the facility. Tapping the card is tapping the facility:
-## it forwards `hit` (the facility's own tap point; defaults to `screen`) to the world as a tap.
+## kept inside the screen with its pointer still on the facility. Tapping the card is tapping the facility: it
+## forwards `hit` (the facility's own tap point; defaults to `screen`) to the world as a tap. The card is passive:
+## the scene pad under it gets the press, so a drag that starts on a card is the joystick, and only the pad's real
+## tap (GestureArbiter thresholds) on the card's 44 px hit rect counts (_tap_at, PR #12 review fix 3).
 func tag(id: String, text: String, screen: Vector2, show: bool, hit := Vector2.INF) -> void:
 	var c: UiTapCard = _cards.get(id)
 	if c == null:
 		c = UiTapCard.new()
+		c.passive = true
 		_kit.add_child(c)
 		_kit.move_child(c, 0)
-		c.tapped.connect(func(): if _modal == null: tapped.emit(_card_hits[id]))
 		_cards[id] = c
 	c.visible = show and _modal == null
 	if not c.visible: return
@@ -555,6 +583,17 @@ func tag(id: String, text: String, screen: Vector2, show: bool, hit := Vector2.I
 	_place_marker(c, screen, true)
 
 ## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.
+## A scene tap: on a shown finger card it is that facility's tap, elsewhere the world's (also a double tap: a card
+## never recenters the camera by accident).
+func _tap_at(global_pos: Vector2, double: bool) -> void:
+	for id in _cards:
+		var c: UiTapCard = _cards[id]
+		if c.is_visible_in_tree() and c.hit_rect().has_point(global_pos):
+			if _modal == null: tapped.emit(_card_hits[id])
+			return
+	if double: recenter.emit()
+	else: tapped.emit(global_pos - root.global_position)
+
 func badge(id: String, state: UiStatusBadge.State, screen: Vector2, show: bool, caption := "", icon: Texture2D = null) -> void:
 	var b: UiStatusBadge = _badges.get(id)
 	if b == null:
@@ -1449,10 +1488,7 @@ func teach(key: String, text: String) -> void:
 	if _teach == null:
 		_teach = PanelContainer.new()
 		_teach.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-		_teach.offset_left = 10
-		_teach.offset_right = -84
-		_teach.offset_top = -41 - 53 - 14 - 64
-		_teach.offset_bottom = -41 - 53 - 12
+		_teach.grow_vertical = Control.GROW_DIRECTION_BEGIN
 		_teach.add_theme_stylebox_override("panel", _box(Color("2f3a33"), 14, Color("2f3a33"), 0, Vector4(12, 8, 12, 8)))
 		var l := _label("", 11, PAPER, true)
 		l.name = "Text"
@@ -1462,6 +1498,7 @@ func teach(key: String, text: String) -> void:
 		_teach.gui_input.connect(func(e: InputEvent):
 			if P0Ui.is_tap(e) or (e is InputEventScreenTouch and e.pressed): _teach.hide())
 		root.add_child(_teach)
+		_place_controls()
 	(_teach.get_node("Text") as Label).text = text
 	_teach.show()
 	_teach_left = 7.0
@@ -2064,9 +2101,7 @@ class _TouchPad extends Control:
 				&"joystick_end":
 					ui.joystick.emit(Vector2.ZERO)
 					queue_redraw()
-				&"tap":
-					if o.double: ui.recenter.emit()
-					else: ui.tapped.emit(o.pos)
+				&"tap": ui._tap_at(get_global_transform() * o.pos, bool(o.double))
 				&"pinch": ui.zoom.emit(o.factor)
 	func _draw() -> void:
 		var start := _arb.origin()

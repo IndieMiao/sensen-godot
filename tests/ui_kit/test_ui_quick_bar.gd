@@ -18,7 +18,12 @@ func before_test() -> void:
 	bar = UiQuickBar.new()
 	bar.haptics = false
 	bar.position = Vector2(12, 400)
-	add_child(auto_free(bar))
+	# On the top canvas layer: an earlier suite can leave a scene in the tree (tests/scenes leaks a MapPoc whose
+	# HUD would take the press), and the real-input cases need the GUI routing (as #11 5809a810).
+	var top := CanvasLayer.new()
+	top.layer = 128
+	add_child(auto_free(top))
+	top.add_child(bar)
 	bar.slots = _slots()
 	events = []
 	for sig in ["slot_tapped", "ghost_tapped", "pin_toggled", "slots_swapped", "slot_removed", "bag_requested", "close_requested", "handle_tapped"]:
@@ -252,7 +257,9 @@ func test_long_press_that_turns_into_a_drag_does_not_pin() -> void:
 	await await_idle_frame()
 	now[0] = GestureArbiter.LONG_PRESS_MS + 10
 	bar.cells()[1]._process(0.0)
+	assert_int(bar.cells()[1].state).is_equal(UiItemCell.State.LIFTED)   # the press really reached the slot
 	_push(_move(at + Vector2(30, 0)))
+	assert_bool(bar.is_dragging()).is_true()
 	_push(_move(at))   # back over its own slot
 	_push(_press(at, false))
 	await await_idle_frame()
@@ -270,23 +277,35 @@ func _move(pos: Vector2) -> InputEvent:
 	return m
 
 func test_collapsed_or_bag_only_bar_leaves_its_gap_to_the_world() -> void:
-	var sink := _Sink.new()
-	add_child(auto_free(sink))
+	# The "world" is a STOP catcher under the bar on the same top layer, so nothing an earlier suite left in the
+	# tree (a MapPoc HUD) can take the press first (full runs, PR #12 review).
+	var world := _World.new()
+	world.set_anchors_preset(Control.PRESET_FULL_RECT)
+	world.size = Vector2(720, 1280)
+	bar.get_parent().add_child(world)
+	bar.get_parent().move_child(world, 0)
 	await _into_view()
 	var gap := bar.get_global_rect().position + Vector2(40, bar.size.y * 0.5)   # where the first slot would be
 	for mode in ["collapsed", "bag_only"]:
 		bar.collapsed = mode == "collapsed"
 		bar.bag_only = mode == "bag_only"
 		await await_idle_frame()
-		sink.n = 0
+		world.n = 0
 		_push(_press(gap, true))
 		_push(_press(gap, false))
 		await await_idle_frame()
-		assert_int(sink.n).is_equal(2)
+		assert_int(world.n).is_equal(2)
 	bar.bag_only = false
 	await await_idle_frame()
-	sink.n = 0
+	world.n = 0
 	_push(_press(gap, true))
 	_push(_press(gap, false))
 	await await_idle_frame()
-	assert_int(sink.n).is_equal(0)   # with cells shown the bar keeps its touches
+	assert_int(world.n).is_equal(0)   # with cells shown the bar keeps its touches
+	world.queue_free()
+
+class _World extends Control:
+	var n := 0
+	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
+	func _gui_input(e: InputEvent) -> void:
+		if e is InputEventMouseButton or e is InputEventScreenTouch: n += 1

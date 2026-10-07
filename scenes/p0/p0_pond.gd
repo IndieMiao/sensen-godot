@@ -144,14 +144,11 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 ## Away from the bank the key still casts: it walks to the nearest bank spot first (the old Go fishing).
 func _action_state(v: Dictionary) -> Dictionary:
 	var a := P0Logic.fish_action(v, rt.ui.selected_bait, site)
-	if not _plan.is_empty(): return {"icon": "rod", "verb": "Cast", "sub": "Walking to the shore", "enabled": false, "amber": false, "cmd": {}, "need": 0}
+	# On the way to the shore (李白 q(44) ②): pressing again does nothing; not greyed (不知火舞, PR #12), no auto-cast.
+	if not _plan.is_empty(): return {"icon": "rod", "verb": "Cast", "sub": "On the way", "enabled": true, "amber": false, "cmd": {}, "need": 0}
 	if not a.get("enabled", false) or str(a.cmd.get("type", "")) != "cast": return a
-	if _shore_distance() > float(FishingModel.data().shore_range) + 0.9: a.sub = "Walk to the shore"
+	# Away from the bank the key keeps `Cast · 5 Energy` and walks there first (李白 q(44) ①).
 	return a
-
-func _shore_distance() -> float:
-	var shore := FishingModel.nearest_water(str(entry.id), actor.position, site_spec)
-	return Vector2(shore.x - actor.position.x, shore.z - actor.position.z).length()
 
 func p0_action(cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "cast": _go_cast(Vector3.INF)

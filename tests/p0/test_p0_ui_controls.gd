@@ -18,6 +18,7 @@ func _make() -> P0Ui:
 	var u := P0Ui.new()
 	u.quick_store = STORE
 	add_child(auto_free(u))
+	u.layer = 128   # above anything an earlier suite leaves in the tree (tests/scenes leaks a MapPoc)
 	return u
 
 func before_test() -> void:
@@ -142,8 +143,14 @@ func test_finger_card_forwards_its_tap_to_the_facility() -> void:
 	assert_bool(card.visible).is_true()
 	assert_str(card.text).is_equal("Tap to shop")
 	assert_float(card.get_rect().end.y).is_equal(300.0 - UiTokens.SPACE_WITHIN)
-	card.tapped.emit()
+	await await_idle_frame()
+	var on_card := card.hit_rect().get_center()
+	ui._tap_at(on_card, false)   # the scene pad's real tap on the card = the facility's tap
 	assert_array(taps).is_equal([Vector2(180, 340)])
+	ui._tap_at(on_card, true)    # a double tap on a card never recenters
+	assert_array(taps).is_equal([Vector2(180, 340), Vector2(180, 340)])
+	ui._tap_at(Vector2(40, 600), false)   # elsewhere it is the world's tap
+	assert_vector(taps[-1]).is_equal(Vector2(40, 600))
 	# Near the edge the card stays on screen and its pointer keeps aiming at the facility.
 	ui.tag("stall", "Tap to shop", Vector2(4, 300), true)
 	assert_float(card.position.x).is_equal(float(UiTokens.SPACE_WITHIN))
@@ -162,3 +169,71 @@ func test_badges_show_state_and_lift_the_finger_card() -> void:
 	assert_float(ui.badge_height("home")).is_equal(0.0)
 	ui.badge("home", UiStatusBadge.State.READY, Vector2(500, 260), true)   # facility off screen
 	assert_bool(b.visible).is_false()
+
+func test_a_drag_from_a_finger_card_starts_the_joystick() -> void:
+	# PR #12 review fix 3: the card is passive, so the press reaches the scene pad under it.
+	ui.tag("stall", "Tap to shop", Vector2(180, 300), true)
+	await await_idle_frame()
+	var card: UiTapCard = ui._cards.stall
+	var at := card.hit_rect().get_center()
+	var sticks := []
+	var taps := []
+	ui.joystick.connect(func(v): sticks.append(v))
+	ui.tapped.connect(func(p): taps.append(p))
+	assert_int(card._card.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	_touch(at, true)
+	var drag := InputEventMouseMotion.new()
+	drag.position = at + Vector2(0, -40)
+	drag.global_position = drag.position
+	drag.button_mask = MOUSE_BUTTON_MASK_LEFT
+	get_viewport().push_input(drag, true)
+	_touch(at + Vector2(0, -40), false)
+	await await_idle_frame()
+	assert_bool(sticks.any(func(v): return v != Vector2.ZERO)).is_true()
+	assert_array(taps).is_empty()
+
+func test_teaching_card_stays_clear_of_the_bar_and_the_keys() -> void:
+	# PR #12 review fix 5: the tip sits above the quick bar and left of the action key group.
+	var had_tips := FileAccess.file_exists(P0Ui.TIPS_PATH)
+	var saved := FileAccess.get_file_as_string(P0Ui.TIPS_PATH) if had_tips else ""
+	ui._taught = {"_": true}   # non-empty: teach() won't load saved tips over it
+	ui.teach("probe_tip", "Pick a seed, walk up to a bed and press Sow. Hold to keep sowing.")
+	await await_idle_frame()
+	await await_idle_frame()
+	var tip := ui._teach.get_global_rect()
+	assert_float(tip.end.y).is_less_equal(ui._bar.get_global_rect().position.y)
+	assert_float(tip.end.x).is_less_equal(ui._keys.get_global_rect().position.x)
+	assert_bool(tip.intersects(ui._keys.get_global_rect())).is_false()
+	if had_tips:
+		var f := FileAccess.open(P0Ui.TIPS_PATH, FileAccess.WRITE)
+		f.store_string(saved)
+	else:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(P0Ui.TIPS_PATH))
+
+func test_a_seed_sown_to_zero_is_deselected_and_a_zero_slot_cannot_be_picked() -> void:
+	# 李白 q(44) ③ / PR #12 review fix 2: the pinned slot stays at 0, the key goes back to Sow · Pick a seed.
+	ui.set_view(_view())
+	ui._on_pin_toggled("seed_radish", true)
+	assert_str(ui.selected_seed).is_equal("seed_radish")
+	var v := _view()
+	v.bag.slots = v.bag.slots.filter(func(s): return s.id != "seed_radish")
+	ui.set_view(v)
+	assert_array(ui._bar.slots.map(func(s): return s.id)).contains(["seed_radish"])
+	assert_str(ui.selected_seed).is_empty()
+	ui._on_slot_tapped("seed_radish")
+	assert_str(ui.selected_seed).is_empty()   # a 0 slot can't be picked
+
+func test_the_last_bait_on_a_hook_empties_the_hook_with_a_toast() -> void:
+	# 李白 q(44) ④: casting goes on without bait.
+	var v := _view()
+	v.bag.slots.append({"id": "bait_worm", "qty": 1})
+	v.names["bait_worm"] = "Worm Bait"
+	ui.set_mode("fish")
+	ui.set_view(v)
+	ui._on_slot_tapped("bait_worm")
+	assert_str(ui.selected_bait).is_equal("bait_worm")
+	ui._on_pin_toggled("bait_worm", true)
+	v.bag.slots = v.bag.slots.filter(func(s): return s.id != "bait_worm")
+	ui.set_view(v)
+	assert_str(ui.selected_bait).is_empty()
+	assert_str(ui._toast.text).is_equal("Out of Worm Bait · no bait on the hook")

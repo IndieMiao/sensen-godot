@@ -53,7 +53,8 @@ func _init() -> void:
 	add_child(_caption)
 	_refresh()
 
-func set_tool_icon(v: Texture2D) -> void: tool_icon = v; _refresh()
+func set_tool_icon(v: Texture2D) -> void:
+	if v != tool_icon: tool_icon = v; _refresh()
 func set_caption(v: String) -> void: caption = v; _refresh()
 func set_switch_visible(v: bool) -> void: switch_visible = v; _refresh()
 

@@ -6,10 +6,14 @@ const ROD := preload("res://assets/p0/icons/rod.svg")
 const S := UiSceneAction.State
 
 func _host(c: Control) -> Control:
+	# On the top canvas layer: tests/scenes leaks a MapPoc whose HUD would take pushed presses in a full run.
+	var top := CanvasLayer.new()
+	top.layer = 128
+	add_child(auto_free(top))
 	var host := Control.new()
 	host.theme = UiKit.theme()
 	host.size = Vector2(360, 640)
-	add_child(auto_free(host))
+	top.add_child(host)
 	host.add_child(c)
 	return c
 

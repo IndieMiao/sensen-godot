@@ -51,9 +51,17 @@ func _init() -> void:
 	set_process(false)
 	_refresh()
 
-func set_verb(v: String) -> void: verb = v; _refresh()
-func set_cost(v: String) -> void: cost = v; _refresh()
+# Owners set these every frame (P0 worlds call set_action per frame): unchanged values skip the relayout.
+func set_verb(v: String) -> void:
+	if v == verb: return
+	verb = v
+	_refresh()
+func set_cost(v: String) -> void:
+	if v == cost: return
+	cost = v
+	_refresh()
 func set_state(v: State) -> void:
+	if v == state and _verb != null: return
 	state = v
 	set_process(v == State.PENDING)
 	_refresh()
