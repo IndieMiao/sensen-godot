@@ -138,3 +138,27 @@ def drop_modules(*names):
 def move_zone(names,delta):
     for name in names:
         k=p.KITS[name];r2.move_kit(name,tuple(k['at'][i]+delta[i] for i in range(3)))
+
+def open_front_bounds(width,depth,height,entrance_x=0,entrance_width=1.18):
+    x=width/2;z=depth/2;half=entrance_width/2
+    p.KITS['room_shell']['collision']=[{'at':[0,-.07,0],'size':[width+.3,.30,depth+.3]},
+       {'at':[-x,height/2,0],'size':[.22,height,depth+.3]}, {'at':[0,height/2,-z],'size':[width+.3,height,.22]},
+       {'at':[x+.10,.75,0],'size':[.10,1.5,depth+.3]},
+       {'at':[(-x+entrance_x-half)/2,.75,z+.10],'size':[entrance_x-half+x,1.5,.10]},
+       {'at':[(entrance_x+half+x)/2,.75,z+.10],'size':[x-entrance_x-half,1.5,.10]},
+       {'at':[entrance_x,-.07,z+.42],'size':[entrance_width+.08,.30,.9]},
+       {'at':[entrance_x-half-.04,.7,z+.44],'size':[.08,1.4,.9]},
+       {'at':[entrance_x+half+.04,.7,z+.44],'size':[.08,1.4,.9]},
+       {'at':[entrance_x,.7,z+.88],'size':[entrance_width+.2,1.4,.08]}]
+
+def bold_lettering(text,at,width,color='linen'):
+    """Nunito Black, 4mm physical extrusion after fitting, shared OFL font."""
+    font_path=ROOT/'tools/art/source/coffee_shop/fonts/Nunito-Black.ttf'
+    font=bpy.data.fonts.load(str(font_path),check_existing=True)
+    data=bpy.data.curves.new('Bold round lettering '+text,'FONT');data.body=text;data.font=font;data.align_x='CENTER';data.size=.30;data.resolution_u=3
+    obj=bpy.data.objects.new('Bold sign '+text,data);bpy.context.scene.collection.objects.link(obj);obj.location=v(at);obj.rotation_euler=(math.pi/2,0,0)
+    bpy.context.view_layer.update();factor=width/max(obj.dimensions.x,.001);obj.scale*=factor
+    data.extrude=.004/factor;data.bevel_depth=.0006/factor;data.bevel_resolution=1
+    bpy.context.view_layer.update();bpy.ops.object.select_all(action='DESELECT');obj.select_set(True);bpy.context.view_layer.objects.active=obj;bpy.ops.object.convert(target='MESH')
+    p.b.finish(obj,'Bold sign '+text,color)
+    obj['font']='Nunito Black / OFL';obj['extrusion_metres']=.004;return obj

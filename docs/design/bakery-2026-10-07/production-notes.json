@@ -1,5 +1,9 @@
 {
-  "description": "A warm bakery with a genuine cut-out domed masonry oven and open chimney, brick arch, recessed wood store and visible flame; tray rack and ingredient jars; sink and wall windows; kneading bench with dough, rolling pin and flour sack; curved transparent pastry case with three shelves; separate register counter; and a small round café table. BAKERY, FLOUR and Good Bread / Brighter Days preserve the source English wording.",
-  "differences": "The 7.2 × 6.4m floor, hidden construction and all dimensions are inferred. Brickwork and bread scoring are simplified; croissants and cakes use readable stylized forms instead of the exact pastry assortment. The shelving is less crowded, curtain/lighting embellishments are reduced, and the menu font differs. The source does not define an entrance, so the open presentation side is retained rather than inventing a visible door. Godot uses one deliberate transparent glazing material; the original image has more complex reflections and warm bounce light.",
-  "collision": "The oven has a real arched cavity and a shallow dark lining positioned for the review angle. Counters, rack and furniture have simple collision boxes; decorative pastry, glass and tools do not introduce gameplay collision."
+  "revision": "Bakery review after172release",
+  "structure": "Apricot plaster, no timber posts/brackets, red-brown top trims,31-row narrow plank floor",
+  "goods": "25 pastries from5linked prototypes,5stocked bread-rack levels,24wall jars plus6pantry jars, upright baguette baskets,working scale and folded checked cloth",
+  "source": "Named prototype collections retained; placed food groups batch into one display-zoneGLB. Explicit local-pivot furniture modules.",
+  "collision": "Authored open-front controlled entrance,perimeter and furniture blockers.34actual rendered checks,1.08095m narrowest overlap aisle,15sreal-time route pass.",
+  "camera_limits": "Three selected plinthcorners constrain an orthographic fit,not pixel-perfect registration of stylized upperwalls.",
+  "shared_palette": "1ec21f9e ordinary/olive deeper green;sharedGLBbytes unchanged"
 }

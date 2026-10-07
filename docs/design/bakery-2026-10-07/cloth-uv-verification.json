@@ -1,0 +1,14 @@
+{
+  "checks": [
+    {
+      "object": "Baker folded red checked towel",
+      "uv_layer": "MetricClothUV",
+      "edges": 5152,
+      "minimum": 0.9897206643763103,
+      "maximum": 1.030327864607008,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "scope": "Authored folded cloth only; no metric UV claim for props without this layer."
+}

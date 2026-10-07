@@ -1,0 +1,159 @@
+{
+  "method": "11x11 RGB median; circular HSV hue distance; fixed declared corresponding lit faces",
+  "checks": [
+    {
+      "name": "left_plaster",
+      "surface": "Clear left plaster between front wall edge and black wall lamp, above wheat picture",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          224,
+          405
+        ],
+        "rgb": [
+          216,
+          167,
+          131
+        ],
+        "hex": "#D8A783",
+        "hue_degrees": 25.412,
+        "saturation": 0.3935,
+        "value": 0.8471
+      },
+      "runtime": {
+        "pixel": [
+          249,
+          410
+        ],
+        "rgb": [
+          241,
+          201,
+          153
+        ],
+        "hex": "#F1C999",
+        "hue_degrees": 32.727,
+        "saturation": 0.3651,
+        "value": 0.9451
+      },
+      "hue_delta_degrees": 7.316,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "back_plaster",
+      "surface": "Right back plaster strip beside the right window",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          1219,
+          473
+        ],
+        "rgb": [
+          229,
+          189,
+          156
+        ],
+        "hex": "#E5BD9C",
+        "hue_degrees": 27.123,
+        "saturation": 0.3188,
+        "value": 0.898
+      },
+      "runtime": {
+        "pixel": [
+          1168,
+          487
+        ],
+        "rgb": [
+          247,
+          215,
+          169
+        ],
+        "hex": "#F7D7A9",
+        "hue_degrees": 35.385,
+        "saturation": 0.3158,
+        "value": 0.9686
+      },
+      "hue_delta_degrees": 8.261,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "top_trim",
+      "surface": "Front stretch of left red-brown top trim",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          282,
+          334
+        ],
+        "rgb": [
+          150,
+          79,
+          41
+        ],
+        "hex": "#964F29",
+        "hue_degrees": 20.917,
+        "saturation": 0.7267,
+        "value": 0.5882
+      },
+      "runtime": {
+        "pixel": [
+          286,
+          301
+        ],
+        "rgb": [
+          152,
+          58,
+          19
+        ],
+        "hex": "#983A13",
+        "hue_degrees": 17.594,
+        "saturation": 0.875,
+        "value": 0.5961
+      },
+      "hue_delta_degrees": 3.323,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "floor",
+      "surface": "Clear horizontal foreground wood floor between cafe and display",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          752,
+          793
+        ],
+        "rgb": [
+          246,
+          181,
+          131
+        ],
+        "hex": "#F6B583",
+        "hue_degrees": 26.087,
+        "saturation": 0.4675,
+        "value": 0.9647
+      },
+      "runtime": {
+        "pixel": [
+          668,
+          758
+        ],
+        "rgb": [
+          248,
+          164,
+          82
+        ],
+        "hex": "#F8A452",
+        "hue_degrees": 29.639,
+        "saturation": 0.6694,
+        "value": 0.9725
+      },
+      "hue_delta_degrees": 3.552,
+      "limit_degrees": 10,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Representative patches only. Full image retains independent brightness/saturation/composition differences."
+}

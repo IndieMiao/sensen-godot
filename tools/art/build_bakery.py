@@ -141,4 +141,6 @@ def build():
     finalize({'position':[10.5,9.4,12],'target':[0,1.6,0],'size':11.9});complete()
 
 
-if __name__=='__main__':build()
+if __name__=='__main__':
+    import runpy
+    runpy.run_path(str(Path(__file__).resolve().parent/'source/bakery/revision.py'),run_name='__main__')

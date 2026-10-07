@@ -1,0 +1,17 @@
+{
+  "door": {
+    "applicable": false
+  },
+  "counter": {
+    "kit": "checkout_counter",
+    "name": "Counter thick oak top"
+  },
+  "chair": {
+    "kit": "cafe_chair",
+    "name": "Green round cafe cushion"
+  },
+  "table": {
+    "kit": "cafe_table",
+    "name": "Round timber tabletop"
+  }
+}

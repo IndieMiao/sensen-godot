@@ -1,0 +1,853 @@
+{
+  "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+  "checks": [
+    {
+      "details": null,
+      "name": "Default Avatar fixture assembles",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Bench route/probe schema",
+      "passed": true
+    },
+    {
+      "details": 0.0900000035762787,
+      "name": "Spawn stands on authored floor",
+      "passed": true
+    },
+    {
+      "details": "(0.65, 0.09, 2.68)",
+      "name": "Spawn capsule clear",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.649999976158142,
+          0.0899287909269333,
+          2.6175000667572
+        ],
+        "from": [
+          0.649999976158142,
+          0.0900000035762787,
+          2.6800000667572
+        ],
+        "name": "front entrance",
+        "reached": true,
+        "remaining_m": 0.0980043187737465,
+        "seconds": 0.002,
+        "target": [
+          0.649999976158142,
+          0.0799999982118607,
+          2.51999998092651
+        ]
+      },
+      "name": "Route: front entrance",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          2.1617443561554,
+          0.0899064391851425,
+          1.91699409484863
+        ],
+        "from": [
+          0.649999976158142,
+          0.0899287909269333,
+          2.6175000667572
+        ],
+        "name": "pastry front",
+        "reached": true,
+        "remaining_m": 0.0649657025933266,
+        "seconds": 0.346,
+        "target": [
+          2.22000002861023,
+          0.0799999982118607,
+          1.88999998569489
+        ]
+      },
+      "name": "Route: pastry front",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.552786588668823,
+          0.0899329334497452,
+          1.89116823673248
+        ],
+        "from": [
+          2.1617443561554,
+          0.0899064391851425,
+          1.91699409484863
+        ],
+        "name": "display aisle",
+        "reached": true,
+        "remaining_m": 0.0734705179929733,
+        "seconds": 0.45,
+        "target": [
+          0.479999989271164,
+          0.0799999982118607,
+          1.88999998569489
+        ]
+      },
+      "name": "Route: display aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.482216686010361,
+          0.0899380892515182,
+          -1.10586261749268
+        ],
+        "from": [
+          0.552786588668823,
+          0.0899329334497452,
+          1.89116823673248
+        ],
+        "name": "register approach",
+        "reached": true,
+        "remaining_m": 0.0946865081787109,
+        "seconds": 0.816,
+        "target": [
+          0.479999989271164,
+          0.0799999982118607,
+          -1.20000004768372
+        ]
+      },
+      "name": "Route: register approach",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          2.34496641159058,
+          0.0899368599057198,
+          -1.61668133735657
+        ],
+        "from": [
+          0.482216686010361,
+          0.0899380892515182,
+          -1.10586261749268
+        ],
+        "name": "checkout",
+        "reached": true,
+        "remaining_m": 0.0887311846017838,
+        "seconds": 0.534,
+        "target": [
+          2.4300000667572,
+          0.0799999982118607,
+          -1.63999998569489
+        ]
+      },
+      "name": "Route: checkout",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -0.562473177909851,
+          0.0899369195103645,
+          -1.24130070209503
+        ],
+        "from": [
+          2.34496641159058,
+          0.0899368599057198,
+          -1.61668133735657
+        ],
+        "name": "workbench rear",
+        "reached": true,
+        "remaining_m": 0.0888109728693962,
+        "seconds": 0.676,
+        "target": [
+          -0.649999976158142,
+          0.0799999982118607,
+          -1.23000001907349
+        ]
+      },
+      "name": "Route: workbench rear",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BakeryArt/brick_oven/@StaticBody3D@23"
+        ],
+        "final": [
+          -2.07806491851807,
+          0.0898186936974525,
+          -1.16836380958557
+        ],
+        "from": [
+          -0.562473177909851,
+          0.0899369195103645,
+          -1.24130070209503
+        ],
+        "name": "workbench west",
+        "reached": true,
+        "remaining_m": 0.0757575333118439,
+        "seconds": 0.432,
+        "target": [
+          -2.15000009536743,
+          0.0799999982118607,
+          -1.19000005722046
+        ]
+      },
+      "name": "Route: workbench west",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.14783716201782,
+          0.089930422604084,
+          0.93479859828949
+        ],
+        "from": [
+          -2.07806491851807,
+          0.0898186936974525,
+          -1.16836380958557
+        ],
+        "name": "cafe approach",
+        "reached": true,
+        "remaining_m": 0.0659887418150902,
+        "seconds": 0.583,
+        "target": [
+          -2.15000009536743,
+          0.0799999982118607,
+          1.0
+        ]
+      },
+      "name": "Route: cafe approach",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -0.55064445734024,
+          0.089943915605545,
+          1.12173187732697
+        ],
+        "from": [
+          -2.14783716201782,
+          0.089930422604084,
+          0.93479859828949
+        ],
+        "name": "cafe beside",
+        "reached": true,
+        "remaining_m": 0.0718184113502502,
+        "seconds": 0.45,
+        "target": [
+          -0.479999989271164,
+          0.0799999982118607,
+          1.12999999523163
+        ]
+      },
+      "name": "Route: cafe beside",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BakeryArt/brick_oven/@StaticBody3D@23"
+        ],
+        "final": [
+          -1.09109103679657,
+          0.0751455798745155,
+          -1.94319570064545
+        ],
+        "from": [
+          -1.02999997138977,
+          0.0900000035762787,
+          -1.92999994754791
+        ],
+        "reached": false,
+        "remaining_m": 1.21641838550568,
+        "seconds": 0.866,
+        "target": [
+          -2.27999997138977,
+          0.0900000035762787,
+          -2.20000004768372
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BakeryArt/brick_oven/@StaticBody3D@23"
+      },
+      "name": "Blocked: oven",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.117284417152405,
+          0.0723652690649033,
+          -0.219999998807907
+        ],
+        "from": [
+          0.449999988079071,
+          0.0900000035762787,
+          -0.219999998807907
+        ],
+        "reached": false,
+        "remaining_m": 1.10742485523224,
+        "seconds": 0.882,
+        "target": [
+          -0.990000009536743,
+          0.0900000035762787,
+          -0.219999998807907
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BakeryArt/baking_workbench/@StaticBody3D@35"
+      },
+      "name": "Blocked: workbench",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BakeryArt/pastry_display/@StaticBody3D@25"
+        ],
+        "final": [
+          0.726384699344635,
+          0.0799523591995239,
+          0.850000023841858
+        ],
+        "from": [
+          0.5,
+          0.0900000035762787,
+          0.850000023841858
+        ],
+        "reached": false,
+        "remaining_m": 1.33365321159363,
+        "seconds": 0.881,
+        "target": [
+          2.05999994277954,
+          0.0900000035762787,
+          0.850000023841858
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BakeryArt/pastry_display/@StaticBody3D@25"
+      },
+      "name": "Blocked: display",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BakeryArt/checkout_counter/@StaticBody3D@27"
+        ],
+        "final": [
+          2.88373875617981,
+          0.0804684236645699,
+          -1.37556040287018
+        ],
+        "from": [
+          2.84999990463257,
+          0.0900000035762787,
+          -1.55999994277954
+        ],
+        "reached": false,
+        "remaining_m": 0.646176874637604,
+        "seconds": 0.882,
+        "target": [
+          3.0,
+          0.0900000035762787,
+          -0.740000009536743
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BakeryArt/checkout_counter/@StaticBody3D@27"
+      },
+      "name": "Blocked: checkout",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BakeryArt/bakery_rack/@StaticBody3D@33"
+        ],
+        "final": [
+          -2.35432553291321,
+          0.0836223736405373,
+          -0.270000010728836
+        ],
+        "from": [
+          -2.13000011444092,
+          0.0900000035762787,
+          -0.270000010728836
+        ],
+        "reached": false,
+        "remaining_m": 0.585709273815155,
+        "seconds": 0.882,
+        "target": [
+          -2.94000005722046,
+          0.0900000035762787,
+          -0.270000010728836
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BakeryArt/bakery_rack/@StaticBody3D@33"
+      },
+      "name": "Blocked: rack",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BakeryArt/room_shell/@StaticBody3D@5"
+        ],
+        "final": [
+          -3.26355195045471,
+          0.0746737793087959,
+          1.0
+        ],
+        "from": [
+          -2.09999990463257,
+          0.0900000035762787,
+          1.0
+        ],
+        "reached": false,
+        "remaining_m": 0.736607491970062,
+        "seconds": 0.881,
+        "target": [
+          -4.0,
+          0.0900000035762787,
+          1.0
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BakeryArt/room_shell/@StaticBody3D@5"
+      },
+      "name": "Blocked: west wall",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BakeryArt/room_shell/@StaticBody3D@9"
+        ],
+        "final": [
+          3.42619204521179,
+          0.0828584358096123,
+          2.67000007629395
+        ],
+        "from": [
+          2.70000004768372,
+          0.0900000035762787,
+          2.67000007629395
+        ],
+        "reached": false,
+        "remaining_m": 0.673845708370209,
+        "seconds": 0.883,
+        "target": [
+          4.09999990463257,
+          0.0900000035762787,
+          2.67000007629395
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BakeryArt/room_shell/@StaticBody3D@9"
+      },
+      "name": "Blocked: east edge",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BakeryArt/room_shell/@StaticBody3D@13"
+        ],
+        "final": [
+          1.75,
+          0.0804669111967087,
+          3.03749990463257
+        ],
+        "from": [
+          1.75,
+          0.0900000035762787,
+          2.59999990463257
+        ],
+        "reached": false,
+        "remaining_m": 0.762559652328491,
+        "seconds": 0.883,
+        "target": [
+          1.75,
+          0.0900000035762787,
+          3.79999995231628
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BakeryArt/room_shell/@StaticBody3D@13"
+      },
+      "name": "Blocked: front boundary",
+      "passed": true
+    },
+    {
+      "details": {
+        "authored_width": 1.08095,
+        "measured_m": 1.08094990253448,
+        "minimum_m": 0.8
+      },
+      "name": "Gap width: workbench display aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.449999988079071,
+          0.0899375602602959,
+          -1.15859413146973
+        ],
+        "from": [
+          0.449999988079071,
+          0.0900000035762787,
+          1.39999997615814
+        ],
+        "reached": true,
+        "remaining_m": 0.0914058908820152,
+        "seconds": 0.717,
+        "target": [
+          0.449999988079071,
+          0.0900000035762787,
+          -1.25
+        ]
+      },
+      "name": "Traverse: workbench display aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "entry": {
+          "collisions": [],
+          "final": [
+            0.650000035762787,
+            0.089933805167675,
+            2.80689358711243
+          ],
+          "from": [
+            0.650000035762787,
+            0.0899271368980408,
+            3.54290199279785
+          ],
+          "reached": true,
+          "remaining_m": 0.0768935903906822,
+          "seconds": 0.217,
+          "target": [
+            0.649999976158142,
+            0.0900000035762787,
+            2.73000001907349
+          ]
+        },
+        "exit": {
+          "collisions": [],
+          "final": [
+            0.650000035762787,
+            0.0899271368980408,
+            3.54290199279785
+          ],
+          "from": [
+            0.649999976158142,
+            0.0900000035762787,
+            2.73000001907349
+          ],
+          "reached": true,
+          "remaining_m": 0.0970981419086456,
+          "seconds": 0.249,
+          "target": [
+            0.649999976158142,
+            0.0900000035762787,
+            3.64000010490417
+          ]
+        }
+      },
+      "name": "Entrance gap allows exit and reentry",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "delta": [
+          1.59099149703979,
+          0.000156328082084656,
+          -0.218608617782593
+        ]
+      },
+      "name": "Diagonal collision preserves wall sliding",
+      "passed": true
+    },
+    {
+      "details": [
+        "run",
+        0.15,
+        0.316666666666667
+      ],
+      "name": "Run animation advances in rendered viewport",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Input release stops horizontal motion",
+      "passed": true
+    },
+    {
+      "details": "idle",
+      "name": "Release returns to idle",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Focus loss cancels movement",
+      "passed": true
+    },
+    {
+      "details": 1.74549426138401,
+      "name": "Fixture head-top height measurable",
+      "passed": true
+    },
+    {
+      "details": {
+        "applicable": false,
+        "reason": "Open-front bakery has a controlled floor entrance, no doorway"
+      },
+      "name": "Scale category absent: door",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.660271434571305,
+        "difference": 0.00216919739696331,
+        "height": 1.15,
+        "ratio_to_H": 0.658839175494143,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.392438987142164,
+        "difference": 0.0656934306569341,
+        "height": 0.73,
+        "ratio_to_H": 0.418219650531065,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: chair",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.650245621031176,
+        "difference": 0.116828193832599,
+        "height": 1.0024,
+        "ratio_to_H": 0.574278599578547,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: table",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "renderer": "mobile",
+  "route": [
+    {
+      "collisions": [],
+      "final": [
+        0.649999976158142,
+        0.0899287909269333,
+        2.6175000667572
+      ],
+      "from": [
+        0.649999976158142,
+        0.0900000035762787,
+        2.6800000667572
+      ],
+      "name": "front entrance",
+      "reached": true,
+      "remaining_m": 0.0980043187737465,
+      "seconds": 0.002,
+      "target": [
+        0.649999976158142,
+        0.0799999982118607,
+        2.51999998092651
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        2.1617443561554,
+        0.0899064391851425,
+        1.91699409484863
+      ],
+      "from": [
+        0.649999976158142,
+        0.0899287909269333,
+        2.6175000667572
+      ],
+      "name": "pastry front",
+      "reached": true,
+      "remaining_m": 0.0649657025933266,
+      "seconds": 0.346,
+      "target": [
+        2.22000002861023,
+        0.0799999982118607,
+        1.88999998569489
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        0.552786588668823,
+        0.0899329334497452,
+        1.89116823673248
+      ],
+      "from": [
+        2.1617443561554,
+        0.0899064391851425,
+        1.91699409484863
+      ],
+      "name": "display aisle",
+      "reached": true,
+      "remaining_m": 0.0734705179929733,
+      "seconds": 0.45,
+      "target": [
+        0.479999989271164,
+        0.0799999982118607,
+        1.88999998569489
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        0.482216686010361,
+        0.0899380892515182,
+        -1.10586261749268
+      ],
+      "from": [
+        0.552786588668823,
+        0.0899329334497452,
+        1.89116823673248
+      ],
+      "name": "register approach",
+      "reached": true,
+      "remaining_m": 0.0946865081787109,
+      "seconds": 0.816,
+      "target": [
+        0.479999989271164,
+        0.0799999982118607,
+        -1.20000004768372
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        2.34496641159058,
+        0.0899368599057198,
+        -1.61668133735657
+      ],
+      "from": [
+        0.482216686010361,
+        0.0899380892515182,
+        -1.10586261749268
+      ],
+      "name": "checkout",
+      "reached": true,
+      "remaining_m": 0.0887311846017838,
+      "seconds": 0.534,
+      "target": [
+        2.4300000667572,
+        0.0799999982118607,
+        -1.63999998569489
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -0.562473177909851,
+        0.0899369195103645,
+        -1.24130070209503
+      ],
+      "from": [
+        2.34496641159058,
+        0.0899368599057198,
+        -1.61668133735657
+      ],
+      "name": "workbench rear",
+      "reached": true,
+      "remaining_m": 0.0888109728693962,
+      "seconds": 0.676,
+      "target": [
+        -0.649999976158142,
+        0.0799999982118607,
+        -1.23000001907349
+      ]
+    },
+    {
+      "collisions": [
+        "/root/SceneBenchmark/BakeryArt/brick_oven/@StaticBody3D@23"
+      ],
+      "final": [
+        -2.07806491851807,
+        0.0898186936974525,
+        -1.16836380958557
+      ],
+      "from": [
+        -0.562473177909851,
+        0.0899369195103645,
+        -1.24130070209503
+      ],
+      "name": "workbench west",
+      "reached": true,
+      "remaining_m": 0.0757575333118439,
+      "seconds": 0.432,
+      "target": [
+        -2.15000009536743,
+        0.0799999982118607,
+        -1.19000005722046
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -2.14783716201782,
+        0.089930422604084,
+        0.93479859828949
+      ],
+      "from": [
+        -2.07806491851807,
+        0.0898186936974525,
+        -1.16836380958557
+      ],
+      "name": "cafe approach",
+      "reached": true,
+      "remaining_m": 0.0659887418150902,
+      "seconds": 0.583,
+      "target": [
+        -2.15000009536743,
+        0.0799999982118607,
+        1.0
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -0.55064445734024,
+        0.089943915605545,
+        1.12173187732697
+      ],
+      "from": [
+        -2.14783716201782,
+        0.089930422604084,
+        0.93479859828949
+      ],
+      "name": "cafe beside",
+      "reached": true,
+      "remaining_m": 0.0718184113502502,
+      "seconds": 0.45,
+      "target": [
+        -0.479999989271164,
+        0.0799999982118607,
+        1.12999999523163
+      ]
+    }
+  ],
+  "scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+  "slug": "bakery"
+}

@@ -1,0 +1,36 @@
+{
+  "door": {
+    "applicable": false,
+    "reason": "Open-front bakery has a controlled floor entrance, no doorway"
+  },
+  "counter": {
+    "source_objects": [
+      "Counter thick oak top.001"
+    ],
+    "world_min_y": 1.0820000171661377,
+    "world_max_y": 1.2320001125335693,
+    "measured_height": 1.1500001125335693,
+    "declared_height": 1.15,
+    "passed": true
+  },
+  "chair": {
+    "source_objects": [
+      "Green round cafe cushion"
+    ],
+    "world_min_y": 0.7419999837875366,
+    "world_max_y": 0.812000036239624,
+    "measured_height": 0.7300000362396241,
+    "declared_height": 0.73,
+    "passed": true
+  },
+  "table": {
+    "source_objects": [
+      "Round timber tabletop"
+    ],
+    "world_min_y": 0.938800036907196,
+    "world_max_y": 1.0844000577926636,
+    "measured_height": 1.0024000577926635,
+    "declared_height": 1.0024,
+    "passed": true
+  }
+}

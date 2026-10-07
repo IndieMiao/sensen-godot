@@ -1,0 +1,59 @@
+{
+  "patches": [
+    {
+      "name": "left_plaster",
+      "surface": "Clear left plaster between front wall edge and black wall lamp, above wheat picture",
+      "reference": [
+        224,
+        405
+      ],
+      "runtime": [
+        249,
+        410
+      ]
+    },
+    {
+      "name": "back_plaster",
+      "surface": "Right back plaster strip beside the right window",
+      "reference": [
+        1219,
+        473
+      ],
+      "runtime": [
+        1168,
+        487
+      ]
+    },
+    {
+      "name": "top_trim",
+      "surface": "Front stretch of left red-brown top trim",
+      "reference": [
+        282,
+        334
+      ],
+      "runtime": [
+        286,
+        301
+      ]
+    },
+    {
+      "name": "floor",
+      "surface": "Clear horizontal foreground wood floor between cafe and display",
+      "reference": [
+        752,
+        793
+      ],
+      "runtime": [
+        668,
+        758
+      ]
+    }
+  ],
+  "sample_classification_correction": {
+    "initial_reference": [
+      423,
+      330
+    ],
+    "reason": "Initial reference point lay on the timber pantry ledge beside the oven. Reclassified to plaster left of the wall lamp, with matching runtime wall face, before any palette correction."
+  }
+}
