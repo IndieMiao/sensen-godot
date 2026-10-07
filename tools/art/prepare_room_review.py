@@ -11,6 +11,9 @@ project=out/'godot-project'
 for folder in ['assets/rooms/'+slug,'scenes/'+slug]:
     shutil.copytree(ROOT/folder,project/folder,dirs_exist_ok=True)
 layout=json.loads((ROOT/'assets/rooms'/slug/'layout.json').read_text())
+if layout.get('effects'):
+    shutil.copytree(ROOT/'assets/rooms/_shared/fx',project/'assets/rooms/_shared/fx',dirs_exist_ok=True)
+    shutil.copytree(ROOT/'scenes/room_effects',project/'scenes/room_effects',dirs_exist_ok=True)
 if layout.get('shared_plants'):
     shutil.copytree(ROOT/'assets/rooms/_shared/plants',project/'assets/rooms/_shared/plants',dirs_exist_ok=True,
                     ignore=shutil.ignore_patterns('source'))

@@ -29,6 +29,7 @@ for file in json.loads((ROOT/'tools/dev/scene_bench/fixtures/avatar-dependencies
 for file in ['modules/avatar', 'tools/dev/scene_bench', 'assets/avatar/demo_denylist.json',
              f'scenes/{args.slug}', f'assets/rooms/{args.slug}']:
     copy(file)
+if (ROOT/'scenes/room_effects').exists(): copy('scenes/room_effects')
 # The only shared dependency family allowed here is authored room art.
 if (ROOT/'assets/rooms/_shared').exists(): copy('assets/rooms/_shared')
 manifest = json.loads((ROOT/'assets/avatar/parts_manifest.json').read_text())

@@ -87,6 +87,15 @@ ALBEDO=mix(vec3(.64,.81,.74),vec3(.98,.92,.71),t);}
 	camera.position = vec(layout.camera.position)
 	camera.look_at(vec(layout.camera.target))
 	camera.current = true
+	if OS.get_cmdline_user_args().has("--preservation-control"):
+		var old_fire := room.get_node_or_null("fire") as Node3D
+		if old_fire: old_fire.visible = false
+		for fx in layout.get("effects", []):
+			var effect := room.get_node(str(fx.name)) as Node3D
+			effect.visible = false; effect.set_process(false)
+			effect.light.light_energy = float(fx.light.energy)
+		for mesh in room.find_children("*", "MeshInstance3D", true, false):
+			if mesh.material_override is ShaderMaterial: mesh.material_override.set_shader_parameter("ember_energy", 0.0)
 	for i in range(20): await process_frame
 	await RenderingServer.frame_post_draw
 	var img := viewport.get_texture().get_image()
@@ -100,7 +109,7 @@ ALBEDO=mix(vec3(.64,.81,.74),vec3(.98,.92,.71),t);}
 		assert(viewport.get_texture().get_image().save_png(output_dir + "/" + str(view.name) + ".png") == OK)
 	var stats := {"scene":slug,"renderer":RenderingServer.get_current_rendering_method(),
 		"adapter":RenderingServer.get_video_adapter_name(),"resolution":[1440,1080],
-		"mesh_instances":0,"surfaces":0,"triangles":0,"colliders":0,"finite_aabbs":true}
+		"mesh_instances":0,"surfaces":0,"triangles":0,"colliders":0,"finite_aabbs":true,"particle_emitters":0,"particle_capacity":0}
 	inspect(room,stats)
 	stats["material_count"] = material_ids.size()
 	if layout.has("anchors"):
@@ -126,17 +135,23 @@ ALBEDO=mix(vec3(.64,.81,.74),vec3(.98,.92,.71),t);}
 			hook_checks.append(evidence)
 		stats["anchors"] = hook_checks
 	assert(stats.mesh_instances == layout.assets.size() + layout.instances.size() + layout.get("shared_plants", []).size())
-	assert(stats.finite_aabbs)
+	assert(stats.finite_aabbs and stats.particle_capacity <= 40)
 	var file := FileAccess.open(output_dir + "/godot-validation.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify(stats,"\t"))
 	print("ROOM_RENDER_VERIFIED ",JSON.stringify(stats))
 	quit()
 
 func inspect(node: Node, stats: Dictionary) -> void:
+	if node is GPUParticles3D:
+		stats.particle_emitters += 1
+		stats.particle_capacity += node.amount
+		assert(node.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)
+		assert(node.process_material.collision_mode == ParticleProcessMaterial.COLLISION_DISABLED)
 	if node is MeshInstance3D:
 		stats.mesh_instances += 1
 		assert(node.material_override != null)
-		assert(node.material_override.albedo_texture != null)
+		if node.material_override is StandardMaterial3D: assert(node.material_override.albedo_texture != null)
+		else: assert(node.material_override is ShaderMaterial and node.material_override.get_shader_parameter("room_atlas") != null)
 		var material_id: int = node.material_override.get_instance_id()
 		if not material_ids.has(material_id): material_ids.append(material_id)
 		var box: AABB = node.get_aabb()

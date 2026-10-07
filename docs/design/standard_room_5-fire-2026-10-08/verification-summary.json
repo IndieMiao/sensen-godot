@@ -1,0 +1,505 @@
+{
+  "scene": "standard_room_5",
+  "scope": "Only shared particle flame integration, existing hearth light flicker and masked ember emission. No atlas rebake or physical-device claim.",
+  "shared_library_commit": "5e5bf6af",
+  "renderer": {
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "colliders": 24,
+    "finite_aabbs": true,
+    "material_count": 5,
+    "mesh_instances": 50,
+    "particle_capacity": 16,
+    "particle_emitters": 2,
+    "renderer": "mobile",
+    "resolution": [
+      1440,
+      1080
+    ],
+    "scene": "standard_room_5",
+    "surfaces": 50,
+    "triangles": 128292
+  },
+  "asset_stats": {
+    "atlas": {
+      "size": [
+        2048,
+        2048
+      ],
+      "file": "room_albedo_ao.png",
+      "purpose": "base colour + strengthened contact AO + authored warm window-light stencil; not a full beauty bake"
+    },
+    "assets": [
+      {
+        "name": "room_shell",
+        "vertices": 4912,
+        "triangles": 9476,
+        "surfaces": 1,
+        "bytes": 327200
+      },
+      {
+        "name": "window_wall",
+        "vertices": 1368,
+        "triangles": 2692,
+        "surfaces": 1,
+        "bytes": 93084
+      },
+      {
+        "name": "back_wall",
+        "vertices": 1080,
+        "triangles": 2128,
+        "surfaces": 1,
+        "bytes": 75552
+      },
+      {
+        "name": "arched_window",
+        "vertices": 656,
+        "triangles": 1296,
+        "surfaces": 1,
+        "bytes": 40580
+      },
+      {
+        "name": "window_garden",
+        "vertices": 4,
+        "triangles": 2,
+        "surfaces": 1,
+        "bytes": 1304
+      },
+      {
+        "name": "green_door",
+        "vertices": 1308,
+        "triangles": 2568,
+        "surfaces": 1,
+        "bytes": 97028
+      },
+      {
+        "name": "entry_mat",
+        "vertices": 280,
+        "triangles": 540,
+        "surfaces": 1,
+        "bytes": 19972
+      },
+      {
+        "name": "door_frame",
+        "vertices": 432,
+        "triangles": 864,
+        "surfaces": 1,
+        "bytes": 25808
+      },
+      {
+        "name": "hearth",
+        "vertices": 2740,
+        "triangles": 5348,
+        "surfaces": 1,
+        "bytes": 180868
+      },
+      {
+        "name": "kettle",
+        "vertices": 590,
+        "triangles": 1144,
+        "surfaces": 1,
+        "bytes": 42608
+      },
+      {
+        "name": "firewood_alcove",
+        "vertices": 2550,
+        "triangles": 3922,
+        "surfaces": 1,
+        "bytes": 138100
+      },
+      {
+        "name": "range_cooker",
+        "vertices": 1502,
+        "triangles": 2916,
+        "surfaces": 1,
+        "bytes": 104184
+      },
+      {
+        "name": "bookshelf",
+        "vertices": 4280,
+        "triangles": 8116,
+        "surfaces": 1,
+        "bytes": 300740
+      },
+      {
+        "name": "sink_cabinet",
+        "vertices": 1736,
+        "triangles": 3356,
+        "surfaces": 1,
+        "bytes": 119296
+      },
+      {
+        "name": "wall_shelf",
+        "vertices": 900,
+        "triangles": 1740,
+        "surfaces": 1,
+        "bytes": 62892
+      },
+      {
+        "name": "hanging_cookware",
+        "vertices": 572,
+        "triangles": 1100,
+        "surfaces": 1,
+        "bytes": 46232
+      },
+      {
+        "name": "hanging_towel",
+        "vertices": 2922,
+        "triangles": 5828,
+        "surfaces": 1,
+        "bytes": 147272
+      },
+      {
+        "name": "utensil_crock",
+        "vertices": 300,
+        "triangles": 572,
+        "surfaces": 1,
+        "bytes": 23416
+      },
+      {
+        "name": "counter_board",
+        "vertices": 524,
+        "triangles": 1012,
+        "surfaces": 1,
+        "bytes": 40488
+      },
+      {
+        "name": "straw_hat",
+        "vertices": 1449,
+        "triangles": 2878,
+        "surfaces": 1,
+        "bytes": 99252
+      },
+      {
+        "name": "door_garden_fork",
+        "vertices": 128,
+        "triangles": 228,
+        "surfaces": 1,
+        "bytes": 14208
+      },
+      {
+        "name": "entry_basket",
+        "vertices": 1616,
+        "triangles": 3008,
+        "surfaces": 1,
+        "bytes": 121872
+      },
+      {
+        "name": "garden_boots",
+        "vertices": 568,
+        "triangles": 1120,
+        "surfaces": 1,
+        "bytes": 36712
+      },
+      {
+        "name": "botanical_picture",
+        "vertices": 544,
+        "triangles": 1040,
+        "surfaces": 1,
+        "bytes": 41396
+      },
+      {
+        "name": "bookcase_picture",
+        "vertices": 544,
+        "triangles": 1040,
+        "surfaces": 1,
+        "bytes": 40324
+      },
+      {
+        "name": "window_daisies",
+        "vertices": 3750,
+        "triangles": 7136,
+        "surfaces": 1,
+        "bytes": 254944
+      },
+      {
+        "name": "window_hanging_basket",
+        "vertices": 184,
+        "triangles": 356,
+        "surfaces": 1,
+        "bytes": 15544
+      },
+      {
+        "name": "sofa",
+        "vertices": 5530,
+        "triangles": 10936,
+        "surfaces": 1,
+        "bytes": 294168
+      },
+      {
+        "name": "round_rope_rug",
+        "vertices": 6608,
+        "triangles": 13148,
+        "surfaces": 1,
+        "bytes": 590752
+      },
+      {
+        "name": "dining_rug",
+        "vertices": 528,
+        "triangles": 912,
+        "surfaces": 1,
+        "bytes": 44036
+      },
+      {
+        "name": "reading_stool",
+        "vertices": 96,
+        "triangles": 176,
+        "surfaces": 1,
+        "bytes": 9604
+      },
+      {
+        "name": "reading_cup",
+        "vertices": 842,
+        "triangles": 1656,
+        "surfaces": 1,
+        "bytes": 57848
+      },
+      {
+        "name": "bookcase_stool",
+        "vertices": 96,
+        "triangles": 176,
+        "surfaces": 1,
+        "bytes": 9608
+      },
+      {
+        "name": "dining_table",
+        "vertices": 728,
+        "triangles": 1404,
+        "surfaces": 1,
+        "bytes": 49740
+      },
+      {
+        "name": "checked_runner",
+        "vertices": 196,
+        "triangles": 388,
+        "surfaces": 1,
+        "bytes": 13884
+      },
+      {
+        "name": "chair",
+        "vertices": 616,
+        "triangles": 1188,
+        "surfaces": 1,
+        "bytes": 42292
+      },
+      {
+        "name": "chair_cushion",
+        "vertices": 228,
+        "triangles": 428,
+        "surfaces": 1,
+        "bytes": 22540
+      },
+      {
+        "name": "rug_fringe",
+        "vertices": 900,
+        "triangles": 1560,
+        "surfaces": 1,
+        "bytes": 81780
+      },
+      {
+        "name": "daisy_jug",
+        "vertices": 3814,
+        "triangles": 7260,
+        "surfaces": 1,
+        "bytes": 260380
+      },
+      {
+        "name": "tabletop_still_life",
+        "vertices": 1716,
+        "triangles": 3368,
+        "surfaces": 1,
+        "bytes": 112792
+      }
+    ],
+    "unique_triangles": 114026,
+    "scene_triangles": 128292,
+    "static_draw_surfaces": 50,
+    "glb_bytes": 4100300,
+    "atlas_bytes": 2686358,
+    "placed_instances": 50,
+    "materials": 4,
+    "local_scene_triangles": 115642,
+    "shared_scene_triangles": 12650,
+    "shared_assets": [
+      {
+        "name": "ivy_long",
+        "vertices": 1716,
+        "triangles": 1504,
+        "surfaces": 1,
+        "bytes": 80200
+      },
+      {
+        "name": "ivy_medium",
+        "vertices": 1254,
+        "triangles": 1098,
+        "surfaces": 1,
+        "bytes": 58952
+      },
+      {
+        "name": "monstera",
+        "vertices": 568,
+        "triangles": 910,
+        "surfaces": 1,
+        "bytes": 24892
+      },
+      {
+        "name": "peace_lily",
+        "vertices": 620,
+        "triangles": 946,
+        "surfaces": 1,
+        "bytes": 26780
+      },
+      {
+        "name": "pothos",
+        "vertices": 1670,
+        "triangles": 2048,
+        "surfaces": 1,
+        "bytes": 67012
+      }
+    ],
+    "shared_placed_instances": 8,
+    "shared_atlas": "res://assets/rooms/_shared/plants/room_albedo_ao.png",
+    "local_botanical_budget_triangles": 18776,
+    "plant_budget_triangles": 31426,
+    "budget_limits": {
+      "placed_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "budget_passed": true,
+    "window_texture": {
+      "file": "window_landscape.png",
+      "size": [
+        512,
+        512
+      ],
+      "purpose": "Original layered landscape outside real aperture",
+      "bytes": 62294
+    },
+    "fire_texture": {
+      "file": "fire_gradient.png",
+      "size": [
+        32,
+        128
+      ],
+      "purpose": "Orange/red flame gradient in explicit height UVs",
+      "bytes": 568
+    },
+    "archived_assets": [
+      {
+        "name": "fire",
+        "vertices": 480,
+        "triangles": 944,
+        "surfaces": 1,
+        "bytes": 22360
+      }
+    ],
+    "particles": {
+      "library_commit": "5e5bf6af",
+      "capacity": 16,
+      "limit": 40,
+      "emitters": 2,
+      "dynamic_draws": 2
+    }
+  },
+  "effects": [
+    {
+      "name": "fx_hearth_fire",
+      "scene": "res://assets/rooms/_shared/fx/fx_hearth_fire.tscn",
+      "position": [
+        -1.59,
+        0.3,
+        -2.29
+      ],
+      "emission_box": [
+        0.17,
+        0.006,
+        0.035
+      ],
+      "flame_height": 0.42,
+      "flame_count": 14,
+      "spark_count": 2,
+      "flame_lifetime": 0.72,
+      "flicker_strength": 0.08,
+      "light": {
+        "position": [
+          -1.59,
+          0.56,
+          -1.98
+        ],
+        "color": "FF8B35",
+        "range": 2.0,
+        "energy": 0.95
+      }
+    }
+  ],
+  "ember_surfaces": [
+    {
+      "asset": "hearth",
+      "min": [
+        -0.31,
+        0.155,
+        -0.12
+      ],
+      "max": [
+        0.31,
+        0.26,
+        0.35
+      ],
+      "energy": 0.38
+    }
+  ],
+  "character_checks": 37,
+  "character_passed": true,
+  "motion": {
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "capture": "8 second real-time X11 video; no speed adjustment",
+    "frame_draw_calls": [
+      31,
+      31,
+      31,
+      31,
+      31,
+      31,
+      31,
+      31,
+      31
+    ],
+    "light_base": 0.95,
+    "light_max": 1.0249297618866,
+    "light_min": 0.885786533355713,
+    "light_position": [
+      -1.5900000333786,
+      0.560000002384186,
+      -1.98000001907349
+    ],
+    "particle_capacity": 16,
+    "passed": true,
+    "renderer": "mobile",
+    "scene": "standard_room_5"
+  },
+  "particle_frames_nonblank_and_different": true,
+  "sample_mean_rgb_change_255": [
+    1.8848543595679013,
+    2.174948398919753
+  ],
+  "hearth_video_sha256": "9dbfa4187e4417f731a33ca2db4c1d5c69afb0bf6339cb38295d3166b360f750",
+  "hearth_video_seconds": 8,
+  "preservation_passed": true,
+  "render_control_mean_rgb_255": 0.0001974022633744856,
+  "hashes": {
+    "assets/rooms/standard_room_5/layout.json": "0c9f8b988890af199eedfb982cbb7b1a3ebebe340dfd13d8270fa732746e7dd1",
+    "assets/rooms/standard_room_5/asset_stats.json": "66879d39f42204e4e6539ecfb260eb96a56d1a9969e354b51a22a498ae8e9a0a",
+    "tools/art/source/standard_room_5/standard_room_5.blend": "3f5a09ffe9ee87497330babb6462efa0cdea612cee3d833fbd181821aec464e5",
+    "scenes/standard_room_5/standard_room_5_art.gd": "0e62228b3a1173bc66aa6d44959dd2b5b8770e07a9d0daa89e6566d8be17309c",
+    "scenes/room_effects/ember_surface.gdshader": "608f0fc5a64e606d138e464c717eeabe9a5827be944846559d63a739a2fe81b1",
+    "scenes/room_effects/hearth_fx_adapter.gd": "9254264283094b85877c6d89dc2a822140ccfcdc50f3a6fd864432d99e09a57a",
+    "assets/rooms/_shared/fx/fx_hearth_fire.tscn": "31efd4d0180d6f5068c4489375262663a39dc2416daff2f8e000329ac4839840",
+    "assets/rooms/_shared/fx/fx_chimney_smoke.gd": "5ad397973a66f7c43c8214612dd1709c0878e971f69b62ad75457bf0f03d8b00",
+    "assets/rooms/_shared/fx/particle_style.gd": "ed7bc15a18bf39e1333cdf928276948ce4d48c7b9005c9e5cc1ee29b47ab09ff",
+    "assets/rooms/_shared/fx/fx_hearth_fire.gd": "419877833642c91d5496c674d228d2a1d35029e3c218240308bcc45385568259",
+    "assets/rooms/_shared/fx/smoke_strip.png": "65d41a4e5922fa604de14d691230f77d6f2b50aa0e131a882caad2f6086ac498",
+    "assets/rooms/_shared/fx/fx_chimney_smoke.tscn": "993a0644202e80940d80e5d8ad692e198e8e5df4107e322ffc2e566b6fcd0e89",
+    "assets/rooms/_shared/fx/spark.png": "c5b2a521157c111e818b19eb0a388c9f570d5fcbc753b2da73151b04cbbf5900",
+    "assets/rooms/_shared/fx/flame_strip.png": "58e86c18c95b957259ea68e8bf8847aa34ced94819fe88241539b5f30d57ff58"
+  }
+}

@@ -72,13 +72,6 @@
       "bytes": 180868
     },
     {
-      "name": "fire",
-      "vertices": 480,
-      "triangles": 944,
-      "surfaces": 1,
-      "bytes": 22360
-    },
-    {
       "name": "kettle",
       "vertices": 590,
       "triangles": 1144,
@@ -296,14 +289,14 @@
       "bytes": 112792
     }
   ],
-  "unique_triangles": 114970,
-  "scene_triangles": 129236,
-  "static_draw_surfaces": 51,
-  "glb_bytes": 4122660,
+  "unique_triangles": 114026,
+  "scene_triangles": 128292,
+  "static_draw_surfaces": 50,
+  "glb_bytes": 4100300,
   "atlas_bytes": 2686358,
-  "placed_instances": 51,
+  "placed_instances": 50,
   "materials": 4,
-  "local_scene_triangles": 116586,
+  "local_scene_triangles": 115642,
   "shared_scene_triangles": 12650,
   "shared_assets": [
     {
@@ -369,5 +362,21 @@
     ],
     "purpose": "Orange/red flame gradient in explicit height UVs",
     "bytes": 568
+  },
+  "archived_assets": [
+    {
+      "name": "fire",
+      "vertices": 480,
+      "triangles": 944,
+      "surfaces": 1,
+      "bytes": 22360
+    }
+  ],
+  "particles": {
+    "library_commit": "5e5bf6af",
+    "capacity": 16,
+    "limit": 40,
+    "emitters": 2,
+    "dynamic_draws": 2
   }
 }

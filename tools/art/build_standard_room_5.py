@@ -128,3 +128,8 @@ if __name__=='__main__':
     sys.path.insert(0,str(Path(__file__).resolve().parent/'source/standard_room_5'))
     from revision2 import build as build_review
     build_review()
+
+    # Keep the shared runtime effect after a normal editable-source rebuild.
+    import runpy
+    if '--geometry-only' not in sys.argv:
+        runpy.run_path(str(Path(__file__).resolve().parent/'apply_shared_hearth_fx.py'),init_globals={'ROOM_SLUG':'standard_room_5'})

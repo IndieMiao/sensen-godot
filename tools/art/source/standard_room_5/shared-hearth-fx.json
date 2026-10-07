@@ -1,0 +1,64 @@
+{
+  "effects": [
+    {
+      "name": "fx_hearth_fire",
+      "scene": "res://assets/rooms/_shared/fx/fx_hearth_fire.tscn",
+      "position": [
+        -1.59,
+        0.3,
+        -2.29
+      ],
+      "emission_box": [
+        0.17,
+        0.006,
+        0.035
+      ],
+      "flame_height": 0.42,
+      "flame_count": 14,
+      "spark_count": 2,
+      "flame_lifetime": 0.72,
+      "flicker_strength": 0.08,
+      "light": {
+        "position": [
+          -1.59,
+          0.56,
+          -1.98
+        ],
+        "color": "FF8B35",
+        "range": 2.0,
+        "energy": 0.95
+      }
+    }
+  ],
+  "ember_surfaces": [
+    {
+      "asset": "hearth",
+      "min": [
+        -0.31,
+        0.155,
+        -0.12
+      ],
+      "max": [
+        0.31,
+        0.26,
+        0.35
+      ],
+      "energy": 0.38
+    }
+  ],
+  "replaces_asset": "fire",
+  "library_commit": "5e5bf6af",
+  "fx_review_camera": {
+    "position": [
+      -1.59,
+      1.35,
+      -0.45
+    ],
+    "target": [
+      -1.59,
+      0.59,
+      -2.31
+    ],
+    "size": 2.3
+  }
+}

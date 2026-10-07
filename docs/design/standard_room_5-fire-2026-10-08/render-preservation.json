@@ -1,0 +1,8 @@
+{
+  "scene": "standard_room_5",
+  "mean_rgb_255": 0.0001974022633744856,
+  "maximum_channel_difference": 30,
+  "changed_pixels": 720,
+  "controls": "Static flames/new particles hidden;new ember emission disabled;hearth light fixed tooriginalbase. Same camera/lighting/room assets.",
+  "passed": true
+}

@@ -1,5 +1,6 @@
 @tool
 extends Node3D
+const HearthAdapter = preload("res://scenes/room_effects/hearth_fx_adapter.gd")
 ## Reusable static room assembly. No player, UI, account, network or save dependencies.
 ## Lighting belongs to the consuming scene. Art-only review uses a separate script.
 const KIT := "res://assets/rooms/standard_room_5/"
@@ -11,6 +12,7 @@ var variant_materials: Dictionary = {}
 func _ready() -> void:
 	layout = JSON.parse_string(FileAccess.get_file_as_string(KIT + "layout.json"))
 	_setup_room()
+	if layout.get("effects", []).size() > 0: fire = HearthAdapter.attach(self, layout)
 
 func _vec(a: Array) -> Vector3:
 	return Vector3(float(a[0]), float(a[1]), float(a[2]))
@@ -84,7 +86,10 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 	var variant := "wood_niche" if asset.name == "firewood_alcove" else "garden" if str(asset.name).ends_with("garden") else "fire" if asset.name == "fire" else "plain"
 	if variant_materials.has(variant): applied = variant_materials[variant]
 	else: variant_materials[variant] = applied
-	_set_material(model, applied)
+	var bound_material: Material = applied
+	for ember in layout.get("ember_surfaces", []):
+		if str(ember.asset) == str(asset.name): bound_material = HearthAdapter.material_for(material, ember)
+	_set_material(model, bound_material)
 	if str(asset.name).ends_with("garden"): _disable_shadows(model)
 	if asset.name in ["fire", "daisy_jug", "window_daisies", "counter_board"]: _disable_shadows(model)
 	for c in asset.colliders:
