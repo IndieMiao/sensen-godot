@@ -6,7 +6,8 @@ extends Node
 ## new UI flow is identical everywhere.
 ##
 ## A world implements (all optional): p0_surface() -> String, p0_space() -> String (where the player is for
-## the server: home / pond / outpost / mine; see space_of), p0_frame(view, dt), p0_joystick(v),
+## the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the catalog pond id inside a
+## pond space), p0_frame(view, dt), p0_joystick(v),
 ## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f),
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
@@ -72,6 +73,7 @@ func _init() -> void:
 func attach(w: Node) -> void:
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
+	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
 	if not session.busy and not session.view.is_empty(): session.refresh()   # entering a space reads fresh state
 	mark("attach " + str(w.name))
 	_first_frame.call_deferred(str(w.name))
@@ -97,6 +99,7 @@ func detach(w: Node) -> void:
 		ui.close_modal()
 		ui.set_surface("map")
 		session.space = "map"
+		session.place = ""
 
 ## Back to the map: the active world is an AppRouter instance above it (back locks still apply,
 ## e.g. a line in the water is reeled in first).

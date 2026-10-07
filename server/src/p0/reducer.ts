@@ -17,7 +17,7 @@ export type { P0Event } from './progress.js';
 
 /** Every command may carry `expect_seq`: the state version the client saw. A mismatch is refused as
  * `stale_state` without applying, so a retry after a lost response can never apply twice (SGODOT-211). */
-export type P0Command = P0CommandBody & { expect_seq?: number; space?: string };
+export type P0Command = P0CommandBody & { expect_seq?: number; space?: string; place?: string };
 
 type P0CommandBody =
   | { type: 'till'; plot: number }
@@ -60,7 +60,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   rollDay(c, s, now);
   settleBoards(c, s, now);
   settleParcels(c, s, now);
-  notePresence(c, s, cmd.space, now, events);   // before the command: a session gap of ≥ 2 h already counts as having left
+  notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
 
   switch (cmd.type) {
