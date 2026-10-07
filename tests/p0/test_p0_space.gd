@@ -8,7 +8,7 @@ var sent: Array
 func before_test() -> void:
 	session = auto_free(P0Session.new())
 	sent = []
-	session.transport = func(method: int, path: String, body: Dictionary, cmd: Dictionary): sent.append({body = body, cmd = cmd})
+	session.transport = func(method: int, path: String, body: Dictionary, cmd: Dictionary): sent.append({path = path, body = body, cmd = cmd})
 	session.view = {"seq": 3}
 
 func _world(source: String) -> Object:
@@ -16,6 +16,14 @@ func _world(source: String) -> Object:
 	script.source_code = "extends RefCounted\n" + source
 	script.reload()
 	return script.new()
+
+func test_the_state_read_says_where_the_player_is() -> void:
+	session.refresh()
+	assert_str(str(sent[0].path)).is_equal("/p0/state")
+	session.busy = false
+	session.space = "outpost"
+	session.refresh()
+	assert_str(str(sent[1].path)).is_equal("/p0/state?space=outpost")
 
 func test_commands_carry_the_space_beside_the_command() -> void:
 	session.space = "pond"

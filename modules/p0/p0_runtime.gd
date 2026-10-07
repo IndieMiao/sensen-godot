@@ -71,11 +71,11 @@ func _init() -> void:
 ## The active world takes over input and the HUD surface; the previous one is simply forgotten.
 func attach(w: Node) -> void:
 	world = w
+	session.space = space_of(w)   # before the read below, which tells the server where the player is
 	if not session.busy and not session.view.is_empty(): session.refresh()   # entering a space reads fresh state
 	mark("attach " + str(w.name))
 	_first_frame.call_deferred(str(w.name))
 	ui.set_surface(str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm")
-	session.space = space_of(w)
 
 ## The space a world puts the player in, for the server (q(41)): its p0_space() when it has one (the farmhouse
 ## says home, outposts say outpost), else from its surface — farm is home, pond and map as named, anything else

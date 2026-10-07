@@ -7,7 +7,7 @@ import { expireGiftMeals, giftResident, noteSown, residentRequestCommand, talk }
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
 import { energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
-import { restReadyIn, trackPresence } from './presence.js';
+import { notePresence, restReadyIn } from './presence.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
 import { emptyDay, type P0State, type Plot } from './state.js';
@@ -55,7 +55,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleEnergy(c, s, now);
   rollDay(c, s, now);
   settleBoards(c, s, now);
-  trackPresence(c, s, cmd.space, now);   // before the command: a session gap of ≥ 2 h already counts as having left
+  notePresence(c, s, cmd.space, now, events);   // before the command: a session gap of ≥ 2 h already counts as having left
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
 
   switch (cmd.type) {

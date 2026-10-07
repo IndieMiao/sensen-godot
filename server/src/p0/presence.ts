@@ -5,6 +5,7 @@
  * home, or the previous command when two commands are ≥ 2 h apart (the session ended in between).
  */
 import type { P0Content } from './content.js';
+import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
 
 const AWAY = new Set(['pond', 'outpost', 'mine']);
@@ -20,6 +21,15 @@ export function trackPresence(c: P0Content, s: P0State, space: unknown, now: num
   else if (where === 'home') p.space = 'home';
   p.last_at = now;
   return where === 'home' && !wasHome;
+}
+
+/**
+ * Every place the server learns where the player is goes through here: each command, and the state read a client
+ * makes on entering a space (GET /v1/p0/state?space=…), so sitting in an outpost without acting still counts as
+ * having left. Returns true on arriving home; SGODOT-231 hangs auto-storing materials here (events is null on reads).
+ */
+export function notePresence(c: P0Content, s: P0State, space: unknown, now: number, _events: P0Event[] | null): boolean {
+  return trackPresence(c, s, space, now);
 }
 
 /** ms until Rest opens by the away rule; 0 = open; null = the player has not left yet. */

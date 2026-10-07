@@ -51,8 +51,9 @@ func current() -> Dictionary:
 	if view.is_empty(): return view
 	return P0Logic.project(view, float(Time.get_ticks_msec() - _received_ms))
 
+## The read also says where the player is, so entering a space counts even before the first command (q(41)).
 func refresh() -> void:
-	_request(HTTPClient.METHOD_GET, "/p0/state", {}, {})
+	_request(HTTPClient.METHOD_GET, "/p0/state" + ("?space=" + space.uri_encode() if space != "" else ""), {}, {})
 
 ## World actions send without a key and are never dropped. UI commands pass a key (ui_key) and are ignored
 ## while the same key is on the wire or queued, so double taps on Buy / Sell submit once (WP7-B F-08 §2).

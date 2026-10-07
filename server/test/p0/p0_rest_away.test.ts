@@ -68,3 +68,25 @@ describe('arriving home (hook for SGODOT-231)', () => {
     expect(trackPresence(c, s, 'home', T0 + 4 * MIN)).toBe(true);
   });
 });
+
+describe('the state read on entering a space counts (PR #16 review)', () => {
+  it('GET /v1/p0/state?space=outpost records leaving; a plain read changes nothing', async () => {
+    const { default: Fastify } = await import('fastify');
+    const { registerP0Routes } = await import('../../src/p0/routes.js');
+    const { P0Store } = await import('../../src/p0/store.js');
+    let now = T0;
+    const store = new P0Store(c);
+    const app = Fastify();
+    registerP0Routes(app, { content: c, store, now: () => now, dev: false });
+    const headers = { 'x-p0-player': 'player-rest-02' };
+    await app.inject({ method: 'GET', url: '/v1/p0/state?space=home', headers });
+    now = T0 + 10 * MIN;
+    await app.inject({ method: 'GET', url: '/v1/p0/state', headers });
+    expect(store.get('player-rest-02', now).presence).toMatchObject({ left_at: null, space: 'home' });
+    now = T0 + 20 * MIN;
+    await app.inject({ method: 'GET', url: '/v1/p0/state?space=outpost', headers });   // sat in the tea house, no command
+    now = T0 + 140 * MIN;
+    const back = await app.inject({ method: 'GET', url: '/v1/p0/state?space=home', headers });
+    expect(back.json().state.rest.away_ready_in).toBe(0);
+  });
+});
