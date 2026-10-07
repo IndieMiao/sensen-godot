@@ -95,6 +95,16 @@ export function gainXp(c: P0Content, s: P0State, now: number, skill: Skill, amou
   }
 }
 
+/**
+ * A first-time XP bonus (first cast, first catch of a species, first harvest, first pot of a page): the `first` event
+ * says what it paid after the daily cap, and is left out when the cap took it all.
+ */
+export function firstXp(c: P0Content, s: P0State, now: number, skill: Skill, what: string, xp: number, events: P0Event[]): void {
+  const paid = Math.max(0, Math.min(xp, c.skill_daily_cap - (s.day.xp[skill] ?? 0)));
+  if (paid > 0) events.push({ kind: 'first', what, xp: paid });
+  gainXp(c, s, now, skill, xp, 100, events);
+}
+
 /** §3.4.8: a one-time energy reward, shown with the moment that earned it; may pass max by ≤ max_over. */
 export function grantOnce(c: P0Content, s: P0State, now: number, id: string, amount: number, events: P0Event[]): void {
   if (amount <= 0 || s.rewards.includes(id)) return;

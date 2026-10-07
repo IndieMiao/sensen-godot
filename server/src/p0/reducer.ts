@@ -7,7 +7,7 @@ import { expireGiftMeals, giftResident, noteSown, residentRequestCommand, talk }
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
 import { takeFromCabinet } from './kitchen_storage.js';
-import { energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
+import { firstXp, energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { notePresence, restReadyIn } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
@@ -151,8 +151,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       const first = `harvest:${crop.id}`;
       if (!s.firsts.includes(first)) {
         s.firsts.push(first);
-        events.push({ kind: 'first', what: first, xp: crop.first_xp });
-        gainXp(c, s, now, 'farming', crop.first_xp, 100, events);
+        firstXp(c, s, now, 'farming', first, crop.first_xp, events);
       }
       plot.state = 'tilled';
       delete plot.crop; delete plot.xp_pct; delete plot.ready_at; delete plot.fert;

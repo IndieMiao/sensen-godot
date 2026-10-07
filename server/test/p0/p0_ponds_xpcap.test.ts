@@ -88,6 +88,13 @@ describe('the daily XP cap per skill (§4.3.4, SGODOT-232 S6)', () => {
     // another skill has its own cap
     gainXp(c, s, T, 'cooking', 40, 100, ev);
     expect(s.skills.cooking).toBe(40);
+    // a first-time bonus the cap took says nothing (no "First cast · +10 XP" for 0)
+    const capped = fresh();
+    capped.day = { ...capped.day, key: '2026-10-08', xp: { fishing: 3_000 } };
+    const cast = applyP0(c, capped, { type: 'cast', space: 'pond', place: REED }, T);
+    if (!cast.ok) throw new Error(cast.code);
+    expect(cast.events.some(e => e.kind === 'first')).toBe(false);
+    expect(cast.events).toContainEqual({ kind: 'xp', skill: 'fishing', amount: 0, percent: 100, capped: true });
     // the next player day (after the 04:00 rollover) starts from 0
     const next = step(s, { type: 'cast', space: 'pond', place: REED }, T + 24 * 3_600_000);
     expect(next.day.xp).toEqual({ fishing: 10 });   // first cast +10

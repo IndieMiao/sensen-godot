@@ -5,7 +5,7 @@ import { fireSpeed, giveClue, goldWidth, hasConvenience, noteMishap, triedBefore
 import { isSeasoning } from './gathering.js';
 import { cabinetCap, dishesFit, eatFrom, haveDish, haveIngredient, ingredientStock, rackOn, routeDish, takeIngredient } from './kitchen_storage.js';
 import { grantItems } from './parcels.js';
-import { gainEnergy, gainXp, grantOnce, type P0Event } from './progress.js';
+import { firstXp, gainEnergy, gainXp, grantOnce, type P0Event } from './progress.js';
 import { draw, foodCap, scaledXp, skillLevel, xpPercent } from './rules.js';
 import { putInStorage } from './storage.js';
 import type { Heat, P0State, Pot } from './state.js';
@@ -238,8 +238,7 @@ function finishPot(c: P0Content, s: P0State, pot: Pot, taps: number[], eat: bool
   const before = s.day.cooked[pot.dish] ?? 0;
   s.day.cooked[pot.dish] = before + 1;
   if (first) {
-    events.push({ kind: 'first', what: firstKey, xp: tier.first_xp });
-    gainXp(c, s, now, 'cooking', tier.first_xp, 100, events);
+    firstXp(c, s, now, 'cooking', firstKey, tier.first_xp, events);
   }
   // §7.6.2: level difference, then same-page decay (2nd half rounded up, 3rd+ none), then quality, rounded down.
   // The first pot of a page earns this as well as the first-cook bonus (§14.2.2: Good Grilled Crucian 10 + 4 × 1.25).
