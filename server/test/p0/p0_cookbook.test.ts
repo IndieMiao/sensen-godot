@@ -1,0 +1,144 @@
+/** SGODOT-232 S5: Cookbook page states, Kitchen Mishaps and clues, trial refunds and the P0 Cooking conveniences. */
+import { describe, expect, it } from 'vitest';
+import { loadP0Content } from '../../src/p0/content.js';
+import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reducer.js';
+import { freshState, type P0State } from '../../src/p0/state.js';
+import { viewOf } from '../../src/p0/view.js';
+
+const c = loadP0Content();
+const T0 = Date.UTC(2026, 9, 8, 2);   // 10:00 Shanghai
+const S = 1000, H = 3_600_000;
+const fresh = () => freshState(c, 'cookbook-player', T0, 7);
+const veteran = () => ({ ...fresh(), created_at: T0 - 8 * 24 * H });   // past the Newcomer Blessing
+function step(s: P0State, cmd: P0Command, at = T0): { s: P0State; ev: P0Event[] } {
+  const r = applyP0(c, s, cmd, at);
+  if (!r.ok) throw new Error(`${cmd.type}: ${r.code}`);
+  return { s: r.state, ev: r.events };
+}
+/** Cook these items and collect when done, Plain (no taps). */
+function cookOnce(s: P0State, items: string[], at = T0) {
+  const started = step(s, { type: 'cook', items }, at);
+  return { ...step(started.s, { type: 'collect' }, at + started.s.stove!.ms + S), pot: started.ev.find(e => e.kind === 'pot')! };
+}
+const page = (s: P0State, id: string) => viewOf(c, s, T0).cooking.cookbook.find(p => p.id === id)!;
+
+describe('Cookbook pages (§7.5.1, q(39))', () => {
+  it('lists 48 pages in order: 14 P0 pages and 34 silhouettes; the two starting pages are Tasted', () => {
+    const v = viewOf(c, fresh(), T0).cooking;
+    expect(v.cookbook.map(p => p.n)).toEqual(Array.from({ length: 48 }, (_, i) => i + 1));
+    expect(v.cookbook.filter(p => p.p0)).toHaveLength(14);
+    expect(v).toMatchObject({ pages_total: 48, discovered: 0, conveniences: [], third_slot: { level: 4, xp_to_go: 220 } });
+    expect(v.cookbook.filter(p => p.state === 'tasted').map(p => p.id)).toEqual(['dish_grilled_crucian', 'dish_radish_salad']);
+    const hidden = v.cookbook.find(p => p.id === 'dish_carrot_cake')!;
+    expect(hidden).toMatchObject({ state: 'hidden', name: null, in: ['?', '?'], families: ['F', 'F'], learn: ['experiment', 'card', 'taught'] });
+    const silhouette = v.cookbook.find(p => p.n === 3)!;
+    expect(silhouette).toMatchObject({ id: 'dish_carp_cakes', p0: false, name: null, families: ['W', 'W'], can_cook: false });
+    expect(v.cookbook.find(p => p.id === 'dish_fisher_stew')).toMatchObject({ slots: 3, lock: { level: 4, xp_to_go: 220 } });
+  });
+
+  it('cooking a page discovers it; ten pots master it and widen its gold arc by 10 points', () => {
+    let s = veteran();
+    s.bag.push({ id: 'fish_crucian', qty: 10 });
+    s.fires = 1;   // past the teaching ring
+    for (let i = 0; i < 10; i++) s = cookOnce(s, ['fish_crucian'], T0 + i * 10 * S).s;
+    expect(page(s, 'dish_grilled_crucian')).toMatchObject({ state: 'mastered', cooked: true, cooked_total: 10, best: 0, first_at: T0 + 6 * S });
+    expect(viewOf(c, s, T0).cooking.discovered).toBe(1);
+    s.bag.push({ id: 'fish_crucian', qty: 1 });
+    const pot = step(s, { type: 'cook', items: ['fish_crucian'] }, T0 + 200 * S).s.stove!;
+    expect(pot.heats[0].width).toBe(0.45);   // Common 0.35 + Mastered 0.10
+  });
+
+  it('shows "You might have what it takes" on a Hidden page whose families the stove can fill', () => {
+    const s = fresh();
+    expect(page(s, 'dish_carrot_cake').maybe).toBe(false);
+    s.bag.push({ id: 'crop_carrot', qty: 2 });
+    expect(page(s, 'dish_carrot_cake').maybe).toBe(true);
+  });
+});
+
+describe('Kitchen Mishaps and clues (§7.5.2)', () => {
+  it('a new failed combination is recorded and turns one slot of a page that uses it; a repeat only counts', () => {
+    let s = veteran();
+    s.bag.push({ id: 'crop_radish', qty: 2 }, { id: 'crop_carrot', qty: 2 });
+    let r = cookOnce(s, ['crop_radish', 'crop_carrot']);
+    expect(r.pot).toMatchObject({ dish: null, tried: false });
+    expect(r.ev.find(e => e.kind === 'mishap')).toMatchObject({ tried: false, refund: [],
+      clue: { page: 'dish_veggie_plate', slots: [0] } });   // Veggie Plate takes any Common vegetable; Carrot Cake needs Farming Lv2
+    expect(page(r.s, 'dish_veggie_plate')).toMatchObject({ state: 'clued', in: ['F1'] });
+    expect(count(r.s.bag, 'dish_mystery')).toBe(1);
+    s = r.s;
+    r = cookOnce(s, ['crop_carrot', 'crop_radish'], T0 + 20 * S);
+    expect(r.pot).toMatchObject({ tried: true });
+    expect(r.ev.find(e => e.kind === 'mishap')).toMatchObject({ tried: true, clue: null });
+    expect(viewOf(c, r.s, T0).cooking.mishaps).toEqual([{ items: ['crop_carrot', 'crop_radish'], n: 2, at: T0 + 5 * S + S }]);
+  });
+
+  it('Cooking Lv3 (Double Clue) turns two slots, matching slots first', () => {
+    const s = veteran();
+    s.skills.cooking = 100;   // Lv3
+    s.skills.farming = 50;    // Lv2: carrots can be had
+    s.bag.push({ id: 'crop_carrot', qty: 2 }, { id: 'crop_herb', qty: 1 }, { id: 'crop_lettuce', qty: 1 });
+    const r = cookOnce(s, ['crop_carrot', 'crop_lettuce']);
+    expect(r.ev.find(e => e.kind === 'mishap')).toMatchObject({ clue: { page: 'dish_veggie_plate', slots: [0] } });
+    const r2 = cookOnce(r.s, ['crop_carrot', 'crop_herb'], T0 + 20 * S);
+    // Carrot Cake (Common, uses carrot, now obtainable) gets both slots at once.
+    expect(r2.ev.find(e => e.kind === 'mishap')).toMatchObject({ clue: { page: 'dish_carrot_cake', slots: [0, 1] } });
+  });
+
+  it('in the Newcomer Blessing the first 10 failures a day give the ingredients back, then Common ones are spent', () => {
+    let s = fresh();
+    s.bag.push({ id: 'crop_radish', qty: 20 }, { id: 'crop_carrot', qty: 20 });
+    expect(viewOf(c, s, T0).cooking.trial_refunds).toBe(10);
+    for (let i = 0; i < 10; i++) {
+      const r = cookOnce(s, ['crop_radish', 'crop_carrot'], T0 + i * 20 * S);
+      expect(r.ev.find(e => e.kind === 'mishap')).toMatchObject({ refund: ['crop_radish', 'crop_carrot'], trial_left: 9 - i });
+      s = r.s;
+    }
+    expect(count(s.bag, 'crop_radish')).toBe(20);
+    const r = cookOnce(s, ['crop_radish', 'crop_carrot'], T0 + 300 * S);
+    expect(r.ev.find(e => e.kind === 'mishap')).toMatchObject({ refund: [], trial_left: 0 });
+    expect(count(r.s.bag, 'crop_radish')).toBe(19);
+    expect(viewOf(c, veteran(), T0).cooking.trial_refunds).toBeNull();
+  });
+
+  it('Rare and Legendary ingredients always come back from a failed pot', () => {
+    const rare = structuredClone(c);
+    rare.fish.find(f => f.id === 'fish_bass')!.rarity = 3;
+    const s = veteran();
+    s.bag.push({ id: 'fish_bass', qty: 1 }, { id: 'crop_radish', qty: 1 }, { id: 'crop_lettuce', qty: 1 });
+    const started = applyP0(rare, s, { type: 'cook', items: ['fish_bass', 'crop_radish'] }, T0);
+    if (!started.ok) throw new Error(started.code);
+    const done = applyP0(rare, started.state, { type: 'collect' }, T0 + started.state.stove!.ms + S);
+    if (!done.ok) throw new Error(done.code);
+    expect(done.events.find(e => e.kind === 'mishap')).toMatchObject({ refund: ['fish_bass'] });
+    expect(count(done.state.bag, 'fish_bass')).toBe(1);
+    expect(count(done.state.bag, 'crop_radish')).toBe(0);
+  });
+});
+
+describe('Cooking Lv1–6 conveniences (q(38))', () => {
+  it('lists what the level gives and applies Hearty Mishap, Steady Hand I and Quick Fire', () => {
+    const at = (xp: number) => { const s = veteran(); s.skills.cooking = xp; s.fires = 1; return s; };
+    expect(viewOf(c, at(30), T0).cooking.conveniences).toEqual(['cook_again']);
+    expect(viewOf(c, at(100), T0).cooking.conveniences).toEqual(['cook_again', 'clue_double', 'hearty_mishap']);
+    expect(viewOf(c, at(650), T0).cooking.conveniences).toEqual(
+      ['cook_again', 'clue_double', 'hearty_mishap', 'steady_hand_1', 'queue_two', 'quick_fire']);
+    // Hearty Mishap: a Mystery Dish restores 10 from Lv3 (5 before)
+    for (const [xp, gain] of [[0, 5], [100, 10]] as const) {
+      const s = at(xp); s.energy = { value: 100, tick_ms: T0 }; s.bag.push({ id: 'dish_mystery', qty: 1 });
+      expect(step(s, { type: 'eat', item: 'dish_mystery' }).s.energy.value).toBe(100 + gain);
+    }
+    // Steady Hand I (Lv5): +5 points of gold; Quick Fire (Lv6): time and heat × 0.8
+    const lv5 = at(400); lv5.bag.push({ id: 'fish_crucian', qty: 1 });
+    expect(step(lv5, { type: 'cook', items: ['fish_crucian'] }).s.stove!).toMatchObject({ ms: 5000, heats: [{ at: 2500, width: 0.4 }] });
+    const lv6 = at(650); lv6.bag.push({ id: 'fish_crucian', qty: 1 });
+    expect(step(lv6, { type: 'cook', items: ['fish_crucian'] }).s.stove!).toMatchObject({ ms: 4000, heats: [{ at: 2000, width: 0.4 }] });
+  });
+
+  it('the 3-slot lock lifts at Cooking Lv4', () => {
+    const s = veteran(); s.skills.cooking = 220;
+    const v = viewOf(c, s, T0).cooking;
+    expect(v.third_slot).toBeNull();
+    expect(v.cookbook.find(p => p.id === 'dish_fisher_stew')!.lock).toBeNull();
+  });
+});
