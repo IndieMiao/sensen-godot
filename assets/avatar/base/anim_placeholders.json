@@ -14,6 +14,12 @@
       "referenced_by": "雨天必需照料 (weather_script.care_action.rain)",
       "status": "real"
     },
+    "drink_stand": {
+      "clip_id": "drink_stand",
+      "fallback": "idle",
+      "referenced_by": "站着喝（预留，SGODOT-227；坐着喝待美术总监定）",
+      "status": "real"
+    },
     "harvest": {
       "clip_id": "labour_harvest",
       "fallback": "idle + 程序化俯身",
@@ -24,6 +30,30 @@
       "clip_id": "labour_shelter",
       "fallback": "idle + 程序化俯身",
       "referenced_by": "风天必需照料 (weather_script.care_action.wind)",
+      "status": "real"
+    },
+    "sit_down": {
+      "clip_id": "sit_down",
+      "fallback": "idle",
+      "referenced_by": "坐下过渡（据点茶桌 / 长椅，p0_outpost.gd，SGODOT-227）",
+      "status": "real"
+    },
+    "sit_idle": {
+      "clip_id": "sit_idle",
+      "fallback": "idle",
+      "referenced_by": "坐姿循环（据点座位，SGODOT-227）",
+      "status": "real"
+    },
+    "sit_talk": {
+      "clip_id": "sit_talk",
+      "fallback": "idle",
+      "referenced_by": "坐着说话（预留，SGODOT-227）",
+      "status": "real"
+    },
+    "sit_up": {
+      "clip_id": "sit_up",
+      "fallback": "idle",
+      "referenced_by": "起身过渡（据点座位，SGODOT-227）",
       "status": "real"
     },
     "sow": {
@@ -62,6 +92,11 @@
     "labour_drain",
     "labour_shelter",
     "labour_harvest",
-    "emote_wave"
+    "emote_wave",
+    "sit_down",
+    "sit_idle",
+    "sit_up",
+    "sit_talk",
+    "drink_stand"
   ]
 }
