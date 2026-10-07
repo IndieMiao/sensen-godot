@@ -1,9 +1,9 @@
 /** Cooking and eating (plan §7.2–7.6, §7.17): pots cost no energy; quality comes from heat taps judged on the server. */
 import { dishId, dishParts, fishById, ingredient, itemKind, recipeById, type CookTier, type P0Content, type Recipe } from './content.js';
-import { add, count, room, take } from './bag.js';
+import { cabinetCap, dishesFit, eatFrom, haveDish, haveIngredient, ingredientStock, routeDish, takeIngredient } from './kitchen_storage.js';
 import { gainEnergy, gainXp, grantOnce, type P0Event } from './progress.js';
 import { draw, foodCap, scaledXp, skillLevel, xpPercent } from './rules.js';
-import type { Heat, P0State } from './state.js';
+import type { Heat, P0State, Pot } from './state.js';
 import type { Refusal } from './fishing.js';
 
 const TAG = /^([WFOS])(\d)$/;
@@ -62,10 +62,9 @@ export function matchRecipe(c: P0Content, items: string[]): Recipe | null {
   return c.cooking.recipes.filter(r => fits(c, r, items)).sort((a, b) => wild(a) - wild(b))[0] ?? null;
 }
 
-/** Concrete bag items for a known page: tag slots take the cheapest matching item the bag holds. */
+/** Concrete items for a known page: tag slots take the cheapest matching item the stove can reach. */
 export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe): string[] | null {
-  const left = new Map<string, number>();
-  for (const b of s.bag) left.set(b.id, (left.get(b.id) ?? 0) + b.qty);
+  const left = ingredientStock(c, s);
   const out: string[] = [];
   const priceOf = (id: string) => fishById(c, id)?.price ?? c.crops.find(cr => cr.id === id)?.price ?? 0;
   // Specific tokens first so a tag never eats the item a named slot needs.
@@ -102,13 +101,13 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
   }
   for (const id of new Set(items)) {
     const need = items.filter(x => x === id).length;
-    if (count(s.bag, id) < need) return { code: 'not_enough', detail: { item: id, need, have: count(s.bag, id) } };
+    const have = haveIngredient(c, s, id);
+    if (have < need) return { code: 'not_enough', detail: { item: id, need, have } };
   }
   if (parts.every(p => p.family === 'S')) return { code: 'needs_main' };
   for (const id of new Set(items)) {
     const need = items.filter(x => x === id).length;
-    take(s.bag, id, need);
-    events.push({ kind: 'item', id, delta: -need });
+    takeIngredient(c, s, id, need, events);
   }
   const recipe = matchRecipe(c, items);
   const rarity = deriveRarity(c, parts);
@@ -139,9 +138,16 @@ export function heatHits(c: P0Content, heats: Heat[], taps: number[]): number {
   return hits;
 }
 
-export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown }, now: number, events: P0Event[]): Refusal | null {
+/** Collect a ready pot: heat is judged and XP paid now, and the portions go the Keep way (Warming Cabinet → bag).
+ * With eat: true (COOK-4 Eat) the main portion is eaten from the pot instead, so a full kitchen never blocks
+ * eating (§7.2.6). Portions with no place stay on the stove as `left` (Bag full · dish left on the stove); the
+ * stove can't start a pot until a later collect takes them (Li Bai, 226 comment 250e4ef1). Never to the Inbox. */
+export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?: unknown }, now: number, events: P0Event[], max: number): Refusal | null {
   const pot = s.stove;
   if (!pot) return { code: 'stove_empty' };
+  const eat = cmd.eat === true;
+  if (eat && s.energy.value >= max) return { code: 'energy_full' };
+  if (pot.left) return collectLeft(c, s, pot, eat, now, events);
   const left = pot.started_at + pot.ms - now;
   if (left > 0) return { code: 'not_ready', detail: { ready_in: left } };
   const taps = Array.isArray(cmd.taps) ? cmd.taps.slice(0, 20).map(Number).filter(Number.isFinite) : [];
@@ -149,15 +155,13 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown }, no
   const quality = Math.min(hits, 2);
   const main = dishId(pot.dish, quality);
   const extra = quality === 2 ? 1 : 0; // Perfect: a second, Plain portion (§7.2.5)
-  if (room(c, s, main) < 1 || (extra && room(c, s, pot.dish) < (main === pot.dish ? 2 : 1))) return { code: 'bag_full' };
-  s.stove = null;
-  add(c, s, main, 1);
-  events.push({ kind: 'item', id: main, delta: 1 });
-  if (extra) { add(c, s, pot.dish, 1); events.push({ kind: 'item', id: pot.dish, delta: 1 }); }
+  const portions = extra ? [main, pot.dish] : [main];
+  keepOrLeave(c, s, pot, eat ? portions.slice(1) : portions, events);
   const firstKey = `cook:${pot.dish}`;
   const first = !s.firsts.includes(firstKey);
   if (first) s.firsts.push(firstKey);
   events.push({ kind: 'dish', dish: pot.dish, quality, qty: 1 + extra, first, mystery: pot.mystery, hits });
+  if (eat) eatMeal(c, s, main, now, events);
   if (pot.mystery) return null;
   if (!s.cookbook.includes(pot.dish)) s.cookbook.push(pot.dish);
   if (first) {
@@ -180,6 +184,27 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown }, no
   return null;
 }
 
+/** Portions already judged and waiting on the stove: Eat takes the first, the rest go the Keep way again. */
+function collectLeft(c: P0Content, s: P0State, pot: Pot, eat: boolean, now: number, events: P0Event[]): Refusal | null {
+  const ids = [...pot.left!];
+  if (!eat && !ids.some(id => dishesFit(c, s, [[id, 1]]))) return { code: 'bag_full', detail: { cabinet: cabinetCap(c, s) > 0, left: ids.length } };
+  const eaten = eat ? ids.shift()! : null;
+  keepOrLeave(c, s, pot, ids, events);
+  if (eaten) eatMeal(c, s, eaten, now, events);
+  return null;
+}
+
+/** Keep each portion that has a place; the others stay on the stove (a `plate` event says which). */
+function keepOrLeave(c: P0Content, s: P0State, pot: Pot, ids: string[], events: P0Event[]): void {
+  const left: string[] = [];
+  for (const id of ids) {
+    if (dishesFit(c, s, [[id, 1]])) routeDish(c, s, id, 1, events);
+    else left.push(id);
+  }
+  s.stove = left.length ? { ...pot, left } : null;
+  if (left.length) events.push({ kind: 'plate', ids: left, cabinet: cabinetCap(c, s) > 0 });
+}
+
 /** Nominal energy of one portion today: rarity + quality bonus, same page halves then zeroes (§7.17.1). */
 export function mealValue(c: P0Content, s: P0State, id: string): number {
   const { base, quality } = dishParts(id);
@@ -192,22 +217,28 @@ export function mealValue(c: P0Content, s: P0State, id: string): number {
   return eaten === 0 ? full : eaten === 1 ? Math.ceil(full / 2) : 0;
 }
 
-export function eatDish(c: P0Content, s: P0State, cmd: { item?: unknown }, now: number, events: P0Event[], max: number): Refusal | null {
+/** Eat one portion from the bag, or from the Warming Cabinet with from: "cabinet" (§7.7). */
+export function eatDish(c: P0Content, s: P0State, cmd: { item?: unknown; from?: unknown }, now: number, events: P0Event[], max: number): Refusal | null {
   const id = String(cmd.item ?? '');
+  const from = cmd.from === 'cabinet' ? 'cabinet' : 'bag';
   if (itemKind(id) !== 'dish') return { code: 'not_edible' };
-  if (count(s.bag, id) < 1) return { code: 'not_enough', detail: { item: id, have: 0 } };
+  if (haveDish(c, s, id, from) < 1) return { code: 'not_enough', detail: { item: id, have: 0 } };
   if (s.energy.value >= max) return { code: 'energy_full' };
+  eatFrom(c, s, id, from, events);
+  eatMeal(c, s, id, now, events);
+  return null;
+}
+
+/** One portion eaten (already removed from where it was): daily cap, same-dish decay, energy (§7.17.1). */
+function eatMeal(c: P0Content, s: P0State, id: string, now: number, events: P0Event[]): void {
   const nominal = mealValue(c, s, id);
   const cap = foodCap(c, s, now);
   const counted = Math.max(0, Math.min(nominal, cap - s.day.meals));
-  take(s.bag, id, 1);
-  events.push({ kind: 'item', id, delta: -1 });
   const { base } = dishParts(id);
   s.day.eaten[base] = (s.day.eaten[base] ?? 0) + 1;
   s.day.meals += counted;
   const gain = gainEnergy(c, s, now, counted, events, 'eat');
   events.push({ kind: 'meal', dish: id, nominal, counted, gain, meals: s.day.meals, cap });
-  return null;
 }
 
 const round3 = (x: number) => Math.round(x * 1000) / 1000;
