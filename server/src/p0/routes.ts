@@ -9,9 +9,12 @@ import { add } from './bag.js';
 import { itemName } from './content.js';
 import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
+import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 
-/** presence: players in the outpost rooms right now (SGODOT-227 OutpostRooms.total()); optional. */
-export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean; presence?: () => number }
+/** presence: players in the outpost rooms right now (SGODOT-227 OutpostRooms.total()); log: the observation log (S7). */
+export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean; presence?: () => number; log?: P0EventLog }
+
+const UI_BATCH = 20, UI_PER_MINUTE = 120;
 
 const PLAYER_RE = /^[A-Za-z0-9_-]{8,64}$/;
 
@@ -42,9 +45,32 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const s = store.get(player, deps.now());
     const now = clock(s.clock_ms);
     const result = applyP0(c, s, (req.body ?? {}) as P0Command, now);
+    deps.log?.write({ kind: 'command', t: deps.now(), clock: now, player, seq: s.seq, cmd: commandFields(req.body), ok: result.ok,
+      ...(result.ok ? {} : { code: result.code, detail: result.detail ?? {} }),
+      energy: [s.energy.value, result.ok ? result.state.energy.value : s.energy.value], events: result.ok ? result.events : [] });
     if (!result.ok) return reply.send({ ok: false, code: result.code, detail: result.detail ?? {}, state: view(s, now) });
     store.put(result.state);
     return reply.send({ ok: true, events: result.events, state: view(result.state, now) });
+  });
+
+  /** UI moments for the observation log (S7): known kinds only, a few a minute per player; nothing in the game changes. */
+  const uiSeen = new Map<string, { minute: number; n: number }>();
+  app.post('/v1/p0/telemetry', async (req, reply) => {
+    const player = playerOf(req.headers);
+    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const list = (req.body as { events?: unknown } | undefined)?.events;
+    if (!Array.isArray(list) || list.length > UI_BATCH) return reply.code(400).send({ ok: false, code: 'bad_events' });
+    const t = deps.now(), minute = Math.floor(t / 60_000);
+    const seen = uiSeen.get(player)?.minute === minute ? uiSeen.get(player)! : { minute, n: 0 };
+    uiSeen.set(player, seen);
+    let accepted = 0;
+    for (const raw of list) {
+      const event = uiEvent(raw);
+      if (!event || seen.n >= UI_PER_MINUTE) continue;
+      seen.n += 1; accepted += 1;
+      deps.log?.write({ kind: 'ui', t, player, event });
+    }
+    return reply.send({ ok: true, accepted });
   });
 
   if (!deps.dev) return;
