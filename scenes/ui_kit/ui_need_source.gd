@@ -17,6 +17,10 @@ var _show: UiCommandButton
 ## can_show false hides Show when there is nothing to point the camera at (e.g. a place on the map).
 func _init(text_: String = "", can_show := true) -> void:
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_PILL, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+	# the main floats on a 0 4 12 drop shadow (unbound, α 0.14); the menu shadow is the nearest token (α 0.16)
+	box.shadow_color = UiTokens.COLOR_SHADOW_MENU
+	box.shadow_size = UiTokens.SIZE_SHADOW_MENU_RADIUS
+	box.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_MENU_OFFSET_Y)
 	add_theme_stylebox_override(&"panel", box.with_margins(_PAD.x, _PAD.y, _PAD.z, _PAD.w))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", _GAP)

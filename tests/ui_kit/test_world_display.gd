@@ -88,6 +88,9 @@ func test_need_source_without_a_target_hides_show() -> void:
 	await _settle()
 	var show_btn: UiCommandButton = layer.find_children("*", "UiCommandButton", true, false)[0]
 	assert_bool(show_btn.visible).is_false()
+	var box: UiStyleBox = (layer.get_child(0) as UiNeedSource).get_theme_stylebox(&"panel")
+	assert_that(box.shadow_color).is_equal(UiTokens.COLOR_SHADOW_MENU)   # floats over the world like the main
+	assert_float(box.shadow_offset.y).is_equal(float(UiTokens.SIZE_SHADOW_MENU_OFFSET_Y))
 
 # ---------------------------------------------------------------- HUD
 
