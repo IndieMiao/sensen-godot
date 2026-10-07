@@ -51,11 +51,14 @@ describe('pond templates by point and the cast check (q(36), SGODOT-232 S6)', ()
     expect(applyP0(c, s, { type: 'cast', space: 'pond' }, T + 30)).toMatchObject({ ok: false, code: 'not_at_pond' });
   });
 
-  it('ignores ponds the server does not know or that are not in the home city', () => {
+  it('ignores ponds the server does not know or that are not in the home city, and forgets the last pond for them', () => {
     const s = fresh();
     for (const place of ['pond_los_angeles_05', 'pond_shanghai_99', '']) {
       expect(applyP0(c, s, { type: 'cast', space: 'pond', place }, T)).toMatchObject({ ok: false, code: 'not_at_pond' });
     }
+    s.presence.place = REED;
+    expect(applyP0(c, s, { type: 'cast', space: 'pond', place: 'pond_shanghai_99' }, T)).toMatchObject({ ok: false, code: 'not_at_pond' });
+    expect(applyP0(c, s, { type: 'cast', space: 'pond' }, T).ok).toBe(true);   // no place: the last pond stays
   });
 
   it('the entry read records the pond, so the first cast needs no place', async () => {
