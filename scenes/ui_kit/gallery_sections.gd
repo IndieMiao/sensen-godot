@@ -289,6 +289,14 @@ static func _cells_kitchen() -> Control:
 	row.add_child(_captioned(_cell(D, {icon = _tex("dish_carp_cakes"), state = S.SELECTED}), "selected"))
 	row.add_child(_captioned(_cell(D, {icon = _tex("dish_radish_salad"), marked = true}), "cooked"))
 	row.add_child(_captioned(_cell(D, {state = S.EMPTY}), "empty"))
+	var K := UiItemCell.KitchenState
+	row.add_child(_captioned(_cell(D, {kitchen_state = K.HIDDEN}), "hidden"))
+	row.add_child(_captioned(_cell(D, {kitchen_state = K.CLUED}), "clued"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("dish_fish_soup"), kitchen_state = K.TASTED}), "tasted"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("dish_grilled_fish"), kitchen_state = K.MASTERED}), "mastered"))
+	row.add_child(_captioned(_cell(D, {kitchen_state = K.LOCKED}), "locked"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("fish_crucian"), quantity = "×2", rarity = 1, kitchen_state = K.IN_POT}), "in pot"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("fish_koi"), rarity = 3, kitchen_state = K.NOT_FOR_COOKING}), "not for cooking"))
 	return row
 
 static func _cells_gear() -> Control:

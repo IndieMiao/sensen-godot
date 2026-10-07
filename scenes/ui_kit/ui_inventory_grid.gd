@@ -10,6 +10,7 @@ extends TouchScrollContainer
 ##   sell_mode  the counter's "Sell here" view: only items `can_sell` accepts are listed (LOCK-15); the rest
 ##              of the bag is not shown, so there is no Sell tab and no greyed cell to explain.
 ## Items are dictionaries: {id, icon (Texture2D), qty, rarity (0–4), ...}; extra keys pass through to the hooks.
+## KITCHEN cells also take status, marked and kitchen_state (UiItemCell.KitchenState).
 ## `density` KITCHEN draws Compact/Kitchen/Cell (52×58) for the cooking drawer's Experiment page (LOCK-20,
 ## SGODOT-226); items may then carry `status` ("In pot", "Not for cooking") and `marked` (cooked tick).
 
@@ -110,12 +111,14 @@ func refresh() -> void:
 			c.rarity = int(it.get("rarity", 0))
 			c.status = str(it.get("status", ""))
 			c.marked = bool(it.get("marked", false))
+			c.kitchen_state = int(it.get("kitchen_state", UiItemCell.KitchenState.DEFAULT))
 		else:
 			c.icon = null
 			c.quantity = ""
 			c.rarity = 0
 			c.status = ""
 			c.marked = false
+			c.kitchen_state = UiItemCell.KitchenState.DEFAULT
 	if selected_id != "" and _item(selected_id).is_empty():
 		clear_selection()
 	else:
