@@ -254,3 +254,44 @@ func test_resident_bar_stacks_the_choices_when_one_carries_a_reason() -> void:
 	assert_array(_navs(b)).is_equal(["Today’s meal", "Recipe lesson"])
 	var deliver: UiResidentBar = _host(UiResidentBar.new(_pip({request_label = "Deliver"})))
 	assert_str(deliver.request_button().text).is_equal("Deliver")
+
+# ---------------------------------------------------------------- UiBagHeader / UiGearRow
+
+func test_bag_header_count_sort_and_capacity_bar() -> void:
+	var h: UiBagHeader = _host(UiBagHeader.new(19, 25))
+	await _settle()
+	assert_array(_texts(h)).contains(["Bag 19/25"])
+	assert_str(h.sort_button().label).is_equal("Sort · Recent")
+	assert_bool(h.sort_button().visible).is_true()
+	assert_bool(h.is_nearly_full()).is_false()
+	h.used = 23   # 92 %: amber (§10.4.1)
+	assert_bool(h.is_nearly_full()).is_true()
+	var got := []
+	h.side_changed.connect(func(s: int): got.append(s))
+	h.tabs().tabs()[1].pressed.emit()
+	h.tabs().tabs()[1].button_pressed = true
+	assert_array(got).contains([1])
+	assert_bool(h.sort_button().visible).is_false()   # Sort is a Bag-side control
+	h.side = UiBagHeader.Pane.BAG
+	h.show_tabs = false                               # the gift drawer: just the count
+	assert_bool(h.tabs().visible).is_false()
+	assert_bool(h.sort_button().visible).is_false()
+	assert_bool(h._title.visible).is_true()
+
+func test_gear_row_states() -> void:
+	var rod := load("res://assets/p0/icons/rod_starter.svg")
+	var eq: UiGearRow = _host(UiGearRow.new({icon = rod, title = "Starter Rod", state = &"equipped", effect = "Lands up to Fine fish"}))
+	var owned: UiGearRow = _host(UiGearRow.new({icon = rod, title = "Reed Rod", state = &"owned", effect = "Lands up to Rare fish",
+		action = {id = &"equip", label = "Equip", kind = &"secondary"}}))
+	var locked: UiGearRow = _host(UiGearRow.new({icon = rod, title = "Carbon Rod", state = &"Fishing Lv5 · Tackle Shop", effect = "Lands up to Legendary fish"}))
+	await _settle()
+	assert_array(_texts(eq)).contains(["✓ Equipped"])
+	assert_object(eq.action_button()).is_null()
+	assert_array(_texts(owned)).contains(["Owned"])
+	var got := []
+	owned.action_pressed.connect(func(a: StringName): got.append(a))
+	owned.action_button().activated.emit()
+	assert_array(got).is_equal([&"equip"])
+	assert_array(_texts(locked)).contains(["Fishing Lv5 · Tackle Shop"])
+	assert_object(locked.action_button()).is_null()
+	assert_float(locked._icon.modulate.a).is_equal_approx(UiTokens.OPACITY_UNAVAILABLE_ICON, 0.001)

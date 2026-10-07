@@ -31,6 +31,8 @@ static func all() -> Array[Dictionary]:
 		{id = "drawer", title = "UiDrawer", figma = "Sheet 483:190 · bag drawer of BAG-2-2 · LOCK-12 / 15 (328/360)", build = _drawers},
 		{id = "inventory_grid", title = "UiInventoryGrid", figma = "Bag layout five-column grid · LOCK-12 / 15", build = _inventory_grids},
 		{id = "dialogue_card", title = "UiDialogueCard", figma = "Head of KeeperGreeting 1205:83238 / ResidentDialogue 1213:83392 (336 at 328)", build = _dialogue_cards},
+		{id = "bag_header", title = "UiBagHeader", figma = "BagHeader 1225:83885 · LOCK-12 / 13", build = _bag_headers},
+		{id = "gear_row", title = "UiGearRow", figma = "Gear candidate rows of BAG-2 · Gear · LOCK-13", build = _gear_rows},
 		{id = "resident_bar", title = "UiResidentBar", figma = "ResidentDialogue 1213:83392 Row / Stacked · LOCK-18 (336 at 328)", build = _resident_bars},
 	]
 	return out
@@ -460,4 +462,24 @@ static func _resident_bars() -> Control:
 	var busy := pip.duplicate()
 	busy.merge({gift_reason = "Gift already given today", meal = false, lesson = false}, true)
 	v.add_child(_captioned(_at_336(UiResidentBar.new(busy)), "Choices=Stacked · Gift unavailable with its reason (NPC-5 layout)"))
+	return v
+
+static func _bag_headers() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(UiBagHeader.new(19, 25), "Bag side · Sort · Recent · capacity bar"))
+	v.add_child(_captioned(UiBagHeader.new(23, 25), "92 % full · amber bar"))
+	v.add_child(_captioned(UiBagHeader.new(19, 25, UiBagHeader.Pane.GEAR), "Gear side · no Sort, no bar"))
+	var gift := UiBagHeader.new(19, 25)
+	gift.show_tabs = false
+	v.add_child(_captioned(gift, "gift drawer · count only"))
+	return v
+
+static func _gear_rows() -> Control:
+	var v := _column(0)
+	var rod := _tex("rod_starter")
+	v.add_child(UiGearRow.equipped_badge())
+	v.add_child(UiGearRow.new({icon = rod, title = "Starter Rod", state = &"equipped", effect = "Lands up to Fine fish"}))
+	v.add_child(UiGearRow.new({icon = _tex("rod_reed"), title = "Reed Rod", state = &"owned", effect = "Lands up to Rare fish · Bite window +0.4 s",
+		action = {id = &"equip", label = "Equip", kind = &"secondary"}}))
+	v.add_child(UiGearRow.new({icon = _tex("rod"), title = "Carbon Rod", state = &"Fishing Lv5 · Tackle Shop", effect = "Lands up to Legendary fish"}))
 	return v
