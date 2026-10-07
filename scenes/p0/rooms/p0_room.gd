@@ -402,7 +402,7 @@ func p0_tap(screen: Vector2) -> void:
 	if n != "": walk_to(n)
 
 func p0_frame(v: Dictionary, dt: float) -> void:
-	if _leaving: return
+	if _leaving or not is_inside_tree(): return
 	actor.step(dt)
 	if not _walk.is_empty() and not actor.mover.is_moving():
 		if _flat_distance(actor.position, _walk.point) <= REACH_M: _arrive()
@@ -484,15 +484,18 @@ func p0_show_spot(where: String) -> void:
 			_follow.hold()
 			return
 
+## Back = tapping the door. Whenever the room handles Back itself (walking out, or already leaving) it
+## returns true, so AppRouter never pops a second level (the room may have popped itself synchronously when
+## the player stood at the door; SGODOT-227 found this sending the app to the old map).
 func is_back_navigation_locked() -> bool:
 	if rt and rt.ui.has_modal():
 		rt.ui.close_modal()
 		return true
-	# Back = tapping the door: walk out (a second Back while walking leaves at once).
-	if anchor("exit") and not _leaving:
-		if not _walk.is_empty() and str(_walk.name) == "exit": return false
-		walk_to("exit")
-		return not _leaving
+	if _leaving: return true
+	if anchor("exit"):
+		if not _walk.is_empty() and str(_walk.name) == "exit": leave()   # Back again while walking out
+		else: walk_to("exit")
+		return true
 	return false
 
 func suspend() -> void:

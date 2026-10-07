@@ -241,3 +241,26 @@ func test_a_room_that_fits_the_screen_holds_its_framing_while_walking() -> void:
 	r.p0_joystick(Vector2(-1, 0))
 	for i in 30: r.p0_frame({}, 1.0 / 30.0)
 	assert_bool(r.cam.global_position.is_equal_approx(before)).is_false()
+
+func test_back_is_always_handled_by_the_room_so_the_router_never_pops_twice() -> void:
+	var r := _room()
+	var left := [0]
+	r.left.connect(func(): left[0] += 1)
+	# Far from the door: Back starts the walk out and is handled.
+	assert_bool(r.is_back_navigation_locked()).is_true()
+	assert_int(left[0]).is_equal(0)
+	# Back again while walking out leaves at once, still handled.
+	assert_bool(r.is_back_navigation_locked()).is_true()
+	assert_int(left[0]).is_equal(1)
+	assert_bool(r.is_back_navigation_locked()).is_true()
+	assert_int(left[0]).is_equal(1)
+
+func test_back_at_the_door_leaves_at_once_and_is_still_handled() -> void:
+	var r := _room()
+	var left := [0]
+	r.left.connect(func(): left[0] += 1)
+	var door := r.anchor("exit").global_position
+	r.actor.teleport(Vector3(door.x, r.floor_y, door.z))
+	assert_bool(r.is_back_navigation_locked()).is_true()
+	assert_int(left[0]).is_equal(1)
+	r.p0_frame({}, 0.1)   # a frame after leaving does nothing
