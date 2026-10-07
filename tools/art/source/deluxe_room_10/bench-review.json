@@ -1,0 +1,331 @@
+{
+  "spawn": [
+    3.85,
+    0.09,
+    -2.84
+  ],
+  "bench": {
+    "floor_y": 0.08,
+    "route": [
+      {
+        "name": "door",
+        "position": [
+          3.73,
+          0.08,
+          -1.1
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "living coffee table",
+        "position": [
+          3.68,
+          0.08,
+          1.0
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "dining beside long table",
+        "position": [
+          -0.9,
+          0.08,
+          0.97
+        ]
+      },
+      {
+        "name": "island front",
+        "position": [
+          -2.25,
+          0.08,
+          1.03
+        ]
+      },
+      {
+        "name": "kitchen sink",
+        "position": [
+          -3.45,
+          0.08,
+          0.96
+        ]
+      },
+      {
+        "name": "stair approach",
+        "position": [
+          -0.55,
+          0.08,
+          1.03
+        ]
+      },
+      {
+        "name": "stair foot",
+        "position": [
+          -0.27,
+          0.08,
+          0.23
+        ]
+      },
+      {
+        "name": "stair top",
+        "position": [
+          -0.27,
+          2.49,
+          -3.34
+        ]
+      },
+      {
+        "name": "loft entry",
+        "position": [
+          0.85,
+          2.49,
+          -3.34
+        ]
+      },
+      {
+        "name": "bedside",
+        "position": [
+          0.92,
+          2.49,
+          -1.9
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "island",
+        "from": [
+          -2,
+          0.09,
+          -1.4
+        ],
+        "to": [
+          -2,
+          0.09,
+          -0.3
+        ],
+        "target": "island"
+      },
+      {
+        "name": "dining table",
+        "from": [
+          -1.05,
+          0.09,
+          0.9
+        ],
+        "to": [
+          -1.05,
+          0.09,
+          2.43
+        ],
+        "target": "dining_table"
+      },
+      {
+        "name": "sofa",
+        "from": [
+          2.04,
+          0.09,
+          -1.35
+        ],
+        "to": [
+          2.04,
+          0.09,
+          -0.03
+        ],
+        "target": "sofa"
+      },
+      {
+        "name": "hearth",
+        "from": [
+          2.14,
+          0.09,
+          -0.95
+        ],
+        "to": [
+          2.14,
+          0.09,
+          -1.77
+        ],
+        "target": "hearth"
+      },
+      {
+        "name": "kitchen cabinet",
+        "from": [
+          -3.35,
+          0.09,
+          1.35
+        ],
+        "to": [
+          -4.1,
+          0.09,
+          1.35
+        ],
+        "target": "sink_cabinet"
+      },
+      {
+        "name": "loft guard",
+        "from": [
+          1.25,
+          2.49,
+          -1.75
+        ],
+        "to": [
+          1.25,
+          2.49,
+          -0.7
+        ],
+        "target": "loft_structure"
+      },
+      {
+        "name": "under stair headroom",
+        "from": [
+          -1.5,
+          0.09,
+          -1.5
+        ],
+        "to": [
+          -0.27,
+          0.09,
+          -1.5
+        ],
+        "target": "back_wall_stairs"
+      },
+      {
+        "name": "front edge",
+        "from": [
+          0.05,
+          0.09,
+          3.35
+        ],
+        "to": [
+          0.05,
+          0.09,
+          4.2
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "east edge",
+        "from": [
+          4,
+          0.09,
+          0.1
+        ],
+        "to": [
+          5,
+          0.09,
+          0.1
+        ],
+        "target": "room_shell"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "island to dining chairs",
+        "from": [
+          -0.9,
+          0.09,
+          1.02
+        ],
+        "to": [
+          -2.7,
+          0.09,
+          1.02
+        ],
+        "measure": [
+          [
+            -1.91,
+            0.7,
+            0.53
+          ],
+          [
+            -1.91,
+            0.7,
+            1.285
+          ]
+        ],
+        "minimum": 0.7,
+        "width": 0.755
+      },
+      {
+        "name": "sofa to coffee table",
+        "from": [
+          3.65,
+          0.09,
+          1.0
+        ],
+        "to": [
+          1.1,
+          0.09,
+          1.0
+        ],
+        "measure": [
+          [
+            2.13,
+            0.6,
+            0.42
+          ],
+          [
+            2.13,
+            0.6,
+            1.3542
+          ]
+        ],
+        "minimum": 0.7,
+        "width": 0.9342
+      }
+    ],
+    "entrance": {
+      "inside": [
+        3.85,
+        0.09,
+        -2.91
+      ],
+      "outside": [
+        3.93,
+        0.09,
+        -4.06
+      ]
+    },
+    "slide": {
+      "from": [
+        4.3,
+        0.09,
+        0.6
+      ],
+      "direction": [
+        1,
+        0,
+        -1
+      ],
+      "tangent": [
+        0,
+        0,
+        -1
+      ],
+      "seconds": 0.8
+    },
+    "input_start": [
+      0.05,
+      0.09,
+      0.85
+    ],
+    "scale": {
+      "door": {
+        "height": 2.33,
+        "source": "Sage arched doorway"
+      },
+      "counter": {
+        "height": 1.17,
+        "source": "Island oak worktop; stools .78m top"
+      },
+      "chair": {
+        "height": 0.7825,
+        "source": "Solid chair plus tied cushion"
+      },
+      "table": {
+        "height": 1.135,
+        "source": "Long dining table top; low coffee table .613m is a distinct category"
+      }
+    }
+  }
+}

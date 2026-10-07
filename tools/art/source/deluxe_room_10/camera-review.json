@@ -1,0 +1,33 @@
+{
+  "method": "Three visible plinth edge intersections; fourth inferred. Reference contained proportionally in 1440x1080; no warp.",
+  "anchors": {
+    "left": [
+      88.32000000000001,
+      704.352
+    ],
+    "front": [
+      731.904,
+      1031.52
+    ],
+    "right": [
+      1314.816,
+      693.6
+    ]
+  },
+  "pitch_degrees": 32.878578444448685,
+  "yaw_degrees": 43.119876545625736,
+  "camera": {
+    "position": [
+      11.619959578114093,
+      13.051212664418355,
+      12.4087283555969
+    ],
+    "target": [
+      0,
+      2.0624332279651845,
+      0
+    ],
+    "size": 15.460905247503812
+  },
+  "limits": "Reference base is squarer than retained 9.6x7.8m plinth; fit uses edge slopes and mean scale, with 8% whole-room margin. Direct overlay retains corner residuals."
+}

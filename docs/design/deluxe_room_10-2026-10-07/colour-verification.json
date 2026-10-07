@@ -1,0 +1,159 @@
+{
+  "method": "11x11 RGB median; circular HSV hue distance; fixed declared corresponding lit faces",
+  "checks": [
+    {
+      "name": "left_plaster",
+      "surface": "Lit plaster above the kitchen window",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          330,
+          291
+        ],
+        "rgb": [
+          253,
+          228,
+          185
+        ],
+        "hex": "#FDE4B9",
+        "hue_degrees": 37.941,
+        "saturation": 0.2688,
+        "value": 0.9922
+      },
+      "runtime": {
+        "pixel": [
+          316,
+          314
+        ],
+        "rgb": [
+          216,
+          177,
+          126
+        ],
+        "hex": "#D8B17E",
+        "hue_degrees": 34.0,
+        "saturation": 0.4167,
+        "value": 0.8471
+      },
+      "hue_delta_degrees": 3.941,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "back_plaster",
+      "surface": "Lit upper plaster to the right of the loft, above the door",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          1203,
+          329
+        ],
+        "rgb": [
+          222,
+          188,
+          164
+        ],
+        "hex": "#DEBCA4",
+        "hue_degrees": 24.828,
+        "saturation": 0.2613,
+        "value": 0.8706
+      },
+      "runtime": {
+        "pixel": [
+          1230,
+          464
+        ],
+        "rgb": [
+          227,
+          179,
+          118
+        ],
+        "hex": "#E3B376",
+        "hue_degrees": 33.578,
+        "saturation": 0.4802,
+        "value": 0.8902
+      },
+      "hue_delta_degrees": 8.75,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "front_post",
+      "surface": "Front left timber post interior face",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          133,
+          448
+        ],
+        "rgb": [
+          239,
+          148,
+          68
+        ],
+        "hex": "#EF9444",
+        "hue_degrees": 28.07,
+        "saturation": 0.7155,
+        "value": 0.9373
+      },
+      "runtime": {
+        "pixel": [
+          179,
+          439
+        ],
+        "rgb": [
+          166,
+          93,
+          35
+        ],
+        "hex": "#A65D23",
+        "hue_degrees": 26.565,
+        "saturation": 0.7892,
+        "value": 0.651
+      },
+      "hue_delta_degrees": 1.505,
+      "limit_degrees": 10,
+      "passed": true
+    },
+    {
+      "name": "floor",
+      "surface": "Uncovered horizontal floor between rugs, world [0.28,0.083,3.25]",
+      "patch_size": 11,
+      "reference": {
+        "pixel": [
+          661,
+          871
+        ],
+        "rgb": [
+          254,
+          192,
+          118
+        ],
+        "hex": "#FEC076",
+        "hue_degrees": 32.647,
+        "saturation": 0.5354,
+        "value": 0.9961
+      },
+      "runtime": {
+        "pixel": [
+          532,
+          824
+        ],
+        "rgb": [
+          224,
+          147,
+          69
+        ],
+        "hex": "#E09345",
+        "hue_degrees": 30.194,
+        "saturation": 0.692,
+        "value": 0.8784
+      },
+      "hue_delta_degrees": 2.454,
+      "limit_degrees": 10,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": "Representative patches only. Full image retains independent brightness/saturation/composition differences."
+}

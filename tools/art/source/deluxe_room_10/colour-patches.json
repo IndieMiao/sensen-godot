@@ -1,0 +1,59 @@
+{
+  "patches": [
+    {
+      "name": "left_plaster",
+      "surface": "Lit plaster above the kitchen window",
+      "reference": [
+        330,
+        291
+      ],
+      "runtime": [
+        316,
+        314
+      ]
+    },
+    {
+      "name": "back_plaster",
+      "surface": "Lit upper plaster to the right of the loft, above the door",
+      "reference": [
+        1203,
+        329
+      ],
+      "runtime": [
+        1230,
+        464
+      ]
+    },
+    {
+      "name": "front_post",
+      "surface": "Front left timber post interior face",
+      "reference": [
+        133,
+        448
+      ],
+      "runtime": [
+        179,
+        439
+      ]
+    },
+    {
+      "name": "floor",
+      "surface": "Uncovered horizontal floor between rugs, world [0.28,0.083,3.25]",
+      "reference": [
+        661,
+        871
+      ],
+      "runtime": [
+        532,
+        824
+      ]
+    }
+  ],
+  "sample_classification_correction": {
+    "discarded_pixel": [
+      963,
+      917
+    ],
+    "reason": "Initial point was on the vertical plinth edge, not the declared floor face. Floor patch now projected from fixed world [0.28,0.083,3.25], before material tuning. Prior 11.218-degree edge result retained in preliminary file."
+  }
+}

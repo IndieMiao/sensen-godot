@@ -1,0 +1,42 @@
+{
+  "door": {
+    "source_objects": [
+      "Sage arched door"
+    ],
+    "height_above_floor": 2.297999876022339,
+    "clear_height": 2.329999875277281,
+    "world_min_y": 0.05000000074505806,
+    "world_max_y": 2.379999876022339
+  },
+  "counter": {
+    "source_objects": [
+      "Oak counter.003"
+    ],
+    "height_above_floor": 1.170000093460083,
+    "clear_height": null,
+    "world_min_y": 1.1119999885559082,
+    "world_max_y": 1.252000093460083
+  },
+  "chair": {
+    "source_objects": [
+      "Sage chair seat pad"
+    ],
+    "height_above_floor": 0.7824999861717225,
+    "clear_height": null,
+    "world_min_y": 0.7195000052452087,
+    "world_max_y": 0.8644999861717224
+  },
+  "table": {
+    "source_objects": [
+      "Individual tabletop board.005",
+      "Individual tabletop board.006",
+      "Individual tabletop board.007",
+      "Individual tabletop board.008",
+      "Individual tabletop board.009"
+    ],
+    "height_above_floor": 1.1350000076293945,
+    "clear_height": null,
+    "world_min_y": 1.066999912261963,
+    "world_max_y": 1.2170000076293945
+  }
+}

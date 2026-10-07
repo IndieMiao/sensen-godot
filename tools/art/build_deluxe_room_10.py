@@ -157,4 +157,6 @@ def build():
     finalize({'position':[12,11,14],'target':[0,1.8,0],'size':14.7});complete()
 
 
-if __name__=='__main__':build()
+if __name__=='__main__':
+    import runpy
+    runpy.run_path(str(Path(__file__).resolve().parent/'source/deluxe_room_10/revision.py'),run_name='__main__')

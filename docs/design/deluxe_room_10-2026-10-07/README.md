@@ -1,55 +1,48 @@
-# Deluxe Room-10 · art review candidate
+# SGODOT-173 · Deluxe Room-10 review revision
 
-Plane [SGODOT-173](https://plane.sensenjoy.cn/zili/browse/SGODOT-173), owner Zhao Yun / 赵云. **In Progress, awaiting user review.** Produced 2026-10-07 under the user's request to proceed sequentially overnight and send each scene through Lark CLI.
+赵云 · revised for **Review** after the director's SGODOT-172 R2 release. Reference: Figma `OMLTC3yw3u2WDjOZhLnhaR`, SceneDesign, node `545:2970`. Basic Room's accepted scale and Liu Bei's shared botanical library are read-only dependencies.
 
-Reference: Figma file `OMLTC3yw3u2WDjOZhLnhaR`, node [545:2970](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=545-2970). The [original export](reference.png) was downloaded and visually inspected before modeling.
+![Reference / revised actual Godot / direct 50% overlay](comparison.png)
 
-![Figma and actual Godot render](comparison.png)
+[Whole scene](godot.png) · [Kitchen](detail-kitchen.png) · [Loft and stairs](detail-loft.png) · [Living](detail-living.png) · [Editable-model orthographics](orthographic-sheet.png).
 
-The larger home includes a structural loft with balustrades and landing, 12 real steps, a bed with checked duvet and curtains, kitchen sink/range/hood and island with three reused stools, a fireplace, a widened sofa, coffee table, television console and four-chair dining area. Furniture source is reused read-only from Basic Room and Standard Room, with scene-local modifications and rebaking.
+| Review requirement | Final implementation |
+|---|---|
+| Spatial layout | Left-wall sink/prep/range/pantry, island with three reused stools, rear stairs rising to the right-back loft. Under-loft bookcase, rounded hearth, separate wood niche and right door. Front-left long dining table with six instances of one padded chair; front-right sofa, low coffee table and TV console. Both main rugs are pale natural jute. |
+| Loft and navigation | Structural posts and heavy crossbeam remain visible. Thirteen visual treads sit over one continuous ramp-to-landing convex collider. Outer stair guard stops before the turning opening; loft front/west guards block falling. The solid wedge closes low-headroom under-stair access. Floor is approximately 2.46m high, underside approximately 2.23m, retaining the 1.7455m fixture's clearance. |
+| Kitchen | Broad cream trapezoid hood with an oak lip, four-burner oven and cooking pot; glazed jars, open pantry, utensil crock, fruit bowl and flowers. Green enamel pendant has a long black flex and an unshadowed local warm lamp. Island towel and runner use metric UVs. |
+| Loft dressing | Checked duvet follows physical fold length, two pillows, drawer nightstand with warm lamp, a real upper arched aperture with green frame, white tied curtains, botanical print and trailing shared plants. |
+| Living and dining | Continuous cream upholstered sofa, green and checked cushions, wicker basket, books and ceramic mug. TV console has drawers, knobs and open cubby. Long dining table has a metric checked runner, daisies, six thick solid chairs and tied green pads. Low coffee table is intentionally a distinct furniture category. |
+| Hearth and door | Rounded cream plaster, orange gradient flame, charred logs/embers, matte irregular split-log niche, mantel landscape and candlesticks, warm table/wall lighting, greenery near the entry and striped mat. Mantel projects ahead of the loft beam so it reads in the whole scene. |
+| Materials and batching | Warm timber and lightly textured plaster, room-wide static contact AO, one shadowed sun and four short-range unshadowed lights. Editable named parts remain in the Blender source; fittings and soft goods are grouped by zone at export. Repeated chairs/stools share local-pivot GLBs. Supplied double-sided alpha-scissor plant material is retained; foliage/flowers/backgrounds do not cast shadows. |
 
-## Deliverables
+## Camera and colour evidence
 
-- [Editable Blender model](../../../tools/art/source/deluxe_room_10/deluxe_room_10.blend), with named objects and module collections.
-- [Deterministic scene generator](../../../tools/art/build_deluxe_room_10.py), using the [room pipeline](../../../tools/art/scene_room_pipeline.py).
-- [GLB placement and collision manifest](../../../assets/rooms/deluxe_room_10/layout.json), individual local pivots and a shared external base-color/contact-AO atlas.
-- [Reusable Godot art scene](../../../scenes/deluxe_room_10/deluxe_room_10_art.tscn), without gameplay/account/network dependencies.
-- [Whole-scene runtime image](godot.png), [model orthographic views](orthographic-sheet.png), [budget and verification hashes](verification-summary.json).
+The camera uses the three declared visible plinth-edge intersections, with the hidden fourth inferred. The concept's floor is squarer and its upper back corner is offset relative to a perfect orthographic rectangular room. The retained physical plinth is 9.6×7.8m: edge slopes determine yaw/pitch; mean horizontal scale plus an 8% framing margin keeps the entire ceiling visible. The direct overlay exposes those remaining shape/projection differences; no image warp or pixel-fidelity score is used. [Fit inputs and limits](../../../tools/art/source/deluxe_room_10/camera-review.json).
 
-## Reconstruction and contract
+[Marked surface samples](colour-samples.png) and [full RGB/HSV results](colour-verification.json) record corresponding left plaster, right plaster, front post and horizontal floor. An early supposed floor pixel was on the vertical plinth: its 11.218° result is retained in the private preliminary evidence, and the floor point was then projected from the fixed declared world position `[0.28,0.083,3.25]` before material tuning. Later the fixed back-wall patch rose to 12.925° after hearth placement; the wall material was corrected at the same point. Final hue differences are **3.941° / 8.750° / 1.505° / 2.454°**, all ≤10°. Saturation and brightness remain separately reported.
+
+## Validation and rebuild
+
+**38/38 rendered checks and the unaccelerated 15-second route video pass.** The fixture traverses ten sequential waypoints: door, living, dining, island, sink, stair approach/foot/top, loft entry, bedside. Probes cover furniture, kitchen cabinetry, the closed stair underside, loft guard and open diorama edges. Live measured main aisles are 0.755m between island seating/dining seating and 0.9342m between sofa and coffee table, above the card's 0.70m minimum. Door exit/reentry, diagonal wall sliding, input release and advancing idle/run animation are checked.
+
+[Per-check results](bench-result.json) · [Scale ratios](bench-scale-measurements.json) · [Blender source dimensions](source-scale.json) · [Metric cloth checks](cloth-uv-verification.json) · [Actual colliders](bench-collisions.png) · [Unaccelerated 15-second video frames](video-frames.png).
+
+Measured source heights: door clear 2.33m, island top 1.17m (+1.52%), padded chair .7825m (+14.23%), dining table 1.135m (baseline). All applicable categories stay within ±15% of Basic Room. Three .78m stools serve the higher island; the .613m coffee table is a deliberately lower category, not a replacement for the dining-table baseline.
+
+**153,671 / 200,000 placed triangles**, **30,012 / 100,000 botanical triangles**, **57 / 60 static surfaces**. Exact budgets, delivered GLB UV/normal/image checks and file hashes are in [verification-summary.json](verification-summary.json). Limits are ≤200,000 total / ≤100,000 botanical / ≤60 static surfaces. Character evidence is Godot 4.7.2 Mobile/Vulkan on AMD Custom GPU 0405 (RADV VANGOGH); it is desktop behavioral validation, not physical-phone performance acceptance.
 
 ```sh
 blender --background --factory-startup --python "$PWD/tools/art/build_deluxe_room_10.py" -- --views
+blender --background --factory-startup --python "$PWD/tools/art/source/deluxe_room_10/measure_review.py"
+python3 tools/art/create_room_scene.py deluxe_room_10
 python3 tools/art/prepare_room_review.py deluxe_room_10
-godot --headless --editor --path output/deluxe_room_10-2026-10-07/godot-project --import --quit
-godot --path output/deluxe_room_10-2026-10-07/godot-project \
-  --script res://tools/art/review_room.gd -- deluxe_room_10 \
-  "$PWD/output/deluxe_room_10-2026-10-07"
+# Import, retain configure_room_imports.py settings, then capture through review_room.gd.
+python3 tools/dev/scene_bench/prepare.py deluxe_room_10
+# Import the isolated bench, then run on the current real display:
+python3 tools/dev/scene_bench/run.py deluxe_room_10 --record --output output/zhaoyun-173-review-2026-10-07/bench
+python3 tools/art/check_room_colour.py deluxe_room_10 173
+python3 tools/art/package_room_review.py deluxe_room_10 173
 ```
 
-Use the actual host display for rendering. Blender 5.2.0 LTS and Godot 4.7.2 were used here. `--geometry-only` skips bake/export. Rebuilding replaces this scene's `.blend`; preserve manual edits deliberately. Source assets from Basic Room remain read-only.
-
-Coordinates are metres, Godot Y-up/front +Z and Blender `(x,-z,y)`. Modules export about their own floor/mounting pivot; placement is in the manifest. The baked atlas contains procedural surface detail and softened contact AO, with live runtime sunlight. Rebake after major rearrangement. Raw GLBs must bind this atlas. Triangulation occurs before UV bake/export to keep surface interpolation consistent, and empty atlas gutters are extended before mip generation.
-
-## Validation and budget
-
-Actual Godot **Mobile / Vulkan**, AMD Custom GPU 0405 (RADV VANGOGH), 1440×1080. 55 meshes have atlas materials and finite nonempty bounds; 44 simple collision shapes are present. The imported triangle count matches the export manifest.
-
-| Metric | Measured |
-|---|---:|
-| Unique GLBs / placed instances | 50 / 55 |
-| Unique / placed triangles | 116,062 / 120,302 |
-| Static surfaces | 55 |
-| GLB bytes combined | 4,274,720 |
-| Atlas source PNG bytes | 2,729,278 |
-| Shared atlas | 2048 × 2048 |
-
-Texture imports enable mipmaps and VRAM compression. Fine geometry keeps uncompressed vertices and disables automatic mesh LODs. Static surface counts exclude renderer shadow passes; PNG bytes are not GPU memory. No physical-phone performance measurement is claimed.
-
-## Inferences and differences
-
-The single perspective gives no measured dimensions. The 9.2 × 7.4m footprint, 4.9m wall height, 2.68m stair rise, hidden backs, landing and support structure are inferred. The reference uses more compact furniture grouping and a small upper window; this candidate simplifies upper-wall decoration and the fireplace silhouette, retains Basic Room plant/scenery detail, and uses a greener rug and simpler cloth. The television faces the sofa, so the review camera sees its back. Lighting is the Mobile renderer with contact AO, without real-time GI.
-
-The staircase uses individual tread boxes and a separate top-landing box meeting the loft edge. The loft has a floor slab, support-post boxes and simple guardrail volumes. These are structural checks, not a gameplay traversal claim; an eventual controller must define its step/climb policy.
-
-This is an art-only candidate awaiting review. No gameplay/map integration, avatar benchmark, Android QA, production build, migration or release is included.
+The builder delegates to `tools/art/source/deluxe_room_10/revision.py`. Source edits belong in that deterministic generator; the `.blend` retains named editable parts and reusable pivots. No gameplay, saves, release presets or another artist's assets are changed.

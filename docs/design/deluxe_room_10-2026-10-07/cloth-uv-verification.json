@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "object": "Island folded runner",
+      "uv_layer": "MetricClothUV",
+      "minimum": 0.9999984397932858,
+      "maximum": 1.0303189332329645,
+      "edges": 3136,
+      "passed": true
+    },
+    {
+      "object": "Island side checked towel",
+      "uv_layer": "MetricClothUV",
+      "minimum": 0.9929491214235922,
+      "maximum": 1.0303396718035953,
+      "edges": 2128,
+      "passed": true
+    },
+    {
+      "object": "Square gingham bed duvet",
+      "uv_layer": "MetricClothUV",
+      "minimum": 0.9846095230686174,
+      "maximum": 1.0153985334288427,
+      "edges": 5488,
+      "passed": true
+    },
+    {
+      "object": "Long dining runner square gingham",
+      "uv_layer": "MetricClothUV",
+      "minimum": 0.9859962457844115,
+      "maximum": 1.0303279136668235,
+      "edges": 14336,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

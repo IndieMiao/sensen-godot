@@ -1,0 +1,966 @@
+{
+  "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+  "checks": [
+    {
+      "details": null,
+      "name": "Default Avatar fixture assembles",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Bench route/probe schema",
+      "passed": true
+    },
+    {
+      "details": 0.0900000035762787,
+      "name": "Spawn stands on authored floor",
+      "passed": true
+    },
+    {
+      "details": "(3.85, 0.09, -2.84)",
+      "name": "Spawn capsule clear",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/DeluxeRoom10Art/door_right_plant/@StaticBody3D@93"
+        ],
+        "final": [
+          3.73323750495911,
+          0.0899360030889511,
+          -1.18417942523956
+        ],
+        "from": [
+          3.84999990463257,
+          0.0900000035762787,
+          -2.83999991416931
+        ],
+        "name": "door",
+        "reached": true,
+        "remaining_m": 0.0848255679011345,
+        "seconds": 0.349,
+        "target": [
+          3.73000001907349,
+          0.0799999982118607,
+          -1.10000002384186
+        ]
+      },
+      "name": "Route: door",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          3.6818163394928,
+          0.0899334624409676,
+          0.925478577613831
+        ],
+        "from": [
+          3.73323750495911,
+          0.0899360030889511,
+          -1.18417942523956
+        ],
+        "name": "living coffee table",
+        "reached": true,
+        "remaining_m": 0.0752024948596954,
+        "seconds": 0.472,
+        "target": [
+          3.6800000667572,
+          0.0799999982118607,
+          1.0
+        ]
+      },
+      "name": "Route: living coffee table",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -0.811931073665619,
+          0.0899368822574615,
+          0.969144284725189
+        ],
+        "from": [
+          3.6818163394928,
+          0.0899334624409676,
+          0.925478577613831
+        ],
+        "name": "dining beside long table",
+        "reached": true,
+        "remaining_m": 0.0886318534612656,
+        "seconds": 1.102,
+        "target": [
+          -0.899999976158142,
+          0.0799999982118607,
+          0.970000028610229
+        ]
+      },
+      "name": "Route: dining beside long table",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.17276620864868,
+          0.0899342373013496,
+          1.02673172950745
+        ],
+        "from": [
+          -0.811931073665619,
+          0.0899368822574615,
+          0.969144284725189
+        ],
+        "name": "island front",
+        "reached": true,
+        "remaining_m": 0.077938623726368,
+        "seconds": 0.384,
+        "target": [
+          -2.25,
+          0.0799999982118607,
+          1.02999997138977
+        ]
+      },
+      "name": "Route: island front",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -3.35629892349243,
+          0.0899380221962929,
+          0.964895606040955
+        ],
+        "from": [
+          -2.17276620864868,
+          0.0899342373013496,
+          1.02673172950745
+        ],
+        "name": "kitchen sink",
+        "reached": true,
+        "remaining_m": 0.0943537652492523,
+        "seconds": 0.333,
+        "target": [
+          -3.45000004768372,
+          0.0799999982118607,
+          0.959999978542328
+        ]
+      },
+      "name": "Route: kitchen sink",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -0.622834980487823,
+          0.0899329632520676,
+          1.02831017971039
+        ],
+        "from": [
+          -3.35629892349243,
+          0.0899380221962929,
+          0.964895606040955
+        ],
+        "name": "stair approach",
+        "reached": true,
+        "remaining_m": 0.0735285803675652,
+        "seconds": 0.75,
+        "target": [
+          -0.550000011920929,
+          0.0799999982118607,
+          1.02999997138977
+        ]
+      },
+      "name": "Route: stair approach",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -0.300252467393875,
+          0.0899079963564873,
+          0.298447966575623
+        ],
+        "from": [
+          -0.622834980487823,
+          0.0899329632520676,
+          1.02831017971039
+        ],
+        "name": "stair foot",
+        "reached": true,
+        "remaining_m": 0.0754884332418442,
+        "seconds": 0.234,
+        "target": [
+          -0.270000010728836,
+          0.0799999982118607,
+          0.230000004172325
+        ]
+      },
+      "name": "Route: stair foot",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -0.270117938518524,
+          2.46613574028015,
+          -3.26395106315613
+        ],
+        "from": [
+          -0.300252467393875,
+          0.0899079963564873,
+          0.298447966575623
+        ],
+        "name": "stair top",
+        "reached": true,
+        "remaining_m": 0.0797053650021553,
+        "seconds": 2.316,
+        "target": [
+          -0.270000010728836,
+          2.49000000953674,
+          -3.33999991416931
+        ]
+      },
+      "name": "Route: stair top",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.775546073913574,
+          2.46242141723633,
+          -3.33396124839783
+        ],
+        "from": [
+          -0.270117938518524,
+          2.46613574028015,
+          -3.26395106315613
+        ],
+        "name": "loft entry",
+        "reached": true,
+        "remaining_m": 0.0796268507838249,
+        "seconds": 0.3,
+        "target": [
+          0.850000023841858,
+          2.49000000953674,
+          -3.33999991416931
+        ]
+      },
+      "name": "Route: loft entry",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.912138283252716,
+          2.46241641044617,
+          -1.97804236412048
+        ],
+        "from": [
+          0.775546073913574,
+          2.46242141723633,
+          -3.33396124839783
+        ],
+        "name": "bedside",
+        "reached": true,
+        "remaining_m": 0.0831461176276207,
+        "seconds": 0.383,
+        "target": [
+          0.920000016689301,
+          2.49000000953674,
+          -1.89999997615814
+        ]
+      },
+      "name": "Route: bedside",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/DeluxeRoom10Art/island/@StaticBody3D@31"
+        ],
+        "final": [
+          -2.0,
+          0.0899387076497078,
+          -0.899999558925629
+        ],
+        "from": [
+          -2.0,
+          0.0900000035762787,
+          -1.39999997615814
+        ],
+        "reached": false,
+        "remaining_m": 0.5999995470047,
+        "seconds": 0.866,
+        "target": [
+          -2.0,
+          0.0900000035762787,
+          -0.300000011920929
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/DeluxeRoom10Art/island/@StaticBody3D@31"
+      },
+      "name": "Blocked: island",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/DeluxeRoom10Art/dining_table/@StaticBody3D@71"
+        ],
+        "final": [
+          -1.04999995231628,
+          0.0840354710817337,
+          1.71250092983246
+        ],
+        "from": [
+          -1.04999995231628,
+          0.0900000035762787,
+          0.899999976158142
+        ],
+        "reached": false,
+        "remaining_m": 0.71752393245697,
+        "seconds": 0.883,
+        "target": [
+          -1.04999995231628,
+          0.0900000035762787,
+          2.4300000667572
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/DeluxeRoom10Art/dining_table/@StaticBody3D@71"
+      },
+      "name": "Blocked: dining table",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/DeluxeRoom10Art/sofa/@StaticBody3D@65"
+        ],
+        "final": [
+          2.03999996185303,
+          0.0801166370511055,
+          -0.708158552646637
+        ],
+        "from": [
+          2.03999996185303,
+          0.0801508501172066,
+          -1.0831583738327
+        ],
+        "reached": false,
+        "remaining_m": 0.678230583667755,
+        "seconds": 0.882,
+        "target": [
+          2.03999996185303,
+          0.0900000035762787,
+          -0.0299999993294477
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/DeluxeRoom10Art/sofa/@StaticBody3D@65"
+      },
+      "name": "Blocked: sofa",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/DeluxeRoom10Art/hearth/@StaticBody3D@61"
+        ],
+        "final": [
+          2.14000010490417,
+          0.0760933235287666,
+          -1.07500004768372
+        ],
+        "from": [
+          2.14000010490417,
+          0.0900000035762787,
+          -0.949999988079071
+        ],
+        "reached": false,
+        "remaining_m": 0.695139050483704,
+        "seconds": 0.866,
+        "target": [
+          2.14000010490417,
+          0.0900000035762787,
+          -1.76999998092651
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/DeluxeRoom10Art/hearth/@StaticBody3D@61"
+      },
+      "name": "Blocked: hearth",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -3.41249990463257,
+          0.072510689496994,
+          1.35000002384186
+        ],
+        "from": [
+          -3.34999990463257,
+          0.0900000035762787,
+          1.35000002384186
+        ],
+        "reached": false,
+        "remaining_m": 0.687722384929657,
+        "seconds": 0.882,
+        "target": [
+          -4.09999990463257,
+          0.0900000035762787,
+          1.35000002384186
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/DeluxeRoom10Art/sink_cabinet/@StaticBody3D@25"
+      },
+      "name": "Blocked: kitchen cabinet",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/DeluxeRoom10Art/loft_structure/@StaticBody3D@47"
+        ],
+        "final": [
+          1.25,
+          2.4448139667511,
+          -1.625
+        ],
+        "from": [
+          1.25,
+          2.45666670799255,
+          -1.75
+        ],
+        "reached": false,
+        "remaining_m": 0.926102995872498,
+        "seconds": 0.864,
+        "target": [
+          1.25,
+          2.49000000953674,
+          -0.699999988079071
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/DeluxeRoom10Art/loft_structure/@StaticBody3D@47"
+      },
+      "name": "Blocked: loft guard",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/DeluxeRoom10Art/back_wall_stairs/@StaticBody3D@51"
+        ],
+        "final": [
+          -1.06249928474426,
+          0.0836448445916176,
+          -1.5
+        ],
+        "from": [
+          -1.5,
+          0.0900000035762787,
+          -1.5
+        ],
+        "reached": false,
+        "remaining_m": 0.792524814605713,
+        "seconds": 0.882,
+        "target": [
+          -0.270000010728836,
+          0.0900000035762787,
+          -1.5
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/DeluxeRoom10Art/back_wall_stairs/@StaticBody3D@51"
+      },
+      "name": "Blocked: under stair headroom",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/DeluxeRoom10Art/room_shell/@StaticBody3D@15"
+        ],
+        "final": [
+          0.0500000007450581,
+          0.0804669037461281,
+          3.53749990463257
+        ],
+        "from": [
+          0.0500000007450581,
+          0.0900000035762787,
+          3.34999990463257
+        ],
+        "reached": false,
+        "remaining_m": 0.662568509578705,
+        "seconds": 0.867,
+        "target": [
+          0.0500000007450581,
+          0.0900000035762787,
+          4.19999980926514
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/DeluxeRoom10Art/room_shell/@StaticBody3D@15"
+      },
+      "name": "Blocked: front edge",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/DeluxeRoom10Art/room_shell/@StaticBody3D@13"
+        ],
+        "final": [
+          4.4375,
+          0.0804684013128281,
+          0.100000001490116
+        ],
+        "from": [
+          4.0,
+          0.0900000035762787,
+          0.100000001490116
+        ],
+        "reached": false,
+        "remaining_m": 0.562580764293671,
+        "seconds": 0.866,
+        "target": [
+          5.0,
+          0.0900000035762787,
+          0.100000001490116
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/DeluxeRoom10Art/room_shell/@StaticBody3D@13"
+      },
+      "name": "Blocked: east edge",
+      "passed": true
+    },
+    {
+      "details": {
+        "authored_width": 0.755,
+        "measured_m": 0.754999995231628,
+        "minimum_m": 0.7
+      },
+      "name": "Gap width: island to dining chairs",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.63144564628601,
+          0.0899315774440765,
+          1.01999998092651
+        ],
+        "from": [
+          -0.899999976158142,
+          0.0900000035762787,
+          1.01999998092651
+        ],
+        "reached": true,
+        "remaining_m": 0.0685544386506081,
+        "seconds": 0.499,
+        "target": [
+          -2.70000004768372,
+          0.0900000035762787,
+          1.01999998092651
+        ]
+      },
+      "name": "Traverse: island to dining chairs",
+      "passed": true
+    },
+    {
+      "details": {
+        "authored_width": 0.9342,
+        "measured_m": 0.934200018644333,
+        "minimum_m": 0.7
+      },
+      "name": "Gap width: sofa to coffee table",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.16855418682098,
+          0.089890144765377,
+          1.0
+        ],
+        "from": [
+          3.65000009536743,
+          0.0900000035762787,
+          1.0
+        ],
+        "reached": true,
+        "remaining_m": 0.0685542523860931,
+        "seconds": 0.699,
+        "target": [
+          1.10000002384186,
+          0.0900000035762787,
+          1.0
+        ]
+      },
+      "name": "Traverse: sofa to coffee table",
+      "passed": true
+    },
+    {
+      "details": {
+        "entry": {
+          "collisions": [],
+          "final": [
+            3.85520887374878,
+            0.0899153798818588,
+            -2.98496127128601
+          ],
+          "from": [
+            3.92352437973022,
+            0.0899339765310287,
+            -3.96750593185425
+          ],
+          "reached": true,
+          "remaining_m": 0.0751419961452484,
+          "seconds": 0.283,
+          "target": [
+            3.84999990463257,
+            0.0900000035762787,
+            -2.91000008583069
+          ]
+        },
+        "exit": {
+          "collisions": [],
+          "final": [
+            3.92352437973022,
+            0.0899339765310287,
+            -3.96750593185425
+          ],
+          "from": [
+            3.84999990463257,
+            0.0900000035762787,
+            -2.91000008583069
+          ],
+          "reached": true,
+          "remaining_m": 0.0927204489707947,
+          "seconds": 0.316,
+          "target": [
+            3.9300000667572,
+            0.0900000035762787,
+            -4.05999994277954
+          ]
+        }
+      },
+      "name": "Entrance gap allows exit and reentry",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "delta": [
+          0.128607749938965,
+          0.000174969434738159,
+          -1.59099006652832
+        ]
+      },
+      "name": "Diagonal collision preserves wall sliding",
+      "passed": true
+    },
+    {
+      "details": [
+        "run",
+        0.15,
+        0.316666666666667
+      ],
+      "name": "Run animation advances in rendered viewport",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Input release stops horizontal motion",
+      "passed": true
+    },
+    {
+      "details": "idle",
+      "name": "Release returns to idle",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Focus loss cancels movement",
+      "passed": true
+    },
+    {
+      "details": 1.74549422413111,
+      "name": "Fixture head-top height measurable",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 1.33486548840335,
+        "difference": 0.0,
+        "height": 2.33,
+        "ratio_to_H": 1.33486548840335,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: door",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.660271448663031,
+        "difference": 0.0151843817787418,
+        "height": 1.17,
+        "ratio_to_H": 0.670297262417134,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.392438995517724,
+        "difference": 0.142335766423358,
+        "height": 0.7825,
+        "ratio_to_H": 0.448297100719151,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: chair",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.650245634908929,
+        "difference": 0.0,
+        "height": 1.135,
+        "ratio_to_H": 0.650245634908929,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: table",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "renderer": "mobile",
+  "route": [
+    {
+      "collisions": [
+        "/root/SceneBenchmark/DeluxeRoom10Art/door_right_plant/@StaticBody3D@93"
+      ],
+      "final": [
+        3.73323750495911,
+        0.0899360030889511,
+        -1.18417942523956
+      ],
+      "from": [
+        3.84999990463257,
+        0.0900000035762787,
+        -2.83999991416931
+      ],
+      "name": "door",
+      "reached": true,
+      "remaining_m": 0.0848255679011345,
+      "seconds": 0.349,
+      "target": [
+        3.73000001907349,
+        0.0799999982118607,
+        -1.10000002384186
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        3.6818163394928,
+        0.0899334624409676,
+        0.925478577613831
+      ],
+      "from": [
+        3.73323750495911,
+        0.0899360030889511,
+        -1.18417942523956
+      ],
+      "name": "living coffee table",
+      "reached": true,
+      "remaining_m": 0.0752024948596954,
+      "seconds": 0.472,
+      "target": [
+        3.6800000667572,
+        0.0799999982118607,
+        1.0
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -0.811931073665619,
+        0.0899368822574615,
+        0.969144284725189
+      ],
+      "from": [
+        3.6818163394928,
+        0.0899334624409676,
+        0.925478577613831
+      ],
+      "name": "dining beside long table",
+      "reached": true,
+      "remaining_m": 0.0886318534612656,
+      "seconds": 1.102,
+      "target": [
+        -0.899999976158142,
+        0.0799999982118607,
+        0.970000028610229
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -2.17276620864868,
+        0.0899342373013496,
+        1.02673172950745
+      ],
+      "from": [
+        -0.811931073665619,
+        0.0899368822574615,
+        0.969144284725189
+      ],
+      "name": "island front",
+      "reached": true,
+      "remaining_m": 0.077938623726368,
+      "seconds": 0.384,
+      "target": [
+        -2.25,
+        0.0799999982118607,
+        1.02999997138977
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -3.35629892349243,
+        0.0899380221962929,
+        0.964895606040955
+      ],
+      "from": [
+        -2.17276620864868,
+        0.0899342373013496,
+        1.02673172950745
+      ],
+      "name": "kitchen sink",
+      "reached": true,
+      "remaining_m": 0.0943537652492523,
+      "seconds": 0.333,
+      "target": [
+        -3.45000004768372,
+        0.0799999982118607,
+        0.959999978542328
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -0.622834980487823,
+        0.0899329632520676,
+        1.02831017971039
+      ],
+      "from": [
+        -3.35629892349243,
+        0.0899380221962929,
+        0.964895606040955
+      ],
+      "name": "stair approach",
+      "reached": true,
+      "remaining_m": 0.0735285803675652,
+      "seconds": 0.75,
+      "target": [
+        -0.550000011920929,
+        0.0799999982118607,
+        1.02999997138977
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -0.300252467393875,
+        0.0899079963564873,
+        0.298447966575623
+      ],
+      "from": [
+        -0.622834980487823,
+        0.0899329632520676,
+        1.02831017971039
+      ],
+      "name": "stair foot",
+      "reached": true,
+      "remaining_m": 0.0754884332418442,
+      "seconds": 0.234,
+      "target": [
+        -0.270000010728836,
+        0.0799999982118607,
+        0.230000004172325
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -0.270117938518524,
+        2.46613574028015,
+        -3.26395106315613
+      ],
+      "from": [
+        -0.300252467393875,
+        0.0899079963564873,
+        0.298447966575623
+      ],
+      "name": "stair top",
+      "reached": true,
+      "remaining_m": 0.0797053650021553,
+      "seconds": 2.316,
+      "target": [
+        -0.270000010728836,
+        2.49000000953674,
+        -3.33999991416931
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        0.775546073913574,
+        2.46242141723633,
+        -3.33396124839783
+      ],
+      "from": [
+        -0.270117938518524,
+        2.46613574028015,
+        -3.26395106315613
+      ],
+      "name": "loft entry",
+      "reached": true,
+      "remaining_m": 0.0796268507838249,
+      "seconds": 0.3,
+      "target": [
+        0.850000023841858,
+        2.49000000953674,
+        -3.33999991416931
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        0.912138283252716,
+        2.46241641044617,
+        -1.97804236412048
+      ],
+      "from": [
+        0.775546073913574,
+        2.46242141723633,
+        -3.33396124839783
+      ],
+      "name": "bedside",
+      "reached": true,
+      "remaining_m": 0.0831461176276207,
+      "seconds": 0.383,
+      "target": [
+        0.920000016689301,
+        2.49000000953674,
+        -1.89999997615814
+      ]
+    }
+  ],
+  "scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+  "slug": "deluxe_room_10"
+}
