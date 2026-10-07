@@ -624,7 +624,7 @@ td { font-variant-numeric: tabular-nums; }
     </div>
 <ul>
 <li>日期：2026-10-02</li>
-<li>原型设计（Figma，用户于 2026-10-05 确认）：<a href="https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955">Gensen (US) · Prototype</a>。文件 key：<code>OMLTC3yw3u2WDjOZhLnhaR</code>，原型页 node：<code>310:2955</code>。后续界面进度核查与设计对照从此页进入，按最新审图修订核验。</li>
+<li>界面设计（Figma，用户于 2026-10-07 定为游戏 UI 唯一依据，见 SGODOT-197 LOCK-28）：<a href="https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53">Gensen (US) · 14 · UI semantic refactor</a>（R1 修订中，锁定项以 <a href="https://plane.sensenjoy.cn/zili/browse/SGODOT-197/">SGODOT-197</a> 为准）。文件 key：<code>OMLTC3yw3u2WDjOZhLnhaR</code>，页面 node：<code>481:53</code>。后续界面进度核查与设计对照从此页进入。原型页 <a href="https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955">Gensen (US) · Prototype</a>（node <code>310:2955</code>，2026-10-05 确认）为 Archive，截至 2026-10-06。</li>
 <li>状态：<strong>2026-10-07（Figma 页面 14 UI 审阅 R1 · WP0，SGODOT-199）：铜镐按每块岩石 2 石料、派对房入口撤销并在 P2 社交恢复好友组队语音、新增 <code>Say thanks</code>、Cook All 不含 Legendary 且同页 ≤ 2 锅、界面编号以 §16.3 为准（改动清单 q(1)–q(5)）。</strong> <strong>2026-10-07（R1 · WP1a 样板，SGODOT-200）：离家场景的 Energy Card 把 Cook / Rest 瓦片灰显写 At home、材料进度格新增 count 计数态、三档尺寸按 360 基准落定（改动清单 q(6)–q(8)）。</strong> <strong>2026-10-05 下午（06 批次 2 审图）：农场驿站无人值守（撤伙计 Bao）、新增个人页 Profile（PASS-3 并入）、背包与 Tools &amp; Gear 合并为背包 Gear 页、删除满包二选一、包裹入口 = 铃铛 / 农舍信箱（改动清单 p(6)–p(9)）。</strong> 2026-10-03 修订：操作模型（第 10/16 章及连带）——位移摇杆与安全框相机、主行动键与行动径向、消耗品快捷栏、Tools &amp; Gear、顶栏重排与位置芯片、灶台触发的烹饪面板；连带第 0 / 1 / 3 / 4 / 5 / 6 / 7 / 8 / 9 / 12 / 13 / 14 / 17 / 18 章与附录 A / B。<strong>2026-10-03 第三轮（与 Joey 会议后）：Cooking 技能轨（投料槽 2 → 3，Lv4 开第 3 槽）、矿井按层计费（每层 2、电梯免费、精英石英日限）、据点组六档生成 + Tea Counter 茶座柜台 + POI 降为纯视觉层</strong>——连带第 0 / 1 / 2 / 3 / 4 / 5 / 6 / 7 / 8 / 9 / 10 / 11 / 13 / 14 / 15 / 16 / 17 / 18 章与附录 A / B。<strong>2026-10-04 第四轮：烹饪面板第五版（3D 灶台 + Cookbook / Experiment）、Energy Card 只引导、钉住态、设施点击触发、据点拆成每岗位一处（集市广场为唯一室外）、柜台 + 背包同屏、掌柜先问候再 Trade</strong>——见第 1.5 节改动清单 o(7)–o(10)、p(1)–p(3)。</li>
 <li>性质：原型阶段的完整玩法策划文档。本文自包含：全部原则、规则、数值、物品、文案都在文内，不依赖任何其他文档。</li>
 <li>术语（全文统一）：Energy = 体力；Homestead = 农场等级；Trip 1–7 = 旅行档（Local / Nearby / Regional / Long Haul / Continental / Intercontinental / Antipodal）；Resident = 角色 NPC；Keeper = 功能 NPC；Outpost = 据点（一处系统生成的 NPC 空间：茶馆 Tea House / 渔具铺 Tackle Shop / 集市广场 Market Square / 驿站 Travel Post / 小木屋 Trading Post，每岗位一处、各一枚地图 pin，按城市簇分档生成；除集市广场外全部室内）；Home Set = 家一套（每种据点离家最近的一处）；Cooking = 烹饪技能轨（与 Farming / Fishing 平行的第三条轨）；Neighbor = 其他玩家；Cookbook = 料理图鉴；Fish-dex = 鱼图鉴；Passport = 护照；稀有度一律 Common / Fine / Rare / Legendary（常见 / 上品 / 稀有 / 传说），鱼与料理共用同一套词。</li>
@@ -18830,6 +18830,9 @@ td { font-variant-numeric: tabular-nums; }
 </table></div>
 <hr />
 <h2 id="h329">10.1 位移与相机</h2>
+<blockquote>
+<p>本节尺寸与色值已由 <a href="https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53">Figma 页面 14</a> 主组件与 tokens v2 取代；交互规则与拍板条文仍有效（见 <a href="https://plane.sensenjoy.cn/zili/browse/SGODOT-197/">SGODOT-197</a>）。（2026-10-07，SGODOT-207）</p>
+</blockquote>
 <div class="tbl"><table>
 <thead>
 <tr>
@@ -18878,6 +18881,9 @@ td { font-variant-numeric: tabular-nums; }
 </table></div>
 <hr />
 <h2 id="h330">10.2 行动与主行动键</h2>
+<blockquote>
+<p>本节尺寸与色值已由 <a href="https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53">Figma 页面 14</a> 主组件与 tokens v2 取代；交互规则与拍板条文仍有效（见 <a href="https://plane.sensenjoy.cn/zili/browse/SGODOT-197/">SGODOT-197</a>）。（2026-10-07，SGODOT-207）</p>
+</blockquote>
 <h3 id="h331">10.2.1 四种行动</h3>
 <p>行动 = 消耗体力、用工具做的事。烹饪、商店、对话、布置、拜访是<strong>设施交互</strong>，0 体力，一律<strong>点设施触发</strong>（见 10.2.2 表后的设施点击规则），主行动键不参与。</p>
 <div class="tbl"><table>
@@ -19131,6 +19137,9 @@ td { font-variant-numeric: tabular-nums; }
 <p>不再有"按格裁剪"的批量逻辑：一次按键一条命令，够就整条执行，不够就弹卡。</p>
 <hr />
 <h2 id="h336">10.3 快捷栏 Quick Bar</h2>
+<blockquote>
+<p>本节尺寸与色值已由 <a href="https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53">Figma 页面 14</a> 主组件与 tokens v2 取代；交互规则与拍板条文仍有效（见 <a href="https://plane.sensenjoy.cn/zili/browse/SGODOT-197/">SGODOT-197</a>）。（2026-10-07，SGODOT-207）</p>
+</blockquote>
 <h3 id="h337">10.3.1 形态</h3>
 <div class="tbl"><table>
 <thead>
@@ -30839,6 +30848,9 @@ td { font-variant-numeric: tabular-nums; }
 </tbody>
 </table></div>
 <h3 id="h523">16.1.2 画幅与层</h3>
+<blockquote>
+<p>本节尺寸与色值已由 <a href="https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53">Figma 页面 14</a> 主组件与 tokens v2 取代；交互规则与拍板条文仍有效（见 <a href="https://plane.sensenjoy.cn/zili/browse/SGODOT-197/">SGODOT-197</a>）。（2026-10-07，SGODOT-207）</p>
+</blockquote>
 <div class="tbl"><table>
 <thead>
 <tr>
@@ -30882,6 +30894,9 @@ td { font-variant-numeric: tabular-nums; }
 </tbody>
 </table></div>
 <h3 id="h524">16.1.3 UI 组件约定</h3>
+<blockquote>
+<p>本节尺寸与色值已由 <a href="https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53">Figma 页面 14</a> 主组件与 tokens v2 取代；交互规则与拍板条文仍有效（见 <a href="https://plane.sensenjoy.cn/zili/browse/SGODOT-197/">SGODOT-197</a>）。（2026-10-07，SGODOT-207）</p>
+</blockquote>
 <div class="tbl"><table>
 <thead>
 <tr>

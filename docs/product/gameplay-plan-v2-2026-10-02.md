@@ -1,7 +1,7 @@
 # Gensen 玩法方案 v2：体力驱动的种植·钓鱼·料理·探索循环（独立完整版）
 
 - 日期：2026-10-02
-- 原型设计（Figma，用户于 2026-10-05 确认）：[Gensen (US) · Prototype](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955)。文件 key：`OMLTC3yw3u2WDjOZhLnhaR`，原型页 node：`310:2955`。后续界面进度核查与设计对照从此页进入，按最新审图修订核验。
+- 界面设计（Figma，用户于 2026-10-07 定为游戏 UI 唯一依据，见 SGODOT-197 LOCK-28）：[Gensen (US) · 14 · UI semantic refactor](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53)（R1 修订中，锁定项以 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/) 为准）。文件 key：`OMLTC3yw3u2WDjOZhLnhaR`，页面 node：`481:53`。后续界面进度核查与设计对照从此页进入。原型页 [Gensen (US) · Prototype](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955)（node `310:2955`，2026-10-05 确认）为 Archive，截至 2026-10-06。
 - 状态：**2026-10-07（Figma 页面 14 UI 审阅 R1 · WP0，SGODOT-199）：铜镐按每块岩石 2 石料、派对房入口撤销并在 P2 社交恢复好友组队语音、新增 `Say thanks`、Cook All 不含 Legendary 且同页 ≤ 2 锅、界面编号以 §16.3 为准（改动清单 q(1)–q(5)）。** **2026-10-07（R1 · WP1a 样板，SGODOT-200）：离家场景的 Energy Card 把 Cook / Rest 瓦片灰显写 At home、材料进度格新增 count 计数态、三档尺寸按 360 基准落定（改动清单 q(6)–q(8)）。** **2026-10-05 下午（06 批次 2 审图）：农场驿站无人值守（撤伙计 Bao）、新增个人页 Profile（PASS-3 并入）、背包与 Tools & Gear 合并为背包 Gear 页、删除满包二选一、包裹入口 = 铃铛 / 农舍信箱（改动清单 p(6)–p(9)）。** 2026-10-03 修订：操作模型（第 10/16 章及连带）——位移摇杆与安全框相机、主行动键与行动径向、消耗品快捷栏、Tools & Gear、顶栏重排与位置芯片、灶台触发的烹饪面板；连带第 0 / 1 / 3 / 4 / 5 / 6 / 7 / 8 / 9 / 12 / 13 / 14 / 17 / 18 章与附录 A / B。**2026-10-03 第三轮（与 Joey 会议后）：Cooking 技能轨（投料槽 2 → 3，Lv4 开第 3 槽）、矿井按层计费（每层 2、电梯免费、精英石英日限）、据点组六档生成 + Tea Counter 茶座柜台 + POI 降为纯视觉层**——连带第 0 / 1 / 2 / 3 / 4 / 5 / 6 / 7 / 8 / 9 / 10 / 11 / 13 / 14 / 15 / 16 / 17 / 18 章与附录 A / B。**2026-10-04 第四轮：烹饪面板第五版（3D 灶台 + Cookbook / Experiment）、Energy Card 只引导、钉住态、设施点击触发、据点拆成每岗位一处（集市广场为唯一室外）、柜台 + 背包同屏、掌柜先问候再 Trade**——见第 1.5 节改动清单 o(7)–o(10)、p(1)–p(3)。
 - 性质：原型阶段的完整玩法策划文档。本文自包含：全部原则、规则、数值、物品、文案都在文内，不依赖任何其他文档。
 - 术语（全文统一）：Energy = 体力；Homestead = 农场等级；Trip 1–7 = 旅行档（Local / Nearby / Regional / Long Haul / Continental / Intercontinental / Antipodal）；Resident = 角色 NPC；Keeper = 功能 NPC；Outpost = 据点（一处系统生成的 NPC 空间：茶馆 Tea House / 渔具铺 Tackle Shop / 集市广场 Market Square / 驿站 Travel Post / 小木屋 Trading Post，每岗位一处、各一枚地图 pin，按城市簇分档生成；除集市广场外全部室内）；Home Set = 家一套（每种据点离家最近的一处）；Cooking = 烹饪技能轨（与 Farming / Fishing 平行的第三条轨）；Neighbor = 其他玩家；Cookbook = 料理图鉴；Fish-dex = 鱼图鉴；Passport = 护照；稀有度一律 Common / Fine / Rare / Legendary（常见 / 上品 / 稀有 / 传说），鱼与料理共用同一套词。
@@ -4490,6 +4490,8 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 
 ## 10.1 位移与相机
 
+> 本节尺寸与色值已由 [Figma 页面 14](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53) 主组件与 tokens v2 取代；交互规则与拍板条文仍有效（见 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/)）。（2026-10-07，SGODOT-207）
+
 | 项 | 参数 | 规则 |
 |---|---|---|
 | 位移 | 浮动虚拟摇杆 | 在场景区（HUD 下沿到底部 UI 上沿之间）任意处按下，摇杆出现在按下点；左手拇指操作，抬手消失 |
@@ -4503,6 +4505,8 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 ---
 
 ## 10.2 行动与主行动键
+
+> 本节尺寸与色值已由 [Figma 页面 14](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53) 主组件与 tokens v2 取代；交互规则与拍板条文仍有效（见 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/)）。（2026-10-07，SGODOT-207）
 
 ### 10.2.1 四种行动
 
@@ -4574,6 +4578,8 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 ---
 
 ## 10.3 快捷栏 Quick Bar
+
+> 本节尺寸与色值已由 [Figma 页面 14](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53) 主组件与 tokens v2 取代；交互规则与拍板条文仍有效（见 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/)）。（2026-10-07，SGODOT-207）
 
 ### 10.3.1 形态
 
@@ -7015,6 +7021,8 @@ Lv9 → 10 占总量 28%（650 / 2,350）却占到达时间的 40%（重度第 8
 
 ### 16.1.2 画幅与层
 
+> 本节尺寸与色值已由 [Figma 页面 14](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53) 主组件与 tokens v2 取代；交互规则与拍板条文仍有效（见 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/)）。（2026-10-07，SGODOT-207）
+
 | 项 | 规格 |
 |---|---|
 | 画幅 | 竖屏 1080 × 2400（9 : 20）；生图按此比例出图，不裁切 |
@@ -7027,6 +7035,8 @@ Lv9 → 10 占总量 28%（650 / 2,350）却占到达时间的 40%（重度第 8
 | 两张图的分工 | 图 1 = 常态（玩家 80% 时间看到的样子，所有常驻控件都在）；图 2 = 关键反馈态或并排变体（三联、四联图允许把屏幕按比例缩小并排在一张 1080 × 2400 内） |
 
 ### 16.1.3 UI 组件约定
+
+> 本节尺寸与色值已由 [Figma 页面 14](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53) 主组件与 tokens v2 取代；交互规则与拍板条文仍有效（见 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/)）。（2026-10-07，SGODOT-207）
 
 | 组件 | 规格 | 文案与颜色规则 |
 |---|---|---|

@@ -3,7 +3,7 @@
 ## 规则与实施
 
 - [玩法方案 v2](gameplay-plan-v2-2026-10-02.md) 是唯一玩法基准；[HTML 阅读版](gameplay-plan-v2-2026-10-02.html) 是阅读导出，冲突时回到 Markdown 最新修订。
-- [Figma · Prototype](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955) 与 [本地设计索引](../design/README.md) 用于界面对照。
+- [Figma 页面 14 · UI semantic refactor](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53)（R1 修订中，锁定项以 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/) 为准）与 [本地设计索引](../design/README.md) 用于界面对照；旧 [Figma · Prototype](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955) 为 Archive，截至 2026-10-06。
 - [P0 进度](../qa/p0-progress-audit-2026-10-05.md) 区分已实现、缺失和未验收；[交接经过](research/gameplay-plan-v2-2026-10-02/HANDOFF-2026-10-04.md) 只补充各日期的事实和技术经验。
 
 旧 G0–G4、七日章节、双地域交换、v1 核心循环及旧背包/装备/矿洞/HUD 规格已移除，不再并列作为开工依据。
