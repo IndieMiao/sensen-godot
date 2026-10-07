@@ -7,7 +7,7 @@ import type { P0State } from './state.js';
 
 export type Refusal = { code: string; detail?: Record<string, unknown> };
 export type FishCommand =
-  | { type: 'cast'; bait?: string | null; site?: string }
+  | { type: 'cast'; bait?: string | null }   // the pond is where the player is (presence.place), never named by the cast
   | { type: 'reel'; outcome: 'cancel' | 'escaped' | 'landed' };
 
 const siteFish = (c: P0Content, site: FishSite): Fish[] => site.fish.map(id => fishById(c, id)!).filter(Boolean);
@@ -38,11 +38,13 @@ export function pickFish(c: P0Content, s: P0State, bait: string | null, site: Fi
   return pool[Math.floor(draw(s) * pool.length)];
 }
 
-export function castLine(c: P0Content, s: P0State, cmd: { bait?: string | null; site?: string }, now: number, events: P0Event[]): Refusal | null {
+export function castLine(c: P0Content, s: P0State, cmd: { bait?: string | null }, now: number, events: P0Event[]): Refusal | null {
   const f = c.fishing;
-  const siteId = cmd.site ? String(cmd.site) : 'pond';
+  // q(36): the template comes from the server's table for the pond the player entered, not from the client.
+  const place = s.presence.place ?? '';
+  const siteId = f.places[place]?.site ?? '';
   const site = f.sites[siteId];
-  if (!site) return { code: 'bad_site' };
+  if (!site) return { code: 'not_at_pond' };
   if (s.cast) {
     if (now - s.cast.at < f.stale_ms) return { code: 'already_casting' };
     settleFailure(c, s, now, events, 'escaped'); // a line left in the water past the grace counts as got away
@@ -61,7 +63,7 @@ export function castLine(c: P0Content, s: P0State, cmd: { bait?: string | null; 
   const bite_ms = Math.round((f.bite_min_ms + draw(s) * f.bite_spread_ms) * wait);
   const rod = rodById(c, s.gear.rod) ?? f.rods[0];
   const breaks = fish.level > level ? 'level' : fish.rarity > rod.reach ? 'rod' : null;
-  s.cast = { fish: fish.id, site: siteId, at: now, bite_ms, bait, xp_pct: xpPercent(c, level, fish.level), breaks, ...(pin ? { pin } : {}) };
+  s.cast = { fish: fish.id, site: siteId, place, at: now, bite_ms, bait, xp_pct: xpPercent(c, level, fish.level), breaks, ...(pin ? { pin } : {}) };
   events.push({ kind: 'cast', bite_in: bite_ms, rarity: fish.rarity, breaks, bait });
   if (!s.firsts.includes('cast')) {
     s.firsts.push('cast');
@@ -97,7 +99,7 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
     events.push({ kind: 'catch', fish: fish.id, rarity: fish.rarity, result: 'landed', refund: 0 });
     gainXp(c, s, now, 'fishing', scaledXp(s, c.fishing.catch_xp[fish.rarity - 1], cast.xp_pct), cast.xp_pct, events);
     // q(37): the first catch in a city counts the site's city from the server's table, never a city the client names.
-    const city = c.fishing.sites[cast.site]?.city ?? '';
+    const city = c.fishing.places[cast.place ?? '']?.city ?? '';
     for (const [key, xp] of [[`catch:${fish.id}`, c.fishing.first_xp[fish.rarity - 1]], ['landed', c.fishing.first_landed_xp],
       [`fishing_city:${city}`, city ? c.fishing.first_city_xp : 0]] as const) {
       if (xp <= 0) continue;

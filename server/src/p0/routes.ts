@@ -28,9 +28,9 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const player = playerOf(req.headers);
     if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
     const s = store.get(player, deps.now());
-    const space = (req.query as { space?: unknown } | undefined)?.space;
+    const { space, place } = (req.query ?? {}) as { space?: unknown; place?: unknown };
     if (typeof space === 'string' && space !== '') {   // the read a client makes on entering a space (q(41))
-      notePresence(c, s, space, clock(s.clock_ms), null);
+      notePresence(c, s, space, clock(s.clock_ms), null, place);
       store.put(s);
     }
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });

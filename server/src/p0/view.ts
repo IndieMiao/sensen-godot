@@ -81,6 +81,10 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     },
     fishing: {
       sites: Object.fromEntries(Object.entries(f.sites).map(([id, site]) => [id, { name: site.name, template: site.template }])),
+      // q(36): every catalog pond with its template; place = the pond the player is at (null away from ponds).
+      places: Object.fromEntries(Object.entries(f.places).map(([id, p]) => [id, {
+        name: p.name, site: p.site, template: f.sites[p.site]?.template ?? '', beginner: p.beginner === true }])),
+      place: s.presence.place ?? null,
       rod: (rodById(c, s.gear.rod) ?? f.rods[0]).name, rod_reach: (rodById(c, s.gear.rod) ?? f.rods[0]).reach,
       hook_bonus_ms: (rodById(c, s.gear.rod) ?? f.rods[0]).hook_bonus_ms, band_bonus: (rodById(c, s.gear.rod) ?? f.rods[0]).band_bonus,
       cast_energy: f.cast_energy,

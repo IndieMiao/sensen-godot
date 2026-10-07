@@ -18,7 +18,9 @@ export interface Crop {
 
 export interface Fish { id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[] }
 export interface Rod { id: string; name: string; reach: number; level: number; price: number; hook_bonus_ms: number; band_bonus: number }
-export interface FishSite { name: string; city: string; template: string; weights: number[]; fish: string[] }
+export interface FishSite { name: string; template: string; weights: number[]; fish: string[] }
+/** A catalog pond on the map (assets/ponds/catalog.json id): its fishing template follows the point, not its shape (q(36)). */
+export interface FishPlace { name: string; site: string; city: string; beginner?: boolean }
 
 export interface CookTier {
   energy: number; ms: number; heats: number[]; gold: number; spin_ms: number;
@@ -60,6 +62,7 @@ export interface P0Content {
   level_up_energy: { first: number; later: number };
   level_gifts: Record<string, [string, number][]>;
   xp_multiplier: [number, number][];
+  skill_daily_cap: number;                    // §4.3.4: XP per skill per player day, an anti-script limit only
   crops: Crop[];
   stall: { keeper: { role: string; name: string }; buy: string[] };
   rarity_names: string[];
@@ -69,7 +72,8 @@ export interface P0Content {
     bite_min_ms: number; bite_spread_ms: number; hook_window_ms: number; stale_ms: number;
     catch_xp: number[]; first_xp: number[]; first_cast_xp: number; first_landed_xp: number; first_city_xp: number;
     rods: Rod[];
-    sites: Record<string, FishSite>;
+    sites: Record<string, FishSite>;      // templates: pond (Pond) / river (River)
+    places: Record<string, FishPlace>;
     baits: Record<string, { shift: number[]; wait: number }>;
   };
   goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number; grow_mult?: number }>;

@@ -27,6 +27,7 @@ export const emptyInbox = (): P0Inbox => ({ granted: [], parcels: [], waiting: [
 /** A line in the water: the fish is drawn when it is cast (§6.1.2), the client only sees its rarity. */
 export interface Cast {
   fish: string; site: string; at: number; bite_ms: number; bait: string | null;
+  place?: string;                       // the catalog pond it was cast at (q(36)); site is that pond's template
   xp_pct: number;                       // level difference locked at the bite (§6.7.1)
   breaks: 'level' | 'rod' | null;       // gate failure decided up front, shown after the reel starts
   pin?: string;                         // a teaching pin this cast used (handed back if the line comes in before the bite)
@@ -74,7 +75,8 @@ export interface MineState {
 }
 
 /** Where the player's commands come from (q(41)): when they last left the homestead, for Rest's 2 h rule. */
-export interface Presence { left_at: number | null; last_at: number; space: string | null }
+/** place: the catalog pond the player is at, only while in a pond space (cast reads its template from it, q(36)). */
+export interface Presence { left_at: number | null; last_at: number; space: string | null; place?: string | null }
 
 export interface P0Day {
   key: string; rest: number;
@@ -89,6 +91,7 @@ export interface P0Day {
   sys_done: number;                     // system requests completed today (§9.6.4)
   gift_meal: string | null;             // resident who gave today's gift meal (§3.4.5)
   mine_runs: number;                    // mine runs started today (§13.3.1, ≤ 2)
+  xp: Partial<Record<Skill, number>>;   // XP earned today per skill, for the anti-script cap (§4.3.4)
 }
 
 export interface P0State {
@@ -129,7 +132,7 @@ export interface P0State {
 }
 
 export const emptyDay = (key = ''): P0Day => ({
-  key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0,
+  key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0, xp: {},
 });
 
 export function freshState(c: P0Content, player: string, now: number, seed = hashSeed(player)): P0State {
@@ -147,7 +150,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     homestead: { level: 1, plaque: [] },
     residents: {},
     boards: { stall: [{ req: tutorialRequest(c, now), refill_at: 0 }], market: [] }, req_done: [],
-    presence: { left_at: null, last_at: 0, space: null },
+    presence: { left_at: null, last_at: 0, space: null, place: null },
     firsts: [], rewards: [],
     day: emptyDay(),
     fishing: { casts: 0, bites: 0, caught: {}, seen: [] },
@@ -213,6 +216,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   }
   s.req_done ??= [];
   s.presence ??= { left_at: null, last_at: 0, space: null };
+  s.presence.place ??= null;
   s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
   s.v = 4;
