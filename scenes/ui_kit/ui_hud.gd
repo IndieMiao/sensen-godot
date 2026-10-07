@@ -125,8 +125,6 @@ static func energy_state_for(energy: int, energy_max: int, next_cost: int) -> En
 	if energy >= energy_max: return Energy.FULL
 	return Energy.NORMAL
 
-## `City · Space`, plus `· Day Pass 23h` when one is running. Arrived-but-not-in-a-space reads
-## `Tokyo · Arrived` (the caller passes space "Arrived").
 ## Start / end angles (degrees, 0 = 3 o'clock, clockwise) of the two skill halves for progress 0..1.
 static func skill_arcs(farming: float, fishing: float) -> Dictionary:
 	var span := 180.0 - _SKILL_GAP * 2.0
@@ -137,6 +135,8 @@ static func skill_arcs(farming: float, fishing: float) -> Dictionary:
 		fishing = Vector2(-90.0 - _SKILL_GAP, -90.0 - _SKILL_GAP - span * g),
 	}
 
+## `City · Space`, plus `· Day Pass 23h` when one is running. Arrived-but-not-in-a-space reads
+## `Tokyo · Arrived` (the caller passes space "Arrived").
 static func place_text(place: Dictionary) -> String:
 	var parts := [str(place.get("city", "")), str(place.get("space", ""))]
 	if str(place.get("day_pass", "")) != "": parts.append("Day Pass " + str(place.day_pass))

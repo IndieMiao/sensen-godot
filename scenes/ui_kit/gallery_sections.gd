@@ -447,7 +447,7 @@ static func _energy_facts(zero: bool, home: bool) -> Dictionary:
 		fact = "Recover or do something free" if zero else "Sow 1 plot needs 2 Energy · you have 1",
 		wait = "Wait · Full in 13h 20m",
 		tiles = [
-			{icon = _tex("eat"), label = "Eat", fact = "3 dishes in bag", guide = "Open bag", go = "bag", on = true},
+			{icon = _tex("dish_grilled_fish"), label = "Eat", fact = "3 dishes in bag", guide = "Open bag", go = "bag", on = true},
 			{icon = _tex("pot"), label = "Cook", fact = "4 fish in creel" if home else "At home", guide = "Show kitchen", go = "stove", on = home},
 			{icon = _tex("dish_fruit_tea"), label = "Tea", fact = "Tea House opens later", guide = "", go = "", on = false},
 			{icon = _tex("rest"), label = "Rest", fact = "Available" if home else "At home", guide = "Show bench", go = "home", on = home},

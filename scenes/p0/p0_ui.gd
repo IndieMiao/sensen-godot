@@ -59,6 +59,9 @@ var surface := "farm"
 ## Set by the runtime: true when the current world can move its camera to a spot (p0_show_spot). Show
 ## buttons (Today, NeedSource) only appear then, so a Show never closes a panel and does nothing (LOCK-08).
 var can_show_spot := Callable()
+var _hud_world := true   # set_surface: the map has no HUD
+var _hud_hash := 0       # last state given to hud.apply
+var _hud_need := -1      # main action's Energy need last seen by the HUD
 var _pending := {}   # surface / place / mode set before the HUD exists (the runtime attaches early)
 var _dev_box: Control
 var _creel: PanelContainer
@@ -126,7 +129,7 @@ func _build_hud() -> void:
 	hud = UiHud.new()
 	hud.theme = UiKit.theme()
 	hud.safe_top = safe_top()
-	# TODO(WP7-C item 12, Profile page): the avatar opens Profile (LOCK-06); P0 opens Skills until then.
+	# TODO(SGODOT-225, Profile page): the avatar opens Profile (LOCK-06); P0 opens Skills until then.
 	hud.avatar_pressed.connect(open_skills)
 	hud.energy_pressed.connect(open_energy_panel)
 	hud.inbox_pressed.connect(open_inbox)
@@ -254,11 +257,16 @@ func _skill_pct(s: Dictionary) -> float: return P0Logic.skill_progress(s)
 ## kitchen is the farmhouse's stove corner, so the chip reads "Shanghai · Farmhouse" there (LOCK-06).
 func _refresh_hud() -> void:
 	if hud == null: return
-	# No numbers before the first server view: an empty view would read as 0 Energy (red) and 0 coins.
-	hud.modulate.a = 0.0 if view.is_empty() else 1.0
+	# No HUD before the first server view: an empty view would read as 0 Energy (red) and 0 coins, and its
+	# chips would still take taps.
+	hud.visible = _hud_world and not view.is_empty()
 	if view.is_empty(): return
 	var place := P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else "")
-	hud.apply(P0Logic.hud_state(view, {"next_cost": int(fab_state().get("need", 0)), "place": place}))
+	var state := P0Logic.hud_state(view, {"next_cost": int(fab_state().get("need", 0)), "place": place})
+	var h := state.hash()
+	if h == _hud_hash: return   # set_view runs every frame: apply only what changed (the countdown, once a second)
+	_hud_hash = h
+	hud.apply(state)
 
 ## Top system inset (status bar, notch) in UI units; 0 on desktop.
 func safe_top() -> float:
@@ -288,7 +296,8 @@ func set_surface(name: String) -> void:
 		return
 	var action := name in ["farm", "pond"]
 	var world := name != "map"
-	hud.visible = world
+	_hud_world = world
+	hud.visible = world and not view.is_empty()
 	hud.show_balances = name != "busy"   # a busy world's own close button sits in the coins / bell corner
 	pad.visible = world
 	_fab.visible = action and _modal == null
@@ -419,7 +428,10 @@ func set_action(a: Dictionary) -> void:
 	_fab_verb.add_theme_color_override("font_color", AMBER_D if a.get("amber", false) else (INK if a.get("enabled", false) else INK2))
 	_fab.set_meta("state", a)
 	_fab.queue_redraw()
-	_refresh_hud()   # SGODOT-222: the Energy chip turns Low when short of this action
+	var need := int(a.get("need", 0))
+	if need != _hud_need:   # the worlds call set_action every frame
+		_hud_need = need
+		_refresh_hud()   # SGODOT-222: the Energy chip turns Low when short of this action
 
 func _fab_pressed() -> void:
 	fab_verb = ""
@@ -1275,7 +1287,7 @@ func open_skills() -> void:
 		card.add_theme_stylebox_override("panel", _box(PAPER, 14, EDGE, 1, Vector4(10, 8, 10, 8)))
 		var h := HBoxContainer.new()
 		h.add_theme_constant_override("separation", 10)
-		var ring := _NeedTile.new()
+		var ring := _LevelRing.new()
 		ring.custom_minimum_size = Vector2(58, 58)
 		ring.set_meta("pct", _skill_pct(s))
 		ring.set_meta("text", "Lv %d" % int(s.get("level", 1)))
@@ -2053,8 +2065,8 @@ class _Slot extends Control:
 			s.set_border_width_all(1)
 		draw_style_box(s, r)
 
-## Material / count progress (Figma NEED-TILE): an icon inside a ring that fills with progress.
-class _NeedTile extends Control:
+## Skill level ring on the Skills sheet (progress within the level). Item have / need is UiNeedTile (LOCK-10).
+class _LevelRing extends Control:
 	func _draw() -> void:
 		var c := size * 0.5
 		var r := minf(size.x, size.y) * 0.5 - 3
