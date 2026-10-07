@@ -386,5 +386,4 @@ const PENDING := {
 	"wp1b": "container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)",
 	"segmentTab": "selected style must not use command green (LOCK-13), WP1b",
 	"toast": "sizes read Toast R1 (1178:82265); its tone look (light fills, tone icon, optional action) is not generated yet: ToastPanel and ToastLayer still draw the old dark panel",
-	"emptyState": "EmptyState 1234:87237 is a WP6 main (SGODOT-206), not yet accepted",
 }

@@ -5,12 +5,11 @@
     "status": "draft",
     "source": "Figma OMLTC3yw3u2WDjOZhLnhaR page 481:53 (read-only export, tools/ui/export_tokens_figma.js)",
     "unit": "360-wide logical px = Godot UI unit",
-    "accepted": "WP1a mains (HUD, NeedTile, Energy, Today, ActionKey, SceneAction, RadialPetal, TapCard, StatusBadge, PinMenu, QuickSlot, CommandButton, joystick) accepted 2026-10-07, SGODOT-200; WP2 Toast R1 accepted 2026-10-07, SGODOT-202",
+    "accepted": "WP1a mains (HUD, NeedTile, Energy, Today, ActionKey, SceneAction, RadialPetal, TapCard, StatusBadge, PinMenu, QuickSlot, CommandButton, joystick) accepted 2026-10-07, SGODOT-200; WP2 Toast R1 accepted 2026-10-07, SGODOT-202; WP6 EmptyState accepted 2026-10-07, SGODOT-206",
     "pending": {
       "wp1b": "container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)",
       "segmentTab": "selected style must not use command green (LOCK-13), WP1b",
-      "toast": "sizes read Toast R1 (1178:82265); its tone look (light fills, tone icon, optional action) is not generated yet: ToastPanel and ToastLayer still draw the old dark panel",
-      "emptyState": "EmptyState 1234:87237 is a WP6 main (SGODOT-206), not yet accepted"
+      "toast": "sizes read Toast R1 (1178:82265); its tone look (light fills, tone icon, optional action) is not generated yet: ToastPanel and ToastLayer still draw the old dark panel"
     }
   },
   "font": {
