@@ -642,9 +642,9 @@
       "name": "right_olive_crown_leaves",
       "asset": "olive_crown_leaves",
       "position": [
-        2.55,
+        2.32,
         0.07,
-        -0.12
+        2.03
       ],
       "yaw_degrees": 150,
       "scale": [
@@ -717,7 +717,7 @@
     ],
     "size": 9.518447343421212
   },
-  "revision": "R2",
+  "revision": "R2.1",
   "shared_plants": [
     {
       "name": "LeftOlive",
@@ -758,9 +758,9 @@
       "asset": "olive_tree",
       "file": "res://assets/rooms/_shared/plants/olive_tree.glb",
       "position": [
-        2.55,
+        2.32,
         0.07,
-        -0.12
+        2.03
       ],
       "rotation_degrees": [
         0,
@@ -1381,17 +1381,17 @@
       {
         "name": "right_crate",
         "position": [
-          2.18,
+          1.65,
           0.06,
-          1.55
+          0.35
         ]
       },
       {
         "name": "front_return",
         "position": [
-          2.12,
+          0.15,
           0.06,
-          2.18
+          0.35
         ]
       },
       {
@@ -1451,12 +1451,12 @@
         "from": [
           2.5,
           0.06,
-          1.4
+          0.4
         ],
         "to": [
           3.6,
           0.06,
-          1.4
+          0.4
         ],
         "target": "/side_low_wall/"
       }
@@ -1515,6 +1515,33 @@
         ],
         "width": 1.85,
         "minimum": 0.7
+      },
+      {
+        "name": "entry_to_produce",
+        "from": [
+          0.1,
+          0.06,
+          1.7
+        ],
+        "to": [
+          0.1,
+          0.06,
+          0.25
+        ],
+        "measure": [
+          [
+            -0.91,
+            0.32,
+            1.1
+          ],
+          [
+            0.4,
+            0.32,
+            1.1
+          ]
+        ],
+        "width": 1.31,
+        "minimum": 0.8
       }
     ],
     "entrance": {
@@ -1687,6 +1714,20 @@
         -1.0
       ],
       "size": 3.6
+    },
+    {
+      "name": "clear-produce-detail",
+      "position": [
+        5,
+        4.6,
+        7
+      ],
+      "target": [
+        0.15,
+        1.25,
+        -1.1
+      ],
+      "size": 5.8
     }
   ],
   "render_batches": [

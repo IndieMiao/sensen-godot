@@ -43,6 +43,8 @@ def revise():
                 begin('arch_vine_leaves',at=(-2.76,y,z),yaw=90);lib.vine(1.4,13,flowers=False)
                 for o in k.CURRENT['objects']:o['atlas_constant_colour']=True
             else:k.instance('arch_vine_leaves',name,(-2.76,y,z),90)
+    import revision21
+    revision21.revise()
     r.sync_instances()
 
 def manifest(d):
@@ -62,3 +64,6 @@ def manifest(d):
         if block['name']=='side_wall':block.update({'from':[2.5,.06,1.40],'to':[3.6,.06,1.40]})
     d['bench']['scale']['chair']={'applicable':False,'reason':'N/A: no chair in the reference or delivered scene; no placeholder measurement.'}
     d['review_views']=[{'name':'olive-sign-detail','position':[3.8,3.9,6.2],'target':[-2.30,1.45,1.1],'size':3.35},{'name':'vine-detail','position':[3.4,4.0,5.2],'target':[-2.57,2.1,-1.0],'size':3.6}]
+
+    import revision21
+    revision21.manifest(d)

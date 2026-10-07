@@ -1,6 +1,6 @@
 {
   "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-  "draw_calls": 14.0,
+  "draw_calls": 22.0,
   "instances": 66,
   "renderer": "mobile",
   "resolution": [
@@ -50,6 +50,11 @@
       "draw_calls": 14.0,
       "rendered_objects": 14.0,
       "view": "vine-detail"
+    },
+    {
+      "draw_calls": 22.0,
+      "rendered_objects": 22.0,
+      "view": "clear-produce-detail"
     }
   ]
 }

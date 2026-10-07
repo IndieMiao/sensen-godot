@@ -1,5 +1,5 @@
 {
-	"avatar_top_H": 1.74549429118633,
+	"avatar_top_H": 1.74549417197704,
 	"capsule_height": 1.25,
 	"capsule_radius": 0.21,
 	"measurements": {
@@ -8,24 +8,24 @@
 			"reason": "N/A: no chair in the reference or delivered scene; no placeholder measurement."
 		},
 		"counter": {
-			"baseline_ratio": 0.660271423297924,
+			"baseline_ratio": 0.66027146839145,
 			"difference": 0.123644251626898,
 			"height": 1.01,
-			"ratio_to_H": 0.578632657293625,
+			"ratio_to_H": 0.578632696811596,
 			"reason": ""
 		},
 		"door": {
-			"baseline_ratio": 1.33486543712292,
+			"baseline_ratio": 1.33486552828814,
 			"difference": 0.128755364806867,
 			"height": 2.63,
-			"ratio_to_H": 1.50673652344776,
+			"ratio_to_H": 1.50673662635099,
 			"reason": ""
 		},
 		"table": {
-			"baseline_ratio": 0.650245609928975,
+			"baseline_ratio": 0.650245654337783,
 			"difference": 0.110132158590308,
 			"height": 1.01,
-			"ratio_to_H": 0.578632657293625,
+			"ratio_to_H": 0.578632696811596,
 			"reason": ""
 		}
 	},

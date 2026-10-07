@@ -1,1 +1,14 @@
-[{"file":"olive-sign-detail.png","label":"Wood frame, bold sign and layered olive"},{"file":"vine-detail.png","label":"White flowers on a dense small-leaf arch"}]
+[
+  {
+    "file": "olive-sign-detail.png",
+    "label": "Wood frame, bold sign and layered olive"
+  },
+  {
+    "file": "vine-detail.png",
+    "label": "White flowers on a dense small-leaf arch"
+  },
+  {
+    "file": "clear-produce-detail.png",
+    "label": "R2.1: all five main-counter fruit bins are clear"
+  }
+]

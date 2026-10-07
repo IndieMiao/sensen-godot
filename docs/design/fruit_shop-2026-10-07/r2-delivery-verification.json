@@ -1,0 +1,123 @@
+{
+  "revision": "R2",
+  "plane": {
+    "attachments": 17,
+    "all_download_sha256_match": true,
+    "files": [
+      {
+        "name": "SGODOT-182_R2_01-reference-comparison.png",
+        "bytes": 2278136,
+        "sha256": "d58193b30e03bbd6933e452ce1e406dae3a5ea73980b77adc360d0969838f6e2"
+      },
+      {
+        "name": "SGODOT-182_R2_02-whole.png",
+        "bytes": 1438188,
+        "sha256": "a1775648d3b6a0c75d2a55ea89f82e92b498c27a723f1be017e1f1e456c8ed66"
+      },
+      {
+        "name": "SGODOT-182_R2_03-counter-detail.png",
+        "bytes": 2091119,
+        "sha256": "348c282c4852933141de76ec55d184b404074ae4727377dbaa58a8af2debd7bb"
+      },
+      {
+        "name": "SGODOT-182_R2_04-plants-detail.png",
+        "bytes": 1924723,
+        "sha256": "af137a08c3f472c8e66fbff267c9588442766a92b429a189772e56e20a19d83b"
+      },
+      {
+        "name": "SGODOT-182_R2_05-orthographic.png",
+        "bytes": 758619,
+        "sha256": "598f988018d3b055832c22de0ae6711132f9faca8519586501206728ae198e1a"
+      },
+      {
+        "name": "SGODOT-182_R2_06-bench-spawn.png",
+        "bytes": 995019,
+        "sha256": "fc55a610bc79008631bdcea2694603965faf7e67d4e7226b9d1fc6ef2fce638d"
+      },
+      {
+        "name": "SGODOT-182_R2_07-bench-counter.png",
+        "bytes": 995256,
+        "sha256": "a180aa58e9dc1aecf17c5dab157da669d763073e99b5e33319e35ebcc3e849a1"
+      },
+      {
+        "name": "SGODOT-182_R2_08-bench-entrance.png",
+        "bytes": 994930,
+        "sha256": "ad4a18d9b811b84d4bfa4d7f1fd1a149133a6bd1fc730932f51d32fdf3eb7db2"
+      },
+      {
+        "name": "SGODOT-182_R2_09-collisions.png",
+        "bytes": 1089949,
+        "sha256": "073c87d2688d50fcab4fc5dc6102f2ec54a6ddf7bed758ccc236a3db3bed70cc"
+      },
+      {
+        "name": "SGODOT-182_R2_10-walkthrough.mp4",
+        "bytes": 615641,
+        "sha256": "1e299e6a92380331dbe84040d3d31befb5e7c285b0f2066b6cc597c0e0270fed"
+      },
+      {
+        "name": "SGODOT-182_R2_11-bench-result.json",
+        "bytes": 15698,
+        "sha256": "8f356d78624dc8654ff5baac8266a871325b5255e70cd2c1b547c37bbd907b99"
+      },
+      {
+        "name": "SGODOT-182_R2_13-colour-patches.jpg",
+        "bytes": 496142,
+        "sha256": "dc8615838ad1eab8d937e2f5d9372b4106b0a5399500e0764b375b78c5d20b71"
+      },
+      {
+        "name": "SGODOT-182_R2_14-plant-catalogue.jpg",
+        "bytes": 212185,
+        "sha256": "89cf40edc9bfb4193fe8f2c18bd5806e2bcb5ef3d421a9596230d54135a9cf2a"
+      },
+      {
+        "name": "SGODOT-182_R2_15-budget-verification.json",
+        "bytes": 7015,
+        "sha256": "5008a7bba57a341fe175260014a4c0d8734e598a611ad9328c413686de0ebafa"
+      },
+      {
+        "name": "SGODOT-182_R2_16-camera-registration.png",
+        "bytes": 4086163,
+        "sha256": "39a0137703e67812b8f8fc250e5074a472b5d8ffba171117f070a5c022e0881d"
+      },
+      {
+        "name": "SGODOT-182_R2_17-signage-check.png",
+        "bytes": 47361,
+        "sha256": "1c30f012c2204f47eed3fb3150a6a4143070b0bb3da31c5f029add64bbb20bf0"
+      },
+      {
+        "name": "SGODOT-182_R2_18-asset-details.jpg",
+        "bytes": 396768,
+        "sha256": "e94b7ccac0bcfd8ae761476b7cb0055cf15d78feedbac77145a1ef90d78e1fb3"
+      }
+    ]
+  },
+  "lark": {
+    "messages": 4,
+    "media": [
+      {
+        "name": "whole",
+        "sha256": "a1775648d3b6a0c75d2a55ea89f82e92b498c27a723f1be017e1f1e456c8ed66",
+        "byte_identical": true
+      },
+      {
+        "name": "comparison",
+        "sha256": "d58193b30e03bbd6933e452ce1e406dae3a5ea73980b77adc360d0969838f6e2",
+        "byte_identical": true
+      },
+      {
+        "name": "video",
+        "sha256": "1e299e6a92380331dbe84040d3d31befb5e7c285b0f2066b6cc597c0e0270fed",
+        "byte_identical": true
+      }
+    ],
+    "recipient": "previously verified self DM"
+  },
+  "video": {
+    "black_frames": 0,
+    "sample_count": 8,
+    "motion_max_mean_pixel_delta": 1.926511863425926,
+    "duration_seconds": 15,
+    "accelerated": false,
+    "sha256": "1e299e6a92380331dbe84040d3d31befb5e7c285b0f2066b6cc597c0e0270fed"
+  }
+}

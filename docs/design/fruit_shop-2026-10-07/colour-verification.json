@@ -1,5 +1,5 @@
 {
-  "revision": "r2",
+  "revision": "r21",
   "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
   "checks": [
     {
