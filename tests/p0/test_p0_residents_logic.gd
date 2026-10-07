@@ -109,7 +109,8 @@ func test_resident_bar_gift_and_meal() -> void:
 	var empty := _res({})
 	empty.bag.slots = []
 	assert_str(str(P0Logic.resident_bar(empty, "res_pip").gift_reason)).is_equal("No dishes in your bag")
-	assert_str(str(P0Logic.resident_bar(_res({"meal": "bag_full"}), "res_pip").meal_note)).is_equal("Bag full · free a slot for Pip's meal")
+	# A full bag sends the meal to the Inbox (SGODOT-232 S1), so there is no "free a slot" note any more.
+	assert_str(str(P0Logic.resident_bar(_res({"meal": "ready"}), "res_pip").meal_note)).is_equal("")
 	assert_bool(bool(P0Logic.resident_bar(_res({"meal": "given"}), "res_pip").meal)).is_true()
 	assert_str(P0Logic.resident_reply("res_old_kai", "not_a_fan")).is_equal("Hm. That's… a choice.")
 	assert_str(P0Logic.resident_reply("res_pip", "loved")).is_equal("")

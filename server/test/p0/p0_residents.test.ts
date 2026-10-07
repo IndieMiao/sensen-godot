@@ -77,17 +77,32 @@ describe('gift meal (§3.4.5, K-2, q(33))', () => {
     expect(viewOf(c, r.s, T0).residents).toMatchObject({ res_pip: { meal: 'given' }, res_old_kai: { meal: 'none' } });
   });
 
-  it('a full bag holds the meal back without using the day; it can be eaten, not sold or handed in, and is gone at 04:00', () => {
-    let s = familiar();
+  it('with a full bag the meal waits in the Inbox, uses the day, and is gone at 04:00 unclaimed (q(33), SGODOT-232)', () => {
+    const s = familiar();
     s.bag = Array.from({ length: 25 }, (_, i) => ({ id: `material_x${i}`, qty: 1 }));
-    expect(pip(s).meal).toBe('bag_full');
-    let r = step(s, { type: 'talk', resident: 'res_pip' });
-    expect(r.ev).toContainEqual({ kind: 'gift_meal', resident: 'res_pip', dish: 'dish_carrot_cake', given: false });
-    expect(r.s.day.gift_meal).toBeNull();
-    r.s.bag.pop();
-    r = step(r.s, { type: 'talk', resident: 'res_pip' }, T0 + H);
+    expect(pip(s).meal).toBe('ready');
+    const r = step(s, { type: 'talk', resident: 'res_pip' });
+    expect(r.ev).toContainEqual({ kind: 'gift_meal', resident: 'res_pip', dish: 'dish_carrot_cake', given: true, to: 'parcel' });
+    expect(r.ev.some(e => e.kind === 'item')).toBe(false);
+    expect(r.ev).toContainEqual(expect.objectContaining({ kind: 'parcel', id: 'dish_carrot_cake', gift: true, expires_in: 18 * H }));
     expect(r.s.day.gift_meal).toBe('res_pip');
-    s = r.s;
+    expect(r.s.inbox.parcels).toMatchObject([{ id: 'dish_carrot_cake', qty: 1, gift: { from: 'res_pip', day: '2026-10-08' },
+      source: "Pip's gift meal", expires_at: T0 + 18 * H }]);
+    // claimed into a free slot it is the same gifted stack the bag would have had
+    r.s.bag.pop();
+    const claimed = step(r.s, { type: 'claim_parcel', key: r.s.inbox.parcels[0].key }, T0 + H).s;
+    expect(claimed.bag.find(b => b.gift)).toEqual({ id: 'dish_carrot_cake', qty: 1, gift: { from: 'res_pip', day: '2026-10-08' } });
+    // left unclaimed it is gone at the rollover and pays nothing
+    const coins = r.s.coins;
+    const v = viewOf(c, r.s, T0 + 18 * H);
+    expect(v.inbox.parcels).toEqual([]);
+    expect(v.inbox.updates[0]).toMatchObject({ id: 'dish_carrot_cake', status: 'returned', coins: 0 });
+    expect(v.coins).toBe(coins);
+  });
+
+  it('a gifted meal can be eaten, not sold or handed in, and is gone at 04:00', () => {
+    let s = familiar();
+    s = step(s, { type: 'talk', resident: 'res_pip' }, T0 + H).s;
     expect(refuse(s, { type: 'sell', item: 'dish_carrot_cake', qty: 1 })).toMatchObject({ ok: false, code: 'gifted' });
     s.energy = { value: 100, tick_ms: T0 + H };
     expect(step(s, { type: 'eat', item: 'dish_carrot_cake' }, T0 + H).s.energy.value).toBe(120);
