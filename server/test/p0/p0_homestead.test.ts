@@ -52,7 +52,7 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     expect(maxEnergy(c, after)).toBe(210);
     expect(foodCap(c, after, T0)).toBe(210);
     expect(after.homestead.plaque).toEqual([{ level: 2, at: T0 }]);
-    expect(ev).toContainEqual({ kind: 'homestead', level: 2, energy: 90, unlocks: ['spice_rack'] });
+    expect(ev).toContainEqual({ kind: 'homestead', level: 2, energy: 90, unlocks: ['spice_rack', 'clay_bank'] });
     expect(ev).toContainEqual({ kind: 'item', id: 'wood', delta: -12 });
     const v = viewOf(c, after, T0);
     expect(v.homestead.unlocks).toMatchObject({ spice_rack: true, warming_cabinet: false, bag_upgrade_1: 'locked', board_slots: 2 });
@@ -63,7 +63,7 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     expect(s.homestead.level).toBe(3);
     expect(maxEnergy(c, s)).toBe(220);
     const v = viewOf(c, s, T0);
-    expect(v.homestead.unlocks).toEqual({ spice_rack: true, warming_cabinet: true, bag_upgrade_1: 'for_sale', board_slots: 3, fence: true });
+    expect(v.homestead.unlocks).toEqual({ spice_rack: true, warming_cabinet: true, bag_upgrade_1: 'for_sale', board_slots: 3, fence: true, clay_bank: true });
     expect(v.homestead.next).toBeNull();
     expect(applyP0(c, s, { type: 'homestead_upgrade' }, T0)).toMatchObject({ ok: false, code: 'max_level' });
   });
@@ -121,7 +121,7 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     s.energy = { value: 230, tick_ms: T0 };
     const { s: after, ev } = step(s, { type: 'homestead_upgrade' });
     expect(after.energy.value).toBe(230);
-    expect(ev).toContainEqual({ kind: 'homestead', level: 2, energy: 0, unlocks: ['spice_rack'] });
+    expect(ev).toContainEqual({ kind: 'homestead', level: 2, energy: 0, unlocks: ['spice_rack', 'clay_bank'] });
   });
 
   it('the view lists what the next level needs, with storage and bag shown apart', () => {
@@ -151,7 +151,7 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     (old.requests as { status: string }[])[0].status = 'accepted';
     (old.gear as Record<string, unknown>).hoes = undefined;
     const s = upgradeState(c, old as unknown as P0State, T0);
-    expect(s.v).toBe(3);
+    expect(s.v).toBe(4);
     expect(s.homestead.level).toBe(1);
     expect(s.bag_cap).toBe(25);
     expect(s.boards.stall[0].req).toMatchObject({ id: 'req_pond_catch', status: 'accepted', qty: 2, drawn_at: old.created_at });
