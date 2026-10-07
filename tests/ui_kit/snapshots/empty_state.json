@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    238
+    256
   ],
   "children": [
     {
@@ -24,16 +24,16 @@
         0,
         28,
         328,
-        18
+        36
       ],
       "variation": "CaptionR12",
-      "text": "No Figma main yet (engineering default, WP7-B F-08 §5)"
+      "text": "Main pending: WP6 SGODOT-206 · provisional look per WP7-B F-08 §5"
     },
     {
       "type": "VBoxContainer",
       "rect": [
         0,
-        52,
+        70,
         328,
         186
       ],
@@ -42,7 +42,7 @@
           "type": "UiEmptyState",
           "rect": [
             0,
-            52,
+            70,
             328,
             108
           ],
@@ -51,7 +51,7 @@
               "type": "TextureRect",
               "rect": [
                 148,
-                52,
+                70,
                 32,
                 32
               ]
@@ -60,7 +60,7 @@
               "type": "Label",
               "rect": [
                 0,
-                90,
+                108,
                 328,
                 20
               ],
@@ -71,7 +71,7 @@
               "type": "UiNavButton",
               "rect": [
                 122,
-                116,
+                134,
                 84,
                 44
               ],
@@ -84,7 +84,7 @@
           "type": "UiEmptyState",
           "rect": [
             0,
-            180,
+            198,
             328,
             58
           ],
@@ -93,7 +93,7 @@
               "type": "TextureRect",
               "rect": [
                 148,
-                180,
+                198,
                 32,
                 32
               ]
@@ -102,7 +102,7 @@
               "type": "Label",
               "rect": [
                 0,
-                218,
+                236,
                 328,
                 20
               ],

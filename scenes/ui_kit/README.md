@@ -55,7 +55,7 @@ must not change structure, role, entry point or key copy. Engineering specs: SGO
 | `UiFilterChip` | Compact/Filter 633:41280 | toggle chip, 26 drawn in 44; `UiFilterChip.row()` builds a grouped row |
 | `UiSegmentTab` | Tab 483:322 · Compact/Kitchen/Mode 655:58504 | 2–3 way mode switch with optional count; selected is never the command green (LOCK-13) |
 | `UiBadge` | StateBadge 483:324 | short state word pill |
-| `UiEmptyState` | none yet (WP7-B F-08 §5) | icon + one line + optional navigation; engineering default until a main exists |
+| `UiEmptyState` | pending, WP6 SGODOT-206 (WP7-B F-08 §5) | icon + one line + optional navigation; provisional look until the main lands |
 
 Positions inside a fixed-size main (e.g. the InventoryCell icon at y 10, the 3 px pill inset) are private
 constants in the component script, each citing its main; everything shared comes from `UiTokens`.

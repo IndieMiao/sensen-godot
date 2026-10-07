@@ -1,6 +1,6 @@
 class_name UiEmptyState
 extends VBoxContainer
-## EmptyState (SGODOT-212; WP7-B F-08 §5, no Figma main yet, engineering default): icon + one line +
+## EmptyState (SGODOT-212; WP7-B F-08 §5): provisional look until the Figma main lands in WP6 (SGODOT-206). Icon + one line +
 ## optional navigation row, centred, e.g. "No fish yet". The navigation only opens a panel or moves the
 ## camera (LOCK-08); copy comes from the caller (final wording by WP6 / the plan). Emits `navigate`.
 

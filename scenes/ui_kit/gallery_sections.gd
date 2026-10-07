@@ -26,7 +26,7 @@ static func all() -> Array[Dictionary]:
 		{id = "filter_chip", title = "UiFilterChip", figma = "Compact/Filter 633:41280", build = _filter_chips},
 		{id = "segment_tab", title = "UiSegmentTab", figma = "Tab 483:322 · Compact/Kitchen/Mode 655:58504 · LOCK-13 / 20", build = _segment_tabs},
 		{id = "badge", title = "UiBadge", figma = "StateBadge 483:324", build = _badges},
-		{id = "empty_state", title = "UiEmptyState", figma = "No Figma main yet (engineering default, WP7-B F-08 §5)", build = _empty_states},
+		{id = "empty_state", title = "UiEmptyState", figma = "Main pending: WP6 SGODOT-206 · provisional look per WP7-B F-08 §5", build = _empty_states},
 	]
 	return out
 
