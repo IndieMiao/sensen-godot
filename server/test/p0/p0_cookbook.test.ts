@@ -160,6 +160,7 @@ describe('Queue ×2 (Cooking Lv5; 李白 2026-10-08)', () => {
     // any later command keeps the first pot (Good from its heat tap) and fires the queued one at the first one's end
     const later = step(s, { type: 'read_inbox', keys: [] }, T0 + 7 * S);
     expect(count(later.s.bag, 'dish_grilled_crucian@good')).toBe(1);
+    expect(later.ev.find(e => e.kind === 'dish')).toMatchObject({ dish: 'dish_grilled_crucian', quality: 1, auto: true });
     expect(later.ev.find(e => e.kind === 'queue')).toMatchObject({ started_at: T0 + 5 * S });
     expect(later.s.stove).toMatchObject({ dish: 'dish_carrot_cake', started_at: T0 + 5 * S });
     expect(later.s.queue).toBeNull();

@@ -199,7 +199,7 @@ export function settleStove(c: P0Content, s: P0State, now: number, events: P0Eve
   if (now < readyAt) return;
   const quality = Math.min(pot.mystery ? 0 : heatHits(c, pot.heats, pot.taps ?? []), 2);
   if (!dishesFit(c, s, [[dishId(pot.dish, quality), 1]])) return;
-  finishPot(c, s, pot, pot.taps ?? [], false, now, events);
+  finishPot(c, s, pot, pot.taps ?? [], false, now, events, true);
   startQueued(c, s, readyAt, events);
 }
 
@@ -211,8 +211,9 @@ function startQueued(c: P0Content, s: P0State, at: number, events: P0Event[]): v
   events.push({ kind: 'queue', dish: s.cookbook.includes(s.stove.dish) && !s.stove.mystery ? s.stove.dish : null, started_at: at, ms: s.stove.ms });
 }
 
-/** Judge a done pot and pay it out: portions the Keep way (or eaten), Cookbook, first-time rewards and XP. */
-function finishPot(c: P0Content, s: P0State, pot: Pot, taps: number[], eat: boolean, now: number, events: P0Event[]): void {
+/** Judge a done pot and pay it out: portions the Keep way (or eaten), Cookbook, first-time rewards and XP.
+ * auto: kept on its own (Queue ×2), so the client shows the Keep toast instead of the COOK-4 card. */
+function finishPot(c: P0Content, s: P0State, pot: Pot, taps: number[], eat: boolean, now: number, events: P0Event[], auto = false): void {
   const hits = pot.mystery ? 0 : heatHits(c, pot.heats, taps);
   const quality = Math.min(hits, 2);
   const main = dishId(pot.dish, quality);
@@ -222,7 +223,7 @@ function finishPot(c: P0Content, s: P0State, pot: Pot, taps: number[], eat: bool
   const firstKey = `cook:${pot.dish}`;
   const first = !s.firsts.includes(firstKey);
   if (first) s.firsts.push(firstKey);
-  events.push({ kind: 'dish', dish: pot.dish, quality, qty: 1 + extra, first, mystery: pot.mystery, hits });
+  events.push({ kind: 'dish', dish: pot.dish, quality, qty: 1 + extra, first, mystery: pot.mystery, hits, ...(auto ? { auto: true as const } : {}) });
   if (eat) eatMeal(c, s, main, now, events);
   if (pot.mystery) { failedPot(c, s, pot.items ?? [], pot.started_at, now, events); return; }
   if (!s.cookbook.includes(pot.dish)) s.cookbook.push(pot.dish);
