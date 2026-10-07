@@ -1,0 +1,73 @@
+{
+  "authority": {
+    "page_id": "2d11d5b2-e24c-4089-8e6b-c4810ea26b14",
+    "section": "Arthur WP7-B / F-03 \u2462 world anchors v1, \u00a7\u00a71\u20137,2026-10-07"
+  },
+  "validator": "Additional scene-local authoring audit. The verbatim engineering check_room_anchors.gd has also run successfully; see anchor-engineering-verification.json.",
+  "checks": [
+    {
+      "name": "use_stove_1",
+      "module": "range_cooker",
+      "passed": true
+    },
+    {
+      "name": "use_stove_2",
+      "module": "range_cooker",
+      "passed": true
+    },
+    {
+      "name": "use_stove_3",
+      "module": "range_cooker",
+      "passed": true
+    },
+    {
+      "name": "drop_pot_1",
+      "module": "range_cooker",
+      "passed": true
+    },
+    {
+      "name": "drop_pot_2",
+      "module": "range_cooker",
+      "passed": true
+    },
+    {
+      "name": "drop_pot_3",
+      "module": "range_cooker",
+      "passed": true
+    },
+    {
+      "name": "use_spice_rack",
+      "module": "kitchen_fittings",
+      "passed": true
+    },
+    {
+      "name": "use_warming_cabinet",
+      "module": "kitchen_fittings",
+      "passed": true
+    },
+    {
+      "name": "stand_stove",
+      "module": "range_cooker",
+      "passed": true
+    },
+    {
+      "name": "cam_stove",
+      "module": "range_cooker",
+      "passed": true
+    },
+    {
+      "name": "spawn",
+      "module": null,
+      "passed": true
+    },
+    {
+      "name": "exit",
+      "module": null,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "forbidden_legacy_key_absent": true,
+  "pot_mouth_height_m": 1.615,
+  "pot_height_source": "Existing cooking-pot source:placement1.305m + .06m base offset + .25m rim profile; future213 can update drop height with its module."
+}

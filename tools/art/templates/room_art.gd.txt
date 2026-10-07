@@ -28,14 +28,17 @@ func _setup_room() -> void:
 		_add_asset(asset, asset, material)
 	for instance in layout.instances:
 		_add_asset(assets[instance.asset], instance, material)
-	for point in layout.get("attachment_points", []):
+	for point in layout.get("anchors", []):
 		var marker := Marker3D.new()
 		marker.name = str(point.name)
-		marker.position = _vec(point.position)
-		marker.rotation_degrees = _vec(point.get("rotation_degrees", [0,0,0]))
-		marker.set_meta("purpose", str(point.get("purpose", "")))
-		if point.has("size"): marker.set_meta("slot_size", _vec(point.size))
-		add_child(marker)
+		var anchor_parent: Node3D = self
+		if point.has("module"):
+			anchor_parent = get_node(str(point.module)) as Node3D
+			marker.set_meta("module", str(point.module))
+		anchor_parent.add_child(marker)
+		var room_transform := Transform3D(Basis(Vector3.UP, deg_to_rad(float(point.get("yaw_degrees", 0.0)))), _vec(point.position))
+		marker.transform = room_transform if anchor_parent == self else anchor_parent.transform.affine_inverse() * room_transform
+		if point.has("size"): marker.set_meta("sign_size", Vector2(float(point.size[0]), float(point.size[1])))
 	var plant_material := load("res://assets/rooms/_shared/plants/material.tres") as StandardMaterial3D
 	for plant in layout.get("shared_plants", []):
 		var container := Node3D.new()

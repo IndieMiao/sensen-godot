@@ -1,0 +1,122 @@
+{
+	"checks": [
+		{
+			"exists": true,
+			"module": "range_cooker",
+			"module_matches": true,
+			"name": "use_stove_1",
+			"passed": true,
+			"position_error_m": 0.0,
+			"up_dot": 1.0
+		},
+		{
+			"exists": true,
+			"module": "range_cooker",
+			"module_matches": true,
+			"name": "use_stove_2",
+			"passed": true,
+			"position_error_m": 0.0,
+			"up_dot": 1.0
+		},
+		{
+			"exists": true,
+			"module": "range_cooker",
+			"module_matches": true,
+			"name": "use_stove_3",
+			"passed": true,
+			"position_error_m": 0.0,
+			"up_dot": 1.0
+		},
+		{
+			"exists": true,
+			"module": "range_cooker",
+			"module_matches": true,
+			"name": "drop_pot_1",
+			"passed": true,
+			"position_error_m": 0.0,
+			"up_dot": 1.0
+		},
+		{
+			"exists": true,
+			"module": "range_cooker",
+			"module_matches": true,
+			"name": "drop_pot_2",
+			"passed": true,
+			"position_error_m": 0.0,
+			"up_dot": 1.0
+		},
+		{
+			"exists": true,
+			"module": "range_cooker",
+			"module_matches": true,
+			"name": "drop_pot_3",
+			"passed": true,
+			"position_error_m": 0.0,
+			"up_dot": 1.0
+		},
+		{
+			"exists": true,
+			"module": "kitchen_fittings",
+			"module_matches": true,
+			"name": "use_spice_rack",
+			"passed": true,
+			"position_error_m": 0.0,
+			"up_dot": 1.0
+		},
+		{
+			"exists": true,
+			"module": "kitchen_fittings",
+			"module_matches": true,
+			"name": "use_warming_cabinet",
+			"passed": true,
+			"position_error_m": 0.0,
+			"up_dot": 1.0
+		},
+		{
+			"blockers": [],
+			"capsule_clear": true,
+			"exists": true,
+			"module": "range_cooker",
+			"module_matches": true,
+			"name": "stand_stove",
+			"passed": true,
+			"position_error_m": 0.0,
+			"supported_floor": true,
+			"up_dot": 1.0,
+			"yaw_error": 0.00000250447816085853
+		},
+		{
+			"exists": true,
+			"module": "range_cooker",
+			"module_matches": true,
+			"name": "cam_stove",
+			"passed": true,
+			"position_error_m": 0.0,
+			"up_dot": 1.0
+		},
+		{
+			"blockers": [],
+			"capsule_clear": true,
+			"exists": true,
+			"module": null,
+			"module_matches": true,
+			"name": "spawn",
+			"passed": true,
+			"position_error_m": 0.0,
+			"supported_floor": true,
+			"up_dot": 1.0,
+			"yaw_error": 0.00000865142203565483
+		},
+		{
+			"exists": true,
+			"module": null,
+			"module_matches": true,
+			"name": "exit",
+			"passed": true,
+			"position_error_m": 0.0,
+			"up_dot": 1.0
+		}
+	],
+	"passed": true,
+	"scope": "Headless instantiated-art marker, module/yaw and standing physics contract only; no new rendered art/movement claim."
+}

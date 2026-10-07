@@ -1,9 +1,4 @@
 {
-  "spawn": [
-    3.85,
-    0.09,
-    -2.84
-  ],
   "bench": {
     "floor_y": 0.08,
     "route": [
@@ -326,6 +321,11 @@
         "height": 1.135,
         "source": "Long dining table top; low coffee table .613m is a distinct category"
       }
-    }
+    },
+    "spawn": [
+      3.85,
+      0.09,
+      -2.84
+    ]
   }
 }

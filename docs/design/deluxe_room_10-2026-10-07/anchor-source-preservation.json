@@ -1,0 +1,6 @@
+{
+  "mesh_geometry_and_placement_before": "a6b1ed8c3aa113bef18eb613cf2a48e6d18d434ab2a1302e7781ea0262f85424",
+  "after": "a6b1ed8c3aa113bef18eb613cf2a48e6d18d434ab2a1302e7781ea0262f85424",
+  "identical": true,
+  "change": "Empties migrated only; no room meshes, materials, lights or camera altered."
+}

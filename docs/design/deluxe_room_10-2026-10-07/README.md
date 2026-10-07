@@ -1,6 +1,6 @@
-# SGODOT-173 · Deluxe Room-10 R2.1 finishing revision
+# SGODOT-173 · Deluxe Room-10 R2.2 canonical anchors
 
-赵云 · revised for **Review** after the director's SGODOT-172 R2 release. Reference: Figma `OMLTC3yw3u2WDjOZhLnhaR`, SceneDesign, node `545:2970`. Basic Room's accepted scale and Liu Bei's shared botanical library are read-only dependencies.
+赵云 · **R2.1 美术已通过；R2.2 正式挂点修正完成，工程校验与本轮实渲/录像通过，提交Review。** Reference: Figma `OMLTC3yw3u2WDjOZhLnhaR`, SceneDesign, node `545:2970`. Basic Room's accepted scale and Liu Bei's shared botanical library are read-only dependencies.
 
 ![Reference / revised actual Godot / direct 50% overlay](comparison.png)
 
@@ -16,17 +16,36 @@
 | Hearth and door | Rounded cream plaster, orange gradient flame, charred logs/embers, matte irregular split-log niche, mantel landscape and candlesticks, warm table/wall lighting, greenery near the entry and striped mat. Mantel projects ahead of the loft beam so it reads in the whole scene. |
 | Materials and batching | Warm timber and lightly textured plaster, room-wide static contact AO, one shadowed sun and five short-range unshadowed lights. Editable named parts remain in the Blender source; fittings and soft goods are grouped by zone at export. Repeated chairs/stools share local-pivot GLBs. Supplied double-sided alpha-scissor plant material is retained; foliage/flowers/backgrounds do not cast shadows. |
 
-## Latest R2.1 items and future kitchen hooks
+## R2.1 art approval and corrected WP7-B anchors
 
-The TV screen is 33% smaller in width/height, and its reduced console moves to the room's front-right area with a 55-degree angle toward the sofa. Main-view sofa, coffee table and fireplace visibility is improved. The back wall changes from salmon to low-saturation cream; the stair wall gains a framed botanical picture, wooden shelf, a local black wall lamp and hanging pothos. A plant beside the stairs and a small loft-entry plant supplement the enlarged window/loft foliage. Shared leaves use the current deeper-green atlas `1ec21f9e`; 172's accepted geometry and source remain unchanged.
+The director accepted the R2.1 art: smaller angled TV at front-right, cream stair wall with picture/shelf/lamp and fuller plants, clear preparation worktop and a pendant shade bottom of 2.670m. R2.2 changes only the authoring anchors. The previous temporary names and `attachment_points` storage were withdrawn by the director because they conflicted with Arthur's formal contract.
 
-![Named future kitchen-module mounts](kitchen-attachment-points.png)
+Authority: Plane page **WP7-B / F-03 ③ World anchor names v1**, ID `2d11d5b2-e24c-4089-8e6b-c4810ea26b14`, §§1–7 (2026-10-07). The new top-level **`layout.json.anchors`** contains the following; same-name Blender Empties are provided. All coordinates are room metres, Y up. Only oriented anchors carry `yaw_degrees`; only sign anchors may carry 2D `size`, so these anchors carry no size field.
 
-Six named **Blender Empties / Godot Marker3D** mounts are present in `layout.json.attachment_points`: `hob_slot_1..3` point upward over three of the four burners; `prep_area` occupies the cleared 0.50m worktop beside the cooker; `spice_rack` uses the open shelf; `warmer_slot` reserves a 0.56m cabinet below prep for a later replacement. Its dashed box is an x-ray annotation because the island partly occludes the base from this camera. The utensil crock moves beside the sink. No kitchen-module model or gameplay behavior is added (213/218 own integration).
+| Anchor | Position [x,y,z] | Module | Purpose |
+|---|---|---|---|
+| `use_stove_1` | `[-3.915, 1.291, -0.381]` | `range_cooker` | Visible top centre, first burner |
+| `use_stove_2` | `[-4.245, 1.291, -0.381]` | `range_cooker` | Visible top centre, second burner |
+| `use_stove_3` | `[-3.915, 1.291, -0.859]` | `range_cooker` | Visible top centre, third burner |
+| `drop_pot_1` | `[-3.915, 1.615, -0.381]` | `range_cooker` | Ingredient drop, pot rim height |
+| `drop_pot_2` | `[-4.245, 1.615, -0.381]` | `range_cooker` | Ingredient drop, pot rim height |
+| `drop_pot_3` | `[-3.915, 1.615, -0.859]` | `range_cooker` | Ingredient drop, pot rim height |
+| `use_spice_rack` | `[-4.22, 2.62, 0.38]` | `kitchen_fittings` | Existing open shelf / future Lv2 module |
+| `use_warming_cabinet` | `[-4.08, 0.082, -1.69]` | `kitchen_fittings` | Existing green cabinet / future Lv3 replacement |
+| `stand_stove` | `[-3.33, 0.083, -0.62]` | `range_cooker` | Floor operation position; yaw 90 faces −X toward stove |
+| `cam_stove` | `[-4.03, 1.55, -0.45]` | `range_cooker` | Camera focus above the active burner/pot |
+| `spawn` | `[3.85, 0.083, -2.84]` | room | Inside doorway, yaw 180 into room |
+| `exit` | `[3.93, 0.083, -3.56]` | room | Door threshold |
 
-The pendant was raised and shifted forward over the island: measured shade bottom **2.670m**, 0.9245m above the fixture's visual head. The main/detail views show the prep surface unobstructed. Source AABB checks verify the cleared prep area; source Empties and runtime Markers independently verify matching positions and +Y up axes. [Measured hook contract](kitchen-hooks-verification.json).
+The three `use_stove_*`, spice and warming-cabinet positions are preserved exactly. `drop_pot_*` are above their burners at **1.615m**, using the existing pot source rim height. `prep_area` is removed; the clear 0.50m preparation surface remains. Its dimensions remain descriptive room metadata, not an interaction anchor. The current `range_cooker` and `kitchen_fittings` asset names are temporary valid module references until 213 supplies separately switchable kitchen modules. Room-level spawn/exit have no module reference. The obsolete top-level spawn is removed; the benchmark retains its identical legacy start inside `bench.spawn`, separate from canonical room anchors.
 
-R2.1 repeats **38/38** actual character checks and records a fresh 15-second route through the loft. Original review remains in Git history and the Plane card; current images/results belong to R2.1.
+![Canonical kitchen anchors projected on accepted art](kitchen-attachment-points.png)
+
+Marker3D nodes are parented under the named modules while preserving room-space coordinates, so they follow module visibility. A focused Godot scene-instantiation check verifies all 12 nodes, module parents, positions/up axes and oriented yaws; the standing/spawn capsule is clear and supported by authored floor. [Runtime checks](anchor-runtime-verification.json) · [Schema audit](anchor-schema-verification.json) · [Source geometry preservation](anchor-source-preservation.json) · [Source positions and prep clearance](kitchen-hooks-verification.json).
+
+The engineering **`tools/dev/check_room_anchors.gd`** and its **`P0RoomAnchors`** dependency are now available on `feat/p0-room-shell`. They were copied verbatim into an isolated verification project and run against this scene's actual layout: **12 anchors, 0 problems**. [Exact branch/commit, file hashes and output](anchor-engineering-verification.json). `validate_anchors.py` complements that check with stricter scene-specific field and pot-height assertions.
+
+The mesh/placement digest is identical before/after the metadata migration; runtime GLBs, atlases, camera and lights remain unchanged. After permissions were restored, **R2.2 was freshly rendered in Godot Mobile/Vulkan**, the anchor positions/module parents and capsule clearance were checked there, and **38/38 rendered character checks plus a new 15-second route recording passed**. The annotation uses this current capture with [explicit provenance](anchor-annotation-provenance.json).
 
 ## Camera and colour evidence
 
@@ -52,9 +71,9 @@ python3 tools/art/prepare_room_review.py deluxe_room_10
 # Import, retain configure_room_imports.py settings, then capture through review_room.gd.
 python3 tools/dev/scene_bench/prepare.py deluxe_room_10
 # Import the isolated bench, then run on the current real display:
-python3 tools/dev/scene_bench/run.py deluxe_room_10 --record --output output/zhaoyun-173-review-2026-10-07/bench
-python3 tools/art/check_room_colour.py deluxe_room_10 173
-python3 tools/art/package_room_review.py deluxe_room_10 173
+python3 tools/dev/scene_bench/run.py deluxe_room_10 --record --output output/zhaoyun-173-r22-2026-10-08/bench
+SCENE_REVIEW_OUTPUT="$PWD/output/zhaoyun-173-r22-2026-10-08" python3 tools/art/check_room_colour.py deluxe_room_10 173
+SCENE_REVIEW_OUTPUT="$PWD/output/zhaoyun-173-r22-2026-10-08" python3 tools/art/package_room_review.py deluxe_room_10 173
 ```
 
 The builder delegates to `tools/art/source/deluxe_room_10/revision.py`. Source edits belong in that deterministic generator; the `.blend` retains named editable parts and reusable pivots. No gameplay, saves, release presets or another artist's assets are changed.

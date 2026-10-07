@@ -210,18 +210,14 @@ def build():
     r2.shared_plant('loft_entry_greenery','peace_lily',(1.35,2.49,-3.48),.43,20)
     merge_modules('dining_island_flowers',['dining_daisies','island_daisies'])
     # Future kitchen modules attach to upward Y axes; no cooking behavior.
-    hooks=[
-      {'name':'hob_slot_1','position':[-3.915,1.291,-.381],'purpose':'Pot mount on forward right burner'},
-      {'name':'hob_slot_2','position':[-4.245,1.291,-.381],'purpose':'Pot mount on rear right burner'},
-      {'name':'hob_slot_3','position':[-3.915,1.291,-.859],'purpose':'Pot mount on forward left burner'},
-      {'name':'prep_area','position':[-4.04,1.296,-1.69],'size':[.70,.10,.55],'purpose':'Clear 0.55m preparation worktop; utensil crock moved beside sink'},
-      {'name':'spice_rack','position':[-4.22,2.62,.38],'size':[.38,.35,.98],'purpose':'Open pantry shelf accepts Lv2 spice module'},
-      {'name':'warmer_slot','position':[-4.08,.082,-1.69],'size':[.69,1.08,.56],'purpose':'Lv3 replaceable green cabinet slot under prep, 0.56m along counter'}]
-    collection=bpy.data.collections.new('ATTACHMENT_POINTS');bpy.context.scene.collection.children.link(collection)
-    for h in hooks:
-        h['rotation_degrees']=[0,0,0];h['up_axis']='+Y'
-        obj=bpy.data.objects.new(h['name'],None);collection.objects.link(obj);obj.location=v(h['position']);obj.empty_display_type='ARROWS';obj.empty_display_size=.16;obj['purpose']=h['purpose']
-    p.MANIFEST_EXTRA['attachment_points']=hooks
+    anchors=json.loads(Path(__file__).with_name('kitchen-anchors.json').read_text())
+    collection=bpy.data.collections.new('WORLD_ANCHORS');bpy.context.scene.collection.children.link(collection)
+    for anchor in anchors:
+        obj=bpy.data.objects.new(anchor['name'],None);collection.objects.link(obj)
+        obj.location=v(anchor['position']);obj.rotation_euler.z=math.radians(anchor.get('yaw_degrees',0))
+        obj.empty_display_type='ARROWS';obj.empty_display_size=.16
+        if 'module' in anchor:obj['module']=anchor['module']
+    p.MANIFEST_EXTRA['anchors']=anchors
     p.MANIFEST_EXTRA['kitchen_clearance']={'pendant_shade_bottom_y':2.67,'avatar_head_H':1.7455,'clearance_metres':.9245,'prep_clear_width_metres':.55,'visual_check':'Main and kitchen detail supplied; pendant hangs over island, prep sits against left wall.'}
     # Fabric lampshades themselves glow; a hidden bulb does not illuminate an
     # opaque outward-facing shade. Keep metal stems in their opaque modules.

@@ -103,15 +103,28 @@ ALBEDO=mix(vec3(.64,.81,.74),vec3(.98,.92,.71),t);}
 		"mesh_instances":0,"surfaces":0,"triangles":0,"colliders":0,"finite_aabbs":true}
 	inspect(room,stats)
 	stats["material_count"] = material_ids.size()
-	if layout.has("attachment_points"):
+	if layout.has("anchors"):
 		var hook_checks: Array = []
-		for point in layout.attachment_points:
-			var marker := room.get_node_or_null(str(point.name)) as Marker3D
+		for point in layout.anchors:
+			var marker := room.find_child(str(point.name), true, false) as Marker3D
 			assert(marker != null)
-			var error := marker.position.distance_to(vec(point.position))
-			assert(error < .0001 and marker.basis.y.dot(Vector3.UP) > .999)
-			hook_checks.append({"name":point.name,"position_error_m":error,"up_dot":marker.basis.y.dot(Vector3.UP)})
-		stats["attachment_points"] = hook_checks
+			var error: float = room.to_local(marker.global_position).distance_to(vec(point.position))
+			assert(error < .0001 and marker.global_basis.y.normalized().dot(Vector3.UP) > .999)
+			var evidence := {"name":point.name,"position_error_m":error,"up_dot":marker.global_basis.y.normalized().dot(Vector3.UP)}
+			if point.has("module"): assert(marker.get_parent().name == str(point.module))
+			if str(point.name).begins_with("stand_") or point.name == "spawn":
+				var capsule := CapsuleShape3D.new(); capsule.radius = .21; capsule.height = 1.25
+				var query := PhysicsShapeQueryParameters3D.new(); query.shape = capsule
+				query.transform = Transform3D(Basis.IDENTITY, marker.global_position + Vector3.UP * .65)
+				var space := world.get_world_3d().direct_space_state
+				var hits := space.intersect_shape(query)
+				assert(hits.is_empty())
+				var ray := PhysicsRayQueryParameters3D.create(marker.global_position + Vector3.UP * .18, marker.global_position - Vector3.UP * .25)
+				var floor_hit := space.intersect_ray(ray)
+				assert(not floor_hit.is_empty() and floor_hit.normal.y > .7)
+				evidence["capsule_clear"] = true; evidence["supported_floor"] = true
+			hook_checks.append(evidence)
+		stats["anchors"] = hook_checks
 	assert(stats.mesh_instances == layout.assets.size() + layout.instances.size() + layout.get("shared_plants", []).size())
 	assert(stats.finite_aabbs)
 	var file := FileAccess.open(output_dir + "/godot-validation.json",FileAccess.WRITE)
