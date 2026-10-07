@@ -100,10 +100,19 @@ def geometry():
     s.menu('good_tea_wall_sign',(-2.84,1.14,1.49),'GOOD TEA',['BRIGHTER','DAYS'],.63,.81)
     # Left-wall signage faces the room; root transforms are manifest-owned.
     root=k.KITS['good_tea_wall_sign']['root'];root.rotation_euler.z=math.pi/2;k.KITS['good_tea_wall_sign']['yaw']=90
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('milk_revision',Path(__file__).resolve().parent/'source/milk_tea_shop/revision.py')
+    rev=importlib.util.module_from_spec(spec);spec.loader.exec_module(rev)
+    sys.path.insert(0,str(Path(__file__).resolve().parent/'source/milk_tea_shop'))
+    rev.revise()
     k.save('545:2962',{'position':[10,9.2,12],'target':[0,1.10,.15],'size':9.4})
+    rev.manifest()
 
 if __name__=='__main__':
     k.configure('milk_tea_shop');args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
     if '--bake-only' in args:k.load()
     else:geometry()
-    if '--geometry-only' not in args:k.bake_and_export()
+    if '--geometry-only' not in args:k.bake_and_export(ao_strength=.45,ao_distance=.36,coherent_swatches=True)
+    if '--geometry-only' not in args:
+        from series_batch import build
+        build('milk_tea_shop')

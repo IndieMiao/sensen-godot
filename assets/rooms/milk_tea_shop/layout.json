@@ -19,12 +19,12 @@
         {
           "at": [
             0,
-            -0.09,
+            -0.08,
             0
           ],
           "size": [
             6.1,
-            0.22,
+            0.26,
             5.6
           ]
         }
@@ -66,24 +66,24 @@
       "colliders": [
         {
           "at": [
-            -1.91,
+            -2.175,
             1.5,
             0
           ],
           "size": [
-            1.02,
+            1.0500000000000003,
             3,
             0.23
           ]
         },
         {
           "at": [
-            1.65,
+            1.375,
             1.5,
             0
           ],
           "size": [
-            2.22,
+            3.05,
             3,
             0.23
           ]
@@ -103,12 +103,12 @@
         {
           "at": [
             0,
-            0.32,
+            0.2016,
             0
           ],
           "size": [
             1.95,
-            0.64,
+            0.4032,
             0.3
           ]
         }
@@ -199,13 +199,60 @@
         {
           "at": [
             0,
-            0.025,
-            0.05
+            0,
+            0
           ],
-          "size": [
-            2.06,
-            0.17,
-            0.5
+          "points": [
+            [
+              -1.03,
+              -0.19,
+              -0.4
+            ],
+            [
+              -1.03,
+              0.211,
+              -0.4
+            ],
+            [
+              -1.03,
+              0.211,
+              0.21
+            ],
+            [
+              -1.03,
+              -0.02,
+              0.7
+            ],
+            [
+              -1.03,
+              -0.19,
+              0.7
+            ],
+            [
+              1.03,
+              -0.19,
+              -0.4
+            ],
+            [
+              1.03,
+              0.211,
+              -0.4
+            ],
+            [
+              1.03,
+              0.211,
+              0.21
+            ],
+            [
+              1.03,
+              -0.02,
+              0.7
+            ],
+            [
+              1.03,
+              -0.19,
+              0.7
+            ]
           ]
         }
       ]
@@ -436,12 +483,12 @@
         {
           "at": [
             0,
-            0.44,
+            0.528,
             0
           ],
           "size": [
             1.1,
-            0.88,
+            1.056,
             1.1
           ]
         }
@@ -460,12 +507,12 @@
         {
           "at": [
             0,
-            0.48,
+            0.5423999999999999,
             0
           ],
           "size": [
             0.59,
-            0.96,
+            1.0847999999999998,
             0.6
           ]
         }
@@ -476,7 +523,7 @@
       "file": "table_flower_vase.glb",
       "position": [
         -1.45,
-        0.93,
+        1.104,
         0.63
       ],
       "yaw_degrees": 0,
@@ -495,62 +542,16 @@
         {
           "at": [
             0,
-            0.35,
+            0.4,
             0
           ],
           "size": [
             1.68,
-            0.7,
-            0.52
+            0.8,
+            0.56
           ]
         }
       ]
-    },
-    {
-      "name": "corner_plant",
-      "file": "corner_plant.glb",
-      "position": [
-        -2.56,
-        0.07,
-        -0.35
-      ],
-      "yaw_degrees": 0,
-      "colliders": [
-        {
-          "at": [
-            0,
-            0.28,
-            0
-          ],
-          "size": [
-            0.52,
-            0.56,
-            0.52
-          ]
-        }
-      ]
-    },
-    {
-      "name": "trailing_wall_plant",
-      "file": "trailing_wall_plant.glb",
-      "position": [
-        -2.66,
-        2.72,
-        -2.39
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
-      "name": "flower_wall_ivy",
-      "file": "flower_wall_ivy.glb",
-      "position": [
-        2.32,
-        0.85,
-        2.67
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
     },
     {
       "name": "street_signboard",
@@ -570,6 +571,39 @@
         -2.84,
         1.14,
         1.49
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "fridge_glass",
+      "file": "fridge_glass.glb",
+      "position": [
+        -2.3,
+        0.06,
+        -1.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "urn_glass",
+      "file": "urn_glass.glb",
+      "position": [
+        0.16,
+        1.26,
+        -2.09
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "left_tea_logo",
+      "file": "left_tea_logo.glb",
+      "position": [
+        -2.85,
+        1.78,
+        1.23
       ],
       "yaw_degrees": 90,
       "colliders": []
@@ -651,7 +685,7 @@
       "asset": "table_flower_vase",
       "position": [
         1.45,
-        0.93,
+        1.104,
         1.18
       ],
       "yaw_degrees": 0
@@ -665,39 +699,976 @@
         -1.46
       ],
       "yaw_degrees": 0
-    },
-    {
-      "name": "trailing_wall_plant_2",
-      "asset": "trailing_wall_plant",
-      "position": [
-        2.62,
-        2.72,
-        -2.44
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "flower_wall_ivy_2",
-      "asset": "flower_wall_ivy",
-      "position": [
-        -2.15,
-        0.85,
-        2.68
-      ],
-      "yaw_degrees": 0
     }
   ],
   "camera": {
     "position": [
-      10,
-      9.2,
-      12
+      10.8,
+      10.6,
+      11.4
     ],
     "target": [
       0,
-      1.1,
-      0.15
+      1.24,
+      0.05
     ],
     "size": 9.4
-  }
+  },
+  "revision": "R1",
+  "shared_plants": [
+    {
+      "name": "MonsteraCorner",
+      "asset": "monstera",
+      "file": "res://assets/rooms/_shared/plants/monstera.glb",
+      "position": [
+        -2.54,
+        0.06,
+        -0.54
+      ],
+      "rotation_degrees": [
+        0,
+        20,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.28,
+            0
+          ],
+          "size": [
+            0.57,
+            0.56,
+            0.57
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WallPothos0",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        -2.6,
+        2.7,
+        -2.39
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallPothos1",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        2.64,
+        2.7,
+        -2.39
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.15,
+        1.15,
+        1.15
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox0",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.57,
+        0.8,
+        2.61
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.84,
+        0.84,
+        0.84
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerDrape0",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.57,
+        0.95,
+        2.77
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox1",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -1.01,
+        0.8,
+        2.65
+      ],
+      "rotation_degrees": [
+        0,
+        29,
+        0
+      ],
+      "scale": [
+        0.84,
+        0.84,
+        0.84
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerDrape1",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -1.01,
+        0.95,
+        2.81
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        7
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox2",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        1.4,
+        0.8,
+        2.63
+      ],
+      "rotation_degrees": [
+        0,
+        58,
+        0
+      ],
+      "scale": [
+        0.84,
+        0.84,
+        0.84
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerDrape2",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        1.4,
+        0.95,
+        2.79
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        14
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox3",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.07,
+        0.8,
+        2.64
+      ],
+      "rotation_degrees": [
+        0,
+        87,
+        0
+      ],
+      "scale": [
+        0.84,
+        0.84,
+        0.84
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerDrape3",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        2.07,
+        0.95,
+        2.8000000000000003
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox4",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.72,
+        0.8,
+        2.62
+      ],
+      "rotation_degrees": [
+        0,
+        116,
+        0
+      ],
+      "scale": [
+        0.84,
+        0.84,
+        0.84
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerDrape4",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        2.72,
+        0.95,
+        2.7800000000000002
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        7
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox5",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.92,
+        0.8,
+        1.92
+      ],
+      "rotation_degrees": [
+        0,
+        145,
+        0
+      ],
+      "scale": [
+        0.84,
+        0.84,
+        0.84
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerDrape5",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        2.92,
+        0.95,
+        2.08
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        14
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerBox6",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.93,
+        0.8,
+        1.21
+      ],
+      "rotation_degrees": [
+        0,
+        174,
+        0
+      ],
+      "scale": [
+        0.84,
+        0.84,
+        0.84
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FlowerDrape6",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        2.93,
+        0.95,
+        1.3699999999999999
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    }
+  ],
+  "material_overrides": {
+    "floor": {
+      "roughness": 0.46
+    },
+    "urn_glass": {
+      "alpha": 0.12
+    },
+    "fridge_glass": {
+      "alpha": 0.07
+    }
+  },
+  "boundaries": [
+    {
+      "name": "side_arch_limit",
+      "at": [
+        -3.13,
+        1.4,
+        0
+      ],
+      "size": [
+        0.1,
+        3,
+        5.6
+      ]
+    },
+    {
+      "name": "landing_floor",
+      "at": [
+        0.15,
+        -0.245,
+        3.2
+      ],
+      "size": [
+        2.06,
+        0.1,
+        0.8
+      ]
+    },
+    {
+      "name": "landing_front_edge",
+      "at": [
+        0.15,
+        0.5,
+        3.63
+      ],
+      "size": [
+        2.16,
+        1.6,
+        0.1
+      ]
+    },
+    {
+      "name": "landing_left_edge",
+      "at": [
+        -0.93,
+        0.5,
+        3.17
+      ],
+      "size": [
+        0.1,
+        1.6,
+        0.9
+      ]
+    },
+    {
+      "name": "landing_right_edge",
+      "at": [
+        1.23,
+        0.5,
+        3.17
+      ],
+      "size": [
+        0.1,
+        1.6,
+        0.9
+      ]
+    }
+  ],
+  "lighting": {
+    "background": "E3AF96",
+    "ambient": "C8BFB6",
+    "ambient_energy": 0.72,
+    "sun_color": "FFE4C3",
+    "sun_energy": 1.2,
+    "sun_position": [
+      6,
+      9,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -0.8
+    ],
+    "angular_distance": 6,
+    "lamps": [
+      {
+        "position": [
+          -2.46,
+          2.3,
+          1.27
+        ],
+        "color": "FFE1AB",
+        "energy": 0.65,
+        "range": 1.6
+      }
+    ]
+  },
+  "review_lighting": {
+    "background": "E3AF96",
+    "ambient_color": "C8BFB6",
+    "ambient": 0.72,
+    "sun_color": "FFE4C3",
+    "sun": 1.2,
+    "sun_position": [
+      6,
+      9,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -0.8
+    ],
+    "points": [
+      {
+        "position": [
+          -2.46,
+          2.3,
+          1.27
+        ],
+        "color": "FFE1AB",
+        "energy": 0.65,
+        "range": 1.6
+      }
+    ]
+  },
+  "spawn": [
+    0.15,
+    0.06,
+    2.18
+  ],
+  "bench": {
+    "floor_y": 0.05,
+    "route": [
+      {
+        "name": "entrance",
+        "position": [
+          0.15,
+          0.06,
+          2.18
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "between_tables",
+        "position": [
+          0,
+          0.06,
+          0.7
+        ]
+      },
+      {
+        "name": "counter",
+        "position": [
+          0,
+          0.06,
+          -0.68
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "pickup",
+        "position": [
+          2.1,
+          0.06,
+          -0.68
+        ]
+      },
+      {
+        "name": "return_counter",
+        "position": [
+          0,
+          0.06,
+          -0.68
+        ]
+      },
+      {
+        "name": "bench_approach",
+        "position": [
+          0,
+          0.06,
+          1.65
+        ]
+      },
+      {
+        "name": "bench_front",
+        "position": [
+          -1.5,
+          0.06,
+          1.67
+        ]
+      },
+      {
+        "name": "center_return",
+        "position": [
+          0,
+          0.06,
+          1.65
+        ]
+      },
+      {
+        "name": "fridge_approach",
+        "position": [
+          0,
+          0.06,
+          -0.75
+        ]
+      },
+      {
+        "name": "fridge_front",
+        "position": [
+          -2.02,
+          0.06,
+          -1.08
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "counter",
+        "from": [
+          0,
+          0.06,
+          -0.65
+        ],
+        "to": [
+          0,
+          0.06,
+          -1.8
+        ],
+        "target": "/service_counter/"
+      },
+      {
+        "name": "fridge",
+        "from": [
+          -2.02,
+          0.06,
+          -1.05
+        ],
+        "to": [
+          -2.02,
+          0.06,
+          -2
+        ],
+        "target": "/drinks_fridge/"
+      },
+      {
+        "name": "bench",
+        "from": [
+          -1.8,
+          0.06,
+          1.7
+        ],
+        "to": [
+          -1.8,
+          0.06,
+          2.5
+        ],
+        "target": "/pastel_bench/"
+      },
+      {
+        "name": "table",
+        "from": [
+          -1.45,
+          0.06,
+          -0.5
+        ],
+        "to": [
+          -1.45,
+          0.06,
+          0.6
+        ],
+        "target": "/cafe_table/"
+      },
+      {
+        "name": "side_wall",
+        "from": [
+          2.5,
+          0.06,
+          0.1
+        ],
+        "to": [
+          3.5,
+          0.06,
+          0.1
+        ],
+        "target": "/side_low_wall/"
+      },
+      {
+        "name": "front_wall",
+        "from": [
+          2.2,
+          0.06,
+          2.07
+        ],
+        "to": [
+          2.2,
+          0.06,
+          3.3
+        ],
+        "target": "/front_wall_right/"
+      },
+      {
+        "name": "arch_boundary",
+        "from": [
+          -2.5,
+          0.06,
+          1.3
+        ],
+        "to": [
+          -3.5,
+          0.06,
+          1.3
+        ],
+        "target": "side_arch_limit"
+      },
+      {
+        "name": "landing_front",
+        "from": [
+          0.15,
+          -0.18,
+          3.24
+        ],
+        "to": [
+          0.15,
+          -0.18,
+          4.1
+        ],
+        "target": "landing_front_edge"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "chairs_center",
+        "from": [
+          0,
+          0.06,
+          1.7
+        ],
+        "to": [
+          0,
+          0.06,
+          -0.5
+        ],
+        "measure": [
+          [
+            -0.38,
+            0.7,
+            0.9
+          ],
+          [
+            0.38,
+            0.7,
+            0.9
+          ]
+        ],
+        "width": 0.76,
+        "minimum": 0.7
+      },
+      {
+        "name": "tables_counter",
+        "from": [
+          -1.4,
+          0.06,
+          -0.55
+        ],
+        "to": [
+          1.8,
+          0.06,
+          -0.55
+        ],
+        "measure": [
+          [
+            -1.4,
+            0.7,
+            -1.19
+          ],
+          [
+            -1.4,
+            0.7,
+            0.08
+          ]
+        ],
+        "width": 1.27,
+        "minimum": 0.7
+      },
+      {
+        "name": "entry",
+        "from": [
+          0.15,
+          0.06,
+          2.1
+        ],
+        "to": [
+          0.15,
+          -0.18,
+          3.21
+        ],
+        "measure": [
+          [
+            -0.77,
+            0.6,
+            2.68
+          ],
+          [
+            1.08,
+            0.6,
+            2.68
+          ]
+        ],
+        "width": 1.85,
+        "minimum": 0.7
+      }
+    ],
+    "entrance": {
+      "inside": [
+        0.15,
+        0.06,
+        2.15
+      ],
+      "outside": [
+        0.15,
+        -0.18,
+        3.23
+      ]
+    },
+    "slide": {
+      "from": [
+        2.6,
+        0.06,
+        0
+      ],
+      "direction": [
+        1,
+        0,
+        -1
+      ],
+      "tangent": [
+        0,
+        0,
+        -1
+      ],
+      "seconds": 0.65
+    },
+    "input_start": [
+      0,
+      0.06,
+      -0.6
+    ],
+    "scale": {
+      "door": {
+        "height": 2.63,
+        "source": "Arch clear apex 1.96+.67; source metres"
+      },
+      "counter": {
+        "height": 1.2005,
+        "source": "Counter worktop top 1.1905 + pivot .06 - supporting floor .05"
+      },
+      "chair": {
+        "height": 0.69365,
+        "source": "Pink cushion (.55+.055)*1.13+.06-.05"
+      },
+      "table": {
+        "height": 1.048,
+        "source": "White tabletop (.82+.045)*1.20+.06-.05"
+      }
+    }
+  },
+  "render_batches": [
+    {
+      "name": "back_dressing",
+      "file": "res://assets/rooms/milk_tea_shop/batches/review_back_dressing.glb",
+      "material": "room",
+      "sources": [
+        "main_menu",
+        "toppings_menu",
+        "freshly_made",
+        "wall_tea_symbol",
+        "syrup_shelf",
+        "tea_urns",
+        "cup_sealer",
+        "ingredient_jars",
+        "shakers",
+        "topping_case",
+        "checkout_register",
+        "pickup_counter",
+        "straw_box",
+        "cup_stacks"
+      ],
+      "triangles": 32284,
+      "cast_shadow": true
+    },
+    {
+      "name": "glass",
+      "file": "res://assets/rooms/milk_tea_shop/batches/review_glass.glb",
+      "material": "glass",
+      "sources": [
+        "topping_glass",
+        "fridge_glass",
+        "urn_glass"
+      ],
+      "triangles": 242,
+      "cast_shadow": false
+    },
+    {
+      "name": "botanical",
+      "file": "res://assets/rooms/milk_tea_shop/batches/review_botanical.glb",
+      "material": "room",
+      "sources": [
+        "table_flower_vase",
+        "table_flower_vase_2",
+        "counter_flower_vase"
+      ],
+      "triangles": 13788,
+      "cast_shadow": false
+    },
+    {
+      "name": "front_dressing",
+      "file": "res://assets/rooms/milk_tea_shop/batches/review_front_dressing.glb",
+      "material": "room",
+      "sources": [
+        "street_signboard",
+        "good_tea_wall_sign",
+        "left_tea_logo"
+      ],
+      "triangles": 3820,
+      "cast_shadow": true
+    },
+    {
+      "name": "large_plants",
+      "file": "res://assets/rooms/milk_tea_shop/batches/review_large_plants.glb",
+      "material": "plants",
+      "sources": [
+        "MonsteraCorner"
+      ],
+      "triangles": 910,
+      "cast_shadow": true
+    },
+    {
+      "name": "back_plants",
+      "file": "res://assets/rooms/milk_tea_shop/batches/review_back_plants.glb",
+      "material": "plants",
+      "sources": [
+        "WallPothos0",
+        "WallPothos1"
+      ],
+      "triangles": 4096,
+      "cast_shadow": false
+    },
+    {
+      "name": "front_plants",
+      "file": "res://assets/rooms/milk_tea_shop/batches/review_front_plants.glb",
+      "material": "plants",
+      "sources": [
+        "FlowerBox0",
+        "FlowerDrape0",
+        "FlowerBox1",
+        "FlowerDrape1",
+        "FlowerBox2",
+        "FlowerDrape2",
+        "FlowerBox3",
+        "FlowerDrape3",
+        "FlowerBox4",
+        "FlowerDrape4",
+        "FlowerBox5",
+        "FlowerDrape5",
+        "FlowerBox6",
+        "FlowerDrape6"
+      ],
+      "triangles": 21658,
+      "cast_shadow": false
+    }
+  ]
 }

@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[5]
 sys.path.insert(0,str(ROOT/'tools/art/source/coffee_shop'))
 import kit as k
 from mathutils import Vector
-GREENS=['91A65B','A0B469','B0BE77','82964E','B9C883','9CAC60']
+GREENS=['718D42','829B4D','93AA59','5E7935','9AB35F','678442']
 LEAF_COSTS=[]
 
 def blade(name,a,b,width,color,split=False,seed=0):
@@ -37,8 +37,9 @@ def flower(at,scale=1,seed=0):
     x,y,z=at
     for j in range(5):
         a=j*math.tau/5+seed*.3
-        blade('Small ivory petal',(x,y,z),(x+math.cos(a)*.042*scale,y+.009*scale,z+math.sin(a)*.042*scale),.032*scale,'FFF2CF',seed=j)
-    k.ellipsoid('Warm daisy centre',(x,y+.008*scale,z),(.023*scale,.013*scale,.023*scale),'D9AC4C',8,4)
+        blade('Small ivory petal',(x,y,z),(x+math.cos(a)*.042*scale,y+.009*scale,z+math.sin(a)*.042*scale),.032*scale,'FFFEF5',seed=j)
+    rr=.0115*scale;hh=.0065*scale;cy=y+.008*scale
+    k.mesh('Eight-triangle daisy centre',[(x+rr,cy,z),(x,cy,z+rr),(x-rr,cy,z),(x,cy,z-rr),(x,cy+hh,z),(x,cy-hh,z)],[(i,(i+1)%4,4) for i in range(4)]+[((i+1)%4,i,5) for i in range(4)],'D9AC4C')
 
 def pot(radius=.25,height=.48,style='ceramic'):
     color={'ceramic':'E6CEA6','terra':'C68150','woven':'C5A16C'}[style]
@@ -88,8 +89,8 @@ def vine(length=.9,seed=7,flowers=True):
         for s in (-1,1):
             end=(p[0]+s*rng.uniform(.072,.138),p[1]+rng.uniform(-.060,.054),p[2]+rng.uniform(.018,.084))
             blade('Small curved ivy leaf',p,end,rng.uniform(.060,.090),GREENS[(j+(0 if s<0 else 2))%6],seed=j+seed)
-        if flowers and j%2==seed%2:
-            flower((p[0]+rng.uniform(-.07,.07),p[1]+.02,p[2]+.065),rng.uniform(.7,1.05),j)
+        if flowers:
+            flower((p[0]+rng.uniform(-.07,.07),p[1]+.02,p[2]+.065),rng.uniform(1.05,1.57),j)
 
 def pothos():
     pot(.20,.30,'woven')
@@ -101,15 +102,14 @@ def pothos():
 
 def shrub():
     rng=random.Random(44)
-    for i in range(29):
-        a=i*2.399;r=.11+.27*math.sqrt(i/29)
-        end=(math.cos(a)*r,.15+rng.random()*.14,math.sin(a)*r)
-        # Short rooted sprays instead of a long-stemmed fan.
-        k.tube('Compact shrub twig',[(end[0]*.65,.035,end[2]*.65),end],.005,GREENS[3],4)
-        for j in range(4):
+    for i in range(56):
+        a=i*2.399;r=.44*math.sqrt((i+.5)/56)
+        end=(math.cos(a)*r,.055+.28*math.sqrt(max(0,1-(r/.46)**2))+rng.uniform(-.02,.02),math.sin(a)*r)
+        # Overlapping tiers hide the branches, forming a hemispherical cushion.
+        for j in range(5):
             angle=a+j*2.3
-            blade('Small shrub leaf',end,(end[0]+math.cos(angle)*.10,end[1]+.05,end[2]+math.sin(angle)*.10),.069,GREENS[(i+j)%6],seed=i+j)
-        if i%2==0:flower((end[0],end[1]+.035,end[2]),.95,i)
+            blade('Small shrub leaf',end,(end[0]+math.cos(angle)*.13,end[1]+.015,end[2]+math.sin(angle)*.13),.10,GREENS[(i+j)%6],seed=i+j)
+        if i%3==0:flower((end[0],end[1]+.035,end[2]),1.40,i)
 
 def olive():
     pot(.30,.53,'terra')
@@ -121,7 +121,7 @@ def olive():
         for j in range(16):
             angle=j*2.399+i;start=(p[0]+math.cos(angle)*.09,p[1]+rng.uniform(-.07,.12),p[2]+math.sin(angle)*.09)
             end=(start[0]+math.cos(angle)*.16,start[1]+.06,start[2]+math.sin(angle)*.16)
-            blade('Silver olive leaf',start,end,.046,['ACB587','BBC496','99AA79','C2C99F'][j%4],seed=j+i)
+            blade('Silver olive leaf',start,end,.046,['829369','909F77','6C8459','99A681'][j%4],seed=j+i)
 
 def fruit_tree():
     pot(.42,.55,'terra')
@@ -147,7 +147,7 @@ def build():
     sys.path.insert(0,str(Path(__file__).resolve().parent))
     from export_atlas import export
     export()
-    data=json.loads((k.OUT/'layout.json').read_text());data['library']=True;data['revision']='R2'
+    data=json.loads((k.OUT/'layout.json').read_text());data['library']=True;data['revision']='R2.1'
     for a in data['assets']:a['position']=[0,0,0]
     (k.OUT/'layout.json').write_text(json.dumps(data,indent=2)+'\n')
     stats=json.loads((k.OUT/'asset_stats.json').read_text())

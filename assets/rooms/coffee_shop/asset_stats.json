@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3678673
+    "bytes": 3656076
   },
   "assets": [
     {
@@ -168,7 +168,7 @@
       "vertices": 1415,
       "triangles": 2790,
       "surfaces": 1,
-      "bytes": 90684
+      "bytes": 90652
     },
     {
       "name": "jute_rug",
@@ -221,10 +221,10 @@
     },
     {
       "name": "window_garden_backdrop",
-      "vertices": 2028,
-      "triangles": 3900,
+      "vertices": 1872,
+      "triangles": 3600,
       "surfaces": 1,
-      "bytes": 129828
+      "bytes": 141116
     },
     {
       "name": "wall_shelf",
@@ -234,13 +234,13 @@
       "bytes": 62216
     }
   ],
-  "unique_triangles": 65394,
-  "scene_triangles": 87200,
+  "unique_triangles": 65094,
+  "scene_triangles": 86900,
   "static_draw_surfaces": 48,
   "unique_assets": 32,
   "placed_instances": 48,
-  "glb_bytes": 2253744,
-  "revision": "R2",
+  "glb_bytes": 2265000,
+  "revision": "R2.1",
   "scene_budget": {
     "before": {
       "room_triangles": 80734,
@@ -250,11 +250,11 @@
       "shared_plant_triangles": 441576
     },
     "after": {
-      "room_triangles": 87200,
-      "shared_plant_triangles": 43972,
-      "room_botanical_triangles": 18766,
-      "plant_triangles": 62738,
-      "total_triangles": 131172,
+      "room_triangles": 86900,
+      "shared_plant_triangles": 60250,
+      "room_botanical_triangles": 18466,
+      "plant_triangles": 78716,
+      "total_triangles": 147150,
       "static_surfaces": 49
     },
     "limits": {
@@ -282,9 +282,19 @@
           "ArchSide_front2",
           "ArchSide_back0",
           "ArchSide_back1",
-          "ArchSide_back2"
+          "ArchSide_back2",
+          "ArchWoven00",
+          "ArchWoven01",
+          "ArchWoven02",
+          "ArchWoven03",
+          "ArchWoven04",
+          "ArchWoven05",
+          "ArchWoven06",
+          "ArchShoulder00",
+          "ArchShoulder01",
+          "ArchShoulder02"
         ],
-        "triangles": 10760,
+        "triangles": 22550,
         "cast_shadow": false
       },
       {
@@ -295,9 +305,15 @@
           "TransomTrailing00",
           "TransomTrailing01",
           "TransomTrailing02",
-          "TransomTrailing03"
+          "TransomTrailing03",
+          "TransomGarland00",
+          "TransomGarland01",
+          "TransomGarland02",
+          "TransomGarland03",
+          "TransomGarland04",
+          "TransomGarland05"
         ],
-        "triangles": 4920,
+        "triangles": 8950,
         "cast_shadow": false
       },
       {
@@ -315,7 +331,7 @@
           "RightPillarVine01",
           "RightPillarVine02"
         ],
-        "triangles": 7240,
+        "triangles": 7040,
         "cast_shadow": false
       },
       {
@@ -332,7 +348,7 @@
           "LeftPierFlowers",
           "LeftPierDrape"
         ],
-        "triangles": 12124,
+        "triangles": 12782,
         "cast_shadow": false
       },
       {

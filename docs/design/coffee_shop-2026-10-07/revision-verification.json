@@ -1,9 +1,9 @@
 {
-  "revision": "R2",
+  "revision": "R2.1",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
     "draw_calls": 37.0,
-    "instances": 89,
+    "instances": 105,
     "renderer": "mobile",
     "resolution": [
       1400,
@@ -112,11 +112,11 @@
       "shared_plant_triangles": 441576
     },
     "after": {
-      "room_triangles": 87200,
-      "shared_plant_triangles": 43972,
-      "room_botanical_triangles": 18766,
-      "plant_triangles": 62738,
-      "total_triangles": 131172,
+      "room_triangles": 86900,
+      "shared_plant_triangles": 60250,
+      "room_botanical_triangles": 18466,
+      "plant_triangles": 78716,
+      "total_triangles": 147150,
       "static_surfaces": 49
     },
     "limits": {
@@ -144,9 +144,19 @@
           "ArchSide_front2",
           "ArchSide_back0",
           "ArchSide_back1",
-          "ArchSide_back2"
+          "ArchSide_back2",
+          "ArchWoven00",
+          "ArchWoven01",
+          "ArchWoven02",
+          "ArchWoven03",
+          "ArchWoven04",
+          "ArchWoven05",
+          "ArchWoven06",
+          "ArchShoulder00",
+          "ArchShoulder01",
+          "ArchShoulder02"
         ],
-        "triangles": 10760,
+        "triangles": 22550,
         "cast_shadow": false
       },
       {
@@ -157,9 +167,15 @@
           "TransomTrailing00",
           "TransomTrailing01",
           "TransomTrailing02",
-          "TransomTrailing03"
+          "TransomTrailing03",
+          "TransomGarland00",
+          "TransomGarland01",
+          "TransomGarland02",
+          "TransomGarland03",
+          "TransomGarland04",
+          "TransomGarland05"
         ],
-        "triangles": 4920,
+        "triangles": 8950,
         "cast_shadow": false
       },
       {
@@ -177,7 +193,7 @@
           "RightPillarVine01",
           "RightPillarVine02"
         ],
-        "triangles": 7240,
+        "triangles": 7040,
         "cast_shadow": false
       },
       {
@@ -194,7 +210,7 @@
           "LeftPierFlowers",
           "LeftPierDrape"
         ],
-        "triangles": 12124,
+        "triangles": 12782,
         "cast_shadow": false
       },
       {
@@ -249,7 +265,7 @@
     ]
   },
   "shared_plants": {
-    "unique_triangles": 17286,
+    "unique_triangles": 17378,
     "leaf_triangle_max": 8,
     "r1_comparison": {
       "monstera": {
@@ -270,19 +286,19 @@
       },
       "ivy_short": {
         "before": 5784,
-        "after": 704
+        "after": 692
       },
       "ivy_medium": {
         "before": 9312,
-        "after": 1156
+        "after": 1098
       },
       "ivy_long": {
         "before": 11956,
-        "after": 1530
+        "after": 1504
       },
       "flower_shrub": {
         "before": 14992,
-        "after": 2214
+        "after": 2402
       },
       "olive_tree": {
         "before": 13276,

@@ -1,8 +1,8 @@
-# Shared stylized plants · Liu Bei · SGODOT-179 R2
+# Shared stylized plants · Liu Bei · SGODOT-179 R2.1
 
 Twelve editable local-pivot modules: monstera, monstera_woven, peace_lily, pothos, three ivy lengths, flower_shrub, olive_tree, fruit_tree, pot_terracotta and pot_woven. R2 replaces R1's closed dense leaf meshes with open curved patches: ordinary leaves/petals have 6 triangles; Monstera patches have 8 triangles and an authored alpha-scissor silhouette with edge splits and internal holes. Do not substitute alpha blending: scissor retains depth writes. Bind the supplied shared `material.tres`, including double-sided rendering and threshold 0.45.
 
-Vine and pothos leaves are 60% of R1 length/width. The six yellow-green source colours have one darkest variant (less than one-third). Four peace-lily spathes are approximately half R1 size. Olive has 352 silver-green leaves and a terracotta pot. The right-corner Monstera variant uses the woven pot. The stand-alone terracotta and woven pots can be reused separately.
+Vine and pothos leaves are 60% of R1 length/width. The six yellow-green source colours now retain two middle/deep variants; R2.1 reduces value about 15% and raises saturation 10–15%. Four peace-lily spathes are approximately half R1 size. Olive has 352 silver-green leaves and a terracotta pot. The right-corner Monstera variant uses the woven pot. The stand-alone terracotta and woven pots can be reused separately.
 
 ## Atlas correction
 
@@ -14,7 +14,7 @@ This texture contains surface colour/detail, not a beauty render or direct-light
 
 Godot metres, Y up, front +Z. Pots/trees/shrub pivot at their base; vines pivot at the upper stem and grow along local -Y. Rotate local Z to follow the tangent of an arch. Coffee Shop retains editable placements but merges the vines per wall at export, preserving atlas UVs. Small leaves/flowers and distant garden masses do not cast shadows; large potted plants can cast shadows.
 
-The library has **17,286 unique triangles** (R1: 99,620). `flower_shrub` is **2,214** (R1: 14,992). These are library unique costs, not placed-scene costs. See `asset_stats.json` for per-module before/after values. Coffee Shop R2 places 43,972 plant triangles. Consumers must enforce their own ≤100,000 plant / ≤200,000 total / ≤60 static-surface limits, including instances.
+The library has **17,378 unique triangles** (R1: 99,620). `flower_shrub` is **2,402** (R1: 14,992). These are library unique costs, not placed-scene costs. See `asset_stats.json` for per-module before/after values. Coffee Shop R2 places 60,250 plant triangles. Consumers must enforce their own ≤100,000 plant / ≤200,000 total / ≤60 static-surface limits, including instances.
 
 ## Rebuild and review
 
@@ -28,4 +28,4 @@ Generator: `source/build_plants.py`; explicit UV atlas/export: `source/export_at
 
 ![R2 actual runtime catalogue](catalogue.jpg)
 
-R2 is submitted for review, not an approval to apply this kit to the other scene cards yet. Per SGODOT-171, other artists wait for 179 R2 approval. Basic Room and the shared scene benchmark remain unchanged by Liu Bei.
+179 R2 passed art-director review on 2026-10-07. 180–186 may consume the library. R2.1 restores twice as many 1.5x white vine flowers, a closed hemispherical shrub canopy, silver-green olive leaves and three deep Monstera splits plus oval holes. Eight-triangle pollen centres preserve density within the budget. Basic Room and the shared scene benchmark remain unchanged by Liu Bei.

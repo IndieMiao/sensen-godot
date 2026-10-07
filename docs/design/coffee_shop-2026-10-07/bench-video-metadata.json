@@ -13,9 +13,9 @@
   },
   "capture": "Godot rendered viewport; wall-clock frame timestamps",
   "accelerated": false,
-  "captured_frames": 228,
+  "captured_frames": 229,
   "capture_intervals_seconds": {
-    "mean": 0.06609977533039647,
-    "max": 0.0745199999999997
+    "mean": 0.0659511754385965,
+    "max": 0.06848399999999977
   }
 }

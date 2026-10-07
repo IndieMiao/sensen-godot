@@ -6,10 +6,10 @@ from pathlib import Path
 import os, shutil, subprocess, sys
 
 ROOT=Path(__file__).resolve().parents[4]
-slug='coffee_shop'
+slug=sys.argv[2] if len(sys.argv)>2 else 'coffee_shop'
 assert slug.replace('_','').isalnum()
 revision=sys.argv[1] if len(sys.argv)>1 else 'r1'
-assert revision in ('r1','r2')
+assert revision in ('r1','r2','r21')
 out=ROOT/'output'/slug/revision
 stage=out/'godot-project'
 out.mkdir(parents=True,exist_ok=True)

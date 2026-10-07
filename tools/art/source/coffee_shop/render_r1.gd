@@ -55,6 +55,9 @@ void fragment() {
  ALBEDO=mix(mint,cream,t)*(1.0-contact*.13);
 }"""
 	mat.shader = backdrop
+	if slug != "coffee_shop":
+		var bg := Color(layout.lighting.background)
+		backdrop.code = "shader_type spatial; render_mode unshaded; void fragment(){ ALBEDO=vec3(%f,%f,%f); }" % [bg.srgb_to_linear().r,bg.srgb_to_linear().g,bg.srgb_to_linear().b]
 	ground.material_override = mat
 	world.add_child(ground)
 	var environment := WorldEnvironment.new()

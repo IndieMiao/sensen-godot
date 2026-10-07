@@ -27,7 +27,7 @@
 				"name": "entry_step",
 				"reached": true,
 				"remaining_m": 0.148080661892891,
-				"seconds": 0.014,
+				"seconds": 0.015,
 				"target": [
 					0.150000005960464,
 					-0.180000007152557,
@@ -53,7 +53,7 @@
 				"name": "entry_inside",
 				"reached": true,
 				"remaining_m": 0.0741135478019714,
-				"seconds": 0.361,
+				"seconds": 0.363,
 				"target": [
 					0.150000005960464,
 					0.0700000002980232,
@@ -79,7 +79,7 @@
 				"name": "between_tables",
 				"reached": true,
 				"remaining_m": 0.0701723992824554,
-				"seconds": 0.466,
+				"seconds": 0.467,
 				"target": [
 					0.0500000007450581,
 					0.0700000002980232,
@@ -131,7 +131,7 @@
 				"name": "plant_corner_left",
 				"reached": true,
 				"remaining_m": 0.0702724382281303,
-				"seconds": 0.554,
+				"seconds": 0.571,
 				"target": [
 					-2.0,
 					0.0700000002980232,
@@ -157,7 +157,7 @@
 				"name": "center_return",
 				"reached": true,
 				"remaining_m": 0.0651928186416626,
-				"seconds": 0.538,
+				"seconds": 0.562,
 				"target": [
 					0.0500000007450581,
 					0.0700000002980232,
@@ -183,7 +183,7 @@
 				"name": "plant_corner_right",
 				"reached": true,
 				"remaining_m": 0.0931238234043121,
-				"seconds": 0.599,
+				"seconds": 0.598,
 				"target": [
 					2.20000004768372,
 					0.0700000002980232,
@@ -209,7 +209,7 @@
 				"name": "center_return_right",
 				"reached": true,
 				"remaining_m": 0.0738705992698669,
-				"seconds": 0.579,
+				"seconds": 0.58,
 				"target": [
 					0.0500000007450581,
 					0.0700000002980232,
@@ -235,7 +235,7 @@
 				"name": "between_tables_return",
 				"reached": true,
 				"remaining_m": 0.0706017315387726,
-				"seconds": 0.366,
+				"seconds": 0.379,
 				"target": [
 					0.0500000007450581,
 					0.0700000002980232,
@@ -272,13 +272,13 @@
 			"passed": true
 		},
 		{
-			"details": 6.734,
+			"details": 6.733,
 			"name": "Full route fits unaccelerated 15s clip",
 			"passed": true
 		}
 	],
 	"passed": true,
-	"pid": 1049594,
+	"pid": 1058205,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -296,7 +296,7 @@
 			"name": "entry_step",
 			"reached": true,
 			"remaining_m": 0.148080661892891,
-			"seconds": 0.014,
+			"seconds": 0.015,
 			"target": [
 				0.150000005960464,
 				-0.180000007152557,
@@ -318,7 +318,7 @@
 			"name": "entry_inside",
 			"reached": true,
 			"remaining_m": 0.0741135478019714,
-			"seconds": 0.361,
+			"seconds": 0.363,
 			"target": [
 				0.150000005960464,
 				0.0700000002980232,
@@ -340,7 +340,7 @@
 			"name": "between_tables",
 			"reached": true,
 			"remaining_m": 0.0701723992824554,
-			"seconds": 0.466,
+			"seconds": 0.467,
 			"target": [
 				0.0500000007450581,
 				0.0700000002980232,
@@ -384,7 +384,7 @@
 			"name": "plant_corner_left",
 			"reached": true,
 			"remaining_m": 0.0702724382281303,
-			"seconds": 0.554,
+			"seconds": 0.571,
 			"target": [
 				-2.0,
 				0.0700000002980232,
@@ -406,7 +406,7 @@
 			"name": "center_return",
 			"reached": true,
 			"remaining_m": 0.0651928186416626,
-			"seconds": 0.538,
+			"seconds": 0.562,
 			"target": [
 				0.0500000007450581,
 				0.0700000002980232,
@@ -428,7 +428,7 @@
 			"name": "plant_corner_right",
 			"reached": true,
 			"remaining_m": 0.0931238234043121,
-			"seconds": 0.599,
+			"seconds": 0.598,
 			"target": [
 				2.20000004768372,
 				0.0700000002980232,
@@ -450,7 +450,7 @@
 			"name": "center_return_right",
 			"reached": true,
 			"remaining_m": 0.0738705992698669,
-			"seconds": 0.579,
+			"seconds": 0.58,
 			"target": [
 				0.0500000007450581,
 				0.0700000002980232,
@@ -472,7 +472,7 @@
 			"name": "between_tables_return",
 			"reached": true,
 			"remaining_m": 0.0706017315387726,
-			"seconds": 0.366,
+			"seconds": 0.379,
 			"target": [
 				0.0500000007450581,
 				0.0700000002980232,

@@ -1,0 +1,967 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"checks": [
+		{
+			"details": null,
+			"name": "Default Avatar fixture assembles",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Bench route/probe schema",
+			"passed": true
+		},
+		{
+			"details": 0.0599999986588955,
+			"name": "Spawn stands on authored floor",
+			"passed": true
+		},
+		{
+			"details": "(0.15, 0.06, 2.18)",
+			"name": "Spawn capsule clear",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.1800000667572
+				],
+				"from": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.1800000667572
+				],
+				"name": "entrance",
+				"reached": true,
+				"remaining_m": 0.0,
+				"seconds": 0.0,
+				"target": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.1800000667572
+				]
+			},
+			"name": "Route: entrance",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.00691770296543837,
+					0.0599315986037254,
+					0.768254578113556
+				],
+				"from": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.1800000667572
+				],
+				"name": "between_tables",
+				"reached": true,
+				"remaining_m": 0.0686042904853821,
+				"seconds": 0.267,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					0.699999988079071
+				]
+			},
+			"name": "Route: between_tables",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.000395188690163195,
+					0.059935636818409,
+					-0.597265422344208
+				],
+				"from": [
+					0.00691770296543837,
+					0.0599315986037254,
+					0.768254578113556
+				],
+				"name": "counter",
+				"reached": true,
+				"remaining_m": 0.0827355533838272,
+				"seconds": 0.383,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-0.680000007152557
+				]
+			},
+			"name": "Route: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.99884486198425,
+					0.0599270015954971,
+					-0.676013946533203
+				],
+				"from": [
+					0.000395188690163195,
+					0.059935636818409,
+					-0.597265422344208
+				],
+				"name": "pickup",
+				"reached": true,
+				"remaining_m": 0.101233571767807,
+				"seconds": 0.417,
+				"target": [
+					2.09999990463257,
+					0.0599999986588955,
+					-0.680000007152557
+				]
+			},
+			"name": "Route: pickup",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.0754703208804131,
+					0.0599337071180344,
+					-0.6798495054245
+				],
+				"from": [
+					1.99884486198425,
+					0.0599270015954971,
+					-0.676013946533203
+				],
+				"name": "return_counter",
+				"reached": true,
+				"remaining_m": 0.0754704996943474,
+				"seconds": 0.534,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-0.680000007152557
+				]
+			},
+			"name": "Route: return_counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.00283251400105655,
+					0.0599364340305328,
+					1.56255722045898
+				],
+				"from": [
+					0.0754703208804131,
+					0.0599337071180344,
+					-0.6798495054245
+				],
+				"name": "bench_approach",
+				"reached": true,
+				"remaining_m": 0.0874886438250542,
+				"seconds": 0.616,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					1.64999997615814
+				]
+			},
+			"name": "Route: bench_approach",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.41996908187866,
+					0.0599283650517464,
+					1.66427838802338
+				],
+				"from": [
+					0.00283251400105655,
+					0.0599364340305328,
+					1.56255722045898
+				],
+				"name": "bench_front",
+				"reached": true,
+				"remaining_m": 0.0802352130413055,
+				"seconds": 0.408,
+				"target": [
+					-1.5,
+					0.0599999986588955,
+					1.66999995708466
+				]
+			},
+			"name": "Route: bench_front",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.0655293464660645,
+					0.0599301755428314,
+					1.65065884590149
+				],
+				"from": [
+					-1.41996908187866,
+					0.0599283650517464,
+					1.66427838802338
+				],
+				"name": "center_return",
+				"reached": true,
+				"remaining_m": 0.0655326917767525,
+				"seconds": 0.376,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					1.64999997615814
+				]
+			},
+			"name": "Route: center_return",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.00251994980499148,
+					0.0599377378821373,
+					-0.657682061195374
+				],
+				"from": [
+					-0.0655293464660645,
+					0.0599301755428314,
+					1.65065884590149
+				],
+				"name": "fridge_approach",
+				"reached": true,
+				"remaining_m": 0.0923523455858231,
+				"seconds": 0.633,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-0.75
+				]
+			},
+			"name": "Route: fridge_approach",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.94350636005402,
+					0.0599344223737717,
+					-1.05941545963287
+				],
+				"from": [
+					-0.00251994980499148,
+					0.0599377378821373,
+					-0.657682061195374
+				],
+				"name": "fridge_front",
+				"reached": true,
+				"remaining_m": 0.0792149156332016,
+				"seconds": 0.55,
+				"target": [
+					-2.01999998092651,
+					0.0599999986588955,
+					-1.08000004291534
+				]
+			},
+			"name": "Route: fridge_front",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/MilkTeaShopArt/service_counter/Collider"
+				],
+				"final": [
+					0.0,
+					0.0430923849344254,
+					-0.962499856948853
+				],
+				"from": [
+					0.0,
+					0.0600000023841858,
+					-0.649999976158142
+				],
+				"reached": false,
+				"remaining_m": 0.837670743465424,
+				"seconds": 0.883,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-1.79999995231628
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/MilkTeaShopArt/service_counter/Collider"
+			},
+			"name": "Blocked: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/MilkTeaShopArt/drinks_fridge/Collider"
+				],
+				"final": [
+					-2.01999998092651,
+					0.0500789284706116,
+					-1.37633490562439
+				],
+				"from": [
+					-2.01999998092651,
+					0.0600000023841858,
+					-1.04999995231628
+				],
+				"reached": false,
+				"remaining_m": 0.623744010925293,
+				"seconds": 0.883,
+				"target": [
+					-2.01999998092651,
+					0.0599999986588955,
+					-2.0
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/MilkTeaShopArt/drinks_fridge/Collider"
+			},
+			"name": "Blocked: fridge",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.79999995231628,
+					0.0500789284706116,
+					1.84546566009521
+				],
+				"from": [
+					-1.79999995231628,
+					0.0600000023841858,
+					1.70000004768372
+				],
+				"reached": false,
+				"remaining_m": 0.654609560966492,
+				"seconds": 0.883,
+				"target": [
+					-1.79999995231628,
+					0.0599999986588955,
+					2.5
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/MilkTeaShopArt/pastel_bench/Collider"
+			},
+			"name": "Blocked: bench",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/MilkTeaShopArt/cafe_table/Collider"
+				],
+				"final": [
+					-1.45000004768372,
+					0.050097793340683,
+					-0.149110689759254
+				],
+				"from": [
+					-1.45000004768372,
+					0.0600000023841858,
+					-0.5
+				],
+				"reached": false,
+				"remaining_m": 0.749176144599915,
+				"seconds": 0.883,
+				"target": [
+					-1.45000004768372,
+					0.0599999986588955,
+					0.600000023841858
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/MilkTeaShopArt/cafe_table/Collider"
+			},
+			"name": "Blocked: table",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/MilkTeaShopArt/side_low_wall/Collider"
+				],
+				"final": [
+					2.625,
+					0.0458936542272568,
+					0.100000001490116
+				],
+				"from": [
+					2.5,
+					0.0599999986588955,
+					0.100000001490116
+				],
+				"reached": false,
+				"remaining_m": 0.875113666057587,
+				"seconds": 0.882,
+				"target": [
+					3.5,
+					0.0599999986588955,
+					0.100000001490116
+				]
+			},
+			"name": "Blocked: side_wall",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/MilkTeaShopArt/front_wall_right/Collider"
+				],
+				"final": [
+					2.20000004768372,
+					0.0500789284706116,
+					2.29635286331177
+				],
+				"from": [
+					2.20000004768372,
+					0.0600000023841858,
+					2.0699999332428
+				],
+				"reached": false,
+				"remaining_m": 1.00369620323181,
+				"seconds": 0.882,
+				"target": [
+					2.20000004768372,
+					0.0599999986588955,
+					3.29999995231628
+				]
+			},
+			"name": "Blocked: front_wall",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/MilkTeaShopArt/side_arch_limit"
+				],
+				"final": [
+					-2.8511917591095,
+					0.0423652678728104,
+					1.29999995231628
+				],
+				"from": [
+					-2.5,
+					0.0600000023841858,
+					1.29999995231628
+				],
+				"reached": false,
+				"remaining_m": 0.6490478515625,
+				"seconds": 0.867,
+				"target": [
+					-3.5,
+					0.0599999986588955,
+					1.29999995231628
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/MilkTeaShopArt/side_arch_limit"
+			},
+			"name": "Blocked: arch_boundary",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/MilkTeaShopArt/landing_front_edge"
+				],
+				"final": [
+					0.150000005960464,
+					-0.0792001932859421,
+					3.36574149131775
+				],
+				"from": [
+					0.150000005960464,
+					-0.0612560734152794,
+					3.29598546028137
+				],
+				"reached": false,
+				"remaining_m": 0.741145074367523,
+				"seconds": 0.883,
+				"target": [
+					0.150000005960464,
+					-0.180000007152557,
+					4.09999990463257
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/MilkTeaShopArt/landing_front_edge"
+			},
+			"name": "Blocked: landing_front",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 0.76,
+				"measured_m": 0.760000020265579,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: chairs_center",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.0,
+					0.0599358826875687,
+					-0.416211187839508
+				],
+				"from": [
+					0.0,
+					0.0600000023841858,
+					1.70000004768372
+				],
+				"reached": true,
+				"remaining_m": 0.0837888345122337,
+				"seconds": 0.599,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-0.5
+				]
+			},
+			"name": "Traverse: chairs_center",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.27,
+				"measured_m": 1.27000004053116,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: tables_counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.71621072292328,
+					0.0599358826875687,
+					-0.550000011920929
+				],
+				"from": [
+					-1.39999997615814,
+					0.0600000023841858,
+					-0.550000011920929
+				],
+				"reached": true,
+				"remaining_m": 0.0837892517447472,
+				"seconds": 0.865,
+				"target": [
+					1.79999995231628,
+					0.0599999986588955,
+					-0.550000011920929
+				]
+			},
+			"name": "Traverse: tables_counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.85,
+				"measured_m": 1.84999996423721,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: entry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.15000008046627,
+					0.047677855938673,
+					3.10516571998596
+				],
+				"from": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.09999990463257
+				],
+				"reached": true,
+				"remaining_m": 0.25065404176712,
+				"seconds": 0.299,
+				"target": [
+					0.150000005960464,
+					-0.180000007152557,
+					3.21000003814697
+				]
+			},
+			"name": "Traverse: entry",
+			"passed": true
+		},
+		{
+			"details": {
+				"entry": {
+					"collisions": [],
+					"final": [
+						0.150000050663948,
+						0.0599322281777859,
+						2.25244498252869
+					],
+					"from": [
+						0.150000050663948,
+						0.0277420617640018,
+						3.14976811408997
+					],
+					"reached": true,
+					"remaining_m": 0.102444909512997,
+					"seconds": 0.267,
+					"target": [
+						0.150000005960464,
+						0.0599999986588955,
+						2.15000009536743
+					]
+				},
+				"exit": {
+					"collisions": [],
+					"final": [
+						0.150000050663948,
+						0.0277420617640018,
+						3.14976811408997
+					],
+					"from": [
+						0.150000005960464,
+						0.0599999986588955,
+						2.15000009536743
+					],
+					"reached": true,
+					"remaining_m": 0.222696930170059,
+					"seconds": 0.299,
+					"target": [
+						0.150000005960464,
+						-0.180000007152557,
+						3.23000001907349
+					]
+				}
+			},
+			"name": "Entrance gap allows exit and reentry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"delta": [
+					0.0273687839508057,
+					0.0000430233776569366,
+					-1.72357332706451
+				]
+			},
+			"name": "Diagonal collision preserves wall sliding",
+			"passed": true
+		},
+		{
+			"details": [
+				"run",
+				0.15,
+				0.317692777777778
+			],
+			"name": "Run animation advances in rendered viewport",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Input release stops horizontal motion",
+			"passed": true
+		},
+		{
+			"details": "idle",
+			"name": "Release returns to idle",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Focus loss cancels movement",
+			"passed": true
+		},
+		{
+			"details": 1.74549420922995,
+			"name": "Fixture head-top height measurable",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 1.334865499799,
+				"difference": 0.128755364806867,
+				"height": 2.63,
+				"ratio_to_H": 1.50673659419373,
+				"reason": ""
+			},
+			"name": "Scale ±15%: door",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.660271454299722,
+				"difference": 0.0416485900216919,
+				"height": 1.2005,
+				"ratio_to_H": 0.687770829402877,
+				"reason": ""
+			},
+			"name": "Scale ±15%: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.392438998867948,
+				"difference": 0.0126277372262773,
+				"height": 0.69365,
+				"ratio_to_H": 0.397394615422995,
+				"reason": ""
+			},
+			"name": "Scale ±15%: chair",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.65024564046003,
+				"difference": 0.0766519823788546,
+				"height": 1.048,
+				"ratio_to_H": 0.600403023085561,
+				"reason": ""
+			},
+			"name": "Scale ±15%: table",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"pid": 1058482,
+	"renderer": "mobile",
+	"route": [
+		{
+			"collisions": [],
+			"final": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.1800000667572
+			],
+			"from": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.1800000667572
+			],
+			"name": "entrance",
+			"reached": true,
+			"remaining_m": 0.0,
+			"seconds": 0.0,
+			"target": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.1800000667572
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.00691770296543837,
+				0.0599315986037254,
+				0.768254578113556
+			],
+			"from": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.1800000667572
+			],
+			"name": "between_tables",
+			"reached": true,
+			"remaining_m": 0.0686042904853821,
+			"seconds": 0.267,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				0.699999988079071
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.000395188690163195,
+				0.059935636818409,
+				-0.597265422344208
+			],
+			"from": [
+				0.00691770296543837,
+				0.0599315986037254,
+				0.768254578113556
+			],
+			"name": "counter",
+			"reached": true,
+			"remaining_m": 0.0827355533838272,
+			"seconds": 0.383,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				-0.680000007152557
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				1.99884486198425,
+				0.0599270015954971,
+				-0.676013946533203
+			],
+			"from": [
+				0.000395188690163195,
+				0.059935636818409,
+				-0.597265422344208
+			],
+			"name": "pickup",
+			"reached": true,
+			"remaining_m": 0.101233571767807,
+			"seconds": 0.417,
+			"target": [
+				2.09999990463257,
+				0.0599999986588955,
+				-0.680000007152557
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.0754703208804131,
+				0.0599337071180344,
+				-0.6798495054245
+			],
+			"from": [
+				1.99884486198425,
+				0.0599270015954971,
+				-0.676013946533203
+			],
+			"name": "return_counter",
+			"reached": true,
+			"remaining_m": 0.0754704996943474,
+			"seconds": 0.534,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				-0.680000007152557
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.00283251400105655,
+				0.0599364340305328,
+				1.56255722045898
+			],
+			"from": [
+				0.0754703208804131,
+				0.0599337071180344,
+				-0.6798495054245
+			],
+			"name": "bench_approach",
+			"reached": true,
+			"remaining_m": 0.0874886438250542,
+			"seconds": 0.616,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				1.64999997615814
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.41996908187866,
+				0.0599283650517464,
+				1.66427838802338
+			],
+			"from": [
+				0.00283251400105655,
+				0.0599364340305328,
+				1.56255722045898
+			],
+			"name": "bench_front",
+			"reached": true,
+			"remaining_m": 0.0802352130413055,
+			"seconds": 0.408,
+			"target": [
+				-1.5,
+				0.0599999986588955,
+				1.66999995708466
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.0655293464660645,
+				0.0599301755428314,
+				1.65065884590149
+			],
+			"from": [
+				-1.41996908187866,
+				0.0599283650517464,
+				1.66427838802338
+			],
+			"name": "center_return",
+			"reached": true,
+			"remaining_m": 0.0655326917767525,
+			"seconds": 0.376,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				1.64999997615814
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.00251994980499148,
+				0.0599377378821373,
+				-0.657682061195374
+			],
+			"from": [
+				-0.0655293464660645,
+				0.0599301755428314,
+				1.65065884590149
+			],
+			"name": "fridge_approach",
+			"reached": true,
+			"remaining_m": 0.0923523455858231,
+			"seconds": 0.633,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				-0.75
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.94350636005402,
+				0.0599344223737717,
+				-1.05941545963287
+			],
+			"from": [
+				-0.00251994980499148,
+				0.0599377378821373,
+				-0.657682061195374
+			],
+			"name": "fridge_front",
+			"reached": true,
+			"remaining_m": 0.0792149156332016,
+			"seconds": 0.55,
+			"target": [
+				-2.01999998092651,
+				0.0599999986588955,
+				-1.08000004291534
+			]
+		}
+	],
+	"scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+	"slug": "milk_tea_shop"
+}

@@ -1,12 +1,45 @@
 {
   "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-  "draw_calls": 42.0,
-  "instances": 45,
+  "draw_calls": 27.0,
+  "instances": 60,
   "renderer": "mobile",
   "resolution": [
     1400,
     1400
   ],
   "scope": "offline art render; no mobile/gameplay/performance acceptance",
-  "slug": "milk_tea_shop"
+  "slug": "milk_tea_shop",
+  "static_surfaces": 27,
+  "views": [
+    {
+      "draw_calls": 29.0,
+      "rendered_objects": 29.0,
+      "view": "godot-whole"
+    },
+    {
+      "draw_calls": 29.0,
+      "rendered_objects": 29.0,
+      "view": "model-front"
+    },
+    {
+      "draw_calls": 29.0,
+      "rendered_objects": 29.0,
+      "view": "model-side"
+    },
+    {
+      "draw_calls": 29.0,
+      "rendered_objects": 29.0,
+      "view": "model-top"
+    },
+    {
+      "draw_calls": 23.0,
+      "rendered_objects": 23.0,
+      "view": "godot-detail"
+    },
+    {
+      "draw_calls": 27.0,
+      "rendered_objects": 27.0,
+      "view": "godot-detail-plants"
+    }
+  ]
 }

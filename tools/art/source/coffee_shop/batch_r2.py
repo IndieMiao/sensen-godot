@@ -65,7 +65,7 @@ def build_batches():
     for (name,material),placements in groups.items():
         dst=folder/'batches'/('r2_'+name+'.glb');triangles=merged(dst,placements)
         batches.append({'name':name,'file':'res://'+str(dst.relative_to(ROOT)),'material':material,'sources':[p['name'] for p in placements],'triangles':triangles,'cast_shadow':False if material in ('plants','glass') or name in ('table_settings','counter_botanical') else True})
-    layout['render_batches']=batches;layout['revision']='R2';path.write_text(json.dumps(layout,indent=2)+'\n')
+    layout['render_batches']=batches;layout['revision']='R2.1';path.write_text(json.dumps(layout,indent=2)+'\n')
     stats=json.loads((folder/'asset_stats.json').read_text());plants=json.loads((ROOT/'assets/rooms/_shared/plants/asset_stats.json').read_text());counts={p['name']:p['triangles'] for p in plants['assets']}
     placed=sum(counts[p['asset']] for p in layout['shared_plants']);surfaces=stats['static_draw_surfaces']+len(layout['shared_plants'])-sum(len(b['sources'])-1 for b in batches)
     before={'room_triangles':80734,'plant_triangles':441576,'total_triangles':522310,'static_surfaces':97}
@@ -75,7 +75,7 @@ def build_batches():
     before['shared_plant_triangles']=before['plant_triangles']
     before['plant_triangles']+=sum(a['triangles']*botanical_counts.get(a['name'],0) for a in old['assets'])
     after={'room_triangles':stats['scene_triangles'],'shared_plant_triangles':placed,'room_botanical_triangles':incidental,'plant_triangles':placed+incidental,'total_triangles':stats['scene_triangles']+placed,'static_surfaces':surfaces}
-    stats['revision']='R2';stats['scene_budget']={'before':before,'after':after,'limits':{'total_triangles':200000,'plant_triangles':100000,'static_surfaces':60},'plant_leaf_triangle_max':plants['leaf_triangle_max'],'render_batches':batches}
+    stats['revision']='R2.1';stats['scene_budget']={'before':before,'after':after,'limits':{'total_triangles':200000,'plant_triangles':100000,'static_surfaces':60},'plant_leaf_triangle_max':plants['leaf_triangle_max'],'render_batches':batches}
     assert after['total_triangles']<=200000 and after['plant_triangles']<=100000 and surfaces<=60,after
     (folder/'asset_stats.json').write_text(json.dumps(stats,indent=2)+'\n')
     print('COFFEE_R2_BUDGET',json.dumps(after),flush=True)
