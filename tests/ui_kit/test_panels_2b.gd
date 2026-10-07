@@ -364,3 +364,30 @@ func test_farm_card_lines() -> void:
 	f.status = ""
 	assert_array(_texts(f)).not_contains(["Radishes ready 3h 32m"])
 	assert_float(f.size.y).is_equal(76.0)
+
+func _request(fields := {}) -> Dictionary:
+	var d := {portrait = PIP, title = "Pip's request", who = "Pip · Courier Kid · personal request",
+		line = "Could you catch me a fish? Any kind is fine.", needs = [{name = "Common fish", have = 0, need = 1,
+		icon = load("res://assets/p0/icons/fish_crucian.svg")}], reward = "+5 Friendship · 20 coins", deliver_to = "Pip · Travel Post"}
+	d.merge(fields, true)
+	return d
+
+func test_request_card_reads_the_request_and_offers_accept_or_not_now() -> void:
+	var c: UiRequestCard = _host(UiRequestCard.new(_request()))
+	await _settle()
+	assert_array(_texts(c)).contains(["Pip's request", "Pip · Courier Kid · personal request", "Could you catch me a fish? Any kind is fine.",
+		"Bring", "Reward", "+5 Friendship · 20 coins", "Deliver to", "Pip · Travel Post"])
+	assert_int(c.find_children("*", "UiNeedTile", true, false).size()).is_equal(1)
+	var got := []
+	c.action_pressed.connect(func(): got.append("accept"))
+	c.dismissed.connect(func(): got.append("later"))
+	assert_str(c.action_button().text).is_equal("Accept")
+	c.action_button().activated.emit()
+	(c.find_children("*", "UiDismissButton", true, false)[0] as Button).pressed.emit()
+	assert_array(got).is_equal(["accept", "later"])
+
+func test_request_card_short_of_items_puts_the_gap_on_the_button() -> void:
+	var c: UiRequestCard = _host(UiRequestCard.new(_request({action = "Deliver", reason = "Need 1 more Common fish"})))
+	await _settle()
+	assert_str(c.action_button().text).is_equal("Need 1 more Common fish")
+	assert_bool(c.action_button().is_unavailable()).is_true()

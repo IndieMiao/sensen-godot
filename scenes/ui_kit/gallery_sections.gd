@@ -41,6 +41,7 @@ static func all() -> Array[Dictionary]:
 		{id = "bag_header", title = "UiBagHeader", figma = "BagHeader 1225:83885 · LOCK-12 / 13", build = _bag_headers},
 		{id = "gear_row", title = "UiGearRow", figma = "Gear candidate rows of BAG-2 · Gear · LOCK-13", build = _gear_rows},
 		{id = "profile_parts", title = "Profile parts", figma = "ProfileTopBar 1233:107734 · ProfileMoreMenu 1233:107735 · SkillRing 1251:109246 · LOCK-22 (336 at 328)", build = _profile_parts},
+		{id = "request_card", title = "UiRequestCard", figma = "ResidentRequestCard 1211:83296 · LOCK-18 (336 at 328)", build = _request_cards},
 		{id = "resident_bar", title = "UiResidentBar", figma = "ResidentDialogue 1213:83392 Row / Stacked · LOCK-18 (336 at 328)", build = _resident_bars},
 	]
 	return out
@@ -610,3 +611,9 @@ static func _profile_parts() -> Control:
 	var farm := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
 	v.add_child(_captioned(_at_336(farm), "farm overview"))
 	return v
+
+static func _request_cards() -> Control:
+	var d := {portrait = load("res://assets/p0/art/pip-portrait.jpg"), title = "Pip's request", who = "Pip · Courier Kid · personal request",
+		line = "Could you catch me a fish? Any kind is fine.", needs = [{name = "Common fish", have = 0, need = 1, icon = _tex("fish_crucian")}],
+		reward = "+5 Friendship · 20 coins", deliver_to = "Pip · Travel Post"}
+	return _captioned(_at_336(UiRequestCard.new(d)), "open · Accept")
