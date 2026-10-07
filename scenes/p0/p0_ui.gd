@@ -989,7 +989,7 @@ func open_stall(tab := "") -> void:
 	if stall_tab == "board":
 		_board(v, board)
 		return
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScrollContainer.new()   # drags that start on a row or cell still scroll (WP7-B F-04 §4)
 	scroll.name = "StallScroll"
 	scroll.custom_minimum_size = Vector2(0, 370)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -1443,7 +1443,7 @@ func open_kitchen(tab := "") -> void:
 	else: _experiment(v, int(ck.get("slots", 2)))
 
 func _cookbook(v: VBoxContainer, pages: Array) -> void:
-	var scroll := ScrollContainer.new()
+	var scroll := TouchScrollContainer.new()   # drags that start on a row or cell still scroll (WP7-B F-04 §4)
 	scroll.custom_minimum_size = Vector2(0, 420)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var list := VBoxContainer.new()
@@ -2000,96 +2000,36 @@ func _flat_button(text: String) -> Button:
 # ---------------------------------------------------------------- small drawn widgets
 class _TouchPad extends Control:
 	## Scene area: a press-and-drag is the floating joystick (§10.1); a short tap picks a facility;
-	## a double tap recenters; two fingers pinch-zoom (CTRL-1).
+	## a double tap recenters; two fingers pinch-zoom (CTRL-1). Thresholds live in GestureArbiter (WP7-B F-04).
 	var ui: P0Ui
-	var _down := false
-	var _start := Vector2.ZERO
-	var _now := Vector2.ZERO
-	var _t := 0
-	var _id := -1
-	var _touches := {}
-	var _pinch := 0.0
-	var _last_tap := 0
-	const RADIUS := 43.0
+	var _arb := GestureArbiter.new(GestureArbiter.Mode.SCENE)
 	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
 	func _gui_input(e: InputEvent) -> void:
-		var pressed := false
-		var released := false
-		var pos := Vector2.ZERO
-		if e is InputEventScreenTouch:
-			if e.pressed: _touches[e.index] = e.position
-			else: _touches.erase(e.index)
-			if _touches.size() >= 2:
-				_pinch = _spread()
-				_cancel_stick()
-				return
-			if e.pressed and _id < 0:
-				pressed = true
-				_id = e.index
-			elif not e.pressed and e.index == _id:
-				released = true
-				_id = -1
-			pos = e.position
-		elif e is InputEventScreenDrag:
-			_touches[e.index] = e.position
-			if _touches.size() >= 2:
-				var d := _spread()
-				if _pinch > 0.0 and d > 0.0: ui.zoom.emit(_pinch / d)
-				_pinch = d
-				return
-			if e.index == _id: _move(e.position)
-			return
-		elif e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
-			if DisplayServer.is_touchscreen_available(): return   # touch already handled above
-			pressed = e.pressed
-			released = not e.pressed
-			pos = e.position
-		elif e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		if e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1)
 			return
-		elif e is InputEventMouseMotion and _down:
-			_move(e.position)
-			return
-		if pressed:
-			_down = true
-			_start = pos
-			_now = pos
-			_t = Time.get_ticks_msec()
-			queue_redraw()
-		elif released and _down:
-			_down = false
-			ui.joystick.emit(Vector2.ZERO)
-			if _now.distance_to(_start) < 12.0 and Time.get_ticks_msec() - _t < 350:
-				if Time.get_ticks_msec() - _last_tap < 320:
-					ui.recenter.emit()
-					_last_tap = 0
-				else:
-					_last_tap = Time.get_ticks_msec()
-					ui.tapped.emit(pos)
-			queue_redraw()
-	func _spread() -> float:
-		var pts: Array = _touches.values()
-		return (pts[0] as Vector2).distance_to(pts[1]) if pts.size() >= 2 else 0.0
-	func _cancel_stick() -> void:
-		if _down:
-			_down = false
-			_id = -1
-			ui.joystick.emit(Vector2.ZERO)
-			queue_redraw()
-	func _move(p: Vector2) -> void:
-		if not _down: return
-		_now = p
-		var v := (p - _start) / RADIUS
-		if v.length() > 1.0: v = v.normalized()
-		ui.joystick.emit(Vector2.ZERO if v.length() < 0.15 else v)
-		queue_redraw()
+		for o in _arb.feed(e, Time.get_ticks_msec()):
+			match o.kind:
+				&"joystick_move":
+					ui.joystick.emit(o.vector)
+					queue_redraw()
+				&"joystick_end":
+					ui.joystick.emit(Vector2.ZERO)
+					queue_redraw()
+				&"tap":
+					if o.double: ui.recenter.emit()
+					else: ui.tapped.emit(o.pos)
+				&"pinch": ui.zoom.emit(o.factor)
 	func _draw() -> void:
-		if not _down or _now.distance_to(_start) < 12.0: return
-		draw_circle(_start, RADIUS, Color(1, 1, 1, 0.35))
-		draw_arc(_start, RADIUS, 0, TAU, 48, Color(0.37, 0.66, 0.35, 0.7), 2.0)
-		var k := _start + ((_now - _start).limit_length(RADIUS))
-		draw_circle(k, RADIUS * 0.45, Color(0.98, 0.97, 0.94, 0.95))
-		draw_circle(k, RADIUS * 0.3, Color(0.5, 0.78, 0.42))
+		var start := _arb.origin()
+		var now := _arb.position()
+		if not _arb.is_steering() or now.distance_to(start) < GestureArbiter.TAP_SLOP: return
+		var radius := _arb.stick_radius
+		draw_circle(start, radius, Color(1, 1, 1, 0.35))
+		draw_arc(start, radius, 0, TAU, 48, Color(0.37, 0.66, 0.35, 0.7), 2.0)
+		var k := start + ((now - start).limit_length(radius))
+		draw_circle(k, radius * 0.45, Color(0.98, 0.97, 0.94, 0.95))
+		draw_circle(k, radius * 0.3, Color(0.5, 0.78, 0.42))
 
 class _RarityDot extends Control:   # FISH-3 title dot: rarity colour in a cream ring
 	var color := Color.WHITE

@@ -1,0 +1,155 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    456
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "Button variations"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "CommandButton 483:216 · Compact/Command 633:41273"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        404
+      ],
+      "children": [
+        {
+          "type": "Button",
+          "rect": [
+            0,
+            52,
+            328,
+            48
+          ],
+          "variation": "CmdPrimary",
+          "text": "CmdPrimary"
+        },
+        {
+          "type": "Button",
+          "rect": [
+            0,
+            112,
+            328,
+            48
+          ],
+          "variation": "CmdSecondary",
+          "text": "CmdSecondary"
+        },
+        {
+          "type": "Button",
+          "rect": [
+            0,
+            172,
+            328,
+            48
+          ],
+          "variation": "CmdDestructive",
+          "text": "CmdDestructive"
+        },
+        {
+          "type": "Button",
+          "rect": [
+            0,
+            232,
+            328,
+            48
+          ],
+          "variation": "CmdDangerSecondary",
+          "text": "CmdDangerSecondary"
+        },
+        {
+          "type": "Button",
+          "rect": [
+            0,
+            292,
+            328,
+            48
+          ],
+          "variation": "CmdBlocked",
+          "text": "Need 6 more Timber"
+        },
+        {
+          "type": "Button",
+          "rect": [
+            0,
+            352,
+            328,
+            48
+          ],
+          "variation": "CmdPrimary",
+          "text": "Offline",
+          "disabled": true
+        },
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            412,
+            328,
+            44
+          ],
+          "children": [
+            {
+              "type": "Button",
+              "rect": [
+                0,
+                412,
+                51,
+                44
+              ],
+              "variation": "CmdPrimaryCompact",
+              "text": "Eat"
+            },
+            {
+              "type": "Button",
+              "rect": [
+                57,
+                412,
+                51,
+                44
+              ],
+              "variation": "CmdSecondaryCompact",
+              "text": "Eat"
+            },
+            {
+              "type": "Button",
+              "rect": [
+                114,
+                412,
+                51,
+                44
+              ],
+              "variation": "CmdBlockedCompact",
+              "text": "Eat"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

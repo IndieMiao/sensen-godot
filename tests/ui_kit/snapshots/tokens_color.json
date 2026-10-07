@@ -1,0 +1,1470 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    574
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "Colour tokens"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Gensen Refactor · Semantic variables"
+    },
+    {
+      "type": "GridContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        522
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                52,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                76,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "border"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            52,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                52,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                76,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "danger"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            160,
+            52,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                160,
+                52,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                160,
+                76,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "danger_tint"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            240,
+            52,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                240,
+                52,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                240,
+                76,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "disabled"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            96,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                96,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                120,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "disabled_ink"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            96,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                96,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                120,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "edge_strong"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            160,
+            96,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                160,
+                96,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                160,
+                120,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "energy_hud_deep"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            240,
+            96,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                240,
+                96,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                240,
+                120,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "energy_hud_fill"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            140,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                140,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                164,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "energy_hud_light"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            140,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                140,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                164,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "float_affinity"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            160,
+            140,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                160,
+                140,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                160,
+                164,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "float_coins"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            240,
+            140,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                240,
+                140,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                240,
+                164,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "float_energy_cost"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            184,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                184,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                208,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "float_energy_gain"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            184,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                184,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                208,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "float_xp"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            160,
+            184,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                160,
+                184,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                160,
+                208,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "info"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            240,
+            184,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                240,
+                184,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                240,
+                208,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "joystick_ring"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            228,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                228,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                252,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "joystick_thumb"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            228,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                228,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                252,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "lift_shadow"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            160,
+            228,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                160,
+                228,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                160,
+                252,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "muted"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            240,
+            228,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                240,
+                228,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                240,
+                252,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "pin_amber"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            272,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                272,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                296,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "pin_warm"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            272,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                272,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                296,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "primary"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            160,
+            272,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                160,
+                272,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                160,
+                296,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "primary_pressed"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            240,
+            272,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                240,
+                272,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                240,
+                296,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "primary_tint"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            316,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                316,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                340,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "quality_gold"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            316,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                316,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                340,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "rarity_common"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            160,
+            316,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                160,
+                316,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                160,
+                340,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "rarity_fine"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            240,
+            316,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                240,
+                316,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                240,
+                340,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "rarity_legendary"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            360,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                360,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                384,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "rarity_rare"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            360,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                360,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                384,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "role_market"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            160,
+            360,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                160,
+                360,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                160,
+                384,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "role_market_tint"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            240,
+            360,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                240,
+                360,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                240,
+                384,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "role_post"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            404,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                404,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                428,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "role_post_tint"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            404,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                404,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                428,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "role_tackle"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            160,
+            404,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                160,
+                404,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                160,
+                428,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "role_tackle_tint"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            240,
+            404,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                240,
+                404,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                240,
+                428,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "role_tea"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            448,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                448,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                472,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "role_tea_tint"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            448,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                448,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                472,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "scrim"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            160,
+            448,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                160,
+                448,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                160,
+                472,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "scrim_drawer"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            240,
+            448,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                240,
+                448,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                240,
+                472,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "scrim_modal"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            492,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                492,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                516,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "secondary"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            492,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                492,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                516,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "surface"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            160,
+            492,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                160,
+                492,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                160,
+                516,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "surface_raised"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            240,
+            492,
+            74,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                240,
+                492,
+                74,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                240,
+                516,
+                74,
+                14
+              ],
+              "variation": "C9B",
+              "text": "text"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            536,
+            75,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                536,
+                75,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                560,
+                75,
+                14
+              ],
+              "variation": "C9B",
+              "text": "warning"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            81,
+            536,
+            73,
+            38
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                81,
+                536,
+                73,
+                22
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                81,
+                560,
+                73,
+                14
+              ],
+              "variation": "C9B",
+              "text": "warning_tint"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

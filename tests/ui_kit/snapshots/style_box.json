@@ -1,0 +1,89 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    210
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiStyleBox inset, dashed, shadow"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "Compact/Command 633:41273 (34 in 44) · Compact/QuickSlot 633:41279 empty / lifted / drop-target"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        140
+      ],
+      "children": [
+        {
+          "type": "Panel",
+          "rect": [
+            0,
+            70,
+            70,
+            64
+          ]
+        },
+        {
+          "type": "Panel",
+          "rect": [
+            82,
+            70,
+            70,
+            64
+          ]
+        },
+        {
+          "type": "Panel",
+          "rect": [
+            164,
+            70,
+            52,
+            64
+          ]
+        },
+        {
+          "type": "Panel",
+          "rect": [
+            228,
+            70,
+            52,
+            64
+          ]
+        },
+        {
+          "type": "Panel",
+          "rect": [
+            0,
+            146,
+            52,
+            64
+          ]
+        }
+      ]
+    }
+  ]
+}

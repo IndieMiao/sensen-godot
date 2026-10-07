@@ -1,0 +1,159 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    318
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "Panel variations"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "Sheet 483:190 · InformationSheet 932:71686 · Toast 483:302 · StateBadge 483:324"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        248
+      ],
+      "children": [
+        {
+          "type": "PanelContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            44
+          ],
+          "variation": "Card",
+          "children": [
+            {
+              "type": "Label",
+              "rect": [
+                12,
+                82,
+                304,
+                20
+              ],
+              "variation": "BodyB14",
+              "text": "Card"
+            }
+          ]
+        },
+        {
+          "type": "PanelContainer",
+          "rect": [
+            0,
+            126,
+            328,
+            28
+          ],
+          "variation": "HudChip",
+          "children": [
+            {
+              "type": "Label",
+              "rect": [
+                8,
+                130,
+                312,
+                20
+              ],
+              "variation": "BodyB14",
+              "text": "HudChip  142/200"
+            }
+          ]
+        },
+        {
+          "type": "PanelContainer",
+          "rect": [
+            0,
+            166,
+            328,
+            52
+          ],
+          "variation": "InfoSheet",
+          "children": [
+            {
+              "type": "Label",
+              "rect": [
+                16,
+                182,
+                296,
+                20
+              ],
+              "variation": "BodyB14",
+              "text": "InfoSheet"
+            }
+          ]
+        },
+        {
+          "type": "PanelContainer",
+          "rect": [
+            0,
+            230,
+            328,
+            44
+          ],
+          "variation": "ToastPanel",
+          "children": [
+            {
+              "type": "Label",
+              "rect": [
+                12,
+                242,
+                304,
+                20
+              ],
+              "variation": "BodyB14",
+              "text": "Bag full · free a slot first"
+            }
+          ]
+        },
+        {
+          "type": "PanelContainer",
+          "rect": [
+            0,
+            286,
+            51,
+            32
+          ],
+          "variation": "Badge",
+          "children": [
+            {
+              "type": "Label",
+              "rect": [
+                8,
+                293,
+                35,
+                18
+              ],
+              "variation": "CaptionB12",
+              "text": "Ready"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
