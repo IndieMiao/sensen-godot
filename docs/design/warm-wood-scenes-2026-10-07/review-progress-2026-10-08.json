@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-08",
+  "cards": {
+    "173": {
+      "owner": "赵云",
+      "state": "Review",
+      "revision": "R2.2",
+      "commit": "bb33765a",
+      "triangles": 159455,
+      "plant_triangles": 33952,
+      "surfaces": 60,
+      "rendered_checks": 38,
+      "video_seconds": 15.0,
+      "verified_plane_attachments": 31,
+      "verified_lark_messages": 5,
+      "review_media_path": "output/zhaoyun-173-r22-2026-10-08",
+      "subsequent_work": "Shared particle fire integration waits on178"
+    },
+    "175": {
+      "owner": "赵云",
+      "state": "Review",
+      "revision": "R2.1",
+      "commit": "74b4c361",
+      "triangles": 181235,
+      "plant_triangles": 31154,
+      "surfaces": 40,
+      "rendered_checks": 34,
+      "video_seconds": 15.0,
+      "verified_plane_attachments": 26,
+      "verified_lark_messages": 6,
+      "review_media_path": "output/zhaoyun-175-r21-2026-10-08",
+      "subsequent_work": "Shared particle fire integration waits on178"
+    },
+    "172": {
+      "owner": "赵云",
+      "state": "Todo",
+      "art": "PreviousR2.1accepted; user reopened only for shared particle fire"
+    },
+    "174": {
+      "owner": "赵云",
+      "state": "Done",
+      "art": "R2.1 accepted,unchanged"
+    },
+    "176": {
+      "owner": "赵云",
+      "state": "Done",
+      "art": "R2accepted fcbf8805,27attachments/6Lark verified"
+    },
+    "177": {
+      "owner": "刘备",
+      "state": "Done"
+    },
+    "178": {
+      "owner": "刘备",
+      "state": "In Progress",
+      "work": "Shared self-contained particle FX"
+    }
+  },
+  "shared_fx_dependency": {
+    "owner": "刘备 / SGODOT-178 R2.2",
+    "path": "assets/rooms/_shared/fx/",
+    "module": "fx_hearth_fire",
+    "consumers": [
+      172,
+      173,
+      175
+    ],
+    "status": "Awaiting separate shared-library commit on wp-3d-scene; absent in latest fetched shared tree",
+    "instruction": "Reuse after merge; do not create a separate flame implementation."
+  }
+}
