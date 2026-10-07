@@ -66,12 +66,48 @@ Desktop render, Basic Room placeholder: player on the door-side chair, a scripte
 Acceptance of the seated pose (hip contact within 2 cm, legs clear of the table, recording on the final
 tea-house scene 179) belongs to the art director.
 
+## NPC outfits (2026-10-08)
+
+The thumbnails in `assets/avatar/thumbs` are grey placeholders, so the catalogue parts were rendered on the
+base rig first (`tools/dev/parts_contact_sheet.gd`, front and 3/4). Only five hairHats are usable: `hairhat20`
+(traffic-cone hood) is out, and `hairhat0` is the default player's hair.
+
+![hairHat](p0-outpost-rooms-2026-10-08/parts-hairhat.jpg)
+![cloth](p0-outpost-rooms-2026-10-08/parts-cloth.jpg)
+![shoes](p0-outpost-rooms-2026-10-08/parts-shoes.jpg)
+![messengerBag](p0-outpost-rooms-2026-10-08/parts-messengerbag.jpg)
+
+Outfits in `assets/p0/outpost_npcs.json`, matched to the SGODOT-219 portraits (Old Kai, Ama, Mei, Pip) and
+to the keepers' room-art crops (Finn, Sigrid):
+
+| NPC | Where | hairHat | cloth | shoes | Why |
+|---|---|---|---|---|---|
+| Finn | Tackle shop keeper | hairhat43 | cloth1 | shoes4 | Not like Old Kai in the same room |
+| Old Kai | Tackle shop resident | hairhat51 | cloth11 | shoes3 | Hat for the knit cap, apron, dark boots |
+| Ama | Tea house keeper | hairhat41 | cloth11 | shoes5 | Brown hair, sage-green apron |
+| Sigrid | Travel post keeper | hairhat43 | cloth1_1 | shoes3 | Blue uniform shirt |
+| Pip | Travel post resident (scale 0.88) | hairhat70 | cloth1 | shoes1 | Navy cap, cream shirt, dark shorts, cross-body bag `messengerbag4` |
+| Mei | Market keeper | hairhat41 | cloth1_1 | shoes2 | Brown hair; blue stripes and khaki for the scarf and apron |
+
+No two NPCs share both hairHat and cloth, no one uses `hairhat0`, and the two NPCs in each room differ in
+both. `tools/dev/npc_lineup.gd` renders the lineup next to the default player (`--portraits=<dir>` adds the
+219 portraits, which stay out of the repo):
+
+![NPC lineup](p0-outpost-rooms-2026-10-08/npc-lineup.jpg)
+
+At the counter, with the player on `stand_counter` (market: `stand_stall_1`), finger cards hidden with the
+`nomarks` shot step. The Basic Room counter stands against the wall, so keepers stand at its door end
+facing the room; standing behind a counter waits for the final scenes:
+
+![Keepers at the counter](p0-outpost-rooms-2026-10-08/npc-counters.jpg)
+
 ## Open
 
 - Keeper and door finger cards overlap near the spawn (placeholder anchors near the door); marker
   avoidance comes with SGODOT-221's tag layer.
 - Seated pose not yet accepted by the art director; sitting while drinking is not done (see SGODOT-227).
-- Keeper / Pip / Old Kai outfits are provisional (Old Kai's `hairhat20` reads as an animal hood); the
-  hairHat / cloth contact sheet goes to the art director first.
+- NPC outfits wait for the art director's acceptance; dedicated parts come with SGODOT-229. Pip's bag is the
+  closest cross-body part, not a mail satchel.
+- `drink_stand` is in the library but not played in P0 (no cup prop yet; art director, SGODOT-227).
 - Not covered here: physical phone (ask the user first), real network latency, more than one client
   device.

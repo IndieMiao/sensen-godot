@@ -33,6 +33,7 @@ var seat := ""           # the seat we sit on ("" while standing)
 var _sit_request := {}   # {seq, seat} waiting for the server
 var _standing := {}      # {left, then} while sit_up plays
 var _glide := {}         # {from, to, t, dur}: the root eases between the floor and the seat
+var _dev_no_marks := false
 
 func setup(args: Dictionary) -> void:
 	outpost = P0Outposts.find(str(args.get("outpost_id", "")))
@@ -177,9 +178,11 @@ func _open_keeper() -> void:
 	elif role == "tackle": rt.ui.open_kai_greeting()   # the existing tackle greeting until 224 lands
 	else: rt.ui.toast("%s · %s" % [str(keeper.get("role", "")), str(keeper.get("name", ""))])
 
-## LOCK-18: residents open the dialogue bar (SGODOT-225).
+## LOCK-18: residents open the dialogue bar (SGODOT-225); open_resident() is false when the view has no such
+## resident, and then only their name shows.
 func _open_resident(id: String, resident_name: String) -> void:
-	_open_entry("open_resident", [id], resident_name)
+	if rt == null: return
+	if not (rt.ui.has_method("open_resident") and rt.ui.call("open_resident", id)): rt.ui.toast(resident_name)
 
 func _open_entry(method: String, args: Array, fallback: String) -> void:
 	if rt == null: return
@@ -187,6 +190,7 @@ func _open_entry(method: String, args: Array, fallback: String) -> void:
 	else: rt.ui.toast(fallback)
 
 func _marker(n: String, view: Dictionary) -> Dictionary:
+	if _dev_no_marks: return {}
 	if npcs.has(n): return {text = "%s · Tap to talk" % str(npcs[n].name)}
 	if SEAT_GROUPS.has(n): return {text = "Sit"} if seat == "" and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}
 	if n == "use_market_board": return {text = "Market Board"}
@@ -306,6 +310,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"sit": _go_sit(step[1] if step.size() > 1 else "seat_table1_")
 		"stand": _stand_up()
+		"nomarks": _dev_no_marks = true   # acceptance shots: finger cards off, name tags stay
 		_: return super.p0_dev(step)
 	return true
 
