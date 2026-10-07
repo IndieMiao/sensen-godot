@@ -1330,5 +1330,11 @@
         }
       ]
     }
+  },
+  "profile": {
+    "name": "Farmer",
+    "city": "Shanghai",
+    "climate": "Subtropical",
+    "farm_name": "Farmer's Homestead"
   }
 }

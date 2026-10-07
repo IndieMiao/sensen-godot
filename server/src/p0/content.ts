@@ -89,6 +89,8 @@ export interface P0Content {
     mystery_line: string;
   };
   residents: Record<string, ResidentDef>;
+  /** P0 has no nickname or city choice yet: what the Profile page shows (SGODOT-225). */
+  profile: { name: string; city: string; climate: string; farm_name: string };
   /** §9.6 / §9.13.2 request boards: the Stall Board (slot 1 starts with the tutorial) and the Market Board. */
   requests: {
     slots: number; refill_h: number; tutorial: { id: string; title: string; item: string; qty: number; coins: number; where: string };

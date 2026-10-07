@@ -124,6 +124,13 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     expect(next.block).toMatchObject({ code: 'skills_short' });
   });
 
+  it('the Profile page reads the homestead level and the account start (SGODOT-225)', () => {
+    const s = fresh();
+    s.homestead.level = 2;
+    expect(viewOf(c, s, T0).profile).toEqual({ name: 'Farmer', city: 'Shanghai', climate: 'Subtropical', since_ms: s.created_at,
+      farm: { name: "Farmer's Homestead", level: 2 } });
+  });
+
   it('v2 saves gain Homestead Lv1, storage and the boards; the tutorial request keeps its status', () => {
     const old = fresh() as unknown as Record<string, unknown>;
     for (const k of ['bag_cap', 'storage', 'locked', 'owned', 'homestead', 'residents', 'boards']) delete old[k];
