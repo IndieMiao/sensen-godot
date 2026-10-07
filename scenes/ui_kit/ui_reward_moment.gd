@@ -19,6 +19,7 @@ signal unavailable_pressed(reason: String)
 enum Tone { REWARD, NEUTRAL, MILESTONE }
 
 const WIDTH := 280.0
+# RewardMoment main (WP1b, not exported as tokens yet; see UiTokens.PENDING "wp1b"):
 const _PAD_X := 16.0
 const _PAD_Y := 14.0
 const _GAP := 10.0
@@ -36,7 +37,10 @@ const _REWARD_GAP := 8.0
 const _STRIP_ICON := 18.0
 const _STRIP_GAP := 8.0
 const _STRIP_RADIUS := 10.0
+const _STRIP_PAD := Vector4(10, 7, 12, 7)   # One-time strip padding: left, top, right, bottom
 const _ACTION_GAP := 6.0
+## Longest name before it is cut with …: the card's inner width minus the icon disc and its gap.
+const NAME_MAX_W := WIDTH - _PAD_X * 2.0 - _DISC - _ITEM_GAP
 const RARITY_COLORS := [UiTokens.COLOR_RARITY_COMMON, UiTokens.COLOR_RARITY_FINE, UiTokens.COLOR_RARITY_RARE, UiTokens.COLOR_RARITY_LEGENDARY]
 
 var tone: Tone = Tone.REWARD: set = set_tone
@@ -49,7 +53,8 @@ var rarity := 0: set = set_rarity
 var rarity_word := "": set = set_rarity_word
 ## 0 Plain (no badge), 1 Good, 2 Perfect.
 var quality := 0: set = set_quality
-## Float pills built by the caller (UiFloatText.pill(text, tone, icon)); [] hides the row.
+## Float pills built by the caller (UiFloatText.pill(text, tone, icon)); [] hides the row. The card owns the
+## pills it is given: pills dropped by a later assignment are freed, pills passed again are kept.
 var rewards: Array = []: set = set_rewards
 var strip := "": set = set_strip
 var strip_icon: Texture2D: set = set_strip_icon
@@ -120,6 +125,8 @@ func _build_item() -> Control:
 	names.alignment = BoxContainer.ALIGNMENT_CENTER
 	names.add_theme_constant_override(&"separation", int(_NAME_GAP))
 	_name = UiKit.label("", UiTokens.STYLE_ROW_TITLE_XB15)
+	_name.clip_text = true
+	_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	names.add_child(_name)
 	_tags = HBoxContainer.new()
 	_tags.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -140,7 +147,8 @@ func _build_item() -> Control:
 func _build_strip() -> Control:
 	_strip = PanelContainer.new()
 	_strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_strip.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, _STRIP_RADIUS, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_DEFAULT).with_margins(10, 7, 12, 7))
+	_strip.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, _STRIP_RADIUS, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_DEFAULT)
+		.with_margins(_STRIP_PAD.x, _STRIP_PAD.y, _STRIP_PAD.z, _STRIP_PAD.w))
 	var h := HBoxContainer.new()
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.add_theme_constant_override(&"separation", int(_STRIP_GAP))
@@ -188,11 +196,23 @@ func set_note(v: String) -> void: note = v; _refresh()
 func set_rewards(v: Array) -> void:
 	rewards = v
 	if _rewards == null: return
+	var keep := v.slice(0, 2)
 	for c in _rewards.get_children():
 		_rewards.remove_child(c)
-		c.queue_free()
-	for c in v.slice(0, 2): _rewards.add_child(c)
-	_rewards.visible = not _rewards.get_children().is_empty()
+		if not keep.has(c): c.queue_free()
+	for c in keep: _rewards.add_child(c)
+	_rewards.visible = not keep.is_empty()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED: _fit_name()
+
+## A clipped label has no natural width, so give the name its text width up to NAME_MAX_W (then …): short names
+## stay centred with their icon, long ones never push the card past 280.
+func _fit_name() -> void:
+	if _name == null: return
+	var font := _name.get_theme_font(&"font")
+	var w := font.get_string_size(item_name, HORIZONTAL_ALIGNMENT_LEFT, -1, _name.get_theme_font_size(&"font_size")).x if font else 0.0
+	_name.custom_minimum_size.x = minf(ceilf(w), NAME_MAX_W)
 
 ## Fills the card in one call: keys are the field names above.
 func show_fields(fields: Dictionary) -> void:
@@ -207,6 +227,7 @@ func _refresh() -> void:
 	_disc.add_theme_stylebox_override(&"panel", UiStyleBox.make(disc_bg, _DISC * 0.5))
 	_icon.texture = icon
 	_name.text = item_name
+	_fit_name()
 	_tags.visible = rarity > 0 or quality > 0
 	_dot.visible = rarity > 0
 	if rarity > 0:
