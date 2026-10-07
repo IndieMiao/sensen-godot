@@ -47,7 +47,7 @@ static func popup(host: Control, anchor: Rect2, source: String, on_show: Callabl
 		if (e is InputEventMouseButton or e is InputEventScreenTouch) and not e.pressed: layer.queue_free())
 	host.add_child(layer)
 	var pill := UiNeedSource.new(source, on_show.is_valid())
-	pill.custom_minimum_size.x = UiTokens.SIZE_TOAST_W
+	pill.custom_minimum_size.x = host.size.x - UiTokens.SPACE_PAGE * 2.0   # one column, like the main (317 of 360)
 	layer.add_child(pill)
 	pill.show_pressed.connect(func():
 		if on_show.is_valid(): on_show.call()

@@ -249,6 +249,9 @@ func _skill_pct(s: Dictionary) -> float: return P0Logic.skill_progress(s)
 ## kitchen is the farmhouse's stove corner, so the chip reads "Shanghai · Farmhouse" there (LOCK-06).
 func _refresh_hud() -> void:
 	if hud == null: return
+	# No numbers before the first server view: an empty view would read as 0 Energy (red) and 0 coins.
+	hud.modulate.a = 0.0 if view.is_empty() else 1.0
+	if view.is_empty(): return
 	var place := P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else "")
 	hud.apply(P0Logic.hud_state(view, {"next_cost": int(fab_state().get("need", 0)), "place": place}))
 

@@ -230,7 +230,7 @@ func test_vertical_drag_in_a_touch_scroll_is_not_a_tap() -> void:
 		col.add_child(c)
 		cells.append(c)
 	await _settle()
-	var c := cells[0]
+	var c := cells[1]   # not the first cell: a window-coordinate mix-up would land on another one
 	assert_int(c.mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
 	var taps := [0]
 	var kinds := []
@@ -250,7 +250,8 @@ func test_vertical_drag_in_a_touch_scroll_is_not_a_tap() -> void:
 	assert_int(taps[0]).is_equal(1)
 	assert_array(kinds).contains(["cancel"])
 
-func _push(e: InputEvent) -> void: get_viewport().push_input(e)
+## Viewport coordinates: the test window is 720×1280 over a 360×640 viewport, so window coordinates would be halved.
+func _push(e: InputEvent) -> void: get_viewport().push_input(e, true)
 
 func _press(pos: Vector2, down: bool) -> InputEvent:
 	if DisplayServer.is_touchscreen_available():
