@@ -35,7 +35,7 @@
     {
       "id": "sh_post_1",
       "role": "post",
-      "name": "Shanghai Travel Post",
+      "name": "Huangpu Travel Post",
       "category": "Travel post · Coffee",
       "lat": 31.2318,
       "lng": 121.4785,
@@ -50,7 +50,7 @@
     {
       "id": "sh_market_1",
       "role": "market",
-      "name": "Shanghai Market Square",
+      "name": "Xuhui Market Square",
       "category": "Market square · Requests",
       "lat": 31.211,
       "lng": 121.4405,

@@ -44,6 +44,10 @@ func _exit_tree() -> void:
 
 # ---------------------------------------------------------------- realtime room
 func _go_online(session: P0Session) -> void:
+	# A room opened first (dev boot) creates the runtime this frame: its session reads the server URL and
+	# player id in _ready, one frame later.
+	if not session.is_node_ready(): await session.ready
+	if not is_inside_tree(): return
 	var o := P0Online.new()
 	o.url = P0Online.ws_url(session.base_url)
 	o.player_id = session.player_id
