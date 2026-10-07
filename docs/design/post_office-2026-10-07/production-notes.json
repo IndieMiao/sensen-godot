@@ -1,0 +1,5 @@
+{
+  "description": "The post office uses copper-brown timber, a blue panelled entrance and service counter, red pillar box with a cut-out slot, sorting cabinet with twelve repeated letter stacks, parcel shelving and canvas mailbags. The packing table holds a carton, twine, a scale and stationery. A wall clock, decorative world map and POST OFFICE sign retain the reference identity. Crates, packing tools and plants remain individually named in the editable source.",
+  "differences": "The 6.6 × 6.0m floor and hidden geometry are inferred. The paper labels use generic strokes, not real addresses. The world map is an original simplified decorative silhouette, not geographic navigation data. The card beside the door uses a botanical placeholder and the register uses the shared shop design. The parcel pile is less dense and material wear is simplified. The English POST OFFICE wording is preserved.",
+  "collision": "The door aperture and letter-box slot are real cutouts. Room containment and large furnishings use simple boxes; paper, labels, hands and parcels are decorative. No route transition, postal interaction or character traversal is implemented."
+}

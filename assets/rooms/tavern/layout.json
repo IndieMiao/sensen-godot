@@ -1,0 +1,1173 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2966"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "file": "room_shell.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.09,
+            0
+          ],
+          "size": [
+            7.7,
+            0.34,
+            7.1
+          ]
+        },
+        {
+          "at": [
+            -3.7,
+            1.9,
+            0
+          ],
+          "size": [
+            0.22,
+            3.8,
+            7.0
+          ]
+        },
+        {
+          "at": [
+            0,
+            1.9,
+            -3.4
+          ],
+          "size": [
+            7.6000000000000005,
+            3.8,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "window_wall",
+      "file": "window_wall.glb",
+      "position": [
+        -3.7,
+        0,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0,
+        -3.4
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "saloon_door",
+      "file": "saloon_door.glb",
+      "position": [
+        -3.59,
+        0.07,
+        -2.5
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "tavern_window",
+      "file": "tavern_window.glb",
+      "position": [
+        2.65,
+        0,
+        -3.295
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tavern_window_garden",
+      "file": "tavern_window_garden.glb",
+      "position": [
+        2.65,
+        0,
+        -3.295
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "long_bar",
+      "file": "long_bar.glb",
+      "position": [
+        0.03,
+        0.082,
+        -1.54
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.6,
+            0
+          ],
+          "size": [
+            3.75,
+            1.2,
+            0.88
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bar_return",
+      "file": "bar_return.glb",
+      "position": [
+        1.99,
+        0.082,
+        -1.98
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.6,
+            0
+          ],
+          "size": [
+            0.66,
+            1.2,
+            1.75
+          ]
+        }
+      ]
+    },
+    {
+      "name": "back_bar",
+      "file": "back_bar.glb",
+      "position": [
+        0.07,
+        0.94,
+        -3.04
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bottle_green",
+      "file": "bottle_green.glb",
+      "position": [
+        -1.16,
+        1.047,
+        -2.96
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bottle_amber",
+      "file": "bottle_amber.glb",
+      "position": [
+        -0.83,
+        1.047,
+        -2.96
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tavern_sign",
+      "file": "tavern_sign.glb",
+      "position": [
+        0.07,
+        3.07,
+        -3.21
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bar_stool",
+      "file": "bar_stool.glb",
+      "position": [
+        -1.29,
+        0.082,
+        -0.66
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.38,
+            0
+          ],
+          "size": [
+            0.5,
+            0.76,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "beer_cask",
+      "file": "beer_cask.glb",
+      "position": [
+        1.3,
+        1.45,
+        -1.78
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bar_drinks",
+      "file": "bar_drinks.glb",
+      "position": [
+        -0.25,
+        1.46,
+        -1.34
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "barrel",
+      "file": "barrel.glb",
+      "position": [
+        -2.93,
+        0.082,
+        -1.58
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.42,
+            0
+          ],
+          "size": [
+            0.65,
+            0.84,
+            0.65
+          ]
+        }
+      ]
+    },
+    {
+      "name": "left_table_rug",
+      "file": "left_table_rug.glb",
+      "position": [
+        -2.14,
+        0.092,
+        0.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "square_table",
+      "file": "square_table.glb",
+      "position": [
+        -2.14,
+        0.082,
+        0.91
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.6,
+            0
+          ],
+          "size": [
+            1.88,
+            1.2,
+            1.18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "round_table",
+      "file": "round_table.glb",
+      "position": [
+        0.07,
+        0.082,
+        2.22
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.43,
+            0
+          ],
+          "size": [
+            1.58,
+            0.86,
+            1.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dining_stool",
+      "file": "dining_stool.glb",
+      "position": [
+        -2.14,
+        0.082,
+        1.87
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.295,
+            0
+          ],
+          "size": [
+            0.5,
+            0.59,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "table_mug",
+      "file": "table_mug.glb",
+      "position": [
+        -2.59,
+        1.29,
+        0.85
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "table_candle",
+      "file": "table_candle.glb",
+      "position": [
+        -2.12,
+        1.29,
+        0.95
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "candle_glow",
+      "file": "candle_glow.glb",
+      "position": [
+        -2.12,
+        1.57,
+        0.95
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tavern_snacks",
+      "file": "tavern_snacks.glb",
+      "position": [
+        0.12,
+        1.09,
+        2.35
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "left_display_shelf",
+      "file": "left_display_shelf.glb",
+      "position": [
+        -3.47,
+        1.37,
+        0.27
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "shelf_plant",
+      "file": "shelf_plant.glb",
+      "position": [
+        -3.26,
+        1.64,
+        0.65
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "landscape_frame",
+      "file": "landscape_frame.glb",
+      "position": [
+        -3.54,
+        1.62,
+        1.36
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "stag_banner",
+      "file": "stag_banner.glb",
+      "position": [
+        -3.51,
+        2.85,
+        1.22
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "floor_plant",
+      "file": "floor_plant.glb",
+      "position": [
+        1.44,
+        0.083,
+        3.03
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "wall_lantern",
+      "file": "wall_lantern.glb",
+      "position": [
+        -3.45,
+        2.06,
+        2.22
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "lantern_glow",
+      "file": "lantern_glow.glb",
+      "position": [
+        -3.45,
+        2.06,
+        2.22
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "hanging_chandelier",
+      "file": "hanging_chandelier.glb",
+      "position": [
+        -2.2,
+        2.99,
+        0.1
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "bar_bottle_0_2",
+      "asset": "bottle_green",
+      "position": [
+        -0.47999999999999987,
+        1.047,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_0_3",
+      "asset": "bottle_amber",
+      "position": [
+        -0.1399999999999999,
+        1.047,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_0_4",
+      "asset": "bottle_green",
+      "position": [
+        0.20000000000000018,
+        1.047,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_0_5",
+      "asset": "bottle_amber",
+      "position": [
+        0.5400000000000003,
+        1.047,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_0_6",
+      "asset": "bottle_green",
+      "position": [
+        0.8800000000000001,
+        1.047,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_0_7",
+      "asset": "bottle_amber",
+      "position": [
+        1.2200000000000004,
+        1.047,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_1_0",
+      "asset": "bottle_amber",
+      "position": [
+        -1.16,
+        1.5419999999999998,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_1_1",
+      "asset": "bottle_green",
+      "position": [
+        -0.8199999999999998,
+        1.5419999999999998,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_1_2",
+      "asset": "bottle_amber",
+      "position": [
+        -0.47999999999999987,
+        1.5419999999999998,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_1_3",
+      "asset": "bottle_green",
+      "position": [
+        -0.1399999999999999,
+        1.5419999999999998,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_1_4",
+      "asset": "bottle_amber",
+      "position": [
+        0.20000000000000018,
+        1.5419999999999998,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_1_5",
+      "asset": "bottle_green",
+      "position": [
+        0.5400000000000003,
+        1.5419999999999998,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_1_6",
+      "asset": "bottle_amber",
+      "position": [
+        0.8800000000000001,
+        1.5419999999999998,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_1_7",
+      "asset": "bottle_green",
+      "position": [
+        1.2200000000000004,
+        1.5419999999999998,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_2_0",
+      "asset": "bottle_green",
+      "position": [
+        -1.16,
+        2.037,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_2_1",
+      "asset": "bottle_amber",
+      "position": [
+        -0.8199999999999998,
+        2.037,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_2_2",
+      "asset": "bottle_green",
+      "position": [
+        -0.47999999999999987,
+        2.037,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_2_3",
+      "asset": "bottle_amber",
+      "position": [
+        -0.1399999999999999,
+        2.037,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_2_4",
+      "asset": "bottle_green",
+      "position": [
+        0.20000000000000018,
+        2.037,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_2_5",
+      "asset": "bottle_amber",
+      "position": [
+        0.5400000000000003,
+        2.037,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_2_6",
+      "asset": "bottle_green",
+      "position": [
+        0.8800000000000001,
+        2.037,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_bottle_2_7",
+      "asset": "bottle_amber",
+      "position": [
+        1.2200000000000004,
+        2.037,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_stool_0",
+      "asset": "bar_stool",
+      "position": [
+        -0.41,
+        0.082,
+        -0.66
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_stool_1",
+      "asset": "bar_stool",
+      "position": [
+        0.47,
+        0.082,
+        -0.66
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_stool_2",
+      "asset": "bar_stool",
+      "position": [
+        1.35,
+        0.082,
+        -0.66
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "barrel_left",
+      "asset": "barrel",
+      "position": [
+        -2.42,
+        0.082,
+        -2.03
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "barrel_right_one",
+      "asset": "barrel",
+      "position": [
+        2.67,
+        0.082,
+        -2.09
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "barrel_right_two",
+      "asset": "barrel",
+      "position": [
+        3.16,
+        0.082,
+        -1.59
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "round_table_right",
+      "asset": "round_table",
+      "position": [
+        2.52,
+        0.082,
+        0.94
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_0",
+      "asset": "dining_stool",
+      "position": [
+        -3.02,
+        0.082,
+        0.85
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_1",
+      "asset": "dining_stool",
+      "position": [
+        -1.26,
+        0.082,
+        0.85
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_2",
+      "asset": "dining_stool",
+      "position": [
+        -2.14,
+        0.082,
+        -0.04
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_3",
+      "asset": "dining_stool",
+      "position": [
+        -0.83,
+        0.082,
+        2.22
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_4",
+      "asset": "dining_stool",
+      "position": [
+        0.04,
+        0.082,
+        3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_5",
+      "asset": "dining_stool",
+      "position": [
+        0.94,
+        0.082,
+        2.23
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_6",
+      "asset": "dining_stool",
+      "position": [
+        0.05,
+        0.082,
+        1.31
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_7",
+      "asset": "dining_stool",
+      "position": [
+        1.62,
+        0.082,
+        0.94
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_8",
+      "asset": "dining_stool",
+      "position": [
+        2.5,
+        0.082,
+        1.84
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_9",
+      "asset": "dining_stool",
+      "position": [
+        3.39,
+        0.082,
+        0.91
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_10",
+      "asset": "dining_stool",
+      "position": [
+        2.52,
+        0.082,
+        0.04
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_mug_0",
+      "asset": "table_mug",
+      "position": [
+        -1.62,
+        1.29,
+        1.02
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_mug_1",
+      "asset": "table_mug",
+      "position": [
+        -0.21,
+        1.08,
+        2.42
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_mug_2",
+      "asset": "table_mug",
+      "position": [
+        0.48,
+        1.08,
+        2.03
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_mug_3",
+      "asset": "table_mug",
+      "position": [
+        2.1,
+        1.08,
+        0.95
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_mug_4",
+      "asset": "table_mug",
+      "position": [
+        2.85,
+        1.08,
+        1.1
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_candle_0",
+      "asset": "table_candle",
+      "position": [
+        0.1,
+        1.08,
+        2.18
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "candle_glow_0",
+      "asset": "candle_glow",
+      "position": [
+        0.1,
+        1.36,
+        2.18
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_candle_1",
+      "asset": "table_candle",
+      "position": [
+        2.5,
+        1.08,
+        0.94
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "candle_glow_1",
+      "asset": "candle_glow",
+      "position": [
+        2.5,
+        1.36,
+        0.94
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_left_frame",
+      "asset": "wall_lantern",
+      "position": [
+        -1.31,
+        2.94,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_left_glow",
+      "asset": "lantern_glow",
+      "position": [
+        -1.31,
+        2.94,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_right_frame",
+      "asset": "wall_lantern",
+      "position": [
+        1.56,
+        2.94,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_right_glow",
+      "asset": "lantern_glow",
+      "position": [
+        1.56,
+        2.94,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "window_right_frame",
+      "asset": "wall_lantern",
+      "position": [
+        3.28,
+        2.49,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "window_right_glow",
+      "asset": "lantern_glow",
+      "position": [
+        3.28,
+        2.49,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_frame_0",
+      "asset": "wall_lantern",
+      "position": [
+        -1.5500000000000003,
+        2.72,
+        0.1
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_glow_0",
+      "asset": "lantern_glow",
+      "position": [
+        -1.5500000000000003,
+        2.72,
+        0.1
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_frame_1",
+      "asset": "wall_lantern",
+      "position": [
+        -2.2,
+        2.72,
+        0.75
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_glow_1",
+      "asset": "lantern_glow",
+      "position": [
+        -2.2,
+        2.72,
+        0.75
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_frame_2",
+      "asset": "wall_lantern",
+      "position": [
+        -2.85,
+        2.72,
+        0.10000000000000009
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_glow_2",
+      "asset": "lantern_glow",
+      "position": [
+        -2.85,
+        2.72,
+        0.10000000000000009
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_frame_3",
+      "asset": "wall_lantern",
+      "position": [
+        -2.2,
+        2.72,
+        -0.55
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_glow_3",
+      "asset": "lantern_glow",
+      "position": [
+        -2.2,
+        2.72,
+        -0.55
+      ],
+      "yaw_degrees": 0
+    }
+  ],
+  "camera": {
+    "position": [
+      10.5,
+      9.5,
+      12.0
+    ],
+    "target": [
+      0,
+      1.5,
+      0
+    ],
+    "size": 12.0
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ],
+  "review_lighting": {
+    "ambient": 0.5,
+    "sun": 0.65,
+    "points": [
+      {
+        "position": [
+          -2.2,
+          2.7,
+          0.1
+        ],
+        "energy": 1.5,
+        "range": 3.7
+      },
+      {
+        "position": [
+          -1.25,
+          2.7,
+          -2.85
+        ],
+        "energy": 0.95,
+        "range": 2.8
+      },
+      {
+        "position": [
+          1.6,
+          2.7,
+          -2.85
+        ],
+        "energy": 0.95,
+        "range": 2.8
+      }
+    ]
+  }
+}

@@ -1,0 +1,1106 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2970"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "file": "room_shell.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.09,
+            0
+          ],
+          "size": [
+            9.5,
+            0.34,
+            7.7
+          ]
+        },
+        {
+          "at": [
+            -4.6,
+            2.45,
+            0
+          ],
+          "size": [
+            0.22,
+            4.9,
+            7.6000000000000005
+          ]
+        },
+        {
+          "at": [
+            0,
+            2.45,
+            -3.7
+          ],
+          "size": [
+            9.399999999999999,
+            4.9,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "window_wall",
+      "file": "window_wall.glb",
+      "position": [
+        -4.6,
+        0,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0,
+        -3.7
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "arched_window",
+      "file": "arched_window.glb",
+      "position": [
+        -4.5,
+        0,
+        1.2
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "window_garden",
+      "file": "window_garden.glb",
+      "position": [
+        -4.76,
+        0,
+        1.2
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "green_door",
+      "file": "green_door.glb",
+      "position": [
+        3.94,
+        0.05,
+        -3.585
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "entry_mat",
+      "file": "entry_mat.glb",
+      "position": [
+        3.94,
+        0.092,
+        -2.9800000000000004
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "sink_cabinet",
+      "file": "sink_cabinet.glb",
+      "position": [
+        -4.1,
+        0.082,
+        1.04
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.6,
+            0
+          ],
+          "size": [
+            1.8,
+            1.2,
+            0.86
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sink_left_cabinet",
+      "file": "sink_left_cabinet.glb",
+      "position": [
+        -4.12,
+        0.082,
+        2.35
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.54,
+            0
+          ],
+          "size": [
+            0.74,
+            1.08,
+            0.77
+          ]
+        }
+      ]
+    },
+    {
+      "name": "kitchen_drawers",
+      "file": "kitchen_drawers.glb",
+      "position": [
+        -4.12,
+        0.082,
+        -0.24
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.54,
+            0
+          ],
+          "size": [
+            0.75,
+            1.08,
+            0.77
+          ]
+        }
+      ]
+    },
+    {
+      "name": "range_cooker",
+      "file": "range_cooker.glb",
+      "position": [
+        -4.1,
+        0.082,
+        -1.13
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.59,
+            0
+          ],
+          "size": [
+            0.91,
+            1.18,
+            0.85
+          ]
+        }
+      ]
+    },
+    {
+      "name": "kitchen_end_cabinet",
+      "file": "kitchen_end_cabinet.glb",
+      "position": [
+        -4.12,
+        0.082,
+        -2.2
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.54,
+            0
+          ],
+          "size": [
+            1.15,
+            1.08,
+            0.77
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wall_shelf",
+      "file": "wall_shelf.glb",
+      "position": [
+        -4.45,
+        2.5,
+        -0.1
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "shelf_plant",
+      "file": "shelf_plant.glb",
+      "position": [
+        -4.24,
+        2.62,
+        -0.35
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "utensil_crock",
+      "file": "utensil_crock.glb",
+      "position": [
+        -3.97,
+        1.25,
+        -1.95
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "range_hood",
+      "file": "range_hood.glb",
+      "position": [
+        -4.22,
+        1.42,
+        -1.1
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "bookshelf",
+      "file": "bookshelf.glb",
+      "position": [
+        -3.97,
+        0.082,
+        -3.09
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.1,
+            0
+          ],
+          "size": [
+            1.12,
+            2.2,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "loft_structure",
+      "file": "loft_structure.glb",
+      "position": [
+        1.9,
+        0.4,
+        -2.6
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            2.2,
+            0
+          ],
+          "size": [
+            4.5,
+            0.25,
+            2.32
+          ]
+        },
+        {
+          "at": [
+            -2.13,
+            1.1,
+            1.02
+          ],
+          "size": [
+            0.2,
+            2.2,
+            0.2
+          ]
+        },
+        {
+          "at": [
+            2.13,
+            1.1,
+            1.02
+          ],
+          "size": [
+            0.2,
+            2.2,
+            0.2
+          ]
+        },
+        {
+          "at": [
+            0,
+            2.78,
+            1.09
+          ],
+          "size": [
+            4.4,
+            0.87,
+            0.1
+          ]
+        },
+        {
+          "at": [
+            -2.19,
+            2.77,
+            -0.7
+          ],
+          "size": [
+            0.1,
+            0.87,
+            0.87
+          ]
+        },
+        {
+          "at": [
+            -2.63,
+            2.2,
+            0.27
+          ],
+          "size": [
+            0.88,
+            0.25,
+            0.7
+          ]
+        }
+      ]
+    },
+    {
+      "name": "loft_stairs",
+      "file": "loft_stairs.glb",
+      "position": [
+        -0.99,
+        0.082,
+        -0.24
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.1115,
+            0.99
+          ],
+          "size": [
+            0.94,
+            0.223,
+            0.28
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.223,
+            0.71
+          ],
+          "size": [
+            0.94,
+            0.446,
+            0.28
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.3345,
+            0.42999999999999994
+          ],
+          "size": [
+            0.94,
+            0.669,
+            0.28
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.446,
+            0.1499999999999999
+          ],
+          "size": [
+            0.94,
+            0.892,
+            0.28
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.5575,
+            -0.13000000000000012
+          ],
+          "size": [
+            0.94,
+            1.115,
+            0.28
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.669,
+            -0.41000000000000014
+          ],
+          "size": [
+            0.94,
+            1.338,
+            0.28
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.7805,
+            -0.6900000000000002
+          ],
+          "size": [
+            0.94,
+            1.561,
+            0.28
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.892,
+            -0.9700000000000002
+          ],
+          "size": [
+            0.94,
+            1.784,
+            0.28
+          ]
+        },
+        {
+          "at": [
+            0,
+            1.0035,
+            -1.2500000000000002
+          ],
+          "size": [
+            0.94,
+            2.007,
+            0.28
+          ]
+        },
+        {
+          "at": [
+            0,
+            1.115,
+            -1.5300000000000005
+          ],
+          "size": [
+            0.94,
+            2.23,
+            0.28
+          ]
+        },
+        {
+          "at": [
+            0,
+            1.2265,
+            -1.8100000000000003
+          ],
+          "size": [
+            0.94,
+            2.453,
+            0.28
+          ]
+        },
+        {
+          "at": [
+            0,
+            1.338,
+            -2.09
+          ],
+          "size": [
+            0.94,
+            2.676,
+            0.28
+          ]
+        }
+      ]
+    },
+    {
+      "name": "loft_bed",
+      "file": "loft_bed.glb",
+      "position": [
+        2.0,
+        2.78,
+        -2.88
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.82,
+            0.64,
+            1.63
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bedside_table",
+      "file": "bedside_table.glb",
+      "position": [
+        3.3,
+        2.78,
+        -2.86
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.27,
+            0
+          ],
+          "size": [
+            0.54,
+            0.54,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bedside_lamp",
+      "file": "bedside_lamp.glb",
+      "position": [
+        3.3,
+        3.35,
+        -2.86
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "loft_curtain_left",
+      "file": "loft_curtain_left.glb",
+      "position": [
+        0.26,
+        4.83,
+        -3.54
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "loft_curtain_right",
+      "file": "loft_curtain_right.glb",
+      "position": [
+        3.9,
+        4.83,
+        -3.54
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bedroom_botanical",
+      "file": "bedroom_botanical.glb",
+      "position": [
+        2.06,
+        4.22,
+        -3.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "loft_greenery",
+      "file": "loft_greenery.glb",
+      "position": [
+        3.91,
+        2.8,
+        -1.66
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hearth",
+      "file": "hearth.glb",
+      "position": [
+        2.38,
+        0.082,
+        -1.9
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.77,
+            0
+          ],
+          "size": [
+            1.17,
+            1.54,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "fire",
+      "file": "fire.glb",
+      "position": [
+        2.38,
+        0.29,
+        -1.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mantel",
+      "file": "mantel.glb",
+      "position": [
+        2.38,
+        1.4,
+        -1.9
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mantel_picture",
+      "file": "mantel_picture.glb",
+      "position": [
+        2.34,
+        1.9,
+        -1.98
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mantel_plant",
+      "file": "mantel_plant.glb",
+      "position": [
+        1.92,
+        1.49,
+        -1.91
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "underloft_bookcase",
+      "file": "underloft_bookcase.glb",
+      "position": [
+        0.64,
+        0.082,
+        -3.1
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.98,
+            0
+          ],
+          "size": [
+            1.12,
+            1.96,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "island",
+      "file": "island.glb",
+      "position": [
+        -2.4,
+        0.082,
+        -0.35
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.495,
+            0
+          ],
+          "size": [
+            1.65,
+            0.99,
+            0.77
+          ]
+        }
+      ]
+    },
+    {
+      "name": "island_flowers",
+      "file": "island_flowers.glb",
+      "position": [
+        -2.4,
+        1.23,
+        -0.36
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bar_stool",
+      "file": "bar_stool.glb",
+      "position": [
+        -2.93,
+        0.082,
+        0.33
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.36,
+            0
+          ],
+          "size": [
+            0.48,
+            0.72,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "living_rug",
+      "file": "living_rug.glb",
+      "position": [
+        2.3,
+        0.095,
+        1.2
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "sofa",
+      "file": "sofa.glb",
+      "position": [
+        2.27,
+        0.082,
+        -0.02
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.55,
+            0
+          ],
+          "size": [
+            2.62,
+            1.1,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "coffee_table",
+      "file": "coffee_table.glb",
+      "position": [
+        2.32,
+        0.082,
+        1.22
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.35,
+            0
+          ],
+          "size": [
+            1.9,
+            0.7,
+            1.18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "coffee_plant",
+      "file": "coffee_plant.glb",
+      "position": [
+        2.83,
+        0.73,
+        1.13
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "coffee_mug",
+      "file": "coffee_mug.glb",
+      "position": [
+        1.96,
+        0.73,
+        1.21
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tv_console",
+      "file": "tv_console.glb",
+      "position": [
+        2.33,
+        0.082,
+        2.69
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.29,
+            0
+          ],
+          "size": [
+            2.22,
+            0.58,
+            0.44
+          ]
+        }
+      ]
+    },
+    {
+      "name": "television",
+      "file": "television.glb",
+      "position": [
+        2.33,
+        0.73,
+        2.69
+      ],
+      "yaw_degrees": 180,
+      "colliders": []
+    },
+    {
+      "name": "dining_rug",
+      "file": "dining_rug.glb",
+      "position": [
+        -1.71,
+        0.095,
+        2.3
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "dining_table",
+      "file": "dining_table.glb",
+      "position": [
+        -1.73,
+        0.13,
+        2.29
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.6,
+            0
+          ],
+          "size": [
+            1.88,
+            1.2,
+            1.18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "checked_runner",
+      "file": "checked_runner.glb",
+      "position": [
+        -1.73,
+        1.281,
+        2.29
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "daisy_jug",
+      "file": "daisy_jug.glb",
+      "position": [
+        -1.73,
+        1.31,
+        2.29
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "chair",
+      "file": "chair.glb",
+      "position": [
+        -2.22,
+        0.13,
+        3.18
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.66,
+            0
+          ],
+          "size": [
+            0.63,
+            1.32,
+            0.63
+          ]
+        }
+      ]
+    },
+    {
+      "name": "floor_plant",
+      "file": "floor_plant.glb",
+      "position": [
+        -4.0,
+        0.083,
+        3.0
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "entry_plant",
+      "file": "entry_plant.glb",
+      "position": [
+        4.02,
+        0.083,
+        -2.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "living_lamp",
+      "file": "living_lamp.glb",
+      "position": [
+        3.37,
+        1.07,
+        -1.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "bar_stool_middle",
+      "asset": "bar_stool",
+      "position": [
+        -2.4,
+        0.082,
+        0.33
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_stool_right",
+      "asset": "bar_stool",
+      "position": [
+        -1.87,
+        0.082,
+        0.33
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chair_front_right",
+      "asset": "chair",
+      "position": [
+        -1.32,
+        0.13,
+        3.18
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chair_back_left",
+      "asset": "chair",
+      "position": [
+        -2.22,
+        0.13,
+        1.4
+      ],
+      "yaw_degrees": 180
+    },
+    {
+      "name": "chair_back_right",
+      "asset": "chair",
+      "position": [
+        -1.32,
+        0.13,
+        1.4
+      ],
+      "yaw_degrees": 180
+    }
+  ],
+  "camera": {
+    "position": [
+      12,
+      11,
+      14
+    ],
+    "target": [
+      0,
+      1.8,
+      0
+    ],
+    "size": 14.7
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ]
+}

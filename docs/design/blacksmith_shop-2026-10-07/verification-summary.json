@@ -1,0 +1,306 @@
+{
+  "status": "art review candidate; user acceptance pending",
+  "asset_stats": {
+    "atlas": {
+      "size": [
+        2048,
+        2048
+      ],
+      "file": "room_albedo_ao.png",
+      "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+    },
+    "assets": [
+      {
+        "name": "room_shell",
+        "vertices": 4912,
+        "triangles": 9476,
+        "surfaces": 1,
+        "bytes": 327264
+      },
+      {
+        "name": "window_wall",
+        "vertices": 832,
+        "triangles": 1616,
+        "surfaces": 1,
+        "bytes": 54980
+      },
+      {
+        "name": "back_wall",
+        "vertices": 584,
+        "triangles": 1132,
+        "surfaces": 1,
+        "bytes": 39332
+      },
+      {
+        "name": "brick_forge",
+        "vertices": 2178,
+        "triangles": 4196,
+        "surfaces": 1,
+        "bytes": 155360
+      },
+      {
+        "name": "forge_hood",
+        "vertices": 1080,
+        "triangles": 2092,
+        "surfaces": 1,
+        "bytes": 72300
+      },
+      {
+        "name": "smoke",
+        "vertices": 1022,
+        "triangles": 2016,
+        "surfaces": 1,
+        "bytes": 59612
+      },
+      {
+        "name": "fire",
+        "vertices": 180,
+        "triangles": 348,
+        "surfaces": 1,
+        "bytes": 13416
+      },
+      {
+        "name": "forge_coals",
+        "vertices": 1176,
+        "triangles": 2240,
+        "surfaces": 1,
+        "bytes": 77548
+      },
+      {
+        "name": "forge_sign",
+        "vertices": 4180,
+        "triangles": 7216,
+        "surfaces": 1,
+        "bytes": 614224
+      },
+      {
+        "name": "hammer_wall",
+        "vertices": 568,
+        "triangles": 1084,
+        "surfaces": 1,
+        "bytes": 40636
+      },
+      {
+        "name": "tongs_wall",
+        "vertices": 784,
+        "triangles": 1516,
+        "surfaces": 1,
+        "bytes": 61680
+      },
+      {
+        "name": "left_tool_shelves",
+        "vertices": 336,
+        "triangles": 648,
+        "surfaces": 1,
+        "bytes": 23708
+      },
+      {
+        "name": "display_swords",
+        "vertices": 546,
+        "triangles": 1032,
+        "surfaces": 1,
+        "bytes": 39416
+      },
+      {
+        "name": "horseshoe_stock",
+        "vertices": 1356,
+        "triangles": 2628,
+        "surfaces": 1,
+        "bytes": 104328
+      },
+      {
+        "name": "tool_shelf_mugs",
+        "vertices": 484,
+        "triangles": 936,
+        "surfaces": 1,
+        "bytes": 40064
+      },
+      {
+        "name": "shelf_plant",
+        "vertices": 1514,
+        "triangles": 2868,
+        "surfaces": 1,
+        "bytes": 118336
+      },
+      {
+        "name": "quench_barrel",
+        "vertices": 2848,
+        "triangles": 5528,
+        "surfaces": 1,
+        "bytes": 360880
+      },
+      {
+        "name": "coal_bucket",
+        "vertices": 3832,
+        "triangles": 7400,
+        "surfaces": 1,
+        "bytes": 424912
+      },
+      {
+        "name": "anvil_workbench",
+        "vertices": 672,
+        "triangles": 1296,
+        "surfaces": 1,
+        "bytes": 46028
+      },
+      {
+        "name": "main_anvil",
+        "vertices": 464,
+        "triangles": 912,
+        "surfaces": 1,
+        "bytes": 51892
+      },
+      {
+        "name": "heated_bar_glow",
+        "vertices": 56,
+        "triangles": 108,
+        "surfaces": 1,
+        "bytes": 5096
+      },
+      {
+        "name": "bench_hammer",
+        "vertices": 128,
+        "triangles": 244,
+        "surfaces": 1,
+        "bytes": 10244
+      },
+      {
+        "name": "leather_apron",
+        "vertices": 108,
+        "triangles": 212,
+        "surfaces": 1,
+        "bytes": 8600
+      },
+      {
+        "name": "metal_ingot_crate",
+        "vertices": 1120,
+        "triangles": 2160,
+        "surfaces": 1,
+        "bytes": 75776
+      },
+      {
+        "name": "back_tool_bench",
+        "vertices": 672,
+        "triangles": 1296,
+        "surfaces": 1,
+        "bytes": 46032
+      },
+      {
+        "name": "punch_set",
+        "vertices": 264,
+        "triangles": 480,
+        "surfaces": 1,
+        "bytes": 24224
+      },
+      {
+        "name": "stump",
+        "vertices": 1325,
+        "triangles": 2622,
+        "surfaces": 1,
+        "bytes": 99540
+      },
+      {
+        "name": "tool_bucket",
+        "vertices": 3148,
+        "triangles": 6108,
+        "surfaces": 1,
+        "bytes": 382920
+      },
+      {
+        "name": "forge_stool",
+        "vertices": 96,
+        "triangles": 176,
+        "surfaces": 1,
+        "bytes": 9596
+      },
+      {
+        "name": "forge_mat",
+        "vertices": 360,
+        "triangles": 660,
+        "surfaces": 1,
+        "bytes": 28376
+      },
+      {
+        "name": "forge_lantern",
+        "vertices": 200,
+        "triangles": 368,
+        "surfaces": 1,
+        "bytes": 17032
+      },
+      {
+        "name": "right_wall_shelf",
+        "vertices": 410,
+        "triangles": 792,
+        "surfaces": 1,
+        "bytes": 31816
+      },
+      {
+        "name": "right_shelf_plant",
+        "vertices": 1514,
+        "triangles": 2868,
+        "surfaces": 1,
+        "bytes": 118412
+      }
+    ],
+    "unique_triangles": 74274,
+    "scene_triangles": 75186,
+    "static_draw_surfaces": 34,
+    "glb_bytes": 3583580,
+    "atlas_bytes": 2543312,
+    "placed_instances": 34,
+    "materials": 2
+  },
+  "godot": {
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "colliders": 13,
+    "finite_aabbs": true,
+    "material_count": 2,
+    "mesh_instances": 34,
+    "renderer": "mobile",
+    "resolution": [
+      1440,
+      1080
+    ],
+    "scene": "blacksmith_shop",
+    "surfaces": 34,
+    "triangles": 75186
+  },
+  "hashes": {
+    "assets/rooms/blacksmith_shop/tool_bucket.glb": "8289348b21d5d69b930a2784f5a40d7dcebd125f3c0385a18f13354d08ef9e79",
+    "assets/rooms/blacksmith_shop/horseshoe_stock.glb": "0395eca96ae3cd1e4a33a5276ec70f6329f9beb2a06aa0b5cbd4f2946fece970",
+    "assets/rooms/blacksmith_shop/forge_lantern.glb": "565787a140e0d272561fa8ece01a85fa26662f06305020f7759c305add3ab01b",
+    "assets/rooms/blacksmith_shop/shelf_plant.glb": "1c1e365620d35bb016ae39da3b8501c9db2d73a82408ecf3d1db4553902400c0",
+    "assets/rooms/blacksmith_shop/quench_barrel.glb": "51fcd3c7f1d1714f283e13f8d51a93bbd228b65d1c838cb8e43a5e5de9da181c",
+    "assets/rooms/blacksmith_shop/leather_apron.glb": "b249e06b0fabc9e51458cbbb9566a218a3a52598ad1433b43710d166110378f5",
+    "assets/rooms/blacksmith_shop/tool_shelf_mugs.glb": "ad01e2f134872d1c91746ab733715fb43edb1afbbc4fbfc4f9b08a1c1cd8f946",
+    "assets/rooms/blacksmith_shop/back_wall.glb": "069f3a1189642ac3d95f8da5d78eec2a9d7359e3b2d7e6007d37e558e1b8dcc0",
+    "assets/rooms/blacksmith_shop/left_tool_shelves.glb": "062854b725065125267b6c69141a0ca5715417a190b6e8e393f60cf7f31ce30e",
+    "assets/rooms/blacksmith_shop/metal_ingot_crate.glb": "385b2209639e41bb5055ab1e316dc5d0af37eae3e92cff2e5ddb843becee8cc1",
+    "assets/rooms/blacksmith_shop/heated_bar_glow.glb": "65daa3812d55954a5533fba73cd4d5b212817e443405b4ec62dcfa26eee0c0c8",
+    "assets/rooms/blacksmith_shop/back_tool_bench.glb": "d65f5bed6d73400dadc226cb2ba0434544c5cdd52145de6c9aed587c959f8740",
+    "assets/rooms/blacksmith_shop/stump.glb": "b0ac383e7b4a20d1e382088ef118e869ea7402a4cad2e1ca460719f51872ce42",
+    "assets/rooms/blacksmith_shop/tongs_wall.glb": "d68a13b38035dfb3f57de47f1c36386aa5281dbebe5a1287e47c6af68f620494",
+    "assets/rooms/blacksmith_shop/room_shell.glb": "745cc4bc231bbacc6a0723ae993a70562fac530dcc70a9632318fe35d2a7c1db",
+    "assets/rooms/blacksmith_shop/smoke.glb": "c8768902217d4c200696ccd1abf4e43929ebc1d2d39a64fb6bd25e96012604fb",
+    "assets/rooms/blacksmith_shop/forge_mat.glb": "02b5fee15d4bad8a526b2cd9d021373625843eee4f655220d503cf3881d903c0",
+    "assets/rooms/blacksmith_shop/brick_forge.glb": "3c4334ead377459c89278ddf76e440762fee2a03d6e4b1b46130ad3ffc714d49",
+    "assets/rooms/blacksmith_shop/bench_hammer.glb": "dd6c520bd90f9feba8fb242ba887ab20a6fe9d1c9501e4ac96d3c0300121eaf9",
+    "assets/rooms/blacksmith_shop/hammer_wall.glb": "b68a635a9db0071b7cb38558d2bed7491ddc90813ac916d9725e82fc92b1e1b6",
+    "assets/rooms/blacksmith_shop/fire.glb": "6c0df9c69a1ac96f566107ee9020ddb228d3bfe5f494594614f055559567ea94",
+    "assets/rooms/blacksmith_shop/right_wall_shelf.glb": "954241a4e16f3f7bbec55cc627d46b5704f265b668714599fe793dacd9b07291",
+    "assets/rooms/blacksmith_shop/main_anvil.glb": "5e8bfde6c4566e5d568e1c4ad9998aed5595497c7e2179fef88671c95a15e215",
+    "assets/rooms/blacksmith_shop/coal_bucket.glb": "c7f693b5d63c0ce71bf4f5aca7f31bc15a6749fd7a8c58be1c277d29e407193c",
+    "assets/rooms/blacksmith_shop/punch_set.glb": "89654b25f988319c69d715365bcf85c8582521eafb3f5924ab1b89ff953de5b5",
+    "assets/rooms/blacksmith_shop/right_shelf_plant.glb": "1c43c389947e9b06ef7457900ab6d01189f64eab4c52b6c73c7a7e03d89e8bc4",
+    "assets/rooms/blacksmith_shop/forge_hood.glb": "334bdabd0b52706ecb6257d01e493d3e161880d3a737d4de01e0ab9a912e94f5",
+    "assets/rooms/blacksmith_shop/forge_coals.glb": "0bec7a1b551cf42b7e1ea07ec1d62fd6ce84f34063d7ec823c88bda45cfdac0b",
+    "assets/rooms/blacksmith_shop/forge_sign.glb": "edb896cad8b38e349c7b6081d6a1ab0a937cd4fc9c784f8967f73e80b67b771d",
+    "assets/rooms/blacksmith_shop/anvil_workbench.glb": "5325f26f39122f7cedae23cbcc985de4e467dc1cfb85d58afd7c63a4dac424f8",
+    "assets/rooms/blacksmith_shop/display_swords.glb": "849981d538aa490440e8f9e0638fc51a045da2da57b78aa64b205130dad0068d",
+    "assets/rooms/blacksmith_shop/forge_stool.glb": "77072d2bf7ed7171ee6547b7a4020006fcc1b0ceaafaf75900f7e230481d83dd",
+    "assets/rooms/blacksmith_shop/window_wall.glb": "22c201a108e8e94d73b4f2dd3ef1c79b68a9f480d9646680f053c483772d87b4",
+    "assets/rooms/blacksmith_shop/room_albedo_ao.png": "197c64b9dd828392a8aef2e997ca59917cb5a83d1013f1a47a4b391b0423da8d",
+    "tools/art/source/blacksmith_shop/blacksmith_shop.blend": "2811691ca4a71cfb7fa52eef28764a0813cf2405c84c09853b3f20233dda06dc"
+  },
+  "scope": "Art assets only; no gameplay, Android benchmark, physical-device performance or release claim."
+}

@@ -1,0 +1,580 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2965"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "file": "room_shell.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.09,
+            0
+          ],
+          "size": [
+            6.7,
+            0.34,
+            6.3
+          ]
+        },
+        {
+          "at": [
+            -3.2,
+            1.85,
+            0
+          ],
+          "size": [
+            0.22,
+            3.7,
+            6.2
+          ]
+        },
+        {
+          "at": [
+            0,
+            1.85,
+            -3.0
+          ],
+          "size": [
+            6.6000000000000005,
+            3.7,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "window_wall",
+      "file": "window_wall.glb",
+      "position": [
+        -3.2,
+        0,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0,
+        -3.0
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "brick_forge",
+      "file": "brick_forge.glb",
+      "position": [
+        -1.55,
+        0.082,
+        -2.2
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.3,
+            0
+          ],
+          "size": [
+            1.96,
+            2.6,
+            1.44
+          ]
+        }
+      ]
+    },
+    {
+      "name": "forge_hood",
+      "file": "forge_hood.glb",
+      "position": [
+        -1.55,
+        2.59,
+        -2.29
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "smoke",
+      "file": "smoke.glb",
+      "position": [
+        -1.55,
+        4.32,
+        -2.29
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "fire",
+      "file": "fire.glb",
+      "position": [
+        -1.55,
+        1.17,
+        -1.65
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "forge_coals",
+      "file": "forge_coals.glb",
+      "position": [
+        -1.55,
+        1.18,
+        -1.69
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "forge_sign",
+      "file": "forge_sign.glb",
+      "position": [
+        0.94,
+        2.98,
+        -2.84
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hammer_wall",
+      "file": "hammer_wall.glb",
+      "position": [
+        0.73,
+        1.49,
+        -2.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tongs_wall",
+      "file": "tongs_wall.glb",
+      "position": [
+        0.69,
+        0.61,
+        -2.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "left_tool_shelves",
+      "file": "left_tool_shelves.glb",
+      "position": [
+        -2.99,
+        0.74,
+        0.33
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "display_swords",
+      "file": "display_swords.glb",
+      "position": [
+        -2.75,
+        1.58,
+        0.9
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "horseshoe_stock",
+      "file": "horseshoe_stock.glb",
+      "position": [
+        -2.76,
+        0.92,
+        0.72
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "tool_shelf_mugs",
+      "file": "tool_shelf_mugs.glb",
+      "position": [
+        -2.76,
+        1.64,
+        -0.03
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "shelf_plant",
+      "file": "shelf_plant.glb",
+      "position": [
+        -2.85,
+        2.49,
+        -0.29
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "quench_barrel",
+      "file": "quench_barrel.glb",
+      "position": [
+        -2.52,
+        0.082,
+        1.35
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.46,
+            0
+          ],
+          "size": [
+            0.94,
+            0.92,
+            0.94
+          ]
+        }
+      ]
+    },
+    {
+      "name": "coal_bucket",
+      "file": "coal_bucket.glb",
+      "position": [
+        -2.76,
+        0.082,
+        -1.13
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.35,
+            0
+          ],
+          "size": [
+            0.58,
+            0.7,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "anvil_workbench",
+      "file": "anvil_workbench.glb",
+      "position": [
+        0.15,
+        0.082,
+        1.28
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.485,
+            0
+          ],
+          "size": [
+            2.31,
+            0.97,
+            1.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "main_anvil",
+      "file": "main_anvil.glb",
+      "position": [
+        0.15,
+        1.24,
+        1.23
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.18,
+            0.3,
+            0
+          ],
+          "size": [
+            1.58,
+            0.6,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "heated_bar_glow",
+      "file": "heated_bar_glow.glb",
+      "position": [
+        0.31,
+        1.865,
+        1.2
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bench_hammer",
+      "file": "bench_hammer.glb",
+      "position": [
+        -0.63,
+        1.16,
+        1.28
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "leather_apron",
+      "file": "leather_apron.glb",
+      "position": [
+        0.68,
+        1.22,
+        1.4
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "metal_ingot_crate",
+      "file": "metal_ingot_crate.glb",
+      "position": [
+        0.13,
+        0.33,
+        1.28
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "back_tool_bench",
+      "file": "back_tool_bench.glb",
+      "position": [
+        1.54,
+        0.082,
+        -1.99
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.385,
+            0
+          ],
+          "size": [
+            1.39,
+            0.77,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "punch_set",
+      "file": "punch_set.glb",
+      "position": [
+        1.31,
+        0.96,
+        -2.0
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "stump",
+      "file": "stump.glb",
+      "position": [
+        2.39,
+        0.082,
+        -0.52
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.42,
+            0
+          ],
+          "size": [
+            0.87,
+            0.84,
+            0.87
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tool_bucket",
+      "file": "tool_bucket.glb",
+      "position": [
+        2.54,
+        0.082,
+        0.46
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.27,
+            0
+          ],
+          "size": [
+            0.5,
+            0.54,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "forge_stool",
+      "file": "forge_stool.glb",
+      "position": [
+        -1.43,
+        0.082,
+        2.18
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.25,
+            0
+          ],
+          "size": [
+            0.56,
+            0.5,
+            0.56
+          ]
+        }
+      ]
+    },
+    {
+      "name": "forge_mat",
+      "file": "forge_mat.glb",
+      "position": [
+        0.22,
+        0.094,
+        2.33
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "forge_lantern",
+      "file": "forge_lantern.glb",
+      "position": [
+        2.74,
+        2.54,
+        -2.76
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "right_wall_shelf",
+      "file": "right_wall_shelf.glb",
+      "position": [
+        2.48,
+        2.875,
+        -2.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "right_shelf_plant",
+      "file": "right_shelf_plant.glb",
+      "position": [
+        2.63,
+        2.93,
+        -2.73
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "small_anvil",
+      "asset": "main_anvil",
+      "position": [
+        2.39,
+        0.94,
+        -0.52
+      ],
+      "yaw_degrees": 0,
+      "scale": [
+        0.48,
+        0.48,
+        0.48
+      ]
+    }
+  ],
+  "camera": {
+    "position": [
+      10,
+      9.2,
+      11.5
+    ],
+    "target": [
+      0,
+      1.85,
+      0
+    ],
+    "size": 12.5
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ],
+  "review_lighting": {
+    "ambient": 0.6,
+    "sun": 0.92,
+    "ambient_color": "eef0e9",
+    "sun_color": "fff2e5",
+    "points": [
+      {
+        "position": [
+          -1.55,
+          1.6,
+          -1.2
+        ],
+        "color": "ff873b",
+        "energy": 1.5,
+        "range": 2.4
+      }
+    ]
+  }
+}

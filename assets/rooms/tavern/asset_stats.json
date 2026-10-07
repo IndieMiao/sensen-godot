@@ -1,0 +1,243 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "vertices": 5976,
+      "triangles": 11528,
+      "surfaces": 1,
+      "bytes": 397824
+    },
+    {
+      "name": "window_wall",
+      "vertices": 1042,
+      "triangles": 2036,
+      "surfaces": 1,
+      "bytes": 75168
+    },
+    {
+      "name": "back_wall",
+      "vertices": 794,
+      "triangles": 1552,
+      "surfaces": 1,
+      "bytes": 59712
+    },
+    {
+      "name": "saloon_door",
+      "vertices": 2328,
+      "triangles": 4524,
+      "surfaces": 1,
+      "bytes": 156688
+    },
+    {
+      "name": "tavern_window",
+      "vertices": 600,
+      "triangles": 1188,
+      "surfaces": 1,
+      "bytes": 36732
+    },
+    {
+      "name": "tavern_window_garden",
+      "vertices": 4,
+      "triangles": 2,
+      "surfaces": 1,
+      "bytes": 1508
+    },
+    {
+      "name": "long_bar",
+      "vertices": 1176,
+      "triangles": 2268,
+      "surfaces": 1,
+      "bytes": 79496
+    },
+    {
+      "name": "bar_return",
+      "vertices": 392,
+      "triangles": 756,
+      "surfaces": 1,
+      "bytes": 27416
+    },
+    {
+      "name": "back_bar",
+      "vertices": 392,
+      "triangles": 756,
+      "surfaces": 1,
+      "bytes": 27408
+    },
+    {
+      "name": "bottle_green",
+      "vertices": 176,
+      "triangles": 340,
+      "surfaces": 1,
+      "bytes": 13896
+    },
+    {
+      "name": "bottle_amber",
+      "vertices": 176,
+      "triangles": 340,
+      "surfaces": 1,
+      "bytes": 13896
+    },
+    {
+      "name": "tavern_sign",
+      "vertices": 1306,
+      "triangles": 2264,
+      "surfaces": 1,
+      "bytes": 176920
+    },
+    {
+      "name": "bar_stool",
+      "vertices": 96,
+      "triangles": 176,
+      "surfaces": 1,
+      "bytes": 9548
+    },
+    {
+      "name": "beer_cask",
+      "vertices": 3016,
+      "triangles": 5840,
+      "surfaces": 1,
+      "bytes": 368080
+    },
+    {
+      "name": "bar_drinks",
+      "vertices": 726,
+      "triangles": 1404,
+      "surfaces": 1,
+      "bytes": 59020
+    },
+    {
+      "name": "barrel",
+      "vertices": 2872,
+      "triangles": 5564,
+      "surfaces": 1,
+      "bytes": 362108
+    },
+    {
+      "name": "left_table_rug",
+      "vertices": 504,
+      "triangles": 876,
+      "surfaces": 1,
+      "bytes": 41720
+    },
+    {
+      "name": "square_table",
+      "vertices": 728,
+      "triangles": 1404,
+      "surfaces": 1,
+      "bytes": 49740
+    },
+    {
+      "name": "round_table",
+      "vertices": 288,
+      "triangles": 556,
+      "surfaces": 1,
+      "bytes": 23400
+    },
+    {
+      "name": "dining_stool",
+      "vertices": 96,
+      "triangles": 176,
+      "surfaces": 1,
+      "bytes": 9572
+    },
+    {
+      "name": "table_mug",
+      "vertices": 242,
+      "triangles": 468,
+      "surfaces": 1,
+      "bytes": 20564
+    },
+    {
+      "name": "table_candle",
+      "vertices": 72,
+      "triangles": 136,
+      "surfaces": 1,
+      "bytes": 7292
+    },
+    {
+      "name": "candle_glow",
+      "vertices": 86,
+      "triangles": 168,
+      "surfaces": 1,
+      "bytes": 7056
+    },
+    {
+      "name": "tavern_snacks",
+      "vertices": 526,
+      "triangles": 1028,
+      "surfaces": 1,
+      "bytes": 33192
+    },
+    {
+      "name": "left_display_shelf",
+      "vertices": 280,
+      "triangles": 540,
+      "surfaces": 1,
+      "bytes": 19992
+    },
+    {
+      "name": "shelf_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 118276
+    },
+    {
+      "name": "landscape_frame",
+      "vertices": 544,
+      "triangles": 1040,
+      "surfaces": 1,
+      "bytes": 45124
+    },
+    {
+      "name": "stag_banner",
+      "vertices": 151,
+      "triangles": 275,
+      "surfaces": 1,
+      "bytes": 11960
+    },
+    {
+      "name": "floor_plant",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 45620
+    },
+    {
+      "name": "wall_lantern",
+      "vertices": 144,
+      "triangles": 260,
+      "surfaces": 1,
+      "bytes": 13304
+    },
+    {
+      "name": "lantern_glow",
+      "vertices": 56,
+      "triangles": 108,
+      "surfaces": 1,
+      "bytes": 5088
+    },
+    {
+      "name": "hanging_chandelier",
+      "vertices": 272,
+      "triangles": 508,
+      "surfaces": 1,
+      "bytes": 24384
+    }
+  ],
+  "unique_triangles": 52027,
+  "scene_triangles": 84743,
+  "static_draw_surfaces": 95,
+  "glb_bytes": 2341704,
+  "atlas_bytes": 2591330,
+  "placed_instances": 95,
+  "materials": 3
+}

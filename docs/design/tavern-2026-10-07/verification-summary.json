@@ -1,0 +1,298 @@
+{
+  "status": "art review candidate; user acceptance pending",
+  "asset_stats": {
+    "atlas": {
+      "size": [
+        2048,
+        2048
+      ],
+      "file": "room_albedo_ao.png",
+      "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+    },
+    "assets": [
+      {
+        "name": "room_shell",
+        "vertices": 5976,
+        "triangles": 11528,
+        "surfaces": 1,
+        "bytes": 397824
+      },
+      {
+        "name": "window_wall",
+        "vertices": 1042,
+        "triangles": 2036,
+        "surfaces": 1,
+        "bytes": 75168
+      },
+      {
+        "name": "back_wall",
+        "vertices": 794,
+        "triangles": 1552,
+        "surfaces": 1,
+        "bytes": 59712
+      },
+      {
+        "name": "saloon_door",
+        "vertices": 2328,
+        "triangles": 4524,
+        "surfaces": 1,
+        "bytes": 156688
+      },
+      {
+        "name": "tavern_window",
+        "vertices": 600,
+        "triangles": 1188,
+        "surfaces": 1,
+        "bytes": 36732
+      },
+      {
+        "name": "tavern_window_garden",
+        "vertices": 4,
+        "triangles": 2,
+        "surfaces": 1,
+        "bytes": 1508
+      },
+      {
+        "name": "long_bar",
+        "vertices": 1176,
+        "triangles": 2268,
+        "surfaces": 1,
+        "bytes": 79496
+      },
+      {
+        "name": "bar_return",
+        "vertices": 392,
+        "triangles": 756,
+        "surfaces": 1,
+        "bytes": 27416
+      },
+      {
+        "name": "back_bar",
+        "vertices": 392,
+        "triangles": 756,
+        "surfaces": 1,
+        "bytes": 27408
+      },
+      {
+        "name": "bottle_green",
+        "vertices": 176,
+        "triangles": 340,
+        "surfaces": 1,
+        "bytes": 13896
+      },
+      {
+        "name": "bottle_amber",
+        "vertices": 176,
+        "triangles": 340,
+        "surfaces": 1,
+        "bytes": 13896
+      },
+      {
+        "name": "tavern_sign",
+        "vertices": 1306,
+        "triangles": 2264,
+        "surfaces": 1,
+        "bytes": 176920
+      },
+      {
+        "name": "bar_stool",
+        "vertices": 96,
+        "triangles": 176,
+        "surfaces": 1,
+        "bytes": 9548
+      },
+      {
+        "name": "beer_cask",
+        "vertices": 3016,
+        "triangles": 5840,
+        "surfaces": 1,
+        "bytes": 368080
+      },
+      {
+        "name": "bar_drinks",
+        "vertices": 726,
+        "triangles": 1404,
+        "surfaces": 1,
+        "bytes": 59020
+      },
+      {
+        "name": "barrel",
+        "vertices": 2872,
+        "triangles": 5564,
+        "surfaces": 1,
+        "bytes": 362108
+      },
+      {
+        "name": "left_table_rug",
+        "vertices": 504,
+        "triangles": 876,
+        "surfaces": 1,
+        "bytes": 41720
+      },
+      {
+        "name": "square_table",
+        "vertices": 728,
+        "triangles": 1404,
+        "surfaces": 1,
+        "bytes": 49740
+      },
+      {
+        "name": "round_table",
+        "vertices": 288,
+        "triangles": 556,
+        "surfaces": 1,
+        "bytes": 23400
+      },
+      {
+        "name": "dining_stool",
+        "vertices": 96,
+        "triangles": 176,
+        "surfaces": 1,
+        "bytes": 9572
+      },
+      {
+        "name": "table_mug",
+        "vertices": 242,
+        "triangles": 468,
+        "surfaces": 1,
+        "bytes": 20564
+      },
+      {
+        "name": "table_candle",
+        "vertices": 72,
+        "triangles": 136,
+        "surfaces": 1,
+        "bytes": 7292
+      },
+      {
+        "name": "candle_glow",
+        "vertices": 86,
+        "triangles": 168,
+        "surfaces": 1,
+        "bytes": 7056
+      },
+      {
+        "name": "tavern_snacks",
+        "vertices": 526,
+        "triangles": 1028,
+        "surfaces": 1,
+        "bytes": 33192
+      },
+      {
+        "name": "left_display_shelf",
+        "vertices": 280,
+        "triangles": 540,
+        "surfaces": 1,
+        "bytes": 19992
+      },
+      {
+        "name": "shelf_plant",
+        "vertices": 1514,
+        "triangles": 2868,
+        "surfaces": 1,
+        "bytes": 118276
+      },
+      {
+        "name": "landscape_frame",
+        "vertices": 544,
+        "triangles": 1040,
+        "surfaces": 1,
+        "bytes": 45124
+      },
+      {
+        "name": "stag_banner",
+        "vertices": 151,
+        "triangles": 275,
+        "surfaces": 1,
+        "bytes": 11960
+      },
+      {
+        "name": "floor_plant",
+        "vertices": 571,
+        "triangles": 1078,
+        "surfaces": 1,
+        "bytes": 45620
+      },
+      {
+        "name": "wall_lantern",
+        "vertices": 144,
+        "triangles": 260,
+        "surfaces": 1,
+        "bytes": 13304
+      },
+      {
+        "name": "lantern_glow",
+        "vertices": 56,
+        "triangles": 108,
+        "surfaces": 1,
+        "bytes": 5088
+      },
+      {
+        "name": "hanging_chandelier",
+        "vertices": 272,
+        "triangles": 508,
+        "surfaces": 1,
+        "bytes": 24384
+      }
+    ],
+    "unique_triangles": 52027,
+    "scene_triangles": 84743,
+    "static_draw_surfaces": 95,
+    "glb_bytes": 2341704,
+    "atlas_bytes": 2591330,
+    "placed_instances": 95,
+    "materials": 3
+  },
+  "godot": {
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "colliders": 29,
+    "finite_aabbs": true,
+    "material_count": 3,
+    "mesh_instances": 95,
+    "renderer": "mobile",
+    "resolution": [
+      1440,
+      1080
+    ],
+    "scene": "tavern",
+    "surfaces": 95,
+    "triangles": 84743
+  },
+  "hashes": {
+    "assets/rooms/tavern/left_table_rug.glb": "15bc4317190d33491f680a4e02c7a4dbf3bdb55bfc82eea591bab57b20d9f78e",
+    "assets/rooms/tavern/hanging_chandelier.glb": "c7536a8666b32fc069510f4acaa0c7037eb03637f20d1ed897eed3010099cba8",
+    "assets/rooms/tavern/long_bar.glb": "dd9e2382708eff07a916d0c9ca7d9446e70a90016fea350322e84e75edd0cef7",
+    "assets/rooms/tavern/shelf_plant.glb": "ea776f8a6bd776273dedef915115f25242d1d6420b06a7c24b01eb93a32d7709",
+    "assets/rooms/tavern/bottle_amber.glb": "297d569b80eca72386577fce33a35febc2b9d40c3e635204febd0917a4aeb505",
+    "assets/rooms/tavern/beer_cask.glb": "7c7254cbc3da64a6c6025908ad587731637d1e736e7d4df672c448322416ca4e",
+    "assets/rooms/tavern/saloon_door.glb": "93a3d1517ca8f8acd73b1da3da348c3bb497f9f856816df2d97b46d5fc30bb1d",
+    "assets/rooms/tavern/candle_glow.glb": "c4a18c32d4abd67886b27477fb52d21e825993aed92e9b28b36450245bfc0dbe",
+    "assets/rooms/tavern/back_wall.glb": "ed66c3c257064f01723281c4d1285b8e9472e830579fabd155d304ffb552afeb",
+    "assets/rooms/tavern/tavern_snacks.glb": "c8ce471fd74bd654e638c705af049ab843ac123074d8e82d8ec59fedece8f6dc",
+    "assets/rooms/tavern/floor_plant.glb": "b39bc9602f35fd21f4ef2278e64be03017199d2ffec2514079ea1638e4f2189b",
+    "assets/rooms/tavern/wall_lantern.glb": "7b0b0d46f05a384706cf9a8583ba658608d8728f71a28fbbf710a3165cfc74c4",
+    "assets/rooms/tavern/table_candle.glb": "5e8539674e80f24dfeaf095847caa6392c3b65ca0d38125f16b73967c17d09b1",
+    "assets/rooms/tavern/room_shell.glb": "30049a729da48a95b27ccc200b8670ca1f7c870dba6b24d30dccae60154ba550",
+    "assets/rooms/tavern/bar_return.glb": "354adf87a1e2b4d1dd6761def0fa3e90b3a7ecf004d44af817b6f0f9b0755082",
+    "assets/rooms/tavern/back_bar.glb": "e3a1743c4c14125ee661a16d1063b4044aaf269de261c7fcbd959e08557b9f45",
+    "assets/rooms/tavern/lantern_glow.glb": "ac18ba61e868cba1a12f58e4ce79bee695a965de06d84a5d673287c87466e151",
+    "assets/rooms/tavern/left_display_shelf.glb": "0a9d9bcf808da5d3d90e2d238fc9f839499e9cf69ab5b967592452dd23489ca0",
+    "assets/rooms/tavern/square_table.glb": "01ecb884ca79ebe029c96fc03fd4d5533911fd30cc42165bef675a6d730f2347",
+    "assets/rooms/tavern/tavern_sign.glb": "17b4ac1ffe8fba0889e1b0301eb4f94054a91c3fc8a25d03aa0d2599c4417981",
+    "assets/rooms/tavern/round_table.glb": "9454fbb5e61b2e6a3a9a45a3abc9b0426b0cfc9f07520dda0d9f403c54afcb9c",
+    "assets/rooms/tavern/bottle_green.glb": "ab45326a0286a7b13bcb3741ad6dd65673bfc4c9df4abe7baa1e6e8c9fcd4f3d",
+    "assets/rooms/tavern/bar_stool.glb": "63e38b059d9966e32d411b7edb03e69de7e9e477467843405d2501a8840212c0",
+    "assets/rooms/tavern/tavern_window.glb": "fbc99f339a2dee03177c85e4749cccae3bcf4c37d86ca08d65f177fb911afeed",
+    "assets/rooms/tavern/bar_drinks.glb": "84e20605002034affd15637d7ed18a6613f30498d2bdd3953445264fabd00e1b",
+    "assets/rooms/tavern/table_mug.glb": "aa22ee34fdf405020f9d9abfb61750e72124116884e48506f2c3f84a72271f6e",
+    "assets/rooms/tavern/barrel.glb": "84be750a9438bf531f165adf433b31ef693a387d15ab1fe7c078bcb3d7980fd3",
+    "assets/rooms/tavern/stag_banner.glb": "6f889dfd6175d990b7a5aefa111e402e7b452f73bd80c57205302abb5c285991",
+    "assets/rooms/tavern/tavern_window_garden.glb": "28e29b3ed786d091a273b8e952be4e6935f83416a8e1c994a3dbeb31bf098244",
+    "assets/rooms/tavern/landscape_frame.glb": "afb526f6256ef9f098bf1834f9dec3634a47f31d824ca260c118955e689bbb64",
+    "assets/rooms/tavern/window_wall.glb": "e9564e25649662c374d0e9df43f50da8bb68c1fa4e2486531851215a814c117c",
+    "assets/rooms/tavern/dining_stool.glb": "8c2beac966f044f8815483afb42bc0580b1089b31d9dd5924dce6861a3624b1c",
+    "assets/rooms/tavern/room_albedo_ao.png": "8c22af715f0454cb4b1a2fad848b9507057a486fae08dca3e63eebe597cf02b5",
+    "tools/art/source/tavern/tavern.blend": "32497143ce981ac013416ec7eb2c4f3a6e3c9b948e78e44a6fd769296ec7757e"
+  },
+  "scope": "Art assets only; no gameplay, Android benchmark, physical-device performance or release claim."
+}

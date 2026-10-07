@@ -1,0 +1,271 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "vertices": 5416,
+      "triangles": 10448,
+      "surfaces": 1,
+      "bytes": 360776
+    },
+    {
+      "name": "window_wall",
+      "vertices": 986,
+      "triangles": 1928,
+      "surfaces": 1,
+      "bytes": 71572
+    },
+    {
+      "name": "back_wall",
+      "vertices": 738,
+      "triangles": 1444,
+      "surfaces": 1,
+      "bytes": 56056
+    },
+    {
+      "name": "arched_window",
+      "vertices": 656,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 41284
+    },
+    {
+      "name": "window_garden",
+      "vertices": 4,
+      "triangles": 2,
+      "surfaces": 1,
+      "bytes": 1488
+    },
+    {
+      "name": "green_door",
+      "vertices": 1740,
+      "triangles": 3432,
+      "surfaces": 1,
+      "bytes": 122028
+    },
+    {
+      "name": "entry_mat",
+      "vertices": 280,
+      "triangles": 540,
+      "surfaces": 1,
+      "bytes": 19972
+    },
+    {
+      "name": "farm_tools_sign",
+      "vertices": 2454,
+      "triangles": 4228,
+      "surfaces": 1,
+      "bytes": 362612
+    },
+    {
+      "name": "sign_sprout",
+      "vertices": 84,
+      "triangles": 160,
+      "surfaces": 1,
+      "bytes": 7772
+    },
+    {
+      "name": "sales_counter",
+      "vertices": 896,
+      "triangles": 1728,
+      "surfaces": 1,
+      "bytes": 60908
+    },
+    {
+      "name": "cash_register",
+      "vertices": 952,
+      "triangles": 1836,
+      "surfaces": 1,
+      "bytes": 64632
+    },
+    {
+      "name": "counter_flowers",
+      "vertices": 3814,
+      "triangles": 7260,
+      "surfaces": 1,
+      "bytes": 262280
+    },
+    {
+      "name": "counter_pencil_pot",
+      "vertices": 220,
+      "triangles": 416,
+      "surfaces": 1,
+      "bytes": 18976
+    },
+    {
+      "name": "counter_price_card",
+      "vertices": 544,
+      "triangles": 1040,
+      "surfaces": 1,
+      "bytes": 41288
+    },
+    {
+      "name": "seed_wall_shelf",
+      "vertices": 336,
+      "triangles": 648,
+      "surfaces": 1,
+      "bytes": 23704
+    },
+    {
+      "name": "seed_packet",
+      "vertices": 240,
+      "triangles": 464,
+      "surfaces": 1,
+      "bytes": 16996
+    },
+    {
+      "name": "seed_packet_top",
+      "vertices": 1092,
+      "triangles": 2104,
+      "surfaces": 1,
+      "bytes": 75812
+    },
+    {
+      "name": "shelf_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 119300
+    },
+    {
+      "name": "silver_watering_can",
+      "vertices": 214,
+      "triangles": 412,
+      "surfaces": 1,
+      "bytes": 18500
+    },
+    {
+      "name": "window_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 119200
+    },
+    {
+      "name": "long_tools_wall",
+      "vertices": 656,
+      "triangles": 1220,
+      "surfaces": 1,
+      "bytes": 53064
+    },
+    {
+      "name": "pot_wall_shelf",
+      "vertices": 280,
+      "triangles": 540,
+      "surfaces": 1,
+      "bytes": 19984
+    },
+    {
+      "name": "pots_on_shelf",
+      "vertices": 640,
+      "triangles": 1264,
+      "surfaces": 1,
+      "bytes": 48892
+    },
+    {
+      "name": "pot_shelf_plant",
+      "vertices": 1514,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 119304
+    },
+    {
+      "name": "hand_tools_board",
+      "vertices": 2108,
+      "triangles": 3972,
+      "surfaces": 1,
+      "bytes": 162572
+    },
+    {
+      "name": "shelf_supplies",
+      "vertices": 690,
+      "triangles": 1324,
+      "surfaces": 1,
+      "bytes": 53492
+    },
+    {
+      "name": "front_display",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 46028
+    },
+    {
+      "name": "display_seed_tray",
+      "vertices": 2044,
+      "triangles": 3940,
+      "surfaces": 1,
+      "bytes": 139132
+    },
+    {
+      "name": "display_gloves",
+      "vertices": 672,
+      "triangles": 1296,
+      "surfaces": 1,
+      "bytes": 46032
+    },
+    {
+      "name": "display_tools",
+      "vertices": 58,
+      "triangles": 104,
+      "surfaces": 1,
+      "bytes": 7888
+    },
+    {
+      "name": "display_flowers",
+      "vertices": 3814,
+      "triangles": 7260,
+      "surfaces": 1,
+      "bytes": 262280
+    },
+    {
+      "name": "display_under_crates",
+      "vertices": 2820,
+      "triangles": 5472,
+      "surfaces": 1,
+      "bytes": 193896
+    },
+    {
+      "name": "tool_barrel",
+      "vertices": 1846,
+      "triangles": 3472,
+      "surfaces": 1,
+      "bytes": 152976
+    },
+    {
+      "name": "entry_crate",
+      "vertices": 1152,
+      "triangles": 2228,
+      "surfaces": 1,
+      "bytes": 79500
+    },
+    {
+      "name": "floor_plant",
+      "vertices": 571,
+      "triangles": 1078,
+      "surfaces": 1,
+      "bytes": 45784
+    },
+    {
+      "name": "door_lantern",
+      "vertices": 200,
+      "triangles": 368,
+      "surfaces": 1,
+      "bytes": 17028
+    }
+  ],
+  "unique_triangles": 82824,
+  "scene_triangles": 85144,
+  "static_draw_surfaces": 41,
+  "glb_bytes": 3313008,
+  "atlas_bytes": 2867417,
+  "placed_instances": 41,
+  "materials": 2
+}
