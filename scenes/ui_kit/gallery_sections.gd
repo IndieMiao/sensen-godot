@@ -411,7 +411,7 @@ static func _huds() -> Control:
 	col.add_theme_constant_override(&"separation", 0)
 	var home := {city = "Shanghai", space = "Homestead", kind = UiHud.PlaceKind.HOME}
 	var samples := [
-		{energy = 142, energy_max = 200, regen = "+1 in 2:40", skills = {farming = 0.6, fishing = 0.3}, coins = 230,
+		{energy = 142, energy_max = 200, regen = "+1 in 2:40", skills = {farming = 0.6, fishing = 0.4}, coins = 230,
 			today = "Radishes ready in 1h 12m", place = home},
 		{energy = 1, energy_max = 200, next_cost = 2, regen = "+1 in 2:41", skills = {farming = 0.6, fishing = 0.3}, coins = 230,
 			unread = 3, buff = {icon = _tex("crop_herb"), remaining = "2h 59m"}, today = "Sow your first plot",

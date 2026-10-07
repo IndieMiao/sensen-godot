@@ -114,6 +114,15 @@ func test_hud_energy_number_colour_follows_the_state() -> void:
 	hud.apply({energy = 120})
 	assert_str(value.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_TEXT.to_html())
 
+func test_skill_ring_halves_fill_from_twelve_with_4_degree_gaps_and_5_percent_steps() -> void:
+	var a := UiHud.skill_arcs(0.6, 0.4)   # the HUD main's sample: Farming -86 → 17.2, Fishing -94 → -162.8
+	assert_vector(a.farming).is_equal_approx(Vector2(-86.0, 17.2), Vector2(0.01, 0.01))
+	assert_vector(a.fishing).is_equal_approx(Vector2(-94.0, -162.8), Vector2(0.01, 0.01))
+	assert_float(UiHud.skill_arcs(0.64, 0.0).farming.y).is_equal_approx(17.2, 0.01)   # floored to 60 %
+	var full := UiHud.skill_arcs(1.0, 1.0)   # top level: both halves full, 4° short of 6 o'clock
+	assert_float(full.farming.y).is_equal_approx(86.0, 0.01)
+	assert_float(full.fishing.y).is_equal_approx(-266.0, 0.01)
+
 func test_hud_rows_read_today_and_the_actual_place() -> void:
 	var hud: UiHud = _host(UiHud.new())
 	hud.apply({today = "", place = {city = "Shanghai", space = "Farmhouse"}})

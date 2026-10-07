@@ -44,6 +44,7 @@ const _ENERGY_GAP := 1
 const _ICON_ENERGY := 12
 const _ICON_COIN := 13
 const _ICON_BELL := 18
+const _SKILL_GAP := 4.0           # degrees each skill half stops short of 12 and 6 o'clock
 const _ICON_BUFF := 14
 const _ICON_PLACE := 11
 const _CHEVRON := 12              # Today chip chevron box
@@ -126,6 +127,16 @@ static func energy_state_for(energy: int, energy_max: int, next_cost: int) -> En
 
 ## `City · Space`, plus `· Day Pass 23h` when one is running. Arrived-but-not-in-a-space reads
 ## `Tokyo · Arrived` (the caller passes space "Arrived").
+## Start / end angles (degrees, 0 = 3 o'clock, clockwise) of the two skill halves for progress 0..1.
+static func skill_arcs(farming: float, fishing: float) -> Dictionary:
+	var span := 180.0 - _SKILL_GAP * 2.0
+	var f := floorf(clampf(farming, 0.0, 1.0) * 20.0) / 20.0
+	var g := floorf(clampf(fishing, 0.0, 1.0) * 20.0) / 20.0
+	return {
+		farming = Vector2(-90.0 + _SKILL_GAP, -90.0 + _SKILL_GAP + span * f),
+		fishing = Vector2(-90.0 - _SKILL_GAP, -90.0 - _SKILL_GAP - span * g),
+	}
+
 static func place_text(place: Dictionary) -> String:
 	var parts := [str(place.get("city", "")), str(place.get("space", ""))]
 	if str(place.get("day_pass", "")) != "": parts.append("Day Pass " + str(place.day_pass))
@@ -410,7 +421,9 @@ class _Chip extends BaseButton:
 	func _get_minimum_size() -> Vector2:
 		return body.get_combined_minimum_size() if body != null else Vector2.ZERO
 
-## Avatar ring: right half Farming, left half Fishing, each filled by its level progress.
+## Avatar ring (HUD main, 197 2026-10-07): right half Farming fills clockwise from 12 o'clock, left half Fishing
+## counter-clockwise from 12 o'clock; each half stops 4° short of 12 and 6 o'clock (172° to fill) and shows
+## the progress within the current level floored to 5 % (full at the top level). Cooking is not on the ring.
 class _SkillRing extends Control:
 	var farming := 0.0
 	var fishing := 0.0
@@ -421,8 +434,12 @@ class _SkillRing extends Control:
 		var t := float(UiTokens.STROKE_RING)
 		var r := side * 0.5 - t * 0.5
 		draw_arc(c, r, 0.0, TAU, 48, UiTokens.COLOR_BORDER, t, true)
-		if farming > 0.0: draw_arc(c, r, -PI * 0.5, -PI * 0.5 + PI * farming, 24, UiTokens.COLOR_SKILL_FARMING, t, true)
-		if fishing > 0.0: draw_arc(c, r, PI * 0.5, PI * 0.5 + PI * fishing, 24, UiTokens.COLOR_SKILL_FISHING, t, true)
+		var arcs := UiHud.skill_arcs(farming, fishing)
+		if farming > 0.0: _arc(c, r, t, arcs.farming, UiTokens.COLOR_SKILL_FARMING)
+		if fishing > 0.0: _arc(c, r, t, arcs.fishing, UiTokens.COLOR_SKILL_FISHING)
+
+	func _arc(c: Vector2, r: float, t: float, deg: Vector2, color: Color) -> void:
+		draw_arc(c, r, deg_to_rad(deg.x), deg_to_rad(deg.y), 24, color, t, true)
 
 	func _notification(what: int) -> void:
 		if what == NOTIFICATION_RESIZED and get_child_count() > 0:
