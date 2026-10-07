@@ -10,7 +10,7 @@ for i,im in enumerate([a,b]):
  can.paste(im.resize((800,800)),(800*i,45));d.text((800*i+20,10),['R2 delivered','R2.1 Godot Mobile / Vulkan'][i],font=font,fill='#443b37')
 for j,(label,box) in enumerate([('Smoke: fused volumes increase upward',(650,160,940,380)),('Cool unlit wall below left shelves',(155,790,285,970)),('Orange-red flame + ember bed',(620,640,785,778))]):
  for i,im in enumerate([a,b]):
-  crop=im.crop(box);crop.thumbnail((650,210));crop=crop.resize((int(crop.width*min(650/crop.width,210/crop.height)),int(crop.height*min(650/crop.width,210/crop.height))));can.paste(crop,(i*800+30,905+j*250));d.text((i*800+20,860+j*250),label,font=font,fill='#443b37')
+  crop=im.crop(box);crop.thumbnail((650,210));crop=crop.resize((int(crop.width*min(650/crop.width,180/crop.height)),int(crop.height*min(650/crop.width,180/crop.height))));can.paste(crop,(i*800+30,905+j*250));d.text((i*800+20,860+j*250),label,font=font,fill='#443b37')
 can.save(doc/'r21-changes.jpg',quality=95)
 # Surface sample recorded independently of the warm lantern patch hue test.
 import numpy as np
