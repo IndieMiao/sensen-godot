@@ -458,6 +458,17 @@ func tag(id: String, text: String, screen: Vector2, show: bool, lit := false) ->
 	t.reset_size()
 	t.position = screen - Vector2(t.size.x * 0.5, t.size.y + 6)
 
+## Keep a world tag whole on screen: near an edge it slides inward instead of being cut (TapCard Pointer=Left / Right).
+func clamp_tag(id: String, margin := 8.0) -> void:
+	var t: Label = _tags.get(id)
+	if t == null or not t.visible: return
+	t.position.x = clampf(t.position.x, margin, maxf(margin, root.size.x - t.size.x - margin))
+
+## A tap on a visible world tag counts as a tap on its object (LOCK-11), wherever clamp_tag / lift_tag moved it.
+func tag_hit(id: String, screen: Vector2) -> bool:
+	var t: Label = _tags.get(id)
+	return t != null and t.visible and Rect2(t.position, t.size).grow(6).has_point(screen)
+
 ## Two world tags that collide (the Homestead sign stands beside the stall): lift `id` clear above `under`.
 func lift_tag(id: String, under: String) -> void:
 	var a: Label = _tags.get(id)

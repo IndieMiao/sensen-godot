@@ -178,3 +178,16 @@ func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void
 	assert_str(rt.ui._toast.text).is_equal("Need 2 more Copper Ore")
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui._toast.text).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
+
+func test_a_tag_at_the_screen_edge_slides_inward_whole() -> void:
+	var ui := _ui(_view())
+	await get_tree().process_frame
+	ui.tag("homestead", "Homestead Lv3", Vector2(ui.root.size.x - 4, 300), true)
+	ui.clamp_tag("homestead")
+	var t: Label = ui._tags["homestead"]
+	assert_float(t.position.x + t.size.x).is_less_equal(ui.root.size.x - 8.0)
+	ui.tag("homestead", "Homestead Lv3", Vector2(2, 300), true)
+	ui.clamp_tag("homestead")
+	assert_float(t.position.x).is_greater_equal(8.0)
+	assert_bool(ui.tag_hit("homestead", t.position + t.size * 0.5)).is_true()
+	assert_bool(ui.tag_hit("homestead", t.position + Vector2(t.size.x + 40, 0))).is_false()

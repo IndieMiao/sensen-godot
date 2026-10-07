@@ -324,7 +324,8 @@ func p0_tap(screen: Vector2) -> void:
 	if _sign_hit(screen):
 		actor.face(_sign)
 		HomePanel.open(rt.ui)
-	elif _plaque_node.visible and cam.unproject_position(_plaque + Vector3(0, 0.35, 0)).distance_to(screen) < 34:
+	elif _plaque_node.visible and (cam.unproject_position(_plaque + Vector3(0, 0.35, 0)).distance_to(screen) < 34
+			or rt.ui.tag_hit("plaque", screen)):
 		actor.face(_plaque)
 		HomePanel.plaque(rt.ui)
 	elif cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
@@ -338,7 +339,7 @@ func p0_tap(screen: Vector2) -> void:
 ## The sign or its badge (tapping a badge = tapping the object); small, so the door beside it stays the house.
 func _sign_hit(screen: Vector2) -> bool:
 	return cam.unproject_position(_sign + Vector3(0, 0.45, 0)).distance_to(screen) < 34 \
-		or cam.unproject_position(_sign + SIGN_BADGE).distance_to(screen) < 30
+		or cam.unproject_position(_sign + SIGN_BADGE).distance_to(screen) < 30 or rt.ui.tag_hit("homestead", screen)
 
 func _tags(v: Dictionary) -> void:
 	var near_stall := actor.position.distance_to(_stall) < 3.2
@@ -354,11 +355,13 @@ func _tags(v: Dictionary) -> void:
 	var nxt = h.get("next", null)   # lit when the next level is ready to take
 	rt.ui.tag("homestead", "Homestead Lv%d" % int(h.get("level", 1)), cam.unproject_position(_sign + SIGN_BADGE), true,
 		nxt is Dictionary and bool(nxt.get("can_upgrade", false)))
+	rt.ui.clamp_tag("homestead")
 	rt.ui.lift_tag("homestead", "stall")
 	# TapCard (LOCK-07): only near the plaque; tapping the card = tapping the plaque (the card sits right above it).
 	_plaque_node.visible = not h.get("plaque", []).is_empty()
 	rt.ui.tag("plaque", "Upgrade Plaque · Tap to read", cam.unproject_position(_plaque + Vector3(0, 0.85, 0)),
 		_plaque_node.visible and actor.position.distance_to(_plaque) < 2.6)
+	rt.ui.clamp_tag("plaque")
 
 func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return
