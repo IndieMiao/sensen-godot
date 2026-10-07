@@ -1,0 +1,910 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"checks": [
+		{
+			"details": null,
+			"name": "Default Avatar fixture assembles",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Bench route/probe schema",
+			"passed": true
+		},
+		{
+			"details": -0.215000003576279,
+			"name": "Spawn stands on authored floor",
+			"passed": true
+		},
+		{
+			"details": "(0.15, -0.215, 4.15)",
+			"name": "Spawn capsule clear",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.150000005960464,
+					-0.210068434476852,
+					3.91855502128601
+				],
+				"from": [
+					0.150000005960464,
+					-0.215000003576279,
+					4.15000009536743
+				],
+				"name": "path",
+				"reached": true,
+				"remaining_m": 0.0692905262112617,
+				"seconds": 0.003,
+				"target": [
+					0.150000005960464,
+					-0.200000002980232,
+					3.84999990463257
+				]
+			},
+			"name": "Route: path",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.149999991059303,
+					-0.0588090047240257,
+					3.33319520950317
+				],
+				"from": [
+					0.150000005960464,
+					-0.210068434476852,
+					3.91855502128601
+				],
+				"name": "lower_step",
+				"reached": true,
+				"remaining_m": 0.15169931948185,
+				"seconds": 0.197,
+				"target": [
+					0.150000005960464,
+					-0.170000001788139,
+					3.23000001907349
+				]
+			},
+			"name": "Route: lower_step",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.150000050663948,
+					0.0599268302321434,
+					2.25506138801575
+				],
+				"from": [
+					0.149999991059303,
+					-0.0588090047240257,
+					3.33319520950317
+				],
+				"name": "entrance",
+				"reached": true,
+				"remaining_m": 0.0750613585114479,
+				"seconds": 0.35,
+				"target": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.1800000667572
+				]
+			},
+			"name": "Route: entrance",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.00783310271799564,
+					0.0599354803562164,
+					0.771728515625
+				],
+				"from": [
+					0.150000050663948,
+					0.0599268302321434,
+					2.25506138801575
+				],
+				"name": "between_tables",
+				"reached": true,
+				"remaining_m": 0.0821030586957932,
+				"seconds": 0.284,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					0.689999997615814
+				]
+			},
+			"name": "Route: between_tables",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.000723452074453235,
+					0.0599323958158493,
+					-0.228246226906776
+				],
+				"from": [
+					0.00783310271799564,
+					0.0599354803562164,
+					0.771728515625
+				],
+				"name": "counter",
+				"reached": true,
+				"remaining_m": 0.101756386458874,
+				"seconds": 0.283,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-0.330000013113022
+				]
+			},
+			"name": "Route: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-1.92191278934479,
+					0.0599341616034508,
+					-0.326028615236282
+				],
+				"from": [
+					0.000723452074453235,
+					0.0599323958158493,
+					-0.228246226906776
+				],
+				"name": "left_tree_bed",
+				"reached": true,
+				"remaining_m": 0.0781881585717201,
+				"seconds": 0.401,
+				"target": [
+					-2.0,
+					0.0599999986588955,
+					-0.330000013113022
+				]
+			},
+			"name": "Route: left_tree_bed",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					-0.0666763335466385,
+					0.059907853603363,
+					-0.329862236976624
+				],
+				"from": [
+					-1.92191278934479,
+					0.0599341616034508,
+					-0.326028615236282
+				],
+				"name": "counter_return",
+				"reached": true,
+				"remaining_m": 0.0666765421628952,
+				"seconds": 0.516,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-0.330000013113022
+				]
+			},
+			"name": "Route: counter_return",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					2.11366605758667,
+					0.0599361583590508,
+					-0.329994738101959
+				],
+				"from": [
+					-0.0666763335466385,
+					0.059907853603363,
+					-0.329862236976624
+				],
+				"name": "right_tree_bed",
+				"reached": true,
+				"remaining_m": 0.0863340124487877,
+				"seconds": 0.6,
+				"target": [
+					2.20000004768372,
+					0.0599999986588955,
+					-0.330000013113022
+				]
+			},
+			"name": "Route: right_tree_bed",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.0692647248506546,
+					0.0599353425204754,
+					-0.329999834299088
+				],
+				"from": [
+					2.11366605758667,
+					0.0599361583590508,
+					-0.329994738101959
+				],
+				"name": "center_return",
+				"reached": true,
+				"remaining_m": 0.069264754652977,
+				"seconds": 0.567,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-0.330000013113022
+				]
+			},
+			"name": "Route: center_return",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.147892087697983,
+					0.059935137629509,
+					2.08524966239929
+				],
+				"from": [
+					0.0692647248506546,
+					0.0599353425204754,
+					-0.329999834299088
+				],
+				"name": "door_return",
+				"reached": true,
+				"remaining_m": 0.0647847652435303,
+				"seconds": 0.667,
+				"target": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.15000009536743
+				]
+			},
+			"name": "Route: door_return",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/CoffeeShop0Art/serving_counter/Collider"
+				],
+				"final": [
+					0.0,
+					0.0504684150218964,
+					-0.529999971389771
+				],
+				"from": [
+					0.0,
+					0.0599999986588955,
+					-0.280000001192093
+				],
+				"reached": false,
+				"remaining_m": 0.770058989524841,
+				"seconds": 0.883,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-1.29999995231628
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/CoffeeShop0Art/serving_counter/Collider"
+			},
+			"name": "Blocked: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/CoffeeShop0Art/round_table/Collider"
+				],
+				"final": [
+					-1.45000004768372,
+					0.0460931360721588,
+					-0.124999970197678
+				],
+				"from": [
+					-1.45000004768372,
+					0.0600000023841858,
+					-0.25
+				],
+				"reached": false,
+				"remaining_m": 0.775124788284302,
+				"seconds": 0.883,
+				"target": [
+					-1.45000004768372,
+					0.0599999986588955,
+					0.649999976158142
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/CoffeeShop0Art/round_table/Collider"
+			},
+			"name": "Blocked: left_table",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/CoffeeShop0Art/stone_tree_bed_1/Collider"
+				],
+				"final": [
+					2.34999990463257,
+					0.0471446104347706,
+					-1.02605199813843
+				],
+				"from": [
+					2.34999990463257,
+					0.0600000023841858,
+					-0.550000011920929
+				],
+				"reached": false,
+				"remaining_m": 0.774054706096649,
+				"seconds": 0.883,
+				"target": [
+					2.34999990463257,
+					0.0599999986588955,
+					-1.79999995231628
+				]
+			},
+			"name": "Blocked: tree_bed",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					2.61249995231628,
+					0.0423652678728104,
+					0.0
+				],
+				"from": [
+					2.54999995231628,
+					0.0599999986588955,
+					0.0
+				],
+				"reached": false,
+				"remaining_m": 0.937665820121765,
+				"seconds": 0.882,
+				"target": [
+					3.54999995231628,
+					0.0599999986588955,
+					0.0
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/CoffeeShop0Art/side_low_wall/Collider"
+			},
+			"name": "Blocked: stone_wall",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [
+					"/root/SceneBenchmark/CoffeeShop0Art/meadow_front_limit"
+				],
+				"final": [
+					0.150000005960464,
+					-0.223914131522179,
+					4.29500007629395
+				],
+				"from": [
+					0.150000005960464,
+					-0.219921886920929,
+					4.17000007629395
+				],
+				"reached": false,
+				"remaining_m": 1.00528454780579,
+				"seconds": 0.882,
+				"target": [
+					0.150000005960464,
+					-0.200000002980232,
+					5.30000019073486
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/CoffeeShop0Art/meadow_front_limit"
+			},
+			"name": "Blocked: meadow_edge",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					3.72500014305115,
+					-0.227502956986427,
+					3.34999990463257
+				],
+				"from": [
+					3.59999990463257,
+					-0.219921886920929,
+					3.34999990463257
+				],
+				"reached": false,
+				"remaining_m": 0.975387454032898,
+				"seconds": 0.867,
+				"target": [
+					4.69999980926514,
+					-0.200000002980232,
+					3.34999990463257
+				],
+				"torso_ray_blocker": "/root/SceneBenchmark/CoffeeShop0Art/meadow_right_limit"
+			},
+			"name": "Blocked: meadow_side",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 0.82,
+				"measured_m": 0.820000052452087,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: chairs_center",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.0,
+					0.0599334463477135,
+					-0.185351729393005
+				],
+				"from": [
+					0.0,
+					0.0600000023841858,
+					1.79999995231628
+				],
+				"reached": true,
+				"remaining_m": 0.0746482908725739,
+				"seconds": 0.566,
+				"target": [
+					0.0,
+					0.0599999986588955,
+					-0.259999990463257
+				]
+			},
+			"name": "Traverse: chairs_center",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 0.84,
+				"measured_m": 0.839999914169312,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: table_counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					1.53144562244415,
+					0.0599312335252762,
+					-0.310000002384186
+				],
+				"from": [
+					-1.45000004768372,
+					0.0600000023841858,
+					-0.310000002384186
+				],
+				"reached": true,
+				"remaining_m": 0.0685544386506081,
+				"seconds": 0.833,
+				"target": [
+					1.60000002384186,
+					0.0599999986588955,
+					-0.310000002384186
+				]
+			},
+			"name": "Traverse: table_counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"authored_width": 1.85,
+				"measured_m": 1.84999996423721,
+				"minimum_m": 0.7
+			},
+			"name": "Gap width: entrance",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"final": [
+					0.149999991059303,
+					0.0152054484933615,
+					3.17506742477417
+				],
+				"from": [
+					0.150000005960464,
+					0.0599999986588955,
+					2.1800000667572
+				],
+				"reached": true,
+				"remaining_m": 0.199789762496948,
+				"seconds": 0.3,
+				"target": [
+					0.150000005960464,
+					-0.170000001788139,
+					3.25
+				]
+			},
+			"name": "Traverse: entrance",
+			"passed": true
+		},
+		{
+			"details": {
+				"entry": {
+					"collisions": [],
+					"final": [
+						0.150000035762787,
+						0.0599314197897911,
+						2.24399185180664
+					],
+					"from": [
+						0.149999991059303,
+						-0.00423646625131369,
+						3.21953082084656
+					],
+					"reached": true,
+					"remaining_m": 0.0939917787909508,
+					"seconds": 0.3,
+					"target": [
+						0.150000005960464,
+						0.0599999986588955,
+						2.15000009536743
+					]
+				},
+				"exit": {
+					"collisions": [],
+					"final": [
+						0.149999991059303,
+						-0.00423646625131369,
+						3.21953082084656
+					],
+					"from": [
+						0.150000005960464,
+						0.0599999986588955,
+						2.15000009536743
+					],
+					"reached": true,
+					"remaining_m": 0.211192175745964,
+					"seconds": 0.316,
+					"target": [
+						0.150000005960464,
+						-0.189999997615814,
+						3.3199999332428
+					]
+				}
+			},
+			"name": "Entrance gap allows exit and reentry",
+			"passed": true
+		},
+		{
+			"details": {
+				"collisions": [],
+				"delta": [
+					0.0273687839508057,
+					0.0000430233776569366,
+					-1.0164657831192
+				]
+			},
+			"name": "Diagonal collision preserves wall sliding",
+			"passed": true
+		},
+		{
+			"details": [
+				"run",
+				0.14997,
+				0.316636666666667
+			],
+			"name": "Run animation advances in rendered viewport",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Input release stops horizontal motion",
+			"passed": true
+		},
+		{
+			"details": "idle",
+			"name": "Release returns to idle",
+			"passed": true
+		},
+		{
+			"details": null,
+			"name": "Focus loss cancels movement",
+			"passed": true
+		},
+		{
+			"details": 1.74549430608749,
+			"name": "Fixture head-top height measurable",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 1.33486542572727,
+				"difference": 0.128755364806867,
+				"height": 2.63,
+				"ratio_to_H": 1.50673651058485,
+				"reason": ""
+			},
+			"name": "Scale ±15%: door",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.660271417661233,
+				"difference": 0.0416485900216919,
+				"height": 1.2005,
+				"ratio_to_H": 0.687770791238447,
+				"reason": ""
+			},
+			"name": "Scale ±15%: counter",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.392438977091492,
+				"difference": 0.0078832116788321,
+				"height": 0.6904,
+				"ratio_to_H": 0.395532656618929,
+				"reason": ""
+			},
+			"name": "Scale ±15%: chair",
+			"passed": true
+		},
+		{
+			"details": {
+				"baseline_ratio": 0.650245604377874,
+				"difference": 0.0855947136563877,
+				"height": 1.03785,
+				"ratio_to_H": 0.594588018064825,
+				"reason": ""
+			},
+			"name": "Scale ±15%: table",
+			"passed": true
+		}
+	],
+	"passed": true,
+	"pid": 1063650,
+	"renderer": "mobile",
+	"route": [
+		{
+			"collisions": [],
+			"final": [
+				0.150000005960464,
+				-0.210068434476852,
+				3.91855502128601
+			],
+			"from": [
+				0.150000005960464,
+				-0.215000003576279,
+				4.15000009536743
+			],
+			"name": "path",
+			"reached": true,
+			"remaining_m": 0.0692905262112617,
+			"seconds": 0.003,
+			"target": [
+				0.150000005960464,
+				-0.200000002980232,
+				3.84999990463257
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.149999991059303,
+				-0.0588090047240257,
+				3.33319520950317
+			],
+			"from": [
+				0.150000005960464,
+				-0.210068434476852,
+				3.91855502128601
+			],
+			"name": "lower_step",
+			"reached": true,
+			"remaining_m": 0.15169931948185,
+			"seconds": 0.197,
+			"target": [
+				0.150000005960464,
+				-0.170000001788139,
+				3.23000001907349
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.150000050663948,
+				0.0599268302321434,
+				2.25506138801575
+			],
+			"from": [
+				0.149999991059303,
+				-0.0588090047240257,
+				3.33319520950317
+			],
+			"name": "entrance",
+			"reached": true,
+			"remaining_m": 0.0750613585114479,
+			"seconds": 0.35,
+			"target": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.1800000667572
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.00783310271799564,
+				0.0599354803562164,
+				0.771728515625
+			],
+			"from": [
+				0.150000050663948,
+				0.0599268302321434,
+				2.25506138801575
+			],
+			"name": "between_tables",
+			"reached": true,
+			"remaining_m": 0.0821030586957932,
+			"seconds": 0.284,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				0.689999997615814
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.000723452074453235,
+				0.0599323958158493,
+				-0.228246226906776
+			],
+			"from": [
+				0.00783310271799564,
+				0.0599354803562164,
+				0.771728515625
+			],
+			"name": "counter",
+			"reached": true,
+			"remaining_m": 0.101756386458874,
+			"seconds": 0.283,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				-0.330000013113022
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-1.92191278934479,
+				0.0599341616034508,
+				-0.326028615236282
+			],
+			"from": [
+				0.000723452074453235,
+				0.0599323958158493,
+				-0.228246226906776
+			],
+			"name": "left_tree_bed",
+			"reached": true,
+			"remaining_m": 0.0781881585717201,
+			"seconds": 0.401,
+			"target": [
+				-2.0,
+				0.0599999986588955,
+				-0.330000013113022
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				-0.0666763335466385,
+				0.059907853603363,
+				-0.329862236976624
+			],
+			"from": [
+				-1.92191278934479,
+				0.0599341616034508,
+				-0.326028615236282
+			],
+			"name": "counter_return",
+			"reached": true,
+			"remaining_m": 0.0666765421628952,
+			"seconds": 0.516,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				-0.330000013113022
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				2.11366605758667,
+				0.0599361583590508,
+				-0.329994738101959
+			],
+			"from": [
+				-0.0666763335466385,
+				0.059907853603363,
+				-0.329862236976624
+			],
+			"name": "right_tree_bed",
+			"reached": true,
+			"remaining_m": 0.0863340124487877,
+			"seconds": 0.6,
+			"target": [
+				2.20000004768372,
+				0.0599999986588955,
+				-0.330000013113022
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.0692647248506546,
+				0.0599353425204754,
+				-0.329999834299088
+			],
+			"from": [
+				2.11366605758667,
+				0.0599361583590508,
+				-0.329994738101959
+			],
+			"name": "center_return",
+			"reached": true,
+			"remaining_m": 0.069264754652977,
+			"seconds": 0.567,
+			"target": [
+				0.0,
+				0.0599999986588955,
+				-0.330000013113022
+			]
+		},
+		{
+			"collisions": [],
+			"final": [
+				0.147892087697983,
+				0.059935137629509,
+				2.08524966239929
+			],
+			"from": [
+				0.0692647248506546,
+				0.0599353425204754,
+				-0.329999834299088
+			],
+			"name": "door_return",
+			"reached": true,
+			"remaining_m": 0.0647847652435303,
+			"seconds": 0.667,
+			"target": [
+				0.150000005960464,
+				0.0599999986588955,
+				2.15000009536743
+			]
+		}
+	],
+	"scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+	"slug": "coffee_shop_0"
+}

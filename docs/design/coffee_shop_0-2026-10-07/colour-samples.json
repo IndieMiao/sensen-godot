@@ -1,0 +1,38 @@
+[
+  {
+    "name": "cream stone wall",
+    "surface": "Lit front face of sandstone above and right of the left arched entrance",
+    "reference_pixel": [
+      650,
+      550
+    ],
+    "runtime_pixel": [
+      515,
+      389
+    ]
+  },
+  {
+    "name": "cream stone floor",
+    "surface": "Open lit front stone paving between entrance and left table",
+    "reference_pixel": [
+      826,
+      1283
+    ],
+    "runtime_pixel": [
+      496,
+      820
+    ]
+  },
+  {
+    "name": "meadow grass",
+    "surface": "Exposed grass along the left outside edge near entrance",
+    "reference_pixel": [
+      232,
+      1444
+    ],
+    "runtime_pixel": [
+      195,
+      898
+    ]
+  }
+]

@@ -19,12 +19,12 @@
         {
           "at": [
             0,
-            -0.09,
+            -0.08,
             0
           ],
           "size": [
             6.1,
-            0.22,
+            0.26,
             5.6
           ]
         }
@@ -66,24 +66,24 @@
       "colliders": [
         {
           "at": [
-            -1.91,
+            -2.175,
             1.5,
             0
           ],
           "size": [
-            1.02,
+            1.0500000000000003,
             3,
             0.23
           ]
         },
         {
           "at": [
-            1.65,
+            1.375,
             1.5,
             0
           ],
           "size": [
-            2.22,
+            3.05,
             3,
             0.23
           ]
@@ -151,12 +151,12 @@
         {
           "at": [
             0,
-            0.32,
+            0.38,
             0
           ],
           "size": [
             5.28,
-            0.64,
+            0.76,
             0.3
           ]
         }
@@ -199,13 +199,60 @@
         {
           "at": [
             0,
-            0.025,
-            0.05
+            0,
+            0
           ],
-          "size": [
-            2.06,
-            0.17,
-            0.5
+          "points": [
+            [
+              -1.03,
+              -0.19,
+              -0.4
+            ],
+            [
+              -1.03,
+              0.211,
+              -0.4
+            ],
+            [
+              -1.03,
+              0.211,
+              0.21
+            ],
+            [
+              -1.03,
+              -0.02,
+              0.7
+            ],
+            [
+              -1.03,
+              -0.19,
+              0.7
+            ],
+            [
+              1.03,
+              -0.19,
+              -0.4
+            ],
+            [
+              1.03,
+              0.211,
+              -0.4
+            ],
+            [
+              1.03,
+              0.211,
+              0.21
+            ],
+            [
+              1.03,
+              -0.02,
+              0.7
+            ],
+            [
+              1.03,
+              -0.19,
+              0.7
+            ]
           ]
         }
       ]
@@ -415,41 +462,6 @@
       "colliders": []
     },
     {
-      "name": "orange_tree",
-      "file": "orange_tree.glb",
-      "position": [
-        -2.25,
-        0.06,
-        -1.77
-      ],
-      "yaw_degrees": 0,
-      "colliders": [
-        {
-          "at": [
-            0,
-            0.37,
-            0
-          ],
-          "size": [
-            0.71,
-            0.74,
-            0.71
-          ]
-        }
-      ]
-    },
-    {
-      "name": "flower_border",
-      "file": "flower_border.glb",
-      "position": [
-        -2.12,
-        0.78,
-        2.68
-      ],
-      "yaw_degrees": 0,
-      "colliders": []
-    },
-    {
       "name": "chair",
       "file": "chair.glb",
       "position": [
@@ -462,13 +474,13 @@
         {
           "at": [
             0,
-            0.49,
+            0.5,
             0
           ],
           "size": [
-            0.67,
-            0.98,
-            0.64
+            0.61,
+            1,
+            0.62
           ]
         }
       ]
@@ -486,12 +498,12 @@
         {
           "at": [
             0,
-            0.43,
+            0.5246,
             0
           ],
           "size": [
             1.1,
-            0.86,
+            1.0492,
             1.1
           ]
         }
@@ -502,7 +514,7 @@
       "file": "blue_vase_flowers.glb",
       "position": [
         -1.45,
-        0.91,
+        1.095,
         0.65
       ],
       "yaw_degrees": 0,
@@ -513,7 +525,7 @@
       "file": "table_cup.glb",
       "position": [
         1.76,
-        0.91,
+        1.095,
         1.38
       ],
       "yaw_degrees": 0,
@@ -523,9 +535,9 @@
       "name": "sleeping_cat",
       "file": "sleeping_cat.glb",
       "position": [
-        0.12,
-        0.035,
-        2.7
+        0.04,
+        0.085,
+        2.44
       ],
       "yaw_degrees": -25,
       "colliders": []
@@ -539,17 +551,6 @@
         -0.9
       ],
       "yaw_degrees": -45,
-      "colliders": []
-    },
-    {
-      "name": "walking_cat",
-      "file": "walking_cat.glb",
-      "position": [
-        -0.23,
-        0.06,
-        0.67
-      ],
-      "yaw_degrees": -35,
       "colliders": []
     },
     {
@@ -573,6 +574,87 @@
       ],
       "yaw_degrees": 0,
       "colliders": []
+    },
+    {
+      "name": "grass_clump",
+      "file": "grass_clump.glb",
+      "position": [
+        -3.52,
+        -0.2,
+        2.9
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "calico_cat",
+      "file": "calico_cat.glb",
+      "position": [
+        -0.38,
+        0.065,
+        -0.05
+      ],
+      "yaw_degrees": -30,
+      "colliders": []
+    },
+    {
+      "name": "seated_cat",
+      "file": "seated_cat.glb",
+      "position": [
+        0.58,
+        0.065,
+        1.97
+      ],
+      "yaw_degrees": 115,
+      "colliders": []
+    },
+    {
+      "name": "stone_tree_bed_0",
+      "file": "stone_tree_bed_0.glb",
+      "position": [
+        -2.35,
+        0.065,
+        -1.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.25,
+            0
+          ],
+          "size": [
+            1.0,
+            0.5,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stone_tree_bed_1",
+      "file": "stone_tree_bed_1.glb",
+      "position": [
+        2.38,
+        0.065,
+        -1.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.25,
+            0
+          ],
+          "size": [
+            1.0,
+            0.5,
+            1.0
+          ]
+        }
+      ]
     }
   ],
   "instances": [
@@ -617,60 +699,10 @@
       "yaw_degrees": 0
     },
     {
-      "name": "orange_tree_2",
-      "asset": "orange_tree",
-      "position": [
-        2.37,
-        0.06,
-        -1.72
-      ],
-      "yaw_degrees": 70
-    },
-    {
-      "name": "flower_border_front_right",
-      "asset": "flower_border",
-      "position": [
-        2.16,
-        0.78,
-        2.68
-      ],
-      "yaw_degrees": 0
-    },
-    {
-      "name": "flower_border_right_0",
-      "asset": "flower_border",
-      "position": [
-        3,
-        0.78,
-        -1.65
-      ],
-      "yaw_degrees": 90
-    },
-    {
-      "name": "flower_border_right_1",
-      "asset": "flower_border",
-      "position": [
-        3,
-        0.78,
-        0
-      ],
-      "yaw_degrees": 90
-    },
-    {
-      "name": "flower_border_right_2",
-      "asset": "flower_border",
-      "position": [
-        3,
-        0.78,
-        1.65
-      ],
-      "yaw_degrees": 90
-    },
-    {
       "name": "chair_2",
       "asset": "chair",
       "position": [
-        -0.66,
+        -0.72,
         0.06,
         0.65
       ],
@@ -680,7 +712,7 @@
       "name": "chair_3",
       "asset": "chair",
       "position": [
-        0.66,
+        0.72,
         0.06,
         1.24
       ],
@@ -711,33 +743,1421 @@
       "asset": "blue_vase_flowers",
       "position": [
         1.45,
-        0.91,
+        1.095,
         1.24
       ],
       "yaw_degrees": 0
     },
     {
-      "name": "walking_cat_2",
-      "asset": "walking_cat",
+      "name": "grass_clump_00",
+      "asset": "grass_clump",
       "position": [
-        1.0,
-        0.06,
-        2.15
+        -1.276295712747097,
+        -0.2,
+        -3.508312401369518
       ],
-      "yaw_degrees": 150
+      "yaw_degrees": 226.96764316407405
+    },
+    {
+      "name": "grass_clump_01",
+      "asset": "grass_clump",
+      "position": [
+        -0.18839215070662219,
+        -0.2,
+        4.303737919142815
+      ],
+      "yaw_degrees": 38.84324524363375
+    },
+    {
+      "name": "grass_clump_02",
+      "asset": "grass_clump",
+      "position": [
+        -3.739396946173315,
+        -0.2,
+        0.3579628142844147
+      ],
+      "yaw_degrees": 139.67126964245688
+    },
+    {
+      "name": "grass_clump_03",
+      "asset": "grass_clump",
+      "position": [
+        3.5348575335880175,
+        -0.2,
+        -2.828092256347815
+      ],
+      "yaw_degrees": 177.718894051107
+    },
+    {
+      "name": "grass_clump_04",
+      "asset": "grass_clump",
+      "position": [
+        2.13663214623466,
+        -0.2,
+        -3.280846802139132
+      ],
+      "yaw_degrees": 272.36653405865445
+    },
+    {
+      "name": "grass_clump_05",
+      "asset": "grass_clump",
+      "position": [
+        -3.267643309768071,
+        -0.2,
+        4.142120207020937
+      ],
+      "yaw_degrees": 165.58687841858546
+    },
+    {
+      "name": "grass_clump_06",
+      "asset": "grass_clump",
+      "position": [
+        -3.739335968184052,
+        -0.2,
+        -1.4625057372808186
+      ],
+      "yaw_degrees": 107.45291713171731
+    },
+    {
+      "name": "grass_clump_07",
+      "asset": "grass_clump",
+      "position": [
+        3.6162606475935144,
+        -0.2,
+        3.3088434585492625
+      ],
+      "yaw_degrees": 47.20073345997446
+    },
+    {
+      "name": "grass_clump_08",
+      "asset": "grass_clump",
+      "position": [
+        -1.6890486422205906,
+        -0.2,
+        -3.4042744650323944
+      ],
+      "yaw_degrees": 115.44337686004795
+    },
+    {
+      "name": "grass_clump_09",
+      "asset": "grass_clump",
+      "position": [
+        1.9824374344301048,
+        -0.2,
+        4.215811554333837
+      ],
+      "yaw_degrees": 277.3004601518718
+    },
+    {
+      "name": "grass_clump_10",
+      "asset": "grass_clump",
+      "position": [
+        -3.650920404474904,
+        -0.2,
+        3.6551591414090487
+      ],
+      "yaw_degrees": 137.96735699729865
+    },
+    {
+      "name": "grass_clump_11",
+      "asset": "grass_clump",
+      "position": [
+        3.7175446802813936,
+        -0.2,
+        -0.4605809480155383
+      ],
+      "yaw_degrees": 243.27416636205635
+    },
+    {
+      "name": "grass_clump_12",
+      "asset": "grass_clump",
+      "position": [
+        -0.8640647955243246,
+        -0.2,
+        -3.53363890274997
+      ],
+      "yaw_degrees": 133.3268606308331
+    },
+    {
+      "name": "grass_clump_13",
+      "asset": "grass_clump",
+      "position": [
+        2.5663873767198413,
+        -0.2,
+        4.345235501889541
+      ],
+      "yaw_degrees": 126.35028161776759
+    },
+    {
+      "name": "grass_clump_14",
+      "asset": "grass_clump",
+      "position": [
+        -3.6432270295232656,
+        -0.2,
+        0.09812332200772911
+      ],
+      "yaw_degrees": 88.76310362270726
+    },
+    {
+      "name": "grass_clump_15",
+      "asset": "grass_clump",
+      "position": [
+        3.722982588061473,
+        -0.2,
+        3.9359661976583546
+      ],
+      "yaw_degrees": 195.62602328728195
+    },
+    {
+      "name": "grass_clump_16",
+      "asset": "grass_clump",
+      "position": [
+        2.755197853886687,
+        -0.2,
+        -3.501452099387961
+      ],
+      "yaw_degrees": 172.14221289273326
+    },
+    {
+      "name": "grass_clump_17",
+      "asset": "grass_clump",
+      "position": [
+        -3.1287541734512296,
+        -0.2,
+        4.310025391790607
+      ],
+      "yaw_degrees": 351.76653924221256
+    },
+    {
+      "name": "grass_clump_18",
+      "asset": "grass_clump",
+      "position": [
+        -3.7144284945136348,
+        -0.2,
+        -2.265588660707916
+      ],
+      "yaw_degrees": 359.93449095162543
+    },
+    {
+      "name": "grass_clump_19",
+      "asset": "grass_clump",
+      "position": [
+        3.5429409168147066,
+        -0.2,
+        -2.004240941482646
+      ],
+      "yaw_degrees": 243.84040307599426
+    },
+    {
+      "name": "grass_clump_20",
+      "asset": "grass_clump",
+      "position": [
+        -2.9948423825392902,
+        -0.2,
+        -3.3025888721213414
+      ],
+      "yaw_degrees": 38.007910035937236
+    },
+    {
+      "name": "grass_clump_21",
+      "asset": "grass_clump",
+      "position": [
+        1.3300384319768468,
+        -0.2,
+        4.238568730706103
+      ],
+      "yaw_degrees": 339.2254393033176
+    },
+    {
+      "name": "grass_clump_22",
+      "asset": "grass_clump",
+      "position": [
+        -3.5413987803945823,
+        -0.2,
+        3.6846479310017552
+      ],
+      "yaw_degrees": 216.62569706015458
+    },
+    {
+      "name": "grass_clump_23",
+      "asset": "grass_clump",
+      "position": [
+        3.6514806874189016,
+        -0.2,
+        0.880454726061902
+      ],
+      "yaw_degrees": 258.60327887636305
+    },
+    {
+      "name": "grass_clump_24",
+      "asset": "grass_clump",
+      "position": [
+        1.7808938286263545,
+        -0.2,
+        -3.3991843598801705
+      ],
+      "yaw_degrees": 215.84253735962469
+    },
+    {
+      "name": "grass_clump_25",
+      "asset": "grass_clump",
+      "position": [
+        1.4673705752920987,
+        -0.2,
+        4.117832494726428
+      ],
+      "yaw_degrees": 98.96879212672134
+    },
+    {
+      "name": "grass_clump_26",
+      "asset": "grass_clump",
+      "position": [
+        -3.5820522473286713,
+        -0.2,
+        4.148283552301578
+      ],
+      "yaw_degrees": 36.70159890948096
+    },
+    {
+      "name": "grass_clump_27",
+      "asset": "grass_clump",
+      "position": [
+        3.4854895914104973,
+        -0.2,
+        2.3381022132760063
+      ],
+      "yaw_degrees": 352.6793621841861
+    },
+    {
+      "name": "grass_clump_28",
+      "asset": "grass_clump",
+      "position": [
+        -2.225147375775763,
+        -0.2,
+        -3.288125738502014
+      ],
+      "yaw_degrees": 329.498439180628
+    },
+    {
+      "name": "grass_clump_29",
+      "asset": "grass_clump",
+      "position": [
+        1.8553177027700296,
+        -0.2,
+        4.183680000803936
+      ],
+      "yaw_degrees": 264.6447574221646
+    },
+    {
+      "name": "grass_clump_30",
+      "asset": "grass_clump",
+      "position": [
+        -3.469025134426572,
+        -0.2,
+        3.755031968317826
+      ],
+      "yaw_degrees": 344.84325217725103
+    },
+    {
+      "name": "grass_clump_31",
+      "asset": "grass_clump",
+      "position": [
+        3.7400033765608494,
+        -0.2,
+        -1.7189343889044733
+      ],
+      "yaw_degrees": 283.1685578070711
+    },
+    {
+      "name": "grass_clump_32",
+      "asset": "grass_clump",
+      "position": [
+        -2.450484900763249,
+        -0.2,
+        -3.459560905249801
+      ],
+      "yaw_degrees": 186.64967211670117
+    },
+    {
+      "name": "grass_clump_33",
+      "asset": "grass_clump",
+      "position": [
+        -1.5283768201024643,
+        -0.2,
+        4.1340282969549955
+      ],
+      "yaw_degrees": 65.03329473325032
+    },
+    {
+      "name": "grass_clump_34",
+      "asset": "grass_clump",
+      "position": [
+        -3.4523167136237345,
+        -0.2,
+        -0.9833528738940043
+      ],
+      "yaw_degrees": 269.645823809221
+    },
+    {
+      "name": "grass_clump_35",
+      "asset": "grass_clump",
+      "position": [
+        3.547467792311392,
+        -0.2,
+        3.5915815035688676
+      ],
+      "yaw_degrees": 355.3335317238479
+    },
+    {
+      "name": "grass_clump_36",
+      "asset": "grass_clump",
+      "position": [
+        1.3056734750376182,
+        -0.2,
+        -3.475255128635833
+      ],
+      "yaw_degrees": 348.2638392827459
+    },
+    {
+      "name": "grass_clump_37",
+      "asset": "grass_clump",
+      "position": [
+        -2.022214769925826,
+        -0.2,
+        4.3117952314131855
+      ],
+      "yaw_degrees": 228.21872171280685
+    },
+    {
+      "name": "grass_clump_38",
+      "asset": "grass_clump",
+      "position": [
+        -3.5172239309045747,
+        -0.2,
+        -0.8194992385702835
+      ],
+      "yaw_degrees": 240.68118884410728
+    },
+    {
+      "name": "grass_clump_39",
+      "asset": "grass_clump",
+      "position": [
+        3.7152272768760466,
+        -0.2,
+        -2.972586508659915
+      ],
+      "yaw_degrees": 220.51978905950045
+    },
+    {
+      "name": "grass_clump_40",
+      "asset": "grass_clump",
+      "position": [
+        -3.5784023639262017,
+        -0.2,
+        -3.3243683521645866
+      ],
+      "yaw_degrees": 13.404360964356727
     }
   ],
   "camera": {
     "position": [
-      10,
-      10,
+      11,
+      11.3,
       12
     ],
     "target": [
       0,
-      1.0,
-      0.45
+      1.08,
+      0.42
     ],
-    "size": 12.0
-  }
+    "size": 11.5
+  },
+  "revision": "R1",
+  "shared_plants": [
+    {
+      "name": "FruitTreeLeft",
+      "asset": "fruit_tree",
+      "file": "res://assets/rooms/_shared/plants/fruit_tree.glb",
+      "position": [
+        -2.35,
+        0.06,
+        -1.75
+      ],
+      "rotation_degrees": [
+        0,
+        30,
+        0
+      ],
+      "scale": [
+        1.16,
+        1.16,
+        1.16
+      ],
+      "colliders": [],
+      "cast_shadow": true
+    },
+    {
+      "name": "FruitTreeRight",
+      "asset": "fruit_tree",
+      "file": "res://assets/rooms/_shared/plants/fruit_tree.glb",
+      "position": [
+        2.38,
+        0.06,
+        -1.75
+      ],
+      "rotation_degrees": [
+        0,
+        95,
+        0
+      ],
+      "scale": [
+        1.16,
+        1.16,
+        1.16
+      ],
+      "colliders": [],
+      "cast_shadow": true
+    },
+    {
+      "name": "ArchPeaceLily",
+      "asset": "peace_lily",
+      "file": "res://assets/rooms/_shared/plants/peace_lily.glb",
+      "position": [
+        -2.6,
+        0.06,
+        -0.47
+      ],
+      "rotation_degrees": [
+        0,
+        15,
+        0
+      ],
+      "scale": [
+        1.12,
+        1.12,
+        1.12
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.22,
+            0
+          ],
+          "size": [
+            0.52,
+            0.44,
+            0.52
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ShelfPothos",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        0.73,
+        2.08,
+        -2.46
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub00",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.6,
+        0.73,
+        2.61
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub01",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -1.99,
+        0.73,
+        2.61
+      ],
+      "rotation_degrees": [
+        0,
+        29,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub02",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -1.35,
+        0.73,
+        2.61
+      ],
+      "rotation_degrees": [
+        0,
+        58,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub03",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        1.55,
+        0.73,
+        2.63
+      ],
+      "rotation_degrees": [
+        0,
+        87,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub04",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.18,
+        0.73,
+        2.63
+      ],
+      "rotation_degrees": [
+        0,
+        116,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub05",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.8,
+        0.73,
+        2.63
+      ],
+      "rotation_degrees": [
+        0,
+        145,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub06",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.9,
+        0.73,
+        -2.25
+      ],
+      "rotation_degrees": [
+        0,
+        174,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub07",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.9,
+        0.73,
+        -1.55
+      ],
+      "rotation_degrees": [
+        0,
+        203,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub08",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.9,
+        0.73,
+        -0.85
+      ],
+      "rotation_degrees": [
+        0,
+        232,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub09",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.9,
+        0.73,
+        -0.15
+      ],
+      "rotation_degrees": [
+        0,
+        261,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub10",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.9,
+        0.73,
+        0.55
+      ],
+      "rotation_degrees": [
+        0,
+        290,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub11",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.9,
+        0.73,
+        1.25
+      ],
+      "rotation_degrees": [
+        0,
+        319,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub12",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.9,
+        0.73,
+        1.95
+      ],
+      "rotation_degrees": [
+        0,
+        348,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub13",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.66,
+        0.73,
+        -1.06
+      ],
+      "rotation_degrees": [
+        0,
+        377,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    },
+    {
+      "name": "GardenShrub14",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.58,
+        0.73,
+        -2.1
+      ],
+      "rotation_degrees": [
+        0,
+        406,
+        0
+      ],
+      "scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "colliders": []
+    }
+  ],
+  "material_overrides": {
+    "floor": {
+      "roughness": 0.76
+    }
+  },
+  "boundaries": [
+    {
+      "name": "meadow_floor",
+      "at": [
+        0,
+        -0.32,
+        0.42
+      ],
+      "size": [
+        8,
+        0.2,
+        8.3
+      ]
+    },
+    {
+      "name": "meadow_front_limit",
+      "at": [
+        0,
+        0.55,
+        4.58
+      ],
+      "size": [
+        8.2,
+        1.8,
+        0.12
+      ]
+    },
+    {
+      "name": "meadow_back_limit",
+      "at": [
+        0,
+        0.55,
+        -3.75
+      ],
+      "size": [
+        8.2,
+        1.8,
+        0.12
+      ]
+    },
+    {
+      "name": "meadow_left_limit",
+      "at": [
+        -4.02,
+        0.55,
+        0.42
+      ],
+      "size": [
+        0.12,
+        1.8,
+        8.4
+      ]
+    },
+    {
+      "name": "meadow_right_limit",
+      "at": [
+        4.02,
+        0.55,
+        0.42
+      ],
+      "size": [
+        0.12,
+        1.8,
+        8.4
+      ]
+    }
+  ],
+  "lighting": {
+    "background": "B8C879",
+    "ambient": "BAC6D0",
+    "ambient_energy": 0.72,
+    "sun_color": "FFE5D0",
+    "sun_energy": 1.22,
+    "sun_position": [
+      6,
+      9,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -0.8
+    ],
+    "angular_distance": 6,
+    "lamps": []
+  },
+  "review_lighting": {
+    "background": "B8C879",
+    "ambient_color": "BAC6D0",
+    "ambient": 0.72,
+    "sun_color": "FFE5D0",
+    "sun": 1.22,
+    "sun_position": [
+      6,
+      9,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -0.8
+    ],
+    "points": []
+  },
+  "spawn": [
+    0.15,
+    -0.2,
+    4.15
+  ],
+  "bench": {
+    "floor_y": -0.22,
+    "route": [
+      {
+        "name": "path",
+        "position": [
+          0.15,
+          -0.2,
+          3.85
+        ]
+      },
+      {
+        "name": "lower_step",
+        "position": [
+          0.15,
+          -0.17,
+          3.23
+        ]
+      },
+      {
+        "name": "entrance",
+        "position": [
+          0.15,
+          0.06,
+          2.18
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "between_tables",
+        "position": [
+          0,
+          0.06,
+          0.69
+        ]
+      },
+      {
+        "name": "counter",
+        "position": [
+          0,
+          0.06,
+          -0.33
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "left_tree_bed",
+        "position": [
+          -2.0,
+          0.06,
+          -0.33
+        ]
+      },
+      {
+        "name": "counter_return",
+        "position": [
+          0,
+          0.06,
+          -0.33
+        ]
+      },
+      {
+        "name": "right_tree_bed",
+        "position": [
+          2.2,
+          0.06,
+          -0.33
+        ]
+      },
+      {
+        "name": "center_return",
+        "position": [
+          0,
+          0.06,
+          -0.33
+        ]
+      },
+      {
+        "name": "door_return",
+        "position": [
+          0.15,
+          0.06,
+          2.15
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "counter",
+        "from": [
+          0,
+          0.06,
+          -0.28
+        ],
+        "to": [
+          0,
+          0.06,
+          -1.3
+        ],
+        "target": "/serving_counter/"
+      },
+      {
+        "name": "left_table",
+        "from": [
+          -1.45,
+          0.06,
+          -0.25
+        ],
+        "to": [
+          -1.45,
+          0.06,
+          0.65
+        ],
+        "target": "/round_table/"
+      },
+      {
+        "name": "tree_bed",
+        "from": [
+          2.35,
+          0.06,
+          -0.55
+        ],
+        "to": [
+          2.35,
+          0.06,
+          -1.8
+        ],
+        "target": "/stone_tree_bed_1/"
+      },
+      {
+        "name": "stone_wall",
+        "from": [
+          2.55,
+          0.06,
+          0
+        ],
+        "to": [
+          3.55,
+          0.06,
+          0
+        ],
+        "target": "/side_low_wall/"
+      },
+      {
+        "name": "meadow_edge",
+        "from": [
+          0.15,
+          -0.2,
+          4.17
+        ],
+        "to": [
+          0.15,
+          -0.2,
+          5.3
+        ],
+        "target": "meadow_front_limit"
+      },
+      {
+        "name": "meadow_side",
+        "from": [
+          3.6,
+          -0.2,
+          3.35
+        ],
+        "to": [
+          4.7,
+          -0.2,
+          3.35
+        ],
+        "target": "meadow_right_limit"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "chairs_center",
+        "from": [
+          0,
+          0.06,
+          1.8
+        ],
+        "to": [
+          0,
+          0.06,
+          -0.26
+        ],
+        "measure": [
+          [
+            -0.41,
+            0.7,
+            0.945
+          ],
+          [
+            0.41,
+            0.7,
+            0.945
+          ]
+        ],
+        "width": 0.82,
+        "minimum": 0.7
+      },
+      {
+        "name": "table_counter",
+        "from": [
+          -1.45,
+          0.06,
+          -0.31
+        ],
+        "to": [
+          1.6,
+          0.06,
+          -0.31
+        ],
+        "measure": [
+          [
+            -1.45,
+            0.7,
+            -0.74
+          ],
+          [
+            -1.45,
+            0.7,
+            0.1
+          ]
+        ],
+        "width": 0.84,
+        "minimum": 0.7
+      },
+      {
+        "name": "entrance",
+        "from": [
+          0.15,
+          0.06,
+          2.18
+        ],
+        "to": [
+          0.15,
+          -0.17,
+          3.25
+        ],
+        "measure": [
+          [
+            -0.77,
+            0.6,
+            2.68
+          ],
+          [
+            1.08,
+            0.6,
+            2.68
+          ]
+        ],
+        "width": 1.85,
+        "minimum": 0.7
+      }
+    ],
+    "entrance": {
+      "inside": [
+        0.15,
+        0.06,
+        2.15
+      ],
+      "outside": [
+        0.15,
+        -0.19,
+        3.32
+      ]
+    },
+    "slide": {
+      "from": [
+        2.6,
+        0.06,
+        0
+      ],
+      "direction": [
+        1,
+        0,
+        -1
+      ],
+      "tangent": [
+        0,
+        0,
+        -1
+      ],
+      "seconds": 0.65
+    },
+    "input_start": [
+      0,
+      0.06,
+      -0.31
+    ],
+    "scale": {
+      "door": {
+        "height": 2.63,
+        "source": "Side arch clear apex 1.96+.67"
+      },
+      "counter": {
+        "height": 1.2005,
+        "source": "Stone worktop 1.1905+.06-.05"
+      },
+      "chair": {
+        "height": 0.6904,
+        "source": "Wicker seat cushion (.57+.06)*1.08+.06-.05"
+      },
+      "table": {
+        "height": 1.03785,
+        "source": "Stone tabletop (.80+.0425)*1.22+.06-.05"
+      }
+    }
+  },
+  "render_batches": [
+    {
+      "name": "botanical",
+      "file": "res://assets/rooms/coffee_shop_0/batches/review_botanical.glb",
+      "material": "room",
+      "sources": [
+        "grass_base",
+        "blue_vase_flowers",
+        "grass_clump",
+        "blue_vase_flowers_2",
+        "grass_clump_00",
+        "grass_clump_01",
+        "grass_clump_02",
+        "grass_clump_03",
+        "grass_clump_04",
+        "grass_clump_05",
+        "grass_clump_06",
+        "grass_clump_07",
+        "grass_clump_08",
+        "grass_clump_09",
+        "grass_clump_10",
+        "grass_clump_11",
+        "grass_clump_12",
+        "grass_clump_13",
+        "grass_clump_14",
+        "grass_clump_15",
+        "grass_clump_16",
+        "grass_clump_17",
+        "grass_clump_18",
+        "grass_clump_19",
+        "grass_clump_20",
+        "grass_clump_21",
+        "grass_clump_22",
+        "grass_clump_23",
+        "grass_clump_24",
+        "grass_clump_25",
+        "grass_clump_26",
+        "grass_clump_27",
+        "grass_clump_28",
+        "grass_clump_29",
+        "grass_clump_30",
+        "grass_clump_31",
+        "grass_clump_32",
+        "grass_clump_33",
+        "grass_clump_34",
+        "grass_clump_35",
+        "grass_clump_36",
+        "grass_clump_37",
+        "grass_clump_38",
+        "grass_clump_39",
+        "grass_clump_40"
+      ],
+      "triangles": 10262,
+      "cast_shadow": false
+    },
+    {
+      "name": "back_dressing",
+      "file": "res://assets/rooms/coffee_shop_0/batches/review_back_dressing.glb",
+      "material": "room",
+      "sources": [
+        "back_crenellations",
+        "sink",
+        "espresso_machine",
+        "coffee_grinder",
+        "pastry_case",
+        "supply_shelf",
+        "cookie_jars"
+      ],
+      "triangles": 15820,
+      "cast_shadow": true
+    },
+    {
+      "name": "front_dressing",
+      "file": "res://assets/rooms/coffee_shop_0/batches/review_front_dressing.glb",
+      "material": "room",
+      "sources": [
+        "left_crenellations",
+        "service_tray",
+        "counter_chalkboard",
+        "table_cup",
+        "sleeping_cat",
+        "counter_cat",
+        "garden_stepping_stones",
+        "street_signboard",
+        "calico_cat",
+        "seated_cat",
+        "service_tray_2"
+      ],
+      "triangles": 13124,
+      "cast_shadow": true
+    },
+    {
+      "name": "glass",
+      "file": "res://assets/rooms/coffee_shop_0/batches/review_glass.glb",
+      "material": "glass",
+      "sources": [
+        "display_glass"
+      ],
+      "triangles": 8,
+      "cast_shadow": false
+    },
+    {
+      "name": "large_plants",
+      "file": "res://assets/rooms/coffee_shop_0/batches/review_large_plants.glb",
+      "material": "plants",
+      "sources": [
+        "FruitTreeLeft",
+        "FruitTreeRight",
+        "ArchPeaceLily"
+      ],
+      "triangles": 5794,
+      "cast_shadow": true
+    },
+    {
+      "name": "back_plants",
+      "file": "res://assets/rooms/coffee_shop_0/batches/review_back_plants.glb",
+      "material": "plants",
+      "sources": [
+        "ShelfPothos",
+        "GardenShrub06",
+        "GardenShrub07",
+        "GardenShrub13",
+        "GardenShrub14"
+      ],
+      "triangles": 11656,
+      "cast_shadow": false
+    },
+    {
+      "name": "front_plants",
+      "file": "res://assets/rooms/coffee_shop_0/batches/review_front_plants.glb",
+      "material": "plants",
+      "sources": [
+        "GardenShrub00",
+        "GardenShrub01",
+        "GardenShrub02",
+        "GardenShrub03",
+        "GardenShrub04",
+        "GardenShrub05",
+        "GardenShrub08",
+        "GardenShrub09",
+        "GardenShrub10",
+        "GardenShrub11",
+        "GardenShrub12"
+      ],
+      "triangles": 26422,
+      "cast_shadow": false
+    }
+  ]
 }

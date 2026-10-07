@@ -12,7 +12,7 @@ def build(slug):
         group='glass' if mat=='glass' else 'botanical' if any(x in name for x in ['flower','bouquet','leaves','grass']) else 'back_dressing' if a['position'][2]<-1 else 'front_dressing'
         groups.setdefault((group,mat),[]).append({**a,'file':'res://assets/rooms/'+slug+'/'+source['file']})
     for a in d.get('shared_plants',[]):
-        group='large_plants' if a['colliders'] else 'back_plants' if a['position'][2]<-1 else 'front_plants'
+        group='large_plants' if a['colliders'] or a.get('cast_shadow',False) else 'back_plants' if a['position'][2]<-1 else 'front_plants'
         groups.setdefault((group,'plants'),[]).append(a)
     batches=[]
     for (name,mat),placements in groups.items():

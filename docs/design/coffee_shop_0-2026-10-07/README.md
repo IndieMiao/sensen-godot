@@ -1,52 +1,34 @@
-# Coffee Shop 0 — SGODOT-181
+# SGODOT-181 · Courtyard Cat Café · 刘备 R1 修订
 
-Review draft produced by 刘备 on 2026-10-07. User art approval is pending; Plane remains In Progress.
+依据 Figma `545:2955` 原图和不知火舞本卡评论。179 R2 放行后接入共享植物 R2.1；Basic Room 现有比例保留，技术通过不替代美术总监验收。
 
-## Reference and visual scope
+| Review 项 | 本轮处理 |
+|---|---|
+| 石墙、城垛 | 大块错缝砂岩、圆角凸面、两面各 7 个大城垛，奶油压顶；后墙两处真实拱形凹龛。 |
+| 铺地 | 大块奶油石板，行间错缝和轻微颜色变化；草地岛上 42 簇草、10 块不规则踏脚石与烘焙草地色块。 |
+| 两棵果树 | 共享果树各 1.16 倍，石砌花坛与碰撞独立，两棵大树保留投影。 |
+| 白花围墙 | 15 簇共享半球花丛，重叠覆盖前沿与右墙；不使用长茎代替花团。另有白掌与架上绿萝。 |
+| 桌椅与咖啡台 | 白垫藤编椅、白桌面、木台、透明糕点柜、咖啡机、磨豆机、杯盘、罐子与蓝花瓶。 |
+| 四只猫 | 入口灰色睡猫、台上橘色趴猫、地面站立三花、前方灰白坐猫；独立命名模型，无动态宠物行为。 |
+| 入口与边界 | 两级石阶、条纹垫、连续坡道、草坪四边封闭碰撞。右侧墙碰撞延伸到真实可见压顶，修复角色碰撞测试漏检。 |
 
-Actual Figma export: file `OMLTC3yw3u2WDjOZhLnhaR`, node `545:2955`.
-[Reference](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=545-2955). Local export SHA-256: `16d1ad0bd5a2f98c517b156bffd7730474009cd5f8e1e852e229694de21610a2`.
-The full image was inspected before modeling. Geometry is original; unshown backs, depths and metre dimensions are inferred.
+草簇每簇 **42 个三角面**（7 片双面折叶），低于 50 上限。共享花丛每簇 **2,402 个三角面**，低于 4,000 上限。花草、藤、桌花关闭投影，大树可投影；低面数不会用稀疏摆放抵消密度要求。按材质/位置组合并，保留独立 GLB 和源命名部件，不修改共享测试核心。
 
-![Reference and runtime comparison](comparison.png)
+Basic Room 不变，台面 1.2005m、椅面 0.6904m、桌面 1.03785m、侧拱净高 2.63m。同类尺寸均在 ±15%；椅间净宽 0.82m、桌与柜台 0.84m、入口 1.85m，由真实物理射线和角色行走验证。草坪高度与门内石坪不同，入口坡道连接两者。
 
-## Deliverables and rebuild
+当前摆放总面数 **132,026**，其中植物 **54,134**，静态 surface **29**，均在 200,000 / 100,000 / 60 上限内。角色检查 **37/37 PASS**。石墙 / 石坪 / 草地色相差分别 **4.21° / 9.37° / 6.95°**，均小于 10°。交付记录见本目录 JSON；色板使用声明的对应物理表面 9×9 像素中位数，三栏对比为完整原图 / 完整运行时 / 50% 直接叠图，没有变形配准。15 秒实际 Godot Mobile/Vulkan 视口原速录像，不是 Android 或实机性能结论。
 
-- Editable named Blender objects/collections: `tools/art/source/coffee_shop_0/coffee_shop_0.blend`.
-- Generator: `tools/art/build_coffee_shop_0.py`; shared helpers remain in the Coffee Shop source directory. Basic Room is unchanged.
-- Runtime modules, atlas, layout/collisions and budget: `assets/rooms/coffee_shop_0/`.
-- Reusable art scene: `scenes/coffee_shop_0/coffee_shop_0_art.tscn`. Contains artwork and simple box collisions only.
-- Godot metres, Y up, front +Z; each GLB has its own floor/mount pivot. Repeated objects use the same GLB.
+重建：
 
 ```sh
-blender --background --factory-startup --python "$PWD/tools/art/build_coffee_shop_0.py"
-python3 tools/art/render_shop_review.py coffee_shop_0
+blender -b -t 8 --python tools/art/build_coffee_shop_0.py
+python tools/art/source/coffee_shop/render_r1.py r1 coffee_shop_0
+python tools/art/source/coffee_shop/run_bench.py coffee_shop_0 --record
+output/art-tools/bin/python tools/art/source/coffee_shop/package_series.py coffee_shop_0 r1
+output/art-tools/bin/python tools/art/source/coffee_shop/check_series_colour.py coffee_shop_0 r1
+output/art-tools/bin/python tools/art/source/coffee_shop/prepare_series_media.py coffee_shop_0 r1
 ```
 
-For manual source edits, use `-- --bake-only` to rebake/export the saved source. A full rebuild overwrites the generated `.blend`; preserve intentional edits first.
-The renderer needs the current host's legitimate DISPLAY/XAUTHORITY. Pillow is needed only for packaging comparison images.
+可编辑源 `tools/art/source/coffee_shop_0/coffee_shop_0.blend`；修订与通行定义在同目录 `revision.py` / `courtyard_bench.py`。源中保留共享植物实例和局部轴心，材质表面细节烘入房间图集，共享植物使用全系列图集。
 
-## Asset budget
-
-| Metric | Value |
-|---|---:|
-| Unique GLBs / placed instances | 34 / 49 |
-| Unique / placed triangles | 98,995 / 151,377 |
-| Static mesh surfaces | 49 |
-| Shared atlas | 2048 × 2048, mipmaps + VRAM compression |
-| GLB bytes, total | 2,756,180 |
-| Atlas PNG bytes | 3,720,307 |
-
-One shared matte atlas material; separate soft translucent material for glass modules where present. Color/surface detail and softened contact AO are baked; direct lighting remains dynamic. Padded palette swatches protect subpixel detail from black seams. Major rearrangements require rebaking contact AO.
-
-## Verification and limits
-
-Blender 5.2.2 LTS; Godot 4.7.2 Mobile/Vulkan on `AMD Custom GPU 0405 (RADV VANGOGH)`. All 34 GLBs pass container/mesh/surface checks and contain no duplicated embedded images; the assembled render contains all 49 instances. Whole/detail/front/side/top images rendered at 1400 × 1400. Source import settings are retained beside the atlas.
-
-The images are real Godot renders of the exported models. No Android, character/movement benchmark, gameplay integration, release or physical-phone performance claim is part of these art-only cards.
-
-Differences / inferred choices: Orange-tree crowns, cats and vegetation are simplified stylized geometry; cats are static decorations without rigs or animation. Stone joints and planting are more regular than the reference. Grass uses a bounded rounded base with sparse tufts instead of the reference’s surrounding meadow. The U-shaped work area, cabinet backs and metre dimensions are inferred. The sink has an actual countertop aperture and recessed lining.
-
-![Actual model orthographic views](orthographic.png)
-
-Delivery: Lark self-review messages and downloaded-attachment verification are recorded privately under `output/coffee_shop_0/delivery/`; no chat identifiers or credentials are committed.
+待视觉复审：参考果树的树冠更层叠密实，当前是共享库枝叶形态；猫的轮廓和毛色为简化静态造型；柜台和两组桌子的构图仍不同于原图；草地使用局部地台，没有无限背景草甸；桌面和压顶的明度仍需总监判断。没有宣称逐像素还原。

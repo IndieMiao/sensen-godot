@@ -1,0 +1,266 @@
+{
+  "revision": "r1",
+  "reference_sha256": "16d1ad0bd5a2f98c517b156bffd7730474009cd5f8e1e852e229694de21610a2",
+  "renderer": {
+    "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "draw_calls": 27.0,
+    "instances": 105,
+    "renderer": "mobile",
+    "resolution": [
+      1400,
+      1400
+    ],
+    "scope": "offline art render; no mobile/gameplay/performance acceptance",
+    "slug": "coffee_shop_0",
+    "static_surfaces": 29,
+    "views": [
+      {
+        "draw_calls": 31.0,
+        "rendered_objects": 31.0,
+        "view": "godot-whole"
+      },
+      {
+        "draw_calls": 31.0,
+        "rendered_objects": 31.0,
+        "view": "model-front"
+      },
+      {
+        "draw_calls": 31.0,
+        "rendered_objects": 31.0,
+        "view": "model-side"
+      },
+      {
+        "draw_calls": 31.0,
+        "rendered_objects": 31.0,
+        "view": "model-top"
+      },
+      {
+        "draw_calls": 26.0,
+        "rendered_objects": 26.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 27.0,
+        "rendered_objects": 27.0,
+        "view": "godot-detail-plants"
+      }
+    ]
+  },
+  "budget": {
+    "after": {
+      "room_triangles": 88154,
+      "shared_plant_triangles": 43872,
+      "room_botanical_triangles": 10262,
+      "plant_triangles": 54134,
+      "total_triangles": 132026,
+      "static_surfaces": 29
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "grass_base",
+          "blue_vase_flowers",
+          "grass_clump",
+          "blue_vase_flowers_2",
+          "grass_clump_00",
+          "grass_clump_01",
+          "grass_clump_02",
+          "grass_clump_03",
+          "grass_clump_04",
+          "grass_clump_05",
+          "grass_clump_06",
+          "grass_clump_07",
+          "grass_clump_08",
+          "grass_clump_09",
+          "grass_clump_10",
+          "grass_clump_11",
+          "grass_clump_12",
+          "grass_clump_13",
+          "grass_clump_14",
+          "grass_clump_15",
+          "grass_clump_16",
+          "grass_clump_17",
+          "grass_clump_18",
+          "grass_clump_19",
+          "grass_clump_20",
+          "grass_clump_21",
+          "grass_clump_22",
+          "grass_clump_23",
+          "grass_clump_24",
+          "grass_clump_25",
+          "grass_clump_26",
+          "grass_clump_27",
+          "grass_clump_28",
+          "grass_clump_29",
+          "grass_clump_30",
+          "grass_clump_31",
+          "grass_clump_32",
+          "grass_clump_33",
+          "grass_clump_34",
+          "grass_clump_35",
+          "grass_clump_36",
+          "grass_clump_37",
+          "grass_clump_38",
+          "grass_clump_39",
+          "grass_clump_40"
+        ],
+        "triangles": 10262,
+        "cast_shadow": false
+      },
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "back_crenellations",
+          "sink",
+          "espresso_machine",
+          "coffee_grinder",
+          "pastry_case",
+          "supply_shelf",
+          "cookie_jars"
+        ],
+        "triangles": 15820,
+        "cast_shadow": true
+      },
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "left_crenellations",
+          "service_tray",
+          "counter_chalkboard",
+          "table_cup",
+          "sleeping_cat",
+          "counter_cat",
+          "garden_stepping_stones",
+          "street_signboard",
+          "calico_cat",
+          "seated_cat",
+          "service_tray_2"
+        ],
+        "triangles": 13124,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "display_glass"
+        ],
+        "triangles": 8,
+        "cast_shadow": false
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "FruitTreeLeft",
+          "FruitTreeRight",
+          "ArchPeaceLily"
+        ],
+        "triangles": 5794,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "ShelfPothos",
+          "GardenShrub06",
+          "GardenShrub07",
+          "GardenShrub13",
+          "GardenShrub14"
+        ],
+        "triangles": 11656,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "GardenShrub00",
+          "GardenShrub01",
+          "GardenShrub02",
+          "GardenShrub03",
+          "GardenShrub04",
+          "GardenShrub05",
+          "GardenShrub08",
+          "GardenShrub09",
+          "GardenShrub10",
+          "GardenShrub11",
+          "GardenShrub12"
+        ],
+        "triangles": 26422,
+        "cast_shadow": false
+      }
+    ]
+  },
+  "glb_checks": {
+    "passed": true,
+    "single_surface_no_embedded_images": true,
+    "files": [
+      "assets/rooms/_shared/plants/flower_shrub.glb",
+      "assets/rooms/_shared/plants/fruit_tree.glb",
+      "assets/rooms/_shared/plants/peace_lily.glb",
+      "assets/rooms/_shared/plants/pothos.glb",
+      "assets/rooms/coffee_shop_0/back_cabinet.glb",
+      "assets/rooms/coffee_shop_0/back_crenellations.glb",
+      "assets/rooms/coffee_shop_0/back_wall.glb",
+      "assets/rooms/coffee_shop_0/batches/review_back_dressing.glb",
+      "assets/rooms/coffee_shop_0/batches/review_back_plants.glb",
+      "assets/rooms/coffee_shop_0/batches/review_botanical.glb",
+      "assets/rooms/coffee_shop_0/batches/review_front_dressing.glb",
+      "assets/rooms/coffee_shop_0/batches/review_front_plants.glb",
+      "assets/rooms/coffee_shop_0/batches/review_glass.glb",
+      "assets/rooms/coffee_shop_0/batches/review_large_plants.glb",
+      "assets/rooms/coffee_shop_0/blue_vase_flowers.glb",
+      "assets/rooms/coffee_shop_0/calico_cat.glb",
+      "assets/rooms/coffee_shop_0/chair.glb",
+      "assets/rooms/coffee_shop_0/coffee_grinder.glb",
+      "assets/rooms/coffee_shop_0/cookie_jars.glb",
+      "assets/rooms/coffee_shop_0/corner_pier.glb",
+      "assets/rooms/coffee_shop_0/counter_cat.glb",
+      "assets/rooms/coffee_shop_0/counter_chalkboard.glb",
+      "assets/rooms/coffee_shop_0/counter_return.glb",
+      "assets/rooms/coffee_shop_0/display_glass.glb",
+      "assets/rooms/coffee_shop_0/entry_step.glb",
+      "assets/rooms/coffee_shop_0/espresso_machine.glb",
+      "assets/rooms/coffee_shop_0/floor.glb",
+      "assets/rooms/coffee_shop_0/front_wall_left.glb",
+      "assets/rooms/coffee_shop_0/front_wall_right.glb",
+      "assets/rooms/coffee_shop_0/garden_stepping_stones.glb",
+      "assets/rooms/coffee_shop_0/grass_base.glb",
+      "assets/rooms/coffee_shop_0/grass_clump.glb",
+      "assets/rooms/coffee_shop_0/left_crenellations.glb",
+      "assets/rooms/coffee_shop_0/left_door_wall.glb",
+      "assets/rooms/coffee_shop_0/pastry_case.glb",
+      "assets/rooms/coffee_shop_0/round_table.glb",
+      "assets/rooms/coffee_shop_0/seated_cat.glb",
+      "assets/rooms/coffee_shop_0/service_tray.glb",
+      "assets/rooms/coffee_shop_0/serving_counter.glb",
+      "assets/rooms/coffee_shop_0/side_low_wall.glb",
+      "assets/rooms/coffee_shop_0/sink.glb",
+      "assets/rooms/coffee_shop_0/sleeping_cat.glb",
+      "assets/rooms/coffee_shop_0/stone_tree_bed_0.glb",
+      "assets/rooms/coffee_shop_0/stone_tree_bed_1.glb",
+      "assets/rooms/coffee_shop_0/street_signboard.glb",
+      "assets/rooms/coffee_shop_0/supply_shelf.glb",
+      "assets/rooms/coffee_shop_0/table_cup.glb"
+    ]
+  },
+  "visual_acceptance": "Pending art director Review; metrics do not establish reference fidelity."
+}

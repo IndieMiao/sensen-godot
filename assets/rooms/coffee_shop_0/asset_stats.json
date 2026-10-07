@@ -6,239 +6,218 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3720307
+    "bytes": 3630844
   },
   "assets": [
     {
       "name": "floor",
-      "vertices": 9952,
-      "triangles": 19196,
+      "vertices": 3232,
+      "triangles": 6236,
       "surfaces": 1,
-      "bytes": 471116
+      "bytes": 215556
     },
     {
       "name": "back_wall",
-      "vertices": 4592,
-      "triangles": 8856,
+      "vertices": 3068,
+      "triangles": 5940,
       "surfaces": 1,
-      "bytes": 286456
+      "bytes": 224352
     },
     {
       "name": "left_door_wall",
-      "vertices": 4184,
-      "triangles": 8100,
+      "vertices": 2616,
+      "triangles": 5076,
       "surfaces": 1,
-      "bytes": 222024
+      "bytes": 170692
     },
     {
       "name": "front_wall_left",
       "vertices": 616,
       "triangles": 1188,
       "surfaces": 1,
-      "bytes": 42772
+      "bytes": 42260
     },
     {
       "name": "front_wall_right",
       "vertices": 504,
       "triangles": 972,
       "surfaces": 1,
-      "bytes": 35364
+      "bytes": 34852
     },
     {
       "name": "side_low_wall",
       "vertices": 1288,
       "triangles": 2484,
       "surfaces": 1,
-      "bytes": 87440
+      "bytes": 86928
     },
     {
       "name": "corner_pier",
       "vertices": 168,
       "triangles": 324,
       "surfaces": 1,
-      "bytes": 15092
+      "bytes": 12532
     },
     {
       "name": "entry_step",
-      "vertices": 112,
-      "triangles": 216,
+      "vertices": 272,
+      "triangles": 480,
       "surfaces": 1,
-      "bytes": 9064
+      "bytes": 23452
     },
     {
       "name": "grass_base",
-      "vertices": 411,
-      "triangles": 293,
+      "vertices": 96,
+      "triangles": 188,
       "surfaces": 1,
-      "bytes": 18548
+      "bytes": 7196
     },
     {
       "name": "back_crenellations",
-      "vertices": 560,
-      "triangles": 1080,
+      "vertices": 672,
+      "triangles": 1316,
       "surfaces": 1,
-      "bytes": 43716
+      "bytes": 42440
     },
     {
       "name": "left_crenellations",
-      "vertices": 504,
-      "triangles": 972,
+      "vertices": 672,
+      "triangles": 1316,
       "surfaces": 1,
-      "bytes": 39480
+      "bytes": 42440
     },
     {
       "name": "back_cabinet",
       "vertices": 1936,
       "triangles": 3752,
       "surfaces": 1,
-      "bytes": 101464
+      "bytes": 123000
     },
     {
       "name": "serving_counter",
       "vertices": 1368,
       "triangles": 2644,
       "surfaces": 1,
-      "bytes": 73312
+      "bytes": 91232
     },
     {
       "name": "counter_return",
       "vertices": 752,
       "triangles": 1456,
       "surfaces": 1,
-      "bytes": 43656
+      "bytes": 50312
     },
     {
       "name": "sink",
       "vertices": 536,
       "triangles": 1032,
       "surfaces": 1,
-      "bytes": 27776
+      "bytes": 37604
     },
     {
       "name": "espresso_machine",
-      "vertices": 1586,
-      "triangles": 3048,
+      "vertices": 1670,
+      "triangles": 3220,
       "surfaces": 1,
-      "bytes": 77856
+      "bytes": 120680
     },
     {
       "name": "coffee_grinder",
       "vertices": 726,
       "triangles": 1360,
       "surfaces": 1,
-      "bytes": 36336
+      "bytes": 38640
     },
     {
       "name": "pastry_case",
-      "vertices": 1764,
-      "triangles": 3388,
+      "vertices": 2988,
+      "triangles": 5660,
       "surfaces": 1,
-      "bytes": 86328
+      "bytes": 193916
     },
     {
       "name": "display_glass",
-      "vertices": 12,
-      "triangles": 6,
+      "vertices": 16,
+      "triangles": 8,
       "surfaces": 1,
-      "bytes": 1780
+      "bytes": 1920
     },
     {
       "name": "supply_shelf",
       "vertices": 916,
       "triangles": 1776,
       "surfaces": 1,
-      "bytes": 48520
+      "bytes": 65416
     },
     {
       "name": "cookie_jars",
       "vertices": 784,
       "triangles": 1456,
       "surfaces": 1,
-      "bytes": 40836
+      "bytes": 41348
     },
     {
       "name": "service_tray",
       "vertices": 541,
       "triangles": 1054,
       "surfaces": 1,
-      "bytes": 28068
+      "bytes": 41256
     },
     {
       "name": "counter_chalkboard",
       "vertices": 1408,
       "triangles": 1472,
       "surfaces": 1,
-      "bytes": 78068
-    },
-    {
-      "name": "orange_tree",
-      "vertices": 4274,
-      "triangles": 8196,
-      "surfaces": 1,
-      "bytes": 209856
-    },
-    {
-      "name": "flower_border",
-      "vertices": 3002,
-      "triangles": 5672,
-      "surfaces": 1,
-      "bytes": 133384
+      "bytes": 78580
     },
     {
       "name": "chair",
       "vertices": 2097,
       "triangles": 4018,
       "surfaces": 1,
-      "bytes": 98216
+      "bytes": 158184
     },
     {
       "name": "round_table",
       "vertices": 128,
       "triangles": 240,
       "surfaces": 1,
-      "bytes": 11768
+      "bytes": 12024
     },
     {
       "name": "blue_vase_flowers",
       "vertices": 2480,
       "triangles": 4596,
       "surfaces": 1,
-      "bytes": 108952
+      "bytes": 125752
     },
     {
       "name": "table_cup",
       "vertices": 373,
       "triangles": 730,
       "surfaces": 1,
-      "bytes": 19972
+      "bytes": 30084
     },
     {
       "name": "sleeping_cat",
-      "vertices": 1329,
-      "triangles": 2582,
+      "vertices": 657,
+      "triangles": 1236,
       "surfaces": 1,
-      "bytes": 60172
+      "bytes": 45980
     },
     {
       "name": "counter_cat",
-      "vertices": 1329,
-      "triangles": 2582,
+      "vertices": 679,
+      "triangles": 1280,
       "surfaces": 1,
-      "bytes": 60168
-    },
-    {
-      "name": "walking_cat",
-      "vertices": 1329,
-      "triangles": 2582,
-      "surfaces": 1,
-      "bytes": 60168
+      "bytes": 47140
     },
     {
       "name": "garden_stepping_stones",
-      "vertices": 224,
-      "triangles": 432,
+      "vertices": 560,
+      "triangles": 1080,
       "surfaces": 1,
-      "bytes": 15252
+      "bytes": 38600
     },
     {
       "name": "street_signboard",
@@ -246,12 +225,210 @@
       "triangles": 1240,
       "surfaces": 1,
       "bytes": 63200
+    },
+    {
+      "name": "grass_clump",
+      "vertices": 35,
+      "triangles": 21,
+      "surfaces": 1,
+      "bytes": 3104
+    },
+    {
+      "name": "calico_cat",
+      "vertices": 730,
+      "triangles": 1382,
+      "surfaces": 1,
+      "bytes": 48644
+    },
+    {
+      "name": "seated_cat",
+      "vertices": 679,
+      "triangles": 1280,
+      "surfaces": 1,
+      "bytes": 47392
+    },
+    {
+      "name": "stone_tree_bed_0",
+      "vertices": 224,
+      "triangles": 432,
+      "surfaces": 1,
+      "bytes": 16240
+    },
+    {
+      "name": "stone_tree_bed_1",
+      "vertices": 224,
+      "triangles": 432,
+      "surfaces": 1,
+      "bytes": 16240
     }
   ],
-  "unique_triangles": 98995,
-  "scene_triangles": 151377,
-  "static_draw_surfaces": 49,
-  "unique_assets": 34,
-  "placed_instances": 49,
-  "glb_bytes": 2756180
+  "unique_triangles": 68377,
+  "scene_triangles": 88154,
+  "static_draw_surfaces": 86,
+  "unique_assets": 36,
+  "placed_instances": 86,
+  "glb_bytes": 2439188,
+  "scene_budget": {
+    "after": {
+      "room_triangles": 88154,
+      "shared_plant_triangles": 43872,
+      "room_botanical_triangles": 10262,
+      "plant_triangles": 54134,
+      "total_triangles": 132026,
+      "static_surfaces": 29
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "grass_base",
+          "blue_vase_flowers",
+          "grass_clump",
+          "blue_vase_flowers_2",
+          "grass_clump_00",
+          "grass_clump_01",
+          "grass_clump_02",
+          "grass_clump_03",
+          "grass_clump_04",
+          "grass_clump_05",
+          "grass_clump_06",
+          "grass_clump_07",
+          "grass_clump_08",
+          "grass_clump_09",
+          "grass_clump_10",
+          "grass_clump_11",
+          "grass_clump_12",
+          "grass_clump_13",
+          "grass_clump_14",
+          "grass_clump_15",
+          "grass_clump_16",
+          "grass_clump_17",
+          "grass_clump_18",
+          "grass_clump_19",
+          "grass_clump_20",
+          "grass_clump_21",
+          "grass_clump_22",
+          "grass_clump_23",
+          "grass_clump_24",
+          "grass_clump_25",
+          "grass_clump_26",
+          "grass_clump_27",
+          "grass_clump_28",
+          "grass_clump_29",
+          "grass_clump_30",
+          "grass_clump_31",
+          "grass_clump_32",
+          "grass_clump_33",
+          "grass_clump_34",
+          "grass_clump_35",
+          "grass_clump_36",
+          "grass_clump_37",
+          "grass_clump_38",
+          "grass_clump_39",
+          "grass_clump_40"
+        ],
+        "triangles": 10262,
+        "cast_shadow": false
+      },
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "back_crenellations",
+          "sink",
+          "espresso_machine",
+          "coffee_grinder",
+          "pastry_case",
+          "supply_shelf",
+          "cookie_jars"
+        ],
+        "triangles": 15820,
+        "cast_shadow": true
+      },
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "left_crenellations",
+          "service_tray",
+          "counter_chalkboard",
+          "table_cup",
+          "sleeping_cat",
+          "counter_cat",
+          "garden_stepping_stones",
+          "street_signboard",
+          "calico_cat",
+          "seated_cat",
+          "service_tray_2"
+        ],
+        "triangles": 13124,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "display_glass"
+        ],
+        "triangles": 8,
+        "cast_shadow": false
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "FruitTreeLeft",
+          "FruitTreeRight",
+          "ArchPeaceLily"
+        ],
+        "triangles": 5794,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "ShelfPothos",
+          "GardenShrub06",
+          "GardenShrub07",
+          "GardenShrub13",
+          "GardenShrub14"
+        ],
+        "triangles": 11656,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/coffee_shop_0/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "GardenShrub00",
+          "GardenShrub01",
+          "GardenShrub02",
+          "GardenShrub03",
+          "GardenShrub04",
+          "GardenShrub05",
+          "GardenShrub08",
+          "GardenShrub09",
+          "GardenShrub10",
+          "GardenShrub11",
+          "GardenShrub12"
+        ],
+        "triangles": 26422,
+        "cast_shadow": false
+      }
+    ]
+  }
 }

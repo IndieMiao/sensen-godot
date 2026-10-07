@@ -127,10 +127,19 @@ def geometry():
     begin('garden_stepping_stones',at=(.10,-.13,3.24))
     for j in range(4):cube('Garden stepping stone',((-.18 if j%2 else .16),-.07,j*.35),(.40,.09,.29),'plaster',.08)
     s.signboard(at=(-1.56,.02,3.13),lines=('COFFEE','& CAKE'))
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('courtyard_revision',Path(__file__).resolve().parent/'source/coffee_shop_0/revision.py')
+    rev=importlib.util.module_from_spec(spec);spec.loader.exec_module(rev)
+    sys.path.insert(0,str(Path(__file__).resolve().parent/'source/coffee_shop_0'))
+    rev.revise()
     k.save('545:2955',{'position':[10,10,12],'target':[0,1.0,.45],'size':12.0})
+    rev.manifest()
 
 if __name__=='__main__':
     k.configure('coffee_shop_0');args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
     if '--bake-only' in args:k.load()
     else:geometry()
-    if '--geometry-only' not in args:k.bake_and_export()
+    if '--geometry-only' not in args:k.bake_and_export(ao_strength=.45,ao_distance=.38,coherent_swatches=True)
+    if '--geometry-only' not in args:
+        from series_batch import build
+        build('coffee_shop_0')

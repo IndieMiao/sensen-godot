@@ -1,0 +1,21 @@
+{
+  "programs": [],
+  "stream_groups": [],
+  "streams": [
+    {
+      "codec_name": "h264",
+      "width": 960,
+      "height": 720
+    }
+  ],
+  "format": {
+    "duration": "15.000000"
+  },
+  "capture": "Godot rendered viewport; wall-clock frame timestamps",
+  "accelerated": false,
+  "captured_frames": 234,
+  "capture_intervals_seconds": {
+    "mean": 0.06453945493562231,
+    "max": 0.06739299999999915
+  }
+}
