@@ -1,0 +1,189 @@
+{
+  "card": 175,
+  "revision": "R2",
+  "commit": "f4b88a42",
+  "plane": {
+    "comment_id": "7756cee1-943e-4a0f-823d-6e2bcb36774e",
+    "state": "Review",
+    "commit": "f4b88a42",
+    "attachments": 23
+  },
+  "attachments": [
+    {
+      "name": "bakery-R2-README.md",
+      "id": "3e512d01-0050-4a07-b49b-a47bea0daf6f",
+      "sha256": "1d3bfaf5bb0a46d609e7e907df843a2cc595c01b7a810744bfd981fe54425600",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-bench-collisions.png",
+      "id": "08a353b9-8483-47f3-9d5f-ad058cc62eee",
+      "sha256": "10fcde196ee58e48603157d9bada8fdb22fa97cd55c5118f4dd4039270aeefe6",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-bench-door.png",
+      "id": "9432180d-c652-4fc4-bd7e-f6db61512bdc",
+      "sha256": "4a52ea39ca378f67e5ecca41d9b28968f6653cc2ac3bee4b6e5bd340b4b63135",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-bench-main.png",
+      "id": "2269016f-a7cb-4c1b-98b3-df57f4a8428a",
+      "sha256": "2c9665a39d18e0abb99948d179bfa73ef126b7abcb65608daa363da0477eef9a",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-bench-record-result.json",
+      "id": "0c05ef67-3543-413b-9df0-c959a1222740",
+      "sha256": "7735bd135833ed745dd5d3ba4f689cfa09b8bb7656e44af322f3534692d13127",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-bench-result.json",
+      "id": "cd2fbb12-05f6-4716-9a6b-7d143edd7799",
+      "sha256": "4970b59bf4fb3ae22a9bf66abe42976992fab0f326c1ee17099b8708d774e895",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-bench-scale-measurements.json",
+      "id": "95cc5f5f-5d6f-4432-9353-69eb7dce3991",
+      "sha256": "fb9f848c973455bdf6143daea1f4975964c6a3b18993774498a7106588090d2a",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-bench-spawn.png",
+      "id": "422d2353-2735-4a1f-a2e2-fd7048f813a0",
+      "sha256": "cb30365ccf015d8cafd6e88297913fdda8ceead6cd998910b82f201d5032c7b4",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-bench-video-metadata.json",
+      "id": "ccb49e1c-b5ac-4bbe-bef8-2ca7558f4a94",
+      "sha256": "078611d616652a9ad0458f0949433b430c7adb8e1638b14a302334c5f4929a99",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-cloth-uv-verification.json",
+      "id": "9b714ad3-c003-4a72-8306-293d801fcb66",
+      "sha256": "1fd842d29c9fbf119abed1153333faa02c4d6814f44768f5ad324fd94be63c5b",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-colour-samples.png",
+      "id": "ef98052f-bd7c-48fb-b2b1-a69e4bea657c",
+      "sha256": "c16a0f054623c02be343f72b4f5cfe7b53fed2ced317ae11e3030cb68bdcf6bc",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-colour-verification.json",
+      "id": "9da3a6db-b2ac-4470-b207-cba26535b9d8",
+      "sha256": "b61e3e2a9dc5333bd205b278af8be1a8ac87ff438dcdf4656a130fadea11893b",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-comparison.png",
+      "id": "7c406e32-c5d2-43da-bacf-7bdcbe2f7191",
+      "sha256": "0c3db0fe2d1eb44f0af70aacf18f006871fec26a978822adfb215afd1be630e4",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-detail-oven.png",
+      "id": "da0b4172-3111-425f-b1ab-4a0636f523ef",
+      "sha256": "707c562c18834a006069fc9719b139c7f2a42811d5fadbcffee0173d1f6ffb8e",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-detail-pastries.png",
+      "id": "75e5c4ad-2f51-4649-b25f-f5f0952fc5f5",
+      "sha256": "773b1ebddc5d352467337ca5365ed9bfb5b6a4cb279d00cf90e44d4a1f58d9c7",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-godot.png",
+      "id": "c4bf9f49-b23a-4ce4-9b50-d5a4c36e958a",
+      "sha256": "3934a578f671ea943c1230b099b02922906217d6791cf44ab7c78e141532f479",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-orthographic-sheet.png",
+      "id": "e4ef03d9-0b53-4790-a6ce-95900e2e2ef6",
+      "sha256": "c2a52037088a80d9caf6273ec26d8033f5961ce91cabc667337c0fbfa5a35315",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-overlay-50.png",
+      "id": "530e80a0-50a5-448f-842c-f1f304b51d15",
+      "sha256": "a641d76774fbae567c3f589b48e14bc3e3e4d6dd80da83efa95c1b4ccc9b0b6a",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-production-notes.json",
+      "id": "dd090351-8427-464c-ab99-de6e882e393a",
+      "sha256": "12a98a09c9d824903769d8684297b6e586e7469c927b04707aa99b17c7c41adb",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-source-scale.json",
+      "id": "15e37272-7385-4ce2-a025-54f1888a619f",
+      "sha256": "cc10dde5e2175e167b68bf5749deb4239cd0bbf3458ab793dfa959f1433a030a",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-verification-summary.json",
+      "id": "aa9f8c8f-807c-488d-a61b-20c05fd2e8c8",
+      "sha256": "c6dcdc23684a9c182bc879274912f129b6441c17ebc04a0015d5cfa362fb4cec",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-video-frames.png",
+      "id": "e62eacf4-63de-439c-b299-6389721f4c47",
+      "sha256": "92b5935d015ec3d86ebcdd8383b21dae18f6ccf1620cc573679e58f7f28539f8",
+      "verified": true
+    },
+    {
+      "name": "bakery-R2-walkthrough.mp4",
+      "id": "7e3aecbd-ddb1-4c0f-8ce7-211fc311f5fb",
+      "sha256": "c869718d4209b006b86edf74d047f75c097480e02aa340aa8be46e3479c0c985",
+      "verified": true
+    }
+  ],
+  "lark": [
+    {
+      "name": "note",
+      "message_id": "om_x100b6351b71024a0c32b0a911bf96b2",
+      "download_verified": null,
+      "sha256": null
+    },
+    {
+      "name": "image-0",
+      "message_id": "om_x100b6351b4965ca4c3e42324b4a7c4a",
+      "download_verified": true,
+      "sha256": "0c3db0fe2d1eb44f0af70aacf18f006871fec26a978822adfb215afd1be630e4"
+    },
+    {
+      "name": "image-1",
+      "message_id": "om_x100b6351b40a28a0c3ae7f080382192",
+      "download_verified": true,
+      "sha256": "707c562c18834a006069fc9719b139c7f2a42811d5fadbcffee0173d1f6ffb8e"
+    },
+    {
+      "name": "image-2",
+      "message_id": "om_x100b6351b43faca8c4f79807e729084",
+      "download_verified": true,
+      "sha256": "773b1ebddc5d352467337ca5365ed9bfb5b6a4cb279d00cf90e44d4a1f58d9c7"
+    },
+    {
+      "name": "image-3",
+      "message_id": "om_x100b6351b5c618a4c00ad1c4e59cb60",
+      "download_verified": true,
+      "sha256": "2c9665a39d18e0abb99948d179bfa73ef126b7abcb65608daa363da0477eef9a"
+    },
+    {
+      "name": "video",
+      "message_id": "om_x100b6351b5a524a4c4b24a1751cb3e5",
+      "download_verified": true,
+      "sha256": "c869718d4209b006b86edf74d047f75c097480e02aa340aa8be46e3479c0c985"
+    }
+  ]
+}
