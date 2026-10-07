@@ -125,6 +125,8 @@ def revise():
     begin('entrance_sky',at=(-3.18,.06,1.96),yaw=90)
     k.arch_solid('Sky seen through boutique entrance',1.34,.025,2.13,.34,.012,0,'A6CDDA')
     for j in range(7):ellipsoid('Garden canopy silhouette',(-.60+j*.20,.56+(j%3)*.14,.016),(.48,.52,.018),['8FB8AA','A9C5A3','A7CAB6'][j%3],8,4)
+    from revision2 import revise as revise_r2
+    revise_r2()
     r.sync_instances()
 
 def manifest():
@@ -135,4 +137,7 @@ def manifest():
     r.lighting(d,'DFA571',ambient='C6B4BB',sun='FFE2C9',energy=1.10,lamps=[{'position':[-1.63,2.9,-1.94],'color':'FFE3B6','energy':.70,'range':2.1}]+[{'position':p,'color':'FFE6BF','energy':.42,'range':1.25} for p in [[-.88,2,-2.3],[-2.60,1.68,2.64],[-2.35,2.05,-2.3],[2.70,1.92,-2.3]]])
     d['lighting']['sun_position']=[6,9,4];d['review_lighting']['sun_position']=[6,9,4];d['camera']={'position':[10,10,12],'target':[0,1.28,.08],'size':10.4}
     from boutique_bench import bench
-    bench(d);p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)
+    bench(d)
+    from revision2 import manifest as manifest_r2
+    manifest_r2(d)
+    p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)

@@ -1,34 +1,31 @@
-# SGODOT-185 · Clothing Store B · 刘备 R1 修订
+# SGODOT-185 · Clothing Store B · 刘备 R2
 
-依据 Figma `545:2963` 原图与不知火舞两轮评论修订，沿用 179 R2.1 共享植物与合批做法。Basic Room 比例固定，待总监视觉 Review。
+依据 Figma `545:2963`（1489×1544 原图）及不知火舞复审。沿用已定的粉桃墙、粉调木地板、方格软凳、圆台直径和家具比例。
 
-| Review 项 | 当前处理 |
+| 复审项 | 本轮修改 |
 |---|---|
-| 长凳 | 2×4 方格鼓包：每块有曲面肩部、真实下凹中心和小钉扣；保留原占地，金色脚、连续软包基座。 |
-| 地板/墙 | 地板改粉米木色、减窄拼缝、降低粗糙度；墙面粉线框加深加厚。 |
-| 左衣架 | 八件裙装，蓬袖与裙褶体积，小花/波点；五种基础裙装，再实例化。 |
-| 右衣架 | 上排七件、下排六件，保留衣服厚度；三色上衣复用。 |
-| 圆台 | 保留 2.34m 直径，整体后移 0.4m；上层五包与花瓶，下层五双鞋和两摞针织衫。 |
-| 鞋包 | 四色基础包；粉/黑鞋、薄荷玛丽珍、小白运动鞋四种鞋型/配色，保留可复用原件。 |
-| 首饰柜 | 项链胸像、戒指、耳环 T 架/吊坠、太阳镜，透明玻璃。 |
-| 入口/橱窗 | 金框玻璃、门外天空树冠、粉垫、共享盆栽；橱窗粉裙腰部蝴蝶结、礼盒。 |
-| 灯与试衣间 | 三层花瓣吊灯、四盏暖壁灯；保留粉拱帘/圆凳，立镜改金框。 |
+| 花瓣吊灯 | 删除球泡，改为三层交错的曲面花瓣，每片有扇贝轮廓、12mm 内外厚度和封边，单独暖色内扩散罩。保留花茎/金属帽；外罩微弱按图集发光，内罩独立发暖光。 |
+| 首饰柜 | 十组可辨陈列：珍珠/金链肩颈胸像各一组、两组宝石耳环 T 架、两组绒面戒指托盘、黑/金太阳镜各一组、两张珍珠耳钉展示卡。实做肩颈、项链珠粒、吊坠、眼镜深色镜片、戒指宝石；降低柜玻璃不透明度。 |
+| 鞋 | 粉色高跟鞋有独立后跟和开口鞋面，黑色玛丽珍有低跟/搭带/金扣，白运动鞋有厚底/脚踝衬垫/鞋带；保留一双薄荷玛丽珍和可复用原件。 |
+| 右架上衣 | 蓝色有领 Polo、米白圆领花朵、薄荷长袖 V 领、粉色船领条纹四种，替换挂架上下层的分配；不只是同款换色。 |
+| 入口 | 粉色垫移入可见入口空地，避开软凳边缘。共享深绿植物保留，小叶和花不投影。 |
 
-总摆放 **113,770 面**，植物 **11,272 面**（含花瓶、窗外树冠），静态 surface **18**，低于 200,000 / 100,000 / 60。房间 / 植物各一张 2048 图集；衣服、鞋包按前后组合并，保留独立 GLB、局部 pivot 与命名源零件。小叶、花、窗景不投影；吊灯为自发光，另加五盏局部无阴影点光。实际导入无嵌入贴图，启用 mipmap 和 VRAM 压缩。
+陈列件保留独立 GLB 和 Blender 命名对象，运行时合并服装/装饰/玻璃；场景与植物各一张 2048 图集。细首饰/印花采用稳定图集色块防采样串色，非每件一张图。最终总摆放 **120,414** 三角面，其中植物 **11,552**（含内嵌花束等 5,300），静态 surface **19**；限制分别为 200,000 / 100,000 / 60。角色 **35/35 PASS**。地板 / 墙板 / 软凳三个实体对应亮面色相差 **5.662° / 0.566° / 1.436°**。
 
-取色点见 `colour-patch-comparison.jpg` / `colour-verification.json`：对原图和运行时同类、同位置的亮面取 9×9 中位数，地板/墙板/长凳色相差 **4.21° / 4.50° / 0.87°**，阈值 10°。首轮地板偏差 10.13°，已据此重调；墙首选误取到压顶，重新标定到墙板后再检查。色相指标不涵盖全部明度、饱和度或造型相似度。
+机位用地台角点刚性拟合，固定 6.16×5.76m 地台；原图不是正方形，1400 输出按同样比例留边，不拉伸。左角被原图裁边，按可见边交点估计，三角点残差为 13.79px / 16.04px / 15.17px，误差如实记录。保留完整参考/实景/直接叠图；陈列与墙面细节仍非像素复刻。
 
-门 2.46m、首饰台 1.07625m、圆台 1.033m、长凳约 0.68m，均在 Basic Room 同类 ±15%。圆台碰撞使用 24 边凸体，保持真实圆形外轮廓。实际角色 **35/35 PASS**，完整绕台一圈、到试衣间/镜子/首饰柜；三处通道净宽：左衣架 **0.985m**、后衣架 **1.321m**、长凳 **0.857m**，均实际射线测量，不拿包围盒角落误算通道。15 秒原速视口视频与碰撞截图随卡；不是 Android/物理设备性能验收。
+Godot Mobile/Vulkan 隔离角色绕圆台、软凳、衣架、首饰柜与入口，验证家具阻挡、边界、净宽、输入及动画。15 秒原速桌面录像与细节照片另附，不代表物理手机性能或美术验收。
 
 ```sh
 blender -b -t 8 --python tools/art/build_clothing_store_b.py
-python tools/art/source/coffee_shop/render_r1.py r1 clothing_store_b
+python tools/art/source/coffee_shop/render_r1.py r2 clothing_store_b
 python tools/art/source/coffee_shop/run_bench.py clothing_store_b --record
-output/art-tools/bin/python tools/art/source/coffee_shop/package_series.py clothing_store_b r1
-output/art-tools/bin/python tools/art/source/coffee_shop/check_series_colour.py clothing_store_b r1
-output/art-tools/bin/python tools/art/source/coffee_shop/prepare_series_media.py clothing_store_b r1
+output/art-tools/bin/python tools/art/source/coffee_shop/package_series.py clothing_store_b r2
+output/art-tools/bin/python tools/art/source/coffee_shop/check_series_colour.py clothing_store_b r2
+output/art-tools/bin/python tools/art/source/coffee_shop/prepare_series_media.py clothing_store_b r2
+output/art-tools/bin/python tools/art/source/coffee_shop/package_r2_details.py clothing_store_b
 ```
 
-源文件 `tools/art/source/clothing_store_b/clothing_store_b.blend`，同目录 `revision.py`、`boutique_bench.py`。隔离适配器沿用全部接触点采集，未改共享 harness。
+源文件 tools/art/source/clothing_store_b/clothing_store_b.blend，revision.py / revision2.py 与 boutique_bench.py 可复现；等待不知火舞复审。
 
-待视觉复审：服装仍是静态陈列资产；鞋包/首饰和印花比设计图简化；后排鞋部分被上层遮挡，镜面为绘制高光；植物种类和橱窗景色是共享库替代；整体更亮、陈列节奏更规则，圆台和长凳位置有为通行作出的差异。
+细长包带、墙框和滚边也改用稳定图集色块，修正最终 mip 采样黑缝。整景、四项细节与录像八时点已目视核验；独立项链与鞋带是简化静态陈列。

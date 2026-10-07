@@ -1,5 +1,5 @@
 {
-  "revision": "r1",
+  "revision": "r2",
   "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
   "checks": [
     {
@@ -10,8 +10,8 @@
         1220
       ],
       "runtime_pixel": [
-        618,
-        1030
+        538,
+        1068
       ],
       "reference": {
         "rgb": [
@@ -27,15 +27,15 @@
       "runtime": {
         "rgb": [
           253,
-          225,
-          206
+          222,
+          203
         ],
-        "hex": "#FDE1CE",
-        "hue_degrees": 24.255,
-        "saturation": 0.1858,
+        "hex": "#FDDECB",
+        "hue_degrees": 22.8,
+        "saturation": 0.1976,
         "value": 0.9922
       },
-      "hue_delta_degrees": 4.206,
+      "hue_delta_degrees": 5.662,
       "passed": true
     },
     {
@@ -46,8 +46,8 @@
         332
       ],
       "runtime_pixel": [
-        550,
-        310
+        493,
+        220
       ],
       "reference": {
         "rgb": [
@@ -62,16 +62,16 @@
       },
       "runtime": {
         "rgb": [
-          255,
-          204,
-          195
+          245,
+          188,
+          184
         ],
-        "hex": "#FFCCC3",
-        "hue_degrees": 9.0,
-        "saturation": 0.2353,
-        "value": 1.0
+        "hex": "#F5BCB8",
+        "hue_degrees": 3.934,
+        "saturation": 0.249,
+        "value": 0.9608
       },
-      "hue_delta_degrees": 4.5,
+      "hue_delta_degrees": 0.566,
       "passed": true
     },
     {
@@ -82,8 +82,8 @@
         1093
       ],
       "runtime_pixel": [
-        452,
-        850
+        342,
+        840
       ],
       "reference": {
         "rgb": [
@@ -99,15 +99,15 @@
       "runtime": {
         "rgb": [
           255,
-          195,
-          204
+          191,
+          200
         ],
-        "hex": "#FFC3CC",
-        "hue_degrees": 351.0,
-        "saturation": 0.2353,
+        "hex": "#FFBFC8",
+        "hue_degrees": 351.562,
+        "saturation": 0.251,
         "value": 1.0
       },
-      "hue_delta_degrees": 0.873,
+      "hue_delta_degrees": 1.436,
       "passed": true
     }
   ],

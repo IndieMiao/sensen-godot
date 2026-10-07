@@ -1,0 +1,83 @@
+{
+  "method": "orthographic fit to plinth edge intersections; no model scaling or image warp",
+  "reference_size": [
+    1489,
+    1544
+  ],
+  "reference_corners_left_front_right": [
+    [
+      0,
+      912
+    ],
+    [
+      751,
+      1440
+    ],
+    [
+      1453,
+      1006
+    ]
+  ],
+  "inferred_back": [
+    702,
+    478
+  ],
+  "footprint_m": [
+    6.16,
+    5.76
+  ],
+  "plinth_y": -0.255,
+  "render_size": [
+    1400,
+    1400
+  ],
+  "fitted_corners": [
+    [
+      32.929933297833145,
+      838.1799609510564
+    ],
+    [
+      689.9463105834234,
+      1307.3821141114206
+    ],
+    [
+      1350.3750514555313,
+      899.2565777872638
+    ]
+  ],
+  "observed_letterboxed_corners": [
+    [
+      24.935233160621806,
+      826.9430051813472
+    ],
+    [
+      705.8937823834198,
+      1305.699481865285
+    ],
+    [
+      1342.422279792746,
+      912.1761658031088
+    ]
+  ],
+  "residual_px": [
+    13.790736211469198,
+    16.035994140913598,
+    15.171101859112508
+  ],
+  "pitch_degrees": 41.62999999999998,
+  "yaw_degrees": 47.07,
+  "camera": {
+    "position": [
+      11.019102461482488,
+      14.518119182093892,
+      10.177535185813127
+    ],
+    "target": [
+      0.03630685486111318,
+      1.186444479186516,
+      -0.03902982710477448
+    ],
+    "size": 8.940178633538647
+  },
+  "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
+}

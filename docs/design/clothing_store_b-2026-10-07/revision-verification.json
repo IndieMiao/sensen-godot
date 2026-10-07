@@ -1,10 +1,10 @@
 {
-  "revision": "r1",
+  "revision": "r2",
   "reference_sha256": "05260b090aa79b5d1d848e62be65b513e9bbc1c9f6d1ebfe4656b1e93d25ca00",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "draw_calls": 18.0,
-    "instances": 72,
+    "draw_calls": 11.0,
+    "instances": 73,
     "renderer": "mobile",
     "resolution": [
       1400,
@@ -12,48 +12,68 @@
     ],
     "scope": "offline art render; no mobile/gameplay/performance acceptance",
     "slug": "clothing_store_b",
-    "static_surfaces": 18,
+    "static_surfaces": 19,
     "views": [
       {
-        "draw_calls": 20.0,
-        "rendered_objects": 20.0,
+        "draw_calls": 26.0,
+        "rendered_objects": 26.0,
         "view": "godot-whole"
       },
       {
-        "draw_calls": 20.0,
-        "rendered_objects": 20.0,
+        "draw_calls": 21.0,
+        "rendered_objects": 21.0,
         "view": "model-front"
       },
       {
-        "draw_calls": 20.0,
-        "rendered_objects": 20.0,
+        "draw_calls": 21.0,
+        "rendered_objects": 21.0,
         "view": "model-side"
       },
       {
-        "draw_calls": 20.0,
-        "rendered_objects": 20.0,
+        "draw_calls": 21.0,
+        "rendered_objects": 21.0,
         "view": "model-top"
-      },
-      {
-        "draw_calls": 17.0,
-        "rendered_objects": 17.0,
-        "view": "godot-detail"
       },
       {
         "draw_calls": 18.0,
         "rendered_objects": 18.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 19.0,
+        "rendered_objects": 19.0,
         "view": "godot-detail-plants"
+      },
+      {
+        "draw_calls": 11.0,
+        "rendered_objects": 11.0,
+        "view": "petal-lamp-detail"
+      },
+      {
+        "draw_calls": 14.0,
+        "rendered_objects": 14.0,
+        "view": "jewelry-detail"
+      },
+      {
+        "draw_calls": 13.0,
+        "rendered_objects": 13.0,
+        "view": "footwear-detail"
+      },
+      {
+        "draw_calls": 11.0,
+        "rendered_objects": 11.0,
+        "view": "blouse-detail"
       }
     ]
   },
   "budget": {
     "after": {
-      "room_triangles": 107518,
+      "room_triangles": 114162,
       "shared_plant_triangles": 6252,
-      "room_botanical_triangles": 5020,
-      "plant_triangles": 11272,
-      "total_triangles": 113770,
-      "static_surfaces": 18
+      "room_botanical_triangles": 5300,
+      "plant_triangles": 11552,
+      "total_triangles": 120414,
+      "static_surfaces": 19
     },
     "limits": {
       "total_triangles": 200000,
@@ -89,7 +109,7 @@
           "island_bag_coral",
           "stacked_blue_knit"
         ],
-        "triangles": 33926,
+        "triangles": 32626,
         "cast_shadow": true
       },
       {
@@ -121,6 +141,7 @@
           "changing_curtain",
           "folded_ivory_knit",
           "wall_sconce",
+          "hanging_blouse_rose",
           "right_pink_bag",
           "right_blue_bag",
           "stacked_knit",
@@ -129,7 +150,6 @@
           "left_extra_dress_0",
           "left_extra_dress_1",
           "left_extra_dress_2",
-          "right_upper_3",
           "right_upper_4",
           "right_upper_5",
           "right_upper_6",
@@ -141,7 +161,7 @@
           "right_lower_5",
           "cream_shoe_pair"
         ],
-        "triangles": 41450,
+        "triangles": 41358,
         "cast_shadow": true
       },
       {
@@ -211,6 +231,7 @@
       "assets/rooms/clothing_store_b/entrance_frame.glb",
       "assets/rooms/clothing_store_b/entrance_glass.glb",
       "assets/rooms/clothing_store_b/entrance_sky.glb",
+      "assets/rooms/clothing_store_b/flower_pendant_glow.glb",
       "assets/rooms/clothing_store_b/folded_blue_knit.glb",
       "assets/rooms/clothing_store_b/folded_ivory_knit.glb",
       "assets/rooms/clothing_store_b/gift_boxes.glb",
@@ -221,6 +242,7 @@
       "assets/rooms/clothing_store_b/hanging_blouse_blue.glb",
       "assets/rooms/clothing_store_b/hanging_blouse_ivory.glb",
       "assets/rooms/clothing_store_b/hanging_blouse_mint.glb",
+      "assets/rooms/clothing_store_b/hanging_blouse_rose.glb",
       "assets/rooms/clothing_store_b/hanging_dress_blue.glb",
       "assets/rooms/clothing_store_b/hanging_dress_cream.glb",
       "assets/rooms/clothing_store_b/hanging_dress_ivory.glb",

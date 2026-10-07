@@ -79,7 +79,7 @@
 				"name": "left_rack",
 				"reached": true,
 				"remaining_m": 0.0801620855927467,
-				"seconds": 0.333,
+				"seconds": 0.334,
 				"target": [
 					-1.82000005245209,
 					0.0649999976158142,
@@ -105,7 +105,7 @@
 				"name": "fitting_room",
 				"reached": true,
 				"remaining_m": 0.0698474124073982,
-				"seconds": 0.406,
+				"seconds": 0.416,
 				"target": [
 					-1.36600005626678,
 					0.0649999976158142,
@@ -131,7 +131,7 @@
 				"name": "mirror",
 				"reached": true,
 				"remaining_m": 0.089975118637085,
-				"seconds": 0.307,
+				"seconds": 0.328,
 				"target": [
 					-0.270000010728836,
 					0.0649999976158142,
@@ -157,7 +157,7 @@
 				"name": "rear_rack",
 				"reached": true,
 				"remaining_m": 0.082451157271862,
-				"seconds": 0.362,
+				"seconds": 0.333,
 				"target": [
 					0.825999975204468,
 					0.0649999976158142,
@@ -183,7 +183,7 @@
 				"name": "jewelry",
 				"reached": true,
 				"remaining_m": 0.082080751657486,
-				"seconds": 0.466,
+				"seconds": 0.467,
 				"target": [
 					1.42999994754791,
 					0.0649999976158142,
@@ -209,7 +209,7 @@
 				"name": "circle_southeast",
 				"reached": true,
 				"remaining_m": 0.075083427131176,
-				"seconds": 0.267,
+				"seconds": 0.266,
 				"target": [
 					0.825999975204468,
 					0.0649999976158142,
@@ -235,7 +235,7 @@
 				"name": "circle_front",
 				"reached": true,
 				"remaining_m": 0.0773969069123268,
-				"seconds": 0.36,
+				"seconds": 0.338,
 				"target": [
 					-0.270000010728836,
 					0.0649999976158142,
@@ -261,7 +261,7 @@
 				"name": "circle_complete",
 				"reached": true,
 				"remaining_m": 0.0705156177282333,
-				"seconds": 0.36,
+				"seconds": 0.338,
 				"target": [
 					-1.36600005626678,
 					0.0649999976158142,
@@ -272,13 +272,13 @@
 			"passed": true
 		},
 		{
-			"details": 5.585,
+			"details": 5.613,
 			"name": "Full route fits unaccelerated 15s clip",
 			"passed": true
 		}
 	],
 	"passed": true,
-	"pid": 1077526,
+	"pid": 1110433,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -340,7 +340,7 @@
 			"name": "left_rack",
 			"reached": true,
 			"remaining_m": 0.0801620855927467,
-			"seconds": 0.333,
+			"seconds": 0.334,
 			"target": [
 				-1.82000005245209,
 				0.0649999976158142,
@@ -362,7 +362,7 @@
 			"name": "fitting_room",
 			"reached": true,
 			"remaining_m": 0.0698474124073982,
-			"seconds": 0.406,
+			"seconds": 0.416,
 			"target": [
 				-1.36600005626678,
 				0.0649999976158142,
@@ -384,7 +384,7 @@
 			"name": "mirror",
 			"reached": true,
 			"remaining_m": 0.089975118637085,
-			"seconds": 0.307,
+			"seconds": 0.328,
 			"target": [
 				-0.270000010728836,
 				0.0649999976158142,
@@ -406,7 +406,7 @@
 			"name": "rear_rack",
 			"reached": true,
 			"remaining_m": 0.082451157271862,
-			"seconds": 0.362,
+			"seconds": 0.333,
 			"target": [
 				0.825999975204468,
 				0.0649999976158142,
@@ -428,7 +428,7 @@
 			"name": "jewelry",
 			"reached": true,
 			"remaining_m": 0.082080751657486,
-			"seconds": 0.466,
+			"seconds": 0.467,
 			"target": [
 				1.42999994754791,
 				0.0649999976158142,
@@ -450,7 +450,7 @@
 			"name": "circle_southeast",
 			"reached": true,
 			"remaining_m": 0.075083427131176,
-			"seconds": 0.267,
+			"seconds": 0.266,
 			"target": [
 				0.825999975204468,
 				0.0649999976158142,
@@ -472,7 +472,7 @@
 			"name": "circle_front",
 			"reached": true,
 			"remaining_m": 0.0773969069123268,
-			"seconds": 0.36,
+			"seconds": 0.338,
 			"target": [
 				-0.270000010728836,
 				0.0649999976158142,
@@ -494,7 +494,7 @@
 			"name": "circle_complete",
 			"reached": true,
 			"remaining_m": 0.0705156177282333,
-			"seconds": 0.36,
+			"seconds": 0.338,
 			"target": [
 				-1.36600005626678,
 				0.0649999976158142,

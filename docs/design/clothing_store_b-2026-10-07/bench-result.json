@@ -89,7 +89,7 @@
 				"name": "left_rack",
 				"reached": true,
 				"remaining_m": 0.0801620855927467,
-				"seconds": 0.316,
+				"seconds": 0.317,
 				"target": [
 					-1.82000005245209,
 					0.0649999976158142,
@@ -141,7 +141,7 @@
 				"name": "mirror",
 				"reached": true,
 				"remaining_m": 0.089975118637085,
-				"seconds": 0.299,
+				"seconds": 0.3,
 				"target": [
 					-0.270000010728836,
 					0.0649999976158142,
@@ -271,7 +271,7 @@
 				"name": "circle_complete",
 				"reached": true,
 				"remaining_m": 0.0705156177282333,
-				"seconds": 0.333,
+				"seconds": 0.334,
 				"target": [
 					-1.36600005626678,
 					0.0649999976158142,
@@ -288,7 +288,7 @@
 				],
 				"final": [
 					-0.270000010728836,
-					0.0505106970667839,
+					0.0580977872014046,
 					1.25477635860443
 				],
 				"from": [
@@ -297,8 +297,8 @@
 					1.39999997615814
 				],
 				"reached": false,
-				"remaining_m": 0.954886257648468,
-				"seconds": 0.866,
+				"remaining_m": 0.954801261425018,
+				"seconds": 0.883,
 				"target": [
 					-0.270000010728836,
 					0.0649999976158142,
@@ -316,7 +316,7 @@
 				],
 				"final": [
 					-2.1949999332428,
-					0.0503652766346931,
+					0.0580789372324944,
 					-1.0
 				],
 				"from": [
@@ -325,8 +325,8 @@
 					-1.0
 				],
 				"reached": false,
-				"remaining_m": 0.605177044868469,
-				"seconds": 0.867,
+				"remaining_m": 0.605039596557617,
+				"seconds": 0.882,
 				"target": [
 					-2.79999995231628,
 					0.0649999976158142,
@@ -354,7 +354,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.732508301734924,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					2.59999990463257,
 					0.0649999976158142,
@@ -382,7 +382,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.682508289813995,
-				"seconds": 0.883,
+				"seconds": 0.882,
 				"target": [
 					-1.24000000953674,
 					0.0649999976158142,
@@ -485,7 +485,7 @@
 				],
 				"reached": true,
 				"remaining_m": 0.0853631049394608,
-				"seconds": 0.317,
+				"seconds": 0.316,
 				"target": [
 					-0.200000002980232,
 					0.0649999976158142,
@@ -511,7 +511,7 @@
 					],
 					"reached": true,
 					"remaining_m": 0.0698150619864464,
-					"seconds": 0.116,
+					"seconds": 0.117,
 					"target": [
 						-2.40000009536743,
 						0.0649999976158142,
@@ -532,7 +532,7 @@
 					],
 					"reached": true,
 					"remaining_m": 0.0811216831207275,
-					"seconds": 0.15,
+					"seconds": 0.149,
 					"target": [
 						-2.80999994277954,
 						0.0649999976158142,
@@ -558,8 +558,8 @@
 		{
 			"details": [
 				"run",
-				0.15,
-				0.316666666666667
+				0.149961,
+				0.316627666666667
 			],
 			"name": "Run animation advances in rendered viewport",
 			"passed": true
@@ -580,16 +580,16 @@
 			"passed": true
 		},
 		{
-			"details": 1.74549423158169,
+			"details": 1.74549424648285,
 			"name": "Fixture head-top height measurable",
 			"passed": true
 		},
 		{
 			"details": {
-				"baseline_ratio": 1.33486548270553,
+				"baseline_ratio": 1.33486547130987,
 				"difference": 0.055793991416309,
 				"height": 2.46,
-				"ratio_to_H": 1.40934295598952,
+				"ratio_to_H": 1.40934294395806,
 				"reason": ""
 			},
 			"name": "Scale ±15%: door",
@@ -597,10 +597,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.660271445844686,
+				"baseline_ratio": 0.660271440207995,
 				"difference": 0.0661605206073754,
 				"height": 1.07625,
-				"ratio_to_H": 0.616587543245417,
+				"ratio_to_H": 0.616587537981653,
 				"reason": ""
 			},
 			"name": "Scale ±15%: counter",
@@ -608,10 +608,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.392438993842612,
+				"baseline_ratio": 0.392438990492388,
 				"difference": 0.00729927007299269,
 				"height": 0.68,
-				"ratio_to_H": 0.389574475639381,
+				"ratio_to_H": 0.389574472313611,
 				"reason": ""
 			},
 			"name": "Scale ±15%: chair",
@@ -619,10 +619,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.650245632133378,
+				"baseline_ratio": 0.650245626582277,
 				"difference": 0.0898678414096917,
 				"height": 1.033,
-				"ratio_to_H": 0.591809460787471,
+				"ratio_to_H": 0.591809455735235,
 				"reason": ""
 			},
 			"name": "Scale ±15%: table",
@@ -630,7 +630,7 @@
 		}
 	],
 	"passed": true,
-	"pid": 1077454,
+	"pid": 1110358,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -692,7 +692,7 @@
 			"name": "left_rack",
 			"reached": true,
 			"remaining_m": 0.0801620855927467,
-			"seconds": 0.316,
+			"seconds": 0.317,
 			"target": [
 				-1.82000005245209,
 				0.0649999976158142,
@@ -736,7 +736,7 @@
 			"name": "mirror",
 			"reached": true,
 			"remaining_m": 0.089975118637085,
-			"seconds": 0.299,
+			"seconds": 0.3,
 			"target": [
 				-0.270000010728836,
 				0.0649999976158142,
@@ -846,7 +846,7 @@
 			"name": "circle_complete",
 			"reached": true,
 			"remaining_m": 0.0705156177282333,
-			"seconds": 0.333,
+			"seconds": 0.334,
 			"target": [
 				-1.36600005626678,
 				0.0649999976158142,

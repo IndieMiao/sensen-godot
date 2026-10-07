@@ -794,9 +794,9 @@
       "name": "pink_entry_mat",
       "file": "pink_entry_mat.glb",
       "position": [
-        -2.42,
+        -2.52,
         0.079,
-        1.96
+        1.5
       ],
       "yaw_degrees": 90,
       "colliders": []
@@ -805,11 +805,11 @@
       "name": "ivory_sneakers",
       "file": "ivory_sneakers.glb",
       "position": [
-        -1.0,
+        0.6,
         0.68,
-        -0.43
+        0.25
       ],
-      "yaw_degrees": -90,
+      "yaw_degrees": 0,
       "colliders": []
     },
     {
@@ -832,6 +832,28 @@
         1.96
       ],
       "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "flower_pendant_glow",
+      "file": "flower_pendant_glow.glb",
+      "position": [
+        -1.63,
+        3.66,
+        -1.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hanging_blouse_rose",
+      "file": "hanging_blouse_rose.glb",
+      "position": [
+        1.5950000000000002,
+        2.23,
+        -2.25
+      ],
+      "yaw_degrees": 0,
       "colliders": []
     }
   ],
@@ -957,18 +979,8 @@
       "yaw_degrees": 90
     },
     {
-      "name": "right_upper_3",
-      "asset": "hanging_blouse_blue",
-      "position": [
-        1.5950000000000002,
-        2.23,
-        -2.25
-      ],
-      "yaw_degrees": 0
-    },
-    {
       "name": "right_upper_4",
-      "asset": "hanging_blouse_ivory",
+      "asset": "hanging_blouse_blue",
       "position": [
         1.92,
         2.23,
@@ -978,7 +990,7 @@
     },
     {
       "name": "right_upper_5",
-      "asset": "hanging_blouse_mint",
+      "asset": "hanging_blouse_ivory",
       "position": [
         2.245,
         2.23,
@@ -988,7 +1000,7 @@
     },
     {
       "name": "right_upper_6",
-      "asset": "hanging_blouse_blue",
+      "asset": "hanging_blouse_mint",
       "position": [
         2.5700000000000003,
         2.23,
@@ -1018,7 +1030,7 @@
     },
     {
       "name": "right_lower_2",
-      "asset": "hanging_blouse_blue",
+      "asset": "hanging_blouse_rose",
       "position": [
         1.43,
         1.25,
@@ -1028,7 +1040,7 @@
     },
     {
       "name": "right_lower_3",
-      "asset": "hanging_blouse_ivory",
+      "asset": "hanging_blouse_blue",
       "position": [
         1.785,
         1.25,
@@ -1038,7 +1050,7 @@
     },
     {
       "name": "right_lower_4",
-      "asset": "hanging_blouse_mint",
+      "asset": "hanging_blouse_ivory",
       "position": [
         2.1399999999999997,
         1.25,
@@ -1048,7 +1060,7 @@
     },
     {
       "name": "right_lower_5",
-      "asset": "hanging_blouse_blue",
+      "asset": "hanging_blouse_mint",
       "position": [
         2.495,
         1.25,
@@ -1099,18 +1111,18 @@
   ],
   "camera": {
     "position": [
-      10,
-      10,
-      12
+      11.019102461482488,
+      14.518119182093892,
+      10.177535185813127
     ],
     "target": [
-      0,
-      1.28,
-      0.08
+      0.03630685486111318,
+      1.186444479186516,
+      -0.03902982710477448
     ],
-    "size": 10.4
+    "size": 8.940178633538647
   },
-  "revision": "R1",
+  "revision": "R2",
   "botanical_assets": [
     "entrance_sky"
   ],
@@ -1219,16 +1231,21 @@
     },
     "petal_pendant": {
       "emission": "FFE4B2",
-      "emission_energy": 0.28
+      "emission_energy": 0.1,
+      "emission_use_atlas": true
     },
     "boutique_floor": {
       "roughness": 0.48
     },
     "jewelry_glass": {
-      "alpha": 0.08
+      "alpha": 0.035
     },
     "entrance_glass": {
       "alpha": 0.08
+    },
+    "flower_pendant_glow": {
+      "emission": "FFE6B4",
+      "emission_energy": 0.6
     }
   },
   "boundaries": [
@@ -1697,6 +1714,147 @@
       }
     }
   },
+  "review_camera_fit": {
+    "method": "orthographic fit to plinth edge intersections; no model scaling or image warp",
+    "reference_size": [
+      1489,
+      1544
+    ],
+    "reference_corners_left_front_right": [
+      [
+        0,
+        912
+      ],
+      [
+        751,
+        1440
+      ],
+      [
+        1453,
+        1006
+      ]
+    ],
+    "inferred_back": [
+      702,
+      478
+    ],
+    "footprint_m": [
+      6.16,
+      5.76
+    ],
+    "plinth_y": -0.255,
+    "render_size": [
+      1400,
+      1400
+    ],
+    "fitted_corners": [
+      [
+        32.929933297833145,
+        838.1799609510564
+      ],
+      [
+        689.9463105834234,
+        1307.3821141114206
+      ],
+      [
+        1350.3750514555313,
+        899.2565777872638
+      ]
+    ],
+    "observed_letterboxed_corners": [
+      [
+        24.935233160621806,
+        826.9430051813472
+      ],
+      [
+        705.8937823834198,
+        1305.699481865285
+      ],
+      [
+        1342.422279792746,
+        912.1761658031088
+      ]
+    ],
+    "residual_px": [
+      13.790736211469198,
+      16.035994140913598,
+      15.171101859112508
+    ],
+    "pitch_degrees": 41.62999999999998,
+    "yaw_degrees": 47.07,
+    "camera": {
+      "position": [
+        11.019102461482488,
+        14.518119182093892,
+        10.177535185813127
+      ],
+      "target": [
+        0.03630685486111318,
+        1.186444479186516,
+        -0.03902982710477448
+      ],
+      "size": 8.940178633538647
+    },
+    "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
+  },
+  "review_views": [
+    {
+      "name": "petal-lamp-detail",
+      "position": [
+        -0.1,
+        3.7,
+        1.4
+      ],
+      "target": [
+        -1.63,
+        3.03,
+        -1.94
+      ],
+      "size": 1.55
+    },
+    {
+      "name": "jewelry-detail",
+      "position": [
+        5.5,
+        2.6,
+        3.4
+      ],
+      "target": [
+        2.43,
+        0.77,
+        1.13
+      ],
+      "size": 2.9
+    },
+    {
+      "name": "footwear-detail",
+      "position": [
+        0.3,
+        2.3,
+        3.2
+      ],
+      "target": [
+        -0.26,
+        0.84,
+        0.25
+      ],
+      "size": 2.45
+    },
+    {
+      "name": "blouse-detail",
+      "position": [
+        3.9,
+        2.8,
+        2.8
+      ],
+      "target": [
+        1.65,
+        1.5,
+        -2.25
+      ],
+      "size": 2.9
+    }
+  ],
   "render_batches": [
     {
       "name": "front_dressing",
@@ -1726,7 +1884,7 @@
         "island_bag_coral",
         "stacked_blue_knit"
       ],
-      "triangles": 33926,
+      "triangles": 32626,
       "cast_shadow": true
     },
     {
@@ -1758,6 +1916,7 @@
         "changing_curtain",
         "folded_ivory_knit",
         "wall_sconce",
+        "hanging_blouse_rose",
         "right_pink_bag",
         "right_blue_bag",
         "stacked_knit",
@@ -1766,7 +1925,6 @@
         "left_extra_dress_0",
         "left_extra_dress_1",
         "left_extra_dress_2",
-        "right_upper_3",
         "right_upper_4",
         "right_upper_5",
         "right_upper_6",
@@ -1778,7 +1936,7 @@
         "right_lower_5",
         "cream_shoe_pair"
       ],
-      "triangles": 41450,
+      "triangles": 41358,
       "cast_shadow": true
     },
     {
