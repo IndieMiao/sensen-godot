@@ -33,3 +33,16 @@ func test_ui_moments_go_out_in_batches_without_touching_the_command_queue() -> v
 	for i in 20: session.report({"kind": "screen"})
 	assert_int(sent.size()).is_equal(2)   # a full batch goes at once
 	assert_int((sent[1].body.events as Array).size()).is_equal(20)
+
+## PR #23 review (刘邦): pressing the main action key is a tap even while it is still down; only the farm's
+## hold-to-repeat commands are holds.
+func test_a_press_is_a_tap_and_only_hold_repeats_are_holds() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	session.src_of = rt.src_of_press
+	session.send({"type": "sow", "plot": 0, "seed": "seed_radish"})
+	assert_str(str(sent[0].body.src)).is_equal("tap")
+	session.busy = false
+	rt.holding_repeat = true
+	session.send({"type": "sow", "plot": 1, "seed": "seed_radish"})
+	rt.holding_repeat = false
+	assert_str(str(sent[1].body.src)).is_equal("hold")

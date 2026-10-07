@@ -11,11 +11,24 @@ import type { P0Event } from './progress.js';
 
 /** Command fields worth keeping; anything else (free text, bulky arrays) stays out of the log. */
 const CMD_FIELDS = ['type', 'plot', 'plots', 'seed', 'item', 'qty', 'shop', 'recipe', 'items', 'request', 'resident',
-  'bait', 'outcome', 'key', 'keys', 'eat', 'from', 'spot', 'floor', 'rock', 'space', 'place', 'src', 'expect_seq'] as const;
+  'bait', 'outcome', 'key', 'keys', 'eat', 'from', 'spot', 'floor', 'rock', 'space', 'place', 'src', 'expect_seq', 'pot'] as const;
+const MAX_STR = 64, MAX_LIST = 8;
 
-/** UI moments the client may report (anything else is dropped). */
-export const UI_KINDS = new Set(['tip_shown', 'tip_hidden', 'card_shown', 'today_done', 'energy_card', 'gate_card', 'screen',
-  'level_banner', 'session_start', 'session_end']);
+/** UI moments the client may report, each with the only fields kept beside `kind` (no position, no free text). */
+export const UI_FIELDS: Record<string, readonly string[]> = {
+  tip_shown: ['key'], tip_hidden: ['key', 'ms', 'why'], card_shown: ['card', 'fish', 'dish', 'item'], today_done: ['row', 'key'],
+  energy_card: ['need', 'refused'], gate_card: ['gate', 'need', 'level'], screen: ['name'], level_banner: ['skill', 'level'],
+  session_start: [], session_end: ['ms'],
+};
+export const UI_KINDS = new Set(Object.keys(UI_FIELDS));
+
+/** A short flat value: numbers and booleans as they are, strings cut to 64 characters, anything else dropped. */
+function flat(v: unknown): string | number | boolean | undefined {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : undefined;
+  if (typeof v === 'boolean') return v;
+  if (typeof v === 'string') return v.slice(0, MAX_STR);
+  return undefined;
+}
 
 export interface CommandRecord {
   kind: 'command'; t: number; clock: number; player: string; seq: number; cmd: Record<string, unknown>;
@@ -24,32 +37,53 @@ export interface CommandRecord {
 export interface UiRecord { kind: 'ui'; t: number; player: string; event: Record<string, unknown> }
 export type LogRecord = CommandRecord | UiRecord;
 
+/**
+ * The log never affects the game (PR #23 review): a write that fails (folder removed mid-playtest, disk full, no
+ * permission) is retried once after recreating the folder, then the log warns once and stops writing.
+ */
 export class P0EventLog {
-  constructor(private dir?: string, private sink?: (r: LogRecord) => void) {
-    if (dir) mkdirSync(dir, { recursive: true });
+  private broken = false;
+  constructor(private dir?: string, private sink?: (r: LogRecord) => void, private warn: (msg: string) => void = m => console.warn(m)) {
+    if (dir) {
+      try { mkdirSync(dir, { recursive: true }); } catch (err) { this.stop(err); }
+    }
   }
   write(record: LogRecord): void {
-    this.sink?.(record);
-    if (!this.dir) return;
-    const day = new Date(record.t).toISOString().slice(0, 10);
-    appendFileSync(path.join(this.dir, `p0-events-${day}.jsonl`), JSON.stringify(record) + '\n');
+    try { this.sink?.(record); } catch { /* a test sink never breaks a command either */ }
+    if (!this.dir || this.broken) return;
+    const file = path.join(this.dir, `p0-events-${new Date(record.t).toISOString().slice(0, 10)}.jsonl`);
+    const line = JSON.stringify(record) + '\n';
+    try { appendFileSync(file, line); return; } catch { /* the folder may be gone: recreate it once */ }
+    try { mkdirSync(this.dir, { recursive: true }); appendFileSync(file, line); } catch (err) { this.stop(err); }
+  }
+  get stopped(): boolean { return this.broken; }
+  private stop(err: unknown): void {
+    this.broken = true;
+    this.warn(`[p0] observation log stopped (${this.dir}): ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 
+/** The kept command fields, each short: strings cut to 64 characters, lists to their first 8 flat items. */
 export function commandFields(raw: unknown): Record<string, unknown> {
-  const body = (raw ?? {}) as Record<string, unknown>;
-  return Object.fromEntries(CMD_FIELDS.filter(k => body[k] !== undefined).map(k => [k, body[k]]));
+  const body = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const k of CMD_FIELDS) {
+    const v = body[k];
+    if (Array.isArray(v)) out[k] = v.slice(0, MAX_LIST).map(flat).filter(x => x !== undefined);
+    else if (flat(v) !== undefined) out[k] = flat(v);
+  }
+  return out;
 }
 
-/** Keep a reported UI moment only if it is a known kind with short, flat fields. */
+/** Keep a reported UI moment only if it is a known kind; only that kind's fields, short and flat. */
 export function uiEvent(raw: unknown): Record<string, unknown> | null {
-  if (!raw || typeof raw !== 'object') return null;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const e = raw as Record<string, unknown>;
   if (typeof e.kind !== 'string' || !UI_KINDS.has(e.kind)) return null;
-  const out: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(e).slice(0, 8)) {
-    if (typeof v === 'number' || typeof v === 'boolean') out[k] = v;
-    else if (typeof v === 'string') out[k] = v.slice(0, 80);
+  const out: Record<string, unknown> = { kind: e.kind };
+  for (const k of UI_FIELDS[e.kind]) {
+    const v = flat(e[k]);
+    if (v !== undefined) out[k] = v;
   }
   return out;
 }

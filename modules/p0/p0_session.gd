@@ -24,7 +24,7 @@ var space := ""
 ## The catalog pond inside a pond space (q(36)): the server reads the pond's template from its own table.
 var place := ""
 ## How the player pressed for the next command ("hold" / "tap"), for the observation log (S7): P0Runtime sets a
-## callable that reads the main action key; panels' buttons are taps. Sent beside the command, like space.
+## callable that says "hold" only for the farm's hold-to-repeat commands. Sent beside the command, like space.
 var src_of := Callable()
 var busy := false
 var _queue: Array = []        # {cmd, key} sent while a request was in flight (reel / collect must never be dropped)

@@ -39,7 +39,7 @@ export function sessionReport(records: LogRecord[]) {
   const opened = new Map<string, number[]>();   // session_start moments the client reported (the app opened)
   for (const r of records) {
     if (r.kind === 'command') byPlayer.set(r.player, [...(byPlayer.get(r.player) ?? []), r]);
-    else if (r.event.kind === 'session_start') opened.set(r.player, [...(opened.get(r.player) ?? []), r.t]);
+    else if (r.kind === 'ui' && r.event?.kind === 'session_start') opened.set(r.player, [...(opened.get(r.player) ?? []), r.t]);
   }
   return [...byPlayer.entries()].map(([player, list]) => {
     list.sort((a, b) => a.t - b.t);
@@ -72,10 +72,31 @@ export function sessionReport(records: LogRecord[]) {
   });
 }
 
+/** Log lines → records. A half-written last line (the server was killed) or a record of a kind this script does not
+ * know is skipped and counted, never fatal (PR #23 review). */
+export function parseRecords(text: string): { records: LogRecord[]; skipped: number } {
+  const records: LogRecord[] = [];
+  let skipped = 0;
+  for (const line of text.split('\n')) {
+    if (!line.trim()) continue;
+    let r: unknown;
+    try { r = JSON.parse(line); } catch { skipped += 1; continue; }
+    const rec = (r ?? {}) as Record<string, unknown>;
+    const ok = typeof rec.player === 'string' && typeof rec.t === 'number'
+      && ((rec.kind === 'command' && Array.isArray(rec.events) && Array.isArray(rec.energy) && !!rec.cmd)
+        || (rec.kind === 'ui' && !!rec.event && typeof rec.event === 'object'));
+    if (ok) records.push(rec as unknown as LogRecord); else skipped += 1;
+  }
+  return { records, skipped };
+}
+
 function readRecords(inputs: string[]): LogRecord[] {
   const files = inputs.flatMap(p => (statSync(p).isDirectory()
     ? readdirSync(p).filter(f => f.endsWith('.jsonl')).map(f => path.join(p, f)) : [p]));
-  return files.flatMap(f => readFileSync(f, 'utf8').split('\n').filter(Boolean).map(line => JSON.parse(line) as LogRecord));
+  let skipped = 0;
+  const records = files.flatMap(f => { const r = parseRecords(readFileSync(f, 'utf8')); skipped += r.skipped; return r.records; });
+  if (skipped) console.error(`skipped ${skipped} unreadable line(s)`);
+  return records;
 }
 
 function markdown(report: ReturnType<typeof sessionReport>): string {
