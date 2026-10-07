@@ -1,23 +1,31 @@
-# Shared stylized plants · Liu Bei · SGODOT-179 R1
+# Shared stylized plants · Liu Bei · SGODOT-179 R2
 
-Nine original modules: `monstera` (11 split leaves), `peace_lily` (4 ivory spathes), `pothos`, `ivy_short` (0.65m), `ivy_medium` (1m), `ivy_long` (1.4m), `flower_shrub`, `olive_tree`, `fruit_tree`. The three vine segments have distinct silhouettes and seeded leaf/flower placement. Leaf surfaces are curved, closed meshes; midribs and secondary veins are baked from a separate source UV map into one shared 2048 atlas. No alpha-cutout leaves or duplicate embedded images.
+Twelve editable local-pivot modules: monstera, monstera_woven, peace_lily, pothos, three ivy lengths, flower_shrub, olive_tree, fruit_tree, pot_terracotta and pot_woven. R2 replaces R1's closed dense leaf meshes with open curved patches: ordinary leaves/petals have 6 triangles; Monstera patches have 8 triangles and an authored alpha-scissor silhouette with edge splits and internal holes. Do not substitute alpha blending: scissor retains depth writes. Bind the supplied shared `material.tres`, including double-sided rendering and threshold 0.45.
 
-Units: metres; Godot Y up, front +Z. Pots/trees/shrub pivot at their base. Vines pivot at the upper stem and grow along local -Y; rotate about local Z to follow an arch, and yaw to face the wall. Use 0.7–1.0 scale for the cafe vines and stagger/overlap endpoints by 5–12cm. Source objects stay named and editable.
+Vine and pothos leaves are 60% of R1 length/width. The six yellow-green source colours have one darkest variant (less than one-third). Four peace-lily spathes are approximately half R1 size. Olive has 352 silver-green leaves and a terracotta pot. The right-corner Monstera variant uses the woven pot. The stand-alone terracotta and woven pots can be reused separately.
 
-Bind `room_albedo_ao.png` to all GLBs with a shared StandardMaterial3D, roughness 0.86, specular 0.22, mipmapped filtering. Import the atlas with VRAM compression and mipmaps. The GLBs intentionally do not embed the atlas. `layout.json` is a catalogue (all local pivots zero), not a complete room. `asset_stats.json` gives unique costs; multiply by placements to budget a scene.
+## Atlas correction
 
-Editable source: `source/plants.blend`. Reproducible generator:
+The shared 2048 RGBA atlas has explicit 128px detail tiles and 12px guards; UVs stay inside each tile. Leaf veins and wicker weave are authored into the atlas. Whole source objects choose one material treatment. R1's per-face switch to constant swatches caused rectangular discontinuities on curved surfaces; it is no longer used here. Shader linear colours are encoded to sRGB before writing generated image pixels, avoiding double decoding and dark saturated foliage. The editable `.blend` embeds this same atlas and retains source `LeafDetailUV` plus runtime `RoomAtlas`.
+
+This texture contains surface colour/detail, not a beauty render or direct-light bake. No texture is embedded in individual GLBs. The atlas must use mipmaps and VRAM compression in the consuming project. A material override that forgets alpha scissor will reveal rectangular Monstera patches.
+
+## Placement and budget
+
+Godot metres, Y up, front +Z. Pots/trees/shrub pivot at their base; vines pivot at the upper stem and grow along local -Y. Rotate local Z to follow the tangent of an arch. Coffee Shop retains editable placements but merges the vines per wall at export, preserving atlas UVs. Small leaves/flowers and distant garden masses do not cast shadows; large potted plants can cast shadows.
+
+The library has **17,286 unique triangles** (R1: 99,620). `flower_shrub` is **2,214** (R1: 14,992). These are library unique costs, not placed-scene costs. See `asset_stats.json` for per-module before/after values. Coffee Shop R2 places 43,972 plant triangles. Consumers must enforce their own ≤100,000 plant / ≤200,000 total / ≤60 static-surface limits, including instances.
+
+## Rebuild and review
 
 ```sh
 blender --background --factory-startup --python "$PWD/assets/rooms/_shared/plants/source/build_plants.py"
 ```
 
-The generator reuses the existing Liu Bei source helpers in `tools/art/source/coffee_shop/kit.py`; it does not touch Basic Room. It writes this library and ignored `output/_shared/plants/`. It overwrites the generated source; preserve manual edits in the generator before rebuilding.
+Generator: `source/build_plants.py`; explicit UV atlas/export: `source/export_atlas.py`; editable source: `source/plants.blend`. Generation overwrites the source: keep manual edits in the generator before rebuilding. There is no dependency on ignored local R1 evidence.
 
-Consumer example: `assets/rooms/coffee_shop/layout.json` stores `shared_plants` placements with file, position, rotation_degrees, scale, and optional simple pot colliders. `scenes/coffee_shop/coffee_shop_art.gd` shows shared atlas binding and placement. Other agents can consume these GLBs directly in their own assembler. Do not add their geometry into each scene atlas: the library has module-local contact AO and can be rearranged independently. Large room contact shadows should be handled by the room bake/runtime lighting.
+`source/render_library.gd` produces independent actual Godot Mobile/Vulkan module previews. All 12 have been rendered, with normals, pot openings and atlas appearance inspected. Source leaf triangle counts are asserted during generation. All runtime GLBs have one mesh/surface and no embedded images.
 
-Ownership: Liu Bei per SGODOT-171. Other scene owners consume the library; request changes on the parent card. This is an art review candidate, not physical-phone performance acceptance.
+![R2 actual runtime catalogue](catalogue.jpg)
 
-![Actual Godot Mobile/Vulkan botanical catalogue](catalogue.jpg)
-
-Validation: all nine modules rendered independently in Godot 4.7.2 Mobile/Vulkan on AMD Custom GPU 0405 (RADV VANGOGH), then checked in the cafe. Single mesh/surface and no embedded image checks passed. The library contains 99,620 unique triangles; per-module costs are in `asset_stats.json`. This is a reusable library cost, not a promise that every scene uses all modules.
+R2 is submitted for review, not an approval to apply this kit to the other scene cards yet. Per SGODOT-171, other artists wait for 179 R2 approval. Basic Room and the shared scene benchmark remain unchanged by Liu Bei.

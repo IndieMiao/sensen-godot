@@ -8,3 +8,6 @@ albedo_texture = ExtResource("1")
 roughness = 0.86
 metallic_specular = 0.22
 texture_filter = 3
+cull_mode = 2
+transparency = 2
+alpha_scissor_threshold = 0.45

@@ -38,7 +38,7 @@ func render_library() -> void:
 	world.add_child(camera)
 	camera.current = true
 	var mat := load("res://assets/rooms/_shared/plants/material.tres") as Material
-	for name in ["monstera","peace_lily","pothos","ivy_short","ivy_medium","ivy_long","flower_shrub","olive_tree","fruit_tree"]:
+	for name in ["monstera","monstera_woven","peace_lily","pothos","ivy_short","ivy_medium","ivy_long","flower_shrub","olive_tree","fruit_tree","pot_terracotta","pot_woven"]:
 		var plant := (load("res://assets/rooms/_shared/plants/"+name+".glb") as PackedScene).instantiate() as Node3D
 		world.add_child(plant)
 		assign(plant,mat)
@@ -53,6 +53,12 @@ func render_library() -> void:
 		elif name == "flower_shrub":
 			target.y = .2
 			camera.size = 1.30
+		elif name.begins_with("pot_"):
+			target.y = .28
+			camera.size = 1.1
+		elif name in ["olive_tree", "fruit_tree"]:
+			target.y = 1.0
+			camera.size = 2.8
 		camera.position = target + Vector3(2,1.3,4)
 		camera.look_at(target)
 		for i in range(8): await process_frame

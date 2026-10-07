@@ -18,6 +18,17 @@
       "colliders": []
     },
     {
+      "name": "monstera_woven",
+      "file": "monstera_woven.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
       "name": "peace_lily",
       "file": "peace_lily.glb",
       "position": [
@@ -104,6 +115,28 @@
       ],
       "yaw_degrees": 0,
       "colliders": []
+    },
+    {
+      "name": "pot_terracotta",
+      "file": "pot_terracotta.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "pot_woven",
+      "file": "pot_woven.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
     }
   ],
   "instances": [],
@@ -118,7 +151,8 @@
       0.7,
       0
     ],
-    "size": 9
+    "size": 11
   },
-  "library": true
+  "library": true,
+  "revision": "R2"
 }
