@@ -1,6 +1,6 @@
 {
-  "version": "p0-m3a-2026-10-08",
-  "_note": "P0 content (M1 homestead + M2 fish/cook/eat) (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit; M2: §6.1.2–6.1.3 fishing gates and protection, §6.2.2 fish, §6.3.1 pond weights, §6.4 rod/bait, §6.6.1 cast energy, §6.7.1 fishing XP, §7.2.3–7.2.5 cooking, §7.3 ingredient families, §7.4.1 rarity derivation, §7.6.2 cooking XP, §7.14 recipes, §7.17.1 eating). Shared by server/src/p0 and the Godot client (labels only). M2b: P0 fish list (§17.2.1) — Willow Pond (Pond template) and Willow Creek (River template) on the homestead; mackerel is Coast-only (shown in the Fish-dex, not catchable here). Recipes: the 14 pages that need only P0 fish and crops; rock-salt pages (#11, #16, #29, #37) wait for materials. M3a (SGODOT-228): Homestead Lv1–3 (§8.1–8.3), farm storage (§10.4.8), materials and their buyback (§9.13.1, sources come with SGODOT-162/163), Bag Upgrade I, drinks (§3.4.4, §9.12), counters by role and buyback quotas (§9.11, §9.13.1), compost (§9.11.1, §17.2.1), Row Hoe and the Shanghai Postcard (§9.11.2, §9.11.5), residents Pip and Old Kai with affinity, gifts and gift meals (§3.4.5, §9.4.3–9.4.4, §7.6.3), and the Stall / Market boards (§9.6, §9.13.2). Numbers and copy per Li Bai on SGODOT-228 (b7d8b665, v1.1, 719ce953). Outpost names and keepers live in p0_outposts.json. q(40): Wild Herb is a material and a seasoning like Herb; the Fishing Lv2 gift gives Wild Herb ×3. q(41): Rest needs 2 h since the player last left the homestead (rest_away_h).",
+  "version": "p0-m3a-s1-2026-10-08",
+  "_note": "P0 content (M1 homestead + M2 fish/cook/eat) (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit; M2: §6.1.2–6.1.3 fishing gates and protection, §6.2.2 fish, §6.3.1 pond weights, §6.4 rod/bait, §6.6.1 cast energy, §6.7.1 fishing XP, §7.2.3–7.2.5 cooking, §7.3 ingredient families, §7.4.1 rarity derivation, §7.6.2 cooking XP, §7.14 recipes, §7.17.1 eating). Shared by server/src/p0 and the Godot client (labels only). M2b: P0 fish list (§17.2.1) — Willow Pond (Pond template) and Willow Creek (River template) on the homestead; mackerel is Coast-only (shown in the Fish-dex, not catchable here). Recipes: the 14 pages that need only P0 fish and crops; rock-salt pages (#11, #16, #29, #37) wait for materials. M3a (SGODOT-228): Homestead Lv1–3 (§8.1–8.3), farm storage (§10.4.8), materials and their buyback (§9.13.1, sources come with SGODOT-162/163), Bag Upgrade I, drinks (§3.4.4, §9.12), counters by role and buyback quotas (§9.11, §9.13.1), compost (§9.11.1, §17.2.1), Row Hoe and the Shanghai Postcard (§9.11.2, §9.11.5), residents Pip and Old Kai with affinity, gifts and gift meals (§3.4.5, §9.4.3–9.4.4, §7.6.3), and the Stall / Market boards (§9.6, §9.13.2). Numbers and copy per Li Bai on SGODOT-228 (b7d8b665, v1.1, 719ce953). Outpost names and keepers live in p0_outposts.json. q(40): Wild Herb is a material and a seasoning like Herb; the Fishing Lv2 gift gives Wild Herb ×3. q(41): Rest needs 2 h since the player last left the homestead (rest_away_h). S1 (SGODOT-232): first cast and first landed fish 10 / 10, first catch in a city +10 (q(37), the city comes from the server's fishing site); the Cooking Lv2 gift is the Fresh Fish Soup recipe (§4.6.3).",
   "energy": {
     "max_base": 200,
     "regen_ms": 240000,
@@ -99,6 +99,12 @@
       ],
       [
         "recipe:dish_herb_grilled_fish",
+        1
+      ]
+    ],
+    "cooking:2": [
+      [
+        "recipe:dish_fish_soup",
         1
       ]
     ]
@@ -416,8 +422,9 @@
       60,
       120
     ],
-    "first_cast_xp": 5,
-    "first_landed_xp": 5,
+    "first_cast_xp": 10,
+    "first_landed_xp": 10,
+    "first_city_xp": 10,
     "baits": {
       "bait_worm": {
         "shift": [
@@ -432,6 +439,7 @@
     "sites": {
       "pond": {
         "name": "Willow Pond",
+        "city": "shanghai",
         "template": "Pond",
         "weights": [
           60,
@@ -449,6 +457,7 @@
       },
       "river": {
         "name": "Willow Creek",
+        "city": "shanghai",
         "template": "River",
         "weights": [
           35,

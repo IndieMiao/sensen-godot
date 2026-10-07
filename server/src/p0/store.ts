@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import type { P0Content } from './content.js';
 import { freshState, upgradeState, type P0State } from './state.js';
+import { settleParcels } from './parcels.js';
 
 export class P0Store {
   private players = new Map<string, P0State>();
@@ -14,6 +15,8 @@ export class P0Store {
   get(player: string, now: number): P0State {
     let s = this.players.get(player);
     if (!s) { s = freshState(this.c, player, now); this.players.set(player, s); this.flush(); }
+    // Expired parcels pay out on any read, so the coins are saved even if the next command is refused.
+    if (settleParcels(this.c, s, now + s.clock_ms)) this.flush();
     return s;
   }
   put(state: P0State): void { this.players.set(state.player, state); this.flush(); }

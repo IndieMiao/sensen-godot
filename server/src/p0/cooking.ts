@@ -171,9 +171,9 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown }, no
   if (first) {
     events.push({ kind: 'first', what: firstKey, xp: tier.first_xp });
     gainXp(c, s, now, 'cooking', tier.first_xp, 100, events);
-    return null;
   }
   // §7.6.2: level difference, then same-page decay (2nd half rounded up, 3rd+ none), then quality, rounded down.
+  // The first pot of a page earns this as well as the first-cook bonus (§14.2.2: Good Grilled Crucian 10 + 4 × 1.25).
   const scaled = scaledXp(s, tier.xp, pot.xp_pct);
   const decayed = before === 0 ? scaled : before === 1 ? Math.ceil(scaled / 2) : 0;
   gainXp(c, s, now, 'cooking', Math.floor(decayed * c.cooking.quality_xp[quality]), pot.xp_pct, events);

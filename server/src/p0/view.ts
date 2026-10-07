@@ -13,6 +13,7 @@ import type { BoardRequest } from './state.js';
 import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
 import { haveTotal, stored } from './storage.js';
 import { restReadyIn } from './presence.js';
+import { inboxView, settleParcels } from './parcels.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
 export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
@@ -21,6 +22,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
   if (s.day.key !== dayKey(c, now)) s.day = emptyDay(dayKey(c, now));
   expireGiftMeals(s);
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
+  settleParcels(c, s, now);
   const skills = Object.fromEntries(SKILLS.map(skill => {
     const level = skillLevel(c, s, skill), th = c.skills[skill];
     return [skill, { level, xp: s.skills[skill], floor: th[level - 1], next: level < th.length ? th[level] : null }];
@@ -32,6 +34,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     energy: { value: s.energy.value, max: maxEnergy(c, s), next_in: nextTickIn(c, s, now), regen_ms: regenMs(c, s, now) },
     blessing: blessed(c, s, now) ? { left: s.created_at + c.blessing.days * 86_400_000 - now, regen_mult: c.blessing.regen_mult, food_bonus: c.blessing.food_bonus } : null,
     coins: s.coins,
+    inbox: inboxView(s, now),   // §10.4.8 parcels; the Inbox panel comes with stage 4, the bell reads `badge`
     skills,
     plots: s.plots.map(p => ({
       id: p.id, state: p.state === 'growing' && (p.ready_at ?? Infinity) <= now ? 'ready' : p.state,

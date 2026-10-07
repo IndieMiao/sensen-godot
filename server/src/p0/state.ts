@@ -10,6 +10,20 @@ export interface Plot {
 /** One bag slot. A resident's gift meal is its own stack (gift), never merged with bought or cooked ones (§3.4.5). */
 export interface BagStack { id: string; qty: number; gift?: { from: string; day: string } }
 
+/** A passive reward that did not fit the bag (§10.4.8, q(45)): kept 24 h from when it enters the Inbox. */
+export interface Parcel extends BagStack { key: string; source: string; created_at: number; expires_at: number }
+/** What became of a parcel: claimed, or expired (sellable items paid out as coins). */
+export interface ParcelUpdate extends BagStack {
+  key: string; source: string; at: number; status: 'claimed' | 'expired'; coins: number; read: boolean;
+}
+export interface P0Inbox {
+  granted: string[];                          // reward sources already granted, one key each
+  parcels: Parcel[];                          // at most 8 (§10.4.8)
+  waiting: Omit<Parcel, 'expires_at'>[];      // queued while 8 parcels wait; their 24 h starts on admission (q(45))
+  updates: ParcelUpdate[];                    // the last 100 claims and expiries
+}
+export const emptyInbox = (): P0Inbox => ({ granted: [], parcels: [], waiting: [], updates: [] });
+
 /** A line in the water: the fish is drawn when it is cast (§6.1.2), the client only sees its rarity. */
 export interface Cast {
   fish: string; site: string; at: number; bite_ms: number; bait: string | null;
@@ -83,6 +97,7 @@ export interface P0State {
   boards: { stall: BoardSlot[]; market: BoardSlot[] };
   req_done: string[];            // last completed request ids (a repeated deliver says request_done)
   presence: Presence;
+  inbox: P0Inbox;                // passive rewards that did not fit the bag (§10.4.8)
   firsts: string[];              // e.g. harvest:crop_radish, catch:fish_crucian, cook:dish_grilled_crucian
   rewards: string[];             // one-time rewards already granted
   day: P0Day;
@@ -112,7 +127,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     skills: { farming: 0, fishing: 0, cooking: 0 },
     plots,
     bag: c.start.bag.map(([id, qty]) => ({ id, qty })),
-    bag_cap: c.bag.capacity, storage: {}, locked: [], owned: [],
+    bag_cap: c.bag.capacity, storage: {}, locked: [], owned: [], inbox: emptyInbox(),
     homestead: { level: 1, plaque: [] },
     residents: {},
     boards: { stall: [{ req: tutorialRequest(c, now), refill_at: 0 }], market: [] }, req_done: [],
@@ -172,6 +187,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   }
   s.req_done ??= [];
   s.presence ??= { left_at: null, last_at: 0, space: null };
+  s.inbox ??= emptyInbox();   // SGODOT-232: no version bump, so v4 stays free for SGODOT-231
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
   s.v = 3;
   return s;
