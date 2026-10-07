@@ -53,7 +53,7 @@
 				"name": "left_front",
 				"reached": true,
 				"remaining_m": 0.0722875148057938,
-				"seconds": 0.199,
+				"seconds": 0.2,
 				"target": [
 					-1.54999995231628,
 					0.0820000022649765,
@@ -79,7 +79,7 @@
 				"name": "left_bench",
 				"reached": true,
 				"remaining_m": 0.0699983835220337,
-				"seconds": 0.504,
+				"seconds": 0.516,
 				"target": [
 					-1.48000001907349,
 					0.0820000022649765,
@@ -105,7 +105,7 @@
 				"name": "forge_safe",
 				"reached": true,
 				"remaining_m": 0.0745145976543427,
-				"seconds": 0.383,
+				"seconds": 0.371,
 				"target": [
 					-1.29999995231628,
 					0.0820000022649765,
@@ -131,7 +131,7 @@
 				"name": "water_side",
 				"reached": true,
 				"remaining_m": 0.0877421125769615,
-				"seconds": 0.532,
+				"seconds": 0.537,
 				"target": [
 					-1.58000004291534,
 					0.0820000022649765,
@@ -159,7 +159,7 @@
 				"name": "front",
 				"reached": true,
 				"remaining_m": 0.0729423090815544,
-				"seconds": 0.349,
+				"seconds": 0.338,
 				"target": [
 					-1.01999998092651,
 					0.0820000022649765,
@@ -185,7 +185,7 @@
 				"name": "bench_right",
 				"reached": true,
 				"remaining_m": 0.0798263475298882,
-				"seconds": 0.733,
+				"seconds": 0.734,
 				"target": [
 					1.63999998569489,
 					0.0820000022649765,
@@ -211,7 +211,7 @@
 				"name": "stump_front",
 				"reached": true,
 				"remaining_m": 0.0829791054129601,
-				"seconds": 0.551,
+				"seconds": 0.55,
 				"target": [
 					1.76999998092651,
 					0.0820000022649765,
@@ -237,7 +237,7 @@
 				"name": "rear_bench",
 				"reached": true,
 				"remaining_m": 0.07201087474823,
-				"seconds": 0.584,
+				"seconds": 0.596,
 				"target": [
 					0.449999988079071,
 					0.0820000022649765,
@@ -248,13 +248,13 @@
 			"passed": true
 		},
 		{
-			"details": 6.05,
+			"details": 6.036,
 			"name": "Full route fits unaccelerated 15s clip",
 			"passed": true
 		}
 	],
 	"passed": true,
-	"pid": 1153187,
+	"pid": 1162728,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -294,7 +294,7 @@
 			"name": "left_front",
 			"reached": true,
 			"remaining_m": 0.0722875148057938,
-			"seconds": 0.199,
+			"seconds": 0.2,
 			"target": [
 				-1.54999995231628,
 				0.0820000022649765,
@@ -316,7 +316,7 @@
 			"name": "left_bench",
 			"reached": true,
 			"remaining_m": 0.0699983835220337,
-			"seconds": 0.504,
+			"seconds": 0.516,
 			"target": [
 				-1.48000001907349,
 				0.0820000022649765,
@@ -338,7 +338,7 @@
 			"name": "forge_safe",
 			"reached": true,
 			"remaining_m": 0.0745145976543427,
-			"seconds": 0.383,
+			"seconds": 0.371,
 			"target": [
 				-1.29999995231628,
 				0.0820000022649765,
@@ -360,7 +360,7 @@
 			"name": "water_side",
 			"reached": true,
 			"remaining_m": 0.0877421125769615,
-			"seconds": 0.532,
+			"seconds": 0.537,
 			"target": [
 				-1.58000004291534,
 				0.0820000022649765,
@@ -384,7 +384,7 @@
 			"name": "front",
 			"reached": true,
 			"remaining_m": 0.0729423090815544,
-			"seconds": 0.349,
+			"seconds": 0.338,
 			"target": [
 				-1.01999998092651,
 				0.0820000022649765,
@@ -406,7 +406,7 @@
 			"name": "bench_right",
 			"reached": true,
 			"remaining_m": 0.0798263475298882,
-			"seconds": 0.733,
+			"seconds": 0.734,
 			"target": [
 				1.63999998569489,
 				0.0820000022649765,
@@ -428,7 +428,7 @@
 			"name": "stump_front",
 			"reached": true,
 			"remaining_m": 0.0829791054129601,
-			"seconds": 0.551,
+			"seconds": 0.55,
 			"target": [
 				1.76999998092651,
 				0.0820000022649765,
@@ -450,7 +450,7 @@
 			"name": "rear_bench",
 			"reached": true,
 			"remaining_m": 0.07201087474823,
-			"seconds": 0.584,
+			"seconds": 0.596,
 			"target": [
 				0.449999988079071,
 				0.0820000022649765,

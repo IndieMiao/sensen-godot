@@ -9,7 +9,7 @@ ROOT=Path(__file__).resolve().parents[4]
 slug=sys.argv[2] if len(sys.argv)>2 else 'coffee_shop'
 assert slug.replace('_','').isalnum()
 revision=sys.argv[1] if len(sys.argv)>1 else 'r1'
-assert revision in ('r1','r2','r21','r2plants')
+assert revision in ('r1','r2','r21','r22','r2plants')
 out=ROOT/'output'/slug/revision
 stage=out/'godot-project'
 out.mkdir(parents=True,exist_ok=True)
@@ -19,6 +19,8 @@ for family in ('assets/rooms','scenes'):
 if slug!='coffee_shop':
     shutil.copytree(ROOT/'scenes/coffee_shop',stage/'scenes/coffee_shop',dirs_exist_ok=True)
 shutil.copytree(ROOT/'assets/rooms/_shared/plants',stage/'assets/rooms/_shared/plants',dirs_exist_ok=True,ignore=shutil.ignore_patterns('source','*.md'))
+if (ROOT/'assets/rooms/_shared/fx').exists():
+    shutil.copytree(ROOT/'assets/rooms/_shared/fx',stage/'assets/rooms/_shared/fx',dirs_exist_ok=True)
 shutil.copy2(ROOT/'tools/art/source/coffee_shop/render_r1.gd',stage/'render_review.gd')
 (stage/'project.godot').write_text('''config_version=5
 [application]

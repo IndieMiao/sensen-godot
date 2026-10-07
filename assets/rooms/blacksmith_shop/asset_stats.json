@@ -45,20 +45,6 @@
       "bytes": 74680
     },
     {
-      "name": "smoke",
-      "vertices": 5156,
-      "triangles": 10296,
-      "surfaces": 1,
-      "bytes": 228140
-    },
-    {
-      "name": "fire",
-      "vertices": 1078,
-      "triangles": 2128,
-      "surfaces": 1,
-      "bytes": 48476
-    },
-    {
       "name": "forge_coals",
       "vertices": 1809,
       "triangles": 3402,
@@ -332,20 +318,20 @@
       "bytes": 5088
     }
   ],
-  "unique_triangles": 93290,
-  "scene_triangles": 95578,
-  "static_draw_surfaces": 52,
-  "unique_assets": 46,
-  "placed_instances": 52,
-  "glb_bytes": 3506436,
+  "unique_triangles": 80866,
+  "scene_triangles": 83154,
+  "static_draw_surfaces": 50,
+  "unique_assets": 44,
+  "placed_instances": 50,
+  "glb_bytes": 3229820,
   "scene_budget": {
     "after": {
-      "room_triangles": 95578,
+      "room_triangles": 83154,
       "shared_plant_triangles": 4096,
       "room_botanical_triangles": 0,
       "plant_triangles": 4096,
-      "total_triangles": 99674,
-      "static_surfaces": 19
+      "total_triangles": 87250,
+      "static_surfaces": 18
     },
     "limits": {
       "total_triangles": 200000,
@@ -383,7 +369,6 @@
         "sources": [
           "back_wall",
           "forge_hood",
-          "smoke",
           "forge_sign",
           "hammer_wall",
           "tongs_wall",
@@ -405,7 +390,7 @@
           "wall_tong_4",
           "wall_tong_5"
         ],
-        "triangles": 25514,
+        "triangles": 15218,
         "cast_shadow": true
       },
       {
@@ -438,5 +423,29 @@
     ],
     "source": "accepted SGODOT-172 R2.1",
     "bytes": 568
+  },
+  "effects": {
+    "flames": 16,
+    "sparks": 4,
+    "smoke": 12,
+    "total_particles": 32,
+    "particle_surfaces": 3,
+    "fixed_fps": 30,
+    "collision": false,
+    "shadows": false,
+    "textures": {
+      "flame_strip.png": [
+        1024,
+        256
+      ],
+      "smoke_strip.png": [
+        1024,
+        256
+      ],
+      "spark.png": [
+        64,
+        64
+      ]
+    }
   }
 }

@@ -63,7 +63,7 @@
 				"name": "left_front",
 				"reached": true,
 				"remaining_m": 0.0722875148057938,
-				"seconds": 0.05,
+				"seconds": 0.051,
 				"target": [
 					-1.54999995231628,
 					0.0820000022649765,
@@ -89,7 +89,7 @@
 				"name": "left_bench",
 				"reached": true,
 				"remaining_m": 0.0699983835220337,
-				"seconds": 0.499,
+				"seconds": 0.5,
 				"target": [
 					-1.48000001907349,
 					0.0820000022649765,
@@ -115,7 +115,7 @@
 				"name": "forge_safe",
 				"reached": true,
 				"remaining_m": 0.0745145976543427,
-				"seconds": 0.367,
+				"seconds": 0.366,
 				"target": [
 					-1.29999995231628,
 					0.0820000022649765,
@@ -195,7 +195,7 @@
 				"name": "bench_right",
 				"reached": true,
 				"remaining_m": 0.0798263475298882,
-				"seconds": 0.716,
+				"seconds": 0.717,
 				"target": [
 					1.63999998569489,
 					0.0820000022649765,
@@ -247,7 +247,7 @@
 				"name": "rear_bench",
 				"reached": true,
 				"remaining_m": 0.07201087474823,
-				"seconds": 0.566,
+				"seconds": 0.567,
 				"target": [
 					0.449999988079071,
 					0.0820000022649765,
@@ -264,7 +264,7 @@
 				],
 				"final": [
 					-1.23749983310699,
-					0.0820977911353111,
+					0.0745107084512711,
 					1.25
 				],
 				"from": [
@@ -273,8 +273,8 @@
 					1.25
 				],
 				"reached": false,
-				"remaining_m": 1.38749980926514,
-				"seconds": 0.867,
+				"remaining_m": 1.38752007484436,
+				"seconds": 0.883,
 				"target": [
 					0.150000005960464,
 					0.0820000022649765,
@@ -386,7 +386,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.523533463478088,
-				"seconds": 0.882,
+				"seconds": 0.883,
 				"target": [
 					1.5,
 					0.0820000022649765,
@@ -447,7 +447,7 @@
 					],
 					"reached": true,
 					"remaining_m": 0.066797561943531,
-					"seconds": 0.066,
+					"seconds": 0.067,
 					"target": [
 						-0.949999988079071,
 						0.0820000022649765,
@@ -496,7 +496,7 @@
 			"details": [
 				"run",
 				0.15,
-				0.316666666666667
+				0.316640333333333
 			],
 			"name": "Run animation advances in rendered viewport",
 			"passed": true
@@ -564,7 +564,7 @@
 		}
 	],
 	"passed": true,
-	"pid": 1153098,
+	"pid": 1162639,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -604,7 +604,7 @@
 			"name": "left_front",
 			"reached": true,
 			"remaining_m": 0.0722875148057938,
-			"seconds": 0.05,
+			"seconds": 0.051,
 			"target": [
 				-1.54999995231628,
 				0.0820000022649765,
@@ -626,7 +626,7 @@
 			"name": "left_bench",
 			"reached": true,
 			"remaining_m": 0.0699983835220337,
-			"seconds": 0.499,
+			"seconds": 0.5,
 			"target": [
 				-1.48000001907349,
 				0.0820000022649765,
@@ -648,7 +648,7 @@
 			"name": "forge_safe",
 			"reached": true,
 			"remaining_m": 0.0745145976543427,
-			"seconds": 0.367,
+			"seconds": 0.366,
 			"target": [
 				-1.29999995231628,
 				0.0820000022649765,
@@ -716,7 +716,7 @@
 			"name": "bench_right",
 			"reached": true,
 			"remaining_m": 0.0798263475298882,
-			"seconds": 0.716,
+			"seconds": 0.717,
 			"target": [
 				1.63999998569489,
 				0.0820000022649765,
@@ -760,7 +760,7 @@
 			"name": "rear_bench",
 			"reached": true,
 			"remaining_m": 0.07201087474823,
-			"seconds": 0.566,
+			"seconds": 0.567,
 			"target": [
 				0.449999988079071,
 				0.0820000022649765,
