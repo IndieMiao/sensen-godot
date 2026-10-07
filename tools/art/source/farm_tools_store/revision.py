@@ -42,7 +42,8 @@ def build():
     # Smaller rear counter, lower to the accepted worktop scale.
     r2.scale_kit('sales_counter',(.76,.89,1));r2.move_kit('sales_counter',(-.55,.082,-1.94))
     move_zone(['cash_register','counter_flowers','counter_pencil_pot','counter_price_card'],[-.11,-.165,-.66])
-    r2.move_kit('farm_tools_sign',(-.61,2.77,-2.73));r2.move_kit('sign_sprout',(-.61,2.50,-2.59))
+    r2.move_kit('farm_tools_sign',(-1.10,2.77,-2.73));r2.move_kit('sign_sprout',(-1.10,2.50,-2.59))
+    r2.remove_named('farm_tools_sign',['sign farm tools']);p.b.CURRENT=p.KITS['farm_tools_sign'];bold_lettering('FARM TOOLS',(0,-.10,.102),2.19,'linen')
     r2.move_kit('pot_wall_shelf',(1.0,2.44,-2.70));move_zone(['pots_on_shelf','hand_tools_board','shelf_supplies'],[0,0,.1])
     r2.move_kit('seed_wall_shelf',(-3.02,.63,1.87));r2.scale_kit('seed_wall_shelf',(1.20,.94,1.12))
     p.KITS['seed_wall_shelf']['collision']=[{'at':[0,.74,0],'size':[1.63,1.60,.39]}]
@@ -92,9 +93,9 @@ def build():
     tube('Tall bamboo garden stake',[(.19,.18,-.07),(.24,1.84,-.12)],.025,'sage',8)
     begin('long_tools_wall',(-3.03,.87,-1.95),90)
     cube('Long-tool hanging rail',(0,1.52,0),(1.38,.14,.12),'oak',.025,'wood')
-    for i,(kind,h) in enumerate([('shovel',1.50),('fork',1.29),('rake',1.55),('shovel',1.17),('fork',1.40)]):
+    for i,(kind,h) in enumerate([('shovel',1.48),('fork',1.11),('rake',1.57),('shovel',1.26),('fork',1.38)]):
         before=len(p.KITS['long_tools_wall']['objects']);garden_tool(kind,(-.53+i*.26,0,.14),h)
-        pivot=v((-.53+i*.26,1.40,.14));rot=Matrix.Translation(pivot)@Matrix.Rotation(math.radians([-3,3,-1,5,-4][i]),4,'Y')@Matrix.Translation(-pivot)
+        pivot=v((-.53+i*.26,1.40,.14));rot=Matrix.Translation(pivot)@Matrix.Rotation(math.radians([-9,6,-5,11,-7][i]),4,'Y')@Matrix.Translation(-pivot)
         for o in p.KITS['long_tools_wall']['objects'][before:]:o.matrix_basis=rot@o.matrix_basis
     # Replace the old identical four-tool lineup with seven distinct lengths/jaws.
     r2.remove_named('hand_tools_board',['shaft','grip','blade','fork','rake','tooth','tine','shoulder']);p.b.CURRENT=p.KITS['hand_tools_board']
@@ -110,11 +111,12 @@ def build():
     for y in (0,.16,.32):pot((0,y,0),.19,.27)
     begin('counter_checked_cloth',(.19,1.25,-1.94))
     r2.metric_cloth('Counter folded square gingham',[(-.39,.01),(.35,.01),(.45,-.07),(.46,-.39)],-.22,.44,.105)
-    begin('door_copper_bell',(2.99,2.06,-2.60))
+    begin('door_copper_bell',(3.02,2.35,-2.53))
     tube('Bell wrought mounting arm',[(0,.31,-.07),(0,.32,.15),(0,.17,.15)],.024,'iron',8)
     lathe('Copper shop bell',(0,-.10,.15),[(0,.14),(.03,.15),(.10,.11),(.27,.055),(.29,.042)],'B48043',24)
     ellipsoid('Bell hanging clapper',(0,-.12,.15),(.054,.072,.054),'brass',12,8)
-    begin('sign_iron_chains',(-.61,3.21,-2.64))
+    r2.scale_kit('door_copper_bell',(1.23,1.23,1.23));r2.scale_kit('entry_mat',(1.17,1,1.20))
+    begin('sign_iron_chains',(-1.10,3.21,-2.64))
     for x in (-.90,.90):
         for i in range(3):tube('Interlocking sign chain',[(x+.028*math.cos(a),-.02-i*.060+.048*math.sin(a),.01*(i%2)) for a in [j*math.tau/12 for j in range(13)]],.009,'iron',6)
     for name,asset,at,s,yaw,col in [
@@ -124,19 +126,26 @@ def build():
       ('pot_shelf_trailing_plant','pothos',(1.38,2.56,-2.61),.91,0,False)]:
         r2.shared_plant(name,asset,at,s,yaw,[{'at':[0,.30,0],'size':[.76,.60,.76]}] if col else None)
     r2.scale_kit('front_display',(.91,1,1))
-    move_zone(['front_display','display_gloves','display_tools','display_flowers','display_under_crates','display_seed_rack','display_small_goods','price_boards'],[.20,0,0])
+    move_zone(['front_display','display_gloves','display_tools','display_flowers','display_under_crates','display_seed_rack','display_small_goods','price_boards'],[.75,0,.24])
     for name in ('seed_crop_0','seed_crop_1','seed_crop_2','seed_crop_3'):
-        k=p.KITS[name];r2.move_kit(name,(k['at'][0]+.2,k['at'][1],k['at'][2]))
+        k=p.KITS[name];r2.move_kit(name,(k['at'][0]+.75,k['at'][1],k['at'][2]+.24))
     for inst in p.INSTANCES:
         if inst['name'].startswith('rack_packet_'):
-            inst['position'][0]+=.20
-            bpy.data.objects[inst['name']].location.x+=.20
+            inst['position'][0]+=.75;inst['position'][2]+=.24
+            bpy.data.objects[inst['name']].location.x+=.75;bpy.data.objects[inst['name']].location.y-=.24
     # Reference calls for a terracotta vessel: use the supplied standalone pot
     # around the existing plant, retaining the same shared atlas and source.
     r2.shared_plant('entry_terracotta_pot','pot_terracotta',(2.88,.083,-1.65),1.18,0)
     merge_modules('counter_dressing',['cash_register','counter_flowers','counter_pencil_pot','counter_price_card','counter_checked_cloth'])
     merge_modules('display_dressing',['display_gloves','display_tools','display_flowers','display_under_crates','display_seed_rack','display_small_goods','price_boards'])
     merge_modules('wall_dressing',['pots_on_shelf','shelf_supplies','sign_sprout','sign_iron_chains','door_copper_bell','silver_watering_can'])
+    begin('front_sack_crate',(-2.12,.082,2.63),collision=[{'at':[0,.29,0],'size':[.68,.58,.49]}])
+    crate(width=.66,height=.40,depth=.47)
+    for x in (-.15,.15):
+        cube('Soft sack in front corner crate',(x,.43,0),(.28,.32,.38),'linen',.055,'cloth')
+        cube('Seed sack woven green band',(x,.598,0),(.10,.01,.34),'sage',.008,'cloth')
+    begin('counter_extra_pots',(.99,.082,-1.75),collision=[{'at':[0,.28,0],'size':[.47,.56,.47]}])
+    for h in (0,.13,.26):pot((0,h,0),.19,.28)
     begin('metal_fittings',(0,0,0));dest=p.KITS['metal_fittings'];bpy.context.view_layer.update()
     for name,kit in list(p.KITS.items()):
         if name=='metal_fittings':continue

@@ -28,6 +28,14 @@ func _setup_room() -> void:
 		_add_asset(asset, asset, material)
 	for instance in layout.instances:
 		_add_asset(assets[instance.asset], instance, material)
+	for point in layout.get("attachment_points", []):
+		var marker := Marker3D.new()
+		marker.name = str(point.name)
+		marker.position = _vec(point.position)
+		marker.rotation_degrees = _vec(point.get("rotation_degrees", [0,0,0]))
+		marker.set_meta("purpose", str(point.get("purpose", "")))
+		if point.has("size"): marker.set_meta("slot_size", _vec(point.size))
+		add_child(marker)
 	var plant_material := load("res://assets/rooms/_shared/plants/material.tres") as StandardMaterial3D
 	for plant in layout.get("shared_plants", []):
 		var container := Node3D.new()
@@ -78,9 +86,13 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 	elif mode == "glass":
 		applied = material.duplicate()
 		applied.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		applied.albedo_color = Color(.9,.97,1,.12)
+		applied.albedo_color = Color(.98,.99,1,.045)
 		applied.roughness = .15
 		applied.cull_mode = BaseMaterial3D.CULL_DISABLED
+	elif mode == "metal":
+		applied = material.duplicate()
+		applied.roughness = .43
+		applied.metallic_specular = .52
 	elif mode == "matte":
 		applied = material.duplicate()
 		applied.roughness = 1.0

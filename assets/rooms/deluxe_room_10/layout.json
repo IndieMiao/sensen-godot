@@ -387,25 +387,12 @@
       "cast_shadow": true
     },
     {
-      "name": "island_daisies",
-      "file": "island_daisies.glb",
-      "position": [
-        -1.72,
-        1.245,
-        -0.3
-      ],
-      "yaw_degrees": 0,
-      "colliders": [],
-      "material": "plain",
-      "cast_shadow": false
-    },
-    {
       "name": "green_pendant",
       "file": "green_pendant.glb",
       "position": [
-        -2,
-        3.83,
-        -0.3
+        -2.2,
+        4.15,
+        0.35
       ],
       "yaw_degrees": 0,
       "colliders": [],
@@ -914,22 +901,22 @@
       "name": "tv_console",
       "file": "tv_console.glb",
       "position": [
-        2.52,
+        3.73,
         0.082,
-        3.02
+        2.25
       ],
-      "yaw_degrees": 0,
+      "yaw_degrees": 55,
       "colliders": [
         {
           "at": [
-            0,
-            0.31,
-            0
+            0.0,
+            0.279,
+            0.0
           ],
           "size": [
-            2.4,
-            0.62,
-            0.48
+            1.776,
+            0.558,
+            0.432
           ]
         }
       ],
@@ -940,11 +927,11 @@
       "name": "television",
       "file": "television.glb",
       "position": [
-        2.52,
-        0.82,
-        3.02
+        3.73,
+        0.75,
+        2.25
       ],
-      "yaw_degrees": 180,
+      "yaw_degrees": 235,
       "colliders": [],
       "material": "plain",
       "cast_shadow": true
@@ -1020,19 +1007,6 @@
       "cast_shadow": true
     },
     {
-      "name": "dining_daisies",
-      "file": "dining_daisies.glb",
-      "position": [
-        -2.1,
-        1.26,
-        2.43
-      ],
-      "yaw_degrees": 0,
-      "colliders": [],
-      "material": "plain",
-      "cast_shadow": false
-    },
-    {
       "name": "living_dressing",
       "file": "living_dressing.glb",
       "position": [
@@ -1075,6 +1049,32 @@
       "colliders": [],
       "material": "plain",
       "cast_shadow": true
+    },
+    {
+      "name": "stair_wall_dressing",
+      "file": "stair_wall_dressing.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "dining_island_flowers",
+      "file": "dining_island_flowers.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": false
     },
     {
       "name": "warm_lamps_glow",
@@ -1213,9 +1213,9 @@
       },
       {
         "position": [
-          -2,
-          2.35,
-          -0.3
+          -2.2,
+          2.67,
+          0.35
         ],
         "energy": 0.75,
         "color": "FFDD8C",
@@ -1240,6 +1240,16 @@
         "energy": 0.5,
         "color": "FFDC90",
         "range": 1.8
+      },
+      {
+        "position": [
+          -1.72,
+          2.74,
+          -3.02
+        ],
+        "energy": 0.6,
+        "color": "FFE0A0",
+        "range": 1.85
       }
     ]
   },
@@ -1285,9 +1295,9 @@
       "name": "door_right_plant",
       "file": "monstera.glb",
       "position": [
-        4.32,
+        4.3,
         0.083,
-        -2.6
+        -2.58
       ],
       "rotation_degrees": [
         0,
@@ -1295,9 +1305,9 @@
         0
       ],
       "scale": [
-        0.95,
-        0.95,
-        0.95
+        1.08,
+        1.08,
+        1.08
       ],
       "colliders": [
         {
@@ -1318,9 +1328,9 @@
       "name": "door_left_plant",
       "file": "peace_lily.glb",
       "position": [
-        0.46,
+        3.1,
         0.083,
-        -1.83
+        -2.84
       ],
       "rotation_degrees": [
         0,
@@ -1328,9 +1338,9 @@
         0
       ],
       "scale": [
-        0.94,
-        0.94,
-        0.94
+        0.88,
+        0.88,
+        0.88
       ],
       "colliders": [
         {
@@ -1361,9 +1371,9 @@
         0
       ],
       "scale": [
-        1.25,
-        1.25,
-        1.25
+        1.52,
+        1.52,
+        1.52
       ],
       "colliders": []
     },
@@ -1401,9 +1411,9 @@
         0
       ],
       "scale": [
-        1.1,
-        1.1,
-        1.1
+        1.25,
+        1.25,
+        1.25
       ],
       "colliders": []
     },
@@ -1441,9 +1451,9 @@
         0
       ],
       "scale": [
-        0.78,
-        0.78,
-        0.78
+        1.02,
+        1.02,
+        1.02
       ],
       "colliders": []
     },
@@ -1486,8 +1496,195 @@
         0.34
       ],
       "colliders": []
+    },
+    {
+      "name": "stairs_floor_greenery",
+      "file": "peace_lily.glb",
+      "position": [
+        -1.65,
+        0.083,
+        -1.58
+      ],
+      "rotation_degrees": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        0.81,
+        0.81,
+        0.81
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.2,
+            0
+          ],
+          "size": [
+            0.42,
+            0.4,
+            0.42
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stairs_wall_pothos",
+      "file": "pothos.glb",
+      "position": [
+        -2.43,
+        2.55,
+        -3.34
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.08,
+        1.08,
+        1.08
+      ],
+      "colliders": []
+    },
+    {
+      "name": "loft_entry_greenery",
+      "file": "peace_lily.glb",
+      "position": [
+        1.35,
+        2.49,
+        -3.48
+      ],
+      "rotation_degrees": [
+        0,
+        20,
+        0
+      ],
+      "scale": [
+        0.43,
+        0.43,
+        0.43
+      ],
+      "colliders": []
     }
   ],
+  "attachment_points": [
+    {
+      "name": "hob_slot_1",
+      "position": [
+        -3.915,
+        1.291,
+        -0.381
+      ],
+      "purpose": "Pot mount on forward right burner",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y"
+    },
+    {
+      "name": "hob_slot_2",
+      "position": [
+        -4.245,
+        1.291,
+        -0.381
+      ],
+      "purpose": "Pot mount on rear right burner",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y"
+    },
+    {
+      "name": "hob_slot_3",
+      "position": [
+        -3.915,
+        1.291,
+        -0.859
+      ],
+      "purpose": "Pot mount on forward left burner",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y"
+    },
+    {
+      "name": "prep_area",
+      "position": [
+        -4.04,
+        1.296,
+        -1.69
+      ],
+      "size": [
+        0.7,
+        0.1,
+        0.55
+      ],
+      "purpose": "Clear 0.55m preparation worktop; utensil crock moved beside sink",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y"
+    },
+    {
+      "name": "spice_rack",
+      "position": [
+        -4.22,
+        2.62,
+        0.38
+      ],
+      "size": [
+        0.38,
+        0.35,
+        0.98
+      ],
+      "purpose": "Open pantry shelf accepts Lv2 spice module",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y"
+    },
+    {
+      "name": "warmer_slot",
+      "position": [
+        -4.08,
+        0.082,
+        -1.69
+      ],
+      "size": [
+        0.69,
+        1.08,
+        0.56
+      ],
+      "purpose": "Lv3 replaceable green cabinet slot under prep, 0.56m along counter",
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "up_axis": "+Y"
+    }
+  ],
+  "kitchen_clearance": {
+    "pendant_shade_bottom_y": 2.67,
+    "avatar_head_H": 1.7455,
+    "clearance_metres": 0.9245,
+    "prep_clear_width_metres": 0.55,
+    "visual_check": "Main and kitchen detail supplied; pendant hangs over island, prep sits against left wall."
+  },
   "review_views": [
     {
       "name": "detail-kitchen",

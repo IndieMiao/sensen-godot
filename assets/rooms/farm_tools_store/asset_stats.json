@@ -20,14 +20,14 @@
       "vertices": 930,
       "triangles": 1820,
       "surfaces": 1,
-      "bytes": 66448
+      "bytes": 66480
     },
     {
       "name": "back_wall",
       "vertices": 738,
       "triangles": 1444,
       "surfaces": 1,
-      "bytes": 55448
+      "bytes": 55416
     },
     {
       "name": "arched_window",
@@ -48,7 +48,7 @@
       "vertices": 1308,
       "triangles": 2568,
       "surfaces": 1,
-      "bytes": 95524
+      "bytes": 95492
     },
     {
       "name": "entry_mat",
@@ -59,10 +59,10 @@
     },
     {
       "name": "farm_tools_sign",
-      "vertices": 2454,
-      "triangles": 4228,
+      "vertices": 4984,
+      "triangles": 7572,
       "surfaces": 1,
-      "bytes": 363444
+      "bytes": 620676
     },
     {
       "name": "sales_counter",
@@ -90,7 +90,7 @@
       "vertices": 2072,
       "triangles": 3924,
       "surfaces": 1,
-      "bytes": 155244
+      "bytes": 155372
     },
     {
       "name": "front_display",
@@ -125,7 +125,7 @@
       "vertices": 282,
       "triangles": 544,
       "surfaces": 1,
-      "bytes": 21128
+      "bytes": 21160
     },
     {
       "name": "seed_crop_1",
@@ -153,7 +153,7 @@
       "vertices": 1696,
       "triangles": 3292,
       "surfaces": 1,
-      "bytes": 278912
+      "bytes": 278848
     },
     {
       "name": "long_tools_wall",
@@ -181,38 +181,52 @@
       "vertices": 8140,
       "triangles": 15768,
       "surfaces": 1,
-      "bytes": 497576
+      "bytes": 497480
     },
     {
       "name": "display_dressing",
       "vertices": 8386,
       "triangles": 16100,
       "surfaces": 1,
-      "bytes": 558544
+      "bytes": 558384
     },
     {
       "name": "wall_dressing",
       "vertices": 2120,
       "triangles": 4116,
       "surfaces": 1,
-      "bytes": 163204
+      "bytes": 162948
+    },
+    {
+      "name": "front_sack_crate",
+      "vertices": 1176,
+      "triangles": 2268,
+      "surfaces": 1,
+      "bytes": 76808
+    },
+    {
+      "name": "counter_extra_pots",
+      "vertices": 480,
+      "triangles": 948,
+      "surfaces": 1,
+      "bytes": 36248
     },
     {
       "name": "metal_fittings",
       "vertices": 2506,
       "triangles": 4656,
       "surfaces": 1,
-      "bytes": 193052
+      "bytes": 192812
     }
   ],
-  "unique_triangles": 84479,
-  "scene_triangles": 97986,
-  "static_draw_surfaces": 41,
-  "glb_bytes": 3359860,
-  "atlas_bytes": 2778673,
-  "placed_instances": 41,
+  "unique_triangles": 91039,
+  "scene_triangles": 104546,
+  "static_draw_surfaces": 43,
+  "glb_bytes": 3729460,
+  "atlas_bytes": 2787875,
+  "placed_instances": 43,
   "materials": 2,
-  "local_scene_triangles": 90192,
+  "local_scene_triangles": 96752,
   "shared_scene_triangles": 7794,
   "shared_assets": [
     {

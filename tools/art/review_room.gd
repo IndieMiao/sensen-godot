@@ -103,6 +103,15 @@ ALBEDO=mix(vec3(.64,.81,.74),vec3(.98,.92,.71),t);}
 		"mesh_instances":0,"surfaces":0,"triangles":0,"colliders":0,"finite_aabbs":true}
 	inspect(room,stats)
 	stats["material_count"] = material_ids.size()
+	if layout.has("attachment_points"):
+		var hook_checks: Array = []
+		for point in layout.attachment_points:
+			var marker := room.get_node_or_null(str(point.name)) as Marker3D
+			assert(marker != null)
+			var error := marker.position.distance_to(vec(point.position))
+			assert(error < .0001 and marker.basis.y.dot(Vector3.UP) > .999)
+			hook_checks.append({"name":point.name,"position_error_m":error,"up_dot":marker.basis.y.dot(Vector3.UP)})
+		stats["attachment_points"] = hook_checks
 	assert(stats.mesh_instances == layout.assets.size() + layout.instances.size() + layout.get("shared_plants", []).size())
 	assert(stats.finite_aabbs)
 	var file := FileAccess.open(output_dir + "/godot-validation.json",FileAccess.WRITE)
