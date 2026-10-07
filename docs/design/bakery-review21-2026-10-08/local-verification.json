@@ -1,0 +1,486 @@
+{
+  "state": "Superseded by completed Godot R2.1 verification",
+  "triangles": 181235,
+  "botanical_triangles": 31154,
+  "static_surfaces": 40,
+  "budget_passed": true,
+  "source_audit": {
+    "passed": true,
+    "inventory": {
+      "layers_bottom_to_top": [
+        [
+          "croissant",
+          "scored loaf",
+          "scored baguette",
+          "croissant",
+          "scored loaf",
+          "croissant",
+          "scored baguette",
+          "scored loaf"
+        ],
+        [
+          "pink macaron",
+          "pink strawberry tart",
+          "green macaron",
+          "yellow macaron",
+          "lemon tart",
+          "pink macaron",
+          "green macaron",
+          "pink strawberry tart"
+        ],
+        [
+          "white pink cake slice",
+          "lemon tart",
+          "cream strawberry cake",
+          "pink strawberry tart",
+          "white pink cake slice",
+          "chocolate berry cake",
+          "lemon tart",
+          "cream strawberry cake"
+        ]
+      ],
+      "placed_count": 24,
+      "prototype_count": 11,
+      "placements": [
+        {
+          "layer": 1,
+          "kind": "croissant",
+          "position": [
+            1.20419305354805,
+            0.965,
+            0.9336912841770776
+          ],
+          "yaw_degrees": -9.866155725350211,
+          "scale": 0.9808567945423113
+        },
+        {
+          "layer": 1,
+          "kind": "scored loaf",
+          "position": [
+            1.4371042618429766,
+            0.965,
+            0.8961413400140528
+          ],
+          "yaw_degrees": 15.025358604113578,
+          "scale": 0.9892087956596807
+        },
+        {
+          "layer": 1,
+          "kind": "scored baguette",
+          "position": [
+            1.6753207614196677,
+            0.965,
+            0.9118690613402736
+          ],
+          "yaw_degrees": 18.0776735235022,
+          "scale": 1.0417947665753358
+        },
+        {
+          "layer": 1,
+          "kind": "croissant",
+          "position": [
+            1.9200553957483808,
+            0.965,
+            0.8895150723474243
+          ],
+          "yaw_degrees": -8.22940775741532,
+          "scale": 1.0273655668413264
+        },
+        {
+          "layer": 1,
+          "kind": "scored loaf",
+          "position": [
+            2.156812038277832,
+            0.965,
+            0.9534715273096442
+          ],
+          "yaw_degrees": -16.756000783959006,
+          "scale": 0.9967657022194378
+        },
+        {
+          "layer": 1,
+          "kind": "croissant",
+          "position": [
+            2.4191962963496523,
+            0.965,
+            0.9095968742440281
+          ],
+          "yaw_degrees": -15.976516834890969,
+          "scale": 1.022241741196131
+        },
+        {
+          "layer": 1,
+          "kind": "scored baguette",
+          "position": [
+            2.640566580104338,
+            0.965,
+            0.9018887181407308
+          ],
+          "yaw_degrees": 0.3154193533770382,
+          "scale": 1.0128064507292427
+        },
+        {
+          "layer": 1,
+          "kind": "scored loaf",
+          "position": [
+            2.912684937577536,
+            0.965,
+            0.9061651220571761
+          ],
+          "yaw_degrees": 7.120939813328732,
+          "scale": 1.009533212384626
+        },
+        {
+          "layer": 2,
+          "kind": "pink macaron",
+          "position": [
+            1.2109011793338782,
+            1.335,
+            0.7920030055474826
+          ],
+          "yaw_degrees": 15.667984347290648,
+          "scale": 1.0348141635425494
+        },
+        {
+          "layer": 2,
+          "kind": "pink strawberry tart",
+          "position": [
+            1.4601758729186818,
+            1.335,
+            0.7910586731052696
+          ],
+          "yaw_degrees": -5.755812130398681,
+          "scale": 1.0181931699861635
+        },
+        {
+          "layer": 2,
+          "kind": "green macaron",
+          "position": [
+            1.6740224676576245,
+            1.335,
+            0.7582194002451387
+          ],
+          "yaw_degrees": 9.358720761553784,
+          "scale": 1.01712557187913
+        },
+        {
+          "layer": 2,
+          "kind": "yellow macaron",
+          "position": [
+            1.9011603597267677,
+            1.335,
+            0.788653446269848
+          ],
+          "yaw_degrees": 1.1258421545803685,
+          "scale": 0.9949368713420874
+        },
+        {
+          "layer": 2,
+          "kind": "lemon tart",
+          "position": [
+            2.166181075515415,
+            1.335,
+            0.7721435349760466
+          ],
+          "yaw_degrees": 0.22454975601390004,
+          "scale": 1.0197479542221313
+        },
+        {
+          "layer": 2,
+          "kind": "pink macaron",
+          "position": [
+            2.3965014685513992,
+            1.335,
+            0.742428011671116
+          ],
+          "yaw_degrees": 19.332945335266572,
+          "scale": 1.0242619743917316
+        },
+        {
+          "layer": 2,
+          "kind": "green macaron",
+          "position": [
+            2.6552190832760867,
+            1.335,
+            0.7594233662541474
+          ],
+          "yaw_degrees": 17.416228523103683,
+          "scale": 0.9691908850060024
+        },
+        {
+          "layer": 2,
+          "kind": "pink strawberry tart",
+          "position": [
+            2.903022833693405,
+            1.335,
+            0.7664811335281768
+          ],
+          "yaw_degrees": 4.032853674043363,
+          "scale": 1.0140815941576398
+        },
+        {
+          "layer": 3,
+          "kind": "white pink cake slice",
+          "position": [
+            1.2125000312284444,
+            1.705,
+            0.6547226975932601
+          ],
+          "yaw_degrees": 14.736093256879357,
+          "scale": 0.969052161508345
+        },
+        {
+          "layer": 3,
+          "kind": "lemon tart",
+          "position": [
+            1.4598648292357372,
+            1.705,
+            0.6461896097477801
+          ],
+          "yaw_degrees": -0.2373617813439175,
+          "scale": 0.9480009386932268
+        },
+        {
+          "layer": 3,
+          "kind": "cream strawberry cake",
+          "position": [
+            1.6903976258130282,
+            1.705,
+            0.6332582853942436
+          ],
+          "yaw_degrees": 5.488986526759412,
+          "scale": 1.0437538520163772
+        },
+        {
+          "layer": 3,
+          "kind": "pink strawberry tart",
+          "position": [
+            1.9120266475695364,
+            1.705,
+            0.6069518791439484
+          ],
+          "yaw_degrees": 17.998974984398835,
+          "scale": 0.9483009665340131
+        },
+        {
+          "layer": 3,
+          "kind": "white pink cake slice",
+          "position": [
+            2.1442801967784058,
+            1.705,
+            0.6063204859181877
+          ],
+          "yaw_degrees": -6.854894933147948,
+          "scale": 0.9657958931275703
+        },
+        {
+          "layer": 3,
+          "kind": "chocolate berry cake",
+          "position": [
+            2.419695997443949,
+            1.705,
+            0.637158870223256
+          ],
+          "yaw_degrees": -11.905748282754939,
+          "scale": 0.9972165933615746
+        },
+        {
+          "layer": 3,
+          "kind": "lemon tart",
+          "position": [
+            2.6464302836364584,
+            1.705,
+            0.6516823251856076
+          ],
+          "yaw_degrees": 8.224475644304906,
+          "scale": 0.9774216748049073
+        },
+        {
+          "layer": 3,
+          "kind": "cream strawberry cake",
+          "position": [
+            2.9084133529299563,
+            1.705,
+            0.5859476738664523
+          ],
+          "yaw_degrees": 10.94125603474479,
+          "scale": 1.037066726890036
+        }
+      ]
+    },
+    "minimum_cut_crumb_faces": 106,
+    "legacy_raised_white_score_objects": [],
+    "plant_projected_bounds": [
+      1056.2743879837417,
+      558.2655540572338,
+      1145.6066724216416,
+      708.2097576501955
+    ],
+    "case_projected_bounds": [
+      694.3470584245324,
+      512.4264070524412,
+      942.2865759986948,
+      722.4176436675053
+    ],
+    "plant_does_not_overlap_display_bounds": true,
+    "scope": "Evaluated Blender source, declared accepted camera, source inventory and actual recessed faces. Godot visual/route verification remains pending due unavailable desktop.",
+    "scored_source_objects_including_prototypes": 29
+  },
+  "normals_uv_external_images_passed": true,
+  "current_godot_visual_validation": "Passed; see ../bakery-2026-10-07/verification-summary.json",
+  "current_rendered_character_validation": "Fresh34/34 and15srecord pass",
+  "current_plane_lark_remote_delivery": "Delivery tracked by current primary README/receipt",
+  "hashes": {
+    "assets/rooms/bakery/room_shell.glb": "67e1c37d0a9d2181cf5a030cfff9cfbf9df99a20f85b81dea7abc9b29fcf632f",
+    "assets/rooms/bakery/window_wall.glb": "20e469ee08f591a02aa356571f68ac52c6688fb8a18d88e3c69fa28f934dd1bd",
+    "assets/rooms/bakery/back_wall.glb": "13d99d5a22bf57565586cbee1f185dcccaa192abde38c9cd8e5af9bf847acb37",
+    "assets/rooms/bakery/back_window_left.glb": "44446b709ade122211ab6011af81d349d9406ccd256d12cc4cc4e3817009bf8d",
+    "assets/rooms/bakery/back_window_left_garden.glb": "13eef3e51c8a71f505ad13d0ea3cce3fedf9d409e516822076cae792b436feaa",
+    "assets/rooms/bakery/back_window_right.glb": "aa92e48eb7e9acd5a577326cdb045e37b74e578408a0060e0734eaa14d472625",
+    "assets/rooms/bakery/back_window_right_garden.glb": "a7342931ac7925ca021943237df24cfef470fed9dfe08dc35212e5e4256077f4",
+    "assets/rooms/bakery/brick_oven.glb": "32eaf0c657562b62c9ab545ae0d89c85f4e3b5d2668528e41ecc098dcd459ce0",
+    "assets/rooms/bakery/baking_loaves.glb": "cc82f719f9551a3f59705dad2f11a2de7cd67ad7b58643e67451a841373e46c4",
+    "assets/rooms/bakery/oven_peel.glb": "149c4f54350ea5c17c25a1058d9ca4619ab0cc0a04b480096dd9f8d893ce9a23",
+    "assets/rooms/bakery/pastry_display.glb": "a9711b04e265128c2d2c12305e43b33645a3c08163e54dfb14b41b8ce952a1b4",
+    "assets/rooms/bakery/display_frame.glb": "aeb9992799440f3808aec821071fc5a1be9f106ee742742b8dc49cbb29d5c6bb",
+    "assets/rooms/bakery/display_glass.glb": "2cce52c984fd63d051766885d8707dfee9ad555102221e0fb901fa10a90695c1",
+    "assets/rooms/bakery/checkout_counter.glb": "dcef8e6efd0344a87e97eace73f89b6116b8fe1cfb91b25f8f038e7eb59bc996",
+    "assets/rooms/bakery/bread_motto.glb": "8217f91ed96c78d4b0d310379f9433f8ed3c3404781f60e349aa9652eacdab36",
+    "assets/rooms/bakery/sink_cabinet.glb": "13998ccb24ca182e7923e6c6775120c9de89345d6cf94e356464340350db22ee",
+    "assets/rooms/bakery/back_counter.glb": "b46b5a49fa1df0f4f762ef8bccc99823ef0ea2ed6e5799beab4649785f038a1c",
+    "assets/rooms/bakery/pantry.glb": "cf0d5b469cad0058ce0c56186f650c49d243bf5df750f9e92bb63c4d6d28eaae",
+    "assets/rooms/bakery/jar_wall_shelves.glb": "c5e42d51727ffac23279c5ada5d139d49cbf06330356a730103048919e3f939a",
+    "assets/rooms/bakery/bakery_rack.glb": "213ab7ab379abd1f83a391fc88a9b17016848ab39341e93aa8ff9e085c7af82d",
+    "assets/rooms/bakery/baking_workbench.glb": "6c5cb42b1c634db395ad0e13c274d6f908f2b2c80df15ffde5866cd8b817aa89",
+    "assets/rooms/bakery/cafe_table.glb": "dabc3d05d3cc21027c1091e582d5eeb3def62cf317c313a630cff02edac18de5",
+    "assets/rooms/bakery/cafe_rope_rug.glb": "26b87088917c9aa1b0198d95fcae990b15e6879725666acefdd448e5b44608f8",
+    "assets/rooms/bakery/fire.glb": "f1e623310bf86d81ba9bf8f35992141248fc2e593f04eb9e84362ec600ed28c8",
+    "assets/rooms/bakery/display_shelves.glb": "caaa0829feeea80219b38b5733549e129e8fc5ae46fe8558503312abd9f79dca",
+    "assets/rooms/bakery/bakery_sign.glb": "15b576d751031e314b9efa1e2dc93e1082816b5a332aecce1e005938ebef175c",
+    "assets/rooms/bakery/cafe_chair.glb": "db01899c6c96dfc5dce4af27428343bed8fab361f5243629d7ad2a7552853cda",
+    "assets/rooms/bakery/back_counter_dressing.glb": "327a6739451a4ae837bb8c7a87f8a07a2528a965b61497412ee69caf1c82f2dc",
+    "assets/rooms/bakery/prep_dressing.glb": "bdcf5b1641b27f68cf2deb4eb4ed0d0611548e45217489909eb8d78d4a9cce20",
+    "assets/rooms/bakery/wall_and_cafe_dressing.glb": "4411bb15be8a88a7b7fff8edccac7c4aca6964d78f17a261c86d4c18d6d68ae3",
+    "assets/rooms/bakery/wall_lamps.glb": "e1f766087364ed115c1136112aa06d9c86cebef952a390fa69ad733f78ab9dee",
+    "assets/rooms/bakery/warm_lamps_glow.glb": "6b594dfa15cdb46b6c57cd3dea3eb85e896eb31883730e312524b69d1516a8b7",
+    "assets/rooms/bakery/stocked_pastries.glb": "bb3e3b9a2a481ac0b558db979e08b14248481df3f560109426fca1a5cc9d310e",
+    "assets/rooms/bakery/room_albedo_ao.png": "ebee15887ac676a94c646f843216347d4f2a67248b4a3ce5cccc2fa1169edb89",
+    "assets/rooms/bakery/fire_gradient.png": "349870df4e628410dc128999d57558a6654b17e5ef4d5a2cabc06db6b8e89f5b",
+    "assets/rooms/bakery/layout.json": "dcc4809049528ef8b31babab79c755648f01d5b9fb639ac61191824ff064c9df",
+    "tools/art/source/bakery/bakery.blend": "9076d605c4e327c07453ce19a79b4324b839f5e868fc068b9e5b9105410f2028"
+  },
+  "godot_headless_contract": {
+    "checkout_probes": [
+      {
+        "clear": true,
+        "point": [
+          0.479999989271164,
+          0.0900000035762787,
+          -1.20000004768372
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          0.642499983310699,
+          0.0900000035762787,
+          -1.23666667938232
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          0.805000007152557,
+          0.0900000035762787,
+          -1.27333331108093
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          0.967499971389771,
+          0.0900000035762787,
+          -1.31000006198883
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          1.12999999523163,
+          0.0900000035762787,
+          -1.34666669368744
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          1.29250001907349,
+          0.0900000035762787,
+          -1.38333332538605
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          1.45500004291534,
+          0.0900000035762787,
+          -1.42000007629395
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          1.6175000667572,
+          0.0900000035762787,
+          -1.45666670799255
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          1.78000009059906,
+          0.0900000035762787,
+          -1.49333333969116
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          1.94250011444092,
+          0.0900000035762787,
+          -1.52999997138977
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          2.10500001907349,
+          0.0900000035762787,
+          -1.56666660308838
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          2.26749992370605,
+          0.0900000035762787,
+          -1.60333335399628
+        ]
+      },
+      {
+        "clear": true,
+        "point": [
+          2.4300000667572,
+          0.0900000035762787,
+          -1.63999998569489
+        ]
+      }
+    ],
+    "mesh_instances": 40,
+    "passed": true,
+    "scope": "Headless imported mesh/budget and relocated planter checkout-approach capsule checks only. Not a rendered route/video or colour test.",
+    "surfaces": 40,
+    "triangles": 181235
+  },
+  "final_verification": "../bakery-2026-10-07/verification-summary.json"
+}

@@ -28,14 +28,17 @@ func _setup_room() -> void:
 		_add_asset(asset, asset, material)
 	for instance in layout.instances:
 		_add_asset(assets[instance.asset], instance, material)
-	for point in layout.get("attachment_points", []):
+	for point in layout.get("anchors", []):
 		var marker := Marker3D.new()
 		marker.name = str(point.name)
-		marker.position = _vec(point.position)
-		marker.rotation_degrees = _vec(point.get("rotation_degrees", [0,0,0]))
-		marker.set_meta("purpose", str(point.get("purpose", "")))
-		if point.has("size"): marker.set_meta("slot_size", _vec(point.size))
-		add_child(marker)
+		var anchor_parent: Node3D = self
+		if point.has("module"):
+			anchor_parent = get_node(str(point.module)) as Node3D
+			marker.set_meta("module", str(point.module))
+		anchor_parent.add_child(marker)
+		var room_transform := Transform3D(Basis(Vector3.UP, deg_to_rad(float(point.get("yaw_degrees", 0.0)))), _vec(point.position))
+		marker.transform = room_transform if anchor_parent == self else anchor_parent.transform.affine_inverse() * room_transform
+		if point.has("size"): marker.set_meta("sign_size", Vector2(float(point.size[0]), float(point.size[1])))
 	var plant_material := load("res://assets/rooms/_shared/plants/material.tres") as StandardMaterial3D
 	for plant in layout.get("shared_plants", []):
 		var container := Node3D.new()
@@ -89,6 +92,13 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 		applied.albedo_color = Color(.98,.99,1,.045)
 		applied.roughness = .15
 		applied.cull_mode = BaseMaterial3D.CULL_DISABLED
+	elif mode == "window_glass":
+		applied = material.duplicate()
+		applied.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		applied.emission_enabled = true
+		applied.emission = Color("dce9dc")
+		applied.emission_texture = applied.albedo_texture
+		applied.emission_energy_multiplier = .06
 	elif mode == "metal":
 		applied = material.duplicate()
 		applied.roughness = .43
@@ -100,7 +110,7 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 	if variant_materials.has(mode): applied = variant_materials[mode]
 	else: variant_materials[mode] = applied
 	_set_material(model, applied)
-	if not asset.get("cast_shadow", true) or mode in ["garden","fire","glow","glass"]: _disable_shadows(model)
+	if not asset.get("cast_shadow", true) or mode in ["garden","fire","glow","glass","window_glass"]: _disable_shadows(model)
 	for c in asset.colliders: _add_collider(container,c)
 
 func _add_collider(container: Node3D, c: Dictionary) -> void:
@@ -125,8 +135,11 @@ func _add_collider(container: Node3D, c: Dictionary) -> void:
 
 func set_bench_door_open(open: bool) -> void:
 	if not layout.has("door"): return
-	var door := get_node_or_null(str(layout.door.module)) as Node3D
-	if door: door.rotation.y = deg_to_rad(float(layout.door.open_yaw_degrees)) if open else 0.0
+	var names: Array = [layout.door.module]
+	names.append_array(layout.door.get("companions", []))
+	for name in names:
+		var door := get_node_or_null(str(name)) as Node3D
+		if door: door.rotation.y = deg_to_rad(float(layout.door.open_yaw_degrees)) if open else deg_to_rad(float(layout.door.get("closed_yaw_degrees", 0.0)))
 
 func _set_material(node: Node, mat: Material) -> void:
 	if node is MeshInstance3D:

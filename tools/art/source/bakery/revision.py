@@ -4,7 +4,7 @@ import sys,math,json,random
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 from zhaoyun_review import *
 from shop_room_parts import *
-from build_bakery import bread
+from build_bakery import bread as initial_bread
 from mathutils import Matrix
 
 PALETTE=dict(r2.PALETTE,oak='AB663C',oak_light='C5804D',oak_edge='93542F',oak_end='A46137',floor='B57449',floor_light='BE7D50',floor_shade='B17248',joint='955D38',plaster='F4D6B6',plaster_light='F3DABB',linen='EEDCC0',terra='BB7245')
@@ -16,29 +16,73 @@ def wall_lamp(name,at,yaw=0):
     lathe('Black flared light shade',(0,-.12,.35),[(0,.15),(.03,.16),(.10,.10),(.15,.045)],'iron',20)
     begin(name+'_glow',at,yaw);ellipsoid('Warm wall lamp globe',(0,-.17,.35),(.18,.18,.18),'FFCE75',16,10)
 
-def pastries():
-    # Five reusable prototypes, 25 display pieces (some share a surface batch).
-    locations=[]
-    for row in range(3):
-        for i in range(8):locations.append((1.20+i*.245,.965+row*.37,.92-row*.15))
-    rng=random.Random(175)
-    for kind in range(5):
-        x,y,z=locations[kind];begin('pastry_'+str(kind),(x,y,z))
-        if kind<3:bread(kind=['cake','croissant','loaf'][kind])
-        elif kind==3:
-            lathe('Fluted golden tart',profile=[(0,.10),(.04,.14),(.075,.15),(.09,.13)],at=(0,0,0),color='D69A55',segments=20)
-            cylinder('Tart vanilla filling',(0,.075,0),.12,.02,'linen',vertices=20)
-            for j in range(5):
-                a=j*math.tau/5;ellipsoid('Red fruit tart topping',(.074*math.cos(a),.13,.074*math.sin(a)),(.06,.08,.06),'C74D35',12,8)
+def bread(at=(0,0,0),kind='loaf'):
+    if kind not in ('loaf','baguette'):
+        return initial_bread(at,kind)
+    x,y,z=at;baguette=kind=='baguette'
+    crust='D6A061' if baguette else 'D09B5A';crumb='DDB478'
+    size=(.19,.19,.62) if baguette else (.34,.22,.28)
+    body=ellipsoid('Baguette with recessed scores' if baguette else 'Loaf with recessed scores',(x,y+.105,z),size,crust,22,12)
+    inside=material(crumb);body.data.materials.append(inside)
+    for j in range(5 if baguette else 3):
+        if baguette:
+            zz=-.22+j*.11;top=.105+.095*math.sqrt(max(0,1-(zz/.31)**2))
+            cutter=ellipsoid('Shallow diagonal baguette scoring cutter',(x,y+top+.003,z+zz),(.16,.032,.028),crumb,12,8)
+            cutter.rotation_euler.z=math.radians(-23)
         else:
-            cylinder('Chocolate petit cake',(0,.09,0),.14,.18,'754B36',vertices=20)
-            cylinder('Chocolate glaze',(0,.19,0),.145,.03,'523727',vertices=20)
-            for j in range(3):ellipsoid('Berry cake topping',((j-1)*.065,.24,0),(.065,.07,.065),'9E3852',12,8)
+            dx=(j-1)*.075;top=.105+.11*math.sqrt(max(0,1-(dx/.17)**2))
+            cutter=ellipsoid('Shallow loaf scoring cutter',(x+dx,y+top+.006,z),(.033,.040,.17),crumb,12,8)
+            cutter.rotation_euler.z=math.radians(9)
+        cutter.data.materials.clear();cutter.data.materials.append(material(crust));cutter.data.materials.append(inside)
+        for face in cutter.data.polygons:face.material_index=1
+        boolean_cut(body,cutter)
+    body['bread_score']='Boolean recessed crumb, warm crust-relative tint; no separate white bars'
+
+def pastry_geometry(kind):
+    if kind==1:return bread(kind='croissant')
+    if kind==2:return bread(kind='loaf')
+    if kind==10:return bread(kind='baguette')
+    if kind in (0,4):
+        cylinder('Vanilla or chocolate cake',(0,.10,0),.16,.20,'F0D5AC' if kind==0 else '754B36',vertices=24)
+        cylinder('Cream or dark ganache top',(0,.215,0),.166,.055,'FFF1DF' if kind==0 else '71462F',vertices=24)
+        cylinder('Cake strawberry cream band',(0,.115,0),.162,.044,'EE9DA8' if kind==0 else 'AE7866',vertices=24)
+        for j in range(4):
+            a=j*math.tau/4;ellipsoid('Cake berry topping',(.085*math.cos(a),.285,.085*math.sin(a)),(.068,.081,.068),'D8465D' if kind==0 else '97415A',12,8)
+    elif kind in (3,5):
+        lathe('Fluted golden tart',(0,0,0),[(0,.10),(.04,.14),(.075,.15),(.09,.13)],'D9AD6C',20)
+        cylinder('Pink strawberry or lemon tart filling',(0,.080,0),.125,.025,'ED8DAA' if kind==3 else 'F3D450',vertices=24)
+        for j in range(4):
+            a=j*math.tau/4
+            ellipsoid('Strawberry or lemon garnish',(.072*math.cos(a),.135,.072*math.sin(a)),(.06,.072,.06),'D84961' if kind==3 else 'FBE36E',12,8)
+        ellipsoid('Soft cream tart centre',(0,.127,0),(.073,.055,.073),'FFF0DE',14,8)
+    elif kind==6:
+        outline=[(-.14,-.13),(.14,-.13),(.04,.17)]
+        for bottom,top,color in [(0,.075,'F6DEB6'),(.075,.116,'EE9BB5'),(.116,.190,'FFF2E2'),(.190,.22,'F5C4D2')]:
+            verts=[(x,y,z) for y in (bottom,top) for x,z in outline]
+            mesh('White pink layer cake slice',verts,[(0,2,1),(3,4,5),(0,1,4,3),(1,2,5,4),(2,0,3,5)],color)
+        ellipsoid('Cake slice cream rosette',(0,.255,-.03),(.10,.065,.09),'FFF2E2',14,8)
+        ellipsoid('Cake slice strawberry',(0,.298,-.02),(.063,.07,.06),'D44B61',12,8)
+    else:
+        color={7:'EB98BA',8:'9EBA84',9:'EACD65'}[kind]
+        ellipsoid('Macaron lower shell',(0,.058,0),(.26,.11,.245),color,20,10)
+        cylinder('Macaron cream filling',(0,.105,0),.114,.035,'FFF0DC',vertices=24)
+        ellipsoid('Macaron upper shell',(0,.154,0),(.26,.11,.245),color,20,10)
+
+def pastries():
+    # Deliberate layer composition, never a repeated modulo pattern.
+    sequences=[[1,2,10,1,2,1,10,2],[7,3,8,9,5,7,8,3],[6,5,0,3,6,4,5,0]]
+    names=['cream strawberry cake','croissant','scored loaf','pink strawberry tart','chocolate berry cake','lemon tart','white pink cake slice','pink macaron','green macaron','yellow macaron','scored baguette']
+    for kind in range(11):
+        begin('pastry_'+str(kind),(0,0,0));pastry_geometry(kind)
         r2.scale_kit('pastry_'+str(kind),(.76,.76,.76))
-    for i,(x,y,z) in enumerate(locations[5:],5):instance('pastry_'+str(i%5),'display_pastry_'+str(i),(x+rng.uniform(-.035,.035),y,z+rng.uniform(-.04,.04)),rng.uniform(-14,14))
-    instance('pastry_3','extra_tart',(2.97,.965,1.17),14)
-    # Bake tray props are authored with linked prototype meshes and batched as
-    # a separate rack module instead of adding a surface per small bun.
+    rng=random.Random(17521);placements=[]
+    for row,sequence in enumerate(sequences):
+        for i,kind in enumerate(sequence):
+            at=(1.20+[0,.25,.48,.72,.96,1.20,1.44,1.70][i]+rng.uniform(-.020,.020),.965+row*.37,.92-row*.15+rng.uniform(-.035,.035))
+            angle=rng.uniform(-20,20);size=rng.uniform(.94,1.05)
+            instance('pastry_'+str(kind),'display_pastry_'+str(row)+'_'+str(i),at,angle,size)
+            placements.append({'layer':row+1,'kind':names[kind],'position':list(at),'yaw_degrees':angle,'scale':size})
+    p.MANIFEST_EXTRA['pastry_display']={'layers_bottom_to_top':[[names[i] for i in row] for row in sequences],'placed_count':len(placements),'prototype_count':11,'placements':placements}
 
 def chair(at):
     begin('cafe_chair',at,collision=[{'at':[0,.64,0],'size':[.59,1.28,.60]}])
@@ -50,7 +94,7 @@ def chair(at):
     for x in (-.13,0,.13):tube('Curving chair back spindle',[(x,.69,.24),(x,.97,.28),(x,1.26-.10*abs(x)/.13,.24)],.022,'oak',8)
 
 def build():
-    draft_scene('bakery');p.b.PALETTE.update(PALETTE);p.b.MATS.clear()
+    draft_scene('bakery',lambda module:setattr(module,'bread',bread));p.b.PALETTE.update(PALETTE);p.b.MATS.clear()
     for name in ('window_wall','back_wall'):r2.remove_named(name,['upright oak timber','timber joint cap','post foot','beam peg'])
     for name in ('window_wall','back_wall'):
         for o in p.KITS[name]['objects']:
@@ -103,6 +147,11 @@ def build():
         before=len(p.KITS['back_bread_basket']['objects']);bread((0,0,0),'baguette')
         transform=Matrix.Translation(v((-.18+i*.12,.52,0)))@Matrix.Rotation(math.pi/2,4,'X')
         for o in p.KITS['back_bread_basket']['objects'][before:]:o.matrix_basis=transform@o.matrix_basis
+    drop_modules('baguette_basket');begin('baguette_basket',(.30,2.51,-2.74));basket(width=.38,height=.25,depth=.30)
+    for i in range(3):
+        before=len(p.KITS['baguette_basket']['objects']);bread(kind='baguette')
+        transform=Matrix.Translation(v((-.10+i*.10,.42,0)))@Matrix.Rotation(math.pi/2,4,'X')
+        for obj in p.KITS['baguette_basket']['objects'][before:]:obj.matrix_basis=transform@obj.matrix_basis
     r2.remove_named('bread_motto',['sign hanging hook','sign good bread']);p.b.CURRENT=p.KITS['bread_motto']
     for i,line in enumerate(('Good','Bread','Brighter','Days')):bold_lettering(line,(0,.30-i*.19,.112),.36 if i!=2 else .42,'linen')
     # Wall-mounted curved cream sign with red wood edge and wheat decoration.
@@ -133,7 +182,7 @@ def build():
     r2.remove_named('cafe_cup',['']);p.b.CURRENT=p.KITS['cafe_cup'];r2.mug()
     for name,asset,at,sc,yaw,collide in [
        ('left_olive','olive_tree',(-3.12,.083,2.61),.68,10,True),('left_back_olive','olive_tree',(-3.14,.083,1.94),.55,100,True),
-       ('front_peace_lily','peace_lily',(3.15,.083,1.92),1.25,-15,True),
+       ('front_peace_lily','peace_lily',(3.23,.083,-1.86),1.10,-15,True),
        ('window_left_pothos','pothos',(-.98,1.40,-2.91),.68,0,False),('window_right_pothos','pothos',(2.41,1.40,-2.91),.74,0,False),
        ('shelf_pothos','pothos',(1.19,2.51,-2.74),.93,0,False)]:
         r2.shared_plant(name,asset,at,sc,yaw,[{'at':[0,.25,0],'size':[.51,.5,.51]}] if collide else None)
@@ -145,10 +194,8 @@ def build():
     # Batch all placed pastries by display zone, but keep linked named source
     # meshes and the five local-pivot prototypes in an explicit source library.
     begin('stocked_pastries',(0,0,0));dest=p.KITS['stocked_pastries'];bpy.context.view_layer.update()
-    for name in ['pastry_'+str(i) for i in range(5)]:
+    for name in ['pastry_'+str(i) for i in range(11)]:
         kit=p.KITS[name]
-        for obj in kit['objects']:
-            dup=obj.copy();dup.data=obj.data;dest['collection'].objects.link(dup);world=obj.matrix_world.copy();dup.parent=dest['root'];dup.matrix_world=world;dest['objects'].append(dup)
         kit['collection'].name='PROTOTYPE_'+name
         for o in kit['collection'].objects:o.hide_render=True
         del p.KITS[name]

@@ -1,0 +1,13 @@
+{
+  "branch": "origin/feat/p0-room-shell",
+  "commit": "6f76247c2e8f0b608c7c256b70629fc56e7a7c2f",
+  "verbatim_files_sha256": {
+    "tools/dev/check_room_anchors.gd": "a1797f6ee5be1f1c893efc26cf8e7738c52ad49c23368a3f2f5890a52cbe3852",
+    "modules/p0/p0_room_anchors.gd": "e80d4b86ebaebd911e4e16e35e52c62a9a8d289ae0b4e53faff9afb8c985b350"
+  },
+  "passed": true,
+  "anchors": 12,
+  "problems": 0,
+  "command": "godot --headless --path isolated_project --script res://tools/dev/check_room_anchors.gd -- layout.json",
+  "log": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\n12 anchors, 0 problems\n"
+}

@@ -27,7 +27,7 @@
         "name": "front entrance",
         "reached": true,
         "remaining_m": 0.0980043187737465,
-        "seconds": 0.049,
+        "seconds": 0.051,
         "target": [
           0.649999976158142,
           0.0799999982118607,
@@ -53,7 +53,7 @@
         "name": "pastry front",
         "reached": true,
         "remaining_m": 0.0649657025933266,
-        "seconds": 0.482,
+        "seconds": 0.484,
         "target": [
           2.22000002861023,
           0.0799999982118607,
@@ -79,7 +79,7 @@
         "name": "display aisle",
         "reached": true,
         "remaining_m": 0.0734705179929733,
-        "seconds": 0.466,
+        "seconds": 0.467,
         "target": [
           0.479999989271164,
           0.0799999982118607,
@@ -105,7 +105,7 @@
         "name": "register approach",
         "reached": true,
         "remaining_m": 0.0946865081787109,
-        "seconds": 0.833,
+        "seconds": 0.832,
         "target": [
           0.479999989271164,
           0.0799999982118607,
@@ -131,7 +131,7 @@
         "name": "checkout",
         "reached": true,
         "remaining_m": 0.0887311846017838,
-        "seconds": 0.55,
+        "seconds": 0.551,
         "target": [
           2.4300000667572,
           0.0799999982118607,
@@ -157,7 +157,7 @@
         "name": "workbench rear",
         "reached": true,
         "remaining_m": 0.0888109728693962,
-        "seconds": 0.816,
+        "seconds": 0.819,
         "target": [
           -0.649999976158142,
           0.0799999982118607,
@@ -185,7 +185,7 @@
         "name": "workbench west",
         "reached": true,
         "remaining_m": 0.0759051889181137,
-        "seconds": 0.449,
+        "seconds": 0.452,
         "target": [
           -2.15000009536743,
           0.0799999982118607,
@@ -211,7 +211,7 @@
         "name": "cafe approach",
         "reached": true,
         "remaining_m": 0.0659287869930267,
-        "seconds": 0.599,
+        "seconds": 0.6,
         "target": [
           -2.15000009536743,
           0.0799999982118607,
@@ -237,7 +237,7 @@
         "name": "cafe beside",
         "reached": true,
         "remaining_m": 0.07181266695261,
-        "seconds": 0.466,
+        "seconds": 0.467,
         "target": [
           -0.479999989271164,
           0.0799999982118607,
@@ -271,7 +271,7 @@
       "name": "front entrance",
       "reached": true,
       "remaining_m": 0.0980043187737465,
-      "seconds": 0.049,
+      "seconds": 0.051,
       "target": [
         0.649999976158142,
         0.0799999982118607,
@@ -293,7 +293,7 @@
       "name": "pastry front",
       "reached": true,
       "remaining_m": 0.0649657025933266,
-      "seconds": 0.482,
+      "seconds": 0.484,
       "target": [
         2.22000002861023,
         0.0799999982118607,
@@ -315,7 +315,7 @@
       "name": "display aisle",
       "reached": true,
       "remaining_m": 0.0734705179929733,
-      "seconds": 0.466,
+      "seconds": 0.467,
       "target": [
         0.479999989271164,
         0.0799999982118607,
@@ -337,7 +337,7 @@
       "name": "register approach",
       "reached": true,
       "remaining_m": 0.0946865081787109,
-      "seconds": 0.833,
+      "seconds": 0.832,
       "target": [
         0.479999989271164,
         0.0799999982118607,
@@ -359,7 +359,7 @@
       "name": "checkout",
       "reached": true,
       "remaining_m": 0.0887311846017838,
-      "seconds": 0.55,
+      "seconds": 0.551,
       "target": [
         2.4300000667572,
         0.0799999982118607,
@@ -381,7 +381,7 @@
       "name": "workbench rear",
       "reached": true,
       "remaining_m": 0.0888109728693962,
-      "seconds": 0.816,
+      "seconds": 0.819,
       "target": [
         -0.649999976158142,
         0.0799999982118607,
@@ -405,7 +405,7 @@
       "name": "workbench west",
       "reached": true,
       "remaining_m": 0.0759051889181137,
-      "seconds": 0.449,
+      "seconds": 0.452,
       "target": [
         -2.15000009536743,
         0.0799999982118607,
@@ -427,7 +427,7 @@
       "name": "cafe approach",
       "reached": true,
       "remaining_m": 0.0659287869930267,
-      "seconds": 0.599,
+      "seconds": 0.6,
       "target": [
         -2.15000009536743,
         0.0799999982118607,
@@ -449,7 +449,7 @@
       "name": "cafe beside",
       "reached": true,
       "remaining_m": 0.07181266695261,
-      "seconds": 0.466,
+      "seconds": 0.467,
       "target": [
         -0.479999989271164,
         0.0799999982118607,

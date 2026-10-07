@@ -79,7 +79,7 @@
         "name": "dining beside long table",
         "reached": true,
         "remaining_m": 0.0883858427405357,
-        "seconds": 1.233,
+        "seconds": 1.216,
         "target": [
           -0.899999976158142,
           0.0799999982118607,
@@ -131,7 +131,7 @@
         "name": "kitchen sink",
         "reached": true,
         "remaining_m": 0.0942631587386131,
-        "seconds": 0.35,
+        "seconds": 0.348,
         "target": [
           -3.45000004768372,
           0.0799999982118607,
@@ -183,7 +183,7 @@
         "name": "stair foot",
         "reached": true,
         "remaining_m": 0.075504407286644,
-        "seconds": 0.25,
+        "seconds": 0.249,
         "target": [
           -0.270000010728836,
           0.0799999982118607,
@@ -235,7 +235,7 @@
         "name": "loft entry",
         "reached": true,
         "remaining_m": 0.0796314775943756,
-        "seconds": 0.317,
+        "seconds": 0.316,
         "target": [
           0.850000023841858,
           2.49000000953674,
@@ -261,7 +261,7 @@
         "name": "bedside",
         "reached": true,
         "remaining_m": 0.0831451117992401,
-        "seconds": 0.399,
+        "seconds": 0.4,
         "target": [
           0.920000016689301,
           2.49000000953674,
@@ -272,7 +272,7 @@
       "passed": true
     },
     {
-      "details": 9.65,
+      "details": 9.633,
       "name": "Full route fits unaccelerated 15s clip",
       "passed": true
     }
@@ -339,7 +339,7 @@
       "name": "dining beside long table",
       "reached": true,
       "remaining_m": 0.0883858427405357,
-      "seconds": 1.233,
+      "seconds": 1.216,
       "target": [
         -0.899999976158142,
         0.0799999982118607,
@@ -383,7 +383,7 @@
       "name": "kitchen sink",
       "reached": true,
       "remaining_m": 0.0942631587386131,
-      "seconds": 0.35,
+      "seconds": 0.348,
       "target": [
         -3.45000004768372,
         0.0799999982118607,
@@ -427,7 +427,7 @@
       "name": "stair foot",
       "reached": true,
       "remaining_m": 0.075504407286644,
-      "seconds": 0.25,
+      "seconds": 0.249,
       "target": [
         -0.270000010728836,
         0.0799999982118607,
@@ -471,7 +471,7 @@
       "name": "loft entry",
       "reached": true,
       "remaining_m": 0.0796314775943756,
-      "seconds": 0.317,
+      "seconds": 0.316,
       "target": [
         0.850000023841858,
         2.49000000953674,
@@ -493,7 +493,7 @@
       "name": "bedside",
       "reached": true,
       "remaining_m": 0.0831451117992401,
-      "seconds": 0.399,
+      "seconds": 0.4,
       "target": [
         0.920000016689301,
         2.49000000953674,

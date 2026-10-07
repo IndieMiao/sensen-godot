@@ -1,19 +1,13 @@
 {
-  "attachment_points": [
+  "anchors": [
     {
-      "name": "hob_slot_1",
+      "name": "use_stove_1",
       "position": [
         -3.915,
         1.291,
         -0.381
       ],
-      "purpose": "Pot mount on forward right burner",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y",
+      "module": "range_cooker",
       "source_position": [
         -3.9149999618530273,
         1.2910000085830688,
@@ -23,19 +17,13 @@
       "source_up_dot": 1.0
     },
     {
-      "name": "hob_slot_2",
+      "name": "use_stove_2",
       "position": [
         -4.245,
         1.291,
         -0.381
       ],
-      "purpose": "Pot mount on rear right burner",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y",
+      "module": "range_cooker",
       "source_position": [
         -4.244999885559082,
         1.2910000085830688,
@@ -45,19 +33,13 @@
       "source_up_dot": 1.0
     },
     {
-      "name": "hob_slot_3",
+      "name": "use_stove_3",
       "position": [
         -3.915,
         1.291,
         -0.859
       ],
-      "purpose": "Pot mount on forward left burner",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y",
+      "module": "range_cooker",
       "source_position": [
         -3.9149999618530273,
         1.2910000085830688,
@@ -67,51 +49,61 @@
       "source_up_dot": 1.0
     },
     {
-      "name": "prep_area",
+      "name": "drop_pot_1",
       "position": [
-        -4.04,
-        1.296,
-        -1.69
+        -3.915,
+        1.615,
+        -0.381
       ],
-      "size": [
-        0.7,
-        0.1,
-        0.55
-      ],
-      "purpose": "Clear 0.55m preparation worktop; utensil crock moved beside sink",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y",
+      "module": "range_cooker",
       "source_position": [
-        -4.039999961853027,
-        1.2960000038146973,
-        -1.690000057220459
+        -3.9149999618530273,
+        1.6150000095367432,
+        -0.38100001215934753
       ],
-      "source_error_m": 6.887615242553135e-08,
+      "source_error_m": 4.115811861858187e-08,
       "source_up_dot": 1.0
     },
     {
-      "name": "spice_rack",
+      "name": "drop_pot_2",
+      "position": [
+        -4.245,
+        1.615,
+        -0.381
+      ],
+      "module": "range_cooker",
+      "source_position": [
+        -4.244999885559082,
+        1.6150000095367432,
+        -0.38100001215934753
+      ],
+      "source_error_m": 1.1547953469164474e-07,
+      "source_up_dot": 1.0
+    },
+    {
+      "name": "drop_pot_3",
+      "position": [
+        -3.915,
+        1.615,
+        -0.859
+      ],
+      "module": "range_cooker",
+      "source_position": [
+        -3.9149999618530273,
+        1.6150000095367432,
+        -0.859000027179718
+      ],
+      "source_error_m": 4.780039820107616e-08,
+      "source_up_dot": 1.0
+    },
+    {
+      "name": "use_spice_rack",
       "position": [
         -4.22,
         2.62,
         0.38
       ],
-      "size": [
-        0.38,
-        0.35,
-        0.98
-      ],
-      "purpose": "Open pantry shelf accepts Lv2 spice module",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y",
+      "module": "kitchen_fittings",
       "source_position": [
         -4.21999979019165,
         2.619999885559082,
@@ -121,30 +113,83 @@
       "source_up_dot": 1.0
     },
     {
-      "name": "warmer_slot",
+      "name": "use_warming_cabinet",
       "position": [
         -4.08,
         0.082,
         -1.69
       ],
-      "size": [
-        0.69,
-        1.08,
-        0.56
-      ],
-      "purpose": "Lv3 replaceable green cabinet slot under prep, 0.56m along counter",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y",
+      "module": "kitchen_fittings",
       "source_position": [
         -4.079999923706055,
         0.0820000022649765,
         -1.690000057220459
       ],
       "source_error_m": 9.539432453352002e-08,
+      "source_up_dot": 1.0
+    },
+    {
+      "name": "stand_stove",
+      "position": [
+        -3.33,
+        0.083,
+        -0.62
+      ],
+      "yaw_degrees": 90,
+      "module": "range_cooker",
+      "source_position": [
+        -3.3299999237060547,
+        0.08299999684095383,
+        -0.6200000047683716
+      ],
+      "source_error_m": 7.650805867702136e-08,
+      "source_up_dot": 1.0
+    },
+    {
+      "name": "cam_stove",
+      "position": [
+        -4.03,
+        1.55,
+        -0.45
+      ],
+      "module": "range_cooker",
+      "source_position": [
+        -4.03000020980835,
+        1.5499999523162842,
+        -0.44999998807907104
+      ],
+      "source_error_m": 2.1548872074319684e-07,
+      "source_up_dot": 1.0
+    },
+    {
+      "name": "spawn",
+      "position": [
+        3.85,
+        0.083,
+        -2.84
+      ],
+      "yaw_degrees": 180,
+      "source_position": [
+        3.8499999046325684,
+        0.08299999684095383,
+        -2.8399999141693115
+      ],
+      "source_error_m": 1.2834264165657187e-07,
+      "source_up_dot": 1.0
+    },
+    {
+      "name": "exit",
+      "position": [
+        3.93,
+        0.083,
+        -3.56
+      ],
+      "source_position": [
+        3.930000066757202,
+        0.08299999684095383,
+        -3.559999942779541
+      ],
+      "source_error_m": 8.798116004335476e-08,
       "source_up_dot": 1.0
     }
   ],
@@ -155,5 +200,5 @@
   "prep_usable_width_m": 0.5,
   "prep_source_obstructions": [],
   "passed": true,
-  "scope": "Named source empties/up axes and evaluated shade/clear worktop geometry. Marker nodes are independently read back in Godot capture; kitchen behavior and modules belong to213."
+  "scope": "Source Empties/up axes and evaluated shade/clear worktop. Runtime markers independently verified by focused Godot instantiation, not a new rendered capture."
 }

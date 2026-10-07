@@ -14,20 +14,20 @@
   "frame_checks": [
     {
       "time_seconds": 0.5,
-      "luma_mean": 192.66959635416666,
-      "luma_std": 63.74501522663023,
+      "luma_mean": 192.69075520833334,
+      "luma_std": 63.72443885388211,
       "nonblack_nonuniform": true
     },
     {
       "time_seconds": 7.5,
-      "luma_mean": 192.70865885416666,
-      "luma_std": 63.728178070870484,
+      "luma_mean": 192.69108072916666,
+      "luma_std": 63.73511834986743,
       "nonblack_nonuniform": true
     },
     {
       "time_seconds": 14.0,
-      "luma_mean": 192.830078125,
-      "luma_std": 63.65324893919186,
+      "luma_mean": 192.83072916666666,
+      "luma_std": 63.65300520276569,
       "nonblack_nonuniform": true
     }
   ],

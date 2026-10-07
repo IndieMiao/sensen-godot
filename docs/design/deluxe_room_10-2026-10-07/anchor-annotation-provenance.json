@@ -1,0 +1,8 @@
+{
+  "base_capture": "output/zhaoyun-173-r22-2026-10-08/detail-kitchen.png",
+  "base_capture_sha256": "f0bf3c041c4ad6a48def86523516ead65be6acf05c676a0af1eaa4c09f9132e6",
+  "method": "Current Godot R2.2 capture, canonical anchors projected with the exact capture camera.",
+  "anchor_schema": "WP7-B F-03 \u2462",
+  "room_anchor_count": 12,
+  "detail_annotations": 10
+}

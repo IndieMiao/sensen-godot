@@ -1,7 +1,7 @@
 {
-  "revision": "Bakery review after172release",
+  "revision": "Bakery R2.1 finishing review",
   "structure": "Apricot plaster, no timber posts/brackets, red-brown top trims,31-row narrow plank floor",
-  "goods": "25 pastries from5linked prototypes,5stocked bread-rack levels,24wall jars plus6pantry jars, upright baguette baskets,working scale and folded checked cloth",
+  "goods": "24pastries from11linked prototypes; three distinct layer compositions with pink/lemon/cream/macarons, recessed loaf/baguette scores; foreground planter relocated beside checkout.",
   "source": "Named prototype collections retained; placed food groups batch into one display-zoneGLB. Explicit local-pivot furniture modules.",
   "collision": "Authored open-front controlled entrance,perimeter and furniture blockers.34actual rendered checks,1.08095m narrowest overlap aisle,15sreal-time route pass.",
   "camera_limits": "Three selected plinthcorners constrain an orthographic fit,not pixel-perfect registration of stylized upperwalls.",

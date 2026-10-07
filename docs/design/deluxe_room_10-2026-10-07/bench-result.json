@@ -37,7 +37,7 @@
         "name": "door",
         "reached": true,
         "remaining_m": 0.0694973170757294,
-        "seconds": 0.353,
+        "seconds": 0.366,
         "target": [
           3.73000001907349,
           0.0799999982118607,
@@ -63,7 +63,7 @@
         "name": "living coffee table",
         "reached": true,
         "remaining_m": 0.0658644065260887,
-        "seconds": 0.457,
+        "seconds": 0.47,
         "target": [
           3.6800000667572,
           0.0799999982118607,
@@ -89,7 +89,7 @@
         "name": "dining beside long table",
         "reached": true,
         "remaining_m": 0.0883858427405357,
-        "seconds": 1.088,
+        "seconds": 1.103,
         "target": [
           -0.899999976158142,
           0.0799999982118607,
@@ -141,7 +141,7 @@
         "name": "kitchen sink",
         "reached": true,
         "remaining_m": 0.0942631587386131,
-        "seconds": 0.333,
+        "seconds": 0.317,
         "target": [
           -3.45000004768372,
           0.0799999982118607,
@@ -298,7 +298,7 @@
         ],
         "reached": false,
         "remaining_m": 0.599999606609344,
-        "seconds": 0.882,
+        "seconds": 0.883,
         "target": [
           -2.0,
           0.0900000035762787,
@@ -326,7 +326,7 @@
         ],
         "reached": false,
         "remaining_m": 0.71752393245697,
-        "seconds": 0.883,
+        "seconds": 0.882,
         "target": [
           -1.04999995231628,
           0.0900000035762787,
@@ -354,7 +354,7 @@
         ],
         "reached": false,
         "remaining_m": 0.678230583667755,
-        "seconds": 0.882,
+        "seconds": 0.883,
         "target": [
           2.03999996185303,
           0.0900000035762787,
@@ -382,7 +382,7 @@
         ],
         "reached": false,
         "remaining_m": 0.695139050483704,
-        "seconds": 0.883,
+        "seconds": 0.881,
         "target": [
           2.14000010490417,
           0.0900000035762787,
@@ -426,7 +426,7 @@
         ],
         "final": [
           1.25,
-          2.4448139667511,
+          2.45270252227783,
           -1.625
         ],
         "from": [
@@ -435,8 +435,8 @@
           -1.75
         ],
         "reached": false,
-        "remaining_m": 0.926102995872498,
-        "seconds": 0.866,
+        "remaining_m": 0.925751686096191,
+        "seconds": 0.882,
         "target": [
           1.25,
           2.49000000953674,
@@ -464,7 +464,7 @@
         ],
         "reached": false,
         "remaining_m": 0.799117147922516,
-        "seconds": 0.882,
+        "seconds": 0.883,
         "target": [
           -0.270000010728836,
           0.0900000035762787,
@@ -492,7 +492,7 @@
         ],
         "reached": false,
         "remaining_m": 0.662568509578705,
-        "seconds": 0.866,
+        "seconds": 0.881,
         "target": [
           0.0500000007450581,
           0.0900000035762787,
@@ -520,7 +520,7 @@
         ],
         "reached": false,
         "remaining_m": 0.562580764293671,
-        "seconds": 0.883,
+        "seconds": 0.882,
         "target": [
           5.0,
           0.0900000035762787,
@@ -555,7 +555,7 @@
         ],
         "reached": true,
         "remaining_m": 0.0685544386506081,
-        "seconds": 0.5,
+        "seconds": 0.499,
         "target": [
           -2.70000004768372,
           0.0900000035762787,
@@ -589,7 +589,7 @@
         ],
         "reached": true,
         "remaining_m": 0.0685542523860931,
-        "seconds": 0.7,
+        "seconds": 0.699,
         "target": [
           1.10000002384186,
           0.0900000035762787,
@@ -615,7 +615,7 @@
           ],
           "reached": true,
           "remaining_m": 0.0751417577266693,
-          "seconds": 0.284,
+          "seconds": 0.282,
           "target": [
             3.84999990463257,
             0.0900000035762787,
@@ -654,7 +654,8 @@
           0.128607749938965,
           0.000174969434738159,
           -1.59099006652832
-        ]
+        ],
+        "wall_torso_ray": {}
       },
       "name": "Diagonal collision preserves wall sliding",
       "passed": true
@@ -662,8 +663,8 @@
     {
       "details": [
         "run",
-        0.149994,
-        0.316654
+        0.15,
+        0.316666666666667
       ],
       "name": "Run animation advances in rendered viewport",
       "passed": true
@@ -684,16 +685,16 @@
       "passed": true
     },
     {
-      "details": 1.74549410492182,
+      "details": 1.74549422413111,
       "name": "Fixture head-top height measurable",
       "passed": true
     },
     {
       "details": {
-        "baseline_ratio": 1.33486557956858,
+        "baseline_ratio": 1.33486548840335,
         "difference": 0.0,
         "height": 2.33,
-        "ratio_to_H": 1.33486557956858,
+        "ratio_to_H": 1.33486548840335,
         "reason": ""
       },
       "name": "Scale \u00b115%: door",
@@ -701,10 +702,10 @@
     },
     {
       "details": {
-        "baseline_ratio": 0.660271493756561,
+        "baseline_ratio": 0.660271448663031,
         "difference": 0.0151843817787418,
         "height": 1.17,
-        "ratio_to_H": 0.670297308195381,
+        "ratio_to_H": 0.670297262417134,
         "reason": ""
       },
       "name": "Scale \u00b115%: counter",
@@ -712,10 +713,10 @@
     },
     {
       "details": {
-        "baseline_ratio": 0.392439022319518,
+        "baseline_ratio": 0.392438995517724,
         "difference": 0.142335766423358,
         "height": 0.7825,
-        "ratio_to_H": 0.4482971313358,
+        "ratio_to_H": 0.448297100719151,
         "reason": ""
       },
       "name": "Scale \u00b115%: chair",
@@ -723,10 +724,10 @@
     },
     {
       "details": {
-        "baseline_ratio": 0.650245679317741,
+        "baseline_ratio": 0.650245634908929,
         "difference": 0.0,
         "height": 1.135,
-        "ratio_to_H": 0.650245679317741,
+        "ratio_to_H": 0.650245634908929,
         "reason": ""
       },
       "name": "Scale \u00b115%: table",
@@ -751,7 +752,7 @@
       "name": "door",
       "reached": true,
       "remaining_m": 0.0694973170757294,
-      "seconds": 0.353,
+      "seconds": 0.366,
       "target": [
         3.73000001907349,
         0.0799999982118607,
@@ -773,7 +774,7 @@
       "name": "living coffee table",
       "reached": true,
       "remaining_m": 0.0658644065260887,
-      "seconds": 0.457,
+      "seconds": 0.47,
       "target": [
         3.6800000667572,
         0.0799999982118607,
@@ -795,7 +796,7 @@
       "name": "dining beside long table",
       "reached": true,
       "remaining_m": 0.0883858427405357,
-      "seconds": 1.088,
+      "seconds": 1.103,
       "target": [
         -0.899999976158142,
         0.0799999982118607,
@@ -839,7 +840,7 @@
       "name": "kitchen sink",
       "reached": true,
       "remaining_m": 0.0942631587386131,
-      "seconds": 0.333,
+      "seconds": 0.317,
       "target": [
         -3.45000004768372,
         0.0799999982118607,

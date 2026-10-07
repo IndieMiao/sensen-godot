@@ -1,0 +1,322 @@
+{
+  "passed": true,
+  "inventory": {
+    "layers_bottom_to_top": [
+      [
+        "croissant",
+        "scored loaf",
+        "scored baguette",
+        "croissant",
+        "scored loaf",
+        "croissant",
+        "scored baguette",
+        "scored loaf"
+      ],
+      [
+        "pink macaron",
+        "pink strawberry tart",
+        "green macaron",
+        "yellow macaron",
+        "lemon tart",
+        "pink macaron",
+        "green macaron",
+        "pink strawberry tart"
+      ],
+      [
+        "white pink cake slice",
+        "lemon tart",
+        "cream strawberry cake",
+        "pink strawberry tart",
+        "white pink cake slice",
+        "chocolate berry cake",
+        "lemon tart",
+        "cream strawberry cake"
+      ]
+    ],
+    "placed_count": 24,
+    "prototype_count": 11,
+    "placements": [
+      {
+        "layer": 1,
+        "kind": "croissant",
+        "position": [
+          1.20419305354805,
+          0.965,
+          0.9336912841770776
+        ],
+        "yaw_degrees": -9.866155725350211,
+        "scale": 0.9808567945423113
+      },
+      {
+        "layer": 1,
+        "kind": "scored loaf",
+        "position": [
+          1.4371042618429766,
+          0.965,
+          0.8961413400140528
+        ],
+        "yaw_degrees": 15.025358604113578,
+        "scale": 0.9892087956596807
+      },
+      {
+        "layer": 1,
+        "kind": "scored baguette",
+        "position": [
+          1.6753207614196677,
+          0.965,
+          0.9118690613402736
+        ],
+        "yaw_degrees": 18.0776735235022,
+        "scale": 1.0417947665753358
+      },
+      {
+        "layer": 1,
+        "kind": "croissant",
+        "position": [
+          1.9200553957483808,
+          0.965,
+          0.8895150723474243
+        ],
+        "yaw_degrees": -8.22940775741532,
+        "scale": 1.0273655668413264
+      },
+      {
+        "layer": 1,
+        "kind": "scored loaf",
+        "position": [
+          2.156812038277832,
+          0.965,
+          0.9534715273096442
+        ],
+        "yaw_degrees": -16.756000783959006,
+        "scale": 0.9967657022194378
+      },
+      {
+        "layer": 1,
+        "kind": "croissant",
+        "position": [
+          2.4191962963496523,
+          0.965,
+          0.9095968742440281
+        ],
+        "yaw_degrees": -15.976516834890969,
+        "scale": 1.022241741196131
+      },
+      {
+        "layer": 1,
+        "kind": "scored baguette",
+        "position": [
+          2.640566580104338,
+          0.965,
+          0.9018887181407308
+        ],
+        "yaw_degrees": 0.3154193533770382,
+        "scale": 1.0128064507292427
+      },
+      {
+        "layer": 1,
+        "kind": "scored loaf",
+        "position": [
+          2.912684937577536,
+          0.965,
+          0.9061651220571761
+        ],
+        "yaw_degrees": 7.120939813328732,
+        "scale": 1.009533212384626
+      },
+      {
+        "layer": 2,
+        "kind": "pink macaron",
+        "position": [
+          1.2109011793338782,
+          1.335,
+          0.7920030055474826
+        ],
+        "yaw_degrees": 15.667984347290648,
+        "scale": 1.0348141635425494
+      },
+      {
+        "layer": 2,
+        "kind": "pink strawberry tart",
+        "position": [
+          1.4601758729186818,
+          1.335,
+          0.7910586731052696
+        ],
+        "yaw_degrees": -5.755812130398681,
+        "scale": 1.0181931699861635
+      },
+      {
+        "layer": 2,
+        "kind": "green macaron",
+        "position": [
+          1.6740224676576245,
+          1.335,
+          0.7582194002451387
+        ],
+        "yaw_degrees": 9.358720761553784,
+        "scale": 1.01712557187913
+      },
+      {
+        "layer": 2,
+        "kind": "yellow macaron",
+        "position": [
+          1.9011603597267677,
+          1.335,
+          0.788653446269848
+        ],
+        "yaw_degrees": 1.1258421545803685,
+        "scale": 0.9949368713420874
+      },
+      {
+        "layer": 2,
+        "kind": "lemon tart",
+        "position": [
+          2.166181075515415,
+          1.335,
+          0.7721435349760466
+        ],
+        "yaw_degrees": 0.22454975601390004,
+        "scale": 1.0197479542221313
+      },
+      {
+        "layer": 2,
+        "kind": "pink macaron",
+        "position": [
+          2.3965014685513992,
+          1.335,
+          0.742428011671116
+        ],
+        "yaw_degrees": 19.332945335266572,
+        "scale": 1.0242619743917316
+      },
+      {
+        "layer": 2,
+        "kind": "green macaron",
+        "position": [
+          2.6552190832760867,
+          1.335,
+          0.7594233662541474
+        ],
+        "yaw_degrees": 17.416228523103683,
+        "scale": 0.9691908850060024
+      },
+      {
+        "layer": 2,
+        "kind": "pink strawberry tart",
+        "position": [
+          2.903022833693405,
+          1.335,
+          0.7664811335281768
+        ],
+        "yaw_degrees": 4.032853674043363,
+        "scale": 1.0140815941576398
+      },
+      {
+        "layer": 3,
+        "kind": "white pink cake slice",
+        "position": [
+          1.2125000312284444,
+          1.705,
+          0.6547226975932601
+        ],
+        "yaw_degrees": 14.736093256879357,
+        "scale": 0.969052161508345
+      },
+      {
+        "layer": 3,
+        "kind": "lemon tart",
+        "position": [
+          1.4598648292357372,
+          1.705,
+          0.6461896097477801
+        ],
+        "yaw_degrees": -0.2373617813439175,
+        "scale": 0.9480009386932268
+      },
+      {
+        "layer": 3,
+        "kind": "cream strawberry cake",
+        "position": [
+          1.6903976258130282,
+          1.705,
+          0.6332582853942436
+        ],
+        "yaw_degrees": 5.488986526759412,
+        "scale": 1.0437538520163772
+      },
+      {
+        "layer": 3,
+        "kind": "pink strawberry tart",
+        "position": [
+          1.9120266475695364,
+          1.705,
+          0.6069518791439484
+        ],
+        "yaw_degrees": 17.998974984398835,
+        "scale": 0.9483009665340131
+      },
+      {
+        "layer": 3,
+        "kind": "white pink cake slice",
+        "position": [
+          2.1442801967784058,
+          1.705,
+          0.6063204859181877
+        ],
+        "yaw_degrees": -6.854894933147948,
+        "scale": 0.9657958931275703
+      },
+      {
+        "layer": 3,
+        "kind": "chocolate berry cake",
+        "position": [
+          2.419695997443949,
+          1.705,
+          0.637158870223256
+        ],
+        "yaw_degrees": -11.905748282754939,
+        "scale": 0.9972165933615746
+      },
+      {
+        "layer": 3,
+        "kind": "lemon tart",
+        "position": [
+          2.6464302836364584,
+          1.705,
+          0.6516823251856076
+        ],
+        "yaw_degrees": 8.224475644304906,
+        "scale": 0.9774216748049073
+      },
+      {
+        "layer": 3,
+        "kind": "cream strawberry cake",
+        "position": [
+          2.9084133529299563,
+          1.705,
+          0.5859476738664523
+        ],
+        "yaw_degrees": 10.94125603474479,
+        "scale": 1.037066726890036
+      }
+    ]
+  },
+  "minimum_cut_crumb_faces": 106,
+  "legacy_raised_white_score_objects": [],
+  "plant_projected_bounds": [
+    1056.2743879837417,
+    558.2655540572338,
+    1145.6066724216416,
+    708.2097576501955
+  ],
+  "case_projected_bounds": [
+    694.3470584245324,
+    512.4264070524412,
+    942.2865759986948,
+    722.4176436675053
+  ],
+  "plant_does_not_overlap_display_bounds": true,
+  "scope": "Evaluated Blender source, declared accepted camera, source inventory and actual recessed faces. Godot visual/route verification remains pending due unavailable desktop.",
+  "scored_source_objects_including_prototypes": 29
+}

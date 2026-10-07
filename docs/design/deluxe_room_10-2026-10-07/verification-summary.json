@@ -7,34 +7,68 @@
   },
   "renderer": {
     "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "attachment_points": [
+    "anchors": [
       {
-        "name": "hob_slot_1",
+        "name": "use_stove_1",
         "position_error_m": 0.0,
         "up_dot": 1.0
       },
       {
-        "name": "hob_slot_2",
+        "name": "use_stove_2",
         "position_error_m": 0.0,
         "up_dot": 1.0
       },
       {
-        "name": "hob_slot_3",
+        "name": "use_stove_3",
         "position_error_m": 0.0,
         "up_dot": 1.0
       },
       {
-        "name": "prep_area",
+        "name": "drop_pot_1",
         "position_error_m": 0.0,
         "up_dot": 1.0
       },
       {
-        "name": "spice_rack",
+        "name": "drop_pot_2",
         "position_error_m": 0.0,
         "up_dot": 1.0
       },
       {
-        "name": "warmer_slot",
+        "name": "drop_pot_3",
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "name": "use_spice_rack",
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "name": "use_warming_cabinet",
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "capsule_clear": true,
+        "name": "stand_stove",
+        "position_error_m": 0.0,
+        "supported_floor": true,
+        "up_dot": 1.0
+      },
+      {
+        "name": "cam_stove",
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "capsule_clear": true,
+        "name": "spawn",
+        "position_error_m": 0.0,
+        "supported_floor": true,
+        "up_dot": 1.0
+      },
+      {
+        "name": "exit",
         "position_error_m": 0.0,
         "up_dot": 1.0
       }
@@ -432,7 +466,7 @@
   },
   "video": {
     "duration_seconds": 15.0,
-    "sha256": "603899b59a86a8326eb2785b05dafc6b1de559d6776f78e1c4e2e8542dd5ff8d"
+    "sha256": "e70a16051828f79432ae8800abb4a483c58ff654e701c7c7641b6308d8029113"
   },
   "hashes": {
     "assets/rooms/deluxe_room_10/room_shell.glb": "695e44c4a1084e565fe761de9f6844264028540c19b9b282a6fe6f7910cec42e",
@@ -483,8 +517,224 @@
     "assets/rooms/deluxe_room_10/fire_gradient.png": "349870df4e628410dc128999d57558a6654b17e5ef4d5a2cabc06db6b8e89f5b",
     "assets/rooms/_shared/plants/room_albedo_ao.png": "713c9f88ad08d91fccb6f2b0f1969162cbb6381367e632919ec8159ccf810b4a",
     "assets/rooms/_shared/plants/material.tres": "f75e3970edd6f8caeaa485218465d51f718b0caee941923ee5825da94adf791b",
-    "tools/art/source/deluxe_room_10/deluxe_room_10.blend": "ab8a67a5d377d10458f34de7abd70bbba4d2d69d842f29276cf137ddc4bf712d",
-    "assets/rooms/deluxe_room_10/layout.json": "40dff7b05c6834134a663fafd364c3a1b9eb94a346468d75a7b4e93d4ff178c1"
+    "tools/art/source/deluxe_room_10/deluxe_room_10.blend": "f41713f7eb7fac1e1af2dc331a99714808a36c38d702507aee4ca97d41e62eb8",
+    "assets/rooms/deluxe_room_10/layout.json": "83280d962144fbedad25b93890e5b9a58e8565966527ebf455a9eac9b36af841"
   },
-  "scope": "Zhao Yun scene art revision; actual desktop rendered benchmark. No production update or physical-phone GPU claim."
+  "scope": "Zhao Yun scene art revision; actual desktop rendered benchmark. No production update or physical-phone GPU claim.",
+  "revision": "R2.2",
+  "art_review": "R2.1 art passed; R2.2 canonical anchors submitted for review",
+  "anchor_engineering": {
+    "branch": "origin/feat/p0-room-shell",
+    "commit": "6f76247c2e8f0b608c7c256b70629fc56e7a7c2f",
+    "verbatim_files_sha256": {
+      "tools/dev/check_room_anchors.gd": "a1797f6ee5be1f1c893efc26cf8e7738c52ad49c23368a3f2f5890a52cbe3852",
+      "modules/p0/p0_room_anchors.gd": "e80d4b86ebaebd911e4e16e35e52c62a9a8d289ae0b4e53faff9afb8c985b350"
+    },
+    "passed": true,
+    "anchors": 12,
+    "problems": 0,
+    "command": "godot --headless --path isolated_project --script res://tools/dev/check_room_anchors.gd -- layout.json",
+    "log": "Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org\n\n12 anchors, 0 problems\n"
+  },
+  "anchor_schema": {
+    "authority": {
+      "page_id": "2d11d5b2-e24c-4089-8e6b-c4810ea26b14",
+      "section": "Arthur WP7-B / F-03 \u2462 world anchors v1, \u00a7\u00a71\u20137,2026-10-07"
+    },
+    "validator": "Additional scene-local authoring audit. The verbatim engineering check_room_anchors.gd has also run successfully; see anchor-engineering-verification.json.",
+    "checks": [
+      {
+        "name": "use_stove_1",
+        "module": "range_cooker",
+        "passed": true
+      },
+      {
+        "name": "use_stove_2",
+        "module": "range_cooker",
+        "passed": true
+      },
+      {
+        "name": "use_stove_3",
+        "module": "range_cooker",
+        "passed": true
+      },
+      {
+        "name": "drop_pot_1",
+        "module": "range_cooker",
+        "passed": true
+      },
+      {
+        "name": "drop_pot_2",
+        "module": "range_cooker",
+        "passed": true
+      },
+      {
+        "name": "drop_pot_3",
+        "module": "range_cooker",
+        "passed": true
+      },
+      {
+        "name": "use_spice_rack",
+        "module": "kitchen_fittings",
+        "passed": true
+      },
+      {
+        "name": "use_warming_cabinet",
+        "module": "kitchen_fittings",
+        "passed": true
+      },
+      {
+        "name": "stand_stove",
+        "module": "range_cooker",
+        "passed": true
+      },
+      {
+        "name": "cam_stove",
+        "module": "range_cooker",
+        "passed": true
+      },
+      {
+        "name": "spawn",
+        "module": null,
+        "passed": true
+      },
+      {
+        "name": "exit",
+        "module": null,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "forbidden_legacy_key_absent": true,
+    "pot_mouth_height_m": 1.615,
+    "pot_height_source": "Existing cooking-pot source:placement1.305m + .06m base offset + .25m rim profile; future213 can update drop height with its module."
+  },
+  "anchor_runtime": {
+    "checks": [
+      {
+        "exists": true,
+        "module": "range_cooker",
+        "module_matches": true,
+        "name": "use_stove_1",
+        "passed": true,
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "exists": true,
+        "module": "range_cooker",
+        "module_matches": true,
+        "name": "use_stove_2",
+        "passed": true,
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "exists": true,
+        "module": "range_cooker",
+        "module_matches": true,
+        "name": "use_stove_3",
+        "passed": true,
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "exists": true,
+        "module": "range_cooker",
+        "module_matches": true,
+        "name": "drop_pot_1",
+        "passed": true,
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "exists": true,
+        "module": "range_cooker",
+        "module_matches": true,
+        "name": "drop_pot_2",
+        "passed": true,
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "exists": true,
+        "module": "range_cooker",
+        "module_matches": true,
+        "name": "drop_pot_3",
+        "passed": true,
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "exists": true,
+        "module": "kitchen_fittings",
+        "module_matches": true,
+        "name": "use_spice_rack",
+        "passed": true,
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "exists": true,
+        "module": "kitchen_fittings",
+        "module_matches": true,
+        "name": "use_warming_cabinet",
+        "passed": true,
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "blockers": [],
+        "capsule_clear": true,
+        "exists": true,
+        "module": "range_cooker",
+        "module_matches": true,
+        "name": "stand_stove",
+        "passed": true,
+        "position_error_m": 0.0,
+        "supported_floor": true,
+        "up_dot": 1.0,
+        "yaw_error": 2.50447816085853e-06
+      },
+      {
+        "exists": true,
+        "module": "range_cooker",
+        "module_matches": true,
+        "name": "cam_stove",
+        "passed": true,
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      },
+      {
+        "blockers": [],
+        "capsule_clear": true,
+        "exists": true,
+        "module": null,
+        "module_matches": true,
+        "name": "spawn",
+        "passed": true,
+        "position_error_m": 0.0,
+        "supported_floor": true,
+        "up_dot": 1.0,
+        "yaw_error": 8.65142203565483e-06
+      },
+      {
+        "exists": true,
+        "module": null,
+        "module_matches": true,
+        "name": "exit",
+        "passed": true,
+        "position_error_m": 0.0,
+        "up_dot": 1.0
+      }
+    ],
+    "passed": true,
+    "scope": "Headless instantiated-art marker, module/yaw and standing physics contract only; no new rendered art/movement claim."
+  },
+  "source_preservation": {
+    "mesh_geometry_and_placement_before": "a6b1ed8c3aa113bef18eb613cf2a48e6d18d434ab2a1302e7781ea0262f85424",
+    "after": "a6b1ed8c3aa113bef18eb613cf2a48e6d18d434ab2a1302e7781ea0262f85424",
+    "identical": true,
+    "change": "Empties migrated only; no room meshes, materials, lights or camera altered."
+  }
 }

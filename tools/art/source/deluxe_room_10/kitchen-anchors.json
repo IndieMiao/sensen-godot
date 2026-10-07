@@ -1,0 +1,110 @@
+[
+  {
+    "name": "use_stove_1",
+    "position": [
+      -3.915,
+      1.291,
+      -0.381
+    ],
+    "module": "range_cooker"
+  },
+  {
+    "name": "use_stove_2",
+    "position": [
+      -4.245,
+      1.291,
+      -0.381
+    ],
+    "module": "range_cooker"
+  },
+  {
+    "name": "use_stove_3",
+    "position": [
+      -3.915,
+      1.291,
+      -0.859
+    ],
+    "module": "range_cooker"
+  },
+  {
+    "name": "drop_pot_1",
+    "position": [
+      -3.915,
+      1.615,
+      -0.381
+    ],
+    "module": "range_cooker"
+  },
+  {
+    "name": "drop_pot_2",
+    "position": [
+      -4.245,
+      1.615,
+      -0.381
+    ],
+    "module": "range_cooker"
+  },
+  {
+    "name": "drop_pot_3",
+    "position": [
+      -3.915,
+      1.615,
+      -0.859
+    ],
+    "module": "range_cooker"
+  },
+  {
+    "name": "use_spice_rack",
+    "position": [
+      -4.22,
+      2.62,
+      0.38
+    ],
+    "module": "kitchen_fittings"
+  },
+  {
+    "name": "use_warming_cabinet",
+    "position": [
+      -4.08,
+      0.082,
+      -1.69
+    ],
+    "module": "kitchen_fittings"
+  },
+  {
+    "name": "stand_stove",
+    "position": [
+      -3.33,
+      0.083,
+      -0.62
+    ],
+    "yaw_degrees": 90,
+    "module": "range_cooker"
+  },
+  {
+    "name": "cam_stove",
+    "position": [
+      -4.03,
+      1.55,
+      -0.45
+    ],
+    "module": "range_cooker"
+  },
+  {
+    "name": "spawn",
+    "position": [
+      3.85,
+      0.083,
+      -2.84
+    ],
+    "yaw_degrees": 180
+  },
+  {
+    "name": "exit",
+    "position": [
+      3.93,
+      0.083,
+      -3.56
+    ]
+  }
+]

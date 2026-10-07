@@ -1571,113 +1571,6 @@
       "colliders": []
     }
   ],
-  "attachment_points": [
-    {
-      "name": "hob_slot_1",
-      "position": [
-        -3.915,
-        1.291,
-        -0.381
-      ],
-      "purpose": "Pot mount on forward right burner",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y"
-    },
-    {
-      "name": "hob_slot_2",
-      "position": [
-        -4.245,
-        1.291,
-        -0.381
-      ],
-      "purpose": "Pot mount on rear right burner",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y"
-    },
-    {
-      "name": "hob_slot_3",
-      "position": [
-        -3.915,
-        1.291,
-        -0.859
-      ],
-      "purpose": "Pot mount on forward left burner",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y"
-    },
-    {
-      "name": "prep_area",
-      "position": [
-        -4.04,
-        1.296,
-        -1.69
-      ],
-      "size": [
-        0.7,
-        0.1,
-        0.55
-      ],
-      "purpose": "Clear 0.55m preparation worktop; utensil crock moved beside sink",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y"
-    },
-    {
-      "name": "spice_rack",
-      "position": [
-        -4.22,
-        2.62,
-        0.38
-      ],
-      "size": [
-        0.38,
-        0.35,
-        0.98
-      ],
-      "purpose": "Open pantry shelf accepts Lv2 spice module",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y"
-    },
-    {
-      "name": "warmer_slot",
-      "position": [
-        -4.08,
-        0.082,
-        -1.69
-      ],
-      "size": [
-        0.69,
-        1.08,
-        0.56
-      ],
-      "purpose": "Lv3 replaceable green cabinet slot under prep, 0.56m along counter",
-      "rotation_degrees": [
-        0,
-        0,
-        0
-      ],
-      "up_axis": "+Y"
-    }
-  ],
   "kitchen_clearance": {
     "pendant_shade_bottom_y": 2.67,
     "avatar_head_H": 1.7455,
@@ -1728,11 +1621,6 @@
       ],
       "size": 6.4
     }
-  ],
-  "spawn": [
-    3.85,
-    0.09,
-    -2.84
   ],
   "bench": {
     "floor_y": 0.08,
@@ -2056,6 +1944,121 @@
         "height": 1.135,
         "source": "Long dining table top; low coffee table .613m is a distinct category"
       }
+    },
+    "spawn": [
+      3.85,
+      0.09,
+      -2.84
+    ]
+  },
+  "anchors": [
+    {
+      "name": "use_stove_1",
+      "position": [
+        -3.915,
+        1.291,
+        -0.381
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "use_stove_2",
+      "position": [
+        -4.245,
+        1.291,
+        -0.381
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "use_stove_3",
+      "position": [
+        -3.915,
+        1.291,
+        -0.859
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "drop_pot_1",
+      "position": [
+        -3.915,
+        1.615,
+        -0.381
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "drop_pot_2",
+      "position": [
+        -4.245,
+        1.615,
+        -0.381
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "drop_pot_3",
+      "position": [
+        -3.915,
+        1.615,
+        -0.859
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "use_spice_rack",
+      "position": [
+        -4.22,
+        2.62,
+        0.38
+      ],
+      "module": "kitchen_fittings"
+    },
+    {
+      "name": "use_warming_cabinet",
+      "position": [
+        -4.08,
+        0.082,
+        -1.69
+      ],
+      "module": "kitchen_fittings"
+    },
+    {
+      "name": "stand_stove",
+      "position": [
+        -3.33,
+        0.083,
+        -0.62
+      ],
+      "yaw_degrees": 90,
+      "module": "range_cooker"
+    },
+    {
+      "name": "cam_stove",
+      "position": [
+        -4.03,
+        1.55,
+        -0.45
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "spawn",
+      "position": [
+        3.85,
+        0.083,
+        -2.84
+      ],
+      "yaw_degrees": 180
+    },
+    {
+      "name": "exit",
+      "position": [
+        3.93,
+        0.083,
+        -3.56
+      ]
     }
-  }
+  ]
 }

@@ -18,7 +18,7 @@
     ],
     "scene": "bakery",
     "surfaces": 40,
-    "triangles": 173399
+    "triangles": 181235
   },
   "asset_stats": {
     "atlas": {
@@ -56,7 +56,7 @@
         "vertices": 600,
         "triangles": 1188,
         "surfaces": 1,
-        "bytes": 37252
+        "bytes": 37124
       },
       {
         "name": "back_window_left_garden",
@@ -70,7 +70,7 @@
         "vertices": 600,
         "triangles": 1188,
         "surfaces": 1,
-        "bytes": 37252
+        "bytes": 37124
       },
       {
         "name": "back_window_right_garden",
@@ -84,14 +84,14 @@
         "vertices": 3872,
         "triangles": 7368,
         "surfaces": 1,
-        "bytes": 288632
+        "bytes": 288792
       },
       {
         "name": "baking_loaves",
-        "vertices": 436,
-        "triangles": 840,
+        "vertices": 796,
+        "triangles": 1584,
         "surfaces": 1,
-        "bytes": 28568
+        "bytes": 47376
       },
       {
         "name": "oven_peel",
@@ -112,7 +112,7 @@
         "vertices": 140,
         "triangles": 264,
         "surfaces": 1,
-        "bytes": 12628
+        "bytes": 12436
       },
       {
         "name": "display_glass",
@@ -140,7 +140,7 @@
         "vertices": 1736,
         "triangles": 3356,
         "surfaces": 1,
-        "bytes": 118748
+        "bytes": 119132
       },
       {
         "name": "back_counter",
@@ -165,10 +165,10 @@
       },
       {
         "name": "bakery_rack",
-        "vertices": 4966,
-        "triangles": 9592,
+        "vertices": 7666,
+        "triangles": 15172,
         "surfaces": 1,
-        "bytes": 312444
+        "bytes": 452588
       },
       {
         "name": "baking_workbench",
@@ -189,7 +189,7 @@
         "vertices": 6608,
         "triangles": 13148,
         "surfaces": 1,
-        "bytes": 559456
+        "bytes": 559200
       },
       {
         "name": "fire",
@@ -210,66 +210,66 @@
         "vertices": 3453,
         "triangles": 5349,
         "surfaces": 1,
-        "bytes": 419568
+        "bytes": 418928
       },
       {
         "name": "cafe_chair",
         "vertices": 514,
         "triangles": 988,
         "surfaces": 1,
-        "bytes": 41256
+        "bytes": 41352
       },
       {
         "name": "back_counter_dressing",
-        "vertices": 5612,
-        "triangles": 10524,
+        "vertices": 7298,
+        "triangles": 14024,
         "surfaces": 1,
-        "bytes": 407016
+        "bytes": 497812
       },
       {
         "name": "prep_dressing",
         "vertices": 5724,
         "triangles": 10804,
         "surfaces": 1,
-        "bytes": 467916
+        "bytes": 467980
       },
       {
         "name": "wall_and_cafe_dressing",
         "vertices": 9536,
         "triangles": 18328,
         "surfaces": 1,
-        "bytes": 662424
+        "bytes": 665080
       },
       {
         "name": "wall_lamps",
         "vertices": 432,
         "triangles": 832,
         "surfaces": 1,
-        "bytes": 32864
+        "bytes": 32832
       },
       {
         "name": "warm_lamps_glow",
         "vertices": 438,
         "triangles": 864,
         "surfaces": 1,
-        "bytes": 26468
+        "bytes": 26596
       },
       {
         "name": "stocked_pastries",
-        "vertices": 13382,
-        "triangles": 26096,
+        "vertices": 12298,
+        "triangles": 24108,
         "surfaces": 1,
-        "bytes": 835224
+        "bytes": 750368
       }
     ],
-    "unique_triangles": 159585,
-    "scene_triangles": 173399,
+    "unique_triangles": 167421,
+    "scene_triangles": 181235,
     "static_draw_surfaces": 40,
-    "glb_bytes": 7024260,
-    "atlas_bytes": 2641105,
+    "glb_bytes": 7191264,
+    "atlas_bytes": 2626384,
     "placed_instances": 40,
     "materials": 4,
-    "local_scene_triangles": 160573,
+    "local_scene_triangles": 168409,
     "shared_scene_triangles": 12826,
     "shared_assets": [
       {
@@ -343,51 +343,51 @@
   },
   "video": {
     "duration_seconds": 15.0,
-    "sha256": "c869718d4209b006b86edf74d047f75c097480e02aa340aa8be46e3479c0c985"
+    "sha256": "544a4a114805ce5d1492c5f37fddd1be1192901d2aeaea253d62def3677997d7"
   },
   "hashes": {
-    "assets/rooms/bakery/room_shell.glb": "bbcf2940e42b284e5bca149123deef9c0f98be726ade491f73ab9ab23278bd42",
-    "assets/rooms/bakery/window_wall.glb": "dbbdf480157ed5f615ef9e888ab253b426716cccab8dc906c5ab232b215651c2",
-    "assets/rooms/bakery/back_wall.glb": "65c2b8184ccb5f20297c3e902873452f1e44ca657164c54461110bbb6c66d704",
-    "assets/rooms/bakery/back_window_left.glb": "d62f291874afc0e13742862b17eb7dfc4b1c79f4ce9c5b2dc35835d95c22ce5d",
-    "assets/rooms/bakery/back_window_left_garden.glb": "304ba2f73fa5759329e8f1584d7987f68973ff115dee9bcc8277cdac31cf6a65",
-    "assets/rooms/bakery/back_window_right.glb": "25b3a8151ebcd0baefb6e61148faec967433cac8830d61d2cacd0ba9762e0d5e",
-    "assets/rooms/bakery/back_window_right_garden.glb": "1c4555823f5f9c2290c95f8228a412f2c8e262b13e53ed8dc64ea386ce7748f4",
-    "assets/rooms/bakery/brick_oven.glb": "85908d8db693b9238ac8e26c669724102f268e0e9d13da00a6f0ae2ea7bc1bb8",
-    "assets/rooms/bakery/baking_loaves.glb": "30116d0a4ec1ad2dc6c48d1794aae1c2a04ec1958ff8a1e2430b23eac02eea54",
-    "assets/rooms/bakery/oven_peel.glb": "291a159a5a34bfaa0473067f97b6f840723777ef771dd0565b7c5b6bb1a9151d",
-    "assets/rooms/bakery/pastry_display.glb": "846b101470a374559ab751c12e5c722b31837e0213d8a17189a34af76e79b367",
-    "assets/rooms/bakery/display_frame.glb": "ede7c3155be803a7505c52d776df1670a33bcf7953b19c07abe34800f2d0e16e",
-    "assets/rooms/bakery/display_glass.glb": "4c0f931ce8e4c9372013151fe1ad00d9b54a36643a9015dec9978799dd312c6c",
-    "assets/rooms/bakery/checkout_counter.glb": "8d443e1ce4c66e1760defe86dc063e418d8b3b5fe65480b858c315306beea78d",
-    "assets/rooms/bakery/bread_motto.glb": "167ac56da89fdd382a4afedd833635a4ee2bf2cbd31fcbf60453425525421564",
-    "assets/rooms/bakery/sink_cabinet.glb": "613339ce9a8ea97aeb48f2ef2d70d30832d0fa1684e67344100db03dcd706467",
-    "assets/rooms/bakery/back_counter.glb": "769cbb7e7ae3300556046ce2a42785cf156814c93ff9a36185376795fdbb6279",
-    "assets/rooms/bakery/pantry.glb": "72e36edefad61cadacc0b4e8ea9f85a8dbf3cc8865cbef1020327ac14af9c052",
-    "assets/rooms/bakery/jar_wall_shelves.glb": "4f2af247ccf5b53e8818ce2d085721ce4447630d564ecc3655e73b1e395d187b",
-    "assets/rooms/bakery/bakery_rack.glb": "63638a01b8ed649feca1c8099c2e733b688174c8c225ea05c004b1f305c9ba62",
-    "assets/rooms/bakery/baking_workbench.glb": "f28313d1835ccb455f530c31e87de98da9b8c1606a89df2a87f5292276a9d31d",
-    "assets/rooms/bakery/cafe_table.glb": "e6b5bfe7dfe5fc74bc1f0771563f16ef02a3595bf84cf8acbd317c7762fea817",
-    "assets/rooms/bakery/cafe_rope_rug.glb": "d46f904a3f45e0150fa2468aa594cb7ca63616308472294d570c07a9c0748bbc",
+    "assets/rooms/bakery/room_shell.glb": "67e1c37d0a9d2181cf5a030cfff9cfbf9df99a20f85b81dea7abc9b29fcf632f",
+    "assets/rooms/bakery/window_wall.glb": "20e469ee08f591a02aa356571f68ac52c6688fb8a18d88e3c69fa28f934dd1bd",
+    "assets/rooms/bakery/back_wall.glb": "13d99d5a22bf57565586cbee1f185dcccaa192abde38c9cd8e5af9bf847acb37",
+    "assets/rooms/bakery/back_window_left.glb": "44446b709ade122211ab6011af81d349d9406ccd256d12cc4cc4e3817009bf8d",
+    "assets/rooms/bakery/back_window_left_garden.glb": "13eef3e51c8a71f505ad13d0ea3cce3fedf9d409e516822076cae792b436feaa",
+    "assets/rooms/bakery/back_window_right.glb": "aa92e48eb7e9acd5a577326cdb045e37b74e578408a0060e0734eaa14d472625",
+    "assets/rooms/bakery/back_window_right_garden.glb": "a7342931ac7925ca021943237df24cfef470fed9dfe08dc35212e5e4256077f4",
+    "assets/rooms/bakery/brick_oven.glb": "32eaf0c657562b62c9ab545ae0d89c85f4e3b5d2668528e41ecc098dcd459ce0",
+    "assets/rooms/bakery/baking_loaves.glb": "cc82f719f9551a3f59705dad2f11a2de7cd67ad7b58643e67451a841373e46c4",
+    "assets/rooms/bakery/oven_peel.glb": "149c4f54350ea5c17c25a1058d9ca4619ab0cc0a04b480096dd9f8d893ce9a23",
+    "assets/rooms/bakery/pastry_display.glb": "a9711b04e265128c2d2c12305e43b33645a3c08163e54dfb14b41b8ce952a1b4",
+    "assets/rooms/bakery/display_frame.glb": "aeb9992799440f3808aec821071fc5a1be9f106ee742742b8dc49cbb29d5c6bb",
+    "assets/rooms/bakery/display_glass.glb": "2cce52c984fd63d051766885d8707dfee9ad555102221e0fb901fa10a90695c1",
+    "assets/rooms/bakery/checkout_counter.glb": "dcef8e6efd0344a87e97eace73f89b6116b8fe1cfb91b25f8f038e7eb59bc996",
+    "assets/rooms/bakery/bread_motto.glb": "8217f91ed96c78d4b0d310379f9433f8ed3c3404781f60e349aa9652eacdab36",
+    "assets/rooms/bakery/sink_cabinet.glb": "13998ccb24ca182e7923e6c6775120c9de89345d6cf94e356464340350db22ee",
+    "assets/rooms/bakery/back_counter.glb": "b46b5a49fa1df0f4f762ef8bccc99823ef0ea2ed6e5799beab4649785f038a1c",
+    "assets/rooms/bakery/pantry.glb": "cf0d5b469cad0058ce0c56186f650c49d243bf5df750f9e92bb63c4d6d28eaae",
+    "assets/rooms/bakery/jar_wall_shelves.glb": "c5e42d51727ffac23279c5ada5d139d49cbf06330356a730103048919e3f939a",
+    "assets/rooms/bakery/bakery_rack.glb": "213ab7ab379abd1f83a391fc88a9b17016848ab39341e93aa8ff9e085c7af82d",
+    "assets/rooms/bakery/baking_workbench.glb": "6c5cb42b1c634db395ad0e13c274d6f908f2b2c80df15ffde5866cd8b817aa89",
+    "assets/rooms/bakery/cafe_table.glb": "dabc3d05d3cc21027c1091e582d5eeb3def62cf317c313a630cff02edac18de5",
+    "assets/rooms/bakery/cafe_rope_rug.glb": "26b87088917c9aa1b0198d95fcae990b15e6879725666acefdd448e5b44608f8",
     "assets/rooms/bakery/fire.glb": "f1e623310bf86d81ba9bf8f35992141248fc2e593f04eb9e84362ec600ed28c8",
-    "assets/rooms/bakery/display_shelves.glb": "2e164f4731520bed913e78f8f4d5114c9f2577e12b7826aad777c3704e5450b8",
-    "assets/rooms/bakery/bakery_sign.glb": "c7a22c0307346d40500fc06404f44472687599415e3915a74d208b84c7232106",
-    "assets/rooms/bakery/cafe_chair.glb": "ca9ecd7827ca5161d12faced4d254887e2a9217fba2d30e7e9fbc574c5365ff5",
-    "assets/rooms/bakery/back_counter_dressing.glb": "aaa3cf75b9a3666c99c1ecaab92816c73c22ee1facda1a868149224f136bcb83",
-    "assets/rooms/bakery/prep_dressing.glb": "d014ff60d50b9c6fdb8650ca5d7faa1e261de26224feeb2dbf09b26a5d514d95",
-    "assets/rooms/bakery/wall_and_cafe_dressing.glb": "178e77019db4db049bbeea9f9755b46a868da579b68890e15bb169719dee5f28",
-    "assets/rooms/bakery/wall_lamps.glb": "13624afecd31cd44a61d84c6b1efb9afdbd7f0b56e770ea54589925184f749ec",
-    "assets/rooms/bakery/warm_lamps_glow.glb": "9f77092db0a55e9038d84ba27f86d808b06bf97cca6b22dd2b14cc11fe8f1ead",
-    "assets/rooms/bakery/stocked_pastries.glb": "10dcf6297354e629fdf95eb8fa2ddc09664a88d7e11b546e2109055168587724",
+    "assets/rooms/bakery/display_shelves.glb": "caaa0829feeea80219b38b5733549e129e8fc5ae46fe8558503312abd9f79dca",
+    "assets/rooms/bakery/bakery_sign.glb": "15b576d751031e314b9efa1e2dc93e1082816b5a332aecce1e005938ebef175c",
+    "assets/rooms/bakery/cafe_chair.glb": "db01899c6c96dfc5dce4af27428343bed8fab361f5243629d7ad2a7552853cda",
+    "assets/rooms/bakery/back_counter_dressing.glb": "327a6739451a4ae837bb8c7a87f8a07a2528a965b61497412ee69caf1c82f2dc",
+    "assets/rooms/bakery/prep_dressing.glb": "bdcf5b1641b27f68cf2deb4eb4ed0d0611548e45217489909eb8d78d4a9cce20",
+    "assets/rooms/bakery/wall_and_cafe_dressing.glb": "4411bb15be8a88a7b7fff8edccac7c4aca6964d78f17a261c86d4c18d6d68ae3",
+    "assets/rooms/bakery/wall_lamps.glb": "e1f766087364ed115c1136112aa06d9c86cebef952a390fa69ad733f78ab9dee",
+    "assets/rooms/bakery/warm_lamps_glow.glb": "6b594dfa15cdb46b6c57cd3dea3eb85e896eb31883730e312524b69d1516a8b7",
+    "assets/rooms/bakery/stocked_pastries.glb": "bb3e3b9a2a481ac0b558db979e08b14248481df3f560109426fca1a5cc9d310e",
     "assets/rooms/_shared/plants/olive_tree.glb": "f2aa7fd237588d9fa720182977bf8ee7b13fd07f9765fa06d50ccfb376c77870",
     "assets/rooms/_shared/plants/peace_lily.glb": "c08e656b11a7dfcf41d2831a73d1ae547001247ff2eab45a4bee0ed494016d21",
     "assets/rooms/_shared/plants/pothos.glb": "705ffac2b97ee66d8756fb610d01a87bf6a5e0578e312233e71264dfa99976e1",
-    "assets/rooms/bakery/room_albedo_ao.png": "353d1c23e549b4cb567b778019ff4d2328e2309aaf7ac3f3019dd2c81d4c141e",
+    "assets/rooms/bakery/room_albedo_ao.png": "ebee15887ac676a94c646f843216347d4f2a67248b4a3ce5cccc2fa1169edb89",
     "assets/rooms/bakery/fire_gradient.png": "349870df4e628410dc128999d57558a6654b17e5ef4d5a2cabc06db6b8e89f5b",
     "assets/rooms/_shared/plants/room_albedo_ao.png": "713c9f88ad08d91fccb6f2b0f1969162cbb6381367e632919ec8159ccf810b4a",
     "assets/rooms/_shared/plants/material.tres": "f75e3970edd6f8caeaa485218465d51f718b0caee941923ee5825da94adf791b",
-    "tools/art/source/bakery/bakery.blend": "395a23e856564a7a0c55552da37f67be2cacfe1d8866293baf561adb69dd87f6",
-    "assets/rooms/bakery/layout.json": "a7d9c5282fcb5e87960898e39415f2b05eb5a6e09a96a41220b190aee36deda5"
+    "tools/art/source/bakery/bakery.blend": "9076d605c4e327c07453ce19a79b4324b839f5e868fc068b9e5b9105410f2028",
+    "assets/rooms/bakery/layout.json": "dcc4809049528ef8b31babab79c755648f01d5b9fb639ac61191824ff064c9df"
   },
   "scope": "Zhao Yun scene art revision; actual desktop rendered benchmark. No production update or physical-phone GPU claim."
 }
