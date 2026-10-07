@@ -1,0 +1,61 @@
+/** Homestead Lv1–3 (plan §8.1–8.3): materials + coins + Farming + Fishing levels; upgrading refills Energy to the new max. */
+import type { P0Content } from './content.js';
+import { gainEnergy, type P0Event } from './progress.js';
+import { maxEnergy, skillLevel } from './rules.js';
+import type { P0State } from './state.js';
+import { missing, takeStorageFirst } from './storage.js';
+import type { Refusal } from './fishing.js';
+
+export function nextLevel(c: P0Content, s: P0State) {
+  return c.homestead.levels.find(l => l.level === s.homestead.level + 1) ?? null;
+}
+
+export function skillsTotal(c: P0Content, s: P0State): number {
+  return skillLevel(c, s, 'farming') + skillLevel(c, s, 'fishing');
+}
+
+/** Unlocks granted at or below the current level (spice_rack, warming_cabinet, bag_upgrade_1, board_slot_3, fence). */
+export function unlocked(c: P0Content, s: P0State, what: string): boolean {
+  return c.homestead.levels.some(l => l.level <= s.homestead.level && l.unlocks.includes(what));
+}
+
+export function boardSlots(c: P0Content, s: P0State): number {
+  let slots = 0;
+  for (const [from, n] of c.homestead.board_slots) if (s.homestead.level >= from) slots = n;
+  return slots;
+}
+
+/** Coins a spend needs in the wallet: price + the 40-coin floor (q(32); seeds are exempt, §11.2.2 rule 9). */
+export function coinsNeeded(c: P0Content, price: number): number { return price + c.wallet_floor; }
+
+/** Why the next level can't be bought right now, in button order: skills, then materials, then coins (§8.6.1). */
+export function upgradeBlock(c: P0Content, s: P0State): Refusal | null {
+  const next = nextLevel(c, s);
+  if (!next) return { code: 'max_level', detail: { level: s.homestead.level } };
+  const skills = skillsTotal(c, s);
+  if (skills < next.skills) return { code: 'skills_short', detail: { need: next.skills, have: skills } };
+  const gap = missing(s, next.materials);
+  if (gap) return { code: 'need_material', detail: gap };
+  if (s.coins < coinsNeeded(c, next.coins)) return { code: 'no_coins', detail: { need: coinsNeeded(c, next.coins) - s.coins } };
+  return null;
+}
+
+export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: P0Event[]): Refusal | null {
+  // TODO(P1): only at home (§8.1.1 前置 ①); the P0 server has no position, the client offers it at home only.
+  const block = upgradeBlock(c, s);
+  if (block) return block;
+  const next = nextLevel(c, s)!;
+  for (const [item, qty] of next.materials) {
+    takeStorageFirst(s, item, qty);
+    events.push({ kind: 'item', id: item, delta: -qty });
+  }
+  s.coins -= next.coins;
+  events.push({ kind: 'coins', delta: -next.coins });
+  s.homestead.level = next.level;
+  s.homestead.plaque.push({ level: next.level, at: now });
+  // §8.1.1: Energy refills to the new max (200/200 → 210/210); a bonus-zone value above it is kept.
+  const max = maxEnergy(c, s);
+  const gain = gainEnergy(c, s, now, max - s.energy.value, events, 'homestead');
+  events.push({ kind: 'homestead', level: next.level, energy: gain, unlocks: next.unlocks });
+  return null;
+}
