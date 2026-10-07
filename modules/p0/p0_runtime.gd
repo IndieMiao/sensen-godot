@@ -93,7 +93,10 @@ func detach(w: Node) -> void:
 func leave_world() -> void:
 	if not is_instance_valid(world) or AppRouter.top_instance() != world: return
 	if not (world is P0Room) and AppRouter.scene_locks_back_navigation(world): return
-	while AppRouter.instance_depth() > 0: AppRouter.pop_instance()
+	while AppRouter.instance_depth() > 0:
+		var depth := AppRouter.instance_depth()
+		AppRouter.pop_instance()
+		if AppRouter.instance_depth() >= depth: break   # a locked layer (a committed relocation map) stays
 
 ## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
 func leave_room() -> void:

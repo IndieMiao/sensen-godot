@@ -105,8 +105,8 @@ func _ready() -> void:
 	actor.setup(bp, grid, cam, Vector3(at.x, floor_y, at.z))
 	actor.ground_height = func(_p: Vector3) -> float: return floor_y
 	if spawn: actor.face(actor.position + yaw_dir(float(_data.spawn.get("yaw_degrees", 180))))
-	frame_all()
 	_room_ready()
+	frame_all()   # after the subclass spawned what can be tapped (keepers, residents)
 	if OS.is_debug_build() and FileAccess.file_exists("user://p0_perf"): _perf_left = 5.0
 	if use_runtime:
 		rt = P0Runtime.ensure()
