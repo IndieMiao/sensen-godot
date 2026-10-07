@@ -8,7 +8,7 @@ import { dishParts, itemKind, recipeById, type P0Content, type ResidentDef, type
 import { recipeRarity } from './cooking.js';
 import type { Refusal } from './fishing.js';
 import type { P0Event } from './progress.js';
-import { haveFor, noteDone, payBonus, pick } from './requests.js';
+import { floorPrice, haveFor, noteDone, payBonus, pick } from './requests.js';
 import { skillLevel, untilRollover } from './rules.js';
 import type { P0State, ResidentState } from './state.js';
 
@@ -130,20 +130,27 @@ export function residentRequestCommand(c: P0Content, s: P0State, type: 'accept' 
   }
   if (st.state !== 'accepted') return { code: 'not_accepted' };
   const q = st.req!;
+  let floor = 0;   // floor value of what is handed in: paid in full, like a system request (q(44))
   if (q.need.kind === 'sow') {
     if (r.req!.progress < q.qty) return { code: 'not_ready', detail: { progress: r.req!.progress, need: q.qty } };
   } else {
     const parts = pick(c, s, q.need, q.need.id ? [q.need.id] : [], q.qty);
     if (!parts) return { code: 'not_enough', detail: { need: q.qty, have: progressOf(c, s, owner, q) } };
-    for (const [item, n] of parts) { take(s.bag, item, n, 'skip'); events.push({ kind: 'item', id: item, delta: -n }); }
+    for (const [item, n] of parts) {
+      take(s.bag, item, n, 'skip');
+      floor += floorPrice(c, item) * n;
+      events.push({ kind: 'item', id: item, delta: -n });
+    }
   }
-  const coins = payBonus(c, s, q.coins);   // resident coins count against the 100-coin daily bonus cap
+  // q(44): the part of the listed coins above the floor is the resident's reward and shares the 100-coin daily cap.
+  const bonus = payBonus(c, s, Math.max(0, q.coins - floor));
+  const coins = floor + bonus;
   s.coins += coins;
   r.req = null;
   r.next += 1;
   r.done_day = s.day.key;
   noteDone(s, reqId);
-  events.push({ kind: 'coins', delta: coins }, { kind: 'request', id: reqId, status: 'done', coins, bonus: coins });
+  events.push({ kind: 'coins', delta: coins }, { kind: 'request', id: reqId, status: 'done', coins, bonus });
   addAffinity(c, s, owner, c.affinity.request, 'request', events);
   return null;
 }
