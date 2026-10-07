@@ -191,6 +191,8 @@ func p0_recenter() -> void:
 
 func p0_show_spot(where: String) -> void:
 	var at := _house if where in ["stove", "bench", "home"] else actor.position
+	if where == "stall": at = _stall
+	elif where == "plots": at = _plots_center()
 	_focus = at
 	_cam_follow.hold()
 	var ring := MeshInstance3D.new()
@@ -237,6 +239,12 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	for p in v.get("plots", []):
 		var id := int(p.get("id", -1))
 		if id >= 0 and id < P0Garden.plot_count(): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
+
+## Middle of the plot beds, for camera-only "Show" from the Today panel and NeedSource (LOCK-08).
+func _plots_center() -> Vector3:
+	var sum := Vector3.ZERO
+	for id in P0Garden.plot_count(): sum += bp.cell_to_world(P0Garden.cell_of(id))
+	return sum / maxf(1.0, float(P0Garden.plot_count()))
 
 ## The bed the player faces from the walkway: nearest bed ahead within reach.
 func _pick_front(v: Dictionary) -> void:
