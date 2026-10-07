@@ -1105,6 +1105,15 @@
   `tools/android/README.md`. Keep an entire multi-step scenario in one session.
   The runner force-stops the target before launch and on exit or interruption.
 - Use `--clean-all` when old Sensen test processes must be stopped. Preserve
-  installed applications and saves, and keep the Android emulator running.
+  installed applications and saves.
+- Resource rule adopted on 2026-10-07 at the user's request, superseding the
+  earlier "keep the Android emulator running": after each test round (unit
+  tests, emulator walkthrough, screenshots), shut down the Android emulators
+  and test Godot instances you started, plus any local test servers or
+  database containers, unless you still need them for an immediate next run or
+  a user hand test; say so when you keep one, and close it afterwards. Stop
+  only processes you started, never another session's emulator or Godot or the
+  user's own editor. Shutting down an emulator must not wipe its data
+  (no wipe-data). Confirm with `ps` that nothing you started is left running.
 - Background CPU diagnosis starts with measurements before application changes.
   Do not infer a runtime defect solely from the number of installed packages.
