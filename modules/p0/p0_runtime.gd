@@ -187,6 +187,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					ui.float_text("+%d XP" % int(ev.amount) + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)), at + Vector2(0, dy), Color("1e9bb0"))
 			"item":
 				var iid := str(ev.id)
+				if iid.begins_with("dish_"): _call("p0_event", [ev, v])   # where a collected dish went (the kitchen's Keep toast)
 				if int(ev.delta) > 0 and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"):
 					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at + Vector2(0, dy), Color("4f934b"))
 			"coins":
@@ -200,12 +201,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"catch":
 				# A world that shows the catch itself (the open fishing panel) returns true.
 				if not bool(_call("p0_event", [ev, v])): _on_catch(ev, xp_lines)
-			"cast", "pot":
+			"cast", "pot", "cabinet", "plate", "first", "mishap", "queue":
 				_call("p0_event", [ev, v])
 			"dish":
 				var lines := xp_lines.duplicate()
-				_call("p0_event", [ev, v])
-				ui.queue_card(func(): ui.show_dish(ev, lines))
+				# The farmhouse stove shows its own result card (COOK-4 / 6 / P0-9); elsewhere the old one.
+				if not bool(_call("p0_event", [ev, v])): ui.queue_card(func(): ui.show_dish(ev, lines))
 			"request":
 				if str(ev.status) == "accepted": ui.toast("Tracking · it shows in Today")
 				else: ui.toast("Request complete · +%d coins" % int(ev.coins))
@@ -289,6 +290,8 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast("Fish from a pond · open one from the map")   # the server did not get which pond (q(36))
 		"too_early", "no_cast":
 			_call("p0_event", [{"kind": "fish_abort"}, session.view])
+		"stale_pot":
+			session.refresh()   # S5: the server already kept that pot (Queue ×2); the fresh view shows where it went
 		"stove_busy":
 			ui.toast("The stove is busy · %s left" % P0Logic.duration(float(detail.get("ready_in", 0))))
 		"needs_main":

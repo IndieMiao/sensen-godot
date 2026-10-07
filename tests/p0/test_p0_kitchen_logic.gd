@@ -112,3 +112,91 @@ func test_the_stove_reads_the_queue_list_when_the_server_sends_one() -> void:
 	assert_int(int(P0KitchenLogic.stove(v).ready_in)).is_equal(9000)
 	v.cooking.stoves = [{"dish": null, "ready_in": null, "queued": null}]
 	assert_object(P0KitchenLogic.stove(v)).is_null()
+
+# ---------------------------------------------------------------- the dish comes out (COOK-4 / 6 / P0-9, COOK-7-2)
+func _eat_view(energy: int, used: int, meal: int) -> Dictionary:
+	var v := _view()
+	v["energy"] = {"value": energy, "max": 210}
+	v["meals"] = {"used": used, "cap": 210, "resets_in": 33120000, "eaten": {}}
+	v.items["dish_perch@good"] = {"name": "Herb Baked Perch", "kind": "dish", "quality": 1, "meal": meal, "full": 45}
+	return v
+
+func test_eating_states_follow_cook_7_2_first_match_wins() -> void:
+	var id := "dish_perch@good"
+	# 1 Energy full (bonus counts as full): unavailable with the reason on the button.
+	assert_dict(P0KitchenLogic.eat_state(_eat_view(210, 100, 45), id)).is_equal({text = "Energy full", reason = "Energy full", confirm = ""})
+	# 2 food limit used up, 3 the third serving today: eats for nothing.
+	assert_str(P0KitchenLogic.eat_state(_eat_view(142, 210, 45), id).text).is_equal("Eat · no Energy today")
+	assert_str(P0KitchenLogic.eat_state(_eat_view(142, 100, 0), id).text).is_equal("Eat · no Energy today")
+	# 4 the second serving is half (the server's meal value).
+	assert_str(P0KitchenLogic.eat_state(_eat_view(142, 100, 23), id).text).is_equal("Eat · +23 Energy")
+	# 5 Energy room smaller than the meal: the smaller value, and the first tap asks.
+	assert_dict(P0KitchenLogic.eat_state(_eat_view(198, 100, 45), id)).is_equal({text = "Eat · +12 Energy", reason = "", confirm = "Only +12 of 45 · Eat anyway?"})
+	# 6 food-limit room smaller than the meal: the smaller value, no question.
+	assert_dict(P0KitchenLogic.eat_state(_eat_view(142, 190, 45), id)).is_equal({text = "Eat · +20 Energy", reason = "", confirm = ""})
+	# 7 plain.
+	assert_dict(P0KitchenLogic.eat_state(_eat_view(142, 100, 45), id)).is_equal({text = "Eat · +45 Energy", reason = "", confirm = ""})
+
+func test_a_portion_left_on_the_stove_is_worth_its_tier_halved_for_a_second_serving() -> void:
+	var v := _view()
+	v.cooking.tiers["2"]["bonus"] = [0, 5, 10]
+	v["meals"] = {"used": 0, "cap": 210, "eaten": {}}
+	assert_int(P0KitchenLogic.meal_value(v, "dish_perch@good")).is_equal(45)   # not in the bag: tier 40 + Good 5
+	v.meals.eaten["dish_perch"] = 1
+	assert_int(P0KitchenLogic.meal_value(v, "dish_perch@good")).is_equal(23)
+	v.cooking["cabinet"] = {"cap": 6, "have": 1, "items": [{"id": "dish_perch@good", "qty": 1, "energy": 30}]}
+	assert_int(P0KitchenLogic.meal_value(v, "dish_perch@good")).is_equal(30)   # the cabinet row's own number
+
+func test_routes_say_where_each_portion_went() -> void:
+	var events := [
+		{"kind": "cabinet", "id": "dish_perch@perfect", "delta": 1, "to_bag": 0, "have": 5, "cap": 6},
+		{"kind": "item", "id": "dish_perch", "delta": 1},
+		{"kind": "cabinet", "id": "dish_perch", "delta": 0, "to_bag": 1, "have": 5, "cap": 6},
+		{"kind": "dish", "dish": "dish_perch", "quality": 2},
+	]
+	assert_dict(P0KitchenLogic.routes(events)).is_equal({"dish_perch@perfect": "cabinet", "dish_perch": "bag"})
+	assert_dict(P0KitchenLogic.routes([{"kind": "plate", "ids": ["dish_perch"], "cabinet": false}])).is_equal({"dish_perch": "stove"})
+	assert_dict(P0KitchenLogic.eat_command("dish_perch", "cabinet")).is_equal({"type": "eat", "item": "dish_perch", "from": "cabinet"})
+	assert_dict(P0KitchenLogic.eat_command("dish_perch", "stove")).is_equal({"type": "collect", "eat": true})
+	assert_dict(P0KitchenLogic.eat_command("dish_perch", "bag")).is_equal({"type": "eat", "item": "dish_perch"})
+
+func test_keep_lines_follow_keep_states() -> void:
+	var v := _view()
+	v.items["dish_perch"] = {"name": "Herb Baked Perch", "kind": "dish"}
+	assert_str(P0KitchenLogic.keep_line(v, "dish_perch", "bag").text).is_equal("Herb Baked Perch · saved to your bag")
+	assert_str(P0KitchenLogic.keep_line(v, "dish_perch", "stove").text).is_equal("Bag full · dish left on the stove")
+	v.cooking["cabinet"] = {"cap": 6, "have": 5, "items": []}
+	assert_str(P0KitchenLogic.keep_line(v, "dish_perch", "cabinet").text).is_equal("Kept · Warming Cabinet 5/6")
+	assert_str(P0KitchenLogic.keep_line(v, "dish_perch", "bag").text).is_equal("Cabinet full · Herb Baked Perch sent to bag")
+	assert_str(P0KitchenLogic.keep_line(v, "dish_perch", "stove").text).is_equal("Cabinet and bag full · dish left on the stove")
+
+func test_dish_cards_say_new_recipe_mystery_or_ready() -> void:
+	var v := _view()
+	var first := P0KitchenLogic.dish_card(v, {"dish": "dish_perch", "quality": 1, "first": true}, 20, false)
+	assert_str(first.event).is_equal("New recipe!")
+	assert_str(first.item_name).is_equal("Herb Baked Perch")
+	assert_str(first.rarity_word).is_equal("Fine")
+	assert_int(first.quality).is_equal(1)
+	assert_str(first.strip).is_equal("First cooked · +20 Cooking XP · Cookbook 3/5")
+	assert_str(first.note).is_equal("Gift later from your bag")
+	assert_str(first.dish_id).is_equal("dish_perch@good")
+	var back := P0KitchenLogic.dish_card(v, {"dish": "dish_grilled_crucian", "quality": 0}, 0, true)
+	assert_str(back.event).is_equal("Dish ready")
+	assert_str(back.strip).is_equal("Collected from Stove 1")
+	var mystery := P0KitchenLogic.dish_card(v, {"dish": "dish_mystery", "quality": 0, "mystery": true, "clue": {"page": "dish_perch"}}, 0, false)
+	assert_int(mystery.tone).is_equal(UiRewardMoment.Tone.NEUTRAL)
+	assert_str(mystery.strip).is_equal("A clue was added to your Cookbook")
+	assert_str(mystery.note).is_equal("Can't be sold or delivered")
+
+func test_keep_room_spares_a_retry_that_would_be_refused() -> void:
+	var v := _view()
+	v.bag.free = 0
+	assert_bool(P0KitchenLogic.keep_room(v, "dish_perch")).is_false()
+	v.bag.slots.append({"id": "dish_perch", "qty": 4})
+	assert_bool(P0KitchenLogic.keep_room(v, "dish_perch")).is_true()   # a dish stack (5) with room
+	v.bag.slots[-1].qty = 5
+	v.cooking["cabinet"] = {"cap": 6, "have": 5, "items": []}
+	assert_bool(P0KitchenLogic.keep_room(v, "dish_perch")).is_true()
+	assert_array(P0KitchenLogic.stove_left(v)).is_empty()
+	v.cooking.stove = {"ready_in": 0, "left": ["dish_perch"]}
+	assert_array(P0KitchenLogic.stove_left(v)).contains_exactly(["dish_perch"])

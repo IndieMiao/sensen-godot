@@ -200,3 +200,113 @@ static func experiment_reason(view: Dictionary, pot: Array) -> String:
 	if preview(view, pot).title == "Needs a main ingredient": return "Needs a main ingredient"
 	if stove(view) != null: return "Stove busy"
 	return ""
+
+# ---------------------------------------------------------------- the dish comes out (COOK-4 / 6 / P0-9, COOK-7-2)
+## Portions waiting on the stove after a collect with no room (§7.2.6, PR #20): [] when none.
+static func stove_left(view: Dictionary) -> Array:
+	var st = stove(view)
+	if not (st is Dictionary) or st.get("left", null) == null: return []
+	return st.left
+
+## What one portion restores today (§7.17.1): the server's number when the dish sits in the bag or the Warming
+## Cabinet; for a portion still on the stove the page's tier and quality, halved for a 2nd serving, 0 after.
+static func meal_value(view: Dictionary, id: String) -> int:
+	var info := P0Logic.item(view, id)
+	if info.has("meal"): return int(info.meal)
+	var cab = cooking(view).get("cabinet", null)
+	if cab is Dictionary:
+		for row in cab.get("items", []):
+			if str(row.id) == id: return int(row.get("energy", 0))
+	var base := id.get_slice("@", 0)
+	var page := _page(view, base)
+	if page.is_empty(): return int(P0Logic.content().get("cooking", {}).get("mystery", {}).get("energy", 5))
+	var tier: Dictionary = cooking(view).get("tiers", {}).get(str(int(page.get("rarity", 1))), {})
+	var quality := ["plain", "good", "perfect"].find(id.get_slice("@", 1)) if id.contains("@") else 0
+	var full := int(tier.get("energy", 20)) + int((tier.get("bonus", [0, 0, 0]) as Array)[maxi(quality, 0)])
+	var eaten := int(view.get("meals", {}).get("eaten", {}).get(base, 0))
+	return full if eaten == 0 else (ceili(full / 2.0) if eaten == 1 else 0)
+
+static func _page(view: Dictionary, id: String) -> Dictionary:
+	for p in pages(view):
+		if str(p.id) == id: return p
+	return {}
+
+## COOK-7-2 eating states, first match wins: {text, reason, confirm}. `reason` makes Eat unavailable (LOCK-10,
+## Energy full, Bonus counts as full); `confirm` is the first tap's question when Energy can't take it all. The
+## button shows the smaller of the energy room and the food-limit room.
+static func eat_state(view: Dictionary, id: String) -> Dictionary:
+	var e: Dictionary = view.get("energy", {})
+	var have := int(e.get("value", 0))
+	var mx := int(e.get("max", 200))
+	if have >= mx: return {text = "Energy full", reason = "Energy full", confirm = ""}
+	var value := meal_value(view, id)
+	var m: Dictionary = view.get("meals", {})
+	var left := maxi(0, int(m.get("cap", 200)) - int(m.get("used", 0)))
+	if left <= 0 or value <= 0: return {text = "Eat · no Energy today", reason = "", confirm = ""}
+	var counted := mini(value, left)
+	var gain := mini(counted, mx - have)
+	return {text = "Eat · +%d Energy" % gain, reason = "", confirm = ("Only +%d of %d · Eat anyway?" % [gain, value]) if gain < counted else ""}
+
+## Where each portion of a collect went, from its events: id → "cabinet" / "bag" / "stove" (PR #20 events).
+static func routes(events: Array) -> Dictionary:
+	var out := {}
+	for ev in events:
+		match str(ev.get("kind", "")):
+			"cabinet":
+				if int(ev.delta) > 0: out[str(ev.id)] = "cabinet"
+				elif int(ev.get("to_bag", 0)) > 0: out[str(ev.id)] = "bag"
+			"item":
+				if str(ev.id).begins_with("dish_") and int(ev.delta) > 0 and not out.has(str(ev.id)): out[str(ev.id)] = "bag"
+			"plate":
+				for id in ev.get("ids", []): out[str(id)] = "stove"
+	return out
+
+## The eat command for a portion that went `where` (cabinet / bag / stove), §7.2.6.
+static func eat_command(id: String, where: String) -> Dictionary:
+	match where:
+		"cabinet": return {"type": "eat", "item": id, "from": "cabinet"}
+		"stove": return {"type": "collect", "eat": true}
+	return {"type": "eat", "item": id}
+
+## KEEP-STATES (§7.2.6, appendix B.7): the toast once the player keeps the dish (Keep, or tapping outside).
+## {text, tone}: tone "info" for a normal keep, "warn" when it went to the bag instead, "error" when it stayed.
+static func keep_line(view: Dictionary, id: String, where: String) -> Dictionary:
+	var name := str(P0Logic.item(view, id).get("name", P0Logic.item_name(view, id.get_slice("@", 0))))
+	var cab = cooking(view).get("cabinet", null)
+	match where:
+		"cabinet": return {text = "Kept · Warming Cabinet %d/%d" % [int(cab.get("have", 0)), int(cab.get("cap", 6))] if cab is Dictionary else "Kept", tone = "info"}
+		"stove": return {text = ("Cabinet and bag full · dish left on the stove" if cab is Dictionary else "Bag full · dish left on the stove"), tone = "error"}
+	if cab is Dictionary: return {text = "Cabinet full · %s sent to bag" % name, tone = "warn"}
+	return {text = "%s · saved to your bag" % name, tone = "info"}
+
+## RewardMoment fields for a collected pot (COOK-4 New recipe! / COOK-6 Mystery Dish / COOK-P0-9 Dish ready).
+## ev = the `dish` event; first_xp = the first-cook XP of the same reply (0 when not first); from_stove = the
+## player came back to a Ready stove instead of watching the pot.
+static func dish_card(view: Dictionary, ev: Dictionary, first_xp: int, from_stove: bool) -> Dictionary:
+	var base := str(ev.get("dish", ""))
+	var quality := int(ev.get("quality", 0))
+	var id := base if quality == 0 else "%s@%s" % [base, ["plain", "good", "perfect"][quality]]
+	if bool(ev.get("mystery", false)):
+		return {tone = UiRewardMoment.Tone.NEUTRAL, event = "Mystery Dish", icon = P0Logic.icon("dish_mystery"),
+			item_name = "Hmm… not a dish", rarity = 0, rarity_word = "", quality = 0,
+			strip = "A clue was added to your Cookbook" if ev.get("clue", null) != null else "", strip_icon = P0Logic.icon("cookbook"),
+			note = "Can't be sold or delivered", dish_id = id}
+	var page := _page(view, base)
+	var rarity := int(page.get("rarity", 1))
+	var strip := ""
+	if bool(ev.get("first", false)): strip = "First cooked · +%d Cooking XP · Cookbook %s" % [first_xp, cookbook_count(view)]
+	elif from_stove: strip = "Collected from Stove 1"
+	return {tone = UiRewardMoment.Tone.REWARD, event = "New recipe!" if bool(ev.get("first", false)) else "Dish ready",
+		icon = P0Logic.icon(base), item_name = str(page.get("name", P0Logic.item_name(view, base))) if page.get("name", null) != null else P0Logic.item_name(view, base),
+		rarity = rarity, rarity_word = P0Logic.rarity_name(view, rarity), quality = quality,
+		strip = strip, strip_icon = P0Logic.icon("cookbook"), note = "Gift later from your bag", dish_id = id}
+
+## Whether a kept portion of `id` would find a place now: a free cabinet portion, a dish stack with room, or a
+## free bag slot (the server decides; this only spares a retry that would be refused, §7.2.6).
+static func keep_room(view: Dictionary, id: String) -> bool:
+	var cab = cooking(view).get("cabinet", null)
+	if cab is Dictionary and int(cab.get("have", 0)) < int(cab.get("cap", 0)): return true
+	var bag: Dictionary = view.get("bag", {})
+	if int(bag.get("free", 0)) > 0: return true
+	var limit := int(P0Logic.content().get("bag", {}).get("stack", {}).get("dish", 5))
+	return bag.get("slots", []).any(func(b): return str(b.id) == id and not b.get("gifted", false) and int(b.qty) < limit)

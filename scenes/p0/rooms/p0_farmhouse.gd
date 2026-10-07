@@ -39,31 +39,38 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 func _on_facility(n: String) -> void:
 	if n == STOVE: open_stove()
 
-## Empty → the cooking drawer; cooking → watch the pot; ready → the dish comes out (COOK-1 interactions).
+## Empty → the cooking drawer; cooking → watch the pot; ready → the dish comes out and COOK-P0-9 asks Eat or Keep
+## (unwatched rings are misses: Plain); portions left on the stove (no room earlier) → the same card for them.
 func open_stove(tab := "cookbook") -> void:
 	if rt == null or kitchen == null or kitchen.busy(): return
-	var st = P0KitchenLogic.stove(rt.session.current())
+	var v := rt.session.current()
+	var st = P0KitchenLogic.stove(v)
+	var left := P0KitchenLogic.stove_left(v)
 	if st == null: kitchen.open(tab)
-	elif float(st.get("ready_in", 0)) <= 0.0: kitchen.serve([])
+	elif not left.is_empty(): kitchen.show_left(str(left[0]))
+	elif float(st.get("ready_in", 0)) <= 0.0: kitchen.serve([], true)
 	else: kitchen.watch(st)
 
 ## The cooking drawer from elsewhere (the Energy card's Cook tile, dev steps): walk to the stove first.
 func p0_open_kitchen(tab := "cookbook") -> void:
 	walk_to(STOVE, func(): open_stove(tab))
 
-func p0_event(ev: Dictionary, v: Dictionary) -> void:
+## Returns true when the kitchen shows the result itself (the runtime then skips its old dish card).
+func p0_event(ev: Dictionary, v: Dictionary) -> bool:
+	if kitchen == null: return false
 	match str(ev.get("kind", "")):
 		"pot":
 			var st = P0KitchenLogic.stove(v)
-			if st is Dictionary: kitchen.on_pot(st)
-		"dish": kitchen.on_collected()
+			if st is Dictionary and not bool(ev.get("queued", false)): kitchen.on_pot(st)
+			return false
+	return kitchen.on_event(ev)
 
 func _room_frame(v: Dictionary, _dt: float) -> void:
 	if kitchen == null: return
 	var st = P0KitchenLogic.stove(v)
 	var cooking: bool = st != null and float(st.get("ready_in", 0)) > 0.0
 	if kitchen.phase == "idle" and kitchen.stage.is_cooking() != cooking: kitchen.stage.set_cooking(cooking)
-	if kitchen.phase == "serve" and st == null: kitchen.on_collected()   # collected (or refused as empty)
+	if kitchen.phase == "serve" and st == null and kitchen.waiting_events(): kitchen.on_collected()   # refused as empty
 
 func p0_tap(screen: Vector2) -> void:
 	if kitchen and kitchen.tap(): return
@@ -79,7 +86,7 @@ func is_back_navigation_locked() -> bool:
 		kitchen.stop_watching()
 		return true
 	if kitchen and kitchen.phase == "serve": return true
-	return super()
+	return super()   # the result card is a modal: the base closes it, which keeps the dish
 
 func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
@@ -89,12 +96,15 @@ func p0_dev(step: PackedStringArray) -> bool:
 			if kitchen.phase != "compose": kitchen.open("experiment")
 			if kitchen.drawer and kitchen.drawer.tab != "experiment": kitchen.drawer.tab = "experiment"
 			kitchen._on_ingredient(step[1], Vector2.INF)
+		"keep": if kitchen.phase == "card": rt.ui.close_modal()
+		"eat": if kitchen.phase == "card": kitchen.press_eat()
 		_: return super(step)
 	return true
 
 func p0_until(n: String) -> bool:
 	match n:
 		"cooking": return kitchen != null and kitchen.phase == "watch"
+		"card": return kitchen != null and kitchen.phase == "card"
 		"compose": return kitchen != null and kitchen.phase == "compose"
 		"idle": return (kitchen == null or not kitchen.busy()) and super(n)
 	return super(n)

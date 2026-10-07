@@ -35,7 +35,6 @@ func set_result(v: int) -> void: result = v; queue_redraw()
 
 func _draw() -> void:
 	var c := Vector2(_SIDE, _SIDE) * 0.5
-	draw_circle(c, _SIDE * 0.5, UiTokens.COLOR_SURFACE, true, -1.0, true)
 	var r := _OUTER - _TRACK * 0.5
 	draw_arc(c, r, 0.0, TAU, _SEGMENTS, UiTokens.COLOR_BORDER, _TRACK, true)
 	var g0 := -PI * 0.5 + TAU * gold
