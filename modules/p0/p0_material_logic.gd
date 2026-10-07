@@ -1,8 +1,9 @@
 class_name P0MaterialLogic
 extends RefCounted
 ## SGODOT-231 client rules for the material chain, read only from the server view: the mine mouth, the mine floors
-## and elevator (plan §13.3, LOCK-21, q(44)), gathering spots (§13.2), the workbench (§13.4, B2-06) and Farm Storage
-## rows (§10.4.8). Every user-visible string is written here, so scenes only render. Pure and static: tested headless.
+## and elevator (plan §13.3, LOCK-21, q(44)), gathering spots (§13.2) and the workbench (§13.4, B2-06). Farm Storage
+## rows in the bag drawer follow P0ItemInfo.kind_of (225), not this file. Every user-visible string is written here, so
+## scenes only render. Pure and static: tested headless.
 ## Key dicts have the P0Logic.main_action shape {icon, verb, sub, enabled, amber, cmd, need}; line 2 (sub) stays
 ## within ~16 characters (q(44)), longer reasons go to a toast through cmd {type: "toast", text}.
 
@@ -247,19 +248,3 @@ static func _craft_button(r: Dictionary) -> Dictionary:
 		"bag_full":
 			return {"label": "No room · free a slot first", "kind": "unavailable", "cmd": {}}
 	return {"label": "Craft", "kind": "unavailable", "cmd": {}}
-
-# --- Farm Storage rows for the bag drawer (§10.4.8; 225 renders them) ---
-
-## Storage stacks for a bag tab: "Seeds" (seeds, fertilizer), "Materials" (materials, torches), "Tackle" (bait).
-static func storage_rows(view: Dictionary, category: String) -> Array:
-	var out: Array = []
-	for it in view.get("storage", {}).get("items", []):
-		var id := str(it.get("id", ""))
-		if storage_category(id) == category: out.append({"id": id, "qty": int(it.get("qty", 0)), "icon_id": id})
-	return out
-
-static func storage_category(id: String) -> String:
-	if id.begins_with("seed_") or id.begins_with("fert_"): return "Seeds"
-	if id.begins_with("bait_"): return "Tackle"
-	if id.begins_with("postcard_"): return ""   # ornaments live in storage only (q(29)), not in a bag tab
-	return "Materials"

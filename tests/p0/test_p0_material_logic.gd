@@ -1,5 +1,5 @@
 extends GdUnitTestSuite
-## SGODOT-231 P0MaterialLogic: mine mouth and floors (LOCK-21, q(44)), gathering marks, workbench cards (B2-06), storage rows.
+## SGODOT-231 P0MaterialLogic: mine mouth and floors (LOCK-21, q(44)), gathering marks, workbench cards (B2-06).
 
 func _floor(n: int, paid := true, broken := [false, false, false, false, false, false], lit := false, bag_ok := true, preview = null) -> Dictionary:
 	var left := broken.filter(func(b): return not b).size()
@@ -162,13 +162,6 @@ func test_workbench_pickaxe_equip_and_bag_full() -> void:
 	v.workbench.recipes[0].equipped = true
 	assert_str(str(P0MaterialLogic.workbench_model(v, "tools")[0].button.label)).is_equal("Equipped")
 	assert_str(str(P0MaterialLogic.workbench_model(v, "supplies")[0].button.label)).is_equal("No room · free a slot first")
-
-func test_storage_rows_by_bag_tab() -> void:
-	var v := {"storage": {"items": [{"id": "wood", "name": "Timber", "qty": 18}, {"id": "seed_radish", "name": "Radish Seeds", "qty": 5},
-		{"id": "bait_worm", "name": "Worm Bait", "qty": 2}, {"id": "torch", "name": "Torch", "qty": 3}, {"id": "postcard_shanghai", "name": "Shanghai Postcard", "qty": 1}]}}
-	assert_array(P0MaterialLogic.storage_rows(v, "Materials").map(func(r): return r.id)).is_equal(["wood", "torch"])
-	assert_array(P0MaterialLogic.storage_rows(v, "Seeds").map(func(r): return r.id)).is_equal(["seed_radish"])
-	assert_that(P0MaterialLogic.storage_rows(v, "Tackle")).is_equal([{"id": "bait_worm", "qty": 2, "icon_id": "bait_worm"}])
 
 func test_mining_quick_bar_holds_torches_only() -> void:
 	var v := _view()
