@@ -648,3 +648,73 @@ static func _request_gap(req: Dictionary) -> String:
 			var what := (str(names[rarity - 1]) + " fish") if rarity > 0 and rarity <= names.size() else "fish"
 			return "Need %d more %s" % [left, what]
 	return "Need %d more" % left
+
+## HOME-1 (Figma 482:152, §8.6.1, LOCK-10) from view.homestead facts: title, the look line, NEED-TILEs in order
+## materials → coins → skills, what changes, and the button (the first gap is written on it). P0 stops at Lv3.
+## {title, look, tiles: [{id, name, have, need, icon}], changes: [{icon, text, note}], label, reason, footer, max}
+static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
+	var h: Dictionary = view.get("homestead", {})
+	var level := int(h.get("level", 1))
+	var next = h.get("next", null)
+	var out := {"title": "Homestead Lv%d" % level, "look": "", "tiles": [], "changes": [], "label": "Upgrade",
+		"reason": "", "footer": "Upgrading is free of Energy · fills Energy to the new max", "max": next == null}
+	if next == null:
+		out.reason = "Highest level for now"
+		return out
+	out.title = "Homestead Lv%d → Lv%d" % [level, int(next.level)]
+	var unlocks: Array = next.get("unlocks", [])
+	if unlocks.has("fence"): out.look = "Lv%d look · Full fence" % int(next.level)
+	for m in next.get("materials", []):
+		out.tiles.append({"id": str(m.id), "name": str(m.name), "have": int(m.have), "need": int(m.need), "icon": str(m.id)})
+	out.tiles.append({"id": "coins", "name": "Coins", "have": int(next.coins.have), "need": int(next.coins.need), "icon": "coin"})
+	out.tiles.append({"id": "skills", "name": "Skills", "have": int(next.skills.have), "need": int(next.skills.need), "icon": "star"})
+	var energy: Dictionary = view.get("energy", {})
+	out.changes.append({"icon": "energy", "text": "Max Energy %d · Meals %d a day" % [int(next.energy), int(next.meals)],
+		"note": "now %d" % int(energy.get("max", 0))})
+	var board_now := int(h.get("unlocks", {}).get("board_slots", 2))
+	for u in unlocks:
+		match str(u):
+			"spice_rack": out.changes.append({"icon": "kitchen", "text": "Spice Rack", "note": "seasonings off your bag"})
+			"warming_cabinet": out.changes.append({"icon": "kitchen", "text": "Warming Cabinet", "note": "keeps 6 dishes by the stove"})
+			"bag_upgrade_1":
+				out.changes.append({"icon": "bag", "text": "Bag Upgrade I for sale · 150 coins",
+					"note": "Bag %d → %d" % [int(view.get("bag", {}).get("capacity", 25)), int(view.get("bag", {}).get("capacity", 25)) + 5]})
+			"board_slot_3": out.changes.append({"icon": "board", "text": "Stall Board · 3rd slot", "note": "now %d" % board_now})
+	# The first gap in tile order goes on the button (LOCK-10); away from home the button says how to get there.
+	if not at_home:
+		out.reason = "Go home to upgrade · Free"
+		return out
+	for t in out.tiles:
+		if int(t.have) >= int(t.need): continue
+		var short := int(t.need) - int(t.have)
+		match str(t.id):
+			"coins": out.reason = "Need %d more coins" % short
+			"skills": out.reason = "Skills total %d needed · now %d" % [int(t.need), int(t.have)]
+			_: out.reason = "Need %d more %s" % [short, str(t.name)]
+		break
+	return out
+
+## The one-line source for a HOME-1 tile (NeedSource, guide only): where coins and skill levels come from.
+## Material sources (gathering spots, the mine) arrive with SGODOT-231; until then the tile names the material.
+static func home_source(view: Dictionary, id: String) -> Dictionary:
+	var sk: Dictionary = view.get("skills", {})
+	match id:
+		"coins": return {"text": "Coins · sell crops and fish at the Homestead Stall", "go": "stall"}
+		"skills":
+			return {"text": "Farming %d + Fishing %d · Cooking not counted" % [int(sk.get("farming", {}).get("level", 1)),
+				int(sk.get("fishing", {}).get("level", 1))], "go": ""}
+	return {"text": item_name(view, id), "go": ""}
+
+## HOME-2 MomentBanner (Figma 482:154 / 1228:108620) from the server's homestead event: level disc, title,
+## what changed (Energy refilled to the new max) and one line of consequences.
+static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
+	var level := int(ev.get("level", 1))
+	var max_e := int(view.get("energy", {}).get("max", 0))
+	var lines: Array = []
+	for u in ev.get("unlocks", []):
+		match str(u):
+			"spice_rack": lines.append("Spice Rack · seasonings off your bag")
+			"warming_cabinet": lines.append("Warming Cabinet")
+			"bag_upgrade_1": lines.append("Bag Upgrade I for sale · 150 coins")
+	return {"level": str(level), "title": "Homestead Lv %d" % level, "subtitle": "Max Energy %d · Energy full" % max_e,
+		"detail": "\n".join(lines)}
