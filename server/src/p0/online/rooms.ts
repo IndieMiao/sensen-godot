@@ -110,12 +110,20 @@ export class OutpostRooms {
     return o;
   }
 
-  /** One player per seat. A player already seated elsewhere moves to the new seat. */
-  sit(player: string, seat: string): 'ok' | 'SEAT_TAKEN' | 'NO_SEAT' | 'NOT_IN_ROOM' {
+  /** Whether this player may take the seat now (no state change). */
+  canSit(player: string, seat: string): 'ok' | 'SEAT_TAKEN' | 'NO_SEAT' | 'NOT_IN_ROOM' {
     const o = this.byPlayer.get(player);
     if (!o) return 'NOT_IN_ROOM';
     if (!this.specs.get(o.outpost)!.seats.includes(seat)) return 'NO_SEAT';
     if (this.members(o.outpost, o.room).some(m => m.seat === seat && m.player !== player)) return 'SEAT_TAKEN';
+    return 'ok';
+  }
+
+  /** One player per seat. A player already seated elsewhere moves to the new seat. */
+  sit(player: string, seat: string): 'ok' | 'SEAT_TAKEN' | 'NO_SEAT' | 'NOT_IN_ROOM' {
+    const code = this.canSit(player, seat);
+    if (code !== 'ok') return code;
+    const o = this.byPlayer.get(player)!;
     o.seat = seat;
     o.action = 'sit';
     return 'ok';

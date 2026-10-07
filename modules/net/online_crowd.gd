@@ -6,6 +6,8 @@ const DETAIL_LIMIT := 8
 const SIT_ACTION := 15
 ## Name tags show "HP / max" in combat spaces; the P0 outposts have no health.
 var show_health := true
+## Optional (id) -> float: ground height of a member (P0 outposts lift seated players onto their seat).
+var height_of := Callable()
 var actors: Dictionary = {}
 var rigs: Array[Dictionary] = []
 var bodies: MultiMeshInstance3D
@@ -119,6 +121,7 @@ func step(delta: float, local_position: Vector3) -> void:
 		if not actor.ready: continue
 		actor.position = (actor.from as Vector3).lerp(actor.target, clampf((_time - float(actor.at)) / float(actor.duration), 0, 1))
 		var point: Vector3 = actor.position
+		if height_of.is_valid(): point.y = float(height_of.call(id))
 		var work := int(actor.action) in [3, 4, 5, 6, 7, 10, 11, 12]
 		var wave := int(actor.action) == 8
 		var fishing: Dictionary = actor.get("fishing", {}) if _time - float(actor.get("fishing_at", 0)) < 1.0 else {}
@@ -143,7 +146,7 @@ func step(delta: float, local_position: Vector3) -> void:
 			if animation == "mine": animation = "labour_drain"
 			if animation == "attack": animation = "labour_harvest"
 			if fishing_action: animation = "idle"
-			if int(actor.action) == SIT_ACTION: animation = "idle"   # sit clips are not in the library yet
+			if int(actor.action) == SIT_ACTION: animation = "sit_idle"
 			if fishing.is_empty() and animation != entry.animation:
 				entry.animation = animation
 				entry.rig.play_motion(animation)

@@ -45,12 +45,32 @@ Huangpu Travel Post (Sigrid, Pip); Xuhui Market Square (`Exit · Back to map`).
 3. The room connection read the default server URL when an outpost was the first world (dev boot):
    it now waits for the P0 session (a34a041b).
 
+## Seats and sit clips (2026-10-08, later the same night)
+
+The user's Mixamo takes (SGODOT-230) are in the library as `sit_down`, `sit_idle`, `sit_up`, `sit_talk`
+(first 8 s) and `drink_stand`; all 46 bones map and the probe contact sheet shows correct arms, no foot
+sliding and an in-place hip:
+
+![Sit clips probe](p0-outpost-rooms-2026-10-08/sit-clips-probe.jpg)
+
+Measured on the base rig: `sit_idle` puts the hip joint 0.426 m above the rig root (standing 0.778 m), with
+the thighs about 0.086 m below the joint. Basic Room seat surfaces are about 0.74 m (chairs) and 0.745 m
+(window bench) in room coordinates, so the seated root sits 0.34 m below the `seat_` anchor (feet dangle on
+these tall stylized seats). Sitting plays `sit_down` then loops `sit_idle` while the root eases onto the
+seat (about 0.3 s); standing plays `sit_up` at 2x and releases the player after 0.55 s; Back while seated
+stands up and then walks to the door. Other players on a seat are lifted onto it and play `sit_idle`.
+
+![Seated at the tea table and on the bench](p0-outpost-rooms-2026-10-08/seated-tea-house.jpg)
+
+Desktop render, Basic Room placeholder: player on the door-side chair, a scripted player on the bench.
+Acceptance of the seated pose (hip contact within 2 cm, legs clear of the table, recording on the final
+tea-house scene 179) belongs to the art director.
+
 ## Open
 
 - Keeper and door finger cards overlap near the spawn (placeholder anchors near the door); marker
   avoidance comes with SGODOT-221's tag layer.
-- Sit clips (`sit_down` / `sit_idle` / `sit_up`) are not in the library yet: seated players stand on
-  the seat. Remote seated players do the same.
+- Seated pose not yet accepted by the art director; sitting while drinking is not done (see SGODOT-227).
 - Keeper / Pip / Old Kai outfits are provisional (Old Kai's `hairhat20` reads as an animal hood); the
   hairHat / cloth contact sheet goes to the art director first.
 - Not covered here: physical phone (ask the user first), real network latency, more than one client

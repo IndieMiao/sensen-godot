@@ -146,10 +146,17 @@ export class P0OnlineHub {
     if (!Number.isSafeInteger(b.seq) || !['sit', 'stand'].includes(String(b.action))) throw new Error('SCHEMA');
     if (!me || b.epoch !== c.epoch) { this.send(c, { t: 'result', seq: b.seq, ok: false, code: 'NOT_IN_ROOM' }); return; }
     const before = me.seat;
-    // Sitting carries the seat's position: the step from the stand point onto the chair is not "walking away".
-    if (b.action === 'sit' && Array.isArray(b.at) && b.at.length === 2 && b.at.every(v => typeof v === 'number' && Number.isFinite(v)))
-      this.deps.rooms.move(c.player, Number(b.at[0]), Number(b.at[1]), me.yaw, 'idle');
-    const code = b.action === 'sit' ? this.deps.rooms.sit(c.player, String(b.node ?? '').slice(0, 40)) : (this.deps.rooms.stand(c.player), 'ok');
+    const node = String(b.node ?? '').slice(0, 40);
+    let code: string = 'ok';
+    if (b.action === 'stand') this.deps.rooms.stand(c.player);
+    else {
+      // Check the seat first; only then step onto it (the move from the stand point onto the chair is not
+      // "walking away"), so a refused sit never moves the player.
+      code = this.deps.rooms.canSit(c.player, node);
+      if (code === 'ok' && Array.isArray(b.at) && b.at.length === 2 && b.at.every(v => typeof v === 'number' && Number.isFinite(v)))
+        this.deps.rooms.move(c.player, Number(b.at[0]), Number(b.at[1]), me.yaw, 'idle');
+      if (code === 'ok') code = this.deps.rooms.sit(c.player, node);
+    }
     this.send(c, { t: 'result', seq: b.seq, ok: code === 'ok', code: code === 'ok' ? '' : code });
     if (me.seat !== before) this.seat(me);
   }

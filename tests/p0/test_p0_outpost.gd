@@ -3,6 +3,8 @@ extends GdUnitTestSuite
 ## outpost table with its anchors, keeper and residents; counters and residents are tappable, decor is not;
 ## seats walk to the nearest free one, sit, skip seats other players hold, and the joystick stands up.
 
+const OutpostScript := preload("res://scenes/p0/p0_outpost.gd")
+
 class Sample extends "res://scenes/p0/p0_outpost.gd":
 	var used: Array = []
 	func setup(a: Dictionary) -> void:
@@ -73,9 +75,29 @@ func test_tapping_the_tea_table_sits_on_the_nearest_free_seat_and_the_joystick_s
 	assert_str(r.actor.state).is_equal("locked")
 	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("seat_table1_1").global_position)).is_less(0.05)
 	assert_dict(r._marker("use_tea_table_1", {})).is_empty()   # no Sit card while seated
+	for i in 12: r.p0_frame({}, 1.0 / 30.0)   # the root eases up onto the seat within 0.3 s
+	assert_float(r.actor.position.y).is_equal_approx(r.anchor("seat_table1_1").global_position.y - OutpostScript.SIT_ROOT_BELOW_SEAT, 0.02)
+	var ap := r.actor.rig.get_node("AnimationPlayer") as AnimationPlayer
+	assert_str(ap.current_animation).is_equal("sit_down")
+	assert_array(ap.get_queue()).contains(["sit_idle"])
 	r.p0_joystick(Vector2(0, 1))
 	assert_str(r.seat).is_equal("")
+	assert_str(ap.current_animation).is_equal("sit_up")
+	assert_str(r.actor.state).override_failure_message("held while sit_up plays").is_equal("locked")
+	for i in 30: r.p0_frame({}, 1.0 / 30.0)
 	assert_str(r.actor.state).is_not_equal("locked")
+	assert_float(r.actor.position.y).is_equal_approx(r.floor_y, 0.02)
+
+func test_other_players_on_seats_are_lifted_onto_them() -> void:
+	var r := _room("sh_tea_1")
+	var online := P0Online.new()
+	online.transport = func(_m): pass
+	r.attach_online(online)
+	online._message(JSON.stringify({"t": "joined", "room": 1, "self": 1, "epoch": 2}))
+	online._message(JSON.stringify({"t": "roster", "members": [{"id": 1, "player": "me-0000001", "seat": ""}, {"id": 2, "player": "them-000002", "seat": "seat_bench_1"}, {"id": 3, "player": "walker-0003", "seat": ""}]}))
+	var bench_y: float = r.seat_root_y("seat_bench_1") - r.room.position.y
+	assert_float(r._crowd_height(2)).is_equal_approx(bench_y, 0.001)
+	assert_float(r._crowd_height(3)).is_equal_approx(r.floor_y - r.room.position.y, 0.001)
 
 func test_seats_other_players_hold_are_skipped() -> void:
 	var r := _room("sh_tea_1")
@@ -104,6 +126,8 @@ func test_back_while_seated_stands_up_and_walks_out() -> void:
 	assert_str(r.seat).is_not_empty()
 	assert_bool(r.is_back_navigation_locked()).override_failure_message("Back is handled by the room").is_true()
 	assert_str(r.seat).is_equal("")
-	assert_int(left[0]).override_failure_message("walks to the door first, not out at once").is_equal(0)
+	assert_bool(r.is_back_navigation_locked()).override_failure_message("a second Back while standing up is absorbed").is_true()
+	assert_int(left[0]).override_failure_message("stands, then walks to the door, not out at once").is_equal(0)
+	for i in 30: r.p0_frame({}, 1.0 / 30.0)   # sit_up
 	_walk_until_idle(r, 8.0)
 	assert_int(left[0]).is_equal(1)

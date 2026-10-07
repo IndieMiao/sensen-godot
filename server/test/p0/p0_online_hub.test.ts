@@ -124,6 +124,21 @@ describe('P0 online hub (/v1/p0/online, SGODOT-227)', () => {
     expect(await until(() => b.json.filter(m => m.t === 'result')[1])).toMatchObject({ ok: true });
   });
 
+  it('a refused sit does not move the player', async () => {
+    const { port, rooms } = await server();
+    const a = await connect(port, 'player-aaaa');
+    const b = await connect(port, 'player-bbbb');
+    const ea = (await join(a, 'sh_tea_1', [1.15, 0])).epoch, eb = (await join(b, 'sh_tea_1', [-1, 1])).epoch;
+    send(a, { t: 'act', seq: 1, epoch: ea, action: 'sit', node: 'seat_table1_1' });
+    await until(msg(a, 'result'));
+    await new Promise(r => setTimeout(r, 200));
+    send(b, { t: 'act', seq: 1, epoch: eb, action: 'sit', node: 'seat_table1_1', at: [1.15, 0.62] });
+    expect(await until(msg(b, 'result'))).toMatchObject({ ok: false, code: 'SEAT_TAKEN' });
+    send(b, { t: 'act', seq: 2, epoch: eb, action: 'sit', node: 'seat_nowhere', at: [1.15, 0.62] });
+    expect(await until(() => b.json.filter(m => m.t === 'result')[1])).toMatchObject({ ok: false, code: 'NO_SEAT' });
+    expect(rooms.occupant('player-bbbb')).toMatchObject({ x: -1, z: 1, seat: '' });
+  });
+
   it('a sit carries the seat position, so the next input at the seat keeps the player seated', async () => {
     const { port, rooms } = await server();
     const a = await connect(port, 'player-aaaa');

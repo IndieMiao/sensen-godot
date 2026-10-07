@@ -13,6 +13,12 @@ const DECOR := ["use_fish_board", "use_fee_board", "use_stamp_desk", "use_coffee
 const COUNTERS := ["use_counter", "use_stall_1", "npc_keeper"]
 ## Furniture that seats: its seat_ anchors are seat_<group>_<n>.
 const SEAT_GROUPS := {"use_tea_table_1": "seat_table1_", "use_bench": "seat_bench_"}
+## sit_idle puts the hip joint 0.426 m above the rig root and the thighs rest about 0.086 m below the joint
+## (measured on the base rig, SGODOT-227), so a seated root sits this far below the seat surface.
+const SIT_ROOT_BELOW_SEAT := 0.34
+## sit_up runs at this speed; the player is released once it is upright.
+const STAND_SPEED := 2.0
+const STAND_S := 0.55
 
 var outpost: Dictionary = {}
 var role := ""
@@ -22,6 +28,7 @@ var crowd: Node3D
 var npcs := {}           # npc anchor name → {id, name, root}
 var seat := ""           # the seat we sit on ("" while standing)
 var _sit_request := {}   # {seq, seat} waiting for the server
+var _standing := {}      # {left, at, then} while sit_up plays
 
 func setup(args: Dictionary) -> void:
 	outpost = P0Outposts.find(str(args.get("outpost_id", "")))
@@ -33,8 +40,10 @@ func setup(args: Dictionary) -> void:
 
 func _room_ready() -> void:
 	_spawn_npcs()
+	actor.ground_height = func(_p: Vector3) -> float: return seat_root_y(seat) if seat != "" else floor_y
 	crowd = OnlineCrowd.new()
 	crowd.show_health = false
+	crowd.height_of = _crowd_height
 	room.add_child(crowd)   # remote players arrive in room metres, like the anchors
 	if use_runtime and not outpost.is_empty(): _go_online(P0Runtime.ensure().session)
 
@@ -73,10 +82,21 @@ func _on_joined(info: Dictionary) -> void:
 	if n > 1 and not bool(info.get("rejoined", false)) and rt: rt.ui.toast("Room %d is full · you're in Room %d" % [n - 1, n])
 	if seat != "": _stand_up()   # a new connection starts standing
 
+## The space every P0 command carries (SGODOT-228 Rest "away from the farm"): outposts are "outpost".
+func p0_space() -> String: return "outpost"
+
+## Other players stand on the floor, or on their seat (room metres; the crowd lives in the room node).
+func _crowd_height(id: int) -> float:
+	var s := online.seat_of(id) if online else ""
+	return (seat_root_y(s) if s != "" and anchor(s) else floor_y) - room.position.y
+
 func to_room(world: Vector3) -> Vector3:
 	return world - room.position
 
 func _room_frame(_view: Dictionary, dt: float) -> void:
+	if not _standing.is_empty():
+		_standing.left = float(_standing.left) - dt
+		if float(_standing.left) <= 0.0: _finish_stand()
 	if crowd: crowd.step(dt, to_room(actor.position))
 
 # ---------------------------------------------------------------- keeper and residents
@@ -102,7 +122,7 @@ func _spawn_npcs() -> void:
 		rig.apply_config(OnlineAppearance.config({"version": 1, "slots": def.get("slots", {})}))
 		var tag := Label3D.new()   # every NPC carries a name tag (art director, SGODOT-227)
 		tag.text = str(def.get("name", ""))
-		tag.font = GameUi.theme().default_font
+		tag.font = UiKit.font(&"bold")
 		tag.font_size = 28
 		tag.pixel_size = 0.006
 		tag.position.y = 2.0
@@ -123,9 +143,12 @@ func p0_tap(screen: Vector2) -> void:
 	if rt and rt.ui.has_modal(): return
 	var n := pick(screen)
 	if n == "": return
-	if seat != "": _stand_up()
-	if SEAT_GROUPS.has(n): _go_sit(str(SEAT_GROUPS[n]))
-	else: walk_to(n)
+	if not _standing.is_empty(): return
+	var go := func():
+		if SEAT_GROUPS.has(n): _go_sit(str(SEAT_GROUPS[n]))
+		else: walk_to(n)
+	if seat != "": _stand_up(go)
+	else: go.call()
 
 func _on_facility(n: String) -> void:
 	if COUNTERS.has(n): _open_keeper()
@@ -197,27 +220,61 @@ func _sit_down(n: String) -> void:
 	var m := anchor(n)
 	if m == null: return
 	seat = n
-	actor.teleport(Vector3(m.global_position.x, floor_y, m.global_position.z))
+	_standing = {}
+	actor.teleport(Vector3(m.global_position.x, actor.position.y, m.global_position.z))
 	actor.face(actor.position + yaw_dir(float(anchor_data(n).get("yaw_degrees", 0))))
-	actor.lock(true)   # sit clips pending (sit_down / sit_idle / sit_up): idle on the seat until they land
+	actor.lock(true)   # ground_height lifts the root onto the seat (§ seat_root_y) while sit_down plays
+	_play_seated(actor.rig, true)
 
-func _stand_up() -> void:
+## sit_down then the sit_idle loop (in place: the hips stay over the seat anchor).
+static func _play_seated(rig: AvatarRig, from_standing: bool) -> void:
+	var ap := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if ap == null or not ap.has_animation("sit_idle"): return
+	if from_standing and ap.has_animation("sit_down"):
+		rig.play_motion("sit_down")
+		ap.queue("sit_idle")
+	else: rig.play_motion("sit_idle")
+
+## Rig root height (world) for a player on this seat: the seat anchor is the seat surface.
+func seat_root_y(seat_name: String) -> float:
+	var m := anchor(seat_name)
+	return m.global_position.y - SIT_ROOT_BELOW_SEAT if m else floor_y
+
+## Stand up: sit_up (sped up), then the player is back on the floor next to the seat and `then` runs
+## (walk to the door on Back, the tapped facility, or nothing for the joystick, which moves on its own).
+func _stand_up(then := Callable()) -> void:
+	if seat == "":
+		if then.is_valid(): then.call()
+		return
 	var m := anchor(seat)
 	seat = ""
 	_sit_request = {}
-	actor.lock(false)
-	if m:
-		var p := P0RoomNav.nearest_walkable(bp, m.global_position)
-		if p != Vector3.INF: actor.teleport(Vector3(p.x, floor_y, p.z))
 	if online and online.epoch > 0: online.stand()
+	var ap := actor.rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if ap and ap.has_animation("sit_up"):
+		ap.play("sit_up", -1, STAND_SPEED)
+		_standing = {left = STAND_S, at = m.global_position if m else actor.position, then = then}
+	else:
+		_standing = {left = 0.0, at = m.global_position if m else actor.position, then = then}
+		_finish_stand()
+
+func _finish_stand() -> void:
+	var s := _standing
+	_standing = {}
+	actor.lock(false)
+	var p := P0RoomNav.nearest_walkable(bp, s.at)
+	if p != Vector3.INF: actor.teleport(Vector3(p.x, floor_y, p.z))
+	if (s.then as Callable).is_valid(): (s.then as Callable).call()
 
 ## Back while seated stands up first: the seat is inside the chair's collider, so the walk to the door
-## would find no path from it.
+## would find no path from it. The room has handled Back either way.
 func is_back_navigation_locked() -> bool:
-	if seat != "" and not (rt and rt.ui.has_modal()): _stand_up()
+	if (seat != "" or not _standing.is_empty()) and not (rt and rt.ui.has_modal()):
+		if seat != "": _stand_up(func(): walk_to("exit"))
+		return true
 	return super.is_back_navigation_locked()
 
-## The joystick stands a sitting player up before it moves them.
+## The joystick stands a sitting player up before it moves them (movement resumes once standing).
 func _on_joystick(v: Vector2) -> void:
 	if seat != "" and v != Vector2.ZERO: _stand_up()
 

@@ -80,12 +80,13 @@ func start(outpost_id: String, at: Vector2) -> void:
 	_attempt = 0
 	_connect()
 
-## Leaves the room on purpose (no reconnect, no seat kept).
+## Leaves the room on purpose (no reconnect, no seat kept); the socket keeps polling until the close completes.
 func stop() -> void:
 	_stopped = true
 	if socket and socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
 		_send({"t": "leave"})
 		socket.close(1000, "LEAVING")
+		socket.poll()   # flush now: a room that frees this node never polls again
 	_reset()
 
 ## Claims a seat; `at` is its position in room metres (the server moves us onto it before seating us).
@@ -126,7 +127,11 @@ func _retry() -> void:
 	_attempt += 1
 
 func _process(dt: float) -> void:
-	if _stopped: return
+	if _stopped:
+		if socket:   # finish the close handshake
+			socket.poll()
+			if socket.get_ready_state() == WebSocketPeer.STATE_CLOSED: socket = null
+		return
 	if _retry_left >= 0.0:
 		_retry_left -= dt
 		if _retry_left < 0.0: _connect()
