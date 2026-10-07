@@ -1,0 +1,187 @@
+{
+  "checks": [
+    {
+      "name": "Wall sconce",
+      "position": [
+        -3.49,
+        2.07,
+        2.1
+      ],
+      "pixel": [
+        194,
+        606
+      ],
+      "patch_size": 17,
+      "mean_rgb_255_gain": 20.456,
+      "passed": true
+    },
+    {
+      "name": "Bar candle",
+      "position": [
+        -0.56,
+        1.402,
+        -1.25
+      ],
+      "pixel": [
+        753,
+        650
+      ],
+      "patch_size": 17,
+      "mean_rgb_255_gain": 64.08,
+      "passed": true
+    },
+    {
+      "name": "Table lantern",
+      "position": [
+        -2.35,
+        1.293,
+        0.98
+      ],
+      "pixel": [
+        395,
+        688
+      ],
+      "patch_size": 17,
+      "mean_rgb_255_gain": 67.288,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "lights": [
+    {
+      "name": "saloon_pair",
+      "position": [
+        -3.18,
+        2.38,
+        -2.43
+      ],
+      "energy": 1.05,
+      "range": 1.45,
+      "color": "FFC16C"
+    },
+    {
+      "name": "chandelier",
+      "position": [
+        -2.2,
+        2.68,
+        0.1
+      ],
+      "energy": 1.6,
+      "range": 1.8,
+      "color": "FFC16C"
+    },
+    {
+      "name": "left_wall",
+      "position": [
+        -3.23,
+        2.06,
+        2.22
+      ],
+      "energy": 1.15,
+      "range": 1.35,
+      "color": "FFC16C"
+    },
+    {
+      "name": "bar_left",
+      "position": [
+        -1.31,
+        2.9,
+        -2.87
+      ],
+      "energy": 1.1,
+      "range": 1.45,
+      "color": "FFC16C"
+    },
+    {
+      "name": "bar_right",
+      "position": [
+        1.56,
+        2.9,
+        -2.87
+      ],
+      "energy": 1.1,
+      "range": 1.45,
+      "color": "FFC16C"
+    },
+    {
+      "name": "right_wall",
+      "position": [
+        3.12,
+        2.49,
+        -2.87
+      ],
+      "energy": 0.95,
+      "range": 1.35,
+      "color": "FFC16C"
+    },
+    {
+      "name": "left_table",
+      "position": [
+        -2.12,
+        1.57,
+        0.95
+      ],
+      "energy": 0.75,
+      "range": 1.3,
+      "color": "FFCA77"
+    },
+    {
+      "name": "front_table",
+      "position": [
+        0.1,
+        1.45,
+        1.9200000000000002
+      ],
+      "energy": 0.75,
+      "range": 1.3,
+      "color": "FFCA77"
+    },
+    {
+      "name": "right_table",
+      "position": [
+        2.2199999999999998,
+        1.45,
+        0.94
+      ],
+      "energy": 0.75,
+      "range": 1.3,
+      "color": "FFCA77"
+    },
+    {
+      "name": "bar_left_candle",
+      "position": [
+        -0.7,
+        1.7,
+        -1.4
+      ],
+      "energy": 0.75,
+      "range": 1.3,
+      "color": "FFCA77"
+    },
+    {
+      "name": "bar_right_candle",
+      "position": [
+        0.9,
+        1.7,
+        -1.2
+      ],
+      "energy": 0.75,
+      "range": 1.3,
+      "color": "FFCA77"
+    },
+    {
+      "name": "shelf_candle",
+      "position": [
+        -3.18,
+        1.95,
+        0.03
+      ],
+      "energy": 0.75,
+      "range": 1.3,
+      "color": "FFCA77"
+    }
+  ],
+  "local_light_count": 12,
+  "all_local_shadows": false,
+  "method": "Same camera/materials, all local Omni lights on vs off; 17x17 mean RGB around declared physical surface positions; emission remains enabled."
+}

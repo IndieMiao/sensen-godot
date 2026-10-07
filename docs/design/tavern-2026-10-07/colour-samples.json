@@ -1,0 +1,35 @@
+[
+  {
+    "name": "Counter lit timber",
+    "reference_pixel": [
+      860,
+      648
+    ],
+    "runtime_pixel": [
+      802,
+      643
+    ]
+  },
+  {
+    "name": "Floor front plank",
+    "reference_pixel": [
+      969,
+      1050
+    ],
+    "runtime_pixel": [
+      945,
+      1065
+    ]
+  },
+  {
+    "name": "Left wall timber",
+    "reference_pixel": [
+      253,
+      747
+    ],
+    "runtime_pixel": [
+      207,
+      715
+    ]
+  }
+]

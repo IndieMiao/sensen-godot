@@ -1,0 +1,271 @@
+{
+  "revision": "r2",
+  "reference_sha256": "d2a62575af885df1b7fc953cbd64f0daca68475f3d637f1ac01ba4e4d58a43d3",
+  "renderer": {
+    "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "draw_calls": 24.0,
+    "instances": 118,
+    "renderer": "mobile",
+    "resolution": [
+      1400,
+      1400
+    ],
+    "scope": "offline art render; no mobile/gameplay/performance acceptance",
+    "slug": "tavern",
+    "static_surfaces": 32,
+    "views": [
+      {
+        "draw_calls": 34.0,
+        "rendered_objects": 34.0,
+        "view": "godot-whole"
+      },
+      {
+        "draw_calls": 34.0,
+        "rendered_objects": 34.0,
+        "view": "model-front"
+      },
+      {
+        "draw_calls": 34.0,
+        "rendered_objects": 34.0,
+        "view": "model-side"
+      },
+      {
+        "draw_calls": 34.0,
+        "rendered_objects": 34.0,
+        "view": "model-top"
+      },
+      {
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
+        "view": "godot-detail"
+      },
+      {
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
+        "view": "godot-detail-plants"
+      },
+      {
+        "draw_calls": 23.0,
+        "rendered_objects": 23.0,
+        "view": "bar-stock-detail"
+      },
+      {
+        "draw_calls": 24.0,
+        "rendered_objects": 24.0,
+        "view": "wheel-table-detail"
+      }
+    ]
+  },
+  "budget": {
+    "after": {
+      "room_triangles": 100380,
+      "shared_plant_triangles": 5446,
+      "room_botanical_triangles": 2,
+      "plant_triangles": 5448,
+      "total_triangles": 105826,
+      "static_surfaces": 32
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/tavern/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "window_wall",
+          "bar_stool",
+          "left_table_rug",
+          "dining_stool",
+          "table_candle",
+          "tavern_snacks",
+          "left_display_shelf",
+          "landscape_frame",
+          "stag_banner",
+          "wall_lantern",
+          "hanging_chandelier",
+          "square_dining_stool",
+          "backed_dining_stool",
+          "mug_variant_1",
+          "mug_variant_2",
+          "table_runner",
+          "floor_clay_pitcher",
+          "bar_stool_0",
+          "bar_stool_1",
+          "bar_stool_2",
+          "seat_1",
+          "seat_2",
+          "seat_3",
+          "seat_4",
+          "seat_5",
+          "seat_6",
+          "seat_8",
+          "seat_9",
+          "seat_10",
+          "table_candle_0",
+          "table_candle_1",
+          "chandelier_frame_0",
+          "chandelier_frame_1",
+          "chandelier_frame_2",
+          "chandelier_frame_3",
+          "varied_mug_2",
+          "varied_mug_3",
+          "varied_mug_4",
+          "varied_mug_5",
+          "table_bottle_0",
+          "table_bottle_1",
+          "table_bottle_2",
+          "shelf_candle"
+        ],
+        "triangles": 26330,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/tavern/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "back_wall",
+          "saloon_door",
+          "tavern_window",
+          "tavern_sign",
+          "beer_cask",
+          "back_bar",
+          "bottle_variant_0",
+          "bottle_variant_3",
+          "bottle_variant_1",
+          "bottle_variant_4",
+          "bottle_variant_2",
+          "mug_variant_0",
+          "beer_chalkboard",
+          "copper_cookware",
+          "bar_runner",
+          "ceramic_jug",
+          "right_plant_shelf",
+          "bar_left_frame",
+          "bar_right_frame",
+          "window_right_frame",
+          "shelf_bottle_5",
+          "shelf_bottle_6",
+          "shelf_bottle_7",
+          "shelf_bottle_8",
+          "shelf_bottle_9",
+          "shelf_bottle_10",
+          "shelf_bottle_11",
+          "shelf_bottle_12",
+          "shelf_bottle_13",
+          "shelf_bottle_14",
+          "shelf_bottle_15",
+          "shelf_bottle_16",
+          "shelf_bottle_17",
+          "shelf_bottle_18",
+          "shelf_bottle_19",
+          "varied_mug_0",
+          "varied_mug_1",
+          "varied_mug_6",
+          "varied_mug_7",
+          "table_bottle_3",
+          "saloon_sconce_0",
+          "saloon_sconce_1",
+          "bar_candle_left",
+          "bar_candle_right"
+        ],
+        "triangles": 32408,
+        "cast_shadow": true
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/tavern/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "FrontTerracottaMonstera"
+        ],
+        "triangles": 910,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/tavern/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "ShelfPothos",
+          "FrontTerracottaSleeve"
+        ],
+        "triangles": 2488,
+        "cast_shadow": false
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/tavern/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "RightShelfPothos"
+        ],
+        "triangles": 2048,
+        "cast_shadow": false
+      }
+    ]
+  },
+  "glb_checks": {
+    "passed": true,
+    "single_surface_no_embedded_images": true,
+    "files": [
+      "assets/rooms/_shared/plants/monstera.glb",
+      "assets/rooms/_shared/plants/pot_terracotta.glb",
+      "assets/rooms/_shared/plants/pothos.glb",
+      "assets/rooms/tavern/back_bar.glb",
+      "assets/rooms/tavern/back_wall.glb",
+      "assets/rooms/tavern/backed_dining_stool.glb",
+      "assets/rooms/tavern/bar_return.glb",
+      "assets/rooms/tavern/bar_runner.glb",
+      "assets/rooms/tavern/bar_stool.glb",
+      "assets/rooms/tavern/barrel.glb",
+      "assets/rooms/tavern/batches/review_back_dressing.glb",
+      "assets/rooms/tavern/batches/review_back_plants.glb",
+      "assets/rooms/tavern/batches/review_front_dressing.glb",
+      "assets/rooms/tavern/batches/review_front_plants.glb",
+      "assets/rooms/tavern/batches/review_large_plants.glb",
+      "assets/rooms/tavern/beer_cask.glb",
+      "assets/rooms/tavern/beer_chalkboard.glb",
+      "assets/rooms/tavern/bottle_variant_0.glb",
+      "assets/rooms/tavern/bottle_variant_1.glb",
+      "assets/rooms/tavern/bottle_variant_2.glb",
+      "assets/rooms/tavern/bottle_variant_3.glb",
+      "assets/rooms/tavern/bottle_variant_4.glb",
+      "assets/rooms/tavern/candle_glow.glb",
+      "assets/rooms/tavern/ceramic_jug.glb",
+      "assets/rooms/tavern/copper_cookware.glb",
+      "assets/rooms/tavern/dining_stool.glb",
+      "assets/rooms/tavern/floor_clay_pitcher.glb",
+      "assets/rooms/tavern/hanging_chandelier.glb",
+      "assets/rooms/tavern/horizontal_floor_barrel.glb",
+      "assets/rooms/tavern/landscape_frame.glb",
+      "assets/rooms/tavern/lantern_glow.glb",
+      "assets/rooms/tavern/left_display_shelf.glb",
+      "assets/rooms/tavern/left_table_rug.glb",
+      "assets/rooms/tavern/long_bar.glb",
+      "assets/rooms/tavern/mug_variant_0.glb",
+      "assets/rooms/tavern/mug_variant_1.glb",
+      "assets/rooms/tavern/mug_variant_2.glb",
+      "assets/rooms/tavern/right_plant_shelf.glb",
+      "assets/rooms/tavern/room_shell.glb",
+      "assets/rooms/tavern/round_table.glb",
+      "assets/rooms/tavern/saloon_door.glb",
+      "assets/rooms/tavern/square_dining_stool.glb",
+      "assets/rooms/tavern/square_table.glb",
+      "assets/rooms/tavern/stag_banner.glb",
+      "assets/rooms/tavern/table_candle.glb",
+      "assets/rooms/tavern/table_runner.glb",
+      "assets/rooms/tavern/tavern_sign.glb",
+      "assets/rooms/tavern/tavern_snacks.glb",
+      "assets/rooms/tavern/tavern_window.glb",
+      "assets/rooms/tavern/tavern_window_garden.glb",
+      "assets/rooms/tavern/wall_lantern.glb",
+      "assets/rooms/tavern/window_wall.glb"
+    ]
+  },
+  "visual_acceptance": "Pending art director Review; metrics do not establish reference fidelity."
+}

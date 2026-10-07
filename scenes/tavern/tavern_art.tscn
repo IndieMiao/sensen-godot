@@ -4,3 +4,4 @@
 
 [node name="TavernArt" type="Node3D"]
 script = ExtResource("1")
+kit_path = "res://assets/rooms/tavern"
