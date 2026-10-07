@@ -94,3 +94,16 @@ func test_seats_other_players_hold_are_skipped() -> void:
 	assert_int((claim.at as Array).size()).is_equal(2)
 	online._message(JSON.stringify({"t": "result", "seq": claim.seq, "ok": true, "code": ""}))
 	assert_str(r.seat).is_equal("seat_table1_2")   # … seated once it agrees
+
+func test_back_while_seated_stands_up_and_walks_out() -> void:
+	var r := _room("sh_tea_1")
+	var left := [0]
+	r.left.connect(func(): left[0] += 1)
+	_tap(r, "use_tea_table_1")
+	_walk_until_idle(r)
+	assert_str(r.seat).is_not_empty()
+	assert_bool(r.is_back_navigation_locked()).override_failure_message("Back is handled by the room").is_true()
+	assert_str(r.seat).is_equal("")
+	assert_int(left[0]).override_failure_message("walks to the door first, not out at once").is_equal(0)
+	_walk_until_idle(r, 8.0)
+	assert_int(left[0]).is_equal(1)

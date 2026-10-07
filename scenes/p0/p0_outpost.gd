@@ -211,6 +211,12 @@ func _stand_up() -> void:
 		if p != Vector3.INF: actor.teleport(Vector3(p.x, floor_y, p.z))
 	if online and online.epoch > 0: online.stand()
 
+## Back while seated stands up first: the seat is inside the chair's collider, so the walk to the door
+## would find no path from it.
+func is_back_navigation_locked() -> bool:
+	if seat != "" and not (rt and rt.ui.has_modal()): _stand_up()
+	return super.is_back_navigation_locked()
+
 ## The joystick stands a sitting player up before it moves them.
 func _on_joystick(v: Vector2) -> void:
 	if seat != "" and v != Vector2.ZERO: _stand_up()
