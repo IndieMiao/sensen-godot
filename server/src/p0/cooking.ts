@@ -149,11 +149,11 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown }, no
   const quality = Math.min(hits, 2);
   const main = dishId(pot.dish, quality);
   const extra = quality === 2 ? 1 : 0; // Perfect: a second, Plain portion (§7.2.5)
-  if (room(c, s.bag, main) < 1 || (extra && room(c, s.bag, pot.dish) < (main === pot.dish ? 2 : 1))) return { code: 'bag_full' };
+  if (room(c, s, main) < 1 || (extra && room(c, s, pot.dish) < (main === pot.dish ? 2 : 1))) return { code: 'bag_full' };
   s.stove = null;
-  add(c, s.bag, main, 1);
+  add(c, s, main, 1);
   events.push({ kind: 'item', id: main, delta: 1 });
-  if (extra) { add(c, s.bag, pot.dish, 1); events.push({ kind: 'item', id: pot.dish, delta: 1 }); }
+  if (extra) { add(c, s, pot.dish, 1); events.push({ kind: 'item', id: pot.dish, delta: 1 }); }
   const firstKey = `cook:${pot.dish}`;
   const first = !s.firsts.includes(firstKey);
   if (first) s.firsts.push(firstKey);

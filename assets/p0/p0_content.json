@@ -1,11 +1,12 @@
 {
-  "version": "p0-m2e-2026-10-05",
-  "_note": "P0 content (M1 homestead + M2 fish/cook/eat) (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit; M2: §6.1.2–6.1.3 fishing gates and protection, §6.2.2 fish, §6.3.1 pond weights, §6.4 rod/bait, §6.6.1 cast energy, §6.7.1 fishing XP, §7.2.3–7.2.5 cooking, §7.3 ingredient families, §7.4.1 rarity derivation, §7.6.2 cooking XP, §7.14 recipes, §7.17.1 eating). Shared by server/src/p0 and the Godot client (labels only). M2b: P0 fish list (§17.2.1) — Willow Pond (Pond template) and Willow Creek (River template) on the homestead; mackerel is Coast-only (shown in the Fish-dex, not catchable here). Recipes: the 14 pages that need only P0 fish and crops; rock-salt pages (#11, #16, #29, #37) wait for materials.",
+  "version": "p0-m3a-2026-10-08",
+  "_note": "P0 content (M1 homestead + M2 fish/cook/eat) (gameplay plan v2: §3.1.1 energy, §3.3.2 costs, §4.2.1 level-difference, §4.5 thresholds, §5.2.2 crops, §5.3 planting rules, §5.4.1 farming XP, §9.11.1 stall, §9.13.1 buyback, §14.1.2 start kit; M2: §6.1.2–6.1.3 fishing gates and protection, §6.2.2 fish, §6.3.1 pond weights, §6.4 rod/bait, §6.6.1 cast energy, §6.7.1 fishing XP, §7.2.3–7.2.5 cooking, §7.3 ingredient families, §7.4.1 rarity derivation, §7.6.2 cooking XP, §7.14 recipes, §7.17.1 eating). Shared by server/src/p0 and the Godot client (labels only). M2b: P0 fish list (§17.2.1) — Willow Pond (Pond template) and Willow Creek (River template) on the homestead; mackerel is Coast-only (shown in the Fish-dex, not catchable here). Recipes: the 14 pages that need only P0 fish and crops; rock-salt pages (#11, #16, #29, #37) wait for materials. M3a (SGODOT-228): Homestead Lv1–3 (§8.1–8.3), farm storage (§10.4.8), materials and their buyback (§9.13.1, sources come with SGODOT-162/163), Bag Upgrade I, drinks (§3.4.4, §9.12), counters by role and buyback quotas (§9.11, §9.13.1), compost (§9.11.1, §17.2.1), Row Hoe and the Shanghai Postcard (§9.11.2, §9.11.5), residents Pip and Old Kai with affinity, gifts and gift meals (§3.4.5, §9.4.3–9.4.4, §7.6.3), and the Stall / Market boards (§9.6, §9.13.2). Numbers and copy per Li Bai on SGODOT-228 (b7d8b665, v1.1, 719ce953). Outpost names and keepers live in p0_outposts.json. q(40): Wild Herb is a material and a seasoning like Herb; the Fishing Lv2 gift gives Wild Herb ×3. q(41): Rest needs 2 h since the player last left the homestead (rest_away_h).",
   "energy": {
     "max_base": 200,
     "regen_ms": 240000,
     "bonus_zone": 50,
-    "rest_amount": 60
+    "rest_amount": 60,
+    "rest_away_h": 2
   },
   "day": {
     "utc_offset_hours": 8,
@@ -34,7 +35,8 @@
       "dish": 5,
       "fish": 10,
       "material": 99,
-      "bait": 99
+      "bait": 99,
+      "fert": 99
     }
   },
   "skills": {
@@ -92,7 +94,7 @@
         3
       ],
       [
-        "crop_herb",
+        "wild_herb",
         3
       ],
       [
@@ -295,7 +297,8 @@
       "seed_chamomile",
       "seed_chili",
       "seed_tomato",
-      "bait_worm"
+      "bait_worm",
+      "fert_compost"
     ]
   },
   "rarity_names": [
@@ -491,6 +494,14 @@
       "skill": "fishing",
       "gate": 2,
       "daily": 30
+    },
+    "fert_compost": {
+      "name": "Compost",
+      "price": 2,
+      "skill": "farming",
+      "gate": 3,
+      "daily": 40,
+      "grow_mult": 0.8
     }
   },
   "cooking": {
@@ -619,7 +630,8 @@
         "in": [
           "fish_crucian"
         ],
-        "known": true
+        "known": true,
+        "style": "Grilled"
       },
       {
         "id": "dish_herb_grilled_fish",
@@ -627,14 +639,16 @@
         "in": [
           "W1",
           "S1"
-        ]
+        ],
+        "style": "Grilled"
       },
       {
         "id": "dish_grilled_fish",
         "name": "Grilled Fish",
         "in": [
           "W1"
-        ]
+        ],
+        "style": "Grilled"
       },
       {
         "id": "dish_carp_cakes",
@@ -642,7 +656,8 @@
         "in": [
           "fish_carp",
           "fish_carp"
-        ]
+        ],
+        "style": "Grilled"
       },
       {
         "id": "dish_mullet_skewers",
@@ -650,7 +665,8 @@
         "in": [
           "fish_mullet",
           "fish_mullet"
-        ]
+        ],
+        "style": "Grilled"
       },
       {
         "id": "dish_radish_salad",
@@ -659,14 +675,16 @@
           "crop_radish",
           "crop_lettuce"
         ],
-        "known": true
+        "known": true,
+        "style": "Salad"
       },
       {
         "id": "dish_veggie_plate",
         "name": "Veggie Plate",
         "in": [
           "F1"
-        ]
+        ],
+        "style": "Salad"
       },
       {
         "id": "dish_carrot_cake",
@@ -674,7 +692,8 @@
         "in": [
           "crop_carrot",
           "crop_carrot"
-        ]
+        ],
+        "style": "Dessert"
       },
       {
         "id": "dish_fish_soup",
@@ -682,28 +701,32 @@
         "in": [
           "W1",
           "F1"
-        ]
+        ],
+        "style": "Soup"
       },
       {
         "id": "dish_pan_fried_fish",
         "name": "Pan-Fried Fish",
         "in": [
           "W2"
-        ]
+        ],
+        "style": "Grilled"
       },
       {
         "id": "dish_fruit_tea",
         "name": "Fruit Tea",
         "in": [
           "O2"
-        ]
+        ],
+        "style": "Tea"
       },
       {
         "id": "dish_roast_veggies",
         "name": "Roast Veggies",
         "in": [
           "F2"
-        ]
+        ],
+        "style": "Grilled"
       },
       {
         "id": "dish_herb_baked_perch",
@@ -711,7 +734,8 @@
         "in": [
           "fish_perch",
           "crop_herb"
-        ]
+        ],
+        "style": "Grilled"
       },
       {
         "id": "dish_bass_tomato_stew",
@@ -719,7 +743,8 @@
         "in": [
           "fish_bass",
           "crop_tomato"
-        ]
+        ],
+        "style": "Stew"
       }
     ]
   },
@@ -769,12 +794,161 @@
       "qty": 2,
       "coins": 14,
       "where": "any pond"
+    },
+    "done_refill_h": 4,
+    "drop_refill_h": 8,
+    "expire_h": 72,
+    "track_max": 3,
+    "qty": [
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        4,
+        4,
+        6
+      ],
+      [
+        7,
+        6,
+        10
+      ]
+    ],
+    "quality_bonus": [
+      0,
+      0.1,
+      0.25
+    ],
+    "floor_rate": 0.8,
+    "boards": {
+      "stall": {
+        "title": "Stall Board",
+        "templates": [
+          "req_sys_crop_basic",
+          "req_sys_fish_common",
+          "req_sys_dish_common",
+          "req_sys_material_wood"
+        ]
+      },
+      "market": {
+        "title": "Market Board",
+        "slots": 2,
+        "templates": [
+          "req_sys_crop_mixed",
+          "req_sys_fish_fine",
+          "req_sys_dish_fine"
+        ]
+      }
+    },
+    "templates": {
+      "req_sys_crop_basic": {
+        "title": "Fresh Greens",
+        "need": {
+          "kind": "crop",
+          "same": true
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "farming",
+            1
+          ]
+        ],
+        "bonus": 10
+      },
+      "req_sys_fish_common": {
+        "title": "Pond Catch",
+        "need": {
+          "kind": "fish",
+          "rarity": 1
+        },
+        "skill": "fishing",
+        "gate": [
+          [
+            "fishing",
+            1
+          ]
+        ],
+        "bonus": 10
+      },
+      "req_sys_dish_common": {
+        "title": "Home Cooking",
+        "need": {
+          "kind": "dish",
+          "rarity": 1
+        },
+        "skill": "cooking",
+        "gate": [],
+        "bonus": 10
+      },
+      "req_sys_material_wood": {
+        "title": "Timber Run",
+        "need": {
+          "kind": "material",
+          "id": "wood"
+        },
+        "skill": "farming",
+        "gate": [],
+        "bonus": 10,
+        "enabled": false
+      },
+      "req_sys_crop_mixed": {
+        "title": "Market Basket",
+        "need": {
+          "kind": "crop",
+          "distinct": 3
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "farming",
+            4
+          ]
+        ],
+        "bonus": 20
+      },
+      "req_sys_fish_fine": {
+        "title": "Dusk Haul",
+        "need": {
+          "kind": "fish",
+          "rarity": 2
+        },
+        "skill": "fishing",
+        "gate": [
+          [
+            "fishing",
+            3
+          ]
+        ],
+        "bonus": 20
+      },
+      "req_sys_dish_fine": {
+        "title": "A Proper Meal",
+        "need": {
+          "kind": "dish",
+          "rarity": 2
+        },
+        "skill": "cooking",
+        "gate": [
+          [
+            "farming",
+            4
+          ],
+          [
+            "fishing",
+            4
+          ]
+        ],
+        "bonus": 20
+      }
     }
   },
   "tackle": {
     "keeper": {
       "role": "Tackle Keeper",
-      "name": "Old Kai"
+      "name": "Finn"
     },
     "buy": [
       "rod_reed",
@@ -789,7 +963,379 @@
     "names": {
       "hoe_starter": "Starter Hoe",
       "pick_starter": "Starter Pickaxe",
-      "sword_wooden": "Wooden Sword"
+      "sword_wooden": "Wooden Sword",
+      "tool_row_hoe": "Row Hoe"
+    },
+    "row_hoe": {
+      "id": "tool_row_hoe",
+      "price": 240,
+      "skill": "farming",
+      "gate": 4,
+      "sow": 3
     }
+  },
+  "materials": {
+    "wood": {
+      "name": "Timber",
+      "price": 2
+    },
+    "stone": {
+      "name": "Stone",
+      "price": null
+    },
+    "fiber": {
+      "name": "Reeds",
+      "price": 1
+    },
+    "copper_ore": {
+      "name": "Copper Ore",
+      "price": 4
+    },
+    "rock_salt": {
+      "name": "Rock Salt",
+      "price": 2,
+      "ingr": [
+        "S",
+        1
+      ]
+    },
+    "clay": {
+      "name": "Clay",
+      "price": 2
+    },
+    "wild_herb": {
+      "name": "Wild Herb",
+      "price": 1,
+      "ingr": [
+        "S",
+        1
+      ]
+    }
+  },
+  "wallet_floor": 40,
+  "homestead": {
+    "max_level": 3,
+    "per_level": {
+      "energy": 10,
+      "meals": 10
+    },
+    "board_slots": [
+      [
+        1,
+        2
+      ],
+      [
+        3,
+        3
+      ]
+    ],
+    "levels": [
+      {
+        "level": 2,
+        "coins": 250,
+        "skills": 3,
+        "materials": [
+          [
+            "wood",
+            12
+          ],
+          [
+            "stone",
+            8
+          ],
+          [
+            "fiber",
+            6
+          ],
+          [
+            "rock_salt",
+            3
+          ]
+        ],
+        "unlocks": [
+          "spice_rack"
+        ]
+      },
+      {
+        "level": 3,
+        "coins": 400,
+        "skills": 5,
+        "materials": [
+          [
+            "wood",
+            16
+          ],
+          [
+            "stone",
+            12
+          ],
+          [
+            "fiber",
+            10
+          ],
+          [
+            "clay",
+            4
+          ],
+          [
+            "rock_salt",
+            4
+          ]
+        ],
+        "unlocks": [
+          "warming_cabinet",
+          "bag_upgrade_1",
+          "board_slot_3",
+          "fence"
+        ]
+      }
+    ]
+  },
+  "bag_upgrades": [
+    {
+      "id": "bag_upgrade_1",
+      "name": "Bag Upgrade I",
+      "homestead": 3,
+      "price": 150,
+      "materials": [
+        [
+          "fiber",
+          10
+        ],
+        [
+          "wood",
+          6
+        ]
+      ],
+      "capacity": 30
+    }
+  ],
+  "drinks": {
+    "energy": 30,
+    "prices": [
+      40,
+      50,
+      60
+    ],
+    "daily": 3,
+    "items": {
+      "drink_hot_tea": {
+        "name": "Hot Tea",
+        "shop": "tea"
+      },
+      "drink_coffee": {
+        "name": "Coffee",
+        "shop": "post"
+      }
+    }
+  },
+  "specialty": {
+    "postcard_shanghai": {
+      "name": "Shanghai Postcard",
+      "price": 100,
+      "shop": "market",
+      "to": "storage"
+    }
+  },
+  "shops": {
+    "homestead": {
+      "sells": "stall",
+      "buys": {
+        "crop": {
+          "rate": 1,
+          "quota": null
+        },
+        "fish": {
+          "rate": 1,
+          "quota": null
+        },
+        "dish": {
+          "rate": 1,
+          "quota": "dish"
+        },
+        "material": {
+          "rate": 1,
+          "quota": "material"
+        }
+      }
+    },
+    "tackle": {
+      "sells": "tackle",
+      "buys": {
+        "fish": {
+          "rate": 0.8,
+          "quota": "fish_tackle"
+        }
+      }
+    },
+    "market": {
+      "sells": "market",
+      "buys": {}
+    },
+    "tea": {
+      "sells": "drinks",
+      "buys": {}
+    },
+    "post": {
+      "sells": "drinks",
+      "buys": {}
+    }
+  },
+  "market": {
+    "buy": [
+      "tool_row_hoe"
+    ],
+    "specialty": [
+      "postcard_shanghai"
+    ]
+  },
+  "quotas": {
+    "fish_tackle": {
+      "cap": 80,
+      "scope": "any Tackle Shop"
+    },
+    "dish": {
+      "cap": 120,
+      "scope": "Homestead Stall"
+    },
+    "material": {
+      "cap": 30,
+      "scope": "Homestead Stall"
+    },
+    "request_bonus": {
+      "cap": 100,
+      "scope": "all requests"
+    },
+    "sys_requests": {
+      "cap": 6,
+      "scope": "Stall Board and Market Board"
+    }
+  },
+  "affinity": {
+    "stages": [
+      [
+        "Stranger",
+        0
+      ],
+      [
+        "Acquainted",
+        15
+      ],
+      [
+        "Familiar",
+        45
+      ],
+      [
+        "Trusted",
+        90
+      ],
+      [
+        "Kindred",
+        150
+      ]
+    ],
+    "first_chat": 2,
+    "request": 5,
+    "gift": {
+      "loved_fine": 3,
+      "liked": 2,
+      "any": 1,
+      "perfect": 1,
+      "cap": 4,
+      "chef_touch": {
+        "cooking": 9,
+        "bonus": 1,
+        "cap": 5
+      },
+      "mystery": -2
+    },
+    "gift_meal_stage": "Familiar",
+    "mystery_line": "Oh… thanks, I suppose."
+  },
+  "residents": {
+    "res_pip": {
+      "name": "Pip",
+      "role": "Courier Kid",
+      "portrait": "pip",
+      "likes": "Dessert",
+      "gift_meal": "dish_carrot_cake",
+      "one_per_day": true,
+      "lines": {
+        "Stranger": "Hi! I'm Pip. I carry letters all over Shanghai.",
+        "Acquainted": "You again! Got anything sweet?",
+        "Familiar": "I saved you something. Don't tell the others.",
+        "mystery": "Um… thanks? I'll save it for later."
+      },
+      "requests": [
+        {
+          "id": "req_res_pip_1",
+          "title": "Pip's First Fish",
+          "text": "Could you catch me a fish? Any kind is fine.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "fish",
+            "rarity": 1
+          },
+          "qty": 1,
+          "coins": 20
+        },
+        {
+          "id": "req_res_pip_2",
+          "title": "Five Little Plots",
+          "text": "Plant five plots for me? I want to watch them grow.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "sow"
+          },
+          "qty": 5,
+          "coins": 20
+        },
+        {
+          "id": "req_res_pip_3",
+          "title": "Lunch for Pip",
+          "text": "I'm starving. Any dish will do!",
+          "stage": "Stranger",
+          "need": {
+            "kind": "dish"
+          },
+          "qty": 1,
+          "coins": 20
+        }
+      ]
+    },
+    "res_old_kai": {
+      "name": "Old Kai",
+      "role": "Harbour Elder",
+      "portrait": "kai",
+      "likes": "Grilled",
+      "gift_meal": "dish_grilled_crucian",
+      "one_per_day": true,
+      "lines": {
+        "Stranger": "Hm. You fish?",
+        "Acquainted": "Fish bite early here.",
+        "Familiar": "Sit. I grilled too much again.",
+        "mystery": "Hm. That's… a choice."
+      },
+      "requests": [
+        {
+          "id": "req_res_kai_1",
+          "title": "An Old Man's Catch",
+          "text": "Bring me a Rare fish. Haven't seen one in weeks.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "fish",
+            "rarity": 3
+          },
+          "qty": 1,
+          "coins": 50
+        }
+      ]
+    }
+  },
+  "profile": {
+    "name": "Farmer",
+    "city": "Shanghai",
+    "climate": "Subtropical",
+    "farm_name": "Farmer's Homestead"
   }
 }
