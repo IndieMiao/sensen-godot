@@ -1,0 +1,414 @@
+{
+  "scene": "bakery",
+  "scope": "Only shared particle flame integration, existing hearth light flicker and masked ember emission. No atlas rebake or physical-device claim.",
+  "shared_library_commit": "5e5bf6af",
+  "renderer": {
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "colliders": 23,
+    "finite_aabbs": true,
+    "material_count": 6,
+    "mesh_instances": 39,
+    "particle_capacity": 18,
+    "particle_emitters": 2,
+    "renderer": "mobile",
+    "resolution": [
+      1440,
+      1080
+    ],
+    "scene": "bakery",
+    "surfaces": 39,
+    "triangles": 180291
+  },
+  "asset_stats": {
+    "atlas": {
+      "size": [
+        2048,
+        2048
+      ],
+      "file": "room_albedo_ao.png",
+      "purpose": "base colour + static contact ambient occlusion; no baked direct light"
+    },
+    "assets": [
+      {
+        "name": "room_shell",
+        "vertices": 9896,
+        "triangles": 19088,
+        "surfaces": 1,
+        "bytes": 658384
+      },
+      {
+        "name": "window_wall",
+        "vertices": 168,
+        "triangles": 324,
+        "surfaces": 1,
+        "bytes": 12512
+      },
+      {
+        "name": "back_wall",
+        "vertices": 476,
+        "triangles": 948,
+        "surfaces": 1,
+        "bytes": 45832
+      },
+      {
+        "name": "back_window_left",
+        "vertices": 600,
+        "triangles": 1188,
+        "surfaces": 1,
+        "bytes": 37124
+      },
+      {
+        "name": "back_window_left_garden",
+        "vertices": 4,
+        "triangles": 2,
+        "surfaces": 1,
+        "bytes": 1512
+      },
+      {
+        "name": "back_window_right",
+        "vertices": 600,
+        "triangles": 1188,
+        "surfaces": 1,
+        "bytes": 37124
+      },
+      {
+        "name": "back_window_right_garden",
+        "vertices": 4,
+        "triangles": 2,
+        "surfaces": 1,
+        "bytes": 1516
+      },
+      {
+        "name": "brick_oven",
+        "vertices": 3872,
+        "triangles": 7368,
+        "surfaces": 1,
+        "bytes": 288792
+      },
+      {
+        "name": "baking_loaves",
+        "vertices": 796,
+        "triangles": 1584,
+        "surfaces": 1,
+        "bytes": 47376
+      },
+      {
+        "name": "oven_peel",
+        "vertices": 112,
+        "triangles": 216,
+        "surfaces": 1,
+        "bytes": 8808
+      },
+      {
+        "name": "pastry_display",
+        "vertices": 784,
+        "triangles": 1512,
+        "surfaces": 1,
+        "bytes": 53472
+      },
+      {
+        "name": "display_frame",
+        "vertices": 140,
+        "triangles": 264,
+        "surfaces": 1,
+        "bytes": 12436
+      },
+      {
+        "name": "display_glass",
+        "vertices": 10,
+        "triangles": 8,
+        "surfaces": 1,
+        "bytes": 1792
+      },
+      {
+        "name": "checkout_counter",
+        "vertices": 448,
+        "triangles": 864,
+        "surfaces": 1,
+        "bytes": 31148
+      },
+      {
+        "name": "bread_motto",
+        "vertices": 13566,
+        "triangles": 20492,
+        "surfaces": 1,
+        "bytes": 1735836
+      },
+      {
+        "name": "sink_cabinet",
+        "vertices": 1736,
+        "triangles": 3356,
+        "surfaces": 1,
+        "bytes": 119132
+      },
+      {
+        "name": "back_counter",
+        "vertices": 452,
+        "triangles": 876,
+        "surfaces": 1,
+        "bytes": 30292
+      },
+      {
+        "name": "pantry",
+        "vertices": 336,
+        "triangles": 648,
+        "surfaces": 1,
+        "bytes": 23684
+      },
+      {
+        "name": "jar_wall_shelves",
+        "vertices": 392,
+        "triangles": 756,
+        "surfaces": 1,
+        "bytes": 27428
+      },
+      {
+        "name": "bakery_rack",
+        "vertices": 7666,
+        "triangles": 15172,
+        "surfaces": 1,
+        "bytes": 452588
+      },
+      {
+        "name": "baking_workbench",
+        "vertices": 672,
+        "triangles": 1296,
+        "surfaces": 1,
+        "bytes": 46032
+      },
+      {
+        "name": "cafe_table",
+        "vertices": 288,
+        "triangles": 556,
+        "surfaces": 1,
+        "bytes": 23396
+      },
+      {
+        "name": "cafe_rope_rug",
+        "vertices": 6608,
+        "triangles": 13148,
+        "surfaces": 1,
+        "bytes": 559200
+      },
+      {
+        "name": "display_shelves",
+        "vertices": 168,
+        "triangles": 324,
+        "surfaces": 1,
+        "bytes": 12540
+      },
+      {
+        "name": "bakery_sign",
+        "vertices": 3453,
+        "triangles": 5349,
+        "surfaces": 1,
+        "bytes": 418928
+      },
+      {
+        "name": "cafe_chair",
+        "vertices": 514,
+        "triangles": 988,
+        "surfaces": 1,
+        "bytes": 41352
+      },
+      {
+        "name": "back_counter_dressing",
+        "vertices": 7298,
+        "triangles": 14024,
+        "surfaces": 1,
+        "bytes": 497812
+      },
+      {
+        "name": "prep_dressing",
+        "vertices": 5724,
+        "triangles": 10804,
+        "surfaces": 1,
+        "bytes": 467980
+      },
+      {
+        "name": "wall_and_cafe_dressing",
+        "vertices": 9536,
+        "triangles": 18328,
+        "surfaces": 1,
+        "bytes": 665080
+      },
+      {
+        "name": "wall_lamps",
+        "vertices": 432,
+        "triangles": 832,
+        "surfaces": 1,
+        "bytes": 32832
+      },
+      {
+        "name": "warm_lamps_glow",
+        "vertices": 438,
+        "triangles": 864,
+        "surfaces": 1,
+        "bytes": 26596
+      },
+      {
+        "name": "stocked_pastries",
+        "vertices": 12298,
+        "triangles": 24108,
+        "surfaces": 1,
+        "bytes": 750368
+      }
+    ],
+    "unique_triangles": 166477,
+    "scene_triangles": 180291,
+    "static_draw_surfaces": 39,
+    "glb_bytes": 7168904,
+    "atlas_bytes": 2626384,
+    "placed_instances": 39,
+    "materials": 4,
+    "local_scene_triangles": 167465,
+    "shared_scene_triangles": 12826,
+    "shared_assets": [
+      {
+        "name": "olive_tree",
+        "vertices": 3268,
+        "triangles": 2868,
+        "surfaces": 1,
+        "bytes": 123052
+      },
+      {
+        "name": "peace_lily",
+        "vertices": 620,
+        "triangles": 946,
+        "surfaces": 1,
+        "bytes": 26780
+      },
+      {
+        "name": "pothos",
+        "vertices": 1670,
+        "triangles": 2048,
+        "surfaces": 1,
+        "bytes": 67012
+      }
+    ],
+    "plant_budget_triangles": 31154,
+    "budget_limits": {
+      "placed_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "budget_passed": true,
+    "archived_assets": [
+      {
+        "name": "fire",
+        "vertices": 480,
+        "triangles": 944,
+        "surfaces": 1,
+        "bytes": 22360
+      }
+    ],
+    "particles": {
+      "library_commit": "5e5bf6af",
+      "capacity": 18,
+      "limit": 40,
+      "emitters": 2,
+      "dynamic_draws": 2
+    }
+  },
+  "effects": [
+    {
+      "name": "fx_hearth_fire",
+      "scene": "res://assets/rooms/_shared/fx/fx_hearth_fire.tscn",
+      "position": [
+        -2.28,
+        1.09,
+        -1.99
+      ],
+      "emission_box": [
+        0.24,
+        0.006,
+        0.02
+      ],
+      "flame_height": 0.49,
+      "flame_count": 16,
+      "spark_count": 2,
+      "flame_lifetime": 0.72,
+      "flicker_strength": 0.08,
+      "light": {
+        "position": [
+          -2.25,
+          1.52,
+          -1.4
+        ],
+        "color": "FF9137",
+        "range": 3.0,
+        "energy": 1.3
+      }
+    }
+  ],
+  "ember_surfaces": [
+    {
+      "asset": "brick_oven",
+      "min": [
+        -0.6,
+        1.0,
+        0.06
+      ],
+      "max": [
+        0.6,
+        1.34,
+        0.16
+      ],
+      "energy": 0.22
+    }
+  ],
+  "character_checks": 34,
+  "character_passed": true,
+  "motion": {
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "capture": "8 second real-time X11 video; no speed adjustment",
+    "frame_draw_calls": [
+      31,
+      31,
+      31,
+      31,
+      31,
+      31,
+      31,
+      31,
+      31
+    ],
+    "light_base": 1.3,
+    "light_max": 1.40254127979279,
+    "light_min": 1.20541322231293,
+    "light_position": [
+      -2.25,
+      1.51999998092651,
+      -1.39999997615814
+    ],
+    "particle_capacity": 18,
+    "passed": true,
+    "renderer": "mobile",
+    "scene": "bakery"
+  },
+  "particle_frames_nonblank_and_different": true,
+  "sample_mean_rgb_change_255": [
+    1.5569695216049382,
+    1.6150704089506174
+  ],
+  "hearth_video_sha256": "4b24422870b41b7858281e7acca2ce59a114a7621e2d396f92fd92f595adcf28",
+  "hearth_video_seconds": 8,
+  "preservation_passed": true,
+  "render_control_mean_rgb_255": 0.00022483710562414265,
+  "hashes": {
+    "assets/rooms/bakery/layout.json": "916a98777f5af0683ca79fbc24d70c6cafaa57656184130ebbc4ab8ec67dcf29",
+    "assets/rooms/bakery/asset_stats.json": "a0fefedda3a2a261dc7a93df5fd03e29161b432fbaac36cc6301a65ef031b74a",
+    "tools/art/source/bakery/bakery.blend": "98fbc59fde6f4b467090a0d6465e548b2a57131b56ac3c46dd960147227edfe8",
+    "scenes/bakery/bakery_art.gd": "a8a0e73b86841ca7764acd69f885b61f34b9f2241120280c0a41d5d3f156752d",
+    "scenes/room_effects/ember_surface.gdshader": "608f0fc5a64e606d138e464c717eeabe9a5827be944846559d63a739a2fe81b1",
+    "scenes/room_effects/hearth_fx_adapter.gd": "9254264283094b85877c6d89dc2a822140ccfcdc50f3a6fd864432d99e09a57a",
+    "assets/rooms/_shared/fx/fx_hearth_fire.tscn": "31efd4d0180d6f5068c4489375262663a39dc2416daff2f8e000329ac4839840",
+    "assets/rooms/_shared/fx/fx_chimney_smoke.gd": "5ad397973a66f7c43c8214612dd1709c0878e971f69b62ad75457bf0f03d8b00",
+    "assets/rooms/_shared/fx/particle_style.gd": "ed7bc15a18bf39e1333cdf928276948ce4d48c7b9005c9e5cc1ee29b47ab09ff",
+    "assets/rooms/_shared/fx/fx_hearth_fire.gd": "419877833642c91d5496c674d228d2a1d35029e3c218240308bcc45385568259",
+    "assets/rooms/_shared/fx/smoke_strip.png": "65d41a4e5922fa604de14d691230f77d6f2b50aa0e131a882caad2f6086ac498",
+    "assets/rooms/_shared/fx/fx_chimney_smoke.tscn": "993a0644202e80940d80e5d8ad692e198e8e5df4107e322ffc2e566b6fcd0e89",
+    "assets/rooms/_shared/fx/spark.png": "c5b2a521157c111e818b19eb0a388c9f570d5fcbc753b2da73151b04cbbf5900",
+    "assets/rooms/_shared/fx/flame_strip.png": "58e86c18c95b957259ea68e8bf8847aa34ced94819fe88241539b5f30d57ff58"
+  }
+}

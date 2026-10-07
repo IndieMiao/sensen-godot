@@ -170,13 +170,6 @@
       "bytes": 559200
     },
     {
-      "name": "fire",
-      "vertices": 480,
-      "triangles": 944,
-      "surfaces": 1,
-      "bytes": 22360
-    },
-    {
       "name": "display_shelves",
       "vertices": 168,
       "triangles": 324,
@@ -240,14 +233,14 @@
       "bytes": 750368
     }
   ],
-  "unique_triangles": 167421,
-  "scene_triangles": 181235,
-  "static_draw_surfaces": 40,
-  "glb_bytes": 7191264,
+  "unique_triangles": 166477,
+  "scene_triangles": 180291,
+  "static_draw_surfaces": 39,
+  "glb_bytes": 7168904,
   "atlas_bytes": 2626384,
-  "placed_instances": 40,
+  "placed_instances": 39,
   "materials": 4,
-  "local_scene_triangles": 168409,
+  "local_scene_triangles": 167465,
   "shared_scene_triangles": 12826,
   "shared_assets": [
     {
@@ -278,5 +271,21 @@
     "plant_triangles": 100000,
     "static_surfaces": 60
   },
-  "budget_passed": true
+  "budget_passed": true,
+  "archived_assets": [
+    {
+      "name": "fire",
+      "vertices": 480,
+      "triangles": 944,
+      "surfaces": 1,
+      "bytes": 22360
+    }
+  ],
+  "particles": {
+    "library_commit": "5e5bf6af",
+    "capacity": 18,
+    "limit": 40,
+    "emitters": 2,
+    "dynamic_draws": 2
+  }
 }

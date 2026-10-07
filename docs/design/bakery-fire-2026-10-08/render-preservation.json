@@ -1,0 +1,8 @@
+{
+  "scene": "bakery",
+  "mean_rgb_255": 0.00022483710562414265,
+  "maximum_channel_difference": 5,
+  "changed_pixels": 891,
+  "controls": "Static flames/new particles hidden;new ember emission disabled;hearth light fixed tooriginalbase. Same camera/lighting/room assets.",
+  "passed": true
+}
