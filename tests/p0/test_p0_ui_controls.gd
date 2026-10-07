@@ -113,6 +113,10 @@ func test_map_keeps_only_bag_and_hides_the_keys() -> void:
 	assert_bool(ui._bar.visible).is_true()
 	assert_bool(ui._bar.bag_only).is_true()
 	assert_bool(ui._keys.visible).is_false()
+	ui.set_surface("room")   # farmhouse kitchen / outpost rooms: Bag only, no keys
+	assert_bool(ui._bar.visible).is_true()
+	assert_bool(ui._bar.bag_only).is_true()
+	assert_bool(ui._keys.visible).is_false()
 	ui.set_surface("busy")
 	assert_bool(ui._bar.visible).is_false()
 	ui.set_surface("farm")

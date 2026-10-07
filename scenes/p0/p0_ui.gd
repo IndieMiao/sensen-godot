@@ -366,8 +366,7 @@ func set_surface(name: String) -> void:
 	pad.visible = world
 	_keys.visible = action and _modal == null
 	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
-	# Action spaces show the full bar; the map keeps only Bag (MAP-1, §10.3.5); busy worlds hide it.
-	_bar.visible = (action or (name == "map" and map_bag)) and _modal == null
+	_bar.visible = _bar_shown() and _modal == null
 	_bar.bag_only = not action
 	_bar_sig = []
 	if _radial.visible: _radial.close()
@@ -375,6 +374,11 @@ func set_surface(name: String) -> void:
 	if _dev_box: _dev_box.visible = world
 	for c in _cards.values(): (c as Control).visible = false
 	for b in _badges.values(): (b as Control).visible = false
+
+## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
+## or switch key (MAP-1, §10.3.5, o(8)); the map waits for map_bag. Busy worlds hide it.
+func _bar_shown() -> bool:
+	return surface in ["farm", "pond", "room"] or (surface == "map" and map_bag)
 
 func set_mode(mode: String, place := "") -> void:
 	if place != "": set_place(place)
@@ -619,7 +623,7 @@ func _drop_modal() -> void:
 	_modal = null
 	modal_kind = ""
 	_keys.visible = surface in ["farm", "pond"]
-	_bar.visible = surface in ["farm", "pond"] or (surface == "map" and map_bag)
+	_bar.visible = _bar_shown()
 	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
