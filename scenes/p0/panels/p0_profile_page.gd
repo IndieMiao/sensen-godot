@@ -60,7 +60,9 @@ func _init(view_: Dictionary = {}, safe_top_ := 0.0) -> void:
 	_body.add_theme_constant_override(&"separation", 0)
 	pad.add_child(_body)
 	top_bar = UiProfileTopBar.new(UiProfileTopBar.Kind.SELF, "Profile")
-	top_bar.show_settings = false   # TODO(SGODOT-225 / LOCK-22): show the gear once P0 has a Settings page (奕星 to confirm)
+	# TODO(LOCK-22): P0 has no Settings page (cut from the demo, 2026-10-08); show the gear again when first-run /
+	# Settings come back.
+	top_bar.show_settings = false
 	top_bar.back_pressed.connect(func(): back_pressed.emit())
 	top_bar.settings_pressed.connect(func(): settings_pressed.emit())
 	_body.add_child(top_bar)

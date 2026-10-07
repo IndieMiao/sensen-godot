@@ -179,6 +179,24 @@ func test_filter_and_cell_gestures_pass_through_with_the_item() -> void:
 	g.cells()[5].gesture.emit({kind = &"long_press", pos = Vector2.ZERO})   # an empty cell: nothing
 	assert_array(got).is_equal([["it6", "long_press"]])
 
+func test_kitchen_density_draws_kitchen_cells_with_status_and_mark() -> void:
+	var g := UiInventoryGrid.new()
+	g.custom_minimum_size = Vector2(336, 240)
+	g.density = UiItemCell.Density.KITCHEN
+	var it := _items(2)
+	it[0]["status"] = "In pot"
+	it[1]["status"] = "Not for cooking"
+	it[1]["marked"] = true
+	g.items = it
+	_host(g)
+	await _settle()
+	var c0 := g.cells()[0]
+	assert_int(c0.density).is_equal(UiItemCell.Density.KITCHEN)
+	assert_vector(c0.size).is_equal(Vector2(UiTokens.SIZE_KITCHEN_CELL_W, UiTokens.SIZE_KITCHEN_CELL_H))
+	assert_str(c0.status).is_equal("In pot")
+	assert_bool(g.cells()[1].marked).is_true()
+	assert_float(g.cells()[5].position.y - c0.position.y).is_equal(float(UiTokens.SIZE_KITCHEN_CELL_H) + 6.0)
+
 func test_grid_scrolls_vertically_only() -> void:
 	var g := _grid(25)
 	await _settle()

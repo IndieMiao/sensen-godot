@@ -10,6 +10,8 @@ extends TouchScrollContainer
 ##   sell_mode  the counter's "Sell here" view: only items `can_sell` accepts are listed (LOCK-15); the rest
 ##              of the bag is not shown, so there is no Sell tab and no greyed cell to explain.
 ## Items are dictionaries: {id, icon (Texture2D), qty, rarity (0–4), ...}; extra keys pass through to the hooks.
+## `density` KITCHEN draws Compact/Kitchen/Cell (52×58) for the cooking drawer's Experiment page (LOCK-20,
+## SGODOT-226); items may then carry `status` ("In pot", "Not for cooking") and `marked` (cooked tick).
 
 signal item_selected(item: Dictionary)
 signal selection_cleared
@@ -20,6 +22,8 @@ signal cell_gesture(item: Dictionary, outcome: Dictionary)
 const COLUMNS := 5
 const _ROW_GAP := 6.0   # rows are 58 apart in the Bag layout (52 cell + 6)
 
+## Cell main: INVENTORY (bag, counter) or KITCHEN (Experiment). Set before the first items.
+var density: UiItemCell.Density = UiItemCell.Density.INVENTORY: set = set_density
 var items: Array = []: set = set_items
 var capacity := 25: set = set_capacity
 ## Extra predicate (item -> bool), e.g. the drawer's category chip; empty = everything.
@@ -44,6 +48,12 @@ func _init() -> void:
 	add_child(_grid)
 
 func set_items(v: Array) -> void: items = v; refresh()
+func set_density(v: UiItemCell.Density) -> void:
+	if v == density: return
+	density = v
+	for c in _cells: c.free()
+	_cells.clear()
+	refresh()
 func set_capacity(v: int) -> void: capacity = v; refresh()
 func set_filter(v: Callable) -> void: filter = v; refresh()
 func set_sell_mode(v: bool) -> void: sell_mode = v; refresh()
@@ -83,7 +93,7 @@ func refresh() -> void:
 	_shown = items.filter(_listed)
 	var total := maxi(capacity, _shown.size())
 	while _cells.size() < total:
-		var c := UiItemCell.new(UiItemCell.Density.INVENTORY)
+		var c := UiItemCell.new(density)
 		var i := _cells.size()
 		c.tapped.connect(_on_tap.bind(i))
 		c.gesture.connect(_on_gesture.bind(i))
@@ -98,10 +108,14 @@ func refresh() -> void:
 			var qty := int(it.get("qty", 0))
 			c.quantity = "×%d" % qty if qty > 0 else ""
 			c.rarity = int(it.get("rarity", 0))
+			c.status = str(it.get("status", ""))
+			c.marked = bool(it.get("marked", false))
 		else:
 			c.icon = null
 			c.quantity = ""
 			c.rarity = 0
+			c.status = ""
+			c.marked = false
 	if selected_id != "" and _item(selected_id).is_empty():
 		clear_selection()
 	else:
